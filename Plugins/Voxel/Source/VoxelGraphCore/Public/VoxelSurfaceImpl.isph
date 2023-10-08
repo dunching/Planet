@@ -1,0 +1,22 @@
+﻿// Copyright Voxel Plugin, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "VoxelMinimal.isph"
+
+struct FVoxelSurfaceLayer
+{
+	uniform bool bConstantMaterials;
+	const uniform uint16* uniform Materials;
+
+	uniform bool bConstantStrengths;
+	const uniform uint8* uniform Strengths;
+};
+
+struct FVoxelSurfaceWriteLayer
+{
+	uniform uint16* uniform Materials;
+	uniform uint8* uniform Strengths;
+};
+
+#define GVoxelInvalidMaterialId MAX_uint16

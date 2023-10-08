@@ -1,0 +1,23 @@
+Fast noise 2
+MIT: https://github.com/Auburn/FastNoise2/blob/master/LICENSE
+Used as a base for most of the compute voxel noise
+
+opengametools
+MIT: https://github.com/jpaver/opengametools/blob/master/LICENSE.md
+Used as a base for the magica voxel importer
+
+SDFGen
+MIT: https://github.com/christopherbatty/SDFGen/blob/master/README.md
+Used as a base for the mesh voxelizer
+
+miniz
+MIT: https://github.com/richgel999/miniz/blob/master/LICENSE
+Used for zip
+
+Transvoxel
+Custom: https://transvoxel.org/Transvoxel.cpp
+Used for marching cubes
+
+meshoptimizer
+MIT: https://github.com/zeux/meshoptimizer/blob/master/LICENSE.md
+Used for mesh optimization

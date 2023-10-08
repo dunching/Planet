@@ -1,0 +1,65 @@
+// Copyright Voxel Plugin, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "VoxelMinimal.isph"
+
+// ReSharper disable CppCStyleCast
+
+struct FVoxelBuffer
+{
+	void* Data;
+	bool bIsConstant;
+};
+
+FORCEINLINE bool LoadBool(const uniform FVoxelBuffer Buffer, const int32 Index)
+{
+	const bool* uniform BufferPtr = (bool*)Buffer.Data;
+	return Buffer.bIsConstant ? BufferPtr[0] : BufferPtr[Index];
+}
+FORCEINLINE uint8 LoadByte(const uniform FVoxelBuffer Buffer, const int32 Index)
+{
+	const uint8* uniform BufferPtr = (uint8*)Buffer.Data;
+	return Buffer.bIsConstant ? BufferPtr[0] : BufferPtr[Index];
+}
+FORCEINLINE float LoadFloat(const uniform FVoxelBuffer Buffer, const int32 Index)
+{
+	const float* uniform BufferPtr = (float*)Buffer.Data;
+	return Buffer.bIsConstant ? BufferPtr[0] : BufferPtr[Index];
+}
+FORCEINLINE double LoadDouble(const uniform FVoxelBuffer Buffer, const int32 Index)
+{
+	const double* uniform BufferPtr = (double*)Buffer.Data;
+	return Buffer.bIsConstant ? BufferPtr[0] : BufferPtr[Index];
+}
+FORCEINLINE int32 LoadInt32(const uniform FVoxelBuffer Buffer, const int32 Index)
+{
+	const int32* uniform BufferPtr = (int32*)Buffer.Data;
+	return Buffer.bIsConstant ? BufferPtr[0] : BufferPtr[Index];
+}
+
+FORCEINLINE void StoreBool(const uniform FVoxelBuffer Buffer, const int32 Index, const bool bValue)
+{
+	uint8* uniform BufferPtr = (uint8*)Buffer.Data;
+	BufferPtr[Index] = bValue ? 1 : 0;
+}
+FORCEINLINE void StoreByte(const uniform FVoxelBuffer Buffer, const int32 Index, const uint8 Value)
+{
+	uint8* uniform BufferPtr = (uint8*)Buffer.Data;
+	BufferPtr[Index] = Value;
+}
+FORCEINLINE void StoreFloat(const uniform FVoxelBuffer Buffer, const int32 Index, const float Value)
+{
+	float* uniform BufferPtr = (float*)Buffer.Data;
+	BufferPtr[Index] = Value;
+}
+FORCEINLINE void StoreDouble(const uniform FVoxelBuffer Buffer, const int32 Index, const double Value)
+{
+	double* uniform BufferPtr = (double*)Buffer.Data;
+	BufferPtr[Index] = Value;
+}
+FORCEINLINE void StoreInt32(const uniform FVoxelBuffer Buffer, const int32 Index, const int32 Value)
+{
+	int32* uniform BufferPtr = (int32*)Buffer.Data;
+	BufferPtr[Index] = Value;
+}

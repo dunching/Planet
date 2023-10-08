@@ -1,0 +1,28 @@
+// Copyright Voxel Plugin, Inc. All Rights Reserved.
+
+#include "VoxelISPCNodeHelpers.h"
+
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_CrossProduct_2D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_CrossProduct_2D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_CrossProduct_3D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_CrossProduct_3D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Distance2D_3D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Distance2D_3D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Distance_2D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Distance_2D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Distance_3D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Distance_3D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_DotProduct_2D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_DotProduct_2D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_DotProduct_3D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_DotProduct_3D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Length_2D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Length_2D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Length_3D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Length_3D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_LengthXY_3D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_LengthXY_3D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Normalize_2D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Normalize_2D_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Normalize_3D_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelVectorNodes, VoxelNode_Normalize_3D_Float);

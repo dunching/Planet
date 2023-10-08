@@ -1,0 +1,35 @@
+// Copyright Voxel Plugin, Inc. All Rights Reserved.
+
+#include "VoxelISPCNodeHelpers.h"
+
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Acos);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_AcosDegrees);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Asin);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_AsinDegrees);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Atan);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Atan2);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Atan2Degrees);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_AtanDegrees);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_BilinearInterpolation);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Bitwise_And);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Bitwise_Not);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Bitwise_Or);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Bitwise_Xor);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_BooleanNOR);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_BooleanNOT);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_BooleanXOR);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_BreakQuaternion);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Cos);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_CosDegrees);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_DegreesToRadians);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_DistanceToColor);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_GetPI);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_LeftShift);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_MakeQuaternion);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_MakeRotationFromZ);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_RadiansToDegrees);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_RightShift);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Sin);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_SinDegrees);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_Tan);
+REGISTER_VOXEL_NODE_ISPC(VoxelMathNodes, VoxelNode_TanDegrees);

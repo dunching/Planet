@@ -1,0 +1,16 @@
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+SHIYU_API class UShiYuGameInstance* GGameInstancePtr = nullptr;
+
+UWorld* GetWorldImp();
+
+#define GENERATIONCLASSINFO(ThisClassType, ParentClassType) \
+using ThisClass = ThisClassType; \
+using Super = ParentClassType;
+
+#define GENERATIONCLASSINFOONLYTHIS(ThisClassType) \
+using ThisClass = ThisClassType; 
