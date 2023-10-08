@@ -30,30 +30,29 @@ FRotator UGravitySpringComponent::GetTargetRotationOverride() const
 			auto MovementPtr = OwningPawn->GetGravityMovementComponent();
 			if (MovementPtr)
 			{
-				FQuat Quat0(MovementPtr->GravityDirection.Rotation());
-				FQuat Quat1(MovementPtr->GravityDirection, FMath::DegreesToRadians(Yaw));
-				const auto DesiredRot(Quat0 * Quat1);
-				FVector Dir = Quat0.GetAxisY();
+ 				FQuat Quat0(MovementPtr->GravityDirection.Rotation());
+ 
+ 				FQuat Quat1(MovementPtr->GravityDirection, FMath::DegreesToRadians(MovementPtr->Yaw));
+ 
+ 				auto DesiredRot = Quat1 * Quat0;
+ 
+ 				FQuat Quat2(DesiredRot.GetAxisZ(), FMath::DegreesToRadians(MovementPtr->Pitch));
+ 
+ 				DesiredRot = Quat2 * Quat1 * Quat0;
+ 
+ 				DrawDebugLine(GetWorld(),
+ 					OwningPawn->GetActorLocation(),
+ 					OwningPawn->GetActorLocation() + (DesiredRot.GetAxisX() * 200), FColor::Red, false, 3.f);
+ 				
+ 				DrawDebugLine(GetWorld(),
+ 					OwningPawn->GetActorLocation(),
+ 					OwningPawn->GetActorLocation() + (DesiredRot.GetAxisY() * 200), FColor::Green, false, 3.f);
+ 
+                 DrawDebugLine(GetWorld(),
+                     OwningPawn->GetActorLocation(),
+                     OwningPawn->GetActorLocation() + (DesiredRot.GetAxisZ() * 200), FColor::Blue, false, 3.f);
 
-				DrawDebugLine(GetWorld(),
-					OwningPawn->GetActorLocation(),
-					OwningPawn->GetActorLocation() + (Quat0.GetAxisX() * 200), FColor::Red, false, 3.f);
-				
-				DrawDebugLine(GetWorld(),
-					OwningPawn->GetActorLocation(),
-					OwningPawn->GetActorLocation() + (Quat0.GetAxisY() * 200), FColor::Green, false, 3.f);
-
-                DrawDebugLine(GetWorld(),
-                    OwningPawn->GetActorLocation(),
-                    OwningPawn->GetActorLocation() + (Quat0.GetAxisZ() * 200), FColor::Blue, false, 3.f);
-
-                FQuat Quat2(Dir, FMath::DegreesToRadians(Pitch));
-				
-				DrawDebugLine(GetWorld(),
-					OwningPawn->GetActorLocation(),
-					OwningPawn->GetActorLocation() + (DesiredRot.Vector() * 200), FColor::Yellow, false, 3.f);
-
-				return DesiredRot.Rotator();
+				return FRotationMatrix::MakeFromXY(DesiredRot.GetAxisY(), -DesiredRot.GetAxisZ()).Rotator();
 			}
 		}
 	}
@@ -62,7 +61,16 @@ FRotator UGravitySpringComponent::GetTargetRotationOverride() const
 
 void UGravitySpringComponent::UpdateDesiredArmLocation(bool bDoTrace, bool bDoLocationLag, bool bDoRotationLag, float DeltaTime)
 {
-	FRotator DesiredRot = GetTargetRotationOverride();
+	FRotator DesiredRot = GetTargetRotation();
+
+	if (AGravityCharacter* OwningPawn = Cast<AGravityCharacter>(GetOwner()))
+	{
+		auto MovementPtr = OwningPawn->GetGravityMovementComponent();
+		if (MovementPtr)
+		{
+			DesiredRot = FRotator(MovementPtr->Pitch, MovementPtr->Yaw, 0.f);
+		}
+	}
 
 	// If our viewtarget is simulating using physics, we may need to clamp deltatime
 	if (bClampToMaxPhysicsDeltaTime)

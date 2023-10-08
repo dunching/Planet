@@ -17,12 +17,6 @@ public:
 
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sphere)
-	float Yaw = 0.f;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Sphere)
-    float Pitch = 0.f;
-
 protected:	
 	
 	uint8 bOrientRotationToMovement:1;

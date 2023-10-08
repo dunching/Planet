@@ -2437,7 +2437,6 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 
 	FRotator DesiredRotation = CurrentRotation;
 
-
 	if (bOrientRotationToMovement)
 	{
 		DesiredRotation = ComputeOrientToMovementRotation(CurrentRotation, DeltaTime, DeltaRot);
@@ -2457,7 +2456,16 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 	{
 		DesiredRotation = UKismetMathLibrary::MakeRotFromZX(-GravityDirection, CurrentRotation.Vector());
 	}
-	DrawDebugLine(GetWorld(), UpdatedComponent->GetComponentLocation(), UpdatedComponent->GetComponentLocation() + (DesiredRotation.Vector() * 200), FColor::Red, false, 3.f);
+// 
+// 	DrawDebugLine(
+// 		GetWorld(),
+// 		UpdatedComponent->GetComponentLocation(),
+// 		UpdatedComponent->GetComponentLocation() + (Acceleration * 200), FColor::Black, false, 3.f);
+// 
+// 	DrawDebugLine(
+// 		GetWorld(),
+// 		UpdatedComponent->GetComponentLocation(), 
+// 		UpdatedComponent->GetComponentLocation() + (DesiredRotation.Vector() * 200), FColor::Yellow, false, 3.f);
 
 	DesiredRotation.Normalize();
 
@@ -2486,7 +2494,35 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 
 		// Set the new rotation.
 		DesiredRotation.DiagnosticCheckNaN(TEXT("CharacterMovementComponent::PhysicsRotation(): DesiredRotation"));
+
+		if (bOrientRotationToMovement)
+		{
+			IverseYaw(CurrentRotation.Vector(), DesiredRotation.Vector());
+        }
+
 		MoveUpdatedComponent(FVector::ZeroVector, DesiredRotation, /*bSweep*/ false);
+	}
+}
+
+void UGravityMovementComponent::IverseYaw(const FVector& Dir1, const FVector& Dir2)
+{
+	if (Acceleration.SizeSquared() < UE_KINDA_SMALL_NUMBER)
+	{
+	}
+	else
+	{
+		const auto ReDir1 = UKismetMathLibrary::ProjectVectorOnToPlane(Dir1, GravityDirection);
+		const auto ReDir2 = UKismetMathLibrary::ProjectVectorOnToPlane(Dir2, GravityDirection);
+
+		const auto Yaw_ = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(ReDir1, ReDir2)));
+		if (FVector::CrossProduct(ReDir1, ReDir2).Equals(GravityDirection))
+		{
+			Yaw = Yaw_;
+		}
+		else
+		{
+			Yaw = -Yaw_;
+		}
 	}
 }
 

@@ -77,12 +77,17 @@ namespace HorseProcessor
 
 		const auto Dir = FRotationMatrix::MakeFromZX(
 			-OnwerActorPtr->GetGravityMovementComponent()->GravityDirection,
-			OnwerActorPtr->GetSpringArmComponent()->GetForwardVector()
+			OnwerActorPtr->GetCameraComp()->GetForwardVector()
+		).GetUnitAxis(EAxis::X);
+
+		DrawDebugLine(
+			OnwerActorPtr->GetWorld(),
+			OnwerActorPtr->GetActorLocation(),
+			OnwerActorPtr->GetActorLocation() + (Dir * 200),
+			FColor::Blue, false, 3.f
 		);
 
-		DrawDebugLine(OnwerActorPtr->GetWorld(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (Dir.GetUnitAxis(EAxis::X) * 200), FColor::Blue, false, 3.f);
-
-		OnwerActorPtr->AddMovementInput(Dir.GetUnitAxis(EAxis::X), Value);
+		OnwerActorPtr->AddMovementInput(Dir, Value);
 	}
 
 	void FHorseRegularProcessor::MoveRight(const FInputActionValue& InputActionValue)
@@ -92,12 +97,17 @@ namespace HorseProcessor
 
 		const auto Dir = FRotationMatrix::MakeFromZY(
 			-OnwerActorPtr->GetGravityMovementComponent()->GravityDirection,
-			OnwerActorPtr->GetSpringArmComponent()->GetRightVector()
+			OnwerActorPtr->GetCameraComp()->GetRightVector()
+		).GetUnitAxis(EAxis::Y);
+
+		DrawDebugLine(
+			OnwerActorPtr->GetWorld(), 
+			OnwerActorPtr->GetActorLocation(),
+			OnwerActorPtr->GetActorLocation() + (Dir * 200), 
+			FColor::Blue, false, 3.f
 		);
 
-		DrawDebugLine(OnwerActorPtr->GetWorld(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (Dir.GetUnitAxis(EAxis::X) * 200), FColor::Blue, false, 3.f);
-
-		OnwerActorPtr->AddMovementInput(Dir.GetUnitAxis(EAxis::Y), Value);
+		OnwerActorPtr->AddMovementInput(Dir, Value);
 	}
 
 	void FHorseRegularProcessor::MoveUp(const FInputActionValue& InputActionValue)
