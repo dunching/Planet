@@ -1,0 +1,63 @@
+// Created by Alexander Alikin
+// Can be used in any project free of charge,
+// can be modified, cannot be resold
+// Facebook: https://www.facebook.com/aaalikin/
+// Discord: scrappy526
+
+#include "/PlanetOcean/Shaders/DataTypes.ush"
+#include "/PlanetOcean/Shaders/Utils.ush"
+#include "/PlanetOcean/Shaders/Gerstner.ush"
+
+struct FlatGerstner
+{  
+  
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    // Based on Unreal's Gerstner function from Water Plugin. Gerstner waves for flat plane
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    
+    WaveOutput CalculateGerstnerWaves(
+    FMaterialParams MatParams)
+    {
+        // Arbitrary start numbers
+        int2 Seed = int2(10007, 802709);
+        
+        WaveOutput OutWaves = Gerstner::GetAllGerstnerWaves(MatParams._Position, MatParams, Seed);
+        
+        OutWaves.Normal = Gerstner::FinalizeNormal(OutWaves.Normal);
+        OutWaves.FoamMask = Gerstner::FinalizeFoamMask(OutWaves.FoamMask, MatParams._FoamStrength);
+        return OutWaves;
+    }
+
+};
+/////////////////////////////////////////////////////////////////////////////////
+/////// Main function ///////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+FlatGerstner Waves;
+
+
+FMaterialParams MatParams = Utils::CreateFlatOceanParameters(
+WaveCount,
+float2(MinWavelength, MaxWavelength),
+float2(MinSteepness, MaxSteepness),
+float2(MinAmplitude, MaxAmplitude),
+WindDirection,
+Spread,
+WaveDistribution,
+PositionWS,
+Speed,
+Time,
+FoamStrength);
+
+WaveOutput FinalWaves = Waves.CalculateGerstnerWaves(
+    MatParams);
+
+Normal = FinalWaves.Normal;
+FoamMask = FinalWaves.FoamMask;
+
+return FinalWaves.WPO;
+
+////////////////////////////////////////////////////////////////////////////////////////
+/////// End of Main function ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////

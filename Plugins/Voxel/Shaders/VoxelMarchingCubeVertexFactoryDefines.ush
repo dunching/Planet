@@ -1,0 +1,444 @@
+﻿// Copyright Voxel Plugin, Inc. All Rights Reserved.
+
+#if VOXEL_MARCHING_CUBE_VERTEX_FACTORY
+#ifndef VOXEL_MARCHING_CUBE_VERTEX_FACTORY_DEFINES
+#define VOXEL_MARCHING_CUBE_VERTEX_FACTORY_DEFINES 1
+
+#include "Common.ush"
+
+uint NumCells;
+// CellTextureCoordinates[TextureIndex * NumCells + CellIndex]
+Buffer<uint2> CellTextureCoordinates;
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+float3 SampleVoxelNormalImpl(
+	const uint VoxelDetailTexture_CellIndex,
+	const float2 VoxelDetailTexture_Delta,
+	const Texture2D Texture,
+	const SamplerState TextureSampler,
+	const float TextureIndex,
+	const float TextureSize,
+	const float Texture_Size,
+	const float Texture_InvSize,
+	const float2 Offset)
+{
+	const uint2 TextureCoordinates = CellTextureCoordinates[TextureIndex * NumCells + VoxelDetailTexture_CellIndex];
+	float2 UVs = float2(TextureCoordinates.x, TextureCoordinates.y) * TextureSize;
+
+	UVs += 1 + VoxelDetailTexture_Delta * (TextureSize - 2);
+	UVs += clamp(Offset, -1.f, 1.f) / 2.f;
+	UVs *= Texture_InvSize;
+
+#if INTELLISENSE_PARSER
+	uint4 Octahedron_Corners;
+#else
+	const uint4 Octahedron_Corners = asuint(Texture.GatherRed(TextureSampler, UVs));
+#endif
+
+	const float2 Octahedron0 = float2(
+		ByteToFloat(Octahedron_Corners[0] & 0xFF),
+		ByteToFloat(Octahedron_Corners[0] >> 8));
+
+	const float2 Octahedron1 = float2(
+		ByteToFloat(Octahedron_Corners[1] & 0xFF),
+		ByteToFloat(Octahedron_Corners[1] >> 8));
+
+	const float2 Octahedron2 = float2(
+		ByteToFloat(Octahedron_Corners[2] & 0xFF),
+		ByteToFloat(Octahedron_Corners[2] >> 8));
+
+	const float2 Octahedron3 = float2(
+		ByteToFloat(Octahedron_Corners[3] & 0xFF),
+		ByteToFloat(Octahedron_Corners[3] >> 8));
+
+	const float3 Normal0 = OctahedronToUnitVector(Octahedron0 * 2.f - 1.f);
+	const float3 Normal1 = OctahedronToUnitVector(Octahedron1 * 2.f - 1.f);
+	const float3 Normal2 = OctahedronToUnitVector(Octahedron2 * 2.f - 1.f);
+	const float3 Normal3 = OctahedronToUnitVector(Octahedron3 * 2.f - 1.f);
+
+	return normalize(InterpolateGather(Normal0, Normal1, Normal2, Normal3, UVs, Texture_Size));
+}
+
+float3 SampleVoxelNormal(
+	FMaterialVertexParameters Parameters,
+	const Texture2D Texture,
+	const SamplerState TextureSampler,
+	const float TextureIndex,
+	const float TextureSize,
+	const float Texture_Size,
+	const float Texture_InvSize,
+	const float2 Offset)
+{
+#if VERTEX_PARAMETERS_HAS_VoxelDetailTexture_CellIndex && \
+	VERTEX_PARAMETERS_HAS_VoxelDetailTexture_Delta
+	return SampleVoxelNormalImpl(
+		Parameters.VoxelDetailTexture_CellIndex,
+		Parameters.VoxelDetailTexture_Delta,
+		Texture,
+		TextureSampler,
+		TextureIndex,
+		TextureSize,
+		Texture_Size,
+		Texture_InvSize,
+		Offset);
+#else
+	return 0;
+#endif
+}
+
+float3 SampleVoxelNormal(
+	FMaterialPixelParameters Parameters,
+	const Texture2D Texture,
+	const SamplerState TextureSampler,
+	const float TextureIndex,
+	const float TextureSize,
+	const float Texture_Size,
+	const float Texture_InvSize,
+	const float2 Offset)
+{
+#if PIXEL_PARAMETERS_HAS_VoxelDetailTexture_CellIndex && \
+	PIXEL_PARAMETERS_HAS_VoxelDetailTexture_Delta
+	return SampleVoxelNormalImpl(
+		Parameters.VoxelDetailTexture_CellIndex,
+		Parameters.VoxelDetailTexture_Delta,
+		Texture,
+		TextureSampler,
+		TextureIndex,
+		TextureSize,
+		Texture_Size,
+		Texture_InvSize,
+		Offset);
+#else
+	return 0;
+#endif
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+void SampleVoxelMaterialIdImpl(
+	const uint VoxelDetailTexture_CellIndex,
+	const float2 VoxelDetailTexture_Delta,
+	const Texture2D TextureA,
+	const Texture2D TextureB,
+	const SamplerState TextureSampler,
+	const float TextureIndex,
+	const float TextureSize,
+	const float Texture_Size,
+	const float Texture_InvSize,
+	const float2 Offset,
+	out float Layer0,
+	out float Layer1,
+	out float Layer2,
+	out float LerpAlphaA,
+	out float LerpAlphaB)
+{
+	const uint2 TextureCoordinates = CellTextureCoordinates[TextureIndex * NumCells + VoxelDetailTexture_CellIndex];
+	float2 UVs = float2(TextureCoordinates.x, TextureCoordinates.y) * TextureSize;
+
+	UVs += 1 + VoxelDetailTexture_Delta * (TextureSize - 2);
+	UVs += clamp(Offset, -1.f, 1.f) / 2.f;
+	UVs *= Texture_InvSize;
+
+	// 12 bits: IndexA
+	// 12 bits: IndexB
+	// 8 bits: AlphaA
+	const uint4 Packed4A = asuint(TextureA.GatherRed(INTELLISENSE_HIDE(TextureSampler, ) UVs));
+	// 8 bits: AlphaB
+	// 8 bits: AlphaC
+	// 16 bits: IndexC
+	const uint4 Packed4B = asuint(TextureB.GatherRed(INTELLISENSE_HIDE(TextureSampler, ) UVs));
+
+	// Hack to hide frac precision errors
+	const float Hack = 0.50198f;
+	const float4 GatherAlphas = GetGatherAlphas(UVs, Texture_Size, Hack);
+
+	uint Packed[12];
+	{
+		float AlphaA0 = GatherAlphas[0] * ByteToFloat(Packed4A[0] & 0xFF);
+		float AlphaA1 = GatherAlphas[1] * ByteToFloat(Packed4A[1] & 0xFF);
+		float AlphaA2 = GatherAlphas[2] * ByteToFloat(Packed4A[2] & 0xFF);
+		float AlphaA3 = GatherAlphas[3] * ByteToFloat(Packed4A[3] & 0xFF);
+		float AlphaB0 = GatherAlphas[0] * ByteToFloat(Packed4B[0] >> 24);
+		float AlphaB1 = GatherAlphas[1] * ByteToFloat(Packed4B[1] >> 24);
+		float AlphaB2 = GatherAlphas[2] * ByteToFloat(Packed4B[2] >> 24);
+		float AlphaB3 = GatherAlphas[3] * ByteToFloat(Packed4B[3] >> 24);
+		float AlphaC0 = GatherAlphas[0] * ByteToFloat((Packed4B[0] >> 16) & 0xFF);
+		float AlphaC1 = GatherAlphas[1] * ByteToFloat((Packed4B[1] >> 16) & 0xFF);
+		float AlphaC2 = GatherAlphas[2] * ByteToFloat((Packed4B[2] >> 16) & 0xFF);
+		float AlphaC3 = GatherAlphas[3] * ByteToFloat((Packed4B[3] >> 16) & 0xFF);
+
+		uint IndexA0 = Packed4A[0] >> 20;
+		uint IndexA1 = Packed4A[1] >> 20;
+		uint IndexA2 = Packed4A[2] >> 20;
+		uint IndexA3 = Packed4A[3] >> 20;
+		uint IndexB0 = (Packed4A[0] >> 8) & 0xFFF;
+		uint IndexB1 = (Packed4A[1] >> 8) & 0xFFF;
+		uint IndexB2 = (Packed4A[2] >> 8) & 0xFFF;
+		uint IndexB3 = (Packed4A[3] >> 8) & 0xFFF;
+		uint IndexC0 = Packed4B[0] & 0xFFFF;
+		uint IndexC1 = Packed4B[1] & 0xFFFF;
+		uint IndexC2 = Packed4B[2] & 0xFFFF;
+		uint IndexC3 = Packed4B[3] & 0xFFFF;
+
+		// De-duplicate
+
+#define COMP(X, Y) \
+		FLATTEN \
+		if (Index ## X == Index ## Y) \
+		{ \
+			Alpha ## Y += Alpha ## X; \
+			Index ## X = -1; \
+		}
+
+		COMP(A0, A1);
+		COMP(A0, A2);
+		COMP(A0, A3);
+		COMP(A0, B1);
+		COMP(A0, B2);
+		COMP(A0, B3);
+		COMP(A0, C1);
+		COMP(A0, C2);
+		COMP(A0, C3);
+
+		COMP(A1, A2);
+		COMP(A1, A3);
+		COMP(A1, B0);
+		COMP(A1, B2);
+		COMP(A1, B3);
+		COMP(A1, C0);
+		COMP(A1, C2);
+		COMP(A1, C3);
+
+		COMP(A2, A3);
+		COMP(A2, B0);
+		COMP(A2, B1);
+		COMP(A2, B3);
+		COMP(A2, C0);
+		COMP(A2, C1);
+		COMP(A2, C3);
+
+		COMP(A3, B0);
+		COMP(A3, B1);
+		COMP(A3, B2);
+		COMP(A3, C0);
+		COMP(A3, C1);
+		COMP(A3, C2);
+
+		COMP(B0, B1);
+		COMP(B0, B2);
+		COMP(B0, B3);
+		COMP(B0, C1);
+		COMP(B0, C2);
+		COMP(B0, C3);
+
+		COMP(B1, B2);
+		COMP(B1, B3);
+		COMP(B1, C0);
+		COMP(B1, C2);
+		COMP(B1, C3);
+
+		COMP(B2, B3);
+		COMP(B2, C0);
+		COMP(B2, C1);
+		COMP(B2, C3);
+
+		COMP(B3, C0);
+		COMP(B3, C1);
+		COMP(B3, C2);
+
+		COMP(C0, C1);
+		COMP(C0, C2);
+		COMP(C0, C3);
+
+		COMP(C1, C2);
+		COMP(C1, C3);
+
+		COMP(C2, C3);
+
+#undef COMP
+
+		// Alpha is in high bits to allow comparison without masking
+		Packed[0] = IndexA0 == -1 ? 0 : ((uint(floor(AlphaA0 * 100000.999f)) << 12) | IndexA0);
+		Packed[1] = IndexA1 == -1 ? 0 : ((uint(floor(AlphaA1 * 100000.999f)) << 12) | IndexA1);
+		Packed[2] = IndexA2 == -1 ? 0 : ((uint(floor(AlphaA2 * 100000.999f)) << 12) | IndexA2);
+		Packed[3] = IndexA3 == -1 ? 0 : ((uint(floor(AlphaA3 * 100000.999f)) << 12) | IndexA3);
+		Packed[4] = IndexB0 == -1 ? 0 : ((uint(floor(AlphaB0 * 100000.999f)) << 12) | IndexB0);
+		Packed[5] = IndexB1 == -1 ? 0 : ((uint(floor(AlphaB1 * 100000.999f)) << 12) | IndexB1);
+		Packed[6] = IndexB2 == -1 ? 0 : ((uint(floor(AlphaB2 * 100000.999f)) << 12) | IndexB2);
+		Packed[7] = IndexB3 == -1 ? 0 : ((uint(floor(AlphaB3 * 100000.999f)) << 12) | IndexB3);
+		Packed[8] = IndexC0 == -1 ? 0 : ((uint(floor(AlphaC0 * 100000.999f)) << 12) | IndexC0);
+		Packed[9] = IndexC1 == -1 ? 0 : ((uint(floor(AlphaC1 * 100000.999f)) << 12) | IndexC1);
+		Packed[10] = IndexC2 == -1 ? 0 : ((uint(floor(AlphaC2 * 100000.999f)) << 12) | IndexC2);
+		Packed[11] = IndexC3 == -1 ? 0 : ((uint(floor(AlphaC3 * 100000.999f)) << 12) | IndexC3);
+	}
+
+	// Optimized version of https://bertdobbelaere.github.io/sorting_networks_extended.html#N12L39D9 for 3 outputs
+
+#define SWAP(A, B) \
+	FLATTEN \
+	if (Packed[A] < Packed[B]) \
+	{ \
+		const uint Temp = Packed[A]; \
+		Packed[A] = Packed[B]; \
+		Packed[B] = Temp; \
+	}
+
+	SWAP(2, 6);
+	SWAP(1, 7);
+	SWAP(0, 8);
+	SWAP(5, 9);
+	SWAP(4, 10);
+	SWAP(3, 11);
+
+	SWAP(2, 5);
+	SWAP(6, 9);
+
+	SWAP(0, 1);
+	SWAP(3, 4);
+	SWAP(7, 8);
+	SWAP(10, 11);
+
+	SWAP(1, 6);
+	SWAP(0, 2);
+	SWAP(5, 10);
+
+	SWAP(0, 3);
+	SWAP(4, 6);
+
+	SWAP(1, 2);
+	SWAP(5, 7);
+
+	SWAP(3, 5);
+	SWAP(1, 4);
+	SWAP(2, 5);
+	SWAP(1, 3);
+	SWAP(2, 3);
+
+#undef SWAP
+
+	Layer0 = Packed[0] & 0xFFF;
+	Layer1 = Packed[1] & 0xFFF;
+	Layer2 = Packed[2] & 0xFFF;
+
+	float Alpha0 = (Packed[0] >> 12) / 100000.f;
+	float Alpha1 = (Packed[1] >> 12) / 100000.f;
+	float Alpha2 = (Packed[2] >> 12) / 100000.f;
+
+#define SWAP(A, B) \
+	{ \
+		const float Tmp = A; \
+		A = B; \
+		B = Tmp; \
+	}
+
+	if (Layer0 > Layer1)
+	{
+		SWAP(Layer0, Layer1);
+		SWAP(Alpha0, Alpha1);
+	}
+	if (Layer0 > Layer2)
+	{
+		SWAP(Layer0, Layer2);
+		SWAP(Alpha0, Alpha2);
+	}
+	if (Layer1 > Layer2)
+	{
+		SWAP(Layer1, Layer2);
+		SWAP(Alpha1, Alpha2);
+	}
+
+#undef SWAP
+
+	const float Sum = Alpha0 + Alpha1 + Alpha2;
+
+	Alpha0 /= Sum;
+	Alpha1 /= Sum;
+	Alpha2 /= Sum;
+
+	const float Alpha01 = Alpha0 + Alpha1;
+
+	LerpAlphaA = Alpha01 != 0 ? Alpha1 / Alpha01 : 0;
+	LerpAlphaB = Alpha2;
+}
+
+void SampleVoxelMaterialId(
+	FMaterialVertexParameters Parameters,
+	const Texture2D TextureA,
+	const Texture2D TextureB,
+	const SamplerState TextureSampler,
+	const float TextureIndex,
+	const float TextureSize,
+	const float Texture_Size,
+	const float Texture_InvSize,
+	const float2 Offset,
+	out float Layer0,
+	out float Layer1,
+	out float Layer2,
+	out float LerpAlphaA,
+	out float LerpAlphaB)
+{
+#if VERTEX_PARAMETERS_HAS_VoxelDetailTexture_CellIndex && \
+	VERTEX_PARAMETERS_HAS_VoxelDetailTexture_Delta
+	SampleVoxelMaterialIdImpl(
+		Parameters.VoxelDetailTexture_CellIndex,
+		Parameters.VoxelDetailTexture_Delta,
+		TextureA,
+		TextureB,
+		TextureSampler,
+		TextureIndex,
+		TextureSize,
+		Texture_Size,
+		Texture_InvSize,
+		Offset,
+		Layer0,
+		Layer1,
+		Layer2,
+		LerpAlphaA,
+		LerpAlphaB);
+#endif
+}
+
+void SampleVoxelMaterialId(
+	FMaterialPixelParameters Parameters,
+	const Texture2D TextureA,
+	const Texture2D TextureB,
+	const SamplerState TextureSampler,
+	const float TextureIndex,
+	const float TextureSize,
+	const float Texture_Size,
+	const float Texture_InvSize,
+	const float2 Offset,
+	out float Layer0,
+	out float Layer1,
+	out float Layer2,
+	out float LerpAlphaA,
+	out float LerpAlphaB)
+{
+#if PIXEL_PARAMETERS_HAS_VoxelDetailTexture_CellIndex && \
+	PIXEL_PARAMETERS_HAS_VoxelDetailTexture_Delta
+	SampleVoxelMaterialIdImpl(
+		Parameters.VoxelDetailTexture_CellIndex,
+		Parameters.VoxelDetailTexture_Delta,
+		TextureA,
+		TextureB,
+		TextureSampler,
+		TextureIndex,
+		TextureSize,
+		Texture_Size,
+		Texture_InvSize,
+		Offset,
+		Layer0,
+		Layer1,
+		Layer2,
+		LerpAlphaA,
+		LerpAlphaB);
+#endif
+}
+
+#endif
+#endif

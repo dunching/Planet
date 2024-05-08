@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "PlanetOcean",
+	"Description": "Gerstner waves for planets and flat worlds ",
+	"Category": "Other",
+	"CreatedBy": "Alexander Alikin",
+	"CreatedByURL": "Discord: scrappy526",
+	"DocsURL": "https://github.com/script526/WavesGenerator/",
+	"MarketplaceURL": "",
+	"SupportURL": "Discord: scrappy526",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "PlanetOcean",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

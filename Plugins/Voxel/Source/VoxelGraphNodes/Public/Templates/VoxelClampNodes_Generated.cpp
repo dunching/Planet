@@ -1,0 +1,11 @@
+// Copyright Voxel Plugin, Inc. All Rights Reserved.
+
+#include "VoxelISPCNodeHelpers.h"
+
+REGISTER_VOXEL_NODE_ISPC(VoxelClampNodes, VoxelNode_Clamp_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelClampNodes, VoxelNode_Clamp_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelClampNodes, VoxelNode_Clamp_Int);
+REGISTER_VOXEL_NODE_ISPC(VoxelClampNodes, VoxelNode_MappedRangeValueClamped_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelClampNodes, VoxelNode_MappedRangeValueClamped_Float);
+REGISTER_VOXEL_NODE_ISPC(VoxelClampNodes, VoxelNode_MappedRangeValueUnclamped_Double);
+REGISTER_VOXEL_NODE_ISPC(VoxelClampNodes, VoxelNode_MappedRangeValueUnclamped_Float);

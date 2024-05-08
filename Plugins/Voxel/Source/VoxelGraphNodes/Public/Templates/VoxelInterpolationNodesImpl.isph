@@ -1,0 +1,80 @@
+﻿// Copyright Voxel Plugin, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "VoxelMinimal.isph"
+
+FORCEINLINE float InterpStep(float A, float B, float Alpha, int Steps)
+{
+	if (Steps <= 1 ||
+		Alpha <= 0)
+	{
+		return A;
+	}
+	else if (Alpha >= 1)
+	{
+		return B;
+	}
+
+	return lerp(A, B, floor(Alpha * Steps) / (Steps - 1.f));
+}
+
+FORCEINLINE float InterpSinIn(float A, float B, float Alpha)
+{
+	return lerp(A, B, -1.f * cos(Alpha * PI / 2.f) + 1.f);
+}
+
+FORCEINLINE float InterpSinOut(float A, float B, float Alpha)
+{
+	return lerp(A, B, sin(Alpha * PI / 2.f));
+}
+
+FORCEINLINE float InterpSinInOut(float A, float B, float Alpha)
+{
+	return lerp(A, B, (Alpha < 0.5f) ? (InterpSinIn(0.f, 1.f, Alpha * 2.f) * 0.5f) : (InterpSinOut(0.f, 1.f, Alpha * 2.f - 1.f) * 0.5f + 0.5f));
+}
+
+FORCEINLINE float InterpEaseIn(float A, float B, float Alpha, float Exp)
+{
+	return lerp(A, B, pow(clamp(Alpha, 0.f, 1.f), Exp));
+}
+
+FORCEINLINE float InterpEaseOut(float A, float B, float Alpha, float Exp)
+{
+	return lerp(A, B, 1.f - pow(1.f - clamp(Alpha, 0.f, 1.f), Exp));
+}
+
+FORCEINLINE float InterpEaseInOut(float A, float B, float Alpha, float Exp)
+{
+	return lerp(A, B, (Alpha < 0.5f) ? (InterpEaseIn(0.f, 1.f, Alpha * 2.f, Exp) * 0.5f) : (InterpEaseOut(0.f, 1.f, Alpha * 2.f - 1.f, Exp) * 0.5f + 0.5f));
+}
+
+FORCEINLINE float InterpExpoIn(float A, float B, float Alpha)
+{
+	return lerp(A, B, (Alpha == 0.f) ? 0.f : pow(2.f, 10.f * (Alpha - 1.f)));
+}
+
+FORCEINLINE float InterpExpoOut(float A, float B, float Alpha)
+{
+	return lerp(A, B, (Alpha == 1.f) ? 1.f : -pow(2.f, -10.f * Alpha) + 1.f);
+}
+
+FORCEINLINE float InterpExpoInOut(float A, float B, float Alpha)
+{
+	return lerp(A, B, (Alpha < 0.5f) ? (InterpExpoIn(0.f, 1.f, Alpha * 2.f) * 0.5f) : (InterpExpoOut(0.f, 1.f, Alpha * 2.f - 1.f) * 0.5f + 0.5f));
+}
+
+FORCEINLINE float InterpCircularIn(float A, float B, float Alpha)
+{
+	return lerp(A, B, -1.f * (sqrt(1.f - Alpha * Alpha) - 1.f));
+}
+
+FORCEINLINE float InterpCircularOut(float A, float B, float Alpha)
+{
+	return lerp(A, B, sqrt(1.f - ((Alpha - 1.f) * (Alpha - 1.f))));
+}
+
+FORCEINLINE float InterpCircularInOut(float A, float B, float Alpha)
+{
+	return lerp(A, B, (Alpha < 0.5f) ? (InterpCircularIn(0.f, 1.f, Alpha * 2.f) * 0.5f) : (InterpCircularOut(0.f, 1.f, Alpha * 2.f - 1.f) * 0.5f + 0.5f));
+}

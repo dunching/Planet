@@ -1,0 +1,112 @@
+struct PlanetHelpers
+{
+    static float3 CalculateTriplanarMask(const float3 VertexNormalWS, const float BlendSharpness)
+    {
+        float3 FaceBlend = pow(abs(VertexNormalWS), BlendSharpness);
+        float3 Mask = FaceBlend / dot(FaceBlend, float3(1.f, 1.f, 1.f));
+        return Mask;
+    }
+    
+    static FTriplanar GetTriplanarPosition(const float3 InPosition, out float3 RotatedToX, out float3 RotatedToY)
+    {
+        FTriplanar OutTriplanar = (FTriplanar) 0;
+        
+        OutTriplanar.ProjectionX = InPosition.zyx;
+        OutTriplanar.ProjectionY = InPosition.xzy;
+        OutTriplanar.ProjectionZ = InPosition; // xyz already, no need to swizzle
+       
+        return OutTriplanar;
+    }
+};
+
+struct FMath
+{
+    static int2 GetRandomInt2(int2 Seed)
+    {
+        Seed.x *= Seed.x + 12345;
+        Seed.y *= Seed.y + 12345;
+        
+        return Seed;
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    
+    static float3 RotateVector(float3 VectorToRotate, float3 LookAtVector, float3 RestingVector = float3(0.f, 0.f, 1.f))
+    {
+            //float3 LookAtVector = normalize(PositionExcludingOffsets - ObjectPositionWS);
+        const float3 RotationAxis = cross(RestingVector, LookAtVector);
+        const float RotationAngle = acos(dot(RestingVector, LookAtVector)) * 57.29000092 / 360.f * PI * 2.f;
+        const float3 PositionOnAxis = float3(0.f, 0.f, 0.f);
+        VectorToRotate += RotateAboutAxis(float4(RotationAxis.xyz, RotationAngle), PositionOnAxis, VectorToRotate);
+        
+        return VectorToRotate;
+    }
+};
+
+struct Utils
+{
+    static FMaterialParams CreateMaterialParameters(
+        int WaveCount,
+        float2 MinMaxWavelength,
+        float2 MinMaxSteepness,
+        float2 MinMaxAmplitude,
+        float2 WindDirection,
+        float Spread,
+        float WaveDistribution,
+        float3 PositionOS,
+        float3 TriplanarMaskOS,
+        float Speed,
+        float Time,
+        float FoamStrength)
+    {
+        FMaterialParams OutParams = (FMaterialParams) 0;
+        
+        OutParams._WaveCount = WaveCount;
+        OutParams._MinMaxWavelength = MinMaxWavelength;
+        OutParams._MinMaxSteepness = MinMaxSteepness;
+        OutParams._MinMaxAmplitude = MinMaxAmplitude;
+        OutParams._WindDirection = WindDirection;
+        OutParams._Spread = Spread;
+        OutParams._WaveDistribution = WaveDistribution;
+        OutParams._Position = PositionOS;
+        OutParams._TriplanarMaskOS = TriplanarMaskOS;
+        OutParams._Speed = Speed;
+        OutParams._Time = Time;
+        OutParams._FoamStrength = FoamStrength;
+        
+        return OutParams;
+    }
+    
+    
+    static FMaterialParams CreateFlatOceanParameters(
+        int WaveCount,
+        float2 MinMaxWavelength,
+        float2 MinMaxSteepness,
+        float2 MinMaxAmplitude,
+        float2 WindDirection,
+        float Spread,
+        float WaveDistribution,
+        float3 PositionWS,
+        float Speed,
+        float Time,
+        float FoamStrength)
+    {
+        FMaterialParams OutParams = (FMaterialParams)0;
+        
+        OutParams._WaveCount = WaveCount;
+        OutParams._MinMaxWavelength = MinMaxWavelength;
+        OutParams._MinMaxSteepness = MinMaxSteepness;
+        OutParams._MinMaxAmplitude = MinMaxAmplitude;
+        OutParams._WindDirection = WindDirection;
+        OutParams._Spread = Spread;
+        OutParams._WaveDistribution = WaveDistribution;
+        OutParams._Position = PositionWS;
+        OutParams._Speed = Speed;
+        OutParams._Time = Time;
+        OutParams._FoamStrength = FoamStrength;
+        
+        return OutParams;
+    }   
+};

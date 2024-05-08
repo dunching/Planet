@@ -1,0 +1,308 @@
+// Created by Alexander Alikin
+// Can be used in any project free of charge,
+// can be modified, cannot be resold
+// Facebook: https://www.facebook.com/aaalikin/
+// Discord: scrappy526
+
+#include "/PlanetOcean/Shaders/DataTypes.ush"
+#include "/PlanetOcean/Shaders/Utils.ush"
+#include "/PlanetOcean/Shaders/Gerstner.ush"
+
+struct PlanetGerstner
+{
+    FTriplanar AlignWPOToSphere(FTriplanar InWPO, const float3 InVertexNormalWS)
+    {
+        FTriplanar Triplanar = (FTriplanar)0;
+        
+        float3 Sign = sign(InVertexNormalWS);
+        
+        float3 SwizzledX = InWPO.ProjectionX;    
+        SwizzledX.z *= Sign.x;
+        SwizzledX.xyz = SwizzledX.zyx;
+        
+        float3 SwizzledY = InWPO.ProjectionY;
+        SwizzledY.z *= Sign.y;
+        SwizzledY.xyz = SwizzledY.xzy;
+        
+        float3 OriginalZ = InWPO.ProjectionZ; // no need to swizzle
+        OriginalZ.z *= Sign.z;
+        
+        Triplanar.ProjectionX = FMath::RotateVector(SwizzledX, InVertexNormalWS, FVector::PositiveX()) * Sign.x;
+        Triplanar.ProjectionY = FMath::RotateVector(SwizzledY, InVertexNormalWS, FVector::PositiveY()) * Sign.y;
+        Triplanar.ProjectionZ = FMath::RotateVector(OriginalZ, InVertexNormalWS, FVector::PositiveZ()) * Sign.z;
+        
+        return Triplanar;
+
+    }
+    
+    FTriplanar AlignNormalsToSphere(FTriplanar InNormals, const float3 InVertexNormalWS)
+    {
+        FTriplanar OutTriplanar = (FTriplanar)0;
+        float3 Sign = sign(InVertexNormalWS);
+        
+        float3 NormalX = InNormals.ProjectionX;
+        NormalX.x += InVertexNormalWS.z;
+        NormalX.y += InVertexNormalWS.y;
+        NormalX.z *= Sign.x;
+        NormalX.xyz = NormalX.zyx;
+        
+        float3 NormalY = InNormals.ProjectionY;
+        NormalY.x += InVertexNormalWS.x;
+        NormalY.y += InVertexNormalWS.z;
+        NormalY.z *= Sign.y;
+        NormalY.xyz = NormalY.xzy;
+        
+        float3 NormalZ = InNormals.ProjectionZ;
+        NormalZ.x += InVertexNormalWS.x;
+        NormalZ.y += InVertexNormalWS.y;
+        NormalZ.z *= Sign.z;
+
+        OutTriplanar.ProjectionX = NormalX;
+        OutTriplanar.ProjectionY = NormalY;
+        OutTriplanar.ProjectionZ = NormalZ;
+        
+        return OutTriplanar;
+    }
+    
+    WaveOutput CombineTriplanarProjections(const FTriplanar InWPO, const FTriplanar InNormals, const float3 FoamMasks, const float3 InTriplanarMask)
+    {
+        WaveOutput OutWaves = (WaveOutput)0;
+        
+        // WPO
+        float3 ProjXY = lerp(InWPO.ProjectionX, InWPO.ProjectionY, InTriplanarMask.y);
+        float3 ProjXYZ = lerp(ProjXY, InWPO.ProjectionZ, InTriplanarMask.z);
+        
+        OutWaves.WPO = ProjXYZ; // world space
+        
+        // Normals
+        float3 NormalProjXY = lerp(InNormals.ProjectionX, InNormals.ProjectionY, InTriplanarMask.y);
+        float3 NormalProjXYZ = lerp(NormalProjXY, InNormals.ProjectionZ, InTriplanarMask.z);
+        
+        OutWaves.Normal = NormalProjXYZ; // world space
+        
+        // Foam Masks
+        
+        float FoamMaskXY = lerp(FoamMasks.x, FoamMasks.y, InTriplanarMask.y);
+        float FoamMaskXYZ = lerp(FoamMaskXY, FoamMasks.z, InTriplanarMask.z);
+        
+        OutWaves.FoamMask = FoamMaskXYZ;
+        
+        return OutWaves;
+    }
+    
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    // CURRENTLY UNUSED. FOR FUTURE EXPERIMENTS. BUT IT WORKS CORRECTLY.
+    // Implimentation of Real-Time Rendering of Procedurally Generated Planets by Florian Michelic (Austria, 2018)
+    // https://cescg.org/cescg_submission/real-time-rendering-of-procedurally-generated-planets/
+    // Ported from Unity: https://github.com/kulesz/PlanetaryWater?tab=readme-ov-file
+    // Added some control over how waves lay on top of each other
+    // INcoming PositionExcludingOffsets should be in local space, WPO and normals outputs are in local space too
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    float3 CalculateMichelicGerstnerWavesOnSphere(
+    float WaveCount,
+    float WaveDistribution,
+    float Spread,
+    float2 WindDirection,
+    float MinWavelength,
+    float MaxWavelength,
+    float MinAmplitude,
+    float MaxAmplitude,
+    float MinSteepness,
+    float MaxSteepness,
+    float3 PositionOS,
+    float PlanetRadius,
+    float Time,
+    float Speed,
+    out float3 Normal,
+    out float WaveMask)
+    {
+        // Initialize
+        float3 positionOSNormalized = normalize(PositionOS);
+        
+        float3 VertexOffset = float3(0.f, 0.f, 0.f);
+        Normal = float3(0.f, 0.f, 0.f);
+        WaveMask = 0.0;
+
+        float SinPart = 0;
+        float3 CosPart = float3(0, 0, 0);
+
+        float sinPartNorm = 0;
+        float3 cosPartNorm = float3(0, 0, 0);
+                
+        float3 tangent = float3(0, 0, 0);
+        
+        // Arbitrary start numbers
+        int RandX = 10007;
+        int RandY = 802709;
+        
+
+        for (int waveIdx = 0; waveIdx < WaveCount; waveIdx++)
+        {
+            const float IndexFrac = (float) waveIdx / (float) WaveCount;
+            
+            RandX *= RandX + 12345;
+            RandY *= RandY + 12345;
+            
+            float2 Direction = float2(cos((float) RandX / 801571.f), sin((float) RandY / 10223.f));
+            Direction = normalize(lerp(WindDirection, (Direction * 2.f) - 1.f, Spread));
+            
+            const float Alpha = pow(IndexFrac, WaveDistribution);
+            
+            const float Wavelength = lerp(MaxWavelength, MinWavelength, Alpha);
+            const float Steepness = lerp(MaxSteepness, MinSteepness, Alpha);
+            float Amplitude = lerp(MaxAmplitude, MinAmplitude, Alpha);
+            
+            float Dispersion = 2.f * PI / Wavelength;
+            Amplitude *= Dispersion;
+            
+            float WaveSpeed = sqrt(Dispersion * GRAVITY);
+            float2 WaveVector = Direction * Dispersion;
+            float WaveTime = WaveSpeed * Time * Speed;
+            
+            //float WavePos = dot(float2(PositionExcludingOffsets.xy), WaveVector) - WaveTime;
+            
+            
+            float4 waveParams = float4(Amplitude, Steepness, Wavelength, Speed);
+
+            float3 waveDir = float3(WaveVector, 0.f);
+            float3 waveDirNormalized = normalize(waveDir);
+
+            float A = waveParams.x; // _AmplitudeModifier * waveParams.x * ampitudeDamping
+            float Q = waveParams.y;
+            float w = waveParams.z;
+            float fi = waveParams.w;
+                    
+            float3 di = cross(positionOSNormalized, cross(positionOSNormalized - waveDirNormalized, positionOSNormalized));
+            float li = acos(dot(positionOSNormalized, waveDirNormalized)) * PlanetRadius;
+                    
+            SinPart += A * sin(w * li + fi * Time);
+            CosPart += Q * A * cos(w * li + fi * Time) * di;
+
+            sinPartNorm += Q * A * w * sin(w * li + fi * Time);
+            cosPartNorm += di * A * w * cos(w * li + fi * Time);
+
+            VertexOffset += positionOSNormalized * SinPart + CosPart;
+            Normal += positionOSNormalized - positionOSNormalized * sinPartNorm - cosPartNorm;
+
+            WaveMask += SinPart / WaveCount;
+            
+            float3 diCross = cross(di, positionOSNormalized);
+            tangent += diCross / length(diCross);
+        }
+
+        tangent = normalize(tangent);
+        float3 surfaceLevel = positionOSNormalized * PlanetRadius;
+
+        //waveNormal = lerp(positionOSNormalized, waveNormal, _WaveNormalAmount);
+        //Normal.z = 1.f - Normal.z;
+        Normal = normalize(Normal.xyz);
+        WaveMask = saturate(WaveMask);
+        //WaveMask = 0.f;
+        
+        return VertexOffset;
+        //return positionOSNormalized * SinPart + CosPart;
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+    // Based on Unreal's Gerstner function. Gerstner waves for flat plane
+    // Waves are generated for 3 planes that are then being onto a sphere
+    // This function is 3 times more expensive than the regular one
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+WaveOutput CalculateGerstnerWavesOnSphere(
+    FMaterialParams MatParams)
+    {
+        // Passing VertexNormalWS node doesn't work (everything is zero), so here's a workaround
+        // This means it will work only on a perfect sphere and will fail on a slightly different shape
+        float3 SphereVertexNormal = normalize(MatParams._Position);
+        
+        if (MatParams._WaveCount <= 0.f)
+        {
+            WaveOutput OutWaves = (WaveOutput) 0;
+            OutWaves.WPO = FVector::Zero();
+            OutWaves.Normal = SphereVertexNormal;
+            OutWaves.FoamMask = 0.f;
+        }
+            
+        float ProjectionX, ProjectionY;
+        FTriplanar TriplanarPos = PlanetHelpers::GetTriplanarPosition(MatParams._Position, ProjectionX, ProjectionY);
+      
+        // Arbitrary start numbers
+        int2 Seed = int2(10007, 802709);
+        
+        // Waves for X face /////////
+        WaveOutput OutWavesX = Gerstner::GetAllGerstnerWaves(TriplanarPos.ProjectionX, MatParams, Seed);
+        
+        // Waves for Y face /////////
+        WaveOutput OutWavesY = Gerstner::GetAllGerstnerWaves(TriplanarPos.ProjectionY, MatParams, Seed);
+        
+        // Waves for Z face
+        WaveOutput OutWavesZ = Gerstner::GetAllGerstnerWaves(TriplanarPos.ProjectionZ, MatParams, Seed);
+        
+        FTriplanar RawWPO = (FTriplanar)0;
+        RawWPO.ProjectionX = OutWavesX.WPO;
+        RawWPO.ProjectionY = OutWavesY.WPO;
+        RawWPO.ProjectionZ = OutWavesZ.WPO;
+
+        FTriplanar RawNormal = (FTriplanar)0;
+        RawNormal.ProjectionX = OutWavesX.Normal;
+        RawNormal.ProjectionY = OutWavesY.Normal;
+        RawNormal.ProjectionZ = OutWavesZ.Normal;
+
+        float3 FoamMasks;
+        FoamMasks.x = OutWavesX.FoamMask;
+        FoamMasks.y = OutWavesY.FoamMask;
+        FoamMasks.z = OutWavesZ.FoamMask;
+
+        
+        // Normal Z needs to be 1-x once all waves are combined
+        RawNormal.ProjectionX = Gerstner::FinalizeNormal(RawNormal.ProjectionX);
+        RawNormal.ProjectionY = Gerstner::FinalizeNormal(RawNormal.ProjectionY);
+        RawNormal.ProjectionZ = Gerstner::FinalizeNormal(RawNormal.ProjectionZ);
+              
+        FTriplanar AlignedWPO = AlignWPOToSphere(RawWPO, SphereVertexNormal);
+        FTriplanar AlignedNormal = AlignNormalsToSphere(RawNormal, SphereVertexNormal);
+        
+        // combine the result
+        WaveOutput OutWaves = CombineTriplanarProjections(AlignedWPO, AlignedNormal, FoamMasks, MatParams._TriplanarMaskOS);
+        OutWaves.Normal = normalize(OutWaves.Normal + SphereVertexNormal);
+        OutWaves.FoamMask = Gerstner::FinalizeFoamMask(OutWaves.FoamMask, MatParams._FoamStrength);
+        return OutWaves;
+    }
+    
+};
+
+/////////////////////////////////////////////////////////////////////////////////
+/////// Main function ///////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+PlanetGerstner Waves;
+
+
+FMaterialParams MatParams = Utils::CreateMaterialParameters(
+WaveCount,
+float2(MinWavelength, MaxWavelength),
+float2(MinSteepness, MaxSteepness),
+float2(MinAmplitude, MaxAmplitude),
+WindDirection,
+Spread,
+WaveDistribution,
+PositionOS,
+TriplanarMaskOS,
+Speed,
+Time,
+FoamStrength);
+
+WaveOutput FinalWaves = Waves.CalculateGerstnerWavesOnSphere(
+    MatParams);
+
+Normal = FinalWaves.Normal;
+FoamMask = FinalWaves.FoamMask;
+
+return FinalWaves.WPO;
+
+////////////////////////////////////////////////////////////////////////////////////////
+/////// End of Main function ///////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////
