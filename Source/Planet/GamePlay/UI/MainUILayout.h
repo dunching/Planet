@@ -38,8 +38,14 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName EffectsListSocket;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName ProgressTipsSocket;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FName HUD_TeamSocket;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	UWidget* Ttt = nullptr;
 
 };

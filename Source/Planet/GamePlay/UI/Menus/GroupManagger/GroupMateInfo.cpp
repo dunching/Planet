@@ -37,42 +37,12 @@ FReply UGroupMateInfo::NativeOnMouseButtonDown(const FGeometry& InGeometry, cons
 {
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-		if (bIsInBackpakc)
-		{
-			Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+		Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
-			return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
-		}
-		else
-		{
-			return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-		}
-	}
-	else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
-	{
-		ResetToolUIByData(nullptr);
+		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 	}
 
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-}
-
-bool UGroupMateInfo::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-{
-	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-
-	if (InOperation->IsA(UItemsDragDropOperation::StaticClass()))
-	{
-		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
-		if (WidgetDragPtr)
-		{
-			if (WidgetDragPtr->bIsInBackpakc)
-			{
-				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
-			}
-		}
-	}
-
-	return true;
 }
 
 void UGroupMateInfo::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -94,7 +64,6 @@ void UGroupMateInfo::NativeOnDragDetected(const FGeometry& InGeometry, const FPo
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
 				WidgetDragPtr->SceneToolSPtr = GroupMateUnitPtr;
-				WidgetDragPtr->bIsInBackpakc = bIsInBackpakc;
 
 				OutOperation = WidgetDragPtr;
 			}

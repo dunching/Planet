@@ -33,6 +33,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/SPlineActor");
         PublicIncludePaths.Add("Planet/GamePlay/UI");
         PublicIncludePaths.Add("Planet/GamePlay/UI/HUD");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/HUD/Team");
         PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState");
         PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState/ActionStateHUD");
         PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState/BuildingStateHUD");
