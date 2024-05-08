@@ -27,11 +27,19 @@ class PLANET_API UGroupMateInfo :
 
 public:
 
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
+
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
+
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
 private:
+
+	bool bIsInBackpakc = false;
 
 	UGourpMateUnit* GroupMateUnitPtr = nullptr;
 

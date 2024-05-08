@@ -33,6 +33,75 @@ namespace GroupMateInfo
 	const FName Default = TEXT("Default");
 }
 
+FReply UGroupMateInfo::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+	{
+		if (bIsInBackpakc)
+		{
+			Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+
+			return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
+		}
+		else
+		{
+			return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+		}
+	}
+	else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
+	{
+		ResetToolUIByData(nullptr);
+	}
+
+	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+}
+
+bool UGroupMateInfo::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+
+	if (InOperation->IsA(UItemsDragDropOperation::StaticClass()))
+	{
+		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
+		if (WidgetDragPtr)
+		{
+			if (WidgetDragPtr->bIsInBackpakc)
+			{
+				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
+			}
+		}
+	}
+
+	return true;
+}
+
+void UGroupMateInfo::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+{
+	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
+
+	auto BaseItemClassPtr = UAssetRefMap::GetInstance()->DragDropOperationWidgetClass;
+
+	if (BaseItemClassPtr)
+	{
+		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);
+		if (DragWidgetPtr)
+		{
+			DragWidgetPtr->ResetSize(InGeometry.Size);
+			DragWidgetPtr->ResetToolUIByData(GroupMateUnitPtr);
+
+			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
+			if (WidgetDragPtr)
+			{
+				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
+				WidgetDragPtr->SceneToolSPtr = GroupMateUnitPtr;
+				WidgetDragPtr->bIsInBackpakc = bIsInBackpakc;
+
+				OutOperation = WidgetDragPtr;
+			}
+		}
+	}
+}
+
 void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
 	if (BaseWidgetPtr)
