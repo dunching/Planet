@@ -1,0 +1,98 @@
+
+#include "HumanViewAlloctionSkillsProcessor.h"
+
+#include <Kismet/GameplayStatics.h>
+
+#include "GenerateType.h"
+#include "PlanetPlayerState.h"
+#include "CharacterBase.h"
+#include "GameFramework/PlayerController.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "HumanCharacter.h"
+#include "UI/UIManagerSubSystem.h"
+#include "InteractionToAIMenu.h"
+#include "BackpackMenu.h"
+#include "CreateMenu.h"
+#include "InputProcessorSubSystem.h"
+#include "HumanRegularProcessor.h"
+#include "HorseProcessor.h"
+#include "HumanProcessor.h"
+#include "HoldingItemsComponent.h"
+#include "BuildingBaseProcessor.h"
+#include "CharacterAttributesComponent.h"
+#include "HumanViewBackpackProcessor.h"
+
+namespace HumanProcessor
+{
+	FHumanViewAlloctionSkillsProcessor::FHumanViewAlloctionSkillsProcessor(FOwnerPawnType* CharacterPtr) :
+		Super(CharacterPtr)
+	{
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::EnterAction()
+	{
+		Super::EnterAction();
+		
+		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
+
+		UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(false);
+		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
+		UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
+		UUIManagerSubSystem::GetInstance()->ViewSkills(true, HumanCharaterPtr->GetHoldingItemsComponent()->GetHoldItemProperty());
+
+		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
+		if (PlayerPCPtr)
+		{
+			PlayerPCPtr->bShowMouseCursor = true;
+
+			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
+		}
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::QuitAction()
+	{
+		UUIManagerSubSystem::GetInstance()->ViewSkills(false);
+
+		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
+
+		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
+		if (PlayerPCPtr)
+		{
+			PlayerPCPtr->bShowMouseCursor = false;
+
+			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
+		}
+
+		Super::QuitAction();
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::VKeyPressed()
+	{
+		QuitCurrentState();
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::BKeyPressed()
+	{
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewBackpackProcessor>();
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::ESCKeyPressed()
+	{
+		QuitCurrentState();
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::PressedNumKey(int32 NumKey)
+	{
+
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::CheckInteraction()
+	{
+	}
+
+	void FHumanViewAlloctionSkillsProcessor::QuitCurrentState()
+	{
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
+	}
+
+}
