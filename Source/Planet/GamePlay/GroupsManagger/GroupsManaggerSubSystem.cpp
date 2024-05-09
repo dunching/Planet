@@ -64,11 +64,11 @@ void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(IPlanetController
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
 
-void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(const FGameplayTag& Tag, IPlanetControllerInterface* PCPtr)
+void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpMateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr)
 {
-	MembersMap.Add(Tag, PCPtr);
+	MembersMap.Add(GourpMateUnitPtr, PCPtr);
 
-	PCPtr->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerPCPtr);
+	PCPtr->GetGroupMnaggerComponent()->OnAddToNewTeam(OwnerPCPtr);
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }

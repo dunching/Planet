@@ -87,16 +87,11 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::SwitchCurrentWeapon()
 	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>(); 
 		if (OnwerActorPtr)
 		{
 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
-			UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
-			UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
-			UUIManagerSubSystem::GetInstance()->ViewSkills(false);
-			UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(false);
-			UUIManagerSubSystem::GetInstance()->ViewProgressTips(false);
-			UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(false);
+			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
 
 			{
 				auto WeaponUnitPtr = OnwerActorPtr->GetEquipmentItemsComponent()->GetMainWeaponUnit();
@@ -122,11 +117,12 @@ namespace HumanProcessor
 	{
 		AddOrRemoveUseMenuItemEvent(false);
 
+		UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(false);
+		UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(false);
+
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(false);
-
 			OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kNone);
 		}
 

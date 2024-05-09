@@ -14,6 +14,7 @@ struct FStreamableHandle;
 
 class UBasicUnit;
 class UGourpMateUnit;
+class UTeamMateInfo;
 
 /**
  *
@@ -25,10 +26,24 @@ class PLANET_API UTeanMatesList : public UUserWidget, public IItemsMenuInterface
 
 public:
 
+	using FDelegateHandle = TCallbackHandleContainer<void(UTeamMateInfo*)>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct()override;
+
+	virtual void NativeDestruct()override;
 
 protected:
 
 	virtual void ResetUIByData()override;
+
+	void OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr);
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UTeamMateInfo>TeamMateInfoClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	int32 MaxMemberNum = 6;
+
+	TArray<FDelegateHandle>DelegateAry;
 
 };

@@ -33,6 +33,11 @@ void UGroupManaggerMenu::NativeConstruct()
 
 void UGroupManaggerMenu::ResetUIByData()
 {
+	ResetGroupmates();
+}
+
+void UGroupManaggerMenu::ResetGroupmates()
+{
 	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(GroupManaggerMenu::GroupMatesTileView));
 	if (!TileViewPtr)
 	{

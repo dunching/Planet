@@ -11,6 +11,7 @@
 #include "SceneElement.generated.h"
 
 class AToolUnitBase;
+class IPlanetControllerInterface;
 
 class USkill_Base;
 
@@ -158,7 +159,7 @@ public:
 
 	void InitialByCharactor(ACharacterBase* InCharacterPtr);
 
-	ACharacterBase* CharacterPtr = nullptr;
+	IPlanetControllerInterface* PCPtr = nullptr;
 
 	int32 Level = 1;
 

@@ -31,4 +31,6 @@ protected:
 
 private:
 
+	void ResetGroupmates();
+
 };

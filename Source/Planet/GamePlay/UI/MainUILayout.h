@@ -45,7 +45,4 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName HUD_TeamSocket;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	UWidget* Ttt = nullptr;
-
 };

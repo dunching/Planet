@@ -28,6 +28,7 @@ class UEffectsList;
 class UProgressTips;
 class UTalentAllocation;
 class UGroupManaggerMenu;
+class UHUD_TeamInfo;
 
 class UToolUnit;
 class UWeaponUnit;
@@ -93,6 +94,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGroupManaggerMenu>GroupManaggerMenuClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
 #pragma endregion MenusUI
 
 #pragma region Tags

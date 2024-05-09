@@ -37,7 +37,7 @@ public:
 
 	struct FTeamMatesHelper
 	{
-		void AddCharacter(const FGameplayTag &Tag, IPlanetControllerInterface* PCPtr);
+		void AddCharacter(UGourpMateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr);
 
 		int32 ID = 1;
 
@@ -45,7 +45,7 @@ public:
 
 		IPlanetControllerInterface* OwnerPCPtr = nullptr;
 
-		TMap<FGameplayTag, IPlanetControllerInterface*> MembersMap;
+		TMap<UGourpMateUnit*, IPlanetControllerInterface*> MembersMap;
 	};
 
 	static UGroupsManaggerSubSystem* GetInstance();

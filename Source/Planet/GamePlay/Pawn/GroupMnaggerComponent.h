@@ -25,6 +25,8 @@ public:
 
 	void OnAddToNewGroup(IPlanetControllerInterface* OwnerPCPtr);
 
+	void OnAddToNewTeam(IPlanetControllerInterface* OwnerPCPtr);
+
 	const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& GetGroupsHelper();
 
 	const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& GetTeamsHelper();
@@ -35,8 +37,8 @@ protected:
 
 private:
 
-	TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> GroupsHelperSPtr;
+	TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> GroupHelperSPtr;
 
-	TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> TeamsHelperSPtr;
+	TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> TeamHelperSPtr;
 
 };

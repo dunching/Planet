@@ -30,6 +30,7 @@
 #include "ProgressTips.h"
 #include "TalentAllocation.h"
 #include "GroupManaggerMenu.h"
+#include "HUD_TeamInfo.h"
 
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
 {
@@ -287,6 +288,45 @@ void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay)
 	}
 }
 
+void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay)
+{
+	MainUILayoutPtr = GetMainUILAyout();
+	if (!MainUILayoutPtr)
+	{
+		return;
+	}
+
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->HUD_TeamSocket));
+	if (!BorderPtr)
+	{
+		return;
+	}
+
+	auto UIPtr = Cast<UHUD_TeamInfo>(BorderPtr->GetContent());
+	if (UIPtr)
+	{
+		if (bIsDisplay)
+		{
+			UIPtr->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			UIPtr->RemoveFromParent();
+		}
+	}
+	else
+	{
+		if (bIsDisplay)
+		{
+			UIPtr = CreateWidget<UHUD_TeamInfo>(GetWorldImp(), UAssetRefMap::GetInstance()->HUD_TeamInfoClass);
+			if (UIPtr)
+			{
+				BorderPtr->AddChild(UIPtr);
+			}
+		}
+	}
+}
+
 UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
 {
 	MainUILayoutPtr = GetMainUILAyout();
@@ -366,6 +406,16 @@ UMainUILayout* UUIManagerSubSystem::GetMainUILAyout()
 		if (MainUILayoutPtr)
 		{
 			MainUILayoutPtr->AddToViewport();
+
+			DisplayActionStateHUD(false);
+			DisplayBuildingStateHUD(false);
+			ViewBackpack(false);
+			ViewSkills(false);
+			ViewTalentAllocation(false);
+			ViewGroupMatesManagger(false);
+			DisplayTeamInfo(false);
+			ViewEffectsList(false);
+			ViewProgressTips(false);
 		}
 	}
 

@@ -34,10 +34,8 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(false);
 		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
 		UUIManagerSubSystem::GetInstance()->ViewBackpack(true, HumanCharaterPtr->GetHoldingItemsComponent()->GetHoldItemProperty());
-		UUIManagerSubSystem::GetInstance()->ViewSkills(false);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)

@@ -29,6 +29,7 @@ class UDestroyProgress;
 class UMainUILayout;
 class UEffectsList;
 class UProgressTips;
+class UHUD_TeamInfo;
 
 struct FPawnDataStruct;
 struct FSceneTool;
@@ -69,6 +70,9 @@ public:
 	
 	// 浏览 成员管理界面
 	void ViewGroupMatesManagger(bool bIsDisplay);
+	
+	// 出战队员列表
+	void DisplayTeamInfo(bool bIsDisplay);
 	
 	// 效果栏（buff、debuff）
 	UEffectsList* ViewEffectsList(bool bIsViewMenus);
