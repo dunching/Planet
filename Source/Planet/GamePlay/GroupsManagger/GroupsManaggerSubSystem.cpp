@@ -15,31 +15,60 @@ UGroupsManaggerSubSystem* UGroupsManaggerSubSystem::GetInstance()
 	return Cast<UGroupsManaggerSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UGroupsManaggerSubSystem::StaticClass()));
 }
 
-TSharedPtr<UGroupsManaggerSubSystem::FGroupsHelper> UGroupsManaggerSubSystem::CreateGroup(AHumanCharacter* CharacterPtr)
+TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> UGroupsManaggerSubSystem::CreateGroup(IPlanetControllerInterface* PCPtr)
 {
-	TSharedPtr<FGroupsHelper> ResultSPtr = MakeShared<FGroupsHelper>();
+	TSharedPtr<FGroupMatesHelper> ResultSPtr = MakeShared<FGroupMatesHelper>();
 	for (;;)
 	{
 		ResultSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-		if (GroupsMap.Find(ResultSPtr))
+		if (GroupMatesMap.Find(ResultSPtr))
 		{
 			continue;
 		}
 		else
 		{
-			ResultSPtr->OwnerCharacterPtr = CharacterPtr;
-			GroupsMap.Add(ResultSPtr);
+			ResultSPtr->OwnerPCPtr = PCPtr;
+			GroupMatesMap.Add(ResultSPtr);
 			break;
 		}
 	}
 	return ResultSPtr;
 }
 
-void UGroupsManaggerSubSystem::FGroupsHelper::AddCharacter(AHumanCharacter* CharacterPtr)
+TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> UGroupsManaggerSubSystem::CreateTeam(IPlanetControllerInterface* PCPtr)
 {
-	CharactersSet.Add(CharacterPtr);
+	TSharedPtr<FTeamMatesHelper> ResultSPtr = MakeShared<FTeamMatesHelper>();
+	for (;;)
+	{
+		ResultSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		if (TeamMatesMap.Find(ResultSPtr))
+		{
+			continue;
+		}
+		else
+		{
+			ResultSPtr->OwnerPCPtr = PCPtr;
+			TeamMatesMap.Add(ResultSPtr);
+			break;
+		}
+	}
+	return ResultSPtr;
+}
 
-	CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerCharacterPtr);
+void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(IPlanetControllerInterface* PCPtr)
+{
+	MembersSet.Add(PCPtr);
 
-	GroupsChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterPtr);
+	PCPtr->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerPCPtr);
+
+	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
+}
+
+void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(const FGameplayTag& Tag, IPlanetControllerInterface* PCPtr)
+{
+	MembersMap.Add(Tag, PCPtr);
+
+	PCPtr->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerPCPtr);
+
+	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }

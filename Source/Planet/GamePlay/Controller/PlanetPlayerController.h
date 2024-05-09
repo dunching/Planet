@@ -11,6 +11,8 @@
 #include "PlanetPlayerController.generated.h"
 
 class ACharacterBase;
+class IPlanetControllerInterface;
+class UGourpMateUnit;
 
 /**
  *
@@ -22,7 +24,7 @@ class PLANET_API APlanetPlayerController : public AGravityPlayerController, publ
 
 public:
 
-	using FDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, ACharacterBase*)>::FCallbackHandleSPtr;
+	using FDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>::FCallbackHandleSPtr;
 
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -42,7 +44,12 @@ protected:
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() override;
 
-	void OnCharacterGroupMateChanged(EGroupMateChangeType GroupMateChangeType, ACharacterBase* NewCharacterPtr);
+	virtual UGourpMateUnit* GetGourpMateUnit() override;
+
+	void OnCharacterGroupMateChanged(
+		EGroupMateChangeType GroupMateChangeType, 
+		IPlanetControllerInterface* NewPCPtr
+	);
 
 	FDelegateHandle DelegateHandle;
 

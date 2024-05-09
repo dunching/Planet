@@ -238,7 +238,9 @@ void TestCommand::RecruitCharacter()
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 			if (TargetCharacterPtr)
 			{
-				CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent()->AddCharacterToGroup(TargetCharacterPtr);
+				CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent()->AddCharacterToGroup(
+					Cast<IPlanetControllerInterface>(TargetCharacterPtr->GetController())
+				);
 			}
 		}
 	}

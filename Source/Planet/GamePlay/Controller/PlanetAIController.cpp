@@ -6,6 +6,8 @@
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "GroupMnaggerComponent.h"
+#include "SceneElement.h"
+#include "HumanCharacter.h"
 
 void APlanetAIController::SetCampType(ECharacterCampType CharacterCampType)
 {
@@ -22,6 +24,11 @@ UGroupMnaggerComponent* APlanetAIController::GetGroupMnaggerComponent()
 		GroupMnaggerComponentPtr = Cast<UGroupMnaggerComponent>(AddComponentByClass(UGroupMnaggerComponent::StaticClass(), true, FTransform::Identity, false));
 	}
 	return  GroupMnaggerComponentPtr;
+}
+
+UGourpMateUnit* APlanetAIController::GetGourpMateUnit()
+{
+	return Cast<AHumanCharacter>(GetPawn())->GetGourpMateUnit();
 }
 
 void APlanetAIController::BeginPlay()

@@ -42,21 +42,20 @@ void UGroupManaggerMenu::ResetUIByData()
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
 
-
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (!CharacterPtr)
+	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	if (!PCPtr)
 	{
 		return;
 	}
 
-	auto GMCPtr = CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent();
+	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
 
 	auto GroupsHelperSPtr = GMCPtr->GetGroupsHelper();
 	if (GroupsHelperSPtr)
 	{
-		for (auto Iter : GroupsHelperSPtr->CharactersSet)
+		for (auto Iter : GroupsHelperSPtr->MembersSet)
 		{
-			if (Iter == GroupsHelperSPtr->OwnerCharacterPtr)
+			if (Iter == GroupsHelperSPtr->OwnerPCPtr)
 			{
 				continue;
 			}

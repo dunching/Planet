@@ -10,7 +10,7 @@
 
 #include "GroupsManaggerSubSystem.generated.h"
 
-class AHumanCharacter;
+class IPlanetControllerInterface;
 class UGourpMateUnit;
 
 UCLASS()
@@ -20,27 +20,44 @@ class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
 
 public:
 
-	using FCallbackHandleContainerVoid = TCallbackHandleContainer<void(EGroupMateChangeType, ACharacterBase*)>;
+	using FCallbackHandleContainerVoid = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>;
 
-	struct FGroupsHelper
+	struct FGroupMatesHelper
 	{
-		void AddCharacter(AHumanCharacter* CharacterPtr);
+		void AddCharacter(IPlanetControllerInterface* PCPtr);
 
 		int32 ID = 1;
 
-		FCallbackHandleContainerVoid GroupsChanged;
+		FCallbackHandleContainerVoid MembersChanged;
 
-		AHumanCharacter* OwnerCharacterPtr = nullptr;
+		IPlanetControllerInterface* OwnerPCPtr = nullptr;
 
-		TSet<AHumanCharacter*> CharactersSet;
+		TSet<IPlanetControllerInterface*> MembersSet;
+	};
+
+	struct FTeamMatesHelper
+	{
+		void AddCharacter(const FGameplayTag &Tag, IPlanetControllerInterface* PCPtr);
+
+		int32 ID = 1;
+
+		FCallbackHandleContainerVoid MembersChanged;
+
+		IPlanetControllerInterface* OwnerPCPtr = nullptr;
+
+		TMap<FGameplayTag, IPlanetControllerInterface*> MembersMap;
 	};
 
 	static UGroupsManaggerSubSystem* GetInstance();
 
-	TSharedPtr<FGroupsHelper> CreateGroup(AHumanCharacter* CharacterPtr);
+	TSharedPtr<FGroupMatesHelper> CreateGroup(IPlanetControllerInterface* PCPtr);
+
+	TSharedPtr<FTeamMatesHelper> CreateTeam(IPlanetControllerInterface* PCPtr);
 
 private:
 
-	TSet<TSharedPtr<FGroupsHelper>>GroupsMap;
+	TSet<TSharedPtr<FGroupMatesHelper>>GroupMatesMap;
+
+	TSet<TSharedPtr<FTeamMatesHelper>>TeamMatesMap;
 
 };

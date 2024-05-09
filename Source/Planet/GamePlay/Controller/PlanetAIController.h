@@ -12,6 +12,7 @@
 
 class UAIHumanInfo;
 class UGroupMnaggerComponent;
+class UGourpMateUnit;
 
 /**
  * 
@@ -26,6 +27,8 @@ public:
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() override;
+
+	virtual UGourpMateUnit* GetGourpMateUnit() override;
 
 	UAIHumanInfo* AIHumanInfoPtr = nullptr;
 

@@ -13,24 +13,39 @@
 
 FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
-void UGroupMnaggerComponent::AddCharacterToGroup(AHumanCharacter* CharacterPtr)
+void UGroupMnaggerComponent::AddCharacterToGroup(IPlanetControllerInterface* PCPtr)
 {
-	GetGroupsHelper()->AddCharacter(CharacterPtr);
+	GetGroupsHelper()->AddCharacter(PCPtr);
 }
 
-void UGroupMnaggerComponent::OnAddToNewGroup(AHumanCharacter* GroupOwnerCharacterPtr)
+void UGroupMnaggerComponent::AddCharacterToTeam(IPlanetControllerInterface* PCPtr)
 {
-	GroupsHelperSPtr = GroupOwnerCharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent()->GetGroupsHelper();
+	GetGroupsHelper()->AddCharacter(PCPtr);
 }
 
-const TSharedPtr<UGroupsManaggerSubSystem::FGroupsHelper>& UGroupMnaggerComponent::GetGroupsHelper() 
+void UGroupMnaggerComponent::OnAddToNewGroup(IPlanetControllerInterface* OwnerPCPtr)
+{
+	GroupsHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetGroupsHelper();
+}
+
+const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupsHelper() 
 {
 	if (!GroupsHelperSPtr)
 	{
-		auto CharacterPtr = Cast<AHumanCharacter>(GetOwner<AController>()->GetPawn());
-		GroupsHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(CharacterPtr);
+		auto OwnerPCPtr = GetOwner<IPlanetControllerInterface>();
+		GroupsHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(OwnerPCPtr);
 	}
 	return GroupsHelperSPtr;
+}
+
+const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamsHelper()
+{
+	if (!TeamsHelperSPtr)
+	{
+		auto OwnerPCPtr = GetOwner<IPlanetControllerInterface>();
+		TeamsHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(OwnerPCPtr);
+	}
+	return TeamsHelperSPtr;
 }
 
 void UGroupMnaggerComponent::BeginPlay()

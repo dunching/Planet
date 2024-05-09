@@ -18,6 +18,9 @@
 #include "HoldingItemsComponent.h"
 #include "GroupMnaggerComponent.h"
 #include "PlanetAIController.h"
+#include "SceneElement.h"
+#include "HumanCharacter.h"
+#include "PlanetControllerInterface.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -57,7 +60,7 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 	auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupsHelper();
 	if (GroupsHelperSPtr)
 	{
-		DelegateHandle = GroupsHelperSPtr->GroupsChanged.AddCallback(
+		DelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
 			std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 	}
@@ -97,19 +100,25 @@ UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()
 	return  GroupMnaggerComponentPtr;
 }
 
-void APlanetPlayerController::OnCharacterGroupMateChanged(EGroupMateChangeType GroupMateChangeType, ACharacterBase* NewCharacterPtr)
+UGourpMateUnit* APlanetPlayerController::GetGourpMateUnit()
 {
-	APawn* CurrentPawn = GetPawn();
+	return Cast<AHumanCharacter>(GetPawn())->GetGourpMateUnit();
+}
 
+void APlanetPlayerController::OnCharacterGroupMateChanged(
+	EGroupMateChangeType GroupMateChangeType,
+	IPlanetControllerInterface* NewPCPtr
+)
+{
 	switch (GroupMateChangeType)
 	{
 	case EGroupMateChangeType::kAdd:
 	{
-		if (NewCharacterPtr)
+		if (NewPCPtr)
 		{
-			if (GetGroupMnaggerComponent()->GetGroupsHelper()->OwnerCharacterPtr == CurrentPawn)
+			if (GetGroupMnaggerComponent()->GetGroupsHelper()->OwnerPCPtr == this)
 			{
-				auto AIPCPtr = Cast<APlanetAIController>(NewCharacterPtr->GetController());
+				auto AIPCPtr = Cast<APlanetAIController>(NewPCPtr);
 				if (AIPCPtr)
 				{
 					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
