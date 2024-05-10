@@ -59,7 +59,7 @@ void AMMTPawn::TickPostPhysics(float DeltaSeconds, ELevelTick TickType, FSeconda
 	const bool bShouldTick = ((TickType != LEVELTICK_ViewportsOnly) || GetOwner()->ShouldTickIfViewportsOnly());
 	if (bShouldTick)
 	{
-		if (!IsPendingKill() && GetWorld())
+		if (!IsValid(this) && GetWorld())
 		{
 			//if (GetOwner()->GetWorldSettings() != NULL && !IsRunningDedicatedServer())
 			if (GetWorldSettings() != NULL && !IsRunningDedicatedServer())
