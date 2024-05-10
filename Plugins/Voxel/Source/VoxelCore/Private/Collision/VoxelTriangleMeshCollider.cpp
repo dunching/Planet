@@ -74,7 +74,7 @@ void FVoxelTriangleMeshCollider::AddToBodySetup(UBodySetup& BodySetup) const
 
 	ensure(!TriangleMesh->GetDoCollide());
 
-	BodySetup.ChaosTriMeshes.Add(TriangleMesh);
+	BodySetup.UE_504_SWITCH(ChaosTriMeshes, TriMeshGeometries).Add(TriangleMesh);
 }
 
 TSharedPtr<const FVoxelNavmesh> FVoxelTriangleMeshCollider::GetNavmesh() const
@@ -277,13 +277,13 @@ FVoxelTriangleMeshCollider_RenderData::FVoxelTriangleMeshCollider_RenderData(con
 			for (const auto& Element : Elements)
 			{
 				Indices.Add(Vertices.Num());
-				Vertices.Add(Collider.TriangleMesh->Particles().X(Element[0]));
+				Vertices.Add(Collider.TriangleMesh->Particles().UE_504_SWITCH(X, GetX)(Element[0]));
 
 				Indices.Add(Vertices.Num());
-				Vertices.Add(Collider.TriangleMesh->Particles().X(Element[1]));
+				Vertices.Add(Collider.TriangleMesh->Particles().UE_504_SWITCH(X, GetX)(Element[1]));
 
 				Indices.Add(Vertices.Num());
-				Vertices.Add(Collider.TriangleMesh->Particles().X(Element[2]));
+				Vertices.Add(Collider.TriangleMesh->Particles().UE_504_SWITCH(X, GetX)(Element[2]));
 			}
 		};
 
@@ -338,7 +338,7 @@ FVoxelTriangleMeshCollider_RenderData::FVoxelTriangleMeshCollider_RenderData(con
 	StaticMeshVertexBuffer.BindPackedTexCoordVertexBuffer(VertexFactory.Get(), Data);
 	ColorVertexBuffer.BindColorVertexBuffer(VertexFactory.Get(), Data);
 
-	VertexFactory->SetData(Data);
+	VertexFactory->SetData(UE_504_ONLY(RHICmdList, ) Data);
 	VertexFactory->InitResource(UE_503_ONLY(RHICmdList));
 }
 

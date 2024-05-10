@@ -127,6 +127,8 @@ public:
 	void ProcessRenderTasks(FRDGBuilder& GraphBuilder);
 	void ProcessAsyncTasks();
 
+	void DestroyTasks();
+
 public:
 	FORCEINLINE bool ShouldExit() const
 	{
@@ -174,7 +176,7 @@ public:
 	FVoxelTaskGroupScope() = default;
 	~FVoxelTaskGroupScope();
 
-	UE_NODISCARD bool Initialize(FVoxelTaskGroup& NewGroup);
+	[[nodiscard]] bool Initialize(FVoxelTaskGroup& NewGroup);
 
 	FORCEINLINE FVoxelTaskGroup& GetGroup() const
 	{

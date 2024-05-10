@@ -11,7 +11,7 @@
 #include "TalentUnit.generated.h"
 
 UENUM(BlueprintType)
-enum class EPointSkillType
+enum class EPointSkillType :uint8
 {
 	kNuQi,
 	kWuXing,
@@ -21,7 +21,7 @@ enum class EPointSkillType
 };
 
 UENUM(BlueprintType)
-enum class EPointPropertyType
+enum class EPointPropertyType :uint8
 {
 	kLiDao,
 	kGenGu,
@@ -31,7 +31,7 @@ enum class EPointPropertyType
 };
 
 UENUM(BlueprintType)
-enum class EPointType
+enum class EPointType :uint8
 {
 	kNone,
 	kSkill,
@@ -43,7 +43,7 @@ struct FTalentHelper
 {
 	GENERATED_USTRUCT_BODY()
 
-	bool operator==(const FTalentHelper&RightValue)const;
+	bool operator==(const FTalentHelper& RightValue)const;
 
 	std::variant<EPointSkillType, EPointPropertyType>Type;
 

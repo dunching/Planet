@@ -231,7 +231,7 @@ void FVoxelScreenSizeChunkSpawner::UpdateTree(const FVector& ViewOrigin)
 			ensure(!Chunk->ChunkRef);
 		}
 
-		FVoxelUtilities::RunOnGameThread(MakeWeakPtrLambda(this, [=]
+		FVoxelUtilities::RunOnGameThread(MakeWeakPtrLambda(this, [this, NewTree]
 		{
 			VOXEL_FUNCTION_COUNTER();
 			check(IsInGameThread());

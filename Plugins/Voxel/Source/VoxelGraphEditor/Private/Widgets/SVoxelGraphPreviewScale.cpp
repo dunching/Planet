@@ -7,7 +7,7 @@ void SVoxelGraphPreviewScale::Construct(const FArguments& InArgs)
 	Value = InArgs._Value;
 	Resolution = InArgs._Resolution;
 
-	const auto GetPixelSize = [=]() -> double
+	const auto GetPixelSize = [this]() -> double
 	{
 		const TSharedPtr<SWidget> Widget = SizeWidget.Pin();
 		if (!ensure(Widget.IsValid()))

@@ -4,6 +4,7 @@
 #include "Rendering/VoxelMesh.h"
 #include "Rendering/VoxelMeshComponent.h"
 #include "Engine/Engine.h"
+#include "RenderTransform.h"
 #include "RayTracingInstance.h"
 #include "Materials/Material.h"
 
@@ -53,13 +54,13 @@ FVoxelMeshSceneProxy::FVoxelMeshSceneProxy(const UVoxelMeshComponent& Component)
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-void FVoxelMeshSceneProxy::CreateRenderThreadResources()
+void FVoxelMeshSceneProxy::CreateRenderThreadResources(UE_504_ONLY(FRHICommandListBase& RHICmdList))
 {
 	VOXEL_FUNCTION_COUNTER();
 	check(IsInRenderingThread());
 
 	Mesh->CallInitialize_RenderThread(
-		FRHICommandListExecutor::GetImmediateCommandList(),
+		UE_504_SWITCH(FRHICommandListExecutor::GetImmediateCommandList(), RHICmdList),
 		GetScene().GetFeatureLevel());
 }
 
@@ -218,7 +219,10 @@ void FVoxelMeshSceneProxy::GetDynamicRayTracingInstances(FRayTracingMaterialGath
 	RayTracingInstance.Geometry = RayTracingGeometry;
 	RayTracingInstance.InstanceTransforms.Add(GetLocalToWorld());
 	RayTracingInstance.Materials.Add(MeshBatch);
+
+#if VOXEL_ENGINE_VERSION < 504
 	Context.BuildInstanceMaskAndFlags(RayTracingInstance, *this);
+#endif
 
 	OutRayTracingInstances.Add(RayTracingInstance);
 }

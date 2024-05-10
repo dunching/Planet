@@ -1073,10 +1073,10 @@ void UVoxelGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContext
 				INVTEXT("Collapse to Macro"),
 				INVTEXT("Collapse to Macro"),
 				{},
-				FUIAction(MakeLambdaDelegate([=]
+				FUIAction(MakeLambdaDelegate([this, Context, Toolkit]
 				{
 					FVoxelGraphSchemaAction_CollapseToMacro Action;
-					if (const UVoxelGraphMacroNode* NewMacroNode = Cast<UVoxelGraphMacroNode>(Action.PerformAction(Cast<UEdGraph>(Context->Graph), nullptr, FVector2D::ZeroVector, true)))
+					if (const UVoxelGraphMacroNode* NewMacroNode = Cast<UVoxelGraphMacroNode>(Action.PerformAction(ConstCast(Context->Graph), nullptr, FVector2D::ZeroVector, true)))
 					{
 						Toolkit->SelectMember(NewMacroNode->GraphInterface, true, true);
 					}
@@ -1092,10 +1092,10 @@ void UVoxelGraphSchema::GetContextMenuActions(UToolMenu* Menu, UGraphNodeContext
 					INVTEXT("Expand Macro"),
 					INVTEXT("Expand Macro"),
 					{},
-					FUIAction(MakeLambdaDelegate([=]
+					FUIAction(MakeLambdaDelegate([this, Context]
 					{
 						FVoxelGraphSchemaAction_ExpandMacro Action;
-						Action.PerformAction(Cast<UEdGraph>(Context->Graph), nullptr, FVector2D::ZeroVector, true);
+						Action.PerformAction(ConstCast(Context->Graph), nullptr, FVector2D::ZeroVector, true);
 					}))
 				);
 			}

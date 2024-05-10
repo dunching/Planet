@@ -152,7 +152,7 @@ void SVoxelNewAssetInstanceSourceFilterBox::Construct(const FArguments& Args)
 
 			    return ECheckBoxState::Checked;
 			})
-            .OnCheckStateChanged(FOnCheckStateChanged::CreateLambda([=](ECheckBoxState NewState)
+            .OnCheckStateChanged(FOnCheckStateChanged::CreateLambda([this](ECheckBoxState NewState)
 			{
 			    bool bAnyChange = false;
 			    for (int32 SourceIndex = 0; SourceIndex < int32(EVoxelGraphScriptSource::Unknown); SourceIndex++)

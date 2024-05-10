@@ -171,7 +171,7 @@ FVoxelComputeValue FVoxelFunctionNode::CompileCompute(const FName ReturnPinName)
 
 		MakeVoxelTask(STATIC_FNAME("FVoxelFunctionNode"))
 		.Dependencies(InputValues)
-		.Execute([=]
+		.Execute([this, InputValues, Query, OutputStates]
 		{
 			TVoxelArray<FVoxelRuntimePinValue*, FAllocatorType> Values;
 			TVoxelArray<FVoxelRuntimePinValue, FAllocatorType> InputBufferStorage;

@@ -107,7 +107,7 @@ void FVoxelTexturePreviewHandler::Create(const FVoxelPinType& Type)
 			});
 		}
 
-		FVoxelUtilities::RunOnGameThread(MakeWeakPtrLambda(this, [=]
+		FVoxelUtilities::RunOnGameThread(MakeWeakPtrLambda(this, [this, Bytes]
 		{
 			if (!Texture)
 			{

@@ -34,7 +34,7 @@ void FVoxelRenderMeshExecNodeRuntime::Create()
 		GetLocalToWorld());
 
 	InvokerView->Bind_Async(
-		MakeWeakPtrDelegate(this, [=](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
+		MakeWeakPtrDelegate(this, [this, ChunkedPoints, RenderDistance, MinRenderDistance, FadeDistance, FoliageSettings, ChunkSize](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
 		{
 			VOXEL_SCOPE_COUNTER("OnAddChunk");
 
@@ -71,7 +71,7 @@ void FVoxelRenderMeshExecNodeRuntime::Create()
 				}
 			}
 		}),
-		MakeWeakPtrDelegate(this, [=](const TVoxelAddOnlySet<FIntVector>& ChunksToRemove)
+		MakeWeakPtrDelegate(this, [this, ChunkSize](const TVoxelAddOnlySet<FIntVector>& ChunksToRemove)
 		{
 			VOXEL_SCOPE_COUNTER("OnRemoveChunk");
 

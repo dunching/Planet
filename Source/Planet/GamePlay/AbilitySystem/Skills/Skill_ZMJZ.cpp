@@ -50,7 +50,7 @@ void USkill_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGa
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
 	RepeatType = ERepeatType::kCount;
-
+	RepeatCount = 1;
 	CurrentRepeatCount = 0;
 }
 

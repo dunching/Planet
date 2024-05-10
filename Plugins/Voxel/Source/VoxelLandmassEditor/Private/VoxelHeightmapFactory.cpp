@@ -246,7 +246,7 @@ void SVoxelHeightmapFactoryDetails::Construct(const FArguments& Args)
 						.HAlign(HAlign_Center)
 						.IsEnabled(Args._CanCreate)
 						.ContentPadding(FAppStyle::GetMargin("StandardDialog.ContentPadding"))
-						.OnClicked_Lambda([=]
+						.OnClicked_Lambda([this, Args]
 						{
 							if (Args._OnCreate.Execute())
 							{

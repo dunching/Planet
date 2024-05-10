@@ -99,8 +99,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 Decrement = 5;
 
-	ACharacterBase* CharacterPtr = nullptr;
-
 	FValueChangedDelegateHandle OnValueChanged;
 
 	FDelegateHandle AbilityActivatedCallbacksHandle;

@@ -6,10 +6,15 @@
 #include "VoxelMinimal/Containers/VoxelChunkedArray.h"
 #include "Templates/Casts.h"
 #include "Templates/SubclassOf.h"
+#include "Templates/ChooseClass.h"
 #include "UObject/UObjectHash.h"
 #include "Serialization/BulkData.h"
 
 class FUObjectToken;
+
+template<typename>
+class TVoxelStructView;
+using FVoxelStructView = TVoxelStructView<void>;
 
 template<typename FieldType>
 FORCEINLINE FieldType* CastField(FField& Src)
@@ -239,7 +244,7 @@ public:
 public:
 	static uint32 HashProperty(const FProperty& Property, const void* DataPtr);
 	static void DestroyStruct_Safe(const UScriptStruct* Struct, void* StructMemory);
-	static void AddStructReferencedObjects(FReferenceCollector& Collector, const UScriptStruct* Struct, void* StructMemory);
+	static void AddStructReferencedObjects(FReferenceCollector& Collector, const FVoxelStructView& StructView);
 
 	template<typename T>
 	static bool AreStructsIdentical(const T& A, const T& B)
@@ -277,19 +282,19 @@ public:
 public:
 	template<typename T>
 	using TPropertyType = typename TChooseClass<
-		std::is_same_v<T, bool>          , FBoolProperty      , typename TChooseClass<
-		std::is_same_v<T, uint8>         , FByteProperty      , typename TChooseClass<
-		std::is_same_v<T, float>         , FFloatProperty     , typename TChooseClass<
-		std::is_same_v<T, double>        , FDoubleProperty    , typename TChooseClass<
-		std::is_same_v<T, int32>         , FIntProperty       , typename TChooseClass<
-		std::is_same_v<T, int64>         , FInt64Property     , typename TChooseClass<
-		std::is_same_v<T, FName>         , FNameProperty      , typename TChooseClass<
-		TIsEnum<T>::Value                , FEnumProperty      , typename TChooseClass<
-		TIsDerivedFrom<T, UObject>::Value, FObjectProperty    , typename TChooseClass<
-		TIsTObjectPtr<T>::Value          , FObjectPtrProperty , typename TChooseClass<
-		TIsSoftObjectPtr<T>::Value       , FSoftObjectProperty, typename TChooseClass<
+		std::is_same_v<T, bool>          , FBoolProperty                                      , typename TChooseClass<
+		std::is_same_v<T, uint8>         , FByteProperty                                      , typename TChooseClass<
+		std::is_same_v<T, float>         , FFloatProperty                                     , typename TChooseClass<
+		std::is_same_v<T, double>        , FDoubleProperty                                    , typename TChooseClass<
+		std::is_same_v<T, int32>         , FIntProperty                                       , typename TChooseClass<
+		std::is_same_v<T, int64>         , FInt64Property                                     , typename TChooseClass<
+		std::is_same_v<T, FName>         , FNameProperty                                      , typename TChooseClass<
+		TIsEnum<T>::Value                , FEnumProperty                                      , typename TChooseClass<
+		TIsDerivedFrom<T, UObject>::Value, FObjectProperty                                    , typename TChooseClass<
+		TIsTObjectPtr<T>::Value          , UE_504_SWITCH(FObjectPtrProperty, FObjectProperty) , typename TChooseClass<
+		TIsSoftObjectPtr<T>::Value       , FSoftObjectProperty                                , typename TChooseClass<
 		TIsTSubclassOf<T>::Value         , FClassProperty
-	                                     , FStructProperty
+										 , FStructProperty
 	>::Result
 	>::Result
 	>::Result
@@ -328,6 +333,12 @@ private:
 		{
 			return CastFieldChecked<FStructProperty>(Property).Struct == StaticStructFast<T>();
 		}
+#if VOXEL_ENGINE_VERSION >= 504
+		else if constexpr (std::is_same_v<PropertyType, FObjectProperty>)
+		{
+			return CastFieldChecked<FObjectProperty>(Property).PropertyClass == StaticClassFast<typename TRemoveObjectPointer<T>::Type>();
+		}
+#else
 		else if constexpr (std::is_same_v<PropertyType, FObjectProperty>)
 		{
 			return CastFieldChecked<FObjectProperty>(Property).PropertyClass == StaticClassFast<T>();
@@ -336,6 +347,7 @@ private:
 		{
 			return CastFieldChecked<FObjectProperty>(Property).PropertyClass == StaticClassFast<typename TRemoveObjectPointer<T>::Type>();
 		}
+#endif
 		else if constexpr (std::is_same_v<PropertyType, FSoftObjectProperty>)
 		{
 			return CastFieldChecked<FSoftObjectProperty>(Property).PropertyClass == StaticClassFast<T>();
@@ -457,7 +469,7 @@ public:
 	virtual void AllowEliminatingReferences(bool bAllow) override;
 	virtual void SetSerializedProperty(FProperty* InProperty) override;
 	virtual FProperty* GetSerializedProperty() const override;
-	virtual bool MarkWeakObjectReferenceForClearing(UObject** WeakReference) override;
+	virtual bool MarkWeakObjectReferenceForClearing(UObject** WeakReference UE_504_ONLY(, UObject* ReferenceOwner)) override;
 	virtual void SetIsProcessingNativeReferences(bool bIsNative) override;
 	virtual bool IsProcessingNativeReferences() const override;
 	virtual bool NeedsInitialReferences() const override;

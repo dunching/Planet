@@ -8,6 +8,9 @@ public class PlanetEditorTarget : TargetRules
 	public PlanetEditorTarget( TargetInfo Target) : base(Target)
     {
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+        //  bStrictConformanceMode = true;
+
+        BuildEnvironment = TargetBuildEnvironment.Unique;
 
         Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;

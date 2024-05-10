@@ -12,7 +12,7 @@ void FVoxelExecNodeRuntimeWrapper::Initialize(const TSharedRef<FVoxelQueryContex
 		.Thread(EVoxelTaskThread::GameThread)
 		.Compute(Context.ToSharedRef());
 
-	EnableNodeValue.OnChanged_GameThread(MakeWeakPtrLambda(this, [=](const bool bNewEnableNode)
+	EnableNodeValue.OnChanged_GameThread(MakeWeakPtrLambda(this, [this](const bool bNewEnableNode)
 	{
 		if (!bNewEnableNode)
 		{

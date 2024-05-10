@@ -18,13 +18,13 @@ DEFINE_VOXEL_INSTANCE_COUNTER(FVoxelMaterialRef);
 
 struct FVoxelInstanceRef
 {
-	UMaterialInstanceDynamic* Instance = nullptr;
+	TObjectPtr<UMaterialInstanceDynamic> Instance = nullptr;
 };
 
 struct FVoxelInstancePool
 {
 	double LastAccessTime = 0;
-	TArray<UMaterialInstanceDynamic*> Instances;
+	TArray<TObjectPtr<UMaterialInstanceDynamic>> Instances;
 };
 
 class FVoxelMaterialRefManager : public FVoxelSingleton

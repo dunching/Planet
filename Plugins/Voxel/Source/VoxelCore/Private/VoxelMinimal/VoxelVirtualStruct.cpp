@@ -55,7 +55,7 @@ TSharedRef<FVoxelVirtualStruct> FVoxelVirtualStruct::MakeSharedCopy() const
 
 void FVoxelVirtualStruct::AddStructReferencedObjects(FReferenceCollector& Collector)
 {
-	FVoxelObjectUtilities::AddStructReferencedObjects(Collector, GetStruct(), this);
+	FVoxelObjectUtilities::AddStructReferencedObjects(Collector, MakeVoxelStructView(*this));
 }
 
 bool FVoxelVirtualStruct::Equals_UPropertyOnly(

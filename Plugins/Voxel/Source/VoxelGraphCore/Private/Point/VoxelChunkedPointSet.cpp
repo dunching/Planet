@@ -111,7 +111,7 @@ TVoxelDynamicValue<FVoxelPointSet> FVoxelChunkedPointSet::GetPointsValue(
 
 	TVoxelDynamicValueFactory<FVoxelPointSet> Factory(
 		STATIC_FNAME("ChunkedPointSet"),
-		MakeWeakPtrLambda(this, [=](const FVoxelQuery& Query)
+		MakeWeakPtrLambda(this, [this, ChunkMin](const FVoxelQuery& Query)
 		{
 			return GetPoints(Query.GetDependencyTracker(), ChunkMin);
 		}));

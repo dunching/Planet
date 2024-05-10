@@ -126,7 +126,7 @@ FReply SVoxelAddContentWidget::AddButtonClicked()
 	const TSharedRef<IHttpRequest> Request = FHttpModule::Get().CreateRequest();
 	Request->SetURL(Url);
 	Request->SetVerb("GET");
-	Request->OnProcessRequestComplete().BindLambda([=](FHttpRequestPtr, const FHttpResponsePtr Response, const bool bConnectedSuccessfully)
+	Request->OnProcessRequestComplete().BindLambda([this, Content](FHttpRequestPtr, const FHttpResponsePtr Response, const bool bConnectedSuccessfully)
 	{
 		if (!bConnectedSuccessfully ||
 			!Response ||
@@ -152,9 +152,9 @@ FReply SVoxelAddContentWidget::AddButtonClicked()
 			return;
 		}
 
-		const FString DownloadUrl = ContentObject->GetStringField("url");
-		const int32 DownloadSize = ContentObject->GetNumberField("size");
-		const FString Hash = ContentObject->GetStringField("hash");
+		const FString DownloadUrl = ContentObject->GetStringField(TEXT("url"));
+		const int32 DownloadSize = ContentObject->GetNumberField(TEXT("size"));
+		const FString Hash = ContentObject->GetStringField(TEXT("hash"));
 
 		FNotificationInfo Info(FText::FromString("Downloading " + Content.Name));
 		Info.bFireAndForget = false;
@@ -163,14 +163,18 @@ FReply SVoxelAddContentWidget::AddButtonClicked()
 		const TSharedRef<IHttpRequest> NewRequest = FHttpModule::Get().CreateRequest();
 		NewRequest->SetURL(DownloadUrl);
 		NewRequest->SetVerb("GET");
-		NewRequest->OnRequestProgress().BindLambda([=](FHttpRequestPtr, int32 BytesSent, int32 BytesReceived)
+#if VOXEL_ENGINE_VERSION < 504
+		NewRequest->OnRequestProgress().BindLambda([=](const FHttpRequestPtr&, const int32 BytesSent, const int32 BytesReceived)
+#else
+		NewRequest->OnRequestProgress64().BindLambda([Notification, DownloadSize](const FHttpRequestPtr&, const int64 BytesSent, const int64 BytesReceived)
+#endif
 		{
 			Notification->SetSubText(FText::FromString(FString::Printf(
 				TEXT("%.1f/%.1fMB"),
 				BytesReceived / double(1 << 20),
 				DownloadSize / double(1 << 20))));
 		});
-		NewRequest->OnProcessRequestComplete().BindLambda([=](FHttpRequestPtr, const FHttpResponsePtr NewResponse, const bool bNewConnectedSuccessfully)
+		NewRequest->OnProcessRequestComplete().BindLambda([this, Notification, Hash, Content](FHttpRequestPtr, const FHttpResponsePtr NewResponse, const bool bNewConnectedSuccessfully)
 		{
 			Notification->ExpireAndFadeout();
 

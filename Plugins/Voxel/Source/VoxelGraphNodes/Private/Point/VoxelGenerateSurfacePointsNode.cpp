@@ -93,7 +93,7 @@ void FVoxelGenerateSurfacePointsBuilder::ComputeDistances()
 
 	MakeVoxelTask()
 	.Dependency(Distances)
-	.Execute(MakeWeakPtrLambda(this, [=]
+	.Execute(MakeWeakPtrLambda(this, [this, Distances]
 	{
 		ProcessDistances(Distances.Get_CheckCompleted().GetStorage());
 	}));
@@ -295,7 +295,7 @@ void FVoxelGenerateSurfacePointsBuilder::ComputeFinalDistances()
 
 	MakeVoxelTask()
 	.Dependency(SparseDistances)
-	.Execute(MakeWeakPtrLambda(this, [=, ValueIndices = MoveTemp(ValueIndices)]
+	.Execute(MakeWeakPtrLambda(this, [this, NumQueries, SparseDistances, ValueIndices = MoveTemp(ValueIndices)]
 	{
 		ProcessFinalDistances(
 			NumQueries,

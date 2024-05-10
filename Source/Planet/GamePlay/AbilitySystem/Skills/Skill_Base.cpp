@@ -16,7 +16,20 @@ void USkill_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const 
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
+	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+
 	CooldownConsumeTime = CooldownTime - ResetCooldownTime;
+}
+
+void USkill_Base::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
+{
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
 void USkill_Base::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -120,7 +133,6 @@ void USkill_Base::AddCooldownConsumeTime(float NewTime)
 
 void USkill_Base::SendEvent(const FGameplayEventData& Payload)
 {
-	auto CharacterPtr = Cast<ACharacterBase>(GetActorInfo().AvatarActor.Get());
 	if (CharacterPtr)
 	{
 		auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();

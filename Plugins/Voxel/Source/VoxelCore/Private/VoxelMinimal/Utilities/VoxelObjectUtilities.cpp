@@ -494,7 +494,9 @@ uint32 FVoxelObjectUtilities::HashProperty(const FProperty& Property, const void
 	CASE(FClassProperty);
 	CASE(FNameProperty);
 	CASE(FObjectProperty);
+#if VOXEL_ENGINE_VERSION < 504
 	CASE(FObjectPtrProperty);
+#endif
 	CASE(FWeakObjectProperty);
 #undef CASE
 	default: break;
@@ -634,23 +636,23 @@ void FVoxelObjectUtilities::DestroyStruct_Safe(const UScriptStruct* Struct, void
 ///////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 
-void FVoxelObjectUtilities::AddStructReferencedObjects(FReferenceCollector& Collector, const UScriptStruct* Struct, void* StructMemory)
+void FVoxelObjectUtilities::AddStructReferencedObjects(FReferenceCollector& Collector, const FVoxelStructView& StructView)
 {
 	VOXEL_FUNCTION_COUNTER();
 
-	if (!ensure(Struct))
+	if (!ensure(StructView.IsValid()))
 	{
 		return;
 	}
 
-	if (Struct->StructFlags & STRUCT_AddStructReferencedObjects)
+	if (StructView.GetStruct()->StructFlags & STRUCT_AddStructReferencedObjects)
 	{
-		Struct->GetCppStructOps()->AddStructReferencedObjects()(StructMemory, Collector);
+		StructView.GetStruct()->GetCppStructOps()->AddStructReferencedObjects()(StructView.GetMemory(), Collector);
 	}
 
-	for (TPropertyValueIterator<const FObjectProperty> It(Struct, StructMemory); It; ++It)
+	for (TPropertyValueIterator<const FObjectProperty> It(StructView.GetStruct(), StructView.GetMemory()); It; ++It)
 	{
-		UObject** ObjectPtr = static_cast<UObject**>(ConstCast(It.Value()));
+		TObjectPtr<UObject>* ObjectPtr = static_cast<TObjectPtr<UObject>*>(ConstCast(It.Value()));
 		Collector.AddReferencedObject(*ObjectPtr);
 	}
 }
@@ -868,9 +870,9 @@ FProperty* FVoxelNullCheckReferenceCollector::GetSerializedProperty() const
 	return ReferenceCollector.GetSerializedProperty();
 }
 
-bool FVoxelNullCheckReferenceCollector::MarkWeakObjectReferenceForClearing(UObject** WeakReference)
+bool FVoxelNullCheckReferenceCollector::MarkWeakObjectReferenceForClearing(UObject** WeakReference UE_504_ONLY(, UObject* ReferenceOwner))
 {
-	return ReferenceCollector.MarkWeakObjectReferenceForClearing(WeakReference);
+	return ReferenceCollector.MarkWeakObjectReferenceForClearing(WeakReference UE_504_ONLY(, ReferenceOwner));
 }
 
 void FVoxelNullCheckReferenceCollector::SetIsProcessingNativeReferences(const bool bIsNative)

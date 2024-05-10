@@ -217,7 +217,7 @@ void FVoxelParameterValues::Update_GameThread_RequiresLock()
 		{
 			if (ParameterValue.Value.IsValid() &&
 				// TODO IsArray?
-//				ensure(!ParameterValue.Value.IsBuffer()) &&
+				ensure(!ParameterValue.Value.IsBuffer()) &&
 				FVoxelPinType::MakeExposedValue(ParameterValue.Value, false) == NewValue)
 			{
 				continue;

@@ -59,7 +59,7 @@ void FVoxelInvokerView::Bind_Async(
 
 void FVoxelInvokerView::Tick(
 	const UWorld* World,
-	const TVoxelSet<UVoxelInvokerComponent*>& InvokerComponents)
+	const TVoxelSet<TObjectPtr<UVoxelInvokerComponent>>& InvokerComponents)
 {
 	VOXEL_SCOPE_COUNTER_FORMAT("FVoxelInvokerView::Tick Channel=%s NumInvokers=%d", *Channel.ToString(), InvokerComponents.Num());
 
@@ -372,7 +372,7 @@ void FVoxelInvokerManager::AddReferencedObjects(FReferenceCollector& Collector)
 
 	for (auto It = InvokerComponents.CreateIterator(); It; ++It)
 	{
-		UVoxelInvokerComponent* InvokerComponent = *It;
+		TObjectPtr<UVoxelInvokerComponent> InvokerComponent = *It;
 		Collector.AddReferencedObject(InvokerComponent);
 
 		if (!ensure(InvokerComponent))

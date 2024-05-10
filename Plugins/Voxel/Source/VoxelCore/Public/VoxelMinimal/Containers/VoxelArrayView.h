@@ -82,7 +82,7 @@ public:
 	{
 		CheckInvariants();
 
-		checkfVoxelSlow((Index >= 0) & (Index < Num()),TEXT("Array index out of bounds: %i from an array of size %i"),Index,Num()); // & for one branch
+		checkf((Index >= 0) & (Index < Num()),TEXT("Array index out of bounds: %i from an array of size %i"),Index,Num()); // & for one branch
 	}
 
 	FORCEINLINE TVoxelArrayView Slice(InSizeType Index, InSizeType InNum) const

@@ -525,6 +525,35 @@ void FVoxelTaskGroup::ProcessAsyncTasks()
 	}
 }
 
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
+void FVoxelTaskGroup::DestroyTasks()
+{
+	VOXEL_FUNCTION_COUNTER();
+
+	while (GameTasks.Pop())
+	{
+		// Continue emptying queue
+	}
+	while (RenderTasks.Pop())
+	{
+		// Continue emptying queue
+	}
+	while (AsyncTasks.Pop())
+	{
+		// Continue emptying queue
+	}
+
+	VOXEL_SCOPE_LOCK(PendingTasksCriticalSection);
+	PendingTasks_RequiresLock.Reset();
+}
+
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+
 FVoxelTaskGroup::FVoxelTaskGroup(
 	const FName Name,
 	const bool bIsSynchronous,
@@ -577,23 +606,35 @@ FVoxelTaskGroupScope::~FVoxelTaskGroupScope()
 
 bool FVoxelTaskGroupScope::Initialize(FVoxelTaskGroup& NewGroup)
 {
-	if (NewGroup.RuntimeInfo->bDestroyStarted.Load())
+	const bool bInitialized = INLINE_LAMBDA
 	{
-		return false;
+		if (NewGroup.RuntimeInfo->bDestroyStarted.Load())
+		{
+			return false;
+		}
+
+		NewGroup.RuntimeInfo->NumActiveTasks.Increment();
+
+		if (NewGroup.RuntimeInfo->bDestroyStarted.Load())
+		{
+			ensure(NewGroup.RuntimeInfo->NumActiveTasks.Decrement() >= 0);
+			return false;
+		}
+
+		Group = NewGroup.AsShared();
+
+		PreviousTLS = FPlatformTLS::GetTlsValue(GVoxelTaskGroupTLS);
+		FPlatformTLS::SetTlsValue(GVoxelTaskGroupTLS, &NewGroup);
+
+		return true;
+	};
+
+	if (bInitialized)
+	{
+		return true;
 	}
 
-	NewGroup.RuntimeInfo->NumActiveTasks.Increment();
-
-	if (NewGroup.RuntimeInfo->bDestroyStarted.Load())
-	{
-		ensure(Group->RuntimeInfo->NumActiveTasks.Decrement() >= 0);
-		return false;
-	}
-
-	Group = NewGroup.AsShared();
-
-	PreviousTLS = FPlatformTLS::GetTlsValue(GVoxelTaskGroupTLS);
-	FPlatformTLS::SetTlsValue(GVoxelTaskGroupTLS, &NewGroup);
-
-	return true;
+	// Exiting, make sure to clean up any pending tasks to avoid cyclic shared references with async tasks
+	NewGroup.DestroyTasks();
+	return false;
 }

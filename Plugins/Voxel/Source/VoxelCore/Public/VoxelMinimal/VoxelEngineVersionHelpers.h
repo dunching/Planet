@@ -7,6 +7,14 @@
 
 #define VOXEL_ENGINE_VERSION (ENGINE_MAJOR_VERSION * 100 + ENGINE_MINOR_VERSION)
 
+#if VOXEL_ENGINE_VERSION >= 504
+#define UE_504_SWITCH(Before, AfterOrEqual) AfterOrEqual
+#define UE_504_ONLY(...) __VA_ARGS__
+#else
+#define UE_504_SWITCH(Before, AfterOrEqual) Before
+#define UE_504_ONLY(...)
+#endif
+
 #if VOXEL_ENGINE_VERSION >= 503
 #define UE_503_SWITCH(Before, AfterOrEqual) AfterOrEqual
 #define UE_503_ONLY(...) __VA_ARGS__

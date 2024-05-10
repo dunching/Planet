@@ -54,8 +54,6 @@ protected:
 
 	FDelegateHandle AbilityActivatedCallbacksHandle;
 
-	ACharacterBase* CharacterPtr = nullptr;
-
 	UEffectItem* EffectItemPtr = nullptr;
 
 	uint8 MaxCount = 5;

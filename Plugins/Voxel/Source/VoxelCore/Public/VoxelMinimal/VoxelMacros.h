@@ -22,6 +22,9 @@
 #define INTELLISENSE_ONLY(...) __VA_ARGS__
 #define INTELLISENSE_SKIP(...)
 
+// Don't tag unused variables as errors
+#pragma warning(default: 4101)
+
 // Needed for Resharper to detect the printf hidden in the lambda
 #undef UE_LOG
 #define UE_LOG(CategoryName, Verbosity, Format, ...) \

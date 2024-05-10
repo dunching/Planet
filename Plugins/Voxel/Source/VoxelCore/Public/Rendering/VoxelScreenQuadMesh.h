@@ -20,7 +20,7 @@ public:
 	virtual int64 GetGpuAllocatedSize() const override;
 	virtual TSharedPtr<FVoxelMaterialRef> GetMaterial() const override;
 
-	virtual void Initialize_RenderThread(FRHICommandList& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) override;
+	virtual void Initialize_RenderThread(FRHICommandListBase& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) override;
 	virtual void Destroy_RenderThread() override;
 
 	virtual bool Draw_RenderThread(const FPrimitiveSceneProxy& Proxy, FMeshBatch& MeshBatch) const override;

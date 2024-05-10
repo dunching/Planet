@@ -255,7 +255,7 @@ public:
 	void Update_GameThread();
 
 private:
-	TArray<UTexture2D*> Textures_GameThread;
+	TArray<TObjectPtr<UTexture2D>> Textures_GameThread;
 	const TSharedRef<FVoxelDetailTextureDynamicMaterialParameter> DynamicParameter = MakeVoxelShared<FVoxelDetailTextureDynamicMaterialParameter>();
 
 	VOXEL_ALLOCATED_SIZE_TRACKER_CUSTOM(STAT_VoxelDetailTextureMemory, DetailTextureMemory);
@@ -398,7 +398,7 @@ public:
 	//~ End FVoxelSingleton Interface
 
 private:
-	TMap<UVoxelDetailTexture*, TSharedPtr<FVoxelDetailTexturePool>> TextureToPool;
+	TMap<TObjectPtr<UVoxelDetailTexture>, TSharedPtr<FVoxelDetailTexturePool>> TextureToPool;
 	TQueue<TSharedPtr<FVoxelDetailTextureUpload>, EQueueMode::Mpsc> PendingUploads;
 	TQueue<TWeakPtr<FVoxelDetailTextureAllocator>, EQueueMode::Mpsc> AllocatorsToUpdate;
 

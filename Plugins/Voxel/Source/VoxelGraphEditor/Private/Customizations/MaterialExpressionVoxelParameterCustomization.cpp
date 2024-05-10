@@ -43,7 +43,7 @@ public:
 			[
 				SAssignNew(ParameterComboBox, SVoxelDetailComboBox<FGuid>)
 				.RefreshDelegate(ParameterGuidHandle, DetailLayout)
-				.Options_Lambda([=]
+				.Options_Lambda([this]
 				{
 					return AvailableParameters;
 				})

@@ -22,7 +22,7 @@ void FVoxelRaymarchDistanceFieldProcessor::Compute()
 
 	MakeVoxelTask()
 	.Dependency(NewDistances)
-	.Execute(MakeWeakPtrLambda(this, [=]
+	.Execute(MakeWeakPtrLambda(this, [this, NewDistances]
 	{
 		ProcessDistances(NewDistances.Get_CheckCompleted());
 	}));
@@ -166,7 +166,7 @@ void FVoxelRaymarchDistanceFieldProcessor::ProcessDistances(const FVoxelFloatBuf
 
 	MakeVoxelTask()
 	.Dependency(Gradient)
-	.Execute(MakeWeakPtrLambda(this, [=]
+	.Execute(MakeWeakPtrLambda(this, [this, Gradient]
 	{
 		ProcessGradient(Gradient.Get_CheckCompleted());
 	}));
@@ -231,7 +231,7 @@ void FVoxelRaymarchDistanceFieldProcessor::ProcessGradient(const FVoxelVectorBuf
 
 	MakeVoxelTask()
 	.Dependency(NewDistances)
-	.Execute(MakeWeakPtrLambda(this, [=]
+	.Execute(MakeWeakPtrLambda(this, [this, NewDistances]
 	{
 		ProcessDistances(NewDistances.Get_CheckCompleted());
 	}));
@@ -278,7 +278,7 @@ void FVoxelRaymarchDistanceFieldProcessor::Finalize()
 
 	MakeVoxelTask()
 	.Dependency(Gradient)
-	.Execute(MakeWeakPtrLambda(this, [=]
+	.Execute(MakeWeakPtrLambda(this, [this, Gradient]
 	{
 		NewPointNormals = Gradient.Get_CheckCompleted();
 		Dummy.MarkDummyAsCompleted();

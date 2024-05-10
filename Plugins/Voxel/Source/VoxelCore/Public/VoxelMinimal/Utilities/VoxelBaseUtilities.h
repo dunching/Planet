@@ -313,7 +313,7 @@ namespace FVoxelUtilities
 
 	FORCEINLINE uint8 CastToUINT8(int32 Value)
 	{
-		ensureMsgfVoxelSlowNoSideEffects(0 <= Value && Value < 256, TEXT("Invalid uint8 value: %d"), Value);
+		ensureMsgf((0 <= Value && Value < 256) || GVoxelDisableSlowChecks, TEXT("Invalid uint8 value: %d"), Value);
 		return Value;
 	}
 	FORCEINLINE constexpr int8 ClampToINT8(int32 Value)

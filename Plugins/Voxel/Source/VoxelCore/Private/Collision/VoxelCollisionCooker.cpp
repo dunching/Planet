@@ -18,7 +18,7 @@ template <>
 struct FTriangleMeshOverlapVisitorNoMTD<FCookTriangleDummy>
 {
 	template<typename IndexType>
-	static TSharedPtr<FTriangleMeshImplicitObject> CookTriangleMesh(
+	static UE_504_SWITCH(TSharedPtr, TRefCountPtr)<FTriangleMeshImplicitObject> CookTriangleMesh(
 		const TConstVoxelArrayView<int32> Indices,
 		const TConstVoxelArrayView<FVector3f> Vertices,
 		const TConstVoxelArrayView<uint16> FaceMaterials)
@@ -31,7 +31,11 @@ struct FTriangleMeshOverlapVisitorNoMTD<FCookTriangleDummy>
 
 		for (int32 Index = 0; Index < Vertices.Num(); Index++)
 		{
+#if VOXEL_ENGINE_VERSION >= 504
+			Particles.SetX(Index, Vertices[Index]);
+#else
 			Particles.X(Index) = Vertices[Index];
+#endif
 		}
 
 		const int32 NumTriangles = Indices.Num() / 3;
@@ -48,9 +52,9 @@ struct FTriangleMeshOverlapVisitorNoMTD<FCookTriangleDummy>
 			};
 
 			if (!FConvexBuilder::IsValidTriangle(
-				Particles.X(Triangle.X),
-				Particles.X(Triangle.Y),
-				Particles.X(Triangle.Z)))
+				Particles.UE_504_SWITCH(X, GetX)(Triangle.X),
+				Particles.UE_504_SWITCH(X, GetX)(Triangle.Y),
+				Particles.UE_504_SWITCH(X, GetX)(Triangle.Z)))
 			{
 				continue;
 			}
@@ -67,7 +71,11 @@ struct FTriangleMeshOverlapVisitorNoMTD<FCookTriangleDummy>
 		{
 			VOXEL_SCOPE_COUNTER("Slow cook");
 
+#if VOXEL_ENGINE_VERSION < 504
 			return MakeVoxelShared<FTriangleMeshImplicitObject>(
+#else
+			return new FTriangleMeshImplicitObject(
+#endif
 				MoveTemp(Particles),
 				MoveTemp(Triangles),
 				TArray<uint16>(FaceMaterials),
@@ -153,7 +161,11 @@ struct FTriangleMeshOverlapVisitorNoMTD<FCookTriangleDummy>
 		}
 
 		VOXEL_SCOPE_COUNTER("FTriangleMeshImplicitObject::FTriangleMeshImplicitObject");
+#if VOXEL_ENGINE_VERSION < 504
 		return MakeVoxelShareable(new (GVoxelMemory) FTriangleMeshImplicitObject(
+#else
+		return (new FTriangleMeshImplicitObject(
+#endif
 			MoveTemp(Particles),
 			MoveTemp(Triangles),
 			TArray<uint16>(FaceMaterials),
@@ -180,7 +192,7 @@ TSharedPtr<FVoxelTriangleMeshCollider> FVoxelCollisionCooker::CookTriangleMesh(
 
 	using FCooker = Chaos::FTriangleMeshOverlapVisitorNoMTD<Chaos::FCookTriangleDummy>;
 
-	TSharedPtr<Chaos::FTriangleMeshImplicitObject> TriangleMesh;
+	UE_504_SWITCH(TSharedPtr, TRefCountPtr)<Chaos::FTriangleMeshImplicitObject> TriangleMesh;
 	if (Vertices.Num() < MAX_uint16)
 	{
 		TriangleMesh = FCooker::CookTriangleMesh<uint16>(Indices, Vertices, FaceMaterials);

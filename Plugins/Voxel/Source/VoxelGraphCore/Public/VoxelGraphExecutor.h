@@ -15,7 +15,7 @@ struct VOXELGRAPHCORE_API FVoxelGraphExecutorInfo
 #if WITH_EDITOR
 	TSharedPtr<const Voxel::Graph::FGraph> Graph_EditorOnly;
 #endif
-	UVoxelRuntimeGraph* RuntimeInfo = nullptr;
+	TObjectPtr<UVoxelRuntimeGraph> RuntimeInfo = nullptr;
 };
 
 class VOXELGRAPHCORE_API FVoxelGraphExecutor

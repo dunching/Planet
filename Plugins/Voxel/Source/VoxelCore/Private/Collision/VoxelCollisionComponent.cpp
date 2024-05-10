@@ -66,7 +66,7 @@ void UVoxelCollisionComponent::SetCollider(const TSharedPtr<const FVoxelCollider
 
 	if (Collider)
 	{
-		ensure(BodySetup->ChaosTriMeshes.Num() == 0);
+		ensure(BodySetup->UE_504_SWITCH(ChaosTriMeshes, TriMeshGeometries).Num() == 0);
 		Collider->AddToBodySetup(*BodySetup);
 		BodySetup->bCreatedPhysicsMeshes = true;
 	}

@@ -67,7 +67,7 @@ TSharedPtr<FVoxelMaterialRef> FVoxelScreenQuadMesh::GetMaterial() const
 	return Material;
 }
 
-void FVoxelScreenQuadMesh::Initialize_RenderThread(FRHICommandList& RHICmdList, ERHIFeatureLevel::Type FeatureLevel)
+void FVoxelScreenQuadMesh::Initialize_RenderThread(FRHICommandListBase& RHICmdList, ERHIFeatureLevel::Type FeatureLevel)
 {
 	VOXEL_FUNCTION_COUNTER();
 	check(IsInRenderingThread());
@@ -81,7 +81,7 @@ void FVoxelScreenQuadMesh::Initialize_RenderThread(FRHICommandList& RHICmdList, 
 	GVoxelQuadMeshVertexBuffer.Buffers.StaticMeshVertexBuffer.BindPackedTexCoordVertexBuffer(VertexFactory.Get(), Data);
 	GVoxelQuadMeshVertexBuffer.Buffers.ColorVertexBuffer.BindColorVertexBuffer(VertexFactory.Get(), Data);
 
-	VertexFactory->SetData(Data);
+	VertexFactory->SetData(UE_504_ONLY(RHICmdList, ) Data);
 	VOXEL_INLINE_COUNTER("VertexFactory", VertexFactory->InitResource(UE_503_ONLY(RHICmdList)));
 }
 

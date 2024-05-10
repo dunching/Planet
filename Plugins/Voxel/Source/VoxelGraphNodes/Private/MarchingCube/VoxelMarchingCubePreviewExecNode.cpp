@@ -313,7 +313,7 @@ FVoxelOptionalBox FVoxelMarchingCubePreviewExecNodeRuntime::GetBounds() const
 
 		return MakeVoxelTask()
 			.Dependency(FutureLocalBounds)
-			.Execute<FVoxelBox>([=]
+			.Execute<FVoxelBox>([this, FutureLocalBounds, Query]
 			{
 				const TValue<FVoxelSurface> Surface = FutureLocalBounds.Get_CheckCompleted().IsValid()
 					? FVoxelSurface()

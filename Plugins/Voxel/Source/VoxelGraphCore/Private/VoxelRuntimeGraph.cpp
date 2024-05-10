@@ -486,8 +486,7 @@ void UVoxelRuntimeGraph::AddReferencedObjects(UObject* InThis, FReferenceCollect
 		{
 			FVoxelObjectUtilities::AddStructReferencedObjects(
 				NullCheckCollector,
-				StaticStructFast<FVoxelPinValue>(),
-				&ConstCast(Pin.GetDefaultValue()));
+				MakeVoxelStructView(ConstCast(Pin.GetDefaultValue())));
 		}
 	}
 }

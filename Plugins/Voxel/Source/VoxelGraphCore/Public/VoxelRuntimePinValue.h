@@ -23,7 +23,7 @@ private:
 		int32 Int32;
 		int64 Int64;
 		FVoxelNameWrapper Name;
-		TSubclassOf<UObject> Class;
+		UClass* Class;
 		UScriptStruct* SharedStructType;
 		uint64 Raw;
 	};

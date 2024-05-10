@@ -29,18 +29,40 @@ USkill_Displacement::USkill_Displacement() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void USkill_Displacement::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void USkill_Displacement::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo, 
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
+{
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	RepeatType = ERepeatType::kCount;
+	RepeatCount = 1;
+	CurrentRepeatCount = 0;
+}
+
+void USkill_Displacement::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-	StartTasksLink(0);
 }
 
-bool USkill_Displacement::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /*= nullptr*/, const FGameplayTagContainer* TargetTags /*= nullptr*/, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */) const
+bool USkill_Displacement::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/, 
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+) const
 {
 	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
 	{
@@ -49,7 +71,13 @@ bool USkill_Displacement::CanActivateAbility(const FGameplayAbilitySpecHandle Ha
 	return false;
 }
 
-void USkill_Displacement::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+void USkill_Displacement::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility, 
+	bool bWasCancelled
+)
 {
 	if (SPlineActorPtr)
 	{
@@ -59,11 +87,10 @@ void USkill_Displacement::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Displacement::StartTasksLink(int32 ActionNumber)
+void USkill_Displacement::ExcuteStepsLink()
 {
 	if (CharacterPtr)
 	{
-		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::K2_EndAbility));
 		FindTarget();
 		PlayMontage();
 	}

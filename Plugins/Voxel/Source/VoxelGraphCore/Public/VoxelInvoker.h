@@ -26,7 +26,7 @@ public:
 		, Offset(Offset)
 		, LocalToWorld(LocalToWorld)
 	{
-		//ensure(ChunkSize > 0);
+		ensure(ChunkSize > 0);
 	}
 
 	VOXEL_COUNT_INSTANCES();
@@ -46,7 +46,7 @@ public:
 
 	void Tick(
 		const UWorld* World,
-		const TVoxelSet<UVoxelInvokerComponent*>& InvokerComponents);
+		const TVoxelSet<TObjectPtr<UVoxelInvokerComponent>>& InvokerComponents);
 
 private:
 	bool bTaskInProgress = false;
@@ -83,7 +83,7 @@ public:
 
 private:
 	double LastTickTime = 0;
-	TVoxelSet<UVoxelInvokerComponent*> InvokerComponents;
+	TVoxelSet<TObjectPtr<UVoxelInvokerComponent>> InvokerComponents;
 
 	struct FViewKey
 	{

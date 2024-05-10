@@ -163,7 +163,7 @@ void FVoxelParameterChildBuilder::GenerateChildContent(IDetailChildrenBuilder& C
 	for (const auto& It : CategoryToAllChildParameterViews)
 	{
 		DetailCategoryInterface.EditCategory(It.Key, GetName().ToString() + "." + It.Key, MakeWeakPtrLambda(this,
-			[=](const FVoxelDetailInterface& DetailInterface)
+			[this, It](const FVoxelDetailInterface& DetailInterface)
 			{
 				for (const TVoxelArray<IVoxelParameterView*>& ChildParameterViews : It.Value)
 				{

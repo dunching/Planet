@@ -107,7 +107,7 @@ TVoxelFutureValue<FVoxelDetailTextureQueryHelperImpl> FVoxelDetailTextureQueryHe
 	{
 		Impl =
 			MakeVoxelTask(STATIC_FNAME("ComputeQueryPositions"))
-			.Execute<FVoxelDetailTextureQueryHelperImpl>([=]
+			.Execute<FVoxelDetailTextureQueryHelperImpl>([this, TextureSize]
 			{
 				FVoxelDetailTextureQueryHelperImpl Result;
 				Result.TextureSize = TextureSize;

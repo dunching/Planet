@@ -42,7 +42,7 @@ void FVoxelExampleContentManager::OnExamplesReady(const FSimpleDelegate& OnReady
 	const TSharedRef<IHttpRequest, ESPMode::ThreadSafe> Request = FHttpModule::Get().CreateRequest();
 	Request->SetURL("https://api.voxelplugin.dev/content/list?version=" + ContentVersion);
 	Request->SetVerb("GET");
-	Request->OnProcessRequestComplete().BindLambda([=](FHttpRequestPtr, const FHttpResponsePtr Response, const bool bConnectedSuccessfully)
+	Request->OnProcessRequestComplete().BindLambda([this, ContentVersion, OnReady](FHttpRequestPtr, const FHttpResponsePtr Response, const bool bConnectedSuccessfully)
 	{
 		if (ExampleContents.Num() > 0)
 		{
@@ -78,14 +78,14 @@ void FVoxelExampleContentManager::OnExamplesReady(const FSimpleDelegate& OnReady
 			}
 
 			const TSharedRef<FVoxelExampleContent> Content = MakeVoxelShared<FVoxelExampleContent>();
-			Content->Name = ContentObject->GetStringField("name");
+			Content->Name = ContentObject->GetStringField(TEXT("name"));
 			Content->Version = ContentVersion;
-			Content->Size = ContentObject->GetNumberField("size");
-			Content->Hash = ContentObject->GetStringField("hash");
-			Content->DisplayName = ContentObject->GetStringField("displayName");
-			Content->Description = ContentObject->GetStringField("description");
-			Content->Thumbnail = MakeImage(ContentObject->GetStringField("thumbnailHash"));
-			Content->Image = MakeImage(ContentObject->GetStringField("imageHash"));
+			Content->Size = ContentObject->GetNumberField(TEXT("size"));
+			Content->Hash = ContentObject->GetStringField(TEXT("hash"));
+			Content->DisplayName = ContentObject->GetStringField(TEXT("displayName"));
+			Content->Description = ContentObject->GetStringField(TEXT("description"));
+			Content->Thumbnail = MakeImage(ContentObject->GetStringField(TEXT("thumbnailHash")));
+			Content->Image = MakeImage(ContentObject->GetStringField(TEXT("imageHash")));
 
 			ExampleContents.Add(Content);
 		}

@@ -333,6 +333,11 @@ void UK2Node_VoxelGraphParameterBase::PostLoad()
 {
 	Super::PostLoad();
 
+	if (!HasValidBlueprint())
+	{
+		return;
+	}
+
 	FixupParameter();
 }
 

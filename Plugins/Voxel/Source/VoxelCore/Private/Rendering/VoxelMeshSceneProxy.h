@@ -14,7 +14,7 @@ public:
 	explicit FVoxelMeshSceneProxy(const UVoxelMeshComponent& Component);
 
 	//~ Begin FPrimitiveSceneProxy Interface
-	virtual void CreateRenderThreadResources() override;
+	virtual void CreateRenderThreadResources(UE_504_ONLY(FRHICommandListBase& RHICmdList)) override;
 
 	virtual void DrawStaticElements(FStaticPrimitiveDrawInterface* PDI) override;
 	virtual void GetDynamicMeshElements(const TArray<const FSceneView*>& Views, const FSceneViewFamily& ViewFamily, uint32 VisibilityMap, FMeshElementCollector& Collector) const override;

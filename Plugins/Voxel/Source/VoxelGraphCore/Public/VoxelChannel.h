@@ -375,5 +375,5 @@ private:
 	TVoxelArray<TSharedPtr<FStreamableHandle>> PendingHandles;
 
 	mutable FVoxelFastCriticalSection CriticalSection;
-	TVoxelMap<const UObject*, TVoxelMap<FName, FVoxelChannelDefinition>> AssetToChannelDefinitions_RequiresLock;
+	TVoxelMap<TObjectPtr<const UObject>, TVoxelMap<FName, FVoxelChannelDefinition>> AssetToChannelDefinitions_RequiresLock;
 };

@@ -28,6 +28,14 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	);
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -107,5 +115,7 @@ protected:
 protected:
 
 	float CooldownConsumeTime = 0.f;
+
+	ACharacterBase* CharacterPtr = nullptr;
 
 };

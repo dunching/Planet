@@ -97,8 +97,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 Damage = 7;
 
-	ACharacterBase* CharacterPtr = nullptr;
-
 	AWeapon_HandProtection* WeaponPtr = nullptr;
 
 	UProgressTips* InputRangeHelperPtr = nullptr;

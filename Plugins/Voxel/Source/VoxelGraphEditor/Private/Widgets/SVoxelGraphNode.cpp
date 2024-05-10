@@ -649,7 +649,7 @@ void SVoxelGraphNode::AddStandardNodePin(UEdGraphPin* PinToAdd, const FName Full
 	if (Path.Num() > 0)
 	{
 		CategoryPins.FindOrAdd(FullPath).Add(PinWidget);
-		PinWidget->SetVisibility(MakeAttributeLambda([=]
+		PinWidget->SetVisibility(MakeAttributeLambda([this, PinToAdd, Path]
 		{
 			if (PinToAdd->bHidden ||
 				!NodeDefinition->IsPinVisible(PinToAdd, GraphNode))
@@ -686,7 +686,7 @@ void SVoxelGraphNode::AddStandardNodePin(UEdGraphPin* PinToAdd, const FName Full
 	}
 	else
 	{
-		PinWidget->SetVisibility(MakeAttributeLambda([=]
+		PinWidget->SetVisibility(MakeAttributeLambda([this, PinToAdd]
 		{
 			if (PinToAdd->bHidden ||
 				!NodeDefinition->IsPinVisible(PinToAdd, GraphNode))
@@ -723,7 +723,7 @@ TSharedRef<SVerticalBox> SVoxelGraphNode::CreateCategoryWidget(const FName Name,
 		.VAlign(VAlign_Center)
 		.HAlign(HAlign_Center)
 		.ClickMethod(EButtonClickMethod::MouseDown)
-		.OnClicked_Lambda([=]
+		.OnClicked_Lambda([this, bIsInput, FullPath]
 		{
 			TSet<FName>& CollapsedCategories = bIsInput ? GetVoxelNode().CollapsedInputCategories : GetVoxelNode().CollapsedOutputCategories;
 			if (CollapsedCategories.Contains(FullPath))
@@ -740,7 +740,7 @@ TSharedRef<SVerticalBox> SVoxelGraphNode::CreateCategoryWidget(const FName Name,
 
 	Button->SetContent(
 		SNew(SImage)
-		.Image_Lambda([=, ButtonPtr = &Button.Get()]() -> const FSlateBrush*
+		.Image_Lambda([this, bIsInput, FullPath, ButtonPtr = &Button.Get()]() -> const FSlateBrush*
 		{
 			const TSet<FName>& CollapsedCategories = bIsInput ? GetVoxelNode().CollapsedInputCategories : GetVoxelNode().CollapsedOutputCategories;
 			if (CollapsedCategories.Contains(FullPath))
@@ -848,17 +848,17 @@ TSharedRef<SVerticalBox> SVoxelGraphNode::CreateCategoryWidget(const FName Name,
 			.Cursor(EMouseCursor::Default)
 			.ToolTipText(INVTEXT("Add pin"))
 			.ButtonStyle(FAppStyle::Get(), "NoBorder")
-			.IsEnabled_Lambda([=]
+			.IsEnabled_Lambda([this, Name]
 			{
 				return IsNodeEditable() && NodeDefinition->CanAddToCategory(Name);
 			})
-			.OnClicked_Lambda([=]
+			.OnClicked_Lambda([this, Name]
 			{
 				const FVoxelTransaction Transaction(GetVoxelNode(), "Add pin");
 				NodeDefinition->AddToCategory(Name);
 				return FReply::Handled();
 			})
-			.Visibility_Lambda([=]
+			.Visibility_Lambda([this, Name]
 			{
 				return GetButtonVisibility(NodeDefinition->CanAddToCategory(Name) || NodeDefinition->CanRemoveFromCategory(Name));
 			})
@@ -879,7 +879,7 @@ TSharedRef<SVerticalBox> SVoxelGraphNode::CreateCategoryWidget(const FName Name,
 			.VAlign(VAlign_Center)
 			[
 				SNew(SVoxelDetailText)
-				.Visibility_Lambda([=]
+				.Visibility_Lambda([this, FullPath]
 				{
 					return GetVoxelNode().CollapsedInputCategories.Contains(FullPath) ? EVisibility::Collapsed : EVisibility::Visible;
 				})
@@ -890,7 +890,7 @@ TSharedRef<SVerticalBox> SVoxelGraphNode::CreateCategoryWidget(const FName Name,
 			if (Path.Num() > 1)
 			{
 				bAddVisibilityCheck = false;
-				Result->SetVisibility(MakeAttributeLambda([=]
+				Result->SetVisibility(MakeAttributeLambda([this, bIsInput, Path]
 				{
 					const TSet<FName>& CollapsedCategories = bIsInput ? GetVoxelNode().CollapsedInputCategories : GetVoxelNode().CollapsedOutputCategories;
 
@@ -926,7 +926,7 @@ TSharedRef<SVerticalBox> SVoxelGraphNode::CreateCategoryWidget(const FName Name,
 	if (bAddVisibilityCheck &&
 		Path.Num() > 1)
 	{
-		Result->SetVisibility(MakeAttributeLambda([=]
+		Result->SetVisibility(MakeAttributeLambda([this, bIsInput, Path, FullPath]
 		{
 			const TSet<FName>& CollapsedCategories = bIsInput ? GetVoxelNode().CollapsedInputCategories : GetVoxelNode().CollapsedOutputCategories;
 

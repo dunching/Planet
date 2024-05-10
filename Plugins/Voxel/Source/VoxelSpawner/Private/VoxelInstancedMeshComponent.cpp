@@ -9,17 +9,21 @@ void FVoxelInstancedMeshData::Build()
 {
 	VOXEL_FUNCTION_COUNTER();
 	ensure(CustomDatas_Transient.Num() == NumCustomDatas);
+#if VOXEL_ENGINE_VERSION < 504
 	ensure(PerInstanceSMData.Num() == 0);
+#endif
 	ensure(PerInstanceSMCustomData.Num() == 0);
 
 	ensure(PointIds_Transient.Num() == Transforms.Num());
 	PointIds_Transient.Empty();
 
+#if VOXEL_ENGINE_VERSION < 504
 	FVoxelUtilities::SetNumFast(PerInstanceSMData, Num());
 	for (int32 Index = 0; Index < Num(); Index++)
 	{
 		PerInstanceSMData[Index].Transform = FMatrix(Transforms[Index].ToMatrixWithScale());
 	}
+#endif
 
 	FVoxelUtilities::SetNumFast(PerInstanceSMCustomData, Num() * CustomDatas_Transient.Num());
 	for (int32 CustomDataIndex = 0; CustomDataIndex < CustomDatas_Transient.Num(); CustomDataIndex++)
@@ -40,10 +44,10 @@ void FVoxelInstancedMeshData::Build()
 
 		const FVoxelBox VoxelMeshBounds(MeshBounds);
 
-		FVoxelBox Result = VoxelMeshBounds.TransformBy(Transforms[0]);
+		FVoxelBox Result = VoxelMeshBounds.TransformBy(FTransform(Transforms[0]));
 		for (int32 Index = 1; Index < Num(); Index++)
 		{
-			Result += VoxelMeshBounds.TransformBy(Transforms[Index]);
+			Result += VoxelMeshBounds.TransformBy(FTransform(Transforms[Index]));
 		}
 		Bounds = Result;
 	}
@@ -56,7 +60,9 @@ int64 FVoxelInstancedMeshData::GetAllocatedSize() const
 {
 	return
 		FVoxelMeshDataBase::GetAllocatedSize() +
+#if VOXEL_ENGINE_VERSION < 504
 		PerInstanceSMData.GetAllocatedSize() +
+#endif
 		PerInstanceSMCustomData.GetAllocatedSize();
 }
 
@@ -74,6 +80,45 @@ void UVoxelInstancedMeshComponent::AddMeshData(const TSharedRef<FVoxelInstancedM
 	VOXEL_FUNCTION_COUNTER();
 	ensure(NewMeshData->Num() > 0);
 
+#if VOXEL_ENGINE_VERSION >= 504
+	if (!ensure(NewMeshData->InstanceIndices.Num() == NewMeshData->Num()))
+	{
+		return;
+	}
+
+	if (!ensure(MeshData) ||
+		!ensure(MeshData->Mesh == NewMeshData->Mesh) ||
+		!ensure(MeshData->NumCustomDatas == NewMeshData->NumCustomDatas))
+	{
+		return;
+	}
+
+	MeshData->Transforms.AddUninitialized(NewMeshData->NumNewInstances);
+
+	{
+		TArray<FTransform> Transforms;
+		FVoxelUtilities::SetNumFast(Transforms, NewMeshData->Num());
+		AddInstances(Transforms, false);
+	}
+
+	for (int32 Index = 0; Index < NewMeshData->Num(); Index++)
+	{
+		const int32 InstanceIndex = NewMeshData->InstanceIndices[Index];
+		MeshData->Transforms[InstanceIndex] = NewMeshData->Transforms[Index];
+
+		UpdateInstanceTransform(InstanceIndex, FTransform(NewMeshData->Transforms[Index]));
+
+		for (int32 CustomFloatIndex = 0; CustomFloatIndex < NumCustomDataFloats; CustomFloatIndex++)
+		{
+			const int32 CustomIndex = NumCustomDataFloats * Index + CustomFloatIndex;
+			const int32 InstanceCustomIndex = NumCustomDataFloats * InstanceIndex + CustomFloatIndex;
+			MakeVoxelArrayView(PerInstanceSMCustomData)[InstanceCustomIndex] = NewMeshData->PerInstanceSMCustomData[CustomIndex];
+		}
+	}
+
+	MeshData->UpdateStats();
+	NumInstances = MeshData->Num();
+#else
 	if (!ensure(NewMeshData->InstanceIndices.Num() == NewMeshData->Num()) ||
 		!ensure(NewMeshData->PerInstanceSMData.Num() == NewMeshData->Num()))
 	{
@@ -122,6 +167,7 @@ void UVoxelInstancedMeshComponent::AddMeshData(const TSharedRef<FVoxelInstancedM
 	// Edit will trigger a full render buffer recreate when combined with MarkRenderStateDirty
 	InstanceUpdateCmdBuffer.NumEdits++;
 	MarkRenderStateDirty();
+#endif
 }
 
 void UVoxelInstancedMeshComponent::SetMeshData(const TSharedRef<FVoxelInstancedMeshData>& NewMeshData)
@@ -136,13 +182,27 @@ void UVoxelInstancedMeshComponent::SetMeshData(const TSharedRef<FVoxelInstancedM
 
 	SetStaticMesh(NewMeshData->Mesh.StaticMesh.Get());
 
+#if VOXEL_ENGINE_VERSION >= 504
+	{
+		TArray<FTransform> Transforms;
+		FVoxelUtilities::SetNumFast(Transforms, MeshData->Num());
+		for (int32 Index = 0; Index < Transforms.Num(); Index++)
+		{
+			Transforms[Index] = FTransform(MeshData->Transforms[Index]);
+		}
+		AddInstances(Transforms, false);
+	}
+#else
 	PerInstanceSMData = MoveTemp(MeshData->PerInstanceSMData);
+#endif
 	NumCustomDataFloats = MeshData->NumCustomDatas;
 	PerInstanceSMCustomData = MoveTemp(MeshData->PerInstanceSMCustomData);
 
+#if VOXEL_ENGINE_VERSION < 504
 	// Edit will trigger a full render buffer recreate when combined with MarkRenderStateDirty
 	InstanceUpdateCmdBuffer.NumEdits++;
 	MarkRenderStateDirty();
+#endif
 
 	MeshData->UpdateStats();
 	NumInstances = MeshData->Num();
@@ -166,6 +226,13 @@ void UVoxelInstancedMeshComponent::HideInstances(const TConstVoxelArrayView<int3
 {
 	VOXEL_FUNCTION_COUNTER();
 
+#if VOXEL_ENGINE_VERSION >= 504
+	const FTransform EmptyTransform(FQuat::Identity, FVector::ZeroVector, FVector::ZeroVector);
+	for (const int32 Index : Indices)
+	{
+		UpdateInstanceTransform(Index, EmptyTransform);
+	}
+#else
 	const FMatrix EmptyMatrix = FTransform(FQuat::Identity, FVector::ZeroVector, FVector::ZeroVector).ToMatrixWithScale();
 
 	for (const int32 Index : Indices)
@@ -181,10 +248,23 @@ void UVoxelInstancedMeshComponent::HideInstances(const TConstVoxelArrayView<int3
 	// Edit will trigger a full render buffer recreate when combined with MarkRenderStateDirty
 	InstanceUpdateCmdBuffer.NumEdits++;
 	MarkRenderStateDirty();
+#endif
 }
 
 void UVoxelInstancedMeshComponent::ShowInstances(const TConstVoxelArrayView<int32> Indices)
 {
+#if VOXEL_ENGINE_VERSION >= 504
+	for (const int32 Index : Indices)
+	{
+		if (!ensure(PerInstanceSMData.IsValidIndex(Index)) ||
+			!ensure(MeshData->Transforms.IsValidIndex(Index)))
+		{
+			continue;
+		}
+
+		UpdateInstanceTransform(Index, FTransform(MeshData->Transforms[Index]));
+	}
+#else
 	for (const int32 Index : Indices)
 	{
 		if (!ensure(PerInstanceSMData.IsValidIndex(Index)) ||
@@ -199,6 +279,7 @@ void UVoxelInstancedMeshComponent::ShowInstances(const TConstVoxelArrayView<int3
 	// Edit will trigger a full render buffer recreate when combined with MarkRenderStateDirty
 	InstanceUpdateCmdBuffer.NumEdits++;
 	MarkRenderStateDirty();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -7,6 +7,7 @@
 #include "Point/VoxelPointHandleProvider.h"
 #include "Point/VoxelPointOverrideManager.h"
 #include "VoxelRuntime.h"
+#include "Engine/OverlapResult.h"
 
 EVoxelSuccess UVoxelPointFunctionLibrary::MakePointHandleFromHitResult(const FHitResult& HitResult, FVoxelPointHandle& Handle)
 {

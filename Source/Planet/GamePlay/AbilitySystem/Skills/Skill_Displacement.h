@@ -24,6 +24,14 @@ public:
 
 	USkill_Displacement();
 
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	);
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -49,8 +57,7 @@ public:
 
 protected:
 
-	UFUNCTION()
-	void StartTasksLink(int32 ActionNumber);
+	virtual void ExcuteStepsLink()override;
 
 	void FindTarget();
 
@@ -69,8 +76,6 @@ protected:
 	float ToCharacterOffset = 100.f;
 
 	ASPlineActor* SPlineActorPtr = nullptr;
-
-	ACharacterBase* CharacterPtr = nullptr;
 
 	ATool_PickAxe* EquipmentAxePtr = nullptr;
 

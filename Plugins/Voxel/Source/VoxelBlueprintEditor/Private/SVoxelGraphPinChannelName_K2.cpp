@@ -34,7 +34,7 @@ TSharedRef<SWidget>	SVoxelGraphPinChannelName_K2::GetDefaultValueWidget()
 		SNew(SComboButton)
 		.Visibility(this, &SGraphPin::GetDefaultValueVisibility)
 		.ComboButtonStyle(FAppStyle::Get(), "ComboButton")
-		.OnGetMenuContent_Lambda([=]
+		.OnGetMenuContent_Lambda([this, CurrentName]
 		{
 			return
 				SNew(SVoxelChannelEditor)

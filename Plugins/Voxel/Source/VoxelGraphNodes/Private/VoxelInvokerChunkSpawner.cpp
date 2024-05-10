@@ -30,7 +30,7 @@ void FVoxelInvokerChunkSpawner::Tick(FVoxelRuntime& Runtime)
 	InvokerViewBindRef_GameThread = MakeSharedVoid();
 
 	InvokerView_GameThread->Bind_Async(
-		MakeWeakPtrDelegate(InvokerViewBindRef_GameThread, MakeWeakPtrLambda(this, [=](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
+		MakeWeakPtrDelegate(InvokerViewBindRef_GameThread, MakeWeakPtrLambda(this, [this, FullChunkSize](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
 		{
 			VOXEL_SCOPE_COUNTER("OnAddChunk");
 			VOXEL_SCOPE_LOCK(CriticalSection);

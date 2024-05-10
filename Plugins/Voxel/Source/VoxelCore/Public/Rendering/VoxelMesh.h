@@ -31,7 +31,7 @@ public:
 	void MarkRenderStateDirty_GameThread() const;
 
 	void CallInitialize_GameThread() const;
-	void CallInitialize_RenderThread(FRHICommandList& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) const;
+	void CallInitialize_RenderThread(FRHICommandListBase& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) const;
 
 	TSharedRef<FVoxelMaterialRef> GetMaterialSafe() const;
 
@@ -51,7 +51,7 @@ public:
 
 protected:
 	virtual void Initialize_GameThread() {}
-	virtual void Initialize_RenderThread(FRHICommandList& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) {}
+	virtual void Initialize_RenderThread(FRHICommandListBase& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) {}
 	virtual void Destroy_RenderThread() {}
 
 	bool IsInitialized_GameThread() const

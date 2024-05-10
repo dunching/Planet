@@ -158,7 +158,7 @@ void FVoxelMaterialDefinitionManager::Tick()
 		DynamicParameter->OnChangedMulticast.Broadcast();
 	}
 
-	const TSet<UVoxelMaterialDefinition*> MaterialDefinitionsToRebuildCopy = MoveTemp(MaterialDefinitionsToRebuild);
+	const TSet<TObjectPtr<UVoxelMaterialDefinition>> MaterialDefinitionsToRebuildCopy = MoveTemp(MaterialDefinitionsToRebuild);
 	check(MaterialDefinitionsToRebuild.Num() == 0);
 
 	for (UVoxelMaterialDefinition* Definition : MaterialDefinitionsToRebuildCopy)
@@ -180,7 +180,7 @@ void FVoxelMaterialDefinitionManager::AddReferencedObjects(FReferenceCollector& 
 
 	Collector.AddReferencedObjects(MaterialDefinitionsToRebuild);
 
-	for (UVoxelMaterialDefinitionInterface*& Material : Materials)
+	for (TObjectPtr<UVoxelMaterialDefinitionInterface>& Material : Materials)
 	{
 		Collector.AddReferencedObject(Material);
 	}

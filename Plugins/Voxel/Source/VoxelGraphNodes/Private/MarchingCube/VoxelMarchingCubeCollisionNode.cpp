@@ -121,7 +121,7 @@ void FVoxelMarchingCubeCollisionExecNodeRuntime::Create()
 		GetLocalToWorld());
 
 	InvokerView->Bind(
-		MakeWeakPtrDelegate(this, [=](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
+		MakeWeakPtrDelegate(this, [this, VoxelSize, ChunkSize, FullChunkSize](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
 		{
 			VOXEL_SCOPE_COUNTER("OnAddChunk");
 			VOXEL_SCOPE_LOCK(CriticalSection);

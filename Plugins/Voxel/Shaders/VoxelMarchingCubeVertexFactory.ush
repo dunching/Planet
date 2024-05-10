@@ -247,7 +247,7 @@ FMaterialPixelParameters GetMaterialPixelParameters(FVertexFactoryInterpolantsVS
 	Parameters.UnMirrored = 1;
 
 	// Required by GetVoxelDetailTextureOffset0
-	Parameters.AbsoluteWorldPosition = TransformLocalToWorld(Interpolants.VoxelPosition * VoxelSize, GetLocalToWorld(Parameters));
+	Parameters.AbsoluteWorldPosition = TransformLocalToWorld(Interpolants.VoxelPosition * VoxelSize, UE_504_SWITCH(GetLocalToWorld, GetLocalToWorldDF)(Parameters));
 
 #if NUM_TEX_COORD_INTERPOLATORS
 	UNROLL
@@ -369,7 +369,7 @@ float3 VertexFactoryGetPositionForVertexLighting(FVertexFactoryInput Input, FVer
 
 float4 VertexFactoryGetPreviousWorldPosition(FVertexFactoryInput Input, FVertexFactoryIntermediates Intermediates)
 {
-    return mul(float4(Input.VoxelPosition * VoxelSize, 1), LWCMultiplyTranslation(Intermediates.SceneData.InstanceData.PrevLocalToWorld, ResolvedView.PrevPreViewTranslation));
+    return mul(float4(Input.VoxelPosition * VoxelSize, 1), UE_504_SWITCH(LWCMultiplyTranslation, DFMultiplyTranslationDemote)(Intermediates.SceneData.InstanceData.PrevLocalToWorld, ResolvedView.PrevPreViewTranslation));
 }
 
 struct FVertexFactoryInputDummy

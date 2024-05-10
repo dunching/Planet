@@ -74,8 +74,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 Damage = 10;
 
-	ACharacterBase* CharacterPtr = nullptr;
-
 	AWeapon_PickAxe* EquipmentAxePtr = nullptr;
 
 };

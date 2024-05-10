@@ -38,7 +38,7 @@ TSharedRef<SWidget> SVoxelGraphPinEnum::GetDefaultValueWidget()
 
 	return SNew(SPinComboBox)
 		.ComboItemList(Items)
-		.VisibleText_Lambda([=]
+		.VisibleText_Lambda([this, Enum]
 		{
 			const FString SelectedValue = GraphPinObj->GetDefaultAsString();
 
@@ -58,7 +58,7 @@ TSharedRef<SWidget> SVoxelGraphPinEnum::GetDefaultValueWidget()
 
 			return SelectedValue + " (INVALID)";
 		})
-		.OnSelectionChanged_Lambda([=](const TSharedPtr<int32>& NewSelection, ESelectInfo::Type)
+		.OnSelectionChanged_Lambda([this, Enum](const TSharedPtr<int32>& NewSelection, ESelectInfo::Type)
 		{
 			FString NewValue;
 			if (NewSelection.IsValid())

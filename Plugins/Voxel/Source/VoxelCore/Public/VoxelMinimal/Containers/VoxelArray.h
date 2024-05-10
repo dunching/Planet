@@ -3,6 +3,7 @@
 #pragma once
 
 #include "VoxelCoreMinimal.h"
+#include "Templates/MakeUnsigned.h"
 
 template<typename InElementType, typename InAllocator = FVoxelAllocator>
 class TVoxelArray : public TArray<InElementType, InAllocator>
@@ -46,12 +47,12 @@ public:
 		// Template property, branch will be optimized out
 		if (AllocatorType::RequireRangeCheck)
 		{
-			checkfVoxelSlow((Index >= 0) & (Index < ArrayNum), TEXT("Array index out of bounds: %i from an array of size %i"), Index, ArrayNum); // & for one branch
+			checkVoxelSlow((Index >= 0) & (Index < ArrayNum)); // & for one branch
 		}
 	}
 	FORCEINLINE void CheckAddress(const ElementType* Addr) const
 	{
-		checkfVoxelSlow(Addr < GetData() || Addr >= (GetData() + ArrayMax), TEXT("Attempting to use a container element (%p) which already comes from the container being modified (%p, ArrayMax: %d, ArrayNum: %d, SizeofElement: %d)!"), Addr, GetData(), ArrayMax, ArrayNum, sizeof(ElementType));
+		checkVoxelSlow(Addr < GetData() || Addr >= (GetData() + ArrayMax));
 	}
 
 public:

@@ -13,13 +13,18 @@ DECLARE_VOXEL_COUNTER(VOXELSPAWNER_API, STAT_VoxelHierarchicalMeshNumInstances, 
 
 struct VOXELSPAWNER_API FVoxelHierarchicalMeshBuiltData
 {
+#if VOXEL_ENGINE_VERSION >= 504
+	TVoxelArray<FTransform> Transforms;
+	TVoxelArray<float, FDefaultAllocator> CustomDatas;
+#else
 	TUniquePtr<FStaticMeshInstanceData> InstanceBuffer;
 	TArray<FClusterNode> ClusterTree;
 	int32 OcclusionLayerNum = 0;
 
-	TCompatibleVoxelArray<FInstancedStaticMeshInstanceData> InstanceDatas;
-	TCompatibleVoxelArray<float> CustomDatas;
-	TCompatibleVoxelArray<int32> InstanceReorderTable;
+	TVoxelArray<FInstancedStaticMeshInstanceData, FDefaultAllocator> InstanceDatas;
+	TVoxelArray<float, FDefaultAllocator> CustomDatas;
+	TVoxelArray<int32, FDefaultAllocator> InstanceReorderTable;
+#endif
 };
 
 struct VOXELSPAWNER_API FVoxelHierarchicalMeshData : public FVoxelMeshDataBase

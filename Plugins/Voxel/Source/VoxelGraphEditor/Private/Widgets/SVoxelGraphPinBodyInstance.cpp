@@ -44,7 +44,7 @@ TSharedRef<SWidget> SVoxelGraphPinBodyInstance::GetDefaultValueWidget()
 
 	return SNew(SPinComboBox)
 		.ComboItemList(Items)
-		.VisibleText_Lambda([=]() -> FString
+		.VisibleText_Lambda([this, Enum]() -> FString
 		{
 			const FVoxelPinValue PinValue = FVoxelPinValue::MakeFromPinDefaultValue(*GraphPinObj);
 			if (!ensure(PinValue.Is<FBodyInstance>()))
@@ -70,7 +70,7 @@ TSharedRef<SWidget> SVoxelGraphPinBodyInstance::GetDefaultValueWidget()
 
 			return "(INVALID)";
 		})
-		.OnSelectionChanged_Lambda([=](const TSharedPtr<int32>& NewSelection, ESelectInfo::Type)
+		.OnSelectionChanged_Lambda([this, Enum](const TSharedPtr<int32>& NewSelection, ESelectInfo::Type)
 		{
 			const FVoxelPinValue PinValue = FVoxelPinValue::MakeFromPinDefaultValue(*GraphPinObj);
 			if (!ensure(PinValue.Is<FBodyInstance>()))
@@ -102,11 +102,11 @@ TSharedRef<SWidget> SVoxelGraphPinBodyInstance::GetDefaultValueWidget()
 		})
 		.IsEnabled(this, &SGraphPin::GetDefaultValueIsEditable)
 		.Visibility(this, &SGraphPin::GetDefaultValueVisibility)
-		.OnGetDisplayName_Lambda([=](const int32 Index)
+		.OnGetDisplayName_Lambda([Enum](const int32 Index)
 		{
 			return Enum->GetDisplayNameTextByIndex(Index);
 		})
-		.OnGetTooltip_Lambda([=](const int32 Index)
+		.OnGetTooltip_Lambda([Enum](const int32 Index)
 		{
 			return Enum->GetToolTipTextByIndex(Index);
 		});

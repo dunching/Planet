@@ -34,7 +34,7 @@ void FVoxelPointCollisionExecNodeRuntime::Create()
 			GetLocalToWorld());
 
 	InvokerView->Bind_Async(
-		MakeWeakPtrDelegate(this, [=](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
+		MakeWeakPtrDelegate(this, [this, ChunkedPoints, BodyInstance, SmallChunkSize, LargeChunkSize](const TVoxelAddOnlySet<FIntVector>& ChunksToAdd)
 		{
 			VOXEL_SCOPE_COUNTER("OnAddChunk");
 			VOXEL_SCOPE_LOCK(CriticalSection);
@@ -76,7 +76,7 @@ void FVoxelPointCollisionExecNodeRuntime::Create()
 				SmallChunks_RequiresLock.Add(SmallChunkMin, Chunk);
 			}
 		}),
-		MakeWeakPtrDelegate(this, [=](const TVoxelAddOnlySet<FIntVector>& ChunksToRemove)
+		MakeWeakPtrDelegate(this, [this, SmallChunkSize](const TVoxelAddOnlySet<FIntVector>& ChunksToRemove)
 		{
 			VOXEL_SCOPE_COUNTER("OnRemoveChunk");
 

@@ -147,7 +147,7 @@ void SVoxelGraphPreview::Construct(const FArguments& Args)
 					FText::FromString(Text),
 					FSlateIcon(),
 					FUIAction(
-						MakeLambdaDelegate([=]
+						MakeLambdaDelegate([this, NewPreviewSize]
 						{
 							UVoxelGraph* Graph = WeakGraph.Get();
 							if (!ensure(Graph))

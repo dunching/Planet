@@ -18,7 +18,7 @@ DEFINE_VOXEL_COUNTER(STAT_VoxelNumTexturesPooled);
 
 struct FVoxelTextureRefImpl
 {
-	UTexture* Texture = nullptr;
+	TObjectPtr<UTexture> Texture = nullptr;
 };
 
 class FVoxelTexturePool : public FVoxelSingleton

@@ -71,7 +71,7 @@ public:
 private:
 	FVoxelMaterialRef() = default;
 
-	UMaterialInterface* Material = nullptr;
+	TObjectPtr<UMaterialInterface> Material = nullptr;
 	TWeakObjectPtr<UMaterialInterface> WeakMaterial;
 	TSharedPtr<FVoxelInstanceRef> InstanceRef;
 

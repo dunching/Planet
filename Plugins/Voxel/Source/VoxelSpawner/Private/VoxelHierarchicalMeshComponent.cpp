@@ -30,6 +30,7 @@ void FVoxelHierarchicalMeshData::Build()
 		Mesh.GetMeshInfo().DesiredInstancesPerLeaf,
 		*this);
 
+#if VOXEL_ENGINE_VERSION < 504
 	if (ensure(NewBuiltData->ClusterTree.Num() > 0))
 	{
 		ensure(!Bounds.IsValid());
@@ -37,6 +38,7 @@ void FVoxelHierarchicalMeshData::Build()
 			FVector(NewBuiltData->ClusterTree[0].BoundMin),
 			FVector(NewBuiltData->ClusterTree[0].BoundMax));
 	}
+#endif
 
 	CustomDatas_Transient.Empty();
 
@@ -51,9 +53,14 @@ int64 FVoxelHierarchicalMeshData::GetAllocatedSize() const
 	int64 AllocatedSize = FVoxelMeshDataBase::GetAllocatedSize();
 	if (BuiltData)
 	{
+#if VOXEL_ENGINE_VERSION >= 504
+		AllocatedSize += BuiltData->Transforms.GetAllocatedSize();
+		AllocatedSize += BuiltData->CustomDatas.GetAllocatedSize();
+#else
 		AllocatedSize += BuiltData->InstanceDatas.GetAllocatedSize();
 		AllocatedSize += BuiltData->CustomDatas.GetAllocatedSize();
 		AllocatedSize += BuiltData->InstanceReorderTable.GetAllocatedSize();
+#endif
 	}
 	return AllocatedSize;
 }
@@ -208,6 +215,19 @@ void UVoxelHierarchicalMeshComponent::HideInstances(const TConstVoxelArrayView<i
 		return;
 	}
 
+#if VOXEL_ENGINE_VERSION >= 504
+	const FTransform EmptyTransform(FQuat::Identity, FVector::ZeroVector, FVector::ZeroVector);
+
+	for (const int32 Index : Indices)
+	{
+		if (!IsValidInstance(Index))
+		{
+			continue;
+		}
+
+		UpdateInstanceTransform(Index, EmptyTransform, false);
+	}
+#else
 	const FMatrix EmptyMatrix = FTransform(FQuat::Identity, FVector::ZeroVector, FVector::ZeroVector).ToMatrixWithScale();
 	const FMatrix44f EmptyMatrixFloat = FMatrix44f(EmptyMatrix);
 
@@ -252,6 +272,7 @@ void UVoxelHierarchicalMeshComponent::HideInstances(const TConstVoxelArrayView<i
 	}
 
 	MarkRenderStateDirty();
+#endif
 }
 
 void UVoxelHierarchicalMeshComponent::ShowInstances(const TConstVoxelArrayView<int32> Indices)
@@ -263,6 +284,18 @@ void UVoxelHierarchicalMeshComponent::ShowInstances(const TConstVoxelArrayView<i
 		return;
 	}
 
+#if VOXEL_ENGINE_VERSION >= 504
+	for (const int32 Index : Indices)
+	{
+		if (!ensure(IsValidInstance(Index)) ||
+			!ensure(MeshData->Transforms.IsValidIndex(Index)))
+		{
+			continue;
+		}
+
+		UpdateInstanceTransform(Index, FTransform(MeshData->Transforms[Index]), false);
+	}
+#else
 	if (PerInstanceSMData.Num() > 0)
 	{
 		for (const int32 Index : Indices)
@@ -306,6 +339,7 @@ void UVoxelHierarchicalMeshComponent::ShowInstances(const TConstVoxelArrayView<i
 	}
 
 	MarkRenderStateDirty();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,11 +353,13 @@ int64 UVoxelHierarchicalMeshComponent::GetAllocatedSize() const
 	{
 		AllocatedSize += ClusterTreePtr->GetAllocatedSize();
 	}
+#if VOXEL_ENGINE_VERSION < 504
 	if (PerInstanceRenderData &&
 		PerInstanceRenderData->InstanceBuffer_GameThread)
 	{
 		AllocatedSize += PerInstanceRenderData->InstanceBuffer_GameThread->GetResourceSize();
 	}
+#endif
 	AllocatedSize += PerInstanceSMData.GetAllocatedSize();
 	AllocatedSize += PerInstanceSMCustomData.GetAllocatedSize();
 	AllocatedSize += InstanceReorderTable.GetAllocatedSize();
@@ -334,6 +370,7 @@ void UVoxelHierarchicalMeshComponent::ReleasePerInstanceRenderData_Safe()
 {
 	VOXEL_FUNCTION_COUNTER();
 
+#if VOXEL_ENGINE_VERSION < 504
 	if (!PerInstanceRenderData.IsValid())
 	{
 		return;
@@ -365,6 +402,7 @@ void UVoxelHierarchicalMeshComponent::ReleasePerInstanceRenderData_Safe()
 	});
 
 	ReleasePerInstanceRenderData();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -418,6 +456,31 @@ void UVoxelHierarchicalMeshComponent::AsyncTreeBuild(
 
 	const int32 NumInstances = InMeshData.Transforms.Num();
 	check(NumInstances > 0);
+
+#if VOXEL_ENGINE_VERSION >= 504
+	FVoxelUtilities::SetNumFast(OutBuiltData.Transforms, NumInstances);
+	FVoxelUtilities::SetNumFast(OutBuiltData.CustomDatas, InMeshData.CustomDatas_Transient.Num() * NumInstances);
+
+	FBox BoundsBox(ForceInit);
+	for (int32 InstanceIndex = 0; InstanceIndex < NumInstances; InstanceIndex++)
+	{
+		OutBuiltData.Transforms[InstanceIndex] = FTransform(InMeshData.Transforms[InstanceIndex]);
+		BoundsBox += MeshBox.TransformBy(OutBuiltData.Transforms[InstanceIndex]);
+
+		for (int32 CustomDataIndex = 0; CustomDataIndex < InMeshData.CustomDatas_Transient.Num(); CustomDataIndex++)
+		{
+			const TVoxelArray<float>& CustomData = InMeshData.CustomDatas_Transient[CustomDataIndex];
+			if (!ensure(CustomData.Num() == NumInstances))
+			{
+				continue;
+			}
+
+			OutBuiltData.CustomDatas[InstanceIndex * InMeshData.CustomDatas_Transient.Num() + CustomDataIndex] = CustomData[InstanceIndex];
+		}
+	}
+
+	ConstCast(InMeshData).Bounds = FVoxelBox(BoundsBox.Min, BoundsBox.Max);
+#else
 
 	OutBuiltData.InstanceBuffer = MakeUnique<FStaticMeshInstanceData>(false);
 	{
@@ -516,12 +579,28 @@ void UVoxelHierarchicalMeshComponent::AsyncTreeBuild(
 			SortedInstances[FirstUnfixedIndex] = FirstUnfixedIndex;
 		}
 	}
+#endif
 }
 
 void UVoxelHierarchicalMeshComponent::SetBuiltData(FVoxelHierarchicalMeshBuiltData&& BuiltData)
 {
 	VOXEL_FUNCTION_COUNTER();
 
+#if VOXEL_ENGINE_VERSION >= 504
+	{
+		VOXEL_SCOPE_COUNTER("ReleasePerInstanceRenderData");
+		Super::ClearInstances();
+	}
+	{
+		VOXEL_SCOPE_COUNTER("UpdateFromPreallocatedData");
+
+		ensure(PerInstanceSMData.Num() == 0);
+		AddInstances(BuiltData.Transforms.ToConstArray(), false, false);
+
+		NumCustomDataFloats = MeshData->NumCustomDatas;
+		PerInstanceSMCustomData = MoveTemp(BuiltData.CustomDatas);
+	}
+#else
 	if (PerInstanceRenderData.IsValid())
 	{
 		ReleasePerInstanceRenderData_Safe();
@@ -556,4 +635,5 @@ void UVoxelHierarchicalMeshComponent::SetBuiltData(FVoxelHierarchicalMeshBuiltDa
 	NumCustomDataFloats = MeshData->NumCustomDatas;
 	PerInstanceSMCustomData = MoveTemp(BuiltData.CustomDatas);
 	InstanceReorderTable = MoveTemp(BuiltData.InstanceReorderTable);
+#endif
 }

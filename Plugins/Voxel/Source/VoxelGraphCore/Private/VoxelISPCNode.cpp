@@ -69,7 +69,7 @@ FVoxelComputeValue FVoxelISPCNode::CompileCompute(const FName ReturnPinName) con
 
 		MakeVoxelTask(STATIC_FNAME("FVoxelISPCNode"))
 		.Dependencies(InputValues)
-		.Execute([=]
+		.Execute([this, InputValues, OutputStates]
 		{
 			int32 Num = 1;
 			for (const FVoxelFutureValue& InputValue : InputValues)

@@ -771,7 +771,7 @@ void FVoxelBufferUtilities::Select(
 					{
 						for (int32 Index = 0; Index < Iterator.Num(); Index++)
 						{
-							WriteView[Index] = ConditionView[Index] ? TrueBuffer[Index] : FalseBuffer[Index];
+							WriteView[Index] = ConditionView[Index] ? TrueBuffer[Iterator.GetIndex() + Index] : FalseBuffer[Iterator.GetIndex() + Index];
 						}
 					}
 					else

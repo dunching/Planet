@@ -17,7 +17,9 @@ struct VOXELSPAWNER_API FVoxelInstancedMeshData : public FVoxelMeshDataBase
 	int32 NumNewInstances = 0;
 	TVoxelArray<int32> InstanceIndices;
 
-	TCompatibleVoxelArray<FInstancedStaticMeshInstanceData> PerInstanceSMData;
+#if VOXEL_ENGINE_VERSION < 504
+	TVoxelArray<FInstancedStaticMeshInstanceData, FDefaultAllocator> PerInstanceSMData;
+#endif
 	TCompatibleVoxelArray<float> PerInstanceSMCustomData;
 
 	VOXEL_ALLOCATED_SIZE_TRACKER(STAT_VoxelInstancedMeshDataMemory);

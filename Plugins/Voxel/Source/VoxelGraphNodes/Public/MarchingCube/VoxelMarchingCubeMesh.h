@@ -153,7 +153,7 @@ struct VOXELGRAPHNODES_API FVoxelMarchingCubeMesh : public FVoxelMesh
 	TSharedPtr<FDistanceFieldVolumeData> DistanceFieldVolumeData;
 
 	void SetTransitionMask_GameThread(uint8 NewTransitionMask);
-	void SetTransitionMask_RenderThread(FRHICommandList& RHICmdList, uint8 NewTransitionMask);
+	void SetTransitionMask_RenderThread(FRHICommandListBase& RHICmdList, uint8 NewTransitionMask);
 
 	virtual FVoxelBox GetBounds() const override { return Bounds; }
 	virtual int64 GetAllocatedSize() const override;
@@ -162,7 +162,7 @@ struct VOXELGRAPHNODES_API FVoxelMarchingCubeMesh : public FVoxelMesh
 
 	virtual void Initialize_GameThread() override;
 
-	virtual void Initialize_RenderThread(FRHICommandList& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) override;
+	virtual void Initialize_RenderThread(FRHICommandListBase& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) override;
 	virtual void Destroy_RenderThread() override;
 
 	virtual bool Draw_RenderThread(const FPrimitiveSceneProxy& Proxy, FMeshBatch& MeshBatch) const override;

@@ -252,7 +252,7 @@ FVoxelNodeAliases::TValue<FVoxelMarchingCubeExecNodeMesh> FVoxelMarchingCubeExec
 			const TValue<FVoxelMaterial> Material =
 				MakeVoxelTask()
 				.Dependencies(FutureSurface, MaterialTemplate, FutureMaterialIdMaterialParameter)
-				.Execute<FVoxelMaterial>([=]
+				.Execute<FVoxelMaterial>([this, FutureSurface, Query, FutureMaterialIdMaterialParameter, MaterialTemplate]
 				{
 					const FVoxelSurface& Surface = FutureSurface.Get_CheckCompleted();
 
@@ -303,7 +303,7 @@ FVoxelNodeAliases::TValue<FVoxelMarchingCubeExecNodeMesh> FVoxelMarchingCubeExec
 					return
 						MakeVoxelTask()
 						.Dependencies(Parameters)
-						.Execute<FVoxelMaterial>([=]
+						.Execute<FVoxelMaterial>([this, FutureMaterialIdMaterialParameter, MaterialTemplate, Parameters]
 						{
 							if (!FutureMaterialIdMaterialParameter.Get_CheckCompleted().IsA<FVoxelDetailTextureParameter>() ||
 								!FutureMaterialIdMaterialParameter.Get_CheckCompleted().AsChecked<FVoxelDetailTextureParameter>().Pool)
@@ -394,7 +394,7 @@ FVoxelNodeAliases::TValue<FVoxelMarchingCubeExecNodeMesh> FVoxelMarchingCubeExec
 	return
 		MakeVoxelTask(STATIC_FNAME("MarchingCubeSceneNode - CreateCollider"))
 		.Dependencies(Mesh, MeshSettings, BodyInstance)
-		.Execute<FVoxelMarchingCubeExecNodeMesh>([=]() -> TValue<FVoxelMarchingCubeExecNodeMesh>
+		.Execute<FVoxelMarchingCubeExecNodeMesh>([this, Mesh, MeshSettings, Query, BodyInstance, MarchingCubeSurface]() -> TValue<FVoxelMarchingCubeExecNodeMesh>
 		{
 			const TSharedRef<FVoxelMarchingCubeExecNodeMesh> Result = MakeVoxelShared<FVoxelMarchingCubeExecNodeMesh>();
 			if (Mesh.Get_CheckCompleted().GetStruct() == FVoxelMesh::StaticStruct())
@@ -621,19 +621,6 @@ void FVoxelMarchingCubeExecNodeRuntime::ProcessMeshes(FVoxelRuntime& Runtime)
 				Component->SetRelativeLocation(ChunkInfo->Bounds.Min);
 				Component->SetMesh(Mesh);
 				QueuedMesh.Mesh->MeshSettings->ApplyToComponent(*Component);
-			}
-
-			const auto Box = ChunkInfo->Bounds.ToFBox();
-			for (const auto& Iter : Runtime.OnChunkChangedMap)
-			{
-				if (Iter.Value)
-				{
-					Iter.Value(
-						Box,
-						ChunkInfo->LOD,
-						ChunkInfo->ChunkSize
-					);
-				}
 			}
 		}
 

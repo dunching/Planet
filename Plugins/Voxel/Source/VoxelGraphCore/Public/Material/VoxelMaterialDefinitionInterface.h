@@ -121,10 +121,10 @@ public:
 
 private:
 	bool bMaterialRefreshQueued = false;
-	TSet<UVoxelMaterialDefinition*> MaterialDefinitionsToRebuild;
+	TSet<TObjectPtr<UVoxelMaterialDefinition>> MaterialDefinitionsToRebuild;
 
-	TVoxelArray<UVoxelMaterialDefinitionInterface*> Materials;
-	TVoxelMap<UVoxelMaterialDefinitionInterface*, FVoxelMaterialDefinitionRef> MaterialRefs;
+	TVoxelArray<TObjectPtr<UVoxelMaterialDefinitionInterface>> Materials;
+	TVoxelMap<TObjectPtr<UVoxelMaterialDefinitionInterface>, FVoxelMaterialDefinitionRef> MaterialRefs;
 
 	TUniquePtr<FVoxelMaterialParameterData::FCachedParameters> CachedParameters;
 

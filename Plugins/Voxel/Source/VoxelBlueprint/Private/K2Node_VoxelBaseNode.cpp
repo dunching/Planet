@@ -87,12 +87,12 @@ void UK2Node_VoxelBaseNode::AddConvertPinContextAction(UToolMenu* Menu, UGraphNo
 		"PromotePin",
 		INVTEXT("Convert pin"),
 		INVTEXT("Convert this pin"),
-		MakeLambdaDelegate([=](const FToolMenuContext&) -> TSharedRef<SWidget>
+		MakeLambdaDelegate([this, Context, TypeSet](const FToolMenuContext&) -> TSharedRef<SWidget>
 		{
 			return
 				SNew(SVoxelPinTypeSelector)
 				.AllowedTypes(TypeSet)
-				.OnTypeChanged_Lambda([=](const FVoxelPinType NewType)
+				.OnTypeChanged_Lambda([this, Context](const FVoxelPinType NewType)
 				{
 					if (!ensure(Context) ||
 						!ensure(Context->Pin))

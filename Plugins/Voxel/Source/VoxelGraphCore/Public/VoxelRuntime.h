@@ -2,8 +2,6 @@
 
 #pragma once
 
-#include <functional>
-
 #include "VoxelMinimal.h"
 #include "VoxelQuery.h"
 
@@ -11,8 +9,6 @@ class UVoxelGraphInterface;
 class UVoxelParameterContainer;
 class IVoxelExecNodeRuntimeInterface;
 struct FVoxelSubsystem;
-
-using FOnChunkChanged = std::function<void(const FBox&, int32, int32)>;
 
 class VOXELGRAPHCORE_API FVoxelRuntime
 	: public TSharedFromThis<FVoxelRuntime>
@@ -34,8 +30,6 @@ public:
 	void Tick();
 	void AddReferencedObjects(FReferenceCollector& Collector);
 	FVoxelOptionalBox GetBounds() const;
-
-	TMap<uint8, FOnChunkChanged>OnChunkChangedMap;
 
 public:
 	FORCEINLINE const FVoxelRuntimeInfo& GetRuntimeInfoRef() const

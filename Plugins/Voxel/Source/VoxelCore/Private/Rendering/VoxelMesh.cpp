@@ -39,7 +39,7 @@ void FVoxelMesh::CallInitialize_GameThread() const
 	UpdateGpuStats();
 }
 
-void FVoxelMesh::CallInitialize_RenderThread(FRHICommandList& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) const
+void FVoxelMesh::CallInitialize_RenderThread(FRHICommandListBase& RHICmdList, ERHIFeatureLevel::Type FeatureLevel) const
 {
 	check(IsInRenderingThread());
 

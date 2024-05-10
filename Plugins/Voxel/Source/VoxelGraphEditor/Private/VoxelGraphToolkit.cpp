@@ -77,7 +77,7 @@ void FVoxelGraphToolkit::FixupGraph(UVoxelGraph* Graph)
 	Graph->OnParametersChanged.AddSP(this, &FVoxelGraphToolkit::FixupGraphParameters);
 
 	Graph->GetRuntimeGraph().OnMessagesChanged.RemoveAll(this);
-	Graph->GetRuntimeGraph().OnMessagesChanged.Add(MakeWeakPtrDelegate(this, [=]
+	Graph->GetRuntimeGraph().OnMessagesChanged.Add(MakeWeakPtrDelegate(this, [this]
 	{
 		bMessageUpdateQueued = true;
 	}));
@@ -175,7 +175,7 @@ void FVoxelGraphToolkit::Initialize()
 
 	GetCommands()->MapAction(
 		FVoxelGraphCommands::Get().Compile,
-		MakeLambdaDelegate([=]
+		MakeLambdaDelegate([this]
 		{
 			for (const UVoxelGraph* Graph : Asset->GetAllGraphs())
 			{

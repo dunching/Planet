@@ -249,7 +249,7 @@ void FVoxelMarchingCubeMesh::SetTransitionMask_GameThread(uint8 NewTransitionMas
 	MarkRenderStateDirty_GameThread();
 }
 
-void FVoxelMarchingCubeMesh::SetTransitionMask_RenderThread(FRHICommandList& RHICmdList, const uint8 NewTransitionMask)
+void FVoxelMarchingCubeMesh::SetTransitionMask_RenderThread(FRHICommandListBase& RHICmdList, const uint8 NewTransitionMask)
 {
 	VOXEL_FUNCTION_COUNTER();
 	ensure(IsInRenderingThread());
@@ -819,7 +819,7 @@ void FVoxelMarchingCubeMesh::Initialize_GameThread()
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void FVoxelMarchingCubeMesh::Initialize_RenderThread(FRHICommandList& RHICmdList, ERHIFeatureLevel::Type FeatureLevel)
+void FVoxelMarchingCubeMesh::Initialize_RenderThread(FRHICommandListBase& RHICmdList, ERHIFeatureLevel::Type FeatureLevel)
 {
 	VOXEL_FUNCTION_COUNTER();
 	check(IsInRenderingThread());

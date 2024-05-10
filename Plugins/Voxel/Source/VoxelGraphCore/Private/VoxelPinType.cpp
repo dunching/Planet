@@ -1010,8 +1010,7 @@ FVoxelPinValue FVoxelPinType::MakeExposedValue(
 		}
 		else
 		{
-			//if (!ensure(Buffer.IsConstant()))
-			if (!(Buffer.IsConstant()))
+			if (!ensure(Buffer.IsConstant()))
 			{
 				return {};
 			}

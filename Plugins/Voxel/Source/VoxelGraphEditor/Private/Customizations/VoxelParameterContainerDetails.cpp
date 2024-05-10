@@ -432,7 +432,7 @@ void FVoxelParameterContainerDetails::Initialize(
 			*Categories[0],
 			*Categories[0],
 			MakeWeakPtrLambda(this,
-				[=](const FVoxelDetailInterface& DetailInterface)
+				[this, It, Categories](const FVoxelDetailInterface& DetailInterface)
 				{
 					AddParameters(DetailInterface, It.Key, Categories, It.Value, 1);
 				}));
@@ -453,7 +453,7 @@ void FVoxelParameterContainerDetails::AddParameters(
 			*Categories[CategoryIndex],
 			*Categories[CategoryIndex],
 			MakeWeakPtrLambda(this,
-				[=](const FVoxelDetailInterface& ChildDetailInterface)
+				[this, FullCategoryPath, Categories, AllChildParameterViews, CategoryIndex](const FVoxelDetailInterface& ChildDetailInterface)
 				{
 					AddParameters(ChildDetailInterface, FullCategoryPath, Categories, AllChildParameterViews, CategoryIndex + 1);
 				}));

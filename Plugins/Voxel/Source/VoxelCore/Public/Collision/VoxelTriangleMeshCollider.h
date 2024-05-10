@@ -19,7 +19,7 @@ struct VOXELCORE_API FVoxelTriangleMeshCollider : public FVoxelCollider
 
 	FVector Offset = FVector::ZeroVector;
 	FVoxelBox LocalBounds;
-	TSharedPtr<Chaos::FTriangleMeshImplicitObject> TriangleMesh;
+	UE_504_SWITCH(TSharedPtr, TRefCountPtr)<Chaos::FTriangleMeshImplicitObject> TriangleMesh;
 	TArray<TWeakObjectPtr<UPhysicalMaterial>> PhysicalMaterials;
 
 	virtual FVector GetOffset() const override { return Offset; }

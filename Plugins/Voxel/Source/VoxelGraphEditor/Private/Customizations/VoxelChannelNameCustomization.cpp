@@ -141,7 +141,7 @@ private:
 			[
 				SNew(SVoxelChannelEditor)
 				.SelectedChannel(Channel)
-				.OnChannelSelected_Lambda(MakeWeakPtrLambda(this, [=](const FName NewChannel)
+				.OnChannelSelected_Lambda(MakeWeakPtrLambda(this, [this](const FName NewChannel)
 				{
 					CachedChannel = NewChannel;
 					if (!ensure(NameHandle))

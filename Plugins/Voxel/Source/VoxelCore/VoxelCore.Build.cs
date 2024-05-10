@@ -17,7 +17,7 @@ public class ModuleRules_Voxel : ModuleRules
 		// C++ 20 and 17 have incompatible lambda captures
 		// C++ 20 wants [=, this]
 		// C++ 17 wants [=]
-		CppStandard = CppStandardVersion.Cpp17;
+		CppStandard = CppStandardVersion.Cpp20;
 
 		string AppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "/Unreal Engine/";
 

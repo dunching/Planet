@@ -106,6 +106,11 @@ void UK2Node_QueryVoxelChannelBase::PostLoad()
 {
 	Super::PostLoad();
 
+	if (!HasValidBlueprint())
+	{
+		return;
+	}
+
 	UpdateChannel();
 }
 
