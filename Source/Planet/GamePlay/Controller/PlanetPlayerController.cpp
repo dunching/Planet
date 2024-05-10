@@ -100,7 +100,7 @@ UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()
 	return  GroupMnaggerComponentPtr;
 }
 
-UGourpMateUnit* APlanetPlayerController::GetGourpMateUnit()
+UGourpmateUnit* APlanetPlayerController::GetGourpMateUnit()
 {
 	return Cast<AHumanCharacter>(GetPawn())->GetGourpMateUnit();
 }

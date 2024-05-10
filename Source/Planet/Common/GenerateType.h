@@ -6,7 +6,6 @@
 #include <variant>
 
 #include "CoreMinimal.h"
-#include "GAEvent.h"
 
 #include "GenerateType.generated.h"
 
@@ -49,6 +48,13 @@ enum class ETagChangeType : uint8
 {
 	kAdd,
 	kRemove,
+};
+
+UENUM(BlueprintType)
+enum class ETeammateOption : uint8
+{
+	kFollow,
+	kAssistance,
 };
 
 #pragma region Callback

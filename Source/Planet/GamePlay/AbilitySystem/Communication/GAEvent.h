@@ -5,22 +5,34 @@
 #include "CoreMinimal.h"
 
 #include "Abilities/GameplayAbilityTargetTypes.h"
-#include "UObject/Interface.h"
+
+#include "GenerateType.h"
 
 class ACharacterBase;
 class UEquipmentElementComponent;
 
 struct FGameplayAbilityTargetData_GAEvent : public FGameplayAbilityTargetData
 {
+	struct FData
+	{
+		int32 ADDamage = 0;
+
+		int32 TreatmentVolume = 0;
+
+		int32 GAPerformSpeedOffset = 0;
+	};
+
+	using FCallbackHandleContainer = TCallbackHandleContainer<void(ACharacterBase*, const FData&)> ;
+
 	FGameplayAbilityTargetData_GAEvent* Clone()const;
 
 	TArray<ACharacterBase*>TargetActorAry;
 
 	ACharacterBase* TriggerCharacterPtr = nullptr;
 
-	int32 ADDamage = 10;
+	FData Data;
 
-	int32 GAPerformSpeedOffset = 0;
+	FCallbackHandleContainer TrueDataDelagate;
 
 };
 
@@ -35,7 +47,7 @@ public:
 
 	IGAEventModifyInterface(int32 InPriority = 1);
 
-	virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent);
+	virtual void Modify(FGameplayAbilityTargetData_GAEvent& OutGameplayAbilityTargetData_GAEvent);
 
 	bool operator<(const IGAEventModifyInterface& RightValue)const;
 

@@ -35,6 +35,10 @@ namespace HumanProcessor
 
 		virtual void InputKey(const FInputKeyParams& Params)override;
 
+		virtual void F1KeyPressed()override;
+
+		virtual void F2KeyPressed()override;
+
 		virtual void QKeyPressed()override;
 
 		virtual void GKeyPressed()override;

@@ -12,7 +12,7 @@
 
 class ACharacterBase;
 class IPlanetControllerInterface;
-class UGourpMateUnit;
+class UGourpmateUnit;
 
 /**
  *
@@ -44,7 +44,7 @@ protected:
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() override;
 
-	virtual UGourpMateUnit* GetGourpMateUnit() override;
+	virtual UGourpmateUnit* GetGourpMateUnit() override;
 
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType, 

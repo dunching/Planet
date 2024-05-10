@@ -20,7 +20,7 @@ class UAnimInstanceCharacter;
 class UZYInputComponent;
 class UAIHumanInfo;
 class UGroupMnaggerComponent;
-class UGourpMateUnit;
+class UGourpmateUnit;
 
 UCLASS()
 class PLANET_API AHumanCharacter : public ACharacterBase
@@ -33,7 +33,7 @@ public:
 
 	virtual TPair<FVector, FVector>GetCharacterViewInfo();
 
-	UGourpMateUnit* GetGourpMateUnit();
+	UGourpmateUnit* GetGourpMateUnit();
 
 protected:
 
@@ -49,7 +49,7 @@ protected:
 	TSoftObjectPtr<UTexture2D> CharacterIcon;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
-	UGourpMateUnit* GourpMateUnitPtr = nullptr;
+	UGourpmateUnit* GourpMateUnitPtr = nullptr;
 
 private:
 

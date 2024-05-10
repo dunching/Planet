@@ -229,7 +229,7 @@ void USkill_WeaponHandProtection::OnNotifyBeginReceived(FName NotifyName)
 
 			GAEventData->TargetActorAry.Empty();
 			GAEventData->TriggerCharacterPtr = CharacterPtr;
-			GAEventData->ADDamage = Damage;
+			GAEventData->Data.ADDamage = Damage;
 
 			for (auto Iter : OutHits)
 			{

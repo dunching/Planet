@@ -76,6 +76,10 @@ protected:
 
 	void AddYawInput(const FInputActionValue& InputActionValue);
 
+	void F1KeyPressed();
+
+	void F2KeyPressed();
+
 	void QKeyPressed();
 
 	void WKeyPressed();

@@ -155,48 +155,35 @@ namespace HumanProcessor
 						WeaponPtr = OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kSecondary);
 					}
 
-					switch (SkillIter->SkillUnit->GetSceneElementType<ESkillUnitType>())
+					FGameplayEventData Payload;
+					auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+					if (OnwerActorPtr)
 					{
-					case ESkillUnitType::kHumanSkill_PickAxe_Attack1:
-					{
-						auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-						if (OnwerActorPtr)
+						switch (SkillIter->SkillUnit->GetSceneElementType<ESkillUnitType>())
 						{
-							FGameplayEventData Payload;
+						case ESkillUnitType::kHumanSkill_PickAxe_Attack1:
+						{
 							auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
 							GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(WeaponPtr);
 							Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
-							auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-							ASCPtr->TriggerAbilityFromGameplayEvent(
-								SkillIter->Handle,
-								ASCPtr->AbilityActorInfo.Get(),
-								FGameplayTag(),
-								&Payload,
-								*ASCPtr
-							);
 						}
-					}
-					break;
-					case ESkillUnitType::kHumanSkill_WeaponHandProtection_Attack1:
-					{
-						auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-						if (OnwerActorPtr)
+						break;
+						case ESkillUnitType::kHumanSkill_WeaponHandProtection_Attack1:
 						{
-							FGameplayEventData Payload;
 							auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
 							GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(WeaponPtr);
 							Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
-							auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-							ASCPtr->TriggerAbilityFromGameplayEvent(
-								SkillIter->Handle,
-								ASCPtr->AbilityActorInfo.Get(),
-								FGameplayTag(),
-								&Payload,
-								*ASCPtr
-							);
 						}
-					}
-					break;
+						break;
+						}
+						auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+						ASCPtr->TriggerAbilityFromGameplayEvent(
+							SkillIter->Handle,
+							ASCPtr->AbilityActorInfo.Get(),
+							FGameplayTag(),
+							&Payload,
+							*ASCPtr
+						);
 					}
 				}
 				break;
@@ -205,6 +192,7 @@ namespace HumanProcessor
 					switch (SkillIter->SkillUnit->GetSceneElementType<ESkillUnitType>())
 					{
 					case ESkillUnitType::kHumanSkill_Displacement:
+					case ESkillUnitType::kHumanSkill_GroupTherapy:
 					{
 						auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 						if (OnwerActorPtr)
@@ -234,6 +222,16 @@ namespace HumanProcessor
 				}
 			}
 		}
+	}
+
+	void FHumanRegularProcessor::F1KeyPressed()
+	{
+
+	}
+
+	void FHumanRegularProcessor::F2KeyPressed()
+	{
+
 	}
 
 	void FHumanRegularProcessor::QKeyPressed()

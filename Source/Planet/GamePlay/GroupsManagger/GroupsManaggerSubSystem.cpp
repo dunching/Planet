@@ -64,7 +64,7 @@ void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(IPlanetController
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
 
-void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpMateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr)
+void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpmateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr)
 {
 	MembersMap.Add(GourpMateUnitPtr, PCPtr);
 

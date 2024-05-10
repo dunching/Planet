@@ -31,13 +31,19 @@ void UGAEvent_Received::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			return;
 		}
 
+		auto Clone = GAEventDataPtr->Clone();
+
 		auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 		if (!CharacterPtr)
 		{
 			return;
 		}
 
-		CharacterPtr->GetEquipmentItemsComponent()->OnReceivedEventModifyData(*GAEventDataPtr);
+		CharacterPtr->GetEquipmentItemsComponent()->OnReceivedEventModifyData(*Clone);
+
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*Clone);
+
+		Clone->TrueDataDelagate.ExcuteCallback(CharacterPtr, Clone->Data);
 	}
 }
 

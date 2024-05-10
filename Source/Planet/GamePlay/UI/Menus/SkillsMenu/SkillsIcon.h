@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UIInterfaces.h"
-#include "Common/GenerateType.h"
 
+#include "GameplayTagContainer.h"
+
+#include "UIInterfaces.h"
+#include "GenerateType.h"
 #include "SceneElement.h"
 
 #include "SkillsIcon.generated.h"

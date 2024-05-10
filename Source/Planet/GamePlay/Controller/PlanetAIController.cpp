@@ -26,7 +26,7 @@ UGroupMnaggerComponent* APlanetAIController::GetGroupMnaggerComponent()
 	return  GroupMnaggerComponentPtr;
 }
 
-UGourpMateUnit* APlanetAIController::GetGourpMateUnit()
+UGourpmateUnit* APlanetAIController::GetGourpMateUnit()
 {
 	return Cast<AHumanCharacter>(GetPawn())->GetGourpMateUnit();
 }

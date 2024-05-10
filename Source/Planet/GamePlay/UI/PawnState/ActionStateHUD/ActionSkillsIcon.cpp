@@ -246,7 +246,7 @@ void UActionSkillsIcon::SetRemainingCooldown(
 
 void UActionSkillsIcon::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(Icon));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::Icon));
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();

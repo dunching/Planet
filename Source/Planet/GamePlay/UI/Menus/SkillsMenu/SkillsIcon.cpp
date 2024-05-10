@@ -67,53 +67,56 @@ void USkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kSkill)
 	{
 		SkillUnitPtr = Cast<USkillUnit>(BasicUnitPtr);
-		SetLevel(SkillUnitPtr->Level);
-		SetItemType();
 
+		if (SkillUnitPtr && (bIsInBackpakc || SkillUnitPtr->SkillType == SkillType))
 		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(HighlightBorder));
-			if (ImagePtr)
+
+			SetLevel(SkillUnitPtr->Level);
+			SetItemType();
+
 			{
-				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+				auto ImagePtr = Cast<UImage>(GetWidgetFromName(HighlightBorder));
+				if (ImagePtr)
+				{
+					ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
-		}
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(Content));
-			if (BorderPtr)
 			{
-				BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(Content));
+				if (BorderPtr)
+				{
+					BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				}
 			}
-		}
-		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(StateOverlap));
-			if (UIPtr)
 			{
-				UIPtr->SetVisibility(ESlateVisibility::Hidden);
+				auto UIPtr = Cast<UOverlay>(GetWidgetFromName(StateOverlap));
+				if (UIPtr)
+				{
+					UIPtr->SetVisibility(ESlateVisibility::Hidden);
+				}
 			}
+			return;
 		}
 	}
-	else
 	{
+		auto ImagePtr = Cast<UImage>(GetWidgetFromName(HighlightBorder));
+		if (ImagePtr)
 		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(HighlightBorder));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Visible);
-			}
+			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 		}
+	}
+	{
+		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(Content));
+		if (BorderPtr)
 		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
+			BorderPtr->SetVisibility(ESlateVisibility::Hidden);
 		}
+	}
+	{
+		auto UIPtr = Cast<UOverlay>(GetWidgetFromName(StateOverlap));
+		if (UIPtr)
 		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(StateOverlap));
-			if (UIPtr)
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
+			UIPtr->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }

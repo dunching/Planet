@@ -11,7 +11,7 @@
 #include "GroupsManaggerSubSystem.generated.h"
 
 class IPlanetControllerInterface;
-class UGourpMateUnit;
+class UGourpmateUnit;
 
 UCLASS()
 class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
@@ -20,7 +20,7 @@ class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
 
 public:
 
-	using FCallbackHandleContainerVoid = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>;
+	using FCallbackHandleContainer = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>;
 
 	struct FGroupMatesHelper
 	{
@@ -28,7 +28,7 @@ public:
 
 		int32 ID = 1;
 
-		FCallbackHandleContainerVoid MembersChanged;
+		FCallbackHandleContainer MembersChanged;
 
 		IPlanetControllerInterface* OwnerPCPtr = nullptr;
 
@@ -37,15 +37,15 @@ public:
 
 	struct FTeamMatesHelper
 	{
-		void AddCharacter(UGourpMateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr);
+		void AddCharacter(UGourpmateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr);
 
 		int32 ID = 1;
 
-		FCallbackHandleContainerVoid MembersChanged;
+		FCallbackHandleContainer MembersChanged;
 
 		IPlanetControllerInterface* OwnerPCPtr = nullptr;
 
-		TMap<UGourpMateUnit*, IPlanetControllerInterface*> MembersMap;
+		TMap<UGourpmateUnit*, IPlanetControllerInterface*> MembersMap;
 	};
 
 	static UGroupsManaggerSubSystem* GetInstance();

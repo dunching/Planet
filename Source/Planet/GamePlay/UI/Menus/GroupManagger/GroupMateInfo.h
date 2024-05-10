@@ -13,7 +13,7 @@
 struct FStreamableHandle;
 
 class UBasicUnit;
-class UGourpMateUnit;
+class UGourpmateUnit;
 
 /**
  *
@@ -37,7 +37,7 @@ public:
 
 private:
 
-	UGourpMateUnit* GroupMateUnitPtr = nullptr;
+	UGourpmateUnit* GroupMateUnitPtr = nullptr;
 
 	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 

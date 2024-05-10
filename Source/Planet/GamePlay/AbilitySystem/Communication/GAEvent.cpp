@@ -16,7 +16,7 @@ IGAEventModifyInterface::IGAEventModifyInterface(int32 InPriority) :
 
 }
 
-void IGAEventModifyInterface::Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)
+void IGAEventModifyInterface::Modify(FGameplayAbilityTargetData_GAEvent& OutGameplayAbilityTargetData_GAEvent)
 {
 
 }

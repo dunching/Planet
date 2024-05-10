@@ -22,7 +22,7 @@ class PLANET_API UWeaponsIcon : public UUserWidget, public IToolsIconInterface
 
 public:
 
-	using FCallbackHandleContainerVoid = TCallbackHandleContainer<void(UWeaponUnit*)>;
+	using FCallbackHandleContainer = TCallbackHandleContainer<void(UWeaponUnit*)>;
 
 	UWeaponsIcon(const FObjectInitializer& ObjectInitializer);
 
@@ -30,7 +30,7 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
-	FCallbackHandleContainerVoid OnDroped;
+	FCallbackHandleContainer OnDroped;
 
 	UWeaponUnit* WeaponUnitPtr = nullptr;
 

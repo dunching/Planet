@@ -181,13 +181,13 @@ USkillUnit::USkillUnit() :
 
 }
 
-UGourpMateUnit::UGourpMateUnit() :
+UGourpmateUnit::UGourpmateUnit() :
 	Super(ESceneToolsType::kGroupMate)
 {
 
 }
 
-void UGourpMateUnit::InitialByCharactor(ACharacterBase* InCharacterPtr)
+void UGourpmateUnit::InitialByCharactor(ACharacterBase* InCharacterPtr)
 {
 	PCPtr = Cast<IPlanetControllerInterface>(InCharacterPtr->GetController());
 	Name = InCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;

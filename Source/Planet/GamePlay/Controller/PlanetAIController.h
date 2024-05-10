@@ -12,7 +12,7 @@
 
 class UAIHumanInfo;
 class UGroupMnaggerComponent;
-class UGourpMateUnit;
+class UGourpmateUnit;
 
 /**
  * 
@@ -28,7 +28,7 @@ public:
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() override;
 
-	virtual UGourpMateUnit* GetGourpMateUnit() override;
+	virtual UGourpmateUnit* GetGourpMateUnit() override;
 
 	UAIHumanInfo* AIHumanInfoPtr = nullptr;
 

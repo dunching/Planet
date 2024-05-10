@@ -102,7 +102,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Icon")
 	int32 CooldownTime = -1;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Icon")
 	int32 ResetCooldownTime = 1;
 
 protected:

@@ -271,6 +271,16 @@ void FInputProcessor::AddYawInput(const FInputActionValue& InputActionValue)
 {
 }
 
+void FInputProcessor::F1KeyPressed()
+{
+
+}
+
+void FInputProcessor::F2KeyPressed()
+{
+
+}
+
 void FInputProcessor::LCtrlKeyPressed()
 {
 

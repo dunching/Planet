@@ -7,7 +7,7 @@
 #include "PlanetControllerInterface.generated.h"
 
 class UGroupMnaggerComponent;
-class UGourpMateUnit;
+class UGourpmateUnit;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class UPlanetControllerInterface : public UInterface
@@ -27,7 +27,7 @@ public:
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() = 0;
 
-	virtual UGourpMateUnit* GetGourpMateUnit() = 0;
+	virtual UGourpmateUnit* GetGourpMateUnit() = 0;
 
 protected:
 

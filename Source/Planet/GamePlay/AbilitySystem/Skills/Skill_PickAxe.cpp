@@ -9,6 +9,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
+#include "GameFramework/Controller.h"
 
 #include "GAEvent.h"
 #include "CharacterBase.h"
@@ -21,6 +22,8 @@
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "Weapon_PickAxe.h"
+#include "PlanetControllerInterface.h"
+#include "GroupMnaggerComponent.h"
 
 const FName Hit = TEXT("Hit");
 
@@ -127,6 +130,19 @@ void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
 		FCollisionQueryParams CapsuleParams;
 		CapsuleParams.AddIgnoredActor(CharacterPtr);
 
+		auto GroupMnaggerComponent = CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent();
+		if (GroupMnaggerComponent)
+		{
+			auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper(); 
+			if (TeamsHelperSPtr)
+			{
+				for (auto Iter : TeamsHelperSPtr->MembersMap)
+				{
+					CapsuleParams.AddIgnoredActor(Cast<ACharacterBase>(Cast<AController>(Iter.Value)->GetPawn()));
+				}
+			}
+		}
+
 		TArray<struct FHitResult> OutHits;
 		if (GetWorldImp()->SweepMultiByObjectType(
 			OutHits,
@@ -145,7 +161,7 @@ void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
 
 			GAEventData->TargetActorAry.Empty();
 			GAEventData->TriggerCharacterPtr = CharacterPtr;
-			GAEventData->ADDamage = Damage;
+			GAEventData->Data.ADDamage = Damage;
 
 			for (auto Iter : OutHits)
 			{

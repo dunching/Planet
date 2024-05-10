@@ -52,6 +52,7 @@ void TestCommand::AddCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkills_ZMJZ);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Displacement);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_TalentSkill_NuQi);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_GroupTherapy);
 	}
 }
 

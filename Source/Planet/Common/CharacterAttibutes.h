@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "GenerateType.h"
+#include "GAEvent.h"
 
 #include "CharacterAttibutes.generated.h"
 
@@ -208,4 +209,10 @@ struct PLANET_API FCharacterAttributes
 	FBasePropertySet RunningConsume;
 
 };
+
+struct PLANET_API FScopeCharacterAttributes
+{
+	FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes);
+};
+
 #pragma endregion CharacterAttributes

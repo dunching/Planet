@@ -38,8 +38,8 @@ void UEquipmentElementComponent::BeginPlay()
 			{
 				if (GameplayAbilityTargetData_GAEvent.TargetActorAry.Num() > 1)
 				{
-					GameplayAbilityTargetData_GAEvent.ADDamage =
-						GameplayAbilityTargetData_GAEvent.ADDamage / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
+					GameplayAbilityTargetData_GAEvent.Data.ADDamage =
+						GameplayAbilityTargetData_GAEvent.Data.ADDamage / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
 				}
 			}
 		};
@@ -102,17 +102,20 @@ void UEquipmentElementComponent::InitialBaseGAs()
 	}
 }
 
-void UEquipmentElementComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GAEvent& GAEventData)
+void UEquipmentElementComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData)
 {
 	for (auto Iter : SendEventModifysMap)
 	{
-		Iter->Modify(GAEventData);
+		Iter->Modify(OutGAEventData);
 	}
 }
 
-void UEquipmentElementComponent::OnReceivedEventModifyData(const FGameplayAbilityTargetData_GAEvent& GAEventData)
+void UEquipmentElementComponent::OnReceivedEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData)
 {
-	GetOwner<ACharacterBase>()->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(GAEventData);
+	for (auto Iter : ReceivedEventModifysMap)
+	{
+		Iter->Modify(OutGAEventData);
+	}
 }
 
 void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, FSkillsSocketInfo>& InSkillsMap)

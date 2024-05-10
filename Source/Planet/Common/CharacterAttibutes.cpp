@@ -59,5 +59,10 @@ FCharacterAttributes::~FCharacterAttributes()
 
 void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAEvent)
 {
-	HP.AddCurrentValue(-GAEvent.ADDamage);
+	HP.AddCurrentValue(GAEvent.Data.TreatmentVolume - GAEvent.Data.ADDamage);
+}
+
+FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)
+{
+
 }

@@ -63,11 +63,11 @@ TPair<FVector, FVector> AHumanCharacter::GetCharacterViewInfo()
 	return Result;
 }
 
-UGourpMateUnit* AHumanCharacter::GetGourpMateUnit()
+UGourpmateUnit* AHumanCharacter::GetGourpMateUnit()
 {
 	if (!GourpMateUnitPtr)
 	{
-		GourpMateUnitPtr = NewObject<UGourpMateUnit>();
+		GourpMateUnitPtr = NewObject<UGourpmateUnit>();
 		GourpMateUnitPtr->InitialByCharactor(this);
 	}
 

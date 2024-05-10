@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+
 #include "UIInterfaces.h"
-#include "Common/GenerateType.h"
+#include "GenerateType.h"
 
 #include "SceneElement.h"
 

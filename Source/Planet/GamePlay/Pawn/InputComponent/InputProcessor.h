@@ -63,6 +63,10 @@ public:
 
 	virtual void AddYawInput(const FInputActionValue& InputActionValue);
 
+	virtual void F1KeyPressed();
+
+	virtual void F2KeyPressed();
+
 	virtual void QKeyPressed();
 
 	virtual void WKeyPressed();

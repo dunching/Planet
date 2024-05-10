@@ -10,6 +10,7 @@
 #include <SceneElement.h>
 #include "GameplayTagContainer.h"
 #include "GameplayAbilitySpecHandle.h"
+#include "GAEvent.h"
 
 #include "EquipmentElementComponent.generated.h"
 
@@ -71,9 +72,9 @@ public:
 
 	void InitialBaseGAs();
 
-	void OnSendEventModifyData(FGameplayAbilityTargetData_GAEvent& GAEventData);
+	void OnSendEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData);
 
-	void OnReceivedEventModifyData(const FGameplayAbilityTargetData_GAEvent& GAEventData);
+	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData);
 
 	UWeaponUnit* GetMainWeaponUnit()const;
 
@@ -121,6 +122,8 @@ protected:
 	FGameplayTagContainer CharacterTags;
 
 	std::multiset<TSharedPtr<IGAEventModifyInterface>, FGAEventModify_key_compare>SendEventModifysMap;
+
+	std::multiset<TSharedPtr<IGAEventModifyInterface>, FGAEventModify_key_compare>ReceivedEventModifysMap;
 
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")

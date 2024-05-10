@@ -69,6 +69,9 @@ void UInputProcessorSubSystem::BindAction(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::Eight], ETriggerEvent::Started, this, &ThisClass::PressedNumKeyIndex, 8);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::Nine], ETriggerEvent::Started, this, &ThisClass::PressedNumKeyIndex, 9);
 
+		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::F1], ETriggerEvent::Started, this, &ThisClass::F1KeyPressed);
+		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::F2], ETriggerEvent::Started, this, &ThisClass::F2KeyPressed);
+
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::Q], ETriggerEvent::Started, this, &ThisClass::QKeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::W], ETriggerEvent::Started, this, &ThisClass::WKeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::E], ETriggerEvent::Started, this, &ThisClass::EKeyPressed);
@@ -127,6 +130,16 @@ void UInputProcessorSubSystem::AddPitchInput(const FInputActionValue& InputActio
 void UInputProcessorSubSystem::AddYawInput(const FInputActionValue& InputActionValue)
 {
 	CurrentProcessorSPtr->AddYawInput(InputActionValue);
+}
+
+void UInputProcessorSubSystem::F1KeyPressed()
+{
+	CurrentProcessorSPtr->F1KeyPressed();
+}
+
+void UInputProcessorSubSystem::F2KeyPressed()
+{
+	CurrentProcessorSPtr->F2KeyPressed();
 }
 
 void UInputProcessorSubSystem::WKeyPressed()

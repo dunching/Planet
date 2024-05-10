@@ -66,6 +66,11 @@ void UInputActions::InitialInputMapping()
 		EKeys::Eight,
 		EKeys::Nine,
 
+		EKeys::F1,
+		EKeys::F2,
+		EKeys::F3,
+		EKeys::F4,
+
 		EKeys::Q,
 		EKeys::W,
 		EKeys::E,

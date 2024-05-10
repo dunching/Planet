@@ -14,6 +14,7 @@ class AToolUnitBase;
 class IPlanetControllerInterface;
 
 class USkill_Base;
+class ACharacterBase;
 
 struct FSceneToolsContainer;
 
@@ -63,6 +64,7 @@ enum class ESkillUnitType : uint8
 	kHumanSkill_PickAxe_Attack1,
 	kHumanSkill_WeaponHandProtection_Attack1,
 	kHumanSkill_Displacement,
+	kHumanSkill_GroupTherapy,
 	kHumanSkill_TalentSkill_NuQi,
 };
 
@@ -149,13 +151,13 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class UGourpMateUnit : public UBasicUnit
+class UGourpmateUnit : public UBasicUnit
 {
 	GENERATED_BODY()
 
 public:
 
-	UGourpMateUnit();
+	UGourpmateUnit();
 
 	void InitialByCharactor(ACharacterBase* InCharacterPtr);
 

@@ -102,7 +102,7 @@ void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 
-		GroupMateUnitPtr = Cast<UGourpMateUnit>(BasicUnitPtr);
+		GroupMateUnitPtr = Cast<UGourpmateUnit>(BasicUnitPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Texture));
 			if (UIPtr)
