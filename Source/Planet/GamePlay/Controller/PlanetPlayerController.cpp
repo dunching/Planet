@@ -21,6 +21,7 @@
 #include "SceneElement.h"
 #include "HumanCharacter.h"
 #include "PlanetControllerInterface.h"
+#include "NavgationSubSysetem.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -41,6 +42,8 @@ void APlanetPlayerController::BeginPlay()
 
 	FInputModeGameOnly InputMode;
 	SetInputMode(InputMode);
+
+	UNavgationSubSystem::GetInstance();
 }
 
 void APlanetPlayerController::PlayerTick(float DeltaTime)

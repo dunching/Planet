@@ -54,8 +54,8 @@ void USkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->SkillUnitPtr);
 			bIsInBackpakc = NewPtr->bIsInBackpakc;
+			ResetToolUIByData(NewPtr->SkillUnitPtr);
 		}
 	}
 }

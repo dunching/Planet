@@ -1,6 +1,8 @@
 
 #include "PlanetAIController.h"
 
+#include <GameFramework/CharacterMovementComponent.h>
+
 #include "AIHumanInfo.h"
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
@@ -61,6 +63,8 @@ void APlanetAIController::OnPossess(APawn* InPawn)
 			AIHumanInfoPtr->CharacterPtr = CharacterPtr;
 			AIHumanInfoPtr->AddToViewport();
 		}
+
+		CharacterPtr->GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 
 	SetCampType(ECharacterCampType::kEnemy);

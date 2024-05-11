@@ -29,6 +29,7 @@ public class Planet : ModuleRules
         PrivateDependencyModuleNames.AddRange(new string[] { });
         PublicIncludePaths.Add("Planet");
         PublicIncludePaths.Add("Planet/GamePlay");
+        PublicIncludePaths.Add("Planet/GamePlay/Navgation");
         PublicIncludePaths.Add("Planet/GamePlay/GroupsManagger");
         PublicIncludePaths.Add("Planet/GamePlay/SPlineActor");
         PublicIncludePaths.Add("Planet/GamePlay/UI");
@@ -92,8 +93,9 @@ public class Planet : ModuleRules
             "VoxelGraphCore",
             "Gravity",
             "MMT",
-            "EnhancedInput" ,
+            "FlyingNavSystem" ,
 
+            "EnhancedInput" ,
             "GameplayAbilities",
             "GameplayTags",
             "GameplayTasks"
