@@ -1,0 +1,27 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0.18",
+	"FriendlyName": "Flying Navigation System",
+	"Description": "Enables complex flying AI behavior",
+	"Category": "Navigation",
+	"CreatedBy": "Ben Sutherland",
+	"CreatedByURL": "https://codingqilin.com/",
+	"DocsURL": "https://blendersleuth.github.io/FlyingNavSystemSite/",
+	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/65b9b3247c5c458dbb6de81c79cdc8f0",
+	"SupportURL": "https://github.com/BlenderSleuth/FlyingNavSystemSupport",
+	"CanContainContent": true,
+	"Installed": true,
+	"Modules": [
+		{
+			"Name": "FlyingNavSystem",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"PlatformAllowList": [
+				"Win64",
+				"Mac",
+				"Linux"
+			]
+		}
+	]
+}
