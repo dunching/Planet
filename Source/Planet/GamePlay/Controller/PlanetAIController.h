@@ -15,7 +15,7 @@ class UGroupMnaggerComponent;
 class UGourpmateUnit;
 
 /**
- * 
+ *
  */
 UCLASS()
 class PLANET_API APlanetAIController : public AGravityAIController, public IPlanetControllerInterface
@@ -29,6 +29,9 @@ public:
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnTeammateOptionChanged(ETeammateOption TeammateOption, ACharacter* LeaderPtr);
 
 	UAIHumanInfo* AIHumanInfoPtr = nullptr;
 

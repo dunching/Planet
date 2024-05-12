@@ -125,6 +125,7 @@ void APlanetPlayerController::OnCharacterGroupMateChanged(
 				if (AIPCPtr)
 				{
 					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
+					AIPCPtr->OnTeammateOptionChanged(ETeammateOption::kFollow, Cast<ACharacter>(GetPawn()));
 				}
 			}
 		}

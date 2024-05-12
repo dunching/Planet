@@ -64,7 +64,7 @@ void APlanetAIController::OnPossess(APawn* InPawn)
 			AIHumanInfoPtr->AddToViewport();
 		}
 
-		CharacterPtr->GetCharacterMovement()->bOrientRotationToMovement = true;
+//		CharacterPtr->GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 
 	SetCampType(ECharacterCampType::kEnemy);

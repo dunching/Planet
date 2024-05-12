@@ -51,39 +51,6 @@ public:
 
     virtual void SetGravityDirection(const FVector& GravityDir)override;
 
-    virtual void CalcVelocity(
-        float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration
-    )override;
-
-    virtual void MaintainHorizontalGroundVelocity()override;
-
-    virtual FVector ConstrainInputAcceleration(const FVector& InputAcceleration) const override;
-
-    virtual FRotator ComputeOrientToMovementRotation(
-        const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation
-    ) const override;
-
-    virtual bool ShouldComputePerchResult(
-        const FHitResult& InHit, bool bCheckRadius = true
-    ) const override;
-
-    virtual bool ComputePerchResult(
-        const float TestRadius,
-        const FHitResult& InHit,
-        const float InMaxFloorDist,
-        FFindFloorResult& OutPerchFloorResult
-    ) const override;
-
-    virtual bool FloorSweepTest(
-        struct FHitResult& OutHit,
-        const FVector& Start,
-        const FVector& End,
-        ECollisionChannel TraceChannel,
-        const struct FCollisionShape& CollisionShape,
-        const struct FCollisionQueryParams& Params,
-        const struct FCollisionResponseParams& ResponseParam
-    ) const;
-
     virtual void PhysicsRotation(float DeltaTime)override;
 
     virtual void PhysNavWalking(float deltaTime, int32 Iterations)override;
@@ -97,9 +64,7 @@ public:
 
 private:
 
-    float VelocityScale = 1.f;
-
     // 通过这个向量获取连续的Transform
-    FVector DesiredDirection = FVector::ForwardVector;
+    FVector PreviousGravityTransformForward = FVector::ForwardVector;
 
 };
