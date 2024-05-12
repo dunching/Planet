@@ -43,6 +43,8 @@ public:
 
     virtual void BeginPlay() override;
 
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
+
     virtual void TickComponent(
         float DeltaTime,
         enum ELevelTick TickType,
@@ -57,12 +59,14 @@ public:
 
     virtual void PhysWalking(float deltaTime, int32 Iterations)override;
 
-    virtual void ComputeFloorDist(
-        const FVector& CapsuleLocation, float LineDistance, float SweepDistance,
-        FFindFloorResult& OutFloorResult, float SweepRadius, const FHitResult* DownwardSweepResult = NULL
-    ) const override;
+protected:
 
-private:
+    bool UpdateGravityTransform(float Delta);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	float Frequency = 1.f;
+
+    FTSTicker::FDelegateHandle TickDelegateHandle;
 
     // 通过这个向量获取连续的Transform
     FVector PreviousGravityTransformForward = FVector::ForwardVector;
