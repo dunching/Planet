@@ -72,6 +72,14 @@ void USkill_Base::CancelAbility(const FGameplayAbilitySpecHandle Handle, const F
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
+void USkill_Base::OnRemoveAbility(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
 void USkill_Base::Tick(float DeltaTime)
 {
 	CooldownConsumeTime += DeltaTime;

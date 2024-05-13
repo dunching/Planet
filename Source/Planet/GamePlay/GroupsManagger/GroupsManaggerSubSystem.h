@@ -20,7 +20,9 @@ class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
 
 public:
 
-	using FCallbackHandleContainer = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>;
+	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>;
+
+	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, IPlanetControllerInterface*)>;
 
 	struct FGroupMatesHelper
 	{
@@ -28,7 +30,7 @@ public:
 
 		int32 ID = 1;
 
-		FCallbackHandleContainer MembersChanged;
+		FMemberChangedDelegateContainer MembersChanged;
 
 		IPlanetControllerInterface* OwnerPCPtr = nullptr;
 
@@ -39,13 +41,24 @@ public:
 	{
 		void AddCharacter(UGourpmateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr);
 
+		void SwitchTeammateOption(ETeammateOption InTeammateOption);
+
+		ETeammateOption GetTeammateOption()const;
+
 		int32 ID = 1;
 
-		FCallbackHandleContainer MembersChanged;
+		FMemberChangedDelegateContainer MembersChanged;
+
+		FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
 		IPlanetControllerInterface* OwnerPCPtr = nullptr;
 
 		TMap<UGourpmateUnit*, IPlanetControllerInterface*> MembersMap;
+
+	private:
+
+		ETeammateOption TeammateOption = ETeammateOption::kFollow;
+
 	};
 
 	static UGroupsManaggerSubSystem* GetInstance();

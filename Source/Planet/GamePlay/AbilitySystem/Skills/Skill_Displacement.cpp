@@ -31,9 +31,9 @@ USkill_Displacement::USkill_Displacement() :
 
 void USkill_Displacement::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayAbilityActivationInfo ActivationInfo, 
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
@@ -45,7 +45,7 @@ void USkill_Displacement::PreActivate(
 }
 
 void USkill_Displacement::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
@@ -57,10 +57,10 @@ void USkill_Displacement::ActivateAbility(
 }
 
 bool USkill_Displacement::CanActivateAbility(
-	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
-	const FGameplayTagContainer* TargetTags /*= nullptr*/, 
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
@@ -73,9 +73,9 @@ bool USkill_Displacement::CanActivateAbility(
 
 void USkill_Displacement::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility, 
+	bool bReplicateEndAbility,
 	bool bWasCancelled
 )
 {

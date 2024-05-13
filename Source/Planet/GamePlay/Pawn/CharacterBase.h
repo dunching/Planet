@@ -51,6 +51,8 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UGroupMnaggerComponent* GetGroupMnaggerComponent();
+	
 	UHoldingItemsComponent* GetHoldingItemsComponent();
 
 	UCharacterAttributesComponent* GetCharacterAttributesComponent();

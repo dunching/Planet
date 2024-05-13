@@ -72,3 +72,15 @@ void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpmateUnit* Go
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
+
+void UGroupsManaggerSubSystem::FTeamMatesHelper::SwitchTeammateOption(ETeammateOption InTeammateOption)
+{
+	TeammateOption = InTeammateOption;
+
+	TeammateOptionChanged.ExcuteCallback(InTeammateOption, OwnerPCPtr);
+}
+
+ETeammateOption UGroupsManaggerSubSystem::FTeamMatesHelper::GetTeammateOption() const
+{
+	return TeammateOption;
+}

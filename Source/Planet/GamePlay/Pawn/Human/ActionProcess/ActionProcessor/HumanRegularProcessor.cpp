@@ -59,6 +59,8 @@
 #include "Weapon_PickAxe.h"
 #include "HumanViewTalentAllocation.h"
 #include "HumanViewGroupManagger.h"
+#include "GroupMnaggerComponent.h"
+#include "GroupsManaggerSubSystem.h"
 
 namespace HumanProcessor
 {
@@ -226,12 +228,20 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::F1KeyPressed()
 	{
-
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (OnwerActorPtr)
+		{
+			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamsHelper()->SwitchTeammateOption(ETeammateOption::kFollow); 
+		}
 	}
 
 	void FHumanRegularProcessor::F2KeyPressed()
 	{
-
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (OnwerActorPtr)
+		{
+			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamsHelper()->SwitchTeammateOption(ETeammateOption::kAssistance);
+		}
 	}
 
 	void FHumanRegularProcessor::QKeyPressed()

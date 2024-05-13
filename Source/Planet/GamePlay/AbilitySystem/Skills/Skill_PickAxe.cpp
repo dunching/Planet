@@ -25,9 +25,12 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 
-const FName Hit = TEXT("Hit");
+namespace Skill_PickAxe
+{
+	const FName Hit = TEXT("Hit");
 
-const FName AttachEnd = TEXT("AttachEnd");
+	const FName AttachEnd = TEXT("AttachEnd");
+}
 
 USkill_PickAxe1::USkill_PickAxe1() :
 	Super()
@@ -120,7 +123,7 @@ void USkill_PickAxe1::StartTasksLink()
 
 void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
 {
-	if (NotifyName == Hit)
+	if (NotifyName == Skill_PickAxe::Hit)
 	{
 		FCollisionObjectQueryParams ObjectQueryParams;
 		ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
@@ -175,7 +178,7 @@ void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
 			SendEvent(Payload);
 		}
 	}
-	else if (NotifyName == AttachEnd)
+	else if (NotifyName == Skill_PickAxe::AttachEnd)
 	{
 		bIsAttackEnd = true;
 		if (RepeatType != USkill_Base::ERepeatType::kStop)

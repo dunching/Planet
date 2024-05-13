@@ -30,6 +30,7 @@
 #include "TalentAllocationComponent.h"
 #include "GroupMnaggerComponent.h"
 #include "AssetRefMap.h"
+#include "../Controller/PlanetControllerInterface.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -101,6 +102,17 @@ void ACharacterBase::PossessedBy(AController* NewController)
 class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponentPtr;
+}
+
+UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()
+{
+	auto PCPtr = Cast<IPlanetControllerInterface>(GetController());
+	if (PCPtr)
+	{
+		return PCPtr->GetGroupMnaggerComponent();
+	}
+
+	return nullptr;
 }
 
 UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent()
