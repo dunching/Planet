@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include <AIController.h>
+
 #include "GravityPlayerController.h"
 #include "GenerateType.h"
 #include "PlanetControllerInterface.h"
@@ -13,6 +15,7 @@
 class ACharacterBase;
 class IPlanetControllerInterface;
 class UGourpmateUnit;
+class UFocusIcon;
 
 /**
  *
@@ -27,6 +30,14 @@ public:
 	using FDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>::FCallbackHandleSPtr;
 
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
+
+	virtual void SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
+
+	AActor* GetFocusActor() const;
+
+	virtual void ClearFocus(EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
+
+	virtual ACharacterBase* GetCharacter()override;
 
 protected:
 
@@ -47,13 +58,17 @@ protected:
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
 
 	void OnCharacterGroupMateChanged(
-		EGroupMateChangeType GroupMateChangeType, 
-		IPlanetControllerInterface* NewPCPtr
+		EGroupMateChangeType GroupMateChangeType,
+		IPlanetControllerInterface* LeaderPCPtr
 	);
 
 	FDelegateHandle DelegateHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
+
+	FFocusKnowledge	FocusInformation;
+
+	UFocusIcon* FocusIconPtr = nullptr;
 
 };

@@ -34,6 +34,11 @@ void FInputProcessor::ESCKeyPressed()
 {
 }
 
+void FInputProcessor::TabKeyPressed()
+{
+
+}
+
 void FInputProcessor::EnterAction()
 {
 	bIsRequestQuit = false;

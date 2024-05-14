@@ -26,11 +26,15 @@ void UGroupMnaggerComponent::AddCharacterToTeam(IPlanetControllerInterface* PCPt
 void UGroupMnaggerComponent::OnAddToNewGroup(IPlanetControllerInterface* OwnerPCPtr)
 {
 	GroupHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetGroupsHelper();
+
+	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 
 void UGroupMnaggerComponent::OnAddToNewTeam(IPlanetControllerInterface* OwnerPCPtr)
 {
 	TeamHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetTeamsHelper();
+
+	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
 
 const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupsHelper() 
@@ -39,6 +43,8 @@ const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComp
 	{
 		auto OwnerPCPtr = GetOwner<IPlanetControllerInterface>();
 		GroupHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(OwnerPCPtr);
+
+		GroupHelperChangedDelegateContainer.ExcuteCallback();
 	}
 	return GroupHelperSPtr;
 }
@@ -49,6 +55,8 @@ const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& UGroupMnaggerCompo
 	{
 		auto OwnerPCPtr = GetOwner<IPlanetControllerInterface>();
 		TeamHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(OwnerPCPtr);
+
+		TeamHelperChangedDelegateContainer.ExcuteCallback();
 	}
 	return TeamHelperSPtr;
 }

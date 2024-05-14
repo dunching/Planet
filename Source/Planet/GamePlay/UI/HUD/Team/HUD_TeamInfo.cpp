@@ -89,7 +89,10 @@ void UHUD_TeamInfo::ResetUIByData()
 	OnTeammateOptionChanged(GMCPtr->GetTeamsHelper()->GetTeammateOption(), GMCPtr->GetTeamsHelper()->OwnerPCPtr);
 }
 
-void UHUD_TeamInfo::OnTeammateOptionChanged(ETeammateOption TeammateOption, IPlanetControllerInterface* PCPtr)
+void UHUD_TeamInfo::OnTeammateOptionChanged(
+	ETeammateOption TeammateOption,
+	IPlanetControllerInterface* LeaderPCPtr
+)
 {
 	{
 		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupManaggerMenu::FollowOpetion));

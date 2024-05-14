@@ -109,6 +109,8 @@ public:
 
 	virtual void ESCKeyPressed();
 
+	virtual void TabKeyPressed();
+
 	virtual void LCtrlKeyPressed();
 
 	virtual void LCtrlKeyReleased();

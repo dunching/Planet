@@ -17,6 +17,8 @@ class UGroupMnaggerComponent : public UActorComponent
 
 public:
 
+	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
+
 	static FName ComponentName;
 
 	void AddCharacterToGroup(IPlanetControllerInterface* PCPtr);
@@ -30,6 +32,10 @@ public:
 	const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& GetGroupsHelper();
 
 	const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& GetTeamsHelper();
+
+	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
+
+	FTeamHelperChangedDelegateContainer GroupHelperChangedDelegateContainer;
 
 protected:
 

@@ -1,0 +1,46 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+#include "Blueprint/UserWidget.h"
+#include <AIController.h>
+
+#include "GenerateType.h"
+
+#include "FocusIcon.generated.h"
+
+class ACharacterBase;
+
+class UToolIcon;
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API UFocusIcon : public UUserWidget
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void NativeConstruct()override;
+
+	virtual void NativeDestruct()override;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+
+	FFocusKnowledge::FFocusItem FocusItem;
+
+protected:
+
+private:
+
+	bool ResetPosition(float InDeltaTime);
+
+	FTSTicker::FDelegateHandle TickDelegateHandle;
+
+	FVector2D SizeBox = FVector2D::ZeroVector;
+
+};

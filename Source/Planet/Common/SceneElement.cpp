@@ -88,6 +88,30 @@ USkillUnit* FSceneToolsContainer::FindUnit(ESkillUnitType Type)
 	return nullptr;
 }
 
+UWeaponUnit* FSceneToolsContainer::FindUnit(EWeaponUnitType Type)
+{
+	for (const auto& Iter : SceneToolsAry)
+	{
+		if (!Iter)
+		{
+			continue;
+		}
+		switch (Iter->GetSceneToolsType())
+		{
+		case ESceneToolsType::kWeapon:
+		{
+			if (Iter->GetSceneElementType<EWeaponUnitType>() == Type)
+			{
+				return Cast<UWeaponUnit>(Iter);
+			}
+		}
+		break;
+		}
+	}
+
+	return nullptr;
+}
+
 UToolUnit* FSceneToolsContainer::AddUnit(EToolUnitType Type)
 {
 	auto AssetRefMapPtr = UAssetRefMap::GetInstance();

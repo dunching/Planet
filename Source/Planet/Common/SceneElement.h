@@ -233,6 +233,8 @@ struct FSceneToolsContainer
 
 	USkillUnit* AddUnit(ESkillUnitType Type);
 	
+	UWeaponUnit* FindUnit(EWeaponUnitType Type);
+
 	USkillUnit* FindUnit(ESkillUnitType Type);
 
 	UBasicUnit* FindUnit(UBasicUnit::IDType ID);

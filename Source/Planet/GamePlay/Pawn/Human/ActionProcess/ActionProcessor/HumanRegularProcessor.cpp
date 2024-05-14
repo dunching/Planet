@@ -89,7 +89,7 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::SwitchCurrentWeapon()
 	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>(); 
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
@@ -147,68 +147,22 @@ namespace HumanProcessor
 					if (Params.Key == EKeys::LeftMouseButton)
 					{
 						auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-						WeaponPtr = OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kMain);
-
-
+						OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter, EWeaponSocket::kMain);
 					}
 					else if (Params.Key == EKeys::RightMouseButton)
 					{
 						auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-						WeaponPtr = OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kSecondary);
-					}
-
-					FGameplayEventData Payload;
-					auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-					if (OnwerActorPtr)
-					{
-						switch (SkillIter->SkillUnit->GetSceneElementType<ESkillUnitType>())
-						{
-						case ESkillUnitType::kHumanSkill_PickAxe_Attack1:
-						{
-							auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
-							GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(WeaponPtr);
-							Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
-						}
-						break;
-						case ESkillUnitType::kHumanSkill_WeaponHandProtection_Attack1:
-						{
-							auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
-							GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(WeaponPtr);
-							Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
-						}
-						break;
-						}
-						auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-						ASCPtr->TriggerAbilityFromGameplayEvent(
-							SkillIter->Handle,
-							ASCPtr->AbilityActorInfo.Get(),
-							FGameplayTag(),
-							&Payload,
-							*ASCPtr
-						);
+						OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter, EWeaponSocket::kSecondary);
 					}
 				}
 				break;
 				case ESkillType::kActive:
 				{
-					switch (SkillIter->SkillUnit->GetSceneElementType<ESkillUnitType>())
-					{
-					case ESkillUnitType::kHumanSkill_Displacement:
-					case ESkillUnitType::kHumanSkill_GroupTherapy:
-					{
-						auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-						if (OnwerActorPtr)
-						{
-							auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-							ASCPtr->TryActivateAbility(SkillIter->Handle);
-						}
-					}
-					break;
-					}
+					auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+					OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter, EWeaponSocket::kSecondary);
 				}
 				break;
 				}
-
 			}
 		}
 		else
@@ -217,11 +171,7 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				if (OnwerActorPtr)
-				{
-					auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-					ASCPtr->CancelAbilityHandle(SkillIter->Handle);
-				}
+				OnwerActorPtr->GetEquipmentItemsComponent()->CancelSkill(*SkillIter);
 			}
 		}
 	}
@@ -231,7 +181,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamsHelper()->SwitchTeammateOption(ETeammateOption::kFollow); 
+			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamsHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
 		}
 	}
 
@@ -264,18 +214,67 @@ namespace HumanProcessor
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewBackpackProcessor>();
 	}
 
+	void FHumanRegularProcessor::TabKeyPressed()
+	{
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (!OnwerActorPtr)
+		{
+			return;
+		}
+
+		auto PCPtr = OnwerActorPtr->GetController<APlanetPlayerController>();
+		if (!PCPtr)
+		{
+			return;
+		}
+
+		auto PlayerCameraManagerPtr = UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0);
+		if (PlayerCameraManagerPtr)
+		{
+			FVector OutCamLoc;
+			FRotator OutCamRot;
+			PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
+
+			FCollisionObjectQueryParams ObjectQueryParams;
+			ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(OnwerActorPtr);
+
+			FHitResult OutHit;
+			if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+			{
+				if (PCPtr->GetFocusActor() == OutHit.GetActor())
+				{
+					return;
+				}
+				auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+				if (TargetCharacterPtr)
+				{
+					PCPtr->SetFocus(TargetCharacterPtr);
+					return;
+				}
+			}
+		}
+
+		if (PCPtr->GetFocusActor())
+		{
+			PCPtr->ClearFocus();
+		}
+	}
+
 	void FHumanRegularProcessor::GKeyPressed()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewTalentAllocation>();
 
-		auto PlayerCharacterPtr = GetOwnerActor<FOwnerPawnType>();
-		if (!PlayerCharacterPtr)
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (!OnwerActorPtr)
 		{
 			return;
 		}
 
 		FMinimalViewInfo DesiredView;
-		PlayerCharacterPtr->GetCameraComp()->GetCameraView(0, DesiredView);
+		OnwerActorPtr->GetCameraComp()->GetCameraView(0, DesiredView);
 
 		auto StartPt = DesiredView.Location;
 		auto StopPt = DesiredView.Location + (DesiredView.Rotation.Vector() * 1000);
@@ -288,8 +287,7 @@ namespace HumanProcessor
 		FCollisionQueryParams Params;
 		Params.bTraceComplex = false;
 
-		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-		if (HumanCharaterPtr->GetWorld()->LineTraceSingleByObjectType(
+		if (OnwerActorPtr->GetWorld()->LineTraceSingleByObjectType(
 			Result,
 			StartPt,
 			StopPt,
@@ -297,8 +295,7 @@ namespace HumanProcessor
 			Params)
 			)
 		{
-
-			DrawDebugSphere(HumanCharaterPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
+			DrawDebugSphere(OnwerActorPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
 		}
 	}
 

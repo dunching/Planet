@@ -25,7 +25,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 
-namespace GroupMateInfo
+namespace TeamMateInfo
 {
 	const FName Texture = TEXT("Texture");
 
@@ -87,14 +87,14 @@ void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kGroupMate)
 	{
 		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupMateInfo::Content));
+			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TeamMateInfo::Content));
 			if (BorderPtr)
 			{
 				BorderPtr->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
 		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Default));
+			auto ImagePtr = Cast<UImage>(GetWidgetFromName(TeamMateInfo::Default));
 			if (ImagePtr)
 			{
 				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
@@ -103,7 +103,7 @@ void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 		
 		GroupMateUnitPtr = Cast<UGourpmateUnit>(BasicUnitPtr);
 		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Texture));
+			auto UIPtr = Cast<UImage>(GetWidgetFromName(TeamMateInfo::Texture));
 			if (UIPtr)
 			{
 				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
@@ -114,7 +114,7 @@ void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 		{
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(GroupMateInfo::Text));
+			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(TeamMateInfo::Text));
 			if (UIPtr)
 			{
 				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"), *GroupMateUnitPtr->Name.ToString(), GroupMateUnitPtr->Level)));
@@ -124,14 +124,14 @@ void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	else
 	{
 		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupMateInfo::Content));
+			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TeamMateInfo::Content));
 			if (BorderPtr)
 			{
 				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
 		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Default));
+			auto ImagePtr = Cast<UImage>(GetWidgetFromName(TeamMateInfo::Default));
 			if (ImagePtr)
 			{
 				ImagePtr->SetVisibility(ESlateVisibility::Visible);

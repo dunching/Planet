@@ -49,6 +49,8 @@ namespace HumanProcessor
 
 		virtual void BKeyPressed()override;
 
+		virtual void TabKeyPressed()override;
+
 	private:
 
 		void SwitchCurrentWeapon();

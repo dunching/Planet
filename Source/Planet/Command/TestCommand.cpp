@@ -37,10 +37,26 @@ void TestCommand::AddCahracterTestData()
 	{
 		return;
 	}
-	AddCharacterTestDataImp(CharacterPtr);
+	AddPlayerCharacterTestDataImp(CharacterPtr);
 }
 
-void TestCommand::AddCharacterTestDataImp(AHumanCharacter* CharacterPtr)
+void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
+{
+	{
+		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+		HoldItemComponent.AddUnit(EToolUnitType::kPickAxe);
+
+		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
+		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
+
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkills_ZMJZ);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Displacement);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_TalentSkill_NuQi);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_GroupTherapy);
+	}
+}
+
+void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 {
 	{
 		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();

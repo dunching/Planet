@@ -11,18 +11,20 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Tasks/AITask_MoveTo.h"
-#include "AITask_DashToLeader.h"
+
+#include "AITask_ReleaseSkill.h"
+#include "PlanetControllerInterface.h"
+#include "CharacterBase.h"
 
 UBTTask_ReleaseSkill::UBTTask_ReleaseSkill(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	NodeName = "DashToLeader";
+	NodeName = "ReleaseSkill";
 
 	INIT_TASK_NODE_NOTIFY_FLAGS();
 
 	// accept only actors and vectors
 	BlackboardKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(ThisClass, BlackboardKey), AActor::StaticClass());
-	BlackboardKey.AddVectorFilter(this, GET_MEMBER_NAME_CHECKED(ThisClass, BlackboardKey));
 }
 
 EBTNodeResult::Type UBTTask_ReleaseSkill::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
@@ -31,17 +33,16 @@ EBTNodeResult::Type UBTTask_ReleaseSkill::ExecuteTask(UBehaviorTreeComponent& Ow
 
 	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
 
-	FBTReleaseSkillTaskMemory* MyMemory = CastInstanceNodeMemory<FBTReleaseSkillTaskMemory>(NodeMemory);
-	MyMemory->PreviousGoalLocation = FAISystem::InvalidLocation;
-
-	AAIController* MyController = OwnerComp.GetAIOwner();
-	if (MyController == nullptr)
+	auto IPCPtr = Cast<IPlanetControllerInterface>(OwnerComp.GetAIOwner());
+	AAIController * AICPtr = OwnerComp.GetAIOwner();
+	if (IPCPtr == nullptr || AICPtr == nullptr)
 	{
-		UE_VLOG(OwnerComp.GetOwner(), LogBehaviorTree, Error, TEXT("UBTTask_MoveTo::ExecuteTask failed since AIController is missing."));
 		NodeResult = EBTNodeResult::Failed;
 	}
 	else
 	{
+		FTaskMemoryType* MyMemory = CastInstanceNodeMemory<FTaskMemoryType>(NodeMemory);
+
 		NodeResult = PerformMoveTask(OwnerComp, NodeMemory);
 	}
 
@@ -55,29 +56,28 @@ EBTNodeResult::Type UBTTask_ReleaseSkill::AbortTask(UBehaviorTreeComponent& Owne
 
 uint16 UBTTask_ReleaseSkill::GetInstanceMemorySize() const
 {
-	return sizeof(FBTReleaseSkillTaskMemory);
+	return sizeof(FTaskMemoryType);
 }
 
 void UBTTask_ReleaseSkill::InitializeMemory(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTMemoryInit::Type InitType) const
 {
-	InitializeNodeMemory<FBTReleaseSkillTaskMemory>(NodeMemory, InitType);
+	InitializeNodeMemory<FTaskMemoryType>(NodeMemory, InitType);
 }
 
 void UBTTask_ReleaseSkill::CleanupMemory(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTMemoryClear::Type CleanupType) const
 {
-	CleanupNodeMemory<FBTReleaseSkillTaskMemory>(NodeMemory, CleanupType);
+	CleanupNodeMemory<FTaskMemoryType>(NodeMemory, CleanupType);
 }
 
 EBTNodeResult::Type UBTTask_ReleaseSkill::PerformMoveTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
-	FBTReleaseSkillTaskMemory* MyMemory = CastInstanceNodeMemory<FBTReleaseSkillTaskMemory>(NodeMemory);
-	AAIController* MyController = OwnerComp.GetAIOwner();
+	FTaskMemoryType* MyMemory = CastInstanceNodeMemory<FTaskMemoryType>(NodeMemory);
 
 	EBTNodeResult::Type NodeResult = EBTNodeResult::Failed;
-	if (MyController && MyBlackboard)
+	if (MyBlackboard)
 	{
-		UAITask_DashToLeader* MoveTask = MyMemory->Task.Get();
+		FAITaskType* MoveTask = MyMemory->Task.Get();
 		const bool bReuseExistingTask = (MoveTask != nullptr);
 
 		MoveTask = PrepareMoveTask(OwnerComp, MoveTask);
@@ -87,18 +87,15 @@ EBTNodeResult::Type UBTTask_ReleaseSkill::PerformMoveTask(UBehaviorTreeComponent
 			{
 				if (MoveTask->IsActive())
 				{
-					UE_VLOG(MyController, LogBehaviorTree, Verbose, TEXT("\'%s\' reusing AITask %s"), *GetNodeName(), *MoveTask->GetName());
 					MoveTask->ConditionalPerformMove();
 				}
 				else
 				{
-					UE_VLOG(MyController, LogBehaviorTree, Verbose, TEXT("\'%s\' reusing AITask %s, but task is not active - handing over move performing to task mechanics"), *GetNodeName(), *MoveTask->GetName());
 				}
 			}
 			else
 			{
 				MyMemory->Task = MoveTask;
-				UE_VLOG(MyController, LogBehaviorTree, Verbose, TEXT("\'%s\' task implementing move with task %s"), *GetNodeName(), *MoveTask->GetName());
 				MoveTask->ReadyForActivation();
 			}
 
@@ -111,9 +108,9 @@ EBTNodeResult::Type UBTTask_ReleaseSkill::PerformMoveTask(UBehaviorTreeComponent
 	return NodeResult;
 }
 
-UAITask_DashToLeader* UBTTask_ReleaseSkill::PrepareMoveTask(UBehaviorTreeComponent& OwnerComp, UAITask_DashToLeader* ExistingTask)
+UBTTask_ReleaseSkill::FAITaskType* UBTTask_ReleaseSkill::PrepareMoveTask(UBehaviorTreeComponent& OwnerComp, FAITaskType* ExistingTask)
 {
-	UAITask_DashToLeader* MoveTask = ExistingTask ? ExistingTask : NewBTAITask<UAITask_DashToLeader>(OwnerComp);
+	FAITaskType* MoveTask = ExistingTask ? ExistingTask : NewBTAITask<FAITaskType>(OwnerComp);
 	if (MoveTask)
 	{
 		const UBlackboardComponent* MyBlackboard = OwnerComp.GetBlackboardComponent();
@@ -121,11 +118,10 @@ UAITask_DashToLeader* UBTTask_ReleaseSkill::PrepareMoveTask(UBehaviorTreeCompone
 		if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Object::StaticClass())
 		{
 			UObject* KeyValue = MyBlackboard->GetValue<UBlackboardKeyType_Object>(BlackboardKey.GetSelectedKeyID());
-			APawn* TargetActor = Cast<APawn>(KeyValue);
+			ACharacterBase* TargetActor = Cast<ACharacterBase>(KeyValue);
 			if (TargetActor)
 			{
-				auto TargetPt = TargetActor->GetActorLocation() + (TargetActor->GetActorForwardVector() * 100.f);
-				MoveTask->SetUp(MoveTask->GetAIController(), TargetPt);
+				MoveTask->SetUp(TargetActor);
 			}
 		}
 		else if (BlackboardKey.SelectedKeyType == UBlackboardKeyType_Vector::StaticClass())

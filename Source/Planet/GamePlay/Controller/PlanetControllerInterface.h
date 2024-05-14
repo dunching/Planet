@@ -8,6 +8,7 @@
 
 class UGroupMnaggerComponent;
 class UGourpmateUnit;
+class ACharacterBase;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class UPlanetControllerInterface : public UInterface
@@ -18,16 +19,18 @@ public:
 
 };
 
-
 class PLANET_API IPlanetControllerInterface
 {
 	GENERATED_BODY()
 
 public:
 
+	// “成员管理”记录了成员信息，因为
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() = 0;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() = 0;
+
+	virtual ACharacterBase* GetCharacter() = 0;
 
 protected:
 

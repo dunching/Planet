@@ -38,7 +38,10 @@ protected:
 
 private:
 
-	void OnTeammateOptionChanged(ETeammateOption TeammateOption, IPlanetControllerInterface* PCPtr);
+	void OnTeammateOptionChanged(
+		ETeammateOption TeammateOption, 
+		IPlanetControllerInterface* LeaderPCPtr
+	);
 
 	FTeammateOptionChangedDelegateContainer TeammateOptionChangedDelegateContainer;
 

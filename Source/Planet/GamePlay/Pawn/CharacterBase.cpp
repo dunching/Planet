@@ -56,18 +56,6 @@ ACharacterBase::~ACharacterBase()
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetEquipmentItemsComponent()->InitialBaseGAs();
-
-	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
-	OnMoveSpeedChanged(CharacterAttributesRef.WalkingSpeed.GetCurrentValue());
-
-	HPChangedHandle = CharacterAttributesRef.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
-		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-	);
-	MoveSpeedChangedHandle = CharacterAttributesRef.WalkingSpeed.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
-		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-	);
 }
 
 void ACharacterBase::Destroyed()
@@ -97,6 +85,18 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+
+	GetEquipmentItemsComponent()->InitialBaseGAs();
+
+	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
+	OnMoveSpeedChanged(CharacterAttributesRef.WalkingSpeed.GetCurrentValue());
+
+	HPChangedHandle = CharacterAttributesRef.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
+	);
+	MoveSpeedChangedHandle = CharacterAttributesRef.WalkingSpeed.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
+	);
 }
 
 class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const

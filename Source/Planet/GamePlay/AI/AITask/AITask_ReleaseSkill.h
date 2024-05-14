@@ -1,3 +1,4 @@
+
 // Copyright Epic Games, Inc. All Rights Reserved.
 #pragma once
 
@@ -11,7 +12,9 @@
 
 #include "AITask_ReleaseSkill.generated.h"
 
-class AAIController;
+class UGameplayAbility;
+
+class ACharacterBase;
 
 UCLASS()
 class PLANET_API UAITask_ReleaseSkill : public UAITask
@@ -26,26 +29,20 @@ public:
 
 	bool WasMoveSuccessful() const;
 
-	void SetUp(AAIController* Controller, const FVector& FVector);
+	void SetUp(ACharacterBase* InChracterPtr);
 
 protected:
 
-	AAIController* ControllerPtr = nullptr;
+	bool bIsReleasingSkill = false;
 
-	FVector GoalLocation = FVector::ZeroVector;
-
-	bool bIsTransformPawn = false;
-
-	float LerpDuration = .5f;
-	
-	float LerpTime = 0.f;
+	ACharacterBase* CharacterPtr = nullptr;
 
 	virtual void Activate() override;
-
-	virtual void TickTask(float DeltaTime)override;
 
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	virtual void PerformMove();
+
+	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
 };

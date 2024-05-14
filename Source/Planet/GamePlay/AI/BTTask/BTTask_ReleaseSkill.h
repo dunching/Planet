@@ -9,13 +9,17 @@
 
 #include "BTTask_ReleaseSkill.generated.h"
 
-class UAITask_DashToLeader;
+class UAITask_ReleaseSkill;
+class IPlanetControllerInterface;
+class ACharacterBase;
 
 struct FBTReleaseSkillTaskMemory
 {
-	FVector PreviousGoalLocation;
+	IPlanetControllerInterface * PCPtr = nullptr;
+	
+	ACharacterBase * CharacterPtr = nullptr;
 
-	TWeakObjectPtr<UAITask_DashToLeader> Task;
+	TWeakObjectPtr<UAITask_ReleaseSkill> Task;
 };
 
 UCLASS()
@@ -24,6 +28,10 @@ class PLANET_API UBTTask_ReleaseSkill : public UBTTask_BlackboardBase
 	GENERATED_BODY()
 
 public:
+
+	using FTaskMemoryType = FBTReleaseSkillTaskMemory;
+
+	using FAITaskType = UAITask_ReleaseSkill;
 
 	UBTTask_ReleaseSkill(const FObjectInitializer& ObjectInitializer);
 
@@ -53,8 +61,8 @@ protected:
 		UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory
 	);
 
-	virtual UAITask_DashToLeader* PrepareMoveTask(
-		UBehaviorTreeComponent& OwnerComp, UAITask_DashToLeader* ExistingTask
+	virtual FAITaskType* PrepareMoveTask(
+		UBehaviorTreeComponent& OwnerComp, FAITaskType* ExistingTask
 	);
 
 };

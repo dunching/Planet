@@ -29,6 +29,7 @@ class UProgressTips;
 class UTalentAllocation;
 class UGroupManaggerMenu;
 class UHUD_TeamInfo;
+class UFocusIcon;
 
 class UToolUnit;
 class UWeaponUnit;
@@ -82,6 +83,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UAIHumanInfo>AIHumanInfoClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UFocusIcon>FocusIconClass;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UEffectsList>EffectsListClass;

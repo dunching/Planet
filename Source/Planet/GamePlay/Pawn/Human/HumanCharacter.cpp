@@ -77,10 +77,6 @@ UGourpmateUnit* AHumanCharacter::GetGourpMateUnit()
 void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-#if TESTHOLDDATA
-	TestCommand::AddCharacterTestDataImp(this);
-#endif
 }
 
 void AHumanCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -99,12 +95,20 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
+#if TESTHOLDDATA
+		TestCommand::AddPlayerCharacterTestDataImp(this);
+#endif
+
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this](auto NewProcessor) {
 			NewProcessor->SetPawn(this);
 			});
 	} 
 	else if (NewController->IsA(APlanetAIController::StaticClass()))
 	{
+#if TESTHOLDDATA
+		TestCommand::AddAICharacterTestDataImp(this);
+#endif
+
 		SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 	}
 }

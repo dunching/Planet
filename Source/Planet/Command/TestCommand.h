@@ -8,7 +8,9 @@ class AHumanCharacter;
 
 namespace TestCommand
 {
-	void AddCharacterTestDataImp(AHumanCharacter* CharacterPtr);
+	void AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr);
+
+	void AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr);
 
 	void AddCahracterTestData();
 

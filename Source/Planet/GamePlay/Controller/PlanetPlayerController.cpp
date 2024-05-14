@@ -22,10 +22,74 @@
 #include "HumanCharacter.h"
 #include "PlanetControllerInterface.h"
 #include "NavgationSubSysetem.h"
+#include "AssetRefMap.h"
+#include "FocusIcon.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+}
+
+void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
+{
+	ClearFocus(InPriority);
+
+	if (NewFocus)
+	{
+		if (InPriority >= FocusInformation.Priorities.Num())
+		{
+			FocusInformation.Priorities.SetNum(InPriority + 1);
+		}
+		FocusInformation.Priorities[InPriority].Actor = NewFocus;
+
+		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+		FocusIconPtr = CreateWidget<UFocusIcon>(GetWorldImp(), AssetRefMapPtr->FocusIconClass);
+		if (FocusIconPtr)
+		{
+			FocusIconPtr->FocusItem = FocusInformation.Priorities[InPriority];
+			FocusIconPtr->AddToViewport();
+		}
+	}
+}
+
+AActor* APlanetPlayerController::GetFocusActor() const
+{
+	AActor* FocusActor = nullptr;
+	for (int32 Index = FocusInformation.Priorities.Num() - 1; Index >= 0; --Index)
+	{
+		const FFocusKnowledge::FFocusItem& FocusItem = FocusInformation.Priorities[Index];
+		FocusActor = FocusItem.Actor.Get();
+		if (FocusActor)
+		{
+			break;
+		}
+		else if (FAISystem::IsValidLocation(FocusItem.Position))
+		{
+			break;
+		}
+	}
+
+	return FocusActor;
+}
+
+void APlanetPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
+{
+	if (InPriority < FocusInformation.Priorities.Num())
+	{
+		FocusInformation.Priorities[InPriority].Actor = nullptr;
+		FocusInformation.Priorities[InPriority].Position = FAISystem::InvalidLocation;
+	}
+
+	if (FocusIconPtr)
+	{
+		FocusIconPtr->RemoveFromParent();
+		FocusIconPtr = nullptr; 
+	}
+}
+
+ACharacterBase* APlanetPlayerController::GetCharacter()
+{
+	return Cast<ACharacterBase>(GetPawn());
 }
 
 void APlanetPlayerController::BeginPlay()
@@ -110,25 +174,21 @@ UGourpmateUnit* APlanetPlayerController::GetGourpMateUnit()
 
 void APlanetPlayerController::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
-	IPlanetControllerInterface* NewPCPtr
+	IPlanetControllerInterface* LeaderPCPtr
 )
 {
 	switch (GroupMateChangeType)
 	{
 	case EGroupMateChangeType::kAdd:
 	{
-		if (NewPCPtr)
+		if (LeaderPCPtr)
 		{
 			if (GetGroupMnaggerComponent()->GetGroupsHelper()->OwnerPCPtr == this)
 			{
-				auto AIPCPtr = Cast<APlanetAIController>(NewPCPtr);
+				auto AIPCPtr = Cast<APlanetAIController>(LeaderPCPtr);
 				if (AIPCPtr)
 				{
 					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
-
-					AIPCPtr->OnTeammateOptionChanged(
-						GetGroupMnaggerComponent()->GetTeamsHelper()->GetTeammateOption(), Cast<ACharacter>(GetPawn())
-					);
 				}
 			}
 		}

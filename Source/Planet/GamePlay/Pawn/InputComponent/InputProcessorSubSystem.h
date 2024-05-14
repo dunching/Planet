@@ -122,6 +122,8 @@ protected:
 
 	void ESCKeyPressed();
 
+	void TabKeyPressed();
+
 	void LCtrlKeyPressed();
 
 	void LCtrlKeyReleased();

@@ -14,6 +14,10 @@
 #include "SceneElement.h"
 #include "Skill_Base.h"
 #include "Weapon_Base.h"
+#include "Skill_PickAxe.h"
+#include "Skill_WeaponHandProtection.h"
+#include "Weapon_HandProtection.h"
+#include "Weapon_PickAxe.h"
 
 UEquipmentElementComponent::UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -372,4 +376,94 @@ void UEquipmentElementComponent::RemoveTag(const FGameplayTag& Tag)
 	CharacterTags.RemoveTag(Tag);
 
 	TagsModifyHandleContainer.ExcuteCallback(ETagChangeType::kRemove, Tag);
+}
+
+void UEquipmentElementComponent::ActiveSkill(const FSkillsSocketInfo& SkillsSocketInfo, EWeaponSocket WeaponSocket)
+{
+	switch (SkillsSocketInfo.SkillUnit->SkillType)
+	{
+	case ESkillType::kWeaponActive:
+	{
+		AWeapon_Base* WeaponPtr = nullptr;
+
+		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		if (OnwerActorPtr)
+		{
+			switch (WeaponSocket)
+			{
+			case EWeaponSocket::kMain:
+			{
+				WeaponPtr = OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kMain);
+			}
+			break;
+			case EWeaponSocket::kSecondary:
+			{
+				WeaponPtr = OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kSecondary);
+			}
+			break;
+			default:
+			{
+
+			}
+			break;
+			}
+
+			FGameplayEventData Payload;
+			switch (SkillsSocketInfo.SkillUnit->GetSceneElementType<ESkillUnitType>())
+			{
+			case ESkillUnitType::kHumanSkill_PickAxe_Attack1:
+			{
+				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
+				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(WeaponPtr);
+				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+			}
+			break;
+			case ESkillUnitType::kHumanSkill_WeaponHandProtection_Attack1:
+			{
+				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
+				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(WeaponPtr);
+				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+			}
+			break;
+			}
+			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+			ASCPtr->TriggerAbilityFromGameplayEvent(
+				SkillsSocketInfo.Handle,
+				ASCPtr->AbilityActorInfo.Get(),
+				FGameplayTag(),
+				&Payload,
+				*ASCPtr
+			);
+		}
+	}
+	break;
+	case ESkillType::kActive:
+	{
+		switch (SkillsSocketInfo.SkillUnit->GetSceneElementType<ESkillUnitType>())
+		{
+		case ESkillUnitType::kHumanSkill_Displacement:
+		case ESkillUnitType::kHumanSkill_GroupTherapy:
+		{
+			auto OnwerActorPtr = GetOwner<ACharacterBase>();
+			if (OnwerActorPtr)
+			{
+				auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+				ASCPtr->TryActivateAbility(SkillsSocketInfo.Handle);
+			}
+		}
+		break;
+		}
+	}
+	break;
+	}
+}
+
+void UEquipmentElementComponent::CancelSkill(const FSkillsSocketInfo& SkillsSocketInfo)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		ASCPtr->CancelAbilityHandle(SkillsSocketInfo.Handle);
+	}
 }

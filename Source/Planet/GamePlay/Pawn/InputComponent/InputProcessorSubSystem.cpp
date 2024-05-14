@@ -85,6 +85,7 @@ void UInputProcessorSubSystem::BindAction(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::V], ETriggerEvent::Started, this, &ThisClass::VKeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::B], ETriggerEvent::Started, this, &ThisClass::BKeyPressed);
 
+		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::Tab], ETriggerEvent::Started, this, &ThisClass::TabKeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::Escape], ETriggerEvent::Started, this, &ThisClass::ESCKeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::LeftControl], ETriggerEvent::Started, this, &ThisClass::LCtrlKeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::LeftControl], ETriggerEvent::Completed, this, &ThisClass::LCtrlKeyReleased);
@@ -245,6 +246,11 @@ void UInputProcessorSubSystem::HKeyPressed()
 void UInputProcessorSubSystem::ESCKeyPressed()
 {
 	CurrentProcessorSPtr->ESCKeyPressed();
+}
+
+void UInputProcessorSubSystem::TabKeyPressed()
+{
+	CurrentProcessorSPtr->TabKeyPressed();
 }
 
 void UInputProcessorSubSystem::LCtrlKeyPressed()

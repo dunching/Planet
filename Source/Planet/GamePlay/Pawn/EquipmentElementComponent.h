@@ -114,6 +114,10 @@ public:
 
 	void RemoveTag(const FGameplayTag& Tag);
 
+	void ActiveSkill(const FSkillsSocketInfo& SkillsSocketInfo, EWeaponSocket WeaponSocket);
+
+	void CancelSkill(const FSkillsSocketInfo& SkillsSocketInfo);
+
 	FCallbackHandleContainer TagsModifyHandleContainer;
 
 protected:
