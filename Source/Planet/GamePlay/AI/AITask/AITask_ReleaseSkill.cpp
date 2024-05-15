@@ -47,16 +47,16 @@ void UAITask_ReleaseSkill::PerformMove()
 	if (CharacterPtr)
 	{
 		auto SkillsMap = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
-		for (const auto& iter : SkillsMap)
+		for (const auto& Iter : SkillsMap)
 		{
-			if (iter.Value.SkillUnit)
+			if (Iter.Value.SkillUnit)
 			{
-				switch (iter.Value.SkillUnit->SkillType)
+				switch (Iter.Value.SkillUnit->SkillType)
 				{
 				case ESkillType::kActive:
 				{
 					auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(iter.Value.Handle);
+					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value.Handle);
 					if (!GameplayAbilitySpecPtr)
 					{
 						return;
@@ -71,10 +71,11 @@ void UAITask_ReleaseSkill::PerformMove()
 					if (bIsReady)
 					{
 						bIsReleasingSkill = true;
+						CurrentActivedSkill = Iter.Value;
 
-						GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded);
+						OnOnGameplayAbilityEndedHandle = GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded);
 
-						CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(iter.Value, EWeaponSocket::kMain);
+						CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter.Value, EWeaponSocket::kMain);
 						return;
 					}
 				}
@@ -82,7 +83,7 @@ void UAITask_ReleaseSkill::PerformMove()
 				case ESkillType::kWeaponActive:
 				{
 					auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(iter.Value.Handle);
+					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value.Handle);
 					if (!GameplayAbilitySpecPtr)
 					{
 						return;
@@ -97,10 +98,11 @@ void UAITask_ReleaseSkill::PerformMove()
 					if (bIsReady)
 					{
 						bIsReleasingSkill = true;
+						CurrentActivedSkill = Iter.Value;
 
-						GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded);
+						OnOnGameplayAbilityEndedHandle = GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded);
 
-						CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(iter.Value, EWeaponSocket::kMain);
+						CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter.Value, EWeaponSocket::kMain);
 						return;
 					}
 				}
@@ -120,5 +122,23 @@ void UAITask_ReleaseSkill::OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr)
 
 void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
 {
+	// 1.如果不取消这个回调，CancelSkill会调用无效的成员函数（UE判断过了 不会崩溃 但是逻辑不对）
+	auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+	auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(CurrentActivedSkill.Handle);
+	if (!GameplayAbilitySpecPtr)
+	{
+		return;
+	}
+	auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	if (!GAInsPtr)
+	{
+		return;
+	}
+
+	GAInsPtr->OnGameplayAbilityEnded.Remove(OnOnGameplayAbilityEndedHandle);
+
+	// 2.
+	CharacterPtr->GetEquipmentItemsComponent()->CancelSkill(CurrentActivedSkill);
+
 	Super::OnDestroy(bInOwnerFinished);
 }

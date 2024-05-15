@@ -218,7 +218,9 @@ void USkill_Base::OnCurrentStepEnd()
 	case ERepeatType::kStop:
 	default:
 	{
+		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::K2_CancelAbility));
 		ExcuteStopStep();
+		RunIfListLock();
 	}
 	break;
 	}

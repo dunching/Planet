@@ -9,6 +9,7 @@
 #include "AITypes.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Tasks/AITask.h"
+#include "EquipmentElementComponent.h"
 
 #include "AITask_ReleaseSkill.generated.h"
 
@@ -33,10 +34,6 @@ public:
 
 protected:
 
-	bool bIsReleasingSkill = false;
-
-	ACharacterBase* CharacterPtr = nullptr;
-
 	virtual void Activate() override;
 
 	virtual void OnDestroy(bool bOwnerFinished) override;
@@ -44,5 +41,13 @@ protected:
 	virtual void PerformMove();
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
+
+	FDelegateHandle OnOnGameplayAbilityEndedHandle;
+
+	FSkillsSocketInfo CurrentActivedSkill;
+
+	bool bIsReleasingSkill = false;
+
+	ACharacterBase* CharacterPtr = nullptr;
 
 };

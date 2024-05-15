@@ -51,6 +51,14 @@ EBTNodeResult::Type UBTTask_ReleaseSkill::ExecuteTask(UBehaviorTreeComponent& Ow
 
 EBTNodeResult::Type UBTTask_ReleaseSkill::AbortTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	FTaskMemoryType* MyMemory = CastInstanceNodeMemory<FTaskMemoryType>(NodeMemory);
+
+	auto MoveTask = MyMemory->Task.Get();
+	if (MoveTask)
+	{
+		MoveTask->ExternalCancel();
+	}
+
 	return Super::AbortTask(OwnerComp, NodeMemory);
 }
 

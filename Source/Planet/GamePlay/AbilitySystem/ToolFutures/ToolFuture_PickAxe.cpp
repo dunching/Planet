@@ -91,7 +91,7 @@ void UToolFuture_PickAxe::StartTasksLink(int32 ActionNumber)
 		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::StartNextLink));
 		{
 			const auto Len = PickAxeMontage->CalculateSequenceLength();
-			auto TaskPtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+			auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 				this,
 				TEXT(""),
 				PickAxeMontage,
@@ -110,7 +110,7 @@ void UToolFuture_PickAxe::StartTasksLink(int32 ActionNumber)
 		}
 		{
 			const auto Len = HumanMontage->CalculateSequenceLength();
-			auto TaskPtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+			auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 				this,
 				TEXT(""),
 				HumanMontage,

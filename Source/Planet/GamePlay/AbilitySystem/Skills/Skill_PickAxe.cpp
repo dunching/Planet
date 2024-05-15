@@ -212,7 +212,7 @@ void USkill_PickAxe1::PlayMontage()
 		IncrementListLock();
 	}
 	{
-		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
 			TEXT(""),
 			HumanMontage,

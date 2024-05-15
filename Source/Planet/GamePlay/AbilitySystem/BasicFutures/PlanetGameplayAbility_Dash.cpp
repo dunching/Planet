@@ -199,7 +199,7 @@ void UPlanetGameplayAbility_Dash::DoDash(
 void UPlanetGameplayAbility_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	{
-		auto TaskPtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
 			TEXT(""),
 			CurMontagePtr,

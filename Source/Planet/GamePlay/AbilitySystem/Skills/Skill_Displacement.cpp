@@ -177,7 +177,7 @@ void USkill_Displacement::PlayMontage()
 	{
 		const float InPlayRate = HumanMontage->CalculateSequenceLength() / Duration;
 
-		auto TaskPtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
 			TEXT(""),
 			HumanMontage,

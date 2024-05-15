@@ -22,7 +22,7 @@ void UPlanetGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHan
 void UPlanetGameplayAbility_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	{
-		auto TaskPtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
 			TEXT(""),
 			CurMontagePtr,
