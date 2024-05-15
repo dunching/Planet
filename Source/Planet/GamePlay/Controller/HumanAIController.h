@@ -6,22 +6,23 @@
 
 #include "GravityAIController.h"
 #include "GenerateType.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "GroupsManaggerSubSystem.h"
 #include "GroupMnaggerComponent.h"
 
-#include "PlanetAIController.generated.h"
+#include "HumanAIController.generated.h"
 
 class UAIHumanInfo;
 class UGroupMnaggerComponent;
 class UGourpmateUnit;
 class ACharacterBase;
+class AHumanCharacter;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API APlanetAIController : public AGravityAIController, public IPlanetControllerInterface
+class PLANET_API AHumanAIController : public AGravityAIController, public IHumanControllerInterface
 {
 	GENERATED_BODY()
 
@@ -35,11 +36,11 @@ public:
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() override;
+	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
 
-	virtual ACharacterBase* GetCharacter()override;
+	virtual FPawnType* GetCharacter()override;
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	AActor* GetTeamFocusEnemy() const;
@@ -56,7 +57,7 @@ protected:
 
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		IPlanetControllerInterface* LeaderPCPtr
+		FPawnType* LeaderPCPtr
 	);
 
 	virtual void BeginPlay() override;
@@ -66,9 +67,6 @@ protected:
 	virtual void OnPossess(APawn* InPawn)override;
 
 	void OnTeamHelperChanged();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
 
 	FTeammateOptionChangedDelegateContainer TeammateOptionChangedDelegateContainer;
 

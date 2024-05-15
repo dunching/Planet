@@ -47,7 +47,7 @@
 #include "AssetRefMap.h"
 #include "BuildingBaseProcessor.h"
 #include "CharacterAttributesComponent.h"
-#include "PlanetPlayerController.h"
+#include "HumanPlayerController.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "CollisionDataStruct.h"
 #include "ToolFuture_PickAxe.h"
@@ -196,7 +196,7 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::QKeyPressed()
 	{
-		auto PCPtr = Cast<APlanetPlayerController>(GetOwnerActor()->GetController());
+		auto PCPtr = Cast<AHumanPlayerController>(GetOwnerActor()->GetController());
 
 		if (PCPtr->PlayerInput->IsPressed(EKeys::LeftAlt))
 		{
@@ -222,7 +222,7 @@ namespace HumanProcessor
 			return;
 		}
 
-		auto PCPtr = OnwerActorPtr->GetController<APlanetPlayerController>();
+		auto PCPtr = OnwerActorPtr->GetController<AHumanPlayerController>();
 		if (!PCPtr)
 		{
 			return;

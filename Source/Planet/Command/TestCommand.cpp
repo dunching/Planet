@@ -28,7 +28,7 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 
 void TestCommand::AddCahracterTestData()
 {
@@ -231,7 +231,7 @@ void TestCommand::SpawnCharacter(const TArray< FString >& Args)
 
 void TestCommand::RecruitCharacter()
 {
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+	auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (!CharacterPtr)
 	{
 		return;
@@ -255,9 +255,7 @@ void TestCommand::RecruitCharacter()
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 			if (TargetCharacterPtr)
 			{
-				CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent()->AddCharacterToGroup(
-					Cast<IPlanetControllerInterface>(TargetCharacterPtr->GetController())
-				);
+				CharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(TargetCharacterPtr);
 			}
 		}
 	}

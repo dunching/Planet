@@ -249,7 +249,7 @@ void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 	}
 }
 
-void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay)
+void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
 {
 	MainUILayoutPtr = GetMainUILAyout();
 	if (!MainUILayoutPtr)
@@ -282,13 +282,14 @@ void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay)
 			UIPtr = CreateWidget<UGroupManaggerMenu>(GetWorldImp(), UAssetRefMap::GetInstance()->GroupManaggerMenuClass);
 			if (UIPtr)
 			{
+				UIPtr->HumanCharacterPtr = HumanCharacterPtr;
 				BorderPtr->AddChild(UIPtr);
 			}
 		}
 	}
 }
 
-void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay)
+void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
 {
 	MainUILayoutPtr = GetMainUILAyout();
 	if (!MainUILayoutPtr)

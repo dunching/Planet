@@ -5,7 +5,7 @@
 #include <Components/VerticalBox.h>
 #include <Components/Border.h>
 
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "TeamMateInfo.h"
 #include "HUD_TeamMateInfo.h"
@@ -59,7 +59,7 @@ void UHUD_TeamInfo::ResetUIByData()
 	}
 	PanelPtr->ClearChildren();
 
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	auto PCPtr = Cast<IHumanControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;
@@ -91,7 +91,7 @@ void UHUD_TeamInfo::ResetUIByData()
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(
 	ETeammateOption TeammateOption,
-	IPlanetControllerInterface* LeaderPCPtr
+	UGroupsManaggerSubSystem::FPawnType* LeaderPCPtr
 )
 {
 	{

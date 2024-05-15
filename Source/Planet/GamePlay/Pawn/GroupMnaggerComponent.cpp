@@ -8,29 +8,29 @@
 #include "CharacterBase.h"
 #include "HumanCharacter.h"
 #include "AIHumanInfo.h"
-#include "PlanetAIController.h"
-#include "PlanetControllerInterface.h"
+#include "HumanAIController.h"
+#include "HumanControllerInterface.h"
 
 FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
-void UGroupMnaggerComponent::AddCharacterToGroup(IPlanetControllerInterface* PCPtr)
+void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* PCPtr)
 {
 	GetGroupsHelper()->AddCharacter(PCPtr);
 }
 
-void UGroupMnaggerComponent::AddCharacterToTeam(IPlanetControllerInterface* PCPtr)
+void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* PCPtr)
 {
 	GetGroupsHelper()->AddCharacter(PCPtr);
 }
 
-void UGroupMnaggerComponent::OnAddToNewGroup(IPlanetControllerInterface* OwnerPCPtr)
+void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPCPtr)
 {
 	GroupHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetGroupsHelper();
 
 	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-void UGroupMnaggerComponent::OnAddToNewTeam(IPlanetControllerInterface* OwnerPCPtr)
+void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* OwnerPCPtr)
 {
 	TeamHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetTeamsHelper();
 
@@ -41,7 +41,7 @@ const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComp
 {
 	if (!GroupHelperSPtr)
 	{
-		auto OwnerPCPtr = GetOwner<IPlanetControllerInterface>();
+		auto OwnerPCPtr = GetOwner<FPawnType>();
 		GroupHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(OwnerPCPtr);
 
 		GroupHelperChangedDelegateContainer.ExcuteCallback();
@@ -53,7 +53,7 @@ const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& UGroupMnaggerCompo
 {
 	if (!TeamHelperSPtr)
 	{
-		auto OwnerPCPtr = GetOwner<IPlanetControllerInterface>();
+		auto OwnerPCPtr = GetOwner<FPawnType>();
 		TeamHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(OwnerPCPtr);
 
 		TeamHelperChangedDelegateContainer.ExcuteCallback();

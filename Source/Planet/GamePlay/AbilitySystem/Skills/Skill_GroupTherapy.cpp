@@ -23,8 +23,9 @@
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "Weapon_PickAxe.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
+#include "HumanCharacter.h"
 
 namespace Skill_GroupTherapy
 {
@@ -91,7 +92,7 @@ void USkill_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
 
 		TSet<ACharacterBase*>TeammatesSet;
 		TeammatesSet.Add(CharacterPtr);
-		auto GroupMnaggerComponent = CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent();
+		auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
 		if (GroupMnaggerComponent)
 		{
 			auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper(); 

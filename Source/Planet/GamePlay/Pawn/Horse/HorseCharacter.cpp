@@ -40,7 +40,7 @@
 #include "Pawn/HoldingItemsComponent.h"
 #include "Pawn/InputComponent/InputActions.h"
 #include "InputProcessorSubSystem.h"
-#include "PlanetPlayerController.h"
+#include "HumanPlayerController.h"
 #include "HumanCharacter.h"
 
 AHorseCharacter::AHorseCharacter(const FObjectInitializer& ObjectInitializer) :
@@ -96,7 +96,7 @@ void AHorseCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (NewController->IsA(APlanetPlayerController::StaticClass()))
+	if (NewController->IsA(AHumanPlayerController::StaticClass()))
 	{
 		auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
 

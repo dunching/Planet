@@ -1,5 +1,5 @@
 
-#include "TeanMatesList.h"
+#include "TeamMatesList.h"
 
 #include <Kismet/GameplayStatics.h>
 #include "Components/VerticalBox.h"
@@ -16,7 +16,7 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "SceneElement.h"
 #include "HumanCharacter.h"
 #include "GroupsManaggerSubSystem.h"
@@ -27,21 +27,21 @@ namespace TeanMatesList
 	const FName VerticalBox = TEXT("VerticalBox");
 }
 
-void UTeanMatesList::NativeConstruct()
+void UTeamMatesList::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	ResetUIByData();
 }
 
-void UTeanMatesList::NativeDestruct()
+void UTeamMatesList::NativeDestruct()
 {
 	DelegateAry.Empty();
 
 	Super::NativeDestruct();
 }
 
-void UTeanMatesList::ResetUIByData()
+void UTeamMatesList::ResetUIByData()
 {
 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::VerticalBox));
 	if (!PanelPtr)
@@ -51,13 +51,12 @@ void UTeanMatesList::ResetUIByData()
 	PanelPtr->ClearChildren();
 	DelegateAry.Empty();
 
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
-	if (!PCPtr)
+	if (!HumanCharacterPtr)
 	{
 		return;
 	}
 
-	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
+	auto GMCPtr = HumanCharacterPtr->GetGroupMnaggerComponent();
 
 	int32 CurrentMemberNum = 0;
 	auto MembersHelperSPtr = GMCPtr->GetTeamsHelper();
@@ -89,7 +88,7 @@ void UTeanMatesList::ResetUIByData()
 	}
 }
 
-void UTeanMatesList::OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr)
+void UTeamMatesList::OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr)
 {
 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::VerticalBox));
 	if (!PanelPtr)

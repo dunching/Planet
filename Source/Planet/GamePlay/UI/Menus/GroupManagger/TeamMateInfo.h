@@ -14,7 +14,7 @@ struct FStreamableHandle;
 
 class UBasicUnit;
 class UGourpmateUnit;
-class UTeanMatesList;
+class UTeamMatesList;
 
 /**
  *
@@ -28,7 +28,7 @@ class PLANET_API UTeamMateInfo :
 
 public:
 
-	friend UTeanMatesList;
+	friend UTeamMatesList;
 
 	using FCallbackHandleContainer = TCallbackHandleContainer<void(UTeamMateInfo*)>;
 
@@ -52,4 +52,11 @@ private:
 
 	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
+};
+
+
+UCLASS()
+class PLANET_API UTeamMateInfo : public UTeamMateInfo
+{
+	GENERATED_BODY()
 };

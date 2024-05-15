@@ -8,19 +8,20 @@
 #include "Common/GenerateType.h"
 #include "SceneElement.h"
 
-#include "TeanMatesList.generated.h"
+#include "TeamMatesList.generated.h"
 
 struct FStreamableHandle;
 
 class UBasicUnit;
 class UGourpmateUnit;
 class UTeamMateInfo;
+class AHumanCharacter;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API UTeanMatesList : public UUserWidget, public IItemsMenuInterface
+class PLANET_API UTeamMatesList : public UUserWidget, public IItemsMenuInterface
 {
 	GENERATED_BODY()
 
@@ -31,6 +32,8 @@ public:
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
+
+	AHumanCharacter* HumanCharacterPtr = nullptr;
 
 protected:
 
@@ -46,4 +49,10 @@ protected:
 
 	TArray<FDelegateHandle>DelegateAry;
 
+};
+
+UCLASS()
+class PLANET_API UTeanMatesList1 : public UTeamMatesList
+{
+	GENERATED_BODY()
 };

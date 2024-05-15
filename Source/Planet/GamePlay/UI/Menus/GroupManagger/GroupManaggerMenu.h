@@ -25,6 +25,8 @@ public:
 
 	virtual void NativeConstruct()override;
 
+	AHumanCharacter* HumanCharacterPtr = nullptr;
+
 protected:
 
 	virtual void ResetUIByData()override;

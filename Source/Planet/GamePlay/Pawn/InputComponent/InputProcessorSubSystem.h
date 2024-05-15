@@ -19,7 +19,7 @@
 class UInputComponent;
 
 class UInputActions;
-class APlanetPlayerController;
+class AHumanPlayerController;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FSYKeyEvent, EInputEvent);
 
@@ -30,7 +30,7 @@ class UInputProcessorSubSystem : public UGameInstanceSubsystem
 
 public:
 
-	friend APlanetPlayerController;
+	friend AHumanPlayerController;
 
 	template<typename ProcessorType>
 	using FInitSwitchFunc = std::function<void(ProcessorType*)>;

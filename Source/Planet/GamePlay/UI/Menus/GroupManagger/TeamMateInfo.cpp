@@ -22,7 +22,7 @@
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 
 namespace TeamMateInfo
@@ -142,7 +142,7 @@ void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 
 void UTeamMateInfo::AddMember()
 {
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	auto PCPtr = Cast<IHumanControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;

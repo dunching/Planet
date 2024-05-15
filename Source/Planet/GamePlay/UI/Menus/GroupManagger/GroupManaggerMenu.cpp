@@ -15,13 +15,15 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "SceneElement.h"
 #include "HumanCharacter.h"
 
 namespace GroupManaggerMenu
 {
 	const FName GroupMatesTileView = TEXT("GroupMatesTileView");
+
+	const FName TeamMatesList = TEXT("TeamMatesList");
 }
 
 void UGroupManaggerMenu::NativeConstruct()
@@ -47,7 +49,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
 
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	auto PCPtr = Cast<IHumanControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;

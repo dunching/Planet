@@ -6,7 +6,8 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
+#include "HumanCharacter.h"
 
 UWeaponUnit* FSceneToolsContainer::AddUnit(EWeaponUnitType Type)
 {
@@ -211,8 +212,8 @@ UGourpmateUnit::UGourpmateUnit() :
 
 }
 
-void UGourpmateUnit::InitialByCharactor(ACharacterBase* InCharacterPtr)
+void UGourpmateUnit::InitialByCharactor(FPawnType* InCharacterPtr)
 {
-	PCPtr = Cast<IPlanetControllerInterface>(InCharacterPtr->GetController());
+	PCPtr = InCharacterPtr;
 	Name = InCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
 }

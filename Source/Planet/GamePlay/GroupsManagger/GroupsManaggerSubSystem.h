@@ -12,6 +12,7 @@
 
 class IPlanetControllerInterface;
 class UGourpmateUnit;
+class AHumanCharacter;
 
 UCLASS()
 class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
@@ -20,26 +21,28 @@ class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
 
 public:
 
-	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>;
+	using FPawnType = AHumanCharacter;
 
-	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, IPlanetControllerInterface*)>;
+	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>;
+
+	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FPawnType*)>;
 
 	struct FGroupMatesHelper
 	{
-		void AddCharacter(IPlanetControllerInterface* PCPtr);
+		void AddCharacter(FPawnType* PCPtr);
 
 		int32 ID = 1;
 
 		FMemberChangedDelegateContainer MembersChanged;
 
-		IPlanetControllerInterface* OwnerPCPtr = nullptr;
+		FPawnType* OwnerPCPtr = nullptr;
 
-		TSet<IPlanetControllerInterface*> MembersSet;
+		TSet<FPawnType*> MembersSet;
 	};
 
 	struct FTeamMatesHelper
 	{
-		void AddCharacter(UGourpmateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr);
+		void AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr);
 
 		void SwitchTeammateOption(ETeammateOption InTeammateOption);
 
@@ -51,9 +54,9 @@ public:
 
 		FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
-		IPlanetControllerInterface* OwnerPCPtr = nullptr;
+		FPawnType* OwnerPCPtr = nullptr;
 
-		TMap<UGourpmateUnit*, IPlanetControllerInterface*> MembersMap;
+		TMap<UGourpmateUnit*, FPawnType*> MembersMap;
 
 	private:
 
@@ -63,9 +66,9 @@ public:
 
 	static UGroupsManaggerSubSystem* GetInstance();
 
-	TSharedPtr<FGroupMatesHelper> CreateGroup(IPlanetControllerInterface* PCPtr);
+	TSharedPtr<FGroupMatesHelper> CreateGroup(FPawnType* PCPtr);
 
-	TSharedPtr<FTeamMatesHelper> CreateTeam(IPlanetControllerInterface* PCPtr);
+	TSharedPtr<FTeamMatesHelper> CreateTeam(FPawnType* PCPtr);
 
 private:
 

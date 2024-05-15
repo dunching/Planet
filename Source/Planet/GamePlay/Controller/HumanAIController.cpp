@@ -1,5 +1,5 @@
 
-#include "PlanetAIController.h"
+#include "HumanAIController.h"
 
 #include <GameFramework/CharacterMovementComponent.h>
 
@@ -11,9 +11,9 @@
 #include "SceneElement.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
-#include "PlanetPlayerController.h"
+#include "HumanPlayerController.h"
 
-void APlanetAIController::SetCampType(ECharacterCampType CharacterCampType)
+void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 {
 	if (AIHumanInfoPtr)
 	{
@@ -21,30 +21,26 @@ void APlanetAIController::SetCampType(ECharacterCampType CharacterCampType)
 	}
 }
 
-UGroupMnaggerComponent* APlanetAIController::GetGroupMnaggerComponent()
+UGroupMnaggerComponent* AHumanAIController::GetGroupMnaggerComponent()const
 {
-	if (!GroupMnaggerComponentPtr)
+	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
+}
+
+UGourpmateUnit* AHumanAIController::GetGourpMateUnit()
+{
+	return Cast<FPawnType>(GetPawn())->GetGourpMateUnit(); 
+}
+
+AHumanAIController::FPawnType* AHumanAIController::GetCharacter()
+{
+	return Cast<FPawnType>(GetPawn());
+}
+
+AActor* AHumanAIController::GetTeamFocusEnemy() const
+{
+	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamsHelper())
 	{
-		GroupMnaggerComponentPtr = Cast<UGroupMnaggerComponent>(AddComponentByClass(UGroupMnaggerComponent::StaticClass(), true, FTransform::Identity, false));
-	}
-	return  GroupMnaggerComponentPtr;
-}
-
-UGourpmateUnit* APlanetAIController::GetGourpMateUnit()
-{
-	return Cast<AHumanCharacter>(GetPawn())->GetGourpMateUnit();
-}
-
-ACharacterBase* APlanetAIController::GetCharacter()
-{
-	return Cast<ACharacterBase>(GetPawn());
-}
-
-AActor* APlanetAIController::GetTeamFocusEnemy() const
-{
-	if (GroupMnaggerComponentPtr && GroupMnaggerComponentPtr->GetTeamsHelper())
-	{
-		auto LeaderPCPtr = Cast<APlanetPlayerController>(GroupMnaggerComponentPtr->GetTeamsHelper()->OwnerPCPtr);
+		auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamsHelper()->OwnerPCPtr->GetController<AHumanPlayerController>();
 		if (LeaderPCPtr)
 		{
 			return LeaderPCPtr->GetFocusActor();
@@ -54,25 +50,25 @@ AActor* APlanetAIController::GetTeamFocusEnemy() const
 	return nullptr;
 }
 
-void APlanetAIController::OnTeammateOptionChangedImp(
+void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	IPlanetControllerInterface* LeaderPCPtr
+	FPawnType* LeaderPCPtr
 )
 {
-	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr->GetCharacter());
+	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);
 }
 
-void APlanetAIController::BeginPlay()
+void AHumanAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
 	GetGroupMnaggerComponent();
 
 	TeamHelperChangedDelegateContainer = 
-		GroupMnaggerComponentPtr->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamHelperChanged, this));
+		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamHelperChanged, this));
 }
 
-void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	if (AIHumanInfoPtr)
 	{
@@ -93,11 +89,11 @@ void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void APlanetAIController::OnPossess(APawn* InPawn)
+void AHumanAIController::OnPossess(APawn* InPawn)
 {
-	Super::OnPossess(InPawn);
+	Super::OnPossess(InPawn); 
 
-	auto CharacterPtr = Cast<ACharacterBase>(InPawn);
+	auto CharacterPtr = Cast<FPawnType>(InPawn);
 	if (CharacterPtr)
 	{
 		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
@@ -136,16 +132,16 @@ void APlanetAIController::OnPossess(APawn* InPawn)
 	SetCampType(ECharacterCampType::kEnemy);
 }
 
-void APlanetAIController::OnTeamHelperChanged()
+void AHumanAIController::OnTeamHelperChanged()
 {
-	auto TeamsHelper = GroupMnaggerComponentPtr->GetTeamsHelper();
+	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamsHelper();
 	if (TeamsHelper)
 	{
 		TeammateOptionChangedDelegateContainer = TeamsHelper->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		auto PlayerPCPtr = Cast<APlanetPlayerController>(TeamsHelper->OwnerPCPtr);
+		auto PlayerPCPtr = Cast<AHumanPlayerController>(TeamsHelper->OwnerPCPtr);
 		if (PlayerPCPtr)
 		{
 			OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPCPtr);

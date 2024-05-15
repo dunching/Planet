@@ -51,8 +51,6 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UGroupMnaggerComponent* GetGroupMnaggerComponent();
-	
 	UHoldingItemsComponent* GetHoldingItemsComponent();
 
 	UCharacterAttributesComponent* GetCharacterAttributesComponent();
@@ -60,7 +58,7 @@ public:
 	UEquipmentElementComponent* GetEquipmentItemsComponent();
 	
 	UTalentAllocationComponent* GetTalentAllocationComponent();
-	
+
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 

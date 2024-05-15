@@ -15,6 +15,7 @@ class IPlanetControllerInterface;
 
 class USkill_Base;
 class ACharacterBase;
+class AHumanCharacter;
 
 struct FSceneToolsContainer;
 
@@ -157,11 +158,13 @@ class UGourpmateUnit : public UBasicUnit
 
 public:
 
+	using FPawnType = AHumanCharacter;
+
 	UGourpmateUnit();
 
-	void InitialByCharactor(ACharacterBase* InCharacterPtr);
+	void InitialByCharactor(FPawnType* InCharacterPtr);
 
-	IPlanetControllerInterface* PCPtr = nullptr;
+	FPawnType* PCPtr = nullptr;
 
 	int32 Level = 1;
 

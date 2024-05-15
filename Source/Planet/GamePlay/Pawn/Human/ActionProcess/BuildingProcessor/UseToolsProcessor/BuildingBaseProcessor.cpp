@@ -28,7 +28,7 @@
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
-#include "PlanetPlayerController.h"
+#include "HumanPlayerController.h"
 #include "ToolsIcon.h"
 #include "Tool_PickAxe.h"
 #include "PlanetGameplayAbility.h"
@@ -113,7 +113,7 @@ namespace HumanProcessor
 
 	void FBuildingBaseProcessor::QKeyPressed()
 	{
-		auto PCPtr = Cast<APlanetPlayerController>(GetOwnerActor()->GetController());
+		auto PCPtr = Cast<AHumanPlayerController>(GetOwnerActor()->GetController());
 
 		if (PCPtr->PlayerInput->IsPressed(EKeys::LeftAlt))
 		{

@@ -7,7 +7,7 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterBase.h"
 #include "SceneElement.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "HumanCharacter.h"
 
 UGroupsManaggerSubSystem* UGroupsManaggerSubSystem::GetInstance()
@@ -15,7 +15,7 @@ UGroupsManaggerSubSystem* UGroupsManaggerSubSystem::GetInstance()
 	return Cast<UGroupsManaggerSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UGroupsManaggerSubSystem::StaticClass()));
 }
 
-TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> UGroupsManaggerSubSystem::CreateGroup(IPlanetControllerInterface* PCPtr)
+TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> UGroupsManaggerSubSystem::CreateGroup(FPawnType* PCPtr)
 {
 	TSharedPtr<FGroupMatesHelper> ResultSPtr = MakeShared<FGroupMatesHelper>();
 	for (;;)
@@ -35,7 +35,7 @@ TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> UGroupsManaggerSubSystem
 	return ResultSPtr;
 }
 
-TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> UGroupsManaggerSubSystem::CreateTeam(IPlanetControllerInterface* PCPtr)
+TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> UGroupsManaggerSubSystem::CreateTeam(FPawnType* PCPtr)
 {
 	TSharedPtr<FTeamMatesHelper> ResultSPtr = MakeShared<FTeamMatesHelper>();
 	for (;;)
@@ -55,7 +55,7 @@ TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> UGroupsManaggerSubSystem:
 	return ResultSPtr;
 }
 
-void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(IPlanetControllerInterface* PCPtr)
+void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
 {
 	MembersSet.Add(PCPtr);
 
@@ -64,7 +64,7 @@ void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(IPlanetController
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
 
-void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpmateUnit* GourpMateUnitPtr, IPlanetControllerInterface* PCPtr)
+void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr)
 {
 	MembersMap.Add(GourpMateUnitPtr, PCPtr);
 

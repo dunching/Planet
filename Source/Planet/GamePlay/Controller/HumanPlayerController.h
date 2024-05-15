@@ -8,9 +8,9 @@
 
 #include "GravityPlayerController.h"
 #include "GenerateType.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 
-#include "PlanetPlayerController.generated.h"
+#include "HumanPlayerController.generated.h"
 
 class ACharacterBase;
 class IPlanetControllerInterface;
@@ -21,15 +21,15 @@ class UFocusIcon;
  *
  */
 UCLASS()
-class PLANET_API APlanetPlayerController : public AGravityPlayerController, public IPlanetControllerInterface
+class PLANET_API AHumanPlayerController : public AGravityPlayerController, public IHumanControllerInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	using FDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, IPlanetControllerInterface*)>::FCallbackHandleSPtr;
+	using FDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>::FCallbackHandleSPtr;
 
-	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
+	AHumanPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	virtual void SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
 
@@ -37,7 +37,7 @@ public:
 
 	virtual void ClearFocus(EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
 
-	virtual ACharacterBase* GetCharacter()override;
+	virtual FPawnType* GetCharacter()override;
 
 protected:
 
@@ -53,19 +53,16 @@ protected:
 
 	virtual bool InputKey(const FInputKeyParams& Params)override;
 
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() override;
+	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
 
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
-		IPlanetControllerInterface* LeaderPCPtr
+		FPawnType* LeaderPCPtr
 	);
 
 	FDelegateHandle DelegateHandle;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
 
 	FFocusKnowledge	FocusInformation;
 

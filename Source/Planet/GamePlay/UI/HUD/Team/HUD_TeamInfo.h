@@ -40,7 +40,7 @@ private:
 
 	void OnTeammateOptionChanged(
 		ETeammateOption TeammateOption, 
-		IPlanetControllerInterface* LeaderPCPtr
+		UGroupsManaggerSubSystem::FPawnType* LeaderPCPtr
 	);
 
 	FTeammateOptionChangedDelegateContainer TeammateOptionChangedDelegateContainer;

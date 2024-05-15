@@ -38,9 +38,9 @@
 #include "InputProcessorSubSystem.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
-#include "PlanetPlayerController.h"
+#include "HumanPlayerController.h"
 #include "PlanetPlayerState.h"
-#include "PlanetAIController.h"
+#include "HumanAIController.h"
 #include "AIHumanInfo.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneElement.h"
@@ -48,6 +48,12 @@
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
+}
+
+UGroupMnaggerComponent* AHumanCharacter::GetGroupMnaggerComponent()
+{
+	return GroupMnaggerComponentPtr;
 }
 
 TPair<FVector, FVector> AHumanCharacter::GetCharacterViewInfo()
@@ -78,13 +84,13 @@ void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetController()->IsA(APlanetPlayerController::StaticClass()))
+	if (GetController()->IsA(AHumanPlayerController::StaticClass()))
 	{
 #if TESTHOLDDATA
 		TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
 	}
-	else if (GetController()->IsA(APlanetAIController::StaticClass()))
+	else if (GetController()->IsA(AHumanAIController::StaticClass()))
 	{
 #if TESTHOLDDATA
 		TestCommand::AddAICharacterTestDataImp(this);
@@ -106,13 +112,13 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (NewController->IsA(APlanetPlayerController::StaticClass()))
+	if (NewController->IsA(AHumanPlayerController::StaticClass()))
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this](auto NewProcessor) {
 			NewProcessor->SetPawn(this);
 			});
 	} 
-	else if (NewController->IsA(APlanetAIController::StaticClass()))
+	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
 		SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 	}

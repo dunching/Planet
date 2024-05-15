@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 
-#include "PlanetControllerInterface.generated.h"
+#include "HumanControllerInterface.generated.h"
 
 class UGroupMnaggerComponent;
 class UGourpmateUnit;
-class ACharacterBase;
+class AHumanCharacter;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UPlanetControllerInterface : public UInterface
+class UHumanControllerInterface : public UInterface
 {
 	GENERATED_BODY()
 
@@ -19,18 +19,20 @@ public:
 
 };
 
-class PLANET_API IPlanetControllerInterface
+class PLANET_API IHumanControllerInterface
 {
 	GENERATED_BODY()
 
 public:
 
+	using FPawnType = AHumanCharacter;
+
 	// “成员管理”记录了成员信息，因为
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() = 0;
+	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const = 0;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() = 0;
 
-	virtual ACharacterBase* GetCharacter() = 0;
+	virtual FPawnType* GetCharacter() = 0;
 
 protected:
 

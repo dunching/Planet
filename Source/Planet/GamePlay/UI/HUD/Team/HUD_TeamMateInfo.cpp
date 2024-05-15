@@ -21,7 +21,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
 
 namespace HUD_TeamMateInfo
@@ -88,7 +88,7 @@ void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 
-		auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+		auto PCPtr = Cast<IHumanControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 		if (!PCPtr)
 		{
 			return;

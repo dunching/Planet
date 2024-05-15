@@ -69,10 +69,10 @@ public:
 	void ViewTalentAllocation(bool bIsDisplay);
 	
 	// 浏览 成员管理界面
-	void ViewGroupMatesManagger(bool bIsDisplay);
+	void ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
 	
 	// 出战队员列表
-	void DisplayTeamInfo(bool bIsDisplay);
+	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
 	
 	// 效果栏（buff、debuff）
 	UEffectsList* ViewEffectsList(bool bIsViewMenus);

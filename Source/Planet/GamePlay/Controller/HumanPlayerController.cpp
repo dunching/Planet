@@ -1,5 +1,5 @@
 
-#include "PlanetPlayerController.h"
+#include "HumanPlayerController.h"
 
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/NetworkPredictionInterface.h"
@@ -17,20 +17,20 @@
 #include "CharacterBase.h"
 #include "HoldingItemsComponent.h"
 #include "GroupMnaggerComponent.h"
-#include "PlanetAIController.h"
+#include "HumanAIController.h"
 #include "SceneElement.h"
 #include "HumanCharacter.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "NavgationSubSysetem.h"
 #include "AssetRefMap.h"
 #include "FocusIcon.h"
 
-APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
+AHumanPlayerController::AHumanPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 }
 
-void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
+void AHumanPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
 {
 	ClearFocus(InPriority);
 
@@ -52,7 +52,7 @@ void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type 
 	}
 }
 
-AActor* APlanetPlayerController::GetFocusActor() const
+AActor* AHumanPlayerController::GetFocusActor() const
 {
 	AActor* FocusActor = nullptr;
 	for (int32 Index = FocusInformation.Priorities.Num() - 1; Index >= 0; --Index)
@@ -72,7 +72,7 @@ AActor* APlanetPlayerController::GetFocusActor() const
 	return FocusActor;
 }
 
-void APlanetPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
+void AHumanPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
 {
 	if (InPriority < FocusInformation.Priorities.Num())
 	{
@@ -83,16 +83,16 @@ void APlanetPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
 	if (FocusIconPtr)
 	{
 		FocusIconPtr->RemoveFromParent();
-		FocusIconPtr = nullptr; 
+		FocusIconPtr = nullptr;
 	}
 }
 
-ACharacterBase* APlanetPlayerController::GetCharacter()
+AHumanPlayerController::FPawnType* AHumanPlayerController::GetCharacter()
 {
-	return Cast<ACharacterBase>(GetPawn());
+	return Cast<FPawnType>(GetPawn());
 }
 
-void APlanetPlayerController::BeginPlay()
+void AHumanPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -110,17 +110,17 @@ void APlanetPlayerController::BeginPlay()
 	UNavgationSubSystem::GetInstance();
 }
 
-void APlanetPlayerController::PlayerTick(float DeltaTime)
+void AHumanPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 }
 
-void APlanetPlayerController::UpdateRotation(float DeltaTime)
+void AHumanPlayerController::UpdateRotation(float DeltaTime)
 {
 	Super::UpdateRotation(DeltaTime);
 }
 
-void APlanetPlayerController::OnPossess(APawn* InPawn)
+void AHumanPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
@@ -133,11 +133,11 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 	}
 }
 
-void APlanetPlayerController::OnUnPossess()
+void AHumanPlayerController::OnUnPossess()
 {
 	APawn* CurrentPawn = GetPawn();
 
-	auto CharacterPtr = Cast<ACharacterBase>(CurrentPawn);
+	auto CharacterPtr = Cast<FPawnType>(CurrentPawn);
 	if (CharacterPtr)
 	{
 		if (DelegateHandle)
@@ -149,7 +149,7 @@ void APlanetPlayerController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
-bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
+bool AHumanPlayerController::InputKey(const FInputKeyParams& Params)
 {
 	auto Result = Super::InputKey(Params);
 
@@ -158,23 +158,19 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 	return Result;
 }
 
-UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()
+UGroupMnaggerComponent* AHumanPlayerController::GetGroupMnaggerComponent()const
 {
-	if (!GroupMnaggerComponentPtr)
-	{
-		GroupMnaggerComponentPtr = Cast<UGroupMnaggerComponent>(AddComponentByClass(UGroupMnaggerComponent::StaticClass(), true, FTransform::Identity, false));
-	}
-	return  GroupMnaggerComponentPtr;
+	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
 }
 
-UGourpmateUnit* APlanetPlayerController::GetGourpMateUnit()
+UGourpmateUnit* AHumanPlayerController::GetGourpMateUnit()
 {
 	return Cast<AHumanCharacter>(GetPawn())->GetGourpMateUnit();
 }
 
-void APlanetPlayerController::OnCharacterGroupMateChanged(
+void AHumanPlayerController::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
-	IPlanetControllerInterface* LeaderPCPtr
+	FPawnType* LeaderPCPtr
 )
 {
 	switch (GroupMateChangeType)
@@ -183,9 +179,9 @@ void APlanetPlayerController::OnCharacterGroupMateChanged(
 	{
 		if (LeaderPCPtr)
 		{
-			if (GetGroupMnaggerComponent()->GetGroupsHelper()->OwnerPCPtr == this)
+			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupsHelper()->OwnerPCPtr == GetPawn<FPawnType>())
 			{
-				auto AIPCPtr = Cast<APlanetAIController>(LeaderPCPtr);
+				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
 				if (AIPCPtr)
 				{
 					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);

@@ -22,8 +22,9 @@
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "Weapon_PickAxe.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
+#include "HumanCharacter.h"
 
 namespace Skill_PickAxe
 {
@@ -133,7 +134,7 @@ void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
 		FCollisionQueryParams CapsuleParams;
 		CapsuleParams.AddIgnoredActor(CharacterPtr);
 
-		auto GroupMnaggerComponent = CharacterPtr->GetController<IPlanetControllerInterface>()->GetGroupMnaggerComponent();
+		auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
 		if (GroupMnaggerComponent)
 		{
 			auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper(); 
@@ -141,7 +142,7 @@ void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
 			{
 				for (auto Iter : TeamsHelperSPtr->MembersMap)
 				{
-					CapsuleParams.AddIgnoredActor(Cast<ACharacterBase>(Cast<AController>(Iter.Value)->GetPawn()));
+					CapsuleParams.AddIgnoredActor(Iter.Value);
 				}
 			}
 		}

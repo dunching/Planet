@@ -13,7 +13,7 @@
 #include "Tasks/AITask_MoveTo.h"
 
 #include "AITask_ReleaseSkill.h"
-#include "PlanetControllerInterface.h"
+#include "HumanControllerInterface.h"
 #include "CharacterBase.h"
 
 UBTTask_ReleaseSkill::UBTTask_ReleaseSkill(const FObjectInitializer& ObjectInitializer) :
@@ -33,7 +33,7 @@ EBTNodeResult::Type UBTTask_ReleaseSkill::ExecuteTask(UBehaviorTreeComponent& Ow
 
 	EBTNodeResult::Type NodeResult = EBTNodeResult::InProgress;
 
-	auto IPCPtr = Cast<IPlanetControllerInterface>(OwnerComp.GetAIOwner());
+	auto IPCPtr = Cast<IHumanControllerInterface>(OwnerComp.GetAIOwner());
 	AAIController * AICPtr = OwnerComp.GetAIOwner();
 	if (IPCPtr == nullptr || AICPtr == nullptr)
 	{

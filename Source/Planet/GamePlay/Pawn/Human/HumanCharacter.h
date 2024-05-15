@@ -35,6 +35,8 @@ public:
 
 	UGourpmateUnit* GetGourpMateUnit();
 
+	UGroupMnaggerComponent* GetGroupMnaggerComponent();
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -50,6 +52,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	UGourpmateUnit* GourpMateUnitPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
 
 private:
 
