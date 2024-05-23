@@ -127,6 +127,7 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 
 			EICPtr->ActiveWeapon(EWeaponSocket::kMain);
 		}
+		CharacterPtr->SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 	}
 
 	SetCampType(ECharacterCampType::kEnemy);

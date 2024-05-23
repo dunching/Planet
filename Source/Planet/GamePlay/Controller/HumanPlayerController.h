@@ -51,6 +51,8 @@ protected:
 
 	virtual void OnUnPossess() override;
 
+	virtual void SetPawn(APawn* InPawn) override;
+
 	virtual bool InputKey(const FInputKeyParams& Params)override;
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;

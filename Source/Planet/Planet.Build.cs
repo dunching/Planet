@@ -72,6 +72,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments/Tools");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments/Weapons");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Building");
+        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Projectile");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/InputComponent");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse");

@@ -5,7 +5,7 @@
 
 #include "Skill_Base.h"
 
-#include "Skill_WeaponHandProtection.generated.h"
+#include "Skill_WeaponActive_HandProtection.generated.h"
 
 class UAnimMontage;
 
@@ -17,13 +17,13 @@ class UProgressTips;
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_WeaponHandProtection : public USkill_Base
+class PLANET_API USkill_WeaponActive_HandProtection : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	USkill_WeaponHandProtection();
+	USkill_WeaponActive_HandProtection();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -64,6 +64,8 @@ protected:
 
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
+
+	void MakeDamage();
 
 	void FirstStep();
 	

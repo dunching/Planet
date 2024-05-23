@@ -30,6 +30,11 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
+	virtual void OnRemoveAbility(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	)override;
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,

@@ -1,5 +1,5 @@
 
-#include "Skill_WeaponHandProtection.h"
+#include "Skill_WeaponActive_HandProtection.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -27,10 +27,10 @@ namespace Skill_WeaponHandProtection
 {
 	const FName Hit = TEXT("Hit");
 
-	const FName AttachEnd = TEXT("AttachEnd");
+	const FName AttackEnd = TEXT("AttackEnd");
 }
 
-USkill_WeaponHandProtection::USkill_WeaponHandProtection() :
+USkill_WeaponActive_HandProtection::USkill_WeaponActive_HandProtection() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -38,7 +38,7 @@ USkill_WeaponHandProtection::USkill_WeaponHandProtection() :
 	bRetriggerInstancedAbility = true;
 }
 
-void USkill_WeaponHandProtection::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_WeaponActive_HandProtection::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -48,7 +48,7 @@ void USkill_WeaponHandProtection::OnAvatarSet(const FGameplayAbilityActorInfo* A
 	}
 }
 
-void USkill_WeaponHandProtection::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
+void USkill_WeaponActive_HandProtection::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -84,7 +84,7 @@ void USkill_WeaponHandProtection::PreActivate(const FGameplayAbilitySpecHandle H
 	K2_EndAbility();
 }
 
-bool USkill_WeaponHandProtection::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /*= nullptr*/, const FGameplayTagContainer* TargetTags /*= nullptr*/, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */) const
+bool USkill_WeaponActive_HandProtection::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /*= nullptr*/, const FGameplayTagContainer* TargetTags /*= nullptr*/, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */) const
 {
 	switch (RepeatType)
 	{
@@ -101,7 +101,7 @@ bool USkill_WeaponHandProtection::CanActivateAbility(const FGameplayAbilitySpecH
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void USkill_WeaponHandProtection::EndAbility(
+void USkill_WeaponActive_HandProtection::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -109,17 +109,10 @@ void USkill_WeaponHandProtection::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (IsMarkPendingKillOnAbilityEnd())
-	{
-		if (CharacterPtr)
-		{
-		}
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_WeaponHandProtection::ExcuteStepsLink()
+void USkill_WeaponActive_HandProtection::ExcuteStepsLink()
 {
 	switch (CurrentIndex)
 	{
@@ -148,7 +141,7 @@ void USkill_WeaponHandProtection::ExcuteStepsLink()
 	}
 }
 
-void USkill_WeaponHandProtection::ExcuteStopStep()
+void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 {
 	IncrementListLock();
 
@@ -175,7 +168,7 @@ void USkill_WeaponHandProtection::ExcuteStopStep()
 	TaskPtr->ReadyForActivation();
 }
 
-void USkill_WeaponHandProtection::FirstStep()
+void USkill_WeaponActive_HandProtection::FirstStep()
 {
 	if (WeaponPtr && CharacterPtr)
 	{
@@ -183,7 +176,7 @@ void USkill_WeaponHandProtection::FirstStep()
 	}
 }
 
-void USkill_WeaponHandProtection::SecondStep()
+void USkill_WeaponActive_HandProtection::SecondStep()
 {
 	if (WeaponPtr && CharacterPtr)
 	{
@@ -191,7 +184,7 @@ void USkill_WeaponHandProtection::SecondStep()
 	}
 }
 
-void USkill_WeaponHandProtection::ThirdStep()
+void USkill_WeaponActive_HandProtection::ThirdStep()
 {
 	if (WeaponPtr && CharacterPtr)
 	{
@@ -199,80 +192,12 @@ void USkill_WeaponHandProtection::ThirdStep()
 	}
 }
 
-void USkill_WeaponHandProtection::OnNotifyBeginReceived(FName NotifyName)
+void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 {
-	if (NotifyName == Skill_WeaponHandProtection::Hit)
+	if (NotifyName == Skill_WeaponHandProtection::AttackEnd)
 	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+		MakeDamage();
 
-		FCollisionShape  CollisionShape = FCollisionShape::MakeCapsule(45, 90);
-
-		FCollisionQueryParams CapsuleParams;
-		CapsuleParams.AddIgnoredActor(CharacterPtr);
-
-		TArray<struct FHitResult> OutHits;
-		if (GetWorldImp()->SweepMultiByObjectType(
-			OutHits,
-			CharacterPtr->GetActorLocation(),
-			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
-			FQuat::Identity,
-			ObjectQueryParams,
-			CollisionShape,
-			CapsuleParams
-		))
-		{
-			FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
-
-			FGameplayEventData Payload;
-			Payload.TargetData.Add(GAEventData);
-
-			GAEventData->TargetActorAry.Empty();
-			GAEventData->TriggerCharacterPtr = CharacterPtr;
-			GAEventData->Data.ADDamage = Damage;
-
-			for (auto Iter : OutHits)
-			{
-				auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-				if (TargetCharacterPtr)
-				{
-					GAEventData->TargetActorAry.Add(TargetCharacterPtr);
-				}
-			}
-
-			auto SkillsAry = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
-			auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-			for (const auto& Iter : SkillsAry)
-			{
-				if (Iter.Value.SkillUnit)
-				{
-					switch (Iter.Value.SkillUnit->SkillType)
-					{
-					case ESkillType::kActive:
-					{
-						auto GAPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value.Handle);
-						if (!GAPtr)
-						{
-							continue;
-						}
-						auto GAInstPtr = Cast<USkill_Base>(GAPtr->GetPrimaryInstance());
-						if (!GAInstPtr)
-						{
-							continue;
-						}
-
-						GAInstPtr->AddCooldownConsumeTime(1.f);
-					}
-					break;
-					}
-				}
-			}
-
-			SendEvent(Payload);
-		}
-	}
-	else if (NotifyName == Skill_WeaponHandProtection::AttachEnd)
-	{
 		bIsAttackEnd = true;
 		if (RepeatType != USkill_Base::ERepeatType::kStop)
 		{
@@ -281,7 +206,78 @@ void USkill_WeaponHandProtection::OnNotifyBeginReceived(FName NotifyName)
 	}
 }
 
-void USkill_WeaponHandProtection::PlayMontage()
+void USkill_WeaponActive_HandProtection::MakeDamage()
+{
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+
+	FCollisionShape  CollisionShape = FCollisionShape::MakeCapsule(45, 90);
+
+	FCollisionQueryParams CapsuleParams;
+	CapsuleParams.AddIgnoredActor(CharacterPtr);
+
+	TArray<struct FHitResult> OutHits;
+	if (GetWorldImp()->SweepMultiByObjectType(
+		OutHits,
+		CharacterPtr->GetActorLocation(),
+		CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
+		FQuat::Identity,
+		ObjectQueryParams,
+		CollisionShape,
+		CapsuleParams
+	))
+	{
+		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
+
+		FGameplayEventData Payload;
+		Payload.TargetData.Add(GAEventData);
+
+		GAEventData->TargetActorAry.Empty();
+		GAEventData->TriggerCharacterPtr = CharacterPtr;
+		GAEventData->Data.ADDamage = Damage;
+
+		for (auto Iter : OutHits)
+		{
+			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+			if (TargetCharacterPtr)
+			{
+				GAEventData->TargetActorAry.Add(TargetCharacterPtr);
+			}
+		}
+
+		auto SkillsAry = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
+		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+		for (const auto& Iter : SkillsAry)
+		{
+			if (Iter.Value.SkillUnit)
+			{
+				switch (Iter.Value.SkillUnit->SkillType)
+				{
+				case ESkillType::kActive:
+				{
+					auto GAPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value.Handle);
+					if (!GAPtr)
+					{
+						continue;
+					}
+					auto GAInstPtr = Cast<USkill_Base>(GAPtr->GetPrimaryInstance());
+					if (!GAInstPtr)
+					{
+						continue;
+					}
+
+					GAInstPtr->AddCooldownConsumeTime(1.f);
+				}
+				break;
+				}
+			}
+		}
+
+		SendEvent(Payload);
+	}
+}
+
+void USkill_WeaponActive_HandProtection::PlayMontage()
 {
 	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;

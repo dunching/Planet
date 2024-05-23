@@ -49,6 +49,24 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 	}
 }
 
+void USkill_Talent_NuQi::OnRemoveAbility(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	if (OnValueChanged)
+	{
+		OnValueChanged->UnBindCallback();
+	}
+
+	if (CharacterPtr)
+	{
+		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
+	}
+
+	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
 void USkill_Talent_NuQi::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -57,19 +75,6 @@ void USkill_Talent_NuQi::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (IsMarkPendingKillOnAbilityEnd())
-	{
-		if (OnValueChanged)
-		{
-			OnValueChanged->UnBindCallback();
-		}
-
-		if (CharacterPtr)
-		{
-			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
-		}
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

@@ -1,5 +1,5 @@
 
-#include "Skill_GroupTherapy.h"
+#include "Skill_Active_GroupTherapy.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -34,7 +34,7 @@ namespace Skill_GroupTherapy
 	const FName AttachEnd = TEXT("AttachEnd");
 }
 
-USkill_GroupTherapy::USkill_GroupTherapy() :
+USkill_Active_GroupTherapy::USkill_Active_GroupTherapy() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -42,7 +42,7 @@ USkill_GroupTherapy::USkill_GroupTherapy() :
 	bRetriggerInstancedAbility = true;
 }
 
-void USkill_GroupTherapy::PreActivate(
+void USkill_Active_GroupTherapy::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -57,7 +57,7 @@ void USkill_GroupTherapy::PreActivate(
 	CurrentRepeatCount = 0;
 }
 
-void USkill_GroupTherapy::ActivateAbility(
+void USkill_Active_GroupTherapy::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -69,17 +69,17 @@ void USkill_GroupTherapy::ActivateAbility(
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 }
 
-void USkill_GroupTherapy::ExcuteStepsLink()
+void USkill_Active_GroupTherapy::ExcuteStepsLink()
 {
 	StartTasksLink();
 }
 
-void USkill_GroupTherapy::StartTasksLink()
+void USkill_Active_GroupTherapy::StartTasksLink()
 {
 	PlayMontage();
 }
 
-void USkill_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
+void USkill_Active_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_GroupTherapy::TriggerTherapy)
 	{
@@ -143,7 +143,7 @@ void USkill_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
 	}
 }
 
-void USkill_GroupTherapy::PlayMontage()
+void USkill_Active_GroupTherapy::PlayMontage()
 {
 	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;

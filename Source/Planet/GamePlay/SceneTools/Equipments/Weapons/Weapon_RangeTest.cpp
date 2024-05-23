@@ -1,5 +1,5 @@
 
-#include "Weapon_PickAxe.h"
+#include "Weapon_RangeTest.h"
 
 #include "NiagaraComponent.h"
 #include "Components/PrimitiveComponent.h"
@@ -19,21 +19,21 @@
 #include "ToolFuture_PickAxe.h"
 #include "Skill_WeaponActive_PickAxe.h"
 
-AWeapon_PickAxe::AWeapon_PickAxe(const FObjectInitializer& ObjectInitializer) :
+AWeapon_RangeTest::AWeapon_RangeTest(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	SkeletalComponentPtr = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"));
 	SkeletalComponentPtr->SetupAttachment(SceneCompPtr);
 }
 
-void AWeapon_PickAxe::AttachToCharacter(AHumanCharacter* CharacterPtr)
+void AWeapon_RangeTest::AttachToCharacter(AHumanCharacter* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 
 	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
 }
 
-USkeletalMeshComponent* AWeapon_PickAxe::GetMesh()
+USkeletalMeshComponent* AWeapon_RangeTest::GetMesh()
 {
 	return SkeletalComponentPtr;
 }

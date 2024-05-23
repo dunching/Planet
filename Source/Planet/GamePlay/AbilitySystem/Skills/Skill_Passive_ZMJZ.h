@@ -6,24 +6,29 @@
 #include "PlanetGameplayAbility.h"
 #include "Skill_Base.h"
 
-#include "Skill_ZMJZ.generated.h"
+#include "Skill_Passive_ZMJZ.generated.h"
 
 class UEffectItem;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API USkill_ZMJZ : public USkill_Base
+class PLANET_API USkill_Passive_ZMJZ : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	USkill_ZMJZ();
+	USkill_Passive_ZMJZ();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
+
+	virtual void OnRemoveAbility(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	)override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,

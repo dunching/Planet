@@ -160,7 +160,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 			{
 				switch (Iter.Value.SkillUnit->GetSceneElementType<ESkillUnitType>())
 				{
-				case ESkillUnitType::kHumanSkill_TalentSkill_NuQi:
+				case ESkillUnitType::kHumanSkill_Talent_NuQi:
 				{
 					auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, TalentState_NuQi_Class);
 					if (UIPtr)

@@ -53,8 +53,8 @@
 #include "ToolFuture_PickAxe.h"
 #include "Weapon_Base.h"
 #include "Skill_Base.h"
-#include "Skill_PickAxe.h"
-#include "Skill_WeaponHandProtection.h"
+#include "Skill_WeaponActive_PickAxe.h"
+#include "Skill_WeaponActive_HandProtection.h"
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "HumanViewTalentAllocation.h"
@@ -92,8 +92,8 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
-			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
+ 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
+ 			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
 
 			{
 				auto WeaponUnitPtr = OnwerActorPtr->GetEquipmentItemsComponent()->GetMainWeaponUnit();

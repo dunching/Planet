@@ -114,12 +114,8 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(AHumanPlayerController::StaticClass()))
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this](auto NewProcessor) {
-			NewProcessor->SetPawn(this);
-			});
 	} 
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
-		SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 	}
 }

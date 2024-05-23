@@ -37,8 +37,6 @@ void UState_Talent_NuQi::NativeConstruct()
 
 void UState_Talent_NuQi::NativeDestruct()
 {
-	Super::NativeDestruct();
-
 	if (OnValueChanged)
 	{
 		OnValueChanged->UnBindCallback();
@@ -47,6 +45,8 @@ void UState_Talent_NuQi::NativeDestruct()
 	{
 		OnMaxValueChanged->UnBindCallback();
 	}
+
+	Super::NativeDestruct();
 }
 
 void UState_Talent_NuQi::OnNuQiCurrentValueChanged(int32 CurrentValue)

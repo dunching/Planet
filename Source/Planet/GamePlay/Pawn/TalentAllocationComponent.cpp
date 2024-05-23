@@ -161,10 +161,10 @@ void UTalentAllocationComponent::SyncToHolding(const FTalentHelper& NewTalentHel
 			if (CharacterPtr)
 			{
 				auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-				auto SkillUnitPtr = HoldItemComponent.FindUnit(ESkillUnitType::kHumanSkill_TalentSkill_NuQi);
+				auto SkillUnitPtr = HoldItemComponent.FindUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
 				if (!SkillUnitPtr)
 				{
-					SkillUnitPtr = HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_TalentSkill_NuQi);
+					SkillUnitPtr = HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
 				}
 				if (SkillUnitPtr)
 				{

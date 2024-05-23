@@ -55,18 +55,20 @@ enum class EWeaponUnitType : uint8
 	kNone,
 	kPickAxe,
 	kWeaponHandProtection,
+	kRangeTest,
 };
 
 UENUM(BlueprintType)
 enum class ESkillUnitType : uint8
 {
 	kNone,
-	kHumanSkills_ZMJZ,
-	kHumanSkill_PickAxe_Attack1,
-	kHumanSkill_WeaponHandProtection_Attack1,
-	kHumanSkill_Displacement,
-	kHumanSkill_GroupTherapy,
-	kHumanSkill_TalentSkill_NuQi,
+	kHumanSkill_Passive_ZMJZ,
+	kHumanSkill_WeaponActive_PickAxe_Attack1,
+	kHumanSkill_WeaponActive_HandProtection_Attack1,
+	kHumanSkill_WeaponActive_RangeTest,
+	kHumanSkill_Active_Displacement,
+	kHumanSkill_Active_GroupTherapy,
+	kHumanSkill_Talent_NuQi,
 };
 
 UENUM(BlueprintType)

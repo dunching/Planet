@@ -1,5 +1,5 @@
 
-#include "Skill_ZMJZ.h"
+#include "Skill_Passive_ZMJZ.h"
 
 #include "AbilitySystemComponent.h"
 
@@ -13,7 +13,7 @@
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 
-USkill_ZMJZ::USkill_ZMJZ() :
+USkill_Passive_ZMJZ::USkill_Passive_ZMJZ() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -21,7 +21,7 @@ USkill_ZMJZ::USkill_ZMJZ() :
 	bRetriggerInstancedAbility = true;
 }
 
-void USkill_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -45,7 +45,29 @@ void USkill_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const 
 	}
 }
 
-void USkill_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
+void USkill_Passive_ZMJZ::OnRemoveAbility(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	if (CharacterPtr)
+	{
+		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-(ModifyCount * SpeedOffset));
+	}
+
+	if (EffectItemPtr)
+	{
+		EffectItemPtr->RemoveFromParent();
+		EffectItemPtr = nullptr;
+
+		ModifyCount = 0;
+	}
+
+	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
+void USkill_Passive_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -54,7 +76,7 @@ void USkill_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGa
 	CurrentRepeatCount = 0;
 }
 
-void USkill_ZMJZ::EndAbility(
+void USkill_Passive_ZMJZ::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -62,27 +84,10 @@ void USkill_ZMJZ::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (IsMarkPendingKillOnAbilityEnd())
-	{
-		if (CharacterPtr)
-		{
-			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-(ModifyCount * SpeedOffset));
-		}
-
-		if (EffectItemPtr)
-		{
-			EffectItemPtr->RemoveFromParent();
-			EffectItemPtr = nullptr;
-
-			ModifyCount = 0;
-		}
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_ZMJZ::ExcuteStepsLink()
+void USkill_Passive_ZMJZ::ExcuteStepsLink()
 {
 	if (CharacterPtr)
 	{

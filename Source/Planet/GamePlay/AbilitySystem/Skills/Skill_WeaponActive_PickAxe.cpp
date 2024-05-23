@@ -1,5 +1,5 @@
 
-#include "Skill_PickAxe.h"
+#include "Skill_WeaponActive_PickAxe.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -30,10 +30,10 @@ namespace Skill_PickAxe
 {
 	const FName Hit = TEXT("Hit");
 
-	const FName AttachEnd = TEXT("AttachEnd");
+	const FName AttackEnd = TEXT("AttackEnd");
 }
 
-USkill_PickAxe1::USkill_PickAxe1() :
+USkill_WeaponActive_PickAxe::USkill_WeaponActive_PickAxe() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -41,20 +41,42 @@ USkill_PickAxe1::USkill_PickAxe1() :
 	bRetriggerInstancedAbility = true;
 }
 
-void USkill_PickAxe1::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_WeaponActive_PickAxe::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(15);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(10);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(5);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(AD);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(AD_Penetration);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(AD_PercentPenetration);
 	}
 }
 
-void USkill_PickAxe1::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
+void USkill_WeaponActive_PickAxe::OnRemoveAbility(
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+)
+{
+	// Ins Or Spec
+	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	if (CharacterPtr)
+	{
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(-AD);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(-AD_Penetration);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(-AD_PercentPenetration);
+	}
+
+	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
+void USkill_WeaponActive_PickAxe::PreActivate(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -77,7 +99,13 @@ void USkill_PickAxe1::PreActivate(const FGameplayAbilitySpecHandle Handle, const
 	K2_EndAbility();
 }
 
-bool USkill_PickAxe1::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /*= nullptr*/, const FGameplayTagContainer* TargetTags /*= nullptr*/, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */) const
+bool USkill_WeaponActive_PickAxe::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+) const
 {
 	switch (RepeatType)
 	{
@@ -94,26 +122,12 @@ bool USkill_PickAxe1::CanActivateAbility(const FGameplayAbilitySpecHandle Handle
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void USkill_PickAxe1::OnRemoveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
-{
-	// Ins Or Spec
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-	if (CharacterPtr)
-	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(-15);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(-10);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(-5);
-	}
-
-	Super::OnAvatarSet(ActorInfo, Spec);
-}
-
-void USkill_PickAxe1::ExcuteStepsLink()
+void USkill_WeaponActive_PickAxe::ExcuteStepsLink()
 {
 	StartTasksLink();
 }
 
-void USkill_PickAxe1::StartTasksLink()
+void USkill_WeaponActive_PickAxe::StartTasksLink()
 {
 	if (EquipmentAxePtr && CharacterPtr)
 	{
@@ -122,65 +136,12 @@ void USkill_PickAxe1::StartTasksLink()
 	}
 }
 
-void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
+void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 {
-	if (NotifyName == Skill_PickAxe::Hit)
+	if (NotifyName == Skill_PickAxe::AttackEnd)
 	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+		MakeDamage();
 
-		FCollisionShape  CollisionShape = FCollisionShape::MakeCapsule(45, 90);
-
-		FCollisionQueryParams CapsuleParams;
-		CapsuleParams.AddIgnoredActor(CharacterPtr);
-
-		auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
-		if (GroupMnaggerComponent)
-		{
-			auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper(); 
-			if (TeamsHelperSPtr)
-			{
-				for (auto Iter : TeamsHelperSPtr->MembersMap)
-				{
-					CapsuleParams.AddIgnoredActor(Iter.Value);
-				}
-			}
-		}
-
-		TArray<struct FHitResult> OutHits;
-		if (GetWorldImp()->SweepMultiByObjectType(
-			OutHits,
-			CharacterPtr->GetActorLocation(),
-			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
-			FQuat::Identity,
-			ObjectQueryParams,
-			CollisionShape,
-			CapsuleParams
-		))
-		{
-			FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
-
-			FGameplayEventData Payload;
-			Payload.TargetData.Add(GAEventData);
-
-			GAEventData->TargetActorAry.Empty();
-			GAEventData->TriggerCharacterPtr = CharacterPtr;
-			GAEventData->Data.ADDamage = Damage;
-
-			for (auto Iter : OutHits)
-			{
-				auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-				if (TargetCharacterPtr)
-				{
-					GAEventData->TargetActorAry.Add(TargetCharacterPtr);
-				}
-			}
-
-			SendEvent(Payload);
-		}
-	}
-	else if (NotifyName == Skill_PickAxe::AttachEnd)
-	{
 		bIsAttackEnd = true;
 		if (RepeatType != USkill_Base::ERepeatType::kStop)
 		{
@@ -189,7 +150,63 @@ void USkill_PickAxe1::OnNotifyBeginReceived(FName NotifyName)
 	}
 }
 
-void USkill_PickAxe1::PlayMontage()
+void USkill_WeaponActive_PickAxe::MakeDamage()
+{
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+
+	FCollisionShape  CollisionShape = FCollisionShape::MakeCapsule(45, 90);
+
+	FCollisionQueryParams CapsuleParams;
+	CapsuleParams.AddIgnoredActor(CharacterPtr);
+
+	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
+	if (GroupMnaggerComponent)
+	{
+		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper();
+		if (TeamsHelperSPtr)
+		{
+			for (auto Iter : TeamsHelperSPtr->MembersMap)
+			{
+				CapsuleParams.AddIgnoredActor(Iter.Value);
+			}
+		}
+	}
+
+	TArray<struct FHitResult> OutHits;
+	if (GetWorldImp()->SweepMultiByObjectType(
+		OutHits,
+		CharacterPtr->GetActorLocation(),
+		CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
+		FQuat::Identity,
+		ObjectQueryParams,
+		CollisionShape,
+		CapsuleParams
+	))
+	{
+		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
+
+		FGameplayEventData Payload;
+		Payload.TargetData.Add(GAEventData);
+
+		GAEventData->TargetActorAry.Empty();
+		GAEventData->TriggerCharacterPtr = CharacterPtr;
+		GAEventData->Data.ADDamage = Damage;
+
+		for (auto Iter : OutHits)
+		{
+			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+			if (TargetCharacterPtr)
+			{
+				GAEventData->TargetActorAry.Add(TargetCharacterPtr);
+			}
+		}
+
+		SendEvent(Payload);
+	}
+}
+
+void USkill_WeaponActive_PickAxe::PlayMontage()
 {
 	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;

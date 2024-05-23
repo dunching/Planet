@@ -14,10 +14,12 @@
 #include "SceneElement.h"
 #include "Skill_Base.h"
 #include "Weapon_Base.h"
-#include "Skill_PickAxe.h"
-#include "Skill_WeaponHandProtection.h"
+#include "Skill_WeaponActive_PickAxe.h"
+#include "Skill_WeaponActive_HandProtection.h"
+#include "Skill_WeaponActive_RangeTest.h"
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
+#include "Weapon_RangeTest.h"
 
 UEquipmentElementComponent::UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -411,17 +413,24 @@ void UEquipmentElementComponent::ActiveSkill(const FSkillsSocketInfo& SkillsSock
 			FGameplayEventData Payload;
 			switch (SkillsSocketInfo.SkillUnit->GetSceneElementType<ESkillUnitType>())
 			{
-			case ESkillUnitType::kHumanSkill_PickAxe_Attack1:
+			case ESkillUnitType::kHumanSkill_WeaponActive_PickAxe_Attack1:
 			{
 				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
 				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(WeaponPtr);
 				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 			}
 			break;
-			case ESkillUnitType::kHumanSkill_WeaponHandProtection_Attack1:
+			case ESkillUnitType::kHumanSkill_WeaponActive_HandProtection_Attack1:
 			{
 				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
 				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(WeaponPtr);
+				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+			}
+			break;
+			case ESkillUnitType::kHumanSkill_WeaponActive_RangeTest:
+			{
+				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest;
+				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(WeaponPtr);
 				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 			}
 			break;
@@ -441,8 +450,8 @@ void UEquipmentElementComponent::ActiveSkill(const FSkillsSocketInfo& SkillsSock
 	{
 		switch (SkillsSocketInfo.SkillUnit->GetSceneElementType<ESkillUnitType>())
 		{
-		case ESkillUnitType::kHumanSkill_Displacement:
-		case ESkillUnitType::kHumanSkill_GroupTherapy:
+		case ESkillUnitType::kHumanSkill_Active_Displacement:
+		case ESkillUnitType::kHumanSkill_Active_GroupTherapy:
 		{
 			auto OnwerActorPtr = GetOwner<ACharacterBase>();
 			if (OnwerActorPtr)

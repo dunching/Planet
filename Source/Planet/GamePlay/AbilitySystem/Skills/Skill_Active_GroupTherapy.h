@@ -5,7 +5,7 @@
 
 #include "Skill_Base.h"
 
-#include "Skill_GroupTherapy.generated.h"
+#include "Skill_Active_GroupTherapy.generated.h"
 
 class UAnimMontage;
 
@@ -16,13 +16,13 @@ class UAbilityTask_PlayMontage;
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_GroupTherapy : public USkill_Base
+class PLANET_API USkill_Active_GroupTherapy : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	USkill_GroupTherapy();
+	USkill_Active_GroupTherapy();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,

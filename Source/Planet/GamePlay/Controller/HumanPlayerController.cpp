@@ -122,14 +122,26 @@ void AHumanPlayerController::UpdateRotation(float DeltaTime)
 
 void AHumanPlayerController::OnPossess(APawn* InPawn)
 {
+	bool bIsNewPawn = (InPawn && InPawn != GetPawn());
+
 	Super::OnPossess(InPawn);
 
-	auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupsHelper();
-	if (GroupsHelperSPtr)
+	if (bIsNewPawn)
 	{
-		DelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
-			std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
+		if (InPawn && InPawn->IsA(AHumanCharacter::StaticClass()))
+		{
+			auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupsHelper();
+			if (GroupsHelperSPtr)
+			{
+				DelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
+					std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
+				);
+			}
+
+			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
+				NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
+				});
+		}
 	}
 }
 
@@ -149,6 +161,11 @@ void AHumanPlayerController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
+void AHumanPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+}
+
 bool AHumanPlayerController::InputKey(const FInputKeyParams& Params)
 {
 	auto Result = Super::InputKey(Params);
@@ -165,7 +182,7 @@ UGroupMnaggerComponent* AHumanPlayerController::GetGroupMnaggerComponent()const
 
 UGourpmateUnit* AHumanPlayerController::GetGourpMateUnit()
 {
-	return Cast<AHumanCharacter>(GetPawn())->GetGourpMateUnit();
+	return GetPawn<FPawnType>()->GetGourpMateUnit();
 }
 
 void AHumanPlayerController::OnCharacterGroupMateChanged(

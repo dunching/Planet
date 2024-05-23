@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include <GameplayTagContainer.h>
+
 #include "UIInterfaces.h"
 #include "GenerateType.h"
 

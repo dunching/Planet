@@ -48,11 +48,12 @@ void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 
 		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
 		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
+		HoldItemComponent.AddUnit(EWeaponUnitType::kRangeTest);
 
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkills_ZMJZ);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Displacement);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_TalentSkill_NuQi);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_GroupTherapy);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
 	}
 }
 
@@ -65,10 +66,10 @@ void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
 		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
 
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkills_ZMJZ);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Displacement);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_TalentSkill_NuQi);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_GroupTherapy);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
 	}
 }
 
@@ -120,7 +121,7 @@ void TestCommand::TestDisplacementSkill()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		auto UnitClass = UAssetRefMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Displacement];
+		auto UnitClass = UAssetRefMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
 
 		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
 		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);

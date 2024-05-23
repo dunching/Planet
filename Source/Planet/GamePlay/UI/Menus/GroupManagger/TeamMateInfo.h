@@ -53,10 +53,3 @@ private:
 	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };
-
-
-UCLASS()
-class PLANET_API UTeamMateInfo : public UTeamMateInfo
-{
-	GENERATED_BODY()
-};

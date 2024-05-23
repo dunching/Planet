@@ -1,5 +1,5 @@
 
-#include "Skill_Displacement.h"
+#include "Skill_Active_Displacement.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -23,13 +23,13 @@
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 
-USkill_Displacement::USkill_Displacement() :
+USkill_Active_Displacement::USkill_Active_Displacement() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void USkill_Displacement::PreActivate(
+void USkill_Active_Displacement::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -44,7 +44,7 @@ void USkill_Displacement::PreActivate(
 	CurrentRepeatCount = 0;
 }
 
-void USkill_Displacement::ActivateAbility(
+void USkill_Active_Displacement::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -56,7 +56,7 @@ void USkill_Displacement::ActivateAbility(
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 }
 
-bool USkill_Displacement::CanActivateAbility(
+bool USkill_Active_Displacement::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
@@ -71,7 +71,7 @@ bool USkill_Displacement::CanActivateAbility(
 	return false;
 }
 
-void USkill_Displacement::EndAbility(
+void USkill_Active_Displacement::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -87,7 +87,7 @@ void USkill_Displacement::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Displacement::ExcuteStepsLink()
+void USkill_Active_Displacement::ExcuteStepsLink()
 {
 	if (CharacterPtr)
 	{
@@ -96,7 +96,7 @@ void USkill_Displacement::ExcuteStepsLink()
 	}
 }
 
-void USkill_Displacement::FindTarget()
+void USkill_Active_Displacement::FindTarget()
 {
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
@@ -172,7 +172,7 @@ void USkill_Displacement::FindTarget()
 	IncrementListLock();
 }
 
-void USkill_Displacement::PlayMontage()
+void USkill_Active_Displacement::PlayMontage()
 {
 	{
 		const float InPlayRate = HumanMontage->CalculateSequenceLength() / Duration;

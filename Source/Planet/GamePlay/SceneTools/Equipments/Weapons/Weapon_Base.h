@@ -17,4 +17,6 @@ class PLANET_API AWeapon_Base : public AToolUnitBase
 
 public:
 
+protected:
+
 };
