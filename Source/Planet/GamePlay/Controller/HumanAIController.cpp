@@ -12,6 +12,7 @@
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
 #include "HumanPlayerController.h"
+#include "TestCommand.h"
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 {
@@ -61,11 +62,6 @@ void AHumanAIController::OnTeammateOptionChangedImp(
 void AHumanAIController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GetGroupMnaggerComponent();
-
-	TeamHelperChangedDelegateContainer = 
-		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamHelperChanged, this));
 }
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -76,16 +72,6 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		AIHumanInfoPtr = nullptr;
 	}
 
-	if (TeammateOptionChangedDelegateContainer)
-	{
-		TeammateOptionChangedDelegateContainer->UnBindCallback();
-	}
-
-	if (TeamHelperChangedDelegateContainer)
-	{
-		TeamHelperChangedDelegateContainer->UnBindCallback();
-	}
-
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -93,9 +79,16 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn); 
 
+	TeamHelperChangedDelegateContainer =
+		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamHelperChanged, this));
+
 	auto CharacterPtr = Cast<FPawnType>(InPawn);
 	if (CharacterPtr)
 	{
+#if TESTHOLDDATA
+		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
+#endif
+
 		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
 		AIHumanInfoPtr = CreateWidget<UAIHumanInfo>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
 		if (AIHumanInfoPtr)
@@ -108,29 +101,46 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
 		{
 			auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
-			EICPtr->SetMainWeapon(WeaponUnitPtr);
-
-			TMap<FGameplayTag, FSkillsSocketInfo> InSkillsMap;
+			if (WeaponUnitPtr)
 			{
-				FSkillsSocketInfo SkillsSocketInfo;
+				EICPtr->SetMainWeapon(WeaponUnitPtr);
 
-				SkillsSocketInfo.SkillSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.WeaponActiveSocket1"));
-				SkillsSocketInfo.SkillUnit = HICPtr->GetHoldItemProperty().AddUnit(WeaponUnitPtr->FirstSkillClass);
+				TMap<FGameplayTag, FSkillsSocketInfo> InSkillsMap;
+				{
+					FSkillsSocketInfo SkillsSocketInfo;
 
-				InSkillsMap.Add(
-					SkillsSocketInfo.SkillSocket,
-					SkillsSocketInfo
-				);
+					SkillsSocketInfo.SkillSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.WeaponActiveSocket1"));
+					SkillsSocketInfo.SkillUnit = HICPtr->GetHoldItemProperty().AddUnit(WeaponUnitPtr->FirstSkillClass);
+
+					InSkillsMap.Add(
+						SkillsSocketInfo.SkillSocket,
+						SkillsSocketInfo
+					);
+				}
+
+				EICPtr->RegisterMultiGAs(InSkillsMap);
+
+				EICPtr->ActiveWeapon(EWeaponSocket::kMain);
 			}
-
-			EICPtr->RegisterMultiGAs(InSkillsMap);
-
-			EICPtr->ActiveWeapon(EWeaponSocket::kMain);
 		}
-		CharacterPtr->SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 	}
 
 	SetCampType(ECharacterCampType::kEnemy);
+}
+
+void AHumanAIController::OnUnPossess()
+{
+	if (TeammateOptionChangedDelegateContainer)
+	{
+		TeammateOptionChangedDelegateContainer->UnBindCallback();
+	}
+
+	if (TeamHelperChangedDelegateContainer)
+	{
+		TeamHelperChangedDelegateContainer->UnBindCallback();
+	}
+
+	Super::OnUnPossess();
 }
 
 void AHumanAIController::OnTeamHelperChanged()

@@ -8,6 +8,7 @@
 
 #include "Skill_WeaponActive_RangeTest.generated.h"
 
+class UPrimitiveComponent;
 class UAnimMontage;
 
 class AWeapon_RangeTest;
@@ -71,6 +72,16 @@ protected:
 	void MakeDamage();
 
 	void StartTasksLink();
+
+	UFUNCTION()
+	void OnProjectileBounce(
+		UPrimitiveComponent* OverlappedComponent, 
+		AActor* OtherActor, 
+		UPrimitiveComponent* OtherComp, 
+		int32 OtherBodyIndex,
+		bool bFromSweep, 
+		const FHitResult& SweepResult
+	);
 
 	bool bIsAttackEnd = true;
 

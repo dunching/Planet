@@ -56,6 +56,31 @@ UGroupMnaggerComponent* AHumanCharacter::GetGroupMnaggerComponent()
 	return GroupMnaggerComponentPtr;
 }
 
+bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
+{
+	if (TargetCharacterPtr == this)
+	{
+		return true;
+	}
+
+	{
+		auto TeammateHelper = GroupMnaggerComponentPtr->GetTeamsHelper();
+		for (auto Iter : TeammateHelper->MembersMap)
+		{
+			if (Iter.Value == TargetCharacterPtr)
+			{
+				return true;
+			}
+		}
+
+		if (TeammateHelper->OwnerPCPtr == TargetCharacterPtr)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 TPair<FVector, FVector> AHumanCharacter::GetCharacterViewInfo()
 {
 	FMinimalViewInfo DesiredView;
@@ -86,15 +111,9 @@ void AHumanCharacter::BeginPlay()
 
 	if (GetController()->IsA(AHumanPlayerController::StaticClass()))
 	{
-#if TESTHOLDDATA
-		TestCommand::AddPlayerCharacterTestDataImp(this);
-#endif
 	}
 	else if (GetController()->IsA(AHumanAIController::StaticClass()))
 	{
-#if TESTHOLDDATA
-		TestCommand::AddAICharacterTestDataImp(this);
-#endif
 	}
 }
 

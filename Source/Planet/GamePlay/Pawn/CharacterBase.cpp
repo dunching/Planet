@@ -30,7 +30,7 @@
 #include "TalentAllocationComponent.h"
 #include "GroupMnaggerComponent.h"
 #include "AssetRefMap.h"
-#include "../Controller/HumanControllerInterface.h"
+#include "HumanControllerInterface.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -122,6 +122,11 @@ UEquipmentElementComponent* ACharacterBase::GetEquipmentItemsComponent()
 UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()
 {
 	return TalentAllocationComponentPtr;
+}
+
+bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
+{
+	return false;
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

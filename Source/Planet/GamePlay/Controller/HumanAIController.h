@@ -66,6 +66,8 @@ protected:
 
 	virtual void OnPossess(APawn* InPawn)override;
 
+	virtual void OnUnPossess() override;
+
 	void OnTeamHelperChanged();
 
 	FTeammateOptionChangedDelegateContainer TeammateOptionChangedDelegateContainer;

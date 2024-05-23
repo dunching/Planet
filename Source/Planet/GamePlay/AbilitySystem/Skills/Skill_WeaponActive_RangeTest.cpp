@@ -5,8 +5,9 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "NiagaraComponent.h"
 #include "Components/PrimitiveComponent.h"
-#include "UObject/Class.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/SphereComponent.h"
+#include <GameFramework/ProjectileMovementComponent.h>
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
@@ -106,6 +107,44 @@ void USkill_WeaponActive_RangeTest::StartTasksLink()
 	}
 }
 
+void USkill_WeaponActive_RangeTest::OnProjectileBounce(
+	UPrimitiveComponent* OverlappedComponent,
+	AActor* OtherActor,
+	UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex,
+	bool bFromSweep,
+	const FHitResult& SweepResult
+)
+{
+	if (OtherActor && OtherActor->IsA(ACharacterBase::StaticClass()))
+	{
+		auto OtherCharacterPtr = Cast<ACharacterBase>(OtherActor);
+		if (CharacterPtr->IsTeammate(OtherCharacterPtr))
+		{
+			return;
+		}
+	}
+
+	FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
+
+	FGameplayEventData Payload;
+	Payload.TargetData.Add(GAEventData);
+
+	GAEventData->TargetActorAry.Empty();
+	GAEventData->TriggerCharacterPtr = CharacterPtr;
+	GAEventData->Data.ADDamage = Damage;
+
+	auto TargetCharacterPtr = Cast<ACharacterBase>(OtherActor);
+	if (TargetCharacterPtr)
+	{
+		GAEventData->TargetActorAry.Add(TargetCharacterPtr);
+	}
+
+	SendEvent(Payload);
+
+	OverlappedComponent->GetOwner()->Destroy();
+}
+
 void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_PickAxe::AttackEnd)
@@ -122,57 +161,14 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 
 void USkill_WeaponActive_RangeTest::MakeDamage()
 {
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
-
-	FCollisionShape  CollisionShape = FCollisionShape::MakeCapsule(45, 90);
-
-	FCollisionQueryParams CapsuleParams;
-	CapsuleParams.AddIgnoredActor(CharacterPtr);
-
-	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
-	if (GroupMnaggerComponent)
-	{
-		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper();
-		if (TeamsHelperSPtr)
-		{
-			for (auto Iter : TeamsHelperSPtr->MembersMap)
-			{
-				CapsuleParams.AddIgnoredActor(Iter.Value);
-			}
-		}
-	}
-
-	TArray<struct FHitResult> OutHits;
-	if (GetWorldImp()->SweepMultiByObjectType(
-		OutHits,
+	auto ProjectilePtr = GetWorld()->SpawnActor<ASkill_WeaponActive_RangeTest_Projectile>(
+		Skill_WeaponActive_RangeTest_ProjectileClass, 
 		CharacterPtr->GetActorLocation(),
-		CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
-		FQuat::Identity,
-		ObjectQueryParams,
-		CollisionShape,
-		CapsuleParams
-	))
+		CharacterPtr->GetActorRotation()
+		);
+	if (ProjectilePtr)
 	{
-		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
-
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(GAEventData);
-
-		GAEventData->TargetActorAry.Empty();
-		GAEventData->TriggerCharacterPtr = CharacterPtr;
-		GAEventData->Data.ADDamage = Damage;
-
-		for (auto Iter : OutHits)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
-			{
-				GAEventData->TargetActorAry.Add(TargetCharacterPtr);
-			}
-		}
-
-		SendEvent(Payload);
+		ProjectilePtr->CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnProjectileBounce);
 	}
 }
 

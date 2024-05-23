@@ -6,36 +6,32 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include <DrawDebugHelpers.h>
+#include "Components/SphereComponent.h"
 
 AProjectileBase::AProjectileBase(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
 {
-	SceneCompPtr = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComp"));
-	RootComponent = SceneCompPtr;
+    CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
+	RootComponent = CollisionComp;
 
     // Use a sphere as a simple collision representation
     StaticMeshCompPtr = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComp"));
-    StaticMeshCompPtr->SetCollisionProfileName(ProjecttileItem);
     StaticMeshCompPtr->SetSimulatePhysics(false);
     StaticMeshCompPtr->SetGenerateOverlapEvents(true);
-    StaticMeshCompPtr->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+    StaticMeshCompPtr->SetCollisionEnabled(ECollisionEnabled::NoCollision);
     StaticMeshCompPtr->SetMobility(EComponentMobility::Movable);
-
-    // Players can't walk on it
-    StaticMeshCompPtr->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-	StaticMeshCompPtr->CanCharacterStepUpOn = ECB_No;
-    StaticMeshCompPtr->SetupAttachment(SceneCompPtr);
+    StaticMeshCompPtr->SetupAttachment(CollisionComp);
 
     // Use a ProjectileMovementComponent to govern this projectile's movement
     ProjectileMovementCompPtr = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
-    ProjectileMovementCompPtr->UpdatedComponent = SceneCompPtr;
+    ProjectileMovementCompPtr->UpdatedComponent = CollisionComp;
     ProjectileMovementCompPtr->InitialSpeed = 10000.f;
     ProjectileMovementCompPtr->MaxSpeed = 10000.f;
     ProjectileMovementCompPtr->bRotationFollowsVelocity = true;
     ProjectileMovementCompPtr->bShouldBounce = true;
 
     // Die after 3 seconds by default
-    InitialLifeSpan = 3.0f;
+    InitialLifeSpan = 1.5f;
 }
 
 #ifdef WITH_EDITOR

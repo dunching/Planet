@@ -6,7 +6,7 @@
 #include "SceneObj.h"
 #include "ProjectileBase.generated.h"
 
-class UStaticMeshComponent;
+class USphereComponent;
 class USceneComponent;
 class UProjectileMovementComponent;
 
@@ -17,21 +17,21 @@ class PLANET_API AProjectileBase : public ASceneObj
 
 public:
 
-    AProjectileBase(const FObjectInitializer& ObjectInitializer);
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Projectile")
-		USceneComponent* SceneCompPtr = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Projectile")
-		UStaticMeshComponent* StaticMeshCompPtr = nullptr;
+	AProjectileBase(const FObjectInitializer& ObjectInitializer);
 
 #ifdef WITH_EDITOR
 	virtual void Tick(float DeltaSeconds)override;
 #endif
 
-protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Projectile")
+	USphereComponent* CollisionComp = nullptr;
 
-    UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")
-        UProjectileMovementComponent* ProjectileMovementCompPtr = nullptr;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Projectile")
+	UStaticMeshComponent* StaticMeshCompPtr = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")
+	UProjectileMovementComponent* ProjectileMovementCompPtr = nullptr;
+
+protected:
 
 };

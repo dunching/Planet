@@ -37,6 +37,8 @@ public:
 
 	UGroupMnaggerComponent* GetGroupMnaggerComponent();
 
+	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const override;
+
 protected:
 
 	virtual void BeginPlay() override;

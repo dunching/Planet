@@ -24,6 +24,7 @@
 #include "NavgationSubSysetem.h"
 #include "AssetRefMap.h"
 #include "FocusIcon.h"
+#include "TestCommand.h"
 
 AHumanPlayerController::AHumanPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -130,6 +131,10 @@ void AHumanPlayerController::OnPossess(APawn* InPawn)
 	{
 		if (InPawn && InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
+#if TESTHOLDDATA
+			TestCommand::AddPlayerCharacterTestDataImp(Cast<AHumanCharacter>(InPawn));
+#endif
+
 			auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupsHelper();
 			if (GroupsHelperSPtr)
 			{
