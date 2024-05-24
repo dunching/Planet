@@ -37,8 +37,6 @@ public:
 
 	virtual void ClearFocus(EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
 
-	virtual FPawnType* GetCharacter()override;
-
 protected:
 
 	virtual void BeginPlay() override;

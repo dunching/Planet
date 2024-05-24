@@ -31,6 +31,8 @@ void UTeamMatesList::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	HumanCharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
 	ResetUIByData();
 }
 
@@ -59,7 +61,7 @@ void UTeamMatesList::ResetUIByData()
 	auto GMCPtr = HumanCharacterPtr->GetGroupMnaggerComponent();
 
 	int32 CurrentMemberNum = 0;
-	auto MembersHelperSPtr = GMCPtr->GetTeamsHelper();
+	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
 	if (MembersHelperSPtr)
 	{
 		for (auto Iter : MembersHelperSPtr->MembersMap)

@@ -17,6 +17,8 @@ class UGroupMnaggerComponent;
 class UGourpmateUnit;
 class ACharacterBase;
 class AHumanCharacter;
+class UStateTreeComponent;
+class UStateTreeAIComponent;
 
 /**
  *
@@ -28,19 +30,19 @@ class PLANET_API AHumanAIController : public AGravityAIController, public IHuman
 
 public:
 
-	using FTeammateOptionChangedDelegateContainer =
+	using FTeamOptionChangedDelegate =
 		UGroupsManaggerSubSystem::FTeammateOptionChangedDelegateContainer::FCallbackHandleSPtr;
 
-	using FTeamHelperChangedDelegateContainer =
+	using FTeamHelperChangedDelegate =
 		UGroupMnaggerComponent::FTeamHelperChangedDelegateContainer::FCallbackHandleSPtr;
+
+	AHumanAIController(const FObjectInitializer& ObjectInitializer);
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
-
-	virtual FPawnType* GetCharacter()override;
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	AActor* GetTeamFocusEnemy() const;
@@ -68,10 +70,19 @@ protected:
 
 	virtual void OnUnPossess() override;
 
-	void OnTeamHelperChanged();
+	void OnGroupChanged();
 
-	FTeammateOptionChangedDelegateContainer TeammateOptionChangedDelegateContainer;
+	void OnTeamChanged();
 
-	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
+	void InitialCharacter();
+
+	FTeamOptionChangedDelegate TeammateOptionChangedDelegateContainer;
+
+	FTeamHelperChangedDelegate TeamHelperChangedDelegate;
+
+	FTeamHelperChangedDelegate GroupHelperChangedDelegate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UStateTreeComponent> StateTreeComponentPtr = nullptr;
 
 };

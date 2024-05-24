@@ -15,29 +15,29 @@ FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
 void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* PCPtr)
 {
-	GetGroupsHelper()->AddCharacter(PCPtr);
+	GetGroupHelper()->AddCharacter(PCPtr);
 }
 
 void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* PCPtr)
 {
-	GetGroupsHelper()->AddCharacter(PCPtr);
+	GetGroupHelper()->AddCharacter(PCPtr);
 }
 
 void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPCPtr)
 {
-	GroupHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetGroupsHelper();
+	GroupHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 
 	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 
 void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* OwnerPCPtr)
 {
-	TeamHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetTeamsHelper();
+	TeamHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupsHelper() 
+const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupHelper() 
 {
 	if (!GroupHelperSPtr)
 	{
@@ -49,7 +49,7 @@ const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComp
 	return GroupHelperSPtr;
 }
 
-const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamsHelper()
+const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
 {
 	if (!TeamHelperSPtr)
 	{

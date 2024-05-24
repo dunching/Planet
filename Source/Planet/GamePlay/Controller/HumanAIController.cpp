@@ -2,6 +2,9 @@
 #include "HumanAIController.h"
 
 #include <GameFramework/CharacterMovementComponent.h>
+#include "Components/StateTreeComponent.h"
+#include "Components/StateTreeAIComponent.h"
+#include <Kismet/GameplayStatics.h>
 
 #include "AIHumanInfo.h"
 #include "CharacterBase.h"
@@ -13,6 +16,12 @@
 #include "HoldingItemsComponent.h"
 #include "HumanPlayerController.h"
 #include "TestCommand.h"
+
+AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
+	Super()
+{
+	StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
+}
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 {
@@ -29,19 +38,14 @@ UGroupMnaggerComponent* AHumanAIController::GetGroupMnaggerComponent()const
 
 UGourpmateUnit* AHumanAIController::GetGourpMateUnit()
 {
-	return Cast<FPawnType>(GetPawn())->GetGourpMateUnit(); 
-}
-
-AHumanAIController::FPawnType* AHumanAIController::GetCharacter()
-{
-	return Cast<FPawnType>(GetPawn());
+	return  GetPawn<FPawnType>()->GetGourpMateUnit();
 }
 
 AActor* AHumanAIController::GetTeamFocusEnemy() const
 {
-	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamsHelper())
+	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
 	{
-		auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamsHelper()->OwnerPCPtr->GetController<AHumanPlayerController>();
+		auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPCPtr->GetController<AHumanPlayerController>();
 		if (LeaderPCPtr)
 		{
 			return LeaderPCPtr->GetFocusActor();
@@ -79,10 +83,68 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn); 
 
-	TeamHelperChangedDelegateContainer =
-		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamHelperChanged, this));
+	InitialCharacter();
 
-	auto CharacterPtr = Cast<FPawnType>(InPawn);
+	GroupHelperChangedDelegate =
+		GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
+	OnGroupChanged();
+
+	TeamHelperChangedDelegate =
+		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+	OnTeamChanged();
+
+	if (StateTreeComponentPtr && !StateTreeComponentPtr->IsRunning())
+	{
+		StateTreeComponentPtr->StartLogic(); 
+	}
+}
+
+void AHumanAIController::OnUnPossess()
+{
+	if (TeammateOptionChangedDelegateContainer)
+	{
+		TeammateOptionChangedDelegateContainer->UnBindCallback();
+	}
+
+	if (TeamHelperChangedDelegate)
+	{
+		TeamHelperChangedDelegate->UnBindCallback();
+	}
+
+	Super::OnUnPossess();
+}
+
+void AHumanAIController::OnGroupChanged()
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (CharacterPtr)
+	{
+		SetCampType(
+			CharacterPtr->IsTeammate(Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0))) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+		);
+	}
+}
+
+void AHumanAIController::OnTeamChanged()
+{
+	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
+	if (TeamsHelper)
+	{
+		TeammateOptionChangedDelegateContainer = TeamsHelper->TeammateOptionChanged.AddCallback(
+			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
+			));
+
+		auto PlayerPCPtr = Cast<AHumanPlayerController>(TeamsHelper->OwnerPCPtr);
+		if (PlayerPCPtr)
+		{
+			OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPCPtr);
+		}
+	}
+}
+
+void AHumanAIController::InitialCharacter()
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
 #if TESTHOLDDATA
@@ -122,40 +184,6 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 
 				EICPtr->ActiveWeapon(EWeaponSocket::kMain);
 			}
-		}
-	}
-
-	SetCampType(ECharacterCampType::kEnemy);
-}
-
-void AHumanAIController::OnUnPossess()
-{
-	if (TeammateOptionChangedDelegateContainer)
-	{
-		TeammateOptionChangedDelegateContainer->UnBindCallback();
-	}
-
-	if (TeamHelperChangedDelegateContainer)
-	{
-		TeamHelperChangedDelegateContainer->UnBindCallback();
-	}
-
-	Super::OnUnPossess();
-}
-
-void AHumanAIController::OnTeamHelperChanged()
-{
-	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamsHelper();
-	if (TeamsHelper)
-	{
-		TeammateOptionChangedDelegateContainer = TeamsHelper->TeammateOptionChanged.AddCallback(
-			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
-			));
-
-		auto PlayerPCPtr = Cast<AHumanPlayerController>(TeamsHelper->OwnerPCPtr);
-		if (PlayerPCPtr)
-		{
-			OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPCPtr);
 		}
 	}
 }

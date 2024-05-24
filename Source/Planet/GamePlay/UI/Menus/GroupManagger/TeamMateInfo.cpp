@@ -149,7 +149,7 @@ void UTeamMateInfo::AddMember()
 	}
 	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
 
-	auto TeamsHelperSPtr = GMCPtr->GetTeamsHelper();
+	auto TeamsHelperSPtr = GMCPtr->GetTeamHelper();
 	if (TeamsHelperSPtr)
 	{
 		TeamsHelperSPtr->AddCharacter(GroupMateUnitPtr, GroupMateUnitPtr->PCPtr);

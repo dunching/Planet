@@ -64,7 +64,23 @@ bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 	}
 
 	{
-		auto TeammateHelper = GroupMnaggerComponentPtr->GetTeamsHelper();
+		auto GroupHelper = GroupMnaggerComponentPtr->GetGroupHelper();
+		for (auto Iter : GroupHelper->MembersSet)
+		{
+			if (Iter == TargetCharacterPtr)
+			{
+				return true;
+			}
+		}
+
+		if (GroupHelper->OwnerPCPtr == TargetCharacterPtr)
+		{
+			return true;
+		}
+	}
+
+	{
+		auto TeammateHelper = GroupMnaggerComponentPtr->GetTeamHelper();
 		for (auto Iter : TeammateHelper->MembersMap)
 		{
 			if (Iter.Value == TargetCharacterPtr)
@@ -78,6 +94,7 @@ bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 			return true;
 		}
 	}
+
 	return false;
 }
 

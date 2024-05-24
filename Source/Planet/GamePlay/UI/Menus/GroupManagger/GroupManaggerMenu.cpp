@@ -57,7 +57,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 
 	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
 
-	auto GroupsHelperSPtr = GMCPtr->GetGroupsHelper();
+	auto GroupsHelperSPtr = GMCPtr->GetGroupHelper();
 	if (GroupsHelperSPtr)
 	{
 		for (auto Iter : GroupsHelperSPtr->MembersSet)

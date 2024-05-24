@@ -52,7 +52,7 @@ protected:
 };
 
 UCLASS()
-class PLANET_API UTeanMatesList1 : public UTeamMatesList
+class PLANET_API UTeanMatesList : public UTeamMatesList
 {
 	GENERATED_BODY()
 };

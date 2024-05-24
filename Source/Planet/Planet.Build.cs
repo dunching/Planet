@@ -93,30 +93,33 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Tools/ThreadPoolHelper");
 
         PrivateDependencyModuleNames.AddRange(new string[] {
+            "Core",
+            "CoreUObject",
+            "Engine",
+            "InputCore",
+            "SlateCore",
+            "Slate",
+            "Niagara",
+            "UMG",
+
+            "EnhancedInput" ,
+            "GameplayAbilities",
+            "GameplayTags",
+            "GameplayTasks",
+
+            "AIModule",
+            "GameplayStateTreeModule",
+            "StateTreeModule",
+            "NavigationSystem",
+            "ChaosVehicles",
+        });
+
+        PublicDependencyModuleNames.AddRange(new string[] {
             "VoxelCore",
             "VoxelGraphCore",
             "Gravity",
             "MMT",
             "FlyingNavSystem" ,
-
-            "EnhancedInput" ,
-            "GameplayAbilities",
-            "GameplayTags",
-            "GameplayTasks"
-        });
-
-        PublicDependencyModuleNames.AddRange(new string[] {
-			"Core",
-			"CoreUObject",
-			"Engine", 
-			"InputCore",
-			"SlateCore",
-            "Slate", 
-			"Niagara", 
-			"UMG", 
-			"AIModule",
-			"NavigationSystem",
-            "ChaosVehicles",
         });
     }
 }

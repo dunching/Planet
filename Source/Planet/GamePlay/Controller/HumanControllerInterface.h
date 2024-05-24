@@ -32,8 +32,6 @@ public:
 
 	virtual UGourpmateUnit* GetGourpMateUnit() = 0;
 
-	virtual FPawnType* GetCharacter() = 0;
-
 protected:
 
 private:

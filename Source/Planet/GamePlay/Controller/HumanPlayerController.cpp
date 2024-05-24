@@ -88,11 +88,6 @@ void AHumanPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
 	}
 }
 
-AHumanPlayerController::FPawnType* AHumanPlayerController::GetCharacter()
-{
-	return Cast<FPawnType>(GetPawn());
-}
-
 void AHumanPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -135,7 +130,7 @@ void AHumanPlayerController::OnPossess(APawn* InPawn)
 			TestCommand::AddPlayerCharacterTestDataImp(Cast<AHumanCharacter>(InPawn));
 #endif
 
-			auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupsHelper();
+			auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupHelper();
 			if (GroupsHelperSPtr)
 			{
 				DelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
@@ -201,7 +196,7 @@ void AHumanPlayerController::OnCharacterGroupMateChanged(
 	{
 		if (LeaderPCPtr)
 		{
-			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupsHelper()->OwnerPCPtr == GetPawn<FPawnType>())
+			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPCPtr == GetPawn<FPawnType>())
 			{
 				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
 				if (AIPCPtr)

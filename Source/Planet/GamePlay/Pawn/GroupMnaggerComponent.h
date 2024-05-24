@@ -31,9 +31,9 @@ public:
 
 	void OnAddToNewTeam(FPawnType* OwnerPCPtr);
 
-	const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& GetGroupsHelper();
+	const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& GetGroupHelper();
 
-	const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& GetTeamsHelper();
+	const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& GetTeamHelper();
 
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 

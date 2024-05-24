@@ -181,7 +181,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamsHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
+			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
 		}
 	}
 
@@ -190,7 +190,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamsHelper()->SwitchTeammateOption(ETeammateOption::kAssistance);
+			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kAssistance);
 		}
 	}
 

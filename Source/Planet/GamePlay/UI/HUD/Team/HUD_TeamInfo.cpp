@@ -67,7 +67,7 @@ void UHUD_TeamInfo::ResetUIByData()
 
 	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
 
-	auto MembersHelperSPtr = GMCPtr->GetTeamsHelper();
+	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
 	if (MembersHelperSPtr)
 	{
 		for (auto Iter : MembersHelperSPtr->MembersMap)
@@ -86,7 +86,7 @@ void UHUD_TeamInfo::ResetUIByData()
 		std::bind(&ThisClass::OnTeammateOptionChanged, this, std::placeholders::_1, std::placeholders::_2
 		));
 
-	OnTeammateOptionChanged(GMCPtr->GetTeamsHelper()->GetTeammateOption(), GMCPtr->GetTeamsHelper()->OwnerPCPtr);
+	OnTeammateOptionChanged(GMCPtr->GetTeamHelper()->GetTeammateOption(), GMCPtr->GetTeamHelper()->OwnerPCPtr);
 }
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(

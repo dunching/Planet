@@ -26,7 +26,7 @@
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
 
-namespace Skill_PickAxe
+namespace Skill_WeaponActive_PickAxe
 {
 	const FName Hit = TEXT("Hit");
 
@@ -138,7 +138,7 @@ void USkill_WeaponActive_PickAxe::StartTasksLink()
 
 void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 {
-	if (NotifyName == Skill_PickAxe::AttackEnd)
+	if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
 	{
 		MakeDamage();
 
@@ -163,7 +163,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
 	if (GroupMnaggerComponent)
 	{
-		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper();
+		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
 		if (TeamsHelperSPtr)
 		{
 			for (auto Iter : TeamsHelperSPtr->MembersMap)

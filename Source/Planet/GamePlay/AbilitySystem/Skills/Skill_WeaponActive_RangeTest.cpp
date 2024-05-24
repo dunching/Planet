@@ -28,7 +28,7 @@
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
 
-namespace Skill_PickAxe
+namespace Skill_WeaponActive_RangeTest
 {
 	const FName Hit = TEXT("Hit");
 
@@ -147,7 +147,7 @@ void USkill_WeaponActive_RangeTest::OnProjectileBounce(
 
 void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 {
-	if (NotifyName == Skill_PickAxe::AttackEnd)
+	if (NotifyName == Skill_WeaponActive_RangeTest::AttackEnd)
 	{
 		MakeDamage();
 

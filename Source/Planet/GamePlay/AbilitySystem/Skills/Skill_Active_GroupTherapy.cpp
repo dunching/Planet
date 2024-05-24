@@ -95,7 +95,7 @@ void USkill_Active_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
 		auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
 		if (GroupMnaggerComponent)
 		{
-			auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamsHelper(); 
+			auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper(); 
 			if (TeamsHelperSPtr)
 			{
 				for (auto Iter : TeamsHelperSPtr->MembersMap)
