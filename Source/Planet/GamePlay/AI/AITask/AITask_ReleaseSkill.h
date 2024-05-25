@@ -42,11 +42,11 @@ protected:
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
-	FDelegateHandle OnOnGameplayAbilityEndedHandle;
+	bool ReleasingSKill();
 
-	FSkillsSocketInfo CurrentActivedSkill;
+	TMap<FGameplayAbilitySpecHandle, FSkillsSocketInfo>ReleasingSkillMap;
 
-	bool bIsReleasingSkill = false;
+	TMap<FGameplayAbilitySpecHandle, FDelegateHandle>ReleasingSkillDelegateMap;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

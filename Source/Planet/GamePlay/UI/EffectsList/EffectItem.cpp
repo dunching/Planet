@@ -15,8 +15,6 @@ namespace EffectItem
 
 	const FName Icon = TEXT("Icon");
 
-	const FName Inversion = TEXT("Inversion");
-
 	const FName TextCanvas = TEXT("TextCanvas");
 }
 
@@ -64,7 +62,6 @@ void UEffectItem::SetPercent(bool bIsInversion, float Percent)
 	if (MIDPtr)
 	{
 		MIDPtr->SetScalarParameterValue(EffectItem::Percent, Percent);
-		MIDPtr->SetScalarParameterValue(EffectItem::Inversion, bIsInversion);
 	}
 }
 

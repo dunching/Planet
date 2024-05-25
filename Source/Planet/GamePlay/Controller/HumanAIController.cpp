@@ -20,7 +20,8 @@
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super()
 {
-	StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
+	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
+	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
 }
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
@@ -63,6 +64,11 @@ void AHumanAIController::OnTeammateOptionChangedImp(
 	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);
 }
 
+void AHumanAIController::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+}
+
 void AHumanAIController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -81,7 +87,7 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
-	Super::OnPossess(InPawn); 
+	Super::OnPossess(InPawn);
 
 	InitialCharacter();
 
@@ -93,9 +99,9 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
 	OnTeamChanged();
 
-	if (StateTreeComponentPtr && !StateTreeComponentPtr->IsRunning())
+	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
 	{
-		StateTreeComponentPtr->StartLogic(); 
+		StateTreeAIComponentPtr->StartLogic();
 	}
 }
 

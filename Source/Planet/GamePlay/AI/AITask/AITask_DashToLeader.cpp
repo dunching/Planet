@@ -54,6 +54,14 @@ void UAITask_DashToLeader::ConditionalPerformMove()
 
 bool UAITask_DashToLeader::WasMoveSuccessful() const
 {
+// 	auto PawnPtr = ControllerPtr->GetPawn();
+// 	if (PawnPtr)
+// 	{
+// 		auto Offset = GoalLocation - PawnPtr->GetActorLocation();
+// 
+// 		return Offset.IsNearlyZero();
+// 	}
+
 	return LerpTime < LerpDuration;
 }
 

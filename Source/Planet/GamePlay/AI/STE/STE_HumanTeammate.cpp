@@ -1,6 +1,8 @@
 
 #include "STE_HumanTeammate.h"
 
+#include <NavigationSystem.h>
+
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanAIController.h"
@@ -52,6 +54,8 @@ void USTE_HumanTeammate::OnTeamChanged()
 	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 	if (TeamHelperSPtr)
 	{
+		TargetCharacterPtr = TeamHelperSPtr->OwnerPCPtr;
+
 		TeammateOptionChangedDelegate = TeamHelperSPtr->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeamOptionChanged, this, std::placeholders::_1)
 		);

@@ -439,7 +439,7 @@ void UEquipmentElementComponent::ActiveSkill(const FSkillsSocketInfo& SkillsSock
 			ASCPtr->TriggerAbilityFromGameplayEvent(
 				SkillsSocketInfo.Handle,
 				ASCPtr->AbilityActorInfo.Get(),
-				FGameplayTag(),
+				FGameplayTag::EmptyTag,
 				&Payload,
 				*ASCPtr
 			);

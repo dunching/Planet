@@ -38,19 +38,14 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	AHumanCharacter* HumanCharacterPtr = nullptr;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	AHumanCharacter* TargetCharacterPtr = nullptr;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
 
 	TCallbackHandleContainer<void(ETeammateOption, AHumanCharacter*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
 	
 	TCallbackHandleContainer<void()>::FCallbackHandleSPtr TeammateChangedDelegate;
-
-};
-
-UCLASS(Blueprintable)
-class PLANET_API USTE_Teammate : public USTE_HumanTeammate
-{
-	GENERATED_BODY()
-public:
 
 };

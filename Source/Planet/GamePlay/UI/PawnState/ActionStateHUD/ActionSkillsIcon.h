@@ -47,10 +47,13 @@ protected:
 	void SetLevel(int32 NewNum);
 
 	void SetRemainingCooldown(
-		bool bIsReady,
 		bool bCooldownIsReady,
 		float RemainingTime,
 		float Percent
+	);
+
+	void SetCanRelease(
+		bool bIsReady_In
 	);
 
 	void SetItemType();

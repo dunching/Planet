@@ -29,9 +29,9 @@
 
 namespace ActionSkillsIcon
 {
-	const FName Content = TEXT("Content");
+	const FName Percent = TEXT("Percent");
 
-	const FName HighlightBorder = TEXT("HighlightBorder");
+	const FName Content = TEXT("Content");
 
 	const FName StateOverlap = TEXT("StateOverlap");
 
@@ -41,7 +41,7 @@ namespace ActionSkillsIcon
 
 	const FName CooldownText = TEXT("CooldownText");
 
-	const FName DisableMask = TEXT("DisableMask");
+	const FName CanRelease = TEXT("CanRelease");
 }
 
 UActionSkillsIcon::UActionSkillsIcon(const FObjectInitializer& ObjectInitializer) :
@@ -71,53 +71,10 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 		ToolSPtr = Cast<USkillUnit>(BasicUnitPtr);
 		SetLevel(ToolSPtr->Level);
 		SetItemType();
+	}
 
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::HighlightBorder));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(ActionSkillsIcon::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ActionSkillsIcon::StateOverlap));
-			if (UIPtr)
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-	}
-	else
-	{
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::HighlightBorder));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(ActionSkillsIcon::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ActionSkillsIcon::StateOverlap));
-			if (UIPtr)
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-	}
+	SetCanRelease(true);
+	SetRemainingCooldown(true, 0.f, 0.f);
 }
 
 void UActionSkillsIcon::UpdateSkillState()
@@ -146,11 +103,11 @@ void UActionSkillsIcon::UpdateSkillState()
 	float RemainingCooldown = 0.f;
 	float RemainingCooldownPercent = 0.f;
 
-	auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-
 	auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+	SetCanRelease(bIsReady);
 
-	SetRemainingCooldown(bIsReady, bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
+	auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+	SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 }
 
 void UActionSkillsIcon::SetLevel(int32 NewNum)
@@ -158,55 +115,11 @@ void UActionSkillsIcon::SetLevel(int32 NewNum)
 }
 
 void UActionSkillsIcon::SetRemainingCooldown(
-	bool bIsReady_In,
 	bool bCooldownIsReady,
 	float RemainingTime,
 	float Percent
 )
 {
-	bool bIsReady = bIsReady_In && bCooldownIsReady;
-	if (bIsReady)
-	{
-		if (bIsReady_Previous)
-		{
-			return;
-		}
-		else
-		{
-			PlaySkillIsReady();
-
-			{
-				auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ActionSkillsIcon::StateOverlap));
-				if (UIPtr)
-				{
-					UIPtr->SetVisibility(ESlateVisibility::Hidden);
-				}
-			}
-		}
-	}
-
-	bIsReady_Previous = bIsReady;
-
-	if (bIsReady_In)
-	{
-		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ActionSkillsIcon::DisableMask));
-			if (UIPtr)
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-	}
-	else
-	{
-		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ActionSkillsIcon::DisableMask));
-			if (UIPtr)
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-	}
 
 	if (bCooldownIsReady)
 	{
@@ -227,18 +140,61 @@ void UActionSkillsIcon::SetRemainingCooldown(
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
+	}
+	{
+		auto UIPtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::CooldownProgress));
+		if (!UIPtr)
 		{
-			auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(ActionSkillsIcon::CooldownProgress));
+			return;
+		}
+		auto MIDPtr = UIPtr->GetDynamicMaterial();
+		if (MIDPtr)
+		{
+			MIDPtr->SetScalarParameterValue(ActionSkillsIcon::Percent, Percent);
+		}
+	}
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(ActionSkillsIcon::CooldownText));
+		if (UIPtr)
+		{
+			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%.1lf"), RemainingTime)));
+		}
+	}
+}
+
+void UActionSkillsIcon::SetCanRelease(bool bIsReady_In)
+{
+	if (bIsReady_In)
+	{
+		if (bIsReady_Previous)
+		{
+			return;
+		}
+		else
+		{
+			PlaySkillIsReady();
+		}
+	}
+
+	bIsReady_Previous = bIsReady_In;
+
+	if (bIsReady_In)
+	{
+		{
+			auto UIPtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::CanRelease));
 			if (UIPtr)
 			{
-				UIPtr->SetPercent(Percent);
+				UIPtr->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
+	}
+	else
+	{
 		{
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(ActionSkillsIcon::CooldownText));
+			auto UIPtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::CanRelease));
 			if (UIPtr)
 			{
-				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%.1lf"), RemainingTime)));
+				UIPtr->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
 	}

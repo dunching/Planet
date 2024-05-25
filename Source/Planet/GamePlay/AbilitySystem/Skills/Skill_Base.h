@@ -84,9 +84,6 @@ public:
 
 	void AddCooldownConsumeTime(float NewTime);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Requirement")
-	TArray<TSubclassOf<UBasicUnit>>RequirementUnitAry;
-
 	mutable FActiveGameplayEffectHandle CoolDownGEHanlde;
 
 protected:

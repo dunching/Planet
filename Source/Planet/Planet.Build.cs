@@ -107,8 +107,8 @@ public class Planet : ModuleRules
             "GameplayTags",
             "GameplayTasks",
 
-            "AIModule",
             "GameplayStateTreeModule",
+            "AIModule",
             "StateTreeModule",
             "NavigationSystem",
             "ChaosVehicles",
