@@ -55,9 +55,14 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 
+	UPROPERTY(Transient)
+	bool bIsFinished = false;
+
 	TSharedPtr<FEnvQueryResult> ResultSPtr;
 
 	void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result);
+
+	void Reset();
 
 };
 

@@ -8,6 +8,7 @@
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
 #include "STE_Human.h"
+#include "Planet.h"
 
 namespace STT_RunEQS
 {
@@ -16,7 +17,7 @@ namespace STT_RunEQS
 	FName Donut_OuterRadius = TEXT("Donut.OuterRadius");
 }
 
-FSTT_RunEQS::FSTT_RunEQS():
+FSTT_RunEQS::FSTT_RunEQS() :
 	Super()
 {
 }
@@ -54,33 +55,37 @@ void FSTT_RunEQS::ExitState(
 	if (QueryManager)
 	{
 		QueryManager->AbortQuery(InstanceData.RequestID);
-		InstanceData.RequestID = 0;
-		InstanceData.ResultSPtr.Reset();
+		InstanceData.Reset();
 	}
 }
 
 EStateTreeRunStatus FSTT_RunEQS::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-	) const
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	const bool bValid = (InstanceData.RequestID >= 0);
-	if (InstanceData.ResultSPtr && bValid)
+	if (InstanceData.bIsFinished)
 	{
-		bool bSuccess = InstanceData.ResultSPtr->IsSuccessful() && (InstanceData.ResultSPtr->Items.Num() >= 1);
-		if (bSuccess)
+		if (InstanceData.ResultSPtr)
 		{
-			InstanceData.Location = InstanceData.Location;
+			bool bSuccess = InstanceData.ResultSPtr->IsSuccessful() && (InstanceData.ResultSPtr->Items.Num() >= 1);
+			if (bSuccess)
+			{
+				InstanceData.GloabVariable->Location = InstanceData.ResultSPtr->GetItemAsLocation(0);
+				InstanceData.Location = InstanceData.GloabVariable->Location;
 
-			return EStateTreeRunStatus::Succeeded;
+#if WITH_EDITOR
+				DrawDebugSphere(GetWorldImp(), InstanceData.Location, 20, 20, FColor::Yellow, false, 5);
+#endif
+
+				return EStateTreeRunStatus::Succeeded;
+			}
 		}
-		else
-		{
-			return EStateTreeRunStatus::Failed;
-		}
+		return EStateTreeRunStatus::Failed;
 	}
+
 	return Super::Tick(Context, DeltaTime);
 }
 
@@ -92,7 +97,8 @@ EStateTreeRunStatus FSTT_RunEQS::PerformMoveTask(FStateTreeExecutionContext& Con
 	{
 		FEnvQueryRequest QueryRequest(InstanceData.QueryTemplate, InstanceData.CharacterPtr);
 
-		QueryRequest.SetIntParam(STT_RunEQS::Donut_OuterRadius, InstanceData.Donut_OuterRadius);
+		// SetIntParam <-这是在干啥？
+		QueryRequest.SetFloatParam(STT_RunEQS::Donut_OuterRadius, InstanceData.Donut_OuterRadius);
 
 		auto QueryFinishedDelegate = FQueryFinishedSignature::CreateRaw(&InstanceData, &FInstanceDataType::OnQueryFinished);
 		InstanceData.RequestID = QueryRequest.Execute(InstanceData.RunMode, QueryFinishedDelegate);
@@ -104,15 +110,19 @@ EStateTreeRunStatus FSTT_RunEQS::PerformMoveTask(FStateTreeExecutionContext& Con
 
 void FStateTreeRunEQSTaskInstanceData::OnQueryFinished(TSharedPtr<FEnvQueryResult> Result)
 {
+	bIsFinished = true;
+
 	if (Result->IsAborted())
 	{
 		return;
 	}
 
-	bool bSuccess = Result->IsSuccessful() && (Result->Items.Num() >= 1);
-	if (bSuccess)
-	{
-		GloabVariable->Location = Result->GetItemAsLocation(0);
-		ResultSPtr = Result;
-	}
+	ResultSPtr = Result;
+}
+
+void FStateTreeRunEQSTaskInstanceData::Reset()
+{
+	RequestID = 0;
+	bIsFinished = false;
+	ResultSPtr.Reset();
 }

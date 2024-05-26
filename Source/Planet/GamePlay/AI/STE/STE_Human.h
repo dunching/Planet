@@ -57,6 +57,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	AHumanCharacter* TargetCharacterPtr = nullptr;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	int32 AttackDistance = 75;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanCharacter* HumanCharacterPtr = nullptr;
 
