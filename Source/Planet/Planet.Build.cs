@@ -16,11 +16,6 @@ public class Planet : ModuleRules
         {
         }
 
-        if (Target.bBuildEditor == true)
-        {
-            PrivateDependencyModuleNames.Add("UnrealEd");
-        }
-
         CppStandard = CppStandardVersion.Cpp20;
         bUseRTTI = true;
 
@@ -31,7 +26,9 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AI");
         PublicIncludePaths.Add("Planet/GamePlay/AI/AITask");
-        PublicIncludePaths.Add("Planet/GamePlay/AI/BTTask");
+        PublicIncludePaths.Add("Planet/GamePlay/AI/EQS");
+        PublicIncludePaths.Add("Planet/GamePlay/AI/STE");
+        PublicIncludePaths.Add("Planet/GamePlay/AI/STT");
         PublicIncludePaths.Add("Planet/GamePlay/Navgation");
         PublicIncludePaths.Add("Planet/GamePlay/GroupsManagger");
         PublicIncludePaths.Add("Planet/GamePlay/SPlineActor");
@@ -91,6 +88,11 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Library");
         PublicIncludePaths.Add("Planet/Tools");
         PublicIncludePaths.Add("Planet/Tools/ThreadPoolHelper");
+
+        if (Target.bBuildEditor == true)
+        {
+            PrivateDependencyModuleNames.Add("UnrealEd");
+        }
 
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Core",

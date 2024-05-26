@@ -1,5 +1,5 @@
 
-#include "STE_HumanTeammate.h"
+#include "STE_Human.h"
 
 #include <NavigationSystem.h>
 
@@ -7,9 +7,11 @@
 #include "GroupMnaggerComponent.h"
 #include "HumanAIController.h"
 
-void USTE_HumanTeammate::TreeStart(FStateTreeExecutionContext& Context)
+void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 {
 	Super::TreeStart(Context);
+
+	GloabVariable = NewObject<UGloabVariable>();
 
 	if (HumanAIControllerPtr)
 	{
@@ -24,7 +26,7 @@ void USTE_HumanTeammate::TreeStart(FStateTreeExecutionContext& Context)
 	}
 }
 
-void USTE_HumanTeammate::TreeStop(FStateTreeExecutionContext& Context)
+void USTE_Human::TreeStop(FStateTreeExecutionContext& Context)
 {
 	if (TeammateOptionChangedDelegate)
 	{
@@ -39,17 +41,17 @@ void USTE_HumanTeammate::TreeStop(FStateTreeExecutionContext& Context)
 	Super::TreeStop(Context);
 }
 
-void USTE_HumanTeammate::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
+void USTE_Human::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
 	Super::Tick(Context, DeltaTime);
 }
 
-void USTE_HumanTeammate::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
+void USTE_Human::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 {
 	TeammateOption = NewTeammateOption;
 }
 
-void USTE_HumanTeammate::OnTeamChanged()
+void USTE_Human::OnTeamChanged()
 {
 	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 	if (TeamHelperSPtr)

@@ -8,6 +8,10 @@
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/Character.h>
 
+#include "HumanCharacter.h"
+#include "HumanPlayerController.h"
+#include "HumanAIController.h"
+
 void UEQC_FindTeammate::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryContextData& ContextData) const
 {
 	UObject* QuerierObject = QueryInstance.Owner.Get();
@@ -16,17 +20,32 @@ void UEQC_FindTeammate::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQue
 		return;
 	}
 
-	// NOTE: QuerierActor is redundant with QuerierObject and should be removed in the future.  It's here for now for
-	// backwards compatibility.
-	AActor* QuerierActor = Cast<AActor>(QuerierObject);
-
-	AActor* ResultingActor = nullptr;
-	
-	ResultingActor = UGameplayStatics::GetPlayerCharacter(this, 0);
-
-	if (ResultingActor)
+#if WITH_EDITOR
+	if (GEditor->IsPlayingSessionInEditor())
 	{
-		UEnvQueryItemType_Actor::SetContextHelper(ContextData, ResultingActor);
+	}
+	else
+	{
+		TArray<AActor*>ResutAry;
+		UGameplayStatics::GetAllActorsOfClass(this, AHumanCharacter::StaticClass(), ResutAry);
+
+		if (ResutAry.IsValidIndex(0))
+		{
+			auto ResultingActor = ResutAry[0];
+			UEnvQueryItemType_Actor::SetContextHelper(ContextData, ResultingActor);
+		}
+		return;
+	}
+#endif
+	auto CharacterPtr = Cast<AHumanCharacter>(QuerierObject);
+
+	if (CharacterPtr)
+	{
+		auto PCPtr = CharacterPtr->GetController<AHumanAIController>();
+		if (PCPtr)
+		{
+			UEnvQueryItemType_Actor::SetContextHelper(ContextData, PCPtr->GetTeamFocusEnemy());
+		}
 	}
 }
 

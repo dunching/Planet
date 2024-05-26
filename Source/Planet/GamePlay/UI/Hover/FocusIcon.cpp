@@ -22,6 +22,7 @@ void UFocusIcon::NativeConstruct()
 	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(
 		FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition)
 	);
+	ResetPosition(0.f);
 }
 
 void UFocusIcon::NativeDestruct()

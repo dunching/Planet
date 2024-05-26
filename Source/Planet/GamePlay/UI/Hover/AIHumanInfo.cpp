@@ -43,6 +43,7 @@ void UAIHumanInfo::NativeConstruct()
 	}
 
 	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
+	ResetPosition(0.f);
 }
 
 void UAIHumanInfo::NativeDestruct()

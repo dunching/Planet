@@ -9,15 +9,29 @@
 
 #include "GenerateType.h"
 
-#include "STE_HumanTeammate.generated.h"
+#include "STE_Human.generated.h"
 
 class AHumanCharacter;
 class AHumanAIController;
 
+
 UCLASS(Blueprintable)
-class PLANET_API USTE_HumanTeammate : public UStateTreeEvaluatorBlueprintBase
+class PLANET_API UGloabVariable : public UObject
 {
 	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	FVector Location = FVector::ZeroVector;
+
+};
+
+UCLASS(Blueprintable)
+class PLANET_API USTE_Human : public UStateTreeEvaluatorBlueprintBase
+{
+	GENERATED_BODY()
+
 public:
 
 protected:
@@ -33,13 +47,18 @@ protected:
 	void OnTeamChanged();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	UGloabVariable* GloabVariable = nullptr;
+
+public:
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kFollow;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	AHumanCharacter* HumanCharacterPtr = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	AHumanCharacter* TargetCharacterPtr = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
+	AHumanCharacter* HumanCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
