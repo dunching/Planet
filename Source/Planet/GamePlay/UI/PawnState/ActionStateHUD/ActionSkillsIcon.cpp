@@ -86,10 +86,14 @@ void UActionSkillsIcon::UpdateSkillState()
 	}
 
 	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
-	const auto Ref = EICPtr->FindSkill(IconSocket);
+	const auto SkillSocketInfoSPtr = EICPtr->FindSkill(IconSocket);
+	if (!SkillSocketInfoSPtr)
+	{
+		return;
+	}
 
 	auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-	auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Ref->Handle);
+	auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(SkillSocketInfoSPtr->Handle);
 	if (!GameplayAbilitySpecPtr)
 	{
 		return;

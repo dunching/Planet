@@ -30,8 +30,6 @@ class UWeaponUnit;
 
 struct FSkillSocketInfo
 {
-	FKey Key;
-
 	FGameplayTag SkillSocket;
 
 	USkillUnit* SkillUnit = nullptr;

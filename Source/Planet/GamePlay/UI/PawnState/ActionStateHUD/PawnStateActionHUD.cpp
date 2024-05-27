@@ -238,52 +238,41 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
 
 	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 
+	TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
+	TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
 	switch (WeaponSocket)
 	{
 	case EWeaponSocket::kMain:
 	{
-		TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfo;
-		TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfo;
-		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfo, SecondWeaponSocketInfo);
-		{
-			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
-			if (IconPtr)
-			{
-				IconPtr->ResetToolUIByData(FirstWeaponSocketInfo->WeaponUnitPtr);
-			}
-		}
-
-		{
-			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
-			if (IconPtr)
-			{
-				IconPtr->ResetToolUIByData(SecondWeaponSocketInfo->WeaponUnitPtr);
-			}
-		}
+		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	break;
 	case EWeaponSocket::kSecondary:
 	{
-		TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfo;
-		TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfo;
-		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfo, SecondWeaponSocketInfo);
-		{
-			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
-			if (IconPtr)
-			{
-				IconPtr->ResetToolUIByData(SecondWeaponSocketInfo->WeaponUnitPtr);
-			}
-		}
-
-		{
-			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
-			if (IconPtr)
-			{
-				IconPtr->ResetToolUIByData(FirstWeaponSocketInfo->WeaponUnitPtr);
-			}
-		}
+		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
 	}
 	break;
 	}
-
+	{
+		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
+		if (IconPtr)
+		{
+			IconPtr->ResetToolUIByData(
+				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->WeaponUnitPtr ?
+				FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill :
+				nullptr
+			);
+		}
+	}
+	{
+		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
+		if (IconPtr)
+		{
+			IconPtr->ResetToolUIByData(
+				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->WeaponUnitPtr ?
+				SecondWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill : 
+				nullptr
+			);
+		}
+	}
 }

@@ -83,6 +83,8 @@ namespace HumanProcessor
 		);
 
 		SwitchCurrentWeapon();
+
+		AddOrRemoveUseMenuItemEvent(true);
 	}
 
 	void FHumanRegularProcessor::SwitchCurrentWeapon()
@@ -99,6 +101,8 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::QuitAction()
 	{
+		AddOrRemoveUseMenuItemEvent(false);
+
 		UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(false);
 		UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(false);
 
@@ -118,28 +122,8 @@ namespace HumanProcessor
 			auto SkillIter = HandleKeysMap.Find(Params.Key);
 			if (SkillIter)
 			{
-				switch ((*SkillIter)->SkillUnit->SkillType)
-				{
-				case ESkillType::kWeaponActive:
-				{
-					AWeapon_Base* WeaponPtr = nullptr;
-
-					if (Params.Key == EKeys::LeftMouseButton)
-					{
-						auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-					}
-					else if (Params.Key == EKeys::RightMouseButton)
-					{
-					}
-				}
-				break;
-				case ESkillType::kActive:
-				{
-					auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				//	OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter);
-				}
-				break;
-				}
+				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+				OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter);
 			}
 		}
 		else
@@ -148,7 +132,7 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			//	OnwerActorPtr->GetEquipmentItemsComponent()->CancelSkill(*SkillIter);
+				OnwerActorPtr->GetEquipmentItemsComponent()->CancelSkill(*SkillIter);
 			}
 		}
 	}
@@ -287,6 +271,23 @@ namespace HumanProcessor
 		if (OnwerActorPtr)
 		{
 			OnwerActorPtr->GetEquipmentItemsComponent()->SwitchWeapon();
+		}
+	}
+
+	void FHumanRegularProcessor::AddOrRemoveUseMenuItemEvent(bool bIsAdd)
+	{
+		HandleKeysMap.Empty();
+		if (bIsAdd)
+		{
+			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+			if (OnwerActorPtr)
+			{
+				auto CanbeActivedInfoAry = OnwerActorPtr->GetEquipmentItemsComponent()->GetCanbeActivedInfo();
+				for (const auto& Iter : CanbeActivedInfoAry)
+				{
+					HandleKeysMap.Add(Iter->Key, Iter);
+				}
+			}
 		}
 	}
 

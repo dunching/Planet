@@ -32,8 +32,6 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
-	void UpdateSkillState();
-
 	USkillUnit* SkillUnitPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
@@ -46,17 +44,6 @@ public:
 
 protected:
 
-	void SetLevel(int32 NewNum);
-
-	void SetRemainingCooldown(
-		bool bIsReady,
-		bool bCooldownIsReady,
-		float RemainingTime,
-		float Percent
-	);
-
-	void SetItemType();
-
 	virtual void NativeConstruct()override;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
@@ -67,6 +54,10 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlaySkillIsReady();
+
+	void SetLevel(int32 NewNum);
+
+	void SetItemType();
 
 private:
 

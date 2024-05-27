@@ -63,7 +63,7 @@ namespace HumanProcessor
 
 		void UpdateLookAtObject();
 
-		TMap<FKey, TSharedPtr<FSkillSocketInfo>>HandleKeysMap;
+		TMap<FKey, TSharedPtr<FCanbeActivedInfo>>HandleKeysMap;
 
 	};
 }
