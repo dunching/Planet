@@ -42,7 +42,7 @@ void UPawnStateBuildingHUD::NativeDestruct()
 		auto Ary = GetEquipMenus();
 		for (auto& Iter : Ary)
 		{
-			EICPtr->RegisterTool(Iter);
+		//	EICPtr->RegisterTool(Iter);
 		}
 	}
 
@@ -74,10 +74,10 @@ void UPawnStateBuildingHUD::ResetUIByData()
 			if (IconPtr)
 			{
 				auto Result = EICPtr->FindTool(IconPtr->IconSocket);
-				if (Result.ToolUnitPtr)
+				if (Result->ToolUnitPtr)
 				{
 				}
-				IconPtr->ResetToolUIByData(Result.ToolUnitPtr);
+				IconPtr->ResetToolUIByData(Result->ToolUnitPtr);
 			}
 		}
 	}

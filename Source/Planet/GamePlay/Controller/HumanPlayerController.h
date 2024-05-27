@@ -57,6 +57,8 @@ protected:
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
 
+	void InitialCharacter();
+
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
 		FPawnType* LeaderPCPtr

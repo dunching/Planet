@@ -26,10 +26,13 @@ public:
 
 	virtual void NativeConstruct()override;
 
+	virtual void NativeDestruct()override;
+
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
 	virtual void ResetUIByData()override;
 
+	// 外部初始化
 	ACharacterBase* CharacterPtr = nullptr;
 
 protected:
@@ -37,6 +40,10 @@ protected:
 	void InitialTalentUI();
 
 	void InitialSkillIcon();
+
+	void OnActivedWeaponChanged(EWeaponSocket WeaponSocket);
+
+	TCallbackHandleContainer<void(EWeaponSocket)>::FCallbackHandleSPtr ActivedWeaponChangedDelegate;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UState_Talent_NuQi>TalentState_NuQi_Class;

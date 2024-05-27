@@ -171,24 +171,41 @@ void AHumanAIController::InitialCharacter()
 			auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
 			if (WeaponUnitPtr)
 			{
-				EICPtr->SetMainWeapon(WeaponUnitPtr);
+				TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
 
-				TMap<FGameplayTag, FSkillsSocketInfo> InSkillsMap;
+				// ÎäÆ÷
 				{
-					FSkillsSocketInfo SkillsSocketInfo;
+					TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 
-					SkillsSocketInfo.SkillSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.WeaponActiveSocket1"));
-					SkillsSocketInfo.SkillUnit = HICPtr->GetHoldItemProperty().AddUnit(WeaponUnitPtr->FirstSkillClass);
+					FirstWeaponSocketInfoSPtr->WeaponSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.WeaponActiveSocket1"));
+					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
 
-					InSkillsMap.Add(
-						SkillsSocketInfo.SkillSocket,
-						SkillsSocketInfo
-					);
+					TSharedPtr < FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
+
+					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
+					EICPtr->SwitchWeapon();
+
+					TSharedPtr < FSkillSocketInfo> SkillsSocketInfo;
+
+					SkillsSocketInfo->SkillSocket = FirstWeaponSocketInfoSPtr->WeaponSocket;
+					SkillsSocketInfo->SkillUnit = FirstWeaponSocketInfoSPtr->WeaponUnitPtr ? FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill : nullptr;
+
+					SkillsMap.Add(FirstWeaponSocketInfoSPtr->WeaponSocket, SkillsSocketInfo);
 				}
+				{
+					{
+						TSharedPtr < FSkillSocketInfo> SkillsSocketInfo;
 
-				EICPtr->RegisterMultiGAs(InSkillsMap);
+						SkillsSocketInfo->SkillSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.ActiveSocket1"));
+						SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().AddUnit(WeaponUnitPtr->FirstSkillClass);
 
-				EICPtr->ActiveWeapon(EWeaponSocket::kMain);
+						SkillsMap.Add(
+							SkillsSocketInfo->SkillSocket,
+							SkillsSocketInfo
+						);
+					}
+				}
+				EICPtr->RegisterMultiGAs(SkillsMap);
 			}
 		}
 	}

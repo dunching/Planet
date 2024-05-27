@@ -18,8 +18,6 @@
 
 namespace AllocationSkillsMenu
 {
-	const FName SkillsHorizontal = TEXT("SkillsHorizontal");
-
 	const FName ActiveSkill1 = TEXT("ActiveSkill1");
 
 	const FName ActiveSkill2 = TEXT("ActiveSkill2");
@@ -62,6 +60,16 @@ void UPawnStateActionHUD::NativeConstruct()
 	Super::NativeConstruct();
 
 	ResetUIByData();
+}
+
+void UPawnStateActionHUD::NativeDestruct()
+{
+	if (ActivedWeaponChangedDelegate)
+	{
+		ActivedWeaponChangedDelegate->UnBindCallback();
+	}
+
+	Super::NativeDestruct();
 }
 
 void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -152,13 +160,13 @@ void UPawnStateActionHUD::InitialTalentUI()
 	for (auto Iter : SkillsMap)
 	{
 		bool bIsGiveTalentPassive = false;
-		if (Iter.Value.SkillUnit)
+		if (Iter.Value->SkillUnit)
 		{
-			switch (Iter.Value.SkillUnit->SkillType)
+			switch (Iter.Value->SkillUnit->SkillType)
 			{
 			case ESkillType::kTalentPassive:
 			{
-				switch (Iter.Value.SkillUnit->GetSceneElementType<ESkillUnitType>())
+				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
 				{
 				case ESkillUnitType::kHumanSkill_Talent_NuQi:
 				{
@@ -187,26 +195,95 @@ void UPawnStateActionHUD::InitialSkillIcon()
 	{
 		return;
 	}
+
 	auto SkillsMap = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
-	auto HorizontalBoxPtr = Cast<UHorizontalBox>(GetWidgetFromName(AllocationSkillsMenu::SkillsHorizontal));
-	if (HorizontalBoxPtr)
+	TArray<FName>Ary
 	{
-		auto ChildsAry = HorizontalBoxPtr->GetAllChildren();
-		for (auto Iter : ChildsAry)
+		AllocationSkillsMenu::ActiveSkill1,
+		AllocationSkillsMenu::ActiveSkill2,
+		AllocationSkillsMenu::ActiveSkill3,
+		AllocationSkillsMenu::ActiveSkill4 ,
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		auto SkillIcon = Cast<UActionSkillsIcon>(GetWidgetFromName(Iter));
+		if (SkillIcon)
 		{
-			auto SkillIcon = Cast<UActionSkillsIcon>(Iter);
-			if (SkillIcon)
+			auto SocketIter = SkillsMap.Find(SkillIcon->IconSocket);
+			if (SocketIter)
 			{
-				auto SocketIter = SkillsMap.Find(SkillIcon->IconSocket);
-				if (SocketIter)
-				{
-					SkillIcon->ResetToolUIByData(SocketIter->SkillUnit);
-				}
-				else
-				{
-					SkillIcon->ResetToolUIByData(nullptr);
-				}
+				SkillIcon->ResetToolUIByData((*SocketIter)->SkillUnit);
+			}
+			else
+			{
+				SkillIcon->ResetToolUIByData(nullptr);
 			}
 		}
 	}
+	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+
+	ActivedWeaponChangedDelegate = EICPtr->OnActivedWeaponChangedContainer.AddCallback(
+		std::bind(&ThisClass::OnActivedWeaponChanged, this, std::placeholders::_1)
+	);
+	OnActivedWeaponChanged(EICPtr->GetActivedWeapon());
+}
+
+void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
+{
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+
+	switch (WeaponSocket)
+	{
+	case EWeaponSocket::kMain:
+	{
+		TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfo;
+		TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfo;
+		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfo, SecondWeaponSocketInfo);
+		{
+			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
+			if (IconPtr)
+			{
+				IconPtr->ResetToolUIByData(FirstWeaponSocketInfo->WeaponUnitPtr);
+			}
+		}
+
+		{
+			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
+			if (IconPtr)
+			{
+				IconPtr->ResetToolUIByData(SecondWeaponSocketInfo->WeaponUnitPtr);
+			}
+		}
+	}
+	break;
+	case EWeaponSocket::kSecondary:
+	{
+		TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfo;
+		TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfo;
+		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfo, SecondWeaponSocketInfo);
+		{
+			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
+			if (IconPtr)
+			{
+				IconPtr->ResetToolUIByData(SecondWeaponSocketInfo->WeaponUnitPtr);
+			}
+		}
+
+		{
+			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
+			if (IconPtr)
+			{
+				IconPtr->ResetToolUIByData(FirstWeaponSocketInfo->WeaponUnitPtr);
+			}
+		}
+	}
+	break;
+	}
+
 }

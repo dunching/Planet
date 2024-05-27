@@ -185,6 +185,10 @@ UGourpmateUnit* AHumanPlayerController::GetGourpMateUnit()
 	return GetPawn<FPawnType>()->GetGourpMateUnit();
 }
 
+void AHumanPlayerController::InitialCharacter()
+{
+}
+
 void AHumanPlayerController::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
 	FPawnType* LeaderPCPtr

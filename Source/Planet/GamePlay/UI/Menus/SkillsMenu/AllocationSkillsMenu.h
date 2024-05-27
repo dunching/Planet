@@ -37,6 +37,30 @@ protected:
 
 	virtual void ResetUIByData()override;
 
+	void ResetUIByData_Skills();
+
+	void ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocket);
+
+	void ResetUIByData_Weapons();
+
+	void BindEvent();
+
+	UFUNCTION()
+	void OnWeaponsBtnCliked();
+
+	UFUNCTION()
+	void OnSkillsBtnCliked();
+
+	void OnMainWeaponChanged(UWeaponUnit* ToolSPtr);
+
+	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
+
+	FDelegateHandle MainDelegateHandleSPtr;
+
+	FDelegateHandle SecondaryDelegateHandleSPtr;
+
+	FSceneToolsContainer SPHoldItemPerpertyPtr;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ActiveSkills_1;
 	
@@ -50,33 +74,8 @@ protected:
 	FKey ActiveSkills_4;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey WeaponActiveSkills_1;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey WeaponActiveSkills_2;
+	FKey WeaponActiveSkills;
 	
 private:
-
-	void ResetUIByData_Skills();
-	
-	void ResetUIByData_Weapons();
-
-	void BindEvent();
-
-	UFUNCTION()
-	void OnWeaponsBtnCliked();
-
-	UFUNCTION()
-	void OnSkillsBtnCliked();
-
-	void OnMainWeaponChanged(UWeaponUnit*ToolSPtr);
-
-	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
-
-	FDelegateHandle MainDelegateHandleSPtr;
-
-	FDelegateHandle SecondaryDelegateHandleSPtr;
-
-	FSceneToolsContainer SPHoldItemPerpertyPtr;
 
 };

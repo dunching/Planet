@@ -14,6 +14,8 @@
 
 #include "EquipmentElementComponent.generated.h"
 
+class UGameplayAbility;
+
 class UBasicFuturesBase;
 class UPlanetGameplayAbility_HumanSkillBase;
 class IGAEventModifyInterface;
@@ -26,7 +28,7 @@ class UGAEvent_Received;
 struct FGameplayAbilityTargetData_GAEvent;
 class UWeaponUnit;
 
-struct FSkillsSocketInfo
+struct FSkillSocketInfo
 {
 	FKey Key;
 
@@ -35,6 +37,30 @@ struct FSkillsSocketInfo
 	USkillUnit* SkillUnit = nullptr;
 
 	FGameplayAbilitySpecHandle Handle;
+};
+
+struct FWeaponSocketInfo
+{
+	FGameplayTag WeaponSocket;
+
+	UWeaponUnit* WeaponUnitPtr = nullptr;
+
+	FGameplayAbilitySpecHandle Handle;
+};
+
+struct FCanbeActivedInfo
+{
+	enum class EType
+	{
+		kActiveSkill,
+		kWeaponActiveSkill,
+	};
+
+	EType Type = EType::kActiveSkill;
+
+	FKey Key;
+
+	FGameplayTag SkillSocket;
 };
 
 struct FToolsSocketInfo
@@ -46,13 +72,6 @@ struct FToolsSocketInfo
 	UToolUnit* ToolUnitPtr = nullptr;
 };
 
-enum class EWeaponSocket
-{
-	kNone,
-	kMain,
-	kSecondary,
-};
-
 UCLASS(BlueprintType, Blueprintable)
 class UEquipmentElementComponent : public UActorComponent
 {
@@ -61,6 +80,8 @@ class UEquipmentElementComponent : public UActorComponent
 public:
 
 	using FCallbackHandleContainer = TCallbackHandleContainer<void(ETagChangeType, const FGameplayTag&)>;
+
+	using FOnActivedWeaponChangedContainer = TCallbackHandleContainer<void(EWeaponSocket)>;
 
 	UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer);
 
@@ -76,29 +97,37 @@ public:
 
 	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData);
 
-	UWeaponUnit* GetMainWeaponUnit()const;
+	void RegisterWeapon(
+		const TSharedPtr < FWeaponSocketInfo>& FirstWeaponSocketInfo,
+		const TSharedPtr < FWeaponSocketInfo>& SecondWeaponSocketInfo
+	);
 
-	void SetMainWeapon(UWeaponUnit* InMainWeaponSPtr);
+	void GetWeapon(
+		TSharedPtr < FWeaponSocketInfo>& FirstWeaponSocketInfo,
+		TSharedPtr < FWeaponSocketInfo>& SecondWeaponSocketInfo
+	)const;
 
-	UWeaponUnit* GetSecondaryWeaponUnit()const;
+	AWeapon_Base* SwitchWeapon();
 
-	void SetSecondaryWeapon(UWeaponUnit* InMainWeaponSPtr);
+	void RetractputWeapon();
 
-	AWeapon_Base* ActiveWeapon(EWeaponSocket WeaponSocket);
+	EWeaponSocket GetActivedWeapon();
 
-	AWeapon_Base* GetActivedWeapon();
+	void RegisterMultiGAs(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
 
-	void RegisterMultiGAs(const TMap<FGameplayTag, FSkillsSocketInfo>&InSkillsMap);
+	void RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo);
 
-	void RegisterTool(const FToolsSocketInfo& InToolInfo);
+	void RegisterCanbeActivedInfo(const TArray< TSharedPtr<FCanbeActivedInfo>>& InCanbeActivedInfoAry);
 
-	FSkillsSocketInfo FindSkill(const FGameplayTag& Tag);
+	TSharedPtr < FSkillSocketInfo> FindSkill(const FGameplayTag& Tag);
 
-	FToolsSocketInfo FindTool(const FGameplayTag& Tag);
+	TSharedPtr < FToolsSocketInfo> FindTool(const FGameplayTag& Tag);
 
-	const TMap<FGameplayTag, FSkillsSocketInfo>& GetSkills()const;
+	const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& GetSkills()const;
 
-	const TMap<FGameplayTag, FToolsSocketInfo>& GetTools()const;
+	const TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>& GetTools()const;
+
+	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedInfo()const;
 
 	void AddGAEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
 
@@ -110,17 +139,25 @@ public:
 
 	const FGameplayTagContainer& GetCharacterTags()const;
 
-	void AddTag(const FGameplayTag&Tag);
+	void AddTag(const FGameplayTag& Tag);
 
 	void RemoveTag(const FGameplayTag& Tag);
 
-	void ActiveSkill(const FSkillsSocketInfo& SkillsSocketInfo, EWeaponSocket WeaponSocket);
+	void ActiveSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
 
-	void CancelSkill(const FSkillsSocketInfo& SkillsSocketInfo);
+	void CancelSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
 
 	FCallbackHandleContainer TagsModifyHandleContainer;
 
+	FOnActivedWeaponChangedContainer OnActivedWeaponChangedContainer;
+
 protected:
+
+	AWeapon_Base* ActiveWeapon(EWeaponSocket WeaponSocket);
+
+	bool ActivedCorrespondingWeapon(USkill_Base* GAPtr);
+
+	FDelegateHandle AbilityActivatedCallbacksHandle;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTagContainer CharacterTags;
@@ -136,12 +173,16 @@ protected:
 
 	AWeapon_Base* ActivedWeaponPtr = nullptr;
 
-	UWeaponUnit* MainWeaponUnitPtr = nullptr;
+	EWeaponSocket CurrentActivedWeaponSocket = EWeaponSocket::kNone;
 
-	UWeaponUnit* SecondaryWeaponUnitPtr = nullptr;
+	TSharedPtr < FWeaponSocketInfo >FirstWeaponUnit;
 
-	TMap<FGameplayTag, FSkillsSocketInfo>SkillsMap;
+	TSharedPtr < FWeaponSocketInfo >SecondaryWeaponUnit;
 
-	TMap<FGameplayTag, FToolsSocketInfo>ToolsMap;
+	TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>SkillsMap;
+
+	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>ToolsMap;
+
+	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActivedInfoAry;
 
 };

@@ -56,6 +56,12 @@ void UAllocationSkillsMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
 	BindEvent();
 
 	ResetUIByData();
@@ -63,6 +69,11 @@ void UAllocationSkillsMenu::NativeConstruct()
 
 void UAllocationSkillsMenu::NativeDestruct()
 {
+	ON_SCOPE_EXIT
+	{
+		Super::NativeDestruct();
+	};
+
 	if (MainDelegateHandleSPtr)
 	{
 		MainDelegateHandleSPtr->UnBindCallback();
@@ -80,60 +91,73 @@ void UAllocationSkillsMenu::NativeDestruct()
 
 	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 
+	TMap<FGameplayTag, TSharedPtr <FSkillSocketInfo>> SkillsMap;
+
+	// ÎäÆ÷¼¼ÄÜ
 	{
-		auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(MainWeapon));
-		if (IconPtr)
+		TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfo;
 		{
-			EICPtr->SetMainWeapon(IconPtr->WeaponUnitPtr);
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(MainWeapon));
+			if (IconPtr && IconPtr->WeaponUnitPtr)
+			{
+				FirstWeaponSocketInfo->WeaponSocket = IconPtr->IconSocket;
+				FirstWeaponSocketInfo->WeaponUnitPtr = IconPtr->WeaponUnitPtr;
+			}
 		}
+		TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfo;
+		{
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(SecondaryWeapon));
+			if (IconPtr && IconPtr->WeaponUnitPtr)
+			{
+				SecondWeaponSocketInfo->WeaponSocket = IconPtr->IconSocket;
+				SecondWeaponSocketInfo->WeaponUnitPtr = IconPtr->WeaponUnitPtr;
+			}
+		}
+		EICPtr->RegisterWeapon(FirstWeaponSocketInfo, SecondWeaponSocketInfo);
+
+		TSharedPtr < FSkillSocketInfo >SkillsSocketInfo;
+
+		SkillsSocketInfo->Key = WeaponActiveSkills;
+
+		SkillsMap.Add(FirstWeaponSocketInfo->WeaponSocket, SkillsSocketInfo);
 	}
 	{
-		auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(SecondaryWeapon));
-		if (IconPtr)
+		struct FHelper
 		{
-			EICPtr->SetSecondaryWeapon(IconPtr->WeaponUnitPtr);
-		}
-	}
-	struct FHelper
-	{
-		FName Name;
-		FKey Key;
-	};
+			FName Name;
+			FKey Key;
+		};
 
-	TArray<FHelper>Ary
-	{
-		{WeaponActiveSkill1,WeaponActiveSkills_1},
-		{WeaponActiveSkill2,WeaponActiveSkills_2},
-		{ActiveSkill1,ActiveSkills_1},
-		{ActiveSkill2,ActiveSkills_2},
-		{ActiveSkill3,ActiveSkills_3},
-		{ActiveSkill4,ActiveSkills_4},
-		{PassivSkill1,EKeys::Invalid},
-		{PassivSkill2,EKeys::Invalid},
-		{PassivSkill3,EKeys::Invalid},
-		{PassivSkill4,EKeys::Invalid},
-		{PassivSkill5,EKeys::Invalid},
-		{TalentPassivSkill,EKeys::Invalid},
-	};
-
-	TMap<FGameplayTag, FSkillsSocketInfo> SkillsMap;
-	for (auto Iter : Ary)
-	{
-		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
-		if (IconPtr && IconPtr->SkillUnitPtr)
+		TArray<FHelper>Ary
 		{
-			FSkillsSocketInfo SkillsSocketInfo;
+			{ActiveSkill1,ActiveSkills_1},
+			{ActiveSkill2,ActiveSkills_2},
+			{ActiveSkill3,ActiveSkills_3},
+			{ActiveSkill4,ActiveSkills_4},
+			{PassivSkill1,EKeys::Invalid},
+			{PassivSkill2,EKeys::Invalid},
+			{PassivSkill3,EKeys::Invalid},
+			{PassivSkill4,EKeys::Invalid},
+			{PassivSkill5,EKeys::Invalid},
+			{TalentPassivSkill,EKeys::Invalid},
+		};
 
-			SkillsSocketInfo.SkillSocket = IconPtr->IconSocket;
-			SkillsSocketInfo.SkillUnit = IconPtr->SkillUnitPtr;
-			SkillsSocketInfo.Key = Iter.Key;
+		for (auto Iter : Ary)
+		{
+			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
+			if (IconPtr && IconPtr->SkillUnitPtr)
+			{
+				TSharedPtr < FSkillSocketInfo >SkillsSocketInfo;
 
-			SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
+				SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
+				SkillsSocketInfo->SkillUnit = IconPtr->SkillUnitPtr;
+				SkillsSocketInfo->Key = Iter.Key;
+
+				SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
+			}
 		}
 	}
 	EICPtr->RegisterMultiGAs(SkillsMap);
-
-	Super::NativeDestruct();
 }
 
 void UAllocationSkillsMenu::ResetUIByData_Skills()
@@ -179,13 +203,74 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 			auto WidgetPtr = CreateWidget<USkillsIcon>(this, EntryClass);
 			if (WidgetPtr)
 			{
-				TileViewPtr->AddItem(WidgetPtr); 
+				TileViewPtr->AddItem(WidgetPtr);
 				WidgetPtr->bIsInBackpakc = true;
 				WidgetPtr->ResetToolUIByData(Iter);
 			}
 		}
 		break;
 		};
+	}
+}
+
+void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocket)
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+
+	TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfo;
+	TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfo;
+	switch (WeaponSocket)
+	{
+	case EWeaponSocket::kNone:
+	case EWeaponSocket::kMain:
+	{
+		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfo, SecondWeaponSocketInfo);
+	}
+	break;
+	case EWeaponSocket::kSecondary:
+	{
+		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(SecondWeaponSocketInfo, FirstWeaponSocketInfo);
+	}
+	break;
+	}
+	{
+		{
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(MainWeapon));
+			if (IconPtr)
+			{
+				IconPtr->ResetToolUIByData(FirstWeaponSocketInfo->WeaponUnitPtr);
+			}
+		}
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(WeaponActiveSkill1));
+		if (IconPtr)
+		{
+			IconPtr->ResetToolUIByData(
+				FirstWeaponSocketInfo->WeaponUnitPtr ? FirstWeaponSocketInfo->WeaponUnitPtr->FirstSkill : nullptr
+			);
+		}
+	}
+
+	{
+		{
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(SecondaryWeapon));
+			if (IconPtr)
+			{
+				IconPtr->ResetToolUIByData(SecondWeaponSocketInfo->WeaponUnitPtr);
+			}
+		}
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(WeaponActiveSkill2));
+		if (IconPtr)
+		{
+			IconPtr->ResetToolUIByData(
+				SecondWeaponSocketInfo->WeaponUnitPtr ? SecondWeaponSocketInfo->WeaponUnitPtr->FirstSkill : nullptr
+			);
+		}
 	}
 }
 
@@ -282,21 +367,7 @@ void UAllocationSkillsMenu::ResetUIByData()
 
 	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 
-	{
-		auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(MainWeapon));
-		if (IconPtr)
-		{
-			IconPtr->ResetToolUIByData(CharacterPtr->GetEquipmentItemsComponent()->GetMainWeaponUnit());
-		}
-	}
-
-	{
-		auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(SecondaryWeapon));
-		if (IconPtr)
-		{
-			IconPtr->ResetToolUIByData(CharacterPtr->GetEquipmentItemsComponent()->GetSecondaryWeaponUnit());
-		}
-	}
+	ResetUIByData_WeaponSkills(EICPtr->GetActivedWeapon());
 
 	{
 		TArray<FName>Ary
@@ -305,8 +376,6 @@ void UAllocationSkillsMenu::ResetUIByData()
 			ActiveSkill2,
 			ActiveSkill3,
 			ActiveSkill4 ,
-			WeaponActiveSkill1,
-			WeaponActiveSkill2,
 			PassivSkill1,
 			PassivSkill2,
 			PassivSkill3,
@@ -321,7 +390,7 @@ void UAllocationSkillsMenu::ResetUIByData()
 			if (IconPtr)
 			{
 				auto Result = EICPtr->FindSkill(IconPtr->IconSocket);
-				IconPtr->ResetToolUIByData(Result.SkillUnit);
+				IconPtr->ResetToolUIByData(Result->SkillUnit);
 			}
 		}
 	}

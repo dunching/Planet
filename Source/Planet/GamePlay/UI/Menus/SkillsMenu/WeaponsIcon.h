@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "GameplayTagContainer.h"
+
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
 
@@ -33,6 +36,9 @@ public:
 	FCallbackHandleContainer OnDroped;
 
 	UWeaponUnit* WeaponUnitPtr = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
+	FGameplayTag IconSocket;
 
 	bool bIsInBackpakc = false;
 

@@ -111,6 +111,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Icon")
 	int32 CooldownTime = -1;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Require Weapon")
+	EWeaponUnitType WeaponUnitType = EWeaponUnitType::kNone;
 
 	int32 ResetCooldownTime = 1;
 

@@ -77,7 +77,7 @@ struct PLANET_API FSTT_RunEQS : public FStateTreeAIActionTaskBase
 
 	FSTT_RunEQS();
 
-	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+	virtual const UStruct* GetInstanceDataType() const override;
 
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context,

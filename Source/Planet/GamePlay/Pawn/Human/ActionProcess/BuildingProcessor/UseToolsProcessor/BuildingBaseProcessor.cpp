@@ -171,7 +171,7 @@ namespace HumanProcessor
 				auto ActiveSkillsAry = OnwerActorPtr->GetEquipmentItemsComponent()->GetTools();
 				for (const auto& Iter : ActiveSkillsAry)
 				{
-					HandleKeysMap.Add(Iter.Value.Key, Iter.Value);
+	//				HandleKeysMap.Add(Iter.Value->Key, Iter.Value);
 				}
 			}
 		}

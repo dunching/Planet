@@ -97,6 +97,8 @@ public:
 
 	virtual void FKeyPressed();
 
+	virtual void XKeyPressed();
+
 	virtual void CKeyPressed();
 
 	virtual void VKeyPressed();

@@ -63,7 +63,7 @@ void UEquipmentElementComponent::TickComponent(float DeltaTime, enum ELevelTick 
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (auto& Iter : SkillsMap)
 		{
-			auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value.Handle);
+			auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value->Handle);
 			if (!GameplayAbilitySpecPtr)
 			{
 				continue;
@@ -124,7 +124,7 @@ void UEquipmentElementComponent::OnReceivedEventModifyData(FGameplayAbilityTarge
 	}
 }
 
-void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, FSkillsSocketInfo>& InSkillsMap)
+void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap)
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
 	if (!OnwerActorPtr)
@@ -138,7 +138,7 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, FSkil
 		bool bIsHave = false;
 		for (const auto& SecondIter : InSkillsMap)
 		{
-			if (Iter.Value.SkillUnit == SecondIter.Value.SkillUnit)
+			if (Iter.Value->SkillUnit == SecondIter.Value->SkillUnit)
 			{
 				bIsHave = true;
 				break;
@@ -146,7 +146,7 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, FSkil
 		}
 		if (!bIsHave)
 		{
-			auto GASpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(Iter.Value.Handle);
+			auto GASpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(Iter.Value->Handle);
 			if (GASpecPtr)
 			{
 				auto GAInsPtr = Cast<UPlanetGameplayAbility>(GASpecPtr->GetPrimaryInstance());
@@ -156,7 +156,7 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, FSkil
 				}
 			}
 
-			OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(Iter.Value.Handle);
+			OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(Iter.Value->Handle);
 		}
 	}
 
@@ -167,7 +167,7 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, FSkil
 		bool bIsHave = false;
 		for (const auto& SecondIter : SkillsMap)
 		{
-			if (Iter.Value.SkillUnit == SecondIter.Value.SkillUnit)
+			if (Iter.Value->SkillUnit == SecondIter.Value->SkillUnit)
 			{
 				NewSkillMap.Add(SecondIter);
 				bIsHave = true;
@@ -176,130 +176,213 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, FSkil
 		}
 		if (!bIsHave)
 		{
-			switch (Iter.Value.SkillUnit->SkillType)
+			switch (Iter.Value->SkillUnit->SkillType)
 			{
 			case ESkillType::kActive:
-			case ESkillType::kWeaponActive:
 			case ESkillType::kPassive:
 			case ESkillType::kTalentPassive:
-			default:
+			case ESkillType::kWeaponActive:
 			{
-				auto& Ref = NewSkillMap.Add(Iter.Value.SkillSocket, Iter.Value);
-
-				Ref.Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+				auto& Ref = NewSkillMap.Add(Iter.Value->SkillSocket, Iter.Value);
+				Ref->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 					FGameplayAbilitySpec(
-						Iter.Value.SkillUnit->SkillClass,
-						Iter.Value.SkillUnit->Level
+						Iter.Value->SkillUnit->SkillClass,
+						Iter.Value->SkillUnit->Level
 					)
 				);
 			}
 			break;
+			default:
+				break;
 			}
 		}
 	}
 	SkillsMap = NewSkillMap;
 }
 
-void UEquipmentElementComponent::RegisterTool(const FToolsSocketInfo& InToolInfo)
+void UEquipmentElementComponent::RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo)
 {
-	ToolsMap.Add(InToolInfo.SkillSocket, InToolInfo);
+	ToolsMap.Add(InToolInfo->SkillSocket, InToolInfo);
 }
 
-void UEquipmentElementComponent::SetMainWeapon(UWeaponUnit* InMainWeaponSPtr)
+void UEquipmentElementComponent::RegisterCanbeActivedInfo(const TArray< TSharedPtr<FCanbeActivedInfo>>& InCanbeActivedInfoAry)
 {
-	MainWeaponUnitPtr = InMainWeaponSPtr;
+	CanbeActivedInfoAry = InCanbeActivedInfoAry;
 }
 
-UWeaponUnit* UEquipmentElementComponent::GetMainWeaponUnit() const
+void UEquipmentElementComponent::RegisterWeapon(
+	const TSharedPtr < FWeaponSocketInfo>& FirstWeaponSocketInfo,
+	const TSharedPtr < FWeaponSocketInfo>& SecondWeaponSocketInfo
+)
 {
-	return MainWeaponUnitPtr;
+	FirstWeaponUnit = FirstWeaponSocketInfo;
+	SecondaryWeaponUnit = SecondWeaponSocketInfo;
 }
 
-UWeaponUnit* UEquipmentElementComponent::GetSecondaryWeaponUnit() const
+void UEquipmentElementComponent::GetWeapon(
+	TSharedPtr < FWeaponSocketInfo>& FirstWeaponSocketInfo,
+	TSharedPtr < FWeaponSocketInfo>& SecondWeaponSocketInfo
+)const
 {
-	return SecondaryWeaponUnitPtr;
+	FirstWeaponSocketInfo = FirstWeaponUnit;
+	SecondWeaponSocketInfo = SecondaryWeaponUnit;
 }
 
-void UEquipmentElementComponent::SetSecondaryWeapon(UWeaponUnit* InMainWeaponSPtr)
+AWeapon_Base* UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 {
-	SecondaryWeaponUnitPtr = InMainWeaponSPtr;
-}
-
-AWeapon_Base* UEquipmentElementComponent::ActiveWeapon(EWeaponSocket WeaponSocket)
-{
-	switch (WeaponSocket)
-	{
-	case EWeaponSocket::kMain:
+	if (InWeaponSocket != CurrentActivedWeaponSocket)
 	{
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
-
-		FActorSpawnParameters ActorSpawnParameters;
-		ActorSpawnParameters.Owner = OnwerActorPtr;
-
-		if (ActivedWeaponPtr)
+		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
 		{
-			if (ActivedWeaponPtr->IsA(MainWeaponUnitPtr->ToolActorClass))
+			switch (CurrentActivedWeaponSocket)
 			{
-				break;
+			case EWeaponSocket::kMain:
+			{
+				if (FirstWeaponUnit->WeaponUnitPtr)
+				{
+					WeaponUnit = FirstWeaponUnit;
+				}
+				else
+				{
+					return ActivedWeaponPtr;
+				}
+			}
+			break;
+			case EWeaponSocket::kSecondary:
+			{
+				if (FirstWeaponUnit->WeaponUnitPtr)
+				{
+					WeaponUnit = SecondaryWeaponUnit;
+				}
+				else
+				{
+					return ActivedWeaponPtr;
+				}
+			}
+			break;
+			}
+
+			auto GASpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(WeaponUnit->Handle);
+			if (GASpecPtr)
+			{
+				auto GAInsPtr = Cast<UPlanetGameplayAbility>(GASpecPtr->GetPrimaryInstance());
+				if (GAInsPtr)
+				{
+					GAInsPtr->ResetListLock();
+				}
+			}
+
+			OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(WeaponUnit->Handle);
+		}
+		CurrentActivedWeaponSocket = InWeaponSocket;
+		{
+			switch (CurrentActivedWeaponSocket)
+			{
+			case EWeaponSocket::kMain:
+			{
+				WeaponUnit = FirstWeaponUnit;
+			}
+			break;
+			case EWeaponSocket::kSecondary:
+			{
+				WeaponUnit = SecondaryWeaponUnit;
+			}
+			break;
+			case EWeaponSocket::kNone:
+			{
+				if (ActivedWeaponPtr)
+				{
+					ActivedWeaponPtr->Destroy();
+					ActivedWeaponPtr = nullptr;
+				}
+			}
+			break;
+			}
+
+			if (WeaponUnit->WeaponUnitPtr)
+			{
+				WeaponUnit->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+					FGameplayAbilitySpec(
+						WeaponUnit->WeaponUnitPtr->FirstSkill->SkillClass,
+						WeaponUnit->WeaponUnitPtr->FirstSkill->Level
+					)
+				);
+			}
+		}
+		{
+			FActorSpawnParameters ActorSpawnParameters;
+			ActorSpawnParameters.Owner = OnwerActorPtr;
+
+			if (ActivedWeaponPtr)
+			{
+				if (ActivedWeaponPtr->IsA(WeaponUnit->WeaponUnitPtr->ToolActorClass))
+				{
+				}
+				else
+				{
+					ActivedWeaponPtr->Destroy();
+
+					ActivedWeaponPtr = GetWorld()->SpawnActor<AWeapon_Base>(WeaponUnit->WeaponUnitPtr->ToolActorClass, ActorSpawnParameters);
+
+					OnwerActorPtr->SwitchAnimLink(WeaponUnit->WeaponUnitPtr->AnimLinkClassType);
+				}
 			}
 			else
 			{
-				ActivedWeaponPtr->Destroy();
+				OnwerActorPtr->SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 			}
 		}
+		OnActivedWeaponChangedContainer.ExcuteCallback(InWeaponSocket);
+	}
 
-		ActivedWeaponPtr = GetWorld()->SpawnActor<AWeapon_Base>(MainWeaponUnitPtr->ToolActorClass, ActorSpawnParameters);
+	return ActivedWeaponPtr;
+}
 
-		OnwerActorPtr->SwitchAnimLink(MainWeaponUnitPtr->AnimLinkClassType);
+AWeapon_Base* UEquipmentElementComponent::SwitchWeapon()
+{
+	switch (CurrentActivedWeaponSocket)
+	{
+	case EWeaponSocket::kMain:
+	{
+		return ActiveWeapon(EWeaponSocket::kSecondary);
 	}
 	break;
 	case EWeaponSocket::kSecondary:
 	{
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
-
-		FActorSpawnParameters ActorSpawnParameters;
-		ActorSpawnParameters.Owner = OnwerActorPtr;
-
-		if (ActivedWeaponPtr)
-		{
-			if (ActivedWeaponPtr->IsA(SecondaryWeaponUnitPtr->ToolActorClass))
-			{
-				break;
-			}
-			else
-			{
-				ActivedWeaponPtr->Destroy();
-			}
-		}
-
-		ActivedWeaponPtr = GetWorld()->SpawnActor<AWeapon_Base>(SecondaryWeaponUnitPtr->ToolActorClass, ActorSpawnParameters);
-
-		OnwerActorPtr->SwitchAnimLink(SecondaryWeaponUnitPtr->AnimLinkClassType);
+		return ActiveWeapon(EWeaponSocket::kMain);
 	}
-	break;
 	case EWeaponSocket::kNone:
+	default:
 	{
-		if (ActivedWeaponPtr)
+		if (FirstWeaponUnit->WeaponUnitPtr)
 		{
-			ActivedWeaponPtr->Destroy();
-			ActivedWeaponPtr = nullptr;
-
-			auto OnwerActorPtr = GetOwner<ACharacterBase>();
-			OnwerActorPtr->SwitchAnimLink(EAnimLinkClassType::kUnarmed);
+			return ActiveWeapon(EWeaponSocket::kMain);
+		}
+		else if (FirstWeaponUnit->WeaponUnitPtr)
+		{
+			return ActiveWeapon(EWeaponSocket::kSecondary);
+		}
+		else
+		{
+			return ActiveWeapon(EWeaponSocket::kNone);
 		}
 	}
 	break;
 	}
-
-	return ActivedWeaponPtr;
 }
 
-AWeapon_Base* UEquipmentElementComponent::GetActivedWeapon()
+void UEquipmentElementComponent::RetractputWeapon()
 {
-	return ActivedWeaponPtr;
+	ActiveWeapon(EWeaponSocket::kNone);
 }
 
-FSkillsSocketInfo UEquipmentElementComponent::FindSkill(const FGameplayTag& Tag)
+EWeaponSocket UEquipmentElementComponent::GetActivedWeapon()
+{
+	return CurrentActivedWeaponSocket;
+}
+
+TSharedPtr < FSkillSocketInfo >UEquipmentElementComponent::FindSkill(const FGameplayTag& Tag)
 {
 	auto Iter = SkillsMap.Find(Tag);
 	if (Iter)
@@ -307,10 +390,10 @@ FSkillsSocketInfo UEquipmentElementComponent::FindSkill(const FGameplayTag& Tag)
 		return *Iter;
 	}
 
-	return FSkillsSocketInfo();
+	return nullptr;
 }
 
-FToolsSocketInfo UEquipmentElementComponent::FindTool(const FGameplayTag& Tag)
+TSharedPtr < FToolsSocketInfo> UEquipmentElementComponent::FindTool(const FGameplayTag& Tag)
 {
 	auto Iter = ToolsMap.Find(Tag);
 	if (Iter)
@@ -318,17 +401,22 @@ FToolsSocketInfo UEquipmentElementComponent::FindTool(const FGameplayTag& Tag)
 		return *Iter;
 	}
 
-	return FToolsSocketInfo();
+	return nullptr;
 }
 
-const TMap<FGameplayTag, FSkillsSocketInfo>& UEquipmentElementComponent::GetSkills() const
+const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& UEquipmentElementComponent::GetSkills() const
 {
 	return SkillsMap;
 }
 
-const TMap<FGameplayTag, FToolsSocketInfo>& UEquipmentElementComponent::GetTools() const
+const TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>& UEquipmentElementComponent::GetTools() const
 {
 	return ToolsMap;
+}
+
+const TArray<TSharedPtr<FCanbeActivedInfo>>& UEquipmentElementComponent::GetCanbeActivedInfo() const
+{
+	return CanbeActivedInfoAry;
 }
 
 void UEquipmentElementComponent::AddGAEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
@@ -380,64 +468,76 @@ void UEquipmentElementComponent::RemoveTag(const FGameplayTag& Tag)
 	TagsModifyHandleContainer.ExcuteCallback(ETagChangeType::kRemove, Tag);
 }
 
-void UEquipmentElementComponent::ActiveSkill(const FSkillsSocketInfo& SkillsSocketInfo, EWeaponSocket WeaponSocket)
+void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
 {
-	switch (SkillsSocketInfo.SkillUnit->SkillType)
+	if (CanbeActivedInfoSPtr->Type == FCanbeActivedInfo::EType::kWeaponActiveSkill)
 	{
-	case ESkillType::kWeaponActive:
-	{
-		AWeapon_Base* WeaponPtr = nullptr;
+		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
+		switch (CurrentActivedWeaponSocket)
+		{
+		case EWeaponSocket::kMain:
+		{
+			WeaponUnit = FirstWeaponUnit;
+		}
+		break;
+		case EWeaponSocket::kSecondary:
+		{
+			WeaponUnit = SecondaryWeaponUnit;
+		}
+		break;
+		default:
+		{
+			return;
+		}
+		}
 
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		if (OnwerActorPtr)
 		{
-			switch (WeaponSocket)
+			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(WeaponUnit->Handle);
+			if (!GameplayAbilitySpecPtr)
 			{
-			case EWeaponSocket::kMain:
-			{
-				WeaponPtr = OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kMain);
+				return;
 			}
-			break;
-			case EWeaponSocket::kSecondary:
+			auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+			if (!GAInsPtr)
 			{
-				WeaponPtr = OnwerActorPtr->GetEquipmentItemsComponent()->ActiveWeapon(EWeaponSocket::kSecondary);
+				return;
 			}
-			break;
-			default:
-			{
 
-			}
-			break;
+			if (!ActivedCorrespondingWeapon(GAInsPtr))
+			{
+				return;
 			}
 
 			FGameplayEventData Payload;
-			switch (SkillsSocketInfo.SkillUnit->GetSceneElementType<ESkillUnitType>())
+			switch (WeaponUnit->WeaponUnitPtr->FirstSkill->GetSceneElementType<ESkillUnitType>())
 			{
 			case ESkillUnitType::kHumanSkill_WeaponActive_PickAxe_Attack1:
 			{
 				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
-				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(WeaponPtr);
+				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(ActivedWeaponPtr);
 				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 			}
 			break;
 			case ESkillUnitType::kHumanSkill_WeaponActive_HandProtection_Attack1:
 			{
 				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
-				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(WeaponPtr);
+				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(ActivedWeaponPtr);
 				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 			}
 			break;
 			case ESkillUnitType::kHumanSkill_WeaponActive_RangeTest:
 			{
 				auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest;
-				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(WeaponPtr);
+				GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(ActivedWeaponPtr);
 				Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 			}
 			break;
 			}
-			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(
-				SkillsSocketInfo.Handle,
+				WeaponUnit->Handle,
 				ASCPtr->AbilityActorInfo.Get(),
 				FGameplayTag::EmptyTag,
 				&Payload,
@@ -445,34 +545,106 @@ void UEquipmentElementComponent::ActiveSkill(const FSkillsSocketInfo& SkillsSock
 			);
 		}
 	}
-	break;
-	case ESkillType::kActive:
+	else
 	{
-		switch (SkillsSocketInfo.SkillUnit->GetSceneElementType<ESkillUnitType>())
-		{
-		case ESkillUnitType::kHumanSkill_Active_Displacement:
-		case ESkillUnitType::kHumanSkill_Active_GroupTherapy:
-		{
-			auto OnwerActorPtr = GetOwner<ACharacterBase>();
-			if (OnwerActorPtr)
-			{
-				auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-				ASCPtr->TryActivateAbility(SkillsSocketInfo.Handle);
-			}
-		}
-		break;
-		}
-	}
-	break;
+		// 		auto SkillIter = SkillsMap.Find(CanbeActivedInfoSPtr->SkillSocket);
+		// 		switch (SkillIter->SkillUnit->SkillType)
+		// 		{
+		// 		case ESkillType::kActive:
+		// 		{
+		// 			switch (SkillsSocketInfo.SkillUnit->GetSceneElementType<ESkillUnitType>())
+		// 			{
+		// 			case ESkillUnitType::kHumanSkill_Active_Displacement:
+		// 			case ESkillUnitType::kHumanSkill_Active_GroupTherapy:
+		// 			{
+		// 				auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		// 				if (OnwerActorPtr)
+		// 				{
+		// 					auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		// 					ASCPtr->TryActivateAbility(SkillsSocketInfo.Handle);
+		// 				}
+		// 			}
+		// 			break;
+		// 			}
+		// 		}
+		// 		break;
+		// 		}
 	}
 }
 
-void UEquipmentElementComponent::CancelSkill(const FSkillsSocketInfo& SkillsSocketInfo)
+void UEquipmentElementComponent::CancelSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
+	// 	if (SkillsSocketInfo.bIsWeaponSkill)
+	// 	{
+	// 		FWeaponSocketInfo WeaponUnit;
+	// 		switch (CurrentActivedWeaponSocket)
+	// 		{
+	// 		case EWeaponSocket::kMain:
+	// 		{
+	// 			WeaponUnit = FirstWeaponUnit;
+	// 		}
+	// 		break;
+	// 		case EWeaponSocket::kSecondary:
+	// 		{
+	// 			WeaponUnit = SecondaryWeaponUnit;
+	// 		}
+	// 		break;
+	// 		default:
+	// 		{
+	// 			return;
+	// 		}
+	// 		}
+	// 
+	// 	}
+	// 	else
+	// 	{
+	// 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	// 		if (OnwerActorPtr)
+	// 		{
+	// 			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	// 			ASCPtr->CancelAbilityHandle(SkillsSocketInfo.Handle);
+	// 		}
+	// 	}
+}
+
+bool UEquipmentElementComponent::ActivedCorrespondingWeapon(USkill_Base* SkillGAPtr)
+{
+	if (SkillGAPtr)
 	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		ASCPtr->CancelAbilityHandle(SkillsSocketInfo.Handle);
+		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
+		TSharedPtr < FWeaponSocketInfo > OtherWeaponUnit;
+		switch (CurrentActivedWeaponSocket)
+		{
+		case EWeaponSocket::kMain:
+		{
+			WeaponUnit = FirstWeaponUnit;
+			OtherWeaponUnit = SecondaryWeaponUnit;
+		}
+		break;
+		case EWeaponSocket::kSecondary:
+		{
+			WeaponUnit = SecondaryWeaponUnit;
+			OtherWeaponUnit = FirstWeaponUnit;
+		}
+		break;
+		}
+
+		if (
+			WeaponUnit->WeaponUnitPtr &&
+			(WeaponUnit->WeaponUnitPtr->GetSceneElementType<EWeaponUnitType>() == SkillGAPtr->WeaponUnitType)
+			)
+		{
+			return true;
+		}
+		else if (
+			OtherWeaponUnit->WeaponUnitPtr &&
+			(OtherWeaponUnit->WeaponUnitPtr->GetSceneElementType<EWeaponUnitType>() == SkillGAPtr->WeaponUnitType)
+			)
+		{
+			SwitchWeapon();
+			return true;
+		}
 	}
+
+	return false;
 }

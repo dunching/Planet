@@ -249,13 +249,13 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{
-			if (Iter.Value.SkillUnit)
+			if (Iter.Value->SkillUnit)
 			{
-				switch (Iter.Value.SkillUnit->SkillType)
+				switch (Iter.Value->SkillUnit->SkillType)
 				{
 				case ESkillType::kActive:
 				{
-					auto GAPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value.Handle);
+					auto GAPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value->Handle);
 					if (!GAPtr)
 					{
 						continue;

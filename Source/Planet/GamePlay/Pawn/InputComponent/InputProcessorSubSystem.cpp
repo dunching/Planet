@@ -223,6 +223,11 @@ void UInputProcessorSubSystem::CKeyPressed()
 	CurrentProcessorSPtr->CKeyPressed();
 }
 
+void UInputProcessorSubSystem::XKeyPressed()
+{
+	CurrentProcessorSPtr->XKeyPressed();
+}
+
 void UInputProcessorSubSystem::VKeyPressed()
 {
 	CurrentProcessorSPtr->VKeyPressed();

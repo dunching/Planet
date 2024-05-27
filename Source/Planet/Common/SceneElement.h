@@ -19,6 +19,13 @@ class AHumanCharacter;
 
 struct FSceneToolsContainer;
 
+enum class EWeaponSocket
+{
+	kNone,
+	kMain,
+	kSecondary,
+};
+
 #pragma region HoldItem
 UENUM(BlueprintType)
 enum class ERawMaterialsType : uint8

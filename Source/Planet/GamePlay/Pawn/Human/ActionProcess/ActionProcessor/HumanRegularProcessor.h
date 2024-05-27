@@ -11,6 +11,8 @@
 #include "HumanProcessor.h"
 #include "EquipmentElementComponent.h"
 
+struct FSkillSocketInfo;
+
 class AWeapon_Base;
 
 class UWeaponUnit;
@@ -45,6 +47,8 @@ namespace HumanProcessor
 
 		virtual void HKeyPressed()override;
 
+		virtual void XKeyPressed()override;
+
 		virtual void VKeyPressed()override;
 
 		virtual void BKeyPressed()override;
@@ -59,7 +63,7 @@ namespace HumanProcessor
 
 		void UpdateLookAtObject();
 
-		TMap<FKey, FSkillsSocketInfo>HandleKeysMap;
+		TMap<FKey, TSharedPtr<FSkillSocketInfo>>HandleKeysMap;
 
 	};
 }

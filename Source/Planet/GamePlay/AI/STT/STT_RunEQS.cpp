@@ -22,6 +22,11 @@ FSTT_RunEQS::FSTT_RunEQS() :
 {
 }
 
+const UStruct* FSTT_RunEQS::GetInstanceDataType() const
+{
+	return FInstanceDataType::StaticStruct();
+}
+
 EStateTreeRunStatus FSTT_RunEQS::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition

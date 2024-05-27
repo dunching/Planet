@@ -112,6 +112,8 @@ protected:
 
 	void CKeyPressed();
 
+	void XKeyPressed();
+
 	void VKeyPressed();
 
 	void BKeyPressed();

@@ -44,7 +44,7 @@ protected:
 
 	bool ReleasingSKill();
 
-	TMap<FGameplayAbilitySpecHandle, FSkillsSocketInfo>ReleasingSkillMap;
+	TMap<FGameplayAbilitySpecHandle, TSharedPtr<FSkillSocketInfo>>ReleasingSkillMap;
 
 	TMap<FGameplayAbilitySpecHandle, FDelegateHandle>ReleasingSkillDelegateMap;
 

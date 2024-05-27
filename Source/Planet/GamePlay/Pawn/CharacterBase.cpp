@@ -56,6 +56,8 @@ ACharacterBase::~ACharacterBase()
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 }
 
 void ACharacterBase::Destroyed()

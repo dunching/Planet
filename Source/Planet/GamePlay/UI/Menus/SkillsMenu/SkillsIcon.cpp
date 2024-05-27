@@ -133,7 +133,7 @@ void USkillsIcon::UpdateSkillState()
 	const auto Ref = EICPtr->FindSkill(IconSocket);
 
 	auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-	auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Ref.Handle);
+	auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Ref->Handle);
 	if (!GameplayAbilitySpecPtr)
 	{
 		return;
