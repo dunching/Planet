@@ -31,10 +31,13 @@ void UAbilityTask_TimerHelper::SetCount(int32 InCount)
 	Count = InCount;
 }
 
-void UAbilityTask_TimerHelper::SetIntervalTime(float InIntervalTime)
+void UAbilityTask_TimerHelper::SetInfinite()
 {
 	Type = EType::kInfinite_Interval;
+}
 
+void UAbilityTask_TimerHelper::SetIntervalTime(float InIntervalTime)
+{
 	IntervalTime = InIntervalTime;
 }
 

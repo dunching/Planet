@@ -15,6 +15,8 @@ struct FGameplayAbilityTargetData_GAEvent : public FGameplayAbilityTargetData
 {
 	struct FData
 	{
+		bool bIsWeaponAttack = false;
+
 		int32 ADDamage = 0;
 
 		int32 TreatmentVolume = 0;

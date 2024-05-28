@@ -141,8 +141,6 @@ bool ATrackBase::GetCanLinkTrack(ETrackVehiclePosState Pos) const
 	{
 		return NextTrackPtr == nullptr;
     }
-
-    return false;
 }
 
 FTransform ATrackBase::GetLinkPos(ETrackVehiclePosState Pos)
@@ -165,8 +163,6 @@ FTransform ATrackBase::GetLinkPos(ETrackVehiclePosState Pos)
 
 FBearerState ATrackBase::CheckTrackBearerState() const
 {
-	// ֱ���ڳ������ҵ����е�TrackVehicle�뱾TracksУ���ϵ��ʱ�临�Ӷ�ΪO(n^2),���Ǵ˺�����Ӧֻ���ڷ���TrackVehicleʱ�ŵ���
-	// ���Կ���ֱ����Tracks������
 	TArray<AActor*>Result;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATrackVehicleBase::StaticClass(), Result);
 

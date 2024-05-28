@@ -28,19 +28,7 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddLambda([this, Spec](UGameplayAbility* GAPtr) {
-			auto CharacterPtr = Cast<ACharacterBase>(GAPtr->GetActorInfo().AvatarActor.Get());
-			if (CharacterPtr)
-			{
-				if (
-					GAPtr &&
-					(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
-					)
-				{
-					AddNuQi();
-				}
-			}
-			});
+		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnReceviedDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		OnValueChanged = CharacterAttributes.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
@@ -246,5 +234,19 @@ void USkill_Talent_NuQi::StopForceWeakState()
 	{
 		EffectItemPtr->RemoveFromParent();
 		EffectItemPtr = nullptr;
+	}
+}
+
+void USkill_Talent_NuQi::OnReceviedDamage(UGameplayAbility* GAPtr)
+{
+	if (CharacterPtr)
+	{
+		if (
+			GAPtr &&
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
+			)
+		{
+			AddNuQi();
+		}
 	}
 }

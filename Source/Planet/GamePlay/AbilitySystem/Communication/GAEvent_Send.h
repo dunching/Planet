@@ -3,12 +3,12 @@
 
 #include "CoreMinimal.h"
 
-#include "PlanetGameplayAbility.h"
+#include "GAEvent_Base.h"
 
 #include "GAEvent_Send.generated.h"
 
 UCLASS()
-class PLANET_API UGAEvent_Send : public UPlanetGameplayAbility
+class PLANET_API UGAEvent_Send : public UGAEvent_Base
 {
 	GENERATED_BODY()
 

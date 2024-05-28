@@ -3,7 +3,7 @@
 
 #include "AbilitySystemComponent.h"
 
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
 #include "EquipmentElementComponent.h"
 #include "CharacterAttributesComponent.h"

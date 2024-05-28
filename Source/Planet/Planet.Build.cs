@@ -83,6 +83,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human/ActionProcess/BuildingProcessor");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human/ActionProcess/InteractionProcessor");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human/ActionProcess/ViewMenusProcessor");
+        PublicIncludePaths.Add("Planet/GamePlay/WorldSetting");
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");
         PublicIncludePaths.Add("Planet/Library");

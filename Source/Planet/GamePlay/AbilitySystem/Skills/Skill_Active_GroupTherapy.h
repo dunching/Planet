@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Skill_Base.h"
+#include "Skill_Active_Base.h"
 
 #include "Skill_Active_GroupTherapy.generated.h"
 
@@ -16,7 +16,7 @@ class UAbilityTask_PlayMontage;
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_Active_GroupTherapy : public USkill_Base
+class PLANET_API USkill_Active_GroupTherapy : public USkill_Active_Base
 {
 	GENERATED_BODY()
 
@@ -48,6 +48,8 @@ protected:
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
 
+	void EmitEffect();
+
 	void StartTasksLink();
 
 	bool bIsAttackEnd = true;
@@ -59,6 +61,6 @@ protected:
 	float Radius = 250.f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 TreatmentVolume = 50;
-
+	int32 TreatmentVolume = 5;
+	
 };

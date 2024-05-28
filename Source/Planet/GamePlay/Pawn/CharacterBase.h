@@ -49,6 +49,7 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UHoldingItemsComponent* GetHoldingItemsComponent();

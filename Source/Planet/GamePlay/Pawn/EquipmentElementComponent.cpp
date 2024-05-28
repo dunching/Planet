@@ -3,7 +3,7 @@
 
 #include "GameplayAbilitySpec.h"
 
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
@@ -12,8 +12,9 @@
 #include "GAEvent_Send.h"
 #include "GAEvent_Received.h"
 #include "SceneElement.h"
-#include "Skill_Base.h"
 #include "Weapon_Base.h"
+#include "Skill_Base.h"
+#include "Skill_Active_Base.h"
 #include "Skill_WeaponActive_PickAxe.h"
 #include "Skill_WeaponActive_HandProtection.h"
 #include "Skill_WeaponActive_RangeTest.h"
@@ -582,7 +583,7 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 			{
 				return;
 			}
-			auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+			auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
 			if (!GAInsPtr)
 			{
 				return;
@@ -653,9 +654,9 @@ void UEquipmentElementComponent::CancelSkill(const TSharedPtr<FCanbeActivedInfo>
 	}
 }
 
-bool UEquipmentElementComponent::ActivedCorrespondingWeapon(USkill_Base* SkillGAPtr)
+bool UEquipmentElementComponent::ActivedCorrespondingWeapon(USkill_Active_Base* SkillGAPtr)
 {
-	if (SkillGAPtr && (SkillGAPtr->WeaponUnitType == EWeaponUnitType::kNone))
+	if (SkillGAPtr && (SkillGAPtr->WeaponUnitType != EWeaponUnitType::kNone))
 	{
 		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
 		TSharedPtr < FWeaponSocketInfo > OtherWeaponUnit;

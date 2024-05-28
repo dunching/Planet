@@ -149,7 +149,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
 			if (IconPtr && IconPtr->SkillUnitPtr)
 			{
-				TSharedPtr < FSkillSocketInfo >SkillsSocketInfo;
+				TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 				SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
 				SkillsSocketInfo->SkillUnit = IconPtr->SkillUnitPtr;
@@ -427,11 +427,6 @@ void UAllocationSkillsMenu::OnMainWeaponChanged(UWeaponUnit* ToolSPtr)
 		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(WeaponActiveSkill1));
 		if (IconPtr)
 		{
-			if (!ToolSPtr->FirstSkill)
-			{
-				ToolSPtr->FirstSkill = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty().AddUnit(ToolSPtr->FirstSkillClass);
-			}
-
 			IconPtr->ResetToolUIByData(ToolSPtr->FirstSkill);
 		}
 	}

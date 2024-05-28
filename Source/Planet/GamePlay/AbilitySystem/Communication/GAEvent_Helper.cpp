@@ -1,5 +1,5 @@
 
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 
 FGameplayAbilityTargetData_GAEvent * FGameplayAbilityTargetData_GAEvent::Clone() const
 {

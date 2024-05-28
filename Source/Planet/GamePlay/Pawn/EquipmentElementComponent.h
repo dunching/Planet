@@ -10,7 +10,7 @@
 #include <SceneElement.h>
 #include "GameplayTagContainer.h"
 #include "GameplayAbilitySpecHandle.h"
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 
 #include "EquipmentElementComponent.generated.h"
 
@@ -21,6 +21,7 @@ class UPlanetGameplayAbility_HumanSkillBase;
 class IGAEventModifyInterface;
 class AEquipmentBase;
 class USkill_Base;
+class USkill_Active_Base;
 class AWeapon_Base;
 class UGAEvent_Send;
 class UGAEvent_Received;
@@ -153,7 +154,7 @@ protected:
 
 	AWeapon_Base* ActiveWeapon(EWeaponSocket WeaponSocket);
 
-	bool ActivedCorrespondingWeapon(USkill_Base* GAPtr);
+	bool ActivedCorrespondingWeapon(USkill_Active_Base* GAPtr);
 
 	FDelegateHandle AbilityActivatedCallbacksHandle;
 

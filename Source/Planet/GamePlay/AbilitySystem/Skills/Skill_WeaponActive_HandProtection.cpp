@@ -10,7 +10,7 @@
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
 #include "EquipmentElementComponent.h"
 #include "AbilityTask_PlayMontage.h"
@@ -38,7 +38,10 @@ USkill_WeaponActive_HandProtection::USkill_WeaponActive_HandProtection() :
 	bRetriggerInstancedAbility = true;
 }
 
-void USkill_WeaponActive_HandProtection::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_WeaponActive_HandProtection::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -48,7 +51,13 @@ void USkill_WeaponActive_HandProtection::OnAvatarSet(const FGameplayAbilityActor
 	}
 }
 
-void USkill_WeaponActive_HandProtection::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
+void USkill_WeaponActive_HandProtection::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -84,7 +93,13 @@ void USkill_WeaponActive_HandProtection::PreActivate(const FGameplayAbilitySpecH
 	K2_EndAbility();
 }
 
-bool USkill_WeaponActive_HandProtection::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /*= nullptr*/, const FGameplayTagContainer* TargetTags /*= nullptr*/, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */) const
+bool USkill_WeaponActive_HandProtection::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+) const
 {
 	switch (RepeatType)
 	{
@@ -96,6 +111,11 @@ bool USkill_WeaponActive_HandProtection::CanActivateAbility(const FGameplayAbili
 		}
 	}
 	break;
+	}
+
+	if (bIsInInputRange)
+	{
+		return true;
 	}
 
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
@@ -163,6 +183,8 @@ void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 			InputRangeHelperPtr->RemoveFromParent();
 			InputRangeHelperPtr = nullptr;
 		}
+
+
 		});
 
 	TaskPtr->ReadyForActivation();
@@ -234,6 +256,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 
 		GAEventData->TargetActorAry.Empty();
 		GAEventData->TriggerCharacterPtr = CharacterPtr;
+		GAEventData->Data.bIsWeaponAttack = true;
 		GAEventData->Data.ADDamage = Damage;
 
 		for (auto Iter : OutHits)

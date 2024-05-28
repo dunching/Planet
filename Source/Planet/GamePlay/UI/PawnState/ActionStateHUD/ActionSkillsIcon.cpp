@@ -124,7 +124,6 @@ void UActionSkillsIcon::SetRemainingCooldown(
 	float Percent
 )
 {
-
 	if (bCooldownIsReady)
 	{
 		{

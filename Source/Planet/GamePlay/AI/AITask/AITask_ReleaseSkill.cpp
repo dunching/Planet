@@ -13,6 +13,7 @@
 #include "EquipmentElementComponent.h"
 #include "CharacterBase.h"
 #include "Skill_Base.h"
+#include "AssetRefMap.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -61,61 +62,37 @@ void UAITask_ReleaseSkill::OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr)
 		ReleasingSkillMap.Remove(GAPtr->GetCurrentAbilitySpecHandle());
 	}
 
-	EndTask();
+	if (GAPtr && ReleasingSkillDelegateMap.Contains(GAPtr->GetCurrentAbilitySpecHandle()))
+	{
+		ReleasingSkillDelegateMap.Remove(GAPtr->GetCurrentAbilitySpecHandle());
+	}
+
+	if (ReleasingSkillMap.IsEmpty() && ReleasingSkillDelegateMap.IsEmpty())
+	{
+		EndTask();
+	}
 }
 
 bool UAITask_ReleaseSkill::ReleasingSKill()
 {
 	if (CharacterPtr)
 	{
-		auto SkillsMap = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
-		for (const auto& Iter : SkillsMap)
-		{
-			if (Iter.Value->SkillUnit)
-			{
-				switch (Iter.Value->SkillUnit->SkillType)
-				{
-				case ESkillType::kActive:
-				{
-					auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value->Handle);
-					if (!GameplayAbilitySpecPtr)
-					{
-						continue;
-					}
-					auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-					if (!GAInsPtr)
-					{
-						continue;
-					}
+		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 
-					auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
-					if (bIsReady)
-					{
-						ReleasingSkillMap.Add(Iter.Value->Handle, Iter.Value);
-						ReleasingSkillDelegateMap.Add(
-							Iter.Value->Handle,
-							GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
-						);
+		FGameplayTagContainer GameplayTagContainer;
+		GameplayTagContainer.AddTag(UAssetRefMap::GetInstance()->GameplayTag1);
 
-				//		CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter.Value);
-					}
-				}
-				break;
-				}
-			}
-		}
-		if (ReleasingSkillMap.IsEmpty())
+		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchNoTags(GameplayTagContainer)))
 		{
+			auto SkillsMap = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
 			for (const auto& Iter : SkillsMap)
 			{
 				if (Iter.Value->SkillUnit)
 				{
 					switch (Iter.Value->SkillUnit->SkillType)
 					{
-					case ESkillType::kWeaponActive:
+					case ESkillType::kActive:
 					{
-						auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 						auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value->Handle);
 						if (!GameplayAbilitySpecPtr)
 						{
@@ -136,10 +113,48 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 								GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
 							);
 
-						//	CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter.Value);
+							//		CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter.Value);
 						}
 					}
 					break;
+					}
+				}
+			}
+			if (ReleasingSkillMap.IsEmpty())
+			{
+				for (const auto& Iter : SkillsMap)
+				{
+					if (Iter.Value->SkillUnit)
+					{
+						switch (Iter.Value->SkillUnit->SkillType)
+						{
+						case ESkillType::kWeaponActive:
+						{
+							auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value->Handle);
+							if (!GameplayAbilitySpecPtr)
+							{
+								continue;
+							}
+							auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+							if (!GAInsPtr)
+							{
+								continue;
+							}
+
+							auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+							if (bIsReady)
+							{
+								ReleasingSkillMap.Add(Iter.Value->Handle, Iter.Value);
+								ReleasingSkillDelegateMap.Add(
+									Iter.Value->Handle,
+									GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
+								);
+
+								//	CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter.Value);
+							}
+						}
+						break;
+						}
 					}
 				}
 			}

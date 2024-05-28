@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "GenerateType.h"
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 
 #include "CharacterAttibutes.generated.h"
 

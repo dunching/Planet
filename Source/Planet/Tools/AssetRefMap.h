@@ -104,20 +104,29 @@ public:
 #pragma endregion MenusUI
 
 #pragma region Tags
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
-	FGameplayTag JumpAbilityTag = FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag JumpAbilityTag =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
-	FGameplayTag RunningAbilityTag = FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Run")));
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag RunningAbilityTag =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Run")));
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
-	FGameplayTag DashAbilityTag = FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Dash")));
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag DashAbilityTag =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Dash")));
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
-	FGameplayTag DeathingTag = FGameplayTag::RequestGameplayTag(FName(TEXT("Deathing")));
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag DeathingTag = 
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Deathing")));
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
-	FGameplayTag InFightingTag = FGameplayTag::RequestGameplayTag(FName(TEXT("InFighting")));
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag InFightingTag = 
+		FGameplayTag::RequestGameplayTag(FName(TEXT("InFighting")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	FGameplayTag GameplayTag1 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Continuous.Interruptible")));
 #pragma endregion Tags
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

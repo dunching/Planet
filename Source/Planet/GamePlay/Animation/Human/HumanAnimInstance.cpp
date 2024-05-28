@@ -17,6 +17,36 @@ FQuat UHumanAnimInstance::GetGravityToWorldTransform() const
 	return Character->GetGravityToWorldTransform();
 }
 
+bool UHumanAnimInstance::HasMatchingGameplayTag() const
+{
+	ACharacterBase* Character = Cast<ACharacterBase>(GetOwningActor());
+	if (!Character)
+	{
+		return false;
+	}
+	return Character->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(TagToCheck);
+}
+
+bool UHumanAnimInstance::HasAnyMatchingGameplayTags() const
+{
+	ACharacterBase* Character = Cast<ACharacterBase>(GetOwningActor());
+	if (!Character)
+	{
+		return false;
+	}
+	return Character->GetAbilitySystemComponent()->K2_HasAnyMatchingGameplayTags(TagContainer);
+}
+
+UPlanetAbilitySystemComponent* UHumanAnimInstance::GetAbilitySystemComponent() const
+{
+	ACharacterBase* Character = Cast<ACharacterBase>(GetOwningActor());
+	if (!Character)
+	{
+		return nullptr;
+	}
+	return Character->GetAbilitySystemComponent();
+}
+
 void UHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);

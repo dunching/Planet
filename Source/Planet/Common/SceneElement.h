@@ -69,12 +69,17 @@ UENUM(BlueprintType)
 enum class ESkillUnitType : uint8
 {
 	kNone,
+
 	kHumanSkill_Passive_ZMJZ,
+
 	kHumanSkill_WeaponActive_PickAxe_Attack1,
 	kHumanSkill_WeaponActive_HandProtection_Attack1,
 	kHumanSkill_WeaponActive_RangeTest,
+
 	kHumanSkill_Active_Displacement,
 	kHumanSkill_Active_GroupTherapy,
+	kHumanSkill_Active_ContinuousGroupTherapy,
+
 	kHumanSkill_Talent_NuQi,
 };
 

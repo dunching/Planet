@@ -27,6 +27,8 @@ UWeaponUnit* FSceneToolsContainer::AddUnit(EWeaponUnitType Type)
 			ResultPtr->ID = NewID;
 			ResultPtr->UnitType = Type;
 
+			ResultPtr->FirstSkill = AddUnit(ResultPtr->FirstSkillClass);
+
 			SceneToolsAry.Add(ResultPtr);
 			SceneMetaMap.Add(NewID, ResultPtr);
 

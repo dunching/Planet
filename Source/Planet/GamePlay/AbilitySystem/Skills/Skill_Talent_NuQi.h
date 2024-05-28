@@ -68,6 +68,8 @@ protected:
 
 	void StopForceWeakState();
 
+	void OnReceviedDamage(UGameplayAbility* GAPtr);
+
 	bool bIsInFury = false;
 
 	bool bIsInWeak = false;

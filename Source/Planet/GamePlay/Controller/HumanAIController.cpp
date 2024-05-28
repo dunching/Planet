@@ -171,8 +171,7 @@ void AHumanAIController::InitialCharacter()
 			auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
 			if (WeaponUnitPtr)
 			{
-				TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
-
+				TArray< TSharedPtr<FCanbeActivedInfo>>CanbeActivedInfoAry;
 				// ÎäÆ÷
 				{
 					TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
@@ -185,16 +184,17 @@ void AHumanAIController::InitialCharacter()
 					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
 					EICPtr->SwitchWeapon();
 
-					TSharedPtr < FSkillSocketInfo> SkillsSocketInfo;
+					TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
 
-					SkillsSocketInfo->SkillSocket = FirstWeaponSocketInfoSPtr->WeaponSocket;
-					SkillsSocketInfo->SkillUnit = FirstWeaponSocketInfoSPtr->WeaponUnitPtr ? FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill : nullptr;
+					CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kWeaponActiveSkill;
 
-					SkillsMap.Add(FirstWeaponSocketInfoSPtr->WeaponSocket, SkillsSocketInfo);
+					CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
 				}
 				{
+					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
+
 					{
-						TSharedPtr < FSkillSocketInfo> SkillsSocketInfo;
+						TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 						SkillsSocketInfo->SkillSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.ActiveSocket1"));
 						SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().AddUnit(WeaponUnitPtr->FirstSkillClass);
@@ -203,9 +203,17 @@ void AHumanAIController::InitialCharacter()
 							SkillsSocketInfo->SkillSocket,
 							SkillsSocketInfo
 						);
+
+						TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
+
+						CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveSkill;
+						CanbeActivedInfoSPtr->SkillSocket = SkillsSocketInfo->SkillSocket;
+
+						CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
 					}
+					EICPtr->RegisterMultiGAs(SkillsMap);
 				}
-				EICPtr->RegisterMultiGAs(SkillsMap);
+				EICPtr->RegisterCanbeActivedInfo(CanbeActivedInfoAry);
 			}
 		}
 	}

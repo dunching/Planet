@@ -12,7 +12,7 @@
 #include "Components/SplineComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
 #include "EquipmentElementComponent.h"
 #include "Tool_PickAxe.h"

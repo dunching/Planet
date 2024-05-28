@@ -12,7 +12,7 @@
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
 #include "EquipmentElementComponent.h"
 #include "ToolFuture_Base.h"
@@ -123,24 +123,9 @@ void USkill_WeaponActive_RangeTest::OnProjectileBounce(
 		{
 			return;
 		}
+
+		MakeDamage(OtherCharacterPtr);
 	}
-
-	FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
-
-	FGameplayEventData Payload;
-	Payload.TargetData.Add(GAEventData);
-
-	GAEventData->TargetActorAry.Empty();
-	GAEventData->TriggerCharacterPtr = CharacterPtr;
-	GAEventData->Data.ADDamage = Damage;
-
-	auto TargetCharacterPtr = Cast<ACharacterBase>(OtherActor);
-	if (TargetCharacterPtr)
-	{
-		GAEventData->TargetActorAry.Add(TargetCharacterPtr);
-	}
-
-	SendEvent(Payload);
 
 	OverlappedComponent->GetOwner()->Destroy();
 }
@@ -149,7 +134,7 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_WeaponActive_RangeTest::AttackEnd)
 	{
-		MakeDamage();
+		EmitProjectile();
 
 		bIsAttackEnd = true;
 		if (RepeatType != USkill_Base::ERepeatType::kStop)
@@ -159,17 +144,37 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 	}
 }
 
-void USkill_WeaponActive_RangeTest::MakeDamage()
+void USkill_WeaponActive_RangeTest::EmitProjectile()
 {
 	auto ProjectilePtr = GetWorld()->SpawnActor<ASkill_WeaponActive_RangeTest_Projectile>(
-		Skill_WeaponActive_RangeTest_ProjectileClass, 
+		Skill_WeaponActive_RangeTest_ProjectileClass,
 		CharacterPtr->GetActorLocation(),
 		CharacterPtr->GetActorRotation()
-		);
+	);
 	if (ProjectilePtr)
 	{
 		ProjectilePtr->CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnProjectileBounce);
 	}
+}
+
+void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPtr)
+{
+	FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
+
+	FGameplayEventData Payload;
+	Payload.TargetData.Add(GAEventData);
+
+	GAEventData->TargetActorAry.Empty();
+	GAEventData->TriggerCharacterPtr = CharacterPtr;
+	GAEventData->Data.bIsWeaponAttack = true;
+	GAEventData->Data.ADDamage = Damage;
+
+	if (TargetCharacterPtr)
+	{
+		GAEventData->TargetActorAry.Add(TargetCharacterPtr);
+	}
+
+	SendEvent(Payload);
 }
 
 void USkill_WeaponActive_RangeTest::PlayMontage()

@@ -69,7 +69,9 @@ protected:
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
 
-	void MakeDamage();
+	void EmitProjectile();
+
+	void MakeDamage(ACharacterBase * TargetCharacterPtr);
 
 	void StartTasksLink();
 

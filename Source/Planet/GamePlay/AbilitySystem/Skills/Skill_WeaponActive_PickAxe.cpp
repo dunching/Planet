@@ -11,7 +11,7 @@
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 
-#include "GAEvent.h"
+#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
 #include "EquipmentElementComponent.h"
 #include "ToolFuture_Base.h"
@@ -191,6 +191,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 		GAEventData->TargetActorAry.Empty();
 		GAEventData->TriggerCharacterPtr = CharacterPtr;
+		GAEventData->Data.bIsWeaponAttack = true;
 		GAEventData->Data.ADDamage = Damage;
 
 		for (auto Iter : OutHits)

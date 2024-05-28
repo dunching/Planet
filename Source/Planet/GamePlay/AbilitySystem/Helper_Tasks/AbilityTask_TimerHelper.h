@@ -30,6 +30,8 @@ public:
 	void SetDuration(float InDuration);
 
 	void SetCount(int32 InCount);
+	
+	void SetInfinite();
 
 	void SetIntervalTime(float InIntervalTime);
 
@@ -50,7 +52,7 @@ protected:
 		kInfinite_Interval,
 	};
 
-	EType Type = EType::kCount;
+	EType Type = EType::kInfinite_Interval;
 
 	float Duration = -1.f;
 
@@ -60,7 +62,7 @@ protected:
 
 	float CurrentIntervalTime = 0.f;
 
-	int32 Count = -1;
+	int32 Count = 1;
 
 	int32 CurrentCount = 0;
 

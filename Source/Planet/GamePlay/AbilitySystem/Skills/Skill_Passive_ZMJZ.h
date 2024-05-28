@@ -50,6 +50,8 @@ protected:
 
 	virtual void ExcuteStepsLink()override;
 
+	void TriggerSelf(UGameplayAbility* GAPtr);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
 

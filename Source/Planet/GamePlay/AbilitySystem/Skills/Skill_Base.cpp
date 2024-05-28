@@ -5,6 +5,7 @@
 #include "CharacterBase.h"
 #include "EquipmentElementComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "PlanetWorldSettings.h"
 
 USkill_Base::USkill_Base() :
 	Super()
@@ -12,13 +13,16 @@ USkill_Base::USkill_Base() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
 }
 
-void USkill_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_Base::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilitySpec& Spec
+)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
-	CooldownConsumeTime = CooldownTime - ResetCooldownTime;
+	CooldownConsumeTime = CooldownTime - Cast<APlanetWorldSettings>(GetWorld()->GetWorldSettings())->ResetCooldownTime;
 }
 
 void USkill_Base::PreActivate(
@@ -32,14 +36,23 @@ void USkill_Base::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void USkill_Base::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void USkill_Base::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	OnCurrentStepEnd();
 }
 
-void USkill_Base::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+void USkill_Base::ApplyCooldown(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo
+) const
 {
 	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
 	if (CooldownGE)
@@ -48,14 +61,25 @@ void USkill_Base::ApplyCooldown(const FGameplayAbilitySpecHandle Handle, const F
 	}
 }
 
-bool USkill_Base::CommitAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */)
+bool USkill_Base::CommitAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+)
 {
 	CooldownConsumeTime = 0.f;
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
-bool USkill_Base::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /*= nullptr*/, const FGameplayTagContainer* TargetTags /*= nullptr*/, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */) const
+bool USkill_Base::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+) const
 {
 	if (CooldownConsumeTime < CooldownTime)
 	{
@@ -103,7 +127,7 @@ bool USkill_Base::GetRemainingCooldown(float& RemainingCooldown, float& Remainin
 		{
 			RemainingCooldown = Remaining;
 
-			RemainingCooldownPercent = RemainingCooldown / ResetCooldownTime;
+			RemainingCooldownPercent = RemainingCooldown / Cast<APlanetWorldSettings>(GetWorld()->GetWorldSettings())->ResetCooldownTime;
 
 			return false;
 		}

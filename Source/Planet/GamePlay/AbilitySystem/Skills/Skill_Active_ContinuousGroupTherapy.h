@@ -5,24 +5,25 @@
 
 #include "Skill_Active_Base.h"
 
-#include "Skill_Active_Displacement.generated.h"
+#include "Skill_Active_ContinuousGroupTherapy.generated.h"
 
 class UAnimMontage;
 
-class ATool_PickAxe;
+class AWeapon_PickAxe;
 class ACharacterBase;
-class ASPlineActor;
+class UAbilityTask_TimerHelper;
+class UAbilityTask_PlayMontage;
 
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_Active_Displacement : public USkill_Active_Base
+class PLANET_API USkill_Active_ContinuousGroupTherapy : public USkill_Active_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	USkill_Active_Displacement();
+	USkill_Active_ContinuousGroupTherapy();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -39,49 +40,33 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
-	virtual bool CanActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayTagContainer* SourceTags = nullptr,
-		const FGameplayTagContainer* TargetTags = nullptr,
-		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	) const override;
-
-	virtual void EndAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		bool bReplicateEndAbility,
-		bool bWasCancelled
-	);
-
 protected:
 
 	virtual void ExcuteStepsLink()override;
 
-	void FindTarget();
-
 	void PlayMontage();
+
+	UFUNCTION()
+	void OnNotifyBeginReceived(FName NotifyName);
+
+	void EmitEffect();
+
+	void StartTasksLink();
+
+	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float DeltaTime);
+
+	bool bIsAttackEnd = true;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float Duration = .5f;
+	float Radius = 250.f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float Distance = 800.f;
+	int32 TreatmentVolume = 10;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float ToCharacterOffset = 100.f;
+	int32 Duration = 5;
 
-	ASPlineActor* SPlineActorPtr = nullptr;
-
-	ATool_PickAxe* EquipmentAxePtr = nullptr;
-
-};
-
-struct FGameplayAbilityTargetData_Displacement : public FGameplayAbilityTargetData
-{
-	ACharacterBase* TargetCharacterPtr = nullptr;
 };

@@ -33,4 +33,10 @@ class PLANET_API UPlanetAbilitySystemComponent : public UAbilitySystemComponent
 
 public:
 
+	UFUNCTION(BlueprintCallable, Category = "ASC")
+	bool K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASC")
+	bool K2_HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const;
+
 };

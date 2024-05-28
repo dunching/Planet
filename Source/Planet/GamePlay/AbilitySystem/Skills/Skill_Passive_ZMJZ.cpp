@@ -28,20 +28,8 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddLambda([this, Spec](UGameplayAbility* GAPtr) {
-			auto CharacterPtr = Cast<ACharacterBase>(GAPtr->GetActorInfo().AvatarActor.Get());
-			if (CharacterPtr)
-			{
-				if (
-					GAPtr &&
-					(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
-					)
-				{
-					auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
-					ASCPtr->TryActivateAbility(Spec.Handle);
-				}
-			}
-			});
+		AbilityActivatedCallbacksHandle =
+			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::TriggerSelf);
 	}
 }
 
@@ -92,6 +80,7 @@ void USkill_Passive_ZMJZ::ExcuteStepsLink()
 	if (CharacterPtr)
 	{
 		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		TaskPtr->SetInfinite();
 		TaskPtr->SetIntervalTime(CountDown);
 		TaskPtr->TickDelegate.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr, float) {
 
@@ -150,6 +139,35 @@ void USkill_Passive_ZMJZ::ExcuteStepsLink()
 			{
 				EffectItemPtr->SetNum(ModifyCount);
 			}
+		}
+	}
+}
+
+void USkill_Passive_ZMJZ::TriggerSelf(UGameplayAbility* GAPtr)
+{
+	if (CharacterPtr)
+	{
+		if (!(
+				GAPtr &&
+				(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
+				))
+		{
+			return;
+		}
+
+		auto GA_SendPtr = Cast<UGAEvent_Send>(GAPtr);
+		if (!GA_SendPtr)
+		{
+			return;
+		}
+
+		const auto& EventData = GA_SendPtr->GetCurrentEventData();
+
+		auto GAEventPtr = dynamic_cast<const FGameplayAbilityTargetData_GAEvent*>(EventData.TargetData.Get(0));
+		if (GAEventPtr&& GAEventPtr->Data.bIsWeaponAttack)
+		{
+			auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
+			ASCPtr->TryActivateAbility(GetCurrentAbilitySpecHandle());
 		}
 	}
 }
