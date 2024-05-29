@@ -21,6 +21,7 @@
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
+#include "AssetRefMap.h"
 
 UEquipmentElementComponent::UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -179,10 +180,9 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 			auto GASpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(Iter.Value->Handle);
 			if (GASpecPtr)
 			{
-				auto GAInsPtr = Cast<UPlanetGameplayAbility>(GASpecPtr->GetPrimaryInstance());
+				auto GAInsPtr = Cast<USkill_Base>(GASpecPtr->GetPrimaryInstance());
 				if (GAInsPtr)
 				{
-					GAInsPtr->ResetListLock();
 				}
 			}
 
@@ -258,7 +258,7 @@ void UEquipmentElementComponent::GetWeapon(
 	SecondWeaponSocketInfo = SecondaryWeaponUnit;
 }
 
-AWeapon_Base* UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
+bool UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 {
 	if (InWeaponSocket != CurrentActivedWeaponSocket)
 	{
@@ -277,7 +277,7 @@ AWeapon_Base* UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSoc
 				}
 				else
 				{
-					return ActivedWeaponPtr;
+					return false;
 				}
 			}
 			break;
@@ -289,7 +289,7 @@ AWeapon_Base* UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSoc
 				}
 				else
 				{
-					return ActivedWeaponPtr;
+					return false;
 				}
 			}
 			break;
@@ -300,10 +300,14 @@ AWeapon_Base* UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSoc
 				auto GASpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(WeaponUnit->Handle);
 				if (GASpecPtr)
 				{
-					auto GAInsPtr = Cast<UPlanetGameplayAbility>(GASpecPtr->GetPrimaryInstance());
+					auto GAInsPtr = Cast<USkill_WeaponActive_Base>(GASpecPtr->GetPrimaryInstance());
 					if (GAInsPtr)
 					{
-						GAInsPtr->ResetListLock();
+						GAInsPtr->ForceCancel();
+					}
+					else
+					{
+						return false;
 					}
 				}
 
@@ -361,13 +365,14 @@ AWeapon_Base* UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSoc
 				OnwerActorPtr->SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 			}
 			OnActivedWeaponChangedContainer.ExcuteCallback(InWeaponSocket);
+			return true;
 		}
 	}
 
-	return ActivedWeaponPtr;
+	return false;
 }
 
-AWeapon_Base* UEquipmentElementComponent::SwitchWeapon()
+bool UEquipmentElementComponent::SwitchWeapon()
 {
 	switch (CurrentActivedWeaponSocket)
 	{
@@ -596,8 +601,11 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 
 			switch ((*SkillIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
 			{
-			case ESkillUnitType::kHumanSkill_Active_Displacement:
-			case ESkillUnitType::kHumanSkill_Active_GroupTherapy:
+			case ESkillUnitType::kNone:
+			{
+			}
+			break;
+			default:
 			{
 				ASCPtr->TryActivateAbility((*SkillIter)->Handle);
 			}
@@ -640,17 +648,6 @@ void UEquipmentElementComponent::CancelSkill(const TSharedPtr<FCanbeActivedInfo>
 	}
 	else
 	{
-		auto SkillIter = SkillsMap.Find(CanbeActivedInfoSPtr->SkillSocket);
-		if (!SkillIter)
-		{
-			return;
-		}
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
-		if (OnwerActorPtr)
-		{
-			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-			ASCPtr->CancelAbilityHandle((*SkillIter)->Handle);
-		}
 	}
 }
 
@@ -677,6 +674,7 @@ bool UEquipmentElementComponent::ActivedCorrespondingWeapon(USkill_Active_Base* 
 		}
 
 		if (
+			WeaponUnit &&
 			WeaponUnit->WeaponUnitPtr &&
 			(WeaponUnit->WeaponUnitPtr->GetSceneElementType<EWeaponUnitType>() == SkillGAPtr->WeaponUnitType)
 			)
@@ -684,12 +682,12 @@ bool UEquipmentElementComponent::ActivedCorrespondingWeapon(USkill_Active_Base* 
 			return true;
 		}
 		else if (
+			OtherWeaponUnit &&
 			OtherWeaponUnit->WeaponUnitPtr &&
 			(OtherWeaponUnit->WeaponUnitPtr->GetSceneElementType<EWeaponUnitType>() == SkillGAPtr->WeaponUnitType)
 			)
 		{
-			SwitchWeapon();
-			return true;
+			return SwitchWeapon();
 		}
 	}
 

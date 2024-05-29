@@ -51,10 +51,6 @@ void USkill_Active_GroupTherapy::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	RepeatType = ERepeatType::kCount;
-	RepeatCount = 1; 
-	CurrentRepeatCount = 0;
 }
 
 void USkill_Active_GroupTherapy::ActivateAbility(
@@ -67,9 +63,11 @@ void USkill_Active_GroupTherapy::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
+
+	PerformAction();
 }
 
-void USkill_Active_GroupTherapy::ExcuteStepsLink()
+void USkill_Active_GroupTherapy::PerformAction()
 {
 	StartTasksLink();
 }
@@ -77,7 +75,6 @@ void USkill_Active_GroupTherapy::ExcuteStepsLink()
 void USkill_Active_GroupTherapy::StartTasksLink()
 {
 	PlayMontage();
-
 }
 
 void USkill_Active_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
@@ -165,13 +162,11 @@ void USkill_Active_GroupTherapy::PlayMontage()
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
 		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
 		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }

@@ -3,8 +3,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Skill_Base.h"
 #include "GenerateType.h"
+#include "Skill_Talent_Base.h"
 
 #include "Skill_Talent_NuQi.generated.h"
 
@@ -15,7 +15,7 @@ class UEffectItem;
 class UAbilityTask_TimerHelper;
 
 UCLASS()
-class PLANET_API USkill_Talent_NuQi : public USkill_Base
+class PLANET_API USkill_Talent_NuQi : public USkill_Talent_Base
 {
 	GENERATED_BODY()
 

@@ -41,7 +41,7 @@ public:
 
 protected:
 
-	virtual void ExcuteStepsLink()override;
+	void PerformAction();
 
 	void PlayMontage();
 
@@ -62,5 +62,5 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 TreatmentVolume = 5;
-	
+
 };

@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 
 #include "PlanetGameplayAbility.h"
-#include "Skill_Base.h"
+#include "Skill_Passive_Base.h"
 
 #include "Skill_Passive_ZMJZ.generated.h"
 
@@ -12,7 +12,7 @@ class UEffectItem;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API USkill_Passive_ZMJZ : public USkill_Base
+class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 {
 	GENERATED_BODY()
 
@@ -24,6 +24,13 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
+
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
 
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -48,7 +55,7 @@ public:
 
 protected:
 
-	virtual void ExcuteStepsLink()override;
+	void PerformAction();
 
 	void TriggerSelf(UGameplayAbility* GAPtr);
 

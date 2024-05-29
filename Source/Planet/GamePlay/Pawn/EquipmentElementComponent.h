@@ -106,7 +106,7 @@ public:
 		TSharedPtr < FWeaponSocketInfo>& SecondWeaponSocketInfo
 	)const;
 
-	AWeapon_Base* SwitchWeapon();
+	bool SwitchWeapon();
 
 	void RetractputWeapon();
 
@@ -152,7 +152,7 @@ public:
 
 protected:
 
-	AWeapon_Base* ActiveWeapon(EWeaponSocket WeaponSocket);
+	bool ActiveWeapon(EWeaponSocket WeaponSocket);
 
 	bool ActivedCorrespondingWeapon(USkill_Active_Base* GAPtr);
 

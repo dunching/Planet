@@ -38,10 +38,6 @@ void USkill_Active_Displacement::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	RepeatType = ERepeatType::kCount;
-	RepeatCount = 1;
-	CurrentRepeatCount = 0;
 }
 
 void USkill_Active_Displacement::ActivateAbility(
@@ -54,6 +50,8 @@ void USkill_Active_Displacement::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
+
+	PerformAction();
 }
 
 bool USkill_Active_Displacement::CanActivateAbility(
@@ -87,7 +85,7 @@ void USkill_Active_Displacement::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_Displacement::ExcuteStepsLink()
+void USkill_Active_Displacement::PerformAction()
 {
 	if (CharacterPtr)
 	{
@@ -166,10 +164,8 @@ void USkill_Active_Displacement::FindTarget()
 		SPlineActorPtr,
 		TargetCharacterPtr
 	);
-	TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementListLock);
+	TaskPtr->OnFinish.BindUObject(this, &ThisClass::K2_CancelAbility);
 	TaskPtr->ReadyForActivation();
-
-	IncrementListLock();
 }
 
 void USkill_Active_Displacement::PlayMontage()
@@ -187,11 +183,9 @@ void USkill_Active_Displacement::PlayMontage()
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLock);
-		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLock);
+		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
 		TaskPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }

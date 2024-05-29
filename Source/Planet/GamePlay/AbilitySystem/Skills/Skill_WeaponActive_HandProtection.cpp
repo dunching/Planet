@@ -22,6 +22,7 @@
 #include "Weapon_HandProtection.h"
 #include "UIManagerSubSystem.h"
 #include "ProgressTips.h"
+#include "Skill_Active_Base.h"
 
 namespace Skill_WeaponHandProtection
 {
@@ -34,8 +35,6 @@ USkill_WeaponActive_HandProtection::USkill_WeaponActive_HandProtection() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	bRetriggerInstancedAbility = true;
 }
 
 void USkill_WeaponActive_HandProtection::OnAvatarSet(
@@ -60,19 +59,6 @@ void USkill_WeaponActive_HandProtection::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	RepeatType = ERepeatType::kInfinte;
-
-	if (!bIsInInputRange)
-	{
-		CurrentIndex = 0;
-	}
-
-	if (InputRangeHelperPtr)
-	{
-		InputRangeHelperPtr->RemoveFromParent();
-		InputRangeHelperPtr = nullptr;
-	}
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
@@ -101,23 +87,6 @@ bool USkill_WeaponActive_HandProtection::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	switch (RepeatType)
-	{
-	case ERepeatType::kStop:
-	{
-		if (!bIsAttackEnd)
-		{
-			return false;
-		}
-	}
-	break;
-	}
-
-	if (bIsInInputRange)
-	{
-		return true;
-	}
-
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -132,8 +101,10 @@ void USkill_WeaponActive_HandProtection::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_WeaponActive_HandProtection::ExcuteStepsLink()
+void USkill_WeaponActive_HandProtection::PerformAction()
 {
+	Super::PerformAction();
+
 	switch (CurrentIndex)
 	{
 	case 0:
@@ -161,6 +132,22 @@ void USkill_WeaponActive_HandProtection::ExcuteStepsLink()
 	}
 }
 
+void USkill_WeaponActive_HandProtection::PerformStopAction()
+{
+	ExcuteStopStep();
+}
+
+void USkill_WeaponActive_HandProtection::ResetPreviousStageActions()
+{
+	if (InputRangeHelperPtr)
+	{
+		InputRangeHelperPtr->RemoveFromParent();
+		InputRangeHelperPtr = nullptr;
+	}
+
+	Super::ResetPreviousStageActions();
+}
+
 void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 {
 	IncrementListLock();
@@ -168,15 +155,12 @@ void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 	InputRangeHelperPtr = UUIManagerSubSystem::GetInstance()->ViewProgressTips(true);
 	InputRangeHelperPtr->SetWaitTime(InputRangeInSecond);
 
-	bIsInInputRange = true;
-
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 
 	TaskPtr->SetDuration(InputRangeInSecond);
 
 	TaskPtr->OnFinished.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr) {
-		bIsInInputRange = false;
-		DecrementListLockOverride();
+		CurrentIndex = 0;
 
 		if (InputRangeHelperPtr)
 		{
@@ -184,7 +168,7 @@ void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 			InputRangeHelperPtr = nullptr;
 		}
 
-
+		DecrementListLockOverride();
 		});
 
 	TaskPtr->ReadyForActivation();
@@ -221,7 +205,7 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 		MakeDamage();
 
 		bIsAttackEnd = true;
-		if (RepeatType != USkill_Base::ERepeatType::kStop)
+		if (!bIsRequstCancel)
 		{
 			DecrementToZeroListLock();
 		}
@@ -283,7 +267,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 					{
 						continue;
 					}
-					auto GAInstPtr = Cast<USkill_Base>(GAPtr->GetPrimaryInstance());
+					auto GAInstPtr = Cast<USkill_Active_Base>(GAPtr->GetPrimaryInstance());
 					if (!GAInstPtr)
 					{
 						continue;

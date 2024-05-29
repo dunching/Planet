@@ -14,15 +14,13 @@ USkill_Base::USkill_Base() :
 }
 
 void USkill_Base::OnAvatarSet(
-	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
-	CooldownConsumeTime = CooldownTime - Cast<APlanetWorldSettings>(GetWorld()->GetWorldSettings())->ResetCooldownTime;
 }
 
 void USkill_Base::PreActivate(
@@ -44,21 +42,6 @@ void USkill_Base::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	OnCurrentStepEnd();
-}
-
-void USkill_Base::ApplyCooldown(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayAbilityActivationInfo ActivationInfo
-) const
-{
-	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
-	if (CooldownGE)
-	{
-		CoolDownGEHanlde = ApplyGameplayEffectToOwner(Handle, ActorInfo, ActivationInfo, CooldownGE, GetAbilityLevel(Handle, ActorInfo));
-	}
 }
 
 bool USkill_Base::CommitAbility(
@@ -68,31 +51,16 @@ bool USkill_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	CooldownConsumeTime = 0.f;
-
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
-bool USkill_Base::CanActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayTagContainer* SourceTags /*= nullptr*/,
-	const FGameplayTagContainer* TargetTags /*= nullptr*/,
-	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+void USkill_Base::CancelAbility(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo, 
+	bool bReplicateCancelAbility
+)
 {
-	if (CooldownConsumeTime < CooldownTime)
-	{
-		return false;
-	}
-
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
-}
-
-void USkill_Base::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
-{
-	RepeatType = ERepeatType::kStop;
-
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
@@ -106,51 +74,11 @@ void USkill_Base::OnRemoveAbility(
 
 void USkill_Base::Tick(float DeltaTime)
 {
-	CooldownConsumeTime += DeltaTime;
 }
 
 bool USkill_Base::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	if (CooldownTime < 0.f)
-	{
-		const auto Remaining = CooldownTime - CooldownConsumeTime;
-
-		if (Remaining <= 0.f)
-		{
-			RemainingCooldown = 0.f;
-
-			RemainingCooldownPercent = 1.f;
-
-			return true;
-		}
-		else
-		{
-			RemainingCooldown = Remaining;
-
-			RemainingCooldownPercent = RemainingCooldown / Cast<APlanetWorldSettings>(GetWorld()->GetWorldSettings())->ResetCooldownTime;
-
-			return false;
-		}
-	}
-
-	const auto Remaining = CooldownTime - CooldownConsumeTime;
-
-	if (Remaining <= 0.f)
-	{
-		RemainingCooldown = 0.f;
-
-		RemainingCooldownPercent = 1.f;
-
-		return true;
-	}
-	else
-	{
-		RemainingCooldown = Remaining;
-
-		RemainingCooldownPercent = RemainingCooldown / CooldownTime;
-
-		return false;
-	}
+	return true;
 }
 
 const TArray<FAbilityTriggerData>& USkill_Base::GetTriggers() const
@@ -158,9 +86,19 @@ const TArray<FAbilityTriggerData>& USkill_Base::GetTriggers() const
 	return AbilityTriggers;
 }
 
-void USkill_Base::AddCooldownConsumeTime(float NewTime)
+void USkill_Base::ResetPreviousStageActions()
 {
-	CooldownConsumeTime += NewTime;
+	// 清除上一阶段遗留的内容
+	for (int32 TaskIdx = ActiveTasks.Num() - 1; TaskIdx >= 0 && ActiveTasks.Num() > 0; --TaskIdx)
+	{
+		UGameplayTask* Task = ActiveTasks[TaskIdx];
+		if (Task)
+		{
+			Task->TaskOwnerEnded();
+		}
+	}
+	ActiveTasks.Reset();
+	ResetListLock();
 }
 
 void USkill_Base::SendEvent(const FGameplayEventData& Payload)
@@ -177,76 +115,3 @@ void USkill_Base::SendEvent(const FGameplayEventData& Payload)
 		);
 	}
 }
-
-void USkill_Base::ExcuteStepsLink()
-{
-
-}
-
-void USkill_Base::ExcuteStopStep()
-{
-}
-
-void USkill_Base::OnCurrentStepEnd()
-{
-	// 清楚上一阶段遗留的内容
-	for (int32 TaskIdx = ActiveTasks.Num() - 1; TaskIdx >= 0 && ActiveTasks.Num() > 0; --TaskIdx)
-	{
-		UGameplayTask* Task = ActiveTasks[TaskIdx];
-		if (Task)
-		{
-			Task->TaskOwnerEnded();
-		}
-	}
-	ActiveTasks.Reset();
-	ResetListLock();
-
-	// 开始下一阶段
-	switch (RepeatType)
-	{
-	case ERepeatType::kCount:
-	{
-		CurrentRepeatCount++;
-
-		if (CurrentRepeatCount > RepeatCount)
-		{
-			K2_EndAbility();
-		}
-		else
-		{
-			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			TaskPtr->SetCount(1);
-			TaskPtr->OnFinished.BindLambda([this](auto) {
-				WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::OnCurrentStepEnd));
-				ExcuteStepsLink();
-				RunIfListLock();
-				});
-
-			TaskPtr->ReadyForActivation();
-		}
-	}
-	break;
-	case ERepeatType::kInfinte:
-	{
-		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetCount(1);
-		TaskPtr->OnFinished.BindLambda([this](auto) {
-			WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::OnCurrentStepEnd));
-			ExcuteStepsLink();
-			RunIfListLock();
-			});
-
-		TaskPtr->ReadyForActivation();
-	}
-	break;
-	case ERepeatType::kStop:
-	default:
-	{
-		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::K2_CancelAbility));
-		ExcuteStopStep();
-		RunIfListLock();
-	}
-	break;
-	}
-}
-

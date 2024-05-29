@@ -21,6 +21,46 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Require Weapon")
 	EWeaponUnitType WeaponUnitType = EWeaponUnitType::kNone;
 
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
+	virtual bool CommitAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	);
+
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr,
+		const FGameplayTagContainer* TargetTags = nullptr,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
+	virtual void CancelAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateCancelAbility
+	)override;
+
+	virtual void Tick(float DeltaTime)override;
+
+	virtual bool GetRemainingCooldown(
+		float& RemainingCooldown, float& RemainingCooldownPercent
+	)const override;
+
+	virtual void AddCooldownConsumeTime(float NewTime);
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Icon")
+	int32 CooldownTime = -1;
+
 protected:
+
+	float CooldownConsumeTime = 0.f;
 
 };

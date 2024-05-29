@@ -43,26 +43,12 @@ public:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	virtual void ApplyCooldown(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo
-	) const;
-
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	);
-
-	virtual bool CanActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayTagContainer* SourceTags = nullptr,
-		const FGameplayTagContainer* TargetTags = nullptr,
-		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	) const override;
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -78,43 +64,15 @@ public:
 
 	virtual void Tick(float DeltaTime);
 
-	bool GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent)const;
+	virtual bool GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent)const;
 
 	const TArray<FAbilityTriggerData>& GetTriggers()const;
 
-	void AddCooldownConsumeTime(float NewTime);
-
-	mutable FActiveGameplayEffectHandle CoolDownGEHanlde;
-
 protected:
+
+	virtual void ResetPreviousStageActions();
 
 	virtual void SendEvent(const FGameplayEventData& Payload);
-
-	virtual void ExcuteStepsLink();
-
-	virtual void ExcuteStopStep();
-
-	void OnCurrentStepEnd();
-
-	enum class ERepeatType
-	{
-		kCount,
-		kInfinte,
-		kStop,
-	};
-
-	ERepeatType RepeatType = ERepeatType::kCount;
-
-	int32 RepeatCount = 1;
-
-	int32 CurrentRepeatCount = 0;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Icon")
-	int32 CooldownTime = -1;
-	
-protected:
-
-	float CooldownConsumeTime = 0.f;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

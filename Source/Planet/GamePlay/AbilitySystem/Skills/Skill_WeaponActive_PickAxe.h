@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Skill_Base.h"
+#include "Skill_WeaponActive_Base.h"
 
 #include "Skill_WeaponActive_PickAxe.generated.h"
 
@@ -16,7 +16,7 @@ class UAbilityTask_PlayMontage;
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_WeaponActive_PickAxe : public USkill_Base
+class PLANET_API USkill_WeaponActive_PickAxe : public USkill_WeaponActive_Base
 {
 	GENERATED_BODY()
 
@@ -37,21 +37,13 @@ public:
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
 
-	virtual bool CanActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayTagContainer* SourceTags = nullptr,
-		const FGameplayTagContainer* TargetTags = nullptr,
-		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	) const override;
-
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 	) override;
 
 protected:
 
-	virtual void ExcuteStepsLink()override;
+	virtual void PerformAction()override;
 
 	void PlayMontage();
 
@@ -61,8 +53,6 @@ protected:
 	void MakeDamage();
 
 	void StartTasksLink();
-
-	bool bIsAttackEnd = true;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* PickAxeMontage = nullptr;

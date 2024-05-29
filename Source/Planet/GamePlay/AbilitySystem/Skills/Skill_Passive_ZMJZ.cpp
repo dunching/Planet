@@ -33,6 +33,18 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	}
 }
 
+void USkill_Passive_ZMJZ::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	PerformAction();
+}
+
 void USkill_Passive_ZMJZ::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
@@ -58,10 +70,6 @@ void USkill_Passive_ZMJZ::OnRemoveAbility(
 void USkill_Passive_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	RepeatType = ERepeatType::kCount;
-	RepeatCount = 1;
-	CurrentRepeatCount = 0;
 }
 
 void USkill_Passive_ZMJZ::EndAbility(
@@ -75,7 +83,7 @@ void USkill_Passive_ZMJZ::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Passive_ZMJZ::ExcuteStepsLink()
+void USkill_Passive_ZMJZ::PerformAction()
 {
 	if (CharacterPtr)
 	{

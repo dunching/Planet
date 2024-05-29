@@ -51,10 +51,6 @@ void USkill_Active_ContinuousGroupTherapy::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	RepeatType = ERepeatType::kCount;
-	RepeatCount = 1; 
-	CurrentRepeatCount = 0;
 }
 
 void USkill_Active_ContinuousGroupTherapy::ActivateAbility(
@@ -67,9 +63,11 @@ void USkill_Active_ContinuousGroupTherapy::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
+
+	PerformAction();
 }
 
-void USkill_Active_ContinuousGroupTherapy::ExcuteStepsLink()
+void USkill_Active_ContinuousGroupTherapy::PerformAction()
 {
 	StartTasksLink();
 }
@@ -83,10 +81,9 @@ void USkill_Active_ContinuousGroupTherapy::StartTasksLink()
 	TaskPtr->SetIntervalTime(1.f);
 	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
 	TaskPtr->OnFinished.BindLambda([this](auto) {
-		DecrementListLockOverride();
+		K2_CancelAbility();
 		});
 	TaskPtr->ReadyForActivation();
-	IncrementListLock();
 }
 
 void USkill_Active_ContinuousGroupTherapy::OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float DeltaTime)
@@ -178,13 +175,11 @@ void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
 		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
 		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }

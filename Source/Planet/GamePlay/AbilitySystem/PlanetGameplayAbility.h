@@ -20,23 +20,13 @@ public:
 
 	UPlanetGameplayAbility();
 
-	void RunIfListLock()const;
-
-	void ResetListLock()const;
-
-	void DecrementToZeroListLock()const;
-
-	void DecrementListLockOverride()const;
-
-protected:
-
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
 
 	virtual void PreActivate(
-		const FGameplayAbilitySpecHandle Handle, 
+		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
@@ -51,9 +41,9 @@ protected:
 	) override;
 
 	virtual bool CommitAbility(
-		const FGameplayAbilitySpecHandle Handle, 
-		const FGameplayAbilityActorInfo* ActorInfo, 
-		const FGameplayAbilityActivationInfo ActivationInfo, 
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	);
 
@@ -70,20 +60,30 @@ protected:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateCancelAbility
-	);
+	)override;
 
 	virtual void EndAbility(
-		const FGameplayAbilitySpecHandle Handle, 
+		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo, 
+		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	)override;
 
 	virtual void OnGameplayTaskInitialized(UGameplayTask& Task) override;
 
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+
+protected:
+
+	void RunIfListLock()const;
+
+	void ResetListLock()const;
+
+	void DecrementToZeroListLock()const;
+
+	void DecrementListLockOverride()const;
 
 };

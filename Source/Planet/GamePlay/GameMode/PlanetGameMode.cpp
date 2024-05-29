@@ -38,31 +38,35 @@ void APlanetGameMode::BeginPlay()
 	Super::BeginPlay();
 
 	TArray<AActor*>ResultAry;
-	UGameplayStatics::GetAllActorsOfClass(GetWorldImp(), ACharacterBase::StaticClass(), ResultAry);
-	for (auto Iter : ResultAry)
+	UGameplayStatics::GetAllActorsOfClass(GetWorldImp(), AVoxelActor::StaticClass(), ResultAry);
+	if (!ResultAry.IsEmpty())
 	{
-		auto CharacterPtr = Cast<ACharacterBase>(Iter);
-		if (CharacterPtr)
-		{
-			CharacterPtr->GetCharacterMovement()->UpdatedComponent->Mobility = EComponentMobility::Stationary;
-		}
-	}
-
-	Delegate = GVoxelTaskExecutor->OnEndProcessing.AddLambda([this]() {
-
-		TArray<AActor*>ResultAry;
 		UGameplayStatics::GetAllActorsOfClass(GetWorldImp(), ACharacterBase::StaticClass(), ResultAry);
 		for (auto Iter : ResultAry)
 		{
 			auto CharacterPtr = Cast<ACharacterBase>(Iter);
 			if (CharacterPtr)
 			{
-				CharacterPtr->GetCharacterMovement()->UpdatedComponent->Mobility = EComponentMobility::Movable;
+				CharacterPtr->GetCharacterMovement()->UpdatedComponent->Mobility = EComponentMobility::Stationary;
 			}
 		}
 
-		GVoxelTaskExecutor->OnEndProcessing.Remove(Delegate);
-		});
+		Delegate = GVoxelTaskExecutor->OnEndProcessing.AddLambda([this]() {
+
+			TArray<AActor*>ResultAry;
+			UGameplayStatics::GetAllActorsOfClass(GetWorldImp(), ACharacterBase::StaticClass(), ResultAry);
+			for (auto Iter : ResultAry)
+			{
+				auto CharacterPtr = Cast<ACharacterBase>(Iter);
+				if (CharacterPtr)
+				{
+					CharacterPtr->GetCharacterMovement()->UpdatedComponent->Mobility = EComponentMobility::Movable;
+				}
+			}
+
+			GVoxelTaskExecutor->OnEndProcessing.Remove(Delegate);
+			});
+	}
 
 	LoadGameImp();
 

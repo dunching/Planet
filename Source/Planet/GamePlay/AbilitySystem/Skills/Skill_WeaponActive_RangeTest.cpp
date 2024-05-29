@@ -39,8 +39,6 @@ USkill_WeaponActive_RangeTest::USkill_WeaponActive_RangeTest() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	bRetriggerInstancedAbility = true;
 }
 
 void USkill_WeaponActive_RangeTest::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
@@ -51,8 +49,6 @@ void USkill_WeaponActive_RangeTest::OnAvatarSet(const FGameplayAbilityActorInfo*
 void USkill_WeaponActive_RangeTest::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	RepeatType = ERepeatType::kInfinte;
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
@@ -71,29 +67,12 @@ void USkill_WeaponActive_RangeTest::PreActivate(const FGameplayAbilitySpecHandle
 	K2_EndAbility();
 }
 
-bool USkill_WeaponActive_RangeTest::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags /*= nullptr*/, const FGameplayTagContainer* TargetTags /*= nullptr*/, OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */) const
-{
-	switch (RepeatType)
-	{
-	case ERepeatType::kStop:
-	{
-		if (!bIsAttackEnd)
-		{
-			return false;
-		}
-	}
-	break;
-	}
-
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
-}
-
 void USkill_WeaponActive_RangeTest::OnRemoveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void USkill_WeaponActive_RangeTest::ExcuteStepsLink()
+void USkill_WeaponActive_RangeTest::PerformAction()
 {
 	StartTasksLink();
 }
@@ -137,7 +116,7 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 		EmitProjectile();
 
 		bIsAttackEnd = true;
-		if (RepeatType != USkill_Base::ERepeatType::kStop)
+		if (!bIsRequstCancel)
 		{
 			DecrementToZeroListLock();
 		}

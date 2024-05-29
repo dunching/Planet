@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Skill_Base.h"
+#include "Skill_WeaponActive_Base.h"
 
 #include "Skill_WeaponActive_HandProtection.generated.h"
 
@@ -17,7 +17,7 @@ class UProgressTips;
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_WeaponActive_HandProtection : public USkill_Base
+class PLANET_API USkill_WeaponActive_HandProtection : public USkill_WeaponActive_Base
 {
 	GENERATED_BODY()
 
@@ -56,9 +56,13 @@ public:
 
 protected:
 
-	virtual void ExcuteStepsLink()override;
+	virtual void PerformAction()override;
 
-	virtual void ExcuteStopStep()override;
+	virtual void PerformStopAction()override;
+
+	virtual void ResetPreviousStageActions()override;
+
+	void ExcuteStopStep();
 
 	void PlayMontage();
 
@@ -68,22 +72,18 @@ protected:
 	void MakeDamage();
 
 	void FirstStep();
-	
+
 	void SecondStep();
 
 	void ThirdStep();
 
 	int32 TatalCount = 3;
-	
+
 	int32 CurrentIndex = 0;
-
-	bool bIsInInputRange = false;
-
-	bool bIsAttackEnd = true;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* HumanStep1Montage = nullptr;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* HumanStep2Montage = nullptr;
 

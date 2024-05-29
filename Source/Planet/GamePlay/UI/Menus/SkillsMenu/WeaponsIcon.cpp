@@ -21,6 +21,15 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 
+namespace WeaponsIcon
+{
+	const FName Content = TEXT("Content");
+
+	const FName Default = TEXT("Default");
+
+	const FName Texture = TEXT("Texture");
+}
+
 UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
@@ -49,12 +58,12 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 
 		OnDroped.ExcuteCallback(WeaponUnitPtr);
 
-		auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Default")));
+		auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Default));
 		if (ImagePtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Collapsed);
 		}
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TEXT("Content")));
+		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(WeaponsIcon::Content));
 		if (BorderPtr)
 		{
 			BorderPtr->SetVisibility(ESlateVisibility::Visible);
@@ -62,12 +71,12 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	}
 	else
 	{
-		auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Default")));
+		auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Default));
 		if (ImagePtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 		}
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TEXT("Content")));
+		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(WeaponsIcon::Content));
 		if (BorderPtr)
 		{
 			BorderPtr->SetVisibility(ESlateVisibility::Collapsed);
@@ -77,7 +86,7 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 
 void UWeaponsIcon::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Texture));
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();

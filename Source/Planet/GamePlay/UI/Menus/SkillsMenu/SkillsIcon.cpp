@@ -27,19 +27,14 @@
 #include "EquipmentElementComponent.h"
 #include "Skill_Base.h"
 
-const FName Content = TEXT("Content");
+namespace SkillsIcon
+{
+	const FName Content = TEXT("Content");
 
-const FName HighlightBorder = TEXT("HighlightBorder");
+	const FName Default = TEXT("Default");
 
-const FName StateOverlap = TEXT("StateOverlap");
-
-const FName Icon = TEXT("Icon");
-
-const FName CooldownProgress = TEXT("CooldownProgress");
-
-const FName CooldownText = TEXT("CooldownText");
-
-const FName DisableMask = TEXT("DisableMask");
+	const FName Icon = TEXT("Icon");
+}
 
 USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -75,48 +70,36 @@ void USkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			SetItemType();
 
 			{
-				auto ImagePtr = Cast<UImage>(GetWidgetFromName(HighlightBorder));
+				auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Default));
 				if (ImagePtr)
 				{
 					ImagePtr->SetVisibility(ESlateVisibility::Hidden);
 				}
 			}
 			{
-				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(Content));
+				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(SkillsIcon::Content));
 				if (BorderPtr)
 				{
 					BorderPtr->SetVisibility(ESlateVisibility::Visible);
 				}
 			}
+		}
+	}
+	else
+	{
+		{
+			auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Default));
+			if (ImagePtr)
 			{
-				auto UIPtr = Cast<UOverlay>(GetWidgetFromName(StateOverlap));
-				if (UIPtr)
-				{
-					UIPtr->SetVisibility(ESlateVisibility::Hidden);
-				}
+				ImagePtr->SetVisibility(ESlateVisibility::Visible);
 			}
-			return;
 		}
-	}
-	{
-		auto ImagePtr = Cast<UImage>(GetWidgetFromName(HighlightBorder));
-		if (ImagePtr)
 		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
-		}
-	}
-	{
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(Content));
-		if (BorderPtr)
-		{
-			BorderPtr->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
-	{
-		auto UIPtr = Cast<UOverlay>(GetWidgetFromName(StateOverlap));
-		if (UIPtr)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Hidden);
+			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(SkillsIcon::Content));
+			if (BorderPtr)
+			{
+				BorderPtr->SetVisibility(ESlateVisibility::Collapsed);
+			}
 		}
 	}
 }
@@ -127,7 +110,7 @@ void USkillsIcon::SetLevel(int32 NewNum)
 
 void USkillsIcon::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(Icon));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Icon));
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();

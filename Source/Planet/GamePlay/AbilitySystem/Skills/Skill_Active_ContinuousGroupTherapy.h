@@ -42,7 +42,7 @@ public:
 
 protected:
 
-	virtual void ExcuteStepsLink()override;
+	void PerformAction();
 
 	void PlayMontage();
 

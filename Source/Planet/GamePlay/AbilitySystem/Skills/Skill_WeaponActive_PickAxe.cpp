@@ -37,8 +37,6 @@ USkill_WeaponActive_PickAxe::USkill_WeaponActive_PickAxe() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	bRetriggerInstancedAbility = true;
 }
 
 void USkill_WeaponActive_PickAxe::OnAvatarSet(
@@ -80,8 +78,6 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
-	RepeatType = ERepeatType::kInfinte;
-
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
 		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_PickAxe*>(TriggerEventData->TargetData.Get(0));
@@ -99,31 +95,10 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 	K2_EndAbility();
 }
 
-bool USkill_WeaponActive_PickAxe::CanActivateAbility(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayTagContainer* SourceTags /*= nullptr*/,
-	const FGameplayTagContainer* TargetTags /*= nullptr*/,
-	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+void USkill_WeaponActive_PickAxe::PerformAction()
 {
-	switch (RepeatType)
-	{
-	case ERepeatType::kStop:
-	{
-		if (!bIsAttackEnd)
-		{
-			return false;
-		}
-	}
-	break;
-	}
+	Super::PerformAction();
 
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
-}
-
-void USkill_WeaponActive_PickAxe::ExcuteStepsLink()
-{
 	StartTasksLink();
 }
 
@@ -143,7 +118,7 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 		MakeDamage();
 
 		bIsAttackEnd = true;
-		if (RepeatType != USkill_Base::ERepeatType::kStop)
+		if (!bIsRequstCancel)
 		{
 			DecrementToZeroListLock();
 		}

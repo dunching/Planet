@@ -3,8 +3,8 @@
 
 #include "CoreMinimal.h"
 
-#include "Skill_Base.h"
 #include "ProjectileBase.h"
+#include "Skill_WeaponActive_Base.h"
 
 #include "Skill_WeaponActive_RangeTest.generated.h"
 
@@ -27,7 +27,7 @@ public:
 };
 
 UCLASS()
-class PLANET_API USkill_WeaponActive_RangeTest : public USkill_Base
+class PLANET_API USkill_WeaponActive_RangeTest : public USkill_WeaponActive_Base
 {
 	GENERATED_BODY()
 
@@ -48,21 +48,13 @@ public:
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
 
-	virtual bool CanActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayTagContainer* SourceTags = nullptr,
-		const FGameplayTagContainer* TargetTags = nullptr,
-		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	) const override;
-
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 	) override;
 
 protected:
 
-	virtual void ExcuteStepsLink()override;
+	virtual void PerformAction()override;
 
 	void PlayMontage();
 
@@ -84,8 +76,6 @@ protected:
 		bool bFromSweep, 
 		const FHitResult& SweepResult
 	);
-
-	bool bIsAttackEnd = true;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;

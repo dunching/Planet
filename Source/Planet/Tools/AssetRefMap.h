@@ -126,7 +126,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
 	FGameplayTag GameplayTag1 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Continuous.Interruptible")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Continuous")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	FGameplayTag GameplayTag2 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.WeaponActive")));
 #pragma endregion Tags
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

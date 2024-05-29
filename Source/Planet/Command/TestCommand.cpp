@@ -131,34 +131,6 @@ void TestCommand::TestDisplacementSkill()
 
 void TestCommand::TestCooldown()
 {
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
-	if (CharacterPtr)
-	{
-		auto GAHandle = CharacterPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(Handle1);
-		auto GEHandle1 = CharacterPtr->GetAbilitySystemComponent()->FindActiveGameplayEffectHandle(Handle1);
-
-		auto GEHandle = Cast<USkill_Base>(GAHandle->GetPrimaryInstance())->CoolDownGEHanlde;
-
-		auto ActiveGameplayEffectPtr = CharacterPtr->GetAbilitySystemComponent()->GetActiveGameplayEffect(GEHandle);
-
-		TArray<FGameplayEffectSpec> OutSpecCopies;
-		CharacterPtr->GetAbilitySystemComponent()->GetAllActiveGameplayEffectSpecs(OutSpecCopies);
-
-		auto f = ActiveGameplayEffectPtr->GetTimeRemaining(CharacterPtr->GetAbilitySystemComponent()->GetActiveGameplayEffects().GetWorldTime());
-
-		for (auto& Iter : OutSpecCopies)
-		{
-			if (&Iter == &ActiveGameplayEffectPtr->Spec)
-			{
-			}
-			Iter.SetDuration(5, true);
-		}
-
-		auto f2 = ActiveGameplayEffectPtr->GetTimeRemaining(CharacterPtr->GetAbilitySystemComponent()->GetActiveGameplayEffects().GetWorldTime());
-
-
-		UE_LOG(LogTemp, Log, TEXT(""));
-	}
 }
 
 void TestCommand::TestGAEventModify()
