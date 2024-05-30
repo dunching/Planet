@@ -43,7 +43,7 @@ protected:
 
 	void OnHPMaxValueChanged(int32 NewVal);
 
-private:
+protected:
 
 	void OnHPChanged();
 
@@ -53,17 +53,20 @@ private:
 
 	bool ResetPosition(float InDeltaTime);
 
-	FVector2D SizeBox = FVector2D::ZeroVector;
-
 	FVector2D PreviousPt = FVector2D::ZeroVector;
 
 	FVector2D DesiredPt = FVector2D::ZeroVector;
+
+	FVector2D Size = FVector2D::ZeroVector;
 
 	float Interval = 1.f / 30.f;
 
 	float CurrentInterval = 0.f;
 
-	float Offset = 100.f;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	float Offset = 150.f;
+
+	float Scale = 1.f;
 
 	FDelegateHandle CurrentHPValueChanged;
 

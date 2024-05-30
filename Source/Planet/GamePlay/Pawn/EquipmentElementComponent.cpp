@@ -235,9 +235,27 @@ void UEquipmentElementComponent::RegisterTool(const TSharedPtr < FToolsSocketInf
 	ToolsMap.Add(InToolInfo->SkillSocket, InToolInfo);
 }
 
-void UEquipmentElementComponent::RegisterCanbeActivedInfo(const TArray< TSharedPtr<FCanbeActivedInfo>>& InCanbeActivedInfoAry)
+void UEquipmentElementComponent::GenerationCanbeActivedInfo()
 {
-	CanbeActivedInfoAry = InCanbeActivedInfoAry;
+	CanbeActivedInfoAry.Empty();
+
+	// 响应武器
+	{
+		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
+		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kWeaponActiveSkill;
+		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
+	}
+
+	// 响应主动技能
+	for (const auto & Iter : SkillsMap)
+	{
+		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
+
+		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveSkill;
+		CanbeActivedInfoSPtr->SkillSocket = Iter.Value->SkillSocket;
+
+		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
+	}
 }
 
 void UEquipmentElementComponent::RegisterWeapon(
@@ -501,7 +519,7 @@ void UEquipmentElementComponent::RemoveTag(const FGameplayTag& Tag)
 	TagsModifyHandleContainer.ExcuteCallback(ETagChangeType::kRemove, Tag);
 }
 
-void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
 {
 	if (CanbeActivedInfoSPtr->Type == FCanbeActivedInfo::EType::kWeaponActiveSkill)
 	{
@@ -520,7 +538,7 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		break;
 		default:
 		{
-			return;
+			return false;
 		}
 		}
 
@@ -552,7 +570,7 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		if (!OnwerActorPtr)
 		{
-			return;
+			return  false;
 		}
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
@@ -569,7 +587,7 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		auto SkillIter = SkillsMap.Find(CanbeActivedInfoSPtr->SkillSocket);
 		if (!SkillIter)
 		{
-			return;
+			return  false;
 		}
 
 		switch ((*SkillIter)->SkillUnit->SkillType)
@@ -579,24 +597,24 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 			auto OnwerActorPtr = GetOwner<ACharacterBase>();
 			if (!OnwerActorPtr)
 			{
-				return;
+				return  false;
 			}
 
 			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle((*SkillIter)->Handle);
 			if (!GameplayAbilitySpecPtr)
 			{
-				return;
+				return false;
 			}
 			auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
 			if (!GAInsPtr)
 			{
-				return;
+				return false;
 			}
 
 			if (!ActivedCorrespondingWeapon(GAInsPtr))
 			{
-				return;
+				return false;
 			}
 
 			switch ((*SkillIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
@@ -608,6 +626,7 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 			default:
 			{
 				ASCPtr->TryActivateAbility((*SkillIter)->Handle);
+				return true;
 			}
 			break;
 			}
@@ -615,6 +634,7 @@ void UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		break;
 		}
 	}
+	return false;
 }
 
 void UEquipmentElementComponent::CancelSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)

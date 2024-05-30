@@ -167,54 +167,66 @@ void AHumanAIController::InitialCharacter()
 
 		auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
+
 		{
-			auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
-			if (WeaponUnitPtr)
+			// ÎäÆ÷
 			{
-				TArray< TSharedPtr<FCanbeActivedInfo>>CanbeActivedInfoAry;
-				// ÎäÆ÷
+				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
+				if (WeaponUnitPtr)
 				{
 					TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 
-					FirstWeaponSocketInfoSPtr->WeaponSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.WeaponActiveSocket1"));
+					FirstWeaponSocketInfoSPtr->WeaponSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket1;
 					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
 
 					TSharedPtr < FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
 
 					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
-					EICPtr->SwitchWeapon();
-
-					TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
-
-					CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kWeaponActiveSkill;
-
-					CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
 				}
-				{
-					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
-
-					{
-						TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-						SkillsSocketInfo->SkillSocket = FGameplayTag::RequestGameplayTag(TEXT("UI.SkillSocket.ActiveSocket1"));
-						SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().AddUnit(WeaponUnitPtr->FirstSkillClass);
-
-						SkillsMap.Add(
-							SkillsSocketInfo->SkillSocket,
-							SkillsSocketInfo
-						);
-
-						TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
-
-						CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveSkill;
-						CanbeActivedInfoSPtr->SkillSocket = SkillsSocketInfo->SkillSocket;
-
-						CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
-					}
-					EICPtr->RegisterMultiGAs(SkillsMap);
-				}
-				EICPtr->RegisterCanbeActivedInfo(CanbeActivedInfoAry);
 			}
+			{
+				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kRangeTest);
+				if (WeaponUnitPtr)
+				{
+					TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
+
+					FirstWeaponSocketInfoSPtr->WeaponSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket2;
+					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
+
+					TSharedPtr < FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
+
+					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
+				}
+			}
+			EICPtr->SwitchWeapon();
 		}
+		// ¼¼ÄÜ
+		{
+			TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
+			{
+				TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+
+				SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket1;
+				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
+
+				SkillsMap.Add(
+					SkillsSocketInfo->SkillSocket,
+					SkillsSocketInfo
+				);
+			}
+			{
+				TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+
+				SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket2;
+				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
+
+				SkillsMap.Add(
+					SkillsSocketInfo->SkillSocket,
+					SkillsSocketInfo
+				);
+			}
+			EICPtr->RegisterMultiGAs(SkillsMap);
+		}
+		EICPtr->GenerationCanbeActivedInfo();
 	}
 }

@@ -91,7 +91,6 @@ void UAllocationSkillsMenu::NativeDestruct()
 
 	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 
-	TArray< TSharedPtr<FCanbeActivedInfo>>CanbeActivedInfoAry;
 	// 武器技能
 	{
 		TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
@@ -113,14 +112,8 @@ void UAllocationSkillsMenu::NativeDestruct()
 			}
 		}
 		EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
-
-		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
-
-		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kWeaponActiveSkill;
-		CanbeActivedInfoSPtr->Key = WeaponActiveSkills;
-
-		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
 	}
+	// 技能
 	{
 		struct FHelper
 		{
@@ -155,19 +148,11 @@ void UAllocationSkillsMenu::NativeDestruct()
 				SkillsSocketInfo->SkillUnit = IconPtr->SkillUnitPtr;
 
 				SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
-
-				TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
-
-				CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveSkill;
-				CanbeActivedInfoSPtr->Key = Iter.Key;
-				CanbeActivedInfoSPtr->SkillSocket = IconPtr->IconSocket;
-
-				CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
 			}
 		}
 		EICPtr->RegisterMultiGAs(SkillsMap);
 	}
-	EICPtr->RegisterCanbeActivedInfo(CanbeActivedInfoAry);
+	EICPtr->GenerationCanbeActivedInfo();
 }
 
 void UAllocationSkillsMenu::ResetUIByData_Skills()

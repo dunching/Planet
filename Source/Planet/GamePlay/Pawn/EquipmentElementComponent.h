@@ -116,7 +116,7 @@ public:
 
 	void RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo);
 
-	void RegisterCanbeActivedInfo(const TArray< TSharedPtr<FCanbeActivedInfo>>& InCanbeActivedInfoAry);
+	void GenerationCanbeActivedInfo();
 
 	TSharedPtr < FSkillSocketInfo> FindSkill(const FGameplayTag& Tag);
 
@@ -142,7 +142,7 @@ public:
 
 	void RemoveTag(const FGameplayTag& Tag);
 
-	void ActiveSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+	bool ActiveSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
 
 	void CancelSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
 

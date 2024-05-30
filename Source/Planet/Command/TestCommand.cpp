@@ -66,11 +66,13 @@ void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 
 		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
 		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
+		HoldItemComponent.AddUnit(EWeaponUnitType::kRangeTest);
 
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
 	}
 }
 
@@ -184,10 +186,22 @@ void TestCommand::SpawnCharacter(const TArray< FString >& Args)
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
+		FActorSpawnParameters SpawnParameters;
+
+		SpawnParameters.CustomPreSpawnInitalization = [&](AActor* ActorPtr) 
+			{
+				if (Args.IsValidIndex(1))
+				{
+					auto NewCharacterPtr = Cast<AHumanCharacter>(ActorPtr);
+					NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
+				}
+			};
+
 		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHumanCharacter>(
 			UAssetRefMap::GetInstance()->HumanClass,
 			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * 600),
-			FRotator::ZeroRotator
+			FRotator::ZeroRotator,
+			SpawnParameters
 		);
 
 		if (Args.IsValidIndex(0))
@@ -195,10 +209,6 @@ void TestCommand::SpawnCharacter(const TArray< FString >& Args)
 			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HPReplay.AddCurrentValue(
 				UKismetStringLibrary::Conv_StringToInt(Args[0])
 			);
-		}
-		if (Args.IsValidIndex(1))
-		{
-			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
 		}
 	}
 }
