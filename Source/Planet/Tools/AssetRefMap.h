@@ -118,11 +118,11 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DeathingTag = 
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Deathing")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Deathing")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag InFightingTag = 
-		FGameplayTag::RequestGameplayTag(FName(TEXT("InFighting")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.InFighting")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
 	FGameplayTag GameplayTag1 =

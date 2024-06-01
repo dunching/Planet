@@ -35,8 +35,6 @@ void UFocusIcon::NativeDestruct()
 void UFocusIcon::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-
-
 }
 
 bool UFocusIcon::ResetPosition(float InDeltaTime)

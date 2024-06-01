@@ -32,6 +32,11 @@ void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 	}
 }
 
+UPlanetAbilitySystemComponent* AHumanAIController::GetAbilitySystemComponent() const
+{
+	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
+}
+
 UGroupMnaggerComponent* AHumanAIController::GetGroupMnaggerComponent()const
 {
 	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
@@ -64,6 +69,29 @@ void AHumanAIController::OnTeammateOptionChangedImp(
 	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);
 }
 
+void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
+{
+	if (Count > 0)
+	{
+		GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
+			OnOwnedDeathTagDelegateHandle,
+			UAssetRefMap::GetInstance()->DeathingTag,
+			EGameplayTagEventType::NewOrRemoved
+		);
+
+		DoDeathing();
+	}
+}
+
+void AHumanAIController::DoDeathing()
+{
+	if (AIHumanInfoPtr)
+	{
+		AIHumanInfoPtr->RemoveFromParent();
+		AIHumanInfoPtr = nullptr;
+	}
+}
+
 void AHumanAIController::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
@@ -76,11 +104,7 @@ void AHumanAIController::BeginPlay()
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (AIHumanInfoPtr)
-	{
-		AIHumanInfoPtr->RemoveFromParent();
-		AIHumanInfoPtr = nullptr;
-	}
+	DoDeathing();
 
 	Super::EndPlay(EndPlayReason);
 }
@@ -90,6 +114,12 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	InitialCharacter();
+
+	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
+		UAssetRefMap::GetInstance()->DeathingTag,
+		EGameplayTagEventType::NewOrRemoved
+	);
+	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
 
 	GroupHelperChangedDelegate =
 		GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
@@ -170,34 +200,25 @@ void AHumanAIController::InitialCharacter()
 
 		{
 			// ÎäÆ÷
+			TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 			{
 				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
 				if (WeaponUnitPtr)
 				{
-					TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
-
 					FirstWeaponSocketInfoSPtr->WeaponSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket1;
 					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
-
-					TSharedPtr < FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
-
-					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
 				}
 			}
+			TSharedPtr < FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
 			{
 				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kRangeTest);
 				if (WeaponUnitPtr)
 				{
-					TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
-
-					FirstWeaponSocketInfoSPtr->WeaponSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket2;
-					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
-
-					TSharedPtr < FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
-
-					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
+					SecondWeaponSocketInfo->WeaponSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket2;
+					SecondWeaponSocketInfo->WeaponUnitPtr = WeaponUnitPtr;
 				}
 			}
+			EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
 			EICPtr->SwitchWeapon();
 		}
 		// ¼¼ÄÜ

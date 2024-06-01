@@ -207,13 +207,15 @@ namespace HumanProcessor
 			{
 				if (PCPtr->GetFocusActor() == OutHit.GetActor())
 				{
-					return;
 				}
-				auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
-				if (TargetCharacterPtr)
+				else
 				{
-					PCPtr->SetFocus(TargetCharacterPtr);
-					return;
+					auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+					if (TargetCharacterPtr)
+					{
+						PCPtr->SetFocus(TargetCharacterPtr);
+						return;
+					}
 				}
 			}
 		}

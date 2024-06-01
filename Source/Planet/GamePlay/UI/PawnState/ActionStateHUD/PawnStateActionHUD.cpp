@@ -226,7 +226,7 @@ void UPawnStateActionHUD::InitialSkillIcon()
 	ActivedWeaponChangedDelegate = EICPtr->OnActivedWeaponChangedContainer.AddCallback(
 		std::bind(&ThisClass::OnActivedWeaponChanged, this, std::placeholders::_1)
 	);
-	OnActivedWeaponChanged(EICPtr->GetActivedWeapon());
+	OnActivedWeaponChanged(EICPtr->GetActivedWeaponType());
 }
 
 void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)

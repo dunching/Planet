@@ -15,7 +15,7 @@ void AGravityAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePa
 	APawn* const MyPawn = GetPawn();
 	if (MyPawn)
 	{
-		FRotator NewControlRotation = ControlRotationWithoutGravityTrans;
+		FRotator NewControlRotation = GetControlRotation();
 
 		// Look toward focus
 		const FVector FocalPoint = GetFocalPoint();
@@ -25,7 +25,7 @@ void AGravityAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePa
 		}
 		else if (bSetControlRotationFromPawnOrientation)
 		{
-			NewControlRotation = ControlRotationWithoutGravityTrans;
+			NewControlRotation = MyPawn->GetActorRotation();
 		}
 
 		// Don't pitch view unless looking at another pawn
@@ -33,10 +33,6 @@ void AGravityAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePa
 		{
 			NewControlRotation.Pitch = 0.f;
 		}
-
-		ControlRotationWithoutGravityTrans = NewControlRotation;
-
-		NewControlRotation = (MyPawn->GetGravityTransform() * NewControlRotation.Quaternion()).Rotator();
 
 		SetControlRotation(NewControlRotation);
 

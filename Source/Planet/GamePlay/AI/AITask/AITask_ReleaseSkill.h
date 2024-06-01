@@ -44,6 +44,8 @@ protected:
 
 	bool ReleasingSKill();
 
+	int32 CurrentTaslHasReleaseNum = 0;
+
 	TMap<FGameplayAbilitySpecHandle, TSharedPtr<FCanbeActivedInfo>>ReleasingSkillMap;
 
 	TMap<FGameplayAbilitySpecHandle, FDelegateHandle>ReleasingSkillDelegateMap;

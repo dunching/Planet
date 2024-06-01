@@ -31,6 +31,8 @@ class UWeaponUnit;
 
 struct FSkillSocketInfo
 {
+	FKey Key;
+
 	FGameplayTag SkillSocket;
 
 	USkillUnit* SkillUnit = nullptr;
@@ -86,6 +88,8 @@ public:
 
 	virtual void BeginPlay()override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
+
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
 	static FName ComponentName;
@@ -96,6 +100,27 @@ public:
 
 	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData);
 
+	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedInfo()const;
+
+	void GenerationCanbeActivedInfo();
+
+#pragma region Tools
+	void RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo);
+
+	TSharedPtr < FToolsSocketInfo> FindTool(const FGameplayTag& Tag);
+
+	const TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>& GetTools()const;
+#pragma endregion Tools
+
+#pragma region Skills
+	void RegisterMultiGAs(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
+
+	TSharedPtr < FSkillSocketInfo> FindSkill(const FGameplayTag& Tag);
+
+	const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& GetSkills()const;
+#pragma endregion Skills
+
+#pragma region Weapon
 	void RegisterWeapon(
 		const TSharedPtr < FWeaponSocketInfo>& FirstWeaponSocketInfo,
 		const TSharedPtr < FWeaponSocketInfo>& SecondWeaponSocketInfo
@@ -110,23 +135,10 @@ public:
 
 	void RetractputWeapon();
 
-	EWeaponSocket GetActivedWeapon();
+	EWeaponSocket GetActivedWeaponType();
 
-	void RegisterMultiGAs(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
-
-	void RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo);
-
-	void GenerationCanbeActivedInfo();
-
-	TSharedPtr < FSkillSocketInfo> FindSkill(const FGameplayTag& Tag);
-
-	TSharedPtr < FToolsSocketInfo> FindTool(const FGameplayTag& Tag);
-
-	const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& GetSkills()const;
-
-	const TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>& GetTools()const;
-
-	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedInfo()const;
+	TSharedPtr < FWeaponSocketInfo >GetActivedWeapon()const;
+#pragma endregion Weapon
 
 	void AddGAEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
 

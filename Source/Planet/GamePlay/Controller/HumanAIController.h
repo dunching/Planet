@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 
 #include "GravityAIController.h"
 #include "GenerateType.h"
@@ -40,6 +41,8 @@ public:
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
+	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
@@ -62,6 +65,10 @@ protected:
 		FPawnType* LeaderPCPtr
 	);
 
+	void OnDeathing(const FGameplayTag Tag, int32 Count);
+
+	void DoDeathing();
+
 	virtual void OnConstruction(const FTransform& Transform)override;
 
 	virtual void BeginPlay() override;
@@ -83,6 +90,8 @@ protected:
 	FTeamHelperChangedDelegate TeamHelperChangedDelegate;
 
 	FTeamHelperChangedDelegate GroupHelperChangedDelegate;
+
+	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;

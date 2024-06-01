@@ -30,12 +30,14 @@ void UAITask_ReleaseSkill::Activate()
 
 void UAITask_ReleaseSkill::ConditionalPerformMove()
 {
+	CurrentTaslHasReleaseNum = 0;
+
 	PerformMove();
 }
 
 bool UAITask_ReleaseSkill::WasMoveSuccessful() const
 {
-	return ReleasingSkillMap.IsEmpty();
+	return CurrentTaslHasReleaseNum > 0;
 }
 
 void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
@@ -88,7 +90,6 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 		else
 		{
 			auto CanbeActivedInfo = CharacterPtr->GetEquipmentItemsComponent()->GetCanbeActivedInfo();
-			auto Skills = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
 			{
 				for (const auto& Iter : CanbeActivedInfo)
 				{
@@ -96,6 +97,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 					{
 					case FCanbeActivedInfo::EType::kActiveSkill:
 					{
+						auto Skills = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
 						auto SkillIter = Skills.Find(Iter->SkillSocket);
 						if (!SkillIter)
 						{
@@ -112,17 +114,20 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 							continue;
 						}
 
-						auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+						auto bIsReady = GAInsPtr->CanActivateAbility(
+							GAInsPtr->GetCurrentAbilitySpecHandle(), 
+							GAInsPtr->GetCurrentActorInfo()
+						);
 						if (bIsReady)
 						{
-							ReleasingSkillMap.Add((*SkillIter)->Handle, Iter);
-							ReleasingSkillDelegateMap.Add(
-								(*SkillIter)->Handle,
-								GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
-							);
-
 							if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter))
 							{
+								ReleasingSkillMap.Add((*SkillIter)->Handle, Iter);
+								ReleasingSkillDelegateMap.Add(
+									(*SkillIter)->Handle,
+									GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
+								);
+								CurrentTaslHasReleaseNum++;
 								return true;
 							}
 						}
@@ -139,12 +144,12 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 					{
 					case FCanbeActivedInfo::EType::kWeaponActiveSkill:
 					{
-						auto SkillIter = Skills.Find(Iter->SkillSocket);
-						if (!SkillIter)
+						auto WeaponSPtr = CharacterPtr->GetEquipmentItemsComponent()->GetActivedWeapon();
+						if (!WeaponSPtr)
 						{
 							continue;
 						}
-						auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle((*SkillIter)->Handle);
+						auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(WeaponSPtr->Handle);
 						if (!GameplayAbilitySpecPtr)
 						{
 							continue;
@@ -155,17 +160,20 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 							continue;
 						}
 
-						auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+						auto bIsReady = GAInsPtr->CanActivateAbility(
+							GAInsPtr->GetCurrentAbilitySpecHandle(), 
+							GAInsPtr->GetCurrentActorInfo()
+						);
 						if (bIsReady)
 						{
-							ReleasingSkillMap.Add((*SkillIter)->Handle, Iter);
-							ReleasingSkillDelegateMap.Add(
-								(*SkillIter)->Handle,
-								GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
-							);
-
 							if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter))
 							{
+								ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
+								ReleasingSkillDelegateMap.Add(
+									WeaponSPtr->Handle,
+									GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
+								);
+								CurrentTaslHasReleaseNum++;
 								return true;
 							}
 						}
@@ -200,7 +208,7 @@ void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
 		GAInsPtr->OnGameplayAbilityEnded.Remove(ReleasingSkillDelegateMap[Iter.Key]);
 
 		// 2.
-	//	CharacterPtr->GetEquipmentItemsComponent()->CancelSkill(Iter.Value);
+		CharacterPtr->GetEquipmentItemsComponent()->CancelSkill(Iter.Value);
 	}
 
 	Super::OnDestroy(bInOwnerFinished);

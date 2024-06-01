@@ -19,7 +19,5 @@ public:
 
 private:
 
-	FRotator ControlRotationWithoutGravityTrans = FRotator::ZeroRotator;
-
 };
 

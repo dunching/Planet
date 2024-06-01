@@ -11,14 +11,15 @@
 UCLASS(config = Game)
 class GRAVITY_API AGravityPlayerController : public APlayerController
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
 
-    virtual void UpdateRotation(float DeltaTime)override;
+	virtual void UpdateRotation(float DeltaTime)override;
 
-private:
+protected:
 
-    FRotator ControlRotationWithoutGravityTrans = FRotator::ZeroRotator;
+	// ¼ÇÂ¼PlayerµÄYawºÍPitch
+	FRotator ControlRotationWithoutGravityTrans = FRotator::ZeroRotator;
 
 };

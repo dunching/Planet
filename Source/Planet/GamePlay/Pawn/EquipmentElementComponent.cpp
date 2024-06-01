@@ -56,6 +56,13 @@ void UEquipmentElementComponent::BeginPlay()
 	}
 }
 
+void UEquipmentElementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	RetractputWeapon();
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void UEquipmentElementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -243,6 +250,7 @@ void UEquipmentElementComponent::GenerationCanbeActivedInfo()
 	{
 		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
 		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kWeaponActiveSkill;
+		CanbeActivedInfoSPtr->Key = EKeys::LeftMouseButton;
 		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
 	}
 
@@ -252,6 +260,7 @@ void UEquipmentElementComponent::GenerationCanbeActivedInfo()
 		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
 
 		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveSkill;
+		CanbeActivedInfoSPtr->Key = Iter.Value->Key;
 		CanbeActivedInfoSPtr->SkillSocket = Iter.Value->SkillSocket;
 
 		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
@@ -428,9 +437,32 @@ void UEquipmentElementComponent::RetractputWeapon()
 	ActiveWeapon(EWeaponSocket::kNone);
 }
 
-EWeaponSocket UEquipmentElementComponent::GetActivedWeapon()
+EWeaponSocket UEquipmentElementComponent::GetActivedWeaponType()
 {
 	return CurrentActivedWeaponSocket;
+}
+
+TSharedPtr < FWeaponSocketInfo > UEquipmentElementComponent::GetActivedWeapon() const
+{
+	TSharedPtr < FWeaponSocketInfo > WeaponUnit;
+	switch (CurrentActivedWeaponSocket)
+	{
+	case EWeaponSocket::kMain:
+	{
+		WeaponUnit = FirstWeaponUnit;
+	}
+	break;
+	case EWeaponSocket::kSecondary:
+	{
+		WeaponUnit = SecondaryWeaponUnit;
+	}
+	break;
+	default:
+	{
+		WeaponUnit = MakeShared<FWeaponSocketInfo>();
+	}
+	}
+	return WeaponUnit;
 }
 
 TSharedPtr < FSkillSocketInfo >UEquipmentElementComponent::FindSkill(const FGameplayTag& Tag)
@@ -523,23 +555,14 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 {
 	if (CanbeActivedInfoSPtr->Type == FCanbeActivedInfo::EType::kWeaponActiveSkill)
 	{
-		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
-		switch (CurrentActivedWeaponSocket)
-		{
-		case EWeaponSocket::kMain:
-		{
-			WeaponUnit = FirstWeaponUnit;
-		}
-		break;
-		case EWeaponSocket::kSecondary:
-		{
-			WeaponUnit = SecondaryWeaponUnit;
-		}
-		break;
-		default:
+		TSharedPtr < FWeaponSocketInfo > WeaponUnit = GetActivedWeapon();
+		if (!WeaponUnit)
 		{
 			return false;
 		}
+		if (!WeaponUnit->WeaponUnitPtr)
+		{
+			return false;
 		}
 
 		FGameplayEventData Payload;

@@ -7,6 +7,7 @@
 #include "HumanControllerInterface.generated.h"
 
 class UGroupMnaggerComponent;
+class UPlanetAbilitySystemComponent;
 class UGourpmateUnit;
 class AHumanCharacter;
 
@@ -26,6 +27,8 @@ class PLANET_API IHumanControllerInterface
 public:
 
 	using FPawnType = AHumanCharacter;
+
+	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
 
 	// “成员管理”记录了成员信息，因为
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const = 0;

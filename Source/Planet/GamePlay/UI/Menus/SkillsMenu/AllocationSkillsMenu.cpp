@@ -146,6 +146,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 
 				SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
 				SkillsSocketInfo->SkillUnit = IconPtr->SkillUnitPtr;
+				SkillsSocketInfo->Key = Iter.Key;
 
 				SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
 			}
@@ -374,7 +375,7 @@ void UAllocationSkillsMenu::ResetUIByData()
 
 	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 
-	ResetUIByData_WeaponSkills(EICPtr->GetActivedWeapon());
+	ResetUIByData_WeaponSkills(EICPtr->GetActivedWeaponType());
 
 	{
 		TArray<FName>Ary

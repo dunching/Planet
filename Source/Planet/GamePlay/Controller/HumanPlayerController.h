@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 
 #include <AIController.h>
 
@@ -27,7 +28,7 @@ class PLANET_API AHumanPlayerController : public AGravityPlayerController, publi
 
 public:
 
-	using FDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>::FCallbackHandleSPtr;
+	using FTeamMembersChangedDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>::FCallbackHandleSPtr;
 
 	AHumanPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -36,6 +37,10 @@ public:
 	AActor* GetFocusActor() const;
 
 	virtual void ClearFocus(EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
+
+	FVector GetFocalPoint() const;
+
+	FVector GetFocalPointOnActor(const AActor* Actor) const;
 
 protected:
 
@@ -53,6 +58,8 @@ protected:
 
 	virtual bool InputKey(const FInputKeyParams& Params)override;
 
+	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
@@ -64,7 +71,16 @@ protected:
 		FPawnType* LeaderPCPtr
 	);
 
-	FDelegateHandle DelegateHandle;
+	UFUNCTION()
+	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);
+
+	void OnFocusDeathing(const FGameplayTag Tag, int32 Count);
+
+	void BindRemove(AActor* Actor);
+
+	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
+
+	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge	FocusInformation;
 

@@ -6,6 +6,7 @@
 
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
+#include "HumanAIController.h"
 
 void UPlanetGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -16,7 +17,13 @@ void UPlanetGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHan
 	WaitingToExecute.Add(FPostLockDelegate::CreateLambda([this]() {
 		K2_EndAbility();
 		}));
+
 	PlayMontage(DeathMontage, 1.f);
+
+	if (auto AIPCPtr = CharacterPtr->GetController<AHumanAIController>())
+	{
+
+	}
 }
 
 void UPlanetGameplayAbility_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)

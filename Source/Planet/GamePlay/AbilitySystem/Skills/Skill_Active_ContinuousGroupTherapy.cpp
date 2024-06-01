@@ -108,13 +108,13 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 	FCollisionQueryParams CapsuleParams;
 
 	TSet<ACharacterBase*>TeammatesSet;
-	TeammatesSet.Add(CharacterPtr);
 	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
 	if (GroupMnaggerComponent)
 	{
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
 		if (TeamsHelperSPtr)
 		{
+			TeammatesSet.Add(TeamsHelperSPtr->OwnerPCPtr);
 			for (auto Iter : TeamsHelperSPtr->MembersMap)
 			{
 				TeammatesSet.Add(Iter.Value);
