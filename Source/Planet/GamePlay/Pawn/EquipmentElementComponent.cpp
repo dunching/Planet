@@ -551,7 +551,7 @@ void UEquipmentElementComponent::RemoveTag(const FGameplayTag& Tag)
 	TagsModifyHandleContainer.ExcuteCallback(ETagChangeType::kRemove, Tag);
 }
 
-bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop)
 {
 	if (CanbeActivedInfoSPtr->Type == FCanbeActivedInfo::EType::kWeaponActiveSkill)
 	{
@@ -572,6 +572,7 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
 			GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(ActivedWeaponPtr);
+			GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 		}
 		break;
@@ -579,6 +580,7 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
 			GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(ActivedWeaponPtr);
+			GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 		}
 		break;
@@ -586,6 +588,7 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest;
 			GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(ActivedWeaponPtr);
+			GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 		}
 		break;

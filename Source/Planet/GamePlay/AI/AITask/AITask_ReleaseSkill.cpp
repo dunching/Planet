@@ -166,7 +166,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 						);
 						if (bIsReady)
 						{
-							if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter))
+							if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter, true))
 							{
 								ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
 								ReleasingSkillDelegateMap.Add(

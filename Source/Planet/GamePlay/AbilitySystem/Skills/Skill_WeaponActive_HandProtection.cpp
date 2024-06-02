@@ -44,7 +44,6 @@ void USkill_WeaponActive_HandProtection::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
 	}
@@ -62,8 +61,6 @@ void USkill_WeaponActive_HandProtection::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
 		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_WeaponHandProtection*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetData_DashPtr)
 		{
@@ -105,6 +102,16 @@ void USkill_WeaponActive_HandProtection::PerformAction()
 {
 	Super::PerformAction();
 
+	if ((CurrentIndex >= 3)&& (!bIsAutomaticStop))
+	{
+		return;
+	}
+
+	if (CurrentIndex >= 3)
+	{
+		CurrentIndex = 0;
+	}
+
 	switch (CurrentIndex)
 	{
 	case 0:
@@ -126,7 +133,7 @@ void USkill_WeaponActive_HandProtection::PerformAction()
 	{
 		ThirdStep();
 
-		CurrentIndex = 0;
+		CurrentIndex++;
 	}
 	break;
 	}
@@ -204,7 +211,6 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 	{
 		MakeDamage();
 
-		bIsAttackEnd = true;
 		if (!bIsRequstCancel)
 		{
 			DecrementToZeroListLock();

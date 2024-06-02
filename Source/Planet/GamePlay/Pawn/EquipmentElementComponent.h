@@ -154,7 +154,7 @@ public:
 
 	void RemoveTag(const FGameplayTag& Tag);
 
-	bool ActiveSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+	bool ActiveSkill(const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false);
 
 	void CancelSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
 

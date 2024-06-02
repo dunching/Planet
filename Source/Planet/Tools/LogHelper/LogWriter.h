@@ -17,7 +17,7 @@
 #else
 #define PRINTFUNC()\
 {\
-UE_LOG(LogTemp, Warning, TEXT("%s %s %d"), *FString(__FILE__), *FString(__FUNCDNAME__), __LINE__); \
+UE_LOG(LogTemp, Log, TEXT("%s %s %d"), *FString(__FILE__), *FString(__FUNCDNAME__), __LINE__); \
 }
 #endif
 

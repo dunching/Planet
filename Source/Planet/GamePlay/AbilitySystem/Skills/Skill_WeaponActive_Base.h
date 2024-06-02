@@ -66,10 +66,26 @@ protected:
 
 	virtual void PerformStopAction();
 
+	virtual bool IsEnd()const;
+
 	void RepeatAction();
 
-	bool bIsAttackEnd = true;
+	enum class EType
+	{
+		kNone,
+		kRunning,
+		kAttackingEnd,
+		kFinished,
+	};
 
-	bool bIsRequstCancel = true;
+	EType SkillState = EType::kNone;
 
+	bool bIsRequstCancel = false;
+
+	bool bIsAutomaticStop = false;
+};
+
+struct FGameplayAbilityTargetData_Skill_Weapon : public FGameplayAbilityTargetData
+{
+	bool bIsAutomaticStop = false;
 };

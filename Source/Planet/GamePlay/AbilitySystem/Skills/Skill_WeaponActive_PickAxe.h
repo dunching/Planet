@@ -45,6 +45,8 @@ protected:
 
 	virtual void PerformAction()override;
 
+	virtual bool IsEnd()const override;
+
 	void PlayMontage();
 
 	UFUNCTION()
@@ -79,7 +81,7 @@ protected:
 
 };
 
-struct FGameplayAbilityTargetData_Skill_PickAxe : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_Skill_PickAxe : public FGameplayAbilityTargetData_Skill_Weapon
 {
 	AWeapon_PickAxe* WeaponPtr = nullptr;
 };

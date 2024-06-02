@@ -105,7 +105,7 @@ protected:
 
 };
 
-struct FGameplayAbilityTargetData_Skill_WeaponHandProtection : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_Skill_WeaponHandProtection : public FGameplayAbilityTargetData_Skill_Weapon
 {
 	AWeapon_HandProtection* WeaponPtr = nullptr;
 };

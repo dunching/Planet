@@ -89,6 +89,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Library");
         PublicIncludePaths.Add("Planet/Tools");
         PublicIncludePaths.Add("Planet/Tools/ThreadPoolHelper");
+        PublicIncludePaths.Add("Planet/Tools/LogHelper");
 
         if (Target.bBuildEditor == true)
         {

@@ -74,14 +74,20 @@ void USkill_WeaponActive_RangeTest::OnRemoveAbility(const FGameplayAbilityActorI
 
 void USkill_WeaponActive_RangeTest::PerformAction()
 {
+	Super::PerformAction();
+
 	StartTasksLink();
+}
+
+bool USkill_WeaponActive_RangeTest::IsEnd() const
+{
+	return Super::IsEnd();
 }
 
 void USkill_WeaponActive_RangeTest::StartTasksLink()
 {
 	if (EquipmentAxePtr && CharacterPtr)
 	{
-		bIsAttackEnd = false;
 		PlayMontage();
 	}
 }
@@ -115,7 +121,7 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 	{
 		EmitProjectile();
 
-		bIsAttackEnd = true;
+		SkillState = EType::kAttackingEnd;
 		if (!bIsRequstCancel)
 		{
 			DecrementToZeroListLock();

@@ -45,7 +45,6 @@ void USkill_WeaponActive_PickAxe::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
 		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(AD);
@@ -102,11 +101,15 @@ void USkill_WeaponActive_PickAxe::PerformAction()
 	StartTasksLink();
 }
 
+bool USkill_WeaponActive_PickAxe::IsEnd() const
+{
+	return Super::IsEnd();
+}
+
 void USkill_WeaponActive_PickAxe::StartTasksLink()
 {
 	if (EquipmentAxePtr && CharacterPtr)
 	{
-		bIsAttackEnd = false;
 		PlayMontage();
 	}
 }
@@ -117,7 +120,7 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 	{
 		MakeDamage();
 
-		bIsAttackEnd = true;
+		SkillState = EType::kAttackingEnd;
 		if (!bIsRequstCancel)
 		{
 			DecrementToZeroListLock();

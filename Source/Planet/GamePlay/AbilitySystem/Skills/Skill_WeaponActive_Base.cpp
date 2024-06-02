@@ -1,6 +1,9 @@
 
 #include "Skill_WeaponActive_Base.h"
 
+#include "CharacterBase.h"
+#include "LogWriter.h"
+
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
@@ -15,12 +18,13 @@ bool USkill_WeaponActive_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-
-	if (!bIsAttackEnd)
+	switch (SkillState)
+	{
+	case EType::kRunning:
 	{
 		return false;
 	}
-
+	}
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -34,9 +38,24 @@ void USkill_WeaponActive_Base::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_Weapon*>(TriggerEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetDataPtr)
+		{
+			bIsAutomaticStop = GameplayAbilityTargetDataPtr->bIsAutomaticStop;
+		}
+		else
+		{
+			return;
+		}
+	}
+
 	ResetPreviousStageActions();
 
-	bIsAttackEnd = false;
+	SkillState = EType::kNone;
 
 	bIsRequstCancel = false;
 }
@@ -74,16 +93,9 @@ void USkill_WeaponActive_Base::EndAbility(
 	bool bWasCancelled
 )
 {
-	bIsAttackEnd = true;
+	SkillState = EType::kFinished;
 
-	if (bIsRequstCancel)
-	{
-		Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-	}
-	else
-	{
-		PerformAction();
-	}
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void USkill_WeaponActive_Base::ForceCancel()
@@ -94,25 +106,61 @@ void USkill_WeaponActive_Base::ForceCancel()
 
 void USkill_WeaponActive_Base::PerformAction()
 {
+	SkillState = EType::kRunning;
 }
 
 void USkill_WeaponActive_Base::PerformStopAction()
 {
+}
 
+bool USkill_WeaponActive_Base::IsEnd() const
+{
+	switch (SkillState)
+	{
+	case EType::kAttackingEnd:
+	case EType::kFinished:
+	{
+		return true;
+	}
+	}
+	return false;
 }
 
 void USkill_WeaponActive_Base::RepeatAction()
 {
+	// 运行之这里，说明 ScopeLockCount == 0
+
 	if (bIsRequstCancel)
 	{
+		PRINTINVOKEINFO();
 		PerformStopAction();
 	}
 	else
 	{
-		ResetPreviousStageActions();
+		// AI自动释放技能时停止方式
+		if (bIsAutomaticStop && IsEnd())
+		{
+			PRINTINVOKEINFO();
+			K2_CancelAbility();
+			return;
+		}
 
-		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::RepeatAction));
+		if (CanActivateAbility(CurrentSpecHandle, CurrentActorInfo))
+		{
+			PRINTINVOKEINFO();
+			ResetPreviousStageActions();
 
-		PerformAction();
+			WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::RepeatAction));
+
+			PerformAction();
+
+			RunIfListLock();
+		}
+		// 被其他技能打断
+		else
+		{
+			PRINTINVOKEINFO();
+			K2_CancelAbility();
+		}
 	}
 }

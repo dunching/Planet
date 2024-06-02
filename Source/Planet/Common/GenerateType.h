@@ -53,8 +53,12 @@ enum class ETagChangeType : uint8
 UENUM(BlueprintType)
 enum class ETeammateOption : uint8
 {
+	// 
 	kFollow,
 	kAssistance,
+
+	//
+	kEnemy,
 };
 
 #pragma region Callback

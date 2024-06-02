@@ -160,10 +160,29 @@ void AHumanPlayerController::UpdateRotation(float DeltaTime)
 		const FVector FocalPoint = GetFocalPoint();
 		if (FAISystem::IsValidLocation(FocalPoint))
 		{
-			const auto FocusRotation = (FocalPoint - MyPawn->GetPawnViewLocation()).Rotation();
+			const auto FocusRotation = (FocalPoint - MyPawn->GetPawnViewLocation()).ToOrientationQuat();
 			FRotator CurrentControlRotation = GetControlRotation();
 
-			RotationInput = (MyPawn->GetGravityTransform().Inverse() * (FocusRotation - CurrentControlRotation).Quaternion()).Rotator();
+			const auto FoucusRotationInput = (MyPawn->GetGravityTransform().Inverse() * FocusRotation).Rotator();
+
+			const auto DeltaRot = DeltaTime * 120.f;
+			const float AngleTolerance = 1e-3f;
+
+			// PITCH
+			if (!FMath::IsNearlyEqual(ViewRotation.Pitch, FoucusRotationInput.Pitch, AngleTolerance))
+			{
+				ViewRotation.Pitch = FMath::FixedTurn(ViewRotation.Pitch, FoucusRotationInput.Pitch, DeltaRot);
+			}
+
+			// YAW
+			if (!FMath::IsNearlyEqual(ViewRotation.Yaw, FoucusRotationInput.Yaw, AngleTolerance))
+			{
+				ViewRotation.Yaw = FMath::FixedTurn(ViewRotation.Yaw, FoucusRotationInput.Yaw, DeltaRot);
+			}
+
+			ViewRotation.Roll = 0.f;
+
+			RotationInput = FRotator::ZeroRotator;
 		}
 
 		if (PlayerCameraManager)

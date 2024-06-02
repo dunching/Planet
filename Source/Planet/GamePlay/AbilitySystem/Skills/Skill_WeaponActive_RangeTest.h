@@ -56,6 +56,8 @@ protected:
 
 	virtual void PerformAction()override;
 
+	virtual bool IsEnd()const override;
+
 	void PlayMontage();
 
 	UFUNCTION()
@@ -93,7 +95,7 @@ protected:
 
 };
 
-struct FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest : public FGameplayAbilityTargetData_Skill_Weapon
 {
 	AWeapon_RangeTest* WeaponPtr = nullptr;
 };
