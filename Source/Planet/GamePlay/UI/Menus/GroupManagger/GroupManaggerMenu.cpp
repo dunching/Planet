@@ -62,7 +62,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 	{
 		for (auto Iter : GroupsHelperSPtr->MembersSet)
 		{
-			if (Iter == GroupsHelperSPtr->OwnerPCPtr)
+			if (Iter == GroupsHelperSPtr->OwnerPtr)
 			{
 				continue;
 			}

@@ -4,6 +4,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include "Components/StateTreeComponent.h"
 #include "Components/StateTreeAIComponent.h"
+#include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
 
 #include "AIHumanInfo.h"
@@ -22,6 +23,7 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
+	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 }
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
@@ -47,11 +49,16 @@ UGourpmateUnit* AHumanAIController::GetGourpMateUnit()
 	return  GetPawn<FPawnType>()->GetGourpMateUnit();
 }
 
+UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
+{
+	return AIPerceptionComponentPtr;
+}
+
 AActor* AHumanAIController::GetTeamFocusEnemy() const
 {
 	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
 	{
-		auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPCPtr->GetController<AHumanPlayerController>();
+		auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHumanPlayerController>();
 		if (LeaderPCPtr)
 		{
 			return LeaderPCPtr->GetFocusActor();
@@ -127,7 +134,7 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 
 	TeamHelperChangedDelegate =
 		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
-	OnTeamChanged();
+	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
 
 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
 	{
@@ -170,10 +177,10 @@ void AHumanAIController::OnTeamChanged()
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		auto PlayerPCPtr = Cast<AHumanPlayerController>(TeamsHelper->OwnerPCPtr);
+		auto PlayerPCPtr = Cast<AHumanPlayerController>(TeamsHelper->OwnerPtr);
 		if (PlayerPCPtr)
 		{
-			OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPCPtr);
+			OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPtr);
 		}
 	}
 }

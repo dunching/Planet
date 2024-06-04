@@ -114,7 +114,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
 		if (TeamsHelperSPtr)
 		{
-			TeammatesSet.Add(TeamsHelperSPtr->OwnerPCPtr);
+			TeammatesSet.Add(TeamsHelperSPtr->OwnerPtr);
 			for (auto Iter : TeamsHelperSPtr->MembersMap)
 			{
 				TeammatesSet.Add(Iter.Value);

@@ -27,7 +27,7 @@ TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> UGroupsManaggerSubSystem
 		}
 		else
 		{
-			ResultSPtr->OwnerPCPtr = PCPtr;
+			ResultSPtr->OwnerPtr = PCPtr;
 			GroupMatesMap.Add(ResultSPtr);
 			break;
 		}
@@ -47,7 +47,7 @@ TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> UGroupsManaggerSubSystem:
 		}
 		else
 		{
-			ResultSPtr->OwnerPCPtr = PCPtr;
+			ResultSPtr->OwnerPtr = PCPtr;
 			TeamMatesMap.Add(ResultSPtr);
 			break;
 		}
@@ -59,7 +59,7 @@ void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
 {
 	MembersSet.Add(PCPtr);
 
-	PCPtr->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerPCPtr);
+	PCPtr->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerPtr);
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
@@ -68,7 +68,7 @@ void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpmateUnit* Go
 {
 	MembersMap.Add(GourpMateUnitPtr, PCPtr);
 
-	PCPtr->GetGroupMnaggerComponent()->OnAddToNewTeam(OwnerPCPtr);
+	PCPtr->GetGroupMnaggerComponent()->OnAddToNewTeam(OwnerPtr);
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
@@ -77,7 +77,7 @@ void UGroupsManaggerSubSystem::FTeamMatesHelper::SwitchTeammateOption(ETeammateO
 {
 	TeammateOption = InTeammateOption;
 
-	TeammateOptionChanged.ExcuteCallback(InTeammateOption, OwnerPCPtr);
+	TeammateOptionChanged.ExcuteCallback(InTeammateOption, OwnerPtr);
 }
 
 ETeammateOption UGroupsManaggerSubSystem::FTeamMatesHelper::GetTeammateOption() const

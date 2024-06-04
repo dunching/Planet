@@ -2,14 +2,18 @@
 
 #pragma once
 
-#include "Templates/SubclassOf.h"
+#include "CoreMinimal.h"
 
+#include "Templates/SubclassOf.h"
+#include <Perception/AIPerceptionTypes.h>
 #include "Blueprint/StateTreeEvaluatorBlueprintBase.h"
 #include "StateTreeExecutionContext.h"
 
 #include "GenerateType.h"
 
 #include "STE_Human.generated.h"
+
+class AActor;
 
 class AHumanCharacter;
 class AHumanAIController;
@@ -51,6 +55,22 @@ protected:
 
 public:
 
+	UFUNCTION()
+	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+
+	UFUNCTION()
+	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+
+	bool GetPatrolPosition(float);
+
+	FTSTicker::FDelegateHandle TickDelegateHandle;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
+	AHumanCharacter* HumanCharacterPtr = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
+	AHumanAIController* HumanAIControllerPtr = nullptr;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kFollow;
 
@@ -58,13 +78,10 @@ public:
 	AHumanCharacter* TargetCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	int32 AttackDistance = 75;
+	bool bIsFoundTarget = false;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
-	AHumanCharacter* HumanCharacterPtr = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
-	AHumanAIController* HumanAIControllerPtr = nullptr;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	float GetPatrolPositionDelta = 5.0;
 
 	TCallbackHandleContainer<void(ETeammateOption, AHumanCharacter*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
 	

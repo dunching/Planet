@@ -102,11 +102,6 @@ void USkill_WeaponActive_HandProtection::PerformAction()
 {
 	Super::PerformAction();
 
-	if ((CurrentIndex >= 3)&& (!bIsAutomaticStop))
-	{
-		return;
-	}
-
 	if (CurrentIndex >= 3)
 	{
 		CurrentIndex = 0;
@@ -153,6 +148,16 @@ void USkill_WeaponActive_HandProtection::ResetPreviousStageActions()
 	}
 
 	Super::ResetPreviousStageActions();
+}
+
+bool USkill_WeaponActive_HandProtection::IsEnd() const
+{
+	if (CurrentIndex >= 3)
+	{
+		return true;
+	}
+
+	return Super::IsEnd();
 }
 
 void USkill_WeaponActive_HandProtection::ExcuteStopStep()
@@ -211,6 +216,7 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 	{
 		MakeDamage();
 
+		SkillState = EType::kAttackingEnd;
 		if (!bIsRequstCancel)
 		{
 			DecrementToZeroListLock();

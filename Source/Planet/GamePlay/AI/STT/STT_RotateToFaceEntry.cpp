@@ -9,6 +9,7 @@
 #include "AITask_ReleaseSkill.h"
 #include "STE_Human.h"
 #include "Planet.h"
+#include "HumanPlayerController.h"
 
 namespace STT_RotateToFaceEntry
 {
@@ -38,12 +39,6 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
-	if (!InstanceData.TaskOwner)
-	{
-		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
-	}
-
 	return PerformMoveTask(Context);
 }
 
@@ -52,16 +47,14 @@ void FSTT_RotateToFaceEntry::ExitState(
 	const FStateTreeTransitionResult& Transition
 )const
 {
-	Super::ExitState(Context, Transition);
-
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	UEnvQueryManager* QueryManager = UEnvQueryManager::GetCurrent(InstanceData.CharacterPtr);
 
-	if (QueryManager)
+	if (InstanceData.AIControllerPtr)
 	{
-		QueryManager->AbortQuery(InstanceData.RequestID);
-		InstanceData.Reset();
+		InstanceData.AIControllerPtr->ClearFocus(EAIFocusPriority::Gameplay);
 	}
+
+	Super::ExitState(Context, Transition);
 }
 
 EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
@@ -71,23 +64,21 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (InstanceData.bIsFinished)
+	if (InstanceData.AIControllerPtr->GetTeamFocusEnemy())
 	{
-		if (InstanceData.ResultSPtr)
+		const float AngleTolerance = 5.f;
+
+		const auto PCRot = InstanceData.AIControllerPtr->GetControlRotation();
+		const auto PawnRot = InstanceData.CharacterPtr->GetActorRotation();
+
+		// Gravity?
+		if (FMath::IsNearlyEqual(PCRot.Yaw, PawnRot.Yaw, AngleTolerance))
 		{
-			bool bSuccess = InstanceData.ResultSPtr->IsSuccessful() && (InstanceData.ResultSPtr->Items.Num() >= 1);
-			if (bSuccess)
-			{
-				InstanceData.GloabVariable->Location = InstanceData.ResultSPtr->GetItemAsLocation(0);
-				InstanceData.Location = InstanceData.GloabVariable->Location;
-
-#if WITH_EDITOR
-				DrawDebugSphere(GetWorldImp(), InstanceData.Location, 20, 20, FColor::Yellow, false, 5);
-#endif
-
-				return EStateTreeRunStatus::Succeeded;
-			}
+			return EStateTreeRunStatus::Succeeded;
 		}
+	}
+	else
+	{
 		return EStateTreeRunStatus::Failed;
 	}
 
@@ -98,36 +89,11 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::PerformMoveTask(FStateTreeExecutionC
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (!InstanceData.QueryTemplate.IsNull())
+	if (InstanceData.CharacterPtr && InstanceData.AIControllerPtr)
 	{
-		FEnvQueryRequest QueryRequest(InstanceData.QueryTemplate, InstanceData.CharacterPtr);
-
-		// SetIntParam <-这是在干啥？
-		QueryRequest.SetFloatParam(STT_RotateToFaceEntry::Donut_OuterRadius, InstanceData.Donut_OuterRadius);
-
-		auto QueryFinishedDelegate = FQueryFinishedSignature::CreateRaw(&InstanceData, &FInstanceDataType::OnQueryFinished);
-		InstanceData.RequestID = QueryRequest.Execute(InstanceData.RunMode, QueryFinishedDelegate);
+		InstanceData.AIControllerPtr->SetFocus(InstanceData.AIControllerPtr->GetTeamFocusEnemy());
 
 		return EStateTreeRunStatus::Running;
 	}
 	return EStateTreeRunStatus::Failed;
-}
-
-void FStateTreeRotateToFaceEntryTaskInstanceData::OnQueryFinished(TSharedPtr<FEnvQueryResult> Result)
-{
-	bIsFinished = true;
-
-	if (Result->IsAborted())
-	{
-		return;
-	}
-
-	ResultSPtr = Result;
-}
-
-void FStateTreeRotateToFaceEntryTaskInstanceData::Reset()
-{
-	RequestID = 0;
-	bIsFinished = false;
-	ResultSPtr.Reset();
 }

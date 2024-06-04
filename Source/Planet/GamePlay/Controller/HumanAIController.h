@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "GameplayTagContainer.h"
 
 #include "GravityAIController.h"
@@ -20,6 +21,7 @@ class ACharacterBase;
 class AHumanCharacter;
 class UStateTreeComponent;
 class UStateTreeAIComponent;
+class UAIPerceptionComponent;
 
 /**
  *
@@ -46,6 +48,8 @@ public:
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
+	
+	virtual UAIPerceptionComponent* GetAIPerceptionComponent() ;
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	AActor* GetTeamFocusEnemy() const;
@@ -95,5 +99,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponentPtr = nullptr;
 
 };

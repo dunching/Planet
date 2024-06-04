@@ -73,7 +73,7 @@ bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 			}
 		}
 
-		if (GroupHelper->OwnerPCPtr == TargetCharacterPtr)
+		if (GroupHelper->OwnerPtr == TargetCharacterPtr)
 		{
 			return true;
 		}
@@ -89,7 +89,7 @@ bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 			}
 		}
 
-		if (TeammateHelper->OwnerPCPtr == TargetCharacterPtr)
+		if (TeammateHelper->OwnerPtr == TargetCharacterPtr)
 		{
 			return true;
 		}

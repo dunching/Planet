@@ -27,9 +27,9 @@ public:
 
 	void AddCharacterToTeam(FPawnType* PCPtr);
 
-	void OnAddToNewGroup(FPawnType* OwnerPCPtr);
+	void OnAddToNewGroup(FPawnType* OwnerPtr);
 
-	void OnAddToNewTeam(FPawnType* OwnerPCPtr);
+	void OnAddToNewTeam(FPawnType* OwnerPtr);
 
 	const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& GetGroupHelper();
 

@@ -35,7 +35,7 @@ public:
 
 		FMemberChangedDelegateContainer MembersChanged;
 
-		FPawnType* OwnerPCPtr = nullptr;
+		FPawnType* OwnerPtr = nullptr;
 
 		TSet<FPawnType*> MembersSet;
 	};
@@ -54,7 +54,7 @@ public:
 
 		FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
-		FPawnType* OwnerPCPtr = nullptr;
+		FPawnType* OwnerPtr = nullptr;
 
 		TMap<UGourpmateUnit*, FPawnType*> MembersMap;
 

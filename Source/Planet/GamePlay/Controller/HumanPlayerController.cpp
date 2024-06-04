@@ -308,7 +308,7 @@ void AHumanPlayerController::OnCharacterGroupMateChanged(
 	{
 		if (LeaderPCPtr)
 		{
-			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPCPtr == GetPawn<FPawnType>())
+			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPtr == GetPawn<FPawnType>())
 			{
 				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
 				if (AIPCPtr)

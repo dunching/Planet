@@ -98,7 +98,7 @@ EStateTreeRunStatus FSTT_RunEQS::PerformMoveTask(FStateTreeExecutionContext& Con
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (!InstanceData.QueryTemplate.IsNull())
+	if (InstanceData.QueryTemplate)
 	{
 		FEnvQueryRequest QueryRequest(InstanceData.QueryTemplate, InstanceData.CharacterPtr);
 

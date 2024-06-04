@@ -32,38 +32,6 @@ struct PLANET_API FStateTreeRotateToFaceEntryTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Output)
-	FVector Location = FVector::ZeroVector;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	TObjectPtr<UEnvQuery> QueryTemplate;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	TEnumAsByte<EEnvQueryRunMode::Type> RunMode;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	int32 Donut_InnerRadius = 150;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	int32 Donut_OuterRadius = 850;
-	
-	int32 RequestID = 0;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(Transient)
-	bool bIsFinished = false;
-
-	TSharedPtr<FEnvQueryResult> ResultSPtr;
-
-	void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result);
-
-	void Reset();
-
 };
 
 USTRUCT()

@@ -23,16 +23,16 @@ void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* PCPtr)
 	GetGroupHelper()->AddCharacter(PCPtr);
 }
 
-void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPCPtr)
+void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPtr)
 {
-	GroupHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetGroupHelper();
+	GroupHelperSPtr = OwnerPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 
 	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* OwnerPCPtr)
+void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* OwnerPtr)
 {
-	TeamHelperSPtr = OwnerPCPtr->GetGroupMnaggerComponent()->GetTeamHelper();
+	TeamHelperSPtr = OwnerPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
@@ -41,8 +41,8 @@ const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComp
 {
 	if (!GroupHelperSPtr)
 	{
-		auto OwnerPCPtr = GetOwner<FPawnType>();
-		GroupHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(OwnerPCPtr);
+		auto OwnerPtr = GetOwner<FPawnType>();
+		GroupHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(OwnerPtr);
 
 		GroupHelperChangedDelegateContainer.ExcuteCallback();
 	}
@@ -53,8 +53,8 @@ const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& UGroupMnaggerCompo
 {
 	if (!TeamHelperSPtr)
 	{
-		auto OwnerPCPtr = GetOwner<FPawnType>();
-		TeamHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(OwnerPCPtr);
+		auto OwnerPtr = GetOwner<FPawnType>();
+		TeamHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(OwnerPtr);
 
 		TeamHelperChangedDelegateContainer.ExcuteCallback();
 	}

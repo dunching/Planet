@@ -86,7 +86,7 @@ void UHUD_TeamInfo::ResetUIByData()
 		std::bind(&ThisClass::OnTeammateOptionChanged, this, std::placeholders::_1, std::placeholders::_2
 		));
 
-	OnTeammateOptionChanged(GMCPtr->GetTeamHelper()->GetTeammateOption(), GMCPtr->GetTeamHelper()->OwnerPCPtr);
+	OnTeammateOptionChanged(GMCPtr->GetTeamHelper()->GetTeammateOption(), GMCPtr->GetTeamHelper()->OwnerPtr);
 }
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(

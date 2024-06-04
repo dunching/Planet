@@ -62,6 +62,8 @@ protected:
 
 	virtual void ResetPreviousStageActions()override;
 
+	virtual bool IsEnd()const override;
+
 	void ExcuteStopStep();
 
 	void PlayMontage();
