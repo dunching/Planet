@@ -19,4 +19,10 @@ struct PLANET_API FSTT_MoveToTask : public FStateTreeMoveToTask
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
+	virtual void StateCompleted(
+		FStateTreeExecutionContext& Context, 
+		const EStateTreeRunStatus CompletionStatus, 
+		const FStateTreeActiveStates& CompletedActiveStates
+	) const override;
+
 };

@@ -52,9 +52,12 @@ public:
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent() ;
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
-	AActor* GetTeamFocusEnemy() const;
+	AActor* GetTeamFocusTarget() const;
 
 	UAIHumanInfo* AIHumanInfoPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TWeakObjectPtr<AHumanCharacter> TargetCharacterPtr;
 
 protected:
 

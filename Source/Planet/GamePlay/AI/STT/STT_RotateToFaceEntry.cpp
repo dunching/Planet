@@ -57,14 +57,14 @@ void FSTT_RotateToFaceEntry::ExitState(
 	Super::ExitState(Context, Transition);
 }
 
-EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
+EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick( 
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
 ) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (InstanceData.AIControllerPtr->GetTeamFocusEnemy())
+	if (InstanceData.AIControllerPtr->GetTeamFocusTarget())
 	{
 		const float AngleTolerance = 5.f;
 
@@ -91,7 +91,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::PerformMoveTask(FStateTreeExecutionC
 
 	if (InstanceData.CharacterPtr && InstanceData.AIControllerPtr)
 	{
-		InstanceData.AIControllerPtr->SetFocus(InstanceData.AIControllerPtr->GetTeamFocusEnemy());
+		InstanceData.AIControllerPtr->SetFocus(InstanceData.AIControllerPtr->GetTeamFocusTarget());
 
 		return EStateTreeRunStatus::Running;
 	}

@@ -14,6 +14,7 @@
 
 #include "NavgationSubSysetem.generated.h"
 
+class ANavMeshBoundsVolume;
 class AFlyingNavigationData;
 class UNavigationPath;
 
@@ -26,6 +27,8 @@ public:
 
 	static UNavgationSubSystem* GetInstance();
 
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+
 	virtual void Tick(float DeltaTime) override;
 
 	virtual TStatId GetStatId() const override;
@@ -34,7 +37,15 @@ protected:
 
 	UFUNCTION()
 	void FlyingNavGenerationFinished();
-	
+
+	void CheckNeedRebuildNavData();
+
+	void RebuildNavData(
+		ANavMeshBoundsVolume* NavMeshBoundsVolumePtr, 
+		ACharacter*CharacterPtr,
+		const FVector& TargetPt
+	);
+
 	float Interval = 1.f;
 
 	float CurrentInterval = 0.f;

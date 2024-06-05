@@ -39,6 +39,8 @@ public:
 
 	FTeamHelperChangedDelegateContainer GroupHelperChangedDelegateContainer;
 
+	TSet<AHumanCharacter*>TargetSet;
+
 protected:
 
 	virtual void BeginPlay()override;

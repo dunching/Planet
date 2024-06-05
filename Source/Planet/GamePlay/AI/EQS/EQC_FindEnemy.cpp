@@ -1,5 +1,5 @@
 
-#include "EQC_FindTeammate.h"
+#include "EQC_FindEnemy.h"
 
 #include <EnvironmentQuery/EnvQueryTypes.h>
 #include <EnvironmentQuery/Items/EnvQueryItemType_Point.h>
@@ -12,7 +12,7 @@
 #include "HumanPlayerController.h"
 #include "HumanAIController.h"
 
-void UEQC_FindTeammate::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryContextData& ContextData) const
+void UEQC_FindEnemy::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryContextData& ContextData) const
 {
 	UObject* QuerierObject = QueryInstance.Owner.Get();
 	if (QuerierObject == nullptr)

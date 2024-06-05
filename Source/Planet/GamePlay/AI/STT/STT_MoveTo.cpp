@@ -25,3 +25,12 @@ void FSTT_MoveToTask::ExitState(FStateTreeExecutionContext& Context, const FStat
 		InstanceData.MoveToTask = nullptr;
 	}
 }
+
+void FSTT_MoveToTask::StateCompleted(
+	FStateTreeExecutionContext& Context, 
+	const EStateTreeRunStatus CompletionStatus,
+	const FStateTreeActiveStates& CompletedActiveStates
+) const
+{
+	Super::StateCompleted(Context, CompletionStatus, CompletedActiveStates);
+}

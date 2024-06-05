@@ -61,6 +61,8 @@ public:
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
+	void CaculationPatrolPosition();
+
 	bool GetPatrolPosition(float);
 
 	FTSTicker::FDelegateHandle TickDelegateHandle;
@@ -75,10 +77,12 @@ public:
 	ETeammateOption TeammateOption = ETeammateOption::kFollow;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	AHumanCharacter* TargetCharacterPtr = nullptr;
+	AHumanCharacter* LeaderCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	bool bIsFoundTarget = false;
+	AHumanCharacter* TargetCharacterPtr = nullptr;
+
+	TSet<AHumanCharacter*>TargetSet;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	float GetPatrolPositionDelta = 5.0;

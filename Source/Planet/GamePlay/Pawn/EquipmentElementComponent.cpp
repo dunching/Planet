@@ -600,7 +600,7 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		}
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		ASCPtr->TriggerAbilityFromGameplayEvent(
+		return ASCPtr->TriggerAbilityFromGameplayEvent(
 			WeaponUnit->Handle,
 			ASCPtr->AbilityActorInfo.Get(),
 			FGameplayTag::EmptyTag,
@@ -651,8 +651,7 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 			break;
 			default:
 			{
-				ASCPtr->TryActivateAbility((*SkillIter)->Handle);
-				return true;
+				return ASCPtr->TryActivateAbility((*SkillIter)->Handle);
 			}
 			break;
 			}

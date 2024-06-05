@@ -54,14 +54,31 @@ UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
 	return AIPerceptionComponentPtr;
 }
 
-AActor* AHumanAIController::GetTeamFocusEnemy() const
+AActor* AHumanAIController::GetTeamFocusTarget() const
 {
 	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
 	{
-		auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHumanPlayerController>();
-		if (LeaderPCPtr)
 		{
-			return LeaderPCPtr->GetFocusActor();
+			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHumanPlayerController>();
+			if (LeaderPCPtr)
+			{
+				return LeaderPCPtr->GetFocusActor();
+			}
+		}
+		{
+			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHumanAIController>();
+			if (LeaderPCPtr)
+			{
+				auto ResultPtr = LeaderPCPtr->GetFocusActor();
+				if (ResultPtr)
+				{
+					return ResultPtr;
+				}
+				else
+				{
+					return LeaderPCPtr->TargetCharacterPtr.Get();
+				}
+			}
 		}
 	}
 

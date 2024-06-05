@@ -28,6 +28,8 @@ void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 			);
 			OnTeamChanged();
 		}
+		
+		CaculationPatrolPosition();
 	}
 }
 
@@ -61,7 +63,7 @@ void USTE_Human::OnTeamChanged()
 	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 	if (TeamHelperSPtr)
 	{
-		TargetCharacterPtr = TeamHelperSPtr->OwnerPtr;
+		LeaderCharacterPtr = TeamHelperSPtr->OwnerPtr;
 
 		TeammateOptionChangedDelegate = TeamHelperSPtr->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeamOptionChanged, this, std::placeholders::_1)
@@ -72,37 +74,71 @@ void USTE_Human::OnTeamChanged()
 
 void USTE_Human::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
-	if (Stimulus.WasSuccessfullySensed())
+	auto CharacterPtr = Cast<AHumanCharacter>(Actor);
+	if (CharacterPtr)
 	{
-		bIsFoundTarget = true;
-
-		FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
-
-		auto CharacterPtr = Cast<AHumanCharacter>(Actor);
 		if (CharacterPtr->GetController()->IsA(AHumanPlayerController::StaticClass()))
 		{
-			TargetCharacterPtr = CharacterPtr;
-		}
-		else
-		{
-			if (!TargetCharacterPtr)
+			if (Stimulus.WasSuccessfullySensed())
 			{
-				TargetCharacterPtr = CharacterPtr;
+				TargetSet.Add(CharacterPtr);
+			}
+			else
+			{
+				if (TargetSet.Contains(CharacterPtr))
+				{
+					TargetSet.Remove(CharacterPtr);
+				}
 			}
 		}
+		else if (CharacterPtr->GetController()->IsA(AHumanAIController::StaticClass()))
+		{
+			if (Stimulus.WasSuccessfullySensed())
+			{
+				HumanCharacterPtr->GetGroupMnaggerComponent()->TargetSet.Add(CharacterPtr);
+			}
+			else
+			{
+				if (HumanCharacterPtr->GetGroupMnaggerComponent()->TargetSet.Contains(CharacterPtr))
+				{
+					HumanCharacterPtr->GetGroupMnaggerComponent()->TargetSet.Remove(CharacterPtr);
+				}
+			}
+		}
+		CaculationPatrolPosition();
+	}
+}
+
+void USTE_Human::CaculationPatrolPosition()
+{
+	if (TargetSet.IsEmpty())
+	{
+		TargetCharacterPtr = nullptr;
+		HumanAIControllerPtr->TargetCharacterPtr = TargetCharacterPtr;
+		FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
+		TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::GetPatrolPosition), GetPatrolPositionDelta);
+	}
+	else
+	{
+		for (auto Iter : TargetSet)
+		{
+			if (Iter->GetController()->IsA(AHumanPlayerController::StaticClass()))
+			{
+				TargetCharacterPtr = Iter;
+				break;
+			}
+			else if (Iter->GetController()->IsA(AHumanAIController::StaticClass()))
+			{
+				TargetCharacterPtr = Iter;
+			}
+		}
+		HumanAIControllerPtr->TargetCharacterPtr = TargetCharacterPtr;
+		FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 	}
 }
 
 void USTE_Human::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
 {
-	if (UpdatedActors.IsEmpty())
-	{
-		TargetCharacterPtr = nullptr;
-
-		bIsFoundTarget = false;
-
-		TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::GetPatrolPosition), GetPatrolPositionDelta);
-	}
 }
 
 bool USTE_Human::GetPatrolPosition(float)
@@ -111,7 +147,7 @@ bool USTE_Human::GetPatrolPosition(float)
 	if (UNavigationSystemV1::K2_GetRandomReachablePointInRadius(
 		this,
 		HumanCharacterPtr->GetActorLocation(),
-		GloabVariable->Location,
+		Location,
 		800.f
 	))
 	{
