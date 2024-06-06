@@ -56,6 +56,11 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/BasicFutures");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Communication");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Active");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Element");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Passive");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Talent");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Weapon");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/ToolFutures");
         PublicIncludePaths.Add("Planet/GamePlay/Animation");
         PublicIncludePaths.Add("Planet/GamePlay/Controller");
@@ -86,6 +91,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/WorldSetting");
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");
+        PublicIncludePaths.Add("Planet/Common/Talent");
         PublicIncludePaths.Add("Planet/Library");
         PublicIncludePaths.Add("Planet/Tools");
         PublicIncludePaths.Add("Planet/Tools/ThreadPoolHelper");

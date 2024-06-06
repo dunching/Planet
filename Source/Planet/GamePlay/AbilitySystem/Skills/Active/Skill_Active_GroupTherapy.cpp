@@ -1,5 +1,5 @@
 
-#include "Skill_Active_ContinuousGroupTherapy.h"
+#include "Skill_Active_GroupTherapy.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -27,14 +27,14 @@
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
 
-namespace Skill_GroupTherapy
+namespace Skill_Active_ContinuousGroupTherapy
 {
 	const FName TriggerTherapy = TEXT("TriggerTherapy");
 
 	const FName AttachEnd = TEXT("AttachEnd");
 }
 
-USkill_Active_ContinuousGroupTherapy::USkill_Active_ContinuousGroupTherapy() :
+USkill_Active_GroupTherapy::USkill_Active_GroupTherapy() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
@@ -42,7 +42,7 @@ USkill_Active_ContinuousGroupTherapy::USkill_Active_ContinuousGroupTherapy() :
 	bRetriggerInstancedAbility = true;
 }
 
-void USkill_Active_ContinuousGroupTherapy::PreActivate(
+void USkill_Active_GroupTherapy::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -53,7 +53,7 @@ void USkill_Active_ContinuousGroupTherapy::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void USkill_Active_ContinuousGroupTherapy::ActivateAbility(
+void USkill_Active_GroupTherapy::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -67,38 +67,25 @@ void USkill_Active_ContinuousGroupTherapy::ActivateAbility(
 	PerformAction();
 }
 
-void USkill_Active_ContinuousGroupTherapy::PerformAction()
+void USkill_Active_GroupTherapy::PerformAction()
 {
 	StartTasksLink();
 }
 
-void USkill_Active_ContinuousGroupTherapy::StartTasksLink()
+void USkill_Active_GroupTherapy::StartTasksLink()
 {
 	PlayMontage();
-
-	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-	TaskPtr->SetDuration(Duration);
-	TaskPtr->SetIntervalTime(1.f);
-	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
-	TaskPtr->OnFinished.BindLambda([this](auto) {
-		K2_CancelAbility();
-		});
-	TaskPtr->ReadyForActivation();
 }
 
-void USkill_Active_ContinuousGroupTherapy::OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float DeltaTime)
+void USkill_Active_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
 {
-	EmitEffect();
-}
-
-void USkill_Active_ContinuousGroupTherapy::OnNotifyBeginReceived(FName NotifyName)
-{
-	if (NotifyName == Skill_GroupTherapy::TriggerTherapy)
+	if (NotifyName == Skill_Active_ContinuousGroupTherapy::TriggerTherapy)
 	{
+		EmitEffect();
 	}
 }
 
-void USkill_Active_ContinuousGroupTherapy::EmitEffect()
+void USkill_Active_GroupTherapy::EmitEffect()
 {
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
@@ -108,16 +95,16 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 	FCollisionQueryParams CapsuleParams;
 
 	TSet<ACharacterBase*>TeammatesSet;
+	TeammatesSet.Add(CharacterPtr);
 	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
 	if (GroupMnaggerComponent)
 	{
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
 		if (TeamsHelperSPtr)
 		{
-			TeammatesSet.Add(TeamsHelperSPtr->OwnerPtr);
 			for (auto Iter : TeamsHelperSPtr->MembersMap)
 			{
-				TeammatesSet.Add(Iter.Value);
+				TeammatesSet.Add(Cast<ACharacterBase>(Cast<AController>(Iter.Value)->GetPawn()));
 			}
 		}
 	}
@@ -133,7 +120,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
+		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent(CharacterPtr);
 
 		FGameplayEventData Payload;
 		Payload.TargetData.Add(GAEventData);
@@ -159,7 +146,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 	}
 }
 
-void USkill_Active_ContinuousGroupTherapy::PlayMontage()
+void USkill_Active_GroupTherapy::PlayMontage()
 {
 	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;

@@ -57,6 +57,9 @@ enum class ETeammateOption : uint8
 	kFollow,
 	kAssistance,
 
+	// Test
+	kTest,
+
 	//
 	kEnemy,
 };

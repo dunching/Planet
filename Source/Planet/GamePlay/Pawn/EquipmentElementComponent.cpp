@@ -1,6 +1,9 @@
 
 #include "EquipmentElementComponent.h"
 
+#include <queue>
+#include <map>
+
 #include "GameplayAbilitySpec.h"
 
 #include "GAEvent_Helper.h"
@@ -34,26 +37,22 @@ void UEquipmentElementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Ⱥ���˺������Ƽ���
-	{
-		struct GAEventModify_MultyTarget : public IGAEventModifyInterface
-		{
-			GAEventModify_MultyTarget(int32 InPriority) :
-				IGAEventModifyInterface(InPriority)
-			{
-			}
+#pragma region 结算效果修正
+	// 输出
 
-			virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
-			{
-				if (GameplayAbilityTargetData_GAEvent.TargetActorAry.Num() > 1)
-				{
-					GameplayAbilityTargetData_GAEvent.Data.ADDamage =
-						GameplayAbilityTargetData_GAEvent.Data.ADDamage / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
-				}
-			}
-		};
-		AddGAEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
-	}
+	// 群体伤害或治疗减益
+	AddSendGroupEffectModify();
+	// 伤害类型
+	AddSendWuXingModify();
+
+	// 接收
+
+	// 五行之间的减免
+	AddReceivedWuXingModify(); 
+	
+	// 基础属性
+	AddReceivedModify();
+#pragma endregion 结算效果修正
 }
 
 void UEquipmentElementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -170,7 +169,7 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 		return;
 	}
 
-	// �Ƴ�ȱʧ�ļ���
+	// 移除缺失的技能
 	for (const auto& Iter : SkillsMap)
 	{
 		bool bIsHave = false;
@@ -197,7 +196,7 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 		}
 	}
 
-	// ���������ļ���
+	// 添加新增的技能
 	decltype(SkillsMap)NewSkillMap;
 	for (const auto& Iter : InSkillsMap)
 	{
@@ -246,7 +245,7 @@ void UEquipmentElementComponent::GenerationCanbeActivedInfo()
 {
 	CanbeActivedInfoAry.Empty();
 
-	// ��Ӧ����
+	// 响应武器
 	{
 		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
 		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kWeaponActiveSkill;
@@ -254,8 +253,8 @@ void UEquipmentElementComponent::GenerationCanbeActivedInfo()
 		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
 	}
 
-	// ��Ӧ��������
-	for (const auto & Iter : SkillsMap)
+	// 响应主动技能
+	for (const auto& Iter : SkillsMap)
 	{
 		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
 
@@ -292,7 +291,7 @@ bool UEquipmentElementComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
 
-		// �����һ�ε�
+		// 清除上一次的
 		{
 			switch (CurrentActivedWeaponSocket)
 			{
@@ -737,4 +736,176 @@ bool UEquipmentElementComponent::ActivedCorrespondingWeapon(USkill_Active_Base* 
 	}
 
 	return false;
+}
+
+void UEquipmentElementComponent::AddSendGroupEffectModify()
+{
+	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	{
+		GAEventModify_MultyTarget(int32 InPriority) :
+			IGAEventModifyInterface(InPriority)
+		{
+		}
+
+		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		{
+			if (GameplayAbilityTargetData_GAEvent.TargetActorAry.Num() > 1)
+			{
+				GameplayAbilityTargetData_GAEvent.Data.TrueDamage =
+					GameplayAbilityTargetData_GAEvent.Data.TrueDamage / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
+
+				GameplayAbilityTargetData_GAEvent.Data.BaseDamage =
+					GameplayAbilityTargetData_GAEvent.Data.BaseDamage / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
+
+				for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+				{
+					Iter.Get<2>() =
+						Iter.Get<2>() / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
+				}
+
+				GameplayAbilityTargetData_GAEvent.Data.TreatmentVolume =
+					GameplayAbilityTargetData_GAEvent.Data.TreatmentVolume / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
+			}
+		}
+	};
+	AddGAEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
+}
+
+void UEquipmentElementComponent::AddSendWuXingModify()
+{
+	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	{
+		GAEventModify_MultyTarget(int32 InPriority) :
+			IGAEventModifyInterface(InPriority)
+		{
+		}
+
+		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		{
+			if (GameplayAbilityTargetData_GAEvent.Data.ElementSet.IsEmpty())
+			{
+				const auto& CharacterAttributes =
+					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
+				ElementMap.emplace(CharacterAttributes.Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
+				ElementMap.emplace(CharacterAttributes.Element.WoodElement.GetCurrentValue(), EWuXingType::kWood);
+				ElementMap.emplace(CharacterAttributes.Element.WaterElement.GetCurrentValue(), EWuXingType::kWater);
+				ElementMap.emplace(CharacterAttributes.Element.FireElement.GetCurrentValue(), EWuXingType::kFire);
+				ElementMap.emplace(CharacterAttributes.Element.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+
+				if (ElementMap.begin()->first > 0)
+				{
+					const auto Tuple = MakeTuple(
+						ElementMap.begin()->second,
+						ElementMap.begin()->first,
+						GameplayAbilityTargetData_GAEvent.Data.BaseDamage
+					);
+					GameplayAbilityTargetData_GAEvent.Data.ElementSet.Add(Tuple);
+				}
+			}
+		}
+	};
+	AddGAEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
+}
+
+void UEquipmentElementComponent::AddReceivedWuXingModify()
+{
+	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	{
+		GAEventModify_MultyTarget(int32 InPriority) :
+			IGAEventModifyInterface(InPriority)
+		{
+		}
+
+		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		{
+			const auto Caculation_Effective_Rate = [](int32 SelfLevel, int32 TargetLevel) {
+				if (SelfLevel <= 0)
+				{
+					return 1.f;
+				}
+				else
+				{
+					// 
+					const int32 MaxLevel = 9;
+
+					// 最大差为 此 时，伤害全部减免
+					const int32 MaxOffset = 6;
+
+					const auto Offset = SelfLevel - TargetLevel;
+					const auto Effective_Rate = (MaxOffset - FMath::Clamp(Offset, 0, MaxOffset)) / static_cast<float>(MaxOffset);
+					return Effective_Rate;
+				}
+				};
+
+			if (GameplayAbilityTargetData_GAEvent.Data.ElementSet.IsEmpty())
+			{
+				const auto& CharacterAttributes =
+					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
+				ElementMap.emplace(CharacterAttributes.Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
+				ElementMap.emplace(CharacterAttributes.Element.WoodElement.GetCurrentValue(), EWuXingType::kWood);
+				ElementMap.emplace(CharacterAttributes.Element.WaterElement.GetCurrentValue(), EWuXingType::kWater);
+				ElementMap.emplace(CharacterAttributes.Element.FireElement.GetCurrentValue(), EWuXingType::kFire);
+				ElementMap.emplace(CharacterAttributes.Element.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+
+				const auto Effective_Rate = Caculation_Effective_Rate(ElementMap.begin()->first, 0);
+
+				GameplayAbilityTargetData_GAEvent.Data.BaseDamage = GameplayAbilityTargetData_GAEvent.Data.BaseDamage * Effective_Rate;
+			}
+			else
+			{
+				const auto& CharacterAttributes =
+					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+				for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+				{
+					// 木克土，土克水，水克火，火克金，金克木
+					switch (Iter.Get<0>())
+					{
+					case EWuXingType::kGold:
+					{
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.FireElement.GetCurrentValue(), Iter.Get<1>()); 
+						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+					}
+					break;
+					case EWuXingType::kWood:
+					{
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.GoldElement.GetCurrentValue(), Iter.Get<1>());
+						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+					}
+					break;
+					case EWuXingType::kWater:
+					{
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.SoilElement.GetCurrentValue(), Iter.Get<1>());
+						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+					}
+					break;
+					case EWuXingType::kFire:
+					{
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.WaterElement.GetCurrentValue(), Iter.Get<1>());
+						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+					}
+					break;
+					case EWuXingType::kSoil:
+					{
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.WoodElement.GetCurrentValue(), Iter.Get<1>());
+						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+					}
+					break;
+					default:
+						break;
+					}
+				}
+			}
+		}
+	};
+	AddGAEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
+}
+
+void UEquipmentElementComponent::AddReceivedModify()
+{
+
 }

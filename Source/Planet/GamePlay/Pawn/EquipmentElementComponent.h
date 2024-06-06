@@ -168,6 +168,14 @@ protected:
 
 	bool ActivedCorrespondingWeapon(USkill_Active_Base* GAPtr);
 
+	void AddSendGroupEffectModify();
+
+	void AddSendWuXingModify();
+
+	void AddReceivedWuXingModify();
+
+	void AddReceivedModify();
+
 	FDelegateHandle AbilityActivatedCallbacksHandle;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")

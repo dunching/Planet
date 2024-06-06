@@ -210,6 +210,18 @@ void TestCommand::SpawnCharacter(const TArray< FString >& Args)
 				UKismetStringLibrary::Conv_StringToInt(Args[0])
 			);
 		}
+
+		if (Args.IsValidIndex(2))
+		{
+			if (Args[2] == TEXT("1"))
+			{
+				NewCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+			}
+			else if (Args[2] == TEXT("2"))
+			{
+				NewCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
+			}
+		}
 	}
 }
 
@@ -242,6 +254,75 @@ void TestCommand::RecruitCharacter()
 				CharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(TargetCharacterPtr);
 			}
 		}
+	}
+}
+
+void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
+{
+	if (!Args.IsValidIndex(2))
+	{
+		return;
+	}
+
+	AHumanCharacter* TargetCharacterPtr = nullptr;
+	if (Args[0] == TEXT("0"))
+	{
+		TargetCharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+		if (!TargetCharacterPtr)
+		{
+			return;
+		}
+	}
+	else
+	{
+		auto PlayerCameraManagerPtr = UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0);
+		if (PlayerCameraManagerPtr)
+		{
+			FVector OutCamLoc;
+			FRotator OutCamRot;
+			PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
+
+			FCollisionObjectQueryParams ObjectQueryParams;
+			ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+
+			FCollisionQueryParams Params;
+
+			auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+			Params.AddIgnoredActor(CharacterPtr);
+
+			FHitResult OutHit;
+			if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+			{
+				TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+				if (!TargetCharacterPtr)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+	auto Level = UKismetStringLibrary::Conv_StringToInt(Args[2]);
+	auto& Element = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element;
+	if (Args[1] == TEXT("1"))
+	{
+		Element.GoldElement.GetCurrentProperty().SetCurrentValue(Level);
+	}
+	else if (Args[1] == TEXT("2"))
+	{
+		Element.WoodElement.GetCurrentProperty().SetCurrentValue(Level);
+	}
+	else if (Args[1] == TEXT("3"))
+	{
+		Element.WaterElement.GetCurrentProperty().SetCurrentValue(Level);
+	}
+	else if (Args[1] == TEXT("4"))
+	{
+		Element.FireElement.GetCurrentProperty().SetCurrentValue(Level);
+	}
+	else if (Args[1] == TEXT("5"))
+	{
+		Element.SoilElement.GetCurrentProperty().SetCurrentValue(Level);
 	}
 }
 

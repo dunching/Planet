@@ -245,7 +245,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
+		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent(CharacterPtr);
 
 		FGameplayEventData Payload;
 		Payload.TargetData.Add(GAEventData);
@@ -253,7 +253,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		GAEventData->TargetActorAry.Empty();
 		GAEventData->TriggerCharacterPtr = CharacterPtr;
 		GAEventData->Data.bIsWeaponAttack = true;
-		GAEventData->Data.ADDamage = Damage;
+		GAEventData->Data.BaseDamage = Damage;
 
 		for (auto Iter : OutHits)
 		{

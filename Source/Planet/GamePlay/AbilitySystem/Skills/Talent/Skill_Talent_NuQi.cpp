@@ -12,6 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
+#include "Talent_NuQi.h"
 
 USkill_Talent_NuQi::USkill_Talent_NuQi() :
 	Super()
@@ -132,30 +133,37 @@ void USkill_Talent_NuQi::AddNuQi()
 	}
 	else
 	{
-		auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		CharacterAttributes.NuQi.AddCurrentValue(AttackIncrement);
-		if (CharacterAttributes.NuQi.GetCurrentValue() >= 100)
+		auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();	
+		auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentPtr);
+		if (NuQiPtr)
 		{
-			StartFuryState();
+			NuQiPtr->AddCurrentValue(AttackIncrement);
+			if (NuQiPtr->GetCurrentValue() >= 100)
+			{
+				StartFuryState();
+			}
 		}
 	}
 }
 
 void USkill_Talent_NuQi::SubNuQi(float Inveral)
 {
-	if (bIsInWeak)
+	auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+	auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentPtr);
+	if (NuQiPtr)
 	{
-		auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		const auto Value = CharacterAttributes.NuQi.GetMaxValue() / FMath::FloorToFloat(WeakDuration);
-		CharacterAttributes.NuQi.AddCurrentValue(-Value);
-	}
-	else
-	{
-		DecrementTime_Accumulate += Inveral;
-		if (DecrementTime_Accumulate > DecrementTime)
+		if (bIsInWeak)
 		{
-			auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			CharacterAttributes.NuQi.AddCurrentValue(-Decrement);
+			const auto Value = NuQiPtr->GetMaxValue() / FMath::FloorToFloat(WeakDuration);
+			NuQiPtr->AddCurrentValue(-Value);
+		}
+		else
+		{
+			DecrementTime_Accumulate += Inveral;
+			if (DecrementTime_Accumulate > DecrementTime)
+			{
+				NuQiPtr->AddCurrentValue(-Decrement);
+			}
 		}
 	}
 }
@@ -177,9 +185,9 @@ void USkill_Talent_NuQi::StartFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(55);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(100);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(50);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(55);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(100);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(50);
 		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.AddCurrentValue(100);
 		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(100);
 	}
@@ -198,9 +206,9 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(-55);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(-100);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(-50);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(-55);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(-100);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(-50);
 		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.AddCurrentValue(-100);
 		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-100);
 	}

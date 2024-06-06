@@ -40,6 +40,16 @@ enum class EBuildingsType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EWuXingType : uint8
+{
+	kGold,
+	kWood,
+	kWater,
+	kFire,
+	kSoil,
+};
+
+UENUM(BlueprintType)
 enum class ESceneToolsType : uint8
 {
 	kNone,

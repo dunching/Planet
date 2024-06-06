@@ -9,6 +9,8 @@
 
 #include "CharacterAttibutes.generated.h"
 
+class FTalent_Base;
+
 #pragma region CharacterAttributes
 USTRUCT(BlueprintType)
 struct FBaseProperty
@@ -65,30 +67,46 @@ protected:
 };
 
 USTRUCT(BlueprintType)
+struct FElementPropertySet : public FBasePropertySet
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EWuXingType WuXingType = EWuXingType::kFire;
+
+protected:
+
+};
+
+USTRUCT(BlueprintType)
 struct FElement
 {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet GoldElement;
+	FElementPropertySet GoldElement;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet WoodElement;
+	FElementPropertySet WoodElement;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet WaterElement;
+	FElementPropertySet WaterElement;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet FireElement;
+	FElementPropertySet FireElement;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet SoilElement;
+	FElementPropertySet SoilElement;
 };
 
 USTRUCT(BlueprintType)
 struct PLANET_API FCharacterAttributes
 {
 	GENERATED_USTRUCT_BODY()
+
+	FCharacterAttributes();
 
 	virtual ~FCharacterAttributes();
 
@@ -97,30 +115,6 @@ struct PLANET_API FCharacterAttributes
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName Name;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AD;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AD_Penetration;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AD_PercentPenetration;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AD_Resistance;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AP;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AP_Penetration;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AP_PercentPenetration;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet AP_Resistance;
-
 	// 基础 属性：力道、根骨、身法、洞察、天资
 #pragma region 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -142,14 +136,26 @@ struct PLANET_API FCharacterAttributes
 	// 天赋属性
 #pragma region 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet NuQi;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FElement Element;
+
+	FTalent_Base* TalentPtr = nullptr;
 #pragma endregion
 
 	// 基础属性
 #pragma region 
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet BaseAttackPower;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet Penetration;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet PercentPenetration;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet Resistance;
+
 	// 攻击速度、技能释放速度
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet GAPerformSpeed;
@@ -169,14 +175,6 @@ struct PLANET_API FCharacterAttributes
 	// 体力回复速率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet PPReplay;
-
-	// 法力值
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet ManaValue;
-
-	// 法力值回复速率
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet ManaValueReplay;
 
 	// 闪避几率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

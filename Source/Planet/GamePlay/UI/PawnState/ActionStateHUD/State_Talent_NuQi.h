@@ -27,16 +27,12 @@ protected:
 
 	void OnNuQiCurrentValueChanged(int32 CurrentValue);
 
-	void OnNuQiMaxValueChanged(int32 CurrentValue);
-
 	void OnNuQiValueChanged();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetNuQiPercent(float Percent);
 
 	FDelegateHandle OnValueChanged;
-
-	FDelegateHandle OnMaxValueChanged;
 
 	int32 NuQiCurrentValue = 0;
 	

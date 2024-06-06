@@ -7,30 +7,68 @@
 #include "Abilities/GameplayAbilityTargetTypes.h"
 
 #include "GenerateType.h"
+#include "SceneElement.h"
 
 class ACharacterBase;
 class UEquipmentElementComponent;
+
+struct FCharacterAttributes;
 
 struct FGameplayAbilityTargetData_GAEvent : public FGameplayAbilityTargetData
 {
 	struct FData
 	{
+		// 
 		bool bIsWeaponAttack = false;
 
-		int32 ADDamage = 0;
+		// 本次攻击的 穿透
+		int32 Penetration = 0;
 
+		// 本次攻击的 百分比穿透
+		int32 PercentPenetration = 0;
+
+		// 本次攻击的 命中率
+		int32 HitRate = 0;
+
+		// 本次攻击的 会心率
+		int32 CriticalHitRate = 0;
+
+		// 本次攻击的 会心伤害
+		int32 CriticalDamage = 0;
+
+		// 造成的真实伤害
+		int32 TrueDamage = 0;
+
+		// 攻击速度
+		int32 GAPerformSpeedOffset = 0;
+
+		void SetBaseDamage(int32 Value);
+
+		void SetWuXingDamage(EWuXingType WuXingType, int32 Value);
+
+		// 治疗量
 		int32 TreatmentVolume = 0;
 
-		int32 GAPerformSpeedOffset = 0;
+		// 造成的基础伤害
+		int32 BaseDamage = 0;
+
+		// 伤害分布：类型、等级、伤害量
+		TSet<TTuple<EWuXingType, int32, int32>>ElementSet;
+
+		TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 	};
 
-	using FCallbackHandleContainer = TCallbackHandleContainer<void(ACharacterBase*, const FData&)> ;
+	using FCallbackHandleContainer = TCallbackHandleContainer<void(ACharacterBase*, const FData&)>;
 
 	FGameplayAbilityTargetData_GAEvent* Clone()const;
 
+	FGameplayAbilityTargetData_GAEvent(
+		ACharacterBase* TriggerCharacterPtr
+	);
+
 	TArray<ACharacterBase*>TargetActorAry;
 
-	ACharacterBase* TriggerCharacterPtr = nullptr;
+	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
 	FData Data;
 

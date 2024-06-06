@@ -100,17 +100,14 @@ void USkill_Passive_ZMJZ::PerformAction()
 				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-SpeedOffset);
 			}
 
-			if (ModifyCount == 0)
+			if (ModifyCount <= 0)
 			{
-				DecrementListLockOverride();
-
 				if (EffectItemPtr)
 				{
 					EffectItemPtr->RemoveFromParent();
 					EffectItemPtr = nullptr;
-
-					ModifyCount = 0;
 				}
+				TaskPtr->ExternalCancel();
 			}
 			else if (TaskPtr)
 			{
@@ -122,8 +119,6 @@ void USkill_Passive_ZMJZ::PerformAction()
 			}
 			});
 		TaskPtr->ReadyForActivation();
-
-		IncrementListLock();
 
 		if (ModifyCount > MaxCount)
 		{
@@ -172,7 +167,7 @@ void USkill_Passive_ZMJZ::TriggerSelf(UGameplayAbility* GAPtr)
 		const auto& EventData = GA_SendPtr->GetCurrentEventData();
 
 		auto GAEventPtr = dynamic_cast<const FGameplayAbilityTargetData_GAEvent*>(EventData.TargetData.Get(0));
-		if (GAEventPtr&& GAEventPtr->Data.bIsWeaponAttack)
+		if (GAEventPtr && GAEventPtr->Data.bIsWeaponAttack)
 		{
 			auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TryActivateAbility(GetCurrentAbilitySpecHandle());

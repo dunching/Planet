@@ -47,9 +47,9 @@ void USkill_WeaponActive_PickAxe::OnAvatarSet(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(AD);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(AD_Penetration);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(AD_PercentPenetration);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(AD);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(AD_Penetration);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(AD_PercentPenetration);
 	}
 }
 
@@ -61,9 +61,9 @@ void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddCurrentValue(-AD);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_Penetration.AddCurrentValue(-AD_Penetration);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD_PercentPenetration.AddCurrentValue(-AD_PercentPenetration);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(-AD);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(-AD_Penetration);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(-AD_PercentPenetration);
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -162,7 +162,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent;
+		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent(CharacterPtr);
 
 		FGameplayEventData Payload;
 		Payload.TargetData.Add(GAEventData);
@@ -170,7 +170,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		GAEventData->TargetActorAry.Empty();
 		GAEventData->TriggerCharacterPtr = CharacterPtr;
 		GAEventData->Data.bIsWeaponAttack = true;
-		GAEventData->Data.ADDamage = Damage;
+		GAEventData->Data.BaseDamage = Damage;
 
 		for (auto Iter : OutHits)
 		{

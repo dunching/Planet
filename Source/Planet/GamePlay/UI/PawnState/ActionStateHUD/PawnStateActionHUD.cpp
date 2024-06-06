@@ -128,7 +128,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.AD);
+			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::AD_Penetration));
@@ -136,7 +136,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.AD_Penetration, CharacterAttributes.AD_PercentPenetration);
+			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
 		}
 	}
 	InitialTalentUI();

@@ -8,6 +8,7 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
+#include "Talent_NuQi.h"
 
 namespace State_Talent_NuQi
 {
@@ -24,14 +25,15 @@ void UState_Talent_NuQi::NativeConstruct()
 	if (CharacterPtr)
 	{
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.NuQi.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
-			std::bind(&ThisClass::OnNuQiCurrentValueChanged, this, std::placeholders::_2)
-		);
-		OnMaxValueChanged = CharacterAttributes.NuQi.GetMaxProperty().CallbackContainerHelper.AddOnValueChanged(
-			std::bind(&ThisClass::OnNuQiMaxValueChanged, this, std::placeholders::_2)
-		);
-		OnNuQiCurrentValueChanged(CharacterAttributes.NuQi.GetCurrentValue());
-		OnNuQiMaxValueChanged(CharacterAttributes.NuQi.GetMaxValue());
+		auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentPtr);
+		if (NuQiPtr)
+		{
+			OnValueChanged = NuQiPtr->CallbackContainerHelper.AddOnValueChanged(
+				std::bind(&ThisClass::OnNuQiCurrentValueChanged, this, std::placeholders::_2)
+			);
+
+			NuQiMaxValue = NuQiPtr->GetMaxValue();
+		}
 	}
 }
 
@@ -41,23 +43,12 @@ void UState_Talent_NuQi::NativeDestruct()
 	{
 		OnValueChanged->UnBindCallback();
 	}
-	if (OnMaxValueChanged)
-	{
-		OnMaxValueChanged->UnBindCallback();
-	}
-
 	Super::NativeDestruct();
 }
 
 void UState_Talent_NuQi::OnNuQiCurrentValueChanged(int32 CurrentValue)
 {
 	NuQiCurrentValue = CurrentValue;
-	OnNuQiValueChanged();
-}
-
-void UState_Talent_NuQi::OnNuQiMaxValueChanged(int32 CurrentValue)
-{
-	NuQiMaxValue = CurrentValue;
 	OnNuQiValueChanged();
 }
 
