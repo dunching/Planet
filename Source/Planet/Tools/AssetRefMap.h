@@ -30,6 +30,7 @@ class UTalentAllocation;
 class UGroupManaggerMenu;
 class UHUD_TeamInfo;
 class UFocusIcon;
+class UFightingTips;
 
 class UToolUnit;
 class UWeaponUnit;
@@ -101,6 +102,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UFightingTips>FightingTipsClass;
 #pragma endregion MenusUI
 
 #pragma region Tags

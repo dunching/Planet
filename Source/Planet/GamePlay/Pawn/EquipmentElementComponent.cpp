@@ -501,7 +501,7 @@ const TArray<TSharedPtr<FCanbeActivedInfo>>& UEquipmentElementComponent::GetCanb
 	return CanbeActivedInfoAry;
 }
 
-void UEquipmentElementComponent::AddGAEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+void UEquipmentElementComponent::AddSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -519,13 +519,43 @@ void UEquipmentElementComponent::AddGAEventModify(const TSharedPtr<IGAEventModif
 	SendEventModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UEquipmentElementComponent::RemoveGAEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+void UEquipmentElementComponent::RemoveSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
 {
 	for (auto Iter = SendEventModifysMap.begin(); Iter != SendEventModifysMap.end(); Iter++)
 	{
 		if ((*Iter)->ID == GAEventModifySPtr->ID)
 		{
 			SendEventModifysMap.erase(Iter);
+			break;
+		}
+	}
+}
+
+void UEquipmentElementComponent::AddReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+{
+	for (bool bIsContinue = true; bIsContinue;)
+	{
+		bIsContinue = false;
+		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		for (const auto& Iter : ReceivedEventModifysMap)
+		{
+			if (Iter->ID == GAEventModifySPtr->ID)
+			{
+				bIsContinue = true;
+				break;
+			}
+		}
+	}
+	ReceivedEventModifysMap.emplace(GAEventModifySPtr);
+}
+
+void UEquipmentElementComponent::RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+{
+	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
+	{
+		if ((*Iter)->ID == GAEventModifySPtr->ID)
+		{
+			ReceivedEventModifysMap.erase(Iter);
 			break;
 		}
 	}
@@ -768,7 +798,7 @@ void UEquipmentElementComponent::AddSendGroupEffectModify()
 			}
 		}
 	};
-	AddGAEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
+	AddSendEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
 }
 
 void UEquipmentElementComponent::AddSendWuXingModify()
@@ -806,7 +836,7 @@ void UEquipmentElementComponent::AddSendWuXingModify()
 			}
 		}
 	};
-	AddGAEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
+	AddSendEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
 }
 
 void UEquipmentElementComponent::AddReceivedWuXingModify()
@@ -821,28 +851,17 @@ void UEquipmentElementComponent::AddReceivedWuXingModify()
 		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
 		{
 			const auto Caculation_Effective_Rate = [](int32 SelfLevel, int32 TargetLevel) {
-				if (SelfLevel <= 0)
-				{
-					return 1.f;
-				}
-				else
-				{
-					// 
-					const int32 MaxLevel = 9;
 
-					// 最大差为 此 时，伤害全部减免
-					const int32 MaxOffset = 6;
-
-					const auto Offset = SelfLevel - TargetLevel;
-					const auto Effective_Rate = (MaxOffset - FMath::Clamp(Offset, 0, MaxOffset)) / static_cast<float>(MaxOffset);
-					return Effective_Rate;
-				}
+				// 
+				const auto Offset = (SelfLevel - TargetLevel) / 3;
+				const auto Effective_Rate = 1.f + (Offset * 0.25f);
+				return Effective_Rate;
 				};
 
-			if (GameplayAbilityTargetData_GAEvent.Data.ElementSet.IsEmpty())
+			if (GameplayAbilityTargetData_GAEvent.Data.ElementSet.IsEmpty() && GameplayAbilityTargetData_GAEvent.TargetActorAry.IsValidIndex(0))
 			{
 				const auto& CharacterAttributes =
-					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+					GameplayAbilityTargetData_GAEvent.TargetActorAry[0]->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
 				ElementMap.emplace(CharacterAttributes.Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
@@ -902,10 +921,36 @@ void UEquipmentElementComponent::AddReceivedWuXingModify()
 			}
 		}
 	};
-	AddGAEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
+	AddReceviedEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
 }
 
 void UEquipmentElementComponent::AddReceivedModify()
 {
+	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	{
+		GAEventModify_MultyTarget(int32 InPriority) :
+			IGAEventModifyInterface(InPriority)
+		{
+		}
 
+		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		{
+			if (GameplayAbilityTargetData_GAEvent.TargetActorAry.IsValidIndex(0))
+			{
+				const auto& SelfCharacterAttributes =
+					GameplayAbilityTargetData_GAEvent.TargetActorAry[0]->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+				const auto& TargetCharacterAttributes =
+					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+				{
+					const auto Rate = (TargetCharacterAttributes.HitRate.GetCurrentValue() - SelfCharacterAttributes.Evade.GetCurrentValue()) /
+						static_cast<float>(TargetCharacterAttributes.HitRate.GetMaxValue());
+
+					GameplayAbilityTargetData_GAEvent.Data.HitRate = FMath::FRand() <= Rate ? 100 : 0;
+				}
+			}
+		}
+	};
+	AddReceviedEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
 }

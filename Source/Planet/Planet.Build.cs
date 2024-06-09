@@ -40,6 +40,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState/BuildingStateHUD");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Hover");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Hover/DestroyProgress");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/Hover/FightingTips");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/GroupManagger");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/Backpacks");

@@ -38,12 +38,6 @@ namespace AllocationSkillsMenu
 	
 	const FName AD_Resistance = TEXT("AD_Resistance");
 
-	const FName AP = TEXT("AP");
-
-	const FName AP_Penetration = TEXT("AP_Penetration");
-
-	const FName AP_Resistance = TEXT("AP_Resistance");
-
 	const FName MoveSpeed = TEXT("MoveSpeed");
 
 	const FName SkillPerformSpeed = TEXT("SkillPerformSpeed");
@@ -53,6 +47,17 @@ namespace AllocationSkillsMenu
 	const FName PP = TEXT("PP");
 
 	const FName Shield = TEXT("Shield");
+
+	const FName Gold = TEXT("Gold");
+
+	const FName Wood = TEXT("Wood");
+
+	const FName Water = TEXT("Water");
+
+	const FName Fire = TEXT("Fire");
+
+	const FName Soil = TEXT("Soil");
+
 }
 
 void UPawnStateActionHUD::NativeConstruct()
@@ -137,6 +142,46 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Gold));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Element.GoldElement);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Wood));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Element.WoodElement);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Water));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Element.WaterElement);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Fire));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Element.FireElement);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Soil));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Element.SoilElement);
 		}
 	}
 	InitialTalentUI();

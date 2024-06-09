@@ -40,11 +40,13 @@ void UGAEvent_Send::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 		CharacterPtr->GetEquipmentItemsComponent()->OnSendEventModifyData(*Clone);
 
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(Clone);
-
-		for (auto Iter : Clone->TargetActorAry)
+		for (auto Iter : GAEventDataPtr->TargetActorAry)
 		{
+			Clone->TargetActorAry = { Iter };
+
+			FGameplayEventData Payload;
+			Payload.TargetData.Add(Clone);
+
 			auto ASCPtr = Iter->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(
 				Iter->GetEquipmentItemsComponent()->ReceivedEventHandle,

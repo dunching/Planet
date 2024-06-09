@@ -12,12 +12,17 @@
 class FTalent_Base;
 
 #pragma region CharacterAttributes
+
+struct FScoped_BaseProperty_SaveUpdate;
+
 USTRUCT(BlueprintType)
 struct FBaseProperty
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
+
+	friend FScoped_BaseProperty_SaveUpdate;
 
 	FBaseProperty();
 
@@ -32,8 +37,29 @@ public:
 protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 CurrentValue = 100;
+	int32 CurrentValue = 0;
 
+	bool bIsSaveUpdate = false;
+
+};
+
+struct FScoped_BaseProperty_SaveUpdate
+{
+	FScoped_BaseProperty_SaveUpdate(FBaseProperty& TargetRef)
+		: TargetRef(TargetRef)
+	{
+		TargetRef.bIsSaveUpdate = true;
+	}
+
+	~FScoped_BaseProperty_SaveUpdate()
+	{
+		TargetRef.bIsSaveUpdate = false;
+
+		TargetRef.CallbackContainerHelper.ValueChanged(TargetRef.CurrentValue, TargetRef.CurrentValue);
+	}
+
+private:
+	FBaseProperty& TargetRef;
 };
 
 USTRUCT(BlueprintType)
@@ -52,6 +78,8 @@ public:
 	int32 GetMaxValue()const;
 
 	FBaseProperty& GetMaxProperty();
+
+	FBaseProperty& GetMinProperty();
 
 protected:
 

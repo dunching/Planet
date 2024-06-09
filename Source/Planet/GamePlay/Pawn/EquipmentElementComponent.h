@@ -140,9 +140,13 @@ public:
 	TSharedPtr < FWeaponSocketInfo >GetActivedWeapon()const;
 #pragma endregion Weapon
 
-	void AddGAEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+	void AddSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
 
-	void RemoveGAEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+	void RemoveSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+
+	void AddReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+
+	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
 
 	FGameplayAbilitySpecHandle SendEventHandle;
 

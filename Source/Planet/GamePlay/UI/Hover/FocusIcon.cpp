@@ -5,7 +5,6 @@
 #include <Blueprint/WidgetLayoutLibrary.h>
 #include <Components/SizeBox.h>
 
-
 void UFocusIcon::NativeConstruct()
 {
 	Super::NativeConstruct();

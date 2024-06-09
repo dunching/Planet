@@ -170,7 +170,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		GAEventData->TargetActorAry.Empty();
 		GAEventData->TriggerCharacterPtr = CharacterPtr;
 		GAEventData->Data.bIsWeaponAttack = true;
-		GAEventData->Data.BaseDamage = Damage;
+		GAEventData->Data.SetBaseDamage(Damage);
 
 		for (auto Iter : OutHits)
 		{

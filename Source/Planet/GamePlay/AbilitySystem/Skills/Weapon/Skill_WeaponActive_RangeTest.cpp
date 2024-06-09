@@ -152,7 +152,7 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 	GAEventData->TargetActorAry.Empty();
 	GAEventData->TriggerCharacterPtr = CharacterPtr;
 	GAEventData->Data.bIsWeaponAttack = true;
-	GAEventData->Data.BaseDamage = Damage;
+	GAEventData->Data.SetBaseDamage(Damage);
 
 	if (TargetCharacterPtr)
 	{

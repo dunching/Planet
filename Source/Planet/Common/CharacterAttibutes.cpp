@@ -1,6 +1,10 @@
 
 #include "CharacterAttibutes.h"
 
+#include "AssetRefMap.h"
+#include "FightingTips.h"
+#include "Planet.h"
+
 FBaseProperty::FBaseProperty()
 {
 }
@@ -14,7 +18,13 @@ void FBaseProperty::SetCurrentValue(int32 val)
 {
 	if (CurrentValue != val)
 	{
-		CallbackContainerHelper.ValueChanged(CurrentValue, val);
+		if (bIsSaveUpdate)
+		{
+		}
+		else
+		{
+			CallbackContainerHelper.ValueChanged(CurrentValue, val);
+		}
 
 		CurrentValue = val;
 	}
@@ -50,6 +60,11 @@ int32 FBasePropertySet::GetMaxValue() const
 FBaseProperty& FBasePropertySet::GetMaxProperty()
 {
 	return MaxValue;
+}
+
+FBaseProperty& FBasePropertySet::GetMinProperty()
+{
+	return MinValue;
 }
 
 FCharacterAttributes::FCharacterAttributes()
@@ -148,7 +163,43 @@ FCharacterAttributes::~FCharacterAttributes()
 
 void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAEvent)
 {
-	HP.AddCurrentValue(GAEvent.Data.TreatmentVolume - GAEvent.Data.BaseDamage);
+	// 处理数据
+	if (GAEvent.Data.HitRate <= 0)
+	{
+	}
+	else
+	{
+		float CurCriticalDamage = 1.f;
+		if (GAEvent.Data.CriticalHitRate >= 100)
+		{
+			CurCriticalDamage = (100 + GAEvent.Data.CriticalDamage) / 100.f;
+		}
+
+		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
+		HP.AddCurrentValue(GAEvent.Data.TreatmentVolume);
+
+		if (GAEvent.Data.ElementSet.IsEmpty())
+		{
+			HP.AddCurrentValue(-GAEvent.Data.BaseDamage * CurCriticalDamage);
+		}
+		else
+		{
+			for (const auto& Iter : GAEvent.Data.ElementSet)
+			{
+				HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage);
+			}
+		}
+
+		HP.AddCurrentValue(GAEvent.Data.TrueDamage);
+	}
+
+	// 显示对应的浮动UI
+	if (GAEvent.TargetActorAry.IsValidIndex(0))
+	{
+		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
+		UIPtr->ProcessGAEVent(GAEvent);
+		UIPtr->AddToViewport();
+	}
 }
 
 FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)

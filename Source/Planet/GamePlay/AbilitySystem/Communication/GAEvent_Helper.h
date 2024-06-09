@@ -27,10 +27,10 @@ struct FGameplayAbilityTargetData_GAEvent : public FGameplayAbilityTargetData
 		// 本次攻击的 百分比穿透
 		int32 PercentPenetration = 0;
 
-		// 本次攻击的 命中率
+		// 本次攻击的 命中率(0则为此次被闪避)
 		int32 HitRate = 0;
 
-		// 本次攻击的 会心率
+		// 本次攻击的 会心率(100则为此次被会心)
 		int32 CriticalHitRate = 0;
 
 		// 本次攻击的 会心伤害
@@ -93,6 +93,7 @@ public:
 
 private:
 
+	// 越小的越先算
 	int32 Priority = -1;
 
 	int32 ID = -1;

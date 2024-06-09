@@ -157,17 +157,17 @@ void TestCommand::TestGAEventModify()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->AddGAEventModify(MakeShared<MyStruct>(123, 523));
-		CharacterPtr->GetEquipmentItemsComponent()->AddGAEventModify(MakeShared<MyStruct>(1, 423));
-		CharacterPtr->GetEquipmentItemsComponent()->AddGAEventModify(MakeShared<MyStruct>(12, 323));
-		CharacterPtr->GetEquipmentItemsComponent()->AddGAEventModify(MakeShared<MyStruct>(13, 223));
+		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(123, 523));
+		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(1, 423));
+		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(12, 323));
+		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(13, 223));
 
 		auto d = MakeShared<MyStruct>(14, 1231);
-		CharacterPtr->GetEquipmentItemsComponent()->AddGAEventModify(d);
-		CharacterPtr->GetEquipmentItemsComponent()->AddGAEventModify(MakeShared<MyStruct>(14, 1232));
-		CharacterPtr->GetEquipmentItemsComponent()->AddGAEventModify(MakeShared<MyStruct>(14, 1233));
+		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(d);
+		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(14, 1232));
+		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(14, 1233));
 
-		CharacterPtr->GetEquipmentItemsComponent()->RemoveGAEventModify(d);
+		CharacterPtr->GetEquipmentItemsComponent()->RemoveSendEventModify(d);
 
 
 	}
@@ -302,27 +302,38 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 		}
 	}
 
-	auto Level = UKismetStringLibrary::Conv_StringToInt(Args[2]);
-	auto& Element = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element;
+	auto Value = UKismetStringLibrary::Conv_StringToInt(Args[2]);
+	auto& CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 	if (Args[1] == TEXT("1"))
 	{
-		Element.GoldElement.GetCurrentProperty().SetCurrentValue(Level);
+		CharacterAttributes.Element.GoldElement.GetCurrentProperty().SetCurrentValue(Value);
 	}
 	else if (Args[1] == TEXT("2"))
 	{
-		Element.WoodElement.GetCurrentProperty().SetCurrentValue(Level);
+		CharacterAttributes.Element.WoodElement.GetCurrentProperty().SetCurrentValue(Value);
 	}
 	else if (Args[1] == TEXT("3"))
 	{
-		Element.WaterElement.GetCurrentProperty().SetCurrentValue(Level);
+		CharacterAttributes.Element.WaterElement.GetCurrentProperty().SetCurrentValue(Value);
 	}
 	else if (Args[1] == TEXT("4"))
 	{
-		Element.FireElement.GetCurrentProperty().SetCurrentValue(Level);
+		CharacterAttributes.Element.FireElement.GetCurrentProperty().SetCurrentValue(Value);
 	}
 	else if (Args[1] == TEXT("5"))
 	{
-		Element.SoilElement.GetCurrentProperty().SetCurrentValue(Level);
+		CharacterAttributes.Element.SoilElement.GetCurrentProperty().SetCurrentValue(Value);
+	}
+	else if (Args[1] == TEXT("6"))
+	{
+		CharacterAttributes.CriticalHitRate.GetCurrentProperty().SetCurrentValue(Value);
+	}
+	else if (Args[1] == TEXT("7"))
+	{
+		CharacterAttributes.HitRate.GetCurrentProperty().SetCurrentValue(Value);
+	}
+	else if (Args[1] == TEXT("8"))
+	{
+		CharacterAttributes.Evade.GetCurrentProperty().SetCurrentValue(Value);
 	}
 }
-
