@@ -21,6 +21,8 @@ class PLANET_API UTalentIcon : public UUserWidget
 
 public:
 
+	using FDelegateHandle = TOnValueChangedCallbackContainer<UTalentIcon*>::FCallbackHandleSPtr;
+
 protected:
 
 	virtual void NativeConstruct()override;
@@ -30,6 +32,8 @@ protected:
 	void ResetUI(const FTalentHelper& TalentHelper);
 
 	FTalentHelper GetTalentHelper()const;
+
+public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EPointType PointType = EPointType::kSkill;
@@ -45,5 +49,7 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FGameplayTag IconSocket;
+
+	FDelegateHandle OnValueChanged;
 
 };

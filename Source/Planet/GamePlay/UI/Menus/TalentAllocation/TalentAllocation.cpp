@@ -3,9 +3,11 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
+#include <Blueprint/WidgetTree.h>
 
 #include "CharacterBase.h"
 #include "TalentAllocationComponent.h"
+#include "TalentIcon.h"
 
 const FName UsedNum = TEXT("UsedNum");
 
@@ -28,7 +30,21 @@ void UTalentAllocation::NativeConstruct()
 
 void UTalentAllocation::NativeDestruct()
 {
-	Super::NativeDestruct();
+	Super::NativeDestruct(); 
+
+	if (WidgetTree) 
+	{
+		WidgetTree->ForEachWidget([](UWidget* Widget) {
+			if (Widget && Widget->IsA<UTalentIcon>())
+			{
+				auto UIPtr = Cast<UTalentIcon>(Widget);
+				if (!UIPtr)
+				{
+					return;
+				}
+			}
+			});
+	}
 
 	if (OnValueChanged)
 	{
