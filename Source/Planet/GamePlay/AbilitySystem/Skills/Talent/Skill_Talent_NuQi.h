@@ -10,6 +10,7 @@
 
 class UTexture2D;
 
+class FTalent_NuQi;
 class ACharacterBase;
 class UEffectItem;
 class UAbilityTask_TimerHelper;
@@ -68,7 +69,7 @@ protected:
 
 	void StopForceWeakState();
 
-	void OnReceviedDamage(UGameplayAbility* GAPtr);
+	void OnSendDamage(UGameplayAbility* GAPtr);
 
 	bool bIsInFury = false;
 
@@ -115,4 +116,7 @@ protected:
 	float Tick_Interval = 1.f;
 
 	float Tick_Accumulate = 0.f;
+
+	TSharedPtr<FTalent_NuQi>TalentSPtr;
+
 };

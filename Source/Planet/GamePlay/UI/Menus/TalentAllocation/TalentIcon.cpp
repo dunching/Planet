@@ -12,6 +12,23 @@ namespace TalentIcon
 	const FName Level = TEXT("Level");
 }
 
+void UTalentIcon::ResetPoint()
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (CharacterPtr)
+	{
+		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
+		if (TalentAllocationComponentPtr)
+		{
+			FTalentHelper TalentHelper = GetTalentHelper();
+
+			TalentAllocationComponentPtr->Clear(TalentHelper);
+
+			ResetUI(TalentHelper);
+		}
+	}
+}
+
 void UTalentIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -53,7 +70,10 @@ FReply UTalentIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const F
 				FTalentHelper TalentHelper = GetTalentHelper();
 
 				auto Result = TalentAllocationComponentPtr->AddCheck(TalentHelper);
+
 				ResetUI(Result);
+
+				OnValueChanged.ExcuteCallback(this, true);
 			}
 			else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 			{

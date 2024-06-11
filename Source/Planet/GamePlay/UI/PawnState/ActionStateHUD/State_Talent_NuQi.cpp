@@ -9,6 +9,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "Talent_NuQi.h"
+#include "LogWriter.h"
 
 namespace State_Talent_NuQi
 {
@@ -20,12 +21,12 @@ namespace State_Talent_NuQi
 void UState_Talent_NuQi::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	PRINTINVOKEINFO();
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (CharacterPtr)
 	{
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentPtr);
+		auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentSPtr.Get());
 		if (NuQiPtr)
 		{
 			OnValueChanged = NuQiPtr->CallbackContainerHelper.AddOnValueChanged(
@@ -39,6 +40,7 @@ void UState_Talent_NuQi::NativeConstruct()
 
 void UState_Talent_NuQi::NativeDestruct()
 {
+	PRINTINVOKEINFO();
 	if (OnValueChanged)
 	{
 		OnValueChanged->UnBindCallback();

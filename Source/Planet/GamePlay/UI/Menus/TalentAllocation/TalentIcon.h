@@ -21,7 +21,12 @@ class PLANET_API UTalentIcon : public UUserWidget
 
 public:
 
-	using FDelegateHandle = TOnValueChangedCallbackContainer<UTalentIcon*>::FCallbackHandleSPtr;
+	// 
+	using FDelegateHandle = TCallbackHandleContainer<void(UTalentIcon*, bool)>;
+
+	void ResetPoint();
+
+	FTalentHelper GetTalentHelper()const;
 
 protected:
 
@@ -30,8 +35,6 @@ protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 
 	void ResetUI(const FTalentHelper& TalentHelper);
-
-	FTalentHelper GetTalentHelper()const;
 
 public:
 
@@ -44,9 +47,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EPointPropertyType PointPropertyType = EPointPropertyType::kLiDao;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 CurrentLevel = 0;
-	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FGameplayTag IconSocket;
 

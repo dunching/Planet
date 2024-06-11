@@ -159,6 +159,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ActiveSocket4 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket4")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag TalentPassiveSocket1 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.TalentPassiveSocket1")));
 #pragma endregion Tags
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

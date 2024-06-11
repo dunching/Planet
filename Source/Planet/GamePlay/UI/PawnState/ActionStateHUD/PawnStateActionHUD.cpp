@@ -15,6 +15,7 @@
 #include "State_Talent_NuQi.h"
 #include "MyProgressBar.h"
 #include "MyBaseProperty.h"
+#include "LogWriter.h"
 
 namespace AllocationSkillsMenu
 {
@@ -215,6 +216,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 				{
 				case ESkillUnitType::kHumanSkill_Talent_NuQi:
 				{
+					PRINTINVOKEINFO();
 					auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, TalentState_NuQi_Class);
 					if (UIPtr)
 					{

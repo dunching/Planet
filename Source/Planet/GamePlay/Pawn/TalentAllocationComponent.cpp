@@ -6,6 +6,8 @@
 #include "HoldingItemsComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
+#include "EquipmentElementComponent.h"
+#include "AssetRefMap.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
@@ -26,7 +28,6 @@ FTalentHelper UTalentAllocationComponent::AddCheck(FTalentHelper& TalentHelper)
 				Result = *Iter;
 
 				CalculorUsedTalentPointNum();
-				SyncToHolding(Result, OldValue);
 			}
 		}
 		Result = *Iter;
@@ -50,12 +51,20 @@ FTalentHelper UTalentAllocationComponent::SubCheck(FTalentHelper& TalentHelper)
 			Result = *Iter;
 
 			CalculorUsedTalentPointNum();
-			SyncToHolding(Result, OldValue);
 		}
 		Result = *Iter;
 	}
 
 	return Result;
+}
+
+void UTalentAllocationComponent::Clear(FTalentHelper& TalentHelper)
+{
+	FTalentHelper * Iter = GetCheck(TalentHelper);
+	if (Iter)
+	{
+		Iter->Level = 0;
+	}
 }
 
 FTalentHelper* UTalentAllocationComponent::GetCheck(FTalentHelper& TalentHelper)
@@ -92,7 +101,7 @@ void UTalentAllocationComponent::InitialTalentData()
 	TArray<FSkillHelper>SkillAry
 	{
 		{TEXT("Talent.NuQi"), EPointSkillType::kNuQi },
-		{TEXT("Talent.WuXing"), EPointSkillType::kWuXing },
+		{TEXT("Talent.YinYang"), EPointSkillType::kYinYang },
 		{TEXT("Talent.DuXing"), EPointSkillType::kDuXing },
 		{TEXT("Talent.FaLi"), EPointSkillType::kFaLi },
 		{TEXT("Talent.GongMing"), EPointSkillType::kGongMing },
@@ -147,72 +156,102 @@ void UTalentAllocationComponent::InitialTalentData()
 	}
 }
 
-void UTalentAllocationComponent::SyncToHolding(const FTalentHelper& NewTalentHelper, const FTalentHelper& OldTalentHelper)
+void UTalentAllocationComponent::SyncToHolding()
 {
-	switch (NewTalentHelper.PointType)
+	for (const auto& Iter : TalentMap)
 	{
-	case EPointType::kSkill:
-	{
-		switch (std::get<EPointSkillType>(NewTalentHelper.Type))
+		switch (Iter.Value.PointType)
 		{
-		case EPointSkillType::kNuQi:
+		case EPointType::kSkill:
+		{
+			if (Iter.Value.Level > 0)
+			{
+				if (std::get<EPointSkillType>(Iter.Value.Type) == PreviousSkillType)
+				{
+					continue;
+				}
+				else
+				{
+					switch (std::get<EPointSkillType>(Iter.Value.Type))
+					{
+					case EPointSkillType::kNuQi:
+					{
+						if (Iter.Value.Level > 0)
+						{
+							auto CharacterPtr = GetOwner<ACharacterBase>();
+							if (CharacterPtr)
+							{
+								auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+								auto SkillUnitPtr = HoldItemComponent.FindUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+								if (!SkillUnitPtr)
+								{
+									SkillUnitPtr = HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+								}
+								if (SkillUnitPtr)
+								{
+									SkillUnitPtr->Level = Iter.Value.Level;
+								}
+
+								TMap<FGameplayTag, TSharedPtr <FSkillSocketInfo>> SkillsMap;
+
+								TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+
+								SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->TalentPassiveSocket1;
+								SkillsSocketInfo->SkillUnit = SkillUnitPtr;
+								SkillsSocketInfo->Key = EKeys::Invalid;
+
+								SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+
+								auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+								EICPtr->RegisterMultiGAs(SkillsMap);
+								EICPtr->GenerationCanbeActivedInfo();
+							}
+						}
+					}
+					break;
+					}
+				}
+			}
+		}
+		break;
+		case EPointType::kProperty:
 		{
 			auto CharacterPtr = GetOwner<ACharacterBase>();
 			if (CharacterPtr)
 			{
-				auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-				auto SkillUnitPtr = HoldItemComponent.FindUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
-				if (!SkillUnitPtr)
+				auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+				switch (std::get<EPointPropertyType>(Iter.Value.Type))
 				{
-					SkillUnitPtr = HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+				case EPointPropertyType::kLiDao:
+				{
+					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
 				}
-				if (SkillUnitPtr)
+				break;
+				case EPointPropertyType::kGenGu:
 				{
-					SkillUnitPtr->Level = NewTalentHelper.Level;
+					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+				}
+				break;
+				case EPointPropertyType::kShenFa:
+				{
+					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+				}
+				break;
+				case EPointPropertyType::kDongCha:
+				{
+					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+				}
+				break;
+				case EPointPropertyType::kTianZi:
+				{
+					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+				}
+				break;
 				}
 			}
 		}
 		break;
 		}
-	}
-	break;
-	case EPointType::kProperty:
-	{
-		auto CharacterPtr = GetOwner<ACharacterBase>();
-		if (CharacterPtr)
-		{
-			auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			switch (std::get<EPointPropertyType>(NewTalentHelper.Type))
-			{
-			case EPointPropertyType::kLiDao:
-			{
-				CharacterAttributes.LiDao.AddCurrentValue((NewTalentHelper.Level - OldTalentHelper.Level) * BasePropertyOffset);
-			}
-			break;
-			case EPointPropertyType::kGenGu:
-			{
-				CharacterAttributes.GenGu.AddCurrentValue((NewTalentHelper.Level - OldTalentHelper.Level) * BasePropertyOffset);
-			}
-			break;
-			case EPointPropertyType::kShenFa:
-			{
-				CharacterAttributes.ShenFa.AddCurrentValue((NewTalentHelper.Level - OldTalentHelper.Level) * BasePropertyOffset);
-			}
-			break;
-			case EPointPropertyType::kDongCha:
-			{
-				CharacterAttributes.DongCha.AddCurrentValue((NewTalentHelper.Level - OldTalentHelper.Level) * BasePropertyOffset);
-			}
-			break;
-			case EPointPropertyType::kTianZi:
-			{
-				CharacterAttributes.TianZi.AddCurrentValue((NewTalentHelper.Level - OldTalentHelper.Level) * BasePropertyOffset);
-			}
-			break;
-			}
-		}
-	}
-	break;
 	}
 }
 

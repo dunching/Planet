@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+// 是否应该为 UObject ？
 class  FTalent_Base
 {
 public:

@@ -42,6 +42,11 @@ void FBasePropertySet::AddCurrentValue(int32 val)
 	CurrentValue.SetCurrentValue(FMath::Clamp(NewVal, MinValue.GetCurrentValue(), MaxValue.GetCurrentValue()));
 }
 
+void FBasePropertySet::SetCurrentValue(int32 val)
+{
+	CurrentValue.SetCurrentValue(FMath::Clamp(val, MinValue.GetCurrentValue(), MaxValue.GetCurrentValue()));
+}
+
 int32 FBasePropertySet::GetCurrentValue() const
 {
 	return CurrentValue.GetCurrentValue();

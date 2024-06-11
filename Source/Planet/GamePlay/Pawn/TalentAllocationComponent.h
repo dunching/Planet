@@ -20,12 +20,16 @@ public:
 	FTalentHelper AddCheck(FTalentHelper& TalentHelper);
 
 	FTalentHelper SubCheck(FTalentHelper& TalentHelper);
-
+	
 	FTalentHelper* GetCheck(FTalentHelper& TalentHelper);
+
+	void Clear(FTalentHelper& TalentHelper);
 
 	int32 GetTotalTalentPointNum() const;
 
 	int32 GetUsedTalentPointNum() const;
+
+	void SyncToHolding();
 
 	TOnValueChangedCallbackContainer<int32>CallbackContainerHelper;
 
@@ -34,8 +38,6 @@ protected:
 	virtual void BeginPlay()override;
 
 	void InitialTalentData();
-
-	void SyncToHolding(const FTalentHelper& NewTalentHelper, const FTalentHelper& OldTalentHelper);
 
 	void CalculorUsedTalentPointNum();
 
@@ -51,7 +53,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
 	int32 UsedTalentPointNum = 0;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
-	int32 BasePropertyOffset = 10;
+	EPointSkillType PreviousSkillType = EPointSkillType::kDuXing;
 
 };

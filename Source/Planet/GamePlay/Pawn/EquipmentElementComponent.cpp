@@ -25,6 +25,7 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "AssetRefMap.h"
+#include "Talent_NuQi.h"
 
 UEquipmentElementComponent::UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -48,8 +49,8 @@ void UEquipmentElementComponent::BeginPlay()
 	// 接收
 
 	// 五行之间的减免
-	AddReceivedWuXingModify(); 
-	
+	AddReceivedWuXingModify();
+
 	// 基础属性
 	AddReceivedModify();
 #pragma endregion 结算效果修正
@@ -169,54 +170,39 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 		return;
 	}
 
-	// 移除缺失的技能
-	for (const auto& Iter : SkillsMap)
-	{
-		bool bIsHave = false;
-		for (const auto& SecondIter : InSkillsMap)
-		{
-			if (Iter.Value->SkillUnit == SecondIter.Value->SkillUnit)
-			{
-				bIsHave = true;
-				break;
-			}
-		}
-		if (!bIsHave)
-		{
-			auto GASpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(Iter.Value->Handle);
-			if (GASpecPtr)
-			{
-				auto GAInsPtr = Cast<USkill_Base>(GASpecPtr->GetPrimaryInstance());
-				if (GAInsPtr)
-				{
-				}
-			}
-
-			OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(Iter.Value->Handle);
-		}
-	}
-
-	// 添加新增的技能
 	decltype(SkillsMap)NewSkillMap;
 	for (const auto& Iter : InSkillsMap)
 	{
-		bool bIsHave = false;
-		for (const auto& SecondIter : SkillsMap)
+		auto PreviouIter = SkillsMap.Find(Iter.Key);
+		if (PreviouIter && *PreviouIter)
 		{
-			if (Iter.Value->SkillUnit == SecondIter.Value->SkillUnit)
+			if ((*PreviouIter)->SkillUnit == (Iter.Value ? Iter.Value->SkillUnit : nullptr))
 			{
-				NewSkillMap.Add(SecondIter);
-				bIsHave = true;
+				continue;
+			}
+			else
+			{
+				switch ((*PreviouIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
+				{
+				case ESkillUnitType::kHumanSkill_Talent_NuQi:
+				{
+					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr.Reset();
+				}
+				default:
+				{
+					OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(Iter.Value->Handle);
+				}
 				break;
+				}
 			}
 		}
-		if (!bIsHave)
+
+		if (Iter.Value && Iter.Value->SkillUnit)
 		{
 			switch (Iter.Value->SkillUnit->SkillType)
 			{
 			case ESkillType::kActive:
 			case ESkillType::kPassive:
-			case ESkillType::kTalentPassive:
 			case ESkillType::kWeaponActive:
 			{
 				auto& Ref = NewSkillMap.Add(Iter.Value->SkillSocket, Iter.Value);
@@ -228,12 +214,25 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 				);
 			}
 			break;
+			case ESkillType::kTalentPassive:
+			{
+				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
+				{
+				case ESkillUnitType::kHumanSkill_Talent_NuQi:
+				{
+					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_NuQi>();
+				}
+				break;
+				}
+			}
+			break;
 			default:
 				break;
 			}
+
+			SkillsMap.Add(Iter);
 		}
 	}
-	SkillsMap = NewSkillMap;
 }
 
 void UEquipmentElementComponent::RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo)
@@ -886,7 +885,7 @@ void UEquipmentElementComponent::AddReceivedWuXingModify()
 					{
 					case EWuXingType::kGold:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.FireElement.GetCurrentValue(), Iter.Get<1>()); 
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.FireElement.GetCurrentValue(), Iter.Get<1>());
 						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
 					}
 					break;

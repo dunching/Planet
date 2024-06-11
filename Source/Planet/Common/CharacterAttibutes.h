@@ -71,6 +71,8 @@ public:
 
 	void AddCurrentValue(int32 val);
 
+	void SetCurrentValue(int32 val);
+
 	int32 GetCurrentValue()const;
 	
 	FBaseProperty & GetCurrentProperty();
@@ -166,7 +168,7 @@ struct PLANET_API FCharacterAttributes
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FElement Element;
 
-	FTalent_Base* TalentPtr = nullptr;
+	TSharedPtr<FTalent_Base> TalentSPtr;
 #pragma endregion
 
 	// 基础属性

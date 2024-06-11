@@ -26,15 +26,10 @@ void UTalentAllocation::NativeConstruct()
 			);
 		}
 	}
-}
 
-void UTalentAllocation::NativeDestruct()
-{
-	Super::NativeDestruct(); 
-
-	if (WidgetTree) 
+	if (WidgetTree)
 	{
-		WidgetTree->ForEachWidget([](UWidget* Widget) {
+		WidgetTree->ForEachWidget([this](UWidget* Widget) {
 			if (Widget && Widget->IsA<UTalentIcon>())
 			{
 				auto UIPtr = Cast<UTalentIcon>(Widget);
@@ -42,14 +37,41 @@ void UTalentAllocation::NativeDestruct()
 				{
 					return;
 				}
+
+				OnPointChangedHandleAry.Add(UIPtr->OnValueChanged.AddCallback(
+					std::bind(&ThisClass::OnAddPoint, this, std::placeholders::_1, std::placeholders::_2)
+				));
 			}
 			});
 	}
+}
+
+void UTalentAllocation::NativeDestruct()
+{
+	Super::NativeDestruct(); 
 
 	if (OnValueChanged)
 	{
 		OnValueChanged->UnBindCallback();
 	}
+	for (auto& Iter : OnPointChangedHandleAry)
+	{
+		if (Iter)
+		{
+			Iter->UnBindCallback();
+		}
+	}
+
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (CharacterPtr)
+	{
+		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
+		if (TalentAllocationComponentPtr)
+		{
+			TalentAllocationComponentPtr->SyncToHolding();
+		}
+	}
+
 }
 
 void UTalentAllocation::OnUsedTalentNumChanged(int32 OldNum, int32 NewNum)
@@ -65,6 +87,38 @@ void UTalentAllocation::OnUsedTalentNumChanged(int32 OldNum, int32 NewNum)
 			{
 				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), NewNum, TalentAllocationComponentPtr->GetTotalTalentPointNum())));
 			}
+		}
+	}
+}
+
+void UTalentAllocation::OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd)
+{
+	if (TalentIconPtr && bIsAdd)
+	{
+		if (WidgetTree)
+		{
+			WidgetTree->ForEachWidget([this, TalentIconPtr](UWidget* Widget) {
+				if (Widget && Widget->IsA<UTalentIcon>())
+				{
+					auto UIPtr = Cast<UTalentIcon>(Widget);
+					if (!UIPtr)
+					{
+						return;
+					}
+
+					if (UIPtr == TalentIconPtr)
+					{
+					}
+					else
+					{
+						auto TalentHelper = UIPtr->GetTalentHelper();
+						if (TalentHelper.PointType == EPointType::kSkill)
+						{
+							UIPtr->ResetPoint();
+						}
+					}
+				}
+				});
 		}
 	}
 }

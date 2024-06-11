@@ -14,7 +14,7 @@ UENUM(BlueprintType)
 enum class EPointSkillType :uint8
 {
 	kNuQi,
-	kWuXing,
+	kYinYang,
 	kDuXing,
 	kFaLi,
 	kGongMing,

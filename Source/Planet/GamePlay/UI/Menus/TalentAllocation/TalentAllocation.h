@@ -9,6 +9,8 @@
 
 #include "TalentAllocation.generated.h"
 
+class UTalentIcon;
+
 /**
  *
  */
@@ -19,7 +21,11 @@ class PLANET_API UTalentAllocation : public UUserWidget
 
 public:
 
-	using FDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+	// 可用的总点数变更
+	using FPointsDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+
+	// 分配的点数变更
+	using FPointDelegateHandle = TCallbackHandleContainer<void(UTalentIcon*, bool)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -28,7 +34,11 @@ public:
 protected:
 
 	void OnUsedTalentNumChanged(int32 OldNum, int32 NewNum);
+	
+	void OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);
 
-	FDelegateHandle OnValueChanged;
+	FPointsDelegateHandle OnValueChanged;
+	
+	TArray<FPointDelegateHandle> OnPointChangedHandleAry;
 
 };

@@ -132,7 +132,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 			{PassivSkill3,EKeys::Invalid},
 			{PassivSkill4,EKeys::Invalid},
 			{PassivSkill5,EKeys::Invalid},
-			{TalentPassivSkill,EKeys::Invalid},
+//			{TalentPassivSkill,EKeys::Invalid},
 		};
 
 		TMap<FGameplayTag, TSharedPtr <FSkillSocketInfo>> SkillsMap;
@@ -147,6 +147,12 @@ void UAllocationSkillsMenu::NativeDestruct()
 				SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
 				SkillsSocketInfo->SkillUnit = IconPtr->SkillUnitPtr;
 				SkillsSocketInfo->Key = Iter.Key;
+
+				SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
+			}
+			else
+			{
+				TSharedPtr < FSkillSocketInfo >SkillsSocketInfo;
 
 				SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
 			}

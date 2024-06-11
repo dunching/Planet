@@ -29,12 +29,19 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnReceviedDamage);
+		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		OnValueChanged = CharacterAttributes.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
+
+		if (TalentSPtr)
+		{
+			auto T1alentSPtr = TSharedPtr<FTalent_NuQi>(
+				CharacterAttributes.TalentSPtr, dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentSPtr.Get())
+			);
+		}
 	}
 }
 
@@ -133,12 +140,10 @@ void USkill_Talent_NuQi::AddNuQi()
 	}
 	else
 	{
-		auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();	
-		auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentPtr);
-		if (NuQiPtr)
+		if (TalentSPtr)
 		{
-			NuQiPtr->AddCurrentValue(AttackIncrement);
-			if (NuQiPtr->GetCurrentValue() >= 100)
+			TalentSPtr->AddCurrentValue(AttackIncrement);
+			if (TalentSPtr->GetCurrentValue() >= 100)
 			{
 				StartFuryState();
 			}
@@ -149,7 +154,7 @@ void USkill_Talent_NuQi::AddNuQi()
 void USkill_Talent_NuQi::SubNuQi(float Inveral)
 {
 	auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentPtr);
+	auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentSPtr.Get());
 	if (NuQiPtr)
 	{
 		if (bIsInWeak)
@@ -245,7 +250,7 @@ void USkill_Talent_NuQi::StopForceWeakState()
 	}
 }
 
-void USkill_Talent_NuQi::OnReceviedDamage(UGameplayAbility* GAPtr)
+void USkill_Talent_NuQi::OnSendDamage(UGameplayAbility* GAPtr)
 {
 	if (CharacterPtr)
 	{
