@@ -245,22 +245,23 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent(CharacterPtr);
+		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
 		FGameplayEventData Payload;
-		Payload.TargetData.Add(GAEventData);
+		Payload.TargetData.Add(GAEventDataPtr);
 
-		GAEventData->TargetActorAry.Empty();
-		GAEventData->TriggerCharacterPtr = CharacterPtr;
-		GAEventData->Data.bIsWeaponAttack = true;
-		GAEventData->Data.SetBaseDamage(Damage);
+		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
 		for (auto Iter : OutHits)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
 			if (TargetCharacterPtr)
 			{
-				GAEventData->TargetActorAry.Add(TargetCharacterPtr);
+				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+				GAEventData.SetBaseDamage(Damage);
+
+				GAEventDataPtr->DataAry.Add(GAEventData);
 			}
 		}
 

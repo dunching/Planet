@@ -12,7 +12,33 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "Talent_NuQi.h"
+
+int32 FTalent_NuQi::GetCurrentValue() const
+{
+	return CurrentValue;
+}
+
+int32 FTalent_NuQi::GetMaxValue() const
+{
+	return MaxValue;
+}
+
+void FTalent_NuQi::SetCurrentValue(int32 NewVal)
+{
+	if (CurrentValue != NewVal)
+	{
+		NewVal = FMath::Clamp(NewVal, 0, MaxValue);
+
+		CallbackContainerHelper.ValueChanged(CurrentValue, NewVal);
+
+		CurrentValue = NewVal;
+	}
+}
+
+void FTalent_NuQi::AddCurrentValue(int32 Value)
+{
+	SetCurrentValue(GetCurrentValue() + Value);
+}
 
 USkill_Talent_NuQi::USkill_Talent_NuQi() :
 	Super()
@@ -36,12 +62,9 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 
-		if (TalentSPtr)
-		{
-			auto T1alentSPtr = TSharedPtr<FTalent_NuQi>(
-				CharacterAttributes.TalentSPtr, dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentSPtr.Get())
-			);
-		}
+		TalentSPtr = TSharedPtr<FCurrentTalentType>(
+			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
+		);
 	}
 }
 
@@ -154,20 +177,20 @@ void USkill_Talent_NuQi::AddNuQi()
 void USkill_Talent_NuQi::SubNuQi(float Inveral)
 {
 	auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	auto NuQiPtr = dynamic_cast<FTalent_NuQi*>(CharacterAttributes.TalentSPtr.Get());
-	if (NuQiPtr)
+	auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
+	if (TalentPtr)
 	{
 		if (bIsInWeak)
 		{
-			const auto Value = NuQiPtr->GetMaxValue() / FMath::FloorToFloat(WeakDuration);
-			NuQiPtr->AddCurrentValue(-Value);
+			const auto Value = TalentPtr->GetMaxValue() / FMath::FloorToFloat(WeakDuration);
+			TalentPtr->AddCurrentValue(-Value);
 		}
 		else
 		{
 			DecrementTime_Accumulate += Inveral;
 			if (DecrementTime_Accumulate > DecrementTime)
 			{
-				NuQiPtr->AddCurrentValue(-Decrement);
+				TalentPtr->AddCurrentValue(-Decrement);
 			}
 		}
 	}

@@ -161,8 +161,12 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket4")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag TalentPassiveSocket1 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.TalentPassiveSocket1")));
+	FGameplayTag Talent_NuQi_Socket =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.Talent_NuQi_Socket")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag Talent_YinYang_Socket =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.Talent_YinYang_Socket")));
 #pragma endregion Tags
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

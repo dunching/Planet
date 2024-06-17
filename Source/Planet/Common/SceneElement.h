@@ -26,6 +26,13 @@ enum class EWeaponSocket
 	kSecondary,
 };
 
+UENUM(BlueprintType)
+enum class ETalent_State_Type : uint8
+{
+	kYin,
+	kYang,
+};
+
 #pragma region HoldItem
 UENUM(BlueprintType)
 enum class ERawMaterialsType : uint8
@@ -91,6 +98,7 @@ enum class ESkillUnitType : uint8
 	kHumanSkill_Active_ContinuousGroupTherapy,
 
 	kHumanSkill_Talent_NuQi,
+	kHumanSkill_Talent_YinYang,
 };
 
 UENUM(BlueprintType)

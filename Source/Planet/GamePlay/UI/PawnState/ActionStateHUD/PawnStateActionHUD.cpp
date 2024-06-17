@@ -12,10 +12,11 @@
 #include "ActionSkillsIcon.h"
 #include "CharacterAttibutes.h"
 #include "AssetRefMap.h"
-#include "State_Talent_NuQi.h"
 #include "MyProgressBar.h"
 #include "MyBaseProperty.h"
 #include "LogWriter.h"
+#include "State_Talent_NuQi.h"
+#include "State_Talent_YinYang.h"
 
 namespace AllocationSkillsMenu
 {
@@ -206,7 +207,10 @@ void UPawnStateActionHUD::InitialTalentUI()
 	for (auto Iter : SkillsMap)
 	{
 		bool bIsGiveTalentPassive = false;
-		if (Iter.Value->SkillUnit)
+		if (
+			Iter.Value->SkillUnit && 
+			(Iter.Value->SkillUnit->Level > 0)
+			)
 		{
 			switch (Iter.Value->SkillUnit->SkillType)
 			{
@@ -217,9 +221,21 @@ void UPawnStateActionHUD::InitialTalentUI()
 				case ESkillUnitType::kHumanSkill_Talent_NuQi:
 				{
 					PRINTINVOKEINFO();
-					auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, TalentState_NuQi_Class);
+					auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 					if (UIPtr)
 					{
+						BorderPtr->AddChild(UIPtr);
+						bIsGiveTalentPassive = true;
+					}
+				}
+				break;
+				case ESkillUnitType::kHumanSkill_Talent_YinYang:
+				{
+					PRINTINVOKEINFO();
+					auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
+					if (UIPtr)
+					{
+						UIPtr->TargetCharacterPtr = CharacterPtr;
 						BorderPtr->AddChild(UIPtr);
 						bIsGiveTalentPassive = true;
 					}

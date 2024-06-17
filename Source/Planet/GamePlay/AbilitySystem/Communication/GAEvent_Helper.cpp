@@ -5,30 +5,24 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 
-FGameplayAbilityTargetData_GAEvent* FGameplayAbilityTargetData_GAEvent::Clone() const
+FGameplayAbilityTargetData_GASendEvent* FGameplayAbilityTargetData_GASendEvent::Clone() const
 {
-	FGameplayAbilityTargetData_GAEvent* ResultPtr = new FGameplayAbilityTargetData_GAEvent(TriggerCharacterPtr.Get());
+	FGameplayAbilityTargetData_GASendEvent* ResultPtr = new FGameplayAbilityTargetData_GASendEvent(TriggerCharacterPtr.Get());
 
 	*ResultPtr = *this;
 
 	return ResultPtr;
 }
 
-FGameplayAbilityTargetData_GAEvent::FGameplayAbilityTargetData_GAEvent(
-	ACharacterBase* InTriggerCharacterPtr
+FGameplayAbilityTargetData_GASendEvent::FGameplayAbilityTargetData_GASendEvent(
+	TWeakObjectPtr<ACharacterBase>  InTriggerCharacterPtr
 ) :
 	TriggerCharacterPtr(InTriggerCharacterPtr)
 {
-	Data.TriggerCharacterPtr = TriggerCharacterPtr;
 }
 
 IGAEventModifyInterface::IGAEventModifyInterface(int32 InPriority) :
 	Priority(InPriority)
-{
-
-}
-
-void IGAEventModifyInterface::Modify(FGameplayAbilityTargetData_GAEvent& OutGameplayAbilityTargetData_GAEvent)
 {
 
 }
@@ -38,12 +32,22 @@ bool IGAEventModifyInterface::operator<(const IGAEventModifyInterface& RightValu
 	return (Priority > RightValue.Priority) && (ID == RightValue.ID);
 }
 
-void FGameplayAbilityTargetData_GAEvent::FData::SetBaseDamage(int32 Value)
+FGAEventData::FGAEventData(
+	TWeakObjectPtr<ACharacterBase>  InTargetCharacterPtr,
+	TWeakObjectPtr<ACharacterBase>  InTriggerCharacterPtr
+) :
+	TriggerCharacterPtr(InTriggerCharacterPtr),
+	TargetCharacterPtr(InTargetCharacterPtr)
+{
+
+}
+
+void FGAEventData::SetBaseDamage(int32 Value)
 {
 	BaseDamage = Value;
 }
 
-void FGameplayAbilityTargetData_GAEvent::FData::SetWuXingDamage(EWuXingType WuXingType, int32 Value)
+void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 {
 	const auto& CharacterAttributes =
 		TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
@@ -83,4 +87,46 @@ void FGameplayAbilityTargetData_GAEvent::FData::SetWuXingDamage(EWuXingType WuXi
 		Value
 	);
 	ElementSet.Add(Tuple);
+}
+
+FGameplayAbilityTargetData_GAReceivedEvent::FGameplayAbilityTargetData_GAReceivedEvent(
+	TWeakObjectPtr<ACharacterBase>  InTargetCharacterPtr,
+	TWeakObjectPtr<ACharacterBase>  InTriggerCharacterPtr
+) :
+	TriggerCharacterPtr(InTriggerCharacterPtr),
+	Data(InTargetCharacterPtr, InTriggerCharacterPtr)
+{
+
+}
+
+FGameplayAbilityTargetData_GAReceivedEvent* FGameplayAbilityTargetData_GAReceivedEvent::Clone() const
+{
+	FGameplayAbilityTargetData_GAReceivedEvent* ResultPtr = 
+		new FGameplayAbilityTargetData_GAReceivedEvent(Data.TargetCharacterPtr, TriggerCharacterPtr.Get());
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
+IGAEventModifySendInterface::IGAEventModifySendInterface(int32 InPriority /*= 1*/) :
+	IGAEventModifyInterface(InPriority)
+{
+
+}
+
+void IGAEventModifySendInterface::Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent)
+{
+
+}
+
+IGAEventModifyReceivedInterface::IGAEventModifyReceivedInterface(int32 InPriority /*= 1*/) :
+	IGAEventModifyInterface(InPriority)
+{
+
+}
+
+void IGAEventModifyReceivedInterface::Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent)
+{
+
 }

@@ -14,66 +14,92 @@ class UEquipmentElementComponent;
 
 struct FCharacterAttributes;
 
-struct FGameplayAbilityTargetData_GAEvent : public FGameplayAbilityTargetData
+struct FGAEventData
 {
-	struct FData
-	{
-		// 
-		bool bIsWeaponAttack = false;
-
-		// 本次攻击的 穿透
-		int32 Penetration = 0;
-
-		// 本次攻击的 百分比穿透
-		int32 PercentPenetration = 0;
-
-		// 本次攻击的 命中率(0则为此次被闪避)
-		int32 HitRate = 0;
-
-		// 本次攻击的 会心率(100则为此次被会心)
-		int32 CriticalHitRate = 0;
-
-		// 本次攻击的 会心伤害
-		int32 CriticalDamage = 0;
-
-		// 造成的真实伤害
-		int32 TrueDamage = 0;
-
-		// 攻击速度
-		int32 GAPerformSpeedOffset = 0;
-
-		void SetBaseDamage(int32 Value);
-
-		void SetWuXingDamage(EWuXingType WuXingType, int32 Value);
-
-		// 治疗量
-		int32 TreatmentVolume = 0;
-
-		// 造成的基础伤害
-		int32 BaseDamage = 0;
-
-		// 伤害分布：类型、等级、伤害量
-		TSet<TTuple<EWuXingType, int32, int32>>ElementSet;
-
-		TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
-	};
-
-	using FCallbackHandleContainer = TCallbackHandleContainer<void(ACharacterBase*, const FData&)>;
-
-	FGameplayAbilityTargetData_GAEvent* Clone()const;
-
-	FGameplayAbilityTargetData_GAEvent(
-		ACharacterBase* TriggerCharacterPtr
+	FGAEventData(
+		TWeakObjectPtr<ACharacterBase>  TargetCharacterPtr,
+		TWeakObjectPtr<ACharacterBase>  TriggerCharacterPtr
 	);
 
-	TArray<ACharacterBase*>TargetActorAry;
+	// 
+	bool bIsWeaponAttack = false;
+
+	// 本次攻击的 穿透
+	int32 Penetration = 0;
+
+	// 本次攻击的 百分比穿透
+	int32 PercentPenetration = 0;
+
+	// 本次攻击的 命中率(0则为此次被闪避)
+	int32 HitRate = 0;
+
+	// 本次攻击的 会心率(100则为此次被会心)
+	int32 CriticalHitRate = 0;
+
+	// 本次攻击的 会心伤害
+	int32 CriticalDamage = 0;
+
+	// 造成的真实伤害
+	int32 TrueDamage = 0;
+
+	// 攻击速度
+	int32 GAPerformSpeedOffset = 0;
+
+	void SetBaseDamage(int32 Value);
+
+	void AddWuXingDamage(EWuXingType WuXingType, int32 Value);
+
+	// 
+	int32 HP = 0;
+
+	// 
+	int32 PP = 0;
+
+	// 造成的基础伤害
+	int32 BaseDamage = 0;
+
+	// 伤害分布：类型、等级、伤害量
+	TSet<TTuple<EWuXingType, int32, int32>>ElementSet;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
-	FData Data;
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
+};
+
+struct FGameplayAbilityTargetData_GASendEvent : public FGameplayAbilityTargetData
+{
+	using FCallbackHandleContainer = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
+
+	FGameplayAbilityTargetData_GASendEvent(
+		TWeakObjectPtr<ACharacterBase>  TriggerCharacterPtr
+	);
+
+	FGameplayAbilityTargetData_GASendEvent* Clone()const;
+
+	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
+
+	TArray<FGAEventData> DataAry;
 
 	FCallbackHandleContainer TrueDataDelagate;
 
+};
+
+struct FGameplayAbilityTargetData_GAReceivedEvent : public FGameplayAbilityTargetData
+{
+	using FCallbackHandleContainer = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
+
+	FGameplayAbilityTargetData_GAReceivedEvent(
+		TWeakObjectPtr<ACharacterBase>  TargetCharacterPtr,
+		TWeakObjectPtr<ACharacterBase>  TriggerCharacterPtr
+	);
+
+	FGameplayAbilityTargetData_GAReceivedEvent* Clone()const;
+
+	FGAEventData Data;
+
+	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
+
+	FCallbackHandleContainer TrueDataDelagate;
 };
 
 struct FGAEventModify_key_compare;
@@ -87,8 +113,6 @@ public:
 
 	IGAEventModifyInterface(int32 InPriority = 1);
 
-	virtual void Modify(FGameplayAbilityTargetData_GAEvent& OutGameplayAbilityTargetData_GAEvent);
-
 	bool operator<(const IGAEventModifyInterface& RightValue)const;
 
 private:
@@ -97,6 +121,26 @@ private:
 	int32 Priority = -1;
 
 	int32 ID = -1;
+
+};
+
+class PLANET_API IGAEventModifySendInterface : public IGAEventModifyInterface
+{
+public:
+
+	IGAEventModifySendInterface(int32 InPriority = 1);
+
+	virtual void Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent);
+
+};
+
+class PLANET_API IGAEventModifyReceivedInterface : public IGAEventModifyInterface
+{
+public:
+
+	IGAEventModifyReceivedInterface(int32 InPriority = 1);
+
+	virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent);
 
 };
 

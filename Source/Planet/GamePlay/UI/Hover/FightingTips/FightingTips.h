@@ -33,7 +33,7 @@ public:
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
-	void ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAEvent);
+	void ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 protected:
 

@@ -25,7 +25,8 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "AssetRefMap.h"
-#include "Talent_NuQi.h"
+#include "Skill_Talent_NuQi.h"
+#include "Skill_Talent_YinYang.h"
 
 UEquipmentElementComponent::UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -146,7 +147,7 @@ void UEquipmentElementComponent::InitialBaseGAs()
 	}
 }
 
-void UEquipmentElementComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData)
+void UEquipmentElementComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData)
 {
 	for (auto Iter : SendEventModifysMap)
 	{
@@ -154,7 +155,7 @@ void UEquipmentElementComponent::OnSendEventModifyData(FGameplayAbilityTargetDat
 	}
 }
 
-void UEquipmentElementComponent::OnReceivedEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData)
+void UEquipmentElementComponent::OnReceivedEventModifyData(FGameplayAbilityTargetData_GAReceivedEvent& OutGAEventData)
 {
 	for (auto Iter : ReceivedEventModifysMap)
 	{
@@ -170,13 +171,15 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 		return;
 	}
 
-	decltype(SkillsMap)NewSkillMap;
 	for (const auto& Iter : InSkillsMap)
 	{
 		auto PreviouIter = SkillsMap.Find(Iter.Key);
-		if (PreviouIter && *PreviouIter)
+		if (PreviouIter && *PreviouIter && (*PreviouIter)->SkillUnit)
 		{
-			if ((*PreviouIter)->SkillUnit == (Iter.Value ? Iter.Value->SkillUnit : nullptr))
+			if (
+				(Iter.Value->SkillUnit) &&
+				(Iter.Value->SkillUnit->Level > 0)
+				)
 			{
 				continue;
 			}
@@ -185,12 +188,14 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 				switch ((*PreviouIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
 				{
 				case ESkillUnitType::kHumanSkill_Talent_NuQi:
+				case ESkillUnitType::kHumanSkill_Talent_YinYang:
 				{
 					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr.Reset();
 				}
 				default:
 				{
 					OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(Iter.Value->Handle);
+					SkillsMap.Remove(Iter.Value->SkillSocket);
 				}
 				break;
 				}
@@ -199,13 +204,17 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 
 		if (Iter.Value && Iter.Value->SkillUnit)
 		{
+			if (Iter.Value->SkillUnit->Level <= 0)
+			{
+				continue;
+			}
 			switch (Iter.Value->SkillUnit->SkillType)
 			{
 			case ESkillType::kActive:
 			case ESkillType::kPassive:
 			case ESkillType::kWeaponActive:
 			{
-				auto& Ref = NewSkillMap.Add(Iter.Value->SkillSocket, Iter.Value);
+				auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 				Ref->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 					FGameplayAbilitySpec(
 						Iter.Value->SkillUnit->SkillClass,
@@ -223,14 +232,32 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_NuQi>();
 				}
 				break;
+				case ESkillUnitType::kHumanSkill_Talent_YinYang:
+				{
+					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_YinYang>();
+				}
+				break;
+				}
+				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
+				{
+				case ESkillUnitType::kHumanSkill_Talent_NuQi:
+				case ESkillUnitType::kHumanSkill_Talent_YinYang:
+				{
+						auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
+						Ref->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+							FGameplayAbilitySpec(
+								Iter.Value->SkillUnit->SkillClass,
+								Iter.Value->SkillUnit->Level
+							)
+						);
+				}
+				break;
 				}
 			}
 			break;
 			default:
 				break;
 			}
-
-			SkillsMap.Add(Iter);
 		}
 	}
 }
@@ -500,7 +527,7 @@ const TArray<TSharedPtr<FCanbeActivedInfo>>& UEquipmentElementComponent::GetCanb
 	return CanbeActivedInfoAry;
 }
 
-void UEquipmentElementComponent::AddSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+void UEquipmentElementComponent::AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -518,7 +545,7 @@ void UEquipmentElementComponent::AddSendEventModify(const TSharedPtr<IGAEventMod
 	SendEventModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UEquipmentElementComponent::RemoveSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+void UEquipmentElementComponent::RemoveSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
 {
 	for (auto Iter = SendEventModifysMap.begin(); Iter != SendEventModifysMap.end(); Iter++)
 	{
@@ -530,7 +557,7 @@ void UEquipmentElementComponent::RemoveSendEventModify(const TSharedPtr<IGAEvent
 	}
 }
 
-void UEquipmentElementComponent::AddReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+void UEquipmentElementComponent::AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -548,7 +575,7 @@ void UEquipmentElementComponent::AddReceviedEventModify(const TSharedPtr<IGAEven
 	ReceivedEventModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UEquipmentElementComponent::RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr)
+void UEquipmentElementComponent::RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
 {
 	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
 	{
@@ -769,31 +796,34 @@ bool UEquipmentElementComponent::ActivedCorrespondingWeapon(USkill_Active_Base* 
 
 void UEquipmentElementComponent::AddSendGroupEffectModify()
 {
-	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	struct GAEventModify_MultyTarget : public IGAEventModifySendInterface
 	{
 		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifyInterface(InPriority)
+			IGAEventModifySendInterface(InPriority)
 		{
 		}
 
-		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		virtual void Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
 		{
-			if (GameplayAbilityTargetData_GAEvent.TargetActorAry.Num() > 1)
+			if (GameplayAbilityTargetData_GAEvent.DataAry.Num() > 1)
 			{
-				GameplayAbilityTargetData_GAEvent.Data.TrueDamage =
-					GameplayAbilityTargetData_GAEvent.Data.TrueDamage / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
-
-				GameplayAbilityTargetData_GAEvent.Data.BaseDamage =
-					GameplayAbilityTargetData_GAEvent.Data.BaseDamage / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
-
-				for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+				for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
 				{
-					Iter.Get<2>() =
-						Iter.Get<2>() / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
-				}
+					Iter.TrueDamage =
+						Iter.TrueDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
 
-				GameplayAbilityTargetData_GAEvent.Data.TreatmentVolume =
-					GameplayAbilityTargetData_GAEvent.Data.TreatmentVolume / GameplayAbilityTargetData_GAEvent.TargetActorAry.Num();
+					Iter.BaseDamage =
+						Iter.BaseDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+
+					for (auto& ElementIter : Iter.ElementSet)
+					{
+						ElementIter.Get<2>() =
+							ElementIter.Get<2>() / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+					}
+
+					Iter.HP =
+						Iter.HP / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+				}
 			}
 		}
 	};
@@ -802,35 +832,38 @@ void UEquipmentElementComponent::AddSendGroupEffectModify()
 
 void UEquipmentElementComponent::AddSendWuXingModify()
 {
-	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	struct GAEventModify_MultyTarget : public IGAEventModifySendInterface
 	{
 		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifyInterface(InPriority)
+			IGAEventModifySendInterface(InPriority)
 		{
 		}
 
-		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		virtual void Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
 		{
-			if (GameplayAbilityTargetData_GAEvent.Data.ElementSet.IsEmpty())
+			for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
 			{
-				const auto& CharacterAttributes =
-					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
-				ElementMap.emplace(CharacterAttributes.Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
-				ElementMap.emplace(CharacterAttributes.Element.WoodElement.GetCurrentValue(), EWuXingType::kWood);
-				ElementMap.emplace(CharacterAttributes.Element.WaterElement.GetCurrentValue(), EWuXingType::kWater);
-				ElementMap.emplace(CharacterAttributes.Element.FireElement.GetCurrentValue(), EWuXingType::kFire);
-				ElementMap.emplace(CharacterAttributes.Element.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
-
-				if (ElementMap.begin()->first > 0)
+				if (Iter.ElementSet.IsEmpty())
 				{
-					const auto Tuple = MakeTuple(
-						ElementMap.begin()->second,
-						ElementMap.begin()->first,
-						GameplayAbilityTargetData_GAEvent.Data.BaseDamage
-					);
-					GameplayAbilityTargetData_GAEvent.Data.ElementSet.Add(Tuple);
+					const auto& CharacterAttributes =
+						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+					std::map<int32, EWuXingType, std::greater<int>> ElementMap;
+					ElementMap.emplace(CharacterAttributes.Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
+					ElementMap.emplace(CharacterAttributes.Element.WoodElement.GetCurrentValue(), EWuXingType::kWood);
+					ElementMap.emplace(CharacterAttributes.Element.WaterElement.GetCurrentValue(), EWuXingType::kWater);
+					ElementMap.emplace(CharacterAttributes.Element.FireElement.GetCurrentValue(), EWuXingType::kFire);
+					ElementMap.emplace(CharacterAttributes.Element.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+
+					if (ElementMap.begin()->first > 0)
+					{
+						const auto Tuple = MakeTuple(
+							ElementMap.begin()->second,
+							ElementMap.begin()->first,
+							Iter.BaseDamage
+						);
+						Iter.ElementSet.Add(Tuple);
+					}
 				}
 			}
 		}
@@ -840,14 +873,14 @@ void UEquipmentElementComponent::AddSendWuXingModify()
 
 void UEquipmentElementComponent::AddReceivedWuXingModify()
 {
-	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	struct GAEventModify_MultyTarget : public IGAEventModifyReceivedInterface
 	{
 		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifyInterface(InPriority)
+			IGAEventModifyReceivedInterface(InPriority)
 		{
 		}
 
-		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
 		{
 			const auto Caculation_Effective_Rate = [](int32 SelfLevel, int32 TargetLevel) {
 
@@ -857,10 +890,11 @@ void UEquipmentElementComponent::AddReceivedWuXingModify()
 				return Effective_Rate;
 				};
 
-			if (GameplayAbilityTargetData_GAEvent.Data.ElementSet.IsEmpty() && GameplayAbilityTargetData_GAEvent.TargetActorAry.IsValidIndex(0))
+			auto& DataRef = GameplayAbilityTargetData_GAEvent.Data;
+			if (DataRef.ElementSet.IsEmpty() && DataRef.TargetCharacterPtr.IsValid())
 			{
 				const auto& CharacterAttributes =
-					GameplayAbilityTargetData_GAEvent.TargetActorAry[0]->GetCharacterAttributesComponent()->GetCharacterAttributes();
+					DataRef.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
 				ElementMap.emplace(CharacterAttributes.Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
@@ -871,46 +905,46 @@ void UEquipmentElementComponent::AddReceivedWuXingModify()
 
 				const auto Effective_Rate = Caculation_Effective_Rate(ElementMap.begin()->first, 0);
 
-				GameplayAbilityTargetData_GAEvent.Data.BaseDamage = GameplayAbilityTargetData_GAEvent.Data.BaseDamage * Effective_Rate;
+				DataRef.BaseDamage = DataRef.BaseDamage * Effective_Rate;
 			}
 			else
 			{
 				const auto& CharacterAttributes =
 					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-				for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+				for (auto& ElementIter : DataRef.ElementSet)
 				{
 					// 木克土，土克水，水克火，火克金，金克木
-					switch (Iter.Get<0>())
+					switch (ElementIter.Get<0>())
 					{
 					case EWuXingType::kGold:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.FireElement.GetCurrentValue(), Iter.Get<1>());
-						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.FireElement.GetCurrentValue(), ElementIter.Get<1>());
+						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kWood:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.GoldElement.GetCurrentValue(), Iter.Get<1>());
-						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.GoldElement.GetCurrentValue(), ElementIter.Get<1>());
+						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kWater:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.SoilElement.GetCurrentValue(), Iter.Get<1>());
-						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.SoilElement.GetCurrentValue(), ElementIter.Get<1>());
+						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kFire:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.WaterElement.GetCurrentValue(), Iter.Get<1>());
-						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.WaterElement.GetCurrentValue(), ElementIter.Get<1>());
+						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kSoil:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.WoodElement.GetCurrentValue(), Iter.Get<1>());
-						Iter.Get<2>() = Iter.Get<2>() * Effective_Rate;
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.Element.WoodElement.GetCurrentValue(), ElementIter.Get<1>());
+						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					default:
@@ -925,19 +959,19 @@ void UEquipmentElementComponent::AddReceivedWuXingModify()
 
 void UEquipmentElementComponent::AddReceivedModify()
 {
-	struct GAEventModify_MultyTarget : public IGAEventModifyInterface
+	struct GAEventModify_MultyTarget : public IGAEventModifyReceivedInterface
 	{
 		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifyInterface(InPriority)
+			IGAEventModifyReceivedInterface(InPriority)
 		{
 		}
 
-		virtual void Modify(FGameplayAbilityTargetData_GAEvent& GameplayAbilityTargetData_GAEvent)override
+		virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
 		{
-			if (GameplayAbilityTargetData_GAEvent.TargetActorAry.IsValidIndex(0))
+			if (GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr.IsValid())
 			{
 				const auto& SelfCharacterAttributes =
-					GameplayAbilityTargetData_GAEvent.TargetActorAry[0]->GetCharacterAttributesComponent()->GetCharacterAttributes();
+					GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				const auto& TargetCharacterAttributes =
 					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();

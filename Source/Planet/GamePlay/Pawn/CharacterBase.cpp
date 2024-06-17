@@ -126,6 +126,11 @@ UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()
 	return TalentAllocationComponentPtr;
 }
 
+bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
+{
+	return false;
+}
+
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
 	return false;

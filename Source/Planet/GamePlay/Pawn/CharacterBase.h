@@ -63,7 +63,9 @@ public:
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
-	virtual bool IsTeammate(ACharacterBase*TargetCharacterPtr)const;
+	virtual bool IsGroupmate(ACharacterBase*TargetCharacterPtr)const;
+
+	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);

@@ -39,13 +39,14 @@ void UFightingTipsItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTim
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
-void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGameplayAbilityTargetData_GAEvent& GAEvent)
+void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	if (GAEvent.TargetActorAry.IsValidIndex(0))
+	const auto& Ref = GAEvent.Data;
+	if (Ref.TargetCharacterPtr.IsValid())
 	{
 		auto Lambda = [&](int32 Value) {
 			// 
-			if (GAEvent.Data.HitRate <= 0)
+			if (Ref.HitRate <= 0)
 			{
 				auto UIPtr = Cast<UImage>(GetWidgetFromName(FightingTipsItem::Icon_Disable));
 				if (!UIPtr)
@@ -54,7 +55,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 				}
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
 			}
-			else if (GAEvent.Data.CriticalHitRate >= 100)
+			else if (Ref.CriticalHitRate >= 100)
 			{
 				auto UIPtr = Cast<USizeBox>(GetWidgetFromName(FightingTipsItem::SizeBox));
 				if (!UIPtr)
@@ -79,17 +80,17 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 		{
 		case UFightingTipsItem::EType::kBaseDamage:
 		{
-			Lambda(GAEvent.Data.BaseDamage);
+			Lambda(Ref.BaseDamage);
 		}
 		break;
 		case UFightingTipsItem::EType::kTrueDamage:
 		{
-			Lambda(GAEvent.Data.TrueDamage);
+			Lambda(Ref.TrueDamage);
 		}
 		break;
 		case UFightingTipsItem::EType::kGold:
 		{
-			for (const auto& Iter : GAEvent.Data.ElementSet)
+			for (const auto& Iter : Ref.ElementSet)
 			{
 				bool bIsBreak = false;
 				switch (Iter.Get<0>())
@@ -110,7 +111,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 		break;
 		case UFightingTipsItem::EType::kWood:
 		{
-			for (const auto& Iter : GAEvent.Data.ElementSet)
+			for (const auto& Iter : Ref.ElementSet)
 			{
 				bool bIsBreak = false;
 				switch (Iter.Get<0>())
@@ -131,7 +132,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 		break;
 		case UFightingTipsItem::EType::kWater:
 		{
-			for (const auto& Iter : GAEvent.Data.ElementSet)
+			for (const auto& Iter : Ref.ElementSet)
 			{
 				bool bIsBreak = false;
 				switch (Iter.Get<0>())
@@ -152,7 +153,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 		break;
 		case UFightingTipsItem::EType::kFire:
 		{
-			for (const auto& Iter : GAEvent.Data.ElementSet)
+			for (const auto& Iter : Ref.ElementSet)
 			{
 				bool bIsBreak = false;
 				switch (Iter.Get<0>())
@@ -173,7 +174,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 		break;
 		case UFightingTipsItem::EType::kSoil:
 		{
-			for (const auto& Iter : GAEvent.Data.ElementSet)
+			for (const auto& Iter : Ref.ElementSet)
 			{
 				bool bIsBreak = false;
 				switch (Iter.Get<0>())
@@ -215,7 +216,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 			{
 				return;
 			}
-			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("+%d"), GAEvent.Data.TreatmentVolume)));
+			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Ref.HP)));
 			UIPtr->SetColorAndOpacity(FSlateColor(FLinearColor(0.000000, 1.000000, 0.191129, 1.000000)));
 		}
 		break;

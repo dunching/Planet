@@ -108,6 +108,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 					EffectItemPtr = nullptr;
 				}
 				TaskPtr->ExternalCancel();
+				K2_EndAbility();
 			}
 			else if (TaskPtr)
 			{
@@ -166,8 +167,8 @@ void USkill_Passive_ZMJZ::TriggerSelf(UGameplayAbility* GAPtr)
 
 		const auto& EventData = GA_SendPtr->GetCurrentEventData();
 
-		auto GAEventPtr = dynamic_cast<const FGameplayAbilityTargetData_GAEvent*>(EventData.TargetData.Get(0));
-		if (GAEventPtr && GAEventPtr->Data.bIsWeaponAttack)
+		auto GAEventPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventData.TargetData.Get(0));
+		if (GAEventPtr && GAEventPtr->DataAry[0].bIsWeaponAttack)
 		{
 			auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TryActivateAbility(GetCurrentAbilitySpecHandle());

@@ -166,45 +166,43 @@ FCharacterAttributes::~FCharacterAttributes()
 
 }
 
-void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAEvent)
+void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
 	// 处理数据
-	if (GAEvent.Data.HitRate <= 0)
+	const auto& Ref = GAEvent.Data;
+	if (Ref.HitRate <= 0)
 	{
 	}
 	else
 	{
 		float CurCriticalDamage = 1.f;
-		if (GAEvent.Data.CriticalHitRate >= 100)
+		if (Ref.CriticalHitRate >= 100)
 		{
-			CurCriticalDamage = (100 + GAEvent.Data.CriticalDamage) / 100.f;
+			CurCriticalDamage = (100 + Ref.CriticalDamage) / 100.f;
 		}
 
 		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
-		HP.AddCurrentValue(GAEvent.Data.TreatmentVolume);
+		HP.AddCurrentValue(Ref.HP);
 
-		if (GAEvent.Data.ElementSet.IsEmpty())
+		if (Ref.ElementSet.IsEmpty())
 		{
-			HP.AddCurrentValue(-GAEvent.Data.BaseDamage * CurCriticalDamage);
+			HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage);
 		}
 		else
 		{
-			for (const auto& Iter : GAEvent.Data.ElementSet)
+			for (const auto& Iter : Ref.ElementSet)
 			{
 				HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage);
 			}
 		}
 
-		HP.AddCurrentValue(GAEvent.Data.TrueDamage);
+		HP.AddCurrentValue(Ref.TrueDamage);
 	}
 
 	// 显示对应的浮动UI
-	if (GAEvent.TargetActorAry.IsValidIndex(0))
-	{
-		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
-		UIPtr->ProcessGAEVent(GAEvent);
-		UIPtr->AddToViewport();
-	}
+	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
+	UIPtr->ProcessGAEVent(GAEvent);
+	UIPtr->AddToViewport();
 }
 
 FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)

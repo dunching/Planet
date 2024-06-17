@@ -15,6 +15,7 @@ struct FSceneTool;
 struct FCharacterAttributes;
 
 class UState_Talent_NuQi;
+class UState_Talent_YinYang;
 class ACharacterBase;
 
 UCLASS()
@@ -46,7 +47,10 @@ protected:
 	TCallbackHandleContainer<void(EWeaponSocket)>::FCallbackHandleSPtr ActivedWeaponChangedDelegate;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UState_Talent_NuQi>TalentState_NuQi_Class;
+	TSubclassOf<UState_Talent_NuQi>State_Talent_NuQi_Class;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UState_Talent_YinYang>Talent_YinYang_Class;
 
 private:
 

@@ -42,11 +42,12 @@ void UFightingTips::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
-void UFightingTips::ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAEvent)
+void UFightingTips::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	if (GAEvent.TargetActorAry.IsValidIndex(0))
+	const auto& Ref = GAEvent.Data;
+	if (Ref.TargetCharacterPtr.IsValid())
 	{
-		TargetCharacterPtr = GAEvent.TargetActorAry[0];
+		TargetCharacterPtr = Ref.TargetCharacterPtr.Get();
 
 		auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(FightingTips::VerticalBox));
 		if (!PanelPtr)
@@ -55,16 +56,16 @@ void UFightingTips::ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAE
 		}
 		PanelPtr->ClearChildren();
 
-		if (GAEvent.Data.TrueDamage > 0)
+		if (Ref.TrueDamage > 0)
 		{
 			auto UIPtr = CreateWidget<UFightingTipsItem>(GetWorldImp(), FightingTipsItemClass);
 			UIPtr->ProcessGAEVent(UFightingTipsItem::EType::kTrueDamage, GAEvent);
 			PanelPtr->AddChild(UIPtr);
 		}
 
-		if (GAEvent.Data.ElementSet.Num() > 0)
+		if (Ref.ElementSet.Num() > 0)
 		{
-			for (const auto& Iter : GAEvent.Data.ElementSet)
+			for (const auto& Iter : Ref.ElementSet)
 			{
 				auto UIPtr = CreateWidget<UFightingTipsItem>(GetWorldImp(), FightingTipsItemClass);
 				switch (Iter.Get<0>())
@@ -98,14 +99,14 @@ void UFightingTips::ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAE
 				PanelPtr->AddChild(UIPtr);
 			}
 		}
-		else if (GAEvent.Data.BaseDamage > 0)
+		else if (Ref.BaseDamage > 0)
 		{
 			auto UIPtr = CreateWidget<UFightingTipsItem>(GetWorldImp(), FightingTipsItemClass);
 			UIPtr->ProcessGAEVent(UFightingTipsItem::EType::kBaseDamage, GAEvent);
 			PanelPtr->AddChild(UIPtr);
 		}
 
-		if (GAEvent.Data.TreatmentVolume > 0)
+		if (Ref.HP > 0)
 		{
 			auto UIPtr = CreateWidget<UFightingTipsItem>(GetWorldImp(), FightingTipsItemClass);
 			UIPtr->ProcessGAEVent(UFightingTipsItem::EType::kTreatment, GAEvent);

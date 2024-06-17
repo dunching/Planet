@@ -114,7 +114,7 @@ void UTalentAllocationComponent::InitialTalentData()
 
 		TalentHelper.IconSocket = GameplayTag;
 		TalentHelper.PointType = EPointType::kSkill;
-		TalentHelper.Type = EPointSkillType::kNuQi;
+		TalentHelper.Type = Iter.PointSkillType;
 		TalentHelper.Level = 0;
 		TalentHelper.TotalLevel = 3;
 
@@ -164,52 +164,65 @@ void UTalentAllocationComponent::SyncToHolding()
 		{
 		case EPointType::kSkill:
 		{
-			if (Iter.Value.Level > 0)
+			if (std::get<EPointSkillType>(Iter.Value.Type) == PreviousSkillType)
 			{
-				if (std::get<EPointSkillType>(Iter.Value.Type) == PreviousSkillType)
+				continue;
+			}
+			else
+			{
+				auto CharacterPtr = GetOwner<ACharacterBase>();
+				if (CharacterPtr)
 				{
-					continue;
-				}
-				else
-				{
+					TMap<FGameplayTag, TSharedPtr <FSkillSocketInfo>> SkillsMap;
+					auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
 					switch (std::get<EPointSkillType>(Iter.Value.Type))
 					{
 					case EPointSkillType::kNuQi:
 					{
-						if (Iter.Value.Level > 0)
+						auto SkillUnitPtr = HoldItemComponent.FindUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+						if (!SkillUnitPtr)
 						{
-							auto CharacterPtr = GetOwner<ACharacterBase>();
-							if (CharacterPtr)
-							{
-								auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-								auto SkillUnitPtr = HoldItemComponent.FindUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
-								if (!SkillUnitPtr)
-								{
-									SkillUnitPtr = HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
-								}
-								if (SkillUnitPtr)
-								{
-									SkillUnitPtr->Level = Iter.Value.Level;
-								}
-
-								TMap<FGameplayTag, TSharedPtr <FSkillSocketInfo>> SkillsMap;
-
-								TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-								SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->TalentPassiveSocket1;
-								SkillsSocketInfo->SkillUnit = SkillUnitPtr;
-								SkillsSocketInfo->Key = EKeys::Invalid;
-
-								SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
-
-								auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
-								EICPtr->RegisterMultiGAs(SkillsMap);
-								EICPtr->GenerationCanbeActivedInfo();
-							}
+							SkillUnitPtr = HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
 						}
+						if (SkillUnitPtr)
+						{
+							SkillUnitPtr->Level = Iter.Value.Level;
+						}
+
+						TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+
+						SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->Talent_NuQi_Socket;
+						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
+						SkillsSocketInfo->Key = EKeys::Invalid;
+
+						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+					}
+					break;
+					case EPointSkillType::kYinYang:
+					{
+						auto SkillUnitPtr = HoldItemComponent.FindUnit(ESkillUnitType::kHumanSkill_Talent_YinYang);
+						if (!SkillUnitPtr)
+						{
+							SkillUnitPtr = HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_YinYang);
+						}
+						if (SkillUnitPtr)
+						{
+							SkillUnitPtr->Level = Iter.Value.Level;
+						}
+
+						TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+
+						SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->Talent_YinYang_Socket;
+						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
+						SkillsSocketInfo->Key = EKeys::Invalid;
+
+						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
 					}
 					break;
 					}
+					auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+					EICPtr->RegisterMultiGAs(SkillsMap);
+					EICPtr->GenerationCanbeActivedInfo();
 				}
 			}
 		}

@@ -25,7 +25,7 @@ void UGAEvent_Received::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GAEvent*>(TriggerEventData->TargetData.Get(0));
+		auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GAReceivedEvent*>(TriggerEventData->TargetData.Get(0));
 		if (!GAEventDataPtr)
 		{
 			return;

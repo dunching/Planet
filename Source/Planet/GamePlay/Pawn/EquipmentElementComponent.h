@@ -26,7 +26,7 @@ class AWeapon_Base;
 class UGAEvent_Send;
 class UGAEvent_Received;
 
-struct FGameplayAbilityTargetData_GAEvent;
+struct FGameplayAbilityTargetData_GASendEvent;
 class UWeaponUnit;
 
 struct FSkillSocketInfo
@@ -96,9 +96,9 @@ public:
 
 	void InitialBaseGAs();
 
-	void OnSendEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData);
+	void OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData);
 
-	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAEvent& OutGAEventData);
+	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAReceivedEvent& OutGAEventData);
 
 	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedInfo()const;
 
@@ -140,13 +140,13 @@ public:
 	TSharedPtr < FWeaponSocketInfo >GetActivedWeapon()const;
 #pragma endregion Weapon
 
-	void AddSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+	void AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
 
-	void RemoveSendEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+	void RemoveSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
 
-	void AddReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+	void AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
-	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyInterface>& GAEventModifySPtr);
+	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
 	FGameplayAbilitySpecHandle SendEventHandle;
 
@@ -185,9 +185,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTagContainer CharacterTags;
 
-	std::multiset<TSharedPtr<IGAEventModifyInterface>, FGAEventModify_key_compare>SendEventModifysMap;
+	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare>SendEventModifysMap;
 
-	std::multiset<TSharedPtr<IGAEventModifyInterface>, FGAEventModify_key_compare>ReceivedEventModifysMap;
+	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare>ReceivedEventModifysMap;
 
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")

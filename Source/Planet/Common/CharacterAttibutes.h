@@ -140,7 +140,7 @@ struct PLANET_API FCharacterAttributes
 
 	virtual ~FCharacterAttributes();
 
-	void ProcessGAEVent(const FGameplayAbilityTargetData_GAEvent& GAEvent);
+	void ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName Name;

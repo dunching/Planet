@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 
 #include "GenerateType.h"
+#include "Skill_Talent_NuQi.h"
 
 #include "State_Talent_NuQi.generated.h"
 
@@ -17,11 +18,13 @@ class PLANET_API UState_Talent_NuQi : public UUserWidget
 
 public:
 
+	using FCurrentTalentType = FTalent_NuQi;
+
+	using FDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
-
-	using FDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
 protected:
 

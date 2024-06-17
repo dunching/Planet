@@ -144,10 +144,10 @@ void TestCommand::TestGAEventModify()
 		map.Add(1000 - Index, Index);
 	}
 
-	struct MyStruct : public IGAEventModifyInterface
+	struct MyStruct : public IGAEventModifySendInterface
 	{
 		MyStruct(int32 P, int32 a1a) :
-			IGAEventModifyInterface(P)
+			IGAEventModifySendInterface(P)
 		{
 			aa = a1a;
 		}

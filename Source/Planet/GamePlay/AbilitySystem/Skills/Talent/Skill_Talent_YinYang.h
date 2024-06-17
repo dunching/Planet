@@ -6,7 +6,7 @@
 #include "GenerateType.h"
 #include "Skill_Talent_Base.h"
 
-#include "Skill_Talent_NuQi.generated.h"
+#include "Skill_Talent_YinYang.generated.h"
 
 class UTexture2D;
 
@@ -15,7 +15,7 @@ class ACharacterBase;
 class UEffectItem;
 class UAbilityTask_TimerHelper;
 
-class FTalent_NuQi : public FTalent_Base
+class FTalent_YinYang : public FTalent_Base
 {
 public:
 
@@ -29,6 +29,8 @@ public:
 
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 
+	ETalent_State_Type CurentType = ETalent_State_Type::kYang;
+
 private:
 
 	int32 CurrentValue = 0;
@@ -38,17 +40,17 @@ private:
 };
 
 UCLASS()
-class PLANET_API USkill_Talent_NuQi : public USkill_Talent_Base
+class PLANET_API USkill_Talent_YinYang : public USkill_Talent_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	using FCurrentTalentType = FTalent_NuQi;
+	using FCurrentTalentType = FTalent_YinYang;
 
 	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
-	USkill_Talent_NuQi();
+	USkill_Talent_YinYang();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -79,57 +81,35 @@ public:
 
 protected:
 
-	void AddNuQi();
+	void AddValue(int32 Value);
 
-	void SubNuQi(float Inveral);
+	void PerformAction();
+
+	void PerformAction_Yang();
+
+	void PerformAction_Yin();
 
 	void OnHPValueChanged(int32 OldValue, int32 NewValue);
 
-	void StartFuryState();
-
-	void StopFuryState();
-
-	void StartForceWeakState();
-
-	void StopForceWeakState();
-
 	void OnSendDamage(UGameplayAbility* GAPtr);
 
-	bool bIsInFury = false;
-
-	bool bIsInWeak = false;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float DecrementTime = 3.f;
-
-	float DecrementTime_Accumulate = 0.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float FuryDuration = 10.f;
-
-	float FuryDuration_Accumulate = 0.f;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
+	TSoftObjectPtr<UTexture2D> YinIcon;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
-	TSoftObjectPtr<UTexture2D> FuryIcon;
+	TSoftObjectPtr<UTexture2D> YangIcon;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float MaxExtendDuration = 5.f;
-
-	float MaxExtendDuration_Accumulate = 0.f;
+	int32 AttackIncrement = 3;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float WeakDuration = 5.f;
-
-	float WeakDuration_Accumulate = 0.f;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
-	TSoftObjectPtr<UTexture2D> WeakIcon;
+	int32 Increment = 1;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float Radius = 250.f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 AttackIncrement = 5;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 Decrement = 5;
+	int32 TreatmentVolumePercent = 5;
 
 	FValueChangedDelegateHandle OnValueChanged;
 
@@ -137,9 +117,13 @@ protected:
 
 	UEffectItem* EffectItemPtr = nullptr;
 
-	float Tick_Interval = 1.f;
+	float Tick_StateTrans_Interval = 1.f;
 
-	float Tick_Accumulate = 0.f;
+	float Tick_StateTrans_Accumulate = 0.f;
+	
+	float Tick_Buff_Interval = 4.f;
+
+	float Tick_Buff_Accumulate = 0.f;
 
 	TSharedPtr<FCurrentTalentType>TalentSPtr;
 

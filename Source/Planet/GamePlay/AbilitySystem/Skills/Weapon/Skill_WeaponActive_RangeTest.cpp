@@ -104,7 +104,7 @@ void USkill_WeaponActive_RangeTest::OnProjectileBounce(
 	if (OtherActor && OtherActor->IsA(ACharacterBase::StaticClass()))
 	{
 		auto OtherCharacterPtr = Cast<ACharacterBase>(OtherActor);
-		if (CharacterPtr->IsTeammate(OtherCharacterPtr))
+		if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
 		{
 			return;
 		}
@@ -144,19 +144,20 @@ void USkill_WeaponActive_RangeTest::EmitProjectile()
 
 void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPtr)
 {
-	FGameplayAbilityTargetData_GAEvent* GAEventData = new FGameplayAbilityTargetData_GAEvent(CharacterPtr);
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
 	FGameplayEventData Payload;
-	Payload.TargetData.Add(GAEventData);
+	Payload.TargetData.Add(GAEventDataPtr);
 
-	GAEventData->TargetActorAry.Empty();
-	GAEventData->TriggerCharacterPtr = CharacterPtr;
-	GAEventData->Data.bIsWeaponAttack = true;
-	GAEventData->Data.SetBaseDamage(Damage);
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
 	if (TargetCharacterPtr)
 	{
-		GAEventData->TargetActorAry.Add(TargetCharacterPtr);
+		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+		GAEventData.SetBaseDamage(Damage);
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
 
 	SendEvent(Payload);

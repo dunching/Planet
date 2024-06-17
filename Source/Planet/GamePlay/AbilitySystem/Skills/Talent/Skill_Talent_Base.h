@@ -11,12 +11,28 @@
 
 class UBasicUnit;
 
+// 是否应该为 UObject ？
+class FTalent_Base
+{
+public:
+
+	virtual ~FTalent_Base();
+
+protected:
+
+};
+
 UCLASS()
 class USkill_Talent_Base : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
 
 protected:
 

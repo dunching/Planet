@@ -56,6 +56,30 @@ UGroupMnaggerComponent* AHumanCharacter::GetGroupMnaggerComponent()
 	return GroupMnaggerComponentPtr;
 }
 
+bool AHumanCharacter::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
+{
+	if (TargetCharacterPtr == this)
+	{
+		return true;
+	}
+
+	auto GroupHelper = GroupMnaggerComponentPtr->GetGroupHelper();
+	for (auto Iter : GroupHelper->MembersSet)
+	{
+		if (Iter == TargetCharacterPtr)
+		{
+			return true;
+		}
+	}
+
+	if (GroupHelper->OwnerPtr == TargetCharacterPtr)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
 	if (TargetCharacterPtr == this)
@@ -63,22 +87,7 @@ bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 		return true;
 	}
 
-	{
-		auto GroupHelper = GroupMnaggerComponentPtr->GetGroupHelper();
-		for (auto Iter : GroupHelper->MembersSet)
-		{
-			if (Iter == TargetCharacterPtr)
-			{
-				return true;
-			}
-		}
-
-		if (GroupHelper->OwnerPtr == TargetCharacterPtr)
-		{
-			return true;
-		}
-	}
-
+	if (IsGroupmate(TargetCharacterPtr))
 	{
 		auto TeammateHelper = GroupMnaggerComponentPtr->GetTeamHelper();
 		for (auto Iter : TeammateHelper->MembersMap)
