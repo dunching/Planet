@@ -24,13 +24,12 @@ void UGAEvent_Send::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(TriggerEventData->TargetData.Get(0));
+		// 外部需要这个修改的内容，所以我们这里修改CurrentEventData，而非const TriggerEventData
+		auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_GASendEvent*>(CurrentEventData.TargetData.Get(0));
 		if (!GAEventDataPtr)
 		{
 			return;
 		}
-
-		auto Clone = GAEventDataPtr->Clone();
 
 		auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 		if (!CharacterPtr)
@@ -38,9 +37,9 @@ void UGAEvent_Send::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 			return;
 		}
 
-		CharacterPtr->GetEquipmentItemsComponent()->OnSendEventModifyData(*Clone);
+		CharacterPtr->GetEquipmentItemsComponent()->OnSendEventModifyData(*GAEventDataPtr);
 
-		for (const auto & Iter : Clone->DataAry)
+		for (const auto & Iter : GAEventDataPtr->DataAry)
 		{
 			FGameplayAbilityTargetData_GAReceivedEvent* GAEventData =
 				new FGameplayAbilityTargetData_GAReceivedEvent(Iter.TargetCharacterPtr, CharacterPtr);

@@ -35,6 +35,7 @@ void UState_Talent_YinYang::NativeConstruct()
 			OnValueChangedHandle = TalentSPtr->CallbackContainerHelper.AddOnValueChanged(
 				std::bind(&ThisClass::OnCurrentValueChanged, this, std::placeholders::_2)
 			);
+			OnValueChanged();
 		}
 	}
 }

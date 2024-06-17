@@ -59,7 +59,7 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
+		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		OnValueChanged = CharacterAttributes.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
@@ -275,9 +275,10 @@ void USkill_Talent_YinYang::OnSendDamage(UGameplayAbility* GAPtr)
 					for (const auto& Iter : DataIter.ElementSet)
 					{
 						const auto Type = Iter.Get<0>();
+						const auto Damage = Iter.Get<2>();
 						if (
-							(Type == EWuXingType::kWood) &&
-							(Type == EWuXingType::kWater)
+							((Type == EWuXingType::kWood) && (Damage > 0)) ||
+							((Type == EWuXingType::kWater) && (Damage > 0))
 							)
 						{
 							AddValue(AttackIncrement);
@@ -291,9 +292,10 @@ void USkill_Talent_YinYang::OnSendDamage(UGameplayAbility* GAPtr)
 					for (const auto& Iter : DataIter.ElementSet)
 					{
 						const auto Type = Iter.Get<0>();
+						const auto Damage = Iter.Get<2>();
 						if (
-							(Type == EWuXingType::kGold) &&
-							(Type == EWuXingType::kFire)
+							((Type == EWuXingType::kGold) && (Damage > 0)) ||
+							((Type == EWuXingType::kFire) && (Damage > 0)) 
 							)
 						{
 							AddValue(AttackIncrement);
