@@ -93,10 +93,10 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
 	OnMoveSpeedChanged(CharacterAttributesRef.WalkingSpeed.GetCurrentValue());
 
-	HPChangedHandle = CharacterAttributesRef.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+	HPChangedHandle = CharacterAttributesRef.HP.AddOnValueChanged(
 		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
 	);
-	MoveSpeedChangedHandle = CharacterAttributesRef.WalkingSpeed.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+	MoveSpeedChangedHandle = CharacterAttributesRef.WalkingSpeed.AddOnValueChanged(
 		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
 	);
 }

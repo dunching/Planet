@@ -104,7 +104,7 @@ void USkill_Active_GroupTherapy::EmitEffect()
 		{
 			for (auto Iter : TeamsHelperSPtr->MembersMap)
 			{
-				TeammatesSet.Add(Cast<ACharacterBase>(Cast<AController>(Iter.Value)->GetPawn()));
+				TeammatesSet.Add(Iter.Value);
 			}
 		}
 	}

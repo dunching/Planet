@@ -47,9 +47,10 @@ void USkill_WeaponActive_PickAxe::OnAvatarSet(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(AD);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(AD_Penetration);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(AD_PercentPenetration);
+		auto & CharacterAttributesRef= CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		CharacterAttributesRef.BaseAttackPower.AddCurrentValue(AD, PropertuModify_GUID);
+		CharacterAttributesRef.Penetration.AddCurrentValue(AD_Penetration, PropertuModify_GUID);
+		CharacterAttributesRef.PercentPenetration.AddCurrentValue(AD_PercentPenetration, PropertuModify_GUID);
 	}
 }
 
@@ -61,9 +62,10 @@ void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(-AD);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(-AD_Penetration);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(-AD_PercentPenetration);
+		auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		CharacterAttributesRef.BaseAttackPower.RemoveCurrentValue(PropertuModify_GUID);
+		CharacterAttributesRef.Penetration.RemoveCurrentValue(PropertuModify_GUID);
+		CharacterAttributesRef.PercentPenetration.RemoveCurrentValue(PropertuModify_GUID);
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -176,6 +178,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			{
 				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
+				GAEventData.bIsWeaponAttack = true;
 				GAEventData.SetBaseDamage(Damage);
 
 				GAEventDataPtr->DataAry.Add(GAEventData);

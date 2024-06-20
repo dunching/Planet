@@ -30,7 +30,7 @@ void UMyBaseProperty::NativeDestruct()
 void UMyBaseProperty::SetDataSource(FBasePropertySet& Property)
 {
 	SetCurrentValue(Property.GetCurrentValue());
-	OnValueChanged = Property.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+	OnValueChanged = Property.AddOnValueChanged(
 		std::bind(&ThisClass::SetCurrentValue, this, std::placeholders::_2)
 	);
 }
@@ -38,11 +38,11 @@ void UMyBaseProperty::SetDataSource(FBasePropertySet& Property)
 void UMyBaseProperty::SetDataSource(FBasePropertySet& Property1, FBasePropertySet& Property2)
 {
 	SetCurrentValue1(Property1.GetCurrentValue());
-	OnValueChanged = Property1.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+	OnValueChanged = Property1.AddOnValueChanged(
 		std::bind(&ThisClass::SetCurrentValue1, this, std::placeholders::_2)
 	);
 	SetCurrentValue2(Property2.GetCurrentValue());
-	OnValueChanged = Property2.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+	OnValueChanged = Property2.AddOnValueChanged(
 		std::bind(&ThisClass::SetCurrentValue2, this, std::placeholders::_2)
 	);
 }

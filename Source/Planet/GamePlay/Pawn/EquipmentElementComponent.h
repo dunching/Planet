@@ -25,6 +25,7 @@ class USkill_Active_Base;
 class AWeapon_Base;
 class UGAEvent_Send;
 class UGAEvent_Received;
+class USkill_Element_Gold;
 
 struct FGameplayAbilityTargetData_GASendEvent;
 class UWeaponUnit;
@@ -207,5 +208,8 @@ protected:
 	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>ToolsMap;
 
 	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActivedInfoAry;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
+	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;
 
 };

@@ -18,6 +18,13 @@ class USkill_Element_Base : public USkill_Base
 
 public:
 
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
 protected:
+
+	float CountDown = 5.f;
 
 };

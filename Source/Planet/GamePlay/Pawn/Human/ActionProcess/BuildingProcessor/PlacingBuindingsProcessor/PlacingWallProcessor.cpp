@@ -53,8 +53,8 @@ namespace HumanProcessor
 				auto BuildingCaptureDataPtr = Cast<ABuildingCaptureData>(CaptureInfoSPtr->CapturePtPtr->GetParentActor());
 				if (BuildingCaptureDataPtr)
 				{
-					auto BulidingPtr = Cast<ABuildingBase>(BuildingCaptureDataPtr);
-					BuildTargetPtr->SetAttchedBuilding(BulidingPtr);
+// 					auto BulidingPtr = Cast<ABuildingBase>(BuildingCaptureDataPtr);
+// 					BuildTargetPtr->SetAttchedBuilding(BulidingPtr);
 				}
 			}
 		}

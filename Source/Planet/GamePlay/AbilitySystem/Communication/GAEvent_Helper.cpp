@@ -93,8 +93,8 @@ FGameplayAbilityTargetData_GAReceivedEvent::FGameplayAbilityTargetData_GAReceive
 	TWeakObjectPtr<ACharacterBase>  InTargetCharacterPtr,
 	TWeakObjectPtr<ACharacterBase>  InTriggerCharacterPtr
 ) :
-	TriggerCharacterPtr(InTriggerCharacterPtr),
-	Data(InTargetCharacterPtr, InTriggerCharacterPtr)
+	Data(InTargetCharacterPtr, InTriggerCharacterPtr),
+	TriggerCharacterPtr(InTriggerCharacterPtr)
 {
 
 }

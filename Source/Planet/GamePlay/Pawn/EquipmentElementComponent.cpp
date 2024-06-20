@@ -27,6 +27,7 @@
 #include "AssetRefMap.h"
 #include "Skill_Talent_NuQi.h"
 #include "Skill_Talent_YinYang.h"
+#include "Skill_Element_Gold.h"
 
 UEquipmentElementComponent::UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -144,6 +145,13 @@ void UEquipmentElementComponent::InitialBaseGAs()
 				FGameplayAbilitySpec(Iter, 1)
 			);
 		}
+
+		// 五行技能
+		GASPtr->GiveAbility(
+			FGameplayAbilitySpec(
+				Skill_Element_GoldClass
+			)
+		); 
 	}
 }
 

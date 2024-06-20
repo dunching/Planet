@@ -38,13 +38,13 @@ void UAIHumanInfo::NativeConstruct()
 		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
 		{
 			OnHPMaxValueChanged(Ref.GetMaxValue());
-			MaxHPValueChanged = Ref.GetMaxProperty().CallbackContainerHelper.AddOnValueChanged(
+			MaxHPValueChanged = Ref.AddOnMaxValueChanged(
 				std::bind(&ThisClass::OnHPMaxValueChanged, this, std::placeholders::_2)
 			);
 		}
 		{
 			OnHPCurrentValueChanged(Ref.GetCurrentValue());
-			CurrentHPValueChanged = Ref.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+			CurrentHPValueChanged = Ref.AddOnValueChanged(
 				std::bind(&ThisClass::OnHPCurrentValueChanged, this, std::placeholders::_2)
 			);
 		}

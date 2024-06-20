@@ -17,7 +17,7 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	CharacterAttributes.HP.AddCurrentValue(CharacterAttributes.HPReplay.GetCurrentValue());
+	CharacterAttributes.HP.AddCurrentValue(CharacterAttributes.HPReplay.GetCurrentValue(), CharacterAttributes.PropertuModify_GUID);
 	
 	auto CharacterPtr = GetOwner<ACharacterBase>();
 	if (CharacterPtr)
@@ -36,13 +36,13 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 				}
 				else
 				{
-					CharacterAttributes.PP.AddCurrentValue(-CharacterAttributes.RunningConsume.GetCurrentValue());
+					CharacterAttributes.PP.AddCurrentValue(-CharacterAttributes.RunningConsume.GetCurrentValue(), CharacterAttributes.PropertuModify_GUID);
 				}
 			}
 		}
 		else
 		{
-			CharacterAttributes.PP.AddCurrentValue(CharacterAttributes.PPReplay.GetCurrentValue());
+			CharacterAttributes.PP.AddCurrentValue(CharacterAttributes.PPReplay.GetCurrentValue(), CharacterAttributes.PropertuModify_GUID);
 		}
 	}
 }

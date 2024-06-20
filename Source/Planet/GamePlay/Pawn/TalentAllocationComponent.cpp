@@ -237,27 +237,27 @@ void UTalentAllocationComponent::SyncToHolding()
 				{
 				case EPointPropertyType::kLiDao:
 				{
-					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+					CharacterAttributes.LiDao.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				case EPointPropertyType::kGenGu:
 				{
-					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+					CharacterAttributes.GenGu.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				case EPointPropertyType::kShenFa:
 				{
-					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+					CharacterAttributes.ShenFa.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				case EPointPropertyType::kDongCha:
 				{
-					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+					CharacterAttributes.DongCha.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				case EPointPropertyType::kTianZi:
 				{
-					CharacterAttributes.LiDao.SetCurrentValue((Iter.Value.Level));
+					CharacterAttributes.TianZi.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				}

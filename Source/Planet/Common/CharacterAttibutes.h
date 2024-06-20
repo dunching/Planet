@@ -14,6 +14,7 @@ class FTalent_Base;
 #pragma region CharacterAttributes
 
 struct FScoped_BaseProperty_SaveUpdate;
+struct FCharacterAttributes;
 
 USTRUCT(BlueprintType)
 struct FBaseProperty
@@ -69,21 +70,45 @@ struct FBasePropertySet
 
 public:
 
-	void AddCurrentValue(int32 val);
+	void AddCurrentValue(int32 NewValue, FGuid GUID);
 
-	void SetCurrentValue(int32 val);
+	void RemoveCurrentValue(FGuid GUID);
+
+	void SetCurrentValue(int32 NewValue, FGuid GUID);
 
 	int32 GetCurrentValue()const;
 	
-	FBaseProperty & GetCurrentProperty();
+	const FBaseProperty & GetCurrentProperty()const;
 
 	int32 GetMaxValue()const;
 
-	FBaseProperty& GetMaxProperty();
+	const FBaseProperty& GetMaxProperty()const;
 
-	FBaseProperty& GetMinProperty();
+	const FBaseProperty& GetMinProperty()const;
+
+	template<typename Type>
+	auto AddOnValueChanged(const Type& Func)
+	{
+		return CurrentValue.CallbackContainerHelper.AddOnValueChanged(Func);
+	}
+
+	template<typename Type>
+	auto AddOnMaxValueChanged(const Type& Func)
+	{
+		return MaxValue.CallbackContainerHelper.AddOnValueChanged(Func);
+	}
 
 protected:
+
+	friend FCharacterAttributes;
+
+	friend FScoped_BaseProperty_SaveUpdate;
+
+	FBaseProperty& GetCurrentProperty();
+
+	FBaseProperty& GetMaxProperty();
+
+	void Update();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty CurrentValue;
@@ -93,6 +118,8 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty MaxValue;
+
+	TMap<FGuid, int32>ValueMap;
 
 };
 
@@ -235,6 +262,8 @@ struct PLANET_API FCharacterAttributes
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet RunningConsume;
+
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 };
 

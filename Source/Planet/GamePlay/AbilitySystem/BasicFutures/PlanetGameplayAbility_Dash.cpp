@@ -75,13 +75,13 @@ bool UPlanetGameplayAbility_Dash::CommitAbility(
 	{
 		if (CharacterPtr)
 		{
-			auto& PawnDataStructPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			if (PawnDataStructPtr.PP.GetCurrentValue() <= 0)
+			auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			if (CharacterAttributesRef.PP.GetCurrentValue() <= 0)
 			{
 			}
 			else
 			{
-				PawnDataStructPtr.PP.AddCurrentValue(-Consume);
+				CharacterAttributesRef.PP.AddCurrentValue(-Consume, CharacterAttributesRef.PropertuModify_GUID);
 				return true;
 			}
 		}

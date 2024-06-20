@@ -55,4 +55,6 @@ protected:
 
 	EPointSkillType PreviousSkillType = EPointSkillType::kDuXing;
 
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
+
 };

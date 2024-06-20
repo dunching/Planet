@@ -83,6 +83,9 @@ protected:
 	bool bIsRequstCancel = false;
 
 	bool bIsAutomaticStop = false;
+
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
+
 };
 
 struct FGameplayAbilityTargetData_Skill_Weapon : public FGameplayAbilityTargetData

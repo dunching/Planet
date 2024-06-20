@@ -36,13 +36,13 @@ void UMyProgressBar::SetDataSource(FBasePropertySet& Property)
 {
 	{
 		SetMaxValue(Property.GetMaxValue());
-		OnMaxPPValueChanged = Property.GetMaxProperty().CallbackContainerHelper.AddOnValueChanged(
+		OnMaxPPValueChanged = Property.AddOnMaxValueChanged(
 			std::bind(&ThisClass::SetMaxValue, this, std::placeholders::_2)
 		);
 	}
 	{
 		SetCurrentValue(Property.GetCurrentValue());
-		OnPPValueChanged = Property.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+		OnPPValueChanged = Property.AddOnValueChanged(
 			std::bind(&ThisClass::SetCurrentValue, this, std::placeholders::_2)
 		);
 	}

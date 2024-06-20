@@ -29,7 +29,7 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	if (CharacterPtr)
 	{
 		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::TriggerSelf);
+			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendAttack);
 	}
 }
 
@@ -53,7 +53,7 @@ void USkill_Passive_ZMJZ::OnRemoveAbility(
 	if (CharacterPtr)
 	{
 		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-(ModifyCount * SpeedOffset));
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.RemoveCurrentValue(PropertuModify_GUID);
 	}
 
 	if (EffectItemPtr)
@@ -97,7 +97,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 			auto CharacterPtr = Cast<ACharacterBase>(GetActorInfo().AvatarActor.Get());
 			if (CharacterPtr)
 			{
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-SpeedOffset);
+				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-SpeedOffset, PropertuModify_GUID);
 			}
 
 			if (ModifyCount <= 0)
@@ -137,7 +137,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 			}
 
 			ModifyCount++;
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(SpeedOffset);
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(SpeedOffset, PropertuModify_GUID);
 
 			if (EffectItemPtr)
 			{
@@ -147,7 +147,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 	}
 }
 
-void USkill_Passive_ZMJZ::TriggerSelf(UGameplayAbility* GAPtr)
+void USkill_Passive_ZMJZ::OnSendAttack(UGameplayAbility* GAPtr)
 {
 	if (CharacterPtr)
 	{

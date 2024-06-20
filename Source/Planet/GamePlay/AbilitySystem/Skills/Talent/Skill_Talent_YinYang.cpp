@@ -62,7 +62,7 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 

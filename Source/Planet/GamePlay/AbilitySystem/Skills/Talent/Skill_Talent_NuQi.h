@@ -143,4 +143,6 @@ protected:
 
 	TSharedPtr<FCurrentTalentType>TalentSPtr;
 
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
+
 };

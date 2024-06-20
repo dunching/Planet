@@ -194,11 +194,7 @@ void AHumanAIController::OnTeamChanged()
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		auto PlayerPCPtr = Cast<AHumanPlayerController>(TeamsHelper->OwnerPtr);
-		if (PlayerPCPtr)
-		{
-			OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPtr);
-		}
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPtr);
 	}
 }
 

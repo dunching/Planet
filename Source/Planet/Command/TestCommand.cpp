@@ -188,7 +188,7 @@ void TestCommand::SpawnCharacter(const TArray< FString >& Args)
 	{
 		FActorSpawnParameters SpawnParameters;
 
-		SpawnParameters.CustomPreSpawnInitalization = [&](AActor* ActorPtr) 
+		SpawnParameters.CustomPreSpawnInitalization = [&](AActor* ActorPtr)
 			{
 				if (Args.IsValidIndex(1))
 				{
@@ -207,7 +207,8 @@ void TestCommand::SpawnCharacter(const TArray< FString >& Args)
 		if (Args.IsValidIndex(0))
 		{
 			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HPReplay.AddCurrentValue(
-				UKismetStringLibrary::Conv_StringToInt(Args[0])
+				UKismetStringLibrary::Conv_StringToInt(Args[0]),
+				NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PropertuModify_GUID
 			);
 		}
 
@@ -306,34 +307,34 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	auto& CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 	if (Args[1] == TEXT("1"))
 	{
-		CharacterAttributes.Element.GoldElement.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.Element.GoldElement.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 	else if (Args[1] == TEXT("2"))
 	{
-		CharacterAttributes.Element.WoodElement.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.Element.WoodElement.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 	else if (Args[1] == TEXT("3"))
 	{
-		CharacterAttributes.Element.WaterElement.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.Element.WaterElement.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 	else if (Args[1] == TEXT("4"))
 	{
-		CharacterAttributes.Element.FireElement.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.Element.FireElement.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 	else if (Args[1] == TEXT("5"))
 	{
-		CharacterAttributes.Element.SoilElement.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.Element.SoilElement.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 	else if (Args[1] == TEXT("6"))
 	{
-		CharacterAttributes.CriticalHitRate.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 	else if (Args[1] == TEXT("7"))
 	{
-		CharacterAttributes.HitRate.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.HitRate.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 	else if (Args[1] == TEXT("8"))
 	{
-		CharacterAttributes.Evade.GetCurrentProperty().SetCurrentValue(Value);
+		CharacterAttributes.Evade.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
 }

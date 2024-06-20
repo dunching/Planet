@@ -20,6 +20,7 @@ void USkill_Base::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
+	// CDO
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 }
 
@@ -32,6 +33,9 @@ void USkill_Base::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	// Inst
+	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 }
 
 void USkill_Base::ActivateAbility(

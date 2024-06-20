@@ -52,13 +52,12 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
 		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.HP.GetCurrentProperty().CallbackContainerHelper.AddOnValueChanged(
+		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 
@@ -213,11 +212,11 @@ void USkill_Talent_NuQi::StartFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(55);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(100);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(50);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.AddCurrentValue(100);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(100);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(55, PropertuModify_GUID);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(100, PropertuModify_GUID);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(50, PropertuModify_GUID);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.AddCurrentValue(100, PropertuModify_GUID);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(100, PropertuModify_GUID);
 	}
 
 	auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
@@ -234,11 +233,7 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(-55);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(-100);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(-50);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.AddCurrentValue(-100);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-100);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.RemoveCurrentValue(PropertuModify_GUID);
 	}
 
 	if (EffectItemPtr)

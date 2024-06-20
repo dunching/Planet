@@ -39,6 +39,8 @@ public:
 	
 	TimerHelper_Tick_Delegate TickDelegate;
 
+	TimerHelper_Tick_Delegate IntervalDelegate;
+
 protected:
 
 	virtual void Activate() override;

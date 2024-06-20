@@ -57,7 +57,7 @@ protected:
 
 	void PerformAction();
 
-	void TriggerSelf(UGameplayAbility* GAPtr);
+	void OnSendAttack(UGameplayAbility* GAPtr);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
@@ -75,5 +75,7 @@ protected:
 	uint8 ModifyCount = 0;
 
 	int32 SpeedOffset = 10;
+
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 };

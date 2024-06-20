@@ -14,7 +14,7 @@ namespace FightingTipsItem
 	const FName Icon = TEXT("Icon");
 
 	const FName Icon_Disable = TEXT("Icon_Disable");
-	
+
 	const FName Icon_Treatment = TEXT("Icon_Treatment");
 
 	const FName Text = TEXT("Text");
@@ -44,36 +44,48 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 	const auto& Ref = GAEvent.Data;
 	if (Ref.TargetCharacterPtr.IsValid())
 	{
-		auto Lambda = [&](int32 Value) {
-			// 
-			if (Ref.HitRate <= 0)
+		auto Lambda = [&](int32 Value) 
 			{
-				auto UIPtr = Cast<UImage>(GetWidgetFromName(FightingTipsItem::Icon_Disable));
-				if (!UIPtr)
+				// 
+				if (Ref.HitRate <= 0)
 				{
-					return;
+					{
+						auto UIPtr = Cast<UImage>(GetWidgetFromName(FightingTipsItem::Icon_Disable));
+						if (!UIPtr)
+						{
+							return;
+						}
+						UIPtr->SetVisibility(ESlateVisibility::Visible);
+					}
+					{
+						auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FightingTipsItem::Text));
+						if (!UIPtr)
+						{
+							return;
+						}
+						UIPtr->SetText(FText::FromString(FString::Printf(TEXT("ÉÁ±Ü£º%d"), Value)));
+					}
 				}
-				UIPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-			else if (Ref.CriticalHitRate >= 100)
-			{
-				auto UIPtr = Cast<USizeBox>(GetWidgetFromName(FightingTipsItem::SizeBox));
-				if (!UIPtr)
+				else if (Ref.CriticalHitRate >= 100)
 				{
-					return;
+					{
+						auto UIPtr = Cast<USizeBox>(GetWidgetFromName(FightingTipsItem::SizeBox));
+						if (!UIPtr)
+						{
+							return;
+						}
+						UIPtr->SetHeightOverride(Size.X * 1.5f);
+						UIPtr->SetWidthOverride(Size.X * 1.5f);
+					}
+					{
+						auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FightingTipsItem::Text));
+						if (!UIPtr)
+						{
+							return;
+						}
+						UIPtr->SetText(FText::FromString(FString::Printf(TEXT("±©»÷£º%d"), Value)));
+					}
 				}
-				UIPtr->SetHeightOverride(Size.X * 1.5f);
-				UIPtr->SetWidthOverride(Size.X * 1.5f);
-			}
-
-			{
-				auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FightingTipsItem::Text));
-				if (!UIPtr)
-				{
-					return;
-				}
-				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%d"), Value)));
-			}
 			};
 
 		switch (Type)
