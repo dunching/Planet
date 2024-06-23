@@ -50,6 +50,8 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
 
+	TickDelegate.ExecuteIfBound(this, DeltaTime);
+
 	switch (Type)
 	{
 	case EType::kDuration:
@@ -80,22 +82,13 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 	break;
 	case EType::kInfinite_Interval:
 	{
-		TickDelegate.ExecuteIfBound(this, CurrentIntervalTime);
-	}
-	break;
-	}
-
-	CurrentIntervalTime += DeltaTime;
-	if (IntervalTime > 0.f)
-	{
+		CurrentIntervalTime += DeltaTime;
+		IntervalDelegate.ExecuteIfBound(this, CurrentIntervalTime, IntervalTime);
 		if (CurrentIntervalTime >= IntervalTime)
 		{
-			IntervalDelegate.ExecuteIfBound(this, CurrentIntervalTime);
 			CurrentIntervalTime = 0.f;
 		}
 	}
-	else
-	{
-		IntervalDelegate.ExecuteIfBound(this, CurrentIntervalTime);
+	break;
 	}
 }

@@ -230,6 +230,25 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
+class UPassiveSkillUnit : public USkillUnit
+{
+	GENERATED_BODY()
+
+public:
+
+	UPassiveSkillUnit();
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
+	TMap<EWuXingType, int32>AddtionalElementMap;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
+	TSubclassOf<USkill_Base>AddtionalSkillClass;
+
+protected:
+
+};
+
+UCLASS(BlueprintType, Blueprintable)
 class UWeaponUnit : public UBasicUnit
 {
 	GENERATED_BODY()

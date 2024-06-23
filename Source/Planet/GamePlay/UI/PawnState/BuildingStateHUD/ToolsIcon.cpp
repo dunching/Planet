@@ -73,6 +73,11 @@ void UToolIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	}
 }
 
+void UToolIcon::EnableIcon(bool bIsEnable)
+{
+
+}
+
 UToolUnit* UToolIcon::GetToolUnit() const
 {
 	return ToolSPtr;

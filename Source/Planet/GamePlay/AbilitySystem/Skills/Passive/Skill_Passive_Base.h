@@ -19,5 +19,5 @@ class USkill_Passive_Base : public USkill_Base
 public:
 
 protected:
-
+	
 };

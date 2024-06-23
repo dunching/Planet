@@ -49,10 +49,10 @@ struct FGAEventData
 
 	void AddWuXingDamage(EWuXingType WuXingType, int32 Value);
 
-	// 
+	// 回复：HP
 	int32 HP = 0;
 
-	// 
+	// 回复：PP
 	int32 PP = 0;
 
 	// 造成的基础伤害

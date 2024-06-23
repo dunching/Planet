@@ -33,6 +33,8 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
+	virtual void EnableIcon(bool bIsEnable)override;
+
 protected:
 
 	void SetNum(int32 NewNum);

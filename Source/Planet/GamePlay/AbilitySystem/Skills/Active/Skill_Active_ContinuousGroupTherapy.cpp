@@ -79,16 +79,19 @@ void USkill_Active_ContinuousGroupTherapy::StartTasksLink()
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 	TaskPtr->SetDuration(Duration);
 	TaskPtr->SetIntervalTime(1.f);
-	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
+	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
 	TaskPtr->OnFinished.BindLambda([this](auto) {
 		K2_CancelAbility();
 		});
 	TaskPtr->ReadyForActivation();
 }
 
-void USkill_Active_ContinuousGroupTherapy::OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float DeltaTime)
+void USkill_Active_ContinuousGroupTherapy::OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
 {
-	EmitEffect();
+	if (CurrentInterval >= Interval)
+	{
+		EmitEffect();
+	}
 }
 
 void USkill_Active_ContinuousGroupTherapy::OnNotifyBeginReceived(FName NotifyName)

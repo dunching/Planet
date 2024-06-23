@@ -57,6 +57,11 @@ void UDragDropOperationWidget::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	}
 }
 
+void UDragDropOperationWidget::EnableIcon(bool bIsEnable)
+{
+
+}
+
 void UDragDropOperationWidget::SetNum(int32 NewNum)
 {
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(TEXT("Number")));

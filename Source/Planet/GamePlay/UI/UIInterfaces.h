@@ -32,6 +32,8 @@ public:
 	
 	virtual void ResetToolUIByData(UBasicUnit * BasicUnitPtr) = 0;
 
+	virtual void EnableIcon(bool bIsEnable) = 0;
+
 protected:
 
 private:

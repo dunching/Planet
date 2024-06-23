@@ -25,7 +25,7 @@ class PLANET_API UAllocationSkillsMenu : public UUserWidget, public IItemsMenuIn
 
 public:
 
-	using FDelegateHandle = TCallbackHandleContainer<void(UWeaponUnit*)>::FCallbackHandleSPtr;
+	using FOnWeaponChangedDelegate = TCallbackHandleContainer<void(UWeaponUnit*)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -55,9 +55,9 @@ protected:
 
 	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
 
-	FDelegateHandle MainDelegateHandleSPtr;
+	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 
-	FDelegateHandle SecondaryDelegateHandleSPtr;
+	FOnWeaponChangedDelegate SecondaryDelegateHandleSPtr;
 
 	FSceneToolsContainer SPHoldItemPerpertyPtr;
 

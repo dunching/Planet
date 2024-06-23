@@ -219,3 +219,9 @@ void UGourpmateUnit::InitialByCharactor(FPawnType* InCharacterPtr)
 	PCPtr = InCharacterPtr;
 	Name = InCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
 }
+
+UPassiveSkillUnit::UPassiveSkillUnit() :
+	Super()
+{
+	SkillType = ESkillType::kActive;
+}

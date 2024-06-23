@@ -15,6 +15,8 @@ DECLARE_DELEGATE_OneParam(TimerHelper_Finished_Delegate, UAbilityTask_TimerHelpe
 
 DECLARE_DELEGATE_TwoParams(TimerHelper_Tick_Delegate, UAbilityTask_TimerHelper*, float);
 
+DECLARE_DELEGATE_ThreeParams(TimerHelper_Interval_Tick_Delegate, UAbilityTask_TimerHelper*, float, float);
+
 UCLASS()
 class PLANET_API UAbilityTask_TimerHelper : public UAbilityTask
 {
@@ -39,7 +41,7 @@ public:
 	
 	TimerHelper_Tick_Delegate TickDelegate;
 
-	TimerHelper_Tick_Delegate IntervalDelegate;
+	TimerHelper_Interval_Tick_Delegate IntervalDelegate;
 
 protected:
 

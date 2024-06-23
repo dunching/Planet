@@ -63,7 +63,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 						{
 							return;
 						}
-						UIPtr->SetText(FText::FromString(FString::Printf(TEXT("ÉÁ±Ü£º%d"), Value)));
+						UIPtr->SetText(FText::FromString(FString::Printf(TEXT("é—ªé¿ï¼š%d"), Value)));
 					}
 				}
 				else if (Ref.CriticalHitRate >= 100)
@@ -83,7 +83,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 						{
 							return;
 						}
-						UIPtr->SetText(FText::FromString(FString::Printf(TEXT("±©»÷£º%d"), Value)));
+						UIPtr->SetText(FText::FromString(FString::Printf(TEXT("æš´å‡»ï¼š%d"), Value)));
 					}
 				}
 			};

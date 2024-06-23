@@ -113,3 +113,8 @@ void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	}
 }
 
+void UHUD_TeamMateInfo::EnableIcon(bool bIsEnable)
+{
+
+}
+

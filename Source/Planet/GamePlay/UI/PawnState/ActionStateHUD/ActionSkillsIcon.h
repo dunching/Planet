@@ -32,9 +32,11 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
+	virtual void EnableIcon(bool bIsEnable)override;
+
 	void UpdateSkillState();
 
-	USkillUnit* ToolSPtr = nullptr;
+	USkillUnit* ToolPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;
@@ -44,7 +46,7 @@ public:
 
 protected:
 
-	void SetLevel(int32 NewNum);
+	void SetLevel();
 
 	void SetRemainingCooldown(
 		bool bCooldownIsReady,

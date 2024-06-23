@@ -27,6 +27,8 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
+	virtual void EnableIcon(bool bIsEnable)override;
+
 protected:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;

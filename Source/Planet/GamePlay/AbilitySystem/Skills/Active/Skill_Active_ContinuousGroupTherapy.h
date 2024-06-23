@@ -53,7 +53,7 @@ protected:
 
 	void StartTasksLink();
 
-	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float DeltaTime);
+	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
 	bool bIsAttackEnd = true;
 

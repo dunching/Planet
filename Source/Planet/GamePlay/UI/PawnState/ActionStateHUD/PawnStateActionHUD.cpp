@@ -97,7 +97,7 @@ void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 		for (const auto& Iter : Ary)
 		{
 			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(Iter));
-			if (IconPtr && IconPtr->ToolSPtr)
+			if (IconPtr && IconPtr->ToolPtr)
 			{
 				IconPtr->UpdateSkillState();
 			}

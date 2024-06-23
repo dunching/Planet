@@ -40,6 +40,8 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
+	virtual void EnableIcon(bool bIsEnable)override;
+
 	FCallbackHandleContainer OnDroped;
 
 private:

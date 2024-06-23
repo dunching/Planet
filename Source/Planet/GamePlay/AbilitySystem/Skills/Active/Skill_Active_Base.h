@@ -56,7 +56,7 @@ public:
 
 	virtual void AddCooldownConsumeTime(float NewTime);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Icon")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "CooldownTime")
 	int32 CooldownTime = -1;
 
 protected:

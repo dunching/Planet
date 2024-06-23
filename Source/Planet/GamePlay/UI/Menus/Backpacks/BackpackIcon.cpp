@@ -49,6 +49,11 @@ void UBackpackIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	}
 }
 
+void UBackpackIcon::EnableIcon(bool bIsEnable)
+{
+
+}
+
 void UBackpackIcon::SetNum(int32 NewNum)
 {
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(TEXT("Number")));

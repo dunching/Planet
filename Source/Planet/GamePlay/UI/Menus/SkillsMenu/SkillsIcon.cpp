@@ -31,7 +31,7 @@ namespace SkillsIcon
 {
 	const FName Content = TEXT("Content");
 
-	const FName Default = TEXT("Default");
+	const FName Enable = TEXT("Enable");
 
 	const FName Icon = TEXT("Icon");
 }
@@ -49,7 +49,10 @@ void USkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
+			OnResetUnit = NewPtr->OnResetUnit;
+			OnDragDelegate = NewPtr->OnDragDelegate;
 			bIsInBackpakc = NewPtr->bIsInBackpakc;
+			SkillType = NewPtr->SkillType;
 			ResetToolUIByData(NewPtr->SkillUnitPtr);
 		}
 	}
@@ -65,46 +68,58 @@ void USkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 
 		if (SkillUnitPtr && (bIsInBackpakc || SkillUnitPtr->SkillType == SkillType))
 		{
+		}
+		else
+		{
+			SkillUnitPtr = nullptr;
+		}
+	}
 
-			SetLevel(SkillUnitPtr->Level);
-			SetItemType();
+	OnResetUnit.ExcuteCallback(SkillUnitPtr);
+	SetLevel();
+	SetItemType();
+}
 
-			{
-				auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Default));
-				if (ImagePtr)
-				{
-					ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-				}
-			}
-			{
-				auto BorderPtr = Cast<UBorder>(GetWidgetFromName(SkillsIcon::Content));
-				if (BorderPtr)
-				{
-					BorderPtr->SetVisibility(ESlateVisibility::Visible);
-				}
-			}
+void USkillsIcon::EnableIcon(bool bIsEnable)
+{
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Enable));
+	if (ImagePtr)
+	{
+		ImagePtr->SetVisibility(bIsEnable ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+	}
+}
+
+void USkillsIcon::OnDragSkillIcon(bool bIsDragging, USkillUnit* InSkillUnitPtr)
+{
+	if (bIsDragging)
+	{
+		if (InSkillUnitPtr && InSkillUnitPtr->SkillType != SkillType)
+		{
+			EnableIcon(false);
 		}
 	}
 	else
 	{
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Default));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(SkillsIcon::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Collapsed);
-			}
-		}
+		EnableIcon(true);
 	}
 }
 
-void USkillsIcon::SetLevel(int32 NewNum)
+void USkillsIcon::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr)
+{
+	if (bIsDragging)
+	{
+		if (WeaponUnitPtr)
+		{
+			EnableIcon(false);
+		}
+	}
+	else
+	{
+		EnableIcon(true);
+	}
+}
+
+void USkillsIcon::SetLevel()
 {
 }
 
@@ -113,11 +128,20 @@ void USkillsIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Icon));
 	if (ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(SkillUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(SkillUnitPtr->GetIcon().Get());
-			});
+		if (SkillUnitPtr)
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Visible);
+
+			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(SkillUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+				{
+					ImagePtr->SetBrushFromTexture(SkillUnitPtr->GetIcon().Get());
+				});
+		}
+		else
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
@@ -126,6 +150,11 @@ void USkillsIcon::NativeConstruct()
 	Super::NativeConstruct();
 
 	ResetToolUIByData(nullptr);
+}
+
+void USkillsIcon::NativeDestruct()
+{
+	Super::NativeDestruct();
 }
 
 FReply USkillsIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -160,14 +189,20 @@ bool USkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent
  		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
  		if (WidgetDragPtr)
 		{
-			if (WidgetDragPtr->bIsInBackpakc)
-			{
-				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
-			}
+			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
+
+			WidgetDragPtr->OnDrop.Broadcast(WidgetDragPtr);
  		}
 	}
 
 	return true;
+}
+
+void USkillsIcon::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
+
+	OnDragDelegate.ExcuteCallback(false, nullptr);
 }
 
 void USkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -190,9 +225,17 @@ void USkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoint
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
 				WidgetDragPtr->SceneToolSPtr = SkillUnitPtr;
 				WidgetDragPtr->bIsInBackpakc = bIsInBackpakc;
+				WidgetDragPtr->OnDrop.AddDynamic(this, &ThisClass::OnDroped);
 
 				OutOperation = WidgetDragPtr;
+
+				OnDragDelegate.ExcuteCallback(true, SkillUnitPtr);
 			}
 		}
 	}
+}
+
+void USkillsIcon::OnDroped(UDragDropOperation* Operation)
+{
+	OnDragDelegate.ExcuteCallback(false, nullptr);
 }

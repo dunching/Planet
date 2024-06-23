@@ -2,6 +2,8 @@
 #include "Skill_Passive_ZMJZ.h"
 
 #include "AbilitySystemComponent.h"
+#include "Engine/StreamableManager.h"
+#include "Engine/AssetManager.h"
 
 #include "CharacterBase.h"
 #include "EquipmentElementComponent.h"
@@ -90,35 +92,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 		TaskPtr->SetInfinite();
 		TaskPtr->SetIntervalTime(CountDown);
-		TaskPtr->TickDelegate.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr, float) {
-
-			ModifyCount--;
-
-			auto CharacterPtr = Cast<ACharacterBase>(GetActorInfo().AvatarActor.Get());
-			if (CharacterPtr)
-			{
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-SpeedOffset, PropertuModify_GUID);
-			}
-
-			if (ModifyCount <= 0)
-			{
-				if (EffectItemPtr)
-				{
-					EffectItemPtr->RemoveFromParent();
-					EffectItemPtr = nullptr;
-				}
-				TaskPtr->ExternalCancel();
-				K2_EndAbility();
-			}
-			else if (TaskPtr)
-			{
-				if (EffectItemPtr)
-				{
-					EffectItemPtr->SetNum(ModifyCount);
-				}
-				TaskPtr->SetIntervalTime(SecondaryCountDown);
-			}
-			});
+		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnIntervalTick);
 		TaskPtr->ReadyForActivation();
 
 		if (ModifyCount > MaxCount)
@@ -132,7 +106,11 @@ void USkill_Passive_ZMJZ::PerformAction()
 				if (EffectPtr)
 				{
 					EffectItemPtr = EffectPtr->AddEffectItem();
-					EffectItemPtr->SetTexutre(BuffIcon);
+					FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+					AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(BuffIcon.ToSoftObjectPath(), [this]()
+						{
+							EffectItemPtr->SetTexutre(BuffIcon);
+						});
 				}
 			}
 
@@ -172,6 +150,45 @@ void USkill_Passive_ZMJZ::OnSendAttack(UGameplayAbility* GAPtr)
 		{
 			auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TryActivateAbility(GetCurrentAbilitySpecHandle());
+		}
+	}
+}
+
+void USkill_Passive_ZMJZ::OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
+{
+	if (CurrentInterval > Interval)
+	{
+		ModifyCount--;
+
+		if (CharacterPtr)
+		{
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-SpeedOffset, PropertuModify_GUID);
+		}
+
+		if (ModifyCount <= 0)
+		{
+			if (EffectItemPtr)
+			{
+				EffectItemPtr->RemoveFromParent();
+				EffectItemPtr = nullptr;
+			}
+			TaskPtr->ExternalCancel();
+			K2_EndAbility();
+		}
+		else if (TaskPtr)
+		{
+			if (EffectItemPtr)
+			{
+				EffectItemPtr->SetNum(ModifyCount);
+			}
+			TaskPtr->SetIntervalTime(SecondaryCountDown);
+		}
+	}
+	else
+	{
+		if (EffectItemPtr)
+		{
+			EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
 		}
 	}
 }

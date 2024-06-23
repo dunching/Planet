@@ -4,6 +4,7 @@
 
 #include <functional>
 #include <variant>
+#include <map>
 
 #include "CoreMinimal.h"
 
@@ -74,7 +75,8 @@ public:
 
 	using FCallbackType = std::function<void(ValueType, ValueType)>;
 
-	using FMapType = TMap<FCallbackIDType, FCallbackType>;
+	// 注意：这里使用TMap，有概率出现前四条保存的function失效，具体原因未知
+	using FMapType = std::map<FCallbackIDType, FCallbackType>;
 
 	TOnValueChangedCallbackHandle();
 
@@ -119,9 +121,8 @@ TOnValueChangedCallbackHandle<ValueType>::TOnValueChangedCallbackHandle(
 template<typename ValueType>
 void TOnValueChangedCallbackHandle<ValueType>::UnBindCallback()
 {
-	if (ContainerSPtr->Contains(CallbackID))
+	if (ContainerSPtr->erase(CallbackID))
 	{
-		ContainerSPtr->Remove(CallbackID);
 	}
 }
 
@@ -169,9 +170,9 @@ TSharedPtr<typename TOnValueChangedCallbackContainer<ValueType>::FCallbackHandle
 		for (;;)
 		{
 			const auto ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-			if (!CallbacksMapSPtr->Contains(ID))
+			if (!CallbacksMapSPtr->contains(ID))
 			{
-				CallbacksMapSPtr->Add(ID, Callback);
+				CallbacksMapSPtr->emplace(ID, Callback);
 
 				return MakeShared<FCallbackHandle>(ID, CallbacksMapSPtr);
 			}
@@ -188,12 +189,12 @@ void TOnValueChangedCallbackContainer<ValueType>::ValueChanged(ValueType OldValu
 	{
 		return;
 	}
-	auto Temp = *CallbacksMapSPtr;
+	const auto Temp = *CallbacksMapSPtr;
 	for (auto Iter : Temp)
 	{
-		if (Iter.Value)
+		if (Iter.second)
 		{
-			Iter.Value(OldValue, NewValue);
+			Iter.second(OldValue, NewValue);
 		}
 	}
 }
@@ -207,7 +208,7 @@ public:
 
 	using FCallbackType = std::function<FuncType>;
 
-	using FMapType = TMap<FCallbackIDType, FCallbackType>;
+	using FMapType = std::map<FCallbackIDType, FCallbackType>;
 
 	TCallbackHandle();
 
@@ -216,6 +217,8 @@ public:
 	~TCallbackHandle();
 
 	void UnBindCallback();
+
+	bool bIsAutoUnregister = true;
 
 protected:
 
@@ -230,7 +233,10 @@ private:
 template<typename FuncType>
 TCallbackHandle<FuncType>::~TCallbackHandle()
 {
-	UnBindCallback();
+	if (bIsAutoUnregister)
+	{
+		UnBindCallback();
+	}
 }
 
 template<typename FuncType>
@@ -252,9 +258,8 @@ TCallbackHandle<FuncType>::TCallbackHandle(
 template<typename FuncType>
 void TCallbackHandle<FuncType>::UnBindCallback()
 {
-	if (ContainerSPtr->Contains(CallbackID))
+	if (ContainerSPtr->erase(CallbackID))
 	{
-		ContainerSPtr->Remove(CallbackID);
 	}
 }
 
@@ -301,12 +306,12 @@ void TCallbackHandleContainer<FuncType>::ExcuteCallback(ArgsType...Args)
 	{
 		return;
 	}
-	auto Temp = *CallbacksMapSPtr;
+	const auto Temp = *CallbacksMapSPtr;
 	for (auto Iter : Temp)
 	{
-		if (Iter.Value)
+		if (Iter.second)
 		{
-			Iter.Value(Args...);
+			Iter.second(Args...);
 		}
 	}
 }
@@ -321,9 +326,9 @@ TSharedPtr<typename TCallbackHandleContainer<FuncType>::FCallbackHandle> TCallba
 		for (;;)
 		{
 			const auto ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-			if (!CallbacksMapSPtr->Contains(ID))
+			if (!CallbacksMapSPtr->contains(ID))
 			{
-				CallbacksMapSPtr->Add(ID, Callback);
+				CallbacksMapSPtr->emplace(ID, Callback);
 
 				return MakeShared<FCallbackHandle>(ID, CallbacksMapSPtr);
 			}

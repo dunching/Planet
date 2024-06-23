@@ -13,11 +13,13 @@
 #include "SkillsIcon.generated.h"
 
 struct FStreamableHandle;
+class UDragDropOperation;
 
 class USkillUnit;
 
 /**
- *
+ * 作为技能Icon
+ * 1.同类的需要能互相移除 2.右键移除 3.拖拽时禁用对应的Icon
  */
 UCLASS()
 class PLANET_API USkillsIcon : public UUserWidget, public IToolsIconInterface
@@ -26,11 +28,25 @@ class PLANET_API USkillsIcon : public UUserWidget, public IToolsIconInterface
 
 public:
 
+	using FOnResetUnit = TCallbackHandleContainer<void(USkillUnit*)>;
+
+	using FOnDragDelegate = TCallbackHandleContainer<void(bool, USkillUnit*)>;
+
 	USkillsIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+
+	virtual void EnableIcon(bool bIsEnable)override;
+
+	void OnDragSkillIcon(bool bIsDragging, USkillUnit* SkillUnitPtr);
+
+	void OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr);
+
+	FOnResetUnit OnResetUnit;
+	
+	FOnDragDelegate OnDragDelegate;
 
 	USkillUnit* SkillUnitPtr = nullptr;
 
@@ -46,16 +62,23 @@ protected:
 
 	virtual void NativeConstruct()override;
 
+	virtual void NativeDestruct()override;
+
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
 
+	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+
 	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
+
+	UFUNCTION()
+	void OnDroped(UDragDropOperation* Operation);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlaySkillIsReady();
 
-	void SetLevel(int32 NewNum);
+	void SetLevel();
 
 	void SetItemType();
 

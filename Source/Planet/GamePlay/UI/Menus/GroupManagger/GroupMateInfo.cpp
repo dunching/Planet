@@ -140,3 +140,8 @@ void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 		}
 	}
 }
+
+void UGroupMateInfo::EnableIcon(bool bIsEnable)
+{
+
+}

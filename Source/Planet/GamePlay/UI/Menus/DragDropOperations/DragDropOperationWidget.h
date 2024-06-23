@@ -34,7 +34,9 @@ public:
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
 	virtual void ResetToolUIByData(UBasicUnit * BasicUnitPtr)override;
-	
+
+	virtual void EnableIcon(bool bIsEnable)override;
+
 	void SetNum(int32 NewNum);
 
 	void SetItemType(UBasicUnit* ToolSPtr);

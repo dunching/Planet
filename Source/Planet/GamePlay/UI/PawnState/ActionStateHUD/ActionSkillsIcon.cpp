@@ -57,7 +57,7 @@ void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->ToolSPtr);
+			ResetToolUIByData(NewPtr->ToolPtr);
 		}
 	}
 }
@@ -68,13 +68,22 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kSkill)
 	{
-		ToolSPtr = Cast<USkillUnit>(BasicUnitPtr);
-		SetLevel(ToolSPtr->Level);
-		SetItemType();
+		ToolPtr = Cast<USkillUnit>(BasicUnitPtr);
+	}
+	else
+	{
+		ToolPtr = nullptr;
 	}
 
+	SetLevel();
+	SetItemType();
 	SetCanRelease(true);
 	SetRemainingCooldown(true, 0.f, 0.f);
+}
+
+void UActionSkillsIcon::EnableIcon(bool bIsEnable)
+{
+
 }
 
 void UActionSkillsIcon::UpdateSkillState()
@@ -114,7 +123,7 @@ void UActionSkillsIcon::UpdateSkillState()
 	SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 }
 
-void UActionSkillsIcon::SetLevel(int32 NewNum)
+void UActionSkillsIcon::SetLevel()
 {
 }
 
@@ -208,11 +217,20 @@ void UActionSkillsIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::Icon));
 	if (ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(ToolSPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(ToolSPtr->GetIcon().Get());
-			});
+		if (ToolPtr)
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Visible);
+
+			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(ToolPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+				{
+					ImagePtr->SetBrushFromTexture(ToolPtr->GetIcon().Get());
+				});
+		}
+		else
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
@@ -262,13 +280,13 @@ void UActionSkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const 
 		if (DragWidgetPtr)
 		{
 			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(ToolSPtr);
+			DragWidgetPtr->ResetToolUIByData(ToolPtr);
 
 			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = ToolSPtr;
+				WidgetDragPtr->SceneToolSPtr = ToolPtr;
 
 				OutOperation = WidgetDragPtr;
 			}

@@ -35,6 +35,8 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
+	virtual void EnableIcon(bool bIsEnable)override;
+
 private:
 
 	UGourpmateUnit* GroupMateUnitPtr = nullptr;

@@ -8,6 +8,9 @@
 
 #include "Skill_Passive_ZMJZ.generated.h"
 
+struct FStreamableHandle;
+
+class UAbilityTask_TimerHelper;
 class UEffectItem;
 class ACharacterBase;
 
@@ -59,6 +62,8 @@ protected:
 
 	void OnSendAttack(UGameplayAbility* GAPtr);
 
+	void OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
 
@@ -77,5 +82,7 @@ protected:
 	int32 SpeedOffset = 10;
 
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
+
+	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

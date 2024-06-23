@@ -43,6 +43,8 @@ void UWeaponsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
+			OnResetUnit = NewPtr->OnResetUnit;
+			OnDragDelegate = NewPtr->OnDragDelegate;
 			ResetToolUIByData(NewPtr->WeaponUnitPtr);
 			bIsInBackpakc = NewPtr->bIsInBackpakc;
 		}
@@ -56,7 +58,7 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 		WeaponUnitPtr = Cast<UWeaponUnit>(BasicUnitPtr);
 		SetItemType();
 
-		OnDroped.ExcuteCallback(WeaponUnitPtr);
+		OnResetUnit.ExcuteCallback(WeaponUnitPtr);
 
 		auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Default));
 		if (ImagePtr)
@@ -71,6 +73,9 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	}
 	else
 	{
+		WeaponUnitPtr = nullptr;
+		OnResetUnit.ExcuteCallback(nullptr);
+
 		auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Default));
 		if (ImagePtr)
 		{
@@ -81,6 +86,41 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 		{
 			BorderPtr->SetVisibility(ESlateVisibility::Collapsed);
 		}
+	}
+}
+
+void UWeaponsIcon::EnableIcon(bool bIsEnable)
+{
+
+}
+
+void UWeaponsIcon::OnDragSkillIcon(bool bIsDragging, USkillUnit* InSkillUnitPtr)
+{
+	if (bIsDragging)
+	{
+		if (InSkillUnitPtr)
+		{
+			EnableIcon(false);
+		}
+	}
+	else
+	{
+		EnableIcon(true);
+	}
+}
+
+void UWeaponsIcon::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* InWeaponUnitPtr)
+{
+	if (bIsDragging)
+	{
+		if (InWeaponUnitPtr && InWeaponUnitPtr->GetSceneToolsType() != ESceneToolsType::kWeapon)
+		{
+			EnableIcon(false);
+		}
+	}
+	else
+	{
+		EnableIcon(true);
 	}
 }
 
@@ -143,10 +183,19 @@ bool UWeaponsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEven
 		if (WidgetDragPtr)
 		{
 			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
+
+			WidgetDragPtr->OnDrop.Broadcast(WidgetDragPtr);
 		}
 	}
 
 	return true;
+}
+
+void UWeaponsIcon::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
+
+	OnDragDelegate.ExcuteCallback(false, nullptr);
 }
 
 void UWeaponsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
@@ -169,9 +218,17 @@ void UWeaponsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoin
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
 				WidgetDragPtr->SceneToolSPtr = WeaponUnitPtr;
 				WidgetDragPtr->bIsInBackpakc = bIsInBackpakc;
+				WidgetDragPtr->OnDrop.AddDynamic(this, &ThisClass::OnDroped);
 
 				OutOperation = WidgetDragPtr;
+
+				OnDragDelegate.ExcuteCallback(true, WeaponUnitPtr);
 			}
 		}
 	}
+}
+
+void UWeaponsIcon::OnDroped(UDragDropOperation* Operation)
+{
+	OnDragDelegate.ExcuteCallback(false, nullptr);
 }

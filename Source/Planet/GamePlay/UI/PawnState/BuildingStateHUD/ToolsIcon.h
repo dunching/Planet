@@ -31,6 +31,8 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit * BasicUnitPtr)override;
 
+	virtual void EnableIcon(bool bIsEnable)override;
+
 	UToolUnit* GetToolUnit()const;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")

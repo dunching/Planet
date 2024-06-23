@@ -206,21 +206,21 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		}
 
 		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
-		HP.SetCurrentValue(Ref.HP, PropertuModify_GUID);
+		HP.AddCurrentValue(Ref.HP, PropertuModify_GUID);
 
 		if (Ref.ElementSet.IsEmpty())
 		{
-			HP.SetCurrentValue(-Ref.BaseDamage * CurCriticalDamage, PropertuModify_GUID);
+			HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage, PropertuModify_GUID);
 		}
 		else
 		{
 			for (const auto& Iter : Ref.ElementSet)
 			{
-				HP.SetCurrentValue(-Iter.Get<2>() * CurCriticalDamage, PropertuModify_GUID);
+				HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage, PropertuModify_GUID);
 			}
 		}
 
-		HP.SetCurrentValue(Ref.TrueDamage, PropertuModify_GUID);
+		HP.AddCurrentValue(Ref.TrueDamage, PropertuModify_GUID);
 	}
 
 	// 显示对应的浮动UI
