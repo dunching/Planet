@@ -73,6 +73,6 @@ void UMyBaseProperty::ValueChanged()
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(MyBaseProperty::Text));
 	if (UIPtr)
 	{
-		UIPtr->SetText(FText::FromString(*FString::Printf(TEXT("%d/%d"), Value1, Value2)));
+		UIPtr->SetText(FText::FromString(*FString::Printf(TEXT("%d/%d%%"), Value1, Value2)));
 	}
 }

@@ -31,6 +31,7 @@
 #include "GroupMnaggerComponent.h"
 #include "AssetRefMap.h"
 #include "HumanControllerInterface.h"
+#include "GameplayTagsSubSystem.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -147,11 +148,11 @@ void ACharacterBase::OnHPChanged(int32 CurrentValue)
 {
 	if (CurrentValue <= 0)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UAssetRefMap::GetInstance()->DeathingTag });
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			{
-				if (Iter == UAssetRefMap::GetInstance()->DeathingTag)
+				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
 				{
 					Destroy();
 				}

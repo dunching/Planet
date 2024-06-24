@@ -5,6 +5,7 @@
 #include "EquipmentElementComponent.h"
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
+#include "GameplayTagsSubSystem.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -24,14 +25,14 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 	{
 		if (
 			(CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f) &&
-			(CharacterPtr->GetEquipmentItemsComponent()->GetCharacterTags().HasTag(UAssetRefMap::GetInstance()->RunningAbilityTag))
+			(CharacterPtr->GetEquipmentItemsComponent()->GetCharacterTags().HasTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag))
 			)
 		{
 			if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
 			{
 				if (CharacterAttributes.PP.GetCurrentValue() <= 0)
 				{
-					FGameplayTagContainer GameplayTagContainer{ UAssetRefMap::GetInstance()->RunningAbilityTag };
+					FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag };
 					CharacterPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 				}
 				else

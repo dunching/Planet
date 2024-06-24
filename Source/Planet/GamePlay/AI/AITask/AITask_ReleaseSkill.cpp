@@ -14,6 +14,7 @@
 #include "CharacterBase.h"
 #include "Skill_Base.h"
 #include "AssetRefMap.h"
+#include "GameplayTagsSubSystem.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -82,7 +83,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 
 		FGameplayTagContainer GameplayTagContainer;
-		GameplayTagContainer.AddTag(UAssetRefMap::GetInstance()->GameplayTag1);
+		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->GameplayTag1);
 
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{

@@ -17,6 +17,7 @@
 #include "HoldingItemsComponent.h"
 #include "HumanPlayerController.h"
 #include "TestCommand.h"
+#include "GameplayTagsSubSystem.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super()
@@ -99,7 +100,7 @@ void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 	{
 		GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UAssetRefMap::GetInstance()->DeathingTag,
+			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 
@@ -140,7 +141,7 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 	InitialCharacter();
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UAssetRefMap::GetInstance()->DeathingTag,
+		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
@@ -225,7 +226,7 @@ void AHumanAIController::InitialCharacter()
 				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
 				if (WeaponUnitPtr)
 				{
-					FirstWeaponSocketInfoSPtr->WeaponSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket1;
+					FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
 					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
 				}
 			}
@@ -234,7 +235,7 @@ void AHumanAIController::InitialCharacter()
 				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kRangeTest);
 				if (WeaponUnitPtr)
 				{
-					SecondWeaponSocketInfo->WeaponSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket2;
+					SecondWeaponSocketInfo->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
 					SecondWeaponSocketInfo->WeaponUnitPtr = WeaponUnitPtr;
 				}
 			}
@@ -247,7 +248,7 @@ void AHumanAIController::InitialCharacter()
 			{
 				TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
-				SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket1;
+				SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
 				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
 
 				SkillsMap.Add(
@@ -258,7 +259,7 @@ void AHumanAIController::InitialCharacter()
 			{
 				TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
-				SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->WeaponActiveSocket2;
+				SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
 				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
 
 				SkillsMap.Add(

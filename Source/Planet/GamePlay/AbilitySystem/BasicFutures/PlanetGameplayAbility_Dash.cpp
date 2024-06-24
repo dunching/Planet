@@ -12,6 +12,7 @@
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AssetRefMap.h"
 #include "EquipmentElementComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 UPlanetGameplayAbility_Dash::UPlanetGameplayAbility_Dash() :
 	Super()
@@ -60,7 +61,7 @@ void UPlanetGameplayAbility_Dash::PreActivate(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->AddTag(UAssetRefMap::GetInstance()->DashAbilityTag);
+		CharacterPtr->GetEquipmentItemsComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 	}
 }
 
@@ -100,7 +101,7 @@ void UPlanetGameplayAbility_Dash::EndAbility(
 {
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->RemoveTag(UAssetRefMap::GetInstance()->DashAbilityTag);
+		CharacterPtr->GetEquipmentItemsComponent()->RemoveTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 	}
 
 	DrawDebugSphere(GetWorld(), CharacterPtr->GetActorLocation(), 20, 20, FColor::Red, false, 10);
@@ -184,7 +185,7 @@ void UPlanetGameplayAbility_Dash::DoDash(
 
 				Displacement(Direction);
 
-				CharacterPtr->GetEquipmentItemsComponent()->AddTag(UAssetRefMap::GetInstance()->DashAbilityTag);
+				CharacterPtr->GetEquipmentItemsComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 			}
 		}
 	}

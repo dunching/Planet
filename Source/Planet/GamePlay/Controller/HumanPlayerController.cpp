@@ -28,6 +28,7 @@
 #include "AssetRefMap.h"
 #include "FocusIcon.h"
 #include "TestCommand.h"
+#include "GameplayTagsSubSystem.h"
 
 AHumanPlayerController::AHumanPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -347,7 +348,7 @@ void AHumanPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Count
 
 		AIPCPtr->GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UAssetRefMap::GetInstance()->DeathingTag,
+			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 	}
@@ -375,7 +376,7 @@ void AHumanPlayerController::BindRemove(AActor* Actor)
 	}
 
 	auto& DelegateRef = AIPCPtr->GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UAssetRefMap::GetInstance()->DeathingTag,
+		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnFocusDeathing);

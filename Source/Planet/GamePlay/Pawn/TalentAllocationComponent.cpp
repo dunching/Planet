@@ -8,6 +8,7 @@
 #include "CharacterAttibutes.h"
 #include "EquipmentElementComponent.h"
 #include "AssetRefMap.h"
+#include "GameplayTagsSubSystem.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
@@ -191,7 +192,7 @@ void UTalentAllocationComponent::SyncToHolding()
 
 						TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
-						SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->Talent_NuQi_Socket;
+						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->Talent_NuQi_Socket;
 						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
 						SkillsSocketInfo->Key = EKeys::Invalid;
 
@@ -212,7 +213,7 @@ void UTalentAllocationComponent::SyncToHolding()
 
 						TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
-						SkillsSocketInfo->SkillSocket = UAssetRefMap::GetInstance()->Talent_YinYang_Socket;
+						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->Talent_YinYang_Socket;
 						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
 						SkillsSocketInfo->Key = EKeys::Invalid;
 
