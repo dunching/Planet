@@ -255,7 +255,7 @@ struct PLANET_API FCharacterAttributes
 #pragma endregion
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet WalkingSpeed;
+	FBasePropertySet MoveSpeed;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet RunningSpeedOffset;

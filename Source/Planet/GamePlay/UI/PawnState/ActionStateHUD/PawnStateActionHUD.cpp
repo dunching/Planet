@@ -18,7 +18,7 @@
 #include "State_Talent_NuQi.h"
 #include "State_Talent_YinYang.h"
 
-namespace AllocationSkillsMenu
+namespace PawnStateActionHUD
 {
 	const FName ActiveSkill1 = TEXT("ActiveSkill1");
 
@@ -34,15 +34,15 @@ namespace AllocationSkillsMenu
 	
 	const FName TalentStateSocket = TEXT("TalentStateSocket");
 	
-	const FName AD = TEXT("AD");
+	const FName BaseAttackPower = TEXT("BaseAttackPower");
 
-	const FName AD_Penetration = TEXT("AD_Penetration");
+	const FName Penetration = TEXT("Penetration");
 	
-	const FName AD_Resistance = TEXT("AD_Resistance");
+	const FName Resistance = TEXT("Resistance");
 
 	const FName MoveSpeed = TEXT("MoveSpeed");
 
-	const FName SkillPerformSpeed = TEXT("SkillPerformSpeed");
+	const FName GAPerformSpeed = TEXT("GAPerformSpeed");
 
 	const FName HP = TEXT("HP");
 
@@ -86,12 +86,12 @@ void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	{
 		TArray<FName>Ary
 		{
-			AllocationSkillsMenu::ActiveSkill1,
-			AllocationSkillsMenu::ActiveSkill2,
-			AllocationSkillsMenu::ActiveSkill3,
-			AllocationSkillsMenu::ActiveSkill4 ,
-			AllocationSkillsMenu::WeaponActiveSkill1,
-			AllocationSkillsMenu::WeaponActiveSkill2,
+			PawnStateActionHUD::ActiveSkill1,
+			PawnStateActionHUD::ActiveSkill2,
+			PawnStateActionHUD::ActiveSkill3,
+			PawnStateActionHUD::ActiveSkill4 ,
+			PawnStateActionHUD::WeaponActiveSkill1,
+			PawnStateActionHUD::WeaponActiveSkill2,
 		};
 
 		for (const auto& Iter : Ary)
@@ -114,7 +114,7 @@ void UPawnStateActionHUD::ResetUIByData()
 	{
 		auto & CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(AllocationSkillsMenu::HP));
+			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(PawnStateActionHUD::HP));
 			if (!UIPtr)
 			{
 				return;
@@ -122,7 +122,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.HP);
 		}
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(AllocationSkillsMenu::PP));
+			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(PawnStateActionHUD::PP));
 			if (!UIPtr)
 			{
 				return;
@@ -130,7 +130,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.PP);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::AD));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::BaseAttackPower));
 			if (!UIPtr)
 			{
 				return;
@@ -138,7 +138,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::AD_Penetration));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Penetration));
 			if (!UIPtr)
 			{
 				return;
@@ -146,7 +146,31 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Gold));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Resistance));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Resistance);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::MoveSpeed));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.MoveSpeed);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::GAPerformSpeed));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.GAPerformSpeed);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Gold));
 			if (!UIPtr)
 			{
 				return;
@@ -154,7 +178,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.GoldElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Wood));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Wood));
 			if (!UIPtr)
 			{
 				return;
@@ -162,7 +186,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.WoodElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Water));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Water));
 			if (!UIPtr)
 			{
 				return;
@@ -170,7 +194,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.WaterElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Fire));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Fire));
 			if (!UIPtr)
 			{
 				return;
@@ -178,7 +202,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.FireElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(AllocationSkillsMenu::Soil));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Soil));
 			if (!UIPtr)
 			{
 				return;
@@ -192,7 +216,7 @@ void UPawnStateActionHUD::ResetUIByData()
 
 void UPawnStateActionHUD::InitialTalentUI()
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(AllocationSkillsMenu::TalentStateSocket));
+	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(PawnStateActionHUD::TalentStateSocket));
 	if (!BorderPtr)
 	{
 		return;
@@ -262,10 +286,10 @@ void UPawnStateActionHUD::InitialSkillIcon()
 	auto SkillsMap = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
 	TArray<FName>Ary
 	{
-		AllocationSkillsMenu::ActiveSkill1,
-		AllocationSkillsMenu::ActiveSkill2,
-		AllocationSkillsMenu::ActiveSkill3,
-		AllocationSkillsMenu::ActiveSkill4 ,
+		PawnStateActionHUD::ActiveSkill1,
+		PawnStateActionHUD::ActiveSkill2,
+		PawnStateActionHUD::ActiveSkill3,
+		PawnStateActionHUD::ActiveSkill4 ,
 	};
 
 	for (const auto& Iter : Ary)
@@ -317,7 +341,7 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
 	break;
 	}
 	{
-		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
+		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(PawnStateActionHUD::WeaponActiveSkill1));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
@@ -328,7 +352,7 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
 		}
 	}
 	{
-		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
+		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(PawnStateActionHUD::WeaponActiveSkill2));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(

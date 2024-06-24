@@ -80,12 +80,67 @@ void TestCommand::TestAsyncAssetLoad()
 {
 }
 
-void TestCommand::TestSubSystem()
+void TestCommand::TestContainer()
 {
 	// 	auto Class = LoadClass<UAssetRefMap>(nullptr, *AssetRefMapClass.ToString());
 	// 	auto CacheAssetManagerPtr = USubsystemBlueprintLibrary::GetEngineSubsystem(Class);
+	{
+		std::map<int32, TFunction<void(bool)>>Map;
 
-	UE_LOG(LogTemp, Warning, TEXT("123"));
+		for (int32 Index = 0; Index < 10000; Index++)
+		{
+			Map.emplace(Index, [](bool) {
+
+				UE_LOG(LogTemp, Warning, TEXT("123"));
+
+				});
+		}
+
+		for (const auto& Iter : Map)
+		{
+			Iter.second(true);
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("123"));
+	}
+	{
+		TArray<TTuple<int32, TFunction<void(bool)>>>Map;
+
+		for (int32 Index = 0; Index < 10000; Index++)
+		{
+			Map.Add({ Index, [](bool) {
+
+				UE_LOG(LogTemp, Warning, TEXT("123"));
+
+				} });
+		}
+
+		for (const auto& Iter : Map)
+		{
+			Iter.Get<1>()(true);
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("123"));
+	}
+	{
+		TMap<int32, TFunction<void(bool)>>Map;
+
+		for (int32 Index = 0; Index < 10000; Index++)
+		{
+			Map.Add(Index, [](bool) {
+
+				UE_LOG(LogTemp, Warning, TEXT("123"));
+
+				});
+		}
+
+		for (const auto& Iter : Map)
+		{
+			Iter.Value(true);
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("123"));
+	}
 }
 
 void TestCommand::TestSpline()

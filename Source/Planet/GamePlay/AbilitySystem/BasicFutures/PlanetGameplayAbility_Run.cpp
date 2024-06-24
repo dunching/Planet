@@ -22,9 +22,10 @@ void UPlanetGameplayAbility_Run::ActivateAbility(const FGameplayAbilitySpecHandl
 	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
+		auto & CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		CharacterPtr->GetCharacterMovement()->MaxWalkSpeed =
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.GetCurrentValue() +
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().RunningSpeedOffset.GetCurrentValue();
+			CharacterAttributesRef.MoveSpeed.GetCurrentValue() +
+			CharacterAttributesRef.RunningSpeedOffset.GetCurrentValue();
 	}
 }
 
@@ -45,7 +46,8 @@ void UPlanetGameplayAbility_Run::EndAbility(const FGameplayAbilitySpecHandle Han
 	if (CharacterPtr)
 	{
 		CharacterPtr->GetEquipmentItemsComponent()->RemoveTag(UAssetRefMap::GetInstance()->RunningAbilityTag);
-		CharacterPtr->GetCharacterMovement()->MaxWalkSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.GetCurrentValue();
+		CharacterPtr->GetCharacterMovement()->MaxWalkSpeed = 
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue();
 	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);

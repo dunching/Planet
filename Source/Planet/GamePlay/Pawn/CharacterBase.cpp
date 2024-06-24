@@ -91,12 +91,12 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	GetEquipmentItemsComponent()->InitialBaseGAs();
 
 	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
-	OnMoveSpeedChanged(CharacterAttributesRef.WalkingSpeed.GetCurrentValue());
+	OnMoveSpeedChanged(CharacterAttributesRef.MoveSpeed.GetCurrentValue());
 
 	HPChangedHandle = CharacterAttributesRef.HP.AddOnValueChanged(
 		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
 	);
-	MoveSpeedChangedHandle = CharacterAttributesRef.WalkingSpeed.AddOnValueChanged(
+	MoveSpeedChangedHandle = CharacterAttributesRef.MoveSpeed.AddOnValueChanged(
 		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
 	);
 }
@@ -162,5 +162,5 @@ void ACharacterBase::OnHPChanged(int32 CurrentValue)
 
 void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
 {
-	GetCharacterMovement()->MaxWalkSpeed = GetCharacterAttributesComponent()->GetCharacterAttributes().WalkingSpeed.GetCurrentValue();
+	GetCharacterMovement()->MaxWalkSpeed = GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue();
 }

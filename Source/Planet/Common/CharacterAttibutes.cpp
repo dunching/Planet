@@ -175,8 +175,8 @@ FCharacterAttributes::FCharacterAttributes()
 	CriticalDamage.GetMaxProperty().SetCurrentValue(100);
 	CriticalDamage.SetCurrentValue(50, PropertuModify_GUID);
 
-	WalkingSpeed.GetMaxProperty().SetCurrentValue(800);
-	WalkingSpeed.SetCurrentValue(250, PropertuModify_GUID);
+	MoveSpeed.GetMaxProperty().SetCurrentValue(800);
+	MoveSpeed.SetCurrentValue(250, PropertuModify_GUID);
 
 	RunningSpeedOffset.GetMaxProperty().SetCurrentValue(100);
 	RunningSpeedOffset.SetCurrentValue(100, PropertuModify_GUID);

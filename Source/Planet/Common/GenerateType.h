@@ -67,7 +67,7 @@ enum class ETeammateOption : uint8
 
 #pragma region Callback
 template<typename ValueType>
-class TOnValueChangedCallbackHandle
+class TOnValueChangedCallbackHandle final
 {
 public:
 
@@ -127,7 +127,7 @@ void TOnValueChangedCallbackHandle<ValueType>::UnBindCallback()
 }
 
 template<typename ValueType>
-class TOnValueChangedCallbackContainer
+class TOnValueChangedCallbackContainer final
 {
 public:
 
@@ -199,14 +199,19 @@ void TOnValueChangedCallbackContainer<ValueType>::ValueChanged(ValueType OldValu
 	}
 }
 
-template<typename FuncType>
-class TCallbackHandle
+template<typename Ret, typename... ParamTypes>
+class TCallbackHandle final
+{
+};
+
+template<typename Ret, typename... ParamTypes>
+class TCallbackHandle<Ret(ParamTypes...)> final
 {
 public:
 
 	using FCallbackIDType = int32;
 
-	using FCallbackType = std::function<FuncType>;
+	using FCallbackType = std::function<Ret(ParamTypes...)>;
 
 	using FMapType = std::map<FCallbackIDType, FCallbackType>;
 
@@ -230,8 +235,8 @@ private:
 
 };
 
-template<typename FuncType>
-TCallbackHandle<FuncType>::~TCallbackHandle()
+template<typename Ret, typename... ParamTypes>
+TCallbackHandle<Ret(ParamTypes...)>::~TCallbackHandle()
 {
 	if (bIsAutoUnregister)
 	{
@@ -239,14 +244,14 @@ TCallbackHandle<FuncType>::~TCallbackHandle()
 	}
 }
 
-template<typename FuncType>
-TCallbackHandle<FuncType>::TCallbackHandle()
+template<typename Ret, typename... ParamTypes>
+TCallbackHandle<Ret(ParamTypes...)>::TCallbackHandle()
 {
 
 }
 
-template<typename FuncType>
-TCallbackHandle<FuncType>::TCallbackHandle(
+template<typename Ret, typename... ParamTypes>
+TCallbackHandle<Ret(ParamTypes...)>::TCallbackHandle(
 	FCallbackIDType InCallbackID, const TSharedPtr<FMapType>& InContainerSPtr
 ) :
 	CallbackID(InCallbackID),
@@ -255,33 +260,36 @@ TCallbackHandle<FuncType>::TCallbackHandle(
 
 }
 
-template<typename FuncType>
-void TCallbackHandle<FuncType>::UnBindCallback()
+template<typename Ret, typename... ParamTypes>
+void TCallbackHandle<Ret(ParamTypes...)>::UnBindCallback()
 {
 	if (ContainerSPtr->erase(CallbackID))
 	{
 	}
 }
 
-template<typename FuncType>
+template<typename Ret, typename... ParamTypes>
 class TCallbackHandleContainer
+{};
+
+template<typename Ret, typename... ParamTypes>
+class TCallbackHandleContainer<Ret(ParamTypes...)> final
 {
 public:
 
-	using FCallbackHandle = TCallbackHandle<FuncType>;
+	using FCallbackHandle = TCallbackHandle<Ret(ParamTypes...)>;
 
 	using FCallbackHandleSPtr = TSharedPtr<FCallbackHandle>;
 
 	using FMapType = FCallbackHandle::FMapType;
 
-	TCallbackHandleContainer<FuncType>& operator=(const TCallbackHandleContainer<FuncType>& RightValue);
+	const TCallbackHandleContainer<Ret(ParamTypes...)>& operator=(const TCallbackHandleContainer<Ret(ParamTypes...)>& RightValue);
 
 	_NODISCARD TSharedPtr<FCallbackHandle> AddCallback(
 		const typename FCallbackHandle::FCallbackType& Callback
 	);
 
-	template<typename ...ArgsType>
-	void ExcuteCallback(ArgsType...Args);
+	void ExcuteCallback(ParamTypes...Args);
 
 private:
 
@@ -289,8 +297,8 @@ private:
 
 };
 
-template<typename FuncType>
-TCallbackHandleContainer<FuncType>& TCallbackHandleContainer<FuncType>::operator=(const TCallbackHandleContainer<FuncType>& RightValue)
+template<typename Ret, typename... ParamTypes>
+const TCallbackHandleContainer<Ret(ParamTypes...)>& TCallbackHandleContainer<Ret(ParamTypes...)>::operator=(const TCallbackHandleContainer<Ret(ParamTypes...)>& RightValue)
 {
 	CallbacksMapSPtr = MakeShared<FMapType>();
 	*CallbacksMapSPtr = *RightValue.CallbacksMapSPtr;
@@ -298,9 +306,8 @@ TCallbackHandleContainer<FuncType>& TCallbackHandleContainer<FuncType>::operator
 	return *this;
 }
 
-template<typename FuncType>
-template<typename ...ArgsType>
-void TCallbackHandleContainer<FuncType>::ExcuteCallback(ArgsType...Args)
+template<typename Ret, typename... ParamTypes>
+void TCallbackHandleContainer<Ret(ParamTypes...)>::ExcuteCallback(ParamTypes...Args)
 {
 	if (!CallbacksMapSPtr)
 	{
@@ -316,8 +323,8 @@ void TCallbackHandleContainer<FuncType>::ExcuteCallback(ArgsType...Args)
 	}
 }
 
-template<typename FuncType>
-TSharedPtr<typename TCallbackHandleContainer<FuncType>::FCallbackHandle> TCallbackHandleContainer<FuncType>::AddCallback(
+template<typename Ret, typename... ParamTypes>
+TSharedPtr<typename TCallbackHandleContainer<Ret(ParamTypes...)>::FCallbackHandle> TCallbackHandleContainer<Ret(ParamTypes...)>::AddCallback(
 	const typename FCallbackHandle::FCallbackType& Callback
 )
 {

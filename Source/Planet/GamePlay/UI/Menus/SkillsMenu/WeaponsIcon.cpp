@@ -25,9 +25,9 @@ namespace WeaponsIcon
 {
 	const FName Content = TEXT("Content");
 
-	const FName Default = TEXT("Default");
+	const FName Enable = TEXT("Enable");
 
-	const FName Texture = TEXT("Texture");
+	const FName Icon = TEXT("Icon");
 }
 
 UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
@@ -56,42 +56,23 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kWeapon)
 	{
 		WeaponUnitPtr = Cast<UWeaponUnit>(BasicUnitPtr);
-		SetItemType();
-
-		OnResetUnit.ExcuteCallback(WeaponUnitPtr);
-
-		auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Default));
-		if (ImagePtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Collapsed);
-		}
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(WeaponsIcon::Content));
-		if (BorderPtr)
-		{
-			BorderPtr->SetVisibility(ESlateVisibility::Visible);
-		}
 	}
 	else
 	{
 		WeaponUnitPtr = nullptr;
-		OnResetUnit.ExcuteCallback(nullptr);
-
-		auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Default));
-		if (ImagePtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(WeaponsIcon::Content));
-		if (BorderPtr)
-		{
-			BorderPtr->SetVisibility(ESlateVisibility::Collapsed);
-		}
 	}
+
+	OnResetUnit.ExcuteCallback(WeaponUnitPtr);
+	SetItemType();
 }
 
 void UWeaponsIcon::EnableIcon(bool bIsEnable)
 {
-
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Enable));
+	if (ImagePtr)
+	{
+		ImagePtr->SetVisibility(bIsEnable ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+	}
 }
 
 void UWeaponsIcon::OnDragSkillIcon(bool bIsDragging, USkillUnit* InSkillUnitPtr)
@@ -126,14 +107,23 @@ void UWeaponsIcon::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* InWeaponUnitP
 
 void UWeaponsIcon::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Texture));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Icon));
 	if (ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(WeaponUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(WeaponUnitPtr->GetIcon().Get());
-			});
+		if (WeaponUnitPtr)
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Visible);
+
+			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(WeaponUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+				{
+					ImagePtr->SetBrushFromTexture(WeaponUnitPtr->GetIcon().Get());
+				});
+		}
+		else
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
