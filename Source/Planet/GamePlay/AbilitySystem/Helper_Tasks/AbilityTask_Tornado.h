@@ -4,39 +4,36 @@
 #include "CoreMinimal.h"
 
 #include "UObject/ObjectMacros.h"
+#include "Engine/EngineTypes.h"
 #include "Abilities/Tasks/AbilityTask.h"
 #include "Abilities/Tasks/AbilityTask_ApplyRootMotion_Base.h"
 
-#include "AbilityTask_ApplyRootMotionBySPline.generated.h"
+#include "AbilityTask_Tornado.generated.h"
 
-class UCurveFloat;
-class ASPlineActor;
+class UGameplayAbility;
+class ATornado;
 class ACharacterBase;
 
 DECLARE_DELEGATE(FOnTaskFinished);
 
-/**
- *	Applies force to character's movement
- */
 UCLASS()
-class PLANET_API UAbilityTask_ApplyRootMotionBySPline : public UAbilityTask_ApplyRootMotion_Base
+class PLANET_API UAbilityTask_Tornado : public UAbilityTask_ApplyRootMotion_Base
 {
 	GENERATED_BODY()
+
 public:
 
+	UAbilityTask_Tornado(const FObjectInitializer& ObjectInitializer);
+
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UAbilityTask_ApplyRootMotionBySPline* ApplyRootMotionBySpline
-	(
+	static UAbilityTask_Tornado* TornadoTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
-		float Duration,
-		ASPlineActor* InSPlineActorPtr,
+		ATornado* InTornadoPtr,
 		ACharacterBase* InTargetCharacterPtr
 	);
 
 	virtual void Activate() override;
-
-	virtual void TickTask(float DeltaTime) override;
 
 	virtual void OnDestroy(bool AbilityIsEnding) override;
 
@@ -48,9 +45,7 @@ protected:
 
 protected:
 
-	float Duration;
-
-	ASPlineActor* SPlineActorPtr = nullptr;
+	ATornado* TornadoPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 

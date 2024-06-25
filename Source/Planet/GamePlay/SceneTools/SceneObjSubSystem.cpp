@@ -1,14 +1,23 @@
 
-#include "GameplayTagsSubSystem.h"
+#include "SceneObjSubSystem.h"
 
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 
 #include "Planet.h"
 
-UGameplayTagsSubSystem* UGameplayTagsSubSystem::GetInstance()
+USceneObjSubSystem* USceneObjSubSystem::GetInstance()
 {
-	return Cast<UGameplayTagsSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(
-		GetWorldImp(), UGameplayTagsSubSystem::StaticClass())
+	return Cast<USceneObjSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(
+		GetWorldImp(), USceneObjSubSystem::StaticClass())
 	);
+}
+
+APostProcessVolume* USceneObjSubSystem::GetSkillPost() const
+{
+	APostProcessVolume * ResultPtr = nullptr;
+
+	
+
+	return ResultPtr;
 }
 

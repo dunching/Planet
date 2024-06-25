@@ -55,6 +55,7 @@ void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
+		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Tornado);
 	}
 }
 

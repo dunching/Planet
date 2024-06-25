@@ -11,8 +11,12 @@
 #include "Engine/Engine.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/SplineComponent.h"
+#include <Kismet/KismetMathLibrary.h>
 
 #include "SPlineActor.h"
+#include "Skill_Active_tornado.h"
+#include "CharacterBase.h"
+#include "LogWriter.h"
 
 FRootMotionSource_BySpline::FRootMotionSource_BySpline()
 {
@@ -67,6 +71,76 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 		FVector Force = (Pt - CurrentLocation) / MovementTickTime;
 
 		NewTransform.SetTranslation(Force);
+	}
+
+	RootMotionParams.Set(NewTransform);
+
+	SetTime(GetTime() + SimulationTime);
+}
+
+FRootMotionSource_ByTornado::FRootMotionSource_ByTornado()
+{
+	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
+}
+
+FRootMotionSource_ByTornado::~FRootMotionSource_ByTornado()
+{
+
+}
+
+FRootMotionSource* FRootMotionSource_ByTornado::Clone() const
+{
+	FRootMotionSource_ByTornado* CopyPtr = new FRootMotionSource_ByTornado(*this);
+	return CopyPtr;
+}
+
+bool FRootMotionSource_ByTornado::Matches(const FRootMotionSource* Other) const
+{
+	if (!FRootMotionSource::Matches(Other))
+	{
+		return false;
+	}
+
+	const FRootMotionSource_ByTornado* OtherCast = static_cast<const FRootMotionSource_ByTornado*>(Other);
+
+	return TornadoPtr == OtherCast->TornadoPtr;
+}
+
+void FRootMotionSource_ByTornado::PrepareRootMotion
+(
+	float SimulationTime,
+	float MovementTickTime,
+	const ACharacter& Character,
+	const UCharacterMovementComponent& MoveComponent
+)
+{
+	RootMotionParams.Clear();
+
+	FTransform NewTransform;
+
+	if (TornadoPtr)
+	{
+		const FVector CurrentLocation = Character.GetActorLocation();
+		const FVector TornadoLocation = TornadoPtr->GetActorLocation();
+
+		const auto Rotator =
+			UKismetMathLibrary::MakeRotFromZX(-Character.GetGravityDirection(), CurrentLocation - TornadoLocation);
+
+		const auto NewRotator =
+			Rotator.Vector().RotateAngleAxis(SimulationTime * RotationSpeed, -Character.GetGravityDirection());
+
+		const auto NewPt = 
+			TornadoLocation + 
+			(-Character.GetGravityDirection() * MaxHeight) +
+			(NewRotator * OuterRadius);
+
+		FVector Distance = (NewPt - CurrentLocation) / MovementTickTime;
+
+		NewTransform.SetTranslation(Distance);
+
+		FQuat Rot = FQuat::FindBetween(Character.GetActorForwardVector(), NewRotator) / MovementTickTime;
+
+		NewTransform.SetRotation(Rot);
 	}
 
 	RootMotionParams.Set(NewTransform);

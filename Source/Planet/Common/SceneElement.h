@@ -96,6 +96,7 @@ enum class ESkillUnitType : uint8
 	kHumanSkill_Active_Displacement,
 	kHumanSkill_Active_GroupTherapy,
 	kHumanSkill_Active_ContinuousGroupTherapy,
+	kHumanSkill_Active_Tornado,
 
 	kHumanSkill_Talent_NuQi,
 	kHumanSkill_Talent_YinYang,

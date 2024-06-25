@@ -14,6 +14,7 @@
 #include "Helper_RootMotionSource.generated.h"
 
 class ASPlineActor;
+class ATornado;
 class ACharacterBase;
 
 USTRUCT()
@@ -39,5 +40,36 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 	ASPlineActor* SPlineActorPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
+};
 
+USTRUCT()
+struct FRootMotionSource_ByTornado : public FRootMotionSource
+{
+	GENERATED_USTRUCT_BODY()
+
+	FRootMotionSource_ByTornado();
+
+	virtual ~FRootMotionSource_ByTornado();
+
+	virtual FRootMotionSource* Clone() const override;
+
+	virtual bool Matches(const FRootMotionSource* Other) const override;
+
+	virtual void PrepareRootMotion(
+		float SimulationTime,
+		float MovementTickTime,
+		const ACharacter& Character,
+		const UCharacterMovementComponent& MoveComponent
+	) override;
+	
+	// 如果这个值过小，会导致移动时距离过近从而忽略本次移动
+	float OuterRadius = 150.f;
+	
+	float MaxHeight = 200.f;
+
+	float RotationSpeed = 360.f;
+
+	ATornado* TornadoPtr = nullptr;
+
+	ACharacterBase* TargetCharacterPtr = nullptr;
 };
