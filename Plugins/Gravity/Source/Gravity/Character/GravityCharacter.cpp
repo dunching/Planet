@@ -2,12 +2,12 @@
 
 #include "GravityCharacter.h"
 
-#include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 
 #include "GravityMovementComponent.h"
 #include "Gravity/GravityPlanet.h"
 #include "GameFramework/PlayerInput.h"
+#include "GravitySpringArmComponent.h"
 
 AGravityCharacter::AGravityCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UGravityMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -22,7 +22,7 @@ AGravityCharacter::AGravityCharacter(const FObjectInitializer& ObjectInitializer
     GetCharacterMovement()->RotationRate = FRotator(0.0f, 180.0f, 0.0f); // ...at this rotation rate
 
     // Create a camera boom (pulls in towards the player if there is a collision)
-    CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
+    CameraBoom = CreateDefaultSubobject<UGravitySpringArmComponent>(TEXT("CameraBoom"));
     CameraBoom->SetupAttachment(RootComponent);
     CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
     CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller

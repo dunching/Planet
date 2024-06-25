@@ -40,15 +40,6 @@ void AGravityAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePa
 			if (CurrentPawnRotation.Equals(NewControlRotation, 1e-3f) == false)
 			{
 #if WITH_EDITOR
-				DrawDebugLine(
-					GetWorld(), 
-					MyPawn->GetActorLocation(),
-					MyPawn->GetActorLocation() + (NewControlRotation.Vector() * 300),
-					FColor::Yellow,
-					false,
-					3.f
-				);
-
 				RootComponent->SetWorldLocation(MyPawn->GetActorLocation());
 #endif
 

@@ -148,10 +148,10 @@ void UGravityMovementComponent::SetGravityDirection(const FVector& InNewGravityD
 
 void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 {
-	// 	if (HasRootMotionSources())
-	// 	{
-	// 		return;
-	// 	}
+	if (HasRootMotionSources())
+	{
+		return;
+	}
 
     Super::PhysicsRotation(DeltaTime);
 }
