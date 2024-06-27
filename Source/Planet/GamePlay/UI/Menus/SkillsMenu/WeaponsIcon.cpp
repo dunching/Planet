@@ -105,6 +105,14 @@ void UWeaponsIcon::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* InWeaponUnitP
 	}
 }
 
+void UWeaponsIcon::OnSublingIconReset(UWeaponUnit* InWeaponUnitPtr)
+{
+	if (InWeaponUnitPtr && (InWeaponUnitPtr == WeaponUnitPtr))
+	{
+		ResetToolUIByData(nullptr);
+	}
+}
+
 void UWeaponsIcon::SetItemType()
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Icon));

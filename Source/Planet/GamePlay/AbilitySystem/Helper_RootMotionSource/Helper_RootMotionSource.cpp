@@ -18,6 +18,12 @@
 #include "CharacterBase.h"
 #include "LogWriter.h"
 
+static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
+	TEXT("Skill.DrawDebug.Tornado"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
+
 FRootMotionSource_BySpline::FRootMotionSource_BySpline()
 {
 	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
@@ -135,6 +141,13 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 			(NewRotator * OuterRadius);
 
 		FVector Distance = (NewPt - CurrentLocation) / MovementTickTime;
+
+#ifdef WITH_EDITOR
+		if (SkillDrawDebugTornado.GetValueOnGameThread())
+		{
+			DrawDebugSphere(MoveComponent.GetWorld(), NewPt, 20, 20, FColor::Red, false, 3);
+		}
+#endif
 
 		NewTransform.SetTranslation(Distance);
 

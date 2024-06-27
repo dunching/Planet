@@ -127,4 +127,16 @@ protected:
 
 	TSharedPtr<FCurrentTalentType>TalentSPtr;
 
+	APostProcessVolume* TargetPostPtr = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillType")
+	float MaxYang = 7500.f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillType")
+	float MaxYin = 5500.f;
+
+	float PreviousWhiteTemp = -1.f;
+
+	float WhiteTemp = 6500.f;
+
 };

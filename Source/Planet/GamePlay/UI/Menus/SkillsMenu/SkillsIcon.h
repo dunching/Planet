@@ -44,6 +44,8 @@ public:
 
 	void OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr);
 
+	void OnSublingIconReset(USkillUnit* SkillUnitPtr);
+
 	FOnResetUnit OnResetUnit;
 	
 	FOnDragDelegate OnDragDelegate;

@@ -16,6 +16,7 @@
 #include "CollisionDataStruct.h"
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
+#include "SceneObjSubSystem.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {
@@ -70,6 +71,13 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
 		);
 	}
+
+	TargetPostPtr = USceneObjSubSystem::GetInstance()->GetSkillPost();
+	if (TargetPostPtr)
+	{
+		WhiteTemp = TargetPostPtr->Settings.WhiteTemp;
+		PreviousWhiteTemp = WhiteTemp;
+	}
 }
 
 void USkill_Talent_YinYang::OnRemoveAbility(
@@ -98,6 +106,11 @@ void USkill_Talent_YinYang::EndAbility(
 	bool bWasCancelled
 )
 {
+	if (TargetPostPtr)
+	{
+		TargetPostPtr->Settings.WhiteTemp = WhiteTemp;
+	}
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -148,6 +161,8 @@ void USkill_Talent_YinYang::AddValue(int32 Value)
 		{
 			TalentSPtr->SetCurrentValue(0);
 			TalentSPtr->CurentType = ETalent_State_Type::kYang;
+
+			PreviousWhiteTemp = TargetPostPtr->Settings.WhiteTemp;
 		}
 	}
 	break;
@@ -158,9 +173,29 @@ void USkill_Talent_YinYang::AddValue(int32 Value)
 		{
 			TalentSPtr->SetCurrentValue(0);
 			TalentSPtr->CurentType = ETalent_State_Type::kYin;
+			  
+			PreviousWhiteTemp = TargetPostPtr->Settings.WhiteTemp;
 		}
 	}
 	break;
+	}
+
+	if (TargetPostPtr)
+	{
+		const auto Percent = static_cast<float>(TalentSPtr->GetCurrentValue()) / TalentSPtr->GetMaxValue();
+		switch (TalentSPtr->CurentType)
+		{
+		case ETalent_State_Type::kYin:
+		{
+			TargetPostPtr->Settings.WhiteTemp = FMath::Lerp(PreviousWhiteTemp, MaxYin, Percent);
+		}
+		break;
+		case ETalent_State_Type::kYang:
+		{
+			TargetPostPtr->Settings.WhiteTemp = FMath::Lerp(PreviousWhiteTemp, MaxYang, Percent);
+		}
+		break;
+		}
 	}
 }
 

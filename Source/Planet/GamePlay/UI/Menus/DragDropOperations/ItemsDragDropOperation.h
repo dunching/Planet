@@ -25,8 +25,6 @@ public:
 
 	UBasicUnit* SceneToolSPtr;
 
-	std::function<void(bool)>OnDroped;
-
 	bool bIsInBackpakc = false;
 
 };

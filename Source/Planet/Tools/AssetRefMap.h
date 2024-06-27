@@ -121,6 +121,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName ValidAreaCheckBoxComponnetTag;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FName PostProcessVolume_Skill_Tag;
 
 };
 

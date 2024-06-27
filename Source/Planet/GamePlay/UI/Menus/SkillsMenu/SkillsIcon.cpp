@@ -62,16 +62,17 @@ void USkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
+	SkillUnitPtr = nullptr;
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kSkill)
 	{
-		SkillUnitPtr = Cast<USkillUnit>(BasicUnitPtr);
+		auto InSkillUnitPtr = Cast<USkillUnit>(BasicUnitPtr);
 
-		if (SkillUnitPtr && (bIsInBackpakc || SkillUnitPtr->SkillType == SkillType))
+		if (InSkillUnitPtr && (bIsInBackpakc || InSkillUnitPtr->SkillType == SkillType))
 		{
+			SkillUnitPtr = InSkillUnitPtr;
 		}
 		else
 		{
-			SkillUnitPtr = nullptr;
 		}
 	}
 
@@ -116,6 +117,14 @@ void USkillsIcon::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr)
 	else
 	{
 		EnableIcon(true);
+	}
+}
+
+void USkillsIcon::OnSublingIconReset(USkillUnit* InSkillUnitPtr)
+{
+	if (InSkillUnitPtr && (InSkillUnitPtr == SkillUnitPtr))
+	{
+		ResetToolUIByData(nullptr);
 	}
 }
 

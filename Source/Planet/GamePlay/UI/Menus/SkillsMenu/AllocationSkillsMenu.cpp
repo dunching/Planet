@@ -453,6 +453,68 @@ void UAllocationSkillsMenu::BindEvent()
 			BtnPtr->OnClicked.AddDynamic(this, &ThisClass::OnSkillsBtnCliked);
 		}
 	}
+	{
+		TArray<FName>Ary
+		{
+			{AllocationSkillsMenu::ActiveSkill1},
+			{AllocationSkillsMenu::ActiveSkill2},
+			{AllocationSkillsMenu::ActiveSkill3},
+			{AllocationSkillsMenu::ActiveSkill4},
+			{AllocationSkillsMenu::WeaponActiveSkill1},
+			{AllocationSkillsMenu::WeaponActiveSkill2},
+			{AllocationSkillsMenu::PassivSkill1},
+			{AllocationSkillsMenu::PassivSkill2},
+			{AllocationSkillsMenu::PassivSkill3},
+			{AllocationSkillsMenu::PassivSkill4},
+			{AllocationSkillsMenu::PassivSkill5},
+			{AllocationSkillsMenu::TalentPassivSkill},
+		};
+
+		for (const auto& FirstIter : Ary)
+		{
+			for (const auto& SecondIter : Ary)
+			{
+				if (FirstIter == SecondIter)
+				{
+					continue;
+				}
+				auto FirstPtr = Cast<USkillsIcon>(GetWidgetFromName(FirstIter));
+				auto SecondPtr = Cast<USkillsIcon>(GetWidgetFromName(SecondIter));
+				if (FirstPtr && SecondPtr)
+				{
+					auto Result = SecondPtr->OnResetUnit.AddCallback(
+						std::bind(&USkillsIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
+					Result->bIsAutoUnregister = false;
+				}
+			}
+		}
+	}
+	{
+		TArray<FName>Ary
+		{
+			{AllocationSkillsMenu::MainWeapon},
+			{AllocationSkillsMenu::SecondaryWeapon},
+		};
+
+		for (const auto& FirstIter : Ary)
+		{
+			for (const auto& SecondIter : Ary)
+			{
+				if (FirstIter == SecondIter)
+				{
+					continue;
+				}
+				auto FirstPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FirstIter));
+				auto SecondPtr = Cast<UWeaponsIcon>(GetWidgetFromName(SecondIter));
+				if (FirstPtr && SecondPtr)
+				{
+					auto Result = SecondPtr->OnResetUnit.AddCallback(
+						std::bind(&UWeaponsIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
+					Result->bIsAutoUnregister = false;
+				}
+			}
+		}
+	}
 }
 
 void UAllocationSkillsMenu::OnWeaponsBtnCliked()

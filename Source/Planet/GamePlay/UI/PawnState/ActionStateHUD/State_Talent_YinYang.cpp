@@ -10,6 +10,7 @@
 #include "CharacterAttibutes.h"
 #include "Skill_Talent_YinYang.h"
 #include "LogWriter.h"
+#include "SceneObjSubSystem.h"
 
 namespace State_Talent_YinYang
 {
@@ -68,7 +69,7 @@ void UState_Talent_YinYang::OnValueChanged()
 		if (UIPtr)
 		{
 			UIPtr->SetText(
-				FText::FromString(*FString::Printf(TEXT("%d/%d"), 
+				FText::FromString(*FString::Printf(TEXT("%d/%d"),
 					CurrentValue, MaxValue))
 			);
 		}
@@ -81,5 +82,6 @@ void UState_Talent_YinYang::OnValueChanged()
 			UIPtr->SetPercent(Percent);
 		}
 	}
+
 	SetValue(CurentType, CurrentValue, MaxValue);
 }

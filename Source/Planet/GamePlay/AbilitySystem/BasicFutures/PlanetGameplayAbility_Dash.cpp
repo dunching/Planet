@@ -14,6 +14,12 @@
 #include "EquipmentElementComponent.h"
 #include "GameplayTagsSubSystem.h"
 
+static TAutoConsoleVariable<int32> SkillDrawDebugDash(
+	TEXT("Skill.DrawDebug.Dash"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
+
 UPlanetGameplayAbility_Dash::UPlanetGameplayAbility_Dash() :
 	Super()
 {
@@ -42,7 +48,13 @@ void UPlanetGameplayAbility_Dash::ActivateAbility(
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
 	Start = CharacterPtr->GetActorLocation();
-	DrawDebugSphere(GetWorld(), Start, 20, 20, FColor::Red, false, 10);
+
+#ifdef WITH_EDITOR
+	if (SkillDrawDebugDash.GetValueOnGameThread())
+	{
+		DrawDebugSphere(GetWorld(), Start, 20, 20, FColor::Red, false, 10);
+	}
+#endif
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
@@ -104,8 +116,13 @@ void UPlanetGameplayAbility_Dash::EndAbility(
 		CharacterPtr->GetEquipmentItemsComponent()->RemoveTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 	}
 
-	DrawDebugSphere(GetWorld(), CharacterPtr->GetActorLocation(), 20, 20, FColor::Red, false, 10);
-	UE_LOG(LogTemp, Log, TEXT("%.2lf"), (CharacterPtr->GetActorLocation() - Start).Length());
+#ifdef WITH_EDITOR
+	if (SkillDrawDebugDash.GetValueOnGameThread())
+	{
+		DrawDebugSphere(GetWorld(), CharacterPtr->GetActorLocation(), 20, 20, FColor::Red, false, 10);
+		UE_LOG(LogTemp, Log, TEXT("%.2lf"), (CharacterPtr->GetActorLocation() - Start).Length());
+	}
+#endif
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
