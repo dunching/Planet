@@ -51,6 +51,10 @@ public:
         FActorComponentTickFunction* ThisTickFunction
     ) override;
 
+    virtual void PerformMovement(float DeltaTime)override;
+
+    virtual void ApplyRootMotionToVelocity(float deltaTime)override;
+
     virtual void SetGravityDirection(const FVector& GravityDir)override;
 
     virtual void PhysicsRotation(float DeltaTime)override;
