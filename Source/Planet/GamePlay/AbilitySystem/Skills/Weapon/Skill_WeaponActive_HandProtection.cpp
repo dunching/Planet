@@ -275,18 +275,21 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 				{
 				case ESkillType::kActive:
 				{
-					auto GAPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value->Handle);
-					if (!GAPtr)
+					for (const auto SkillHandleIter : Iter.Value->HandleAry)
 					{
-						continue;
-					}
-					auto GAInstPtr = Cast<USkill_Active_Base>(GAPtr->GetPrimaryInstance());
-					if (!GAInstPtr)
-					{
-						continue;
-					}
+						auto GAPtr = GASPtr->FindAbilitySpecFromHandle(SkillHandleIter);
+						if (!GAPtr)
+						{
+							continue;
+						}
+						auto GAInstPtr = Cast<USkill_Active_Base>(GAPtr->GetPrimaryInstance());
+						if (!GAInstPtr)
+						{
+							continue;
+						}
 
-					GAInstPtr->AddCooldownConsumeTime(1.f);
+						GAInstPtr->AddCooldownConsumeTime(1.f);
+					}
 				}
 				break;
 				}

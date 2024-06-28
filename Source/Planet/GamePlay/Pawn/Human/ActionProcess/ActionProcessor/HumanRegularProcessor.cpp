@@ -15,6 +15,7 @@
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include <Blueprint/WidgetBlueprintLibrary.h>
 
 #include "LogHelper/LogWriter.h"
 #include "ThreadPoolHelper/ThreadLibrary.h"
@@ -223,6 +224,34 @@ namespace HumanProcessor
 		if (PCPtr->GetFocusActor())
 		{
 			PCPtr->ClearFocus();
+		}
+	}
+
+	void FHumanRegularProcessor::LAltKeyPressed()
+	{
+	}
+
+	void FHumanRegularProcessor::LAltKeyReleased()
+	{
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (!OnwerActorPtr)
+		{
+			return;
+		}
+
+		auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
+		if (PlayerPCPtr)
+		{
+			if (PlayerPCPtr->bShowMouseCursor > 0)
+			{
+				PlayerPCPtr->bShowMouseCursor = 0;
+				UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
+			}
+			else
+			{
+				PlayerPCPtr->bShowMouseCursor = 1;
+				UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
+			}
 		}
 	}
 

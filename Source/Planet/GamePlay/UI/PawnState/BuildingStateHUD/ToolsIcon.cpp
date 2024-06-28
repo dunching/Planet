@@ -21,6 +21,19 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 
+namespace ToolsIcon
+{
+	const FName Content = TEXT("Content");
+
+	const FName Number = TEXT("Number");
+
+	const FName Enable = TEXT("Enable");
+
+	const FName SizeBox = TEXT("SizeBox");
+
+	const FName Icon = TEXT("Icon");
+}
+
 UToolIcon::UToolIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
@@ -34,7 +47,7 @@ void UToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->ToolSPtr);
+			ResetToolUIByData(NewPtr->ToolUnitPtr);
 		}
 	}
 }
@@ -43,34 +56,14 @@ void UToolIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kTool)
 	{
-		ToolSPtr = Cast<UToolUnit>(BasicUnitPtr);
-		SetNum(ToolSPtr->Num);
-		SetItemType();
-
-		auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Default")));
-		if (ImagePtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Collapsed);
-		}
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TEXT("Content")));
-		if (BorderPtr)
-		{
-			BorderPtr->SetVisibility(ESlateVisibility::Visible);
-		}
+		ToolUnitPtr = Cast<UToolUnit>(BasicUnitPtr);
 	}
 	else
 	{
-		auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Default")));
-		if (ImagePtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TEXT("Content")));
-		if (BorderPtr)
-		{
-			BorderPtr->SetVisibility(ESlateVisibility::Collapsed);
-		}
+		ToolUnitPtr = nullptr;
 	}
+	SetNum();
+	SetItemType();
 }
 
 void UToolIcon::EnableIcon(bool bIsEnable)
@@ -80,12 +73,26 @@ void UToolIcon::EnableIcon(bool bIsEnable)
 
 UToolUnit* UToolIcon::GetToolUnit() const
 {
-	return ToolSPtr;
+	return ToolUnitPtr;
 }
 
-void UToolIcon::SetNum(int32 NewNum)
+void UToolIcon::OnSublingIconReset(UToolUnit* InToolUnitPtr)
 {
-	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(TEXT("Number")));
+	if (InToolUnitPtr && (InToolUnitPtr == ToolUnitPtr))
+	{
+		ResetToolUIByData(nullptr);
+	}
+}
+
+void UToolIcon::SetNum()
+{
+	int32 NewNum = 0;
+	if (ToolUnitPtr)
+	{
+		NewNum = ToolUnitPtr->Num;
+	}
+
+	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(ToolsIcon::Number));
 	if (!NumTextPtr)
 	{
 		return;
@@ -104,20 +111,29 @@ void UToolIcon::SetNum(int32 NewNum)
 
 void UToolIcon::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(ToolsIcon::Icon));
 	if (ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(ToolSPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(ToolSPtr->GetIcon().Get());
-			});
+		if (ToolUnitPtr)
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Visible);
+
+			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(ToolUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+				{
+					ImagePtr->SetBrushFromTexture(ToolUnitPtr->GetIcon().Get());
+				});
+		}
+		else
+		{
+			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
 void UToolIcon::ResetSize(const FVector2D& Size)
 {
-	auto SizeBoxPtr = Cast<USizeBox>(GetWidgetFromName(TEXT("SizeBox")));
+	auto SizeBoxPtr = Cast<USizeBox>(GetWidgetFromName(ToolsIcon::SizeBox));
 	if (SizeBoxPtr)
 	{
 		SizeBoxPtr->SetWidthOverride(Size.X);

@@ -55,6 +55,10 @@ namespace HumanProcessor
 
 		virtual void TabKeyPressed()override;
 
+		virtual void LAltKeyPressed()override;
+
+		virtual void LAltKeyReleased()override;
+
 	private:
 
 		void SwitchCurrentWeapon();

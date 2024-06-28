@@ -38,7 +38,8 @@ struct FSkillSocketInfo
 
 	USkillUnit* SkillUnit = nullptr;
 
-	FGameplayAbilitySpecHandle Handle;
+	// Active类型只会有一个技能
+	TArray<FGameplayAbilitySpecHandle>HandleAry;
 };
 
 struct FWeaponSocketInfo
@@ -199,16 +200,16 @@ protected:
 
 	EWeaponSocket CurrentActivedWeaponSocket = EWeaponSocket::kNone;
 
-	TSharedPtr < FWeaponSocketInfo >FirstWeaponUnit;
+	TSharedPtr<FWeaponSocketInfo>FirstWeaponUnit;
 
-	TSharedPtr < FWeaponSocketInfo >SecondaryWeaponUnit;
+	TSharedPtr<FWeaponSocketInfo>SecondaryWeaponUnit;
 
 	TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>SkillsMap;
 
 	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>ToolsMap;
 
 	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActivedInfoAry;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;
 

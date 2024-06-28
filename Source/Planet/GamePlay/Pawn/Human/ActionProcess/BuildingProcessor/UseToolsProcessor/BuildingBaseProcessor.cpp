@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Async/Async.h"
 #include "EnhancedInputSubsystems.h"
+#include <Blueprint/WidgetBlueprintLibrary.h>
+#include <GameFramework/PlayerController.h>
 
 #include "Character/GravityMovementComponent.h"
 //#include "VoxelSceneActor.h"
@@ -158,6 +160,30 @@ namespace HumanProcessor
 	void FBuildingBaseProcessor::MouseRightPressed()
 	{
 
+	}
+
+	void FBuildingBaseProcessor::LAltKeyReleased()
+	{
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (!OnwerActorPtr)
+		{
+			return;
+		}
+
+		auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
+		if (PlayerPCPtr)
+		{
+			if (PlayerPCPtr->bShowMouseCursor > 0)
+			{
+				PlayerPCPtr->bShowMouseCursor = 0;
+				UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
+			}
+			else
+			{
+				PlayerPCPtr->bShowMouseCursor = 1;
+				UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
+			}
+		}
 	}
 
 	void FBuildingBaseProcessor::AddOrRemoveUseMenuItemEvent(bool bIsAdd)

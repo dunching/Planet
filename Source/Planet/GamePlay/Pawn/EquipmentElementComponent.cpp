@@ -75,18 +75,21 @@ void UEquipmentElementComponent::TickComponent(float DeltaTime, enum ELevelTick 
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		for (auto& Iter : SkillsMap)
 		{
-			auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Value->Handle);
-			if (!GameplayAbilitySpecPtr)
+			for (const auto SkillHandleIter : Iter.Value->HandleAry)
 			{
-				continue;
-			}
-			auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-			if (!GAInsPtr)
-			{
-				continue;
-			}
+				auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(SkillHandleIter);
+				if (!GameplayAbilitySpecPtr)
+				{
+					continue;
+				}
+				auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				if (!GAInsPtr)
+				{
+					continue;
+				}
 
-			GAInsPtr->Tick(DeltaTime);
+				GAInsPtr->Tick(DeltaTime);
+			}
 		}
 
 		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
@@ -151,7 +154,7 @@ void UEquipmentElementComponent::InitialBaseGAs()
 			FGameplayAbilitySpec(
 				Skill_Element_GoldClass
 			)
-		); 
+		);
 	}
 }
 
@@ -179,6 +182,7 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 		return;
 	}
 
+	// 所有插槽都会被注册；要移除会把Level设置为0，
 	for (const auto& Iter : InSkillsMap)
 	{
 		auto PreviouIter = SkillsMap.Find(Iter.Key);
@@ -193,6 +197,31 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 			}
 			else
 			{
+				switch ((*PreviouIter)->SkillUnit->SkillType)
+				{
+				case ESkillType::kPassive:
+				{
+					auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>((*PreviouIter)->SkillUnit);
+					if (PassiveSkillUnitPtr)
+					{
+						for (const auto& ElementIter : PassiveSkillUnitPtr->AddtionalElementMap)
+						{
+							switch (ElementIter.Key)
+							{
+							case EWuXingType::kGold:
+							{
+								OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element.GoldElement.RemoveCurrentValue(
+									PassiveSkillUnitPtr->PropertuModify_GUID
+								);
+							}
+							break;
+							}
+						}
+					}
+				}
+				break;
+				}
+
 				switch ((*PreviouIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
 				{
 				case ESkillUnitType::kHumanSkill_Talent_NuQi:
@@ -202,7 +231,10 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 				}
 				default:
 				{
-					OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(Iter.Value->Handle);
+					for (const auto SkillHandleIter : Iter.Value->HandleAry)
+					{
+						OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(SkillHandleIter);
+					}
 					SkillsMap.Remove(Iter.Value->SkillSocket);
 				}
 				break;
@@ -218,17 +250,50 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 			}
 			switch (Iter.Value->SkillUnit->SkillType)
 			{
-			case ESkillType::kActive:
 			case ESkillType::kPassive:
+			{
+				auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>(Iter.Value->SkillUnit);
+				if (PassiveSkillUnitPtr)
+				{
+					if (PassiveSkillUnitPtr->AddtionalElementMap.IsEmpty())
+					{
+						auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
+						Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+							FGameplayAbilitySpec(
+								Iter.Value->SkillUnit->SkillClass,
+								Iter.Value->SkillUnit->Level
+							)
+						));
+					}
+					else
+					{
+						for (const auto& ElementIter : PassiveSkillUnitPtr->AddtionalElementMap)
+						{
+							switch (ElementIter.Key)
+							{
+							case EWuXingType::kGold:
+							{
+								OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element.GoldElement.AddCurrentValue(
+									ElementIter.Value,
+									PassiveSkillUnitPtr->PropertuModify_GUID
+								);
+							}
+							break;
+							}
+						}
+					}
+				}
+			}
+			case ESkillType::kActive:
 			case ESkillType::kWeaponActive:
 			{
 				auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
-				Ref->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+				Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 					FGameplayAbilitySpec(
 						Iter.Value->SkillUnit->SkillClass,
 						Iter.Value->SkillUnit->Level
 					)
-				);
+				));
 			}
 			break;
 			case ESkillType::kTalentPassive:
@@ -251,13 +316,13 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 				case ESkillUnitType::kHumanSkill_Talent_NuQi:
 				case ESkillUnitType::kHumanSkill_Talent_YinYang:
 				{
-						auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
-						Ref->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
-							FGameplayAbilitySpec(
-								Iter.Value->SkillUnit->SkillClass,
-								Iter.Value->SkillUnit->Level
-							)
-						);
+					auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
+					Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+						FGameplayAbilitySpec(
+							Iter.Value->SkillUnit->SkillClass,
+							Iter.Value->SkillUnit->Level
+						)
+					));
 				}
 				break;
 				}
@@ -690,33 +755,36 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 			}
 
 			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle((*SkillIter)->Handle);
-			if (!GameplayAbilitySpecPtr)
+			for (const auto SkillHandleIter : (*SkillIter)->HandleAry)
 			{
-				return false;
-			}
-			auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-			if (!GAInsPtr)
-			{
-				return false;
-			}
+				auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(SkillHandleIter);
+				if (!GameplayAbilitySpecPtr)
+				{
+					return false;
+				}
+				auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				if (!GAInsPtr)
+				{
+					return false;
+				}
 
-			if (!ActivedCorrespondingWeapon(GAInsPtr))
-			{
-				return false;
-			}
+				if (!ActivedCorrespondingWeapon(GAInsPtr))
+				{
+					return false;
+				}
 
-			switch ((*SkillIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
-			{
-			case ESkillUnitType::kNone:
-			{
-			}
-			break;
-			default:
-			{
-				return ASCPtr->TryActivateAbility((*SkillIter)->Handle);
-			}
-			break;
+				switch ((*SkillIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
+				{
+				case ESkillUnitType::kNone:
+				{
+				}
+				break;
+				default:
+				{
+					return ASCPtr->TryActivateAbility(SkillHandleIter);
+				}
+				break;
+				}
 			}
 		}
 		break;

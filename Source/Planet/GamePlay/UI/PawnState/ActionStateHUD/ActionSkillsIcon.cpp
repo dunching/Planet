@@ -102,25 +102,28 @@ void UActionSkillsIcon::UpdateSkillState()
 	}
 
 	auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-	auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(SkillSocketInfoSPtr->Handle);
-	if (!GameplayAbilitySpecPtr)
+	for (const auto SkillHandleIter : SkillSocketInfoSPtr->HandleAry)
 	{
-		return;
+		auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(SkillHandleIter);
+		if (!GameplayAbilitySpecPtr)
+		{
+			return;
+		}
+		auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+		if (!GAInsPtr)
+		{
+			return;
+		}
+
+		float RemainingCooldown = 0.f;
+		float RemainingCooldownPercent = 0.f;
+
+		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+		SetCanRelease(bIsReady);
+
+		auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 	}
-	auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-	if (!GAInsPtr)
-	{
-		return;
-	}
-
-	float RemainingCooldown = 0.f;
-	float RemainingCooldownPercent = 0.f;
-
-	auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
-	SetCanRelease(bIsReady);
-
-	auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-	SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 }
 
 void UActionSkillsIcon::SetLevel()

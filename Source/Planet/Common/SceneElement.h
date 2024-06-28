@@ -239,8 +239,11 @@ public:
 
 	UPassiveSkillUnit();
 
+	// 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
 	TMap<EWuXingType, int32>AddtionalElementMap;
+
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
 	TSubclassOf<USkill_Base>AddtionalSkillClass;

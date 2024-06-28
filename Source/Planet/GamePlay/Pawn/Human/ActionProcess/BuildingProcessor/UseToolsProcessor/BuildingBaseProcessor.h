@@ -50,9 +50,11 @@ namespace HumanProcessor
 
 		virtual void MouseLeftPressed()override;
 
-		virtual void MouseLeftReleased();
+		virtual void MouseLeftReleased()override;
 
 		virtual void MouseRightPressed()override;
+
+		virtual void LAltKeyReleased()override;
 
 	private:
 

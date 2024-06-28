@@ -25,6 +25,8 @@ class PLANET_API UToolIcon : public UUserWidget, public IToolsIconInterface
 
 public:
 
+	using FOnResetUnit = TCallbackHandleContainer<void(UWeaponUnit*)>;
+
 	UToolIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
@@ -35,12 +37,16 @@ public:
 
 	UToolUnit* GetToolUnit()const;
 
+	void OnSublingIconReset(UToolUnit* InToolUnitPtr);
+
+	FOnResetUnit OnResetUnit;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;
 
 protected:
 
-	void SetNum(int32 NewNum);
+	void SetNum();
 
 	void SetItemType();
 
@@ -54,7 +60,7 @@ protected:
 
 private:
 
-	UToolUnit*ToolSPtr;
+	UToolUnit*ToolUnitPtr = nullptr;
 
 	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 

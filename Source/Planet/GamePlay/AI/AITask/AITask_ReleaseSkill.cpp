@@ -104,32 +104,35 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 						{
 							continue;
 						}
-						auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle((*SkillIter)->Handle);
-						if (!GameplayAbilitySpecPtr)
+						for (const auto SkillHandleIter : (*SkillIter)->HandleAry)
 						{
-							continue;
-						}
-						auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-						if (!GAInsPtr)
-						{
-							continue;
-						}
-
-						auto bIsReady = GAInsPtr->CanActivateAbility(
-							GAInsPtr->GetCurrentAbilitySpecHandle(), 
-							GAInsPtr->GetCurrentActorInfo()
-						);
-						if (bIsReady)
-						{
-							if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter))
+							auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(SkillHandleIter);
+							if (!GameplayAbilitySpecPtr)
 							{
-								ReleasingSkillMap.Add((*SkillIter)->Handle, Iter);
-								ReleasingSkillDelegateMap.Add(
-									(*SkillIter)->Handle,
-									GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
-								);
-								CurrentTaslHasReleaseNum++;
-								return true;
+								continue;
+							}
+							auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+							if (!GAInsPtr)
+							{
+								continue;
+							}
+
+							auto bIsReady = GAInsPtr->CanActivateAbility(
+								GAInsPtr->GetCurrentAbilitySpecHandle(),
+								GAInsPtr->GetCurrentActorInfo()
+							);
+							if (bIsReady)
+							{
+								if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter))
+								{
+									ReleasingSkillMap.Add(SkillHandleIter, Iter);
+									ReleasingSkillDelegateMap.Add(
+										SkillHandleIter,
+										GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
+									);
+									CurrentTaslHasReleaseNum++;
+									return true;
+								}
 							}
 						}
 					}

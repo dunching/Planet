@@ -11,6 +11,9 @@
 
 class UBasicUnit;
 
+/**
+ * 主动触发的节能
+ */
 UCLASS()
 class USkill_Active_Base : public USkill_Base
 {
