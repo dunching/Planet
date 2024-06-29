@@ -40,7 +40,7 @@ void UToolFuture_PickAxe::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 			EquipmentAxePtr = GameplayAbilityTargetData_DashPtr->EquipmentAxePtr;
 		}
 
-		StartTasksLink(0);
+		PerformAction();
 	}
 	else
 	{
@@ -65,30 +65,11 @@ void UToolFuture_PickAxe::CancelAbility(const FGameplayAbilitySpecHandle Handle,
 	bIsKeepAction = false;
 }
 
-void UToolFuture_PickAxe::StartNextLink()
-{
-	if (!bIsKeepAction)
-	{
-		K2_EndAbility();
-		return;
-	}
-
-	auto TaskPtr = UAbilityTask_Repeat::RepeatAction(
-		this,
-		.1f,
-		2
-	);
-
-	TaskPtr->Ability = this;
-	TaskPtr->OnFinished.AddDynamic(this, &ThisClass::StartTasksLink);
-	TaskPtr->ReadyForActivation();
-}
-
-void UToolFuture_PickAxe::StartTasksLink(int32 ActionNumber)
+void UToolFuture_PickAxe::PerformAction()
 {
 	if (EquipmentAxePtr && CharacterPtr && bIsKeepAction)
 	{
-		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::StartNextLink));
+		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::K2_CancelAbility));
 		{
 			const auto Len = PickAxeMontage->CalculateSequenceLength();
 			auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(

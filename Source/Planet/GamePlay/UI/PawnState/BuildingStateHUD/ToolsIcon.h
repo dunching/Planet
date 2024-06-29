@@ -25,7 +25,7 @@ class PLANET_API UToolIcon : public UUserWidget, public IToolsIconInterface
 
 public:
 
-	using FOnResetUnit = TCallbackHandleContainer<void(UWeaponUnit*)>;
+	using FOnResetUnit = TCallbackHandleContainer<void(UToolUnit*)>;
 
 	UToolIcon(const FObjectInitializer& ObjectInitializer);
 

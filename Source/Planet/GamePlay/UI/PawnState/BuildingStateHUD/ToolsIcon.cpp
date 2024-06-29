@@ -9,6 +9,7 @@
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
 #include "Components/Border.h"
+#include "Components/Overlay.h"
 
 #include "Components/SizeBox.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
@@ -32,6 +33,8 @@ namespace ToolsIcon
 	const FName SizeBox = TEXT("SizeBox");
 
 	const FName Icon = TEXT("Icon");
+
+	const FName Overlay = TEXT("Overlay");
 }
 
 UToolIcon::UToolIcon(const FObjectInitializer& ObjectInitializer) :
@@ -47,6 +50,7 @@ void UToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
+			OnResetUnit = NewPtr->OnResetUnit;
 			ResetToolUIByData(NewPtr->ToolUnitPtr);
 		}
 	}
@@ -62,6 +66,22 @@ void UToolIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	{
 		ToolUnitPtr = nullptr;
 	}
+
+	OnResetUnit.ExcuteCallback(ToolUnitPtr);
+
+	auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ToolsIcon::Overlay));
+	if (UIPtr)
+	{
+		if (ToolUnitPtr)
+		{
+			UIPtr->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			UIPtr->SetVisibility(ESlateVisibility::Hidden);
+		}
+	}
+
 	SetNum();
 	SetItemType();
 }

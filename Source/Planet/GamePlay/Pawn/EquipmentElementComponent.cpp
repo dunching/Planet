@@ -28,6 +28,10 @@
 #include "Skill_Talent_NuQi.h"
 #include "Skill_Talent_YinYang.h"
 #include "Skill_Element_Gold.h"
+#include "InputComponent/InputProcessorSubSystem.h"
+#include "Tool_PickAxe.h"
+#include "HumanRegularProcessor.h"
+#include "HumanCharacter.h"
 
 UEquipmentElementComponent::UEquipmentElementComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -174,7 +178,9 @@ void UEquipmentElementComponent::OnReceivedEventModifyData(FGameplayAbilityTarge
 	}
 }
 
-void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap)
+void UEquipmentElementComponent::RegisterMultiGAs(
+	const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap, bool bIsGenerationEvent 
+)
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
 	if (!OnwerActorPtr)
@@ -333,23 +339,80 @@ void UEquipmentElementComponent::RegisterMultiGAs(const TMap<FGameplayTag, TShar
 			}
 		}
 	}
+
+	if (bIsGenerationEvent)
+	{
+		GenerationCanbeActiveSkills();
+	}
 }
 
-void UEquipmentElementComponent::RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo)
+void UEquipmentElementComponent::GenerationCanbeActiveTools()
 {
-	ToolsMap.Add(InToolInfo->SkillSocket, InToolInfo);
+	CanbeActiveToolsAry.Empty();
+
+	// 激活对应的工具
+	for (const auto& Iter : ToolsMap)
+	{
+		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
+
+		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kSwitchToTool;
+		CanbeActivedInfoSPtr->Key = Iter.Value->Key;
+		CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
+
+		CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
+	}
+
+	// “使用”一次这个工具
+	{
+		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
+		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveTool;
+		CanbeActivedInfoSPtr->Key = EKeys::LeftMouseButton;
+
+		CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
+	}
 }
 
-void UEquipmentElementComponent::GenerationCanbeActivedInfo()
+const TArray<TSharedPtr<FCanbeActivedInfo>>& UEquipmentElementComponent::GetCanbeActivedTools() const
 {
-	CanbeActivedInfoAry.Empty();
+	return CanbeActiveToolsAry;
+}
+
+void UEquipmentElementComponent::RetractputTool()
+{
+	if (CurrentEquipmentPtr)
+	{
+		CurrentEquipmentPtr->Destroy();
+		CurrentEquipmentPtr = nullptr;
+	}
+
+	PreviousTool = FGameplayTag::EmptyTag;
+}
+
+void UEquipmentElementComponent::RegisterTool(
+	const TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>>& InToolInfoMap, bool bIsGenerationEvent
+)
+{
+	for (const auto Iter : InToolInfoMap)
+	{
+		ToolsMap.Add(Iter.Key, Iter.Value);
+	}
+
+	if (bIsGenerationEvent)
+	{
+		GenerationCanbeActiveTools();
+	}
+}
+
+void UEquipmentElementComponent::GenerationCanbeActiveSkills()
+{
+	CanbeActiveSkillsAry.Empty();
 
 	// 响应武器
 	{
 		TSharedPtr < FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
 		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kWeaponActiveSkill;
 		CanbeActivedInfoSPtr->Key = EKeys::LeftMouseButton;
-		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
+		CanbeActiveSkillsAry.Add(CanbeActivedInfoSPtr);
 	}
 
 	// 响应主动技能
@@ -359,9 +422,9 @@ void UEquipmentElementComponent::GenerationCanbeActivedInfo()
 
 		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveSkill;
 		CanbeActivedInfoSPtr->Key = Iter.Value->Key;
-		CanbeActivedInfoSPtr->SkillSocket = Iter.Value->SkillSocket;
+		CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
 
-		CanbeActivedInfoAry.Add(CanbeActivedInfoSPtr);
+		CanbeActiveSkillsAry.Add(CanbeActivedInfoSPtr);
 	}
 }
 
@@ -595,9 +658,14 @@ const TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>& UEquipmentElementCompone
 	return ToolsMap;
 }
 
-const TArray<TSharedPtr<FCanbeActivedInfo>>& UEquipmentElementComponent::GetCanbeActivedInfo() const
+ATool_Base* UEquipmentElementComponent::GetCurrentTool() const
 {
-	return CanbeActivedInfoAry;
+	return CurrentEquipmentPtr;
+}
+
+const TArray<TSharedPtr<FCanbeActivedInfo>>& UEquipmentElementComponent::GetCanbeActivedSkills() const
+{
+	return CanbeActiveSkillsAry;
 }
 
 void UEquipmentElementComponent::AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
@@ -679,48 +747,220 @@ void UEquipmentElementComponent::RemoveTag(const FGameplayTag& Tag)
 	TagsModifyHandleContainer.ExcuteCallback(ETagChangeType::kRemove, Tag);
 }
 
-bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop)
+bool UEquipmentElementComponent::ActiveSkill(
+	const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop
+)
 {
-	if (CanbeActivedInfoSPtr->Type == FCanbeActivedInfo::EType::kWeaponActiveSkill)
+	switch (CanbeActivedInfoSPtr->Type)
 	{
-		TSharedPtr < FWeaponSocketInfo > WeaponUnit = GetActivedWeapon();
-		if (!WeaponUnit)
-		{
-			return false;
-		}
-		if (!WeaponUnit->WeaponUnitPtr)
-		{
-			return false;
-		}
+	case FCanbeActivedInfo::EType::kSwitchToTool:
+	{
+		return ActiveSkill_SwitchToTool(CanbeActivedInfoSPtr, bIsAutomaticStop);
+	}
+	break;
+	case FCanbeActivedInfo::EType::kActiveTool:
+	{
+		return ActiveSkill_ActiveTool(CanbeActivedInfoSPtr, bIsAutomaticStop);
+	}
+	break;
+	case FCanbeActivedInfo::EType::kActiveSkill:
+	{
+		return ActiveSkill_Active(CanbeActivedInfoSPtr, bIsAutomaticStop);
+	}
+	break;
+	case FCanbeActivedInfo::EType::kWeaponActiveSkill:
+	{
+		return ActiveSkill_WeaponActive(CanbeActivedInfoSPtr, bIsAutomaticStop);
+	}
+	break;
+	default:
+		break;
+	}
 
-		FGameplayEventData Payload;
-		switch (WeaponUnit->WeaponUnitPtr->FirstSkill->GetSceneElementType<ESkillUnitType>())
+	return false;
+}
+
+void UEquipmentElementComponent::CancelSkill_SwitchToTool(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+{
+
+}
+
+bool UEquipmentElementComponent::ActiveSkill_SwitchToTool(
+	const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false*/
+)
+{
+	if (PreviousTool == CanbeActivedInfoSPtr->Socket)
+	{
+		RetractputTool();
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+		return false;
+	}
+
+	auto ToolIter = ToolsMap.Find(CanbeActivedInfoSPtr->Socket);
+	if (!ToolIter)
+	{
+		return  false;
+	}
+
+	PreviousTool = CanbeActivedInfoSPtr->Socket;
+
+	FGameplayEventData Payload;
+	switch ((*ToolIter)->ToolUnitPtr->GetSceneElementType<EToolUnitType>())
+	{
+	case EToolUnitType::kPickAxe:
+	{
+		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		if (!OnwerActorPtr)
 		{
-		case ESkillUnitType::kHumanSkill_WeaponActive_PickAxe_Attack1:
+			return  false;
+		}
+		OnwerActorPtr->SwitchAnimLink(EAnimLinkClassType::kPickAxe);
+
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.Owner = OnwerActorPtr;
+		auto AxePtr = GetWorld()->SpawnActor<ATool_PickAxe>((*ToolIter)->ToolUnitPtr->ToolActorClass, ActorSpawnParameters);
+		if (AxePtr)
 		{
-			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
-			GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(ActivedWeaponPtr);
-			GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
-			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+			CurrentEquipmentPtr = AxePtr;
+			return true;
 		}
-		break;
-		case ESkillUnitType::kHumanSkill_WeaponActive_HandProtection_Attack1:
+	}
+	break;
+	}
+
+
+	return false;
+}
+
+void UEquipmentElementComponent::CancelSkill_ActiveTool(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+{
+	auto OnwerActorPtr = GetOwner<AHumanCharacter>();
+	if (OnwerActorPtr)
+	{
+		if (CurrentEquipmentPtr)
 		{
-			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
-			GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(ActivedWeaponPtr);
-			GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
-			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+			CurrentEquipmentPtr->DoActionByCharacter(OnwerActorPtr, EEquipmentActionType::kStopAction);
 		}
-		break;
-		case ESkillUnitType::kHumanSkill_WeaponActive_RangeTest:
+	}
+}
+
+bool UEquipmentElementComponent::ActiveSkill_ActiveTool(
+	const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
+)
+{
+	auto OnwerActorPtr = GetOwner<AHumanCharacter>();
+	if (OnwerActorPtr)
+	{
+		if (CurrentEquipmentPtr)
 		{
-			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest;
-			GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(ActivedWeaponPtr);
-			GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
-			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+			CurrentEquipmentPtr->DoActionByCharacter(OnwerActorPtr, EEquipmentActionType::kStartAction);
+
+			return true;
 		}
-		break;
-		}
+	}
+	return false;
+}
+
+void UEquipmentElementComponent::CancelSkill_WeaponActive(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+{
+	TSharedPtr < FWeaponSocketInfo > WeaponUnit;
+	switch (CurrentActivedWeaponSocket)
+	{
+	case EWeaponSocket::kMain:
+	{
+		WeaponUnit = FirstWeaponUnit;
+	}
+	break;
+	case EWeaponSocket::kSecondary:
+	{
+		WeaponUnit = SecondaryWeaponUnit;
+	}
+	break;
+	default:
+	{
+		return;
+	}
+	}
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		ASCPtr->CancelAbilityHandle(WeaponUnit->Handle);
+	}
+}
+
+bool UEquipmentElementComponent::ActiveSkill_WeaponActive(
+	const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false*/
+)
+{
+	TSharedPtr < FWeaponSocketInfo > WeaponUnit = GetActivedWeapon();
+	if (!WeaponUnit)
+	{
+		return false;
+	}
+	if (!WeaponUnit->WeaponUnitPtr)
+	{
+		return false;
+	}
+
+	FGameplayEventData Payload;
+	switch (WeaponUnit->WeaponUnitPtr->FirstSkill->GetSceneElementType<ESkillUnitType>())
+	{
+	case ESkillUnitType::kHumanSkill_WeaponActive_PickAxe_Attack1:
+	{
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
+		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(ActivedWeaponPtr);
+		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
+		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+	}
+	break;
+	case ESkillUnitType::kHumanSkill_WeaponActive_HandProtection_Attack1:
+	{
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
+		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(ActivedWeaponPtr);
+		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
+		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+	}
+	break;
+	case ESkillUnitType::kHumanSkill_WeaponActive_RangeTest:
+	{
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest;
+		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(ActivedWeaponPtr);
+		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
+		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+	}
+	break;
+	}
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return  false;
+	}
+
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	return ASCPtr->TriggerAbilityFromGameplayEvent(
+		WeaponUnit->Handle,
+		ASCPtr->AbilityActorInfo.Get(),
+		FGameplayTag::EmptyTag,
+		&Payload,
+		*ASCPtr
+	);
+}
+
+bool UEquipmentElementComponent::ActiveSkill_Active(
+	const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false*/
+)
+{
+	auto SkillIter = SkillsMap.Find(CanbeActivedInfoSPtr->Socket);
+	if (!SkillIter)
+	{
+		return  false;
+	}
+
+	switch ((*SkillIter)->SkillUnit->SkillType)
+	{
+	case ESkillType::kActive:
+	{
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		if (!OnwerActorPtr)
 		{
@@ -728,102 +968,64 @@ bool UEquipmentElementComponent::ActiveSkill(const TSharedPtr<FCanbeActivedInfo>
 		}
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		return ASCPtr->TriggerAbilityFromGameplayEvent(
-			WeaponUnit->Handle,
-			ASCPtr->AbilityActorInfo.Get(),
-			FGameplayTag::EmptyTag,
-			&Payload,
-			*ASCPtr
-		);
+		for (const auto SkillHandleIter : (*SkillIter)->HandleAry)
+		{
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(SkillHandleIter);
+			if (!GameplayAbilitySpecPtr)
+			{
+				return false;
+			}
+			auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+			if (!GAInsPtr)
+			{
+				return false;
+			}
+
+			if (!ActivedCorrespondingWeapon(GAInsPtr))
+			{
+				return false;
+			}
+
+			switch ((*SkillIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
+			{
+			case ESkillUnitType::kNone:
+			{
+			}
+			break;
+			default:
+			{
+				return ASCPtr->TryActivateAbility(SkillHandleIter);
+			}
+			break;
+			}
+		}
 	}
-	else
-	{
-		auto SkillIter = SkillsMap.Find(CanbeActivedInfoSPtr->SkillSocket);
-		if (!SkillIter)
-		{
-			return  false;
-		}
-
-		switch ((*SkillIter)->SkillUnit->SkillType)
-		{
-		case ESkillType::kActive:
-		{
-			auto OnwerActorPtr = GetOwner<ACharacterBase>();
-			if (!OnwerActorPtr)
-			{
-				return  false;
-			}
-
-			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-			for (const auto SkillHandleIter : (*SkillIter)->HandleAry)
-			{
-				auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(SkillHandleIter);
-				if (!GameplayAbilitySpecPtr)
-				{
-					return false;
-				}
-				auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-				if (!GAInsPtr)
-				{
-					return false;
-				}
-
-				if (!ActivedCorrespondingWeapon(GAInsPtr))
-				{
-					return false;
-				}
-
-				switch ((*SkillIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
-				{
-				case ESkillUnitType::kNone:
-				{
-				}
-				break;
-				default:
-				{
-					return ASCPtr->TryActivateAbility(SkillHandleIter);
-				}
-				break;
-				}
-			}
-		}
-		break;
-		}
+	break;
 	}
 	return false;
 }
 
 void UEquipmentElementComponent::CancelSkill(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
 {
-	if (CanbeActivedInfoSPtr->Type == FCanbeActivedInfo::EType::kWeaponActiveSkill)
+	switch (CanbeActivedInfoSPtr->Type)
 	{
-		TSharedPtr < FWeaponSocketInfo > WeaponUnit;
-		switch (CurrentActivedWeaponSocket)
-		{
-		case EWeaponSocket::kMain:
-		{
-			WeaponUnit = FirstWeaponUnit;
-		}
-		break;
-		case EWeaponSocket::kSecondary:
-		{
-			WeaponUnit = SecondaryWeaponUnit;
-		}
-		break;
-		default:
-		{
-			return;
-		}
-		}
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
-		if (OnwerActorPtr)
-		{
-			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-			ASCPtr->CancelAbilityHandle(WeaponUnit->Handle);
-		}
+	case FCanbeActivedInfo::EType::kWeaponActiveSkill:
+	{
+		CancelSkill_WeaponActive(CanbeActivedInfoSPtr);
 	}
-	else
+	break;
+	case FCanbeActivedInfo::EType::kSwitchToTool:
 	{
+		CancelSkill_SwitchToTool(CanbeActivedInfoSPtr);
+	}
+	break;
+	case FCanbeActivedInfo::EType::kActiveTool:
+	{
+		CancelSkill_ActiveTool(CanbeActivedInfoSPtr);
+	}
+	break;
+	default:
+		break;
 	}
 }
 

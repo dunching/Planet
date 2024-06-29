@@ -59,12 +59,8 @@ namespace HumanProcessor
 	private:
 
 		void AddOrRemoveUseMenuItemEvent(bool bIsAdd);
-		
-		TMap<FKey, FToolsSocketInfo>HandleKeysMap;
 
-		ATool_Base* CurrentEquipmentPtr = nullptr;
-
-		UToolUnit::IDType PreviousID = 0;
+		TMap<FKey, TSharedPtr<FCanbeActivedInfo>>HandleKeysMap;
 
 	};
 

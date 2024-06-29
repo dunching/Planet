@@ -223,7 +223,6 @@ void UTalentAllocationComponent::SyncToHolding()
 					}
 					auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 					EICPtr->RegisterMultiGAs(SkillsMap);
-					EICPtr->GenerationCanbeActivedInfo();
 				}
 			}
 		}

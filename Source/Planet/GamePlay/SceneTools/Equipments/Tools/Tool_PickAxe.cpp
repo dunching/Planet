@@ -34,9 +34,9 @@ void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmen
 	case EEquipmentActionType::kStartAction:
 	{
 		FGameplayEventData Payload;
-		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_ToolFuture_PickAxe;
-		GameplayAbilityTargetDashPtr->EquipmentAxePtr = this;
-		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_ToolFuture_PickAxe;
+		GameplayAbilityTargetDataPtr->EquipmentAxePtr = this;
+		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(

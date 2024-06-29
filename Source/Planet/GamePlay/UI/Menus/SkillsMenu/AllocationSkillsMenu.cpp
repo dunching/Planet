@@ -162,7 +162,6 @@ void UAllocationSkillsMenu::NativeDestruct()
 		}
 		EICPtr->RegisterMultiGAs(SkillsMap);
 	}
-	EICPtr->GenerationCanbeActivedInfo();
 }
 
 void UAllocationSkillsMenu::ResetUIByData_Skills()

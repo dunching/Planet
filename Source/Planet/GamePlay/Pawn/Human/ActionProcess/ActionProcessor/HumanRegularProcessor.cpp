@@ -313,7 +313,7 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				auto CanbeActivedInfoAry = OnwerActorPtr->GetEquipmentItemsComponent()->GetCanbeActivedInfo();
+				auto CanbeActivedInfoAry = OnwerActorPtr->GetEquipmentItemsComponent()->GetCanbeActivedSkills();
 				for (const auto& Iter : CanbeActivedInfoAry)
 				{
 					HandleKeysMap.Add(Iter->Key, Iter);

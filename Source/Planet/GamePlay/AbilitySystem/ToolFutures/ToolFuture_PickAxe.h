@@ -48,10 +48,7 @@ public:
 
 protected:
 
-	void StartNextLink();
-
-	UFUNCTION()
-	void StartTasksLink(int32 ActionNumber);
+	virtual void PerformAction();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* PickAxeMontage = nullptr;

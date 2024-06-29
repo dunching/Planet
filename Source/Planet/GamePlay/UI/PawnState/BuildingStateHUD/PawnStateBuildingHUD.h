@@ -36,7 +36,7 @@ public:
 
 	virtual void ResetUIByData()override;
 
-	TArray<FToolsSocketInfo>GetEquipMenus();
+	TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>>GetEquipMenus();
 
 protected:
 
@@ -57,6 +57,12 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ToolSocket6;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
+	FKey ToolSocket7;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
+	FKey ToolSocket8;
 
 	FCharacterAttributes* PawnDataStructPtr = nullptr;
 

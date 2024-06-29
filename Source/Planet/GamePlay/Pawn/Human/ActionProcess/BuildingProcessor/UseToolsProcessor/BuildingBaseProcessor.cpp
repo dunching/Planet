@@ -64,12 +64,13 @@ namespace HumanProcessor
 	{
 		AddOrRemoveUseMenuItemEvent(false);
 
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
-
-		if (CurrentEquipmentPtr)
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (OnwerActorPtr)
 		{
-			CurrentEquipmentPtr->Destroy();
+			OnwerActorPtr->GetEquipmentItemsComponent()->RetractputTool();
 		}
+
+		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
 
 		Super::QuitAction();
 	}
@@ -78,37 +79,23 @@ namespace HumanProcessor
 	{
 		if (Params.Event == EInputEvent::IE_Pressed)
 		{
-			auto Iter = HandleKeysMap.Find(Params.Key);
-			if (Iter)
+			auto SkillIter = HandleKeysMap.Find(Params.Key);
+			if (SkillIter)
 			{
-				const auto ToolSPtr = Iter->ToolUnitPtr;
-
-				if (PreviousID == ToolSPtr->GetID())
-				{
-					if (CurrentEquipmentPtr)
-					{
-						CurrentEquipmentPtr->Destroy();
-					}
-
-					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-
-					return;
-				}
-
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (OnwerActorPtr)
 				{
-					OnwerActorPtr->SwitchAnimLink(EAnimLinkClassType::kPickAxe);
-
-					FActorSpawnParameters ActorSpawnParameters;
-					ActorSpawnParameters.Owner = OnwerActorPtr;
-					auto AxePtr = GetWorldImp()->SpawnActor<ATool_Base>(ToolSPtr->ToolActorClass, ActorSpawnParameters);
-					if (AxePtr)
-					{
-						CurrentEquipmentPtr = AxePtr;
-						PreviousID = ToolSPtr->GetID();
-					}
+					OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter);
 				}
+			}
+		}
+		else
+		{
+			auto SkillIter = HandleKeysMap.Find(Params.Key);
+			if (SkillIter)
+			{
+				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+				OnwerActorPtr->GetEquipmentItemsComponent()->CancelSkill(*SkillIter);
 			}
 		}
 	}
@@ -122,7 +109,7 @@ namespace HumanProcessor
 			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 		}
 	}
-	
+
 	void FBuildingBaseProcessor::VKeyPressed()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
@@ -135,26 +122,11 @@ namespace HumanProcessor
 
 	void FBuildingBaseProcessor::MouseLeftPressed()
 	{
-		if (CurrentEquipmentPtr)
-		{
-			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			if (OnwerActorPtr)
-			{
-				CurrentEquipmentPtr->DoActionByCharacter(OnwerActorPtr, EEquipmentActionType::kStartAction);
-			}
-		}
+
 	}
 
 	void FBuildingBaseProcessor::MouseLeftReleased()
 	{
-		if (CurrentEquipmentPtr)
-		{
-			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			if (OnwerActorPtr)
-			{
-				CurrentEquipmentPtr->DoActionByCharacter(OnwerActorPtr, EEquipmentActionType::kStopAction);
-			}
-		}
 	}
 
 	void FBuildingBaseProcessor::MouseRightPressed()
@@ -194,13 +166,12 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				auto ActiveSkillsAry = OnwerActorPtr->GetEquipmentItemsComponent()->GetTools();
-				for (const auto& Iter : ActiveSkillsAry)
+				auto CanbeActiveInfos = OnwerActorPtr->GetEquipmentItemsComponent()->GetCanbeActivedTools();
+				for (const auto& Iter : CanbeActiveInfos)
 				{
-	//				HandleKeysMap.Add(Iter.Value->Key, Iter.Value);
+					HandleKeysMap.Add(Iter->Key, Iter);
 				}
 			}
 		}
 	}
-
 }

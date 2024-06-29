@@ -16,6 +16,7 @@
 
 class UGameplayAbility;
 
+class ATool_Base;
 class UBasicFuturesBase;
 class UPlanetGameplayAbility_HumanSkillBase;
 class IGAEventModifyInterface;
@@ -55,6 +56,9 @@ struct FCanbeActivedInfo
 {
 	enum class EType
 	{
+		kSwitchToTool,
+		kActiveTool,
+
 		kActiveSkill,
 		kWeaponActiveSkill,
 	};
@@ -63,7 +67,7 @@ struct FCanbeActivedInfo
 
 	FKey Key;
 
-	FGameplayTag SkillSocket;
+	FGameplayTag Socket;
 };
 
 struct FToolsSocketInfo
@@ -102,20 +106,28 @@ public:
 
 	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAReceivedEvent& OutGAEventData);
 
-	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedInfo()const;
-
-	void GenerationCanbeActivedInfo();
-
 #pragma region Tools
-	void RegisterTool(const TSharedPtr < FToolsSocketInfo>& InToolInfo);
+	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedTools()const;
+
+	void RetractputTool();
+
+	void RegisterTool(
+		const TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>>& InToolInfoMap, bool bIsGenerationEvent = true
+	);
 
 	TSharedPtr < FToolsSocketInfo> FindTool(const FGameplayTag& Tag);
 
 	const TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>& GetTools()const;
+
+	ATool_Base* GetCurrentTool()const;
 #pragma endregion Tools
 
+	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedSkills()const;
+
 #pragma region Skills
-	void RegisterMultiGAs(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
+	void RegisterMultiGAs(
+		const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap, bool bIsGenerationEvent = true
+	);
 
 	TSharedPtr < FSkillSocketInfo> FindSkill(const FGameplayTag& Tag);
 
@@ -160,7 +172,9 @@ public:
 
 	void RemoveTag(const FGameplayTag& Tag);
 
-	bool ActiveSkill(const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false);
+	bool ActiveSkill(
+		const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+	);
 
 	void CancelSkill(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
 
@@ -169,6 +183,32 @@ public:
 	FOnActivedWeaponChangedContainer OnActivedWeaponChangedContainer;
 
 protected:
+
+	void GenerationCanbeActiveTools();
+
+	void CancelSkill_SwitchToTool(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+
+	bool ActiveSkill_SwitchToTool(
+		const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+	);
+
+	void CancelSkill_ActiveTool(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+
+	bool ActiveSkill_ActiveTool(
+		const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+	);
+
+	void GenerationCanbeActiveSkills();
+
+	void CancelSkill_WeaponActive(const TSharedPtr < FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+
+	bool ActiveSkill_WeaponActive(
+		const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+	);
+
+	bool ActiveSkill_Active(
+		const TSharedPtr <FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+	);
 
 	bool ActiveWeapon(EWeaponSocket WeaponSocket);
 
@@ -200,15 +240,21 @@ protected:
 
 	EWeaponSocket CurrentActivedWeaponSocket = EWeaponSocket::kNone;
 
+	FGameplayTag PreviousTool = FGameplayTag::EmptyTag;
+
+	ATool_Base* CurrentEquipmentPtr = nullptr;
+
+	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>ToolsMap;
+
+	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActiveToolsAry;
+
 	TSharedPtr<FWeaponSocketInfo>FirstWeaponUnit;
 
 	TSharedPtr<FWeaponSocketInfo>SecondaryWeaponUnit;
 
 	TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>SkillsMap;
 
-	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>ToolsMap;
-
-	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActivedInfoAry;
+	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActiveSkillsAry;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;

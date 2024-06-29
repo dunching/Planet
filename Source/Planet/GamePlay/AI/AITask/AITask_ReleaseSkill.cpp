@@ -90,7 +90,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 		}
 		else
 		{
-			auto CanbeActivedInfo = CharacterPtr->GetEquipmentItemsComponent()->GetCanbeActivedInfo();
+			auto CanbeActivedInfo = CharacterPtr->GetEquipmentItemsComponent()->GetCanbeActivedSkills();
 			{
 				for (const auto& Iter : CanbeActivedInfo)
 				{
@@ -99,7 +99,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 					case FCanbeActivedInfo::EType::kActiveSkill:
 					{
 						auto Skills = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
-						auto SkillIter = Skills.Find(Iter->SkillSocket);
+						auto SkillIter = Skills.Find(Iter->Socket);
 						if (!SkillIter)
 						{
 							continue;

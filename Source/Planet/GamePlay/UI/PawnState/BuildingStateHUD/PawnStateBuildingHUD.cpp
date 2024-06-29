@@ -11,17 +11,24 @@
 #include "ToolsIcon.h"
 #include "AssetRefMap.h"
 
-const FName Tool1 = TEXT("Tool1");
+namespace PawnStateBuildingHUD
+{
+	const FName EquipIcon1 = TEXT("EquipIcon1");
 
-const FName Tool2 = TEXT("Tool2");
+	const FName EquipIcon2 = TEXT("EquipIcon2");
 
-const FName Tool3 = TEXT("Tool3");
+	const FName EquipIcon3 = TEXT("EquipIcon3");
 
-const FName Tool4 = TEXT("Tool4");
+	const FName EquipIcon4 = TEXT("EquipIcon4");
 
-const FName Tool5 = TEXT("Tool5");
+	const FName EquipIcon5 = TEXT("EquipIcon5");
 
-const FName Tool6 = TEXT("Tool6");
+	const FName EquipIcon6 = TEXT("EquipIcon6");
+
+	const FName EquipIcon7 = TEXT("EquipIcon7");
+
+	const FName EquipIcon8 = TEXT("EquipIcon8");
+}
 
 void UPawnStateBuildingHUD::NativeConstruct()
 {
@@ -32,6 +39,11 @@ void UPawnStateBuildingHUD::NativeConstruct()
 
 void UPawnStateBuildingHUD::NativeDestruct()
 {
+	ON_SCOPE_EXIT
+	{
+		Super::NativeDestruct();
+	};
+
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
 	{
@@ -39,14 +51,9 @@ void UPawnStateBuildingHUD::NativeDestruct()
 	}
 	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
 	{
-		auto Ary = GetEquipMenus();
-		for (auto& Iter : Ary)
-		{
-		//	EICPtr->RegisterTool(Iter);
-		}
+		const auto Result = GetEquipMenus();
+		EICPtr->RegisterTool(Result);
 	}
-
-	Super::NativeDestruct();
 }
 
 void UPawnStateBuildingHUD::ResetUIByData()
@@ -60,12 +67,14 @@ void UPawnStateBuildingHUD::ResetUIByData()
 	{
 		TArray<FName>Ary
 		{
-			Tool1,
-			Tool2,
-			Tool3,
-			Tool4,
-			Tool5,
-			Tool6,
+			PawnStateBuildingHUD::EquipIcon1,
+			PawnStateBuildingHUD::EquipIcon2,
+			PawnStateBuildingHUD::EquipIcon3,
+			PawnStateBuildingHUD::EquipIcon4,
+			PawnStateBuildingHUD::EquipIcon5,
+			PawnStateBuildingHUD::EquipIcon6,
+			PawnStateBuildingHUD::EquipIcon7,
+			PawnStateBuildingHUD::EquipIcon8,
 		};
 
 		for (const auto& Iter : Ary)
@@ -74,10 +83,32 @@ void UPawnStateBuildingHUD::ResetUIByData()
 			if (IconPtr)
 			{
 				auto Result = EICPtr->FindTool(IconPtr->IconSocket);
-				if (Result->ToolUnitPtr)
+				if (Result && Result->ToolUnitPtr)
 				{
+					IconPtr->ResetToolUIByData(Result->ToolUnitPtr);
 				}
-				IconPtr->ResetToolUIByData(Result->ToolUnitPtr);
+				else
+				{
+					IconPtr->ResetToolUIByData(nullptr);
+				}
+			}
+		}
+		for (const auto& FirstIter : Ary)
+		{
+			for (const auto& SecondIter : Ary)
+			{
+				if (FirstIter == SecondIter)
+				{
+					continue;
+				}
+				auto FirstPtr = Cast<UToolIcon>(GetWidgetFromName(FirstIter));
+				auto SecondPtr = Cast<UToolIcon>(GetWidgetFromName(SecondIter));
+				if (FirstPtr && SecondPtr)
+				{
+					auto Result = SecondPtr->OnResetUnit.AddCallback(
+						std::bind(&UToolIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
+					Result->bIsAutoUnregister = false;
+				}
 			}
 		}
 	}
@@ -88,21 +119,35 @@ UToolsMenu* UPawnStateBuildingHUD::GetEquipMenu()
 	return Cast<UToolsMenu>(GetWidgetFromName(ItemMenu));
 }
 
-TArray<FToolsSocketInfo> UPawnStateBuildingHUD::GetEquipMenus()
+TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>> UPawnStateBuildingHUD::GetEquipMenus()
 {
-	TArray<FToolsSocketInfo>Result;
+	TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>>Result;
 
-	auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Tool1));
-	if (UIPtr)
+	TArray<TTuple<FKey, FName>>Ary
 	{
-		FToolsSocketInfo ToolsSocketInfo;
+		{ToolSocket1, PawnStateBuildingHUD::EquipIcon1},
+		{ToolSocket2, PawnStateBuildingHUD::EquipIcon2},
+		{ToolSocket3, PawnStateBuildingHUD::EquipIcon3},
+		{ToolSocket4, PawnStateBuildingHUD::EquipIcon4},
+		{ToolSocket5, PawnStateBuildingHUD::EquipIcon5},
+		{ToolSocket6, PawnStateBuildingHUD::EquipIcon6},
+		{ToolSocket7, PawnStateBuildingHUD::EquipIcon7},
+		{ToolSocket8, PawnStateBuildingHUD::EquipIcon8},
+	};
 
-		ToolsSocketInfo.Key = ToolSocket1;
-		ToolsSocketInfo.SkillSocket = UIPtr->IconSocket;
-		ToolsSocketInfo.ToolUnitPtr = UIPtr->GetToolUnit();
+	for (const auto& Iter : Ary)
+	{
+		auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Iter.Get<1>()));
+		if (UIPtr)
+		{
+			TSharedPtr<FToolsSocketInfo> ToolsSocketInfoSPtr = MakeShared<FToolsSocketInfo>();
 
-		Result.Add(ToolsSocketInfo);
+			ToolsSocketInfoSPtr->Key = Iter.Get<0>();
+			ToolsSocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
+			ToolsSocketInfoSPtr->ToolUnitPtr = UIPtr->GetToolUnit();
+
+			Result.Add(ToolsSocketInfoSPtr->SkillSocket, ToolsSocketInfoSPtr);
+		}
 	}
-
 	return Result;
 }

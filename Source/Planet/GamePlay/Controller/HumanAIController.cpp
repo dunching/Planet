@@ -269,6 +269,5 @@ void AHumanAIController::InitialCharacter()
 			}
 			EICPtr->RegisterMultiGAs(SkillsMap);
 		}
-		EICPtr->GenerationCanbeActivedInfo();
 	}
 }
