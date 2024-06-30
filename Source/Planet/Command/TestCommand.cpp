@@ -29,6 +29,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "HumanControllerInterface.h"
+#include "InteractiveBaseGAComponent.h"
 
 void TestCommand::AddCahracterTestData()
 {
@@ -213,17 +214,18 @@ void TestCommand::TestGAEventModify()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(123, 523));
-		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(1, 423));
-		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(12, 323));
-		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(13, 223));
+		auto InteractiveBaseGAComponentPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(123, 523));
+		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(1, 423));
+		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(12, 323));
+		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(13, 223));
 
 		auto d = MakeShared<MyStruct>(14, 1231);
-		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(d);
-		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(14, 1232));
-		CharacterPtr->GetEquipmentItemsComponent()->AddSendEventModify(MakeShared<MyStruct>(14, 1233));
+		InteractiveBaseGAComponentPtr->AddSendEventModify(d);
+		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1232));
+		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1233));
 
-		CharacterPtr->GetEquipmentItemsComponent()->RemoveSendEventModify(d);
+		InteractiveBaseGAComponentPtr->RemoveSendEventModify(d);
 
 
 	}

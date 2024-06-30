@@ -72,18 +72,19 @@ void UToolFuture_PickAxe::PerformAction()
 		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::K2_CancelAbility));
 		{
 			const auto Len = PickAxeMontage->CalculateSequenceLength();
-			auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+			const float Rate = 1.f;
+			auto TaskPtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
 				this,
 				TEXT(""),
 				PickAxeMontage,
 				EquipmentAxePtr->GetMesh()->GetAnimInstance(),
-				Len
+				Rate
 			);
 
 			TaskPtr->Ability = this;
 			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLock);
-			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLock);
+			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 
 			TaskPtr->ReadyForActivation();
 
@@ -91,18 +92,19 @@ void UToolFuture_PickAxe::PerformAction()
 		}
 		{
 			const auto Len = HumanMontage->CalculateSequenceLength();
+			const float Rate = 1.f;
 			auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 				this,
 				TEXT(""),
 				HumanMontage,
 				CharacterPtr->GetMesh()->GetAnimInstance(),
-				Len
+				Rate
 			);
 
 			TaskPtr->Ability = this;
 			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLock);
-			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLock);
+			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 
 			TaskPtr->ReadyForActivation();
 

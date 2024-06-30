@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -12,6 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
+#include "InteractiveBaseGAComponent.h"
 
 void USkill_Element_Gold::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -59,7 +60,7 @@ void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 	{
 		if (!(
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
 			))
 		{
 			return;

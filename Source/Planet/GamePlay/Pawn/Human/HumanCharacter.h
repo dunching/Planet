@@ -6,7 +6,7 @@
 
 #include "CharacterBase.h"
 #include <SceneElement.h>
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 
 #include "HumanCharacter.generated.h"
 

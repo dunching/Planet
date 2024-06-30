@@ -8,7 +8,7 @@
 
 #include "SceneElement.h"
 #include "Pawn/HoldingItemsComponent.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 
 #include "ToolsMenu.generated.h"
 

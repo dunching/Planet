@@ -24,7 +24,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "Skill_Base.h"
 
 namespace SkillsIcon

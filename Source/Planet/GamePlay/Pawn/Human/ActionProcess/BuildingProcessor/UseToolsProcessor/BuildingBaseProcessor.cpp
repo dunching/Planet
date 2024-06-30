@@ -40,6 +40,7 @@
 #include "CollisionDataStruct.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "Tool_Base.h"
+#include "InteractiveToolComponent.h"
 
 namespace HumanProcessor
 {
@@ -67,7 +68,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetEquipmentItemsComponent()->RetractputTool();
+			OnwerActorPtr->GetInteractiveToolComponent()->RetractputTool();
 		}
 
 		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
@@ -85,7 +86,7 @@ namespace HumanProcessor
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (OnwerActorPtr)
 				{
-					OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter);
+					OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
 				}
 			}
 		}
@@ -95,7 +96,7 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetEquipmentItemsComponent()->CancelSkill(*SkillIter);
+				OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter); 
 			}
 		}
 	}
@@ -166,7 +167,7 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				auto CanbeActiveInfos = OnwerActorPtr->GetEquipmentItemsComponent()->GetCanbeActivedTools();
+				auto CanbeActiveInfos = OnwerActorPtr->GetInteractiveToolComponent()->GetCanbeActivedTools();
 				for (const auto& Iter : CanbeActiveInfos)
 				{
 					HandleKeysMap.Add(Iter->Key, Iter);

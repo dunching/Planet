@@ -24,15 +24,17 @@ class UEquipmentInteractionComponent;
 class UHoldItemComponent;
 class UInputProcessorSubSystem;
 class UZYInputComponent;
-class UEquipmentSocksComponent;
 class USceneObjPropertyComponent;
 class UPlanetGameplayAbility;
 class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
-class UEquipmentElementComponent;
 class UPlanetAbilitySystemInterface;
 class UTalentAllocationComponent;
 class UGroupMnaggerComponent;
+class UInteractiveBaseGAComponent;
+class UInteractiveConsumablesComponent;
+class UInteractiveSkillComponent;
+class UInteractiveToolComponent;
 
 UCLASS()
 class PLANET_API ACharacterBase : public AGravityCharacter, public IPlanetAbilitySystemInterface
@@ -56,9 +58,15 @@ public:
 
 	UCharacterAttributesComponent* GetCharacterAttributesComponent();
 
-	UEquipmentElementComponent* GetEquipmentItemsComponent();
-	
 	UTalentAllocationComponent* GetTalentAllocationComponent();
+
+	UInteractiveBaseGAComponent* GetInteractiveBaseGAComponent();
+
+	UInteractiveConsumablesComponent* GetInteractiveConsumablesComponent();
+
+	UInteractiveSkillComponent* GetInteractiveSkillComponent();
+
+	UInteractiveToolComponent* GetInteractiveToolComponent();
 
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
@@ -91,9 +99,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UEquipmentElementComponent> EquipmentElementComponentPtr = nullptr;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
 
@@ -102,6 +107,18 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	TObjectPtr<UInteractiveBaseGAComponent> InteractiveBaseGAComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	TObjectPtr<UInteractiveConsumablesComponent> InteractiveConsumablesComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	TObjectPtr<UInteractiveSkillComponent> InteractiveSkillComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
+	TObjectPtr<UInteractiveToolComponent> InteractiveToolComponentPtr = nullptr;
 
 private:
 

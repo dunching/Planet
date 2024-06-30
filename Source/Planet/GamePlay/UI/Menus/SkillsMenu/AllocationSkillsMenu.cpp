@@ -14,7 +14,7 @@
 #include "SkillsIcon.h"
 #include "WeaponsIcon.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 
 namespace AllocationSkillsMenu
 {
@@ -92,11 +92,11 @@ void UAllocationSkillsMenu::NativeDestruct()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 
 	// ÎäÆ÷¼¼ÄÜ
 	{
-		TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
+		TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::MainWeapon));
 			if (IconPtr && IconPtr->WeaponUnitPtr)
@@ -105,7 +105,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 				FirstWeaponSocketInfoSPtr->WeaponUnitPtr = IconPtr->WeaponUnitPtr;
 			}
 		}
-		TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
+		TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::SecondaryWeapon));
 			if (IconPtr && IconPtr->WeaponUnitPtr)
@@ -138,14 +138,14 @@ void UAllocationSkillsMenu::NativeDestruct()
 //			{AllocationSkillsMenu::TalentPassivSkill,EKeys::Invalid},
 		};
 
-		TMap<FGameplayTag, TSharedPtr <FSkillSocketInfo>> SkillsMap;
+		TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
 
 		for (auto Iter : Ary)
 		{
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
 			if (IconPtr && IconPtr->SkillUnitPtr)
 			{
-				TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+				TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 				SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
 				SkillsSocketInfo->SkillUnit = IconPtr->SkillUnitPtr;
@@ -155,7 +155,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 			}
 			else
 			{
-				TSharedPtr < FSkillSocketInfo >SkillsSocketInfo;
+				TSharedPtr<FSkillSocketInfo >SkillsSocketInfo;
 
 				SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
 			}
@@ -274,21 +274,21 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocke
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 
-	TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
-	TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
+	TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
 	switch (WeaponSocket)
 	{
 	case EWeaponSocket::kNone:
 	case EWeaponSocket::kMain:
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+		EICPtr->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	break;
 	case EWeaponSocket::kSecondary:
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
+		EICPtr->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
 	}
 	break;
 	}
@@ -539,7 +539,7 @@ void UAllocationSkillsMenu::ResetUIByData()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 
 	ResetUIByData_WeaponSkills(EICPtr->GetActivedWeaponType());
 

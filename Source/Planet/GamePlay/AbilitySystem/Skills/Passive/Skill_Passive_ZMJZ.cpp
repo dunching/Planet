@@ -6,7 +6,7 @@
 #include "Engine/AssetManager.h"
 
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -14,6 +14,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
+#include "InteractiveBaseGAComponent.h"
 
 USkill_Passive_ZMJZ::USkill_Passive_ZMJZ() :
 	Super()
@@ -131,7 +132,7 @@ void USkill_Passive_ZMJZ::OnSendAttack(UGameplayAbility* GAPtr)
 	{
 		if (!(
 				GAPtr &&
-				(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
+				(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
 				))
 		{
 			return;

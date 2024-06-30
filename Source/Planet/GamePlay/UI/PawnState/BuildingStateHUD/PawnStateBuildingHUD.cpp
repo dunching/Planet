@@ -49,7 +49,7 @@ void UPawnStateBuildingHUD::NativeDestruct()
 	{
 		return;
 	}
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
 	{
 		const auto Result = GetEquipMenus();
 		EICPtr->RegisterTool(Result);
@@ -63,7 +63,7 @@ void UPawnStateBuildingHUD::ResetUIByData()
 	{
 		return;
 	}
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
 	{
 		TArray<FName>Ary
 		{
@@ -119,9 +119,9 @@ UToolsMenu* UPawnStateBuildingHUD::GetEquipMenu()
 	return Cast<UToolsMenu>(GetWidgetFromName(ItemMenu));
 }
 
-TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>> UPawnStateBuildingHUD::GetEquipMenus()
+TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>> UPawnStateBuildingHUD::GetEquipMenus()
 {
-	TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>>Result;
+	TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>>Result;
 
 	TArray<TTuple<FKey, FName>>Ary
 	{

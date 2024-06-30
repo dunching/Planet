@@ -3,9 +3,10 @@
 
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
+#include "InteractiveSkillComponent.h"
+#include "InteractiveBaseGAComponent.h"
 
 USkill_Base::USkill_Base() :
 	Super()
@@ -111,7 +112,7 @@ void USkill_Base::SendEvent(const FGameplayEventData& Payload)
 	{
 		auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
-			CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle,
+			CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
 			ASCPtr->AbilityActorInfo.Get(),
 			FGameplayTag(),
 			&Payload,

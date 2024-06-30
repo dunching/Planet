@@ -10,7 +10,8 @@
 #include "AIResources.h"
 #include "GameplayTasksComponent.h"
 
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
+#include "InteractiveToolComponent.h"
 #include "CharacterBase.h"
 #include "Skill_Base.h"
 #include "AssetRefMap.h"
@@ -90,7 +91,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 		}
 		else
 		{
-			auto CanbeActivedInfo = CharacterPtr->GetEquipmentItemsComponent()->GetCanbeActivedSkills();
+			auto CanbeActivedInfo = CharacterPtr->GetInteractiveSkillComponent()->GetCanbeActiveAction();
 			{
 				for (const auto& Iter : CanbeActivedInfo)
 				{
@@ -98,7 +99,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 					{
 					case FCanbeActivedInfo::EType::kActiveSkill:
 					{
-						auto Skills = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
+						auto Skills = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 						auto SkillIter = Skills.Find(Iter->Socket);
 						if (!SkillIter)
 						{
@@ -123,7 +124,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 							);
 							if (bIsReady)
 							{
-								if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter))
+								if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter))
 								{
 									ReleasingSkillMap.Add(SkillHandleIter, Iter);
 									ReleasingSkillDelegateMap.Add(
@@ -148,7 +149,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 					{
 					case FCanbeActivedInfo::EType::kWeaponActiveSkill:
 					{
-						auto WeaponSPtr = CharacterPtr->GetEquipmentItemsComponent()->GetActivedWeapon();
+						auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
 						if (!WeaponSPtr)
 						{
 							continue;
@@ -170,7 +171,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 						);
 						if (bIsReady)
 						{
-							if (CharacterPtr->GetEquipmentItemsComponent()->ActiveSkill(Iter, true))
+							if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter, true))
 							{
 								ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
 								ReleasingSkillDelegateMap.Add(
@@ -196,7 +197,7 @@ void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
 {
 	for (const auto Iter : ReleasingSkillMap)
 	{
-		// 1.如果不取消这个回调，CancelSkill会调用无效的成员函数（UE判断过了 不会崩溃 但是逻辑不对）
+		// 1.如果不取消这个回调，CancelAction会调用无效的成员函数（UE判断过了 不会崩溃 但是逻辑不对）
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Key);
 		if (!GameplayAbilitySpecPtr)
@@ -212,7 +213,7 @@ void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
 		GAInsPtr->OnGameplayAbilityEnded.Remove(ReleasingSkillDelegateMap[Iter.Key]);
 
 		// 2.
-		CharacterPtr->GetEquipmentItemsComponent()->CancelSkill(Iter.Value);
+		CharacterPtr->GetInteractiveSkillComponent()->CancelAction(Iter.Value);
 	}
 
 	Super::OnDestroy(bInOwnerFinished);

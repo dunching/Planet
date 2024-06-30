@@ -24,7 +24,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "Skill_Base.h"
 
 namespace ActionSkillsIcon
@@ -94,7 +94,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 	const auto SkillSocketInfoSPtr = EICPtr->FindSkill(IconSocket);
 	if (!SkillSocketInfoSPtr)
 	{

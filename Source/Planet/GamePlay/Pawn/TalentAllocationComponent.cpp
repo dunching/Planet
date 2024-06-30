@@ -6,7 +6,7 @@
 #include "HoldingItemsComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 
@@ -174,7 +174,7 @@ void UTalentAllocationComponent::SyncToHolding()
 				auto CharacterPtr = GetOwner<ACharacterBase>();
 				if (CharacterPtr)
 				{
-					TMap<FGameplayTag, TSharedPtr <FSkillSocketInfo>> SkillsMap;
+					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
 					auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
 					switch (std::get<EPointSkillType>(Iter.Value.Type))
 					{
@@ -190,7 +190,7 @@ void UTalentAllocationComponent::SyncToHolding()
 							SkillUnitPtr->Level = Iter.Value.Level;
 						}
 
-						TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->Talent_NuQi_Socket;
 						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
@@ -211,7 +211,7 @@ void UTalentAllocationComponent::SyncToHolding()
 							SkillUnitPtr->Level = Iter.Value.Level;
 						}
 
-						TSharedPtr < FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->Talent_YinYang_Socket;
 						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
@@ -221,7 +221,7 @@ void UTalentAllocationComponent::SyncToHolding()
 					}
 					break;
 					}
-					auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 					EICPtr->RegisterMultiGAs(SkillsMap);
 				}
 			}

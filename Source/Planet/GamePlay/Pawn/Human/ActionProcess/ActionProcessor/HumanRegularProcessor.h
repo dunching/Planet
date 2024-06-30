@@ -9,7 +9,7 @@
 
 #include "SceneElement.h"
 #include "HumanProcessor.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 
 struct FSkillSocketInfo;
 

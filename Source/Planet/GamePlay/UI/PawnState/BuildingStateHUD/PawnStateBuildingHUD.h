@@ -8,7 +8,7 @@
 
 #include "GenerateType.h"
 #include "UIInterfaces.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveToolComponent.h"
 
 #include "PawnStateBuildingHUD.generated.h"
 
@@ -36,7 +36,7 @@ public:
 
 	virtual void ResetUIByData()override;
 
-	TMap <FGameplayTag, TSharedPtr < FToolsSocketInfo>>GetEquipMenus();
+	TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>>GetEquipMenus();
 
 protected:
 

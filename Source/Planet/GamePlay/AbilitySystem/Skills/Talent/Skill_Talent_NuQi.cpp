@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -12,6 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
+#include "InteractiveBaseGAComponent.h"
 
 int32 FTalent_NuQi::GetCurrentValue() const
 {
@@ -274,7 +275,7 @@ void USkill_Talent_NuQi::OnSendDamage(UGameplayAbility* GAPtr)
 	{
 		if (
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
 			)
 		{
 			AddNuQi();

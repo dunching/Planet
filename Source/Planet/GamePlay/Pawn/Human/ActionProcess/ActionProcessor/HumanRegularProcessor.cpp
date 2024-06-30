@@ -30,7 +30,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include <Pawn/EquipmentElementComponent.h>
+#include "InteractiveSkillComponent.h"
 #include "ToolsMenu.h"
 #include <BackpackMenu.h>
 #include "UIManagerSubSystem.h"
@@ -96,7 +96,7 @@ namespace HumanProcessor
  			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
  			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
 
-			OnwerActorPtr->GetEquipmentItemsComponent()->SwitchWeapon();
+			OnwerActorPtr->GetInteractiveSkillComponent()->SwitchWeapon();
 		}
 	}
 
@@ -110,7 +110,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetEquipmentItemsComponent()->RetractputWeapon();
+			OnwerActorPtr->GetInteractiveSkillComponent()->RetractputWeapon();
 		}
 
 		Super::QuitAction();
@@ -124,7 +124,7 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetEquipmentItemsComponent()->ActiveSkill(*SkillIter);
+				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
 			}
 		}
 		else
@@ -133,7 +133,7 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetEquipmentItemsComponent()->CancelSkill(*SkillIter);
+				OnwerActorPtr->GetInteractiveSkillComponent()->CancelAction(*SkillIter);
 			}
 		}
 	}
@@ -301,7 +301,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetEquipmentItemsComponent()->SwitchWeapon();
+			OnwerActorPtr->GetInteractiveSkillComponent()->SwitchWeapon();
 		}
 	}
 
@@ -313,7 +313,7 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				auto CanbeActivedInfoAry = OnwerActorPtr->GetEquipmentItemsComponent()->GetCanbeActivedSkills();
+				auto CanbeActivedInfoAry = OnwerActorPtr->GetInteractiveSkillComponent()->GetCanbeActiveAction();
 				for (const auto& Iter : CanbeActivedInfoAry)
 				{
 					HandleKeysMap.Add(Iter->Key, Iter);

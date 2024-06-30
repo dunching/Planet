@@ -32,7 +32,7 @@
 #include "ActionStairBase.h"
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
-#include "Pawn/EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "Pawn/HoldingItemsComponent.h"
 #include "Pawn/InputComponent/InputActions.h"
 #include "InputProcessorSubSystem.h"

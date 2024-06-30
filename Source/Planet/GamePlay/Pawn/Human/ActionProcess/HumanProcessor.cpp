@@ -29,7 +29,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include <Pawn/EquipmentElementComponent.h>
+#include "InteractiveSkillComponent.h"
 #include "ToolsMenu.h"
 #include <BackpackMenu.h>
 #include "UIManagerSubSystem.h"
@@ -52,6 +52,7 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttibutes.h"
 #include "GameplayTagsSubSystem.h"
+#include "InteractiveBaseGAComponent.h"
 
 namespace HumanProcessor
 {
@@ -117,7 +118,7 @@ namespace HumanProcessor
 	{
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
-		if (OnwerActorPtr->GetEquipmentItemsComponent()->GetCharacterTags().HasTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag))
+		if (OnwerActorPtr->GetInteractiveBaseGAComponent()->GetCharacterTags().HasTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag))
 		{
 			if (OnwerActorPtr)
 			{

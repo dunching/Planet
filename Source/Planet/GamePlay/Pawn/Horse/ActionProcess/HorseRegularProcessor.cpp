@@ -28,7 +28,7 @@
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
 #include "Pawn/Vehicle/4WheeledVehicle/4WheeledVehicle.h"
-#include <Pawn/EquipmentElementComponent.h>
+#include "InteractiveSkillComponent.h"
 #include "ToolsMenu.h"
 #include "BackpackMenu.h"
 #include "UIManagerSubSystem.h"

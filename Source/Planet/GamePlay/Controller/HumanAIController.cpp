@@ -216,7 +216,7 @@ void AHumanAIController::InitialCharacter()
 			AIHumanInfoPtr->AddToViewport();
 		}
 
-		auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
 
 		{
@@ -230,7 +230,7 @@ void AHumanAIController::InitialCharacter()
 					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
 				}
 			}
-			TSharedPtr < FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
+			TSharedPtr<FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
 			{
 				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kRangeTest);
 				if (WeaponUnitPtr)
@@ -246,7 +246,7 @@ void AHumanAIController::InitialCharacter()
 		{
 			TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
 			{
-				TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+				TSharedPtr<FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 				SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
 				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
@@ -257,7 +257,7 @@ void AHumanAIController::InitialCharacter()
 				);
 			}
 			{
-				TSharedPtr < FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+				TSharedPtr<FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 				SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
 				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);

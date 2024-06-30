@@ -11,8 +11,10 @@
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AssetRefMap.h"
-#include "EquipmentElementComponent.h"
 #include "GameplayTagsSubSystem.h"
+#include "InteractiveSkillComponent.h"
+#include "InteractiveToolComponent.h"
+#include "InteractiveBaseGAComponent.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(
 	TEXT("Skill.DrawDebug.Dash"),
@@ -73,7 +75,7 @@ void UPlanetGameplayAbility_Dash::PreActivate(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
+		CharacterPtr->GetInteractiveBaseGAComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 	}
 }
 
@@ -113,7 +115,7 @@ void UPlanetGameplayAbility_Dash::EndAbility(
 {
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->RemoveTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
+		CharacterPtr->GetInteractiveBaseGAComponent()->RemoveTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 	}
 
 #ifdef WITH_EDITOR
@@ -202,7 +204,7 @@ void UPlanetGameplayAbility_Dash::DoDash(
 
 				Displacement(Direction);
 
-				CharacterPtr->GetEquipmentItemsComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
+				CharacterPtr->GetInteractiveBaseGAComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 			}
 		}
 	}

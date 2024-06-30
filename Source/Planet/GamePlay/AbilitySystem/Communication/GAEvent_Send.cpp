@@ -5,7 +5,9 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
+#include "InteractiveToolComponent.h"
+#include "InteractiveBaseGAComponent.h"
 
 UGAEvent_Send::UGAEvent_Send() :
 	Super()
@@ -37,7 +39,7 @@ void UGAEvent_Send::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 			return;
 		}
 
-		CharacterPtr->GetEquipmentItemsComponent()->OnSendEventModifyData(*GAEventDataPtr);
+		CharacterPtr->GetInteractiveBaseGAComponent()->OnSendEventModifyData(*GAEventDataPtr);
 
 		for (const auto & Iter : GAEventDataPtr->DataAry)
 		{
@@ -51,7 +53,7 @@ void UGAEvent_Send::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
 			auto ASCPtr = Iter.TargetCharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(
-				Iter.TargetCharacterPtr->GetEquipmentItemsComponent()->ReceivedEventHandle,
+				Iter.TargetCharacterPtr->GetInteractiveBaseGAComponent()->ReceivedEventHandle,
 				ASCPtr->AbilityActorInfo.Get(),
 				FGameplayTag(),
 				&Payload,

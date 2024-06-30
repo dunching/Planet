@@ -9,7 +9,7 @@
 
 #include "HumanProcessor.h"
 #include <SceneElement.h>
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 
 class AHumanCharacter;
 class ABuildingBase;

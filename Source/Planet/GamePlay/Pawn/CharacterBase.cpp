@@ -21,7 +21,6 @@
 #include <ToolsMenu.h>
 #include "InputComponent/InputActions.h"
 #include "InputProcessorSubSystem.h"
-#include "EquipmentElementComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "PlanetPlayerState.h"
 #include "PlanetGameplayAbility.h"
@@ -32,6 +31,10 @@
 #include "AssetRefMap.h"
 #include "HumanControllerInterface.h"
 #include "GameplayTagsSubSystem.h"
+#include "InteractiveBaseGAComponent.h"
+#include "InteractiveConsumablesComponent.h"
+#include "InteractiveSkillComponent.h"
+#include "InteractiveToolComponent.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -45,8 +48,12 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
 	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
-	EquipmentElementComponentPtr = CreateDefaultSubobject<UEquipmentElementComponent>(UEquipmentElementComponent::ComponentName);
 	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
+
+	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UInteractiveBaseGAComponent>(UInteractiveBaseGAComponent::ComponentName);
+	InteractiveConsumablesComponentPtr = CreateDefaultSubobject<UInteractiveConsumablesComponent>(UInteractiveConsumablesComponent::ComponentName);
+	InteractiveSkillComponentPtr = CreateDefaultSubobject<UInteractiveSkillComponent>(UInteractiveSkillComponent::ComponentName);
+	InteractiveToolComponentPtr = CreateDefaultSubobject<UInteractiveToolComponent>(UInteractiveToolComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -89,7 +96,8 @@ void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	GetEquipmentItemsComponent()->InitialBaseGAs();
+	GetInteractiveSkillComponent()->InitialBaseGAs();
+	GetInteractiveBaseGAComponent()->InitialBaseGAs();
 
 	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
 	OnMoveSpeedChanged(CharacterAttributesRef.MoveSpeed.GetCurrentValue());
@@ -117,14 +125,29 @@ UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent()
 	return CharacterAttributesComponentPtr;
 }
 
-UEquipmentElementComponent* ACharacterBase::GetEquipmentItemsComponent()
-{
-	return EquipmentElementComponentPtr;
-}
-
 UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()
 {
 	return TalentAllocationComponentPtr;
+}
+
+UInteractiveBaseGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()
+{
+	return InteractiveBaseGAComponentPtr;
+}
+
+UInteractiveConsumablesComponent* ACharacterBase::GetInteractiveConsumablesComponent()
+{
+	return InteractiveConsumablesComponentPtr;
+}
+
+UInteractiveSkillComponent* ACharacterBase::GetInteractiveSkillComponent()
+{
+	return InteractiveSkillComponentPtr;
+}
+
+UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()
+{
+	return InteractiveToolComponentPtr;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const

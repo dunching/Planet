@@ -10,7 +10,7 @@
 #include "Skill_Base.generated.h"
 
 class UBasicUnit;
-class UEquipmentElementComponent;
+class UInteractiveComponent;
 
 UCLASS()
 class PLANET_API USkill_Base : public UPlanetGameplayAbility
@@ -19,7 +19,7 @@ class PLANET_API USkill_Base : public UPlanetGameplayAbility
 
 public:
 
-	friend UEquipmentElementComponent;
+	friend UInteractiveComponent;
 
 	USkill_Base();
 

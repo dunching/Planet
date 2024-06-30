@@ -6,9 +6,11 @@
 
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
+#include "InteractiveToolComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
+#include "InteractiveBaseGAComponent.h"
 
 UPlanetGameplayAbility_Run::UPlanetGameplayAbility_Run() :
 	Super()
@@ -37,7 +39,7 @@ void UPlanetGameplayAbility_Run::PreActivate(const FGameplayAbilitySpecHandle Ha
 	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag);
+		CharacterPtr->GetInteractiveBaseGAComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag);
 	}
 }
 
@@ -46,7 +48,7 @@ void UPlanetGameplayAbility_Run::EndAbility(const FGameplayAbilitySpecHandle Han
 	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());	
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->RemoveTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag);
+		CharacterPtr->GetInteractiveBaseGAComponent()->RemoveTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag);
 		CharacterPtr->GetCharacterMovement()->MaxWalkSpeed = 
 			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue();
 	}

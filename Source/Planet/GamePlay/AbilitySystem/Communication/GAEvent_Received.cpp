@@ -5,8 +5,10 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
+#include "InteractiveToolComponent.h"
 #include "CharacterAttributesComponent.h"
+#include "InteractiveBaseGAComponent.h"
 
 UGAEvent_Received::UGAEvent_Received() :
 	Super()
@@ -39,7 +41,7 @@ void UGAEvent_Received::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 			return;
 		}
 
-		CharacterPtr->GetEquipmentItemsComponent()->OnReceivedEventModifyData(*Clone);
+		CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*Clone);
 
 		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*Clone);
 

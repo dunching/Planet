@@ -5,7 +5,7 @@
 #include <Engine/OverlapResult.h>
 
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -17,6 +17,7 @@
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneObjSubSystem.h"
+#include "InteractiveBaseGAComponent.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {
@@ -282,7 +283,7 @@ void USkill_Talent_YinYang::OnSendDamage(UGameplayAbility* GAPtr)
 	{
 		if (
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetEquipmentItemsComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
 			)
 		{
 			auto SendGaPtr = Cast<UGAEvent_Send>(GAPtr);

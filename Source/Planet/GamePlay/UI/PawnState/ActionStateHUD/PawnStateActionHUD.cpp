@@ -8,7 +8,7 @@
 #include "PlanetPlayerState.h"
 #include "Planet.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "ActionSkillsIcon.h"
 #include "CharacterAttibutes.h"
 #include "AssetRefMap.h"
@@ -227,7 +227,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 	{
 		return;
 	}
-	const auto& SkillsMap = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
+	const auto& SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 	for (auto Iter : SkillsMap)
 	{
 		bool bIsGiveTalentPassive = false;
@@ -283,7 +283,7 @@ void UPawnStateActionHUD::InitialSkillIcon()
 		return;
 	}
 
-	auto SkillsMap = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
+	auto SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 	TArray<FName>Ary
 	{
 		PawnStateActionHUD::ActiveSkill1,
@@ -308,7 +308,7 @@ void UPawnStateActionHUD::InitialSkillIcon()
 			}
 		}
 	}
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 
 	ActivedWeaponChangedDelegate = EICPtr->OnActivedWeaponChangedContainer.AddCallback(
 		std::bind(&ThisClass::OnActivedWeaponChanged, this, std::placeholders::_1)
@@ -323,20 +323,20 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetEquipmentItemsComponent();
+	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 
-	TSharedPtr < FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
-	TSharedPtr < FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
+	TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
 	switch (WeaponSocket)
 	{
 	case EWeaponSocket::kMain:
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+		EICPtr->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	break;
 	case EWeaponSocket::kSecondary:
 	{
-		CharacterPtr->GetEquipmentItemsComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
+		EICPtr->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
 	}
 	break;
 	}

@@ -12,7 +12,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
 #include "Planet.h"
@@ -265,7 +265,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 			}
 		}
 
-		auto SkillsAry = CharacterPtr->GetEquipmentItemsComponent()->GetSkills();
+		auto SkillsAry = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{

@@ -2,10 +2,11 @@
 #include "CharacterAttributesComponent.h"
 
 #include "CharacterBase.h"
-#include "EquipmentElementComponent.h"
+#include "InteractiveSkillComponent.h"
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
+#include "InteractiveBaseGAComponent.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -25,7 +26,7 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 	{
 		if (
 			(CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f) &&
-			(CharacterPtr->GetEquipmentItemsComponent()->GetCharacterTags().HasTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag))
+			(CharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterTags().HasTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag))
 			)
 		{
 			if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())

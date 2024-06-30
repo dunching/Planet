@@ -10,7 +10,8 @@
 #include "SceneElement.h"
 
 class ACharacterBase;
-class UEquipmentElementComponent;
+class UInteractiveComponent;
+class UInteractiveBaseGAComponent;
 
 struct FCharacterAttributes;
 
@@ -108,7 +109,7 @@ class PLANET_API IGAEventModifyInterface
 {
 public:
 
-	friend UEquipmentElementComponent;
+	friend UInteractiveBaseGAComponent;
 	friend FGAEventModify_key_compare;
 
 	IGAEventModifyInterface(int32 InPriority = 1);

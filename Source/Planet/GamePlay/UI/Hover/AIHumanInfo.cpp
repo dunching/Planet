@@ -127,7 +127,7 @@ bool UAIHumanInfo::ResetPosition(float InDeltaTime)
 		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(AIHumanInfo::CanvasPanel));
 		if (UIPtr)
 		{
-			TSharedPtr < SPanel> PanelSPtr = UIPtr->GetCanvasWidget();
+			TSharedPtr<SPanel> PanelSPtr = UIPtr->GetCanvasWidget();
 			Size = PanelSPtr->ComputeDesiredSize(0.f);
 		}
 	}
