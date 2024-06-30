@@ -118,11 +118,11 @@ namespace HumanProcessor
 	{
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
-		if (OnwerActorPtr->GetInteractiveBaseGAComponent()->GetCharacterTags().HasTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag))
+		if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
 		{
 			if (OnwerActorPtr)
 			{
-				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag };
+				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running };
 				OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 			}
 		}
@@ -131,7 +131,7 @@ namespace HumanProcessor
 			if (OnwerActorPtr)
 			{
 				OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-					FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag }
+					FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running }
 				);
 			}
 		}
@@ -175,7 +175,7 @@ namespace HumanProcessor
 			}
 			Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->DashAbilityTag, Payload);
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Dash, Payload);
 		}
 	}
 
@@ -185,7 +185,7 @@ namespace HumanProcessor
 
 		if (OnwerActorPtr)
 		{
-			FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DashAbilityTag };
+			FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Dash };
 			OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 		}
 	}
@@ -197,7 +197,7 @@ namespace HumanProcessor
 		if (OnwerActorPtr)
 		{
 			OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->JumpAbilityTag }
+				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump }
 			);
 		}
 	}
@@ -208,7 +208,7 @@ namespace HumanProcessor
 
 		if (OnwerActorPtr)
 		{
-			FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->JumpAbilityTag };
+			FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump };
 			OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 		}
 	}

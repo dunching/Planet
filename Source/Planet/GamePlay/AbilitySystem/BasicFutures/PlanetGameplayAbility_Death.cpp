@@ -8,7 +8,12 @@
 #include "CharacterBase.h"
 #include "HumanAIController.h"
 
-void UPlanetGameplayAbility_Death::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UPlanetGameplayAbility_Death::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -40,8 +45,8 @@ void UPlanetGameplayAbility_Death::PlayMontage(UAnimMontage* CurMontagePtr, floa
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLock);
-		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLock);
+		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 
 		TaskPtr->ReadyForActivation();
 

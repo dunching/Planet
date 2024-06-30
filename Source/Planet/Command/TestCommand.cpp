@@ -30,6 +30,7 @@
 #include "CharacterAttibutes.h"
 #include "HumanControllerInterface.h"
 #include "InteractiveBaseGAComponent.h"
+#include "HorseCharacter.h"
 
 void TestCommand::AddCahracterTestData()
 {
@@ -239,7 +240,7 @@ void TestCommand::TestGAEventModify()
 
 }
 
-void TestCommand::SpawnCharacter(const TArray< FString >& Args)
+void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
@@ -281,6 +282,22 @@ void TestCommand::SpawnCharacter(const TArray< FString >& Args)
 				NewCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
 			}
 		}
+	}
+}
+
+void TestCommand::SpawnHorseCharacter(const TArray< FString >& Args)
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+	if (CharacterPtr)
+	{
+		FActorSpawnParameters SpawnParameters;
+
+		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHorseCharacter>(
+			UAssetRefMap::GetInstance()->HorseClass,
+			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * 600),
+			FRotator::ZeroRotator,
+			SpawnParameters
+		);
 	}
 }
 

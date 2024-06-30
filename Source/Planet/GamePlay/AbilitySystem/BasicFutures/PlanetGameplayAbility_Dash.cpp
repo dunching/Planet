@@ -75,7 +75,6 @@ void UPlanetGameplayAbility_Dash::PreActivate(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetInteractiveBaseGAComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 	}
 }
 
@@ -115,7 +114,6 @@ void UPlanetGameplayAbility_Dash::EndAbility(
 {
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetInteractiveBaseGAComponent()->RemoveTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 	}
 
 #ifdef WITH_EDITOR
@@ -204,7 +202,6 @@ void UPlanetGameplayAbility_Dash::DoDash(
 
 				Displacement(Direction);
 
-				CharacterPtr->GetInteractiveBaseGAComponent()->AddTag(UGameplayTagsSubSystem::GetInstance()->DashAbilityTag);
 			}
 		}
 	}
@@ -230,8 +227,8 @@ void UPlanetGameplayAbility_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLock);
-		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLock);
+		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 
 		TaskPtr->ReadyForActivation();
 
@@ -259,7 +256,7 @@ void UPlanetGameplayAbility_Dash::Displacement(const FVector& Direction)
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-		TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementListLock);
+		TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementListLockOverride);
 
 		TaskPtr->ReadyForActivation();
 

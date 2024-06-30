@@ -18,6 +18,32 @@ public:
 	static UGameplayTagsSubSystem* GetInstance();
 
 #pragma region Tags
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Jump =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Running =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Run")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Dash =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Dash")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Mount =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Mount")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag DisMount =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.DisMount")));
+
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Ridering =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Ridering")));
+	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag SuperArmor =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.SuperArmor")));
@@ -25,18 +51,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Suspension =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Suspension")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag JumpAbilityTag =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag RunningAbilityTag =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Run")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag DashAbilityTag =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Dash")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DeathingTag = 

@@ -318,30 +318,34 @@ TSharedPtr<FWeaponSocketInfo > UInteractiveSkillComponent::GetActivedWeapon() co
 
 void UInteractiveSkillComponent::CancelSkill_WeaponActive(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
 {
-	TSharedPtr<FWeaponSocketInfo > WeaponUnit;
-	switch (CurrentActivedWeaponSocket)
-	{
-	case EWeaponSocket::kMain:
-	{
-		WeaponUnit = FirstWeaponUnit;
-	}
-	break;
-	case EWeaponSocket::kSecondary:
-	{
-		WeaponUnit = SecondaryWeaponUnit;
-	}
-	break;
-	default:
+	TSharedPtr<FWeaponSocketInfo > WeaponUnit = GetActivedWeapon();
+	if (!WeaponUnit)
 	{
 		return;
 	}
-	}
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
+	if (!WeaponUnit->WeaponUnitPtr)
 	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		ASCPtr->CancelAbilityHandle(WeaponUnit->Handle);
+		return;
 	}
+
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(WeaponUnit->Handle);
+	if (!GameplayAbilitySpecPtr)
+	{
+		return;
+	}
+	auto GAInsPtr = Cast<USkill_WeaponActive_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	if (!GAInsPtr)
+	{
+		return;
+	}
+	GAInsPtr->RequestCancel();
 }
 
 bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
@@ -356,6 +360,30 @@ bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
 	if (!WeaponUnit->WeaponUnitPtr)
 	{
 		return false;
+	}
+
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return false;
+	}
+
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(WeaponUnit->Handle);
+	if (!GameplayAbilitySpecPtr)
+	{
+		return false;
+	}
+	auto GAInsPtr = Cast<USkill_WeaponActive_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	if (!GAInsPtr)
+	{
+		return false;
+	}
+
+	if (GAInsPtr->IsActive())
+	{
+		GAInsPtr->ContinueActive();
+		return true;
 	}
 
 	FGameplayEventData Payload;
@@ -386,13 +414,7 @@ bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
 	}
 	break;
 	}
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (!OnwerActorPtr)
-	{
-		return  false;
-	}
 
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 	return ASCPtr->TriggerAbilityFromGameplayEvent(
 		WeaponUnit->Handle,
 		ASCPtr->AbilityActorInfo.Get(),
@@ -465,7 +487,9 @@ TArray<TSharedPtr<FCanbeActivedInfo>> UInteractiveSkillComponent::GetCanbeActive
 	return CanbeActiveSkillsAry;
 }
 
-bool UInteractiveSkillComponent::ActiveAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */)
+bool UInteractiveSkillComponent::ActiveAction(
+	const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
+)
 {
 	switch (CanbeActivedInfoSPtr->Type)
 	{

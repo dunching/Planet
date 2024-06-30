@@ -12,13 +12,10 @@
 class UAbilitySystemComponent;
 
 UENUM(BlueprintType)
-enum class ERidingState_Anim : uint8
+enum class EAnimationType : uint8
 {
-	kNone,
-	kRequestMount,
+	kNormal,
 	kMounted,
-	kRequestDismount,
-	kDismounted,
 };
 
 UCLASS(Config = Game)
@@ -29,7 +26,7 @@ class PLANET_API UHumanAnimInstance : public UAnimInstance
 public:
 
 	UPROPERTY(BlueprintReadWrite, Category = "Character State Data")
-	ERidingState_Anim RidingState_Anim = ERidingState_Anim::kNone;
+	EAnimationType AnimationType = EAnimationType::kNormal;
 
 protected:
 

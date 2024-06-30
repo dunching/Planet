@@ -79,6 +79,8 @@ void USkill_WeaponActive_Base::CancelAbility(
 	bool bReplicateCancelAbility
 )
 {
+	ResetListLock();
+
 	bIsRequstCancel = true;
 
 	// 
@@ -102,6 +104,27 @@ void USkill_WeaponActive_Base::ForceCancel()
 {
 	bIsRequstCancel = true;
 	DecrementToZeroListLock();
+}
+
+void USkill_WeaponActive_Base::RequestCancel()
+{
+	bIsRequstCancel = true;
+}
+
+void USkill_WeaponActive_Base::ContinueActive()
+{
+	bIsRequstCancel = false;
+
+	switch (SkillState)
+	{
+	case USkill_WeaponActive_Base::EType::kAttackingEnd:
+	{
+		RepeatAction();
+	}
+	break;
+	default:
+		break;
+	}
 }
 
 void USkill_WeaponActive_Base::PerformAction()
@@ -133,7 +156,13 @@ void USkill_WeaponActive_Base::RepeatAction()
 	if (bIsRequstCancel)
 	{
 		PRINTINVOKEINFO();
+		ResetPreviousStageActions();
+
+		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::K2_CancelAbility));
+
 		PerformStopAction();
+
+		RunIfListLock();
 	}
 	else
 	{

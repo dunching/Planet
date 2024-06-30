@@ -40,14 +40,6 @@ public:
 
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
 
-	const FGameplayTagContainer& GetCharacterTags()const;
-
-	void AddTag(const FGameplayTag& Tag);
-
-	void RemoveTag(const FGameplayTag& Tag);
-
-	FCallbackHandleContainer TagsModifyHandleContainer;
-
 protected:
 
 	void AddSendGroupEffectModify();

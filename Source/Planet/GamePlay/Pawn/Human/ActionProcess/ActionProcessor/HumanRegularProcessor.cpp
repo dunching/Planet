@@ -62,6 +62,14 @@
 #include "HumanViewGroupManagger.h"
 #include "GroupMnaggerComponent.h"
 #include "GroupsManaggerSubSystem.h"
+#include "GameplayTagsSubSystem.h"
+#include "PlanetGameplayAbility_Mount.h"
+
+static TAutoConsoleVariable<int32> HumanRegularProcessor(
+	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
 
 namespace HumanProcessor
 {
@@ -88,13 +96,94 @@ namespace HumanProcessor
 		AddOrRemoveUseMenuItemEvent(true);
 	}
 
+	void FHumanRegularProcessor::TickImp(float Delta)
+	{
+		Super::TickImp(Delta);
+
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (!OnwerActorPtr)
+		{
+			return;
+		}
+
+		FVector OutCamLoc = FVector::ZeroVector;
+		FRotator OutCamRot = FRotator::ZeroRotator;
+		auto CameraManagerPtr = UGameplayStatics::GetPlayerCameraManager(OnwerActorPtr->GetWorld(), 0);
+		if (CameraManagerPtr)
+		{
+			CameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
+		}
+
+		auto StartPt = OutCamLoc;
+		auto StopPt = OutCamLoc + (OutCamRot.Vector() * 1000);
+
+		FHitResult Result;
+
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+
+		FCollisionQueryParams Params;
+		Params.bTraceComplex = false;
+
+		AHorseCharacter * TempHorseCharacterPtr = nullptr;
+		if (OnwerActorPtr->GetWorld()->LineTraceSingleByObjectType(
+			Result,
+			StartPt,
+			StopPt,
+			ObjectQueryParams,
+			Params)
+			)
+		{
+#ifdef WITH_EDITOR
+			if (HumanRegularProcessor.GetValueOnGameThread())
+			{
+				DrawDebugSphere(OnwerActorPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
+			}
+#endif
+
+			if (Result.GetActor()->IsA(AHorseCharacter::StaticClass()))
+			{
+				TempHorseCharacterPtr = Cast<AHorseCharacter>(Result.GetActor());
+			}
+		}
+
+		if (TempHorseCharacterPtr)
+		{
+			if (HorseCharacterPtr)
+			{
+				if (TempHorseCharacterPtr == HorseCharacterPtr)
+				{
+				}
+				else
+				{
+					TempHorseCharacterPtr->SwitchDisplayMountTips(true);
+					HorseCharacterPtr->SwitchDisplayMountTips(false);
+					HorseCharacterPtr = TempHorseCharacterPtr;
+				}
+			}
+			else
+			{
+				TempHorseCharacterPtr->SwitchDisplayMountTips(true);
+				HorseCharacterPtr = TempHorseCharacterPtr;
+			}
+		}
+		else
+		{
+			if (HorseCharacterPtr)
+			{
+				HorseCharacterPtr->SwitchDisplayMountTips(false);
+				HorseCharacterPtr = nullptr;
+			}
+		}
+	}
+
 	void FHumanRegularProcessor::SwitchCurrentWeapon()
 	{
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
- 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
- 			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
+			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
+			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
 
 			OnwerActorPtr->GetInteractiveSkillComponent()->SwitchWeapon();
 		}
@@ -153,6 +242,26 @@ namespace HumanProcessor
 		if (OnwerActorPtr)
 		{
 			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kAssistance);
+		}
+	}
+
+	void FHumanRegularProcessor::EKeyPressed()
+	{
+		if (HorseCharacterPtr)
+		{
+			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+
+			if (OnwerActorPtr)
+			{
+				FGameplayEventData Payload;
+				auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Mount;
+
+				GameplayAbilityTargetData_DashPtr->HorseCharacterPtr = HorseCharacterPtr;
+
+				Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Mount, Payload);
+			}
 		}
 	}
 
@@ -287,7 +396,12 @@ namespace HumanProcessor
 			Params)
 			)
 		{
-			DrawDebugSphere(OnwerActorPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
+#ifdef WITH_EDITOR
+			if (HumanRegularProcessor.GetValueOnGameThread())
+			{
+				DrawDebugSphere(OnwerActorPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
+			}
+#endif
 		}
 	}
 

@@ -26,14 +26,14 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 	{
 		if (
 			(CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f) &&
-			(CharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterTags().HasTag(UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag))
+			(CharacterPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
 			)
 		{
 			if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
 			{
 				if (CharacterAttributes.PP.GetCurrentValue() <= 0)
 				{
-					FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->RunningAbilityTag };
+					FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running };
 					CharacterPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 				}
 				else

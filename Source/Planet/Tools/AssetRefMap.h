@@ -31,6 +31,8 @@ class UGroupManaggerMenu;
 class UHUD_TeamInfo;
 class UFocusIcon;
 class UFightingTips;
+class AHumanCharacter;
+class AHorseCharacter;
 
 class UToolUnit;
 class UWeaponUnit;
@@ -47,7 +49,10 @@ public:
 	static UAssetRefMap* GetInstance();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<ACharacterBase>HumanClass;
+	TSubclassOf<AHumanCharacter>HumanClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<AHorseCharacter>HorseClass;
 
 #pragma region SceneTools
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")

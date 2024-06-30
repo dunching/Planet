@@ -55,20 +55,6 @@ namespace HorseProcessor
 	void FHorseRegularProcessor::EnterAction()
 	{
 		Super::EnterAction();
-		
-		if (RiderPtr)
-		{
-			RiderPtr->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
-
-			auto AnimInstPtr = RiderPtr->GetAnimationIns<UHumanAnimInstance>();
-			if (AnimInstPtr)
-			{
-				AnimInstPtr->RidingState_Anim = ERidingState_Anim::kRequestMount;
-			}
-
-			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			RiderPtr->AttachToActor(OnwerActorPtr, FAttachmentTransformRules::SnapToTargetIncludingScale);
-		}
 	}
 
 	void FHorseRegularProcessor::QuitAction()
@@ -170,13 +156,6 @@ namespace HorseProcessor
 	void FHorseRegularProcessor::EKeyPressed()
 	{
 		bIsPressdE = true;
-
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		auto AnimInstPtr = OnwerActorPtr->GetAnimationIns<UHumanAnimInstance>();
-		if (AnimInstPtr)
-		{
-			AnimInstPtr->RidingState_Anim = ERidingState_Anim::kRequestDismount;
-		}
 	}
 
 	void FHorseRegularProcessor::EKeyReleased()
@@ -271,31 +250,6 @@ namespace HorseProcessor
 
 	void FHorseRegularProcessor::TickImp(float Delta)
 	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		auto AnimInstPtr = OnwerActorPtr->GetAnimationIns<UHumanAnimInstance>();
-		if (AnimInstPtr)
-		{
-			if (AnimInstPtr->RidingState_Anim == ERidingState_Anim::kMounted)
-			{
-				auto PlayerCharacterPtr = GetOwnerActor<FOwnerPawnType>();
-				if (!PlayerCharacterPtr)
-				{
-					return;
-				}
-				
-				auto PlayerController = Cast<APlayerController>(PlayerCharacterPtr->GetController());
-				if (!PlayerController)
-				{
-					return;
-				}
-
-				if (RiderPtr)
-				{
-					RiderPtr->GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECollisionResponse::ECR_Overlap);
-					PlayerController->Possess(RiderPtr);
-				}
-			}
-		}
 	}
 
 	void FHorseRegularProcessor::ESCKeyPressed()
@@ -314,12 +268,10 @@ namespace HorseProcessor
 
 	void FHorseRegularProcessor::LShiftKeyPressed()
 	{
-		//	GetOwnerActor<FOwnerPawnType>()->GetGravityMovementComponent()->SetMoveMaxSpeed(RunSpeed);
 	}
 
 	void FHorseRegularProcessor::LShiftKeyReleased()
 	{
-		//	GetOwnerActor<FOwnerPawnType>()->GetGravityMovementComponent()->SetMoveMaxSpeed(WalkSpeed);
 	}
 
 	void FHorseRegularProcessor::SpaceKeyPressed()

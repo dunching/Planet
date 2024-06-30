@@ -60,6 +60,10 @@ public:
 
 	void ForceCancel();
 
+	void RequestCancel();
+
+	void ContinueActive();
+
 protected:
 
 	virtual void PerformAction();

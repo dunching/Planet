@@ -348,22 +348,3 @@ void UInteractiveBaseGAComponent::OnReceivedEventModifyData(FGameplayAbilityTarg
 		Iter->Modify(OutGAEventData);
 	}
 }
-
-const FGameplayTagContainer& UInteractiveBaseGAComponent::GetCharacterTags() const
-{
-	return CharacterTags;
-}
-
-void UInteractiveBaseGAComponent::AddTag(const FGameplayTag& Tag)
-{
-	CharacterTags.AddTag(Tag);
-
-	TagsModifyHandleContainer.ExcuteCallback(ETagChangeType::kAdd, Tag);
-}
-
-void UInteractiveBaseGAComponent::RemoveTag(const FGameplayTag& Tag)
-{
-	CharacterTags.RemoveTag(Tag);
-
-	TagsModifyHandleContainer.ExcuteCallback(ETagChangeType::kRemove, Tag);
-}

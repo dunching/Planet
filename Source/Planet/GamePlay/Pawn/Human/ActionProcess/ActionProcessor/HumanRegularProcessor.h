@@ -14,6 +14,7 @@
 struct FSkillSocketInfo;
 
 class AWeapon_Base;
+class AHorseCharacter;
 
 class UWeaponUnit;
 
@@ -41,6 +42,8 @@ namespace HumanProcessor
 
 		virtual void F2KeyPressed()override;
 
+		virtual void EKeyPressed()override;
+
 		virtual void QKeyPressed()override;
 
 		virtual void GKeyPressed()override;
@@ -61,6 +64,8 @@ namespace HumanProcessor
 
 	private:
 
+		virtual void TickImp(float Delta)override;
+
 		void SwitchCurrentWeapon();
 
 		void AddOrRemoveUseMenuItemEvent(bool bIsAdd);
@@ -68,6 +73,8 @@ namespace HumanProcessor
 		void UpdateLookAtObject();
 
 		TMap<FKey, TSharedPtr<FCanbeActivedInfo>>HandleKeysMap;
+
+		AHorseCharacter* HorseCharacterPtr = nullptr;
 
 	};
 }
