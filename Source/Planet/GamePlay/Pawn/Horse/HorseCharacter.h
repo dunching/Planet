@@ -20,6 +20,7 @@ class FProcessActionBase;
 class USceneObjPropertyComponent;
 class FInputProcessor;
 class UAnimInstanceCharacter;
+class AHumanCharacter;
 
 UCLASS()
 class PLANET_API AHorseCharacter : public ACharacterBase
@@ -41,6 +42,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = Camera)
 	float MaxLookUp = 80.f;
+
+	AHumanCharacter* RiderPtr = nullptr;
 
 protected:
 

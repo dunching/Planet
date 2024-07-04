@@ -624,7 +624,7 @@ void UGravityMovementComponent::SetGravityDirection(const FVector& InNewGravityD
 
 void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 {
-	if (HasRootMotionSources())
+	if (HasRootMotionSources() || HasAnimRootMotion())
 	{
 		return;
 	}

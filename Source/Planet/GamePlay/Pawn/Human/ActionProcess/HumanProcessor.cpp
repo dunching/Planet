@@ -76,7 +76,8 @@ namespace HumanProcessor
 		{
 			const FRotator Rotation = OnwerActorPtr->Controller->GetControlRotation();
 
-			const FVector ForwardDirection = UKismetMathLibrary::MakeRotFromZX(-OnwerActorPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
+			const FVector ForwardDirection = 
+				UKismetMathLibrary::MakeRotFromZX(-OnwerActorPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
 
 			DrawDebugLine(GetWorldImp(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (100 * ForwardDirection), FColor::Red, false, 3);
 			OnwerActorPtr->AddMovementInput(ForwardDirection, Value);

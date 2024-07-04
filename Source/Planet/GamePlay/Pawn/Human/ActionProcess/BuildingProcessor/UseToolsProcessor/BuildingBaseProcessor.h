@@ -54,11 +54,15 @@ namespace HumanProcessor
 
 		virtual void MouseRightPressed()override;
 
+		virtual void LAltKeyPressed()override;
+
 		virtual void LAltKeyReleased()override;
 
 	private:
 
 		void AddOrRemoveUseMenuItemEvent(bool bIsAdd);
+
+		bool bIsPressdLeftAlt = false;
 
 		TMap<FKey, TSharedPtr<FCanbeActivedInfo>>HandleKeysMap;
 

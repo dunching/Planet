@@ -228,23 +228,23 @@ void AHumanPlayerController::OnPossess(APawn* InPawn)
 
 	if (bIsNewPawn)
 	{
-		if (InPawn && InPawn->IsA(AHumanCharacter::StaticClass()))
+		if (InPawn)
 		{
-#if TESTHOLDDATA
-			TestCommand::AddPlayerCharacterTestDataImp(Cast<AHumanCharacter>(InPawn));
-#endif
-
-			auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupHelper();
-			if (GroupsHelperSPtr)
+			if (InPawn->IsA(AHumanCharacter::StaticClass()))
 			{
-				TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
-					std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
-				);
+				// 在SetPawn之后调用
+				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
+					NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
+					});
 			}
+			else if (InPawn->IsA(AHorseCharacter::StaticClass()))
+			{
+				auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
 
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
-				NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
-				});
+				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>([this, InPawn](auto NewProcessor) {
+					NewProcessor->SetPawn(Cast<AHorseCharacter>(InPawn));
+					});
+			}
 		}
 	}
 }
@@ -256,10 +256,6 @@ void AHumanPlayerController::OnUnPossess()
 	auto CharacterPtr = Cast<FPawnType>(CurrentPawn);
 	if (CharacterPtr)
 	{
-		if (TeamMembersChangedDelegateHandle)
-		{
-			TeamMembersChangedDelegateHandle->UnBindCallback();
-		}
 	}
 
 	Super::OnUnPossess();
@@ -296,31 +292,6 @@ UGourpmateUnit* AHumanPlayerController::GetGourpMateUnit()
 
 void AHumanPlayerController::InitialCharacter()
 {
-}
-
-void AHumanPlayerController::OnCharacterGroupMateChanged(
-	EGroupMateChangeType GroupMateChangeType,
-	FPawnType* LeaderPCPtr
-)
-{
-	switch (GroupMateChangeType)
-	{
-	case EGroupMateChangeType::kAdd:
-	{
-		if (LeaderPCPtr)
-		{
-			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPtr == GetPawn<FPawnType>())
-			{
-				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
-				if (AIPCPtr)
-				{
-					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
-				}
-			}
-		}
-	}
-	break;
-	}
 }
 
 void AHumanPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)

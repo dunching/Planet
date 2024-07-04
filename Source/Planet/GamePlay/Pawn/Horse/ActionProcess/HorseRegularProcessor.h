@@ -120,8 +120,6 @@ namespace HorseProcessor
 
 		virtual void PressedNumKey(int32 NumKey)override;
 
-		AHumanCharacter* RiderPtr = nullptr;
-
 	protected:
 
 		virtual void TickImp(float Delta)override;

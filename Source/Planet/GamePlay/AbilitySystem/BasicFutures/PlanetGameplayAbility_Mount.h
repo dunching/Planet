@@ -13,7 +13,7 @@ class AHorseCharacter;
 
 struct FGameplayAbilityTargetData_Mount : public FGameplayAbilityTargetData
 {
-	AHorseCharacter * HorseCharacterPtr = nullptr;
+	AHorseCharacter* HorseCharacterPtr = nullptr;
 };
 
 /**
@@ -52,9 +52,11 @@ public:
 
 protected:
 
-	void Mount();
+	void PerformAction();
 
 	void PlayMontage();
+
+	void OnMontageComplete();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* MontagePtr = nullptr;

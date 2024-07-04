@@ -44,6 +44,8 @@ namespace HumanProcessor
 
 		virtual void EKeyPressed()override;
 
+		virtual void EKeyReleased()override;
+
 		virtual void QKeyPressed()override;
 
 		virtual void GKeyPressed()override;
@@ -71,6 +73,8 @@ namespace HumanProcessor
 		void AddOrRemoveUseMenuItemEvent(bool bIsAdd);
 
 		void UpdateLookAtObject();
+
+		bool bIsPressdLeftAlt = false;
 
 		TMap<FKey, TSharedPtr<FCanbeActivedInfo>>HandleKeysMap;
 

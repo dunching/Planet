@@ -159,8 +159,55 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(AHumanPlayerController::StaticClass()))
 	{
+#if TESTHOLDDATA
+		TestCommand::AddPlayerCharacterTestDataImp(this);
+#endif
+
+		auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupHelper();
+		if (GroupsHelperSPtr)
+		{
+			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
+				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
+			);
+		}
+
 	} 
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
+	}
+}
+
+void AHumanCharacter::UnPossessed()
+{
+	if (TeamMembersChangedDelegateHandle)
+	{
+		TeamMembersChangedDelegateHandle->UnBindCallback();
+	}
+
+	Super::UnPossessed();
+}
+
+void AHumanCharacter::OnCharacterGroupMateChanged(
+	EGroupMateChangeType GroupMateChangeType,
+	AHumanCharacter* LeaderPCPtr
+)
+{
+	switch (GroupMateChangeType)
+	{
+	case EGroupMateChangeType::kAdd:
+	{
+		if (LeaderPCPtr)
+		{
+			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPtr == this)
+			{
+				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
+				if (AIPCPtr)
+				{
+					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
+				}
+			}
+		}
+	}
+	break;
 	}
 }

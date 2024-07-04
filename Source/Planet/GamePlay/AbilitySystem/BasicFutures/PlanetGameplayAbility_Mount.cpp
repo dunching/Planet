@@ -20,6 +20,7 @@
 #include "HumanAIController.h"
 #include "HorseCharacter.h"
 #include "HumanAnimInstance.h"
+#include "HumanCharacter.h"
 
 UPlanetGameplayAbility_Mount::UPlanetGameplayAbility_Mount() :
 	Super()
@@ -43,7 +44,7 @@ void UPlanetGameplayAbility_Mount::PreActivate(
 		HorseCharacterPtr = GameplayAbilityTargetDataPtr->HorseCharacterPtr;
 	}
 
-	 CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
 	}
@@ -58,7 +59,7 @@ void UPlanetGameplayAbility_Mount::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	PlayMontage();
+	PerformAction();
 }
 
 void UPlanetGameplayAbility_Mount::EndAbility(
@@ -69,34 +70,26 @@ void UPlanetGameplayAbility_Mount::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (CharacterPtr)
-	{
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UPlanetGameplayAbility_Mount::Mount()
+void UPlanetGameplayAbility_Mount::PerformAction()
 {
-	auto PCPtr = UGameplayStatics::GetPlayerController(GetWorld(), 0); 
-	if (PCPtr)
+	if (CharacterPtr)
 	{
+		HorseCharacterPtr->RiderPtr = Cast<AHumanCharacter>(CharacterPtr);
+
 		CharacterPtr->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		auto AnimInstPtr = CharacterPtr->GetAnimationIns<UHumanAnimInstance>();
-		if (AnimInstPtr)
-		{
-			AnimInstPtr->AnimationType = EAnimationType::kMounted;
-		}
-
-		PCPtr->Possess(HorseCharacterPtr);
-
-		CharacterPtr->AttachToActor(HorseCharacterPtr, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		CharacterPtr->AttachToActor(HorseCharacterPtr, FAttachmentTransformRules::KeepRelativeTransform);
+		CharacterPtr->SetActorRelativeTransform(FTransform::Identity);
 	}
+
+	PlayMontage();
 }
 
 void UPlanetGameplayAbility_Mount::PlayMontage()
 {
-	WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::Mount));
+	WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::OnMontageComplete));
 
 	auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 		this,
@@ -115,4 +108,23 @@ void UPlanetGameplayAbility_Mount::PlayMontage()
 	TaskPtr->ReadyForActivation();
 
 	IncrementListLock();
+}
+
+void UPlanetGameplayAbility_Mount::OnMontageComplete()
+{
+	if (CharacterPtr)
+	{
+		CharacterPtr->SetActorRelativeTransform(FTransform::Identity);
+	}
+	auto PCPtr = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (PCPtr)
+	{
+		auto AnimInstPtr = CharacterPtr->GetAnimationIns<UHumanAnimInstance>();
+		if (AnimInstPtr)
+		{
+			AnimInstPtr->AnimationType = EAnimationType::kMounted;
+		}
+		HorseCharacterPtr->SwitchDisplayMountTips(false);
+		PCPtr->Possess(HorseCharacterPtr);
+	}
 }

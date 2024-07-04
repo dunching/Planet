@@ -98,11 +98,5 @@ void AHorseCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(AHumanPlayerController::StaticClass()))
 	{
-		auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
-
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>([this, PreviousPawnPtr](auto NewProcessor) {
-			NewProcessor->SetPawn(this);
-			NewProcessor->RiderPtr = Cast<AHumanCharacter>(PreviousPawnPtr);
-			});
 	}
 }

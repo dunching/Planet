@@ -29,6 +29,8 @@ class PLANET_API AHumanCharacter : public ACharacterBase
 
 public:
 
+	using FTeamMembersChangedDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, AHumanCharacter*)>::FCallbackHandleSPtr;
+
 	AHumanCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual TPair<FVector, FVector>GetCharacterViewInfo();
@@ -51,6 +53,13 @@ protected:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void UnPossessed() override;
+
+	void OnCharacterGroupMateChanged(
+		EGroupMateChangeType GroupMateChangeType,
+		AHumanCharacter* LeaderPCPtr
+	);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	TSoftObjectPtr<UTexture2D> CharacterIcon;
 	
@@ -59,6 +68,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
+
+	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
 private:
 

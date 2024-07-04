@@ -28,8 +28,6 @@ class PLANET_API AHumanPlayerController : public AGravityPlayerController, publi
 
 public:
 
-	using FTeamMembersChangedDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>::FCallbackHandleSPtr;
-
 	AHumanPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	virtual void SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
@@ -66,19 +64,12 @@ protected:
 
 	void InitialCharacter();
 
-	void OnCharacterGroupMateChanged(
-		EGroupMateChangeType GroupMateChangeType,
-		FPawnType* LeaderPCPtr
-	);
-
 	UFUNCTION()
 	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);
 
 	void OnFocusDeathing(const FGameplayTag Tag, int32 Count);
 
 	void BindRemove(AActor* Actor);
-
-	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 

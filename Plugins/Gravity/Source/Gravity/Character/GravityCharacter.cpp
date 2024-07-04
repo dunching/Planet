@@ -9,6 +9,12 @@
 #include "GameFramework/PlayerInput.h"
 #include "GravitySpringArmComponent.h"
 
+static TAutoConsoleVariable<int32> GravityCharacter(
+    TEXT("Skill.DrawDebug.GravityCharacter"),
+    0,
+    TEXT("")
+    TEXT(" default: 0"));
+
 AGravityCharacter::AGravityCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer.SetDefaultSubobjectClass<UGravityMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
@@ -48,4 +54,16 @@ FQuat AGravityCharacter::GetGravityToWorldTransform() const
     }
 
     return GravityTransform;
+}
+
+void AGravityCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue /*= 1.0f*/, bool bForce /*= false*/)
+{
+#ifdef WITH_EDITOR
+    if (GravityCharacter.GetValueOnGameThread())
+    {
+        //	DrawDebugLine(GetWorldImp(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (100 * ForwardDirection), FColor::Red, false, 3);
+    }
+#endif
+
+    Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 }

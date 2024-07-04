@@ -11,6 +11,8 @@
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 #include "Async/Async.h"
 #include "Components/CapsuleComponent.h"
+#include "GameplayTags/GameplayTagsSubSystem.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 #include "Character/GravityMovementComponent.h"
 
@@ -40,6 +42,7 @@
 #include "HumanProcessor.h"
 #include "HumanAnimInstance.h"
 #include "CollisionDataStruct.h"
+#include "PlanetGameplayAbility_DisMount.h"
 
 namespace HorseProcessor
 {
@@ -76,7 +79,8 @@ namespace HorseProcessor
         {
             const FRotator Rotation = OnwerActorPtr->Controller->GetControlRotation();
 
-            const FVector ForwardDirection = UKismetMathLibrary::MakeRotFromZX(-OnwerActorPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
+            const FVector ForwardDirection = 
+				UKismetMathLibrary::MakeRotFromZX(-OnwerActorPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
 
             DrawDebugLine(GetWorldImp(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (100 * ForwardDirection), FColor::Red, false, 3);
             OnwerActorPtr->AddMovementInput(ForwardDirection, Value);
@@ -161,6 +165,20 @@ namespace HorseProcessor
 	void FHorseRegularProcessor::EKeyReleased()
 	{
 		bIsPressdE = false;
+
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+
+		if (OnwerActorPtr && OnwerActorPtr->RiderPtr)
+		{
+			FGameplayEventData Payload;
+			auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_DisMount;
+
+			GameplayAbilityTargetData_DashPtr->HorseCharacterPtr = OnwerActorPtr;
+
+			Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr->RiderPtr, UGameplayTagsSubSystem::GetInstance()->DisMount, Payload);
+		}
 	}
 
 	void FHorseRegularProcessor::RKeyPressed()

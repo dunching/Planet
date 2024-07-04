@@ -32,6 +32,8 @@ public:
         return FollowCamera;
     };
 
+    virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false)override;
+
 protected:
 
     /** Camera boom positioning the camera behind the character */

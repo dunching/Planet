@@ -265,6 +265,11 @@ namespace HumanProcessor
 		}
 	}
 
+	void FHumanRegularProcessor::EKeyReleased()
+	{
+
+	}
+
 	void FHumanRegularProcessor::QKeyPressed()
 	{
 		auto PCPtr = Cast<AHumanPlayerController>(GetOwnerActor()->GetController());
@@ -338,30 +343,36 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::LAltKeyPressed()
 	{
+		bIsPressdLeftAlt = true;
 	}
 
 	void FHumanRegularProcessor::LAltKeyReleased()
 	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		if (!OnwerActorPtr)
+		if (bIsPressdLeftAlt)
 		{
-			return;
+			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+			if (!OnwerActorPtr)
+			{
+				return;
+			}
+
+			auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
+			if (PlayerPCPtr)
+			{
+				if (PlayerPCPtr->bShowMouseCursor > 0)
+				{
+					PlayerPCPtr->bShowMouseCursor = 0;
+					UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
+				}
+				else
+				{
+					PlayerPCPtr->bShowMouseCursor = 1;
+					UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
+				}
+			}
 		}
 
-		auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			if (PlayerPCPtr->bShowMouseCursor > 0)
-			{
-				PlayerPCPtr->bShowMouseCursor = 0;
-				UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
-			}
-			else
-			{
-				PlayerPCPtr->bShowMouseCursor = 1;
-				UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
-			}
-		}
+		bIsPressdLeftAlt = false;
 	}
 
 	void FHumanRegularProcessor::GKeyPressed()
