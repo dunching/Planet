@@ -96,6 +96,13 @@ void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+		GASPtr->ClearAllAbilities();
+	}
 	GetInteractiveSkillComponent()->InitialBaseGAs();
 	GetInteractiveBaseGAComponent()->InitialBaseGAs();
 

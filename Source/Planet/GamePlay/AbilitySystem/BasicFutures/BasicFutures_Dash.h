@@ -7,7 +7,7 @@
 #include "BasicFuturesBase.h"
 #include "GenerateType.h"
 
-#include "PlanetGameplayAbility_Dash.generated.h"
+#include "BasicFutures_Dash.generated.h"
 
 class UAnimMontage;
 

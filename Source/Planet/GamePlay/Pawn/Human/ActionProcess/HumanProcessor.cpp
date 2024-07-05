@@ -43,7 +43,7 @@
 #include "PlanetGameInstance.h"
 #include "HorseCharacter.h"
 #include "PlanetGameplayAbility.h"
-#include "PlanetGameplayAbility_Dash.h"
+#include "BasicFutures_Dash.h"
 #include "AssetRefMap.h"
 #include "BuildingBaseProcessor.h"
 #include "CharacterAttributesComponent.h"
@@ -53,6 +53,14 @@
 #include "CharacterAttibutes.h"
 #include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
+
+#ifdef WITH_EDITOR
+static TAutoConsoleVariable<int32> DrawDebugHumanProcessor(
+	TEXT("Skill.DrawDebug.HumanProcessor"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
+#endif
 
 namespace HumanProcessor
 {
@@ -79,7 +87,12 @@ namespace HumanProcessor
 			const FVector ForwardDirection = 
 				UKismetMathLibrary::MakeRotFromZX(-OnwerActorPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
 
-			DrawDebugLine(GetWorldImp(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (100 * ForwardDirection), FColor::Red, false, 3);
+#ifdef WITH_EDITOR
+			if (DrawDebugHumanProcessor.GetValueOnGameThread())
+			{
+				DrawDebugLine(GetWorldImp(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (100 * ForwardDirection), FColor::Red, false, 3);
+			}
+#endif
 			OnwerActorPtr->AddMovementInput(ForwardDirection, Value);
 		}
 	}

@@ -196,7 +196,6 @@ namespace HorseProcessor
 			)
 		{
 
-			DrawDebugSphere(HumanCharaterPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
 		}
 	}
 

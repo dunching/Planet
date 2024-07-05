@@ -135,11 +135,14 @@ void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetController()->IsA(AHumanPlayerController::StaticClass()))
+	if (GetController())
 	{
-	}
-	else if (GetController()->IsA(AHumanAIController::StaticClass()))
-	{
+		if (GetController()->IsA(AHumanPlayerController::StaticClass()))
+		{
+		}
+		else if (GetController()->IsA(AHumanAIController::StaticClass()))
+		{
+		}
 	}
 }
 

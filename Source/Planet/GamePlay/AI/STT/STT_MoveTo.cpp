@@ -5,6 +5,14 @@
 #include <Tasks/AITask_MoveTo.h>
 #include <GameplayTask.h>
 
+EStateTreeRunStatus FSTT_MoveToTask::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+)const
+{
+	return Super::EnterState(Context, Transition);
+}
+
 void FSTT_MoveToTask::ExitState(FStateTreeExecutionContext& Context, const FStateTreeTransitionResult& Transition) const
 {
 #if WITH_EDITOR

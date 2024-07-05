@@ -14,6 +14,11 @@ struct PLANET_API FSTT_MoveToTask : public FStateTreeMoveToTask
 {
 	GENERATED_BODY()
 
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
 	virtual void ExitState(
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition

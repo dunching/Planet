@@ -1,3 +1,4 @@
+
 #include "ProjectileBase.h"
 
 #include "Components/StaticMeshComponent.h"
@@ -7,6 +8,12 @@
 #include "GameFramework/Character.h"
 #include <DrawDebugHelpers.h>
 #include "Components/SphereComponent.h"
+
+static TAutoConsoleVariable<int32> ProjectileBase(
+    TEXT("Skill.DrawDebug.ProjectileBase"),
+    0,
+    TEXT("")
+    TEXT(" default: 0"));
 
 AProjectileBase::AProjectileBase(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
@@ -39,6 +46,12 @@ void AProjectileBase::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	DrawDebugSphere(GetWorld(), GetActorLocation(), 8.f, 10, FColor::Red, false, 10);
+
+#ifdef WITH_EDITOR
+    if (ProjectileBase.GetValueOnGameThread())
+    {
+        DrawDebugSphere(GetWorld(), GetActorLocation(), 8.f, 10, FColor::Red, false, 10);
+    }
+#endif
 }
 #endif

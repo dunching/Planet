@@ -33,6 +33,7 @@ class UFocusIcon;
 class UFightingTips;
 class AHumanCharacter;
 class AHorseCharacter;
+class AGeneratorNPC;
 
 class UToolUnit;
 class UWeaponUnit;
@@ -48,12 +49,15 @@ public:
 
 	static UAssetRefMap* GetInstance();
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHumanCharacter>HumanClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHorseCharacter>HorseClass;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GeneratorNPCClass")
+	TSubclassOf<AGeneratorNPC>GeneratorNPCClass;
+	
 #pragma region SceneTools
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
 	TMap<EToolUnitType, TSubclassOf<UToolUnit>>EquipmentToolsMap;

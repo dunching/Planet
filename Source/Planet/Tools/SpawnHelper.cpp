@@ -66,8 +66,6 @@ void ASpawnHelper::SpanActor()
 		Params)
 		)
 	{
-		DrawDebugSphere(GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, false, 10);
-
 		int32 Index = SpawnActorAry.Num();
 		int32 CurrentIndex = 0;
 		for (auto Iter : SpawnActorAry)

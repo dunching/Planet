@@ -60,7 +60,7 @@ public:
 
 	private:
 
-		ETeammateOption TeammateOption = ETeammateOption::kFollow;
+		ETeammateOption TeammateOption = ETeammateOption::kEnemy;
 
 	};
 

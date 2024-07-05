@@ -7,7 +7,7 @@
 #include "BasicFuturesBase.h"
 #include "GenerateType.h"
 
-#include "PlanetGameplayAbility_Mount.generated.h"
+#include "BasicFutures_Mount.generated.h"
 
 class AHorseCharacter;
 

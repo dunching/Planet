@@ -10,6 +10,14 @@
 #include "STE_Human.h"
 #include "Planet.h"
 
+#ifdef WITH_EDITOR
+static TAutoConsoleVariable<int32> DrawDebugSTT_RunEQS(
+	TEXT("Skill.DrawDebug.STT_RunEQS"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
+#endif
+
 namespace STT_RunEQS
 {
 	FName Donut_InnerRadius = TEXT("Donut.InnerRadius");
@@ -81,8 +89,12 @@ EStateTreeRunStatus FSTT_RunEQS::Tick(
 				InstanceData.GloabVariable->Location = InstanceData.ResultSPtr->GetItemAsLocation(0);
 				InstanceData.Location = InstanceData.GloabVariable->Location;
 
-#if WITH_EDITOR
-				DrawDebugSphere(GetWorldImp(), InstanceData.Location, 20, 20, FColor::Yellow, false, 5);
+
+#ifdef WITH_EDITOR
+				if (DrawDebugSTT_RunEQS.GetValueOnGameThread())
+				{
+					DrawDebugSphere(GetWorldImp(), InstanceData.Location, 20, 20, FColor::Yellow, false, 5);
+				}
 #endif
 
 				return EStateTreeRunStatus::Succeeded;

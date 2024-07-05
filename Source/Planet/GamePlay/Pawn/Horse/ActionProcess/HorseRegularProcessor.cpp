@@ -42,7 +42,13 @@
 #include "HumanProcessor.h"
 #include "HumanAnimInstance.h"
 #include "CollisionDataStruct.h"
-#include "PlanetGameplayAbility_DisMount.h"
+#include "BasicFutures_DisMount.h"
+
+static TAutoConsoleVariable<int32> HorseRegularProcessor(
+	TEXT("Skill.DrawDebug.HorseRegularProcessor"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
 
 namespace HorseProcessor
 {
@@ -234,7 +240,13 @@ namespace HorseProcessor
 			)
 		{
 
-			DrawDebugSphere(HumanCharaterPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
+#ifdef WITH_EDITOR
+			if (HorseRegularProcessor.GetValueOnGameThread())
+			{
+				DrawDebugSphere(HumanCharaterPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
+			}
+#endif
+
 		}
 	}
 

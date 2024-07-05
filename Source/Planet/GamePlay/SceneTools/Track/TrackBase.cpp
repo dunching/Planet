@@ -109,9 +109,6 @@ void ATrackBase::UpdateSpline(const FTransform& StartTransForm, const FTransform
 		SplinePtr->SetTangentAtSplinePoint(1, SecondTan * GetTrackLen(), ESplineCoordinateSpace::World);
     }
 
-	DrawDebugSphere(GetWorld(), SplinePtr->GetWorldLocationAtSplinePoint(0), 12, 12, FColor::Yellow);
-	DrawDebugSphere(GetWorld(), SplinePtr->GetWorldLocationAtSplinePoint(1), 12, 12, FColor::Yellow);
-
 	SplineMesh1Ptr->SetStartPosition(SplinePtr->GetWorldLocationAtSplinePoint(0));
 	SplineMesh1Ptr->SetStartTangent(SplinePtr->GetTangentAtSplinePoint(0, ESplineCoordinateSpace::World));
 

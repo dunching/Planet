@@ -102,7 +102,6 @@ void UInteractiveBaseGAComponent::InitialBaseGAs()
 	{
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		GASPtr->ClearAllAbilities();
 		GASPtr->InitAbilityActorInfo(OnwerActorPtr, OnwerActorPtr);
 
 		SendEventHandle = GASPtr->GiveAbility(

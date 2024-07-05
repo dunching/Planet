@@ -7,7 +7,7 @@
 #include "BasicFuturesBase.h"
 #include "GenerateType.h"
 
-#include "PlanetGameplayAbility_Death.generated.h"
+#include "BasicFutures_Death.generated.h"
 
 class UAnimMontage;
 

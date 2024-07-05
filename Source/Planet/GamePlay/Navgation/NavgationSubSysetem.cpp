@@ -67,7 +67,7 @@ void UNavgationSubSystem::CheckNeedRebuildNavData()
 			(FVector::Distance(Pt1, Pt2) > 500)
 			)
 		{
-			RebuildNavData(NavMeshBoundsVolumePtr, CharacterPtr, Pt1);
+	//		RebuildNavData(NavMeshBoundsVolumePtr, CharacterPtr, Pt1);
 			break;
 		}
 	}
@@ -84,18 +84,8 @@ void UNavgationSubSystem::RebuildNavData(
 	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	if (NavSys)
 	{
-		NavSys->OnNavigationBoundsUpdated(NavMeshBoundsVolumePtr);
-	}
-
-	if (!PreviouFlyingNavigationDataPtr)
-	{
-		PreviouFlyingNavigationDataPtr = UFlyingNavFunctionLibrary::GetFlyingNavigationData(CharacterPtr);
-		PreviouFlyingNavigationDataPtr->OnFlyingNavGenerationFinished.AddDynamic(this, &ThisClass::FlyingNavGenerationFinished);
-	}
-	if (PreviouFlyingNavigationDataPtr)
-	{
-		PreviouFlyingNavigationDataPtr->StopRebuild();
-		PreviouFlyingNavigationDataPtr->RebuildNavigationData();
+ 		NavSys->OnNavigationBoundsUpdated(NavMeshBoundsVolumePtr);
+ 		NavSys->Build();
 	}
 }
 
