@@ -14,7 +14,7 @@ class UAnimMontage;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API UPlanetGameplayAbility_Death : public UBasicFuturesBase
+class PLANET_API UBasicFutures_Death : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 

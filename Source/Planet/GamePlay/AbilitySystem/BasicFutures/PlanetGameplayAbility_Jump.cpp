@@ -5,13 +5,13 @@
 #include "GenerateType.h"
 #include "CharacterBase.h"
 
-UPlanetGameplayAbility_Jump::UPlanetGameplayAbility_Jump() :
+UBasicFutures_Jump::UBasicFutures_Jump() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UPlanetGameplayAbility_Jump::ActivateAbility(
+void UBasicFutures_Jump::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -24,7 +24,7 @@ void UPlanetGameplayAbility_Jump::ActivateAbility(
 	Character->Jump();
 }
 
-bool UPlanetGameplayAbility_Jump::CanActivateAbility(
+bool UBasicFutures_Jump::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
@@ -40,7 +40,7 @@ bool UPlanetGameplayAbility_Jump::CanActivateAbility(
 	return false;
 }
 
-void UPlanetGameplayAbility_Jump::CancelAbility(
+void UBasicFutures_Jump::CancelAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,

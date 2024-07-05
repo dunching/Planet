@@ -22,13 +22,13 @@
 #include "HumanAnimInstance.h"
 #include "HumanCharacter.h"
 
-UPlanetGameplayAbility_Mount::UPlanetGameplayAbility_Mount() :
+UBasicFutures_Mount::UBasicFutures_Mount() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UPlanetGameplayAbility_Mount::PreActivate(
+void UBasicFutures_Mount::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, 
@@ -50,7 +50,7 @@ void UPlanetGameplayAbility_Mount::PreActivate(
 	}
 }
 
-void UPlanetGameplayAbility_Mount::ActivateAbility(
+void UBasicFutures_Mount::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -62,7 +62,7 @@ void UPlanetGameplayAbility_Mount::ActivateAbility(
 	PerformAction();
 }
 
-void UPlanetGameplayAbility_Mount::EndAbility(
+void UBasicFutures_Mount::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -73,7 +73,7 @@ void UPlanetGameplayAbility_Mount::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UPlanetGameplayAbility_Mount::PerformAction()
+void UBasicFutures_Mount::PerformAction()
 {
 	if (CharacterPtr)
 	{
@@ -87,7 +87,7 @@ void UPlanetGameplayAbility_Mount::PerformAction()
 	PlayMontage();
 }
 
-void UPlanetGameplayAbility_Mount::PlayMontage()
+void UBasicFutures_Mount::PlayMontage()
 {
 	WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::OnMontageComplete));
 
@@ -110,7 +110,7 @@ void UPlanetGameplayAbility_Mount::PlayMontage()
 	IncrementListLock();
 }
 
-void UPlanetGameplayAbility_Mount::OnMontageComplete()
+void UBasicFutures_Mount::OnMontageComplete()
 {
 	if (CharacterPtr)
 	{

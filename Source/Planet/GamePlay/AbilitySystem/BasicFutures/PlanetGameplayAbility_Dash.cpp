@@ -22,13 +22,13 @@ static TAutoConsoleVariable<int32> SkillDrawDebugDash(
 	TEXT("")
 	TEXT(" default: 0"));
 
-UPlanetGameplayAbility_Dash::UPlanetGameplayAbility_Dash() :
+UBasicFutures_Dash::UBasicFutures_Dash() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UPlanetGameplayAbility_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void UBasicFutures_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -38,7 +38,7 @@ void UPlanetGameplayAbility_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* A
 	}
 }
 
-void UPlanetGameplayAbility_Dash::ActivateAbility(
+void UBasicFutures_Dash::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -63,7 +63,7 @@ void UPlanetGameplayAbility_Dash::ActivateAbility(
 	DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UPlanetGameplayAbility_Dash::PreActivate(
+void UBasicFutures_Dash::PreActivate(
 	const FGameplayAbilitySpecHandle Handle, 
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo, 
@@ -78,7 +78,7 @@ void UPlanetGameplayAbility_Dash::PreActivate(
 	}
 }
 
-bool UPlanetGameplayAbility_Dash::CommitAbility(
+bool UBasicFutures_Dash::CommitAbility(
 	const FGameplayAbilitySpecHandle Handle, 
 	const FGameplayAbilityActorInfo* ActorInfo, 
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -104,7 +104,7 @@ bool UPlanetGameplayAbility_Dash::CommitAbility(
 	return false;
 }
 
-void UPlanetGameplayAbility_Dash::EndAbility(
+void UBasicFutures_Dash::EndAbility(
 	const FGameplayAbilitySpecHandle Handle, 
 	const FGameplayAbilityActorInfo* ActorInfo, 
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -127,7 +127,7 @@ void UPlanetGameplayAbility_Dash::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-bool UPlanetGameplayAbility_Dash::CanActivateAbility(
+bool UBasicFutures_Dash::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo, 
 	const FGameplayTagContainer* SourceTags, 
@@ -150,7 +150,7 @@ bool UPlanetGameplayAbility_Dash::CanActivateAbility(
 	return false;
 }
 
-void UPlanetGameplayAbility_Dash::DoDash(
+void UBasicFutures_Dash::DoDash(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -213,7 +213,7 @@ void UPlanetGameplayAbility_Dash::DoDash(
 	}
 }
 
-void UPlanetGameplayAbility_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
+void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -236,7 +236,7 @@ void UPlanetGameplayAbility_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float
 	}
 }
 
-void UPlanetGameplayAbility_Dash::Displacement(const FVector& Direction)
+void UBasicFutures_Dash::Displacement(const FVector& Direction)
 {
 	{
 		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(

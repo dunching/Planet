@@ -20,12 +20,12 @@ struct FGameplayAbilityTargetData_Mount : public FGameplayAbilityTargetData
  * Makes the Character try to jump using the standard Character->Jump. This is an example of a non-instanced ability.
  */
 UCLASS()
-class PLANET_API UPlanetGameplayAbility_Mount : public UBasicFuturesBase
+class PLANET_API UBasicFutures_Mount : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
 public:
-	UPlanetGameplayAbility_Mount();
+	UBasicFutures_Mount();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,

@@ -12,13 +12,13 @@
 #include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
 
-UPlanetGameplayAbility_Run::UPlanetGameplayAbility_Run() :
+UBasicFutures_Run::UBasicFutures_Run() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UPlanetGameplayAbility_Run::PreActivate(
+void UBasicFutures_Run::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -34,7 +34,7 @@ void UPlanetGameplayAbility_Run::PreActivate(
 	}
 }
 
-void UPlanetGameplayAbility_Run::ActivateAbility(
+void UBasicFutures_Run::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -53,7 +53,7 @@ void UPlanetGameplayAbility_Run::ActivateAbility(
 	}
 }
 
-void UPlanetGameplayAbility_Run::EndAbility(
+void UBasicFutures_Run::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -71,7 +71,7 @@ void UPlanetGameplayAbility_Run::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-bool UPlanetGameplayAbility_Run::CanActivateAbility(
+bool UBasicFutures_Run::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,

@@ -8,7 +8,7 @@
 #include "CharacterBase.h"
 #include "HumanAIController.h"
 
-void UPlanetGameplayAbility_Death::ActivateAbility(
+void UBasicFutures_Death::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -31,7 +31,7 @@ void UPlanetGameplayAbility_Death::ActivateAbility(
 	}
 }
 
-void UPlanetGameplayAbility_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
+void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(

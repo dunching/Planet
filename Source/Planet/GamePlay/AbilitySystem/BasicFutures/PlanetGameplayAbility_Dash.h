@@ -22,12 +22,12 @@ struct FGameplayAbilityTargetData_Dash : public FGameplayAbilityTargetData
  * Makes the Character try to jump using the standard Character->Jump. This is an example of a non-instanced ability.
  */
 UCLASS()
-class PLANET_API UPlanetGameplayAbility_Dash : public UBasicFuturesBase
+class PLANET_API UBasicFutures_Dash : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
 public:
-	UPlanetGameplayAbility_Dash();
+	UBasicFutures_Dash();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,

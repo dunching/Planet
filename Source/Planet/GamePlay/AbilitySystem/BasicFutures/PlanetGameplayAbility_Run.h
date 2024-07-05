@@ -13,12 +13,12 @@
  * Makes the Character try to jump using the standard Character->Jump. This is an example of a non-instanced ability.
  */
 UCLASS()
-class PLANET_API UPlanetGameplayAbility_Run : public UBasicFuturesBase
+class PLANET_API UBasicFutures_Run : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
 public:
-	UPlanetGameplayAbility_Run();
+	UBasicFutures_Run();
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
