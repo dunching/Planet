@@ -1,5 +1,5 @@
 {
-	"FileVersion": 3,
+	"FileVersion": 1,
 	"EngineAssociation": "{0CD8EBCA-4C21-F1A1-4443-95B2FA556040}",
 	"Category": "",
 	"Description": "",
@@ -12,6 +12,11 @@
 				"Engine",
 				"CoreUObject"
 			]
+		},
+		{
+			"Name": "PlanetEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [
