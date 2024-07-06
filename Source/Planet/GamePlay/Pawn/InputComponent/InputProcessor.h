@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 
 #include "GenerateType.h"
+#include "Tools.h"
 #include "Planet.h"
 
 class APawn;

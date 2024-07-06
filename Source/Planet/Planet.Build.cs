@@ -97,8 +97,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Common/Talent");
         PublicIncludePaths.Add("Planet/Library");
         PublicIncludePaths.Add("Planet/Tools");
-        PublicIncludePaths.Add("Planet/Tools/ThreadPoolHelper");
-        PublicIncludePaths.Add("Planet/Tools/LogHelper");
 
         if (Target.bBuildEditor == true)
         {
@@ -116,7 +114,6 @@ public class Planet : ModuleRules
             "UMG",
 
             "EnhancedInput" ,
-            "GameplayAbilities",
             "GameplayTags",
             "GameplayTasks",
 
@@ -125,9 +122,13 @@ public class Planet : ModuleRules
             "StateTreeModule",
             "NavigationSystem",
             "ChaosVehicles",
+
+            "Tools",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {
+            "GameplayAbilities",
+
             "VoxelCore",
             "VoxelGraphCore",
             "Gravity",

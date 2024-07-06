@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 
-#include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
 
 #include "Character/GravityCharacter.h"

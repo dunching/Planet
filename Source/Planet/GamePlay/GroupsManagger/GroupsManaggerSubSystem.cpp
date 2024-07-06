@@ -15,7 +15,7 @@ UGroupsManaggerSubSystem* UGroupsManaggerSubSystem::GetInstance()
 	return Cast<UGroupsManaggerSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UGroupsManaggerSubSystem::StaticClass()));
 }
 
-TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> UGroupsManaggerSubSystem::CreateGroup(FPawnType* PCPtr)
+TSharedPtr<FGroupMatesHelper> UGroupsManaggerSubSystem::CreateGroup(FPawnType* PCPtr)
 {
 	TSharedPtr<FGroupMatesHelper> ResultSPtr = MakeShared<FGroupMatesHelper>();
 	for (;;)
@@ -35,7 +35,7 @@ TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> UGroupsManaggerSubSystem
 	return ResultSPtr;
 }
 
-TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> UGroupsManaggerSubSystem::CreateTeam(FPawnType* PCPtr)
+TSharedPtr<FTeamMatesHelper> UGroupsManaggerSubSystem::CreateTeam(FPawnType* PCPtr)
 {
 	TSharedPtr<FTeamMatesHelper> ResultSPtr = MakeShared<FTeamMatesHelper>();
 	for (;;)
@@ -55,7 +55,7 @@ TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> UGroupsManaggerSubSystem:
 	return ResultSPtr;
 }
 
-void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
+void FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
 {
 	MembersSet.Add(PCPtr);
 
@@ -64,7 +64,7 @@ void UGroupsManaggerSubSystem::FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
 
-void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr)
+void FTeamMatesHelper::AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr)
 {
 	MembersMap.Add(GourpMateUnitPtr, PCPtr);
 
@@ -73,14 +73,14 @@ void UGroupsManaggerSubSystem::FTeamMatesHelper::AddCharacter(UGourpmateUnit* Go
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
 
-void UGroupsManaggerSubSystem::FTeamMatesHelper::SwitchTeammateOption(ETeammateOption InTeammateOption)
+void FTeamMatesHelper::SwitchTeammateOption(ETeammateOption InTeammateOption)
 {
 	TeammateOption = InTeammateOption;
 
 	TeammateOptionChanged.ExcuteCallback(InTeammateOption, OwnerPtr);
 }
 
-ETeammateOption UGroupsManaggerSubSystem::FTeamMatesHelper::GetTeammateOption() const
+ETeammateOption FTeamMatesHelper::GetTeammateOption() const
 {
 	return TeammateOption;
 }

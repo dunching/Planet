@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 
 #include "GameFramework/Actor.h"
-#include "GenerateType.h"
 
 #include "SpawnHelper.generated.h"
 
@@ -14,7 +13,7 @@ class USphereComponent;
 class ARawMaterialBase;
 
 UCLASS()
-class PLANET_API ASpawnHelper : public AActor
+class PLANETEDITOR_API ASpawnHelper : public AActor
 {
 	GENERATED_BODY()
 public:
@@ -35,9 +34,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Simulation Fist")
 		float Offset = 10.f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Simulation Fist")
-		TMap<TSubclassOf<ARawMaterialBase>, int32>SpawnActorAry;
+// 
+// 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Simulation Fist")
+// 		TMap<TSubclassOf<ARawMaterialBase>, int32>SpawnActorAry;
 
 	FTimerHandle UpdateGravityCenterLocationTimer;
 

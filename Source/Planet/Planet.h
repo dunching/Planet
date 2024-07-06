@@ -4,15 +4,8 @@
 
 #include "CoreMinimal.h"
 
-PLANET_API class UPlanetGameInstance* GGameInstancePtr = nullptr;
+class UPlanetGameInstance* GGameInstancePtr = nullptr;
 
-PLANET_API bool bIsExiting = false;
+bool bIsExiting = false;
 
-UWorld* GetWorldImp();
-
-#define GENERATIONCLASSINFO(ThisClassType, ParentClassType) \
-using ThisClass = ThisClassType; \
-using Super = ParentClassType;
-
-#define GENERATIONCLASSINFOONLYTHIS(ThisClassType) \
-using ThisClass = ThisClassType; 
+PLANET_API UWorld* GetWorldImp();

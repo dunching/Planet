@@ -11,7 +11,7 @@
 class AHumanCharacter;
 
 UCLASS(BlueprintType, Blueprintable)
-class UGroupMnaggerComponent : public UActorComponent
+class PLANET_API UGroupMnaggerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -31,9 +31,9 @@ public:
 
 	void OnAddToNewTeam(FPawnType* OwnerPtr);
 
-	const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& GetGroupHelper();
+	const TSharedPtr<FGroupMatesHelper>& GetGroupHelper();
 
-	const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& GetTeamHelper();
+	const TSharedPtr<FTeamMatesHelper>& GetTeamHelper();
 
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
@@ -47,8 +47,8 @@ protected:
 
 private:
 
-	TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper> GroupHelperSPtr;
+	TSharedPtr<FGroupMatesHelper> GroupHelperSPtr;
 
-	TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper> TeamHelperSPtr;
+	TSharedPtr<FTeamMatesHelper> TeamHelperSPtr;
 
 };

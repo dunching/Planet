@@ -112,7 +112,7 @@ enum class ESkillType : uint8
 };
 
 UCLASS(BlueprintType)
-class UBasicUnit : public UObject
+class PLANET_API UBasicUnit : public UObject
 {
 	GENERATED_BODY()
 
@@ -163,7 +163,7 @@ SceneElementType UBasicUnit::GetSceneElementType() const
 }
 
 UCLASS(BlueprintType, Blueprintable)
-class UToolUnit : public UBasicUnit
+class PLANET_API UToolUnit : public UBasicUnit
 {
 	GENERATED_BODY()
 
@@ -185,7 +185,7 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class UGourpmateUnit : public UBasicUnit
+class PLANET_API UGourpmateUnit : public UBasicUnit
 {
 	GENERATED_BODY()
 
@@ -208,7 +208,7 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class USkillUnit : public UBasicUnit
+class PLANET_API USkillUnit : public UBasicUnit
 {
 	GENERATED_BODY()
 
@@ -231,7 +231,7 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class UPassiveSkillUnit : public USkillUnit
+class PLANET_API UPassiveSkillUnit : public USkillUnit
 {
 	GENERATED_BODY()
 
@@ -253,7 +253,7 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class UWeaponUnit : public UBasicUnit
+class PLANET_API UWeaponUnit : public UBasicUnit
 {
 	GENERATED_BODY()
 

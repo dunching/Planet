@@ -12,6 +12,9 @@ public class PlanetGameTarget : TargetRules
         Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 
-		ExtraModuleNames.AddRange( new string[] { "Planet" } );
+		ExtraModuleNames.AddRange( new string[] {
+            "Planet",
+            "Tools",
+        } );
 	}
 }

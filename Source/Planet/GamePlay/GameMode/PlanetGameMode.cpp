@@ -13,7 +13,7 @@
 
 #include "VoxelTaskExecutor.h"
 
-#include "Planet/Planet.h"
+#include "Planet.h"
 #include "ArticleBase.h"
 #include "CollisionDataStruct.h"
 #include "SaveGame/ShiYuSaveGame.h"

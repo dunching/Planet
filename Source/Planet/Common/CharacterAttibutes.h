@@ -64,7 +64,7 @@ private:
 };
 
 USTRUCT(BlueprintType)
-struct FBasePropertySet
+struct PLANET_API FBasePropertySet
 {
 	GENERATED_USTRUCT_BODY()
 

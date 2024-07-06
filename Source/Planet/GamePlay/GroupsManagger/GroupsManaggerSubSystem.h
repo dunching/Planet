@@ -14,6 +14,57 @@ class IPlanetControllerInterface;
 class UGourpmateUnit;
 class AHumanCharacter;
 
+PLANET_API class FGroupMatesHelper
+{
+public:
+	using FPawnType = AHumanCharacter;
+
+	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>;
+
+	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FPawnType*)>;
+
+	void AddCharacter(FPawnType* PCPtr);
+
+	int32 ID = 1;
+
+	FMemberChangedDelegateContainer MembersChanged;
+
+	FPawnType* OwnerPtr = nullptr;
+
+	TSet<FPawnType*> MembersSet;
+};
+
+PLANET_API class FTeamMatesHelper
+{
+public:
+	using FPawnType = AHumanCharacter;
+
+	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>;
+
+	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FPawnType*)>;
+
+	void AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr);
+
+	PLANET_API void SwitchTeammateOption(ETeammateOption InTeammateOption);
+
+	ETeammateOption GetTeammateOption()const;
+
+	int32 ID = 1;
+
+	FMemberChangedDelegateContainer MembersChanged;
+
+	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
+
+	FPawnType* OwnerPtr = nullptr;
+
+	TMap<UGourpmateUnit*, FPawnType*> MembersMap;
+
+private:
+
+	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
+
+};
+
 UCLASS()
 class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
 {
@@ -26,43 +77,6 @@ public:
 	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>;
 
 	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FPawnType*)>;
-
-	struct FGroupMatesHelper
-	{
-		void AddCharacter(FPawnType* PCPtr);
-
-		int32 ID = 1;
-
-		FMemberChangedDelegateContainer MembersChanged;
-
-		FPawnType* OwnerPtr = nullptr;
-
-		TSet<FPawnType*> MembersSet;
-	};
-
-	struct FTeamMatesHelper
-	{
-		void AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr);
-
-		void SwitchTeammateOption(ETeammateOption InTeammateOption);
-
-		ETeammateOption GetTeammateOption()const;
-
-		int32 ID = 1;
-
-		FMemberChangedDelegateContainer MembersChanged;
-
-		FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
-
-		FPawnType* OwnerPtr = nullptr;
-
-		TMap<UGourpmateUnit*, FPawnType*> MembersMap;
-
-	private:
-
-		ETeammateOption TeammateOption = ETeammateOption::kEnemy;
-
-	};
 
 	static UGroupsManaggerSubSystem* GetInstance();
 

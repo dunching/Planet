@@ -12,7 +12,7 @@
 #include "InteractiveBaseGAComponent.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)
-class UInteractiveBaseGAComponent : public UInteractiveComponent
+class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
 {
 	GENERATED_BODY()
 

@@ -37,7 +37,7 @@ void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* OwnerPtr)
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupHelper() 
+const TSharedPtr<FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupHelper() 
 {
 	if (!GroupHelperSPtr)
 	{
@@ -49,7 +49,7 @@ const TSharedPtr<UGroupsManaggerSubSystem::FGroupMatesHelper>& UGroupMnaggerComp
 	return GroupHelperSPtr;
 }
 
-const TSharedPtr<UGroupsManaggerSubSystem::FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
+const TSharedPtr<FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
 {
 	if (!TeamHelperSPtr)
 	{
