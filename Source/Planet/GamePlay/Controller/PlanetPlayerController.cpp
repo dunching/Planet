@@ -1,5 +1,5 @@
 
-#include "HumanPlayerController.h"
+#include "PlanetPlayerController.h"
 
 #include "GameFramework/PlayerState.h"
 #include "Interfaces/NetworkPredictionInterface.h"
@@ -30,12 +30,12 @@
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
 
-AHumanPlayerController::AHumanPlayerController(const FObjectInitializer& ObjectInitializer) :
+APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 }
 
-void AHumanPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
+void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
 {
 	ClearFocus(InPriority);
 
@@ -59,7 +59,7 @@ void AHumanPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type I
 	}
 }
 
-AActor* AHumanPlayerController::GetFocusActor() const
+AActor* APlanetPlayerController::GetFocusActor() const
 {
 	AActor* FocusActor = nullptr;
 	for (int32 Index = FocusInformation.Priorities.Num() - 1; Index >= 0; --Index)
@@ -79,7 +79,7 @@ AActor* AHumanPlayerController::GetFocusActor() const
 	return FocusActor;
 }
 
-void AHumanPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
+void APlanetPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
 {
 	if (InPriority < FocusInformation.Priorities.Num())
 	{
@@ -99,7 +99,7 @@ void AHumanPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
 	}
 }
 
-FVector AHumanPlayerController::GetFocalPoint() const
+FVector APlanetPlayerController::GetFocalPoint() const
 {
 	FVector Result = FAISystem::InvalidLocation;
 
@@ -123,12 +123,12 @@ FVector AHumanPlayerController::GetFocalPoint() const
 	return Result;
 }
 
-FVector AHumanPlayerController::GetFocalPointOnActor(const AActor* Actor) const
+FVector APlanetPlayerController::GetFocalPointOnActor(const AActor* Actor) const
 {
 	return Actor != nullptr ? Actor->GetActorLocation() : FAISystem::InvalidLocation;
 }
 
-void AHumanPlayerController::BeginPlay()
+void APlanetPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -146,12 +146,12 @@ void AHumanPlayerController::BeginPlay()
 	UNavgationSubSystem::GetInstance();
 }
 
-void AHumanPlayerController::PlayerTick(float DeltaTime)
+void APlanetPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 }
 
-void AHumanPlayerController::UpdateRotation(float DeltaTime)
+void APlanetPlayerController::UpdateRotation(float DeltaTime)
 {
 	APawn* const MyPawn = GetPawnOrSpectator();
 	if (MyPawn)
@@ -220,7 +220,7 @@ void AHumanPlayerController::UpdateRotation(float DeltaTime)
 	}
 }
 
-void AHumanPlayerController::OnPossess(APawn* InPawn)
+void APlanetPlayerController::OnPossess(APawn* InPawn)
 {
 	bool bIsNewPawn = (InPawn && InPawn != GetPawn());
 
@@ -249,7 +249,7 @@ void AHumanPlayerController::OnPossess(APawn* InPawn)
 	}
 }
 
-void AHumanPlayerController::OnUnPossess()
+void APlanetPlayerController::OnUnPossess()
 {
 	APawn* CurrentPawn = GetPawn();
 
@@ -261,12 +261,12 @@ void AHumanPlayerController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
-void AHumanPlayerController::SetPawn(APawn* InPawn)
+void APlanetPlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 }
 
-bool AHumanPlayerController::InputKey(const FInputKeyParams& Params)
+bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 {
 	auto Result = Super::InputKey(Params);
 
@@ -275,31 +275,31 @@ bool AHumanPlayerController::InputKey(const FInputKeyParams& Params)
 	return Result;
 }
 
-UPlanetAbilitySystemComponent* AHumanPlayerController::GetAbilitySystemComponent() const
+UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponent() const
 {
 	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
 }
 
-UGroupMnaggerComponent* AHumanPlayerController::GetGroupMnaggerComponent()const
+UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()const
 {
 	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
 }
 
-UGourpmateUnit* AHumanPlayerController::GetGourpMateUnit()
+UGourpmateUnit* APlanetPlayerController::GetGourpMateUnit()
 {
 	return GetPawn<FPawnType>()->GetGourpMateUnit();
 }
 
-void AHumanPlayerController::InitialCharacter()
+void APlanetPlayerController::InitialCharacter()
 {
 }
 
-void AHumanPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)
+void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)
 {
 	ClearFocus();
 }
 
-void AHumanPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Count)
+void APlanetPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Count)
 {
 	if (Count > 0)
 	{
@@ -325,7 +325,7 @@ void AHumanPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Count
 	}
 }
 
-void AHumanPlayerController::BindRemove(AActor* Actor)
+void APlanetPlayerController::BindRemove(AActor* Actor)
 {
 	if (!Actor)
 	{

@@ -56,7 +56,7 @@ protected:
 	ACharacterBase* PlaceCharacterPtr = nullptr;
 
 	UPROPERTY()
-		TMap<UStaticMeshComponent*, FMaterialAry>MaterialsMap;
+	TMap<UStaticMeshComponent*, FMaterialAry>MaterialsMap;
 
 	EBuildingState BuildingState = EBuildingState::kRegular;
 
@@ -73,8 +73,8 @@ class PLANET_API UBuildingPropertyComponent : public USceneObjPropertyComponent
 {
 	GENERATED_BODY()
 
-		friend UStateSwitchComponent;
-		friend ABuildingBase;
+	friend UStateSwitchComponent;
+	friend ABuildingBase;
 
 	using FTraverseUpCallback = std::function<void(UBuildingPropertyComponent*)>;
 
@@ -83,12 +83,12 @@ public:
 	virtual void BeginPlay()override;
 
 	UBuildingPropertyComponent(const FObjectInitializer& ObjectInitializer);
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		EBuildingsType BuildingType = EBuildingsType::kNone;
-	
+	EBuildingsType BuildingType = EBuildingsType::kNone;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Capture Info")
-		TSubclassOf<ABuildingCaptureData> BuildSharedDataClass;
+	TSubclassOf<ABuildingCaptureData> BuildSharedDataClass;
 
 protected:
 
@@ -100,7 +100,7 @@ class PLANET_API ABuildingBase : public ASceneObj
 	GENERATED_BODY()
 
 public:
-	 
+
 	ABuildingBase(const FObjectInitializer& ObjectInitializer);
 
 	template<typename Type = UStateSwitchComponent>
@@ -120,7 +120,7 @@ public:
 
 	void TravelUp(const FTravelNode& TravelNode);
 
-    void TravelDown(const FTravelNode& TravelNode);
+	void TravelDown(const FTravelNode& TravelNode);
 
 	ABuildingCaptureData* BuildingCaptureDataPtr = nullptr;
 
@@ -131,7 +131,7 @@ protected:
 	TSet<ABuildingBase*>AttachedBuildingSet;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Capture Point")
-		UStateSwitchComponent* StateSwitchComponentPtr = nullptr;
+	UStateSwitchComponent* StateSwitchComponentPtr = nullptr;
 
 };
 

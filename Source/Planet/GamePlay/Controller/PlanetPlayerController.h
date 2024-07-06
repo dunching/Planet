@@ -11,7 +11,7 @@
 #include "GenerateType.h"
 #include "HumanControllerInterface.h"
 
-#include "HumanPlayerController.generated.h"
+#include "PlanetPlayerController.generated.h"
 
 class ACharacterBase;
 class IPlanetControllerInterface;
@@ -22,13 +22,13 @@ class UFocusIcon;
  *
  */
 UCLASS()
-class PLANET_API AHumanPlayerController : public AGravityPlayerController, public IHumanControllerInterface
+class PLANET_API APlanetPlayerController : public AGravityPlayerController, public IPlanetControllerInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	AHumanPlayerController(const FObjectInitializer& ObjectInitializer);
+	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	virtual void SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
 

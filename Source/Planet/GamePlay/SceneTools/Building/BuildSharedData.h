@@ -37,10 +37,10 @@ public:
 #endif
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		EBuildingsType BuildingType = EBuildingsType::kNone;
+	EBuildingsType BuildingType = EBuildingsType::kNone;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		uint8 CaptureOrder = 0;
+	uint8 CaptureOrder = 0;
 
 };
 
@@ -66,7 +66,7 @@ public:
 	TSharedPtr<FCapturesInfo> GetCaptureAry(EBuildingsType ItemsType)const;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Capture Info")
-		UPrimitiveComponent* TerrainCheckComponnetPtr = nullptr;
+	UPrimitiveComponent* TerrainCheckComponnetPtr = nullptr;
 
 protected:
 

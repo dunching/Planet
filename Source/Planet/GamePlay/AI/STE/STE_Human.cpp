@@ -3,11 +3,14 @@
 
 #include <NavigationSystem.h>
 #include <Perception/AIPerceptionComponent.h>
+#include <Components/SphereComponent.h>
 
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanAIController.h"
-#include "HumanPlayerController.h"
+#include "PlanetPlayerController.h"
+#include "LogWriter.h"
+#include "BuildingArea.h"
 
 void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 {
@@ -56,6 +59,26 @@ void USTE_Human::Tick(FStateTreeExecutionContext& Context, const float DeltaTime
 void USTE_Human::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 {
 	TeammateOption = NewTeammateOption;
+
+	switch (TeammateOption)
+	{
+	case ETeammateOption::kEnemy: 
+	{
+		FTSTicker::GetCoreTicker().RemoveTicker(CaculationDistance2AreaHandle);
+		CaculationDistance2AreaHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([&](float) {
+
+			if (HumanAIControllerPtr->BuildingArea)
+			{
+				const auto Distance = FVector::Distance(HumanCharacterPtr->GetActorLocation(), HumanAIControllerPtr->BuildingArea->GetActorLocation());
+				bIsInArea = Distance < HumanAIControllerPtr->BuildingArea->AreaPtr->GetScaledSphereRadius();
+
+				PRINTINVOKEWITHSTR(FString::Printf(TEXT("Update Distance 2 Area:%.2lf"), Distance));
+			}
+			return true;
+			}), 1.f);
+	}
+	break;
+	}
 }
 
 void USTE_Human::OnTeamChanged()
@@ -77,18 +100,27 @@ void USTE_Human::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 	auto CharacterPtr = Cast<AHumanCharacter>(Actor);
 	if (CharacterPtr)
 	{
-		if (CharacterPtr->GetController()->IsA(AHumanPlayerController::StaticClass()))
+		if (CharacterPtr->GetController()->IsA(APlanetPlayerController::StaticClass()))
 		{
 			if (Stimulus.WasSuccessfullySensed())
 			{
+				GetWorld()->GetTimerManager().ClearTimer(RemoveTarget);
 				TargetSet.Add(CharacterPtr);
+
+				PRINTINVOKEWITHSTR(FString(TEXT("Found Target")));
 			}
 			else
 			{
-				if (TargetSet.Contains(CharacterPtr))
-				{
-					TargetSet.Remove(CharacterPtr);
-				}
+				GetWorld()->GetTimerManager().SetTimer(RemoveTarget, [&, CharacterPtr]() {
+					if (TargetSet.Contains(CharacterPtr))
+					{
+						TargetSet.Remove(CharacterPtr);
+					}
+
+					PRINTINVOKEWITHSTR(FString(TEXT("Not Find Target Remove Target")));
+					}, 5.f, false, 5.f);
+
+				PRINTINVOKEWITHSTR(FString(TEXT("Not Find Target")));
 			}
 		}
 		else if (CharacterPtr->GetController()->IsA(AHumanAIController::StaticClass()))
@@ -115,14 +147,14 @@ void USTE_Human::CaculationPatrolPosition()
 	{
 		TargetCharacterPtr = nullptr;
 		HumanAIControllerPtr->TargetCharacterPtr = TargetCharacterPtr;
-		FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
-		TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::GetPatrolPosition), GetPatrolPositionDelta);
+		FTSTicker::GetCoreTicker().RemoveTicker(CaculationPatrolHandle);
+		CaculationPatrolHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::GetPatrolPosition), GetPatrolPositionDelta);
 	}
 	else
 	{
 		for (auto Iter : TargetSet)
 		{
-			if (Iter->GetController()->IsA(AHumanPlayerController::StaticClass()))
+			if (Iter->GetController()->IsA(APlanetPlayerController::StaticClass()))
 			{
 				TargetCharacterPtr = Iter;
 				break;
@@ -133,7 +165,7 @@ void USTE_Human::CaculationPatrolPosition()
 			}
 		}
 		HumanAIControllerPtr->TargetCharacterPtr = TargetCharacterPtr;
-		FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
+		FTSTicker::GetCoreTicker().RemoveTicker(CaculationPatrolHandle);
 	}
 }
 

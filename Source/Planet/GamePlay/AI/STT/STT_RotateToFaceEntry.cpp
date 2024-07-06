@@ -9,7 +9,7 @@
 #include "AITask_ReleaseSkill.h"
 #include "STE_Human.h"
 #include "Planet.h"
-#include "HumanPlayerController.h"
+#include "PlanetPlayerController.h"
 
 namespace STT_RotateToFaceEntry
 {

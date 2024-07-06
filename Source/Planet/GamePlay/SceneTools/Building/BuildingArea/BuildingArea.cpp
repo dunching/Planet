@@ -5,13 +5,14 @@
 #include "Components/ArrowComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/BoxComponent.h"
+#include <Components/SphereComponent.h>
 
 #include "CollisionDataStruct.h"
 
 ABuildingArea::ABuildingArea(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	AreaPtr = CreateDefaultSubobject<UBoxComponent>(TEXT("AreaComponent"));
+	AreaPtr = CreateDefaultSubobject<USphereComponent>(TEXT("AreaComponent"));
 	AreaPtr->SetupAttachment(RootComponent);
 
 	MeshPtr = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));

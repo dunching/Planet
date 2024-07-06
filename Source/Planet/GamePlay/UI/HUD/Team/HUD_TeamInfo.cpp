@@ -59,7 +59,7 @@ void UHUD_TeamInfo::ResetUIByData()
 	}
 	PanelPtr->ClearChildren();
 
-	auto PCPtr = Cast<IHumanControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;

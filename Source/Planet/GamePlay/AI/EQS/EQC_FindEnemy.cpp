@@ -9,7 +9,7 @@
 #include <GameFramework/Character.h>
 
 #include "HumanCharacter.h"
-#include "HumanPlayerController.h"
+#include "PlanetPlayerController.h"
 #include "HumanAIController.h"
 
 void UEQC_FindEnemy::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryContextData& ContextData) const

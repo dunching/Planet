@@ -18,5 +18,8 @@ class PLANET_API AWeapon_Base : public AToolUnitBase
 public:
 
 protected:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Range")
+	int32 AttackRange = 150;
 
 };

@@ -147,7 +147,7 @@ void UTeamMateInfo::EnableIcon(bool bIsEnable)
 
 void UTeamMateInfo::AddMember()
 {
-	auto PCPtr = Cast<IHumanControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;

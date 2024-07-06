@@ -114,7 +114,9 @@ EStateTreeRunStatus FSTT_RunEQS::PerformMoveTask(FStateTreeExecutionContext& Con
 	{
 		FEnvQueryRequest QueryRequest(InstanceData.QueryTemplate, InstanceData.CharacterPtr);
 
+		// 在状态树里通过参数设置不生效？原因还不清楚 在这里通过这种方式设置 ↓
 		// SetIntParam <-这是在干啥？
+		QueryRequest.SetFloatParam(STT_RunEQS::Donut_InnerRadius, InstanceData.Donut_InnerRadius);
 		QueryRequest.SetFloatParam(STT_RunEQS::Donut_OuterRadius, InstanceData.Donut_OuterRadius);
 
 		auto QueryFinishedDelegate = FQueryFinishedSignature::CreateRaw(&InstanceData, &FInstanceDataType::OnQueryFinished);

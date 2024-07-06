@@ -38,7 +38,7 @@
 #include "InputProcessorSubSystem.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
-#include "HumanPlayerController.h"
+#include "PlanetPlayerController.h"
 #include "PlanetPlayerState.h"
 #include "HumanAIController.h"
 #include "AIHumanInfo.h"
@@ -137,7 +137,7 @@ void AHumanCharacter::BeginPlay()
 
 	if (GetController())
 	{
-		if (GetController()->IsA(AHumanPlayerController::StaticClass()))
+		if (GetController()->IsA(APlanetPlayerController::StaticClass()))
 		{
 		}
 		else if (GetController()->IsA(AHumanAIController::StaticClass()))
@@ -160,7 +160,7 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (NewController->IsA(AHumanPlayerController::StaticClass()))
+	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
 #if TESTHOLDDATA
 		TestCommand::AddPlayerCharacterTestDataImp(this);

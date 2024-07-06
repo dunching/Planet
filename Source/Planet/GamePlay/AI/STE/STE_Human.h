@@ -65,7 +65,9 @@ public:
 
 	bool GetPatrolPosition(float);
 
-	FTSTicker::FDelegateHandle TickDelegateHandle;
+	FTSTicker::FDelegateHandle CaculationPatrolHandle;
+
+	FTSTicker::FDelegateHandle CaculationDistance2AreaHandle;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanCharacter* HumanCharacterPtr = nullptr;
@@ -87,8 +89,13 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	float GetPatrolPositionDelta = 5.0;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
+	bool bIsInArea = true;
+
 	TCallbackHandleContainer<void(ETeammateOption, AHumanCharacter*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
 	
 	TCallbackHandleContainer<void()>::FCallbackHandleSPtr TeammateChangedDelegate;
+
+	FTimerHandle RemoveTarget;
 
 };

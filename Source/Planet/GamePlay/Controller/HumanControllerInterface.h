@@ -12,7 +12,7 @@ class UGourpmateUnit;
 class AHumanCharacter;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UHumanControllerInterface : public UInterface
+class UPlanetControllerInterface : public UInterface
 {
 	GENERATED_BODY()
 
@@ -20,7 +20,7 @@ public:
 
 };
 
-class PLANET_API IHumanControllerInterface
+class PLANET_API IPlanetControllerInterface
 {
 	GENERATED_BODY()
 

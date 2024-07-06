@@ -12,7 +12,7 @@
 #include "GroupsManaggerSubSystem.h"
 #include "GroupMnaggerComponent.h"
 
-#include "HumanAIController.generated.h"
+#include "HorseAIController.generated.h"
 
 class UAIHumanInfo;
 class UGroupMnaggerComponent;
@@ -22,13 +22,12 @@ class AHumanCharacter;
 class UStateTreeComponent;
 class UStateTreeAIComponent;
 class UAIPerceptionComponent;
-class ABuildingArea;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API AHumanAIController : public AGravityAIController, public IPlanetControllerInterface
+class PLANET_API AHorseAIController : public AGravityAIController, public IPlanetControllerInterface
 {
 	GENERATED_BODY()
 
@@ -40,7 +39,7 @@ public:
 	using FTeamHelperChangedDelegate =
 		UGroupMnaggerComponent::FTeamHelperChangedDelegateContainer::FCallbackHandleSPtr;
 
-	AHumanAIController(const FObjectInitializer& ObjectInitializer);
+	AHorseAIController(const FObjectInitializer& ObjectInitializer);
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
@@ -49,8 +48,8 @@ public:
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
 	virtual UGourpmateUnit* GetGourpMateUnit() override;
-
-	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
+	
+	virtual UAIPerceptionComponent* GetAIPerceptionComponent() ;
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	AActor* GetTeamFocusTarget() const;
@@ -60,15 +59,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TWeakObjectPtr<AHumanCharacter> TargetCharacterPtr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	ABuildingArea* BuildingArea = nullptr;
-
 protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnTeammateOptionChanged(
 		ETeammateOption TeammateOption,
-		ACharacterBase* LeaderCharacterPtr
+		ACharacterBase*LeaderCharacterPtr
 	);
 
 	void OnTeammateOptionChangedImp(

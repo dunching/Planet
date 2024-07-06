@@ -11,23 +11,24 @@
 class UStaticMeshComponent;
 class USceneComponent;
 class UBoxComponent;
+class USphereComponent;
 
 UCLASS()
 class PLANET_API ABuildingArea : public ABuildingBase
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
 
 	ABuildingArea(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay()override;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "MeshPtr")
-		UBoxComponent* AreaPtr = nullptr;
-	
+	USphereComponent* AreaPtr = nullptr;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = StaticMeshComponent)
-		UStaticMeshComponent* MeshPtr = nullptr;
+	UStaticMeshComponent* MeshPtr = nullptr;
 
 protected:
 

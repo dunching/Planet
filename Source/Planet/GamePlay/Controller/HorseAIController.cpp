@@ -1,5 +1,5 @@
 
-#include "HumanAIController.h"
+#include "HorseAIController.h"
 
 #include <GameFramework/CharacterMovementComponent.h>
 #include "Components/StateTreeComponent.h"
@@ -19,7 +19,7 @@
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
 
-AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
+AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
 	Super()
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
@@ -27,7 +27,7 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 }
 
-void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
+void AHorseAIController::SetCampType(ECharacterCampType CharacterCampType)
 {
 	if (AIHumanInfoPtr)
 	{
@@ -35,27 +35,27 @@ void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 	}
 }
 
-UPlanetAbilitySystemComponent* AHumanAIController::GetAbilitySystemComponent() const
+UPlanetAbilitySystemComponent* AHorseAIController::GetAbilitySystemComponent() const
 {
 	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
 }
 
-UGroupMnaggerComponent* AHumanAIController::GetGroupMnaggerComponent()const
+UGroupMnaggerComponent* AHorseAIController::GetGroupMnaggerComponent()const
 {
 	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
 }
 
-UGourpmateUnit* AHumanAIController::GetGourpMateUnit()
+UGourpmateUnit* AHorseAIController::GetGourpMateUnit()
 {
 	return  GetPawn<FPawnType>()->GetGourpMateUnit();
 }
 
-UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
+UAIPerceptionComponent* AHorseAIController::GetAIPerceptionComponent()
 {
 	return AIPerceptionComponentPtr;
 }
 
-AActor* AHumanAIController::GetTeamFocusTarget() const
+AActor* AHorseAIController::GetTeamFocusTarget() const
 {
 	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
 	{
@@ -67,7 +67,7 @@ AActor* AHumanAIController::GetTeamFocusTarget() const
 			}
 		}
 		{
-			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHumanAIController>();
+			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHorseAIController>();
 			if (LeaderPCPtr)
 			{
 				auto ResultPtr = LeaderPCPtr->GetFocusActor();
@@ -86,7 +86,7 @@ AActor* AHumanAIController::GetTeamFocusTarget() const
 	return nullptr;
 }
 
-void AHumanAIController::OnTeammateOptionChangedImp(
+void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
 	FPawnType* LeaderPCPtr
 )
@@ -94,7 +94,7 @@ void AHumanAIController::OnTeammateOptionChangedImp(
 	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);
 }
 
-void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
+void AHorseAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 {
 	if (Count > 0)
 	{
@@ -108,7 +108,7 @@ void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 	}
 }
 
-void AHumanAIController::DoDeathing()
+void AHorseAIController::DoDeathing()
 {
 	if (AIHumanInfoPtr)
 	{
@@ -117,24 +117,24 @@ void AHumanAIController::DoDeathing()
 	}
 }
 
-void AHumanAIController::OnConstruction(const FTransform& Transform)
+void AHorseAIController::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 }
 
-void AHumanAIController::BeginPlay()
+void AHorseAIController::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AHorseAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	DoDeathing();
 
 	Super::EndPlay(EndPlayReason);
 }
 
-void AHumanAIController::OnPossess(APawn* InPawn)
+void AHorseAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
@@ -160,7 +160,7 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 	}
 }
 
-void AHumanAIController::OnUnPossess()
+void AHorseAIController::OnUnPossess()
 {
 	if (TeammateOptionChangedDelegateContainer)
 	{
@@ -175,7 +175,7 @@ void AHumanAIController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
-void AHumanAIController::OnGroupChanged()
+void AHorseAIController::OnGroupChanged()
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
@@ -186,7 +186,7 @@ void AHumanAIController::OnGroupChanged()
 	}
 }
 
-void AHumanAIController::OnTeamChanged()
+void AHorseAIController::OnTeamChanged()
 {
 	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
 	if (TeamsHelper)
@@ -199,7 +199,7 @@ void AHumanAIController::OnTeamChanged()
 	}
 }
 
-void AHumanAIController::InitialCharacter()
+void AHorseAIController::InitialCharacter()
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
