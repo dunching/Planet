@@ -35,10 +35,6 @@ class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
 
-class UToolUnit;
-class UWeaponUnit;
-class USkillUnit;
-
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UObject
 {
@@ -58,17 +54,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GeneratorNPCClass")
 	TSubclassOf<AGeneratorNPC>GeneratorNPCClass;
 	
-#pragma region SceneTools
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EToolUnitType, TSubclassOf<UToolUnit>>EquipmentToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EWeaponUnitType, TSubclassOf<UWeaponUnit>>WeaponToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<ESkillUnitType, TSubclassOf<USkillUnit>>SkillToolsMap;
-#pragma endregion 
-
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UDragDropOperationWidget>DragDropOperationWidgetClass;
@@ -124,9 +109,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<TSoftObjectPtr<UStaticMesh>>TreeStaticMeshRefAry;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<EMaterialInstanceType, TSoftObjectPtr<UMaterialInstance>>MaterialInsSoftPath;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName ValidAreaCheckBoxComponnetTag;

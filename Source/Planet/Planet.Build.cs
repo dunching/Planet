@@ -24,14 +24,8 @@ public class Planet : ModuleRules
         PrivateDependencyModuleNames.AddRange(new string[] { });
         PublicIncludePaths.Add("Planet");
         PublicIncludePaths.Add("Planet/GamePlay");
-        PublicIncludePaths.Add("Planet/GamePlay/AI");
-        PublicIncludePaths.Add("Planet/GamePlay/AI/AITask");
-        PublicIncludePaths.Add("Planet/GamePlay/AI/EQS");
-        PublicIncludePaths.Add("Planet/GamePlay/AI/STE");
-        PublicIncludePaths.Add("Planet/GamePlay/AI/STT");
         PublicIncludePaths.Add("Planet/GamePlay/Navgation");
         PublicIncludePaths.Add("Planet/GamePlay/GroupsManagger");
-        PublicIncludePaths.Add("Planet/GamePlay/SPlineActor");
         PublicIncludePaths.Add("Planet/GamePlay/UI");
         PublicIncludePaths.Add("Planet/GamePlay/UI/HUD");
         PublicIncludePaths.Add("Planet/GamePlay/UI/HUD/Team");
@@ -50,19 +44,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/TalentAllocation");
         PublicIncludePaths.Add("Planet/GamePlay/UI/EffectsList");
         PublicIncludePaths.Add("Planet/GamePlay/UI/UMGs");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_RootMotionSource");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Tasks");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Async");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/BasicFutures");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Communication");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Active");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Passive");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Weapon");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Talent");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Element");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/ToolFutures");
         PublicIncludePaths.Add("Planet/GamePlay/Animation");
         PublicIncludePaths.Add("Planet/GamePlay/Controller");
         PublicIncludePaths.Add("Planet/GamePlay/GameInstance");
@@ -71,16 +52,8 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/Animation/Horse");
         PublicIncludePaths.Add("Planet/GamePlay/Animation/Human");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools");
-        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Biomes");
-        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments");
-        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments/Tools");
-        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments/Weapons");
-        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Building");
-        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Building/BuildingArea");
-        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Projectile");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/InputComponent");
-        PublicIncludePaths.Add("Planet/GamePlay/Pawn/ToolsInteractiveComponent");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse/ActionProcess");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human");
@@ -124,6 +97,8 @@ public class Planet : ModuleRules
             "ChaosVehicles",
 
             "Tools",
+            "SceneObjects",
+            "AbilitySystem",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {

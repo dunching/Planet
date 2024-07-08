@@ -5,16 +5,17 @@
 #include "CoreMinimal.h"
 
 #include "Blueprint/UserWidget.h"
+#include <GameplayTagContainer.h>
 
 #include "GenerateType.h"
 #include "UIInterfaces.h"
-#include "InteractiveToolComponent.h"
 
 #include "PawnStateBuildingHUD.generated.h"
 
 class UToolsMenu;
 
 struct FCharacterAttributes;
+struct FToolsSocketInfo;
 
 /**
  *

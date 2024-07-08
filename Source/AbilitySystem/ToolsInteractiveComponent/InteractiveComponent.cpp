@@ -1,0 +1,73 @@
+
+#include "InteractiveComponent.h"
+
+#include <queue>
+#include <map>
+
+#include "GameplayAbilitySpec.h"
+
+#include "GAEvent_Helper.h"
+#include "GenerateType.h"
+#include "BasicFuturesBase.h"
+#include "GAEvent_Send.h"
+#include "GAEvent_Received.h"
+#include "SceneElement.h"
+#include "Weapon_Base.h"
+#include "Skill_Base.h"
+#include "Skill_Active_Base.h"
+#include "Skill_WeaponActive_PickAxe.h"
+#include "Skill_WeaponActive_HandProtection.h"
+#include "Skill_WeaponActive_RangeTest.h"
+#include "Weapon_HandProtection.h"
+#include "Weapon_PickAxe.h"
+#include "Weapon_RangeTest.h"
+#include "Skill_Talent_NuQi.h"
+#include "Skill_Talent_YinYang.h"
+#include "Skill_Element_Gold.h"
+#include "Tool_PickAxe.h"
+
+FName UInteractiveComponent::ComponentName = TEXT("InteractiveComponent");
+
+UInteractiveComponent::UInteractiveComponent(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.TickInterval = 1.f / 10;
+}
+
+void UInteractiveComponent::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void UInteractiveComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
+void UInteractiveComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+TArray<TSharedPtr<FCanbeActivedInfo>> UInteractiveComponent::GetCanbeActiveAction() const
+{
+	return {};
+}
+
+bool UInteractiveComponent::ActiveAction(
+	const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop
+)
+{
+	return false;
+}
+
+void UInteractiveComponent::CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+{
+
+}
+
+void UInteractiveComponent::GenerationCanbeActiveEvent()
+{
+
+}

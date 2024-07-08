@@ -1,0 +1,39 @@
+// Copyright 2020 Dan Kestranek.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+#include "BasicFuturesBase.h"
+#include "GenerateType.h"
+
+#include "BasicFutures_Death.generated.h"
+
+class UAnimMontage;
+
+class FOwnerType;
+
+UCLASS()
+class ABILITYSYSTEM_API UBasicFutures_Death : public UBasicFuturesBase
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	) override;
+
+protected:
+
+	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UAnimMontage* DeathMontage = nullptr;
+
+	FOwnerInterfaceType* CharacterPtr = nullptr;
+
+};
