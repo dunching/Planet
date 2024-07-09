@@ -21,9 +21,8 @@ public class Tools : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
         PublicIncludePaths.Add("Tools");
-        PublicIncludePaths.Add("Tools/Tools");
-        PublicIncludePaths.Add("Tools/Tools/ThreadPoolHelper");
-        PublicIncludePaths.Add("Tools/Tools/LogHelper");
+        PublicIncludePaths.Add("Tools/ThreadPoolHelper");
+        PublicIncludePaths.Add("Tools/LogHelper");
 
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Core",

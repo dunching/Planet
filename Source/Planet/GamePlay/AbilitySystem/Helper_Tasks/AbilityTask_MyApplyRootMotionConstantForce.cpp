@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
+
 #include "GameFramework/RootMotionSource.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
@@ -8,6 +9,9 @@
 #include "AbilitySystemLog.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
+
+
+#include "Helper_RootMotionSource.h"
 
 UAbilityTask_MyApplyRootMotionConstantForce::UAbilityTask_MyApplyRootMotionConstantForce(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -67,7 +71,7 @@ void UAbilityTask_MyApplyRootMotionConstantForce::SharedInitAndApply()
 		if (MovementComponent)
 		{
 			ForceName = ForceName.IsNone() ? FName("AbilityTaskApplyRootMotionConstantForce") : ForceName;
-			TSharedPtr<FRootMotionSource_ConstantForce> ConstantForce = MakeShared<FRootMotionSource_ConstantForce>();
+			TSharedPtr<FRootMotionSource_MyConstantForce> ConstantForce = MakeShared<FRootMotionSource_MyConstantForce>();
 			ConstantForce->InstanceName = ForceName;
 			ConstantForce->AccumulateMode = bIsAdditive ? ERootMotionAccumulateMode::Additive : ERootMotionAccumulateMode::Override;
 			ConstantForce->Priority = 5;

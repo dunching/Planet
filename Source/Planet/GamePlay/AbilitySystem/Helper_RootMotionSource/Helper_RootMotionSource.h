@@ -16,6 +16,18 @@
 class ASPlineActor;
 class ATornado;
 class ACharacterBase;
+USTRUCT()
+struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForce
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual void PrepareRootMotion(
+		float SimulationTime, 
+		float MovementTickTime,
+		const ACharacter& Character, 
+		const UCharacterMovementComponent& MoveComponent
+		) override;
+};
 
 USTRUCT()
 struct FRootMotionSource_BySpline : public FRootMotionSource

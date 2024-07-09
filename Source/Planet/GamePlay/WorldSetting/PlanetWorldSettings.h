@@ -6,6 +6,8 @@
 
 #include "PlanetWorldSettings.generated.h"
 
+class UAssetRefMap;
+
 /**
  *
  */
@@ -18,5 +20,15 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Skill Settings")
 	int32 ResetCooldownTime = 1;
+
+	UAssetRefMap* GetAssetRefMapInstance();
+
+protected:
+
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+		UAssetRefMap* AssetRefMapPtr = nullptr;
+		
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+		TSubclassOf<UAssetRefMap>AssetRefMapClass;
 
 };

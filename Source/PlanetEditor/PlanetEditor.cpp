@@ -4,4 +4,4 @@
 
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, PlanetEditor, "PlanetEditor" );
+IMPLEMENT_MODULE( FDefaultGameModuleImpl, PlanetEditor );

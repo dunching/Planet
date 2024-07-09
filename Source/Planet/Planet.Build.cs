@@ -21,7 +21,6 @@ public class Planet : ModuleRules
 
         PublicDefinitions.Add("TESTHOLDDATA = 1");
 
-        PrivateDependencyModuleNames.AddRange(new string[] { });
         PublicIncludePaths.Add("Planet");
         PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AI");
@@ -116,24 +115,23 @@ public class Planet : ModuleRules
             "EnhancedInput" ,
             "GameplayTags",
             "GameplayTasks",
-
+            "GameplayAbilities",
             "GameplayStateTreeModule",
             "AIModule",
             "StateTreeModule",
             "NavigationSystem",
             "ChaosVehicles",
 
+            "VoxelCore",
+            "VoxelGraphCore",
+            "MMT",
+            "FlyingNavSystem" ,
+
             "Tools",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {
-            "GameplayAbilities",
-
-            "VoxelCore",
-            "VoxelGraphCore",
             "Gravity",
-            "MMT",
-            "FlyingNavSystem" ,
         });
 
         // b*[^:b#/]+.*$

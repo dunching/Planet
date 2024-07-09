@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 
-class UPlanetGameInstance* GGameInstancePtr = nullptr;
-
 bool bIsExiting = false;
 
 PLANET_API UWorld* GetWorldImp();

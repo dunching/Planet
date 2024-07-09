@@ -11,9 +11,8 @@ IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Planet, "Planet" );
 UWorld* GetWorldImp()
 {
 #if WITH_EDITOR
-	UWorld* Result = GGameInstancePtr ? GGameInstancePtr->GetWorld() : GEditor->GetEditorWorldContext().World();
-	return Result;
+	return GEngine->GetWorld()? GEngine->GetWorld() : GEditor->GetEditorWorldContext().World();
 #else 
-	return GGameInstancePtr->GetWorld();
+	return GEngine->GetWorld();
 #endif
 }

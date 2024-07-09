@@ -14,13 +14,13 @@
 void UPlanetGameInstance::Init()
 {
 	Super::Init();
-
-	GGameInstancePtr = this;
 }
 
 void UPlanetGameInstance::OnStart()
 {
 	Super::OnStart();
+
+	GetWorldImp()->SetGameInstance(this);
 
 	bIsExiting = false;
 }
@@ -35,9 +35,6 @@ void UPlanetGameInstance::Shutdown()
 
 void UPlanetGameInstance::FinishDestroy()
 {
-	GGameInstancePtr = nullptr;
-	AssetRefMapPtr = nullptr;
-
 	Super::FinishDestroy();
 	PRINTFUNC();
 }
@@ -45,14 +42,4 @@ void UPlanetGameInstance::FinishDestroy()
 UPlanetGameInstance::~UPlanetGameInstance()
 {
 	PRINTFUNC();
-}
-
-UAssetRefMap* UPlanetGameInstance::GetAssetRefMapInstance()
-{
-	if (!AssetRefMapPtr)
-	{
-		AssetRefMapPtr = NewObject<UAssetRefMap>(GetWorld(), AssetRefMapClass);
-	}
-
-	return AssetRefMapPtr;
 }

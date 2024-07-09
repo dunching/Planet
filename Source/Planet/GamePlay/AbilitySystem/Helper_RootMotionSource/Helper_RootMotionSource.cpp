@@ -13,6 +13,8 @@
 #include "Components/SplineComponent.h"
 #include <Kismet/KismetMathLibrary.h>
 
+#include "GravityMovementComponent.h"
+
 #include "SPlineActor.h"
 #include "Skill_Active_tornado.h"
 #include "CharacterBase.h"
@@ -23,6 +25,27 @@ static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
 	0,
 	TEXT("")
 	TEXT(" default: 0"));
+
+void FRootMotionSource_MyConstantForce::PrepareRootMotion
+(
+	float SimulationTime,
+	float MovementTickTime,
+	const ACharacter& Character,
+	const UCharacterMovementComponent& MoveComponent
+)
+{
+	RootMotionParams.Clear();
+
+	auto GravityMoveComponentPtr = Cast<UGravityMovementComponent>(&MoveComponent);
+	if (GravityMoveComponentPtr->bHasBlockResult)
+	{
+		SetTime(GetTime() + Duration);
+
+		return;
+	}
+
+	Super::PrepareRootMotion(SimulationTime, MovementTickTime, Character, MoveComponent);
+}
 
 FRootMotionSource_BySpline::FRootMotionSource_BySpline()
 {
@@ -61,6 +84,14 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 )
 {
 	RootMotionParams.Clear();
+
+	auto GravityMoveComponentPtr = Cast<UGravityMovementComponent>(&MoveComponent);
+	if (GravityMoveComponentPtr->bHasBlockResult)
+	{
+		SetTime(GetTime() + Duration);
+
+		return;
+	}
 
 	FTransform NewTransform;
 

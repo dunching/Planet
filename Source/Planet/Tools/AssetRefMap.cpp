@@ -1,9 +1,12 @@
 
 #include "AssetRefMap.h"
 
+#include <Kismet/GameplayStatics.h>
+
 #include "GameInstance/PlanetGameInstance.h"
 #include "AssetRefrencePath.h"
 #include "Planet.h"
+#include "PlanetWorldSettings.h"
 
 UAssetRefMap::UAssetRefMap():
 	Super()
@@ -13,7 +16,8 @@ UAssetRefMap::UAssetRefMap():
 
 UAssetRefMap* UAssetRefMap::GetInstance()
 {
-	return GGameInstancePtr->GetAssetRefMapInstance();
+	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
+	return WorldSetting->GetAssetRefMapInstance();
 }
 
 FString GetVoxelWorldSlot()

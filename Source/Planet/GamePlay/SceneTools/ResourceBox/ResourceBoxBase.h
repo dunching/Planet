@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 
-#include "GameFramework/Actor.h"
+#include "SceneObj.h"
 
 #include "ResourceBoxBase.generated.h"
 
 UCLASS()
-class PLANET_API AResourceBoxBase : public AActor
+class PLANET_API AResourceBoxBase : public ASceneObj
 {
 	GENERATED_BODY()
 

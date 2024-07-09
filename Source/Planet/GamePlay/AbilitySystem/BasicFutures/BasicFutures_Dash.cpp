@@ -256,7 +256,10 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-		TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		// TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementListLockOverride);
+
+		// 如果遇到障碍 提前结束
+		TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementToZeroListLock);
 
 		TaskPtr->ReadyForActivation();
 

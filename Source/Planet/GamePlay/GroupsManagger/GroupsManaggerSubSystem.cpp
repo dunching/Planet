@@ -12,7 +12,9 @@
 
 UGroupsManaggerSubSystem* UGroupsManaggerSubSystem::GetInstance()
 {
-	return Cast<UGroupsManaggerSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UGroupsManaggerSubSystem::StaticClass()));
+	return Cast<UGroupsManaggerSubSystem>(
+		USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UGroupsManaggerSubSystem::StaticClass())
+	);
 }
 
 TSharedPtr<FGroupMatesHelper> UGroupsManaggerSubSystem::CreateGroup(FPawnType* PCPtr)

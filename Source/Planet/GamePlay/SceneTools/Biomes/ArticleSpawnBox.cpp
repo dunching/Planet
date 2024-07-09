@@ -44,7 +44,7 @@ void AArticleSpawnBox::SpawnItem()
 	{
 		TArray<AActor*>ResultAry;
 
-		UGameplayStatics::GetAllActorsOfClass(GGameInstancePtr, ARawMaterialBase::StaticClass(), ResultAry);
+		UGameplayStatics::GetAllActorsOfClass(GetWorldImp(), ARawMaterialBase::StaticClass(), ResultAry);
 
 		const auto Extent = BoxCompPtr->GetScaledBoxExtent();
 		const auto Transform = GetActorTransform();

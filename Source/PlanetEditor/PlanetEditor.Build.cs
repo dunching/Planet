@@ -21,8 +21,7 @@ public class PlanetEditor : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
         PublicIncludePaths.Add("PlanetEditor");
-        PublicIncludePaths.Add("PlanetEditor/PlanetEditor");
-        PublicIncludePaths.Add("PlanetEditor/PlanetEditor/Command");
+        PublicIncludePaths.Add("PlanetEditor/Command");
 
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Core",

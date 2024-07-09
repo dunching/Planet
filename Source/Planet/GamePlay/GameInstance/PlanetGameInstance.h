@@ -31,15 +31,7 @@ public:
 
 	virtual ~UPlanetGameInstance();
 
-	UAssetRefMap* GetAssetRefMapInstance();
-
 protected:
-
-	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
-		UAssetRefMap* AssetRefMapPtr = nullptr;
-		
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-		TSubclassOf<UAssetRefMap>AssetRefMapClass;
 
 	std::mutex SingletonMutex;
 
