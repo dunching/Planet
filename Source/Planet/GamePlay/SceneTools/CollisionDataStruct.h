@@ -12,12 +12,11 @@ const FName TrackItem = TEXT("TrackItem");
 const FName BuildingItem = TEXT("BuildingItem");
 const FName VehicleItem = TEXT("Vehicle");
 
-const ECollisionChannel PawnECC = ECollisionChannel::ECC_Pawn;
-const ECollisionChannel Equipment = ECollisionChannel::ECC_GameTraceChannel2;
-const ECollisionChannel PickableItemECC = ECollisionChannel::ECC_GameTraceChannel3;	
-const ECollisionChannel Track = ECollisionChannel::ECC_GameTraceChannel4;
-const ECollisionChannel TrackVehicle = ECollisionChannel::ECC_GameTraceChannel6;
-const ECollisionChannel Projectile = ECollisionChannel::ECC_GameTraceChannel7;
-const ECollisionChannel Building = ECollisionChannel::ECC_GameTraceChannel9;
-const ECollisionChannel VoxelWorld = ECollisionChannel::ECC_GameTraceChannel10;
-const ECollisionChannel CapturePoint = ECollisionChannel::ECC_GameTraceChannel1;
+const ECollisionChannel Pawn_Object = ECollisionChannel::ECC_Pawn;
+const ECollisionChannel CapturePoint_Object = ECollisionChannel::ECC_GameTraceChannel1;
+const ECollisionChannel Equipment_Object = ECollisionChannel::ECC_GameTraceChannel2;
+const ECollisionChannel Projectile_Object = ECollisionChannel::ECC_GameTraceChannel7;
+const ECollisionChannel Building_Object = ECollisionChannel::ECC_GameTraceChannel9;
+const ECollisionChannel VoxelWorld_Object = ECollisionChannel::ECC_GameTraceChannel10;
+
+const ECollisionChannel SceneObj_Channel = ECollisionChannel::ECC_GameTraceChannel6;

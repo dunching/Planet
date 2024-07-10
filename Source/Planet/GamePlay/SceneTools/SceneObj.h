@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Component/ItemInteractionComponent.h"
+#include "SceneObjInteractionInterface.h"
 
 #include "SceneObj.generated.h"
 
@@ -30,7 +31,9 @@ private:
 };
 
 UCLASS()
-class PLANET_API ASceneObj : public AActor
+class PLANET_API ASceneObj :
+	public AActor,
+	public ISceneObjInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -38,13 +41,17 @@ public:
 
 	ASceneObj(const FObjectInitializer& ObjectInitializer);
 
-	virtual void Interaction(ACharacterBase*CharacterPtr);
+	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+
+	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
+
+	virtual void EndLookAt()override;
 
 	template<typename Type = USceneObjPropertyComponent>
 	Type* GetPropertyComponent()const { return Cast<Type>(PropertyComponentPtr); }
 
 protected:
-	 
+
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
@@ -52,7 +59,7 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-		USceneObjPropertyComponent* PropertyComponentPtr = nullptr;
+	USceneObjPropertyComponent* PropertyComponentPtr = nullptr;
 
 private:
 

@@ -67,6 +67,36 @@ USkillUnit* FSceneToolsContainer::AddUnit(ESkillUnitType Type)
 	return ResultPtr;
 }
 
+UConsumablesUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 Num)
+{
+	check(Num > 0);
+
+	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+
+	if (ConsumablesUnitMap.Contains(Type))
+	{
+		auto Ref = ConsumablesUnitMap[Type];
+
+		Ref->Num += Num;
+
+		return Ref;
+	}
+	else
+	{
+		UConsumablesUnit* ResultPtr = NewObject<UConsumablesUnit>(GetWorldImp(), AssetRefMapPtr->ConsumableToolMap[Type]);
+
+		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
+
+		ResultPtr->Num = Num;
+		ResultPtr->ID = NewID;
+		ResultPtr->UnitType = Type;
+
+		ConsumablesUnitMap.Add(Type, ResultPtr);
+
+		return ResultPtr;
+	}
+}
+
 USkillUnit* FSceneToolsContainer::FindUnit(ESkillUnitType Type)
 {
 	for (const auto& Iter : SceneToolsAry)
@@ -188,6 +218,12 @@ ESceneToolsType UBasicUnit::GetSceneToolsType() const
 TSoftObjectPtr<UTexture2D> UBasicUnit::GetIcon() const
 {
 	return DefaultIcon;
+}
+
+UConsumablesUnit::UConsumablesUnit() :
+	Super(ESceneToolsType::kConsumables)
+{
+
 }
 
 UToolUnit::UToolUnit() :

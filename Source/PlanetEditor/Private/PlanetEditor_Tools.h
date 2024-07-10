@@ -4,4 +4,4 @@
 
 #include "CoreMinimal.h"
 
-#include "Planet_Tools.h"
+UWorld* GetWorldImp();

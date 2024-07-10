@@ -88,7 +88,7 @@ void USkill_Active_GroupTherapy::OnNotifyBeginReceived(FName NotifyName)
 void USkill_Active_GroupTherapy::EmitEffect()
 {
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 	FCollisionShape  CollisionShape = FCollisionShape::MakeSphere(Radius);
 

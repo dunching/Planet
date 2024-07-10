@@ -56,8 +56,8 @@ void AArticleSpawnBox::SpawnItem()
 		TArray<AActor*> ActorsToIgnore;
 
 		TArray<TEnumAsByte<EObjectTypeQuery>>ObjectTypes;
-		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(VoxelWorld));
-		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(Building));
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(VoxelWorld_Object));
+		ObjectTypes.Add(UEngineTypes::ConvertToObjectType(Building_Object));
 
 		FHitResult OutHits;
 

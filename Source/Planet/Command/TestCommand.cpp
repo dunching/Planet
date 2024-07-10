@@ -13,7 +13,7 @@
 
 #include "HumanCharacter.h"
 #include "GameInstance/PlanetGameInstance.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 #include "AssetRefMap.h"
 #include <AssetRefrencePath.h>
 #include "Planet.h"

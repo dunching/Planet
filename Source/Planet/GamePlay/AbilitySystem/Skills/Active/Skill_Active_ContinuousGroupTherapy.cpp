@@ -104,7 +104,7 @@ void USkill_Active_ContinuousGroupTherapy::OnNotifyBeginReceived(FName NotifyNam
 void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 {
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 	FCollisionShape  CollisionShape = FCollisionShape::MakeSphere(Radius);
 

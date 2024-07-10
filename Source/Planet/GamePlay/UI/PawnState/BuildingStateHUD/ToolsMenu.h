@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 
 #include "SceneElement.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 #include "InteractiveSkillComponent.h"
 
 #include "ToolsMenu.generated.h"

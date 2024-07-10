@@ -10,6 +10,7 @@
 
 #include "SceneElement.h"
 #include "PlanetAbilitySystemComponent.h"
+#include "SceneObjInteractionInterface.h"
 
 #include "CharacterBase.generated.h"
 
@@ -36,7 +37,10 @@ class UInteractiveSkillComponent;
 class UInteractiveToolComponent;
 
 UCLASS()
-class PLANET_API ACharacterBase : public AGravityCharacter, public IPlanetAbilitySystemInterface
+class PLANET_API ACharacterBase : 
+	public AGravityCharacter,
+	public IPlanetAbilitySystemInterface,
+	public ISceneObjInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -49,6 +53,12 @@ public:
 	virtual ~ACharacterBase();
 
 	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void Interaction(ACharacterBase* CharacterPtr) override;
+
+	virtual void StartLookAt(ACharacterBase* CharacterPtr) override;
+
+	virtual void EndLookAt() override;
 
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;

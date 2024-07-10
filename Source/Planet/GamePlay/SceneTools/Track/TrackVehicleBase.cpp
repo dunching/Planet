@@ -11,7 +11,7 @@
 #include "ToolsLibrary.h"
 #include "CollisionDataStruct.h"
 #include "TrackBase.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 
 ATrackVehicleBase::ATrackVehicleBase(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)

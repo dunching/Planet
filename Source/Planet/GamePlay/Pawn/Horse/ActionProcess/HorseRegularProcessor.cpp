@@ -225,7 +225,7 @@ namespace HorseProcessor
 		FHitResult Result;
 
 		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld);
+		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld_Object);
 
 		FCollisionQueryParams Params;
 		Params.bTraceComplex = false;

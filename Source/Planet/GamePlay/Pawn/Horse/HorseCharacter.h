@@ -23,7 +23,8 @@ class UAnimInstanceCharacter;
 class AHumanCharacter;
 
 UCLASS()
-class PLANET_API AHorseCharacter : public ACharacterBase
+class PLANET_API AHorseCharacter : 
+	public ACharacterBase
 {
 	GENERATED_BODY()
 
@@ -32,6 +33,12 @@ public:
 	AHorseCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+
+	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
+
+	virtual void EndLookAt()override;
 
 	virtual TPair<FVector, FVector>GetCharacterViewInfo();
 

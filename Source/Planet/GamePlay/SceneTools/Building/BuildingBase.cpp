@@ -14,7 +14,7 @@
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 
 #include "CharacterBase.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 #include "PlacingProcessor.h"
 #include "HumanCharacter.h"
 #include "AssetRefMap.h"
@@ -89,7 +89,7 @@ void UStateSwitchComponent::SwitchCollisionToStartCapture()
 	for (auto Iter : StaticMeshAry)
 	{
 		Iter->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		Iter->SetCollisionObjectType(CapturePoint);
+		Iter->SetCollisionObjectType(CapturePoint_Object);
 		Iter->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	}
 }
@@ -103,7 +103,7 @@ void UStateSwitchComponent::SwitchCollisionToStopCapture()
 	for (auto Iter : StaticMeshAry)
 	{
 		Iter->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		Iter->SetCollisionObjectType(CapturePoint);
+		Iter->SetCollisionObjectType(CapturePoint_Object);
 		Iter->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	}
 }
@@ -117,11 +117,11 @@ void UStateSwitchComponent::SwitchCollisionToPlaced()
 	for (auto Iter : StaticMeshAry)
 	{
 		Iter->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		Iter->SetCollisionObjectType(Building);
+		Iter->SetCollisionObjectType(Building_Object);
 		Iter->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		Iter->SetCollisionResponseToChannel(Building, ECollisionResponse::ECR_Block);
-		Iter->SetCollisionResponseToChannel(VoxelWorld, ECollisionResponse::ECR_Block);
-		Iter->SetCollisionResponseToChannel(PawnECC, ECollisionResponse::ECR_Block);
+		Iter->SetCollisionResponseToChannel(Building_Object, ECollisionResponse::ECR_Block);
+		Iter->SetCollisionResponseToChannel(VoxelWorld_Object, ECollisionResponse::ECR_Block);
+		Iter->SetCollisionResponseToChannel(Pawn_Object, ECollisionResponse::ECR_Block);
 	}
 }
 

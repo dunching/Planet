@@ -12,10 +12,9 @@
 
 #include "HumanCharacter.h"
 #include "GameInstance/PlanetGameInstance.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 #include "AssetRefMap.h"
 #include <AssetRefrencePath.h>
-#include "Planet.h"
 #include "HumanCharacter.h"
 #include "SPlineActor.h"
 #include "SceneElement.h"
@@ -30,6 +29,7 @@
 #include "HumanControllerInterface.h"
 #include "InteractiveBaseGAComponent.h"
 #include "HorseCharacter.h"
+#include "PlanetEditor_Tools.h"
 
 void TestCommand::TestAsyncAssetLoad()
 {
@@ -268,7 +268,7 @@ void TestCommand::RecruitCharacter()
 		PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
 
 		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+		ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(CharacterPtr);
@@ -311,7 +311,7 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 			PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
 
 			FCollisionObjectQueryParams ObjectQueryParams;
-			ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+			ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 			FCollisionQueryParams Params;
 

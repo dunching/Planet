@@ -57,6 +57,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Communication");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Active");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Consumables");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Passive");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Weapon");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Talent");
@@ -71,6 +72,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/Animation/Human");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Biomes");
+        PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Consumables");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments/Tools");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Equipments/Weapons");
@@ -97,6 +99,8 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Library");
         PublicIncludePaths.Add("Planet/Tools");
 
+        PrivateIncludePaths.Add("Planet/Private");
+
         if (Target.bBuildEditor == true)
         {
             PrivateDependencyModuleNames.Add("UnrealEd");
@@ -121,6 +125,7 @@ public class Planet : ModuleRules
             "StateTreeModule",
             "NavigationSystem",
             "ChaosVehicles",
+            "ActorSequence",
 
             "VoxelCore",
             "VoxelGraphCore",

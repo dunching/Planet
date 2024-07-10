@@ -14,7 +14,9 @@
 struct FSkillSocketInfo;
 
 class AWeapon_Base;
+class ASceneObj;
 class AHorseCharacter;
+class ISceneObjInteractionInterface;
 
 class UWeaponUnit;
 
@@ -78,7 +80,7 @@ namespace HumanProcessor
 
 		TMap<FKey, TSharedPtr<FCanbeActivedInfo>>HandleKeysMap;
 
-		AHorseCharacter* HorseCharacterPtr = nullptr;
+		ISceneObjInteractionInterface* LookAtSceneObjPtr = nullptr;
 
 	};
 }

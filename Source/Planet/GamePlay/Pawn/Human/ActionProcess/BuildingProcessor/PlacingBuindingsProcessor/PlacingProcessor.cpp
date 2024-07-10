@@ -182,9 +182,9 @@ namespace HumanProcessor
 		Params.AddIgnoredActor(OnwerActorPtr);
 
 		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld);
-		ObjectQueryParams.AddObjectTypesToQuery(Building);
-		ObjectQueryParams.AddObjectTypesToQuery(CapturePoint);
+		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld_Object);
+		ObjectQueryParams.AddObjectTypesToQuery(Building_Object);
+		ObjectQueryParams.AddObjectTypesToQuery(CapturePoint_Object);
 
 		TArray<FHitResult> OutHitsAry;
 		if (GetWorldImp()->LineTraceMultiByObjectType(

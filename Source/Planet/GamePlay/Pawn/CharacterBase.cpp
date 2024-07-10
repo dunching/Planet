@@ -117,6 +117,21 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	);
 }
 
+void ACharacterBase::Interaction(ACharacterBase* CharacterPtr)
+{
+
+}
+
+void ACharacterBase::StartLookAt(ACharacterBase* CharacterPtr)
+{
+
+}
+
+void ACharacterBase::EndLookAt()
+{
+
+}
+
 class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponentPtr;

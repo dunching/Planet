@@ -220,7 +220,7 @@ void USkill_Talent_YinYang::PerformAction()
 void USkill_Talent_YinYang::PerformAction_Yang()
 {
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 	FCollisionShape  CollisionShape = FCollisionShape::MakeSphere(Radius);
 

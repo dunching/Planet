@@ -227,7 +227,7 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 void USkill_WeaponActive_HandProtection::MakeDamage()
 {
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 	FCollisionShape  CollisionShape = FCollisionShape::MakeCapsule(45, 90);
 

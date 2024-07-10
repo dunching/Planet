@@ -33,7 +33,7 @@
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
 #include "InteractiveSkillComponent.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 #include "Pawn/InputComponent/InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "HorseProcessor.h"

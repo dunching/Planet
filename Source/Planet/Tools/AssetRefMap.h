@@ -67,6 +67,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
 	TMap<ESkillUnitType, TSubclassOf<USkillUnit>>SkillToolsMap;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
+	TMap<EConsumableUnitType, TSubclassOf<UConsumablesUnit>>ConsumableToolMap;
 #pragma endregion 
 
 #pragma region MenusUI

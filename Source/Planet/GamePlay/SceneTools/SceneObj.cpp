@@ -35,3 +35,13 @@ void ASceneObj::Interaction(ACharacterBase* CharacterPtr)
 {
 
 }
+
+void ASceneObj::EndLookAt()
+{
+
+}
+
+void ASceneObj::StartLookAt(ACharacterBase* CharacterPtr)
+{
+
+}

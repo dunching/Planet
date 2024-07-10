@@ -4,4 +4,6 @@
 
 #include "CoreMinimal.h"
 
-#include "Planet_Tools.h"
+bool bIsExiting = false;
+
+UWorld* GetWorldImp();

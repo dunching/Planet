@@ -119,19 +119,17 @@ namespace HumanProcessor
 
 		FHitResult Result;
 
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
-
 		FCollisionQueryParams Params;
 		Params.bTraceComplex = false;
 
-		AHorseCharacter * TempHorseCharacterPtr = nullptr;
-		if (OnwerActorPtr->GetWorld()->LineTraceSingleByObjectType(
+		ISceneObjInteractionInterface* TempLookAtSceneObjPtr = nullptr;
+		if (OnwerActorPtr->GetWorld()->LineTraceSingleByChannel(
 			Result,
 			StartPt,
 			StopPt,
-			ObjectQueryParams,
-			Params)
+			SceneObj_Channel,
+			Params
+			)
 			)
 		{
 #ifdef WITH_EDITOR
@@ -141,38 +139,38 @@ namespace HumanProcessor
 			}
 #endif
 
-			if (Result.GetActor()->IsA(AHorseCharacter::StaticClass()))
+			if (Cast<ISceneObjInteractionInterface>(Result.GetActor()))
 			{
-				TempHorseCharacterPtr = Cast<AHorseCharacter>(Result.GetActor());
+				TempLookAtSceneObjPtr = Cast<ISceneObjInteractionInterface>(Result.GetActor());
 			}
 		}
 
-		if (TempHorseCharacterPtr)
+		if (TempLookAtSceneObjPtr)
 		{
-			if (HorseCharacterPtr)
+			if (LookAtSceneObjPtr)
 			{
-				if (TempHorseCharacterPtr == HorseCharacterPtr)
+				if (TempLookAtSceneObjPtr == LookAtSceneObjPtr)
 				{
 				}
 				else
 				{
-					TempHorseCharacterPtr->SwitchDisplayMountTips(true);
-					HorseCharacterPtr->SwitchDisplayMountTips(false);
-					HorseCharacterPtr = TempHorseCharacterPtr;
+					TempLookAtSceneObjPtr->StartLookAt(OnwerActorPtr);
+					LookAtSceneObjPtr->EndLookAt();
+					LookAtSceneObjPtr = TempLookAtSceneObjPtr;
 				}
 			}
 			else
 			{
-				TempHorseCharacterPtr->SwitchDisplayMountTips(true);
-				HorseCharacterPtr = TempHorseCharacterPtr;
+				TempLookAtSceneObjPtr->StartLookAt(OnwerActorPtr);
+				LookAtSceneObjPtr = TempLookAtSceneObjPtr;
 			}
 		}
 		else
 		{
-			if (HorseCharacterPtr)
+			if (LookAtSceneObjPtr)
 			{
-				HorseCharacterPtr->SwitchDisplayMountTips(false);
-				HorseCharacterPtr = nullptr;
+				LookAtSceneObjPtr->EndLookAt();
+				LookAtSceneObjPtr = nullptr;
 			}
 		}
 	}
@@ -247,21 +245,10 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::EKeyPressed()
 	{
-		if (HorseCharacterPtr)
+		if (LookAtSceneObjPtr)
 		{
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-			if (OnwerActorPtr)
-			{
-				FGameplayEventData Payload;
-				auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Mount;
-
-				GameplayAbilityTargetData_DashPtr->HorseCharacterPtr = HorseCharacterPtr;
-
-				Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
-
-				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Mount, Payload);
-			}
+			LookAtSceneObjPtr->Interaction(OnwerActorPtr);
 		}
 	}
 
@@ -312,7 +299,7 @@ namespace HumanProcessor
 			PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
 
 			FCollisionObjectQueryParams ObjectQueryParams;
-			ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+			ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 			FCollisionQueryParams Params;
 			Params.AddIgnoredActor(OnwerActorPtr);
@@ -394,7 +381,7 @@ namespace HumanProcessor
 		FHitResult Result;
 
 		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld);
+		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld_Object);
 
 		FCollisionQueryParams Params;
 		Params.bTraceComplex = false;

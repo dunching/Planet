@@ -27,7 +27,11 @@ bool FInputProcessor::Tick(float Delta)
 
 	ReduceAsyncTaskNum();
 
-	return !bIsRequestQuit;
+#if WITH_EDITOR
+	return !bIsRequestQuit && !bIsExiting;
+#else
+	return !bIsRequestQuit
+#endif
 }
 
 void FInputProcessor::ESCKeyPressed()

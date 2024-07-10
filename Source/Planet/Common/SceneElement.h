@@ -11,6 +11,7 @@
 #include "SceneElement.generated.h"
 
 class AToolUnitBase;
+class AConsumable_Base;
 class IPlanetControllerInterface;
 
 class USkill_Base;
@@ -62,6 +63,7 @@ enum class ESceneToolsType : uint8
 	kNone,
 	kWeapon,
 	kTool,
+	kConsumables,
 	kSkill,
 	kGroupMate,
 };
@@ -71,6 +73,13 @@ enum class EToolUnitType : uint8
 {
 	kNone,
 	kPickAxe,
+};
+
+UENUM(BlueprintType)
+enum class EConsumableUnitType : uint8
+{
+	kNone,
+	kTest,
 };
 
 UENUM(BlueprintType)
@@ -145,6 +154,7 @@ protected:
 	std::variant<
 		EToolUnitType, 
 		EWeaponUnitType,
+		EConsumableUnitType,
 		ESkillUnitType
 	> UnitType;
 
@@ -163,6 +173,26 @@ SceneElementType UBasicUnit::GetSceneElementType() const
 }
 
 UCLASS(BlueprintType, Blueprintable)
+class PLANET_API UConsumablesUnit : public UBasicUnit
+{
+	GENERATED_BODY()
+
+public:
+
+	friend FSceneToolsContainer;
+
+	UConsumablesUnit();
+
+	int32 Num = 1;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolType")
+	TSubclassOf<AConsumable_Base> ConsumablesClass;
+
+protected:
+
+};
+
+UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UToolUnit : public UBasicUnit
 {
 	GENERATED_BODY()
@@ -177,7 +207,7 @@ public:
 
 	int32 Num = 1;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolType")
 	TSubclassOf<AToolUnitBase> ToolActorClass;
 
 protected:
@@ -285,6 +315,8 @@ struct FSceneToolsContainer
 {
 	GENERATED_USTRUCT_BODY()
 
+	UConsumablesUnit* AddUnit(EConsumableUnitType Type, int32 Num);
+
 	UToolUnit* AddUnit(EToolUnitType Type);
 
 	UWeaponUnit* AddUnit(EWeaponUnitType Type);
@@ -306,7 +338,8 @@ private:
 
 	TMap<UBasicUnit::IDType, UBasicUnit*> SceneMetaMap;
 
-	TMap<ESceneToolsType, TSharedPtr<int32>> NumIndexMap;
+	TMap<EConsumableUnitType, UConsumablesUnit*> ConsumablesUnitMap;
+
 };
 
 #pragma endregion HoldingItems

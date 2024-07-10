@@ -14,6 +14,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayTagsSubSystem.h"
 
 #include "ThreadSycAction.h"
 
@@ -37,11 +39,12 @@
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
 #include "InteractiveSkillComponent.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 #include "Pawn/InputComponent/InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "PlanetPlayerController.h"
 #include "HumanCharacter.h"
+#include "BasicFutures_Mount.h"
 
 AHorseCharacter::AHorseCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -99,4 +102,29 @@ void AHorseCharacter::PossessedBy(AController* NewController)
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
 	}
+}
+
+void AHorseCharacter::Interaction(ACharacterBase* CharacterPtr)
+{
+	if (CharacterPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Mount;
+
+		GameplayAbilityTargetData_DashPtr->HorseCharacterPtr = this;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(CharacterPtr, UGameplayTagsSubSystem::GetInstance()->Mount, Payload);
+	}
+}
+
+void AHorseCharacter::StartLookAt(ACharacterBase* CharacterPtr)
+{
+	SwitchDisplayMountTips(true);
+}
+
+void AHorseCharacter::EndLookAt()
+{
+	SwitchDisplayMountTips(false);
 }

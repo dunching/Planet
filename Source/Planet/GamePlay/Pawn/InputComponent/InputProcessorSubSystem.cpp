@@ -22,10 +22,19 @@ void UInputProcessorSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UInputProcessorSubSystem::Deinitialize()
 {
-    if (CurrentProcessorSPtr)
-    {
-        CurrentProcessorSPtr->QuitAction();
-    }
+#if WITH_EDITOR
+	if (GEditor->IsPlayingSessionInEditor())
+	{
+	}
+	else
+	{
+	}
+#else
+	if (CurrentProcessorSPtr)
+	{
+		CurrentProcessorSPtr->QuitAction();
+	}
+#endif
 
 	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 

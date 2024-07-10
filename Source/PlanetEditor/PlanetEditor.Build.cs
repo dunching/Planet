@@ -20,8 +20,16 @@ public class PlanetEditor : ModuleRules
         bUseRTTI = true;
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
+
         PublicIncludePaths.Add("PlanetEditor");
         PublicIncludePaths.Add("PlanetEditor/Command");
+
+        PrivateIncludePaths.Add("PlanetEditor/Private");
+
+        if (Target.bBuildEditor == true)
+        {
+            PrivateDependencyModuleNames.Add("UnrealEd");
+        }
 
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Core",

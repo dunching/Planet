@@ -97,7 +97,7 @@ void USkill_Active_Displacement::PerformAction()
 void USkill_Active_Displacement::FindTarget()
 {
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(PawnECC);
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
 	FCollisionShape  CollisionShape = FCollisionShape::MakeSphere(200);
 

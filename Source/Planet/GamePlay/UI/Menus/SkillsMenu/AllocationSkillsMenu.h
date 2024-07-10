@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 
 #include "Common/GenerateType.h"
-#include "Pawn/HoldingItemsComponent.h"
+#include "HoldingItemsComponent.h"
 #include <SceneElement.h>
 
 #include "AllocationSkillsMenu.generated.h"
