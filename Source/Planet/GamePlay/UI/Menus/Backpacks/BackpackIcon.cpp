@@ -117,7 +117,9 @@ FReply UBackpackIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 }
 
-void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+void UBackpackIcon::NativeOnDragDetected(
+	const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation
+)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 

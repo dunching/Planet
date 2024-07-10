@@ -315,7 +315,7 @@ struct FSceneToolsContainer
 {
 	GENERATED_USTRUCT_BODY()
 
-	UConsumablesUnit* AddUnit(EConsumableUnitType Type, int32 Num);
+	UConsumablesUnit* AddUnit(EConsumableUnitType Type, int32 Num = 1);
 
 	UToolUnit* AddUnit(EToolUnitType Type);
 

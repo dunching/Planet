@@ -11,11 +11,4 @@ Intermediate/
 /Script
 /Plugins/*/Binaries
 /Plugins/*/Intermediate
-/Content/StarterContent
-/Content/HorseStarterKit
-/Content/Poplar_Forest
-/Content/EasyBuildingSystem
-/Content/UltraDynamicSky
-/Content/NaturePackage
-/Content/Vegetation
-/Content/Space_Creator_Pro
+/Content/*

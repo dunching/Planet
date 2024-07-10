@@ -47,7 +47,10 @@ void UBackpackMenu::ResetUIByData()
 		{
 			continue;
 		}
-		if (Iter->GetSceneToolsType() == ESceneToolsType::kTool)
+		switch (Iter->GetSceneToolsType())
+		{
+		case ESceneToolsType::kTool:
+		case ESceneToolsType::kConsumables:
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIcon>(this, EntryClass);
 			if (WidgetPtr)
@@ -55,6 +58,10 @@ void UBackpackMenu::ResetUIByData()
 				TileViewPtr->AddItem(WidgetPtr);
 				WidgetPtr->ResetToolUIByData(Iter);
 			}
+		};
+		break;
+		default:
+			break;
 		}
 	}
 }
