@@ -63,6 +63,16 @@ public:
 
     virtual void PhysWalking(float deltaTime, int32 Iterations)override;
 
+    virtual void HandleImpact(
+        const FHitResult& Hit, float TimeSlice = 0.f, const FVector& MoveDelta = FVector::ZeroVector
+    ) override;
+
+    virtual float SlideAlongSurface(
+        const FVector& Delta, float Time, const FVector& Normal, FHitResult& Hit, bool bHandleImpact
+    ) override;
+
+    bool bHasBlockResult = false;
+
 protected:
 
     bool UpdateGravityTransform(float Delta);

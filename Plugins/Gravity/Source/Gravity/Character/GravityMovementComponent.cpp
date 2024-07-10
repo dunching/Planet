@@ -301,6 +301,8 @@ void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
             {
                 SCOPE_CYCLE_COUNTER(STAT_CharacterMovementRootMotionSourceCalculate);
                 CurrentRootMotion.PrepareRootMotion(DeltaSeconds, *CharacterOwner, *this, true);
+
+                bHasBlockResult = false;
             }
 
             // For local human clients, save off root motion data so it can be used by movement networking code.
@@ -849,6 +851,27 @@ void UGravityMovementComponent::PhysWalking(float deltaTime, int32 Iterations)
     {
         MaintainHorizontalGroundVelocity();
     }
+}
+
+void UGravityMovementComponent::HandleImpact(
+    const FHitResult& Hit, float TimeSlice /*= 0.f*/, const FVector& MoveDelta /*= FVector::ZeroVector */
+)
+{
+    bHasBlockResult = Hit.bBlockingHit;
+
+    return Super::HandleImpact(Hit, TimeSlice, MoveDelta);
+}
+
+float UGravityMovementComponent::SlideAlongSurface(
+    const FVector& Delta, float Time, const FVector& Normal, FHitResult& Hit, bool bHandleImpact
+)
+{
+    if (!Hit.bBlockingHit)
+    {
+        return 0.f;
+    }
+
+    return Super::SlideAlongSurface(Delta, Time, RotateGravityToWorld(Normal), Hit, bHandleImpact);
 }
 
 void UGravityMovementComponent::PhysNavWalking(float deltaTime, int32 Iterations)
