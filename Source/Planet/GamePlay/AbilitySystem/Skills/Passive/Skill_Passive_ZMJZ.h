@@ -67,9 +67,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
 
-	float CountDown = 5.f;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float DecreamTime = 5.f;
 
-	float SecondaryCountDown = 1.f;
+	float SecondaryDecreamTime = 1.f;
 
 	FDelegateHandle AbilityActivatedCallbacksHandle;
 

@@ -12,6 +12,8 @@
 #include "BackpackMenu.generated.h"
 
 struct FSceneObjContainer;
+class UBackpackConsumableIcon;
+class UBackpackToolIcon;
 
 /**
  *

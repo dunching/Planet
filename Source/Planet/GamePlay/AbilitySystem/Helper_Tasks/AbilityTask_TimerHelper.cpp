@@ -1,6 +1,9 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "AbilityTask_TimerHelper.h"
+
+#include <functional>
+
 #include "TimerManager.h"
 #include "Engine/World.h"
 
@@ -17,27 +20,26 @@ UAbilityTask_TimerHelper* UAbilityTask_TimerHelper::DelayTask(UGameplayAbility* 
 	return MyObj;
 }
 
-void UAbilityTask_TimerHelper::SetDuration(float InDuration)
+void UAbilityTask_TimerHelper::SetDuration(float InDuration, float InIntervalTime)
 {
 	Type = EType::kDuration;
 
 	Duration = InDuration;
+	IntervalTime = InIntervalTime;
 }
 
-void UAbilityTask_TimerHelper::SetCount(int32 InCount)
+void UAbilityTask_TimerHelper::SetCount(int32 InCount, float InIntervalTime)
 {
 	Type = EType::kCount;
 
 	Count = InCount;
+	IntervalTime = InIntervalTime;
 }
 
-void UAbilityTask_TimerHelper::SetInfinite()
+void UAbilityTask_TimerHelper::SetInfinite(float InIntervalTime)
 {
-	Type = EType::kInfinite_Interval;
-}
+	Type = EType::kInfinite;
 
-void UAbilityTask_TimerHelper::SetIntervalTime(float InIntervalTime)
-{
 	IntervalTime = InIntervalTime;
 }
 
@@ -52,20 +54,30 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 
 	TickDelegate.ExecuteIfBound(this, DeltaTime);
 
-	if (IntervalTime > 0.f)
-	{
-		CurrentIntervalTime += DeltaTime;
-		IntervalDelegate.ExecuteIfBound(this, CurrentIntervalTime, IntervalTime);
-		if (CurrentIntervalTime >= IntervalTime)
+	auto UpdateIntervalTime = [&] (const std::function<void()>& Lambda = nullptr)
 		{
-			CurrentIntervalTime = 0.f;
-		}
-	}
+			CurrentIntervalTime += DeltaTime;
+			DurationIntervalDelegate.ExecuteIfBound(this, CurrentIntervalTime, IntervalTime);
+			if (CurrentIntervalTime >= IntervalTime)
+			{
+				if (Lambda)
+				{
+					Lambda();
+				}
+
+				CurrentIntervalTime = 0.f;
+			}
+		};
 
 	switch (Type)
 	{
 	case EType::kDuration:
 	{
+		if (IntervalTime > 0.f)
+		{
+			UpdateIntervalTime();
+		}
+
 		if (Duration > 0.f)
 		{
 			TotalTime += DeltaTime;
@@ -75,11 +87,25 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 				EndTask();
 			}
 		}
+		else
+		{
+			EndTask();
+		}
 	}
 	break;
 	case EType::kCount:
 	{
-		CurrentCount++;
+		if (IntervalTime > 0.f)
+		{
+			UpdateIntervalTime([&] {
+				CurrentCount++;
+				});
+		}
+		else
+		{
+			CurrentCount++;
+		}
+
 		if (Count > 0)
 		{
 			if (CurrentCount >= Count)
@@ -88,10 +114,22 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 				EndTask();
 			}
 		}
+		else
+		{
+			EndTask();
+		}
 	}
 	break;
-	case EType::kInfinite_Interval:
+	case EType::kInfinite:
 	{
+		if (IntervalTime > 0.f)
+		{
+			UpdateIntervalTime();
+		}
+		else
+		{
+			EndTask();
+		}
 	}
 	break;
 	}

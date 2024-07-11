@@ -24,4 +24,36 @@ class PLANET_API UBackpackToolIcon :
 
 public:
 
+	UBackpackToolIcon(const FObjectInitializer& ObjectInitializer);
+
+	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
+
+	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+
+	virtual void EnableIcon(bool bIsEnable)override;
+
+protected:
+
+	void SetNum(int32 NewNum);
+
+	void SetItemType();
+
+	void SetValue(int32 Value);
+
+	void ResetSize(const FVector2D& Size);
+
+	virtual void NativeConstruct()override;
+
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
+
+	virtual void NativeOnDragDetected(
+		const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation
+	)override;
+
+private:
+
+	UToolUnit* UnitPtr = nullptr;
+
+	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
+
 };

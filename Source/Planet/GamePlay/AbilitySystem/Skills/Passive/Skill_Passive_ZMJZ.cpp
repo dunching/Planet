@@ -91,9 +91,8 @@ void USkill_Passive_ZMJZ::PerformAction()
 	if (CharacterPtr)
 	{
 		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetInfinite();
-		TaskPtr->SetIntervalTime(CountDown);
-		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnIntervalTick);
+		TaskPtr->SetInfinite(DecreamTime);
+		TaskPtr->DurationIntervalDelegate.BindUObject(this, &ThisClass::OnIntervalTick);
 		TaskPtr->ReadyForActivation();
 
 		if (ModifyCount > MaxCount)
@@ -182,7 +181,7 @@ void USkill_Passive_ZMJZ::OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, floa
 			{
 				EffectItemPtr->SetNum(ModifyCount);
 			}
-			TaskPtr->SetIntervalTime(SecondaryCountDown);
+			TaskPtr->SetInfinite(SecondaryDecreamTime);
 		}
 	}
 	else

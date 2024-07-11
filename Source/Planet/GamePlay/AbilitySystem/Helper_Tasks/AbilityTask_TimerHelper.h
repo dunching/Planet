@@ -29,19 +29,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
 	static UAbilityTask_TimerHelper* DelayTask(UGameplayAbility* OwningAbility);
 
-	void SetDuration(float InDuration);
+	void SetDuration(float InDuration, float InIntervalTime = -1.f);
 
-	void SetCount(int32 InCount);
+	// 如果 InIntervalTime > 0；则count会在累计时间大于InIntervalTime才会+1，否则每次tick+1
+	void SetCount(int32 InCount, float InIntervalTime = -1.f);
 	
-	void SetInfinite();
-
-	void SetIntervalTime(float InIntervalTime);
+	void SetInfinite(float InIntervalTime = -1.f);
 
 	TimerHelper_Finished_Delegate OnFinished;
 	
 	TimerHelper_Tick_Delegate TickDelegate;
 
-	TimerHelper_Interval_Tick_Delegate IntervalDelegate;
+	TimerHelper_Interval_Tick_Delegate DurationIntervalDelegate;
+
+	TimerHelper_Interval_Tick_Delegate InfiniteIntervalDelegate;
+
+	TimerHelper_Interval_Tick_Delegate CountIntervalDelegate;
 
 protected:
 
@@ -53,10 +56,10 @@ protected:
 	{
 		kDuration,
 		kCount,
-		kInfinite_Interval,
+		kInfinite,
 	};
 
-	EType Type = EType::kInfinite_Interval;
+	EType Type = EType::kInfinite;
 
 	float Duration = -1.f;
 

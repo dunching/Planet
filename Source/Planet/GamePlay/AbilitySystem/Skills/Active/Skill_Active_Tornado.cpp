@@ -138,9 +138,8 @@ void USkill_Active_Tornado::PerformAction()
 void USkill_Active_Tornado::ExcuteTasks()
 {
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-	TaskPtr->SetDuration(Duration);
-	TaskPtr->SetIntervalTime(Duration);
-	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
+	TaskPtr->SetDuration(Duration, Duration);
+	TaskPtr->DurationIntervalDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
 	TaskPtr->OnFinished.BindLambda([this](auto) {
 		K2_CancelAbility();
 		});

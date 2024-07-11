@@ -91,6 +91,8 @@ UConsumablesUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 
 		ResultPtr->ID = NewID;
 		ResultPtr->UnitType = Type;
 
+		SceneToolsAry.Add(ResultPtr);
+		SceneMetaMap.Add(NewID, ResultPtr);
 		ConsumablesUnitMap.Add(Type, ResultPtr);
 
 		return ResultPtr;

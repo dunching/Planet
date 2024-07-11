@@ -12,6 +12,9 @@
 #include "AssetRefMap.h"
 #include "HoldingItemsComponent.h"
 #include "GenerateType.h"
+#include "BackpackToolIcon.h"
+#include "BackpackConsumableIcon.h"
+#include "BackpackIconWrapper.h"
 
 namespace BackpackMenu
 {
@@ -52,11 +55,11 @@ void UBackpackMenu::ResetUIByData()
 		case ESceneToolsType::kTool:
 		case ESceneToolsType::kConsumables:
 		{
-			auto WidgetPtr = CreateWidget<UBackpackIcon>(this, EntryClass);
+			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
 			if (WidgetPtr)
 			{
+				WidgetPtr->TargetBasicUnitPtr = Iter;
 				TileViewPtr->AddItem(WidgetPtr);
-				WidgetPtr->ResetToolUIByData(Iter);
 			}
 		};
 		break;

@@ -17,7 +17,7 @@ struct FToolsSocketInfo
 
 	FGameplayTag SkillSocket;
 
-	UToolUnit* ToolUnitPtr = nullptr;
+	UToolUnit* UnitPtr = nullptr;
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -38,8 +38,6 @@ public:
 	virtual void CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)override;
 
 #pragma region Tools
-	const TArray<TSharedPtr<FCanbeActivedInfo>>& GetCanbeActivedTools()const;
-
 	void RetractputTool();
 
 	void RegisterTool(

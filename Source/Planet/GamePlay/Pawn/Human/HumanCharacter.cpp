@@ -139,6 +139,9 @@ void AHumanCharacter::BeginPlay()
 	{
 		if (GetController()->IsA(APlanetPlayerController::StaticClass()))
 		{
+#if TESTHOLDDATA
+			TestCommand::AddPlayerCharacterTestDataImp(this);
+#endif
 		}
 		else if (GetController()->IsA(AHumanAIController::StaticClass()))
 		{
@@ -162,10 +165,6 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
-#if TESTHOLDDATA
-		TestCommand::AddPlayerCharacterTestDataImp(this);
-#endif
-
 		auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupHelper();
 		if (GroupsHelperSPtr)
 		{

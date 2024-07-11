@@ -41,6 +41,7 @@
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "Tool_Base.h"
 #include "InteractiveToolComponent.h"
+#include "InteractiveConsumablesComponent.h"
 
 namespace HumanProcessor
 {
@@ -86,7 +87,22 @@ namespace HumanProcessor
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (OnwerActorPtr)
 				{
-					OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
+					switch ((*SkillIter)->Type)
+					{
+					case FCanbeActivedInfo::EType::kSwitchToTool:
+					case FCanbeActivedInfo::EType::kActiveTool:
+					{
+						OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
+					}
+					break;
+					case FCanbeActivedInfo::EType::kConsumables:
+					{
+						OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
+					}
+					break;
+					default:
+						break;
+					}
 				}
 			}
 		}
@@ -96,7 +112,25 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter); 
+				if (OnwerActorPtr)
+				{
+					switch ((*SkillIter)->Type)
+					{
+					case FCanbeActivedInfo::EType::kSwitchToTool:
+					case FCanbeActivedInfo::EType::kActiveTool:
+					{
+						OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter);
+					}
+					break;
+					case FCanbeActivedInfo::EType::kConsumables:
+					{
+						OnwerActorPtr->GetInteractiveConsumablesComponent()->CancelAction(*SkillIter);
+					}
+					break;
+					default:
+						break;
+					}
+				}
 			}
 		}
 	}
@@ -176,10 +210,21 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				auto CanbeActiveInfos = OnwerActorPtr->GetInteractiveToolComponent()->GetCanbeActivedTools();
+				auto CanbeActiveInfos = OnwerActorPtr->GetInteractiveToolComponent()->GetCanbeActiveAction();
+				CanbeActiveInfos.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction());
 				for (const auto& Iter : CanbeActiveInfos)
 				{
-					HandleKeysMap.Add(Iter->Key, Iter);
+					switch (Iter->Type)
+					{
+					case FCanbeActivedInfo::EType::kNone:
+					{}
+					break;
+					default:
+					{
+						HandleKeysMap.Add(Iter->Key, Iter);
+					}
+					break;
+					}
 				}
 			}
 		}

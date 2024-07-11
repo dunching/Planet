@@ -19,7 +19,14 @@ class PLANET_API AConsumable_Test : public AConsumable_Base
 public:
 
 	AConsumable_Test(const FObjectInitializer& ObjectInitializer);
-	
+
+	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+
+protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equiment")
+	FName Socket;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Capture Point")
 	UStaticMeshComponent* StaticComponentPtr = nullptr;
 

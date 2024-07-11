@@ -25,7 +25,7 @@ class PLANET_API UToolIcon : public UUserWidget, public IToolsIconInterface
 
 public:
 
-	using FOnResetUnit = TCallbackHandleContainer<void(UToolUnit*)>;
+	using FOnResetUnit = TCallbackHandleContainer<void(UBasicUnit*)>;
 
 	UToolIcon(const FObjectInitializer& ObjectInitializer);
 
@@ -37,7 +37,9 @@ public:
 
 	UToolUnit* GetToolUnit()const;
 
-	void OnSublingIconReset(UToolUnit* InToolUnitPtr);
+	UConsumablesUnit* GetConsumablesUnit()const;
+
+	void OnSublingIconReset(UBasicUnit* InToolUnitPtr);
 
 	FOnResetUnit OnResetUnit;
 
@@ -54,13 +56,17 @@ protected:
 
 	virtual void NativeConstruct()override;
 
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
+	virtual FReply NativeOnMouseButtonDown(
+		const FGeometry& InGeometry, const FPointerEvent& InMouseEvent
+	)override;
 
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+	virtual bool NativeOnDrop(
+		const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation
+	)override;
 
 private:
 
-	UToolUnit*ToolUnitPtr = nullptr;
+	UBasicUnit*UnitPtr = nullptr;
 
 	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 

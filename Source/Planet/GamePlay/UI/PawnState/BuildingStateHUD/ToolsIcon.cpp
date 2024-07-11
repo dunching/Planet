@@ -51,28 +51,42 @@ void UToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		if (NewPtr)
 		{
 			OnResetUnit = NewPtr->OnResetUnit;
-			ResetToolUIByData(NewPtr->ToolUnitPtr);
+			ResetToolUIByData(NewPtr->UnitPtr);
 		}
 	}
 }
 
 void UToolIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kTool)
+	if (BasicUnitPtr)
 	{
-		ToolUnitPtr = Cast<UToolUnit>(BasicUnitPtr);
+		switch (BasicUnitPtr->GetSceneToolsType())
+		{
+		case ESceneToolsType::kTool:
+		{
+			UnitPtr = Cast<UToolUnit>(BasicUnitPtr);
+		}
+		break;
+		case ESceneToolsType::kConsumables:
+		{
+			UnitPtr = Cast<UConsumablesUnit>(BasicUnitPtr);
+		}
+		break;
+		default:
+			break;
+		}
 	}
 	else
 	{
-		ToolUnitPtr = nullptr;
+		UnitPtr = nullptr;
 	}
 
-	OnResetUnit.ExcuteCallback(ToolUnitPtr);
+	OnResetUnit.ExcuteCallback(UnitPtr);
 
 	auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ToolsIcon::Overlay));
 	if (UIPtr)
 	{
-		if (ToolUnitPtr)
+		if (UnitPtr)
 		{
 			UIPtr->SetVisibility(ESlateVisibility::Visible);
 		}
@@ -93,12 +107,17 @@ void UToolIcon::EnableIcon(bool bIsEnable)
 
 UToolUnit* UToolIcon::GetToolUnit() const
 {
-	return ToolUnitPtr;
+	return Cast<UToolUnit>(UnitPtr);
 }
 
-void UToolIcon::OnSublingIconReset(UToolUnit* InToolUnitPtr)
+UConsumablesUnit* UToolIcon::GetConsumablesUnit() const
 {
-	if (InToolUnitPtr && (InToolUnitPtr == ToolUnitPtr))
+	return Cast<UConsumablesUnit>(UnitPtr);
+}
+
+void UToolIcon::OnSublingIconReset(UBasicUnit* InToolUnitPtr)
+{
+	if (InToolUnitPtr && (InToolUnitPtr == UnitPtr))
 	{
 		ResetToolUIByData(nullptr);
 	}
@@ -107,9 +126,32 @@ void UToolIcon::OnSublingIconReset(UToolUnit* InToolUnitPtr)
 void UToolIcon::SetNum()
 {
 	int32 NewNum = 0;
-	if (ToolUnitPtr)
+
+	if (UnitPtr)
 	{
-		NewNum = ToolUnitPtr->Num;
+		switch (UnitPtr->GetSceneToolsType())
+		{
+		case ESceneToolsType::kTool:
+		{
+			auto TempUnitPtr = Cast<UToolUnit>(UnitPtr);
+			if (TempUnitPtr)
+			{
+				NewNum = TempUnitPtr->Num;
+			}
+		}
+		break;
+		case ESceneToolsType::kConsumables:
+		{
+			auto TempUnitPtr = Cast<UConsumablesUnit>(UnitPtr);
+			if (TempUnitPtr)
+			{
+				NewNum = TempUnitPtr->Num;
+			}
+		}
+		break;
+		default:
+			break;
+		}
 	}
 
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(ToolsIcon::Number));
@@ -134,14 +176,14 @@ void UToolIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(ToolsIcon::Icon));
 	if (ImagePtr)
 	{
-		if (ToolUnitPtr)
+		if (UnitPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(ToolUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
-					ImagePtr->SetBrushFromTexture(ToolUnitPtr->GetIcon().Get());
+					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
 				});
 		}
 		else
@@ -173,7 +215,9 @@ FReply UToolIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPo
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-bool UToolIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+bool UToolIcon::NativeOnDrop(
+	const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation
+)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 

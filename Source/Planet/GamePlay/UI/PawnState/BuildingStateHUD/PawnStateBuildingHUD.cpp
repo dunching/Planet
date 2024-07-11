@@ -6,6 +6,7 @@
 #include "PlanetPlayerState.h"
 #include "Planet.h"
 #include "CharacterAttributesComponent.h"
+#include "InteractiveConsumablesComponent.h"
 #include "CharacterBase.h"
 #include "ToolsMenu.h"
 #include "ToolsIcon.h"
@@ -49,10 +50,15 @@ void UPawnStateBuildingHUD::NativeDestruct()
 	{
 		return;
 	}
-	auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
 	{
-		const auto Result = GetEquipMenus();
+		auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
+		const auto Result = GetTools();
 		EICPtr->RegisterTool(Result);
+	}
+	{
+		auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
+		const auto Result = GetConsumables();
+		EICPtr->RegisterConsumable(Result);
 	}
 }
 
@@ -63,7 +69,6 @@ void UPawnStateBuildingHUD::ResetUIByData()
 	{
 		return;
 	}
-	auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
 	{
 		TArray<FName>Ary
 		{
@@ -82,14 +87,36 @@ void UPawnStateBuildingHUD::ResetUIByData()
 			auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
 			if (IconPtr)
 			{
-				auto Result = EICPtr->FindTool(IconPtr->IconSocket);
-				if (Result && Result->ToolUnitPtr)
+				IconPtr->ResetToolUIByData(nullptr);
+			}
+		}
+		{
+			auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
+			for (const auto& Iter : Ary)
+			{
+				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
+				if (IconPtr)
 				{
-					IconPtr->ResetToolUIByData(Result->ToolUnitPtr);
+					auto Result = EICPtr->FindTool(IconPtr->IconSocket);
+					if (Result && Result->UnitPtr)
+					{
+						IconPtr->ResetToolUIByData(Result->UnitPtr);
+					}
 				}
-				else
+			}
+		}
+		{
+			auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
+			for (const auto& Iter : Ary)
+			{
+				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
+				if (IconPtr)
 				{
-					IconPtr->ResetToolUIByData(nullptr);
+					auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
+					if (Result && Result->UnitPtr)
+					{
+						IconPtr->ResetToolUIByData(Result->UnitPtr);
+					}
 				}
 			}
 		}
@@ -119,7 +146,7 @@ UToolsMenu* UPawnStateBuildingHUD::GetEquipMenu()
 	return Cast<UToolsMenu>(GetWidgetFromName(ItemMenu));
 }
 
-TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>> UPawnStateBuildingHUD::GetEquipMenus()
+TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>> UPawnStateBuildingHUD::GetTools()
 {
 	TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>>Result;
 
@@ -140,13 +167,46 @@ TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>> UPawnStateBuildingHUD::GetEqui
 		auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Iter.Get<1>()));
 		if (UIPtr)
 		{
-			TSharedPtr<FToolsSocketInfo> ToolsSocketInfoSPtr = MakeShared<FToolsSocketInfo>();
+			TSharedPtr<FToolsSocketInfo> SocketInfoSPtr = MakeShared<FToolsSocketInfo>();
 
-			ToolsSocketInfoSPtr->Key = Iter.Get<0>();
-			ToolsSocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
-			ToolsSocketInfoSPtr->ToolUnitPtr = UIPtr->GetToolUnit();
+			SocketInfoSPtr->Key = Iter.Get<0>();
+			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
+			SocketInfoSPtr->UnitPtr = UIPtr->GetToolUnit();
 
-			Result.Add(ToolsSocketInfoSPtr->SkillSocket, ToolsSocketInfoSPtr);
+			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
+		}
+	}
+	return Result;
+}
+
+TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>> UPawnStateBuildingHUD::GetConsumables()
+{
+	TMap <FGameplayTag, TSharedPtr<FConsumableSocketInfo>>Result;
+
+	TArray<TTuple<FKey, FName>>Ary
+	{
+		{ToolSocket1, PawnStateBuildingHUD::EquipIcon1},
+		{ToolSocket2, PawnStateBuildingHUD::EquipIcon2},
+		{ToolSocket3, PawnStateBuildingHUD::EquipIcon3},
+		{ToolSocket4, PawnStateBuildingHUD::EquipIcon4},
+		{ToolSocket5, PawnStateBuildingHUD::EquipIcon5},
+		{ToolSocket6, PawnStateBuildingHUD::EquipIcon6},
+		{ToolSocket7, PawnStateBuildingHUD::EquipIcon7},
+		{ToolSocket8, PawnStateBuildingHUD::EquipIcon8},
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Iter.Get<1>()));
+		if (UIPtr)
+		{
+			TSharedPtr<FConsumableSocketInfo> SocketInfoSPtr = MakeShared<FConsumableSocketInfo>();
+
+			SocketInfoSPtr->Key = Iter.Get<0>();
+			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
+			SocketInfoSPtr->UnitPtr = UIPtr->GetConsumablesUnit();
+
+			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
 		}
 	}
 	return Result;

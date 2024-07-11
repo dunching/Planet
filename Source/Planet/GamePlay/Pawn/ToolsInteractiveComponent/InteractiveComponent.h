@@ -35,8 +35,12 @@ struct FCanbeActivedInfo
 {
 	enum class EType
 	{
+		kNone,
+
 		kSwitchToTool,
 		kActiveTool,
+
+		kConsumables,
 
 		kActiveSkill,
 		kWeaponActiveSkill,

@@ -16,6 +16,9 @@ class UToolsMenu;
 
 struct FCharacterAttributes;
 
+struct FToolsSocketInfo;
+struct FConsumableSocketInfo;
+
 /**
  *
  */
@@ -36,7 +39,9 @@ public:
 
 	virtual void ResetUIByData()override;
 
-	TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>>GetEquipMenus();
+	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>GetTools();
+
+	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>GetConsumables();
 
 protected:
 

@@ -42,13 +42,16 @@ void UInteractiveToolComponent::GenerationCanbeActiveEvent()
 	// 激活对应的工具
 	for (const auto& Iter : ToolsMap)
 	{
-		TSharedPtr<FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
+		if (Iter.Value->UnitPtr)
+		{
+			TSharedPtr<FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
 
-		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kSwitchToTool;
-		CanbeActivedInfoSPtr->Key = Iter.Value->Key;
-		CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
+			CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kSwitchToTool;
+			CanbeActivedInfoSPtr->Key = Iter.Value->Key;
+			CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
 
-		CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
+			CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
+		}
 	}
 
 	// “使用”一次这个工具
@@ -86,7 +89,7 @@ bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
 	PreviousTool = CanbeActivedInfoSPtr->Socket;
 
 	FGameplayEventData Payload;
-	switch ((*ToolIter)->ToolUnitPtr->GetSceneElementType<EToolUnitType>())
+	switch ((*ToolIter)->UnitPtr->GetSceneElementType<EToolUnitType>())
 	{
 	case EToolUnitType::kPickAxe:
 	{
@@ -99,7 +102,7 @@ bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
 
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = OnwerActorPtr;
-		auto AxePtr = GetWorld()->SpawnActor<ATool_PickAxe>((*ToolIter)->ToolUnitPtr->ToolActorClass, ActorSpawnParameters);
+		auto AxePtr = GetWorld()->SpawnActor<ATool_PickAxe>((*ToolIter)->UnitPtr->ToolActorClass, ActorSpawnParameters);
 		if (AxePtr)
 		{
 			CurrentEquipmentPtr = AxePtr;
@@ -108,7 +111,6 @@ bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
 	}
 	break;
 	}
-
 
 	return false;
 }
@@ -198,11 +200,6 @@ void UInteractiveToolComponent::CancelAction(const TSharedPtr<FCanbeActivedInfo>
 	}
 }
 
-const TArray<TSharedPtr<FCanbeActivedInfo>>& UInteractiveToolComponent::GetCanbeActivedTools() const
-{
-	return CanbeActiveToolsAry;
-}
-
 void UInteractiveToolComponent::RetractputTool()
 {
 	if (CurrentEquipmentPtr)
@@ -224,10 +221,7 @@ void UInteractiveToolComponent::RegisterTool(
 	const TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>>& InToolInfoMap, bool bIsGenerationEvent
 )
 {
-	for (const auto Iter : InToolInfoMap)
-	{
-		ToolsMap.Add(Iter.Key, Iter.Value);
-	}
+	ToolsMap = InToolInfoMap;
 
 	if (bIsGenerationEvent)
 	{
