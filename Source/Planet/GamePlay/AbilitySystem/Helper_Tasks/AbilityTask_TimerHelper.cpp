@@ -57,7 +57,7 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 	auto UpdateIntervalTime = [&] (const std::function<void()>& Lambda = nullptr)
 		{
 			CurrentIntervalTime += DeltaTime;
-			DurationIntervalDelegate.ExecuteIfBound(this, CurrentIntervalTime, IntervalTime);
+			IntervalDelegate.ExecuteIfBound(this, CurrentIntervalTime, IntervalTime);
 			if (CurrentIntervalTime >= IntervalTime)
 			{
 				if (Lambda)
@@ -81,6 +81,7 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 		if (Duration > 0.f)
 		{
 			TotalTime += DeltaTime;
+			DurationDelegate.ExecuteIfBound(this, TotalTime, Duration);
 			if (TotalTime >= Duration)
 			{
 				OnFinished.ExecuteIfBound(this);

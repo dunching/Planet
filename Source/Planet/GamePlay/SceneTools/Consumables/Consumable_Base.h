@@ -22,9 +22,4 @@ public:
 
 	virtual void Interaction(ACharacterBase* CharacterPtr)override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TSubclassOf<USkill_Consumable_Base> Skill_Consumables_Class;
-
-	FGameplayAbilitySpecHandle AbilitieHandle;
-
 };

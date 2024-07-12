@@ -69,7 +69,7 @@ void UToolIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 		break;
 		case ESceneToolsType::kConsumables:
 		{
-			UnitPtr = Cast<UConsumablesUnit>(BasicUnitPtr);
+			UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
 		}
 		break;
 		default:
@@ -110,9 +110,9 @@ UToolUnit* UToolIcon::GetToolUnit() const
 	return Cast<UToolUnit>(UnitPtr);
 }
 
-UConsumablesUnit* UToolIcon::GetConsumablesUnit() const
+UConsumableUnit* UToolIcon::GetConsumablesUnit() const
 {
-	return Cast<UConsumablesUnit>(UnitPtr);
+	return Cast<UConsumableUnit>(UnitPtr);
 }
 
 void UToolIcon::OnSublingIconReset(UBasicUnit* InToolUnitPtr)
@@ -142,10 +142,10 @@ void UToolIcon::SetNum()
 		break;
 		case ESceneToolsType::kConsumables:
 		{
-			auto TempUnitPtr = Cast<UConsumablesUnit>(UnitPtr);
+			auto TempUnitPtr = Cast<UConsumableUnit>(UnitPtr);
 			if (TempUnitPtr)
 			{
-				NewNum = TempUnitPtr->Num;
+				NewNum = TempUnitPtr->GetCurrentValue();
 			}
 		}
 		break;

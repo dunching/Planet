@@ -3,6 +3,9 @@
 
 #include "Consumable_Test.h"
 #include "CharacterBase.h"
+#include "Skill_Consumable_Base.h"
+#include "Skill_Consumable_Test.h"
+#include "Skill_Consumable_Generic.h"
 
 FName UInteractiveConsumablesComponent::ComponentName = TEXT("InteractiveConsumablesComponent");
 
@@ -41,15 +44,26 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 			return  false;
 		}
 
-		FActorSpawnParameters ActorSpawnParameters;
-		ActorSpawnParameters.Owner = OnwerActorPtr;
-		auto ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>((*ToolIter)->UnitPtr->ConsumablesClass, ActorSpawnParameters);
-		if (ConsumableActorPtr)
-		{
-			ConsumableActorPtr->Interaction(OnwerActorPtr);
+		FGameplayEventData Payload;
 
-			return true;
-		}
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable_Test;
+		GameplayAbilityTargetDashPtr->UnitPtr = (*ToolIter)->UnitPtr;
+		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+
+		FGameplayAbilitySpec GameplayAbilitySpec(
+			(*ToolIter)->UnitPtr->Skill_Consumable_Class, 
+			1
+		);
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		ASCPtr->TriggerAbilityFromGameplayEvent(
+			Skill_Consumable_GenericHandle,
+			ASCPtr->AbilityActorInfo.Get(),
+			FGameplayTag::EmptyTag,
+			&Payload,
+			*ASCPtr
+		);
+
+		return true;
 	}
 	break;
 	}
@@ -71,6 +85,19 @@ TSharedPtr<FConsumableSocketInfo> UInteractiveConsumablesComponent::FindConsumab
 	}
 
 	return nullptr;
+}
+
+void UInteractiveConsumablesComponent::InitialBaseGAs()
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+		Skill_Consumable_GenericHandle = GASPtr->GiveAbility(
+			FGameplayAbilitySpec(Skill_Consumable_GenericClass, 1)
+		);
+	}
 }
 
 void UInteractiveConsumablesComponent::GenerationCanbeActiveEvent()

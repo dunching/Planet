@@ -6,16 +6,17 @@
 
 #include "SceneElement.h"
 #include "Skill_Consumable_Base.h"
+#include "CharacterAttibutes.h"
 
-#include "Skill_Consumable_Test.generated.h"
+#include "Skill_Consumable_Generic.generated.h"
 
 class UAbilityTask_TimerHelper;
 class AConsumable_Base;
-class AConsumable_Test;
 class UConsumableUnit;
+class UGA_Tool_Periodic;
 
 UCLASS()
-class USkill_Consumable_Test : public USkill_Consumable_Base
+class USkill_Consumable_Generic : public USkill_Consumable_Base
 {
 	GENERATED_BODY()
 
@@ -41,6 +42,14 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr,
+		const FGameplayTagContainer* TargetTags = nullptr,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
 protected:
 
 	void PerformAction();
@@ -49,7 +58,9 @@ protected:
 
 	void ExcuteTasks();
 
-	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+
+	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
 	void PlayMontage();
 
@@ -58,27 +69,16 @@ protected:
 	void EmitEffect();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	UAnimMontage* HumanMontage = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float Duration = 3.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float PerformActionInterval = 1.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 HP = 10;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TSubclassOf<AConsumable_Base> Consumable_Class;
 
-	AConsumable_Test* ConsumableActorPtr = nullptr;
-
+	AConsumable_Base* ConsumableActorPtr = nullptr;
+	
 	UConsumableUnit* UnitPtr = nullptr;
 
+	TMap<UConsumableUnit*, UGA_Tool_Periodic*>EffectsMap;
 };
 
-struct FGameplayAbilityTargetData_Consumable_Test : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_Consumable_Generic : public FGameplayAbilityTargetData
 {
 	UConsumableUnit* UnitPtr = nullptr;
 };

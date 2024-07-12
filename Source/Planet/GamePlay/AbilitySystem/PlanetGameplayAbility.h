@@ -20,6 +20,7 @@ public:
 
 	UPlanetGameplayAbility();
 
+#if WITH_EDITOR
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
@@ -75,6 +76,7 @@ public:
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+#endif
 
 protected:
 

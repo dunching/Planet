@@ -37,7 +37,7 @@ public:
 
 	UToolUnit* GetToolUnit()const;
 
-	UConsumablesUnit* GetConsumablesUnit()const;
+	UConsumableUnit* GetConsumablesUnit()const;
 
 	void OnSublingIconReset(UBasicUnit* InToolUnitPtr);
 

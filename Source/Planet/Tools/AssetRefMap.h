@@ -69,7 +69,7 @@ public:
 	TMap<ESkillUnitType, TSubclassOf<USkillUnit>>SkillToolsMap;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EConsumableUnitType, TSubclassOf<UConsumablesUnit>>ConsumableToolMap;
+	TMap<EConsumableUnitType, TSubclassOf<UConsumableUnit>>ConsumableToolMap;
 #pragma endregion 
 
 #pragma region MenusUI

@@ -6,11 +6,14 @@
 #include <variant>
 
 #include "CoreMinimal.h"
+
 #include "GenerateType.h"
+#include "BaseData.h"
 
 #include "SceneElement.generated.h"
 
 class AToolUnitBase;
+class USkill_Consumable_Base;
 class AConsumable_Base;
 class IPlanetControllerInterface;
 
@@ -19,6 +22,8 @@ class ACharacterBase;
 class AHumanCharacter;
 
 struct FSceneToolsContainer;
+
+enum class ECharacterPropertyType : uint8;
 
 enum class EWeaponSocket
 {
@@ -173,7 +178,7 @@ SceneElementType UBasicUnit::GetSceneElementType() const
 }
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UConsumablesUnit : public UBasicUnit
+class PLANET_API UConsumableUnit : public UBasicUnit
 {
 	GENERATED_BODY()
 
@@ -181,14 +186,32 @@ public:
 
 	friend FSceneToolsContainer;
 
-	UConsumablesUnit();
+	UConsumableUnit();
 
-	int32 Num = 1;
+	void AddCurrentValue(int32 val);
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolType")
-	TSubclassOf<AConsumable_Base> ConsumablesClass;
+	int32 GetCurrentValue()const;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Type")
+	TSubclassOf<USkill_Consumable_Base> Skill_Consumable_Class;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UAnimMontage* HumanMontage = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float Duration = 3.f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float PerformActionInterval = 1.f;
 
 protected:
+	
+	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
+
+	int32 Num = 1;
 
 };
 
@@ -315,7 +338,7 @@ struct FSceneToolsContainer
 {
 	GENERATED_USTRUCT_BODY()
 
-	UConsumablesUnit* AddUnit(EConsumableUnitType Type, int32 Num = 1);
+	UConsumableUnit* AddUnit(EConsumableUnitType Type, int32 Num = 1);
 
 	UToolUnit* AddUnit(EToolUnitType Type);
 
@@ -338,8 +361,7 @@ private:
 
 	TMap<UBasicUnit::IDType, UBasicUnit*> SceneMetaMap;
 
-	TMap<EConsumableUnitType, UConsumablesUnit*> ConsumablesUnitMap;
-
+	TMap<EConsumableUnitType, UConsumableUnit*> ConsumablesUnitMap;
 };
 
 #pragma endregion HoldingItems

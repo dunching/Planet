@@ -6,14 +6,12 @@
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
 
-#include "SceneElement.h"
-
 #include "DragDropOperationWidget.generated.h"
 
 class UUserWidget;
 class UToolUnit;
 class USkillUnit;
-class USkillUnit;
+class UConsumableUnit;
 
 struct FStreamableHandle;
 
@@ -52,6 +50,8 @@ private:
 	UToolUnit* ToolUnitSPtr;
 	
 	USkillUnit* SkillUnitSPtr;
+
+	UConsumableUnit* ConsumableUnitSPtr;
 
 	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 

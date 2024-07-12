@@ -11,6 +11,7 @@ UPlanetGameplayAbility::UPlanetGameplayAbility() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
+#if WITH_EDITOR
 void UPlanetGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
@@ -93,6 +94,7 @@ void UPlanetGameplayAbility::OnGameplayTaskDeactivated(UGameplayTask& Task)
 {
 	Super::OnGameplayTaskDeactivated(Task);
 }
+#endif
 
 void UPlanetGameplayAbility::RunIfListLock() const
 {

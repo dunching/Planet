@@ -92,7 +92,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 	{
 		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 		TaskPtr->SetInfinite(DecreamTime);
-		TaskPtr->DurationIntervalDelegate.BindUObject(this, &ThisClass::OnIntervalTick);
+		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnIntervalTick);
 		TaskPtr->ReadyForActivation();
 
 		if (ModifyCount > MaxCount)

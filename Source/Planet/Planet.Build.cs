@@ -63,6 +63,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Talent");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Element");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/ToolFutures");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Tools");
         PublicIncludePaths.Add("Planet/GamePlay/Animation");
         PublicIncludePaths.Add("Planet/GamePlay/Controller");
         PublicIncludePaths.Add("Planet/GamePlay/GameInstance");

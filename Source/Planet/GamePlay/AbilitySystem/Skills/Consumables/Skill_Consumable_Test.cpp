@@ -8,6 +8,7 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
+#include "Consumable_Test.h"
 
 void USkill_Consumable_Test::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -21,8 +22,20 @@ void USkill_Consumable_Test::PerformAction()
 {
 	if (CharacterPtr)
 	{
+		SpawnActor();
 		ExcuteTasks();
 		PlayMontage();
+	}
+}
+
+void USkill_Consumable_Test::SpawnActor()
+{
+	FActorSpawnParameters ActorSpawnParameters;
+	ActorSpawnParameters.Owner = CharacterPtr;
+	ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(Consumable_Class, ActorSpawnParameters);
+	if (ConsumableActorPtr)
+	{
+		ConsumableActorPtr->Interaction(CharacterPtr);
 	}
 }
 
@@ -30,7 +43,7 @@ void USkill_Consumable_Test::ExcuteTasks()
 {
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 	TaskPtr->SetDuration(Duration, PerformActionInterval);
-	TaskPtr->DurationIntervalDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
+	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
 	TaskPtr->OnFinished.BindLambda([this](auto) {
 		K2_CancelAbility();
 		});
@@ -39,12 +52,9 @@ void USkill_Consumable_Test::ExcuteTasks()
 
 void USkill_Consumable_Test::OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
 {
-	if (CurrentInterval <= Interval)
+	if (CurrentInterval >= Interval)
 	{
-		if (CurrentInterval >= Interval)
-		{
-			EmitEffect();
-		}
+		EmitEffect();
 	}
 }
 
@@ -73,7 +83,11 @@ void USkill_Consumable_Test::PlayMontage()
 
 void USkill_Consumable_Test::OnPlayMontageEnd()
 {
-
+	if (ConsumableActorPtr)
+	{
+		ConsumableActorPtr->Destroy();
+		ConsumableActorPtr = nullptr;
+	}
 }
 
 void USkill_Consumable_Test::EmitEffect()
@@ -103,6 +117,15 @@ void USkill_Consumable_Test::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable_Test*>(TriggerEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetDataPtr)
+		{
+			UnitPtr = GameplayAbilityTargetDataPtr->UnitPtr;
+		}
+	}
 }
 
 void USkill_Consumable_Test::ActivateAbility(

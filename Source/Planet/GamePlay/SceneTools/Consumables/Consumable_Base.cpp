@@ -9,15 +9,5 @@
 
 void AConsumable_Base::Interaction(ACharacterBase* CharacterPtr)
 {
-	FGameplayEventData Payload;
-	FGameplayAbilitySpec GameplayAbilitySpec(
-		Skill_Consumables_Class,
-		1
-	);
-	auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
-	AbilitieHandle = ASCPtr->GiveAbilityAndActivateOnce(
-		GameplayAbilitySpec,
-		&Payload
-	);
 }
 

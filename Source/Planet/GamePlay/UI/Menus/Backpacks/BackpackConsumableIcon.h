@@ -11,7 +11,7 @@
 struct FStreamableHandle;
 
 class UBasicUnit;
-class UConsumablesUnit;
+class UConsumableUnit;
 
 /**
  *
@@ -52,7 +52,7 @@ protected:
 
 private:
 
-	UConsumablesUnit* UnitPtr = nullptr;
+	UConsumableUnit* UnitPtr = nullptr;
 
 	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 

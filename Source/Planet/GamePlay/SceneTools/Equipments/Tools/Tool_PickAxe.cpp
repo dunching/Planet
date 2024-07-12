@@ -42,7 +42,7 @@ void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmen
 		ASCPtr->TriggerAbilityFromGameplayEvent(
 			EquipmentAbilitieHandle,
 			ASCPtr->AbilityActorInfo.Get(),
-			FGameplayTag(),
+			FGameplayTag::EmptyTag,
 			&Payload,
 			*ASCPtr
 		);

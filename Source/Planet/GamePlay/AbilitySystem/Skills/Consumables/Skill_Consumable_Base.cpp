@@ -9,6 +9,9 @@ void USkill_Consumable_Base::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
+}
 
-	ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);
+bool USkill_Consumable_Base::CanUse() const
+{
+	return false;
 }

@@ -9,6 +9,8 @@
 
 #include "Skill_Consumable_Base.generated.h"
 
+class AConsumable_Base;
+
 UCLASS()
 class USkill_Consumable_Base : public USkill_Base
 {
@@ -21,6 +23,8 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
-protected:
+	virtual bool CanUse()const;
 
+protected:
+	
 };

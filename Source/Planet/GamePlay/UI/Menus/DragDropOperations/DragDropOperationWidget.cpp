@@ -17,6 +17,7 @@
 #include <AssetRefrencePath.h>
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
+#include "SceneElement.h"
 
 UDragDropOperationWidget::UDragDropOperationWidget(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -51,6 +52,12 @@ void UDragDropOperationWidget::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 		{
 			SkillUnitSPtr = Cast<USkillUnit>(BasicUnitPtr);
 			SetItemType(SkillUnitSPtr);
+		}
+		break;
+		case ESceneToolsType::kConsumables:
+		{
+			ConsumableUnitSPtr = Cast<UConsumableUnit>(BasicUnitPtr);
+			SetItemType(ConsumableUnitSPtr);
 		}
 		break;
 		}

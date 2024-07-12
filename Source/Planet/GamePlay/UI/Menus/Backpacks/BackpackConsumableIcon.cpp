@@ -43,8 +43,8 @@ void UBackpackConsumableIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kConsumables)
 	{
-		UnitPtr = Cast<UConsumablesUnit>(BasicUnitPtr);
-		SetNum(UnitPtr->Num);
+		UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
+		SetNum(UnitPtr->GetCurrentValue());
 		SetItemType();
 	}
 }

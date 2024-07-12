@@ -14,6 +14,36 @@ class ABuildingBase;
 class UPlanetGameplayAbility;
 class UPlanetGameplayAbility_SkillBase;
 
+UENUM(BlueprintType)
+enum class ECharacterPropertyType : uint8
+{
+	LiDao,
+	GenGu,
+	ShenFa,
+	DongCha,
+	TianZi,
+
+	GoldElement,
+	WoodElement,
+	WaterElement,
+	FireElement,
+	SoilElement,
+	
+	BaseAttackPower,
+	Penetration,
+	PercentPenetration,
+	Resistance,
+	GAPerformSpeed,
+	kHP,
+	kPP,
+	Evade,
+	HitRate,
+	Toughness,
+	CriticalHitRate,
+	CriticalDamage,
+	MoveSpeed,
+};
+
 enum class EDashDirection : uint8
 {
 	kForward,

@@ -40,11 +40,9 @@ public:
 	
 	TimerHelper_Tick_Delegate TickDelegate;
 
-	TimerHelper_Interval_Tick_Delegate DurationIntervalDelegate;
+	TimerHelper_Interval_Tick_Delegate DurationDelegate;
 
-	TimerHelper_Interval_Tick_Delegate InfiniteIntervalDelegate;
-
-	TimerHelper_Interval_Tick_Delegate CountIntervalDelegate;
+	TimerHelper_Interval_Tick_Delegate IntervalDelegate;
 
 protected:
 

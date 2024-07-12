@@ -5,7 +5,6 @@
 #include "Planet.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "CharacterAttibutes.h"
 #include "HumanControllerInterface.h"
 #include "HumanCharacter.h"
 
@@ -67,7 +66,7 @@ USkillUnit* FSceneToolsContainer::AddUnit(ESkillUnitType Type)
 	return ResultPtr;
 }
 
-UConsumablesUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 Num)
+UConsumableUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 Num)
 {
 	check(Num > 0);
 
@@ -83,7 +82,7 @@ UConsumablesUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 
 	}
 	else
 	{
-		UConsumablesUnit* ResultPtr = NewObject<UConsumablesUnit>(GetWorldImp(), AssetRefMapPtr->ConsumableToolMap[Type]);
+		UConsumableUnit* ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), AssetRefMapPtr->ConsumableToolMap[Type]);
 
 		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
 
@@ -222,10 +221,23 @@ TSoftObjectPtr<UTexture2D> UBasicUnit::GetIcon() const
 	return DefaultIcon;
 }
 
-UConsumablesUnit::UConsumablesUnit() :
+UConsumableUnit::UConsumableUnit() :
 	Super(ESceneToolsType::kConsumables)
 {
 
+}
+
+void UConsumableUnit::AddCurrentValue(int32 val)
+{
+	const auto Old = Num;
+	Num += val;
+
+	CallbackContainerHelper.ValueChanged(Old, Num);
+}
+
+int32 UConsumableUnit::GetCurrentValue() const
+{
+	return Num;
 }
 
 UToolUnit::UToolUnit() :

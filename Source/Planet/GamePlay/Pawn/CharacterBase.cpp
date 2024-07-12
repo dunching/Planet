@@ -102,9 +102,11 @@ void ACharacterBase::PossessedBy(AController* NewController)
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
 		GASPtr->ClearAllAbilities();
+		GASPtr->InitAbilityActorInfo(OnwerActorPtr, OnwerActorPtr);
 	}
 	GetInteractiveSkillComponent()->InitialBaseGAs();
 	GetInteractiveBaseGAComponent()->InitialBaseGAs();
+	GetInteractiveConsumablesComponent()->InitialBaseGAs();
 
 	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
 	OnMoveSpeedChanged(CharacterAttributesRef.MoveSpeed.GetCurrentValue());

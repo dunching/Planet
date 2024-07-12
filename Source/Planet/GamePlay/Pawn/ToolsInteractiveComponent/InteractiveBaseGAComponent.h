@@ -11,6 +11,9 @@
 
 #include "InteractiveBaseGAComponent.generated.h"
 
+class UGA_Tool_Periodic;
+struct FGameplayAbilityTargetData_Tool_Periodic;
+
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
 {
@@ -34,11 +37,15 @@ public:
 
 	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
+	UGA_Tool_Periodic* ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr);
+
 	void InitialBaseGAs();
 
 	FGameplayAbilitySpecHandle SendEventHandle;
-
+	
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
+
+	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
 
 protected:
 

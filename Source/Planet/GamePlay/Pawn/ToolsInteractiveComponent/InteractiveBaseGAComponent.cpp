@@ -32,6 +32,7 @@
 #include "Tool_PickAxe.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter.h"
+#include "GA_Tool_Periodic.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -95,6 +96,36 @@ void UInteractiveBaseGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGA
 	}
 }
 
+UGA_Tool_Periodic* UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return nullptr;
+	}
+
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+	FGameplayEventData Payload;
+	Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+	if (ASCPtr->TriggerAbilityFromGameplayEvent(
+		GAToolPeriodicHandle,
+		ASCPtr->AbilityActorInfo.Get(),
+		FGameplayTag::EmptyTag,
+		&Payload,
+		*ASCPtr
+	))
+	{
+		auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GAToolPeriodicHandle);
+		if (!GameplayAbilitySpecPtr)
+		{
+			return Cast<UGA_Tool_Periodic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+		}
+	}
+
+	return nullptr;
+}
+
 void UInteractiveBaseGAComponent::InitialBaseGAs()
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
@@ -102,14 +133,16 @@ void UInteractiveBaseGAComponent::InitialBaseGAs()
 	{
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		GASPtr->InitAbilityActorInfo(OnwerActorPtr, OnwerActorPtr);
-
 		SendEventHandle = GASPtr->GiveAbility(
 			FGameplayAbilitySpec(UGAEvent_Send::StaticClass(), 1)
 		);
 
 		ReceivedEventHandle = GASPtr->GiveAbility(
 			FGameplayAbilitySpec(UGAEvent_Received::StaticClass(), 1)
+		);
+		
+		GAToolPeriodicHandle = GASPtr->GiveAbility(
+			FGameplayAbilitySpec(UGA_Tool_Periodic::StaticClass(), 1)
 		);
 
 		for (auto Iter : CharacterAbilities)

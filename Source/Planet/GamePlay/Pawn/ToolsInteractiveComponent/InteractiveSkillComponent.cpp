@@ -106,8 +106,6 @@ void UInteractiveSkillComponent::InitialBaseGAs()
 	{
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		GASPtr->InitAbilityActorInfo(OnwerActorPtr, OnwerActorPtr);
-
 		// 五行技能
 		GASPtr->GiveAbility(
 			FGameplayAbilitySpec(

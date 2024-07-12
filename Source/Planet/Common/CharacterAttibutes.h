@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 #include "GenerateType.h"
+#include "BaseData.h"
+#include "SceneElement.h"
 #include "GAEvent_Helper.h"
 
 #include "CharacterAttibutes.generated.h"
@@ -13,55 +15,7 @@ class FTalent_Base;
 
 #pragma region CharacterAttributes
 
-struct FScoped_BaseProperty_SaveUpdate;
 struct FCharacterAttributes;
-
-USTRUCT(BlueprintType)
-struct FBaseProperty
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	friend FScoped_BaseProperty_SaveUpdate;
-
-	FBaseProperty();
-
-	int32 GetCurrentValue() const;
-
-	void SetCurrentValue(int32 val);
-
-	void AddCurrentValue(int32 val);
-
-	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
-
-protected:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 CurrentValue = 0;
-
-	bool bIsSaveUpdate = false;
-
-};
-
-struct FScoped_BaseProperty_SaveUpdate
-{
-	FScoped_BaseProperty_SaveUpdate(FBaseProperty& TargetRef)
-		: TargetRef(TargetRef)
-	{
-		TargetRef.bIsSaveUpdate = true;
-	}
-
-	~FScoped_BaseProperty_SaveUpdate()
-	{
-		TargetRef.bIsSaveUpdate = false;
-
-		TargetRef.CallbackContainerHelper.ValueChanged(TargetRef.CurrentValue, TargetRef.CurrentValue);
-	}
-
-private:
-	FBaseProperty& TargetRef;
-};
 
 USTRUCT(BlueprintType)
 struct PLANET_API FBasePropertySet
@@ -200,7 +154,6 @@ struct PLANET_API FCharacterAttributes
 
 	// 基础属性
 #pragma region 
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet BaseAttackPower;
 
@@ -210,6 +163,7 @@ struct PLANET_API FCharacterAttributes
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet PercentPenetration;
 
+	// 护甲
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet Resistance;
 
@@ -264,7 +218,6 @@ struct PLANET_API FCharacterAttributes
 	FBasePropertySet RunningConsume;
 
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
-
 };
 
 struct PLANET_API FScopeCharacterAttributes
