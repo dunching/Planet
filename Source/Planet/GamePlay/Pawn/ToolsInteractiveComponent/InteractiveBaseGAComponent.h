@@ -37,15 +37,13 @@ public:
 
 	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
-	UGA_Tool_Periodic* ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr);
+	FGameplayAbilitySpecHandle ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr);
 
 	void InitialBaseGAs();
 
 	FGameplayAbilitySpecHandle SendEventHandle;
 	
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
-
-	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
 
 protected:
 

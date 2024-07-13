@@ -59,7 +59,8 @@ void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Tornado);
 
-		HoldItemComponent.AddUnit(EConsumableUnitType::kTest, 1);
+		HoldItemComponent.AddUnit(EConsumableUnitType::kGeneric_HP, 1);
+		HoldItemComponent.AddUnit(EConsumableUnitType::kGeneric_PP, 1);
 	}
 }
 

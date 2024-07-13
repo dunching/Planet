@@ -33,7 +33,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	);
+	)override;
 
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -46,7 +46,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	)override;
 
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -54,7 +54,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	)override;
 
 protected:
 

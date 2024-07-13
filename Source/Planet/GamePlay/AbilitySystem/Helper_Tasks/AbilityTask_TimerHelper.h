@@ -29,6 +29,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
 	static UAbilityTask_TimerHelper* DelayTask(UGameplayAbility* OwningAbility);
 
+	void UpdateDuration();
+
 	void SetDuration(float InDuration, float InIntervalTime = -1.f);
 
 	// 如果 InIntervalTime > 0；则count会在累计时间大于InIntervalTime才会+1，否则每次tick+1
@@ -61,7 +63,7 @@ protected:
 
 	float Duration = -1.f;
 
-	float TotalTime = 0.f;
+	float Duration_TotalTime = 0.f;
 	
 	float IntervalTime = -1.f;
 

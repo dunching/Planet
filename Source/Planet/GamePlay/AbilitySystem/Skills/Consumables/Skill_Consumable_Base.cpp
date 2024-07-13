@@ -3,6 +3,14 @@
 
 #include "AbilitySystemComponent.h"
 
+USkill_Consumable_Base::USkill_Consumable_Base():
+	Super()
+{
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	bRetriggerInstancedAbility = true;
+}
+
 void USkill_Consumable_Base::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec

@@ -74,6 +74,13 @@ protected:
 
 	virtual void SendEvent(const FGameplayEventData& Payload);
 
+	virtual void SendEvent2Other(
+		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap, 
+		bool bIsWeaponAttack = false
+	);
+
+	virtual void SendEvent2Self(const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap);
+
 	ACharacterBase* CharacterPtr = nullptr;
 
 };

@@ -96,34 +96,29 @@ void UInteractiveBaseGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGA
 	}
 }
 
-UGA_Tool_Periodic* UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr)
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr)
 {
+	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
+
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
 	if (!OnwerActorPtr)
 	{
-		return nullptr;
+		return GAToolPeriodicHandle;
 	}
 
 	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
 	FGameplayEventData Payload;
 	Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-	if (ASCPtr->TriggerAbilityFromGameplayEvent(
-		GAToolPeriodicHandle,
-		ASCPtr->AbilityActorInfo.Get(),
-		FGameplayTag::EmptyTag,
-		&Payload,
-		*ASCPtr
-	))
-	{
-		auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GAToolPeriodicHandle);
-		if (!GameplayAbilitySpecPtr)
-		{
-			return Cast<UGA_Tool_Periodic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-		}
-	}
 
-	return nullptr;
+	FGameplayAbilitySpec Spec(UGA_Tool_Periodic::StaticClass(), 1);
+
+	GAToolPeriodicHandle = ASCPtr->GiveAbilityAndActivateOnce(
+		Spec,
+		&Payload
+	);
+
+	return GAToolPeriodicHandle;
 }
 
 void UInteractiveBaseGAComponent::InitialBaseGAs()
@@ -141,10 +136,6 @@ void UInteractiveBaseGAComponent::InitialBaseGAs()
 			FGameplayAbilitySpec(UGAEvent_Received::StaticClass(), 1)
 		);
 		
-		GAToolPeriodicHandle = GASPtr->GiveAbility(
-			FGameplayAbilitySpec(UGA_Tool_Periodic::StaticClass(), 1)
-		);
-
 		for (auto Iter : CharacterAbilities)
 		{
 			GASPtr->GiveAbility(

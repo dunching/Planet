@@ -152,7 +152,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			}
 		}
 	}
-
+	TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap;
 	TArray<struct FHitResult> OutHits;
 	if (GetWorldImp()->SweepMultiByObjectType(
 		OutHits,
@@ -164,29 +164,21 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(GAEventDataPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
 		for (auto Iter : OutHits)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
 			if (TargetCharacterPtr)
 			{
-				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+				decltype(ModifyPropertyMap)::ValueType Value;
 
-				GAEventData.bIsWeaponAttack = true;
-				GAEventData.SetBaseDamage(Damage);
+				Value.Add(ECharacterPropertyType::kHP, FBaseProperty(Damage));
 
-				GAEventDataPtr->DataAry.Add(GAEventData);
+				ModifyPropertyMap.Add(TargetCharacterPtr, Value);
 			}
 		}
 
-		SendEvent(Payload);
 	}
+	SendEvent2Other(ModifyPropertyMap, true);
 }
 
 void USkill_WeaponActive_PickAxe::PlayMontage()

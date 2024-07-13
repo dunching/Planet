@@ -9,6 +9,8 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
+#include "GA_Tool_Periodic.h"
+#include "InteractiveBaseGAComponent.h"
 
 void USkill_Consumable_Generic::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -63,6 +65,17 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
+void USkill_Consumable_Generic::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
 void USkill_Consumable_Generic::PerformAction()
 {
 	if (CharacterPtr)
@@ -86,27 +99,30 @@ void USkill_Consumable_Generic::SpawnActor()
 
 void USkill_Consumable_Generic::ExcuteTasks()
 {
-	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-	TaskPtr->SetDuration(UnitPtr->Duration, UnitPtr->PerformActionInterval);
-	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
-	TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
-	TaskPtr->OnFinished.BindLambda([this](auto) {
-		K2_CancelAbility();
-		});
-	TaskPtr->ReadyForActivation();
-}
-
-void USkill_Consumable_Generic::OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
-{
-	if (CurrentInterval >= Interval)
+	if (CharacterPtr)
 	{
-		EmitEffect();
+		if (EffectsMap.Contains(UnitPtr))
+		{
+			auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(EffectsMap[UnitPtr]);
+			if (GameplayAbilitySpecPtr)
+			{
+				auto GAPtr = Cast<UGA_Tool_Periodic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				if (GAPtr)
+				{
+					GAPtr->UpdateDuration();
+					return;
+				}
+			}
+		}
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Tool_Periodic;
+
+		*GameplayAbilityTargetDataPtr = UnitPtr;
+
+		auto GAPtr = ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
+		EffectsMap.Add(UnitPtr, GAPtr);
 	}
-}
-
-void USkill_Consumable_Generic::OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
-{
-
 }
 
 void USkill_Consumable_Generic::PlayMontage()
@@ -139,32 +155,23 @@ void USkill_Consumable_Generic::OnPlayMontageEnd()
 		ConsumableActorPtr->Destroy();
 		ConsumableActorPtr = nullptr;
 	}
+
+	K2_CancelAbility();
 }
 
 void USkill_Consumable_Generic::EmitEffect()
 {
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+	SendEvent2Self(UnitPtr->ModifyPropertyMap);
+}
 
-	FGameplayEventData Payload;
-	Payload.TargetData.Add(GAEventDataPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-	for (const auto& Iter : UnitPtr->ModifyPropertyMap)
+void USkill_Consumable_Generic::OnGAEnd(UGameplayAbility* GAPtr)
+{
+	for (const auto Iter : EffectsMap)
 	{
-		switch (Iter.Key)
-		{
-		case ECharacterPropertyType::kHP:
-		{
-			GAEventData.HP = Iter.Value.GetCurrentValue();
-		}
-		break;
-		}
+// 		if (Iter.Value == GAPtr)
+// 		{
+// 			EffectsMap.Remove(Iter.Key);
+// 			break;
+// 		}
 	}
-
-	GAEventDataPtr->DataAry.Add(GAEventData);
-
-	SendEvent(Payload);
 }

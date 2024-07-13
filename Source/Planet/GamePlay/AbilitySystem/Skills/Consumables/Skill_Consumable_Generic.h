@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "GameplayAbilitySpecHandle.h"
+
 #include "SceneElement.h"
 #include "Skill_Consumable_Base.h"
 #include "CharacterAttibutes.h"
@@ -14,6 +16,7 @@ class UAbilityTask_TimerHelper;
 class AConsumable_Base;
 class UConsumableUnit;
 class UGA_Tool_Periodic;
+class UGameplayAbility;
 
 UCLASS()
 class USkill_Consumable_Generic : public USkill_Consumable_Base
@@ -50,6 +53,14 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+	virtual void EndAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateEndAbility,
+		bool bWasCancelled
+	)override;
+
 protected:
 
 	void PerformAction();
@@ -58,15 +69,13 @@ protected:
 
 	void ExcuteTasks();
 
-	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
-	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
 	void PlayMontage();
 
 	void OnPlayMontageEnd();
 
 	void EmitEffect();
+
+	void OnGAEnd(UGameplayAbility* GAPtr);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TSubclassOf<AConsumable_Base> Consumable_Class;
@@ -75,7 +84,7 @@ protected:
 	
 	UConsumableUnit* UnitPtr = nullptr;
 
-	TMap<UConsumableUnit*, UGA_Tool_Periodic*>EffectsMap;
+	TMap<UConsumableUnit*, FGameplayAbilitySpecHandle>EffectsMap;
 };
 
 struct FGameplayAbilityTargetData_Consumable_Generic : public FGameplayAbilityTargetData

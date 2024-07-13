@@ -36,7 +36,8 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 
 	switch ((*ToolIter)->UnitPtr->GetSceneElementType<EConsumableUnitType>())
 	{
-	case EConsumableUnitType::kTest:
+	case EConsumableUnitType::kGeneric_HP:
+	case EConsumableUnitType::kGeneric_PP:
 	{
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		if (!OnwerActorPtr)
@@ -46,7 +47,7 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 
 		FGameplayEventData Payload;
 
-		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable_Test;
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable_Generic;
 		GameplayAbilityTargetDashPtr->UnitPtr = (*ToolIter)->UnitPtr;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 
@@ -55,15 +56,14 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 			1
 		);
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		ASCPtr->TriggerAbilityFromGameplayEvent(
+
+		return ASCPtr->TriggerAbilityFromGameplayEvent(
 			Skill_Consumable_GenericHandle,
 			ASCPtr->AbilityActorInfo.Get(),
 			FGameplayTag::EmptyTag,
 			&Payload,
 			*ASCPtr
 		);
-
-		return true;
 	}
 	break;
 	}

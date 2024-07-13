@@ -120,3 +120,77 @@ void USkill_Base::SendEvent(const FGameplayEventData& Payload)
 		);
 	}
 }
+
+void USkill_Base::SendEvent2Other(
+	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
+	bool bIsWeaponAttack 
+)
+{
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+	FGameplayEventData Payload;
+	Payload.TargetData.Add(GAEventDataPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+	for (const auto Iter : ModifyPropertyMap)
+	{
+		FGAEventData GAEventData(Iter.Key, CharacterPtr);
+
+		GAEventData.bIsWeaponAttack = bIsWeaponAttack;
+
+		for (const auto& SecondIter : Iter.Value)
+		{
+			switch (SecondIter.Key)
+			{
+			case ECharacterPropertyType::kHP:
+			{
+				GAEventData.HP = SecondIter.Value.GetCurrentValue();
+			}
+			break;
+			case ECharacterPropertyType::kPP:
+			{
+				GAEventData.PP = SecondIter.Value.GetCurrentValue();
+			}
+			break;
+			}
+		}
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+
+	}
+	SendEvent(Payload);
+}
+
+void USkill_Base::SendEvent2Self(const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap)
+{
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+	FGameplayEventData Payload;
+	Payload.TargetData.Add(GAEventDataPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+	for (const auto& Iter : ModifyPropertyMap)
+	{
+		switch (Iter.Key)
+		{
+		case ECharacterPropertyType::kHP:
+		{
+			GAEventData.HP = Iter.Value.GetCurrentValue();
+		}
+		break;
+		case ECharacterPropertyType::kPP:
+		{
+			GAEventData.PP = Iter.Value.GetCurrentValue();
+		}
+		break;
+		}
+	}
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	SendEvent(Payload);
+}

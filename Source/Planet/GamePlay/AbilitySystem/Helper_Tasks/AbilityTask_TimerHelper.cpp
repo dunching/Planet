@@ -20,6 +20,11 @@ UAbilityTask_TimerHelper* UAbilityTask_TimerHelper::DelayTask(UGameplayAbility* 
 	return MyObj;
 }
 
+void UAbilityTask_TimerHelper::UpdateDuration()
+{
+	Duration_TotalTime = 0.f;
+}
+
 void UAbilityTask_TimerHelper::SetDuration(float InDuration, float InIntervalTime)
 {
 	Type = EType::kDuration;
@@ -80,9 +85,9 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 
 		if (Duration > 0.f)
 		{
-			TotalTime += DeltaTime;
-			DurationDelegate.ExecuteIfBound(this, TotalTime, Duration);
-			if (TotalTime >= Duration)
+			Duration_TotalTime += DeltaTime;
+			DurationDelegate.ExecuteIfBound(this, Duration_TotalTime, Duration);
+			if (Duration_TotalTime >= Duration)
 			{
 				OnFinished.ExecuteIfBound(this);
 				EndTask();

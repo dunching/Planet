@@ -5,6 +5,11 @@ FBaseProperty::FBaseProperty()
 {
 }
 
+FBaseProperty::FBaseProperty(int32 Value)
+{
+	SetCurrentValue(Value);
+}
+
 int32 FBaseProperty::GetCurrentValue() const
 {
 	return CurrentValue;

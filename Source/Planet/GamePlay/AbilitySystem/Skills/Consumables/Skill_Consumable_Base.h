@@ -18,6 +18,8 @@ class USkill_Consumable_Base : public USkill_Base
 
 public:
 
+	USkill_Consumable_Base();
+
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec

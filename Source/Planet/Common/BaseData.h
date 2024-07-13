@@ -21,6 +21,8 @@ public:
 
 	FBaseProperty();
 
+	FBaseProperty(int32 Value);
+
 	int32 GetCurrentValue() const;
 
 	void SetCurrentValue(int32 val);

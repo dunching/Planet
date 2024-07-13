@@ -3,9 +3,16 @@
 
 #include "CoreMinimal.h"
 
-#include "PlanetGameplayAbility.h"
+#include "Skill_Base.h"
 
 #include "GA_Tool_Periodic.generated.h"
+
+class UAbilityTask_TimerHelper;
+class UTexture2D;
+class UConsumableUnit;
+class UEffectItem;
+
+struct FStreamableHandle;
 
 struct FGameplayAbilityTargetData_Tool_Periodic : public FGameplayAbilityTargetData
 {
@@ -14,10 +21,14 @@ struct FGameplayAbilityTargetData_Tool_Periodic : public FGameplayAbilityTargetD
 	float Duration = 3.f;
 
 	float PerformActionInterval = 1.f;
+
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+	const FGameplayAbilityTargetData_Tool_Periodic& operator=(UConsumableUnit*RightVal);
 };
 
 UCLASS()
-class PLANET_API UGA_Tool_Periodic : public UPlanetGameplayAbility
+class PLANET_API UGA_Tool_Periodic : public USkill_Base
 {
 	GENERATED_BODY()
 
@@ -40,10 +51,32 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
+	virtual void EndAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateEndAbility,
+		bool bWasCancelled
+	)override;
+
+	void UpdateDuration();
+
 protected:
 
 	void PerformAction();
 
+	void ExcuteTasks();
+
+	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+
+	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+
 	const FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr = nullptr;
+
+	UEffectItem* EffectItemPtr = nullptr;
+
+	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
+
+	UAbilityTask_TimerHelper* TaskPtr = nullptr;
 
 };

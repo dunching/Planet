@@ -84,7 +84,8 @@ UENUM(BlueprintType)
 enum class EConsumableUnitType : uint8
 {
 	kNone,
-	kTest,
+	kGeneric_HP,
+	kGeneric_PP,
 };
 
 UENUM(BlueprintType)
