@@ -25,6 +25,7 @@
 #include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
+#include "InteractiveBaseGAComponent.h"
 
 namespace Skill_WeaponActive_PickAxe
 {
@@ -178,7 +179,9 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		}
 
 	}
-	SendEvent2Other(ModifyPropertyMap, true);
+	
+	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	ICPtr->SendEvent2Other(ModifyPropertyMap, true);
 }
 
 void USkill_WeaponActive_PickAxe::PlayMontage()

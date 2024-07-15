@@ -11,6 +11,7 @@
 
 #include "InteractiveBaseGAComponent.generated.h"
 
+class UConsumableUnit;
 class UGA_Tool_Periodic;
 struct FGameplayAbilityTargetData_Tool_Periodic;
 
@@ -38,6 +39,17 @@ public:
 	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
 	FGameplayAbilitySpecHandle ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr);
+	
+	FGameplayAbilitySpecHandle ExcuteEffects(UConsumableUnit* UnitPtr);
+
+	void SendEvent(FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr);
+
+	void SendEvent2Other(
+		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
+		bool bIsWeaponAttack = false
+	);
+
+	void SendEvent2Self(const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap);
 
 	void InitialBaseGAs();
 
@@ -66,5 +78,7 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTagContainer CharacterTags;
+
+	TMap<UConsumableUnit*, FGameplayAbilitySpecHandle>EffectsMap;
 
 };

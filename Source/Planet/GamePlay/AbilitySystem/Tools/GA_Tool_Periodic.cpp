@@ -3,6 +3,7 @@
 
 #include <Engine/AssetManager.h>
 #include <Engine/StreamableManager.h>
+#include "AbilitySystemGlobals.h"
 
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterBase.h"
@@ -28,15 +29,16 @@ void UGA_Tool_Periodic::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
 		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Tool_Periodic*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
+			ActivationOwnedTags.AppendTags(GameplayAbilityTargetDataPtr->Tag);
 		}
 	}
+
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
 void UGA_Tool_Periodic::ActivateAbility(
@@ -124,12 +126,25 @@ void UGA_Tool_Periodic::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float Cu
 	}
 }
 
-const FGameplayAbilityTargetData_Tool_Periodic& FGameplayAbilityTargetData_Tool_Periodic::operator=(UConsumableUnit* RightVal)
+FGameplayAbilityTargetData_Tool_Periodic::FGameplayAbilityTargetData_Tool_Periodic(UConsumableUnit* RightVal)
 {
 	Duration = RightVal->Duration;
 	PerformActionInterval = RightVal->PerformActionInterval;
 	ModifyPropertyMap = RightVal->ModifyPropertyMap;
 	DefaultIcon = RightVal->GetIcon();
+}
 
-	return *this;
+FGameplayAbilityTargetData_Tool_Periodic::FGameplayAbilityTargetData_Tool_Periodic(
+	const FGameplayTagContainer& InTag, 
+	float InDuration
+	):
+	Duration(InDuration),
+	Tag(InTag)
+{
+
+}
+
+FGameplayAbilityTargetData_Tool_Periodic::FGameplayAbilityTargetData_Tool_Periodic()
+{
+
 }

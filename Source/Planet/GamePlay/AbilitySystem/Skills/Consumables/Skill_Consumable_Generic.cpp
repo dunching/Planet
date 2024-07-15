@@ -49,6 +49,8 @@ void USkill_Consumable_Generic::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
+
 	PerformAction();
 }
 
@@ -63,6 +65,16 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 
 
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
+bool USkill_Consumable_Generic::CommitAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+)
+{
+	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
 void USkill_Consumable_Generic::EndAbility(
@@ -101,27 +113,8 @@ void USkill_Consumable_Generic::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		if (EffectsMap.Contains(UnitPtr))
-		{
-			auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(EffectsMap[UnitPtr]);
-			if (GameplayAbilitySpecPtr)
-			{
-				auto GAPtr = Cast<UGA_Tool_Periodic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-				if (GAPtr)
-				{
-					GAPtr->UpdateDuration();
-					return;
-				}
-			}
-		}
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Tool_Periodic;
-
-		*GameplayAbilityTargetDataPtr = UnitPtr;
-
-		auto GAPtr = ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
-		EffectsMap.Add(UnitPtr, GAPtr);
+		auto GAPtr = ICPtr->ExcuteEffects(UnitPtr);
 	}
 }
 
@@ -161,17 +154,8 @@ void USkill_Consumable_Generic::OnPlayMontageEnd()
 
 void USkill_Consumable_Generic::EmitEffect()
 {
-	SendEvent2Self(UnitPtr->ModifyPropertyMap);
 }
 
 void USkill_Consumable_Generic::OnGAEnd(UGameplayAbility* GAPtr)
 {
-	for (const auto Iter : EffectsMap)
-	{
-// 		if (Iter.Value == GAPtr)
-// 		{
-// 			EffectsMap.Remove(Iter.Key);
-// 			break;
-// 		}
-	}
 }

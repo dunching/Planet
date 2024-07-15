@@ -26,6 +26,7 @@
 #include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
+#include "InteractiveBaseGAComponent.h"
 
 namespace Skill_GroupTherapy
 {
@@ -137,9 +138,6 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 	{
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(GAEventDataPtr);
-
 		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
 		for (auto Iter : OutOverlaps)
@@ -159,7 +157,8 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 			}
 		}
 
-		SendEvent(Payload);
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		ICPtr->SendEvent(GAEventDataPtr);
 	}
 }
 

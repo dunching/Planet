@@ -9,6 +9,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
+#include "InteractiveBaseGAComponent.h"
 
 void USkill_Consumable_Test::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -105,7 +106,8 @@ void USkill_Consumable_Test::EmitEffect()
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	SendEvent(Payload);
+	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	ICPtr->SendEvent(GAEventDataPtr);
 }
 
 void USkill_Consumable_Test::PreActivate(

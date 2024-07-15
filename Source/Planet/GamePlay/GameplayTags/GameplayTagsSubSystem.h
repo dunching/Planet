@@ -17,8 +17,7 @@ public:
 
 	static UGameplayTagsSubSystem* GetInstance();
 
-#pragma region Tags
-	
+#pragma region Locamotion Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Jump =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
@@ -38,8 +37,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DisMount =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.DisMount")));
+#pragma endregion 
 
-
+#pragma region State Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Ridering =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Ridering")));
@@ -49,8 +49,8 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.SuperArmor")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag Suspension =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Suspension")));
+	FGameplayTag FlyAway =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.FlyAway")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DeathingTag = 
@@ -67,7 +67,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
 	FGameplayTag GameplayTag2 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.WeaponActive")));
+#pragma endregion 
 
+#pragma region UISocket Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag WeaponActiveSocket1 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.WeaponActiveSocket1")));
@@ -99,6 +101,5 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag Talent_YinYang_Socket =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.Talent_YinYang_Socket")));
-#pragma endregion Tags
-
+#pragma endregion 
 };

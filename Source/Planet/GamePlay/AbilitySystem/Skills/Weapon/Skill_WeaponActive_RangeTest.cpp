@@ -27,6 +27,7 @@
 #include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
+#include "InteractiveBaseGAComponent.h"
 
 namespace Skill_WeaponActive_RangeTest
 {
@@ -146,9 +147,6 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 {
 	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
-	FGameplayEventData Payload;
-	Payload.TargetData.Add(GAEventDataPtr);
-
 	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
 	if (TargetCharacterPtr)
@@ -160,7 +158,8 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
 
-	SendEvent(Payload);
+	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	ICPtr->SendEvent(GAEventDataPtr);
 }
 
 void USkill_WeaponActive_RangeTest::PlayMontage()

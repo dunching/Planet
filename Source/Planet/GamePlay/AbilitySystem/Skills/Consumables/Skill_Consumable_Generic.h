@@ -53,6 +53,13 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+	virtual bool CommitAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	);
+
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -83,8 +90,6 @@ protected:
 	AConsumable_Base* ConsumableActorPtr = nullptr;
 	
 	UConsumableUnit* UnitPtr = nullptr;
-
-	TMap<UConsumableUnit*, FGameplayAbilitySpecHandle>EffectsMap;
 };
 
 struct FGameplayAbilityTargetData_Consumable_Generic : public FGameplayAbilityTargetData

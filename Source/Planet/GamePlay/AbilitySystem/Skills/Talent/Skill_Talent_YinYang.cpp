@@ -239,9 +239,6 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 	{
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(GAEventDataPtr);
-
 		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
 		for (auto Iter : OutOverlaps)
@@ -261,7 +258,8 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 			}
 		}
 
-		SendEvent(Payload);
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		ICPtr->SendEvent(GAEventDataPtr);
 	}
 }
 

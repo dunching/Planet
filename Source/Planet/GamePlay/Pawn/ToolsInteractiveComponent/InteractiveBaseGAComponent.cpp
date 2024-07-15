@@ -121,6 +121,132 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 	return GAToolPeriodicHandle;
 }
 
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(UConsumableUnit* UnitPtr)
+{
+	FGameplayAbilitySpecHandle Result;
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		if (EffectsMap.Contains(UnitPtr))
+		{
+			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(EffectsMap[UnitPtr]);
+			if (GameplayAbilitySpecPtr)
+			{
+				auto GAPtr = Cast<UGA_Tool_Periodic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				if (GAPtr)
+				{
+					GAPtr->UpdateDuration();
+					return Result;
+				}
+			}
+		}
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Tool_Periodic(UnitPtr);
+
+		Result = ExcuteEffects(GameplayAbilityTargetDataPtr);
+		EffectsMap.Add(UnitPtr, Result);
+	}
+	return Result;
+}
+
+void UInteractiveBaseGAComponent::SendEvent(FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		Payload.TargetData.Add(GAEventDataPtr);
+
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		ASCPtr->TriggerAbilityFromGameplayEvent(
+			OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
+			ASCPtr->AbilityActorInfo.Get(),
+			FGameplayTag(),
+			&Payload,
+			*ASCPtr
+		);
+	}
+}
+
+void UInteractiveBaseGAComponent::SendEvent2Other(
+	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap, bool bIsWeaponAttack
+)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
+
+	for (const auto Iter : ModifyPropertyMap)
+	{
+		FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
+
+		GAEventData.bIsWeaponAttack = bIsWeaponAttack;
+
+		for (const auto& SecondIter : Iter.Value)
+		{
+			switch (SecondIter.Key)
+			{
+			case ECharacterPropertyType::kHP:
+			{
+				GAEventData.HP = SecondIter.Value.GetCurrentValue();
+			}
+			break;
+			case ECharacterPropertyType::kPP:
+			{
+				GAEventData.PP = SecondIter.Value.GetCurrentValue();
+			}
+			break;
+			}
+		}
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+
+	}
+	SendEvent(GAEventDataPtr);
+}
+
+void UInteractiveBaseGAComponent::SendEvent2Self(
+	const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap
+)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
+
+	FGAEventData GAEventData(OnwerActorPtr, OnwerActorPtr);
+
+	for (const auto& Iter : ModifyPropertyMap)
+	{
+		switch (Iter.Key)
+		{
+		case ECharacterPropertyType::kHP:
+		{
+			GAEventData.HP = Iter.Value.GetCurrentValue();
+		}
+		break;
+		case ECharacterPropertyType::kPP:
+		{
+			GAEventData.PP = Iter.Value.GetCurrentValue();
+		}
+		break;
+		}
+	}
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	SendEvent(GAEventDataPtr);
+}
+
 void UInteractiveBaseGAComponent::InitialBaseGAs()
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();

@@ -30,6 +30,7 @@
 #include "InteractiveBaseGAComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
+#include "GA_Tool_Periodic.h"
 
 void TestCommand::TestAsyncAssetLoad()
 {
@@ -364,4 +365,24 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	{
 		CharacterAttributes.Evade.SetCurrentValue(Value, CharacterAttributes.PropertuModify_GUID);
 	}
+}
+
+void TestCommand::TestGATag(const TArray< FString >& Args)
+{
+	auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+
+	FGameplayTagContainer Tag;
+
+	for (auto Iter : Args)
+	{
+		Tag.AddTag(FGameplayTag::RequestGameplayTag(*Iter));
+	}
+
+	FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Tool_Periodic(
+		Tag,
+		3.f
+	);
+
+	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
 }

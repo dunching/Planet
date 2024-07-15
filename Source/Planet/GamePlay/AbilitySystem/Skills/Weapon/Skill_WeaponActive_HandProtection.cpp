@@ -23,6 +23,7 @@
 #include "UIManagerSubSystem.h"
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
+#include "InteractiveBaseGAComponent.h"
 
 namespace Skill_WeaponHandProtection
 {
@@ -247,9 +248,6 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 	{
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(GAEventDataPtr);
-
 		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
 		for (auto Iter : OutHits)
@@ -296,7 +294,8 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 			}
 		}
 
-		SendEvent(Payload);
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		ICPtr->SendEvent(GAEventDataPtr);
 	}
 }
 

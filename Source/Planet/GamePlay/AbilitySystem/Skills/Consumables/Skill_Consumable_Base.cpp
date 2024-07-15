@@ -8,7 +8,7 @@ USkill_Consumable_Base::USkill_Consumable_Base():
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
-	bRetriggerInstancedAbility = true;
+	bRetriggerInstancedAbility = false;
 }
 
 void USkill_Consumable_Base::OnAvatarSet(
