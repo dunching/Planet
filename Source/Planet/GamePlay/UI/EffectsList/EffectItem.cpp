@@ -83,10 +83,10 @@ void UEffectItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
+		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
 			{
 				ImagePtr->SetBrushFromTexture(TexturePtr.Get());
-			});
+			}));
 	}
 }
 

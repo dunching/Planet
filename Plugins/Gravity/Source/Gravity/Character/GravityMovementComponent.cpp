@@ -1022,8 +1022,11 @@ void UGravityMovementComponent::PhysNavWalking(float deltaTime, int32 Iterations
 
 bool UGravityMovementComponent::UpdateGravityTransform(float Delta)
 {
-//	SetGravityDirection(-UpdatedComponent->GetComponentLocation());
-	SetGravityDirection(FVector::DownVector);
+#if USECUSTOMEGRAVITY
+	SetGravityDirection(-UpdatedComponent->GetComponentLocation());
+#else
+    SetGravityDirection(FVector::DownVector);
+#endif
 
     return true;
 }

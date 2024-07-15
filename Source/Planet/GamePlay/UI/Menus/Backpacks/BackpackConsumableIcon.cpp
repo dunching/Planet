@@ -79,10 +79,10 @@ void UBackpackConsumableIcon::SetItemType()
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 			{
 				ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
-			});
+			}));
 	}
 }
 

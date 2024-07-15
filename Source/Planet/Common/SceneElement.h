@@ -152,10 +152,16 @@ public:
 	template<typename SceneElementType>
 	SceneElementType GetSceneElementType()const;
 
+	// 
+	FString GetUnitName()const;
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
+	FString UnitName = TEXT("UnitName");
 
 	std::variant<
 		EToolUnitType, 
@@ -227,14 +233,16 @@ public:
 
 	UToolUnit();
 
-	int32 DamageDegree = 0;
+	int32 GetNum()const;
 
-	int32 Num = 1;
+	int32 DamageDegree = 0;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolType")
 	TSubclassOf<AToolUnitBase> ToolActorClass;
 
 protected:
+
+	int32 Num = 1;
 
 };
 
@@ -339,7 +347,15 @@ struct FSceneToolsContainer
 {
 	GENERATED_USTRUCT_BODY()
 
+	using FOnSkillUnitChanged = TCallbackHandleContainer<void(USkillUnit*, bool)>;
+
+	using FOnToolUnitChanged = TCallbackHandleContainer<void(UToolUnit*)>;
+	
+	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(UConsumableUnit*, bool, int32)>;
+
 	UConsumableUnit* AddUnit(EConsumableUnitType Type, int32 Num = 1);
+
+	void RemoveUnit(UConsumableUnit*UnitPtr, int32 Num = 1);
 
 	UToolUnit* AddUnit(EToolUnitType Type);
 
@@ -355,6 +371,12 @@ struct FSceneToolsContainer
 
 	const TArray<UBasicUnit*>& GetSceneUintAry()const;
 
+	FOnSkillUnitChanged OnSkillUnitChanged;
+
+	FOnToolUnitChanged OnToolUnitChanged;
+
+	FOnConsumableUnitChanged OnConsumableUnitChanged;
+
 private:
 
 	UPROPERTY()
@@ -363,6 +385,9 @@ private:
 	TMap<UBasicUnit::IDType, UBasicUnit*> SceneMetaMap;
 
 	TMap<EConsumableUnitType, UConsumableUnit*> ConsumablesUnitMap;
+
+	TMap<ESkillUnitType, USkillUnit*> SkillUnitMap;
+
 };
 
 #pragma endregion HoldingItems

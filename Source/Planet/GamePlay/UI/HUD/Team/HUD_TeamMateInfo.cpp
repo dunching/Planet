@@ -74,10 +74,10 @@ void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			if (UIPtr)
 			{
 				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-				AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(GroupMateUnitPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
+				AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateUnitPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
 					{
 						UIPtr->SetBrushFromTexture(GroupMateUnitPtr->GetIcon().Get());
-					});
+					}));
 			}
 		}
 		{

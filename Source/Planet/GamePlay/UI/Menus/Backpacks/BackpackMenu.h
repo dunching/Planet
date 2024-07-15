@@ -19,7 +19,7 @@ class UBackpackToolIcon;
  *
  */
 UCLASS()
-class PLANET_API UBackpackMenu : public UUserWidget, public IItemsMenuInterface
+class PLANET_API UBackpackMenu : public UMyUserWidget, public IItemsMenuInterface
 {
 	GENERATED_BODY()
 

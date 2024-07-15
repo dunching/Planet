@@ -90,11 +90,7 @@ void UGA_Tool_Periodic::ExcuteTasks()
 	if (EffectPtr)
 	{
 		EffectItemPtr = EffectPtr->AddEffectItem();
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(GameplayAbilityTargetDataPtr->DefaultIcon.ToSoftObjectPath(), [this]()
-			{
-				EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
-			});
+		EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
 	}
 
 	TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "CharacterAttibutes.h"
 #include "GenerateType.h"
@@ -12,7 +12,7 @@
 #include "MyBaseProperty.generated.h"
 
 UCLASS()
-class PLANET_API UMyBaseProperty : public UUserWidget
+class PLANET_API UMyBaseProperty : public UMyUserWidget
 {
 	GENERATED_BODY()
 

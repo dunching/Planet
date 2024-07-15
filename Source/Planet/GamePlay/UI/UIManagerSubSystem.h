@@ -30,6 +30,7 @@ class UMainUILayout;
 class UEffectsList;
 class UProgressTips;
 class UHUD_TeamInfo;
+class UGetItemInfos;
 
 struct FPawnDataStruct;
 struct FSceneTool;
@@ -79,6 +80,9 @@ public:
 	
 	// 进度条 工具
 	UProgressTips* ViewProgressTips(bool bIsViewMenus);
+	
+	// 进度条 工具
+	UGetItemInfos* GetItemInfos();
 
 protected:
 

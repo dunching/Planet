@@ -75,8 +75,6 @@ protected:
 
 	UEffectItem* EffectItemPtr = nullptr;
 
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
-
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
 
 };

@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "MyUserWidget.h"
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
 
@@ -20,7 +22,7 @@ struct FStreamableHandle;
  */
 UCLASS()
 class PLANET_API UDragDropOperationWidget :
-	public UUserWidget, 
+	public UMyUserWidget,
 	public IToolsIconInterface
 {
 	GENERATED_BODY()
@@ -52,7 +54,5 @@ private:
 	USkillUnit* SkillUnitSPtr;
 
 	UConsumableUnit* ConsumableUnitSPtr;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

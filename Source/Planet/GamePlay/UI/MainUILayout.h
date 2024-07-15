@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "MainUILAyout.generated.h"
 
@@ -12,7 +12,7 @@
  *
  */
 UCLASS()
-class PLANET_API UMainUILayout : public UUserWidget
+class PLANET_API UMainUILayout : public UMyUserWidget
 {
 	GENERATED_BODY()
 
@@ -44,5 +44,5 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName HUD_TeamSocket;
-
+	
 };

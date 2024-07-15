@@ -44,7 +44,7 @@ void UBackpackToolIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kTool)
 	{
 		UnitPtr = Cast<UToolUnit>(BasicUnitPtr);
-		SetNum(UnitPtr->Num);
+		SetNum(UnitPtr->GetNum());
 		SetItemType();
 	}
 }
@@ -79,10 +79,10 @@ void UBackpackToolIcon::SetItemType()
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 			{
 				ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
-			});
+			}));
 	}
 }
 

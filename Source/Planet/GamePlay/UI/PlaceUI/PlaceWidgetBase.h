@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "PlaceWidgetBase.generated.h"
 
@@ -12,7 +12,7 @@
  *
  */
 UCLASS()
-class PLANET_API UPlaceWidgetBase: public UUserWidget
+class PLANET_API UPlaceWidgetBase: public UMyUserWidget
 {
 	GENERATED_BODY()
 

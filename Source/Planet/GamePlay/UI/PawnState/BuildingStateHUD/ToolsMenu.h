@@ -6,6 +6,7 @@
 
 #include "UIInterfaces.h"
 
+#include "MyUserWidget.h"
 #include "SceneElement.h"
 #include "HoldingItemsComponent.h"
 #include "InteractiveSkillComponent.h"
@@ -19,7 +20,7 @@ class UToolIcon;
  *
  */
 UCLASS()
-class PLANET_API UToolsMenu : public UUserWidget
+class PLANET_API UToolsMenu : public UMyUserWidget
 {
 	GENERATED_BODY()
 

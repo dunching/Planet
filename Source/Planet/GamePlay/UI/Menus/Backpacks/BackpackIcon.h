@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "UIInterfaces.h"
+#include "MyUserWidget.h"
 #include "Common/GenerateType.h"
 #include "SceneElement.h"
 
@@ -20,7 +21,7 @@ class UToolUnit;
  */
 UCLASS()
 class PLANET_API UBackpackIcon :
-	public UUserWidget,
+	public UMyUserWidget,
 	public IToolsIconInterface
 {
 	GENERATED_BODY()

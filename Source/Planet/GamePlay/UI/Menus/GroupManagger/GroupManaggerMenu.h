@@ -17,7 +17,7 @@ struct FSceneObjContainer;
  *
  */
 UCLASS()
-class PLANET_API UGroupManaggerMenu : public UUserWidget, public IItemsMenuInterface
+class PLANET_API UGroupManaggerMenu : public UMyUserWidget, public IItemsMenuInterface
 {
 	GENERATED_BODY()
 

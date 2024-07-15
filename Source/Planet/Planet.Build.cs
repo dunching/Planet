@@ -19,7 +19,9 @@ public class Planet : ModuleRules
         CppStandard = CppStandardVersion.Cpp20;
         bUseRTTI = true;
 
-        PublicDefinitions.Add("TESTHOLDDATA = 1");
+        PublicDefinitions.Add("TESTPLAYERCHARACTERHOLDDATA = 1");
+        PublicDefinitions.Add("TESTAICHARACTERHOLDDATA = 1");
+        PublicDefinitions.Add("TESTRESOURCEBOXHOLDDATA = 1");
 
         PublicIncludePaths.Add("Planet");
         PublicIncludePaths.Add("Planet/GamePlay");
@@ -34,6 +36,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/UI");
         PublicIncludePaths.Add("Planet/GamePlay/UI/HUD");
         PublicIncludePaths.Add("Planet/GamePlay/UI/HUD/Team");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/HUD/GetItemInfos");
         PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState");
         PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState/ActionStateHUD");
         PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState/BuildingStateHUD");

@@ -5,7 +5,6 @@
 #include "Camera/CameraComponent.h"
 
 #include "GravityMovementComponent.h"
-#include "Gravity/GravityPlanet.h"
 #include "GameFramework/PlayerInput.h"
 #include "GravitySpringArmComponent.h"
 

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 #include <AIController.h>
 
 #include "GenerateType.h"
@@ -20,7 +20,7 @@ class UToolIcon;
  *
  */
 UCLASS()
-class PLANET_API UFightingTipsItem : public UUserWidget
+class PLANET_API UFightingTipsItem : public UMyUserWidget
 {
 	GENERATED_BODY()
 

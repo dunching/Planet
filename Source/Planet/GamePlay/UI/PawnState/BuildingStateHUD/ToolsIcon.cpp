@@ -136,7 +136,7 @@ void UToolIcon::SetNum()
 			auto TempUnitPtr = Cast<UToolUnit>(UnitPtr);
 			if (TempUnitPtr)
 			{
-				NewNum = TempUnitPtr->Num;
+				NewNum = TempUnitPtr->GetNum();
 			}
 		}
 		break;
@@ -181,10 +181,10 @@ void UToolIcon::SetItemType()
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
 					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
-				});
+				}));
 		}
 		else
 		{

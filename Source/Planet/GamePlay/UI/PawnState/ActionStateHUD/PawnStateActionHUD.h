@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
@@ -19,7 +19,7 @@ class UState_Talent_YinYang;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API UPawnStateActionHUD : public UUserWidget, public IItemsMenuInterface
+class PLANET_API UPawnStateActionHUD : public UMyUserWidget, public IItemsMenuInterface
 {
 	GENERATED_BODY()
 

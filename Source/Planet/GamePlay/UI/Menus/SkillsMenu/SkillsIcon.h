@@ -22,7 +22,7 @@ class USkillUnit;
  * 1.同类的需要能互相移除 2.右键移除 3.拖拽时禁用对应的Icon
  */
 UCLASS()
-class PLANET_API USkillsIcon : public UUserWidget, public IToolsIconInterface
+class PLANET_API USkillsIcon : public UMyUserWidget, public IToolsIconInterface
 {
 	GENERATED_BODY()
 
@@ -87,7 +87,5 @@ protected:
 private:
 
 	bool bIsReady_Previous = false;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

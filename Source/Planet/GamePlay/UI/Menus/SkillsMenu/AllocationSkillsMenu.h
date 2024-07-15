@@ -19,7 +19,7 @@ class UBasicUnit;
  *
  */
 UCLASS()
-class PLANET_API UAllocationSkillsMenu : public UUserWidget, public IItemsMenuInterface
+class PLANET_API UAllocationSkillsMenu : public UMyUserWidget, public IItemsMenuInterface
 {
 	GENERATED_BODY()
 

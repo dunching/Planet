@@ -15,7 +15,7 @@ struct FStreamableHandle;
  *
  */
 UCLASS()
-class PLANET_API UTalentIcon : public UUserWidget
+class PLANET_API UTalentIcon : public UMyUserWidget
 {
 	GENERATED_BODY()
 

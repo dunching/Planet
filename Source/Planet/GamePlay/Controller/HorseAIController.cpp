@@ -204,7 +204,7 @@ void AHorseAIController::InitialCharacter()
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
-#if TESTHOLDDATA
+#if TESTAICHARACTERHOLDDATA
 		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
 #endif
 

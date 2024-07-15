@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "GenerateType.h"
 #include "Skill_Talent_NuQi.h"
@@ -12,7 +12,7 @@
 #include "State_Talent_NuQi.generated.h"
 
 UCLASS()
-class PLANET_API UState_Talent_NuQi : public UUserWidget
+class PLANET_API UState_Talent_NuQi : public UMyUserWidget
 {
 	GENERATED_BODY()
 

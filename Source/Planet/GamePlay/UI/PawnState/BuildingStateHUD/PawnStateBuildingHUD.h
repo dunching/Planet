@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "GenerateType.h"
 #include "UIInterfaces.h"
@@ -23,7 +23,7 @@ struct FConsumableSocketInfo;
  *
  */
 UCLASS()
-class PLANET_API UPawnStateBuildingHUD : public UUserWidget, public IItemsMenuInterface
+class PLANET_API UPawnStateBuildingHUD : public UMyUserWidget, public IItemsMenuInterface
 {
 	GENERATED_BODY()
 

@@ -4,7 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "Engine/StreamableManager.h"
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 #include "Engine/AssetManager.h"
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 #include "Components/SplineComponent.h"

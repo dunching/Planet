@@ -20,7 +20,7 @@ class USkillUnit;
  *
  */
 UCLASS()
-class PLANET_API UActionSkillsIcon : public UUserWidget, public IToolsIconInterface
+class PLANET_API UActionSkillsIcon : public UMyUserWidget, public IToolsIconInterface
 {
 	GENERATED_BODY()
 
@@ -74,7 +74,5 @@ protected:
 private:
 
 	bool bIsReady_Previous = false;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

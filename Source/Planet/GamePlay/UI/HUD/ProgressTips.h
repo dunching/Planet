@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
@@ -12,7 +12,7 @@
 #include "ProgressTips.generated.h"
 
 UCLASS()
-class PLANET_API UProgressTips : public UUserWidget
+class PLANET_API UProgressTips : public UMyUserWidget
 {
 	GENERATED_BODY()
 

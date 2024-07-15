@@ -94,10 +94,10 @@ void UDragDropOperationWidget::SetItemType(UBasicUnit* ToolSPtr)
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(ToolSPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr, ToolSPtr]()
+		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ToolSPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr, ToolSPtr]()
 			{
 				ImagePtr->SetBrushFromTexture(ToolSPtr->GetIcon().Get());
-			});
+			}));
 	}
 }
 

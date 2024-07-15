@@ -236,6 +236,8 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
 					NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
 					});
+
+
 			}
 			else if (InPawn->IsA(AHorseCharacter::StaticClass()))
 			{

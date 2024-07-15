@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
@@ -14,7 +14,7 @@
 struct FStreamableHandle;
 
 UCLASS()
-class PLANET_API UEffectItem : public UUserWidget
+class PLANET_API UEffectItem : public UMyUserWidget
 {
 	GENERATED_BODY()
 
@@ -36,7 +36,5 @@ protected:
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

@@ -24,7 +24,7 @@ void AResourceBox::OnConstruction(const FTransform& Transform)
 
 void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
 {
-	TargetCharacterPtr = InCharacterPtr;
+	Super::Interaction(InCharacterPtr);
 	if (ActorSequenceComponent)
 	{
 		ActorSequenceComponent->PlaySequence();
@@ -61,10 +61,7 @@ void AResourceBox::BeginPlay()
 
 void AResourceBox::OnAnimationFinished()
 {
-	if (TargetCharacterPtr)
-	{
-
-	}
+	AddItemsToTarget();
 
 	Destroy();
 }

@@ -19,7 +19,7 @@ class UToolUnit;
 struct FStreamableHandle;
 
 UCLASS()
-class PLANET_API UToolIcon : public UUserWidget, public IToolsIconInterface
+class PLANET_API UToolIcon : public UMyUserWidget, public IToolsIconInterface
 {
 	GENERATED_BODY()
 
@@ -67,7 +67,5 @@ protected:
 private:
 
 	UBasicUnit*UnitPtr = nullptr;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

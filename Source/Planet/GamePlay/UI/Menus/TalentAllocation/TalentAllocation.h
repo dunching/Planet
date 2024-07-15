@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "GenerateType.h"
 
@@ -15,7 +15,7 @@ class UTalentIcon;
  *
  */
 UCLASS()
-class PLANET_API UTalentAllocation : public UUserWidget
+class PLANET_API UTalentAllocation : public UMyUserWidget
 {
 	GENERATED_BODY()
 

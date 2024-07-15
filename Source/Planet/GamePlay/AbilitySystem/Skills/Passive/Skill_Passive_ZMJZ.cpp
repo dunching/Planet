@@ -106,11 +106,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 				if (EffectPtr)
 				{
 					EffectItemPtr = EffectPtr->AddEffectItem();
-					FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-					AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(BuffIcon.ToSoftObjectPath(), [this]()
-						{
-							EffectItemPtr->SetTexutre(BuffIcon);
-						});
+					EffectItemPtr->SetTexutre(BuffIcon);
 				}
 			}
 

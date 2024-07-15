@@ -9,6 +9,7 @@
 #include "ResourceBoxBase.generated.h"
 
 class UHoldingItemsComponent;
+class ACharacterBase;
 
 UCLASS()
 class PLANET_API AResourceBoxBase : public ASceneObj
@@ -22,6 +23,16 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+
+protected:
+
+	void AddItemsToTarget();
+
+	ACharacterBase* TargetCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;

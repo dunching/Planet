@@ -44,6 +44,7 @@
 #include "AIHumanInfo.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneElement.h"
+#include "GetItemInfos.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -139,7 +140,17 @@ void AHumanCharacter::BeginPlay()
 	{
 		if (GetController()->IsA(APlanetPlayerController::StaticClass()))
 		{
-#if TESTHOLDDATA
+			auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
+
+			OnSkillUnitChangedHanlde = GetHoldingItemsComponent()->GetHoldItemProperty().OnSkillUnitChanged.AddCallback(
+				std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+				));
+
+			OnConsumableUnitChangedHandle = GetHoldingItemsComponent()->GetHoldItemProperty().OnConsumableUnitChanged.AddCallback(
+				std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+				));
+
+#if TESTPLAYERCHARACTERHOLDDATA
 			TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
 		}
@@ -172,7 +183,6 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
 			);
 		}
-
 	} 
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{

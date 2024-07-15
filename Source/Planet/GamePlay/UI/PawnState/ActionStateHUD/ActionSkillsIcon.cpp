@@ -225,10 +225,10 @@ void UActionSkillsIcon::SetItemType()
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(ToolPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ToolPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
 					ImagePtr->SetBrushFromTexture(ToolPtr->GetIcon().Get());
-				});
+				}));
 		}
 		else
 		{

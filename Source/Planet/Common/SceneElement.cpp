@@ -40,9 +40,84 @@ UWeaponUnit* FSceneToolsContainer::AddUnit(EWeaponUnitType Type)
 
 USkillUnit* FSceneToolsContainer::AddUnit(ESkillUnitType Type)
 {
+	if (SkillUnitMap.Contains(Type))
+	{
+		// 
+
+		return nullptr;
+	}
+	else
+	{
+		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+
+		USkillUnit* ResultPtr = NewObject<USkillUnit>(GetWorldImp(), AssetRefMapPtr->SkillToolsMap[Type]);
+
+		for (;;)
+		{
+			const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
+			if (SceneMetaMap.Contains(NewID))
+			{
+				continue;
+			}
+			else
+			{
+				ResultPtr->ID = NewID;
+				ResultPtr->UnitType = Type;
+
+				SceneToolsAry.Add(ResultPtr);
+				SceneMetaMap.Add(NewID, ResultPtr);
+				SkillUnitMap.Add(Type, ResultPtr);
+
+				OnSkillUnitChanged.ExcuteCallback(ResultPtr, true);
+
+				break;
+			}
+		}
+		return ResultPtr;
+	}
+}
+
+UConsumableUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 Num)
+{
+	check(Num > 0);
+
+	if (ConsumablesUnitMap.Contains(Type))
+	{
+		auto Ref = ConsumablesUnitMap[Type];
+
+		Ref->Num += Num;
+
+		OnConsumableUnitChanged.ExcuteCallback(Ref, true, Num);
+
+		return Ref;
+	}
+	else
+	{
+		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+
+		UConsumableUnit* ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), AssetRefMapPtr->ConsumableToolMap[Type]);
+
+		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
+
+		ResultPtr->Num = Num;
+		ResultPtr->ID = NewID;
+		ResultPtr->UnitType = Type;
+
+		SceneToolsAry.Add(ResultPtr);
+		SceneMetaMap.Add(NewID, ResultPtr);
+		ConsumablesUnitMap.Add(Type, ResultPtr);
+
+		OnConsumableUnitChanged.ExcuteCallback(ResultPtr, true, Num);
+
+		return ResultPtr;
+	}
+}
+
+UToolUnit* FSceneToolsContainer::AddUnit(EToolUnitType Type)
+{
 	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
 
-	USkillUnit* ResultPtr = NewObject<USkillUnit>(GetWorldImp(), AssetRefMapPtr->SkillToolsMap[Type]);
+	UToolUnit* ResultPtr = NewObject<UToolUnit>(GetWorldImp(), AssetRefMapPtr->EquipmentToolsMap[Type]);
 
 	for (;;)
 	{
@@ -66,35 +141,13 @@ USkillUnit* FSceneToolsContainer::AddUnit(ESkillUnitType Type)
 	return ResultPtr;
 }
 
-UConsumableUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 Num)
+void FSceneToolsContainer::RemoveUnit(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
 {
-	check(Num > 0);
-
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-
-	if (ConsumablesUnitMap.Contains(Type))
+	if (UnitPtr)
 	{
-		auto Ref = ConsumablesUnitMap[Type];
+		UnitPtr->Num -= Num;
 
-		Ref->Num += Num;
-
-		return Ref;
-	}
-	else
-	{
-		UConsumableUnit* ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), AssetRefMapPtr->ConsumableToolMap[Type]);
-
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-
-		ResultPtr->Num = Num;
-		ResultPtr->ID = NewID;
-		ResultPtr->UnitType = Type;
-
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(NewID, ResultPtr);
-		ConsumablesUnitMap.Add(Type, ResultPtr);
-
-		return ResultPtr;
+		OnConsumableUnitChanged.ExcuteCallback(UnitPtr, false, Num);
 	}
 }
 
@@ -146,34 +199,6 @@ UWeaponUnit* FSceneToolsContainer::FindUnit(EWeaponUnitType Type)
 	return nullptr;
 }
 
-UToolUnit* FSceneToolsContainer::AddUnit(EToolUnitType Type)
-{
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-
-	UToolUnit* ResultPtr = NewObject<UToolUnit>(GetWorldImp(), AssetRefMapPtr->EquipmentToolsMap[Type]);
-
-	for (;;)
-	{
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-		if (SceneMetaMap.Contains(NewID))
-		{
-			continue;
-		}
-		else
-		{
-			ResultPtr->ID = NewID;
-			ResultPtr->UnitType = Type;
-
-			SceneToolsAry.Add(ResultPtr);
-			SceneMetaMap.Add(NewID, ResultPtr);
-
-			break;
-		}
-	}
-
-	return ResultPtr;
-}
-
 UBasicUnit* FSceneToolsContainer::FindUnit(UBasicUnit::IDType ID)
 {
 	auto Iter = SceneMetaMap.Find(ID);
@@ -221,6 +246,11 @@ TSoftObjectPtr<UTexture2D> UBasicUnit::GetIcon() const
 	return DefaultIcon;
 }
 
+FString UBasicUnit::GetUnitName() const
+{
+	return UnitName;
+}
+
 UConsumableUnit::UConsumableUnit() :
 	Super(ESceneToolsType::kConsumables)
 {
@@ -244,6 +274,11 @@ UToolUnit::UToolUnit() :
 	Super(ESceneToolsType::kTool)
 {
 
+}
+
+int32 UToolUnit::GetNum() const
+{
+	return Num;
 }
 
 UWeaponUnit::UWeaponUnit() :

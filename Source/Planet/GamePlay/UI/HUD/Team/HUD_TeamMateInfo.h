@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
@@ -17,7 +17,7 @@ class UBasicUnit;
 class UGourpmateUnit;
 
 UCLASS()
-class PLANET_API UHUD_TeamMateInfo : public UUserWidget, public IToolsIconInterface
+class PLANET_API UHUD_TeamMateInfo : public UMyUserWidget, public IToolsIconInterface
 {
 	GENERATED_BODY()
 
@@ -36,7 +36,5 @@ protected:
 private:
 
 	UGourpmateUnit* GroupMateUnitPtr = nullptr;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

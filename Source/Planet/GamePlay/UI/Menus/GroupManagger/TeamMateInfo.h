@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "UIInterfaces.h"
+#include "MyUserWidget.h"
 #include "Common/GenerateType.h"
 #include "SceneElement.h"
 
@@ -21,7 +22,7 @@ class UTeamMatesList;
  */
 UCLASS()
 class PLANET_API UTeamMateInfo :
-	public UUserWidget,
+	public UMyUserWidget,
 	public IToolsIconInterface
 {
 	GENERATED_BODY()
@@ -51,7 +52,5 @@ private:
 	bool bIsInBackpakc = false;
 
 	UGourpmateUnit* GroupMateUnitPtr = nullptr;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

@@ -31,6 +31,12 @@
 #include "TalentAllocation.h"
 #include "GroupManaggerMenu.h"
 #include "HUD_TeamInfo.h"
+#include "GetItemInfos.h"
+
+namespace UIManagerSubSystem
+{
+	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
+}
 
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
 {
@@ -395,6 +401,26 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 	}
 
 	BorderPtr->ClearChildren();
+
+	return nullptr;
+}
+
+UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
+{
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(UIManagerSubSystem::GetItemInfos_Socket));
+	if (!BorderPtr)
+	{
+		return nullptr;
+	}
+
+	for (auto Iter : BorderPtr->GetAllChildren())
+	{
+		auto UIPtr = Cast<UGetItemInfos>(Iter);
+		if (UIPtr)
+		{
+			return UIPtr;
+		}
+	}
 
 	return nullptr;
 }

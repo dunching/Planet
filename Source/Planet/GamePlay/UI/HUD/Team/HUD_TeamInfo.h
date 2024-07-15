@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "UIInterfaces.h"
 #include "GroupsManaggerSubSystem.h"
@@ -14,7 +14,7 @@
 class UHUD_TeamMateInfo;
 
 UCLASS()
-class PLANET_API UHUD_TeamInfo : public UUserWidget, public IItemsMenuInterface
+class PLANET_API UHUD_TeamInfo : public UMyUserWidget, public IItemsMenuInterface
 {
 	GENERATED_BODY()
 

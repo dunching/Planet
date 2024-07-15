@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "GenerateType.h"
 #include "Skill_Talent_YinYang.h"
@@ -12,7 +12,7 @@
 #include "State_Talent_YinYang.generated.h"
 
 UCLASS()
-class PLANET_API UState_Talent_YinYang : public UUserWidget
+class PLANET_API UState_Talent_YinYang : public UMyUserWidget
 {
 	GENERATED_BODY()
 

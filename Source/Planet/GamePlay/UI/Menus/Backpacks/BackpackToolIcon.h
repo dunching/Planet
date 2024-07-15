@@ -54,6 +54,4 @@ private:
 
 	UToolUnit* UnitPtr = nullptr;
 
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
-
 };

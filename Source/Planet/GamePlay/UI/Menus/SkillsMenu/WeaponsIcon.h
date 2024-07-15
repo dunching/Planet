@@ -21,7 +21,7 @@ class UWeaponUnit;
 class UBasicUnit;
 
 UCLASS()
-class PLANET_API UWeaponsIcon : public UUserWidget, public IToolsIconInterface
+class PLANET_API UWeaponsIcon : public UMyUserWidget, public IToolsIconInterface
 {
 	GENERATED_BODY()
 
@@ -74,7 +74,5 @@ protected:
 	void OnDroped(UDragDropOperation* Operation);
 
 private:
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

@@ -84,6 +84,4 @@ protected:
 
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
-
 };

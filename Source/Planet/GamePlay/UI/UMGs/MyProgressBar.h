@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "Blueprint/UserWidget.h"
+#include "MyUserWidget.h"
 
 #include "CharacterAttibutes.h"
 #include "GenerateType.h"
@@ -12,7 +12,7 @@
 #include "MyProgressBar.generated.h"
 
 UCLASS()
-class PLANET_API UMyProgressBar : public UUserWidget
+class PLANET_API UMyProgressBar : public UMyUserWidget
 {
 	GENERATED_BODY()
 

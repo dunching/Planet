@@ -21,6 +21,8 @@ class UZYInputComponent;
 class UAIHumanInfo;
 class UGroupMnaggerComponent;
 class UGourpmateUnit;
+class USkillUnit;
+class UConsumableUnit;
 
 UCLASS()
 class PLANET_API AHumanCharacter : public ACharacterBase
@@ -59,6 +61,14 @@ protected:
 		EGroupMateChangeType GroupMateChangeType,
 		AHumanCharacter* LeaderPCPtr
 	);
+
+	using FOnSkillUnitChanged = FSceneToolsContainer::FOnSkillUnitChanged::FCallbackHandleSPtr;
+
+	FOnSkillUnitChanged OnSkillUnitChangedHanlde;
+	
+	using FOnConsumableUnitChanged = FSceneToolsContainer::FOnConsumableUnitChanged::FCallbackHandleSPtr;
+
+	FOnConsumableUnitChanged OnConsumableUnitChangedHandle;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	TSoftObjectPtr<UTexture2D> CharacterIcon;

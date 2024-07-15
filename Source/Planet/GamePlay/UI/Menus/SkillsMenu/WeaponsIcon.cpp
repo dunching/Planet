@@ -123,10 +123,10 @@ void UWeaponsIcon::SetItemType()
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandle = StreamableManager.RequestAsyncLoad(WeaponUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(WeaponUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
 					ImagePtr->SetBrushFromTexture(WeaponUnitPtr->GetIcon().Get());
-				});
+				}));
 		}
 		else
 		{

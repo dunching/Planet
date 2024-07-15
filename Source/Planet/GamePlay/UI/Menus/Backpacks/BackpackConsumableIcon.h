@@ -54,6 +54,4 @@ private:
 
 	UConsumableUnit* UnitPtr = nullptr;
 
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
-
 };

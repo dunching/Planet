@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "MyUserWidget.h"
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
 #include "SceneElement.h"
@@ -20,7 +21,7 @@ class UGourpmateUnit;
  */
 UCLASS()
 class PLANET_API UGroupMateInfo :
-	public UUserWidget,
+	public UMyUserWidget,
 	public IToolsIconInterface
 {
 	GENERATED_BODY()
@@ -40,7 +41,5 @@ public:
 private:
 
 	UGourpmateUnit* GroupMateUnitPtr = nullptr;
-
-	TSharedPtr<FStreamableHandle> AsyncLoadTextureHandle;
 
 };

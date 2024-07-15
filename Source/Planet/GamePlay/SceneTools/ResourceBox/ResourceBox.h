@@ -48,6 +48,4 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* BoxComponentPtr = nullptr;
 
-	ACharacterBase* TargetCharacterPtr = nullptr;
-
 };

@@ -11,6 +11,8 @@ public class Gravity : ModuleRules
 
         CppStandard = CppStandardVersion.Cpp17;
 
+        PublicDefinitions.Add("USECUSTOMEGRAVITY = 0");
+
         PublicIncludePaths.AddRange(
 			new string[] {
                    Path.Combine(PluginDirectory, "Source/Gravity"),
