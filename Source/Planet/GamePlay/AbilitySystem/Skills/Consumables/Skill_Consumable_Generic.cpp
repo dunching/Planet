@@ -10,6 +10,13 @@
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
 #include "InteractiveBaseGAComponent.h"
+#include "GameplayTagsSubSystem.h"
+
+USkill_Consumable_Generic::USkill_Consumable_Generic() :
+	Super()
+{
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->UsingConsumable);
+}
 
 void USkill_Consumable_Generic::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,

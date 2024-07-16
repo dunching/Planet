@@ -41,9 +41,13 @@ public:
 
 #pragma region State Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag UsingConsumable =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.UsingConsumable")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Ridering =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Ridering")));
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag SuperArmor =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.SuperArmor")));

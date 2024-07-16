@@ -13,7 +13,9 @@
 
 class UConsumableUnit;
 struct FGameplayAbilityTargetData_Periodic_StateTagModefy;
+class UGA_Periodic_PropertyModefy;
 struct FGameplayAbilityTargetData_Periodic_PropertyModefy;
+class UGA_Periodic_StateTagModefy;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
@@ -72,6 +74,12 @@ protected:
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilities;
+
+// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+// 	TSubclassOf<UGA_Periodic_PropertyModefy> GA_Periodic_PropertyModefyClass;
+// 
+// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+// 	TSubclassOf<UGA_Periodic_StateTagModefy> GA_Periodic_StateTagModefyClass;
 #pragma endregion GAs
 
 	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare>SendEventModifysMap;

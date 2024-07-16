@@ -175,7 +175,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 		FGameplayEventData Payload;
 		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-		FGameplayAbilitySpec Spec(UGA_Periodic_PropertyModefy::StaticClass(), 1);
+		FGameplayAbilitySpec Spec(UGA_Periodic_StateTagModefy::StaticClass(), 1);
 
 		Result = ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,

@@ -25,6 +25,8 @@ class USkill_Consumable_Generic : public USkill_Consumable_Base
 
 public:
 
+	USkill_Consumable_Generic();
+
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec

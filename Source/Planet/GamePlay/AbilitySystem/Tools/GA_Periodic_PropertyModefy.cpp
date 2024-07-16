@@ -16,7 +16,8 @@
 #include "EffectItem.h"
 #include "InteractiveBaseGAComponent.h"
 
-UGA_Periodic_PropertyModefy::UGA_Periodic_PropertyModefy()
+UGA_Periodic_PropertyModefy::UGA_Periodic_PropertyModefy():
+	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
