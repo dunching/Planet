@@ -41,7 +41,7 @@
 #include "PlanetPlayerController.h"
 #include "PlanetPlayerState.h"
 #include "HumanAIController.h"
-#include "AIHumanInfo.h"
+#include "CharacterTitle.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneElement.h"
 #include "GetItemInfos.h"

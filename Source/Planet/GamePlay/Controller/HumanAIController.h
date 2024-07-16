@@ -14,7 +14,7 @@
 
 #include "HumanAIController.generated.h"
 
-class UAIHumanInfo;
+class UCharacterTitle;
 class UGroupMnaggerComponent;
 class UGourpmateUnit;
 class ACharacterBase;
@@ -54,8 +54,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	AActor* GetTeamFocusTarget() const;
-
-	UAIHumanInfo* AIHumanInfoPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TWeakObjectPtr<AHumanCharacter> TargetCharacterPtr;

@@ -21,18 +21,19 @@
 #include "Skill_WeaponActive_PickAxe.h"
 #include "Skill_WeaponActive_HandProtection.h"
 #include "Skill_WeaponActive_RangeTest.h"
+#include "Skill_Talent_NuQi.h"
+#include "Skill_Talent_YinYang.h"
+#include "Skill_Element_Gold.h"
+#include "GA_Periodic_StateTagModefy.h"
+#include "GA_Periodic_PropertyModefy.h"
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "AssetRefMap.h"
-#include "Skill_Talent_NuQi.h"
-#include "Skill_Talent_YinYang.h"
-#include "Skill_Element_Gold.h"
 #include "InputComponent/InputProcessorSubSystem.h"
 #include "Tool_PickAxe.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter.h"
-#include "GA_Tool_Periodic.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -96,7 +97,7 @@ void UInteractiveBaseGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGA
 	}
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr)
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Periodic_PropertyModefy* GameplayAbilityTargetDataPtr)
 {
 	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
 
@@ -111,7 +112,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 	FGameplayEventData Payload;
 	Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-	FGameplayAbilitySpec Spec(UGA_Tool_Periodic::StaticClass(), 1);
+	FGameplayAbilitySpec Spec(UGA_Periodic_PropertyModefy::StaticClass(), 1);
 
 	GAToolPeriodicHandle = ASCPtr->GiveAbilityAndActivateOnce(
 		Spec,
@@ -127,13 +128,13 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(UConsumabl
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
 	if (OnwerActorPtr)
 	{
-		if (EffectsMap.Contains(UnitPtr))
+		if (PeriodicPropertyModifyMap.Contains(UnitPtr))
 		{
 			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(EffectsMap[UnitPtr]);
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicPropertyModifyMap[UnitPtr]);
 			if (GameplayAbilitySpecPtr)
 			{
-				auto GAPtr = Cast<UGA_Tool_Periodic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				auto GAPtr = Cast<UGA_Periodic_PropertyModefy>(GameplayAbilitySpecPtr->GetPrimaryInstance());
 				if (GAPtr)
 				{
 					GAPtr->UpdateDuration();
@@ -141,10 +142,47 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(UConsumabl
 				}
 			}
 		}
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Tool_Periodic(UnitPtr);
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_PropertyModefy(UnitPtr);
 
 		Result = ExcuteEffects(GameplayAbilityTargetDataPtr);
-		EffectsMap.Add(UnitPtr, Result);
+		PeriodicPropertyModifyMap.Add(UnitPtr, Result);
+	}
+	return Result;
+}
+
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Periodic_StateTagModefy* GameplayAbilityTargetDataPtr)
+{
+	FGameplayAbilitySpecHandle Result;
+
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		if (PeriodicStateTagModifyMap.Contains(GameplayAbilityTargetDataPtr->Tag))
+		{
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[GameplayAbilityTargetDataPtr->Tag]);
+			if (GameplayAbilitySpecPtr)
+			{
+				auto GAPtr = Cast<UGA_Periodic_StateTagModefy>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				if (GAPtr)
+				{
+					GAPtr->UpdateDuration();
+					return Result;
+				}
+			}
+		}
+
+		FGameplayEventData Payload;
+		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+
+		FGameplayAbilitySpec Spec(UGA_Periodic_PropertyModefy::StaticClass(), 1);
+
+		Result = ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			&Payload
+		);
+
+		PeriodicStateTagModifyMap.Add(GameplayAbilityTargetDataPtr->Tag, Result);
 	}
 	return Result;
 }

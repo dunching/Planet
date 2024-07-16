@@ -18,7 +18,7 @@ class USceneObjPropertyComponent;
 class FInputProcessor;
 class UAnimInstanceCharacter;
 class UZYInputComponent;
-class UAIHumanInfo;
+class UCharacterTitle;
 class UGroupMnaggerComponent;
 class UGourpmateUnit;
 class USkillUnit;

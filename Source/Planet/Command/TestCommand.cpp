@@ -15,7 +15,6 @@
 #include "GameInstance/PlanetGameInstance.h"
 #include "HoldingItemsComponent.h"
 #include "AssetRefMap.h"
-#include <AssetRefrencePath.h>
 #include "Planet.h"
 #include "HumanCharacter.h"
 #include "SPlineActor.h"

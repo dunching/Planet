@@ -23,7 +23,7 @@ class UDragDropOperationWidget;
 class UAllocationToolsMenu;
 class UAllocationSkillsMenu;
 class UBackpackMenu;
-class UAIHumanInfo;
+class UCharacterTitle;
 class UEffectsList;
 class UProgressTips;
 class UTalentAllocation;
@@ -95,7 +95,7 @@ public:
 	TSubclassOf<UPawnStateBuildingHUD>PawnStateBuildingHUDClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UAIHumanInfo>AIHumanInfoClass;
+	TSubclassOf<UCharacterTitle>AIHumanInfoClass;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFocusIcon>FocusIconClass;

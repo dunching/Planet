@@ -13,6 +13,9 @@ void UMyUserWidget::NativeDestruct()
 
 	for (auto Iter : AsyncLoadTextureHandleAry)
 	{
-		Iter->CancelHandle();
+		if (Iter)
+		{
+			Iter->CancelHandle();
+		}
 	}
 }

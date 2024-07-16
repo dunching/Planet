@@ -14,7 +14,7 @@
 #include "backpackMenu.h"
 #include "ToolsMenu.h"
 #include "CharacterInteraction/Piginteraction.h"
-#include <AssetRefrencePath.h>
+#include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "DestroyProgress.h"
 #include "MainUILayout.h"

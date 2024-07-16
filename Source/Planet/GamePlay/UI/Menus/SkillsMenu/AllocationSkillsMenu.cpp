@@ -9,7 +9,7 @@
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/Border.h"
-#include <AssetRefrencePath.h>
+#include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "SkillsIcon.h"
 #include "WeaponsIcon.h"

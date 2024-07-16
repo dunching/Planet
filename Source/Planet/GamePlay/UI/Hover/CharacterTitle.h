@@ -8,7 +8,7 @@
 
 #include "GenerateType.h"
 
-#include "AIHumanInfo.generated.h"
+#include "CharacterTitle.generated.h"
 
 class ACharacterBase;
 
@@ -18,7 +18,7 @@ class UToolIcon;
  *
  */
 UCLASS()
-class PLANET_API UAIHumanInfo : public UMyUserWidget
+class PLANET_API UCharacterTitle : public UMyUserWidget
 {
 	GENERATED_BODY()
 

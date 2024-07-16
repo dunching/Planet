@@ -14,7 +14,7 @@
 #include "ToolsLibrary.h"
 #include "BackpackIcon.h"
 #include <CacheAssetManager.h>
-#include <AssetRefrencePath.h>
+#include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "SceneElement.h"

@@ -12,7 +12,7 @@
 #include "CollisionDataStruct.h"
 #include "CharacterBase.h"
 #include "ArticleBase.h"
-#include "AssetRefrencePath.h"
+#include "StateTagExtendInfo.h"
 #include "HumanCharacter.h"
 #include "Animation/AnimInstanceBase.h"
 #include "AbilityTask_PlayMontage.h"

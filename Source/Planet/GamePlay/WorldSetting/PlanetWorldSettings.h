@@ -7,6 +7,7 @@
 #include "PlanetWorldSettings.generated.h"
 
 class UAssetRefMap;
+class UStateTagExtendInfoMap;
 
 /**
  *
@@ -23,12 +24,20 @@ public:
 
 	UAssetRefMap* GetAssetRefMapInstance();
 
+	UStateTagExtendInfoMap* GetStateTagExtendInfoInstance();
+
 protected:
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
-		UAssetRefMap* AssetRefMapPtr = nullptr;
-		
+	UAssetRefMap* AssetRefMapPtr = nullptr;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-		TSubclassOf<UAssetRefMap>AssetRefMapClass;
+	TSubclassOf<UAssetRefMap>AssetRefMapClass;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	UStateTagExtendInfoMap* StateExtendInfoPtr = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<UStateTagExtendInfoMap>StateExtendInfoClass;
 
 };

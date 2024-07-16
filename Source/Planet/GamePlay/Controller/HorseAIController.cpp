@@ -7,7 +7,7 @@
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
 
-#include "AIHumanInfo.h"
+#include "CharacterTitle.h"
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
 #include "Planet.h"
@@ -209,7 +209,7 @@ void AHorseAIController::InitialCharacter()
 #endif
 
 		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-		AIHumanInfoPtr = CreateWidget<UAIHumanInfo>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+		AIHumanInfoPtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
 		if (AIHumanInfoPtr)
 		{
 			AIHumanInfoPtr->CharacterPtr = CharacterPtr;

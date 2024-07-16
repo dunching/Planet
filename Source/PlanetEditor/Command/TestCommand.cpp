@@ -14,7 +14,7 @@
 #include "GameInstance/PlanetGameInstance.h"
 #include "HoldingItemsComponent.h"
 #include "AssetRefMap.h"
-#include <AssetRefrencePath.h>
+#include <StateTagExtendInfo.h>
 #include "HumanCharacter.h"
 #include "SPlineActor.h"
 #include "SceneElement.h"
@@ -30,7 +30,8 @@
 #include "InteractiveBaseGAComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
-#include "GA_Tool_Periodic.h"
+#include "GA_Periodic_StateTagModefy.h"
+#include "GA_Periodic_PropertyModefy.h"
 
 void TestCommand::TestAsyncAssetLoad()
 {
@@ -371,18 +372,14 @@ void TestCommand::TestGATag(const TArray< FString >& Args)
 {
 	auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 
-	FGameplayTagContainer Tag;
-
 	for (auto Iter : Args)
 	{
-		Tag.AddTag(FGameplayTag::RequestGameplayTag(*Iter));
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModefy(
+			FGameplayTag::RequestGameplayTag(*Iter),
+			3.f
+		);
+
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
 	}
-
-	FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Tool_Periodic(
-		Tag,
-		3.f
-	);
-
-	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-	ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
 }

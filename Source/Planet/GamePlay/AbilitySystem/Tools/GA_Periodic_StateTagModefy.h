@@ -7,7 +7,7 @@
 
 #include "Skill_Base.h"
 
-#include "GA_Tool_Periodic.generated.h"
+#include "GA_Periodic_StateTagModefy.generated.h"
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
@@ -16,16 +16,16 @@ class UEffectItem;
 
 struct FStreamableHandle;
 
-struct FGameplayAbilityTargetData_Tool_Periodic;
+struct FGameplayAbilityTargetData_Periodic_StateTagModefy;
 
 UCLASS()
-class PLANET_API UGA_Tool_Periodic : public USkill_Base
+class PLANET_API UGA_Periodic_StateTagModefy : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	UGA_Tool_Periodic();
+	UGA_Periodic_StateTagModefy();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -62,7 +62,7 @@ protected:
 
 	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
-	const FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr = nullptr;
+	const FGameplayAbilityTargetData_Periodic_StateTagModefy* GameplayAbilityTargetDataPtr = nullptr;
 
 	UEffectItem* EffectItemPtr = nullptr;
 
@@ -71,31 +71,26 @@ protected:
 };
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_Tool_Periodic : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_Periodic_StateTagModefy : public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
 
-	friend UGA_Tool_Periodic;
+	friend UGA_Periodic_StateTagModefy;
 
-	FGameplayAbilityTargetData_Tool_Periodic();
+	FGameplayAbilityTargetData_Periodic_StateTagModefy();
 
-	FGameplayAbilityTargetData_Tool_Periodic(UConsumableUnit* RightVal);
-
-	FGameplayAbilityTargetData_Tool_Periodic(
-		const FGameplayTagContainer & Tag, 
+	FGameplayAbilityTargetData_Periodic_StateTagModefy(
+		const FGameplayTag& Tag,
 		float Duration
 	);
 
-private:
-
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
 	float Duration = 3.f;
 
-	float PerformActionInterval = 1.f;
+	// 会一次性修改多个状态码？
+	FGameplayTag Tag;
+
+private:
 
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
-
-	FGameplayTagContainer Tag;
 
 };

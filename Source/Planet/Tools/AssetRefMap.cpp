@@ -4,7 +4,7 @@
 #include <Kismet/GameplayStatics.h>
 
 #include "GameInstance/PlanetGameInstance.h"
-#include "AssetRefrencePath.h"
+#include "StateTagExtendInfo.h"
 #include "Planet.h"
 #include "PlanetWorldSettings.h"
 

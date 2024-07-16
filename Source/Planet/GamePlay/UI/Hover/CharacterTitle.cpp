@@ -1,5 +1,5 @@
 
-#include "AIHumanInfo.h"
+#include "CharacterTitle.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/ProgressBar.h"
@@ -14,7 +14,7 @@
 #include "GenerateType.h"
 #include "CharacterBase.h"
 
-namespace AIHumanInfo
+namespace CharacterTitle
 {
 	const FName ProgressBar = TEXT("ProgressBar");
 
@@ -25,7 +25,7 @@ namespace AIHumanInfo
 	const FName CanvasPanel = TEXT("CanvasPanel");
 }
 
-void UAIHumanInfo::NativeConstruct()
+void UCharacterTitle::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -51,7 +51,7 @@ void UAIHumanInfo::NativeConstruct()
 	}
 
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(AIHumanInfo::Title));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Title));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
@@ -62,7 +62,7 @@ void UAIHumanInfo::NativeConstruct()
 	ResetPosition(0.f);
 }
 
-void UAIHumanInfo::NativeDestruct()
+void UCharacterTitle::NativeDestruct()
 {
 	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 
@@ -78,34 +78,34 @@ void UAIHumanInfo::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UAIHumanInfo::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UCharacterTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
-void UAIHumanInfo::OnHPCurrentValueChanged(int32 NewVal)
+void UCharacterTitle::OnHPCurrentValueChanged(int32 NewVal)
 {
 	CurrentHP = NewVal;
 	OnHPChanged();
 }
 
-void UAIHumanInfo::OnHPMaxValueChanged(int32 NewVal)
+void UCharacterTitle::OnHPMaxValueChanged(int32 NewVal)
 {
 	MaxHP = NewVal;
 	OnHPChanged();
 }
 
-void UAIHumanInfo::OnHPChanged()
+void UCharacterTitle::OnHPChanged()
 {
 	{
-		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(AIHumanInfo::ProgressBar));
+		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::ProgressBar));
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetPercent(static_cast<float>(CurrentHP) / MaxHP);
 		}
 	}
 	{
-		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(AIHumanInfo::Text));
+		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Text));
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), CurrentHP, MaxHP)));
@@ -113,7 +113,7 @@ void UAIHumanInfo::OnHPChanged()
 	}
 }
 
-bool UAIHumanInfo::ResetPosition(float InDeltaTime)
+bool UCharacterTitle::ResetPosition(float InDeltaTime)
 {
 	FVector2D ScreenPosition = FVector2D::ZeroVector;
 	UGameplayStatics::ProjectWorldToScreen(
@@ -124,7 +124,7 @@ bool UAIHumanInfo::ResetPosition(float InDeltaTime)
 
 	if (Size.IsNearlyZero())
 	{
-		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(AIHumanInfo::CanvasPanel));
+		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(CharacterTitle::CanvasPanel));
 		if (UIPtr)
 		{
 			TSharedPtr<SPanel> PanelSPtr = UIPtr->GetCanvasWidget();

@@ -7,7 +7,7 @@
 
 #include <GenerateType.h>
 #include <GameInstance/PlanetGameInstance.h>
-#include "AssetRefrencePath.h"
+#include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include <SceneElement.h>
 #include "HoldingItemsComponent.h"

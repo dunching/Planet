@@ -35,6 +35,7 @@
 #include "InteractiveConsumablesComponent.h"
 #include "InteractiveSkillComponent.h"
 #include "InteractiveToolComponent.h"
+#include "CharacterTitle.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -66,6 +67,14 @@ void ACharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
+
+	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+	CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+	if (CharacterTitlePtr)
+	{
+		CharacterTitlePtr->CharacterPtr = this;
+		CharacterTitlePtr->AddToViewport();
+	}
 }
 
 void ACharacterBase::Destroyed()

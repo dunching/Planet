@@ -18,6 +18,7 @@ class UAbilitySystemComponent;
 
 class AEquipmentBase;
 class ASceneObj;
+class UCharacterTitle;
 
 class UAnimInstanceBase;
 class UEquipmentInteractionComponent;
@@ -86,6 +87,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
+
+	UCharacterTitle* CharacterTitlePtr = nullptr;
 
 protected:
 

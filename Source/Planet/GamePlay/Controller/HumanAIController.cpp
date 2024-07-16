@@ -7,7 +7,7 @@
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
 
-#include "AIHumanInfo.h"
+#include "CharacterTitle.h"
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
 #include "Planet.h"
@@ -29,9 +29,13 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 {
-	if (AIHumanInfoPtr)
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (CharacterPtr)
 	{
-		AIHumanInfoPtr->SetCampType(CharacterCampType);
+		if (CharacterPtr->CharacterTitlePtr)
+		{
+			CharacterPtr->CharacterTitlePtr->SetCampType(CharacterCampType);
+		}
 	}
 }
 
@@ -110,10 +114,14 @@ void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 
 void AHumanAIController::DoDeathing()
 {
-	if (AIHumanInfoPtr)
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (CharacterPtr)
 	{
-		AIHumanInfoPtr->RemoveFromParent();
-		AIHumanInfoPtr = nullptr;
+		if (CharacterPtr->CharacterTitlePtr)
+		{
+			CharacterPtr->CharacterTitlePtr->RemoveFromParent();
+			CharacterPtr->CharacterTitlePtr = nullptr;
+		}
 	}
 }
 
@@ -207,14 +215,6 @@ void AHumanAIController::InitialCharacter()
 #if TESTAICHARACTERHOLDDATA
 		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
 #endif
-
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-		AIHumanInfoPtr = CreateWidget<UAIHumanInfo>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-		if (AIHumanInfoPtr)
-		{
-			AIHumanInfoPtr->CharacterPtr = CharacterPtr;
-			AIHumanInfoPtr->AddToViewport();
-		}
 
 		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();

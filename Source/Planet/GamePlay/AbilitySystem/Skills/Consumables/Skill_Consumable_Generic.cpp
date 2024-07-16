@@ -9,7 +9,6 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
-#include "GA_Tool_Periodic.h"
 #include "InteractiveBaseGAComponent.h"
 
 void USkill_Consumable_Generic::OnAvatarSet(

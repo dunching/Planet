@@ -7,7 +7,7 @@
 #include "GroupsManaggerSubSystem.h"
 #include "CharacterBase.h"
 #include "HumanCharacter.h"
-#include "AIHumanInfo.h"
+#include "CharacterTitle.h"
 #include "HumanAIController.h"
 #include "HumanControllerInterface.h"
 

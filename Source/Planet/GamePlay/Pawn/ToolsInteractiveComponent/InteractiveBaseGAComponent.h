@@ -12,8 +12,8 @@
 #include "InteractiveBaseGAComponent.generated.h"
 
 class UConsumableUnit;
-class UGA_Tool_Periodic;
-struct FGameplayAbilityTargetData_Tool_Periodic;
+struct FGameplayAbilityTargetData_Periodic_StateTagModefy;
+struct FGameplayAbilityTargetData_Periodic_PropertyModefy;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
@@ -38,7 +38,9 @@ public:
 
 	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
-	FGameplayAbilitySpecHandle ExcuteEffects(FGameplayAbilityTargetData_Tool_Periodic* GameplayAbilityTargetDataPtr);
+	FGameplayAbilitySpecHandle ExcuteEffects(FGameplayAbilityTargetData_Periodic_StateTagModefy* GameplayAbilityTargetDataPtr);
+	
+	FGameplayAbilitySpecHandle ExcuteEffects(FGameplayAbilityTargetData_Periodic_PropertyModefy* GameplayAbilityTargetDataPtr);
 	
 	FGameplayAbilitySpecHandle ExcuteEffects(UConsumableUnit* UnitPtr);
 
@@ -79,6 +81,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTagContainer CharacterTags;
 
-	TMap<UConsumableUnit*, FGameplayAbilitySpecHandle>EffectsMap;
+	TMap<UConsumableUnit*, FGameplayAbilitySpecHandle>PeriodicPropertyModifyMap;
+	
+	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicStateTagModifyMap;
 
 };
