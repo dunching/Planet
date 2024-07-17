@@ -6,6 +6,7 @@
 #include "Components/TextBlock.h"
 #include <Components/CanvasPanel.h>
 #include <Components/CanvasPanelSlot.h>
+#include <GameplayTagsManager.h>
 
 #include "HumanCharacter.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -13,6 +14,7 @@
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "CharacterBase.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace CharacterTitle
 {
@@ -35,6 +37,10 @@ void UCharacterTitle::NativeConstruct()
 
 	if (CharacterPtr)
 	{
+		{
+			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent(); 
+			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
+		}
 		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
 		{
 			OnHPMaxValueChanged(Ref.GetMaxValue());
@@ -49,14 +55,7 @@ void UCharacterTitle::NativeConstruct()
 			);
 		}
 	}
-
-	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Title));
-		if (UIPtr)
-		{
-			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
-		}
-	}
+	ApplyCharaterNameToTitle();
 
 	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
 	ResetPosition(0.f);
@@ -73,6 +72,14 @@ void UCharacterTitle::NativeDestruct()
 	if (CurrentHPValueChanged)
 	{
 		CurrentHPValueChanged->UnBindCallback();
+	}
+
+	if (CharacterPtr)
+	{
+		{
+			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
+		}
 	}
 
 	Super::NativeDestruct();
@@ -95,6 +102,33 @@ void UCharacterTitle::OnHPMaxValueChanged(int32 NewVal)
 	OnHPChanged();
 }
 
+void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
+{
+	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	{
+	}
+	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	{
+		if (Count > 0)
+		{
+			TagSet.Add(Tag);
+		}
+		else
+		{
+			TagSet.Remove(Tag);
+		}
+
+		if (TagSet.IsEmpty())
+		{
+			ApplyCharaterNameToTitle();
+		}
+		else
+		{
+			ApplyStatesToTitle();
+		}
+	}
+}
+
 void UCharacterTitle::OnHPChanged()
 {
 	{
@@ -109,6 +143,43 @@ void UCharacterTitle::OnHPChanged()
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), CurrentHP, MaxHP)));
+		}
+	}
+}
+
+void UCharacterTitle::ApplyCharaterNameToTitle()
+{
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Title));
+		if (UIPtr)
+		{
+			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
+		}
+	}
+}
+
+void UCharacterTitle::ApplyStatesToTitle()
+{
+	FString Title;
+	for (const auto Iter : TagSet)
+	{
+		TSharedPtr<FGameplayTagNode> TagNode = UGameplayTagsManager::Get().FindTagNode(Iter);
+		if (TagNode.IsValid())
+		{
+			Title.Append(TagNode->GetSimpleTagName().ToString());
+			Title.Append(TEXT(","));
+		}
+	}
+	if (!Title.IsEmpty())
+	{
+		Title.RemoveAt(Title.Len() - 1);
+	}
+
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Title));
+		if (UIPtr)
+		{
+			UIPtr->SetText(FText::FromString(Title));
 		}
 	}
 }

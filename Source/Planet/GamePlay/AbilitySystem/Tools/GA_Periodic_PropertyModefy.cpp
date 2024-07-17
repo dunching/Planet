@@ -88,11 +88,18 @@ void UGA_Periodic_PropertyModefy::PerformAction()
 
 void UGA_Periodic_PropertyModefy::ExcuteTasks()
 {
-	auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-	if (EffectPtr)
+	if (CharacterPtr->IsPlayerControlled())
 	{
-		EffectItemPtr = EffectPtr->AddEffectItem();
-		EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
+		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+		if (EffectPtr)
+		{
+			EffectItemPtr = EffectPtr->AddEffectItem();
+			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
+		}
+	}
+	else
+	{
+
 	}
 
 	TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -114,15 +121,22 @@ void UGA_Periodic_PropertyModefy::OnInterval(UAbilityTask_TimerHelper* InTaskPtr
 
 void UGA_Periodic_PropertyModefy::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
-	if (CurrentInterval > Interval)
+	if (CharacterPtr->IsPlayerControlled())
 	{
+		if (CurrentInterval > Interval)
+		{
+		}
+		else
+		{
+			if (EffectItemPtr)
+			{
+				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
+			}
+		}
 	}
 	else
 	{
-		if (EffectItemPtr)
-		{
-			EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
-		}
+
 	}
 }
 

@@ -51,7 +51,11 @@ public:
         FActorComponentTickFunction* ThisTickFunction
     ) override;
 
+    virtual void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)override;
+
     virtual void PerformMovement(float DeltaTime)override;
+
+    virtual void StartNewPhysics(float DeltaTime, int32 Iterations)override;
 
     virtual void ApplyRootMotionToVelocity(float deltaTime)override;
 
@@ -72,6 +76,8 @@ public:
     ) override;
 
     bool bHasBlockResult = false;
+
+	bool bSkilPerformMovement = false;
 
 protected:
 

@@ -31,6 +31,7 @@ class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
 class UPlanetAbilitySystemInterface;
 class UTalentAllocationComponent;
+class UStateProcessorComponent;
 class UGroupMnaggerComponent;
 class UInteractiveBaseGAComponent;
 class UInteractiveConsumablesComponent;
@@ -119,6 +120,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	TObjectPtr<UInteractiveBaseGAComponent> InteractiveBaseGAComponentPtr = nullptr;

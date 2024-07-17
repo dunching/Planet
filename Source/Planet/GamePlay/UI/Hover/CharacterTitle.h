@@ -4,8 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include <GameplayTagContainer.h>
 
+#include "MyUserWidget.h"
 #include "GenerateType.h"
 
 #include "CharacterTitle.generated.h"
@@ -24,7 +25,7 @@ class PLANET_API UCharacterTitle : public UMyUserWidget
 
 public:
 
-	using FDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+	using FOnValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -45,7 +46,13 @@ protected:
 
 protected:
 
+	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
+
 	void OnHPChanged();
+
+	void ApplyCharaterNameToTitle();
+
+	void ApplyStatesToTitle();
 
 	int32 CurrentHP = 0;
 
@@ -68,10 +75,14 @@ protected:
 
 	float Scale = 1.f;
 
-	FDelegateHandle CurrentHPValueChanged;
+	FOnValueChangedDelegateHandle CurrentHPValueChanged;
 
-	FDelegateHandle MaxHPValueChanged;
+	FOnValueChangedDelegateHandle MaxHPValueChanged;
 
 	FTSTicker::FDelegateHandle TickDelegateHandle;
+
+	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
+
+	TSet<FGameplayTag>TagSet;
 
 };

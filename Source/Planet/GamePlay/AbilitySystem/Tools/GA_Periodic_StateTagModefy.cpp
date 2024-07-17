@@ -15,6 +15,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "InteractiveBaseGAComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 UGA_Periodic_StateTagModefy::UGA_Periodic_StateTagModefy() :
 	Super()
@@ -87,16 +88,36 @@ void UGA_Periodic_StateTagModefy::PerformAction()
 	if (CharacterPtr)
 	{
 		ExcuteTasks();
+
+		if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+		{
+
+		}
+		else if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Silent))
+		{
+
+		}
+		else if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Stun))
+		{
+
+		}
 	}
 }
 
 void UGA_Periodic_StateTagModefy::ExcuteTasks()
 {
-	auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-	if (EffectPtr)
+	if (CharacterPtr->IsPlayerControlled())
 	{
-		EffectItemPtr = EffectPtr->AddEffectItem();
-		EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
+		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+		if (EffectPtr)
+		{
+			EffectItemPtr = EffectPtr->AddEffectItem();
+			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
+		}
+	}
+	else
+	{
+
 	}
 
 	TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -118,15 +139,22 @@ void UGA_Periodic_StateTagModefy::OnInterval(UAbilityTask_TimerHelper* InTaskPtr
 
 void UGA_Periodic_StateTagModefy::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
-	if (CurrentInterval > Interval)
+	if (CharacterPtr->IsPlayerControlled())
 	{
+		if (CurrentInterval > Interval)
+		{
+		}
+		else
+		{
+			if (EffectItemPtr)
+			{
+				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
+			}
+		}
 	}
 	else
 	{
-		if (EffectItemPtr)
-		{
-			EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
-		}
+
 	}
 }
 

@@ -138,15 +138,28 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void TestGATag(const TArray< FString >& Args);
+	void TestGATag2Self(const TArray< FString >& Args);
 
-	static FAutoConsoleCommand TestGATagCMD(
+	static FAutoConsoleCommand TestGATag2SelfCMD(
 		//CMD 名字，在控制台输入这个调用
-		TEXT("TestGATag"),
+		TEXT("TestGATag2Self"),
 		//控制台帮助信息，选择这个命令的时候会看到
 		TEXT("this is a CMD test."),
 		//创建静态委托，输入上面的命令后会调用到后面的函数
-		FConsoleCommandWithArgsDelegate::CreateStatic(TestGATag),
+		FConsoleCommandWithArgsDelegate::CreateStatic(TestGATag2Self),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
+	void TestGATag2Target(const TArray< FString >& Args);
+
+	static FAutoConsoleCommand TestGATag2TargetCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("TestGATag2Target"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandWithArgsDelegate::CreateStatic(TestGATag2Target),
 		//可选标志位掩码
 		EConsoleVariableFlags::ECVF_Default
 	);

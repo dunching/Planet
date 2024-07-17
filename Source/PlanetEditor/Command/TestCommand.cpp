@@ -368,18 +368,67 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	}
 }
 
-void TestCommand::TestGATag(const TArray< FString >& Args)
+void TestCommand::TestGATag2Self(const TArray< FString >& Args)
 {
+	if (!Args.IsValidIndex(1))
+	{
+		return;
+	}
+
 	auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 
-	for (auto Iter : Args)
-	{
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModefy(
-			FGameplayTag::RequestGameplayTag(*Iter),
-			3.f
-		);
+	float Duration = 10.f;
+	LexFromString(Duration, *Args[1]);
+	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModefy(
+		FGameplayTag::RequestGameplayTag(*Args[0]),
+		Duration
+	);
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
+	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
+}
+
+void TestCommand::TestGATag2Target(const TArray< FString >& Args)
+{
+	if (!Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+	auto PlayerCameraManagerPtr = UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0);
+	if (PlayerCameraManagerPtr)
+	{
+		FVector OutCamLoc;
+		FRotator OutCamRot;
+		PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
+
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(CharacterPtr);
+
+		FHitResult OutHit;
+		if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+		{
+			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+			if (TargetCharacterPtr)
+			{
+				float Duration = 10.f;
+				LexFromString(Duration, *Args[1]);
+				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModefy(
+					FGameplayTag::RequestGameplayTag(*Args[0]),
+					Duration
+				);
+
+				auto ICPtr = TargetCharacterPtr->GetInteractiveBaseGAComponent();
+				ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
+			}
+		}
 	}
 }

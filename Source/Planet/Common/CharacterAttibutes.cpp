@@ -78,6 +78,8 @@ FBaseProperty& FBasePropertySet::GetMaxProperty()
 
 FCharacterAttributes::FCharacterAttributes()
 {
+	Name = TEXT("Player");
+	
 	LiDao.GetMaxProperty().SetCurrentValue(6);
 	
 	GenGu.GetMaxProperty().SetCurrentValue(6);

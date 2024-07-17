@@ -15,7 +15,6 @@
 USkill_Consumable_Generic::USkill_Consumable_Generic() :
 	Super()
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->UsingConsumable);
 }
 
 void USkill_Consumable_Generic::OnAvatarSet(
@@ -34,6 +33,8 @@ void USkill_Consumable_Generic::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->UsingConsumable);
+
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))

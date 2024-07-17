@@ -12,10 +12,11 @@
 #include "InteractiveBaseGAComponent.generated.h"
 
 class UConsumableUnit;
-struct FGameplayAbilityTargetData_Periodic_StateTagModefy;
 class UGA_Periodic_PropertyModefy;
-struct FGameplayAbilityTargetData_Periodic_PropertyModefy;
 class UGA_Periodic_StateTagModefy;
+
+struct FGameplayAbilityTargetData_Periodic_StateTagModefy;
+struct FGameplayAbilityTargetData_Periodic_PropertyModefy;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent

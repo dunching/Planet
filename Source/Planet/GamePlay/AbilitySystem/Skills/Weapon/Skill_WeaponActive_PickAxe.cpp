@@ -178,10 +178,9 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			}
 		}
 
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		ICPtr->SendEvent2Other(ModifyPropertyMap, true);
 	}
-	
-	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-	ICPtr->SendEvent2Other(ModifyPropertyMap, true);
 }
 
 void USkill_WeaponActive_PickAxe::PlayMontage()

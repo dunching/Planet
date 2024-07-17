@@ -31,6 +31,7 @@
 #include "AssetRefMap.h"
 #include "HumanControllerInterface.h"
 #include "GameplayTagsSubSystem.h"
+#include "StateProcessorComponent.h"
 #include "InteractiveBaseGAComponent.h"
 #include "InteractiveConsumablesComponent.h"
 #include "InteractiveSkillComponent.h"
@@ -50,6 +51,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
 	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
 	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
+	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
 	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UInteractiveBaseGAComponent>(UInteractiveBaseGAComponent::ComponentName);
 	InteractiveConsumablesComponentPtr = CreateDefaultSubobject<UInteractiveConsumablesComponent>(UInteractiveConsumablesComponent::ComponentName);
@@ -65,16 +67,6 @@ ACharacterBase::~ACharacterBase()
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
-
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-	CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-	if (CharacterTitlePtr)
-	{
-		CharacterTitlePtr->CharacterPtr = this;
-		CharacterTitlePtr->AddToViewport();
-	}
 }
 
 void ACharacterBase::Destroyed()
@@ -105,14 +97,21 @@ void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
-	{
-		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		GASPtr->ClearAllAbilities();
-		GASPtr->InitAbilityActorInfo(OnwerActorPtr, OnwerActorPtr);
+	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
+
+	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+	CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+	if (CharacterTitlePtr)
+	{
+		CharacterTitlePtr->CharacterPtr = this;
+		CharacterTitlePtr->AddToViewport();
 	}
+
+	auto GASPtr = GetAbilitySystemComponent();
+
+	GASPtr->ClearAllAbilities();
+	GASPtr->InitAbilityActorInfo(this, this);
 	GetInteractiveSkillComponent()->InitialBaseGAs();
 	GetInteractiveBaseGAComponent()->InitialBaseGAs();
 	GetInteractiveConsumablesComponent()->InitialBaseGAs();

@@ -42,7 +42,7 @@ public:
 #pragma region State Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag UsingConsumable =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.UsingConsumable")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.IsUsingConsumable")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Ridering =
@@ -51,10 +51,22 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag SuperArmor =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.SuperArmor")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Debuff =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag FlyAway =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.FlyAway")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Stun =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Stun")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Silent =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Silent")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DeathingTag = 

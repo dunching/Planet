@@ -75,7 +75,7 @@ void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 		const auto& EventData = GA_SendPtr->GetCurrentEventData();
 
 		auto GAEventPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventData.TargetData.Get(0));
-		if (GAEventPtr && GAEventPtr->DataAry[0].bIsWeaponAttack)
+		if (GAEventPtr && GAEventPtr->DataAry.IsValidIndex(0) && GAEventPtr->DataAry[0].bIsWeaponAttack)
 		{
 			auto RegisterRemoveBuff = [this]
 				{

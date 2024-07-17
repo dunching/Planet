@@ -127,6 +127,16 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
+{
+    if (bSkilPerformMovement)
+    {
+        return;
+    }
+
+    Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
+}
+
 void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
 {
     SCOPE_CYCLE_COUNTER(STAT_CharacterMovementPerformMovement);
@@ -140,7 +150,11 @@ void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
     bTeleportedSinceLastUpdate = UpdatedComponent->GetComponentLocation() != LastUpdateLocation;
 
     // no movement if we can't move, or if currently doing physical simulation on UpdatedComponent
-    if (MovementMode == MOVE_None || UpdatedComponent->Mobility != EComponentMobility::Movable || UpdatedComponent->IsSimulatingPhysics())
+    if (
+        MovementMode == MOVE_None ||
+        UpdatedComponent->Mobility != EComponentMobility::Movable || 
+        UpdatedComponent->IsSimulatingPhysics()
+        )
     {
         if (!CharacterOwner->bClientUpdating && !CharacterOwner->bServerMoveIgnoreRootMotion)
         {
@@ -524,6 +538,11 @@ void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
     LastUpdateVelocity = Velocity;
 }
 
+void UGravityMovementComponent::StartNewPhysics(float DeltaTime, int32 Iterations)
+{
+    Super::StartNewPhysics(DeltaTime, Iterations);
+}
+
 void UGravityMovementComponent::ApplyRootMotionToVelocity(float deltaTime)
 {
     SCOPE_CYCLE_COUNTER(STAT_CharacterMovementRootMotionSourceApply);
@@ -626,7 +645,11 @@ void UGravityMovementComponent::SetGravityDirection(const FVector& InNewGravityD
 
 void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 {
-	if (HasRootMotionSources() || HasAnimRootMotion())
+	if (
+        bSkilPerformMovement || 
+        HasRootMotionSources() ||
+        HasAnimRootMotion()
+        )
 	{
 		return;
 	}
