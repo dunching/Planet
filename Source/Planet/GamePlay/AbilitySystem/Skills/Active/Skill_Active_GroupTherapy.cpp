@@ -143,7 +143,7 @@ void USkill_Active_GroupTherapy::EmitEffect()
 		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		ICPtr->SendEvent(GAEventDataPtr);
+		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

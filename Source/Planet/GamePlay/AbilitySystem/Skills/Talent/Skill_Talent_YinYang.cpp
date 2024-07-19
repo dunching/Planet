@@ -259,7 +259,7 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		ICPtr->SendEvent(GAEventDataPtr);
+		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

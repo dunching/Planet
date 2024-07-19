@@ -9,6 +9,8 @@
 #include "InteractiveToolComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "InteractiveBaseGAComponent.h"
+#include "GA_Periodic_StateTagModify.h"
+#include "GA_Periodic_PropertyModify.h"
 
 UGAEvent_Received::UGAEvent_Received() :
 	Super()
@@ -16,7 +18,12 @@ UGAEvent_Received::UGAEvent_Received() :
 
 }
 
-void UGAEvent_Received::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGAEvent_Received::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo, 
+	const FGameplayEventData* TriggerEventData
+)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -25,27 +32,73 @@ void UGAEvent_Received::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	K2_EndAbility();
 	};
 
-	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(1))
 	{
-		auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GAReceivedEvent*>(TriggerEventData->TargetData.Get(0));
-		if (!GAEventDataPtr)
+		auto GAEventData_EventTypePtr = dynamic_cast<FGameplayAbilityTargetData_GAEventType*>(CurrentEventData.TargetData.Get(0));
+		if (!GAEventData_EventTypePtr)
 		{
 			return;
 		}
-
-		auto Clone = GAEventDataPtr->Clone();
-
-		auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-		if (!CharacterPtr)
+		switch (GAEventData_EventTypePtr->EventType)
 		{
-			return;
+		case FGameplayAbilityTargetData_GAEventType::EEventType::kNormal:
+		{
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GAReceivedEvent*>(TriggerEventData->TargetData.Get(1));
+			if (!GAEventDataPtr)
+			{
+				return;
+			}
+
+			auto Clone = GAEventDataPtr->Clone();
+
+			auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+			if (!CharacterPtr)
+			{
+				return;
+			}
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*Clone);
+
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*Clone);
+
+			Clone->TrueDataDelagate.ExcuteCallback(CharacterPtr, Clone->Data);
 		}
+		break;
+		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify:
+		{
+			auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_Periodic_PropertyModify*>(CurrentEventData.TargetData.Get(1));
+			if (!GAEventDataPtr)
+			{
+				return;
+			}
 
-		CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*Clone);
+			auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+			if (!CharacterPtr)
+			{
+				return;
+			}
 
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*Clone);
+			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(GAEventDataPtr);
+		}
+		break;
+		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify:
+		{
+			auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_Periodic_StateTagModify*>(CurrentEventData.TargetData.Get(1));
+			if (!GAEventDataPtr)
+			{
+				return;
+			}
 
-		Clone->TrueDataDelagate.ExcuteCallback(CharacterPtr, Clone->Data);
+			auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+			if (!CharacterPtr)
+			{
+				return;
+			}
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(GAEventDataPtr);
+		}
+		break;
+		}
 	}
 }
 

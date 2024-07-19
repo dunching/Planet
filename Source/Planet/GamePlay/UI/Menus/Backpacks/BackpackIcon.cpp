@@ -14,7 +14,7 @@
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
 
-#include <CacheAssetManager.h>
+
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"

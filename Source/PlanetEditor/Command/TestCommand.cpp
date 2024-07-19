@@ -30,8 +30,17 @@
 #include "InteractiveBaseGAComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
-#include "GA_Periodic_StateTagModefy.h"
-#include "GA_Periodic_PropertyModefy.h"
+#include "GA_Periodic_StateTagModify.h"
+#include "GA_Periodic_PropertyModify.h"
+#include "KismetCollisionHelper.h"
+
+void TestCommand::TestSectorCollision()
+{
+	FCollisionObjectQueryParams ObjectQueryParams;
+	FCollisionQueryParams Params;
+
+	UKismetCollisionHelper::OverlapMultiSectorByObjectType(GetWorldImp(), FVector(100, 100 ,100), FVector(200, 100, 100), 90, 9, ObjectQueryParams, Params);
+}
 
 void TestCommand::TestAsyncAssetLoad()
 {
@@ -368,7 +377,7 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	}
 }
 
-void TestCommand::TestGATag2Self(const TArray< FString >& Args)
+void TestCommand::TestGAState2Self(const TArray< FString >& Args)
 {
 	if (!Args.IsValidIndex(1))
 	{
@@ -379,16 +388,19 @@ void TestCommand::TestGATag2Self(const TArray< FString >& Args)
 
 	float Duration = 10.f;
 	LexFromString(Duration, *Args[1]);
-	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModefy(
+	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModify(
 		FGameplayTag::RequestGameplayTag(*Args[0]),
 		Duration
 	);
+
+	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+	GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
 	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 	ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
 }
 
-void TestCommand::TestGATag2Target(const TArray< FString >& Args)
+void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 {
 	if (!Args.IsValidIndex(1))
 	{
@@ -421,10 +433,13 @@ void TestCommand::TestGATag2Target(const TArray< FString >& Args)
 			{
 				float Duration = 10.f;
 				LexFromString(Duration, *Args[1]);
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModefy(
+				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModify(
 					FGameplayTag::RequestGameplayTag(*Args[0]),
 					Duration
 				);
+
+				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = TargetCharacterPtr;
+				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
 				auto ICPtr = TargetCharacterPtr->GetInteractiveBaseGAComponent();
 				ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);

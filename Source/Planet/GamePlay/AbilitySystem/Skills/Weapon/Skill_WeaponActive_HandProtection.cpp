@@ -295,7 +295,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		ICPtr->SendEvent(GAEventDataPtr);
+		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

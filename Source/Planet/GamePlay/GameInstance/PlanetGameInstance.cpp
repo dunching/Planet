@@ -5,7 +5,7 @@
 
 #include "LogHelper/LogWriter.h"
 
-#include "CacheAssetManager.h"
+
 #include "ArticleBase.h"
 #include "ArticleSharedData.h"
 #include "AssetRefMap.h"

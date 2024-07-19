@@ -17,12 +17,9 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayTagsSubSystem.h"
 
-#include "ThreadSycAction.h"
-
 #include "GameMode/PlanetGameMode.h"
 #include "PlanetPlayerState.h"
 #include "GenerateType.h"
-#include <CacheAssetManager.h>
 #include "Command/TestCommand.h"
 #include "HumanActionPigInteractionUI.h"
 #include "HorseViewBackpackProcessor.h"

@@ -15,7 +15,7 @@
 #include "Engine/AssetManager.h"
 #include "Components/Border.h"
 
-#include <CacheAssetManager.h>
+
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"

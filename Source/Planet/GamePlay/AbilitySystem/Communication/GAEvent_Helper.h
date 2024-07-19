@@ -67,6 +67,22 @@ struct FGAEventData
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 };
 
+struct FGameplayAbilityTargetData_GAEventType : public FGameplayAbilityTargetData
+{
+	enum class EEventType : uint8
+	{
+		kNormal,
+		kPeriodic_PropertyModify,
+		kPeriodic_StateTagModify,
+	};
+
+	FGameplayAbilityTargetData_GAEventType(
+		EEventType InEventType
+	);
+
+	EEventType EventType = EEventType::kNormal;
+};
+
 struct FGameplayAbilityTargetData_GASendEvent : public FGameplayAbilityTargetData
 {
 	using FCallbackHandleContainer = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;

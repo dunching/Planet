@@ -107,7 +107,7 @@ void USkill_Consumable_Test::EmitEffect()
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
 	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-	ICPtr->SendEvent(GAEventDataPtr);
+	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
 void USkill_Consumable_Test::PreActivate(

@@ -14,6 +14,7 @@
 #include <Kismet/KismetMathLibrary.h>
 
 #include "GravityMovementComponent.h"
+#include "KismetGravityLibrary.h"
 
 #include "SPlineActor.h"
 #include "Skill_Active_tornado.h"
@@ -99,8 +100,6 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 	{
 		const float MoveFraction = (GetTime() + SimulationTime) / Duration;
 
-		const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
-
 		const auto Pt = SPlineActorPtr->SplineComponentPtr->GetWorldLocationAtTime(MoveFraction, true);
 
 		const FVector CurrentLocation = Character.GetActorLocation();
@@ -108,6 +107,9 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 		FVector Force = (Pt - CurrentLocation) / MovementTickTime;
 
 		NewTransform.SetTranslation(Force);
+
+		const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
+		NewTransform.ScaleTranslation(Multiplier);
 	}
 
 	RootMotionParams.Set(NewTransform);
@@ -185,6 +187,75 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 		FQuat Rot = FQuat::FindBetween(Character.GetActorForwardVector(), NewRotator) / MovementTickTime;
 
 		NewTransform.SetRotation(Rot);
+	}
+
+	RootMotionParams.Set(NewTransform);
+
+	SetTime(GetTime() + SimulationTime);
+}
+
+FRootMotionSource_FlyAway::FRootMotionSource_FlyAway()
+{
+	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
+}
+
+FRootMotionSource_FlyAway::~FRootMotionSource_FlyAway()
+{
+
+}
+
+FRootMotionSource* FRootMotionSource_FlyAway::Clone() const
+{
+	FRootMotionSource_FlyAway* CopyPtr = new FRootMotionSource_FlyAway(*this);
+	return CopyPtr;
+}
+
+bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
+{
+	if (!FRootMotionSource::Matches(Other))
+	{
+		return false;
+	}
+
+	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
+
+	return FMath::IsNearlyEqual(Height, OtherCast->Height);
+}
+
+void FRootMotionSource_FlyAway::PrepareRootMotion(
+	float SimulationTime, 
+	float MovementTickTime, 
+	const ACharacter& Character,
+	const UCharacterMovementComponent& MoveComponent
+)
+{
+	RootMotionParams.Clear();
+
+	FTransform NewTransform = FTransform::Identity;
+
+	const FVector CurrentLocation = Character.GetActorLocation();
+
+	MoveComponent.CurrentFloor;
+
+	const auto LastLandPt = MoveComponent.CurrentFloor.HitResult.ImpactPoint;
+
+	if (GetTime() < RiseDuration)
+	{
+		float MoveFraction = (GetTime() + SimulationTime) / RiseDuration;
+
+		const auto TargetPt = LastLandPt + (UKismetGravityLibrary::GetGravity(LastLandPt) * MoveFraction * Height);
+
+		FVector Distance = (TargetPt - CurrentLocation) / MovementTickTime;
+
+		NewTransform.SetTranslation(Distance);
+	}
+	else
+	{
+		const auto TargetPt = LastLandPt + (UKismetGravityLibrary::GetGravity(LastLandPt) * Height);
+
+		FVector Distance = (TargetPt - CurrentLocation) / MovementTickTime;
+
+		NewTransform.SetTranslation(Distance);
 	}
 
 	RootMotionParams.Set(NewTransform);

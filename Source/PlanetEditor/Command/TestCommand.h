@@ -8,6 +8,19 @@ class AHumanCharacter;
 
 namespace TestCommand
 {
+	void TestSectorCollision();
+
+	static FAutoConsoleCommand TestSectorCollisionCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("TestSectorCollision"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandDelegate::CreateStatic(TestSectorCollision),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
 	void TestAsyncAssetLoad();
 
 	static FAutoConsoleCommand CMDTestAsyncAssetLoadt(
@@ -138,28 +151,28 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void TestGATag2Self(const TArray< FString >& Args);
+	void TestGAState2Self(const TArray< FString >& Args);
 
-	static FAutoConsoleCommand TestGATag2SelfCMD(
+	static FAutoConsoleCommand TestGAState2SelfCMD(
 		//CMD 名字，在控制台输入这个调用
-		TEXT("TestGATag2Self"),
+		TEXT("TestGAState2Self"),
 		//控制台帮助信息，选择这个命令的时候会看到
 		TEXT("this is a CMD test."),
 		//创建静态委托，输入上面的命令后会调用到后面的函数
-		FConsoleCommandWithArgsDelegate::CreateStatic(TestGATag2Self),
+		FConsoleCommandWithArgsDelegate::CreateStatic(TestGAState2Self),
 		//可选标志位掩码
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void TestGATag2Target(const TArray< FString >& Args);
+	void TestGATagState2Target(const TArray< FString >& Args);
 
-	static FAutoConsoleCommand TestGATag2TargetCMD(
+	static FAutoConsoleCommand TestGATagState2TargetCMD(
 		//CMD 名字，在控制台输入这个调用
-		TEXT("TestGATag2Target"),
+		TEXT("TestGATagState2Target"),
 		//控制台帮助信息，选择这个命令的时候会看到
 		TEXT("this is a CMD test."),
 		//创建静态委托，输入上面的命令后会调用到后面的函数
-		FConsoleCommandWithArgsDelegate::CreateStatic(TestGATag2Target),
+		FConsoleCommandWithArgsDelegate::CreateStatic(TestGATagState2Target),
 		//可选标志位掩码
 		EConsoleVariableFlags::ECVF_Default
 	);

@@ -130,3 +130,9 @@ void IGAEventModifyReceivedInterface::Modify(FGameplayAbilityTargetData_GAReceiv
 {
 
 }
+
+FGameplayAbilityTargetData_GAEventType::FGameplayAbilityTargetData_GAEventType(EEventType InEventType) :
+	EventType(InEventType)
+{
+
+}

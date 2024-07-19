@@ -159,7 +159,7 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 	}
 
 	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-	ICPtr->SendEvent(GAEventDataPtr);
+	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
 void USkill_WeaponActive_RangeTest::PlayMontage()

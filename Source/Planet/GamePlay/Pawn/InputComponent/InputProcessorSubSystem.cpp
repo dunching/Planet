@@ -5,7 +5,7 @@
 #include "Subsystems/SubsystemBlueprintLibrary.h"
 
 #include "InputProcessor.h"
-#include "ThreadSycAction.h"
+
 #include "Pawn/InputComponent/InputActions.h"
 
 void UInputProcessorSubSystem::Initialize(FSubsystemCollectionBase& Collection)

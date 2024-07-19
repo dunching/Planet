@@ -28,6 +28,8 @@ public class Tools : ModuleRules
             "Core",
             "CoreUObject",
             "Engine",
+
+            "Gravity",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {

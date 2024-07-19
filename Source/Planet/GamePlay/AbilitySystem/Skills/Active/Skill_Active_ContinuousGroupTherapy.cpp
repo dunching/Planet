@@ -136,10 +136,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
+		TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap;
 		for (auto Iter : OutOverlaps)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
@@ -148,17 +145,17 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 				auto CharacterIter = TeammatesSet.Find(TargetCharacterPtr);
 				if (CharacterIter)
 				{
-					FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+					decltype(ModifyPropertyMap)::ValueType Value;
 
-					GAEventData.HP = TreatmentVolume;
+					Value.Add(ECharacterPropertyType::kHP, FBaseProperty(TreatmentVolume));
 
-					GAEventDataPtr->DataAry.Add(GAEventData);
+					ModifyPropertyMap.Add(TargetCharacterPtr, Value);
 				}
 			}
 		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		ICPtr->SendEvent(GAEventDataPtr);
+		ICPtr->SendEvent2Other(ModifyPropertyMap, true);
 	}
 }
 

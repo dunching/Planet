@@ -36,6 +36,8 @@ public class PlanetEditor : ModuleRules
             "CoreUObject",
             "Engine",
             "GameplayTags",
+
+            "Tools",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {

@@ -121,7 +121,7 @@ void USkill_Consumable_Generic::ExcuteTasks()
 	if (CharacterPtr)
 	{
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		auto GAPtr = ICPtr->ExcuteEffects(UnitPtr);
+		auto GAPtr = ICPtr->ExcuteEffects2Self(UnitPtr);
 	}
 }
 

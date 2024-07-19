@@ -12,11 +12,12 @@
 #include "InteractiveBaseGAComponent.generated.h"
 
 class UConsumableUnit;
-class UGA_Periodic_PropertyModefy;
-class UGA_Periodic_StateTagModefy;
+class UGA_Periodic_PropertyModify;
+class UGA_Periodic_StateTagModify;
 
-struct FGameplayAbilityTargetData_Periodic_StateTagModefy;
-struct FGameplayAbilityTargetData_Periodic_PropertyModefy;
+struct FGameplayAbilityTargetData_Periodic_StateTagModify;
+struct FGameplayAbilityTargetData_Periodic_PropertyModify;
+struct FGameplayAbilityTargetData_AddTemporaryTag;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
@@ -41,13 +42,20 @@ public:
 
 	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
-	FGameplayAbilitySpecHandle ExcuteEffects(FGameplayAbilityTargetData_Periodic_StateTagModefy* GameplayAbilityTargetDataPtr);
-	
-	FGameplayAbilitySpecHandle ExcuteEffects(FGameplayAbilityTargetData_Periodic_PropertyModefy* GameplayAbilityTargetDataPtr);
-	
-	FGameplayAbilitySpecHandle ExcuteEffects(UConsumableUnit* UnitPtr);
+	FGameplayAbilitySpecHandle AddTemporaryTag(
+		ACharacterBase* TargetCharacterPtr, 
+		FGameplayAbilityTargetData_AddTemporaryTag* GameplayAbilityTargetDataPtr
+	);
 
-	void SendEvent(FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr);
+	FGameplayAbilitySpecHandle ExcuteEffects(
+		FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+	);
+
+	FGameplayAbilitySpecHandle ExcuteEffects(
+		FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+	);
+
+	FGameplayAbilitySpecHandle ExcuteEffects2Self(UConsumableUnit* UnitPtr);
 
 	void SendEvent2Other(
 		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
@@ -56,10 +64,22 @@ public:
 
 	void SendEvent2Self(const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap);
 
+	void SendEventImp(
+		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
+	);
+	
+	void SendEventImp(
+		FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+	);
+	
+	void SendEventImp(
+		FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+	);
+
 	void InitialBaseGAs();
 
 	FGameplayAbilitySpecHandle SendEventHandle;
-	
+
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
 
 protected:
@@ -76,22 +96,22 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilities;
 
-// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-// 	TSubclassOf<UGA_Periodic_PropertyModefy> GA_Periodic_PropertyModefyClass;
-// 
-// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-// 	TSubclassOf<UGA_Periodic_StateTagModefy> GA_Periodic_StateTagModefyClass;
+	// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	// 	TSubclassOf<UGA_Periodic_PropertyModefy> GA_Periodic_PropertyModefyClass;
+	// 
+	// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	// 	TSubclassOf<UGA_Periodic_StateTagModefy> GA_Periodic_StateTagModefyClass;
 #pragma endregion GAs
 
 	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare>SendEventModifysMap;
 
 	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare>ReceivedEventModifysMap;
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTagContainer CharacterTags;
 
 	TMap<UConsumableUnit*, FGameplayAbilitySpecHandle>PeriodicPropertyModifyMap;
-	
+
 	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicStateTagModifyMap;
 
 };

@@ -15,7 +15,7 @@
 #include "GenerateType.h"
 #include "HumanCharacter.h"
 #include "ThreadPoolHelper/ThreadLibrary.h"
-#include "ThreadSycAction.h"
+
 #include "BuildSharedData.h"
 #include "BuildingBase.h"
 #include "CollisionDataStruct.h"

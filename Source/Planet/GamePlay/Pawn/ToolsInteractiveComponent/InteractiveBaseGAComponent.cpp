@@ -24,8 +24,8 @@
 #include "Skill_Talent_NuQi.h"
 #include "Skill_Talent_YinYang.h"
 #include "Skill_Element_Gold.h"
-#include "GA_Periodic_StateTagModefy.h"
-#include "GA_Periodic_PropertyModefy.h"
+#include "GA_Periodic_StateTagModify.h"
+#include "GA_Periodic_PropertyModify.h"
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
@@ -97,11 +97,23 @@ void UInteractiveBaseGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGA
 	}
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Periodic_PropertyModefy* GameplayAbilityTargetDataPtr)
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddTemporaryTag(
+	ACharacterBase* TargetCharacterPtr, 
+	FGameplayAbilityTargetData_AddTemporaryTag* GameplayAbilityTargetDataPtr
+)
 {
 	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
 
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	return GAToolPeriodicHandle;
+}
+
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
+	FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+)
+{
+	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
+
+	auto OnwerActorPtr = GameplayAbilityTargetDataPtr->TargetCharacterPtr.Get();
 	if (!OnwerActorPtr)
 	{
 		return GAToolPeriodicHandle;
@@ -112,7 +124,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 	FGameplayEventData Payload;
 	Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-	FGameplayAbilitySpec Spec(UGA_Periodic_PropertyModefy::StaticClass(), 1);
+	FGameplayAbilitySpec Spec(UGA_Periodic_PropertyModify::StaticClass(), 1);
 
 	GAToolPeriodicHandle = ASCPtr->GiveAbilityAndActivateOnce(
 		Spec,
@@ -122,39 +134,13 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 	return GAToolPeriodicHandle;
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(UConsumableUnit* UnitPtr)
-{
-	FGameplayAbilitySpecHandle Result;
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
-	{
-		if (PeriodicPropertyModifyMap.Contains(UnitPtr))
-		{
-			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicPropertyModifyMap[UnitPtr]);
-			if (GameplayAbilitySpecPtr)
-			{
-				auto GAPtr = Cast<UGA_Periodic_PropertyModefy>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-				if (GAPtr)
-				{
-					GAPtr->UpdateDuration();
-					return Result;
-				}
-			}
-		}
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_PropertyModefy(UnitPtr);
-
-		Result = ExcuteEffects(GameplayAbilityTargetDataPtr);
-		PeriodicPropertyModifyMap.Add(UnitPtr, Result);
-	}
-	return Result;
-}
-
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayAbilityTargetData_Periodic_StateTagModefy* GameplayAbilityTargetDataPtr)
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
+	FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+)
 {
 	FGameplayAbilitySpecHandle Result;
 
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto OnwerActorPtr = GameplayAbilityTargetDataPtr->TargetCharacterPtr.Get();
 	if (OnwerActorPtr)
 	{
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
@@ -163,7 +149,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[GameplayAbilityTargetDataPtr->Tag]);
 			if (GameplayAbilitySpecPtr)
 			{
-				auto GAPtr = Cast<UGA_Periodic_StateTagModefy>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				auto GAPtr = Cast<UGA_Periodic_StateTagModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
 				if (GAPtr)
 				{
 					GAPtr->UpdateDuration();
@@ -175,7 +161,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 		FGameplayEventData Payload;
 		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-		FGameplayAbilitySpec Spec(UGA_Periodic_StateTagModefy::StaticClass(), 1);
+		FGameplayAbilitySpec Spec(UGA_Periodic_StateTagModify::StaticClass(), 1);
 
 		Result = ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,
@@ -187,13 +173,94 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(FGameplayA
 	return Result;
 }
 
-void UInteractiveBaseGAComponent::SendEvent(FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr)
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects2Self(UConsumableUnit* UnitPtr)
+{
+	FGameplayAbilitySpecHandle Result;
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		if (PeriodicPropertyModifyMap.Contains(UnitPtr))
+		{
+			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicPropertyModifyMap[UnitPtr]);
+			if (GameplayAbilitySpecPtr)
+			{
+				auto GAPtr = Cast<UGA_Periodic_PropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				if (GAPtr)
+				{
+					GAPtr->UpdateDuration();
+					return Result;
+				}
+			}
+		}
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_PropertyModify(UnitPtr);
+
+		GameplayAbilityTargetDataPtr->TriggerCharacterPtr = OnwerActorPtr;
+		GameplayAbilityTargetDataPtr->TargetCharacterPtr = OnwerActorPtr;
+
+		Result = ExcuteEffects(GameplayAbilityTargetDataPtr);
+		PeriodicPropertyModifyMap.Add(UnitPtr, Result);
+	}
+	return Result;
+}
+
+void UInteractiveBaseGAComponent::SendEventImp(
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
+)
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
 	if (OnwerActorPtr)
 	{
 		FGameplayEventData Payload;
+
+		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(FGameplayAbilityTargetData_GAEventType::EEventType::kNormal));
 		Payload.TargetData.Add(GAEventDataPtr);
+
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		ASCPtr->TriggerAbilityFromGameplayEvent(
+			OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
+			ASCPtr->AbilityActorInfo.Get(),
+			FGameplayTag(),
+			&Payload,
+			*ASCPtr
+		);
+	}
+}
+
+void UInteractiveBaseGAComponent::SendEventImp(
+	FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+
+		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify));
+		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		ASCPtr->TriggerAbilityFromGameplayEvent(
+			OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
+			ASCPtr->AbilityActorInfo.Get(),
+			FGameplayTag(),
+			&Payload,
+			*ASCPtr
+		);
+	}
+}
+
+void UInteractiveBaseGAComponent::SendEventImp(
+	FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+
+		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify));
+		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
@@ -215,6 +282,7 @@ void UInteractiveBaseGAComponent::SendEvent2Other(
 	{
 		return;
 	}
+
 	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
 
 	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
@@ -245,7 +313,7 @@ void UInteractiveBaseGAComponent::SendEvent2Other(
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
 	}
-	SendEvent(GAEventDataPtr);
+	SendEventImp(GAEventDataPtr);
 }
 
 void UInteractiveBaseGAComponent::SendEvent2Self(
@@ -257,8 +325,8 @@ void UInteractiveBaseGAComponent::SendEvent2Self(
 	{
 		return;
 	}
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
 
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
 	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
 
 	FGAEventData GAEventData(OnwerActorPtr, OnwerActorPtr);
@@ -282,7 +350,7 @@ void UInteractiveBaseGAComponent::SendEvent2Self(
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	SendEvent(GAEventDataPtr);
+	SendEventImp(GAEventDataPtr);
 }
 
 void UInteractiveBaseGAComponent::InitialBaseGAs()

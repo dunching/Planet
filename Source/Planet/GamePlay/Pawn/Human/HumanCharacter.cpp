@@ -13,11 +13,10 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 
-#include "ThreadSycAction.h"
+
 
 #include "GameMode/PlanetGameMode.h"
 #include "GenerateType.h"
-#include <CacheAssetManager.h>
 #include "Command/TestCommand.h"
 #include "HumanActionPigInteractionUI.h"
 #include "HumanViewBackpackProcessor.h"

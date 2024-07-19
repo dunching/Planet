@@ -14,8 +14,8 @@
 
 #include "HumanCharacter.h"
 #include "Animation/AnimInstanceBase.h"
-#include "CacheAssetManager.h"
-#include "ThreadSycAction.h"
+
+
 #include "LogHelper/LogWriter.h"
 #include "UIManagerSubSystem.h"
 #include "ToolsMenu.h"
@@ -41,13 +41,6 @@ namespace HumanProcessor
 
 		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
 
-		auto CacheAssetManagerPtr = UCacheAssetManager::GetInstance();
-		if (!CacheAssetManagerPtr)
-		{
-			return;
-		}
-
-		//	BuildTargetPtr = GetWorldImp()->SpawnActor<ABuildingBase>(CacheAssetManagerPtr->GetClassByItemType(Item));
 		if (!BuildTargetPtr)
 		{
 			return;

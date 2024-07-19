@@ -1,9 +1,12 @@
 
-#include "GA_Periodic_StateTagModefy.h"
+#include "GA_Periodic_StateTagModify.h"
 
 #include <Engine/AssetManager.h>
 #include <Engine/StreamableManager.h>
 #include "AbilitySystemGlobals.h"
+#include <GameFramework/CharacterMovementComponent.h>
+
+#include "KismetGravityLibrary.h"
 
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterBase.h"
@@ -16,14 +19,16 @@
 #include "EffectItem.h"
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
+#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_FlyAway.h"
 
-UGA_Periodic_StateTagModefy::UGA_Periodic_StateTagModefy() :
+UGA_Periodic_StateTagModify::UGA_Periodic_StateTagModify() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UGA_Periodic_StateTagModefy::PreActivate(
+void UGA_Periodic_StateTagModify::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -33,7 +38,7 @@ void UGA_Periodic_StateTagModefy::PreActivate(
 {
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_StateTagModefy*>(TriggerEventData->TargetData.Get(0));
+		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_StateTagModify*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
 			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
@@ -46,7 +51,7 @@ void UGA_Periodic_StateTagModefy::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void UGA_Periodic_StateTagModefy::ActivateAbility(
+void UGA_Periodic_StateTagModify::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -58,7 +63,7 @@ void UGA_Periodic_StateTagModefy::ActivateAbility(
 	PerformAction();
 }
 
-void UGA_Periodic_StateTagModefy::EndAbility(
+void UGA_Periodic_StateTagModify::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -75,7 +80,7 @@ void UGA_Periodic_StateTagModefy::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UGA_Periodic_StateTagModefy::UpdateDuration()
+void UGA_Periodic_StateTagModify::UpdateDuration()
 {
 	if (TaskPtr)
 	{
@@ -83,7 +88,7 @@ void UGA_Periodic_StateTagModefy::UpdateDuration()
 	}
 }
 
-void UGA_Periodic_StateTagModefy::PerformAction()
+void UGA_Periodic_StateTagModify::PerformAction()
 {
 	if (CharacterPtr)
 	{
@@ -91,6 +96,19 @@ void UGA_Periodic_StateTagModefy::PerformAction()
 
 		if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
 		{
+			auto RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
+				this,
+				TEXT(""),
+				GameplayAbilityTargetDataPtr->Height
+			);
+
+			RootMotionTaskPtr->Ability = this;
+			RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+
+			// 如果遇到障碍 提前结束
+			RootMotionTaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementToZeroListLock);
+
+			RootMotionTaskPtr->ReadyForActivation();
 
 		}
 		else if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Silent))
@@ -104,7 +122,7 @@ void UGA_Periodic_StateTagModefy::PerformAction()
 	}
 }
 
-void UGA_Periodic_StateTagModefy::ExcuteTasks()
+void UGA_Periodic_StateTagModify::ExcuteTasks()
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
@@ -130,14 +148,14 @@ void UGA_Periodic_StateTagModefy::ExcuteTasks()
 	TaskPtr->ReadyForActivation();
 }
 
-void UGA_Periodic_StateTagModefy::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UGA_Periodic_StateTagModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
 	if (CurrentInterval >= Interval)
 	{
 	}
 }
 
-void UGA_Periodic_StateTagModefy::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UGA_Periodic_StateTagModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
@@ -158,7 +176,7 @@ void UGA_Periodic_StateTagModefy::OnDuration(UAbilityTask_TimerHelper* InTaskPtr
 	}
 }
 
-FGameplayAbilityTargetData_Periodic_StateTagModefy::FGameplayAbilityTargetData_Periodic_StateTagModefy(
+FGameplayAbilityTargetData_Periodic_StateTagModify::FGameplayAbilityTargetData_Periodic_StateTagModify(
 	const FGameplayTag& InTag,
 	float InDuration
 	):
@@ -168,7 +186,7 @@ FGameplayAbilityTargetData_Periodic_StateTagModefy::FGameplayAbilityTargetData_P
 
 }
 
-FGameplayAbilityTargetData_Periodic_StateTagModefy::FGameplayAbilityTargetData_Periodic_StateTagModefy()
+FGameplayAbilityTargetData_Periodic_StateTagModify::FGameplayAbilityTargetData_Periodic_StateTagModify()
 {
 
 }

@@ -12,7 +12,6 @@
 #include "Async/Async.h"
 #include <Kismet/KismetMathLibrary.h>
 
-#include <CacheAssetManager.h>
 #include "ArticleBase.h"
 #include "ArticleStone.h"
 #include "ArticleTree.h"
