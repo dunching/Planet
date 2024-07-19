@@ -34,6 +34,7 @@ public:
 		float Strength,
 		float Duration,
 		bool bIsAdditive,
+		bool bIsForceMove,
 		UCurveFloat* StrengthOverTime,
 		ERootMotionFinishVelocityMode VelocityOnFinishMode,
 		FVector SetVelocityOnFinish,

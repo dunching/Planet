@@ -61,7 +61,7 @@ void UAbilityTask_ApplyRootMotionBySPline::SharedInitAndApply()
 
 			RootMotionSource->InstanceName = ForceName;
 			RootMotionSource->AccumulateMode = ERootMotionAccumulateMode::Override;
-			RootMotionSource->Priority = 5;
+			RootMotionSource->Priority = ERootMotionSource_Priority::kMove;
 			RootMotionSource->Duration = Duration;
 			RootMotionSource->FinishVelocityParams.Mode = FinishVelocityMode;
 			RootMotionSource->FinishVelocityParams.SetVelocity = FinishSetVelocity;

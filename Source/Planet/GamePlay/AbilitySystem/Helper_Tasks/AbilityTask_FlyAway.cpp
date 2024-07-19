@@ -24,6 +24,7 @@ UAbilityTask_FlyAway::UAbilityTask_FlyAway(const FObjectInitializer& ObjectIniti
 UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,
+	float InDuration,
 	float InHeight
 )
 {
@@ -34,6 +35,7 @@ UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
 	MyTask->FinishSetVelocity = FVector::ZeroVector;
 	MyTask->FinishClampVelocity = 0.f;
 
+	MyTask->Duration = InDuration;
 	MyTask->Height = InHeight;
 
 	return MyTask;
@@ -59,13 +61,14 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 
 			RootMotionSourceSPtr->InstanceName = ForceName;
 			RootMotionSourceSPtr->AccumulateMode = ERootMotionAccumulateMode::Override;
-			RootMotionSourceSPtr->Priority = 5;
-			RootMotionSourceSPtr->Duration = -1.f;
+			RootMotionSourceSPtr->Priority = ERootMotionSource_Priority::kFlyAway;
+			RootMotionSourceSPtr->Duration = Duration;
 			RootMotionSourceSPtr->FinishVelocityParams.Mode = FinishVelocityMode;
 			RootMotionSourceSPtr->FinishVelocityParams.SetVelocity = FinishSetVelocity;
 			RootMotionSourceSPtr->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
 
 			RootMotionSourceSPtr->Height = Height;
+			RootMotionSourceSPtr->OriginalPt = ASC->AbilityActorInfo->AvatarActor->GetActorLocation();
 
 			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RootMotionSourceSPtr);
 		}

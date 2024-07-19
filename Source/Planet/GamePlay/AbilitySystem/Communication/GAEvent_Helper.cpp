@@ -136,3 +136,18 @@ FGameplayAbilityTargetData_GAEventType::FGameplayAbilityTargetData_GAEventType(E
 {
 
 }
+
+FGameplayAbilityTargetData_GAEventType::FGameplayAbilityTargetData_GAEventType()
+{
+
+}
+
+FGameplayAbilityTargetData_GAEventType* FGameplayAbilityTargetData_GAEventType::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_GAEventType;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}

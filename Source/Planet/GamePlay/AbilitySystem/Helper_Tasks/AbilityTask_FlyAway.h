@@ -29,6 +29,7 @@ public:
 	static UAbilityTask_FlyAway* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
+		float Duration,
 		float Height
 	);
 
@@ -45,5 +46,7 @@ protected:
 protected:
 
 	float Height = 300.f;
+
+	float Duration = 2.f;
 
 };

@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 
 #include "KismetCollisionHelper.h"
+#include "KismetGravityLibrary.h"
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -24,6 +25,9 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
+#include "InteractiveBaseGAComponent.h"
+#include "GameplayTagsSubSystem.h"
+#include "GA_Periodic_StateTagModify.h"
 
 USkill_Active_FlyAway::USkill_Active_FlyAway() :
 	Super()
@@ -101,20 +105,69 @@ void USkill_Active_FlyAway::ExcuteTasks()
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(CharacterPtr);
 
+		DrawDebugLine(
+			GetWorld(), 
+			CharacterPtr->GetActorLocation(),
+			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorRotation().Vector() * 100),
+			FColor::Red, false, 3
+		);
+
+		DrawDebugLine(
+			GetWorld(),
+			CharacterPtr->GetActorLocation(),
+			CharacterPtr->GetActorLocation() + (CharacterPtr->GetControlRotation().Vector() * 100),
+			FColor::Yellow, false, 3
+		);
+
+		const auto Dir = UKismetMathLibrary::MakeRotFromZX(
+			UKismetGravityLibrary::GetGravity(CharacterPtr->GetActorLocation()), CharacterPtr->GetControlRotation().Vector()
+		).Vector();
+
 		auto Result = UKismetCollisionHelper::OverlapMultiSectorByObjectType(
 			GetWorld(),
 			CharacterPtr->GetActorLocation(),
-			CharacterPtr->GetControlRotation().Vector() * Radius,
+			CharacterPtr->GetActorLocation() + (Dir * Radius),
 			Angle,
 			9,
 			ObjectQueryParams,
 			Params
 		);
 
+		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+
+		TSet <ACharacterBase*>TargetSet;
 		for (const auto & Iter : Result)
 		{
-
+			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+			if (TargetCharacterPtr)
+			{
+				TargetSet.Add(TargetCharacterPtr);
+			}
 		}
+		for (const auto& Iter : TargetSet)
+		{
+			FGAEventData GAEventData(Iter, CharacterPtr);
+
+			GAEventData.SetBaseDamage(Damage);
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto GAEventData_Periodic_StateTagModifyPtr = new FGameplayAbilityTargetData_Periodic_StateTagModify(
+				UGameplayTagsSubSystem::GetInstance()->FlyAway,
+				FlyAwayTime
+			);
+
+			GAEventData_Periodic_StateTagModifyPtr->Height = Height;
+
+			GAEventData_Periodic_StateTagModifyPtr->TriggerCharacterPtr = CharacterPtr;
+			GAEventData_Periodic_StateTagModifyPtr->TargetCharacterPtr = Iter;
+
+			ICPtr->SendEventImp(GAEventData_Periodic_StateTagModifyPtr);
+		}
+		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

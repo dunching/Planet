@@ -99,13 +99,13 @@ void UGA_Periodic_StateTagModify::PerformAction()
 			auto RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
 				this,
 				TEXT(""),
+				GameplayAbilityTargetDataPtr->Duration,
 				GameplayAbilityTargetDataPtr->Height
 			);
 
 			RootMotionTaskPtr->Ability = this;
 			RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-			// 如果遇到障碍 提前结束
 			RootMotionTaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementToZeroListLock);
 
 			RootMotionTaskPtr->ReadyForActivation();
@@ -189,4 +189,14 @@ FGameplayAbilityTargetData_Periodic_StateTagModify::FGameplayAbilityTargetData_P
 FGameplayAbilityTargetData_Periodic_StateTagModify::FGameplayAbilityTargetData_Periodic_StateTagModify()
 {
 
+}
+
+FGameplayAbilityTargetData_Periodic_StateTagModify* FGameplayAbilityTargetData_Periodic_StateTagModify::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_Periodic_StateTagModify;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
 }

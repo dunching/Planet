@@ -65,15 +65,20 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	int32 Damage = 10;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 Radius = 250;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 Angle = 90;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	float FlyAwayTime = 1.5f;
+
+	float Height = 300.f;
 
 	ATool_PickAxe* EquipmentAxePtr = nullptr;
 

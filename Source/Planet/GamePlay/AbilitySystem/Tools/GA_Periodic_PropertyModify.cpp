@@ -152,3 +152,13 @@ FGameplayAbilityTargetData_Periodic_PropertyModify::FGameplayAbilityTargetData_P
 {
 
 }
+
+FGameplayAbilityTargetData_Periodic_PropertyModify* FGameplayAbilityTargetData_Periodic_PropertyModify::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_Periodic_PropertyModify;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}

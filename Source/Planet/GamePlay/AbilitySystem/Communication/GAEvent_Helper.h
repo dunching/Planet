@@ -76,9 +76,13 @@ struct FGameplayAbilityTargetData_GAEventType : public FGameplayAbilityTargetDat
 		kPeriodic_StateTagModify,
 	};
 
+	FGameplayAbilityTargetData_GAEventType();
+
 	FGameplayAbilityTargetData_GAEventType(
 		EEventType InEventType
 	);
+
+	FGameplayAbilityTargetData_GAEventType* Clone()const;
 
 	EEventType EventType = EEventType::kNormal;
 };

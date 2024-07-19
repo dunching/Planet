@@ -81,6 +81,8 @@ struct PLANET_API FGameplayAbilityTargetData_Periodic_PropertyModify : public FG
 
 	FGameplayAbilityTargetData_Periodic_PropertyModify(UConsumableUnit* RightVal);
 
+	FGameplayAbilityTargetData_Periodic_PropertyModify* Clone()const;
+
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;

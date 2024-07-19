@@ -7,6 +7,12 @@
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
 
+USkill_Active_Base::USkill_Active_Base():
+	Super()
+{
+	CooldownTime = 1.f;
+}
+
 void USkill_Active_Base::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec

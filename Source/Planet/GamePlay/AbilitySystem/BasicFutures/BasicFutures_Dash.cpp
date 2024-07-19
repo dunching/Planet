@@ -246,6 +246,7 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 			MoveLength / Duration,
 			Duration,
 			false,
+			true,
 			nullptr,
 			ERootMotionFinishVelocityMode::SetVelocity,
 			CharacterPtr->GetCharacterMovement()->Velocity,

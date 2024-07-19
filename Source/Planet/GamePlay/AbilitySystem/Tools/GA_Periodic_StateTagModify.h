@@ -87,9 +87,11 @@ struct PLANET_API FGameplayAbilityTargetData_Periodic_StateTagModify : public FG
 		float Duration
 	);
 
+	FGameplayAbilityTargetData_Periodic_StateTagModify* Clone()const;
+
 	float Duration = 3.f;
 
-	int32 Height = 250;
+	int32 Height = 100;
 
 	// 会一次性修改多个状态码？
 	FGameplayTag Tag;

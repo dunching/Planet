@@ -24,6 +24,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Require Weapon")
 	EWeaponUnitType WeaponUnitType = EWeaponUnitType::kNone;
 
+	USkill_Active_Base();
+
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec

@@ -67,6 +67,16 @@ void AResourceBoxBase::AddItemsToTarget()
 		{
 			HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
 		}
+		for (const auto Iter : ToolUnitMap)
+		{
+		}
+		for (const auto Iter : WeaponUnitMap)
+		{
+		}
+		for (const auto Iter : SkillUnitMap)
+		{
+			HoldItemPropertyRef.AddUnit(Iter.Key);
+		}
 	}
 }
 

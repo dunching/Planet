@@ -13,6 +13,15 @@
 
 #include "Helper_RootMotionSource.generated.h"
 
+enum ERootMotionSource_Priority : uint16
+{
+	kDefault = 1,
+	kMove,
+	kFlyAway,
+	kTraction,
+	kForceMove,
+};
+
 class ASPlineActor;
 class ATornado;
 class ACharacterBase;
@@ -52,6 +61,8 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 	float Height = 300.f;
 
 	float RiseDuration = .75f;
+
+	FVector OriginalPt = FVector::ZeroVector;
 
 };
 

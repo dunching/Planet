@@ -397,7 +397,7 @@ void TestCommand::TestGAState2Self(const TArray< FString >& Args)
 	GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
 	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-	ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
+	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 
 void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
@@ -442,7 +442,7 @@ void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
 				auto ICPtr = TargetCharacterPtr->GetInteractiveBaseGAComponent();
-				ICPtr->ExcuteEffects(GameplayAbilityTargetDataPtr);
+				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 		}
 	}

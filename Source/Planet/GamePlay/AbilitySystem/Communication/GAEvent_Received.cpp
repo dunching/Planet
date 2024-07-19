@@ -34,7 +34,7 @@ void UGAEvent_Received::ActivateAbility(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(1))
 	{
-		auto GAEventData_EventTypePtr = dynamic_cast<FGameplayAbilityTargetData_GAEventType*>(CurrentEventData.TargetData.Get(0));
+		auto GAEventData_EventTypePtr = dynamic_cast<const FGameplayAbilityTargetData_GAEventType*>(TriggerEventData->TargetData.Get(0));
 		if (!GAEventData_EventTypePtr)
 		{
 			return;
@@ -49,24 +49,24 @@ void UGAEvent_Received::ActivateAbility(
 				return;
 			}
 
-			auto Clone = GAEventDataPtr->Clone();
-
 			auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 			if (!CharacterPtr)
 			{
 				return;
 			}
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*Clone);
+			auto ClonePtr = GAEventDataPtr->Clone();
 
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*Clone);
+			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*ClonePtr);
 
-			Clone->TrueDataDelagate.ExcuteCallback(CharacterPtr, Clone->Data);
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*ClonePtr);
+
+			ClonePtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, ClonePtr->Data);
 		}
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify:
 		{
-			auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_Periodic_PropertyModify*>(CurrentEventData.TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_PropertyModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;
@@ -78,12 +78,14 @@ void UGAEvent_Received::ActivateAbility(
 				return;
 			}
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(GAEventDataPtr);
+			auto ClonePtr = GAEventDataPtr->Clone();
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
 		}
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify:
 		{
-			auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_Periodic_StateTagModify*>(CurrentEventData.TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_StateTagModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;
@@ -95,7 +97,9 @@ void UGAEvent_Received::ActivateAbility(
 				return;
 			}
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(GAEventDataPtr);
+			auto ClonePtr = GAEventDataPtr->Clone();
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
 		}
 		break;
 		}

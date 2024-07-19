@@ -27,6 +27,7 @@ UAbilityTask_MyApplyRootMotionConstantForce* UAbilityTask_MyApplyRootMotionConst
 	float Strength,
 	float Duration,
 	bool bIsAdditive,
+	bool bIsForceMove,
 	UCurveFloat* StrengthOverTime,
 	ERootMotionFinishVelocityMode VelocityOnFinishMode,
 	FVector SetVelocityOnFinish,
@@ -38,6 +39,7 @@ UAbilityTask_MyApplyRootMotionConstantForce* UAbilityTask_MyApplyRootMotionConst
 
 	UAbilityTask_MyApplyRootMotionConstantForce* MyTask = NewAbilityTask<UAbilityTask_MyApplyRootMotionConstantForce>(OwningAbility, TaskInstanceName);
 
+	MyTask->Priority = bIsForceMove ? ERootMotionSource_Priority::kForceMove: ERootMotionSource_Priority::kMove;
 	MyTask->ForceName = TaskInstanceName;
 	MyTask->WorldDirection = WorldDirection.GetSafeNormal();
 	MyTask->Strength = Strength;

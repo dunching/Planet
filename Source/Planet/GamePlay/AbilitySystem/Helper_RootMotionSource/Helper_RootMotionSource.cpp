@@ -12,6 +12,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Components/SplineComponent.h"
 #include <Kismet/KismetMathLibrary.h>
+#include <Components/CapsuleComponent.h>
 
 #include "GravityMovementComponent.h"
 #include "KismetGravityLibrary.h"
@@ -234,16 +235,13 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	FTransform NewTransform = FTransform::Identity;
 
 	const FVector CurrentLocation = Character.GetActorLocation();
-
-	MoveComponent.CurrentFloor;
-
-	const auto LastLandPt = MoveComponent.CurrentFloor.HitResult.ImpactPoint;
+	const auto LastLandPt = OriginalPt;
 
 	if (GetTime() < RiseDuration)
 	{
 		float MoveFraction = (GetTime() + SimulationTime) / RiseDuration;
 
-		const auto TargetPt = LastLandPt + (UKismetGravityLibrary::GetGravity(LastLandPt) * MoveFraction * Height);
+		const auto TargetPt = LastLandPt - (UKismetGravityLibrary::GetGravity(LastLandPt) * MoveFraction * Height);
 
 		FVector Distance = (TargetPt - CurrentLocation) / MovementTickTime;
 
@@ -251,7 +249,7 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	}
 	else
 	{
-		const auto TargetPt = LastLandPt + (UKismetGravityLibrary::GetGravity(LastLandPt) * Height);
+		const auto TargetPt = LastLandPt - (UKismetGravityLibrary::GetGravity(LastLandPt) * Height);
 
 		FVector Distance = (TargetPt - CurrentLocation) / MovementTickTime;
 

@@ -33,7 +33,7 @@ void UGAEvent_Send::ActivateAbility(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(1))
 	{
-		auto GAEventData_EventTypePtr = dynamic_cast<FGameplayAbilityTargetData_GAEventType*>(CurrentEventData.TargetData.Get(0));
+		auto GAEventData_EventTypePtr = dynamic_cast<const FGameplayAbilityTargetData_GAEventType*>(TriggerEventData->TargetData.Get(0));
 		if (!GAEventData_EventTypePtr)
 		{
 			return;
@@ -44,7 +44,7 @@ void UGAEvent_Send::ActivateAbility(
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kNormal:
 		{
 			// 外部需要这个修改的内容，所以我们这里修改CurrentEventData，而非const TriggerEventData
-			auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_GASendEvent*>(CurrentEventData.TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;
@@ -56,7 +56,9 @@ void UGAEvent_Send::ActivateAbility(
 				return;
 			}
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->OnSendEventModifyData(*GAEventDataPtr);
+			auto ClonePtr = GAEventDataPtr->Clone();
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->OnSendEventModifyData(*ClonePtr);
 
 			for (const auto& Iter : GAEventDataPtr->DataAry)
 			{
@@ -66,7 +68,7 @@ void UGAEvent_Send::ActivateAbility(
 				GAEventData->Data = Iter;
 
 				FGameplayEventData Payload;
-				Payload.TargetData.Add(GAEventData_EventTypePtr);
+				Payload.TargetData.Add(GAEventData_EventTypePtr->Clone());
 				Payload.TargetData.Add(GAEventData);
 
 				auto ASCPtr = Iter.TargetCharacterPtr->GetAbilitySystemComponent();
@@ -82,7 +84,7 @@ void UGAEvent_Send::ActivateAbility(
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify:
 		{
-			auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_Periodic_PropertyModify*>(CurrentEventData.TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_PropertyModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;
@@ -94,9 +96,11 @@ void UGAEvent_Send::ActivateAbility(
 				return;
 			}
 
+			auto ClonePtr = GAEventDataPtr->Clone();
+
 			FGameplayEventData Payload;
-			Payload.TargetData.Add(GAEventData_EventTypePtr);
-			Payload.TargetData.Add(GAEventDataPtr);
+			Payload.TargetData.Add(GAEventData_EventTypePtr->Clone());
+			Payload.TargetData.Add(ClonePtr);
 
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(
@@ -110,7 +114,7 @@ void UGAEvent_Send::ActivateAbility(
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify:
 		{
-			auto GAEventDataPtr = dynamic_cast<FGameplayAbilityTargetData_Periodic_StateTagModify*>(CurrentEventData.TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_StateTagModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;
@@ -122,9 +126,11 @@ void UGAEvent_Send::ActivateAbility(
 				return;
 			}
 
+			auto ClonePtr = GAEventDataPtr->Clone();
+
 			FGameplayEventData Payload;
-			Payload.TargetData.Add(GAEventData_EventTypePtr);
-			Payload.TargetData.Add(GAEventDataPtr);
+			Payload.TargetData.Add(GAEventData_EventTypePtr->Clone());
+			Payload.TargetData.Add(ClonePtr);
 
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(

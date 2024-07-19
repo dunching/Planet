@@ -11,6 +11,7 @@
 
 #include "InteractiveBaseGAComponent.generated.h"
 
+class UGAEvent_Received;
 class UConsumableUnit;
 class UGA_Periodic_PropertyModify;
 class UGA_Periodic_StateTagModify;
@@ -25,6 +26,8 @@ class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
 	GENERATED_BODY()
 
 public:
+
+	friend UGAEvent_Received;
 
 	using FCallbackHandleContainer = TCallbackHandleContainer<void(ETagChangeType, const FGameplayTag&)>;
 
@@ -46,16 +49,6 @@ public:
 		ACharacterBase* TargetCharacterPtr, 
 		FGameplayAbilityTargetData_AddTemporaryTag* GameplayAbilityTargetDataPtr
 	);
-
-	FGameplayAbilitySpecHandle ExcuteEffects(
-		FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
-	);
-
-	FGameplayAbilitySpecHandle ExcuteEffects(
-		FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
-	);
-
-	FGameplayAbilitySpecHandle ExcuteEffects2Self(UConsumableUnit* UnitPtr);
 
 	void SendEvent2Other(
 		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
@@ -83,6 +76,16 @@ public:
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
 
 protected:
+
+	FGameplayAbilitySpecHandle ExcuteEffects(
+		FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+	);
+
+	FGameplayAbilitySpecHandle ExcuteEffects(
+		FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+	);
+
+	FGameplayAbilitySpecHandle ExcuteEffects2Self(UConsumableUnit* UnitPtr);
 
 	void AddSendGroupEffectModify();
 
