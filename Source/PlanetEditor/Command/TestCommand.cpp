@@ -33,6 +33,30 @@
 #include "GA_Periodic_StateTagModify.h"
 #include "GA_Periodic_PropertyModify.h"
 #include "KismetCollisionHelper.h"
+#include "PlanetPlayerCameraManager.h"
+
+void TestCommand::TestCameraManager(const TArray< FString >& Args)
+{
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorldImp(), AActor::StaticClass(), TEXT("CameraTest"), OutActors);
+
+	auto CameraManagerPtr = Cast<APlanetPlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0));
+	if (CameraManagerPtr && OutActors.IsValidIndex(0) && Args.IsValidIndex(0))
+	{
+		FViewTargetTransitionParams TransitionParams;
+
+		TransitionParams.BlendTime = 1.f;
+
+		if (Args[0] == TEXT("0"))
+		{
+			CameraManagerPtr->SetViewTarget(OutActors[0], TransitionParams);
+		}
+		else
+		{
+			CameraManagerPtr->SetViewTarget(CameraManagerPtr->GetOwningPlayerController()->GetPawn(), TransitionParams);
+		}
+	}
+}
 
 void TestCommand::TestSectorCollision()
 {

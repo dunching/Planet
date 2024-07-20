@@ -31,11 +31,11 @@ struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForc
 	GENERATED_USTRUCT_BODY()
 
 	virtual void PrepareRootMotion(
-		float SimulationTime, 
+		float SimulationTime,
 		float MovementTickTime,
-		const ACharacter& Character, 
+		const ACharacter& Character,
 		const UCharacterMovementComponent& MoveComponent
-		) override;
+	) override;
 };
 
 USTRUCT()
@@ -58,11 +58,25 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
-	float Height = 300.f;
+	void Initial(
+		float Height,
+		float Duration,
+		const FVector& OriginalPt
+	);
+
+	void UpdateDuration(
+		float Height,
+		float Duration,
+		const FVector& OriginalPt
+	);
 
 	float RiseDuration = .75f;
 
-	FVector OriginalPt = FVector::ZeroVector;
+	FVector TargetPt = FVector::ZeroVector;
+
+	FVector CurrentStartPt = FVector::ZeroVector;
+
+	FVector OriginalLandingPt = FVector::ZeroVector;
 
 };
 
@@ -110,10 +124,10 @@ struct FRootMotionSource_ByTornado : public FRootMotionSource
 		const ACharacter& Character,
 		const UCharacterMovementComponent& MoveComponent
 	) override;
-	
+
 	// 如果这个值过小，会导致移动时距离过近从而忽略本次移动 ?
 	float OuterRadius = 150.f;
-	
+
 	float MaxHeight = 200.f;
 
 	float RotationSpeed = 360.f;

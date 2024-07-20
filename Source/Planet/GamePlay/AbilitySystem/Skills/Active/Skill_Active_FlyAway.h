@@ -78,7 +78,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	float FlyAwayTime = 1.5f;
 
-	float Height = 300.f;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	int32 Height = 300;
 
 	ATool_PickAxe* EquipmentAxePtr = nullptr;
 

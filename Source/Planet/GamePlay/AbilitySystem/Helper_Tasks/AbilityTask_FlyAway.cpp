@@ -62,13 +62,11 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 			RootMotionSourceSPtr->InstanceName = ForceName;
 			RootMotionSourceSPtr->AccumulateMode = ERootMotionAccumulateMode::Override;
 			RootMotionSourceSPtr->Priority = ERootMotionSource_Priority::kFlyAway;
-			RootMotionSourceSPtr->Duration = Duration;
 			RootMotionSourceSPtr->FinishVelocityParams.Mode = FinishVelocityMode;
 			RootMotionSourceSPtr->FinishVelocityParams.SetVelocity = FinishSetVelocity;
 			RootMotionSourceSPtr->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
 
-			RootMotionSourceSPtr->Height = Height;
-			RootMotionSourceSPtr->OriginalPt = ASC->AbilityActorInfo->AvatarActor->GetActorLocation();
+			RootMotionSourceSPtr->Initial(Height, Duration, ASC->AbilityActorInfo->AvatarActor->GetActorLocation());
 
 			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RootMotionSourceSPtr);
 		}
@@ -83,5 +81,16 @@ void UAbilityTask_FlyAway::OnDestroy(bool AbilityIsEnding)
 	}
 
 	Super::OnDestroy(AbilityIsEnding);
+}
+
+void UAbilityTask_FlyAway::UpdateDuration()
+{
+	if (MovementComponent)
+	{
+		auto Ptr = MovementComponent->GetRootMotionSourceByID(RootMotionSourceID);
+		TSharedPtr<FRootMotionSource_FlyAway>RootMotionSourceSPtr(Ptr, dynamic_cast<FRootMotionSource_FlyAway*>(Ptr.Get()));
+
+		RootMotionSourceSPtr->UpdateDuration(Height, Duration, MovementComponent->GetActorLocation());
+	}
 }
 

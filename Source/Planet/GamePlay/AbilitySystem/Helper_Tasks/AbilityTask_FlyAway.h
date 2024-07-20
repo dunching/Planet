@@ -37,6 +37,8 @@ public:
 
 	virtual void OnDestroy(bool AbilityIsEnding) override;
 
+	void UpdateDuration();
+
 	FOnTaskFinished OnFinish;
 
 protected:
@@ -45,7 +47,7 @@ protected:
 
 protected:
 
-	float Height = 300.f;
+	int32 Height = 300;
 
 	float Duration = 2.f;
 

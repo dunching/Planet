@@ -86,6 +86,19 @@ void UGA_Periodic_StateTagModify::UpdateDuration()
 	{
 		TaskPtr->UpdateDuration();
 	}
+	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+	{
+		for (auto Iter : ActiveTasks)
+		{
+			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
+			{
+				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
+
+				RootMotionTaskPtr->UpdateDuration();
+				break;
+			}
+		}
+	}
 }
 
 void UGA_Periodic_StateTagModify::PerformAction()

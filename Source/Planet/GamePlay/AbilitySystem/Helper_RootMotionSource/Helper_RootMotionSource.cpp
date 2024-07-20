@@ -108,11 +108,11 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 		FVector Force = (Pt - CurrentLocation) / MovementTickTime;
 
 		NewTransform.SetTranslation(Force);
-
-		const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
-		NewTransform.ScaleTranslation(Multiplier);
 	}
 
+
+	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
+	NewTransform.ScaleTranslation(Multiplier);
 	RootMotionParams.Set(NewTransform);
 
 	SetTime(GetTime() + SimulationTime);
@@ -169,8 +169,8 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 		const auto NewRotator =
 			Rotator.Vector().RotateAngleAxis(SimulationTime * RotationSpeed, -Character.GetGravityDirection());
 
-		const auto NewPt = 
-			TornadoLocation + 
+		const auto NewPt =
+			TornadoLocation +
 			(-Character.GetGravityDirection() * MaxHeight) +
 			(NewRotator * OuterRadius);
 
@@ -189,6 +189,10 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 
 		NewTransform.SetRotation(Rot);
 	}
+
+
+	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
+	NewTransform.ScaleTranslation(Multiplier);
 
 	RootMotionParams.Set(NewTransform);
 
@@ -220,12 +224,16 @@ bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
 
 	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
 
-	return FMath::IsNearlyEqual(Height, OtherCast->Height);
+	return 
+		FMath::IsNearlyEqual(RiseDuration, OtherCast->RiseDuration) ||
+		TargetPt == OtherCast->TargetPt ||
+		CurrentStartPt == OtherCast->CurrentStartPt ||
+		OriginalLandingPt == OtherCast->OriginalLandingPt;
 }
 
 void FRootMotionSource_FlyAway::PrepareRootMotion(
-	float SimulationTime, 
-	float MovementTickTime, 
+	float SimulationTime,
+	float MovementTickTime,
 	const ACharacter& Character,
 	const UCharacterMovementComponent& MoveComponent
 )
@@ -235,28 +243,54 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	FTransform NewTransform = FTransform::Identity;
 
 	const FVector CurrentLocation = Character.GetActorLocation();
-	const auto LastLandPt = OriginalPt;
 
 	if (GetTime() < RiseDuration)
 	{
 		float MoveFraction = (GetTime() + SimulationTime) / RiseDuration;
 
-		const auto TargetPt = LastLandPt - (UKismetGravityLibrary::GetGravity(LastLandPt) * MoveFraction * Height);
+		FVector CurrentTargetLocation = FMath::Lerp<FVector, float>(CurrentStartPt, TargetPt, MoveFraction);
 
-		FVector Distance = (TargetPt - CurrentLocation) / MovementTickTime;
+		FVector Force = (CurrentTargetLocation - CurrentLocation) / MovementTickTime;
 
-		NewTransform.SetTranslation(Distance);
+		NewTransform.SetTranslation(Force);
 	}
 	else
 	{
-		const auto TargetPt = LastLandPt - (UKismetGravityLibrary::GetGravity(LastLandPt) * Height);
+		FVector Force = (TargetPt - CurrentLocation) / MovementTickTime;
 
-		FVector Distance = (TargetPt - CurrentLocation) / MovementTickTime;
-
-		NewTransform.SetTranslation(Distance);
+		NewTransform.SetTranslation(Force);
 	}
+
+
+	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
+	NewTransform.ScaleTranslation(Multiplier);
 
 	RootMotionParams.Set(NewTransform);
 
 	SetTime(GetTime() + SimulationTime);
+}
+
+void FRootMotionSource_FlyAway::Initial(
+	float Height,
+	float InDuration,
+	const FVector& OriginalPt
+)
+{
+	OriginalLandingPt = OriginalPt;
+	UpdateDuration(Height, InDuration, OriginalPt);
+}
+
+void FRootMotionSource_FlyAway::UpdateDuration(
+	float InHeight,
+	float InDuration,
+	const FVector& InOriginalPt
+)
+{
+	Duration = InDuration;
+
+	SetTime(0.f);
+
+	CurrentStartPt = InOriginalPt;
+
+	TargetPt = OriginalLandingPt - (UKismetGravityLibrary::GetGravity(OriginalLandingPt) * InHeight);
 }
