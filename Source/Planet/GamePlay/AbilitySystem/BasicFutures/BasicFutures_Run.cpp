@@ -47,9 +47,7 @@ void UBasicFutures_Run::ActivateAbility(
 	if (CharacterPtr)
 	{
 		auto & CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		CharacterPtr->GetCharacterMovement()->MaxWalkSpeed =
-			CharacterAttributesRef.MoveSpeed.GetCurrentValue() +
-			CharacterAttributesRef.RunningSpeedOffset.GetCurrentValue();
+		CharacterAttributesRef.MoveSpeed.AddCurrentValue(CharacterAttributesRef.RunningSpeedOffset.GetCurrentValue(), PropertuModify_GUID);
 	}
 }
 
@@ -64,8 +62,8 @@ void UBasicFutures_Run::EndAbility(
 	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());	
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterMovement()->MaxWalkSpeed = 
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue();
+		auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		CharacterAttributesRef.MoveSpeed.RemoveCurrentValue(PropertuModify_GUID);
 	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);

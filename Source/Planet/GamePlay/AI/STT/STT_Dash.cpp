@@ -1,13 +1,13 @@
 
-#include "STT_ReleaseSkill.h"
+#include "STT_Dash.h"
 
 #include <NavigationSystem.h>
 
+#include "AITask_DashToLeader.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
-#include "AITask_ReleaseSkill.h"
 
-EStateTreeRunStatus FSTT_ReleaseSkill::EnterState(
+EStateTreeRunStatus FSTT_Dash::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
 )const
@@ -24,10 +24,31 @@ EStateTreeRunStatus FSTT_ReleaseSkill::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	return PerformMoveTask(Context);
+	InstanceData.AITaskPtr = PerformMoveTask(Context);
+
+	if (InstanceData.AITaskPtr)
+	{
+		if (InstanceData.AITaskPtr->IsActive())
+		{
+			InstanceData.AITaskPtr->ConditionalPerformTask();
+		}
+		else
+		{
+			InstanceData.AITaskPtr->ReadyForActivation();
+		}
+
+		if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
+		{
+			return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
+		}
+
+		return EStateTreeRunStatus::Running;
+	}
+
+	return Super::EnterState(Context, Transition);
 }
 
-void FSTT_ReleaseSkill::ExitState(
+void FSTT_Dash::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
 )const
@@ -40,10 +61,9 @@ void FSTT_ReleaseSkill::ExitState(
 		InstanceData.AITaskPtr->ExternalCancel();
 	}
 	InstanceData.AITaskPtr = nullptr;
-
 }
 
-EStateTreeRunStatus FSTT_ReleaseSkill::Tick(
+EStateTreeRunStatus FSTT_Dash::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
 ) const
@@ -61,35 +81,17 @@ EStateTreeRunStatus FSTT_ReleaseSkill::Tick(
 	return EStateTreeRunStatus::Failed;
 }
 
-EStateTreeRunStatus FSTT_ReleaseSkill::PerformMoveTask(FStateTreeExecutionContext& Context) const
+FSTT_Dash::FAITaskType* FSTT_Dash::PerformMoveTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-
-	if (!InstanceData.AITaskPtr)
+	FAITaskType* AITaskPtr =
+		InstanceData.AITaskPtr.Get() ? InstanceData.AITaskPtr.Get() : UAITask::NewAITask<FAITaskType>(*InstanceData.AIControllerPtr, *InstanceData.TaskOwner);
+	if (AITaskPtr)
 	{
-		InstanceData.AITaskPtr =
-			UAITask::NewAITask<FAITaskType>(*InstanceData.AIControllerPtr, *InstanceData.TaskOwner);
+		FVector Destination = FVector::ZeroVector;
+		UNavigationSystemV1::K2_GetRandomReachablePointInRadius(InstanceData.AIControllerPtr, InstanceData.Destination, Destination, InstanceData.AcceptableRadius);
+		AITaskPtr->SetUp(InstanceData.AIControllerPtr.Get(), Destination);
 	}
 
-	if (InstanceData.AITaskPtr)
-	{
-		InstanceData.AITaskPtr->SetUp(InstanceData.CharacterPtr.Get());
-
-		if (InstanceData.AITaskPtr->IsActive())
-		{
-			InstanceData.AITaskPtr->ConditionalPerformTask();
-		}
-		else
-		{
-			InstanceData.AITaskPtr->ReadyForActivation();
-		}
-
-		if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
-		{
-			return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
-		}
-
-		return EStateTreeRunStatus::Running;
-	}
-	return EStateTreeRunStatus::Failed;
+	return AITaskPtr;
 }

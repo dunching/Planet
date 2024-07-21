@@ -9,36 +9,36 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "Tasks/AITask.h"
 
-#include "AITask_DashToLeader.generated.h"
+#include "AITask_SwitchWalkState.generated.h"
 
 class AAIController;
 
 UCLASS()
-class PLANET_API UAITask_DashToLeader : public UAITask
+class PLANET_API UAITask_SwitchWalkState : public UAITask
 {
 	GENERATED_BODY()
 
 public:
 
-	UAITask_DashToLeader(const FObjectInitializer& ObjectInitializer);
+	UAITask_SwitchWalkState(const FObjectInitializer& ObjectInitializer);
 
 	void ConditionalPerformTask();
 
 	bool WasMoveSuccessful() const;
 
-	void SetUp(AAIController* Controller, const FVector& FVector);
+	void SetUp(
+		AAIController* Controller,
+		bool bIsSwitchToRun,
+		bool bIscontinueCheck
+	);
 
 protected:
 
 	AAIController* ControllerPtr = nullptr;
 
-	FVector GoalLocation = FVector::ZeroVector;
+	bool bIsSwitchToRun = false;
 
-	bool bIsTransformPawn = false;
-
-	float LerpDuration = .5f;
-	
-	float LerpTime = 0.f;
+	bool bIscontinueCheck = true;
 
 	virtual void Activate() override;
 
@@ -47,5 +47,7 @@ protected:
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
 	virtual void PerformTask();
+
+	bool SwitchWalkState();
 
 };

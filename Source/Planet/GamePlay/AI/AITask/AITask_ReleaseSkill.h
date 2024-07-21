@@ -26,7 +26,7 @@ public:
 
 	UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer);
 
-	void ConditionalPerformMove();
+	void ConditionalPerformTask();
 
 	bool WasMoveSuccessful() const;
 
@@ -38,7 +38,7 @@ protected:
 
 	virtual void OnDestroy(bool bOwnerFinished) override;
 
-	virtual void PerformMove();
+	virtual void PerformTask();
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 

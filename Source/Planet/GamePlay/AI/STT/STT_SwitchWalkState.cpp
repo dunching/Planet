@@ -1,13 +1,14 @@
 
-#include "STT_ReleaseSkill.h"
+#include "STT_SwitchWalkState.h"
 
 #include <NavigationSystem.h>
 
+#include "AITask_DashToLeader.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
-#include "AITask_ReleaseSkill.h"
+#include "AITask_SwitchWalkState.h"
 
-EStateTreeRunStatus FSTT_ReleaseSkill::EnterState(
+EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
 )const
@@ -24,57 +25,10 @@ EStateTreeRunStatus FSTT_ReleaseSkill::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	return PerformMoveTask(Context);
-}
-
-void FSTT_ReleaseSkill::ExitState(
-	FStateTreeExecutionContext& Context,
-	const FStateTreeTransitionResult& Transition
-)const
-{
-	Super::ExitState(Context, Transition);
-
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	if (InstanceData.AITaskPtr && InstanceData.AITaskPtr->GetState() != EGameplayTaskState::Finished)
-	{
-		InstanceData.AITaskPtr->ExternalCancel();
-	}
-	InstanceData.AITaskPtr = nullptr;
-
-}
-
-EStateTreeRunStatus FSTT_ReleaseSkill::Tick(
-	FStateTreeExecutionContext& Context,
-	const float DeltaTime
-) const
-{
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	if (InstanceData.AITaskPtr)
-	{
-		if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
-		{
-			return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
-		}
-
-		return Super::Tick(Context, DeltaTime);
-	}
-	return EStateTreeRunStatus::Failed;
-}
-
-EStateTreeRunStatus FSTT_ReleaseSkill::PerformMoveTask(FStateTreeExecutionContext& Context) const
-{
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-
-	if (!InstanceData.AITaskPtr)
-	{
-		InstanceData.AITaskPtr =
-			UAITask::NewAITask<FAITaskType>(*InstanceData.AIControllerPtr, *InstanceData.TaskOwner);
-	}
+	InstanceData.AITaskPtr = PerformMoveTask(Context);
 
 	if (InstanceData.AITaskPtr)
 	{
-		InstanceData.AITaskPtr->SetUp(InstanceData.CharacterPtr.Get());
-
 		if (InstanceData.AITaskPtr->IsActive())
 		{
 			InstanceData.AITaskPtr->ConditionalPerformTask();
@@ -91,5 +45,62 @@ EStateTreeRunStatus FSTT_ReleaseSkill::PerformMoveTask(FStateTreeExecutionContex
 
 		return EStateTreeRunStatus::Running;
 	}
+
+	return Super::EnterState(Context, Transition);
+}
+
+void FSTT_SwitchWalkState::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+)const
+{
+	Super::ExitState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (InstanceData.AITaskPtr && InstanceData.AITaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.AITaskPtr->ExternalCancel();
+	}
+	InstanceData.AITaskPtr = nullptr;
+}
+
+EStateTreeRunStatus FSTT_SwitchWalkState::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (InstanceData.AITaskPtr)
+	{
+		if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
+		{
+			return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
+		}
+
+		if (InstanceData.bIscontinueCheck)
+		{
+			PerformMoveTask(Context);
+			InstanceData.AITaskPtr->ConditionalPerformTask();
+		}
+
+		return Super::Tick(Context, DeltaTime);
+	}
 	return EStateTreeRunStatus::Failed;
+}
+
+FSTT_SwitchWalkState::FAITaskType* FSTT_SwitchWalkState::PerformMoveTask(FStateTreeExecutionContext& Context) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	FAITaskType* AITaskPtr =
+		InstanceData.AITaskPtr.Get() ? InstanceData.AITaskPtr.Get() : UAITask::NewAITask<FAITaskType>(*InstanceData.AIControllerPtr, *InstanceData.TaskOwner);
+	if (AITaskPtr)
+	{
+		AITaskPtr->SetUp(
+			InstanceData.AIControllerPtr.Get(), 
+			FVector::Distance(InstanceData.CharacterPtr->GetActorLocation(), InstanceData.TargetCharacterPtr->GetActorLocation()) > 500,
+			InstanceData.bIscontinueCheck
+		);
+	}
+
+	return AITaskPtr;
 }

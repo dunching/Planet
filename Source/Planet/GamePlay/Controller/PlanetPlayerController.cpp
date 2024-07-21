@@ -237,7 +237,7 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 					NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
 					});
 
-
+				GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
 			}
 			else if (InPawn->IsA(AHorseCharacter::StaticClass()))
 			{

@@ -29,9 +29,10 @@ void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 			TeammateChangedDelegate = HumanCharacterPtr->GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(
 				std::bind(&ThisClass::OnTeamChanged, this)
 			);
+
 			OnTeamChanged();
 		}
-		
+
 		CaculationPatrolPosition();
 	}
 }
@@ -62,20 +63,18 @@ void USTE_Human::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 
 	switch (TeammateOption)
 	{
-	case ETeammateOption::kEnemy: 
+	case ETeammateOption::kEnemy:
 	{
 		FTSTicker::GetCoreTicker().RemoveTicker(CaculationDistance2AreaHandle);
-		CaculationDistance2AreaHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([&](float) {
-
-			if (HumanAIControllerPtr->BuildingArea)
-			{
-				const auto Distance = FVector::Distance(HumanCharacterPtr->GetActorLocation(), HumanAIControllerPtr->BuildingArea->GetActorLocation());
-				bIsInArea = Distance < HumanAIControllerPtr->BuildingArea->AreaPtr->GetScaledSphereRadius();
-
-				PRINTINVOKEWITHSTR(FString::Printf(TEXT("Update Distance 2 Area:%.2lf"), Distance));
-			}
-			return true;
-			}), 1.f);
+		CaculationDistance2AreaHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::UpdateInArea), 1.f);
+	}
+	break;
+	case ETeammateOption::kFollow:
+	{
+	}
+	break;
+	case ETeammateOption::kAssistance:
+	{
 	}
 	break;
 	}
@@ -139,6 +138,18 @@ void USTE_Human::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 		}
 		CaculationPatrolPosition();
 	}
+}
+
+bool USTE_Human::UpdateInArea(float DletaTime)
+{
+	if (HumanAIControllerPtr->BuildingArea)
+	{
+		const auto Distance = FVector::Distance(HumanCharacterPtr->GetActorLocation(), HumanAIControllerPtr->BuildingArea->GetActorLocation());
+		bIsInArea = Distance < HumanAIControllerPtr->BuildingArea->AreaPtr->GetScaledSphereRadius();
+
+		PRINTINVOKEWITHSTR(FString::Printf(TEXT("Update Distance 2 Area:%.2lf"), Distance));
+	}
+	return true;
 }
 
 void USTE_Human::CaculationPatrolPosition()

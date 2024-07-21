@@ -84,15 +84,18 @@ enum class ETagChangeType : uint8
 UENUM(BlueprintType)
 enum class ETeammateOption : uint8
 {
-	// 
+	// Groupmate
+	kFree,
+
+	// Teammate
 	kFollow,
 	kAssistance,
 
+	// 
+	kEnemy,
+
 	// Test
 	kTest,
-
-	//
-	kEnemy,
 };
 
 #pragma region Callback

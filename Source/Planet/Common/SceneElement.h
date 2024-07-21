@@ -71,6 +71,13 @@ enum class ESceneToolsType : uint8
 	kConsumables,
 	kSkill,
 	kGroupMate,
+	kCoin,
+};
+
+UENUM(BlueprintType)
+enum class ECoinUnitType : uint8
+{
+	kRegular,
 };
 
 UENUM(BlueprintType)
@@ -168,7 +175,8 @@ protected:
 		EToolUnitType, 
 		EWeaponUnitType,
 		EConsumableUnitType,
-		ESkillUnitType
+		ESkillUnitType,
+		ECoinUnitType
 	> UnitType;
 
 private:
@@ -184,6 +192,29 @@ SceneElementType UBasicUnit::GetSceneElementType() const
 {
 	return std::get<SceneElementType>(UnitType);
 }
+
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API UCoinUnit : public UBasicUnit
+{
+	GENERATED_BODY()
+
+public:
+
+	friend FSceneToolsContainer;
+
+	UCoinUnit();
+
+	void AddCurrentValue(int32 val);
+
+	int32 GetCurrentValue()const;
+
+protected:
+	
+	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
+
+	int32 Num = 1;
+
+};
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UConsumableUnit : public UBasicUnit
@@ -354,6 +385,10 @@ struct FSceneToolsContainer
 	
 	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(UConsumableUnit*, bool, int32)>;
 
+	using FOnCoinUnitChanged = TCallbackHandleContainer<void(UCoinUnit*, bool, int32)>;
+
+	UCoinUnit* AddUnit(ECoinUnitType Type, int32 Num = 1);
+
 	UConsumableUnit* AddUnit(EConsumableUnitType Type, int32 Num = 1);
 
 	void RemoveUnit(UConsumableUnit*UnitPtr, int32 Num = 1);
@@ -378,6 +413,8 @@ struct FSceneToolsContainer
 
 	FOnConsumableUnitChanged OnConsumableUnitChanged;
 
+	FOnCoinUnitChanged OnCoinUnitChanged;
+
 private:
 
 	UPROPERTY()
@@ -388,6 +425,8 @@ private:
 	TMap<EConsumableUnitType, UConsumableUnit*> ConsumablesUnitMap;
 
 	TMap<ESkillUnitType, USkillUnit*> SkillUnitMap;
+	
+	TMap<ECoinUnitType, UCoinUnit*> CoinUnitMap;
 
 };
 

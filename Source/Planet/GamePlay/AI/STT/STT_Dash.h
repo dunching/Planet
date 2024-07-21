@@ -10,7 +10,7 @@
 
 #include "GenerateType.h"
 
-#include "STT_DashToLeader.generated.h"
+#include "STT_Dash.generated.h"
 
 class IGameplayTaskOwnerInterface;
 
@@ -20,7 +20,7 @@ class AHumanCharacter;
 class AHumanAIController;
 
 USTRUCT()
-struct PLANET_API FStateTreeDashToLeaderTaskInstanceData
+struct PLANET_API FStateTreeDashTaskInstanceData
 {
 	GENERATED_BODY()
 
@@ -44,11 +44,11 @@ struct PLANET_API FStateTreeDashToLeaderTaskInstanceData
 };
 
 USTRUCT()
-struct PLANET_API FSTT_DashToLeader : public FStateTreeAIActionTaskBase
+struct PLANET_API FSTT_Dash : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeDashToLeaderTaskInstanceData;
+	using FInstanceDataType = FStateTreeDashTaskInstanceData;
 
 	using FAITaskType = UAITask_DashToLeader;
 

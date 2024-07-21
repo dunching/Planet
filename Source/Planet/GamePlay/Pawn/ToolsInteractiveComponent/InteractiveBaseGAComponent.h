@@ -29,6 +29,8 @@ public:
 
 	friend UGAEvent_Received;
 
+	using FOwnerPawnType = ACharacterBase;
+
 	using FCallbackHandleContainer = TCallbackHandleContainer<void(ETagChangeType, const FGameplayTag&)>;
 
 	static FName ComponentName;
@@ -70,6 +72,10 @@ public:
 	);
 
 	void InitialBaseGAs();
+
+	bool SwitchWalkState(bool bIsRun);
+	
+	bool Dash(EDashDirection DashDirection);
 
 	FGameplayAbilitySpecHandle SendEventHandle;
 

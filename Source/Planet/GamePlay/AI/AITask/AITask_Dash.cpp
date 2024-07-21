@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "AITask_DashToLeader.h"
+#include "AITask_Dash.h"
 
 #include "UObject/Package.h"
 #include "TimerManager.h"
@@ -10,7 +10,7 @@
 #include "AIResources.h"
 #include "GameplayTasksComponent.h"
 
-UAITask_DashToLeader::UAITask_DashToLeader(const FObjectInitializer& ObjectInitializer)
+UAITask_Dash::UAITask_Dash(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	bIsPausable = true;
@@ -18,14 +18,14 @@ UAITask_DashToLeader::UAITask_DashToLeader(const FObjectInitializer& ObjectIniti
 	bTickingTask = true;
 }
 
-void UAITask_DashToLeader::Activate()
+void UAITask_Dash::Activate()
 {
 	Super::Activate();
 
 	ConditionalPerformTask();
 }
 
-void UAITask_DashToLeader::TickTask(float DeltaTime)
+void UAITask_Dash::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
 
@@ -47,12 +47,12 @@ void UAITask_DashToLeader::TickTask(float DeltaTime)
 	}
 }
 
-void UAITask_DashToLeader::ConditionalPerformTask()
+void UAITask_Dash::ConditionalPerformTask()
 {
 	PerformTask();
 }
 
-bool UAITask_DashToLeader::WasMoveSuccessful() const
+bool UAITask_Dash::WasMoveSuccessful() const
 {
 // 	auto PawnPtr = ControllerPtr->GetPawn();
 // 	if (PawnPtr)
@@ -65,18 +65,18 @@ bool UAITask_DashToLeader::WasMoveSuccessful() const
 	return LerpTime < LerpDuration;
 }
 
-void UAITask_DashToLeader::SetUp(AAIController* InController, const FVector& InGoalLocation)
+void UAITask_Dash::SetUp(AAIController* InController, const FVector& InGoalLocation)
 {
 	ControllerPtr = InController;
 	GoalLocation = InGoalLocation;
 }
 
-void UAITask_DashToLeader::PerformTask()
+void UAITask_Dash::PerformTask()
 {
 
 }
 
-void UAITask_DashToLeader::OnDestroy(bool bInOwnerFinished)
+void UAITask_Dash::OnDestroy(bool bInOwnerFinished)
 {
 	Super::OnDestroy(bInOwnerFinished);
 }

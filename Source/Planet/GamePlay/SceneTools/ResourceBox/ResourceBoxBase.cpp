@@ -77,6 +77,10 @@ void AResourceBoxBase::AddItemsToTarget()
 		{
 			HoldItemPropertyRef.AddUnit(Iter.Key);
 		}
+		for (const auto Iter : CoinUnitMap)
+		{
+			HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
+		}
 	}
 }
 

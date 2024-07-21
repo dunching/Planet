@@ -10,17 +10,19 @@
 
 #include "GenerateType.h"
 
-#include "STT_DashToLeader.generated.h"
+#include "STT_SwitchWalkState.generated.h"
 
 class IGameplayTaskOwnerInterface;
 
-class UAITask_DashToLeader;
+class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
 class AHumanAIController;
 
+
+
 USTRUCT()
-struct PLANET_API FStateTreeDashToLeaderTaskInstanceData
+struct PLANET_API FStateTreeSwitchWalkStateTaskInstanceData
 {
 	GENERATED_BODY()
 
@@ -29,28 +31,28 @@ struct PLANET_API FStateTreeDashToLeaderTaskInstanceData
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = Context)
+	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Parameter)
-	FVector Destination = FVector::ZeroVector;
-
-	UPROPERTY(EditAnywhere, Category = Parameter)
-	float AcceptableRadius = 200.f;
+	bool bIscontinueCheck = true;
 
 	UPROPERTY(Transient)
-	TObjectPtr<UAITask_DashToLeader> AITaskPtr = nullptr;
+	TObjectPtr<UAITask_SwitchWalkState> AITaskPtr = nullptr;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 };
 
 USTRUCT()
-struct PLANET_API FSTT_DashToLeader : public FStateTreeAIActionTaskBase
+struct PLANET_API FSTT_SwitchWalkState : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeDashToLeaderTaskInstanceData;
+	using FInstanceDataType = FStateTreeSwitchWalkStateTaskInstanceData;
 
-	using FAITaskType = UAITask_DashToLeader;
+	using FAITaskType = UAITask_SwitchWalkState;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

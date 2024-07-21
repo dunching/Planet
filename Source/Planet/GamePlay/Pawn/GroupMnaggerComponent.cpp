@@ -27,6 +27,11 @@ void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPtr)
 {
 	GroupHelperSPtr = OwnerPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 
+	if (OwnerPtr->IsPlayerControlled())
+	{
+		TeamHelperSPtr->SwitchTeammateOption(ETeammateOption::kFree);
+	}
+
 	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 

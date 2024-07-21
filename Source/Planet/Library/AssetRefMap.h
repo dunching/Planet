@@ -38,6 +38,7 @@ class AGeneratorNPC;
 class UToolUnit;
 class UWeaponUnit;
 class USkillUnit;
+class UCoinUnit;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UObject
@@ -70,6 +71,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
 	TMap<EConsumableUnitType, TSubclassOf<UConsumableUnit>>ConsumableToolMap;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
+	TMap<ECoinUnitType, TSubclassOf<UCoinUnit>>CoinToolMap;
 #pragma endregion 
 
 #pragma region MenusUI

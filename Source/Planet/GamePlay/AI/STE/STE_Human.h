@@ -61,6 +61,8 @@ public:
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
+	bool UpdateInArea(float DletaTime);
+
 	void CaculationPatrolPosition();
 
 	bool GetPatrolPosition(float);
@@ -91,6 +93,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
 	bool bIsInArea = true;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
+	bool bIsNeedRun = false;
 
 	TCallbackHandleContainer<void(ETeammateOption, AHumanCharacter*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
 	

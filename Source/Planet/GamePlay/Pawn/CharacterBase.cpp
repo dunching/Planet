@@ -97,7 +97,6 @@ void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
@@ -218,5 +217,5 @@ void ACharacterBase::OnHPChanged(int32 CurrentValue)
 
 void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
 {
-	GetCharacterMovement()->MaxWalkSpeed = GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue();
+	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
 }

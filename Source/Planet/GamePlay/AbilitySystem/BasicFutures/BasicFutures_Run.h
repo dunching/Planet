@@ -51,4 +51,6 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
+
 };

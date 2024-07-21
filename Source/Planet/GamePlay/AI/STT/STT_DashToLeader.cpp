@@ -30,7 +30,7 @@ EStateTreeRunStatus FSTT_DashToLeader::EnterState(
 	{
 		if (InstanceData.AITaskPtr->IsActive())
 		{
-			InstanceData.AITaskPtr->ConditionalPerformMove();
+			InstanceData.AITaskPtr->ConditionalPerformTask();
 		}
 		else
 		{

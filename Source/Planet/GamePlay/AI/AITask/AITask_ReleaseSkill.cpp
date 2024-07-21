@@ -27,14 +27,14 @@ void UAITask_ReleaseSkill::Activate()
 {
 	Super::Activate();
 
-	ConditionalPerformMove();
+	ConditionalPerformTask();
 }
 
-void UAITask_ReleaseSkill::ConditionalPerformMove()
+void UAITask_ReleaseSkill::ConditionalPerformTask()
 {
 	CurrentTaslHasReleaseNum = 0;
 
-	PerformMove();
+	PerformTask();
 }
 
 bool UAITask_ReleaseSkill::WasMoveSuccessful() const
@@ -47,7 +47,7 @@ void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
 	CharacterPtr = InChracterPtr;
 }
 
-void UAITask_ReleaseSkill::PerformMove()
+void UAITask_ReleaseSkill::PerformTask()
 {
 	if (ReleasingSKill())
 	{

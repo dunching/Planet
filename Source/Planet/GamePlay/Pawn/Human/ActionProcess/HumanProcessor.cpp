@@ -132,21 +132,15 @@ namespace HumanProcessor
 	{
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
-		if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
+		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr)
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
 			{
-				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running };
-				OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
+				OnwerActorPtr->GetInteractiveBaseGAComponent()->SwitchWalkState(false);
 			}
-		}
-		else
-		{
-			if (OnwerActorPtr)
+			else
 			{
-				OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-					FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running }
-				);
+				OnwerActorPtr->GetInteractiveBaseGAComponent()->SwitchWalkState(true);
 			}
 		}
 	}
@@ -165,31 +159,31 @@ namespace HumanProcessor
 			auto EnhancedInputLocalPlayerSubsystemPtr = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
 				Cast<APlayerController>(OnwerActorPtr->GetController())->GetLocalPlayer()
 			);
-			FGameplayEventData Payload;
-			auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
+
+			EDashDirection DashDirection = EDashDirection::kForward;
+
 			if (EnhancedInputLocalPlayerSubsystemPtr->GetPlayerInput()->IsPressed(EKeys::W))
 			{
-				GameplayAbilityTargetData_DashPtr->DashDirection = EDashDirection::kForward;
+				DashDirection = EDashDirection::kForward;
 			}
 			else if (EnhancedInputLocalPlayerSubsystemPtr->GetPlayerInput()->IsPressed(EKeys::S))
 			{
-				GameplayAbilityTargetData_DashPtr->DashDirection = EDashDirection::kBackward;
+				DashDirection = EDashDirection::kBackward;
 			}
 			else if (EnhancedInputLocalPlayerSubsystemPtr->GetPlayerInput()->IsPressed(EKeys::A))
 			{
-				GameplayAbilityTargetData_DashPtr->DashDirection = EDashDirection::kLeft;
+				DashDirection = EDashDirection::kLeft;
 			}
 			else if (EnhancedInputLocalPlayerSubsystemPtr->GetPlayerInput()->IsPressed(EKeys::D))
 			{
-				GameplayAbilityTargetData_DashPtr->DashDirection = EDashDirection::kRight;
+				DashDirection = EDashDirection::kRight;
 			}
 			else
 			{
-				GameplayAbilityTargetData_DashPtr->DashDirection = EDashDirection::kForward;
+				DashDirection = EDashDirection::kForward;
 			}
-			Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Dash, Payload);
+			OnwerActorPtr->GetInteractiveBaseGAComponent()->Dash(DashDirection);
 		}
 	}
 

@@ -5,6 +5,7 @@
 #include <map>
 
 #include "GameplayAbilitySpec.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -34,6 +35,8 @@
 #include "Tool_PickAxe.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter.h"
+#include "GameplayTagsSubSystem.h"
+#include "BasicFutures_Dash.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -392,6 +395,58 @@ void UInteractiveBaseGAComponent::InitialBaseGAs()
 	// 基础属性
 	AddReceivedModify();
 #pragma endregion 结算效果修正
+}
+
+bool UInteractiveBaseGAComponent::SwitchWalkState(bool bIsRun)
+{
+	if (bIsRun)
+	{
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+		if (OnwerActorPtr)
+		{
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
+			{
+				return true;
+			}
+
+			return OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
+				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running }
+			);
+		}
+	}
+	else
+	{
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+		if (OnwerActorPtr)
+		{
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
+			{
+				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running };
+				OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
+			}
+
+			return !OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running);
+		}
+	}
+
+	return false;
+}
+
+bool UInteractiveBaseGAComponent::Dash(EDashDirection DashDirection)
+{
+	FGameplayEventData Payload;
+	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
+	GameplayAbilityTargetData_DashPtr->DashDirection = DashDirection;
+
+	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Dash, Payload);
+	}
+
+	return true;
 }
 
 void UInteractiveBaseGAComponent::AddSendGroupEffectModify()

@@ -4,7 +4,8 @@
 
 #include "Templates/SubclassOf.h"
 
-#include "Tasks\StateTreeMoveToTask.h"
+#include "Tasks/StateTreeMoveToTask.h"
+#include "Tasks/StateTreeAITask.h"
 #include "StateTreeExecutionContext.h"
 
 #include "STT_MoveTo.generated.h"

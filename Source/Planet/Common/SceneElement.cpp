@@ -141,6 +141,40 @@ UToolUnit* FSceneToolsContainer::AddUnit(EToolUnitType Type)
 	return ResultPtr;
 }
 
+UCoinUnit* FSceneToolsContainer::AddUnit(ECoinUnitType Type, int32 Num /*= 1*/)
+{
+	if (CoinUnitMap.Contains(Type))
+	{
+		auto Ref = CoinUnitMap[Type];
+
+		Ref->Num += Num;
+
+		OnCoinUnitChanged.ExcuteCallback(Ref, true, Num);
+
+		return Ref;
+	}
+	else
+	{
+		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+
+		auto ResultPtr = NewObject<UCoinUnit>(GetWorldImp(), AssetRefMapPtr->CoinToolMap[Type]);
+
+		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
+
+		ResultPtr->Num = Num;
+		ResultPtr->ID = NewID;
+		ResultPtr->UnitType = Type;
+
+		SceneToolsAry.Add(ResultPtr);
+		SceneMetaMap.Add(NewID, ResultPtr);
+		CoinUnitMap.Add(Type, ResultPtr);
+
+		OnCoinUnitChanged.ExcuteCallback(ResultPtr, true, Num);
+
+		return ResultPtr;
+	}
+}
+
 void FSceneToolsContainer::RemoveUnit(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
 {
 	if (UnitPtr)
@@ -309,4 +343,23 @@ UPassiveSkillUnit::UPassiveSkillUnit() :
 	Super()
 {
 	SkillType = ESkillType::kActive;
+}
+
+UCoinUnit::UCoinUnit() :
+	Super(ESceneToolsType::kCoin)
+{
+
+}
+
+void UCoinUnit::AddCurrentValue(int32 val)
+{
+	const auto Old = Num;
+	Num += val;
+
+	CallbackContainerHelper.ValueChanged(Old, Num);
+}
+
+int32 UCoinUnit::GetCurrentValue() const
+{
+	return Num;
 }

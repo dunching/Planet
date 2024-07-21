@@ -51,6 +51,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<ESkillUnitType, int32> SkillUnitMap;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<ECoinUnitType, int32> CoinUnitMap;
+	
 #endif
 
 };

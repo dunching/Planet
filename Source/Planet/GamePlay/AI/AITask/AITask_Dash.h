@@ -9,18 +9,18 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "Tasks/AITask.h"
 
-#include "AITask_DashToLeader.generated.h"
+#include "AITask_Dash.generated.h"
 
 class AAIController;
 
 UCLASS()
-class PLANET_API UAITask_DashToLeader : public UAITask
+class PLANET_API UAITask_Dash : public UAITask
 {
 	GENERATED_BODY()
 
 public:
 
-	UAITask_DashToLeader(const FObjectInitializer& ObjectInitializer);
+	UAITask_Dash(const FObjectInitializer& ObjectInitializer);
 
 	void ConditionalPerformTask();
 
