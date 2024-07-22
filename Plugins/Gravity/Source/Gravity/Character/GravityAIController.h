@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "AIController.h"
+#include "DetourCrowdAIController.h"
 
 #include "GravityAIController.generated.h"
 
@@ -14,6 +15,8 @@ class GRAVITY_API AGravityAIController : public AAIController
 	GENERATED_BODY()
 
 public:
+
+	AGravityAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn)override;
 

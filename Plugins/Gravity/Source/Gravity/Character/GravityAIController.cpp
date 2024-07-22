@@ -6,9 +6,15 @@
 #include <IXRTrackingSystem.h>
 #include <IXRCamera.h>
 #include <Kismet/KismetMathLibrary.h>
+#include <Navigation/CrowdFollowingComponent.h>
 
 #include "GravityCharacter.h"
 #include "GravityMovementComponent.h"
+
+AGravityAIController::AGravityAIController(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")))
+{
+}
 
 void AGravityAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
 {

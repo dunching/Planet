@@ -34,6 +34,25 @@
 #include "GA_Periodic_PropertyModify.h"
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
+#include "GravityPlayerController.h"
+
+void TestCommand::TestPlayerCharacterMoveTo(const TArray< FString >& Args)
+{
+	if (Args.IsValidIndex(0))
+	{
+		TArray<AActor*> OutActors;
+		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorldImp(), AActor::StaticClass(), *Args[0], OutActors);
+
+		if (OutActors.IsValidIndex(0))
+		{
+			auto PCPtr = Cast<AGravityPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+			if (PCPtr)
+			{
+				PCPtr->MoveToLocation(OutActors[0]->GetActorLocation(), 50);
+			}
+		}
+	}
+}
 
 void TestCommand::TestCameraManager(const TArray< FString >& Args)
 {

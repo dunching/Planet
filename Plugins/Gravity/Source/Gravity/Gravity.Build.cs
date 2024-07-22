@@ -40,7 +40,9 @@ public class Gravity : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"AIModule",
+
+                "NavigationSystem",
+                "AIModule",
             }
 			);
 

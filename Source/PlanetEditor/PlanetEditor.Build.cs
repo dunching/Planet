@@ -4,7 +4,7 @@ using UnrealBuildTool;
 
 public class PlanetEditor : ModuleRules
 {
-	public PlanetEditor(ReadOnlyTargetRules Target) : base(Target)
+    public PlanetEditor(ReadOnlyTargetRules Target) : base(Target)
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -37,7 +37,11 @@ public class PlanetEditor : ModuleRules
             "Engine",
             "GameplayTags",
 
+            "NavigationSystem",
+            "AIModule",
+
             "Tools",
+            "Gravity",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {
