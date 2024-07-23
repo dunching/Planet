@@ -14,6 +14,7 @@
 
 #include "HumanAIController.generated.h"
 
+class USplineComponent;
 class UCharacterTitle;
 class UGroupMnaggerComponent;
 class UGourpmateUnit;
@@ -60,6 +61,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	ABuildingArea* BuildingArea = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	USplineComponent* PatrolSPlinePtr = nullptr;
 
 protected:
 

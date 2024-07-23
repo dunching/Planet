@@ -56,9 +56,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHorseCharacter>HorseClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GeneratorNPCClass")
-	TSubclassOf<AGeneratorNPC>GeneratorNPCClass;
-	
 #pragma region SceneTools
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
 	TMap<EToolUnitType, TSubclassOf<UToolUnit>>EquipmentToolsMap;

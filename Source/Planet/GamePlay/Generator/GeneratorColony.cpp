@@ -41,15 +41,27 @@ void AGeneratorColony::BeginPlay()
 
 	// 
 	{
+		AHumanCharacter * FirstCharacterPtr = nullptr;
+
 		TArray<UChildActorComponent*>Components;
 		GetComponents(UChildActorComponent::StaticClass(), Components);
+
 		for (const auto Iter : Components)
 		{
 			if (Iter->GetChildActor()->IsA(AHumanCharacter::StaticClass()))
 			{
-				auto CharacterPtr = Cast<ACharacterBase>(Iter->GetChildActor());
+				auto CharacterPtr = Cast<AHumanCharacter>(Iter->GetChildActor());
 				if (CharacterPtr)
 				{
+					if (FirstCharacterPtr)
+					{
+						FirstCharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(CharacterPtr);
+					}
+					else
+					{
+						FirstCharacterPtr = CharacterPtr;
+					}
+
 					auto AIControllerPtr = CharacterPtr->GetController<AHumanAIController>();
 					if (AIControllerPtr)
 					{
