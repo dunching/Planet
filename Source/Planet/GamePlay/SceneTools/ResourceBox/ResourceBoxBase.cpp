@@ -7,6 +7,7 @@
 
 #include "HoldingItemsComponent.h"
 #include "CharacterBase.h"
+#include "PlanetPlayerState.h"
 
 AResourceBoxBase::AResourceBoxBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -62,24 +63,29 @@ void AResourceBoxBase::AddItemsToTarget()
 {
 	if (TargetCharacterPtr)
 	{
-		auto & HoldItemPropertyRef = TargetCharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-		for (const auto Iter : ConsumableUnitMap)
 		{
-			HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
+			auto& HoldItemPropertyRef = TargetCharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+			for (const auto Iter : ConsumableUnitMap)
+			{
+				HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
+			}
+			for (const auto Iter : ToolUnitMap)
+			{
+			}
+			for (const auto Iter : WeaponUnitMap)
+			{
+			}
+			for (const auto Iter : SkillUnitMap)
+			{
+				HoldItemPropertyRef.AddUnit(Iter.Key);
+			}
 		}
-		for (const auto Iter : ToolUnitMap)
 		{
-		}
-		for (const auto Iter : WeaponUnitMap)
-		{
-		}
-		for (const auto Iter : SkillUnitMap)
-		{
-			HoldItemPropertyRef.AddUnit(Iter.Key);
-		}
-		for (const auto Iter : CoinUnitMap)
-		{
-			HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
+			auto& HoldItemPropertyRef = TargetCharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty();
+			for (const auto Iter : CoinUnitMap)
+			{
+				HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
+			}
 		}
 	}
 }

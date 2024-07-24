@@ -50,6 +50,8 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/UI/MenuS/DragDropOperations");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/SkillsMenu");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/TalentAllocation");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/CoinList");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/RaffleMenu");
         PublicIncludePaths.Add("Planet/GamePlay/UI/EffectsList");
         PublicIncludePaths.Add("Planet/GamePlay/UI/UMGs");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
@@ -143,7 +145,5 @@ public class Planet : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[] {
             "Gravity",
         });
-
-        // b*[^:b#/]+.*$
     }
 }

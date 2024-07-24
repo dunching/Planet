@@ -77,7 +77,14 @@ enum class ESceneToolsType : uint8
 UENUM(BlueprintType)
 enum class ECoinUnitType : uint8
 {
+	// 
 	kRegular,
+
+	// ³£×¤³é
+	kRafflePermanent,
+
+	// ÏÞ¶¨³é
+	kRaffleLimit,
 };
 
 UENUM(BlueprintType)

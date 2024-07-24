@@ -4,6 +4,7 @@
 #include <NavigationSystem.h>
 #include <Perception/AIPerceptionComponent.h>
 #include <Components/SphereComponent.h>
+#include <Components/SplineComponent.h>
 
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
@@ -66,7 +67,6 @@ void USTE_Human::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 	case ETeammateOption::kEnemy:
 	{
 		FTSTicker::GetCoreTicker().RemoveTicker(CaculationDistance2AreaHandle);
-		CaculationDistance2AreaHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::UpdateInArea), 1.f);
 	}
 	break;
 	case ETeammateOption::kFollow:
@@ -142,12 +142,25 @@ void USTE_Human::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 
 bool USTE_Human::UpdateInArea(float DletaTime)
 {
-	if (HumanAIControllerPtr->BuildingArea)
+	if (HumanAIControllerPtr->PatrolSPlinePtr)
 	{
-		const auto Distance = FVector::Distance(HumanCharacterPtr->GetActorLocation(), HumanAIControllerPtr->BuildingArea->GetActorLocation());
-		bIsInArea = Distance < HumanAIControllerPtr->BuildingArea->AreaPtr->GetScaledSphereRadius();
+		if (HumanAIControllerPtr->BuildingArea)
+		{
+			const auto ClosestPt = HumanAIControllerPtr->PatrolSPlinePtr->FindLocationClosestToWorldLocation(
+				HumanCharacterPtr->GetActorLocation(), ESplineCoordinateSpace::World
+			);
+			bIsFarwayPatrolSpline = FVector::Distance(ClosestPt, ClosestPt) > MaxDistanceToPatrolSpline;
+		}
+	}
+	else
+	{
+		if (HumanAIControllerPtr->BuildingArea)
+		{
+			const auto Distance = FVector::Distance(HumanCharacterPtr->GetActorLocation(), HumanAIControllerPtr->BuildingArea->GetActorLocation());
+			bIsInArea = Distance < HumanAIControllerPtr->BuildingArea->AreaPtr->GetScaledSphereRadius();
 
-		PRINTINVOKEWITHSTR(FString::Printf(TEXT("Update Distance 2 Area:%.2lf"), Distance));
+			PRINTINVOKEWITHSTR(FString::Printf(TEXT("Update Distance 2 Area:%.2lf"), Distance));
+		}
 	}
 	return true;
 }

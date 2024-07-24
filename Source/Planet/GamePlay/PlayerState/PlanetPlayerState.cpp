@@ -10,4 +10,26 @@
 APlanetPlayerState::APlanetPlayerState() :
 	Super()
 {
+	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
+}
+
+UHoldingItemsComponent* APlanetPlayerState::GetHoldingItemsComponent()
+{
+	return HoldingItemsComponentPtr;
+}
+
+void APlanetPlayerState::BeginPlay()
+{
+	Super::BeginPlay();
+
+	InitialData();
+}
+
+void APlanetPlayerState::InitialData()
+{
+	auto& HoldItemComponent = HoldingItemsComponentPtr->GetHoldItemProperty();
+
+	HoldItemComponent.AddUnit(ECoinUnitType::kRegular);
+	HoldItemComponent.AddUnit(ECoinUnitType::kRafflePermanent);
+	HoldItemComponent.AddUnit(ECoinUnitType::kRaffleLimit);
 }

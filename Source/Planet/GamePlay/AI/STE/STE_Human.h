@@ -62,7 +62,7 @@ public:
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	bool UpdateInArea(float DletaTime);
-
+	
 	void CaculationPatrolPosition();
 
 	bool GetPatrolPosition(float);
@@ -76,6 +76,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
+	int32 MaxDistanceToPatrolSpline = 1000;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kFollow;
@@ -93,6 +96,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
 	bool bIsInArea = true;
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
+	bool bIsFarwayPatrolSpline= true;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
 	bool bIsNeedRun = false;
