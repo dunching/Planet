@@ -29,6 +29,7 @@
 #include "FocusIcon.h"
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
+#include "UICommon.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -54,7 +55,7 @@ void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type 
 		if (FocusIconPtr)
 		{
 			FocusIconPtr->FocusItem = FocusInformation.Priorities[InPriority];
-			FocusIconPtr->AddToViewport();
+			FocusIconPtr->AddToViewport(EUIOrder::kFocus);
 		}
 	}
 }

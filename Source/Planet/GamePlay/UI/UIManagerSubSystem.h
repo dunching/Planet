@@ -31,6 +31,7 @@ class UEffectsList;
 class UProgressTips;
 class UHUD_TeamInfo;
 class UGetItemInfos;
+class URaffleMenu;
 
 struct FPawnDataStruct;
 struct FSceneTool;
@@ -54,7 +55,7 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	// 普通界面、
+	// 普通界面(技能状态HUD)、
 	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*CharacterPtr = nullptr);
 	
 	// 工具、
@@ -74,7 +75,10 @@ public:
 	
 	// 出战队员列表
 	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
-	
+
+	// 抽卡界面
+	void ViewRaffleMenu(bool bIsDisplay);
+
 	// 效果栏（buff、debuff）
 	UEffectsList* ViewEffectsList(bool bIsViewMenus);
 	
@@ -90,6 +94,9 @@ protected:
 
 	UPROPERTY()
 	UMainUILayout* MainUILayoutPtr = nullptr;
+	
+	UPROPERTY()
+	URaffleMenu* RaffleMenuPtr = nullptr;
 
 private:
 

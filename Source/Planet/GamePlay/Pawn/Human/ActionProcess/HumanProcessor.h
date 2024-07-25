@@ -67,5 +67,7 @@ namespace HumanProcessor
 
 		void SwitchWalkingOrRunning();
 
+		void Switch2RegularProcessor();
+
 	};
 }

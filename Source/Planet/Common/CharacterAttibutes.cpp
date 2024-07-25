@@ -4,6 +4,7 @@
 #include "AssetRefMap.h"
 #include "FightingTips.h"
 #include "Planet.h"
+#include "UICommon.h"
 
 void FBasePropertySet::AddCurrentValue(int32 NewValue, FGuid GUID)
 {
@@ -198,7 +199,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	// 显示对应的浮动UI
 	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
 	UIPtr->ProcessGAEVent(GAEvent);
-	UIPtr->AddToViewport();
+	UIPtr->AddToViewport(EUIOrder::kFightingTips);
 }
 
 FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)

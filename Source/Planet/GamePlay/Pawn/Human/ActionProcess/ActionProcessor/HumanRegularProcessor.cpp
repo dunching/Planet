@@ -64,6 +64,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
+#include "HumanViewRaffleMenu.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
@@ -241,6 +242,11 @@ namespace HumanProcessor
 		{
 			OnwerActorPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kAssistance);
 		}
+	}
+
+	void FHumanRegularProcessor::F10KeyPressed()
+	{
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewRaffleMenuProcessor>();
 	}
 
 	void FHumanRegularProcessor::EKeyPressed()

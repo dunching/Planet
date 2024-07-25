@@ -34,8 +34,7 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(true, HumanCharaterPtr->GetHoldingItemsComponent()->GetHoldItemProperty());
+		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(true);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
@@ -48,8 +47,7 @@ namespace HumanProcessor
 
 	void FHumanViewRaffleMenuProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
+		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(false);
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
@@ -90,7 +88,7 @@ namespace HumanProcessor
 
 	void FHumanViewRaffleMenuProcessor::QuitCurrentState()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FBuildingBaseProcessor>();
+		Switch2RegularProcessor();
 	}
 
 }

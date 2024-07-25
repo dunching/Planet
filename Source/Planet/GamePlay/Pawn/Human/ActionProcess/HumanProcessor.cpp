@@ -53,6 +53,7 @@
 #include "CharacterAttibutes.h"
 #include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
+#include "HumanRegularProcessor.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugHumanProcessor(

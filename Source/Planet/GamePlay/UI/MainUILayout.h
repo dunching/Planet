@@ -18,6 +18,12 @@ class PLANET_API UMainUILayout : public UMyUserWidget
 
 public:
 
+#if WITH_EDITOR
+	virtual void NativeConstruct()override;
+#else
+	virtual void NativePreConstruct()override;
+#endif
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName PawnActionStateHUDSocket;
 

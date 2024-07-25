@@ -32,15 +32,22 @@
 #include "GroupManaggerMenu.h"
 #include "HUD_TeamInfo.h"
 #include "GetItemInfos.h"
+#include "RaffleMenu.h"
+#include "PlanetPlayerState.h"
+#include "UICommon.h"
 
 namespace UIManagerSubSystem
 {
 	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
+
+	FName RaffleMenu_Socket = TEXT("RaffleMenu_Socket");
 }
 
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
 {
-	return Cast<UUIManagerSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UUIManagerSubSystem::StaticClass()));
+	return Cast<UUIManagerSubSystem>(
+		USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UUIManagerSubSystem::StaticClass())
+	);
 }
 
 UUIManagerSubSystem::UUIManagerSubSystem() :
@@ -334,6 +341,40 @@ void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* Huma
 	}
 }
 
+void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
+{
+	if (RaffleMenuPtr)
+	{
+		if (bIsDisplay)
+		{
+			RaffleMenuPtr->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			RaffleMenuPtr->RemoveFromParent();
+			RaffleMenuPtr = nullptr;
+		}
+	}
+	else
+	{
+		if (bIsDisplay)
+		{
+			RaffleMenuPtr = CreateWidget<URaffleMenu>(GetWorldImp(), UAssetRefMap::GetInstance()->RaffleMenuClass);
+			if (RaffleMenuPtr)
+			{
+				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+				if (CharacterPtr)
+				{
+					RaffleMenuPtr->SetHoldItemProperty(
+						CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty()
+					);
+				}
+				RaffleMenuPtr->AddToViewport(EUIOrder::kRaffle);
+			}
+		}
+	}
+}
+
 UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
 {
 	MainUILayoutPtr = GetMainUILAyout();
@@ -432,7 +473,7 @@ UMainUILayout* UUIManagerSubSystem::GetMainUILAyout()
 		MainUILayoutPtr = CreateWidget<UMainUILayout>(GetWorldImp(), UAssetRefMap::GetInstance()->MainUILayoutClass);
 		if (MainUILayoutPtr)
 		{
-			MainUILayoutPtr->AddToViewport();
+			MainUILayoutPtr->AddToViewport(EUIOrder::kMainUI);
 
 			DisplayActionStateHUD(false);
 			DisplayBuildingStateHUD(false);
@@ -443,6 +484,7 @@ UMainUILayout* UUIManagerSubSystem::GetMainUILAyout()
 			DisplayTeamInfo(false);
 			ViewEffectsList(false);
 			ViewProgressTips(false);
+			ViewRaffleMenu(false);
 		}
 	}
 

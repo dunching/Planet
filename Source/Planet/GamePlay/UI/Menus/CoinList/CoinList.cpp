@@ -26,7 +26,7 @@ void UCoinList::NativeDestruct()
 	Super::NativeDestruct(); 
 }
 
-void UCoinList::ResetUIByData(const TArray<UCoinUnit*>& Ary)
+void UCoinList::ResetUIByData(const TMap<ECoinUnitType, UCoinUnit*>& CoinMap)
 {
 	auto UIPtr = Cast<UHorizontalBox>(GetWidgetFromName(CoinList::HorizontalBox));
 	if (!UIPtr)
@@ -36,12 +36,12 @@ void UCoinList::ResetUIByData(const TArray<UCoinUnit*>& Ary)
 
 	UIPtr->ClearChildren();
 
-	for (const auto& Iter : Ary)
+	for (const auto& Iter : CoinMap)
 	{
 		auto WidgetPtr = CreateWidget<UCoinInfo>(this, CoinInfoClass);
 		if (WidgetPtr)
 		{
-			WidgetPtr->ResetToolUIByData(Iter);
+			WidgetPtr->ResetToolUIByData(Iter.Value);
 			UIPtr->AddChild(WidgetPtr);
 		}
 	}

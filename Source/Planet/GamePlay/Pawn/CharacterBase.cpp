@@ -37,6 +37,7 @@
 #include "InteractiveSkillComponent.h"
 #include "InteractiveToolComponent.h"
 #include "CharacterTitle.h"
+#include "UICommon.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -104,7 +105,7 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	if (CharacterTitlePtr)
 	{
 		CharacterTitlePtr->CharacterPtr = this;
-		CharacterTitlePtr->AddToViewport();
+		CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
 	}
 
 	auto GASPtr = GetAbilitySystemComponent();

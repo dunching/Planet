@@ -37,7 +37,7 @@ void UCoinInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UCoinInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kTool)
+	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kCoin)
 	{
 		UnitPtr = Cast<UCoinUnit>(BasicUnitPtr);
 		SetNum(UnitPtr->GetCurrentValue());

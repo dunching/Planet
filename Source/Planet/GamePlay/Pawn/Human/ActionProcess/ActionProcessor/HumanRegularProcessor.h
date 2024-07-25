@@ -43,6 +43,8 @@ namespace HumanProcessor
 		virtual void F1KeyPressed()override;
 
 		virtual void F2KeyPressed()override;
+		
+		virtual void F10KeyPressed()override;
 
 		virtual void EKeyPressed()override;
 

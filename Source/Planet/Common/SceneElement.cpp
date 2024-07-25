@@ -249,6 +249,11 @@ const TArray<UBasicUnit*>& FSceneToolsContainer::GetSceneUintAry() const
 	return SceneToolsAry;
 }
 
+const TMap<ECoinUnitType, UCoinUnit*>& FSceneToolsContainer::GetCoinUintAry() const
+{
+	return CoinUnitMap;
+}
+
 UBasicUnit::UBasicUnit(ESceneToolsType InSceneToolsType) :
 	SceneToolsType(InSceneToolsType)
 {

@@ -80,6 +80,8 @@ protected:
 
 	void F2KeyPressed();
 
+	void F10KeyPressed();
+
 	void QKeyPressed();
 
 	void WKeyPressed();

@@ -80,6 +80,7 @@ void UInputProcessorSubSystem::BindAction(UInputComponent* PlayerInputComponent)
 
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::F1], ETriggerEvent::Started, this, &ThisClass::F1KeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::F2], ETriggerEvent::Started, this, &ThisClass::F2KeyPressed);
+		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::F10], ETriggerEvent::Started, this, &ThisClass::F10KeyPressed);
 
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::Q], ETriggerEvent::Started, this, &ThisClass::QKeyPressed);
 		EnhancedInputComponent->BindAction(InputActionsPtr->KeyEventMap[EKeys::W], ETriggerEvent::Started, this, &ThisClass::WKeyPressed);
@@ -153,6 +154,11 @@ void UInputProcessorSubSystem::F1KeyPressed()
 void UInputProcessorSubSystem::F2KeyPressed()
 {
 	CurrentProcessorSPtr->F2KeyPressed();
+}
+
+void UInputProcessorSubSystem::F10KeyPressed()
+{
+	CurrentProcessorSPtr->F10KeyPressed();
 }
 
 void UInputProcessorSubSystem::WKeyPressed()

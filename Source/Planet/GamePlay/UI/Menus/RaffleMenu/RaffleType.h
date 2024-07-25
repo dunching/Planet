@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "RaffleCommon.h"
 
 #include "RaffleType.generated.h"
 
@@ -21,10 +22,30 @@ class PLANET_API URaffleType : public UMyUserWidget
 
 public:
 
+	using FOnClicked = TCallbackHandleContainer<void(URaffleType*)>;
+
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
 
+	void UnSelect();
+
+	void Select();
+
+	FOnClicked OnClicked;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RaffleType")
+	ERaffleType RaffleType = ERaffleType::kRafflePermanent;
+
 protected:
+	
+	UFUNCTION()
+	void OnBtnClicked();
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Display")
+	FString DisplayText = TEXT("卡池类型");
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Display")
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
 };

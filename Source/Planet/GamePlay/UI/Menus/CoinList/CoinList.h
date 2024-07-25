@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "SceneElement.h"
 
 #include "CoinList.generated.h"
 
@@ -26,7 +27,7 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	virtual void ResetUIByData(const TArray<UCoinUnit*>& Ary);
+	virtual void ResetUIByData(const TMap<ECoinUnitType, UCoinUnit*>& CoinMap);
 
 protected:
 	

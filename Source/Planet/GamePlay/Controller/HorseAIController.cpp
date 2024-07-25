@@ -18,6 +18,7 @@
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
+#include "UICommon.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
 	Super()
@@ -213,7 +214,7 @@ void AHorseAIController::InitialCharacter()
 		if (AIHumanInfoPtr)
 		{
 			AIHumanInfoPtr->CharacterPtr = CharacterPtr;
-			AIHumanInfoPtr->AddToViewport();
+			AIHumanInfoPtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
 		}
 
 		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();

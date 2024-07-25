@@ -34,7 +34,7 @@ void UInputActions::InitialInputMapping()
 		}
 	}
 
-	TArray<FKey> Axis1DEventAry
+	const TArray<FKey> Axis1DEventAry
 	{
 		EKeys::MouseY ,
 		EKeys::MouseX ,
@@ -50,7 +50,7 @@ void UInputActions::InitialInputMapping()
 		InputMappingContext->MapKey(InputActionPtr, Iter);
 	}
 
-	TArray<FKey> BoolEventAry
+	const TArray<FKey> BoolEventAry
 	{
 		EKeys::LeftMouseButton,
 		EKeys::RightMouseButton,
@@ -70,6 +70,12 @@ void UInputActions::InitialInputMapping()
 		EKeys::F2,
 		EKeys::F3,
 		EKeys::F4,
+		EKeys::F5,
+		EKeys::F6,
+		EKeys::F7,
+		EKeys::F8,
+		EKeys::F9,
+		EKeys::F10,
 
 		EKeys::Q,
 		EKeys::W,

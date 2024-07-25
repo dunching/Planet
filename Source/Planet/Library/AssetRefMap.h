@@ -16,6 +16,7 @@ class UMaterialInstance;
 class USkeletalMesh;
 
 class UMainUILayout;
+class URaffleMenu;
 class UPawnStateActionHUD;
 class UPawnStateBuildingHUD;
 class UItemsDragDropOperation;
@@ -85,6 +86,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UBackpackMenu>BackpackMenuClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<URaffleMenu>RaffleMenuClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UAllocationSkillsMenu>AllocationSkillsMenuClass;

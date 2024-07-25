@@ -68,6 +68,8 @@ public:
 
 	virtual void F2KeyPressed();
 
+	virtual void F10KeyPressed();
+
 	virtual void QKeyPressed();
 
 	virtual void WKeyPressed();

@@ -414,6 +414,8 @@ struct FSceneToolsContainer
 
 	const TArray<UBasicUnit*>& GetSceneUintAry()const;
 
+	const TMap<ECoinUnitType, UCoinUnit*>& GetCoinUintAry()const;
+
 	FOnSkillUnitChanged OnSkillUnitChanged;
 
 	FOnToolUnitChanged OnToolUnitChanged;

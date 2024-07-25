@@ -15,8 +15,9 @@
 #include "WeaponsIcon.h"
 #include "CharacterBase.h"
 #include "InteractiveSkillComponent.h"
+#include "UICommon.h"
 
-namespace AllocationSkillsMenu
+struct AllocationSkillsMenu : public TGetSocketName<AllocationSkillsMenu>
 {
 	const FName WeaponsTileView = TEXT("WeaponsTileView");
 
@@ -98,7 +99,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 	{
 		TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::MainWeapon));
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().MainWeapon));
 			if (IconPtr && IconPtr->WeaponUnitPtr)
 			{
 				FirstWeaponSocketInfoSPtr->WeaponSocket = IconPtr->IconSocket;
@@ -107,7 +108,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 		}
 		TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::SecondaryWeapon));
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().SecondaryWeapon));
 			if (IconPtr && IconPtr->WeaponUnitPtr)
 			{
 				SecondWeaponSocketInfoSPtr->WeaponSocket = IconPtr->IconSocket;
@@ -126,16 +127,16 @@ void UAllocationSkillsMenu::NativeDestruct()
 
 		TArray<FHelper>Ary
 		{
-			{AllocationSkillsMenu::ActiveSkill1,ActiveSkills_1},
-			{AllocationSkillsMenu::ActiveSkill2,ActiveSkills_2},
-			{AllocationSkillsMenu::ActiveSkill3,ActiveSkills_3},
-			{AllocationSkillsMenu::ActiveSkill4,ActiveSkills_4},
-			{AllocationSkillsMenu::PassivSkill1,EKeys::Invalid},
-			{AllocationSkillsMenu::PassivSkill2,EKeys::Invalid},
-			{AllocationSkillsMenu::PassivSkill3,EKeys::Invalid},
-			{AllocationSkillsMenu::PassivSkill4,EKeys::Invalid},
-			{AllocationSkillsMenu::PassivSkill5,EKeys::Invalid},
-//			{AllocationSkillsMenu::TalentPassivSkill,EKeys::Invalid},
+			{AllocationSkillsMenu::Get().ActiveSkill1,ActiveSkills_1},
+			{AllocationSkillsMenu::Get().ActiveSkill2,ActiveSkills_2},
+			{AllocationSkillsMenu::Get().ActiveSkill3,ActiveSkills_3},
+			{AllocationSkillsMenu::Get().ActiveSkill4,ActiveSkills_4},
+			{AllocationSkillsMenu::Get().PassivSkill1,EKeys::Invalid},
+			{AllocationSkillsMenu::Get().PassivSkill2,EKeys::Invalid},
+			{AllocationSkillsMenu::Get().PassivSkill3,EKeys::Invalid},
+			{AllocationSkillsMenu::Get().PassivSkill4,EKeys::Invalid},
+			{AllocationSkillsMenu::Get().PassivSkill5,EKeys::Invalid},
+//			{AllocationSkillsMenu::Get().TalentPassivSkill,EKeys::Invalid},
 		};
 
 		TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
@@ -167,7 +168,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 void UAllocationSkillsMenu::ResetUIByData_Skills()
 {
 	{
-		auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::WeaponsTileView));
+		auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::Get().WeaponsTileView));
 		if (!TileViewPtr)
 		{
 			return;
@@ -175,7 +176,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 		TileViewPtr->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
-	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::SkillsTileView));
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::Get().SkillsTileView));
 	if (!TileViewPtr)
 	{
 		return;
@@ -214,18 +215,18 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 				{
 					TArray<FName>Ary
 					{
-						{AllocationSkillsMenu::ActiveSkill1},
-						{AllocationSkillsMenu::ActiveSkill2},
-						{AllocationSkillsMenu::ActiveSkill3},
-						{AllocationSkillsMenu::ActiveSkill4},
-						{AllocationSkillsMenu::WeaponActiveSkill1},
-						{AllocationSkillsMenu::WeaponActiveSkill2},
-						{AllocationSkillsMenu::PassivSkill1},
-						{AllocationSkillsMenu::PassivSkill2},
-						{AllocationSkillsMenu::PassivSkill3},
-						{AllocationSkillsMenu::PassivSkill4},
-						{AllocationSkillsMenu::PassivSkill5},
-						{AllocationSkillsMenu::TalentPassivSkill},
+						{AllocationSkillsMenu::Get().ActiveSkill1},
+						{AllocationSkillsMenu::Get().ActiveSkill2},
+						{AllocationSkillsMenu::Get().ActiveSkill3},
+						{AllocationSkillsMenu::Get().ActiveSkill4},
+						{AllocationSkillsMenu::Get().WeaponActiveSkill1},
+						{AllocationSkillsMenu::Get().WeaponActiveSkill2},
+						{AllocationSkillsMenu::Get().PassivSkill1},
+						{AllocationSkillsMenu::Get().PassivSkill2},
+						{AllocationSkillsMenu::Get().PassivSkill3},
+						{AllocationSkillsMenu::Get().PassivSkill4},
+						{AllocationSkillsMenu::Get().PassivSkill5},
+						{AllocationSkillsMenu::Get().TalentPassivSkill},
 					};
 
 					for (const auto& IconIter : Ary)
@@ -242,8 +243,8 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 				{
 					TArray<FName>Ary
 					{
-						{AllocationSkillsMenu::MainWeapon},
-						{AllocationSkillsMenu::SecondaryWeapon},
+						{AllocationSkillsMenu::Get().MainWeapon},
+						{AllocationSkillsMenu::Get().SecondaryWeapon},
 					};
 
 					for (const auto& IconIter : Ary)
@@ -294,7 +295,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocke
 	}
 	{
 		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::MainWeapon));
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().MainWeapon));
 			if (IconPtr)
 			{
 				IconPtr->ResetToolUIByData(
@@ -304,7 +305,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocke
 				);
 			}
 		}
-		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().WeaponActiveSkill1));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
@@ -317,7 +318,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocke
 
 	{
 		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::SecondaryWeapon));
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().SecondaryWeapon));
 			if (IconPtr)
 			{
 				IconPtr->ResetToolUIByData(
@@ -327,7 +328,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocke
 				);
 			}
 		}
-		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().WeaponActiveSkill2));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
@@ -342,7 +343,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocke
 void UAllocationSkillsMenu::ResetUIByData_Weapons()
 {
 	{
-		auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::SkillsTileView));
+		auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::Get().SkillsTileView));
 		if (!TileViewPtr)
 		{
 			return;
@@ -350,7 +351,7 @@ void UAllocationSkillsMenu::ResetUIByData_Weapons()
 		TileViewPtr->SetVisibility(ESlateVisibility::Collapsed);
 	}
 
-	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::WeaponsTileView));
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(AllocationSkillsMenu::Get().WeaponsTileView));
 	if (!TileViewPtr)
 	{
 		return;
@@ -372,18 +373,18 @@ void UAllocationSkillsMenu::ResetUIByData_Weapons()
 				{
 					TArray<FName>Ary
 					{
-						{AllocationSkillsMenu::ActiveSkill1},
-						{AllocationSkillsMenu::ActiveSkill2},
-						{AllocationSkillsMenu::ActiveSkill3},
-						{AllocationSkillsMenu::ActiveSkill4},
-						{AllocationSkillsMenu::WeaponActiveSkill1},
-						{AllocationSkillsMenu::WeaponActiveSkill2},
-						{AllocationSkillsMenu::PassivSkill1},
-						{AllocationSkillsMenu::PassivSkill2},
-						{AllocationSkillsMenu::PassivSkill3},
-						{AllocationSkillsMenu::PassivSkill4},
-						{AllocationSkillsMenu::PassivSkill5},
-						{AllocationSkillsMenu::TalentPassivSkill},
+						{AllocationSkillsMenu::Get().ActiveSkill1},
+						{AllocationSkillsMenu::Get().ActiveSkill2},
+						{AllocationSkillsMenu::Get().ActiveSkill3},
+						{AllocationSkillsMenu::Get().ActiveSkill4},
+						{AllocationSkillsMenu::Get().WeaponActiveSkill1},
+						{AllocationSkillsMenu::Get().WeaponActiveSkill2},
+						{AllocationSkillsMenu::Get().PassivSkill1},
+						{AllocationSkillsMenu::Get().PassivSkill2},
+						{AllocationSkillsMenu::Get().PassivSkill3},
+						{AllocationSkillsMenu::Get().PassivSkill4},
+						{AllocationSkillsMenu::Get().PassivSkill5},
+						{AllocationSkillsMenu::Get().TalentPassivSkill},
 					};
 					for (const auto& IconIter : Ary)
 					{
@@ -400,8 +401,8 @@ void UAllocationSkillsMenu::ResetUIByData_Weapons()
 				{
 					TArray<FName>Ary
 					{
-						{AllocationSkillsMenu::MainWeapon},
-						{AllocationSkillsMenu::SecondaryWeapon},
+						{AllocationSkillsMenu::Get().MainWeapon},
+						{AllocationSkillsMenu::Get().SecondaryWeapon},
 					};
 
 					for (const auto& IconIter : Ary)
@@ -425,28 +426,28 @@ void UAllocationSkillsMenu::ResetUIByData_Weapons()
 void UAllocationSkillsMenu::BindEvent()
 {
 	{
-		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::MainWeapon));
+		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().MainWeapon));
 		if (WeaponIconPtr)
 		{
 			MainDelegateHandleSPtr = WeaponIconPtr->OnResetUnit.AddCallback(std::bind(&ThisClass::OnMainWeaponChanged, this, std::placeholders::_1));
 		}
 	}
 	{
-		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::SecondaryWeapon));
+		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().SecondaryWeapon));
 		if (WeaponIconPtr)
 		{
 			SecondaryDelegateHandleSPtr = WeaponIconPtr->OnResetUnit.AddCallback(std::bind(&ThisClass::OnSecondaryWeaponChanged, this, std::placeholders::_1));
 		}
 	}
 	{
-		auto BtnPtr = Cast<UButton>(GetWidgetFromName(AllocationSkillsMenu::WeaponBtn));
+		auto BtnPtr = Cast<UButton>(GetWidgetFromName(AllocationSkillsMenu::Get().WeaponBtn));
 		if (BtnPtr)
 		{
 			BtnPtr->OnClicked.AddDynamic(this, &ThisClass::OnWeaponsBtnCliked);
 		}
 	}
 	{
-		auto BtnPtr = Cast<UButton>(GetWidgetFromName(AllocationSkillsMenu::SkillBtn));
+		auto BtnPtr = Cast<UButton>(GetWidgetFromName(AllocationSkillsMenu::Get().SkillBtn));
 		if (BtnPtr)
 		{
 			BtnPtr->OnClicked.AddDynamic(this, &ThisClass::OnSkillsBtnCliked);
@@ -455,18 +456,18 @@ void UAllocationSkillsMenu::BindEvent()
 	{
 		TArray<FName>Ary
 		{
-			{AllocationSkillsMenu::ActiveSkill1},
-			{AllocationSkillsMenu::ActiveSkill2},
-			{AllocationSkillsMenu::ActiveSkill3},
-			{AllocationSkillsMenu::ActiveSkill4},
-			{AllocationSkillsMenu::WeaponActiveSkill1},
-			{AllocationSkillsMenu::WeaponActiveSkill2},
-			{AllocationSkillsMenu::PassivSkill1},
-			{AllocationSkillsMenu::PassivSkill2},
-			{AllocationSkillsMenu::PassivSkill3},
-			{AllocationSkillsMenu::PassivSkill4},
-			{AllocationSkillsMenu::PassivSkill5},
-			{AllocationSkillsMenu::TalentPassivSkill},
+			{AllocationSkillsMenu::Get().ActiveSkill1},
+			{AllocationSkillsMenu::Get().ActiveSkill2},
+			{AllocationSkillsMenu::Get().ActiveSkill3},
+			{AllocationSkillsMenu::Get().ActiveSkill4},
+			{AllocationSkillsMenu::Get().WeaponActiveSkill1},
+			{AllocationSkillsMenu::Get().WeaponActiveSkill2},
+			{AllocationSkillsMenu::Get().PassivSkill1},
+			{AllocationSkillsMenu::Get().PassivSkill2},
+			{AllocationSkillsMenu::Get().PassivSkill3},
+			{AllocationSkillsMenu::Get().PassivSkill4},
+			{AllocationSkillsMenu::Get().PassivSkill5},
+			{AllocationSkillsMenu::Get().TalentPassivSkill},
 		};
 
 		for (const auto& FirstIter : Ary)
@@ -491,8 +492,8 @@ void UAllocationSkillsMenu::BindEvent()
 	{
 		TArray<FName>Ary
 		{
-			{AllocationSkillsMenu::MainWeapon},
-			{AllocationSkillsMenu::SecondaryWeapon},
+			{AllocationSkillsMenu::Get().MainWeapon},
+			{AllocationSkillsMenu::Get().SecondaryWeapon},
 		};
 
 		for (const auto& FirstIter : Ary)
@@ -546,16 +547,16 @@ void UAllocationSkillsMenu::ResetUIByData()
 	{
 		TArray<FName>Ary
 		{
-			AllocationSkillsMenu::ActiveSkill1,
-			AllocationSkillsMenu::ActiveSkill2,
-			AllocationSkillsMenu::ActiveSkill3,
-			AllocationSkillsMenu::ActiveSkill4 ,
-			AllocationSkillsMenu::PassivSkill1,
-			AllocationSkillsMenu::PassivSkill2,
-			AllocationSkillsMenu::PassivSkill3,
-			AllocationSkillsMenu::PassivSkill4,
-			AllocationSkillsMenu::PassivSkill5,
-			AllocationSkillsMenu::TalentPassivSkill,
+			AllocationSkillsMenu::Get().ActiveSkill1,
+			AllocationSkillsMenu::Get().ActiveSkill2,
+			AllocationSkillsMenu::Get().ActiveSkill3,
+			AllocationSkillsMenu::Get().ActiveSkill4 ,
+			AllocationSkillsMenu::Get().PassivSkill1,
+			AllocationSkillsMenu::Get().PassivSkill2,
+			AllocationSkillsMenu::Get().PassivSkill3,
+			AllocationSkillsMenu::Get().PassivSkill4,
+			AllocationSkillsMenu::Get().PassivSkill5,
+			AllocationSkillsMenu::Get().TalentPassivSkill,
 		};
 
 		for (const auto& Iter : Ary)
@@ -576,7 +577,7 @@ void UAllocationSkillsMenu::OnMainWeaponChanged(UWeaponUnit* ToolSPtr)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	{
-		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill1));
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().WeaponActiveSkill1));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill : nullptr);
@@ -588,7 +589,7 @@ void UAllocationSkillsMenu::OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	{
-		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::WeaponActiveSkill2));
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(AllocationSkillsMenu::Get().WeaponActiveSkill2));
 		if (IconPtr)
 		{
 			if (ToolSPtr && !ToolSPtr->FirstSkill)

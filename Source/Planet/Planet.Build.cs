@@ -100,6 +100,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human/ActionProcess/ViewMenusProcessor");
         PublicIncludePaths.Add("Planet/GamePlay/WorldSetting");
         PublicIncludePaths.Add("Planet/GamePlay/PlayerCameraManager");
+        PublicIncludePaths.Add("Planet/GamePlay/RaffleSystem");
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");
         PublicIncludePaths.Add("Planet/Common/Talent");

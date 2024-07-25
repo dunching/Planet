@@ -6,10 +6,14 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "RaffleCommon.h"
 
 #include "RaffleMenu.generated.h"
 
 class UTalentIcon;
+class URaffleType;
+class URaffleBtn;
+struct FSceneToolsContainer;
 
 /**
  *
@@ -23,8 +27,22 @@ public:
 
 	virtual void NativeConstruct()override;
 
+	void InitialRaffleType();
+
+	void InitialRaffleBtn();
+
 	virtual void NativeDestruct()override;
 
+	void SetHoldItemProperty(const FSceneToolsContainer& NewSPHoldItemPerperty);
+
 protected:
+
+	void OnRaffleTypeSelected(URaffleType* RaffleTypePtr);
+	
+	void OnRaffleBtnSelected(URaffleBtn* RaffleTypePtr);
+
+	URaffleType* PreviouRaffleTypePtr = nullptr;
+
+	ERaffleType LastRaffleType = ERaffleType::kRafflePermanent;
 
 };

@@ -4,21 +4,19 @@
 
 #include "CoreMinimal.h"
 
-#include "HumanProcessor.h"
+#include "HumanViewMenuBase.h"
 
 class AHumanCharacter;
 
 namespace HumanProcessor
 {
-	class FHumanViewGroupManagger : public FInputProcessor
+	class FHumanViewGroupManagger : public FHumanViewMenuBase
 	{
 	private:
 
-		GENERATIONCLASSINFO(FHumanViewGroupManagger, FInputProcessor);
+		GENERATIONCLASSINFO(FHumanViewGroupManagger, FHumanViewMenuBase);
 
 	public:
-
-		using FOwnerPawnType = ACharacterBase;
 
 		FHumanViewGroupManagger(FOwnerPawnType* CharacterPtr);
 
