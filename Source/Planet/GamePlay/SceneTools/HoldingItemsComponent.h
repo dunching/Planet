@@ -28,7 +28,7 @@ protected:
 	virtual void BeginPlay()override;
 
 	UPROPERTY()
-	FSceneToolsContainer HoldItemPropertySPtr;
+	FSceneToolsContainer HoldItemProperty;
 
 private:
 

@@ -176,6 +176,30 @@ UCoinUnit* FSceneToolsContainer::AddUnit(ECoinUnitType Type, int32 Num /*= 1*/)
 	}
 }
 
+void FSceneToolsContainer::AddUnit_Apending(ESkillUnitType Type, FGuid Guid)
+{
+	if (SkillUnitApendingMap.Contains(Guid))
+	{
+		SkillUnitApendingMap[Guid].Get<1>()++;
+	}
+	else
+	{
+		SkillUnitApendingMap.Add(Guid, TTuple<ESkillUnitType, int32>{ Type , 1});
+	}
+}
+
+void FSceneToolsContainer::SyncApendingUnit(FGuid Guid)
+{
+	if (SkillUnitApendingMap.Contains(Guid))
+	{
+		for (const auto & Iter : SkillUnitApendingMap)
+		{
+			AddUnit(Iter.Value.Get<0>());
+		}
+		SkillUnitApendingMap.Remove(Guid);
+	}
+}
+
 void FSceneToolsContainer::RemoveUnit(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
 {
 	if (UnitPtr)

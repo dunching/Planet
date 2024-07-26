@@ -22,7 +22,7 @@ void URaffleSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 }
 
-bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count) const
+bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
@@ -63,7 +63,18 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count) const
 	return false;
 }
 
-bool URaffleSubSystem::RafflePermanent(int32 Count) const
+void URaffleSubSystem::SyncUnits2Player()const
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+	auto& HoldItemPropertyRef = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+	HoldItemPropertyRef.SyncApendingUnit(ApendingID);
+}
+
+bool URaffleSubSystem::RafflePermanent(int32 Count)const
 {
 	// Í¨¹ýHTTPÇëÇó
 
@@ -72,35 +83,35 @@ bool URaffleSubSystem::RafflePermanent(int32 Count) const
 	return true;
 }
 
-void URaffleSubSystem::RafflePermanentComplete() const
+void URaffleSubSystem::RafflePermanentComplete()const
 {
+	TArray<FGuid> Ary;
 #if TESTRAFFLE
-	TArray<FGuid> Ary
-	{
-		FGuid(TEXT("{46DF00CA-5D51-46FA-A136-B0895B1D6812}")),
-	};
+	Ary.Append(
+		{
+			FGuid(TEXT("{46DF00CA-5D51-46FA-A136-B0895B1D6812}")),
+		}
+		);
+#else
 
+#endif
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
 	{
 		return;
 	}
+	auto& HoldItemPropertyRef = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
 
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	for (const auto &Iter : Ary)
+	for (const auto& Iter : Ary)
 	{
 		for (const auto& SecondIter : SceneUnitExtendInfoMapPtr->SkillUnitMap)
 		{
 			if (Iter == SecondIter.Value->Guid)
 			{
-				auto& HoldItemPropertyRef = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-				HoldItemPropertyRef.AddUnit(SecondIter.Key);
-
+				HoldItemPropertyRef.AddUnit_Apending(SecondIter.Key, ApendingID);
 				break;
 			}
 		}
 	}
-#else
-
-#endif
 }

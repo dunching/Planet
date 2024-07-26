@@ -8,7 +8,7 @@ UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectI
 
 FSceneToolsContainer& UHoldingItemsComponent::GetHoldItemProperty()
 {
-	return HoldItemPropertySPtr;
+	return HoldItemProperty;
 }
 
 void UHoldingItemsComponent::BeginPlay()

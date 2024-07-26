@@ -20,6 +20,7 @@
 #include "HoldingItemsComponent.h"
 #include "BuildingBaseProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
+#include "RaffleSubSystem.h"
 
 namespace HumanProcessor
 {
@@ -48,6 +49,8 @@ namespace HumanProcessor
 	void FHumanViewRaffleMenuProcessor::QuitAction()
 	{
 		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(false);
+		
+		URaffleSubSystem::GetInstance()->SyncUnits2Player();
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 

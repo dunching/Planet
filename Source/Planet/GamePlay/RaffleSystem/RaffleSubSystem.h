@@ -9,6 +9,7 @@
 
 #include "UICommon.h"
 #include "RaffleCommon.h"
+#include "SceneElement.h"
 
 #include "RaffleSubSystem.generated.h"
 
@@ -25,6 +26,8 @@ public:
 
 	bool Raffle(ERaffleType RaffleType, int32 Count)const;
 
+	void SyncUnits2Player()const;
+
 protected:
 
 	bool RafflePermanent(int32 Count)const;
@@ -32,5 +35,7 @@ protected:
 	void RafflePermanentComplete()const;
 
 	int32 CostPerRaffle = 180;
+
+	FGuid ApendingID = FGuid::NewGuid();
 
 };

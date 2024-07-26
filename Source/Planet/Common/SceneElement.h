@@ -406,6 +406,10 @@ struct FSceneToolsContainer
 
 	USkillUnit* AddUnit(ESkillUnitType Type);
 	
+	void AddUnit_Apending(ESkillUnitType Type, FGuid Guid);
+	
+	void SyncApendingUnit(FGuid Guid);
+
 	UWeaponUnit* FindUnit(EWeaponUnitType Type);
 
 	USkillUnit* FindUnit(ESkillUnitType Type);
@@ -438,6 +442,8 @@ private:
 	TMap<ESkillUnitType, USkillUnit*> SkillUnitMap;
 	
 	TMap<ECoinUnitType, UCoinUnit*> CoinUnitMap;
+
+	TMap<FGuid, TTuple<ESkillUnitType, int32>> SkillUnitApendingMap;
 
 };
 

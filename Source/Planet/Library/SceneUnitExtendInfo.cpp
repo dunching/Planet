@@ -16,6 +16,12 @@ USceneUnitExtendInfoMap::USceneUnitExtendInfoMap() :
 
 		SkillUnitMap.Add(ESkillUnitType::kHumanSkill_Active_Displacement, SceneUnitExtendInfoBaseSPtr);
 	}
+	{
+		TSharedPtr<FSceneUnitExtendInfoBase> SceneUnitExtendInfoBaseSPtr = MakeShared<FSceneUnitExtendInfoBase>();
+		SceneUnitExtendInfoBaseSPtr->Guid = FGuid(TEXT("{46DF00CA-5D51-46FA-A136-B0895B1D6812}"));
+
+		ToolUnitMap.Add(EToolUnitType::kPickAxe, SceneUnitExtendInfoBaseSPtr);
+	}
 }
 
 USceneUnitExtendInfoMap* USceneUnitExtendInfoMap::GetInstance()

@@ -34,6 +34,8 @@ public:
 	
 	TMap<ESkillUnitType, TSharedPtr<FSceneUnitExtendInfoBase>>SkillUnitMap;
 	
+	TMap<EToolUnitType, TSharedPtr<FSceneUnitExtendInfoBase>>ToolUnitMap;
+	
 #pragma region SceneTools
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
 	TMap<EToolUnitType, TSubclassOf<UToolUnit>>EquipmentToolsMap;
