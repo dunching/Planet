@@ -94,7 +94,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UPawnStateActionHUD>(GetWorldImp(), UAssetRefMap::GetInstance()->PawnStateActionHUDClass);
+			UIPtr = CreateWidget<UPawnStateActionHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateActionHUDClass);
 			if (UIPtr)
 			{
 				UIPtr->CharacterPtr = CharacterPtr;
@@ -133,7 +133,7 @@ void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UPawnStateBuildingHUD>(GetWorldImp(), UAssetRefMap::GetInstance()->PawnStateBuildingHUDClass);
+			UIPtr = CreateWidget<UPawnStateBuildingHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateBuildingHUDClass);
 			if (UIPtr)
 			{
 				BorderPtr->AddChild(UIPtr);
@@ -171,7 +171,7 @@ void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay, const FSceneToolsContain
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UBackpackMenu>(GetWorldImp(), UAssetRefMap::GetInstance()->BackpackMenuClass);
+			UIPtr = CreateWidget<UBackpackMenu>(GetWorldImp(), MainUILayoutPtr->BackpackMenuClass);
 			if (UIPtr)
 			{
 				UIPtr->SetHoldItemProperty(NewSPHoldItemPerperty);
@@ -212,7 +212,7 @@ void UUIManagerSubSystem::ViewSkills(bool bIsDisplay, const FSceneToolsContainer
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UAllocationSkillsMenu>(GetWorldImp(), UAssetRefMap::GetInstance()->AllocationSkillsMenuClass);
+			UIPtr = CreateWidget<UAllocationSkillsMenu>(GetWorldImp(), MainUILayoutPtr->AllocationSkillsMenuClass);
 			if (UIPtr)
 			{
 				UIPtr->SetHoldItemProperty(NewSPHoldItemPerperty);
@@ -253,7 +253,7 @@ void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UTalentAllocation>(GetWorldImp(), UAssetRefMap::GetInstance()->TalentAllocationClass);
+			UIPtr = CreateWidget<UTalentAllocation>(GetWorldImp(), MainUILayoutPtr->TalentAllocationClass);
 			if (UIPtr)
 			{
 				BorderPtr->AddChild(UIPtr);
@@ -292,7 +292,7 @@ void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacte
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UGroupManaggerMenu>(GetWorldImp(), UAssetRefMap::GetInstance()->GroupManaggerMenuClass);
+			UIPtr = CreateWidget<UGroupManaggerMenu>(GetWorldImp(), MainUILayoutPtr->GroupManaggerMenuClass);
 			if (UIPtr)
 			{
 				UIPtr->HumanCharacterPtr = HumanCharacterPtr;
@@ -332,7 +332,7 @@ void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* Huma
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UHUD_TeamInfo>(GetWorldImp(), UAssetRefMap::GetInstance()->HUD_TeamInfoClass);
+			UIPtr = CreateWidget<UHUD_TeamInfo>(GetWorldImp(), MainUILayoutPtr->HUD_TeamInfoClass);
 			if (UIPtr)
 			{
 				BorderPtr->AddChild(UIPtr);
@@ -399,7 +399,7 @@ UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
 				return UIPtr;
 			}
 		}
-		auto UIPtr = CreateWidget<UEffectsList>(GetWorldImp(), UAssetRefMap::GetInstance()->EffectsListClass);
+		auto UIPtr = CreateWidget<UEffectsList>(GetWorldImp(), MainUILayoutPtr->EffectsListClass);
 		if (UIPtr)
 		{
 			BorderPtr->AddChild(UIPtr);
@@ -432,7 +432,7 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 			return nullptr;
 		}
 
-		auto UIPtr = CreateWidget<UProgressTips>(GetWorldImp(), UAssetRefMap::GetInstance()->ProgressTipsClass);
+		auto UIPtr = CreateWidget<UProgressTips>(GetWorldImp(), MainUILayoutPtr->ProgressTipsClass);
 		if (UIPtr)
 		{
 			BorderPtr->AddChild(UIPtr);

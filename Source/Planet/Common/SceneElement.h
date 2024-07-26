@@ -410,8 +410,10 @@ struct FSceneToolsContainer
 
 	USkillUnit* FindUnit(ESkillUnitType Type);
 
-	UBasicUnit* FindUnit(UBasicUnit::IDType ID);
+	UCoinUnit* FindUnit(ECoinUnitType Type);
 
+	UBasicUnit* FindUnit(UBasicUnit::IDType ID);
+	
 	const TArray<UBasicUnit*>& GetSceneUintAry()const;
 
 	const TMap<ECoinUnitType, UCoinUnit*>& GetCoinUintAry()const;

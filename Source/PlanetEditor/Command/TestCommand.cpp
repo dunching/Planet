@@ -35,6 +35,7 @@
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
+#include "SceneUnitExtendInfo.h"
 
 void TestCommand::TestPlayerCharacterMoveTo(const TArray< FString >& Args)
 {
@@ -188,7 +189,7 @@ void TestCommand::TestDisplacementSkill()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		auto UnitClass = UAssetRefMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
+		auto UnitClass = USceneUnitExtendInfoMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
 
 		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
 		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);

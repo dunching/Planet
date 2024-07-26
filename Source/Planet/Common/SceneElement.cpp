@@ -7,10 +7,11 @@
 #include "CharacterAttributesComponent.h"
 #include "HumanControllerInterface.h"
 #include "HumanCharacter.h"
+#include "SceneUnitExtendInfo.h"
 
 UWeaponUnit* FSceneToolsContainer::AddUnit(EWeaponUnitType Type)
 {
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+	auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
 	UWeaponUnit* ResultPtr = NewObject<UWeaponUnit>(GetWorldImp(), AssetRefMapPtr->WeaponToolsMap[Type]);
 
@@ -48,7 +49,7 @@ USkillUnit* FSceneToolsContainer::AddUnit(ESkillUnitType Type)
 	}
 	else
 	{
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+		auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
 		USkillUnit* ResultPtr = NewObject<USkillUnit>(GetWorldImp(), AssetRefMapPtr->SkillToolsMap[Type]);
 
@@ -93,7 +94,7 @@ UConsumableUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 N
 	}
 	else
 	{
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+		auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
 		UConsumableUnit* ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), AssetRefMapPtr->ConsumableToolMap[Type]);
 
@@ -115,7 +116,7 @@ UConsumableUnit* FSceneToolsContainer::AddUnit(EConsumableUnitType Type, int32 N
 
 UToolUnit* FSceneToolsContainer::AddUnit(EToolUnitType Type)
 {
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+	auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
 	UToolUnit* ResultPtr = NewObject<UToolUnit>(GetWorldImp(), AssetRefMapPtr->EquipmentToolsMap[Type]);
 
@@ -155,7 +156,7 @@ UCoinUnit* FSceneToolsContainer::AddUnit(ECoinUnitType Type, int32 Num /*= 1*/)
 	}
 	else
 	{
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+		auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
 		auto ResultPtr = NewObject<UCoinUnit>(GetWorldImp(), AssetRefMapPtr->CoinToolMap[Type]);
 
@@ -236,6 +237,17 @@ UWeaponUnit* FSceneToolsContainer::FindUnit(EWeaponUnitType Type)
 UBasicUnit* FSceneToolsContainer::FindUnit(UBasicUnit::IDType ID)
 {
 	auto Iter = SceneMetaMap.Find(ID);
+	if (Iter)
+	{
+		return *Iter;
+	}
+
+	return nullptr;
+}
+
+UCoinUnit* FSceneToolsContainer::FindUnit(ECoinUnitType Type)
+{
+	auto Iter = CoinUnitMap.Find(Type);
 	if (Iter)
 	{
 		return *Iter;

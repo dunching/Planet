@@ -36,11 +36,6 @@ class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
 
-class UToolUnit;
-class UWeaponUnit;
-class USkillUnit;
-class UCoinUnit;
-
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UObject
 {
@@ -57,23 +52,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHorseCharacter>HorseClass;
 
-#pragma region SceneTools
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EToolUnitType, TSubclassOf<UToolUnit>>EquipmentToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EWeaponUnitType, TSubclassOf<UWeaponUnit>>WeaponToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<ESkillUnitType, TSubclassOf<USkillUnit>>SkillToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EConsumableUnitType, TSubclassOf<UConsumableUnit>>ConsumableToolMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<ECoinUnitType, TSubclassOf<UCoinUnit>>CoinToolMap;
-#pragma endregion 
-
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UDragDropOperationWidget>DragDropOperationWidgetClass;
@@ -85,19 +63,7 @@ public:
 	TSubclassOf<UMainUILayout>MainUILayoutClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UBackpackMenu>BackpackMenuClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<URaffleMenu>RaffleMenuClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UAllocationSkillsMenu>AllocationSkillsMenuClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateActionHUD>PawnStateActionHUDClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateBuildingHUD>PawnStateBuildingHUDClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UCharacterTitle>AIHumanInfoClass;
@@ -105,21 +71,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFocusIcon>FocusIconClass;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UEffectsList>EffectsListClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UProgressTips>ProgressTipsClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UTalentAllocation>TalentAllocationClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UGroupManaggerMenu>GroupManaggerMenuClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFightingTips>FightingTipsClass;
 #pragma endregion MenusUI

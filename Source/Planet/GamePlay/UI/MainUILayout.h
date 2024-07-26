@@ -8,6 +8,27 @@
 
 #include "MainUILAyout.generated.h"
 
+class UMainUILayout;
+class URaffleMenu;
+class UPawnStateActionHUD;
+class UPawnStateBuildingHUD;
+class UItemsDragDropOperation;
+class UDragDropOperationWidget;
+class UAllocationToolsMenu;
+class UAllocationSkillsMenu;
+class UBackpackMenu;
+class UCharacterTitle;
+class UEffectsList;
+class UProgressTips;
+class UTalentAllocation;
+class UGroupManaggerMenu;
+class UHUD_TeamInfo;
+class UFocusIcon;
+class UFightingTips;
+class AHumanCharacter;
+class AHorseCharacter;
+class AGeneratorNPC;
+
 /**
  *
  */
@@ -23,6 +44,35 @@ public:
 #else
 	virtual void NativePreConstruct()override;
 #endif
+	
+#pragma region MenusUI
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UBackpackMenu>BackpackMenuClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UAllocationSkillsMenu>AllocationSkillsMenuClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UPawnStateActionHUD>PawnStateActionHUDClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UPawnStateBuildingHUD>PawnStateBuildingHUDClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UEffectsList>EffectsListClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UProgressTips>ProgressTipsClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UTalentAllocation>TalentAllocationClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UGroupManaggerMenu>GroupManaggerMenuClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
+#pragma endregion MenusUI
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName PawnActionStateHUDSocket;

@@ -3,6 +3,7 @@
 
 #include "AssetRefMap.h"
 #include "StateTagExtendInfo.h"
+#include "SceneUnitExtendInfo.h"
 
 UAssetRefMap* APlanetWorldSettings::GetAssetRefMapInstance()
 {
@@ -22,4 +23,14 @@ UStateTagExtendInfoMap* APlanetWorldSettings::GetStateTagExtendInfoInstance()
 	}
 
 	return StateExtendInfoPtr;
+}
+
+USceneUnitExtendInfoMap* APlanetWorldSettings::GetSceneUnitExtendInfoMap()
+{
+	if (!SceneUnitExtendInfoMapPtr)
+	{
+		SceneUnitExtendInfoMapPtr = NewObject<USceneUnitExtendInfoMap>(GetWorld(), SceneUnitExtendInfoMapPtrClass);
+	}
+
+	return SceneUnitExtendInfoMapPtr;
 }

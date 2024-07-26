@@ -22,6 +22,7 @@ public class Planet : ModuleRules
         PublicDefinitions.Add("TESTPLAYERCHARACTERHOLDDATA = 1");
         PublicDefinitions.Add("TESTAICHARACTERHOLDDATA = 1");
         PublicDefinitions.Add("TESTRESOURCEBOXHOLDDATA = 1");
+        PublicDefinitions.Add("TESTRAFFLE = 1");
 
         PublicIncludePaths.Add("Planet");
         PublicIncludePaths.Add("Planet/GamePlay");

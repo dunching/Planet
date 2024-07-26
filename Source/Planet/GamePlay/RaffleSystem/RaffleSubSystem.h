@@ -25,4 +25,12 @@ public:
 
 	bool Raffle(ERaffleType RaffleType, int32 Count)const;
 
+protected:
+
+	bool RafflePermanent(int32 Count)const;
+
+	void RafflePermanentComplete()const;
+
+	int32 CostPerRaffle = 180;
+
 };

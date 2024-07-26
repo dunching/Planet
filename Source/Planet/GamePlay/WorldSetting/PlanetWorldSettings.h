@@ -8,6 +8,7 @@
 
 class UAssetRefMap;
 class UStateTagExtendInfoMap;
+class USceneUnitExtendInfoMap;
 
 /**
  *
@@ -25,6 +26,8 @@ public:
 	UAssetRefMap* GetAssetRefMapInstance();
 
 	UStateTagExtendInfoMap* GetStateTagExtendInfoInstance();
+	
+	USceneUnitExtendInfoMap* GetSceneUnitExtendInfoMap();
 
 protected:
 
@@ -39,5 +42,11 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UStateTagExtendInfoMap>StateExtendInfoClass;
+	
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	USceneUnitExtendInfoMap* SceneUnitExtendInfoMapPtr = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<USceneUnitExtendInfoMap>SceneUnitExtendInfoMapPtrClass;
 
 };
