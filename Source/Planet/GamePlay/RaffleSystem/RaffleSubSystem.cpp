@@ -8,6 +8,7 @@
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
+#include "SceneUnitExtendInfo.h"
 
 URaffleSubSystem* URaffleSubSystem::GetInstance()
 {
@@ -41,6 +42,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count) const
 		{
 			if (CoinUnitPtr->GetCurrentValue() > Count)
 			{
+				CoinUnitPtr->AddCurrentValue(-Count);
 				return RafflePermanent(Count);
 			}
 		}
@@ -73,11 +75,31 @@ bool URaffleSubSystem::RafflePermanent(int32 Count) const
 void URaffleSubSystem::RafflePermanentComplete() const
 {
 #if TESTRAFFLE
-	TArray<FString> Ary
+	TArray<FGuid> Ary
 	{
-		TEXT(""),
-		TEXT(""),
+		FGuid(TEXT("{46DF00CA-5D51-46FA-A136-B0895B1D6812}")),
 	};
+
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	for (const auto &Iter : Ary)
+	{
+		for (const auto& SecondIter : SceneUnitExtendInfoMapPtr->SkillUnitMap)
+		{
+			if (Iter == SecondIter.Value->Guid)
+			{
+				auto& HoldItemPropertyRef = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+				HoldItemPropertyRef.AddUnit(SecondIter.Key);
+
+				break;
+			}
+		}
+	}
 #else
 
 #endif

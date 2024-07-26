@@ -140,15 +140,25 @@ void AHumanCharacter::BeginPlay()
 		if (GetController()->IsA(APlanetPlayerController::StaticClass()))
 		{
 			auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
-
-			OnSkillUnitChangedHanlde = GetHoldingItemsComponent()->GetHoldItemProperty().OnSkillUnitChanged.AddCallback(
-				std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-				));
-
-			OnConsumableUnitChangedHandle = GetHoldingItemsComponent()->GetHoldItemProperty().OnConsumableUnitChanged.AddCallback(
-				std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
-				));
-
+			{
+				auto Handle = GetHoldingItemsComponent()->GetHoldItemProperty().OnSkillUnitChanged.AddCallback(
+					std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+					));
+				Handle->bIsAutoUnregister = false;
+			}
+			{
+				auto Handle =
+					GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty().OnCoinUnitChanged.AddCallback(
+						std::bind(&UGetItemInfos::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+						));
+				Handle->bIsAutoUnregister = false;
+			}
+			{
+				auto Handle = GetHoldingItemsComponent()->GetHoldItemProperty().OnConsumableUnitChanged.AddCallback(
+					std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+					));
+				Handle->bIsAutoUnregister = false;
+			}
 #if TESTPLAYERCHARACTERHOLDDATA
 			TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
@@ -182,7 +192,7 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
 			);
 		}
-	} 
+	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
 	}

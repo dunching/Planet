@@ -13,30 +13,31 @@
 #include "CharacterBase.h"
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
+#include "UICommon.h"
 
-namespace RaffleBtn
+struct FRaffleBtn : public TGetSocketName<FRaffleBtn>
 {
-	FName SelectBtn = TEXT("SelectBtn");
+	FName Btn = TEXT("Btn");
 
 	FName Select_Border = TEXT("Select_Border");
 
 	FName Text = TEXT("Text");
 
 	FName Texture = TEXT("Texture");
-}
+};
 
 void URaffleBtn::NativeConstruct()
 {
 	Super::NativeConstruct();
 	{
-		auto UIPtr = Cast<UButton>(GetWidgetFromName(RaffleBtn::SelectBtn));
+		auto UIPtr = Cast<UButton>(GetWidgetFromName(FRaffleBtn::Get().Btn));
 		if (UIPtr)
 		{
 			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnBtnClicked);
 		}
 	}
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(RaffleBtn::Text));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FRaffleBtn::Get().Text));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromString(DisplayText));

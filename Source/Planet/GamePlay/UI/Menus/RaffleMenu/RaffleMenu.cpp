@@ -32,7 +32,7 @@ void URaffleMenu::NativeConstruct()
 	Super::NativeConstruct();
 
 	InitialRaffleType();
-
+	InitialRaffleBtn();
 }
 
 void URaffleMenu::InitialRaffleType()
@@ -41,21 +41,25 @@ void URaffleMenu::InitialRaffleType()
 	if (UIPtr)
 	{
 		auto ChildAry = UIPtr->GetAllChildren();
-		URaffleType* LastUIPtr = nullptr;
+		URaffleType* FirstUIPtr = nullptr;
 		for (auto Iter : ChildAry)
 		{
 			auto RafflePtr = Cast<URaffleType>(Iter);
 			if (RafflePtr)
 			{
-				LastUIPtr = RafflePtr;
+				if (!FirstUIPtr)
+				{
+					FirstUIPtr = RafflePtr;
+				}
+
 				RafflePtr->UnSelect();
 				auto Handle = RafflePtr->OnClicked.AddCallback(std::bind(&ThisClass::OnRaffleTypeSelected, this, std::placeholders::_1));
 				Handle->bIsAutoUnregister = false;
 			}
 		}
-		if (LastUIPtr)
+		if (FirstUIPtr)
 		{
-			LastUIPtr->Select();
+			FirstUIPtr->Select();
 		}
 	}
 }

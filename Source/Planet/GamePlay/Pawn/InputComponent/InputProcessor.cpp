@@ -57,9 +57,7 @@ void FInputProcessor::ReEnterAction()
 
 void FInputProcessor::QuitAction()
 {
-	bIsRequestQuit = true;
-
-	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
+	UnRegisterTicker();
 }
 
 void FInputProcessor::BeginDestroy()
@@ -241,6 +239,13 @@ bool FInputProcessor::GetIsComplete() const
 void FInputProcessor::SetPawn(FOwnerPawnType* NewPawnPtr)
 {
 	OnwerPawnPtr = NewPawnPtr;
+}
+
+void FInputProcessor::UnRegisterTicker()
+{
+	bIsRequestQuit = true;
+
+	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 }
 
 void FInputProcessor::IncreaseAsyncTaskNum()

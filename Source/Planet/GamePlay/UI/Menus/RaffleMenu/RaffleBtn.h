@@ -29,7 +29,7 @@ public:
 
 	FOnClicked OnClicked;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RaffleType")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "RaffleType")
 	int32 ReffleCount = 1;
 
 protected:

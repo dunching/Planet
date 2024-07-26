@@ -36,6 +36,32 @@ void UGetItemInfos::ResetUIByData()
 
 void UGetItemInfos::OnSkillUnitChanged(USkillUnit* UnitPtr, bool bIsAdd)
 {
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	if (UIPtr)
+	{
+		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+		if (WidgetPtr)
+		{
+			WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd);
+
+			UIPtr->AddChild(WidgetPtr);
+		}
+	}
+}
+
+void UGetItemInfos::OnCoinUnitChanged(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num)
+{
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	if (UIPtr)
+	{
+		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+		if (WidgetPtr)
+		{
+			WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd, Num);
+
+			UIPtr->AddChild(WidgetPtr);
+		}
+	}
 }
 
 void UGetItemInfos::OnConsumableUnitChanged(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num)

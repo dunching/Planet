@@ -53,6 +53,8 @@ public:
 		const FInitSwitchFunc<ProcessorType>& InitSwitchFunc
 	);
 
+	void ResetProcessor();
+
 	FDelegateHandle AddKeyEvent(FKey Key, const std::function<void(EInputEvent)>& KeyEvent);
 
 	void RemoveKeyEvent(FDelegateHandle DelegateHandle);

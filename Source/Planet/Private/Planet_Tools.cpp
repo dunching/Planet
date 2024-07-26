@@ -5,7 +5,14 @@
 UWorld* GetWorldImp()
 {
 #if WITH_EDITOR
-	return GEngine->GetCurrentPlayWorld() ? GEngine->GetCurrentPlayWorld() : GEditor->GetEditorWorldContext().World();
+	if (GEditor->IsPlayingSessionInEditor() && !bIsExiting)
+	{
+		return GEngine->GetCurrentPlayWorld() ? GEngine->GetCurrentPlayWorld() : GEditor->GetEditorWorldContext().World();
+	}
+	else
+	{
+		return GEditor->PlayWorld;
+	}
 #else 
 	return GEngine->GetCurrentPlayWorld();
 #endif

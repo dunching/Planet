@@ -24,6 +24,8 @@ class PLANET_API UCoinInfo :
 
 public:
 
+	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
@@ -41,5 +43,7 @@ protected:
 	void SetItemType();
 
 	UCoinUnit* UnitPtr = nullptr;
+
+	FValueChangedDelegateHandle OnNumChanged;
 
 };

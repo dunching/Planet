@@ -27,6 +27,8 @@ void UCoinInfo::NativeConstruct()
 
 void UCoinInfo::NativeDestruct()
 {
+	OnNumChanged->UnBindCallback();
+
 	Super::NativeDestruct();
 }
 
@@ -40,6 +42,9 @@ void UCoinInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kCoin)
 	{
 		UnitPtr = Cast<UCoinUnit>(BasicUnitPtr);
+
+		OnNumChanged = UnitPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
+
 		SetNum(UnitPtr->GetCurrentValue());
 		SetItemType();
 	}
@@ -57,7 +62,7 @@ void UCoinInfo::SetNum(int32 NewNum)
 	{
 		return;
 	}
-	if (NewNum > 0)
+	if (NewNum >= 0)
 	{
 		const auto NumStr = FString::Printf(TEXT("%d"), NewNum);
 
@@ -65,7 +70,8 @@ void UCoinInfo::SetNum(int32 NewNum)
 	}
 	else
 	{
-		NumTextPtr->SetText(FText::FromString(TEXT("")));
+		check(0);
+		NumTextPtr->SetText(FText::FromString(TEXT("无效")));
 	}
 }
 

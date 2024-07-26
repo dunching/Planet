@@ -148,6 +148,8 @@ public:
 
 	void SetPawn(FOwnerPawnType*NewPawnPtr);
 
+	void UnRegisterTicker();
+
 protected:
 
 	void IncreaseAsyncTaskNum();

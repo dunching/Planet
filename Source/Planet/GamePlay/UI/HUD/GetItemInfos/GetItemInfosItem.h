@@ -27,6 +27,8 @@ public:
 
 	void ResetToolUIByData(USkillUnit* UnitPtr, bool bIsAdd);
 	
+	void ResetToolUIByData(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num);
+	
 	void ResetToolUIByData(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num);
 
 protected:

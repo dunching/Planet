@@ -15,6 +15,8 @@ class UHUD_TeamMateInfo;
 
 class UGetItemInfosItem;
 
+class UBasicUnit;
+class UCoinUnit;
 class USkillUnit;
 class UConsumableUnit;
 
@@ -34,6 +36,8 @@ public:
 	virtual void ResetUIByData()override;
 
 	void OnSkillUnitChanged(USkillUnit* UnitPtr, bool bIsAdd);
+
+	void OnCoinUnitChanged(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num);
 
 	void OnConsumableUnitChanged(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num);
 

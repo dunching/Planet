@@ -23,10 +23,23 @@ void UGetItemInfosItem::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 
 void UGetItemInfosItem::ResetToolUIByData(USkillUnit* UnitPtr, bool bIsAdd)
 {
+	SetTexutre(UnitPtr->GetIcon());
 
+	SetText(FString::Printf(TEXT("%s %s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), *UnitPtr->GetUnitName()));
+
+	ResetToolUIByData(UnitPtr);
 }
 
 void UGetItemInfosItem::ResetToolUIByData(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num)
+{
+	SetTexutre(UnitPtr->GetIcon());
+
+	SetText(FString::Printf(TEXT("%s %dX%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), UnitPtr->GetCurrentValue(), *UnitPtr->GetUnitName()));
+
+	ResetToolUIByData(UnitPtr);
+}
+
+void UGetItemInfosItem::ResetToolUIByData(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num)
 {
 	SetTexutre(UnitPtr->GetIcon());
 

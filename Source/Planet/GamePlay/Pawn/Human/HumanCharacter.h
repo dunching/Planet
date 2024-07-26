@@ -62,14 +62,6 @@ protected:
 		AHumanCharacter* LeaderPCPtr
 	);
 
-	using FOnSkillUnitChanged = FSceneToolsContainer::FOnSkillUnitChanged::FCallbackHandleSPtr;
-
-	FOnSkillUnitChanged OnSkillUnitChangedHanlde;
-	
-	using FOnConsumableUnitChanged = FSceneToolsContainer::FOnConsumableUnitChanged::FCallbackHandleSPtr;
-
-	FOnConsumableUnitChanged OnConsumableUnitChangedHandle;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	TSoftObjectPtr<UTexture2D> CharacterIcon;
 	

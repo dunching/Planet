@@ -19,7 +19,7 @@ public class Planet : ModuleRules
         CppStandard = CppStandardVersion.Cpp20;
         bUseRTTI = true;
 
-        PublicDefinitions.Add("TESTPLAYERCHARACTERHOLDDATA = 1");
+        PublicDefinitions.Add("TESTPLAYERCHARACTERHOLDDATA = 0");
         PublicDefinitions.Add("TESTAICHARACTERHOLDDATA = 1");
         PublicDefinitions.Add("TESTRESOURCEBOXHOLDDATA = 1");
         PublicDefinitions.Add("TESTRAFFLE = 1");

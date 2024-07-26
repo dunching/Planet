@@ -10,6 +10,7 @@
 #include "ArticleSharedData.h"
 #include "AssetRefMap.h"
 #include "Planet.h"
+#include "InputProcessorSubSystem.h"
 
 void UPlanetGameInstance::Init()
 {
@@ -28,6 +29,8 @@ void UPlanetGameInstance::OnStart()
 void UPlanetGameInstance::Shutdown()
 {
 	bIsExiting = true;
+
+	UInputProcessorSubSystem::GetInstance()->ResetProcessor();
 
 	Super::Shutdown();
 	PRINTFUNC();

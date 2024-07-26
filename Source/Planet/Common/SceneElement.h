@@ -215,10 +215,10 @@ public:
 
 	int32 GetCurrentValue()const;
 
-protected:
-	
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 
+protected:
+	
 	int32 Num = 1;
 
 };
@@ -394,7 +394,7 @@ struct FSceneToolsContainer
 
 	using FOnCoinUnitChanged = TCallbackHandleContainer<void(UCoinUnit*, bool, int32)>;
 
-	UCoinUnit* AddUnit(ECoinUnitType Type, int32 Num = 1);
+	UCoinUnit* AddUnit(ECoinUnitType Type, int32 Num);
 
 	UConsumableUnit* AddUnit(EConsumableUnitType Type, int32 Num = 1);
 

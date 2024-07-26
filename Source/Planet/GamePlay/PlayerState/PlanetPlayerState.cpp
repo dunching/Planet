@@ -29,7 +29,7 @@ void APlanetPlayerState::InitialData()
 {
 	auto& HoldItemComponent = HoldingItemsComponentPtr->GetHoldItemProperty();
 
-	HoldItemComponent.AddUnit(ECoinUnitType::kRegular);
-	HoldItemComponent.AddUnit(ECoinUnitType::kRafflePermanent);
-	HoldItemComponent.AddUnit(ECoinUnitType::kRaffleLimit);
+	HoldItemComponent.AddUnit(ECoinUnitType::kRegular, 0);
+	HoldItemComponent.AddUnit(ECoinUnitType::kRafflePermanent, 0);
+	HoldItemComponent.AddUnit(ECoinUnitType::kRaffleLimit, 0);
 }

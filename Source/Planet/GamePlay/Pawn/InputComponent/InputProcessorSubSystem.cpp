@@ -3,9 +3,11 @@
 
 #include "EnhancedInputComponent.h"
 #include "Subsystems/SubsystemBlueprintLibrary.h"
+#include <GameDelegates.h>
+
+#include "LogWriter.h"
 
 #include "InputProcessor.h"
-
 #include "Pawn/InputComponent/InputActions.h"
 
 void UInputProcessorSubSystem::Initialize(FSubsystemCollectionBase& Collection)
@@ -18,24 +20,29 @@ void UInputProcessorSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 	CurrentProcessorSPtr = MakeShared<FInputProcessor>(nullptr);
 
 	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::Tick), Frequency);
+
+#if WITH_EDITOR
+	FGameDelegates::Get().GetExitCommandDelegate().AddLambda([]() {
+		PRINTINVOKEINFO();
+		});
+	FGameDelegates::Get().GetEndPlayMapDelegate().AddLambda([]() {
+		PRINTINVOKEINFO();
+		});
+	FCoreDelegates::OnPreExit.AddLambda([]() {
+		PRINTINVOKEINFO();
+		});
+	FCoreDelegates::OnEnginePreExit.AddLambda([]() {
+		PRINTINVOKEINFO();
+		});
+	FWorldDelegates::OnWorldBeginTearDown.AddLambda([](UWorld*) {
+		PRINTINVOKEINFO();
+		});
+#else
+#endif
 }
 
 void UInputProcessorSubSystem::Deinitialize()
 {
-#if WITH_EDITOR
-	if (GEditor->IsPlayingSessionInEditor())
-	{
-	}
-	else
-	{
-	}
-#else
-	if (CurrentProcessorSPtr)
-	{
-		CurrentProcessorSPtr->QuitAction();
-	}
-#endif
-
 	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 
     Super::Deinitialize();
@@ -387,7 +394,15 @@ TSharedPtr<FInputProcessor> UInputProcessorSubSystem::SwitchActionProcessImp(
 	return nullptr;
 }
 
- FDelegateHandle UInputProcessorSubSystem::AddKeyEvent(FKey Key, const std::function<void(EInputEvent)>& KeyEvent)
+void UInputProcessorSubSystem::ResetProcessor()
+{
+	if (CurrentProcessorSPtr)
+	{
+		CurrentProcessorSPtr->QuitAction();
+	}
+}
+
+FDelegateHandle UInputProcessorSubSystem::AddKeyEvent(FKey Key, const std::function<void(EInputEvent)>& KeyEvent)
  {
  	if (OnKeyPressedMap.Contains(Key))
  	{

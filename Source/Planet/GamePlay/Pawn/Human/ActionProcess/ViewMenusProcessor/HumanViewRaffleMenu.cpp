@@ -62,6 +62,11 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
+	void FHumanViewRaffleMenuProcessor::F10KeyPressed()
+	{
+		QuitCurrentState();
+	}
+
 	void FHumanViewRaffleMenuProcessor::VKeyPressed()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
@@ -69,7 +74,6 @@ namespace HumanProcessor
 
 	void FHumanViewRaffleMenuProcessor::BKeyPressed()
 	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewRaffleMenuProcessor::ESCKeyPressed()

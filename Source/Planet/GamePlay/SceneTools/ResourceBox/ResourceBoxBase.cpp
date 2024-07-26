@@ -75,10 +75,13 @@ void AResourceBoxBase::AddItemsToTarget()
 			for (const auto Iter : WeaponUnitMap)
 			{
 			}
+
+#if WITH_EDITORONLY_DATA
 			for (const auto Iter : SkillUnitMap)
 			{
 				HoldItemPropertyRef.AddUnit(Iter.Key);
 			}
+#endif
 		}
 		{
 			auto& HoldItemPropertyRef = TargetCharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty();
