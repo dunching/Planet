@@ -15,11 +15,20 @@ class UWeaponUnit;
 class USkillUnit;
 class UCoinUnit;
 
+USTRUCT(BlueprintType)
 struct PLANET_API FSceneUnitExtendInfoBase
 {
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Code")
 	FString Code;
 	
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Code")
 	FGuid Guid = FGuid::NewGuid();
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -32,9 +41,11 @@ public:
 
 	static USceneUnitExtendInfoMap* GetInstance();
 	
-	TMap<ESkillUnitType, TSharedPtr<FSceneUnitExtendInfoBase>>SkillUnitMap;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TMap<ESkillUnitType, FSceneUnitExtendInfoBase>SkillUnitMap;
 	
-	TMap<EToolUnitType, TSharedPtr<FSceneUnitExtendInfoBase>>ToolUnitMap;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TMap<EToolUnitType, FSceneUnitExtendInfoBase>ToolUnitMap;
 	
 #pragma region SceneTools
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")

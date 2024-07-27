@@ -32,7 +32,11 @@ protected:
 
 	bool RafflePermanent(int32 Count)const;
 
-	void RafflePermanentComplete()const;
+	void RafflePermanentComplete(
+#if WITH_EDITOR
+		int32 Count
+#endif
+	)const;
 
 	int32 CostPerRaffle = 180;
 

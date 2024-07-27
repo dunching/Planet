@@ -78,18 +78,33 @@ bool URaffleSubSystem::RafflePermanent(int32 Count)const
 {
 	// Í¨¹ýHTTPÇëÇó
 
-	RafflePermanentComplete();
+	RafflePermanentComplete(
+#if WITH_EDITOR
+		Count
+#endif
+	);
 
 	return true;
 }
 
-void URaffleSubSystem::RafflePermanentComplete()const
+void URaffleSubSystem::RafflePermanentComplete(
+#if WITH_EDITOR
+	int32 Count
+#endif
+)const
 {
 	TArray<FGuid> Ary;
 #if TESTRAFFLE
 	Ary.Append(
 		{
 			FGuid(TEXT("{46DF00CA-5D51-46FA-A136-B0895B1D6812}")),
+			FGuid(TEXT("{2C712123-CFD0-4775-AF12-CC5C6521CE69}")),
+			FGuid(TEXT("{B3B51225-735D-425B-8368-A3955D670FD5}")),
+			FGuid(TEXT("{4C8652EC-DA76-43E0-85EB-6032E23E6833}")),
+			FGuid(TEXT("{30CB1E1B-80B1-476E-837F-3D2BE43831DF}")),
+			FGuid(TEXT("{E1AF2E92-BBB6-4B5D-97D3-3D7F10957A20}")),
+
+			FGuid(TEXT("{8705713D-8ADA-45D1-84DC-E1B63B9E0AAA}")),
 		}
 		);
 #else
@@ -107,7 +122,7 @@ void URaffleSubSystem::RafflePermanentComplete()const
 	{
 		for (const auto& SecondIter : SceneUnitExtendInfoMapPtr->SkillUnitMap)
 		{
-			if (Iter == SecondIter.Value->Guid)
+			if (Iter == SecondIter.Value.Guid)
 			{
 				HoldItemPropertyRef.AddUnit_Apending(SecondIter.Key, ApendingID);
 				break;

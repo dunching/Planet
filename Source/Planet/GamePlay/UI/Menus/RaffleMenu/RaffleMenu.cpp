@@ -24,8 +24,13 @@ struct FRaffleMenu : public TGetSocketName<FRaffleMenu>
 	FName RaffleType_VerticalBox = TEXT("RaffleType_VerticalBox");
 
 	FName RaffleBtn_VerticalBox = TEXT("RaffleBtn_VerticalBox");
-};
 
+	FName GetUnitUI = TEXT("GetUnitUI");
+
+	FName RaffleUI = TEXT("RaffleUI");
+
+	FName ConfirmBtn = TEXT("ConfirmBtn");
+};
 
 void URaffleMenu::NativeConstruct()
 {
