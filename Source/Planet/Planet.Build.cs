@@ -67,6 +67,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Passive");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Weapon");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Element");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Talent");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/ToolFutures");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Tools");
         PublicIncludePaths.Add("Planet/GamePlay/Animation");
@@ -94,7 +95,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/RaffleSystem");
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");
-        PublicIncludePaths.Add("Planet/Common/Talent");
         PublicIncludePaths.Add("Planet/AssetRefMap");
         PublicIncludePaths.Add("Planet/InputProcessor/InputComponent");
         PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");
