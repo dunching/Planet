@@ -29,7 +29,6 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include "Pawn/Vehicle/4WheeledVehicle/4WheeledVehicle.h"
 #include "InteractiveSkillComponent.h"
 #include "ToolsMenu.h"
 #include "BackpackMenu.h"

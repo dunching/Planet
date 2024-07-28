@@ -13,7 +13,10 @@
 class UTalentIcon;
 class URaffleType;
 class URaffleBtn;
+class URaffle_Unit;
+class UBasicUnit;
 struct FSceneToolsContainer;
+struct FSceneUnitExtendInfoBase;
 
 /**
  *
@@ -25,24 +28,39 @@ class PLANET_API URaffleMenu : public UMyUserWidget
 
 public:
 
+	using FOnGetUnitDelegateHandle =
+		TCallbackHandleContainer<void(const TArray<TPair<FSceneUnitExtendInfoBase, TSubclassOf<UBasicUnit>>>&)>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct()override;
+
+	virtual void NativeDestruct()override;
 
 	void InitialRaffleType();
 
 	void InitialRaffleBtn();
 
-	virtual void NativeDestruct()override;
-
 	void SetHoldItemProperty(const FSceneToolsContainer& NewSPHoldItemPerperty);
 
+	void SwitchDisplay(bool bIsDisplayRaffleUI);
+
+	void ResetGetUnitAry(const TArray<TPair<FSceneUnitExtendInfoBase, TSubclassOf<UBasicUnit>>>&Ary);
+
 protected:
+
+	FOnGetUnitDelegateHandle OnGetUnitDelegateHandle;
 
 	void OnRaffleTypeSelected(URaffleType* RaffleTypePtr);
 	
 	void OnRaffleBtnSelected(URaffleBtn* RaffleTypePtr);
 
+	UFUNCTION()
+	void OnClickedConfirmGetUnitBtn();
+
 	URaffleType* PreviouRaffleTypePtr = nullptr;
 
 	ERaffleType LastRaffleType = ERaffleType::kRafflePermanent;
-
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
+	TSubclassOf<URaffle_Unit>Raffle_UnitClass;
+	
 };

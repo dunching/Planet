@@ -39,8 +39,12 @@ public:
 
 	USceneUnitExtendInfoMap();
 
+	virtual void PostCDOContruct() override;
+
 	static USceneUnitExtendInfoMap* GetInstance();
 	
+	void InitialData();
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TMap<ESkillUnitType, FSceneUnitExtendInfoBase>SkillUnitMap;
 	

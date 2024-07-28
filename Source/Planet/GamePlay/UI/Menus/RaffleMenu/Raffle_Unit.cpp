@@ -14,6 +14,7 @@
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
 #include "UICommon.h"
+#include "SceneUnitExtendInfo.h"
 
 struct FRaffle_Unit : public TGetSocketName<FRaffle_Unit>
 {
@@ -38,6 +39,29 @@ void URaffle_Unit::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void URaffle_Unit::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FRaffle_Unit::Get().Text));
+		if (UIPtr)
+		{
+			UIPtr->SetText(FText::FromString(BasicUnitPtr->GetUnitName()));
+		}
+	}
+}
+
+void URaffle_Unit::ResetToolUIByData(const FSceneUnitExtendInfoBase& SceneUnitExtendInfoBase)
+{
+	{
+		auto UIPtr = Cast<UImage>(GetWidgetFromName(FRaffle_Unit::Get().Texture));
+		if (UIPtr)
+		{
+			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(SceneUnitExtendInfoBase.DefaultIcon.ToSoftObjectPath(),
+				[SceneUnitExtendInfoBase, UIPtr]()
+				{
+					UIPtr->SetBrushFromTexture(SceneUnitExtendInfoBase.DefaultIcon.Get());
+				}));
+		}
+	}
 }
 
 void URaffle_Unit::EnableIcon(bool bIsEnable)

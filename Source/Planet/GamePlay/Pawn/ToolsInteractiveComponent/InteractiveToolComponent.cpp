@@ -28,7 +28,7 @@
 #include "Skill_Talent_NuQi.h"
 #include "Skill_Talent_YinYang.h"
 #include "Skill_Element_Gold.h"
-#include "InputComponent/InputProcessorSubSystem.h"
+#include "InputProcessorSubSystem.h"
 #include "Tool_PickAxe.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter.h"

@@ -37,7 +37,7 @@
 #include <ToolsMenu.h>
 #include "InteractiveSkillComponent.h"
 #include "HoldingItemsComponent.h"
-#include "Pawn/InputComponent/InputActions.h"
+#include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "PlanetPlayerController.h"
 #include "HumanCharacter.h"

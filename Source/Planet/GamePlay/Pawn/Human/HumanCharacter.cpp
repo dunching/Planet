@@ -33,7 +33,7 @@
 #include <ToolsMenu.h>
 #include "InteractiveSkillComponent.h"
 #include "HoldingItemsComponent.h"
-#include "Pawn/InputComponent/InputActions.h"
+#include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"

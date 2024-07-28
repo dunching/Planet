@@ -31,19 +31,19 @@ public:
 
 protected:
 
-	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	UPROPERTY(Transient)
 	UAssetRefMap* AssetRefMapPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UAssetRefMap>AssetRefMapClass;
 	
-	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	UPROPERTY(Transient)
 	UStateTagExtendInfoMap* StateExtendInfoPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UStateTagExtendInfoMap>StateExtendInfoClass;
 	
-	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly)
+	UPROPERTY(Transient)
 	USceneUnitExtendInfoMap* SceneUnitExtendInfoMapPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

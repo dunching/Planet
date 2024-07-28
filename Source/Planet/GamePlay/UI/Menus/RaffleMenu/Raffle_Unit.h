@@ -12,6 +12,7 @@
 #include "Raffle_Unit.generated.h"
 
 class UTalentIcon;
+struct FSceneUnitExtendInfoBase;
 
 /**
  *
@@ -32,6 +33,8 @@ public:
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	
+	virtual void ResetToolUIByData(const FSceneUnitExtendInfoBase& SceneUnitExtendInfoBase);
 
 	virtual void EnableIcon(bool bIsEnable)override;
 

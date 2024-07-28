@@ -8,7 +8,7 @@
 #include "LogWriter.h"
 
 #include "InputProcessor.h"
-#include "Pawn/InputComponent/InputActions.h"
+#include "InputActions.h"
 
 void UInputProcessorSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 {

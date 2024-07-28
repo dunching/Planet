@@ -118,6 +118,8 @@ void URaffleSubSystem::RafflePermanentComplete(
 	auto& HoldItemPropertyRef = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
 
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+
+	TArray<TPair<FSceneUnitExtendInfoBase, TSubclassOf<UBasicUnit>>>GetUnitAry;
 	for (const auto& Iter : Ary)
 	{
 		for (const auto& SecondIter : SceneUnitExtendInfoMapPtr->SkillUnitMap)
@@ -125,8 +127,12 @@ void URaffleSubSystem::RafflePermanentComplete(
 			if (Iter == SecondIter.Value.Guid)
 			{
 				HoldItemPropertyRef.AddUnit_Apending(SecondIter.Key, ApendingID);
+
+				GetUnitAry.Add({ SecondIter.Value , SceneUnitExtendInfoMapPtr->SkillToolsMap[SecondIter.Key]});
 				break;
 			}
 		}
 	}
+
+	OnGetUnitAry.ExcuteCallback(GetUnitAry);
 }

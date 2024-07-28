@@ -19,7 +19,7 @@
 #include "GenerateType.h"
 #include "InputProcessor.h"
 #include <ToolsMenu.h>
-#include "InputComponent/InputActions.h"
+#include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "CharacterAttributesComponent.h"
 #include "PlanetPlayerState.h"

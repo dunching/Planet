@@ -10,6 +10,24 @@
 USceneUnitExtendInfoMap::USceneUnitExtendInfoMap() :
 	Super()
 {
+	SkillUnitMap.Add(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
+}
+
+void USceneUnitExtendInfoMap::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
+	InitialData();
+}
+
+USceneUnitExtendInfoMap* USceneUnitExtendInfoMap::GetInstance()
+{
+	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
+	return WorldSetting->GetSceneUnitExtendInfoMap();
+}
+
+void USceneUnitExtendInfoMap::InitialData()
+{
 #pragma region Skill
 	{
 		FSceneUnitExtendInfoBase SceneUnitExtendInfoBase;
@@ -67,11 +85,5 @@ USceneUnitExtendInfoMap::USceneUnitExtendInfoMap() :
 		ToolUnitMap.Add(EToolUnitType::kPickAxe, SceneUnitExtendInfoBase);
 	}
 #pragma endregion 
-}
-
-USceneUnitExtendInfoMap* USceneUnitExtendInfoMap::GetInstance()
-{
-	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
-	return WorldSetting->GetSceneUnitExtendInfoMap();
 }
 

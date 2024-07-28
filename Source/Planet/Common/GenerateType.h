@@ -176,7 +176,7 @@ public:
 		const typename FCallbackHandle::FCallbackType& Callback
 	);
 
-	void ValueChanged(ValueType OldValue, ValueType NewValue);
+	void ValueChanged(ValueType OldValue, ValueType NewValue)const;
 
 	TSharedPtr<FMapType> CallbacksMapSPtr = MakeShared<FMapType>();
 
@@ -216,7 +216,7 @@ TSharedPtr<typename TOnValueChangedCallbackContainer<ValueType>::FCallbackHandle
 }
 
 template<typename ValueType>
-void TOnValueChangedCallbackContainer<ValueType>::ValueChanged(ValueType OldValue, ValueType NewValue)
+void TOnValueChangedCallbackContainer<ValueType>::ValueChanged(ValueType OldValue, ValueType NewValue)const
 {
 	if (!CallbacksMapSPtr)
 	{
@@ -322,7 +322,7 @@ public:
 		const typename FCallbackHandle::FCallbackType& Callback
 	);
 
-	void ExcuteCallback(ParamTypes...Args);
+	void ExcuteCallback(ParamTypes...Args)const;
 
 private:
 
@@ -340,7 +340,7 @@ const TCallbackHandleContainer<Ret(ParamTypes...)>& TCallbackHandleContainer<Ret
 }
 
 template<typename Ret, typename... ParamTypes>
-void TCallbackHandleContainer<Ret(ParamTypes...)>::ExcuteCallback(ParamTypes...Args)
+void TCallbackHandleContainer<Ret(ParamTypes...)>::ExcuteCallback(ParamTypes...Args)const
 {
 	if (!CallbacksMapSPtr)
 	{
