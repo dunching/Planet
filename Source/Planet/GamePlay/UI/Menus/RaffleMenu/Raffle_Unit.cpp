@@ -48,17 +48,17 @@ void URaffle_Unit::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	}
 }
 
-void URaffle_Unit::ResetToolUIByData(const FSceneUnitExtendInfoBase& SceneUnitExtendInfoBase)
+void URaffle_Unit::ResetToolUIByData(const FTableRowUnit& SceneUnitExtendInfoBase)
 {
 	{
 		auto UIPtr = Cast<UImage>(GetWidgetFromName(FRaffle_Unit::Get().Texture));
 		if (UIPtr)
 		{
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(SceneUnitExtendInfoBase.DefaultIcon.ToSoftObjectPath(),
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(SceneUnitExtendInfoBase.RaffleIcon.ToSoftObjectPath(),
 				[SceneUnitExtendInfoBase, UIPtr]()
 				{
-					UIPtr->SetBrushFromTexture(SceneUnitExtendInfoBase.DefaultIcon.Get());
+					UIPtr->SetBrushFromTexture(SceneUnitExtendInfoBase.RaffleIcon.Get());
 				}));
 		}
 	}

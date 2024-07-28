@@ -37,6 +37,20 @@
 #include "GravityPlayerController.h"
 #include "SceneUnitExtendInfo.h"
 
+void TestCommand::CopyID2RowName()
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
+
+	TArray<FTableRowUnit*> OutRowArray;
+	DataTable->GetAllRows<FTableRowUnit>(TEXT("FPCGDataTableRowToParamDataTest"), OutRowArray);
+
+	for (const auto Iter : OutRowArray)
+	{
+	}
+}
+
 void TestCommand::TestPlayerCharacterMoveTo(const TArray< FString >& Args)
 {
 	if (Args.IsValidIndex(0))
@@ -189,10 +203,10 @@ void TestCommand::TestDisplacementSkill()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		auto UnitClass = USceneUnitExtendInfoMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
-
-		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
-		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);
+// 		auto UnitClass = USceneUnitExtendInfoMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
+// 
+// 		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
+// 		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);
 	}
 }
 

@@ -41,11 +41,11 @@ void AResourceBoxBase::BeginPlay()
 
 	for (const auto Iter : SkillUnitMap)
 	{
-		HoldingItemsComponentPtr->GetHoldItemProperty().AddUnit(Iter.Key);
+		HoldingItemsComponentPtr->GetHoldItemProperty().AddUnit_Skill(Iter.Key);
 	}
 	for (const auto Iter : SkillUnitMap)
 	{
-		HoldingItemsComponentPtr->GetHoldItemProperty().AddUnit(Iter.Key);
+		HoldingItemsComponentPtr->GetHoldItemProperty().AddUnit_Skill(Iter.Key);
 	}
 }
 
@@ -67,7 +67,7 @@ void AResourceBoxBase::AddItemsToTarget()
 			auto& HoldItemPropertyRef = TargetCharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
 			for (const auto Iter : ConsumableUnitMap)
 			{
-				HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
+				HoldItemPropertyRef.AddUnit_Consumable(Iter.Key, Iter.Value);
 			}
 			for (const auto Iter : ToolUnitMap)
 			{
@@ -79,7 +79,7 @@ void AResourceBoxBase::AddItemsToTarget()
 #if WITH_EDITORONLY_DATA
 			for (const auto Iter : SkillUnitMap)
 			{
-				HoldItemPropertyRef.AddUnit(Iter.Key);
+				HoldItemPropertyRef.AddUnit_Skill(Iter.Key);
 			}
 #endif
 		}
@@ -87,7 +87,7 @@ void AResourceBoxBase::AddItemsToTarget()
 			auto& HoldItemPropertyRef = TargetCharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty();
 			for (const auto Iter : CoinUnitMap)
 			{
-				HoldItemPropertyRef.AddUnit(Iter.Key, Iter.Value);
+				HoldItemPropertyRef.AddUnit_Coin(Iter.Key, Iter.Value);
 			}
 		}
 	}

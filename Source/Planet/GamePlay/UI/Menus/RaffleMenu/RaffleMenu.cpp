@@ -154,7 +154,7 @@ void URaffleMenu::SwitchDisplay(bool bIsDisplayRaffleUI)
 	}
 }
 
-void URaffleMenu::ResetGetUnitAry(const TArray<TPair<FSceneUnitExtendInfoBase, TSubclassOf<UBasicUnit>>>& Ary)
+void URaffleMenu::ResetGetUnitAry(const TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>& Ary)
 {
 	SwitchDisplay(false);
 	auto HorizotalUIPtr = Cast<UHorizontalBox>(GetWidgetFromName(FRaffleMenu::Get().GetUnit_HorizaltalBox));

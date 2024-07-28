@@ -16,7 +16,7 @@ class URaffleBtn;
 class URaffle_Unit;
 class UBasicUnit;
 struct FSceneToolsContainer;
-struct FSceneUnitExtendInfoBase;
+struct FTableRowUnit;
 
 /**
  *
@@ -29,7 +29,7 @@ class PLANET_API URaffleMenu : public UMyUserWidget
 public:
 
 	using FOnGetUnitDelegateHandle =
-		TCallbackHandleContainer<void(const TArray<TPair<FSceneUnitExtendInfoBase, TSubclassOf<UBasicUnit>>>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(const TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>&)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -43,7 +43,7 @@ public:
 
 	void SwitchDisplay(bool bIsDisplayRaffleUI);
 
-	void ResetGetUnitAry(const TArray<TPair<FSceneUnitExtendInfoBase, TSubclassOf<UBasicUnit>>>&Ary);
+	void ResetGetUnitAry(const TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>&Ary);
 
 protected:
 

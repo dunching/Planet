@@ -67,7 +67,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Passive");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Weapon");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Element");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Talent");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/ToolFutures");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Tools");
         PublicIncludePaths.Add("Planet/GamePlay/Animation");
@@ -87,7 +86,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Building/BuildingArea");
         PublicIncludePaths.Add("Planet/GamePlay/SceneTools/Projectile");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn");
-        PublicIncludePaths.Add("Planet/GamePlay/Pawn/InputComponent");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/ToolsInteractiveComponent");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human");
@@ -98,7 +96,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Common");
         PublicIncludePaths.Add("Planet/Common/Talent");
         PublicIncludePaths.Add("Planet/AssetRefMap");
-        PublicIncludePaths.Add("Planet/Tools");
         PublicIncludePaths.Add("Planet/InputProcessor/InputComponent");
         PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HorseProcessor");

@@ -712,7 +712,7 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 				}
 			}
 			case ESkillType::kActive:
-			case ESkillType::kWeaponActive:
+			case ESkillType::kWeapon:
 			{
 				auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 				Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
@@ -723,7 +723,7 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 				));
 			}
 			break;
-			case ESkillType::kTalentPassive:
+			case ESkillType::kTalent:
 			{
 				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
 				{

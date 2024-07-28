@@ -66,7 +66,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kSkill)
+	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kActiveSkill)
 	{
 		ToolPtr = Cast<USkillUnit>(BasicUnitPtr);
 	}

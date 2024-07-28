@@ -238,7 +238,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 		{
 			switch (Iter.Value->SkillUnit->SkillType)
 			{
-			case ESkillType::kTalentPassive:
+			case ESkillType::kTalent:
 			{
 				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
 				{

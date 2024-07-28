@@ -45,21 +45,21 @@ void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 {
 	{
 		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-		HoldItemComponent.AddUnit(EToolUnitType::kPickAxe);
-
-		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
-		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
-		HoldItemComponent.AddUnit(EWeaponUnitType::kRangeTest);
-
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Tornado);
-
-		HoldItemComponent.AddUnit(EConsumableUnitType::kGeneric_HP, 1);
-		HoldItemComponent.AddUnit(EConsumableUnitType::kGeneric_PP, 1);
+// 		HoldItemComponent.AddUnit(EToolUnitType::kPickAxe);
+// 
+// 		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
+// 		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
+// 		HoldItemComponent.AddUnit(EWeaponUnitType::kRangeTest);
+// 
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Tornado);
+// 
+// 		HoldItemComponent.AddUnit(EConsumableUnitType::kGeneric_HP, 1);
+// 		HoldItemComponent.AddUnit(EConsumableUnitType::kGeneric_PP, 1);
 	}
 }
 
@@ -67,16 +67,16 @@ void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 {
 	{
 		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-		HoldItemComponent.AddUnit(EToolUnitType::kPickAxe);
-
-		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
-		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
-		HoldItemComponent.AddUnit(EWeaponUnitType::kRangeTest);
-
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
-		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
+// 		HoldItemComponent.AddUnit(EToolUnitType::kPickAxe);
+// 
+// 		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
+// 		HoldItemComponent.AddUnit(EWeaponUnitType::kWeaponHandProtection);
+// 		HoldItemComponent.AddUnit(EWeaponUnitType::kRangeTest);
+// 
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Passive_ZMJZ);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Talent_NuQi);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_GroupTherapy);
+// 		HoldItemComponent.AddUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
 	}
 }

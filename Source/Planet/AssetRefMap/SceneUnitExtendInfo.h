@@ -6,28 +6,62 @@
 #include <GenerateType.h>
 
 #include "GameplayTagContainer.h"
+
 #include "SceneElement.h"
 
 #include "SceneUnitExtendInfo.generated.h"
+
+class UDataTable;
 
 class UToolUnit;
 class UWeaponUnit;
 class USkillUnit;
 class UCoinUnit;
+class UBasicUnit;
 
 USTRUCT(BlueprintType)
-struct PLANET_API FSceneUnitExtendInfoBase
+struct PLANET_API FTableRowUnit : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Code")
-	FString Code;
-	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Code")
-	FGuid Guid = FGuid::NewGuid();
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+	FTableRowUnit() { }
+
+	virtual ~FTableRowUnit() { }
+
+	// 用于复制到RowName
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGuid UnitGuid = FGuid::NewGuid();
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FName RowDescriptionText = TEXT("Row描述文字");
+
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	ESceneToolsType SceneToolsType = ESceneToolsType::kCoin;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	EToolUnitType ToolUnitType = EToolUnitType::kNone;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	EWeaponUnitType WeaponUnitType = EWeaponUnitType::kNone;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	EConsumableUnitType ConsumableUnitType = EConsumableUnitType::kNone;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	ESkillUnitType SkillUnitType = ESkillUnitType::kNone;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	ECoinUnitType CoinUnitType = ECoinUnitType::kNone;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<UTexture2D> RaffleIcon;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<UBasicUnit>UnitClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FName DescriptionText = TEXT("描述文字");
 
 };
 
@@ -42,30 +76,10 @@ public:
 	virtual void PostCDOContruct() override;
 
 	static USceneUnitExtendInfoMap* GetInstance();
-	
+
 	void InitialData();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TMap<ESkillUnitType, FSceneUnitExtendInfoBase>SkillUnitMap;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TMap<EToolUnitType, FSceneUnitExtendInfoBase>ToolUnitMap;
-	
-#pragma region SceneTools
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EToolUnitType, TSubclassOf<UToolUnit>>EquipmentToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EWeaponUnitType, TSubclassOf<UWeaponUnit>>WeaponToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<ESkillUnitType, TSubclassOf<USkillUnit>>SkillToolsMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<EConsumableUnitType, TSubclassOf<UConsumableUnit>>ConsumableToolMap;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SceneTools")
-	TMap<ECoinUnitType, TSubclassOf<UCoinUnit>>CoinToolMap;
-#pragma endregion 
+	TSoftObjectPtr<UDataTable> DataTable;
 
 };

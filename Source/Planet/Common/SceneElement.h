@@ -12,6 +12,7 @@
 
 #include "SceneElement.generated.h"
 
+struct FTableRowUnit;
 class AToolUnitBase;
 class USkill_Consumable_Base;
 class AConsumable_Base;
@@ -66,10 +67,14 @@ UENUM(BlueprintType)
 enum class ESceneToolsType : uint8
 {
 	kNone,
+
 	kWeapon,
 	kTool,
 	kConsumables,
-	kSkill,
+	kWeaponSkill,
+	kActiveSkill,
+	kPassveSkill,
+	kTalentSkill,
 	kGroupMate,
 	kCoin,
 };
@@ -77,6 +82,8 @@ enum class ESceneToolsType : uint8
 UENUM(BlueprintType)
 enum class ECoinUnitType : uint8
 {
+	kNone,
+
 	// 
 	kRegular,
 
@@ -91,6 +98,7 @@ UENUM(BlueprintType)
 enum class EToolUnitType : uint8
 {
 	kNone,
+
 	kPickAxe,
 };
 
@@ -98,6 +106,7 @@ UENUM(BlueprintType)
 enum class EConsumableUnitType : uint8
 {
 	kNone,
+
 	kGeneric_HP,
 	kGeneric_PP,
 };
@@ -106,6 +115,7 @@ UENUM(BlueprintType)
 enum class EWeaponUnitType : uint8
 {
 	kNone,
+
 	kPickAxe,
 	kWeaponHandProtection,
 	kRangeTest,
@@ -136,9 +146,9 @@ UENUM(BlueprintType)
 enum class ESkillType : uint8
 {
 	kActive,
-	kWeaponActive,
+	kWeapon,
 	kPassive,
-	kTalentPassive,
+	kTalent,
 };
 
 UCLASS(BlueprintType)
@@ -319,12 +329,14 @@ public:
 
 	USkillUnit();
 
+	USkillUnit(ESceneToolsType InSceneToolsType);
+
 	int32 Level = 1;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
 	TSubclassOf<USkill_Base>SkillClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "SkillType")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "SkillType")
 	ESkillType SkillType = ESkillType::kActive;
 
 protected:
@@ -348,6 +360,45 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
 	TSubclassOf<USkill_Base>AddtionalSkillClass;
+
+protected:
+
+};
+
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API UActiveSkillUnit : public USkillUnit
+{
+	GENERATED_BODY()
+
+public:
+
+	UActiveSkillUnit();
+
+protected:
+
+};
+
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API UTalentSkillUnit : public USkillUnit
+{
+	GENERATED_BODY()
+
+public:
+
+	UTalentSkillUnit();
+
+protected:
+
+};
+
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API UWeaponSkillUnit : public USkillUnit
+{
+	GENERATED_BODY()
+
+public:
+
+	UWeaponSkillUnit();
 
 protected:
 
@@ -394,33 +445,52 @@ struct FSceneToolsContainer
 
 	using FOnCoinUnitChanged = TCallbackHandleContainer<void(UCoinUnit*, bool, int32)>;
 
-	UCoinUnit* AddUnit(ECoinUnitType Type, int32 Num);
 
-	UConsumableUnit* AddUnit(EConsumableUnitType Type, int32 Num = 1);
-
-	void RemoveUnit(UConsumableUnit*UnitPtr, int32 Num = 1);
-
-	UToolUnit* AddUnit(EToolUnitType Type);
-
-	UWeaponUnit* AddUnit(EWeaponUnitType Type);
-
-	USkillUnit* AddUnit(ESkillUnitType Type);
-	
-	void AddUnit_Apending(ESkillUnitType Type, FGuid Guid);
-	
-	void SyncApendingUnit(FGuid Guid);
-
-	UWeaponUnit* FindUnit(EWeaponUnitType Type);
-
-	USkillUnit* FindUnit(ESkillUnitType Type);
-
-	UCoinUnit* FindUnit(ECoinUnitType Type);
+	UBasicUnit* AddUnit(FGuid UnitGuid, int32 Num);
 
 	UBasicUnit* FindUnit(UBasicUnit::IDType ID);
+
+
+	UCoinUnit* AddUnit_Coin(FGuid UnitGuid, int32 Num);
 	
+	UCoinUnit* AddUnit_Coin(ECoinUnitType CoinUnitType, int32 Num);
+
+	UCoinUnit* FindUnit_Coin(FGuid UnitGuid);
+
+	UCoinUnit* FindUnit_Coin(ECoinUnitType CoinUnitType);
+
+
+	UConsumableUnit* AddUnit_Consumable(FGuid UnitGuid, int32 Num = 1);
+
+	UConsumableUnit* AddUnit_Consumable(EConsumableUnitType ConsumableUnitType, int32 Num = 1);
+
+	void RemoveUnit_Consumable(UConsumableUnit*UnitPtr, int32 Num = 1);
+
+
+	UToolUnit* AddUnit_ToolUnit(FGuid UnitGuid);
+
+
+	UWeaponUnit* AddUnit_Weapon(FGuid UnitGuid);
+
+	UWeaponUnit* FindUnit_Weapon(FGuid UnitGuid);
+
+
+	USkillUnit* AddUnit_Skill(FGuid UnitGuid);
+
+	USkillUnit* AddUnit_Skill(ESkillUnitType SkillUnitType);
+
+	USkillUnit* FindUnit_Skill(FGuid UnitGuid);
+
+	USkillUnit* FindUnit_Skill(ESkillUnitType SkillUnitType);
+
+
 	const TArray<UBasicUnit*>& GetSceneUintAry()const;
 
 	const TMap<ECoinUnitType, UCoinUnit*>& GetCoinUintAry()const;
+
+	void AddUnit_Apending(FGuid UnitGuid, FGuid Guid);
+
+	void SyncApendingUnit(FGuid Guid);
 
 	FOnSkillUnitChanged OnSkillUnitChanged;
 
@@ -432,6 +502,16 @@ struct FSceneToolsContainer
 
 private:
 
+	FTableRowUnit* GetTableRowUnit(FGuid UnitGuid)const;
+
+	USkillUnit* GetUnitByType(ESkillUnitType SkillUnitType)const;
+	
+	UCoinUnit* GetUnitByType(ECoinUnitType CoinUnitType)const;
+	
+	UWeaponUnit* GetUnitByType(EWeaponUnitType WeaponUnitType)const;
+	
+	UConsumableUnit* GetUnitByType(EConsumableUnitType ConsumableUnitType)const;
+	
 	UPROPERTY()
 	TArray<UBasicUnit*> SceneToolsAry;
 
@@ -443,7 +523,7 @@ private:
 	
 	TMap<ECoinUnitType, UCoinUnit*> CoinUnitMap;
 
-	TMap<FGuid, TTuple<ESkillUnitType, int32>> SkillUnitApendingMap;
+	TMap<FGuid, TTuple<FGuid, int32>> SkillUnitApendingMap;
 
 };
 

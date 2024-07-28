@@ -220,55 +220,5 @@ void AHorseAIController::InitialCharacter()
 		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
 
-		{
-			// ÎäÆ÷
-			TSharedPtr<FWeaponSocketInfo> FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
-			{
-				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kPickAxe);
-				if (WeaponUnitPtr)
-				{
-					FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
-					FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
-				}
-			}
-			TSharedPtr<FWeaponSocketInfo >SecondWeaponSocketInfo = MakeShared<FWeaponSocketInfo>();
-			{
-				auto WeaponUnitPtr = HICPtr->GetHoldItemProperty().FindUnit(EWeaponUnitType::kRangeTest);
-				if (WeaponUnitPtr)
-				{
-					SecondWeaponSocketInfo->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
-					SecondWeaponSocketInfo->WeaponUnitPtr = WeaponUnitPtr;
-				}
-			}
-			EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfo);
-			EICPtr->SwitchWeapon();
-		}
-		// ¼¼ÄÜ
-		{
-			TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
-			{
-				TSharedPtr<FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-				SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
-				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_Displacement);
-
-				SkillsMap.Add(
-					SkillsSocketInfo->SkillSocket,
-					SkillsSocketInfo
-				);
-			}
-			{
-				TSharedPtr<FSkillSocketInfo> SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-				SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
-				SkillsSocketInfo->SkillUnit = HICPtr->GetHoldItemProperty().FindUnit(ESkillUnitType::kHumanSkill_Active_ContinuousGroupTherapy);
-
-				SkillsMap.Add(
-					SkillsSocketInfo->SkillSocket,
-					SkillsSocketInfo
-				);
-			}
-			EICPtr->RegisterMultiGAs(SkillsMap);
-		}
 	}
 }

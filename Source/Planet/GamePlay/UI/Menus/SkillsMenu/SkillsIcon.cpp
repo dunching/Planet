@@ -63,7 +63,7 @@ void USkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	bIsReady_Previous = false;
 
 	SkillUnitPtr = nullptr;
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kSkill)
+	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kActiveSkill)
 	{
 		auto InSkillUnitPtr = Cast<USkillUnit>(BasicUnitPtr);
 

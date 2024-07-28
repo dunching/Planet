@@ -37,7 +37,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	{
 	case ERaffleType::kRafflePermanent:
 	{
-		auto CoinUnitPtr = HoldItemPropertyRef.FindUnit(ECoinUnitType::kRaffleLimit);
+		auto CoinUnitPtr = HoldItemPropertyRef.FindUnit_Coin(ECoinUnitType::kRaffleLimit);
 		if (CoinUnitPtr)
 		{
 			if (CoinUnitPtr->GetCurrentValue() > Count)
@@ -119,19 +119,16 @@ void URaffleSubSystem::RafflePermanentComplete(
 
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
-	TArray<TPair<FSceneUnitExtendInfoBase, TSubclassOf<UBasicUnit>>>GetUnitAry;
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
+
+	TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>GetUnitAry;
 	for (const auto& Iter : Ary)
 	{
-		for (const auto& SecondIter : SceneUnitExtendInfoMapPtr->SkillUnitMap)
-		{
-			if (Iter == SecondIter.Value.Guid)
-			{
-				HoldItemPropertyRef.AddUnit_Apending(SecondIter.Key, ApendingID);
+		auto RowPtr = DataTable->FindRow<FTableRowUnit>(*Iter.ToString(), TEXT("GetUnit"));
 
-				GetUnitAry.Add({ SecondIter.Value , SceneUnitExtendInfoMapPtr->SkillToolsMap[SecondIter.Key]});
-				break;
-			}
-		}
+// 		HoldItemPropertyRef.AddUnit_Apending(SecondIter.Key, ApendingID);
+// 
+// 		GetUnitAry.Add({ SecondIter.Value , SceneUnitExtendInfoMapPtr->SkillToolsMap[SecondIter.Key] });
 	}
 
 	OnGetUnitAry.ExcuteCallback(GetUnitAry);

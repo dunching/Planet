@@ -188,7 +188,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 	const auto& SceneUintAryRef = SPHoldItemPerpertyPtr.GetSceneUintAry();
 	for (const auto& Iter : SceneUintAryRef)
 	{
-		if (Iter->GetSceneToolsType() != ESceneToolsType::kSkill)
+		if (Iter->GetSceneToolsType() != ESceneToolsType::kActiveSkill)
 		{
 			continue;
 		}
@@ -203,7 +203,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 		{
 		case ESkillType::kActive:
 		case ESkillType::kPassive:
-		case ESkillType::kTalentPassive:
+		case ESkillType::kTalent:
 		{
 			auto WidgetPtr = CreateWidget<USkillsIcon>(this, EntryClass);
 			if (WidgetPtr)
@@ -594,7 +594,6 @@ void UAllocationSkillsMenu::OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr)
 		{
 			if (ToolSPtr && !ToolSPtr->FirstSkill)
 			{
-				ToolSPtr->FirstSkill = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty().AddUnit(ToolSPtr->FirstSkillClass);
 			}
 
 			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill : nullptr);

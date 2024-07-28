@@ -48,7 +48,7 @@ void UDragDropOperationWidget::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			SetItemType(ToolUnitSPtr);
 		}
 		break;
-		case ESceneToolsType::kSkill:
+		case ESceneToolsType::kActiveSkill:
 		{
 			SkillUnitSPtr = Cast<USkillUnit>(BasicUnitPtr);
 			SetItemType(SkillUnitSPtr);
