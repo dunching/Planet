@@ -32,6 +32,8 @@
 #include "Tool_PickAxe.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter.h"
+#include "GameplayTagsSubSystem.h"
+#include "SceneUnitTable.h"
 
 FName UInteractiveSkillComponent::ComponentName = TEXT("InteractiveSkillComponent");
 
@@ -231,9 +233,11 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 				FActorSpawnParameters ActorSpawnParameters;
 				ActorSpawnParameters.Owner = OnwerActorPtr;
 
-				ActivedWeaponPtr = GetWorld()->SpawnActor<AWeapon_Base>(WeaponUnit->WeaponUnitPtr->ToolActorClass, ActorSpawnParameters);
+				ActivedWeaponPtr = GetWorld()->SpawnActor<AWeapon_Base>(
+					WeaponUnit->WeaponUnitPtr->GetTableRowUnit_WeaponExtendInfo()->ToolActorClass, ActorSpawnParameters
+				);
 
-				OnwerActorPtr->SwitchAnimLink(WeaponUnit->WeaponUnitPtr->AnimLinkClassType);
+				OnwerActorPtr->SwitchAnimLink(WeaponUnit->WeaponUnitPtr->GetTableRowUnit_WeaponExtendInfo()->AnimLinkClassType);
 			}
 			else
 			{
@@ -384,32 +388,26 @@ bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
 	}
 
 	FGameplayEventData Payload;
-	switch (WeaponUnit->WeaponUnitPtr->FirstSkill->GetSceneElementType<ESkillUnitType>())
-	{
-	case ESkillUnitType::kHumanSkill_WeaponActive_PickAxe_Attack1:
+	if (WeaponUnit->WeaponUnitPtr->FirstSkill->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Axe))
 	{
 		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
 		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(ActivedWeaponPtr);
 		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 	}
-	break;
-	case ESkillUnitType::kHumanSkill_WeaponActive_HandProtection_Attack1:
+	else if (WeaponUnit->WeaponUnitPtr->FirstSkill->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_HandProtection))
 	{
 		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
 		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(ActivedWeaponPtr);
 		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 	}
-	break;
-	case ESkillUnitType::kHumanSkill_WeaponActive_RangeTest:
+	else if (WeaponUnit->WeaponUnitPtr->FirstSkill->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_RangeTest))
 	{
 		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest;
 		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(ActivedWeaponPtr);
 		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
-	}
-	break;
 	}
 
 	return ASCPtr->TriggerAbilityFromGameplayEvent(
@@ -428,54 +426,54 @@ bool UInteractiveSkillComponent::ActiveSkill_Active(
 	auto SkillIter = SkillsMap.Find(CanbeActivedInfoSPtr->Socket);
 	if (!SkillIter)
 	{
-		return  false;
+		return false;
 	}
 
-	switch ((*SkillIter)->SkillUnit->SkillType)
+	auto ActiveSkillUnitPtr = Cast<UActiveSkillUnit>((*SkillIter)->SkillUnit);
+	if (!ActiveSkillUnitPtr)
 	{
-	case ESkillType::kActive:
+		return false;
+	}
+
+	if (ActiveSkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
 	{
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		if (!OnwerActorPtr)
 		{
-			return  false;
+			return false;
 		}
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		for (const auto SkillHandleIter : (*SkillIter)->HandleAry)
 		{
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(SkillHandleIter);
-			if (!GameplayAbilitySpecPtr)
-			{
-				return false;
-			}
-			auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-			if (!GAInsPtr)
+			if (!ActivedCorrespondingWeapon(ActiveSkillUnitPtr))
 			{
 				return false;
 			}
 
-			if (!ActivedCorrespondingWeapon(GAInsPtr))
+			if (
+				(*SkillIter)->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) 
+				)
 			{
-				return false;
-			}
+				auto GameplayAbilityTargetPtr =
+					new FGameplayAbilityTargetData_ActiveSkill;
 
-			switch ((*SkillIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
-			{
-			case ESkillUnitType::kNone:
-			{
-			}
-			break;
-			default:
-			{
-				return ASCPtr->TryActivateAbility(SkillHandleIter);
-			}
-			break;
+				GameplayAbilityTargetPtr->ActiveSkillUnitPtr = ActiveSkillUnitPtr;
+
+				FGameplayEventData Payload;
+				Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+				return ASCPtr->TriggerAbilityFromGameplayEvent(
+					SkillHandleIter,
+					ASCPtr->AbilityActorInfo.Get(),
+					FGameplayTag(),
+					&Payload,
+					*ASCPtr
+				);
 			}
 		}
 	}
-	break;
-	}
+
 	return false;
 }
 
@@ -520,43 +518,47 @@ void UInteractiveSkillComponent::CancelAction(const TSharedPtr<FCanbeActivedInfo
 	}
 }
 
-bool UInteractiveSkillComponent::ActivedCorrespondingWeapon(USkill_Active_Base* SkillGAPtr)
+bool UInteractiveSkillComponent::ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr)
 {
-	if (SkillGAPtr && (SkillGAPtr->WeaponUnitType != EWeaponUnitType::kNone))
+	if (ActiveSkillUnitPtr)
 	{
-		TSharedPtr<FWeaponSocketInfo > WeaponUnit;
-		TSharedPtr<FWeaponSocketInfo > OtherWeaponUnit;
-		switch (CurrentActivedWeaponSocket)
+		const auto RequireWeaponUnitType = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->RequireWeaponUnitType;
+		if (RequireWeaponUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 		{
-		case EWeaponSocket::kMain:
-		{
-			WeaponUnit = FirstWeaponUnit;
-			OtherWeaponUnit = SecondaryWeaponUnit;
-		}
-		break;
-		case EWeaponSocket::kSecondary:
-		{
-			WeaponUnit = SecondaryWeaponUnit;
-			OtherWeaponUnit = FirstWeaponUnit;
-		}
-		break;
-		}
+			TSharedPtr<FWeaponSocketInfo > WeaponUnit;
+			TSharedPtr<FWeaponSocketInfo > OtherWeaponUnit;
+			switch (CurrentActivedWeaponSocket)
+			{
+			case EWeaponSocket::kMain:
+			{
+				WeaponUnit = FirstWeaponUnit;
+				OtherWeaponUnit = SecondaryWeaponUnit;
+			}
+			break;
+			case EWeaponSocket::kSecondary:
+			{
+				WeaponUnit = SecondaryWeaponUnit;
+				OtherWeaponUnit = FirstWeaponUnit;
+			}
+			break;
+			}
 
-		if (
-			WeaponUnit &&
-			WeaponUnit->WeaponUnitPtr &&
-			(WeaponUnit->WeaponUnitPtr->GetSceneElementType<EWeaponUnitType>() == SkillGAPtr->WeaponUnitType)
-			)
-		{
-			return true;
-		}
-		else if (
-			OtherWeaponUnit &&
-			OtherWeaponUnit->WeaponUnitPtr &&
-			(OtherWeaponUnit->WeaponUnitPtr->GetSceneElementType<EWeaponUnitType>() == SkillGAPtr->WeaponUnitType)
-			)
-		{
-			return SwitchWeapon();
+			if (
+				WeaponUnit &&
+				WeaponUnit->WeaponUnitPtr &&
+				(RequireWeaponUnitType.MatchesTag(WeaponUnit->WeaponUnitPtr->GetUnitType()))
+				)
+			{
+				return true;
+			}
+			else if (
+				OtherWeaponUnit &&
+				OtherWeaponUnit->WeaponUnitPtr &&
+				(RequireWeaponUnitType.MatchesTag(OtherWeaponUnit->WeaponUnitPtr->GetUnitType()))
+				)
+			{
+				return SwitchWeapon();
+			}
 		}
 	}
 
@@ -624,9 +626,9 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 			}
 			else
 			{
-				switch ((*PreviouIter)->SkillUnit->SkillType)
-				{
-				case ESkillType::kPassive:
+				if (
+					(*PreviouIter)->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve)
+					)
 				{
 					auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>((*PreviouIter)->SkillUnit);
 					if (PassiveSkillUnitPtr)
@@ -646,25 +648,20 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 						}
 					}
 				}
-				break;
-				}
 
-				switch ((*PreviouIter)->SkillUnit->GetSceneElementType<ESkillUnitType>())
-				{
-				case ESkillUnitType::kHumanSkill_Talent_NuQi:
-				case ESkillUnitType::kHumanSkill_Talent_YinYang:
+				if (
+					(*PreviouIter)->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->TalentSocket)
+					)
 				{
 					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr.Reset();
 				}
-				default:
+				else
 				{
 					for (const auto SkillHandleIter : Iter.Value->HandleAry)
 					{
 						OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(SkillHandleIter);
 					}
 					SkillsMap.Remove(Iter.Value->SkillSocket);
-				}
-				break;
 				}
 			}
 		}
@@ -675,9 +672,9 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 			{
 				continue;
 			}
-			switch (Iter.Value->SkillUnit->SkillType)
-			{
-			case ESkillType::kPassive:
+			if (
+				Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve)
+				)
 			{
 				auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>(Iter.Value->SkillUnit);
 				if (PassiveSkillUnitPtr)
@@ -711,8 +708,10 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 					}
 				}
 			}
-			case ESkillType::kActive:
-			case ESkillType::kWeapon:
+			else if (
+				Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
+				Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon)
+				)
 			{
 				auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 				Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
@@ -722,27 +721,15 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 					)
 				));
 			}
-			break;
-			case ESkillType::kTalent:
+			else if (
+				Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent)
+				)
 			{
-				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
-				{
-				case ESkillUnitType::kHumanSkill_Talent_NuQi:
+				if (
+					Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi)
+					)
 				{
 					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_NuQi>();
-				}
-				break;
-				case ESkillUnitType::kHumanSkill_Talent_YinYang:
-				{
-					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_YinYang>();
-				}
-				break;
-				}
-				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
-				{
-				case ESkillUnitType::kHumanSkill_Talent_NuQi:
-				case ESkillUnitType::kHumanSkill_Talent_YinYang:
-				{
 					auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 					Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 						FGameplayAbilitySpec(
@@ -751,12 +738,19 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 						)
 					));
 				}
-				break;
+				else if (
+					Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang)
+					)
+				{
+					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_YinYang>();
+					auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
+					Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+						FGameplayAbilitySpec(
+							Iter.Value->SkillUnit->SkillClass,
+							Iter.Value->SkillUnit->Level
+						)
+					));
 				}
-			}
-			break;
-			default:
-				break;
 			}
 		}
 	}

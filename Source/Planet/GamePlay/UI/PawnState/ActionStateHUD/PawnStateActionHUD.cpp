@@ -17,6 +17,7 @@
 #include "LogWriter.h"
 #include "State_Talent_NuQi.h"
 #include "State_Talent_YinYang.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace PawnStateActionHUD
 {
@@ -236,41 +237,24 @@ void UPawnStateActionHUD::InitialTalentUI()
 			(Iter.Value->SkillUnit->Level > 0)
 			)
 		{
-			switch (Iter.Value->SkillUnit->SkillType)
+			if (Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi))
 			{
-			case ESkillType::kTalent:
-			{
-				switch (Iter.Value->SkillUnit->GetSceneElementType<ESkillUnitType>())
+				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
+				if (UIPtr)
 				{
-				case ESkillUnitType::kHumanSkill_Talent_NuQi:
-				{
-					PRINTINVOKEINFO();
-					auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
-					if (UIPtr)
-					{
-						BorderPtr->AddChild(UIPtr);
-						bIsGiveTalentPassive = true;
-					}
-				}
-				break;
-				case ESkillUnitType::kHumanSkill_Talent_YinYang:
-				{
-					PRINTINVOKEINFO();
-					auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
-					if (UIPtr)
-					{
-						UIPtr->TargetCharacterPtr = CharacterPtr;
-						BorderPtr->AddChild(UIPtr);
-						bIsGiveTalentPassive = true;
-					}
-				}
-				break;
+					BorderPtr->AddChild(UIPtr);
+					bIsGiveTalentPassive = true;
 				}
 			}
-			};
-			if (bIsGiveTalentPassive)
+			else if (Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang))
 			{
-				break;
+				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
+				if (UIPtr)
+				{
+					UIPtr->TargetCharacterPtr = CharacterPtr;
+					BorderPtr->AddChild(UIPtr);
+					bIsGiveTalentPassive = true;
+				}
 			}
 		}
 	}

@@ -182,6 +182,20 @@ UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()
 	return InteractiveToolComponentPtr;
 }
 
+UBasicUnit* ACharacterBase::AddUnit(FGameplayTag UnitType, int32 Num)
+{
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill) ||
+		UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin)
+		)
+	{
+		return GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty().AddUnit(UnitType, Num);
+	}
+	else
+	{
+		return GetHoldingItemsComponent()->GetHoldItemProperty().AddUnit(UnitType, Num);
+	}
+}
+
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 {
 	return false;

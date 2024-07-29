@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 
 #include "SceneElement.h"
+#include "SceneUnitTable.h"
 
 #include "SceneUnitExtendInfo.generated.h"
 
@@ -18,52 +19,6 @@ class UWeaponUnit;
 class USkillUnit;
 class UCoinUnit;
 class UBasicUnit;
-
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	FTableRowUnit() { }
-
-	virtual ~FTableRowUnit() { }
-
-	// 用于复制到RowName
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	FGuid UnitGuid = FGuid::NewGuid();
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName RowDescriptionText = TEXT("Row描述文字");
-
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	ESceneToolsType SceneToolsType = ESceneToolsType::kCoin;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	EToolUnitType ToolUnitType = EToolUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	EWeaponUnitType WeaponUnitType = EWeaponUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	EConsumableUnitType ConsumableUnitType = EConsumableUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	ESkillUnitType SkillUnitType = ESkillUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	ECoinUnitType CoinUnitType = ECoinUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<UTexture2D> RaffleIcon;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<UBasicUnit>UnitClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName DescriptionText = TEXT("描述文字");
-
-};
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API USceneUnitExtendInfoMap : public UObject
@@ -77,9 +32,17 @@ public:
 
 	static USceneUnitExtendInfoMap* GetInstance();
 
+	FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType)const;
+
 	void InitialData();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable;
+	TSoftObjectPtr<UDataTable> DataTable_Unit;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_Unit_WeaponExtendInfo;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_Unit_ActiveSkillExtendInfo;
 
 };

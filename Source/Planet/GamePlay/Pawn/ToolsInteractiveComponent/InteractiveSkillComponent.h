@@ -11,6 +11,8 @@
 
 #include "InteractiveSkillComponent.generated.h"
 
+class UActiveSkillUnit;
+
 struct FSkillSocketInfo
 {
 	FKey Key;
@@ -105,7 +107,7 @@ protected:
 
 	bool ActiveWeapon(EWeaponSocket WeaponSocket);
 
-	bool ActivedCorrespondingWeapon(USkill_Active_Base* GAPtr);
+	bool ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;

@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "HoldingItemsComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 APlanetPlayerState::APlanetPlayerState() :
 	Super()
@@ -29,7 +30,7 @@ void APlanetPlayerState::InitialData()
 {
 	auto& HoldItemComponent = HoldingItemsComponentPtr->GetHoldItemProperty();
 
-	HoldItemComponent.AddUnit_Coin(ECoinUnitType::kRegular, 0);
-	HoldItemComponent.AddUnit_Coin(ECoinUnitType::kRafflePermanent, 0);
-	HoldItemComponent.AddUnit_Coin(ECoinUnitType::kRaffleLimit, 0);
+	HoldItemComponent.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
+	HoldItemComponent.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
+	HoldItemComponent.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
 }

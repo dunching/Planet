@@ -41,7 +41,7 @@ void TestCommand::CopyID2RowName()
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
 
 	TArray<FTableRowUnit*> OutRowArray;
 	DataTable->GetAllRows<FTableRowUnit>(TEXT("FPCGDataTableRowToParamDataTest"), OutRowArray);

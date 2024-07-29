@@ -24,7 +24,7 @@ class PLANET_API URaffleSubSystem : public UGameInstanceSubsystem
 public:
 
 	using FOnGetUnitAry = 
-		TCallbackHandleContainer<void(const TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>&)>;
+		TCallbackHandleContainer<void(const TArray<FTableRowUnit*>&)>;
 
 	static URaffleSubSystem* GetInstance();
 

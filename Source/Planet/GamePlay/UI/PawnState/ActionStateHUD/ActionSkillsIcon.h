@@ -42,7 +42,7 @@ public:
 	FGameplayTag IconSocket;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillType")
-	ESkillType SkillType = ESkillType::kActive;
+	FGameplayTag SkillUnitType = FGameplayTag::EmptyTag;
 
 protected:
 

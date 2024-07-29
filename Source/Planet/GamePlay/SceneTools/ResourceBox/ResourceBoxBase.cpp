@@ -13,8 +13,6 @@ AResourceBoxBase::AResourceBoxBase(const FObjectInitializer& ObjectInitializer) 
 	Super(ObjectInitializer)
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootSceneComponent"));
-
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
 }
 
 void AResourceBoxBase::BeginPlay()
@@ -38,15 +36,6 @@ void AResourceBoxBase::BeginPlay()
 			SetActorLocation(OutHit.ImpactPoint);
 		}
 	}
-
-	for (const auto Iter : SkillUnitMap)
-	{
-		HoldingItemsComponentPtr->GetHoldItemProperty().AddUnit_Skill(Iter.Key);
-	}
-	for (const auto Iter : SkillUnitMap)
-	{
-		HoldingItemsComponentPtr->GetHoldItemProperty().AddUnit_Skill(Iter.Key);
-	}
 }
 
 void AResourceBoxBase::OnConstruction(const FTransform& Transform)
@@ -64,31 +53,12 @@ void AResourceBoxBase::AddItemsToTarget()
 	if (TargetCharacterPtr)
 	{
 		{
-			auto& HoldItemPropertyRef = TargetCharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-			for (const auto Iter : ConsumableUnitMap)
+			for (const auto Iter : UnitMap)
 			{
-				HoldItemPropertyRef.AddUnit_Consumable(Iter.Key, Iter.Value);
+				TargetCharacterPtr->AddUnit(Iter.Key, Iter.Value);
 			}
-			for (const auto Iter : ToolUnitMap)
-			{
-			}
-			for (const auto Iter : WeaponUnitMap)
-			{
-			}
-
 #if WITH_EDITORONLY_DATA
-			for (const auto Iter : SkillUnitMap)
-			{
-				HoldItemPropertyRef.AddUnit_Skill(Iter.Key);
-			}
 #endif
-		}
-		{
-			auto& HoldItemPropertyRef = TargetCharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty();
-			for (const auto Iter : CoinUnitMap)
-			{
-				HoldItemPropertyRef.AddUnit_Coin(Iter.Key, Iter.Value);
-			}
 		}
 	}
 }

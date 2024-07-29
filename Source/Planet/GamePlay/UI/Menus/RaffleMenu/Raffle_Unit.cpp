@@ -39,26 +39,27 @@ void URaffle_Unit::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void URaffle_Unit::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
+	// 
+}
+
+void URaffle_Unit::ResetToolUIByData(FTableRowUnit * TableRowUnitPtr)
+{
 	{
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FRaffle_Unit::Get().Text));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(BasicUnitPtr->GetUnitName()));
+			UIPtr->SetText(FText::FromString(TableRowUnitPtr->UnitName));
 		}
 	}
-}
-
-void URaffle_Unit::ResetToolUIByData(const FTableRowUnit& SceneUnitExtendInfoBase)
-{
 	{
 		auto UIPtr = Cast<UImage>(GetWidgetFromName(FRaffle_Unit::Get().Texture));
 		if (UIPtr)
 		{
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(SceneUnitExtendInfoBase.RaffleIcon.ToSoftObjectPath(),
-				[SceneUnitExtendInfoBase, UIPtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(TableRowUnitPtr->RaffleIcon.ToSoftObjectPath(),
+				[TableRowUnitPtr, UIPtr]()
 				{
-					UIPtr->SetBrushFromTexture(SceneUnitExtendInfoBase.RaffleIcon.Get());
+					UIPtr->SetBrushFromTexture(TableRowUnitPtr->RaffleIcon.Get());
 				}));
 		}
 	}

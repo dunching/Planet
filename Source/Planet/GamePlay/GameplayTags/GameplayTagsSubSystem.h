@@ -109,13 +109,124 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ActiveSocket4 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket4")));
-
+	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag Talent_NuQi_Socket =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.Talent_NuQi_Socket")));
+	FGameplayTag TalentSocket =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.Talent")));
+#pragma endregion 
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag Talent_YinYang_Socket =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.Talent_YinYang_Socket")));
+#pragma region UnitType
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Weapon =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Weapon")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Weapon_Axe =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Weapon.Axe")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Tool =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Tool")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Tool_Axe =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Tool.Axe")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_GroupMate =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.GroupMate")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Consumables =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Consumables")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Consumables_HP =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Consumables.HP")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Consumables_PP =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Consumables.PP")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Coin =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Coin_Regular =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin.Regular")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Coin_RafflePermanent =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin.RafflePermanent")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Coin_RaffleLimit =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin.RaffleLimit")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Weapon =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Weapon_Axe =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.Axe")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Weapon_HandProtection =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.HandProtection")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Weapon_RangeTest =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.RangeTest")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Displacement =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Displacement")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_GroupTherapy =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.GroupTherapy")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_ContinuousGroupTherapy =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.ContinuousGroupTherapy")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Tornado =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Tornado")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_FlyAway =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.FlyAway")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Passve =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Passve")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Passve_ZMJZ =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Passve.ZMJZ")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Talent =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Talent_NuQi =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent.NuQi")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Talent_YinYang =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent.YinYang")));
+	
 #pragma endregion 
 };

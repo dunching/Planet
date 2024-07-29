@@ -154,7 +154,7 @@ void URaffleMenu::SwitchDisplay(bool bIsDisplayRaffleUI)
 	}
 }
 
-void URaffleMenu::ResetGetUnitAry(const TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>& Ary)
+void URaffleMenu::ResetGetUnitAry(const TArray<FTableRowUnit*>& Ary)
 {
 	SwitchDisplay(false);
 	auto HorizotalUIPtr = Cast<UHorizontalBox>(GetWidgetFromName(FRaffleMenu::Get().GetUnit_HorizaltalBox));
@@ -167,8 +167,8 @@ void URaffleMenu::ResetGetUnitAry(const TArray<TPair<FTableRowUnit, TSubclassOf<
 			auto NewUnitPtr = CreateWidget<URaffle_Unit>(GetWorld(), Raffle_UnitClass);
 			if (NewUnitPtr)
 			{
-				NewUnitPtr->ResetToolUIByData(Iter.Value.GetDefaultObject());
-				NewUnitPtr->ResetToolUIByData(Iter.Key);
+				NewUnitPtr->ResetToolUIByData(Iter->UnitClass.GetDefaultObject());
+				NewUnitPtr->ResetToolUIByData(Iter);
 				HorizotalUIPtr->AddChild(NewUnitPtr);
 			}
 		}

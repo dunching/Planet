@@ -26,7 +26,7 @@ void UCoinList::NativeDestruct()
 	Super::NativeDestruct(); 
 }
 
-void UCoinList::ResetUIByData(const TMap<ECoinUnitType, UCoinUnit*>& CoinMap)
+void UCoinList::ResetUIByData(const TMap<FGameplayTag, UCoinUnit*>& CoinMap)
 {
 	auto UIPtr = Cast<UHorizontalBox>(GetWidgetFromName(CoinList::HorizontalBox));
 	if (!UIPtr)

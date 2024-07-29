@@ -10,6 +10,12 @@
 #include "Skill_Active_Base.generated.h"
 
 class UBasicUnit;
+class UActiveSkillUnit;
+
+struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetData
+{
+	UActiveSkillUnit * ActiveSkillUnitPtr = nullptr;
+};
 
 /**
  * 主动触发的节能
@@ -21,15 +27,20 @@ class USkill_Active_Base : public USkill_Base
 
 public:
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Require Weapon")
-	EWeaponUnitType WeaponUnitType = EWeaponUnitType::kNone;
-
 	USkill_Active_Base();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
+
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	);
 
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -63,6 +74,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "CooldownTime")
 	int32 CooldownTime = -1;
+
+	UActiveSkillUnit* ActiveSkillUnitPtr = nullptr;
 
 protected:
 

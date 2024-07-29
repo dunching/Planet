@@ -24,6 +24,7 @@
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
 #include "InteractiveBaseGAComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace Skill_WeaponHandProtection
 {
@@ -269,9 +270,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		{
 			if (Iter.Value->SkillUnit)
 			{
-				switch (Iter.Value->SkillUnit->SkillType)
-				{
-				case ESkillType::kActive:
+				if (Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
 				{
 					for (const auto SkillHandleIter : Iter.Value->HandleAry)
 					{
@@ -288,8 +287,6 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 
 						GAInstPtr->AddCooldownConsumeTime(1.f);
 					}
-				}
-				break;
 				}
 			}
 		}

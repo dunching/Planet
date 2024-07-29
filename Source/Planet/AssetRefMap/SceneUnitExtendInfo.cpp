@@ -18,10 +18,10 @@ void USceneUnitExtendInfoMap::PostCDOContruct()
 
 	InitialData();
 
-	if (DataTable)
+	if (DataTable_Unit)
 	{
 		FTableRowUnit SceneUnitExtendInfoBase;
-		DataTable.Get()->AddRow(TEXT("{"), SceneUnitExtendInfoBase);
+		DataTable_Unit.Get()->AddRow(TEXT("{"), SceneUnitExtendInfoBase);
 	}
 }
 
@@ -29,6 +29,15 @@ USceneUnitExtendInfoMap* USceneUnitExtendInfoMap::GetInstance()
 {
 	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
 	return WorldSetting->GetSceneUnitExtendInfoMap();
+}
+
+FTableRowUnit* USceneUnitExtendInfoMap::GetTableRowUnit(FGameplayTag UnitType) const
+{
+	auto DataTablePtr = DataTable_Unit.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowUnit>(*UnitType.ToString(), TEXT("GetUnit"));
+
+	return SceneUnitExtendInfoPtr;
 }
 
 void USceneUnitExtendInfoMap::InitialData()

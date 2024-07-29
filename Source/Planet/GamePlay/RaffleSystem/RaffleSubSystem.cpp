@@ -9,6 +9,7 @@
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
 #include "SceneUnitExtendInfo.h"
+#include "GameplayTagsSubSystem.h"
 
 URaffleSubSystem* URaffleSubSystem::GetInstance()
 {
@@ -37,7 +38,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	{
 	case ERaffleType::kRafflePermanent:
 	{
-		auto CoinUnitPtr = HoldItemPropertyRef.FindUnit_Coin(ECoinUnitType::kRaffleLimit);
+		auto CoinUnitPtr = HoldItemPropertyRef.FindUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit);
 		if (CoinUnitPtr)
 		{
 			if (CoinUnitPtr->GetCurrentValue() > Count)
@@ -93,18 +94,17 @@ void URaffleSubSystem::RafflePermanentComplete(
 #endif
 )const
 {
-	TArray<FGuid> Ary;
+	TArray<FGameplayTag> Ary;
 #if TESTRAFFLE
 	Ary.Append(
 		{
-			FGuid(TEXT("{46DF00CA-5D51-46FA-A136-B0895B1D6812}")),
-			FGuid(TEXT("{2C712123-CFD0-4775-AF12-CC5C6521CE69}")),
-			FGuid(TEXT("{B3B51225-735D-425B-8368-A3955D670FD5}")),
-			FGuid(TEXT("{4C8652EC-DA76-43E0-85EB-6032E23E6833}")),
-			FGuid(TEXT("{30CB1E1B-80B1-476E-837F-3D2BE43831DF}")),
-			FGuid(TEXT("{E1AF2E92-BBB6-4B5D-97D3-3D7F10957A20}")),
+			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Displacement,
+			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_GroupTherapy,
+			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_ContinuousGroupTherapy,
+			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Tornado,
+			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_FlyAway,
 
-			FGuid(TEXT("{8705713D-8ADA-45D1-84DC-E1B63B9E0AAA}")),
+			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve_ZMJZ,
 		}
 		);
 #else
@@ -119,16 +119,16 @@ void URaffleSubSystem::RafflePermanentComplete(
 
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
 
-	TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>GetUnitAry;
+	TArray<FTableRowUnit*>GetUnitAry;
 	for (const auto& Iter : Ary)
 	{
 		auto RowPtr = DataTable->FindRow<FTableRowUnit>(*Iter.ToString(), TEXT("GetUnit"));
 
-// 		HoldItemPropertyRef.AddUnit_Apending(SecondIter.Key, ApendingID);
-// 
-// 		GetUnitAry.Add({ SecondIter.Value , SceneUnitExtendInfoMapPtr->SkillToolsMap[SecondIter.Key] });
+ 		HoldItemPropertyRef.AddUnit_Apending(Iter, ApendingID);
+ 
+ 		GetUnitAry.Add(SceneUnitExtendInfoMapPtr->GetTableRowUnit(Iter));
 	}
 
 	OnGetUnitAry.ExcuteCallback(GetUnitAry);

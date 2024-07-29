@@ -34,7 +34,7 @@ public:
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 	
-	virtual void ResetToolUIByData(const FTableRowUnit& SceneUnitExtendInfoBase);
+	virtual void ResetToolUIByData(FTableRowUnit * TableRowUnitPtr);
 
 	virtual void EnableIcon(bool bIsEnable)override;
 

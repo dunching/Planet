@@ -21,6 +21,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace ToolsIcon
 {
@@ -60,20 +61,13 @@ void UToolIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	if (BasicUnitPtr)
 	{
-		switch (BasicUnitPtr->GetSceneToolsType())
-		{
-		case ESceneToolsType::kTool:
+		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 		{
 			UnitPtr = Cast<UToolUnit>(BasicUnitPtr);
 		}
-		break;
-		case ESceneToolsType::kConsumables:
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 		{
 			UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
-		}
-		break;
-		default:
-			break;
 		}
 	}
 	else
@@ -129,9 +123,7 @@ void UToolIcon::SetNum()
 
 	if (UnitPtr)
 	{
-		switch (UnitPtr->GetSceneToolsType())
-		{
-		case ESceneToolsType::kTool:
+		if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 		{
 			auto TempUnitPtr = Cast<UToolUnit>(UnitPtr);
 			if (TempUnitPtr)
@@ -139,18 +131,13 @@ void UToolIcon::SetNum()
 				NewNum = TempUnitPtr->GetNum();
 			}
 		}
-		break;
-		case ESceneToolsType::kConsumables:
+		else if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 		{
 			auto TempUnitPtr = Cast<UConsumableUnit>(UnitPtr);
 			if (TempUnitPtr)
 			{
 				NewNum = TempUnitPtr->GetCurrentValue();
 			}
-		}
-		break;
-		default:
-			break;
 		}
 	}
 

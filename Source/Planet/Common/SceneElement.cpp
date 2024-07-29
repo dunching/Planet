@@ -8,12 +8,7 @@
 #include "HumanControllerInterface.h"
 #include "HumanCharacter.h"
 #include "SceneUnitExtendInfo.h"
-
-UBasicUnit::UBasicUnit(ESceneToolsType InSceneToolsType) :
-	SceneToolsType(InSceneToolsType)
-{
-
-}
+#include "GameplayTagsSubSystem.h"
 
 UBasicUnit::UBasicUnit()
 {
@@ -30,23 +25,35 @@ UBasicUnit::IDType UBasicUnit::GetID()const
 	return ID;
 }
 
-ESceneToolsType UBasicUnit::GetSceneToolsType() const
+FGameplayTag UBasicUnit::GetUnitType() const
 {
-	return SceneToolsType;
+	return UnitType;
 }
 
 TSoftObjectPtr<UTexture2D> UBasicUnit::GetIcon() const
 {
-	return DefaultIcon;
+	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
+
+	return SceneUnitExtendInfoPtr->DefaultIcon;
 }
 
 FString UBasicUnit::GetUnitName() const
 {
-	return UnitName;
+	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
+
+	return SceneUnitExtendInfoPtr->UnitName;
 }
 
-UConsumableUnit::UConsumableUnit() :
-	Super(ESceneToolsType::kConsumables)
+FTableRowUnit* UBasicUnit::GetTableRowUnit() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit>(*UnitType.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
+}
+
+UConsumableUnit::UConsumableUnit()
 {
 
 }
@@ -64,8 +71,7 @@ int32 UConsumableUnit::GetCurrentValue() const
 	return Num;
 }
 
-UToolUnit::UToolUnit() :
-	Super(ESceneToolsType::kTool)
+UToolUnit::UToolUnit()
 {
 
 }
@@ -75,49 +81,52 @@ int32 UToolUnit::GetNum() const
 	return Num;
 }
 
-UWeaponUnit::UWeaponUnit() :
-	Super(ESceneToolsType::kWeapon)
+UWeaponUnit::UWeaponUnit()
 {
 
 }
 
-USkillUnit::USkillUnit(ESceneToolsType InSceneToolsType) :
-	Super(InSceneToolsType)
+FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponExtendInfo.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_WeaponExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
+}
+
+USkillUnit::USkillUnit() :
+	Super()
 {
 
 }
 
-USkillUnit::USkillUnit()
+UWeaponSkillUnit::UWeaponSkillUnit()
 {
-
 }
 
-UWeaponSkillUnit::UWeaponSkillUnit() :
-	Super(ESceneToolsType::kWeaponSkill)
+UTalentSkillUnit::UTalentSkillUnit()
 {
-	SkillType = ESkillType::kWeapon;
 }
 
-UTalentSkillUnit::UTalentSkillUnit() :
-	Super(ESceneToolsType::kTalentSkill)
+UActiveSkillUnit::UActiveSkillUnit()
 {
-	SkillType = ESkillType::kTalent;
 }
 
-UActiveSkillUnit::UActiveSkillUnit() :
-	Super(ESceneToolsType::kActiveSkill)
+FTableRowUnit_ActiveSkillExtendInfo* UActiveSkillUnit::GetTableRowUnit_ActiveSkillExtendInfo() const
 {
-	SkillType = ESkillType::kActive;
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_ActiveSkillExtendInfo.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_ActiveSkillExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
 }
 
-UPassiveSkillUnit::UPassiveSkillUnit() :
-	Super(ESceneToolsType::kPassveSkill)
+UPassiveSkillUnit::UPassiveSkillUnit()
 {
-	SkillType = ESkillType::kPassive;
 }
 
-UGourpmateUnit::UGourpmateUnit() :
-	Super(ESceneToolsType::kGroupMate)
+UGourpmateUnit::UGourpmateUnit()
 {
 
 }
@@ -128,8 +137,7 @@ void UGourpmateUnit::InitialByCharactor(FPawnType* InCharacterPtr)
 	Name = InCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
 }
 
-UCoinUnit::UCoinUnit() :
-	Super(ESceneToolsType::kCoin)
+UCoinUnit::UCoinUnit()
 {
 
 }
@@ -147,12 +155,11 @@ int32 UCoinUnit::GetCurrentValue() const
 	return Num;
 }
 
-UWeaponUnit* FSceneToolsContainer::AddUnit_Weapon(FGuid UnitGuid)
+UWeaponUnit* FSceneToolsContainer::AddUnit_Weapon(FGameplayTag UnitType)
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
-	const auto Type = SceneUnitExtendInfoPtr->WeaponUnitType;
+	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-	UWeaponUnit* ResultPtr = NewObject<UWeaponUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+	auto ResultPtr = NewObject<UWeaponUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 
 	for (;;)
 	{
@@ -164,9 +171,9 @@ UWeaponUnit* FSceneToolsContainer::AddUnit_Weapon(FGuid UnitGuid)
 		else
 		{
 			ResultPtr->ID = NewID;
-			ResultPtr->UnitType = Type;
+			ResultPtr->UnitType = UnitType;
 
-			ResultPtr->FirstSkill = GetUnitByType(ResultPtr->FirstSkillClass);
+			ResultPtr->FirstSkill = AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType);
 
 			SceneToolsAry.Add(ResultPtr);
 			SceneMetaMap.Add(NewID, ResultPtr);
@@ -178,19 +185,14 @@ UWeaponUnit* FSceneToolsContainer::AddUnit_Weapon(FGuid UnitGuid)
 	return ResultPtr;
 }
 
-USkillUnit* FSceneToolsContainer::AddUnit_Skill(FGuid UnitGuid)
+UWeaponUnit* FSceneToolsContainer::FindUnit_Weapon(FGameplayTag UnitType)
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
-	const auto Type = SceneUnitExtendInfoPtr->SkillUnitType;
-
-	return AddUnit_Skill(Type);
+	return nullptr;
 }
 
-USkillUnit* FSceneToolsContainer::AddUnit_Skill(ESkillUnitType SkillUnitType)
+USkillUnit* FSceneToolsContainer::AddUnit_Skill(FGameplayTag UnitType)
 {
-	const auto Type = SkillUnitType;
-
-	if (SkillUnitMap.Contains(Type))
+	if (SkillUnitMap.Contains(UnitType))
 	{
 		// 
 
@@ -198,9 +200,10 @@ USkillUnit* FSceneToolsContainer::AddUnit_Skill(ESkillUnitType SkillUnitType)
 	}
 	else
 	{
-		auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
+		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-		auto ResultPtr = GetUnitByType(Type);
+		auto ResultPtr = NewObject<USkillUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+
 		if (!ResultPtr)
 		{
 			return nullptr;
@@ -216,11 +219,11 @@ USkillUnit* FSceneToolsContainer::AddUnit_Skill(ESkillUnitType SkillUnitType)
 			else
 			{
 				ResultPtr->ID = NewID;
-				ResultPtr->UnitType = Type;
+				ResultPtr->UnitType = UnitType;
 
 				SceneToolsAry.Add(ResultPtr);
 				SceneMetaMap.Add(NewID, ResultPtr);
-				SkillUnitMap.Add(Type, ResultPtr);
+				SkillUnitMap.Add(UnitType, ResultPtr);
 
 				OnSkillUnitChanged.ExcuteCallback(ResultPtr, true);
 
@@ -231,17 +234,9 @@ USkillUnit* FSceneToolsContainer::AddUnit_Skill(ESkillUnitType SkillUnitType)
 	}
 }
 
-USkillUnit* FSceneToolsContainer::FindUnit_Skill(FGuid UnitGuid)
+USkillUnit* FSceneToolsContainer::FindUnit_Skill(FGameplayTag UnitType)
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
-	const auto Type = SceneUnitExtendInfoPtr->SkillUnitType;
-
-	return FindUnit_Skill(Type);
-}
-
-USkillUnit* FSceneToolsContainer::FindUnit_Skill(ESkillUnitType SkillUnitType)
-{
-	auto Iter = SkillUnitMap.Find(SkillUnitType);
+	auto Iter = SkillUnitMap.Find(UnitType);
 	if (Iter)
 	{
 		return *Iter;
@@ -250,23 +245,13 @@ USkillUnit* FSceneToolsContainer::FindUnit_Skill(ESkillUnitType SkillUnitType)
 	return nullptr;
 }
 
-UConsumableUnit* FSceneToolsContainer::AddUnit_Consumable(FGuid UnitGuid, int32 Num)
+UConsumableUnit* FSceneToolsContainer::AddUnit_Consumable(FGameplayTag UnitType, int32 Num)
 {
 	check(Num > 0);
 
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
-	const auto Type = SceneUnitExtendInfoPtr->ConsumableUnitType;
-
-	return AddUnit_Consumable(Type);
-}
-
-UConsumableUnit* FSceneToolsContainer::AddUnit_Consumable(EConsumableUnitType ConsumableUnitType, int32 Num /*= 1*/)
-{
-	const auto Type = ConsumableUnitType;
-
-	if (ConsumablesUnitMap.Contains(Type))
+	if (ConsumablesUnitMap.Contains(UnitType))
 	{
-		auto Ref = ConsumablesUnitMap[Type];
+		auto Ref = ConsumablesUnitMap[UnitType];
 
 		Ref->Num += Num;
 
@@ -276,19 +261,19 @@ UConsumableUnit* FSceneToolsContainer::AddUnit_Consumable(EConsumableUnitType Co
 	}
 	else
 	{
-		auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
+		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-		auto ResultPtr = GetUnitByType(Type);
+		auto ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 
 		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
 
 		ResultPtr->Num = Num;
 		ResultPtr->ID = NewID;
-		ResultPtr->UnitType = Type;
+		ResultPtr->UnitType = UnitType;
 
 		SceneToolsAry.Add(ResultPtr);
 		SceneMetaMap.Add(NewID, ResultPtr);
-		ConsumablesUnitMap.Add(Type, ResultPtr);
+		ConsumablesUnitMap.Add(UnitType, ResultPtr);
 
 		OnConsumableUnitChanged.ExcuteCallback(ResultPtr, true, Num);
 
@@ -296,11 +281,11 @@ UConsumableUnit* FSceneToolsContainer::AddUnit_Consumable(EConsumableUnitType Co
 	}
 }
 
-UToolUnit* FSceneToolsContainer::AddUnit_ToolUnit(FGuid UnitGuid)
+UToolUnit* FSceneToolsContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
+	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-	UToolUnit* ResultPtr = NewObject<UToolUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+	auto ResultPtr = NewObject<UToolUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 
 	for (;;)
 	{
@@ -312,7 +297,7 @@ UToolUnit* FSceneToolsContainer::AddUnit_ToolUnit(FGuid UnitGuid)
 		else
 		{
 			ResultPtr->ID = NewID;
-			ResultPtr->UnitType = SceneUnitExtendInfoPtr->ToolUnitType;
+			ResultPtr->UnitType = UnitType;
 
 			SceneToolsAry.Add(ResultPtr);
 			SceneMetaMap.Add(NewID, ResultPtr);
@@ -324,112 +309,29 @@ UToolUnit* FSceneToolsContainer::AddUnit_ToolUnit(FGuid UnitGuid)
 	return ResultPtr;
 }
 
-UBasicUnit* FSceneToolsContainer::AddUnit(FGuid UnitGuid, int32 Num)
+UBasicUnit* FSceneToolsContainer::AddUnit(FGameplayTag UnitType, int32 Num)
 {
-	return nullptr;
-}
+	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-UCoinUnit* FSceneToolsContainer::AddUnit_Coin(FGuid UnitGuid, int32 Num /*= 1*/)
-{
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
-	const auto Type = SceneUnitExtendInfoPtr->CoinUnitType;
-
-	return AddUnit_Coin(Type, Num);
-}
-
-UCoinUnit* FSceneToolsContainer::AddUnit_Coin(ECoinUnitType CoinUnitType, int32 Num)
-{
-	const auto Type = CoinUnitType;
-
-	if (CoinUnitMap.Contains(Type))
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 	{
-		auto Ref = CoinUnitMap[Type];
-
-		Ref->Num += Num;
-
-		OnCoinUnitChanged.ExcuteCallback(Ref, true, Num);
-
-		return Ref;
+		return AddUnit_ToolUnit(UnitType);
 	}
-	else
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
-		auto AssetRefMapPtr = USceneUnitExtendInfoMap::GetInstance();
-
-		auto ResultPtr = GetUnitByType(CoinUnitType);
-
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-
-		ResultPtr->Num = Num;
-		ResultPtr->ID = NewID;
-		ResultPtr->UnitType = Type;
-
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(NewID, ResultPtr);
-		CoinUnitMap.Add(Type, ResultPtr);
-
-		OnCoinUnitChanged.ExcuteCallback(ResultPtr, true, Num);
-
-		return ResultPtr;
+		return AddUnit_Weapon(UnitType);
 	}
-}
-
-void FSceneToolsContainer::AddUnit_Apending(FGuid UnitGuid, FGuid Guid)
-{
-	if (SkillUnitApendingMap.Contains(Guid))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
 	{
-		SkillUnitApendingMap[Guid].Get<1>()++;
+		return AddUnit_Skill(UnitType);
 	}
-	else
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
 	{
-		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
-
-		SkillUnitApendingMap.Add(Guid, TTuple<FGuid, int32>{ UnitGuid, 1});
+		return AddUnit_Coin(UnitType, Num);
 	}
-}
-
-void FSceneToolsContainer::SyncApendingUnit(FGuid Guid)
-{
-	if (SkillUnitApendingMap.Contains(Guid))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 	{
-		for (const auto& Iter : SkillUnitApendingMap)
-		{
-			AddUnit(Iter.Value.Get<0>(), 1);
-		}
-		SkillUnitApendingMap.Remove(Guid);
-	}
-}
-
-void FSceneToolsContainer::RemoveUnit_Consumable(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
-{
-	if (UnitPtr)
-	{
-		UnitPtr->Num -= Num;
-
-		OnConsumableUnitChanged.ExcuteCallback(UnitPtr, false, Num);
-	}
-}
-
-UWeaponUnit* FSceneToolsContainer::FindUnit_Weapon(FGuid UnitGuid)
-{
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
-
-	for (const auto& Iter : SceneToolsAry)
-	{
-		if (!Iter)
-		{
-			continue;
-		}
-		switch (Iter->GetSceneToolsType())
-		{
-		case ESceneToolsType::kWeapon:
-		{
-			if (Iter->GetSceneElementType<EWeaponUnitType>() == SceneUnitExtendInfoPtr->WeaponUnitType)
-			{
-				return Cast<UWeaponUnit>(Iter);
-			}
-		}
-		break;
-		}
+		return AddUnit_Consumable(UnitType);
 	}
 
 	return nullptr;
@@ -446,16 +348,43 @@ UBasicUnit* FSceneToolsContainer::FindUnit(UBasicUnit::IDType ID)
 	return nullptr;
 }
 
-UCoinUnit* FSceneToolsContainer::FindUnit_Coin(FGuid UnitGuid)
+UCoinUnit* FSceneToolsContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*= 1*/)
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitGuid);
+	if (CoinUnitMap.Contains(UnitType))
+	{
+		auto Ref = CoinUnitMap[UnitType];
 
-	return FindUnit_Coin(SceneUnitExtendInfoPtr->CoinUnitType);
+		Ref->Num += Num;
+
+		OnCoinUnitChanged.ExcuteCallback(Ref, true, Num);
+
+		return Ref;
+	}
+	else
+	{
+		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
+
+		auto ResultPtr = NewObject<UCoinUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+
+		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
+
+		ResultPtr->Num = Num;
+		ResultPtr->ID = NewID;
+		ResultPtr->UnitType = UnitType;
+
+		SceneToolsAry.Add(ResultPtr);
+		SceneMetaMap.Add(NewID, ResultPtr);
+		CoinUnitMap.Add(UnitType, ResultPtr);
+
+		OnCoinUnitChanged.ExcuteCallback(ResultPtr, true, Num);
+
+		return ResultPtr;
+	}
 }
 
-UCoinUnit* FSceneToolsContainer::FindUnit_Coin(ECoinUnitType CoinUnitType)
+UCoinUnit* FSceneToolsContainer::FindUnit_Coin(FGameplayTag UnitType)
 {
-	auto Iter = CoinUnitMap.Find(CoinUnitType);
+	auto Iter = CoinUnitMap.Find(UnitType);
 	if (Iter)
 	{
 		return *Iter;
@@ -464,105 +393,67 @@ UCoinUnit* FSceneToolsContainer::FindUnit_Coin(ECoinUnitType CoinUnitType)
 	return nullptr;
 }
 
+void FSceneToolsContainer::RemoveUnit_Consumable(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
+{
+	if (UnitPtr)
+	{
+		UnitPtr->Num -= Num;
+
+		OnConsumableUnitChanged.ExcuteCallback(UnitPtr, false, Num);
+	}
+}
+
 const TArray<UBasicUnit*>& FSceneToolsContainer::GetSceneUintAry() const
 {
 	return SceneToolsAry;
 }
 
-const TMap<ECoinUnitType, UCoinUnit*>& FSceneToolsContainer::GetCoinUintAry() const
+const TMap<FGameplayTag, UCoinUnit*>& FSceneToolsContainer::GetCoinUintAry() const
 {
 	return CoinUnitMap;
 }
 
-FTableRowUnit* FSceneToolsContainer::GetTableRowUnit(FGuid UnitGuid) const
+FTableRowUnit* FSceneToolsContainer::GetTableRowUnit(FGameplayTag UnitType) const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit>(*UnitGuid.ToString(), TEXT("GetUnit"));
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit>(*UnitType.ToString(), TEXT("GetUnit"));
 
 	return SceneUnitExtendInfoPtr;
 }
 
-USkillUnit* FSceneToolsContainer::GetUnitByType(ESkillUnitType SkillUnitType) const
+void FSceneToolsContainer::AddUnit_Apending(FGameplayTag UnitType, FGuid Guid)
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
-
-	TArray<FTableRowUnit*> OutRowArray;
-	DataTable->GetAllRows<FTableRowUnit>(TEXT("GetUnit"), OutRowArray);
-
-	for (const auto& Iter : OutRowArray)
+	if (SkillUnitApendingMap.Contains(Guid))
 	{
-		if (Iter->SkillUnitType == SkillUnitType)
+		if (SkillUnitApendingMap[Guid].Contains(UnitType))
 		{
-			auto ResultPtr = NewObject<USkillUnit>(GetWorldImp(), Iter->UnitClass);
-
-			return ResultPtr;
+			SkillUnitApendingMap[Guid][UnitType]++;
+		}
+		else
+		{
+			SkillUnitApendingMap[Guid].Add(UnitType, 1);
 		}
 	}
-
-	return nullptr;
+	else
+	{
+		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
+		SkillUnitApendingMap.Add(Guid, { {UnitType, 1} });
+	}
 }
 
-UWeaponUnit* FSceneToolsContainer::GetUnitByType(EWeaponUnitType WeaponUnitType) const
+void FSceneToolsContainer::SyncApendingUnit(FGuid Guid)
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
-
-	TArray<FTableRowUnit*> OutRowArray;
-	DataTable->GetAllRows<FTableRowUnit>(TEXT("GetUnit"), OutRowArray);
-
-	for (const auto& Iter : OutRowArray)
+	if (SkillUnitApendingMap.Contains(Guid))
 	{
-		if (Iter->WeaponUnitType == WeaponUnitType)
+		for (const auto& Iter : SkillUnitApendingMap)
 		{
-			auto ResultPtr = NewObject<UWeaponUnit>(GetWorldImp(), Iter->UnitClass);
-
-			return ResultPtr;
+			for (const auto& SecondIter : Iter.Value)
+			{
+				AddUnit(SecondIter.Key, SecondIter.Value);
+			}
 		}
+		SkillUnitApendingMap.Remove(Guid);
 	}
-
-	return nullptr;
-}
-
-UCoinUnit* FSceneToolsContainer::GetUnitByType(ECoinUnitType CoinUnitType) const
-{
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
-
-	TArray<FTableRowUnit*> OutRowArray;
-	DataTable->GetAllRows<FTableRowUnit>(TEXT("GetUnit"), OutRowArray);
-
-	for (const auto& Iter : OutRowArray)
-	{
-		if (Iter->CoinUnitType == CoinUnitType)
-		{
-			auto ResultPtr = NewObject<UCoinUnit>(GetWorldImp(), Iter->UnitClass);
-
-			return ResultPtr;
-		}
-	}
-
-	return nullptr;
-}
-
-UConsumableUnit* FSceneToolsContainer::GetUnitByType(EConsumableUnitType ConsumableUnitType) const
-{
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable.LoadSynchronous();
-
-	TArray<FTableRowUnit*> OutRowArray;
-	DataTable->GetAllRows<FTableRowUnit>(TEXT("GetUnit"), OutRowArray);
-
-	for (const auto& Iter : OutRowArray)
-	{
-		if (Iter->ConsumableUnitType == ConsumableUnitType)
-		{
-			auto ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), Iter->UnitClass);
-
-			return ResultPtr;
-		}
-	}
-
-	return nullptr;
 }

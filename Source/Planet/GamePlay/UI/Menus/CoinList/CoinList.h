@@ -3,8 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include <GameplayTagContainer.h>
 
+#include "MyUserWidget.h"
 #include "GenerateType.h"
 #include "SceneElement.h"
 
@@ -27,7 +28,7 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	virtual void ResetUIByData(const TMap<ECoinUnitType, UCoinUnit*>& CoinMap);
+	virtual void ResetUIByData(const TMap<FGameplayTag, UCoinUnit*>& CoinMap);
 
 protected:
 	

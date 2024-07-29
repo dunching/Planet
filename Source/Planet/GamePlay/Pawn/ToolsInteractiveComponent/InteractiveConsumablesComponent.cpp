@@ -6,6 +6,7 @@
 #include "Skill_Consumable_Base.h"
 #include "Skill_Consumable_Test.h"
 #include "Skill_Consumable_Generic.h"
+#include "GameplayTagsSubSystem.h"
 
 FName UInteractiveConsumablesComponent::ComponentName = TEXT("InteractiveConsumablesComponent");
 
@@ -34,10 +35,10 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 		return  false;
 	}
 
-	switch ((*ToolIter)->UnitPtr->GetSceneElementType<EConsumableUnitType>())
-	{
-	case EConsumableUnitType::kGeneric_HP:
-	case EConsumableUnitType::kGeneric_PP:
+	if (
+		(*ToolIter)->UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables_HP)||
+		(*ToolIter)->UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables_PP)
+		)
 	{
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		if (!OnwerActorPtr)
@@ -52,7 +53,7 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 
 		FGameplayAbilitySpec GameplayAbilitySpec(
-			(*ToolIter)->UnitPtr->Skill_Consumable_Class, 
+			(*ToolIter)->UnitPtr->Skill_Consumable_Class,
 			1
 		);
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
@@ -64,8 +65,6 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 			&Payload,
 			*ASCPtr
 		);
-	}
-	break;
 	}
 
 	return false;

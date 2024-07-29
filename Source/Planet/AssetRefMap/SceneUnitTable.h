@@ -3,45 +3,36 @@
 
 #include "CoreMinimal.h"
 
+#include <GenerateType.h>
+
+#include "GameplayTagContainer.h"
+
 #include "SceneElement.h"
 
 #include "SceneUnitTable.generated.h"
 
-class UBasicUnit;
+class UDataTable;
+
+class UToolUnit;
+class UWeaponUnit;
+class USkillUnit;
+class UCoinUnit;
+class UBasicUnit; 
+class AWeapon_Base; 
 
 USTRUCT(BlueprintType)
-struct PLANET_API FSceneUnitExtendInfoBase : public FTableRowBase
+struct PLANET_API FTableRowUnit : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	FSceneUnitExtendInfoBase() { }
-
-	virtual ~FSceneUnitExtendInfoBase() { }
-
-	// 用于复制到RowName
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	FGuid UnitGuid = FGuid::NewGuid();
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName RowDescriptionText = TEXT("Row描述文字");
+	FName RowDescriptionText = TEXT("Row鎻忚堪鏂囧瓧");
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	ESceneToolsType SceneToolsType = ESceneToolsType::kCoin;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	EToolUnitType ToolUnitType = EToolUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	EWeaponUnitType WeaponUnitType = EWeaponUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	EConsumableUnitType ConsumableUnitType = EConsumableUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	ESkillUnitType SkillUnitType = ESkillUnitType::kNone;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	ECoinUnitType CoinUnitType = ECoinUnitType::kNone;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
+	FString UnitName = TEXT("UnitName");
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<UTexture2D> RaffleIcon;
@@ -50,6 +41,33 @@ struct PLANET_API FSceneUnitExtendInfoBase : public FTableRowBase
 	TSubclassOf<UBasicUnit>UnitClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName DescriptionText = TEXT("描述文字");
+	FName DescriptionText = TEXT("鎻忚堪鏂囧瓧");
+
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolClass")
+	TSubclassOf<AWeapon_Base> ToolActorClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolClass")
+	FGameplayTag WeaponSkillUnitType = FGameplayTag::EmptyTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Skill")
+	EAnimLinkClassType AnimLinkClassType = EAnimLinkClassType::kUnarmed;
+	
+};
+
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Require Weapon")
+	FGameplayTag RequireWeaponUnitType = FGameplayTag::EmptyTag;
 
 };

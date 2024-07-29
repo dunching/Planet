@@ -26,6 +26,7 @@
 #include "CharacterBase.h"
 #include "InteractiveSkillComponent.h"
 #include "Skill_Base.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace SkillsIcon
 {
@@ -52,22 +53,25 @@ void USkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 			OnResetUnit = NewPtr->OnResetUnit;
 			OnDragDelegate = NewPtr->OnDragDelegate;
 			bIsInBackpakc = NewPtr->bIsInBackpakc;
-			SkillType = NewPtr->SkillType;
+			SkillUnitType = NewPtr->SkillUnitType;
 			ResetToolUIByData(NewPtr->SkillUnitPtr);
 		}
 	}
 }
 
-void USkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
+void USkillsIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
 	SkillUnitPtr = nullptr;
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kActiveSkill)
+	if (BasicUnitPtr && (
+		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
+		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) 
+		))
 	{
 		auto InSkillUnitPtr = Cast<USkillUnit>(BasicUnitPtr);
 
-		if (InSkillUnitPtr && (bIsInBackpakc || InSkillUnitPtr->SkillType == SkillType))
+		if (InSkillUnitPtr && (bIsInBackpakc || InSkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType)))
 		{
 			SkillUnitPtr = InSkillUnitPtr;
 		}
@@ -94,7 +98,11 @@ void USkillsIcon::OnDragSkillIcon(bool bIsDragging, USkillUnit* InSkillUnitPtr)
 {
 	if (bIsDragging)
 	{
-		if (InSkillUnitPtr && InSkillUnitPtr->SkillType != SkillType)
+		if (InSkillUnitPtr && InSkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
+		{
+			EnableIcon(true);
+		}
+		else
 		{
 			EnableIcon(false);
 		}
@@ -195,13 +203,13 @@ bool USkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent
 
 	if (InOperation->IsA(UItemsDragDropOperation::StaticClass()))
 	{
- 		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
- 		if (WidgetDragPtr)
+		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
+		if (WidgetDragPtr)
 		{
 			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
 
 			WidgetDragPtr->OnDrop.Broadcast(WidgetDragPtr);
- 		}
+		}
 	}
 
 	return true;
@@ -219,7 +227,7 @@ void USkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoint
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	auto BaseItemClassPtr = UAssetRefMap::GetInstance()->DragDropOperationWidgetClass;
-	
+
 	if (BaseItemClassPtr)
 	{
 		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);

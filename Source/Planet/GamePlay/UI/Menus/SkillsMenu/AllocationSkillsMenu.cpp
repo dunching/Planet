@@ -16,6 +16,7 @@
 #include "CharacterBase.h"
 #include "InteractiveSkillComponent.h"
 #include "UICommon.h"
+#include "GameplayTagsSubSystem.h"
 
 struct AllocationSkillsMenu : public TGetSocketName<AllocationSkillsMenu>
 {
@@ -188,28 +189,27 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 	const auto& SceneUintAryRef = SPHoldItemPerpertyPtr.GetSceneUintAry();
 	for (const auto& Iter : SceneUintAryRef)
 	{
-		if (Iter->GetSceneToolsType() != ESceneToolsType::kActiveSkill)
+		if (!Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
 		{
 			continue;
 		}
 
-		auto ToolSPtr = Cast<USkillUnit>(Iter);
-		if (!ToolSPtr)
+		auto UnitPtr = Cast<USkillUnit>(Iter);
+		if (!UnitPtr)
 		{
 			continue;
 		}
 
-		switch (ToolSPtr->SkillType)
-		{
-		case ESkillType::kActive:
-		case ESkillType::kPassive:
-		case ESkillType::kTalent:
+		if (
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) 
+			)
 		{
 			auto WidgetPtr = CreateWidget<USkillsIcon>(this, EntryClass);
 			if (WidgetPtr)
 			{
 				WidgetPtr->bIsInBackpakc = true;
-				WidgetPtr->SkillType = ToolSPtr->SkillType;
+				WidgetPtr->SkillUnitType = UnitPtr->GetUnitType();
 				WidgetPtr->ResetToolUIByData(Iter);
 
 				{
@@ -262,8 +262,6 @@ void UAllocationSkillsMenu::ResetUIByData_Skills()
 				TileViewPtr->AddItem(WidgetPtr);
 			}
 		}
-		break;
-		};
 	}
 }
 
@@ -363,7 +361,7 @@ void UAllocationSkillsMenu::ResetUIByData_Weapons()
 	const auto& ItemsAry = SPHoldItemPerpertyPtr.GetSceneUintAry();
 	for (const auto& Iter : ItemsAry)
 	{
-		if (Iter->GetSceneToolsType() == ESceneToolsType::kWeapon)
+		if (Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 		{
 			auto WidgetPtr = CreateWidget<UWeaponsIcon>(this, EntryClass);
 			if (WidgetPtr)

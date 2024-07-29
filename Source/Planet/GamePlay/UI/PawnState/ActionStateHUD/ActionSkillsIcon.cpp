@@ -26,6 +26,7 @@
 #include "CharacterBase.h"
 #include "InteractiveSkillComponent.h"
 #include "Skill_Base.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace ActionSkillsIcon
 {
@@ -66,13 +67,17 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kActiveSkill)
+	ToolPtr = nullptr;
+
+	if (BasicUnitPtr)
 	{
-		ToolPtr = Cast<USkillUnit>(BasicUnitPtr);
-	}
-	else
-	{
-		ToolPtr = nullptr;
+		if (
+			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)) ||
+			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+			)
+		{
+			ToolPtr = Cast<USkillUnit>(BasicUnitPtr);
+		}
 	}
 
 	SetLevel();
@@ -261,7 +266,7 @@ bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
  		if (WidgetDragPtr)
 		{
 			auto SkillUnitPtr = Cast<USkillUnit>(WidgetDragPtr->SceneToolSPtr);
-			if (SkillUnitPtr && SkillUnitPtr->SkillType == SkillType)
+			if (SkillUnitPtr && SkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
 			{
 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
 			}

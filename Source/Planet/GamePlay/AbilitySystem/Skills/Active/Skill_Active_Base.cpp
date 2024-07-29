@@ -25,6 +25,26 @@ void USkill_Active_Base::OnAvatarSet(
 	CooldownConsumeTime = CooldownTime - Cast<APlanetWorldSettings>(GetWorld()->GetWorldSettings())->ResetCooldownTime;
 }
 
+void USkill_Active_Base::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
+{
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetPtr)
+		{
+			ActiveSkillUnitPtr = GameplayAbilityTargetPtr->ActiveSkillUnitPtr;
+		}
+	}
+}
+
 bool USkill_Active_Base::CommitAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,

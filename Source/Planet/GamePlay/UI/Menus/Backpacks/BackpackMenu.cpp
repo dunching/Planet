@@ -15,6 +15,7 @@
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
 #include "BackpackIconWrapper.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace BackpackMenu
 {
@@ -50,10 +51,10 @@ void UBackpackMenu::ResetUIByData()
 		{
 			continue;
 		}
-		switch (Iter->GetSceneToolsType())
-		{
-		case ESceneToolsType::kTool:
-		case ESceneToolsType::kConsumables:
+		if (
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
+			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
 			if (WidgetPtr)
@@ -61,10 +62,6 @@ void UBackpackMenu::ResetUIByData()
 				WidgetPtr->TargetBasicUnitPtr = Iter;
 				TileViewPtr->AddItem(WidgetPtr);
 			}
-		};
-		break;
-		default:
-			break;
 		}
 	}
 }

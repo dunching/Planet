@@ -24,6 +24,7 @@
 #include "CharacterBase.h"
 #include "HumanControllerInterface.h"
 #include "GroupMnaggerComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace TeamMateInfo
 {
@@ -84,7 +85,7 @@ void UTeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kGroupMate)
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
 		{
 			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TeamMateInfo::Content));

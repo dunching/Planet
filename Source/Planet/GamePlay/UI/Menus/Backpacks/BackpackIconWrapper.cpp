@@ -23,6 +23,7 @@
 #include "SceneElement.h"
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace BackpackIconWrapper
 {
@@ -51,9 +52,7 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	if (BasicUnitPtr)
 	{
-		switch (BasicUnitPtr->GetSceneToolsType())
-		{
-		case ESceneToolsType::kTool:
+		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -68,8 +67,7 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
-		break;
-		case ESceneToolsType::kConsumables:
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -83,8 +81,6 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 				UIPtr->AddChild(WidgetPtr);
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
-		}
-		break;
 		}
 	}
 }

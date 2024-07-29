@@ -21,6 +21,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace GroupMateInfo
 {
@@ -85,7 +86,7 @@ void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kGroupMate)
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
 		{
 			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupMateInfo::Content));

@@ -7,7 +7,8 @@ UWorld* GetWorldImp()
 #if WITH_EDITOR
 	if (GEditor->IsPlayingSessionInEditor() && !bIsExiting)
 	{
-		return GEngine->GetCurrentPlayWorld() ? GEngine->GetCurrentPlayWorld() : GEditor->GetEditorWorldContext().World();
+		auto Ptr = GWorld;
+		return GEngine->GetCurrentPlayWorld() ? GEngine->GetCurrentPlayWorld() : GEditor->PlayWorld.Get();
 	}
 	else
 	{

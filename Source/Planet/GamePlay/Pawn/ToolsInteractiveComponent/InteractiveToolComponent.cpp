@@ -32,6 +32,7 @@
 #include "Tool_PickAxe.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter.h"
+#include "GameplayTagsSubSystem.h"
 
 FName UInteractiveToolComponent::ComponentName = TEXT("InteractiveToolComponent");
 
@@ -89,9 +90,7 @@ bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
 	PreviousTool = CanbeActivedInfoSPtr->Socket;
 
 	FGameplayEventData Payload;
-	switch ((*ToolIter)->UnitPtr->GetSceneElementType<EToolUnitType>())
-	{
-	case EToolUnitType::kPickAxe:
+	if ((*ToolIter)->UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool_Axe))
 	{
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		if (!OnwerActorPtr)
@@ -109,9 +108,6 @@ bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
 			return true;
 		}
 	}
-	break;
-	}
-
 	return false;
 }
 

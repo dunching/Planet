@@ -11,6 +11,8 @@
 #include "DragDropOperationWidget.generated.h"
 
 class UUserWidget;
+
+class UBasicUnit;
 class UToolUnit;
 class USkillUnit;
 class UConsumableUnit;
@@ -47,12 +49,6 @@ protected:
 
 private:
 
-	UWeaponUnit* WeaponUnitSPtr;
-	
-	UToolUnit* ToolUnitSPtr;
-	
-	USkillUnit* SkillUnitSPtr;
-
-	UConsumableUnit* ConsumableUnitSPtr;
+	UBasicUnit* BasicUnitPtr = nullptr;
 
 };

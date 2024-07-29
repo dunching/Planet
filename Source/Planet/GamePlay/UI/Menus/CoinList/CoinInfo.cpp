@@ -12,6 +12,7 @@
 #include "CharacterBase.h"
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace CoinInfo
 {
@@ -39,7 +40,7 @@ void UCoinInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UCoinInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kCoin)
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
 	{
 		UnitPtr = Cast<UCoinUnit>(BasicUnitPtr);
 

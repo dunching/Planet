@@ -29,7 +29,7 @@ class PLANET_API URaffleMenu : public UMyUserWidget
 public:
 
 	using FOnGetUnitDelegateHandle =
-		TCallbackHandleContainer<void(const TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(const TArray<FTableRowUnit*>&)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -43,7 +43,7 @@ public:
 
 	void SwitchDisplay(bool bIsDisplayRaffleUI);
 
-	void ResetGetUnitAry(const TArray<TPair<FTableRowUnit, TSubclassOf<UBasicUnit>>>&Ary);
+	void ResetGetUnitAry(const TArray<FTableRowUnit*>&Ary);
 
 protected:
 

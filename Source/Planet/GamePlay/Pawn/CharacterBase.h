@@ -79,6 +79,8 @@ public:
 
 	UInteractiveToolComponent* GetInteractiveToolComponent();
 
+	UBasicUnit* AddUnit(FGameplayTag UnitType, int32 Num);
+
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 

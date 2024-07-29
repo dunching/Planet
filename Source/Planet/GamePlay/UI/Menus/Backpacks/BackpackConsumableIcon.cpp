@@ -20,6 +20,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
+#include "GameplayTagsSubSystem.h"
 
 UBackpackConsumableIcon::UBackpackConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -41,7 +42,7 @@ void UBackpackConsumableIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UBackpackConsumableIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kConsumables)
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 	{
 		UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
 		SetNum(UnitPtr->GetCurrentValue());

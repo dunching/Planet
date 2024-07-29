@@ -180,10 +180,10 @@ void UTalentAllocationComponent::SyncToHolding()
 					{
 					case EPointSkillType::kNuQi:
 					{
-						auto SkillUnitPtr = HoldItemComponent.FindUnit_Skill(ESkillUnitType::kHumanSkill_Talent_NuQi);
+						auto SkillUnitPtr = HoldItemComponent.FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
 						if (!SkillUnitPtr)
 						{
-							SkillUnitPtr = HoldItemComponent.AddUnit_Skill(ESkillUnitType::kHumanSkill_Talent_NuQi);
+							SkillUnitPtr = HoldItemComponent.AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
 						}
 						if (SkillUnitPtr)
 						{
@@ -192,7 +192,7 @@ void UTalentAllocationComponent::SyncToHolding()
 
 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
-						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->Talent_NuQi_Socket;
+						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
 						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
 						SkillsSocketInfo->Key = EKeys::Invalid;
 
@@ -201,10 +201,10 @@ void UTalentAllocationComponent::SyncToHolding()
 					break;
 					case EPointSkillType::kYinYang:
 					{
-						auto SkillUnitPtr = HoldItemComponent.FindUnit_Skill(ESkillUnitType::kHumanSkill_Talent_YinYang);
+						auto SkillUnitPtr = HoldItemComponent.FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
 						if (!SkillUnitPtr)
 						{
-							SkillUnitPtr = HoldItemComponent.AddUnit_Skill(ESkillUnitType::kHumanSkill_Talent_YinYang);
+							SkillUnitPtr = HoldItemComponent.AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
 						}
 						if (SkillUnitPtr)
 						{
@@ -213,7 +213,7 @@ void UTalentAllocationComponent::SyncToHolding()
 
 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
-						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->Talent_YinYang_Socket;
+						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
 						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
 						SkillsSocketInfo->Key = EKeys::Invalid;
 

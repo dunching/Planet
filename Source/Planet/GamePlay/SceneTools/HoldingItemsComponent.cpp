@@ -1,6 +1,12 @@
 
 #include "HoldingItemsComponent.h"
 
+#include <GameFramework/PlayerState.h>
+
+#include "GameplayTagsSubSystem.h"
+#include "CharacterBase.h"
+#include "PlanetPlayerState.h"
+
 UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
 {

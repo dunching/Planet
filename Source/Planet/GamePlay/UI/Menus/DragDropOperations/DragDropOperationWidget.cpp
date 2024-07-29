@@ -30,37 +30,12 @@ void UDragDropOperationWidget::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UDragDropOperationWidget::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UDragDropOperationWidget::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
-	if (BasicUnitPtr)
+	if (InBasicUnitPtr)
 	{
-		switch (BasicUnitPtr->GetSceneToolsType())
-		{
-		case ESceneToolsType::kWeapon:
-		{
-			WeaponUnitSPtr = Cast<UWeaponUnit>(BasicUnitPtr);
-			SetItemType(WeaponUnitSPtr);
-		}
-		break;
-		case ESceneToolsType::kTool:
-		{
-			ToolUnitSPtr = Cast<UToolUnit>(BasicUnitPtr);
-			SetItemType(ToolUnitSPtr);
-		}
-		break;
-		case ESceneToolsType::kActiveSkill:
-		{
-			SkillUnitSPtr = Cast<USkillUnit>(BasicUnitPtr);
-			SetItemType(SkillUnitSPtr);
-		}
-		break;
-		case ESceneToolsType::kConsumables:
-		{
-			ConsumableUnitSPtr = Cast<UConsumableUnit>(BasicUnitPtr);
-			SetItemType(ConsumableUnitSPtr);
-		}
-		break;
-		}
+		BasicUnitPtr = InBasicUnitPtr;
+		SetItemType(BasicUnitPtr);
 	}
 }
 

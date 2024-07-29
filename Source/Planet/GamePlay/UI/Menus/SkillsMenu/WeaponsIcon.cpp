@@ -20,6 +20,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace WeaponsIcon
 {
@@ -53,7 +54,7 @@ void UWeaponsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetSceneToolsType() == ESceneToolsType::kWeapon)
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
 		WeaponUnitPtr = Cast<UWeaponUnit>(BasicUnitPtr);
 	}
@@ -94,7 +95,7 @@ void UWeaponsIcon::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* InWeaponUnitP
 {
 	if (bIsDragging)
 	{
-		if (InWeaponUnitPtr && InWeaponUnitPtr->GetSceneToolsType() != ESceneToolsType::kWeapon)
+		if (InWeaponUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 		{
 			EnableIcon(false);
 		}
