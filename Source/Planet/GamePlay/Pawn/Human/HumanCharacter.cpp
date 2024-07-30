@@ -141,14 +141,15 @@ void AHumanCharacter::BeginPlay()
 		{
 			auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
 			{
-				auto Handle = GetHoldingItemsComponent()->GetHoldItemProperty().OnSkillUnitChanged.AddCallback(
-					std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-					));
+				auto Handle =
+					GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().OnSkillUnitChanged.AddCallback(
+						std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty().OnCoinUnitChanged.AddCallback(
+					GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().OnCoinUnitChanged.AddCallback(
 						std::bind(&UGetItemInfos::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 						));
 				Handle->bIsAutoUnregister = false;
@@ -162,12 +163,12 @@ void AHumanCharacter::BeginPlay()
 #if TESTPLAYERCHARACTERHOLDDATA
 			TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
-		}
+			}
 		else if (GetController()->IsA(AHumanAIController::StaticClass()))
 		{
 		}
+		}
 	}
-}
 
 void AHumanCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {

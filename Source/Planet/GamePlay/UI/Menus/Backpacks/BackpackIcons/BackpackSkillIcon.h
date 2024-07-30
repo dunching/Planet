@@ -24,8 +24,6 @@ class PLANET_API UBackpackSkillIcon :
 
 public:
 
-	using FOnDragDelegate = TCallbackHandleContainer<void(bool, USkillUnit*)>;
-
 	UBackpackSkillIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
@@ -34,29 +32,15 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	FOnDragDelegate OnDragDelegate;
-
 protected:
 
 	void SetNum(int32 NewNum);
-
-	void SetItemType();
 
 	void SetValue(int32 Value);
 
 	void ResetSize(const FVector2D& Size);
 
 	virtual void NativeConstruct()override;
-
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
-
-	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
-
-	virtual void NativeOnDragDetected(
-		const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation
-	)override;
-	
-	virtual void OnDroped(UDragDropOperation* Operation)override;
 
 private:
 

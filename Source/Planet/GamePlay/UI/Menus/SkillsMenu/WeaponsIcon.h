@@ -8,8 +8,8 @@
 
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
-
 #include "SceneElement.h"
+#include "AllocationIconBase.h"
 
 #include "WeaponsIcon.generated.h"
 
@@ -21,44 +21,27 @@ class UWeaponUnit;
 class UBasicUnit;
 
 UCLASS()
-class PLANET_API UWeaponsIcon : public UMyUserWidget, public IToolsIconInterface
+class PLANET_API UWeaponsIcon : public UAllocationIconBase
 {
 	GENERATED_BODY()
 
 public:
 
-	using FOnResetUnit = TCallbackHandleContainer<void(UWeaponUnit*)>;
+	using FOnResetUnit_Weapon = TCallbackHandleContainer<void(UWeaponUnit*)>;
 
 	UWeaponsIcon(const FObjectInitializer& ObjectInitializer);
-
-	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	void OnDragSkillIcon(bool bIsDragging, USkillUnit* SkillUnitPtr);
+	UWeaponUnit* UnitPtr = nullptr;
 
-	void OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr);
-
-	void OnSublingIconReset(UWeaponUnit* InWeaponUnitPtr);
-
-	FOnResetUnit OnResetUnit;
-
-	UWeaponUnit* WeaponUnitPtr = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
-	FGameplayTag IconSocket;
+	FOnResetUnit_Weapon OnResetUnit_Weapon;
 
 protected:
 
-	void SetItemType();
-
 	virtual void NativeConstruct()override;
-
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
-
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
 
 private:
 

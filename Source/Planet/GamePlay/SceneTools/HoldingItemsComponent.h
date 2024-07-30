@@ -21,6 +21,12 @@ public:
 
 	FSceneUnitContainer & GetHoldItemProperty();
 
+	UBasicUnit* AddUnit(FGameplayTag UnitType, int32 Num);
+
+	void AddUnit_Apending(FGameplayTag UnitType, FGuid Guid);
+
+	void SyncApendingUnit(FGuid Guid);
+
 	static FName ComponentName;
 
 protected:
@@ -31,5 +37,7 @@ protected:
 	FSceneUnitContainer HoldItemProperty;
 
 private:
+
+	TMap<FGuid, TMap<FGameplayTag, int32>> SkillUnitApendingMap;
 
 };

@@ -7,35 +7,33 @@
 #include "GameplayTagContainer.h"
 
 #include "UIInterfaces.h"
-#include "GenerateType.h"
+#include "Common/GenerateType.h"
 #include "SceneElement.h"
 #include "AllocationIconBase.h"
 
-#include "SkillsIcon.generated.h"
+#include "ConsumableIcon.generated.h"
 
 struct FStreamableHandle;
 class UDragDropOperation;
 
 class USkillUnit;
+class UConsumableUnit;
+class UBasicUnit;
 
-/**
- * 作为技能Icon
- * 1.同类的需要能互相移除 2.右键移除 3.拖拽时禁用对应的Icon
- */
 UCLASS()
-class PLANET_API USkillsIcon : public UAllocationIconBase
+class PLANET_API UConsumableIcon : public UAllocationIconBase
 {
 	GENERATED_BODY()
 
 public:
 
-	USkillsIcon(const FObjectInitializer& ObjectInitializer);
-
+	UConsumableIcon(const FObjectInitializer& ObjectInitializer);
+	
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	USkillUnit* UnitPtr = nullptr;
+	UConsumableUnit* UnitPtr = nullptr;
 
 protected:
 

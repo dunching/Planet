@@ -87,6 +87,22 @@ public:
 
 #pragma region UISocket Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag ConsumableSocket1 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket1")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag ConsumableSocket2 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket2")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag ConsumableSocket3 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket3")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag ConsumableSocket4 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket4")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag WeaponActiveSocket1 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.WeaponActiveSocket1")));
 

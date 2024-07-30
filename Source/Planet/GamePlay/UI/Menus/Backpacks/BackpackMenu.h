@@ -27,10 +27,8 @@ class PLANET_API UBackpackMenu : public UMyUserWidget, public IItemsMenuInterfac
 
 public:
 
-	using FOnDragSkillIconDelegate = TCallbackHandleContainer<void(bool, USkillUnit*)>;
+	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, UBasicUnit*)>;
 	
-	using FOnDragWeaponIconDelegate = TCallbackHandleContainer<void(bool, UWeaponUnit*)>;
-
 	virtual void NativeConstruct()override;
 
 	virtual void ResetUIByData()override;
@@ -42,25 +40,31 @@ public:
 
 	bool bIsPlayerMenu = true;
 
-	FOnDragSkillIconDelegate OnDragSkillIconDelegate;
-
-	FOnDragWeaponIconDelegate OnDragWeaponIconDelegate;
+	FOnDragIconDelegate OnDragIconDelegate;
 
 protected:
 
 	void BindEvent();
 
 	UFUNCTION()
-	void OnWeaponsBtnCliked();
+	void OnWeaponBtnCliked();
 
 	UFUNCTION()
-	void OnSkillsBtnCliked();
+	void OnSkillBtnCliked();
+
+	UFUNCTION()
+	void OnConsumableBtnCliked();
+
+	UFUNCTION()
+	void OnShowAllBtnCliked();
 
 private:
 
-	void ResetUIByData_Skills();
+	void ResetUIByData_Skill();
 
-	void ResetUIByData_Weapons();
+	void ResetUIByData_Weapon();
+
+	void ResetUIByData_Consumable();
 
 	void ResetUIByData_All();
 

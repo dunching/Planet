@@ -40,12 +40,19 @@ void UBackpackSkillIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackSkillIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UBackpackSkillIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
+	Super::ResetToolUIByData(InBasicUnitPtr);
+
+	if (InBasicUnitPtr)
 	{
-		UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
-		SetItemType();
+		if (
+			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
+			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve)
+			)
+		{
+			UnitPtr = Cast<USkillUnit>(InBasicUnitPtr);
+		}
 	}
 }
 
@@ -73,19 +80,6 @@ void UBackpackSkillIcon::SetNum(int32 NewNum)
 	}
 }
 
-void UBackpackSkillIcon::SetItemType()
-{
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
-	if (ImagePtr)
-	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
-			}));
-	}
-}
-
 void UBackpackSkillIcon::SetValue(int32 Value)
 {
 	auto ProgressBarPtr = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar")));
@@ -108,55 +102,4 @@ void UBackpackSkillIcon::ResetSize(const FVector2D& Size)
 void UBackpackSkillIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
-}
-
-FReply UBackpackSkillIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
-	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
-}
-
-void UBackpackSkillIcon::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-{
-	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
-
-	OnDragDelegate.ExcuteCallback(false, nullptr);
-}
-
-void UBackpackSkillIcon::NativeOnDragDetected(
-	const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation
-)
-{
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	auto BaseItemClassPtr = UAssetRefMap::GetInstance()->DragDropOperationWidgetClass;
-
-	if (BaseItemClassPtr)
-	{
-		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);
-		if (DragWidgetPtr)
-		{
-			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(UnitPtr);
-
-			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
-			if (WidgetDragPtr)
-			{
-				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = UnitPtr;
-				WidgetDragPtr->bIsInBackpakc = true;
-				WidgetDragPtr->OnDrop.AddDynamic(this, &ThisClass::OnDroped);
-
-				OutOperation = WidgetDragPtr;
-
-				OnDragDelegate.ExcuteCallback(true, UnitPtr);
-			}
-		}
-	}
-}
-
-void UBackpackSkillIcon::OnDroped(UDragDropOperation* Operation)
-{
-	OnDragDelegate.ExcuteCallback(false, nullptr);
 }

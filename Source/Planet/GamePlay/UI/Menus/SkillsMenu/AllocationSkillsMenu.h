@@ -47,9 +47,7 @@ protected:
 
 	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
 
-	void OnDragSkillIcon(bool bIsDragging, USkillUnit* SkillUnitPtr);
-
-	void OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr);
+	void OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr);
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 

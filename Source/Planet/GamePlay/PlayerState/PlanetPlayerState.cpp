@@ -11,12 +11,11 @@
 APlanetPlayerState::APlanetPlayerState() :
 	Super()
 {
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
 }
 
-UHoldingItemsComponent* APlanetPlayerState::GetHoldingItemsComponent()
+FSceneUnitContainer& APlanetPlayerState::GetSceneUnitContainer() 
 {
-	return HoldingItemsComponentPtr;
+	return SceneUnitContainer;
 }
 
 void APlanetPlayerState::BeginPlay()
@@ -28,9 +27,7 @@ void APlanetPlayerState::BeginPlay()
 
 void APlanetPlayerState::InitialData()
 {
-	auto& HoldItemComponent = HoldingItemsComponentPtr->GetHoldItemProperty();
-
-	HoldItemComponent.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
-	HoldItemComponent.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
-	HoldItemComponent.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
+	SceneUnitContainer.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
+	SceneUnitContainer.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
+	SceneUnitContainer.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
 }

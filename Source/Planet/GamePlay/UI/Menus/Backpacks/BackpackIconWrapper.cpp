@@ -52,12 +52,13 @@ void UBackpackIconWrapper::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
+			OnDragIconDelegate = NewPtr->OnDragIconDelegate;
 			ResetToolUIByData(NewPtr->TargetBasicUnitPtr);
 		}
 	}
 }
 
-void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
+void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
 	if (BasicUnitPtr)
 	{
@@ -74,6 +75,7 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
 
+				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
@@ -90,6 +92,7 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
 
+				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
@@ -106,7 +109,7 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->OnDragDelegate = OnDragSkillIconDelegate;
+				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
@@ -123,7 +126,7 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->OnDragDelegate = OnDragWeaponIconDelegate;
+				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}

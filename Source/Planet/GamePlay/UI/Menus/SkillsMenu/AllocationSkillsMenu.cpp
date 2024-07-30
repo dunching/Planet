@@ -19,6 +19,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "BackpackMenu.h"
 #include "PlanetPlayerState.h"
+#include "ConsumableIcon.h"
 
 struct FAllocationSkillsMenu : public TGetSocketName<FAllocationSkillsMenu>
 {
@@ -55,6 +56,12 @@ struct FAllocationSkillsMenu : public TGetSocketName<FAllocationSkillsMenu>
 	const FName TalentPassivSkill = TEXT("TalentPassivSkill");
 
 	const FName Consumable1 = TEXT("Consumable1");
+
+	const FName Consumable2 = TEXT("Consumable2");
+
+	const FName Consumable3 = TEXT("Consumable3");
+
+	const FName Consumable4 = TEXT("Consumable4");
 };
 
 UAllocationSkillsMenu::UAllocationSkillsMenu(const FObjectInitializer& ObjectInitializer):
@@ -116,19 +123,19 @@ void UAllocationSkillsMenu::NativeDestruct()
 		TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
-			if (IconPtr && IconPtr->WeaponUnitPtr)
+			if (IconPtr && IconPtr->UnitPtr)
 			{
 				FirstWeaponSocketInfoSPtr->WeaponSocket = IconPtr->IconSocket;
-				FirstWeaponSocketInfoSPtr->WeaponUnitPtr = IconPtr->WeaponUnitPtr;
+				FirstWeaponSocketInfoSPtr->WeaponUnitPtr = IconPtr->UnitPtr;
 			}
 		}
 		TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
-			if (IconPtr && IconPtr->WeaponUnitPtr)
+			if (IconPtr && IconPtr->UnitPtr)
 			{
 				SecondWeaponSocketInfoSPtr->WeaponSocket = IconPtr->IconSocket;
-				SecondWeaponSocketInfoSPtr->WeaponUnitPtr = IconPtr->WeaponUnitPtr;
+				SecondWeaponSocketInfoSPtr->WeaponUnitPtr = IconPtr->UnitPtr;
 			}
 		}
 		EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
@@ -162,12 +169,12 @@ void UAllocationSkillsMenu::NativeDestruct()
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
 			if (IconPtr)
 			{
-				if (IconPtr->SkillUnitPtr)
+				if (IconPtr->UnitPtr)
 				{
 					TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 					SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
-					SkillsSocketInfo->SkillUnit = IconPtr->SkillUnitPtr;
+					SkillsSocketInfo->SkillUnit = IconPtr->UnitPtr;
 					SkillsSocketInfo->Key = Iter.Key;
 
 					SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
@@ -263,14 +270,18 @@ void UAllocationSkillsMenu::BindEvent()
 		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
 		if (WeaponIconPtr)
 		{
-			MainDelegateHandleSPtr = WeaponIconPtr->OnResetUnit.AddCallback(std::bind(&ThisClass::OnMainWeaponChanged, this, std::placeholders::_1));
+			MainDelegateHandleSPtr = WeaponIconPtr->OnResetUnit_Weapon.AddCallback(
+				std::bind(&ThisClass::OnMainWeaponChanged, this, std::placeholders::_1)
+			);
 		}
 	}
 	{
 		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
 		if (WeaponIconPtr)
 		{
-			SecondaryDelegateHandleSPtr = WeaponIconPtr->OnResetUnit.AddCallback(std::bind(&ThisClass::OnSecondaryWeaponChanged, this, std::placeholders::_1));
+			SecondaryDelegateHandleSPtr = WeaponIconPtr->OnResetUnit_Weapon.AddCallback(
+				std::bind(&ThisClass::OnSecondaryWeaponChanged, this, std::placeholders::_1)
+			);
 		}
 	}
 	{
@@ -312,6 +323,34 @@ void UAllocationSkillsMenu::BindEvent()
 	{
 		TArray<FName>Ary
 		{
+			{FAllocationSkillsMenu::Get().Consumable1},
+			{FAllocationSkillsMenu::Get().Consumable2},
+			{FAllocationSkillsMenu::Get().Consumable3},
+			{FAllocationSkillsMenu::Get().Consumable4},
+		};
+
+		for (const auto& FirstIter : Ary)
+		{
+			for (const auto& SecondIter : Ary)
+			{
+				if (FirstIter == SecondIter)
+				{
+					continue;
+				}
+				auto FirstPtr = Cast<UConsumableIcon>(GetWidgetFromName(FirstIter));
+				auto SecondPtr = Cast<UConsumableIcon>(GetWidgetFromName(SecondIter));
+				if (FirstPtr && SecondPtr)
+				{
+					auto Result = SecondPtr->OnResetUnit.AddCallback(
+						std::bind(&UConsumableIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
+					Result->bIsAutoUnregister = false;
+				}
+			}
+		}
+	}
+	{
+		TArray<FName>Ary
+		{
 			{FAllocationSkillsMenu::Get().MainWeapon},
 			{FAllocationSkillsMenu::Get().SecondaryWeapon},
 		};
@@ -345,18 +384,13 @@ void UAllocationSkillsMenu::BindEvent()
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
 
  		UIPtr->SetHoldItemProperty(
- 			CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty(),
+ 			CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer(),
  			CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty()
  		);
 
 		{
 			auto Delegate = 
-				UIPtr->OnDragSkillIconDelegate.AddCallback(std::bind(&ThisClass::OnDragSkillIcon, this, std::placeholders::_1, std::placeholders::_2));
-			Delegate->bIsAutoUnregister = false;
-		}
-		{
-			auto Delegate = 
-				UIPtr->OnDragWeaponIconDelegate.AddCallback(std::bind(&ThisClass::OnDragWeaponIcon, this, std::placeholders::_1, std::placeholders::_2));
+				UIPtr->OnDragIconDelegate.AddCallback(std::bind(&ThisClass::OnDragIcon, this, std::placeholders::_1, std::placeholders::_2));
 			Delegate->bIsAutoUnregister = false;
 		}
 		
@@ -431,7 +465,7 @@ void UAllocationSkillsMenu::OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr)
 	}
 }
 
-void UAllocationSkillsMenu::OnDragSkillIcon(bool bIsDragging, USkillUnit* SkillUnitPtr)
+void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
 {
 	{
 		TArray<FName>Ary
@@ -448,51 +482,6 @@ void UAllocationSkillsMenu::OnDragSkillIcon(bool bIsDragging, USkillUnit* SkillU
 			{FAllocationSkillsMenu::Get().PassivSkill4},
 			{FAllocationSkillsMenu::Get().PassivSkill5},
 			{FAllocationSkillsMenu::Get().TalentPassivSkill},
-		};
-
-		for (const auto& IconIter : Ary)
-		{
-			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(IconIter));
-			if (IconPtr)
-			{
-				IconPtr->OnDragSkillIcon(bIsDragging, SkillUnitPtr);
-			}
-		}
-	}
-	{
-		TArray<FName>Ary
-		{
-			{FAllocationSkillsMenu::Get().MainWeapon},
-			{FAllocationSkillsMenu::Get().SecondaryWeapon},
-		};
-
-		for (const auto& IconIter : Ary)
-		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(IconIter));
-			if (IconPtr)
-			{
-				IconPtr->OnDragSkillIcon(bIsDragging, SkillUnitPtr);
-			}
-		}
-	}
-}
-
-void UAllocationSkillsMenu::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr)
-{
-	{
-		TArray<FName>Ary
-		{
-			{FAllocationSkillsMenu::Get().ActiveSkill1},
-			{FAllocationSkillsMenu::Get().ActiveSkill2},
-			{FAllocationSkillsMenu::Get().ActiveSkill3},
-			{FAllocationSkillsMenu::Get().ActiveSkill4},
-			{FAllocationSkillsMenu::Get().WeaponActiveSkill1},
-			{FAllocationSkillsMenu::Get().WeaponActiveSkill2},
-			{FAllocationSkillsMenu::Get().PassivSkill1},
-			{FAllocationSkillsMenu::Get().PassivSkill2},
-			{FAllocationSkillsMenu::Get().PassivSkill3},
-			{FAllocationSkillsMenu::Get().PassivSkill4},
-			{FAllocationSkillsMenu::Get().PassivSkill5},
 			{FAllocationSkillsMenu::Get().TalentPassivSkill},
 		};
 
@@ -501,7 +490,25 @@ void UAllocationSkillsMenu::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* Weap
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(IconIter));
 			if (IconPtr)
 			{
-				IconPtr->OnDragWeaponIcon(bIsDragging, WeaponUnitPtr);
+				IconPtr->OnDragIcon(bIsDragging, UnitPtr);
+			}
+		}
+	}
+	{
+		TArray<FName>Ary
+		{
+			{FAllocationSkillsMenu::Get().Consumable1},
+			{FAllocationSkillsMenu::Get().Consumable2},
+			{FAllocationSkillsMenu::Get().Consumable3},
+			{FAllocationSkillsMenu::Get().Consumable4},
+		};
+
+		for (const auto& IconIter : Ary)
+		{
+			auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(IconIter));
+			if (IconPtr)
+			{
+				IconPtr->OnDragIcon(bIsDragging, UnitPtr);
 			}
 		}
 	}
@@ -517,7 +524,7 @@ void UAllocationSkillsMenu::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* Weap
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(IconIter));
 			if (IconPtr)
 			{
-				IconPtr->OnDragWeaponIcon(bIsDragging, WeaponUnitPtr);
+				IconPtr->OnDragIcon(bIsDragging, UnitPtr);
 			}
 		}
 	}

@@ -32,7 +32,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	}
 
 	auto& HoldItemPropertyRef =
-		CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty();
+		CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer();
 
 	switch (RaffleType)
 	{
@@ -71,8 +71,7 @@ void URaffleSubSystem::SyncUnits2Player()const
 	{
 		return;
 	}
-	auto& HoldItemPropertyRef = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
-	HoldItemPropertyRef.SyncApendingUnit(ApendingID);
+	CharacterPtr->GetHoldingItemsComponent()->SyncApendingUnit(ApendingID);
 }
 
 bool URaffleSubSystem::RafflePermanent(int32 Count)const
@@ -115,7 +114,6 @@ void URaffleSubSystem::RafflePermanentComplete(
 	{
 		return;
 	}
-	auto& HoldItemPropertyRef = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
 
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
@@ -126,7 +124,7 @@ void URaffleSubSystem::RafflePermanentComplete(
 	{
 		auto RowPtr = DataTable->FindRow<FTableRowUnit>(*Iter.ToString(), TEXT("GetUnit"));
 
- 		HoldItemPropertyRef.AddUnit_Apending(Iter, ApendingID);
+		CharacterPtr->GetHoldingItemsComponent()->AddUnit_Apending(Iter, ApendingID);
  
  		GetUnitAry.Add(SceneUnitExtendInfoMapPtr->GetTableRowUnit(Iter));
 	}

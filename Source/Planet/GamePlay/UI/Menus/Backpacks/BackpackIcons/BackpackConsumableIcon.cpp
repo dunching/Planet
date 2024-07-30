@@ -21,15 +21,12 @@
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
 #include "GameplayTagsSubSystem.h"
+#include "UICommon.h"
 
-namespace WeaponsIcon
+struct FBackpackConsumableIcon : public TGetSocketName<FBackpackConsumableIcon>
 {
-	const FName Content = TEXT("Content");
-
-	const FName Enable = TEXT("Enable");
-
-	const FName Icon = TEXT("Icon");
-}
+	const FName Number = TEXT("Number");
+};
 
 UBackpackConsumableIcon::UBackpackConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -37,11 +34,11 @@ UBackpackConsumableIcon::UBackpackConsumableIcon(const FObjectInitializer& Objec
 
 }
 
-void UBackpackConsumableIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UBackpackConsumableIcon::InvokeReset(UUserWidget* InBasicUnitPtr)
 {
-	if (BaseWidgetPtr)
+	if (InBasicUnitPtr)
 	{
-		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
+		auto NewPtr = Cast<ThisClass>(InBasicUnitPtr);
 		if (NewPtr)
 		{
 			ResetToolUIByData(NewPtr->UnitPtr);
@@ -49,13 +46,14 @@ void UBackpackConsumableIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackConsumableIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UBackpackConsumableIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	Super::ResetToolUIByData(InBasicUnitPtr);
+
+	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 	{
-		UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
+		UnitPtr = Cast<UConsumableUnit>(InBasicUnitPtr);
 		SetNum(UnitPtr->GetCurrentValue());
-		SetItemType();
 	}
 }
 
@@ -66,7 +64,7 @@ void UBackpackConsumableIcon::EnableIcon(bool bIsEnable)
 
 void UBackpackConsumableIcon::SetNum(int32 NewNum)
 {
-	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(TEXT("Number")));
+	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackConsumableIcon::Get().Number));
 	if (!NumTextPtr)
 	{
 		return;
@@ -83,74 +81,15 @@ void UBackpackConsumableIcon::SetNum(int32 NewNum)
 	}
 }
 
-void UBackpackConsumableIcon::SetItemType()
-{
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
-	if (ImagePtr)
-	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
-			}));
-	}
-}
-
 void UBackpackConsumableIcon::SetValue(int32 Value)
 {
-	auto ProgressBarPtr = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar")));
-	if (!ProgressBarPtr)
-	{
-		return;
-	}
 }
 
 void UBackpackConsumableIcon::ResetSize(const FVector2D& Size)
 {
-	auto SizeBoxPtr = Cast<USizeBox>(GetWidgetFromName(TEXT("IconSize")));
-	if (SizeBoxPtr)
-	{
-		SizeBoxPtr->SetWidthOverride(Size.X);
-		SizeBoxPtr->SetHeightOverride(Size.Y);
-	}
 }
 
 void UBackpackConsumableIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
-}
-
-FReply UBackpackConsumableIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
-	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
-}
-
-void UBackpackConsumableIcon::NativeOnDragDetected(
-	const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation
-)
-{
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	auto BaseItemClassPtr = UAssetRefMap::GetInstance()->DragDropOperationWidgetClass;
-
-	if (BaseItemClassPtr)
-	{
-		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);
-		if (DragWidgetPtr)
-		{
-			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(UnitPtr);
-
-			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
-			if (WidgetDragPtr)
-			{
-				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = UnitPtr;
-
-				OutOperation = WidgetDragPtr;
-			}
-		}
-	}
 }

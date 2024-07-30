@@ -1,5 +1,5 @@
 
-#include "SkillsIcon.h"
+#include "ConsumableIcon.h"
 
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
@@ -12,12 +12,13 @@
 #include "Components/Overlay.h"
 #include "Components/ProgressBar.h"
 #include "Kismet/KismetStringLibrary.h"
+
 #include "Components/SizeBox.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/Texture2D.h"
-
 #include "ToolsLibrary.h"
 #include "BackpackIcon.h"
+
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
@@ -36,30 +37,29 @@ namespace SkillsIcon
 	const FName Icon = TEXT("Icon");
 }
 
-USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
+UConsumableIcon::UConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 
 }
 
-void USkillsIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UConsumableIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
 	UnitPtr = nullptr;
 	if (BasicUnitPtr && (
-		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) 
+		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
 		))
 	{
-		UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
+		UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
 	}
 
 	OnResetUnit.ExcuteCallback(UnitPtr);
 	SetLevel();
 }
 
-void USkillsIcon::EnableIcon(bool bIsEnable)
+void UConsumableIcon::EnableIcon(bool bIsEnable)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Enable));
 	if (ImagePtr)
@@ -68,18 +68,18 @@ void USkillsIcon::EnableIcon(bool bIsEnable)
 	}
 }
 
-void USkillsIcon::SetLevel()
+void UConsumableIcon::SetLevel()
 {
 }
 
-void USkillsIcon::NativeConstruct()
+void UConsumableIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	ResetToolUIByData(nullptr);
 }
 
-void USkillsIcon::NativeDestruct()
+void UConsumableIcon::NativeDestruct()
 {
 	Super::NativeDestruct();
 }

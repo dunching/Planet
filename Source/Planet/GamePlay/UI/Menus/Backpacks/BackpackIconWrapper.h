@@ -33,9 +33,7 @@ class PLANET_API UBackpackIconWrapper :
 
 public:
 
-	using FOnDragSkillIconDelegate = TCallbackHandleContainer<void(bool, USkillUnit*)>;
-
-	using FOnDragWeaponIconDelegate = TCallbackHandleContainer<void(bool, UWeaponUnit*)>;
+	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, UBasicUnit*)>;
 
 	UBackpackIconWrapper(const FObjectInitializer& ObjectInitializer);
 
@@ -49,9 +47,7 @@ public:
 
 	UBasicUnit* TargetBasicUnitPtr = nullptr;
 
-	FOnDragSkillIconDelegate OnDragSkillIconDelegate;
-
-	FOnDragWeaponIconDelegate OnDragWeaponIconDelegate;
+	FOnDragIconDelegate OnDragIconDelegate;
 
 protected:
 

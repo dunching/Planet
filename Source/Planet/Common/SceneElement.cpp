@@ -422,38 +422,3 @@ FTableRowUnit* FSceneUnitContainer::GetTableRowUnit(FGameplayTag UnitType) const
 
 	return SceneUnitExtendInfoPtr;
 }
-
-void FSceneUnitContainer::AddUnit_Apending(FGameplayTag UnitType, FGuid Guid)
-{
-	if (SkillUnitApendingMap.Contains(Guid))
-	{
-		if (SkillUnitApendingMap[Guid].Contains(UnitType))
-		{
-			SkillUnitApendingMap[Guid][UnitType]++;
-		}
-		else
-		{
-			SkillUnitApendingMap[Guid].Add(UnitType, 1);
-		}
-	}
-	else
-	{
-		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-		SkillUnitApendingMap.Add(Guid, { {UnitType, 1} });
-	}
-}
-
-void FSceneUnitContainer::SyncApendingUnit(FGuid Guid)
-{
-	if (SkillUnitApendingMap.Contains(Guid))
-	{
-		for (const auto& Iter : SkillUnitApendingMap)
-		{
-			for (const auto& SecondIter : Iter.Value)
-			{
-				AddUnit(SecondIter.Key, SecondIter.Value);
-			}
-		}
-		SkillUnitApendingMap.Remove(Guid);
-	}
-}

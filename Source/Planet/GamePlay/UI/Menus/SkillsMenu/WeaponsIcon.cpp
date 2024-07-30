@@ -37,31 +37,21 @@ UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UWeaponsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UWeaponsIcon::ResetToolUIByData(UBasicUnit * InBasicUnitPtr)
 {
-	if (BaseWidgetPtr)
-	{
-		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
-		if (NewPtr)
-		{
-			OnResetUnit = NewPtr->OnResetUnit;
-			ResetToolUIByData(NewPtr->WeaponUnitPtr);
-		}
-	}
-}
+	Super::ResetToolUIByData(InBasicUnitPtr);
 
-void UWeaponsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
-{
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
-		WeaponUnitPtr = Cast<UWeaponUnit>(BasicUnitPtr);
+		UnitPtr = Cast<UWeaponUnit>(BasicUnitPtr);
 	}
 	else
 	{
-		WeaponUnitPtr = nullptr;
+		UnitPtr = nullptr;
 	}
 
-	OnResetUnit.ExcuteCallback(WeaponUnitPtr);
+	OnResetUnit.ExcuteCallback(UnitPtr);
+	OnResetUnit_Weapon.ExcuteCallback(UnitPtr);
 	SetItemType();
 }
 
@@ -74,101 +64,9 @@ void UWeaponsIcon::EnableIcon(bool bIsEnable)
 	}
 }
 
-void UWeaponsIcon::OnDragSkillIcon(bool bIsDragging, USkillUnit* InSkillUnitPtr)
-{
-	if (bIsDragging)
-	{
-		if (InSkillUnitPtr)
-		{
-			EnableIcon(false);
-		}
-	}
-	else
-	{
-		EnableIcon(true);
-	}
-}
-
-void UWeaponsIcon::OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* InWeaponUnitPtr)
-{
-	if (bIsDragging)
-	{
-		if (InWeaponUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
-		{
-			EnableIcon(false);
-		}
-	}
-	else
-	{
-		EnableIcon(true);
-	}
-}
-
-void UWeaponsIcon::OnSublingIconReset(UWeaponUnit* InWeaponUnitPtr)
-{
-	if (InWeaponUnitPtr && (InWeaponUnitPtr == WeaponUnitPtr))
-	{
-		ResetToolUIByData(nullptr);
-	}
-}
-
-void UWeaponsIcon::SetItemType()
-{
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Icon));
-	if (ImagePtr)
-	{
-		if (WeaponUnitPtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
-
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(WeaponUnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-				{
-					ImagePtr->SetBrushFromTexture(WeaponUnitPtr->GetIcon().Get());
-				}));
-		}
-		else
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
-}
-
 void UWeaponsIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	ResetToolUIByData(nullptr);
-}
-
-FReply UWeaponsIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
-	{
-		return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-	}
-	else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
-	{
-		ResetToolUIByData(nullptr);
-	}
-
-	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-}
-
-bool UWeaponsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-{
-	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-
-	if (InOperation->IsA(UItemsDragDropOperation::StaticClass()))
-	{
-		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
-		if (WidgetDragPtr)
-		{
-			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
-
-			WidgetDragPtr->OnDrop.Broadcast(WidgetDragPtr);
-		}
-	}
-
-	return true;
 }

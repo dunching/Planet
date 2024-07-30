@@ -40,13 +40,14 @@ void UBackpackToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackToolIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UBackpackToolIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+	Super::ResetToolUIByData(InBasicUnitPtr);
+
+	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 	{
-		UnitPtr = Cast<UToolUnit>(BasicUnitPtr);
+		UnitPtr = Cast<UToolUnit>(InBasicUnitPtr);
 		SetNum(UnitPtr->GetNum());
-		SetItemType();
 	}
 }
 
@@ -74,19 +75,6 @@ void UBackpackToolIcon::SetNum(int32 NewNum)
 	}
 }
 
-void UBackpackToolIcon::SetItemType()
-{
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
-	if (ImagePtr)
-	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-			{
-				ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
-			}));
-	}
-}
-
 void UBackpackToolIcon::SetValue(int32 Value)
 {
 	auto ProgressBarPtr = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar")));
@@ -109,39 +97,4 @@ void UBackpackToolIcon::ResetSize(const FVector2D& Size)
 void UBackpackToolIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
-}
-
-FReply UBackpackToolIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
-	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
-}
-
-void UBackpackToolIcon::NativeOnDragDetected(
-	const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation
-)
-{
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	auto BaseItemClassPtr = UAssetRefMap::GetInstance()->DragDropOperationWidgetClass;
-
-	if (BaseItemClassPtr)
-	{
-		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);
-		if (DragWidgetPtr)
-		{
-			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(UnitPtr);
-
-			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
-			if (WidgetDragPtr)
-			{
-				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = UnitPtr;
-
-				OutOperation = WidgetDragPtr;
-			}
-		}
-	}
 }

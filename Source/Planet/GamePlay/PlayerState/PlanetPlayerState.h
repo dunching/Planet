@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerState.h"
 
 #include "PlanetAbilitySystemComponent.h"
+#include "SceneElement.h"
 
 #include "PlanetPlayerState.generated.h"
 
@@ -22,17 +23,17 @@ public:
 
 	APlanetPlayerState();
 
-	UHoldingItemsComponent* GetHoldingItemsComponent();
+	FSceneUnitContainer& GetSceneUnitContainer();
 
 protected:
 
 	virtual void BeginPlay() override;
 
 	void InitialData();
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
 	
+	UPROPERTY(Transient)
+	FSceneUnitContainer SceneUnitContainer;
+
 private:
 
 };

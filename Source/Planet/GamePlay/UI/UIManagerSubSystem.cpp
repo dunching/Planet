@@ -326,7 +326,7 @@ void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 				if (CharacterPtr)
 				{
 					RaffleMenuPtr->SetHoldItemProperty(
-						CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetHoldingItemsComponent()->GetHoldItemProperty()
+						CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer()
 					);
 				}
 				RaffleMenuPtr->AddToViewport(EUIOrder::kRaffle);

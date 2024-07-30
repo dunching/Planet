@@ -55,7 +55,7 @@ void AResourceBoxBase::AddItemsToTarget()
 		{
 			for (const auto Iter : UnitMap)
 			{
-				TargetCharacterPtr->AddUnit(Iter.Key, Iter.Value);
+				TargetCharacterPtr->GetHoldingItemsComponent()->AddUnit(Iter.Key, Iter.Value);
 			}
 #if WITH_EDITORONLY_DATA
 #endif

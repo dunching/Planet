@@ -363,10 +363,6 @@ struct FSceneUnitContainer
 
 	const TMap<FGameplayTag, UCoinUnit*>& GetCoinUintAry()const;
 
-	void AddUnit_Apending(FGameplayTag UnitType, FGuid Guid);
-
-	void SyncApendingUnit(FGuid Guid);
-
 	FOnSkillUnitChanged OnSkillUnitChanged;
 
 	FOnToolUnitChanged OnToolUnitChanged;
@@ -378,8 +374,8 @@ struct FSceneUnitContainer
 private:
 
 	FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType)const;
-
-	UPROPERTY()
+	
+	UPROPERTY(Transient)
 	TArray<UBasicUnit*> SceneToolsAry;
 
 	TMap<UBasicUnit::IDType, UBasicUnit*> SceneMetaMap;
@@ -389,8 +385,6 @@ private:
 	TMap<FGameplayTag, USkillUnit*> SkillUnitMap;
 	
 	TMap<FGameplayTag, UCoinUnit*> CoinUnitMap;
-
-	TMap<FGuid, TMap<FGameplayTag, int32>> SkillUnitApendingMap;
 
 };
 
