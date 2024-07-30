@@ -9,12 +9,26 @@
 #include "HumanCharacter.h"
 #include "CharacterTitle.h"
 #include "HumanAIController.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
+#include "PlanetPlayerState.h"
 
 FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
 void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* PCPtr)
 {
+	// 
+	auto CharacterPtr = GetOwner<FPawnType>();
+	if (CharacterPtr && CharacterPtr->IsPlayerControlled())
+	{
+		auto AIControllerPtr = PCPtr->GetController<APlanetAIController>();
+
+		auto GroupmateUnitPtr = 
+			CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().AddUnit_Groupmate(AIControllerPtr->RowName);
+
+		AIControllerPtr->GourpMateUnitPtr = GroupmateUnitPtr;
+	}
+
+	//
 	GetGroupHelper()->AddCharacter(PCPtr);
 }
 

@@ -40,6 +40,8 @@ public:
 	void OnCoinUnitChanged(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num);
 
 	void OnConsumableUnitChanged(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num);
+	
+	void OnGourpmateUnitChanged(UGourpmateUnit* UnitPtr, bool bIsAdd);
 
 protected:
 

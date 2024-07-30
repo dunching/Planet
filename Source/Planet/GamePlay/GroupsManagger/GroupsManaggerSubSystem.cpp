@@ -7,7 +7,7 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterBase.h"
 #include "SceneElement.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
 
 UGroupsManaggerSubSystem* UGroupsManaggerSubSystem::GetInstance()

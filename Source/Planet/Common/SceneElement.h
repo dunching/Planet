@@ -196,7 +196,7 @@ class PLANET_API UGourpmateUnit : public UBasicUnit
 
 public:
 
-	using FPawnType = AHumanCharacter;
+	using FPawnType = ACharacterBase;
 
 	UGourpmateUnit();
 
@@ -326,6 +326,8 @@ struct FSceneUnitContainer
 
 	using FOnToolUnitChanged = TCallbackHandleContainer<void(UToolUnit*)>;
 	
+	using FOnGroupmateUnitChanged = TCallbackHandleContainer<void(UGourpmateUnit*, bool)>;
+	
 	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(UConsumableUnit*, bool, int32)>;
 
 	using FOnCoinUnitChanged = TCallbackHandleContainer<void(UCoinUnit*, bool, int32)>;
@@ -359,6 +361,9 @@ struct FSceneUnitContainer
 	USkillUnit* FindUnit_Skill(FGameplayTag UnitType);
 
 
+	UGourpmateUnit* AddUnit_Groupmate(FGameplayTag UnitType);
+
+
 	const TArray<UBasicUnit*>& GetSceneUintAry()const;
 
 	const TMap<FGameplayTag, UCoinUnit*>& GetCoinUintAry()const;
@@ -370,6 +375,8 @@ struct FSceneUnitContainer
 	FOnConsumableUnitChanged OnConsumableUnitChanged;
 
 	FOnCoinUnitChanged OnCoinUnitChanged;
+
+	FOnGroupmateUnitChanged OnGroupmateUnitChanged;
 
 private:
 

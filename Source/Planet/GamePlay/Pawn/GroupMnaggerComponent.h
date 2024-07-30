@@ -17,7 +17,7 @@ class PLANET_API UGroupMnaggerComponent : public UActorComponent
 
 public:
 
-	using FPawnType = AHumanCharacter;
+	using FPawnType = ACharacterBase;
 
 	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
 

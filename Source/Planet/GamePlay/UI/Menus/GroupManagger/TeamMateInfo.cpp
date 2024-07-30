@@ -22,7 +22,7 @@
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "GameplayTagsSubSystem.h"
 

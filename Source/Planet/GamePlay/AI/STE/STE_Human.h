@@ -15,6 +15,7 @@
 
 class AActor;
 
+class ACharacterBase;
 class AHumanCharacter;
 class AHumanAIController;
 
@@ -72,7 +73,7 @@ public:
 	FTSTicker::FDelegateHandle CaculationDistance2AreaHandle;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
-	AHumanCharacter* HumanCharacterPtr = nullptr;
+	ACharacterBase* HumanCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
@@ -84,12 +85,12 @@ public:
 	ETeammateOption TeammateOption = ETeammateOption::kFollow;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	AHumanCharacter* LeaderCharacterPtr = nullptr;
+	ACharacterBase* LeaderCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	AHumanCharacter* TargetCharacterPtr = nullptr;
+	ACharacterBase* TargetCharacterPtr = nullptr;
 
-	TSet<AHumanCharacter*>TargetSet;
+	TSet<ACharacterBase*>TargetSet;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	float GetPatrolPositionDelta = 5.0;
@@ -103,7 +104,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
 	bool bIsNeedRun = false;
 
-	TCallbackHandleContainer<void(ETeammateOption, AHumanCharacter*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
+	TCallbackHandleContainer<void(ETeammateOption, ACharacterBase*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
 	
 	TCallbackHandleContainer<void()>::FCallbackHandleSPtr TeammateChangedDelegate;
 

@@ -48,12 +48,6 @@
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
-}
-
-UGroupMnaggerComponent* AHumanCharacter::GetGroupMnaggerComponent()
-{
-	return GroupMnaggerComponentPtr;
 }
 
 bool AHumanCharacter::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -120,17 +114,6 @@ TPair<FVector, FVector> AHumanCharacter::GetCharacterViewInfo()
 	return Result;
 }
 
-UGourpmateUnit* AHumanCharacter::GetGourpMateUnit()
-{
-	if (!GourpMateUnitPtr)
-	{
-		GourpMateUnitPtr = NewObject<UGourpmateUnit>();
-		GourpMateUnitPtr->InitialByCharactor(this);
-	}
-
-	return GourpMateUnitPtr;
-}
-
 void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -160,15 +143,21 @@ void AHumanCharacter::BeginPlay()
 					));
 				Handle->bIsAutoUnregister = false;
 			}
+			{
+				auto Handle = GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().OnGroupmateUnitChanged.AddCallback(
+					std::bind(&UGetItemInfos::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+					));
+				Handle->bIsAutoUnregister = false;
+			}
 #if TESTPLAYERCHARACTERHOLDDATA
 			TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
-			}
+		}
 		else if (GetController()->IsA(AHumanAIController::StaticClass()))
 		{
 		}
-		}
 	}
+}
 
 void AHumanCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -207,29 +196,4 @@ void AHumanCharacter::UnPossessed()
 	}
 
 	Super::UnPossessed();
-}
-
-void AHumanCharacter::OnCharacterGroupMateChanged(
-	EGroupMateChangeType GroupMateChangeType,
-	AHumanCharacter* LeaderPCPtr
-)
-{
-	switch (GroupMateChangeType)
-	{
-	case EGroupMateChangeType::kAdd:
-	{
-		if (LeaderPCPtr)
-		{
-			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPtr == this)
-			{
-				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
-				if (AIPCPtr)
-				{
-					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
-				}
-			}
-		}
-	}
-	break;
-	}
 }

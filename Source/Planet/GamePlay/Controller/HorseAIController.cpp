@@ -19,6 +19,7 @@
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
+#include "HorseCharacter.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
 	Super()
@@ -34,21 +35,6 @@ void AHorseAIController::SetCampType(ECharacterCampType CharacterCampType)
 	{
 		AIHumanInfoPtr->SetCampType(CharacterCampType);
 	}
-}
-
-UPlanetAbilitySystemComponent* AHorseAIController::GetAbilitySystemComponent() const
-{
-	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
-}
-
-UGroupMnaggerComponent* AHorseAIController::GetGroupMnaggerComponent()const
-{
-	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
-}
-
-UGourpmateUnit* AHorseAIController::GetGourpMateUnit()
-{
-	return  GetPawn<FPawnType>()->GetGourpMateUnit();
 }
 
 UAIPerceptionComponent* AHorseAIController::GetAIPerceptionComponent()
@@ -89,7 +75,7 @@ AActor* AHorseAIController::GetTeamFocusTarget() const
 
 void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	FPawnType* LeaderPCPtr
+	ACharacterBase* LeaderPCPtr
 )
 {
 	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);
@@ -206,7 +192,7 @@ void AHorseAIController::InitialCharacter()
 	if (CharacterPtr)
 	{
 #if TESTAICHARACTERHOLDDATA
-		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
+//		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
 #endif
 
 		auto AssetRefMapPtr = UAssetRefMap::GetInstance();

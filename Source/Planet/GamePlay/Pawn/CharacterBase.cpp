@@ -29,7 +29,7 @@
 #include "TalentAllocationComponent.h"
 #include "GroupMnaggerComponent.h"
 #include "AssetRefMap.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "GameplayTagsSubSystem.h"
 #include "StateProcessorComponent.h"
 #include "InteractiveBaseGAComponent.h"
@@ -38,6 +38,7 @@
 #include "InteractiveToolComponent.h"
 #include "CharacterTitle.h"
 #include "UICommon.h"
+#include "HumanAIController.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -58,6 +59,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	InteractiveConsumablesComponentPtr = CreateDefaultSubobject<UInteractiveConsumablesComponent>(UInteractiveConsumablesComponent::ComponentName);
 	InteractiveSkillComponentPtr = CreateDefaultSubobject<UInteractiveSkillComponent>(UInteractiveSkillComponent::ComponentName);
 	InteractiveToolComponentPtr = CreateDefaultSubobject<UInteractiveToolComponent>(UInteractiveToolComponent::ComponentName);
+
+	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -219,4 +222,34 @@ void ACharacterBase::OnHPChanged(int32 CurrentValue)
 void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
 {
 	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
+}
+
+UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()
+{
+	return GroupMnaggerComponentPtr;
+}
+
+void ACharacterBase::OnCharacterGroupMateChanged(
+	EGroupMateChangeType GroupMateChangeType,
+	ACharacterBase* LeaderPCPtr
+)
+{
+	switch (GroupMateChangeType)
+	{
+	case EGroupMateChangeType::kAdd:
+	{
+		if (LeaderPCPtr)
+		{
+			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPtr == this)
+			{
+				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
+				if (AIPCPtr)
+				{
+					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
+				}
+			}
+		}
+	}
+	break;
+	}
 }

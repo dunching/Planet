@@ -16,8 +16,9 @@ class PLANET_API AHumanCharacter_NPC : public AHumanCharacter
 public:
 
 protected:
-
+	
 #if WITH_EDITORONLY_DATA
 
 #endif
+
 };

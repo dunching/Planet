@@ -48,6 +48,8 @@ class PLANET_API ACharacterBase :
 
 public:
 
+	using FTeamMembersChangedDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, ACharacterBase*)>::FCallbackHandleSPtr;
+
 	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
 	ACharacterBase(const FObjectInitializer& ObjectInitializer);
@@ -79,6 +81,8 @@ public:
 
 	UInteractiveToolComponent* GetInteractiveToolComponent();
 
+	UGroupMnaggerComponent* GetGroupMnaggerComponent();
+
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
@@ -102,6 +106,11 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+	void OnCharacterGroupMateChanged(
+		EGroupMateChangeType GroupMateChangeType,
+		ACharacterBase* LeaderPCPtr
+	);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
 	float BaseTurnRate = 45.f;
@@ -135,6 +144,11 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	TObjectPtr<UInteractiveToolComponent> InteractiveToolComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
+
+	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
 private:
 

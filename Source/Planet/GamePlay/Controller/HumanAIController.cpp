@@ -39,21 +39,6 @@ void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 	}
 }
 
-UPlanetAbilitySystemComponent* AHumanAIController::GetAbilitySystemComponent() const
-{
-	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
-}
-
-UGroupMnaggerComponent* AHumanAIController::GetGroupMnaggerComponent()const
-{
-	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
-}
-
-UGourpmateUnit* AHumanAIController::GetGourpMateUnit()
-{
-	return  GetPawn<FPawnType>()->GetGourpMateUnit();
-}
-
 UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
 {
 	return AIPerceptionComponentPtr;
@@ -81,7 +66,7 @@ AActor* AHumanAIController::GetTeamFocusTarget() const
 				}
 				else
 				{
-					return LeaderPCPtr->TargetCharacterPtr.Get();
+					return LeaderPCPtr->TargetCharacterPtr;
 				}
 			}
 		}
@@ -92,7 +77,7 @@ AActor* AHumanAIController::GetTeamFocusTarget() const
 
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	FPawnType* LeaderPCPtr
+	ACharacterBase* LeaderPCPtr
 )
 {
 	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);

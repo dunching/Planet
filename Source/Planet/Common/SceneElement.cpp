@@ -5,7 +5,7 @@
 #include "Planet.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
 #include "SceneUnitExtendInfo.h"
 #include "GameplayTagsSubSystem.h"
@@ -243,6 +243,25 @@ USkillUnit* FSceneUnitContainer::FindUnit_Skill(FGameplayTag UnitType)
 	}
 
 	return nullptr;
+}
+
+UGourpmateUnit* FSceneUnitContainer::AddUnit_Groupmate(FGameplayTag UnitType)
+{
+	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
+
+	auto ResultPtr = NewObject<UGourpmateUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+
+	const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
+
+	ResultPtr->ID = NewID;
+	ResultPtr->UnitType = UnitType;
+
+	SceneToolsAry.Add(ResultPtr);
+	SceneMetaMap.Add(NewID, ResultPtr);
+
+	OnGroupmateUnitChanged.ExcuteCallback(ResultPtr, true);
+
+	return ResultPtr;
 }
 
 UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, int32 Num)

@@ -15,7 +15,7 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "SceneElement.h"
 #include "HumanCharacter.h"
 
@@ -72,7 +72,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 			{
 				TileViewPtr->AddItem(WidgetPtr);
 
-				WidgetPtr->ResetToolUIByData(Iter->GetGourpMateUnit());
+				WidgetPtr->ResetToolUIByData(Iter->GetController<IPlanetControllerInterface>()->GetGourpMateUnit());
 			}
 		}
 	}

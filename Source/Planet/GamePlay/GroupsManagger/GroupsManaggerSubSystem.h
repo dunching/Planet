@@ -13,11 +13,12 @@
 class IPlanetControllerInterface;
 class UGourpmateUnit;
 class AHumanCharacter;
+class ACharacterBase;
 
 PLANET_API class FGroupMatesHelper
 {
 public:
-	using FPawnType = AHumanCharacter;
+	using FPawnType = ACharacterBase;
 
 	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>;
 
@@ -37,7 +38,7 @@ public:
 PLANET_API class FTeamMatesHelper
 {
 public:
-	using FPawnType = AHumanCharacter;
+	using FPawnType = ACharacterBase;
 
 	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>;
 
@@ -72,7 +73,7 @@ class PLANET_API UGroupsManaggerSubSystem : public UGameInstanceSubsystem
 
 public:
 
-	using FPawnType = AHumanCharacter;
+	using FPawnType = ACharacterBase;
 
 	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FPawnType*)>;
 

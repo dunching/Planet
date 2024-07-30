@@ -17,7 +17,8 @@ class UToolUnit;
 class UWeaponUnit;
 class USkillUnit;
 class UCoinUnit;
-class UBasicUnit; 
+class UBasicUnit;
+class UGourpmateUnit;
 class AWeapon_Base; 
 
 USTRUCT(BlueprintType)
@@ -28,10 +29,10 @@ struct PLANET_API FTableRowUnit : public FTableRowBase
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName RowDescriptionText = TEXT("Row描述文字");
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FString UnitName = TEXT("UnitName");
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
@@ -50,24 +51,33 @@ struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolClass")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AWeapon_Base> ToolActorClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolClass")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag WeaponSkillUnitType = FGameplayTag::EmptyTag;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Skill")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	EAnimLinkClassType AnimLinkClassType = EAnimLinkClassType::kUnarmed;
 	
 };
-
 
 USTRUCT(BlueprintType)
 struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Require Weapon")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag RequireWeaponUnitType = FGameplayTag::EmptyTag;
 
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag> FirstActiveSkillSet;
+	
 };

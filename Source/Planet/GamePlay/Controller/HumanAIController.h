@@ -8,7 +8,7 @@
 
 #include "GravityAIController.h"
 #include "GenerateType.h"
-#include "HumanControllerInterface.h"
+#include "PlanetAIController.h"
 #include "GroupsManaggerSubSystem.h"
 #include "GroupMnaggerComponent.h"
 
@@ -29,11 +29,13 @@ class ABuildingArea;
  *
  */
 UCLASS()
-class PLANET_API AHumanAIController : public AGravityAIController, public IPlanetControllerInterface
+class PLANET_API AHumanAIController : public APlanetAIController
 {
 	GENERATED_BODY()
 
 public:
+
+	using FPawnType = AHumanCharacter;
 
 	using FTeamOptionChangedDelegate =
 		UGroupsManaggerSubSystem::FTeammateOptionChangedDelegateContainer::FCallbackHandleSPtr;
@@ -45,19 +47,13 @@ public:
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
-	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
-
-	virtual UGourpmateUnit* GetGourpMateUnit() override;
-
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "AI")
 	AActor* GetTeamFocusTarget() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TWeakObjectPtr<AHumanCharacter> TargetCharacterPtr;
+	ACharacterBase* TargetCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	ABuildingArea* BuildingArea = nullptr;
@@ -75,7 +71,7 @@ protected:
 
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		FPawnType* LeaderPCPtr
+		ACharacterBase* LeaderPCPtr
 	);
 
 	void OnDeathing(const FGameplayTag Tag, int32 Count);
@@ -106,10 +102,10 @@ protected:
 
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponentPtr = nullptr;
 
 };

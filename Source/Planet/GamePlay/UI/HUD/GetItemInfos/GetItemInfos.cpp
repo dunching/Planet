@@ -78,3 +78,18 @@ void UGetItemInfos::OnConsumableUnitChanged(UConsumableUnit* UnitPtr, bool bIsAd
 		}
 	}
 }
+
+void UGetItemInfos::OnGourpmateUnitChanged(UGourpmateUnit* UnitPtr, bool bIsAdd)
+{
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	if (UIPtr)
+	{
+		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+		if (WidgetPtr)
+		{
+			WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd);
+
+			UIPtr->AddChild(WidgetPtr);
+		}
+	}
+}

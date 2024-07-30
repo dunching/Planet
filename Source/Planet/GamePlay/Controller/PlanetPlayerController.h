@@ -9,7 +9,7 @@
 
 #include "GravityPlayerController.h"
 #include "GenerateType.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 
 #include "PlanetPlayerController.generated.h"
 
@@ -27,6 +27,8 @@ class PLANET_API APlanetPlayerController : public AGravityPlayerController, publ
 	GENERATED_BODY()
 
 public:
+
+	using FPawnType = AHumanCharacter;
 
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
 

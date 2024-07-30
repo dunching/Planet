@@ -16,7 +16,7 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "SceneElement.h"
 #include "HumanCharacter.h"
 #include "GroupsManaggerSubSystem.h"

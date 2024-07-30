@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "HumanControllerInterface.generated.h"
+#include "PlanetControllerInterface.generated.h"
 
 class UGroupMnaggerComponent;
 class UPlanetAbilitySystemComponent;
@@ -25,8 +25,6 @@ class PLANET_API IPlanetControllerInterface
 	GENERATED_BODY()
 
 public:
-
-	using FPawnType = AHumanCharacter;
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
 

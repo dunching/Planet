@@ -48,6 +48,15 @@ void UGetItemInfosItem::ResetToolUIByData(UCoinUnit* UnitPtr, bool bIsAdd, int32
 	ResetToolUIByData(UnitPtr);
 }
 
+void UGetItemInfosItem::ResetToolUIByData(UGourpmateUnit* UnitPtr, bool bIsAdd)
+{
+	SetTexutre(UnitPtr->GetIcon());
+
+	SetText(FString::Printf(TEXT("%s X%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), *UnitPtr->GetUnitName()));
+
+	ResetToolUIByData(UnitPtr);
+}
+
 void UGetItemInfosItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(GetItemInfosItem::Texture));

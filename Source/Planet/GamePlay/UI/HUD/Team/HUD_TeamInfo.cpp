@@ -5,7 +5,7 @@
 #include <Components/VerticalBox.h>
 #include <Components/Border.h>
 
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "TeamMateInfo.h"
 #include "HUD_TeamMateInfo.h"

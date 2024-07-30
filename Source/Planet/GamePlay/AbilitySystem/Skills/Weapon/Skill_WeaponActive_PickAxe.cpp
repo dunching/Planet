@@ -22,7 +22,7 @@
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "Weapon_PickAxe.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
 #include "InteractiveBaseGAComponent.h"

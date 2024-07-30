@@ -20,7 +20,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
 #include "GameplayTagsSubSystem.h"
 

@@ -26,7 +26,7 @@
 #include "GroupMnaggerComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "InteractiveBaseGAComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"

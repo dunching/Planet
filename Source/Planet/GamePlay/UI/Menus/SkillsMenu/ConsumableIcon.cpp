@@ -27,15 +27,16 @@
 #include "InteractiveSkillComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
+#include "UICommon.h"
 
-namespace SkillsIcon
+struct FConsumableIcon : public TGetSocketName<FConsumableIcon>
 {
 	const FName Content = TEXT("Content");
 
 	const FName Enable = TEXT("Enable");
 
 	const FName Icon = TEXT("Icon");
-}
+};
 
 UConsumableIcon::UConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -61,7 +62,7 @@ void UConsumableIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 
 void UConsumableIcon::EnableIcon(bool bIsEnable)
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Enable));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FConsumableIcon::Get().Enable));
 	if (ImagePtr)
 	{
 		ImagePtr->SetVisibility(bIsEnable ? ESlateVisibility::Hidden : ESlateVisibility::Visible);

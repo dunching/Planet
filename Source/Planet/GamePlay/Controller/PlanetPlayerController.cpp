@@ -23,7 +23,7 @@
 #include "HumanAIController.h"
 #include "SceneElement.h"
 #include "HumanCharacter.h"
-#include "HumanControllerInterface.h"
+#include "PlanetControllerInterface.h"
 #include "NavgationSubSysetem.h"
 #include "AssetRefMap.h"
 #include "FocusIcon.h"
@@ -290,7 +290,7 @@ UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()const
 
 UGourpmateUnit* APlanetPlayerController::GetGourpMateUnit()
 {
-	return GetPawn<FPawnType>()->GetGourpMateUnit();
+	return nullptr;
 }
 
 void APlanetPlayerController::InitialCharacter()
