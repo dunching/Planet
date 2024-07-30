@@ -45,9 +45,7 @@ void UWeaponsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		if (NewPtr)
 		{
 			OnResetUnit = NewPtr->OnResetUnit;
-			OnDragDelegate = NewPtr->OnDragDelegate;
 			ResetToolUIByData(NewPtr->WeaponUnitPtr);
-			bIsInBackpakc = NewPtr->bIsInBackpakc;
 		}
 	}
 }
@@ -147,26 +145,11 @@ FReply UWeaponsIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const 
 {
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-		if (bIsInBackpakc)
-		{
-			Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-
-			return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
-		}
-		else
-		{
-			return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-		}
+		return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 	}
 	else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
-		if (bIsInBackpakc)
-		{
-		}
-		else
-		{
-			ResetToolUIByData(nullptr);
-		}
+		ResetToolUIByData(nullptr);
 	}
 
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
@@ -188,46 +171,4 @@ bool UWeaponsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEven
 	}
 
 	return true;
-}
-
-void UWeaponsIcon::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-{
-	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
-
-	OnDragDelegate.ExcuteCallback(false, nullptr);
-}
-
-void UWeaponsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
-{
-	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-
-	auto BaseItemClassPtr = UAssetRefMap::GetInstance()->DragDropOperationWidgetClass;
-
-	if (BaseItemClassPtr)
-	{
-		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);
-		if (DragWidgetPtr)
-		{
-			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(WeaponUnitPtr);
-
-			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
-			if (WidgetDragPtr)
-			{
-				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = WeaponUnitPtr;
-				WidgetDragPtr->bIsInBackpakc = bIsInBackpakc;
-				WidgetDragPtr->OnDrop.AddDynamic(this, &ThisClass::OnDroped);
-
-				OutOperation = WidgetDragPtr;
-
-				OnDragDelegate.ExcuteCallback(true, WeaponUnitPtr);
-			}
-		}
-	}
-}
-
-void UWeaponsIcon::OnDroped(UDragDropOperation* Operation)
-{
-	OnDragDelegate.ExcuteCallback(false, nullptr);
 }

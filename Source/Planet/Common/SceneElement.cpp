@@ -155,7 +155,7 @@ int32 UCoinUnit::GetCurrentValue() const
 	return Num;
 }
 
-UWeaponUnit* FSceneToolsContainer::AddUnit_Weapon(FGameplayTag UnitType)
+UWeaponUnit* FSceneUnitContainer::AddUnit_Weapon(FGameplayTag UnitType)
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
@@ -185,12 +185,12 @@ UWeaponUnit* FSceneToolsContainer::AddUnit_Weapon(FGameplayTag UnitType)
 	return ResultPtr;
 }
 
-UWeaponUnit* FSceneToolsContainer::FindUnit_Weapon(FGameplayTag UnitType)
+UWeaponUnit* FSceneUnitContainer::FindUnit_Weapon(FGameplayTag UnitType)
 {
 	return nullptr;
 }
 
-USkillUnit* FSceneToolsContainer::AddUnit_Skill(FGameplayTag UnitType)
+USkillUnit* FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
 {
 	if (SkillUnitMap.Contains(UnitType))
 	{
@@ -234,7 +234,7 @@ USkillUnit* FSceneToolsContainer::AddUnit_Skill(FGameplayTag UnitType)
 	}
 }
 
-USkillUnit* FSceneToolsContainer::FindUnit_Skill(FGameplayTag UnitType)
+USkillUnit* FSceneUnitContainer::FindUnit_Skill(FGameplayTag UnitType)
 {
 	auto Iter = SkillUnitMap.Find(UnitType);
 	if (Iter)
@@ -245,7 +245,7 @@ USkillUnit* FSceneToolsContainer::FindUnit_Skill(FGameplayTag UnitType)
 	return nullptr;
 }
 
-UConsumableUnit* FSceneToolsContainer::AddUnit_Consumable(FGameplayTag UnitType, int32 Num)
+UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, int32 Num)
 {
 	check(Num > 0);
 
@@ -281,7 +281,7 @@ UConsumableUnit* FSceneToolsContainer::AddUnit_Consumable(FGameplayTag UnitType,
 	}
 }
 
-UToolUnit* FSceneToolsContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
+UToolUnit* FSceneUnitContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
@@ -309,7 +309,7 @@ UToolUnit* FSceneToolsContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 	return ResultPtr;
 }
 
-UBasicUnit* FSceneToolsContainer::AddUnit(FGameplayTag UnitType, int32 Num)
+UBasicUnit* FSceneUnitContainer::AddUnit(FGameplayTag UnitType, int32 Num)
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
@@ -337,7 +337,7 @@ UBasicUnit* FSceneToolsContainer::AddUnit(FGameplayTag UnitType, int32 Num)
 	return nullptr;
 }
 
-UBasicUnit* FSceneToolsContainer::FindUnit(UBasicUnit::IDType ID)
+UBasicUnit* FSceneUnitContainer::FindUnit(UBasicUnit::IDType ID)
 {
 	auto Iter = SceneMetaMap.Find(ID);
 	if (Iter)
@@ -348,7 +348,7 @@ UBasicUnit* FSceneToolsContainer::FindUnit(UBasicUnit::IDType ID)
 	return nullptr;
 }
 
-UCoinUnit* FSceneToolsContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*= 1*/)
+UCoinUnit* FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*= 1*/)
 {
 	if (CoinUnitMap.Contains(UnitType))
 	{
@@ -382,7 +382,7 @@ UCoinUnit* FSceneToolsContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /
 	}
 }
 
-UCoinUnit* FSceneToolsContainer::FindUnit_Coin(FGameplayTag UnitType)
+UCoinUnit* FSceneUnitContainer::FindUnit_Coin(FGameplayTag UnitType)
 {
 	auto Iter = CoinUnitMap.Find(UnitType);
 	if (Iter)
@@ -393,7 +393,7 @@ UCoinUnit* FSceneToolsContainer::FindUnit_Coin(FGameplayTag UnitType)
 	return nullptr;
 }
 
-void FSceneToolsContainer::RemoveUnit_Consumable(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
+void FSceneUnitContainer::RemoveUnit_Consumable(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
 {
 	if (UnitPtr)
 	{
@@ -403,17 +403,17 @@ void FSceneToolsContainer::RemoveUnit_Consumable(UConsumableUnit* UnitPtr, int32
 	}
 }
 
-const TArray<UBasicUnit*>& FSceneToolsContainer::GetSceneUintAry() const
+const TArray<UBasicUnit*>& FSceneUnitContainer::GetSceneUintAry() const
 {
 	return SceneToolsAry;
 }
 
-const TMap<FGameplayTag, UCoinUnit*>& FSceneToolsContainer::GetCoinUintAry() const
+const TMap<FGameplayTag, UCoinUnit*>& FSceneUnitContainer::GetCoinUintAry() const
 {
 	return CoinUnitMap;
 }
 
-FTableRowUnit* FSceneToolsContainer::GetTableRowUnit(FGameplayTag UnitType) const
+FTableRowUnit* FSceneUnitContainer::GetTableRowUnit(FGameplayTag UnitType) const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
@@ -423,7 +423,7 @@ FTableRowUnit* FSceneToolsContainer::GetTableRowUnit(FGameplayTag UnitType) cons
 	return SceneUnitExtendInfoPtr;
 }
 
-void FSceneToolsContainer::AddUnit_Apending(FGameplayTag UnitType, FGuid Guid)
+void FSceneUnitContainer::AddUnit_Apending(FGameplayTag UnitType, FGuid Guid)
 {
 	if (SkillUnitApendingMap.Contains(Guid))
 	{
@@ -443,7 +443,7 @@ void FSceneToolsContainer::AddUnit_Apending(FGameplayTag UnitType, FGuid Guid)
 	}
 }
 
-void FSceneToolsContainer::SyncApendingUnit(FGuid Guid)
+void FSceneUnitContainer::SyncApendingUnit(FGuid Guid)
 {
 	if (SkillUnitApendingMap.Contains(Guid))
 	{

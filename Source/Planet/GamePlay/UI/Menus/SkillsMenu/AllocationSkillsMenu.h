@@ -27,54 +27,48 @@ public:
 
 	using FOnWeaponChangedDelegate = TCallbackHandleContainer<void(UWeaponUnit*)>::FCallbackHandleSPtr;
 
+	UAllocationSkillsMenu(const FObjectInitializer& ObjectInitializer);
+
+	virtual void PostCDOContruct() override;
+
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
-
-	void SetHoldItemProperty(const FSceneToolsContainer& NewSPHoldItemPerperty);
 
 protected:
 
 	virtual void ResetUIByData()override;
 
-	void ResetUIByData_Skills();
-
 	void ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocket);
 
-	void ResetUIByData_Weapons();
-
 	void BindEvent();
-
-	UFUNCTION()
-	void OnWeaponsBtnCliked();
-
-	UFUNCTION()
-	void OnSkillsBtnCliked();
 
 	void OnMainWeaponChanged(UWeaponUnit* ToolSPtr);
 
 	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
 
+	void OnDragSkillIcon(bool bIsDragging, USkillUnit* SkillUnitPtr);
+
+	void OnDragWeaponIcon(bool bIsDragging, UWeaponUnit* WeaponUnitPtr);
+
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 
 	FOnWeaponChangedDelegate SecondaryDelegateHandleSPtr;
 
-	FSceneToolsContainer SPHoldItemPerpertyPtr;
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_1;
+	FKey ActiveSkills_1_Key;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_2;
+	FKey ActiveSkills_2_Key;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_3;
+	FKey ActiveSkills_3_Key;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey ActiveSkills_4;
+	FKey ActiveSkills_4_Key;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
-	FKey WeaponActiveSkills;
+	FKey WeaponActiveSkills_Key;
 	
 private:
 

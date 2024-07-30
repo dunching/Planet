@@ -51,8 +51,6 @@ void USkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		if (NewPtr)
 		{
 			OnResetUnit = NewPtr->OnResetUnit;
-			OnDragDelegate = NewPtr->OnDragDelegate;
-			bIsInBackpakc = NewPtr->bIsInBackpakc;
 			SkillUnitType = NewPtr->SkillUnitType;
 			ResetToolUIByData(NewPtr->SkillUnitPtr);
 		}
@@ -71,7 +69,7 @@ void USkillsIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 	{
 		auto InSkillUnitPtr = Cast<USkillUnit>(BasicUnitPtr);
 
-		if (InSkillUnitPtr && (bIsInBackpakc || InSkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType)))
+		if (InSkillUnitPtr && InSkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
 		{
 			SkillUnitPtr = InSkillUnitPtr;
 		}
@@ -178,16 +176,9 @@ FReply USkillsIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const F
 {
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
-		if (bIsInBackpakc)
-		{
-			Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
+		Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
-			return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
-		}
-		else
-		{
-			return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-		}
+		return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 	}
 	else if (InMouseEvent.GetEffectingButton() == EKeys::RightMouseButton)
 	{
@@ -215,13 +206,6 @@ bool USkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent
 	return true;
 }
 
-void USkillsIcon::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-{
-	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
-
-	OnDragDelegate.ExcuteCallback(false, nullptr);
-}
-
 void USkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
@@ -239,20 +223,7 @@ void USkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoint
 			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
 			if (WidgetDragPtr)
 			{
-				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = SkillUnitPtr;
-				WidgetDragPtr->bIsInBackpakc = bIsInBackpakc;
-				WidgetDragPtr->OnDrop.AddDynamic(this, &ThisClass::OnDroped);
-
-				OutOperation = WidgetDragPtr;
-
-				OnDragDelegate.ExcuteCallback(true, SkillUnitPtr);
 			}
 		}
 	}
-}
-
-void USkillsIcon::OnDroped(UDragDropOperation* Operation)
-{
-	OnDragDelegate.ExcuteCallback(false, nullptr);
 }

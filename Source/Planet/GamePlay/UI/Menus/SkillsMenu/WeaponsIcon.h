@@ -29,8 +29,6 @@ public:
 
 	using FOnResetUnit = TCallbackHandleContainer<void(UWeaponUnit*)>;
 
-	using FOnDragDelegate = TCallbackHandleContainer<void(bool, UWeaponUnit*)>;
-
 	UWeaponsIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
@@ -47,14 +45,10 @@ public:
 
 	FOnResetUnit OnResetUnit;
 
-	FOnDragDelegate OnDragDelegate;
-
 	UWeaponUnit* WeaponUnitPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;
-
-	bool bIsInBackpakc = false;
 
 protected:
 
@@ -65,13 +59,6 @@ protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 
 	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
-
-	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
-
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
-	
-	UFUNCTION()
-	void OnDroped(UDragDropOperation* Operation);
 
 private:
 

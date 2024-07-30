@@ -47,6 +47,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/GroupManagger");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/Backpacks");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/Backpacks/BackpackIcons");
         PublicIncludePaths.Add("Planet/GamePlay/UI/MenuS/CreateMenuS");
         PublicIncludePaths.Add("Planet/GamePlay/UI/MenuS/DragDropOperations");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/SkillsMenu");

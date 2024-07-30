@@ -15,7 +15,7 @@ class URaffleType;
 class URaffleBtn;
 class URaffle_Unit;
 class UBasicUnit;
-struct FSceneToolsContainer;
+struct FSceneUnitContainer;
 struct FTableRowUnit;
 
 /**
@@ -39,7 +39,7 @@ public:
 
 	void InitialRaffleBtn();
 
-	void SetHoldItemProperty(const FSceneToolsContainer& NewSPHoldItemPerperty);
+	void SetHoldItemProperty(const FSceneUnitContainer& NewSPHoldItemPerperty);
 
 	void SwitchDisplay(bool bIsDisplayRaffleUI);
 

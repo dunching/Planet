@@ -36,4 +36,15 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
+protected:
+
+	virtual void NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
+	
+	UFUNCTION()
+	virtual void OnDroped(UDragDropOperation* Operation);
+
+	virtual	void SetItemType(UBasicUnit* BasicUnitPtr);
+
 };

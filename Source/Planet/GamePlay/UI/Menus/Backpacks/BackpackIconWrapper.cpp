@@ -24,6 +24,8 @@
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
 #include "GameplayTagsSubSystem.h"
+#include "BackpackSkillIcon.h"
+#include "BackpackWeaponIcon.h"
 
 namespace BackpackIconWrapper
 {
@@ -34,6 +36,13 @@ UBackpackIconWrapper::UBackpackIconWrapper(const FObjectInitializer& ObjectIniti
 	Super(ObjectInitializer)
 {
 
+}
+
+void UBackpackIconWrapper::NativeOnListItemObjectSet(UObject* ListItemObject)
+{
+	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
+
+	InvokeReset(Cast<ThisClass>(ListItemObject));
 }
 
 void UBackpackIconWrapper::InvokeReset(UUserWidget* BaseWidgetPtr)
@@ -64,6 +73,7 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			if (WidgetPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
+
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
@@ -79,6 +89,41 @@ void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			if (WidgetPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
+
+				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
+			}
+		}
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
+		{
+			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
+			if (UIPtr)
+			{
+				UIPtr->ClearChildren();
+			}
+
+			auto WidgetPtr = CreateWidget<UBackpackSkillIcon>(this, BackpackSkillIconClass);
+			if (WidgetPtr)
+			{
+				UIPtr->AddChild(WidgetPtr);
+
+				WidgetPtr->OnDragDelegate = OnDragSkillIconDelegate;
+				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
+			}
+		}
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+		{
+			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
+			if (UIPtr)
+			{
+				UIPtr->ClearChildren();
+			}
+
+			auto WidgetPtr = CreateWidget<UBackpackWeaponIcon>(this, BackpackWeaponIconClass);
+			if (WidgetPtr)
+			{
+				UIPtr->AddChild(WidgetPtr);
+
+				WidgetPtr->OnDragDelegate = OnDragWeaponIconDelegate;
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}

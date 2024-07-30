@@ -19,7 +19,7 @@ public:
 
 	UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer);
 
-	FSceneToolsContainer & GetHoldItemProperty();
+	FSceneUnitContainer & GetHoldItemProperty();
 
 	static FName ComponentName;
 
@@ -28,7 +28,7 @@ protected:
 	virtual void BeginPlay()override;
 
 	UPROPERTY()
-	FSceneToolsContainer HoldItemProperty;
+	FSceneUnitContainer HoldItemProperty;
 
 private:
 

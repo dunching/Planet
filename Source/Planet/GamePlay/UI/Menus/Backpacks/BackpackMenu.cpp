@@ -2,6 +2,7 @@
 #include "BackpackMenu.h"
 
 #include <Kismet/GameplayStatics.h>
+#include <Components/Button.h>
 
 #include "BackpackIcon.h"
 #include "Components/TileView.h"
@@ -16,11 +17,16 @@
 #include "BackpackConsumableIcon.h"
 #include "BackpackIconWrapper.h"
 #include "GameplayTagsSubSystem.h"
+#include "UICommon.h"
 
-namespace BackpackMenu
+struct FBackpackMenu : public TGetSocketName<FBackpackMenu>
 {
 	const FName BackpackTile = TEXT("BackpackTile");
-}
+
+	const FName WeaponBtn = TEXT("WeaponBtn");
+
+	const FName SkillBtn = TEXT("SkillBtn");
+};
 
 void UBackpackMenu::NativeConstruct()
 {
@@ -29,14 +35,23 @@ void UBackpackMenu::NativeConstruct()
 	ResetUIByData();
 }
 
-void UBackpackMenu::SetHoldItemProperty(const FSceneToolsContainer& NewSPHoldItemPerperty)
+void UBackpackMenu::SetHoldItemProperty(
+	const FSceneUnitContainer& InPlayerStateSceneUnitContariner,
+	const FSceneUnitContainer& InCharacterSceneUnitContariner
+)
 {
-	SPHoldItemPerpertyPtr = NewSPHoldItemPerperty;
+	PlayerStateSceneUnitContariner = InPlayerStateSceneUnitContariner;
+	CharacterSceneUnitContariner = InCharacterSceneUnitContariner;
 }
 
 void UBackpackMenu::ResetUIByData()
 {
-	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(BackpackMenu::BackpackTile));
+	ResetUIByData_All();
+}
+
+void UBackpackMenu::ResetUIByData_Skills()
+{
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
 	if (!TileViewPtr)
 	{
 		return;
@@ -44,7 +59,7 @@ void UBackpackMenu::ResetUIByData()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SPHoldItemPerpertyPtr.GetSceneUintAry();
+	auto ItemAryRef = PlayerStateSceneUnitContariner.GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -52,6 +67,72 @@ void UBackpackMenu::ResetUIByData()
 			continue;
 		}
 		if (
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill)
+			)
+		{
+			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->OnDragSkillIconDelegate = OnDragSkillIconDelegate;
+				TileViewPtr->AddItem(WidgetPtr);
+			}
+		}
+	}
+}
+
+void UBackpackMenu::ResetUIByData_Weapons()
+{
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
+	if (!TileViewPtr)
+	{
+		return;
+	}
+
+	TileViewPtr->ClearListItems();
+	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
+	auto ItemAryRef = PlayerStateSceneUnitContariner.GetSceneUintAry();
+	for (const auto& Iter : ItemAryRef)
+	{
+		if (!Iter)
+		{
+			continue;
+		}
+		if (
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon)
+			)
+		{
+			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->OnDragWeaponIconDelegate = OnDragWeaponIconDelegate;
+				TileViewPtr->AddItem(WidgetPtr);
+			}
+		}
+	}
+}
+
+void UBackpackMenu::ResetUIByData_All()
+{
+	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(FBackpackMenu::Get().BackpackTile));
+	if (!TileViewPtr)
+	{
+		return;
+	}
+
+	TileViewPtr->ClearListItems();
+	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
+	auto ItemAryRef = PlayerStateSceneUnitContariner.GetSceneUintAry();
+	for (const auto& Iter : ItemAryRef)
+	{
+		if (!Iter)
+		{
+			continue;
+		}
+		if (
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill) ||
 			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool) ||
 			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
 			)
@@ -60,8 +141,38 @@ void UBackpackMenu::ResetUIByData()
 			if (WidgetPtr)
 			{
 				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->OnDragSkillIconDelegate = OnDragSkillIconDelegate;
+				WidgetPtr->OnDragWeaponIconDelegate = OnDragWeaponIconDelegate;
 				TileViewPtr->AddItem(WidgetPtr);
 			}
 		}
 	}
+}
+
+void UBackpackMenu::BindEvent()
+{
+	{
+		auto BtnPtr = Cast<UButton>(GetWidgetFromName(FBackpackMenu::Get().WeaponBtn));
+		if (BtnPtr)
+		{
+			BtnPtr->OnClicked.AddDynamic(this, &ThisClass::OnWeaponsBtnCliked);
+		}
+	}
+	{
+		auto BtnPtr = Cast<UButton>(GetWidgetFromName(FBackpackMenu::Get().SkillBtn));
+		if (BtnPtr)
+		{
+			BtnPtr->OnClicked.AddDynamic(this, &ThisClass::OnSkillsBtnCliked);
+		}
+	}
+}
+
+void UBackpackMenu::OnSkillsBtnCliked()
+{
+	ResetUIByData_Skills();
+}
+
+void UBackpackMenu::OnWeaponsBtnCliked()
+{
+	ResetUIByData_Weapons();
 }

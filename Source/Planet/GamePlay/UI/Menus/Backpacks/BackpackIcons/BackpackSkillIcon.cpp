@@ -1,5 +1,5 @@
 
-#include "BackpackConsumableIcon.h"
+#include "BackpackSkillIcon.h"
 
 #include <Kismet/GameplayStatics.h>
 #include "Components/TextBlock.h"
@@ -22,13 +22,13 @@
 #include "SceneElement.h"
 #include "GameplayTagsSubSystem.h"
 
-UBackpackConsumableIcon::UBackpackConsumableIcon(const FObjectInitializer& ObjectInitializer) :
+UBackpackSkillIcon::UBackpackSkillIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 
 }
 
-void UBackpackConsumableIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UBackpackSkillIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
 	if (BaseWidgetPtr)
 	{
@@ -40,22 +40,21 @@ void UBackpackConsumableIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackConsumableIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UBackpackSkillIcon::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
 	{
-		UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
-		SetNum(UnitPtr->GetCurrentValue());
+		UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
 		SetItemType();
 	}
 }
 
-void UBackpackConsumableIcon::EnableIcon(bool bIsEnable)
+void UBackpackSkillIcon::EnableIcon(bool bIsEnable)
 {
 
 }
 
-void UBackpackConsumableIcon::SetNum(int32 NewNum)
+void UBackpackSkillIcon::SetNum(int32 NewNum)
 {
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(TEXT("Number")));
 	if (!NumTextPtr)
@@ -74,7 +73,7 @@ void UBackpackConsumableIcon::SetNum(int32 NewNum)
 	}
 }
 
-void UBackpackConsumableIcon::SetItemType()
+void UBackpackSkillIcon::SetItemType()
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
 	if (ImagePtr)
@@ -87,7 +86,7 @@ void UBackpackConsumableIcon::SetItemType()
 	}
 }
 
-void UBackpackConsumableIcon::SetValue(int32 Value)
+void UBackpackSkillIcon::SetValue(int32 Value)
 {
 	auto ProgressBarPtr = Cast<UProgressBar>(GetWidgetFromName(TEXT("ProgressBar")));
 	if (!ProgressBarPtr)
@@ -96,7 +95,7 @@ void UBackpackConsumableIcon::SetValue(int32 Value)
 	}
 }
 
-void UBackpackConsumableIcon::ResetSize(const FVector2D& Size)
+void UBackpackSkillIcon::ResetSize(const FVector2D& Size)
 {
 	auto SizeBoxPtr = Cast<USizeBox>(GetWidgetFromName(TEXT("IconSize")));
 	if (SizeBoxPtr)
@@ -106,19 +105,26 @@ void UBackpackConsumableIcon::ResetSize(const FVector2D& Size)
 	}
 }
 
-void UBackpackConsumableIcon::NativeConstruct()
+void UBackpackSkillIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 }
 
-FReply UBackpackConsumableIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply UBackpackSkillIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 }
 
-void UBackpackConsumableIcon::NativeOnDragDetected(
+void UBackpackSkillIcon::NativeOnDragCancelled(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDragCancelled(InDragDropEvent, InOperation);
+
+	OnDragDelegate.ExcuteCallback(false, nullptr);
+}
+
+void UBackpackSkillIcon::NativeOnDragDetected(
 	const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation
 )
 {
@@ -139,9 +145,18 @@ void UBackpackConsumableIcon::NativeOnDragDetected(
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
 				WidgetDragPtr->SceneToolSPtr = UnitPtr;
+				WidgetDragPtr->bIsInBackpakc = true;
+				WidgetDragPtr->OnDrop.AddDynamic(this, &ThisClass::OnDroped);
 
 				OutOperation = WidgetDragPtr;
+
+				OnDragDelegate.ExcuteCallback(true, UnitPtr);
 			}
 		}
 	}
+}
+
+void UBackpackSkillIcon::OnDroped(UDragDropOperation* Operation)
+{
+	OnDragDelegate.ExcuteCallback(false, nullptr);
 }

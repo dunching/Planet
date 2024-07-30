@@ -267,11 +267,11 @@ bool UInteractiveSkillComponent::SwitchWeapon()
 	case EWeaponSocket::kNone:
 	default:
 	{
-		if (FirstWeaponUnit->WeaponUnitPtr)
+		if (FirstWeaponUnit && FirstWeaponUnit->WeaponUnitPtr)
 		{
 			return ActiveWeapon(EWeaponSocket::kMain);
 		}
-		else if (FirstWeaponUnit->WeaponUnitPtr)
+		else if (SecondaryWeaponUnit && SecondaryWeaponUnit->WeaponUnitPtr)
 		{
 			return ActiveWeapon(EWeaponSocket::kSecondary);
 		}

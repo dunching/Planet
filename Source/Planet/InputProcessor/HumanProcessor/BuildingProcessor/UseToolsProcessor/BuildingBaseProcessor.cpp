@@ -54,10 +54,7 @@ namespace HumanProcessor
 	{
 		Super::EnterAction();
 
-		UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(false);
 		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
-		UUIManagerSubSystem::GetInstance()->ViewSkills(false);
 
 		AddOrRemoveUseMenuItemEvent(true);
 	}

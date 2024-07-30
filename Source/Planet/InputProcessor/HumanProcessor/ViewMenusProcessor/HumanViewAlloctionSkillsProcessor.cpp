@@ -35,7 +35,7 @@ namespace HumanProcessor
 		
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->ViewSkills(true, HumanCharaterPtr->GetHoldingItemsComponent()->GetHoldItemProperty());
+		UUIManagerSubSystem::GetInstance()->ViewBackpack(true);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
@@ -48,7 +48,7 @@ namespace HumanProcessor
 
 	void FHumanViewAlloctionSkillsProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->ViewSkills(false);
+		UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
@@ -70,7 +70,7 @@ namespace HumanProcessor
 
 	void FHumanViewAlloctionSkillsProcessor::BKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewBackpackProcessor>();
+		QuitCurrentState();
 	}
 
 	void FHumanViewAlloctionSkillsProcessor::ESCKeyPressed()

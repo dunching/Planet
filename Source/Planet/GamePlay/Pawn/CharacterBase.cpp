@@ -184,7 +184,9 @@ UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()
 
 UBasicUnit* ACharacterBase::AddUnit(FGameplayTag UnitType, int32 Num)
 {
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill) ||
+	if (
+		UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill) ||
+		UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon) ||
 		UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin)
 		)
 	{

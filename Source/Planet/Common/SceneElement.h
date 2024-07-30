@@ -26,7 +26,7 @@ class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter;
 
-struct FSceneToolsContainer;
+struct FSceneUnitContainer;
 
 enum class ECharacterPropertyType : uint8;
 
@@ -74,7 +74,7 @@ class PLANET_API UBasicUnit : public UObject
 
 public:
 
-	friend FSceneToolsContainer;
+	friend FSceneUnitContainer;
 
 	using IDType = int32;
 
@@ -111,7 +111,7 @@ class PLANET_API UCoinUnit : public UBasicUnit
 
 public:
 
-	friend FSceneToolsContainer;
+	friend FSceneUnitContainer;
 
 	UCoinUnit();
 
@@ -134,7 +134,7 @@ class PLANET_API UConsumableUnit : public UBasicUnit
 
 public:
 
-	friend FSceneToolsContainer;
+	friend FSceneUnitContainer;
 
 	UConsumableUnit();
 
@@ -172,7 +172,7 @@ class PLANET_API UToolUnit : public UBasicUnit
 
 public:
 
-	friend FSceneToolsContainer;
+	friend FSceneUnitContainer;
 
 	UToolUnit();
 
@@ -219,7 +219,7 @@ class PLANET_API USkillUnit : public UBasicUnit
 
 public:
 
-	friend FSceneToolsContainer;
+	friend FSceneUnitContainer;
 
 	USkillUnit();
 
@@ -302,7 +302,7 @@ class PLANET_API UWeaponUnit : public UBasicUnit
 
 public:
 
-	friend FSceneToolsContainer;
+	friend FSceneUnitContainer;
 
 	UWeaponUnit();
 
@@ -318,7 +318,7 @@ protected:
 };
 
 USTRUCT(BlueprintType)
-struct FSceneToolsContainer
+struct FSceneUnitContainer
 {
 	GENERATED_USTRUCT_BODY()
 

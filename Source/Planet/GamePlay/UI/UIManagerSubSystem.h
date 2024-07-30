@@ -61,12 +61,9 @@ public:
 	// 工具、
 	void DisplayBuildingStateHUD(bool bIsDisplay);
 
-	// 浏览 背包
-	void ViewBackpack(bool bIsDisplay, const FSceneToolsContainer& NewSPHoldItemPerperty = FSceneToolsContainer());
+	// 浏览 背包、装配技能
+	void ViewBackpack(bool bIsDisplay);
 
-	// 浏览 装配技能
-	void ViewSkills(bool bIsDisplay, const FSceneToolsContainer& NewSPHoldItemPerperty = FSceneToolsContainer());
-	
 	// 浏览 天赋界面
 	void ViewTalentAllocation(bool bIsDisplay);
 	

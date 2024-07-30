@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <Blueprint/IUserObjectListEntry.h>
 
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
@@ -16,20 +17,29 @@ class UBasicUnit;
 class UToolUnit;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
+class UBackpackSkillIcon;
+class UBackpackWeaponIcon;
 
 /**
  *
  */
 UCLASS()
 class PLANET_API UBackpackIconWrapper :
-	public UUserWidget,
-	public IToolsIconInterface
+	public UMyUserWidget,
+	public IToolsIconInterface,
+	public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
 public:
 
+	using FOnDragSkillIconDelegate = TCallbackHandleContainer<void(bool, USkillUnit*)>;
+
+	using FOnDragWeaponIconDelegate = TCallbackHandleContainer<void(bool, UWeaponUnit*)>;
+
 	UBackpackIconWrapper(const FObjectInitializer& ObjectInitializer);
+
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
@@ -39,6 +49,10 @@ public:
 
 	UBasicUnit* TargetBasicUnitPtr = nullptr;
 
+	FOnDragSkillIconDelegate OnDragSkillIconDelegate;
+
+	FOnDragWeaponIconDelegate OnDragWeaponIconDelegate;
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
@@ -46,5 +60,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
 	TSubclassOf<UBackpackConsumableIcon> ConsumableUnitClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
+	TSubclassOf<UBackpackSkillIcon> BackpackSkillIconClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
+	TSubclassOf<UBackpackWeaponIcon> BackpackWeaponIconClass;
 
 };

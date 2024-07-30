@@ -112,7 +112,7 @@ void URaffleMenu::InitialRaffleBtn()
 	}
 }
 
-void URaffleMenu::SetHoldItemProperty(const FSceneToolsContainer& NewSPHoldItemPerperty)
+void URaffleMenu::SetHoldItemProperty(const FSceneUnitContainer& NewSPHoldItemPerperty)
 {
 	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FRaffleMenu::Get().CoinList));
 	if (UIPtr)

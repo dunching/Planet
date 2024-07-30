@@ -275,12 +275,11 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::VKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 	}
 
 	void FHumanRegularProcessor::BKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewBackpackProcessor>();
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 	}
 
 	void FHumanRegularProcessor::TabKeyPressed()

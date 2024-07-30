@@ -36,7 +36,7 @@ namespace HumanProcessor
 
 		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
 		UUIManagerSubSystem::GetInstance()->ViewBackpack(
-			true, HumanCharaterPtr->GetHoldingItemsComponent()->GetHoldItemProperty()
+			true
 		);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();

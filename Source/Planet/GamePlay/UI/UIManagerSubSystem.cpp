@@ -36,12 +36,14 @@
 #include "PlanetPlayerState.h"
 #include "UICommon.h"
 
-namespace UIManagerSubSystem
+struct FUIManagerSubSystem : public TGetSocketName<FUIManagerSubSystem>
 {
 	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
 
 	FName RaffleMenu_Socket = TEXT("RaffleMenu_Socket");
-}
+
+	FName AllocationSkills_Socket = TEXT("AllocationSkills_Socket");
+};
 
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
 {
@@ -142,47 +144,7 @@ void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
 	}
 }
 
-void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay, const FSceneToolsContainer& NewSPHoldItemPerperty)
-{
-	MainUILayoutPtr = GetMainUILAyout();
-	if (!MainUILayoutPtr)
-	{
-		return;
-	}
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->RightBackpackSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	auto UIPtr = Cast<UBackpackMenu>(BorderPtr->GetContent());
-	if (UIPtr)
-	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
-	}
-	else
-	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<UBackpackMenu>(GetWorldImp(), MainUILayoutPtr->BackpackMenuClass);
-			if (UIPtr)
-			{
-				UIPtr->SetHoldItemProperty(NewSPHoldItemPerperty);
-
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
-	}
-}
-
-void UUIManagerSubSystem::ViewSkills(bool bIsDisplay, const FSceneToolsContainer& NewSPHoldItemPerperty)
+void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
 {
 	MainUILayoutPtr = GetMainUILAyout();
 	if (!MainUILayoutPtr)
@@ -190,7 +152,7 @@ void UUIManagerSubSystem::ViewSkills(bool bIsDisplay, const FSceneToolsContainer
 		return;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->AllocationSkillsSocket));
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().AllocationSkills_Socket));
 	if (!BorderPtr)
 	{
 		return;
@@ -215,8 +177,6 @@ void UUIManagerSubSystem::ViewSkills(bool bIsDisplay, const FSceneToolsContainer
 			UIPtr = CreateWidget<UAllocationSkillsMenu>(GetWorldImp(), MainUILayoutPtr->AllocationSkillsMenuClass);
 			if (UIPtr)
 			{
-				UIPtr->SetHoldItemProperty(NewSPHoldItemPerperty);
-
 				BorderPtr->AddChild(UIPtr);
 			}
 		}
@@ -448,7 +408,7 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 
 UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
 {
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(UIManagerSubSystem::GetItemInfos_Socket));
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().GetItemInfos_Socket));
 	if (!BorderPtr)
 	{
 		return nullptr;
@@ -478,7 +438,6 @@ UMainUILayout* UUIManagerSubSystem::GetMainUILAyout()
 			DisplayActionStateHUD(false);
 			DisplayBuildingStateHUD(false);
 			ViewBackpack(false);
-			ViewSkills(false);
 			ViewTalentAllocation(false);
 			ViewGroupMatesManagger(false);
 			DisplayTeamInfo(false);

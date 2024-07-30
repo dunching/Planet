@@ -12,7 +12,7 @@ UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectI
 {
 }
 
-FSceneToolsContainer& UHoldingItemsComponent::GetHoldItemProperty()
+FSceneUnitContainer& UHoldingItemsComponent::GetHoldItemProperty()
 {
 	return HoldItemProperty;
 }

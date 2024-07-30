@@ -81,12 +81,6 @@ public:
 	FName PawnBuildingStateHUDSocket;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName RightBackpackSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName AllocationSkillsSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName GroupMatesManaggerSocket;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
