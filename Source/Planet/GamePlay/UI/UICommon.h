@@ -10,7 +10,7 @@ enum EUIOrder :uint8
 	kFightingTips,
 	kFocus,
 	kMainUI,
-	kRaffle,
+	kTableMenu,
 };
 
 template<typename InheritsType>

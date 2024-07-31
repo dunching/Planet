@@ -329,7 +329,7 @@ void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 						CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer()
 					);
 				}
-				RaffleMenuPtr->AddToViewport(EUIOrder::kRaffle);
+				RaffleMenuPtr->AddToViewport(EUIOrder::kTableMenu);
 			}
 		}
 	}
