@@ -67,21 +67,23 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UHoldingItemsComponent* GetHoldingItemsComponent();
+	UHoldingItemsComponent* GetHoldingItemsComponent()const;
 
-	UCharacterAttributesComponent* GetCharacterAttributesComponent();
+	UCharacterAttributesComponent* GetCharacterAttributesComponent()const;
 
-	UTalentAllocationComponent* GetTalentAllocationComponent();
+	UTalentAllocationComponent* GetTalentAllocationComponent()const;
 
-	UInteractiveBaseGAComponent* GetInteractiveBaseGAComponent();
+	UInteractiveBaseGAComponent* GetInteractiveBaseGAComponent()const;
 
-	UInteractiveConsumablesComponent* GetInteractiveConsumablesComponent();
+	UInteractiveConsumablesComponent* GetInteractiveConsumablesComponent()const;
 
-	UInteractiveSkillComponent* GetInteractiveSkillComponent();
+	UInteractiveSkillComponent* GetInteractiveSkillComponent()const;
 
-	UInteractiveToolComponent* GetInteractiveToolComponent();
+	UInteractiveToolComponent* GetInteractiveToolComponent()const;
 
-	UGroupMnaggerComponent* GetGroupMnaggerComponent();
+	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
+
+	UCharacterUnit* GetGourpMateUnit()const;
 
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
@@ -121,15 +123,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
-	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
@@ -145,9 +138,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	TObjectPtr<UInteractiveToolComponent> InteractiveToolComponentPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
-
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
 private:

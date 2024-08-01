@@ -28,7 +28,10 @@ void UCoinInfo::NativeConstruct()
 
 void UCoinInfo::NativeDestruct()
 {
-	OnNumChanged->UnBindCallback();
+	if (OnNumChanged)
+	{
+		OnNumChanged->UnBindCallback();
+	}
 
 	Super::NativeDestruct();
 }

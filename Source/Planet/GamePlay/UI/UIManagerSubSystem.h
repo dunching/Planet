@@ -32,6 +32,7 @@ class UProgressTips;
 class UHUD_TeamInfo;
 class UGetItemInfos;
 class URaffleMenu;
+class UMenuLayout;
 
 struct FPawnDataStruct;
 struct FSceneTool;
@@ -89,11 +90,13 @@ protected:
 
 	UMainUILayout* GetMainUILAyout();
 
-	UPROPERTY()
+	UPROPERTY(Transient)
 	UMainUILayout* MainUILayoutPtr = nullptr;
-	
+
+	UMenuLayout* GetMenuLayout();
+
 	UPROPERTY()
-	URaffleMenu* RaffleMenuPtr = nullptr;
+	UMenuLayout* MenuLayoutPtr = nullptr;
 
 private:
 

@@ -45,4 +45,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_ActiveSkillExtendInfo;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_Unit_CharacterInfo;
+
 };

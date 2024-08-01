@@ -13,11 +13,6 @@ APlanetPlayerState::APlanetPlayerState() :
 {
 }
 
-FSceneUnitContainer& APlanetPlayerState::GetSceneUnitContainer() 
-{
-	return SceneUnitContainer;
-}
-
 void APlanetPlayerState::BeginPlay()
 {
 	Super::BeginPlay();
@@ -27,7 +22,4 @@ void APlanetPlayerState::BeginPlay()
 
 void APlanetPlayerState::InitialData()
 {
-	SceneUnitContainer.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
-	SceneUnitContainer.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
-	SceneUnitContainer.AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
 }

@@ -9,6 +9,7 @@
 #include "InteractiveSkillComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
+#include "SceneUnitContainer.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
@@ -175,15 +176,15 @@ void UTalentAllocationComponent::SyncToHolding()
 				if (CharacterPtr)
 				{
 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
-					auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+					auto HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
 					switch (std::get<EPointSkillType>(Iter.Value.Type))
 					{
 					case EPointSkillType::kNuQi:
 					{
-						auto SkillUnitPtr = HoldItemComponent.FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
+						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
 						if (!SkillUnitPtr)
 						{
-							SkillUnitPtr = HoldItemComponent.AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
+							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
 						}
 						if (SkillUnitPtr)
 						{
@@ -201,10 +202,10 @@ void UTalentAllocationComponent::SyncToHolding()
 					break;
 					case EPointSkillType::kYinYang:
 					{
-						auto SkillUnitPtr = HoldItemComponent.FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
+						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
 						if (!SkillUnitPtr)
 						{
-							SkillUnitPtr = HoldItemComponent.AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
+							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
 						}
 						if (SkillUnitPtr)
 						{

@@ -8,11 +8,9 @@
 
 #include "CoreMinimal.h"
 
-#include "GenerateType.generated.h"
+#include "TemplateHelper.h"
 
-class ABuildingBase;
-class UPlanetGameplayAbility;
-class UPlanetGameplayAbility_SkillBase;
+#include "GenerateType.generated.h"
 
 UENUM(BlueprintType)
 enum class ECharacterPropertyType : uint8
@@ -98,287 +96,50 @@ enum class ETeammateOption : uint8
 	kTest,
 };
 
-#pragma region Callback
-template<typename ValueType>
-class TOnValueChangedCallbackHandle final
+enum class EItemChangeType
 {
-public:
-
-	using FCallbackIDType = int32;
-
-	using FCallbackType = std::function<void(ValueType, ValueType)>;
-
-	// 注意：这里使用TMap，有概率出现前四条保存的function失效，具体原因未知
-	using FMapType = std::map<FCallbackIDType, FCallbackType>;
-
-	TOnValueChangedCallbackHandle();
-
-	TOnValueChangedCallbackHandle(FCallbackIDType InCallbackID, const TSharedPtr<FMapType>& InContainerSPtr);
-
-	~TOnValueChangedCallbackHandle();
-
-	void UnBindCallback();
-
-protected:
-
-private:
-
-	FCallbackIDType CallbackID = 0;
-
-	TSharedPtr<FMapType> ContainerSPtr = MakeShared<FMapType>();
-
+	kAdd,
+	kSub,
 };
 
-template<typename ValueType>
-TOnValueChangedCallbackHandle<ValueType>::~TOnValueChangedCallbackHandle()
+enum class EWeaponSocket
 {
-	UnBindCallback();
-}
-
-template<typename ValueType>
-TOnValueChangedCallbackHandle<ValueType>::TOnValueChangedCallbackHandle()
-{
-	ContainerSPtr = MakeShared<FMapType>();
-}
-
-template<typename ValueType>
-TOnValueChangedCallbackHandle<ValueType>::TOnValueChangedCallbackHandle(
-	FCallbackIDType InCallbackID, const TSharedPtr<FMapType>& InContainerSPtr
-) :
-	CallbackID(InCallbackID),
-	ContainerSPtr(InContainerSPtr)
-{
-
-}
-
-template<typename ValueType>
-void TOnValueChangedCallbackHandle<ValueType>::UnBindCallback()
-{
-	if (ContainerSPtr->erase(CallbackID))
-	{
-	}
-}
-
-template<typename ValueType>
-class TOnValueChangedCallbackContainer final
-{
-public:
-
-	TOnValueChangedCallbackContainer<ValueType>& operator=(const TOnValueChangedCallbackContainer<ValueType>& RightValue);
-
-	using FCallbackHandle = TOnValueChangedCallbackHandle<ValueType>;
-
-	using FCallbackHandleSPtr = TSharedPtr<FCallbackHandle>;
-
-	using FMapType = FCallbackHandle::FMapType;
-
-	_NODISCARD TSharedPtr<FCallbackHandle> AddOnValueChanged(
-		const typename FCallbackHandle::FCallbackType& Callback
-	);
-
-	void ValueChanged(ValueType OldValue, ValueType NewValue)const;
-
-	TSharedPtr<FMapType> CallbacksMapSPtr = MakeShared<FMapType>();
-
-private:
-
+	kNone,
+	kMain,
+	kSecondary,
 };
 
-template<typename ValueType>
-TOnValueChangedCallbackContainer<ValueType>& TOnValueChangedCallbackContainer<ValueType>::operator=(const TOnValueChangedCallbackContainer<ValueType>& RightValue)
+UENUM(BlueprintType)
+enum class ETalent_State_Type : uint8
 {
-	CallbacksMapSPtr = MakeShared<FMapType>();
-	*CallbacksMapSPtr = *RightValue.CallbacksMapSPtr;
-
-	return *this;
-}
-
-template<typename ValueType>
-TSharedPtr<typename TOnValueChangedCallbackContainer<ValueType>::FCallbackHandle> TOnValueChangedCallbackContainer<ValueType>::AddOnValueChanged(
-	const typename FCallbackHandle::FCallbackType& Callback
-)
-{
-	if (CallbacksMapSPtr)
-	{
-		for (;;)
-		{
-			const auto ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-			if (!CallbacksMapSPtr->contains(ID))
-			{
-				CallbacksMapSPtr->emplace(ID, Callback);
-
-				return MakeShared<FCallbackHandle>(ID, CallbacksMapSPtr);
-			}
-		}
-	}
-
-	return nullptr;
-}
-
-template<typename ValueType>
-void TOnValueChangedCallbackContainer<ValueType>::ValueChanged(ValueType OldValue, ValueType NewValue)const
-{
-	if (!CallbacksMapSPtr)
-	{
-		return;
-	}
-	const auto Temp = *CallbacksMapSPtr;
-	for (auto Iter : Temp)
-	{
-		if (Iter.second)
-		{
-			Iter.second(OldValue, NewValue);
-		}
-	}
-}
-
-template<typename Ret, typename... ParamTypes>
-class TCallbackHandle final
-{
+	kYin,
+	kYang,
 };
 
-template<typename Ret, typename... ParamTypes>
-class TCallbackHandle<Ret(ParamTypes...)> final
+UENUM(BlueprintType)
+enum class ERawMaterialsType : uint8
 {
-public:
-
-	using FCallbackIDType = int32;
-
-	using FCallbackType = std::function<Ret(ParamTypes...)>;
-
-	using FMapType = std::map<FCallbackIDType, FCallbackType>;
-
-	TCallbackHandle();
-
-	TCallbackHandle(FCallbackIDType InCallbackID, const TSharedPtr<FMapType>& InContainerSPtr);
-
-	~TCallbackHandle();
-
-	void UnBindCallback();
-
-	bool bIsAutoUnregister = true;
-
-protected:
-
-private:
-
-	FCallbackIDType CallbackID = 0;
-
-	TSharedPtr<FMapType> ContainerSPtr = MakeShared<FMapType>();
-
+	kNone,
 };
 
-template<typename Ret, typename... ParamTypes>
-TCallbackHandle<Ret(ParamTypes...)>::~TCallbackHandle()
+UENUM(BlueprintType)
+enum class EBuildingsType : uint8
 {
-	if (bIsAutoUnregister)
-	{
-		UnBindCallback();
-	}
-}
-
-template<typename Ret, typename... ParamTypes>
-TCallbackHandle<Ret(ParamTypes...)>::TCallbackHandle()
-{
-
-}
-
-template<typename Ret, typename... ParamTypes>
-TCallbackHandle<Ret(ParamTypes...)>::TCallbackHandle(
-	FCallbackIDType InCallbackID, const TSharedPtr<FMapType>& InContainerSPtr
-) :
-	CallbackID(InCallbackID),
-	ContainerSPtr(InContainerSPtr)
-{
-
-}
-
-template<typename Ret, typename... ParamTypes>
-void TCallbackHandle<Ret(ParamTypes...)>::UnBindCallback()
-{
-	if (ContainerSPtr->erase(CallbackID))
-	{
-	}
-}
-
-template<typename Ret, typename... ParamTypes>
-class TCallbackHandleContainer
-{};
-
-template<typename Ret, typename... ParamTypes>
-class TCallbackHandleContainer<Ret(ParamTypes...)> final
-{
-public:
-
-	using FCallbackHandle = TCallbackHandle<Ret(ParamTypes...)>;
-
-	using FCallbackHandleSPtr = TSharedPtr<FCallbackHandle>;
-
-	using FMapType = FCallbackHandle::FMapType;
-
-	const TCallbackHandleContainer<Ret(ParamTypes...)>& operator=(const TCallbackHandleContainer<Ret(ParamTypes...)>& RightValue);
-
-	_NODISCARD TSharedPtr<FCallbackHandle> AddCallback(
-		const typename FCallbackHandle::FCallbackType& Callback
-	);
-
-	void ExcuteCallback(ParamTypes...Args)const;
-
-private:
-
-	TSharedPtr<FMapType> CallbacksMapSPtr = MakeShared<FMapType>();
-
+	kNone,
 };
 
-template<typename Ret, typename... ParamTypes>
-const TCallbackHandleContainer<Ret(ParamTypes...)>& TCallbackHandleContainer<Ret(ParamTypes...)>::operator=(const TCallbackHandleContainer<Ret(ParamTypes...)>& RightValue)
+UENUM(BlueprintType)
+enum class EWuXingType : uint8
 {
-	CallbacksMapSPtr = MakeShared<FMapType>();
-	*CallbacksMapSPtr = *RightValue.CallbacksMapSPtr;
+	kGold,
+	kWood,
+	kWater,
+	kFire,
+	kSoil,
+};
 
-	return *this;
-}
-
-template<typename Ret, typename... ParamTypes>
-void TCallbackHandleContainer<Ret(ParamTypes...)>::ExcuteCallback(ParamTypes...Args)const
-{
-	if (!CallbacksMapSPtr)
-	{
-		return;
-	}
-	const auto Temp = *CallbacksMapSPtr;
-	for (auto Iter : Temp)
-	{
-		if (Iter.second)
-		{
-			Iter.second(Args...);
-		}
-	}
-}
-
-template<typename Ret, typename... ParamTypes>
-TSharedPtr<typename TCallbackHandleContainer<Ret(ParamTypes...)>::FCallbackHandle> TCallbackHandleContainer<Ret(ParamTypes...)>::AddCallback(
-	const typename FCallbackHandle::FCallbackType& Callback
-)
-{
-	if (CallbacksMapSPtr)
-	{
-		for (;;)
-		{
-			const auto ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-			if (!CallbacksMapSPtr->contains(ID))
-			{
-				CallbacksMapSPtr->emplace(ID, Callback);
-
-				return MakeShared<FCallbackHandle>(ID, CallbacksMapSPtr);
-			}
-		}
-	}
-
-	return nullptr;
-}
-#pragma endregion Callback
-
+// 以前的？
+#pragma region DEPRECATED
 UENUM(BlueprintType)
 enum class EInputProcessorType : uint8
 {
@@ -657,28 +418,4 @@ enum class EBuildingState : uint8
 	kPlaced,
 };
 
-enum class EItemChangeType
-{
-	kAdd,
-	kSub,
-};
-
-USTRUCT(BlueprintType)
-struct FMaterialAry
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY()
-	TArray<UMaterialInterface*>MaterialsAry;
-};
-
-struct FCapturesInfo
-{
-	struct FCaptureInfo
-	{
-		ABuildingBase* CapturePtPtr = nullptr;
-	};
-
-	TArray<TSharedPtr<FCaptureInfo>> CapturesInfoAry;
-};
-
+#pragma endregion  

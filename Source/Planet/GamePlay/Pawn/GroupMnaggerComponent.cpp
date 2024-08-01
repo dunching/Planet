@@ -11,30 +11,32 @@
 #include "HumanAIController.h"
 #include "PlanetControllerInterface.h"
 #include "PlanetPlayerState.h"
+#include "HoldingItemsComponent.h"
+#include "SceneUnitContainer.h"
 
 FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
-void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* PCPtr)
+void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* OwnerPtr)
 {
 	// 
 	auto CharacterPtr = GetOwner<FPawnType>();
 	if (CharacterPtr && CharacterPtr->IsPlayerControlled())
 	{
-		auto AIControllerPtr = PCPtr->GetController<APlanetAIController>();
+		auto AIControllerPtr = OwnerPtr->GetController<APlanetAIController>(); 
 
-		auto GroupmateUnitPtr = 
-			CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().AddUnit_Groupmate(AIControllerPtr->RowName);
+		CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->AddUnit_Groupmate(OwnerPtr->GetGourpMateUnit());
 
-		AIControllerPtr->GourpMateUnitPtr = GroupmateUnitPtr;
+		// 
+		OwnerPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->RemoveUnit(OwnerPtr->GetGourpMateUnit()->GetID());
 	}
 
 	//
-	GetGroupHelper()->AddCharacter(PCPtr);
+	GetGroupHelper()->AddCharacter(OwnerPtr);
 }
 
-void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* PCPtr)
+void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* OwnerPtr)
 {
-	GetGroupHelper()->AddCharacter(PCPtr);
+	GetGroupHelper()->AddCharacter(OwnerPtr);
 }
 
 void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPtr)

@@ -22,7 +22,7 @@
 #include "HorseCharacter.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
-	Super()
+	Super(ObjectInitializer)
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));

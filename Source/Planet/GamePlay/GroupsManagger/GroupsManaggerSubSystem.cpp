@@ -66,7 +66,7 @@ void FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, PCPtr);
 }
 
-void FTeamMatesHelper::AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr)
+void FTeamMatesHelper::AddCharacter(UCharacterUnit* GourpMateUnitPtr, FPawnType* PCPtr)
 {
 	MembersMap.Add(GourpMateUnitPtr, PCPtr);
 

@@ -19,7 +19,9 @@ class UDragDropOperation;
 class UBasicUnit;
 
 UCLASS()
-class PLANET_API UAllocationIconBase : public UMyUserWidget, public IToolsIconInterface
+class PLANET_API UAllocationIconBase :
+	public UMyUserWidget,
+	public IToolsIconInterface
 {
 	GENERATED_BODY()
 

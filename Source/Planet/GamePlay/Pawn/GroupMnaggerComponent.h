@@ -23,9 +23,9 @@ public:
 
 	static FName ComponentName;
 
-	void AddCharacterToGroup(FPawnType* PCPtr);
+	void AddCharacterToGroup(FPawnType* OwnerPtr);
 
-	void AddCharacterToTeam(FPawnType* PCPtr);
+	void AddCharacterToTeam(FPawnType* OwnerPtr);
 
 	void OnAddToNewGroup(FPawnType* OwnerPtr);
 

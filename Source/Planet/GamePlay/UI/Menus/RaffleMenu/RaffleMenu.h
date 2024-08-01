@@ -39,7 +39,7 @@ public:
 
 	void InitialRaffleBtn();
 
-	void SetHoldItemProperty(const FSceneUnitContainer& NewSPHoldItemPerperty);
+	void SetHoldItemProperty(const TSharedPtr<FSceneUnitContainer>& NewSPHoldItemPerperty);
 
 	void SwitchDisplay(bool bIsDisplayRaffleUI);
 

@@ -16,7 +16,7 @@
 
 class UCharacterTitle;
 class UGroupMnaggerComponent;
-class UGourpmateUnit;
+class UCharacterUnit;
 class ACharacterBase;
 class AHorseCharacter;
 class AHumanCharacter;

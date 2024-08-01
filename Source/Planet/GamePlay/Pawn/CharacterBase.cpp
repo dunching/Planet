@@ -39,6 +39,7 @@
 #include "CharacterTitle.h"
 #include "UICommon.h"
 #include "HumanAIController.h"
+#include "PlanetPlayerController.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -50,9 +51,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	AbilitySystemComponentPtr->SetIsReplicated(true);
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
-	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
 	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UInteractiveBaseGAComponent>(UInteractiveBaseGAComponent::ComponentName);
@@ -60,7 +58,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	InteractiveSkillComponentPtr = CreateDefaultSubobject<UInteractiveSkillComponent>(UInteractiveSkillComponent::ComponentName);
 	InteractiveToolComponentPtr = CreateDefaultSubobject<UInteractiveToolComponent>(UInteractiveToolComponent::ComponentName);
 
-	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -150,39 +147,89 @@ class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent()
 	return AbilitySystemComponentPtr;
 }
 
-UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent()
+UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent()const
 {
-	return HoldingItemsComponentPtr;
+	if (IsPlayerControlled())
+	{
+		return GetController<APlanetPlayerController>()->HoldingItemsComponentPtr;
+	}
+	else if (IsBotControlled())
+	{
+		return GetController<APlanetAIController>()->HoldingItemsComponentPtr;
+	}
+	return nullptr;
 }
 
-UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent()
+UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent()const
 {
-	return CharacterAttributesComponentPtr;
+	if (IsPlayerControlled())
+	{
+		return GetController<APlanetPlayerController>()->CharacterAttributesComponentPtr;
+	}
+	else if (IsBotControlled())
+	{
+		return GetController<APlanetAIController>()->CharacterAttributesComponentPtr;
+	}
+	return nullptr;
 }
 
-UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()
+UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
 {
-	return TalentAllocationComponentPtr;
+	if (IsPlayerControlled())
+	{
+		return GetController<APlanetPlayerController>()->TalentAllocationComponentPtr;
+	}
+	else if (IsBotControlled())
+	{
+		return GetController<APlanetAIController>()->TalentAllocationComponentPtr;
+	}
+	return nullptr;
 }
 
-UInteractiveBaseGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()
+UInteractiveBaseGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
 {
 	return InteractiveBaseGAComponentPtr;
 }
 
-UInteractiveConsumablesComponent* ACharacterBase::GetInteractiveConsumablesComponent()
+UInteractiveConsumablesComponent* ACharacterBase::GetInteractiveConsumablesComponent()const
 {
 	return InteractiveConsumablesComponentPtr;
 }
 
-UInteractiveSkillComponent* ACharacterBase::GetInteractiveSkillComponent()
+UInteractiveSkillComponent* ACharacterBase::GetInteractiveSkillComponent()const
 {
 	return InteractiveSkillComponentPtr;
 }
 
-UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()
+UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()const
 {
 	return InteractiveToolComponentPtr;
+}
+
+UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
+{
+	if (IsPlayerControlled())
+	{
+		return GetController<APlanetPlayerController>()->GetGroupMnaggerComponent();
+	}
+	else if (IsBotControlled())
+	{
+		return GetController<APlanetAIController>()->GetGroupMnaggerComponent();
+	}
+	return nullptr;
+}
+
+UCharacterUnit* ACharacterBase::GetGourpMateUnit()const
+{
+	if (IsPlayerControlled())
+	{
+		return GetController<APlanetPlayerController>()->GetGourpMateUnit();
+	}
+	else if (IsBotControlled())
+	{
+		return GetController<APlanetAIController>()->GetGourpMateUnit();
+	}
+	return nullptr;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -222,11 +269,6 @@ void ACharacterBase::OnHPChanged(int32 CurrentValue)
 void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
 {
 	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
-}
-
-UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()
-{
-	return GroupMnaggerComponentPtr;
 }
 
 void ACharacterBase::OnCharacterGroupMateChanged(

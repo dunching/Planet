@@ -35,6 +35,7 @@ class UFightingTips;
 class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
+class UMenuLayout;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UObject
@@ -61,9 +62,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UMainUILayout>MainUILayoutClass;
-
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<URaffleMenu>RaffleMenuClass;
+	TSubclassOf<UMenuLayout>MenuLayoutClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UCharacterTitle>AIHumanInfoClass;

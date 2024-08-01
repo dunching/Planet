@@ -14,7 +14,7 @@
 struct FStreamableHandle;
 
 class UBasicUnit;
-class UGourpmateUnit;
+class UCharacterUnit;
 
 /**
  *
@@ -40,6 +40,6 @@ public:
 
 private:
 
-	UGourpmateUnit* GroupMateUnitPtr = nullptr;
+	UCharacterUnit* GroupMateUnitPtr = nullptr;
 
 };

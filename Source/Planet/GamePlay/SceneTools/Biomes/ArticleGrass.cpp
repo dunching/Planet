@@ -17,7 +17,7 @@ void AArticleGrass::Interaction(ACharacterBase* CharacterPtr)
 
 	if (CharacterPtr)
 	{
-//		CharacterPtr->GetHoldItemComponent()->GetHoldItemProperty()->AddItem(GetPropertyComponent()->GetItemsType());
+//		CharacterPtr->GetHoldItemComponent()->GetSceneUnitContainer()->AddItem(GetPropertyComponent()->GetItemsType());
 	}
 
 	Destroy();

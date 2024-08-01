@@ -12,8 +12,10 @@
 
 #include "AllocationSkillsMenu.generated.h"
 
+class UGroupmateIcon;
 class UWeaponUnit;
 class UBasicUnit;
+class UCharacterUnit;
 
 /**
  *
@@ -39,6 +41,8 @@ protected:
 
 	virtual void ResetUIByData()override;
 
+	void InitialGroupmateList();
+
 	void ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocket);
 
 	void BindEvent();
@@ -48,6 +52,8 @@ protected:
 	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
 
 	void OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr);
+	
+	void OnSelectedGourpmate(UCharacterUnit* UnitPtr);
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 
@@ -67,6 +73,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey WeaponActiveSkills_Key;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UGroupmateIcon>GroupmateIconClass;
 	
 private:
 

@@ -20,7 +20,7 @@ class UAnimInstanceCharacter;
 class UZYInputComponent;
 class UCharacterTitle;
 class UGroupMnaggerComponent;
-class UGourpmateUnit;
+class UCharacterUnit;
 class USkillUnit;
 class UConsumableUnit;
 

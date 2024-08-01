@@ -14,7 +14,7 @@
 struct FStreamableHandle;
 
 class UBasicUnit;
-class UGourpmateUnit;
+class UCharacterUnit;
 class UTeamMatesList;
 
 /**
@@ -51,6 +51,6 @@ private:
 
 	bool bIsInBackpakc = false;
 
-	UGourpmateUnit* GroupMateUnitPtr = nullptr;
+	UCharacterUnit* GroupMateUnitPtr = nullptr;
 
 };

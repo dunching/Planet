@@ -12,6 +12,7 @@
 #include "BackpackMenu.generated.h"
 
 struct FSceneObjContainer;
+struct FSceneUnitContainer;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
 class USkillUnit;
@@ -34,8 +35,7 @@ public:
 	virtual void ResetUIByData()override;
 
 	void SetHoldItemProperty(
-		const FSceneUnitContainer& PlayerStateSceneUnitContariner,
-		const FSceneUnitContainer& CharacterSceneUnitContariner
+		const TSharedPtr<FSceneUnitContainer> & SceneUnitContariner
 	);
 
 	bool bIsPlayerMenu = true;
@@ -68,8 +68,6 @@ private:
 
 	void ResetUIByData_All();
 
-	FSceneUnitContainer PlayerStateSceneUnitContariner;
-
-	FSceneUnitContainer CharacterSceneUnitContariner;
+	TSharedPtr<FSceneUnitContainer> SceneUnitContariner;
 
 };

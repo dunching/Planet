@@ -10,6 +10,7 @@
 #include "HoldingItemsComponent.h"
 #include "SceneUnitExtendInfo.h"
 #include "GameplayTagsSubSystem.h"
+#include "SceneUnitContainer.h"
 
 URaffleSubSystem* URaffleSubSystem::GetInstance()
 {
@@ -31,14 +32,14 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 		return false;
 	}
 
-	auto& HoldItemPropertyRef =
-		CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer();
+	auto HoldItemPropertyRef =
+		CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
 
 	switch (RaffleType)
 	{
 	case ERaffleType::kRafflePermanent:
 	{
-		auto CoinUnitPtr = HoldItemPropertyRef.FindUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit);
+		auto CoinUnitPtr = HoldItemPropertyRef->FindUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit);
 		if (CoinUnitPtr)
 		{
 			if (CoinUnitPtr->GetCurrentValue() > Count)

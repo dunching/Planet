@@ -30,10 +30,17 @@
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
+#include "CharacterAttributesComponent.h"
+#include "TalentAllocationComponent.h"
+#include "SceneUnitContainer.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
+	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
+	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
+	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
 }
 
 void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
@@ -145,6 +152,8 @@ void APlanetPlayerController::BeginPlay()
 	SetInputMode(InputMode);
 
 	UNavgationSubSystem::GetInstance();
+
+	// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
 }
 
 void APlanetPlayerController::PlayerTick(float DeltaTime)
@@ -278,6 +287,14 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 	return Result;
 }
 
+void APlanetPlayerController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)
+{
+	CharacterUnitPtr = NewGourpMateUnitPtr;
+
+	CharacterUnitPtr->ProxyCharacterPtr = GetPawn<FPawnType>();
+	CharacterUnitPtr->CharacterAttributes->Name = GetPawn<FPawnType>()->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
+}
+
 UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponent() const
 {
 	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
@@ -285,12 +302,12 @@ UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponen
 
 UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()const
 {
-	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
+	return GroupMnaggerComponentPtr;
 }
 
-UGourpmateUnit* APlanetPlayerController::GetGourpMateUnit()
+UCharacterUnit* APlanetPlayerController::GetGourpMateUnit()
 {
-	return nullptr;
+	return CharacterUnitPtr;
 }
 
 void APlanetPlayerController::InitialCharacter()

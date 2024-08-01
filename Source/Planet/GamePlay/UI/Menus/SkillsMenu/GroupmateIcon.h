@@ -17,22 +17,43 @@ struct FStreamableHandle;
 class UDragDropOperation;
 
 class USkillUnit;
-class UGourpmateUnit;
+class UCharacterUnit;
 class UBasicUnit;
 
 UCLASS()
-class PLANET_API UGroupmateIcon : public UMyUserWidget
+class PLANET_API UGroupmateIcon :
+	public UMyUserWidget,
+	public IToolsIconInterface
 {
 	GENERATED_BODY()
 
 public:
 
+	using FOnSelected = TCallbackHandleContainer<void(UCharacterUnit*)>;
+
+	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
+
+	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+
+	virtual void EnableIcon(bool bIsEnable)override;
+
+	void SwitchSelectState(bool bIsSelect);
+
+	FOnSelected OnSelected;
+
+	UCharacterUnit* UnitPtr = nullptr;
+
 protected:
 
 	virtual void NativeConstruct()override;
 
-private:
+	void SetItemType();
 
-	UGourpmateUnit* UnitPtr = nullptr;
+	void SetName();
+
+	UFUNCTION()
+	void OnBtnCliked();
+
+private:
 
 };

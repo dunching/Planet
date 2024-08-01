@@ -15,8 +15,12 @@
 
 class ACharacterBase;
 class IPlanetControllerInterface;
-class UGourpmateUnit;
+class UCharacterUnit;
 class UFocusIcon;
+class UCharacterAttributesComponent;
+class UHoldingItemsComponent;
+class UTalentAllocationComponent;
+class UGroupMnaggerComponent;
 
 /**
  *
@@ -42,6 +46,24 @@ public:
 
 	FVector GetFocalPointOnActor(const AActor* Actor) const;
 
+	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
+
+	virtual UCharacterUnit* GetGourpMateUnit() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
+	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -58,11 +80,7 @@ protected:
 
 	virtual bool InputKey(const FInputKeyParams& Params)override;
 
-	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
-
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
-
-	virtual UGourpmateUnit* GetGourpMateUnit() override;
+	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)override;
 
 	void InitialCharacter();
 
@@ -72,11 +90,17 @@ protected:
 	void OnFocusDeathing(const FGameplayTag Tag, int32 Count);
 
 	void BindRemove(AActor* Actor);
-
+	
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge	FocusInformation;
 
 	UFocusIcon* FocusIconPtr = nullptr;
-
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
+	FGameplayTag RowName = FGameplayTag::EmptyTag;
+	
 };

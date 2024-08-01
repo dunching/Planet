@@ -22,6 +22,7 @@
 #include "DragDropOperationWidget.h"
 #include "SceneElement.h"
 #include "GameplayTagsSubSystem.h"
+#include "CharacterAttibutes.h"
 
 namespace GroupMateInfo
 {
@@ -102,8 +103,8 @@ void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
-
-		GroupMateUnitPtr = Cast<UGourpmateUnit>(BasicUnitPtr);
+		
+		GroupMateUnitPtr = Cast<UCharacterUnit>(BasicUnitPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Texture));
 			if (UIPtr)
@@ -119,7 +120,11 @@ void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(GroupMateInfo::Text));
 			if (UIPtr)
 			{
-				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"), *GroupMateUnitPtr->Name.ToString(), GroupMateUnitPtr->Level)));
+				UIPtr->SetText(
+					FText::FromString(FString::Printf(TEXT("%s(%d)"), 
+						*GroupMateUnitPtr->CharacterAttributes->Name.ToString(),
+						GroupMateUnitPtr->CharacterAttributes->Level))
+				);
 			}
 		}
 	}

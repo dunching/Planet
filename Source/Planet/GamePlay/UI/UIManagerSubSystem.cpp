@@ -35,14 +35,20 @@
 #include "RaffleMenu.h"
 #include "PlanetPlayerState.h"
 #include "UICommon.h"
+#include "MenuLayout.h"
 
-struct FUIManagerSubSystem : public TGetSocketName<FUIManagerSubSystem>
+struct FMainUILayout : public TGetSocketName<FMainUILayout>
 {
 	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
 
 	FName RaffleMenu_Socket = TEXT("RaffleMenu_Socket");
 
 	FName AllocationSkills_Socket = TEXT("AllocationSkills_Socket");
+};
+
+struct FMenuLayout : public TGetSocketName<FMenuLayout>
+{
+	FName Content = TEXT("Content");
 };
 
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
@@ -146,13 +152,13 @@ void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
 
 void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
 {
-	MainUILayoutPtr = GetMainUILAyout();
-	if (!MainUILayoutPtr)
+	MenuLayoutPtr = GetMenuLayout();
+	if (!MenuLayoutPtr)
 	{
 		return;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().AllocationSkills_Socket));
+	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
 	if (!BorderPtr)
 	{
 		return;
@@ -174,7 +180,7 @@ void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UAllocationSkillsMenu>(GetWorldImp(), MainUILayoutPtr->AllocationSkillsMenuClass);
+			UIPtr = CreateWidget<UAllocationSkillsMenu>(GetWorldImp(), MenuLayoutPtr->AllocationSkillsMenuClass);
 			if (UIPtr)
 			{
 				BorderPtr->AddChild(UIPtr);
@@ -185,13 +191,13 @@ void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
 
 void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 {
-	MainUILayoutPtr = GetMainUILAyout();
-	if (!MainUILayoutPtr)
+	MenuLayoutPtr = GetMenuLayout();
+	if (!MenuLayoutPtr)
 	{
 		return;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->TalentAllocationSocket));
+	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
 	if (!BorderPtr)
 	{
 		return;
@@ -213,7 +219,7 @@ void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UTalentAllocation>(GetWorldImp(), MainUILayoutPtr->TalentAllocationClass);
+			UIPtr = CreateWidget<UTalentAllocation>(GetWorldImp(), MenuLayoutPtr->TalentAllocationClass);
 			if (UIPtr)
 			{
 				BorderPtr->AddChild(UIPtr);
@@ -224,13 +230,13 @@ void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 
 void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
 {
-	MainUILayoutPtr = GetMainUILAyout();
-	if (!MainUILayoutPtr)
+	MenuLayoutPtr = GetMenuLayout();
+	if (!MenuLayoutPtr)
 	{
 		return;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->GroupMatesManaggerSocket));
+	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
 	if (!BorderPtr)
 	{
 		return;
@@ -252,7 +258,7 @@ void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacte
 	{
 		if (bIsDisplay)
 		{
-			UIPtr = CreateWidget<UGroupManaggerMenu>(GetWorldImp(), MainUILayoutPtr->GroupManaggerMenuClass);
+			UIPtr = CreateWidget<UGroupManaggerMenu>(GetWorldImp(), MenuLayoutPtr->GroupManaggerMenuClass);
 			if (UIPtr)
 			{
 				UIPtr->HumanCharacterPtr = HumanCharacterPtr;
@@ -303,33 +309,38 @@ void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* Huma
 
 void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 {
-	if (RaffleMenuPtr)
+	MenuLayoutPtr = GetMenuLayout();
+	if (!MenuLayoutPtr)
+	{
+		return;
+	}
+
+	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
+	if (!BorderPtr)
+	{
+		return;
+	}
+
+	auto UIPtr = Cast<URaffleMenu>(BorderPtr->GetContent());
+	if (UIPtr)
 	{
 		if (bIsDisplay)
 		{
-			RaffleMenuPtr->SetVisibility(ESlateVisibility::Visible);
+			UIPtr->SetVisibility(ESlateVisibility::Visible);
 		}
 		else
 		{
-			RaffleMenuPtr->RemoveFromParent();
-			RaffleMenuPtr = nullptr;
+			UIPtr->RemoveFromParent();
 		}
 	}
 	else
 	{
 		if (bIsDisplay)
 		{
-			RaffleMenuPtr = CreateWidget<URaffleMenu>(GetWorldImp(), UAssetRefMap::GetInstance()->RaffleMenuClass);
-			if (RaffleMenuPtr)
+			UIPtr = CreateWidget<URaffleMenu>(GetWorldImp(), MenuLayoutPtr->RaffleMenuClass);
+			if (UIPtr)
 			{
-				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-				if (CharacterPtr)
-				{
-					RaffleMenuPtr->SetHoldItemProperty(
-						CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer()
-					);
-				}
-				RaffleMenuPtr->AddToViewport(EUIOrder::kTableMenu);
+				BorderPtr->AddChild(UIPtr);
 			}
 		}
 	}
@@ -408,7 +419,7 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 
 UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
 {
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().GetItemInfos_Socket));
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().GetItemInfos_Socket));
 	if (!BorderPtr)
 	{
 		return nullptr;
@@ -437,15 +448,30 @@ UMainUILayout* UUIManagerSubSystem::GetMainUILAyout()
 
 			DisplayActionStateHUD(false);
 			DisplayBuildingStateHUD(false);
-			ViewBackpack(false);
-			ViewTalentAllocation(false);
-			ViewGroupMatesManagger(false);
 			DisplayTeamInfo(false);
 			ViewEffectsList(false);
 			ViewProgressTips(false);
-			ViewRaffleMenu(false);
 		}
 	}
 
 	return MainUILayoutPtr;
+}
+
+UMenuLayout* UUIManagerSubSystem::GetMenuLayout()
+{
+	if (!MenuLayoutPtr)
+	{
+		MenuLayoutPtr = CreateWidget<UMenuLayout>(GetWorldImp(), UAssetRefMap::GetInstance()->MenuLayoutClass);
+		if (MenuLayoutPtr)
+		{
+			MenuLayoutPtr->AddToViewport(EUIOrder::kTableMenu);
+
+			ViewBackpack(false);
+			ViewTalentAllocation(false);
+			ViewGroupMatesManagger(false);
+			ViewRaffleMenu(false);
+		}
+	}
+
+	return MenuLayoutPtr;
 }

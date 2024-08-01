@@ -35,12 +35,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/GroupsManagger");
         PublicIncludePaths.Add("Planet/GamePlay/SPlineActor");
         PublicIncludePaths.Add("Planet/GamePlay/UI");
-        PublicIncludePaths.Add("Planet/GamePlay/UI/HUD");
-        PublicIncludePaths.Add("Planet/GamePlay/UI/HUD/Team");
-        PublicIncludePaths.Add("Planet/GamePlay/UI/HUD/GetItemInfos");
-        PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState");
-        PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState/ActionStateHUD");
-        PublicIncludePaths.Add("Planet/GamePlay/UI/PawnState/BuildingStateHUD");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Hover");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Hover/DestroyProgress");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Hover/FightingTips");
@@ -54,7 +48,14 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/TalentAllocation");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/CoinList");
         PublicIncludePaths.Add("Planet/GamePlay/UI/Menus/RaffleMenu");
-        PublicIncludePaths.Add("Planet/GamePlay/UI/EffectsList");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI/EffectsList");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI/HUD");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI/HUD/Team");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI/HUD/GetItemInfos");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI/PawnState");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI/PawnState/ActionStateHUD");
+        PublicIncludePaths.Add("Planet/GamePlay/UI/MainUI/PawnState/BuildingStateHUD");
         PublicIncludePaths.Add("Planet/GamePlay/UI/UMGs");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_RootMotionSource");
@@ -96,6 +97,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/RaffleSystem");
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");
+        PublicIncludePaths.Add("Planet/SceneUnit");
         PublicIncludePaths.Add("Planet/AssetRefMap");
         PublicIncludePaths.Add("Planet/InputProcessor/InputComponent");
         PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");

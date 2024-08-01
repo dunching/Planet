@@ -3,12 +3,15 @@
 
 #include <Kismet/GameplayStatics.h>
 #include "Components/Button.h"
-
-#include "BackpackIcon.h"
+#include <Components/HorizontalBox.h>
 #include "Components/TileView.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
 #include "Components/Border.h"
+#include <Components/ScrollBar.h>
+#include <Components/ScrollBox.h>
+
+#include "BackpackIcon.h"
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "SkillsIcon.h"
@@ -20,12 +23,16 @@
 #include "BackpackMenu.h"
 #include "PlanetPlayerState.h"
 #include "ConsumableIcon.h"
+#include "GroupmateIcon.h"
+#include "SceneUnitContainer.h"
 
 struct FAllocationSkillsMenu : public TGetSocketName<FAllocationSkillsMenu>
 {
 	const FName PlayerBackpack = TEXT("PlayerBackpack");
 
 	const FName TargetBackpack = TEXT("TargetBackpack");
+
+	const FName GroupmateList = TEXT("GroupmateList");
 
 	const FName MainWeapon = TEXT("MainWeapon");
 
@@ -384,8 +391,7 @@ void UAllocationSkillsMenu::BindEvent()
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
 
  		UIPtr->SetHoldItemProperty(
- 			CharacterPtr->GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer(),
- 			CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty()
+ 			CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()
  		);
 
 		{
@@ -432,6 +438,38 @@ void UAllocationSkillsMenu::ResetUIByData()
 			{
 				auto Result = EICPtr->FindSkill(IconPtr->IconSocket);
 				IconPtr->ResetToolUIByData(Result ? Result->SkillUnit : nullptr);
+			}
+		}
+	}
+
+	InitialGroupmateList();
+}
+
+void UAllocationSkillsMenu::InitialGroupmateList()
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	{
+		auto UIPtr = Cast<UScrollBox>(GetWidgetFromName(FAllocationSkillsMenu::Get().GroupmateList));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->ClearChildren();
+
+		auto SceneUnitContainerRef = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
+		
+		auto GroupmateUnitAry = SceneUnitContainerRef->GetGourpmateUintAry();
+		for (auto Iter : GroupmateUnitAry)
+		{
+			auto WidgetPtr = CreateWidget<UGroupmateIcon>(this, GroupmateIconClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->ResetToolUIByData(Iter);
+				{
+					auto Handle = WidgetPtr->OnSelected.AddCallback(std::bind(&ThisClass::OnSelectedGourpmate, this, std::placeholders::_1)); 
+					Handle->bIsAutoUnregister = false;
+				}
+				UIPtr->AddChild(WidgetPtr);
 			}
 		}
 	}
@@ -525,6 +563,31 @@ void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
 			if (IconPtr)
 			{
 				IconPtr->OnDragIcon(bIsDragging, UnitPtr);
+			}
+		}
+	}
+}
+
+void UAllocationSkillsMenu::OnSelectedGourpmate(UCharacterUnit* UnitPtr)
+{
+	auto UIPtr = Cast<UScrollBox>(GetWidgetFromName(FAllocationSkillsMenu::Get().GroupmateList));
+	if (!UIPtr)
+	{
+		return;
+	}
+	auto ChildrensAry = UIPtr->GetAllChildren();
+	for (auto Iter : ChildrensAry)
+	{
+		auto GroupmateIconPtr = Cast<UGroupmateIcon>(Iter);
+		if (GroupmateIconPtr)
+		{
+			if (GroupmateIconPtr->UnitPtr == UnitPtr)
+			{
+				continue;
+			}
+			else
+			{
+				GroupmateIconPtr->SwitchSelectState(false);
 			}
 		}
 	}

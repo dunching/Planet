@@ -18,6 +18,7 @@
 #include "BackpackIconWrapper.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
+#include "SceneUnitContainer.h"
 
 struct FBackpackMenu : public TGetSocketName<FBackpackMenu>
 {
@@ -42,12 +43,10 @@ void UBackpackMenu::NativeConstruct()
 }
 
 void UBackpackMenu::SetHoldItemProperty(
-	const FSceneUnitContainer& InPlayerStateSceneUnitContariner,
-	const FSceneUnitContainer& InCharacterSceneUnitContariner
+	const TSharedPtr<FSceneUnitContainer>& InSceneUnitContariner
 )
 {
-	PlayerStateSceneUnitContariner = InPlayerStateSceneUnitContariner;
-	CharacterSceneUnitContariner = InCharacterSceneUnitContariner;
+	SceneUnitContariner = InSceneUnitContariner;
 }
 
 void UBackpackMenu::ResetUIByData()
@@ -62,10 +61,10 @@ void UBackpackMenu::ResetUIByData_Skill()
 	{
 		return;
 	}
-
+	
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = PlayerStateSceneUnitContariner.GetSceneUintAry();
+	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -98,7 +97,7 @@ void UBackpackMenu::ResetUIByData_Weapon()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = PlayerStateSceneUnitContariner.GetSceneUintAry();
+	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -130,8 +129,7 @@ void UBackpackMenu::ResetUIByData_Consumable()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = PlayerStateSceneUnitContariner.GetSceneUintAry();
-	ItemAryRef.Append(CharacterSceneUnitContariner.GetSceneUintAry());
+	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -163,8 +161,7 @@ void UBackpackMenu::ResetUIByData_All()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = PlayerStateSceneUnitContariner.GetSceneUintAry();
-	ItemAryRef.Append(CharacterSceneUnitContariner.GetSceneUintAry());
+	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)

@@ -44,6 +44,8 @@
 #include "GroupMnaggerComponent.h"
 #include "SceneElement.h"
 #include "GetItemInfos.h"
+#include "GroupsManaggerSubSystem.h"
+#include "SceneUnitContainer.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -57,7 +59,7 @@ bool AHumanCharacter::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 		return true;
 	}
 
-	auto GroupHelper = GroupMnaggerComponentPtr->GetGroupHelper();
+	auto GroupHelper = GetGroupMnaggerComponent()->GetGroupHelper();
 	for (auto Iter : GroupHelper->MembersSet)
 	{
 		if (Iter == TargetCharacterPtr)
@@ -83,7 +85,7 @@ bool AHumanCharacter::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 
 	if (IsGroupmate(TargetCharacterPtr))
 	{
-		auto TeammateHelper = GroupMnaggerComponentPtr->GetTeamHelper();
+		auto TeammateHelper = GetGroupMnaggerComponent()->GetTeamHelper();
 		for (auto Iter : TeammateHelper->MembersMap)
 		{
 			if (Iter.Value == TargetCharacterPtr)
@@ -125,39 +127,41 @@ void AHumanCharacter::BeginPlay()
 			auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
 			{
 				auto Handle =
-					GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().OnSkillUnitChanged.AddCallback(
+					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnSkillUnitChanged.AddCallback(
 						std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().OnCoinUnitChanged.AddCallback(
+					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnCoinUnitChanged.AddCallback(
 						std::bind(&UGetItemInfos::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
-				auto Handle = GetHoldingItemsComponent()->GetHoldItemProperty().OnConsumableUnitChanged.AddCallback(
-					std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
-					));
+				auto Handle =
+					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnConsumableUnitChanged.AddCallback(
+						std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
-				auto Handle = GetPlayerState<APlanetPlayerState>()->GetSceneUnitContainer().OnGroupmateUnitChanged.AddCallback(
-					std::bind(&UGetItemInfos::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-					));
+				auto Handle =
+					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnGroupmateUnitChanged.AddCallback(
+						std::bind(&UGetItemInfos::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+						));
 				Handle->bIsAutoUnregister = false;
 			}
 #if TESTPLAYERCHARACTERHOLDDATA
 			TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
-		}
+			}
 		else if (GetController()->IsA(AHumanAIController::StaticClass()))
 		{
 		}
+		}
 	}
-}
 
 void AHumanCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {

@@ -20,6 +20,7 @@
 #include "RaffleSubSystem.h"
 #include "Raffle_Unit.h"
 #include "SceneUnitExtendInfo.h"
+#include "SceneUnitContainer.h"
 
 struct FRaffleMenu : public TGetSocketName<FRaffleMenu>
 {
@@ -112,12 +113,12 @@ void URaffleMenu::InitialRaffleBtn()
 	}
 }
 
-void URaffleMenu::SetHoldItemProperty(const FSceneUnitContainer& NewSPHoldItemPerperty)
+void URaffleMenu::SetHoldItemProperty(const TSharedPtr<FSceneUnitContainer>& NewSPHoldItemPerperty)
 {
 	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FRaffleMenu::Get().CoinList));
 	if (UIPtr)
 	{
-		UIPtr->ResetUIByData(NewSPHoldItemPerperty.GetCoinUintAry());
+		UIPtr->ResetUIByData(NewSPHoldItemPerperty->GetCoinUintAry());
 	}
 }
 

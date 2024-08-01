@@ -23,17 +23,12 @@ public:
 
 	APlanetPlayerState();
 
-	FSceneUnitContainer& GetSceneUnitContainer();
-
 protected:
 
 	virtual void BeginPlay() override;
 
 	void InitialData();
 	
-	UPROPERTY(Transient)
-	FSceneUnitContainer SceneUnitContainer;
-
 private:
 
 };

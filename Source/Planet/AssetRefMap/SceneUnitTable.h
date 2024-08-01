@@ -18,7 +18,7 @@ class UWeaponUnit;
 class USkillUnit;
 class UCoinUnit;
 class UBasicUnit;
-class UGourpmateUnit;
+class UCharacterUnit;
 class AWeapon_Base; 
 
 USTRUCT(BlueprintType)

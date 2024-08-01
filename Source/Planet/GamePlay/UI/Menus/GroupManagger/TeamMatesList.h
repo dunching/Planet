@@ -13,7 +13,7 @@
 struct FStreamableHandle;
 
 class UBasicUnit;
-class UGourpmateUnit;
+class UCharacterUnit;
 class UTeamMateInfo;
 class AHumanCharacter;
 

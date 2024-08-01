@@ -11,7 +11,7 @@
 #include "GroupsManaggerSubSystem.generated.h"
 
 class IPlanetControllerInterface;
-class UGourpmateUnit;
+class UCharacterUnit;
 class AHumanCharacter;
 class ACharacterBase;
 
@@ -44,7 +44,7 @@ public:
 
 	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FPawnType*)>;
 
-	void AddCharacter(UGourpmateUnit* GourpMateUnitPtr, FPawnType* PCPtr);
+	void AddCharacter(UCharacterUnit* GourpMateUnitPtr, FPawnType* PCPtr);
 
 	PLANET_API void SwitchTeammateOption(ETeammateOption InTeammateOption);
 
@@ -58,7 +58,7 @@ public:
 
 	FPawnType* OwnerPtr = nullptr;
 
-	TMap<UGourpmateUnit*, FPawnType*> MembersMap;
+	TMap<UCharacterUnit*, FPawnType*> MembersMap;
 
 private:
 

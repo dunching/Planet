@@ -18,6 +18,26 @@
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
+#include "CharacterAttributesComponent.h"
+#include "CharacterAttibutes.h"
+#include "TalentAllocationComponent.h"
+#include "SceneUnitContainer.h"
+
+APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
+	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
+	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
+	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
+}
+
+void APlanetAIController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	InitialCharacterUnit();
+}
 
 UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() const
 {
@@ -26,10 +46,37 @@ UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() 
 
 UGroupMnaggerComponent* APlanetAIController::GetGroupMnaggerComponent() const
 {
-	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
+	return GroupMnaggerComponentPtr;
 }
 
-UGourpmateUnit* APlanetAIController::GetGourpMateUnit()
+UCharacterUnit* APlanetAIController::GetGourpMateUnit()
 {
-	return GourpMateUnitPtr;
+	return CharacterUnitPtr;
+}
+
+void APlanetAIController::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void APlanetAIController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)
+{
+	CharacterUnitPtr = NewGourpMateUnitPtr;
+
+	CharacterUnitPtr->ProxyCharacterPtr = GetPawn<FPawnType>();
+	CharacterUnitPtr->CharacterAttributes->Name = GetPawn<FPawnType>()->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
+}
+
+void APlanetAIController::InitialCharacterUnit()
+{
+	// 通过临时 SceneUnitContainer 的创建UnitPtr
+	auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
+
+	ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
+
+	SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
+
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
 }

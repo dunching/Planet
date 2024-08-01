@@ -44,7 +44,7 @@ void TestCommand::AddCahracterTestData()
 void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 {
 	{
-		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+//		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
 // 		HoldItemComponent.AddUnit(EToolUnitType::kPickAxe);
 // 
 // 		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);
@@ -66,7 +66,7 @@ void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 {
 	{
-		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetHoldItemProperty();
+//		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
 // 		HoldItemComponent.AddUnit(EToolUnitType::kPickAxe);
 // 
 // 		HoldItemComponent.AddUnit(EWeaponUnitType::kPickAxe);

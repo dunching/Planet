@@ -20,7 +20,7 @@
 #include "GameplayTagsSubSystem.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
-	Super()
+	Super(ObjectInitializer)
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));

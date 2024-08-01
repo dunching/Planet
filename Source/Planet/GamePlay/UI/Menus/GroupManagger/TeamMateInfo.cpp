@@ -25,6 +25,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "GameplayTagsSubSystem.h"
+#include "CharacterAttibutes.h"
 
 namespace TeamMateInfo
 {
@@ -102,7 +103,7 @@ void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 		
-		GroupMateUnitPtr = Cast<UGourpmateUnit>(BasicUnitPtr);
+		GroupMateUnitPtr = Cast<UCharacterUnit>(BasicUnitPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(TeamMateInfo::Texture));
 			if (UIPtr)
@@ -118,7 +119,9 @@ void UTeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(TeamMateInfo::Text));
 			if (UIPtr)
 			{
-				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"), *GroupMateUnitPtr->Name.ToString(), GroupMateUnitPtr->Level)));
+				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"), 
+					*GroupMateUnitPtr->CharacterAttributes->Name.ToString(), GroupMateUnitPtr->CharacterAttributes->Level
+				)));
 			}
 		}
 	}
@@ -158,6 +161,6 @@ void UTeamMateInfo::AddMember()
 	auto TeamsHelperSPtr = GMCPtr->GetTeamHelper();
 	if (TeamsHelperSPtr)
 	{
-		TeamsHelperSPtr->AddCharacter(GroupMateUnitPtr, GroupMateUnitPtr->PCPtr);
+		TeamsHelperSPtr->AddCharacter(GroupMateUnitPtr, GroupMateUnitPtr->ProxyCharacterPtr);
 	}
 }
