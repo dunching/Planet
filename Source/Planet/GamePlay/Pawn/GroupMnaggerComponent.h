@@ -9,6 +9,7 @@
 #include "GroupMnaggerComponent.generated.h"
 
 class AHumanCharacter;
+class IPlanetControllerInterface;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UGroupMnaggerComponent : public UActorComponent
@@ -17,19 +18,21 @@ class PLANET_API UGroupMnaggerComponent : public UActorComponent
 
 public:
 
+	using FOwnerType = IPlanetControllerInterface;
+	
 	using FPawnType = ACharacterBase;
 
 	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
 
 	static FName ComponentName;
 
-	void AddCharacterToGroup(FPawnType* OwnerPtr);
+	void AddCharacterToGroup(FPawnType* TargetCharaterPtr);
 
-	void AddCharacterToTeam(FPawnType* OwnerPtr);
+	void AddCharacterToTeam(FPawnType* TargetCharaterPtr);
 
-	void OnAddToNewGroup(FPawnType* OwnerPtr);
+	void OnAddToNewGroup(FPawnType* TargetCharaterPtr);
 
-	void OnAddToNewTeam(FPawnType* OwnerPtr);
+	void OnAddToNewTeam(FPawnType* TargetCharaterPtr);
 
 	const TSharedPtr<FGroupMatesHelper>& GetGroupHelper();
 

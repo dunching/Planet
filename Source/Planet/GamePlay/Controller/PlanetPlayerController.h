@@ -50,19 +50,15 @@ public:
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
+	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
+
+	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;
+
+	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
+
 	virtual UCharacterUnit* GetGourpMateUnit() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
-	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
+	virtual ACharacterBase* GetRealCharacter()const override;
 
 protected:
 
@@ -82,7 +78,7 @@ protected:
 
 	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)override;
 
-	void InitialCharacter();
+	virtual void BindPCWithCharacter()override;
 
 	UFUNCTION()
 	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);
@@ -91,6 +87,18 @@ protected:
 
 	void BindRemove(AActor* Actor);
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
+	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
+
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge	FocusInformation;
@@ -102,5 +110,8 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
 	FGameplayTag RowName = FGameplayTag::EmptyTag;
-	
+
+	// 
+	TObjectPtr<FPawnType> RealCharacter;
+
 };

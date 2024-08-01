@@ -13,12 +13,18 @@
 
 #include "CharacterAttributesComponent.generated.h"
 
+class IPlanetControllerInterface;
+
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterAttributesComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
+
+	using FOwnerType = IPlanetControllerInterface;
+
+	using FPawnType = ACharacterBase;
 
 	UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer);
 

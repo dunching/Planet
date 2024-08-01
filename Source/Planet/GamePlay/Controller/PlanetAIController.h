@@ -39,7 +39,23 @@ public:
 
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
 
+	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
+
+	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;
+
+	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
+
 	virtual UCharacterUnit* GetGourpMateUnit() override;
+
+	virtual ACharacterBase* GetRealCharacter()const override;
+
+protected:
+
+	virtual void BeginPlay() override;
+
+	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)override;
+
+	virtual void BindPCWithCharacter()override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
@@ -53,14 +69,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
 
-protected:
-
-	virtual void BeginPlay() override;
-
-	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)override;
-
-	void InitialCharacterUnit();
-
 	UPROPERTY(Transient)
 	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
 	
@@ -69,6 +77,7 @@ protected:
 	
 private:
 
-//	TObjectPtr<FPawnType> RealCharacter;
+	// 
+	TObjectPtr<FPawnType> RealCharacter;
 
 };

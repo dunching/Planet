@@ -259,6 +259,9 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 			}
 		}
 	}
+
+	// 注意：PC并非是在此处绑定，这段仅为测试
+	BindPCWithCharacter();
 }
 
 void APlanetPlayerController::OnUnPossess()
@@ -305,13 +308,45 @@ UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()const
 	return GroupMnaggerComponentPtr;
 }
 
+UHoldingItemsComponent* APlanetPlayerController::GetHoldingItemsComponent() const
+{
+	return HoldingItemsComponentPtr;
+}
+
+UCharacterAttributesComponent* APlanetPlayerController::GetCharacterAttributesComponent() const
+{
+	return CharacterAttributesComponentPtr;
+}
+
+UTalentAllocationComponent* APlanetPlayerController::GetTalentAllocationComponent() const
+{
+	return TalentAllocationComponentPtr;
+}
+
 UCharacterUnit* APlanetPlayerController::GetGourpMateUnit()
 {
 	return CharacterUnitPtr;
 }
 
-void APlanetPlayerController::InitialCharacter()
+ACharacterBase* APlanetPlayerController::GetRealCharacter()const
 {
+	return Cast<ACharacterBase>(GetPawn());
+}
+
+void APlanetPlayerController::BindPCWithCharacter()
+{
+	RealCharacter = GetPawn<FPawnType>();
+
+	// 通过临时 SceneUnitContainer 的创建UnitPtr
+	auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
+
+	ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
+
+	SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
+
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
 }
 
 void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)

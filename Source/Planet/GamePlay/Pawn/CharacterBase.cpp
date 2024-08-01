@@ -151,11 +151,11 @@ UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent()const
 {
 	if (IsPlayerControlled())
 	{
-		return GetController<APlanetPlayerController>()->HoldingItemsComponentPtr;
+		return GetController<APlanetPlayerController>()->GetHoldingItemsComponent();
 	}
-	else if (IsBotControlled())
+	else if (IsBotControlled() || IsLocallyControlled())
 	{
-		return GetController<APlanetAIController>()->HoldingItemsComponentPtr;
+		return GetController<APlanetAIController>()->GetHoldingItemsComponent();
 	}
 	return nullptr;
 }
@@ -164,11 +164,11 @@ UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent()
 {
 	if (IsPlayerControlled())
 	{
-		return GetController<APlanetPlayerController>()->CharacterAttributesComponentPtr;
+		return GetController<APlanetPlayerController>()->GetCharacterAttributesComponent();
 	}
-	else if (IsBotControlled())
+	else if (IsBotControlled() || IsLocallyControlled())
 	{
-		return GetController<APlanetAIController>()->CharacterAttributesComponentPtr;
+		return GetController<APlanetAIController>()->GetCharacterAttributesComponent();
 	}
 	return nullptr;
 }
@@ -177,11 +177,11 @@ UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
 {
 	if (IsPlayerControlled())
 	{
-		return GetController<APlanetPlayerController>()->TalentAllocationComponentPtr;
+		return GetController<APlanetPlayerController>()->GetTalentAllocationComponent();
 	}
-	else if (IsBotControlled())
+	else if (IsBotControlled() || IsLocallyControlled())
 	{
-		return GetController<APlanetAIController>()->TalentAllocationComponentPtr;
+		return GetController<APlanetAIController>()->GetTalentAllocationComponent();
 	}
 	return nullptr;
 }
@@ -212,7 +212,7 @@ UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 	{
 		return GetController<APlanetPlayerController>()->GetGroupMnaggerComponent();
 	}
-	else if (IsBotControlled())
+	else if (IsBotControlled() || IsLocallyControlled())
 	{
 		return GetController<APlanetAIController>()->GetGroupMnaggerComponent();
 	}
@@ -225,7 +225,7 @@ UCharacterUnit* ACharacterBase::GetGourpMateUnit()const
 	{
 		return GetController<APlanetPlayerController>()->GetGourpMateUnit();
 	}
-	else if (IsBotControlled())
+	else if (IsBotControlled() || IsLocallyControlled())
 	{
 		return GetController<APlanetAIController>()->GetGourpMateUnit();
 	}

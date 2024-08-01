@@ -7,6 +7,7 @@
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
+#include "PlanetControllerInterface.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -21,7 +22,8 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 
 	CharacterAttributes.HP.AddCurrentValue(CharacterAttributes.HPReplay.GetCurrentValue(), CharacterAttributes.PropertuModify_GUID);
 	
-	auto CharacterPtr = GetOwner<ACharacterBase>();
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	auto CharacterPtr = OwnerPtr->GetRealCharacter();
 	if (CharacterPtr)
 	{
 		if (

@@ -16,34 +16,34 @@
 
 FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
-void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* OwnerPtr)
+void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* TargetCharaterPtr)
 {
 	// 
-	auto CharacterPtr = GetOwner<FPawnType>();
+	auto CharacterPtr = GetOwner<FOwnerType>()->GetRealCharacter();
 	if (CharacterPtr && CharacterPtr->IsPlayerControlled())
 	{
-		auto AIControllerPtr = OwnerPtr->GetController<APlanetAIController>(); 
+		auto AIControllerPtr = TargetCharaterPtr->GetController<APlanetAIController>(); 
 
-		CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->AddUnit_Groupmate(OwnerPtr->GetGourpMateUnit());
+		CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->AddUnit_Groupmate(TargetCharaterPtr->GetGourpMateUnit());
 
 		// 
-		OwnerPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->RemoveUnit(OwnerPtr->GetGourpMateUnit()->GetID());
+		TargetCharaterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->RemoveUnit(TargetCharaterPtr->GetGourpMateUnit()->GetID());
 	}
 
 	//
-	GetGroupHelper()->AddCharacter(OwnerPtr);
+	GetGroupHelper()->AddCharacter(TargetCharaterPtr);
 }
 
-void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* OwnerPtr)
+void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* TargetCharaterPtr)
 {
-	GetGroupHelper()->AddCharacter(OwnerPtr);
+	GetGroupHelper()->AddCharacter(TargetCharaterPtr);
 }
 
-void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPtr)
+void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* TargetCharaterPtr)
 {
-	GroupHelperSPtr = OwnerPtr->GetGroupMnaggerComponent()->GetGroupHelper();
+	GroupHelperSPtr = TargetCharaterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 
-	if (OwnerPtr->IsPlayerControlled())
+	if (TargetCharaterPtr->IsPlayerControlled())
 	{
 		TeamHelperSPtr->SwitchTeammateOption(ETeammateOption::kFree);
 	}
@@ -51,9 +51,9 @@ void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* OwnerPtr)
 	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* OwnerPtr)
+void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* TargetCharaterPtr)
 {
-	TeamHelperSPtr = OwnerPtr->GetGroupMnaggerComponent()->GetTeamHelper();
+	TeamHelperSPtr = TargetCharaterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
@@ -62,8 +62,8 @@ const TSharedPtr<FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupHelper()
 {
 	if (!GroupHelperSPtr)
 	{
-		auto OwnerPtr = GetOwner<FPawnType>();
-		GroupHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(OwnerPtr);
+		auto TargetCharaterPtr = GetOwner<FOwnerType>();
+		GroupHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(GetOwner<FOwnerType>()->GetRealCharacter());
 
 		GroupHelperChangedDelegateContainer.ExcuteCallback();
 	}
@@ -74,8 +74,8 @@ const TSharedPtr<FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
 {
 	if (!TeamHelperSPtr)
 	{
-		auto OwnerPtr = GetOwner<FPawnType>();
-		TeamHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(OwnerPtr);
+		auto TargetCharaterPtr = GetOwner<FOwnerType>();
+		TeamHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(GetOwner<FOwnerType>()->GetRealCharacter());
 
 		TeamHelperChangedDelegateContainer.ExcuteCallback();
 	}

@@ -8,6 +8,7 @@
 #include "PlanetPlayerState.h"
 #include "SceneUnitExtendInfo.h"
 #include "SceneUnitContainer.h"
+#include "PlanetControllerInterface.h"
 
 UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
@@ -16,10 +17,10 @@ UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectI
 
 TSharedPtr<FSceneUnitContainer> UHoldingItemsComponent::GetSceneUnitContainer()
 {
-	auto CharacterPtr = GetOwner<ACharacterBase>();
-	if (CharacterPtr)
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (OwnerPtr && OwnerPtr->GetGourpMateUnit())
 	{
-		return CharacterPtr->GetGourpMateUnit()->SceneUnitContainer;
+		return OwnerPtr->GetGourpMateUnit()->SceneUnitContainer;
 	}
 
 	// 创建临时的 

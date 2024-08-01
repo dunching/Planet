@@ -8,12 +8,16 @@
 
 #include "TalentAllocationComponent.generated.h"
 
+class IPlanetControllerInterface;
+
 UCLASS(BlueprintType, Blueprintable)
 class UTalentAllocationComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
+
+	using FOwnerType = IPlanetControllerInterface;
 
 	static FName ComponentName;
 

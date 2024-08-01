@@ -10,6 +10,7 @@
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitContainer.h"
+#include "PlanetControllerInterface.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
@@ -172,7 +173,7 @@ void UTalentAllocationComponent::SyncToHolding()
 			}
 			else
 			{
-				auto CharacterPtr = GetOwner<ACharacterBase>();
+				auto CharacterPtr = GetOwner<FOwnerType>();
 				if (CharacterPtr)
 				{
 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
@@ -222,15 +223,15 @@ void UTalentAllocationComponent::SyncToHolding()
 					}
 					break;
 					}
-					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-					EICPtr->RegisterMultiGAs(SkillsMap);
+// 					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+// 					EICPtr->RegisterMultiGAs(SkillsMap);
 				}
 			}
 		}
 		break;
 		case EPointType::kProperty:
 		{
-			auto CharacterPtr = GetOwner<ACharacterBase>();
+			auto CharacterPtr = GetOwner<FOwnerType>();
 			if (CharacterPtr)
 			{
 				auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();

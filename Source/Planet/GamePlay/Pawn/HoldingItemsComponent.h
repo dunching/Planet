@@ -11,6 +11,7 @@
 #include "HoldingItemsComponent.generated.h"
 
 struct FSceneUnitContainer;
+class IPlanetControllerInterface;
 
 UCLASS(BlueprintType, Blueprintable)
 class UHoldingItemsComponent : public UActorComponent
@@ -18,6 +19,8 @@ class UHoldingItemsComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+
+	using FOwnerType = IPlanetControllerInterface;
 
 	UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer);
 
