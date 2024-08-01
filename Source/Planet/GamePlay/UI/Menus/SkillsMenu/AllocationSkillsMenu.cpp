@@ -393,6 +393,7 @@ void UAllocationSkillsMenu::BindEvent()
  		UIPtr->SetHoldItemProperty(
  			CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()
  		);
+		UIPtr->ResetUIByData();
 
 		{
 			auto Delegate = 

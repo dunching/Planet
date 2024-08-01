@@ -4,16 +4,12 @@
 
 #include "CoreMinimal.h"
 
-#include "VoxelMinimal.h"
-#include "VoxelActor.h"
-#include "VoxelChunkSpawner.h"
-#include "VoxelRuntime.h"
-#include "VoxelGraph.h"
-
 #include "BrushVoxelActor.generated.h"
 
 UCLASS()
-class PLANET_API ABrushVoxelActor : public AVoxelActor
+class PLANET_API ABrushVoxelActor : 
+//    public AVoxelActor
+    public AActor
 {
     GENERATED_BODY()
 

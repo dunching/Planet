@@ -140,11 +140,6 @@ public class Planet : ModuleRules
             "ChaosVehicles",
             "ActorSequence",
 
-            "VoxelCore",
-            "VoxelGraphCore",
-            "MMT",
-            "FlyingNavSystem" ,
-
             "Tools",
         });
 

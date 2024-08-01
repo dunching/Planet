@@ -16,10 +16,6 @@
 	],
 	"Plugins": [
 		{
-			"Name": "MMT",
-			"Enabled": true
-		},
-		{
 			"Name": "ChaosVehiclesPlugin",
 			"Enabled": true
 		}

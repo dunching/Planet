@@ -7,9 +7,7 @@
 #include <GameFramework/Character.h>
 #include <AIController.h>
 #include <NavigationPath.h>
-
-#include "FlyingNavigationData.h"
-#include "FlyingNavFunctionLibrary.h"
+#include "NavigationSystem.h"
 
 namespace NavgationSubSysetm
 {
@@ -63,7 +61,7 @@ void UNavgationSubSystem::CheckNeedRebuildNavData()
 
 		if (
 			!PreviouFlyingNavigationDataPtr ||
-			!(PreviouFlyingNavigationDataPtr && PreviouFlyingNavigationDataPtr->IsNavigationDataBuilt()) ||
+	//		!(PreviouFlyingNavigationDataPtr && PreviouFlyingNavigationDataPtr->IsNavigationDataBuilt()) ||
 			(FVector::Distance(Pt1, Pt2) > 500)
 			)
 		{

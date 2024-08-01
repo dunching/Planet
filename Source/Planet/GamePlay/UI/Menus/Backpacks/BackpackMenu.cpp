@@ -38,8 +38,6 @@ void UBackpackMenu::NativeConstruct()
 	Super::NativeConstruct();
 
 	BindEvent();
-
-	ResetUIByData();
 }
 
 void UBackpackMenu::SetHoldItemProperty(
