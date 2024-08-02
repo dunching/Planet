@@ -39,7 +39,7 @@ enum class EPointType :uint8
 };
 
 USTRUCT(BlueprintType)
-struct FTalentHelper
+struct FTalentHelper final
 {
 	GENERATED_USTRUCT_BODY()
 

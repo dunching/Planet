@@ -64,6 +64,8 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	virtual void PlayerTick(float DeltaTime)override;
 
 	virtual void UpdateRotation(float DeltaTime)override;
@@ -86,16 +88,16 @@ protected:
 	void OnFocusDeathing(const FGameplayTag Tag, int32 Count);
 
 	void BindRemove(AActor* Actor);
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
 
@@ -104,10 +106,10 @@ protected:
 	FFocusKnowledge	FocusInformation;
 
 	UFocusIcon* FocusIconPtr = nullptr;
-	
+
 	UPROPERTY(Transient)
 	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
 	FGameplayTag RowName = FGameplayTag::EmptyTag;
 

@@ -151,6 +151,11 @@ FTableRowUnit_CharacterInfo* UCharacterUnit::GetTableRowUnit_CharacterInfo() con
 	return SceneUnitExtendInfoPtr;
 }
 
+void UCharacterUnit::RelieveRootBind()
+{
+	SceneUnitContainer.Reset();
+}
+
 UCoinUnit::UCoinUnit()
 {
 

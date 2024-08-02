@@ -79,6 +79,14 @@ void APlanetAIController::BeginPlay()
 	Super::BeginPlay();
 }
 
+void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	CharacterUnitPtr->RelieveRootBind();
+	CharacterUnitPtr = nullptr;
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void APlanetAIController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)
 {
 	CharacterUnitPtr = NewGourpMateUnitPtr;
@@ -94,10 +102,14 @@ void APlanetAIController::BindPCWithCharacter()
 	{
 		RealCharacter = GetPawn<FPawnType>();
 
+		CharacterUnitPtr = nullptr;
+
 		// 通过临时 SceneUnitContainer 的创建UnitPtr
 		auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
 
 		ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
+
+		CharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
 
 		SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
 

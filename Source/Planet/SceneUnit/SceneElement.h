@@ -174,6 +174,9 @@ public:
 
 	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
 
+	// 解除这个类下AddToRoot的对象
+	void RelieveRootBind();
+
 	FPawnType* ProxyCharacterPtr = nullptr;
 
 	TSharedPtr<FCharacterAttributes> CharacterAttributes;

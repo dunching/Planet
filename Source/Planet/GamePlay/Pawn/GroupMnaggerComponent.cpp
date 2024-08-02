@@ -26,8 +26,11 @@ void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* TargetCharaterPtr)
 
 		CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->AddUnit_Groupmate(TargetCharaterPtr->GetGourpMateUnit());
 
+		// 从上一个Group里面移除自己
+
+
 		// 
-		TargetCharaterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->RemoveUnit(TargetCharaterPtr->GetGourpMateUnit()->GetID());
+		// TargetCharaterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->RemoveUnit(TargetCharaterPtr->GetGourpMateUnit()->GetID());
 	}
 
 	//

@@ -156,6 +156,14 @@ void APlanetPlayerController::BeginPlay()
 	// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
 }
 
+void APlanetPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	CharacterUnitPtr->RelieveRootBind();
+	CharacterUnitPtr = nullptr;
+
+	Super::EndPlay(EndPlayReason);
+}
+
 void APlanetPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -296,6 +304,8 @@ void APlanetPlayerController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUni
 
 	CharacterUnitPtr->ProxyCharacterPtr = GetPawn<FPawnType>();
 	CharacterUnitPtr->CharacterAttributes->Name = GetPawn<FPawnType>()->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
+
+//	CharacterUnitPtr->RemoveFromRoot();
 }
 
 UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponent() const
@@ -337,10 +347,18 @@ void APlanetPlayerController::BindPCWithCharacter()
 {
 	RealCharacter = GetPawn<FPawnType>();
 
+	if (CharacterUnitPtr)
+	{
+		CharacterUnitPtr->RelieveRootBind();
+	}
+	CharacterUnitPtr = nullptr;
+
 	// 通过临时 SceneUnitContainer 的创建UnitPtr
 	auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
 
 	ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
+
+	CharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
 
 	SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
 

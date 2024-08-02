@@ -11,7 +11,7 @@
 #include "AllocationSkills.generated.h"
 
 USTRUCT(BlueprintType)
-struct PLANET_API FAllocationSkills
+struct PLANET_API FAllocationSkills final
 {
 	GENERATED_USTRUCT_BODY()
 };

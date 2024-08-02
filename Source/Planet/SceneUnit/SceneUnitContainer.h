@@ -41,7 +41,7 @@ enum class ECharacterPropertyType : uint8;
 
 #pragma region HoldItem
 USTRUCT(BlueprintType)
-struct FSceneUnitContainer
+struct FSceneUnitContainer final
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -55,6 +55,7 @@ struct FSceneUnitContainer
 
 	using FOnCoinUnitChanged = TCallbackHandleContainer<void(UCoinUnit*, bool, int32)>;
 
+	~FSceneUnitContainer();
 
 	UBasicUnit* AddUnit(FGameplayTag UnitType, int32 Num);
 

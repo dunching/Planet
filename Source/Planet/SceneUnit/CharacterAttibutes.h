@@ -17,7 +17,7 @@ class FTalent_Base;
 struct FCharacterAttributes;
 
 USTRUCT(BlueprintType)
-struct PLANET_API FBasePropertySet
+struct PLANET_API FBasePropertySet 
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -112,7 +112,7 @@ struct FElement
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FCharacterAttributes
+struct PLANET_API FCharacterAttributes final
 {
 	GENERATED_USTRUCT_BODY()
 

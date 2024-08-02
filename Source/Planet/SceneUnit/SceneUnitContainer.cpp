@@ -15,6 +15,7 @@ UWeaponUnit* FSceneUnitContainer::AddUnit_Weapon(FGameplayTag UnitType)
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
 	auto ResultPtr = NewObject<UWeaponUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+	ResultPtr->AddToRoot();
 
 	for (;;)
 	{
@@ -58,6 +59,7 @@ USkillUnit* FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
 		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
 		auto ResultPtr = NewObject<USkillUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+		ResultPtr->AddToRoot();
 
 		if (!ResultPtr)
 		{
@@ -105,6 +107,7 @@ UCharacterUnit* FSceneUnitContainer::AddUnit_Groupmate(FGameplayTag UnitType)
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
 	auto ResultPtr = NewObject<UCharacterUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+//	ResultPtr->AddToRoot();
 
 	const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
 
@@ -143,6 +146,7 @@ UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, 
 		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
 		auto ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+		ResultPtr->AddToRoot();
 
 		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
 
@@ -165,6 +169,7 @@ UToolUnit* FSceneUnitContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
 	auto ResultPtr = NewObject<UToolUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+	ResultPtr->AddToRoot();
 
 	for (;;)
 	{
@@ -186,6 +191,17 @@ UToolUnit* FSceneUnitContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 	}
 
 	return ResultPtr;
+}
+
+FSceneUnitContainer::~FSceneUnitContainer()
+{
+	for (auto Iter : SceneToolsAry)
+	{
+		if (Iter)
+		{
+			Iter->RemoveFromRoot();
+		}
+	}
 }
 
 UBasicUnit* FSceneUnitContainer::AddUnit(FGameplayTag UnitType, int32 Num)
@@ -263,6 +279,7 @@ UCoinUnit* FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*
 		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
 		auto ResultPtr = NewObject<UCoinUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
+		ResultPtr->AddToRoot();
 
 		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
 
