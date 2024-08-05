@@ -57,18 +57,18 @@ protected:
 
 	void SyncAllocation2Character();
 
-	void OnMainWeaponChanged(UWeaponUnit* ToolSPtr);
-
-	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
-
 	void OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr);
 	
 	void OnSelectedCharacterUnit(UCharacterUnit* UnitPtr);
 
-	void OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
-	
+	void OnMainWeaponChanged(UWeaponUnit* ToolSPtr);
+
+	void OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr);
+
 	void OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
 
+	void OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
+	
 	void OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;

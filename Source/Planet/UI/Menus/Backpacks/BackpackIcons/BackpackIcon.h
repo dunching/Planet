@@ -31,6 +31,8 @@ public:
 
 	using FOnDragDelegate = TCallbackHandleContainer<void(bool, UBasicUnit*)>;
 
+	using FOnAllocationCharacterUnitChangedHandle = TCallbackHandleContainer<void(UCharacterUnit*)>::FCallbackHandleSPtr;
+
 	UBackpackIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
@@ -39,8 +41,6 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 	
-	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
-
 	FOnDragDelegate OnDragDelegate;
 
 protected:
@@ -58,6 +58,10 @@ protected:
 
 	virtual	void SetItemType(UBasicUnit* BasicUnitPtr);
 
-	UBasicUnit *BasicUnitPtr = nullptr;
+	virtual void OnAllocationCharacterUnitChanged(UCharacterUnit* AllocationCharacterUnitPtr);
+
+	UBasicUnit* BasicUnitPtr = nullptr;
+
+	FOnAllocationCharacterUnitChangedHandle OnAllocationCharacterUnitChangedHandle;
 
 };

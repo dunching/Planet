@@ -72,7 +72,7 @@ struct FAllocationSkillsMenu : public TGetSocketName<FAllocationSkillsMenu>
 	const FName Consumable4 = TEXT("Consumable4");
 };
 
-UAllocationSkillsMenu::UAllocationSkillsMenu(const FObjectInitializer& ObjectInitializer):
+UAllocationSkillsMenu::UAllocationSkillsMenu(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	ActiveSkills_1_Key = EKeys::Q;
@@ -144,7 +144,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(UCharacterUnit* PlayerCha
 				IconPtr->bPaseInvokeOnResetUnitEvent = true;
 				IconPtr->ResetToolUIByData(
 					FirstWeaponSocketInfoSPtr ?
-					FirstWeaponSocketInfoSPtr->WeaponUnitPtr : 
+					FirstWeaponSocketInfoSPtr->WeaponUnitPtr :
 					nullptr
 				);
 				IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -155,8 +155,8 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(UCharacterUnit* PlayerCha
 		{
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(
-				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->WeaponUnitPtr ? 
-				FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill : 
+				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->WeaponUnitPtr ?
+				FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill :
 				nullptr
 			);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -171,7 +171,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(UCharacterUnit* PlayerCha
 				IconPtr->bPaseInvokeOnResetUnitEvent = true;
 				IconPtr->ResetToolUIByData(
 					SecondWeaponSocketInfoSPtr ?
-					SecondWeaponSocketInfoSPtr->WeaponUnitPtr : 
+					SecondWeaponSocketInfoSPtr->WeaponUnitPtr :
 					nullptr
 				);
 				IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -214,7 +214,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(UCharacterUnit* PlayerCharacter
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
 			if (IconPtr)
 			{
-				auto Result =  EICPtr->FindSkill(IconPtr->IconSocket);
+				auto Result = EICPtr->FindSkill(IconPtr->IconSocket);
 
 				IconPtr->bPaseInvokeOnResetUnitEvent = true;
 				IconPtr->ResetToolUIByData(Result ? Result->SkillUnit : nullptr);
@@ -465,7 +465,7 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 			}
 		}
 		auto GroupHelperSPtr = CharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
-		
+
 		auto GroupmateUnitAry = GroupHelperSPtr->MembersSet;
 
 		for (auto Iter : GroupmateUnitAry)
@@ -525,6 +525,7 @@ void UAllocationSkillsMenu::ResetBackpack(UCharacterUnit* AICharacterUnitPtr, UC
 void UAllocationSkillsMenu::OnMainWeaponChanged(UWeaponUnit* ToolSPtr)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
 	{
 		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill1));
 		if (IconPtr)
@@ -537,6 +538,7 @@ void UAllocationSkillsMenu::OnMainWeaponChanged(UWeaponUnit* ToolSPtr)
 void UAllocationSkillsMenu::OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
 	{
 		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill2));
 		if (IconPtr)
@@ -657,6 +659,22 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(UCharacterUnit* UnitPtr)
 
 void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
 {
+	if (NewUnitPtr)
+	{
+		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+	}
+	else
+	{
+		if (PreviousUnitPtr)
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
+		}
+		else
+		{
+
+		}
+	}
+
 	TArray<FName>Ary
 	{
 		{FAllocationSkillsMenu::Get().ActiveSkill1},
@@ -673,6 +691,7 @@ void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBas
 		{FAllocationSkillsMenu::Get().TalentPassivSkill},
 	};
 
+	bool bIsReplaced = false;
 	for (const auto& Iter : Ary)
 	{
 		auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
@@ -683,22 +702,55 @@ void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBas
 				UIPtr->bPaseInvokeOnResetUnitEvent = true;
 				UIPtr->ResetToolUIByData(PreviousUnitPtr);
 				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+
+				bIsReplaced = true;
+
+				break;
 			}
 			else
 			{
 			}
 		}
 	}
+
+	if (PreviousUnitPtr)
+	{
+		if (bIsReplaced)
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+		}
+		else
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
+		}
+	}
 }
 
 void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
 {
+	if (NewUnitPtr)
+	{
+		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+	}
+	else
+	{
+		if (PreviousUnitPtr)
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
+		}
+		else
+		{
+
+		}
+	}
+
 	TArray<FName>Ary
 	{
 		{FAllocationSkillsMenu::Get().MainWeapon},
 		{FAllocationSkillsMenu::Get().SecondaryWeapon},
 	};
 
+	bool bIsReplaced = false;
 	for (const auto& Iter : Ary)
 	{
 		auto UIPtr = Cast<UWeaponsIcon>(GetWidgetFromName(Iter));
@@ -709,16 +761,48 @@ void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBa
 				UIPtr->bPaseInvokeOnResetUnitEvent = true;
 				UIPtr->ResetToolUIByData(PreviousUnitPtr);
 				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+
+				bIsReplaced = true;
+
+				break;
 			}
 			else
 			{
 			}
 		}
 	}
+
+	if (PreviousUnitPtr)
+	{
+		if (bIsReplaced)
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+		}
+		else
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
+		}
+	}
 }
 
 void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
 {
+	if (NewUnitPtr)
+	{
+		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+	}
+	else
+	{
+		if (PreviousUnitPtr)
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
+		}
+		else
+		{
+
+		}
+	}
+
 	TArray<FName>Ary
 	{
 		{FAllocationSkillsMenu::Get().Consumable1},
@@ -727,6 +811,7 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr,
 		{FAllocationSkillsMenu::Get().Consumable4},
 	};
 
+	bool bIsReplaced = false;
 	for (const auto& Iter : Ary)
 	{
 		auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
@@ -737,10 +822,26 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr,
 				UIPtr->bPaseInvokeOnResetUnitEvent = true;
 				UIPtr->ResetToolUIByData(PreviousUnitPtr);
 				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+
+				bIsReplaced = true;
+
+				break;
 			}
 			else
 			{
 			}
+		}
+	}
+
+	if (PreviousUnitPtr)
+	{
+		if (bIsReplaced)
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+		}
+		else
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
 		}
 	}
 }

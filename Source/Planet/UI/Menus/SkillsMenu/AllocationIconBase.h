@@ -18,6 +18,7 @@ struct FStreamableHandle;
 class UDragDropOperation;
 
 class UBasicUnit;
+class UCharacterUnit;
 
 UCLASS()
 class PLANET_API UAllocationIconBase :

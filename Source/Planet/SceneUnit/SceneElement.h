@@ -62,9 +62,11 @@ public:
 	// 
 	FString GetUnitName()const;
 	
-	// 这个物品被分配给的对象
-	UPROPERTY(Transient)
-	UCharacterUnit * AllocationCharacterUnitPtr = nullptr;
+	void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
+
+	TCallbackHandleContainer<void(UCharacterUnit*)> OnAllocationCharacterUnitChanged;
+
+	UCharacterUnit* GetAllocationCharacterUnit()const;
 
 protected:
 
@@ -72,6 +74,10 @@ protected:
 
 	UPROPERTY(Transient)
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
+	
+	// 这个物品被分配给的对象
+	UPROPERTY(Transient)
+	UCharacterUnit * AllocationCharacterUnitPtr = nullptr;
 
 private:
 

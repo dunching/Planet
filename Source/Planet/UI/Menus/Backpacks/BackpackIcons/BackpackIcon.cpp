@@ -52,6 +52,12 @@ void UBackpackIcon::ResetToolUIByData(UBasicUnit * InBasicUnitPtr)
 	if (BasicUnitPtr)
 	{
 		SetItemType(BasicUnitPtr);
+
+		OnAllocationCharacterUnitChangedHandle = BasicUnitPtr->OnAllocationCharacterUnitChanged.AddCallback(
+			std::bind(&ThisClass::OnAllocationCharacterUnitChanged, this, std::placeholders::_1)
+		);
+
+		OnAllocationCharacterUnitChanged(InBasicUnitPtr->GetAllocationCharacterUnit());
 	}
 }
 
@@ -61,31 +67,6 @@ void UBackpackIcon::EnableIcon(bool bIsEnable)
 	if (ImagePtr)
 	{
 		ImagePtr->SetVisibility(bIsEnable ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
-	}
-}
-
-void UBackpackIcon::SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)
-{
-	if (AllocationCharacterUnitPtr)
-	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
-		if (!UIPtr)
-		{
-			return;
-		}
-
-		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr->CharacterAttributes->Name));
-	}
-	else
-	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
-		if (!UIPtr)
-		{
-			return;
-		}
-
-		UIPtr->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
@@ -157,5 +138,30 @@ void UBackpackIcon::SetItemType(UBasicUnit* InBasicUnitPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
 		}
+	}
+}
+
+void UBackpackIcon::OnAllocationCharacterUnitChanged(UCharacterUnit* AllocationCharacterUnitPtr)
+{
+	if (AllocationCharacterUnitPtr)
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
+		if (!UIPtr)
+		{
+			return;
+		}
+
+		UIPtr->SetVisibility(ESlateVisibility::Visible);
+		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr->CharacterAttributes->Name));
+	}
+	else
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
+		if (!UIPtr)
+		{
+			return;
+		}
+
+		UIPtr->SetVisibility(ESlateVisibility::Hidden);
 	}
 }

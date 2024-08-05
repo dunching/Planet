@@ -47,6 +47,23 @@ FString UBasicUnit::GetUnitName() const
 	return SceneUnitExtendInfoPtr->UnitName;
 }
 
+void UBasicUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+{
+	if (AllocationCharacterUnitPtr == InAllocationCharacterUnitPtr)
+	{
+		return;
+	}
+
+	AllocationCharacterUnitPtr = InAllocationCharacterUnitPtr;
+
+	OnAllocationCharacterUnitChanged.ExcuteCallback(AllocationCharacterUnitPtr);
+}
+
+UCharacterUnit* UBasicUnit::GetAllocationCharacterUnit() const
+{
+	return AllocationCharacterUnitPtr;
+}
+
 FTableRowUnit* UBasicUnit::GetTableRowUnit() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
