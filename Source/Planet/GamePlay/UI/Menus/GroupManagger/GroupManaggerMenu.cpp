@@ -62,7 +62,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 	{
 		for (auto Iter : GroupsHelperSPtr->MembersSet)
 		{
-			if (Iter == GroupsHelperSPtr->OwnerPtr)
+			if (Iter == GroupsHelperSPtr->OwnerCharacterUnitPtr)
 			{
 				continue;
 			}
@@ -72,7 +72,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 			{
 				TileViewPtr->AddItem(WidgetPtr);
 
-				WidgetPtr->ResetToolUIByData(Iter->GetController<IPlanetControllerInterface>()->GetGourpMateUnit());
+				WidgetPtr->ResetToolUIByData(Iter);
 			}
 		}
 	}

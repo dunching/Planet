@@ -48,15 +48,6 @@ void UConsumableIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
-	UnitPtr = nullptr;
-	if (BasicUnitPtr && (
-		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
-		))
-	{
-		UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
-	}
-
-	OnResetUnit.ExcuteCallback(UnitPtr);
 	SetLevel();
 }
 

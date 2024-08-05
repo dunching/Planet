@@ -51,6 +51,13 @@ UActionSkillsIcon::UActionSkillsIcon(const FObjectInitializer& ObjectInitializer
 
 }
 
+void UActionSkillsIcon::NativeOnListItemObjectSet(UObject* ListItemObject)
+{
+	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
+
+	InvokeReset(Cast<ThisClass>(ListItemObject));
+}
+
 void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
 	if (BaseWidgetPtr)

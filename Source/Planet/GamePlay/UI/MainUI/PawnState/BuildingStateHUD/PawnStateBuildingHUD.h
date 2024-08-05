@@ -23,7 +23,7 @@ struct FConsumableSocketInfo;
  *
  */
 UCLASS()
-class PLANET_API UPawnStateBuildingHUD : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UPawnStateBuildingHUD : public UMyUserWidget, public IMenuInterface
 {
 	GENERATED_BODY()
 

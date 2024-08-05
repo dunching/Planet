@@ -35,13 +35,15 @@ class PLANET_API AHumanAIController : public APlanetAIController
 
 public:
 
+	using FCharacterUnitType = UCharacterUnit;
+
 	using FPawnType = AHumanCharacter;
 
-	using FTeamOptionChangedDelegate =
-		UGroupsManaggerSubSystem::FTeammateOptionChangedDelegateContainer::FCallbackHandleSPtr;
-
 	using FTeamHelperChangedDelegate =
-		UGroupMnaggerComponent::FTeamHelperChangedDelegateContainer::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
+	using FTeammateOptionChangedDelegate = 
+		TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr;
 
 	AHumanAIController(const FObjectInitializer& ObjectInitializer);
 
@@ -63,15 +65,9 @@ public:
 
 protected:
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void OnTeammateOptionChanged(
-		ETeammateOption TeammateOption,
-		ACharacterBase* LeaderCharacterPtr
-	);
-
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		ACharacterBase* LeaderPCPtr
+		FCharacterUnitType* LeaderCharacterUnitPtr
 	);
 
 	void OnDeathing(const FGameplayTag Tag, int32 Count);
@@ -94,7 +90,7 @@ protected:
 
 	void InitialCharacter();
 
-	FTeamOptionChangedDelegate TeammateOptionChangedDelegateContainer;
+	FTeammateOptionChangedDelegate TeammateOptionChangedDelegate;
 
 	FTeamHelperChangedDelegate TeamHelperChangedDelegate;
 

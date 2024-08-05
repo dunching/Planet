@@ -26,6 +26,7 @@ class IPlanetControllerInterface;
 class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter;
+class UCharacterUnit;
 
 struct FAllocationSkills;
 struct FCharacterAttributes;
@@ -60,6 +61,10 @@ public:
 
 	// 
 	FString GetUnitName()const;
+	
+	// 这个物品被分配给的对象
+	UPROPERTY(Transient)
+	UCharacterUnit * AllocationCharacterUnitPtr = nullptr;
 
 protected:
 

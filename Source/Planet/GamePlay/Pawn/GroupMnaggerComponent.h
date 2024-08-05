@@ -11,6 +11,50 @@
 class AHumanCharacter;
 class IPlanetControllerInterface;
 
+class PLANET_API FGroupMatesHelper
+{
+public:
+
+	using FCharacterUnitType = UCharacterUnit;
+
+	using FPawnType = ACharacterBase;
+
+	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FCharacterUnitType*)>;
+
+	void AddCharacter(FPawnType* PCPtr);
+
+	void AddCharacter(FCharacterUnitType* CharacterUnitPtr);
+
+	bool IsMember(FCharacterUnitType* CharacterUnitPtr)const;
+
+	int32 ID = 1;
+
+	FMemberChangedDelegateContainer MembersChanged;
+
+	FCharacterUnitType* OwnerCharacterUnitPtr = nullptr;
+
+	TSet<FCharacterUnitType*> MembersSet;
+
+};
+
+class PLANET_API FTeamMatesHelper : public FGroupMatesHelper
+{
+public:
+
+	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>;
+
+	void SwitchTeammateOption(ETeammateOption InTeammateOption);
+
+	ETeammateOption GetTeammateOption()const;
+
+	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
+
+private:
+
+	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
+
+};
+
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UGroupMnaggerComponent : public UActorComponent
 {
@@ -18,21 +62,27 @@ class PLANET_API UGroupMnaggerComponent : public UActorComponent
 
 public:
 
+	using FCharacterUnitType = UCharacterUnit;
+
 	using FOwnerType = IPlanetControllerInterface;
-	
+
 	using FPawnType = ACharacterBase;
 
 	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
 
 	static FName ComponentName;
 
-	void AddCharacterToGroup(FPawnType* TargetCharaterPtr);
+	void AddCharacterToGroup(FCharacterUnitType* CharacterUnitPtr);
 
-	void AddCharacterToTeam(FPawnType* TargetCharaterPtr);
+	void AddCharacterToTeam(FCharacterUnitType* CharacterUnitPtr);
 
-	void OnAddToNewGroup(FPawnType* TargetCharaterPtr);
+	TSharedPtr<FGroupMatesHelper> CreateGroup();
 
-	void OnAddToNewTeam(FPawnType* TargetCharaterPtr);
+	TSharedPtr<FTeamMatesHelper> CreateTeam();
+
+	void OnAddToNewGroup(FCharacterUnitType* CharacterUnitPtr);
+
+	void OnAddToNewTeam(FCharacterUnitType* CharacterUnitPtr);
 
 	const TSharedPtr<FGroupMatesHelper>& GetGroupHelper();
 

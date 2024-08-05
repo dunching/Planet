@@ -219,27 +219,27 @@ UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 	return nullptr;
 }
 
-UCharacterUnit* ACharacterBase::GetGourpMateUnit()const
+UCharacterUnit* ACharacterBase::GetCharacterUnit()const
 {
 	if (IsPlayerControlled())
 	{
-		return GetController<APlanetPlayerController>()->GetGourpMateUnit();
+		return GetController<APlanetPlayerController>()->GetCharacterUnit();
 	}
 	else if (IsBotControlled() || IsLocallyControlled())
 	{
-		return GetController<APlanetAIController>()->GetGourpMateUnit();
+		return GetController<APlanetAIController>()->GetCharacterUnit();
 	}
 	return nullptr;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 {
-	return false;
+	return GetGroupMnaggerComponent()->GetGroupHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
 }
 
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
-	return false;
+	return GetGroupMnaggerComponent()->GetTeamHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -273,18 +273,18 @@ void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
 
 void ACharacterBase::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
-	ACharacterBase* LeaderPCPtr
+	FCharacterUnitType* TargetCharacterUnitPtr
 )
 {
 	switch (GroupMateChangeType)
 	{
 	case EGroupMateChangeType::kAdd:
 	{
-		if (LeaderPCPtr)
+		if (TargetCharacterUnitPtr)
 		{
-			if (LeaderPCPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerPtr == this)
+			if (TargetCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerCharacterUnitPtr == GetCharacterUnit())
 			{
-				auto AIPCPtr = LeaderPCPtr->GetController<AHumanAIController>();
+				auto AIPCPtr = TargetCharacterUnitPtr->ProxyCharacterPtr->GetController<AHumanAIController>();
 				if (AIPCPtr)
 				{
 					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);

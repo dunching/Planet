@@ -21,7 +21,7 @@ class USkillUnit;
 class UConsumableUnit;
 
 UCLASS()
-class PLANET_API UGetItemInfos : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UGetItemInfos : public UMyUserWidget, public IMenuInterface
 {
 	GENERATED_BODY()
 

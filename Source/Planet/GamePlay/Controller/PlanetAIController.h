@@ -45,7 +45,7 @@ public:
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
 
-	virtual UCharacterUnit* GetGourpMateUnit() override;
+	virtual UCharacterUnit* GetCharacterUnit() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;
 
@@ -58,7 +58,9 @@ protected:
 	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)override;
 
 	virtual void BindPCWithCharacter()override;
-	
+
+	virtual UCharacterUnit* InitialCharacterUnit(ACharacterBase* CharaterPtr)override;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
 

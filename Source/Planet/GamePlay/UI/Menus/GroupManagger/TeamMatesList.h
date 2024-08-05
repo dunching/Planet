@@ -21,7 +21,7 @@ class AHumanCharacter;
  *
  */
 UCLASS()
-class PLANET_API UTeamMatesList : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UTeamMatesList : public UMyUserWidget, public IMenuInterface
 {
 	GENERATED_BODY()
 

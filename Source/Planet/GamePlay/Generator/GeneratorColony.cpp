@@ -55,7 +55,7 @@ void AGeneratorColony::BeginPlay()
 				{
 					if (FirstCharacterPtr)
 					{
-						FirstCharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(CharacterPtr);
+						FirstCharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(CharacterPtr->GetCharacterUnit());
 					}
 					else
 					{

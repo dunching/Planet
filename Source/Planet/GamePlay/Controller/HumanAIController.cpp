@@ -48,15 +48,16 @@ AActor* AHumanAIController::GetTeamFocusTarget() const
 {
 	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
 	{
+		auto LeaderCharacterPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerCharacterUnitPtr->ProxyCharacterPtr;
 		{
-			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<APlanetPlayerController>();
+			auto LeaderPCPtr = LeaderCharacterPtr->GetController<APlanetPlayerController>();
 			if (LeaderPCPtr)
 			{
 				return LeaderPCPtr->GetFocusActor();
 			}
 		}
 		{
-			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHumanAIController>();
+			auto LeaderPCPtr = LeaderCharacterPtr->GetController<AHumanAIController>();
 			if (LeaderPCPtr)
 			{
 				auto ResultPtr = LeaderPCPtr->GetFocusActor();
@@ -77,10 +78,9 @@ AActor* AHumanAIController::GetTeamFocusTarget() const
 
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	ACharacterBase* LeaderPCPtr
+	FCharacterUnitType* LeaderCharacterUnitPtr
 )
 {
-	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);
 }
 
 void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
@@ -155,9 +155,9 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 
 void AHumanAIController::OnUnPossess()
 {
-	if (TeammateOptionChangedDelegateContainer)
+	if (TeammateOptionChangedDelegate)
 	{
-		TeammateOptionChangedDelegateContainer->UnBindCallback();
+		TeammateOptionChangedDelegate->UnBindCallback();
 	}
 
 	if (TeamHelperChangedDelegate)
@@ -184,11 +184,11 @@ void AHumanAIController::OnTeamChanged()
 	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
 	if (TeamsHelper)
 	{
-		TeammateOptionChangedDelegateContainer = TeamsHelper->TeammateOptionChanged.AddCallback(
+		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPtr);
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterUnitPtr);
 	}
 }
 

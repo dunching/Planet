@@ -38,6 +38,13 @@ namespace TeamMateInfo
 	const FName Default = TEXT("Default");
 }
 
+void UTeamMateInfo::NativeOnListItemObjectSet(UObject* ListItemObject)
+{
+	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
+
+	InvokeReset(Cast<ThisClass>(ListItemObject));
+}
+
 FReply UTeamMateInfo::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
@@ -161,6 +168,6 @@ void UTeamMateInfo::AddMember()
 	auto TeamsHelperSPtr = GMCPtr->GetTeamHelper();
 	if (TeamsHelperSPtr)
 	{
-		TeamsHelperSPtr->AddCharacter(GroupMateUnitPtr, GroupMateUnitPtr->ProxyCharacterPtr);
+		TeamsHelperSPtr->AddCharacter(GroupMateUnitPtr);
 	}
 }

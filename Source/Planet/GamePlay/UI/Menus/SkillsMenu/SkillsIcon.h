@@ -35,8 +35,6 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	USkillUnit* UnitPtr = nullptr;
-
 protected:
 
 	virtual void NativeConstruct()override;

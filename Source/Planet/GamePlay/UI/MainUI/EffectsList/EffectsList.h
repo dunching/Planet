@@ -14,7 +14,7 @@
 class UEffectItem;
 
 UCLASS()
-class PLANET_API UEffectsList : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UEffectsList : public UMyUserWidget, public IMenuInterface
 {
 	GENERATED_BODY()
 

@@ -23,7 +23,7 @@ class UBasicUnit;
 UCLASS()
 class PLANET_API UGroupmateIcon :
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 

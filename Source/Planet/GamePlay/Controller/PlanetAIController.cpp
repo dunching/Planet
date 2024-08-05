@@ -34,9 +34,22 @@ APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitial
 
 void APlanetAIController::OnPossess(APawn* InPawn)
 {
+	bool bIsNewPawn = (InPawn && InPawn != GetPawn());
+
+	if (bIsNewPawn)
+	{
+		InitialCharacterUnit(Cast<ACharacterBase>(InPawn));
+	}
+
 	Super::OnPossess(InPawn);
 
-	BindPCWithCharacter();
+	if (bIsNewPawn)
+	{
+		if (InPawn)
+		{
+			BindPCWithCharacter();
+		}
+	}
 }
 
 UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() const
@@ -64,7 +77,7 @@ UTalentAllocationComponent* APlanetAIController::GetTalentAllocationComponent() 
 	return TalentAllocationComponentPtr;
 }
 
-UCharacterUnit* APlanetAIController::GetGourpMateUnit()
+UCharacterUnit* APlanetAIController::GetCharacterUnit()
 {
 	return CharacterUnitPtr;
 }
@@ -91,30 +104,37 @@ void APlanetAIController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr
 {
 	CharacterUnitPtr = NewGourpMateUnitPtr;
 
-	CharacterUnitPtr->ProxyCharacterPtr = GetPawn<FPawnType>();
-	CharacterUnitPtr->CharacterAttributes->Name = GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
+	//	CharacterUnitPtr->RemoveFromRoot();
 }
 
 void APlanetAIController::BindPCWithCharacter()
 {
-	// AI的控制器，第一次控制的角色即为控制器始终绑定的角色
-	if (!RealCharacter)
+	RealCharacter = GetPawn<FPawnType>();
+
+	CharacterUnitPtr->ProxyCharacterPtr = RealCharacter;
+	CharacterUnitPtr->CharacterAttributes->Name = RealCharacter->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
+}
+
+UCharacterUnit* APlanetAIController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
+{
+	if (CharacterUnitPtr)
 	{
-		RealCharacter = GetPawn<FPawnType>();
-
-		CharacterUnitPtr = nullptr;
-
-		// 通过临时 SceneUnitContainer 的创建UnitPtr
-		auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
-
-		ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
-
-		CharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
-
-		SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
-
-		SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
-		SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
-		SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
+		CharacterUnitPtr->RelieveRootBind();
 	}
+	CharacterUnitPtr = nullptr;
+
+	// 通过临时 SceneUnitContainer 的创建UnitPtr
+	auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
+
+	ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
+
+	CharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
+
+	SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
+
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
+	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
+
+	return CharacterUnitPtr;
 }

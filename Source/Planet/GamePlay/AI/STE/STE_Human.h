@@ -15,6 +15,7 @@
 
 class AActor;
 
+class UCharacterUnit;
 class ACharacterBase;
 class AHumanCharacter;
 class AHumanAIController;
@@ -38,6 +39,8 @@ class PLANET_API USTE_Human : public UStateTreeEvaluatorBlueprintBase
 	GENERATED_BODY()
 
 public:
+
+	using FCharacterUnitType = UCharacterUnit;
 
 protected:
 
@@ -104,7 +107,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
 	bool bIsNeedRun = false;
 
-	TCallbackHandleContainer<void(ETeammateOption, ACharacterBase*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
+	TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
 	
 	TCallbackHandleContainer<void()>::FCallbackHandleSPtr TeammateChangedDelegate;
 

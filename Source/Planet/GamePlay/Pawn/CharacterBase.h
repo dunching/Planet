@@ -48,7 +48,9 @@ class PLANET_API ACharacterBase :
 
 public:
 
-	using FTeamMembersChangedDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, ACharacterBase*)>::FCallbackHandleSPtr;
+	using FCharacterUnitType = UCharacterUnit;
+
+	using FTeamMembersChangedDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, FCharacterUnitType*)>::FCallbackHandleSPtr;
 
 	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
@@ -83,7 +85,7 @@ public:
 
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
 
-	UCharacterUnit* GetGourpMateUnit()const;
+	UCharacterUnit* GetCharacterUnit()const;
 
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
@@ -111,7 +113,7 @@ protected:
 
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
-		ACharacterBase* LeaderPCPtr
+		FCharacterUnitType* TargetCharacterUnitPtr
 	);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")

@@ -25,7 +25,7 @@ struct FStreamableHandle;
 UCLASS()
 class PLANET_API UDragDropOperationWidget :
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 

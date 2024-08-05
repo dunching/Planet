@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <Blueprint/IUserObjectListEntry.h>
 
 #include "GameplayTagContainer.h"
 
@@ -21,15 +22,19 @@ class UBasicUnit;
 UCLASS()
 class PLANET_API UAllocationIconBase :
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface,
+	public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
 public:
 
-	using FOnResetUnit = TCallbackHandleContainer<void(UBasicUnit*)>;
+	// ¾ÉµÄUnit£¬ÐÂµÄUnit
+	using FOnResetUnit = TCallbackHandleContainer<void(UBasicUnit*, UBasicUnit*)>;
 
 	UAllocationIconBase(const FObjectInitializer& ObjectInitializer);
+
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
@@ -39,7 +44,7 @@ public:
 
 	virtual void OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr);
 
-	virtual void OnSublingIconReset(UBasicUnit* UnitPtr);
+	virtual void SublingIconUnitChanged(UBasicUnit* UnitPtr);
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 
@@ -52,13 +57,15 @@ public:
 
 	FOnResetUnit OnResetUnit;
 
+	bool bPaseInvokeOnResetUnitEvent = false;
+
+	UBasicUnit* BasicUnitPtr = nullptr;
+
 protected:
 
 	virtual void SetItemType();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Adaptation UnitType")
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
-
-	UBasicUnit* BasicUnitPtr = nullptr;
 
 };

@@ -16,12 +16,12 @@
 class UBasicUnit;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UToolsIconInterface : public UInterface
+class UUnitIconInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class PLANET_API IToolsIconInterface
+class PLANET_API IUnitIconInterface
 {
 	GENERATED_BODY()
 
@@ -41,13 +41,13 @@ private:
 };
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UItemsMenuInterface : public UInterface
+class UMenuInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
 
-class PLANET_API IItemsMenuInterface
+class PLANET_API IMenuInterface
 {
 	GENERATED_BODY()
 

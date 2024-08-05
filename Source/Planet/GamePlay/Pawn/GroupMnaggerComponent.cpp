@@ -16,37 +16,22 @@
 
 FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
-void UGroupMnaggerComponent::AddCharacterToGroup(FPawnType* TargetCharaterPtr)
+void UGroupMnaggerComponent::AddCharacterToGroup(FCharacterUnitType* CharacterUnitPtr)
 {
-	// 
-	auto CharacterPtr = GetOwner<FOwnerType>()->GetRealCharacter();
-	if (CharacterPtr && CharacterPtr->IsPlayerControlled())
-	{
-		auto AIControllerPtr = TargetCharaterPtr->GetController<APlanetAIController>(); 
-
-		CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->AddUnit_Groupmate(TargetCharaterPtr->GetGourpMateUnit());
-
-		// 从上一个Group里面移除自己
-
-
-		// 
-		// TargetCharaterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()->RemoveUnit(TargetCharaterPtr->GetGourpMateUnit()->GetID());
-	}
-
 	//
-	GetGroupHelper()->AddCharacter(TargetCharaterPtr);
+	GetGroupHelper()->AddCharacter(CharacterUnitPtr);
 }
 
-void UGroupMnaggerComponent::AddCharacterToTeam(FPawnType* TargetCharaterPtr)
+void UGroupMnaggerComponent::AddCharacterToTeam(FCharacterUnitType* CharacterUnitPtr)
 {
-	GetGroupHelper()->AddCharacter(TargetCharaterPtr);
+	GetGroupHelper()->AddCharacter(CharacterUnitPtr);
 }
 
-void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* TargetCharaterPtr)
+void UGroupMnaggerComponent::OnAddToNewGroup(FCharacterUnitType* CharacterUnitPtr)
 {
-	GroupHelperSPtr = TargetCharaterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
+	GroupHelperSPtr = CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 
-	if (TargetCharaterPtr->IsPlayerControlled())
+	if (CharacterUnitPtr->ProxyCharacterPtr->IsPlayerControlled())
 	{
 		TeamHelperSPtr->SwitchTeammateOption(ETeammateOption::kFree);
 	}
@@ -54,21 +39,18 @@ void UGroupMnaggerComponent::OnAddToNewGroup(FPawnType* TargetCharaterPtr)
 	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-void UGroupMnaggerComponent::OnAddToNewTeam(FPawnType* TargetCharaterPtr)
+void UGroupMnaggerComponent::OnAddToNewTeam(FCharacterUnitType* CharacterUnitPtr)
 {
-	TeamHelperSPtr = TargetCharaterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
+	TeamHelperSPtr = CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-const TSharedPtr<FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupHelper() 
+const TSharedPtr<FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupHelper()
 {
 	if (!GroupHelperSPtr)
 	{
-		auto TargetCharaterPtr = GetOwner<FOwnerType>();
-		GroupHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateGroup(GetOwner<FOwnerType>()->GetRealCharacter());
-
-		GroupHelperChangedDelegateContainer.ExcuteCallback();
+		CreateGroup();
 	}
 	return GroupHelperSPtr;
 }
@@ -77,10 +59,7 @@ const TSharedPtr<FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
 {
 	if (!TeamHelperSPtr)
 	{
-		auto TargetCharaterPtr = GetOwner<FOwnerType>();
-		TeamHelperSPtr = UGroupsManaggerSubSystem::GetInstance()->CreateTeam(GetOwner<FOwnerType>()->GetRealCharacter());
-
-		TeamHelperChangedDelegateContainer.ExcuteCallback();
+		CreateTeam();
 	}
 	return TeamHelperSPtr;
 }
@@ -88,4 +67,73 @@ const TSharedPtr<FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
 void UGroupMnaggerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+TSharedPtr<FGroupMatesHelper> UGroupMnaggerComponent::CreateGroup()
+{
+	GroupHelperSPtr = MakeShared<FGroupMatesHelper>();
+	GroupHelperSPtr->OwnerCharacterUnitPtr = GetOwner<IPlanetControllerInterface>()->GetCharacterUnit();
+	for (;;)
+	{
+		GroupHelperSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		break;
+	}
+
+	GroupHelperChangedDelegateContainer.ExcuteCallback();
+
+	return GroupHelperSPtr;
+}
+
+TSharedPtr<FTeamMatesHelper> UGroupMnaggerComponent::CreateTeam()
+{
+	TeamHelperSPtr = MakeShared<FTeamMatesHelper>();
+	TeamHelperSPtr->OwnerCharacterUnitPtr = GetOwner<IPlanetControllerInterface>()->GetCharacterUnit();
+	for (;;)
+	{
+		TeamHelperSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
+		break;
+	}
+
+	TeamHelperChangedDelegateContainer.ExcuteCallback();
+
+	return TeamHelperSPtr;
+}
+
+void FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
+{
+	auto CharacterUnitPtr = PCPtr->GetCharacterUnit();
+	AddCharacter(CharacterUnitPtr);
+}
+
+void FGroupMatesHelper::AddCharacter(FCharacterUnitType* CharacterUnitPtr)
+{
+	MembersSet.Add(CharacterUnitPtr);
+
+	CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerCharacterUnitPtr);
+
+	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterUnitPtr);
+}
+
+bool FGroupMatesHelper::IsMember(FCharacterUnitType* CharacterUnitPtr) const
+{
+	for (auto Iter : MembersSet)
+	{
+		if (Iter == CharacterUnitPtr)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void FTeamMatesHelper::SwitchTeammateOption(ETeammateOption InTeammateOption)
+{
+	TeammateOption = InTeammateOption;
+
+	TeammateOptionChanged.ExcuteCallback(InTeammateOption, OwnerCharacterUnitPtr);
+}
+
+ETeammateOption FTeamMatesHelper::GetTeammateOption() const
+{
+	return TeammateOption;
 }

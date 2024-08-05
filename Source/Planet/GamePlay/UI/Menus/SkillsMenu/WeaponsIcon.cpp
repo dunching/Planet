@@ -41,18 +41,13 @@ void UWeaponsIcon::ResetToolUIByData(UBasicUnit * InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
+	UnitPtr = nullptr;
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
 		UnitPtr = Cast<UWeaponUnit>(BasicUnitPtr);
 	}
-	else
-	{
-		UnitPtr = nullptr;
-	}
 
-	OnResetUnit.ExcuteCallback(UnitPtr);
 	OnResetUnit_Weapon.ExcuteCallback(UnitPtr);
-	SetItemType();
 }
 
 void UWeaponsIcon::EnableIcon(bool bIsEnable)

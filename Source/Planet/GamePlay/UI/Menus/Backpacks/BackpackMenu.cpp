@@ -62,7 +62,7 @@ void UBackpackMenu::ResetUIByData_Skill()
 	
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
+	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -95,7 +95,7 @@ void UBackpackMenu::ResetUIByData_Weapon()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
+	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -127,7 +127,7 @@ void UBackpackMenu::ResetUIByData_Consumable()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
+	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -159,7 +159,7 @@ void UBackpackMenu::ResetUIByData_All()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner->GetSceneUintAry();
+	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)

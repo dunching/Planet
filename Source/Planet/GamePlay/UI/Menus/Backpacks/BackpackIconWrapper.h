@@ -26,7 +26,7 @@ class UBackpackWeaponIcon;
 UCLASS()
 class PLANET_API UBackpackIconWrapper :
 	public UMyUserWidget,
-	public IToolsIconInterface,
+	public IUnitIconInterface,
 	public IUserObjectListEntry
 {
 	GENERATED_BODY()

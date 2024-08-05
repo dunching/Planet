@@ -64,7 +64,7 @@ void UTeamMatesList::ResetUIByData()
 	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
 	if (MembersHelperSPtr)
 	{
-		for (auto Iter : MembersHelperSPtr->MembersMap)
+		for (auto Iter : MembersHelperSPtr->MembersSet)
 		{
 			CurrentMemberNum++;
 			auto WidgetPtr = CreateWidget<UTeamMateInfo>(this, TeamMateInfoClass);
@@ -72,7 +72,7 @@ void UTeamMatesList::ResetUIByData()
 			{
 				PanelPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->ResetToolUIByData(Iter.Key);
+				WidgetPtr->ResetToolUIByData(Iter);
 				DelegateAry.Add(WidgetPtr->OnDroped.AddCallback(std::bind(&ThisClass::OnTeammateChanged, this, std::placeholders::_1)));
 			}
 		}

@@ -17,6 +17,10 @@ UWeaponUnit* FSceneUnitContainer::AddUnit_Weapon(FGameplayTag UnitType)
 	auto ResultPtr = NewObject<UWeaponUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 	ResultPtr->AddToRoot();
 
+#if WITH_EDITOR
+	TestGCUnitMap.Add(ResultPtr);
+#endif
+
 	for (;;)
 	{
 		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
@@ -60,6 +64,10 @@ USkillUnit* FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
 
 		auto ResultPtr = NewObject<USkillUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 		ResultPtr->AddToRoot();
+
+#if WITH_EDITOR
+		TestGCUnitMap.Add(ResultPtr);
+#endif
 
 		if (!ResultPtr)
 		{
@@ -148,6 +156,10 @@ UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, 
 		auto ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 		ResultPtr->AddToRoot();
 
+#if WITH_EDITOR
+		TestGCUnitMap.Add(ResultPtr);
+#endif
+
 		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
 
 		ResultPtr->Num = Num;
@@ -170,6 +182,10 @@ UToolUnit* FSceneUnitContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 
 	auto ResultPtr = NewObject<UToolUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 	ResultPtr->AddToRoot();
+
+#if WITH_EDITOR
+	TestGCUnitMap.Add(ResultPtr);
+#endif
 
 	for (;;)
 	{
@@ -199,6 +215,11 @@ FSceneUnitContainer::~FSceneUnitContainer()
 	{
 		if (Iter)
 		{
+			if (TestGCUnitMap.Contains(Iter))
+			{
+				TestGCUnitMap.Remove(Iter);
+			}
+
 			Iter->RemoveFromRoot();
 		}
 	}
@@ -280,6 +301,10 @@ UCoinUnit* FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*
 
 		auto ResultPtr = NewObject<UCoinUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
 		ResultPtr->AddToRoot();
+
+#if WITH_EDITOR
+		TestGCUnitMap.Add(ResultPtr);
+#endif
 
 		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
 

@@ -35,10 +35,6 @@ public:
 
 	virtual TPair<FVector, FVector>GetCharacterViewInfo();
 
-	virtual bool IsGroupmate(ACharacterBase* TargetCharacterPtr)const override;
-
-	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const override;
-
 protected:
 
 	virtual void BeginPlay() override;

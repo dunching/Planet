@@ -63,10 +63,13 @@ void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		CharacterAttributesRef.BaseAttackPower.RemoveCurrentValue(PropertuModify_GUID);
-		CharacterAttributesRef.Penetration.RemoveCurrentValue(PropertuModify_GUID);
-		CharacterAttributesRef.PercentPenetration.RemoveCurrentValue(PropertuModify_GUID);
+		if (CharacterPtr->GetCharacterAttributesComponent())
+		{
+			auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			CharacterAttributesRef.BaseAttackPower.RemoveCurrentValue(PropertuModify_GUID);
+			CharacterAttributesRef.Penetration.RemoveCurrentValue(PropertuModify_GUID);
+			CharacterAttributesRef.PercentPenetration.RemoveCurrentValue(PropertuModify_GUID);
+		}
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -147,9 +150,9 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
 		if (TeamsHelperSPtr)
 		{
-			for (auto Iter : TeamsHelperSPtr->MembersMap)
+			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				CapsuleParams.AddIgnoredActor(Iter.Value);
+				CapsuleParams.AddIgnoredActor(Iter->ProxyCharacterPtr);
 			}
 		}
 	}

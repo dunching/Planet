@@ -46,16 +46,6 @@ void USkillsIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
-	UnitPtr = nullptr;
-	if (BasicUnitPtr && (
-		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-		BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) 
-		))
-	{
-		UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
-	}
-
-	OnResetUnit.ExcuteCallback(UnitPtr);
 	SetLevel();
 }
 

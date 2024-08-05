@@ -41,7 +41,7 @@ public:
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const = 0;
 
-	virtual UCharacterUnit* GetGourpMateUnit() = 0;
+	virtual UCharacterUnit* GetCharacterUnit() = 0;
 
 	virtual ACharacterBase* GetRealCharacter()const = 0;
 
@@ -53,6 +53,8 @@ public:
 	virtual void BindPCWithCharacter() = 0;
 
 protected:
+
+	virtual UCharacterUnit* InitialCharacterUnit(ACharacterBase * CharaterPtr) = 0;
 
 private:
 

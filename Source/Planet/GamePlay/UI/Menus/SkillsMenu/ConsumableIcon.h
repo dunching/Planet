@@ -33,8 +33,6 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	UConsumableUnit* UnitPtr = nullptr;
-
 protected:
 
 	virtual void NativeConstruct()override;

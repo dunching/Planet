@@ -242,12 +242,20 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 {
 	bool bIsNewPawn = (InPawn && InPawn != GetPawn());
 
+	if (bIsNewPawn)
+	{
+		InitialCharacterUnit(Cast<ACharacterBase>(InPawn));
+	}
+
 	Super::OnPossess(InPawn);
 
 	if (bIsNewPawn)
 	{
 		if (InPawn)
 		{
+			// 注意：PC并非是在此处绑定，这段仅为测试
+			BindPCWithCharacter();
+
 			if (InPawn->IsA(AHumanCharacter::StaticClass()))
 			{
 				// 在SetPawn之后调用
@@ -267,9 +275,6 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 			}
 		}
 	}
-
-	// 注意：PC并非是在此处绑定，这段仅为测试
-	BindPCWithCharacter();
 }
 
 void APlanetPlayerController::OnUnPossess()
@@ -302,9 +307,6 @@ void APlanetPlayerController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUni
 {
 	CharacterUnitPtr = NewGourpMateUnitPtr;
 
-	CharacterUnitPtr->ProxyCharacterPtr = GetPawn<FPawnType>();
-	CharacterUnitPtr->CharacterAttributes->Name = GetPawn<FPawnType>()->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
-
 //	CharacterUnitPtr->RemoveFromRoot();
 }
 
@@ -333,7 +335,7 @@ UTalentAllocationComponent* APlanetPlayerController::GetTalentAllocationComponen
 	return TalentAllocationComponentPtr;
 }
 
-UCharacterUnit* APlanetPlayerController::GetGourpMateUnit()
+UCharacterUnit* APlanetPlayerController::GetCharacterUnit()
 {
 	return CharacterUnitPtr;
 }
@@ -347,6 +349,12 @@ void APlanetPlayerController::BindPCWithCharacter()
 {
 	RealCharacter = GetPawn<FPawnType>();
 
+	CharacterUnitPtr->ProxyCharacterPtr = RealCharacter;
+	CharacterUnitPtr->CharacterAttributes->Name = RealCharacter->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
+}
+
+UCharacterUnit* APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
+{
 	if (CharacterUnitPtr)
 	{
 		CharacterUnitPtr->RelieveRootBind();
@@ -365,6 +373,8 @@ void APlanetPlayerController::BindPCWithCharacter()
 	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
 	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
 	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
+
+	return CharacterUnitPtr;
 }
 
 void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)

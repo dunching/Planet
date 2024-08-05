@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include <Blueprint/IUserObjectListEntry.h>
 
 #include "UIInterfaces.h"
 #include "GenerateType.h"
@@ -20,13 +21,18 @@ class USkillUnit;
  *
  */
 UCLASS()
-class PLANET_API UActionSkillsIcon : public UMyUserWidget, public IToolsIconInterface
+class PLANET_API UActionSkillsIcon : 
+	public UMyUserWidget,
+	public IUnitIconInterface,
+	public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
 public:
 
 	UActionSkillsIcon(const FObjectInitializer& ObjectInitializer);
+
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 

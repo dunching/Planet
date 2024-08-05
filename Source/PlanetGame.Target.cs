@@ -10,7 +10,7 @@ public class PlanetGameTarget : TargetRules
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
 
         Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
 		ExtraModuleNames.AddRange( new string[] {
             "Planet",

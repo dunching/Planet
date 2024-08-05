@@ -21,7 +21,7 @@ class UCharacterUnit;
  *
  */
 UCLASS()
-class PLANET_API UAllocationSkillsMenu : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UAllocationSkillsMenu : public UMyUserWidget, public IMenuInterface
 {
 	GENERATED_BODY()
 
@@ -41,11 +41,21 @@ protected:
 
 	virtual void ResetUIByData()override;
 
+	void BindEvent();
+
+	void ResetUI(UCharacterUnit* TargetCharacterUnitPtr, UCharacterUnit* PlayerCharacterUnitPtr);
+
 	void InitialGroupmateList();
 
-	void ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocket);
+	void ResetBackpack(UCharacterUnit * AICharacterUnitPtr, UCharacterUnit* PlayerCharacterUnitPtr);
 
-	void BindEvent();
+	void ResetUIByData_WeaponSkills(UCharacterUnit* PlayerCharacterUnitPtr);
+
+	void ResetUIByData_Skills(UCharacterUnit* PlayerCharacterUnitPtr);
+
+	void ResetUIByData_Consumable(UCharacterUnit* PlayerCharacterUnitPtr);
+
+	void SyncAllocation2Character();
 
 	void OnMainWeaponChanged(UWeaponUnit* ToolSPtr);
 
@@ -53,7 +63,13 @@ protected:
 
 	void OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr);
 	
-	void OnSelectedGourpmate(UCharacterUnit* UnitPtr);
+	void OnSelectedCharacterUnit(UCharacterUnit* UnitPtr);
+
+	void OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
+	
+	void OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
+
+	void OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 
@@ -78,5 +94,7 @@ protected:
 	TSubclassOf<UGroupmateIcon>GroupmateIconClass;
 	
 private:
+
+	UCharacterUnit* CurrentUnitPtr = nullptr;
 
 };

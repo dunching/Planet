@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include <Blueprint/IUserObjectListEntry.h>
 
 #include "UIInterfaces.h"
 #include "MyUserWidget.h"
@@ -23,7 +24,8 @@ class UTeamMatesList;
 UCLASS()
 class PLANET_API UTeamMateInfo :
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface,
+	public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
@@ -32,6 +34,8 @@ public:
 	friend UTeamMatesList;
 
 	using FCallbackHandleContainer = TCallbackHandleContainer<void(UTeamMateInfo*)>;
+
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 

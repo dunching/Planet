@@ -30,6 +30,13 @@ void UPlanetGameInstance::Shutdown()
 {
 	bIsExiting = true;
 
+	GUObjectArray.ShutdownUObjectArray();
+
+#if WITH_EDITOR
+	auto TestMap1 = TestGCUnitMap;
+	check(TestMap1.IsEmpty());
+#endif
+
 	UInputProcessorSubSystem::GetInstance()->ResetProcessor();
 
 	Super::Shutdown();

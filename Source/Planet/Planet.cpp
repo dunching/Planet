@@ -7,3 +7,5 @@
 #include "GamePlay/GameInstance/PlanetGameInstance.h"
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Planet, "Planet" );
+
+TArray<class UBasicUnit*> TestGCUnitMap;

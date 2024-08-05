@@ -20,7 +20,7 @@ struct FTableRowUnit;
 UCLASS()
 class PLANET_API URaffle_Unit :
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 

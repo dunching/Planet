@@ -13,7 +13,7 @@
 struct FStreamableHandle;
 
 UCLASS()
-class PLANET_API UGetItemInfosItem : public UMyUserWidget, public IToolsIconInterface
+class PLANET_API UGetItemInfosItem : public UMyUserWidget, public IUnitIconInterface
 {
 	GENERATED_BODY()
 

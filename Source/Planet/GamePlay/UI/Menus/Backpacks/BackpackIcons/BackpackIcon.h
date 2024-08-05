@@ -15,6 +15,7 @@ struct FStreamableHandle;
 
 class UBasicUnit;
 class UToolUnit;
+class UCharacterUnit;
 
 /**
  *
@@ -22,7 +23,7 @@ class UToolUnit;
 UCLASS()
 class PLANET_API UBackpackIcon :
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 
@@ -37,6 +38,8 @@ public:
 	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
+	
+	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
 
 	FOnDragDelegate OnDragDelegate;
 

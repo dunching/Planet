@@ -14,14 +14,18 @@
 class UHUD_TeamMateInfo;
 
 UCLASS()
-class PLANET_API UHUD_TeamInfo : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UHUD_TeamInfo :
+	public UMyUserWidget,
+	public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	using FTeammateOptionChangedDelegateContainer =
-		UGroupsManaggerSubSystem::FTeammateOptionChangedDelegateContainer::FCallbackHandleSPtr;
+	using FCharacterUnitType = UCharacterUnit;
+
+	using FTeammateOptionChangedDelegate =
+		TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -40,9 +44,9 @@ private:
 
 	void OnTeammateOptionChanged(
 		ETeammateOption TeammateOption, 
-		UGroupsManaggerSubSystem::FPawnType* LeaderPCPtr
+		FCharacterUnitType* LeaderPCPtr
 	);
 
-	FTeammateOptionChangedDelegateContainer TeammateOptionChangedDelegateContainer;
+	FTeammateOptionChangedDelegate TeammateOptionChangedDelegateContainer;
 
 };

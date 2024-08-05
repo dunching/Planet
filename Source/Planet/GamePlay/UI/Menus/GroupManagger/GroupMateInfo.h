@@ -22,7 +22,7 @@ class UCharacterUnit;
 UCLASS()
 class PLANET_API UGroupMateInfo :
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 

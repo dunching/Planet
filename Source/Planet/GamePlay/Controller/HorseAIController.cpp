@@ -46,28 +46,6 @@ AActor* AHorseAIController::GetTeamFocusTarget() const
 {
 	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
 	{
-		{
-			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<APlanetPlayerController>();
-			if (LeaderPCPtr)
-			{
-				return LeaderPCPtr->GetFocusActor();
-			}
-		}
-		{
-			auto LeaderPCPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerPtr->GetController<AHorseAIController>();
-			if (LeaderPCPtr)
-			{
-				auto ResultPtr = LeaderPCPtr->GetFocusActor();
-				if (ResultPtr)
-				{
-					return ResultPtr;
-				}
-				else
-				{
-					return LeaderPCPtr->TargetCharacterPtr.Get();
-				}
-			}
-		}
 	}
 
 	return nullptr;
@@ -75,10 +53,9 @@ AActor* AHorseAIController::GetTeamFocusTarget() const
 
 void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	ACharacterBase* LeaderPCPtr
+	FCharacterUnitType* LeaderPCPtr
 )
 {
-	OnTeammateOptionChanged(TeammateOption, LeaderPCPtr);
 }
 
 void AHorseAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
@@ -149,9 +126,9 @@ void AHorseAIController::OnPossess(APawn* InPawn)
 
 void AHorseAIController::OnUnPossess()
 {
-	if (TeammateOptionChangedDelegateContainer)
+	if (TeammateOptionChangedDelegate)
 	{
-		TeammateOptionChangedDelegateContainer->UnBindCallback();
+		TeammateOptionChangedDelegate->UnBindCallback();
 	}
 
 	if (TeamHelperChangedDelegate)
@@ -178,11 +155,11 @@ void AHorseAIController::OnTeamChanged()
 	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
 	if (TeamsHelper)
 	{
-		TeammateOptionChangedDelegateContainer = TeamsHelper->TeammateOptionChanged.AddCallback(
+		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerPtr);
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterUnitPtr);
 	}
 }
 

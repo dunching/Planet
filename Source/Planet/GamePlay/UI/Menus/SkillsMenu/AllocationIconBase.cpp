@@ -36,6 +36,13 @@ UAllocationIconBase::UAllocationIconBase(const FObjectInitializer& ObjectInitial
 
 }
 
+void UAllocationIconBase::NativeOnListItemObjectSet(UObject* ListItemObject)
+{
+	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
+
+	InvokeReset(Cast<ThisClass>(ListItemObject));
+}
+
 void UAllocationIconBase::InvokeReset(UUserWidget* InBasicUnitPtr)
 {
 	if (InBasicUnitPtr)
@@ -51,14 +58,24 @@ void UAllocationIconBase::InvokeReset(UUserWidget* InBasicUnitPtr)
 
 void UAllocationIconBase::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 {
+	if (InBasicUnitPtr == BasicUnitPtr)
+	{
+		return;
+	}
+
+	auto PreviousUnitPtr = BasicUnitPtr;
+	UBasicUnit * NewUnitPtr = nullptr;
 	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UnitType))
 	{
-		BasicUnitPtr = InBasicUnitPtr;
+		NewUnitPtr = InBasicUnitPtr;
 	}
-	else
+
+	if (!bPaseInvokeOnResetUnitEvent)
 	{
-		BasicUnitPtr = nullptr;
+		OnResetUnit.ExcuteCallback(PreviousUnitPtr, NewUnitPtr);
 	}
+
+	BasicUnitPtr = NewUnitPtr;
 
 	SetItemType();
 }
@@ -87,7 +104,7 @@ void UAllocationIconBase::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
 	}
 }
 
-void UAllocationIconBase::OnSublingIconReset(UBasicUnit* UnitPtr)
+void UAllocationIconBase::SublingIconUnitChanged(UBasicUnit* UnitPtr)
 {
 	if (BasicUnitPtr && (BasicUnitPtr == UnitPtr))
 	{

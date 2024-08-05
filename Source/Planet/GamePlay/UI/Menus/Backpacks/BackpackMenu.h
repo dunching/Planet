@@ -22,7 +22,7 @@ class UWeaponUnit;
  *
  */
 UCLASS()
-class PLANET_API UBackpackMenu : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UBackpackMenu : public UMyUserWidget, public IMenuInterface
 {
 	GENERATED_BODY()
 
@@ -68,6 +68,6 @@ private:
 
 	void ResetUIByData_All();
 
-	TSharedPtr<FSceneUnitContainer> SceneUnitContariner;
+	TWeakPtr<FSceneUnitContainer> SceneUnitContariner;
 
 };

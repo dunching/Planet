@@ -25,6 +25,7 @@
 #include "ConsumableIcon.h"
 #include "GroupmateIcon.h"
 #include "SceneUnitContainer.h"
+#include "GroupMnaggerComponent.h"
 
 struct FAllocationSkillsMenu : public TGetSocketName<FAllocationSkillsMenu>
 {
@@ -96,9 +97,9 @@ void UAllocationSkillsMenu::NativeConstruct()
 		return;
 	}
 
-	BindEvent();
-
 	ResetUIByData();
+
+	BindEvent();
 }
 
 void UAllocationSkillsMenu::NativeDestruct()
@@ -117,7 +118,125 @@ void UAllocationSkillsMenu::NativeDestruct()
 		SecondaryDelegateHandleSPtr->UnBindCallback();
 	}
 
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	SyncAllocation2Character();
+}
+
+void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(UCharacterUnit* PlayerCharacterUnitPtr)
+{
+	auto CharacterPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr;
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+
+	TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
+
+	EICPtr->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+
+	{
+		{
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
+			if (IconPtr)
+			{
+				IconPtr->bPaseInvokeOnResetUnitEvent = true;
+				IconPtr->ResetToolUIByData(
+					FirstWeaponSocketInfoSPtr ?
+					FirstWeaponSocketInfoSPtr->WeaponUnitPtr : 
+					nullptr
+				);
+				IconPtr->bPaseInvokeOnResetUnitEvent = false;
+			}
+		}
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill1));
+		if (IconPtr)
+		{
+			IconPtr->bPaseInvokeOnResetUnitEvent = true;
+			IconPtr->ResetToolUIByData(
+				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->WeaponUnitPtr ? 
+				FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill : 
+				nullptr
+			);
+			IconPtr->bPaseInvokeOnResetUnitEvent = false;
+		}
+	}
+
+	{
+		{
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
+			if (IconPtr)
+			{
+				IconPtr->bPaseInvokeOnResetUnitEvent = true;
+				IconPtr->ResetToolUIByData(
+					SecondWeaponSocketInfoSPtr ?
+					SecondWeaponSocketInfoSPtr->WeaponUnitPtr : 
+					nullptr
+				);
+				IconPtr->bPaseInvokeOnResetUnitEvent = false;
+			}
+		}
+		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill2));
+		if (IconPtr)
+		{
+			IconPtr->bPaseInvokeOnResetUnitEvent = true;
+			IconPtr->ResetToolUIByData(
+				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->WeaponUnitPtr ?
+				SecondWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill :
+				nullptr
+			);
+			IconPtr->bPaseInvokeOnResetUnitEvent = false;
+		}
+	}
+}
+
+void UAllocationSkillsMenu::ResetUIByData_Skills(UCharacterUnit* PlayerCharacterUnitPtr)
+{
+	{
+		TArray<FName>Ary
+		{
+			FAllocationSkillsMenu::Get().ActiveSkill1,
+			FAllocationSkillsMenu::Get().ActiveSkill2,
+			FAllocationSkillsMenu::Get().ActiveSkill3,
+			FAllocationSkillsMenu::Get().ActiveSkill4 ,
+			FAllocationSkillsMenu::Get().PassivSkill1,
+			FAllocationSkillsMenu::Get().PassivSkill2,
+			FAllocationSkillsMenu::Get().PassivSkill3,
+			FAllocationSkillsMenu::Get().PassivSkill4,
+			FAllocationSkillsMenu::Get().PassivSkill5,
+			FAllocationSkillsMenu::Get().TalentPassivSkill,
+		};
+
+		auto EICPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr->GetInteractiveSkillComponent();
+		for (const auto& Iter : Ary)
+		{
+			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
+			if (IconPtr)
+			{
+				auto Result =  EICPtr->FindSkill(IconPtr->IconSocket);
+
+				IconPtr->bPaseInvokeOnResetUnitEvent = true;
+				IconPtr->ResetToolUIByData(Result ? Result->SkillUnit : nullptr);
+				IconPtr->bPaseInvokeOnResetUnitEvent = false;
+			}
+		}
+	}
+}
+
+void UAllocationSkillsMenu::ResetUIByData_Consumable(UCharacterUnit* PlayerCharacterUnitPtr)
+{
+
+}
+
+void UAllocationSkillsMenu::SyncAllocation2Character()
+{
+	if (!CurrentUnitPtr)
+	{
+		return;
+	}
+
+	auto CharacterPtr = CurrentUnitPtr->ProxyCharacterPtr;
 	if (!CharacterPtr)
 	{
 		return;
@@ -166,7 +285,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 			{FAllocationSkillsMenu::Get().PassivSkill3,EKeys::Invalid},
 			{FAllocationSkillsMenu::Get().PassivSkill4,EKeys::Invalid},
 			{FAllocationSkillsMenu::Get().PassivSkill5,EKeys::Invalid},
-//			{FAllocationSkillsMenu::Get().TalentPassivSkill,EKeys::Invalid},
+			//			{FAllocationSkillsMenu::Get().TalentPassivSkill,EKeys::Invalid},
 		};
 
 		TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
@@ -176,12 +295,12 @@ void UAllocationSkillsMenu::NativeDestruct()
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
 			if (IconPtr)
 			{
-				if (IconPtr->UnitPtr)
+				if (IconPtr->BasicUnitPtr)
 				{
 					TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 					SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
-					SkillsSocketInfo->SkillUnit = IconPtr->UnitPtr;
+					SkillsSocketInfo->SkillUnit = Cast<USkillUnit>(IconPtr->BasicUnitPtr);
 					SkillsSocketInfo->Key = Iter.Key;
 
 					SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
@@ -195,79 +314,6 @@ void UAllocationSkillsMenu::NativeDestruct()
 			}
 		}
 		EICPtr->RegisterMultiGAs(SkillsMap);
-	}
-}
-
-void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(EWeaponSocket WeaponSocket)
-{
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (!CharacterPtr)
-	{
-		return;
-	}
-
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-
-	TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
-	switch (WeaponSocket)
-	{
-	case EWeaponSocket::kNone:
-	case EWeaponSocket::kMain:
-	{
-		EICPtr->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
-	}
-	break;
-	case EWeaponSocket::kSecondary:
-	{
-		EICPtr->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
-	}
-	break;
-	}
-	{
-		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
-			if (IconPtr)
-			{
-				IconPtr->ResetToolUIByData(
-					FirstWeaponSocketInfoSPtr ?
-					FirstWeaponSocketInfoSPtr->WeaponUnitPtr : 
-					nullptr
-				);
-			}
-		}
-		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill1));
-		if (IconPtr)
-		{
-			IconPtr->ResetToolUIByData(
-				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->WeaponUnitPtr ? 
-				FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill : 
-				nullptr
-			);
-		}
-	}
-
-	{
-		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
-			if (IconPtr)
-			{
-				IconPtr->ResetToolUIByData(
-					SecondWeaponSocketInfoSPtr ?
-					SecondWeaponSocketInfoSPtr->WeaponUnitPtr : 
-					nullptr
-				);
-			}
-		}
-		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill2));
-		if (IconPtr)
-		{
-			IconPtr->ResetToolUIByData(
-				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->WeaponUnitPtr ?
-				SecondWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill :
-				nullptr
-			);
-		}
 	}
 }
 
@@ -308,22 +354,16 @@ void UAllocationSkillsMenu::BindEvent()
 			{FAllocationSkillsMenu::Get().TalentPassivSkill},
 		};
 
-		for (const auto& FirstIter : Ary)
+		for (const auto& Iter : Ary)
 		{
-			for (const auto& SecondIter : Ary)
+			auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
+			if (UIPtr)
 			{
-				if (FirstIter == SecondIter)
-				{
-					continue;
-				}
-				auto FirstPtr = Cast<USkillsIcon>(GetWidgetFromName(FirstIter));
-				auto SecondPtr = Cast<USkillsIcon>(GetWidgetFromName(SecondIter));
-				if (FirstPtr && SecondPtr)
-				{
-					auto Result = SecondPtr->OnResetUnit.AddCallback(
-						std::bind(&USkillsIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
-					Result->bIsAutoUnregister = false;
-				}
+				auto Result = UIPtr->OnResetUnit.AddCallback(
+					std::bind(&ThisClass::OnSkillUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+					)
+				);
+				Result->bIsAutoUnregister = false;
 			}
 		}
 	}
@@ -336,22 +376,16 @@ void UAllocationSkillsMenu::BindEvent()
 			{FAllocationSkillsMenu::Get().Consumable4},
 		};
 
-		for (const auto& FirstIter : Ary)
+		for (const auto& Iter : Ary)
 		{
-			for (const auto& SecondIter : Ary)
+			auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
+			if (UIPtr)
 			{
-				if (FirstIter == SecondIter)
-				{
-					continue;
-				}
-				auto FirstPtr = Cast<UConsumableIcon>(GetWidgetFromName(FirstIter));
-				auto SecondPtr = Cast<UConsumableIcon>(GetWidgetFromName(SecondIter));
-				if (FirstPtr && SecondPtr)
-				{
-					auto Result = SecondPtr->OnResetUnit.AddCallback(
-						std::bind(&UConsumableIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
-					Result->bIsAutoUnregister = false;
-				}
+				auto Result = UIPtr->OnResetUnit.AddCallback(
+					std::bind(&ThisClass::OnConsumableUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+					)
+				);
+				Result->bIsAutoUnregister = false;
 			}
 		}
 	}
@@ -362,47 +396,35 @@ void UAllocationSkillsMenu::BindEvent()
 			{FAllocationSkillsMenu::Get().SecondaryWeapon},
 		};
 
-		for (const auto& FirstIter : Ary)
+		for (const auto& Iter : Ary)
 		{
-			for (const auto& SecondIter : Ary)
+			auto UIPtr = Cast<UWeaponsIcon>(GetWidgetFromName(Iter));
+			if (UIPtr)
 			{
-				if (FirstIter == SecondIter)
-				{
-					continue;
-				}
-				auto FirstPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FirstIter));
-				auto SecondPtr = Cast<UWeaponsIcon>(GetWidgetFromName(SecondIter));
-				if (FirstPtr && SecondPtr)
-				{
-					auto Result = SecondPtr->OnResetUnit.AddCallback(
-						std::bind(&UWeaponsIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
-					Result->bIsAutoUnregister = false;
-				}
+				auto Result = UIPtr->OnResetUnit.AddCallback(
+					std::bind(&ThisClass::OnWeaponUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+					)
+				);
+				Result->bIsAutoUnregister = false;
 			}
 		}
 	}
+}
+
+void UAllocationSkillsMenu::ResetUI(UCharacterUnit* TargetCharacterUnitPtr, UCharacterUnit* PlayerCharacterUnitPtr)
+{
+	CurrentUnitPtr = TargetCharacterUnitPtr;
+	ResetUIByData_WeaponSkills(CurrentUnitPtr);
+	if (TargetCharacterUnitPtr == PlayerCharacterUnitPtr)
 	{
-		auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-		if (!CharacterPtr)
-		{
-			return;
-		}
-
-		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
-
- 		UIPtr->SetHoldItemProperty(
- 			CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer()
- 		);
-		UIPtr->ResetUIByData();
-
-		{
-			auto Delegate = 
-				UIPtr->OnDragIconDelegate.AddCallback(std::bind(&ThisClass::OnDragIcon, this, std::placeholders::_1, std::placeholders::_2));
-			Delegate->bIsAutoUnregister = false;
-		}
-		
-		UIPtr->ResetUIByData();
+		ResetBackpack(nullptr, PlayerCharacterUnitPtr);
 	}
+	else
+	{
+		ResetBackpack(TargetCharacterUnitPtr, PlayerCharacterUnitPtr);
+	}
+	ResetUIByData_Skills(CurrentUnitPtr);
+	ResetUIByData_Consumable(CurrentUnitPtr);
 }
 
 void UAllocationSkillsMenu::ResetUIByData()
@@ -413,37 +435,9 @@ void UAllocationSkillsMenu::ResetUIByData()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-
-	ResetUIByData_WeaponSkills(EICPtr->GetActivedWeaponType());
-
-	{
-		TArray<FName>Ary
-		{
-			FAllocationSkillsMenu::Get().ActiveSkill1,
-			FAllocationSkillsMenu::Get().ActiveSkill2,
-			FAllocationSkillsMenu::Get().ActiveSkill3,
-			FAllocationSkillsMenu::Get().ActiveSkill4 ,
-			FAllocationSkillsMenu::Get().PassivSkill1,
-			FAllocationSkillsMenu::Get().PassivSkill2,
-			FAllocationSkillsMenu::Get().PassivSkill3,
-			FAllocationSkillsMenu::Get().PassivSkill4,
-			FAllocationSkillsMenu::Get().PassivSkill5,
-			FAllocationSkillsMenu::Get().TalentPassivSkill,
-		};
-
-		for (const auto& Iter : Ary)
-		{
-			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
-			if (IconPtr)
-			{
-				auto Result = EICPtr->FindSkill(IconPtr->IconSocket);
-				IconPtr->ResetToolUIByData(Result ? Result->SkillUnit : nullptr);
-			}
-		}
-	}
-
 	InitialGroupmateList();
+
+	ResetUI(CharacterPtr->GetCharacterUnit(), CharacterPtr->GetCharacterUnit());
 }
 
 void UAllocationSkillsMenu::InitialGroupmateList()
@@ -456,10 +450,24 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 			return;
 		}
 		UIPtr->ClearChildren();
+		{
+			auto WidgetPtr = CreateWidget<UGroupmateIcon>(this, GroupmateIconClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->ResetToolUIByData(CharacterPtr->GetCharacterUnit());
+				{
+					auto Handle = WidgetPtr->OnSelected.AddCallback(std::bind(&ThisClass::OnSelectedCharacterUnit, this, std::placeholders::_1));
+					Handle->bIsAutoUnregister = false;
+				}
+				UIPtr->AddChild(WidgetPtr);
 
-		auto SceneUnitContainerRef = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
+				WidgetPtr->SwitchSelectState(true);
+			}
+		}
+		auto GroupHelperSPtr = CharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 		
-		auto GroupmateUnitAry = SceneUnitContainerRef->GetGourpmateUintAry();
+		auto GroupmateUnitAry = GroupHelperSPtr->MembersSet;
+
 		for (auto Iter : GroupmateUnitAry)
 		{
 			auto WidgetPtr = CreateWidget<UGroupmateIcon>(this, GroupmateIconClass);
@@ -467,12 +475,50 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 			{
 				WidgetPtr->ResetToolUIByData(Iter);
 				{
-					auto Handle = WidgetPtr->OnSelected.AddCallback(std::bind(&ThisClass::OnSelectedGourpmate, this, std::placeholders::_1)); 
+					auto Handle = WidgetPtr->OnSelected.AddCallback(std::bind(&ThisClass::OnSelectedCharacterUnit, this, std::placeholders::_1));
 					Handle->bIsAutoUnregister = false;
 				}
 				UIPtr->AddChild(WidgetPtr);
 			}
 		}
+	}
+}
+
+void UAllocationSkillsMenu::ResetBackpack(UCharacterUnit* AICharacterUnitPtr, UCharacterUnit* PlayerCharacterUnitPtr)
+{
+	if (AICharacterUnitPtr)
+	{
+		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().TargetBackpack));
+
+		UIPtr->SetHoldItemProperty(
+			AICharacterUnitPtr->SceneUnitContainer
+		);
+		UIPtr->ResetUIByData();
+
+		{
+			auto Delegate =
+				UIPtr->OnDragIconDelegate.AddCallback(std::bind(&ThisClass::OnDragIcon, this, std::placeholders::_1, std::placeholders::_2));
+			Delegate->bIsAutoUnregister = false;
+		}
+
+		UIPtr->ResetUIByData();
+	}
+	if (PlayerCharacterUnitPtr)
+	{
+		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
+
+		UIPtr->SetHoldItemProperty(
+			PlayerCharacterUnitPtr->SceneUnitContainer
+		);
+		UIPtr->ResetUIByData();
+
+		{
+			auto Delegate =
+				UIPtr->OnDragIconDelegate.AddCallback(std::bind(&ThisClass::OnDragIcon, this, std::placeholders::_1, std::placeholders::_2));
+			Delegate->bIsAutoUnregister = false;
+		}
+
+		UIPtr->ResetUIByData();
 	}
 }
 
@@ -569,8 +615,13 @@ void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
 	}
 }
 
-void UAllocationSkillsMenu::OnSelectedGourpmate(UCharacterUnit* UnitPtr)
+void UAllocationSkillsMenu::OnSelectedCharacterUnit(UCharacterUnit* UnitPtr)
 {
+	if (CurrentUnitPtr == UnitPtr)
+	{
+		return;
+	}
+
 	auto UIPtr = Cast<UScrollBox>(GetWidgetFromName(FAllocationSkillsMenu::Get().GroupmateList));
 	if (!UIPtr)
 	{
@@ -579,16 +630,116 @@ void UAllocationSkillsMenu::OnSelectedGourpmate(UCharacterUnit* UnitPtr)
 	auto ChildrensAry = UIPtr->GetAllChildren();
 	for (auto Iter : ChildrensAry)
 	{
-		auto GroupmateIconPtr = Cast<UGroupmateIcon>(Iter);
-		if (GroupmateIconPtr)
+		auto CharacterIconPtr = Cast<UGroupmateIcon>(Iter);
+		if (CharacterIconPtr)
 		{
-			if (GroupmateIconPtr->UnitPtr == UnitPtr)
+			if (CharacterIconPtr->UnitPtr == UnitPtr)
 			{
+				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+				if (!CharacterPtr)
+				{
+					return;
+				}
+
+				SyncAllocation2Character();
+
+				ResetUI(UnitPtr, CharacterPtr->GetCharacterUnit());
+
 				continue;
 			}
 			else
 			{
-				GroupmateIconPtr->SwitchSelectState(false);
+				CharacterIconPtr->SwitchSelectState(false);
+			}
+		}
+	}
+}
+
+void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
+{
+	TArray<FName>Ary
+	{
+		{FAllocationSkillsMenu::Get().ActiveSkill1},
+		{FAllocationSkillsMenu::Get().ActiveSkill2},
+		{FAllocationSkillsMenu::Get().ActiveSkill3},
+		{FAllocationSkillsMenu::Get().ActiveSkill4},
+		{FAllocationSkillsMenu::Get().WeaponActiveSkill1},
+		{FAllocationSkillsMenu::Get().WeaponActiveSkill2},
+		{FAllocationSkillsMenu::Get().PassivSkill1},
+		{FAllocationSkillsMenu::Get().PassivSkill2},
+		{FAllocationSkillsMenu::Get().PassivSkill3},
+		{FAllocationSkillsMenu::Get().PassivSkill4},
+		{FAllocationSkillsMenu::Get().PassivSkill5},
+		{FAllocationSkillsMenu::Get().TalentPassivSkill},
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
+		if (UIPtr)
+		{
+			if (NewUnitPtr && (NewUnitPtr == UIPtr->BasicUnitPtr))
+			{
+				UIPtr->bPaseInvokeOnResetUnitEvent = true;
+				UIPtr->ResetToolUIByData(PreviousUnitPtr);
+				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+			}
+			else
+			{
+			}
+		}
+	}
+}
+
+void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
+{
+	TArray<FName>Ary
+	{
+		{FAllocationSkillsMenu::Get().MainWeapon},
+		{FAllocationSkillsMenu::Get().SecondaryWeapon},
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		auto UIPtr = Cast<UWeaponsIcon>(GetWidgetFromName(Iter));
+		if (UIPtr)
+		{
+			if (NewUnitPtr && (NewUnitPtr == UIPtr->BasicUnitPtr))
+			{
+				UIPtr->bPaseInvokeOnResetUnitEvent = true;
+				UIPtr->ResetToolUIByData(PreviousUnitPtr);
+				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+			}
+			else
+			{
+			}
+		}
+	}
+}
+
+void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
+{
+	TArray<FName>Ary
+	{
+		{FAllocationSkillsMenu::Get().Consumable1},
+		{FAllocationSkillsMenu::Get().Consumable2},
+		{FAllocationSkillsMenu::Get().Consumable3},
+		{FAllocationSkillsMenu::Get().Consumable4},
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
+		if (UIPtr)
+		{
+			if (NewUnitPtr && (NewUnitPtr == UIPtr->BasicUnitPtr))
+			{
+				UIPtr->bPaseInvokeOnResetUnitEvent = true;
+				UIPtr->ResetToolUIByData(PreviousUnitPtr);
+				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+			}
+			else
+			{
 			}
 		}
 	}

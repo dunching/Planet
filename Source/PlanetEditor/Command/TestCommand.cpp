@@ -270,11 +270,6 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 
 		SpawnParameters.CustomPreSpawnInitalization = [&](AActor* ActorPtr)
 			{
-				if (Args.IsValidIndex(1))
-				{
-					auto NewCharacterPtr = Cast<AHumanCharacter>(ActorPtr);
-					NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
-				}
 			};
 
 		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHumanCharacter>(
@@ -283,6 +278,11 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 			FRotator::ZeroRotator,
 			SpawnParameters
 		);
+
+		if (Args.IsValidIndex(1))
+		{
+			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
+		}
 
 		if (Args.IsValidIndex(0))
 		{
@@ -348,7 +348,7 @@ void TestCommand::RecruitCharacter()
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 			if (TargetCharacterPtr)
 			{
-				CharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(TargetCharacterPtr);
+				CharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(TargetCharacterPtr->GetCharacterUnit());
 			}
 		}
 	}

@@ -19,7 +19,7 @@ class UToolUnit;
 struct FStreamableHandle;
 
 UCLASS()
-class PLANET_API UToolIcon : public UMyUserWidget, public IToolsIconInterface
+class PLANET_API UToolIcon : public UMyUserWidget, public IUnitIconInterface
 {
 	GENERATED_BODY()
 

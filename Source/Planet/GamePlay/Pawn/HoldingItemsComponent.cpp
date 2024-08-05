@@ -18,9 +18,9 @@ UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectI
 TSharedPtr<FSceneUnitContainer> UHoldingItemsComponent::GetSceneUnitContainer()
 {
 	auto OwnerPtr = GetOwner<FOwnerType>();
-	if (OwnerPtr && OwnerPtr->GetGourpMateUnit())
+	if (OwnerPtr && OwnerPtr->GetCharacterUnit())
 	{
-		return OwnerPtr->GetGourpMateUnit()->SceneUnitContainer;
+		return OwnerPtr->GetCharacterUnit()->SceneUnitContainer;
 	}
 
 	// 创建临时的 

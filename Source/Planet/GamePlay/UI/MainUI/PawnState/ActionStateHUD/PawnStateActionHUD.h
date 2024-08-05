@@ -19,7 +19,7 @@ class UState_Talent_YinYang;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API UPawnStateActionHUD : public UMyUserWidget, public IItemsMenuInterface
+class PLANET_API UPawnStateActionHUD : public UMyUserWidget, public IMenuInterface
 {
 	GENERATED_BODY()
 

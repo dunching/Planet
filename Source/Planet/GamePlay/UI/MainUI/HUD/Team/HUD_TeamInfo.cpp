@@ -9,6 +9,7 @@
 #include "GroupMnaggerComponent.h"
 #include "TeamMateInfo.h"
 #include "HUD_TeamMateInfo.h"
+#include "CharacterBase.h"
 
 namespace GroupManaggerMenu
 {
@@ -70,14 +71,14 @@ void UHUD_TeamInfo::ResetUIByData()
 	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
 	if (MembersHelperSPtr)
 	{
-		for (auto Iter : MembersHelperSPtr->MembersMap)
+		for (auto Iter : MembersHelperSPtr->MembersSet)
 		{
 			auto WidgetPtr = CreateWidget<UHUD_TeamMateInfo>(this, TeamMateInfoClass);
 			if (WidgetPtr)
 			{
 				PanelPtr->AddChild(WidgetPtr);
 
-				WidgetPtr->ResetToolUIByData(Iter.Key);
+				WidgetPtr->ResetToolUIByData(Iter);
 			}
 		}
 	}
@@ -86,12 +87,12 @@ void UHUD_TeamInfo::ResetUIByData()
 		std::bind(&ThisClass::OnTeammateOptionChanged, this, std::placeholders::_1, std::placeholders::_2
 		));
 
-	OnTeammateOptionChanged(GMCPtr->GetTeamHelper()->GetTeammateOption(), GMCPtr->GetTeamHelper()->OwnerPtr);
+	OnTeammateOptionChanged(GMCPtr->GetTeamHelper()->GetTeammateOption(), GMCPtr->GetTeamHelper()->OwnerCharacterUnitPtr);
 }
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(
 	ETeammateOption TeammateOption,
-	UGroupsManaggerSubSystem::FPawnType* LeaderPCPtr
+	FCharacterUnitType* LeaderPCPtr
 )
 {
 	{

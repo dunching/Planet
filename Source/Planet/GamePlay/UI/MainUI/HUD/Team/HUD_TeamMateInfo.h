@@ -17,7 +17,9 @@ class UBasicUnit;
 class UCharacterUnit;
 
 UCLASS()
-class PLANET_API UHUD_TeamMateInfo : public UMyUserWidget, public IToolsIconInterface
+class PLANET_API UHUD_TeamMateInfo :
+	public UMyUserWidget,
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 

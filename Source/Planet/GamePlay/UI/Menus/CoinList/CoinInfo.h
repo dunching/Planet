@@ -18,7 +18,7 @@ class UCoinUnit;
 UCLASS()
 class PLANET_API UCoinInfo : 
 	public UMyUserWidget,
-	public IToolsIconInterface
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 

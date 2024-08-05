@@ -22,6 +22,7 @@
 #include "SceneElement.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
+#include "CharacterAttibutes.h"
 
 struct FBackpackIcon : public TGetSocketName<FBackpackIcon>
 {
@@ -30,6 +31,8 @@ struct FBackpackIcon : public TGetSocketName<FBackpackIcon>
 	const FName Enable = TEXT("Enable");
 
 	const FName Icon = TEXT("Icon");
+
+	const FName AllocationCharacterUnit = TEXT("AllocationCharacterUnit");
 };
 
 UBackpackIcon::UBackpackIcon(const FObjectInitializer& ObjectInitializer) :
@@ -58,6 +61,31 @@ void UBackpackIcon::EnableIcon(bool bIsEnable)
 	if (ImagePtr)
 	{
 		ImagePtr->SetVisibility(bIsEnable ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+	}
+}
+
+void UBackpackIcon::SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)
+{
+	if (AllocationCharacterUnitPtr)
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
+		if (!UIPtr)
+		{
+			return;
+		}
+
+		UIPtr->SetVisibility(ESlateVisibility::Visible);
+		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr->CharacterAttributes->Name));
+	}
+	else
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
+		if (!UIPtr)
+		{
+			return;
+		}
+
+		UIPtr->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
