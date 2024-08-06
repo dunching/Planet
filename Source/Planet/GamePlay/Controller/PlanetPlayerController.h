@@ -26,7 +26,9 @@ class UGroupMnaggerComponent;
  *
  */
 UCLASS()
-class PLANET_API APlanetPlayerController : public AGravityPlayerController, public IPlanetControllerInterface
+class PLANET_API APlanetPlayerController : 
+	public AGravityPlayerController,
+	public IPlanetControllerInterface
 {
 	GENERATED_BODY()
 

@@ -11,6 +11,8 @@
 
 #include "GravityPlayerController.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMoveCompletedSignature, FAIRequestID, RequestID, EPathFollowingResult::Type, Result);
+
 class UPathFollowingComponent;
 class UNavigationQueryFilter;
 
@@ -36,6 +38,12 @@ public:
 		bool bAllowPartialPath = true
 	);
 
+	virtual void StopMovement() override;
+
+	/** Blueprint notification that we've completed the current movement request */
+	UPROPERTY(BlueprintAssignable, meta = (DisplayName = "MoveCompleted"))
+	FMoveCompletedSignature ReceiveMoveCompleted;
+
 protected:
 
 	 virtual void OnPossess(APawn* InPawn) override;
@@ -52,8 +60,6 @@ protected:
 	virtual void FindPathForMoveRequest(
 		const FAIMoveRequest& MoveRequest, FPathFindingQuery& Query, FNavPathSharedPtr& OutPath
 	) const;
-
-	virtual void StopMovement() override;
 
 	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
 

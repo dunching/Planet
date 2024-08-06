@@ -9,6 +9,7 @@
 class UAssetRefMap;
 class UStateTagExtendInfoMap;
 class USceneUnitExtendInfoMap;
+class UGameOptions;
 
 /**
  *
@@ -20,14 +21,13 @@ class PLANET_API APlanetWorldSettings : public AWorldSettings
 
 public:
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Skill Settings")
-	int32 ResetCooldownTime = 1;
-
 	UAssetRefMap* GetAssetRefMapInstance();
 
 	UStateTagExtendInfoMap* GetStateTagExtendInfoInstance();
 	
 	USceneUnitExtendInfoMap* GetSceneUnitExtendInfoMap();
+	
+	UGameOptions* GetGameOptions();
 
 protected:
 
@@ -48,5 +48,11 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<USceneUnitExtendInfoMap>SceneUnitExtendInfoMapPtrClass;
+	
+	UPROPERTY(Transient)
+	UGameOptions* GameOptionsPtr = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<UGameOptions>GameOptionsClass;
 
 };

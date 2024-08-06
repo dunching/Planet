@@ -17,7 +17,7 @@ public:
 
 	static UGameplayTagsSubSystem* GetInstance();
 
-#pragma region Locamotion Tags
+#pragma region BaseFeature Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Jump =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
@@ -37,6 +37,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DisMount =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.DisMount")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag MoveToAttaclArea =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.MoveToAttaclArea")));
 #pragma endregion 
 
 #pragma region State Tags

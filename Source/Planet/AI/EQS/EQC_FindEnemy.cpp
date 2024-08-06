@@ -41,10 +41,21 @@ void UEQC_FindEnemy::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryC
 
 	if (CharacterPtr)
 	{
-		auto PCPtr = CharacterPtr->GetController<AHumanAIController>();
-		if (PCPtr)
+		if (CharacterPtr->IsPlayerControlled())
 		{
-			UEnvQueryItemType_Actor::SetContextHelper(ContextData, PCPtr->GetTeamFocusTarget());
+			auto ControllerPtr = CharacterPtr->GetController<APlanetPlayerController>();
+			if (ControllerPtr)
+			{
+				UEnvQueryItemType_Actor::SetContextHelper(ContextData, ControllerPtr->GetFocusActor());
+			}
+		}
+		else
+		{
+			auto ControllerPtr = CharacterPtr->GetController<AAIController>();
+			if (ControllerPtr)
+			{
+				UEnvQueryItemType_Actor::SetContextHelper(ContextData, ControllerPtr->GetFocusActor());
+			}
 		}
 	}
 }

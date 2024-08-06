@@ -100,6 +100,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/DelayTask");
         PublicIncludePaths.Add("Planet/SceneUnit");
         PublicIncludePaths.Add("Planet/AssetRefMap");
+        PublicIncludePaths.Add("Planet/GameOptions");
         PublicIncludePaths.Add("Planet/InputProcessor/InputComponent");
         PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HorseProcessor");

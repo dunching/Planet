@@ -314,13 +314,13 @@ void AGravityPlayerController::FindPathForMoveRequest(const FAIMoveRequest& Move
 
 void AGravityPlayerController::StopMovement()
 {
-
-}
-
-void AGravityPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
-{
 	if (PathFollowingComponent)
 	{
 		PathFollowingComponent->AbortMove(*this, FPathFollowingResultFlags::MovementStop | FPathFollowingResultFlags::ForcedScript);
 	}
+}
+
+void AGravityPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+{
+	ReceiveMoveCompleted.Broadcast(RequestID, Result.Code);
 }

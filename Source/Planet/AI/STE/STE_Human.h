@@ -81,7 +81,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
 	int32 MaxDistanceToPatrolSpline = 1000;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)

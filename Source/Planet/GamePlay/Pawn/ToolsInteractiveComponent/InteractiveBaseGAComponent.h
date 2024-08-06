@@ -19,6 +19,8 @@ class UGA_Periodic_StateTagModify;
 struct FGameplayAbilityTargetData_Periodic_StateTagModify;
 struct FGameplayAbilityTargetData_Periodic_PropertyModify;
 struct FGameplayAbilityTargetData_AddTemporaryTag;
+struct FGameplayAbilityTargetData_MoveToAttaclArea;
+struct FGameplayAbilityTargetData;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
@@ -76,6 +78,12 @@ public:
 	bool SwitchWalkState(bool bIsRun);
 	
 	bool Dash(EDashDirection DashDirection);
+
+	void MoveToAttackDistance(
+		FGameplayAbilityTargetData_MoveToAttaclArea * MoveToAttaclAreaPtr
+	);
+
+	void BreakMoveToAttackDistance();
 
 	FGameplayAbilitySpecHandle SendEventHandle;
 

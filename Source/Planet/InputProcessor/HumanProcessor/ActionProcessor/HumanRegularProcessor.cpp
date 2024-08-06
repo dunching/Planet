@@ -65,6 +65,7 @@
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
+#include "InteractiveBaseGAComponent.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
@@ -212,7 +213,22 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+
+				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
+
 				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
+			}
+
+			// 这里应该是特定的输入会打断 还是任意输入都会打断？
+			else if (
+				(Params.Key == EKeys::W) ||
+				(Params.Key == EKeys::A) ||
+				(Params.Key == EKeys::S) ||
+				(Params.Key == EKeys::D) 
+				)
+			{
+				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
 			}
 		}
 		else

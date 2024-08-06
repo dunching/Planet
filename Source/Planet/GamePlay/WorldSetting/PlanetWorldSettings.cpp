@@ -4,6 +4,7 @@
 #include "AssetRefMap.h"
 #include "StateTagExtendInfo.h"
 #include "SceneUnitExtendInfo.h"
+#include "GameOptions.h"
 
 UAssetRefMap* APlanetWorldSettings::GetAssetRefMapInstance()
 {
@@ -33,4 +34,14 @@ USceneUnitExtendInfoMap* APlanetWorldSettings::GetSceneUnitExtendInfoMap()
 	}
 
 	return SceneUnitExtendInfoMapPtr;
+}
+
+UGameOptions* APlanetWorldSettings::GetGameOptions()
+{
+	if (!GameOptionsPtr)
+	{
+		GameOptionsPtr = NewObject<UGameOptions>(GetWorld(), GameOptionsClass);
+	}
+
+	return GameOptionsPtr;
 }

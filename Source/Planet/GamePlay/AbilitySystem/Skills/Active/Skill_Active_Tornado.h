@@ -32,6 +32,11 @@ public:
 
 };
 
+struct FGameplayAbilityTargetData_Tornado : public FGameplayAbilityTargetData
+{
+	ACharacterBase* TargetCharacterPtr = nullptr;
+};
+
 UCLASS()
 class PLANET_API USkill_Active_Tornado : public USkill_Active_Base
 {
@@ -130,9 +135,4 @@ protected:
 
 	TSet<ACharacterBase*>TargetsSet;
 
-};
-
-struct FGameplayAbilityTargetData_Tornado : public FGameplayAbilityTargetData
-{
-	ACharacterBase* TargetCharacterPtr = nullptr;
 };

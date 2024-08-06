@@ -11,10 +11,16 @@
 
 class UBasicUnit;
 class UActiveSkillUnit;
+struct FCanbeActivedInfo;
 
+USTRUCT()
 struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetData
 {
-	UActiveSkillUnit * ActiveSkillUnitPtr = nullptr;
+	GENERATED_USTRUCT_BODY()
+
+	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const;
+
+	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
 };
 
 /**
@@ -72,10 +78,16 @@ public:
 
 	virtual void AddCooldownConsumeTime(float NewTime);
 
+	// 确认锁定的目标是否在范围内
+	bool CheckTargetInDistance(int32 Distance)const;
+
+	// 获取范围内任意可攻击的目标
+	ACharacterBase* GetTargetInDistance(int32 Distance)const;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "CooldownTime")
 	int32 CooldownTime = -1;
 
-	UActiveSkillUnit* ActiveSkillUnitPtr = nullptr;
+	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
 
 protected:
 

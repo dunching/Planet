@@ -34,6 +34,7 @@
 #include "HumanCharacter.h"
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitTable.h"
+#include "Skill_Active_Control.h"
 
 FName UInteractiveSkillComponent::ComponentName = TEXT("InteractiveSkillComponent");
 
@@ -455,21 +456,48 @@ bool UInteractiveSkillComponent::ActiveSkill_Active(
 				(*SkillIter)->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) 
 				)
 			{
-				auto GameplayAbilityTargetPtr =
-					new FGameplayAbilityTargetData_ActiveSkill;
+				// 需要特殊参数的
+				if (
+					(*SkillIter)->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
+					)
+				{
+					auto GameplayAbilityTargetPtr =
+						new FGameplayAbilityTargetData_Control;
 
-				GameplayAbilityTargetPtr->ActiveSkillUnitPtr = ActiveSkillUnitPtr;
+					GameplayAbilityTargetPtr->CanbeActivedInfoSPtr = CanbeActivedInfoSPtr;
 
-				FGameplayEventData Payload;
-				Payload.TargetData.Add(GameplayAbilityTargetPtr);
+					// Test
+					GameplayAbilityTargetPtr->TargetCharacterPtr = OnwerActorPtr; 
 
-				return ASCPtr->TriggerAbilityFromGameplayEvent(
-					SkillHandleIter,
-					ASCPtr->AbilityActorInfo.Get(),
-					FGameplayTag(),
-					&Payload,
-					*ASCPtr
-				);
+					FGameplayEventData Payload;
+					Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+					return ASCPtr->TriggerAbilityFromGameplayEvent(
+						SkillHandleIter,
+						ASCPtr->AbilityActorInfo.Get(),
+						FGameplayTag(),
+						&Payload,
+						*ASCPtr
+					);
+				}
+				else
+				{
+					auto GameplayAbilityTargetPtr =
+						new FGameplayAbilityTargetData_ActiveSkill;
+
+					GameplayAbilityTargetPtr->CanbeActivedInfoSPtr = CanbeActivedInfoSPtr;
+
+					FGameplayEventData Payload;
+					Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+					return ASCPtr->TriggerAbilityFromGameplayEvent(
+						SkillHandleIter,
+						ASCPtr->AbilityActorInfo.Get(),
+						FGameplayTag(),
+						&Payload,
+						*ASCPtr
+					);
+				}
 			}
 		}
 	}

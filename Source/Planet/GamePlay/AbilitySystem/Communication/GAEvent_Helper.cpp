@@ -101,7 +101,7 @@ FGameplayAbilityTargetData_GAReceivedEvent::FGameplayAbilityTargetData_GAReceive
 
 FGameplayAbilityTargetData_GAReceivedEvent* FGameplayAbilityTargetData_GAReceivedEvent::Clone() const
 {
-	FGameplayAbilityTargetData_GAReceivedEvent* ResultPtr = 
+	auto ResultPtr = 
 		new FGameplayAbilityTargetData_GAReceivedEvent(Data.TargetCharacterPtr, TriggerCharacterPtr.Get());
 
 	*ResultPtr = *this;

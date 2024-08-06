@@ -6,6 +6,8 @@
 #include "InteractiveSkillComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
+#include "PlanetPlayerController.h"
+#include "GameOptions.h"
 
 USkill_Active_Base::USkill_Active_Base():
 	Super()
@@ -22,7 +24,7 @@ void USkill_Active_Base::OnAvatarSet(
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
-	CooldownConsumeTime = CooldownTime - Cast<APlanetWorldSettings>(GetWorld()->GetWorldSettings())->ResetCooldownTime;
+	CooldownConsumeTime = CooldownTime - UGameOptions::GetInstance()->ResetCooldownTime;
 }
 
 void USkill_Active_Base::PreActivate(
@@ -40,7 +42,7 @@ void USkill_Active_Base::PreActivate(
 		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetPtr)
 		{
-			ActiveSkillUnitPtr = GameplayAbilityTargetPtr->ActiveSkillUnitPtr;
+			CanbeActivedInfoSPtr = GameplayAbilityTargetPtr->CanbeActivedInfoSPtr;
 		}
 	}
 }
@@ -88,6 +90,31 @@ void USkill_Active_Base::AddCooldownConsumeTime(float NewTime)
 	CooldownConsumeTime += NewTime;
 }
 
+bool USkill_Active_Base::CheckTargetInDistance(int32 InDistance)const
+{
+	if (CharacterPtr->IsPlayerControlled())
+	{
+		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+
+		return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+	}
+	else
+	{
+		auto ACPtr = CharacterPtr->GetController<AAIController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
+
+		return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+	}
+
+	return false;
+}
+
+ACharacterBase* USkill_Active_Base::GetTargetInDistance(int32 Distance) const
+{
+	return nullptr;
+}
+
 void USkill_Active_Base::Tick(float DeltaTime)
 {
 	CooldownConsumeTime += DeltaTime;
@@ -113,7 +140,7 @@ bool USkill_Active_Base::GetRemainingCooldown(
 		{
 			RemainingCooldown = Remaining;
 
-			RemainingCooldownPercent = RemainingCooldown / Cast<APlanetWorldSettings>(GetWorld()->GetWorldSettings())->ResetCooldownTime;
+			RemainingCooldownPercent = RemainingCooldown / UGameOptions::GetInstance()->ResetCooldownTime;
 
 			return false;
 		}
@@ -137,4 +164,14 @@ bool USkill_Active_Base::GetRemainingCooldown(
 
 		return false;
 	}
+}
+
+FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_ActiveSkill::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_ActiveSkill;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
 }

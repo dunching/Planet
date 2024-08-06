@@ -37,6 +37,7 @@
 #include "HumanCharacter.h"
 #include "GameplayTagsSubSystem.h"
 #include "BasicFutures_Dash.h"
+#include "BasicFutures_MoveToAttaclArea.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -447,6 +448,32 @@ bool UInteractiveBaseGAComponent::Dash(EDashDirection DashDirection)
 	}
 
 	return true;
+}
+
+void UInteractiveBaseGAComponent::MoveToAttackDistance(
+	FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
+)
+{
+	FGameplayEventData Payload;
+	Payload.TargetData.Add(MoveToAttaclAreaPtr);
+
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->MoveToAttaclArea, Payload);
+	}
+}
+
+void UInteractiveBaseGAComponent::BreakMoveToAttackDistance()
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
+	{
+		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+		FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->MoveToAttaclArea };
+		GASPtr->CancelAbilities(&GameplayTagContainer);
+	}
 }
 
 void UInteractiveBaseGAComponent::AddSendGroupEffectModify()
