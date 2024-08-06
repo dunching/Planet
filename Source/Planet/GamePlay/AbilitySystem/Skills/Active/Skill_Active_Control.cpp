@@ -57,6 +57,11 @@ void USkill_Active_Control::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	if (!HasFocusActor())
+	{
+		K2_CancelAbility();
+	}
+
 	auto bIsHaveTargetInDistance = CheckTargetInDistance(AttackDistance);
 	if (bIsHaveTargetInDistance)
 	{
@@ -108,6 +113,12 @@ void USkill_Active_Control::EndAbility(
 	bool bWasCancelled
 )
 {
+	if (SPlineActorPtr)
+	{
+		SPlineActorPtr->Destroy();
+	}
+	SPlineActorPtr = nullptr;
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -122,6 +133,20 @@ void USkill_Active_Control::PerformAction()
 
 void USkill_Active_Control::ExcuteTasks()
 {
+	SPlineActorPtr = GetWorldImp()->SpawnActor<ASPlineActor>(FVector::ZeroVector, FRotator::ZeroRotator);
+	SPlineActorPtr->AttachToActor(CharacterPtr, FAttachmentTransformRules::KeepRelativeTransform);
+
+	const auto Duration = HumanMontage->CalculateSequenceLength();
+
+	auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::ApplyRootMotionBySpline(
+		this,
+		TEXT(""),
+		Duration,
+		SPlineActorPtr,
+		HasFocusActor()
+	);
+	TaskPtr->OnFinish.BindUObject(this, &ThisClass::K2_CancelAbility);
+	TaskPtr->ReadyForActivation();
 }
 
 void USkill_Active_Control::PlayMontage()

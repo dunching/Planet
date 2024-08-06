@@ -100,29 +100,29 @@ protected:
 	);
 
 	void OnOverlap(AActor* OtherActor);
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Duration = 3.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Offset = 100.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Distance = 800.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float InnerRadius = 100.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float OuterRadius = 150.f;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float MaxHeight = 200.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Class")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ATornado>TornadoClass;
 
 	ATornado* TornadoPtr = nullptr;

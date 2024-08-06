@@ -34,12 +34,18 @@ class GRAVITY_API UGravityMovementComponent : public UCharacterMovementComponent
 
 public:
 
-    UGravityMovementComponent(const FObjectInitializer& ObjectInitializer);
+    bool bHasBlockResult = false;
 
-    UFUNCTION(BlueprintCallable, Category = "Lyra|CharacterMovement")
     const FLyraCharacterGroundInfo& GetGroundInfo();
 
+    bool bSkilPerformMovement = false;
+
+protected:
+
     FLyraCharacterGroundInfo CachedGroundInfo;
+
+#if USECUSTOMEGRAVITY
+    UGravityMovementComponent(const FObjectInitializer& ObjectInitializer);
 
     virtual void BeginPlay() override;
 
@@ -75,20 +81,16 @@ public:
         const FVector& Delta, float Time, const FVector& Normal, FHitResult& Hit, bool bHandleImpact
     ) override;
 
-    bool bHasBlockResult = false;
-
-	bool bSkilPerformMovement = false;
-
 protected:
 
     bool UpdateGravityTransform(float Delta);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	float Frequency = 1.f;
 
     FTSTicker::FDelegateHandle TickDelegateHandle;
 
     // 通过这个向量获取连续的Transform
     FVector PreviousGravityTransformForward = FVector::ForwardVector;
+#endif
 
 };

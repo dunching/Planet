@@ -4,6 +4,7 @@
 #include <PhysicsEngine/PhysicsSettings.h>
 #include <GameFramework/Character.h>
 
+#if USECUSTOMEGRAVITY
 void UGravitySpringArmComponent::UpdateDesiredArmLocation(
 	bool bDoTrace, bool bDoLocationLag, bool bDoRotationLag, float DeltaTime
 )
@@ -144,3 +145,4 @@ FQuat UGravitySpringArmComponent::GetGravityToWorldTransform() const
 {
 	return GetOwner<ACharacter>()->GetGravityTransform();
 }
+#endif

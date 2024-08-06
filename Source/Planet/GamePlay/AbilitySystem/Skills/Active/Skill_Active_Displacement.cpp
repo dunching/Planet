@@ -162,7 +162,7 @@ void USkill_Active_Displacement::FindTarget()
 		TEXT(""),
 		Duration,
 		SPlineActorPtr,
-		TargetCharacterPtr
+		CharacterPtr
 	);
 	TaskPtr->OnFinish.BindUObject(this, &ThisClass::K2_CancelAbility);
 	TaskPtr->ReadyForActivation();

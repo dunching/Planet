@@ -67,7 +67,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float DecreamTime = 5.f;
 
 	float SecondaryDecreamTime = 1.f;

@@ -16,9 +16,11 @@ class GRAVITY_API AGravityAIController : public AAIController
 
 public:
 
+#if USECUSTOMEGRAVITY
 	AGravityAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn)override;
+#endif
 
 private:
 

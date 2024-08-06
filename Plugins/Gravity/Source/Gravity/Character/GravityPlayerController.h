@@ -25,7 +25,12 @@ public:
 
 	AGravityPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+#if USECUSTOMEGRAVITY
 	virtual void UpdateRotation(float DeltaTime)override;
+
+	// 记录Player的Yaw和Pitch
+	FRotator ControlRotationWithoutGravityTrans = FRotator::ZeroRotator;
+#endif
 
 	EPathFollowingRequestResult::Type MoveToLocation(
 		const FVector& Dest, 
@@ -66,9 +71,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TSubclassOf<UNavigationQueryFilter> DefaultNavigationFilterClass;
 
-	// 记录Player的Yaw和Pitch
-	FRotator ControlRotationWithoutGravityTrans = FRotator::ZeroRotator;
-	
 	/** Component used for moving along a path. */
 	UPROPERTY(VisibleDefaultsOnly, Category = AI)
 	TObjectPtr<UPathFollowingComponent> PathFollowingComponent;

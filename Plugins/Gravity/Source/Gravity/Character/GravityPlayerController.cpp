@@ -23,6 +23,7 @@ AGravityPlayerController::AGravityPlayerController(const FObjectInitializer& Obj
     }
 }
 
+#if USECUSTOMEGRAVITY
 void AGravityPlayerController::UpdateRotation(float DeltaTime)
 {
     APawn* const P = GetPawnOrSpectator();
@@ -64,6 +65,7 @@ void AGravityPlayerController::UpdateRotation(float DeltaTime)
         P->FaceRotation(ViewRotation, DeltaTime);
     }
 }
+#endif
 
 EPathFollowingRequestResult::Type AGravityPlayerController::MoveToLocation(
     const FVector& Dest,

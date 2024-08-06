@@ -132,8 +132,15 @@ void UBasicFutures_MoveToAttaclArea::OnQueryFinished(TSharedPtr<FEnvQueryResult>
 		{
 			auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
 
-			PCPtr->MoveToLocation(DestLocation);
-			PCPtr->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::MoveCompletedSignature);
+			const auto Result = PCPtr->MoveToLocation(DestLocation);
+			if (Result == EPathFollowingRequestResult::RequestSuccessful)
+			{
+				PCPtr->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::MoveCompletedSignature);
+			}
+			else
+			{
+				K2_CancelAbility();
+			}
 		}
 		else
 		{

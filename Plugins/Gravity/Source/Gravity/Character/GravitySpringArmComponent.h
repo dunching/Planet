@@ -17,10 +17,11 @@ public:
 
 protected:
 
+#if USECUSTOMEGRAVITY
 	virtual void UpdateDesiredArmLocation(
 		bool bDoTrace, bool bDoLocationLag, bool bDoRotationLag, float DeltaTime
 	)override;
 
 	FQuat GetGravityToWorldTransform() const;
-
+#endif
 };

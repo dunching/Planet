@@ -16,10 +16,10 @@
 enum ERootMotionSource_Priority : uint16
 {
 	kDefault = 1,
-	kMove,
-	kFlyAway,
-	kTraction,
-	kForceMove,
+	kMove,			// 位移
+	kFlyAway,		// 击飞
+	kTraction,		// 牵引
+	kForceMove,		// 强制位移
 };
 
 class ASPlineActor;

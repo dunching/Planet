@@ -86,7 +86,7 @@ protected:
 
 	void OnGAEnd(UGameplayAbility* GAPtr);
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<AConsumable_Base> Consumable_Class;
 
 	AConsumable_Base* ConsumableActorPtr = nullptr;

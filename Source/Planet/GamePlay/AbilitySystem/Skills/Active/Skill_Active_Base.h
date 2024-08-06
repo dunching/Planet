@@ -78,6 +78,9 @@ public:
 
 	virtual void AddCooldownConsumeTime(float NewTime);
 
+	// 确认是否有锁定的目标
+	ACharacterBase* HasFocusActor()const;
+	
 	// 确认锁定的目标是否在范围内
 	bool CheckTargetInDistance(int32 Distance)const;
 

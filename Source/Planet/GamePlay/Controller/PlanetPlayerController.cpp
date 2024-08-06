@@ -174,29 +174,26 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 	APawn* const MyPawn = GetPawnOrSpectator();
 	if (MyPawn)
 	{
-		FRotator ViewRotation = ControlRotationWithoutGravityTrans;
+		FRotator ViewRotation = GetControlRotation();
 
 		const FVector FocalPoint = GetFocalPoint();
 		if (FAISystem::IsValidLocation(FocalPoint))
 		{
-			const auto FocusRotation = (FocalPoint - MyPawn->GetPawnViewLocation()).ToOrientationQuat();
-			FRotator CurrentControlRotation = GetControlRotation();
-
-			const auto FoucusRotationInput = (MyPawn->GetGravityTransform().Inverse() * FocusRotation).Rotator();
+			const auto FocusRotation = (FocalPoint - MyPawn->GetPawnViewLocation()).Rotation();
 
 			const auto DeltaRot = DeltaTime * 120.f;
 			const float AngleTolerance = 1e-3f;
 
 			// PITCH
-			if (!FMath::IsNearlyEqual(ViewRotation.Pitch, FoucusRotationInput.Pitch, AngleTolerance))
+			if (!FMath::IsNearlyEqual(ViewRotation.Pitch, FocusRotation.Pitch, AngleTolerance))
 			{
-				ViewRotation.Pitch = FMath::FixedTurn(ViewRotation.Pitch, FoucusRotationInput.Pitch, DeltaRot);
+				ViewRotation.Pitch = FMath::FixedTurn(ViewRotation.Pitch, FocusRotation.Pitch, DeltaRot);
 			}
 
 			// YAW
-			if (!FMath::IsNearlyEqual(ViewRotation.Yaw, FoucusRotationInput.Yaw, AngleTolerance))
+			if (!FMath::IsNearlyEqual(ViewRotation.Yaw, FocusRotation.Yaw, AngleTolerance))
 			{
-				ViewRotation.Yaw = FMath::FixedTurn(ViewRotation.Yaw, FoucusRotationInput.Yaw, DeltaRot);
+				ViewRotation.Yaw = FMath::FixedTurn(ViewRotation.Yaw, FocusRotation.Yaw, DeltaRot);
 			}
 
 			ViewRotation.Roll = 0.f;
@@ -223,10 +220,6 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 				}
 			}
 		}
-
-		ControlRotationWithoutGravityTrans = ViewRotation;
-
-		ViewRotation = (MyPawn->GetGravityTransform() * ViewRotation.Quaternion()).Rotator();
 
 		SetControlRotation(ViewRotation);
 

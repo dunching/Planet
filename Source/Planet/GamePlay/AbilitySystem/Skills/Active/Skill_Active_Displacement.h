@@ -62,17 +62,17 @@ protected:
 	void FindTarget();
 
 	void PlayMontage();
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Duration = .5f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Distance = 800.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float ToCharacterOffset = 100.f;
 
 	ASPlineActor* SPlineActorPtr = nullptr;

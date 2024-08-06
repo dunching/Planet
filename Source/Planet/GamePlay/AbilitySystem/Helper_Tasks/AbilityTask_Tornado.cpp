@@ -61,7 +61,7 @@ void UAbilityTask_Tornado::SharedInitAndApply()
 
 			RootMotionSource->InstanceName = ForceName;
 			RootMotionSource->AccumulateMode = ERootMotionAccumulateMode::Override;
-			RootMotionSource->Priority = 5;
+			RootMotionSource->Priority = ERootMotionSource_Priority::kFlyAway;
 			RootMotionSource->Duration = -1.f;
 			RootMotionSource->FinishVelocityParams.Mode = FinishVelocityMode;
 			RootMotionSource->FinishVelocityParams.SetVelocity = FinishSetVelocity;

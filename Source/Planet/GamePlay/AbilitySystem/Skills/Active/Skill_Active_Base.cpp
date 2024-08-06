@@ -90,21 +90,48 @@ void USkill_Active_Base::AddCooldownConsumeTime(float NewTime)
 	CooldownConsumeTime += NewTime;
 }
 
+ACharacterBase * USkill_Active_Base::HasFocusActor() const
+{
+	if (CharacterPtr->IsPlayerControlled())
+	{
+		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+	else
+	{
+		auto ACPtr = CharacterPtr->GetController<AAIController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+	return nullptr;
+}
+
 bool USkill_Active_Base::CheckTargetInDistance(int32 InDistance)const
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
 		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
 		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
-
-		return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+		if (TargetCharacterPtr)
+		{
+			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+		}
 	}
 	else
 	{
 		auto ACPtr = CharacterPtr->GetController<AAIController>();
 		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
-
-		return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+		if (TargetCharacterPtr)
+		{
+			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+		}
 	}
 
 	return false;

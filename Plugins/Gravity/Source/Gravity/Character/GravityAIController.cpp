@@ -11,6 +11,7 @@
 #include "GravityCharacter.h"
 #include "GravityMovementComponent.h"
 
+#if USECUSTOMEGRAVITY
 AGravityAIController::AGravityAIController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")))
 {
@@ -54,3 +55,4 @@ void AGravityAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePa
 		}
 	}
 }
+#endif
