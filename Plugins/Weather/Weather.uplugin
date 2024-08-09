@@ -1,0 +1,18 @@
+{
+	"FileVersion": 1,
+	"Version": 1,
+	"VersionName": "1",
+	"FriendlyName": "Weather",
+	"Category": "Other",
+	"CanContainContent": true,
+	"Modules": [
+		{
+			"Name": "Weather",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		}
+	]
+}

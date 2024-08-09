@@ -8,8 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "DrawDebugHelpers.h"
 #include "GameFramework/PlayerInput.h"
-
 #include "Kismet/GameplayStatics.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #include "Planet.h"
 #include "ArticleBase.h"
@@ -18,7 +18,7 @@
 #include "LogHelper/LogWriter.h"
 #include "AssetRefMap.h"
 #include "HumanCharacter.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "WeatherSystem.h"
 
 APlanetGameMode::APlanetGameMode() :
 	Super()
@@ -33,6 +33,9 @@ void APlanetGameMode::OnConstruction(const FTransform& Transform)
 void APlanetGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UWeatherSystem::GetInstance()->RegisterCallback();
+	UWeatherSystem::GetInstance()->ResetTime();
 
 	TArray<AActor*>ResultAry;
 // 	UGameplayStatics::GetAllActorsOfClass(GetWorldImp(), AVoxelActor::StaticClass(), ResultAry);

@@ -23,5 +23,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
 	int32 MoveToAttaclAreaOffset = 50;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
+	bool bIsAllowAdjustTime = true;
 
 };
