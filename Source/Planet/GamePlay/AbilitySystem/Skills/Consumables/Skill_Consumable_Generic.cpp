@@ -11,7 +11,7 @@
 #include "Consumable_Test.h"
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "GA_Periodic_PropertyModify.h"
+#include "CS_PeriodicPropertyModify.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :
 	Super()
@@ -121,7 +121,7 @@ void USkill_Consumable_Generic::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_PropertyModify(UnitPtr);
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(UnitPtr);
 
 		GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 		GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;

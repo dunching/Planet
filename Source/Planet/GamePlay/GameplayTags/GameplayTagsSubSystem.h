@@ -61,17 +61,29 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag FlyAway =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.FlyAway")));
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Stun =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Stun")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Silent =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Silent")));
-
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag RootMotion =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag FlyAway =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.FlyAway")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Traction =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.Traction")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag MoveAlongSpline =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveAlongSpline")));
+	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DeathingTag = 
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Deathing")));

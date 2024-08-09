@@ -13,7 +13,7 @@
 #include "Helper_RootMotionSource.h"
 #include "CharacterBase.h"
 
-UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::ApplyRootMotionBySpline
+UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewTask
 (
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,

@@ -9,8 +9,8 @@
 #include "InteractiveToolComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "InteractiveBaseGAComponent.h"
-#include "GA_Periodic_StateTagModify.h"
-#include "GA_Periodic_PropertyModify.h"
+#include "CS_RootMotion.h"
+#include "CS_PeriodicPropertyModify.h"
 
 UGAEvent_Received::UGAEvent_Received() :
 	Super()
@@ -66,7 +66,7 @@ void UGAEvent_Received::ActivateAbility(
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify:
 		{
-			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_PropertyModify*>(TriggerEventData->TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_PropertyModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;
@@ -85,7 +85,7 @@ void UGAEvent_Received::ActivateAbility(
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify:
 		{
-			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_StateTagModify*>(TriggerEventData->TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_RootMotion*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;

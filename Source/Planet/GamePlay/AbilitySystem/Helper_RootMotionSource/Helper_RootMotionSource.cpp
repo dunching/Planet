@@ -28,6 +28,12 @@ static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
 	TEXT("")
 	TEXT(" default: 0"));
 
+static TAutoConsoleVariable<int32> SkillDrawDebugSpline(
+	TEXT("Skill.DrawDebug.Spline"),
+	1,
+	TEXT("")
+	TEXT(" default: 0"));
+
 void FRootMotionSource_MyConstantForce::PrepareRootMotion
 (
 	float SimulationTime,
@@ -103,13 +109,19 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 
 		const auto Pt = SPlineActorPtr->SplineComponentPtr->GetWorldLocationAtTime(MoveFraction, true);
 
+#ifdef WITH_EDITOR
+		if (SkillDrawDebugSpline.GetValueOnGameThread())
+		{
+			DrawDebugSphere(MoveComponent.GetWorld(), Pt, 20, 20, FColor::Red, false, 3);
+		}
+#endif
+
 		const FVector CurrentLocation = Character.GetActorLocation();
 
 		FVector Force = (Pt - CurrentLocation) / MovementTickTime;
 
 		NewTransform.SetTranslation(Force);
 	}
-
 
 	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
 	NewTransform.ScaleTranslation(Multiplier);
@@ -190,7 +202,6 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 		NewTransform.SetRotation(Rot);
 	}
 
-
 	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
 	NewTransform.ScaleTranslation(Multiplier);
 
@@ -260,7 +271,6 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 
 		NewTransform.SetTranslation(Force);
 	}
-
 
 	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
 	NewTransform.ScaleTranslation(Multiplier);

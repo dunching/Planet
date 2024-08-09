@@ -7,25 +7,61 @@
 
 #include "Skill_Base.h"
 
-#include "GA_Periodic_PropertyModify.generated.h"
+#include "CS_RootMotion.generated.h"
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
 class UConsumableUnit;
 class UEffectItem;
+class ASPlineActor;
 
 struct FStreamableHandle;
 
-struct FGameplayAbilityTargetData_Periodic_PropertyModify;
+struct FGameplayAbilityTargetData_Periodic_RootMotion;
+
+USTRUCT()
+struct PLANET_API FGameplayAbilityTargetData_Periodic_RootMotion : public FGameplayAbilityTargetData
+{
+	GENERATED_USTRUCT_BODY()
+
+	friend UCS_RootMotion;
+
+	FGameplayAbilityTargetData_Periodic_RootMotion();
+
+	FGameplayAbilityTargetData_Periodic_RootMotion(
+		const FGameplayTag& Tag,
+		float Duration
+	);
+
+	FGameplayAbilityTargetData_Periodic_RootMotion* Clone()const;
+
+	float Duration = 3.f;
+
+	int32 Height = 100;
+
+	// 会一次性修改多个状态码？
+	FGameplayTag Tag;
+
+	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
+
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
+	
+	TWeakObjectPtr<ASPlineActor> SPlineActorPtr = nullptr;
+
+private:
+
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+};
 
 UCLASS()
-class PLANET_API UGA_Periodic_PropertyModify : public USkill_Base
+class PLANET_API UCS_RootMotion : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	UGA_Periodic_PropertyModify();
+	UCS_RootMotion();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -62,41 +98,13 @@ protected:
 
 	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
-	const FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr = nullptr;
+	const FGameplayAbilityTargetData_Periodic_RootMotion* GameplayAbilityTargetDataPtr = nullptr;
 
 	UEffectItem* EffectItemPtr = nullptr;
 
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
-
-};
-
-USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_Periodic_PropertyModify : public FGameplayAbilityTargetData
-{
-	GENERATED_USTRUCT_BODY()
-
-	friend UGA_Periodic_PropertyModify;
-
-	FGameplayAbilityTargetData_Periodic_PropertyModify();
-
-	FGameplayAbilityTargetData_Periodic_PropertyModify(UConsumableUnit* RightVal);
-
-	FGameplayAbilityTargetData_Periodic_PropertyModify* Clone()const;
-
-	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
-
-	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
-
-private:
-
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
-	float Duration = 3.f;
-
-	float PerformActionInterval = 1.f;
-
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
-
-	FGuid Guid = FGuid::NewGuid();
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float FlyAwayHeight = 250.f;
 
 };

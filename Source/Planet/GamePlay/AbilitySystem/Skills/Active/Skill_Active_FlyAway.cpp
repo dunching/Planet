@@ -27,7 +27,7 @@
 #include "SPlineActor.h"
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "GA_Periodic_StateTagModify.h"
+#include "CS_RootMotion.h"
 
 USkill_Active_FlyAway::USkill_Active_FlyAway() :
 	Super()
@@ -147,6 +147,8 @@ void USkill_Active_FlyAway::ExcuteTasks()
 				TargetSet.Add(TargetCharacterPtr);
 			}
 		}
+
+		// ÉËº¦
 		for (const auto& Iter : TargetSet)
 		{
 			FGAEventData GAEventData(Iter, CharacterPtr);
@@ -154,8 +156,13 @@ void USkill_Active_FlyAway::ExcuteTasks()
 			GAEventData.SetBaseDamage(Damage);
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
+		}
+		ICPtr->SendEventImp(GAEventDataPtr);
 
-			auto GAEventData_Periodic_StateTagModifyPtr = new FGameplayAbilityTargetData_Periodic_StateTagModify(
+		// ¿ØÖÆÐ§¹û
+		for (const auto& Iter : TargetSet)
+		{
+			auto GAEventData_Periodic_StateTagModifyPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
 				UGameplayTagsSubSystem::GetInstance()->FlyAway,
 				FlyAwayTime
 			);
@@ -167,7 +174,6 @@ void USkill_Active_FlyAway::ExcuteTasks()
 
 			ICPtr->SendEventImp(GAEventData_Periodic_StateTagModifyPtr);
 		}
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

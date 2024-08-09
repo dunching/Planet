@@ -13,11 +13,11 @@
 
 class UGAEvent_Received;
 class UConsumableUnit;
-class UGA_Periodic_PropertyModify;
-class UGA_Periodic_StateTagModify;
+class UCS_PeriodicPropertyModify;
+class UCS_RootMotion;
 
-struct FGameplayAbilityTargetData_Periodic_StateTagModify;
-struct FGameplayAbilityTargetData_Periodic_PropertyModify;
+struct FGameplayAbilityTargetData_Periodic_RootMotion;
+struct FGameplayAbilityTargetData_PropertyModify;
 struct FGameplayAbilityTargetData_AddTemporaryTag;
 struct FGameplayAbilityTargetData_MoveToAttaclArea;
 struct FGameplayAbilityTargetData;
@@ -66,11 +66,11 @@ public:
 	);
 	
 	void SendEventImp(
-		FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+		FGameplayAbilityTargetData_Periodic_RootMotion* GameplayAbilityTargetDataPtr
 	);
 	
 	void SendEventImp(
-		FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+		FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 	);
 
 	void InitialBaseGAs();
@@ -92,11 +92,11 @@ public:
 protected:
 
 	FGameplayAbilitySpecHandle ExcuteEffects(
-		FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+		FGameplayAbilityTargetData_Periodic_RootMotion* GameplayAbilityTargetDataPtr
 	);
 
 	FGameplayAbilitySpecHandle ExcuteEffects(
-		FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+		FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 	);
 
 	FGameplayAbilitySpecHandle ExcuteEffects2Self(UConsumableUnit* UnitPtr);

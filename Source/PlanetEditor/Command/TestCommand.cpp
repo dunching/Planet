@@ -30,8 +30,8 @@
 #include "InteractiveBaseGAComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
-#include "GA_Periodic_StateTagModify.h"
-#include "GA_Periodic_PropertyModify.h"
+#include "CS_RootMotion.h"
+#include "CS_PeriodicPropertyModify.h"
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
@@ -446,7 +446,7 @@ void TestCommand::TestGAState2Self(const TArray< FString >& Args)
 
 	float Duration = 10.f;
 	LexFromString(Duration, *Args[1]);
-	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModify(
+	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
 		FGameplayTag::RequestGameplayTag(*Args[0]),
 		Duration
 	);
@@ -491,7 +491,7 @@ void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 			{
 				float Duration = 10.f;
 				LexFromString(Duration, *Args[1]);
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_StateTagModify(
+				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
 					FGameplayTag::RequestGameplayTag(*Args[0]),
 					Duration
 				);

@@ -1,5 +1,5 @@
 
-#include "GA_Periodic_PropertyModify.h"
+#include "CS_PeriodicPropertyModify.h"
 
 #include <Engine/AssetManager.h>
 #include <Engine/StreamableManager.h>
@@ -16,13 +16,13 @@
 #include "EffectItem.h"
 #include "InteractiveBaseGAComponent.h"
 
-UGA_Periodic_PropertyModify::UGA_Periodic_PropertyModify():
+UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify():
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UGA_Periodic_PropertyModify::PreActivate(
+void UCS_PeriodicPropertyModify::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -32,7 +32,7 @@ void UGA_Periodic_PropertyModify::PreActivate(
 {
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_PropertyModify*>(TriggerEventData->TargetData.Get(0));
+		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_PropertyModify*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
 		}
@@ -41,7 +41,7 @@ void UGA_Periodic_PropertyModify::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void UGA_Periodic_PropertyModify::ActivateAbility(
+void UCS_PeriodicPropertyModify::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -53,7 +53,7 @@ void UGA_Periodic_PropertyModify::ActivateAbility(
 	PerformAction();
 }
 
-void UGA_Periodic_PropertyModify::EndAbility(
+void UCS_PeriodicPropertyModify::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -70,7 +70,7 @@ void UGA_Periodic_PropertyModify::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UGA_Periodic_PropertyModify::UpdateDuration()
+void UCS_PeriodicPropertyModify::UpdateDuration()
 {
 	if (TaskPtr)
 	{
@@ -78,7 +78,7 @@ void UGA_Periodic_PropertyModify::UpdateDuration()
 	}
 }
 
-void UGA_Periodic_PropertyModify::PerformAction()
+void UCS_PeriodicPropertyModify::PerformAction()
 {
 	if (CharacterPtr)
 	{
@@ -86,7 +86,7 @@ void UGA_Periodic_PropertyModify::PerformAction()
 	}
 }
 
-void UGA_Periodic_PropertyModify::ExcuteTasks()
+void UCS_PeriodicPropertyModify::ExcuteTasks()
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
@@ -112,14 +112,14 @@ void UGA_Periodic_PropertyModify::ExcuteTasks()
 	TaskPtr->ReadyForActivation();
 }
 
-void UGA_Periodic_PropertyModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UCS_PeriodicPropertyModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
 	if (CurrentInterval >= Interval)
 	{
 	}
 }
 
-void UGA_Periodic_PropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UCS_PeriodicPropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
@@ -140,7 +140,7 @@ void UGA_Periodic_PropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr
 	}
 }
 
-FGameplayAbilityTargetData_Periodic_PropertyModify::FGameplayAbilityTargetData_Periodic_PropertyModify(UConsumableUnit* RightVal)
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal)
 {
 	Duration = RightVal->Duration;
 	PerformActionInterval = RightVal->PerformActionInterval;
@@ -148,15 +148,15 @@ FGameplayAbilityTargetData_Periodic_PropertyModify::FGameplayAbilityTargetData_P
 	DefaultIcon = RightVal->GetIcon();
 }
 
-FGameplayAbilityTargetData_Periodic_PropertyModify::FGameplayAbilityTargetData_Periodic_PropertyModify()
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify()
 {
 
 }
 
-FGameplayAbilityTargetData_Periodic_PropertyModify* FGameplayAbilityTargetData_Periodic_PropertyModify::Clone() const
+FGameplayAbilityTargetData_PropertyModify* FGameplayAbilityTargetData_PropertyModify::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_Periodic_PropertyModify;
+		new FGameplayAbilityTargetData_PropertyModify;
 
 	*ResultPtr = *this;
 

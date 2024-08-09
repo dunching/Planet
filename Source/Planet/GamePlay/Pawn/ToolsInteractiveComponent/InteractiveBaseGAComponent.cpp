@@ -25,8 +25,8 @@
 #include "Skill_Talent_NuQi.h"
 #include "Skill_Talent_YinYang.h"
 #include "Skill_Element_Gold.h"
-#include "GA_Periodic_StateTagModify.h"
-#include "GA_Periodic_PropertyModify.h"
+#include "CS_RootMotion.h"
+#include "CS_PeriodicPropertyModify.h"
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
@@ -112,7 +112,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddTemporaryTag(
 }
 
 FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
-	FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+	FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 )
 {
 	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
@@ -128,7 +128,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 	FGameplayEventData Payload;
 	Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-	FGameplayAbilitySpec Spec(UGA_Periodic_PropertyModify::StaticClass(), 1);
+	FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass(), 1);
 
 	GAToolPeriodicHandle = ASCPtr->GiveAbilityAndActivateOnce(
 		Spec,
@@ -139,7 +139,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 }
 
 FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
-	FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+	FGameplayAbilityTargetData_Periodic_RootMotion* GameplayAbilityTargetDataPtr
 )
 {
 	FGameplayAbilitySpecHandle Result;
@@ -148,16 +148,36 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 	if (OnwerActorPtr)
 	{
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		if (PeriodicStateTagModifyMap.Contains(GameplayAbilityTargetDataPtr->Tag))
+
+		if (GameplayAbilityTargetDataPtr->Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
 		{
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[GameplayAbilityTargetDataPtr->Tag]);
-			if (GameplayAbilitySpecPtr)
+			if (PeriodicStateTagModifyMap.Contains(UGameplayTagsSubSystem::GetInstance()->RootMotion))
 			{
-				auto GAPtr = Cast<UGA_Periodic_StateTagModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-				if (GAPtr)
+				auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[GameplayAbilityTargetDataPtr->Tag]);
+				if (GameplayAbilitySpecPtr)
 				{
-					GAPtr->UpdateDuration();
-					return Result;
+					auto GAPtr = Cast<UCS_RootMotion>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+					if (GAPtr)
+					{
+						GAPtr->UpdateDuration();
+						return Result;
+					}
+				}
+			}
+		}
+		else
+		{
+			if (PeriodicStateTagModifyMap.Contains(GameplayAbilityTargetDataPtr->Tag))
+			{
+				auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[GameplayAbilityTargetDataPtr->Tag]);
+				if (GameplayAbilitySpecPtr)
+				{
+					auto GAPtr = Cast<UCS_RootMotion>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+					if (GAPtr)
+					{
+						GAPtr->UpdateDuration();
+						return Result;
+					}
 				}
 			}
 		}
@@ -165,7 +185,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 		FGameplayEventData Payload;
 		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-		FGameplayAbilitySpec Spec(UGA_Periodic_StateTagModify::StaticClass(), 1);
+		FGameplayAbilitySpec Spec(UCS_RootMotion::StaticClass(), 1);
 
 		Result = ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,
@@ -189,7 +209,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects2Self(UCons
 			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicPropertyModifyMap[UnitPtr]);
 			if (GameplayAbilitySpecPtr)
 			{
-				auto GAPtr = Cast<UGA_Periodic_PropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				auto GAPtr = Cast<UCS_PeriodicPropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
 				if (GAPtr)
 				{
 					GAPtr->UpdateDuration();
@@ -197,7 +217,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects2Self(UCons
 				}
 			}
 		}
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_PropertyModify(UnitPtr);
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(UnitPtr);
 
 		GameplayAbilityTargetDataPtr->TriggerCharacterPtr = OnwerActorPtr;
 		GameplayAbilityTargetDataPtr->TargetCharacterPtr = OnwerActorPtr;
@@ -232,7 +252,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 }
 
 void UInteractiveBaseGAComponent::SendEventImp(
-	FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr
+	FGameplayAbilityTargetData_Periodic_RootMotion* GameplayAbilityTargetDataPtr
 )
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
@@ -255,7 +275,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 }
 
 void UInteractiveBaseGAComponent::SendEventImp(
-	FGameplayAbilityTargetData_Periodic_PropertyModify* GameplayAbilityTargetDataPtr
+	FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 )
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();

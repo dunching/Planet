@@ -27,7 +27,7 @@
 #include "SPlineActor.h"
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "GA_Periodic_StateTagModify.h"
+#include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "PlanetPlayerController.h"
 
@@ -133,20 +133,39 @@ void USkill_Active_Control::PerformAction()
 
 void USkill_Active_Control::ExcuteTasks()
 {
-	SPlineActorPtr = GetWorldImp()->SpawnActor<ASPlineActor>(FVector::ZeroVector, FRotator::ZeroRotator);
+	SPlineActorPtr = GetWorldImp()->SpawnActor<ASPlineActor>(SPlineActorClass, FVector::ZeroVector, FRotator::ZeroRotator);
 	SPlineActorPtr->AttachToActor(CharacterPtr, FAttachmentTransformRules::KeepRelativeTransform);
 
 	const auto Duration = HumanMontage->CalculateSequenceLength();
 
-	auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::ApplyRootMotionBySpline(
-		this,
-		TEXT(""),
-		Duration,
-		SPlineActorPtr,
-		HasFocusActor()
-	);
-	TaskPtr->OnFinish.BindUObject(this, &ThisClass::K2_CancelAbility);
-	TaskPtr->ReadyForActivation();
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+
+	// ÉËº¦
+	{
+		FGAEventData GAEventData(HasFocusActor(), CharacterPtr);
+
+		GAEventData.SetBaseDamage(Damage);
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+		ICPtr->SendEventImp(GAEventDataPtr);
+	}
+
+	// ¿ØÖÆÐ§¹û
+	{
+		auto GAEventData_Periodic_StateTagModifyPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
+			UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline,
+			Duration
+		);
+
+		GAEventData_Periodic_StateTagModifyPtr->TriggerCharacterPtr = CharacterPtr;
+		GAEventData_Periodic_StateTagModifyPtr->TargetCharacterPtr = HasFocusActor();
+		GAEventData_Periodic_StateTagModifyPtr->SPlineActorPtr = SPlineActorPtr;
+
+		ICPtr->SendEventImp(GAEventData_Periodic_StateTagModifyPtr);
+	}
 }
 
 void USkill_Active_Control::PlayMontage()

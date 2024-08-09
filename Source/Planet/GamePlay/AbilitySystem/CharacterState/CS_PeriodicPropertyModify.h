@@ -7,7 +7,7 @@
 
 #include "Skill_Base.h"
 
-#include "GA_Periodic_StateTagModify.generated.h"
+#include "CS_PeriodicPropertyModify.generated.h"
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
@@ -16,16 +16,45 @@ class UEffectItem;
 
 struct FStreamableHandle;
 
-struct FGameplayAbilityTargetData_Periodic_StateTagModify;
+USTRUCT()
+struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAbilityTargetData
+{
+	GENERATED_USTRUCT_BODY()
+
+	friend UCS_PeriodicPropertyModify;
+
+	FGameplayAbilityTargetData_PropertyModify();
+
+	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);
+
+	FGameplayAbilityTargetData_PropertyModify* Clone()const;
+
+	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
+
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
+
+private:
+
+	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+
+	float Duration = 3.f;
+
+	float PerformActionInterval = 1.f;
+
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+	FGuid Guid = FGuid::NewGuid();
+
+};
 
 UCLASS()
-class PLANET_API UGA_Periodic_StateTagModify : public USkill_Base
+class PLANET_API UCS_PeriodicPropertyModify : public USkill_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	UGA_Periodic_StateTagModify();
+	UCS_PeriodicPropertyModify();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -62,46 +91,10 @@ protected:
 
 	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
-	const FGameplayAbilityTargetData_Periodic_StateTagModify* GameplayAbilityTargetDataPtr = nullptr;
+	const FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr = nullptr;
 
 	UEffectItem* EffectItemPtr = nullptr;
 
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float FlyAwayHeight = 250.f;
-
-};
-
-USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_Periodic_StateTagModify : public FGameplayAbilityTargetData
-{
-	GENERATED_USTRUCT_BODY()
-
-	friend UGA_Periodic_StateTagModify;
-
-	FGameplayAbilityTargetData_Periodic_StateTagModify();
-
-	FGameplayAbilityTargetData_Periodic_StateTagModify(
-		const FGameplayTag& Tag,
-		float Duration
-	);
-
-	FGameplayAbilityTargetData_Periodic_StateTagModify* Clone()const;
-
-	float Duration = 3.f;
-
-	int32 Height = 100;
-
-	// 会一次性修改多个状态码？
-	FGameplayTag Tag;
-
-	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
-
-	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
-
-private:
-
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
 };

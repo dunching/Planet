@@ -25,7 +25,7 @@ class PLANET_API UAbilityTask_ApplyRootMotionBySPline : public UAbilityTask_Appl
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UAbilityTask_ApplyRootMotionBySPline* ApplyRootMotionBySpline
+	static UAbilityTask_ApplyRootMotionBySPline* NewTask
 	(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,

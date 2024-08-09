@@ -7,7 +7,7 @@
 
 #include "Skill_Base.h"
 
-#include "GA_AddTemporaryTag.generated.h"
+#include "CS_AddTemporaryTag.generated.h"
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
@@ -15,27 +15,6 @@ class UConsumableUnit;
 class UEffectItem;
 
 struct FStreamableHandle;
-
-struct FGameplayAbilityTargetData_Periodic_StateTagModify;
-
-UCLASS()
-class PLANET_API UGA_AddTemporaryTag : public USkill_Base
-{
-	GENERATED_BODY()
-
-public:
-
-	UGA_AddTemporaryTag();
-
-	virtual void PreActivate(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-		const FGameplayEventData* TriggerEventData = nullptr
-	);
-
-};
 
 USTRUCT()
 struct PLANET_API FGameplayAbilityTargetData_AddTemporaryTag : public FGameplayAbilityTargetData
@@ -54,5 +33,24 @@ struct PLANET_API FGameplayAbilityTargetData_AddTemporaryTag : public FGameplayA
 	float Duration = -1.f;
 
 	FGameplayTag Tag;
+
+};
+
+UCLASS()
+class PLANET_API UGA_AddTemporaryTag : public USkill_Base
+{
+	GENERATED_BODY()
+
+public:
+
+	UGA_AddTemporaryTag();
+
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	);
 
 };

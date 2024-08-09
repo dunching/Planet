@@ -157,7 +157,7 @@ void USkill_Active_Displacement::FindTarget()
 
 	SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(2, FVector::ZeroVector, FVector::ZeroVector, ESplineCoordinateSpace::World);
 
-	auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::ApplyRootMotionBySpline(
+	auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
 		this,
 		TEXT(""),
 		Duration,
