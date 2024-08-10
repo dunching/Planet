@@ -79,7 +79,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Traction =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.Traction")));
-	
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag TornadoTraction =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.TornadoTraction")));
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag MoveAlongSpline =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveAlongSpline")));

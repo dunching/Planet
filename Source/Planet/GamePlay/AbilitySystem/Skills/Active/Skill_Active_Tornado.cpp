@@ -28,6 +28,9 @@
 #include "AbilityTask_TimerHelper.h"
 #include "Helper_RootMotionSource.h"
 #include "AbilityTask_tornado.h"
+#include "CS_RootMotion.h"
+#include "GameplayTagsSubSystem.h"
+#include "InteractiveBaseGAComponent.h"
 
 ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/) :
 	Super(ObjectInitializer)
@@ -231,19 +234,20 @@ void USkill_Active_Tornado::OnOverlap(AActor* OtherActor)
 			return;
 		}
 
-		// 
-		if (!TargetsSet.Contains(OtherCharacterPtr))
-		{
-			TargetsSet.Add(OtherCharacterPtr);
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 
-			auto TaskPtr = UAbilityTask_Tornado::TornadoTask(
-				this,
-				TEXT(""),
-				TornadoPtr,
-				OtherCharacterPtr
+		// ¿ØÖÆÐ§¹û
+		{
+			auto GAEventData_Periodic_StateTagModifyPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
+				UGameplayTagsSubSystem::GetInstance()->TornadoTraction,
+				-1.f
 			);
 
-			TaskPtr->ReadyForActivation();
+			GAEventData_Periodic_StateTagModifyPtr->TriggerCharacterPtr = CharacterPtr;
+			GAEventData_Periodic_StateTagModifyPtr->TargetCharacterPtr = OtherCharacterPtr;
+			GAEventData_Periodic_StateTagModifyPtr->TornadoPtr = TornadoPtr;
+
+			ICPtr->SendEventImp(GAEventData_Periodic_StateTagModifyPtr);
 		}
 	}
 }

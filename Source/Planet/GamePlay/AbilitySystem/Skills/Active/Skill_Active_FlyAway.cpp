@@ -142,7 +142,7 @@ void USkill_Active_FlyAway::ExcuteTasks()
 		for (const auto & Iter : Result)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
+			if (TargetCharacterPtr && CharacterPtr->IsGroupmate(TargetCharacterPtr))
 			{
 				TargetSet.Add(TargetCharacterPtr);
 			}

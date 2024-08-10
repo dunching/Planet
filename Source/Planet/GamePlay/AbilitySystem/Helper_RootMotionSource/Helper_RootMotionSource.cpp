@@ -103,7 +103,7 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 
 	FTransform NewTransform;
 
-	if (SPlineActorPtr)
+	if (SPlineActorPtr.IsValid())
 	{
 		const float MoveFraction = (GetTime() + SimulationTime) / Duration;
 
@@ -168,9 +168,7 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 {
 	RootMotionParams.Clear();
 
-	FTransform NewTransform;
-
-	if (TornadoPtr)
+	if (TornadoPtr.IsValid())
 	{
 		const FVector CurrentLocation = Character.GetActorLocation();
 		const FVector TornadoLocation = TornadoPtr->GetActorLocation();
@@ -195,19 +193,25 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 		}
 #endif
 
+		FTransform NewTransform;
+
 		NewTransform.SetTranslation(Distance);
 
 		FQuat Rot = FQuat::FindBetween(Character.GetActorForwardVector(), NewRotator) / MovementTickTime;
 
 		NewTransform.SetRotation(Rot);
+
+		const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
+		NewTransform.ScaleTranslation(Multiplier);
+
+		RootMotionParams.Set(NewTransform);
+
+		SetTime(GetTime() + SimulationTime);
 	}
-
-	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
-	NewTransform.ScaleTranslation(Multiplier);
-
-	RootMotionParams.Set(NewTransform);
-
-	SetTime(GetTime() + SimulationTime);
+	else
+	{
+		SetRootMotionFinished(*this);
+	}
 }
 
 FRootMotionSource_FlyAway::FRootMotionSource_FlyAway()
@@ -303,4 +307,9 @@ void FRootMotionSource_FlyAway::UpdateDuration(
 	CurrentStartPt = InOriginalPt;
 
 	TargetPt = OriginalLandingPt - (UKismetGravityLibrary::GetGravity(OriginalLandingPt) * InHeight);
+}
+
+void SetRootMotionFinished(FRootMotionSource& RootMotionSource)
+{
+	RootMotionSource.Status.SetFlag(ERootMotionSourceStatusFlags::Finished);
 }

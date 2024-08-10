@@ -153,7 +153,8 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 		{
 			if (PeriodicStateTagModifyMap.Contains(UGameplayTagsSubSystem::GetInstance()->RootMotion))
 			{
-				auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[GameplayAbilityTargetDataPtr->Tag]);
+				auto GameplayAbilitySpecPtr = 
+					ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[UGameplayTagsSubSystem::GetInstance()->RootMotion]);
 				if (GameplayAbilitySpecPtr)
 				{
 					auto GAPtr = Cast<UCS_RootMotion>(GameplayAbilitySpecPtr->GetPrimaryInstance());
@@ -164,6 +165,18 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 					}
 				}
 			}
+
+			FGameplayEventData Payload;
+			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+
+			FGameplayAbilitySpec Spec(UCS_RootMotion::StaticClass(), 1);
+
+			Result = ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				&Payload
+			);
+
+			PeriodicStateTagModifyMap.Add(UGameplayTagsSubSystem::GetInstance()->RootMotion, Result);
 		}
 		else
 		{
@@ -180,19 +193,19 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 					}
 				}
 			}
+
+			FGameplayEventData Payload;
+			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+
+			FGameplayAbilitySpec Spec(UCS_RootMotion::StaticClass(), 1);
+
+			Result = ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				&Payload
+			);
+
+			PeriodicStateTagModifyMap.Add(GameplayAbilityTargetDataPtr->Tag, Result);
 		}
-
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-		FGameplayAbilitySpec Spec(UCS_RootMotion::StaticClass(), 1);
-
-		Result = ASCPtr->GiveAbilityAndActivateOnce(
-			Spec,
-			&Payload
-		);
-
-		PeriodicStateTagModifyMap.Add(GameplayAbilityTargetDataPtr->Tag, Result);
 	}
 	return Result;
 }

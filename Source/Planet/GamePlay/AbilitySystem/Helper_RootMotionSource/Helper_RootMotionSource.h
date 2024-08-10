@@ -25,6 +25,9 @@ enum ERootMotionSource_Priority : uint16
 class ASPlineActor;
 class ATornado;
 class ACharacterBase;
+
+void SetRootMotionFinished(FRootMotionSource & RootMotionSource);
+
 USTRUCT()
 struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForce
 {
@@ -100,7 +103,7 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
-	ASPlineActor* SPlineActorPtr = nullptr;
+	TWeakObjectPtr<ASPlineActor> SPlineActorPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 };
@@ -132,7 +135,7 @@ struct FRootMotionSource_ByTornado : public FRootMotionSource
 
 	float RotationSpeed = 360.f;
 
-	ATornado* TornadoPtr = nullptr;
+	TWeakObjectPtr<ATornado> TornadoPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 };

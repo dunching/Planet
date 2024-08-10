@@ -25,17 +25,18 @@ public:
 
 	UAbilityTask_Tornado(const FObjectInitializer& ObjectInitializer);
 
-	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UAbilityTask_Tornado* TornadoTask(
+	static UAbilityTask_Tornado* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
-		ATornado* InTornadoPtr,
+		TWeakObjectPtr<ATornado> InTornadoPtr,
 		ACharacterBase* InTargetCharacterPtr
 	);
 
 	virtual void Activate() override;
 
 	virtual void OnDestroy(bool AbilityIsEnding) override;
+
+	virtual void TickTask(float DeltaTime) override;
 
 	FOnTaskFinished OnFinish;
 
@@ -45,7 +46,7 @@ protected:
 
 protected:
 
-	ATornado* TornadoPtr = nullptr;
+	TWeakObjectPtr<ATornado> TornadoPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 

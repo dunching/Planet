@@ -21,10 +21,10 @@ UAbilityTask_Tornado::UAbilityTask_Tornado(const FObjectInitializer& ObjectIniti
 	bTickingTask = true;
 }
 
-UAbilityTask_Tornado* UAbilityTask_Tornado::TornadoTask(
+UAbilityTask_Tornado* UAbilityTask_Tornado::NewTask(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,
-	ATornado* InTornadoPtr,
+	TWeakObjectPtr<ATornado> InTornadoPtr,
 	ACharacterBase* InTargetCharacterPtr
 )
 {
@@ -83,5 +83,19 @@ void UAbilityTask_Tornado::OnDestroy(bool AbilityIsEnding)
 	}
 
 	Super::OnDestroy(AbilityIsEnding);
+}
+
+void UAbilityTask_Tornado::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+
+	const bool bTimedOut = HasTimedOut();
+
+	if (bTimedOut)
+	{
+		OnFinish.ExecuteIfBound();
+
+		EndTask();
+	}
 }
 

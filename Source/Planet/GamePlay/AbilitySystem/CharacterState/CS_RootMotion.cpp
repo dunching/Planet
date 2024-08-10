@@ -23,6 +23,8 @@
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
+#include "AbilityTask_Tornado.h"
+#include "Skill_Active_Tornado.h"
 
 UCS_RootMotion::UCS_RootMotion() :
 	Super()
@@ -142,6 +144,22 @@ void UCS_RootMotion::PerformAction()
 
 			RootMotionTaskPtr->ReadyForActivation();
 		}
+		else if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
+		{
+			auto RootMotionTaskPtr = UAbilityTask_Tornado::NewTask(
+				this,
+				TEXT(""),
+				GameplayAbilityTargetDataPtr->TornadoPtr.Get(),
+				GameplayAbilityTargetDataPtr->TargetCharacterPtr.Get()
+			);
+
+			RootMotionTaskPtr->Ability = this;
+			RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+
+			RootMotionTaskPtr->OnFinish.BindUObject(this, &ThisClass::OnTaskComplete);
+
+			RootMotionTaskPtr->ReadyForActivation();
+		}
 		else if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Silent))
 		{
 
@@ -169,14 +187,20 @@ void UCS_RootMotion::ExcuteTasks()
 
 	}
 
-	TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-	TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration);
-	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
-	TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
-	TaskPtr->OnFinished.BindLambda([this](auto) {
-		K2_CancelAbility();
-		});
-	TaskPtr->ReadyForActivation();
+	if (GameplayAbilityTargetDataPtr->Duration < 0.f)
+	{
+	}
+	else
+	{
+		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration);
+		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
+		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+		TaskPtr->OnFinished.BindLambda([this](auto) {
+			K2_CancelAbility();
+			});
+		TaskPtr->ReadyForActivation();
+	}
 }
 
 void UCS_RootMotion::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
@@ -205,6 +229,11 @@ void UCS_RootMotion::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float Curre
 	{
 
 	}
+}
+
+void UCS_RootMotion::OnTaskComplete()
+{
+	K2_CancelAbility();
 }
 
 FGameplayAbilityTargetData_Periodic_RootMotion::FGameplayAbilityTargetData_Periodic_RootMotion(

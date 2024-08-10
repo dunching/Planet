@@ -14,6 +14,7 @@ class UTexture2D;
 class UConsumableUnit;
 class UEffectItem;
 class ASPlineActor;
+class ATornado;
 
 struct FStreamableHandle;
 
@@ -35,6 +36,7 @@ struct PLANET_API FGameplayAbilityTargetData_Periodic_RootMotion : public FGamep
 
 	FGameplayAbilityTargetData_Periodic_RootMotion* Clone()const;
 
+	// < 0 则意味着由Task取消
 	float Duration = 3.f;
 
 	int32 Height = 100;
@@ -47,6 +49,8 @@ struct PLANET_API FGameplayAbilityTargetData_Periodic_RootMotion : public FGamep
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 	
 	TWeakObjectPtr<ASPlineActor> SPlineActorPtr = nullptr;
+	
+	TWeakObjectPtr<ATornado> TornadoPtr = nullptr;
 
 private:
 
@@ -97,6 +101,8 @@ protected:
 	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
 	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+
+	void OnTaskComplete();
 
 	const FGameplayAbilityTargetData_Periodic_RootMotion* GameplayAbilityTargetDataPtr = nullptr;
 

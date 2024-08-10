@@ -123,6 +123,12 @@ bool FGroupMatesHelper::IsMember(FCharacterUnitType* CharacterUnitPtr) const
 			return true;
 		}
 	}
+
+	if (CharacterUnitPtr == OwnerCharacterUnitPtr)
+	{
+		return true;
+	}
+
 	return false;
 }
 
