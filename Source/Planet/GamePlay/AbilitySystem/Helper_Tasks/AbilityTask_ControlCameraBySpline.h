@@ -5,12 +5,11 @@
 
 #include "UObject/ObjectMacros.h"
 #include "Abilities/Tasks/AbilityTask.h"
-#include "Abilities/Tasks/AbilityTask_ApplyRootMotion_Base.h"
 
-#include "AbilityTask_ApplyRootMotionBySPline.generated.h"
+#include "AbilityTask_ControlCameraBySpline.generated.h"
 
 class UCurveFloat;
-class ASPlineActor;
+class ACameraTrailHelper;
 class ACharacterBase;
 
 DECLARE_DELEGATE(FOnTaskFinished);
@@ -19,18 +18,18 @@ DECLARE_DELEGATE(FOnTaskFinished);
  *	Applies force to character's movement
  */
 UCLASS()
-class PLANET_API UAbilityTask_ApplyRootMotionBySPline : public UAbilityTask_ApplyRootMotion_Base
+class PLANET_API UAbilityTask_ControlCameraBySpline : public UAbilityTask
 {
 	GENERATED_BODY()
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
-	static UAbilityTask_ApplyRootMotionBySPline* NewTask
+	static UAbilityTask_ControlCameraBySpline* NewTask
 	(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
 		float Duration,
-		ASPlineActor* InSPlineActorPtr,
+		ACameraTrailHelper* CameraTrailHelperPtr,
 		ACharacterBase* InTargetCharacterPtr,
 		int32 StartPtIndex = 0,
 		int32 EndPtIndex = -1
@@ -46,17 +45,25 @@ public:
 
 protected:
 
-	virtual void SharedInitAndApply() override;
-
 protected:
 
 	int32 StartPtIndex = 0;
 
 	int32 EndPtIndex = -1;
 
+	float StartDistance = 0.f;
+
+	float EndDistance = 0.f;
+
+	float StartTime = 0.f;
+
+	float EndTime = 0.f;
+
+	float CurrentTime = 0.f;
+
 	float Duration = 1.f;
 
-	ASPlineActor* SPlineActorPtr = nullptr;
+	ACameraTrailHelper* CameraTrailHelperPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 

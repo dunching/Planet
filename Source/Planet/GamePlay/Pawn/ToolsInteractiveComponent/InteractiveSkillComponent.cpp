@@ -226,7 +226,7 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 			{
 				WeaponUnit->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 					FGameplayAbilitySpec(
-						WeaponUnit->WeaponUnitPtr->FirstSkill->SkillClass,
+						WeaponUnit->WeaponUnitPtr->FirstSkill->GetSkillClass(),
 						WeaponUnit->WeaponUnitPtr->FirstSkill->Level
 					)
 				);
@@ -661,7 +661,8 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 					auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>((*PreviouIter)->SkillUnit);
 					if (PassiveSkillUnitPtr)
 					{
-						for (const auto& ElementIter : PassiveSkillUnitPtr->AddtionalElementMap)
+						auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
+						for (const auto& ElementIter : PassiveSkillExtendInfoPtr->AddtionalElementMap)
 						{
 							switch (ElementIter.Key)
 							{
@@ -707,19 +708,20 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 				auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>(Iter.Value->SkillUnit);
 				if (PassiveSkillUnitPtr)
 				{
-					if (PassiveSkillUnitPtr->AddtionalElementMap.IsEmpty())
+					auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
+					if (PassiveSkillExtendInfoPtr->AddtionalElementMap.IsEmpty())
 					{
 						auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 						Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 							FGameplayAbilitySpec(
-								Iter.Value->SkillUnit->SkillClass,
+								Iter.Value->SkillUnit->GetSkillClass(),
 								Iter.Value->SkillUnit->Level
 							)
 						));
 					}
 					else
 					{
-						for (const auto& ElementIter : PassiveSkillUnitPtr->AddtionalElementMap)
+						for (const auto& ElementIter : PassiveSkillExtendInfoPtr->AddtionalElementMap)
 						{
 							switch (ElementIter.Key)
 							{
@@ -744,7 +746,7 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 				auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 				Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 					FGameplayAbilitySpec(
-						Iter.Value->SkillUnit->SkillClass,
+						Iter.Value->SkillUnit->GetSkillClass(),
 						Iter.Value->SkillUnit->Level
 					)
 				));
@@ -761,7 +763,7 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 					auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 					Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 						FGameplayAbilitySpec(
-							Iter.Value->SkillUnit->SkillClass,
+							Iter.Value->SkillUnit->GetSkillClass(),
 							Iter.Value->SkillUnit->Level
 						)
 					));
@@ -774,7 +776,7 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 					auto& Ref = SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 					Ref->HandleAry.Add(OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 						FGameplayAbilitySpec(
-							Iter.Value->SkillUnit->SkillClass,
+							Iter.Value->SkillUnit->GetSkillClass(),
 							Iter.Value->SkillUnit->Level
 						)
 					));

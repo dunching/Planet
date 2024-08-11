@@ -44,6 +44,10 @@ protected:
 
     FLyraCharacterGroundInfo CachedGroundInfo;
 
+    virtual void PhysicsRotation(float DeltaTime)override;
+
+    virtual void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)override;
+
 #if USECUSTOMEGRAVITY
     UGravityMovementComponent(const FObjectInitializer& ObjectInitializer);
 
@@ -57,8 +61,6 @@ protected:
         FActorComponentTickFunction* ThisTickFunction
     ) override;
 
-    virtual void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)override;
-
     virtual void PerformMovement(float DeltaTime)override;
 
     virtual void StartNewPhysics(float DeltaTime, int32 Iterations)override;
@@ -66,8 +68,6 @@ protected:
     virtual void ApplyRootMotionToVelocity(float deltaTime)override;
 
     virtual void SetGravityDirection(const FVector& GravityDir)override;
-
-    virtual void PhysicsRotation(float DeltaTime)override;
 
     virtual void PhysNavWalking(float deltaTime, int32 Iterations)override;
 

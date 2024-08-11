@@ -62,6 +62,30 @@ const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
     return CachedGroundInfo;
 }
 
+void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
+{
+    if (bSkilPerformMovement)
+    {
+        return;
+    }
+
+    Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
+}
+
+void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
+{
+    if (
+        bSkilPerformMovement ||
+        HasRootMotionSources() ||
+        HasAnimRootMotion()
+        )
+    {
+        return;
+    }
+
+    Super::PhysicsRotation(DeltaTime);
+}
+
 #if USECUSTOMEGRAVITY
 DEFINE_LOG_CATEGORY_STATIC(LogGravityCharacterMovement, Log, All);
 DEFINE_LOG_CATEGORY_STATIC(LogNavMeshMovement, Log, All);
@@ -126,16 +150,6 @@ void UGravityMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason
 void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
     Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
-void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
-{
-    if (bSkilPerformMovement)
-    {
-        return;
-    }
-
-    Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
 }
 
 void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
@@ -642,20 +656,6 @@ void UGravityMovementComponent::SetGravityDirection(const FVector& InNewGravityD
 			bHasCustomGravity = !GravityDirection.Equals(DefaultGravityDirection);
         }
     }
-}
-
-void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
-{
-	if (
-        bSkilPerformMovement || 
-        HasRootMotionSources() ||
-        HasAnimRootMotion()
-        )
-	{
-		return;
-	}
-
-    Super::PhysicsRotation(DeltaTime);
 }
 
 void UGravityMovementComponent::PhysWalking(float deltaTime, int32 Iterations)

@@ -37,16 +37,7 @@ void USkill_WeaponActive_Base::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-}
 
-void USkill_WeaponActive_Base::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
 		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
@@ -55,8 +46,6 @@ void USkill_WeaponActive_Base::ActivateAbility(
 		if (GameplayAbilityTargetDataPtr)
 		{
 			bIsAutomaticStop = GameplayAbilityTargetDataPtr->bIsAutomaticStop;
-
-			RepeatAction();
 		}
 		else
 		{
@@ -69,6 +58,18 @@ void USkill_WeaponActive_Base::ActivateAbility(
 	SkillState = EType::kNone;
 
 	bIsRequstCancel = false;
+}
+
+void USkill_WeaponActive_Base::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	RepeatAction();
 }
 
 void USkill_WeaponActive_Base::CancelAbility(

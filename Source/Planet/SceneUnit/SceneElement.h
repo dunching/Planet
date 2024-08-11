@@ -16,6 +16,8 @@
 struct FTableRowUnit;
 struct FTableRowUnit_WeaponExtendInfo;
 struct FTableRowUnit_ActiveSkillExtendInfo;
+struct FTableRowUnit_PassiveSkillExtendInfo;
+struct FTableRowUnit_WeaponSkillExtendInfo;
 struct FTableRowUnit_CharacterInfo;
 class AToolUnitBase;
 class AWeapon_Base;
@@ -213,8 +215,7 @@ public:
 
 	int32 Level = 1;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
-	TSubclassOf<USkill_Base>SkillClass;
+	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
 protected:
 
@@ -229,14 +230,11 @@ public:
 
 	UPassiveSkillUnit();
 
-	// 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
-	TMap<EWuXingType, int32>AddtionalElementMap;
-
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
-	TSubclassOf<USkill_Base>AddtionalSkillClass;
+	FTableRowUnit_PassiveSkillExtendInfo* GetTableRowUnit_PassiveSkillExtendInfo()const;
+
+	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
 protected:
 
@@ -252,6 +250,8 @@ public:
 	UActiveSkillUnit();
 
 	FTableRowUnit_ActiveSkillExtendInfo* GetTableRowUnit_ActiveSkillExtendInfo()const;
+
+	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
 protected:
 
@@ -278,6 +278,10 @@ class PLANET_API UWeaponSkillUnit : public USkillUnit
 public:
 
 	UWeaponSkillUnit();
+
+	FTableRowUnit_WeaponSkillExtendInfo* GetTableRowUnit_WeaponSkillExtendInfo()const;
+
+	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
 protected:
 

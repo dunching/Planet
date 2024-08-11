@@ -28,9 +28,9 @@ public:
 
     FQuat GetGravityToWorldTransform() const;
 
-    UCameraComponent* GetCameraComp() {
-        return FollowCamera;
-    };
+    UCameraComponent* GetCameraComp();;
+
+    USpringArmComponent* GetCameraBoom();;
 
     virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false)override;
 

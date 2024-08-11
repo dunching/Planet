@@ -107,7 +107,9 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 	{
 		const float MoveFraction = (GetTime() + SimulationTime) / Duration;
 
-		const auto Pt = SPlineActorPtr->SplineComponentPtr->GetWorldLocationAtTime(MoveFraction, true);
+		const auto LerpValue = FMath::Lerp(StartDistance, EndDistance, MoveFraction);
+
+		const auto Pt = SPlineActorPtr->SplineComponentPtr->GetWorldLocationAtDistanceAlongSpline(LerpValue);
 
 #ifdef WITH_EDITOR
 		if (SkillDrawDebugSpline.GetValueOnGameThread())

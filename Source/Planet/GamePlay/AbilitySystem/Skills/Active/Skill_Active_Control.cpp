@@ -133,8 +133,7 @@ void USkill_Active_Control::PerformAction()
 
 void USkill_Active_Control::ExcuteTasks()
 {
-	SPlineActorPtr = GetWorldImp()->SpawnActor<ASPlineActor>(SPlineActorClass, FVector::ZeroVector, FRotator::ZeroRotator);
-	SPlineActorPtr->AttachToActor(CharacterPtr, FAttachmentTransformRules::KeepRelativeTransform);
+	SPlineActorPtr = GetWorldImp()->SpawnActor<ASPlineActor>(SPlineActorClass, CharacterPtr->GetActorTransform());
 
 	const auto Duration = HumanMontage->CalculateSequenceLength();
 

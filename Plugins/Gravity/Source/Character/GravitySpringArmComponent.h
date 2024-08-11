@@ -15,6 +15,8 @@ class GRAVITY_API UGravitySpringArmComponent : public USpringArmComponent
 
 public:
 
+
+
 protected:
 
 #if USECUSTOMEGRAVITY

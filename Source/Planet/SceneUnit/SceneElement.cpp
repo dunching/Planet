@@ -121,8 +121,27 @@ USkillUnit::USkillUnit() :
 
 }
 
+TSubclassOf<USkill_Base> USkillUnit::GetSkillClass() const
+{
+	return nullptr;
+}
+
 UWeaponSkillUnit::UWeaponSkillUnit()
 {
+}
+
+FTableRowUnit_WeaponSkillExtendInfo* UWeaponSkillUnit::GetTableRowUnit_WeaponSkillExtendInfo() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponSkillExtendInfo.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_WeaponSkillExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
+}
+
+TSubclassOf<USkill_Base> UWeaponSkillUnit::GetSkillClass() const
+{
+	return GetTableRowUnit_WeaponSkillExtendInfo()->SkillClass;
 }
 
 UTalentSkillUnit::UTalentSkillUnit()
@@ -142,8 +161,27 @@ FTableRowUnit_ActiveSkillExtendInfo* UActiveSkillUnit::GetTableRowUnit_ActiveSki
 	return SceneUnitExtendInfoPtr;
 }
 
+TSubclassOf<USkill_Base> UActiveSkillUnit::GetSkillClass() const
+{
+	return GetTableRowUnit_ActiveSkillExtendInfo()->SkillClass;
+}
+
 UPassiveSkillUnit::UPassiveSkillUnit()
 {
+}
+
+FTableRowUnit_PassiveSkillExtendInfo* UPassiveSkillUnit::GetTableRowUnit_PassiveSkillExtendInfo() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_PassiveSkillExtendInfo.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PassiveSkillExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
+}
+
+TSubclassOf<USkill_Base> UPassiveSkillUnit::GetSkillClass() const
+{
+	return GetTableRowUnit_PassiveSkillExtendInfo()->SkillClass;
 }
 
 UCharacterUnit::UCharacterUnit()

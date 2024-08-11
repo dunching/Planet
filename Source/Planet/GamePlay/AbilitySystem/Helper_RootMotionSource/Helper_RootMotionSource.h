@@ -103,9 +103,20 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
+	int32 StartPtIndex = 0;
+
+	int32 EndPtIndex = 1;
+
+	float StartDistance = 0.f;
+
+	float EndDistance = 0.f;
+
 	TWeakObjectPtr<ASPlineActor> SPlineActorPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
+
+private:
+
 };
 
 USTRUCT()

@@ -63,13 +63,44 @@ struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowBase
+struct PLANET_API FTableRowUnit_SkillExtendInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<USkill_Base>SkillClass;
+
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag RequireWeaponUnitType = FGameplayTag::EmptyTag;
 
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_PassiveSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
+{
+	GENERATED_USTRUCT_BODY()
+	
+	// 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
+	TMap<EWuXingType, int32>AddtionalElementMap;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
+	TSubclassOf<USkill_Base>AddtionalSkillClass;
+
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_WeaponSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
+{
+	GENERATED_USTRUCT_BODY()
+	
 };
 
 USTRUCT(BlueprintType)

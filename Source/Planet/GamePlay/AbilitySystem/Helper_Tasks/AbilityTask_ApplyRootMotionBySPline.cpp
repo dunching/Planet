@@ -9,9 +9,11 @@
 #include "AbilitySystemLog.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/World.h"
+#include <Components/SplineComponent.h>
 
 #include "Helper_RootMotionSource.h"
 #include "CharacterBase.h"
+#include "SPlineActor.h"
 
 UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewTask
 (
@@ -19,7 +21,9 @@ UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewT
 	FName TaskInstanceName,
 	float Duration,
 	ASPlineActor* InSPlineActorPtr,
-	ACharacterBase* InTargetCharacterPtr
+	ACharacterBase* InTargetCharacterPtr,
+	int32 StartPtIndex,
+	int32 EndPtIndex
 )
 {
 	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
@@ -34,6 +38,8 @@ UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewT
 	MyTask->Duration = Duration;
 	MyTask->SPlineActorPtr = InSPlineActorPtr;
 	MyTask->TargetCharacterPtr = InTargetCharacterPtr;
+	MyTask->StartPtIndex = StartPtIndex;
+	MyTask->EndPtIndex = EndPtIndex;
 
 	return MyTask;
 }
@@ -69,6 +75,20 @@ void UAbilityTask_ApplyRootMotionBySPline::SharedInitAndApply()
 
 			RootMotionSource->SPlineActorPtr = SPlineActorPtr;
 			RootMotionSource->TargetCharacterPtr = TargetCharacterPtr;
+
+			RootMotionSource->StartPtIndex = StartPtIndex;
+			RootMotionSource->StartDistance = 
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(RootMotionSource->StartPtIndex);
+			if (EndPtIndex < 0)
+			{
+				RootMotionSource->EndPtIndex = SPlineActorPtr->SplineComponentPtr->GetNumberOfSplinePoints() - 1;
+			}
+			else
+			{
+				RootMotionSource->EndPtIndex = EndPtIndex;
+			}
+			RootMotionSource->EndDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(RootMotionSource->EndPtIndex);
 
 			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RootMotionSource);
 		}
