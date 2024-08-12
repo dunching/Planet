@@ -28,7 +28,7 @@
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 
-namespace ActionSkillsIcon
+struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 {
 	const FName Percent = TEXT("Percent");
 
@@ -43,7 +43,7 @@ namespace ActionSkillsIcon
 	const FName CooldownText = TEXT("CooldownText");
 
 	const FName CanRelease = TEXT("CanRelease");
-}
+};
 
 UActionSkillsIcon::UActionSkillsIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -151,7 +151,7 @@ void UActionSkillsIcon::SetRemainingCooldown(
 	if (bCooldownIsReady)
 	{
 		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ActionSkillsIcon::StateOverlap));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().StateOverlap));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Hidden);
@@ -161,7 +161,7 @@ void UActionSkillsIcon::SetRemainingCooldown(
 	else
 	{
 		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ActionSkillsIcon::StateOverlap));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().StateOverlap));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
@@ -169,7 +169,7 @@ void UActionSkillsIcon::SetRemainingCooldown(
 		}
 	}
 	{
-		auto UIPtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::CooldownProgress));
+		auto UIPtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().CooldownProgress));
 		if (!UIPtr)
 		{
 			return;
@@ -177,11 +177,11 @@ void UActionSkillsIcon::SetRemainingCooldown(
 		auto MIDPtr = UIPtr->GetDynamicMaterial();
 		if (MIDPtr)
 		{
-			MIDPtr->SetScalarParameterValue(ActionSkillsIcon::Percent, Percent);
+			MIDPtr->SetScalarParameterValue(FActionSkillsIcon::Get().Percent, Percent);
 		}
 	}
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(ActionSkillsIcon::CooldownText));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FActionSkillsIcon::Get().CooldownText));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%.1lf"), RemainingTime)));
@@ -208,7 +208,7 @@ void UActionSkillsIcon::SetCanRelease(bool bIsReady_In)
 	if (bIsReady_In)
 	{
 		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::CanRelease));
+			auto UIPtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Hidden);
@@ -218,7 +218,7 @@ void UActionSkillsIcon::SetCanRelease(bool bIsReady_In)
 	else
 	{
 		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::CanRelease));
+			auto UIPtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
@@ -229,7 +229,7 @@ void UActionSkillsIcon::SetCanRelease(bool bIsReady_In)
 
 void UActionSkillsIcon::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(ActionSkillsIcon::Icon));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().Icon));
 	if (ImagePtr)
 	{
 		if (ToolPtr)
@@ -247,6 +247,15 @@ void UActionSkillsIcon::SetItemType()
 			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)
+{
+
+}
+
+void UActionSkillsIcon::SetDurationPercent(bool bIsHaveDuration, float Percent)
+{
 }
 
 void UActionSkillsIcon::NativeConstruct()

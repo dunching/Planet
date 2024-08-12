@@ -21,7 +21,7 @@
 #include "AssetRefMap.h"
 #include "DragDropOperationWidget.h"
 
-struct FAllocationIconBase : public TGetSocketName<FAllocationIconBase>
+struct FAllocationIconBase : public TStructVariable<FAllocationIconBase>
 {
 	const FName Content = TEXT("Content");
 

@@ -29,7 +29,7 @@ static TAutoConsoleVariable<int32> DrawDebugSTT_MoveToAttaclArea(
 	TEXT(" default: 0"));
 #endif
 
-struct FBasicFutures_MoveToAttaclArea : public TGetSocketName<FBasicFutures_MoveToAttaclArea>
+struct FBasicFutures_MoveToAttaclArea : public TStructVariable<FBasicFutures_MoveToAttaclArea>
 {
 	FName Donut_InnerRadius = TEXT("Donut.InnerRadius");
 

@@ -461,42 +461,84 @@ bool UInteractiveSkillComponent::ActiveSkill_Active(
 					(*SkillIter)->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
 					)
 				{
-					auto GameplayAbilityTargetPtr =
-						new FGameplayAbilityTargetData_Control;
+					for (const auto Iter : (*SkillIter)->HandleAry)
+					{
+						auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(Iter);
+						if (!GameplayAbilitySpecPtr)
+						{
+							return false;
+						}
+						auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+						if (!GAInsPtr)
+						{
+							return false;
+						}
 
-					GameplayAbilityTargetPtr->CanbeActivedInfoSPtr = CanbeActivedInfoSPtr;
+						if (GAInsPtr->IsActive() && GAInsPtr->CanActivateAbility(Iter, GAInsPtr->GetCurrentActorInfo()))
+						{
+							GAInsPtr->ContinueActive();
+						}
+						else
+						{
+							auto GameplayAbilityTargetPtr =
+								new FGameplayAbilityTargetData_Control;
 
-					// Test
-					GameplayAbilityTargetPtr->TargetCharacterPtr = OnwerActorPtr; 
+							GameplayAbilityTargetPtr->CanbeActivedInfoSPtr = CanbeActivedInfoSPtr;
 
-					FGameplayEventData Payload;
-					Payload.TargetData.Add(GameplayAbilityTargetPtr);
+							// Test
+							GameplayAbilityTargetPtr->TargetCharacterPtr = OnwerActorPtr;
 
-					return ASCPtr->TriggerAbilityFromGameplayEvent(
-						SkillHandleIter,
-						ASCPtr->AbilityActorInfo.Get(),
-						FGameplayTag(),
-						&Payload,
-						*ASCPtr
-					);
+							FGameplayEventData Payload;
+							Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+							return ASCPtr->TriggerAbilityFromGameplayEvent(
+								SkillHandleIter,
+								ASCPtr->AbilityActorInfo.Get(),
+								FGameplayTag(),
+								&Payload,
+								*ASCPtr
+							);
+						}
+					}
 				}
 				else
 				{
-					auto GameplayAbilityTargetPtr =
-						new FGameplayAbilityTargetData_ActiveSkill;
+					for (const auto Iter : (*SkillIter)->HandleAry)
+					{
+						auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(Iter);
+						if (!GameplayAbilitySpecPtr)
+						{
+							return false;
+						}
+						auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+						if (!GAInsPtr)
+						{
+							return false;
+						}
 
-					GameplayAbilityTargetPtr->CanbeActivedInfoSPtr = CanbeActivedInfoSPtr;
+						if (GAInsPtr->IsActive() && GAInsPtr->CanActivateAbility(Iter, GAInsPtr->GetCurrentActorInfo()))
+						{
+							GAInsPtr->ContinueActive();
+						}
+						else
+						{
+							auto GameplayAbilityTargetPtr =
+								new FGameplayAbilityTargetData_ActiveSkill;
 
-					FGameplayEventData Payload;
-					Payload.TargetData.Add(GameplayAbilityTargetPtr);
+							GameplayAbilityTargetPtr->CanbeActivedInfoSPtr = CanbeActivedInfoSPtr;
 
-					return ASCPtr->TriggerAbilityFromGameplayEvent(
-						SkillHandleIter,
-						ASCPtr->AbilityActorInfo.Get(),
-						FGameplayTag(),
-						&Payload,
-						*ASCPtr
-					);
+							FGameplayEventData Payload;
+							Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+							return ASCPtr->TriggerAbilityFromGameplayEvent(
+								SkillHandleIter,
+								ASCPtr->AbilityActorInfo.Get(),
+								FGameplayTag(),
+								&Payload,
+								*ASCPtr
+							);
+						}
+					}
 				}
 			}
 		}

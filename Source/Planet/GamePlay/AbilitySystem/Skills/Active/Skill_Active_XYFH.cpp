@@ -67,8 +67,6 @@ void USkill_Active_XYFH::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
-
 	if (!SPlineActorPtr)
 	{
 		SPlineActorPtr = GetWorld()->SpawnActor<ASPlineActor>(
@@ -94,11 +92,7 @@ bool USkill_Active_XYFH::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
-	{
-		return true;
-	}
-	return false;
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
 void USkill_Active_XYFH::EndAbility(
@@ -125,6 +119,8 @@ void USkill_Active_XYFH::EndAbility(
 	SubStepIndex = 0;
 
 	TargetOffsetValue.ReStore();
+
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -239,7 +235,7 @@ void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, flo
 			StartDistance,
 			EndDistance
 		);
-		TaskPtr->ReadyForActivation();
+//		TaskPtr->ReadyForActivation();
 	}
 }
 
@@ -279,7 +275,7 @@ void USkill_Active_XYFH::OnMoveStepComplete()
 		return;
 	}
 
-	PerformAction();
+	WaitInput();
 }
 
 void USkill_Active_XYFH::OnSubMoveStepComplete()

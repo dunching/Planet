@@ -291,6 +291,17 @@ TSharedPtr<typename TCallbackHandleContainer<Ret(ParamTypes...)>::FCallbackHandl
 }
 #pragma endregion Callback
 
+template<typename InheritsType>
+struct TStructVariable
+{
+	static InheritsType Get()
+	{
+		InheritsType InheritsTypeIns;
+
+		return InheritsTypeIns;
+	}
+};
+
 class ABuildingBase;
 class UPlanetGameplayAbility;
 class UPlanetGameplayAbility_SkillBase;

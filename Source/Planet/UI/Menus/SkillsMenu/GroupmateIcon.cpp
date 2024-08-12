@@ -13,7 +13,7 @@
 #include "SceneElement.h"
 #include "CharacterAttibutes.h"
 
-struct FGroupmateIcon : public TGetSocketName<FGroupmateIcon>
+struct FGroupmateIcon : public TStructVariable<FGroupmateIcon>
 {
 	const FName SelectBtn = TEXT("SelectBtn");
 

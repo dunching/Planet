@@ -12,14 +12,3 @@ enum EUIOrder :uint8
 	kMainUI,
 	kTableMenu,
 };
-
-template<typename InheritsType>
-struct TGetSocketName
-{
-	static InheritsType Get()
-	{
-		InheritsType InheritsTypeIns;
-
-		return InheritsTypeIns;
-	}
-};

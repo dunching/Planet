@@ -15,7 +15,7 @@
 #include "TalentIcon.h"
 #include "UICommon.h"
 
-struct FRaffleBtn : public TGetSocketName<FRaffleBtn>
+struct FRaffleBtn : public TStructVariable<FRaffleBtn>
 {
 	FName Btn = TEXT("Btn");
 

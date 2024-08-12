@@ -22,7 +22,7 @@
 #include "SceneUnitExtendInfo.h"
 #include "SceneUnitContainer.h"
 
-struct FRaffleMenu : public TGetSocketName<FRaffleMenu>
+struct FRaffleMenu : public TStructVariable<FRaffleMenu>
 {
 	FName CoinList = TEXT("CoinList");
 

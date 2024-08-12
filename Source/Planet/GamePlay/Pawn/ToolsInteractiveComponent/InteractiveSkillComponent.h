@@ -21,7 +21,7 @@ struct FSkillSocketInfo
 
 	USkillUnit* SkillUnit = nullptr;
 
-	// Active类型只会有一个技能
+	// Active类型只会有一个技能 ?
 	TArray<FGameplayAbilitySpecHandle>HandleAry;
 };
 

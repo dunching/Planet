@@ -20,7 +20,7 @@
 #include "UICommon.h"
 #include "SceneUnitContainer.h"
 
-struct FBackpackMenu : public TGetSocketName<FBackpackMenu>
+struct FBackpackMenu : public TStructVariable<FBackpackMenu>
 {
 	const FName BackpackTile = TEXT("BackpackTile");
 

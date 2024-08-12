@@ -16,7 +16,7 @@
 #include "UICommon.h"
 #include "SceneUnitExtendInfo.h"
 
-struct FRaffle_Unit : public TGetSocketName<FRaffle_Unit>
+struct FRaffle_Unit : public TStructVariable<FRaffle_Unit>
 {
 	FName Texture = TEXT("Texture");
 

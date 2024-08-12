@@ -11,6 +11,7 @@
 
 class UBasicUnit;
 class UActiveSkillUnit;
+class UAbilityTask_TimerHelper;
 struct FCanbeActivedInfo;
 
 USTRUCT()
@@ -70,13 +71,29 @@ public:
 		bool bReplicateCancelAbility
 	)override;
 
+	virtual void EndAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateEndAbility,
+		bool bWasCancelled
+	);
+
 	virtual void Tick(float DeltaTime)override;
 
 	virtual bool GetRemainingCooldown(
 		float& RemainingCooldown, float& RemainingCooldownPercent
 	)const override;
 
-	virtual void AddCooldownConsumeTime(float NewTime);
+	virtual void PerformAction();
+
+	void AddCooldownConsumeTime(float NewTime);
+
+	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
+
+	void WaitInput();
+
+	void ContinueActive();
 
 	// 确认是否有锁定的目标
 	ACharacterBase* HasFocusActor()const;
@@ -94,6 +111,12 @@ public:
 
 protected:
 
+	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
+
 	float CooldownConsumeTime = 0.f;
+
+	bool bIsPreviouInput = false;
+
+	float CurrentWaitInputTime = 3.f;
 
 };

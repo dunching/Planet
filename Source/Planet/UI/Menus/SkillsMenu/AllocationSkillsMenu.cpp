@@ -27,7 +27,7 @@
 #include "SceneUnitContainer.h"
 #include "GroupMnaggerComponent.h"
 
-struct FAllocationSkillsMenu : public TGetSocketName<FAllocationSkillsMenu>
+struct FAllocationSkillsMenu : public TStructVariable<FAllocationSkillsMenu>
 {
 	const FName PlayerBackpack = TEXT("PlayerBackpack");
 

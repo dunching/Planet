@@ -72,6 +72,11 @@ bool USkill_Active_Base::CanActivateAbility(
 		return false;
 	}
 
+	if (IsActive())
+	{
+		return true;
+	}
+
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -85,9 +90,61 @@ void USkill_Active_Base::CancelAbility(
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
+void USkill_Active_Base::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+	WaitInputTaskPtr = nullptr;
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
 void USkill_Active_Base::AddCooldownConsumeTime(float NewTime)
 {
 	CooldownConsumeTime += NewTime;
+}
+
+void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const
+{
+	bIsAcceptInput = false;
+	Percent = 0.f;
+}
+
+void USkill_Active_Base::WaitInput()
+{
+	if (bIsPreviouInput)
+	{
+		PerformAction();
+		bIsPreviouInput = false;
+	}
+	else
+	{
+		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		WaitInputTaskPtr->SetDuration(CurrentWaitInputTime);
+		WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
+			K2_CancelAbility();
+			});
+		WaitInputTaskPtr->ReadyForActivation();
+	}
+}
+
+void USkill_Active_Base::ContinueActive()
+{
+	if (WaitInputTaskPtr)
+	{
+		WaitInputTaskPtr->ExternalCancel();
+		WaitInputTaskPtr = nullptr;
+
+		PerformAction();
+	}
+	else
+	{
+		bIsPreviouInput = true;
+	}
 }
 
 ACharacterBase * USkill_Active_Base::HasFocusActor() const
@@ -191,6 +248,11 @@ bool USkill_Active_Base::GetRemainingCooldown(
 
 		return false;
 	}
+}
+
+void USkill_Active_Base::PerformAction()
+{
+
 }
 
 FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_ActiveSkill::Clone() const

@@ -24,7 +24,7 @@
 #include "UICommon.h"
 #include "CharacterAttibutes.h"
 
-struct FBackpackIcon : public TGetSocketName<FBackpackIcon>
+struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 {
 	const FName Content = TEXT("Content");
 

@@ -66,6 +66,10 @@ protected:
 
 	void SetItemType();
 
+	void SetInputRemainPercent(bool bIsAcceptInput, float Percent);
+
+	void SetDurationPercent(bool bIsHaveDuration, float Percent);
+
 	virtual void NativeConstruct()override;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;

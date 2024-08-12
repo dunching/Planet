@@ -23,7 +23,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
 
-struct FBackpackConsumableIcon : public TGetSocketName<FBackpackConsumableIcon>
+struct FBackpackConsumableIcon : public TStructVariable<FBackpackConsumableIcon>
 {
 	const FName Number = TEXT("Number");
 };

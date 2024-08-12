@@ -37,7 +37,7 @@
 #include "UICommon.h"
 #include "MenuLayout.h"
 
-struct FMainUILayout : public TGetSocketName<FMainUILayout>
+struct FMainUILayout : public TStructVariable<FMainUILayout>
 {
 	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
 
@@ -46,7 +46,7 @@ struct FMainUILayout : public TGetSocketName<FMainUILayout>
 	FName AllocationSkills_Socket = TEXT("AllocationSkills_Socket");
 };
 
-struct FMenuLayout : public TGetSocketName<FMenuLayout>
+struct FMenuLayout : public TStructVariable<FMenuLayout>
 {
 	FName Content = TEXT("Content");
 };

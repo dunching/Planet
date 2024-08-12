@@ -29,7 +29,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
 
-struct FConsumableIcon : public TGetSocketName<FConsumableIcon>
+struct FConsumableIcon : public TStructVariable<FConsumableIcon>
 {
 	const FName Content = TEXT("Content");
 
