@@ -43,6 +43,8 @@ public class Gravity : ModuleRules
 
                 "NavigationSystem",
                 "AIModule",
+
+                "Utils",
             }
 			);
 

@@ -28,6 +28,40 @@ UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewT
 {
 	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
 
+	const auto StartDistance =
+		InSPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StartPtIndex);
+
+	if (EndPtIndex < 0)
+	{
+		EndPtIndex = InSPlineActorPtr->SplineComponentPtr->GetNumberOfSplinePoints() - 1;
+	}
+
+	const auto EndDistance =
+		InSPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(EndPtIndex);
+
+	return ThisClass::NewTask(
+		OwningAbility, 
+		TaskInstanceName,
+		Duration, 
+		InSPlineActorPtr, 
+		InTargetCharacterPtr, 
+		StartDistance,
+		EndDistance
+	);
+}
+
+UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewTask(
+	UGameplayAbility* OwningAbility,
+	FName TaskInstanceName, 
+	float Duration, 
+	ASPlineActor* InSPlineActorPtr, 
+	ACharacterBase* InTargetCharacterPtr, 
+	float StartDistance,
+	float EndDistance
+)
+{
+	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
+
 	UAbilityTask_ApplyRootMotionBySPline* MyTask = NewAbilityTask<UAbilityTask_ApplyRootMotionBySPline>(OwningAbility, TaskInstanceName);
 
 	MyTask->ForceName = TaskInstanceName;
@@ -38,8 +72,9 @@ UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewT
 	MyTask->Duration = Duration;
 	MyTask->SPlineActorPtr = InSPlineActorPtr;
 	MyTask->TargetCharacterPtr = InTargetCharacterPtr;
-	MyTask->StartPtIndex = StartPtIndex;
-	MyTask->EndPtIndex = EndPtIndex;
+
+	MyTask->StartDistance = StartDistance;
+	MyTask->EndDistance = EndDistance;
 
 	return MyTask;
 }
@@ -76,19 +111,8 @@ void UAbilityTask_ApplyRootMotionBySPline::SharedInitAndApply()
 			RootMotionSource->SPlineActorPtr = SPlineActorPtr;
 			RootMotionSource->TargetCharacterPtr = TargetCharacterPtr;
 
-			RootMotionSource->StartPtIndex = StartPtIndex;
-			RootMotionSource->StartDistance = 
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(RootMotionSource->StartPtIndex);
-			if (EndPtIndex < 0)
-			{
-				RootMotionSource->EndPtIndex = SPlineActorPtr->SplineComponentPtr->GetNumberOfSplinePoints() - 1;
-			}
-			else
-			{
-				RootMotionSource->EndPtIndex = EndPtIndex;
-			}
-			RootMotionSource->EndDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(RootMotionSource->EndPtIndex);
+			RootMotionSource->StartDistance = StartDistance;
+			RootMotionSource->EndDistance = EndDistance;
 
 			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RootMotionSource);
 		}

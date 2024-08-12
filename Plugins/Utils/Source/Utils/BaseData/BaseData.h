@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 
-#include "GenerateType.h"
+#include "TemplateHelper.h"
 
 #include "BaseData.generated.h"
 
 struct FScoped_BaseProperty_SaveUpdate;
 
 USTRUCT(BlueprintType)
-struct FBaseProperty
+struct UTILS_API FBaseProperty
 {
 	GENERATED_USTRUCT_BODY()
 

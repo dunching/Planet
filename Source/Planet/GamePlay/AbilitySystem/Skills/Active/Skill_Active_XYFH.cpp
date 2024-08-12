@@ -14,6 +14,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 #include "Kismet/KismetMathLibrary.h"
 #include <Engine/OverlapResult.h>
+#include <GameFramework/SpringArmComponent.h>
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -53,6 +54,8 @@ void USkill_Active_XYFH::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
 }
 
 void USkill_Active_XYFH::ActivateAbility(
@@ -72,7 +75,7 @@ void USkill_Active_XYFH::ActivateAbility(
 			SPlineActorClass, CharacterPtr->GetActorTransform()
 		);
 	}
-	
+
 	if (!CameraTrailHelperPtr)
 	{
 		CameraTrailHelperPtr = GetWorld()->SpawnActor<ACameraTrailHelper>(
@@ -111,7 +114,7 @@ void USkill_Active_XYFH::EndAbility(
 		SPlineActorPtr->Destroy();
 		SPlineActorPtr = nullptr;
 	}
-	
+
 	if (CameraTrailHelperPtr)
 	{
 		CameraTrailHelperPtr->Destroy();
@@ -119,6 +122,9 @@ void USkill_Active_XYFH::EndAbility(
 	}
 
 	StepIndex = 0;
+	SubStepIndex = 0;
+
+	TargetOffsetValue.ReStore();
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -127,32 +133,98 @@ void USkill_Active_XYFH::PerformAction()
 {
 	if (CharacterPtr && bIsContinue)
 	{
-		ExcuteTasks();
-		PlayMontage();
+		switch (StepIndex)
+		{
+		case 0:
+		{
+			const auto StartDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+			const auto EndDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
+
+			PlayMontage();
+
+			auto HumanMontage = GetCurrentMontage();
+
+			const auto Duration = HumanMontage->CalculateSequenceLength();
+
+			ExcuteTasks(StartDistance, EndDistance, Duration, false);
+		}
+		break;
+		case 1:
+		case 2:
+		case 3:
+		{
+			const auto StartDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+			const auto EndDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
+
+			const auto Offset = (EndDistance - StartDistance) * 0.8f;
+
+			switch (SubStepIndex)
+			{
+			case 0:
+			{
+				CharacterPtr->GetMesh()->SetHiddenInGame(true);
+
+				ExcuteTasks(StartDistance, StartDistance + Offset, SubStepMoveDuration, true);
+			}
+			break;
+			case 1:
+			{
+				PlayMontage();
+
+				auto HumanMontage = GetCurrentMontage();
+
+				const auto Duration = HumanMontage->CalculateSequenceLength();
+
+				ExcuteTasks(StartDistance + Offset, EndDistance, Duration, false);
+			}
+			break;
+			}
+		}
+		break;
+		default:
+			break;
+		}
 	}
 	else
 	{
 	}
 }
 
-void USkill_Active_XYFH::ExcuteTasks()
+void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, float Duration, bool bIsSubMoveStep)
 {
-	auto HumanMontage = GetCurrentMontage();
-
-	const auto SequenceLength = HumanMontage->CalculateSequenceLength();
+	if (bIsSubMoveStep)
+	{
+		SubStepIndex++;
+	}
+	else
+	{
+		StepIndex++;
+		SubStepIndex = 0;
+	}
 
 	// ½ÇÉ«ÒÆ¶¯
 	{
 		auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
 			this,
 			TEXT(""),
-			SequenceLength,
+			Duration,
 			SPlineActorPtr,
 			CharacterPtr,
-			StepIndex,
-			StepIndex + 1
+			StartDistance,
+			EndDistance
 		);
-		TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
+		if (bIsSubMoveStep)
+		{
+			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnSubMoveStepComplete);
+		}
+		else
+		{
+			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
+		}
 		TaskPtr->ReadyForActivation();
 	}
 
@@ -161,11 +233,11 @@ void USkill_Active_XYFH::ExcuteTasks()
 		auto TaskPtr = UAbilityTask_ControlCameraBySpline::NewTask(
 			this,
 			TEXT(""),
-			SequenceLength,
+			Duration,
 			CameraTrailHelperPtr,
 			CharacterPtr,
-			StepIndex,
-			StepIndex + 1
+			StartDistance,
+			EndDistance
 		);
 		TaskPtr->ReadyForActivation();
 	}
@@ -201,13 +273,18 @@ void USkill_Active_XYFH::OnPlayMontageEnd()
 
 void USkill_Active_XYFH::OnMoveStepComplete()
 {
-	StepIndex++;
-
 	if (StepIndex >= MaxIndex)
 	{
 		K2_CancelAbility();
 		return;
 	}
+
+	PerformAction();
+}
+
+void USkill_Active_XYFH::OnSubMoveStepComplete()
+{
+	CharacterPtr->GetMesh()->SetHiddenInGame(false);
 
 	PerformAction();
 }

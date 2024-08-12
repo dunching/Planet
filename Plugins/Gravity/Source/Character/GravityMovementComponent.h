@@ -34,10 +34,12 @@ class GRAVITY_API UGravityMovementComponent : public UCharacterMovementComponent
 
 public:
 
-    bool bHasBlockResult = false;
+    // RootMotion或者AinMotion时被物体阻挡
+    FHitResult PerformBlockResult;
 
     const FLyraCharacterGroundInfo& GetGroundInfo();
 
+    // 停止Pwan旋转和输入（用于状态控制，如：眩晕，冲刺）
     bool bSkilPerformMovement = false;
 
 protected:
@@ -47,6 +49,14 @@ protected:
     virtual void PhysicsRotation(float DeltaTime)override;
 
     virtual void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)override;
+
+    virtual void PerformMovement(float DeltaTime)override;
+
+    virtual void StartNewPhysics(float DeltaTime, int32 Iterations)override;
+
+    virtual void HandleImpact(
+        const FHitResult& Hit, float TimeSlice = 0.f, const FVector& MoveDelta = FVector::ZeroVector
+    ) override;
 
 #if USECUSTOMEGRAVITY
     UGravityMovementComponent(const FObjectInitializer& ObjectInitializer);
@@ -61,10 +71,6 @@ protected:
         FActorComponentTickFunction* ThisTickFunction
     ) override;
 
-    virtual void PerformMovement(float DeltaTime)override;
-
-    virtual void StartNewPhysics(float DeltaTime, int32 Iterations)override;
-
     virtual void ApplyRootMotionToVelocity(float deltaTime)override;
 
     virtual void SetGravityDirection(const FVector& GravityDir)override;
@@ -72,10 +78,6 @@ protected:
     virtual void PhysNavWalking(float deltaTime, int32 Iterations)override;
 
     virtual void PhysWalking(float deltaTime, int32 Iterations)override;
-
-    virtual void HandleImpact(
-        const FHitResult& Hit, float TimeSlice = 0.f, const FVector& MoveDelta = FVector::ZeroVector
-    ) override;
 
     virtual float SlideAlongSurface(
         const FVector& Delta, float Time, const FVector& Normal, FHitResult& Hit, bool bHandleImpact

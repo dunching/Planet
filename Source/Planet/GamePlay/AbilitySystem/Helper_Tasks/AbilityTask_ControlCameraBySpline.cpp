@@ -17,6 +17,12 @@
 #include "SPlineActor.h"
 #include "CameraTrailHelper.h"
 
+UAbilityTask_ControlCameraBySpline::UAbilityTask_ControlCameraBySpline(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	bTickingTask = true;
+}
+
 UAbilityTask_ControlCameraBySpline* UAbilityTask_ControlCameraBySpline::NewTask
 (
 	UGameplayAbility* OwningAbility,
@@ -30,25 +36,48 @@ UAbilityTask_ControlCameraBySpline* UAbilityTask_ControlCameraBySpline::NewTask
 {
 	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
 
+	const auto StartDistance =
+		InCameraTrailHelperPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StartPtIndex);
+
+	if (EndPtIndex < 0)
+	{
+		EndPtIndex = InCameraTrailHelperPtr->SplineComponentPtr->GetNumberOfSplinePoints() - 1;
+	}
+
+	const auto EndDistance =
+		InCameraTrailHelperPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(EndPtIndex);
+
+	return ThisClass::NewTask(
+		OwningAbility,
+		TaskInstanceName,
+		Duration,
+		InCameraTrailHelperPtr,
+		InTargetCharacterPtr,
+		StartDistance,
+		EndDistance
+	);
+}
+
+UAbilityTask_ControlCameraBySpline* UAbilityTask_ControlCameraBySpline::NewTask(
+	UGameplayAbility* OwningAbility, 
+	FName TaskInstanceName, 
+	float Duration, 
+	ACameraTrailHelper* InCameraTrailHelperPtr, 
+	ACharacterBase* InTargetCharacterPtr, 
+	float StartDistance,
+	float EndDistance
+)
+{
+	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
+
 	auto MyTask = NewAbilityTask<UAbilityTask_ControlCameraBySpline>(OwningAbility, TaskInstanceName);
 
 	MyTask->Duration = Duration;
 	MyTask->CameraTrailHelperPtr = InCameraTrailHelperPtr;
 	MyTask->TargetCharacterPtr = InTargetCharacterPtr;
 
-	MyTask->StartPtIndex = StartPtIndex;
-	MyTask->StartDistance =
-		MyTask->CameraTrailHelperPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(MyTask->StartPtIndex);
-	if (EndPtIndex < 0)
-	{
-		MyTask->EndPtIndex = MyTask->CameraTrailHelperPtr->SplineComponentPtr->GetNumberOfSplinePoints() - 1;
-	}
-	else
-	{
-		MyTask->EndPtIndex = EndPtIndex;
-	}
-	MyTask->EndDistance =
-		MyTask->CameraTrailHelperPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(MyTask->EndPtIndex);
+	MyTask->StartDistance = StartDistance;
+	MyTask->EndDistance = EndDistance;
 
 	return MyTask;
 }

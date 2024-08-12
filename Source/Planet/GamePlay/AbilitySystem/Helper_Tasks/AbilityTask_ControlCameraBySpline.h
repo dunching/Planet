@@ -23,6 +23,8 @@ class PLANET_API UAbilityTask_ControlCameraBySpline : public UAbilityTask
 	GENERATED_BODY()
 public:
 
+	UAbilityTask_ControlCameraBySpline(const FObjectInitializer& ObjectInitializer);
+
 	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
 	static UAbilityTask_ControlCameraBySpline* NewTask
 	(
@@ -33,6 +35,16 @@ public:
 		ACharacterBase* InTargetCharacterPtr,
 		int32 StartPtIndex = 0,
 		int32 EndPtIndex = -1
+	);
+	static UAbilityTask_ControlCameraBySpline* NewTask
+	(
+		UGameplayAbility* OwningAbility,
+		FName TaskInstanceName,
+		float Duration,
+		ACameraTrailHelper* CameraTrailHelperPtr,
+		ACharacterBase* InTargetCharacterPtr,
+		float StartDistance,
+		float EndDistance
 	);
 
 	virtual void Activate() override;
@@ -46,10 +58,6 @@ public:
 protected:
 
 protected:
-
-	int32 StartPtIndex = 0;
-
-	int32 EndPtIndex = -1;
 
 	float StartDistance = 0.f;
 

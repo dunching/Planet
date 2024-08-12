@@ -149,6 +149,8 @@ public class Planet : ModuleRules
         PublicDependencyModuleNames.AddRange(new string[] {
             "Gravity",
             "Weather",
+            "Utils",
+
         });
     }
 }

@@ -30,7 +30,7 @@ static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
 
 static TAutoConsoleVariable<int32> SkillDrawDebugSpline(
 	TEXT("Skill.DrawDebug.Spline"),
-	1,
+	0,
 	TEXT("")
 	TEXT(" default: 0"));
 
@@ -45,7 +45,7 @@ void FRootMotionSource_MyConstantForce::PrepareRootMotion
 	RootMotionParams.Clear();
 
 	auto GravityMoveComponentPtr = Cast<UGravityMovementComponent>(&MoveComponent);
-	if (GravityMoveComponentPtr->bHasBlockResult)
+	if (false/*GravityMoveComponentPtr->PerformBlockResult.bBlockingHit*/)
 	{
 		SetTime(GetTime() + Duration);
 
@@ -94,7 +94,7 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 	RootMotionParams.Clear();
 
 	auto GravityMoveComponentPtr = Cast<UGravityMovementComponent>(&MoveComponent);
-	if (GravityMoveComponentPtr->bHasBlockResult)
+	if (GravityMoveComponentPtr->PerformBlockResult.bBlockingHit)
 	{
 		SetTime(GetTime() + Duration);
 
@@ -115,6 +115,9 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 		if (SkillDrawDebugSpline.GetValueOnGameThread())
 		{
 			DrawDebugSphere(MoveComponent.GetWorld(), Pt, 20, 20, FColor::Red, false, 3);
+
+			PRINTINVOKEWITHSTR(FString::Printf(TEXT("SimulationTime:%.2lf"), SimulationTime));
+			PRINTINVOKEWITHSTR(FString::Printf(TEXT("MovementTickTime:%.2lf"), MovementTickTime));
 		}
 #endif
 

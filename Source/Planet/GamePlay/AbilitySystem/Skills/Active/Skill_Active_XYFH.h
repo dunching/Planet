@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Active_Base.h"
+#include "ScopeValue.h"
 
 #include "Skill_Active_XYFH.generated.h"
 
@@ -54,7 +55,7 @@ protected:
 
 	void PerformAction();
 
-	void ExcuteTasks();
+	void ExcuteTasks(float StartDistance, float EndDistance, float Duration, bool bIsSubMoveStep);
 
 	void PlayMontage();
 
@@ -62,11 +63,19 @@ protected:
 
 	void OnMoveStepComplete();
 
+	void OnSubMoveStepComplete();
+
 	UAnimMontage* GetCurrentMontage()const;
 
 	int32 StepIndex = 0;
+	
+	int32 SubStepIndex = 0;
 
 	const int32 MaxIndex = 4;
+
+	float SubStepMoveDuration = 0.1f;
+	
+	float SubStepPercent = 0.8f;
 
 	bool bIsContinue = true;
 
@@ -91,5 +100,7 @@ protected:
 	TSubclassOf<ACameraTrailHelper>CameraTrailHelperClass;
 
 	ACameraTrailHelper* CameraTrailHelperPtr = nullptr;
+
+	TScopeValue<FVector> TargetOffsetValue;
 
 };

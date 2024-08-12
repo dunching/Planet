@@ -36,6 +36,17 @@ public:
 		int32 EndPtIndex = -1
 	);
 
+	static UAbilityTask_ApplyRootMotionBySPline* NewTask
+	(
+		UGameplayAbility* OwningAbility,
+		FName TaskInstanceName,
+		float Duration,
+		ASPlineActor* InSPlineActorPtr,
+		ACharacterBase* InTargetCharacterPtr,
+		float StartDistance,
+		float EndDistance
+	);
+
 	virtual void Activate() override;
 
 	virtual void TickTask(float DeltaTime) override;
@@ -50,9 +61,9 @@ protected:
 
 protected:
 
-	int32 StartPtIndex = 0;
+	float StartDistance = 0.f;
 
-	int32 EndPtIndex = -1;
+	float EndDistance = 0.f;
 
 	float Duration = 1.f;
 

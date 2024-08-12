@@ -8,12 +8,21 @@
 #include <Kismet/KismetMathLibrary.h>
 #include "Components/CapsuleComponent.h"
 #include "AI/Navigation/NavigationDataInterface.h"
+#include <Kismet/KismetStringLibrary.h>
+
+#include "LogWriter.h"
 
 namespace LyraCharacter
 {
     static float GroundTraceDistance = 100000.0f;
     FAutoConsoleVariableRef CVar_GroundTraceDistance(TEXT("LyraCharacter.GroundTraceDistance"), GroundTraceDistance, TEXT("Distance to trace down when generating ground information."), ECVF_Cheat);
 };
+
+static TAutoConsoleVariable<int32> GravityMovementComponent_Debug(
+    TEXT("GravityMovementComponent.Debug"),
+    0,
+    TEXT("")
+    TEXT(" default: 0"));
 
 const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
 {
@@ -84,6 +93,41 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
     }
 
     Super::PhysicsRotation(DeltaTime);
+}
+
+void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
+{
+    Super::PerformMovement(DeltaSeconds);
+}
+
+void UGravityMovementComponent::StartNewPhysics(float DeltaTime, int32 Iterations)
+{
+    PerformBlockResult.Reset();
+
+#ifdef WITH_EDITOR
+    if (GravityMovementComponent_Debug.GetValueOnGameThread())
+    {
+        PRINTINVOKEWITHSTR(UKismetStringLibrary::Conv_BoolToString(PerformBlockResult.bBlockingHit));
+    }
+#endif
+
+    Super::StartNewPhysics(DeltaTime, Iterations);
+}
+
+void UGravityMovementComponent::HandleImpact(
+    const FHitResult& Hit, float TimeSlice /*= 0.f*/, const FVector& MoveDelta /*= FVector::ZeroVector */
+)
+{
+    PerformBlockResult = Hit;
+
+#ifdef WITH_EDITOR
+    if (GravityMovementComponent_Debug.GetValueOnGameThread())
+    {
+        PRINTINVOKEWITHSTR(UKismetStringLibrary::Conv_BoolToString(PerformBlockResult.bBlockingHit));
+    }
+#endif
+
+    return Super::HandleImpact(Hit, TimeSlice, MoveDelta);
 }
 
 #if USECUSTOMEGRAVITY
@@ -553,11 +597,6 @@ void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
     LastUpdateVelocity = Velocity;
 }
 
-void UGravityMovementComponent::StartNewPhysics(float DeltaTime, int32 Iterations)
-{
-    Super::StartNewPhysics(DeltaTime, Iterations);
-}
-
 void UGravityMovementComponent::ApplyRootMotionToVelocity(float deltaTime)
 {
     SCOPE_CYCLE_COUNTER(STAT_CharacterMovementRootMotionSourceApply);
@@ -875,15 +914,6 @@ void UGravityMovementComponent::PhysWalking(float deltaTime, int32 Iterations)
     {
         MaintainHorizontalGroundVelocity();
     }
-}
-
-void UGravityMovementComponent::HandleImpact(
-    const FHitResult& Hit, float TimeSlice /*= 0.f*/, const FVector& MoveDelta /*= FVector::ZeroVector */
-)
-{
-    bHasBlockResult = Hit.bBlockingHit;
-
-    return Super::HandleImpact(Hit, TimeSlice, MoveDelta);
 }
 
 float UGravityMovementComponent::SlideAlongSurface(
