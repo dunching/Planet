@@ -111,6 +111,9 @@ public:
 
 protected:
 
+	UFUNCTION()
+	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
+
 	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
 
 	float CooldownConsumeTime = 0.f;
@@ -118,5 +121,7 @@ protected:
 	bool bIsPreviouInput = false;
 
 	float CurrentWaitInputTime = 3.f;
+
+	float WaitInputPercent = 1.f;
 
 };

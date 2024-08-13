@@ -110,8 +110,16 @@ void USkill_Active_Base::AddCooldownConsumeTime(float NewTime)
 
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const
 {
-	bIsAcceptInput = false;
-	Percent = 0.f;
+	if (WaitInputTaskPtr)
+	{
+		bIsAcceptInput = true;
+		Percent = WaitInputPercent;
+	}
+	else
+	{
+		bIsAcceptInput = false;
+		Percent = 0.f;
+	}
 }
 
 void USkill_Active_Base::WaitInput()
@@ -123,8 +131,11 @@ void USkill_Active_Base::WaitInput()
 	}
 	else
 	{
+		WaitInputPercent = 1.f;
+
 		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		WaitInputTaskPtr->SetDuration(CurrentWaitInputTime);
+		WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
+		WaitInputTaskPtr->DurationDelegate.BindUObject(this , &ThisClass::WaitInputTick);
 		WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
 			});
@@ -197,6 +208,19 @@ bool USkill_Active_Base::CheckTargetInDistance(int32 InDistance)const
 ACharacterBase* USkill_Active_Base::GetTargetInDistance(int32 Distance) const
 {
 	return nullptr;
+}
+
+void USkill_Active_Base::WaitInputTick(UAbilityTask_TimerHelper*, float Interval, float Duration)
+{
+	if (Duration > 0.f)
+	{
+		WaitInputPercent =  FMath::Clamp(1.f - (Interval / Duration), 0.f, 1.f);
+	}
+	else
+	{
+		check(0);
+		WaitInputPercent = 1.f;
+	}
 }
 
 void USkill_Active_Base::Tick(float DeltaTime)

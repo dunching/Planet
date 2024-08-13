@@ -27,6 +27,7 @@
 #include "InteractiveSkillComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
+#include "Skill_Active_Base.h"
 
 struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 {
@@ -43,6 +44,8 @@ struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 	const FName CooldownText = TEXT("CooldownText");
 
 	const FName CanRelease = TEXT("CanRelease");
+
+	const FName WaitInputPercent = TEXT("WaitInputPercent");
 };
 
 UActionSkillsIcon::UActionSkillsIcon(const FObjectInitializer& ObjectInitializer) :
@@ -91,6 +94,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	SetItemType();
 	SetCanRelease(true);
 	SetRemainingCooldown(true, 0.f, 0.f);
+	SetInputRemainPercent(false, 0.f);
 }
 
 void UActionSkillsIcon::EnableIcon(bool bIsEnable)
@@ -113,6 +117,8 @@ void UActionSkillsIcon::UpdateSkillState()
 		return;
 	}
 
+	const auto SKillUnitType = SkillSocketInfoSPtr->SkillUnit->GetUnitType();
+
 	auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 	for (const auto SkillHandleIter : SkillSocketInfoSPtr->HandleAry)
 	{
@@ -121,20 +127,40 @@ void UActionSkillsIcon::UpdateSkillState()
 		{
 			return;
 		}
-		auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-		if (!GAInsPtr)
 		{
-			return;
+			auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+			if (!GAInsPtr)
+			{
+				return;
+			}
+
+			float RemainingCooldown = 0.f;
+			float RemainingCooldownPercent = 0.f;
+
+			auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+			SetCanRelease(bIsReady);
+
+			auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+			SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 		}
+		if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+		{
+			auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+			if (!GAInsPtr)
+			{
+				return;
+			}
 
-		float RemainingCooldown = 0.f;
-		float RemainingCooldownPercent = 0.f;
+			bool bIsAcceptInput = false;
+			float Percent = 0.f;
 
-		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
-		SetCanRelease(bIsReady);
+			GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
 
-		auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
+			SetInputRemainPercent(bIsAcceptInput, Percent);
+		}
+		else if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+		{
+		}
 	}
 }
 
@@ -208,7 +234,7 @@ void UActionSkillsIcon::SetCanRelease(bool bIsReady_In)
 	if (bIsReady_In)
 	{
 		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Hidden);
@@ -218,7 +244,7 @@ void UActionSkillsIcon::SetCanRelease(bool bIsReady_In)
 	else
 	{
 		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
@@ -251,7 +277,12 @@ void UActionSkillsIcon::SetItemType()
 
 void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)
 {
-
+	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
+	if (UIPtr)
+	{
+		UIPtr->SetVisibility(bIsAcceptInput ?  ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UIPtr->SetPercent(Percent);
+	}
 }
 
 void UActionSkillsIcon::SetDurationPercent(bool bIsHaveDuration, float Percent)
@@ -282,10 +313,10 @@ bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
  		if (WidgetDragPtr)
 		{
 			auto SkillUnitPtr = Cast<USkillUnit>(WidgetDragPtr->SceneToolSPtr);
-			if (SkillUnitPtr && SkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
-			{
-				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
-			}
+// 			if (SkillUnitPtr && SkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
+// 			{
+// 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
+// 			}
  		}
 	}
 

@@ -47,9 +47,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillType")
-	FGameplayTag SkillUnitType = FGameplayTag::EmptyTag;
-
 protected:
 
 	void SetLevel();

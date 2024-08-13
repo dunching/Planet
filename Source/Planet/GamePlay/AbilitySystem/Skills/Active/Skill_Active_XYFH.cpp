@@ -43,6 +43,8 @@ USkill_Active_XYFH::USkill_Active_XYFH() :
 	bRetriggerInstancedAbility = true;
 
 	CooldownTime = 10;
+
+	CurrentWaitInputTime = 1.f;
 }
 
 void USkill_Active_XYFH::PreActivate(
