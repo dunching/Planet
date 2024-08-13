@@ -30,6 +30,7 @@
 #include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "PlanetPlayerController.h"
+#include "CS_RootMotion_MoveAlongSpline.h"
 
 USkill_Active_Control::USkill_Active_Control() :
 	Super()
@@ -154,16 +155,14 @@ void USkill_Active_Control::ExcuteTasks()
 
 	// ¿ØÖÆÐ§¹û
 	{
-		auto GAEventData_Periodic_StateTagModifyPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
-			UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline,
-			Duration
-		);
+		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_MoveAlongSpline;
 
-		GAEventData_Periodic_StateTagModifyPtr->TriggerCharacterPtr = CharacterPtr;
-		GAEventData_Periodic_StateTagModifyPtr->TargetCharacterPtr = HasFocusActor();
-		GAEventData_Periodic_StateTagModifyPtr->SPlineActorPtr = SPlineActorPtr;
+		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
+		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = HasFocusActor();
+		GameplayAbilityTargetData_RootMotionPtr->SPlineActorPtr = SPlineActorPtr;
+		GameplayAbilityTargetData_RootMotionPtr->Duration = Duration;
 
-		ICPtr->SendEventImp(GAEventData_Periodic_StateTagModifyPtr);
+		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 	}
 }
 

@@ -18,6 +18,11 @@ class UConsumableUnit;
 class UGA_Tool_Periodic;
 class UGameplayAbility;
 
+struct FGameplayAbilityTargetData_Consumable_Generic : public FGameplayAbilityTargetData
+{
+	UConsumableUnit* UnitPtr = nullptr;
+};
+
 UCLASS()
 class USkill_Consumable_Generic : public USkill_Consumable_Base
 {
@@ -91,10 +96,5 @@ protected:
 
 	AConsumable_Base* ConsumableActorPtr = nullptr;
 	
-	UConsumableUnit* UnitPtr = nullptr;
-};
-
-struct FGameplayAbilityTargetData_Consumable_Generic : public FGameplayAbilityTargetData
-{
 	UConsumableUnit* UnitPtr = nullptr;
 };

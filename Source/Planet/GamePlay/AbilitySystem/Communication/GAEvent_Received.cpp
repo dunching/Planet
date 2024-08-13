@@ -11,6 +11,7 @@
 #include "InteractiveBaseGAComponent.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicPropertyModify.h"
+#include "CS_PeriodicStateModify.h"
 
 UGAEvent_Received::UGAEvent_Received() :
 	Super()
@@ -62,6 +63,30 @@ void UGAEvent_Received::ActivateAbility(
 			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*ClonePtr);
 
 			ClonePtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, ClonePtr->Data);
+
+			if (GAEventDataPtr->Data.bIsMakeAttackEffect)
+			{
+				CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteAttackedEffect(EAffectedDirection::kForward);
+			}
+		}
+		break;
+		case FGameplayAbilityTargetData_GAEventType::EEventType::kRootMotion:
+		{
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion*>(TriggerEventData->TargetData.Get(1));
+			if (!GAEventDataPtr)
+			{
+				return;
+			}
+
+			auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+			if (!CharacterPtr)
+			{
+				return;
+			}
+
+			auto ClonePtr = GAEventDataPtr->Clone();
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
 		}
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify:
@@ -85,7 +110,7 @@ void UGAEvent_Received::ActivateAbility(
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify:
 		{
-			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Periodic_RootMotion*>(TriggerEventData->TargetData.Get(1));
+			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_StateModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
 			{
 				return;

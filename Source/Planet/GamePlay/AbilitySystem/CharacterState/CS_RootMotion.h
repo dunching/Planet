@@ -18,28 +18,22 @@ class ATornado;
 
 struct FStreamableHandle;
 
-struct FGameplayAbilityTargetData_Periodic_RootMotion;
+struct FGameplayAbilityTargetData_RootMotion;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_Periodic_RootMotion : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_RootMotion : public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
 
 	friend UCS_RootMotion;
 
-	FGameplayAbilityTargetData_Periodic_RootMotion();
+	FGameplayAbilityTargetData_RootMotion();
 
-	FGameplayAbilityTargetData_Periodic_RootMotion(
-		const FGameplayTag& Tag,
-		float Duration
+	FGameplayAbilityTargetData_RootMotion(
+		const FGameplayTag& Tag
 	);
 
-	FGameplayAbilityTargetData_Periodic_RootMotion* Clone()const;
-
-	// < 0 则意味着由Task取消
-	float Duration = 3.f;
-
-	int32 Height = 100;
+	FGameplayAbilityTargetData_RootMotion* Clone()const;
 
 	// 会一次性修改多个状态码？
 	FGameplayTag Tag;
@@ -47,14 +41,10 @@ struct PLANET_API FGameplayAbilityTargetData_Periodic_RootMotion : public FGamep
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
-	
-	TWeakObjectPtr<ASPlineActor> SPlineActorPtr = nullptr;
-	
-	TWeakObjectPtr<ATornado> TornadoPtr = nullptr;
-
-private:
 
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+private:
 
 };
 
@@ -67,50 +57,10 @@ public:
 
 	UCS_RootMotion();
 
-	virtual void PreActivate(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-		const FGameplayEventData* TriggerEventData = nullptr
-	);
-
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	) override;
-
-	virtual void EndAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		bool bReplicateEndAbility,
-		bool bWasCancelled
-	)override;
-
-	void UpdateDuration();
+	virtual void UpdateDuration();
 
 protected:
 
-	void PerformAction();
-
-	void ExcuteTasks();
-
-	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
-	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
-	void OnTaskComplete();
-
-	const FGameplayAbilityTargetData_Periodic_RootMotion* GameplayAbilityTargetDataPtr = nullptr;
-
-	UEffectItem* EffectItemPtr = nullptr;
-
-	UAbilityTask_TimerHelper* TaskPtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float FlyAwayHeight = 250.f;
+	virtual void PerformAction();
 
 };

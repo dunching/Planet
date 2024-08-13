@@ -22,8 +22,11 @@ struct FGAEventData
 		TWeakObjectPtr<ACharacterBase>  TriggerCharacterPtr
 	);
 
-	// 
+	// 是否是武器造成的伤害
 	bool bIsWeaponAttack = false;
+	
+	// 是否会造成“受击”效果
+	bool bIsMakeAttackEffect = false;
 
 	// 本次攻击的 穿透
 	int32 Penetration = 0;
@@ -71,8 +74,13 @@ struct FGameplayAbilityTargetData_GAEventType : public FGameplayAbilityTargetDat
 {
 	enum class EEventType : uint8
 	{
+		// 人物受“击时”收到的数据
 		kNormal,
+		// 人物添加“某些标签”时收到的数据
+		kRootMotion,
+		// 人物获得“周期性增加属性”时收到的数据，通常是使用消耗品
 		kPeriodic_PropertyModify,
+		// 人物执行“RootMoxing”时收到的数据
 		kPeriodic_StateTagModify,
 	};
 

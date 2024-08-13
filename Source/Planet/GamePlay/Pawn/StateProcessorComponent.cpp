@@ -32,21 +32,42 @@ void UStateProcessorComponent::BeginPlay()
 
 void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+	const auto Value = Count > 0;
+	if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
 	{
 
 	}
-	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Silent))
+	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble))
 	{
-
-	}
-	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Stun))
-	{
-		auto CharacterPtr = GetOwner<ACharacterBase>();
-		if (CharacterPtr)
+		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Jump))
 		{
-			auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-			CharacterMovementPtr->bSkilPerformMovement = Count > 0;
+			auto CharacterPtr = GetOwner<ACharacterBase>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->MovementState.bCanJump = Value;
+			}
+		}
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Move))
+		{
+			auto CharacterPtr = GetOwner<ACharacterBase>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkipPerformMovement = Value;
+			}
+		}
+	}
+	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	{
+		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Stun))
+		{
+			auto CharacterPtr = GetOwner<ACharacterBase>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkipPerformMovement = Value;
+			}
 		}
 	}
 }

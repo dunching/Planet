@@ -1,33 +1,31 @@
-// Copyright 2020 Dan Kestranek.
 
 #pragma once
 
 #include "CoreMinimal.h"
 
+#include "PlanetGameplayAbility.h"
 #include "BasicFuturesBase.h"
-#include "GenerateType.h"
 
-#include "BasicFutures_Dash.generated.h"
+#include "BasicFutures_Affected.generated.h"
 
 class UAnimMontage;
+class ACharacterBase;
 
-class UAbilityTask_PlayMontage;
-
-struct FGameplayAbilityTargetData_Dash : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_Affected : public FGameplayAbilityTargetData
 {
-	EDashDirection DashDirection = EDashDirection::kForward;
+	EAffectedDirection AffectedDirection = EAffectedDirection::kForward;
 };
 
-/**
- * Makes the Character try to jump using the standard Character->Jump. This is an example of a non-instanced ability.
- */
 UCLASS()
-class PLANET_API UBasicFutures_Dash : public UBasicFuturesBase
+class PLANET_API UBasicFutures_Affected : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
 public:
-	UBasicFutures_Dash();
+
+	UBasicFutures_Affected();
+
+	virtual void PostCDOContruct() override;
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -49,21 +47,6 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
-	virtual bool CommitAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
-
-	virtual void EndAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		bool bReplicateEndAbility,
-		bool bWasCancelled
-	);
-
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -74,16 +57,9 @@ public:
 
 protected:
 
-	void DoDash(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	);
+	void PerformAction(EAffectedDirection AffectedDirection);
 
-	void PlayMontage(UAnimMontage* CurMontagePtr,  float Rate);
-
-	void Displacement(const FVector& Direction);
+	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* ForwardMontage = nullptr;
@@ -97,19 +73,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* RightMontage = nullptr;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float Duration = .5f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float MoveLength = 800.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 Consume = 10;
-
 	ACharacterBase* CharacterPtr = nullptr;
-
-	FVector Start;
-
-private:
 
 };

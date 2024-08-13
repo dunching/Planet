@@ -5,14 +5,18 @@
 UWorld* GetWorldImp()
 {
 #if WITH_EDITOR
-	if (GEditor->IsPlayingSessionInEditor() && !bIsExiting)
+	if (GEngine && GEditor && GEditor->IsPlayingSessionInEditor() && !bIsExiting)
 	{
 		auto Ptr = GWorld;
 		return GEngine->GetCurrentPlayWorld() ? GEngine->GetCurrentPlayWorld() : GEditor->PlayWorld.Get();
 	}
-	else
+	else if (GEngine)
 	{
 		return GEditor->PlayWorld;
+	}
+	else
+	{
+		return nullptr;
 	}
 #else 
 	return GEngine->GetCurrentPlayWorld();

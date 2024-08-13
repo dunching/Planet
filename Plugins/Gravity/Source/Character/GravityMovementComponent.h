@@ -40,8 +40,8 @@ public:
     const FLyraCharacterGroundInfo& GetGroundInfo();
 
     // 停止Pwan旋转和输入（用于状态控制，如：眩晕，冲刺）
-    bool bSkilPerformMovement = false;
-
+    bool bSkipPerformMovement = false;
+    
 protected:
 
     FLyraCharacterGroundInfo CachedGroundInfo;

@@ -50,6 +50,14 @@ enum class EDashDirection : uint8
 	kRight,
 };
 
+enum class EAffectedDirection : uint8
+{
+	kForward,
+	kBackward,
+	kLeft,
+	kRight,
+};
+
 UENUM(BlueprintType)
 enum class EAnimLinkClassType : uint8
 {

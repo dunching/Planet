@@ -38,6 +38,21 @@ void UBasicFutures_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 	}
 }
 
+void UBasicFutures_Dash::PreActivate(
+	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, 
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
+{
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	if (CharacterPtr)
+	{
+	}
+}
+
 void UBasicFutures_Dash::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -61,21 +76,6 @@ void UBasicFutures_Dash::ActivateAbility(
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
 	DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-}
-
-void UBasicFutures_Dash::PreActivate(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, 
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
-	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
-{
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	if (CharacterPtr)
-	{
-	}
 }
 
 bool UBasicFutures_Dash::CommitAbility(
@@ -204,12 +204,6 @@ void UBasicFutures_Dash::DoDash(
 
 			}
 		}
-	}
-
-	if (ScopeLockCount <= 0)
-	{
-		check(0);
-		EndAbility(Handle, ActorInfo, ActivationInfo, false, true);
 	}
 }
 

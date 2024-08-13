@@ -17,7 +17,7 @@ public:
 
 	static UGameplayTagsSubSystem* GetInstance();
 
-#pragma region BaseFeature Tags
+#pragma region Locomotion
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Jump =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
@@ -38,6 +38,26 @@ public:
 	FGameplayTag DisMount =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.DisMount")));
 
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag Affected =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Affected")));
+#pragma endregion 
+
+#pragma region MovementStateAble
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_Jump =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Jump")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_Move =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Move")));
+#pragma endregion 
+	
+#pragma region BaseFeature Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag MoveToAttaclArea =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.MoveToAttaclArea")));
@@ -63,7 +83,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Stun =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Stun")));
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Silent =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Silent")));

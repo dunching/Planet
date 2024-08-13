@@ -28,6 +28,7 @@
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
+#include "CS_RootMotion_FlyAway.h"
 
 USkill_Active_FlyAway::USkill_Active_FlyAway() :
 	Super()
@@ -162,17 +163,14 @@ void USkill_Active_FlyAway::ExcuteTasks()
 		// ¿ØÖÆÐ§¹û
 		for (const auto& Iter : TargetSet)
 		{
-			auto GAEventData_Periodic_StateTagModifyPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
-				UGameplayTagsSubSystem::GetInstance()->FlyAway,
-				FlyAwayTime
-			);
+			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_FlyAway;
 
-			GAEventData_Periodic_StateTagModifyPtr->Height = Height;
+			GameplayAbilityTargetData_RootMotionPtr->Height = Height;
 
-			GAEventData_Periodic_StateTagModifyPtr->TriggerCharacterPtr = CharacterPtr;
-			GAEventData_Periodic_StateTagModifyPtr->TargetCharacterPtr = Iter;
+			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
 
-			ICPtr->SendEventImp(GAEventData_Periodic_StateTagModifyPtr);
+			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
 	}
 }

@@ -446,9 +446,8 @@ void TestCommand::TestGAState2Self(const TArray< FString >& Args)
 
 	float Duration = 10.f;
 	LexFromString(Duration, *Args[1]);
-	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
-		FGameplayTag::RequestGameplayTag(*Args[0]),
-		Duration
+	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RootMotion(
+		FGameplayTag::RequestGameplayTag(*Args[0])
 	);
 
 	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
@@ -491,9 +490,8 @@ void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 			{
 				float Duration = 10.f;
 				LexFromString(Duration, *Args[1]);
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Periodic_RootMotion(
-					FGameplayTag::RequestGameplayTag(*Args[0]),
-					Duration
+				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RootMotion(
+					FGameplayTag::RequestGameplayTag(*Args[0])
 				);
 
 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = TargetCharacterPtr;

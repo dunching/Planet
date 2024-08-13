@@ -193,6 +193,8 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			{
 				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
+				GAEventData.bIsWeaponAttack = true;
+				GAEventData.bIsMakeAttackEffect = true;
 				GAEventData.SetBaseDamage(Damage);
 
 				GAEventDataPtr->DataAry.Add(GAEventData);

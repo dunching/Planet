@@ -73,7 +73,7 @@ const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
 
 void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
 {
-    if (bSkilPerformMovement)
+    if (bSkipPerformMovement)
     {
         return;
     }
@@ -84,7 +84,7 @@ void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bo
 void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 {
     if (
-        bSkilPerformMovement ||
+        bSkipPerformMovement ||
         HasRootMotionSources() ||
         HasAnimRootMotion()
         )
