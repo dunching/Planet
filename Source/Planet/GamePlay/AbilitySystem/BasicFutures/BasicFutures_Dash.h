@@ -29,6 +29,8 @@ class PLANET_API UBasicFutures_Dash : public UBasicFuturesBase
 public:
 	UBasicFutures_Dash();
 
+	virtual void PostCDOContruct() override;
+
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec

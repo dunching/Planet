@@ -15,6 +15,7 @@
 #include "InteractiveSkillComponent.h"
 #include "InteractiveToolComponent.h"
 #include "InteractiveBaseGAComponent.h"
+#include "Planet_Tools.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(
 	TEXT("Skill.DrawDebug.Dash"),
@@ -26,6 +27,23 @@ UBasicFutures_Dash::UBasicFutures_Dash() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
+void UBasicFutures_Dash::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
+	if (GetWorldImp())
+	{
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
+
+		FAbilityTriggerData AbilityTriggerData;
+
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Affected;
+		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+		AbilityTriggers.Add(AbilityTriggerData);
+	}
 }
 
 void UBasicFutures_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)

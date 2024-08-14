@@ -8,11 +8,11 @@
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
+#include "GroupMnaggerComponent.h"
 
 USkill_Active_Base::USkill_Active_Base():
 	Super()
 {
-	CooldownTime = 1.f;
 }
 
 void USkill_Active_Base::OnAvatarSet(
@@ -24,7 +24,10 @@ void USkill_Active_Base::OnAvatarSet(
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
-	CooldownConsumeTime = CooldownTime - UGameOptions::GetInstance()->ResetCooldownTime;
+	if (SkillUnitPtr)
+	{
+		Cast<UActiveSkillUnit>(SkillUnitPtr)->OffsetCooldownTime();
+	}
 }
 
 void USkill_Active_Base::PreActivate(
@@ -54,7 +57,7 @@ bool USkill_Active_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	CooldownConsumeTime = 0.f;
+	Cast<UActiveSkillUnit>(SkillUnitPtr)->ApplyCooldown();
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
@@ -67,7 +70,7 @@ bool USkill_Active_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (CooldownConsumeTime < CooldownTime)
+	if (!Cast<UActiveSkillUnit>(SkillUnitPtr)->CheckCooldown())
 	{
 		return false;
 	}
@@ -103,11 +106,6 @@ void USkill_Active_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_Base::AddCooldownConsumeTime(float NewTime)
-{
-	CooldownConsumeTime += NewTime;
-}
-
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const
 {
 	if (WaitInputTaskPtr)
@@ -126,7 +124,7 @@ void USkill_Active_Base::WaitInput()
 {
 	if (bIsPreviouInput)
 	{
-		PerformAction();
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 		bIsPreviouInput = false;
 	}
 	else
@@ -145,12 +143,17 @@ void USkill_Active_Base::WaitInput()
 
 void USkill_Active_Base::ContinueActive()
 {
+	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
+	{
+		return;
+	}
+
 	if (WaitInputTaskPtr)
 	{
 		WaitInputTaskPtr->ExternalCancel();
 		WaitInputTaskPtr = nullptr;
 
-		PerformAction();
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 	}
 	else
 	{
@@ -225,56 +228,14 @@ void USkill_Active_Base::WaitInputTick(UAbilityTask_TimerHelper*, float Interval
 
 void USkill_Active_Base::Tick(float DeltaTime)
 {
-	CooldownConsumeTime += DeltaTime;
 }
 
-bool USkill_Active_Base::GetRemainingCooldown(
-	float& RemainingCooldown, float& RemainingCooldownPercent
-) const
-{
-	if (CooldownTime < 0.f)
-	{
-		const auto Remaining = CooldownTime - CooldownConsumeTime;
-
-		if (Remaining <= 0.f)
-		{
-			RemainingCooldown = 0.f;
-
-			RemainingCooldownPercent = 1.f;
-
-			return true;
-		}
-		else
-		{
-			RemainingCooldown = Remaining;
-
-			RemainingCooldownPercent = RemainingCooldown / UGameOptions::GetInstance()->ResetCooldownTime;
-
-			return false;
-		}
-	}
-
-	const auto Remaining = CooldownTime - CooldownConsumeTime;
-
-	if (Remaining <= 0.f)
-	{
-		RemainingCooldown = 0.f;
-
-		RemainingCooldownPercent = 1.f;
-
-		return true;
-	}
-	else
-	{
-		RemainingCooldown = Remaining;
-
-		RemainingCooldownPercent = RemainingCooldown / CooldownTime;
-
-		return false;
-	}
-}
-
-void USkill_Active_Base::PerformAction()
+void USkill_Active_Base::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 
 }

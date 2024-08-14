@@ -13,6 +13,12 @@ UBasicFutures_Affected::UBasicFutures_Affected() :
 
 	bRetriggerInstancedAbility = true;
 
+}
+
+void UBasicFutures_Affected::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
 	if (GetWorldImp())
 	{
 		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
@@ -22,12 +28,14 @@ UBasicFutures_Affected::UBasicFutures_Affected() :
 
 		// 在“霸体”时不激活
 		ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->SuperArmor);
-	}
-}
 
-void UBasicFutures_Affected::PostCDOContruct()
-{
-	Super::PostCDOContruct();
+		FAbilityTriggerData AbilityTriggerData;
+
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Affected;
+		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+		AbilityTriggers.Add(AbilityTriggerData);
+	}
 }
 
 void UBasicFutures_Affected::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)

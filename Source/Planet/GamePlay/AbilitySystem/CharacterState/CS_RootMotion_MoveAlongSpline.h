@@ -27,7 +27,7 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion_MoveAlongSpline :
 
 	FGameplayAbilityTargetData_RootMotion_MoveAlongSpline();
 
-	FGameplayAbilityTargetData_RootMotion_MoveAlongSpline* Clone()const;
+	virtual FGameplayAbilityTargetData_RootMotion_MoveAlongSpline* Clone()const override;
 
 	float Duration = 1.f;
 

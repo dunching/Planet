@@ -42,7 +42,7 @@ public:
 
 	void UpdateSkillState();
 
-	USkillUnit* ToolPtr = nullptr;
+	USkillUnit* UnitPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;

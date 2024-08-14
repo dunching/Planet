@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "GameplayTagContainer.h"
 
 #include "GroupsManaggerSubSystem.h"
 
@@ -10,6 +11,40 @@
 
 class AHumanCharacter;
 class IPlanetControllerInterface;
+class USkillUnit;
+class UActiveSkillUnit;
+class UConsumableUnit;
+
+struct FSkillCooldownHelper
+{
+	FSkillCooldownHelper();
+
+	virtual bool CheckCooldown()const;
+
+	void IncreaseCooldownTime(float DeltaTime);
+
+	void AddCooldownConsumeTime(float NewTime);
+
+	void FreshCooldownTime();
+
+	void ResetCooldownTime();
+
+	void OffsetCooldownTime();
+
+	bool GetRemainingCooldown(
+		float& RemainingCooldown, float& RemainingCooldownPercent
+	)const;
+
+	void SetCooldown(float CooldDown);
+
+private:
+
+	// 
+	int32 CooldownTime = -1;
+
+	// 
+	float CooldownConsumeTime = 0.f;
+};
 
 class PLANET_API FGroupMatesHelper
 {
@@ -34,6 +69,9 @@ public:
 	FCharacterUnitType* OwnerCharacterUnitPtr = nullptr;
 
 	TSet<FCharacterUnitType*> MembersSet;
+
+	// 公共的冷却，如：团队里面的复活技能
+	TMap<FGameplayTag, TSharedPtr<FSkillCooldownHelper>>CommonCooldownMap;
 
 };
 
@@ -72,6 +110,12 @@ public:
 
 	static FName ComponentName;
 
+	UGroupMnaggerComponent(const FObjectInitializer& ObjectInitializer);
+
+	virtual void TickComponent(
+		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
+	)override;
+
 	void AddCharacterToGroup(FCharacterUnitType* CharacterUnitPtr);
 
 	void AddCharacterToTeam(FCharacterUnitType* CharacterUnitPtr);
@@ -88,6 +132,16 @@ public:
 
 	const TSharedPtr<FTeamMatesHelper>& GetTeamHelper();
 
+	// 重置技能CD（包含公共CD）至满CD
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(UActiveSkillUnit* ActiveSkillUnitPtr);
+
+	// 重置技能CD 至满CD
+	TWeakPtr<FSkillCooldownHelper> ApplyUniqueCooldown(UActiveSkillUnit* ActiveSkillUnitPtr);
+
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const UActiveSkillUnit* ActiveSkillUnitPtr);
+
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(UConsumableUnit* UnitPtr);
+
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
 	FTeamHelperChangedDelegateContainer GroupHelperChangedDelegateContainer;
@@ -98,10 +152,17 @@ protected:
 
 	virtual void BeginPlay()override;
 
+	TWeakPtr<FSkillCooldownHelper> ApplyCommonCooldownTime(
+		const FGameplayTag& CommonCooldownTag
+	);
+
 private:
 
 	TSharedPtr<FGroupMatesHelper> GroupHelperSPtr;
 
 	TSharedPtr<FTeamMatesHelper> TeamHelperSPtr;
+
+	// 角色的技能冷却
+	TMap<FGameplayTag, TSharedPtr<FSkillCooldownHelper>>UniqueCooldownMap;
 
 };

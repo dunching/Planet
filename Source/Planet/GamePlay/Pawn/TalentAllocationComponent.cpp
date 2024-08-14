@@ -195,7 +195,7 @@ void UTalentAllocationComponent::SyncToHolding()
 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
-						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
+						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
 						SkillsSocketInfo->Key = EKeys::Invalid;
 
 						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
@@ -216,7 +216,7 @@ void UTalentAllocationComponent::SyncToHolding()
 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
-						SkillsSocketInfo->SkillUnit = SkillUnitPtr;
+						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
 						SkillsSocketInfo->Key = EKeys::Invalid;
 
 						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);

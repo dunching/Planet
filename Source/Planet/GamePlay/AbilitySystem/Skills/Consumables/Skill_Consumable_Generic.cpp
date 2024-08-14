@@ -12,6 +12,7 @@
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_PeriodicPropertyModify.h"
+#include "SceneUnitTable.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :
 	Super()
@@ -34,18 +35,7 @@ void USkill_Consumable_Generic::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->UsingConsumable);
-
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
-	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable_Generic*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetDataPtr)
-		{
-			UnitPtr = GameplayAbilityTargetDataPtr->UnitPtr;
-		}
-	}
 }
 
 void USkill_Consumable_Generic::ActivateAbility(
@@ -56,10 +46,6 @@ void USkill_Consumable_Generic::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-	PerformAction();
 }
 
 bool USkill_Consumable_Generic::CanActivateAbility(
@@ -70,8 +56,6 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-
-
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -96,8 +80,15 @@ void USkill_Consumable_Generic::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Consumable_Generic::PerformAction()
+void USkill_Consumable_Generic::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
 	if (CharacterPtr)
 	{
 		SpawnActor();
@@ -110,7 +101,10 @@ void USkill_Consumable_Generic::SpawnActor()
 {
 	FActorSpawnParameters ActorSpawnParameters;
 	ActorSpawnParameters.Owner = CharacterPtr;
-	ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(Consumable_Class, ActorSpawnParameters);
+	ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(
+		UnitPtr->GetTableRowUnit_Consumable()->Consumable_Class, ActorSpawnParameters
+	);
+
 	if (ConsumableActorPtr)
 	{
 		ConsumableActorPtr->Interaction(CharacterPtr);
@@ -133,14 +127,15 @@ void USkill_Consumable_Generic::ExcuteTasks()
 
 void USkill_Consumable_Generic::PlayMontage()
 {
-	if (UnitPtr->HumanMontage)
+	auto HumanMontage = UnitPtr->GetTableRowUnit_Consumable()->HumanMontage;
+	if (HumanMontage)
 	{
 		const float InPlayRate = 1.f;
 
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
 			TEXT(""),
-			UnitPtr->HumanMontage,
+			HumanMontage,
 			CharacterPtr->GetMesh()->GetAnimInstance(),
 			InPlayRate
 		);

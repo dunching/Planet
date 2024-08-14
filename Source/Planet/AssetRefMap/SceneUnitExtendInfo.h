@@ -37,6 +37,9 @@ public:
 	void InitialData();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_CommonCooldownInfo;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
@@ -53,5 +56,8 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_CharacterInfo;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_Unit_Consumable;
 
 };

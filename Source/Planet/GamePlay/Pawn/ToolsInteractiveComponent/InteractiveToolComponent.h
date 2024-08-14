@@ -29,13 +29,11 @@ public:
 
 	static FName ComponentName;
 
-	virtual TArray<TSharedPtr<FCanbeActivedInfo>> GetCanbeActiveAction()const override;
-
 	virtual bool ActiveAction(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	)override;
 
-	virtual void CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)override;
+	virtual void CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)override;
 
 #pragma region Tools
 	void RetractputTool();
@@ -55,16 +53,16 @@ protected:
 
 	virtual void GenerationCanbeActiveEvent()override;
 
-	void CancelSkill_SwitchToTool(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+	void CancelSkill_SwitchToTool(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr);
 
 	bool ActiveSkill_SwitchToTool(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	);
 
-	void CancelSkill_ActiveTool(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+	void CancelSkill_ActiveTool(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr);
 
 	bool ActiveSkill_ActiveTool(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	);
 
 	FGameplayTag PreviousTool = FGameplayTag::EmptyTag;
@@ -72,7 +70,5 @@ protected:
 	ATool_Base* CurrentEquipmentPtr = nullptr;
 
 	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>ToolsMap;
-
-	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActiveToolsAry;
 
 };

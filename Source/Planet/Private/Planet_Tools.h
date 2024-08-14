@@ -4,6 +4,6 @@
 
 #include "CoreMinimal.h"
 
-bool bIsExiting = false;
+extern bool bIsExiting;
 
 UWorld* GetWorldImp();

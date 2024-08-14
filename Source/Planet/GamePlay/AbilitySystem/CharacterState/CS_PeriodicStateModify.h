@@ -4,7 +4,6 @@
 #include "CoreMinimal.h"
 
 #include <GameplayTagContainer.h>
-
 #include "Skill_Base.h"
 
 #include "CS_PeriodicStateModify.generated.h"

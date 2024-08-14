@@ -6,6 +6,7 @@
 #include <GameplayTagContainer.h>
 
 #include "Skill_Base.h"
+#include "CS_Base.h"
 
 #include "CS_PeriodicPropertyModify.generated.h"
 
@@ -17,7 +18,7 @@ class UEffectItem;
 struct FStreamableHandle;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAbilityTargetData_CS_Base
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -25,9 +26,13 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 
 	FGameplayAbilityTargetData_PropertyModify();
 
+	FGameplayAbilityTargetData_PropertyModify(
+		const FGameplayTag& Tag
+	);
+
 	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);
 
-	FGameplayAbilityTargetData_PropertyModify* Clone()const;
+	virtual FGameplayAbilityTargetData_PropertyModify* Clone()const override;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
@@ -48,7 +53,7 @@ private:
 };
 
 UCLASS()
-class PLANET_API UCS_PeriodicPropertyModify : public USkill_Base
+class PLANET_API UCS_PeriodicPropertyModify : public UCS_Base
 {
 	GENERATED_BODY()
 

@@ -80,7 +80,7 @@ namespace HumanProcessor
 
 		bool bIsPressdLeftAlt = false;
 
-		TMap<FKey, TSharedPtr<FCanbeActivedInfo>>HandleKeysMap;
+		TMap<FKey, TSharedPtr<FCanbeInteractionInfo>>HandleKeysMap;
 
 		ISceneObjInteractionInterface* LookAtSceneObjPtr = nullptr;
 

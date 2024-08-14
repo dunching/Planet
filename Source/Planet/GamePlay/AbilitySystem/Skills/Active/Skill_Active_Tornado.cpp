@@ -52,8 +52,6 @@ USkill_Active_Tornado::USkill_Active_Tornado() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	CooldownTime = 10;
 }
 
 void USkill_Active_Tornado::PreActivate(
@@ -95,7 +93,7 @@ void USkill_Active_Tornado::ActivateAbility(
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	PerformAction();
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_Tornado::CanActivateAbility(
@@ -130,7 +128,12 @@ void USkill_Active_Tornado::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_Tornado::PerformAction()
+void USkill_Active_Tornado::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	if (CharacterPtr)
 	{

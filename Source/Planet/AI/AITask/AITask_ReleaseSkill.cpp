@@ -97,7 +97,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 				{
 					switch (Iter->Type)
 					{
-					case FCanbeActivedInfo::EType::kActiveSkill:
+					case FCanbeInteractionInfo::EType::kActiveSkill:
 					{
 						auto Skills = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 						auto SkillIter = Skills.Find(Iter->Socket);
@@ -105,35 +105,27 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 						{
 							continue;
 						}
-						for (const auto SkillHandleIter : (*SkillIter)->HandleAry)
+						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->SkillUnitPtr->GAInstPtr);
+						if (!GAInsPtr)
 						{
-							auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(SkillHandleIter);
-							if (!GameplayAbilitySpecPtr)
-							{
-								continue;
-							}
-							auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-							if (!GAInsPtr)
-							{
-								continue;
-							}
+							continue;
+						}
 
-							auto bIsReady = GAInsPtr->CanActivateAbility(
-								GAInsPtr->GetCurrentAbilitySpecHandle(),
-								GAInsPtr->GetCurrentActorInfo()
-							);
-							if (bIsReady)
+						auto bIsReady = GAInsPtr->CanActivateAbility(
+							GAInsPtr->GetCurrentAbilitySpecHandle(),
+							GAInsPtr->GetCurrentActorInfo()
+						);
+						if (bIsReady)
+						{
+							if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter))
 							{
-								if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter))
-								{
-									ReleasingSkillMap.Add(SkillHandleIter, Iter);
-									ReleasingSkillDelegateMap.Add(
-										SkillHandleIter,
-										GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
-									);
-									CurrentTaslHasReleaseNum++;
-									return true;
-								}
+								ReleasingSkillMap.Add(GAInsPtr->GetCurrentAbilitySpecHandle(), Iter);
+								ReleasingSkillDelegateMap.Add(
+									GAInsPtr->GetCurrentAbilitySpecHandle(),
+									GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
+								);
+								CurrentTaslHasReleaseNum++;
+								return true;
 							}
 						}
 					}
@@ -147,7 +139,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 				{
 					switch (Iter->Type)
 					{
-					case FCanbeActivedInfo::EType::kWeaponActiveSkill:
+					case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
 					{
 						auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
 						if (!WeaponSPtr)

@@ -42,8 +42,6 @@ USkill_Active_XYFH::USkill_Active_XYFH() :
 
 	bRetriggerInstancedAbility = true;
 
-	CooldownTime = 10;
-
 	CurrentWaitInputTime = 1.f;
 }
 
@@ -83,7 +81,7 @@ void USkill_Active_XYFH::ActivateAbility(
 		);
 	}
 
-	PerformAction();
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_XYFH::CanActivateAbility(
@@ -127,7 +125,12 @@ void USkill_Active_XYFH::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_XYFH::PerformAction()
+void USkill_Active_XYFH::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	if (CharacterPtr && bIsContinue)
 	{
@@ -284,7 +287,7 @@ void USkill_Active_XYFH::OnSubMoveStepComplete()
 {
 	CharacterPtr->GetMesh()->SetHiddenInGame(false);
 
-	PerformAction();
+	PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 }
 
 UAnimMontage* USkill_Active_XYFH::GetCurrentMontage() const

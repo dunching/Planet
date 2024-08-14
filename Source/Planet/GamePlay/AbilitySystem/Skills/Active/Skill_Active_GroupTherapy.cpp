@@ -65,10 +65,15 @@ void USkill_Active_GroupTherapy::ActivateAbility(
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	PerformAction();
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void USkill_Active_GroupTherapy::PerformAction()
+void USkill_Active_GroupTherapy::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	StartTasksLink();
 }

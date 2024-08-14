@@ -119,8 +119,6 @@ protected:
 		FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
 	);
 
-	FGameplayAbilitySpecHandle ExcuteEffects2Self(UConsumableUnit* UnitPtr);
-
 	void AddSendGroupEffectModify();
 
 	void AddSendWuXingModify();
@@ -147,11 +145,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTagContainer CharacterTags;
 
-	TMap<UConsumableUnit*, FGameplayAbilitySpecHandle>PeriodicPropertyModifyMap;
+	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicPropertyModifyMap;
 
 	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicStateTagModifyMap;
 	
-	// 只会有一个
 	TPair<FGameplayTag, FGameplayAbilitySpecHandle>PreviousRootMotionModify;
 
 };

@@ -27,7 +27,7 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion_FlyAway :
 
 	FGameplayAbilityTargetData_RootMotion_FlyAway();
 
-	FGameplayAbilityTargetData_RootMotion_FlyAway* Clone()const;
+	virtual FGameplayAbilityTargetData_RootMotion_FlyAway* Clone()const override;
 
 	float Duration = 3.f;
 

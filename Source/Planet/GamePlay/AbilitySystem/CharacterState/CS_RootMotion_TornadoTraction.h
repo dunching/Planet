@@ -27,7 +27,7 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion_TornadoTraction  :
 
 	FGameplayAbilityTargetData_RootMotion_TornadoTraction ();
 
-	FGameplayAbilityTargetData_RootMotion_TornadoTraction * Clone()const;
+	virtual FGameplayAbilityTargetData_RootMotion_TornadoTraction * Clone()const override;
 
 	int32 Height = 100;
 

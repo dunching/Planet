@@ -8,9 +8,9 @@ public class PlanetGameTarget : TargetRules
 	public PlanetGameTarget( TargetInfo Target) : base(Target)
     {
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+        DefaultBuildSettings = BuildSettingsVersion.Latest;
 
         Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
 		ExtraModuleNames.AddRange( new string[] {
             "Planet",

@@ -15,6 +15,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "InteractiveBaseGAComponent.h"
+#include "SceneUnitTable.h"
 
 UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify():
 	Super()
@@ -140,15 +141,22 @@ void UCS_PeriodicPropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr,
 	}
 }
 
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal)
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal) :
+	Super(RightVal->GetUnitType())
 {
-	Duration = RightVal->Duration;
-	PerformActionInterval = RightVal->PerformActionInterval;
-	ModifyPropertyMap = RightVal->ModifyPropertyMap;
+	Duration = RightVal->GetTableRowUnit_Consumable()->Duration;
+	PerformActionInterval = RightVal->GetTableRowUnit_Consumable()->PerformActionInterval;
+	ModifyPropertyMap = RightVal->GetTableRowUnit_Consumable()->ModifyPropertyMap;
 	DefaultIcon = RightVal->GetIcon();
 }
 
 FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify()
+{
+
+}
+
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(const FGameplayTag& Tag):
+	Super(Tag)
 {
 
 }

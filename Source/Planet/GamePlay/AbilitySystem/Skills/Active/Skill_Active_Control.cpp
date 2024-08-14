@@ -68,7 +68,7 @@ void USkill_Active_Control::ActivateAbility(
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-		PerformAction();
+		PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	}
 	else
 	{
@@ -123,7 +123,12 @@ void USkill_Active_Control::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_Control::PerformAction()
+void USkill_Active_Control::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	if (CharacterPtr)
 	{

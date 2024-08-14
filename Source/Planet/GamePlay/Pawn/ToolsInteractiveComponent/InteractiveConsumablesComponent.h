@@ -14,7 +14,7 @@
 class UConsumableUnit;
 class USkill_Consumable_Generic;
 
-struct FCanbeActivedInfo;
+struct FCanbeInteractionInfo;
 
 struct FConsumableSocketInfo
 {
@@ -34,19 +34,19 @@ public:
 
 	static FName ComponentName;
 
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
+
 	void RegisterConsumable(
 		const TMap <FGameplayTag, TSharedPtr<FConsumableSocketInfo>>& InToolInfoMap, bool bIsGenerationEvent = true
 	);
 
-	virtual TArray<TSharedPtr<FCanbeActivedInfo>> GetCanbeActiveAction()const override;
-
 	virtual bool ActiveAction(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	)override;
 
-	virtual void CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)override;
+	virtual void CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)override;
 
-	TSharedPtr<FConsumableSocketInfo> FindConsumable(const FGameplayTag& Tag);
+	TSharedPtr<FConsumableSocketInfo> FindConsumable(const FGameplayTag& SocketTag);
 
 	void InitialBaseGAs();
 
@@ -54,17 +54,11 @@ protected:
 
 	virtual void GenerationCanbeActiveEvent()override;
 
-#pragma region GAs
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TSubclassOf<USkill_Consumable_Generic>Skill_Consumable_GenericClass;
+	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>ConsumablesMap;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Type")
+	TSubclassOf<USkill_Consumable_Generic> Skill_Consumable_GenericClass;
 
 	FGameplayAbilitySpecHandle Skill_Consumable_GenericHandle;
-#pragma endregion GAs
-
-	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>ToolsMap;
-
-	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActiveToolsAry;
-
-	FGameplayAbilitySpecHandle AbilitieHandle;
 
 };

@@ -36,6 +36,7 @@
 #include "PlanetPlayerState.h"
 #include "UICommon.h"
 #include "MenuLayout.h"
+#include "PawnStateConsumablesHUD.h"
 
 struct FMainUILayout : public TStructVariable<FMainUILayout>
 {
@@ -44,6 +45,10 @@ struct FMainUILayout : public TStructVariable<FMainUILayout>
 	FName RaffleMenu_Socket = TEXT("RaffleMenu_Socket");
 
 	FName AllocationSkills_Socket = TEXT("AllocationSkills_Socket");
+
+	FName PawnStateConsumablesHUD_Socket = TEXT("PawnStateConsumablesHUD_Socket");
+
+	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
 };
 
 struct FMenuLayout : public TStructVariable<FMenuLayout>
@@ -80,33 +85,70 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 	{
 		return;
 	}
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->PawnActionStateHUDSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
 
-	auto UIPtr = Cast<UPawnStateActionHUD>(BorderPtr->GetContent());
-	if (UIPtr)
+	// 技能HUD
 	{
-		if (bIsDisplay)
+		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnActionStateHUDSocket));
+		if (!BorderPtr)
 		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
+			return;
+		}
+
+		auto UIPtr = Cast<UPawnStateActionHUD>(BorderPtr->GetContent());
+		if (UIPtr)
+		{
+			if (bIsDisplay)
+			{
+				UIPtr->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				UIPtr->RemoveFromParent();
+			}
 		}
 		else
 		{
-			UIPtr->RemoveFromParent();
+			if (bIsDisplay)
+			{
+				UIPtr = CreateWidget<UPawnStateActionHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateActionHUDClass);
+				if (UIPtr)
+				{
+					UIPtr->CharacterPtr = CharacterPtr;
+					BorderPtr->AddChild(UIPtr);
+				}
+			}
 		}
 	}
-	else
+
+	// 消耗品HUD
 	{
-		if (bIsDisplay)
+		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnStateConsumablesHUD_Socket));
+		if (!BorderPtr)
 		{
-			UIPtr = CreateWidget<UPawnStateActionHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateActionHUDClass);
-			if (UIPtr)
+			return;
+		}
+
+		auto UIPtr = Cast<UPawnStateConsumablesHUD>(BorderPtr->GetContent());
+		if (UIPtr)
+		{
+			if (bIsDisplay)
 			{
-				UIPtr->CharacterPtr = CharacterPtr;
-				BorderPtr->AddChild(UIPtr);
+				UIPtr->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				UIPtr->RemoveFromParent();
+			}
+		}
+		else
+		{
+			if (bIsDisplay)
+			{
+				UIPtr = CreateWidget<UPawnStateConsumablesHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateConsumablesHUDClass);
+				if (UIPtr)
+				{
+					BorderPtr->AddChild(UIPtr);
+				}
 			}
 		}
 	}

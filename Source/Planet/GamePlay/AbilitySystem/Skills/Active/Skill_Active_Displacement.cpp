@@ -51,7 +51,7 @@ void USkill_Active_Displacement::ActivateAbility(
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	PerformAction();
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_Displacement::CanActivateAbility(
@@ -85,7 +85,12 @@ void USkill_Active_Displacement::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_Displacement::PerformAction()
+void USkill_Active_Displacement::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	if (CharacterPtr)
 	{

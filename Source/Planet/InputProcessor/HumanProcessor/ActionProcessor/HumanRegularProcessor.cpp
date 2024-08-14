@@ -66,6 +66,7 @@
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
 #include "InteractiveBaseGAComponent.h"
+#include "InteractiveConsumablesComponent.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
@@ -216,7 +217,22 @@ namespace HumanProcessor
 
 				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
 
-				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
+				switch ((*SkillIter)->Type)
+				{
+				case FCanbeInteractionInfo::EType::kActiveSkill:
+				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
+				{
+					OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
+				}
+				break;
+				case FCanbeInteractionInfo::EType::kConsumables:
+				{
+					OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
+				}
+				break;
+				default:
+					break;
+				}
 			}
 
 			// 这里应该是特定的输入会打断 还是任意输入都会打断？
@@ -237,7 +253,16 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetInteractiveSkillComponent()->CancelAction(*SkillIter);
+				switch ((*SkillIter)->Type)
+				{
+				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
+				{
+					OnwerActorPtr->GetInteractiveSkillComponent()->CancelAction(*SkillIter);
+				}
+				break;
+				default:
+					break;
+				}
 			}
 		}
 	}
@@ -447,6 +472,7 @@ namespace HumanProcessor
 			if (OnwerActorPtr)
 			{
 				auto CanbeActivedInfoAry = OnwerActorPtr->GetInteractiveSkillComponent()->GetCanbeActiveAction();
+				CanbeActivedInfoAry.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction()); 
 				for (const auto& Iter : CanbeActivedInfoAry)
 				{
 					HandleKeysMap.Add(Iter->Key, Iter);

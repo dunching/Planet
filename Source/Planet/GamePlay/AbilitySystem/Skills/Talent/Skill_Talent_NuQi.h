@@ -75,7 +75,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void Tick(float DeltaTime)override;
+	virtual void Tick(float DeltaTime);
 
 protected:
 

@@ -18,7 +18,10 @@ class PLANET_API UBasicFutures_Jump : public UBasicFuturesBase
 	GENERATED_BODY()
 
 public:
+
 	UBasicFutures_Jump();
+
+	virtual void PostCDOContruct() override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,

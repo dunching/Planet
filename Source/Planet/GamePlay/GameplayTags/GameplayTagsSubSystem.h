@@ -5,11 +5,12 @@
 #include "CoreMinimal.h"
 #include <GameplayTagContainer.h>
 #include <Subsystems/GameInstanceSubsystem.h>
+#include <Subsystems/EngineSubsystem.h>
 
 #include "GameplayTagsSubSystem.generated.h"
 
 UCLASS()
-class PLANET_API UGameplayTagsSubSystem : public UGameInstanceSubsystem
+class PLANET_API UGameplayTagsSubSystem : public UEngineSubsystem
 {
 	GENERATED_BODY()
 
@@ -20,27 +21,33 @@ public:
 #pragma region Locomotion
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Jump =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Jump")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Jump")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Running =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Run")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Run")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Dash =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Dash")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Dash")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Mount =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Mount")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Mount")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DisMount =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.DisMount")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.DisMount")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Affected =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Locomotion.Affected")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Affected")));
+#pragma endregion 
+	
+#pragma region BaseFeature Tags
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag MoveToAttaclArea =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.MoveToAttaclArea")));
 #pragma endregion 
 
 #pragma region MovementStateAble
@@ -57,12 +64,6 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Move")));
 #pragma endregion 
 	
-#pragma region BaseFeature Tags
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag MoveToAttaclArea =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.MoveToAttaclArea")));
-#pragma endregion 
-
 #pragma region State Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag UsingConsumable =
@@ -95,7 +96,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag FlyAway =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.FlyAway")));
-	
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag KnockDown =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.KnockDown")));
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Traction =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.Traction")));

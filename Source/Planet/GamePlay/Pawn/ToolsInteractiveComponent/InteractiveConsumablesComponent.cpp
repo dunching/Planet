@@ -7,14 +7,38 @@
 #include "Skill_Consumable_Test.h"
 #include "Skill_Consumable_Generic.h"
 #include "GameplayTagsSubSystem.h"
+#include "SceneUnitTable.h"
 
 FName UInteractiveConsumablesComponent::ComponentName = TEXT("InteractiveConsumablesComponent");
+
+void UInteractiveConsumablesComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
 
 void UInteractiveConsumablesComponent::RegisterConsumable(
 	const TMap <FGameplayTag, TSharedPtr<FConsumableSocketInfo>>& InToolInfoMap, bool bIsGenerationEvent /*= true */
 )
 {
-	ToolsMap = InToolInfoMap;
+	ConsumablesMap = InToolInfoMap;
+
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(Skill_Consumable_GenericHandle);
+	if (!GameplayAbilitySpecPtr)
+	{
+		return;
+	}
+	auto GAInsPtr = Cast<USkill_Consumable_Generic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	if (!GAInsPtr)
+	{
+		return;
+	}
+
+	for (const auto Iter : ConsumablesMap)
+	{
+		Iter.Value->UnitPtr->GAInstPtr = GAInsPtr;
+	}
 
 	if (bIsGenerationEvent)
 	{
@@ -22,21 +46,16 @@ void UInteractiveConsumablesComponent::RegisterConsumable(
 	}
 }
 
-TArray<TSharedPtr<FCanbeActivedInfo>> UInteractiveConsumablesComponent::GetCanbeActiveAction() const
+bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */)
 {
-	return CanbeActiveToolsAry;
-}
-
-bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */)
-{
-	auto ToolIter = ToolsMap.Find(CanbeActivedInfoSPtr->Socket);
+	auto ToolIter = ConsumablesMap.Find(CanbeActivedInfoSPtr->Socket);
 	if (!ToolIter)
 	{
 		return  false;
 	}
 
 	if (
-		(*ToolIter)->UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables_HP)||
+		(*ToolIter)->UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables_HP) ||
 		(*ToolIter)->UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables_PP)
 		)
 	{
@@ -52,12 +71,7 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 		GameplayAbilityTargetDashPtr->UnitPtr = (*ToolIter)->UnitPtr;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 
-		FGameplayAbilitySpec GameplayAbilitySpec(
-			(*ToolIter)->UnitPtr->Skill_Consumable_Class,
-			1
-		);
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-
 		return ASCPtr->TriggerAbilityFromGameplayEvent(
 			Skill_Consumable_GenericHandle,
 			ASCPtr->AbilityActorInfo.Get(),
@@ -70,14 +84,14 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 	return false;
 }
 
-void UInteractiveConsumablesComponent::CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+void UInteractiveConsumablesComponent::CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)
 {
 
 }
 
-TSharedPtr<FConsumableSocketInfo> UInteractiveConsumablesComponent::FindConsumable(const FGameplayTag& Tag)
+TSharedPtr<FConsumableSocketInfo> UInteractiveConsumablesComponent::FindConsumable(const FGameplayTag& SocketTag)
 {
-	auto Iter = ToolsMap.Find(Tag);
+	auto Iter = ConsumablesMap.Find(SocketTag);
 	if (Iter)
 	{
 		return *Iter;
@@ -101,18 +115,15 @@ void UInteractiveConsumablesComponent::InitialBaseGAs()
 
 void UInteractiveConsumablesComponent::GenerationCanbeActiveEvent()
 {
-	CanbeActiveToolsAry.Empty();
+	CanbeInteractionAry.Empty();
 
-	for (const auto& Iter : ToolsMap)
+	for (const auto& Iter : ConsumablesMap)
 	{
-		if (Iter.Value->UnitPtr)
-		{
-			TSharedPtr<FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
-			CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kConsumables;
-			CanbeActivedInfoSPtr->Key = Iter.Value->Key;
-			CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
+		TSharedPtr<FCanbeInteractionInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeInteractionInfo>();
+		CanbeActivedInfoSPtr->Type = FCanbeInteractionInfo::EType::kConsumables;
+		CanbeActivedInfoSPtr->Key = Iter.Value->Key;
+		CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
 
-			CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
-		}
+		CanbeInteractionAry.Add(CanbeActivedInfoSPtr);
 	}
 }

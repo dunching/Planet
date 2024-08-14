@@ -20,6 +20,7 @@
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
+#include "Planet_Tools.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_MoveToAttaclArea(
@@ -35,6 +36,23 @@ struct FBasicFutures_MoveToAttaclArea : public TStructVariable<FBasicFutures_Mov
 
 	FName Donut_OuterRadius = TEXT("Donut.OuterRadius");
 };
+
+void UBasicFutures_MoveToAttaclArea::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
+	if (GetWorldImp())
+	{
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MoveToAttaclArea);
+
+		FAbilityTriggerData AbilityTriggerData;
+
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->MoveToAttaclArea;
+		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+		AbilityTriggers.Add(AbilityTriggerData);
+	}
+}
 
 void UBasicFutures_MoveToAttaclArea::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

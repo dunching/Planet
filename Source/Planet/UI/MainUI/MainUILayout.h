@@ -11,6 +11,7 @@
 class UMainUILayout;
 class URaffleMenu;
 class UPawnStateActionHUD;
+class UPawnStateConsumablesHUD;
 class UPawnStateBuildingHUD;
 class UItemsDragDropOperation;
 class UDragDropOperationWidget;
@@ -51,6 +52,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UPawnStateActionHUD>PawnStateActionHUDClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UPawnStateConsumablesHUD>PawnStateConsumablesHUDClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UPawnStateBuildingHUD>PawnStateBuildingHUDClass;
@@ -64,9 +68,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
 #pragma endregion MenusUI
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName PawnActionStateHUDSocket;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName PawnBuildingStateHUDSocket;

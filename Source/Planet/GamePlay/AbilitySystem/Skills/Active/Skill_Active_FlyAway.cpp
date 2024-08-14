@@ -58,7 +58,7 @@ void USkill_Active_FlyAway::ActivateAbility(
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	PerformAction();
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_FlyAway::CanActivateAbility(
@@ -87,7 +87,12 @@ void USkill_Active_FlyAway::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_FlyAway::PerformAction()
+void USkill_Active_FlyAway::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
 	if (CharacterPtr)
 	{

@@ -12,12 +12,13 @@
 #include "Components/Overlay.h"
 #include "Components/ProgressBar.h"
 #include "Kismet/KismetStringLibrary.h"
-
 #include "Components/SizeBox.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/Texture2D.h"
 #include "ToolsLibrary.h"
 #include "BackpackIcon.h"
+
+#include "TemplateHelper.h"
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
@@ -68,7 +69,7 @@ void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->ToolPtr);
+			ResetToolUIByData(NewPtr->UnitPtr);
 		}
 	}
 }
@@ -77,7 +78,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
-	ToolPtr = nullptr;
+	UnitPtr = nullptr;
 
 	if (BasicUnitPtr)
 	{
@@ -86,7 +87,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 			)
 		{
-			ToolPtr = Cast<USkillUnit>(BasicUnitPtr);
+			UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
 		}
 	}
 
@@ -117,50 +118,46 @@ void UActionSkillsIcon::UpdateSkillState()
 		return;
 	}
 
-	const auto SKillUnitType = SkillSocketInfoSPtr->SkillUnit->GetUnitType();
-
-	auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-	for (const auto SkillHandleIter : SkillSocketInfoSPtr->HandleAry)
+	const auto SKillUnitType = SkillSocketInfoSPtr->SkillUnitPtr->GetUnitType();
 	{
-		auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(SkillHandleIter);
-		if (!GameplayAbilitySpecPtr)
+		auto GAInsPtr = SkillSocketInfoSPtr->SkillUnitPtr->GAInstPtr;
+		if (!GAInsPtr)
 		{
 			return;
 		}
+
+		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+		SetCanRelease(bIsReady);
+	}
+	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	{
+		float RemainingCooldown = 0.f;
+		float RemainingCooldownPercent = 0.f;
+
+		auto ActiveSkillUnitPtr = Cast<UActiveSkillUnit>(SkillSocketInfoSPtr->SkillUnitPtr);
+		if (!ActiveSkillUnitPtr)
 		{
-			auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-			if (!GAInsPtr)
-			{
-				return;
-			}
-
-			float RemainingCooldown = 0.f;
-			float RemainingCooldownPercent = 0.f;
-
-			auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
-			SetCanRelease(bIsReady);
-
-			auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-			SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
+			return;
 		}
-		if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+
+		auto bCooldownIsReady = ActiveSkillUnitPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
+
+		bool bIsAcceptInput = false;
+		float Percent = 0.f;
+
+		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->SkillUnitPtr->GAInstPtr);
+		if (!GAInsPtr)
 		{
-			auto GAInsPtr = Cast<USkill_Active_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-			if (!GAInsPtr)
-			{
-				return;
-			}
-
-			bool bIsAcceptInput = false;
-			float Percent = 0.f;
-
-			GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
-
-			SetInputRemainPercent(bIsAcceptInput, Percent);
+			return;
 		}
-		else if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
-		{
-		}
+
+		GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
+
+		SetInputRemainPercent(bIsAcceptInput, Percent);
+	}
+	else if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	{
 	}
 }
 
@@ -258,14 +255,14 @@ void UActionSkillsIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		if (ToolPtr)
+		if (UnitPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ToolPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
-					ImagePtr->SetBrushFromTexture(ToolPtr->GetIcon().Get());
+					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
 				}));
 		}
 		else
@@ -335,13 +332,13 @@ void UActionSkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const 
 		if (DragWidgetPtr)
 		{
 			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(ToolPtr);
+			DragWidgetPtr->ResetToolUIByData(UnitPtr);
 
 			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = ToolPtr;
+				WidgetDragPtr->SceneToolSPtr = UnitPtr;
 
 				OutOperation = WidgetDragPtr;
 			}

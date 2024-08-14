@@ -20,6 +20,17 @@ class UCoinUnit;
 class UBasicUnit;
 class UCharacterUnit;
 class AWeapon_Base; 
+class AConsumable_Base;
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_CommonCooldownInfo : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	int32 CoolDownTime = 10;
+
+};
 
 USTRUCT(BlueprintType)
 struct PLANET_API FTableRowUnit : public FTableRowBase
@@ -50,16 +61,16 @@ USTRUCT(BlueprintType)
 struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AWeapon_Base> ToolActorClass;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag WeaponSkillUnitType = FGameplayTag::EmptyTag;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	EAnimLinkClassType AnimLinkClassType = EAnimLinkClassType::kUnarmed;
-	
+
 };
 
 USTRUCT(BlueprintType)
@@ -79,6 +90,12 @@ struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowUnit_Ski
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag RequireWeaponUnitType = FGameplayTag::EmptyTag;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag>SkillCommonCooldownInfoMap;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<int32, int32>SkillCooldownInfoMap;
 
 };
 
@@ -111,4 +128,29 @@ struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSet<FGameplayTag> FirstActiveSkillSet;
 	
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_Consumable : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<AConsumable_Base> Consumable_Class;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UAnimMontage* HumanMontage = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag>CommonCooldownInfoMap;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float Duration = 3.f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float PerformActionInterval = 1.f;
+
 };

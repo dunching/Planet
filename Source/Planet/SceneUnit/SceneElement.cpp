@@ -12,6 +12,7 @@
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
 #include "SceneUnitContainer.h"
+#include "GroupMnaggerComponent.h"
 
 UBasicUnit::UBasicUnit()
 {
@@ -89,6 +90,24 @@ void UConsumableUnit::AddCurrentValue(int32 val)
 int32 UConsumableUnit::GetCurrentValue() const
 {
 	return Num;
+}
+
+FTableRowUnit_Consumable* UConsumableUnit::GetTableRowUnit_Consumable() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_Consumable.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_Consumable>(*UnitType.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
+}
+
+FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag) 
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_CommonCooldownInfo.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_CommonCooldownInfo>(*CommonCooldownTag.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
 }
 
 UToolUnit::UToolUnit()
@@ -227,4 +246,110 @@ void UCoinUnit::AddCurrentValue(int32 val)
 int32 UCoinUnit::GetCurrentValue() const
 {
 	return Num;
+}
+
+bool UActiveSkillUnit::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+{
+	auto MaxRemainingCooldown = -1.f;
+	auto MaxRemainingCooldownPercent = -1.f;
+
+	auto CurResult = true;
+	auto CurRemainingCooldown = -1.f;
+	auto CurRemainingCooldownPercent = -1.f;
+
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	for (auto Iter : CooldownMap)
+	{
+		if (Iter.Value.IsValid())
+		{
+			CurResult = Iter.Value.Pin()->GetRemainingCooldown(CurRemainingCooldown, CurRemainingCooldownPercent);
+			if (CurResult)
+			{
+				continue;
+			}
+
+			if (CurRemainingCooldown > MaxRemainingCooldown)
+			{
+				MaxRemainingCooldown = CurRemainingCooldown;
+				MaxRemainingCooldownPercent = CurRemainingCooldownPercent;
+			}
+		}
+	}
+
+	RemainingCooldown = MaxRemainingCooldown;
+	RemainingCooldownPercent = MaxRemainingCooldownPercent;
+
+	return CurResult;
+}
+
+bool UActiveSkillUnit::CheckCooldown() const
+{
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	for (auto Iter : CooldownMap)
+	{
+		if (Iter.Value.IsValid())
+		{
+			if (!Iter.Value.Pin()->CheckCooldown())
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+void UActiveSkillUnit::AddCooldownConsumeTime(float NewTime)
+{
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	if (CooldownMap.Contains(GetUnitType()))
+	{
+		CooldownMap[GetUnitType()].Pin()->AddCooldownConsumeTime(NewTime);
+	}
+}
+
+void UActiveSkillUnit::FreshUniqueCooldownTime()
+{
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	// 获取当前技能CD
+	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
+	{
+		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
+	}
+}
+
+void UActiveSkillUnit::ApplyCooldown()
+{
+	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+		this
+	);
+}
+
+void UActiveSkillUnit::OffsetCooldownTime()
+{
+	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyUniqueCooldown(
+		this
+	);
+
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	// 获取当前技能CD
+	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
+	{
+		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
+	}
 }

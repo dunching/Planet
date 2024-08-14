@@ -13,15 +13,18 @@
 
 #include "SceneElement.generated.h"
 
+struct FTableRowUnit_CommonCooldownInfo;
 struct FTableRowUnit;
 struct FTableRowUnit_WeaponExtendInfo;
 struct FTableRowUnit_ActiveSkillExtendInfo;
 struct FTableRowUnit_PassiveSkillExtendInfo;
 struct FTableRowUnit_WeaponSkillExtendInfo;
 struct FTableRowUnit_CharacterInfo;
+struct FTableRowUnit_Consumable;
 class AToolUnitBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;
+class USkill_Consumable_Generic;
 class AConsumable_Base;
 class IPlanetControllerInterface;
 
@@ -34,8 +37,39 @@ struct FAllocationSkills;
 struct FCharacterAttributes;
 struct FTalentHelper;
 struct FSceneUnitContainer;
+struct FSkillCooldownHelper;
 
 enum class ECharacterPropertyType : uint8;
+
+FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag);
+
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class UUnit_Cooldown : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class PLANET_API IUnit_Cooldown
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual bool GetRemainingCooldown(
+		float& RemainingCooldown, float& RemainingCooldownPercent
+	)const = 0;
+
+	virtual bool CheckCooldown()const = 0;
+
+	virtual void AddCooldownConsumeTime(float NewTime) = 0;
+
+	virtual void FreshUniqueCooldownTime() = 0;
+
+	virtual void ApplyCooldown() = 0;
+
+	virtual void OffsetCooldownTime() = 0;
+
+};
 
 // 场景内的对象代理
 // 通用数据记录在DataTable，变化数据记录在对象内
@@ -63,7 +97,7 @@ public:
 
 	// 
 	FString GetUnitName()const;
-	
+
 	void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
 
 	TCallbackHandleContainer<void(UCharacterUnit*)> OnAllocationCharacterUnitChanged;
@@ -76,10 +110,10 @@ protected:
 
 	UPROPERTY(Transient)
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
-	
+
 	// 这个物品被分配给的对象
 	UPROPERTY(Transient)
-	UCharacterUnit * AllocationCharacterUnitPtr = nullptr;
+	UCharacterUnit* AllocationCharacterUnitPtr = nullptr;
 
 private:
 
@@ -125,20 +159,10 @@ public:
 
 	int32 GetCurrentValue()const;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Type")
-	TSubclassOf<USkill_Consumable_Base> Skill_Consumable_Class;
+	FTableRowUnit_Consumable* GetTableRowUnit_Consumable()const;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	UAnimMontage* HumanMontage = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float Duration = 3.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float PerformActionInterval = 1.f;
+	UPROPERTY(Transient)
+	USkill_Consumable_Generic* GAInstPtr = nullptr;
 
 protected:
 
@@ -217,6 +241,9 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
+	UPROPERTY(Transient)
+	USkill_Base* GAInstPtr = nullptr;
+
 protected:
 
 };
@@ -241,7 +268,9 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UActiveSkillUnit : public USkillUnit
+class PLANET_API UActiveSkillUnit :
+	public USkillUnit,
+	public IUnit_Cooldown
 {
 	GENERATED_BODY()
 
@@ -252,6 +281,20 @@ public:
 	FTableRowUnit_ActiveSkillExtendInfo* GetTableRowUnit_ActiveSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
+
+	virtual bool GetRemainingCooldown(
+		float& RemainingCooldown, float& RemainingCooldownPercent
+	)const override;
+
+	virtual bool CheckCooldown()const override;
+
+	virtual void AddCooldownConsumeTime(float NewTime)override;
+
+	virtual void FreshUniqueCooldownTime()override;
+
+	virtual void ApplyCooldown()override;
+
+	virtual void OffsetCooldownTime()override;
 
 protected:
 

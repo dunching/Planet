@@ -7,6 +7,7 @@
 #include "PlanetWorldSettings.h"
 #include "InteractiveSkillComponent.h"
 #include "InteractiveBaseGAComponent.h"
+#include "GameOptions.h"
 
 USkill_Base::USkill_Base() :
 	Super()
@@ -23,6 +24,15 @@ void USkill_Base::OnAvatarSet(
 
 	// CDO
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+
+	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill*>(Spec.GameplayEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetPtr)
+		{
+			SkillUnitPtr = GameplayAbilityTargetPtr->SkillUnitPtr;
+		}
+	}
 }
 
 void USkill_Base::PreActivate(
@@ -59,6 +69,17 @@ bool USkill_Base::CommitAbility(
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
+bool USkill_Base::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+) const
+{
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
 void USkill_Base::CancelAbility(
 	const FGameplayAbilitySpecHandle Handle, 
 	const FGameplayAbilityActorInfo* ActorInfo, 
@@ -75,15 +96,6 @@ void USkill_Base::OnRemoveAbility(
 )
 {
 	Super::OnRemoveAbility(ActorInfo, Spec);
-}
-
-void USkill_Base::Tick(float DeltaTime)
-{
-}
-
-bool USkill_Base::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
-{
-	return true;
 }
 
 const TArray<FAbilityTriggerData>& USkill_Base::GetTriggers() const
@@ -104,4 +116,14 @@ void USkill_Base::ResetPreviousStageActions()
 	}
 	ActiveTasks.Reset();
 	ResetListLock();
+}
+
+FGameplayAbilityTargetData_Skill* FGameplayAbilityTargetData_Skill::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_Skill;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
 }

@@ -46,7 +46,7 @@ void UCS_RootMotion::PerformAction()
 FGameplayAbilityTargetData_RootMotion::FGameplayAbilityTargetData_RootMotion(
 	const FGameplayTag& InTag
 	):
-	Tag(InTag)
+	Super(InTag)
 {
 
 }

@@ -99,8 +99,6 @@ void USkill_Talent_NuQi::EndAbility(
 
 void USkill_Talent_NuQi::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
 	if (bIsInFury)
 	{
 		FuryDuration_Accumulate += DeltaTime;

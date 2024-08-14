@@ -117,7 +117,6 @@ void USkill_Talent_YinYang::EndAbility(
 
 void USkill_Talent_YinYang::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
 	{
 		Tick_StateTrans_Accumulate += DeltaTime;
 		if (Tick_StateTrans_Accumulate >= Tick_StateTrans_Interval)

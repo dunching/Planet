@@ -113,6 +113,11 @@ void USkill_WeaponActive_Base::RequestCancel()
 
 void USkill_WeaponActive_Base::ContinueActive()
 {
+	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
+	{
+		return;
+	}
+
 	bIsRequstCancel = false;
 
 	switch (SkillState)

@@ -19,8 +19,15 @@ void USkill_Consumable_Test::OnAvatarSet(
 	Super::OnAvatarSet(ActorInfo, Spec);
 }
 
-void USkill_Consumable_Test::PerformAction()
+void USkill_Consumable_Test::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
 	if (CharacterPtr)
 	{
 		SpawnActor();
@@ -139,5 +146,4 @@ void USkill_Consumable_Test::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	PerformAction();
 }

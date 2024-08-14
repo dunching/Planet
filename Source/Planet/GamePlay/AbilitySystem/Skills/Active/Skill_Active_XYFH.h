@@ -53,7 +53,12 @@ public:
 
 protected:
 
-	void PerformAction();
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
 
 	void ExcuteTasks(float StartDistance, float EndDistance, float Duration, bool bIsSubMoveStep);
 

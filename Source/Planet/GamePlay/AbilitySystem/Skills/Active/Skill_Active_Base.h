@@ -12,7 +12,8 @@
 class UBasicUnit;
 class UActiveSkillUnit;
 class UAbilityTask_TimerHelper;
-struct FCanbeActivedInfo;
+struct FCanbeInteractionInfo;
+struct FSkillCooldownHelper;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetData
@@ -21,14 +22,15 @@ struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetDat
 
 	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const;
 
-	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
+	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 };
 
 /**
  * 主动触发的节能
  */
 UCLASS()
-class USkill_Active_Base : public USkill_Base
+class USkill_Active_Base :
+	public USkill_Base
 {
 	GENERATED_BODY()
 
@@ -79,15 +81,14 @@ public:
 		bool bWasCancelled
 	);
 
-	virtual void Tick(float DeltaTime)override;
+	virtual void Tick(float DeltaTime);
 
-	virtual bool GetRemainingCooldown(
-		float& RemainingCooldown, float& RemainingCooldownPercent
-	)const override;
-
-	virtual void PerformAction();
-
-	void AddCooldownConsumeTime(float NewTime);
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
 
 	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
 
@@ -104,10 +105,7 @@ public:
 	// 获取范围内任意可攻击的目标
 	ACharacterBase* GetTargetInDistance(int32 Distance)const;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "CooldownTime")
-	int32 CooldownTime = -1;
-
-	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
+	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 
 protected:
 
@@ -115,8 +113,6 @@ protected:
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
 
 	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
-
-	float CooldownConsumeTime = 0.f;
 
 	bool bIsPreviouInput = false;
 

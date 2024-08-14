@@ -53,12 +53,12 @@ void UPawnStateBuildingHUD::NativeDestruct()
 	{
 		auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
 		const auto Result = GetTools();
-		EICPtr->RegisterTool(Result);
+//		EICPtr->RegisterTool(Result);
 	}
 	{
 		auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
 		const auto Result = GetConsumables();
-		EICPtr->RegisterConsumable(Result);
+//		EICPtr->RegisterConsumable(Result);
 	}
 }
 

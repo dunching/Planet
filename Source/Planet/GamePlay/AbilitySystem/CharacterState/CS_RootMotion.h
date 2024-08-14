@@ -6,6 +6,7 @@
 #include <GameplayTagContainer.h>
 
 #include "Skill_Base.h"
+#include "CS_Base.h"
 
 #include "CS_RootMotion.generated.h"
 
@@ -21,7 +22,7 @@ struct FStreamableHandle;
 struct FGameplayAbilityTargetData_RootMotion;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_RootMotion : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_RootMotion : public FGameplayAbilityTargetData_CS_Base
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -33,10 +34,7 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion : public FGameplayAbilit
 		const FGameplayTag& Tag
 	);
 
-	FGameplayAbilityTargetData_RootMotion* Clone()const;
-
-	// 会一次性修改多个状态码？
-	FGameplayTag Tag;
+	virtual FGameplayAbilityTargetData_RootMotion* Clone()const;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
@@ -49,7 +47,7 @@ private:
 };
 
 UCLASS()
-class PLANET_API UCS_RootMotion : public USkill_Base
+class PLANET_API UCS_RootMotion : public UCS_Base
 {
 	GENERATED_BODY()
 

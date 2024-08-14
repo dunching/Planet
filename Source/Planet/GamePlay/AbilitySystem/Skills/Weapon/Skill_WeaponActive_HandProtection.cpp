@@ -282,25 +282,17 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{
-			if (Iter.Value->SkillUnit)
+			if (Iter.Value->SkillUnitPtr)
 			{
-				if (Iter.Value->SkillUnit->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
 				{
-					for (const auto SkillHandleIter : Iter.Value->HandleAry)
+					auto ActiveSkillUnitPtr = Cast<UActiveSkillUnit>(Iter.Value->SkillUnitPtr);
+					if (!ActiveSkillUnitPtr)
 					{
-						auto GAPtr = GASPtr->FindAbilitySpecFromHandle(SkillHandleIter);
-						if (!GAPtr)
-						{
-							continue;
-						}
-						auto GAInstPtr = Cast<USkill_Active_Base>(GAPtr->GetPrimaryInstance());
-						if (!GAInstPtr)
-						{
-							continue;
-						}
-
-						GAInstPtr->AddCooldownConsumeTime(1.f);
+						continue;
 					}
+
+					ActiveSkillUnitPtr->AddCooldownConsumeTime(1.f);
 				}
 			}
 		}

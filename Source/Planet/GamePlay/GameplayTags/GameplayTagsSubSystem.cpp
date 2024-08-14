@@ -7,8 +7,8 @@
 
 UGameplayTagsSubSystem* UGameplayTagsSubSystem::GetInstance()
 {
-	return Cast<UGameplayTagsSubSystem>(USubsystemBlueprintLibrary::GetGameInstanceSubsystem(
-		GetWorldImp(), UGameplayTagsSubSystem::StaticClass())
+	return Cast<UGameplayTagsSubSystem>(USubsystemBlueprintLibrary::GetEngineSubsystem(
+		UGameplayTagsSubSystem::StaticClass())
 	);
 }
 

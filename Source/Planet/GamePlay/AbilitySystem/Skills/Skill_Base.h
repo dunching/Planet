@@ -10,7 +10,18 @@
 #include "Skill_Base.generated.h"
 
 class UBasicUnit;
+class USkillUnit;
 class UInteractiveComponent;
+
+USTRUCT()
+struct FGameplayAbilityTargetData_Skill : public FGameplayAbilityTargetData
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual FGameplayAbilityTargetData_Skill* Clone()const;
+
+	USkillUnit* SkillUnitPtr = nullptr;
+};
 
 UCLASS()
 class PLANET_API USkill_Base : public UPlanetGameplayAbility
@@ -43,6 +54,14 @@ public:
 		const FGameplayEventData* TriggerEventData
 	);
 
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr,
+		const FGameplayTagContainer* TargetTags = nullptr,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -62,10 +81,6 @@ public:
 		const FGameplayAbilitySpec& Spec
 	)override;
 
-	virtual void Tick(float DeltaTime);
-
-	virtual bool GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent)const;
-
 	const TArray<FAbilityTriggerData>& GetTriggers()const;
 
 protected:
@@ -73,5 +88,7 @@ protected:
 	virtual void ResetPreviousStageActions();
 
 	ACharacterBase* CharacterPtr = nullptr;
+
+	USkillUnit* SkillUnitPtr = nullptr;
 
 };

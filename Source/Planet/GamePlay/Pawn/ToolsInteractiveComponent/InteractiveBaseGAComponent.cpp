@@ -120,27 +120,38 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 	FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 )
 {
-	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
+	FGameplayAbilitySpecHandle Result;
 
-	auto OnwerActorPtr = GameplayAbilityTargetDataPtr->TargetCharacterPtr.Get();
-	if (!OnwerActorPtr)
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (OnwerActorPtr)
 	{
-		return GAToolPeriodicHandle;
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		if (PeriodicPropertyModifyMap.Contains(GameplayAbilityTargetDataPtr->Tag))
+		{
+			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicPropertyModifyMap[GameplayAbilityTargetDataPtr->Tag]);
+			if (GameplayAbilitySpecPtr)
+			{
+				auto GAPtr = Cast<UCS_PeriodicPropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+				if (GAPtr)
+				{
+					GAPtr->UpdateDuration();
+					return Result;
+				}
+			}
+		}
+
+		FGameplayEventData Payload;
+		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+
+		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass(), 1);
+
+		Result = ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			&Payload
+		);
+		PeriodicPropertyModifyMap.Add(GameplayAbilityTargetDataPtr->Tag, Result);
 	}
-
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-
-	FGameplayEventData Payload;
-	Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-	FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass(), 1);
-
-	GAToolPeriodicHandle = ASCPtr->GiveAbilityAndActivateOnce(
-		Spec,
-		&Payload
-	);
-
-	return GAToolPeriodicHandle;
+	return Result;
 }
 
 FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
@@ -246,37 +257,6 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 				PreviousRootMotionModify.Value = Result;
 			}
 		}
-	}
-	return Result;
-}
-
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects2Self(UConsumableUnit* UnitPtr)
-{
-	FGameplayAbilitySpecHandle Result;
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
-	{
-		if (PeriodicPropertyModifyMap.Contains(UnitPtr))
-		{
-			auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicPropertyModifyMap[UnitPtr]);
-			if (GameplayAbilitySpecPtr)
-			{
-				auto GAPtr = Cast<UCS_PeriodicPropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-				if (GAPtr)
-				{
-					GAPtr->UpdateDuration();
-					return Result;
-				}
-			}
-		}
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(UnitPtr);
-
-		GameplayAbilityTargetDataPtr->TriggerCharacterPtr = OnwerActorPtr;
-		GameplayAbilityTargetDataPtr->TargetCharacterPtr = OnwerActorPtr;
-
-		Result = ExcuteEffects(GameplayAbilityTargetDataPtr);
-		PeriodicPropertyModifyMap.Add(UnitPtr, Result);
 	}
 	return Result;
 }

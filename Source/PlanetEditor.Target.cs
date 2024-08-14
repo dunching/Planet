@@ -8,14 +8,16 @@ public class PlanetEditorTarget : TargetRules
 	public PlanetEditorTarget( TargetInfo Target) : base(Target)
     {
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+        DefaultBuildSettings = BuildSettingsVersion.Latest;
+
         // bStrictConformanceMode = true;
 
         // 屏蔽之后不能提调试,具体原因未知
-        BuildEnvironment = TargetBuildEnvironment.Unique;
+        // BuildEnvironment = TargetBuildEnvironment.Unique;
+        BuildEnvironment = TargetBuildEnvironment.Shared;
         // bOverrideBuildEnvironment = false;
 
         Type = TargetType.Editor;
-        DefaultBuildSettings = BuildSettingsVersion.Latest;
 
         ExtraModuleNames.AddRange( new string[] {
             "Planet",
