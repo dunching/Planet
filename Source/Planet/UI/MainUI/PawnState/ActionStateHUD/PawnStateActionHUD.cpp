@@ -19,7 +19,7 @@
 #include "State_Talent_YinYang.h"
 #include "GameplayTagsSubSystem.h"
 
-namespace PawnStateActionHUD
+struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 {
 	const FName ActiveSkill1 = TEXT("ActiveSkill1");
 
@@ -32,13 +32,13 @@ namespace PawnStateActionHUD
 	const FName WeaponActiveSkill1 = TEXT("WeaponActiveSkill1");
 
 	const FName WeaponActiveSkill2 = TEXT("WeaponActiveSkill2");
-	
+
 	const FName TalentStateSocket = TEXT("TalentStateSocket");
-	
+
 	const FName BaseAttackPower = TEXT("BaseAttackPower");
 
 	const FName Penetration = TEXT("Penetration");
-	
+
 	const FName Resistance = TEXT("Resistance");
 
 	const FName MoveSpeed = TEXT("MoveSpeed");
@@ -60,8 +60,7 @@ namespace PawnStateActionHUD
 	const FName Fire = TEXT("Fire");
 
 	const FName Soil = TEXT("Soil");
-
-}
+};
 
 void UPawnStateActionHUD::NativeConstruct()
 {
@@ -87,18 +86,18 @@ void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	{
 		TArray<FName>Ary
 		{
-			PawnStateActionHUD::ActiveSkill1,
-			PawnStateActionHUD::ActiveSkill2,
-			PawnStateActionHUD::ActiveSkill3,
-			PawnStateActionHUD::ActiveSkill4 ,
-			PawnStateActionHUD::WeaponActiveSkill1,
-			PawnStateActionHUD::WeaponActiveSkill2,
+			FPawnStateActionHUD::Get().ActiveSkill1,
+			FPawnStateActionHUD::Get().ActiveSkill2,
+			FPawnStateActionHUD::Get().ActiveSkill3,
+			FPawnStateActionHUD::Get().ActiveSkill4 ,
+			FPawnStateActionHUD::Get().WeaponActiveSkill1,
+			FPawnStateActionHUD::Get().WeaponActiveSkill2,
 		};
 
 		for (const auto& Iter : Ary)
 		{
 			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(Iter));
-			if (IconPtr && IconPtr->ToolPtr)
+			if (IconPtr && IconPtr->UnitPtr)
 			{
 				IconPtr->UpdateSkillState();
 			}
@@ -115,7 +114,7 @@ void UPawnStateActionHUD::ResetUIByData()
 	{
 		auto & CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(PawnStateActionHUD::HP));
+			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
 			if (!UIPtr)
 			{
 				return;
@@ -123,7 +122,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.HP);
 		}
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(PawnStateActionHUD::PP));
+			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
 			if (!UIPtr)
 			{
 				return;
@@ -131,7 +130,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.PP);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::BaseAttackPower));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().BaseAttackPower));
 			if (!UIPtr)
 			{
 				return;
@@ -139,7 +138,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Penetration));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Penetration));
 			if (!UIPtr)
 			{
 				return;
@@ -147,7 +146,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Resistance));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Resistance));
 			if (!UIPtr)
 			{
 				return;
@@ -155,7 +154,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Resistance);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::MoveSpeed));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
 			if (!UIPtr)
 			{
 				return;
@@ -163,7 +162,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.MoveSpeed);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::GAPerformSpeed));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
 			if (!UIPtr)
 			{
 				return;
@@ -171,7 +170,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.GAPerformSpeed);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Gold));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Gold));
 			if (!UIPtr)
 			{
 				return;
@@ -179,7 +178,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.GoldElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Wood));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
 			if (!UIPtr)
 			{
 				return;
@@ -187,7 +186,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.WoodElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Water));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
 			if (!UIPtr)
 			{
 				return;
@@ -195,7 +194,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.WaterElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Fire));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
 			if (!UIPtr)
 			{
 				return;
@@ -203,7 +202,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.Element.FireElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(PawnStateActionHUD::Soil));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Soil));
 			if (!UIPtr)
 			{
 				return;
@@ -217,7 +216,7 @@ void UPawnStateActionHUD::ResetUIByData()
 
 void UPawnStateActionHUD::InitialTalentUI()
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(PawnStateActionHUD::TalentStateSocket));
+	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FPawnStateActionHUD::Get().TalentStateSocket));
 	if (!BorderPtr)
 	{
 		return;
@@ -270,10 +269,10 @@ void UPawnStateActionHUD::InitialSkillIcon()
 	auto SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 	TArray<FName>Ary
 	{
-		PawnStateActionHUD::ActiveSkill1,
-		PawnStateActionHUD::ActiveSkill2,
-		PawnStateActionHUD::ActiveSkill3,
-		PawnStateActionHUD::ActiveSkill4 ,
+		FPawnStateActionHUD::Get().ActiveSkill1,
+		FPawnStateActionHUD::Get().ActiveSkill2,
+		FPawnStateActionHUD::Get().ActiveSkill3,
+		FPawnStateActionHUD::Get().ActiveSkill4 ,
 	};
 
 	for (const auto& Iter : Ary)
@@ -325,7 +324,7 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
 	break;
 	}
 	{
-		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(PawnStateActionHUD::WeaponActiveSkill1));
+		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
@@ -336,7 +335,7 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
 		}
 	}
 	{
-		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(PawnStateActionHUD::WeaponActiveSkill2));
+		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(

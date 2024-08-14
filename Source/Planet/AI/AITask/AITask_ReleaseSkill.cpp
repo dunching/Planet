@@ -97,7 +97,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 				{
 					switch (Iter->Type)
 					{
-					case FCanbeActivedInfo::EType::kActiveSkill:
+					case FCanbeInteractionInfo::EType::kActiveSkill:
 					{
 						auto Skills = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 						auto SkillIter = Skills.Find(Iter->Socket);
@@ -147,7 +147,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 				{
 					switch (Iter->Type)
 					{
-					case FCanbeActivedInfo::EType::kWeaponActiveSkill:
+					case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
 					{
 						auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
 						if (!WeaponSPtr)

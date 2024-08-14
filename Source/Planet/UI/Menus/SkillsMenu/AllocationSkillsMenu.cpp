@@ -26,6 +26,7 @@
 #include "GroupmateIcon.h"
 #include "SceneUnitContainer.h"
 #include "GroupMnaggerComponent.h"
+#include "InteractiveConsumablesComponent.h"
 
 struct FAllocationSkillsMenu : public TStructVariable<FAllocationSkillsMenu>
 {
@@ -226,7 +227,27 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(UCharacterUnit* PlayerCharacter
 
 void UAllocationSkillsMenu::ResetUIByData_Consumable(UCharacterUnit* PlayerCharacterUnitPtr)
 {
+	TArray<FName>Ary
+	{
+		FAllocationSkillsMenu::Get().Consumable1, 
+		FAllocationSkillsMenu::Get().Consumable2, 
+		FAllocationSkillsMenu::Get().Consumable3, 
+		FAllocationSkillsMenu::Get().Consumable4, 
+	};
 
+	auto EICPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr->GetInteractiveConsumablesComponent();
+	for (const auto& Iter : Ary)
+	{
+		auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
+		if (IconPtr)
+		{
+			auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
+
+			IconPtr->bPaseInvokeOnResetUnitEvent = true;
+			IconPtr->ResetToolUIByData(Result ? Result->UnitPtr : nullptr);
+			IconPtr->bPaseInvokeOnResetUnitEvent = false;
+		}
+	}
 }
 
 void UAllocationSkillsMenu::SyncAllocation2Character()
@@ -241,8 +262,6 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 	{
 		return;
 	}
-
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 
 	// 武器技能
 	{
@@ -264,8 +283,10 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 				SecondWeaponSocketInfoSPtr->WeaponUnitPtr = IconPtr->UnitPtr;
 			}
 		}
+		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 		EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
+
 	// 技能
 	{
 		struct FHelper
@@ -305,15 +326,49 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 
 					SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
 				}
-				else
+			}
+		}
+		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+		EICPtr->RegisterMultiGAs(SkillsMap);
+	}
+
+	// 消耗品
+	{
+		struct FHelper
+		{
+			FName Name;
+			FKey Key;
+		};
+
+		TArray<FHelper>Ary
+		{
+			{FAllocationSkillsMenu::Get().Consumable1,Consumable_1_Key},
+			{FAllocationSkillsMenu::Get().Consumable2,Consumable_2_Key},
+			{FAllocationSkillsMenu::Get().Consumable3,Consumable_3_Key},
+			{FAllocationSkillsMenu::Get().Consumable4,Consumable_4_Key},
+		};
+
+		TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>> SkillsMap;
+
+		for (auto Iter : Ary)
+		{
+			auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter.Name));
+			if (IconPtr)
+			{
+				if (IconPtr->BasicUnitPtr)
 				{
-					TSharedPtr<FSkillSocketInfo >SkillsSocketInfo;
+					TSharedPtr<FConsumableSocketInfo >SkillsSocketInfo = MakeShared<FConsumableSocketInfo>();
+
+					SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
+					SkillsSocketInfo->UnitPtr = Cast<UConsumableUnit>(IconPtr->BasicUnitPtr);
+					SkillsSocketInfo->Key = Iter.Key;
 
 					SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
 				}
 			}
 		}
-		EICPtr->RegisterMultiGAs(SkillsMap);
+		auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
+		EICPtr->RegisterConsumable(SkillsMap);
 	}
 }
 

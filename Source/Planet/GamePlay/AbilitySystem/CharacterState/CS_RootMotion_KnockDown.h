@@ -6,56 +6,39 @@
 #include <GameplayTagContainer.h>
 
 #include "Skill_Base.h"
-#include "CS_Base.h"
+#include "CS_RootMotion.h"
 
-#include "CS_PeriodicPropertyModify.generated.h"
+#include "CS_RootMotion_KnockDown.generated.h"
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
 class UConsumableUnit;
 class UEffectItem;
+class ASPlineActor;
+class ATornado;
 
 struct FStreamableHandle;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_RootMotion_KnockDown :
+	public FGameplayAbilityTargetData_RootMotion
 {
 	GENERATED_USTRUCT_BODY()
 
-	friend UCS_PeriodicPropertyModify;
+	FGameplayAbilityTargetData_RootMotion_KnockDown();
 
-	FGameplayAbilityTargetData_PropertyModify();
-
-	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);
-
-	FGameplayAbilityTargetData_PropertyModify* Clone()const;
-
-	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
-
-	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
+	FGameplayAbilityTargetData_RootMotion_KnockDown* Clone()const;
 
 private:
-
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
-	float Duration = 3.f;
-
-	float PerformActionInterval = 1.f;
-
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
-
-	FGuid Guid = FGuid::NewGuid();
 
 };
 
 UCLASS()
-class PLANET_API UCS_PeriodicPropertyModify : public UCS_Base
+class PLANET_API UCS_RootMotion_KnockDown : public UCS_RootMotion
 {
 	GENERATED_BODY()
 
 public:
-
-	UCS_PeriodicPropertyModify();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -80,11 +63,11 @@ public:
 		bool bWasCancelled
 	)override;
 
-	void UpdateDuration();
+	virtual void UpdateDuration()override;
 
 protected:
 
-	void PerformAction();
+	virtual void PerformAction()override;
 
 	void ExcuteTasks();
 
@@ -92,10 +75,12 @@ protected:
 
 	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
-	const FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr = nullptr;
+	void OnTaskComplete();
 
+	const FGameplayAbilityTargetData_RootMotion_KnockDown* GameplayAbilityTargetDataPtr = nullptr;
+	
 	UEffectItem* EffectItemPtr = nullptr;
 
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
-
+	
 };

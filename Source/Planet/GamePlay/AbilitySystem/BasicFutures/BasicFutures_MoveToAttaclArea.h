@@ -15,7 +15,7 @@
 struct FEnvQueryResult;
 class UEnvQuery;
 
-struct FCanbeActivedInfo;
+struct FCanbeInteractionInfo;
 
 struct FGameplayAbilityTargetData_MoveToAttaclArea : public FGameplayAbilityTargetData
 {
@@ -25,7 +25,7 @@ struct FGameplayAbilityTargetData_MoveToAttaclArea : public FGameplayAbilityTarg
 
 	int32 AttackDistance = 100;
 
-	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
+	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 };
 
 UCLASS()
@@ -34,6 +34,8 @@ class PLANET_API UBasicFutures_MoveToAttaclArea : public UBasicFuturesBase
 	GENERATED_BODY()
 
 public:
+
+	virtual void PostCDOContruct() override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -79,5 +81,5 @@ private:
 
 	ACharacterBase* AvatorCharacterPtr = nullptr;
 
-	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
+	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 };

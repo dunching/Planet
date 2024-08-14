@@ -22,12 +22,7 @@ void UInteractiveConsumablesComponent::RegisterConsumable(
 	}
 }
 
-TArray<TSharedPtr<FCanbeActivedInfo>> UInteractiveConsumablesComponent::GetCanbeActiveAction() const
-{
-	return CanbeActiveToolsAry;
-}
-
-bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */)
+bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */)
 {
 	auto ToolIter = ToolsMap.Find(CanbeActivedInfoSPtr->Socket);
 	if (!ToolIter)
@@ -70,14 +65,14 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeActiv
 	return false;
 }
 
-void UInteractiveConsumablesComponent::CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+void UInteractiveConsumablesComponent::CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)
 {
 
 }
 
-TSharedPtr<FConsumableSocketInfo> UInteractiveConsumablesComponent::FindConsumable(const FGameplayTag& Tag)
+TSharedPtr<FConsumableSocketInfo> UInteractiveConsumablesComponent::FindConsumable(const FGameplayTag& SocketTag)
 {
-	auto Iter = ToolsMap.Find(Tag);
+	auto Iter = ToolsMap.Find(SocketTag);
 	if (Iter)
 	{
 		return *Iter;
@@ -101,18 +96,15 @@ void UInteractiveConsumablesComponent::InitialBaseGAs()
 
 void UInteractiveConsumablesComponent::GenerationCanbeActiveEvent()
 {
-	CanbeActiveToolsAry.Empty();
+	CanbeInteractionAry.Empty();
 
 	for (const auto& Iter : ToolsMap)
 	{
-		if (Iter.Value->UnitPtr)
-		{
-			TSharedPtr<FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
-			CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kConsumables;
-			CanbeActivedInfoSPtr->Key = Iter.Value->Key;
-			CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
+		TSharedPtr<FCanbeInteractionInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeInteractionInfo>();
+		CanbeActivedInfoSPtr->Type = FCanbeInteractionInfo::EType::kConsumables;
+		CanbeActivedInfoSPtr->Key = Iter.Value->Key;
+		CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
 
-			CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
-		}
+		CanbeInteractionAry.Add(CanbeActivedInfoSPtr);
 	}
 }

@@ -56,6 +56,12 @@ protected:
 
     virtual void HandleImpact(
         const FHitResult& Hit, float TimeSlice = 0.f, const FVector& MoveDelta = FVector::ZeroVector
+	) override;
+
+    virtual void TickComponent(
+        float DeltaTime,
+        enum ELevelTick TickType,
+        FActorComponentTickFunction* ThisTickFunction
     ) override;
 
 #if USECUSTOMEGRAVITY
@@ -64,12 +70,6 @@ protected:
     virtual void BeginPlay() override;
 
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
-
-    virtual void TickComponent(
-        float DeltaTime,
-        enum ELevelTick TickType,
-        FActorComponentTickFunction* ThisTickFunction
-    ) override;
 
     virtual void ApplyRootMotionToVelocity(float deltaTime)override;
 

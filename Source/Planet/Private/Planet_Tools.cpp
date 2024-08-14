@@ -2,6 +2,8 @@
 
 #include "Planet_Tools.h"
 
+bool bIsExiting = true;
+
 UWorld* GetWorldImp()
 {
 #if WITH_EDITOR
@@ -12,7 +14,8 @@ UWorld* GetWorldImp()
 	}
 	else if (GEngine)
 	{
-		return GEditor->PlayWorld;
+		auto Ptr = GWorld;
+		return GWorld ? GWorld : GEditor->PlayWorld;
 	}
 	else
 	{

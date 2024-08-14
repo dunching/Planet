@@ -38,40 +38,40 @@ FName UInteractiveToolComponent::ComponentName = TEXT("InteractiveToolComponent"
 
 void UInteractiveToolComponent::GenerationCanbeActiveEvent()
 {
-	CanbeActiveToolsAry.Empty();
+	CanbeInteractionAry.Empty();
 
 	// 激活对应的工具
 	for (const auto& Iter : ToolsMap)
 	{
 		if (Iter.Value->UnitPtr)
 		{
-			TSharedPtr<FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
+			TSharedPtr<FCanbeInteractionInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeInteractionInfo>();
 
-			CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kSwitchToTool;
+			CanbeActivedInfoSPtr->Type = FCanbeInteractionInfo::EType::kSwitchToTool;
 			CanbeActivedInfoSPtr->Key = Iter.Value->Key;
 			CanbeActivedInfoSPtr->Socket = Iter.Value->SkillSocket;
 
-			CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
+			CanbeInteractionAry.Add(CanbeActivedInfoSPtr);
 		}
 	}
 
 	// “使用”一次这个工具
 	{
-		TSharedPtr<FCanbeActivedInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeActivedInfo>();
-		CanbeActivedInfoSPtr->Type = FCanbeActivedInfo::EType::kActiveTool;
+		TSharedPtr<FCanbeInteractionInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeInteractionInfo>();
+		CanbeActivedInfoSPtr->Type = FCanbeInteractionInfo::EType::kActiveTool;
 		CanbeActivedInfoSPtr->Key = EKeys::LeftMouseButton;
 
-		CanbeActiveToolsAry.Add(CanbeActivedInfoSPtr);
+		CanbeInteractionAry.Add(CanbeActivedInfoSPtr);
 	}
 }
 
-void UInteractiveToolComponent::CancelSkill_SwitchToTool(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+void UInteractiveToolComponent::CancelSkill_SwitchToTool(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)
 {
 
 }
 
 bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
-	const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false*/
+	const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false*/
 )
 {
 	if (PreviousTool == CanbeActivedInfoSPtr->Socket)
@@ -111,7 +111,7 @@ bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
 	return false;
 }
 
-void UInteractiveToolComponent::CancelSkill_ActiveTool(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+void UInteractiveToolComponent::CancelSkill_ActiveTool(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)
 {
 	auto OnwerActorPtr = GetOwner<AHumanCharacter>();
 	if (OnwerActorPtr)
@@ -124,7 +124,7 @@ void UInteractiveToolComponent::CancelSkill_ActiveTool(const TSharedPtr<FCanbeAc
 }
 
 bool UInteractiveToolComponent::ActiveSkill_ActiveTool(
-	const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
+	const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
 )
 {
 	auto OnwerActorPtr = GetOwner<AHumanCharacter>();
@@ -150,23 +150,18 @@ ATool_Base* UInteractiveToolComponent::GetCurrentTool() const
 	return CurrentEquipmentPtr;
 }
 
-TArray<TSharedPtr<FCanbeActivedInfo>> UInteractiveToolComponent::GetCanbeActiveAction() const
-{
-	return CanbeActiveToolsAry;
-}
-
 bool UInteractiveToolComponent::ActiveAction(
-	const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
+	const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
 )
 {
 	switch (CanbeActivedInfoSPtr->Type)
 	{
-	case FCanbeActivedInfo::EType::kSwitchToTool:
+	case FCanbeInteractionInfo::EType::kSwitchToTool:
 	{
 		return ActiveSkill_SwitchToTool(CanbeActivedInfoSPtr, bIsAutomaticStop);
 	}
 	break;
-	case FCanbeActivedInfo::EType::kActiveTool:
+	case FCanbeInteractionInfo::EType::kActiveTool:
 	{
 		return ActiveSkill_ActiveTool(CanbeActivedInfoSPtr, bIsAutomaticStop);
 	}
@@ -177,16 +172,16 @@ bool UInteractiveToolComponent::ActiveAction(
 	return false;
 }
 
-void UInteractiveToolComponent::CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+void UInteractiveToolComponent::CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)
 {
 	switch (CanbeActivedInfoSPtr->Type)
 	{
-	case FCanbeActivedInfo::EType::kSwitchToTool:
+	case FCanbeInteractionInfo::EType::kSwitchToTool:
 	{
 		CancelSkill_SwitchToTool(CanbeActivedInfoSPtr);
 	}
 	break;
-	case FCanbeActivedInfo::EType::kActiveTool:
+	case FCanbeInteractionInfo::EType::kActiveTool:
 	{
 		CancelSkill_ActiveTool(CanbeActivedInfoSPtr);
 	}

@@ -4,11 +4,30 @@
 
 #include "GenerateType.h"
 #include "CharacterBase.h"
+#include "Planet_Tools.h"
+#include "GameplayTagsSubSystem.h"
 
 UBasicFutures_Jump::UBasicFutures_Jump() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
+void UBasicFutures_Jump::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
+	if (GetWorldImp())
+	{
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Jump);
+
+		FAbilityTriggerData AbilityTriggerData;
+
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Jump;
+		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+		AbilityTriggers.Add(AbilityTriggerData);
+	}
 }
 
 void UBasicFutures_Jump::ActivateAbility(

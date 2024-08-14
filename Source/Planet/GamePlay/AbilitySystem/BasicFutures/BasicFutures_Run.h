@@ -18,7 +18,10 @@ class PLANET_API UBasicFutures_Run : public UBasicFuturesBase
 	GENERATED_BODY()
 
 public:
+
 	UBasicFutures_Run();
+
+	virtual void PostCDOContruct() override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,

@@ -14,7 +14,7 @@
 class UConsumableUnit;
 class USkill_Consumable_Generic;
 
-struct FCanbeActivedInfo;
+struct FCanbeInteractionInfo;
 
 struct FConsumableSocketInfo
 {
@@ -38,15 +38,13 @@ public:
 		const TMap <FGameplayTag, TSharedPtr<FConsumableSocketInfo>>& InToolInfoMap, bool bIsGenerationEvent = true
 	);
 
-	virtual TArray<TSharedPtr<FCanbeActivedInfo>> GetCanbeActiveAction()const override;
-
 	virtual bool ActiveAction(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	)override;
 
-	virtual void CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)override;
+	virtual void CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)override;
 
-	TSharedPtr<FConsumableSocketInfo> FindConsumable(const FGameplayTag& Tag);
+	TSharedPtr<FConsumableSocketInfo> FindConsumable(const FGameplayTag& SocketTag);
 
 	void InitialBaseGAs();
 
@@ -62,8 +60,6 @@ protected:
 #pragma endregion GAs
 
 	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>ToolsMap;
-
-	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActiveToolsAry;
 
 	FGameplayAbilitySpecHandle AbilitieHandle;
 

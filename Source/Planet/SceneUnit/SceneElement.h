@@ -140,6 +140,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	float PerformActionInterval = 1.f;
 
+	USkill_Consumable_Base* GAInstPtr = nullptr;
+
 protected:
 
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;

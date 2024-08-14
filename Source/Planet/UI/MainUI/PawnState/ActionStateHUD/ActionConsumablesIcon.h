@@ -11,7 +11,7 @@
 
 #include "SceneElement.h"
 
-#include "ActionSkillsIcon.generated.h"
+#include "ActionConsumablesIcon.generated.h"
 
 struct FStreamableHandle;
 
@@ -21,18 +21,15 @@ class USkillUnit;
  *
  */
 UCLASS()
-class PLANET_API UActionSkillsIcon : 
+class PLANET_API UActionConsumablesIcon :
 	public UMyUserWidget,
-	public IUnitIconInterface,
-	public IUserObjectListEntry
+	public IUnitIconInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	UActionSkillsIcon(const FObjectInitializer& ObjectInitializer);
-
-	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
+	UActionConsumablesIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
@@ -40,9 +37,9 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	void UpdateSkillState();
+	void UpdateState();
 
-	USkillUnit* UnitPtr = nullptr;
+	UConsumableUnit* UnitPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;
@@ -68,12 +65,6 @@ protected:
 	void SetDurationPercent(bool bIsHaveDuration, float Percent);
 
 	virtual void NativeConstruct()override;
-
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
-
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
-
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlaySkillIsReady();

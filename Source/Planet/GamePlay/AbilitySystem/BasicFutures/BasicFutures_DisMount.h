@@ -25,6 +25,7 @@ class PLANET_API UBasicFutures_DisMount : public UBasicFuturesBase
 	GENERATED_BODY()
 
 public:
+
 	UBasicFutures_DisMount();
 
 	virtual void PreActivate(

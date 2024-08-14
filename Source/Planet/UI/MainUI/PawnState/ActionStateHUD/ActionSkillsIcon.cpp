@@ -68,7 +68,7 @@ void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->ToolPtr);
+			ResetToolUIByData(NewPtr->UnitPtr);
 		}
 	}
 }
@@ -77,7 +77,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
-	ToolPtr = nullptr;
+	UnitPtr = nullptr;
 
 	if (BasicUnitPtr)
 	{
@@ -86,7 +86,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 			)
 		{
-			ToolPtr = Cast<USkillUnit>(BasicUnitPtr);
+			UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
 		}
 	}
 
@@ -258,14 +258,14 @@ void UActionSkillsIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		if (ToolPtr)
+		if (UnitPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ToolPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
-					ImagePtr->SetBrushFromTexture(ToolPtr->GetIcon().Get());
+					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
 				}));
 		}
 		else
@@ -335,13 +335,13 @@ void UActionSkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const 
 		if (DragWidgetPtr)
 		{
 			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(ToolPtr);
+			DragWidgetPtr->ResetToolUIByData(UnitPtr);
 
 			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = ToolPtr;
+				WidgetDragPtr->SceneToolSPtr = UnitPtr;
 
 				OutOperation = WidgetDragPtr;
 			}

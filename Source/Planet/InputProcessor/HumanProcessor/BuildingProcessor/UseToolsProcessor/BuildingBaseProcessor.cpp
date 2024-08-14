@@ -86,13 +86,13 @@ namespace HumanProcessor
 				{
 					switch ((*SkillIter)->Type)
 					{
-					case FCanbeActivedInfo::EType::kSwitchToTool:
-					case FCanbeActivedInfo::EType::kActiveTool:
+					case FCanbeInteractionInfo::EType::kSwitchToTool:
+					case FCanbeInteractionInfo::EType::kActiveTool:
 					{
 						OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
 					}
 					break;
-					case FCanbeActivedInfo::EType::kConsumables:
+					case FCanbeInteractionInfo::EType::kConsumables:
 					{
 						OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
 					}
@@ -113,13 +113,13 @@ namespace HumanProcessor
 				{
 					switch ((*SkillIter)->Type)
 					{
-					case FCanbeActivedInfo::EType::kSwitchToTool:
-					case FCanbeActivedInfo::EType::kActiveTool:
+					case FCanbeInteractionInfo::EType::kSwitchToTool:
+					case FCanbeInteractionInfo::EType::kActiveTool:
 					{
 						OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter);
 					}
 					break;
-					case FCanbeActivedInfo::EType::kConsumables:
+					case FCanbeInteractionInfo::EType::kConsumables:
 					{
 						OnwerActorPtr->GetInteractiveConsumablesComponent()->CancelAction(*SkillIter);
 					}
@@ -213,7 +213,7 @@ namespace HumanProcessor
 				{
 					switch (Iter->Type)
 					{
-					case FCanbeActivedInfo::EType::kNone:
+					case FCanbeInteractionInfo::EType::kNone:
 					{}
 					break;
 					default:

@@ -20,6 +20,8 @@ class PLANET_API UBasicFutures_Death : public UBasicFuturesBase
 
 public:
 
+	virtual void PostCDOContruct() override;
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,

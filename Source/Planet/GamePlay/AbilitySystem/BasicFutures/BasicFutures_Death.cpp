@@ -7,6 +7,25 @@
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
+#include "GameplayTagsSubSystem.h"
+#include "Planet_Tools.h"
+
+void UBasicFutures_Death::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
+	if (GetWorldImp())
+	{
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag);
+
+		FAbilityTriggerData AbilityTriggerData;
+
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->DeathingTag;
+		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+		AbilityTriggers.Add(AbilityTriggerData);
+	}
+}
 
 void UBasicFutures_Death::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

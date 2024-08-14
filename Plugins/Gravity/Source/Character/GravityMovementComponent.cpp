@@ -130,6 +130,42 @@ void UGravityMovementComponent::HandleImpact(
     return Super::HandleImpact(Hit, TimeSlice, MoveDelta);
 }
 
+void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+#ifdef WITH_EDITOR
+    if (GravityMovementComponent_Debug.GetValueOnGameThread())
+    {
+        switch (MovementMode)
+        {
+        case MOVE_Walking:
+        {
+            PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Walking")));
+        }
+        break;
+        case MOVE_NavWalking:
+        {
+            PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_NavWalking")));
+        }
+        break;
+        case MOVE_Falling:
+        {
+            PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Falling")));
+        }
+        break;
+        case MOVE_Flying:
+        {
+            PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Flying")));
+        }
+        break;
+        default:
+            break;
+        }
+    }
+#endif
+}
+
 #if USECUSTOMEGRAVITY
 DEFINE_LOG_CATEGORY_STATIC(LogGravityCharacterMovement, Log, All);
 DEFINE_LOG_CATEGORY_STATIC(LogNavMeshMovement, Log, All);
@@ -189,11 +225,6 @@ void UGravityMovementComponent::EndPlay(const EEndPlayReason::Type EndPlayReason
     FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 
 	Super::EndPlay(EndPlayReason);
-}
-
-void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
 void UGravityMovementComponent::PerformMovement(float DeltaSeconds)

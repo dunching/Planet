@@ -12,7 +12,7 @@
 class UBasicUnit;
 class UActiveSkillUnit;
 class UAbilityTask_TimerHelper;
-struct FCanbeActivedInfo;
+struct FCanbeInteractionInfo;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetData
@@ -21,7 +21,7 @@ struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetDat
 
 	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const;
 
-	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
+	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 };
 
 /**
@@ -107,7 +107,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "CooldownTime")
 	int32 CooldownTime = -1;
 
-	TSharedPtr<FCanbeActivedInfo> CanbeActivedInfoSPtr;
+	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 
 protected:
 

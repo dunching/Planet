@@ -49,13 +49,11 @@ public:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
-	virtual TArray<TSharedPtr<FCanbeActivedInfo>> GetCanbeActiveAction()const override;
-
 	virtual bool ActiveAction(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	)override;
 
-	virtual void CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)override;
+	virtual void CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)override;
 
 #pragma region Skills
 	void RegisterMultiGAs(
@@ -95,19 +93,23 @@ protected:
 
 	virtual void GenerationCanbeActiveEvent()override;
 
-	void CancelSkill_WeaponActive(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+	void CancelSkill_WeaponActive(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr);
 
 	bool ActiveSkill_WeaponActive(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	);
 
 	bool ActiveSkill_Active(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	);
 
 	bool ActiveWeapon(EWeaponSocket WeaponSocket);
 
 	bool ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr);
+
+	void RemoveSkill(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
+
+	void AddSkill(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;
@@ -121,7 +123,5 @@ protected:
 	TSharedPtr<FWeaponSocketInfo>SecondaryWeaponUnit;
 
 	TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>SkillsMap;
-
-	TArray<TSharedPtr<FCanbeActivedInfo>>CanbeActiveSkillsAry;
 
 };

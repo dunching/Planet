@@ -57,19 +57,19 @@ void UInteractiveComponent::TickComponent(float DeltaTime, enum ELevelTick TickT
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-TArray<TSharedPtr<FCanbeActivedInfo>> UInteractiveComponent::GetCanbeActiveAction() const
+TArray<TSharedPtr<FCanbeInteractionInfo>> UInteractiveComponent::GetCanbeActiveAction() const
 {
-	return {};
+	return CanbeInteractionAry;
 }
 
 bool UInteractiveComponent::ActiveAction(
-	const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop
+	const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop
 )
 {
 	return false;
 }
 
-void UInteractiveComponent::CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr)
+void UInteractiveComponent::CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr)
 {
 
 }

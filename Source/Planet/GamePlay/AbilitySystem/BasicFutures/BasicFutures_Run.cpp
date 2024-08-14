@@ -11,11 +11,29 @@
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
+#include "Planet_Tools.h"
 
 UBasicFutures_Run::UBasicFutures_Run() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
+void UBasicFutures_Run::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+
+	if (GetWorldImp())
+	{
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Running);
+
+		FAbilityTriggerData AbilityTriggerData;
+
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Running;
+		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+		AbilityTriggers.Add(AbilityTriggerData);
+	}
 }
 
 void UBasicFutures_Run::PreActivate(

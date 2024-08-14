@@ -31,7 +31,7 @@ class USkill_Element_Gold;
 struct FGameplayAbilityTargetData_GASendEvent;
 class UWeaponUnit;
 
-struct FCanbeActivedInfo
+struct FCanbeInteractionInfo
 {
 	enum class EType
 	{
@@ -70,18 +70,20 @@ public:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
-	virtual TArray<TSharedPtr<FCanbeActivedInfo>> GetCanbeActiveAction()const;
+	TArray<TSharedPtr<FCanbeInteractionInfo>> GetCanbeActiveAction()const;
 
 	virtual bool ActiveAction(
-		const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
+		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	);
 
-	virtual void CancelAction(const TSharedPtr<FCanbeActivedInfo>& CanbeActivedInfoSPtr);
+	virtual void CancelAction(const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr);
 
 protected:
 
 	virtual void GenerationCanbeActiveEvent();
 
 	FDelegateHandle AbilityActivatedCallbacksHandle;
+
+	TArray<TSharedPtr<FCanbeInteractionInfo>>CanbeInteractionAry;
 
 };
