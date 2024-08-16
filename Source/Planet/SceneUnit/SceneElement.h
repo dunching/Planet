@@ -164,6 +164,8 @@ public:
 	UPROPERTY(Transient)
 	USkill_Consumable_Generic* GAInstPtr = nullptr;
 
+	USkill_Consumable_Base* GAInstPtr = nullptr;
+
 protected:
 
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
