@@ -31,7 +31,7 @@
 #include "InteractiveConsumablesComponent.h"
 #include "Skill_Consumable_Generic.h"
 
-struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
+struct FActionConsumablesIcon : public TStructVariable<FActionConsumablesIcon>
 {
 	const FName Percent = TEXT("Percent");
 
@@ -125,7 +125,7 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 	if (bCooldownIsReady)
 	{
 		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().StateOverlap));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionConsumablesIcon::Get().StateOverlap));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Hidden);
@@ -135,7 +135,7 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 	else
 	{
 		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().StateOverlap));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionConsumablesIcon::Get().StateOverlap));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
@@ -143,7 +143,7 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 		}
 	}
 	{
-		auto UIPtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().CooldownProgress));
+		auto UIPtr = Cast<UImage>(GetWidgetFromName(FActionConsumablesIcon::Get().CooldownProgress));
 		if (!UIPtr)
 		{
 			return;
@@ -151,11 +151,11 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 		auto MIDPtr = UIPtr->GetDynamicMaterial();
 		if (MIDPtr)
 		{
-			MIDPtr->SetScalarParameterValue(FActionSkillsIcon::Get().Percent, Percent);
+			MIDPtr->SetScalarParameterValue(FActionConsumablesIcon::Get().Percent, Percent);
 		}
 	}
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FActionSkillsIcon::Get().CooldownText));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FActionConsumablesIcon::Get().CooldownText));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%.1lf"), RemainingTime)));
@@ -182,7 +182,7 @@ void UActionConsumablesIcon::SetCanRelease(bool bIsReady_In)
 	if (bIsReady_In)
 	{
 		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionConsumablesIcon::Get().CanRelease));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Hidden);
@@ -192,7 +192,7 @@ void UActionConsumablesIcon::SetCanRelease(bool bIsReady_In)
 	else
 	{
 		{
-			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionSkillsIcon::Get().CanRelease));
+			auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FActionConsumablesIcon::Get().CanRelease));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
@@ -203,7 +203,7 @@ void UActionConsumablesIcon::SetCanRelease(bool bIsReady_In)
 
 void UActionConsumablesIcon::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().Icon));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FActionConsumablesIcon::Get().Icon));
 	if (ImagePtr)
 	{
 		if (UnitPtr)
@@ -225,7 +225,7 @@ void UActionConsumablesIcon::SetItemType()
 
 void UActionConsumablesIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)
 {
-	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
+	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionConsumablesIcon::Get().WaitInputPercent));
 	if (UIPtr)
 	{
 		UIPtr->SetVisibility(bIsAcceptInput ?  ESlateVisibility::Visible : ESlateVisibility::Hidden);
