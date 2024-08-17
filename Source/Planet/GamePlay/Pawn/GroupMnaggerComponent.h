@@ -142,6 +142,8 @@ public:
 
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(UConsumableUnit* UnitPtr);
 
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const UConsumableUnit* ConsumableUnitPtr);
+
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
 	FTeamHelperChangedDelegateContainer GroupHelperChangedDelegateContainer;

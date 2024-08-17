@@ -18,7 +18,7 @@ class UConsumableUnit;
 class UGA_Tool_Periodic;
 class UGameplayAbility;
 
-struct FGameplayAbilityTargetData_Consumable_Generic : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_Consumable : public FGameplayAbilityTargetData
 {
 	UConsumableUnit* UnitPtr = nullptr;
 };

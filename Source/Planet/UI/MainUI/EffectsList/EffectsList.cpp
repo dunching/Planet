@@ -3,12 +3,25 @@
 
 #include "MyWrapBox.h"
 #include "EffectItem.h"
+#include "CS_Base.h"
+#include "CharacterBase.h"
+#include "InteractiveBaseGAComponent.h"
 
 void UEffectsList::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	ResetUIByData();
+}
+
+void UEffectsList::NativeDestruct()
+{
+	if (CallbackHandle)
+	{
+		CallbackHandle->UnBindCallback();
+	}
+
+	Super::NativeDestruct();
 }
 
 UEffectItem* UEffectsList::AddEffectItem()
@@ -23,6 +36,43 @@ UEffectItem* UEffectsList::AddEffectItem()
 	}
 
 	return nullptr;
+}
+
+void UEffectsList::BindCharacterState(ACharacterBase* TargetCharacterPtr)
+{
+	CallbackHandle = TargetCharacterPtr->GetInteractiveBaseGAComponent()->CharacterStateChangedContainer.AddCallback(
+		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
+	);
+}
+
+void UEffectsList::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)
+{
+	switch (CharacterStateType)
+	{
+	case ECharacterStateType::kActive:
+	{
+		auto ItemPtr = AddEffectItem();
+		ItemPtr->SetData(CharacterStatePtr);
+
+		EffectItemMap.Add(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag, ItemPtr);
+	}
+	break;
+	case ECharacterStateType::kEnd:
+	{
+		if (EffectItemMap.Contains(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag))
+		{
+			if (EffectItemMap[CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag])
+			{
+				EffectItemMap[CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag]->RemoveFromParent();
+			}
+
+			EffectItemMap.Remove(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag);
+		}
+	}
+	break;
+	default:
+		break;
+	}
 }
 
 void UEffectsList::ResetUIByData()

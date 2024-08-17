@@ -22,24 +22,6 @@ void UInteractiveConsumablesComponent::RegisterConsumable(
 {
 	ConsumablesMap = InToolInfoMap;
 
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(Skill_Consumable_GenericHandle);
-	if (!GameplayAbilitySpecPtr)
-	{
-		return;
-	}
-	auto GAInsPtr = Cast<USkill_Consumable_Generic>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-	if (!GAInsPtr)
-	{
-		return;
-	}
-
-	for (const auto Iter : ConsumablesMap)
-	{
-		Iter.Value->UnitPtr->GAInstPtr = GAInsPtr;
-	}
-
 	if (bIsGenerationEvent)
 	{
 		GenerationCanbeActiveEvent();
@@ -65,20 +47,25 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeInter
 			return  false;
 		}
 
-		FGameplayEventData Payload;
+		FGameplayEventData * PayloadPtr = new FGameplayEventData;
 
-		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable_Generic;
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable;
 		GameplayAbilityTargetDashPtr->UnitPtr = (*ToolIter)->UnitPtr;
-		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+		PayloadPtr->TargetData.Add(GameplayAbilityTargetDashPtr);
 
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		return ASCPtr->TriggerAbilityFromGameplayEvent(
-			Skill_Consumable_GenericHandle,
-			ASCPtr->AbilityActorInfo.Get(),
-			FGameplayTag::EmptyTag,
-			&Payload,
-			*ASCPtr
+		FGameplayAbilitySpec GameplayAbilitySpec(
+			(*ToolIter)->UnitPtr->GetTableRowUnit_Consumable()->Skill_Consumable_Class,
+			1
+		); 
+
+		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+		GASPtr->GiveAbilityAndActivateOnce(
+			GameplayAbilitySpec,
+			PayloadPtr
 		);
+
+		return true;
 	}
 
 	return false;
@@ -106,10 +93,6 @@ void UInteractiveConsumablesComponent::InitialBaseGAs()
 	if (OnwerActorPtr)
 	{
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
-
-		Skill_Consumable_GenericHandle = GASPtr->GiveAbility(
-			FGameplayAbilitySpec(Skill_Consumable_GenericClass, 1)
-		);
 	}
 }
 

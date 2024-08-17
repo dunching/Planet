@@ -62,12 +62,6 @@ void UCS_PeriodicPropertyModify::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (EffectItemPtr)
-	{
-		EffectItemPtr->RemoveFromParent();
-		EffectItemPtr = nullptr;
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -77,6 +71,14 @@ void UCS_PeriodicPropertyModify::UpdateDuration()
 	{
 		TaskPtr->UpdateDuration();
 	}
+}
+
+void UCS_PeriodicPropertyModify::InitialStateDisplayInfo()
+{
+	Super::InitialStateDisplayInfo();
+
+	StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataPtr->Duration;
+	StateDisplayInfoSPtr->TotalTime = 0.f;
 }
 
 void UCS_PeriodicPropertyModify::PerformAction()
@@ -91,12 +93,6 @@ void UCS_PeriodicPropertyModify::ExcuteTasks()
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
-		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-		if (EffectPtr)
-		{
-			EffectItemPtr = EffectPtr->AddEffectItem();
-			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
-		}
 	}
 	else
 	{
@@ -120,24 +116,16 @@ void UCS_PeriodicPropertyModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr,
 	}
 }
 
-void UCS_PeriodicPropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UCS_PeriodicPropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Duration)
 {
-	if (CharacterPtr->IsPlayerControlled())
+	if (CurrentInterval > Duration)
 	{
-		if (CurrentInterval > Interval)
-		{
-		}
-		else
-		{
-			if (EffectItemPtr)
-			{
-				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
-			}
-		}
+
 	}
 	else
 	{
-
+		StateDisplayInfoSPtr->TotalTime = CurrentInterval;
+		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 

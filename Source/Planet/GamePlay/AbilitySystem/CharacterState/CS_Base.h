@@ -9,19 +9,30 @@
 #include "CS_Base.generated.h"
 
 class UTexture2D;
+class UCS_Base;
 
 USTRUCT()
-struct PLANET_API FStateInfo
+struct PLANET_API FStateDisplayInfo
 {
 	GENERATED_USTRUCT_BODY()
 
-	FStateInfo();
+	using FDataChanged = TCallbackHandleContainer<void()>;
+
+	FStateDisplayInfo();
 
 	float Duration = -1.f;
+
+	float TotalTime = 0.f;
+
+	int32 Num = 1;
+
+	FString Text = TEXT("");
 
 	FGameplayTag Tag;
 
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+	FDataChanged DataChanged;
 
 };
 
@@ -29,6 +40,10 @@ USTRUCT()
 struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
+
+	friend UCS_Base;
+
+	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
 	FGameplayAbilityTargetData_CS_Base();
 
@@ -41,7 +56,11 @@ struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTa
 	// 会一次性修改多个状态码？
 	FGameplayTag Tag;
 
-private:
+	FCharacterStateChanged CharacterStateChanged;
+
+protected:
+
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
 };
 
@@ -52,6 +71,32 @@ class PLANET_API UCS_Base : public USkill_Base
 
 public:
 
-	TMap<FGameplayTag, FStateInfo> StateMap;
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	);
+
+	virtual void EndAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateEndAbility,
+		bool bWasCancelled
+	)override;
+
+	virtual void UpdateDuration();
+
+	virtual TWeakPtr<FStateDisplayInfo> GetStateDisplayInfo()const;
+
+	TSharedPtr<FGameplayAbilityTargetData_CS_Base>GameplayAbilityTargetDataBaseSPtr;
+
+protected:
+
+	virtual void InitialStateDisplayInfo();
+
+	TSharedPtr<FStateDisplayInfo>StateDisplayInfoSPtr;
 
 };

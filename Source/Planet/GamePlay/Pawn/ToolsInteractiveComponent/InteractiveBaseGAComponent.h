@@ -15,6 +15,7 @@ class UGAEvent_Received;
 class UConsumableUnit;
 class UCS_PeriodicPropertyModify;
 class UCS_RootMotion;
+class UCS_Base;
 
 struct FGameplayAbilityTargetData_RootMotion;
 struct FGameplayAbilityTargetData_PropertyModify;
@@ -34,7 +35,7 @@ public:
 
 	using FOwnerPawnType = ACharacterBase;
 
-	using FCallbackHandleContainer = TCallbackHandleContainer<void(ETagChangeType, const FGameplayTag&)>;
+	using FCallbackHandleContainer = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
 	static FName ComponentName;
 
@@ -96,6 +97,8 @@ public:
 
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
 
+	FCallbackHandleContainer CharacterStateChangedContainer;
+
 protected:
 
 	// 注意：如果是RootMotion类型的状态修改，则此类型的子状态只会为一种，比如：人物先被击飞2s，1s之后又被击飞2s，则刷新击飞时间为2s
@@ -107,8 +110,8 @@ protected:
 		FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
 	);
 
-	FGameplayAbilitySpecHandle ExcuteEffects(
-		FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
+	void ExcuteEffects(
+		TSharedPtr<FGameplayAbilityTargetData_PropertyModify> GameplayAbilityTargetDataSPtr
 	);
 
 	// 普通的状态修改（禁止移动的眩晕、禁锢，沉默，虚弱，禁疗）下，通过动画蓝图选择对应的动画（因为这些状态可以共存，比如人物
@@ -127,6 +130,8 @@ protected:
 
 	void AddReceivedModify();
 
+	void OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base * CharacterStatePtr);
+
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilities;
@@ -142,10 +147,7 @@ protected:
 
 	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare>ReceivedEventModifysMap;
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTagContainer CharacterTags;
-
-	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicPropertyModifyMap;
+	TMap<FGameplayTag, UCS_Base*>CharacterStateMap;
 
 	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicStateTagModifyMap;
 	

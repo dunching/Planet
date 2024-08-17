@@ -4,6 +4,8 @@
 #include "Engine/AssetManager.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
+#include "CS_Base.h"
+#include "TemplateHelper.h"
 
 namespace EffectItem
 {
@@ -16,6 +18,17 @@ namespace EffectItem
 	const FName Icon = TEXT("Icon");
 
 	const FName TextCanvas = TEXT("TextCanvas");
+}
+
+void UEffectItem::SetData(UCS_Base* InCharacterStatePtr)
+{
+	CharacterStatePtr = InCharacterStatePtr;
+
+	DataChangedHandle = CharacterStatePtr->GetStateDisplayInfo().Pin()->DataChanged.AddCallback(std::bind(&ThisClass::OnUpdate, this));
+
+	SetTexutre(CharacterStatePtr->GetStateDisplayInfo().Pin()->DefaultIcon);
+
+	OnUpdate();
 }
 
 void UEffectItem::SetNum(int32 NewNum)
@@ -100,6 +113,27 @@ void UEffectItem::NativeConstruct()
 
 void UEffectItem::NativeDestruct()
 {
+	if (DataChangedHandle)
+	{
+		DataChangedHandle->UnBindCallback();
+	}
+
 	Super::NativeDestruct();
+}
+
+void UEffectItem::OnUpdate()
+{
+	auto StateDisplayInfoSPtr = CharacterStatePtr->GetStateDisplayInfo();
+
+	SetNum(StateDisplayInfoSPtr.Pin()->Num);
+
+	if (StateDisplayInfoSPtr.Pin()->Duration > 0.f)
+	{
+		SetPercent(true, 1 - (StateDisplayInfoSPtr.Pin()->TotalTime / StateDisplayInfoSPtr.Pin()->Duration));
+	}
+	else
+	{
+		SetPercentIsDisplay(false);
+	}
 }
 

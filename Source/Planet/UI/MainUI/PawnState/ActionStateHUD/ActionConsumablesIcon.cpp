@@ -98,17 +98,15 @@ void UActionConsumablesIcon::EnableIcon(bool bIsEnable)
 
 void UActionConsumablesIcon::UpdateState()
 {
-	if (UnitPtr && UnitPtr->GAInstPtr)
+	if (UnitPtr)
 	{
-		auto GAInsPtr = UnitPtr->GAInstPtr;
-		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
-		SetCanRelease(bIsReady);
-
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto bCooldownIsReady = GAInsPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		auto bCooldownIsReady = UnitPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
+
+		SetCanRelease(bCooldownIsReady);
 	}
 }
 

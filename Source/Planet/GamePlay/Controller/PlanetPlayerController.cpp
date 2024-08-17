@@ -33,6 +33,8 @@
 #include "CharacterAttributesComponent.h"
 #include "TalentAllocationComponent.h"
 #include "SceneUnitContainer.h"
+#include "InteractiveBaseGAComponent.h"
+#include "EffectsList.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -257,6 +259,13 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 					});
 
 				GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
+
+				// °ó¶¨Ð§¹û×´Ì¬À¸
+				auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+				if (EffectPtr)
+				{
+					EffectPtr->BindCharacterState(GetRealCharacter());
+				}
 			}
 			else if (InPawn->IsA(AHorseCharacter::StaticClass()))
 			{

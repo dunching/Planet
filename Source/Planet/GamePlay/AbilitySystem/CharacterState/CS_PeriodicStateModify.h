@@ -4,7 +4,7 @@
 #include "CoreMinimal.h"
 
 #include <GameplayTagContainer.h>
-#include "Skill_Base.h"
+#include "CS_Base.h"
 
 #include "CS_PeriodicStateModify.generated.h"
 
@@ -52,7 +52,7 @@ private:
 };
 
 UCLASS()
-class PLANET_API UCS_PeriodicStateModify : public USkill_Base
+class PLANET_API UCS_PeriodicStateModify : public UCS_Base
 {
 	GENERATED_BODY()
 
@@ -83,7 +83,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	void UpdateDuration();
+	virtual void UpdateDuration()override;
 
 protected:
 

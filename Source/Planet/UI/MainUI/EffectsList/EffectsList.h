@@ -12,6 +12,8 @@
 #include "EffectsList.generated.h"
 
 class UEffectItem;
+class ACharacterBase;
+class UCS_Base;
 
 UCLASS()
 class PLANET_API UEffectsList : public UMyUserWidget, public IMenuInterface
@@ -20,15 +22,27 @@ class PLANET_API UEffectsList : public UMyUserWidget, public IMenuInterface
 
 public:
 
+	using FCallbackHandle = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct()override;
+
+	virtual void NativeDestruct()override;
 
 	UEffectItem* AddEffectItem();
 
+	void BindCharacterState(ACharacterBase*TargetCharacterPtr);
+
 protected:
+
+	virtual void ResetUIByData()override;
+
+	void OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Class")
 	TSubclassOf<UEffectItem>EffectItemClass;
 
-	virtual void ResetUIByData()override;
+	FCallbackHandle CallbackHandle;
+
+	TMap<FGameplayTag, UEffectItem*>EffectItemMap;
 
 };

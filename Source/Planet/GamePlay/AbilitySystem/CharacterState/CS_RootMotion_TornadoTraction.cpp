@@ -129,7 +129,6 @@ void UCS_RootMotion_TornadoTraction::ExcuteTasks()
 		if (EffectPtr)
 		{
 			EffectItemPtr = EffectPtr->AddEffectItem();
-			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
 		}
 	}
 	else
@@ -161,7 +160,6 @@ void UCS_RootMotion_TornadoTraction::OnDuration(UAbilityTask_TimerHelper* InTask
 		{
 			if (EffectItemPtr)
 			{
-				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
 			}
 		}
 	}

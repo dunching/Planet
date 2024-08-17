@@ -12,13 +12,28 @@
 #include "EffectItem.generated.h"
 
 struct FStreamableHandle;
+class UCS_Base;
 
 UCLASS()
-class PLANET_API UEffectItem : public UMyUserWidget
+class PLANET_API UEffectItem : 
+	public UMyUserWidget
+
 {
 	GENERATED_BODY()
 
 public:
+
+	using FDataChangedHandle = TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
+	void SetData(UCS_Base* CharacterStatePtr);
+
+protected:
+
+	virtual void NativeConstruct()override;
+
+	virtual void NativeDestruct()override;
+
+	void OnUpdate();
 
 	void SetNum(int32 NewNum);
 
@@ -29,12 +44,10 @@ public:
 
 	void SetPercentIsDisplay(bool bIsDisplay);
 
-	void SetTexutre(const TSoftObjectPtr<UTexture2D> & TexturePtr);
+	void SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr);
 
-protected:
+	UCS_Base* CharacterStatePtr = nullptr;
 
-	virtual void NativeConstruct()override;
-
-	virtual void NativeDestruct()override;
+	FDataChangedHandle DataChangedHandle;
 
 };

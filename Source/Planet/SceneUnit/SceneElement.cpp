@@ -101,6 +101,100 @@ FTableRowUnit_Consumable* UConsumableUnit::GetTableRowUnit_Consumable() const
 	return SceneUnitExtendInfoPtr;
 }
 
+bool UConsumableUnit::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+{
+	auto MaxRemainingCooldown = -1.f;
+	auto MaxRemainingCooldownPercent = -1.f;
+
+	auto CurResult = true;
+	auto CurRemainingCooldown = -1.f;
+	auto CurRemainingCooldownPercent = -1.f;
+
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	for (auto Iter : CooldownMap)
+	{
+		if (Iter.Value.IsValid())
+		{
+			CurResult = Iter.Value.Pin()->GetRemainingCooldown(CurRemainingCooldown, CurRemainingCooldownPercent);
+			if (CurResult)
+			{
+				continue;
+			}
+
+			if (CurRemainingCooldown > MaxRemainingCooldown)
+			{
+				MaxRemainingCooldown = CurRemainingCooldown;
+				MaxRemainingCooldownPercent = CurRemainingCooldownPercent;
+			}
+		}
+	}
+
+	RemainingCooldown = MaxRemainingCooldown;
+	RemainingCooldownPercent = MaxRemainingCooldownPercent;
+
+	return CurResult;
+}
+
+bool UConsumableUnit::CheckCooldown() const
+{
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	for (auto Iter : CooldownMap)
+	{
+		if (Iter.Value.IsValid())
+		{
+			if (!Iter.Value.Pin()->CheckCooldown())
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
+
+void UConsumableUnit::AddCooldownConsumeTime(float NewTime)
+{
+}
+
+void UConsumableUnit::FreshUniqueCooldownTime()
+{
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+		this
+	);
+
+	// 获取当前技能CD
+	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
+	{
+		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
+	}
+}
+
+void UConsumableUnit::ApplyCooldown()
+{
+	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+		this
+	);
+}
+
+void UConsumableUnit::OffsetCooldownTime()
+{
+	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+		this
+	);
+
+	// 获取当前技能CD
+	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
+	{
+		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
+	}
+}
+
 FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag) 
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();

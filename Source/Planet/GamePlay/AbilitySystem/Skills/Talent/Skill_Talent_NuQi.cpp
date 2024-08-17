@@ -132,11 +132,9 @@ void USkill_Talent_NuQi::Tick(float DeltaTime)
 	{
 		if (bIsInFury)
 		{
-			EffectItemPtr->SetPercent(true, 1.f - (FuryDuration_Accumulate / (FuryDuration + MaxExtendDuration_Accumulate)));
 		}
 		else if (bIsInWeak)
 		{
-			EffectItemPtr->SetPercent(true, 1.f - (WeakDuration_Accumulate / WeakDuration));
 		}
 	}
 }
@@ -222,7 +220,6 @@ void USkill_Talent_NuQi::StartFuryState()
 	if (EffectPtr)
 	{
 		EffectItemPtr = EffectPtr->AddEffectItem();
-		EffectItemPtr->SetTexutre(FuryIcon);
 	}
 }
 
@@ -252,7 +249,6 @@ void USkill_Talent_NuQi::StartForceWeakState()
 	if (EffectPtr)
 	{
 		EffectItemPtr = EffectPtr->AddEffectItem();
-		EffectItemPtr->SetTexutre(WeakIcon);
 	}
 }
 

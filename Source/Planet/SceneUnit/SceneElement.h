@@ -145,7 +145,9 @@ protected:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UConsumableUnit : public UBasicUnit
+class PLANET_API UConsumableUnit : 
+	public UBasicUnit,
+	public IUnit_Cooldown
 {
 	GENERATED_BODY()
 
@@ -161,8 +163,19 @@ public:
 
 	FTableRowUnit_Consumable* GetTableRowUnit_Consumable()const;
 
-	UPROPERTY(Transient)
-	USkill_Consumable_Generic* GAInstPtr = nullptr;
+	virtual bool GetRemainingCooldown(
+		float& RemainingCooldown, float& RemainingCooldownPercent
+	)const override;
+
+	virtual bool CheckCooldown()const override;
+
+	virtual void AddCooldownConsumeTime(float NewTime)override;
+
+	virtual void FreshUniqueCooldownTime()override;
+
+	virtual void ApplyCooldown()override;
+
+	virtual void OffsetCooldownTime()override;
 
 protected:
 

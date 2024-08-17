@@ -106,7 +106,6 @@ void USkill_Passive_ZMJZ::PerformAction()
 				if (EffectPtr)
 				{
 					EffectItemPtr = EffectPtr->AddEffectItem();
-					EffectItemPtr->SetTexutre(BuffIcon);
 				}
 			}
 
@@ -115,7 +114,6 @@ void USkill_Passive_ZMJZ::PerformAction()
 
 			if (EffectItemPtr)
 			{
-				EffectItemPtr->SetNum(ModifyCount);
 			}
 		}
 	}
@@ -175,7 +173,6 @@ void USkill_Passive_ZMJZ::OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, floa
 		{
 			if (EffectItemPtr)
 			{
-				EffectItemPtr->SetNum(ModifyCount);
 			}
 			TaskPtr->SetInfinite(SecondaryDecreamTime);
 		}
@@ -184,7 +181,6 @@ void USkill_Passive_ZMJZ::OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, floa
 	{
 		if (EffectItemPtr)
 		{
-			EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
 		}
 	}
 }

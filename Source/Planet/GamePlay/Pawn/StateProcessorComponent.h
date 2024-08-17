@@ -18,8 +18,6 @@ public:
 
 	static FName ComponentName;
 
-
-
 protected:
 
 	virtual void BeginPlay()override;

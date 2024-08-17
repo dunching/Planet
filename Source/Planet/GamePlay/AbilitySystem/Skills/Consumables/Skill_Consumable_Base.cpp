@@ -41,7 +41,7 @@ void USkill_Consumable_Base::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable_Generic*>(TriggerEventData->TargetData.Get(0));
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
 			UnitPtr = GameplayAbilityTargetDataPtr->UnitPtr;
@@ -68,6 +68,8 @@ bool USkill_Consumable_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
+	UnitPtr->ApplyCooldown();
+
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
@@ -81,21 +83,6 @@ void USkill_Consumable_Base::ContinueActive(UConsumableUnit* InUnitPtr)
 	UnitPtr = InUnitPtr;
 
 	PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
-}
-
-bool USkill_Consumable_Base::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
-{
-	return false;
-}
-
-void USkill_Consumable_Base::AddCooldownConsumeTime(float NewTime)
-{
-
-}
-
-void USkill_Consumable_Base::ResetCooldownTime()
-{
-
 }
 
 void USkill_Consumable_Base::PerformAction(

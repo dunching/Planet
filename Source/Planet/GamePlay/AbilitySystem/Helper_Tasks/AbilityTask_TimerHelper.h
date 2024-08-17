@@ -42,6 +42,7 @@ public:
 	
 	TimerHelper_Tick_Delegate TickDelegate;
 
+	// 当前时间 总时间
 	TimerHelper_Interval_Tick_Delegate DurationDelegate;
 
 	TimerHelper_Interval_Tick_Delegate IntervalDelegate;

@@ -117,12 +117,6 @@ void UCS_PeriodicStateModify::ExcuteTasks()
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
-		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-		if (EffectPtr)
-		{
-			EffectItemPtr = EffectPtr->AddEffectItem();
-			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
-		}
 	}
 	else
 	{
@@ -163,7 +157,6 @@ void UCS_PeriodicStateModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, fl
 		{
 			if (EffectItemPtr)
 			{
-				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
 			}
 		}
 	}

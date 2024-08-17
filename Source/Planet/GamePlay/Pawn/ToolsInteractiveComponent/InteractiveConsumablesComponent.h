@@ -56,9 +56,4 @@ protected:
 
 	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>ConsumablesMap;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Type")
-	TSubclassOf<USkill_Consumable_Generic> Skill_Consumable_GenericClass;
-
-	FGameplayAbilitySpecHandle Skill_Consumable_GenericHandle;
-
 };

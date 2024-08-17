@@ -46,8 +46,6 @@ private:
 
 	float PerformActionInterval = 1.f;
 
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
-
 	FGuid Guid = FGuid::NewGuid();
 
 };
@@ -84,9 +82,11 @@ public:
 		bool bWasCancelled
 	)override;
 
-	void UpdateDuration();
+	virtual void UpdateDuration()override;
 
 protected:
+
+	virtual void InitialStateDisplayInfo()override;
 
 	void PerformAction();
 
@@ -94,11 +94,9 @@ protected:
 
 	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
-	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
 
 	const FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr = nullptr;
-
-	UEffectItem* EffectItemPtr = nullptr;
 
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
 

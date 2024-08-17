@@ -129,7 +129,6 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 		if (EffectPtr)
 		{
 			EffectItemPtr = EffectPtr->AddEffectItem();
-			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
 		}
 	}
 	else
@@ -176,7 +175,6 @@ void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, flo
 		{
 			if (EffectItemPtr)
 			{
-				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
 			}
 		}
 	}

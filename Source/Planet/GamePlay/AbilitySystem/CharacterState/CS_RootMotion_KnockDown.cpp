@@ -115,7 +115,6 @@ void UCS_RootMotion_KnockDown::ExcuteTasks()
 		if (EffectPtr)
 		{
 			EffectItemPtr = EffectPtr->AddEffectItem();
-			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
 		}
 	}
 	else
@@ -147,7 +146,6 @@ void UCS_RootMotion_KnockDown::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, f
 		{
 			if (EffectItemPtr)
 			{
-				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
 			}
 		}
 	}

@@ -55,7 +55,7 @@ public:
 
 	UCS_RootMotion();
 
-	virtual void UpdateDuration();
+	virtual void UpdateDuration()override;
 
 protected:
 

@@ -88,6 +88,13 @@ enum class ETagChangeType : uint8
 };
 
 UENUM(BlueprintType)
+enum class ECharacterStateType : uint8
+{
+	kActive,
+	kEnd,
+};
+
+UENUM(BlueprintType)
 enum class ETeammateOption : uint8
 {
 	// Groupmate

@@ -137,6 +137,9 @@ struct PLANET_API FTableRowUnit_Consumable : public FTableRowBase
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<AConsumable_Base> Consumable_Class;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<USkill_Consumable_Base> Skill_Consumable_Class;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;

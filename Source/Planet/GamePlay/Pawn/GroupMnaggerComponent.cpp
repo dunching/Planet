@@ -266,31 +266,34 @@ TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCo
 	return Result;
 }
 
-TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::ApplyCooldown(UConsumableUnit* UnitPtr)
+TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCooldown(const UConsumableUnit* ConsumableUnitPtr)
 {
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> Result;
-	if (UnitPtr)
+
+	// 公共CD
+	auto SkillCommonCooldownInfoMap = ConsumableUnitPtr->GetTableRowUnit_Consumable()->CommonCooldownInfoMap;
+	auto& CommonCooldownMap = GetGroupHelper()->CommonCooldownMap;
+	for (const auto Iter : SkillCommonCooldownInfoMap)
 	{
-		auto SkillCommonCooldownInfoMap = UnitPtr->GetTableRowUnit_Consumable()->CommonCooldownInfoMap;
+		if (CommonCooldownMap.Contains(Iter))
+		{
+			Result.Add(Iter, CommonCooldownMap[Iter]);
+		}
+	}
+	return Result;
+}
+
+TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::ApplyCooldown(UConsumableUnit* ConsumableUnitPtr)
+{
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> Result;
+	if (ConsumableUnitPtr)
+	{
+		// 公共CD
+		auto SkillCommonCooldownInfoMap = ConsumableUnitPtr->GetTableRowUnit_Consumable()->CommonCooldownInfoMap;
 		for (const auto Iter : SkillCommonCooldownInfoMap)
 		{
-			if (UniqueCooldownMap.Contains(Iter))
-			{
-
-			}
-			else
-			{
-				TSharedPtr<FSkillCooldownHelper> SkillCooldownHelperSPtr = MakeShared<FSkillCooldownHelper>();
-
-				auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
-				if (CommonCooldownInfoPtr)
-				{
-					SkillCooldownHelperSPtr->SetCooldown(CommonCooldownInfoPtr->CoolDownTime);
-					SkillCooldownHelperSPtr->ResetCooldownTime();
-				}
-				UniqueCooldownMap.Add(Iter, SkillCooldownHelperSPtr);
-				Result.Add(Iter, SkillCooldownHelperSPtr);
-			}
+			auto SkillCooldownHelperSPtr = ApplyCommonCooldownTime(Iter);
+			Result.Add(Iter, SkillCooldownHelperSPtr);
 		}
 	}
 	return Result;

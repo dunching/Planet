@@ -53,14 +53,6 @@ public:
 
 	void ContinueActive(UConsumableUnit* UnitPtr);
 
-	bool GetRemainingCooldown(
-		float& RemainingCooldown, float& RemainingCooldownPercent
-	)const;
-
-	void AddCooldownConsumeTime(float NewTime);
-
-	void ResetCooldownTime();
-
 protected:
 
 	virtual void PerformAction(

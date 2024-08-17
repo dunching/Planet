@@ -116,42 +116,51 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddTemporaryTag(
 	return GAToolPeriodicHandle;
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
-	FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
+void UInteractiveBaseGAComponent::ExcuteEffects(
+	TSharedPtr<FGameplayAbilityTargetData_PropertyModify> GameplayAbilityTargetDataSPtr
 )
 {
-	FGameplayAbilitySpecHandle Result;
-
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
 	if (OnwerActorPtr)
 	{
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		if (PeriodicPropertyModifyMap.Contains(GameplayAbilityTargetDataPtr->Tag))
+		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicPropertyModifyMap[GameplayAbilityTargetDataPtr->Tag]);
-			if (GameplayAbilitySpecPtr)
+			auto GAPtr = CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag];
+			if (GAPtr)
 			{
-				auto GAPtr = Cast<UCS_PeriodicPropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-				if (GAPtr)
-				{
-					GAPtr->UpdateDuration();
-					return Result;
-				}
+				GAPtr->UpdateDuration();
+				return;
 			}
 		}
 
+		auto ClonePtr = GameplayAbilityTargetDataSPtr->Clone();
+		auto Handle = ClonePtr->CharacterStateChanged.AddCallback(
+			std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
+		);
+		Handle->bIsAutoUnregister = false;
+
 		FGameplayEventData Payload;
-		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+		Payload.TargetData.Add(ClonePtr);
 
 		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass(), 1);
 
-		Result = ASCPtr->GiveAbilityAndActivateOnce(
+		auto GAHandle = ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,
 			&Payload
 		);
-		PeriodicPropertyModifyMap.Add(GameplayAbilityTargetDataPtr->Tag, Result);
+
+		// 为什么不在此处直接获取 GetPrimaryInstance？因为在GA过程中调用时会pending，导致返回为nullptr
+// 		auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GAHandle);
+// 		if (GameplayAbilitySpecPtr)
+// 		{
+// 			ResultPtr = Cast<UCS_PeriodicPropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+// 			if (ResultPtr)
+// 			{
+// 				PeriodicPropertyModifyMap.Add(GameplayAbilityTargetDataSPtr->Tag, ResultPtr);
+// 			}
+// 		}
 	}
-	return Result;
 }
 
 FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
@@ -759,6 +768,29 @@ void UInteractiveBaseGAComponent::AddReceivedModify()
 		}
 	};
 	AddReceviedEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
+}
+
+void UInteractiveBaseGAComponent::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)
+{
+	CharacterStateChangedContainer.ExcuteCallback(CharacterStateType, CharacterStatePtr);
+	switch (CharacterStateType)
+	{
+	case ECharacterStateType::kActive:
+	{
+		CharacterStateMap.Add(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag, CharacterStatePtr);
+	}
+	break;
+	case ECharacterStateType::kEnd:
+	{
+		if (CharacterStateMap.Contains(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag))
+		{
+			CharacterStateMap.Remove(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag);
+		}
+	}
+	break;
+	default:
+		break;
+	}
 }
 
 void UInteractiveBaseGAComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData)

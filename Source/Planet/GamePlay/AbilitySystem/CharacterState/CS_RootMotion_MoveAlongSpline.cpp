@@ -130,7 +130,6 @@ void UCS_RootMotion_MoveAlongSpline::ExcuteTasks()
 		if (EffectPtr)
 		{
 			EffectItemPtr = EffectPtr->AddEffectItem();
-			EffectItemPtr->SetTexutre(GameplayAbilityTargetDataPtr->DefaultIcon);
 		}
 	}
 	else
@@ -177,7 +176,6 @@ void UCS_RootMotion_MoveAlongSpline::OnDuration(UAbilityTask_TimerHelper* InTask
 		{
 			if (EffectItemPtr)
 			{
-				EffectItemPtr->SetPercent(true, (Interval - CurrentInterval) / Interval);
 			}
 		}
 	}
