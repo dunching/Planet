@@ -35,6 +35,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitTable.h"
 #include "Skill_Active_Control.h"
+#include "InteractiveBaseGAComponent.h"
 
 FName UInteractiveSkillComponent::ComponentName = TEXT("InteractiveSkillComponent");
 
@@ -616,31 +617,20 @@ void UInteractiveSkillComponent::RemoveSkill(const TMap<FGameplayTag, TSharedPtr
 					Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve)
 					)
 				{
-					auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>((*PreviouIter)->SkillUnitPtr);
-					if (PassiveSkillUnitPtr)
-					{
-						auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
-						for (const auto& ElementIter : PassiveSkillExtendInfoPtr->AddtionalElementMap)
-						{
-							switch (ElementIter.Key)
-							{
-							case EWuXingType::kGold:
-							{
-								OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element.GoldElement.RemoveCurrentValue(
-									PassiveSkillUnitPtr->PropertuModify_GUID
-								);
-							}
-							break;
-							}
-						}
-					}
+					TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+					ModifyPropertyMap.Add(
+						ECharacterPropertyType::GoldElement,
+						0
+					);
+					OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
+						ModifyPropertyMap, Iter.Value->SkillUnitPtr->GetUnitType()
+					);
 				}
 
 				if (
 					Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->TalentSocket)
 					)
 				{
-					OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr.Reset();
 				}
 				else
 				{
@@ -710,59 +700,43 @@ void UInteractiveSkillComponent::AddSkill(const TMap<FGameplayTag, TSharedPtr<FS
 					auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>(Iter.Value->SkillUnitPtr);
 					if (PassiveSkillUnitPtr)
 					{
+						SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
+						MakeGameplayAbilitySpec(Iter.Value->SkillUnitPtr);
+
 						auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
 						if (PassiveSkillExtendInfoPtr->AddtionalElementMap.IsEmpty())
 						{
-							SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
-							MakeGameplayAbilitySpec(Iter.Value->SkillUnitPtr);
-						}
-						else
-						{
+							TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
 							for (const auto& ElementIter : PassiveSkillExtendInfoPtr->AddtionalElementMap)
 							{
 								switch (ElementIter.Key)
 								{
 								case EWuXingType::kGold:
 								{
-									OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element.GoldElement.AddCurrentValue(
-										ElementIter.Value,
-										PassiveSkillUnitPtr->PropertuModify_GUID
+									ModifyPropertyMap.Add(
+										ECharacterPropertyType::GoldElement, 
+										OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element.GoldElement.GetCurrentValue()
 									);
 								}
 								break;
 								}
 							}
+
+							OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
+								ModifyPropertyMap, PassiveSkillUnitPtr->GetUnitType()
+							);
 						}
 					}
 				}
 				else if (
 					Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-					Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon)
+					Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon) ||
+					Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent)
 					)
 				{
 					SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 					MakeGameplayAbilitySpec(Iter.Value->SkillUnitPtr);
-				}
-				else if (
-					Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent)
-					)
-				{
-					if (
-						Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi)
-						)
-					{
-						OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_NuQi>();
-						SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
-						MakeGameplayAbilitySpec(Iter.Value->SkillUnitPtr);
-					}
-					else if (
-						Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang)
-						)
-					{
-						OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr = MakeShared<FTalent_YinYang>();
-						SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
-						MakeGameplayAbilitySpec(Iter.Value->SkillUnitPtr);
-					}
 				}
 			}
 		}

@@ -147,6 +147,7 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
 		TaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
+			return true;
 			});
 		TaskPtr->ReadyForActivation();
 	}

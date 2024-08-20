@@ -14,6 +14,8 @@ class UAbilityTask_TimerHelper;
 class UEffectItem;
 class ACharacterBase;
 
+struct FGAEventData;
+
 UCLASS()
 class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 {
@@ -21,12 +23,23 @@ class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 
 public:
 
+	using FMakedDamageHandle = 
+		TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>::FCallbackHandleSPtr;
+
 	USkill_Passive_ZMJZ();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
+
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	)override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -40,14 +53,6 @@ public:
 		const FGameplayAbilitySpec& Spec
 	)override;
 
-	virtual void PreActivate(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-		const FGameplayEventData* TriggerEventData = nullptr
-	)override;
-
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -58,9 +63,9 @@ public:
 
 protected:
 
-	void PerformAction();
+	virtual void PerformAction()override;
 
-	void OnSendAttack(UGameplayAbility* GAPtr);
+	void OnSendAttack(const FGAEventData& GAEventData);
 
 	void OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
@@ -72,16 +77,11 @@ protected:
 
 	float SecondaryDecreamTime = 1.f;
 
-	FDelegateHandle AbilityActivatedCallbacksHandle;
-
-	UEffectItem* EffectItemPtr = nullptr;
+	FMakedDamageHandle AbilityActivatedCallbacksHandle;
 
 	uint8 MaxCount = 5;
 
-	uint8 ModifyCount = 0;
-
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 SpeedOffset = 10;
-
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 };

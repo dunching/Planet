@@ -14,6 +14,7 @@
 #include "CharacterAttributesComponent.generated.h"
 
 class IPlanetControllerInterface;
+class UGAEvent_Received;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterAttributesComponent : public UActorComponent
@@ -28,11 +29,15 @@ public:
 
 	UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer);
 
+	static FName ComponentName;
+
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
-	FCharacterAttributes& GetCharacterAttributes() { return CharacterAttributes; };
+	const FCharacterAttributes& GetCharacterAttributes()const;
 
-	static FName ComponentName;
+	FCharacterAttributes& GetCharacterAttributes();
+
+	void ProcessCharacterAttributes();
 
 protected:
 

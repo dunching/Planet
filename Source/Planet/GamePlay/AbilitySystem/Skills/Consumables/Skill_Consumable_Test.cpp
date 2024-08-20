@@ -54,6 +54,7 @@ void USkill_Consumable_Test::ExcuteTasks()
 	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
 	TaskPtr->OnFinished.BindLambda([this](auto) {
 		K2_CancelAbility();
+		return true;
 		});
 	TaskPtr->ReadyForActivation();
 }

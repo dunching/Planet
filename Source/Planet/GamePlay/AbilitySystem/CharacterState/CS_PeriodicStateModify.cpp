@@ -134,6 +134,7 @@ void UCS_PeriodicStateModify::ExcuteTasks()
 		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
 		TaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
+			return true;
 			});
 		TaskPtr->ReadyForActivation();
 	}

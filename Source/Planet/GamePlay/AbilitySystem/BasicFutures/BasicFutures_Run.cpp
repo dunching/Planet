@@ -64,8 +64,11 @@ void UBasicFutures_Run::ActivateAbility(
 	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		auto & CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		CharacterAttributesRef.MoveSpeed.AddCurrentValue(CharacterAttributesRef.RunningSpeedOffset.GetCurrentValue(), PropertuModify_GUID);
+		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+		
+		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, RunningSpeedOffset);
+
+		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
 	}
 }
 
@@ -80,8 +83,11 @@ void UBasicFutures_Run::EndAbility(
 	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());	
 	if (CharacterPtr)
 	{
-		auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		CharacterAttributesRef.MoveSpeed.RemoveCurrentValue(PropertuModify_GUID);
+		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
+
+		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
 	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);

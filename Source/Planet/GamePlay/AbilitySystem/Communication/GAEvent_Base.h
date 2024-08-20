@@ -14,6 +14,8 @@ class PLANET_API UGAEvent_Base : public UPlanetGameplayAbility
 
 public:
 
+	UGAEvent_Base();
+
 	const FGameplayEventData& GetCurrentEventData()const;
 
 protected:

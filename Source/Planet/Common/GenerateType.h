@@ -32,8 +32,6 @@ enum class ECharacterPropertyType : uint8
 	PercentPenetration,
 	Resistance,
 	GAPerformSpeed,
-	kHP,
-	kPP,
 	Evade,
 	HitRate,
 	Toughness,

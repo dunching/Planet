@@ -13,6 +13,7 @@
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 #include "InteractiveBaseGAComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 void USkill_Element_Gold::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -88,6 +89,7 @@ void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 					RemoveBuffTask->SetDuration(CountDown);
 					RemoveBuffTask->OnFinished.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr) {
 						RemoveBuff();
+						return true;
 						});
 					RemoveBuffTask->TickDelegate.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr, float) {
 
@@ -122,16 +124,18 @@ void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 
 void USkill_Element_Gold::AddBuff()
 {
-
 	switch (CurrentElementLevel)
 	{
 	case 3:
 	{
 		if (CharacterPtr)
 		{
-			auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			CharacterAttributesRef.CriticalHitRate.AddCurrentValue(CurrentBuffLevel * CriticalHitRate, PropertuModify_GUID);
-			CharacterAttributesRef.Evade.AddCurrentValue(CurrentBuffLevel * Evade, PropertuModify_GUID);
+			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+			ModifyPropertyMap.Add(ECharacterPropertyType::CriticalHitRate, CurrentBuffLevel * CriticalHitRate);
+			ModifyPropertyMap.Add(ECharacterPropertyType::Evade, CurrentBuffLevel * Evade);
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 		}
 	}
 	break;
@@ -150,8 +154,6 @@ void USkill_Element_Gold::RemoveBuff()
 {
 	if (CharacterPtr)
 	{
-		auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		CharacterAttributesRef.CriticalHitRate.RemoveCurrentValue(PropertuModify_GUID);
-		CharacterAttributesRef.Evade.RemoveCurrentValue(PropertuModify_GUID);
+		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
 	}
 }

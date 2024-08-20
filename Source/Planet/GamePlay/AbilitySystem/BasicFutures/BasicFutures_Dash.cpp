@@ -103,23 +103,23 @@ bool UBasicFutures_Dash::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	if (Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags))
+	if (CharacterPtr)
 	{
-		if (CharacterPtr)
-		{
-			auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			if (CharacterAttributesRef.PP.GetCurrentValue() <= 0)
-			{
-			}
-			else
-			{
-				CharacterAttributesRef.PP.AddCurrentValue(-Consume, CharacterAttributesRef.PropertuModify_GUID);
-				return true;
-			}
-		}
+		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+		GAEventData.PP = Consume;
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 
-	return false;
+	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
 void UBasicFutures_Dash::EndAbility(
@@ -153,15 +153,12 @@ bool UBasicFutures_Dash::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags
 ) const
 {
-	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	if (CharacterPtr)
 	{
-		if (CharacterPtr)
+		auto& PawnDataStructPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		if (PawnDataStructPtr.PP.GetCurrentValue() >= Consume)
 		{
-			auto& PawnDataStructPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			if (PawnDataStructPtr.PP.GetCurrentValue() >= Consume)
-			{
-				return true;
-			}
+			return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 		}
 	}
 

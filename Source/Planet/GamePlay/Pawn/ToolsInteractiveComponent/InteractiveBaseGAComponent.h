@@ -24,6 +24,8 @@ struct FGameplayAbilityTargetData_AddTemporaryTag;
 struct FGameplayAbilityTargetData_MoveToAttaclArea;
 struct FGameplayAbilityTargetData;
 
+TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
+
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UInteractiveBaseGAComponent : public UInteractiveComponent
 {
@@ -35,7 +37,9 @@ public:
 
 	using FOwnerPawnType = ACharacterBase;
 
-	using FCallbackHandleContainer = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
+	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
+
+	using FMakedDamage = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
 
 	static FName ComponentName;
 
@@ -58,10 +62,13 @@ public:
 
 	void SendEvent2Other(
 		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-		bool bIsWeaponAttack = false
+		const FGameplayTag &DataSource
 	);
 
-	void SendEvent2Self(const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap);
+	void SendEvent2Self(
+		const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap,
+		const FGameplayTag& DataSource
+	);
 
 	void SendEventImp(
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
@@ -93,11 +100,15 @@ public:
 
 	void ExcuteAttackedEffect(EAffectedDirection AffectedDirection);
 
+	UCS_Base* GetCharacterState(const FGameplayTag&CSTag)const;
+
 	FGameplayAbilitySpecHandle SendEventHandle;
 
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
 
-	FCallbackHandleContainer CharacterStateChangedContainer;
+	FCharacterStateChanged CharacterStateChangedContainer;
+
+	FMakedDamage MakedDamage;
 
 protected:
 

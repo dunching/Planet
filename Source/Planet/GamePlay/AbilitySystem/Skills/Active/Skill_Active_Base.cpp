@@ -136,6 +136,7 @@ void USkill_Active_Base::WaitInput()
 		WaitInputTaskPtr->DurationDelegate.BindUObject(this , &ThisClass::WaitInputTick);
 		WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
+			return true;
 			});
 		WaitInputTaskPtr->ReadyForActivation();
 	}

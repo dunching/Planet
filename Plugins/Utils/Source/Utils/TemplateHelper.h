@@ -238,6 +238,10 @@ public:
 
 	void ExcuteCallback(ParamTypes...Args)const;
 
+	TSharedPtr<FMapType> GetCallbacks()const;
+
+	void AppendCallbacks(const TCallbackHandleContainer<Ret(ParamTypes...)>&Right);
+
 private:
 
 	TSharedPtr<FMapType> CallbacksMapSPtr = MakeShared<FMapType>();
@@ -285,6 +289,21 @@ void TCallbackHandleContainer<Ret(ParamTypes...)>::ExcuteCallback(ParamTypes...A
 		{
 			Iter.second(Args...);
 		}
+	}
+}
+
+template<typename Ret, typename... ParamTypes>
+TSharedPtr<typename TCallbackHandleContainer<Ret(ParamTypes...)>::FMapType> TCallbackHandleContainer<Ret(ParamTypes...)>::GetCallbacks() const
+{
+	return CallbacksMapSPtr;
+}
+
+template<typename Ret, typename... ParamTypes>
+void TCallbackHandleContainer<Ret(ParamTypes...)>::AppendCallbacks(const TCallbackHandleContainer<Ret(ParamTypes...)>& Right) 
+{
+	for (const auto& Iter : *Right.CallbacksMapSPtr)
+	{
+		AddCallback(Iter.second);
 	}
 }
 

@@ -23,11 +23,11 @@ struct PLANET_API FBasePropertySet
 
 public:
 
-	void AddCurrentValue(int32 NewValue, FGuid GUID);
+	void AddCurrentValue(int32 NewValue, const FGameplayTag&DataSource);
 
-	void RemoveCurrentValue(FGuid GUID);
+	void RemoveCurrentValue(const FGameplayTag& DataSource);
 
-	void SetCurrentValue(int32 NewValue, FGuid GUID);
+	void SetCurrentValue(int32 NewValue, const FGameplayTag& DataSource);
 
 	int32 GetCurrentValue()const;
 	
@@ -72,7 +72,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty MaxValue;
 
-	TMap<FGuid, int32>ValueMap;
+	TMap<FGameplayTag, int32>ValueMap;
 
 };
 
@@ -121,6 +121,12 @@ struct PLANET_API FCharacterAttributes final
 	virtual ~FCharacterAttributes();
 
 	void ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
+
+	const FElement& GetElement()const;
+
+	const FBasePropertySet& GetHPReply()const;
+
+	const FBasePropertySet& GetPPReply()const;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName Name;
@@ -218,8 +224,6 @@ struct PLANET_API FCharacterAttributes final
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet RunningConsume;
-
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
 };
 
 struct PLANET_API FScopeCharacterAttributes

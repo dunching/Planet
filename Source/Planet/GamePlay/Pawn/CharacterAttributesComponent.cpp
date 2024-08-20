@@ -20,34 +20,63 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	CharacterAttributes.HP.AddCurrentValue(CharacterAttributes.HPReplay.GetCurrentValue(), CharacterAttributes.PropertuModify_GUID);
-	
+	ProcessCharacterAttributes();
+}
+
+const FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes() const
+{
+	return CharacterAttributes;
+}
+
+FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes()
+{
+	return CharacterAttributes;
+}
+
+void UCharacterAttributesComponent::ProcessCharacterAttributes()
+{
 	auto OwnerPtr = GetOwner<FOwnerType>();
 	auto CharacterPtr = OwnerPtr->GetRealCharacter();
 	if (CharacterPtr)
 	{
+		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+		const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Regular;
+
+		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+		GAEventData.HP = CharacterAttributes.HPReplay.GetCurrentValue();
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+
 		if (
-			(CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f) &&
-			(CharacterPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
+			CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
 			)
 		{
 			if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
 			{
-				if (CharacterAttributes.PP.GetCurrentValue() <= 0)
-				{
-					FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running };
-					CharacterPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
-				}
-				else
-				{
-					CharacterAttributes.PP.AddCurrentValue(-CharacterAttributes.RunningConsume.GetCurrentValue(), CharacterAttributes.PropertuModify_GUID);
-				}
+			}
+		}
+		else if (
+			CharacterPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running)
+			)
+		{
+			if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
+			{
+				GAEventData.PP = CharacterAttributes.RunningConsume.GetCurrentValue();
 			}
 		}
 		else
 		{
-			CharacterAttributes.PP.AddCurrentValue(CharacterAttributes.PPReplay.GetCurrentValue(), CharacterAttributes.PropertuModify_GUID);
+			GAEventData.PP = CharacterAttributes.PPReplay.GetCurrentValue();
 		}
+
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

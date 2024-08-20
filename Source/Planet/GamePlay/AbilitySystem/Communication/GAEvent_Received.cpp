@@ -64,6 +64,8 @@ void UGAEvent_Received::ActivateAbility(
 
 			ClonePtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, ClonePtr->Data);
 
+			GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamage.ExcuteCallback(CharacterPtr, ClonePtr->Data);
+
 			if (GAEventDataPtr->Data.bIsMakeAttackEffect)
 			{
 				CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteAttackedEffect(EAffectedDirection::kForward);

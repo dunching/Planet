@@ -197,6 +197,7 @@ void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 		}
 
 		DecrementListLockOverride();
+		return true;
 		});
 
 	TaskPtr->ReadyForActivation();

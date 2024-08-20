@@ -15,13 +15,13 @@
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 #include "InteractiveBaseGAComponent.h"
+#include "CS_PeriodicPropertyModify.h"
+#include "CS_Base.h"
 
 USkill_Passive_ZMJZ::USkill_Passive_ZMJZ() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	bRetriggerInstancedAbility = true;
 }
 
 void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
@@ -32,8 +32,13 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	if (CharacterPtr)
 	{
 		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendAttack);
+			CharacterPtr->GetInteractiveBaseGAComponent()->MakedDamage.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
 	}
+}
+
+void USkill_Passive_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
+{
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
 void USkill_Passive_ZMJZ::ActivateAbility(
@@ -44,8 +49,6 @@ void USkill_Passive_ZMJZ::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	PerformAction();
 }
 
 void USkill_Passive_ZMJZ::OnRemoveAbility(
@@ -53,26 +56,12 @@ void USkill_Passive_ZMJZ::OnRemoveAbility(
 	const FGameplayAbilitySpec& Spec
 )
 {
-	if (CharacterPtr)
+	if (AbilityActivatedCallbacksHandle)
 	{
-		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.RemoveCurrentValue(PropertuModify_GUID);
-	}
-
-	if (EffectItemPtr)
-	{
-		EffectItemPtr->RemoveFromParent();
-		EffectItemPtr = nullptr;
-
-		ModifyCount = 0;
+		AbilityActivatedCallbacksHandle->UnBindCallback();
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
-}
-
-void USkill_Passive_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
-{
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
 void USkill_Passive_ZMJZ::EndAbility(
@@ -90,98 +79,80 @@ void USkill_Passive_ZMJZ::PerformAction()
 {
 	if (CharacterPtr)
 	{
-		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetInfinite(DecreamTime);
-		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnIntervalTick);
-		TaskPtr->ReadyForActivation();
-
-		if (ModifyCount > MaxCount)
+		auto CSPtr = CharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterState(SkillUnitPtr->GetUnitType());
+		if (CSPtr)
 		{
+			if (CSPtr->GetStateDisplayInfo().Pin()->Num < MaxCount)
+			{
+				TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+
+				ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
+
+				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+					SkillUnitPtr->GetUnitType(),
+					SkillUnitPtr->GetIcon(),
+					DecreamTime,
+					-1.f,
+					SecondaryDecreamTime,
+					ModifyPropertyMap
+				);
+
+				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+
+				auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+			}
+			else
+			{
+				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+					SkillUnitPtr->GetUnitType(),
+					true
+				);
+
+				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+
+				auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+			}
 		}
 		else
 		{
-			if (ModifyCount == 0)
-			{
-				auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-				if (EffectPtr)
-				{
-					EffectItemPtr = EffectPtr->AddEffectItem();
-				}
-			}
+			TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
 
-			ModifyCount++;
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(SpeedOffset, PropertuModify_GUID);
+			ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
 
-			if (EffectItemPtr)
-			{
-			}
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+				SkillUnitPtr->GetUnitType(),
+				SkillUnitPtr->GetIcon(),
+				DecreamTime,
+				-1.f,
+				SecondaryDecreamTime,
+				ModifyPropertyMap
+			);
+
+			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+
+			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		}
 	}
 }
 
-void USkill_Passive_ZMJZ::OnSendAttack(UGameplayAbility* GAPtr)
+void USkill_Passive_ZMJZ::OnSendAttack(const FGAEventData& GAEventData)
 {
 	if (CharacterPtr)
 	{
-		if (!(
-				GAPtr &&
-				(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
-				))
+		if (GAEventData.bIsWeaponAttack)
 		{
-			return;
-		}
-
-		auto GA_SendPtr = Cast<UGAEvent_Send>(GAPtr);
-		if (!GA_SendPtr)
-		{
-			return;
-		}
-
-		const auto& EventData = GA_SendPtr->GetCurrentEventData();
-
-		auto GAEventPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventData.TargetData.Get(0));
-		if (GAEventPtr && GAEventPtr->DataAry[0].bIsWeaponAttack)
-		{
-			auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
-			ASCPtr->TryActivateAbility(GetCurrentAbilitySpecHandle());
+			PerformAction();
 		}
 	}
 }
 
 void USkill_Passive_ZMJZ::OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
 {
-	if (CurrentInterval > Interval)
-	{
-		ModifyCount--;
-
-		if (CharacterPtr)
-		{
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(-SpeedOffset, PropertuModify_GUID);
-		}
-
-		if (ModifyCount <= 0)
-		{
-			if (EffectItemPtr)
-			{
-				EffectItemPtr->RemoveFromParent();
-				EffectItemPtr = nullptr;
-			}
-			TaskPtr->ExternalCancel();
-			K2_EndAbility();
-		}
-		else if (TaskPtr)
-		{
-			if (EffectItemPtr)
-			{
-			}
-			TaskPtr->SetInfinite(SecondaryDecreamTime);
-		}
-	}
-	else
-	{
-		if (EffectItemPtr)
-		{
-		}
-	}
 }
 

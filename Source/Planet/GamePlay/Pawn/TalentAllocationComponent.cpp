@@ -11,6 +11,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitContainer.h"
 #include "PlanetControllerInterface.h"
+#include "InteractiveBaseGAComponent.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
@@ -234,35 +235,35 @@ void UTalentAllocationComponent::SyncToHolding()
 			auto CharacterPtr = GetOwner<FOwnerType>();
 			if (CharacterPtr)
 			{
-				auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+				const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Regular;
+				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+				
 				switch (std::get<EPointPropertyType>(Iter.Value.Type))
 				{
 				case EPointPropertyType::kLiDao:
 				{
-					CharacterAttributes.LiDao.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
+					ModifyPropertyMap.Add(ECharacterPropertyType::LiDao, Iter.Value.Level);
 				}
 				break;
 				case EPointPropertyType::kGenGu:
 				{
-					CharacterAttributes.GenGu.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				case EPointPropertyType::kShenFa:
 				{
-					CharacterAttributes.ShenFa.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				case EPointPropertyType::kDongCha:
 				{
-					CharacterAttributes.DongCha.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				case EPointPropertyType::kTianZi:
 				{
-					CharacterAttributes.TianZi.SetCurrentValue(Iter.Value.Level, PropertuModify_GUID);
 				}
 				break;
 				}
+				
+				CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
 			}
 		}
 		break;

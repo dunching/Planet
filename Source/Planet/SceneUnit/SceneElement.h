@@ -89,6 +89,8 @@ public:
 
 	virtual ~UBasicUnit();
 
+	virtual void InitialUnit();
+
 	IDType GetID()const;
 
 	FGameplayTag GetUnitType()const;
@@ -270,7 +272,7 @@ public:
 
 	UPassiveSkillUnit();
 
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
+	virtual void InitialUnit()override;
 
 	FTableRowUnit_PassiveSkillExtendInfo* GetTableRowUnit_PassiveSkillExtendInfo()const;
 

@@ -11,7 +11,8 @@
 
 class UGameplayAbility;
 
-DECLARE_DELEGATE_OneParam(TimerHelper_Finished_Delegate, UAbilityTask_TimerHelper*);
+// ÊÇ·ñ½áÊø
+using TimerHelper_Finished_Delegate = TDelegate<bool(UAbilityTask_TimerHelper*)>;
 
 DECLARE_DELEGATE_TwoParams(TimerHelper_Tick_Delegate, UAbilityTask_TimerHelper*, float);
 

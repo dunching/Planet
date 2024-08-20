@@ -53,7 +53,8 @@ public:
 		const FGameplayTagContainer* TargetTags = nullptr,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
-
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	int32 RunningSpeedOffset = 10;
 
 };

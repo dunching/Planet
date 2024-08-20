@@ -10,6 +10,7 @@
 
 class UTexture2D;
 class UCS_Base;
+class ACharacterBase;
 
 USTRUCT()
 struct PLANET_API FStateDisplayInfo
@@ -65,11 +66,16 @@ protected:
 };
 
 UCLASS()
-class PLANET_API UCS_Base : public USkill_Base
+class PLANET_API UCS_Base : public UPlanetGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -98,5 +104,7 @@ protected:
 	virtual void InitialStateDisplayInfo();
 
 	TSharedPtr<FStateDisplayInfo>StateDisplayInfoSPtr;
+
+	ACharacterBase* CharacterPtr = nullptr;
 
 };

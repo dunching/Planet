@@ -1,6 +1,8 @@
 
 #include "CS_Base.h"
 
+#include "CharacterBase.h"
+
 FStateDisplayInfo::FStateDisplayInfo()
 {
 
@@ -27,6 +29,17 @@ FGameplayAbilityTargetData_CS_Base* FGameplayAbilityTargetData_CS_Base::Clone() 
 	*ResultPtr = *this;
 
 	return ResultPtr;
+}
+
+void UCS_Base::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	// CDO
+	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 }
 
 void UCS_Base::PreActivate(

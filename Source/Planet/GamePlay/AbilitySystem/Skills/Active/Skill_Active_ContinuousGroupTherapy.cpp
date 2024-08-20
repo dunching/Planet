@@ -87,6 +87,7 @@ void USkill_Active_ContinuousGroupTherapy::StartTasksLink()
 	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
 	TaskPtr->OnFinished.BindLambda([this](auto) {
 		K2_CancelAbility();
+		return true;
 		});
 	TaskPtr->ReadyForActivation();
 }
@@ -141,7 +142,10 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		CapsuleParams
 	))
 	{
-		TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap;
+		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
 		for (auto Iter : OutOverlaps)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
@@ -150,17 +154,18 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 				auto CharacterIter = TeammatesSet.Find(TargetCharacterPtr);
 				if (CharacterIter)
 				{
-					decltype(ModifyPropertyMap)::ValueType Value;
+					FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-					Value.Add(ECharacterPropertyType::kHP, FBaseProperty(TreatmentVolume));
+					GAEventData.HP = TreatmentVolume;
 
-					ModifyPropertyMap.Add(TargetCharacterPtr, Value);
+					GAEventDataPtr->DataAry.Add(GAEventData);
+
 				}
 			}
 		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		ICPtr->SendEvent2Other(ModifyPropertyMap, true);
+		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

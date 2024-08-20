@@ -288,6 +288,21 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Talent_YinYang =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent.YinYang")));
-	
 #pragma endregion 
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag DataSource_Regular =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Regular")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag DataSource_Character =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag DataSource_EquipmentModify =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.EquipmentModify")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag DataSource_TalentModify =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.TalentModify")));
 };

@@ -48,10 +48,13 @@ void USkill_WeaponActive_PickAxe::OnAvatarSet(
 
 	if (CharacterPtr)
 	{
-		auto & CharacterAttributesRef= CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		CharacterAttributesRef.BaseAttackPower.AddCurrentValue(AD, PropertuModify_GUID);
-		CharacterAttributesRef.Penetration.AddCurrentValue(AD_Penetration, PropertuModify_GUID);
-		CharacterAttributesRef.PercentPenetration.AddCurrentValue(AD_PercentPenetration, PropertuModify_GUID);
+		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+		ModifyPropertyMap.Add(ECharacterPropertyType::BaseAttackPower, AD);
+		ModifyPropertyMap.Add(ECharacterPropertyType::Penetration, AD_Penetration);
+		ModifyPropertyMap.Add(ECharacterPropertyType::PercentPenetration, AD_PercentPenetration);
+
+		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 	}
 }
 
@@ -65,10 +68,7 @@ void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 	{
 		if (CharacterPtr->GetCharacterAttributesComponent())
 		{
-			auto& CharacterAttributesRef = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			CharacterAttributesRef.BaseAttackPower.RemoveCurrentValue(PropertuModify_GUID);
-			CharacterAttributesRef.Penetration.RemoveCurrentValue(PropertuModify_GUID);
-			CharacterAttributesRef.PercentPenetration.RemoveCurrentValue(PropertuModify_GUID);
+			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
 		}
 	}
 

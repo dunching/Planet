@@ -47,22 +47,20 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeInter
 			return  false;
 		}
 
-		FGameplayEventData * PayloadPtr = new FGameplayEventData;
-
-		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable;
-		GameplayAbilityTargetDashPtr->UnitPtr = (*ToolIter)->UnitPtr;
-		PayloadPtr->TargetData.Add(GameplayAbilityTargetDashPtr);
-
 		FGameplayAbilitySpec GameplayAbilitySpec(
 			(*ToolIter)->UnitPtr->GetTableRowUnit_Consumable()->Skill_Consumable_Class,
 			1
 		); 
+		GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable;
+		GameplayAbilityTargetDashPtr->UnitPtr = (*ToolIter)->UnitPtr;
+		GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDashPtr);
 
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
 		GASPtr->GiveAbilityAndActivateOnce(
 			GameplayAbilitySpec,
-			PayloadPtr
+			nullptr
 		);
 
 		return true;

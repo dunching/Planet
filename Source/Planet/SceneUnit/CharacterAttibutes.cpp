@@ -5,29 +5,30 @@
 #include "FightingTips.h"
 #include "Planet.h"
 #include "UICommon.h"
+#include "GameplayTagsSubSystem.h"
 
-void FBasePropertySet::AddCurrentValue(int32 NewValue, FGuid GUID)
+void FBasePropertySet::AddCurrentValue(int32 NewValue, const FGameplayTag& DataSource)
 {
-	if (ValueMap.Contains(GUID))
+	if (ValueMap.Contains(DataSource))
 	{
-		ValueMap[GUID] += NewValue;
+		ValueMap[DataSource] += NewValue;
 	}
 	else
 	{
-		ValueMap.Add(GUID, NewValue);
+		ValueMap.Add(DataSource, NewValue);
 	}
 	Update();
 }
 
-void FBasePropertySet::SetCurrentValue(int32 NewValue, FGuid GUID)
+void FBasePropertySet::SetCurrentValue(int32 NewValue, const FGameplayTag& DataSource)
 {
-	ValueMap.Add(GUID, NewValue);
+	ValueMap.Add(DataSource, NewValue);
 	Update();
 }
 
-void FBasePropertySet::RemoveCurrentValue(FGuid GUID)
+void FBasePropertySet::RemoveCurrentValue(const FGameplayTag& DataSource)
 {
-	ValueMap.Remove(GUID);
+	ValueMap.Remove(DataSource);
 	Update();
 }
 
@@ -106,56 +107,58 @@ FCharacterAttributes::FCharacterAttributes()
 	Element.SoilElement.GetMaxProperty().SetCurrentValue(9);
 	Element.SoilElement.WuXingType = EWuXingType::kSoil;
 
+	const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+
 	BaseAttackPower.GetMaxProperty().SetCurrentValue(3000);
-	BaseAttackPower.SetCurrentValue(100, PropertuModify_GUID);
+	BaseAttackPower.SetCurrentValue(100, DataSource);
 
 	Penetration.GetMaxProperty().SetCurrentValue(1000);
-	Penetration.SetCurrentValue(0, PropertuModify_GUID);
+	Penetration.SetCurrentValue(0, DataSource);
 
 	PercentPenetration.GetMaxProperty().SetCurrentValue(100);
-	PercentPenetration.SetCurrentValue(0, PropertuModify_GUID);
+	PercentPenetration.SetCurrentValue(0, DataSource);
 
 	Resistance.GetMaxProperty().SetCurrentValue(1000);
-	Resistance.SetCurrentValue(20, PropertuModify_GUID);
+	Resistance.SetCurrentValue(20, DataSource);
 
 	GAPerformSpeed.GetMaxProperty().SetCurrentValue(500);
-	GAPerformSpeed.SetCurrentValue(100, PropertuModify_GUID);
+	GAPerformSpeed.SetCurrentValue(100, DataSource);
 
 	HP.GetMaxProperty().SetCurrentValue(5000);
-	HP.SetCurrentValue(100, PropertuModify_GUID);
+	HP.SetCurrentValue(100, DataSource);
 
 	HPReplay.GetMaxProperty().SetCurrentValue(1000);
-	HPReplay.SetCurrentValue(1, PropertuModify_GUID);
+	HPReplay.SetCurrentValue(1, DataSource);
 
 	PP.GetMaxProperty().SetCurrentValue(1000);
-	PP.SetCurrentValue(100, PropertuModify_GUID);
+	PP.SetCurrentValue(100, DataSource);
 
 	PPReplay.GetMaxProperty().SetCurrentValue(1000);
-	PPReplay.SetCurrentValue(1, PropertuModify_GUID);
+	PPReplay.SetCurrentValue(1, DataSource);
 
 	Evade.GetMaxProperty().SetCurrentValue(100);
-	Evade.SetCurrentValue(20, PropertuModify_GUID);
+	Evade.SetCurrentValue(20, DataSource);
 
 	HitRate.GetMaxProperty().SetCurrentValue(100);
-	HitRate.SetCurrentValue(50, PropertuModify_GUID);
+	HitRate.SetCurrentValue(50, DataSource);
 
 	Toughness.GetMaxProperty().SetCurrentValue(100);
-	Toughness.SetCurrentValue(0, PropertuModify_GUID);
+	Toughness.SetCurrentValue(0, DataSource);
 
 	CriticalHitRate.GetMaxProperty().SetCurrentValue(100);
-	CriticalHitRate.SetCurrentValue(0, PropertuModify_GUID);
+	CriticalHitRate.SetCurrentValue(0, DataSource);
 
 	CriticalDamage.GetMaxProperty().SetCurrentValue(100);
-	CriticalDamage.SetCurrentValue(50, PropertuModify_GUID);
+	CriticalDamage.SetCurrentValue(50, DataSource);
 
 	MoveSpeed.GetMaxProperty().SetCurrentValue(800);
-	MoveSpeed.SetCurrentValue(250, PropertuModify_GUID);
+	MoveSpeed.SetCurrentValue(250, DataSource);
 
 	RunningSpeedOffset.GetMaxProperty().SetCurrentValue(100);
-	RunningSpeedOffset.SetCurrentValue(100, PropertuModify_GUID);
+	RunningSpeedOffset.SetCurrentValue(100, DataSource);
 
 	RunningConsume.GetMaxProperty().SetCurrentValue(100);
-	RunningConsume.SetCurrentValue(3, PropertuModify_GUID);
+	RunningConsume.SetCurrentValue(3, DataSource);
 }
 
 FCharacterAttributes::~FCharacterAttributes()
@@ -169,6 +172,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	const auto& Ref = GAEvent.Data;
 	if (Ref.HitRate <= 0)
 	{
+		// 未命中
 	}
 	else
 	{
@@ -177,29 +181,45 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		{
 			CurCriticalDamage = (100 + Ref.CriticalDamage) / 100.f;
 		}
-
-		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
-		HP.AddCurrentValue(Ref.HP, PropertuModify_GUID);
-
-		if (Ref.ElementSet.IsEmpty())
 		{
-			HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage, PropertuModify_GUID);
-		}
-		else
-		{
-			for (const auto& Iter : Ref.ElementSet)
+			FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
+			HP.AddCurrentValue(Ref.HP, Ref.DataSource);
+
+			if (Ref.ElementSet.IsEmpty())
 			{
-				HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage, PropertuModify_GUID);
+				HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage, Ref.DataSource);
 			}
-		}
+			else
+			{
+				for (const auto& Iter : Ref.ElementSet)
+				{
+					HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage, Ref.DataSource);
+				}
+			}
 
-		HP.AddCurrentValue(Ref.TrueDamage, PropertuModify_GUID);
+			HP.AddCurrentValue(Ref.TrueDamage, Ref.DataSource);
+		}
 	}
 
 	// 显示对应的浮动UI
 	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
 	UIPtr->ProcessGAEVent(GAEvent);
 	UIPtr->AddToViewport(EUIOrder::kFightingTips);
+}
+
+const FElement& FCharacterAttributes::GetElement() const
+{
+	return Element;
+}
+
+const FBasePropertySet& FCharacterAttributes::GetHPReply() const
+{
+	return HPReplay;
+}
+
+const FBasePropertySet& FCharacterAttributes::GetPPReply() const
+{
+	return PPReplay;
 }
 
 FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)

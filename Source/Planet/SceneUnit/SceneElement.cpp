@@ -24,6 +24,11 @@ UBasicUnit::~UBasicUnit()
 
 }
 
+void UBasicUnit::InitialUnit()
+{
+
+}
+
 UBasicUnit::IDType UBasicUnit::GetID()const
 {
 	return ID;
@@ -280,6 +285,10 @@ TSubclassOf<USkill_Base> UActiveSkillUnit::GetSkillClass() const
 }
 
 UPassiveSkillUnit::UPassiveSkillUnit()
+{
+}
+
+void UPassiveSkillUnit::InitialUnit()
 {
 }
 

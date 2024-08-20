@@ -20,6 +20,15 @@ void USkill_Consumable_Base::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable*>(Spec.GameplayEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetDataPtr)
+		{
+			UnitPtr = GameplayAbilityTargetDataPtr->UnitPtr;
+		}
+	}
 }
 
 bool USkill_Consumable_Base::CanUse() const
@@ -41,11 +50,6 @@ void USkill_Consumable_Base::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetDataPtr)
-		{
-			UnitPtr = GameplayAbilityTargetDataPtr->UnitPtr;
-		}
 	}
 }
 
@@ -59,6 +63,22 @@ void USkill_Consumable_Base::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+bool USkill_Consumable_Base::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+) const
+{
+	if (UnitPtr && UnitPtr->CheckCooldown())
+	{
+		return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+	}
+
+	return false;
 }
 
 bool USkill_Consumable_Base::CommitAbility(

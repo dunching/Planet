@@ -27,7 +27,17 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 	FGameplayAbilityTargetData_PropertyModify();
 
 	FGameplayAbilityTargetData_PropertyModify(
-		const FGameplayTag& Tag
+		const FGameplayTag& Tag,
+		TSoftObjectPtr<UTexture2D>Icon,
+		float InDuration,
+		float InPerformActionInterval,
+		float InLosePropertyNumInterval,
+		const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap
+		);
+
+	FGameplayAbilityTargetData_PropertyModify(
+		const FGameplayTag& Tag,
+		bool bOnluReFreshTime
 	);
 
 	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);
@@ -40,13 +50,19 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 
 private:
 
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
 	float Duration = 3.f;
 
-	float PerformActionInterval = 1.f;
+	// < 0 为只执行一次 属性修改
+	float PerformActionInterval = -1.f;
 
-	FGuid Guid = FGuid::NewGuid();
+	// < 0 为移除所有层数
+	float LosePropertyNumInterval = -1.f;
+
+	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+
+	FGameplayTag DataSource;
+
+	bool bOnluReFreshTime = false;
 
 };
 
@@ -84,6 +100,8 @@ public:
 
 	virtual void UpdateDuration()override;
 
+	void SetCache(const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataPtr);
+
 protected:
 
 	virtual void InitialStateDisplayInfo()override;
@@ -96,7 +114,7 @@ protected:
 
 	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
 
-	const FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr = nullptr;
+	TArray<TSharedPtr<FGameplayAbilityTargetData_PropertyModify>>GameplayAbilityTargetDataAry;
 
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
 

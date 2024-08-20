@@ -126,9 +126,10 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
-			auto GAPtr = CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag];
+			auto GAPtr = Cast<UCS_PeriodicPropertyModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
 			if (GAPtr)
 			{
+				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
 				GAPtr->UpdateDuration();
 				return;
 			}
@@ -285,6 +286,16 @@ void UInteractiveBaseGAComponent::ExcuteAttackedEffect(EAffectedDirection Affect
 	}
 }
 
+UCS_Base* UInteractiveBaseGAComponent::GetCharacterState(const FGameplayTag& CSTag) const
+{
+	if (CharacterStateMap.Contains(CSTag))
+	{
+		return CharacterStateMap[CSTag];
+	}
+
+	return nullptr;
+}
+
 void UInteractiveBaseGAComponent::SendEventImp(
 	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
 )
@@ -378,7 +389,8 @@ void UInteractiveBaseGAComponent::SendEventImp(
 }
 
 void UInteractiveBaseGAComponent::SendEvent2Other(
-	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap, bool bIsWeaponAttack
+	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
+	const FGameplayTag& DataSource
 )
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
@@ -395,24 +407,8 @@ void UInteractiveBaseGAComponent::SendEvent2Other(
 	{
 		FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
 
-		GAEventData.bIsWeaponAttack = bIsWeaponAttack;
-
-		for (const auto& SecondIter : Iter.Value)
-		{
-			switch (SecondIter.Key)
-			{
-			case ECharacterPropertyType::kHP:
-			{
-				GAEventData.HP = SecondIter.Value.GetCurrentValue();
-			}
-			break;
-			case ECharacterPropertyType::kPP:
-			{
-				GAEventData.PP = SecondIter.Value.GetCurrentValue();
-			}
-			break;
-			}
-		}
+		GAEventData.DataSource = DataSource;
+		GAEventData.DataModify = Iter.Value;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
@@ -421,7 +417,8 @@ void UInteractiveBaseGAComponent::SendEvent2Other(
 }
 
 void UInteractiveBaseGAComponent::SendEvent2Self(
-	const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap
+	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap,
+	const FGameplayTag& DataSource
 )
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
@@ -430,31 +427,9 @@ void UInteractiveBaseGAComponent::SendEvent2Self(
 		return;
 	}
 
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
-	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
+	TPair<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>ModifyPropertyMap{ OnwerActorPtr, InModifyPropertyMap };
 
-	FGAEventData GAEventData(OnwerActorPtr, OnwerActorPtr);
-
-	for (const auto& Iter : ModifyPropertyMap)
-	{
-		switch (Iter.Key)
-		{
-		case ECharacterPropertyType::kHP:
-		{
-			GAEventData.HP = Iter.Value.GetCurrentValue();
-		}
-		break;
-		case ECharacterPropertyType::kPP:
-		{
-			GAEventData.PP = Iter.Value.GetCurrentValue();
-		}
-		break;
-		}
-	}
-
-	GAEventDataPtr->DataAry.Add(GAEventData);
-
-	SendEventImp(GAEventDataPtr);
+	SendEvent2Other({ ModifyPropertyMap }, DataSource);
 }
 
 void UInteractiveBaseGAComponent::InitialBaseGAs()
@@ -807,4 +782,35 @@ void UInteractiveBaseGAComponent::OnReceivedEventModifyData(FGameplayAbilityTarg
 	{
 		Iter->Modify(OutGAEventData);
 	}
+}
+
+TMap<ECharacterPropertyType, FBaseProperty> GetAllData()
+{
+	TMap<ECharacterPropertyType, FBaseProperty>Result;
+
+	Result.Add(ECharacterPropertyType::LiDao, 0);
+	Result.Add(ECharacterPropertyType::GenGu, 0);
+	Result.Add(ECharacterPropertyType::ShenFa, 0);
+	Result.Add(ECharacterPropertyType::DongCha, 0);
+	Result.Add(ECharacterPropertyType::TianZi, 0);
+
+	Result.Add(ECharacterPropertyType::GoldElement, 0);
+	Result.Add(ECharacterPropertyType::WoodElement, 0);
+	Result.Add(ECharacterPropertyType::WaterElement, 0);
+	Result.Add(ECharacterPropertyType::FireElement, 0);
+	Result.Add(ECharacterPropertyType::SoilElement, 0);
+
+	Result.Add(ECharacterPropertyType::BaseAttackPower, 0);
+	Result.Add(ECharacterPropertyType::Penetration, 0);
+	Result.Add(ECharacterPropertyType::PercentPenetration, 0);
+	Result.Add(ECharacterPropertyType::Resistance, 0);
+	Result.Add(ECharacterPropertyType::GAPerformSpeed, 0);
+	Result.Add(ECharacterPropertyType::Evade, 0);
+	Result.Add(ECharacterPropertyType::HitRate, 0);
+	Result.Add(ECharacterPropertyType::Toughness, 0);
+	Result.Add(ECharacterPropertyType::CriticalHitRate, 0);
+	Result.Add(ECharacterPropertyType::CriticalDamage, 0);
+	Result.Add(ECharacterPropertyType::MoveSpeed, 0);
+
+	return Result;
 }

@@ -46,12 +46,11 @@ struct FGAEventData
 	// 造成的真实伤害
 	int32 TrueDamage = 0;
 
-	// 攻击速度
-	int32 GAPerformSpeedOffset = 0;
+	// 造成的基础伤害
+	int32 BaseDamage = 0;
 
-	void SetBaseDamage(int32 Value);
-
-	void AddWuXingDamage(EWuXingType WuXingType, int32 Value);
+	// 伤害分布：类型、等级、伤害量
+	TSet<TTuple<EWuXingType, int32, int32>>ElementSet;
 
 	// 回复：HP
 	int32 HP = 0;
@@ -59,11 +58,14 @@ struct FGAEventData
 	// 回复：PP
 	int32 PP = 0;
 
-	// 造成的基础伤害
-	int32 BaseDamage = 0;
+	void SetBaseDamage(int32 Value);
 
-	// 伤害分布：类型、等级、伤害量
-	TSet<TTuple<EWuXingType, int32, int32>>ElementSet;
+	void AddWuXingDamage(EWuXingType WuXingType, int32 Value);
+
+	FGameplayTag DataSource;
+
+	// 直接修改的数据
+	TMap<ECharacterPropertyType, FBaseProperty>DataModify;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 

@@ -209,11 +209,11 @@ void USkill_Talent_NuQi::StartFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.AddCurrentValue(55, PropertuModify_GUID);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Penetration.AddCurrentValue(100, PropertuModify_GUID);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PercentPenetration.AddCurrentValue(50, PropertuModify_GUID);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddCurrentValue(100, PropertuModify_GUID);
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.AddCurrentValue(100, PropertuModify_GUID);
+		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+		ModifyPropertyMap.Add(ECharacterPropertyType::BaseAttackPower, 50);
+
+		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 	}
 
 	auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
@@ -229,7 +229,7 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().BaseAttackPower.RemoveCurrentValue(PropertuModify_GUID);
+		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
 	}
 
 	if (EffectItemPtr)
