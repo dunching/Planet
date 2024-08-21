@@ -49,31 +49,36 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-		GAEventData.HP = CharacterAttributes.HPReplay.GetCurrentValue();
+		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+
+		// »ù´¡»Ø¸´
+		{
+			GAEventData.HP = CharacterAttributes.HPReplay.GetCurrentValue();
+
+			if (
+				CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
+				)
+			{
+				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
+				{
+				}
+			}
+			else if (
+				CharacterPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running)
+				)
+			{
+				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
+				{
+					GAEventData.PP = CharacterAttributes.RunningConsume.GetCurrentValue();
+				}
+			}
+			else
+			{
+				GAEventData.PP = CharacterAttributes.PPReplay.GetCurrentValue();
+			}
+		}
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
-
-		if (
-			CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
-			)
-		{
-			if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
-			{
-			}
-		}
-		else if (
-			CharacterPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running)
-			)
-		{
-			if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
-			{
-				GAEventData.PP = CharacterAttributes.RunningConsume.GetCurrentValue();
-			}
-		}
-		else
-		{
-			GAEventData.PP = CharacterAttributes.PPReplay.GetCurrentValue();
-		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
@@ -85,4 +90,6 @@ FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesCo
 void UCharacterAttributesComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CharacterAttributes.InitialData();
 }

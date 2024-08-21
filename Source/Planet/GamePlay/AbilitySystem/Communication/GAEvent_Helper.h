@@ -64,6 +64,8 @@ struct FGAEventData
 
 	FGameplayTag DataSource;
 
+	bool bIsClearData = false;
+
 	// 直接修改的数据
 	TMap<ECharacterPropertyType, FBaseProperty>DataModify;
 
@@ -125,6 +127,8 @@ struct FGameplayAbilityTargetData_GAReceivedEvent : public FGameplayAbilityTarge
 	);
 
 	FGameplayAbilityTargetData_GAReceivedEvent* Clone()const;
+
+	TSharedPtr<FGameplayAbilityTargetData_GAReceivedEvent> Clone_SmartPtr()const;
 
 	FGAEventData Data;
 

@@ -37,7 +37,9 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 
 	FGameplayAbilityTargetData_PropertyModify(
 		const FGameplayTag& Tag,
-		bool bOnluReFreshTime
+		bool bOnluReFreshTime,
+		float InDuration,
+		float InLosePropertyNumInterval
 	);
 
 	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);
@@ -59,8 +61,6 @@ private:
 	float LosePropertyNumInterval = -1.f;
 
 	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
-	FGameplayTag DataSource;
 
 	bool bOnluReFreshTime = false;
 
@@ -114,7 +114,13 @@ protected:
 
 	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
 
+	bool OnTaskFinished_Continue(UAbilityTask_TimerHelper* TaskPtr);
+
+	bool OnTaskFinished(UAbilityTask_TimerHelper* TaskPtr);
+
 	TArray<TSharedPtr<FGameplayAbilityTargetData_PropertyModify>>GameplayAbilityTargetDataAry;
+
+	TSharedPtr<FGameplayAbilityTargetData_PropertyModify>CacheSPtr;
 
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
 

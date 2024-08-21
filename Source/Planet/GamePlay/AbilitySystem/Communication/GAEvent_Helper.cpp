@@ -110,6 +110,11 @@ FGameplayAbilityTargetData_GAReceivedEvent* FGameplayAbilityTargetData_GAReceive
 	return ResultPtr;
 }
 
+TSharedPtr<FGameplayAbilityTargetData_GAReceivedEvent> FGameplayAbilityTargetData_GAReceivedEvent::Clone_SmartPtr() const
+{
+	return TSharedPtr<FGameplayAbilityTargetData_GAReceivedEvent>(Clone());
+}
+
 IGAEventModifySendInterface::IGAEventModifySendInterface(int32 InPriority /*= 1*/) :
 	IGAEventModifyInterface(InPriority)
 {

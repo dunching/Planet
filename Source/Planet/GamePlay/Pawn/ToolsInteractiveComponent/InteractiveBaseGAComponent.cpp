@@ -116,6 +116,28 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddTemporaryTag(
 	return GAToolPeriodicHandle;
 }
 
+void UInteractiveBaseGAComponent::ClearData2Self(const FGameplayTag& DataSource)
+{
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
+
+	FGAEventData GAEventData(OnwerActorPtr, OnwerActorPtr);
+
+	GAEventData.DataSource = DataSource;
+	GAEventData.bIsClearData = true;
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	SendEventImp(GAEventDataPtr);
+}
+
 void UInteractiveBaseGAComponent::ExcuteEffects(
 	TSharedPtr<FGameplayAbilityTargetData_PropertyModify> GameplayAbilityTargetDataSPtr
 )
@@ -411,7 +433,6 @@ void UInteractiveBaseGAComponent::SendEvent2Other(
 		GAEventData.DataModify = Iter.Value;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
-
 	}
 	SendEventImp(GAEventDataPtr);
 }

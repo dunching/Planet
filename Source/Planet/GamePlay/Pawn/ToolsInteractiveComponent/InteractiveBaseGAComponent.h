@@ -60,9 +60,13 @@ public:
 		FGameplayAbilityTargetData_AddTemporaryTag* GameplayAbilityTargetDataPtr
 	);
 
+	void ClearData2Self(
+		const FGameplayTag &DataSource
+	);
+
 	void SendEvent2Other(
 		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-		const FGameplayTag &DataSource
+		const FGameplayTag& DataSource
 	);
 
 	void SendEvent2Self(

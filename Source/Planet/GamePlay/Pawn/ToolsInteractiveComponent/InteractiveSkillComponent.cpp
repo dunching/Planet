@@ -207,11 +207,21 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 
 			if (WeaponUnit && WeaponUnit->WeaponUnitPtr)
 			{
+				FGameplayAbilitySpec GameplayAbilitySpec(
+					WeaponUnit->WeaponUnitPtr->FirstSkill->GetSkillClass(),
+					WeaponUnit->WeaponUnitPtr->FirstSkill->Level
+				);
+
+				GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
+
+				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
+
+				GameplayAbilityTargetDataPtr->SkillUnitPtr = WeaponUnit->WeaponUnitPtr->FirstSkill;
+
+				GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+
 				WeaponUnit->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
-					FGameplayAbilitySpec(
-						WeaponUnit->WeaponUnitPtr->FirstSkill->GetSkillClass(),
-						WeaponUnit->WeaponUnitPtr->FirstSkill->Level
-					)
+					GameplayAbilitySpec
 				);
 
 				FActorSpawnParameters ActorSpawnParameters;

@@ -107,7 +107,9 @@ void USkill_Passive_ZMJZ::PerformAction()
 			{
 				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
 					SkillUnitPtr->GetUnitType(),
-					true
+					true,
+					DecreamTime,
+					SecondaryDecreamTime
 				);
 
 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
@@ -145,7 +147,7 @@ void USkill_Passive_ZMJZ::OnSendAttack(const FGAEventData& GAEventData)
 {
 	if (CharacterPtr)
 	{
-		if (GAEventData.bIsWeaponAttack)
+		if ((GAEventData.HitRate > 0) && GAEventData.bIsWeaponAttack)
 		{
 			PerformAction();
 		}

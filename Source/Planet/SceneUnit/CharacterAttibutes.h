@@ -116,9 +116,13 @@ struct PLANET_API FCharacterAttributes final
 {
 	GENERATED_USTRUCT_BODY()
 
+	using FProcessedGAEvent = TCallbackHandleContainer<void(const FGameplayAbilityTargetData_GAReceivedEvent&)>;
+
 	FCharacterAttributes();
 
 	virtual ~FCharacterAttributes();
+
+	void InitialData();
 
 	void ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
@@ -127,6 +131,8 @@ struct PLANET_API FCharacterAttributes final
 	const FBasePropertySet& GetHPReply()const;
 
 	const FBasePropertySet& GetPPReply()const;
+
+	FProcessedGAEvent ProcessedGAEvent;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName Name;

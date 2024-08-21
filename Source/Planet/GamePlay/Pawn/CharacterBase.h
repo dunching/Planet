@@ -16,9 +16,12 @@
 
 class UAbilitySystemComponent;
 
+struct FGameplayAbilityTargetData_GAReceivedEvent;
+
 class AEquipmentBase;
 class ASceneObj;
 class UCharacterTitle;
+class UFightingTips;
 
 class UAnimInstanceBase;
 class UEquipmentInteractionComponent;
@@ -50,9 +53,14 @@ public:
 
 	using FCharacterUnitType = UCharacterUnit;
 
-	using FTeamMembersChangedDelegateHandle = TCallbackHandleContainer<void(EGroupMateChangeType, FCharacterUnitType*)>::FCallbackHandleSPtr;
+	using FTeamMembersChangedDelegateHandle = 
+		TCallbackHandleContainer<void(EGroupMateChangeType, FCharacterUnitType*)>::FCallbackHandleSPtr;
 
-	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+	using FValueChangedDelegateHandle =
+		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+
+	using FProcessedGAEventHandle = 
+		TCallbackHandleContainer<void(const FGameplayAbilityTargetData_GAReceivedEvent&)>::FCallbackHandleSPtr;
 
 	ACharacterBase(const FObjectInitializer& ObjectInitializer);
 
@@ -140,6 +148,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
 	TObjectPtr<UInteractiveToolComponent> InteractiveToolComponentPtr = nullptr;
 	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UFightingTips>FightingTipsClass;
+
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
 private:
@@ -148,9 +159,13 @@ private:
 
 	void OnMoveSpeedChanged(int32 CurrentValue);
 
+	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
+
 	FValueChangedDelegateHandle HPChangedHandle;
 
 	FValueChangedDelegateHandle MoveSpeedChangedHandle;
+
+	FProcessedGAEventHandle ProcessedGAEventHandle;
 
 };
 

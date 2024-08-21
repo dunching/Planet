@@ -40,6 +40,8 @@
 #include "UICommon.h"
 #include "HumanAIController.h"
 #include "PlanetPlayerController.h"
+#include "GAEvent_Helper.h"
+#include "FightingTips.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -122,8 +124,13 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	HPChangedHandle = CharacterAttributesRef.HP.AddOnValueChanged(
 		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
 	);
+
 	MoveSpeedChangedHandle = CharacterAttributesRef.MoveSpeed.AddOnValueChanged(
 		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
+	);
+	
+	ProcessedGAEventHandle = CharacterAttributesRef.ProcessedGAEvent.AddCallback(
+		std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
 	);
 }
 
@@ -269,6 +276,14 @@ void ACharacterBase::OnHPChanged(int32 CurrentValue)
 void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
 {
 	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
+}
+
+void ACharacterBase::OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
+{
+	// 显示对应的浮动UI
+	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
+	UIPtr->ProcessGAEVent(GAEvent);
+	UIPtr->AddToViewport(EUIOrder::kFightingTips);
 }
 
 void ACharacterBase::OnCharacterGroupMateChanged(

@@ -56,15 +56,15 @@ void UGAEvent_Received::ActivateAbility(
 				return;
 			}
 
-			auto ClonePtr = GAEventDataPtr->Clone();
+			auto CloneSPtr = GAEventDataPtr->Clone_SmartPtr();
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*ClonePtr);
+			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*CloneSPtr);
 
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*ClonePtr);
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 
-			ClonePtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, ClonePtr->Data);
+			CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
-			GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamage.ExcuteCallback(CharacterPtr, ClonePtr->Data);
+			GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamage.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
 			if (GAEventDataPtr->Data.bIsMakeAttackEffect)
 			{

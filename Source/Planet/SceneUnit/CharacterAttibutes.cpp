@@ -80,30 +80,39 @@ FBaseProperty& FBasePropertySet::GetMaxProperty()
 
 FCharacterAttributes::FCharacterAttributes()
 {
+}
+
+FCharacterAttributes::~FCharacterAttributes()
+{
+
+}
+
+void FCharacterAttributes::InitialData()
+{
 	Name = TEXT("Player");
-	
+
 	LiDao.GetMaxProperty().SetCurrentValue(6);
-	
+
 	GenGu.GetMaxProperty().SetCurrentValue(6);
-	
+
 	ShenFa.GetMaxProperty().SetCurrentValue(6);
-	
+
 	DongCha.GetMaxProperty().SetCurrentValue(6);
 
 	TianZi.GetMaxProperty().SetCurrentValue(6);
 
 	Element.GoldElement.GetMaxProperty().SetCurrentValue(9);
 	Element.GoldElement.WuXingType = EWuXingType::kGold;
-	
+
 	Element.WoodElement.GetMaxProperty().SetCurrentValue(9);
 	Element.WoodElement.WuXingType = EWuXingType::kWood;
-	
+
 	Element.WaterElement.GetMaxProperty().SetCurrentValue(9);
 	Element.WaterElement.WuXingType = EWuXingType::kWater;
-	
+
 	Element.FireElement.GetMaxProperty().SetCurrentValue(9);
 	Element.FireElement.WuXingType = EWuXingType::kFire;
-	
+
 	Element.SoilElement.GetMaxProperty().SetCurrentValue(9);
 	Element.SoilElement.WuXingType = EWuXingType::kSoil;
 
@@ -161,30 +170,30 @@ FCharacterAttributes::FCharacterAttributes()
 	RunningConsume.SetCurrentValue(3, DataSource);
 }
 
-FCharacterAttributes::~FCharacterAttributes()
-{
-
-}
-
 void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
 	// 处理数据
 	const auto& Ref = GAEvent.Data;
+
 	if (Ref.HitRate <= 0)
 	{
 		// 未命中
 	}
-	else
-	{
-		float CurCriticalDamage = 1.f;
-		if (Ref.CriticalHitRate >= 100)
-		{
-			CurCriticalDamage = (100 + Ref.CriticalDamage) / 100.f;
-		}
-		{
-			FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
-			HP.AddCurrentValue(Ref.HP, Ref.DataSource);
 
+	// 会心伤害
+	float CurCriticalDamage = 1.f;
+	if (Ref.CriticalHitRate >= 100)
+	{
+		CurCriticalDamage = (100 + Ref.CriticalDamage) / 100.f;
+	}
+
+	// HP
+	{
+		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
+		HP.AddCurrentValue(Ref.HP, Ref.DataSource);
+
+		if (Ref.HitRate > 0)
+		{
 			if (Ref.ElementSet.IsEmpty())
 			{
 				HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage, Ref.DataSource);
@@ -201,10 +210,32 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		}
 	}
 
-	// 显示对应的浮动UI
-	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
-	UIPtr->ProcessGAEVent(GAEvent);
-	UIPtr->AddToViewport(EUIOrder::kFightingTips);
+	// PP
+	{
+		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(PP.GetCurrentProperty());
+		PP.AddCurrentValue(Ref.PP, Ref.DataSource);
+
+		if (Ref.HitRate > 0)
+		{
+		}
+	}
+
+	// 
+	{
+		for (const auto Iter : Ref.DataModify)
+		{
+			switch (Iter.Key)
+			{
+			case ECharacterPropertyType::GAPerformSpeed:
+			{
+				GAPerformSpeed.AddCurrentValue(Iter.Value.GetCurrentValue(), Ref.DataSource);
+			}
+			break;
+			}
+		}
+	}
+
+	ProcessedGAEvent(GAEvent);
 }
 
 const FElement& FCharacterAttributes::GetElement() const
