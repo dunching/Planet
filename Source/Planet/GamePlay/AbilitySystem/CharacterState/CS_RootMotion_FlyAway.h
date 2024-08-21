@@ -11,6 +11,7 @@
 #include "CS_RootMotion_FlyAway.generated.h"
 
 class UAbilityTask_TimerHelper;
+class UAbilityTask_FlyAway;
 class UTexture2D;
 class UConsumableUnit;
 class UEffectItem;
@@ -83,9 +84,9 @@ protected:
 
 	const FGameplayAbilityTargetData_RootMotion_FlyAway* GameplayAbilityTargetDataPtr = nullptr;
 	
-	UEffectItem* EffectItemPtr = nullptr;
-
-	UAbilityTask_TimerHelper* TaskPtr = nullptr;
+	UAbilityTask_FlyAway* RootMotionTaskPtr = nullptr;
+	
+	UAbilityTask_TimerHelper* AbilityTask_TimerHelperPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	float FlyAwayHeight = 250.f;

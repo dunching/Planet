@@ -25,6 +25,7 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+#include "AbilityTask_PlayMontage.h"
 
 void UCS_RootMotion_KnockDown::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
@@ -39,10 +40,6 @@ void UCS_RootMotion_KnockDown::PreActivate(
 		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion_KnockDown*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
 		}
 	}
 
@@ -69,34 +66,12 @@ void UCS_RootMotion_KnockDown::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (EffectItemPtr)
-	{
-		EffectItemPtr->RemoveFromParent();
-		EffectItemPtr = nullptr;
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UCS_RootMotion_KnockDown::UpdateDuration()
 {
-	if (TaskPtr)
-	{
-		TaskPtr->UpdateDuration();
-	}
-	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-	{
-		for (auto Iter : ActiveTasks)
-		{
-			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
-			{
-				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
-
-				RootMotionTaskPtr->UpdateDuration();
-				break;
-			}
-		}
-	}
+	PerformAction();
 }
 
 void UCS_RootMotion_KnockDown::PerformAction()
@@ -109,17 +84,32 @@ void UCS_RootMotion_KnockDown::PerformAction()
 
 void UCS_RootMotion_KnockDown::ExcuteTasks()
 {
-	if (CharacterPtr->IsPlayerControlled())
+	if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
 	{
-		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-		if (EffectPtr)
-		{
-			EffectItemPtr = EffectPtr->AddEffectItem();
-		}
+		TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+			this,
+			TEXT(""),
+			UKismetGravityLibrary::GetGravity(FVector::ZeroVector),
+			GameplayAbilityTargetDataPtr->KnockDownSpeed,
+			-1.f,
+			false,
+			true,
+			nullptr,
+			ERootMotionFinishVelocityMode::SetVelocity,
+			FVector::ZeroVector,
+			0.f,
+			false
+		);
+
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->ReadyForActivation();
+
+		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanding);
 	}
 	else
 	{
-
+		PlayMontage(HumanMontagePtr, 1.f);
 	}
 }
 
@@ -128,31 +118,32 @@ void UCS_RootMotion_KnockDown::OnTaskComplete()
 	K2_CancelAbility();
 }
 
-void UCS_RootMotion_KnockDown::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UCS_RootMotion_KnockDown::OnLanding(const FHitResult& Hit)
 {
-	if (CurrentInterval >= Interval)
-	{
-	}
+	PlayMontage(HumanMontagePtr, 1.f);
 }
 
-void UCS_RootMotion_KnockDown::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UCS_RootMotion_KnockDown::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
-	if (CharacterPtr->IsPlayerControlled())
-	{
-		if (CurrentInterval > Interval)
-		{
-		}
-		else
-		{
-			if (EffectItemPtr)
-			{
-			}
-		}
-	}
-	else
-	{
+	auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+		this,
+		TEXT(""),
+		CurMontagePtr,
+		CharacterPtr->GetMesh()->GetAnimInstance(),
+		Rate
+	);
 
-	}
+	AbilityTask_PlayMontage_PickAxePtr->Ability = this;
+	AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
+	AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
+
+	AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
+}
+
+void UCS_RootMotion_KnockDown::OnMontageComplete()
+{
+	K2_CancelAbility();
 }
 
 FGameplayAbilityTargetData_RootMotion_KnockDown::FGameplayAbilityTargetData_RootMotion_KnockDown() :

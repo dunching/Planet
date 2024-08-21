@@ -16,6 +16,7 @@ class UConsumableUnit;
 class UCS_PeriodicPropertyModify;
 class UCS_RootMotion;
 class UCS_Base;
+class UCS_RootMotion_KnockDown;
 
 struct FGameplayAbilityTargetData_RootMotion;
 struct FGameplayAbilityTargetData_PropertyModify;
@@ -121,8 +122,8 @@ protected:
 	// 在这些状态，通常会激活对应的GA，并选择对应的montage
 	// 
 	// 此状态（RootMotion）通过GA控制人物的可操控状态
-	FGameplayAbilitySpecHandle ExcuteEffects(
-		FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
+	void ExcuteEffects(
+		TSharedPtr<FGameplayAbilityTargetData_RootMotion> GameplayAbilityTargetDataSPtr
 	);
 
 	void ExcuteEffects(
@@ -133,7 +134,7 @@ protected:
 	// 先被眩晕2s，此时状态机选择被眩晕的动画，然后被虚弱1s，此时根据需求选择是否过度动画，虚弱结束之后回到眩晕的状态）
 	// 
 	// 此状态通过Tag控制人物的可操控状态
-	FGameplayAbilitySpecHandle ExcuteEffects(
+	void ExcuteEffects(
 		FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
 	);
 
@@ -151,11 +152,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilities;
 
-	// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	// 	TSubclassOf<UGA_Periodic_PropertyModefy> GA_Periodic_PropertyModefyClass;
-	// 
-	// 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	// 	TSubclassOf<UGA_Periodic_StateTagModefy> GA_Periodic_StateTagModefyClass;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TSubclassOf<UCS_RootMotion_KnockDown> CS_RootMotion_KnockDownClass;
 #pragma endregion GAs
 
 	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare>SendEventModifysMap;
@@ -166,6 +164,4 @@ protected:
 
 	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicStateTagModifyMap;
 	
-	TPair<FGameplayTag, FGameplayAbilitySpecHandle>PreviousRootMotionModify;
-
 };

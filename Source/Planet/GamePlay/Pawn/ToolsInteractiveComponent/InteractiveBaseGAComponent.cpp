@@ -43,6 +43,7 @@
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_RootMotion_TornadoTraction.h"
 #include "CS_RootMotion_MoveAlongSpline.h"
+#include "CS_RootMotion_KnockDown.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -186,12 +187,10 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 	}
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
+void UInteractiveBaseGAComponent::ExcuteEffects(
 	FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
 )
 {
-	FGameplayAbilitySpecHandle Result;
-
 	auto OnwerActorPtr = GameplayAbilityTargetDataPtr->TargetCharacterPtr.Get();
 	if (OnwerActorPtr)
 	{
@@ -206,7 +205,6 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 				if (GAPtr)
 				{
 					GAPtr->UpdateDuration();
-					return Result;
 				}
 			}
 		}
@@ -216,81 +214,86 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
 
 		FGameplayAbilitySpec Spec(UCS_RootMotion::StaticClass(), 1);
 
-		Result = ASCPtr->GiveAbilityAndActivateOnce(
+		ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,
 			&Payload
 		);
-
-		PeriodicStateTagModifyMap.Add(GameplayAbilityTargetDataPtr->Tag, Result);
 	}
-	return Result;
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::ExcuteEffects(
-	FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
+void UInteractiveBaseGAComponent::ExcuteEffects(
+	TSharedPtr<FGameplayAbilityTargetData_RootMotion> GameplayAbilityTargetDataSPtr
 )
 {
-	FGameplayAbilitySpecHandle Result;
-
-	auto OnwerActorPtr = GameplayAbilityTargetDataPtr->TargetCharacterPtr.Get();
+	auto OnwerActorPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr.Get();
 	if (OnwerActorPtr)
 	{
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		if (GameplayAbilityTargetDataPtr->Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
+		if (GameplayAbilityTargetDataSPtr->Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
 		{
-			if (PreviousRootMotionModify.Key.MatchesTagExact(GameplayAbilityTargetDataPtr->Tag))
+			if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 			{
-				auto GameplayAbilitySpecPtr =
-					ASCPtr->FindAbilitySpecFromHandle(PreviousRootMotionModify.Value);
-				if (GameplayAbilitySpecPtr)
+				auto GAPtr = CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag];
+				if (GAPtr)
 				{
-					auto GAPtr = Cast<UCS_RootMotion>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-					if (GAPtr)
-					{
-						GAPtr->UpdateDuration();
-						return Result;
-					}
+					GAPtr->UpdateDuration();
 				}
 			}
 			else
 			{
 				FGameplayEventData Payload;
-				Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+				Payload.TargetData.Add(GameplayAbilityTargetDataSPtr->Clone());
 
-				if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+				if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->KnockDown))
+				{
+					for (const auto Iter : CharacterStateMap)
+					{
+						if (Iter.Key.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+						{
+							ASCPtr->CancelAbilityHandle(
+								Iter.Value->GetCurrentAbilitySpecHandle()
+							);
+						}
+					}
+
+					FGameplayAbilitySpec Spec(CS_RootMotion_KnockDownClass, 1);
+
+					ASCPtr->GiveAbilityAndActivateOnce(
+						Spec,
+						&Payload
+					);
+				}
+				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
 				{
 					FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass(), 1);
 
-					Result = ASCPtr->GiveAbilityAndActivateOnce(
+					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
 						&Payload
 					);
 				}
-				else if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
+				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
 				{
 					FGameplayAbilitySpec Spec(UCS_RootMotion_TornadoTraction::StaticClass(), 1);
 
-					Result = ASCPtr->GiveAbilityAndActivateOnce(
+					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
 						&Payload
 					);
 				}
-				else if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
+				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
 				{
 					FGameplayAbilitySpec Spec(UCS_RootMotion_MoveAlongSpline::StaticClass(), 1);
 
-					Result = ASCPtr->GiveAbilityAndActivateOnce(
+					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
 						&Payload
 					);
 				}
-
-				PreviousRootMotionModify.Value = Result;
 			}
 		}
 	}
-	return Result;
 }
 
 void UInteractiveBaseGAComponent::ExcuteAttackedEffect(EAffectedDirection AffectedDirection)

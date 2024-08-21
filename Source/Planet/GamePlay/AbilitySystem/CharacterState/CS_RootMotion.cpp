@@ -32,6 +32,29 @@ UCS_RootMotion::UCS_RootMotion() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
+void UCS_RootMotion::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
+{
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion*>(TriggerEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetDataPtr)
+		{
+			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
+			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
+			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
+			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
+		}
+	}
+
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+}
+
 void UCS_RootMotion::UpdateDuration()
 {
 }
@@ -64,4 +87,9 @@ FGameplayAbilityTargetData_RootMotion* FGameplayAbilityTargetData_RootMotion::Cl
 	*ResultPtr = *this;
 
 	return ResultPtr;
+}
+
+TSharedPtr<FGameplayAbilityTargetData_RootMotion> FGameplayAbilityTargetData_RootMotion::Clone_SmartPtr() const
+{
+	return TSharedPtr<FGameplayAbilityTargetData_RootMotion>(Clone());
 }

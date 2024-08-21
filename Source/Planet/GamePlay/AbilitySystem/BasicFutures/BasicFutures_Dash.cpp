@@ -35,11 +35,11 @@ void UBasicFutures_Dash::PostCDOContruct()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
 
 		FAbilityTriggerData AbilityTriggerData;
 
-		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Affected;
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Dash;
 		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
 
 		AbilityTriggers.Add(AbilityTriggerData);
@@ -216,7 +216,6 @@ void UBasicFutures_Dash::DoDash(
 				PlayMontage(CurMontagePtr, Rate);
 
 				Displacement(Direction);
-
 			}
 		}
 	}

@@ -34,7 +34,9 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion : public FGameplayAbilit
 		const FGameplayTag& Tag
 	);
 
-	virtual FGameplayAbilityTargetData_RootMotion* Clone()const;
+	virtual FGameplayAbilityTargetData_RootMotion* Clone()const override;
+
+	TSharedPtr<FGameplayAbilityTargetData_RootMotion> Clone_SmartPtr()const ;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
@@ -54,6 +56,14 @@ class PLANET_API UCS_RootMotion : public UCS_Base
 public:
 
 	UCS_RootMotion();
+
+	virtual void PreActivate(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+		const FGameplayEventData* TriggerEventData = nullptr
+	);
 
 	virtual void UpdateDuration()override;
 

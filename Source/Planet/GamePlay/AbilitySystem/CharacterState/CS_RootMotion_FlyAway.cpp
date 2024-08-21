@@ -39,10 +39,6 @@ void UCS_RootMotion_FlyAway::PreActivate(
 		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion_FlyAway*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
 		}
 	}
 
@@ -69,33 +65,18 @@ void UCS_RootMotion_FlyAway::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (EffectItemPtr)
-	{
-		EffectItemPtr->RemoveFromParent();
-		EffectItemPtr = nullptr;
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UCS_RootMotion_FlyAway::UpdateDuration()
 {
-	if (TaskPtr)
+	if (AbilityTask_TimerHelperPtr)
 	{
-		TaskPtr->UpdateDuration();
+		AbilityTask_TimerHelperPtr->UpdateDuration();
 	}
-	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+	if (RootMotionTaskPtr)
 	{
-		for (auto Iter : ActiveTasks)
-		{
-			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
-			{
-				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
-
-				RootMotionTaskPtr->UpdateDuration();
-				break;
-			}
-		}
+		RootMotionTaskPtr->UpdateDuration();
 	}
 }
 
@@ -105,7 +86,7 @@ void UCS_RootMotion_FlyAway::PerformAction()
 	{
 		ExcuteTasks();
 
-		auto RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
+		RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
 			this,
 			TEXT(""),
 			GameplayAbilityTargetDataPtr->Duration,
@@ -125,11 +106,6 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
-		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-		if (EffectPtr)
-		{
-			EffectItemPtr = EffectPtr->AddEffectItem();
-		}
 	}
 	else
 	{
@@ -141,15 +117,15 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 	}
 	else
 	{
-		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration);
-		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
-		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
-		TaskPtr->OnFinished.BindLambda([this](auto) {
+		AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration);
+		AbilityTask_TimerHelperPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
+		AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+		AbilityTask_TimerHelperPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
 			return true;
 			});
-		TaskPtr->ReadyForActivation();
+		AbilityTask_TimerHelperPtr->ReadyForActivation();
 	}
 }
 
@@ -174,9 +150,6 @@ void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, flo
 		}
 		else
 		{
-			if (EffectItemPtr)
-			{
-			}
 		}
 	}
 	else

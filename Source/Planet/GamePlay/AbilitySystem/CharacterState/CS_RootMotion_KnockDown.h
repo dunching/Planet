@@ -11,6 +11,7 @@
 #include "CS_RootMotion_KnockDown.generated.h"
 
 class UAbilityTask_TimerHelper;
+class UAbilityTask_MyApplyRootMotionConstantForce;
 class UTexture2D;
 class UConsumableUnit;
 class UEffectItem;
@@ -28,6 +29,8 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion_KnockDown :
 	FGameplayAbilityTargetData_RootMotion_KnockDown();
 
 	virtual FGameplayAbilityTargetData_RootMotion_KnockDown* Clone()const override;
+
+	int32 KnockDownSpeed = 1000;
 
 private:
 
@@ -71,16 +74,20 @@ protected:
 
 	void ExcuteTasks();
 
-	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
-	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
 	void OnTaskComplete();
+
+	UFUNCTION()
+	void OnLanding(const FHitResult& Hit);
+
+	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
+
+	void OnMontageComplete();
 
 	const FGameplayAbilityTargetData_RootMotion_KnockDown* GameplayAbilityTargetDataPtr = nullptr;
 	
-	UEffectItem* EffectItemPtr = nullptr;
-
-	UAbilityTask_TimerHelper* TaskPtr = nullptr;
+	UAbilityTask_MyApplyRootMotionConstantForce* TaskPtr = nullptr;
 	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	UAnimMontage* HumanMontagePtr = nullptr;
+
 };

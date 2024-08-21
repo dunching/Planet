@@ -1,5 +1,5 @@
 
-#include "Skill_Active_FlyAway.h"
+#include "Skill_Active_KnockDown.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -30,20 +30,15 @@
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
+#include "CS_RootMotion_KnockDown.h"
 
-static TAutoConsoleVariable<int32> Skill_Active_FlyAway_DrawDebug(
-	TEXT("Skill_Active_FlyAway.DrawDebug"),
-	0,
-	TEXT("")
-	TEXT(" default: 0"));
-
-USkill_Active_FlyAway::USkill_Active_FlyAway() :
+USkill_Active_KnockDown::USkill_Active_KnockDown() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void USkill_Active_FlyAway::PreActivate(
+void USkill_Active_KnockDown::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -54,7 +49,7 @@ void USkill_Active_FlyAway::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void USkill_Active_FlyAway::ActivateAbility(
+void USkill_Active_KnockDown::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -68,7 +63,7 @@ void USkill_Active_FlyAway::ActivateAbility(
 	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-bool USkill_Active_FlyAway::CanActivateAbility(
+bool USkill_Active_KnockDown::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
@@ -83,7 +78,7 @@ bool USkill_Active_FlyAway::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void USkill_Active_FlyAway::EndAbility(
+void USkill_Active_KnockDown::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -94,7 +89,7 @@ void USkill_Active_FlyAway::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_FlyAway::PerformAction(
+void USkill_Active_KnockDown::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -108,7 +103,7 @@ void USkill_Active_FlyAway::PerformAction(
 	}
 }
 
-void USkill_Active_FlyAway::ExcuteTasks()
+void USkill_Active_KnockDown::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
@@ -117,25 +112,6 @@ void USkill_Active_FlyAway::ExcuteTasks()
 
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(CharacterPtr);
-
-#ifdef WITH_EDITOR
-		if (Skill_Active_FlyAway_DrawDebug.GetValueOnGameThread())
-		{
-			DrawDebugLine(
-				GetWorld(),
-				CharacterPtr->GetActorLocation(),
-				CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorRotation().Vector() * 100),
-				FColor::Red, false, 3
-			);
-
-			DrawDebugLine(
-				GetWorld(),
-				CharacterPtr->GetActorLocation(),
-				CharacterPtr->GetActorLocation() + (CharacterPtr->GetControlRotation().Vector() * 100),
-				FColor::Yellow, false, 3
-			);
-		}
-#endif
 
 		const auto Dir = UKismetMathLibrary::MakeRotFromZX(
 			UKismetGravityLibrary::GetGravity(CharacterPtr->GetActorLocation()), CharacterPtr->GetControlRotation().Vector()
@@ -156,11 +132,11 @@ void USkill_Active_FlyAway::ExcuteTasks()
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 
-		TSet<ACharacterBase*>TargetSet;
+		TSet <ACharacterBase*>TargetSet;
 		for (const auto & Iter : Result)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
+			if (TargetCharacterPtr && CharacterPtr->IsGroupmate(TargetCharacterPtr))
 			{
 				TargetSet.Add(TargetCharacterPtr);
 			}
@@ -180,9 +156,7 @@ void USkill_Active_FlyAway::ExcuteTasks()
 		// ¿ØÖÆÐ§¹û
 		for (const auto& Iter : TargetSet)
 		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_FlyAway;
-
-			GameplayAbilityTargetData_RootMotionPtr->Height = Height;
+			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_KnockDown;
 
 			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
@@ -192,7 +166,7 @@ void USkill_Active_FlyAway::ExcuteTasks()
 	}
 }
 
-void USkill_Active_FlyAway::PlayMontage()
+void USkill_Active_KnockDown::PlayMontage()
 {
 	{
 		const float InPlayRate = 1.f;

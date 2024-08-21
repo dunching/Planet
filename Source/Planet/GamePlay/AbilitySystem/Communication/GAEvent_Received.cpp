@@ -86,9 +86,9 @@ void UGAEvent_Received::ActivateAbility(
 				return;
 			}
 
-			auto ClonePtr = GAEventDataPtr->Clone();
+			auto CloneSPtr = GAEventDataPtr->Clone_SmartPtr();
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
+			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(CloneSPtr);
 		}
 		break;
 		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify:
