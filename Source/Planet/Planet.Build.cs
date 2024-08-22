@@ -42,6 +42,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState");
         PublicIncludePaths.Add("Planet/GamePlay/Controller");
         PublicIncludePaths.Add("Planet/GamePlay/GameInstance");
+        PublicIncludePaths.Add("Planet/GamePlay/GameMode");
         PublicIncludePaths.Add("Planet/GamePlay/GameplayTags");
         PublicIncludePaths.Add("Planet/GamePlay/PlayerState");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn");

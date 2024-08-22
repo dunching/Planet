@@ -53,6 +53,11 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	AbilitySystemComponentPtr->SetIsReplicated(true);
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
+	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
+	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
+	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
+	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
+
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
 	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UInteractiveBaseGAComponent>(UInteractiveBaseGAComponent::ComponentName);
@@ -88,6 +93,13 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		MoveSpeedChangedHandle->UnBindCallback();
 	}
+
+	if (CharacterTitlePtr)
+	{
+		CharacterTitlePtr->RemoveFromParent();
+		CharacterTitlePtr = nullptr;
+	}
+
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -98,16 +110,27 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 
 void ACharacterBase::PossessedBy(AController* NewController)
 {
+	auto OldController = Controller;
+
 	Super::PossessedBy(NewController);
+
+	if (OldController && OldController->IsA(AAIController::StaticClass()))
+	{
+		OldController->Destroy();
+	}
 
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-	CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-	if (CharacterTitlePtr)
+
+	if (!CharacterTitlePtr)
 	{
-		CharacterTitlePtr->CharacterPtr = this;
-		CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+		CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+		if (CharacterTitlePtr)
+		{
+			CharacterTitlePtr->CharacterPtr = this;
+			CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+		}
 	}
 
 	auto GASPtr = GetAbilitySystemComponent();
@@ -134,6 +157,16 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	);
 }
 
+void ACharacterBase::UnPossessed()
+{
+	Super::UnPossessed();
+
+	if (!IsActorBeingDestroyed())
+	{
+		SpawnDefaultController();
+	}
+}
+
 void ACharacterBase::Interaction(ACharacterBase* CharacterPtr)
 {
 
@@ -156,41 +189,17 @@ class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent()
 
 UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent()const
 {
-	if (IsPlayerControlled())
-	{
-		return GetController<APlanetPlayerController>()->GetHoldingItemsComponent();
-	}
-	else if (IsBotControlled() || IsLocallyControlled())
-	{
-		return GetController<APlanetAIController>()->GetHoldingItemsComponent();
-	}
-	return nullptr;
+	return HoldingItemsComponentPtr;
 }
 
 UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent()const
 {
-	if (IsPlayerControlled())
-	{
-		return GetController<APlanetPlayerController>()->GetCharacterAttributesComponent();
-	}
-	else if (IsBotControlled() || IsLocallyControlled())
-	{
-		return GetController<APlanetAIController>()->GetCharacterAttributesComponent();
-	}
-	return nullptr;
+	return CharacterAttributesComponentPtr;
 }
 
 UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
 {
-	if (IsPlayerControlled())
-	{
-		return GetController<APlanetPlayerController>()->GetTalentAllocationComponent();
-	}
-	else if (IsBotControlled() || IsLocallyControlled())
-	{
-		return GetController<APlanetAIController>()->GetTalentAllocationComponent();
-	}
-	return nullptr;
+	return TalentAllocationComponentPtr;
 }
 
 UInteractiveBaseGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
@@ -215,28 +224,18 @@ UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()const
 
 UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 {
-	if (IsPlayerControlled())
-	{
-		return GetController<APlanetPlayerController>()->GetGroupMnaggerComponent();
-	}
-	else if (IsBotControlled() || IsLocallyControlled())
-	{
-		return GetController<APlanetAIController>()->GetGroupMnaggerComponent();
-	}
-	return nullptr;
+	return GroupMnaggerComponentPtr;
 }
 
 UCharacterUnit* ACharacterBase::GetCharacterUnit()const
 {
-	if (IsPlayerControlled())
-	{
-		return GetController<APlanetPlayerController>()->GetCharacterUnit();
-	}
-	else if (IsBotControlled() || IsLocallyControlled())
-	{
-		return GetController<APlanetAIController>()->GetCharacterUnit();
-	}
-	return nullptr;
+	return CharacterUnitPtr;
+}
+
+void ACharacterBase::SetCharacterUnit(UCharacterUnit* InCharacterUnitPtr)
+{
+	CharacterUnitPtr = InCharacterUnitPtr;
+	CharacterUnitPtr->ProxyCharacterPtr = this;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const

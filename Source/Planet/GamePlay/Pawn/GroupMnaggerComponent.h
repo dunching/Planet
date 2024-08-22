@@ -102,7 +102,7 @@ public:
 
 	using FCharacterUnitType = UCharacterUnit;
 
-	using FOwnerType = IPlanetControllerInterface;
+	using FOwnerType = ACharacterBase;
 
 	using FPawnType = ACharacterBase;
 

@@ -35,14 +35,12 @@
 #include "SceneUnitContainer.h"
 #include "InteractiveBaseGAComponent.h"
 #include "EffectsList.h"
+#include "PlanetPlayerState.h"
+#include "PlanetGameMode.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
-	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
-	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
 }
 
 void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
@@ -160,9 +158,6 @@ void APlanetPlayerController::BeginPlay()
 
 void APlanetPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	CharacterUnitPtr->RelieveRootBind();
-	CharacterUnitPtr = nullptr;
-
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -307,9 +302,6 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 
 void APlanetPlayerController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)
 {
-	CharacterUnitPtr = NewGourpMateUnitPtr;
-
-//	CharacterUnitPtr->RemoveFromRoot();
 }
 
 UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponent() const
@@ -319,27 +311,27 @@ UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponen
 
 UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()const
 {
-	return GroupMnaggerComponentPtr;
+	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
 }
 
 UHoldingItemsComponent* APlanetPlayerController::GetHoldingItemsComponent() const
 {
-	return HoldingItemsComponentPtr;
+	return GetPawn<FPawnType>()->GetHoldingItemsComponent();
 }
 
 UCharacterAttributesComponent* APlanetPlayerController::GetCharacterAttributesComponent() const
 {
-	return CharacterAttributesComponentPtr;
+	return GetPawn<FPawnType>()->GetCharacterAttributesComponent();
 }
 
 UTalentAllocationComponent* APlanetPlayerController::GetTalentAllocationComponent() const
 {
-	return TalentAllocationComponentPtr;
+	return GetPawn<FPawnType>()->GetTalentAllocationComponent();
 }
 
 UCharacterUnit* APlanetPlayerController::GetCharacterUnit()
 {
-	return CharacterUnitPtr;
+	return GetPawn<FPawnType>()->GetCharacterUnit();
 }
 
 ACharacterBase* APlanetPlayerController::GetRealCharacter()const
@@ -349,34 +341,20 @@ ACharacterBase* APlanetPlayerController::GetRealCharacter()const
 
 void APlanetPlayerController::BindPCWithCharacter()
 {
-	RealCharacter = GetPawn<FPawnType>();
-
-	CharacterUnitPtr->ProxyCharacterPtr = RealCharacter;
-	CharacterUnitPtr->CharacterAttributes->Name = RealCharacter->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
 }
 
 UCharacterUnit* APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
-	if (CharacterUnitPtr)
+	if (!CharaterPtr->GetCharacterUnit())
 	{
-		CharacterUnitPtr->RelieveRootBind();
+		const auto CharacterUnitPtr =
+			Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
+
+		CharaterPtr->SetCharacterUnit(CharacterUnitPtr);
+		return CharacterUnitPtr;
 	}
-	CharacterUnitPtr = nullptr;
 
-	// 通过临时 SceneUnitContainer 的创建UnitPtr
-	auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
-
-	ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
-
-	CharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
-
-	SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
-
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
-
-	return CharacterUnitPtr;
+	return nullptr;
 }
 
 void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)

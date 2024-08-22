@@ -340,7 +340,7 @@ void UGroupMnaggerComponent::BeginPlay()
 TSharedPtr<FGroupMatesHelper> UGroupMnaggerComponent::CreateGroup()
 {
 	GroupHelperSPtr = MakeShared<FGroupMatesHelper>();
-	GroupHelperSPtr->OwnerCharacterUnitPtr = GetOwner<IPlanetControllerInterface>()->GetCharacterUnit();
+	GroupHelperSPtr->OwnerCharacterUnitPtr = GetOwner<FOwnerType>()->GetCharacterUnit();
 	for (;;)
 	{
 		GroupHelperSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
@@ -355,7 +355,7 @@ TSharedPtr<FGroupMatesHelper> UGroupMnaggerComponent::CreateGroup()
 TSharedPtr<FTeamMatesHelper> UGroupMnaggerComponent::CreateTeam()
 {
 	TeamHelperSPtr = MakeShared<FTeamMatesHelper>();
-	TeamHelperSPtr->OwnerCharacterUnitPtr = GetOwner<IPlanetControllerInterface>()->GetCharacterUnit();
+	TeamHelperSPtr->OwnerCharacterUnitPtr = GetOwner<FOwnerType>()->GetCharacterUnit();
 	for (;;)
 	{
 		TeamHelperSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());

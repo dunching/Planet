@@ -23,7 +23,7 @@ class PLANET_API UCharacterAttributesComponent : public UActorComponent
 
 public:
 
-	using FOwnerType = IPlanetControllerInterface;
+	using FOwnerType = ACharacterBase;
 
 	using FPawnType = ACharacterBase;
 

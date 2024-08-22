@@ -110,23 +110,6 @@ USkillUnit* FSceneUnitContainer::FindUnit_Skill(FGameplayTag UnitType)
 	return nullptr;
 }
 
-UCharacterUnit* FSceneUnitContainer::AddUnit_Groupmate(FGameplayTag UnitType)
-{
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-	auto ResultPtr = NewObject<UCharacterUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
-//	ResultPtr->AddToRoot();
-
-	const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-
-	ResultPtr->ID = NewID;
-	ResultPtr->UnitType = UnitType;
-
-	AddUnit_Groupmate(ResultPtr);
-
-	return ResultPtr;
-}
-
 void FSceneUnitContainer::AddUnit_Groupmate(UCharacterUnit* UnitPtr)
 {
 	SceneToolsAry.Add(UnitPtr);
@@ -373,7 +356,7 @@ TArray<UCharacterUnit*> FSceneUnitContainer::GetGourpmateUintAry() const
 	return Result;
 }
 
-FTableRowUnit* FSceneUnitContainer::GetTableRowUnit(FGameplayTag UnitType) const
+FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType) 
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();

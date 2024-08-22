@@ -35,8 +35,7 @@ FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes()
 
 void UCharacterAttributesComponent::ProcessCharacterAttributes()
 {
-	auto OwnerPtr = GetOwner<FOwnerType>();
-	auto CharacterPtr = OwnerPtr->GetRealCharacter();
+	auto CharacterPtr = GetOwner<FOwnerType>();
 	if (CharacterPtr)
 	{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;

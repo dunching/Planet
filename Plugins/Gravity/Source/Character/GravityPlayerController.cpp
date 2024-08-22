@@ -316,10 +316,12 @@ void AGravityPlayerController::FindPathForMoveRequest(const FAIMoveRequest& Move
 
 void AGravityPlayerController::StopMovement()
 {
-	if (PathFollowingComponent)
-	{
-		PathFollowingComponent->AbortMove(*this, FPathFollowingResultFlags::MovementStop | FPathFollowingResultFlags::ForcedScript);
-	}
+	Super::StopMovement();
+
+// 	if (PathFollowingComponent)
+// 	{
+// 		PathFollowingComponent->AbortMove(*this, FPathFollowingResultFlags::MovementStop | FPathFollowingResultFlags::ForcedScript);
+// 	}
 }
 
 void AGravityPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)

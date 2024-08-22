@@ -61,27 +61,9 @@ protected:
 
 	virtual UCharacterUnit* InitialCharacterUnit(ACharacterBase* CharaterPtr)override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
-	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
-	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
 	FGameplayTag RowName = FGameplayTag::EmptyTag;
 	
 private:
-
-	// 
-	TObjectPtr<FPawnType> RealCharacter;
 
 };

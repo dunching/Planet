@@ -20,7 +20,9 @@ class UHoldingItemsComponent : public UActorComponent
 
 public:
 
-	using FOwnerType = IPlanetControllerInterface;
+	using FOwnerType = ACharacterBase;
+
+	using FPawnType = ACharacterBase;
 
 	UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer);
 

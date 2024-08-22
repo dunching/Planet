@@ -34,7 +34,7 @@ class PLANET_API APlanetPlayerController :
 
 public:
 
-	using FPawnType = AHumanCharacter;
+	using FPawnType = ACharacterBase;
 
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -93,31 +93,13 @@ protected:
 
 	void BindRemove(AActor* Actor);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
-	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
-
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge	FocusInformation;
 
 	UFocusIcon* FocusIconPtr = nullptr;
 
-	UPROPERTY(Transient)
-	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
 	FGameplayTag RowName = FGameplayTag::EmptyTag;
-
-	// 
-	TObjectPtr<FPawnType> RealCharacter;
 
 };

@@ -27,6 +27,8 @@ class USkill_Consumable_Base;
 class USkill_Consumable_Generic;
 class AConsumable_Base;
 class IPlanetControllerInterface;
+class APlanetPlayerState;
+class APlanetGameMode;
 
 class USkill_Base;
 class ACharacterBase;
@@ -82,6 +84,7 @@ class PLANET_API UBasicUnit : public UObject
 public:
 
 	friend FSceneUnitContainer;
+	friend APlanetGameMode;
 
 	using IDType = int32;
 

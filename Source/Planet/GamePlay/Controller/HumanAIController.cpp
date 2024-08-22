@@ -165,6 +165,11 @@ void AHumanAIController::OnUnPossess()
 		TeamHelperChangedDelegate->UnBindCallback();
 	}
 
+	if (StateTreeAIComponentPtr)
+	{
+		StateTreeAIComponentPtr->Cleanup();
+	}
+
 	Super::OnUnPossess();
 }
 
@@ -173,9 +178,13 @@ void AHumanAIController::OnGroupChanged()
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
-		SetCampType(
-			CharacterPtr->IsTeammate(Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0))) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
-		);
+		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (PlayerCharacterPtr)
+		{
+			SetCampType(
+				CharacterPtr->IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+			);
+		}
 	}
 }
 

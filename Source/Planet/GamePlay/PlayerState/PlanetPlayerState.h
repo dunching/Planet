@@ -13,6 +13,7 @@
 
 class UPlanetAbilitySystemComponent;
 class UHoldingItemsComponent;
+class UCharacterUnit;
 
 UCLASS()
 class PLANET_API APlanetPlayerState : public APlayerState
@@ -22,13 +23,13 @@ class PLANET_API APlanetPlayerState : public APlayerState
 public:
 
 	APlanetPlayerState();
-
+	
 protected:
 
 	virtual void BeginPlay() override;
 
 	void InitialData();
-	
+
 private:
 
 };

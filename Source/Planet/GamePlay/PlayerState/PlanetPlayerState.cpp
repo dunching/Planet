@@ -7,6 +7,9 @@
 #include "CharacterAttributesComponent.h"
 #include "HoldingItemsComponent.h"
 #include "GameplayTagsSubSystem.h"
+#include "SceneUnitContainer.h"
+#include "SceneUnitTable.h"
+#include "SceneElement.h"
 
 APlanetPlayerState::APlanetPlayerState() :
 	Super()

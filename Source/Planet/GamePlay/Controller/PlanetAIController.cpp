@@ -22,14 +22,11 @@
 #include "CharacterAttibutes.h"
 #include "TalentAllocationComponent.h"
 #include "SceneUnitContainer.h"
+#include "PlanetGameMode.h"
 
 APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
-	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
-	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
 }
 
 void APlanetAIController::OnPossess(APawn* InPawn)
@@ -59,27 +56,27 @@ UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() 
 
 UGroupMnaggerComponent* APlanetAIController::GetGroupMnaggerComponent() const
 {
-	return GroupMnaggerComponentPtr;
+	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
 }
 
 UHoldingItemsComponent* APlanetAIController::GetHoldingItemsComponent() const
 {
-	return HoldingItemsComponentPtr;
+	return GetPawn<FPawnType>()->GetHoldingItemsComponent();
 }
 
 UCharacterAttributesComponent* APlanetAIController::GetCharacterAttributesComponent() const
 {
-	return CharacterAttributesComponentPtr;
+	return GetPawn<FPawnType>()->GetCharacterAttributesComponent();
 }
 
 UTalentAllocationComponent* APlanetAIController::GetTalentAllocationComponent() const
 {
-	return TalentAllocationComponentPtr;
+	return GetPawn<FPawnType>()->GetTalentAllocationComponent();
 }
 
 UCharacterUnit* APlanetAIController::GetCharacterUnit()
 {
-	return CharacterUnitPtr;
+	return GetPawn<FPawnType>()->GetCharacterUnit();
 }
 
 ACharacterBase* APlanetAIController::GetRealCharacter()const
@@ -94,47 +91,27 @@ void APlanetAIController::BeginPlay()
 
 void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	CharacterUnitPtr->RelieveRootBind();
-	CharacterUnitPtr = nullptr;
-
 	Super::EndPlay(EndPlayReason);
 }
 
 void APlanetAIController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)
 {
-	CharacterUnitPtr = NewGourpMateUnitPtr;
-
-	//	CharacterUnitPtr->RemoveFromRoot();
 }
 
 void APlanetAIController::BindPCWithCharacter()
 {
-	RealCharacter = GetPawn<FPawnType>();
-
-	CharacterUnitPtr->ProxyCharacterPtr = RealCharacter;
-	CharacterUnitPtr->CharacterAttributes->Name = RealCharacter->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
 }
 
 UCharacterUnit* APlanetAIController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
-	if (CharacterUnitPtr)
+	if (!CharaterPtr->GetCharacterUnit())
 	{
-		CharacterUnitPtr->RelieveRootBind();
+		const auto CharacterUnitPtr =
+			Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
+
+		CharaterPtr->SetCharacterUnit(CharacterUnitPtr);
+		return CharacterUnitPtr;
 	}
-	CharacterUnitPtr = nullptr;
 
-	// 通过临时 SceneUnitContainer 的创建UnitPtr
-	auto SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
-
-	ResetGroupmateUnit(SceneUnitContainer->AddUnit_Groupmate(RowName));
-
-	CharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
-
-	SceneUnitContainer = HoldingItemsComponentPtr->GetSceneUnitContainer();
-
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
-
-	return CharacterUnitPtr;
+	return nullptr;
 }

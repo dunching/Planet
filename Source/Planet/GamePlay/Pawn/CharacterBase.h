@@ -68,6 +68,8 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void UnPossessed() override;
+
 	virtual void Interaction(ACharacterBase* CharacterPtr) override;
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr) override;
@@ -94,6 +96,8 @@ public:
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
 
 	UCharacterUnit* GetCharacterUnit()const;
+
+	void SetCharacterUnit(UCharacterUnit* CharacterUnitPtr);
 
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
@@ -132,6 +136,18 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
+	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
@@ -166,6 +182,9 @@ private:
 	FValueChangedDelegateHandle MoveSpeedChangedHandle;
 
 	FProcessedGAEventHandle ProcessedGAEventHandle;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
 
 };
 

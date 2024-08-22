@@ -39,6 +39,8 @@ struct FSceneUnitContainer;
 
 enum class ECharacterPropertyType : uint8;
 
+FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType);
+
 #pragma region HoldItem
 USTRUCT(BlueprintType)
 struct FSceneUnitContainer final
@@ -87,8 +89,6 @@ struct FSceneUnitContainer final
 	USkillUnit* FindUnit_Skill(FGameplayTag UnitType);
 
 
-	UCharacterUnit* AddUnit_Groupmate(FGameplayTag UnitType);
-
 	void AddUnit_Groupmate(UCharacterUnit* UnitPtr);
 
 
@@ -110,8 +110,6 @@ struct FSceneUnitContainer final
 
 private:
 
-	FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType)const;
-	
 	// 自定义的“排列方式”
 	UPROPERTY(Transient)
 	TArray<UBasicUnit*> SceneToolsAry;

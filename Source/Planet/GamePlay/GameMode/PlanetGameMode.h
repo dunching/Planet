@@ -14,6 +14,9 @@
 
 extern PLANET_API class AShiYuGameMode* GGameModePtr;
 
+class UHoldingItemsComponent;
+class UCharacterUnit;
+
 /**
  *
  */
@@ -25,6 +28,10 @@ class PLANET_API APlanetGameMode : public AGameModeBase
 public:
 
 	APlanetGameMode();
+	
+	UCharacterUnit* AddCharacterUnit(FGameplayTag UnitType);
+
+	UCharacterUnit* FindCharacterUnit(int32 ID);
 
 protected:
 
@@ -32,13 +39,17 @@ protected:
 
 	virtual void BeginPlay()override;
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
+
 	virtual void BeginDestroy()override;
 
 	UFUNCTION()
-		void OnVoxelWorldGenerated();
+	void OnVoxelWorldGenerated();
 
 	UFUNCTION()
-		void OnVoxelWorldLoad();
+	void OnVoxelWorldLoad();
+	
+protected:
 
 private:
 
@@ -49,5 +60,9 @@ private:
 	FTimerHandle SaveGameTimer;
 
 	FDelegateHandle Delegate;
+	
+	// 角色序列,第0个为Player
+	UPROPERTY(Transient)
+	TMap<int32, UCharacterUnit*> CharacterUnitMap;
 
 };

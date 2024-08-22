@@ -105,12 +105,12 @@ void AHumanCharacter::BeginPlay()
 #if TESTPLAYERCHARACTERHOLDDATA
 			TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
-			}
+		}
 		else if (GetController()->IsA(AHumanAIController::StaticClass()))
 		{
 		}
-		}
 	}
+}
 
 void AHumanCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
