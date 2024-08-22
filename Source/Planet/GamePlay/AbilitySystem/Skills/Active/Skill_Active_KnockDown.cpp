@@ -136,7 +136,7 @@ void USkill_Active_KnockDown::ExcuteTasks()
 		for (const auto & Iter : Result)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr && CharacterPtr->IsGroupmate(TargetCharacterPtr))
+			if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
 			{
 				TargetSet.Add(TargetCharacterPtr);
 			}

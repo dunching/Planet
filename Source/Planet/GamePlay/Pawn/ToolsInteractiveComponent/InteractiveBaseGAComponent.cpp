@@ -242,12 +242,24 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 			}
 			else
 			{
-				FGameplayEventData Payload;
-				Payload.TargetData.Add(GameplayAbilityTargetDataSPtr->Clone());
+				auto MakeSpec = [GameplayAbilityTargetDataSPtr, this]
+					{
+						auto ClonePtr = GameplayAbilityTargetDataSPtr->Clone();
+						auto Handle = ClonePtr->CharacterStateChanged.AddCallback(
+							std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
+						);
+						Handle->bIsAutoUnregister = false;
+
+						FGameplayEventData * Payload = new FGameplayEventData;
+						Payload->TargetData.Add(ClonePtr);
+
+						return Payload;
+					};
 
 				if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->KnockDown))
 				{
-					for (const auto Iter : CharacterStateMap)
+					const auto TempCharacterStateMap = CharacterStateMap;
+					for (const auto Iter : TempCharacterStateMap)
 					{
 						if (Iter.Key.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
 						{
@@ -261,7 +273,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						&Payload
+						MakeSpec()
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
@@ -270,7 +282,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						&Payload
+						MakeSpec()
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
@@ -279,7 +291,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						&Payload
+						MakeSpec()
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
@@ -288,7 +300,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						&Payload
+						MakeSpec()
 					);
 				}
 			}
