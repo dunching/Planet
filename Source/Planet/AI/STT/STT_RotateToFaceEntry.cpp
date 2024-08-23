@@ -64,7 +64,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (InstanceData.AIControllerPtr->GetTeamFocusTarget())
+	if (InstanceData.AIControllerPtr->GetFocusActor())
 	{
 		const float AngleTolerance = 5.f;
 
@@ -91,7 +91,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::PerformMoveTask(FStateTreeExecutionC
 
 	if (InstanceData.CharacterPtr && InstanceData.AIControllerPtr)
 	{
-		InstanceData.AIControllerPtr->SetFocus(InstanceData.AIControllerPtr->GetTeamFocusTarget());
+		InstanceData.AIControllerPtr->SetFocus(InstanceData.TargetCharacterPtr.Get());
 
 		return EStateTreeRunStatus::Running;
 	}

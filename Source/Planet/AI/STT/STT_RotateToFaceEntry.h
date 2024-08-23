@@ -15,6 +15,7 @@
 
 class UEnvQuery;
 
+class ACharacterBase;
 class AHumanCharacter;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
@@ -31,6 +32,9 @@ struct PLANET_API FStateTreeRotateToFaceEntryTaskInstanceData
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = Context)
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
 };
 

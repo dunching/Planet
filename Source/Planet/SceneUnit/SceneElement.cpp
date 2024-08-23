@@ -313,12 +313,6 @@ UCharacterUnit::UCharacterUnit()
 	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
 }
 
-void UCharacterUnit::InitialByCharactor(FPawnType* InCharacterPtr)
-{
-	ProxyCharacterPtr = InCharacterPtr;
-	CharacterAttributes->Name = InCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name;
-}
-
 FTableRowUnit_CharacterInfo* UCharacterUnit::GetTableRowUnit_CharacterInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();

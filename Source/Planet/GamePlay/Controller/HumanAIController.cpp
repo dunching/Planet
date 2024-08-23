@@ -44,36 +44,9 @@ UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
 	return AIPerceptionComponentPtr;
 }
 
-AActor* AHumanAIController::GetTeamFocusTarget() const
+bool AHumanAIController::CheckIsFarawayOriginal() const
 {
-	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
-	{
-		auto LeaderCharacterPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerCharacterUnitPtr->ProxyCharacterPtr;
-		{
-			auto LeaderPCPtr = LeaderCharacterPtr->GetController<APlanetPlayerController>();
-			if (LeaderPCPtr)
-			{
-				return LeaderPCPtr->GetFocusActor();
-			}
-		}
-		{
-			auto LeaderPCPtr = LeaderCharacterPtr->GetController<AHumanAIController>();
-			if (LeaderPCPtr)
-			{
-				auto ResultPtr = LeaderPCPtr->GetFocusActor();
-				if (ResultPtr)
-				{
-					return ResultPtr;
-				}
-				else
-				{
-					return LeaderPCPtr->TargetCharacterPtr;
-				}
-			}
-		}
-	}
-
-	return nullptr;
+	return false;
 }
 
 void AHumanAIController::OnTeammateOptionChangedImp(
@@ -118,6 +91,9 @@ void AHumanAIController::OnConstruction(const FTransform& Transform)
 void AHumanAIController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
+	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
 }
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)

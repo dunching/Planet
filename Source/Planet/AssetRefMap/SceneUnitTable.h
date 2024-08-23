@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 
 #include "SceneElement.h"
+#include "CharacterAttibutes.h"
 
 #include "SceneUnitTable.generated.h"
 
@@ -125,9 +126,32 @@ struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
+	FTableRowUnit_CharacterInfo();
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag> FirstActiveSkillSet;
+	TSet<FGameplayTag> FirstWeaponSocketInfo;
 	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag> SecondWeaponSocketInfo;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag> _1ActiveSkillSet;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag> _2ActiveSkillSet;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag> _3ActiveSkillSet;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag> _4ActiveSkillSet;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FCharacterAttributes CharacterAttributes;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FCharacterAttributes CharacterAttributesPerLevel;
+
 };
 
 USTRUCT(BlueprintType)

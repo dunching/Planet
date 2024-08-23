@@ -42,15 +42,6 @@ UAIPerceptionComponent* AHorseAIController::GetAIPerceptionComponent()
 	return AIPerceptionComponentPtr;
 }
 
-AActor* AHorseAIController::GetTeamFocusTarget() const
-{
-	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
-	{
-	}
-
-	return nullptr;
-}
-
 void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
 	FCharacterUnitType* LeaderPCPtr

@@ -94,6 +94,21 @@ void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+TWeakObjectPtr<ACharacterBase> APlanetAIController::GetTeamFocusTarget() const
+{
+	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
+	{
+		return GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
+	}
+
+	return nullptr;
+}
+
+bool APlanetAIController::CheckIsFarawayOriginal() const
+{
+	return false;
+}
+
 void APlanetAIController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)
 {
 }
@@ -114,4 +129,41 @@ UCharacterUnit* APlanetAIController::InitialCharacterUnit(ACharacterBase* Charat
 	}
 
 	return nullptr;
+}
+
+void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
+{
+	auto CharacterPtr = Cast<AHumanCharacter>(Actor);
+	if (CharacterPtr)
+	{
+		if (IsGroupmate(CharacterPtr))
+		{
+			return;
+		}
+		else
+		{
+			if (Stimulus.WasSuccessfullySensed())
+			{
+				GetGroupMnaggerComponent()->GetTeamHelper()->AddKnowCharacter(CharacterPtr);
+			}
+			else
+			{
+				GetGroupMnaggerComponent()->GetTeamHelper()->RemoveKnowCharacter(CharacterPtr);
+			}
+		}
+	}
+}
+
+void APlanetAIController::OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors)
+{
+}
+
+bool APlanetAIController::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
+{
+	return GetPawn<FPawnType>()->IsGroupmate(TargetCharacterPtr);
+}
+
+bool APlanetAIController::IsTeammate(ACharacterBase* TargetCharacterPtr) const
+{
+	return GetPawn<FPawnType>()->IsTeammate(TargetCharacterPtr);
 }

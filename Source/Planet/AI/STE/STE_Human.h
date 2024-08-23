@@ -42,6 +42,15 @@ public:
 
 	using FCharacterUnitType = UCharacterUnit;
 
+	using FTeamOptionChangedHandle = 
+		TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr;
+
+	using FTeammateChangedHandle =
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
+	using FKownCharacterChangedHandle =
+		TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>::FCallbackHandleSPtr;
+
 protected:
 
 	virtual void TreeStart(FStateTreeExecutionContext& Context)override;
@@ -59,14 +68,10 @@ protected:
 
 public:
 
-	UFUNCTION()
-	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
-
-	UFUNCTION()
-	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	void KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd);
 
 	bool UpdateInArea(float DletaTime);
-	
+
 	void CaculationPatrolPosition();
 
 	bool GetPatrolPosition(float);
@@ -91,25 +96,13 @@ public:
 	ACharacterBase* LeaderCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	ACharacterBase* TargetCharacterPtr = nullptr;
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
-	TSet<ACharacterBase*>TargetSet;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	float GetPatrolPositionDelta = 5.0;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
-	bool bIsInArea = true;
+	FTeamOptionChangedHandle	TeammateOptionChangedDelegate;
 	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
-	bool bIsFarwayPatrolSpline= true;
+	FTeammateChangedHandle	TeammateChangedDelegate;
 
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
-	bool bIsNeedRun = false;
-
-	TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
-	
-	TCallbackHandleContainer<void()>::FCallbackHandleSPtr TeammateChangedDelegate;
+	FKownCharacterChangedHandle	KownCharacterChangedHandle;
 
 	FTimerHandle RemoveTarget;
 

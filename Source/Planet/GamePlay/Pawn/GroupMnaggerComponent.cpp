@@ -411,3 +411,51 @@ ETeammateOption FTeamMatesHelper::GetTeammateOption() const
 {
 	return TeammateOption;
 }
+
+void FTeamMatesHelper::AddKnowCharacter(ACharacterBase* CharacterPtr)
+{
+	for (auto& Iter : KnowCharatersSet)
+	{
+		if (Iter.Key == CharacterPtr)
+		{
+			Iter.Value++;
+
+			return;
+		}
+	}
+
+	KnowCharatersSet.Add({ CharacterPtr, 1 });
+}
+
+void FTeamMatesHelper::RemoveKnowCharacter(ACharacterBase* CharacterPtr)
+{
+	for (int32 Index = 0; Index < KnowCharatersSet.Num(); Index++)
+	{
+		if (KnowCharatersSet[Index].Key == CharacterPtr)
+		{
+			KnowCharatersSet[Index].Value--;
+
+			if (KnowCharatersSet[Index].Value <= 0)
+			{
+				KnowCharatersSet.RemoveAt(Index);
+			}
+
+			return;
+		}
+	}
+}
+
+TWeakObjectPtr<ACharacterBase> FTeamMatesHelper::GetKnowCharacter() const
+{
+	if (ForceKnowCharater.IsValid())
+	{
+		return ForceKnowCharater;
+	}
+
+	for (auto Iter : KnowCharatersSet)
+	{
+		return Iter.Key;
+	}
+
+	return nullptr;
+}

@@ -329,6 +329,16 @@ UTalentAllocationComponent* APlanetPlayerController::GetTalentAllocationComponen
 	return GetPawn<FPawnType>()->GetTalentAllocationComponent();
 }
 
+TWeakObjectPtr<ACharacterBase> APlanetPlayerController::GetTeamFocusTarget() const
+{
+	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
+	{
+		return GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
+	}
+
+	return nullptr;
+}
+
 UCharacterUnit* APlanetPlayerController::GetCharacterUnit()
 {
 	return GetPawn<FPawnType>()->GetCharacterUnit();

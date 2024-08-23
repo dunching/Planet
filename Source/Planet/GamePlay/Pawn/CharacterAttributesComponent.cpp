@@ -90,5 +90,5 @@ void UCharacterAttributesComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CharacterAttributes.InitialData();
+//	CharacterAttributes.InitialData();
 }

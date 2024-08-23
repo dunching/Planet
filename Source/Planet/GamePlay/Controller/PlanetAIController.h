@@ -48,6 +48,14 @@ public:
 	virtual UCharacterUnit* GetCharacterUnit() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;
+	
+	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
+	
+	virtual bool CheckIsFarawayOriginal() const;
+
+	virtual bool IsGroupmate(ACharacterBase* TargetCharacterPtr)const;
+
+	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
 
 protected:
 
@@ -60,6 +68,12 @@ protected:
 	virtual void BindPCWithCharacter()override;
 
 	virtual UCharacterUnit* InitialCharacterUnit(ACharacterBase* CharaterPtr)override;
+	
+	UFUNCTION()
+	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
+
+	UFUNCTION()
+	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
 	FGameplayTag RowName = FGameplayTag::EmptyTag;

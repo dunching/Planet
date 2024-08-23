@@ -51,17 +51,13 @@ public:
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
 
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	AActor* GetTeamFocusTarget() const;
+	virtual bool CheckIsFarawayOriginal() const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	ACharacterBase* TargetCharacterPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	ABuildingArea* BuildingArea = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<USplineComponent> PatrolSPlinePtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	USplineComponent* PatrolSPlinePtr = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
 
 protected:
 

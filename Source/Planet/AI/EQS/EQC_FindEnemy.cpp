@@ -4,6 +4,7 @@
 #include <EnvironmentQuery/EnvQueryTypes.h>
 #include <EnvironmentQuery/Items/EnvQueryItemType_Point.h>
 #include <EnvironmentQuery/Items/EnvQueryItemType_Actor.h>
+#include "EnvironmentQuery/EQSTestingPawn.h"
 #include <AITypes.h>
 #include <Kismet/GameplayStatics.h>
 #include <GameFramework/Character.h>
@@ -20,23 +21,6 @@ void UEQC_FindEnemy::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryC
 		return;
 	}
 
-#if WITH_EDITOR
-	if (GEditor->IsPlayingSessionInEditor())
-	{
-	}
-	else
-	{
-		TArray<AActor*>ResutAry;
-		UGameplayStatics::GetAllActorsOfClass(this, AHumanCharacter::StaticClass(), ResutAry);
-
-		if (ResutAry.IsValidIndex(0))
-		{
-			auto ResultingActor = ResutAry[0];
-			UEnvQueryItemType_Actor::SetContextHelper(ContextData, ResultingActor);
-		}
-		return;
-	}
-#endif
 	auto CharacterPtr = Cast<AHumanCharacter>(QuerierObject);
 
 	if (CharacterPtr)
@@ -46,15 +30,23 @@ void UEQC_FindEnemy::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryC
 			auto ControllerPtr = CharacterPtr->GetController<APlanetPlayerController>();
 			if (ControllerPtr)
 			{
-				UEnvQueryItemType_Actor::SetContextHelper(ContextData, ControllerPtr->GetFocusActor());
+				auto TargetCharacterPtr = ControllerPtr->GetTeamFocusTarget();
+				if (TargetCharacterPtr.IsValid())
+				{
+					UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetCharacterPtr.Get());
+				}
 			}
 		}
 		else
 		{
-			auto ControllerPtr = CharacterPtr->GetController<AAIController>();
+			auto ControllerPtr = CharacterPtr->GetController<AHumanAIController>();
 			if (ControllerPtr)
 			{
-				UEnvQueryItemType_Actor::SetContextHelper(ContextData, ControllerPtr->GetFocusActor());
+				auto TargetCharacterPtr = ControllerPtr->GetTeamFocusTarget();
+				if (TargetCharacterPtr.IsValid())
+				{
+					UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetCharacterPtr.Get());
+				}
 			}
 		}
 	}

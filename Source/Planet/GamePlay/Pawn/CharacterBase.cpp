@@ -100,6 +100,8 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		CharacterTitlePtr = nullptr;
 	}
 
+	OriginalAIController = nullptr;
+
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -110,14 +112,7 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 
 void ACharacterBase::PossessedBy(AController* NewController)
 {
-	auto OldController = Controller;
-
 	Super::PossessedBy(NewController);
-
-	if (OldController && OldController->IsA(AAIController::StaticClass()))
-	{
-		OldController->Destroy();
-	}
 
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
@@ -159,11 +154,22 @@ void ACharacterBase::PossessedBy(AController* NewController)
 
 void ACharacterBase::UnPossessed()
 {
+	AController* const OldController = Controller;
+
+	if (OldController && OldController->IsA(AAIController::StaticClass()))
+	{
+//		OldController->Destroy();
+	}
+
 	Super::UnPossessed();
 
-	if (!IsActorBeingDestroyed())
+	if (IsActorBeingDestroyed())
 	{
-		SpawnDefaultController();
+//		SpawnDefaultController();
+	}
+	else if(OriginalAIController)
+	{
+		OriginalAIController->Possess(this);
 	}
 }
 
@@ -253,6 +259,13 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UInputProcessorSubSystem::GetInstance()->BindAction(InputComponent);
+}
+
+void ACharacterBase::SpawnDefaultController()
+{
+	Super::SpawnDefaultController();
+
+	OriginalAIController = Controller;
 }
 
 void ACharacterBase::OnHPChanged(int32 CurrentValue)

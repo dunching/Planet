@@ -280,6 +280,11 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 			SpawnParameters
 		);
 
+		if (!NewCharacterPtr)
+		{
+			return;
+		}
+
 		if (Args.IsValidIndex(1))
 		{
 			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
