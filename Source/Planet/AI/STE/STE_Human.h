@@ -33,6 +33,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	bool bIsFarawayOriginal = false;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
 };
 
@@ -92,15 +95,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ACharacterBase* LeaderCharacterPtr = nullptr;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
-
 	FTeamOptionChangedHandle TeammateOptionChangedDelegate;
 
 	FTeammateChangedHandle TeammateChangedDelegate;
 
 	FKownCharacterChangedHandle	KownCharacterChangedHandle;
-
-	FTimerHandle RemoveTarget;
 
 };

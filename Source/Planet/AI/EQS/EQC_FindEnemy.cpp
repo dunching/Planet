@@ -25,28 +25,13 @@ void UEQC_FindEnemy::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQueryC
 
 	if (CharacterPtr)
 	{
-		if (CharacterPtr->IsPlayerControlled())
+		auto ControllerPtr = CharacterPtr->GetController<AHumanAIController>();
+		if (ControllerPtr)
 		{
-			auto ControllerPtr = CharacterPtr->GetController<APlanetPlayerController>();
-			if (ControllerPtr)
+			auto TargetCharacterPtr = ControllerPtr->GetTeamFocusTarget();
+			if (TargetCharacterPtr.IsValid())
 			{
-				auto TargetCharacterPtr = ControllerPtr->GetTeamFocusTarget();
-				if (TargetCharacterPtr.IsValid())
-				{
-					UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetCharacterPtr.Get());
-				}
-			}
-		}
-		else
-		{
-			auto ControllerPtr = CharacterPtr->GetController<AHumanAIController>();
-			if (ControllerPtr)
-			{
-				auto TargetCharacterPtr = ControllerPtr->GetTeamFocusTarget();
-				if (TargetCharacterPtr.IsValid())
-				{
-					UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetCharacterPtr.Get());
-				}
+				UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetCharacterPtr.Get());
 			}
 		}
 	}

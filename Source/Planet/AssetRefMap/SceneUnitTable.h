@@ -129,23 +129,14 @@ struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
 	FTableRowUnit_CharacterInfo();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag> FirstWeaponSocketInfo;
+	FGameplayTag FirstWeaponSocketInfo;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag> SecondWeaponSocketInfo;
+	FGameplayTag SecondWeaponSocketInfo;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag> _1ActiveSkillSet;
+	FGameplayTag _1ActiveSkillSet;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag> _2ActiveSkillSet;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag> _3ActiveSkillSet;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag> _4ActiveSkillSet;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FCharacterAttributes CharacterAttributes;
 

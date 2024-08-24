@@ -95,18 +95,4 @@ void USTE_Human::OnTeamChanged()
 
 void USTE_Human::KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd)
 {
-	if (bIsAdd)
-	{
-		if (!TargetCharacterPtr.IsValid())
-		{
-			TargetCharacterPtr = KnowCharacter;
-		}
-	}
-	else
-	{
-		if (TargetCharacterPtr == KnowCharacter)
-		{
-			TargetCharacterPtr = nullptr;
-		}
-	}
 }

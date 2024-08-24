@@ -10,7 +10,7 @@
 
 #include "GenerateType.h"
 
-#include "STT_CheckIsFarawayOriginal.generated.h"
+#include "STT_UpdateIsFarawayOriginal.generated.h"
 
 class IGameplayTaskOwnerInterface;
 
@@ -21,7 +21,7 @@ class AHumanAIController;
 class UGloabVariable;
 
 USTRUCT()
-struct PLANET_API FStateTreeCheckIsFarawayOriginalTaskInstanceData
+struct PLANET_API FStateTreeUpdateIsFarawayOriginalTaskInstanceData
 {
 	GENERATED_BODY()
 
@@ -39,11 +39,11 @@ struct PLANET_API FStateTreeCheckIsFarawayOriginalTaskInstanceData
 };
 
 USTRUCT()
-struct PLANET_API FSTT_CheckIsFarawayOriginal : public FStateTreeAIActionTaskBase
+struct PLANET_API FSTT_UpdateIsFarawayOriginal : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeCheckIsFarawayOriginalTaskInstanceData;
+	using FInstanceDataType = FStateTreeUpdateIsFarawayOriginalTaskInstanceData;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

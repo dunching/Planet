@@ -47,8 +47,6 @@ public:
 
 	AHumanAIController(const FObjectInitializer& ObjectInitializer);
 
-	void InitialSenseConfig();
-
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
@@ -87,6 +85,8 @@ protected:
 	void OnTeamChanged();
 
 	void InitialCharacter();
+
+	void InitialSenseConfig();
 
 	FTeammateOptionChangedDelegate TeammateOptionChangedDelegate;
 

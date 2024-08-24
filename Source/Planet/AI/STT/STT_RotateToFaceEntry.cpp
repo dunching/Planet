@@ -91,6 +91,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::PerformMoveTask(FStateTreeExecutionC
 
 	if (InstanceData.CharacterPtr && InstanceData.AIControllerPtr)
 	{
+		check(InstanceData.CharacterPtr != InstanceData.TargetCharacterPtr);
 		InstanceData.AIControllerPtr->SetFocus(InstanceData.TargetCharacterPtr.Get());
 
 		return EStateTreeRunStatus::Running;

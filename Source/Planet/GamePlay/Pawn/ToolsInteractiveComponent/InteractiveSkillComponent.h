@@ -73,6 +73,8 @@ public:
 		TSharedPtr<FWeaponSocketInfo>& SecondWeaponSocketInfo
 	)const;
 
+	bool ActiveWeapon(EWeaponSocket WeaponSocket);
+
 	bool SwitchWeapon();
 
 	void RetractputWeapon();
@@ -99,8 +101,6 @@ protected:
 	bool ActiveSkill_Active(
 		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	);
-
-	bool ActiveWeapon(EWeaponSocket WeaponSocket);
 
 	bool ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr);
 
