@@ -6,6 +6,7 @@
 #include "Components/StateTreeAIComponent.h"
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
+#include <Perception/AISenseConfig_Sight.h>
 
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
@@ -25,6 +26,23 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+
+	InitialSenseConfig();
+}
+
+void AHumanAIController::InitialSenseConfig()
+{
+	auto SightConfig = NewObject<UAISenseConfig_Sight>(this, UAISenseConfig_Sight::StaticClass(), TEXT("UAISenseConfig_Sight"));
+	check(SightConfig);
+	SightConfig->SightRadius = 50000;
+	SightConfig->LoseSightRadius = 53000;
+	SightConfig->PeripheralVisionAngleDegrees = 120.f;
+	SightConfig->AutoSuccessRangeFromLastSeenLocation = FAISystem::InvalidRange;
+	SightConfig->SetMaxAge(1.f);
+	SightConfig->DetectionByAffiliation.bDetectEnemies = 1;
+	SightConfig->DetectionByAffiliation.bDetectNeutrals = 1;
+	SightConfig->DetectionByAffiliation.bDetectFriendlies = 1;
+	AIPerceptionComponentPtr->ConfigureSense(*SightConfig);
 }
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)

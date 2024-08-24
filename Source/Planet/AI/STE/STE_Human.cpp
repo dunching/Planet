@@ -34,8 +34,6 @@ void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 			);
 			OnTeamChanged();
 		}
-
-		CaculationPatrolPosition();
 	}
 }
 
@@ -111,24 +109,4 @@ void USTE_Human::KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacte
 			TargetCharacterPtr = nullptr;
 		}
 	}
-}
-
-void USTE_Human::CaculationPatrolPosition()
-{
-}
-
-bool USTE_Human::GetPatrolPosition(float)
-{
-	FVector Location = FVector::ZeroVector;
-	if (UNavigationSystemV1::K2_GetRandomReachablePointInRadius(
-		this,
-		HumanCharacterPtr->GetActorLocation(),
-		Location,
-		800.f
-	))
-	{
-		GloabVariable->Location = Location;
-	}
-
-	return true;
 }

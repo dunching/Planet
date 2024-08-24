@@ -31,6 +31,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	FVector Location = FVector::ZeroVector;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	bool bIsFarawayOriginal = false;
+
 };
 
 UCLASS(Blueprintable)
@@ -42,7 +45,7 @@ public:
 
 	using FCharacterUnitType = UCharacterUnit;
 
-	using FTeamOptionChangedHandle = 
+	using FTeamOptionChangedHandle =
 		TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr;
 
 	using FTeammateChangedHandle =
@@ -70,12 +73,6 @@ public:
 
 	void KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd);
 
-	bool UpdateInArea(float DletaTime);
-
-	void CaculationPatrolPosition();
-
-	bool GetPatrolPosition(float);
-
 	FTSTicker::FDelegateHandle CaculationPatrolHandle;
 
 	FTSTicker::FDelegateHandle CaculationDistance2AreaHandle;
@@ -85,7 +82,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
 	int32 MaxDistanceToPatrolSpline = 1000;
 
@@ -98,9 +95,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
-	FTeamOptionChangedHandle	TeammateOptionChangedDelegate;
-	
-	FTeammateChangedHandle	TeammateChangedDelegate;
+	FTeamOptionChangedHandle TeammateOptionChangedDelegate;
+
+	FTeammateChangedHandle TeammateChangedDelegate;
 
 	FKownCharacterChangedHandle	KownCharacterChangedHandle;
 

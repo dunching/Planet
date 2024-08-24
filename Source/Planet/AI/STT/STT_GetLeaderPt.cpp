@@ -1,5 +1,5 @@
 
-#include "STT_GetTargetPt.h"
+#include "STT_GetLeaderPt.h"
 
 #include <NavigationSystem.h>
 
@@ -8,7 +8,7 @@
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
 
-EStateTreeRunStatus FSTT_GetTargetPt::EnterState(
+EStateTreeRunStatus FSTT_GetLeaderPt::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
 )const

@@ -47,6 +47,8 @@ public:
 
 	AHumanAIController(const FObjectInitializer& ObjectInitializer);
 
+	void InitialSenseConfig();
+
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();

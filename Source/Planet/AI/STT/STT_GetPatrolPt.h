@@ -10,7 +10,7 @@
 
 #include "GenerateType.h"
 
-#include "STT_CheckIsFarawayOriginal.generated.h"
+#include "STT_GetPatrolPt.generated.h"
 
 class IGameplayTaskOwnerInterface;
 
@@ -21,7 +21,7 @@ class AHumanAIController;
 class UGloabVariable;
 
 USTRUCT()
-struct PLANET_API FStateTreeCheckIsFarawayOriginalTaskInstanceData
+struct PLANET_API FStateTreeGetPatrolPtTaskInstanceData
 {
 	GENERATED_BODY()
 
@@ -32,18 +32,21 @@ struct PLANET_API FStateTreeCheckIsFarawayOriginalTaskInstanceData
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, Category = Out)
+	FVector Location = FVector::ZeroVector;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 };
 
 USTRUCT()
-struct PLANET_API FSTT_CheckIsFarawayOriginal : public FStateTreeAIActionTaskBase
+struct PLANET_API FSTT_GetPatrolPt : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeCheckIsFarawayOriginalTaskInstanceData;
+	using FInstanceDataType = FStateTreeGetPatrolPtTaskInstanceData;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
