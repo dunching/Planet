@@ -263,7 +263,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 		return;
 	}
 
-	// ÎäÆ÷¼¼ÄÜ
+	// ÎäÆ÷
 	{
 		TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{

@@ -20,23 +20,6 @@ void UEQC_FindTeammate::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQue
 		return;
 	}
 
-#if WITH_EDITOR
-	if (GEditor->IsPlayingSessionInEditor())
-	{
-	}
-	else
-	{
-		TArray<AActor*>ResutAry;
-		UGameplayStatics::GetAllActorsOfClass(this, AHumanCharacter::StaticClass(), ResutAry);
-
-		if (ResutAry.IsValidIndex(0))
-		{
-			auto ResultingActor = ResutAry[0];
-			UEnvQueryItemType_Actor::SetContextHelper(ContextData, ResultingActor);
-		}
-		return;
-	}
-#endif
 	auto CharacterPtr = Cast<AHumanCharacter>(QuerierObject);
 
 	if (CharacterPtr)
@@ -44,7 +27,11 @@ void UEQC_FindTeammate::ProvideContext(FEnvQueryInstance& QueryInstance, FEnvQue
 		auto PCPtr = CharacterPtr->GetController<AHumanAIController>();
 		if (PCPtr)
 		{
-			UEnvQueryItemType_Actor::SetContextHelper(ContextData, PCPtr->GetTeamFocusTarget());
+			auto TargetCharacterPtr = PCPtr->GetTeamFocusTarget();
+			if (TargetCharacterPtr.IsValid())
+			{
+				UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetCharacterPtr.Get());
+			}
 		}
 	}
 }

@@ -123,6 +123,8 @@ protected:
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	virtual void SpawnDefaultController()override;
+
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
 		FCharacterUnitType* TargetCharacterUnitPtr
@@ -185,6 +187,9 @@ private:
 	
 	UPROPERTY(Transient)
 	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<AController> OriginalAIController;
 
 };
 

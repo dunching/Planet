@@ -84,7 +84,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 
 		FGameplayTagContainer GameplayTagContainer;
-		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->GameplayTag1);
+		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill_Continuous);
 
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{

@@ -16,6 +16,16 @@
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
 #include "SceneElement.h"
+#include "Planet.h"
+#include "LogWriter.h"
+
+#ifdef WITH_EDITOR
+static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
+	TEXT("GroupMnaggerComponent.KnowCharaterChanged"),
+	1,
+	TEXT("")
+	TEXT(" default: 0"));
+#endif
 
 FName UGroupMnaggerComponent::ComponentName = TEXT("GroupMnaggerComponent");
 
@@ -410,4 +420,65 @@ void FTeamMatesHelper::SwitchTeammateOption(ETeammateOption InTeammateOption)
 ETeammateOption FTeamMatesHelper::GetTeammateOption() const
 {
 	return TeammateOption;
+}
+
+void FTeamMatesHelper::AddKnowCharacter(ACharacterBase* CharacterPtr)
+{
+	for (auto& Iter : KnowCharatersSet)
+	{
+		if (Iter.Key == CharacterPtr)
+		{
+			Iter.Value++;
+
+			return;
+		}
+	}
+
+	KnowCharatersSet.Add({ CharacterPtr, 1 });
+	KnowCharaterChanged(CharacterPtr, true);
+#ifdef WITH_EDITOR
+	if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
+	{
+		PRINTINVOKEWITHSTR(FString(TEXT("")));
+	}
+#endif
+}
+
+void FTeamMatesHelper::RemoveKnowCharacter(ACharacterBase* CharacterPtr)
+{
+	for (int32 Index = 0; Index < KnowCharatersSet.Num(); Index++)
+	{
+		if (KnowCharatersSet[Index].Key == CharacterPtr)
+		{
+			KnowCharatersSet[Index].Value--;
+
+			if (KnowCharatersSet[Index].Value <= 0)
+			{
+				KnowCharatersSet.RemoveAt(Index);
+			}
+			KnowCharaterChanged(CharacterPtr, false);
+#ifdef WITH_EDITOR
+			if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
+			{
+				PRINTINVOKEWITHSTR(FString(TEXT("")));
+			}
+#endif
+			return;
+		}
+	}
+}
+
+TWeakObjectPtr<ACharacterBase> FTeamMatesHelper::GetKnowCharacter() const
+{
+	if (ForceKnowCharater.IsValid())
+	{
+		return ForceKnowCharater;
+	}
+
+	for (auto Iter : KnowCharatersSet)
+	{
+		return Iter.Key;
+	}
+
+	return nullptr;
 }

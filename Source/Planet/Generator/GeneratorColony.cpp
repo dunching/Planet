@@ -65,7 +65,7 @@ void AGeneratorColony::BeginPlay()
 					auto AIControllerPtr = CharacterPtr->GetController<AHumanAIController>();
 					if (AIControllerPtr)
 					{
-						AIControllerPtr->BuildingArea = BuildingAreaPtr;
+						AIControllerPtr->BuildingAreaPtr = BuildingAreaPtr;
 					}
 				}
 			}

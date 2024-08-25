@@ -31,6 +31,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	FVector Location = FVector::ZeroVector;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	bool bIsFarawayOriginal = false;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
+
 };
 
 UCLASS(Blueprintable)
@@ -41,6 +47,15 @@ class PLANET_API USTE_Human : public UStateTreeEvaluatorBlueprintBase
 public:
 
 	using FCharacterUnitType = UCharacterUnit;
+
+	using FTeamOptionChangedHandle =
+		TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr;
+
+	using FTeammateChangedHandle =
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
+	using FKownCharacterChangedHandle =
+		TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>::FCallbackHandleSPtr;
 
 protected:
 
@@ -59,17 +74,7 @@ protected:
 
 public:
 
-	UFUNCTION()
-	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
-
-	UFUNCTION()
-	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-
-	bool UpdateInArea(float DletaTime);
-	
-	void CaculationPatrolPosition();
-
-	bool GetPatrolPosition(float);
+	void KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd);
 
 	FTSTicker::FDelegateHandle CaculationPatrolHandle;
 
@@ -80,7 +85,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
 	int32 MaxDistanceToPatrolSpline = 1000;
 
@@ -90,27 +95,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ACharacterBase* LeaderCharacterPtr = nullptr;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	ACharacterBase* TargetCharacterPtr = nullptr;
+	FTeamOptionChangedHandle TeammateOptionChangedDelegate;
 
-	TSet<ACharacterBase*>TargetSet;
+	FTeammateChangedHandle TeammateChangedDelegate;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	float GetPatrolPositionDelta = 5.0;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
-	bool bIsInArea = true;
-	
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
-	bool bIsFarwayPatrolSpline= true;
-
-	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
-	bool bIsNeedRun = false;
-
-	TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr TeammateOptionChangedDelegate;
-	
-	TCallbackHandleContainer<void()>::FCallbackHandleSPtr TeammateChangedDelegate;
-
-	FTimerHandle RemoveTarget;
+	FKownCharacterChangedHandle	KownCharacterChangedHandle;
 
 };

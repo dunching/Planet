@@ -1,5 +1,5 @@
 
-#include "STT_GetTargetPt.h"
+#include "STT_UpdateIsFarawayOriginal.h"
 
 #include <NavigationSystem.h>
 
@@ -7,8 +7,9 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
+#include "STE_Human.h"
 
-EStateTreeRunStatus FSTT_GetTargetPt::EnterState(
+EStateTreeRunStatus FSTT_UpdateIsFarawayOriginal::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
 )const
@@ -25,7 +26,7 @@ EStateTreeRunStatus FSTT_GetTargetPt::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	InstanceData.Location = InstanceData.TargetCharacterPtr->GetActorLocation();
+	InstanceData.GloabVariable->bIsFarawayOriginal = InstanceData.AIControllerPtr->CheckIsFarawayOriginal();
 
 	return EStateTreeRunStatus::Succeeded;
 }

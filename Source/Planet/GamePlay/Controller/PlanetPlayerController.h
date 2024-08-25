@@ -58,6 +58,8 @@ public:
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
 
+	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
+
 	virtual UCharacterUnit* GetCharacterUnit() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;

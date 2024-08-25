@@ -81,13 +81,27 @@ public:
 
 	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>;
 
+	using FKnowCharaterChanged = TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>;
+
 	void SwitchTeammateOption(ETeammateOption InTeammateOption);
 
 	ETeammateOption GetTeammateOption()const;
 
+	void AddKnowCharacter(ACharacterBase*CharacterPtr);
+
+	void RemoveKnowCharacter(ACharacterBase* CharacterPtr);
+
+	TWeakObjectPtr<ACharacterBase> GetKnowCharacter()const;
+
 	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
+	FKnowCharaterChanged KnowCharaterChanged;
+
 private:
+
+	TWeakObjectPtr<ACharacterBase>ForceKnowCharater;
+
+	TArray<TPair<TWeakObjectPtr<ACharacterBase>, int32>>KnowCharatersSet;
 
 	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
 

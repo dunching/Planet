@@ -50,9 +50,6 @@ public:
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent() ;
 
-	UFUNCTION(BlueprintCallable, Category = "AI")
-	AActor* GetTeamFocusTarget() const;
-
 	UCharacterTitle* AIHumanInfoPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)

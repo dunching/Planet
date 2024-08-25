@@ -80,6 +80,7 @@ FBaseProperty& FBasePropertySet::GetMaxProperty()
 
 FCharacterAttributes::FCharacterAttributes()
 {
+	InitialData();
 }
 
 FCharacterAttributes::~FCharacterAttributes()
@@ -116,7 +117,8 @@ void FCharacterAttributes::InitialData()
 	Element.SoilElement.GetMaxProperty().SetCurrentValue(9);
 	Element.SoilElement.WuXingType = EWuXingType::kSoil;
 
-	const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+	const auto DataSource = FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
+	//UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
 
 	BaseAttackPower.GetMaxProperty().SetCurrentValue(3000);
 	BaseAttackPower.SetCurrentValue(100, DataSource);

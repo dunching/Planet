@@ -6,6 +6,7 @@
 #include "Components/StateTreeAIComponent.h"
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
+#include <Perception/AISenseConfig_Sight.h>
 
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
@@ -18,6 +19,7 @@
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
+#include "SceneUnitTable.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -25,6 +27,23 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+
+//	InitialSenseConfig();
+}
+
+void AHumanAIController::InitialSenseConfig()
+{
+	auto SightConfig = NewObject<UAISenseConfig_Sight>(this, UAISenseConfig_Sight::StaticClass(), TEXT("UAISenseConfig_Sight"));
+	check(SightConfig);
+	SightConfig->SightRadius = 50000;
+	SightConfig->LoseSightRadius = 53000;
+	SightConfig->PeripheralVisionAngleDegrees = 120.f;
+	SightConfig->AutoSuccessRangeFromLastSeenLocation = FAISystem::InvalidRange;
+	SightConfig->SetMaxAge(1.f);
+	SightConfig->DetectionByAffiliation.bDetectEnemies = 1;
+	SightConfig->DetectionByAffiliation.bDetectNeutrals = 1;
+	SightConfig->DetectionByAffiliation.bDetectFriendlies = 1;
+	AIPerceptionComponentPtr->ConfigureSense(*SightConfig);
 }
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
@@ -44,36 +63,9 @@ UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
 	return AIPerceptionComponentPtr;
 }
 
-AActor* AHumanAIController::GetTeamFocusTarget() const
+bool AHumanAIController::CheckIsFarawayOriginal() const
 {
-	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
-	{
-		auto LeaderCharacterPtr = GetGroupMnaggerComponent()->GetTeamHelper()->OwnerCharacterUnitPtr->ProxyCharacterPtr;
-		{
-			auto LeaderPCPtr = LeaderCharacterPtr->GetController<APlanetPlayerController>();
-			if (LeaderPCPtr)
-			{
-				return LeaderPCPtr->GetFocusActor();
-			}
-		}
-		{
-			auto LeaderPCPtr = LeaderCharacterPtr->GetController<AHumanAIController>();
-			if (LeaderPCPtr)
-			{
-				auto ResultPtr = LeaderPCPtr->GetFocusActor();
-				if (ResultPtr)
-				{
-					return ResultPtr;
-				}
-				else
-				{
-					return LeaderPCPtr->TargetCharacterPtr;
-				}
-			}
-		}
-	}
-
-	return nullptr;
+	return false;
 }
 
 void AHumanAIController::OnTeammateOptionChangedImp(
@@ -118,6 +110,11 @@ void AHumanAIController::OnConstruction(const FTransform& Transform)
 void AHumanAIController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
+	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
+
+	InitialCharacter();
 }
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -130,8 +127,6 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
-	InitialCharacter();
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
 		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
@@ -209,8 +204,45 @@ void AHumanAIController::InitialCharacter()
 #if TESTAICHARACTERHOLDDATA
 		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
 #endif
-
-		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
+		{
+			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
+			if (TableRowUnit_CharacterInfoPtr)
+			{
+				// ÎäÆ÷
+				{
+					TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
+					{
+						auto WeaponUnitPtr = Cast<UWeaponUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo, 1));
+						if (WeaponUnitPtr)
+						{
+							FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
+							FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
+						}
+					}
+
+					TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
+					{
+						auto WeaponUnitPtr = Cast<UWeaponUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo, 1));
+						if (WeaponUnitPtr)
+						{
+							SecondWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
+							SecondWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
+						}
+					}
+
+					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+					EICPtr->ActiveWeapon(EWeaponSocket::kMain);
+				}
+
+				// ¼¼ÄÜ
+				{
+					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
+					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+					EICPtr->RegisterMultiGAs(SkillsMap);
+				}
+			}
+		}
 	}
 }

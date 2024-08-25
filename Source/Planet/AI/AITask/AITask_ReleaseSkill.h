@@ -48,6 +48,7 @@ protected:
 
 	TMap<FGameplayAbilitySpecHandle, TSharedPtr<FCanbeInteractionInfo>>ReleasingSkillMap;
 
+	// ²»ÐèÒª
 	TMap<FGameplayAbilitySpecHandle, FDelegateHandle>ReleasingSkillDelegateMap;
 
 	ACharacterBase* CharacterPtr = nullptr;

@@ -89,7 +89,6 @@ EStateTreeRunStatus FSTT_RunEQS::Tick(
 				InstanceData.GloabVariable->Location = InstanceData.ResultSPtr->GetItemAsLocation(0);
 				InstanceData.Location = InstanceData.GloabVariable->Location;
 
-
 #ifdef WITH_EDITOR
 				if (DrawDebugSTT_RunEQS.GetValueOnGameThread())
 				{

@@ -1,5 +1,5 @@
 
-#include "STT_GetTargetPt.h"
+#include "STT_UpdateTargetCharacter.h"
 
 #include <NavigationSystem.h>
 
@@ -7,8 +7,9 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
+#include "STE_Human.h"
 
-EStateTreeRunStatus FSTT_GetTargetPt::EnterState(
+EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
 )const
@@ -25,7 +26,8 @@ EStateTreeRunStatus FSTT_GetTargetPt::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	InstanceData.Location = InstanceData.TargetCharacterPtr->GetActorLocation();
+	InstanceData.GloabVariable->TargetCharacterPtr =
+		InstanceData.CharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
 
 	return EStateTreeRunStatus::Succeeded;
 }

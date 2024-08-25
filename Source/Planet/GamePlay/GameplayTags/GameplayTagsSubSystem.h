@@ -122,15 +122,23 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.InFighting")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
-	FGameplayTag GameplayTag1 =
+	FGameplayTag State_ReleasingSkill_Continuous =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Continuous")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
-	FGameplayTag GameplayTag2 =
+	FGameplayTag State_ReleasingSkil_WeaponActive =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.WeaponActive")));
 #pragma endregion 
 
-#pragma region UISocket Tags
+#pragma region Socket Tags
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag SkillSocket_WeaponSocket1 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("SkillSocket.WeaponSocket1")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag SkillSocket_WeaponSocket2 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("SkillSocket.WeaponSocket2")));
+	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ConsumableSocket1 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket1")));
