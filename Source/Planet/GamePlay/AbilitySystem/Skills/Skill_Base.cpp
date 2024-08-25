@@ -105,7 +105,7 @@ const TArray<FAbilityTriggerData>& USkill_Base::GetTriggers() const
 
 void USkill_Base::ResetPreviousStageActions()
 {
-	// Çå³ýÉÏÒ»½×¶ÎÒÅÁôµÄÄÚÈÝ
+	// æ¸…é™¤ä¸Šä¸€é˜¶æ®µé—ç•™çš„å†…å®¹
 	for (int32 TaskIdx = ActiveTasks.Num() - 1; TaskIdx >= 0 && ActiveTasks.Num() > 0; --TaskIdx)
 	{
 		UGameplayTask* Task = ActiveTasks[TaskIdx];

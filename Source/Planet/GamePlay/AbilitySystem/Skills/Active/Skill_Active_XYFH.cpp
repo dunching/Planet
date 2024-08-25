@@ -207,7 +207,7 @@ void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, flo
 		SubStepIndex = 0;
 	}
 
-	// 角色移动
+	// 瑙掕壊绉诲姩
 	{
 		auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
 			this,
@@ -229,7 +229,7 @@ void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, flo
 		TaskPtr->ReadyForActivation();
 	}
 
-	// 镜头控制
+	// 闀滃ご鎺у埗
 	{
 		auto TaskPtr = UAbilityTask_ControlCameraBySpline::NewTask(
 			this,

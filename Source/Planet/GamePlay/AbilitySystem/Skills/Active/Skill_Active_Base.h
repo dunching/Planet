@@ -26,7 +26,7 @@ struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetDat
 };
 
 /**
- * Ö÷¶¯´¥·¢µÄ½ÚÄÜ
+ * ä¸»åŠ¨è§¦å‘çš„èŠ‚èƒ½
  */
 UCLASS()
 class USkill_Active_Base :
@@ -96,13 +96,13 @@ public:
 
 	void ContinueActive();
 
-	// È·ÈÏÊÇ·ñÓĞËø¶¨µÄÄ¿±ê
+	// ç¡®è®¤æ˜¯å¦æœ‰é”å®šçš„ç›®æ ‡
 	ACharacterBase* HasFocusActor()const;
 	
-	// È·ÈÏËø¶¨µÄÄ¿±êÊÇ·ñÔÚ·¶Î§ÄÚ
+	// ç¡®è®¤é”å®šçš„ç›®æ ‡æ˜¯å¦åœ¨èŒƒå›´å†…
 	bool CheckTargetInDistance(int32 Distance)const;
 
-	// »ñÈ¡·¶Î§ÄÚÈÎÒâ¿É¹¥»÷µÄÄ¿±ê
+	// è·å–èŒƒå›´å†…ä»»æ„å¯æ”»å‡»çš„ç›®æ ‡
 	ACharacterBase* GetTargetInDistance(int32 Distance)const;
 
 	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;

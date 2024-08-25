@@ -73,9 +73,9 @@ public:
 
 };
 
-// ³¡¾°ÄÚµÄ¶ÔÏó´úÀí
-// Í¨ÓÃÊı¾İ¼ÇÂ¼ÔÚDataTable£¬±ä»¯Êı¾İ¼ÇÂ¼ÔÚ¶ÔÏóÄÚ
-// ĞòÁĞ»¯&·´ĞòÁĞ»¯
+// åœºæ™¯å†…çš„å¯¹è±¡ä»£ç†
+// é€šç”¨æ•°æ®è®°å½•åœ¨DataTableï¼Œå˜åŒ–æ•°æ®è®°å½•åœ¨å¯¹è±¡å†…
+// åºåˆ—åŒ–&ååºåˆ—åŒ–
 UCLASS(BlueprintType)
 class PLANET_API UBasicUnit : public UObject
 {
@@ -116,7 +116,7 @@ protected:
 	UPROPERTY(Transient)
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
 
-	// Õâ¸öÎïÆ·±»·ÖÅä¸øµÄ¶ÔÏó
+	// è¿™ä¸ªç‰©å“è¢«åˆ†é…ç»™çš„å¯¹è±¡
 	UPROPERTY(Transient)
 	UCharacterUnit* AllocationCharacterUnitPtr = nullptr;
 
@@ -229,7 +229,7 @@ public:
 
 	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
 
-	// ½â³ıÕâ¸öÀàÏÂAddToRootµÄ¶ÔÏó
+	// è§£é™¤è¿™ä¸ªç±»ä¸‹AddToRootçš„å¯¹è±¡
 	void RelieveRootBind();
 
 	FPawnType* ProxyCharacterPtr = nullptr;

@@ -20,6 +20,7 @@
 #include "SPlineActor.h"
 #include "Skill_Active_tornado.h"
 #include "CharacterBase.h"
+#include "CS_RootMotion_IceTraction.h"
 #include "LogWriter.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
@@ -217,6 +218,32 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 	{
 		SetRootMotionFinished(*this);
 	}
+}
+
+FRootMotionSource_ByIce::FRootMotionSource_ByIce()
+{
+	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
+}
+
+FRootMotionSource_ByIce::~FRootMotionSource_ByIce()
+{
+}
+
+FRootMotionSource* FRootMotionSource_ByIce::Clone() const
+{
+	FRootMotionSource_ByIce* CopyPtr = new FRootMotionSource_ByIce(*this);
+	return CopyPtr;
+}
+
+bool FRootMotionSource_ByIce::Matches(const FRootMotionSource* Other) const
+{
+	return FRootMotionSource::Matches(Other);
+}
+
+void FRootMotionSource_ByIce::PrepareRootMotion(float SimulationTime, float MovementTickTime,
+	const ACharacter& Character, const UCharacterMovementComponent& MoveComponent)
+{
+	FRootMotionSource::PrepareRootMotion(SimulationTime, MovementTickTime, Character, MoveComponent);
 }
 
 FRootMotionSource_FlyAway::FRootMotionSource_FlyAway()

@@ -13,6 +13,7 @@
 USkill_Active_Base::USkill_Active_Base():
 	Super()
 {
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 void USkill_Active_Base::OnAvatarSet(
