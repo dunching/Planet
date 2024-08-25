@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Skill_Active_IceGun.h"
 
 #include "HAL/IConsoleManager.h"
 #include "UObject/ObjectMacros.h"
@@ -16,10 +17,10 @@
 enum ERootMotionSource_Priority : uint16
 {
 	kDefault = 1,
-	kMove,			// Î»ÒÆ
-	kFlyAway,		// »÷·É
-	kTraction,		// Ç£Òı
-	kForceMove,		// Ç¿ÖÆÎ»ÒÆ
+	kMove,			// ä½ç§»
+	kFlyAway,		// å‡»é£
+	kTraction,		// ç‰µå¼•
+	kForceMove,		// å¼ºåˆ¶ä½ç§»
 };
 
 class ASPlineActor;
@@ -139,7 +140,7 @@ struct FRootMotionSource_ByTornado : public FRootMotionSource
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
-	// Èç¹ûÕâ¸öÖµ¹ıĞ¡£¬»áµ¼ÖÂÒÆ¶¯Ê±¾àÀë¹ı½ü´Ó¶øºöÂÔ±¾´ÎÒÆ¶¯ ?
+	// å¦‚æœè¿™ä¸ªå€¼è¿‡å°ï¼Œä¼šå¯¼è‡´ç§»åŠ¨æ—¶è·ç¦»è¿‡è¿‘ä»è€Œå¿½ç•¥æœ¬æ¬¡ç§»åŠ¨ ?
 	float OuterRadius = 150.f;
 
 	float MaxHeight = 200.f;
@@ -147,6 +148,38 @@ struct FRootMotionSource_ByTornado : public FRootMotionSource
 	float RotationSpeed = 360.f;
 
 	TWeakObjectPtr<ATornado> TornadoPtr = nullptr;
+
+	ACharacterBase* TargetCharacterPtr = nullptr;
+};
+
+USTRUCT()
+struct FRootMotionSource_ByIce : public FRootMotionSource
+{
+	GENERATED_USTRUCT_BODY()
+
+	FRootMotionSource_ByIce();
+
+	virtual ~FRootMotionSource_ByIce();
+
+	virtual FRootMotionSource* Clone() const override;
+
+	virtual bool Matches(const FRootMotionSource* Other) const override;
+
+	virtual void PrepareRootMotion(
+		float SimulationTime,
+		float MovementTickTime,
+		const ACharacter& Character,
+		const UCharacterMovementComponent& MoveComponent
+	) override;
+
+	// å¦‚æœè¿™ä¸ªå€¼è¿‡å°ï¼Œä¼šå¯¼è‡´ç§»åŠ¨æ—¶è·ç¦»è¿‡è¿‘ä»è€Œå¿½ç•¥æœ¬æ¬¡ç§»åŠ¨ ?
+	float OuterRadius = 150.f;
+
+	float MaxHeight = 200.f;
+
+	float RotationSpeed = 360.f;
+
+	TWeakObjectPtr<ASkill_IceGun_Projectile> IceGunPtr = nullptr;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 };

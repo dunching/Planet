@@ -54,7 +54,7 @@ struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTa
 
 	virtual FGameplayAbilityTargetData_CS_Base* Clone()const;
 
-	// »áÒ»´ÎĞÔĞŞ¸Ä¶à¸ö×´Ì¬Âë£¿
+	// ä¼šä¸€æ¬¡æ€§ä¿®æ”¹å¤šä¸ªçŠ¶æ€ç ï¼Ÿ
 	FGameplayTag Tag;
 
 	FCharacterStateChanged CharacterStateChanged;

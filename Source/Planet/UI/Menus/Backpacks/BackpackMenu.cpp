@@ -159,30 +159,35 @@ void UBackpackMenu::ResetUIByData_All()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
-	for (const auto& Iter : ItemAryRef)
+	if (SceneUnitContariner.IsValid())
 	{
-		if (!Iter)
+		auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
+		for (const auto& Iter : ItemAryRef)
 		{
-			continue;
-		}
-		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
-			)
-		{
-			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
-			if (WidgetPtr)
+			if (!Iter)
 			{
-				WidgetPtr->TargetBasicUnitPtr = Iter;
-				WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
-				TileViewPtr->AddItem(WidgetPtr);
+				continue;
+			}
+			if (
+				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon) ||
+				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
+				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) ||
+				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool) ||
+				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
+				)
+			{
+				auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
+				if (WidgetPtr)
+				{
+					WidgetPtr->TargetBasicUnitPtr = Iter;
+					WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
+					TileViewPtr->AddItem(WidgetPtr);
+				}
 			}
 		}
 	}
+
+
 }
 
 void UBackpackMenu::BindEvent()
