@@ -16,6 +16,11 @@ class UProgressTips;
 
 struct FGameplayAbilityTargetData_PickAxe;
 
+struct FGameplayAbilityTargetData_Skill_WeaponHandProtection : public FGameplayAbilityTargetData_Skill_Weapon
+{
+	AWeapon_HandProtection* WeaponPtr = nullptr;
+};
+
 UCLASS()
 class PLANET_API USkill_WeaponActive_HandProtection : public USkill_WeaponActive_Base
 {
@@ -63,13 +68,14 @@ public:
 
 protected:
 
-	virtual void PerformAction()override;
-
-	virtual void PerformStopAction()override;
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	)override;
 
 	virtual void ResetPreviousStageActions()override;
-
-	virtual bool IsEnd()const override;
 
 	void ExcuteStopStep();
 
@@ -110,11 +116,4 @@ protected:
 
 	AWeapon_HandProtection* WeaponPtr = nullptr;
 
-	UProgressTips* InputRangeHelperPtr = nullptr;
-
-};
-
-struct FGameplayAbilityTargetData_Skill_WeaponHandProtection : public FGameplayAbilityTargetData_Skill_Weapon
-{
-	AWeapon_HandProtection* WeaponPtr = nullptr;
 };

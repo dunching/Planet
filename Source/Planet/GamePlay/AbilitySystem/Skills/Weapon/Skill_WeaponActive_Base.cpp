@@ -2,30 +2,13 @@
 #include "Skill_WeaponActive_Base.h"
 
 #include "CharacterBase.h"
+#include "AbilityTask_TimerHelper.h"
 #include "LogWriter.h"
 
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
 	bRetriggerInstancedAbility = true;
-}
-
-bool USkill_WeaponActive_Base::CanActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayTagContainer* SourceTags /*= nullptr*/,
-	const FGameplayTagContainer* TargetTags /*= nullptr*/,
-	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
-{
-	switch (SkillState)
-	{
-	case EType::kRunning:
-	{
-		return false;
-	}
-	}
-	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
 void USkill_WeaponActive_Base::PreActivate(
@@ -42,10 +25,9 @@ void USkill_WeaponActive_Base::PreActivate(
 	{
 		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_Weapon*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetDataPtr)
+		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamPtr)
 		{
-			bIsAutomaticStop = GameplayAbilityTargetDataPtr->bIsAutomaticStop;
 		}
 		else
 		{
@@ -55,9 +37,7 @@ void USkill_WeaponActive_Base::PreActivate(
 
 	ResetPreviousStageActions();
 
-	SkillState = EType::kNone;
-
-	bIsRequstCancel = false;
+	WaitInputTaskPtr = nullptr;
 }
 
 void USkill_WeaponActive_Base::ActivateAbility(
@@ -69,7 +49,19 @@ void USkill_WeaponActive_Base::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	RepeatAction();
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+bool USkill_WeaponActive_Base::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+) const
+{
+
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
 void USkill_WeaponActive_Base::CancelAbility(
@@ -79,11 +71,6 @@ void USkill_WeaponActive_Base::CancelAbility(
 	bool bReplicateCancelAbility
 )
 {
-	ResetListLock();
-
-	bIsRequstCancel = true;
-
-	// 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
@@ -95,20 +82,7 @@ void USkill_WeaponActive_Base::EndAbility(
 	bool bWasCancelled
 )
 {
-	SkillState = EType::kFinished;
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
-void USkill_WeaponActive_Base::ForceCancel()
-{
-	bIsRequstCancel = true;
-	DecrementToZeroListLock();
-}
-
-void USkill_WeaponActive_Base::RequestCancel()
-{
-	bIsRequstCancel = true;
 }
 
 void USkill_WeaponActive_Base::ContinueActive()
@@ -118,83 +92,63 @@ void USkill_WeaponActive_Base::ContinueActive()
 		return;
 	}
 
-	bIsRequstCancel = false;
-
-	switch (SkillState)
+	bIsContinue = true;
+	if (WaitInputTaskPtr)
 	{
-	case USkill_WeaponActive_Base::EType::kAttackingEnd:
-	{
-		RepeatAction();
-	}
-	break;
-	default:
-		break;
-	}
-}
+		WaitInputTaskPtr->ExternalCancel();
+		WaitInputTaskPtr = nullptr;
 
-void USkill_WeaponActive_Base::PerformAction()
-{
-	SkillState = EType::kRunning;
-}
-
-void USkill_WeaponActive_Base::PerformStopAction()
-{
-}
-
-bool USkill_WeaponActive_Base::IsEnd() const
-{
-	switch (SkillState)
-	{
-	case EType::kAttackingEnd:
-	case EType::kFinished:
-	{
-		return true;
-	}
-	}
-	return false;
-}
-
-void USkill_WeaponActive_Base::RepeatAction()
-{
-	// 运行之这里，说明 ScopeLockCount == 0
-
-	if (bIsRequstCancel)
-	{
-		PRINTINVOKEINFO();
-		ResetPreviousStageActions();
-
-		WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::K2_CancelAbility));
-
-		PerformStopAction();
-
-		RunIfListLock();
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 	}
 	else
 	{
-		// AI自动释放技能时停止方式
-		if (bIsAutomaticStop && IsEnd())
-		{
-			PRINTINVOKEINFO();
+	}
+}
+
+void USkill_WeaponActive_Base::StopContinueActive()
+{
+	bIsContinue = false;
+}
+
+void USkill_WeaponActive_Base::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+}
+
+void USkill_WeaponActive_Base::CheckInContinue()
+{
+	if (bIsContinue)
+	{
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+	}
+	else
+	{
+		WaitInputPercent = 1.f;
+
+		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
+		WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
+		WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
-			return;
-		}
+			return true;
+			});
+		WaitInputTaskPtr->ReadyForActivation();
+	}
+}
 
-		if (CanActivateAbility(CurrentSpecHandle, CurrentActorInfo))
-		{
-			PRINTINVOKEINFO();
-			ResetPreviousStageActions();
-
-			WaitingToExecute.Add(FPostLockDelegate::CreateUObject(this, &ThisClass::RepeatAction));
-
-			PerformAction();
-
-			RunIfListLock();
-		}
-		// 被其他技能打断
-		else
-		{
-			PRINTINVOKEINFO();
-			K2_CancelAbility();
-		}
+void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInputTaskPtr, float Interval, float Duration)
+{
+	if (Duration > 0.f)
+	{
+		WaitInputPercent = FMath::Clamp(1.f - (Interval / Duration), 0.f, 1.f);
+	}
+	else
+	{
+		check(0);
+		WaitInputPercent = 1.f;
 	}
 }

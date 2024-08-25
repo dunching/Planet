@@ -15,7 +15,10 @@ class AWeapon_RangeTest;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
 
-struct FGameplayAbilityTargetData_PickAxe;
+struct FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest : public FGameplayAbilityTargetData_Skill_Weapon
+{
+	AWeapon_RangeTest* WeaponPtr = nullptr;
+};
 
 UCLASS()
 class PLANET_API ASkill_WeaponActive_RangeTest_Projectile : public AProjectileBase
@@ -61,9 +64,12 @@ public:
 
 protected:
 
-	virtual void PerformAction()override;
-
-	virtual bool IsEnd()const override;
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	)override;
 
 	void PlayMontage();
 
@@ -100,9 +106,4 @@ protected:
 
 	AWeapon_RangeTest* EquipmentAxePtr = nullptr;
 
-};
-
-struct FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest : public FGameplayAbilityTargetData_Skill_Weapon
-{
-	AWeapon_RangeTest* WeaponPtr = nullptr;
 };

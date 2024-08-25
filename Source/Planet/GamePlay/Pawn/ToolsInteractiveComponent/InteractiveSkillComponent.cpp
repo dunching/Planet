@@ -158,20 +158,7 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 
 			if (WeaponUnit)
 			{
-				auto GASpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(WeaponUnit->Handle);
-				if (GASpecPtr)
-				{
-					auto GAInsPtr = Cast<USkill_WeaponActive_Base>(GASpecPtr->GetPrimaryInstance());
-					if (GAInsPtr)
-					{
-						GAInsPtr->ForceCancel();
-					}
-					else
-					{
-						return false;
-					}
-				}
-
+				OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilityHandle(WeaponUnit->Handle);
 				OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(WeaponUnit->Handle);
 			}
 			if (ActivedWeaponPtr)
@@ -341,7 +328,7 @@ void UInteractiveSkillComponent::CancelSkill_WeaponActive(const TSharedPtr<FCanb
 		return;
 	}
 
-	GAInsPtr->RequestCancel();
+	GAInsPtr->StopContinueActive();
 }
 
 bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
@@ -387,21 +374,21 @@ bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
 	{
 		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_PickAxe;
 		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_PickAxe>(ActivedWeaponPtr);
-		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
+		GameplayAbilityTargetDashPtr->bIsAutoContinue = !bIsAutomaticStop;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 	}
 	else if (WeaponUnit->WeaponUnitPtr->FirstSkill->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_HandProtection))
 	{
 		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponHandProtection;
 		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_HandProtection>(ActivedWeaponPtr);
-		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
+		GameplayAbilityTargetDashPtr->bIsAutoContinue = !bIsAutomaticStop;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 	}
 	else if (WeaponUnit->WeaponUnitPtr->FirstSkill->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_RangeTest))
 	{
 		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest;
 		GameplayAbilityTargetDashPtr->WeaponPtr = Cast<AWeapon_RangeTest>(ActivedWeaponPtr);
-		GameplayAbilityTargetDashPtr->bIsAutomaticStop = bIsAutomaticStop;
+		GameplayAbilityTargetDashPtr->bIsAutoContinue = !bIsAutomaticStop;
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 	}
 

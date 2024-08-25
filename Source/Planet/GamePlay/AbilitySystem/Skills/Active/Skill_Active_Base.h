@@ -23,6 +23,8 @@ struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetDat
 	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const;
 
 	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
+
+	bool bIsAutoContinue = false;
 };
 
 /**
@@ -49,6 +51,13 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
+	);
+
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
 	);
 
 	virtual bool CommitAbility(
@@ -83,16 +92,7 @@ public:
 
 	virtual void Tick(float DeltaTime);
 
-	virtual void PerformAction(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	);
-
 	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
-
-	void WaitInput();
 
 	void ContinueActive();
 
@@ -108,6 +108,15 @@ public:
 	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 
 protected:
+
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
+
+	void CheckInContinue();
 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);

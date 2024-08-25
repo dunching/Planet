@@ -50,6 +50,18 @@ void USkill_Active_Base::PreActivate(
 	}
 }
 
+void USkill_Active_Base::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
 bool USkill_Active_Base::CommitAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -120,7 +132,7 @@ void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Perc
 	}
 }
 
-void USkill_Active_Base::WaitInput()
+void USkill_Active_Base::CheckInContinue()
 {
 	if (bIsPreviouInput)
 	{

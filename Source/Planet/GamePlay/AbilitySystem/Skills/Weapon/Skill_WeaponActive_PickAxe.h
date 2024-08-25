@@ -13,7 +13,10 @@ class AWeapon_PickAxe;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
 
-struct FGameplayAbilityTargetData_PickAxe;
+struct FGameplayAbilityTargetData_Skill_PickAxe : public FGameplayAbilityTargetData_Skill_Weapon
+{
+	AWeapon_PickAxe* WeaponPtr = nullptr;
+};
 
 UCLASS()
 class PLANET_API USkill_WeaponActive_PickAxe : public USkill_WeaponActive_Base
@@ -50,14 +53,20 @@ public:
 
 protected:
 
-	virtual void PerformAction()override;
-
-	virtual bool IsEnd()const override;
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	)override;
 
 	void PlayMontage();
 
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
+
+	UFUNCTION()
+	void OnMontateComplete();
 
 	void MakeDamage();
 
@@ -86,9 +95,6 @@ protected:
 
 	AWeapon_PickAxe* EquipmentAxePtr = nullptr;
 
-};
+	int32 MontageNum = 0;
 
-struct FGameplayAbilityTargetData_Skill_PickAxe : public FGameplayAbilityTargetData_Skill_Weapon
-{
-	AWeapon_PickAxe* WeaponPtr = nullptr;
 };

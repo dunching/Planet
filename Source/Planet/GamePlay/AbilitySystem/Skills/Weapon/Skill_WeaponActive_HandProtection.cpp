@@ -114,9 +114,14 @@ void USkill_WeaponActive_HandProtection::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_WeaponActive_HandProtection::PerformAction()
+void USkill_WeaponActive_HandProtection::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
-	Super::PerformAction();
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	if (CurrentIndex >= 3)
 	{
@@ -150,38 +155,14 @@ void USkill_WeaponActive_HandProtection::PerformAction()
 	}
 }
 
-void USkill_WeaponActive_HandProtection::PerformStopAction()
-{
-	ExcuteStopStep();
-}
-
 void USkill_WeaponActive_HandProtection::ResetPreviousStageActions()
 {
-	if (InputRangeHelperPtr)
-	{
-		InputRangeHelperPtr->RemoveFromParent();
-		InputRangeHelperPtr = nullptr;
-	}
-
 	Super::ResetPreviousStageActions();
-}
-
-bool USkill_WeaponActive_HandProtection::IsEnd() const
-{
-	if (CurrentIndex >= 3)
-	{
-		return true;
-	}
-
-	return Super::IsEnd();
 }
 
 void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 {
 	IncrementListLock();
-
-	InputRangeHelperPtr = UUIManagerSubSystem::GetInstance()->ViewProgressTips(true);
-	InputRangeHelperPtr->SetWaitTime(InputRangeInSecond);
 
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 
@@ -189,12 +170,6 @@ void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 
 	TaskPtr->OnFinished.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr) {
 		CurrentIndex = 0;
-
-		if (InputRangeHelperPtr)
-		{
-			InputRangeHelperPtr->RemoveFromParent();
-			InputRangeHelperPtr = nullptr;
-		}
 
 		DecrementListLockOverride();
 		return true;
@@ -232,12 +207,6 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 	if (NotifyName == Skill_WeaponHandProtection::AttackEnd)
 	{
 		MakeDamage();
-
-		SkillState = EType::kAttackingEnd;
-		if (!bIsRequstCancel)
-		{
-			DecrementToZeroListLock();
-		}
 	}
 }
 

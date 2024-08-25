@@ -115,16 +115,16 @@ void USkill_WeaponActive_PickAxe::ActivateAbility(
 	K2_EndAbility();
 }
 
-void USkill_WeaponActive_PickAxe::PerformAction()
+void USkill_WeaponActive_PickAxe::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
-	Super::PerformAction();
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	StartTasksLink();
-}
-
-bool USkill_WeaponActive_PickAxe::IsEnd() const
-{
-	return Super::IsEnd();
 }
 
 void USkill_WeaponActive_PickAxe::StartTasksLink()
@@ -141,11 +141,16 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 	{
 		MakeDamage();
 
-		SkillState = EType::kAttackingEnd;
-		if (!bIsRequstCancel)
-		{
-			DecrementToZeroListLock();
-		}
+		CheckInContinue();
+	}
+}
+
+void USkill_WeaponActive_PickAxe::OnMontateComplete()
+{
+	MontageNum--;
+	if (MontageNum <= 0)
+	{
+		K2_CancelAbility();
 	}
 }
 
@@ -222,12 +227,12 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 		
 		AbilityTask_PlayMontage_PickAxePtr->Ability = this;
 		AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+		AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 		AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
 
-		IncrementListLock();
+		MontageNum++;
 	}
 	{
 		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -240,13 +245,13 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
 		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
 
-		IncrementListLock();
+		MontageNum++;
 	}
 }

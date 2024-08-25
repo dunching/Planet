@@ -10,6 +10,12 @@
 #include "Skill_WeaponActive_Base.generated.h"
 
 class UBasicUnit;
+class UAbilityTask_TimerHelper;
+
+struct FGameplayAbilityTargetData_Skill_Weapon : public FGameplayAbilityTargetData
+{
+	bool bIsAutoContinue = false;
+};
 
 UCLASS()
 class USkill_WeaponActive_Base : public USkill_Base
@@ -17,6 +23,8 @@ class USkill_WeaponActive_Base : public USkill_Base
 	GENERATED_BODY()
 
 public:
+
+	using ActiveParamType = FGameplayAbilityTargetData_Skill_Weapon;
 
 	USkill_WeaponActive_Base();
 
@@ -28,6 +36,13 @@ public:
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
 
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
+
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -35,13 +50,6 @@ public:
 		const FGameplayTagContainer* TargetTags = nullptr,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
-
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	);
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -58,41 +66,34 @@ public:
 		bool bWasCancelled
 	)override;
 
-	void ForceCancel();
-
-	void RequestCancel();
-
 	void ContinueActive();
 
+	void StopContinueActive();
+
 protected:
+	
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
 
-	virtual void PerformAction();
+	void CheckInContinue();
 
-	virtual void PerformStopAction();
+	UFUNCTION()
+	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
 
-	virtual bool IsEnd()const;
+	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
 
-	void RepeatAction();
+	bool bIsContinue = true;
 
-	enum class EType
-	{
-		kNone,
-		kRunning,
-		kAttackingEnd,
-		kFinished,
-	};
+	float CurrentWaitInputTime = 3.f;
 
-	EType SkillState = EType::kNone;
+	float WaitInputPercent = 1.f;
 
-	bool bIsRequstCancel = false;
-
-	bool bIsAutomaticStop = false;
+	const ActiveParamType* ActiveParamPtr = nullptr;
 
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
-};
-
-struct FGameplayAbilityTargetData_Skill_Weapon : public FGameplayAbilityTargetData
-{
-	bool bIsAutomaticStop = false;
 };

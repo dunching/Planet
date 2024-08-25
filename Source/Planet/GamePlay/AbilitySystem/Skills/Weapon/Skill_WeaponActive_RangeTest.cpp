@@ -88,16 +88,16 @@ void USkill_WeaponActive_RangeTest::OnRemoveAbility(const FGameplayAbilityActorI
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void USkill_WeaponActive_RangeTest::PerformAction()
+void USkill_WeaponActive_RangeTest::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
-	Super::PerformAction();
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	StartTasksLink();
-}
-
-bool USkill_WeaponActive_RangeTest::IsEnd() const
-{
-	return Super::IsEnd();
 }
 
 void USkill_WeaponActive_RangeTest::StartTasksLink()
@@ -136,12 +136,6 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 	if (NotifyName == Skill_WeaponActive_RangeTest::AttackEnd)
 	{
 		EmitProjectile();
-
-		SkillState = EType::kAttackingEnd;
-		if (!bIsRequstCancel)
-		{
-			DecrementToZeroListLock();
-		}
 	}
 }
 

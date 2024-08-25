@@ -20,7 +20,6 @@ class ACharacterBase;
 class AHumanCharacter;
 class AHumanAIController;
 
-
 UCLASS(Blueprintable)
 class PLANET_API UGloabVariable : public UObject
 {

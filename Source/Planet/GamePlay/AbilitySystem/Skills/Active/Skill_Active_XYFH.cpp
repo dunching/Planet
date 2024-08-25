@@ -280,7 +280,7 @@ void USkill_Active_XYFH::OnMoveStepComplete()
 		return;
 	}
 
-	WaitInput();
+	CheckInContinue();
 }
 
 void USkill_Active_XYFH::OnSubMoveStepComplete()
