@@ -28,12 +28,13 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 
-//	InitialSenseConfig();
+	// 设置这个之后BP不能保存？
+	InitialSenseConfig();
 }
 
 void AHumanAIController::InitialSenseConfig()
 {
-	auto SightConfig = NewObject<UAISenseConfig_Sight>(this, UAISenseConfig_Sight::StaticClass(), TEXT("UAISenseConfig_Sight"));
+	auto SightConfig = NewObject<UAISenseConfig_Sight>();
 	check(SightConfig);
 	SightConfig->SightRadius = 50000;
 	SightConfig->LoseSightRadius = 53000;

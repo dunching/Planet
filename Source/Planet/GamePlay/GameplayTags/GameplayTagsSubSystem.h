@@ -124,6 +124,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
 	FGameplayTag State_ReleasingSkill_Continuous =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Continuous")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	FGameplayTag State_ReleasingSkill_Active =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Active")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
 	FGameplayTag State_ReleasingSkil_WeaponActive =

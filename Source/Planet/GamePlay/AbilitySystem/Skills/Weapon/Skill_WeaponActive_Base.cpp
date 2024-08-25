@@ -117,6 +117,7 @@ void USkill_WeaponActive_Base::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
+	bIsContinue = true;
 }
 
 void USkill_WeaponActive_Base::CheckInContinue()

@@ -32,14 +32,7 @@ void UAITask_ReleaseSkill::Activate()
 
 void UAITask_ReleaseSkill::ConditionalPerformTask()
 {
-	CurrentTaslHasReleaseNum = 0;
-
-	PerformTask();
-}
-
-bool UAITask_ReleaseSkill::WasMoveSuccessful() const
-{
-	return CurrentTaslHasReleaseNum > 0;
+	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::PerformTask), Frequency);
 }
 
 void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
@@ -47,38 +40,14 @@ void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
 	CharacterPtr = InChracterPtr;
 }
 
-void UAITask_ReleaseSkill::PerformTask()
+bool UAITask_ReleaseSkill::PerformTask(float)
 {
-	if (ReleasingSKill())
+	if (bIsPauseRelease)
 	{
-
-	}
-	else
-	{
-		EndTask();
-	}
-}
-
-void UAITask_ReleaseSkill::OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr)
-{
-	if (GAPtr && ReleasingSkillMap.Contains(GAPtr->GetCurrentAbilitySpecHandle()))
-	{
-		ReleasingSkillMap.Remove(GAPtr->GetCurrentAbilitySpecHandle());
+		StopReleaseSkill();
+		return true;
 	}
 
-	if (GAPtr && ReleasingSkillDelegateMap.Contains(GAPtr->GetCurrentAbilitySpecHandle()))
-	{
-		ReleasingSkillDelegateMap.Remove(GAPtr->GetCurrentAbilitySpecHandle());
-	}
-
-	if (ReleasingSkillMap.IsEmpty() && ReleasingSkillDelegateMap.IsEmpty())
-	{
-		EndTask();
-	}
-}
-
-bool UAITask_ReleaseSkill::ReleasingSKill()
-{
 	if (CharacterPtr)
 	{
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
@@ -88,6 +57,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{
+			// 
 		}
 		else
 		{
@@ -120,11 +90,6 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 							if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter))
 							{
 								ReleasingSkillMap.Add(GAInsPtr->GetCurrentAbilitySpecHandle(), Iter);
-								ReleasingSkillDelegateMap.Add(
-									GAInsPtr->GetCurrentAbilitySpecHandle(),
-									GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
-								);
-								CurrentTaslHasReleaseNum++;
 								return true;
 							}
 						}
@@ -158,7 +123,7 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 						}
 
 						auto bIsReady = GAInsPtr->CanActivateAbility(
-							GAInsPtr->GetCurrentAbilitySpecHandle(), 
+							GAInsPtr->GetCurrentAbilitySpecHandle(),
 							GAInsPtr->GetCurrentActorInfo()
 						);
 						if (bIsReady)
@@ -166,11 +131,6 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 							if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter, true))
 							{
 								ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
-								ReleasingSkillDelegateMap.Add(
-									WeaponSPtr->Handle,
-									GAInsPtr->OnGameplayAbilityEnded.AddUObject(this, &ThisClass::OnOnGameplayAbilityEnded)
-								);
-								CurrentTaslHasReleaseNum++;
 								return true;
 							}
 						}
@@ -181,11 +141,10 @@ bool UAITask_ReleaseSkill::ReleasingSKill()
 			}
 		}
 	}
-
-	return false;
+	return true;
 }
 
-void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
+void UAITask_ReleaseSkill::StopReleaseSkill()
 {
 	for (const auto Iter : ReleasingSkillMap)
 	{
@@ -202,11 +161,30 @@ void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
 			return;
 		}
 
-		GAInsPtr->OnGameplayAbilityEnded.Remove(ReleasingSkillDelegateMap[Iter.Key]);
-
 		// 2.
 		CharacterPtr->GetInteractiveSkillComponent()->CancelAction(Iter.Value);
 	}
+	ReleasingSkillMap.Empty();
+}
+
+void UAITask_ReleaseSkill::OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr)
+{
+	if (GAPtr && ReleasingSkillMap.Contains(GAPtr->GetCurrentAbilitySpecHandle()))
+	{
+		ReleasingSkillMap.Remove(GAPtr->GetCurrentAbilitySpecHandle());
+	}
+
+	if (ReleasingSkillMap.IsEmpty())
+	{
+		EndTask();
+	}
+}
+
+void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
+{
+	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
+
+	StopReleaseSkill();
 
 	Super::OnDestroy(bInOwnerFinished);
 }

@@ -7,6 +7,7 @@
 #include "StateTreeTaskBase.h"
 #include "StateTreeExecutionContext.h"
 #include "Tasks/StateTreeAITask.h"
+#include "AISystem.h"
 
 #include "GenerateType.h"
 
@@ -19,8 +20,8 @@ class UAITask_ReleaseSkill;
 UENUM(BlueprintType)
 enum class EUpdateReleaseSkillStuteType : uint8
 {
-	kNone,
 	kCheck,
+	kMoveTo,
 	kRelease,
 };
 
@@ -33,9 +34,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	bool bIsNeedRelease = false;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	EUpdateReleaseSkillStuteType UpdateReleaseSkillStuteType = EUpdateReleaseSkillStuteType::kNone;
+	EUpdateReleaseSkillStuteType UpdateReleaseSkillStuteType = EUpdateReleaseSkillStuteType::kCheck;
 
 };
 
@@ -49,8 +50,8 @@ struct PLANET_API FStateTreeReleaseSkillTaskInstanceData
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, Category = Context)
+
+	UPROPERTY(EditAnywhere, Category = Output)
 	UReleaseSkillGloabVariable* GloabVariable = nullptr;
 
 	UPROPERTY(Transient)
@@ -72,7 +73,7 @@ struct PLANET_API FSTT_ReleaseSkill : public FStateTreeAIActionTaskBase
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
 	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context, 
+		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
@@ -82,7 +83,7 @@ struct PLANET_API FSTT_ReleaseSkill : public FStateTreeAIActionTaskBase
 	) const override;
 
 	virtual EStateTreeRunStatus Tick(
-		FStateTreeExecutionContext& Context, 
+		FStateTreeExecutionContext& Context,
 		const float DeltaTime
 	) const override;
 
@@ -94,15 +95,24 @@ USTRUCT()
 struct PLANET_API FStateTreeUpdateReleaseSkillStuteTaskInstanceData
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = Context)
 	UReleaseSkillGloabVariable* GloabVariable = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Context)
+	FVector TargetLocation = FVector::ZeroVector;
+
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	float AcceptableRadius = GET_AI_CONFIG_VAR(AcceptanceRadius);
+
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	EUpdateReleaseSkillStuteType CurrentState = EUpdateReleaseSkillStuteType::kCheck;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;

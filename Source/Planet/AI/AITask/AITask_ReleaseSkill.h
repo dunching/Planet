@@ -28,29 +28,29 @@ public:
 
 	void ConditionalPerformTask();
 
-	bool WasMoveSuccessful() const;
-
 	void SetUp(ACharacterBase* InChracterPtr);
+
+	bool bIsPauseRelease = true;
 
 protected:
 
 	virtual void Activate() override;
 
 	virtual void OnDestroy(bool bOwnerFinished) override;
+	
+	UFUNCTION()
+	bool PerformTask(float Delta);
 
-	virtual void PerformTask();
+	void StopReleaseSkill();
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
-	bool ReleasingSKill();
-
-	int32 CurrentTaslHasReleaseNum = 0;
-
 	TMap<FGameplayAbilitySpecHandle, TSharedPtr<FCanbeInteractionInfo>>ReleasingSkillMap;
 
-	// ²»ÐèÒª
-	TMap<FGameplayAbilitySpecHandle, FDelegateHandle>ReleasingSkillDelegateMap;
-
 	ACharacterBase* CharacterPtr = nullptr;
+
+	FTSTicker::FDelegateHandle TickDelegateHandle;
+
+	const float Frequency = 1.f;
 
 };

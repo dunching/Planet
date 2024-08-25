@@ -41,8 +41,6 @@ FName UInteractiveSkillComponent::ComponentName = TEXT("InteractiveSkillComponen
 
 void UInteractiveSkillComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	RetractputWeapon();
-
 	Super::EndPlay(EndPlayReason);
 }
 
