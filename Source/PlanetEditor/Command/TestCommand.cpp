@@ -274,7 +274,7 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 			};
 
 		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHumanCharacter>(
-			UAssetRefMap::GetInstance()->HumanClass,
+			UAssetRefMap::GetInstance()->TestNPC_HumanClass,
 			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * 600),
 			FRotator::ZeroRotator,
 			SpawnParameters

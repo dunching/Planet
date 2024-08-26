@@ -100,8 +100,4 @@ protected:
 	FFocusKnowledge	FocusInformation;
 
 	UFocusIcon* FocusIconPtr = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
-	FGameplayTag RowName = FGameplayTag::EmptyTag;
-
 };

@@ -53,6 +53,7 @@ void UBasicFutures_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
+		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
 	}
 }
 
@@ -117,6 +118,11 @@ bool UBasicFutures_Dash::CommitAbility(
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
+
+		if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
+		{
+			DashInAir++;
+		}
 	}
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
@@ -153,6 +159,11 @@ bool UBasicFutures_Dash::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags
 ) const
 {
+	if (DashInAir >= MaxDashInAir)
+	{
+		return false;
+	}
+
 	if (CharacterPtr)
 	{
 		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
@@ -163,6 +174,16 @@ bool UBasicFutures_Dash::CanActivateAbility(
 	}
 
 	return false;
+}
+
+void UBasicFutures_Dash::OnGameplayTaskDeactivated(UGameplayTask& Task)
+{
+	Super::OnGameplayTaskDeactivated(Task);
+
+	if (ActiveTasks.IsEmpty())
+	{
+		K2_CancelAbility();
+	}
 }
 
 void UBasicFutures_Dash::DoDash(
@@ -235,12 +256,7 @@ void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-
 		TaskPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }
 
@@ -265,13 +281,11 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-		// TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementListLockOverride);
-
-		// 如果遇到障碍 提前结束
-		TaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementToZeroListLock);
-
 		TaskPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
+}
+
+void UBasicFutures_Dash::OnLanded(const FHitResult&)
+{
+	DashInAir = 0;
 }

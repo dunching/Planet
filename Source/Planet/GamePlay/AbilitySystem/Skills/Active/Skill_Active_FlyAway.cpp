@@ -76,7 +76,10 @@ bool USkill_Active_FlyAway::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
+	if (
+		CharacterPtr->GetCharacterMovement()->IsFlying() ||
+		CharacterPtr->GetCharacterMovement()->IsFalling() 
+		)
 	{
 		return false;
 	}

@@ -230,7 +230,7 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 
 void APlanetPlayerController::OnPossess(APawn* InPawn)
 {
-	bool bIsNewPawn = (InPawn && InPawn != GetPawn());
+	bool bIsNewPawn = (InPawn != GetPawn());
 
 	if (bIsNewPawn)
 	{
@@ -241,35 +241,36 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 
 	if (bIsNewPawn)
 	{
-		if (InPawn)
+	}
+
+	if (InPawn)
+	{
+		// 注意：PC并非是在此处绑定，这段仅为测试
+		BindPCWithCharacter();
+
+		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
-			// 注意：PC并非是在此处绑定，这段仅为测试
-			BindPCWithCharacter();
+			// 在SetPawn之后调用
+			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
+				NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
+				});
 
-			if (InPawn->IsA(AHumanCharacter::StaticClass()))
+			GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
+
+			// 绑定效果状态栏
+			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+			if (EffectPtr)
 			{
-				// 在SetPawn之后调用
-				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
-					NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
-					});
-
-				GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
-
-				// 绑定效果状态栏
-				auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-				if (EffectPtr)
-				{
-					EffectPtr->BindCharacterState(GetRealCharacter());
-				}
+				EffectPtr->BindCharacterState(GetRealCharacter());
 			}
-			else if (InPawn->IsA(AHorseCharacter::StaticClass()))
-			{
-				auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
+		}
+		else if (InPawn->IsA(AHorseCharacter::StaticClass()))
+		{
+			auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
 
-				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>([this, InPawn](auto NewProcessor) {
-					NewProcessor->SetPawn(Cast<AHorseCharacter>(InPawn));
-					});
-			}
+			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>([this, InPawn](auto NewProcessor) {
+				NewProcessor->SetPawn(Cast<AHorseCharacter>(InPawn));
+				});
 		}
 	}
 }
@@ -355,16 +356,7 @@ void APlanetPlayerController::BindPCWithCharacter()
 
 UCharacterUnit* APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
-	if (!CharaterPtr->GetCharacterUnit())
-	{
-		const auto CharacterUnitPtr =
-			Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
-
-		CharaterPtr->SetCharacterUnit(CharacterUnitPtr);
-		return CharacterUnitPtr;
-	}
-
-	return nullptr;
+	return CharaterPtr->GetCharacterUnit();
 }
 
 void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)

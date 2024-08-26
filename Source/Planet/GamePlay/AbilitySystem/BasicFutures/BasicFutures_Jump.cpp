@@ -30,6 +30,17 @@ void UBasicFutures_Jump::PostCDOContruct()
 	}
 }
 
+void UBasicFutures_Jump::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
+	}
+}
+
 void UBasicFutures_Jump::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -70,4 +81,9 @@ void UBasicFutures_Jump::CancelAbility(
 	Character->StopJumping();
 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
+}
+
+void UBasicFutures_Jump::OnLanded(const FHitResult& Hit)
+{
+	K2_CancelAbility();
 }

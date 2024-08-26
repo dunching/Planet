@@ -190,13 +190,6 @@ namespace HumanProcessor
 
 	void FHumanProcessor::LShiftKeyReleased()
 	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr)
-		{
-			FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Dash };
-			OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
-		}
 	}
 
 	void FHumanProcessor::SpaceKeyPressed()
@@ -213,12 +206,5 @@ namespace HumanProcessor
 
 	void FHumanProcessor::SpaceKeyReleased()
 	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr)
-		{
-			FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump };
-			OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
-		}
 	}
 }

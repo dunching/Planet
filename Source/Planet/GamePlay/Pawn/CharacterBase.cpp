@@ -90,14 +90,6 @@ void ACharacterBase::BeginPlay()
 		}
 	}
 
-	auto GASPtr = GetAbilitySystemComponent();
-
-	GASPtr->ClearAllAbilities();
-	GASPtr->InitAbilityActorInfo(this, this);
-	GetInteractiveSkillComponent()->InitialBaseGAs();
-	GetInteractiveBaseGAComponent()->InitialBaseGAs();
-	GetInteractiveConsumablesComponent()->InitialBaseGAs();
-
 	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
 	OnMoveSpeedChanged(CharacterAttributesSPtr->MoveSpeed.GetCurrentValue());
 
@@ -147,6 +139,11 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
+void ACharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
 void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -156,11 +153,6 @@ void ACharacterBase::UnPossessed()
 {
 	AController* const OldController = Controller;
 
-	if (OldController && OldController->IsA(AAIController::StaticClass()))
-	{
-//		OldController->Destroy();
-	}
-
 	Super::UnPossessed();
 
 	if (IsActorBeingDestroyed())
@@ -169,7 +161,17 @@ void ACharacterBase::UnPossessed()
 	}
 	else if(OriginalAIController)
 	{
-		OriginalAIController->Possess(this);
+		if (OldController)
+		{
+			if (OldController->IsA(AAIController::StaticClass()))
+			{
+				//		OldController->Destroy();
+			}
+			else if (OldController->IsA(APlayerController::StaticClass()))
+			{
+				OriginalAIController->Possess(this);
+			}
+		}
 	}
 }
 
@@ -263,6 +265,25 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ACharacterBase::SpawnDefaultController()
 {
+#if WITH_EDITOR
+	UWorld* World = GetWorld();
+	if ((GIsEditor == false || World->IsGameWorld()))
+#endif // WITH_EDITOR
+	{
+	}
+	const auto NewCharacterUnitPtr =
+		Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
+
+	SetCharacterUnit(NewCharacterUnitPtr);
+
+	auto GASPtr = GetAbilitySystemComponent();
+
+	GASPtr->ClearAllAbilities();
+	GASPtr->InitAbilityActorInfo(this, this);
+	GetInteractiveSkillComponent()->InitialBaseGAs();
+	GetInteractiveBaseGAComponent()->InitialBaseGAs();
+	GetInteractiveConsumablesComponent()->InitialBaseGAs();
+
 	Super::SpawnDefaultController();
 
 	OriginalAIController = Controller;

@@ -23,6 +23,11 @@ public:
 
 	virtual void PostCDOContruct() override;
 
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -44,5 +49,10 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo, 
 		bool bReplicateCancelAbility
 	);
+
+protected:
+
+	UFUNCTION()
+	void OnLanded(const FHitResult& Hit);
 
 };

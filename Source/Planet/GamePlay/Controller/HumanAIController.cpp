@@ -114,8 +114,6 @@ void AHumanAIController::BeginPlay()
 
 	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
 	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
-
-	InitialCharacter();
 }
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -128,6 +126,8 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	InitialCharacter();
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
 		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
@@ -240,6 +240,30 @@ void AHumanAIController::InitialCharacter()
 				// ¼¼ÄÜ
 				{
 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
+					{
+						auto SkillUnitPtr = Cast<USkillUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1, 1));
+						if (SkillUnitPtr)
+						{
+							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+
+							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket1;
+							SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
+
+							SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+						}
+					}
+					{
+						auto SkillUnitPtr = Cast<USkillUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2, 1));
+						if (SkillUnitPtr)
+						{
+							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+
+							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket1;
+							SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
+
+							SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+						}
+					}
 					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 					EICPtr->RegisterMultiGAs(SkillsMap);
 				}

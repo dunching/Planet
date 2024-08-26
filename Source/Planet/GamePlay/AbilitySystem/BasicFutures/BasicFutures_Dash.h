@@ -76,6 +76,8 @@ public:
 
 protected:
 
+	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+
 	void DoDash(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -86,6 +88,9 @@ protected:
 	void PlayMontage(UAnimMontage* CurMontagePtr,  float Rate);
 
 	void Displacement(const FVector& Direction);
+
+	UFUNCTION()
+	void OnLanded(const FHitResult& Hit);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* ForwardMontage = nullptr;
@@ -110,7 +115,11 @@ protected:
 
 	ACharacterBase* CharacterPtr = nullptr;
 
-	FVector Start;
+	FVector Start = FVector::ZeroVector;
+
+	int32 DashInAir = 0;
+
+	const int32 MaxDashInAir = 1;
 
 private:
 

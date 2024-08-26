@@ -367,7 +367,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
-			OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
+			SendEventHandle,
 			ASCPtr->AbilityActorInfo.Get(),
 			FGameplayTag(),
 			&Payload,
@@ -390,7 +390,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
-			OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
+			SendEventHandle,
 			ASCPtr->AbilityActorInfo.Get(),
 			FGameplayTag(),
 			&Payload,
@@ -413,7 +413,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
-			OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
+			SendEventHandle,
 			ASCPtr->AbilityActorInfo.Get(),
 			FGameplayTag(),
 			&Payload,
@@ -436,7 +436,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
-			OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEventHandle,
+			SendEventHandle,
 			ASCPtr->AbilityActorInfo.Get(),
 			FGameplayTag(),
 			&Payload,
