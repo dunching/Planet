@@ -16,6 +16,10 @@ struct FGameplayAbilityTargetData_Affected : public FGameplayAbilityTargetData
 	EAffectedDirection AffectedDirection = EAffectedDirection::kForward;
 };
 
+/**
+ * 受击时的“僵直效果”
+ */
+
 UCLASS()
 class PLANET_API UBasicFutures_Affected : public UBasicFuturesBase
 {

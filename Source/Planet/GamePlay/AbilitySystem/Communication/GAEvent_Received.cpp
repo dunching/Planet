@@ -60,11 +60,11 @@ void UGAEvent_Received::ActivateAbility(
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*CloneSPtr);
 
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->ProcessGAEVent(*CloneSPtr);
 
 			CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
-			GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamage.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
+			GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
 			if (GAEventDataPtr->Data.bIsMakeAttackEffect)
 			{

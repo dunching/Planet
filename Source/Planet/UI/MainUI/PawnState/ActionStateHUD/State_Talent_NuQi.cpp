@@ -25,8 +25,8 @@ void UState_Talent_NuQi::NativeConstruct()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (CharacterPtr)
 	{
-		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
+		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributesSPtr->TalentSPtr.Get());
 		if (TalentPtr)
 		{
 			OnValueChanged = TalentPtr->CallbackContainerHelper.AddOnValueChanged(

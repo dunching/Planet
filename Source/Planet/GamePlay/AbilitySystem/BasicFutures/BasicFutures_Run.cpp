@@ -5,12 +5,13 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 #include "CharacterBase.h"
-#include "CharacterAttributesComponent.h"
 #include "InteractiveSkillComponent.h"
 #include "InteractiveToolComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
+#include "CharacterAttributesComponent.h"
+#include "CharacterAttibutes.h"
 #include "Planet_Tools.h"
 
 UBasicFutures_Run::UBasicFutures_Run() :
@@ -26,6 +27,7 @@ void UBasicFutures_Run::PostCDOContruct()
 	if (GetWorldImp())
 	{
 		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Running);
+		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Running);
 
 		FAbilityTriggerData AbilityTriggerData;
 
@@ -66,7 +68,10 @@ void UBasicFutures_Run::ActivateAbility(
 	{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 		
-		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, RunningSpeedOffset);
+		ModifyPropertyMap.Add(
+			ECharacterPropertyType::MoveSpeed,
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->RunningSpeedOffset.GetCurrentValue()
+		);
 
 		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
 	}
@@ -87,7 +92,7 @@ void UBasicFutures_Run::EndAbility(
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
 
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+		CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
 	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -101,19 +106,16 @@ bool UBasicFutures_Run::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
+	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	if (CharacterPtr)
 	{
-		auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-		if (CharacterPtr)
+		if (CharacterPtr->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
 		{
-			if (CharacterPtr->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
+			auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			if (CharacterAttributesSPtr->PP.GetCurrentValue() >=
+				CharacterAttributesSPtr->RunningConsume.GetCurrentValue())
 			{
-				auto& PawnDataStructPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-				if (PawnDataStructPtr.PP.GetCurrentValue() >=
-					PawnDataStructPtr.RunningConsume.GetCurrentValue())
-				{
-					return true;
-				}
+				return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 			}
 		}
 	}

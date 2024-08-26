@@ -203,7 +203,7 @@ bool UCS_PeriodicPropertyModify::OnTaskFinished_Continue(UAbilityTask_TimerHelpe
 		GameplayAbilityTargetDataAry.RemoveAt(GameplayAbilityTargetDataAry.Num() - 1);
 
 
-		// 移除周期内的属性
+		// 移除周期内的属性(按层数)
 		{
 			for (auto& Iter : GameplayAbilityTargetDataPtr->ModifyPropertyMap)
 			{
@@ -217,6 +217,10 @@ bool UCS_PeriodicPropertyModify::OnTaskFinished_Continue(UAbilityTask_TimerHelpe
 
 		if (GameplayAbilityTargetDataAry.IsEmpty())
 		{
+			// 
+			GameplayAbilityTargetDataPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(
+				GameplayAbilityTargetDataPtr->ModifyPropertyMap, GameplayAbilityTargetDataPtr->Tag
+			);
 		}
 		else
 		{

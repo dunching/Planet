@@ -32,7 +32,7 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	if (CharacterPtr)
 	{
 		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetInteractiveBaseGAComponent()->MakedDamage.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
+			CharacterPtr->GetInteractiveBaseGAComponent()->MakedDamageDelegate.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
 	}
 }
 

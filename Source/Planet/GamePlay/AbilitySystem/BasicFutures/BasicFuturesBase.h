@@ -14,4 +14,6 @@ class PLANET_API UBasicFuturesBase : public UPlanetGameplayAbility
 
 public:
 
+	UBasicFuturesBase();
+
 };

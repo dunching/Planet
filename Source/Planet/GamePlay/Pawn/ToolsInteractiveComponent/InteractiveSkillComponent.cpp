@@ -711,7 +711,7 @@ void UInteractiveSkillComponent::AddSkill(const TMap<FGameplayTag, TSharedPtr<FS
 								{
 									ModifyPropertyMap.Add(
 										ECharacterPropertyType::GoldElement, 
-										OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element.GoldElement.GetCurrentValue()
+										OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->Element.GoldElement.GetCurrentValue()
 									);
 								}
 								break;

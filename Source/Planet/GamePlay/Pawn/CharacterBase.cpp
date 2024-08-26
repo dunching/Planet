@@ -75,6 +75,43 @@ ACharacterBase::~ACharacterBase()
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
+
+	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+
+	if (!CharacterTitlePtr)
+	{
+		CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+		if (CharacterTitlePtr)
+		{
+			CharacterTitlePtr->CharacterPtr = this;
+			CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+		}
+	}
+
+	auto GASPtr = GetAbilitySystemComponent();
+
+	GASPtr->ClearAllAbilities();
+	GASPtr->InitAbilityActorInfo(this, this);
+	GetInteractiveSkillComponent()->InitialBaseGAs();
+	GetInteractiveBaseGAComponent()->InitialBaseGAs();
+	GetInteractiveConsumablesComponent()->InitialBaseGAs();
+
+	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
+	OnMoveSpeedChanged(CharacterAttributesSPtr->MoveSpeed.GetCurrentValue());
+
+	HPChangedHandle = CharacterAttributesSPtr->HP.AddOnValueChanged(
+		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
+	);
+
+	MoveSpeedChangedHandle = CharacterAttributesSPtr->MoveSpeed.AddOnValueChanged(
+		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
+	);
+
+	ProcessedGAEventHandle = CharacterAttributesSPtr->ProcessedGAEvent.AddCallback(
+		std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
+	);
 }
 
 void ACharacterBase::Destroyed()
@@ -113,43 +150,6 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
-	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
-
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-
-	if (!CharacterTitlePtr)
-	{
-		CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-		if (CharacterTitlePtr)
-		{
-			CharacterTitlePtr->CharacterPtr = this;
-			CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
-		}
-	}
-
-	auto GASPtr = GetAbilitySystemComponent();
-
-	GASPtr->ClearAllAbilities();
-	GASPtr->InitAbilityActorInfo(this, this);
-	GetInteractiveSkillComponent()->InitialBaseGAs();
-	GetInteractiveBaseGAComponent()->InitialBaseGAs();
-	GetInteractiveConsumablesComponent()->InitialBaseGAs();
-
-	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
-	OnMoveSpeedChanged(CharacterAttributesRef.MoveSpeed.GetCurrentValue());
-
-	HPChangedHandle = CharacterAttributesRef.HP.AddOnValueChanged(
-		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-	);
-
-	MoveSpeedChangedHandle = CharacterAttributesRef.MoveSpeed.AddOnValueChanged(
-		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-	);
-	
-	ProcessedGAEventHandle = CharacterAttributesRef.ProcessedGAEvent.AddCallback(
-		std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
-	);
 }
 
 void ACharacterBase::UnPossessed()

@@ -12,7 +12,7 @@
 
 class FTalent_Base;
 
-#pragma region CharacterAttributes
+#pragma region CharacterAttributesSPtr
 
 struct FCharacterAttributes;
 
@@ -234,7 +234,7 @@ struct PLANET_API FCharacterAttributes final
 
 struct PLANET_API FScopeCharacterAttributes
 {
-	FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes);
+	FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributesSPtr);
 };
 
-#pragma endregion CharacterAttributes
+#pragma endregion CharacterAttributesSPtr

@@ -33,9 +33,7 @@ public:
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
 
-	const FCharacterAttributes& GetCharacterAttributes()const;
-
-	FCharacterAttributes& GetCharacterAttributes();
+	TSharedPtr<FCharacterAttributes> GetCharacterAttributes()const;
 
 	void ProcessCharacterAttributes();
 
@@ -44,8 +42,5 @@ protected:
 	virtual void BeginPlay()override;
 
 private:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	FCharacterAttributes CharacterAttributes;
 
 };

@@ -42,14 +42,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Affected =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Affected")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_MoveToAttaclArea =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.MoveToAttaclArea")));
 #pragma endregion 
 	
-#pragma region BaseFeature Tags
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag MoveToAttaclArea =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.MoveToAttaclArea")));
-#pragma endregion 
-
 #pragma region MovementStateAble
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FGameplayTag MovementStateAble =

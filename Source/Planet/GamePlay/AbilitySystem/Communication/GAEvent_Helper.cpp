@@ -50,7 +50,7 @@ void FGAEventData::SetBaseDamage(int32 Value)
 void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 {
 	const auto CharacterAttributesComponentPtr = TriggerCharacterPtr->GetCharacterAttributesComponent();
-	const auto& CharacterAttributes =
+	 auto CharacterAttributesSPtr =
 		CharacterAttributesComponentPtr->GetCharacterAttributes();
 
 	int32 Level = 0;
@@ -58,27 +58,27 @@ void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 	{
 	case EWuXingType::kGold:
 	{
-		Level = CharacterAttributes.GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWood:
 	{
-		Level = CharacterAttributes.GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWater:
 	{
-		Level = CharacterAttributes.GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kFire:
 	{
-		Level = CharacterAttributes.GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kSoil:
 	{
-		Level = CharacterAttributes.GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
 	}
 	break;
 	}

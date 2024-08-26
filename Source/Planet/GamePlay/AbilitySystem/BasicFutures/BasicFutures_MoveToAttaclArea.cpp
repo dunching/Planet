@@ -43,11 +43,12 @@ void UBasicFutures_MoveToAttaclArea::PostCDOContruct()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MoveToAttaclArea);
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
+		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
 
 		FAbilityTriggerData AbilityTriggerData;
 
-		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->MoveToAttaclArea;
+		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea;
 		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
 
 		AbilityTriggers.Add(AbilityTriggerData);
