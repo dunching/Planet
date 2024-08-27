@@ -11,19 +11,16 @@
 #include "InteractiveSkillComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
-//#include "PlanetEditor_Tools.h"
 #include "AbilityTask_TimerHelper.h"
-#include "CS_RootMotion_IceTraction.h"
-#include "CS_RootMotion_TornadoTraction.h"
+#include "CS_PeriodicPropertyModify.h"
+#include "CS_PeriodicStateModify.h"
+#include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
-#include "MovieSceneSequenceID.h"
-#include "PropertyAccess.h"
 #include "Components/SphereComponent.h"
 #include "Engine/OverlapResult.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-//#include "Private/PlanetEditor_Tools.h"
 
 
 namespace Skill_IceGun_Notify
@@ -94,8 +91,8 @@ void USkill_Active_IceGun::PlayMontage()
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
-		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		// TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		// TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 		TaskPtr->ReadyForActivation();
@@ -110,14 +107,19 @@ void USkill_Active_IceGun::OnNotifyBeginReceived(FName NotifyName)
 		const auto Dir = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(), CharacterPtr->GetControlRotation().Vector());
 		StartPt = Location + (Dir.Vector() * Offset);
 		EndPt = Location + (Dir.Vector() * (Offset + Distance));
-		IceGunPtr = GetWorld()->SpawnActor<ASkill_IceGun_Projectile>(
-		ASkill_IceGun_Projectile::StaticClass(),
-		Location,
-		CharacterPtr->GetActorRotation());
-		if (IceGunPtr)
+		if (!IceGunPtr)
 		{
-			ExcuteTasks();
+			IceGunPtr = GetWorld()->SpawnActor<ASkill_IceGun_Projectile>(
+			ASkill_IceGun_Projectile::StaticClass(),
+			Location,
+			CharacterPtr->GetActorRotation());
 		}
+		else
+		{
+			IceGunPtr->Activate();
+			IceGunPtr->SetActorLocation(Location);
+		}
+		ExcuteTasks();
 		
 	}
 }
@@ -147,6 +149,7 @@ void USkill_Active_IceGun::OnProjectileBounce(
 
 void USkill_Active_IceGun::OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
 {
+
 	if (CurrentInterval <= Interval)
 	{
 		const auto Percent = CurrentInterval / Interval;
@@ -177,6 +180,12 @@ void USkill_Active_IceGun::OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, 
 			}
 		}
 	}
+	else
+	{
+		IceGunPtr->Reset();
+		TaskPtr->EndTask();
+	}
+
 }
 
 ASkill_IceGun_Projectile::ASkill_IceGun_Projectile(const FObjectInitializer& ObjectInitializer):
@@ -207,7 +216,7 @@ Super(ObjectInitializer)
 	CapsuleComponentPtr->SetupAttachment(RootComponent);
 	MeshComp->SetupAttachment(RootComponent);
 	
-	this->InitialLifeSpan=100.f;
+	this->InitialLifeSpan=0.f;
 	this->ProjectileMovementCompPtr->InitialSpeed=100.f;
 	this->ProjectileMovementCompPtr->MaxSpeed=100.f;
 	this->ProjectileMovementCompPtr->ProjectileGravityScale=0.f;
@@ -218,10 +227,7 @@ void USkill_Active_IceGun::ExcuteTasks()
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 	TaskPtr->SetDuration(Duration);
 	TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnTimerHelperTick);
-	TaskPtr->OnFinished.BindLambda([this](auto) {
-		K2_CancelAbility();
-		return true;
-		});
+	TaskPtr->OnFinished.BindUObject(this, &ThisClass::ResetIceGun);
 	TaskPtr->ReadyForActivation();
 }
 
@@ -235,19 +241,78 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 		{
 			return;
 		}
-
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		// 控制效果
+		// debuff
+		auto CSPtr = OtherCharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterState(SkillUnitPtr->GetUnitType());
+		if ((CSPtr && CSPtr->GetStateDisplayInfo().Pin()->Num < 3) || !CSPtr)
 		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_IceTraction;
+			TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
 
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = OtherCharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->IceGunPtr = IceGunPtr;
+			ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, -100);
+			ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, -100);
 
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+				SkillUnitPtr->GetUnitType(),
+				SkillUnitPtr->GetIcon(),
+				5,
+				-1.f,
+				1,
+				ModifyPropertyMap
+			);
+
+			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetDataPtr->TargetCharacterPtr = OtherCharacterPtr;
+
+			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		}
+		else
+		{
+			// 冰冻
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_StateModify(
+				UGameplayTagsSubSystem::GetInstance()->Stun,
+				2
+			);
+
+			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetDataPtr->TargetCharacterPtr = OtherCharacterPtr;
+
+			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+		}
+		auto Mat=LoadObject<UMaterialInstance>(nullptr,TEXT("/Script/Engine.MaterialInstanceConstant'/Game/Megascans/Surfaces/Skated_Frozen_Lake_td0nfjlr/MI_Frozen.MI_Frozen'"));
+		auto MaterialsNum=OtherCharacterPtr->GetMesh()->GetMaterials().Num();
+		auto Mesh=OtherCharacterPtr->GetMesh();
+		float Count=1.0f;//这里要算百分比，不能用整数除
+		if (CSPtr)
+		{
+			Count=CSPtr->GetStateDisplayInfo().Pin()->Num;
+		}
+		for (int i=0;i<MaterialsNum;i++)
+		{
+			auto InstDy = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(i));
+			if (!InstDy)
+			{
+				auto Inst = Cast<UMaterialInstance>(Mesh->GetMaterial(i));
+				InstDy = UMaterialInstanceDynamic::Create(Inst, OtherCharacterPtr);
+				Mesh->SetMaterial(i,InstDy);
+			}
+			InstDy->SetScalarParameterValue(TEXT("Frozen"),-50.f+Count/3.f*230);
+		}
+		GEngine->AddOnScreenDebugMessage(123,2.0f,FColor::Red,FString::FromInt(int(Count)));
+		IceGunPtr->Reset();
 	}
+}
+
+bool USkill_Active_IceGun::ResetIceGun(UAbilityTask_TimerHelper* TaskPtr)
+{
+	if (IceGunPtr)
+	{
+		IceGunPtr->Reset();
+		K2_CancelAbility();
+		return true;
+	}
+	else
+		return false;
 }
 
 

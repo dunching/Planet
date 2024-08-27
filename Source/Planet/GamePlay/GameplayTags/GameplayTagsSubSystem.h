@@ -90,6 +90,10 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Silent")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_Debuff_Ice =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Ice")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag RootMotion =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion")));
 	

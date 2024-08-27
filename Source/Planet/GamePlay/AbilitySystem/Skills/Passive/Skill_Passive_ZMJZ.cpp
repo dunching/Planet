@@ -87,6 +87,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 				TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
 
 				ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
+				ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, SpeedOffset);
 
 				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
 					SkillUnitPtr->GetUnitType(),

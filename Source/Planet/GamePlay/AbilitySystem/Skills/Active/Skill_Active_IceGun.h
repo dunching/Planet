@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilityTask_TimerHelper.h"
 #include "ProjectileBase.h"
 
 #include "Skill_Active_Base.h"
@@ -72,7 +73,7 @@ protected:
 	UAnimMontage* HumanMontage = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float Duration = 5.5f;
+	float Duration = 1.5f;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Distance = 800.f;
@@ -89,9 +90,10 @@ protected:
 
 	ASkill_IceGun_Projectile* IceGunPtr = nullptr;
 
+	TArray<UMaterialInstance> CharacterMat{};
+
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
-
 	
 	void OnProjectileBounce(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	                        UPrimitiveComponent* OtherComp,
@@ -99,6 +101,11 @@ protected:
 	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 	void ExcuteTasks();
 	void OnOverlap(AActor* OtherActor);
+	
+	UFUNCTION()
+	bool ResetIceGun(UAbilityTask_TimerHelper* TaskPtr);
+	// 创建一个TimerHelper_Finished_Delegate类型的实例
+	TimerHelper_Finished_Delegate finishedDelegate;
 };
 
 
@@ -111,4 +118,22 @@ class PLANET_API ASkill_IceGun_Projectile : public AProjectileBase
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UCapsuleComponent> CapsuleComponentPtr = nullptr;
+
+	void Reset()
+	{
+		// 禁用碰撞
+		CapsuleComponentPtr->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		CapsuleComponentPtr->SetCollisionResponseToAllChannels(ECR_Ignore);
+		// 隐藏 Actor
+		SetActorHiddenInGame(true);
+		SetActorTickEnabled(false); // 禁用Actor的Tick
+	}
+
+	void Activate()
+	{
+		CapsuleComponentPtr->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		CapsuleComponentPtr->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap); // 仅示例，根据需要调整
+		SetActorHiddenInGame(false);
+		SetActorTickEnabled(true);
+	}
 };
