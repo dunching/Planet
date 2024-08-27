@@ -36,10 +36,7 @@ struct PLANET_API FStateTreeSwitchWalkStateTaskInstanceData
 	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Parameter)
-	bool bIscontinueCheck = true;
-
-	UPROPERTY(Transient)
-	TObjectPtr<UAITask_SwitchWalkState> AITaskPtr = nullptr;
+	bool bIsRun = true;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
@@ -60,17 +57,5 @@ struct PLANET_API FSTT_SwitchWalkState : public FStateTreeAIActionTaskBase
 		FStateTreeExecutionContext& Context, 
 		const FStateTreeTransitionResult& Transition
 	) const override;
-
-	virtual void ExitState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-	virtual EStateTreeRunStatus Tick(
-		FStateTreeExecutionContext& Context, 
-		const float DeltaTime
-	) const override;
-
-	virtual FAITaskType* PerformMoveTask(FStateTreeExecutionContext& Context) const;
 
 };

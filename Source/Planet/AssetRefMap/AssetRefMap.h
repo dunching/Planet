@@ -49,6 +49,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHumanCharacter>HumanClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
+	TSubclassOf<AHumanCharacter>TestNPC_HumanClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHorseCharacter>HorseClass;

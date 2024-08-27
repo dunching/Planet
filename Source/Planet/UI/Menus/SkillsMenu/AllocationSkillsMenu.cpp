@@ -714,22 +714,6 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(UCharacterUnit* UnitPtr)
 
 void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
 {
-	if (NewUnitPtr)
-	{
-		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
-	}
-	else
-	{
-		if (PreviousUnitPtr)
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
-		}
-		else
-		{
-
-		}
-	}
-
 	TArray<FName>Ary
 	{
 		{FAllocationSkillsMenu::Get().ActiveSkill1},
@@ -826,38 +810,10 @@ void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBa
 			}
 		}
 	}
-
-	if (PreviousUnitPtr)
-	{
-		if (bIsReplaced)
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
-		}
-		else
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
-		}
-	}
 }
 
 void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
 {
-	if (NewUnitPtr)
-	{
-		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
-	}
-	else
-	{
-		if (PreviousUnitPtr)
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
-		}
-		else
-		{
-
-		}
-	}
-
 	TArray<FName>Ary
 	{
 		{FAllocationSkillsMenu::Get().Consumable1},
@@ -885,18 +841,6 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr,
 			else
 			{
 			}
-		}
-	}
-
-	if (PreviousUnitPtr)
-	{
-		if (bIsReplaced)
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
-		}
-		else
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
 		}
 	}
 }

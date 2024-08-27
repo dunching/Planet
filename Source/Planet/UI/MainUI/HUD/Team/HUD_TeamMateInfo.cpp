@@ -85,7 +85,7 @@ void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			if (UIPtr)
 			{
 				UIPtr->SetText(FText::FromString(
-					FString::Printf(TEXT("%s(%d)"), *GroupMateUnitPtr->CharacterAttributes->Name.ToString(), GroupMateUnitPtr->CharacterAttributes->Level)
+					FString::Printf(TEXT("%s(%d)"), *GroupMateUnitPtr->CharacterAttributesSPtr->Name.ToString(), GroupMateUnitPtr->CharacterAttributesSPtr->Level)
 				));
 			}
 		}

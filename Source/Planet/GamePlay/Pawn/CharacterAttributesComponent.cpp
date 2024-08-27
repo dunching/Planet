@@ -23,14 +23,14 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 	ProcessCharacterAttributes();
 }
 
-const FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes() const
+TSharedPtr<FCharacterAttributes> UCharacterAttributesComponent::GetCharacterAttributes() const
 {
-	return CharacterAttributes;
-}
-
-FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes()
-{
-	return CharacterAttributes;
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	if (CharacterPtr)
+	{
+		return CharacterPtr->GetCharacterUnit()->CharacterAttributesSPtr;
+	}
+	return nullptr;
 }
 
 void UCharacterAttributesComponent::ProcessCharacterAttributes()
@@ -50,9 +50,11 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
 
+		auto CharacterAttributesSPtr = GetCharacterAttributes();
+
 		// »ù´¡»Ø¸´
 		{
-			GAEventData.HP = CharacterAttributes.HPReplay.GetCurrentValue();
+			GAEventData.HP = CharacterAttributesSPtr->HPReplay.GetCurrentValue();
 
 			if (
 				CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
@@ -68,12 +70,12 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 			{
 				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
 				{
-					GAEventData.PP = CharacterAttributes.RunningConsume.GetCurrentValue();
+					GAEventData.PP = CharacterAttributesSPtr->RunningConsume.GetCurrentValue();
 				}
 			}
 			else
 			{
-				GAEventData.PP = CharacterAttributes.PPReplay.GetCurrentValue();
+				GAEventData.PP = CharacterAttributesSPtr->PPReplay.GetCurrentValue();
 			}
 		}
 
@@ -90,5 +92,5 @@ void UCharacterAttributesComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-//	CharacterAttributes.InitialData();
+//	CharacterAttributesSPtr->InitialData();
 }

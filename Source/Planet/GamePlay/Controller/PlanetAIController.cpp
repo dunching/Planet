@@ -119,16 +119,7 @@ void APlanetAIController::BindPCWithCharacter()
 
 UCharacterUnit* APlanetAIController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
-	if (!CharaterPtr->GetCharacterUnit())
-	{
-		const auto CharacterUnitPtr =
-			Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
-
-		CharaterPtr->SetCharacterUnit(CharacterUnitPtr);
-		return CharacterUnitPtr;
-	}
-
-	return nullptr;
+	return CharaterPtr->GetCharacterUnit();
 }
 
 void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)

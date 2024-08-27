@@ -112,14 +112,14 @@ void UPawnStateActionHUD::ResetUIByData()
 		return;
 	}
 	{
-		auto & CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
 			if (!UIPtr)
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.HP);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->HP);
 		}
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
@@ -127,7 +127,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.PP);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->PP);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().BaseAttackPower));
@@ -135,7 +135,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->BaseAttackPower);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Penetration));
@@ -143,7 +143,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->Penetration, CharacterAttributesSPtr->PercentPenetration);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Resistance));
@@ -151,7 +151,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Resistance);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->Resistance);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
@@ -159,7 +159,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.MoveSpeed);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->MoveSpeed);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
@@ -167,7 +167,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.GAPerformSpeed);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->GAPerformSpeed);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Gold));
@@ -175,7 +175,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Element.GoldElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.GoldElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
@@ -183,7 +183,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Element.WoodElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.WoodElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
@@ -191,7 +191,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Element.WaterElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.WaterElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
@@ -199,7 +199,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Element.FireElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.FireElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Soil));
@@ -207,7 +207,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Element.SoilElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.SoilElement);
 		}
 	}
 	InitialTalentUI();

@@ -40,7 +40,7 @@ public:
 
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
-	using FMakedDamage = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
 
 	static FName ComponentName;
 
@@ -61,8 +61,14 @@ public:
 		FGameplayAbilityTargetData_AddTemporaryTag* GameplayAbilityTargetDataPtr
 	);
 
+	void ClearData2Other(
+		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
+		const FGameplayTag& DataSource
+	);
+
 	void ClearData2Self(
-		const FGameplayTag &DataSource
+		const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap,
+		const FGameplayTag& DataSource
 	);
 
 	void SendEvent2Other(
@@ -75,18 +81,30 @@ public:
 		const FGameplayTag& DataSource
 	);
 
+	/*
+		一次性的伤害结算
+	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
 	);
-	
+
+	/*
+		周期类的跟运动修改
+	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
 	);
 
+	/*
+		周期类的状态修改
+	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
 	);
 
+	/*
+		周期类的属性修改
+	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 	);
@@ -113,7 +131,8 @@ public:
 
 	FCharacterStateChanged CharacterStateChangedContainer;
 
-	FMakedDamage MakedDamage;
+	// 对“其他”角色造成的影响（伤害、控制）
+	FMakedDamageDelegate MakedDamageDelegate;
 
 protected:
 

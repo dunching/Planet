@@ -75,6 +75,35 @@ ACharacterBase::~ACharacterBase()
 void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
+
+	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+
+	if (!CharacterTitlePtr)
+	{
+		CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+		if (CharacterTitlePtr)
+		{
+			CharacterTitlePtr->CharacterPtr = this;
+			CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+		}
+	}
+
+	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
+	OnMoveSpeedChanged(CharacterAttributesSPtr->MoveSpeed.GetCurrentValue());
+
+	HPChangedHandle = CharacterAttributesSPtr->HP.AddOnValueChanged(
+		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
+	);
+
+	MoveSpeedChangedHandle = CharacterAttributesSPtr->MoveSpeed.AddOnValueChanged(
+		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
+	);
+
+	ProcessedGAEventHandle = CharacterAttributesSPtr->ProcessedGAEvent.AddCallback(
+		std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
+	);
 }
 
 void ACharacterBase::Destroyed()
@@ -110,56 +139,19 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
+void ACharacterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
 void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
-	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
-
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-
-	if (!CharacterTitlePtr)
-	{
-		CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-		if (CharacterTitlePtr)
-		{
-			CharacterTitlePtr->CharacterPtr = this;
-			CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
-		}
-	}
-
-	auto GASPtr = GetAbilitySystemComponent();
-
-	GASPtr->ClearAllAbilities();
-	GASPtr->InitAbilityActorInfo(this, this);
-	GetInteractiveSkillComponent()->InitialBaseGAs();
-	GetInteractiveBaseGAComponent()->InitialBaseGAs();
-	GetInteractiveConsumablesComponent()->InitialBaseGAs();
-
-	auto& CharacterAttributesRef = GetCharacterAttributesComponent()->GetCharacterAttributes();
-	OnMoveSpeedChanged(CharacterAttributesRef.MoveSpeed.GetCurrentValue());
-
-	HPChangedHandle = CharacterAttributesRef.HP.AddOnValueChanged(
-		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-	);
-
-	MoveSpeedChangedHandle = CharacterAttributesRef.MoveSpeed.AddOnValueChanged(
-		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-	);
-	
-	ProcessedGAEventHandle = CharacterAttributesRef.ProcessedGAEvent.AddCallback(
-		std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
-	);
 }
 
 void ACharacterBase::UnPossessed()
 {
 	AController* const OldController = Controller;
-
-	if (OldController && OldController->IsA(AAIController::StaticClass()))
-	{
-//		OldController->Destroy();
-	}
 
 	Super::UnPossessed();
 
@@ -169,7 +161,17 @@ void ACharacterBase::UnPossessed()
 	}
 	else if(OriginalAIController)
 	{
-		OriginalAIController->Possess(this);
+		if (OldController)
+		{
+			if (OldController->IsA(AAIController::StaticClass()))
+			{
+				//		OldController->Destroy();
+			}
+			else if (OldController->IsA(APlayerController::StaticClass()))
+			{
+				OriginalAIController->Possess(this);
+			}
+		}
 	}
 }
 
@@ -263,6 +265,25 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ACharacterBase::SpawnDefaultController()
 {
+#if WITH_EDITOR
+	UWorld* World = GetWorld();
+	if ((GIsEditor == false || World->IsGameWorld()))
+#endif // WITH_EDITOR
+	{
+	}
+	const auto NewCharacterUnitPtr =
+		Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
+
+	SetCharacterUnit(NewCharacterUnitPtr);
+
+	auto GASPtr = GetAbilitySystemComponent();
+
+	GASPtr->ClearAllAbilities();
+	GASPtr->InitAbilityActorInfo(this, this);
+	GetInteractiveSkillComponent()->InitialBaseGAs();
+	GetInteractiveBaseGAComponent()->InitialBaseGAs();
+	GetInteractiveConsumablesComponent()->InitialBaseGAs();
+
 	Super::SpawnDefaultController();
 
 	OriginalAIController = Controller;

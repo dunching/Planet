@@ -6,6 +6,7 @@
 #include "GameInstance/PlanetGameInstance.h"
 #include "Planet.h"
 #include "PlanetWorldSettings.h"
+#include "StateTagExtendInfo.h"
 
 USceneUnitExtendInfoMap::USceneUnitExtendInfoMap() :
 	Super()
@@ -36,6 +37,15 @@ FTableRowUnit* USceneUnitExtendInfoMap::GetTableRowUnit(FGameplayTag UnitType) c
 	auto DataTablePtr = DataTable_Unit.LoadSynchronous();
 
 	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowUnit>(*UnitType.ToString(), TEXT("GetUnit"));
+
+	return SceneUnitExtendInfoPtr;
+}
+
+FTableRowUnit_TagExtendInfo* USceneUnitExtendInfoMap::GetTableRowUnit_TagExtendInfo(FGameplayTag UnitType) const
+{
+	auto DataTablePtr = DataTable_Unit_TagExtendInfo.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowUnit_TagExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
 
 	return SceneUnitExtendInfoPtr;
 }

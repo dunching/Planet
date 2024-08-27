@@ -75,9 +75,6 @@ protected:
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
-	FGameplayTag RowName = FGameplayTag::EmptyTag;
-	
 private:
 
 };

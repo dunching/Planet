@@ -629,6 +629,7 @@ void UInteractiveSkillComponent::RemoveSkill(const TMap<FGameplayTag, TSharedPtr
 				}
 				else
 				{
+					Iter.Value->SkillUnitPtr->SetAllocationCharacterUnit(nullptr);
 					OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(Iter.Value->SkillUnitPtr->GAInstPtr->GetCurrentAbilitySpecHandle());
 				}
 			}
@@ -662,6 +663,7 @@ void UInteractiveSkillComponent::AddSkill(const TMap<FGameplayTag, TSharedPtr<FS
 
 			GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
 
+			SkillUnitPtr->SetAllocationCharacterUnit(OnwerActorPtr->GetCharacterUnit());
 			const auto Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 
 			auto GameplayAbilitySpecPtr = OnwerActorPtr->GetAbilitySystemComponent()->FindAbilitySpecFromHandle(Handle);
@@ -711,7 +713,7 @@ void UInteractiveSkillComponent::AddSkill(const TMap<FGameplayTag, TSharedPtr<FS
 								{
 									ModifyPropertyMap.Add(
 										ECharacterPropertyType::GoldElement, 
-										OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Element.GoldElement.GetCurrentValue()
+										OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->Element.GoldElement.GetCurrentValue()
 									);
 								}
 								break;

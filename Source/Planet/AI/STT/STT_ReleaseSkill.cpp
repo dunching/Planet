@@ -135,20 +135,30 @@ EStateTreeRunStatus FSTT_UpdateReleaseSkillStuta::EnterState(
 				InstanceData.GloabVariable->UpdateReleaseSkillStuteType == EUpdateReleaseSkillStuteType::kRelease;
 		}
 		break;
+		}
+
+		InstanceData.GloabVariable->UpdateReleaseSkillStuteType = InstanceData.CurrentState;
+
+		switch (InstanceData.CurrentState)
+		{
 		case EUpdateReleaseSkillStuteType::kMoveTo:
 		{
 			const auto Distance = FVector::Distance(InstanceData.TargetLocation, InstanceData.CharacterPtr->GetActorLocation());
-			InstanceData.GloabVariable->bIsNeedRelease =
-				(Distance < (InstanceData.AcceptableRadius + 100.f));
+			const auto bIsInDistance = (Distance < (InstanceData.AcceptableRadius + 100.f));
+			InstanceData.GloabVariable->bIsNeedRelease = bIsInDistance;
+			if (bIsInDistance)
+			{
+				return EStateTreeRunStatus::Succeeded;
+			}
+			else
+			{
+				return EStateTreeRunStatus::Failed;
+			}
 		}
 		break;
-		case EUpdateReleaseSkillStuteType::kRelease:
-		{
 		}
-		break;
-		}
-		InstanceData.GloabVariable->UpdateReleaseSkillStuteType = InstanceData.CurrentState;
 	}
 
 	return EStateTreeRunStatus::Succeeded;
 }
+

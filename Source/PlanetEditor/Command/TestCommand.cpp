@@ -274,7 +274,7 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 			};
 
 		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHumanCharacter>(
-			UAssetRefMap::GetInstance()->HumanClass,
+			UAssetRefMap::GetInstance()->TestNPC_HumanClass,
 			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * 600),
 			FRotator::ZeroRotator,
 			SpawnParameters
@@ -287,12 +287,12 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 
 		if (Args.IsValidIndex(1))
 		{
-			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
+			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->Name = *Args[1];
 		}
 
 		if (Args.IsValidIndex(0))
 		{
-			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HPReplay.AddCurrentValue(
+			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->HPReplay.AddCurrentValue(
 				UKismetStringLibrary::Conv_StringToInt(Args[0]),
 				UGameplayTagsSubSystem::GetInstance()->DataSource_Regular
 			);
@@ -406,38 +406,38 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	}
 
 	auto Value = UKismetStringLibrary::Conv_StringToInt(Args[2]);
-	auto& CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+	auto CharacterAttributesSPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
  	if (Args[1] == TEXT("1"))
  	{
- 		CharacterAttributes.Element.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->Element.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
  	else if (Args[1] == TEXT("2"))
  	{
- 		CharacterAttributes.Element.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->Element.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
  	else if (Args[1] == TEXT("3"))
  	{
- 		CharacterAttributes.Element.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->Element.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
  	else if (Args[1] == TEXT("4"))
  	{
- 		CharacterAttributes.Element.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->Element.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
  	else if (Args[1] == TEXT("5"))
  	{
- 		CharacterAttributes.Element.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->Element.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
  	else if (Args[1] == TEXT("6"))
  	{
- 		CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->CriticalHitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
  	else if (Args[1] == TEXT("7"))
  	{
- 		CharacterAttributes.HitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->HitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
  	else if (Args[1] == TEXT("8"))
  	{
- 		CharacterAttributes.Evade.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+ 		CharacterAttributesSPtr->Evade.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
  	}
 }
 

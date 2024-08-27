@@ -43,6 +43,11 @@ class PLANET_API UCS_RootMotion_KnockDown : public UCS_RootMotion
 
 public:
 
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -77,7 +82,7 @@ protected:
 	void OnTaskComplete();
 
 	UFUNCTION()
-	void OnLanding(const FHitResult& Hit);
+	void OnLanded(const FHitResult& Hit);
 
 	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
 

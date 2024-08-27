@@ -70,7 +70,11 @@ public:
 
 	virtual void UpdateDuration()override;
 
+	void SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& GameplayAbilityTargetDataPtr);
+
 protected:
+
+	virtual void InitialStateDisplayInfo()override;
 
 	virtual void PerformAction()override;
 
@@ -82,8 +86,8 @@ protected:
 
 	void OnTaskComplete();
 
-	const FGameplayAbilityTargetData_RootMotion_FlyAway* GameplayAbilityTargetDataPtr = nullptr;
-	
+	TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>GameplayAbilityTargetDataSPtr;
+
 	UAbilityTask_FlyAway* RootMotionTaskPtr = nullptr;
 	
 	UAbilityTask_TimerHelper* AbilityTask_TimerHelperPtr = nullptr;

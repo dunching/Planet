@@ -152,7 +152,7 @@ void UBackpackIcon::OnAllocationCharacterUnitChanged(UCharacterUnit* AllocationC
 		}
 
 		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr->CharacterAttributes->Name));
+		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr->CharacterAttributesSPtr->Name));
 	}
 	else
 	{

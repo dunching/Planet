@@ -33,10 +33,10 @@ void UCS_PeriodicPropertyModify::PreActivate(
 {
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_PropertyModify*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetDataPtr)
+		auto GameplayAbilityTargetDataSPtr = dynamic_cast<const FGameplayAbilityTargetData_PropertyModify*>(TriggerEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetDataSPtr)
 		{
-			SetCache(TSharedPtr<FGameplayAbilityTargetData_PropertyModify>(GameplayAbilityTargetDataPtr->Clone()));
+			SetCache(TSharedPtr<FGameplayAbilityTargetData_PropertyModify>(GameplayAbilityTargetDataSPtr->Clone()));
 		}
 	}
 
@@ -70,31 +70,31 @@ void UCS_PeriodicPropertyModify::UpdateDuration()
 {
 	if (TaskPtr)
 	{
-		auto GameplayAbilityTargetDataPtr = CacheSPtr;
+		auto GameplayAbilityTargetDataSPtr = CacheSPtr;
 
-		if ((GameplayAbilityTargetDataPtr->PerformActionInterval < 0.f) && !GameplayAbilityTargetDataPtr->bOnluReFreshTime)
+		if ((GameplayAbilityTargetDataSPtr->PerformActionInterval < 0.f) && !GameplayAbilityTargetDataSPtr->bOnluReFreshTime)
 		{
-			OnInterval(TaskPtr, GameplayAbilityTargetDataPtr->PerformActionInterval, GameplayAbilityTargetDataPtr->PerformActionInterval);
+			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 		}
 
-		TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration, GameplayAbilityTargetDataPtr->PerformActionInterval);
+		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 		TaskPtr->UpdateDuration();
 
-		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataPtr->Duration;
+		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
 		StateDisplayInfoSPtr->Num = GameplayAbilityTargetDataAry.Num();
 		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 
-void UCS_PeriodicPropertyModify::SetCache(const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataPtr)
+void UCS_PeriodicPropertyModify::SetCache(const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataSPtr)
 {
-	CacheSPtr = GameplayAbilityTargetDataPtr;
-	if (GameplayAbilityTargetDataPtr->bOnluReFreshTime)
+	CacheSPtr = GameplayAbilityTargetDataSPtr;
+	if (GameplayAbilityTargetDataSPtr->bOnluReFreshTime)
 	{
 	}
 	else
 	{
-		GameplayAbilityTargetDataAry.Add(GameplayAbilityTargetDataPtr);
+		GameplayAbilityTargetDataAry.Add(GameplayAbilityTargetDataSPtr);
 	}
 }
 
@@ -121,31 +121,31 @@ void UCS_PeriodicPropertyModify::ExcuteTasks()
 {
 	if (GameplayAbilityTargetDataAry.IsValidIndex(0))
 	{
-		auto GameplayAbilityTargetDataPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
+		auto GameplayAbilityTargetDataSPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
 		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 
-		if (GameplayAbilityTargetDataPtr->PerformActionInterval < 0.f)
+		if (GameplayAbilityTargetDataSPtr->PerformActionInterval < 0.f)
 		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration);
+			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 
-			OnInterval(TaskPtr, GameplayAbilityTargetDataPtr->PerformActionInterval, GameplayAbilityTargetDataPtr->PerformActionInterval);
+			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 		}
 		else
 		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration, GameplayAbilityTargetDataPtr->PerformActionInterval);
+			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 			TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
 
-			OnInterval(TaskPtr, GameplayAbilityTargetDataPtr->PerformActionInterval, GameplayAbilityTargetDataPtr->PerformActionInterval);
+			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 		}
 		
-		if (GameplayAbilityTargetDataPtr->LosePropertyNumInterval < 0.f)
+		if (GameplayAbilityTargetDataSPtr->LosePropertyNumInterval < 0.f)
 		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration, GameplayAbilityTargetDataPtr->PerformActionInterval);
+			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 			TaskPtr->OnFinished.BindLambda(std::bind(&ThisClass::OnTaskFinished, this, std::placeholders::_1));
 		}
 		else
 		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration, GameplayAbilityTargetDataPtr->PerformActionInterval);
+			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 			TaskPtr->OnFinished.BindLambda(std::bind(&ThisClass::OnTaskFinished_Continue, this, std::placeholders::_1));
 		}
 
@@ -169,10 +169,10 @@ void UCS_PeriodicPropertyModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr,
 
 			// 直接修改的属性，会移除
 			{
-				auto GameplayAbilityTargetDataPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
+				auto GameplayAbilityTargetDataSPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
 
-				GameplayAbilityTargetDataPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
-					GameplayAbilityTargetDataPtr->ModifyPropertyMap, GameplayAbilityTargetDataPtr->Tag
+				GameplayAbilityTargetDataSPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
+					GameplayAbilityTargetDataSPtr->ModifyPropertyMap, GameplayAbilityTargetDataSPtr->Tag
 				);
 			}
 		}
@@ -198,32 +198,36 @@ bool UCS_PeriodicPropertyModify::OnTaskFinished_Continue(UAbilityTask_TimerHelpe
 {
 	if (GameplayAbilityTargetDataAry.IsValidIndex(0))
 	{
-		auto GameplayAbilityTargetDataPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
+		auto GameplayAbilityTargetDataSPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
 
 		GameplayAbilityTargetDataAry.RemoveAt(GameplayAbilityTargetDataAry.Num() - 1);
 
 
-		// 移除周期内的属性
+		// 移除周期内的属性(按层数)
 		{
-			for (auto& Iter : GameplayAbilityTargetDataPtr->ModifyPropertyMap)
+			for (auto& Iter : GameplayAbilityTargetDataSPtr->ModifyPropertyMap)
 			{
 				Iter.Value.SetCurrentValue(-Iter.Value.GetCurrentValue());
 			}
 
-			GameplayAbilityTargetDataPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
-				GameplayAbilityTargetDataPtr->ModifyPropertyMap, GameplayAbilityTargetDataPtr->Tag
+			GameplayAbilityTargetDataSPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
+				GameplayAbilityTargetDataSPtr->ModifyPropertyMap, GameplayAbilityTargetDataSPtr->Tag
 			);
 		}
 
 		if (GameplayAbilityTargetDataAry.IsEmpty())
 		{
+			// 
+			GameplayAbilityTargetDataSPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(
+				GameplayAbilityTargetDataSPtr->ModifyPropertyMap, GameplayAbilityTargetDataSPtr->Tag
+			);
 		}
 		else
 		{
 			TaskPtr->UpdateDuration();
-			TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->LosePropertyNumInterval);
+			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->LosePropertyNumInterval);
 
-			StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataPtr->LosePropertyNumInterval;
+			StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->LosePropertyNumInterval;
 			StateDisplayInfoSPtr->Num = GameplayAbilityTargetDataAry.Num();
 			StateDisplayInfoSPtr->DataChanged();
 		}

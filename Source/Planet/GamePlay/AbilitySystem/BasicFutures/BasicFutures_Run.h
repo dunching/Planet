@@ -54,7 +54,4 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 RunningSpeedOffset = 10;
-
 };

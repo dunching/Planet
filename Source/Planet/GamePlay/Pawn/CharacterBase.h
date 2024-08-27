@@ -113,13 +113,15 @@ public:
 
 protected:
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+
+	virtual void PostInitializeComponents() override;
+
 	virtual void BeginPlay() override;
 
 	virtual void Destroyed() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
@@ -168,7 +170,10 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFightingTips>FightingTipsClass;
-
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
+	FGameplayTag RowName = FGameplayTag::EmptyTag;
+	
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
 private:

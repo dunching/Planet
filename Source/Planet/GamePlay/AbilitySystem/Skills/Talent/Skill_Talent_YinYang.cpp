@@ -63,13 +63,13 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 	{
 		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
-		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
+		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		OnValueChanged = CharacterAttributesSPtr->HP.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 
 		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
+			CharacterAttributesSPtr->TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributesSPtr->TalentSPtr.Get())
 		);
 	}
 
@@ -249,8 +249,8 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 				{
 					FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
-					auto & CharacterAttributesRef = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-					GAEventData.HP = CharacterAttributesRef.HP.GetMaxValue() * (TreatmentVolumePercent / 100.f);
+					auto CharacterAttributesSPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+					GAEventData.HP = CharacterAttributesSPtr->HP.GetMaxValue() * (TreatmentVolumePercent / 100.f);
 
 					GAEventDataPtr->DataAry.Add(GAEventData);
 				}

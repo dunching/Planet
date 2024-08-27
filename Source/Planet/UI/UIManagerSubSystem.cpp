@@ -461,6 +461,12 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 
 UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
 {
+	MainUILayoutPtr = GetMainUILAyout();
+	if (!MainUILayoutPtr)
+	{
+		return nullptr;
+	}
+
 	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().GetItemInfos_Socket));
 	if (!BorderPtr)
 	{

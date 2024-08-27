@@ -64,6 +64,7 @@ struct FGAEventData
 
 	FGameplayTag DataSource;
 
+	// 是否 清空DataModify的 DataSource
 	bool bIsClearData = false;
 
 	// 直接修改的数据

@@ -16,6 +16,7 @@
 #include "Skill_Base.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
+#include "InteractiveBaseGAComponent.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -54,6 +55,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 
 		FGameplayTagContainer GameplayTagContainer;
 		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill_Continuous);
+		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
 
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{
@@ -98,45 +100,44 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					}
 				}
 			}
-			if (ReleasingSkillMap.IsEmpty())
-			{
-				for (const auto& Iter : CanbeActivedInfo)
-				{
-					switch (Iter->Type)
-					{
-					case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
-					{
-						auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
-						if (!WeaponSPtr)
-						{
-							continue;
-						}
-						auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(WeaponSPtr->Handle);
-						if (!GameplayAbilitySpecPtr)
-						{
-							continue;
-						}
-						auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-						if (!GAInsPtr)
-						{
-							continue;
-						}
 
-						auto bIsReady = GAInsPtr->CanActivateAbility(
-							GAInsPtr->GetCurrentAbilitySpecHandle(),
-							GAInsPtr->GetCurrentActorInfo()
-						);
-						if (bIsReady)
+			// 未释放主动技能
+			for (const auto& Iter : CanbeActivedInfo)
+			{
+				switch (Iter->Type)
+				{
+				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
+				{
+					auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
+					if (!WeaponSPtr)
+					{
+						continue;
+					}
+					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(WeaponSPtr->Handle);
+					if (!GameplayAbilitySpecPtr)
+					{
+						continue;
+					}
+					auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+					if (!GAInsPtr)
+					{
+						continue;
+					}
+
+					auto bIsReady = GAInsPtr->CanActivateAbility(
+						GAInsPtr->GetCurrentAbilitySpecHandle(),
+						GAInsPtr->GetCurrentActorInfo()
+					);
+					if (bIsReady)
+					{
+						if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter, true))
 						{
-							if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter, true))
-							{
-								ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
-								return true;
-							}
+							ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
+							return true;
 						}
 					}
-					break;
-					}
+				}
+				break;
 				}
 			}
 		}
@@ -146,6 +147,9 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 
 void UAITask_ReleaseSkill::StopReleaseSkill()
 {
+	// 结束移动释放至范围内释放
+	CharacterPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
+
 	for (const auto Iter : ReleasingSkillMap)
 	{
 		// 1.如果不取消这个回调，CancelAction会调用无效的成员函数（UE判断过了 不会崩溃 但是逻辑不对）

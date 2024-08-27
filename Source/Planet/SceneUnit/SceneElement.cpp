@@ -308,7 +308,7 @@ TSubclassOf<USkill_Base> UPassiveSkillUnit::GetSkillClass() const
 
 UCharacterUnit::UCharacterUnit()
 {
-	CharacterAttributes = MakeShared<FCharacterAttributes>();
+	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
 	AllocationSkills = MakeShared<FAllocationSkills>();
 	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
 }

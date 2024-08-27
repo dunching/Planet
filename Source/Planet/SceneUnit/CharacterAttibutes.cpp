@@ -230,7 +230,26 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 			{
 			case ECharacterPropertyType::GAPerformSpeed:
 			{
-				GAPerformSpeed.AddCurrentValue(Iter.Value.GetCurrentValue(), Ref.DataSource);
+				if (Ref.bIsClearData)
+				{
+					GAPerformSpeed.RemoveCurrentValue(Ref.DataSource);
+				}
+				else
+				{
+					GAPerformSpeed.AddCurrentValue(Iter.Value.GetCurrentValue(), Ref.DataSource);
+				}
+			}
+			break;
+			case ECharacterPropertyType::MoveSpeed:
+			{
+				if (Ref.bIsClearData)
+				{
+					MoveSpeed.RemoveCurrentValue(Ref.DataSource);
+				}
+				else
+				{
+					MoveSpeed.AddCurrentValue(Iter.Value.GetCurrentValue(), Ref.DataSource);
+				}
 			}
 			break;
 			}
@@ -255,7 +274,7 @@ const FBasePropertySet& FCharacterAttributes::GetPPReply() const
 	return PPReplay;
 }
 
-FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)
+FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributesSPtr)
 {
 
 }

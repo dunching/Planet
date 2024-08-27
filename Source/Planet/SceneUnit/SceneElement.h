@@ -232,7 +232,7 @@ public:
 
 	FPawnType* ProxyCharacterPtr = nullptr;
 
-	TSharedPtr<FCharacterAttributes> CharacterAttributes;
+	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr;
 
 	TSharedPtr<FAllocationSkills> AllocationSkills;
 

@@ -20,7 +20,23 @@ void UInteractiveConsumablesComponent::RegisterConsumable(
 	const TMap <FGameplayTag, TSharedPtr<FConsumableSocketInfo>>& InToolInfoMap, bool bIsGenerationEvent /*= true */
 )
 {
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+
+	for (auto Iter : ConsumablesMap)
+	{
+		Iter.Value->UnitPtr->SetAllocationCharacterUnit(nullptr);
+	}
+
 	ConsumablesMap = InToolInfoMap;
+
+	for (auto Iter : ConsumablesMap)
+	{
+		Iter.Value->UnitPtr->SetAllocationCharacterUnit(OnwerActorPtr->GetCharacterUnit());
+	}
 
 	if (bIsGenerationEvent)
 	{
