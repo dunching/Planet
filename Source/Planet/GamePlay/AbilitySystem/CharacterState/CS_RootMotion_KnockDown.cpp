@@ -27,6 +27,20 @@
 #include "Skill_Active_Tornado.h"
 #include "AbilityTask_PlayMontage.h"
 
+void UCS_RootMotion_KnockDown::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	// CDO
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
+	}
+}
+
 void UCS_RootMotion_KnockDown::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -66,6 +80,10 @@ void UCS_RootMotion_KnockDown::EndAbility(
 	bool bWasCancelled
 )
 {
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
+	}
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -104,8 +122,6 @@ void UCS_RootMotion_KnockDown::ExcuteTasks()
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 		TaskPtr->ReadyForActivation();
-
-		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanding);
 	}
 	else
 	{
@@ -118,7 +134,7 @@ void UCS_RootMotion_KnockDown::OnTaskComplete()
 	K2_CancelAbility();
 }
 
-void UCS_RootMotion_KnockDown::OnLanding(const FHitResult& Hit)
+void UCS_RootMotion_KnockDown::OnLanded(const FHitResult& Hit)
 {
 	PlayMontage(HumanMontagePtr, 1.f);
 }

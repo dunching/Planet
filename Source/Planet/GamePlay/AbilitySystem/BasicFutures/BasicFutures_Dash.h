@@ -74,9 +74,15 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+	virtual void OnRemoveAbility(
+		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+	)override;
+
 protected:
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+
+	virtual void InitialTags()override;
 
 	void DoDash(
 		const FGameplayAbilitySpecHandle Handle,

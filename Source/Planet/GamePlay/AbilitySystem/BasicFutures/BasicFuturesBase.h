@@ -16,4 +16,13 @@ public:
 
 	UBasicFuturesBase();
 
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
+protected:
+
+	virtual void InitialTags();
+
 };

@@ -50,7 +50,13 @@ public:
 		bool bReplicateCancelAbility
 	);
 
+	virtual void OnRemoveAbility(
+		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+	)override;
+
 protected:
+
+	virtual void InitialTags()override;
 
 	UFUNCTION()
 	void OnLanded(const FHitResult& Hit);

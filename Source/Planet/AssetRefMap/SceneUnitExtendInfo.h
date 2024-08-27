@@ -20,6 +20,8 @@ class USkillUnit;
 class UCoinUnit;
 class UBasicUnit;
 
+struct FTableRowUnit_TagExtendInfo;
+
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API USceneUnitExtendInfoMap : public UObject
 {
@@ -33,6 +35,8 @@ public:
 	static USceneUnitExtendInfoMap* GetInstance();
 
 	FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType)const;
+	
+	FTableRowUnit_TagExtendInfo* GetTableRowUnit_TagExtendInfo(FGameplayTag UnitType)const;
 
 	void InitialData();
 
@@ -59,5 +63,8 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_Consumable;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_Unit_TagExtendInfo;
 
 };

@@ -100,45 +100,44 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					}
 				}
 			}
-			if (ReleasingSkillMap.IsEmpty())
-			{
-				for (const auto& Iter : CanbeActivedInfo)
-				{
-					switch (Iter->Type)
-					{
-					case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
-					{
-						auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
-						if (!WeaponSPtr)
-						{
-							continue;
-						}
-						auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(WeaponSPtr->Handle);
-						if (!GameplayAbilitySpecPtr)
-						{
-							continue;
-						}
-						auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-						if (!GAInsPtr)
-						{
-							continue;
-						}
 
-						auto bIsReady = GAInsPtr->CanActivateAbility(
-							GAInsPtr->GetCurrentAbilitySpecHandle(),
-							GAInsPtr->GetCurrentActorInfo()
-						);
-						if (bIsReady)
+			// 未释放主动技能
+			for (const auto& Iter : CanbeActivedInfo)
+			{
+				switch (Iter->Type)
+				{
+				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
+				{
+					auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
+					if (!WeaponSPtr)
+					{
+						continue;
+					}
+					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(WeaponSPtr->Handle);
+					if (!GameplayAbilitySpecPtr)
+					{
+						continue;
+					}
+					auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+					if (!GAInsPtr)
+					{
+						continue;
+					}
+
+					auto bIsReady = GAInsPtr->CanActivateAbility(
+						GAInsPtr->GetCurrentAbilitySpecHandle(),
+						GAInsPtr->GetCurrentActorInfo()
+					);
+					if (bIsReady)
+					{
+						if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter, true))
 						{
-							if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter, true))
-							{
-								ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
-								return true;
-							}
+							ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
+							return true;
 						}
 					}
-					break;
-					}
+				}
+				break;
 				}
 			}
 		}

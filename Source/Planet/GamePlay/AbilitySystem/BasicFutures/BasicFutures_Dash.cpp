@@ -35,14 +35,6 @@ void UBasicFutures_Dash::PostCDOContruct()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
-
-		FAbilityTriggerData AbilityTriggerData;
-
-		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Dash;
-		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-		AbilityTriggers.Add(AbilityTriggerData);
 	}
 }
 
@@ -184,6 +176,32 @@ void UBasicFutures_Dash::OnGameplayTaskDeactivated(UGameplayTask& Task)
 	{
 		K2_CancelAbility();
 	}
+}
+
+void UBasicFutures_Dash::InitialTags()
+{
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
+
+	// 在运动时不激活
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
+
+	FAbilityTriggerData AbilityTriggerData;
+
+	AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Dash;
+	AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+	AbilityTriggers.Add(AbilityTriggerData);
+}
+
+void UBasicFutures_Dash::OnRemoveAbility(
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+)
+{
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
+	}
+	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
 void UBasicFutures_Dash::DoDash(

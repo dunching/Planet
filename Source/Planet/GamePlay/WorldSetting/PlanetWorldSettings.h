@@ -23,8 +23,6 @@ public:
 
 	UAssetRefMap* GetAssetRefMapInstance();
 
-	UStateTagExtendInfoMap* GetStateTagExtendInfoInstance();
-	
 	USceneUnitExtendInfoMap* GetSceneUnitExtendInfoMap();
 	
 	UGameOptions* GetGameOptions();
@@ -36,12 +34,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<UAssetRefMap>AssetRefMapClass;
-	
-	UPROPERTY(Transient)
-	UStateTagExtendInfoMap* StateExtendInfoPtr = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<UStateTagExtendInfoMap>StateExtendInfoClass;
 	
 	UPROPERTY(Transient)
 	USceneUnitExtendInfoMap* SceneUnitExtendInfoMapPtr = nullptr;

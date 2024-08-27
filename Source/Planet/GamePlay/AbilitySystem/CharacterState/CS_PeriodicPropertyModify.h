@@ -106,7 +106,7 @@ protected:
 
 	virtual void InitialStateDisplayInfo()override;
 
-	void PerformAction();
+	virtual void PerformAction();
 
 	void ExcuteTasks();
 

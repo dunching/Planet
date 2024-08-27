@@ -21,20 +21,6 @@ void UBasicFutures_Affected::PostCDOContruct()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
-
-		// 在运动时不激活
-		ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
-
-		// 在“霸体”时不激活
-		ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->SuperArmor);
-
-		FAbilityTriggerData AbilityTriggerData;
-
-		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Affected;
-		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-		AbilityTriggers.Add(AbilityTriggerData);
 	}
 }
 
@@ -91,6 +77,24 @@ bool UBasicFutures_Affected::CanActivateAbility(
 ) const
 {
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
+void UBasicFutures_Affected::InitialTags()
+{
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
+
+	// 在运动时不激活
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
+
+	// 在“霸体”时不激活
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->SuperArmor);
+
+	FAbilityTriggerData AbilityTriggerData;
+
+	AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Affected;
+	AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+	AbilityTriggers.Add(AbilityTriggerData);
 }
 
 void UBasicFutures_Affected::PerformAction(EAffectedDirection AffectedDirection)

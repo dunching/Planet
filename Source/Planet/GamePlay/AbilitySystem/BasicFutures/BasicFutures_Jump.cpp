@@ -19,14 +19,6 @@ void UBasicFutures_Jump::PostCDOContruct()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Jump);
-
-		FAbilityTriggerData AbilityTriggerData;
-
-		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Jump;
-		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-		AbilityTriggers.Add(AbilityTriggerData);
 	}
 }
 
@@ -34,10 +26,10 @@ void UBasicFutures_Jump::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-	if (CharacterPtr)
+	auto CharacterPtrPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	if (CharacterPtrPtr)
 	{
-		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
+		CharacterPtrPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
 	}
 }
 
@@ -50,8 +42,8 @@ void UBasicFutures_Jump::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
-	Character->Jump();
+	ACharacterBase* CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	CharacterPtr->Jump();
 }
 
 bool UBasicFutures_Jump::CanActivateAbility(
@@ -64,8 +56,8 @@ bool UBasicFutures_Jump::CanActivateAbility(
 {
 	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
 	{
-		const ACharacterBase* Character = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
-		return Character && Character->CanJump();
+		const ACharacterBase* CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
+		return CharacterPtr && CharacterPtr->CanJump();
 	}
 	return false;
 }
@@ -77,10 +69,37 @@ void UBasicFutures_Jump::CancelAbility(
 	bool bReplicateCancelAbility
 )
 {
-	ACharacter* Character = CastChecked<ACharacter>(ActorInfo->AvatarActor.Get());
-	Character->StopJumping();
+	ACharacterBase* CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	CharacterPtr->StopJumping();
 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
+}
+
+void UBasicFutures_Jump::OnRemoveAbility(
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+)
+{
+	ACharacterBase* CharacterPtrPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	if (CharacterPtrPtr)
+	{
+		CharacterPtrPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
+	}
+	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
+void UBasicFutures_Jump::InitialTags()
+{
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Jump);
+
+	// 在运动时不激活
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
+
+	FAbilityTriggerData AbilityTriggerData;
+
+	AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Jump;
+	AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
+
+	AbilityTriggers.Add(AbilityTriggerData);
 }
 
 void UBasicFutures_Jump::OnLanded(const FHitResult& Hit)

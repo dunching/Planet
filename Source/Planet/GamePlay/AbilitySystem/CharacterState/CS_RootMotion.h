@@ -42,8 +42,6 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion : public FGameplayAbilit
 
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
-
 private:
 
 };

@@ -21,11 +21,14 @@ struct PLANET_API FStateDisplayInfo
 
 	FStateDisplayInfo();
 
+	// 总时间
 	float Duration = -1.f;
 
+	// 已过去的时间
 	float TotalTime = 0.f;
 
-	int32 Num = 1;
+	// 层数 <= 0 不显示
+	int32 Num = 0;
 
 	FString Text = TEXT("");
 
@@ -59,9 +62,9 @@ struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTa
 
 	FCharacterStateChanged CharacterStateChanged;
 
-protected:
-
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+protected:
 
 };
 

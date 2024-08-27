@@ -258,7 +258,7 @@ void AHumanAIController::InitialCharacter()
 						{
 							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
-							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket1;
+							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket2;
 							SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
 
 							SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);

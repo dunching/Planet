@@ -36,9 +36,10 @@ void UCS_RootMotion_FlyAway::PreActivate(
 {
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion_FlyAway*>(TriggerEventData->TargetData.Get(0));
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion_FlyAway*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
+			SetCache(TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>(GameplayAbilityTargetDataPtr->Clone()));
 		}
 	}
 
@@ -78,6 +79,25 @@ void UCS_RootMotion_FlyAway::UpdateDuration()
 	{
 		RootMotionTaskPtr->UpdateDuration();
 	}
+
+	StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+	StateDisplayInfoSPtr->DataChanged();
+}
+
+void UCS_RootMotion_FlyAway::SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& InGameplayAbilityTargetDataSPtr)
+{
+	GameplayAbilityTargetDataSPtr = InGameplayAbilityTargetDataSPtr;
+}
+
+void UCS_RootMotion_FlyAway::InitialStateDisplayInfo()
+{
+	Super::InitialStateDisplayInfo();
+
+	if (GameplayAbilityTargetDataSPtr)
+	{
+		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		StateDisplayInfoSPtr->TotalTime = 0.f;
+	}
 }
 
 void UCS_RootMotion_FlyAway::PerformAction()
@@ -89,8 +109,8 @@ void UCS_RootMotion_FlyAway::PerformAction()
 		RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
 			this,
 			TEXT(""),
-			GameplayAbilityTargetDataPtr->Duration,
-			GameplayAbilityTargetDataPtr->Height
+			GameplayAbilityTargetDataSPtr->Duration,
+			GameplayAbilityTargetDataSPtr->Height
 		);
 
 		RootMotionTaskPtr->Ability = this;
@@ -112,13 +132,13 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 
 	}
 
-	if (GameplayAbilityTargetDataPtr->Duration < 0.f)
+	if (GameplayAbilityTargetDataSPtr->Duration < 0.f)
 	{
 	}
 	else
 	{
 		AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration);
+		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		AbilityTask_TimerHelperPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
 		AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
 		AbilityTask_TimerHelperPtr->OnFinished.BindLambda([this](auto) {
@@ -143,18 +163,13 @@ void UCS_RootMotion_FlyAway::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, flo
 
 void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
-	if (CharacterPtr->IsPlayerControlled())
+	if (CurrentInterval > Interval)
 	{
-		if (CurrentInterval > Interval)
-		{
-		}
-		else
-		{
-		}
 	}
 	else
 	{
-
+		StateDisplayInfoSPtr->TotalTime = CurrentInterval;
+		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 

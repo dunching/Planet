@@ -61,6 +61,8 @@ public:
 
 protected:
 
+	virtual void InitialTags()override;
+
 	void PerformAction(EAffectedDirection AffectedDirection);
 
 	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
