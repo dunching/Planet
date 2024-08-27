@@ -230,6 +230,22 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 	return false;
 }
 
+void UInteractiveSkillComponent::ActiveWeapon()
+{
+	if (FirstWeaponUnit)
+	{
+		ActiveWeapon(EWeaponSocket::kMain);
+	}
+	else if (SecondaryWeaponUnit)
+	{
+		ActiveWeapon(EWeaponSocket::kSecondary);
+	}
+	else
+	{
+		RetractputWeapon();
+	}
+}
+
 bool UInteractiveSkillComponent::SwitchWeapon()
 {
 	switch (CurrentActivedWeaponSocket)

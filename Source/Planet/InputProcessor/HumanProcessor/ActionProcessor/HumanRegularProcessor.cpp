@@ -186,7 +186,7 @@ namespace HumanProcessor
 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
 			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
 
-			OnwerActorPtr->GetInteractiveSkillComponent()->SwitchWeapon();
+			OnwerActorPtr->GetInteractiveSkillComponent()->ActiveWeapon();
 		}
 	}
 
