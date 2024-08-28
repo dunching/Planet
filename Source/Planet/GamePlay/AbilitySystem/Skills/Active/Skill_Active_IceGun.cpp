@@ -262,17 +262,17 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 		}
 		else
 		{
-			// 冰冻
-			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_StateModify(
-				UGameplayTagsSubSystem::GetInstance()->Stun,
-				2
-			);
+			// // 冰冻
+			// auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_StateModify(
+			// 	UGameplayTagsSubSystem::GetInstance()->Stun,
+			// 	2
+			// );
+			//
+			// GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+			// GameplayAbilityTargetDataPtr->TargetCharacterPtr = OtherCharacterPtr;
 
-			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetDataPtr->TargetCharacterPtr = OtherCharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+			// auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			// ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			static UParticleSystem* BoomParticle=LoadObject<UParticleSystem>(this,TEXT("/Script/Engine.ParticleSystem'/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Elemental/ICE/P_IceElementalSplit_Small.P_IceElementalSplit_Small'"));
 			static USoundBase* BoomSound=LoadObject<USoundBase>(this,TEXT("/Script/Engine.SoundWave'/Game/StarterContent/Audio/Explosion01.Explosion01'"));
 			if (BoomParticle)
