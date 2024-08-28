@@ -64,8 +64,6 @@ void USkill_Active_ContinuousGroupTherapy::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void USkill_Active_ContinuousGroupTherapy::PerformAction(

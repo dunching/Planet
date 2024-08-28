@@ -18,7 +18,7 @@ class ATornado;
 struct FStreamableHandle;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_StateModify : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_StateModify : public FGameplayAbilityTargetData_CS_Base
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -36,18 +36,11 @@ struct PLANET_API FGameplayAbilityTargetData_StateModify : public FGameplayAbili
 	// < 0 则意味着由Task取消
 	float Duration = 3.f;
 
-	int32 Height = 100;
-
-	// 会一次性修改多个状态码？
-	FGameplayTag Tag;
-
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 	
 private:
-
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
 };
 
@@ -85,7 +78,11 @@ public:
 
 	virtual void UpdateDuration()override;
 
+	void SetCache(const TSharedPtr<FGameplayAbilityTargetData_StateModify>& GameplayAbilityTargetDataSPtr);
+
 protected:
+
+	virtual void InitialStateDisplayInfo()override;
 
 	void PerformAction();
 
@@ -97,13 +94,8 @@ protected:
 
 	void OnTaskComplete();
 
-	const FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr = nullptr;
-
-	UEffectItem* EffectItemPtr = nullptr;
+	TSharedPtr<FGameplayAbilityTargetData_StateModify> GameplayAbilityTargetDataSPtr = nullptr;
 
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float FlyAwayHeight = 250.f;
-
 };

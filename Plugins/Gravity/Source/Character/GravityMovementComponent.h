@@ -39,8 +39,17 @@ public:
 
     const FLyraCharacterGroundInfo& GetGroundInfo();
 
-    // 停止Pwan旋转和输入（用于状态控制，如：眩晕，冲刺）
-    bool bSkipPerformMovement = false;
+    // 
+    bool bSkipRotation = false;
+    
+    // 
+    bool bSkipRootMotion = false;
+    
+    // 
+    bool bSkip_PlayerInput = false;
+    
+    // 
+    bool bSkip_PathFollow = false;
     
 protected:
 
@@ -48,7 +57,23 @@ protected:
 
     virtual void PhysicsRotation(float DeltaTime)override;
 
-    virtual void CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)override;
+    virtual FVector ConsumeInputVector()override;
+
+    virtual void CalcVelocity(
+        float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration
+    )override;
+
+    virtual void ApplyRootMotionToVelocity(float deltaTime)override;
+
+    virtual bool ApplyRequestedMove(
+        float DeltaTime, 
+        float MaxAccel,
+        float MaxSpeed,
+        float Friction, 
+        float BrakingDeceleration, 
+        FVector& OutAcceleration,
+        float& OutRequestedSpeed
+    )override;
 
     virtual void PerformMovement(float DeltaTime)override;
 

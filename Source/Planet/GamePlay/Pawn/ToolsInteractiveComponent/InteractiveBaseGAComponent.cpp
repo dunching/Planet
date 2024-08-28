@@ -46,6 +46,8 @@
 #include "CS_RootMotion_TornadoTraction.h"
 #include "CS_RootMotion_MoveAlongSpline.h"
 #include "CS_RootMotion_KnockDown.h"
+#include "CS_PeriodicStateModify_Stun.h"
+#include "CS_PeriodicStateModify_Charm.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -180,20 +182,11 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 			}
 		}
 
-		auto ClonePtr = GameplayAbilityTargetDataSPtr->Clone();
-		auto Handle = ClonePtr->CharacterStateChanged.AddCallback(
-			std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
-		Handle->bIsAutoUnregister = false;
-
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(ClonePtr);
-
 		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass(), 1);
 
 		auto GAHandle = ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,
-			&Payload
+			MkeSpec(GameplayAbilityTargetDataSPtr)
 		);
 
 		// 为什么不在此处直接获取 GetPrimaryInstance？因为在GA过程中调用时会pending，导致返回为nullptr
@@ -210,36 +203,42 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 }
 
 void UInteractiveBaseGAComponent::ExcuteEffects(
-	FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
+	TSharedPtr<FGameplayAbilityTargetData_StateModify> GameplayAbilityTargetDataSPtr
 )
 {
-	auto OnwerActorPtr = GameplayAbilityTargetDataPtr->TargetCharacterPtr.Get();
+	auto OnwerActorPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr.Get();
 	if (OnwerActorPtr)
 	{
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		if (PeriodicStateTagModifyMap.Contains(GameplayAbilityTargetDataPtr->Tag))
+		if (PeriodicStateTagModifyMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
-			auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(PeriodicStateTagModifyMap[GameplayAbilityTargetDataPtr->Tag]);
-			if (GameplayAbilitySpecPtr)
+			auto GAPtr = Cast<UCS_PeriodicStateModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
+			if (GAPtr)
 			{
-				auto GAPtr = Cast<UCS_RootMotion>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-				if (GAPtr)
-				{
-					GAPtr->UpdateDuration();
-				}
+				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
+				GAPtr->UpdateDuration();
 			}
 		}
 
-		FGameplayEventData Payload;
-		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+		if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun))
+		{
+			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Stun::StaticClass(), 1);
 
-		FGameplayAbilitySpec Spec(UCS_RootMotion::StaticClass(), 1);
+			ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				MkeSpec(GameplayAbilityTargetDataSPtr)
+			);
+		}
+		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
+		{
+			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Charm::StaticClass(), 1);
 
-		ASCPtr->GiveAbilityAndActivateOnce(
-			Spec,
-			&Payload
-		);
+			ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				MkeSpec(GameplayAbilityTargetDataSPtr)
+			);
+		}
 	}
 }
 
@@ -264,54 +263,42 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 			}
 			else
 			{
-				auto MakeSpec = [GameplayAbilityTargetDataSPtr, this]
-					{
-						auto ClonePtr = GameplayAbilityTargetDataSPtr->Clone();
-
-						if (!ClonePtr->DefaultIcon)
-						{
-							ClonePtr->DefaultIcon =
-								USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(ClonePtr->Tag)->DefaultIcon;
-						}
-
-						auto Handle = ClonePtr->CharacterStateChanged.AddCallback(
-							std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
-						);
-						Handle->bIsAutoUnregister = false;
-
-						FGameplayEventData * Payload = new FGameplayEventData;
-						Payload->TargetData.Add(ClonePtr);
-
-						return Payload;
-					};
-
 				if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->KnockDown))
 				{
-					const auto TempCharacterStateMap = CharacterStateMap;
-					for (const auto Iter : TempCharacterStateMap)
-					{
-						if (Iter.Key.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-						{
-							ASCPtr->CancelAbilityHandle(
-								Iter.Value->GetCurrentAbilitySpecHandle()
-							);
+					BreakOhterState(
+						GameplayAbilityTargetDataSPtr,
+						UGameplayTagsSubSystem::GetInstance()->KnockDown, 
+						{ 
+							UGameplayTagsSubSystem::GetInstance()->FlyAway,
+							UGameplayTagsSubSystem::GetInstance()->TornadoTraction,
+							UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline,
 						}
-					}
+						);
 
 					FGameplayAbilitySpec Spec(CS_RootMotion_KnockDownClass, 1);
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MakeSpec()
+						MkeSpec(GameplayAbilityTargetDataSPtr)
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
 				{
+					BreakOhterState(
+						GameplayAbilityTargetDataSPtr,
+						UGameplayTagsSubSystem::GetInstance()->FlyAway,
+						{
+							UGameplayTagsSubSystem::GetInstance()->KnockDown,
+							UGameplayTagsSubSystem::GetInstance()->TornadoTraction,
+							UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline,
+						}
+						);
+
 					FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass(), 1);
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MakeSpec()
+						MkeSpec(GameplayAbilityTargetDataSPtr)
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
@@ -320,7 +307,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MakeSpec()
+						MkeSpec(GameplayAbilityTargetDataSPtr)
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
@@ -329,9 +316,71 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MakeSpec()
+						MkeSpec(GameplayAbilityTargetDataSPtr)
 					);
 				}
+				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Traction))
+				{
+					FGameplayAbilitySpec Spec(UCS_RootMotion_MoveAlongSpline::StaticClass(), 1);
+
+					ASCPtr->GiveAbilityAndActivateOnce(
+						Spec,
+						MkeSpec(GameplayAbilityTargetDataSPtr)
+					);
+				}
+			}
+		}
+	}
+}
+
+FGameplayEventData* UInteractiveBaseGAComponent::MkeSpec(
+	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
+) 
+{
+	auto ClonePtr = GameplayAbilityTargetDataSPtr->Clone();
+
+	if (!ClonePtr->DefaultIcon)
+	{
+		ClonePtr->DefaultIcon =
+			USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(ClonePtr->Tag)->DefaultIcon;
+	}
+
+	auto Handle = ClonePtr->CharacterStateChanged.AddCallback(
+		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
+	);
+	Handle->bIsAutoUnregister = false;
+
+	FGameplayEventData* Payload = new FGameplayEventData;
+	Payload->TargetData.Add(ClonePtr);
+
+	return Payload;
+}
+
+void UInteractiveBaseGAComponent::BreakOhterState(
+	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr, 
+	const FGameplayTag& ThisTag, 
+	const TArray<FGameplayTag>& CancelTags
+)
+{
+	// 会中断其他跟运动的状态
+	FGameplayTagContainer GameplayTagContainer;
+	for (const auto Iter : CancelTags)
+	{
+		GameplayTagContainer.AddTag(Iter);
+	}
+	if (GameplayAbilityTargetDataSPtr->Tag.MatchesAnyExact(GameplayTagContainer))
+	{
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+		const auto TempCharacterStateMap = CharacterStateMap;
+		for (const auto Iter : TempCharacterStateMap)
+		{
+			if (Iter.Key.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+			{
+				ASCPtr->CancelAbilityHandle(
+					Iter.Value->GetCurrentAbilitySpecHandle()
+				);
 			}
 		}
 	}

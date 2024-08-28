@@ -1,5 +1,5 @@
 
-#include "Skill_Active_KnockDown.h"
+#include "Skill_Active_Charm.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -30,15 +30,21 @@
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
-#include "CS_RootMotion_KnockDown.h"
+#include "CS_PeriodicStateModify_Charm.h"
 
-USkill_Active_KnockDown::USkill_Active_KnockDown() :
+static TAutoConsoleVariable<int32> Skill_Active_FlyAway_DrawDebug(
+	TEXT("Skill_Active_FlyAway.DrawDebug"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
+
+USkill_Active_Charm::USkill_Active_Charm() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void USkill_Active_KnockDown::PreActivate(
+void USkill_Active_Charm::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -49,7 +55,7 @@ void USkill_Active_KnockDown::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void USkill_Active_KnockDown::ActivateAbility(
+void USkill_Active_Charm::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -61,7 +67,7 @@ void USkill_Active_KnockDown::ActivateAbility(
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 }
 
-bool USkill_Active_KnockDown::CanActivateAbility(
+bool USkill_Active_Charm::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
@@ -69,14 +75,17 @@ bool USkill_Active_KnockDown::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
+	if (
+		CharacterPtr->GetCharacterMovement()->IsFlying() ||
+		CharacterPtr->GetCharacterMovement()->IsFalling()
+		)
 	{
 		return false;
 	}
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void USkill_Active_KnockDown::EndAbility(
+void USkill_Active_Charm::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -87,7 +96,7 @@ void USkill_Active_KnockDown::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_KnockDown::PerformAction(
+void USkill_Active_Charm::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -101,7 +110,7 @@ void USkill_Active_KnockDown::PerformAction(
 	}
 }
 
-void USkill_Active_KnockDown::ExcuteTasks()
+void USkill_Active_Charm::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
@@ -110,6 +119,25 @@ void USkill_Active_KnockDown::ExcuteTasks()
 
 		FCollisionQueryParams Params;
 		Params.AddIgnoredActor(CharacterPtr);
+
+#ifdef WITH_EDITOR
+		if (Skill_Active_FlyAway_DrawDebug.GetValueOnGameThread())
+		{
+			DrawDebugLine(
+				GetWorld(),
+				CharacterPtr->GetActorLocation(),
+				CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorRotation().Vector() * 100),
+				FColor::Red, false, 3
+			);
+
+			DrawDebugLine(
+				GetWorld(),
+				CharacterPtr->GetActorLocation(),
+				CharacterPtr->GetActorLocation() + (CharacterPtr->GetControlRotation().Vector() * 100),
+				FColor::Yellow, false, 3
+			);
+		}
+#endif
 
 		const auto Dir = UKismetMathLibrary::MakeRotFromZX(
 			UKismetGravityLibrary::GetGravity(CharacterPtr->GetActorLocation()), CharacterPtr->GetControlRotation().Vector()
@@ -130,8 +158,8 @@ void USkill_Active_KnockDown::ExcuteTasks()
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 
-		TSet <ACharacterBase*>TargetSet;
-		for (const auto & Iter : Result)
+		TSet<ACharacterBase*>TargetSet;
+		for (const auto& Iter : Result)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
 			if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
@@ -154,7 +182,7 @@ void USkill_Active_KnockDown::ExcuteTasks()
 		// ¿ØÖÆÐ§¹û
 		for (const auto& Iter : TargetSet)
 		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_KnockDown;
+			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Charm(Duration);
 
 			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
@@ -164,7 +192,7 @@ void USkill_Active_KnockDown::ExcuteTasks()
 	}
 }
 
-void USkill_Active_KnockDown::PlayMontage()
+void USkill_Active_Charm::PlayMontage()
 {
 	{
 		const float InPlayRate = 1.f;

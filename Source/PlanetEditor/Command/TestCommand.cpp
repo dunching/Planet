@@ -98,7 +98,7 @@ void TestCommand::TestSectorCollision()
 	FCollisionObjectQueryParams ObjectQueryParams;
 	FCollisionQueryParams Params;
 
-	UKismetCollisionHelper::OverlapMultiSectorByObjectType(GetWorldImp(), FVector(100, 100 ,100), FVector(200, 100, 100), 90, 9, ObjectQueryParams, Params);
+	UKismetCollisionHelper::OverlapMultiSectorByObjectType(GetWorldImp(), FVector(100, 100, 100), FVector(200, 100, 100), 90, 9, ObjectQueryParams, Params);
 }
 
 void TestCommand::TestAsyncAssetLoad()
@@ -204,10 +204,10 @@ void TestCommand::TestDisplacementSkill()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-// 		auto UnitClass = USceneUnitExtendInfoMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
-// 
-// 		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
-// 		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);
+		// 		auto UnitClass = USceneUnitExtendInfoMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
+		// 
+		// 		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
+		// 		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);
 	}
 }
 
@@ -271,6 +271,11 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 
 		SpawnParameters.CustomPreSpawnInitalization = [&](AActor* ActorPtr)
 			{
+				auto CharacterPtr = Cast<AHumanCharacter>(ActorPtr);
+				if (Args.IsValidIndex(3))
+				{
+					CharacterPtr->RowName = FGameplayTag::RequestGameplayTag(*Args[3]);
+				}
 			};
 
 		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHumanCharacter>(
@@ -407,38 +412,38 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 
 	auto Value = UKismetStringLibrary::Conv_StringToInt(Args[2]);
 	auto CharacterAttributesSPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
- 	if (Args[1] == TEXT("1"))
- 	{
- 		CharacterAttributesSPtr->Element.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
- 	else if (Args[1] == TEXT("2"))
- 	{
- 		CharacterAttributesSPtr->Element.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
- 	else if (Args[1] == TEXT("3"))
- 	{
- 		CharacterAttributesSPtr->Element.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
- 	else if (Args[1] == TEXT("4"))
- 	{
- 		CharacterAttributesSPtr->Element.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
- 	else if (Args[1] == TEXT("5"))
- 	{
- 		CharacterAttributesSPtr->Element.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
- 	else if (Args[1] == TEXT("6"))
- 	{
- 		CharacterAttributesSPtr->CriticalHitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
- 	else if (Args[1] == TEXT("7"))
- 	{
- 		CharacterAttributesSPtr->HitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
- 	else if (Args[1] == TEXT("8"))
- 	{
- 		CharacterAttributesSPtr->Evade.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
- 	}
+	if (Args[1] == TEXT("1"))
+	{
+		CharacterAttributesSPtr->Element.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
+	else if (Args[1] == TEXT("2"))
+	{
+		CharacterAttributesSPtr->Element.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
+	else if (Args[1] == TEXT("3"))
+	{
+		CharacterAttributesSPtr->Element.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
+	else if (Args[1] == TEXT("4"))
+	{
+		CharacterAttributesSPtr->Element.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
+	else if (Args[1] == TEXT("5"))
+	{
+		CharacterAttributesSPtr->Element.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
+	else if (Args[1] == TEXT("6"))
+	{
+		CharacterAttributesSPtr->CriticalHitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
+	else if (Args[1] == TEXT("7"))
+	{
+		CharacterAttributesSPtr->HitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
+	else if (Args[1] == TEXT("8"))
+	{
+		CharacterAttributesSPtr->Evade.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+	}
 }
 
 void TestCommand::TestGAState2Self(const TArray< FString >& Args)

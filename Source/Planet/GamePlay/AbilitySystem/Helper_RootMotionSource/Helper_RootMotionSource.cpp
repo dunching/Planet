@@ -45,7 +45,7 @@ void FRootMotionSource_MyConstantForce::PrepareRootMotion
 	RootMotionParams.Clear();
 
 	auto GravityMoveComponentPtr = Cast<UGravityMovementComponent>(&MoveComponent);
-	if (false/*GravityMoveComponentPtr->PerformBlockResult.bBlockingHit*/)
+	if (GravityMoveComponentPtr->bSkipRootMotion)
 	{
 		SetTime(GetTime() + Duration);
 
