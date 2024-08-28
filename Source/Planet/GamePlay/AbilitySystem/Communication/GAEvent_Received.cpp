@@ -124,7 +124,7 @@ void UGAEvent_Received::ActivateAbility(
 				return;
 			}
 
-			auto ClonePtr = GAEventDataPtr->Clone();
+			auto ClonePtr = TSharedPtr<FGameplayAbilityTargetData_StateModify>(GAEventDataPtr->Clone());
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
 		}

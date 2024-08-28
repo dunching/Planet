@@ -54,12 +54,24 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	FGameplayTag MovementStateAble_Jump =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Jump")));
+	FGameplayTag MovementStateAble_CantJump =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantJump")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
-	FGameplayTag MovementStateAble_Move =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Move")));
+	FGameplayTag MovementStateAble_CantPathFollowMove =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantPathFollowMove")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_CantPlayerInputMove =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantPlayerInputMove")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_CantRootMotion =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantRootMotion")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_CantRotation =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantRotation")));
 #pragma endregion 
 	
 #pragma region State Tags
@@ -80,8 +92,12 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag Stun =
+	FGameplayTag State_Debuff_Stun =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Stun")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_Debuff_Charm =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Charm")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Silent =
@@ -278,6 +294,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Active_FlyAway =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.FlyAway")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Stun =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Stun")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Charm =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Charm")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Passve =

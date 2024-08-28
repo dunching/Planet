@@ -73,18 +73,36 @@ const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
 
 void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
 {
-    if (bSkipPerformMovement)
+    Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
+}
+
+void UGravityMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
+{
+    Super::ApplyRootMotionToVelocity(DeltaTime);
+}
+
+bool UGravityMovementComponent::ApplyRequestedMove(
+    float DeltaTime, 
+    float MaxAccel, 
+    float MaxSpeed, 
+    float Friction, 
+    float BrakingDeceleration,
+    FVector& OutAcceleration, 
+    float& OutRequestedSpeed
+)
+{
+    if (bSkip_PathFollow)
     {
-        return;
+        return false;
     }
 
-    Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
+    return Super::ApplyRequestedMove(DeltaTime, MaxAccel, MaxSpeed, Friction, BrakingDeceleration, OutAcceleration, OutRequestedSpeed);
 }
 
 void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 {
     if (
-        bSkipPerformMovement ||
+        bSkipRotation ||
         HasRootMotionSources() ||
         HasAnimRootMotion()
         )
@@ -93,6 +111,16 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
     }
 
     Super::PhysicsRotation(DeltaTime);
+}
+
+FVector UGravityMovementComponent::ConsumeInputVector()
+{
+    if (bSkip_PlayerInput)
+    {
+        return FVector::ZeroVector;
+    }
+
+    return Super::ConsumeInputVector();
 }
 
 void UGravityMovementComponent::PerformMovement(float DeltaSeconds)

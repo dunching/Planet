@@ -57,38 +57,6 @@ void USkill_Active_Control::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (!HasFocusActor())
-	{
-		K2_CancelAbility();
-	}
-
-	auto bIsHaveTargetInDistance = CheckTargetInDistance(AttackDistance);
-	if (bIsHaveTargetInDistance)
-	{
-		CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-		PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-	}
-	else
-	{
-		auto DataPtr = dynamic_cast<const FGameplayAbilityTargetData_Control*>(TriggerEventData->TargetData.Get(0));
-		if (DataPtr)
-		{
-			auto MoveToAttaclAreaPtr = new FGameplayAbilityTargetData_MoveToAttaclArea;
-
-			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
-			MoveToAttaclAreaPtr->DataPtr = DataPtr->Clone();
-			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
-			MoveToAttaclAreaPtr->CanbeActivedInfoSPtr = DataPtr->CanbeActivedInfoSPtr;
-
-			CharacterPtr->GetInteractiveBaseGAComponent()->MoveToAttackDistance(
-				MoveToAttaclAreaPtr
-			);
-
-			K2_CancelAbility();
-		}
-	}
 }
 
 bool USkill_Active_Control::CanActivateAbility(
@@ -130,10 +98,41 @@ void USkill_Active_Control::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
-	if (CharacterPtr)
+
+	if (!HasFocusActor())
 	{
-		ExcuteTasks();
-		PlayMontage();
+		K2_CancelAbility();
+	}
+
+	auto bIsHaveTargetInDistance = CheckTargetInDistance(AttackDistance);
+	if (bIsHaveTargetInDistance)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+
+		if (CharacterPtr)
+		{
+			ExcuteTasks();
+			PlayMontage();
+		}
+	}
+	else
+	{
+		auto DataPtr = dynamic_cast<const FGameplayAbilityTargetData_Control*>(TriggerEventData->TargetData.Get(0));
+		if (DataPtr)
+		{
+			auto MoveToAttaclAreaPtr = new FGameplayAbilityTargetData_MoveToAttaclArea;
+
+			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
+			MoveToAttaclAreaPtr->DataPtr = DataPtr->Clone();
+			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
+			MoveToAttaclAreaPtr->CanbeActivedInfoSPtr = DataPtr->CanbeActivedInfoSPtr;
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->MoveToAttackDistance(
+				MoveToAttaclAreaPtr
+			);
+
+			K2_CancelAbility();
+		}
 	}
 }
 

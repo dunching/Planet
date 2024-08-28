@@ -110,7 +110,10 @@ public:
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
 
 	UCharacterTitle* CharacterTitlePtr = nullptr;
-
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
+	FGameplayTag RowName = FGameplayTag::EmptyTag;
+	
 protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -170,9 +173,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFightingTips>FightingTipsClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
-	FGameplayTag RowName = FGameplayTag::EmptyTag;
 	
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 

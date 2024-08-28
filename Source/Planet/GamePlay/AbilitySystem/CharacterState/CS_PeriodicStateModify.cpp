@@ -42,13 +42,15 @@ void UCS_PeriodicStateModify::PreActivate(
 {
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_StateModify*>(TriggerEventData->TargetData.Get(0));
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_StateModify*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
+			SetCache(TSharedPtr<FGameplayAbilityTargetData_StateModify>(GameplayAbilityTargetDataPtr->Clone()));
+
+			AbilityTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
+			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
+			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
+			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
 		}
 	}
 
@@ -75,12 +77,6 @@ void UCS_PeriodicStateModify::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (EffectItemPtr)
-	{
-		EffectItemPtr->RemoveFromParent();
-		EffectItemPtr = nullptr;
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -88,20 +84,27 @@ void UCS_PeriodicStateModify::UpdateDuration()
 {
 	if (TaskPtr)
 	{
+		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		TaskPtr->UpdateDuration();
-	}
-	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-	{
-		for (auto Iter : ActiveTasks)
-		{
-			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
-			{
-				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
 
-				RootMotionTaskPtr->UpdateDuration();
-				break;
-			}
-		}
+		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		StateDisplayInfoSPtr->DataChanged();
+	}
+}
+
+void UCS_PeriodicStateModify::SetCache(const TSharedPtr<FGameplayAbilityTargetData_StateModify>& InGameplayAbilityTargetDataSPtr)
+{
+	GameplayAbilityTargetDataSPtr = InGameplayAbilityTargetDataSPtr;
+}
+
+void UCS_PeriodicStateModify::InitialStateDisplayInfo()
+{
+	Super::InitialStateDisplayInfo();
+
+	if (GameplayAbilityTargetDataSPtr)
+	{
+		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		StateDisplayInfoSPtr->TotalTime = 0.f;
 	}
 }
 
@@ -123,13 +126,13 @@ void UCS_PeriodicStateModify::ExcuteTasks()
 
 	}
 
-	if (GameplayAbilityTargetDataPtr->Duration < 0.f)
+	if (GameplayAbilityTargetDataSPtr->Duration < 0.f)
 	{
 	}
 	else
 	{
 		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetDuration(GameplayAbilityTargetDataPtr->Duration);
+		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
 		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
 		TaskPtr->OnFinished.BindLambda([this](auto) {
@@ -149,21 +152,13 @@ void UCS_PeriodicStateModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, fl
 
 void UCS_PeriodicStateModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
 {
-	if (CharacterPtr->IsPlayerControlled())
+	if (CurrentInterval > Interval)
 	{
-		if (CurrentInterval > Interval)
-		{
-		}
-		else
-		{
-			if (EffectItemPtr)
-			{
-			}
-		}
 	}
 	else
 	{
-
+		StateDisplayInfoSPtr->TotalTime = CurrentInterval;
+		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 
@@ -176,8 +171,8 @@ FGameplayAbilityTargetData_StateModify::FGameplayAbilityTargetData_StateModify(
 	const FGameplayTag& InTag,
 	float InDuration
 ) :
-	Duration(InDuration),
-	Tag(InTag)
+	Super(InTag),
+	Duration(InDuration)
 {
 
 }

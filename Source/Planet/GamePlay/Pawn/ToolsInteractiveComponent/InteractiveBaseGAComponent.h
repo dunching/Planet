@@ -18,6 +18,8 @@ class UCS_RootMotion;
 class UCS_Base;
 class UCS_RootMotion_KnockDown;
 
+struct FGameplayEventData;
+struct FGameplayAbilityTargetData_CS_Base;
 struct FGameplayAbilityTargetData_RootMotion;
 struct FGameplayAbilityTargetData_PropertyModify;
 struct FGameplayAbilityTargetData_StateModify;
@@ -154,8 +156,17 @@ protected:
 	// 
 	// 此状态通过Tag控制人物的可操控状态
 	void ExcuteEffects(
-		FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
+		TSharedPtr<FGameplayAbilityTargetData_StateModify> GameplayAbilityTargetDataSPtr
 	);
+
+	FGameplayEventData* MkeSpec(
+		const TSharedPtr<FGameplayAbilityTargetData_CS_Base> &GameplayAbilityTargetDataSPtr
+	);
+
+	void BreakOhterState(
+		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
+		const FGameplayTag& ThisTag, 
+		const TArray<FGameplayTag>& CancelTags);
 
 	void AddSendGroupEffectModify();
 

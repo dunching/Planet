@@ -39,34 +39,49 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 	}
 	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble))
 	{
-		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Jump))
+		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump))
 		{
 			auto CharacterPtr = GetOwner<ACharacterBase>();
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->MovementState.bCanJump = Value;
+				CharacterMovementPtr->MovementState.bCanJump = !Value;
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Move))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove))
 		{
 			auto CharacterPtr = GetOwner<ACharacterBase>();
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkipPerformMovement = Value;
+				CharacterMovementPtr->bSkip_PathFollow = Value;
 			}
 		}
-	}
-	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Debuff))
-	{
-		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Stun))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove))
 		{
 			auto CharacterPtr = GetOwner<ACharacterBase>();
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkipPerformMovement = Value;
+				CharacterMovementPtr->bSkip_PlayerInput = Value;
+			}
+		}
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion))
+		{
+			auto CharacterPtr = GetOwner<ACharacterBase>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkipRootMotion = Value;
+			}
+		}
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation))
+		{
+			auto CharacterPtr = GetOwner<ACharacterBase>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkipRotation = Value;
 			}
 		}
 	}

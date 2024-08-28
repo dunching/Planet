@@ -92,8 +92,6 @@ void USkill_Active_Tornado::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_Tornado::CanActivateAbility(

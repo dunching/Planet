@@ -80,8 +80,6 @@ void USkill_Active_XYFH::ActivateAbility(
 			CameraTrailHelperClass, CharacterPtr->GetActorTransform()
 		);
 	}
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_XYFH::CanActivateAbility(
