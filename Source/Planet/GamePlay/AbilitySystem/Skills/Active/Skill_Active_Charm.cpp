@@ -32,7 +32,7 @@
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_PeriodicStateModify_Charm.h"
 
-static TAutoConsoleVariable<int32> Skill_Active_FlyAway_DrawDebug(
+static TAutoConsoleVariable<int32> Skill_Active_Charm_DrawDebug(
 	TEXT("Skill_Active_FlyAway.DrawDebug"),
 	0,
 	TEXT("")
@@ -121,7 +121,7 @@ void USkill_Active_Charm::ExcuteTasks()
 		Params.AddIgnoredActor(CharacterPtr);
 
 #ifdef WITH_EDITOR
-		if (Skill_Active_Charm_Debug.GetValueOnGameThread())
+		if (Skill_Active_Charm_DrawDebug.GetValueOnGameThread())
 		{
 			DrawDebugLine(
 				GetWorld(),
@@ -168,7 +168,7 @@ void USkill_Active_Charm::ExcuteTasks()
 			}
 		}
 
-		// ÉËº¦
+		// 伤害
 		for (const auto& Iter : TargetSet)
 		{
 			FGAEventData GAEventData(Iter, CharacterPtr);
@@ -179,7 +179,7 @@ void USkill_Active_Charm::ExcuteTasks()
 		}
 		ICPtr->SendEventImp(GAEventDataPtr);
 
-		// ¿ØÖÆÐ§¹û
+		// 控制效果
 		for (const auto& Iter : TargetSet)
 		{
 			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Charm(Duration);
