@@ -101,7 +101,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 				}
 			}
 
-			// Î´ÊÍ·ÅÖ÷¶¯¼¼ÄÜ
+			// æœªé‡Šæ”¾ä¸»åŠ¨æŠ€èƒ½
 			for (const auto& Iter : CanbeActivedInfo)
 			{
 				switch (Iter->Type)
@@ -147,12 +147,12 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 
 void UAITask_ReleaseSkill::StopReleaseSkill()
 {
-	// ½áÊøÒÆ¶¯ÊÍ·ÅÖÁ·¶Î§ÄÚÊÍ·Å
+	// ç»“æŸç§»åŠ¨é‡Šæ”¾è‡³èŒƒå›´å†…é‡Šæ”¾
 	CharacterPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
 
 	for (const auto Iter : ReleasingSkillMap)
 	{
-		// 1.Èç¹û²»È¡ÏûÕâ¸ö»Øµ÷£¬CancelAction»áµ÷ÓÃÎÞÐ§µÄ³ÉÔ±º¯Êý£¨UEÅÐ¶Ï¹ýÁË ²»»á±ÀÀ£ µ«ÊÇÂß¼­²»¶Ô£©
+		// 1.å¦‚æžœä¸å–æ¶ˆè¿™ä¸ªå›žè°ƒï¼ŒCancelActionä¼šè°ƒç”¨æ— æ•ˆçš„æˆå‘˜å‡½æ•°ï¼ˆUEåˆ¤æ–­è¿‡äº† ä¸ä¼šå´©æºƒ ä½†æ˜¯é€»è¾‘ä¸å¯¹ï¼‰
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Key);
 		if (!GameplayAbilitySpecPtr)

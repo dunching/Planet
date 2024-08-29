@@ -83,10 +83,10 @@ void UBasicFutures_Affected::InitialTags()
 {
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
 
-	// ÔÚÔË¶¯Ê±²»¼¤»î
+	// åœ¨è¿åŠ¨æ—¶ä¸æ¿€æ´»
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
 
-	// ÔÚ¡°°ÔÌå¡±Ê±²»¼¤»î
+	// åœ¨â€œéœ¸ä½“â€æ—¶ä¸æ¿€æ´»
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->SuperArmor);
 
 	FAbilityTriggerData AbilityTriggerData;

@@ -11,7 +11,7 @@
 
 class UGameplayAbility;
 
-// ÊÇ·ñ½áÊø
+// æ˜¯å¦ç»“æŸ
 using TimerHelper_Finished_Delegate = TDelegate<bool(UAbilityTask_TimerHelper*)>;
 
 DECLARE_DELEGATE_TwoParams(TimerHelper_Tick_Delegate, UAbilityTask_TimerHelper*, float);
@@ -34,7 +34,7 @@ public:
 
 	void SetDuration(float InDuration, float InIntervalTime = -1.f);
 
-	// Èç¹û InIntervalTime > 0£»Ôòcount»áÔÚÀÛ¼ÆÊ±¼ä´óÓÚInIntervalTime²Å»á+1£¬·ñÔòÃ¿´Îtick+1
+	// å¦‚æœ InIntervalTime > 0ï¼›åˆ™countä¼šåœ¨ç´¯è®¡æ—¶é—´å¤§äºInIntervalTimeæ‰ä¼š+1ï¼Œå¦åˆ™æ¯æ¬¡tick+1
 	void SetCount(int32 InCount, float InIntervalTime = -1.f);
 	
 	void SetInfinite(float InIntervalTime = -1.f);
@@ -43,7 +43,7 @@ public:
 	
 	TimerHelper_Tick_Delegate TickDelegate;
 
-	// µ±Ç°Ê±¼ä ×ÜÊ±¼ä
+	// å½“å‰æ—¶é—´ æ€»æ—¶é—´
 	TimerHelper_Interval_Tick_Delegate DurationDelegate;
 
 	TimerHelper_Interval_Tick_Delegate IntervalDelegate;

@@ -22,40 +22,40 @@ struct FGAEventData
 		TWeakObjectPtr<ACharacterBase>  TriggerCharacterPtr
 	);
 
-	// ÊÇ·ñÊÇÎäÆ÷Ôì³ÉµÄÉËº¦
+	// æ˜¯å¦æ˜¯æ­¦å™¨é€ æˆçš„ä¼¤å®³
 	bool bIsWeaponAttack = false;
 	
-	// ÊÇ·ñ»áÔì³É¡°ÊÜ»÷¡±Ğ§¹û
+	// æ˜¯å¦ä¼šé€ æˆâ€œå—å‡»â€æ•ˆæœ
 	bool bIsMakeAttackEffect = false;
 
-	// ±¾´Î¹¥»÷µÄ ´©Í¸
+	// æœ¬æ¬¡æ”»å‡»çš„ ç©¿é€
 	int32 Penetration = 0;
 
-	// ±¾´Î¹¥»÷µÄ °Ù·Ö±È´©Í¸
+	// æœ¬æ¬¡æ”»å‡»çš„ ç™¾åˆ†æ¯”ç©¿é€
 	int32 PercentPenetration = 0;
 
-	// ±¾´Î¹¥»÷µÄ ÃüÖĞÂÊ(0ÔòÎª´Ë´Î±»ÉÁ±Ü)
+	// æœ¬æ¬¡æ”»å‡»çš„ å‘½ä¸­ç‡(0åˆ™ä¸ºæ­¤æ¬¡è¢«é—ªé¿)
 	int32 HitRate = 0;
 
-	// ±¾´Î¹¥»÷µÄ »áĞÄÂÊ(100ÔòÎª´Ë´Î±»»áĞÄ)
+	// æœ¬æ¬¡æ”»å‡»çš„ ä¼šå¿ƒç‡(100åˆ™ä¸ºæ­¤æ¬¡è¢«ä¼šå¿ƒ)
 	int32 CriticalHitRate = 0;
 
-	// ±¾´Î¹¥»÷µÄ »áĞÄÉËº¦
+	// æœ¬æ¬¡æ”»å‡»çš„ ä¼šå¿ƒä¼¤å®³
 	int32 CriticalDamage = 0;
 
-	// Ôì³ÉµÄÕæÊµÉËº¦
+	// é€ æˆçš„çœŸå®ä¼¤å®³
 	int32 TrueDamage = 0;
 
-	// Ôì³ÉµÄ»ù´¡ÉËº¦
+	// é€ æˆçš„åŸºç¡€ä¼¤å®³
 	int32 BaseDamage = 0;
 
-	// ÉËº¦·Ö²¼£ºÀàĞÍ¡¢µÈ¼¶¡¢ÉËº¦Á¿
+	// ä¼¤å®³åˆ†å¸ƒï¼šç±»å‹ã€ç­‰çº§ã€ä¼¤å®³é‡
 	TSet<TTuple<EWuXingType, int32, int32>>ElementSet;
 
-	// »Ø¸´£ºHP
+	// å›å¤ï¼šHP
 	int32 HP = 0;
 
-	// »Ø¸´£ºPP
+	// å›å¤ï¼šPP
 	int32 PP = 0;
 
 	void SetBaseDamage(int32 Value);
@@ -64,10 +64,10 @@ struct FGAEventData
 
 	FGameplayTag DataSource;
 
-	// ÊÇ·ñ Çå¿ÕDataModifyµÄ DataSource
+	// æ˜¯å¦ æ¸…ç©ºDataModifyçš„ DataSource
 	bool bIsClearData = false;
 
-	// Ö±½ÓĞŞ¸ÄµÄÊı¾İ
+	// ç›´æ¥ä¿®æ”¹çš„æ•°æ®
 	TMap<ECharacterPropertyType, FBaseProperty>DataModify;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
@@ -79,13 +79,13 @@ struct FGameplayAbilityTargetData_GAEventType : public FGameplayAbilityTargetDat
 {
 	enum class EEventType : uint8
 	{
-		// ÈËÎïÊÜ¡°»÷Ê±¡±ÊÕµ½µÄÊı¾İ
+		// äººç‰©å—â€œå‡»æ—¶â€æ”¶åˆ°çš„æ•°æ®
 		kNormal,
-		// ÈËÎïÌí¼Ó¡°Ä³Ğ©±êÇ©¡±Ê±ÊÕµ½µÄÊı¾İ
+		// äººç‰©æ·»åŠ â€œæŸäº›æ ‡ç­¾â€æ—¶æ”¶åˆ°çš„æ•°æ®
 		kRootMotion,
-		// ÈËÎï»ñµÃ¡°ÖÜÆÚĞÔÔö¼ÓÊôĞÔ¡±Ê±ÊÕµ½µÄÊı¾İ£¬Í¨³£ÊÇÊ¹ÓÃÏûºÄÆ·
+		// äººç‰©è·å¾—â€œå‘¨æœŸæ€§å¢åŠ å±æ€§â€æ—¶æ”¶åˆ°çš„æ•°æ®ï¼Œé€šå¸¸æ˜¯ä½¿ç”¨æ¶ˆè€—å“
 		kPeriodic_PropertyModify,
-		// ÈËÎïÖ´ĞĞ¡°RootMoxing¡±Ê±ÊÕµ½µÄÊı¾İ
+		// äººç‰©æ‰§è¡Œâ€œRootMoxingâ€æ—¶æ”¶åˆ°çš„æ•°æ®
 		kPeriodic_StateTagModify,
 	};
 
@@ -153,7 +153,7 @@ public:
 
 private:
 
-	// Ô½Ğ¡µÄÔ½ÏÈËã
+	// è¶Šå°çš„è¶Šå…ˆç®—
 	int32 Priority = -1;
 
 	int32 ID = -1;

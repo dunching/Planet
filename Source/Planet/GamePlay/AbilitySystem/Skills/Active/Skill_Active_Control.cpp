@@ -147,7 +147,7 @@ void USkill_Active_Control::ExcuteTasks()
 
 	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 
-	// ÉËº¦
+	// ä¼¤å®³
 	{
 		FGAEventData GAEventData(HasFocusActor(), CharacterPtr);
 
@@ -157,7 +157,7 @@ void USkill_Active_Control::ExcuteTasks()
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 
-	// ¿ØÖÆÐ§¹û
+	// æŽ§åˆ¶æ•ˆæžœ
 	{
 		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_MoveAlongSpline;
 

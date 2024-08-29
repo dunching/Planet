@@ -59,10 +59,10 @@ private:
 
 	float Duration = 3.f;
 
-	// < 0 ÎªÖ»Ö´ÐÐÒ»´Î ÊôÐÔÐÞ¸Ä
+	// < 0 ä¸ºåªæ‰§è¡Œä¸€æ¬¡ å±žæ€§ä¿®æ”¹
 	float PerformActionInterval = -1.f;
 
-	// < 0 ÎªÒÆ³ýËùÓÐ²ãÊý
+	// < 0 ä¸ºç§»é™¤æ‰€æœ‰å±‚æ•°
 	float LosePropertyNumInterval = -1.f;
 
 	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;

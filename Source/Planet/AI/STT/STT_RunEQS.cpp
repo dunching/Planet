@@ -113,8 +113,8 @@ EStateTreeRunStatus FSTT_RunEQS::PerformMoveTask(FStateTreeExecutionContext& Con
 	{
 		FEnvQueryRequest QueryRequest(InstanceData.QueryTemplate, InstanceData.CharacterPtr);
 
-		// ÔÚ×´Ì¬Ê÷ÀïÍ¨¹ı²ÎÊıÉèÖÃ²»ÉúĞ§£¿Ô­Òò»¹²»Çå³ş ÔÚÕâÀïÍ¨¹ıÕâÖÖ·½Ê½ÉèÖÃ ¡ı
-		// SetIntParam <-ÕâÊÇÔÚ¸ÉÉ¶£¿
+		// åœ¨çŠ¶æ€æ ‘é‡Œé€šè¿‡å‚æ•°è®¾ç½®ä¸ç”Ÿæ•ˆï¼ŸåŸå› è¿˜ä¸æ¸…æ¥š åœ¨è¿™é‡Œé€šè¿‡è¿™ç§æ–¹å¼è®¾ç½® â†“
+		// SetIntParam <-è¿™æ˜¯åœ¨å¹²å•¥ï¼Ÿ
 		QueryRequest.SetFloatParam(STT_RunEQS::Donut_InnerRadius, InstanceData.Donut_InnerRadius);
 		QueryRequest.SetFloatParam(STT_RunEQS::Donut_OuterRadius, InstanceData.Donut_OuterRadius);
 

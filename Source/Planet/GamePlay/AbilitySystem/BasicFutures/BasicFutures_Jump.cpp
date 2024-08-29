@@ -91,7 +91,7 @@ void UBasicFutures_Jump::InitialTags()
 {
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Jump);
 
-	// ÔÚÔË¶¯Ê±²»¼¤»î
+	// åœ¨è¿åŠ¨æ—¶ä¸æ¿€æ´»
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
 
 	FAbilityTriggerData AbilityTriggerData;

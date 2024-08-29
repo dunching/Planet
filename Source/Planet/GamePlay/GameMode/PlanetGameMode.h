@@ -61,7 +61,7 @@ private:
 
 	FDelegateHandle Delegate;
 	
-	// ½ÇÉ«ĞòÁĞ,µÚ0¸öÎªPlayer
+	// è§’è‰²åºåˆ—,ç¬¬0ä¸ªä¸ºPlayer
 	UPROPERTY(Transient)
 	TMap<int32, UCharacterUnit*> CharacterUnitMap;
 

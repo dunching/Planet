@@ -245,19 +245,19 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 
 	if (InPawn)
 	{
-		// ×¢Òâ£ºPC²¢·ÇÊÇÔÚ´Ë´¦°ó¶¨£¬Õâ¶Î½öÎª²âÊÔ
+		// æ³¨æ„ï¼šPCå¹¶éžæ˜¯åœ¨æ­¤å¤„ç»‘å®šï¼Œè¿™æ®µä»…ä¸ºæµ‹è¯•
 		BindPCWithCharacter();
 
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
-			// ÔÚSetPawnÖ®ºóµ÷ÓÃ
+			// åœ¨SetPawnä¹‹åŽè°ƒç”¨
 			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
 				NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
 				});
 
 			GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
 
-			// °ó¶¨Ð§¹û×´Ì¬À¸
+			// ç»‘å®šæ•ˆæžœçŠ¶æ€æ 
 			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
 			if (EffectPtr)
 			{

@@ -33,7 +33,7 @@ struct PLANET_API FGameplayAbilityTargetData_StateModify : public FGameplayAbili
 
 	FGameplayAbilityTargetData_StateModify* Clone()const;
 
-	// < 0 则意味着由Task取消
+	// < 0 鍒欐剰鍛崇潃鐢盩ask鍙栨秷
 	float Duration = 3.f;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;

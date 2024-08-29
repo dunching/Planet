@@ -73,7 +73,7 @@ public:
 		TSharedPtr<FWeaponSocketInfo>& SecondWeaponSocketInfo
 	)const;
 
-	// 激活可用的武器
+	// 婵�娲诲彲鐢ㄧ殑姝﹀櫒
 	void ActiveWeapon();
 
 	bool ActiveWeapon(EWeaponSocket WeaponSocket);

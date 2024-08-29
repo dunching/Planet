@@ -15,13 +15,13 @@ namespace TestCommand
 	void AddCahracterTestData();
 
 	static FAutoConsoleCommand CMDAddCahracterTestData(
-		//CMD Ãû×Ö£¬ÔÚ¿ØÖÆÌ¨ÊäÈëÕâ¸öµ÷ÓÃ
+		//CMD åå­—ï¼Œåœ¨æ§åˆ¶å°è¾“å…¥è¿™ä¸ªè°ƒç”¨
 		TEXT("AddCahracterTestData"),
-		//¿ØÖÆÌ¨°ïÖúĞÅÏ¢£¬Ñ¡ÔñÕâ¸öÃüÁîµÄÊ±ºò»á¿´µ½
+		//æ§åˆ¶å°å¸®åŠ©ä¿¡æ¯ï¼Œé€‰æ‹©è¿™ä¸ªå‘½ä»¤çš„æ—¶å€™ä¼šçœ‹åˆ°
 		TEXT("this is a CMD test."),
-		//´´½¨¾²Ì¬Î¯ÍĞ£¬ÊäÈëÉÏÃæµÄÃüÁîºó»áµ÷ÓÃµ½ºóÃæµÄº¯Êı
+		//åˆ›å»ºé™æ€å§”æ‰˜ï¼Œè¾“å…¥ä¸Šé¢çš„å‘½ä»¤åä¼šè°ƒç”¨åˆ°åé¢çš„å‡½æ•°
 		FConsoleCommandDelegate::CreateStatic(AddCahracterTestData),
-		//¿ÉÑ¡±êÖ¾Î»ÑÚÂë
+		//å¯é€‰æ ‡å¿—ä½æ©ç 
 		EConsoleVariableFlags::ECVF_Default
 	);
 };

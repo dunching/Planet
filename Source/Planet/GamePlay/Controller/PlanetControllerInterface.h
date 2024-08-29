@@ -32,7 +32,7 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
 
-	// ¡°³ÉÔ±¹ÜÀí¡±¼ÇÂ¼ÁË³ÉÔ±ĞÅÏ¢£¬ÒòÎª
+	// â€œæˆå‘˜ç®¡ç†â€è®°å½•äº†æˆå‘˜ä¿¡æ¯ï¼Œå› ä¸º
 	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const = 0;
 
 	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const = 0;
@@ -47,9 +47,9 @@ public:
 
 	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr) = 0;
 
-	// ÎÒÃÇÉè¶¨Ã¿¸öPCÖ»¶ÔÓ¦Ò»¸öCharacter£¬
-	// Èç£ºPlayerÔÚÆï³Ë¡°Âí¡±Ê±£¬PC»á¿ØÖÆµ½¡°Âí¡±Character£¬
-	// µ«ÊÇÎÒÃÇ»áÔÚPCÉÏ¼ÇÂ¼ÎÒÃÇÄ¬ÈÏµÄ¿ØÖÆ
+	// æˆ‘ä»¬è®¾å®šæ¯ä¸ªPCåªå¯¹åº”ä¸€ä¸ªCharacterï¼Œ
+	// å¦‚ï¼šPlayeråœ¨éª‘ä¹˜â€œé©¬â€æ—¶ï¼ŒPCä¼šæ§åˆ¶åˆ°â€œé©¬â€Characterï¼Œ
+	// ä½†æ˜¯æˆ‘ä»¬ä¼šåœ¨PCä¸Šè®°å½•æˆ‘ä»¬é»˜è®¤çš„æ§åˆ¶
 	virtual void BindPCWithCharacter() = 0;
 
 protected:

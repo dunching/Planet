@@ -239,7 +239,7 @@ void USkill_Active_Tornado::OnOverlap(AActor* OtherActor)
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 
-		// ¿ØÖÆÐ§¹û
+		// æŽ§åˆ¶æ•ˆæžœ
 		{
 			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_TornadoTraction;
 

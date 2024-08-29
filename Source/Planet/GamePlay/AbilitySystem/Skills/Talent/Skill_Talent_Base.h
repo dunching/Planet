@@ -11,7 +11,7 @@
 
 class UBasicUnit;
 
-// ÊÇ·ñÓ¦¸ÃÎª UObject £¿
+// æ˜¯å¦åº”è¯¥ä¸º UObject ï¼Ÿ
 class FTalent_Base
 {
 public:

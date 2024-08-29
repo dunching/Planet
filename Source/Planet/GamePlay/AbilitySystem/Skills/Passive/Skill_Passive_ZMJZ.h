@@ -63,7 +63,7 @@ public:
 
 protected:
 
-	virtual void PerformAction()override;
+	void PerformAction();
 
 	void OnSendAttack(const FGAEventData& GAEventData);
 

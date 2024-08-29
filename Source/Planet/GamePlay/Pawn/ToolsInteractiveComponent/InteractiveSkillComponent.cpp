@@ -90,7 +90,7 @@ void UInteractiveSkillComponent::InitialBaseGAs()
 	{
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		// ÎåĞĞ¼¼ÄÜ
+		// äº”è¡ŒæŠ€èƒ½
 		GASPtr->GiveAbility(
 			FGameplayAbilitySpec(
 				Skill_Element_GoldClass
@@ -124,7 +124,7 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
 		TSharedPtr<FWeaponSocketInfo > WeaponUnit;
 
-		// Çå³ıÉÏÒ»´ÎµÄ
+		// æ¸…é™¤ä¸Šä¸€æ¬¡çš„
 		{
 			switch (CurrentActivedWeaponSocket)
 			{
@@ -449,7 +449,7 @@ bool UInteractiveSkillComponent::ActiveSkill_Active(
 			(*SkillIter)->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
 			)
 		{
-			// ĞèÒªÌØÊâ²ÎÊıµÄ
+			// éœ€è¦ç‰¹æ®Šå‚æ•°çš„
 			if (
 				(*SkillIter)->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
 				)
@@ -715,31 +715,6 @@ void UInteractiveSkillComponent::AddSkill(const TMap<FGameplayTag, TSharedPtr<FS
 					{
 						SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 						MakeGameplayAbilitySpec(Iter.Value->SkillUnitPtr);
-
-						auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
-						if (PassiveSkillExtendInfoPtr->AddtionalElementMap.IsEmpty())
-						{
-							TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-							for (const auto& ElementIter : PassiveSkillExtendInfoPtr->AddtionalElementMap)
-							{
-								switch (ElementIter.Key)
-								{
-								case EWuXingType::kGold:
-								{
-									ModifyPropertyMap.Add(
-										ECharacterPropertyType::GoldElement, 
-										OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->Element.GoldElement.GetCurrentValue()
-									);
-								}
-								break;
-								}
-							}
-
-							OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
-								ModifyPropertyMap, PassiveSkillUnitPtr->GetUnitType()
-							);
-						}
 					}
 				}
 				else if (
@@ -762,7 +737,7 @@ void UInteractiveSkillComponent::GenerationCanbeActiveEvent()
 {
 	CanbeInteractionAry.Empty();
 
-	// ÏìÓ¦ÎäÆ÷
+	// å“åº”æ­¦å™¨
 	{
 		TSharedPtr<FCanbeInteractionInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeInteractionInfo>();
 		CanbeActivedInfoSPtr->Type = FCanbeInteractionInfo::EType::kWeaponActiveSkill;
@@ -770,7 +745,7 @@ void UInteractiveSkillComponent::GenerationCanbeActiveEvent()
 		CanbeInteractionAry.Add(CanbeActivedInfoSPtr);
 	}
 
-	// ÏìÓ¦Ö÷¶¯¼¼ÄÜ
+	// å“åº”ä¸»åŠ¨æŠ€èƒ½
 	for (const auto& Iter : SkillsMap)
 	{
 		TSharedPtr<FCanbeInteractionInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeInteractionInfo>();
@@ -804,10 +779,10 @@ void UInteractiveSkillComponent::RegisterMultiGAs(
 		return;
 	}
 
-	// ÒÆ³ıÎ´ÅäÖÃµÄ
+	// ç§»é™¤æœªé…ç½®çš„
 	RemoveSkill(InSkillsMap);
 
-	// ×¢²áĞÂÌí¼ÓµÄ
+	// æ³¨å†Œæ–°æ·»åŠ çš„
 	AddSkill(InSkillsMap);
 
 	if (bIsGenerationEvent)

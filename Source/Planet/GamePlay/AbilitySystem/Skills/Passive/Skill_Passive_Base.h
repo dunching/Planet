@@ -25,6 +25,9 @@ public:
 
 protected:
 
-	virtual void PerformAction();
+	virtual void OnRemoveAbility(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	)override;
 
 };
