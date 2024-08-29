@@ -48,6 +48,11 @@ void UAbilityTask_TimerHelper::SetInfinite(float InIntervalTime)
 	IntervalTime = InIntervalTime;
 }
 
+void UAbilityTask_TimerHelper::SetFinished()
+{
+	Duration_TotalTime = Duration;
+}
+
 void UAbilityTask_TimerHelper::Activate()
 {
 	Super::Activate();

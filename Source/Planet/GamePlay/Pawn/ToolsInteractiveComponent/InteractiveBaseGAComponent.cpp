@@ -48,6 +48,7 @@
 #include "CS_RootMotion_KnockDown.h"
 #include "CS_PeriodicStateModify_Stun.h"
 #include "CS_PeriodicStateModify_Charm.h"
+#include "CS_PeriodicStateModify_Ice.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -211,13 +212,14 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 	{
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		if (PeriodicStateTagModifyMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
+		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
 			auto GAPtr = Cast<UCS_PeriodicStateModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
 			if (GAPtr)
 			{
 				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
 				GAPtr->UpdateDuration();
+				return;
 			}
 		}
 
@@ -233,6 +235,15 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
 		{
 			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Charm::StaticClass(), 1);
+
+			ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				MkeSpec(GameplayAbilityTargetDataSPtr)
+			);
+		}
+		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Ice))
+		{
+			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Ice::StaticClass(), 1);
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,

@@ -67,6 +67,8 @@ private:
 
 	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
 
+	bool bIsClear = false;
+
 	bool bOnluReFreshTime = false;
 
 };

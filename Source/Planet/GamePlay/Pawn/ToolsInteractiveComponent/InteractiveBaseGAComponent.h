@@ -192,6 +192,4 @@ protected:
 
 	TMap<FGameplayTag, UCS_Base*>CharacterStateMap;
 
-	TMap<FGameplayTag, FGameplayAbilitySpecHandle>PeriodicStateTagModifyMap;
-	
 };

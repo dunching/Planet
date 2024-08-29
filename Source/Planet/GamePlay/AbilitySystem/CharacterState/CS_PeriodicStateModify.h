@@ -31,7 +31,7 @@ struct PLANET_API FGameplayAbilityTargetData_StateModify : public FGameplayAbili
 		float Duration
 	);
 
-	FGameplayAbilityTargetData_StateModify* Clone()const;
+	virtual FGameplayAbilityTargetData_StateModify* Clone()const override;
 
 	// < 0 则意味着由Task取消
 	float Duration = 3.f;
@@ -84,7 +84,7 @@ protected:
 
 	virtual void InitialStateDisplayInfo()override;
 
-	void PerformAction();
+	virtual void PerformAction();
 
 	void ExcuteTasks();
 

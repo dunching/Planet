@@ -65,7 +65,7 @@ void UCS_PeriodicStateModify::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
+	ExcuteTasks();
 	PerformAction();
 }
 
@@ -82,6 +82,8 @@ void UCS_PeriodicStateModify::EndAbility(
 
 void UCS_PeriodicStateModify::UpdateDuration()
 {
+	PerformAction();
+	
 	if (TaskPtr)
 	{
 		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
@@ -112,7 +114,6 @@ void UCS_PeriodicStateModify::PerformAction()
 {
 	if (CharacterPtr)
 	{
-		ExcuteTasks();
 	}
 }
 
