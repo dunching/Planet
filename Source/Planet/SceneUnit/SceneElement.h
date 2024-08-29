@@ -21,6 +21,7 @@ struct FTableRowUnit_PassiveSkillExtendInfo;
 struct FTableRowUnit_WeaponSkillExtendInfo;
 struct FTableRowUnit_CharacterInfo;
 struct FTableRowUnit_Consumable;
+struct FTableRowUnit_PropertyEntrys;
 class AToolUnitBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;
@@ -276,7 +277,9 @@ public:
 	virtual void InitialUnit()override;
 
 	FTableRowUnit_PassiveSkillExtendInfo* GetTableRowUnit_PassiveSkillExtendInfo()const;
-
+	
+	FTableRowUnit_PropertyEntrys*GetMainPropertyEntry()const;
+	
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
 protected:
@@ -363,6 +366,14 @@ public:
 
 	UPROPERTY(Transient)
 	USkillUnit* FirstSkill = nullptr;
+	
+	// 主词条
+	UPROPERTY(Transient)
+	FGameplayTag Entry_1 = FGameplayTag::EmptyTag;
+	
+	// 副词条
+	UPROPERTY(Transient)
+	FGameplayTag Entry_2 = FGameplayTag::EmptyTag;
 
 protected:
 

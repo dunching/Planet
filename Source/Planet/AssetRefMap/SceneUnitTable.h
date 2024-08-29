@@ -109,15 +109,16 @@ struct PLANET_API FTableRowUnit_PassiveSkillExtendInfo : public FTableRowUnit_Sk
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
 	TMap<EWuXingType, int32>AddtionalElementMap;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "All Abilities")
-	TSubclassOf<USkill_Base>AddtionalSkillClass;
-
 };
 
 USTRUCT(BlueprintType)
 struct PLANET_API FTableRowUnit_WeaponSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
 {
 	GENERATED_USTRUCT_BODY()
+	
+	// 武器的主属性词条
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
+	FGameplayTag PropertyEntry;
 	
 };
 

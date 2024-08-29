@@ -43,7 +43,7 @@ FTableRowUnit* USceneUnitExtendInfoMap::GetTableRowUnit(FGameplayTag UnitType) c
 
 FTableRowUnit_TagExtendInfo* USceneUnitExtendInfoMap::GetTableRowUnit_TagExtendInfo(FGameplayTag UnitType) const
 {
-	auto DataTablePtr = DataTable_Unit_TagExtendInfo.LoadSynchronous();
+	auto DataTablePtr = DataTable_TagExtendInfo.LoadSynchronous();
 
 	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowUnit_TagExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
 

@@ -13,6 +13,7 @@
 #include "AllocationSkills.h"
 #include "SceneUnitContainer.h"
 #include "GroupMnaggerComponent.h"
+#include "PropertyEntrys.h"
 
 UBasicUnit::UBasicUnit()
 {
@@ -200,7 +201,7 @@ void UConsumableUnit::OffsetCooldownTime()
 	}
 }
 
-FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag) 
+FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag)
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_CommonCooldownInfo.LoadSynchronous();
@@ -298,6 +299,23 @@ FTableRowUnit_PassiveSkillExtendInfo* UPassiveSkillUnit::GetTableRowUnit_Passive
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_PassiveSkillExtendInfo.LoadSynchronous();
 
 	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PassiveSkillExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
+}
+
+FTableRowUnit_PropertyEntrys* UPassiveSkillUnit::GetMainPropertyEntry() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
+
+	// 
+	TArray<FTableRowUnit_PropertyEntrys*>ResultAry;
+	DataTable->GetAllRows(TEXT("GetUnit"), ResultAry);
+	if (!ResultAry.IsEmpty())
+	{
+		return ResultAry[FMath::RandRange(0, ResultAry.Num() - 1)];
+	}
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PropertyEntrys>(*UnitType.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
 }
 
