@@ -129,12 +129,15 @@ void USkill_Active_IceGun::OnNotifyBeginReceived(FName NotifyName)
 		else
 		{
 			IceGunPtr->SetActorLocation(Location);
+			IceGunPtr->SetActorRotation(CharacterPtr->GetActorRotation());
 			IceGunPtr->Activate();
 		}
-		IceGunPtr->ProjectileMovementComp->bIsHomingProjectile=true;
+
 		const auto & Target=GetNearnestTarget(CharacterPtr,1000);
 		if (Target)
 		{
+			IceGunPtr->ProjectileMovementComp->bIsHomingProjectile=true;
+			IceGunPtr->ProjectileMovementComp->bRotationFollowsVelocity=true;
 			IceGunPtr->ProjectileMovementComp->HomingAccelerationMagnitude=2000;
 			IceGunPtr->ProjectileMovementComp->HomingTargetComponent=Target;
 		}
@@ -250,7 +253,7 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 				SkillUnitPtr->GetIcon(),
 				5,
 				-1.f,
-				1,
+				-1.f,
 				ModifyPropertyMap
 			);
 
@@ -262,6 +265,23 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 		}
 		else
 		{
+			// 1.清空缓速
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+				SkillUnitPtr->GetUnitType(),
+				true
+			);
+
+			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetDataPtr->TargetCharacterPtr = OtherCharacterPtr;
+
+			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+
+			// 2.加眩晕
+
+			// 3.设置冷却
+			
+			
 			// // 冰冻
 			// auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_StateModify(
 			// 	UGameplayTagsSubSystem::GetInstance()->Stun,
@@ -363,7 +383,7 @@ Super(ObjectInitializer)
 	
 	UParticleSystem* ParticleSystem=LoadObject<UParticleSystem>(nullptr,TEXT("/Script/Engine.ParticleSystem'/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Elemental/ICE/P_LazerIceAttack.P_LazerIceAttack'"));
 	ParticleSystemComp->SetTemplate(ParticleSystem);
-	ParticleSystemComp->SetRelativeRotation(FRotator(0.f,60.0f,0.f));
+	//ParticleSystemComp->SetRelativeRotation(FRotator(0.f,60.0f,0.f));
 
 	CapsuleComponentPtr->InitCapsuleSize(34.0f, 34.0f);
 	CapsuleComponentPtr->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);

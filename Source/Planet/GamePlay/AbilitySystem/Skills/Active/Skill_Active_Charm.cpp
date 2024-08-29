@@ -169,7 +169,7 @@ void USkill_Active_Charm::ExcuteTasks()
 			}
 		}
 
-		// ÉËº¦
+		// ä¼¤å®³
 		for (const auto& Iter : TargetSet)
 		{
 			FGAEventData GAEventData(Iter, CharacterPtr);
@@ -180,7 +180,7 @@ void USkill_Active_Charm::ExcuteTasks()
 		}
 		ICPtr->SendEventImp(GAEventDataPtr);
 
-		// ¿ØÖÆÐ§¹û
+		// æŽ§åˆ¶æ•ˆæžœ
 		for (const auto& Iter : TargetSet)
 		{
 			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Charm(Duration);

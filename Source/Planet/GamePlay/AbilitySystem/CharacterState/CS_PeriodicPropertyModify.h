@@ -10,6 +10,7 @@
 
 #include "CS_PeriodicPropertyModify.generated.h"
 
+class UCS_PeriodicPropertyModify;
 class UAbilityTask_TimerHelper;
 class UTexture2D;
 class UConsumableUnit;
@@ -40,6 +41,10 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 		bool bOnluReFreshTime,
 		float InDuration,
 		float InLosePropertyNumInterval
+	);
+
+	FGameplayAbilityTargetData_PropertyModify(
+		const FGameplayTag& Tag,bool bClear
 	);
 
 	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);

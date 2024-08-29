@@ -70,7 +70,7 @@ protected:
 	void FindTarget();
 
 	void PlayMontage();
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
 	
@@ -139,8 +139,8 @@ public:
 		SetActorHiddenInGame(true);
 		SetActorTickEnabled(false); // 禁用Actor的Tick
 		ProjectileMovementComp->SetActive(false);
-		ParticleSystemComp->SetVisibility(false);
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+		// ParticleSystemComp->SetVisibility(false);
+		// GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 	}
 
 	void Activate()
@@ -151,20 +151,20 @@ public:
 		SetActorTickEnabled(true);
 		ProjectileMovementComp->SetActive(true);
 		//下一帧再把特效组件显示出来，免得有拖尾残留
-		TWeakObjectPtr<ASkill_IceGun_Projectile> WeakThis=this;
+		//TWeakObjectPtr<ASkill_IceGun_Projectile> WeakThis=this;
 
-		// 当设置定时器时，将句柄保存起来
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			FTimerDelegate::CreateLambda([this, WeakThis]()
-			{
-				if (WeakThis.IsValid())
-				{
-					ParticleSystemComp->SetVisibility(true);
-				}
-			}),
-			1.0f,
-			false
-		);
+		// // 当设置定时器时，将句柄保存起来
+		// GetWorld()->GetTimerManager().SetTimer(
+		// 	TimerHandle,
+		// 	FTimerDelegate::CreateLambda([this, WeakThis]()
+		// 	{
+		// 		if (WeakThis.IsValid())
+		// 		{
+		// 			ParticleSystemComp->SetVisibility(true);
+		// 		}
+		// 	}),
+		// 	1.0f,
+		// 	false
+		// );
 	}
 };

@@ -292,6 +292,13 @@ FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyMo
 {
 }
 
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(const FGameplayTag& Tag,
+	bool bClear)
+{
+	bOnluReFreshTime = true;
+	Duration = 0.f;
+}
+
 FGameplayAbilityTargetData_PropertyModify* FGameplayAbilityTargetData_PropertyModify::Clone() const
 {
 	auto ResultPtr =
