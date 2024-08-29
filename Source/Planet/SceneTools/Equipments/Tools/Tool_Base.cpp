@@ -15,7 +15,7 @@ void ATool_Base::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentAc
 {
 }
 
-void ATool_Base::AttachToCharacter(AHumanCharacter* CharacterPtr)
+void ATool_Base::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 	EquipmentAbilitieHandle = CharacterPtr->GetAbilitySystemComponent()->GiveAbility(
 		FGameplayAbilitySpec(

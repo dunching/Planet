@@ -1,5 +1,5 @@
 
-#include "CS_AddTemporaryTag.h"
+#include "CS_PeriodicStateModify_Frozen.h"
 
 #include <Engine/AssetManager.h>
 #include <Engine/StreamableManager.h>
@@ -20,14 +20,25 @@
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_FlyAway.h"
+#include "AbilityTask_ApplyRootMotionBySPline.h"
+#include "SPlineActor.h"
+#include "AbilityTask_Tornado.h"
+#include "Skill_Active_Tornado.h"
 
-UGA_AddTemporaryTag::UGA_AddTemporaryTag() :
-	Super()
+FGameplayAbilityTargetData_StateModify_Frozen::FGameplayAbilityTargetData_StateModify_Frozen()
 {
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
 }
 
-void UGA_AddTemporaryTag::PreActivate(
+FGameplayAbilityTargetData_StateModify_Frozen::FGameplayAbilityTargetData_StateModify_Frozen(
+	float Duration
+) :
+	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun, Duration)
+{
+}
+
+void UCS_PeriodicStateModify_Frozen::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -35,29 +46,10 @@ void UGA_AddTemporaryTag::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
-	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_AddTemporaryTag*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetDataPtr)
-		{
-			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-		}
-	}
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-}
-
-FGameplayAbilityTargetData_AddTemporaryTag::FGameplayAbilityTargetData_AddTemporaryTag(
-	const FGameplayTag& InTag,
-	float InDuration
-	):
-	Duration(InDuration),
-	Tag(InTag)
-{
-
-}
-
-FGameplayAbilityTargetData_AddTemporaryTag::FGameplayAbilityTargetData_AddTemporaryTag()
-{
-
 }

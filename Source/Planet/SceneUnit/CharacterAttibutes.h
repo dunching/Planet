@@ -77,41 +77,6 @@ protected:
 };
 
 USTRUCT(BlueprintType)
-struct FElementPropertySet : public FBasePropertySet
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EWuXingType WuXingType = EWuXingType::kFire;
-
-protected:
-
-};
-
-USTRUCT(BlueprintType)
-struct FElement
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FElementPropertySet GoldElement;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FElementPropertySet WoodElement;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FElementPropertySet WaterElement;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FElementPropertySet FireElement;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FElementPropertySet SoilElement;
-};
-
-USTRUCT(BlueprintType)
 struct PLANET_API FCharacterAttributes final
 {
 	GENERATED_USTRUCT_BODY()
@@ -125,8 +90,6 @@ struct PLANET_API FCharacterAttributes final
 	void InitialData();
 
 	void ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
-
-	const FElement& GetElement()const;
 
 	const FBasePropertySet& GetHPReply()const;
 
@@ -158,10 +121,22 @@ struct PLANET_API FCharacterAttributes final
 	FBasePropertySet TianZi;
 #pragma endregion
 	
-	// 天赋属性
+	// 五行、天赋属性
 #pragma region 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FElement Element;
+	FBasePropertySet GoldElement;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet WoodElement;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet WaterElement;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet FireElement;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet SoilElement;
 
 	TSharedPtr<FTalent_Base> TalentSPtr;
 #pragma endregion

@@ -26,7 +26,7 @@ AWeapon_PickAxe::AWeapon_PickAxe(const FObjectInitializer& ObjectInitializer) :
 	SkeletalComponentPtr->SetupAttachment(SceneCompPtr);
 }
 
-void AWeapon_PickAxe::AttachToCharacter(AHumanCharacter* CharacterPtr)
+void AWeapon_PickAxe::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 

@@ -23,7 +23,7 @@ struct FGameplayAbilityTargetData_CS_Base;
 struct FGameplayAbilityTargetData_RootMotion;
 struct FGameplayAbilityTargetData_PropertyModify;
 struct FGameplayAbilityTargetData_StateModify;
-struct FGameplayAbilityTargetData_AddTemporaryTag;
+struct FGameplayAbilityTargetData_PeriodicPropertyTag;
 struct FGameplayAbilityTargetData_MoveToAttaclArea;
 struct FGameplayAbilityTargetData;
 
@@ -58,11 +58,6 @@ public:
 
 	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
-	FGameplayAbilitySpecHandle AddTemporaryTag(
-		ACharacterBase* TargetCharacterPtr, 
-		FGameplayAbilityTargetData_AddTemporaryTag* GameplayAbilityTargetDataPtr
-	);
-
 	void ClearData2Other(
 		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
 		const FGameplayTag& DataSource
@@ -84,28 +79,35 @@ public:
 	);
 
 	/*
-		Ò»´ÎĞÔµÄÉËº¦½áËã
+		ä¸€æ¬¡æ€§çš„ä¼¤å®³ç»“ç®—
 	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
 	);
 
 	/*
-		ÖÜÆÚÀàµÄ¸úÔË¶¯ĞŞ¸Ä
+		å‘¨æœŸç±»çš„æ ‡ç­¾
+	*/
+	FGameplayAbilitySpecHandle AddPeriodicPropertyTag(
+		FGameplayAbilityTargetData_PeriodicPropertyTag* GameplayAbilityTargetDataPtr
+	);
+
+	/*
+		å‘¨æœŸç±»çš„è·Ÿè¿åŠ¨ä¿®æ”¹
 	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
 	);
 
 	/*
-		ÖÜÆÚÀàµÄ×´Ì¬ĞŞ¸Ä
+		å‘¨æœŸç±»çš„çŠ¶æ€ä¿®æ”¹
 	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
 	);
 
 	/*
-		ÖÜÆÚÀàµÄÊôĞÔĞŞ¸Ä
+		å‘¨æœŸç±»çš„å±æ€§ä¿®æ”¹
 	*/
 	void SendEventImp(
 		FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
@@ -133,30 +135,30 @@ public:
 
 	FCharacterStateChanged CharacterStateChangedContainer;
 
-	// ¶Ô¡°ÆäËû¡±½ÇÉ«Ôì³ÉµÄÓ°Ïì£¨ÉËº¦¡¢¿ØÖÆ£©
+	// å¯¹â€œå…¶ä»–â€è§’è‰²é€ æˆçš„å½±å“ï¼ˆä¼¤å®³ã€æ§åˆ¶ï¼‰
 	FMakedDamageDelegate MakedDamageDelegate;
 
 protected:
 
-	// ×¢Òâ£ºÈç¹ûÊÇRootMotionÀàĞÍµÄ×´Ì¬ĞŞ¸Ä£¬Ôò´ËÀàĞÍµÄ×Ó×´Ì¬Ö»»áÎªÒ»ÖÖ£¬±ÈÈç£ºÈËÎïÏÈ±»»÷·É2s£¬1sÖ®ºóÓÖ±»»÷·É2s£¬ÔòË¢ĞÂ»÷·ÉÊ±¼äÎª2s
-	// ÓĞĞ©×´Ì¬Ö®¼ä»á»¥³â£¬Èç±»»÷·ÉÖ®ºóÔÙ±»»÷Âä£¬Ôò»áÁ¢¼´È¡Ïû»÷·ÉĞ§¹û
-	// ÔÚÕâĞ©×´Ì¬£¬Í¨³£»á¼¤»î¶ÔÓ¦µÄGA£¬²¢Ñ¡Ôñ¶ÔÓ¦µÄmontage
+	// æ³¨æ„ï¼šå¦‚æœæ˜¯RootMotionç±»å‹çš„çŠ¶æ€ä¿®æ”¹ï¼Œåˆ™æ­¤ç±»å‹çš„å­çŠ¶æ€åªä¼šä¸ºä¸€ç§ï¼Œæ¯”å¦‚ï¼šäººç‰©å…ˆè¢«å‡»é£2sï¼Œ1sä¹‹ååˆè¢«å‡»é£2sï¼Œåˆ™åˆ·æ–°å‡»é£æ—¶é—´ä¸º2s
+	// æœ‰äº›çŠ¶æ€ä¹‹é—´ä¼šäº’æ–¥ï¼Œå¦‚è¢«å‡»é£ä¹‹åå†è¢«å‡»è½ï¼Œåˆ™ä¼šç«‹å³å–æ¶ˆå‡»é£æ•ˆæœ
+	// åœ¨è¿™äº›çŠ¶æ€ï¼Œé€šå¸¸ä¼šæ¿€æ´»å¯¹åº”çš„GAï¼Œå¹¶é€‰æ‹©å¯¹åº”çš„montage
 	// 
-	// ´Ë×´Ì¬£¨RootMotion£©Í¨¹ıGA¿ØÖÆÈËÎïµÄ¿É²Ù¿Ø×´Ì¬
+	// æ­¤çŠ¶æ€ï¼ˆRootMotionï¼‰é€šè¿‡GAæ§åˆ¶äººç‰©çš„å¯æ“æ§çŠ¶æ€
 	void ExcuteEffects(
-		TSharedPtr<FGameplayAbilityTargetData_RootMotion> GameplayAbilityTargetDataSPtr
+		const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& GameplayAbilityTargetDataSPtr
 	);
 
 	void ExcuteEffects(
-		TSharedPtr<FGameplayAbilityTargetData_PropertyModify> GameplayAbilityTargetDataSPtr
+		const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataSPtr
 	);
 
-	// ÆÕÍ¨µÄ×´Ì¬ĞŞ¸Ä£¨½ûÖ¹ÒÆ¶¯µÄÑ£ÔÎ¡¢½ûïÀ£¬³ÁÄ¬£¬ĞéÈõ£¬½ûÁÆ£©ÏÂ£¬Í¨¹ı¶¯»­À¶Í¼Ñ¡Ôñ¶ÔÓ¦µÄ¶¯»­£¨ÒòÎªÕâĞ©×´Ì¬¿ÉÒÔ¹²´æ£¬±ÈÈçÈËÎï
-	// ÏÈ±»Ñ£ÔÎ2s£¬´ËÊ±×´Ì¬»úÑ¡Ôñ±»Ñ£ÔÎµÄ¶¯»­£¬È»ºó±»ĞéÈõ1s£¬´ËÊ±¸ù¾İĞèÇóÑ¡ÔñÊÇ·ñ¹ı¶È¶¯»­£¬ĞéÈõ½áÊøÖ®ºó»Øµ½Ñ£ÔÎµÄ×´Ì¬£©
+	// æ™®é€šçš„çŠ¶æ€ä¿®æ”¹ï¼ˆç¦æ­¢ç§»åŠ¨çš„çœ©æ™•ã€ç¦é”¢ï¼Œæ²‰é»˜ï¼Œè™šå¼±ï¼Œç¦ç–—ï¼‰ä¸‹ï¼Œé€šè¿‡åŠ¨ç”»è“å›¾é€‰æ‹©å¯¹åº”çš„åŠ¨ç”»ï¼ˆå› ä¸ºè¿™äº›çŠ¶æ€å¯ä»¥å…±å­˜ï¼Œæ¯”å¦‚äººç‰©
+	// å…ˆè¢«çœ©æ™•2sï¼Œæ­¤æ—¶çŠ¶æ€æœºé€‰æ‹©è¢«çœ©æ™•çš„åŠ¨ç”»ï¼Œç„¶åè¢«è™šå¼±1sï¼Œæ­¤æ—¶æ ¹æ®éœ€æ±‚é€‰æ‹©æ˜¯å¦è¿‡åº¦åŠ¨ç”»ï¼Œè™šå¼±ç»“æŸä¹‹åå›åˆ°çœ©æ™•çš„çŠ¶æ€ï¼‰
 	// 
-	// ´Ë×´Ì¬Í¨¹ıTag¿ØÖÆÈËÎïµÄ¿É²Ù¿Ø×´Ì¬
+	// æ­¤çŠ¶æ€é€šè¿‡Tagæ§åˆ¶äººç‰©çš„å¯æ“æ§çŠ¶æ€
 	void ExcuteEffects(
-		TSharedPtr<FGameplayAbilityTargetData_StateModify> GameplayAbilityTargetDataSPtr
+		const TSharedPtr<FGameplayAbilityTargetData_StateModify>& GameplayAbilityTargetDataSPtr
 	);
 
 	FGameplayEventData* MkeSpec(
@@ -186,6 +188,7 @@ protected:
 	TSubclassOf<UCS_RootMotion_KnockDown> CS_RootMotion_KnockDownClass;
 #pragma endregion GAs
 
+	// ä»å°åˆ°å¤§
 	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare>SendEventModifysMap;
 
 	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare>ReceivedEventModifysMap;

@@ -175,7 +175,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.GoldElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->GoldElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
@@ -183,7 +183,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.WoodElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->WoodElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
@@ -191,7 +191,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.WaterElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->WaterElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
@@ -199,7 +199,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.FireElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->FireElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Soil));
@@ -207,7 +207,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Element.SoilElement);
+			UIPtr->SetDataSource(CharacterAttributesSPtr->SoilElement);
 		}
 	}
 	InitialTalentUI();

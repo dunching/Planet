@@ -20,7 +20,7 @@ class PLANET_API ATool_Base : public AToolUnitBase
 
 public:
 
-	virtual void AttachToCharacter(AHumanCharacter* CharacterPtr)override;
+	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
 	virtual void DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentActionType ActionType);
 

@@ -7,7 +7,7 @@
 
 #include "CS_PeriodicStateModify.h"
 
-#include "CS_PeriodicStateModify_Stun.generated.h"
+#include "CS_PeriodicStateModify_Frozen.generated.h"
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
@@ -19,13 +19,13 @@ class ATornado;
 struct FStreamableHandle;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_StateModify_Stun : public FGameplayAbilityTargetData_StateModify
+struct PLANET_API FGameplayAbilityTargetData_StateModify_Frozen : public FGameplayAbilityTargetData_StateModify
 {
 	GENERATED_USTRUCT_BODY()
 
-	FGameplayAbilityTargetData_StateModify_Stun();
+	FGameplayAbilityTargetData_StateModify_Frozen();
 
-	FGameplayAbilityTargetData_StateModify_Stun(
+	FGameplayAbilityTargetData_StateModify_Frozen(
 		float Duration
 	);
 
@@ -34,7 +34,7 @@ private:
 };
 
 UCLASS()
-class PLANET_API UCS_PeriodicStateModify_Stun : public UCS_PeriodicStateModify
+class PLANET_API UCS_PeriodicStateModify_Frozen : public UCS_PeriodicStateModify
 {
 	GENERATED_BODY()
 

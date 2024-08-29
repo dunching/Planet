@@ -122,76 +122,82 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 	if (InWeaponSocket != CurrentActivedWeaponSocket)
 	{
 		auto OnwerActorPtr = GetOwner<ACharacterBase>();
-		TSharedPtr<FWeaponSocketInfo > WeaponUnit;
 
 		// 清除上一次的
-		{
-			switch (CurrentActivedWeaponSocket)
+		auto Swith = [this, OnwerActorPtr]
 			{
-			case EWeaponSocket::kMain:
-			{
-				if (FirstWeaponUnit->WeaponUnitPtr)
+				TSharedPtr<FWeaponSocketInfo > WeaponUnit;
+				switch (CurrentActivedWeaponSocket)
 				{
-					WeaponUnit = FirstWeaponUnit;
-				}
-				else
+				case EWeaponSocket::kMain:
 				{
-					return false;
+					if (FirstWeaponUnit->WeaponUnitPtr)
+					{
+						WeaponUnit = FirstWeaponUnit;
+					}
+					else
+					{
+						return;
+					}
 				}
-			}
-			break;
-			case EWeaponSocket::kSecondary:
-			{
-				if (FirstWeaponUnit->WeaponUnitPtr)
+				break;
+				case EWeaponSocket::kSecondary:
 				{
-					WeaponUnit = SecondaryWeaponUnit;
+					if (FirstWeaponUnit->WeaponUnitPtr)
+					{
+						WeaponUnit = SecondaryWeaponUnit;
+					}
+					else
+					{
+						return;
+					}
 				}
-				else
-				{
-					return false;
+				break;
 				}
-			}
-			break;
-			}
 
-			if (WeaponUnit)
-			{
-				OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilityHandle(WeaponUnit->Handle);
-				OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(WeaponUnit->Handle);
-			}
-			if (ActivedWeaponPtr)
-			{
-				ActivedWeaponPtr->Destroy();
-			}
-		}
-		CurrentActivedWeaponSocket = InWeaponSocket;
-		{
-			switch (CurrentActivedWeaponSocket)
-			{
-			case EWeaponSocket::kMain:
-			{
-				WeaponUnit = FirstWeaponUnit;
-			}
-			break;
-			case EWeaponSocket::kSecondary:
-			{
-				WeaponUnit = SecondaryWeaponUnit;
-			}
-			break;
-			case EWeaponSocket::kNone:
-			{
+				if (WeaponUnit)
+				{
+					OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilityHandle(WeaponUnit->Handle);
+					OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(WeaponUnit->Handle);
+				}
 				if (ActivedWeaponPtr)
 				{
 					ActivedWeaponPtr->Destroy();
-					ActivedWeaponPtr = nullptr;
 				}
-				WeaponUnit.Reset();
-			}
-			break;
-			}
+			};
 
+		TSharedPtr<FWeaponSocketInfo > WeaponUnit;
+		switch (InWeaponSocket)
+		{
+		case EWeaponSocket::kMain:
+		{
+			WeaponUnit = FirstWeaponUnit;
+		}
+		break;
+		case EWeaponSocket::kSecondary:
+		{
+			WeaponUnit = SecondaryWeaponUnit;
+		}
+		break;
+		case EWeaponSocket::kNone:
+		{
+			WeaponUnit.Reset();
+		}
+		break;
+		}
+
+		switch (InWeaponSocket)
+		{
+		case EWeaponSocket::kMain:
+		case EWeaponSocket::kSecondary:
+		{
 			if (WeaponUnit && WeaponUnit->WeaponUnitPtr)
 			{
+				// 可以切换时，清楚上一次的
+				Swith();
+
+				CurrentActivedWeaponSocket = InWeaponSocket;
+
 				FGameplayAbilitySpec GameplayAbilitySpec(
 					WeaponUnit->WeaponUnitPtr->FirstSkill->GetSkillClass(),
 					WeaponUnit->WeaponUnitPtr->FirstSkill->Level
@@ -211,19 +217,42 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 
 				FActorSpawnParameters ActorSpawnParameters;
 				ActorSpawnParameters.Owner = OnwerActorPtr;
+				ActorSpawnParameters.CustomPreSpawnInitalization = [WeaponUnit](AActor* ActorPtr)
+					{
+						Cast<AWeapon_Base>(ActorPtr)->WeaponUnitPtr = WeaponUnit->WeaponUnitPtr;
+					};
 
 				ActivedWeaponPtr = GetWorld()->SpawnActor<AWeapon_Base>(
 					WeaponUnit->WeaponUnitPtr->GetTableRowUnit_WeaponExtendInfo()->ToolActorClass, ActorSpawnParameters
 				);
 
 				OnwerActorPtr->SwitchAnimLink(WeaponUnit->WeaponUnitPtr->GetTableRowUnit_WeaponExtendInfo()->AnimLinkClassType);
+
+				OnActivedWeaponChangedContainer.ExcuteCallback(InWeaponSocket);
+
+				return true;
 			}
-			else
+		}
+		break;
+		case EWeaponSocket::kNone:
+		{
+			CurrentActivedWeaponSocket = InWeaponSocket;
+
+			OnwerActorPtr->SwitchAnimLink(EAnimLinkClassType::kUnarmed);
+
+			if (ActivedWeaponPtr)
 			{
-				OnwerActorPtr->SwitchAnimLink(EAnimLinkClassType::kUnarmed);
+				ActivedWeaponPtr->Destroy();
+				ActivedWeaponPtr = nullptr;
 			}
+
+			WeaponUnit.Reset();
+
 			OnActivedWeaponChangedContainer.ExcuteCallback(InWeaponSocket);
+
 			return true;
+		}
+		break;
 		}
 	}
 
@@ -232,11 +261,11 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 
 void UInteractiveSkillComponent::ActiveWeapon()
 {
-	if (FirstWeaponUnit)
+	if (FirstWeaponUnit && FirstWeaponUnit->WeaponUnitPtr)
 	{
 		ActiveWeapon(EWeaponSocket::kMain);
 	}
-	else if (SecondaryWeaponUnit)
+	else if (SecondaryWeaponUnit && SecondaryWeaponUnit->WeaponUnitPtr)
 	{
 		ActiveWeapon(EWeaponSocket::kSecondary);
 	}

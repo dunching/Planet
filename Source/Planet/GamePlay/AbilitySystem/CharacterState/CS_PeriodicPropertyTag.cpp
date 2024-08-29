@@ -1,5 +1,5 @@
 
-#include "CS_PeriodicStateModify_Stun.h"
+#include "CS_PeriodicPropertyTag.h"
 
 #include <Engine/AssetManager.h>
 #include <Engine/StreamableManager.h>
@@ -20,25 +20,14 @@
 #include "InteractiveBaseGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
-#include "AbilityTask_FlyAway.h"
-#include "AbilityTask_ApplyRootMotionBySPline.h"
-#include "SPlineActor.h"
-#include "AbilityTask_Tornado.h"
-#include "Skill_Active_Tornado.h"
 
-FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun(
-	float Duration
-):
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun, Duration)
+UCS_PeriodicPropertyTag::UCS_PeriodicPropertyTag() :
+	Super()
 {
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
 }
 
-FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun()
-{
-
-}
-
-void UCS_PeriodicStateModify_Stun::PreActivate(
+void UCS_PeriodicPropertyTag::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -46,10 +35,14 @@ void UCS_PeriodicStateModify_Stun::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_PeriodicPropertyTag*>(TriggerEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetDataPtr)
+		{
+			ActivationOwnedTags.AppendTags(ActivationOwnedTags);
+		}
+	}
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }

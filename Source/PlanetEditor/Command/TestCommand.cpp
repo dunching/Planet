@@ -414,23 +414,23 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	auto CharacterAttributesSPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 	if (Args[1] == TEXT("1"))
 	{
-		CharacterAttributesSPtr->Element.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributesSPtr->GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("2"))
 	{
-		CharacterAttributesSPtr->Element.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributesSPtr->WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("3"))
 	{
-		CharacterAttributesSPtr->Element.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributesSPtr->WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("4"))
 	{
-		CharacterAttributesSPtr->Element.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributesSPtr->FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("5"))
 	{
-		CharacterAttributesSPtr->Element.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributesSPtr->SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("6"))
 	{

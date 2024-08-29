@@ -49,6 +49,7 @@
 #include "CS_PeriodicStateModify_Stun.h"
 #include "CS_PeriodicStateModify_Charm.h"
 #include "CS_PeriodicStateModify_Ice.h"
+#include "CS_PeriodicPropertyTag.h"
 
 FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -112,14 +113,21 @@ void UInteractiveBaseGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGA
 	}
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddTemporaryTag(
-	ACharacterBase* TargetCharacterPtr,
-	FGameplayAbilityTargetData_AddTemporaryTag* GameplayAbilityTargetDataPtr
+FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddPeriodicPropertyTag(
+	FGameplayAbilityTargetData_PeriodicPropertyTag* GameplayAbilityTargetDataSPtr
 )
 {
-	FGameplayAbilitySpecHandle GAToolPeriodicHandle;
+	FGameplayAbilitySpec Spec(UCS_PeriodicPropertyTag::StaticClass(), 1);
 
-	return GAToolPeriodicHandle;
+	FGameplayEventData* Payload = new FGameplayEventData;
+	Payload->TargetData.Add(GameplayAbilityTargetDataSPtr);
+
+	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	return ASCPtr->GiveAbilityAndActivateOnce(
+		Spec,
+		Payload
+	);
 }
 
 void UInteractiveBaseGAComponent::ClearData2Other(
@@ -165,7 +173,7 @@ void UInteractiveBaseGAComponent::ClearData2Self(
 }
 
 void UInteractiveBaseGAComponent::ExcuteEffects(
-	TSharedPtr<FGameplayAbilityTargetData_PropertyModify> GameplayAbilityTargetDataSPtr
+	const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataSPtr
 )
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
@@ -204,7 +212,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 }
 
 void UInteractiveBaseGAComponent::ExcuteEffects(
-	TSharedPtr<FGameplayAbilityTargetData_StateModify> GameplayAbilityTargetDataSPtr
+	const TSharedPtr<FGameplayAbilityTargetData_StateModify>& GameplayAbilityTargetDataSPtr
 )
 {
 	auto OnwerActorPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr.Get();
@@ -254,7 +262,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 }
 
 void UInteractiveBaseGAComponent::ExcuteEffects(
-	TSharedPtr<FGameplayAbilityTargetData_RootMotion> GameplayAbilityTargetDataSPtr
+	const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& GameplayAbilityTargetDataSPtr
 )
 {
 	auto OnwerActorPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr.Get();
@@ -739,11 +747,11 @@ void UInteractiveBaseGAComponent::AddSendWuXingModify()
 						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 					std::map<int32, EWuXingType, std::greater<int>> ElementMap;
-					ElementMap.emplace(CharacterAttributesSPtr->Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
-					ElementMap.emplace(CharacterAttributesSPtr->Element.WoodElement.GetCurrentValue(), EWuXingType::kWood);
-					ElementMap.emplace(CharacterAttributesSPtr->Element.WaterElement.GetCurrentValue(), EWuXingType::kWater);
-					ElementMap.emplace(CharacterAttributesSPtr->Element.FireElement.GetCurrentValue(), EWuXingType::kFire);
-					ElementMap.emplace(CharacterAttributesSPtr->Element.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+					ElementMap.emplace(CharacterAttributesSPtr->GoldElement.GetCurrentValue(), EWuXingType::kGold);
+					ElementMap.emplace(CharacterAttributesSPtr->WoodElement.GetCurrentValue(), EWuXingType::kWood);
+					ElementMap.emplace(CharacterAttributesSPtr->WaterElement.GetCurrentValue(), EWuXingType::kWater);
+					ElementMap.emplace(CharacterAttributesSPtr->FireElement.GetCurrentValue(), EWuXingType::kFire);
+					ElementMap.emplace(CharacterAttributesSPtr->SoilElement.GetCurrentValue(), EWuXingType::kSoil);
 
 					if (ElementMap.begin()->first > 0)
 					{
@@ -787,11 +795,11 @@ void UInteractiveBaseGAComponent::AddReceivedWuXingModify()
 					DataRef.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
-				ElementMap.emplace(CharacterAttributesSPtr->Element.GoldElement.GetCurrentValue(), EWuXingType::kGold);
-				ElementMap.emplace(CharacterAttributesSPtr->Element.WoodElement.GetCurrentValue(), EWuXingType::kWood);
-				ElementMap.emplace(CharacterAttributesSPtr->Element.WaterElement.GetCurrentValue(), EWuXingType::kWater);
-				ElementMap.emplace(CharacterAttributesSPtr->Element.FireElement.GetCurrentValue(), EWuXingType::kFire);
-				ElementMap.emplace(CharacterAttributesSPtr->Element.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+				ElementMap.emplace(CharacterAttributesSPtr->GoldElement.GetCurrentValue(), EWuXingType::kGold);
+				ElementMap.emplace(CharacterAttributesSPtr->WoodElement.GetCurrentValue(), EWuXingType::kWood);
+				ElementMap.emplace(CharacterAttributesSPtr->WaterElement.GetCurrentValue(), EWuXingType::kWater);
+				ElementMap.emplace(CharacterAttributesSPtr->FireElement.GetCurrentValue(), EWuXingType::kFire);
+				ElementMap.emplace(CharacterAttributesSPtr->SoilElement.GetCurrentValue(), EWuXingType::kSoil);
 
 				const auto Effective_Rate = Caculation_Effective_Rate(ElementMap.begin()->first, 0);
 
@@ -809,31 +817,31 @@ void UInteractiveBaseGAComponent::AddReceivedWuXingModify()
 					{
 					case EWuXingType::kGold:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->Element.FireElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->FireElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kWood:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->Element.GoldElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->GoldElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kWater:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->Element.SoilElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->SoilElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kFire:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->Element.WaterElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->WaterElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kSoil:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->Element.WoodElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->WoodElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;

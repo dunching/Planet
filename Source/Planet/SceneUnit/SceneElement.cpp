@@ -174,7 +174,7 @@ void UConsumableUnit::FreshUniqueCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
@@ -194,7 +194,7 @@ void UConsumableUnit::OffsetCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
@@ -225,6 +225,14 @@ UWeaponUnit::UWeaponUnit()
 
 }
 
+void UWeaponUnit::InitialUnit()
+{
+	Super::InitialUnit();
+	{
+		MaxAttackDistance = GetTableRowUnit_WeaponExtendInfo()->MaxAttackDistance;
+	}
+}
+
 FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
@@ -232,6 +240,22 @@ FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() 
 
 	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_WeaponExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
+}
+
+FTableRowUnit_PropertyEntrys* UWeaponUnit::GetMainPropertyEntry() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PropertyEntrys>(
+		*GetTableRowUnit_WeaponExtendInfo()->PropertyEntry.ToString(), TEXT("GetUnit")
+	);
+	return SceneUnitExtendInfoPtr;
+}
+
+int32 UWeaponUnit::GetMaxAttackDistance() const
+{
+	return MaxAttackDistance;
 }
 
 USkillUnit::USkillUnit() :
@@ -438,7 +462,7 @@ void UActiveSkillUnit::FreshUniqueCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
@@ -462,7 +486,7 @@ void UActiveSkillUnit::OffsetCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();

@@ -110,7 +110,9 @@ struct FSceneUnitContainer final
 
 private:
 
-	// ×Ô¶¨ÒåµÄ¡°ÅÅÁĞ·½Ê½¡±
+	int32 GetValidID()const;
+
+	// è‡ªå®šä¹‰çš„â€œæ’åˆ—æ–¹å¼â€
 	UPROPERTY(Transient)
 	TArray<UBasicUnit*> SceneToolsAry;
 	

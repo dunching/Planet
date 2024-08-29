@@ -360,21 +360,21 @@ public:
 
 	UWeaponUnit();
 
+	virtual void InitialUnit()override;
+
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
 
-	int32 DamageDegree = 0;
+	// 主词条
+	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
+
+	int32 GetMaxAttackDistance()const;
 
 	UPROPERTY(Transient)
 	USkillUnit* FirstSkill = nullptr;
 	
-	// 主词条
-	UPROPERTY(Transient)
-	FGameplayTag Entry_1 = FGameplayTag::EmptyTag;
-	
-	// 副词条
-	UPROPERTY(Transient)
-	FGameplayTag Entry_2 = FGameplayTag::EmptyTag;
-
 protected:
-
+	
+	UPROPERTY(Transient)
+	int32 MaxAttackDistance = 100;
+	
 };

@@ -7,6 +7,7 @@
 #include "CharacterAttibutes.h"
 #include "GenerateType.h"
 #include "CharacterAttributesComponent.h"
+#include "PropertyEntrys.h"
 
 void USkill_Passive_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -17,6 +18,8 @@ void USkill_Passive_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	if (CharacterPtr)
 	{
 		auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>(SkillUnitPtr);
+
+		// 元素
 		auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
 		if (PassiveSkillExtendInfoPtr)
 		{
@@ -24,22 +27,27 @@ void USkill_Passive_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 
 			for (const auto& ElementIter : PassiveSkillExtendInfoPtr->AddtionalElementMap)
 			{
-				switch (ElementIter.Key)
-				{
-				case EWuXingType::kGold:
-				{
-					ModifyPropertyMap.Add(
-						ECharacterPropertyType::GoldElement,
-						CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->Element.GoldElement.GetCurrentValue()
-					);
-				}
-				break;
-				}
+				ModifyPropertyMap.Add(ElementIter.Key, ElementIter.Value);
 			}
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
 				ModifyPropertyMap, PassiveSkillUnitPtr->GetUnitType()
 			);
+		}
+
+		// 词条
+		{
+			auto MainPropertyEntryPtr = PassiveSkillUnitPtr->GetMainPropertyEntry();
+			if (MainPropertyEntryPtr)
+			{
+				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+				ModifyPropertyMap.Add(MainPropertyEntryPtr->CharacterPropertyType, MainPropertyEntryPtr->Value);
+
+				CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
+					ModifyPropertyMap, PassiveSkillUnitPtr->GetUnitType()
+				);
+			}
 		}
 	}
 }
