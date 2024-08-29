@@ -715,31 +715,6 @@ void UInteractiveSkillComponent::AddSkill(const TMap<FGameplayTag, TSharedPtr<FS
 					{
 						SkillsMap.Add(Iter.Value->SkillSocket, Iter.Value);
 						MakeGameplayAbilitySpec(Iter.Value->SkillUnitPtr);
-
-						auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
-						if (PassiveSkillExtendInfoPtr->AddtionalElementMap.IsEmpty())
-						{
-							TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-							for (const auto& ElementIter : PassiveSkillExtendInfoPtr->AddtionalElementMap)
-							{
-								switch (ElementIter.Key)
-								{
-								case EWuXingType::kGold:
-								{
-									ModifyPropertyMap.Add(
-										ECharacterPropertyType::GoldElement, 
-										OnwerActorPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->Element.GoldElement.GetCurrentValue()
-									);
-								}
-								break;
-								}
-							}
-
-							OnwerActorPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
-								ModifyPropertyMap, PassiveSkillUnitPtr->GetUnitType()
-							);
-						}
 					}
 				}
 				else if (

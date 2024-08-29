@@ -32,7 +32,7 @@
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_PeriodicStateModify_Charm.h"
 
-static TAutoConsoleVariable<int32> Skill_Active_FlyAway_DrawDebug(
+static TAutoConsoleVariable<int32> Skill_Active_Charm_Debug(
 	TEXT("Skill_Active_FlyAway.DrawDebug"),
 	0,
 	TEXT("")
@@ -121,7 +121,7 @@ void USkill_Active_Charm::ExcuteTasks()
 		Params.AddIgnoredActor(CharacterPtr);
 
 #ifdef WITH_EDITOR
-		if (Skill_Active_FlyAway_DrawDebug.GetValueOnGameThread())
+		if (Skill_Active_Charm_Debug.GetValueOnGameThread())
 		{
 			DrawDebugLine(
 				GetWorld(),
