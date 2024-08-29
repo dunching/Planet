@@ -6,6 +6,13 @@
 #include "Planet.h"
 #include "UICommon.h"
 #include "GameplayTagsSubSystem.h"
+#include "LogWriter.h"
+
+static TAutoConsoleVariable<int32> DebugPrintCAB(
+	TEXT("DebugPrintCAB"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
 
 void FBasePropertySet::AddCurrentValue(int32 NewValue, const FGameplayTag& DataSource)
 {
@@ -255,6 +262,16 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 			}
 		}
 	}
+#ifdef WITH_EDITOR
+	if (DebugPrintCAB.GetValueOnGameThread())
+	{
+		PRINTINVOKEWITHSTR(
+			FString::Printf(TEXT("MoveSpeed %d GAPerformSpeed %d"),
+			MoveSpeed.GetCurrentValue(),
+			GAPerformSpeed.GetCurrentValue()
+			));
+	}
+#endif
 
 	ProcessedGAEvent(GAEvent);
 }
