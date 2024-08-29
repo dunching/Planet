@@ -113,7 +113,7 @@ void USkill_Active_GroupTherapy::EmitEffect()
 		}
 	}
 
-	// Test:°´ĞÎ×´²éÕÒ£¬·ñÔòÖ±½Ó»ñÈ¡¡°¶ÓÔ±¡±¼ÆËã¾àÀë¼´¿É
+	// Test:æŒ‰å½¢çŠ¶æŸ¥æ‰¾ï¼Œå¦åˆ™ç›´æ¥è·å–â€œé˜Ÿå‘˜â€è®¡ç®—è·ç¦»å³å¯
 	TArray<struct FOverlapResult> OutOverlaps;
 	if (GetWorldImp()->OverlapMultiByObjectType(
 		OutOverlaps,

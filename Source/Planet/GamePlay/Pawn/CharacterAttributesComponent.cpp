@@ -52,7 +52,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		auto CharacterAttributesSPtr = GetCharacterAttributes();
 
-		// »ù´¡»Ø¸´
+		// åŸºç¡€å›žå¤
 		{
 			GAEventData.HP = CharacterAttributesSPtr->HPReplay.GetCurrentValue();
 

@@ -40,7 +40,7 @@ void UInteractiveToolComponent::GenerationCanbeActiveEvent()
 {
 	CanbeInteractionAry.Empty();
 
-	// ¼¤»î¶ÔÓ¦µÄ¹¤¾ß
+	// æ¿€æ´»å¯¹åº”çš„å·¥å…·
 	for (const auto& Iter : ToolsMap)
 	{
 		if (Iter.Value->UnitPtr)
@@ -55,7 +55,7 @@ void UInteractiveToolComponent::GenerationCanbeActiveEvent()
 		}
 	}
 
-	// ¡°Ê¹ÓÃ¡±Ò»´ÎÕâ¸ö¹¤¾ß
+	// â€œä½¿ç”¨â€ä¸€æ¬¡è¿™ä¸ªå·¥å…·
 	{
 		TSharedPtr<FCanbeInteractionInfo > CanbeActivedInfoSPtr = MakeShared<FCanbeInteractionInfo>();
 		CanbeActivedInfoSPtr->Type = FCanbeInteractionInfo::EType::kActiveTool;

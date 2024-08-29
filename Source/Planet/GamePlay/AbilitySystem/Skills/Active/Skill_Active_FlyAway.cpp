@@ -167,7 +167,7 @@ void USkill_Active_FlyAway::ExcuteTasks()
 			}
 		}
 
-		// ÉËº¦
+		// ä¼¤å®³
 		for (const auto& Iter : TargetSet)
 		{
 			FGAEventData GAEventData(Iter, CharacterPtr);
@@ -178,7 +178,7 @@ void USkill_Active_FlyAway::ExcuteTasks()
 		}
 		ICPtr->SendEventImp(GAEventDataPtr);
 
-		// ¿ØÖÆÐ§¹û
+		// æŽ§åˆ¶æ•ˆæžœ
 		for (const auto& Iter : TargetSet)
 		{
 			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_FlyAway;

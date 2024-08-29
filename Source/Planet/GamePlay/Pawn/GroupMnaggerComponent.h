@@ -70,7 +70,7 @@ public:
 
 	TSet<FCharacterUnitType*> MembersSet;
 
-	// ¹«¹²µÄÀäÈ´£¬Èç£ºÍÅ¶ÓÀïÃæµÄ¸´»î¼¼ÄÜ
+	// å…¬å…±çš„å†·å´ï¼Œå¦‚ï¼šå›¢é˜Ÿé‡Œé¢çš„å¤æ´»æŠ€èƒ½
 	TMap<FGameplayTag, TSharedPtr<FSkillCooldownHelper>>CommonCooldownMap;
 
 };
@@ -146,10 +146,10 @@ public:
 
 	const TSharedPtr<FTeamMatesHelper>& GetTeamHelper();
 
-	// ÖØÖÃ¼¼ÄÜCD£¨°üº¬¹«¹²CD£©ÖÁÂúCD
+	// é‡ç½®æŠ€èƒ½CDï¼ˆåŒ…å«å…¬å…±CDï¼‰è‡³æ»¡CD
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(UActiveSkillUnit* ActiveSkillUnitPtr);
 
-	// ÖØÖÃ¼¼ÄÜCD ÖÁÂúCD
+	// é‡ç½®æŠ€èƒ½CD è‡³æ»¡CD
 	TWeakPtr<FSkillCooldownHelper> ApplyUniqueCooldown(UActiveSkillUnit* ActiveSkillUnitPtr);
 
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const UActiveSkillUnit* ActiveSkillUnitPtr);
@@ -178,7 +178,7 @@ private:
 
 	TSharedPtr<FTeamMatesHelper> TeamHelperSPtr;
 
-	// ½ÇÉ«µÄ¼¼ÄÜÀäÈ´
+	// è§’è‰²çš„æŠ€èƒ½å†·å´
 	TMap<FGameplayTag, TSharedPtr<FSkillCooldownHelper>>UniqueCooldownMap;
 
 };

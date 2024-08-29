@@ -28,7 +28,7 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 
-	// ÉèÖÃÕâ¸öÖ®ºóBP²»ÄÜ±£´æ£¿
+	// è®¾ç½®è¿™ä¸ªä¹‹åŽBPä¸èƒ½ä¿å­˜ï¼Ÿ
 	InitialSenseConfig();
 }
 
@@ -210,7 +210,7 @@ void AHumanAIController::InitialCharacter()
 			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
 			if (TableRowUnit_CharacterInfoPtr)
 			{
-				// ÎäÆ÷
+				// æ­¦å™¨
 				{
 					TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 					{
@@ -237,7 +237,7 @@ void AHumanAIController::InitialCharacter()
 					EICPtr->ActiveWeapon(EWeaponSocket::kMain);
 				}
 
-				// ¼¼ÄÜ
+				// æŠ€èƒ½
 				{
 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
 					{

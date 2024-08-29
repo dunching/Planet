@@ -164,10 +164,10 @@ void UCS_PeriodicPropertyModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr,
 	{
 		if (GameplayAbilityTargetDataAry.IsValidIndex(0))
 		{
-			// ÊýÖµÐÞ¸Ä ²»»á±»ÒÆ³ý
+			// æ•°å€¼ä¿®æ”¹ ä¸ä¼šè¢«ç§»é™¤
 
 
-			// Ö±½ÓÐÞ¸ÄµÄÊôÐÔ£¬»áÒÆ³ý
+			// ç›´æŽ¥ä¿®æ”¹çš„å±žæ€§ï¼Œä¼šç§»é™¤
 			{
 				auto GameplayAbilityTargetDataSPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
 
@@ -203,7 +203,7 @@ bool UCS_PeriodicPropertyModify::OnTaskFinished_Continue(UAbilityTask_TimerHelpe
 		GameplayAbilityTargetDataAry.RemoveAt(GameplayAbilityTargetDataAry.Num() - 1);
 
 
-		// ÒÆ³ýÖÜÆÚÄÚµÄÊôÐÔ(°´²ãÊý)
+		// ç§»é™¤å‘¨æœŸå†…çš„å±žæ€§(æŒ‰å±‚æ•°)
 		{
 			for (auto& Iter : GameplayAbilityTargetDataSPtr->ModifyPropertyMap)
 			{
