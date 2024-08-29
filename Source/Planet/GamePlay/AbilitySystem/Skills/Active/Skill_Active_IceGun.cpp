@@ -1,7 +1,14 @@
 #include "Skill_Active_IceGun.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-
+#include "Components/ArrowComponent.h"
+#include "Components/SphereComponent.h"
+#include "Engine/OverlapResult.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "UObject/Class.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -17,14 +24,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "InteractiveBaseGAComponent.h"
 #include "ToolBuilderUtil.h"
-#include "Components/ArrowComponent.h"
-#include "Components/SphereComponent.h"
-#include "Engine/OverlapResult.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
-#include "Particles/ParticleSystemComponent.h"
+#include "CS_PeriodicStateModify_Ice.h"
 
 
 namespace Skill_IceGun_Notify
@@ -121,7 +121,7 @@ void USkill_Active_IceGun::OnNotifyBeginReceived(FName NotifyName)
 		if (!IceGunPtr)
 		{
 			IceGunPtr = GetWorld()->SpawnActor<ASkill_IceGun_Projectile>(
-			ASkill_IceGun_Projectile::StaticClass(),
+			IceGunPtrClass,
 			Location,
 			CharacterPtr->GetActorRotation());
 			IceGunPtr->CapsuleComponentPtr->OnComponentHit.AddDynamic(this, &ThisClass::OnHitCallback);
@@ -129,12 +129,15 @@ void USkill_Active_IceGun::OnNotifyBeginReceived(FName NotifyName)
 		else
 		{
 			IceGunPtr->SetActorLocation(Location);
+			IceGunPtr->SetActorRotation(CharacterPtr->GetActorRotation());
 			IceGunPtr->Activate();
 		}
-		IceGunPtr->ProjectileMovementComp->bIsHomingProjectile=true;
+
 		const auto & Target=GetNearnestTarget(CharacterPtr,1000);
 		if (Target)
 		{
+			IceGunPtr->ProjectileMovementComp->bIsHomingProjectile=true;
+			IceGunPtr->ProjectileMovementComp->bRotationFollowsVelocity=true;
 			IceGunPtr->ProjectileMovementComp->HomingAccelerationMagnitude=2000;
 			IceGunPtr->ProjectileMovementComp->HomingTargetComponent=Target;
 		}
@@ -230,79 +233,32 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 		{
 			return;
 		}
+
+		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_StateModify_Ice();
+		GameplayAbilityTargetDataPtr->TargetCharacterPtr=OtherCharacterPtr;
+		GameplayAbilityTargetDataPtr->TriggerCharacterPtr=CharacterPtr;
+		ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+		
 		// debuff
-		auto CSPtr = OtherCharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterState(SkillUnitPtr->GetUnitType());
+		auto CSPtr = OtherCharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterState(GameplayAbilityTargetDataPtr->Tag);
 		if ((CSPtr && CSPtr->GetStateDisplayInfo().Pin()->Num < 3) || !CSPtr)
 		{
-			static USoundBase* HitSound=LoadObject<USoundBase>(this,TEXT("/Script/Engine.SoundWave'/Game/UltraDynamicSky/Sound/Rain/RainHit_1.RainHit_1'"));
-			static UParticleSystem* HitParticle=LoadObject<UParticleSystem>(this,
-				TEXT("/Script/Engine.ParticleSystem'/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Elemental/ICE/P_CIN_Eye_Flare_01.P_CIN_Eye_Flare_01'"));
-			if (HitSound)
-				UGameplayStatics::PlaySoundAtLocation(OtherActor,HitSound,OtherActor->GetActorLocation());	
-			if (HitParticle)
-				UGameplayStatics::SpawnEmitterAtLocation(OtherActor,HitParticle,OtherActor->GetActorLocation());
-
-			TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-			ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, -100);
-			ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, -100);
-			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-				SkillUnitPtr->GetUnitType(),
-				SkillUnitPtr->GetIcon(),
-				5,
-				-1.f,
-				1,
-				ModifyPropertyMap
-			);
-
-			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetDataPtr->TargetCharacterPtr = OtherCharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+			if (HitSound.IsValid())
+				UGameplayStatics::PlaySoundAtLocation(OtherActor,HitSound.LoadSynchronous(),OtherActor->GetActorLocation());	
+			if (HitParticle.IsValid())
+				UGameplayStatics::SpawnEmitterAtLocation(OtherActor,HitParticle.LoadSynchronous(),OtherActor->GetActorLocation());
 		}
 		else
 		{
 			// // 冰冻
-			// auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_StateModify(
-			// 	UGameplayTagsSubSystem::GetInstance()->Stun,
-			// 	2
-			// );
-			//
-			// GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-			// GameplayAbilityTargetDataPtr->TargetCharacterPtr = OtherCharacterPtr;
-
-			// auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-			// ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			static UParticleSystem* BoomParticle=LoadObject<UParticleSystem>(this,TEXT("/Script/Engine.ParticleSystem'/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Elemental/ICE/P_IceElementalSplit_Small.P_IceElementalSplit_Small'"));
 			static USoundBase* BoomSound=LoadObject<USoundBase>(this,TEXT("/Script/Engine.SoundWave'/Game/StarterContent/Audio/Explosion01.Explosion01'"));
 			if (BoomParticle)
 				UGameplayStatics::SpawnEmitterAtLocation(OtherActor,BoomParticle,OtherActor->GetActorLocation());
 			if (BoomSound)
 				UGameplayStatics::PlaySoundAtLocation(OtherActor,BoomSound,OtherActor->GetActorLocation());	
-			OtherCharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self({},FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.IceGun"))));
 		}
-		auto MaterialsNum=OtherCharacterPtr->GetMesh()->GetMaterials().Num();
-		auto Mesh=OtherCharacterPtr->GetMesh();
-		float Count=1.0f;//这里要算百分比，不能用整数除
-		if (CSPtr)
-		{
-			Count=CSPtr->GetStateDisplayInfo().Pin()->Num;
-		}
-		for (int i=0;i<MaterialsNum;i++)
-		{
-			auto InstDy = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(i));
-			if (!InstDy)
-			{
-				auto Inst = Cast<UMaterialInstance>(Mesh->GetMaterial(i));
-				InstDy = UMaterialInstanceDynamic::Create(Inst, OtherCharacterPtr);
-				Mesh->SetMaterial(i,InstDy);
-			}
-			static float MinValue=-50.f;
-			static float MaxValue=230.f;
-			static float MaxCount=3;
-			InstDy->SetScalarParameterValue(TEXT("Frozen"),MinValue+Count/MaxCount*MaxValue);
-		}
-		GEngine->AddOnScreenDebugMessage(123,2.0f,FColor::Red,FString::FromInt(int(Count)));
 		IceGunPtr->Reset();
 	}
 }
@@ -363,7 +319,7 @@ Super(ObjectInitializer)
 	
 	UParticleSystem* ParticleSystem=LoadObject<UParticleSystem>(nullptr,TEXT("/Script/Engine.ParticleSystem'/Game/InfinityBladeEffects/Effects/FX_Monsters/FX_Monster_Elemental/ICE/P_LazerIceAttack.P_LazerIceAttack'"));
 	ParticleSystemComp->SetTemplate(ParticleSystem);
-	ParticleSystemComp->SetRelativeRotation(FRotator(0.f,60.0f,0.f));
+	//ParticleSystemComp->SetRelativeRotation(FRotator(0.f,60.0f,0.f));
 
 	CapsuleComponentPtr->InitCapsuleSize(34.0f, 34.0f);
 	CapsuleComponentPtr->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
@@ -377,6 +333,44 @@ Super(ObjectInitializer)
 	this->ProjectileMovementComp->ProjectileGravityScale=0.f;
 	CapsuleComponentPtr->SetupAttachment(RootComponent);
 	ParticleSystemComp->SetupAttachment(RootComponent);
+}
+
+void ASkill_IceGun_Projectile::Reset()
+{
+	// 禁用碰撞
+	CapsuleComponentPtr->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CapsuleComponentPtr->SetCollisionResponseToAllChannels(ECR_Ignore);
+	// 隐藏 Actor
+	SetActorHiddenInGame(true);
+	SetActorTickEnabled(false); // 禁用Actor的Tick
+	ProjectileMovementComp->SetActive(false);
+	// ParticleSystemComp->SetVisibility(false);
+	// GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
+}
+
+void ASkill_IceGun_Projectile::Activate()
+{
+	CapsuleComponentPtr->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CapsuleComponentPtr->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block); 
+	SetActorHiddenInGame(false);
+	SetActorTickEnabled(true);
+	ProjectileMovementComp->SetActive(true);
+	//下一帧再把特效组件显示出来，免得有拖尾残留
+	//TWeakObjectPtr<ASkill_IceGun_Projectile> WeakThis=this;
+
+	// // 当设置定时器时，将句柄保存起来
+	// GetWorld()->GetTimerManager().SetTimer(
+	// 	TimerHandle,
+	// 	FTimerDelegate::CreateLambda([this, WeakThis]()
+	// 	{
+	// 		if (WeakThis.IsValid())
+	// 		{
+	// 			ParticleSystemComp->SetVisibility(true);
+	// 		}
+	// 	}),
+	// 	1.0f,
+	// 	false
+	// );
 }
 
 

@@ -72,6 +72,12 @@ void UCS_PeriodicPropertyModify::UpdateDuration()
 	{
 		auto GameplayAbilityTargetDataSPtr = CacheSPtr;
 
+		if (GameplayAbilityTargetDataSPtr->bIsClear)
+		{
+			TaskPtr->SetFinished();
+			return; 
+		}
+
 		if ((GameplayAbilityTargetDataSPtr->PerformActionInterval < 0.f) && !GameplayAbilityTargetDataSPtr->bOnluReFreshTime)
 		{
 			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
@@ -290,6 +296,17 @@ FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyMo
 	LosePropertyNumInterval(InLosePropertyNumInterval),
 	bOnluReFreshTime(bInOnluReFreshTime)
 {
+}
+
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
+	const FGameplayTag& Tag,
+	bool bClear
+	):
+	Super(Tag)
+{
+	bOnluReFreshTime = true;
+	Duration = 0.f;
+	bIsClear = bClear;
 }
 
 FGameplayAbilityTargetData_PropertyModify* FGameplayAbilityTargetData_PropertyModify::Clone() const

@@ -39,6 +39,8 @@ public:
 	
 	void SetInfinite(float InIntervalTime = -1.f);
 
+	void SetFinished();
+	
 	TimerHelper_Finished_Delegate OnFinished;
 	
 	TimerHelper_Tick_Delegate TickDelegate;

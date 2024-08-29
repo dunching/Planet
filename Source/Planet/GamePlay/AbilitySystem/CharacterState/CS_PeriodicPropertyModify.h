@@ -10,6 +10,7 @@
 
 #include "CS_PeriodicPropertyModify.generated.h"
 
+class UCS_PeriodicPropertyModify;
 class UAbilityTask_TimerHelper;
 class UTexture2D;
 class UConsumableUnit;
@@ -42,6 +43,10 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 		float InLosePropertyNumInterval
 	);
 
+	FGameplayAbilityTargetData_PropertyModify(
+		const FGameplayTag& Tag,bool bClear
+	);
+
 	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);
 
 	virtual FGameplayAbilityTargetData_PropertyModify* Clone()const override;
@@ -61,6 +66,8 @@ private:
 	float LosePropertyNumInterval = -1.f;
 
 	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+
+	bool bIsClear = false;
 
 	bool bOnluReFreshTime = false;
 

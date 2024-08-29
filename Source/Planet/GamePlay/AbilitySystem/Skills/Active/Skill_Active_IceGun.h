@@ -70,7 +70,22 @@ protected:
 	void FindTarget();
 
 	void PlayMontage();
+
+	UFUNCTION()
+	void OnHitCallback(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void OnNotifyBeginReceived(FName NotifyName);
 	
+	void OnProjectileBounce(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+							UPrimitiveComponent* OtherComp,
+							int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+	void ExcuteTasks();
+	void OnOverlap(AActor* OtherActor);
+	
+	UFUNCTION()
+	bool ResetIceGun(UAbilityTask_TimerHelper* TaskPtr);
+	USceneComponent* GetNearnestTarget(ACharacterBase* SelfCharacter, float SearchRadius);
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
 	
@@ -92,25 +107,16 @@ protected:
 
 	ASkill_IceGun_Projectile* IceGunPtr = nullptr;
 
-	TArray<UMaterialInstance> CharacterMat{};
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<ASkill_IceGun_Projectile> IceGunPtrClass;
 
-	UFUNCTION()
-	void OnHitCallback(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	UFUNCTION()
-	void OnNotifyBeginReceived(FName NotifyName);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftObjectPtr<USoundBase>HitSound;
 	
-	void OnProjectileBounce(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	                        UPrimitiveComponent* OtherComp,
-	                        int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-	void ExcuteTasks();
-	void OnOverlap(AActor* OtherActor);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftObjectPtr<UParticleSystem>HitParticle;
 	
-	UFUNCTION()
-	bool ResetIceGun(UAbilityTask_TimerHelper* TaskPtr);
-	USceneComponent* GetNearnestTarget(ACharacterBase* SelfCharacter, float SearchRadius);
 };
-
 
 UCLASS()
 class PLANET_API ASkill_IceGun_Projectile : public AActor
@@ -128,43 +134,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UParticleSystemComponent>  ParticleSystemComp;
-
+	
 	FTimerHandle TimerHandle; 
-	void Reset()
-	{
-		// 禁用碰撞
-		CapsuleComponentPtr->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		CapsuleComponentPtr->SetCollisionResponseToAllChannels(ECR_Ignore);
-		// 隐藏 Actor
-		SetActorHiddenInGame(true);
-		SetActorTickEnabled(false); // 禁用Actor的Tick
-		ProjectileMovementComp->SetActive(false);
-		ParticleSystemComp->SetVisibility(false);
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-	}
+	void Reset();
 
-	void Activate()
-	{
-		CapsuleComponentPtr->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		CapsuleComponentPtr->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block); 
-		SetActorHiddenInGame(false);
-		SetActorTickEnabled(true);
-		ProjectileMovementComp->SetActive(true);
-		//下一帧再把特效组件显示出来，免得有拖尾残留
-		TWeakObjectPtr<ASkill_IceGun_Projectile> WeakThis=this;
-
-		// 当设置定时器时，将句柄保存起来
-		GetWorld()->GetTimerManager().SetTimer(
-			TimerHandle,
-			FTimerDelegate::CreateLambda([this, WeakThis]()
-			{
-				if (WeakThis.IsValid())
-				{
-					ParticleSystemComp->SetVisibility(true);
-				}
-			}),
-			1.0f,
-			false
-		);
-	}
+	void Activate();
 };
