@@ -107,10 +107,6 @@ protected:
 
 	bool ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr);
 
-	void RemoveSkill(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
-
-	void AddSkill(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;
 

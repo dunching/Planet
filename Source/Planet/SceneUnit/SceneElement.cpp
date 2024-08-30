@@ -14,6 +14,7 @@
 #include "SceneUnitContainer.h"
 #include "GroupMnaggerComponent.h"
 #include "PropertyEntrys.h"
+#include "Skill_Base.h"
 
 UBasicUnit::UBasicUnit()
 {
@@ -233,6 +234,16 @@ void UWeaponUnit::InitialUnit()
 	}
 }
 
+void UWeaponUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+{
+	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+
+	if (FirstSkill)
+	{
+		FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	}
+}
+
 FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
@@ -267,6 +278,75 @@ USkillUnit::USkillUnit() :
 TSubclassOf<USkill_Base> USkillUnit::GetSkillClass() const
 {
 	return nullptr;
+}
+
+void USkillUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+{
+	if (!InAllocationCharacterUnitPtr)
+	{
+		UnRegisterSkill();
+	}
+
+	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+
+	if (AllocationCharacterUnitPtr)
+	{
+		RegisterSkill();
+	}
+}
+
+void USkillUnit::RegisterSkill()
+{
+	FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
+
+	GameplayAbilityTargetDataPtr->SkillUnitPtr = this;
+
+	FGameplayAbilitySpec GameplayAbilitySpec(
+		GetSkillClass(),
+		Level
+	);
+
+	GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
+	GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+
+	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+	GameplayAbilitySpecHandle = ProxyCharacterPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+}
+
+void USkillUnit::UnRegisterSkill()
+{
+	if (GetAllocationCharacterUnit())
+	{
+		auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+
+		if (ProxyCharacterPtr)
+		{
+			auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+
+			ASCPtr->CancelAbilityHandle(GameplayAbilitySpecHandle);
+			ASCPtr->ClearAbility(GameplayAbilitySpecHandle);
+		}
+	}
+
+	GameplayAbilitySpecHandle = FGameplayAbilitySpecHandle();
+}
+
+USkill_Base* USkillUnit::GetGAInst()const
+{
+	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
+	if (GameplayAbilitySpecPtr)
+	{
+		return Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	}
+
+	return nullptr;
+}
+
+FGameplayAbilitySpecHandle USkillUnit::GetGAHandle() const
+{
+	return GameplayAbilitySpecHandle;
 }
 
 UWeaponSkillUnit::UWeaponSkillUnit()

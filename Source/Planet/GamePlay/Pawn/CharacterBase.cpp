@@ -313,7 +313,7 @@ void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
 
 void ACharacterBase::OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	// 显示对应的浮动UI
+	// 鏄剧ず瀵瑰簲鐨勬诞鍔║I
 	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
 	UIPtr->ProcessGAEVent(GAEvent);
 	UIPtr->AddToViewport(EUIOrder::kFightingTips);

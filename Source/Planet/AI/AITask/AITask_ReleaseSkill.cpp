@@ -77,7 +77,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						{
 							continue;
 						}
-						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->SkillUnitPtr->GAInstPtr);
+						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->SkillUnitPtr->GetGAInst());
 						if (!GAInsPtr)
 						{
 							continue;
@@ -113,7 +113,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					{
 						continue;
 					}
-					auto GAInsPtr = Cast<USkill_Base>(WeaponSPtr->WeaponUnitPtr->FirstSkill->GAInstPtr);
+					auto GAInsPtr = Cast<USkill_Base>(WeaponSPtr->WeaponUnitPtr->FirstSkill->GetGAInst());
 					if (!GAInsPtr)
 					{
 						continue;

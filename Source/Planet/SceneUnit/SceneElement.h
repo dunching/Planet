@@ -7,12 +7,14 @@
 
 #include "CoreMinimal.h"
 #include <GameplayTagContainer.h>
+#include "GameplayAbilitySpecHandle.h"
 
 #include "GenerateType.h"
 #include "BaseData.h"
 
 #include "SceneElement.generated.h"
 
+struct FGameplayAbilityTargetData_Skill;
 struct FTableRowUnit_CommonCooldownInfo;
 struct FTableRowUnit;
 struct FTableRowUnit_WeaponExtendInfo;
@@ -104,7 +106,7 @@ public:
 	// 
 	FString GetUnitName()const;
 
-	void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
+	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
 
 	TCallbackHandleContainer<void(UCharacterUnit*)> OnAllocationCharacterUnitChanged;
 
@@ -258,10 +260,19 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
-	UPROPERTY(Transient)
-	USkill_Base* GAInstPtr = nullptr;
+	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)override;
+
+	void RegisterSkill();
+
+	void UnRegisterSkill();
+
+	USkill_Base* GetGAInst()const;
+
+	FGameplayAbilitySpecHandle GetGAHandle()const;
 
 protected:
+
+	FGameplayAbilitySpecHandle GameplayAbilitySpecHandle;
 
 };
 
@@ -361,6 +372,8 @@ public:
 	UWeaponUnit();
 
 	virtual void InitialUnit()override;
+
+	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)override;
 
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
 
