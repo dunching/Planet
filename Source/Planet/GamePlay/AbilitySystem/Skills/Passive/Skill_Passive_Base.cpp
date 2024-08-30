@@ -9,6 +9,12 @@
 #include "CharacterAttributesComponent.h"
 #include "PropertyEntrys.h"
 
+USkill_Passive_Base::USkill_Passive_Base() :
+	Super()
+{
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
 void USkill_Passive_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);

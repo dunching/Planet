@@ -136,7 +136,14 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 	if (NotifyName == Skill_WeaponActive_RangeTest::AttackEnd)
 	{
 		EmitProjectile();
+
+		CheckInContinue();
 	}
+}
+
+void USkill_WeaponActive_RangeTest::OnMontateComplete()
+{
+	K2_CancelAbility();
 }
 
 void USkill_WeaponActive_RangeTest::EmitProjectile()
@@ -187,13 +194,11 @@ void USkill_WeaponActive_RangeTest::PlayMontage()
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
 		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }

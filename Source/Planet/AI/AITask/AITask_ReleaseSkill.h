@@ -45,7 +45,7 @@ protected:
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
-	TMap<FGameplayAbilitySpecHandle, TSharedPtr<FCanbeInteractionInfo>>ReleasingSkillMap;
+	TMap<UGameplayAbility*, TSharedPtr<FCanbeInteractionInfo>>ReleasingSkillMap;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

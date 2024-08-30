@@ -26,8 +26,6 @@ public:
 	using FMakedDamageHandle = 
 		TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>::FCallbackHandleSPtr;
 
-	USkill_Passive_ZMJZ();
-
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec

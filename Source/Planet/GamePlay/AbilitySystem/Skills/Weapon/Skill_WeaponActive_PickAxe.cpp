@@ -117,6 +117,8 @@ void USkill_WeaponActive_PickAxe::PerformAction(
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	MontageNum = 0;
+
 	StartTasksLink();
 }
 

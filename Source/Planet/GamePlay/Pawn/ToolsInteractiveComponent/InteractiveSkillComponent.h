@@ -27,8 +27,6 @@ struct FWeaponSocketInfo
 	FGameplayTag WeaponSocket;
 
 	UWeaponUnit* WeaponUnitPtr = nullptr;
-
-	FGameplayAbilitySpecHandle Handle;
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -81,6 +79,8 @@ public:
 	bool SwitchWeapon();
 
 	void RetractputWeapon();
+
+	int32 GetCurrentWeaponAttackDistance()const;
 
 	EWeaponSocket GetActivedWeaponType();
 

@@ -117,6 +117,7 @@ void USkill_WeaponActive_Base::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
+	ResetPreviousStageActions();
 	bIsContinue = true;
 }
 
@@ -131,12 +132,21 @@ void USkill_WeaponActive_Base::CheckInContinue()
 		WaitInputPercent = 1.f;
 
 		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
-		WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
-		WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
-			K2_CancelAbility();
-			return true;
-			});
+
+		if (CurrentWaitInputTime > 0.f)
+		{
+			WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
+			WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
+			WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
+				K2_CancelAbility();
+				return true;
+				});
+		}
+		else
+		{
+			WaitInputTaskPtr->SetInfinite();
+		}
+
 		WaitInputTaskPtr->ReadyForActivation();
 	}
 }

@@ -18,6 +18,8 @@ class USkill_Passive_Base : public USkill_Base
 
 public:
 
+	USkill_Passive_Base();
+
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec

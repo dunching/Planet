@@ -36,6 +36,7 @@
 #include "SceneUnitTable.h"
 #include "Skill_Active_Control.h"
 #include "InteractiveBaseGAComponent.h"
+#include "Skill_WeaponActive_Base.h"
 
 FName UInteractiveSkillComponent::ComponentName = TEXT("InteractiveSkillComponent");
 
@@ -121,10 +122,11 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 {
 	if (InWeaponSocket != CurrentActivedWeaponSocket)
 	{
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		auto OnwerActorPtr = GetOwner<ACharacterBase>(); 
+		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
 		// 清除上一次的
-		auto Swith = [this, OnwerActorPtr]
+		auto Swith = [this, OnwerActorPtr, ASCPtr]
 			{
 				TSharedPtr<FWeaponSocketInfo > WeaponUnit;
 				switch (CurrentActivedWeaponSocket)
@@ -157,8 +159,12 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 
 				if (WeaponUnit)
 				{
-					OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilityHandle(WeaponUnit->Handle);
-					OnwerActorPtr->GetAbilitySystemComponent()->ClearAbility(WeaponUnit->Handle);
+					const auto GAHandle =
+						WeaponUnit->WeaponUnitPtr->FirstSkill->GAInstPtr->GetCurrentAbilitySpecHandle();
+					WeaponUnit->WeaponUnitPtr->FirstSkill->GAInstPtr = nullptr;
+
+					ASCPtr->CancelAbilityHandle(GAHandle);
+					ASCPtr->ClearAbility(GAHandle);
 				}
 				if (ActivedWeaponPtr)
 				{
@@ -193,11 +199,6 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 		{
 			if (WeaponUnit && WeaponUnit->WeaponUnitPtr)
 			{
-				// 可以切换时，清楚上一次的
-				Swith();
-
-				CurrentActivedWeaponSocket = InWeaponSocket;
-
 				FGameplayAbilitySpec GameplayAbilitySpec(
 					WeaponUnit->WeaponUnitPtr->FirstSkill->GetSkillClass(),
 					WeaponUnit->WeaponUnitPtr->FirstSkill->Level
@@ -211,9 +212,23 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 
 				GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
 
-				WeaponUnit->Handle = OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
+				const auto GAHandle= OnwerActorPtr->GetAbilitySystemComponent()->GiveAbility(
 					GameplayAbilitySpec
 				);
+
+				auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GAHandle);
+				if (!GameplayAbilitySpecPtr)
+				{
+					return false;
+				}
+
+				// 可以切换时，清楚上一次的
+				Swith();
+
+				CurrentActivedWeaponSocket = InWeaponSocket;
+
+				WeaponUnit->WeaponUnitPtr->FirstSkill->GAInstPtr =
+					Cast<USkill_WeaponActive_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
 
 				FActorSpawnParameters ActorSpawnParameters;
 				ActorSpawnParameters.Owner = OnwerActorPtr;
@@ -229,7 +244,6 @@ bool UInteractiveSkillComponent::ActiveWeapon(EWeaponSocket InWeaponSocket)
 				OnwerActorPtr->SwitchAnimLink(WeaponUnit->WeaponUnitPtr->GetTableRowUnit_WeaponExtendInfo()->AnimLinkClassType);
 
 				OnActivedWeaponChangedContainer.ExcuteCallback(InWeaponSocket);
-
 				return true;
 			}
 		}
@@ -313,6 +327,21 @@ void UInteractiveSkillComponent::RetractputWeapon()
 	ActiveWeapon(EWeaponSocket::kNone);
 }
 
+int32 UInteractiveSkillComponent::GetCurrentWeaponAttackDistance() const
+{
+	auto ActivedWeaponSPtr = GetActivedWeapon();
+	if (ActivedWeaponSPtr)
+	{
+		return ActivedWeaponSPtr->WeaponUnitPtr->GetMaxAttackDistance();
+	}
+	else
+	{
+
+	}
+
+	return 100;
+}
+
 EWeaponSocket UInteractiveSkillComponent::GetActivedWeaponType()
 {
 	return CurrentActivedWeaponSocket;
@@ -359,13 +388,7 @@ void UInteractiveSkillComponent::CancelSkill_WeaponActive(const TSharedPtr<FCanb
 		return;
 	}
 
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(WeaponUnit->Handle);
-	if (!GameplayAbilitySpecPtr)
-	{
-		return;
-	}
-	auto GAInsPtr = Cast<USkill_WeaponActive_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	auto GAInsPtr = Cast<USkill_WeaponActive_Base>(WeaponUnit->WeaponUnitPtr->FirstSkill->GAInstPtr);
 	if (!GAInsPtr)
 	{
 		return;
@@ -394,13 +417,7 @@ bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
 		return false;
 	}
 
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(WeaponUnit->Handle);
-	if (!GameplayAbilitySpecPtr)
-	{
-		return false;
-	}
-	auto GAInsPtr = Cast<USkill_WeaponActive_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	auto GAInsPtr = Cast<USkill_WeaponActive_Base>(WeaponUnit->WeaponUnitPtr->FirstSkill->GAInstPtr);
 	if (!GAInsPtr)
 	{
 		return false;
@@ -435,8 +452,9 @@ bool UInteractiveSkillComponent::ActiveSkill_WeaponActive(
 		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 	}
 
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 	return ASCPtr->TriggerAbilityFromGameplayEvent(
-		WeaponUnit->Handle,
+		GAInsPtr->GetCurrentAbilitySpecHandle(),
 		ASCPtr->AbilityActorInfo.Get(),
 		FGameplayTag::EmptyTag,
 		&Payload,
