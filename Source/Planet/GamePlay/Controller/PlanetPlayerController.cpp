@@ -140,6 +140,8 @@ void APlanetPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	auto  asd = GetNetMode();
+
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(
@@ -239,6 +241,8 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 
 	Super::OnPossess(InPawn);
 
+	auto  asd = GetNetMode();
+
 	if (bIsNewPawn)
 	{
 	}
@@ -250,19 +254,29 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
-			// 在SetPawn之后调用
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
-				NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
-				});
-
-			GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
-
-			// 绑定效果状态栏
-			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-			if (EffectPtr)
+#if UE_EDITOR || UE_SERVER
+			if (GetNetMode() == NM_DedicatedServer)
 			{
-				EffectPtr->BindCharacterState(GetRealCharacter());
+				GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
 			}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+			if (GetNetMode() == NM_Client)
+			{
+				// 在SetPawn之后调用
+				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
+					NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
+					});
+
+				// 绑定效果状态栏
+				auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+				if (EffectPtr)
+				{
+					EffectPtr->BindCharacterState(GetRealCharacter());
+				}
+			}
+#endif
 		}
 		else if (InPawn->IsA(AHorseCharacter::StaticClass()))
 		{

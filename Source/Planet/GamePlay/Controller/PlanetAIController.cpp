@@ -38,6 +38,8 @@ void APlanetAIController::OnPossess(APawn* InPawn)
 		InitialCharacterUnit(Cast<ACharacterBase>(InPawn));
 	}
 
+	auto  asd = GetNetMode();
+
 	Super::OnPossess(InPawn);
 
 	if (bIsNewPawn)

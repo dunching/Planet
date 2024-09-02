@@ -286,8 +286,8 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 				{
 					BreakOhterState(
 						GameplayAbilityTargetDataSPtr,
-						UGameplayTagsSubSystem::GetInstance()->KnockDown, 
-						{ 
+						UGameplayTagsSubSystem::GetInstance()->KnockDown,
+						{
 							UGameplayTagsSubSystem::GetInstance()->FlyAway,
 							UGameplayTagsSubSystem::GetInstance()->TornadoTraction,
 							UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline,
@@ -354,7 +354,7 @@ void UInteractiveBaseGAComponent::ExcuteEffects(
 
 FGameplayEventData* UInteractiveBaseGAComponent::MkeSpec(
 	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
-) 
+)
 {
 	auto ClonePtr = GameplayAbilityTargetDataSPtr->Clone();
 
@@ -376,8 +376,8 @@ FGameplayEventData* UInteractiveBaseGAComponent::MkeSpec(
 }
 
 void UInteractiveBaseGAComponent::BreakOhterState(
-	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr, 
-	const FGameplayTag& ThisTag, 
+	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
+	const FGameplayTag& ThisTag,
 	const TArray<FGameplayTag>& CancelTags
 )
 {
@@ -567,47 +567,52 @@ void UInteractiveBaseGAComponent::SendEvent2Self(
 
 void UInteractiveBaseGAComponent::InitialBaseGAs()
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
-
-		SendEventHandle = GASPtr->GiveAbility(
-			FGameplayAbilitySpec(UGAEvent_Send::StaticClass(), 1)
-		);
-
-		ReceivedEventHandle = GASPtr->GiveAbility(
-			FGameplayAbilitySpec(UGAEvent_Received::StaticClass(), 1)
-		);
-
-		GASPtr->GiveAbility(
-			FGameplayAbilitySpec(UBasicFutures_MoveToAttaclArea::StaticClass(), 1)
-		);
-
-		for (auto Iter : CharacterAbilities)
+		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		if (OnwerActorPtr)
 		{
-			GASPtr->GiveAbility(
-				FGameplayAbilitySpec(Iter, 1)
+			auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+			SendEventHandle = GASPtr->GiveAbility(
+				FGameplayAbilitySpec(UGAEvent_Send::StaticClass(), 1)
 			);
+
+			ReceivedEventHandle = GASPtr->GiveAbility(
+				FGameplayAbilitySpec(UGAEvent_Received::StaticClass(), 1)
+			);
+
+			GASPtr->GiveAbility(
+				FGameplayAbilitySpec(UBasicFutures_MoveToAttaclArea::StaticClass(), 1)
+			);
+
+			for (auto Iter : CharacterAbilities)
+			{
+				GASPtr->GiveAbility(
+					FGameplayAbilitySpec(Iter, 1)
+				);
+			}
 		}
-	}
 
 #pragma region 结算效果修正
-	// 输出
+		// 输出
 
-	// 群体伤害或治疗减益
-	AddSendGroupEffectModify();
-	// 伤害类型
-	AddSendWuXingModify();
+		// 群体伤害或治疗减益
+		AddSendGroupEffectModify();
+		// 伤害类型
+		AddSendWuXingModify();
 
-	// 接收
+		// 接收
 
-	// 五行之间的减免
-	AddReceivedWuXingModify();
+		// 五行之间的减免
+		AddReceivedWuXingModify();
 
-	// 基础属性
-	AddReceivedModify();
+		// 基础属性
+		AddReceivedModify();
 #pragma endregion 结算效果修正
+	}
+#endif
 }
 
 bool UInteractiveBaseGAComponent::SwitchWalkState(bool bIsRun)
@@ -673,7 +678,7 @@ void UInteractiveBaseGAComponent::MoveToAttackDistance(
 	if (OnwerActorPtr)
 	{
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr, 
+			OnwerActorPtr,
 			UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea,
 			Payload
 		);
@@ -871,7 +876,7 @@ void UInteractiveBaseGAComponent::AddReceivedModify()
 				auto SelfCharacterAttributesSPtr =
 					GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-				 auto TargetCharacterAttributesSPtr =
+				auto TargetCharacterAttributesSPtr =
 					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				{

@@ -20,7 +20,12 @@ void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTi
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ProcessCharacterAttributes();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		ProcessCharacterAttributes();
+	}
+#endif
 }
 
 TSharedPtr<FCharacterAttributes> UCharacterAttributesComponent::GetCharacterAttributes() const

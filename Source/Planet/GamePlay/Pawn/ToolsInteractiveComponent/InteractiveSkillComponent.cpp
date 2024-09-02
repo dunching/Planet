@@ -86,18 +86,23 @@ void UInteractiveSkillComponent::TickComponent(float DeltaTime, enum ELevelTick 
 
 void UInteractiveSkillComponent::InitialBaseGAs()
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		if (OnwerActorPtr)
+		{
+			auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		// 五行技能
-		GASPtr->GiveAbility(
-			FGameplayAbilitySpec(
-				Skill_Element_GoldClass
-			)
-		);
+			// 五行技能
+			GASPtr->GiveAbility(
+				FGameplayAbilitySpec(
+					Skill_Element_GoldClass
+				)
+			);
+		}
 	}
+#endif
 }
 
 void UInteractiveSkillComponent::RegisterWeapon(

@@ -76,6 +76,8 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	auto  asd = GetNetMode();
+
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
@@ -141,6 +143,20 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 
 void ACharacterBase::PostInitializeComponents()
 {
+	UWorld* World = GetWorld();
+	if ((World->IsGameWorld()))
+	{
+		InitialCharacterUnit();
+
+		auto GASPtr = GetAbilitySystemComponent();
+
+		GASPtr->ClearAllAbilities();
+		GASPtr->InitAbilityActorInfo(this, this);
+		GetInteractiveSkillComponent()->InitialBaseGAs();
+		GetInteractiveBaseGAComponent()->InitialBaseGAs();
+		GetInteractiveConsumablesComponent()->InitialBaseGAs();
+	}
+
 	Super::PostInitializeComponents();
 }
 
@@ -240,9 +256,9 @@ TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 	return CharacterUnitPtr;
 }
 
-void ACharacterBase::SetCharacterUnit(const TSharedPtr<FCharacterUnitType>& InCharacterUnitPtr)
+void ACharacterBase::InitialCharacterUnit()
 {
-	CharacterUnitPtr = InCharacterUnitPtr;
+	CharacterUnitPtr = MakeShared<FCharacterProxy>();
 	CharacterUnitPtr->ProxyCharacterPtr = this;
 }
 
@@ -265,25 +281,6 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ACharacterBase::SpawnDefaultController()
 {
-#if WITH_EDITOR
-	UWorld* World = GetWorld();
-	if ((GIsEditor == false || World->IsGameWorld()))
-#endif // WITH_EDITOR
-	{
-	}
-// 	const auto NewCharacterUnitPtr =
-// 		Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
-// 
-// 	SetCharacterUnit(NewCharacterUnitPtr);
-
-	auto GASPtr = GetAbilitySystemComponent();
-
-	GASPtr->ClearAllAbilities();
-	GASPtr->InitAbilityActorInfo(this, this);
-	GetInteractiveSkillComponent()->InitialBaseGAs();
-	GetInteractiveBaseGAComponent()->InitialBaseGAs();
-	GetInteractiveConsumablesComponent()->InitialBaseGAs();
-
 	Super::SpawnDefaultController();
 
 	OriginalAIController = Controller;

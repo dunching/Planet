@@ -31,7 +31,7 @@ public:
 
 	using FOnDragDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
 
-	using FOnAllocationCharacterUnitChangedHandle = TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&)>::FCallbackHandleSPtr;
+	using FOnAllocationCharacterUnitChangedHandle = TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>::FCallbackHandleSPtr;
 
 	UBackpackIcon(const FObjectInitializer& ObjectInitializer);
 
@@ -58,7 +58,7 @@ protected:
 
 	virtual	void SetItemType(FBasicProxy* BasicUnitPtr);
 
-	virtual void OnAllocationCharacterUnitChanged(const TSharedPtr<FCharacterProxy>& AllocationCharacterUnitPtr);
+	virtual void OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterProxy>& AllocationCharacterUnitPtr);
 
 	TSharedPtr<FBasicProxy> BasicUnitPtr = nullptr;
 

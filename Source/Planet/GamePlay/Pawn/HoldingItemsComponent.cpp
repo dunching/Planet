@@ -36,10 +36,14 @@ TSharedPtr<FBasicProxy>  UHoldingItemsComponent::AddUnit(FGameplayTag UnitType, 
 {
 	TSharedPtr<FBasicProxy> Result;
 	auto OwnerPtr = GetOwner<FOwnerType>();
-	if (OwnerPtr && OwnerPtr->GetCharacterUnit())
+	if (OwnerPtr)
 	{
 		Result = GetSceneUnitContainer()->AddUnit(UnitType, Num);
-		Result->OwnerCharacterUnitPtr = OwnerPtr->GetCharacterUnit();
+
+		if (GetOwner<FOwnerType>()->GetCharacterUnit())
+		{
+			Result->OwnerCharacterUnitPtr = GetOwner<FOwnerType>()->GetCharacterUnit().ToWeakPtr();
+		}
 	}
 
 	return Result;

@@ -141,9 +141,9 @@ void UBackpackIcon::SetItemType(FBasicProxy* InBasicUnitPtr)
 	}
 }
 
-void UBackpackIcon::OnAllocationCharacterUnitChanged(const TSharedPtr<FCharacterProxy>& AllocationCharacterUnitPtr)
+void UBackpackIcon::OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterProxy>& AllocationCharacterUnitPtr)
 {
-	if (AllocationCharacterUnitPtr)
+	if (AllocationCharacterUnitPtr.IsValid())
 	{
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
 		if (!UIPtr)
@@ -152,7 +152,7 @@ void UBackpackIcon::OnAllocationCharacterUnitChanged(const TSharedPtr<FCharacter
 		}
 
 		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr->CharacterAttributesSPtr->Name));
+		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr.Pin()->CharacterAttributesSPtr->Name));
 	}
 	else
 	{

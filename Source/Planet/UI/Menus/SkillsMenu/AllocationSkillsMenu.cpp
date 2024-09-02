@@ -125,7 +125,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
 {
 	auto CharacterPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr;
-	if (!CharacterPtr)
+	if (!CharacterPtr.IsValid())
 	{
 		return;
 	}
@@ -258,7 +258,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 	}
 
 	auto CharacterPtr = CurrentUnitPtr->ProxyCharacterPtr;
-	if (!CharacterPtr)
+	if (!CharacterPtr.IsValid())
 	{
 		return;
 	}

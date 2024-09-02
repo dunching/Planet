@@ -121,15 +121,15 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
 		if (TeamsHelperSPtr)
 		{
-			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterUnitPtr->ProxyCharacterPtr);
+			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterUnitPtr->ProxyCharacterPtr.Get());
 			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				TeammatesSet.Add(Iter->ProxyCharacterPtr);
+				TeammatesSet.Add(Iter->ProxyCharacterPtr.Get());
 			}
 		}
 	}
 
-	// Test:°´ĞÎ×´²éÕÒ£¬·ñÔòÖ±½Ó»ñÈ¡¡°¶ÓÔ±¡±¼ÆËã¾àÀë¼´¿É
+	// Test:æŒ‰å½¢çŠ¶æŸ¥æ‰¾ï¼Œå¦åˆ™ç›´æ¥è·å–â€œé˜Ÿå‘˜â€è®¡ç®—è·ç¦»å³å¯
 	TArray<struct FOverlapResult> OutOverlaps;
 	if (GetWorldImp()->OverlapMultiByObjectType(
 		OutOverlaps,

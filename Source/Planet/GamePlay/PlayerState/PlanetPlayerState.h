@@ -22,7 +22,7 @@ class PLANET_API APlanetPlayerState : public APlayerState
 
 public:
 
-	APlanetPlayerState();
+	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 protected:
 

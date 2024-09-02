@@ -66,7 +66,7 @@ bool UInteractiveConsumablesComponent::ActiveAction(const TSharedPtr<FCanbeInter
 		FGameplayAbilitySpec GameplayAbilitySpec(
 			(*ToolIter)->UnitPtr->GetTableRowUnit_Consumable()->Skill_Consumable_Class,
 			1
-		); 
+		);
 		GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
 		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Consumable;
 		GameplayAbilityTargetDashPtr->UnitPtr = (*ToolIter)->UnitPtr;
@@ -103,11 +103,16 @@ TSharedPtr<FConsumableSocketInfo> UInteractiveConsumablesComponent::FindConsumab
 
 void UInteractiveConsumablesComponent::InitialBaseGAs()
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		if (OnwerActorPtr)
+		{
+			auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		}
 	}
+#endif
 }
 
 void UInteractiveConsumablesComponent::GenerationCanbeActiveEvent()

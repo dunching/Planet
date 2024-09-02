@@ -13,6 +13,9 @@ USkill_Base::USkill_Base() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
+
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 }
 
 void USkill_Base::OnAvatarSet(

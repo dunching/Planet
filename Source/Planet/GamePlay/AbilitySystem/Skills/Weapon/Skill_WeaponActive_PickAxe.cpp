@@ -167,7 +167,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		{
 			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				CapsuleParams.AddIgnoredActor(Iter->ProxyCharacterPtr);
+				CapsuleParams.AddIgnoredActor(Iter->ProxyCharacterPtr.Get());
 			}
 		}
 	}

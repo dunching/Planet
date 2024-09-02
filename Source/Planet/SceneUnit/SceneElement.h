@@ -102,9 +102,9 @@ public:
 
 	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& AllocationCharacterUnitPtr);
 
-	TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&)> OnAllocationCharacterUnitChanged;
+	TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)> OnAllocationCharacterUnitChanged;
 
-	TSharedPtr<FCharacterProxy> GetAllocationCharacterUnit()const;
+	TWeakPtr<FCharacterProxy> GetAllocationCharacterUnit()const;
 
 protected:
 
@@ -114,10 +114,10 @@ protected:
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
 
 	// 这个物品被分配给的对象
-	TSharedPtr<FCharacterProxy> AllocationCharacterUnitPtr = nullptr;
+	TWeakPtr<FCharacterProxy> AllocationCharacterUnitPtr = nullptr;
 	
 	// 这个物品所在的对象
-	TSharedPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
+	TWeakPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
 
 private:
 
@@ -226,7 +226,7 @@ public:
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();
 
-	FPawnType* ProxyCharacterPtr = nullptr;
+	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr;
 

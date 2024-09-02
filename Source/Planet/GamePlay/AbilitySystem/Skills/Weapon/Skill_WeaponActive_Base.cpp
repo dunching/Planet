@@ -8,7 +8,7 @@
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
-	bRetriggerInstancedAbility = true;
+//	bRetriggerInstancedAbility = true;
 }
 
 void USkill_WeaponActive_Base::PreActivate(

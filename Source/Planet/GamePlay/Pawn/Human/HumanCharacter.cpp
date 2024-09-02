@@ -73,37 +73,42 @@ void AHumanCharacter::BeginPlay()
 	{
 		if (GetController()->IsA(APlanetPlayerController::StaticClass()))
 		{
-			auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
+#if UE_EDITOR || UE_SERVER
+			if (GetNetMode() == NM_DedicatedServer)
 			{
-				auto Handle =
-					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnSkillUnitChanged.AddCallback(
-						std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-						));
-				Handle->bIsAutoUnregister = false;
-			}
-			{
-				auto Handle =
-					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnCoinUnitChanged.AddCallback(
-						std::bind(&UGetItemInfos::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
-						));
-				Handle->bIsAutoUnregister = false;
-			}
-			{
-				auto Handle =
-					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnConsumableUnitChanged.AddCallback(
-						std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
-						));
-				Handle->bIsAutoUnregister = false;
-			}
-			{
-				auto Handle =
-					GetHoldingItemsComponent()->GetSceneUnitContainer()->OnGroupmateUnitChanged.AddCallback(
-						std::bind(&UGetItemInfos::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-						));
-				Handle->bIsAutoUnregister = false;
-			}
+				auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
+				{
+					auto Handle =
+						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnSkillUnitChanged.AddCallback(
+							std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+							));
+					Handle->bIsAutoUnregister = false;
+				}
+				{
+					auto Handle =
+						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnCoinUnitChanged.AddCallback(
+							std::bind(&UGetItemInfos::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+							));
+					Handle->bIsAutoUnregister = false;
+				}
+				{
+					auto Handle =
+						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnConsumableUnitChanged.AddCallback(
+							std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+							));
+					Handle->bIsAutoUnregister = false;
+				}
+				{
+					auto Handle =
+						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnGroupmateUnitChanged.AddCallback(
+							std::bind(&UGetItemInfos::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+							));
+					Handle->bIsAutoUnregister = false;
+				}
 #if TESTPLAYERCHARACTERHOLDDATA
-			TestCommand::AddPlayerCharacterTestDataImp(this);
+				TestCommand::AddPlayerCharacterTestDataImp(this);
+#endif
+			}
 #endif
 		}
 		else if (GetController()->IsA(AHumanAIController::StaticClass()))

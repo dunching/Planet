@@ -108,7 +108,7 @@ void USkill_Active_GroupTherapy::EmitEffect()
 		{
 			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				TeammatesSet.Add(Iter->ProxyCharacterPtr);
+				TeammatesSet.Add(Iter->ProxyCharacterPtr.Get());
 			}
 		}
 	}

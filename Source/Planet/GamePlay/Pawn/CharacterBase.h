@@ -97,8 +97,6 @@ public:
 
 	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
 
-	void SetCharacterUnit(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
-
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
@@ -108,7 +106,8 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
-
+	
+	UPROPERTY(Transient)
 	UCharacterTitle* CharacterTitlePtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
@@ -129,6 +128,8 @@ protected:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	virtual void SpawnDefaultController()override;
+
+	void InitialCharacterUnit();
 
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,

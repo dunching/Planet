@@ -178,6 +178,10 @@ TSharedPtr<FBasicProxy> FSceneUnitContainer::AddUnit(FGameplayTag UnitType, int3
 	{
 		return AddUnit_Consumable(UnitType);
 	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->DataSource_Character))
+	{
+		return AddUnit_Consumable(UnitType);
+	}
 
 	return nullptr;
 }

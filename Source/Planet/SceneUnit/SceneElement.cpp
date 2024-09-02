@@ -64,10 +64,10 @@ void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>
 
 	AllocationCharacterUnitPtr = InAllocationCharacterUnitPtr;
 
-	OnAllocationCharacterUnitChanged.ExcuteCallback(AllocationCharacterUnitPtr);
+	OnAllocationCharacterUnitChanged.ExcuteCallback(nullptr);
 }
 
-TSharedPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterUnit() const
+TWeakPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterUnit() const
 {
 	return AllocationCharacterUnitPtr;
 }
@@ -117,7 +117,7 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 	auto CurRemainingCooldown = -1.f;
 	auto CurRemainingCooldownPercent = -1.f;
 
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -147,7 +147,7 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 
 bool FConsumableProxy::CheckCooldown() const
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -171,7 +171,7 @@ void FConsumableProxy::AddCooldownConsumeTime(float NewTime)
 
 void FConsumableProxy::FreshUniqueCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -184,14 +184,14 @@ void FConsumableProxy::FreshUniqueCooldownTime()
 
 void FConsumableProxy::ApplyCooldown()
 {
-	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
 	);
 }
 
 void FConsumableProxy::OffsetCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
 	);
 
@@ -286,7 +286,7 @@ void FSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>
 
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 
-	if (AllocationCharacterUnitPtr)
+	if (AllocationCharacterUnitPtr.IsValid())
 	{
 		RegisterSkill();
 	}
@@ -306,17 +306,17 @@ void FSkillProxy::RegisterSkill()
 	GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
 	GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
 
-	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+	auto ProxyCharacterPtr = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
 	GameplayAbilitySpecHandle = ProxyCharacterPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 }
 
 void FSkillProxy::UnRegisterSkill()
 {
-	if (GetAllocationCharacterUnit())
+	if (GetAllocationCharacterUnit().IsValid())
 	{
-		auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+		auto ProxyCharacterPtr = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
 
-		if (ProxyCharacterPtr)
+		if (ProxyCharacterPtr.IsValid())
 		{
 			auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
 
@@ -330,7 +330,7 @@ void FSkillProxy::UnRegisterSkill()
 
 USkill_Base* FSkillProxy::GetGAInst()const
 {
-	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+	auto ProxyCharacterPtr = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
 	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
 	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
 	if (GameplayAbilitySpecPtr)
@@ -473,7 +473,7 @@ bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& Re
 	auto CurRemainingCooldown = -1.f;
 	auto CurRemainingCooldownPercent = -1.f;
 
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -503,7 +503,7 @@ bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& Re
 
 bool FActiveSkillProxy::CheckCooldown() const
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -523,7 +523,7 @@ bool FActiveSkillProxy::CheckCooldown() const
 
 void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -535,7 +535,7 @@ void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
 
 void FActiveSkillProxy::FreshUniqueCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -548,18 +548,18 @@ void FActiveSkillProxy::FreshUniqueCooldownTime()
 
 void FActiveSkillProxy::ApplyCooldown()
 {
-	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
 	);
 }
 
 void FActiveSkillProxy::OffsetCooldownTime()
 {
-	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyUniqueCooldown(
+	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyUniqueCooldown(
 		this
 	);
 
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
