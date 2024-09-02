@@ -59,7 +59,7 @@ public:
 
 	virtual bool CanUse()const;
 
-	void ContinueActive(UConsumableUnit* UnitPtr);
+	void ContinueActive(const TSharedPtr<FConsumableProxy>& UnitPtr);
 
 protected:
 
@@ -70,7 +70,7 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	UConsumableUnit* UnitPtr = nullptr;
+	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
 
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>CooldownMap;
 

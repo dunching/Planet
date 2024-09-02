@@ -459,7 +459,7 @@ bool UInteractiveSkillComponent::ActiveSkill_Active(
 		return false;
 	}
 
-	auto ActiveSkillUnitPtr = Cast<UActiveSkillUnit>((*SkillIter)->SkillUnitPtr);
+	auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>((*SkillIter)->SkillUnitPtr);
 	if (!ActiveSkillUnitPtr)
 	{
 		return false;
@@ -593,7 +593,7 @@ void UInteractiveSkillComponent::CancelAction(const TSharedPtr<FCanbeInteraction
 	}
 }
 
-bool UInteractiveSkillComponent::ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr)
+bool UInteractiveSkillComponent::ActivedCorrespondingWeapon(const TSharedPtr<FActiveSkillProxy>& ActiveSkillUnitPtr)
 {
 	if (ActiveSkillUnitPtr)
 	{

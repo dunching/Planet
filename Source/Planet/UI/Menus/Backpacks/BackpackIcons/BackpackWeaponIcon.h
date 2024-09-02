@@ -10,8 +10,8 @@
 
 struct FStreamableHandle;
 
-class UBasicUnit;
-class UWeaponUnit;
+struct FBasicProxy;
+struct FWeaponProxy;
 
 /**
  *
@@ -28,7 +28,7 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -44,6 +44,6 @@ protected:
 
 private:
 
-	UWeaponUnit* UnitPtr = nullptr;
+	TSharedPtr<FWeaponProxy> UnitPtr = nullptr;
 
 };

@@ -28,7 +28,7 @@ public:
 
 	TSharedPtr<FSceneUnitContainer> GetSceneUnitContainer();
 
-	UBasicUnit* AddUnit(FGameplayTag UnitType, int32 Num);
+	TSharedPtr<FBasicProxy> AddUnit(FGameplayTag UnitType, int32 Num);
 
 	void AddUnit_Apending(FGameplayTag UnitType, FGuid Guid);
 

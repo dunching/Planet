@@ -27,7 +27,7 @@ void USkill_Active_Base::OnAvatarSet(
 
 	if (SkillUnitPtr)
 	{
-		Cast<UActiveSkillUnit>(SkillUnitPtr)->OffsetCooldownTime();
+		DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->OffsetCooldownTime();
 	}
 }
 
@@ -70,7 +70,7 @@ bool USkill_Active_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	Cast<UActiveSkillUnit>(SkillUnitPtr)->ApplyCooldown();
+	DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->ApplyCooldown();
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
@@ -83,7 +83,7 @@ bool USkill_Active_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (!Cast<UActiveSkillUnit>(SkillUnitPtr)->CheckCooldown())
+	if (!DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->CheckCooldown())
 	{
 		return false;
 	}

@@ -12,7 +12,7 @@
 #include "InteractiveBaseGAComponent.generated.h"
 
 class UGAEvent_Received;
-class UConsumableUnit;
+struct FConsumableProxy;
 class UCS_PeriodicPropertyModify;
 class UCS_RootMotion;
 class UCS_Base;

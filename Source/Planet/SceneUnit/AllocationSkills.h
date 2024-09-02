@@ -12,21 +12,21 @@
 
 #include "AllocationSkills.generated.h"
 
-class USkillUnit;
-class UWeaponUnit;
+struct FSkillProxy;
+struct FWeaponProxy;
 
 struct FSkillSocket
 {
 	FGameplayTag SkillSocket;
 
-	USkillUnit* SkillUnit = nullptr;
+	FSkillProxy* SkillUnit = nullptr;
 };
 
 struct FWeaponSocket
 {
 	FGameplayTag SkillSocket;
 
-	UWeaponUnit* WeaponUnitPtr = nullptr;
+	FWeaponProxy* WeaponUnitPtr = nullptr;
 };
 
 USTRUCT(BlueprintType)

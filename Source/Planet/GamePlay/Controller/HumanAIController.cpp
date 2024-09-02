@@ -71,7 +71,7 @@ bool AHumanAIController::CheckIsFarawayOriginal() const
 
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	FCharacterUnitType* LeaderCharacterUnitPtr
+	const TSharedPtr < FCharacterUnitType>& LeaderCharacterUnitPtr
 )
 {
 }
@@ -214,7 +214,7 @@ void AHumanAIController::InitialCharacter()
 				{
 					TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 					{
-						auto WeaponUnitPtr = Cast<UWeaponUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo, 1));
+						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo, 1));
 						if (WeaponUnitPtr)
 						{
 							FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
@@ -225,7 +225,7 @@ void AHumanAIController::InitialCharacter()
 
 					TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 					{
-						auto WeaponUnitPtr = Cast<UWeaponUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo, 1));
+						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo, 1));
 						if (WeaponUnitPtr)
 						{
 							SecondWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
@@ -243,7 +243,7 @@ void AHumanAIController::InitialCharacter()
 				{
 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
 					{
-						auto SkillUnitPtr = Cast<USkillUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1, 1));
+						auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1, 1));
 						if (SkillUnitPtr)
 						{
 							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
@@ -255,7 +255,7 @@ void AHumanAIController::InitialCharacter()
 						}
 					}
 					{
-						auto SkillUnitPtr = Cast<USkillUnit>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2, 1));
+						auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2, 1));
 						if (SkillUnitPtr)
 						{
 							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();

@@ -93,7 +93,7 @@ bool USkill_Consumable_Base::CommitAbility(
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
-void USkill_Consumable_Base::ContinueActive(UConsumableUnit* InUnitPtr)
+void USkill_Consumable_Base::ContinueActive(const TSharedPtr<FConsumableProxy>& InUnitPtr)
 {
 	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
 	{

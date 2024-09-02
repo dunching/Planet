@@ -20,9 +20,9 @@ class UAnimInstanceCharacter;
 class UZYInputComponent;
 class UCharacterTitle;
 class UGroupMnaggerComponent;
-class UCharacterUnit;
-class USkillUnit;
-class UConsumableUnit;
+struct FCharacterProxy;
+struct FSkillProxy;
+struct FConsumableProxy;
 
 UCLASS()
 class PLANET_API AHumanCharacter : public ACharacterBase

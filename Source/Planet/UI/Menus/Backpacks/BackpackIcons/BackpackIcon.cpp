@@ -45,13 +45,13 @@ void UBackpackIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
 }
 
-void UBackpackIcon::ResetToolUIByData(UBasicUnit * InBasicUnitPtr)
+void UBackpackIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	BasicUnitPtr = InBasicUnitPtr;
 
 	if (BasicUnitPtr)
 	{
-		SetItemType(BasicUnitPtr);
+		SetItemType(BasicUnitPtr.Get());
 
 		OnAllocationCharacterUnitChangedHandle = BasicUnitPtr->OnAllocationCharacterUnitChanged.AddCallback(
 			std::bind(&ThisClass::OnAllocationCharacterUnitChanged, this, std::placeholders::_1)
@@ -119,7 +119,7 @@ void UBackpackIcon::OnDroped(UDragDropOperation* Operation)
 	OnDragDelegate.ExcuteCallback(false, nullptr);
 }
 
-void UBackpackIcon::SetItemType(UBasicUnit* InBasicUnitPtr)
+void UBackpackIcon::SetItemType(FBasicProxy* InBasicUnitPtr)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FBackpackIcon::Get().Icon));
 	if (ImagePtr)
@@ -141,7 +141,7 @@ void UBackpackIcon::SetItemType(UBasicUnit* InBasicUnitPtr)
 	}
 }
 
-void UBackpackIcon::OnAllocationCharacterUnitChanged(UCharacterUnit* AllocationCharacterUnitPtr)
+void UBackpackIcon::OnAllocationCharacterUnitChanged(const TSharedPtr<FCharacterProxy>& AllocationCharacterUnitPtr)
 {
 	if (AllocationCharacterUnitPtr)
 	{

@@ -13,8 +13,8 @@
 
 struct FStreamableHandle;
 
-class UBasicUnit;
-class UCharacterUnit;
+struct FBasicProxy;
+struct FCharacterProxy;
 
 UCLASS()
 class PLANET_API UHUD_TeamMateInfo :
@@ -27,7 +27,7 @@ public:
 
 	virtual void NativeConstruct()override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -37,6 +37,6 @@ protected:
 
 private:
 
-	UCharacterUnit* GroupMateUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> GroupMateUnitPtr = nullptr;
 
 };

@@ -10,7 +10,7 @@
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
-class UConsumableUnit;
+struct FConsumableProxy;
 class UEffectItem;
 class ASPlineActor;
 class ATornado;

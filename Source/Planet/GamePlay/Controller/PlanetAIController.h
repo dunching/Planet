@@ -12,7 +12,7 @@
 #include "PlanetAIController.generated.h"
 
 class UPlanetAbilitySystemComponent;
-class UCharacterUnit;
+struct FCharacterProxy;
 class ACharacterBase;
 class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
@@ -45,7 +45,7 @@ public:
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
 
-	virtual UCharacterUnit* GetCharacterUnit() override;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterUnit() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;
 	
@@ -63,11 +63,11 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)override;
+	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)override;
 
 	virtual void BindPCWithCharacter()override;
 
-	virtual UCharacterUnit* InitialCharacterUnit(ACharacterBase* CharaterPtr)override;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase* CharaterPtr)override;
 	
 	UFUNCTION()
 	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);

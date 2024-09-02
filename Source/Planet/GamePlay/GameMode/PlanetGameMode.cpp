@@ -86,30 +86,12 @@ void APlanetGameMode::OnVoxelWorldLoad()
 {
 }
 
-UCharacterUnit* APlanetGameMode::AddCharacterUnit(FGameplayTag UnitType)
+FCharacterProxy* APlanetGameMode::AddCharacterUnit(FGameplayTag UnitType)
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-	auto ResultPtr = NewObject<UCharacterUnit>(GetWorld(), SceneUnitExtendInfoPtr->UnitClass);
-	//	ResultPtr->AddToRoot();
-
-	const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-
-	ResultPtr->ID = NewID;
-	ResultPtr->UnitType = UnitType;
-
-	auto SceneUnitContainer = ResultPtr->SceneUnitContainer;
-
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_Regular, 0);
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RafflePermanent, 0);
-	SceneUnitContainer->AddUnit_Coin(UGameplayTagsSubSystem::GetInstance()->Unit_Coin_RaffleLimit, 0);
-
-	CharacterUnitMap.Add(ResultPtr->ID, ResultPtr);
-
-	return ResultPtr;
+	return nullptr;
 }
 
-UCharacterUnit* APlanetGameMode::FindCharacterUnit(int32 ID)
+FCharacterProxy* APlanetGameMode::FindCharacterUnit(int32 ID)
 {
 	if (CharacterUnitMap.Contains(ID))
 	{

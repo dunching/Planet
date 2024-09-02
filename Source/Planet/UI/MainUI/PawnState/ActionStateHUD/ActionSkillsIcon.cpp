@@ -29,6 +29,7 @@
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
+#include "SceneElement.h"
 
 struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 {
@@ -74,7 +75,7 @@ void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
+void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
@@ -87,7 +88,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 			)
 		{
-			UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
+			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(BasicUnitPtr);
 		}
 	}
 
@@ -134,7 +135,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto ActiveSkillUnitPtr = Cast<UActiveSkillUnit>(SkillSocketInfoSPtr->SkillUnitPtr);
+		auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SkillSocketInfoSPtr->SkillUnitPtr);
 		if (!ActiveSkillUnitPtr)
 		{
 			return;
@@ -309,7 +310,7 @@ bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
  		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
  		if (WidgetDragPtr)
 		{
-			auto SkillUnitPtr = Cast<USkillUnit>(WidgetDragPtr->SceneToolSPtr);
+			auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
 // 			if (SkillUnitPtr && SkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
 // 			{
 // 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);

@@ -14,13 +14,13 @@
 
 class UAbilityTask_TimerHelper;
 class AConsumable_Base;
-class UConsumableUnit;
+struct FConsumableProxy;
 class UGA_Tool_Periodic;
 class UGameplayAbility;
 
 struct FGameplayAbilityTargetData_Consumable : public FGameplayAbilityTargetData
 {
-	UConsumableUnit* UnitPtr = nullptr;
+	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
 };
 
 UCLASS()

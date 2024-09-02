@@ -11,7 +11,7 @@
 
 #include "InteractiveConsumablesComponent.generated.h"
 
-class UConsumableUnit;
+struct FConsumableProxy;
 class USkill_Consumable_Generic;
 
 struct FCanbeInteractionInfo;
@@ -22,7 +22,7 @@ struct FConsumableSocketInfo
 
 	FGameplayTag SkillSocket;
 
-	UConsumableUnit* UnitPtr = nullptr;
+	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
 };
 
 UCLASS(BlueprintType, Blueprintable)

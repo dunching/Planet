@@ -10,18 +10,16 @@
 #include "SceneUnitExtendInfo.h"
 #include "GameplayTagsSubSystem.h"
 
-UWeaponUnit* FSceneUnitContainer::AddUnit_Weapon(FGameplayTag UnitType)
+TSharedPtr<FWeaponProxy> FSceneUnitContainer::AddUnit_Weapon(FGameplayTag UnitType)
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-	auto ResultPtr = NewObject<UWeaponUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
-	ResultPtr->AddToRoot();
+	auto ResultPtr = MakeShared<FWeaponProxy>();
 
 #if WITH_EDITOR
 	TestGCUnitMap.Add(ResultPtr);
 #endif
 
-	ResultPtr->ID = GetValidID();
 	ResultPtr->UnitType = UnitType;
 
 	ResultPtr->FirstSkill = AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType);
@@ -34,12 +32,12 @@ UWeaponUnit* FSceneUnitContainer::AddUnit_Weapon(FGameplayTag UnitType)
 	return ResultPtr;
 }
 
-UWeaponUnit* FSceneUnitContainer::FindUnit_Weapon(FGameplayTag UnitType)
+TSharedPtr<FWeaponProxy> FSceneUnitContainer::FindUnit_Weapon(FGameplayTag UnitType)
 {
 	return nullptr;
 }
 
-USkillUnit* FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
+TSharedPtr<FSkillProxy>  FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
 {
 	if (SkillUnitMap.Contains(UnitType))
 	{
@@ -51,19 +49,12 @@ USkillUnit* FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
 	{
 		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-		auto ResultPtr = NewObject<USkillUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
-		ResultPtr->AddToRoot();
+		auto ResultPtr = MakeShared<FSkillProxy>();
 
 #if WITH_EDITOR
 		TestGCUnitMap.Add(ResultPtr);
 #endif
 
-		if (!ResultPtr)
-		{
-			return nullptr;
-		}
-
-		ResultPtr->ID = GetValidID();
 		ResultPtr->UnitType = UnitType;
 
 		SceneToolsAry.Add(ResultPtr);
@@ -74,7 +65,7 @@ USkillUnit* FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
 	}
 }
 
-USkillUnit* FSceneUnitContainer::FindUnit_Skill(FGameplayTag UnitType)
+TSharedPtr<FSkillProxy> FSceneUnitContainer::FindUnit_Skill(FGameplayTag UnitType)
 {
 	auto Iter = SkillUnitMap.Find(UnitType);
 	if (Iter)
@@ -85,7 +76,7 @@ USkillUnit* FSceneUnitContainer::FindUnit_Skill(FGameplayTag UnitType)
 	return nullptr;
 }
 
-void FSceneUnitContainer::AddUnit_Groupmate(UCharacterUnit* UnitPtr)
+void FSceneUnitContainer::AddUnit_Groupmate(const TSharedPtr<FCharacterProxy>& UnitPtr)
 {
 	SceneToolsAry.Add(UnitPtr);
 	SceneMetaMap.Add(UnitPtr->ID, UnitPtr);
@@ -93,7 +84,7 @@ void FSceneUnitContainer::AddUnit_Groupmate(UCharacterUnit* UnitPtr)
 	OnGroupmateUnitChanged.ExcuteCallback(UnitPtr, true);
 }
 
-UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, int32 Num)
+TSharedPtr <FConsumableProxy> FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, int32 Num)
 {
 	check(Num > 0);
 
@@ -111,15 +102,13 @@ UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, 
 	{
 		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-		auto ResultPtr = NewObject<UConsumableUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
-		ResultPtr->AddToRoot();
+		auto ResultPtr = MakeShared<FConsumableProxy>();
 
 #if WITH_EDITOR
 		TestGCUnitMap.Add(ResultPtr);
 #endif
 
 		ResultPtr->Num = Num;
-		ResultPtr->ID = GetValidID();
 		ResultPtr->UnitType = UnitType;
 
 		SceneToolsAry.Add(ResultPtr);
@@ -132,18 +121,16 @@ UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, 
 	}
 }
 
-UToolUnit* FSceneUnitContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
+TSharedPtr<FToolProxy> FSceneUnitContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-	auto ResultPtr = NewObject<UToolUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
-	ResultPtr->AddToRoot();
+	auto ResultPtr = MakeShared<FToolProxy>();
 
 #if WITH_EDITOR
 	TestGCUnitMap.Add(ResultPtr);
 #endif
 
-	ResultPtr->ID = GetValidID();
 	ResultPtr->UnitType = UnitType;
 
 	SceneToolsAry.Add(ResultPtr);
@@ -163,12 +150,11 @@ FSceneUnitContainer::~FSceneUnitContainer()
 				TestGCUnitMap.Remove(Iter);
 			}
 
-			Iter->RemoveFromRoot();
 		}
 	}
 }
 
-UBasicUnit* FSceneUnitContainer::AddUnit(FGameplayTag UnitType, int32 Num)
+TSharedPtr<FBasicProxy> FSceneUnitContainer::AddUnit(FGameplayTag UnitType, int32 Num)
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
@@ -196,7 +182,7 @@ UBasicUnit* FSceneUnitContainer::AddUnit(FGameplayTag UnitType, int32 Num)
 	return nullptr;
 }
 
-UBasicUnit* FSceneUnitContainer::FindUnit(int32 ID)
+TSharedPtr<FBasicProxy> FSceneUnitContainer::FindUnit(IDType ID)
 {
 	auto Iter = SceneMetaMap.Find(ID);
 	if (Iter)
@@ -207,7 +193,7 @@ UBasicUnit* FSceneUnitContainer::FindUnit(int32 ID)
 	return nullptr;
 }
 
-void FSceneUnitContainer::RemoveUnit(int32 ID)
+void FSceneUnitContainer::RemoveUnit(IDType ID)
 {
 	auto TargetIter = SceneMetaMap.Find(ID);
 
@@ -226,7 +212,7 @@ void FSceneUnitContainer::RemoveUnit(int32 ID)
 	}
 }
 
-UCoinUnit* FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*= 1*/)
+TSharedPtr<FCoinProxy> FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*= 1*/)
 {
 	if (CoinUnitMap.Contains(UnitType))
 	{
@@ -242,15 +228,13 @@ UCoinUnit* FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*
 	{
 		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-		auto ResultPtr = NewObject<UCoinUnit>(GetWorldImp(), SceneUnitExtendInfoPtr->UnitClass);
-		ResultPtr->AddToRoot();
+		auto ResultPtr = MakeShared<FCoinProxy>();
 
 #if WITH_EDITOR
 		TestGCUnitMap.Add(ResultPtr);
 #endif
 
 		ResultPtr->Num = Num;
-		ResultPtr->ID = GetValidID();
 		ResultPtr->UnitType = UnitType;
 
 		SceneToolsAry.Add(ResultPtr);
@@ -263,7 +247,7 @@ UCoinUnit* FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*
 	}
 }
 
-UCoinUnit* FSceneUnitContainer::FindUnit_Coin(FGameplayTag UnitType)
+TSharedPtr<FCoinProxy> FSceneUnitContainer::FindUnit_Coin(FGameplayTag UnitType)
 {
 	auto Iter = CoinUnitMap.Find(UnitType);
 	if (Iter)
@@ -274,7 +258,7 @@ UCoinUnit* FSceneUnitContainer::FindUnit_Coin(FGameplayTag UnitType)
 	return nullptr;
 }
 
-void FSceneUnitContainer::RemoveUnit_Consumable(UConsumableUnit* UnitPtr, int32 Num /*= 1*/)
+void FSceneUnitContainer::RemoveUnit_Consumable(const TSharedPtr<FConsumableProxy>& UnitPtr, int32 Num /*= 1*/)
 {
 	if (UnitPtr)
 	{
@@ -284,25 +268,25 @@ void FSceneUnitContainer::RemoveUnit_Consumable(UConsumableUnit* UnitPtr, int32 
 	}
 }
 
-const TArray<UBasicUnit*>& FSceneUnitContainer::GetSceneUintAry() const
+const TArray<TSharedPtr<FBasicProxy>>& FSceneUnitContainer::GetSceneUintAry() const
 {
 	return SceneToolsAry;
 }
 
-const TMap<FGameplayTag, UCoinUnit*>& FSceneUnitContainer::GetCoinUintAry() const
+const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& FSceneUnitContainer::GetCoinUintAry() const
 {
 	return CoinUnitMap;
 }
 
-TArray<UCharacterUnit*> FSceneUnitContainer::GetGourpmateUintAry() const
+TArray<TSharedPtr<FCharacterProxy>> FSceneUnitContainer::GetGourpmateUintAry() const
 {
-	TArray<UCharacterUnit*> Result;
+	TArray<TSharedPtr<FCharacterProxy>> Result;
 
 	for (auto Iter : SceneToolsAry)
 	{
 		if (Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 		{
-			auto GroupmateUnitPtr = Cast<UCharacterUnit>(Iter);
+			auto GroupmateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(Iter);
 			check(GroupmateUnitPtr);
 			if (GroupmateUnitPtr)
 			{
@@ -317,21 +301,6 @@ TArray<UCharacterUnit*> FSceneUnitContainer::GetGourpmateUintAry() const
 int32 FSceneUnitContainer::GetValidID() const
 {
 	int32 Result = 0;
-
-	for (;;)
-	{
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-		if (SceneMetaMap.Contains(NewID))
-		{
-			continue;
-		}
-		else
-		{
-			Result = NewID;
-
-			break;
-		}
-	}
 
 	return Result;
 }

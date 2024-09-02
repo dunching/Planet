@@ -13,6 +13,7 @@
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
 #include "GameplayTagsSubSystem.h"
+#include "TemplateHelper.h"
 
 namespace CoinInfo
 {
@@ -41,11 +42,11 @@ void UCoinInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UCoinInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UCoinInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
 	{
-		UnitPtr = Cast<UCoinUnit>(BasicUnitPtr);
+		UnitPtr = DynamicCastSharedPtr<FCoinProxy>(BasicUnitPtr);
 
 		OnNumChanged = UnitPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
 

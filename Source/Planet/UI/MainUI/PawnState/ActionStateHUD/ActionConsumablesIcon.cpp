@@ -68,7 +68,7 @@ void UActionConsumablesIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UActionConsumablesIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
+void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
@@ -80,7 +80,7 @@ void UActionConsumablesIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
 			)
 		{
-			UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
+			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);
 		}
 	}
 

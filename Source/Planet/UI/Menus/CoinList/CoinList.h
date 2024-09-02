@@ -12,7 +12,7 @@
 #include "CoinList.generated.h"
 
 class UCoinInfo;
-class UCoinUnit;
+struct FCoinProxy;
 
 /**
  *
@@ -28,7 +28,7 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	virtual void ResetUIByData(const TMap<FGameplayTag, UCoinUnit*>& CoinMap);
+	virtual void ResetUIByData(const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& CoinMap);
 
 protected:
 	

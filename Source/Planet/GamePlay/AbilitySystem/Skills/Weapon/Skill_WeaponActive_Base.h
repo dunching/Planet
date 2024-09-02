@@ -9,7 +9,7 @@
 
 #include "Skill_WeaponActive_Base.generated.h"
 
-class UBasicUnit;
+struct FBasicProxy;
 class UAbilityTask_TimerHelper;
 
 struct FGameplayAbilityTargetData_Skill_Weapon : public FGameplayAbilityTargetData

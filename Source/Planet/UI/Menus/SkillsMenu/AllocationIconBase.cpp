@@ -56,7 +56,7 @@ void UAllocationIconBase::InvokeReset(UUserWidget* InBasicUnitPtr)
 	}
 }
 
-void UAllocationIconBase::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	if (InBasicUnitPtr == BasicUnitPtr)
 	{
@@ -64,7 +64,7 @@ void UAllocationIconBase::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 	}
 
 	auto PreviousUnitPtr = BasicUnitPtr;
-	UBasicUnit * NewUnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> NewUnitPtr = nullptr;
 	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UnitType))
 	{
 		NewUnitPtr = InBasicUnitPtr;
@@ -85,7 +85,7 @@ void UAllocationIconBase::EnableIcon(bool bIsEnable)
 
 }
 
-void UAllocationIconBase::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
+void UAllocationIconBase::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)
 {
 	if (bIsDragging)
 	{
@@ -104,7 +104,7 @@ void UAllocationIconBase::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
 	}
 }
 
-void UAllocationIconBase::SublingIconUnitChanged(UBasicUnit* UnitPtr)
+void UAllocationIconBase::SublingIconUnitChanged(const TSharedPtr<FBasicProxy>& UnitPtr)
 {
 	if (BasicUnitPtr && (BasicUnitPtr == UnitPtr))
 	{

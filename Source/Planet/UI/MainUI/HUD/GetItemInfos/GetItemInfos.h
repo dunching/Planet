@@ -15,10 +15,10 @@ class UHUD_TeamMateInfo;
 
 class UGetItemInfosItem;
 
-class UBasicUnit;
-class UCoinUnit;
-class USkillUnit;
-class UConsumableUnit;
+struct FBasicProxy;
+struct FCoinProxy;
+struct FSkillProxy;
+struct FConsumableProxy;
 
 UCLASS()
 class PLANET_API UGetItemInfos : public UMyUserWidget, public IMenuInterface
@@ -35,13 +35,13 @@ public:
 
 	virtual void ResetUIByData()override;
 
-	void OnSkillUnitChanged(USkillUnit* UnitPtr, bool bIsAdd);
+	void OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd);
 
-	void OnCoinUnitChanged(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num);
+	void OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
 
-	void OnConsumableUnitChanged(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num);
+	void OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num);
 	
-	void OnGourpmateUnitChanged(UCharacterUnit* UnitPtr, bool bIsAdd);
+	void OnGourpmateUnitChanged(const TSharedPtr< FCharacterProxy>& UnitPtr, bool bIsAdd);
 
 protected:
 

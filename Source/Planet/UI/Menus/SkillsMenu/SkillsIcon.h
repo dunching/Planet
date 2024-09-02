@@ -16,11 +16,11 @@
 struct FStreamableHandle;
 class UDragDropOperation;
 
-class USkillUnit;
+struct FSkillProxy;
 
 /**
- * 作为技能Icon
- * 1.同类的需要能互相移除 2.右键移除 3.拖拽时禁用对应的Icon
+ * 浣滀负鎶�鑳絀con
+ * 1.鍚岀被鐨勯渶瑕佽兘浜掔浉绉婚櫎 2.鍙抽敭绉婚櫎 3.鎷栨嫿鏃剁鐢ㄥ搴旂殑Icon
  */
 UCLASS()
 class PLANET_API USkillsIcon : public UAllocationIconBase
@@ -31,7 +31,7 @@ public:
 
 	USkillsIcon(const FObjectInitializer& ObjectInitializer);
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 

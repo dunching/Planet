@@ -13,7 +13,7 @@
 
 #include "UIInterfaces.generated.h"
 
-class UBasicUnit;
+struct FBasicProxy;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class UUnitIconInterface : public UInterface
@@ -30,7 +30,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr) = 0;
 	
-	virtual void ResetToolUIByData(UBasicUnit * BasicUnitPtr) = 0;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr) = 0;
 
 	virtual void EnableIcon(bool bIsEnable) = 0;
 

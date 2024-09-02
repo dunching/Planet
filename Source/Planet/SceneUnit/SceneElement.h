@@ -36,7 +36,8 @@ class APlanetGameMode;
 class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter;
-class UCharacterUnit;
+class UHoldingItemsComponent;
+struct FCharacterProxy;
 
 struct FAllocationSkills;
 struct FCharacterAttributes;
@@ -44,20 +45,12 @@ struct FTalentHelper;
 struct FSceneUnitContainer;
 struct FSkillCooldownHelper;
 
-enum class ECharacterPropertyType : uint8;
+enum struct ECharacterPropertyType : uint8;
 
 FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag);
 
-UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UUnit_Cooldown : public UInterface
+struct PLANET_API IUnit_Cooldown
 {
-	GENERATED_BODY()
-};
-
-class PLANET_API IUnit_Cooldown
-{
-	GENERATED_BODY()
-
 public:
 
 	virtual bool GetRemainingCooldown(
@@ -79,21 +72,22 @@ public:
 // 场景内的对象代理
 // 通用数据记录在DataTable，变化数据记录在对象内
 // 序列化&反序列化
-UCLASS(BlueprintType)
-class PLANET_API UBasicUnit : public UObject
+USTRUCT()
+struct PLANET_API FBasicProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
 	friend FSceneUnitContainer;
+	friend UHoldingItemsComponent;
 	friend APlanetGameMode;
 
-	using IDType = int32;
+	using IDType = FGuid;
 
-	UBasicUnit();
+	FBasicProxy();
 
-	virtual ~UBasicUnit();
+	virtual ~FBasicProxy();
 
 	virtual void InitialUnit();
 
@@ -106,11 +100,11 @@ public:
 	// 
 	FString GetUnitName()const;
 
-	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
+	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& AllocationCharacterUnitPtr);
 
-	TCallbackHandleContainer<void(UCharacterUnit*)> OnAllocationCharacterUnitChanged;
+	TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&)> OnAllocationCharacterUnitChanged;
 
-	UCharacterUnit* GetAllocationCharacterUnit()const;
+	TSharedPtr<FCharacterProxy> GetAllocationCharacterUnit()const;
 
 protected:
 
@@ -120,8 +114,10 @@ protected:
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
 
 	// 这个物品被分配给的对象
-	UPROPERTY(Transient)
-	UCharacterUnit* AllocationCharacterUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> AllocationCharacterUnitPtr = nullptr;
+	
+	// 这个物品所在的对象
+	TSharedPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
 
 private:
 
@@ -129,16 +125,16 @@ private:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UCoinUnit : public UBasicUnit
+USTRUCT()
+struct PLANET_API FCoinProxy : public FBasicProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
 	friend FSceneUnitContainer;
 
-	UCoinUnit();
+	FCoinProxy();
 
 	void AddCurrentValue(int32 val);
 
@@ -152,18 +148,18 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UConsumableUnit : 
-	public UBasicUnit,
+USTRUCT()
+struct PLANET_API FConsumableProxy : 
+	public FBasicProxy,
 	public IUnit_Cooldown
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
 	friend FSceneUnitContainer;
 
-	UConsumableUnit();
+	FConsumableProxy();
 
 	void AddCurrentValue(int32 val);
 
@@ -193,23 +189,20 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UToolUnit : public UBasicUnit
+USTRUCT()
+struct PLANET_API FToolProxy : public FBasicProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
 	friend FSceneUnitContainer;
 
-	UToolUnit();
+	FToolProxy();
 
 	int32 GetNum()const;
 
 	int32 DamageDegree = 0;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolType")
-	TSubclassOf<AToolUnitBase> ToolActorClass;
 
 protected:
 
@@ -217,16 +210,16 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UCharacterUnit : public UBasicUnit
+USTRUCT()
+struct PLANET_API FCharacterProxy : public FBasicProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
 	using FPawnType = ACharacterBase;
 
-	UCharacterUnit();
+	FCharacterProxy();
 
 	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
 
@@ -245,22 +238,22 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API USkillUnit : public UBasicUnit
+USTRUCT()
+struct PLANET_API FSkillProxy : public FBasicProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
 	friend FSceneUnitContainer;
 
-	USkillUnit();
+	FSkillProxy();
 
 	int32 Level = 1;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
-	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)override;
+	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& AllocationCharacterUnitPtr)override;
 
 	void RegisterSkill();
 
@@ -276,14 +269,14 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UPassiveSkillUnit : public USkillUnit
+USTRUCT()
+struct PLANET_API FPassiveSkillProxy : public FSkillProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
-	UPassiveSkillUnit();
+	FPassiveSkillProxy();
 
 	virtual void InitialUnit()override;
 
@@ -297,16 +290,16 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UActiveSkillUnit :
-	public USkillUnit,
+USTRUCT()
+struct PLANET_API FActiveSkillProxy :
+	public FSkillProxy,
 	public IUnit_Cooldown
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
-	UActiveSkillUnit();
+	FActiveSkillProxy();
 
 	FTableRowUnit_ActiveSkillExtendInfo* GetTableRowUnit_ActiveSkillExtendInfo()const;
 
@@ -330,27 +323,27 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UTalentSkillUnit : public USkillUnit
+USTRUCT()
+struct PLANET_API FTalentSkillProxy : public FSkillProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
-	UTalentSkillUnit();
+	FTalentSkillProxy();
 
 protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UWeaponSkillUnit : public USkillUnit
+USTRUCT()
+struct PLANET_API FWeaponSkillProxy : public FSkillProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
-	UWeaponSkillUnit();
+	FWeaponSkillProxy();
 
 	FTableRowUnit_WeaponSkillExtendInfo* GetTableRowUnit_WeaponSkillExtendInfo()const;
 
@@ -360,20 +353,20 @@ protected:
 
 };
 
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UWeaponUnit : public UBasicUnit
+USTRUCT()
+struct PLANET_API FWeaponProxy : public FBasicProxy
 {
-	GENERATED_BODY()
+	GENERATED_USTRUCT_BODY()
 
 public:
 
 	friend FSceneUnitContainer;
 
-	UWeaponUnit();
+	FWeaponProxy();
 
 	virtual void InitialUnit()override;
 
-	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)override;
+	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& AllocationCharacterUnitPtr)override;
 
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
 
@@ -382,8 +375,7 @@ public:
 
 	int32 GetMaxAttackDistance()const;
 
-	UPROPERTY(Transient)
-	USkillUnit* FirstSkill = nullptr;
+	TSharedPtr<FSkillProxy >FirstSkill;
 	
 protected:
 	

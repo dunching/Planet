@@ -42,7 +42,7 @@ USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void USkillsIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 

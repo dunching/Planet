@@ -122,7 +122,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 	SyncAllocation2Character();
 }
 
-void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(UCharacterUnit* PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
 {
 	auto CharacterPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr;
 	if (!CharacterPtr)
@@ -192,7 +192,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(UCharacterUnit* PlayerCha
 	}
 }
 
-void UAllocationSkillsMenu::ResetUIByData_Skills(UCharacterUnit* PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
 {
 	{
 		TArray<FName>Ary
@@ -225,7 +225,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(UCharacterUnit* PlayerCharacter
 	}
 }
 
-void UAllocationSkillsMenu::ResetUIByData_Consumable(UCharacterUnit* PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
 {
 	TArray<FName>Ary
 	{
@@ -321,7 +321,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 					TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
 
 					SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
-					SkillsSocketInfo->SkillUnitPtr = Cast<USkillUnit>(IconPtr->BasicUnitPtr);
+					SkillsSocketInfo->SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(IconPtr->BasicUnitPtr);
 					SkillsSocketInfo->Key = Iter.Key;
 
 					SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
@@ -360,7 +360,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 					TSharedPtr<FConsumableSocketInfo >SkillsSocketInfo = MakeShared<FConsumableSocketInfo>();
 
 					SkillsSocketInfo->SkillSocket = IconPtr->IconSocket;
-					SkillsSocketInfo->UnitPtr = Cast<UConsumableUnit>(IconPtr->BasicUnitPtr);
+					SkillsSocketInfo->UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(IconPtr->BasicUnitPtr);
 					SkillsSocketInfo->Key = Iter.Key;
 
 					SkillsMap.Add(IconPtr->IconSocket, SkillsSocketInfo);
@@ -466,7 +466,7 @@ void UAllocationSkillsMenu::BindEvent()
 	}
 }
 
-void UAllocationSkillsMenu::ResetUI(UCharacterUnit* TargetCharacterUnitPtr, UCharacterUnit* PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetUI(const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr, const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
 {
 	CurrentUnitPtr = TargetCharacterUnitPtr;
 	ResetUIByData_WeaponSkills(CurrentUnitPtr);
@@ -539,7 +539,7 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 	}
 }
 
-void UAllocationSkillsMenu::ResetBackpack(UCharacterUnit* AICharacterUnitPtr, UCharacterUnit* PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetBackpack(const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr, const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
 {
 	if (AICharacterUnitPtr)
 	{
@@ -577,7 +577,7 @@ void UAllocationSkillsMenu::ResetBackpack(UCharacterUnit* AICharacterUnitPtr, UC
 	}
 }
 
-void UAllocationSkillsMenu::OnMainWeaponChanged(UWeaponUnit* ToolSPtr)
+void UAllocationSkillsMenu::OnMainWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
@@ -590,7 +590,7 @@ void UAllocationSkillsMenu::OnMainWeaponChanged(UWeaponUnit* ToolSPtr)
 	}
 }
 
-void UAllocationSkillsMenu::OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr)
+void UAllocationSkillsMenu::OnSecondaryWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
@@ -607,7 +607,7 @@ void UAllocationSkillsMenu::OnSecondaryWeaponChanged(UWeaponUnit* ToolSPtr)
 	}
 }
 
-void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
+void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)
 {
 	{
 		TArray<FName>Ary
@@ -672,7 +672,7 @@ void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr)
 	}
 }
 
-void UAllocationSkillsMenu::OnSelectedCharacterUnit(UCharacterUnit* UnitPtr)
+void UAllocationSkillsMenu::OnSelectedCharacterUnit(const TSharedPtr<FCharacterProxy>& UnitPtr)
 {
 	if (CurrentUnitPtr == UnitPtr)
 	{
@@ -712,7 +712,7 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(UCharacterUnit* UnitPtr)
 	}
 }
 
-void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
+void UAllocationSkillsMenu::OnSkillUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr)
 {
 	TArray<FName>Ary
 	{
@@ -755,7 +755,7 @@ void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBas
 	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
+void UAllocationSkillsMenu::OnWeaponUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr)
 {
 	TArray<FName>Ary
 	{
@@ -788,7 +788,7 @@ void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBa
 	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
+void UAllocationSkillsMenu::OnConsumableUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr)
 {
 	TArray<FName>Ary
 	{
@@ -823,7 +823,7 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr,
 	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::SetAllocation(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr, bool bIsReplaced)
+void UAllocationSkillsMenu::SetAllocation(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr, bool bIsReplaced)
 {
 	if (NewUnitPtr)
 	{

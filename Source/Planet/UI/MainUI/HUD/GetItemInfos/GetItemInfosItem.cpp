@@ -16,12 +16,12 @@ void UGetItemInfosItem::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
 }
 
-void UGetItemInfosItem::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	PlayThisAnimation();
 }
 
-void UGetItemInfosItem::ResetToolUIByData(USkillUnit* UnitPtr, bool bIsAdd)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd)
 {
 	SetTexutre(UnitPtr->GetIcon());
 
@@ -30,7 +30,7 @@ void UGetItemInfosItem::ResetToolUIByData(USkillUnit* UnitPtr, bool bIsAdd)
 	ResetToolUIByData(UnitPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num)
 {
 	SetTexutre(UnitPtr->GetIcon());
 
@@ -39,7 +39,7 @@ void UGetItemInfosItem::ResetToolUIByData(UConsumableUnit* UnitPtr, bool bIsAdd,
 	ResetToolUIByData(UnitPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num)
 {
 	SetTexutre(UnitPtr->GetIcon());
 
@@ -48,7 +48,7 @@ void UGetItemInfosItem::ResetToolUIByData(UCoinUnit* UnitPtr, bool bIsAdd, int32
 	ResetToolUIByData(UnitPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(UCharacterUnit* UnitPtr, bool bIsAdd)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd)
 {
 	SetTexutre(UnitPtr->GetIcon());
 

@@ -6,7 +6,7 @@
 
 #include "GameFramework/GameModeBase.h"
 
-#include "ThreadHelper.h"
+
 
 #include "UI/UIManagerSubSystem.h"
 
@@ -15,7 +15,7 @@
 extern PLANET_API class AShiYuGameMode* GGameModePtr;
 
 class UHoldingItemsComponent;
-class UCharacterUnit;
+struct FCharacterProxy;
 
 /**
  *
@@ -29,9 +29,9 @@ public:
 
 	APlanetGameMode();
 	
-	UCharacterUnit* AddCharacterUnit(FGameplayTag UnitType);
+	FCharacterProxy* AddCharacterUnit(FGameplayTag UnitType);
 
-	UCharacterUnit* FindCharacterUnit(int32 ID);
+	FCharacterProxy* FindCharacterUnit(int32 ID);
 
 protected:
 
@@ -62,7 +62,6 @@ private:
 	FDelegateHandle Delegate;
 	
 	// 角色序列,第0个为Player
-	UPROPERTY(Transient)
-	TMap<int32, UCharacterUnit*> CharacterUnitMap;
+	TMap<int32, FCharacterProxy*> CharacterUnitMap;
 
 };

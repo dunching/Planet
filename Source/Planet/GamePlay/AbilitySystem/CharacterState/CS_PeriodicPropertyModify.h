@@ -13,7 +13,7 @@
 class UCS_PeriodicPropertyModify;
 class UAbilityTask_TimerHelper;
 class UTexture2D;
-class UConsumableUnit;
+struct FConsumableProxy;
 class UEffectItem;
 
 struct FStreamableHandle;
@@ -47,7 +47,7 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 		const FGameplayTag& Tag,bool bClear
 	);
 
-	FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal);
+	FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal);
 
 	virtual FGameplayAbilityTargetData_PropertyModify* Clone()const override;
 

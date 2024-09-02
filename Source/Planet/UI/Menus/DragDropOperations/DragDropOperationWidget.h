@@ -12,10 +12,10 @@
 
 class UUserWidget;
 
-class UBasicUnit;
-class UToolUnit;
-class USkillUnit;
-class UConsumableUnit;
+struct FBasicProxy;
+struct FToolProxy;
+struct FSkillProxy;
+struct FConsumableProxy;
 
 struct FStreamableHandle;
 
@@ -35,13 +35,13 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit * BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
 	void SetNum(int32 NewNum);
 
-	void SetItemType(UBasicUnit* ToolSPtr);
+	void SetItemType(FBasicProxy* ToolSPtr);
 	
 	void ResetSize(const FVector2D& Size);
 
@@ -49,6 +49,6 @@ protected:
 
 private:
 
-	UBasicUnit* BasicUnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> BasicUnitPtr = nullptr;
 
 };

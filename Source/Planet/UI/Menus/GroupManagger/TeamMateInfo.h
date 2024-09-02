@@ -14,8 +14,8 @@
 
 struct FStreamableHandle;
 
-class UBasicUnit;
-class UCharacterUnit;
+struct FBasicProxy;
+struct FCharacterProxy;
 class UTeamMatesList;
 
 /**
@@ -43,7 +43,7 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -55,6 +55,6 @@ private:
 
 	bool bIsInBackpakc = false;
 
-	UCharacterUnit* GroupMateUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> GroupMateUnitPtr = nullptr;
 
 };

@@ -23,7 +23,7 @@ TSharedPtr<FSceneUnitContainer> UHoldingItemsComponent::GetSceneUnitContainer()
 		return OwnerPtr->GetCharacterUnit()->SceneUnitContainer;
 	}
 
-	// ´´½¨ÁÙÊ±µÄ 
+	// åˆ›å»ºä¸´æ—¶çš„ 
 	return MakeShared<FSceneUnitContainer>();
 }
 
@@ -32,9 +32,17 @@ void UHoldingItemsComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-UBasicUnit* UHoldingItemsComponent::AddUnit(FGameplayTag UnitType, int32 Num)
+TSharedPtr<FBasicProxy>  UHoldingItemsComponent::AddUnit(FGameplayTag UnitType, int32 Num)
 {
-	return GetSceneUnitContainer()->AddUnit(UnitType, Num);
+	TSharedPtr<FBasicProxy> Result;
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (OwnerPtr && OwnerPtr->GetCharacterUnit())
+	{
+		Result = GetSceneUnitContainer()->AddUnit(UnitType, Num);
+		Result->OwnerCharacterUnitPtr = OwnerPtr->GetCharacterUnit();
+	}
+
+	return Result;
 }
 
 void UHoldingItemsComponent::AddUnit_Apending(FGameplayTag UnitType, FGuid Guid)

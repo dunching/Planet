@@ -85,7 +85,7 @@ void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
@@ -104,7 +104,7 @@ void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 		
-		GroupMateUnitPtr = Cast<UCharacterUnit>(BasicUnitPtr);
+		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Texture));
 			if (UIPtr)

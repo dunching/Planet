@@ -51,10 +51,10 @@ class PLANET_API ACharacterBase :
 
 public:
 
-	using FCharacterUnitType = UCharacterUnit;
+	using FCharacterUnitType = FCharacterProxy;
 
 	using FTeamMembersChangedDelegateHandle = 
-		TCallbackHandleContainer<void(EGroupMateChangeType, FCharacterUnitType*)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
 
 	using FValueChangedDelegateHandle =
 		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
@@ -95,9 +95,9 @@ public:
 
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
 
-	UCharacterUnit* GetCharacterUnit()const;
+	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
 
-	void SetCharacterUnit(UCharacterUnit* CharacterUnitPtr);
+	void SetCharacterUnit(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
@@ -132,7 +132,7 @@ protected:
 
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
-		FCharacterUnitType* TargetCharacterUnitPtr
+		const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
 	);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
@@ -190,8 +190,7 @@ private:
 
 	FProcessedGAEventHandle ProcessedGAEventHandle;
 	
-	UPROPERTY(Transient)
-	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> CharacterUnitPtr = nullptr;
 	
 	UPROPERTY(Transient)
 	TObjectPtr<AController> OriginalAIController;

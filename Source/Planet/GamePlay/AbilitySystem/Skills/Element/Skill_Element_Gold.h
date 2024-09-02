@@ -11,7 +11,7 @@
 
 class UAbilityTask_TimerHelper;
 
-class UBasicUnit;
+struct FBasicProxy;
 
 UCLASS()
 class USkill_Element_Gold : public USkill_Element_Base

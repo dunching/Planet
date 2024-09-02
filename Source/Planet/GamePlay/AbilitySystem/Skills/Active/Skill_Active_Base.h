@@ -9,8 +9,8 @@
 
 #include "Skill_Active_Base.generated.h"
 
-class UBasicUnit;
-class UActiveSkillUnit;
+struct FBasicProxy;
+struct FActiveSkillProxy;
 class UAbilityTask_TimerHelper;
 struct FCanbeInteractionInfo;
 struct FSkillCooldownHelper;

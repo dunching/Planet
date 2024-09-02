@@ -32,7 +32,7 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 	
 	virtual void ResetToolUIByData(FTableRowUnit * TableRowUnitPtr);
 

@@ -16,46 +16,46 @@
 #include "PropertyEntrys.h"
 #include "Skill_Base.h"
 
-UBasicUnit::UBasicUnit()
+FBasicProxy::FBasicProxy()
 {
 
 }
 
-UBasicUnit::~UBasicUnit()
+FBasicProxy::~FBasicProxy()
 {
 
 }
 
-void UBasicUnit::InitialUnit()
+void FBasicProxy::InitialUnit()
 {
-
+	ID = FGuid::NewGuid();
 }
 
-UBasicUnit::IDType UBasicUnit::GetID()const
+FBasicProxy::IDType FBasicProxy::GetID()const
 {
 	return ID;
 }
 
-FGameplayTag UBasicUnit::GetUnitType() const
+FGameplayTag FBasicProxy::GetUnitType() const
 {
 	return UnitType;
 }
 
-TSoftObjectPtr<UTexture2D> UBasicUnit::GetIcon() const
+TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
 
 	return SceneUnitExtendInfoPtr->DefaultIcon;
 }
 
-FString UBasicUnit::GetUnitName() const
+FString FBasicProxy::GetUnitName() const
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
 
 	return SceneUnitExtendInfoPtr->UnitName;
 }
 
-void UBasicUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
 {
 	if (AllocationCharacterUnitPtr == InAllocationCharacterUnitPtr)
 	{
@@ -67,12 +67,12 @@ void UBasicUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacte
 	OnAllocationCharacterUnitChanged.ExcuteCallback(AllocationCharacterUnitPtr);
 }
 
-UCharacterUnit* UBasicUnit::GetAllocationCharacterUnit() const
+TSharedPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterUnit() const
 {
 	return AllocationCharacterUnitPtr;
 }
 
-FTableRowUnit* UBasicUnit::GetTableRowUnit() const
+FTableRowUnit* FBasicProxy::GetTableRowUnit() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
@@ -81,12 +81,12 @@ FTableRowUnit* UBasicUnit::GetTableRowUnit() const
 	return SceneUnitExtendInfoPtr;
 }
 
-UConsumableUnit::UConsumableUnit()
+FConsumableProxy::FConsumableProxy()
 {
 
 }
 
-void UConsumableUnit::AddCurrentValue(int32 val)
+void FConsumableProxy::AddCurrentValue(int32 val)
 {
 	const auto Old = Num;
 	Num += val;
@@ -94,12 +94,12 @@ void UConsumableUnit::AddCurrentValue(int32 val)
 	CallbackContainerHelper.ValueChanged(Old, Num);
 }
 
-int32 UConsumableUnit::GetCurrentValue() const
+int32 FConsumableProxy::GetCurrentValue() const
 {
 	return Num;
 }
 
-FTableRowUnit_Consumable* UConsumableUnit::GetTableRowUnit_Consumable() const
+FTableRowUnit_Consumable* FConsumableProxy::GetTableRowUnit_Consumable() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_Consumable.LoadSynchronous();
@@ -108,7 +108,7 @@ FTableRowUnit_Consumable* UConsumableUnit::GetTableRowUnit_Consumable() const
 	return SceneUnitExtendInfoPtr;
 }
 
-bool UConsumableUnit::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
 	auto MaxRemainingCooldown = -1.f;
 	auto MaxRemainingCooldownPercent = -1.f;
@@ -145,7 +145,7 @@ bool UConsumableUnit::GetRemainingCooldown(float& RemainingCooldown, float& Rema
 	return CurResult;
 }
 
-bool UConsumableUnit::CheckCooldown() const
+bool FConsumableProxy::CheckCooldown() const
 {
 	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
@@ -165,11 +165,11 @@ bool UConsumableUnit::CheckCooldown() const
 	return true;
 }
 
-void UConsumableUnit::AddCooldownConsumeTime(float NewTime)
+void FConsumableProxy::AddCooldownConsumeTime(float NewTime)
 {
 }
 
-void UConsumableUnit::FreshUniqueCooldownTime()
+void FConsumableProxy::FreshUniqueCooldownTime()
 {
 	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
@@ -182,14 +182,14 @@ void UConsumableUnit::FreshUniqueCooldownTime()
 	}
 }
 
-void UConsumableUnit::ApplyCooldown()
+void FConsumableProxy::ApplyCooldown()
 {
 	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
 	);
 }
 
-void UConsumableUnit::OffsetCooldownTime()
+void FConsumableProxy::OffsetCooldownTime()
 {
 	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
@@ -211,22 +211,22 @@ FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGame
 	return SceneUnitExtendInfoPtr;
 }
 
-UToolUnit::UToolUnit()
+FToolProxy::FToolProxy()
 {
 
 }
 
-int32 UToolUnit::GetNum() const
+int32 FToolProxy::GetNum() const
 {
 	return Num;
 }
 
-UWeaponUnit::UWeaponUnit()
+FWeaponProxy::FWeaponProxy()
 {
 
 }
 
-void UWeaponUnit::InitialUnit()
+void FWeaponProxy::InitialUnit()
 {
 	Super::InitialUnit();
 	{
@@ -234,17 +234,14 @@ void UWeaponUnit::InitialUnit()
 	}
 }
 
-void UWeaponUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+void FWeaponProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
 {
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 
-	if (FirstSkill)
-	{
-		FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
-	}
+	FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 }
 
-FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() const
+FTableRowUnit_WeaponExtendInfo* FWeaponProxy::GetTableRowUnit_WeaponExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponExtendInfo.LoadSynchronous();
@@ -253,7 +250,7 @@ FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() 
 	return SceneUnitExtendInfoPtr;
 }
 
-FTableRowUnit_PropertyEntrys* UWeaponUnit::GetMainPropertyEntry() const
+FTableRowUnit_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
@@ -264,23 +261,23 @@ FTableRowUnit_PropertyEntrys* UWeaponUnit::GetMainPropertyEntry() const
 	return SceneUnitExtendInfoPtr;
 }
 
-int32 UWeaponUnit::GetMaxAttackDistance() const
+int32 FWeaponProxy::GetMaxAttackDistance() const
 {
 	return MaxAttackDistance;
 }
 
-USkillUnit::USkillUnit() :
+FSkillProxy::FSkillProxy() :
 	Super()
 {
 
 }
 
-TSubclassOf<USkill_Base> USkillUnit::GetSkillClass() const
+TSubclassOf<USkill_Base> FSkillProxy::GetSkillClass() const
 {
 	return nullptr;
 }
 
-void USkillUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+void FSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
 {
 	if (!InAllocationCharacterUnitPtr)
 	{
@@ -295,11 +292,11 @@ void USkillUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacte
 	}
 }
 
-void USkillUnit::RegisterSkill()
+void FSkillProxy::RegisterSkill()
 {
 	FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
 
-	GameplayAbilityTargetDataPtr->SkillUnitPtr = this;
+	GameplayAbilityTargetDataPtr->SkillUnitPtr = nullptr;
 
 	FGameplayAbilitySpec GameplayAbilitySpec(
 		GetSkillClass(),
@@ -313,7 +310,7 @@ void USkillUnit::RegisterSkill()
 	GameplayAbilitySpecHandle = ProxyCharacterPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 }
 
-void USkillUnit::UnRegisterSkill()
+void FSkillProxy::UnRegisterSkill()
 {
 	if (GetAllocationCharacterUnit())
 	{
@@ -331,7 +328,7 @@ void USkillUnit::UnRegisterSkill()
 	GameplayAbilitySpecHandle = FGameplayAbilitySpecHandle();
 }
 
-USkill_Base* USkillUnit::GetGAInst()const
+USkill_Base* FSkillProxy::GetGAInst()const
 {
 	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
 	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
@@ -344,16 +341,16 @@ USkill_Base* USkillUnit::GetGAInst()const
 	return nullptr;
 }
 
-FGameplayAbilitySpecHandle USkillUnit::GetGAHandle() const
+FGameplayAbilitySpecHandle FSkillProxy::GetGAHandle() const
 {
 	return GameplayAbilitySpecHandle;
 }
 
-UWeaponSkillUnit::UWeaponSkillUnit()
+FWeaponSkillProxy::FWeaponSkillProxy()
 {
 }
 
-FTableRowUnit_WeaponSkillExtendInfo* UWeaponSkillUnit::GetTableRowUnit_WeaponSkillExtendInfo() const
+FTableRowUnit_WeaponSkillExtendInfo* FWeaponSkillProxy::GetTableRowUnit_WeaponSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponSkillExtendInfo.LoadSynchronous();
@@ -362,20 +359,20 @@ FTableRowUnit_WeaponSkillExtendInfo* UWeaponSkillUnit::GetTableRowUnit_WeaponSki
 	return SceneUnitExtendInfoPtr;
 }
 
-TSubclassOf<USkill_Base> UWeaponSkillUnit::GetSkillClass() const
+TSubclassOf<USkill_Base> FWeaponSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_WeaponSkillExtendInfo()->SkillClass;
 }
 
-UTalentSkillUnit::UTalentSkillUnit()
+FTalentSkillProxy::FTalentSkillProxy()
 {
 }
 
-UActiveSkillUnit::UActiveSkillUnit()
+FActiveSkillProxy::FActiveSkillProxy()
 {
 }
 
-FTableRowUnit_ActiveSkillExtendInfo* UActiveSkillUnit::GetTableRowUnit_ActiveSkillExtendInfo() const
+FTableRowUnit_ActiveSkillExtendInfo* FActiveSkillProxy::GetTableRowUnit_ActiveSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_ActiveSkillExtendInfo.LoadSynchronous();
@@ -384,20 +381,20 @@ FTableRowUnit_ActiveSkillExtendInfo* UActiveSkillUnit::GetTableRowUnit_ActiveSki
 	return SceneUnitExtendInfoPtr;
 }
 
-TSubclassOf<USkill_Base> UActiveSkillUnit::GetSkillClass() const
+TSubclassOf<USkill_Base> FActiveSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_ActiveSkillExtendInfo()->SkillClass;
 }
 
-UPassiveSkillUnit::UPassiveSkillUnit()
+FPassiveSkillProxy::FPassiveSkillProxy()
 {
 }
 
-void UPassiveSkillUnit::InitialUnit()
+void FPassiveSkillProxy::InitialUnit()
 {
 }
 
-FTableRowUnit_PassiveSkillExtendInfo* UPassiveSkillUnit::GetTableRowUnit_PassiveSkillExtendInfo() const
+FTableRowUnit_PassiveSkillExtendInfo* FPassiveSkillProxy::GetTableRowUnit_PassiveSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_PassiveSkillExtendInfo.LoadSynchronous();
@@ -406,7 +403,7 @@ FTableRowUnit_PassiveSkillExtendInfo* UPassiveSkillUnit::GetTableRowUnit_Passive
 	return SceneUnitExtendInfoPtr;
 }
 
-FTableRowUnit_PropertyEntrys* UPassiveSkillUnit::GetMainPropertyEntry() const
+FTableRowUnit_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
@@ -423,19 +420,19 @@ FTableRowUnit_PropertyEntrys* UPassiveSkillUnit::GetMainPropertyEntry() const
 	return SceneUnitExtendInfoPtr;
 }
 
-TSubclassOf<USkill_Base> UPassiveSkillUnit::GetSkillClass() const
+TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_PassiveSkillExtendInfo()->SkillClass;
 }
 
-UCharacterUnit::UCharacterUnit()
+FCharacterProxy::FCharacterProxy()
 {
 	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
 	AllocationSkills = MakeShared<FAllocationSkills>();
 	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
 }
 
-FTableRowUnit_CharacterInfo* UCharacterUnit::GetTableRowUnit_CharacterInfo() const
+FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
@@ -444,17 +441,17 @@ FTableRowUnit_CharacterInfo* UCharacterUnit::GetTableRowUnit_CharacterInfo() con
 	return SceneUnitExtendInfoPtr;
 }
 
-void UCharacterUnit::RelieveRootBind()
+void FCharacterProxy::RelieveRootBind()
 {
 	SceneUnitContainer.Reset();
 }
 
-UCoinUnit::UCoinUnit()
+FCoinProxy::FCoinProxy()
 {
 
 }
 
-void UCoinUnit::AddCurrentValue(int32 val)
+void FCoinProxy::AddCurrentValue(int32 val)
 {
 	const auto Old = Num;
 	Num += val;
@@ -462,12 +459,12 @@ void UCoinUnit::AddCurrentValue(int32 val)
 	CallbackContainerHelper.ValueChanged(Old, Num);
 }
 
-int32 UCoinUnit::GetCurrentValue() const
+int32 FCoinProxy::GetCurrentValue() const
 {
 	return Num;
 }
 
-bool UActiveSkillUnit::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
 	auto MaxRemainingCooldown = -1.f;
 	auto MaxRemainingCooldownPercent = -1.f;
@@ -504,7 +501,7 @@ bool UActiveSkillUnit::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 	return CurResult;
 }
 
-bool UActiveSkillUnit::CheckCooldown() const
+bool FActiveSkillProxy::CheckCooldown() const
 {
 	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
@@ -524,7 +521,7 @@ bool UActiveSkillUnit::CheckCooldown() const
 	return true;
 }
 
-void UActiveSkillUnit::AddCooldownConsumeTime(float NewTime)
+void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
 {
 	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
@@ -536,7 +533,7 @@ void UActiveSkillUnit::AddCooldownConsumeTime(float NewTime)
 	}
 }
 
-void UActiveSkillUnit::FreshUniqueCooldownTime()
+void FActiveSkillProxy::FreshUniqueCooldownTime()
 {
 	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
@@ -549,14 +546,14 @@ void UActiveSkillUnit::FreshUniqueCooldownTime()
 	}
 }
 
-void UActiveSkillUnit::ApplyCooldown()
+void FActiveSkillProxy::ApplyCooldown()
 {
 	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
 	);
 }
 
-void UActiveSkillUnit::OffsetCooldownTime()
+void FActiveSkillProxy::OffsetCooldownTime()
 {
 	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyUniqueCooldown(
 		this

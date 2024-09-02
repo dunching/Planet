@@ -58,7 +58,7 @@ void UBackpackIconWrapper::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackIconWrapper::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr)
 	{

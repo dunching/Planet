@@ -7,5 +7,5 @@
 #include "Planet_Tools.h"
 
 #if WITH_EDITOR
-extern PLANET_API TArray<class UBasicUnit*> TestGCUnitMap;
+extern PLANET_API TArray<TWeakPtr<struct FBasicProxy>> TestGCUnitMap;
 #endif

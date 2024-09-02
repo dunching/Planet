@@ -341,6 +341,12 @@ struct TStructVariable
 	}
 };
 
+template<typename ChildType, typename ParentType>
+TSharedPtr<ChildType> DynamicCastSharedPtr(const TSharedPtr<ParentType>& SPtr)
+{
+	return TSharedPtr<ChildType>(SPtr, dynamic_cast<ChildType*>(SPtr.Get()));
+}
+
 class ABuildingBase;
 class UPlanetGameplayAbility;
 class UPlanetGameplayAbility_SkillBase;

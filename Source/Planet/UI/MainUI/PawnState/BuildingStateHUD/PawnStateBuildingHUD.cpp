@@ -100,7 +100,7 @@ void UPawnStateBuildingHUD::ResetUIByData()
 					auto Result = EICPtr->FindTool(IconPtr->IconSocket);
 					if (Result && Result->UnitPtr)
 					{
-						IconPtr->ResetToolUIByData(Result->UnitPtr);
+//						IconPtr->ResetToolUIByData(Result->UnitPtr);
 					}
 				}
 			}
@@ -115,7 +115,7 @@ void UPawnStateBuildingHUD::ResetUIByData()
 					auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
 					if (Result && Result->UnitPtr)
 					{
-						IconPtr->ResetToolUIByData(Result->UnitPtr);
+		//				IconPtr->ResetToolUIByData(Result->UnitPtr);
 					}
 				}
 			}
@@ -171,7 +171,7 @@ TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>> UPawnStateBuildingHUD::GetTool
 
 			SocketInfoSPtr->Key = Iter.Get<0>();
 			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
-			SocketInfoSPtr->UnitPtr = UIPtr->GetToolUnit();
+//			SocketInfoSPtr->UnitPtr = UIPtr->GetToolUnit();
 
 			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
 		}

@@ -15,8 +15,8 @@ struct FSceneObjContainer;
 struct FSceneUnitContainer;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
-class USkillUnit;
-class UWeaponUnit;
+struct FSkillProxy;
+struct FWeaponProxy;
 
 /**
  *
@@ -28,7 +28,7 @@ class PLANET_API UBackpackMenu : public UMyUserWidget, public IMenuInterface
 
 public:
 
-	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, UBasicUnit*)>;
+	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
 	
 	virtual void NativeConstruct()override;
 

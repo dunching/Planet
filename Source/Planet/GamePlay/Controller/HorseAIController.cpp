@@ -44,7 +44,7 @@ UAIPerceptionComponent* AHorseAIController::GetAIPerceptionComponent()
 
 void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	FCharacterUnitType* LeaderPCPtr
+	const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
 )
 {
 }

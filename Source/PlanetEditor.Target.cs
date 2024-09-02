@@ -7,17 +7,17 @@ public class PlanetEditorTarget : TargetRules
 {
 	public PlanetEditorTarget( TargetInfo Target) : base(Target)
     {
+        Type = TargetType.Editor;
+
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
         DefaultBuildSettings = BuildSettingsVersion.Latest;
 
         // bStrictConformanceMode = true;
 
-        // ÆÁ±ÎÖ®ºó²»ÄÜÌáµ÷ÊÔ,¾ßÌåÔ­ÒòÎ´Öª
+        // å±è”½ä¹‹åä¸èƒ½æè°ƒè¯•,å…·ä½“åŸå› æœªçŸ¥
         // BuildEnvironment = TargetBuildEnvironment.Unique;
         BuildEnvironment = TargetBuildEnvironment.Shared;
         // bOverrideBuildEnvironment = false;
-
-        Type = TargetType.Editor;
 
         ExtraModuleNames.AddRange( new string[] {
             "Planet",

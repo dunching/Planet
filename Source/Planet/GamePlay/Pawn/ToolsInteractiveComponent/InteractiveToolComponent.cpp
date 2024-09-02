@@ -101,12 +101,12 @@ bool UInteractiveToolComponent::ActiveSkill_SwitchToTool(
 
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = OnwerActorPtr;
-		auto AxePtr = GetWorld()->SpawnActor<ATool_PickAxe>((*ToolIter)->UnitPtr->ToolActorClass, ActorSpawnParameters);
-		if (AxePtr)
-		{
-			CurrentEquipmentPtr = AxePtr;
-			return true;
-		}
+// 		auto AxePtr = GetWorld()->SpawnActor<ATool_PickAxe>((*ToolIter)->UnitPtr->ToolActorClass, ActorSpawnParameters);
+// 		if (AxePtr)
+// 		{
+// 			CurrentEquipmentPtr = AxePtr;
+// 			return true;
+// 		}
 	}
 	return false;
 }

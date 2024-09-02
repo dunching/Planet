@@ -29,7 +29,7 @@ class UGAEvent_Received;
 class USkill_Element_Gold;
 
 struct FGameplayAbilityTargetData_GASendEvent;
-class UWeaponUnit;
+struct FWeaponProxy;
 
 struct FCanbeInteractionInfo
 {

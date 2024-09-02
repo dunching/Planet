@@ -26,14 +26,14 @@ class IPlanetControllerInterface;
 class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter;
-class UBasicUnit;
-class USkillUnit;
-class UCoinUnit;
-class UConsumableUnit;
-class UToolUnit;
-class UCharacterUnit;
-class USkillUnit;
-class UWeaponUnit;
+struct FBasicProxy;
+struct FSkillProxy;
+struct FCoinProxy;
+struct FConsumableProxy;
+struct FToolProxy;
+struct FCharacterProxy;
+struct FSkillProxy;
+struct FWeaponProxy;
 
 struct FSceneUnitContainer;
 
@@ -47,56 +47,51 @@ struct FSceneUnitContainer final
 {
 	GENERATED_USTRUCT_BODY()
 
-	using FOnSkillUnitChanged = TCallbackHandleContainer<void(USkillUnit*, bool)>;
+	using IDType = FGuid;
 
-	using FOnToolUnitChanged = TCallbackHandleContainer<void(UToolUnit*)>;
-	
-	using FOnGroupmateUnitChanged = TCallbackHandleContainer<void(UCharacterUnit*, bool)>;
-	
-	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(UConsumableUnit*, bool, int32)>;
+	using FOnSkillUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FSkillProxy>&, bool)>;
 
-	using FOnCoinUnitChanged = TCallbackHandleContainer<void(UCoinUnit*, bool, int32)>;
+	using FOnToolUnitChanged = TCallbackHandleContainer<void(const TSharedPtr < FToolProxy>&)>;
+	
+	using FOnGroupmateUnitChanged = TCallbackHandleContainer<void(const TSharedPtr < FCharacterProxy> &, bool)>;
+	
+	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(const TSharedPtr < FConsumableProxy>&, bool, int32)>;
+
+	using FOnCoinUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FCoinProxy>&, bool, int32)>;
 
 	~FSceneUnitContainer();
 
-	UBasicUnit* AddUnit(FGameplayTag UnitType, int32 Num);
+	TSharedPtr<FBasicProxy> AddUnit(FGameplayTag UnitType, int32 Num);
 
-	UBasicUnit* FindUnit(int32 ID);
+	TSharedPtr<FBasicProxy> FindUnit(IDType ID);
 
-	void RemoveUnit(int32 ID);
+	void RemoveUnit(IDType ID);
 
-
-	UCoinUnit* AddUnit_Coin(FGameplayTag UnitType, int32 Num);
+	TSharedPtr<FCoinProxy> AddUnit_Coin(FGameplayTag UnitType, int32 Num);
 	
-	UCoinUnit* FindUnit_Coin(FGameplayTag UnitType);
+	TSharedPtr<FCoinProxy> FindUnit_Coin(FGameplayTag UnitType);
 
+	TSharedPtr <FConsumableProxy> AddUnit_Consumable(FGameplayTag UnitType, int32 Num = 1);
 
-	UConsumableUnit* AddUnit_Consumable(FGameplayTag UnitType, int32 Num = 1);
+	void RemoveUnit_Consumable(const TSharedPtr <FConsumableProxy>&UnitPtr, int32 Num = 1);
 
-	void RemoveUnit_Consumable(UConsumableUnit*UnitPtr, int32 Num = 1);
+	TSharedPtr<FToolProxy> AddUnit_ToolUnit(FGameplayTag UnitType);
 
+	TSharedPtr<FWeaponProxy> AddUnit_Weapon(FGameplayTag UnitType);
 
-	UToolUnit* AddUnit_ToolUnit(FGameplayTag UnitType);
+	TSharedPtr<FWeaponProxy> FindUnit_Weapon(FGameplayTag UnitType);
 
+	TSharedPtr<FSkillProxy>  AddUnit_Skill(FGameplayTag UnitType);
 
-	UWeaponUnit* AddUnit_Weapon(FGameplayTag UnitType);
+	TSharedPtr<FSkillProxy> FindUnit_Skill(FGameplayTag UnitType);
 
-	UWeaponUnit* FindUnit_Weapon(FGameplayTag UnitType);
+	void AddUnit_Groupmate(const TSharedPtr<FCharacterProxy>& UnitPtr);
 
+	const TArray<TSharedPtr<FBasicProxy>>& GetSceneUintAry()const;
 
-	USkillUnit* AddUnit_Skill(FGameplayTag UnitType);
+	const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& GetCoinUintAry()const;
 
-	USkillUnit* FindUnit_Skill(FGameplayTag UnitType);
-
-
-	void AddUnit_Groupmate(UCharacterUnit* UnitPtr);
-
-
-	const TArray<UBasicUnit*>& GetSceneUintAry()const;
-
-	const TMap<FGameplayTag, UCoinUnit*>& GetCoinUintAry()const;
-
-	TArray<UCharacterUnit*> GetGourpmateUintAry()const;
+	TArray<TSharedPtr<FCharacterProxy>> GetGourpmateUintAry()const;
 
 	FOnSkillUnitChanged OnSkillUnitChanged;
 
@@ -113,20 +108,15 @@ private:
 	int32 GetValidID()const;
 
 	// 自定义的“排列方式”
-	UPROPERTY(Transient)
-	TArray<UBasicUnit*> SceneToolsAry;
+	TArray<TSharedPtr<FBasicProxy>> SceneToolsAry;
 	
-	UPROPERTY(Transient)
-	TMap<int32, UBasicUnit*> SceneMetaMap;
+	TMap<IDType, TSharedPtr<FBasicProxy>> SceneMetaMap;
 	
-	UPROPERTY(Transient)
-	TMap<FGameplayTag, UConsumableUnit*> ConsumablesUnitMap;
+	TMap<FGameplayTag, TSharedPtr<FConsumableProxy>> ConsumablesUnitMap;
 	
-	UPROPERTY(Transient)
-	TMap<FGameplayTag, USkillUnit*> SkillUnitMap;
+	TMap<FGameplayTag, TSharedPtr<FSkillProxy>> SkillUnitMap;
 	
-	UPROPERTY(Transient)
-	TMap<FGameplayTag, UCoinUnit*> CoinUnitMap;
+	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinUnitMap;
 };
 
 #pragma endregion HoldingItems

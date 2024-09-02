@@ -235,12 +235,12 @@ UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 	return GroupMnaggerComponentPtr;
 }
 
-UCharacterUnit* ACharacterBase::GetCharacterUnit()const
+TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 {
 	return CharacterUnitPtr;
 }
 
-void ACharacterBase::SetCharacterUnit(UCharacterUnit* InCharacterUnitPtr)
+void ACharacterBase::SetCharacterUnit(const TSharedPtr<FCharacterUnitType>& InCharacterUnitPtr)
 {
 	CharacterUnitPtr = InCharacterUnitPtr;
 	CharacterUnitPtr->ProxyCharacterPtr = this;
@@ -271,10 +271,10 @@ void ACharacterBase::SpawnDefaultController()
 #endif // WITH_EDITOR
 	{
 	}
-	const auto NewCharacterUnitPtr =
-		Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
-
-	SetCharacterUnit(NewCharacterUnitPtr);
+// 	const auto NewCharacterUnitPtr =
+// 		Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
+// 
+// 	SetCharacterUnit(NewCharacterUnitPtr);
 
 	auto GASPtr = GetAbilitySystemComponent();
 
@@ -321,7 +321,7 @@ void ACharacterBase::OnProcessedGAEVent(const FGameplayAbilityTargetData_GARecei
 
 void ACharacterBase::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
-	FCharacterUnitType* TargetCharacterUnitPtr
+	const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
 )
 {
 	switch (GroupMateChangeType)

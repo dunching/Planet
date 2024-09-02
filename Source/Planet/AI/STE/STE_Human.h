@@ -15,7 +15,7 @@
 
 class AActor;
 
-class UCharacterUnit;
+struct FCharacterProxy;
 class ACharacterBase;
 class AHumanCharacter;
 class AHumanAIController;
@@ -48,10 +48,10 @@ class PLANET_API USTE_Human : public UStateTreeEvaluatorBlueprintBase
 
 public:
 
-	using FCharacterUnitType = UCharacterUnit;
+	using FCharacterUnitType = FCharacterProxy;
 
 	using FTeamOptionChangedHandle =
-		TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
 
 	using FTeammateChangedHandle =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;

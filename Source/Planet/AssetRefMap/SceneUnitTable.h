@@ -14,12 +14,12 @@
 
 class UDataTable;
 
-class UToolUnit;
-class UWeaponUnit;
-class USkillUnit;
-class UCoinUnit;
-class UBasicUnit;
-class UCharacterUnit;
+struct FToolProxy;
+struct FWeaponProxy;
+struct FSkillProxy;
+struct FCoinProxy;
+struct FBasicProxy;
+struct FCharacterProxy;
 class AWeapon_Base; 
 class AConsumable_Base;
 
@@ -49,9 +49,6 @@ struct PLANET_API FTableRowUnit : public FTableRowBase
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<UTexture2D> RaffleIcon;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<UBasicUnit>UnitClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName DescriptionText = TEXT("描述文字");

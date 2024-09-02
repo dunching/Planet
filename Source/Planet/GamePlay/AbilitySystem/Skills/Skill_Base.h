@@ -9,8 +9,8 @@
 
 #include "Skill_Base.generated.h"
 
-class UBasicUnit;
-class USkillUnit;
+struct FBasicProxy;
+struct FSkillProxy;
 class UInteractiveComponent;
 
 USTRUCT()
@@ -20,7 +20,7 @@ struct FGameplayAbilityTargetData_Skill : public FGameplayAbilityTargetData
 
 	virtual FGameplayAbilityTargetData_Skill* Clone()const;
 
-	USkillUnit* SkillUnitPtr = nullptr;
+	TSharedPtr<FSkillProxy> SkillUnitPtr = nullptr;
 };
 
 UCLASS()
@@ -89,6 +89,6 @@ protected:
 
 	ACharacterBase* CharacterPtr = nullptr;
 
-	USkillUnit* SkillUnitPtr = nullptr;
+	TSharedPtr<FSkillProxy> SkillUnitPtr = nullptr;
 
 };

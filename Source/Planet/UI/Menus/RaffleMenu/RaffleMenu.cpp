@@ -168,7 +168,6 @@ void URaffleMenu::ResetGetUnitAry(const TArray<FTableRowUnit*>& Ary)
 			auto NewUnitPtr = CreateWidget<URaffle_Unit>(GetWorld(), Raffle_UnitClass);
 			if (NewUnitPtr)
 			{
-				NewUnitPtr->ResetToolUIByData(Iter->UnitClass.GetDefaultObject());
 				NewUnitPtr->ResetToolUIByData(Iter);
 				HorizotalUIPtr->AddChild(NewUnitPtr);
 			}

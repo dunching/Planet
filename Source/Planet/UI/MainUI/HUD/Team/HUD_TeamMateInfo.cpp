@@ -49,7 +49,7 @@ void UHUD_TeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
@@ -68,7 +68,7 @@ void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 
-		GroupMateUnitPtr = Cast<UCharacterUnit>(BasicUnitPtr);
+		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(HUD_TeamMateInfo::Texture));
 			if (UIPtr)

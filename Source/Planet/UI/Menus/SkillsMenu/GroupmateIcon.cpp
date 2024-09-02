@@ -12,6 +12,7 @@
 #include "CharacterAttributesComponent.h"
 #include "SceneElement.h"
 #include "CharacterAttibutes.h"
+#include "TemplateHelper.h"
 
 struct FGroupmateIcon : public TStructVariable<FGroupmateIcon>
 {
@@ -29,10 +30,10 @@ void UGroupmateIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UGroupmateIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UGroupmateIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	UnitPtr = nullptr;
-	UnitPtr = Cast<UCharacterUnit>(InBasicUnitPtr);
+	UnitPtr = DynamicCastSharedPtr<FCharacterProxy>(InBasicUnitPtr);
 
 	SetItemType();
 	SetName();

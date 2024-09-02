@@ -3,14 +3,14 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class PlanetGameTarget : TargetRules
+public class PlanetServerTarget : TargetRules
 {
-	public PlanetGameTarget( TargetInfo Target) : base(Target)
+	public PlanetServerTarget( TargetInfo Target) : base(Target)
     {
+        Type = TargetType.Server;
+
         IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
         DefaultBuildSettings = BuildSettingsVersion.Latest;
-
-        Type = TargetType.Game;
 
 		ExtraModuleNames.AddRange( new string[] {
             "Planet",

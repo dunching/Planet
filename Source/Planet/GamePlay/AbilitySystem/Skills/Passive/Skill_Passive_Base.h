@@ -9,7 +9,7 @@
 
 #include "Skill_Passive_Base.generated.h"
 
-class UBasicUnit;
+struct FBasicProxy;
 
 UCLASS()
 class USkill_Passive_Base : public USkill_Base

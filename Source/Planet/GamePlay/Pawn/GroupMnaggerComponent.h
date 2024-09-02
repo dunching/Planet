@@ -11,9 +11,9 @@
 
 class AHumanCharacter;
 class IPlanetControllerInterface;
-class USkillUnit;
-class UActiveSkillUnit;
-class UConsumableUnit;
+struct FSkillProxy;
+struct FActiveSkillProxy;
+struct FConsumableProxy;
 
 struct FSkillCooldownHelper
 {
@@ -50,25 +50,25 @@ class PLANET_API FGroupMatesHelper
 {
 public:
 
-	using FCharacterUnitType = UCharacterUnit;
+	using FCharacterUnitType = FCharacterProxy;
 
 	using FPawnType = ACharacterBase;
 
-	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, FCharacterUnitType*)>;
+	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>;
 
 	void AddCharacter(FPawnType* PCPtr);
 
-	void AddCharacter(FCharacterUnitType* CharacterUnitPtr);
+	void AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
-	bool IsMember(FCharacterUnitType* CharacterUnitPtr)const;
+	bool IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)const;
 
 	int32 ID = 1;
 
 	FMemberChangedDelegateContainer MembersChanged;
 
-	FCharacterUnitType* OwnerCharacterUnitPtr = nullptr;
+	TSharedPtr<FCharacterUnitType> OwnerCharacterUnitPtr = nullptr;
 
-	TSet<FCharacterUnitType*> MembersSet;
+	TSet<TSharedPtr<FCharacterUnitType>> MembersSet;
 
 	// 公共的冷却，如：团队里面的复活技能
 	TMap<FGameplayTag, TSharedPtr<FSkillCooldownHelper>>CommonCooldownMap;
@@ -79,7 +79,7 @@ class PLANET_API FTeamMatesHelper : public FGroupMatesHelper
 {
 public:
 
-	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>;
+	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>;
 
 	using FKnowCharaterChanged = TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>;
 
@@ -114,7 +114,7 @@ class PLANET_API UGroupMnaggerComponent : public UActorComponent
 
 public:
 
-	using FCharacterUnitType = UCharacterUnit;
+	using FCharacterUnitType = FCharacterProxy;
 
 	using FOwnerType = ACharacterBase;
 
@@ -130,33 +130,33 @@ public:
 		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
 	)override;
 
-	void AddCharacterToGroup(FCharacterUnitType* CharacterUnitPtr);
+	void AddCharacterToGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
-	void AddCharacterToTeam(FCharacterUnitType* CharacterUnitPtr);
+	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
 	TSharedPtr<FGroupMatesHelper> CreateGroup();
 
 	TSharedPtr<FTeamMatesHelper> CreateTeam();
 
-	void OnAddToNewGroup(FCharacterUnitType* CharacterUnitPtr);
+	void OnAddToNewGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
-	void OnAddToNewTeam(FCharacterUnitType* CharacterUnitPtr);
+	void OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
 	const TSharedPtr<FGroupMatesHelper>& GetGroupHelper();
 
 	const TSharedPtr<FTeamMatesHelper>& GetTeamHelper();
 
 	// 重置技能CD（包含公共CD）至满CD
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(UActiveSkillUnit* ActiveSkillUnitPtr);
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr);
 
 	// 重置技能CD 至满CD
-	TWeakPtr<FSkillCooldownHelper> ApplyUniqueCooldown(UActiveSkillUnit* ActiveSkillUnitPtr);
+	TWeakPtr<FSkillCooldownHelper> ApplyUniqueCooldown(FActiveSkillProxy* ActiveSkillUnitPtr);
 
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const UActiveSkillUnit* ActiveSkillUnitPtr);
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const FActiveSkillProxy* ActiveSkillUnitPtr);
 
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(UConsumableUnit* UnitPtr);
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(FConsumableProxy* UnitPtr);
 
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const UConsumableUnit* ConsumableUnitPtr);
+	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const FConsumableProxy* ConsumableUnitPtr);
 
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 

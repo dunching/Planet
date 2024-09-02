@@ -11,7 +11,7 @@
 #include "GroupsManaggerSubSystem.generated.h"
 
 class IPlanetControllerInterface;
-class UCharacterUnit;
+struct FCharacterProxy;
 class AHumanCharacter;
 class ACharacterBase;
 

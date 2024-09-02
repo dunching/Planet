@@ -17,7 +17,7 @@ struct FToolsSocketInfo
 
 	FGameplayTag SkillSocket;
 
-	UToolUnit* UnitPtr = nullptr;
+	FToolProxy* UnitPtr = nullptr;
 };
 
 UCLASS(BlueprintType, Blueprintable)

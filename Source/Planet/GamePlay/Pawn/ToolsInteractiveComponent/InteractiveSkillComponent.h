@@ -11,7 +11,7 @@
 
 #include "InteractiveSkillComponent.generated.h"
 
-class UActiveSkillUnit;
+struct FActiveSkillProxy;
 
 struct FSkillSocketInfo
 {
@@ -19,14 +19,14 @@ struct FSkillSocketInfo
 
 	FGameplayTag SkillSocket;
 
-	USkillUnit* SkillUnitPtr = nullptr;
+	TSharedPtr<FSkillProxy> SkillUnitPtr = nullptr;
 };
 
 struct FWeaponSocketInfo
 {
 	FGameplayTag WeaponSocket;
 
-	UWeaponUnit* WeaponUnitPtr = nullptr;
+	TSharedPtr<FWeaponProxy> WeaponUnitPtr = nullptr;
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -105,7 +105,7 @@ protected:
 		const TSharedPtr<FCanbeInteractionInfo>& CanbeActivedInfoSPtr, bool bIsAutomaticStop = false
 	);
 
-	bool ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr);
+	bool ActivedCorrespondingWeapon(const TSharedPtr<FActiveSkillProxy>& ActiveSkillUnitPtr);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;

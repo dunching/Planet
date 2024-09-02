@@ -14,7 +14,7 @@ class UTalentIcon;
 class URaffleType;
 class URaffleBtn;
 class URaffle_Unit;
-class UBasicUnit;
+struct FBasicProxy;
 struct FSceneUnitContainer;
 struct FTableRowUnit;
 

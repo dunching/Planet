@@ -11,7 +11,7 @@
 #include "Weapon_Base.generated.h"
 
 class AHumanCharacter;
-class UWeaponUnit;
+struct FWeaponProxy;
 
 UCLASS()
 class PLANET_API AWeapon_Base : public AToolUnitBase
@@ -20,7 +20,7 @@ class PLANET_API AWeapon_Base : public AToolUnitBase
 
 public:
 
-	UWeaponUnit* WeaponUnitPtr = nullptr;
+	TSharedPtr<FWeaponProxy> WeaponUnitPtr = nullptr;
 
 protected:
 

@@ -13,7 +13,7 @@
 
 class UPlanetAbilitySystemComponent;
 class UHoldingItemsComponent;
-class UCharacterUnit;
+struct FCharacterProxy;
 
 UCLASS()
 class PLANET_API APlanetPlayerState : public APlayerState

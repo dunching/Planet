@@ -253,7 +253,7 @@ bool UCS_PeriodicPropertyModify::OnTaskFinished(UAbilityTask_TimerHelper* InTask
 	return true;
 }
 
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(UConsumableUnit* RightVal) :
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal) :
 	Super(RightVal->GetUnitType())
 {
 	Duration = RightVal->GetTableRowUnit_Consumable()->Duration;

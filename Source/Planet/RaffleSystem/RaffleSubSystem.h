@@ -14,7 +14,7 @@
 
 #include "RaffleSubSystem.generated.h"
 
-class UBasicUnit;
+struct FBasicProxy;
 
 UCLASS()
 class PLANET_API URaffleSubSystem : public UGameInstanceSubsystem

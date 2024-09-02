@@ -12,7 +12,7 @@
 class UAbilityTask_TimerHelper;
 class AConsumable_Base;
 class AConsumable_Test;
-class UConsumableUnit;
+struct FConsumableProxy;
 
 UCLASS()
 class USkill_Consumable_Test : public USkill_Consumable_Base
@@ -79,11 +79,11 @@ protected:
 
 	AConsumable_Test* ConsumableActorPtr = nullptr;
 
-	UConsumableUnit* UnitPtr = nullptr;
+	FConsumableProxy* UnitPtr = nullptr;
 
 };
 
 struct FGameplayAbilityTargetData_Consumable_Test : public FGameplayAbilityTargetData
 {
-	UConsumableUnit* UnitPtr = nullptr;
+	FConsumableProxy* UnitPtr = nullptr;
 };

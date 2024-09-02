@@ -18,7 +18,7 @@ class ASceneObj;
 class AHorseCharacter;
 class ISceneObjInteractionInterface;
 
-class UWeaponUnit;
+struct FWeaponProxy;
 
 namespace HumanProcessor
 {
