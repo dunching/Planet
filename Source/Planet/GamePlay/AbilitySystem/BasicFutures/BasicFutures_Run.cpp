@@ -66,14 +66,19 @@ void UBasicFutures_Run::ActivateAbility(
 	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-		
-		ModifyPropertyMap.Add(
-			ECharacterPropertyType::MoveSpeed,
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->RunningSpeedOffset.GetCurrentValue()
-		);
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+			ModifyPropertyMap.Add(
+				ECharacterPropertyType::MoveSpeed,
+				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->RunningSpeedOffset.GetCurrentValue()
+			);
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+		}
+#endif
 	}
 }
 
@@ -85,14 +90,19 @@ void UBasicFutures_Run::EndAbility(
 	bool bWasCancelled
 )
 {
-	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());	
+	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
 
 		CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+		}
+#endif
 	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);

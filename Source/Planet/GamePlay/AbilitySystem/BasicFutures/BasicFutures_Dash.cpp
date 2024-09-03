@@ -50,10 +50,10 @@ void UBasicFutures_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 }
 
 void UBasicFutures_Dash::PreActivate(
-	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, 
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
@@ -84,14 +84,19 @@ void UBasicFutures_Dash::ActivateAbility(
 	}
 #endif
 
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
 
-	DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+		DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	}
+#endif
 }
 
 bool UBasicFutures_Dash::CommitAbility(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
@@ -121,8 +126,8 @@ bool UBasicFutures_Dash::CommitAbility(
 }
 
 void UBasicFutures_Dash::EndAbility(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateEndAbility,
 	bool bWasCancelled
@@ -145,9 +150,9 @@ void UBasicFutures_Dash::EndAbility(
 
 bool UBasicFutures_Dash::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayTagContainer* SourceTags, 
-	const FGameplayTagContainer* TargetTags, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags,
+	const FGameplayTagContainer* TargetTags,
 	OUT FGameplayTagContainer* OptionalRelevantTags
 ) const
 {
@@ -182,7 +187,7 @@ void UBasicFutures_Dash::InitialTags()
 {
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
 
-	// ÔÚÔË¶¯Ê±²»¼¤»î
+	// åœ¨è¿åŠ¨æ—¶ä¸æ¿€æ´»
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
 
 	FAbilityTriggerData AbilityTriggerData;
