@@ -71,7 +71,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty MaxValue;
-
+	
 	TMap<FGameplayTag, int32>ValueMap;
 
 };

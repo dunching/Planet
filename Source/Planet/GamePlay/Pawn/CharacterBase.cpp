@@ -76,36 +76,43 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto  asd = GetNetMode();
-
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-
-	if (!CharacterTitlePtr)
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
 	{
-		CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-		if (CharacterTitlePtr)
+		if (!CharacterTitlePtr)
 		{
-			CharacterTitlePtr->CharacterPtr = this;
-			CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+			if (CharacterTitlePtr)
+			{
+				CharacterTitlePtr->CharacterPtr = this;
+				CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+			}
 		}
 	}
+#endif
 
 	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		HPChangedHandle = CharacterAttributesSPtr->HP.AddOnValueChanged(
+			std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
+		);
+
+		MoveSpeedChangedHandle = CharacterAttributesSPtr->MoveSpeed.AddOnValueChanged(
+			std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
+		);
+
+		ProcessedGAEventHandle = CharacterAttributesSPtr->ProcessedGAEvent.AddCallback(
+			std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
+		);
+	}
+#endif
 	OnMoveSpeedChanged(CharacterAttributesSPtr->MoveSpeed.GetCurrentValue());
-
-	HPChangedHandle = CharacterAttributesSPtr->HP.AddOnValueChanged(
-		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-	);
-
-	MoveSpeedChangedHandle = CharacterAttributesSPtr->MoveSpeed.AddOnValueChanged(
-		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-	);
-
-	ProcessedGAEventHandle = CharacterAttributesSPtr->ProcessedGAEvent.AddCallback(
-		std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
-	);
 }
 
 void ACharacterBase::Destroyed()
@@ -173,9 +180,9 @@ void ACharacterBase::UnPossessed()
 
 	if (IsActorBeingDestroyed())
 	{
-//		SpawnDefaultController();
+		//		SpawnDefaultController();
 	}
-	else if(OriginalAIController)
+	else if (OriginalAIController)
 	{
 		if (OldController)
 		{
@@ -281,39 +288,51 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ACharacterBase::SpawnDefaultController()
 {
+	auto  asd = GetNetMode();
+
 	Super::SpawnDefaultController();
 
 	OriginalAIController = Controller;
 }
 
-void ACharacterBase::OnHPChanged(int32 CurrentValue)
+void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
 {
-	if (CurrentValue <= 0)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
-		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
-			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
-			{
-				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+		if (CurrentValue <= 0)
+		{
+			GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
+			GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
+				for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 				{
-					Destroy();
+					if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+					{
+						Destroy();
+					}
 				}
-			}
-			});
+				});
+		}
 	}
+#endif
 }
 
-void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
+void ACharacterBase::OnMoveSpeedChanged_Implementation(int32 CurrentValue)
 {
 	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
 }
 
-void ACharacterBase::OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
+void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	// 显示对应的浮动UI
-	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
-	UIPtr->ProcessGAEVent(GAEvent);
-	UIPtr->AddToViewport(EUIOrder::kFightingTips);
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		// 显示对应的浮动UI
+		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
+		UIPtr->ProcessGAEVent(GAEvent);
+		UIPtr->AddToViewport(EUIOrder::kFightingTips);
+	}
+#endif
 }
 
 void ACharacterBase::OnCharacterGroupMateChanged(

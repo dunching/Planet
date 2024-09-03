@@ -31,6 +31,8 @@ public:
 
 	void UnBindCallback();
 
+	bool bIsAutoUnregister = true;
+
 protected:
 
 private:
@@ -44,7 +46,10 @@ private:
 template<typename ValueType>
 TOnValueChangedCallbackHandle<ValueType>::~TOnValueChangedCallbackHandle()
 {
-	UnBindCallback();
+	if (bIsAutoUnregister)
+	{
+		UnBindCallback();
+	}
 }
 
 template<typename ValueType>

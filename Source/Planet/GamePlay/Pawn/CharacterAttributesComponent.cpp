@@ -16,7 +16,11 @@ UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitia
 	PrimaryComponentTick.TickInterval = 1.f;
 }
 
-void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UCharacterAttributesComponent::TickComponent(
+	float DeltaTime,
+	enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction
+)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -97,5 +101,75 @@ void UCharacterAttributesComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-//	CharacterAttributesSPtr->InitialData();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		auto SPtr = GetCharacterAttributes();
+		auto HPChangedHandle = SPtr->HP.AddOnValueChanged(std::bind(&ThisClass::OnPropertyChanged, this, ECharacterPropertyType::HP, std::placeholders::_2));
+		HPChangedHandle->bIsAutoUnregister = false;
+	}
+#endif
+}
+
+void UCharacterAttributesComponent::OnPropertyChanged_Implementation(
+	ECharacterPropertyType CharacterPropertyType,
+	int32 CurrentValue
+)
+{
+	auto CharacterAttributesSPtr = GetCharacterAttributes();
+
+	const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+
+	switch (CharacterPropertyType)
+	{
+	case ECharacterPropertyType::LiDao:
+		break;
+	case ECharacterPropertyType::GenGu:
+		break;
+	case ECharacterPropertyType::ShenFa:
+		break;
+	case ECharacterPropertyType::DongCha:
+		break;
+	case ECharacterPropertyType::TianZi:
+		break;
+	case ECharacterPropertyType::GoldElement:
+		break;
+	case ECharacterPropertyType::WoodElement:
+		break;
+	case ECharacterPropertyType::WaterElement:
+		break;
+	case ECharacterPropertyType::FireElement:
+		break;
+	case ECharacterPropertyType::SoilElement:
+		break;
+	case ECharacterPropertyType::HP:
+	{
+		CharacterAttributesSPtr->HP.SetCurrentValue(CurrentValue, DataSource);
+	}
+	break;
+	case ECharacterPropertyType::BaseAttackPower:
+		break;
+	case ECharacterPropertyType::Penetration:
+		break;
+	case ECharacterPropertyType::PercentPenetration:
+		break;
+	case ECharacterPropertyType::Resistance:
+		break;
+	case ECharacterPropertyType::GAPerformSpeed:
+		break;
+	case ECharacterPropertyType::Evade:
+		break;
+	case ECharacterPropertyType::HitRate:
+		break;
+	case ECharacterPropertyType::Toughness:
+		break;
+	case ECharacterPropertyType::CriticalHitRate:
+		break;
+	case ECharacterPropertyType::CriticalDamage:
+		break;
+	case ECharacterPropertyType::MoveSpeed:
+		break;
+	default:
+		break;
+	}
 }

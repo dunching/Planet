@@ -42,7 +42,7 @@ void UGAEvent_Received::ActivateAbility(
 		}
 		switch (GAEventData_EventTypePtr->EventType)
 		{
-		case FGameplayAbilityTargetData_GAEventType::EEventType::kNormal:
+		case EEventType::kNormal:
 		{
 			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GAReceivedEvent*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
@@ -72,7 +72,7 @@ void UGAEvent_Received::ActivateAbility(
 			}
 		}
 		break;
-		case FGameplayAbilityTargetData_GAEventType::EEventType::kRootMotion:
+		case EEventType::kRootMotion:
 		{
 			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
@@ -91,7 +91,7 @@ void UGAEvent_Received::ActivateAbility(
 			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(CloneSPtr);
 		}
 		break;
-		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify:
+		case EEventType::kPeriodic_PropertyModify:
 		{
 			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_PropertyModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)
@@ -110,7 +110,7 @@ void UGAEvent_Received::ActivateAbility(
 			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
 		}
 		break;
-		case FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify:
+		case EEventType::kPeriodic_StateTagModify:
 		{
 			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_StateModify*>(TriggerEventData->TargetData.Get(1));
 			if (!GAEventDataPtr)

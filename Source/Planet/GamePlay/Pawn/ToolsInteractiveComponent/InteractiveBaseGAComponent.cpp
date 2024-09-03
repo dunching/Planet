@@ -439,14 +439,14 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	{
 		FGameplayEventData Payload;
 
-		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(FGameplayAbilityTargetData_GAEventType::EEventType::kNormal));
+		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kNormal));
 		Payload.TargetData.Add(GAEventDataPtr);
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
 			SendEventHandle,
 			ASCPtr->AbilityActorInfo.Get(),
-			FGameplayTag(),
+			UGameplayTagsSubSystem::GetInstance()->BaseFeature_Send,
 			&Payload,
 			*ASCPtr
 		);
@@ -462,7 +462,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	{
 		FGameplayEventData Payload;
 
-		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(FGameplayAbilityTargetData_GAEventType::EEventType::kRootMotion));
+		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kRootMotion));
 		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
@@ -485,7 +485,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	{
 		FGameplayEventData Payload;
 
-		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_PropertyModify));
+		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_PropertyModify));
 		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
@@ -508,7 +508,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	{
 		FGameplayEventData Payload;
 
-		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(FGameplayAbilityTargetData_GAEventType::EEventType::kPeriodic_StateTagModify));
+		Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_StateTagModify));
 		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();

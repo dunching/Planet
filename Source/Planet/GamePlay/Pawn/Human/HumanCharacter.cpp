@@ -69,12 +69,12 @@ void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (GetController())
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
 	{
-		if (GetController()->IsA(APlanetPlayerController::StaticClass()))
+		if (GetController())
 		{
-#if UE_EDITOR || UE_SERVER
-			if (GetNetMode() == NM_DedicatedServer)
+			if (GetController()->IsA(APlanetPlayerController::StaticClass()))
 			{
 				auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
 				{
@@ -109,12 +109,12 @@ void AHumanCharacter::BeginPlay()
 				TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif
 			}
-#endif
-		}
-		else if (GetController()->IsA(AHumanAIController::StaticClass()))
-		{
+			else if (GetController()->IsA(AHumanAIController::StaticClass()))
+			{
+			}
 		}
 	}
+#endif
 }
 
 void AHumanCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)

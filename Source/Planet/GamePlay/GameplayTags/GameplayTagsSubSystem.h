@@ -17,6 +17,14 @@ class PLANET_API UGameplayTagsSubSystem : public UEngineSubsystem
 public:
 
 	static UGameplayTagsSubSystem* GetInstance();
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag BaseFeature_Send =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Send")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag BaseFeature_Received =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Received")));
 
 #pragma region Locomotion
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")

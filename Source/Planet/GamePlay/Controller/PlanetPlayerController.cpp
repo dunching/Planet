@@ -142,20 +142,42 @@ void APlanetPlayerController::BeginPlay()
 
 	auto  asd = GetNetMode();
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
 	{
-		Subsystem->AddMappingContext(
-			UInputProcessorSubSystem::GetInstance()->InputActionsPtr->InputMappingContext,
-			0
-		);
+		// 因为Pawn是通过网络同步过来的，所以不再OnPoss里面去做
+		auto CurrentPawn = GetPawn();
+		if (CurrentPawn->IsA(AHumanCharacter::StaticClass()))
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+			{
+				Subsystem->AddMappingContext(
+					UInputProcessorSubSystem::GetInstance()->InputActionsPtr->InputMappingContext,
+					0
+				);
+			}
+
+			FInputModeGameOnly InputMode;
+			SetInputMode(InputMode);
+
+			UNavgationSubSystem::GetInstance();
+
+			// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
+			// 
+			// 在SetPawn之后调用
+			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, CurrentPawn](auto NewProcessor) {
+				NewProcessor->SetPawn(Cast<AHumanCharacter>(CurrentPawn));
+				});
+
+			// 绑定效果状态栏
+			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+			if (EffectPtr)
+			{
+				EffectPtr->BindCharacterState(GetRealCharacter());
+			}
+		}
 	}
-
-	FInputModeGameOnly InputMode;
-	SetInputMode(InputMode);
-
-	UNavgationSubSystem::GetInstance();
-
-	// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
+#endif
 }
 
 void APlanetPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -258,23 +280,6 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 			if (GetNetMode() == NM_DedicatedServer)
 			{
 				GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
-			}
-#endif
-
-#if UE_EDITOR || UE_CLIENT
-			if (GetNetMode() == NM_Client)
-			{
-				// 在SetPawn之后调用
-				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
-					NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
-					});
-
-				// 绑定效果状态栏
-				auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-				if (EffectPtr)
-				{
-					EffectPtr->BindCharacterState(GetRealCharacter());
-				}
 			}
 #endif
 		}

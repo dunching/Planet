@@ -432,6 +432,15 @@ FCharacterProxy::FCharacterProxy()
 	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
 }
 
+void FCharacterProxy::InitialUnit()
+{
+	Super::InitialUnit();
+
+	auto TableRowUnit_CharacterInfoPtr = GetTableRowUnit_CharacterInfo();
+
+	*CharacterAttributesSPtr = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
+}
+
 FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();

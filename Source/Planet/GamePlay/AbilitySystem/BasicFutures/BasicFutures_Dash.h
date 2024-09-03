@@ -13,8 +13,11 @@ class UAnimMontage;
 
 class UAbilityTask_PlayMontage;
 
-struct FGameplayAbilityTargetData_Dash : public FGameplayAbilityTargetData
+USTRUCT()
+struct PLANET_API FGameplayAbilityTargetData_Dash : public FGameplayAbilityTargetData
 {
+	GENERATED_USTRUCT_BODY()
+
 	EDashDirection DashDirection = EDashDirection::kForward;
 };
 

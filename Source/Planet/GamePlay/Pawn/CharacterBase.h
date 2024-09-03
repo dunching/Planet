@@ -179,10 +179,13 @@ protected:
 
 private:
 
+	UFUNCTION(NetMulticast, Reliable)
 	void OnHPChanged(int32 CurrentValue);
-
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void OnMoveSpeedChanged(int32 CurrentValue);
-
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	FValueChangedDelegateHandle HPChangedHandle;

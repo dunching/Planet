@@ -1,4 +1,16 @@
         // b*[^:b#/]+.*$
+		
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+	}
+#endif
 
 Going to:
 

@@ -31,15 +31,27 @@ public:
 
 	static FName ComponentName;
 
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
-
 	TSharedPtr<FCharacterAttributes> GetCharacterAttributes()const;
 
+	// 基础状态回复
 	void ProcessCharacterAttributes();
 
 protected:
 
 	virtual void BeginPlay()override;
+
+	virtual void TickComponent(
+		float DeltaTime,
+		enum ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction
+	)override;
+
+	// 将Client需要（显示）的数据从Server上同步过去
+	UFUNCTION(Client, Reliable)
+	void OnPropertyChanged(
+		ECharacterPropertyType CharacterPropertyType,
+		int32 CurrentValue
+	);
 
 private:
 

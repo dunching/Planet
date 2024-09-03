@@ -27,6 +27,8 @@ enum class ECharacterPropertyType : uint8
 	FireElement,
 	SoilElement,
 	
+	HP,
+
 	BaseAttackPower,
 	Penetration,
 	PercentPenetration,
