@@ -88,13 +88,12 @@ void USkill_Active_IceGun::PlayMontage()
 			CharacterPtr->GetMesh()->GetAnimInstance(),
 			InPlayRate
 		);
-
+		//
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		// TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
-		// TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		// // TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		// // TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
-
 		TaskPtr->ReadyForActivation();
 	}
 }
@@ -118,9 +117,15 @@ void USkill_Active_IceGun::OnNotifyBeginReceived(FName NotifyName)
 		for (int i=0;i<IceGunNum;i++)
 		{
 			FVector FireOffect=this->CharacterPtr->GetActorRightVector();
-			FireOffect.X*=(i-IceGunNum/2)*100.f;
-			FireOffect.Y*=(i-IceGunNum/2)*100.f;
-			FireOffect.Z=0.f;
+			int Factor=0;
+			if (IceGunNum%2!=0)
+				Factor=(i-IceGunNum/2);
+			else if ((i>=IceGunNum/2))
+				Factor=i-(IceGunNum+1)/2;
+			else
+				Factor=(i-(IceGunNum-1)/2);
+			FireOffect.X*=Factor*100.f;
+			FireOffect.Y*=Factor*100.f;
 			auto IceGunPtr = GetWorld()->SpawnActor<ASkill_IceGun_Projectile>(
 				IceGunPtrClass,
 				Location+FireOffect,
