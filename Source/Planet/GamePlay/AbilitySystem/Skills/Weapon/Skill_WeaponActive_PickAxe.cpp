@@ -48,13 +48,6 @@ void USkill_WeaponActive_PickAxe::OnAvatarSet(
 
 	if (CharacterPtr)
 	{
-		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-		ModifyPropertyMap.Add(ECharacterPropertyType::BaseAttackPower, AD);
-		ModifyPropertyMap.Add(ECharacterPropertyType::Penetration, AD_Penetration);
-		ModifyPropertyMap.Add(ECharacterPropertyType::PercentPenetration, AD_PercentPenetration);
-
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 	}
 }
 
@@ -123,6 +116,8 @@ void USkill_WeaponActive_PickAxe::PerformAction(
 )
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	MontageNum = 0;
 
 	StartTasksLink();
 }

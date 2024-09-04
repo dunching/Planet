@@ -27,7 +27,7 @@ public:
 
 	virtual void DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentActionType ActionType)override;
 
-	virtual void AttachToCharacter(AHumanCharacter* CharacterPtr)override;
+	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
 	USkeletalMeshComponent* GetMesh();
 

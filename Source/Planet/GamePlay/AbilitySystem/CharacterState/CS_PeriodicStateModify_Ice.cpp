@@ -64,55 +64,6 @@ void UCS_PeriodicStateModify_Ice::PreActivate(
 
 }
 
-void UCS_PeriodicStateModify_Ice::ModifyMaterials()
-{
-	auto MaterialsNum=CharacterPtr->GetMesh()->GetMaterials().Num();
-	auto Mesh=CharacterPtr->GetMesh();
-	static float MinValue=-50.f;
-	static float MaxValue=230.f;
-	const auto MatValue=MinValue+float(CurrentCount)/float(MaxCount)*MaxValue;
-	for (int i=0;i<MaterialsNum;i++)
-	{
-		auto InstDy = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(i));
-		if (!InstDy)
-		{
-			auto Inst = Cast<UMaterialInstance>(Mesh->GetMaterial(i));
-			InstDy = UMaterialInstanceDynamic::Create(Inst, CharacterPtr);
-			Mesh->SetMaterial(i,InstDy);
-		}
-		//static float MaxCount=3;
-		InstDy->SetScalarParameterValue(TEXT("Frozen"),MatValue);
-	}
-}
-
-void UCS_PeriodicStateModify_Ice::AddTags(FGameplayAbilityTargetData_StateModify_Ice*CurParamPtr)
-{
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
-
-	UAbilitySystemComponent* Comp = GetActorInfo().AbilitySystemComponent.Get();
-
-	Comp->AddLooseGameplayTags(ActivationOwnedTags);
-
-	if (UAbilitySystemGlobals::Get().ShouldReplicateActivationOwnedTags())
-	{
-		Comp->AddReplicatedLooseGameplayTags(ActivationOwnedTags);
-	}
-	
-	CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(
-		GetAllData(), GameplayAbilityTargetDataSPtr->Tag
-	);
-	TaskPtr->SetDuration(CurParamPtr->ImmuneTime);
-	TaskPtr->UpdateDuration();
-
-	bIsImmune = true;
-	
-	StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-	StateDisplayInfoSPtr->DataChanged();
-}
-
 void UCS_PeriodicStateModify_Ice::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -121,6 +72,8 @@ void UCS_PeriodicStateModify_Ice::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	PerformAction();
 }
 
 void UCS_PeriodicStateModify_Ice::EndAbility(
@@ -145,6 +98,13 @@ void UCS_PeriodicStateModify_Ice::UpdateDuration()
 		return;
 	}
 
+	PerformAction();
+
+	if (bIsImmune)
+	{
+		return;
+	}
+
 	Super::UpdateDuration();
 }
 
@@ -153,22 +113,26 @@ void UCS_PeriodicStateModify_Ice::PerformAction()
 	Super::PerformAction();
 	
 	const auto OldCount = CurrentCount;
-	
-	auto CurParamPtr= dynamic_cast<FGameplayAbilityTargetData_StateModify_Ice*>(GameplayAbilityTargetDataSPtr.Get()) ;
-	if (CurParamPtr)
+
+	TSharedPtr<FGameplayAbilityTargetData_StateModify_Ice> CurrentGameplayAbilityTargetDataSPtr(
+		GameplayAbilityTargetDataSPtr, 
+		dynamic_cast<FGameplayAbilityTargetData_StateModify_Ice*>(GameplayAbilityTargetDataSPtr.Get())
+	);
+
+	if (CurrentGameplayAbilityTargetDataSPtr)
 	{
-		CurrentCount += CurParamPtr->Count;
+		CurrentCount += CurrentGameplayAbilityTargetDataSPtr->Count;
 		StateDisplayInfoSPtr->Num = CurrentCount;
 	}
 
 	if (CurrentCount > MaxCount)
 	{
-		AddTags(CurParamPtr);
+		AddTags(CurrentGameplayAbilityTargetDataSPtr);
 	}
 	else
 	{
 		const auto ActuallyCount = CurrentCount - OldCount;
-		//ºı…ŸÀŸ∂»
+		//ÂáèÂ∞ëÈÄüÂ∫¶
 		TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
 		ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, ActuallyCount * -10);
 		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, ActuallyCount * -10);
@@ -179,4 +143,53 @@ void UCS_PeriodicStateModify_Ice::PerformAction()
 	
 		ModifyMaterials();
 	}
+}
+
+void UCS_PeriodicStateModify_Ice::ModifyMaterials()
+{
+	auto MaterialsNum = CharacterPtr->GetMesh()->GetMaterials().Num();
+	auto Mesh = CharacterPtr->GetMesh();
+	static float MinValue = -50.f;
+	static float MaxValue = 230.f;
+	const auto MatValue = MinValue + float(CurrentCount) / float(MaxCount) * MaxValue;
+	for (int i = 0; i < MaterialsNum; i++)
+	{
+		auto InstDy = Cast<UMaterialInstanceDynamic>(Mesh->GetMaterial(i));
+		if (!InstDy)
+		{
+			auto Inst = Cast<UMaterialInstance>(Mesh->GetMaterial(i));
+			InstDy = UMaterialInstanceDynamic::Create(Inst, CharacterPtr);
+			Mesh->SetMaterial(i, InstDy);
+		}
+		//static float MaxCount=3;
+		InstDy->SetScalarParameterValue(TEXT("Frozen"), MatValue);
+	}
+}
+
+void UCS_PeriodicStateModify_Ice::AddTags(const TSharedPtr<FGameplayAbilityTargetData_StateModify_Ice>& CurrentGameplayAbilityTargetDataSPtr)
+{
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+
+	UAbilitySystemComponent* Comp = GetActorInfo().AbilitySystemComponent.Get();
+
+	Comp->AddLooseGameplayTags(ActivationOwnedTags);
+
+	if (UAbilitySystemGlobals::Get().ShouldReplicateActivationOwnedTags())
+	{
+		Comp->AddReplicatedLooseGameplayTags(ActivationOwnedTags);
+	}
+
+	CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(
+		GetAllData(), CurrentGameplayAbilityTargetDataSPtr->Tag
+	);
+	TaskPtr->SetDuration(CurrentGameplayAbilityTargetDataSPtr->ImmuneTime);
+	TaskPtr->UpdateDuration();
+
+	bIsImmune = true;
+
+	StateDisplayInfoSPtr->Duration = CurrentGameplayAbilityTargetDataSPtr->Duration;
+	StateDisplayInfoSPtr->DataChanged();
 }

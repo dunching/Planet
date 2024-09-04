@@ -56,7 +56,7 @@ void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmen
 	}
 }
 
-void ATool_PickAxe::AttachToCharacter(AHumanCharacter* CharacterPtr)
+void ATool_PickAxe::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 

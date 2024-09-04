@@ -40,8 +40,6 @@ class PLANET_API UCS_PeriodicStateModify_Stun : public UCS_PeriodicStateModify
 
 public:
 
-	UCS_PeriodicStateModify_Stun();;
-
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,

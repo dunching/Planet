@@ -55,8 +55,6 @@ protected:
 
 	void ResetUIByData_Consumable(UCharacterUnit* PlayerCharacterUnitPtr);
 
-	void SyncAllocation2Character();
-
 	void OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr);
 	
 	void OnSelectedCharacterUnit(UCharacterUnit* UnitPtr);
@@ -70,6 +68,10 @@ protected:
 	void OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
 	
 	void OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr);
+	
+	void SetAllocation(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr, bool bIsReplaced);
+
+	void SyncAllocation2Character();
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 

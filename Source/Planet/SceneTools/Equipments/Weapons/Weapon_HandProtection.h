@@ -26,7 +26,7 @@ public:
 
 	AWeapon_HandProtection(const FObjectInitializer& ObjectInitializer);
 
-	virtual void AttachToCharacter(AHumanCharacter* CharacterPtr)override;
+	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
 protected:
 

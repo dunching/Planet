@@ -14,6 +14,7 @@
 #include "SceneUnitContainer.h"
 #include "GroupMnaggerComponent.h"
 #include "PropertyEntrys.h"
+#include "Skill_Base.h"
 
 UBasicUnit::UBasicUnit()
 {
@@ -174,7 +175,7 @@ void UConsumableUnit::FreshUniqueCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
@@ -194,7 +195,7 @@ void UConsumableUnit::OffsetCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
@@ -225,6 +226,24 @@ UWeaponUnit::UWeaponUnit()
 
 }
 
+void UWeaponUnit::InitialUnit()
+{
+	Super::InitialUnit();
+	{
+		MaxAttackDistance = GetTableRowUnit_WeaponExtendInfo()->MaxAttackDistance;
+	}
+}
+
+void UWeaponUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+{
+	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+
+	if (FirstSkill)
+	{
+		FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	}
+}
+
 FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
@@ -232,6 +251,22 @@ FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() 
 
 	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_WeaponExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
+}
+
+FTableRowUnit_PropertyEntrys* UWeaponUnit::GetMainPropertyEntry() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PropertyEntrys>(
+		*GetTableRowUnit_WeaponExtendInfo()->PropertyEntry.ToString(), TEXT("GetUnit")
+	);
+	return SceneUnitExtendInfoPtr;
+}
+
+int32 UWeaponUnit::GetMaxAttackDistance() const
+{
+	return MaxAttackDistance;
 }
 
 USkillUnit::USkillUnit() :
@@ -243,6 +278,75 @@ USkillUnit::USkillUnit() :
 TSubclassOf<USkill_Base> USkillUnit::GetSkillClass() const
 {
 	return nullptr;
+}
+
+void USkillUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+{
+	if (!InAllocationCharacterUnitPtr)
+	{
+		UnRegisterSkill();
+	}
+
+	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+
+	if (AllocationCharacterUnitPtr)
+	{
+		RegisterSkill();
+	}
+}
+
+void USkillUnit::RegisterSkill()
+{
+	FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
+
+	GameplayAbilityTargetDataPtr->SkillUnitPtr = this;
+
+	FGameplayAbilitySpec GameplayAbilitySpec(
+		GetSkillClass(),
+		Level
+	);
+
+	GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
+	GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+
+	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+	GameplayAbilitySpecHandle = ProxyCharacterPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+}
+
+void USkillUnit::UnRegisterSkill()
+{
+	if (GetAllocationCharacterUnit())
+	{
+		auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+
+		if (ProxyCharacterPtr)
+		{
+			auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+
+			ASCPtr->CancelAbilityHandle(GameplayAbilitySpecHandle);
+			ASCPtr->ClearAbility(GameplayAbilitySpecHandle);
+		}
+	}
+
+	GameplayAbilitySpecHandle = FGameplayAbilitySpecHandle();
+}
+
+USkill_Base* USkillUnit::GetGAInst()const
+{
+	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
+	if (GameplayAbilitySpecPtr)
+	{
+		return Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+	}
+
+	return nullptr;
+}
+
+FGameplayAbilitySpecHandle USkillUnit::GetGAHandle() const
+{
+	return GameplayAbilitySpecHandle;
 }
 
 UWeaponSkillUnit::UWeaponSkillUnit()
@@ -438,7 +542,7 @@ void UActiveSkillUnit::FreshUniqueCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
@@ -462,7 +566,7 @@ void UActiveSkillUnit::OffsetCooldownTime()
 		this
 	);
 
-	// »ñÈ¡µ±Ç°¼¼ÄÜCD
+	// èŽ·å–å½“å‰æŠ€èƒ½CD
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();

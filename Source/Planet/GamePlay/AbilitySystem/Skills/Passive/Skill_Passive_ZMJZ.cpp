@@ -18,12 +18,6 @@
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_Base.h"
 
-USkill_Passive_ZMJZ::USkill_Passive_ZMJZ() :
-	Super()
-{
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-}
-
 void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);

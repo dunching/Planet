@@ -34,6 +34,9 @@ public:
 	bool bIsFarawayOriginal = false;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	int32 QueryDistance = 100;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
 };

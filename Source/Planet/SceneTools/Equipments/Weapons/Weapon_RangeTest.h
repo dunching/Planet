@@ -25,7 +25,7 @@ public:
 
 	AWeapon_RangeTest(const FObjectInitializer& ObjectInitializer);
 
-	virtual void AttachToCharacter(AHumanCharacter* CharacterPtr)override;
+	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
 	USkeletalMeshComponent* GetMesh();
 

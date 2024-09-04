@@ -77,7 +77,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						{
 							continue;
 						}
-						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->SkillUnitPtr->GAInstPtr);
+						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->SkillUnitPtr->GetGAInst());
 						if (!GAInsPtr)
 						{
 							continue;
@@ -91,7 +91,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						{
 							if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter))
 							{
-								ReleasingSkillMap.Add(GAInsPtr->GetCurrentAbilitySpecHandle(), Iter);
+								ReleasingSkillMap.Add(GAInsPtr, Iter);
 								return true;
 							}
 						}
@@ -113,12 +113,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					{
 						continue;
 					}
-					auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(WeaponSPtr->Handle);
-					if (!GameplayAbilitySpecPtr)
-					{
-						continue;
-					}
-					auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+					auto GAInsPtr = Cast<USkill_Base>(WeaponSPtr->WeaponUnitPtr->FirstSkill->GetGAInst());
 					if (!GAInsPtr)
 					{
 						continue;
@@ -132,7 +127,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					{
 						if (CharacterPtr->GetInteractiveSkillComponent()->ActiveAction(Iter, true))
 						{
-							ReleasingSkillMap.Add(WeaponSPtr->Handle, Iter);
+							ReleasingSkillMap.Add(GAInsPtr, Iter);
 							return true;
 						}
 					}
@@ -153,13 +148,7 @@ void UAITask_ReleaseSkill::StopReleaseSkill()
 	for (const auto Iter : ReleasingSkillMap)
 	{
 		// 1.如果不取消这个回调，CancelAction会调用无效的成员函数（UE判断过了 不会崩溃 但是逻辑不对）
-		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
-		auto GameplayAbilitySpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter.Key);
-		if (!GameplayAbilitySpecPtr)
-		{
-			return;
-		}
-		auto GAInsPtr = Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance());
+		auto GAInsPtr = Cast<USkill_Base>(Iter.Key);
 		if (!GAInsPtr)
 		{
 			return;
@@ -173,9 +162,9 @@ void UAITask_ReleaseSkill::StopReleaseSkill()
 
 void UAITask_ReleaseSkill::OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr)
 {
-	if (GAPtr && ReleasingSkillMap.Contains(GAPtr->GetCurrentAbilitySpecHandle()))
+	if (GAPtr && ReleasingSkillMap.Contains(GAPtr))
 	{
-		ReleasingSkillMap.Remove(GAPtr->GetCurrentAbilitySpecHandle());
+		ReleasingSkillMap.Remove(GAPtr);
 	}
 
 	if (ReleasingSkillMap.IsEmpty())

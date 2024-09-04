@@ -58,27 +58,27 @@ void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 	{
 	case EWuXingType::kGold:
 	{
-		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWood:
 	{
-		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWater:
 	{
-		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kFire:
 	{
-		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kSoil:
 	{
-		Level = CharacterAttributesSPtr->GetElement().GoldElement.GetCurrentValue();
+		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
 	}
 	break;
 	}

@@ -263,7 +263,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 		return;
 	}
 
-	// ÎäÆ÷
+	// æ­¦å™¨
 	{
 		TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
 		{
@@ -287,7 +287,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 		EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 
-	// ¼¼ÄÜ
+	// æŠ€èƒ½
 	{
 		struct FHelper
 		{
@@ -332,7 +332,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 		EICPtr->RegisterMultiGAs(SkillsMap);
 	}
 
-	// ÏûºÄÆ·
+	// æ¶ˆè€—å“
 	{
 		struct FHelper
 		{
@@ -752,37 +752,11 @@ void UAllocationSkillsMenu::OnSkillUnitChanged(UBasicUnit* PreviousUnitPtr, UBas
 		}
 	}
 
-	if (PreviousUnitPtr)
-	{
-		if (bIsReplaced)
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
-		}
-		else
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
-		}
-	}
+	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
 void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
 {
-	if (NewUnitPtr)
-	{
-		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
-	}
-	else
-	{
-		if (PreviousUnitPtr)
-		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
-		}
-		else
-		{
-
-		}
-	}
-
 	TArray<FName>Ary
 	{
 		{FAllocationSkillsMenu::Get().MainWeapon},
@@ -810,6 +784,8 @@ void UAllocationSkillsMenu::OnWeaponUnitChanged(UBasicUnit* PreviousUnitPtr, UBa
 			}
 		}
 	}
+
+	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
 void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr)
@@ -841,6 +817,28 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(UBasicUnit* PreviousUnitPtr,
 			else
 			{
 			}
+		}
+	}
+
+	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
+}
+
+void UAllocationSkillsMenu::SetAllocation(UBasicUnit* PreviousUnitPtr, UBasicUnit* NewUnitPtr, bool bIsReplaced)
+{
+	if (NewUnitPtr)
+	{
+		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+	}
+
+	if (PreviousUnitPtr)
+	{
+		if (bIsReplaced)
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+		}
+		else
+		{
+			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
 		}
 	}
 }

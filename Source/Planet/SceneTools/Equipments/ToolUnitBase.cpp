@@ -22,7 +22,7 @@ AToolUnitBase::AToolUnitBase(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void AToolUnitBase::AttachToCharacter(AHumanCharacter* CharacterPtr)
+void AToolUnitBase::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 }
 

@@ -219,6 +219,7 @@ void AHumanAIController::InitialCharacter()
 						{
 							FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
 							FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
+							FirstWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
 						}
 					}
 
@@ -229,6 +230,7 @@ void AHumanAIController::InitialCharacter()
 						{
 							SecondWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
 							SecondWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
+							SecondWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
 						}
 					}
 

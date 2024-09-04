@@ -84,15 +84,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Damage = 10;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon Property")
-	int32 AD = 15;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon Property")
-	int32 AD_Penetration = 10;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Weapon Property")
-	int32 AD_PercentPenetration = 5;
-
 	AWeapon_PickAxe* EquipmentAxePtr = nullptr;
 
 	int32 MontageNum = 0;

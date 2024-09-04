@@ -27,16 +27,18 @@ class PLANET_API AToolUnitBase : public ASceneObj
 
 public:
 
+	using FOwnerPawnType = ACharacterBase;
+
 	AToolUnitBase(const FObjectInitializer& ObjectInitializer);
 
 protected:
 
-	virtual void AttachToCharacter(AHumanCharacter* CharacterPtr);
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equiment")
-	USceneComponent* SceneCompPtr = nullptr;
+	virtual void AttachToCharacter(ACharacterBase* CharacterPtr);
 
 	virtual void BeginPlay()override;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equiment")
+	USceneComponent* SceneCompPtr = nullptr;
 
 private:
 

@@ -21,26 +21,15 @@ UWeaponUnit* FSceneUnitContainer::AddUnit_Weapon(FGameplayTag UnitType)
 	TestGCUnitMap.Add(ResultPtr);
 #endif
 
-	for (;;)
-	{
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-		if (SceneMetaMap.Contains(NewID))
-		{
-			continue;
-		}
-		else
-		{
-			ResultPtr->ID = NewID;
-			ResultPtr->UnitType = UnitType;
+	ResultPtr->ID = GetValidID();
+	ResultPtr->UnitType = UnitType;
 
-			ResultPtr->FirstSkill = AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType);
+	ResultPtr->FirstSkill = AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType);
 
-			SceneToolsAry.Add(ResultPtr);
-			SceneMetaMap.Add(NewID, ResultPtr);
+	ResultPtr->InitialUnit();
 
-			break;
-		}
-	}
+	SceneToolsAry.Add(ResultPtr);
+	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 
 	return ResultPtr;
 }
@@ -74,27 +63,13 @@ USkillUnit* FSceneUnitContainer::AddUnit_Skill(FGameplayTag UnitType)
 			return nullptr;
 		}
 
-		for (;;)
-		{
-			const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-			if (SceneMetaMap.Contains(NewID))
-			{
-				continue;
-			}
-			else
-			{
-				ResultPtr->ID = NewID;
-				ResultPtr->UnitType = UnitType;
+		ResultPtr->ID = GetValidID();
+		ResultPtr->UnitType = UnitType;
 
-				SceneToolsAry.Add(ResultPtr);
-				SceneMetaMap.Add(NewID, ResultPtr);
-				SkillUnitMap.Add(UnitType, ResultPtr);
+		SceneToolsAry.Add(ResultPtr);
+		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+		SkillUnitMap.Add(UnitType, ResultPtr);
 
-				OnSkillUnitChanged.ExcuteCallback(ResultPtr, true);
-
-				break;
-			}
-		}
 		return ResultPtr;
 	}
 }
@@ -143,14 +118,12 @@ UConsumableUnit* FSceneUnitContainer::AddUnit_Consumable(FGameplayTag UnitType, 
 		TestGCUnitMap.Add(ResultPtr);
 #endif
 
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-
 		ResultPtr->Num = Num;
-		ResultPtr->ID = NewID;
+		ResultPtr->ID = GetValidID();
 		ResultPtr->UnitType = UnitType;
 
 		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(NewID, ResultPtr);
+		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 		ConsumablesUnitMap.Add(UnitType, ResultPtr);
 
 		OnConsumableUnitChanged.ExcuteCallback(ResultPtr, true, Num);
@@ -170,24 +143,11 @@ UToolUnit* FSceneUnitContainer::AddUnit_ToolUnit(FGameplayTag UnitType)
 	TestGCUnitMap.Add(ResultPtr);
 #endif
 
-	for (;;)
-	{
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-		if (SceneMetaMap.Contains(NewID))
-		{
-			continue;
-		}
-		else
-		{
-			ResultPtr->ID = NewID;
-			ResultPtr->UnitType = UnitType;
+	ResultPtr->ID = GetValidID();
+	ResultPtr->UnitType = UnitType;
 
-			SceneToolsAry.Add(ResultPtr);
-			SceneMetaMap.Add(NewID, ResultPtr);
-
-			break;
-		}
-	}
+	SceneToolsAry.Add(ResultPtr);
+	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 
 	return ResultPtr;
 }
@@ -289,14 +249,12 @@ UCoinUnit* FSceneUnitContainer::AddUnit_Coin(FGameplayTag UnitType, int32 Num /*
 		TestGCUnitMap.Add(ResultPtr);
 #endif
 
-		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
-
 		ResultPtr->Num = Num;
-		ResultPtr->ID = NewID;
+		ResultPtr->ID = GetValidID();
 		ResultPtr->UnitType = UnitType;
 
 		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(NewID, ResultPtr);
+		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 		CoinUnitMap.Add(UnitType, ResultPtr);
 
 		OnCoinUnitChanged.ExcuteCallback(ResultPtr, true, Num);
@@ -350,6 +308,28 @@ TArray<UCharacterUnit*> FSceneUnitContainer::GetGourpmateUintAry() const
 			{
 				Result.Add(GroupmateUnitPtr);
 			}
+		}
+	}
+
+	return Result;
+}
+
+int32 FSceneUnitContainer::GetValidID() const
+{
+	int32 Result = 0;
+
+	for (;;)
+	{
+		const auto NewID = FMath::RandRange(1, std::numeric_limits<UBasicUnit::IDType>::max());
+		if (SceneMetaMap.Contains(NewID))
+		{
+			continue;
+		}
+		else
+		{
+			Result = NewID;
+
+			break;
 		}
 	}
 

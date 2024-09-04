@@ -26,11 +26,6 @@
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
 
-UCS_PeriodicStateModify_Stun::UCS_PeriodicStateModify_Stun()
-{
-
-}
-
 FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun(
 	float Duration
 ):

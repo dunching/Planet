@@ -84,6 +84,6 @@ protected:
 	
 	void ModifyMaterials();
 
-	void AddTags(FGameplayAbilityTargetData_StateModify_Ice*CurParamPtr);
+	void AddTags(const TSharedPtr<FGameplayAbilityTargetData_StateModify_Ice> & CurrentGameplayAbilityTargetDataSPtr);
 	
 };

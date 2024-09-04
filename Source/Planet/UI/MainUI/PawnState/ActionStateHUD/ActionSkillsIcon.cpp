@@ -120,7 +120,7 @@ void UActionSkillsIcon::UpdateSkillState()
 
 	const auto SKillUnitType = SkillSocketInfoSPtr->SkillUnitPtr->GetUnitType();
 	{
-		auto GAInsPtr = SkillSocketInfoSPtr->SkillUnitPtr->GAInstPtr;
+		auto GAInsPtr = SkillSocketInfoSPtr->SkillUnitPtr->GetGAInst();
 		if (!GAInsPtr)
 		{
 			return;
@@ -146,7 +146,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		bool bIsAcceptInput = false;
 		float Percent = 0.f;
 
-		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->SkillUnitPtr->GAInstPtr);
+		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->SkillUnitPtr->GetGAInst());
 		if (!GAInsPtr)
 		{
 			return;

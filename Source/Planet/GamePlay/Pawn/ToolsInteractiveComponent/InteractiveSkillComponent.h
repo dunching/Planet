@@ -27,8 +27,6 @@ struct FWeaponSocketInfo
 	FGameplayTag WeaponSocket;
 
 	UWeaponUnit* WeaponUnitPtr = nullptr;
-
-	FGameplayAbilitySpecHandle Handle;
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -82,6 +80,8 @@ public:
 
 	void RetractputWeapon();
 
+	int32 GetCurrentWeaponAttackDistance()const;
+
 	EWeaponSocket GetActivedWeaponType();
 
 	TSharedPtr<FWeaponSocketInfo >GetActivedWeapon()const;
@@ -106,10 +106,6 @@ protected:
 	);
 
 	bool ActivedCorrespondingWeapon(UActiveSkillUnit* ActiveSkillUnitPtr);
-
-	void RemoveSkill(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
-
-	void AddSkill(const TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>>& InSkillsMap);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;

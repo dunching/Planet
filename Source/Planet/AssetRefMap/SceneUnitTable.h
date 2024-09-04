@@ -65,13 +65,21 @@ struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AWeapon_Base> ToolActorClass;
-
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag WeaponSkillUnitType = FGameplayTag::EmptyTag;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	EAnimLinkClassType AnimLinkClassType = EAnimLinkClassType::kUnarmed;
-
+	
+	// 武器的主属性词条
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
+	FGameplayTag PropertyEntry;
+	
+	// 在使用这个武器时，最大攻击范围为多少(AI会使用这个进行场景查询)
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
+	int32 MaxAttackDistance = 50;
+	
 };
 
 USTRUCT(BlueprintType)
@@ -107,7 +115,7 @@ struct PLANET_API FTableRowUnit_PassiveSkillExtendInfo : public FTableRowUnit_Sk
 	
 	// 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
-	TMap<EWuXingType, int32>AddtionalElementMap;
+	TMap<ECharacterPropertyType, int32>AddtionalElementMap;
 	
 };
 
@@ -115,10 +123,6 @@ USTRUCT(BlueprintType)
 struct PLANET_API FTableRowUnit_WeaponSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
 {
 	GENERATED_USTRUCT_BODY()
-	
-	// 武器的主属性词条
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
-	FGameplayTag PropertyEntry;
 	
 };
 

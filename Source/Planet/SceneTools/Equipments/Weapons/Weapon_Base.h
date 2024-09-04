@@ -10,6 +10,9 @@
 
 #include "Weapon_Base.generated.h"
 
+class AHumanCharacter;
+class UWeaponUnit;
+
 UCLASS()
 class PLANET_API AWeapon_Base : public AToolUnitBase
 {
@@ -17,9 +20,12 @@ class PLANET_API AWeapon_Base : public AToolUnitBase
 
 public:
 
+	UWeaponUnit* WeaponUnitPtr = nullptr;
+
 protected:
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack Range")
-	int32 AttackRange = 150;
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
+
+	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
 };

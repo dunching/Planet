@@ -26,7 +26,7 @@ AWeapon_RangeTest::AWeapon_RangeTest(const FObjectInitializer& ObjectInitializer
 	SkeletalComponentPtr->SetupAttachment(SceneCompPtr);
 }
 
-void AWeapon_RangeTest::AttachToCharacter(AHumanCharacter* CharacterPtr)
+void AWeapon_RangeTest::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 

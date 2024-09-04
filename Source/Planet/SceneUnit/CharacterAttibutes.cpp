@@ -109,20 +109,15 @@ void FCharacterAttributes::InitialData()
 
 	TianZi.GetMaxProperty().SetCurrentValue(6);
 
-	Element.GoldElement.GetMaxProperty().SetCurrentValue(9);
-	Element.GoldElement.WuXingType = EWuXingType::kGold;
+	GoldElement.GetMaxProperty().SetCurrentValue(9);
 
-	Element.WoodElement.GetMaxProperty().SetCurrentValue(9);
-	Element.WoodElement.WuXingType = EWuXingType::kWood;
+	WoodElement.GetMaxProperty().SetCurrentValue(9);
 
-	Element.WaterElement.GetMaxProperty().SetCurrentValue(9);
-	Element.WaterElement.WuXingType = EWuXingType::kWater;
+	WaterElement.GetMaxProperty().SetCurrentValue(9);
 
-	Element.FireElement.GetMaxProperty().SetCurrentValue(9);
-	Element.FireElement.WuXingType = EWuXingType::kFire;
+	FireElement.GetMaxProperty().SetCurrentValue(9);
 
-	Element.SoilElement.GetMaxProperty().SetCurrentValue(9);
-	Element.SoilElement.WuXingType = EWuXingType::kSoil;
+	SoilElement.GetMaxProperty().SetCurrentValue(9);
 
 	const auto DataSource = FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
 	//UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
@@ -181,15 +176,15 @@ void FCharacterAttributes::InitialData()
 
 void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	// ¥¶¿Ì ˝æ›
+	// Â§ÑÁêÜÊï∞ÊçÆ
 	const auto& Ref = GAEvent.Data;
 
 	if (Ref.HitRate <= 0)
 	{
-		// Œ¥√¸÷–
+		// Êú™ÂëΩ‰∏≠
 	}
 
-	// ª·–ƒ…À∫¶
+	// ‰ºöÂøÉ‰º§ÂÆ≥
 	float CurCriticalDamage = 1.f;
 	if (Ref.CriticalHitRate >= 100)
 	{
@@ -231,32 +226,73 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 
 	// 
 	{
+		auto Lambda = [&Ref](
+				FBasePropertySet& PropertySetRef, 
+				const FBaseProperty &Property
+			)
+			{
+				if (Ref.bIsClearData)
+				{
+					PropertySetRef.RemoveCurrentValue(Ref.DataSource);
+				}
+				else
+				{
+					PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+				}
+			};
+
 		for (const auto Iter : Ref.DataModify)
 		{
 			switch (Iter.Key)
 			{
+			case ECharacterPropertyType::GoldElement:
+			{
+				Lambda(GoldElement, Iter.Value);
+			}
+			break;
+			case ECharacterPropertyType::WoodElement:
+			{
+				Lambda(WoodElement, Iter.Value);
+			}
+			break;
+			case ECharacterPropertyType::WaterElement:
+			{
+				Lambda(WaterElement, Iter.Value);
+			}
+			break;
+			case ECharacterPropertyType::FireElement:
+			{
+				Lambda(FireElement, Iter.Value);
+			}
+			break;
+			case ECharacterPropertyType::SoilElement:
+			{
+				Lambda(SoilElement, Iter.Value);
+			}
+			break;
+			case ECharacterPropertyType::BaseAttackPower:
+			{
+				Lambda(BaseAttackPower, Iter.Value);
+			}
+			break;
+			case ECharacterPropertyType::Penetration:
+			{
+				Lambda(Penetration, Iter.Value);
+			}
+			break;
+			case ECharacterPropertyType::PercentPenetration:
+			{
+				Lambda(PercentPenetration, Iter.Value);
+			}
+			break;
 			case ECharacterPropertyType::GAPerformSpeed:
 			{
-				if (Ref.bIsClearData)
-				{
-					GAPerformSpeed.RemoveCurrentValue(Ref.DataSource);
-				}
-				else
-				{
-					GAPerformSpeed.AddCurrentValue(Iter.Value.GetCurrentValue(), Ref.DataSource);
-				}
+				Lambda(GAPerformSpeed, Iter.Value);
 			}
 			break;
 			case ECharacterPropertyType::MoveSpeed:
 			{
-				if (Ref.bIsClearData)
-				{
-					MoveSpeed.RemoveCurrentValue(Ref.DataSource);
-				}
-				else
-				{
-					MoveSpeed.AddCurrentValue(Iter.Value.GetCurrentValue(), Ref.DataSource);
-				}
+				Lambda(MoveSpeed, Iter.Value);
 			}
 			break;
 			}
@@ -274,11 +310,6 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #endif
 
 	ProcessedGAEvent(GAEvent);
-}
-
-const FElement& FCharacterAttributes::GetElement() const
-{
-	return Element;
 }
 
 const FBasePropertySet& FCharacterAttributes::GetHPReply() const

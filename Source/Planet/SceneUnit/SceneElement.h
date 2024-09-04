@@ -7,12 +7,14 @@
 
 #include "CoreMinimal.h"
 #include <GameplayTagContainer.h>
+#include "GameplayAbilitySpecHandle.h"
 
 #include "GenerateType.h"
 #include "BaseData.h"
 
 #include "SceneElement.generated.h"
 
+struct FGameplayAbilityTargetData_Skill;
 struct FTableRowUnit_CommonCooldownInfo;
 struct FTableRowUnit;
 struct FTableRowUnit_WeaponExtendInfo;
@@ -104,7 +106,7 @@ public:
 	// 
 	FString GetUnitName()const;
 
-	void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
+	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr);
 
 	TCallbackHandleContainer<void(UCharacterUnit*)> OnAllocationCharacterUnitChanged;
 
@@ -258,10 +260,19 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
-	UPROPERTY(Transient)
-	USkill_Base* GAInstPtr = nullptr;
+	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)override;
+
+	void RegisterSkill();
+
+	void UnRegisterSkill();
+
+	USkill_Base* GetGAInst()const;
+
+	FGameplayAbilitySpecHandle GetGAHandle()const;
 
 protected:
+
+	FGameplayAbilitySpecHandle GameplayAbilitySpecHandle;
 
 };
 
@@ -360,21 +371,23 @@ public:
 
 	UWeaponUnit();
 
+	virtual void InitialUnit()override;
+
+	virtual void SetAllocationCharacterUnit(UCharacterUnit* AllocationCharacterUnitPtr)override;
+
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
 
-	int32 DamageDegree = 0;
+	// 主词条
+	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
+
+	int32 GetMaxAttackDistance()const;
 
 	UPROPERTY(Transient)
 	USkillUnit* FirstSkill = nullptr;
 	
-	// 主词条
-	UPROPERTY(Transient)
-	FGameplayTag Entry_1 = FGameplayTag::EmptyTag;
-	
-	// 副词条
-	UPROPERTY(Transient)
-	FGameplayTag Entry_2 = FGameplayTag::EmptyTag;
-
 protected:
-
+	
+	UPROPERTY(Transient)
+	int32 MaxAttackDistance = 100;
+	
 };

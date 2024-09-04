@@ -56,16 +56,6 @@ void USkill_Active_XYFH::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
 	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
-}
-
-void USkill_Active_XYFH::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	if (!SPlineActorPtr)
 	{
@@ -80,6 +70,16 @@ void USkill_Active_XYFH::ActivateAbility(
 			CameraTrailHelperClass, CharacterPtr->GetActorTransform()
 		);
 	}
+}
+
+void USkill_Active_XYFH::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_XYFH::CanActivateAbility(
