@@ -67,30 +67,22 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	void FindTarget();
-
 	void PlayMontage();
-
+	
 	UFUNCTION()
-	void OnHitCallback(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
-	
-	void OnProjectileBounce(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-							UPrimitiveComponent* OtherComp,
-							int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-	void ExcuteTasks();
+
 	void OnOverlap(AActor* OtherActor);
+
 	
-	UFUNCTION()
-	bool ResetIceGun(UAbilityTask_TimerHelper* TaskPtr);
 	USceneComponent* GetNearnestTarget(ACharacterBase* SelfCharacter, float SearchRadius);
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float Duration = 1.5f;
+	float Duration = 5.0f;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Distance = 800.f;
@@ -100,12 +92,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Offset = 20.f;
-
-	FVector StartPt = FVector::ZeroVector;
-
-	FVector EndPt = FVector::ZeroVector;
-
-	ASkill_IceGun_Projectile* IceGunPtr = nullptr;
+	
+	TArray<ASkill_IceGun_Projectile* >IceGunPtrAry ={};
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ASkill_IceGun_Projectile> IceGunPtrClass;
@@ -115,6 +103,16 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSoftObjectPtr<UParticleSystem>HitParticle;
+
+
+	// // ±ù¶³
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftObjectPtr<UParticleSystem> IceParticle;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftObjectPtr<USoundBase> IceSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int  IceGunNum=3;
 	
 };
 
@@ -125,7 +123,6 @@ class PLANET_API ASkill_IceGun_Projectile : public AActor
 
 	ASkill_IceGun_Projectile(const FObjectInitializer& ObjectInitializer);
 public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UProjectileMovementComponent>  ProjectileMovementComp;
 	
@@ -134,9 +131,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UParticleSystemComponent>  ParticleSystemComp;
-	
-	FTimerHandle TimerHandle; 
-	void Reset();
-
-	void Activate();
 };
