@@ -95,6 +95,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/SceneTools/Building");
         PublicIncludePaths.Add("Planet/SceneTools/Building/BuildingArea");
         PublicIncludePaths.Add("Planet/SceneTools/Projectile");
+        PublicIncludePaths.Add("Planet/SceneTools/ResourceBox");
         PublicIncludePaths.Add("Planet/RaffleSystem");
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");

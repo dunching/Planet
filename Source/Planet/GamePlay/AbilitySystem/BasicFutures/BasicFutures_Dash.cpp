@@ -88,10 +88,10 @@ void UBasicFutures_Dash::ActivateAbility(
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-		DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 	}
 #endif
+
+	DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool UBasicFutures_Dash::CommitAbility(
@@ -311,4 +311,16 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 void UBasicFutures_Dash::OnLanded(const FHitResult&)
 {
 	DashInAir = 0;
+}
+
+UScriptStruct* FGameplayAbilityTargetData_Dash::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Dash::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Dash::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar<< DashDirection;
+
+	return true;
 }

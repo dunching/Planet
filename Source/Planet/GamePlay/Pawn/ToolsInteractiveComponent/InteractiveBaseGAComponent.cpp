@@ -650,7 +650,7 @@ bool UInteractiveBaseGAComponent::SwitchWalkState(bool bIsRun)
 	return false;
 }
 
-bool UInteractiveBaseGAComponent::Dash(EDashDirection DashDirection)
+void UInteractiveBaseGAComponent::Dash_Implementation(EDashDirection DashDirection)
 {
 	FGameplayEventData Payload;
 	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
@@ -661,10 +661,18 @@ bool UInteractiveBaseGAComponent::Dash(EDashDirection DashDirection)
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
+// 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+// 
+// 		ASCPtr->TriggerAbilityFromGameplayEvent(
+// 			FGameplayAbilitySpecHandle (),
+// 			ASCPtr->AbilityActorInfo.Get(),
+// 			UGameplayTagsSubSystem::GetInstance()->Dash,
+// 			&Payload, 
+// 			*ASCPtr
+// 		);
+
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Dash, Payload);
 	}
-
-	return true;
 }
 
 void UInteractiveBaseGAComponent::MoveToAttackDistance(

@@ -13,6 +13,10 @@ FName USceneObjPropertyComponent::ComponentName = TEXT("SceneObjPropertyComponen
 ASceneObj::ASceneObj(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
 {
+	bReplicates = true;
+	NetPriority = 3.0f;
+	NetUpdateFrequency = 100.f;
+
 	PropertyComponentPtr = CreateDefaultSubobject<USceneObjPropertyComponent>(USceneObjPropertyComponent::ComponentName);
 }
 

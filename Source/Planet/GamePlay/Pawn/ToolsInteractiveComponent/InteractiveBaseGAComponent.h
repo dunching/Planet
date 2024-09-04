@@ -117,7 +117,8 @@ public:
 
 	bool SwitchWalkState(bool bIsRun);
 	
-	bool Dash(EDashDirection DashDirection);
+	UFUNCTION(Server, Reliable)
+	void Dash(EDashDirection DashDirection);
 
 	void MoveToAttackDistance(
 		FGameplayAbilityTargetData_MoveToAttaclArea * MoveToAttaclAreaPtr

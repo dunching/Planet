@@ -67,6 +67,7 @@
 #include "HumanViewRaffleMenu.h"
 #include "InteractiveBaseGAComponent.h"
 #include "InteractiveConsumablesComponent.h"
+#include "ResourceBox.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
@@ -235,7 +236,7 @@ namespace HumanProcessor
 				}
 			}
 
-			// ÕâÀïÓ¦¸ÃÊÇÌØ¶¨µÄÊäÈë»á´ò¶Ï »¹ÊÇÈÎÒâÊäÈë¶¼»á´ò¶Ï£¿
+			// è¿™é‡Œåº”è¯¥æ˜¯ç‰¹å®šçš„è¾“å…¥ä¼šæ‰“æ–­ è¿˜æ˜¯ä»»æ„è¾“å…¥éƒ½ä¼šæ‰“æ–­ï¼Ÿ
 			else if (
 				(Params.Key == EKeys::W) ||
 				(Params.Key == EKeys::A) ||
@@ -295,7 +296,7 @@ namespace HumanProcessor
 		if (LookAtSceneObjPtr)
 		{
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			LookAtSceneObjPtr->Interaction(OnwerActorPtr);
+			Cast<AResourceBox>(LookAtSceneObjPtr)->Interaction1(OnwerActorPtr);
 		}
 	}
 

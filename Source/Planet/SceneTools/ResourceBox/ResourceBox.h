@@ -25,8 +25,12 @@ public:
 	AResourceBox(const FObjectInitializer& ObjectInitializer);
 
 	virtual void OnConstruction(const FTransform& Transform)override;
-
+	
+	UFUNCTION(Server, Reliable)
 	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+
+	UFUNCTION(Server, Reliable)
+	void Interaction1(ACharacterBase* CharacterPtr);
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
 
@@ -35,6 +39,9 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Interaction_Imp(ACharacterBase* CharacterPtr);
 
 	UFUNCTION()
 	void OnAnimationFinished();

@@ -22,15 +22,6 @@ void AResourceBox::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
-void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
-{
-	Super::Interaction(InCharacterPtr);
-	if (ActorSequenceComponent)
-	{
-		ActorSequenceComponent->PlaySequence();
-	}
-}
-
 void AResourceBox::EndLookAt()
 {
 	if (InteractionWidgetCompoentPtr)
@@ -59,9 +50,36 @@ void AResourceBox::BeginPlay()
 	EndLookAt();
 }
 
+void AResourceBox::Interaction_Implementation(ACharacterBase* InCharacterPtr)
+{
+	Super::Interaction(InCharacterPtr);
+
+	Interaction_Imp(InCharacterPtr);
+}
+
+void AResourceBox::Interaction1_Implementation(ACharacterBase* InCharacterPtr)
+{
+	Super::Interaction(InCharacterPtr);
+
+	Interaction_Imp(InCharacterPtr);
+}
+
+void AResourceBox::Interaction_Imp_Implementation(ACharacterBase* CharacterPtr)
+{
+	if (ActorSequenceComponent)
+	{
+		ActorSequenceComponent->PlaySequence();
+	}
+}
+
 void AResourceBox::OnAnimationFinished()
 {
-	AddItemsToTarget();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		AddItemsToTarget();
 
-	Destroy();
+		Destroy();
+	}
+#endif
 }

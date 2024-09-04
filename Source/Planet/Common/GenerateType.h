@@ -42,6 +42,7 @@ enum class ECharacterPropertyType : uint8
 	MoveSpeed,
 };
 
+UENUM()
 enum class EDashDirection : uint8
 {
 	kForward,
