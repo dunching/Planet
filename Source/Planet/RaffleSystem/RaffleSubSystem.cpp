@@ -77,7 +77,7 @@ void URaffleSubSystem::SyncUnits2Player()const
 
 bool URaffleSubSystem::RafflePermanent(int32 Count)const
 {
-	// Í¨¹ýHTTPÇëÇó
+	// é€šè¿‡HTTPè¯·æ±‚
 
 	RafflePermanentComplete(
 #if WITH_EDITOR
@@ -125,7 +125,7 @@ void URaffleSubSystem::RafflePermanentComplete(
 	{
 		auto RowPtr = DataTable->FindRow<FTableRowUnit>(*Iter.ToString(), TEXT("GetUnit"));
 
-		CharacterPtr->GetHoldingItemsComponent()->AddUnit_Apending(Iter, ApendingID);
+		CharacterPtr->GetHoldingItemsComponent()->AddUnit_Apending(Iter, 1, ApendingID);
  
  		GetUnitAry.Add(SceneUnitExtendInfoMapPtr->GetTableRowUnit(Iter));
 	}

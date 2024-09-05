@@ -11,6 +11,7 @@
 
 #include "SceneObj.generated.h"
 
+class UNetConnection;
 class ACharacterBase;
 
 UCLASS(BlueprintType, Blueprintable)
@@ -40,6 +41,8 @@ class PLANET_API ASceneObj :
 public:
 
 	ASceneObj(const FObjectInitializer& ObjectInitializer);
+
+	virtual UNetConnection* GetNetConnection() const override;
 
 	virtual void Interaction(ACharacterBase* CharacterPtr)override;
 

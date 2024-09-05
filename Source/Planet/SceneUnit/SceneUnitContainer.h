@@ -39,7 +39,7 @@ struct FSceneUnitContainer;
 
 enum class ECharacterPropertyType : uint8;
 
-FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType);
+FTableRowUnit* GetTableRowUnit(const FGameplayTag &UnitType);
 
 #pragma region HoldItem
 USTRUCT(BlueprintType)
@@ -61,29 +61,33 @@ struct FSceneUnitContainer final
 
 	~FSceneUnitContainer();
 
-	TSharedPtr<FBasicProxy> AddUnit(FGameplayTag UnitType, int32 Num);
+	TSharedPtr<FBasicProxy> AddUnit(const FGameplayTag &UnitType, int32 Num);
 
 	TSharedPtr<FBasicProxy> FindUnit(IDType ID);
 
 	void RemoveUnit(IDType ID);
 
-	TSharedPtr<FCoinProxy> AddUnit_Coin(FGameplayTag UnitType, int32 Num);
+	TSharedPtr<FCoinProxy> AddUnit_Coin(const FGameplayTag &UnitType, int32 Num);
 	
-	TSharedPtr<FCoinProxy> FindUnit_Coin(FGameplayTag UnitType);
+	TSharedPtr<FCoinProxy> FindUnit_Coin(const FGameplayTag &UnitType);
 
-	TSharedPtr <FConsumableProxy> AddUnit_Consumable(FGameplayTag UnitType, int32 Num = 1);
+	TSharedPtr <FConsumableProxy> AddUnit_Consumable(const FGameplayTag &UnitType, int32 Num = 1);
 
 	void RemoveUnit_Consumable(const TSharedPtr <FConsumableProxy>&UnitPtr, int32 Num = 1);
 
-	TSharedPtr<FToolProxy> AddUnit_ToolUnit(FGameplayTag UnitType);
+	TSharedPtr<FToolProxy> AddUnit_ToolUnit(const FGameplayTag &UnitType);
 
-	TSharedPtr<FWeaponProxy> AddUnit_Weapon(FGameplayTag UnitType);
+	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FGameplayTag &UnitType);
 
-	TSharedPtr<FWeaponProxy> FindUnit_Weapon(FGameplayTag UnitType);
+	TSharedPtr<FWeaponProxy> FindUnit_Weapon(const FGameplayTag &UnitType);
 
-	TSharedPtr<FSkillProxy>  AddUnit_Skill(FGameplayTag UnitType);
+	TSharedPtr<FSkillProxy>  AddUnit_Skill(const FGameplayTag &UnitType);
 
-	TSharedPtr<FSkillProxy> FindUnit_Skill(FGameplayTag UnitType);
+	TSharedPtr<FSkillProxy> AddUnit_Skill(const FSkillProxy & Unit);
+
+	TSharedPtr<FSkillProxy> FindUnit_Skill(const FGameplayTag &UnitType);
+
+	TSharedPtr<FCharacterProxy> AddUnit_Character(const FGameplayTag &UnitType);
 
 	void AddUnit_Groupmate(const TSharedPtr<FCharacterProxy>& UnitPtr);
 

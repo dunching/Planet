@@ -42,6 +42,8 @@
 #include "PlanetPlayerController.h"
 #include "GAEvent_Helper.h"
 #include "FightingTips.h"
+#include "SceneObj.h"
+#include "SceneUnitContainer.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -155,13 +157,19 @@ void ACharacterBase::PostInitializeComponents()
 	{
 		InitialCharacterUnit();
 
-		auto GASPtr = GetAbilitySystemComponent();
+#if UE_EDITOR || UE_SERVER
+		if (GetNetMode() == NM_DedicatedServer)
+		{
+			// GA全部通过Server注册
+			auto GASPtr = GetAbilitySystemComponent();
 
-		GASPtr->ClearAllAbilities();
-		GASPtr->InitAbilityActorInfo(this, this);
-		GetInteractiveSkillComponent()->InitialBaseGAs();
-		GetInteractiveBaseGAComponent()->InitialBaseGAs();
-		GetInteractiveConsumablesComponent()->InitialBaseGAs();
+			GASPtr->ClearAllAbilities();
+			GASPtr->InitAbilityActorInfo(this, this);
+			GetInteractiveSkillComponent()->InitialBaseGAs();
+			GetInteractiveBaseGAComponent()->InitialBaseGAs();
+			GetInteractiveConsumablesComponent()->InitialBaseGAs();
+		}
+#endif
 	}
 
 	Super::PostInitializeComponents();
@@ -195,6 +203,14 @@ void ACharacterBase::UnPossessed()
 				OriginalAIController->Possess(this);
 			}
 		}
+	}
+}
+
+void ACharacterBase::InteractionSceneObj_Implementation(ASceneObj* SceneObjPtr)
+{
+	if (SceneObjPtr)
+	{
+		SceneObjPtr->Interaction(this);
 	}
 }
 
@@ -265,8 +281,13 @@ TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 
 void ACharacterBase::InitialCharacterUnit()
 {
-	CharacterUnitPtr = MakeShared<FCharacterProxy>();
-	CharacterUnitPtr->ProxyCharacterPtr = this;
+	auto SceneUnitContainer = MakeShared<FSceneUnitContainer>();
+	auto NewCharacterUnitPtr = SceneUnitContainer->AddUnit_Character(RowName);
+
+	NewCharacterUnitPtr->ProxyCharacterPtr = this;
+	NewCharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
+
+	CharacterUnitPtr = NewCharacterUnitPtr;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -288,8 +309,6 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ACharacterBase::SpawnDefaultController()
 {
-	auto  asd = GetNetMode();
-
 	Super::SpawnDefaultController();
 
 	OriginalAIController = Controller;

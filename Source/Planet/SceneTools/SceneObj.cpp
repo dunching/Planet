@@ -2,6 +2,8 @@
 
 #include "SceneObj.h"
 
+#include "Kismet/GameplayStatics.h"
+
 USceneObjPropertyComponent::USceneObjPropertyComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
@@ -13,16 +15,47 @@ FName USceneObjPropertyComponent::ComponentName = TEXT("SceneObjPropertyComponen
 ASceneObj::ASceneObj(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
 {
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	NetPriority = 3.0f;
 	NetUpdateFrequency = 100.f;
+	SetReplicatingMovement(true);
 
 	PropertyComponentPtr = CreateDefaultSubobject<USceneObjPropertyComponent>(USceneObjPropertyComponent::ComponentName);
+}
+
+UNetConnection* ASceneObj::GetNetConnection() const
+{
+	auto Controller = UGameplayStatics::GetPlayerController(GWorld, 0);
+	if (Controller)
+	{
+		return Controller->GetNetConnection();
+	}
+	return Super::GetNetConnection();
 }
 
 void ASceneObj::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto Controller = UGameplayStatics::GetPlayerController(GWorld, 0);
+		if (Controller)
+		{
+			SetOwner(Controller);
+			// SetAutonomousProxy(true);
+		}
+	}
+#endif
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		SetReplicates(true);
+	}
+#endif
 }
 
 void ASceneObj::EndPlay(const EEndPlayReason::Type EndPlayReason)

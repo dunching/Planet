@@ -10,7 +10,7 @@
 #include "SceneUnitContainer.h"
 #include "PlanetControllerInterface.h"
 
-UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer):
+UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 }
@@ -30,6 +30,36 @@ TSharedPtr<FSceneUnitContainer> UHoldingItemsComponent::GetSceneUnitContainer()
 void UHoldingItemsComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		{
+			auto Handle =
+				GetSceneUnitContainer()->OnSkillUnitChanged.AddCallback([this](const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd)
+					{
+						OnSkillUnitChanged(*UnitPtr, bIsAdd);
+					});
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+#endif
+}
+
+void UHoldingItemsComponent::OnSkillUnitChanged_Implementation(
+	const FSkillProxy& Skill,
+	bool bIsAdd
+)
+{
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (OwnerPtr)
+	{
+		if (bIsAdd)
+		{
+			auto Result = GetSceneUnitContainer()->AddUnit_Skill(Skill);
+			Result->OwnerCharacterUnitPtr = OwnerPtr->GetCharacterUnit().ToWeakPtr();
+		}
+	}
 }
 
 TSharedPtr<FBasicProxy>  UHoldingItemsComponent::AddUnit(FGameplayTag UnitType, int32 Num)
@@ -40,26 +70,26 @@ TSharedPtr<FBasicProxy>  UHoldingItemsComponent::AddUnit(FGameplayTag UnitType, 
 	{
 		Result = GetSceneUnitContainer()->AddUnit(UnitType, Num);
 
-		if (GetOwner<FOwnerType>()->GetCharacterUnit())
+		if (Result && OwnerPtr->GetCharacterUnit())
 		{
-			Result->OwnerCharacterUnitPtr = GetOwner<FOwnerType>()->GetCharacterUnit().ToWeakPtr();
+			Result->OwnerCharacterUnitPtr = OwnerPtr->GetCharacterUnit().ToWeakPtr();
 		}
 	}
 
 	return Result;
 }
 
-void UHoldingItemsComponent::AddUnit_Apending(FGameplayTag UnitType, FGuid Guid)
+void UHoldingItemsComponent::AddUnit_Apending(FGameplayTag UnitType, int32 Num, FGuid Guid)
 {
 	if (SkillUnitApendingMap.Contains(Guid))
 	{
 		if (SkillUnitApendingMap[Guid].Contains(UnitType))
 		{
-			SkillUnitApendingMap[Guid][UnitType]++;
+			SkillUnitApendingMap[Guid][UnitType] += Num;
 		}
 		else
 		{
-			SkillUnitApendingMap[Guid].Add(UnitType, 1);
+			SkillUnitApendingMap[Guid].Add(UnitType, Num);
 		}
 	}
 	else

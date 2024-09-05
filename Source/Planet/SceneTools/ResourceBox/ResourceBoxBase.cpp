@@ -55,10 +55,14 @@ void AResourceBoxBase::AddItemsToTarget()
 	if (TargetCharacterPtr)
 	{
 		{
+			FGuid Guid  = FGuid::NewGuid();
+			auto HICPtr = TargetCharacterPtr->GetHoldingItemsComponent();
 			for (const auto Iter : UnitMap)
 			{
-				TargetCharacterPtr->GetHoldingItemsComponent()->AddUnit(Iter.Key, Iter.Value);
+				HICPtr->AddUnit_Apending(Iter.Key, Iter.Value, Guid);
 			}
+
+			HICPtr->SyncApendingUnit(Guid);
 #if WITH_EDITORONLY_DATA
 #endif
 		}

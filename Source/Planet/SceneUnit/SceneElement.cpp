@@ -26,6 +26,54 @@ FBasicProxy::~FBasicProxy()
 
 }
 
+bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << UnitType;
+	Ar << ID;
+
+	if (Ar.IsSaving())
+	{
+		bool bIsValid = AllocationCharacterUnitPtr.IsValid();
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			AllocationCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		bool bIsValid = false;
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			AllocationCharacterUnitPtr = MakeShared<FCharacterProxy>();
+			AllocationCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+
+	if (Ar.IsSaving())
+	{
+		bool bIsValid = OwnerCharacterUnitPtr.IsValid();
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			OwnerCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		bool bIsValid = false;
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			OwnerCharacterUnitPtr = MakeShared<FCharacterProxy>();
+			OwnerCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+
+	return true;
+}
+
 void FBasicProxy::InitialUnit()
 {
 	ID = FGuid::NewGuid();
@@ -272,6 +320,15 @@ FSkillProxy::FSkillProxy() :
 
 }
 
+bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << Level;
+
+	return true;
+}
+
 TSubclassOf<USkill_Base> FSkillProxy::GetSkillClass() const
 {
 	return nullptr;
@@ -430,6 +487,15 @@ FCharacterProxy::FCharacterProxy()
 	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
 	AllocationSkills = MakeShared<FAllocationSkills>();
 	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
+}
+
+bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << ProxyCharacterPtr;
+
+	return true;
 }
 
 void FCharacterProxy::InitialUnit()

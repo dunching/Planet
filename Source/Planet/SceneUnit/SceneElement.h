@@ -89,6 +89,8 @@ public:
 
 	virtual ~FBasicProxy();
 
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	virtual void InitialUnit();
 
 	IDType GetID()const;
@@ -123,6 +125,16 @@ private:
 
 	IDType ID;
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FBasicProxy> :
+	public TStructOpsTypeTraitsBase2<FBasicProxy>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 USTRUCT()
@@ -221,6 +233,8 @@ public:
 
 	FCharacterProxy();
 
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	virtual void InitialUnit()override;
 
 	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
@@ -240,6 +254,16 @@ protected:
 
 };
 
+template<>
+struct TStructOpsTypeTraits<FCharacterProxy> :
+	public TStructOpsTypeTraitsBase2<FCharacterProxy>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
 USTRUCT()
 struct PLANET_API FSkillProxy : public FBasicProxy
 {
@@ -251,7 +275,7 @@ public:
 
 	FSkillProxy();
 
-	int32 Level = 1;
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
@@ -265,10 +289,22 @@ public:
 
 	FGameplayAbilitySpecHandle GetGAHandle()const;
 
+	int32 Level = 1;
+
 protected:
 
 	FGameplayAbilitySpecHandle GameplayAbilitySpecHandle;
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FSkillProxy> :
+	public TStructOpsTypeTraitsBase2<FSkillProxy>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 USTRUCT()

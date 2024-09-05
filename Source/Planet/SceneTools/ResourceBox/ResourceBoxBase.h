@@ -18,7 +18,7 @@ class PLANET_API AResourceBoxBase : public ASceneObj
 
 public:
 
-	AResourceBoxBase(const FObjectInitializer& ObjectInitializer);
+	AResourceBoxBase(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 protected:
 

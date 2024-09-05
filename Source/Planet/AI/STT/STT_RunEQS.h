@@ -42,7 +42,7 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	TObjectPtr<UEnvQuery> QueryTemplate;
 
 	UPROPERTY(EditAnywhere, Category = Param)
-	TEnumAsByte<EEnvQueryRunMode::Type> RunMode;
+	TEnumAsByte<EEnvQueryRunMode::Type> RunMode = EEnvQueryRunMode::SingleResult;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	int32 Donut_InnerRadius = 150;

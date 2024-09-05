@@ -30,7 +30,7 @@ public:
 
 	TSharedPtr<FBasicProxy> AddUnit(FGameplayTag UnitType, int32 Num);
 
-	void AddUnit_Apending(FGameplayTag UnitType, FGuid Guid);
+	void AddUnit_Apending(FGameplayTag UnitType, int32 Num, FGuid Guid);
 
 	void SyncApendingUnit(FGuid Guid);
 
@@ -41,6 +41,13 @@ protected:
 	virtual void BeginPlay()override;
 
 private:
+
+	// 将Client需要（显示）的数据从Server上同步过去
+	UFUNCTION(Client, Reliable)
+	void OnSkillUnitChanged(
+		const FSkillProxy&Skill,
+		bool bIsAdd
+	);
 
 	TMap<FGuid, TMap<FGameplayTag, int32>> SkillUnitApendingMap;
 

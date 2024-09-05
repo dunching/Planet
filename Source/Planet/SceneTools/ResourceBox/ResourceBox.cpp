@@ -15,6 +15,8 @@ AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer):
 
 	InteractionWidgetCompoentPtr = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 	InteractionWidgetCompoentPtr->SetupAttachment(RootComponent);
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AResourceBox::OnConstruction(const FTransform& Transform)
@@ -50,21 +52,24 @@ void AResourceBox::BeginPlay()
 	EndLookAt();
 }
 
-void AResourceBox::Interaction_Implementation(ACharacterBase* InCharacterPtr)
+void AResourceBox::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}
+
+void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
 {
 	Super::Interaction(InCharacterPtr);
 
-	Interaction_Imp(InCharacterPtr);
+	Interaction2Server();
 }
 
-void AResourceBox::Interaction1_Implementation(ACharacterBase* InCharacterPtr)
+void AResourceBox::Interaction2Server_Implementation()
 {
-	Super::Interaction(InCharacterPtr);
-
-	Interaction_Imp(InCharacterPtr);
+	Interaction2Client();
 }
 
-void AResourceBox::Interaction_Imp_Implementation(ACharacterBase* CharacterPtr)
+void AResourceBox::Interaction2Client_Implementation()
 {
 	if (ActorSequenceComponent)
 	{

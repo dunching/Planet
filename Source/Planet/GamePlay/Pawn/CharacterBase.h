@@ -69,7 +69,7 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void UnPossessed() override;
-
+	
 	virtual void Interaction(ACharacterBase* CharacterPtr) override;
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr) override;
@@ -106,6 +106,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
+	
+	UFUNCTION(Server, Reliable)
+	virtual void InteractionSceneObj(ASceneObj* SceneObjPtr);
 	
 	UPROPERTY(Transient)
 	UCharacterTitle* CharacterTitlePtr = nullptr;

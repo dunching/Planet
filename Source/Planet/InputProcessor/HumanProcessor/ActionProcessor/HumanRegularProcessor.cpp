@@ -296,7 +296,8 @@ namespace HumanProcessor
 		if (LookAtSceneObjPtr)
 		{
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			Cast<AResourceBox>(LookAtSceneObjPtr)->Interaction1(OnwerActorPtr);
+
+			OnwerActorPtr->InteractionSceneObj(Cast<ASceneObj>(LookAtSceneObjPtr));
 		}
 	}
 
