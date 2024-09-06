@@ -6,7 +6,7 @@
 #include "PlanetPlayerState.h"
 #include "Planet.h"
 #include "CharacterAttributesComponent.h"
-#include "InteractiveConsumablesComponent.h"
+
 #include "CharacterBase.h"
 #include "ToolsMenu.h"
 #include "ToolsIcon.h"
@@ -51,13 +51,13 @@ void UPawnStateBuildingHUD::NativeDestruct()
 		return;
 	}
 	{
-		auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
-		const auto Result = GetTools();
+//		auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
+	//	const auto Result = GetTools();
 //		EICPtr->RegisterTool(Result);
 	}
 	{
-		auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
-		const auto Result = GetConsumables();
+	//	auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
+	//	const auto Result = GetConsumables();
 //		EICPtr->RegisterConsumable(Result);
 	}
 }
@@ -91,34 +91,34 @@ void UPawnStateBuildingHUD::ResetUIByData()
 			}
 		}
 		{
-			auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
-			for (const auto& Iter : Ary)
-			{
-				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
-				if (IconPtr)
-				{
-					auto Result = EICPtr->FindTool(IconPtr->IconSocket);
-					if (Result && Result->UnitPtr)
-					{
-//						IconPtr->ResetToolUIByData(Result->UnitPtr);
-					}
-				}
-			}
+// 			auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
+// 			for (const auto& Iter : Ary)
+// 			{
+// 				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
+// 				if (IconPtr)
+// 				{
+// 					auto Result = EICPtr->FindTool(IconPtr->IconSocket);
+// 					if (Result && Result->UnitPtr)
+// 					{
+// //						IconPtr->ResetToolUIByData(Result->UnitPtr);
+// 					}
+// 				}
+// 			}
 		}
 		{
-			auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
-			for (const auto& Iter : Ary)
-			{
-				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
-				if (IconPtr)
-				{
-					auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
-					if (Result && Result->UnitPtr)
-					{
-		//				IconPtr->ResetToolUIByData(Result->UnitPtr);
-					}
-				}
-			}
+// 			auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
+// 			for (const auto& Iter : Ary)
+// 			{
+// 				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
+// 				if (IconPtr)
+// 				{
+// 					auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
+// 					if (Result && Result->UnitPtr)
+// 					{
+// 		//				IconPtr->ResetToolUIByData(Result->UnitPtr);
+// 					}
+// 				}
+// 			}
 		}
 		for (const auto& FirstIter : Ary)
 		{
@@ -145,69 +145,69 @@ UToolsMenu* UPawnStateBuildingHUD::GetEquipMenu()
 {
 	return Cast<UToolsMenu>(GetWidgetFromName(ItemMenu));
 }
-
-TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>> UPawnStateBuildingHUD::GetTools()
-{
-	TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>>Result;
-
-	TArray<TTuple<FKey, FName>>Ary
-	{
-		{ToolSocket1, PawnStateBuildingHUD::EquipIcon1},
-		{ToolSocket2, PawnStateBuildingHUD::EquipIcon2},
-		{ToolSocket3, PawnStateBuildingHUD::EquipIcon3},
-		{ToolSocket4, PawnStateBuildingHUD::EquipIcon4},
-		{ToolSocket5, PawnStateBuildingHUD::EquipIcon5},
-		{ToolSocket6, PawnStateBuildingHUD::EquipIcon6},
-		{ToolSocket7, PawnStateBuildingHUD::EquipIcon7},
-		{ToolSocket8, PawnStateBuildingHUD::EquipIcon8},
-	};
-
-	for (const auto& Iter : Ary)
-	{
-		auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Iter.Get<1>()));
-		if (UIPtr)
-		{
-			TSharedPtr<FToolsSocketInfo> SocketInfoSPtr = MakeShared<FToolsSocketInfo>();
-
-			SocketInfoSPtr->Key = Iter.Get<0>();
-			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
-//			SocketInfoSPtr->UnitPtr = UIPtr->GetToolUnit();
-
-			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
-		}
-	}
-	return Result;
-}
-
-TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>> UPawnStateBuildingHUD::GetConsumables()
-{
-	TMap <FGameplayTag, TSharedPtr<FConsumableSocketInfo>>Result;
-
-	TArray<TTuple<FKey, FName>>Ary
-	{
-		{ToolSocket1, PawnStateBuildingHUD::EquipIcon1},
-		{ToolSocket2, PawnStateBuildingHUD::EquipIcon2},
-		{ToolSocket3, PawnStateBuildingHUD::EquipIcon3},
-		{ToolSocket4, PawnStateBuildingHUD::EquipIcon4},
-		{ToolSocket5, PawnStateBuildingHUD::EquipIcon5},
-		{ToolSocket6, PawnStateBuildingHUD::EquipIcon6},
-		{ToolSocket7, PawnStateBuildingHUD::EquipIcon7},
-		{ToolSocket8, PawnStateBuildingHUD::EquipIcon8},
-	};
-
-	for (const auto& Iter : Ary)
-	{
-		auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Iter.Get<1>()));
-		if (UIPtr)
-		{
-			TSharedPtr<FConsumableSocketInfo> SocketInfoSPtr = MakeShared<FConsumableSocketInfo>();
-
-			SocketInfoSPtr->Key = Iter.Get<0>();
-			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
-			SocketInfoSPtr->UnitPtr = UIPtr->GetConsumablesUnit();
-
-			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
-		}
-	}
-	return Result;
-}
+// 
+// TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>> UPawnStateBuildingHUD::GetTools()
+// {
+// 	TMap <FGameplayTag, TSharedPtr<FToolsSocketInfo>>Result;
+// 
+// 	TArray<TTuple<FKey, FName>>Ary
+// 	{
+// 		{ToolSocket1, PawnStateBuildingHUD::EquipIcon1},
+// 		{ToolSocket2, PawnStateBuildingHUD::EquipIcon2},
+// 		{ToolSocket3, PawnStateBuildingHUD::EquipIcon3},
+// 		{ToolSocket4, PawnStateBuildingHUD::EquipIcon4},
+// 		{ToolSocket5, PawnStateBuildingHUD::EquipIcon5},
+// 		{ToolSocket6, PawnStateBuildingHUD::EquipIcon6},
+// 		{ToolSocket7, PawnStateBuildingHUD::EquipIcon7},
+// 		{ToolSocket8, PawnStateBuildingHUD::EquipIcon8},
+// 	};
+// 
+// 	for (const auto& Iter : Ary)
+// 	{
+// 		auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Iter.Get<1>()));
+// 		if (UIPtr)
+// 		{
+// 			TSharedPtr<FToolsSocketInfo> SocketInfoSPtr = MakeShared<FToolsSocketInfo>();
+// 
+// // 			SocketInfoSPtr->Key = Iter.Get<0>();
+// // 			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
+// // //			SocketInfoSPtr->UnitPtr = UIPtr->GetToolUnit();
+// // 
+// // 			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
+// 		}
+// 	}
+// 	return Result;
+// }
+// 
+// TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>> UPawnStateBuildingHUD::GetConsumables()
+// {
+// 	TMap <FGameplayTag, TSharedPtr<FConsumableSocketInfo>>Result;
+// 
+// 	TArray<TTuple<FKey, FName>>Ary
+// 	{
+// 		{ToolSocket1, PawnStateBuildingHUD::EquipIcon1},
+// 		{ToolSocket2, PawnStateBuildingHUD::EquipIcon2},
+// 		{ToolSocket3, PawnStateBuildingHUD::EquipIcon3},
+// 		{ToolSocket4, PawnStateBuildingHUD::EquipIcon4},
+// 		{ToolSocket5, PawnStateBuildingHUD::EquipIcon5},
+// 		{ToolSocket6, PawnStateBuildingHUD::EquipIcon6},
+// 		{ToolSocket7, PawnStateBuildingHUD::EquipIcon7},
+// 		{ToolSocket8, PawnStateBuildingHUD::EquipIcon8},
+// 	};
+// 
+// 	for (const auto& Iter : Ary)
+// 	{
+// 		auto UIPtr = Cast<UToolIcon>(GetWidgetFromName(Iter.Get<1>()));
+// 		if (UIPtr)
+// 		{
+// 			TSharedPtr<FConsumableSocketInfo> SocketInfoSPtr = MakeShared<FConsumableSocketInfo>();
+// 
+// // 			SocketInfoSPtr->Key = Iter.Get<0>();
+// // 			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
+// // 			SocketInfoSPtr->UnitPtr = UIPtr->GetConsumablesUnit();
+// // 
+// // 			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
+// 		}
+// 	}
+// 	return Result;
+// }

@@ -44,6 +44,8 @@ public:
 
 	virtual UNetConnection* GetNetConnection() const override;
 
+
+
 	virtual void Interaction(ACharacterBase* CharacterPtr)override;
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;

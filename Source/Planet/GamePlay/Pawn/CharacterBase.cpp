@@ -32,10 +32,10 @@
 #include "PlanetControllerInterface.h"
 #include "GameplayTagsSubSystem.h"
 #include "StateProcessorComponent.h"
-#include "InteractiveBaseGAComponent.h"
-#include "InteractiveConsumablesComponent.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
+#include "BaseFeatureGAComponent.h"
+
+#include "UnitProxyProcessComponent.h"
+
 #include "CharacterTitle.h"
 #include "UICommon.h"
 #include "HumanAIController.h"
@@ -62,10 +62,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
-	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UInteractiveBaseGAComponent>(UInteractiveBaseGAComponent::ComponentName);
-	InteractiveConsumablesComponentPtr = CreateDefaultSubobject<UInteractiveConsumablesComponent>(UInteractiveConsumablesComponent::ComponentName);
-	InteractiveSkillComponentPtr = CreateDefaultSubobject<UInteractiveSkillComponent>(UInteractiveSkillComponent::ComponentName);
-	InteractiveToolComponentPtr = CreateDefaultSubobject<UInteractiveToolComponent>(UInteractiveToolComponent::ComponentName);
+	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UBaseFeatureGAComponent>(UBaseFeatureGAComponent::ComponentName);
+	InteractiveSkillComponentPtr = CreateDefaultSubobject<UUnitProxyProcessComponent>(UUnitProxyProcessComponent::ComponentName);
 
 }
 
@@ -165,9 +163,7 @@ void ACharacterBase::PostInitializeComponents()
 
 			GASPtr->ClearAllAbilities();
 			GASPtr->InitAbilityActorInfo(this, this);
-			GetInteractiveSkillComponent()->InitialBaseGAs();
 			GetInteractiveBaseGAComponent()->InitialBaseGAs();
-			GetInteractiveConsumablesComponent()->InitialBaseGAs();
 		}
 #endif
 	}
@@ -249,24 +245,19 @@ UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
 	return TalentAllocationComponentPtr;
 }
 
-UInteractiveBaseGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
+UBaseFeatureGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
 {
 	return InteractiveBaseGAComponentPtr;
 }
 
-UInteractiveConsumablesComponent* ACharacterBase::GetInteractiveConsumablesComponent()const
+UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
 {
-	return InteractiveConsumablesComponentPtr;
+	return StateProcessorComponentPtr;
 }
 
-UInteractiveSkillComponent* ACharacterBase::GetInteractiveSkillComponent()const
+UUnitProxyProcessComponent* ACharacterBase::GetInteractiveSkillComponent()const
 {
 	return InteractiveSkillComponentPtr;
-}
-
-UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()const
-{
-	return InteractiveToolComponentPtr;
 }
 
 UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
@@ -282,7 +273,9 @@ TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 void ACharacterBase::InitialCharacterUnit()
 {
 	auto SceneUnitContainer = MakeShared<FSceneUnitContainer>();
-	auto NewCharacterUnitPtr = SceneUnitContainer->AddUnit_Character(RowName);
+	auto NewCharacterUnitPtr = SceneUnitContainer->AddUnit_Character(RowName); 
+
+	SceneUnitContainer->OwnerCharacter = NewCharacterUnitPtr;
 
 	NewCharacterUnitPtr->ProxyCharacterPtr = this;
 	NewCharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;

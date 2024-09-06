@@ -27,7 +27,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "PlanetControllerInterface.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
 #include "CS_RootMotion.h"

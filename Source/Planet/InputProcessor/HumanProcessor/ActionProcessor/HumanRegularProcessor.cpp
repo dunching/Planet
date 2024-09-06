@@ -30,7 +30,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolsMenu.h"
 #include <BackpackMenu.h>
 #include "UIManagerSubSystem.h"
@@ -65,8 +65,8 @@
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
-#include "InteractiveBaseGAComponent.h"
-#include "InteractiveConsumablesComponent.h"
+#include "BaseFeatureGAComponent.h"
+
 #include "ResourceBox.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
@@ -133,7 +133,7 @@ namespace HumanProcessor
 			StopPt,
 			SceneObj_Channel,
 			Params
-			)
+		)
 			)
 		{
 #ifdef WITH_EDITOR
@@ -218,22 +218,7 @@ namespace HumanProcessor
 
 				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
 
-				switch ((*SkillIter)->Type)
-				{
-				case FCanbeInteractionInfo::EType::kActiveSkill:
-				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
-				{
-					OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
-				}
-				break;
-				case FCanbeInteractionInfo::EType::kConsumables:
-				{
-					OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
-				}
-				break;
-				default:
-					break;
-				}
+				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
 			}
 
 			// 这里应该是特定的输入会打断 还是任意输入都会打断？
@@ -241,7 +226,7 @@ namespace HumanProcessor
 				(Params.Key == EKeys::W) ||
 				(Params.Key == EKeys::A) ||
 				(Params.Key == EKeys::S) ||
-				(Params.Key == EKeys::D) 
+				(Params.Key == EKeys::D)
 				)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
@@ -254,15 +239,11 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				switch ((*SkillIter)->Type)
-				{
-				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
+				if (
+					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket)
+					)
 				{
 					OnwerActorPtr->GetInteractiveSkillComponent()->CancelAction(*SkillIter);
-				}
-				break;
-				default:
-					break;
 				}
 			}
 		}
@@ -474,7 +455,6 @@ namespace HumanProcessor
 			if (OnwerActorPtr)
 			{
 				auto CanbeActivedInfoAry = OnwerActorPtr->GetInteractiveSkillComponent()->GetCanbeActiveAction();
-				CanbeActivedInfoAry.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction()); 
 				for (const auto& Iter : CanbeActivedInfoAry)
 				{
 					HandleKeysMap.Add(Iter->Key, Iter);

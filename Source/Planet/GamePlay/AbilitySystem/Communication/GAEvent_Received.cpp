@@ -5,10 +5,11 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
+#include "UnitProxyProcessComponent.h"
+
 #include "CharacterAttributesComponent.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
+#include "StateProcessorComponent.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_PeriodicStateModify.h"
@@ -88,7 +89,7 @@ void UGAEvent_Received::ActivateAbility(
 
 			auto CloneSPtr = GAEventDataPtr->Clone_SmartPtr();
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(CloneSPtr);
+			CharacterPtr->GetStateProcessorComponent()->ExcuteEffects(CloneSPtr);
 		}
 		break;
 		case EEventType::kPeriodic_PropertyModify:
@@ -107,7 +108,7 @@ void UGAEvent_Received::ActivateAbility(
 
 			auto ClonePtr = TSharedPtr<FGameplayAbilityTargetData_PropertyModify>(GAEventDataPtr->Clone());
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
+			CharacterPtr->GetStateProcessorComponent()->ExcuteEffects(ClonePtr);
 		}
 		break;
 		case EEventType::kPeriodic_StateTagModify:
@@ -126,7 +127,7 @@ void UGAEvent_Received::ActivateAbility(
 
 			auto ClonePtr = TSharedPtr<FGameplayAbilityTargetData_StateModify>(GAEventDataPtr->Clone());
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteEffects(ClonePtr);
+			CharacterPtr->GetStateProcessorComponent()->ExcuteEffects(ClonePtr);
 		}
 		break;
 		}

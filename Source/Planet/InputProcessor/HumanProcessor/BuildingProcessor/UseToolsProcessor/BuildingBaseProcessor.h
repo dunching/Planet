@@ -9,7 +9,7 @@
 
 #include "HumanProcessor.h"
 #include <SceneElement.h>
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 
 class AHumanCharacter;
 class ABuildingBase;
@@ -21,6 +21,7 @@ class UToolIcon;
 class ATool_Base;
 
 struct FSceneTool;
+struct FSocketBase;
 
 namespace HumanProcessor
 {
@@ -64,7 +65,7 @@ namespace HumanProcessor
 
 		bool bIsPressdLeftAlt = false;
 
-		TMap<FKey, TSharedPtr<FCanbeInteractionInfo>>HandleKeysMap;
+		TMap<FKey, TSharedPtr<FSocketBase>>HandleKeysMap;
 
 	};
 

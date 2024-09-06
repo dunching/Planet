@@ -3,7 +3,7 @@
 
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"

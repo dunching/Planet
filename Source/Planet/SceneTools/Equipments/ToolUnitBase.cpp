@@ -30,7 +30,17 @@ void AToolUnitBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto CharacterPtr = Cast<AHumanCharacter>(GetOwner());
+	auto OwnerPtr = GetOwner();
+	if (OwnerPtr->IsA(AController::StaticClass()))
+	{
+		auto CharacterPtr = Cast<AController>(OwnerPtr)->GetPawn<ACharacterBase>();
 
-	AttachToCharacter(CharacterPtr);
+		AttachToCharacter(CharacterPtr);
+	}
+	else if (OwnerPtr->IsA(ACharacterBase::StaticClass()))
+	{
+		auto CharacterPtr = Cast<ACharacterBase>(OwnerPtr);
+
+		AttachToCharacter(CharacterPtr);
+	}
 }

@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 int32 FTalent_NuQi::GetCurrentValue() const
 {

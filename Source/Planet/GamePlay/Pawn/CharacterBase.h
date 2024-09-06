@@ -36,9 +36,9 @@ class UPlanetAbilitySystemInterface;
 class UTalentAllocationComponent;
 class UStateProcessorComponent;
 class UGroupMnaggerComponent;
-class UInteractiveBaseGAComponent;
+class UBaseFeatureGAComponent;
 class UInteractiveConsumablesComponent;
-class UInteractiveSkillComponent;
+class UUnitProxyProcessComponent;
 class UInteractiveToolComponent;
 
 UCLASS()
@@ -85,13 +85,11 @@ public:
 
 	UTalentAllocationComponent* GetTalentAllocationComponent()const;
 
-	UInteractiveBaseGAComponent* GetInteractiveBaseGAComponent()const;
+	UBaseFeatureGAComponent* GetInteractiveBaseGAComponent()const;
+	
+	UStateProcessorComponent* GetStateProcessorComponent()const;
 
-	UInteractiveConsumablesComponent* GetInteractiveConsumablesComponent()const;
-
-	UInteractiveSkillComponent* GetInteractiveSkillComponent()const;
-
-	UInteractiveToolComponent* GetInteractiveToolComponent()const;
+	UUnitProxyProcessComponent* GetInteractiveSkillComponent()const;
 
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
 
@@ -163,17 +161,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveBaseGAComponent> InteractiveBaseGAComponentPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UBaseFeatureGAComponent> InteractiveBaseGAComponentPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveConsumablesComponent> InteractiveConsumablesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveSkillComponent> InteractiveSkillComponentPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveToolComponent> InteractiveToolComponentPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UUnitProxyProcessComponent> InteractiveSkillComponentPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFightingTips>FightingTipsClass;

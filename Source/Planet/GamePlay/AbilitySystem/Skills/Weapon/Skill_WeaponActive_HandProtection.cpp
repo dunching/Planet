@@ -12,7 +12,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
 #include "Planet.h"
@@ -23,7 +23,7 @@
 #include "UIManagerSubSystem.h"
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "TemplateHelper.h"
 
@@ -253,19 +253,19 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{
-			if (Iter.Value->SkillUnitPtr)
-			{
-				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
-				{
-					auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillUnitPtr);
-					if (!ActiveSkillUnitPtr)
-					{
-						continue;
-					}
-
-					ActiveSkillUnitPtr->AddCooldownConsumeTime(1.f);
-				}
-			}
+// 			if (Iter.Value->SkillUnitPtr)
+// 			{
+// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+// 				{
+// 					auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillUnitPtr);
+// 					if (!ActiveSkillUnitPtr)
+// 					{
+// 						continue;
+// 					}
+// 
+// 					ActiveSkillUnitPtr->AddCooldownConsumeTime(1.f);
+// 				}
+// 			}
 		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();

@@ -1,5 +1,5 @@
 
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 #include <queue>
 #include <map>
@@ -41,6 +41,7 @@
 #include "BasicFutures_Affected.h"
 #include "SceneUnitExtendInfo.h"
 #include "StateTagExtendInfo.h"
+#include "StateProcessorComponent.h"
 #include "CS_PeriodicStateModify.h"
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_RootMotion_TornadoTraction.h"
@@ -51,9 +52,9 @@
 #include "CS_PeriodicStateModify_Ice.h"
 #include "CS_PeriodicPropertyTag.h"
 
-FName UInteractiveBaseGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
+FName UBaseFeatureGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
-void UInteractiveBaseGAComponent::AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
+void UBaseFeatureGAComponent::AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -71,7 +72,7 @@ void UInteractiveBaseGAComponent::AddSendEventModify(const TSharedPtr<IGAEventMo
 	SendEventModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UInteractiveBaseGAComponent::RemoveSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
+void UBaseFeatureGAComponent::RemoveSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
 {
 	for (auto Iter = SendEventModifysMap.begin(); Iter != SendEventModifysMap.end(); Iter++)
 	{
@@ -83,7 +84,7 @@ void UInteractiveBaseGAComponent::RemoveSendEventModify(const TSharedPtr<IGAEven
 	}
 }
 
-void UInteractiveBaseGAComponent::AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
+void UBaseFeatureGAComponent::AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -101,7 +102,7 @@ void UInteractiveBaseGAComponent::AddReceviedEventModify(const TSharedPtr<IGAEve
 	ReceivedEventModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UInteractiveBaseGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
+void UBaseFeatureGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
 {
 	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
 	{
@@ -113,7 +114,7 @@ void UInteractiveBaseGAComponent::RemoveReceviedEventModify(const TSharedPtr<IGA
 	}
 }
 
-FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddPeriodicPropertyTag(
+FGameplayAbilitySpecHandle UBaseFeatureGAComponent::AddPeriodicPropertyTag(
 	FGameplayAbilityTargetData_PeriodicPropertyTag* GameplayAbilityTargetDataSPtr
 )
 {
@@ -130,7 +131,7 @@ FGameplayAbilitySpecHandle UInteractiveBaseGAComponent::AddPeriodicPropertyTag(
 	);
 }
 
-void UInteractiveBaseGAComponent::ClearData2Other(
+void UBaseFeatureGAComponent::ClearData2Other(
 	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap, const FGameplayTag& DataSource
 )
 {
@@ -157,7 +158,7 @@ void UInteractiveBaseGAComponent::ClearData2Other(
 	SendEventImp(GAEventDataPtr);
 }
 
-void UInteractiveBaseGAComponent::ClearData2Self(
+void UBaseFeatureGAComponent::ClearData2Self(
 	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap, const FGameplayTag& DataSource
 )
 {
@@ -172,240 +173,7 @@ void UInteractiveBaseGAComponent::ClearData2Self(
 	ClearData2Other({ ModifyPropertyMap }, DataSource);
 }
 
-void UInteractiveBaseGAComponent::ExcuteEffects(
-	const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataSPtr
-)
-{
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
-	if (OnwerActorPtr)
-	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
-		{
-			auto GAPtr = Cast<UCS_PeriodicPropertyModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
-			if (GAPtr)
-			{
-				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
-				GAPtr->UpdateDuration();
-				return;
-			}
-		}
-
-		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass(), 1);
-
-		auto GAHandle = ASCPtr->GiveAbilityAndActivateOnce(
-			Spec,
-			MkeSpec(GameplayAbilityTargetDataSPtr)
-		);
-
-		// 为什么不在此处直接获取 GetPrimaryInstance？因为在GA过程中调用时会pending，导致返回为nullptr
-// 		auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GAHandle);
-// 		if (GameplayAbilitySpecPtr)
-// 		{
-// 			ResultPtr = Cast<UCS_PeriodicPropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-// 			if (ResultPtr)
-// 			{
-// 				PeriodicPropertyModifyMap.Add(GameplayAbilityTargetDataSPtr->Tag, ResultPtr);
-// 			}
-// 		}
-	}
-}
-
-void UInteractiveBaseGAComponent::ExcuteEffects(
-	const TSharedPtr<FGameplayAbilityTargetData_StateModify>& GameplayAbilityTargetDataSPtr
-)
-{
-	auto OnwerActorPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr.Get();
-	if (OnwerActorPtr)
-	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-
-		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
-		{
-			auto GAPtr = Cast<UCS_PeriodicStateModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
-			if (GAPtr)
-			{
-				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
-				GAPtr->UpdateDuration();
-				return;
-			}
-		}
-
-		if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun))
-		{
-			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Stun::StaticClass(), 1);
-
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
-		{
-			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Charm::StaticClass(), 1);
-
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Ice))
-		{
-			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Ice::StaticClass(), 1);
-
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
-			);
-		}
-	}
-}
-
-void UInteractiveBaseGAComponent::ExcuteEffects(
-	const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& GameplayAbilityTargetDataSPtr
-)
-{
-	auto OnwerActorPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr.Get();
-	if (OnwerActorPtr)
-	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-
-		if (GameplayAbilityTargetDataSPtr->Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
-		{
-			if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
-			{
-				auto GAPtr = CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag];
-				if (GAPtr)
-				{
-					GAPtr->UpdateDuration();
-				}
-			}
-			else
-			{
-				if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->KnockDown))
-				{
-					BreakOhterState(
-						GameplayAbilityTargetDataSPtr,
-						UGameplayTagsSubSystem::GetInstance()->KnockDown,
-						{
-							UGameplayTagsSubSystem::GetInstance()->FlyAway,
-							UGameplayTagsSubSystem::GetInstance()->TornadoTraction,
-							UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline,
-						}
-						);
-
-					FGameplayAbilitySpec Spec(CS_RootMotion_KnockDownClass, 1);
-
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-				{
-					BreakOhterState(
-						GameplayAbilityTargetDataSPtr,
-						UGameplayTagsSubSystem::GetInstance()->FlyAway,
-						{
-							UGameplayTagsSubSystem::GetInstance()->KnockDown,
-							UGameplayTagsSubSystem::GetInstance()->TornadoTraction,
-							UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline,
-						}
-						);
-
-					FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass(), 1);
-
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
-				{
-					FGameplayAbilitySpec Spec(UCS_RootMotion_TornadoTraction::StaticClass(), 1);
-
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
-				{
-					FGameplayAbilitySpec Spec(UCS_RootMotion_MoveAlongSpline::StaticClass(), 1);
-
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Traction))
-				{
-					FGameplayAbilitySpec Spec(UCS_RootMotion_MoveAlongSpline::StaticClass(), 1);
-
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
-					);
-				}
-			}
-		}
-	}
-}
-
-FGameplayEventData* UInteractiveBaseGAComponent::MkeSpec(
-	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
-)
-{
-	auto ClonePtr = GameplayAbilityTargetDataSPtr->Clone();
-
-	if (!ClonePtr->DefaultIcon)
-	{
-		ClonePtr->DefaultIcon =
-			USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(ClonePtr->Tag)->DefaultIcon;
-	}
-
-	auto Handle = ClonePtr->CharacterStateChanged.AddCallback(
-		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
-	);
-	Handle->bIsAutoUnregister = false;
-
-	FGameplayEventData* Payload = new FGameplayEventData;
-	Payload->TargetData.Add(ClonePtr);
-
-	return Payload;
-}
-
-void UInteractiveBaseGAComponent::BreakOhterState(
-	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
-	const FGameplayTag& ThisTag,
-	const TArray<FGameplayTag>& CancelTags
-)
-{
-	// 会中断其他跟运动的状态
-	FGameplayTagContainer GameplayTagContainer;
-	for (const auto Iter : CancelTags)
-	{
-		GameplayTagContainer.AddTag(Iter);
-	}
-	if (GameplayAbilityTargetDataSPtr->Tag.MatchesAnyExact(GameplayTagContainer))
-	{
-		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-
-		const auto TempCharacterStateMap = CharacterStateMap;
-		for (const auto Iter : TempCharacterStateMap)
-		{
-			if (Iter.Key.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-			{
-				ASCPtr->CancelAbilityHandle(
-					Iter.Value->GetCurrentAbilitySpecHandle()
-				);
-			}
-		}
-	}
-}
-
-void UInteractiveBaseGAComponent::ExcuteAttackedEffect(EAffectedDirection AffectedDirection)
+void UBaseFeatureGAComponent::ExcuteAttackedEffect(EAffectedDirection AffectedDirection)
 {
 	FGameplayEventData Payload;
 	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
@@ -420,17 +188,7 @@ void UInteractiveBaseGAComponent::ExcuteAttackedEffect(EAffectedDirection Affect
 	}
 }
 
-UCS_Base* UInteractiveBaseGAComponent::GetCharacterState(const FGameplayTag& CSTag) const
-{
-	if (CharacterStateMap.Contains(CSTag))
-	{
-		return CharacterStateMap[CSTag];
-	}
-
-	return nullptr;
-}
-
-void UInteractiveBaseGAComponent::SendEventImp(
+void UBaseFeatureGAComponent::SendEventImp(
 	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
 )
 {
@@ -453,7 +211,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	}
 }
 
-void UInteractiveBaseGAComponent::SendEventImp(
+void UBaseFeatureGAComponent::SendEventImp(
 	FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
 )
 {
@@ -476,7 +234,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	}
 }
 
-void UInteractiveBaseGAComponent::SendEventImp(
+void UBaseFeatureGAComponent::SendEventImp(
 	FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 )
 {
@@ -499,7 +257,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	}
 }
 
-void UInteractiveBaseGAComponent::SendEventImp(
+void UBaseFeatureGAComponent::SendEventImp(
 	FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
 )
 {
@@ -522,7 +280,7 @@ void UInteractiveBaseGAComponent::SendEventImp(
 	}
 }
 
-void UInteractiveBaseGAComponent::SendEvent2Other(
+void UBaseFeatureGAComponent::SendEvent2Other(
 	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
 	const FGameplayTag& DataSource
 )
@@ -549,7 +307,7 @@ void UInteractiveBaseGAComponent::SendEvent2Other(
 	SendEventImp(GAEventDataPtr);
 }
 
-void UInteractiveBaseGAComponent::SendEvent2Self(
+void UBaseFeatureGAComponent::SendEvent2Self(
 	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap,
 	const FGameplayTag& DataSource
 )
@@ -565,7 +323,7 @@ void UInteractiveBaseGAComponent::SendEvent2Self(
 	SendEvent2Other({ ModifyPropertyMap }, DataSource);
 }
 
-void UInteractiveBaseGAComponent::InitialBaseGAs()
+void UBaseFeatureGAComponent::InitialBaseGAs()
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -581,6 +339,13 @@ void UInteractiveBaseGAComponent::InitialBaseGAs()
 
 			ReceivedEventHandle = GASPtr->GiveAbility(
 				FGameplayAbilitySpec(UGAEvent_Received::StaticClass(), 1)
+			);
+
+			// 五行技能
+			GASPtr->GiveAbility(
+				FGameplayAbilitySpec(
+					Skill_Element_GoldClass
+				)
 			);
 
 			GASPtr->GiveAbility(
@@ -615,7 +380,7 @@ void UInteractiveBaseGAComponent::InitialBaseGAs()
 #endif
 }
 
-bool UInteractiveBaseGAComponent::SwitchWalkState(bool bIsRun)
+bool UBaseFeatureGAComponent::SwitchWalkState(bool bIsRun)
 {
 	if (bIsRun)
 	{
@@ -650,7 +415,7 @@ bool UInteractiveBaseGAComponent::SwitchWalkState(bool bIsRun)
 	return false;
 }
 
-void UInteractiveBaseGAComponent::Dash_Implementation(EDashDirection DashDirection)
+void UBaseFeatureGAComponent::Dash_Implementation(EDashDirection DashDirection)
 {
 	FGameplayEventData Payload;
 	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
@@ -675,7 +440,7 @@ void UInteractiveBaseGAComponent::Dash_Implementation(EDashDirection DashDirecti
 	}
 }
 
-void UInteractiveBaseGAComponent::MoveToAttackDistance(
+void UBaseFeatureGAComponent::MoveToAttackDistance(
 	FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
 )
 {
@@ -693,7 +458,7 @@ void UInteractiveBaseGAComponent::MoveToAttackDistance(
 	}
 }
 
-void UInteractiveBaseGAComponent::BreakMoveToAttackDistance()
+void UBaseFeatureGAComponent::BreakMoveToAttackDistance()
 {
 	auto OnwerActorPtr = GetOwner<ACharacterBase>();
 	if (OnwerActorPtr)
@@ -705,7 +470,7 @@ void UInteractiveBaseGAComponent::BreakMoveToAttackDistance()
 	}
 }
 
-void UInteractiveBaseGAComponent::AddSendGroupEffectModify()
+void UBaseFeatureGAComponent::AddSendGroupEffectModify()
 {
 	struct GAEventModify_MultyTarget : public IGAEventModifySendInterface
 	{
@@ -741,7 +506,7 @@ void UInteractiveBaseGAComponent::AddSendGroupEffectModify()
 	AddSendEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
 }
 
-void UInteractiveBaseGAComponent::AddSendWuXingModify()
+void UBaseFeatureGAComponent::AddSendWuXingModify()
 {
 	struct GAEventModify_MultyTarget : public IGAEventModifySendInterface
 	{
@@ -782,7 +547,7 @@ void UInteractiveBaseGAComponent::AddSendWuXingModify()
 	AddSendEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
 }
 
-void UInteractiveBaseGAComponent::AddReceivedWuXingModify()
+void UBaseFeatureGAComponent::AddReceivedWuXingModify()
 {
 	struct GAEventModify_MultyTarget : public IGAEventModifyReceivedInterface
 	{
@@ -868,7 +633,7 @@ void UInteractiveBaseGAComponent::AddReceivedWuXingModify()
 	AddReceviedEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
 }
 
-void UInteractiveBaseGAComponent::AddReceivedModify()
+void UBaseFeatureGAComponent::AddReceivedModify()
 {
 	struct GAEventModify_MultyTarget : public IGAEventModifyReceivedInterface
 	{
@@ -899,30 +664,7 @@ void UInteractiveBaseGAComponent::AddReceivedModify()
 	AddReceviedEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
 }
 
-void UInteractiveBaseGAComponent::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)
-{
-	CharacterStateChangedContainer.ExcuteCallback(CharacterStateType, CharacterStatePtr);
-	switch (CharacterStateType)
-	{
-	case ECharacterStateType::kActive:
-	{
-		CharacterStateMap.Add(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag, CharacterStatePtr);
-	}
-	break;
-	case ECharacterStateType::kEnd:
-	{
-		if (CharacterStateMap.Contains(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag))
-		{
-			CharacterStateMap.Remove(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag);
-		}
-	}
-	break;
-	default:
-		break;
-	}
-}
-
-void UInteractiveBaseGAComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData)
+void UBaseFeatureGAComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData)
 {
 	for (auto Iter : SendEventModifysMap)
 	{
@@ -930,7 +672,7 @@ void UInteractiveBaseGAComponent::OnSendEventModifyData(FGameplayAbilityTargetDa
 	}
 }
 
-void UInteractiveBaseGAComponent::OnReceivedEventModifyData(FGameplayAbilityTargetData_GAReceivedEvent& OutGAEventData)
+void UBaseFeatureGAComponent::OnReceivedEventModifyData(FGameplayAbilityTargetData_GAReceivedEvent& OutGAEventData)
 {
 	for (auto Iter : ReceivedEventModifysMap)
 	{

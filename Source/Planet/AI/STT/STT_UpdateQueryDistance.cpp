@@ -8,7 +8,7 @@
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
 #include "STE_Human.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 
 EStateTreeRunStatus FSTT_UpdateQueryDistance::EnterState(
 	FStateTreeExecutionContext& Context,

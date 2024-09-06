@@ -5,8 +5,8 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveBaseGAComponent.h"
+#include "UnitProxyProcessComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameOptions.h"
 
 USkill_Base::USkill_Base() :

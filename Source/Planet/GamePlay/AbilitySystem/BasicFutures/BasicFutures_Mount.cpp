@@ -10,11 +10,11 @@
 
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
+#include "UnitProxyProcessComponent.h"
+
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"

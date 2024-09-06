@@ -29,7 +29,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolsMenu.h"
 #include <BackpackMenu.h>
 #include "UIManagerSubSystem.h"
@@ -52,7 +52,7 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttibutes.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "HumanRegularProcessor.h"
 
 #ifdef WITH_EDITOR

@@ -15,6 +15,7 @@
 #include "GroupMnaggerComponent.h"
 #include "PropertyEntrys.h"
 #include "Skill_Base.h"
+#include "Weapon_Base.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -46,8 +47,13 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 		Ar << bIsValid;
 		if (bIsValid)
 		{
-			AllocationCharacterUnitPtr = MakeShared<FCharacterProxy>();
-			AllocationCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+			auto TempPtr= MakeShared<FCharacterProxy>();
+			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			AllocationCharacterUnitPtr =
+				TempPtr->ProxyCharacterPtr->GetCharacterUnit()->SceneUnitContainer->FindUnit_Character(
+					TempPtr->GetID()
+				);
 		}
 	}
 
@@ -66,8 +72,13 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 		Ar << bIsValid;
 		if (bIsValid)
 		{
-			OwnerCharacterUnitPtr = MakeShared<FCharacterProxy>();
-			OwnerCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+			auto TempPtr = MakeShared<FCharacterProxy>();
+			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			OwnerCharacterUnitPtr =
+				TempPtr->ProxyCharacterPtr->GetCharacterUnit()->SceneUnitContainer->FindUnit_Character(
+					TempPtr->GetID()
+				);
 		}
 	}
 
@@ -77,6 +88,16 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 void FBasicProxy::InitialUnit()
 {
 	ID = FGuid::NewGuid();
+}
+
+void FBasicProxy::Active()
+{
+
+}
+
+void FBasicProxy::Calcel()
+{
+
 }
 
 FBasicProxy::IDType FBasicProxy::GetID()const
@@ -274,6 +295,38 @@ FWeaponProxy::FWeaponProxy()
 
 }
 
+bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	if (Ar.IsSaving())
+	{
+		bool bIsValid = FirstSkill.IsValid();
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			FirstSkill.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		bool bIsValid = false;
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			auto TempPtr = MakeShared<FSkillProxy>();
+			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			FirstSkill =
+				OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCharacterUnit()->SceneUnitContainer->FindUnit_Skill(
+					TempPtr->GetID()
+				);
+		}
+	}
+
+	return true;
+}
+
 void FWeaponProxy::InitialUnit()
 {
 	Super::InitialUnit();
@@ -286,7 +339,7 @@ void FWeaponProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy
 {
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 
-	FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	FirstSkill.Pin()->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 }
 
 FTableRowUnit_WeaponExtendInfo* FWeaponProxy::GetTableRowUnit_WeaponExtendInfo() const
@@ -642,5 +695,25 @@ void FActiveSkillProxy::OffsetCooldownTime()
 	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
 	{
 		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
+	}
+}
+
+void FWeaponProxy::ActiveWeapon()
+{
+	auto ToolActorClass = GetTableRowUnit_WeaponExtendInfo()->ToolActorClass;
+
+	FActorSpawnParameters SpawnParameters;
+
+	SpawnParameters.Owner = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+
+	ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
+}
+
+void FWeaponProxy::RetractputWeapon()
+{
+	if (ActivedWeaponPtr)
+	{
+		ActivedWeaponPtr->Destroy();
+		ActivedWeaponPtr = nullptr;
 	}
 }

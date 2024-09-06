@@ -58,6 +58,8 @@ struct FSceneUnitContainer final
 	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(const TSharedPtr < FConsumableProxy>&, bool, int32)>;
 
 	using FOnCoinUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FCoinProxy>&, bool, int32)>;
+	
+	using FOnWeaponUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&, bool)>;
 
 	~FSceneUnitContainer();
 
@@ -79,6 +81,8 @@ struct FSceneUnitContainer final
 
 	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FGameplayTag &UnitType);
 
+	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FWeaponProxy& Unit);
+
 	TSharedPtr<FWeaponProxy> FindUnit_Weapon(const FGameplayTag &UnitType);
 
 	TSharedPtr<FSkillProxy>  AddUnit_Skill(const FGameplayTag &UnitType);
@@ -86,6 +90,8 @@ struct FSceneUnitContainer final
 	TSharedPtr<FSkillProxy> AddUnit_Skill(const FSkillProxy & Unit);
 
 	TSharedPtr<FSkillProxy> FindUnit_Skill(const FGameplayTag &UnitType);
+
+	TSharedPtr<FSkillProxy> FindUnit_Skill(const IDType& ID)const;
 
 	TSharedPtr<FCharacterProxy> AddUnit_Character(const FGameplayTag &UnitType);
 
@@ -96,6 +102,8 @@ struct FSceneUnitContainer final
 	const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& GetCoinUintAry()const;
 
 	TArray<TSharedPtr<FCharacterProxy>> GetGourpmateUintAry()const;
+	
+	TSharedPtr<FCharacterProxy> FindUnit_Character(const IDType& ID)const;
 
 	FOnSkillUnitChanged OnSkillUnitChanged;
 
@@ -106,6 +114,10 @@ struct FSceneUnitContainer final
 	FOnCoinUnitChanged OnCoinUnitChanged;
 
 	FOnGroupmateUnitChanged OnGroupmateUnitChanged;
+
+	FOnWeaponUnitChanged OnWeaponUnitChanged;
+
+	TSharedPtr<FCharacterProxy>OwnerCharacter = nullptr;
 
 private:
 

@@ -5,7 +5,7 @@
 #include <Engine/OverlapResult.h>
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -17,7 +17,7 @@
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneObjSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {

@@ -8,7 +8,7 @@
 
 #include "GenerateType.h"
 #include "UIInterfaces.h"
-#include "InteractiveToolComponent.h"
+
 
 #include "PawnStateBuildingHUD.generated.h"
 
@@ -38,10 +38,10 @@ public:
 	virtual void NativeDestruct()override;
 
 	virtual void ResetUIByData()override;
-
-	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>GetTools();
-
-	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>GetConsumables();
+// 
+// 	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>GetTools();
+// 
+// 	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>GetConsumables();
 
 protected:
 

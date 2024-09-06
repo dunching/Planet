@@ -2,11 +2,11 @@
 #include "CharacterAttributesComponent.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "PlanetControllerInterface.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :

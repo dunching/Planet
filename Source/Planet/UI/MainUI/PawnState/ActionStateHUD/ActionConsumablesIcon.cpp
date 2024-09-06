@@ -24,11 +24,11 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
-#include "InteractiveConsumablesComponent.h"
+
 #include "Skill_Consumable_Generic.h"
 
 struct FActionConsumablesIcon : public TStructVariable<FActionConsumablesIcon>

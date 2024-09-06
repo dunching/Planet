@@ -17,7 +17,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -30,7 +30,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "CS_RootMotion_TornadoTraction.h"
 
 ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/) :

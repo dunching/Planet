@@ -12,9 +12,9 @@
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
-#include "InteractiveBaseGAComponent.h"
+#include "UnitProxyProcessComponent.h"
+
+#include "BaseFeatureGAComponent.h"
 #include "Planet_Tools.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(

@@ -10,13 +10,13 @@
 #include "AIResources.h"
 #include "GameplayTasksComponent.h"
 
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
+#include "UnitProxyProcessComponent.h"
+
 #include "CharacterBase.h"
 #include "Skill_Base.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -67,9 +67,9 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 			{
 				for (const auto& Iter : CanbeActivedInfo)
 				{
-					switch (Iter->Type)
-					{
-					case FCanbeInteractionInfo::EType::kActiveSkill:
+					if (
+						Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket)
+						)
 					{
 						auto Skills = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
 						auto SkillIter = Skills.Find(Iter->Socket);
@@ -77,7 +77,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						{
 							continue;
 						}
-						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->SkillUnitPtr->GetGAInst());
+						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->UnitPtr.Pin()->GetGAInst());
 						if (!GAInsPtr)
 						{
 							continue;
@@ -96,24 +96,22 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 							}
 						}
 					}
-					break;
-					}
 				}
 			}
 
 			// 未释放主动技能
 			for (const auto& Iter : CanbeActivedInfo)
 			{
-				switch (Iter->Type)
-				{
-				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
+				if (
+					Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket)
+					)
 				{
 					auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();
 					if (!WeaponSPtr)
 					{
 						continue;
 					}
-					auto GAInsPtr = Cast<USkill_Base>(WeaponSPtr->WeaponUnitPtr->FirstSkill->GetGAInst());
+					auto GAInsPtr = Cast<USkill_Base>(WeaponSPtr->FirstSkill.Pin()->GetGAInst());
 					if (!GAInsPtr)
 					{
 						continue;
@@ -131,8 +129,6 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 							return true;
 						}
 					}
-				}
-				break;
 				}
 			}
 		}

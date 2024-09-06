@@ -5,9 +5,9 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
-#include "InteractiveBaseGAComponent.h"
+#include "UnitProxyProcessComponent.h"
+
+#include "BaseFeatureGAComponent.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicStateModify.h"

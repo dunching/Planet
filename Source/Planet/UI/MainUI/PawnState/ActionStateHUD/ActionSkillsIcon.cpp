@@ -25,7 +25,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
@@ -119,9 +119,9 @@ void UActionSkillsIcon::UpdateSkillState()
 		return;
 	}
 
-	const auto SKillUnitType = SkillSocketInfoSPtr->SkillUnitPtr->GetUnitType();
+	const auto SKillUnitType = SkillSocketInfoSPtr->UnitPtr.Pin()->GetUnitType();
 	{
-		auto GAInsPtr = SkillSocketInfoSPtr->SkillUnitPtr->GetGAInst();
+		auto GAInsPtr = SkillSocketInfoSPtr->UnitPtr.Pin()->GetGAInst();
 		if (!GAInsPtr)
 		{
 			return;
@@ -135,7 +135,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SkillSocketInfoSPtr->SkillUnitPtr);
+		auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SkillSocketInfoSPtr->UnitPtr.Pin());
 		if (!ActiveSkillUnitPtr)
 		{
 			return;
@@ -147,7 +147,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		bool bIsAcceptInput = false;
 		float Percent = 0.f;
 
-		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->SkillUnitPtr->GetGAInst());
+		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->UnitPtr.Pin()->GetGAInst());
 		if (!GAInsPtr)
 		{
 			return;
@@ -310,8 +310,8 @@ bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
  		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
  		if (WidgetDragPtr)
 		{
-			auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
-// 			if (SkillUnitPtr && SkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
+			auto OtherUnitPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
+// 			if (UnitPtr && UnitPtr.Pin()->GetUnitType().MatchesTag(SkillUnitType))
 // 			{
 // 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
 // 			}

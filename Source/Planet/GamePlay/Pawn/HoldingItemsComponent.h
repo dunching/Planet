@@ -45,7 +45,14 @@ private:
 	// 将Client需要（显示）的数据从Server上同步过去
 	UFUNCTION(Client, Reliable)
 	void OnSkillUnitChanged(
-		const FSkillProxy&Skill,
+		const FSkillProxy& Proxy,
+		bool bIsAdd
+	);
+	
+	// 将Client需要（显示）的数据从Server上同步过去
+	UFUNCTION(Client, Reliable)
+	void OnFWeaponUnitChanged(
+		const FWeaponProxy&Proxy,
 		bool bIsAdd
 	);
 

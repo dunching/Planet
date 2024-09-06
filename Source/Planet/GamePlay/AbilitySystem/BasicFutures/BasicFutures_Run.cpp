@@ -5,11 +5,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
+#include "UnitProxyProcessComponent.h"
+
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "Planet_Tools.h"

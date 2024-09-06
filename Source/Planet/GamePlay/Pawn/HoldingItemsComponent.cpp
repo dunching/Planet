@@ -42,12 +42,20 @@ void UHoldingItemsComponent::BeginPlay()
 					});
 			Handle->bIsAutoUnregister = false;
 		}
+		{
+			auto Handle =
+				GetSceneUnitContainer()->OnWeaponUnitChanged.AddCallback([this](const TSharedPtr < FWeaponProxy>& UnitPtr, bool bIsAdd)
+					{
+						OnFWeaponUnitChanged(*UnitPtr, bIsAdd);
+					});
+			Handle->bIsAutoUnregister = false;
+		}
 	}
 #endif
 }
 
 void UHoldingItemsComponent::OnSkillUnitChanged_Implementation(
-	const FSkillProxy& Skill,
+	const FSkillProxy& Proxy,
 	bool bIsAdd
 )
 {
@@ -56,8 +64,22 @@ void UHoldingItemsComponent::OnSkillUnitChanged_Implementation(
 	{
 		if (bIsAdd)
 		{
-			auto Result = GetSceneUnitContainer()->AddUnit_Skill(Skill);
-			Result->OwnerCharacterUnitPtr = OwnerPtr->GetCharacterUnit().ToWeakPtr();
+			auto Result = GetSceneUnitContainer()->AddUnit_Skill(Proxy);
+		}
+	}
+}
+
+void UHoldingItemsComponent::OnFWeaponUnitChanged_Implementation(
+	const FWeaponProxy& Proxy,
+	bool bIsAdd
+)
+{
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (OwnerPtr)
+	{
+		if (bIsAdd)
+		{
+			auto Result = GetSceneUnitContainer()->AddUnit_Weapon(Proxy);
 		}
 	}
 }
@@ -72,7 +94,6 @@ TSharedPtr<FBasicProxy>  UHoldingItemsComponent::AddUnit(FGameplayTag UnitType, 
 
 		if (Result && OwnerPtr->GetCharacterUnit())
 		{
-			Result->OwnerCharacterUnitPtr = OwnerPtr->GetCharacterUnit().ToWeakPtr();
 		}
 	}
 

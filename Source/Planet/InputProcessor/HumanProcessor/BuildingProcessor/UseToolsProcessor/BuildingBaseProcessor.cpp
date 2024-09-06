@@ -40,8 +40,8 @@
 #include "CollisionDataStruct.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "Tool_Base.h"
-#include "InteractiveToolComponent.h"
-#include "InteractiveConsumablesComponent.h"
+
+
 
 namespace HumanProcessor
 {
@@ -66,7 +66,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetInteractiveToolComponent()->RetractputTool();
+//			OnwerActorPtr->GetInteractiveToolComponent()->RetractputTool();
 		}
 
 		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
@@ -84,22 +84,22 @@ namespace HumanProcessor
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (OnwerActorPtr)
 				{
-					switch ((*SkillIter)->Type)
-					{
-					case FCanbeInteractionInfo::EType::kSwitchToTool:
-					case FCanbeInteractionInfo::EType::kActiveTool:
-					{
-						OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
-					}
-					break;
-					case FCanbeInteractionInfo::EType::kConsumables:
-					{
-						OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
-					}
-					break;
-					default:
-						break;
-					}
+// 					switch ((*SkillIter)->Type)
+// 					{
+// 					case FCanbeInteractionInfo::EType::kSwitchToTool:
+// 					case FCanbeInteractionInfo::EType::kActiveTool:
+// 					{
+// 		//				OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
+// 					}
+// 					break;
+// 					case FCanbeInteractionInfo::EType::kConsumables:
+// 					{
+// 						OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
+// 					}
+// 					break;
+// 					default:
+// 						break;
+// 					}
 				}
 			}
 		}
@@ -111,22 +111,22 @@ namespace HumanProcessor
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (OnwerActorPtr)
 				{
-					switch ((*SkillIter)->Type)
-					{
-					case FCanbeInteractionInfo::EType::kSwitchToTool:
-					case FCanbeInteractionInfo::EType::kActiveTool:
-					{
-						OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter);
-					}
-					break;
-					case FCanbeInteractionInfo::EType::kConsumables:
-					{
-						OnwerActorPtr->GetInteractiveConsumablesComponent()->CancelAction(*SkillIter);
-					}
-					break;
-					default:
-						break;
-					}
+// 					switch ((*SkillIter)->Type)
+// 					{
+// 					case FCanbeInteractionInfo::EType::kSwitchToTool:
+// 					case FCanbeInteractionInfo::EType::kActiveTool:
+// 					{
+// 						OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter);
+// 					}
+// 					break;
+// 					case FCanbeInteractionInfo::EType::kConsumables:
+// 					{
+// 						OnwerActorPtr->GetInteractiveConsumablesComponent()->CancelAction(*SkillIter);
+// 					}
+// 					break;
+// 					default:
+// 						break;
+// 					}
 				}
 			}
 		}
@@ -207,22 +207,22 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				auto CanbeActiveInfos = OnwerActorPtr->GetInteractiveToolComponent()->GetCanbeActiveAction();
-				CanbeActiveInfos.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction());
-				for (const auto& Iter : CanbeActiveInfos)
-				{
-					switch (Iter->Type)
-					{
-					case FCanbeInteractionInfo::EType::kNone:
-					{}
-					break;
-					default:
-					{
-						HandleKeysMap.Add(Iter->Key, Iter);
-					}
-					break;
-					}
-				}
+// 				auto CanbeActiveInfos = OnwerActorPtr->GetInteractiveToolComponent()->GetCanbeActiveAction();
+// 				CanbeActiveInfos.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction());
+// 				for (const auto& Iter : CanbeActiveInfos)
+// 				{
+// 					switch (Iter->Type)
+// 					{
+// 					case FCanbeInteractionInfo::EType::kNone:
+// 					{}
+// 					break;
+// 					default:
+// 					{
+// 						HandleKeysMap.Add(Iter->Key, Iter);
+// 					}
+// 					break;
+// 					}
+// 				}
 			}
 		}
 	}

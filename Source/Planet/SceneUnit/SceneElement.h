@@ -93,6 +93,10 @@ public:
 
 	virtual void InitialUnit();
 
+	virtual void Active();
+
+	virtual void Calcel();
+
 	IDType GetID()const;
 
 	FGameplayTag GetUnitType()const;
@@ -117,7 +121,7 @@ protected:
 
 	// 这个物品被分配给的对象
 	TWeakPtr<FCharacterProxy> AllocationCharacterUnitPtr = nullptr;
-	
+
 	// 这个物品所在的对象
 	TWeakPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
 
@@ -161,7 +165,7 @@ protected:
 };
 
 USTRUCT()
-struct PLANET_API FConsumableProxy : 
+struct PLANET_API FConsumableProxy :
 	public FBasicProxy,
 	public IUnit_Cooldown
 {
@@ -319,9 +323,9 @@ public:
 	virtual void InitialUnit()override;
 
 	FTableRowUnit_PassiveSkillExtendInfo* GetTableRowUnit_PassiveSkillExtendInfo()const;
-	
-	FTableRowUnit_PropertyEntrys*GetMainPropertyEntry()const;
-	
+
+	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
+
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
 protected:
@@ -402,22 +406,40 @@ public:
 
 	FWeaponProxy();
 
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	virtual void InitialUnit()override;
 
-	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& AllocationCharacterUnitPtr)override;
+	virtual void SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& AllocationCharacterUnitPtr)override;
 
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
+
+	virtual void ActiveWeapon();
+
+	virtual void RetractputWeapon();
 
 	// 主词条
 	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
 
 	int32 GetMaxAttackDistance()const;
 
-	TSharedPtr<FSkillProxy >FirstSkill;
-	
+	TWeakPtr<FSkillProxy>FirstSkill;
+
 protected:
-	
+
 	UPROPERTY(Transient)
 	int32 MaxAttackDistance = 100;
-	
+
+	AWeapon_Base* ActivedWeaponPtr = nullptr;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FWeaponProxy> :
+	public TStructOpsTypeTraitsBase2<FWeaponProxy>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };

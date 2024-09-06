@@ -13,7 +13,7 @@
 
 class ACharacterBase;
 class UInteractiveComponent;
-class UInteractiveBaseGAComponent;
+class UBaseFeatureGAComponent;
 
 struct FCharacterAttributes;
 
@@ -232,7 +232,7 @@ class PLANET_API IGAEventModifyInterface
 {
 public:
 
-	friend UInteractiveBaseGAComponent;
+	friend UBaseFeatureGAComponent;
 	friend FGAEventModify_key_compare;
 
 	IGAEventModifyInterface(int32 InPriority = 1);

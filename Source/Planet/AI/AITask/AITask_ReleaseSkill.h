@@ -9,7 +9,7 @@
 #include "AITypes.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Tasks/AITask.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 
 #include "AITask_ReleaseSkill.generated.h"
 
@@ -45,7 +45,7 @@ protected:
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
-	TMap<UGameplayAbility*, TSharedPtr<FCanbeInteractionInfo>>ReleasingSkillMap;
+	TMap<UGameplayAbility*, TSharedPtr<FSocketBase>>ReleasingSkillMap;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

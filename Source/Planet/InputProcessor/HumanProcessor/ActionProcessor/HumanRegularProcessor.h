@@ -9,7 +9,7 @@
 
 #include "SceneElement.h"
 #include "HumanProcessor.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 
 struct FSkillSocketInfo;
 
@@ -18,6 +18,7 @@ class ASceneObj;
 class AHorseCharacter;
 class ISceneObjInteractionInterface;
 
+struct FSocketBase;
 struct FWeaponProxy;
 
 namespace HumanProcessor
@@ -80,7 +81,7 @@ namespace HumanProcessor
 
 		bool bIsPressdLeftAlt = false;
 
-		TMap<FKey, TSharedPtr<FCanbeInteractionInfo>>HandleKeysMap;
+		TMap<FKey, TSharedPtr<FSocketBase>>HandleKeysMap;
 
 		ISceneObjInteractionInterface* LookAtSceneObjPtr = nullptr;
 

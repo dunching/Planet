@@ -17,7 +17,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -25,7 +25,7 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"

@@ -7,7 +7,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 	FStateTreeExecutionContext& Context,

@@ -9,7 +9,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "SceneUnitTable.h"

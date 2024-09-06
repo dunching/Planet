@@ -13,6 +13,7 @@
 
 struct FSceneTool;
 struct FCharacterAttributes;
+struct FWeaponSocket;
 
 class UState_Talent_NuQi;
 class UState_Talent_YinYang;
@@ -25,6 +26,9 @@ class PLANET_API UPawnStateActionHUD : public UMyUserWidget, public IMenuInterfa
 
 public:
 
+	using FOnActivedWeaponChangedContainerHandle =
+		TCallbackHandleContainer<void(const TSharedPtr<FWeaponSocket>&)>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
@@ -33,7 +37,7 @@ public:
 
 	virtual void ResetUIByData()override;
 
-	// Õ‚≤ø≥ı ºªØ
+	// Â§ñÈÉ®ÂàùÂßãÂåñ
 	ACharacterBase* CharacterPtr = nullptr;
 
 protected:
@@ -42,9 +46,9 @@ protected:
 
 	void InitialSkillIcon();
 
-	void OnActivedWeaponChanged(EWeaponSocket WeaponSocket);
+	void OnActivedWeaponChanged(const TSharedPtr<FWeaponSocket>&CurrentWeaponSocketSPtr);
 
-	TCallbackHandleContainer<void(EWeaponSocket)>::FCallbackHandleSPtr ActivedWeaponChangedDelegate;
+	FOnActivedWeaponChangedContainerHandle ActivedWeaponChangedDelegate;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UState_Talent_NuQi>State_Talent_NuQi_Class;

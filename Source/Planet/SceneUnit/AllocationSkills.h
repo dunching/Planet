@@ -14,19 +14,28 @@
 
 struct FSkillProxy;
 struct FWeaponProxy;
+struct FConsumableProxy;
 
-struct FSkillSocket
+struct FSocketBase
 {
-	FGameplayTag SkillSocket;
+	FKey Key;
 
-	FSkillProxy* SkillUnit = nullptr;
+	FGameplayTag Socket;
 };
 
-struct FWeaponSocket
+struct FSkillSocket : public FSocketBase
 {
-	FGameplayTag SkillSocket;
+	TWeakPtr<FSkillProxy> UnitPtr = nullptr;
+};
 
-	FWeaponProxy* WeaponUnitPtr = nullptr;
+struct FWeaponSocket : public FSocketBase
+{
+	TWeakPtr<FWeaponProxy> UnitPtr = nullptr;
+};
+
+struct FConsumableSocket : public FSocketBase
+{
+	TWeakPtr<FConsumableProxy> UnitPtr = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -34,8 +43,32 @@ struct PLANET_API FAllocationSkills final
 {
 	GENERATED_USTRUCT_BODY()
 
-	TMap<FGameplayTag, TSharedPtr<FSkillSocket>>SkillsMap;
+	void Update(const TSharedPtr<FSkillSocket>& Socket);
 	
+	void Update(const TSharedPtr<FWeaponSocket>& Socket);
+
+	void Update(const TSharedPtr<FConsumableSocket>& Socket);
+
+	bool Active(const TSharedPtr<FSocketBase>& Socket);
+
+	void Cancel(const TSharedPtr<FSocketBase>& Socket);
+
+	TSharedPtr<FSkillSocket> FindSkill(const FGameplayTag& Socket);
+	
+	TSharedPtr<FConsumableSocket> FindConsumable(const FGameplayTag& Socket);
+
+	TMap<FGameplayTag, TSharedPtr<FSkillSocket>>GetSkillsMap()const;
+	
+	TMap<FGameplayTag, TSharedPtr<FWeaponSocket>>GetWeaponsMap()const;
+
+	TMap<FGameplayTag, TSharedPtr<FConsumableSocket>>GetConsumablesMap()const;
+
+private:
+
+	TMap<FGameplayTag, TSharedPtr<FSkillSocket>>SkillsMap;
+
 	TMap<FGameplayTag, TSharedPtr<FWeaponSocket>>WeaponsMap;
+	
+	TMap<FGameplayTag, TSharedPtr<FConsumableSocket>>ConsumablesMap;
 
 };

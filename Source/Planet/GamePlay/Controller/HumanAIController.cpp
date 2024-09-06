@@ -212,62 +212,62 @@ void AHumanAIController::InitialCharacter()
 			{
 				// 武器
 				{
-					TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
-					{
-						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo, 1));
-						if (WeaponUnitPtr)
-						{
-							FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
-							FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
-							FirstWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-						}
-					}
-
-					TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
-					{
-						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo, 1));
-						if (WeaponUnitPtr)
-						{
-							SecondWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
-							SecondWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
-							SecondWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-						}
-					}
-
-					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
-					EICPtr->ActiveWeapon(EWeaponSocket::kMain);
+// 					TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
+// 					{
+// 						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo, 1));
+// 						if (WeaponUnitPtr)
+// 						{
+// 							FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
+// 							FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
+// 							FirstWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
+// 						}
+// 					}
+// 
+// 					TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
+// 					{
+// 						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo, 1));
+// 						if (WeaponUnitPtr)
+// 						{
+// 							SecondWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
+// 							SecondWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
+// 							SecondWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
+// 						}
+// 					}
+// 
+// 					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+// 					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+// 					EICPtr->ActiveWeapon(EWeaponSocket::kMain);
 				}
 
 				// 技能
 				{
-					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
-					{
-						auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1, 1));
-						if (SkillUnitPtr)
-						{
-							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket1;
-							SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
-
-							SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
-						}
-					}
-					{
-						auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2, 1));
-						if (SkillUnitPtr)
-						{
-							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket2;
-							SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
-
-							SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
-						}
-					}
-					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-					EICPtr->RegisterMultiGAs(SkillsMap);
+// 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
+// 					{
+// 						auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1, 1));
+// 						if (SkillUnitPtr)
+// 						{
+// 							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+// 
+// 							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket1;
+// 							SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
+// 
+// 							SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+// 						}
+// 					}
+// 					{
+// 						auto SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2, 1));
+// 						if (SkillUnitPtr)
+// 						{
+// 							TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+// 
+// 							SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket2;
+// 							SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
+// 
+// 							SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+// 						}
+// 					}
+// 					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+// 					EICPtr->RegisterMultiGAs(SkillsMap);
 				}
 			}
 		}

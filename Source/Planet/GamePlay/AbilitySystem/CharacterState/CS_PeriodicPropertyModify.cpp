@@ -7,14 +7,14 @@
 
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "SceneUnitTable.h"
 
 UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify():

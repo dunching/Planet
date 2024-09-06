@@ -3,7 +3,7 @@
 #include "PropertyEntrys.h"
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "HumanCharacter.h"
 
 void AWeapon_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)

@@ -15,15 +15,16 @@
 #include "AbilitySystemComponent.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_PeriodicStateModify.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "ToolBuilderUtil.h"
+#include "StateProcessorComponent.h"
 #include "CS_PeriodicStateModify_Ice.h"
 
 
@@ -241,7 +242,7 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 		ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		
 		// debuff
-		auto CSPtr = OtherCharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterState(GameplayAbilityTargetDataPtr->Tag);
+		auto CSPtr = OtherCharacterPtr->GetStateProcessorComponent()->GetCharacterState(GameplayAbilityTargetDataPtr->Tag);
 		if ((CSPtr && CSPtr->GetStateDisplayInfo().Pin()->Num < 3) || !CSPtr)
 		{
 			if (HitSound.IsValid())

@@ -14,7 +14,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -26,7 +26,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 namespace Skill_Active_ContinuousGroupTherapy
 {
