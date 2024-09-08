@@ -53,14 +53,9 @@ void USkill_WeaponActive_RangeTest::PreActivate(const FGameplayAbilitySpecHandle
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetData_DashPtr)
+		if (ActiveParamPtr)
 		{
-			EquipmentAxePtr = GameplayAbilityTargetData_DashPtr->WeaponPtr;
-			if (GameplayAbilityTargetData_DashPtr->WeaponPtr)
-			{
-				return;
-			}
+			WeaponPtr = Cast<AWeapon_RangeTest>(ActiveParamPtr->WeaponPtr);
 		}
 	}
 }
@@ -74,7 +69,7 @@ void USkill_WeaponActive_RangeTest::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (EquipmentAxePtr)
+	if (WeaponPtr)
 	{
 		return;
 	}
@@ -102,7 +97,7 @@ void USkill_WeaponActive_RangeTest::PerformAction(
 
 void USkill_WeaponActive_RangeTest::StartTasksLink()
 {
-	if (EquipmentAxePtr && CharacterPtr)
+	if (WeaponPtr && CharacterPtr)
 	{
 		PlayMontage();
 	}

@@ -89,13 +89,15 @@ public:
 
 	virtual ~FBasicProxy();
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	bool NetSerialize_Base(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	virtual void InitialUnit();
 
-	virtual void Active();
+	virtual bool Active();
 
-	virtual void Calcel();
+	virtual void Cancel();
 
 	IDType GetID()const;
 
@@ -106,11 +108,16 @@ public:
 	// 
 	FString GetUnitName()const;
 
-	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& AllocationCharacterUnitPtr);
-
 	TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)> OnAllocationCharacterUnitChanged;
 
 	TWeakPtr<FCharacterProxy> GetAllocationCharacterUnit()const;
+
+	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr);
+
+	TSharedPtr<FBasicProxy> GetThisSPtr()const;
+
+	// 这个物品所在的对象
+	TWeakPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
 
 protected:
 
@@ -122,12 +129,9 @@ protected:
 	// 这个物品被分配给的对象
 	TWeakPtr<FCharacterProxy> AllocationCharacterUnitPtr = nullptr;
 
-	// 这个物品所在的对象
-	TWeakPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
+	IDType ID;
 
 private:
-
-	IDType ID;
 
 };
 
@@ -177,9 +181,7 @@ public:
 
 	FConsumableProxy();
 
-	void AddCurrentValue(int32 val);
-
-	int32 GetCurrentValue()const;
+	virtual bool Active()override;
 
 	FTableRowUnit_Consumable* GetTableRowUnit_Consumable()const;
 
@@ -196,6 +198,10 @@ public:
 	virtual void ApplyCooldown()override;
 
 	virtual void OffsetCooldownTime()override;
+
+	void AddCurrentValue(int32 val);
+
+	int32 GetCurrentValue()const;
 
 protected:
 
@@ -237,22 +243,18 @@ public:
 
 	FCharacterProxy();
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
-
 	virtual void InitialUnit()override;
 
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
+
+	TSharedPtr<FCharacterProxy> GetThisSPtr()const;
 
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();
 
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
-
-	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr;
-
-	TSharedPtr<FAllocationSkills> AllocationSkills;
-
-	TSharedPtr<FSceneUnitContainer> SceneUnitContainer;
 
 protected:
 
@@ -279,11 +281,9 @@ public:
 
 	FSkillProxy();
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
-
-	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& AllocationCharacterUnitPtr)override;
 
 	void RegisterSkill();
 
@@ -343,6 +343,10 @@ public:
 
 	FActiveSkillProxy();
 
+	virtual bool Active()override;
+
+	virtual void Cancel()override;
+
 	FTableRowUnit_ActiveSkillExtendInfo* GetTableRowUnit_ActiveSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
@@ -387,9 +391,17 @@ public:
 
 	FWeaponSkillProxy();
 
+	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)override;
+
+	virtual bool Active()override;
+
+	virtual void Cancel()override;
+
 	FTableRowUnit_WeaponSkillExtendInfo* GetTableRowUnit_WeaponSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
+
+	AWeapon_Base* ActivedWeaponPtr = nullptr;
 
 protected:
 
@@ -406,24 +418,36 @@ public:
 
 	FWeaponProxy();
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
-
 	virtual void InitialUnit()override;
 
-	virtual void SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& AllocationCharacterUnitPtr)override;
+	virtual bool Active()override;
+
+	virtual void Cancel()override;
+
+	virtual void SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& InAllocationCharacterUnitPtr)override;
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
 
+	// 切换至当前武器
 	virtual void ActiveWeapon();
 
+	// 收回武器
 	virtual void RetractputWeapon();
+
+	// 装备武器
+	virtual void EquippingWeapons();
+
+	// 卸下武器
+	virtual void RemoveWeapons();
 
 	// 主词条
 	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
 
 	int32 GetMaxAttackDistance()const;
 
-	TWeakPtr<FSkillProxy>FirstSkill;
+	TWeakPtr<FWeaponSkillProxy>FirstSkill;
 
 protected:
 

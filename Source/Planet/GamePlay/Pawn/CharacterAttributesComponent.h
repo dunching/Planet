@@ -16,6 +16,8 @@
 class IPlanetControllerInterface;
 class UGAEvent_Received;
 
+struct FCharacterAttributes;
+
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterAttributesComponent : public UActorComponent
 {
@@ -35,6 +37,8 @@ public:
 
 	// 基础状态回复
 	void ProcessCharacterAttributes();
+
+	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr;
 
 protected:
 

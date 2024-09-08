@@ -46,7 +46,6 @@ void USkill_Active_Base::PreActivate(
 		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetPtr)
 		{
-			CanbeActivedInfoSPtr = GameplayAbilityTargetPtr->CanbeActivedInfoSPtr;
 		}
 	}
 }

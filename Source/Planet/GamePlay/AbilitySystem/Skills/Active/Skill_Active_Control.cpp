@@ -125,7 +125,6 @@ void USkill_Active_Control::PerformAction(
 			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
 			MoveToAttaclAreaPtr->DataPtr = DataPtr->Clone();
 			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
-			MoveToAttaclAreaPtr->CanbeActivedInfoSPtr = DataPtr->CanbeActivedInfoSPtr;
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->MoveToAttackDistance(
 				MoveToAttaclAreaPtr

@@ -13,6 +13,8 @@
 #include "SceneElement.h"
 #include "CharacterAttibutes.h"
 #include "TemplateHelper.h"
+#include "CharacterBase.h"
+#include "CharacterAttributesComponent.h"
 
 struct FGroupmateIcon : public TStructVariable<FGroupmateIcon>
 {
@@ -93,7 +95,9 @@ void UGroupmateIcon::SetName()
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGroupmateIcon::Get().Text));
 	if (UIPtr)
 	{
-		UIPtr->SetText(FText::FromName(UnitPtr->CharacterAttributesSPtr->Name));
+		auto CharacterAttributesSPtr =
+			UnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributesSPtr;
+		UIPtr->SetText(FText::FromName(CharacterAttributesSPtr->Name));
 	}
 }
 

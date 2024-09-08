@@ -11,10 +11,31 @@
 
 struct FBasicProxy;
 class UAbilityTask_TimerHelper;
+class AWeapon_Base;
 
-struct FGameplayAbilityTargetData_Skill_Weapon : public FGameplayAbilityTargetData
+USTRUCT()
+struct FGameplayAbilityTargetData_Skill_Weapon : 
+	public FGameplayAbilityTargetData_Skill
 {
+	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	bool bIsAutoContinue = false;
+
+	AWeapon_Base* WeaponPtr = nullptr;
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Skill_Weapon> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Skill_Weapon>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()

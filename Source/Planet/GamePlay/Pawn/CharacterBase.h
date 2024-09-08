@@ -94,6 +94,8 @@ public:
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
 
 	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
+	
+	TSharedPtr<FSceneUnitContainer> GetSceneUnitContainer()const;
 
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
@@ -131,6 +133,9 @@ protected:
 	virtual void SpawnDefaultController()override;
 
 	void InitialCharacterUnit();
+	
+	UFUNCTION(Server, Reliable)
+	void InitialCharacterUnitInClient();
 
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
@@ -188,8 +193,6 @@ private:
 	FValueChangedDelegateHandle MoveSpeedChangedHandle;
 
 	FProcessedGAEventHandle ProcessedGAEventHandle;
-	
-	TSharedPtr<FCharacterProxy> CharacterUnitPtr = nullptr;
 	
 	UPROPERTY(Transient)
 	TObjectPtr<AController> OriginalAIController;

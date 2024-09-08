@@ -47,7 +47,10 @@ protected:
 
 	void InitialGroupmateList();
 
-	void ResetBackpack(const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr, const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
+	void ResetBackpack(
+		const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr,
+		const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+	);
 
 	void ResetUIByData_WeaponSkills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
 

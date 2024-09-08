@@ -61,16 +61,12 @@ void USkill_WeaponActive_HandProtection::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_WeaponHandProtection*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetData_DashPtr)
+		if (ActiveParamPtr)
 		{
-			WeaponPtr = GameplayAbilityTargetData_DashPtr->WeaponPtr;
-			if (GameplayAbilityTargetData_DashPtr->WeaponPtr)
-			{
-				return;
-			}
+			WeaponPtr = Cast<AWeapon_HandProtection>(ActiveParamPtr->WeaponPtr);
 		}
 	}
 }

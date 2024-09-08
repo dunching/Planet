@@ -222,7 +222,7 @@ FGameplayAbilityTargetData_GAEventType::FGameplayAbilityTargetData_GAEventType(E
 
 }
 
-inline UScriptStruct* FGameplayAbilityTargetData_GAEventType::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_GAEventType::GetScriptStruct() const
 {
 	return FGameplayAbilityTargetData_GAEventType::StaticStruct();
 }

@@ -8,4 +8,6 @@
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Planet, "Planet" );
 
+#if WITH_EDITOR
 TArray<TWeakPtr<FBasicProxy>> TestGCUnitMap;
+#endif

@@ -26,6 +26,8 @@
 #include "GroupMnaggerComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CharacterAttibutes.h"
+#include "CharacterBase.h"
+#include "CharacterAttributesComponent.h"
 
 namespace TeamMateInfo
 {
@@ -126,8 +128,10 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPt
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(TeamMateInfo::Text));
 			if (UIPtr)
 			{
+				auto CharacterAttributesSPtr =
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributesSPtr;
 				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"), 
-					*GroupMateUnitPtr->CharacterAttributesSPtr->Name.ToString(), GroupMateUnitPtr->CharacterAttributesSPtr->Level
+					*CharacterAttributesSPtr->Name.ToString(), CharacterAttributesSPtr->Level
 				)));
 			}
 		}

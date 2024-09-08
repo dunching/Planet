@@ -23,6 +23,9 @@
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
 #include "CharacterAttibutes.h"
+#include "GameplayTagsSubSystem.h"
+#include "CharacterBase.h"
+#include "CharacterAttributesComponent.h"
 
 struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 {
@@ -151,8 +154,11 @@ void UBackpackIcon::OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterPr
 			return;
 		}
 
+		auto CharacterAttributesSPtr =
+			AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributesSPtr;
+
 		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr.Pin()->CharacterAttributesSPtr->Name));
+		UIPtr->SetText(FText::FromName(CharacterAttributesSPtr->Name));
 	}
 	else
 	{

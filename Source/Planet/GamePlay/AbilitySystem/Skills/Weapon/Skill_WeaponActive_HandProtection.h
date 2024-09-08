@@ -16,11 +16,6 @@ class UProgressTips;
 
 struct FGameplayAbilityTargetData_PickAxe;
 
-struct FGameplayAbilityTargetData_Skill_WeaponHandProtection : public FGameplayAbilityTargetData_Skill_Weapon
-{
-	AWeapon_HandProtection* WeaponPtr = nullptr;
-};
-
 UCLASS()
 class PLANET_API USkill_WeaponActive_HandProtection : public USkill_WeaponActive_Base
 {

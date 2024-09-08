@@ -23,6 +23,7 @@
 #include "PlanetControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
 #include "GameplayTagsSubSystem.h"
+#include "CharacterBase.h"
 
 namespace HUD_TeamMateInfo
 {
@@ -84,8 +85,10 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(HUD_TeamMateInfo::Text));
 			if (UIPtr)
 			{
+				auto CharacterAttributesSPtr = 
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributesSPtr;
 				UIPtr->SetText(FText::FromString(
-					FString::Printf(TEXT("%s(%d)"), *GroupMateUnitPtr->CharacterAttributesSPtr->Name.ToString(), GroupMateUnitPtr->CharacterAttributesSPtr->Level)
+					FString::Printf(TEXT("%s(%d)"), *CharacterAttributesSPtr->Name.ToString(), CharacterAttributesSPtr->Level)
 				));
 			}
 		}

@@ -8,12 +8,15 @@
 #include "GameplayTagsSubSystem.h"
 #include "BaseFeatureGAComponent.h"
 #include "PlanetControllerInterface.h"
+#include "CharacterAttibutes.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickInterval = 1.f;
+
+	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
 }
 
 void UCharacterAttributesComponent::TickComponent(
@@ -34,12 +37,7 @@ void UCharacterAttributesComponent::TickComponent(
 
 TSharedPtr<FCharacterAttributes> UCharacterAttributesComponent::GetCharacterAttributes() const
 {
-	auto CharacterPtr = GetOwner<FOwnerType>();
-	if (CharacterPtr)
-	{
-		return CharacterPtr->GetCharacterUnit()->CharacterAttributesSPtr;
-	}
-	return nullptr;
+	return CharacterAttributesSPtr;
 }
 
 void UCharacterAttributesComponent::ProcessCharacterAttributes()
@@ -58,8 +56,6 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
-
-		auto CharacterAttributesSPtr = GetCharacterAttributes();
 
 		// 基础回复
 		{
@@ -116,8 +112,6 @@ void UCharacterAttributesComponent::OnPropertyChanged_Implementation(
 	int32 CurrentValue
 )
 {
-	auto CharacterAttributesSPtr = GetCharacterAttributes();
-
 	const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
 
 	switch (CharacterPropertyType)

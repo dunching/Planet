@@ -77,25 +77,25 @@ struct FSceneUnitContainer final
 
 	void RemoveUnit_Consumable(const TSharedPtr <FConsumableProxy>&UnitPtr, int32 Num = 1);
 
-	TSharedPtr<FToolProxy> AddUnit_ToolUnit(const FGameplayTag &UnitType);
+	TSharedPtr<FToolProxy> AddUnit_ToolUnit(const FGameplayTag& UnitType);
 
-	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FGameplayTag &UnitType);
+	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FGameplayTag& UnitType);
 
-	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FWeaponProxy& Unit);
+	TSharedPtr<FWeaponProxy> Update_Weapon(const FWeaponProxy& Unit);
 
-	TSharedPtr<FWeaponProxy> FindUnit_Weapon(const FGameplayTag &UnitType);
+	TSharedPtr<FWeaponProxy> FindUnit_Weapon(const FGameplayTag& UnitType);
 
-	TSharedPtr<FSkillProxy>  AddUnit_Skill(const FGameplayTag &UnitType);
+	TSharedPtr<FSkillProxy>  AddUnit_Skill(const FGameplayTag& UnitType);
 
-	TSharedPtr<FSkillProxy> AddUnit_Skill(const FSkillProxy & Unit);
+	TSharedPtr<FSkillProxy> Update_Skill(const FSkillProxy& Unit);
 
-	TSharedPtr<FSkillProxy> FindUnit_Skill(const FGameplayTag &UnitType);
+	TSharedPtr<FSkillProxy> FindUnit_Skill(const FGameplayTag& UnitType);
 
 	TSharedPtr<FSkillProxy> FindUnit_Skill(const IDType& ID)const;
 
 	TSharedPtr<FCharacterProxy> AddUnit_Character(const FGameplayTag &UnitType);
 
-	void AddUnit_Groupmate(const TSharedPtr<FCharacterProxy>& UnitPtr);
+	TSharedPtr<FCharacterProxy> Update_Character(const FCharacterProxy& Unit);
 
 	const TArray<TSharedPtr<FBasicProxy>>& GetSceneUintAry()const;
 
@@ -133,6 +133,9 @@ private:
 	TMap<FGameplayTag, TSharedPtr<FSkillProxy>> SkillUnitMap;
 	
 	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinUnitMap;
+	
+	TMap<FGameplayTag, TSharedPtr<FCharacterProxy>> CharacterCoinUnitMap;
+
 };
 
 #pragma endregion HoldingItems

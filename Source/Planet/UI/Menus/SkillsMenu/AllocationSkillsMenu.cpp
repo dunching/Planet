@@ -273,9 +273,9 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			auto FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocket>();
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
 			FirstWeaponSocketInfoSPtr->Key = WeaponActiveSkills_Key;
+			FirstWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
 			if (IconPtr)
 			{
-				FirstWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
 				FirstWeaponSocketInfoSPtr->UnitPtr = IconPtr->UnitPtr;
 			}
 			EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr);
@@ -284,9 +284,9 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			auto SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocket>();
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
 			SecondWeaponSocketInfoSPtr->Key = WeaponActiveSkills_Key;
+			SecondWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
 			if (IconPtr)
 			{
-				SecondWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
 				SecondWeaponSocketInfoSPtr->UnitPtr = IconPtr->UnitPtr;
 			}
 			EICPtr->RegisterWeapon(SecondWeaponSocketInfoSPtr);
@@ -536,14 +536,17 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 	}
 }
 
-void UAllocationSkillsMenu::ResetBackpack(const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr, const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetBackpack(
+	const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr, 
+	const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+)
 {
 	if (AICharacterUnitPtr)
 	{
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().TargetBackpack));
 
 		UIPtr->SetHoldItemProperty(
-			AICharacterUnitPtr->SceneUnitContainer
+			AICharacterUnitPtr->ProxyCharacterPtr->GetSceneUnitContainer()
 		);
 		UIPtr->ResetUIByData();
 
@@ -560,7 +563,7 @@ void UAllocationSkillsMenu::ResetBackpack(const TSharedPtr<FCharacterProxy>& AIC
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
 
 		UIPtr->SetHoldItemProperty(
-			PlayerCharacterUnitPtr->SceneUnitContainer
+			PlayerCharacterUnitPtr->ProxyCharacterPtr->GetSceneUnitContainer()
 		);
 		UIPtr->ResetUIByData();
 

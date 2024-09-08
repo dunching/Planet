@@ -14,13 +14,28 @@ struct FSkillProxy;
 class UInteractiveComponent;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Skill : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_Skill :
+	public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	virtual FGameplayAbilityTargetData_Skill* Clone()const;
 
 	TSharedPtr<FSkillProxy> SkillUnitPtr = nullptr;
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Skill> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Skill>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()

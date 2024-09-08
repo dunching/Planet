@@ -22,8 +22,6 @@ struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetDat
 
 	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const;
 
-	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
-
 	bool bIsAutoContinue = false;
 };
 
@@ -104,8 +102,6 @@ public:
 
 	// 获取范围内任意可攻击的目标
 	ACharacterBase* GetTargetInDistance(int32 Distance)const;
-
-	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
 
 protected:
 

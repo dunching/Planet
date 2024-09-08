@@ -16,6 +16,16 @@
 #include "PropertyEntrys.h"
 #include "Skill_Base.h"
 #include "Weapon_Base.h"
+#include "Skill_Active_Base.h"
+#include "Skill_Active_Control.h"
+#include "Skill_WeaponActive_Base.h"
+#include "Skill_WeaponActive_PickAxe.h"
+#include "Skill_WeaponActive_HandProtection.h"
+#include "Skill_WeaponActive_RangeTest.h"
+#include "Weapon_HandProtection.h"
+#include "Weapon_PickAxe.h"
+#include "Weapon_RangeTest.h"
+#include "HoldingItemsComponent.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -27,7 +37,7 @@ FBasicProxy::~FBasicProxy()
 
 }
 
-bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FBasicProxy::NetSerialize_Base(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Ar << UnitType;
 	Ar << ID;
@@ -50,10 +60,7 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 			auto TempPtr= MakeShared<FCharacterProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			AllocationCharacterUnitPtr =
-				TempPtr->ProxyCharacterPtr->GetCharacterUnit()->SceneUnitContainer->FindUnit_Character(
-					TempPtr->GetID()
-				);
+			AllocationCharacterUnitPtr = TempPtr->GetThisSPtr();
 		}
 	}
 
@@ -75,14 +82,16 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 			auto TempPtr = MakeShared<FCharacterProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			OwnerCharacterUnitPtr =
-				TempPtr->ProxyCharacterPtr->GetCharacterUnit()->SceneUnitContainer->FindUnit_Character(
-					TempPtr->GetID()
-				);
+			OwnerCharacterUnitPtr = TempPtr->GetThisSPtr();
 		}
 	}
 
 	return true;
+}
+
+bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	return NetSerialize_Base(Ar, Map, bOutSuccess);
 }
 
 void FBasicProxy::InitialUnit()
@@ -90,12 +99,12 @@ void FBasicProxy::InitialUnit()
 	ID = FGuid::NewGuid();
 }
 
-void FBasicProxy::Active()
+bool FBasicProxy::Active()
 {
-
+	return true;
 }
 
-void FBasicProxy::Calcel()
+void FBasicProxy::Cancel()
 {
 
 }
@@ -117,6 +126,13 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 	return SceneUnitExtendInfoPtr->DefaultIcon;
 }
 
+TSharedPtr<FBasicProxy> FBasicProxy::GetThisSPtr() const
+{
+	auto SceneUnitContainer =
+		OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
+	return SceneUnitContainer->FindUnit(GetID());
+}
+
 FString FBasicProxy::GetUnitName() const
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
@@ -132,6 +148,23 @@ void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>
 	}
 
 	AllocationCharacterUnitPtr = InAllocationCharacterUnitPtr;
+
+#if UE_EDITOR || UE_CLIENT
+	auto ProxyCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr;
+	if (ProxyCharacterPtr->GetNetMode() == NM_Client)
+	{
+		auto HoldingItemsComponentPtr = ProxyCharacterPtr->GetHoldingItemsComponent();
+		if (AllocationCharacterUnitPtr.IsValid())
+		{
+			HoldingItemsComponentPtr->SetAllocationCharacterUnit(*this, *AllocationCharacterUnitPtr.Pin());
+		}
+		else
+		{
+			FCharacterProxy CharacterProxy;
+			HoldingItemsComponentPtr->SetAllocationCharacterUnit(*this, CharacterProxy);
+		}
+	}
+#endif
 
 	OnAllocationCharacterUnitChanged.ExcuteCallback(nullptr);
 }
@@ -153,6 +186,11 @@ FTableRowUnit* FBasicProxy::GetTableRowUnit() const
 FConsumableProxy::FConsumableProxy()
 {
 
+}
+
+bool FConsumableProxy::Active()
+{
+	return true;
 }
 
 void FConsumableProxy::AddCurrentValue(int32 val)
@@ -297,7 +335,7 @@ FWeaponProxy::FWeaponProxy()
 
 bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
-	Super::NetSerialize(Ar, Map, bOutSuccess);
+	Super::NetSerialize_Base(Ar, Map, bOutSuccess);
 
 	if (Ar.IsSaving())
 	{
@@ -314,13 +352,10 @@ bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOut
 		Ar << bIsValid;
 		if (bIsValid)
 		{
-			auto TempPtr = MakeShared<FSkillProxy>();
+			auto TempPtr = MakeShared<FWeaponSkillProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			FirstSkill =
-				OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCharacterUnit()->SceneUnitContainer->FindUnit_Skill(
-					TempPtr->GetID()
-				);
+			FirstSkill = DynamicCastSharedPtr<FWeaponSkillProxy>(TempPtr->GetThisSPtr());
 		}
 	}
 
@@ -333,6 +368,20 @@ void FWeaponProxy::InitialUnit()
 	{
 		MaxAttackDistance = GetTableRowUnit_WeaponExtendInfo()->MaxAttackDistance;
 	}
+}
+
+bool FWeaponProxy::Active()
+{
+	Super::Active();
+
+	return FirstSkill.Pin()->Active();
+}
+
+void FWeaponProxy::Cancel()
+{
+	Super::Cancel();
+
+	FirstSkill.Pin()->Cancel();
 }
 
 void FWeaponProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
@@ -375,7 +424,7 @@ FSkillProxy::FSkillProxy() :
 
 bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
-	Super::NetSerialize(Ar, Map, bOutSuccess);
+	Super::NetSerialize_Base(Ar, Map, bOutSuccess);
 
 	Ar << Level;
 
@@ -387,26 +436,142 @@ TSubclassOf<USkill_Base> FSkillProxy::GetSkillClass() const
 	return nullptr;
 }
 
-void FSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
+bool FActiveSkillProxy::Active()
 {
-	if (!InAllocationCharacterUnitPtr)
+	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
+	if (!InGAInsPtr)
 	{
-		UnRegisterSkill();
+		return false;
 	}
 
+	auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
+
+	// 需要特殊参数的
+	if (
+		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
+		)
+	{
+		if (InGAInsPtr->IsActive())
+		{
+			InGAInsPtr->ContinueActive();
+			return true;
+		}
+		else
+		{
+			auto GameplayAbilityTargetPtr =
+				new FGameplayAbilityTargetData_Control;
+
+			// Test
+			GameplayAbilityTargetPtr->TargetCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+
+			FGameplayEventData Payload;
+			Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+			return ASCPtr->TriggerAbilityFromGameplayEvent(
+				InGAInsPtr->GetCurrentAbilitySpecHandle(),
+				ASCPtr->AbilityActorInfo.Get(),
+				FGameplayTag(),
+				&Payload,
+				*ASCPtr
+			);
+		}
+	}
+	else
+	{
+		if (InGAInsPtr->IsActive())
+		{
+			InGAInsPtr->ContinueActive();
+			return true;
+		}
+		else
+		{
+			auto GameplayAbilityTargetPtr =
+				new FGameplayAbilityTargetData_ActiveSkill;
+
+			FGameplayEventData Payload;
+			Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+			return ASCPtr->TriggerAbilityFromGameplayEvent(
+				InGAInsPtr->GetCurrentAbilitySpecHandle(),
+				ASCPtr->AbilityActorInfo.Get(),
+				FGameplayTag(),
+				&Payload,
+				*ASCPtr
+			);
+		}
+	}
+
+	return true;
+}
+
+void FActiveSkillProxy::Cancel()
+{
+}
+
+void FWeaponSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
+{
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+}
 
-	if (AllocationCharacterUnitPtr.IsValid())
+bool FWeaponSkillProxy::Active()
+{
+	auto InGAInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
+	if (!InGAInsPtr)
 	{
-		RegisterSkill();
+		return false;
 	}
+
+	if (InGAInsPtr->IsActive())
+	{
+		InGAInsPtr->ContinueActive();
+		return true;
+	}
+
+	FGameplayEventData Payload;
+	if (
+		 GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Axe) ||
+		 GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_HandProtection) ||
+		 GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_RangeTest) 
+		)
+	{
+		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_Weapon;
+		GameplayAbilityTargetDashPtr->SkillUnitPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(GetThisSPtr());
+		GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
+		GameplayAbilityTargetDashPtr->bIsAutoContinue = true;
+		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+	}
+
+	auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
+
+	return ASCPtr->TriggerAbilityFromGameplayEvent(
+		InGAInsPtr->GetCurrentAbilitySpecHandle(),
+		ASCPtr->AbilityActorInfo.Get(),
+		GetUnitType(),
+		&Payload,
+		*ASCPtr
+	);
+}
+
+void FWeaponSkillProxy::Cancel()
+{
+	auto InGAInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
+	if (!InGAInsPtr)
+	{
+		return;
+	}
+
+	auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
+
+	ASCPtr->CancelAbilityHandle(
+		InGAInsPtr->GetCurrentAbilitySpecHandle()
+	);
 }
 
 void FSkillProxy::RegisterSkill()
 {
 	FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
 
-	GameplayAbilityTargetDataPtr->SkillUnitPtr = nullptr;
+	GameplayAbilityTargetDataPtr->SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(GetThisSPtr());
 
 	FGameplayAbilitySpec GameplayAbilitySpec(
 		GetSkillClass(),
@@ -415,6 +580,7 @@ void FSkillProxy::RegisterSkill()
 
 	GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
 	GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+	GameplayAbilitySpec.GameplayEventData->EventTag = GetUnitType();
 
 	auto ProxyCharacterPtr = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
 	GameplayAbilitySpecHandle = ProxyCharacterPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
@@ -537,14 +703,11 @@ TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 
 FCharacterProxy::FCharacterProxy()
 {
-	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
-	AllocationSkills = MakeShared<FAllocationSkills>();
-	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
 }
 
 bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
-	Super::NetSerialize(Ar, Map, bOutSuccess);
+	Super::NetSerialize_Base(Ar, Map, bOutSuccess);
 
 	Ar << ProxyCharacterPtr;
 
@@ -555,9 +718,6 @@ void FCharacterProxy::InitialUnit()
 {
 	Super::InitialUnit();
 
-	auto TableRowUnit_CharacterInfoPtr = GetTableRowUnit_CharacterInfo();
-
-	*CharacterAttributesSPtr = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
 
 FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
@@ -569,9 +729,15 @@ FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() co
 	return SceneUnitExtendInfoPtr;
 }
 
+TSharedPtr<FCharacterProxy> FCharacterProxy::GetThisSPtr() const
+{
+	auto SceneUnitContainer =
+		ProxyCharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
+	return SceneUnitContainer->FindUnit_Character(GetID());
+}
+
 void FCharacterProxy::RelieveRootBind()
 {
-	SceneUnitContainer.Reset();
 }
 
 FCoinProxy::FCoinProxy()
@@ -700,13 +866,23 @@ void FActiveSkillProxy::OffsetCooldownTime()
 
 void FWeaponProxy::ActiveWeapon()
 {
-	auto ToolActorClass = GetTableRowUnit_WeaponExtendInfo()->ToolActorClass;
+	if (ActivedWeaponPtr)
+	{
+		check(0);
+	}
+	else
+	{
+		auto ToolActorClass = GetTableRowUnit_WeaponExtendInfo()->ToolActorClass;
 
-	FActorSpawnParameters SpawnParameters;
+		FActorSpawnParameters SpawnParameters;
 
-	SpawnParameters.Owner = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+		SpawnParameters.Owner = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
 
-	ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
+		ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
+		ActivedWeaponPtr->WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(GetThisSPtr());
+
+		FirstSkill.Pin()->ActivedWeaponPtr = ActivedWeaponPtr;
+	}
 }
 
 void FWeaponProxy::RetractputWeapon()
@@ -715,5 +891,16 @@ void FWeaponProxy::RetractputWeapon()
 	{
 		ActivedWeaponPtr->Destroy();
 		ActivedWeaponPtr = nullptr;
+		FirstSkill.Pin()->ActivedWeaponPtr = nullptr;
 	}
+}
+
+void FWeaponProxy::EquippingWeapons()
+{
+	FirstSkill.Pin()->RegisterSkill();
+}
+
+void FWeaponProxy::RemoveWeapons()
+{
+	FirstSkill.Pin()->UnRegisterSkill();
 }

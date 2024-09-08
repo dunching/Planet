@@ -33,8 +33,17 @@ public:
 	void AddUnit_Apending(FGameplayTag UnitType, int32 Num, FGuid Guid);
 
 	void SyncApendingUnit(FGuid Guid);
-
+	
+	// 同步到服務器
+	UFUNCTION(Server, Reliable)
+	void SetAllocationCharacterUnit(
+		const FBasicProxy& Proxy,
+		const FCharacterProxy& CharacterProxy
+	);
+	
 	static FName ComponentName;
+
+	TSharedPtr<FSceneUnitContainer>SceneUnitContainer;
 
 protected:
 
@@ -51,8 +60,15 @@ private:
 	
 	// 将Client需要（显示）的数据从Server上同步过去
 	UFUNCTION(Client, Reliable)
-	void OnFWeaponUnitChanged(
+	void OnWeaponUnitChanged(
 		const FWeaponProxy&Proxy,
+		bool bIsAdd
+	);
+	
+	// 将Client需要（显示）的数据从Server上同步过去
+	UFUNCTION(Client, Reliable)
+	void OnGroupmateUnitChanged(
+		const FCharacterProxy&Proxy,
 		bool bIsAdd
 	);
 

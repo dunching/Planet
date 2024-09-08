@@ -140,12 +140,10 @@ void APlanetPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto  asd = GetNetMode();
-
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
-		// 因为Pawn是通过网络同步过来的，所以不再OnPoss里面去做
+		// 因为Pawn是通过网络同步过来的，所以不在OnPoss里面去做
 		auto CurrentPawn = GetPawn();
 		if (CurrentPawn->IsA(AHumanCharacter::StaticClass()))
 		{
@@ -178,6 +176,7 @@ void APlanetPlayerController::BeginPlay()
 		}
 	}
 #endif
+
 }
 
 void APlanetPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -258,12 +257,9 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 
 	if (bIsNewPawn)
 	{
-		InitialCharacterUnit(Cast<ACharacterBase>(InPawn));
 	}
 
 	Super::OnPossess(InPawn);
-
-	auto  asd = GetNetMode();
 
 	if (bIsNewPawn)
 	{
@@ -277,9 +273,15 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
 #if UE_EDITOR || UE_SERVER
-			if (GetNetMode() == NM_DedicatedServer)
+			if (InPawn)
 			{
-				GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
+				if (InPawn->IsA(AHumanCharacter::StaticClass()))
+				{
+					if (GetNetMode() == NM_DedicatedServer)
+					{
+						GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
+					}
+				}
 			}
 #endif
 		}

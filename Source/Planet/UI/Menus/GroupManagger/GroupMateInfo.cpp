@@ -23,6 +23,8 @@
 #include "SceneElement.h"
 #include "GameplayTagsSubSystem.h"
 #include "CharacterAttibutes.h"
+#include "CharacterBase.h"
+#include "CharacterAttributesComponent.h"
 
 namespace GroupMateInfo
 {
@@ -120,10 +122,12 @@ void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitP
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(GroupMateInfo::Text));
 			if (UIPtr)
 			{
+				auto CharacterAttributesSPtr =
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributesSPtr;
 				UIPtr->SetText(
 					FText::FromString(FString::Printf(TEXT("%s(%d)"), 
-						*GroupMateUnitPtr->CharacterAttributesSPtr->Name.ToString(),
-						GroupMateUnitPtr->CharacterAttributesSPtr->Level))
+						*CharacterAttributesSPtr->Name.ToString(),
+						CharacterAttributesSPtr->Level))
 				);
 			}
 		}

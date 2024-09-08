@@ -13,18 +13,12 @@
 UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
 }
 
 TSharedPtr<FSceneUnitContainer> UHoldingItemsComponent::GetSceneUnitContainer()
 {
-	auto OwnerPtr = GetOwner<FOwnerType>();
-	if (OwnerPtr && OwnerPtr->GetCharacterUnit())
-	{
-		return OwnerPtr->GetCharacterUnit()->SceneUnitContainer;
-	}
-
-	// 创建临时的 
-	return MakeShared<FSceneUnitContainer>();
+	return SceneUnitContainer;
 }
 
 void UHoldingItemsComponent::BeginPlay()
@@ -46,7 +40,15 @@ void UHoldingItemsComponent::BeginPlay()
 			auto Handle =
 				GetSceneUnitContainer()->OnWeaponUnitChanged.AddCallback([this](const TSharedPtr < FWeaponProxy>& UnitPtr, bool bIsAdd)
 					{
-						OnFWeaponUnitChanged(*UnitPtr, bIsAdd);
+						OnWeaponUnitChanged(*UnitPtr, bIsAdd);
+					});
+			Handle->bIsAutoUnregister = false;
+		}
+		{
+			auto Handle =
+				GetSceneUnitContainer()->OnGroupmateUnitChanged.AddCallback([this](const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd)
+					{
+						OnGroupmateUnitChanged(*UnitPtr, bIsAdd);
 					});
 			Handle->bIsAutoUnregister = false;
 		}
@@ -64,12 +66,12 @@ void UHoldingItemsComponent::OnSkillUnitChanged_Implementation(
 	{
 		if (bIsAdd)
 		{
-			auto Result = GetSceneUnitContainer()->AddUnit_Skill(Proxy);
+			auto Result = GetSceneUnitContainer()->Update_Skill(Proxy);
 		}
 	}
 }
 
-void UHoldingItemsComponent::OnFWeaponUnitChanged_Implementation(
+void UHoldingItemsComponent::OnWeaponUnitChanged_Implementation(
 	const FWeaponProxy& Proxy,
 	bool bIsAdd
 )
@@ -79,7 +81,22 @@ void UHoldingItemsComponent::OnFWeaponUnitChanged_Implementation(
 	{
 		if (bIsAdd)
 		{
-			auto Result = GetSceneUnitContainer()->AddUnit_Weapon(Proxy);
+			auto Result = GetSceneUnitContainer()->Update_Weapon(Proxy);
+		}
+	}
+}
+
+void UHoldingItemsComponent::OnGroupmateUnitChanged_Implementation(
+	const FCharacterProxy& Proxy,
+	bool bIsAdd
+)
+{
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (OwnerPtr)
+	{
+		if (bIsAdd)
+		{
+			auto Result = GetSceneUnitContainer()->Update_Character(Proxy);
 		}
 	}
 }
@@ -132,6 +149,27 @@ void UHoldingItemsComponent::SyncApendingUnit(FGuid Guid)
 			}
 		}
 		SkillUnitApendingMap.Remove(Guid);
+	}
+}
+
+void UHoldingItemsComponent::SetAllocationCharacterUnit_Implementation(
+	const FBasicProxy& Proxy, 
+	const FCharacterProxy& CharacterProxy
+)
+{
+	auto ProxySPtr = Proxy.GetThisSPtr();
+	if (!ProxySPtr)
+	{
+		return;
+	}
+	auto CharacterProxySPtr = CharacterProxy.GetThisSPtr();
+	if (CharacterProxySPtr)
+	{
+		ProxySPtr->SetAllocationCharacterUnit(CharacterProxySPtr);
+	}
+	else
+	{
+		ProxySPtr->SetAllocationCharacterUnit(nullptr);
 	}
 }
 

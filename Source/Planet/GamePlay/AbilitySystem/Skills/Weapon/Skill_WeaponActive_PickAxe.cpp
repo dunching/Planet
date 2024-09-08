@@ -78,14 +78,9 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_PickAxe*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetData_DashPtr)
+		if (ActiveParamPtr)
 		{
-			EquipmentAxePtr = GameplayAbilityTargetData_DashPtr->WeaponPtr;
-			if (GameplayAbilityTargetData_DashPtr->WeaponPtr)
-			{
-				return;
-			}
+			EquipmentAxePtr = Cast<AWeapon_PickAxe>(ActiveParamPtr->WeaponPtr);
 		}
 	}
 }
@@ -134,7 +129,12 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
 	{
-		MakeDamage();
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			MakeDamage();
+		}
+#endif
 
 		CheckInContinue();
 	}

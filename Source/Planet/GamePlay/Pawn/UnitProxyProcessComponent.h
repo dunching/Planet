@@ -31,6 +31,8 @@ public:
 	using FOnActivedWeaponChangedContainer =
 		TCallbackHandleContainer<void(const TSharedPtr<FWeaponSocket>&)>;
 
+	UUnitProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
 	virtual void TickComponent(
@@ -54,7 +56,7 @@ public:
 	void RegisterMultiGAs(
 		const TSharedPtr<FSkillSocket>& SkillSocket
 	);
-
+	
 	TSharedPtr<FSkillSocket> FindSkill(const FGameplayTag& Tag);
 
 	TMap<FGameplayTag, TSharedPtr<FSkillSocket>> GetSkills()const;
@@ -68,7 +70,8 @@ public:
 	// 激活可用的武器
 	void ActiveWeapon();
 
-	bool SwitchWeapon();
+	// 切換主副武器
+	void SwitchWeapon();
 
 	void RetractputWeapon();
 
@@ -90,11 +93,37 @@ public:
 	FOnActivedWeaponChangedContainer OnActivedWeaponChangedContainer;
 
 protected:
+	
+	UFUNCTION(Server, Reliable)
+	void RegisterMultiGAs_Server(
+		const FSkillSocket& SkillSocket
+	);
+	
+	UFUNCTION(Server, Reliable)
+	void RegisterWeapon_Server(
+		const FWeaponSocket& Socket
+	);
+	
+	UFUNCTION(Server, Reliable)
+	void ActiveAction_Server(
+		const FSocketBase& Socket,
+		bool bIsAutomaticStop
+	);
+
+	UFUNCTION(Server, Reliable)
+	void CancelAction_Server(
+		const FSocketBase& Socket
+	);
+
+	UFUNCTION(Server, Reliable)
+	void SwitchWeaponImp_Server(const FWeaponSocket& NewWeaponSocket);
 
 	bool ActivedCorrespondingWeapon(const TSharedPtr<FActiveSkillProxy>& ActiveSkillUnitPtr);
-
+	
 	void SwitchWeaponImp(const TSharedPtr<FWeaponSocket>& NewWeaponSocketSPtr);
 
 	TSharedPtr<FWeaponSocket>PreviousWeaponSocketSPtr = nullptr;
+
+	TSharedPtr<FAllocationSkills> AllocationSkills_Member;
 
 };

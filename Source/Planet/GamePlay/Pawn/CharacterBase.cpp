@@ -44,6 +44,7 @@
 #include "FightingTips.h"
 #include "SceneObj.h"
 #include "SceneUnitContainer.h"
+#include "SceneUnitTable.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -91,6 +92,8 @@ void ACharacterBase::BeginPlay()
 				CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
 			}
 		}
+
+		InitialCharacterUnitInClient();
 	}
 #endif
 
@@ -112,6 +115,7 @@ void ACharacterBase::BeginPlay()
 		);
 	}
 #endif
+
 	OnMoveSpeedChanged(CharacterAttributesSPtr->MoveSpeed.GetCurrentValue());
 }
 
@@ -267,20 +271,36 @@ UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 {
-	return CharacterUnitPtr;
+	return HoldingItemsComponentPtr->SceneUnitContainer->OwnerCharacter;
+}
+
+TSharedPtr<FSceneUnitContainer> ACharacterBase::GetSceneUnitContainer() const
+{
+	return HoldingItemsComponentPtr->SceneUnitContainer;
 }
 
 void ACharacterBase::InitialCharacterUnit()
 {
-	auto SceneUnitContainer = MakeShared<FSceneUnitContainer>();
-	auto NewCharacterUnitPtr = SceneUnitContainer->AddUnit_Character(RowName); 
-
-	SceneUnitContainer->OwnerCharacter = NewCharacterUnitPtr;
-
+	auto SceneUnitContainer = GetSceneUnitContainer();
+	auto NewCharacterUnitPtr = GetSceneUnitContainer()->AddUnit_Character(RowName);
+	NewCharacterUnitPtr->OwnerCharacterUnitPtr = nullptr;
 	NewCharacterUnitPtr->ProxyCharacterPtr = this;
-	NewCharacterUnitPtr->SceneUnitContainer = SceneUnitContainer;
+	
+	// 
+	SceneUnitContainer->OwnerCharacter = NewCharacterUnitPtr;
+	
+	// 
+	GetInteractiveSkillComponent()->GetAllocationSkills()->OwnerCharacter = NewCharacterUnitPtr;
 
-	CharacterUnitPtr = NewCharacterUnitPtr;
+	// 
+	auto TableRowUnit_CharacterInfoPtr = NewCharacterUnitPtr->GetTableRowUnit_CharacterInfo();
+	*GetCharacterAttributesComponent()->CharacterAttributesSPtr = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
+}
+
+void ACharacterBase::InitialCharacterUnitInClient_Implementation()
+{
+	auto NewCharacterUnitPtr = GetSceneUnitContainer()->AddUnit_Character(RowName);
+	NewCharacterUnitPtr->OwnerCharacterUnitPtr = nullptr;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const

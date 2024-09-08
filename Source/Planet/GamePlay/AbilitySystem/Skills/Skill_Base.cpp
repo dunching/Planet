@@ -12,7 +12,7 @@
 USkill_Base::USkill_Base() :
 	Super()
 {
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
 	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
@@ -28,14 +28,15 @@ void USkill_Base::OnAvatarSet(
 	// CDO
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
-	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
-	{
-		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill*>(Spec.GameplayEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetPtr)
-		{
-			SkillUnitPtr = GameplayAbilityTargetPtr->SkillUnitPtr;
-		}
-	}
+	// 远程不能复制这个参数？
+// 	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
+// 	{
+// 		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill*>(Spec.GameplayEventData->TargetData.Get(0));
+// 		if (GameplayAbilityTargetPtr)
+// 		{
+// 			SkillUnitPtr = GameplayAbilityTargetPtr->SkillUnitPtr;
+// 		}
+// 	}
 }
 
 void USkill_Base::PreActivate(
@@ -119,6 +120,28 @@ void USkill_Base::ResetPreviousStageActions()
 	}
 	ActiveTasks.Reset();
 	ResetListLock();
+}
+
+UScriptStruct* FGameplayAbilityTargetData_Skill::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Skill::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Skill::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	if (Ar.IsSaving())
+	{
+		SkillUnitPtr->NetSerialize(Ar, Map, bOutSuccess);
+	}
+	else if (Ar.IsLoading())
+	{
+		auto TempPtr = MakeShared<FSkillProxy>();
+		TempPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+		SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(TempPtr->GetThisSPtr());
+	}
+
+	return true;
 }
 
 FGameplayAbilityTargetData_Skill* FGameplayAbilityTargetData_Skill::Clone() const

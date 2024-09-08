@@ -288,6 +288,10 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Control =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Control")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Active_Displacement =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Displacement")));
 	

@@ -128,25 +128,6 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	InitialCharacter();
-
-	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
-		EGameplayTagEventType::NewOrRemoved
-	);
-	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
-
-	GroupHelperChangedDelegate =
-		GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
-	OnGroupChanged();
-
-	TeamHelperChangedDelegate =
-		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
-	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
-
-	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
-	{
-		StateTreeAIComponentPtr->StartLogic();
-	}
 }
 
 void AHumanAIController::OnUnPossess()
@@ -199,6 +180,25 @@ void AHumanAIController::OnTeamChanged()
 
 void AHumanAIController::InitialCharacter()
 {
+	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
+		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+		EGameplayTagEventType::NewOrRemoved
+	);
+	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
+
+	GroupHelperChangedDelegate =
+		GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
+	OnGroupChanged();
+
+	TeamHelperChangedDelegate =
+		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+
+	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
+	{
+		StateTreeAIComponentPtr->StartLogic();
+	}
+
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
@@ -207,8 +207,8 @@ void AHumanAIController::InitialCharacter()
 #endif
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
 		{
-			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
-			if (TableRowUnit_CharacterInfoPtr)
+// 			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
+// 			if (TableRowUnit_CharacterInfoPtr)
 			{
 				// 武器
 				{
