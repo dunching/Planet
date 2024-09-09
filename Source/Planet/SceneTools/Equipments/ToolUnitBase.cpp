@@ -29,18 +29,4 @@ void AToolUnitBase::AttachToCharacter(ACharacterBase* CharacterPtr)
 void AToolUnitBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	auto OwnerPtr = GetOwner();
-	if (OwnerPtr->IsA(AController::StaticClass()))
-	{
-		auto CharacterPtr = Cast<AController>(OwnerPtr)->GetPawn<ACharacterBase>();
-
-		AttachToCharacter(CharacterPtr);
-	}
-	else if (OwnerPtr->IsA(ACharacterBase::StaticClass()))
-	{
-		auto CharacterPtr = Cast<ACharacterBase>(OwnerPtr);
-
-		AttachToCharacter(CharacterPtr);
-	}
 }

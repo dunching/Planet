@@ -38,11 +38,8 @@ protected:
 
 	virtual void Tick(float DeltaSeconds)override;
 	
-	UFUNCTION(Server, Reliable)
-	void Interaction2Server();
-
 	UFUNCTION(NetMulticast, Reliable)
-	void Interaction2Client();
+	void InteractionImp();
 
 	UFUNCTION()
 	void OnAnimationFinished();

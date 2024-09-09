@@ -12,6 +12,24 @@
 	}
 #endif
 
+#if UE_EDITOR || UE_SERVER
+	if (GetLocalRole() == ROLE_Authority)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_SimulatedProxy)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+	}
+#endif
+
 Going to:
 
 	联网

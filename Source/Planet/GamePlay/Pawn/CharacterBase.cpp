@@ -7,11 +7,11 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameMode/PlanetGameMode.h"
 #include "DrawDebugHelpers.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystemComponent.h"
 
+#include "GameMode_Main.h"
 #include "ToolsLibrary.h"
 #include "Animation/AnimInstanceBase.h"
 #include "Component/ItemInteractionComponent.h"
@@ -80,7 +80,7 @@ void ACharacterBase::BeginPlay()
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 #if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
+	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		if (!CharacterTitlePtr)
 		{
@@ -311,6 +311,11 @@ bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
 	return GetGroupMnaggerComponent()->GetTeamHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+}
+
+void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType AnimLinkClassType)
+{
+	SwitchAnimLink(AnimLinkClassType);
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

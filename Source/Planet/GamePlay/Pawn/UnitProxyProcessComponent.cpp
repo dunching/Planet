@@ -135,12 +135,12 @@ void UUnitProxyProcessComponent::ActiveWeapon()
 	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1))
 	{
 		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1];
-		SwitchWeaponImp(WeaponSocketSPtr);
+		SwitchWeaponImp(WeaponSocketSPtr->Socket);
 	}
 	else if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2))
 	{
 		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2];
-		SwitchWeaponImp(WeaponSocketSPtr);
+		SwitchWeaponImp(WeaponSocketSPtr->Socket);
 	}
 }
 
@@ -154,22 +154,20 @@ void UUnitProxyProcessComponent::SwitchWeapon()
 		(WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2))
 		)
 	{
-		auto WeaponSocket1SPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1];
-		auto WeaponSocket2SPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2];
-		if (WeaponSocket1SPtr == PreviousWeaponSocketSPtr)
+		if (UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1 == PreviousWeaponSocket)
 		{
-			SwitchWeaponImp(WeaponSocket2SPtr);
+			SwitchWeaponImp(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2);
 		}
 		else
 		{
-			SwitchWeaponImp(WeaponSocket1SPtr);
+			SwitchWeaponImp(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1);
 		}
 	}
 }
 
 void UUnitProxyProcessComponent::RetractputWeapon()
 {
-	SwitchWeaponImp(nullptr);
+	SwitchWeaponImp(FGameplayTag::EmptyTag);
 }
 
 int32 UUnitProxyProcessComponent::GetCurrentWeaponAttackDistance() const
@@ -197,6 +195,7 @@ void UUnitProxyProcessComponent::GetWeapon(
 
 TSharedPtr<FWeaponProxy> UUnitProxyProcessComponent::GetActivedWeapon() const
 {
+	auto PreviousWeaponSocketSPtr = AllocationSkills_Member->FindWeapon(PreviousWeaponSocket);
 	if (PreviousWeaponSocketSPtr)
 	{
 		return PreviousWeaponSocketSPtr->UnitPtr.Pin();
@@ -260,7 +259,7 @@ bool UUnitProxyProcessComponent::ActivedCorrespondingWeapon(const TSharedPtr<FAc
 
 		if (WeaponSocketSPtr->UnitPtr.Pin()->GetUnitType() == RequireWeaponUnitType)
 		{
-			SwitchWeaponImp(WeaponSocketSPtr);
+			SwitchWeaponImp(WeaponSocketSPtr->Socket);
 
 			return true;
 		}
@@ -271,7 +270,7 @@ bool UUnitProxyProcessComponent::ActivedCorrespondingWeapon(const TSharedPtr<FAc
 
 		if (WeaponSocketSPtr->UnitPtr.Pin()->GetUnitType() == RequireWeaponUnitType)
 		{
-			SwitchWeaponImp(WeaponSocketSPtr);
+			SwitchWeaponImp(WeaponSocketSPtr->Socket);
 
 			return true;
 		}
@@ -280,41 +279,28 @@ bool UUnitProxyProcessComponent::ActivedCorrespondingWeapon(const TSharedPtr<FAc
 	return false;
 }
 
-void UUnitProxyProcessComponent::SwitchWeaponImp_Server_Implementation(const FWeaponSocket& NewWeaponSocket)
+void UUnitProxyProcessComponent::SwitchWeaponImp_Implementation(const FGameplayTag& NewWeaponSocket)
 {
-	auto NewWeaponSocketSPtr = AllocationSkills_Member->FindWeapon(NewWeaponSocket.Socket);
-
-	if (NewWeaponSocketSPtr == PreviousWeaponSocketSPtr)
+	if (NewWeaponSocket == PreviousWeaponSocket)
 	{
 	}
 	else
 	{
+		auto PreviousWeaponSocketSPtr = AllocationSkills_Member->FindWeapon(PreviousWeaponSocket);
 		if (PreviousWeaponSocketSPtr)
 		{
 			PreviousWeaponSocketSPtr->UnitPtr.Pin()->RetractputWeapon();
 		}
+
+		auto NewWeaponSocketSPtr = AllocationSkills_Member->FindWeapon(NewWeaponSocket);
 		if (NewWeaponSocketSPtr)
 		{
 			NewWeaponSocketSPtr->UnitPtr.Pin()->ActiveWeapon();
 		}
 		PreviousWeaponSocketSPtr = NewWeaponSocketSPtr;
-	}
 
-	OnActivedWeaponChangedContainer(NewWeaponSocketSPtr);
-}
-
-void UUnitProxyProcessComponent::SwitchWeaponImp(const TSharedPtr<FWeaponSocket>& NewWeaponSocketSPtr)
-{
-	if (NewWeaponSocketSPtr)
-	{
-		SwitchWeaponImp_Server(*NewWeaponSocketSPtr);
+		OnActivedWeaponChangedContainer(NewWeaponSocketSPtr);
 	}
-	else
-	{
-		SwitchWeaponImp_Server(FWeaponSocket());
-	}
-
-	OnActivedWeaponChangedContainer(NewWeaponSocketSPtr);
 }
 
 TSharedPtr<FSkillSocket>UUnitProxyProcessComponent::FindSkill(const FGameplayTag& Tag)

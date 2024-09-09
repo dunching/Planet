@@ -6,7 +6,7 @@
 #include "Components/Border.h"
 #include "Components/Overlay.h"
 
-#include "GameMode/PlanetGameMode.h"
+#include "GameMode_Main.h"
 #include "Kismet/GameplayStatics.h"
 #include "InteractionToAIMenu.h"
 #include "CreateMenu.h"
@@ -86,7 +86,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 		return;
 	}
 
-	// 技能HUD
+	// 鎶�鑳紿UD
 	{
 		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnActionStateHUDSocket));
 		if (!BorderPtr)
@@ -120,7 +120,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 		}
 	}
 
-	// 消耗品HUD
+	// 娑堣�楀搧HUD
 	{
 		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnStateConsumablesHUD_Socket));
 		if (!BorderPtr)

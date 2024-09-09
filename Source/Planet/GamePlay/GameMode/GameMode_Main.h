@@ -10,7 +10,7 @@
 
 #include "UI/UIManagerSubSystem.h"
 
-#include "PlanetGameMode.generated.h"
+#include "GameMode_Main.generated.h"
 
 extern PLANET_API class AShiYuGameMode* GGameModePtr;
 
@@ -21,13 +21,13 @@ struct FCharacterProxy;
  *
  */
 UCLASS()
-class PLANET_API APlanetGameMode : public AGameModeBase
+class PLANET_API AGameMode_Main : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
 
-	APlanetGameMode();
+	AGameMode_Main();
 	
 	FCharacterProxy* AddCharacterUnit(FGameplayTag UnitType);
 
@@ -64,4 +64,10 @@ private:
 	// 角色序列,第0个为Player
 	TMap<int32, FCharacterProxy*> CharacterUnitMap;
 
+};
+
+UCLASS()
+class PLANET_API APlanetGameMode : public AGameMode_Main
+{
+	GENERATED_BODY()
 };

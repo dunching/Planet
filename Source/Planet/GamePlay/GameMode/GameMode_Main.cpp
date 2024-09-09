@@ -1,6 +1,6 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
-#include "PlanetGameMode.h"
+#include "GameMode_Main.h"
 
 #include <iostream>
 
@@ -27,17 +27,17 @@
 #include "SceneUnitTable.h"
 #include "SceneElement.h"
 
-APlanetGameMode::APlanetGameMode() :
+AGameMode_Main::AGameMode_Main() :
 	Super()
 {
 }
 
-void APlanetGameMode::OnConstruction(const FTransform& Transform)
+void AGameMode_Main::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 }
 
-void APlanetGameMode::BeginPlay()
+void AGameMode_Main::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -48,10 +48,10 @@ void APlanetGameMode::BeginPlay()
 
 	LoadGameImp();
 
-	GetWorld()->GetTimerManager().SetTimer(SaveGameTimer, this, &APlanetGameMode::SaveGameImp, 10.f, true);
+	GetWorld()->GetTimerManager().SetTimer(SaveGameTimer, this, &AGameMode_Main::SaveGameImp, 10.f, true);
 }
 
-void APlanetGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AGameMode_Main::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	for (auto Iter : CharacterUnitMap)
 	{
@@ -64,34 +64,34 @@ void APlanetGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void APlanetGameMode::BeginDestroy()
+void AGameMode_Main::BeginDestroy()
 {
 	Super::BeginDestroy();
 }
 
-void APlanetGameMode::LoadGameImp()
+void AGameMode_Main::LoadGameImp()
 {
 }
 
-void APlanetGameMode::SaveGameImp()
+void AGameMode_Main::SaveGameImp()
 {
 }
 
-void APlanetGameMode::OnVoxelWorldGenerated()
+void AGameMode_Main::OnVoxelWorldGenerated()
 {
 
 }
 
-void APlanetGameMode::OnVoxelWorldLoad()
+void AGameMode_Main::OnVoxelWorldLoad()
 {
 }
 
-FCharacterProxy* APlanetGameMode::AddCharacterUnit(FGameplayTag UnitType)
+FCharacterProxy* AGameMode_Main::AddCharacterUnit(FGameplayTag UnitType)
 {
 	return nullptr;
 }
 
-FCharacterProxy* APlanetGameMode::FindCharacterUnit(int32 ID)
+FCharacterProxy* AGameMode_Main::FindCharacterUnit(int32 ID)
 {
 	if (CharacterUnitMap.Contains(ID))
 	{

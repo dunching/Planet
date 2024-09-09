@@ -7,7 +7,7 @@
 #include <Components/WidgetComponent.h>
 #include "ActorSequencePlayer.h"
 
-AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer):
+AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	BoxComponentPtr = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
@@ -44,10 +44,15 @@ void AResourceBox::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ActorSequenceComponent && ActorSequenceComponent->GetSequence())
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		ActorSequenceComponent->GetSequencePlayer()->OnFinished.AddDynamic(this, &ThisClass::OnAnimationFinished);
+		if (ActorSequenceComponent && ActorSequenceComponent->GetSequence())
+		{
+			ActorSequenceComponent->GetSequencePlayer()->OnFinished.AddDynamic(this, &ThisClass::OnAnimationFinished);
+		}
 	}
+#endif
 
 	EndLookAt();
 }
@@ -61,15 +66,10 @@ void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
 {
 	Super::Interaction(InCharacterPtr);
 
-	Interaction2Server();
+	InteractionImp();
 }
 
-void AResourceBox::Interaction2Server_Implementation()
-{
-	Interaction2Client();
-}
-
-void AResourceBox::Interaction2Client_Implementation()
+void AResourceBox::InteractionImp_Implementation()
 {
 	if (ActorSequenceComponent)
 	{

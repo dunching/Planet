@@ -22,7 +22,7 @@
 #include "CharacterAttibutes.h"
 #include "TalentAllocationComponent.h"
 #include "SceneUnitContainer.h"
-#include "PlanetGameMode.h"
+#include "GameMode_Main.h"
 
 APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

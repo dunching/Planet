@@ -116,6 +116,8 @@ public:
 
 	TSharedPtr<FBasicProxy> GetThisSPtr()const;
 
+	ACharacterBase* GetProxyCharacter()const;
+
 	// 这个物品所在的对象
 	TWeakPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
 

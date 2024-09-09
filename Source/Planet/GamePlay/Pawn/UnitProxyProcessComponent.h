@@ -116,13 +116,11 @@ protected:
 	);
 
 	UFUNCTION(Server, Reliable)
-	void SwitchWeaponImp_Server(const FWeaponSocket& NewWeaponSocket);
+	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
 
 	bool ActivedCorrespondingWeapon(const TSharedPtr<FActiveSkillProxy>& ActiveSkillUnitPtr);
 	
-	void SwitchWeaponImp(const TSharedPtr<FWeaponSocket>& NewWeaponSocketSPtr);
-
-	TSharedPtr<FWeaponSocket>PreviousWeaponSocketSPtr = nullptr;
+	FGameplayTag PreviousWeaponSocket;
 
 	TSharedPtr<FAllocationSkills> AllocationSkills_Member;
 

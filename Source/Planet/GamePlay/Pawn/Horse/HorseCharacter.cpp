@@ -17,7 +17,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayTagsSubSystem.h"
 
-#include "GameMode/PlanetGameMode.h"
+#include "GameMode_Main.h"
 #include "PlanetPlayerState.h"
 #include "GenerateType.h"
 #include "Command/TestCommand.h"

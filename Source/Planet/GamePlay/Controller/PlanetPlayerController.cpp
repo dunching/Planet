@@ -36,7 +36,7 @@
 #include "BaseFeatureGAComponent.h"
 #include "EffectsList.h"
 #include "PlanetPlayerState.h"
-#include "PlanetGameMode.h"
+#include "GameMode_Main.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

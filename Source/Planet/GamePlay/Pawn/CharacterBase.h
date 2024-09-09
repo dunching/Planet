@@ -70,6 +70,9 @@ public:
 
 	virtual void UnPossessed() override;
 	
+	UFUNCTION(Server, Reliable)
+	virtual void InteractionSceneObj(ASceneObj* SceneObjPtr);
+	
 	virtual void Interaction(ACharacterBase* CharacterPtr) override;
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr) override;
@@ -103,12 +106,9 @@ public:
 	virtual bool IsGroupmate(ACharacterBase*TargetCharacterPtr)const;
 
 	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
 	
-	UFUNCTION(Server, Reliable)
-	virtual void InteractionSceneObj(ASceneObj* SceneObjPtr);
+	UFUNCTION(Client, Reliable)
+	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
 	
 	UPROPERTY(Transient)
 	UCharacterTitle* CharacterTitlePtr = nullptr;
@@ -133,6 +133,9 @@ protected:
 	virtual void SpawnDefaultController()override;
 
 	void InitialCharacterUnit();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
 	
 	UFUNCTION(Server, Reliable)
 	void InitialCharacterUnitInClient();

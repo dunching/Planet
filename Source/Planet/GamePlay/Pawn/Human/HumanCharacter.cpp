@@ -15,7 +15,7 @@
 
 
 
-#include "GameMode/PlanetGameMode.h"
+#include "GameMode_Main.h"
 #include "GenerateType.h"
 #include "Command/TestCommand.h"
 #include "HumanActionPigInteractionUI.h"
