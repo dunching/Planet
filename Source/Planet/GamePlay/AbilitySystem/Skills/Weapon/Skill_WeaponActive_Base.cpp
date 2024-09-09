@@ -87,6 +87,18 @@ void USkill_WeaponActive_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
+{
+	if (bIsContinue_)
+	{
+		ContinueActive();
+	}
+	else
+	{
+		StopContinueActive();
+	}
+}
+
 void USkill_WeaponActive_Base::ContinueActive()
 {
 	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))

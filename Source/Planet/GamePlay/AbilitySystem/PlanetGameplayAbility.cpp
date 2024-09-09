@@ -2,8 +2,11 @@
 
 
 #include "PlanetGameplayAbility.h"
+
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+
+#include "PlanetAbilitySystemComponent.h"
 
 UPlanetGameplayAbility::UPlanetGameplayAbility() :
 	Super()
@@ -12,6 +15,20 @@ UPlanetGameplayAbility::UPlanetGameplayAbility() :
 
 	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
+}
+
+void UPlanetGameplayAbility::SetContinuePerform(bool bIsContinue)
+{
+	if (CurrentActorInfo && CurrentActorInfo->AbilitySystemComponent.IsValid())
+	{
+		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->ReplicateContinues(
+			CurrentSpecHandle, 
+			CurrentActivationInfo, 
+			bIsContinue
+		);
+	}
+
+	SetContinuePerformImp(bIsContinue);
 }
 
 #if WITH_EDITOR
@@ -98,6 +115,11 @@ void UPlanetGameplayAbility::OnGameplayTaskDeactivated(UGameplayTask& Task)
 	Super::OnGameplayTaskDeactivated(Task);
 }
 #endif
+
+void UPlanetGameplayAbility::SetContinuePerformImp(bool bIsContinue)
+{
+
+}
 
 void UPlanetGameplayAbility::RunIfListLock() const
 {

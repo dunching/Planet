@@ -289,6 +289,8 @@ public:
 
 	void UnRegisterSkill();
 
+	TArray<USkill_Base*> GetGAInstAry()const;
+
 	USkill_Base* GetGAInst()const;
 
 	FGameplayAbilitySpecHandle GetGAHandle()const;

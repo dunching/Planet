@@ -87,9 +87,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	void ContinueActive();
-
-	void StopContinueActive();
+	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
 protected:
 	
@@ -99,6 +97,10 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	);
+
+	void ContinueActive();
+
+	void StopContinueActive();
 
 	void CheckInContinue();
 
