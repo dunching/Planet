@@ -37,7 +37,7 @@ FBasicProxy::~FBasicProxy()
 
 }
 
-bool FBasicProxy::NetSerialize_Base(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Ar << UnitType;
 	Ar << ID;
@@ -60,7 +60,8 @@ bool FBasicProxy::NetSerialize_Base(FArchive& Ar, class UPackageMap* Map, bool& 
 			auto TempPtr = MakeShared<FCharacterProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			AllocationCharacterUnitPtr = TempPtr->GetThisSPtr();
+			AllocationCharacterUnitPtr =
+				TempPtr->ProxyCharacterPtr->GetHoldingItemsComponent()->FindUnit_Character(TempPtr->GetID());
 		}
 	}
 
@@ -82,16 +83,12 @@ bool FBasicProxy::NetSerialize_Base(FArchive& Ar, class UPackageMap* Map, bool& 
 			auto TempPtr = MakeShared<FCharacterProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			OwnerCharacterUnitPtr = TempPtr->GetThisSPtr();
+			OwnerCharacterUnitPtr = 
+				TempPtr->ProxyCharacterPtr->GetHoldingItemsComponent()->FindUnit_Character(TempPtr->GetID());
 		}
 	}
 
 	return true;
-}
-
-bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
-{
-	return NetSerialize_Base(Ar, Map, bOutSuccess);
 }
 
 void FBasicProxy::InitialUnit()
@@ -126,16 +123,15 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 	return SceneUnitExtendInfoPtr->DefaultIcon;
 }
 
-TSharedPtr<FBasicProxy> FBasicProxy::GetThisSPtr() const
-{
-	auto SceneUnitContainer =
-		GetProxyCharacter()->GetHoldingItemsComponent()->GetSceneUnitContainer();
-	return SceneUnitContainer->FindUnit(GetID());
-}
-
 ACharacterBase* FBasicProxy::GetProxyCharacter() const
 {
 	return OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+}
+
+TSharedPtr<FBasicProxy> FBasicProxy::GetThisSPtr() const
+{
+	return
+		OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetHoldingItemsComponent()->FindProxy(ID);
 }
 
 FString FBasicProxy::GetUnitName() const
@@ -161,12 +157,11 @@ void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>
 		auto HoldingItemsComponentPtr = ProxyCharacterPtr->GetHoldingItemsComponent();
 		if (AllocationCharacterUnitPtr.IsValid())
 		{
-			HoldingItemsComponentPtr->SetAllocationCharacterUnit(*this, *AllocationCharacterUnitPtr.Pin());
+			HoldingItemsComponentPtr->SetAllocationCharacterUnit(this->GetID(), AllocationCharacterUnitPtr.Pin()->GetID());
 		}
 		else
 		{
-			FCharacterProxy CharacterProxy;
-			HoldingItemsComponentPtr->SetAllocationCharacterUnit(*this, CharacterProxy);
+			HoldingItemsComponentPtr->SetAllocationCharacterUnit(this->GetID(), FGuid());
 		}
 	}
 #endif
@@ -360,7 +355,7 @@ bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOut
 			auto TempPtr = MakeShared<FWeaponSkillProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			FirstSkill = DynamicCastSharedPtr<FWeaponSkillProxy>(TempPtr->GetThisSPtr());
+			FirstSkill = TempPtr;
 		}
 	}
 
@@ -742,13 +737,6 @@ FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() co
 
 	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_CharacterInfo>(*UnitType.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
-}
-
-TSharedPtr<FCharacterProxy> FCharacterProxy::GetThisSPtr() const
-{
-	auto SceneUnitContainer =
-		ProxyCharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
-	return SceneUnitContainer->FindUnit_Character(GetID());
 }
 
 void FCharacterProxy::RelieveRootBind()

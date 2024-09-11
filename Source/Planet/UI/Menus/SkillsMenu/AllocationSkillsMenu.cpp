@@ -545,9 +545,6 @@ void UAllocationSkillsMenu::ResetBackpack(
 	{
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().TargetBackpack));
 
-		UIPtr->SetHoldItemProperty(
-			AICharacterUnitPtr->ProxyCharacterPtr->GetSceneUnitContainer()
-		);
 		UIPtr->ResetUIByData();
 
 		{
@@ -562,9 +559,6 @@ void UAllocationSkillsMenu::ResetBackpack(
 	{
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
 
-		UIPtr->SetHoldItemProperty(
-			PlayerCharacterUnitPtr->ProxyCharacterPtr->GetSceneUnitContainer()
-		);
 		UIPtr->ResetUIByData();
 
 		{

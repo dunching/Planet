@@ -235,13 +235,7 @@ bool FSkillSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOut
 			auto TempPtr = MakeShared<FSkillProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			auto SceneUnitContainer =
-				TempPtr->OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetSceneUnitContainer();
-
-			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(
-				SceneUnitContainer->FindUnit_Skill(
-					TempPtr->GetID()
-				));
+			UnitPtr = TempPtr;
 		}
 	}
 
@@ -270,13 +264,7 @@ bool FWeaponSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOu
 			auto TempPtr = MakeShared<FWeaponProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			auto SceneUnitContainer =
-				TempPtr->OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetSceneUnitContainer();
-
-			UnitPtr = DynamicCastSharedPtr<FWeaponProxy>(
-				SceneUnitContainer->FindUnit(
-					TempPtr->GetID()
-				));
+			UnitPtr = TempPtr;
 		}
 	}
 

@@ -34,10 +34,6 @@ public:
 
 	virtual void ResetUIByData()override;
 
-	void SetHoldItemProperty(
-		const TSharedPtr<FSceneUnitContainer> & SceneUnitContariner
-	);
-
 	bool bIsPlayerMenu = true;
 
 	FOnDragIconDelegate OnDragIconDelegate;
@@ -60,6 +56,8 @@ protected:
 
 private:
 
+	TArray<TSharedPtr<FBasicProxy>>GetProxys()const;
+
 	void ResetUIByData_Skill();
 
 	void ResetUIByData_Weapon();
@@ -67,7 +65,5 @@ private:
 	void ResetUIByData_Consumable();
 
 	void ResetUIByData_All();
-
-	TWeakPtr<FSceneUnitContainer> SceneUnitContariner;
 
 };

@@ -32,8 +32,8 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 		return false;
 	}
 
-	auto HoldItemPropertyRef =
-		CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
+	const auto HoldItemPropertyRef =
+		CharacterPtr->GetHoldingItemsComponent();
 
 	switch (RaffleType)
 	{

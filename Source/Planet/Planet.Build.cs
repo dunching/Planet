@@ -145,6 +145,7 @@ public class Planet : ModuleRules
             "NavigationSystem",
             "ChaosVehicles",
             "ActorSequence",
+            "NetCore",
 
             "Tools",
         });

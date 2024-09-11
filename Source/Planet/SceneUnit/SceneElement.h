@@ -43,6 +43,7 @@ struct FAllocationSkills;
 struct FCharacterAttributes;
 struct FTalentHelper;
 struct FSceneUnitContainer;
+struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
 enum struct ECharacterPropertyType : uint8;
@@ -80,6 +81,7 @@ struct PLANET_API FBasicProxy
 public:
 
 	friend FSceneUnitContainer;
+	friend FProxy_FASI_Container;
 	friend UHoldingItemsComponent;
 	friend APlanetGameMode;
 
@@ -88,8 +90,6 @@ public:
 	FBasicProxy();
 
 	virtual ~FBasicProxy();
-
-	bool NetSerialize_Base(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
@@ -114,9 +114,9 @@ public:
 
 	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr);
 
-	TSharedPtr<FBasicProxy> GetThisSPtr()const;
-
 	ACharacterBase* GetProxyCharacter()const;
+
+	TSharedPtr<FBasicProxy> GetThisSPtr()const;
 
 	// 这个物品所在的对象
 	TWeakPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
@@ -155,6 +155,8 @@ struct PLANET_API FCoinProxy : public FBasicProxy
 public:
 
 	friend FSceneUnitContainer;
+	friend FProxy_FASI_Container;
+	friend UHoldingItemsComponent;
 
 	FCoinProxy();
 
@@ -180,6 +182,8 @@ struct PLANET_API FConsumableProxy :
 public:
 
 	friend FSceneUnitContainer;
+	friend FProxy_FASI_Container;
+	friend UHoldingItemsComponent;
 
 	FConsumableProxy();
 
@@ -221,6 +225,7 @@ struct PLANET_API FToolProxy : public FBasicProxy
 public:
 
 	friend FSceneUnitContainer;
+	friend UHoldingItemsComponent;
 
 	FToolProxy();
 
@@ -251,8 +256,6 @@ public:
 
 	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
 
-	TSharedPtr<FCharacterProxy> GetThisSPtr()const;
-
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();
 
@@ -280,6 +283,7 @@ struct PLANET_API FSkillProxy : public FBasicProxy
 public:
 
 	friend FSceneUnitContainer;
+	friend UHoldingItemsComponent;
 
 	FSkillProxy();
 

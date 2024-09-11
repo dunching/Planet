@@ -79,28 +79,28 @@ void AHumanCharacter::BeginPlay()
 				auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
 				{
 					auto Handle =
-						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnSkillUnitChanged.AddCallback(
+						GetHoldingItemsComponent()->OnSkillUnitChanged.AddCallback(
 							std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
 							));
 					Handle->bIsAutoUnregister = false;
 				}
 				{
 					auto Handle =
-						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnCoinUnitChanged.AddCallback(
+						GetHoldingItemsComponent()->OnCoinUnitChanged.AddCallback(
 							std::bind(&UGetItemInfos::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 							));
 					Handle->bIsAutoUnregister = false;
 				}
 				{
 					auto Handle =
-						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnConsumableUnitChanged.AddCallback(
+						GetHoldingItemsComponent()->OnConsumableUnitChanged.AddCallback(
 							std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 							));
 					Handle->bIsAutoUnregister = false;
 				}
 				{
 					auto Handle =
-						GetHoldingItemsComponent()->GetSceneUnitContainer()->OnGroupmateUnitChanged.AddCallback(
+						GetHoldingItemsComponent()->OnGroupmateUnitChanged.AddCallback(
 							std::bind(&UGetItemInfos::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
 							));
 					Handle->bIsAutoUnregister = false;

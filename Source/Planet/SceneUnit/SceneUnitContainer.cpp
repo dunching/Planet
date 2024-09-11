@@ -8,496 +8,10 @@
 #include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
 #include "SceneUnitExtendInfo.h"
+#include "HoldingItemsComponent.h"
 #include "GameplayTagsSubSystem.h"
-
-TSharedPtr<FWeaponProxy> FSceneUnitContainer::AddUnit_Weapon(const FGameplayTag& UnitType)
-{
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-	auto ResultPtr = MakeShared<FWeaponProxy>();
-
-#if WITH_EDITOR
-	TestGCUnitMap.Add(ResultPtr);
-#endif
-
-	ResultPtr->UnitType = UnitType;
-	ResultPtr->OwnerCharacterUnitPtr = OwnerCharacter;
-	ResultPtr->FirstSkill = DynamicCastSharedPtr<FWeaponSkillProxy>(
-		AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType)
-	);
-
-	ResultPtr->InitialUnit();
-
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-
-	OnWeaponUnitChanged(ResultPtr, true);
-
-	return ResultPtr;
-}
-
-TSharedPtr<FWeaponProxy> FSceneUnitContainer::Update_Weapon(const FWeaponProxy& Unit)
-{
-	auto ResultPtr = MakeShared<FWeaponProxy>();
-
-#if WITH_EDITOR
-	TestGCUnitMap.Add(ResultPtr);
-#endif
-
-	* ResultPtr = Unit;
-	ResultPtr->OwnerCharacterUnitPtr = OwnerCharacter;
-
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-
-	OnWeaponUnitChanged(ResultPtr, true);
-
-	return ResultPtr;
-}
-
-TSharedPtr<FWeaponProxy> FSceneUnitContainer::FindUnit_Weapon(const FGameplayTag& UnitType)
-{
-	return nullptr;
-}
-
-TSharedPtr<FSkillProxy>  FSceneUnitContainer::AddUnit_Skill(const FGameplayTag& UnitType)
-{
-	if (SkillUnitMap.Contains(UnitType))
-	{
-		// 
-
-		return SkillUnitMap[UnitType];
-	}
-	else
-	{
-		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-		TSharedPtr<FSkillProxy> ResultPtr = nullptr;
-		if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
-		{
-			ResultPtr = MakeShared<FWeaponSkillProxy>();
-		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
-		{
-			ResultPtr = MakeShared<FTalentSkillProxy>();
-		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
-		{
-			ResultPtr = MakeShared<FActiveSkillProxy>();
-		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
-		{
-			ResultPtr = MakeShared<FPassiveSkillProxy>();
-		}
-
-#if WITH_EDITOR
-		TestGCUnitMap.Add(ResultPtr);
-#endif
-
-		ResultPtr->UnitType = UnitType;
-		ResultPtr->OwnerCharacterUnitPtr = OwnerCharacter;
-
-		ResultPtr->InitialUnit();
-
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-		SkillUnitMap.Add(UnitType, ResultPtr);
-
-		OnSkillUnitChanged(ResultPtr, true);
-
-		return ResultPtr;
-	}
-}
-
- TSharedPtr<FSkillProxy>  FSceneUnitContainer::Update_Skill(const FSkillProxy& Unit)
- {
- 	TSharedPtr<FSkillProxy>  ResultPtr = nullptr;
- 	if (SkillUnitMap.Contains(Unit.UnitType))
- 	{
- 		// 
- 
- 		ResultPtr = SkillUnitMap[Unit.UnitType];
- 
- 		if (SceneMetaMap.Contains(ResultPtr->GetID()))
- 		{
- 			SceneMetaMap.Remove(ResultPtr->GetID());
- 		}
- 
- 		*ResultPtr = Unit;
- 	}
- 	else
- 	{
-		const auto UnitType = Unit.GetUnitType();
-
-		if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
-		{
-			ResultPtr = MakeShared<FWeaponSkillProxy>();
-		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
-		{
-			ResultPtr = MakeShared<FTalentSkillProxy>();
-		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
-		{
-			ResultPtr = MakeShared<FActiveSkillProxy>();
-		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
-		{
-			ResultPtr = MakeShared<FPassiveSkillProxy>();
-		}
-
- #if WITH_EDITOR
- 		TestGCUnitMap.Add(ResultPtr);
- #endif
- 
- 		* ResultPtr = Unit;
- 	}
- 
- 	SceneToolsAry.Add(ResultPtr);
- 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
- 	SkillUnitMap.Add(Unit.UnitType, ResultPtr);
- 
- 	OnSkillUnitChanged(ResultPtr, true);
- 
- 	return ResultPtr;
- }
-
-TSharedPtr<FSkillProxy> FSceneUnitContainer::FindUnit_Skill(const FGameplayTag& UnitType)
-{
-	auto Iter = SkillUnitMap.Find(UnitType);
-	if (Iter)
-	{
-		return *Iter;
-	}
-
-	return nullptr;
-}
-
-TSharedPtr<FSkillProxy> FSceneUnitContainer::FindUnit_Skill(const IDType& ID) const
-{
-	if (SceneMetaMap.Contains(ID))
-	{
-		return DynamicCastSharedPtr<FSkillProxy>(SceneMetaMap[ID]);
-	}
-	return nullptr;
-}
-
-TSharedPtr<FCharacterProxy> FSceneUnitContainer::AddUnit_Character(const FGameplayTag& UnitType)
-{
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-	TSharedPtr<FCharacterProxy>  ResultPtr = nullptr;
-
-	if (CharacterCoinUnitMap.Contains(UnitType))
-	{
-		ResultPtr = CharacterCoinUnitMap[UnitType];
-	}
-	else
-	{
-		ResultPtr = MakeShared<FCharacterProxy>();
-
-#if WITH_EDITOR
-		TestGCUnitMap.Add(ResultPtr);
-#endif
-
-		ResultPtr->UnitType = UnitType;
-		ResultPtr->OwnerCharacterUnitPtr = OwnerCharacter;
-
-		ResultPtr->InitialUnit();
-
-	}
-
-	CharacterCoinUnitMap.Add(UnitType, ResultPtr);
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-
-	OnGroupmateUnitChanged(ResultPtr, true);
-
-	return ResultPtr;
-}
-
-TSharedPtr<FCharacterProxy> FSceneUnitContainer::Update_Character(const FCharacterProxy& Unit)
-{
-	TSharedPtr<FCharacterProxy>  ResultPtr = nullptr;
-	if (CharacterCoinUnitMap.Contains(Unit.UnitType))
-	{
-		// 
-
-		ResultPtr = CharacterCoinUnitMap[Unit.UnitType];
-
-		if (SceneMetaMap.Contains(ResultPtr->GetID()))
-		{
-			SceneMetaMap.Remove(ResultPtr->GetID());
-		}
-
-		*ResultPtr = Unit;
-	}
-	else
-	{
-		ResultPtr = MakeShared<FCharacterProxy>();
-
-#if WITH_EDITOR
-		TestGCUnitMap.Add(ResultPtr);
-#endif
-
-		* ResultPtr = Unit;
-	}
-
-	CharacterCoinUnitMap.Add(Unit.UnitType, ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-	SceneToolsAry.Add(ResultPtr);
-
-	OnGroupmateUnitChanged(ResultPtr, true);
-
-	return ResultPtr;
-}
-
-TSharedPtr <FConsumableProxy> FSceneUnitContainer::AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num)
-{
-	check(Num > 0);
-
-	if (ConsumablesUnitMap.Contains(UnitType))
-	{
-		auto Ref = ConsumablesUnitMap[UnitType];
-
-		Ref->Num += Num;
-
-		OnConsumableUnitChanged.ExcuteCallback(Ref, true, Num);
-
-		return Ref;
-	}
-	else
-	{
-		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-		auto ResultPtr = MakeShared<FConsumableProxy>();
-
-#if WITH_EDITOR
-		TestGCUnitMap.Add(ResultPtr);
-#endif
-
-		ResultPtr->Num = Num;
-		ResultPtr->UnitType = UnitType;
-		ResultPtr->OwnerCharacterUnitPtr = OwnerCharacter;
-
-		ResultPtr->InitialUnit();
-
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-		ConsumablesUnitMap.Add(UnitType, ResultPtr);
-
-		OnConsumableUnitChanged.ExcuteCallback(ResultPtr, true, Num);
-
-		return ResultPtr;
-	}
-}
-
-TSharedPtr<FToolProxy> FSceneUnitContainer::AddUnit_ToolUnit(const FGameplayTag& UnitType)
-{
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-	auto ResultPtr = MakeShared<FToolProxy>();
-
-#if WITH_EDITOR
-	TestGCUnitMap.Add(ResultPtr);
-#endif
-
-	ResultPtr->UnitType = UnitType;
-	ResultPtr->OwnerCharacterUnitPtr = OwnerCharacter;
-
-	ResultPtr->InitialUnit();
-
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-
-	return ResultPtr;
-}
-
-FSceneUnitContainer::~FSceneUnitContainer()
-{
-#if WITH_EDITOR
-	for (auto Iter : SceneToolsAry)
-	{
-		if (Iter)
-		{
-			if (TestGCUnitMap.Contains(Iter))
-			{
-				TestGCUnitMap.Remove(Iter);
-			}
-
-		}
-	}
-#endif
-}
-
-TSharedPtr<FBasicProxy> FSceneUnitContainer::AddUnit(const FGameplayTag& UnitType, int32 Num)
-{
-	TSharedPtr<FBasicProxy> Result = nullptr;
-
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
-	{
-		Result = AddUnit_ToolUnit(UnitType);
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
-	{
-		Result = AddUnit_Weapon(UnitType);
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
-	{
-		Result = AddUnit_Skill(UnitType);
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
-	{
-		Result = AddUnit_Coin(UnitType, Num);
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
-	{
-		Result = AddUnit_Consumable(UnitType);
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->DataSource_Character))
-	{
-		Result = AddUnit_Consumable(UnitType);
-	}
-
-	return Result;
-}
-
-TSharedPtr<FBasicProxy> FSceneUnitContainer::FindUnit(IDType ID)
-{
-	auto Iter = SceneMetaMap.Find(ID);
-	if (Iter)
-	{
-		return *Iter;
-	}
-
-	return nullptr;
-}
-
-void FSceneUnitContainer::RemoveUnit(IDType ID)
-{
-	auto TargetIter = SceneMetaMap.Find(ID);
-
-	if (TargetIter)
-	{
-		SceneMetaMap.Remove(ID);
-	}
-
-	for (auto Iter : SceneToolsAry)
-	{
-		if (Iter == *TargetIter)
-		{
-			SceneToolsAry.Remove(Iter);
-			break;
-		}
-	}
-}
-
-TSharedPtr<FCoinProxy> FSceneUnitContainer::AddUnit_Coin(const FGameplayTag& UnitType, int32 Num /*= 1*/)
-{
-	if (CoinUnitMap.Contains(UnitType))
-	{
-		auto Ref = CoinUnitMap[UnitType];
-
-		Ref->Num += Num;
-
-		OnCoinUnitChanged.ExcuteCallback(Ref, true, Num);
-
-		return Ref;
-	}
-	else
-	{
-		auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
-
-		auto ResultPtr = MakeShared<FCoinProxy>();
-
-#if WITH_EDITOR
-		TestGCUnitMap.Add(ResultPtr);
-#endif
-
-		ResultPtr->UnitType = UnitType;
-		ResultPtr->OwnerCharacterUnitPtr = OwnerCharacter;
-		ResultPtr->Num = Num;
-
-		ResultPtr->InitialUnit();
-
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
-		CoinUnitMap.Add(UnitType, ResultPtr);
-
-		OnCoinUnitChanged.ExcuteCallback(ResultPtr, true, Num);
-
-		return ResultPtr;
-	}
-}
-
-TSharedPtr<FCoinProxy> FSceneUnitContainer::FindUnit_Coin(const FGameplayTag& UnitType)
-{
-	auto Iter = CoinUnitMap.Find(UnitType);
-	if (Iter)
-	{
-		return *Iter;
-	}
-
-	return nullptr;
-}
-
-void FSceneUnitContainer::RemoveUnit_Consumable(const TSharedPtr<FConsumableProxy>& UnitPtr, int32 Num /*= 1*/)
-{
-	if (UnitPtr)
-	{
-		UnitPtr->Num -= Num;
-
-		OnConsumableUnitChanged.ExcuteCallback(UnitPtr, false, Num);
-	}
-}
-
-const TArray<TSharedPtr<FBasicProxy>>& FSceneUnitContainer::GetSceneUintAry() const
-{
-	return SceneToolsAry;
-}
-
-const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& FSceneUnitContainer::GetCoinUintAry() const
-{
-	return CoinUnitMap;
-}
-
-TArray<TSharedPtr<FCharacterProxy>> FSceneUnitContainer::GetGourpmateUintAry() const
-{
-	TArray<TSharedPtr<FCharacterProxy>> Result;
-
-	for (auto Iter : SceneToolsAry)
-	{
-		if (Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
-		{
-			auto GroupmateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(Iter);
-			check(GroupmateUnitPtr);
-			if (GroupmateUnitPtr)
-			{
-				Result.Add(GroupmateUnitPtr);
-			}
-		}
-	}
-
-	return Result;
-}
-
-TSharedPtr<FCharacterProxy> FSceneUnitContainer::FindUnit_Character(const IDType& ID) const
-{
-	if (SceneMetaMap.Contains(ID))
-	{
-		return DynamicCastSharedPtr<FCharacterProxy>(SceneMetaMap[ID]);
-	}
-	return nullptr;
-}
-
-int32 FSceneUnitContainer::GetValidID() const
-{
-	int32 Result = 0;
-
-	return Result;
-}
+#include "SceneElement.h"
+#include "TemplateHelper.h"
 
 FTableRowUnit* GetTableRowUnit(const FGameplayTag& UnitType)
 {
@@ -507,4 +21,298 @@ FTableRowUnit* GetTableRowUnit(const FGameplayTag& UnitType)
 	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit>(*UnitType.ToString(), TEXT("GetUnit"));
 
 	return SceneUnitExtendInfoPtr;
+}
+
+bool FProxy_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
+{
+	const auto Result =
+		FFastArraySerializer::FastArrayDeltaSerialize<FItemType, FContainerType>(Items, DeltaParms, *this);
+
+	return Result;
+}
+
+void FProxy_FASI_Container::AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (ProxySPtr)
+		{
+			FProxy_FASI Proxy_FASI;
+
+			Proxy_FASI.ProxySPtr = ProxySPtr;
+
+			auto& Ref = Items.Add_GetRef(Proxy_FASI);
+
+			MarkItemDirty(Ref);
+		}
+	}
+#endif
+}
+
+void FProxy_FASI_Container::UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (ProxySPtr)
+		{
+			for (int32 Index = 0; Index < Items.Num(); Index++)
+			{
+				if (Items[Index].ProxySPtr == ProxySPtr)
+				{
+					MarkItemDirty(Items[Index]);
+					return;
+				}
+			}
+		}
+	}
+#endif
+}
+
+void FProxy_FASI_Container::RemoveItem(const FItemType& Item)
+{
+	for (int32 Idx = 0; Idx < Items.Num(); ++Idx)
+	{
+		if (Items[Idx] == Item)
+		{
+			Items.RemoveAt(Idx);
+
+			MarkArrayDirty();
+			return;
+		}
+	}
+}
+
+TSharedPtr<FBasicProxy> FProxy_FASI_Container::GetProxyType(const FGameplayTag& UnitType)
+{
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+	{
+		return MakeShared<FToolProxy>();
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+	{
+		return  MakeShared<FWeaponProxy>();
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	{
+		return  MakeShared<FActiveSkillProxy>();
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+	{
+		return  MakeShared<FPassiveSkillProxy>();
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
+	{
+		return MakeShared<FTalentSkillProxy>();
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	{
+		return MakeShared<FWeaponSkillProxy>();
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+	{
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	{
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->DataSource_Character))
+	{
+	}
+
+	return nullptr;
+}
+
+void FProxy_FASI::PreReplicatedRemove(const struct FProxy_FASI_Container& InArraySerializer)
+{
+
+}
+
+void FProxy_FASI::PostReplicatedAdd(const struct FProxy_FASI_Container& InArraySerializer)
+{
+	const auto UnitType = ProxySPtr->GetUnitType();
+
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+	{
+
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+	{
+		InArraySerializer.HoldingItemsComponentPtr->Update_Weapon(DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr));
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	{
+		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FActiveSkillProxy>(ProxySPtr));
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+	{
+		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr));
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
+	{
+		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FTalentSkillProxy>(ProxySPtr));
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	{
+		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FWeaponSkillProxy>(ProxySPtr));
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+	{
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	{
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player))
+	{
+		// 1.使用远程的数据
+		*InArraySerializer.HoldingItemsComponentPtr->CharacterProxySPtr = *DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
+
+		// 2.
+		InArraySerializer.HoldingItemsComponentPtr->Update_Character(
+			InArraySerializer.HoldingItemsComponentPtr->CharacterProxySPtr
+		);
+
+		// 3.替换 Caontainer 下的副本
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->CharacterProxySPtr;
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	{
+		InArraySerializer.HoldingItemsComponentPtr->Update_Character(DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr));
+	}
+}
+
+bool FProxy_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	if (Ar.IsSaving())
+	{
+		auto UnitType = ProxySPtr->GetUnitType();
+		Ar << UnitType;
+
+		if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FToolProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+		{
+			auto TempProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		FGameplayTag UnitType = FGameplayTag::EmptyTag;
+		Ar << UnitType;
+
+		if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+		{
+			auto TempProxySPtr = MakeShared<FToolProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+		{
+			auto TempProxySPtr = MakeShared<FWeaponProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+		{
+			auto TempProxySPtr = MakeShared<FActiveSkillProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+		{
+			auto TempProxySPtr = MakeShared<FPassiveSkillProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
+		{
+			auto TempProxySPtr = MakeShared<FTalentSkillProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+		{
+			auto TempProxySPtr = MakeShared<FWeaponSkillProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+		{
+			auto TempProxySPtr = MakeShared<FCoinProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+		{
+			auto TempProxySPtr = MakeShared<FConsumableProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+		{
+			auto TempProxySPtr = MakeShared<FCharacterProxy>();
+			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			ProxySPtr = TempProxySPtr;
+		}
+	}
+
+	return true;
+}
+
+bool FProxy_FASI::operator==(const FProxy_FASI& Right) const
+{
+	if (ProxySPtr && Right.ProxySPtr)
+	{
+		return ProxySPtr->GetUnitType() == Right.ProxySPtr->GetUnitType();
+	}
+
+	return true;
 }

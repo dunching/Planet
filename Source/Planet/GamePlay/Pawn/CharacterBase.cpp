@@ -92,10 +92,9 @@ void ACharacterBase::BeginPlay()
 				CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
 			}
 		}
-
-		InitialCharacterUnitInClient();
 	}
 #endif
+	
 
 	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
@@ -157,7 +156,7 @@ void ACharacterBase::PostInitializeComponents()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
-		InitialCharacterUnit();
+		InitialDefaultCharacterUnit();
 
 #if UE_EDITOR || UE_SERVER
 		if (GetNetMode() == NM_DedicatedServer)
@@ -271,36 +270,34 @@ UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 {
-	return HoldingItemsComponentPtr->SceneUnitContainer->OwnerCharacter;
+	return HoldingItemsComponentPtr->CharacterProxySPtr;
 }
 
-TSharedPtr<FSceneUnitContainer> ACharacterBase::GetSceneUnitContainer() const
+void ACharacterBase::InitialDefaultCharacterUnit()
 {
-	return HoldingItemsComponentPtr->SceneUnitContainer;
-}
+	TSharedPtr<FCharacterProxy>CharacterUnitPtr = nullptr;
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
+	}
+#endif
 
-void ACharacterBase::InitialCharacterUnit()
-{
-	auto SceneUnitContainer = GetSceneUnitContainer();
-	auto NewCharacterUnitPtr = GetSceneUnitContainer()->AddUnit_Character(RowName);
-	NewCharacterUnitPtr->OwnerCharacterUnitPtr = nullptr;
-	NewCharacterUnitPtr->ProxyCharacterPtr = this;
+	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
+	}
+#endif
 	
 	// 
-	SceneUnitContainer->OwnerCharacter = NewCharacterUnitPtr;
-	
-	// 
-	GetInteractiveSkillComponent()->GetAllocationSkills()->OwnerCharacter = NewCharacterUnitPtr;
+	GetInteractiveSkillComponent()->GetAllocationSkills()->OwnerCharacter = CharacterUnitPtr;
 
 	// 
-	auto TableRowUnit_CharacterInfoPtr = NewCharacterUnitPtr->GetTableRowUnit_CharacterInfo();
+	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
 	*GetCharacterAttributesComponent()->CharacterAttributesSPtr = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
-}
-
-void ACharacterBase::InitialCharacterUnitInClient_Implementation()
-{
-	auto NewCharacterUnitPtr = GetSceneUnitContainer()->AddUnit_Character(RowName);
-	NewCharacterUnitPtr->OwnerCharacterUnitPtr = nullptr;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const

@@ -19,6 +19,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
 #include "SceneUnitContainer.h"
+#include "CharacterBase.h"
 
 struct FBackpackMenu : public TStructVariable<FBackpackMenu>
 {
@@ -40,16 +41,17 @@ void UBackpackMenu::NativeConstruct()
 	BindEvent();
 }
 
-void UBackpackMenu::SetHoldItemProperty(
-	const TSharedPtr<FSceneUnitContainer>& InSceneUnitContariner
-)
-{
-	SceneUnitContariner = InSceneUnitContariner;
-}
-
 void UBackpackMenu::ResetUIByData()
 {
 	ResetUIByData_All();
+}
+
+TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GWorld, 0));
+	auto ItemAryRef = CharacterPtr->GetHoldingItemsComponent()->GetProxys();
+
+	return ItemAryRef;
 }
 
 void UBackpackMenu::ResetUIByData_Skill()
@@ -62,7 +64,8 @@ void UBackpackMenu::ResetUIByData_Skill()
 	
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
+
+	auto ItemAryRef = GetProxys();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -95,7 +98,7 @@ void UBackpackMenu::ResetUIByData_Weapon()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
+	auto ItemAryRef = GetProxys();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -127,7 +130,7 @@ void UBackpackMenu::ResetUIByData_Consumable()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
+	auto ItemAryRef = GetProxys();
 	for (const auto& Iter : ItemAryRef)
 	{
 		if (!Iter)
@@ -159,35 +162,30 @@ void UBackpackMenu::ResetUIByData_All()
 
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
-	if (SceneUnitContariner.IsValid())
+	auto ItemAryRef = GetProxys();
+	for (const auto& Iter : ItemAryRef)
 	{
-		auto ItemAryRef = SceneUnitContariner.Pin()->GetSceneUintAry();
-		for (const auto& Iter : ItemAryRef)
+		if (!Iter)
 		{
-			if (!Iter)
+			continue;
+		}
+		if (
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
+			)
+		{
+			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
+			if (WidgetPtr)
 			{
-				continue;
-			}
-			if (
-				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon) ||
-				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) ||
-				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool) ||
-				Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
-				)
-			{
-				auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
-				if (WidgetPtr)
-				{
-					WidgetPtr->TargetBasicUnitPtr = Iter;
-					WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
-					TileViewPtr->AddItem(WidgetPtr);
-				}
+				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
+				TileViewPtr->AddItem(WidgetPtr);
 			}
 		}
 	}
-
-
 }
 
 void UBackpackMenu::BindEvent()

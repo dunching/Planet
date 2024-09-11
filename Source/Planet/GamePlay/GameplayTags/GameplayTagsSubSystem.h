@@ -232,10 +232,6 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Tool.Axe")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
-	FGameplayTag Unit_GroupMate =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.GroupMate")));
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Consumables =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Consumables")));
 	
@@ -340,8 +336,13 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent.YinYang")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
-	FGameplayTag Unit_Skill_Talent_Player =
+	FGameplayTag Unit_GroupMate=
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.GroupMate")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_GroupMate_Player =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.GroupMate.Player")));
+
 #pragma endregion 
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")

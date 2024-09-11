@@ -21,6 +21,7 @@
 #include "Raffle_Unit.h"
 #include "SceneUnitExtendInfo.h"
 #include "SceneUnitContainer.h"
+#include "HoldingItemsComponent.h"
 
 struct FRaffleMenu : public TStructVariable<FRaffleMenu>
 {
@@ -118,7 +119,9 @@ void URaffleMenu::SetHoldItemProperty(const TSharedPtr<FSceneUnitContainer>& New
 	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FRaffleMenu::Get().CoinList));
 	if (UIPtr)
 	{
-		UIPtr->ResetUIByData(NewSPHoldItemPerperty->GetCoinUintAry());
+		auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GWorld, 0));
+
+		UIPtr->ResetUIByData(CharacterPtr->GetHoldingItemsComponent()->GetCoinUintAry());
 	}
 }
 

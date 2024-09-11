@@ -98,8 +98,6 @@ public:
 
 	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
 	
-	TSharedPtr<FSceneUnitContainer> GetSceneUnitContainer()const;
-
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
@@ -107,7 +105,7 @@ public:
 
 	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
 	
-	UFUNCTION(Client, Reliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
 	
 	UPROPERTY(Transient)
@@ -132,14 +130,11 @@ protected:
 
 	virtual void SpawnDefaultController()override;
 
-	void InitialCharacterUnit();
+	void InitialDefaultCharacterUnit();
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
 	
-	UFUNCTION(Server, Reliable)
-	void InitialCharacterUnitInClient();
-
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
 		const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
