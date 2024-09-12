@@ -130,6 +130,13 @@ void FProxy_FASI::PreReplicatedRemove(const struct FProxy_FASI_Container& InArra
 
 void FProxy_FASI::PostReplicatedAdd(const struct FProxy_FASI_Container& InArraySerializer)
 {
+	PostReplicatedChange(InArraySerializer);
+}
+
+void FProxy_FASI::PostReplicatedChange(const struct FProxy_FASI_Container& InArraySerializer)
+{
+	// 在这里 我们对本地的数据进行绑定
+
 	const auto UnitType = ProxySPtr->GetUnitType();
 
 	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
@@ -138,7 +145,19 @@ void FProxy_FASI::PostReplicatedAdd(const struct FProxy_FASI_Container& InArrayS
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
-		InArraySerializer.HoldingItemsComponentPtr->Update_Weapon(DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr));
+		auto WeaponSPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
+
+		auto FirstSkillPtr = InArraySerializer.HoldingItemsComponentPtr->FindUnit_Skill(WeaponSPtr->FirstSkill->GetID());
+		if (FirstSkillPtr)
+		{
+			WeaponSPtr->FirstSkill = DynamicCastSharedPtr<FWeaponSkillProxy>(FirstSkillPtr);
+		}
+		else
+		{
+			InArraySerializer.HoldingItemsComponentPtr->Update_Skill(WeaponSPtr->FirstSkill);
+		}
+
+		InArraySerializer.HoldingItemsComponentPtr->Update_Weapon(WeaponSPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
 	{

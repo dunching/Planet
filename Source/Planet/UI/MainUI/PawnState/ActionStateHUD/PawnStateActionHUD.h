@@ -13,7 +13,8 @@
 
 struct FSceneTool;
 struct FCharacterAttributes;
-struct FWeaponSocket;
+struct FSocket_FASI;
+struct FWeaponProxy;
 
 class UState_Talent_NuQi;
 class UState_Talent_YinYang;
@@ -27,7 +28,7 @@ class PLANET_API UPawnStateActionHUD : public UMyUserWidget, public IMenuInterfa
 public:
 
 	using FOnActivedWeaponChangedContainerHandle =
-		TCallbackHandleContainer<void(const TSharedPtr<FWeaponSocket>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -46,7 +47,7 @@ protected:
 
 	void InitialSkillIcon();
 
-	void OnActivedWeaponChanged(const TSharedPtr<FWeaponSocket>&CurrentWeaponSocketSPtr);
+	void OnActivedWeaponChanged(const TSharedPtr<FWeaponProxy>&CurrentWeaponSocketSPtr);
 
 	FOnActivedWeaponChangedContainerHandle ActivedWeaponChangedDelegate;
 

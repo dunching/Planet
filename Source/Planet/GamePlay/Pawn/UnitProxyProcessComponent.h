@@ -13,10 +13,14 @@
 #include "UnitProxyProcessComponent.generated.h"
 
 struct FActiveSkillProxy;
-struct FSkillSocket;
 struct FWeaponSocket;
+struct FSocket_FASI;
 class ACharacterBase;
 
+/*
+	释放技能
+	技能配置相关
+*/
 UCLASS(BlueprintType, Blueprintable)
 class UUnitProxyProcessComponent : public UActorComponent
 {
@@ -29,7 +33,7 @@ public:
 	using FOwnerPawnType = ACharacterBase;
 
 	using FOnActivedWeaponChangedContainer =
-		TCallbackHandleContainer<void(const TSharedPtr<FWeaponSocket>&)>;
+		TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>;
 
 	UUnitProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
 
@@ -41,30 +45,30 @@ public:
 		FActorComponentTickFunction* ThisTickFunction
 	)override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual bool ActiveAction(
-		const TSharedPtr<FSocketBase>& CanbeActivedInfoSPtr,
+		const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr,
 		bool bIsAutomaticStop = false
 	);
 
 	virtual void CancelAction(
-		const TSharedPtr<FSocketBase>& CanbeActivedInfoSPtr
+		const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr
 	);
 
-	TArray<TSharedPtr<FSocketBase>> GetCanbeActiveAction()const;
+	TArray<TSharedPtr<FSocket_FASI>> GetCanbeActiveAction()const;
 
 #pragma region Skills
-	void RegisterMultiGAs(
-		const TSharedPtr<FSkillSocket>& SkillSocket
-	);
-	
-	TSharedPtr<FSkillSocket> FindSkill(const FGameplayTag& Tag);
+	TSharedPtr<FActiveSkillProxy> FindActiveSkillSocket(const FGameplayTag& Tag)const;
 
-	TMap<FGameplayTag, TSharedPtr<FSkillSocket>> GetSkills()const;
+	void RegisterMultiGAs(
+		const TSharedPtr<FSocket_FASI>& SkillSocket
+	);
 #pragma endregion 
 
 #pragma region Weapon
 	void RegisterWeapon(
-		const TSharedPtr<FWeaponSocket>& WeaponSocket
+		const TSharedPtr<FSocket_FASI>& WeaponSocket
 	);
 
 	// 激活可用的武器
@@ -78,41 +82,60 @@ public:
 	int32 GetCurrentWeaponAttackDistance()const;
 
 	void GetWeapon(
-		TSharedPtr<FWeaponSocket>& FirstWeaponSocketInfoSPtr,
-		TSharedPtr<FWeaponSocket>& SecondWeaponSocketInfoSPtr
+		TSharedPtr<FSocket_FASI>& FirstWeaponSocketInfoSPtr,
+		TSharedPtr<FSocket_FASI>& SecondWeaponSocketInfoSPtr
 	);
 
 	TSharedPtr<FWeaponProxy>GetActivedWeapon()const;
+
+	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& Tag)const;
 #pragma endregion 
 
 #pragma region Consumables
 #pragma endregion 
 
-	TSharedPtr<FAllocationSkills> GetAllocationSkills()const;
+	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> GetSkills()const;
+
+	TSharedPtr<FSocket_FASI> FindSocket(const FGameplayTag& Tag)const;
+
+	void Update(const TSharedPtr<FSocket_FASI>& Socket);
+
+	bool Active(const TSharedPtr<FSocket_FASI>& Socket);
+
+	bool Active(const FGameplayTag& Socket);
+
+	void Cancel(const TSharedPtr<FSocket_FASI>& Socket);
+
+	void Cancel(const FGameplayTag& Socket);
+
+	TSharedPtr<FCharacterProxy>OwnerCharacter = nullptr;
 
 	FOnActivedWeaponChangedContainer OnActivedWeaponChangedContainer;
+	
+	UPROPERTY(ReplicatedUsing = OnRep_ProxyChanged)
+	FAllocationSkills_FASI AllocationSkills_Container;
 
 protected:
 	
 	UFUNCTION(Server, Reliable)
 	void RegisterMultiGAs_Server(
-		const FSkillSocket& SkillSocket
+		const FSocket_FASI& SkillSocket
 	);
 	
 	UFUNCTION(Server, Reliable)
 	void RegisterWeapon_Server(
-		const FWeaponSocket& Socket
+		const FSocket_FASI& Socket
 	);
 	
 	UFUNCTION(Server, Reliable)
 	void ActiveAction_Server(
-		const FSocketBase& Socket,
+		const FSocket_FASI& Socket,
 		bool bIsAutomaticStop
 	);
 
 	UFUNCTION(Server, Reliable)
 	void CancelAction_Server(
-		const FSocketBase& Socket
+		const FSocket_FASI& Socket
 	);
 
 	UFUNCTION(Server, Reliable)
@@ -120,8 +143,11 @@ protected:
 
 	bool ActivedCorrespondingWeapon(const TSharedPtr<FActiveSkillProxy>& ActiveSkillUnitPtr);
 	
+	UFUNCTION()
+	void OnRep_ProxyChanged();
+
 	FGameplayTag PreviousWeaponSocket;
 
-	TSharedPtr<FAllocationSkills> AllocationSkills_Member;
+	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>SkillsMap;
 
 };

@@ -15,25 +15,26 @@
 struct FSkillProxy;
 struct FWeaponProxy;
 struct FConsumableProxy;
+class UUnitProxyProcessComponent;
 
 USTRUCT(BlueprintType)
-struct FSocketBase
+struct FSocket_FASI : public FFastArraySerializerItem
 {
 	GENERATED_USTRUCT_BODY()
 
-	virtual ~FSocketBase();
-
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	FKey Key;
 
 	FGameplayTag Socket;
 
+	TWeakPtr<FBasicProxy> UnitPtr = nullptr;
+
 };
 
 template<>
-struct TStructOpsTypeTraits<FSocketBase> :
-	public TStructOpsTypeTraitsBase2<FSocketBase>
+struct TStructOpsTypeTraits<FSocket_FASI> :
+	public TStructOpsTypeTraitsBase2<FSocket_FASI>
 {
 	enum
 	{
@@ -42,92 +43,49 @@ struct TStructOpsTypeTraits<FSocketBase> :
 };
 
 USTRUCT(BlueprintType)
-struct FSkillSocket : public FSocketBase
+struct PLANET_API FAllocationSkills_FASI : public FFastArraySerializer
 {
 	GENERATED_USTRUCT_BODY()
+	
+	friend ACharacterBase;
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+	using FItemType = FSocket_FASI;
+	using FContainerType = FAllocationSkills_FASI;
+	
+	UPROPERTY()
+	TArray<FSocket_FASI> Items;
 
-	TWeakPtr<FSkillProxy> UnitPtr = nullptr;
-};
+	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms);
 
-template<>
-struct TStructOpsTypeTraits<FSkillSocket> :
-	public TStructOpsTypeTraitsBase2<FSkillSocket>
-{
-	enum
+	template< typename Type, typename SerializerType >
+	bool ShouldWriteFastArrayItem(const Type& Item, const bool bIsWritingOnClient)
 	{
-		WithNetSerializer = true,
-	};
-};
+		if (bIsWritingOnClient)
+		{
+			return Item.ReplicationID != INDEX_NONE;
+		}
 
-USTRUCT(BlueprintType)
-struct FWeaponSocket : public FSocketBase
-{
-	GENERATED_USTRUCT_BODY()
+		return true;
+	}
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
-	TWeakPtr<FWeaponProxy> UnitPtr = nullptr;
-};
+	void AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
-template<>
-struct TStructOpsTypeTraits<FWeaponSocket> :
-	public TStructOpsTypeTraitsBase2<FWeaponSocket>
-{
-	enum
-	{
-		WithNetSerializer = true,
-	};
-};
+	void UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
-USTRUCT(BlueprintType)
-struct FConsumableSocket : public FSocketBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	TWeakPtr<FConsumableProxy> UnitPtr = nullptr;
-};
-
-USTRUCT(BlueprintType)
-struct PLANET_API FAllocationSkills final
-{
-	GENERATED_USTRUCT_BODY()
-
-	void Update(const TSharedPtr<FSkillSocket>& Socket);
-	
-	void Update(const TSharedPtr<FWeaponSocket>& Socket);
-
-	void Update(const TSharedPtr<FConsumableSocket>& Socket);
-
-	bool Active(const TSharedPtr<FSocketBase>& Socket);
-
-	bool Active(const FGameplayTag& Socket);
-
-	void Cancel(const TSharedPtr<FSocketBase>& Socket);
-
-	void Cancel(const FGameplayTag& Socket);
-
-	TSharedPtr<FSkillSocket> FindSkill(const FGameplayTag& Socket);
-	
-	TSharedPtr<FWeaponSocket> FindWeapon(const FGameplayTag& Socket);
-	
-	TSharedPtr<FConsumableSocket> FindConsumable(const FGameplayTag& Socket);
-
-	TMap<FGameplayTag, TSharedPtr<FSkillSocket>>GetSkillsMap()const;
-	
-	TMap<FGameplayTag, TSharedPtr<FWeaponSocket>>GetWeaponsMap()const;
-
-	TMap<FGameplayTag, TSharedPtr<FConsumableSocket>>GetConsumablesMap()const;
-
-	TSharedPtr<FCharacterProxy>OwnerCharacter = nullptr;
+	UUnitProxyProcessComponent* UnitProxyProcessComponentPtr = nullptr;
 
 private:
 
-	TMap<FGameplayTag, TSharedPtr<FSkillSocket>>SkillsMap;
+};
 
-	TMap<FGameplayTag, TSharedPtr<FWeaponSocket>>WeaponsMap;
-	
-	TMap<FGameplayTag, TSharedPtr<FConsumableSocket>>ConsumablesMap;
-
+template<>
+struct TStructOpsTypeTraits< FAllocationSkills_FASI > :
+	public TStructOpsTypeTraitsBase2< FAllocationSkills_FASI >
+{
+	enum
+	{
+		WithNetDeltaSerializer = true,
+	};
 };

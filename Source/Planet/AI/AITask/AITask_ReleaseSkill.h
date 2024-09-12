@@ -13,6 +13,7 @@
 
 #include "AITask_ReleaseSkill.generated.h"
 
+struct FSocket_FASI;
 class UGameplayAbility;
 
 class ACharacterBase;
@@ -45,7 +46,7 @@ protected:
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
-	TMap<UGameplayAbility*, TSharedPtr<FSocketBase>>ReleasingSkillMap;
+	TMap<UGameplayAbility*, TSharedPtr<FSocket_FASI>>ReleasingSkillMap;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

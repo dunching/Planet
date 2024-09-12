@@ -95,9 +95,17 @@ public:
 
 	virtual void InitialUnit();
 
+	// 激活
 	virtual bool Active();
 
+	//  取消 激活
 	virtual void Cancel();
+
+	// 装备至插槽
+	virtual void Allocation();
+
+	// 从插槽移除
+	virtual void UnAllocation();
 
 	IDType GetID()const;
 
@@ -455,7 +463,8 @@ public:
 
 	int32 GetMaxAttackDistance()const;
 
-	TWeakPtr<FWeaponSkillProxy>FirstSkill;
+	// 注意：因为不能确定 “复制顺序”，所以这里不能用 WeakPtr
+	TSharedPtr<FWeaponSkillProxy>FirstSkill;
 
 protected:
 

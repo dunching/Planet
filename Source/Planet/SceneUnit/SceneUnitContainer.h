@@ -53,6 +53,8 @@ struct PLANET_API FProxy_FASI : public FFastArraySerializerItem
 
 	void PostReplicatedAdd(const struct FProxy_FASI_Container& InArraySerializer);
 
+	void PostReplicatedChange(const struct FProxy_FASI_Container& InArraySerializer);
+
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	bool operator==(const FProxy_FASI& Right)const;
@@ -120,4 +122,3 @@ struct TStructOpsTypeTraits< FProxy_FASI_Container > :
 		WithNetDeltaSerializer = true,
 	};
 };
-

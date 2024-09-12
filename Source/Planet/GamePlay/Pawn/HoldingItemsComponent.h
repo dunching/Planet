@@ -16,8 +16,9 @@ struct FProxy_FASI;
 class IPlanetControllerInterface;
 class ACharacterBase;
 
-
-
+/*
+	持有物品相关
+*/
 UCLASS(BlueprintType, Blueprintable)
 class UHoldingItemsComponent : public UActorComponent
 {
@@ -140,7 +141,7 @@ private:
 
 	TMap<IDType, TSharedPtr<FBasicProxy>> SceneMetaMap;
 
-	TMap<IDType, TSharedPtr<FCharacterProxy>> CharacterCoinUnitMap;
+	TMap<IDType, TSharedPtr<FCharacterProxy>> CharacterUnitMap;
 
 	TMap<FGameplayTag, TSharedPtr<FConsumableProxy>> ConsumablesUnitMap;
 

@@ -232,8 +232,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 	{
 		bool bIsGiveTalentPassive = false;
 		if (
-			Iter.Value->UnitPtr.IsValid() &&
-			(Iter.Value->UnitPtr.Pin()->Level > 0)
+			Iter.Value->UnitPtr.IsValid() 
 			)
 		{
 			if (Iter.Value->UnitPtr.Pin()->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi))
@@ -299,15 +298,15 @@ void UPawnStateActionHUD::InitialSkillIcon()
 	OnActivedWeaponChanged(nullptr);
 }
 
-void UPawnStateActionHUD::OnActivedWeaponChanged(const TSharedPtr<FWeaponSocket>& CurrentWeaponSocketSPtr)
+void UPawnStateActionHUD::OnActivedWeaponChanged(const TSharedPtr<FWeaponProxy>& CurrentWeaponSocketSPtr)
 {
 	if (!CharacterPtr)
 	{
 		return;
 	}
 
-	TSharedPtr<FWeaponSocket > FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FWeaponSocket > SecondWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
 	CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 
 	{
@@ -316,7 +315,7 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(const TSharedPtr<FWeaponSocket>
 		{
 			IconPtr->ResetToolUIByData(
 				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->UnitPtr.Pin() ?
-				FirstWeaponSocketInfoSPtr->UnitPtr.Pin()->FirstSkill.Pin() :
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
 				nullptr
 			);
 		}
@@ -327,7 +326,7 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(const TSharedPtr<FWeaponSocket>
 		{
 			IconPtr->ResetToolUIByData(
 				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->UnitPtr.Pin() ?
-				SecondWeaponSocketInfoSPtr->UnitPtr.Pin()->FirstSkill.Pin() :
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
 				nullptr
 			);
 		}

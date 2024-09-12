@@ -106,6 +106,16 @@ void FBasicProxy::Cancel()
 
 }
 
+void FBasicProxy::Allocation()
+{
+
+}
+
+void FBasicProxy::UnAllocation()
+{
+
+}
+
 FBasicProxy::IDType FBasicProxy::GetID()const
 {
 	return ID;
@@ -343,7 +353,7 @@ bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOut
 		Ar << bIsValid;
 		if (bIsValid)
 		{
-			FirstSkill.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+			FirstSkill->NetSerialize(Ar, Map, bOutSuccess);
 		}
 	}
 	else if (Ar.IsLoading())
@@ -374,21 +384,21 @@ bool FWeaponProxy::Active()
 {
 	Super::Active();
 
-	return FirstSkill.Pin()->Active();
+	return FirstSkill->Active();
 }
 
 void FWeaponProxy::Cancel()
 {
 	Super::Cancel();
 
-	FirstSkill.Pin()->Cancel();
+	FirstSkill->Cancel();
 }
 
 void FWeaponProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
 {
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 
-	FirstSkill.Pin()->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 }
 
 FTableRowUnit_WeaponExtendInfo* FWeaponProxy::GetTableRowUnit_WeaponExtendInfo() const
@@ -892,7 +902,7 @@ void FWeaponProxy::ActiveWeapon()
 			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
 			ActivedWeaponPtr->SetWeaponUnit(*this);
 
-			FirstSkill.Pin()->ActivedWeaponPtr = ActivedWeaponPtr;
+			FirstSkill->ActivedWeaponPtr = ActivedWeaponPtr;
 		}
 #endif
 	}
@@ -904,7 +914,7 @@ void FWeaponProxy::RetractputWeapon()
 	{
 		ActivedWeaponPtr->Destroy();
 		ActivedWeaponPtr = nullptr;
-		FirstSkill.Pin()->ActivedWeaponPtr = nullptr;
+		FirstSkill->ActivedWeaponPtr = nullptr;
 	}
 
 	auto OnwerActorPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
@@ -913,10 +923,10 @@ void FWeaponProxy::RetractputWeapon()
 
 void FWeaponProxy::EquippingWeapons()
 {
-	FirstSkill.Pin()->RegisterSkill();
+	FirstSkill->RegisterSkill();
 }
 
 void FWeaponProxy::RemoveWeapons()
 {
-	FirstSkill.Pin()->UnRegisterSkill();
+	FirstSkill->UnRegisterSkill();
 }

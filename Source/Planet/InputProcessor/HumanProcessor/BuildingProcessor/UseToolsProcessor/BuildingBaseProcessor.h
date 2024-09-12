@@ -65,7 +65,7 @@ namespace HumanProcessor
 
 		bool bIsPressdLeftAlt = false;
 
-		TMap<FKey, TSharedPtr<FSocketBase>>HandleKeysMap;
+		TMap<FKey, TSharedPtr<FSocket_FASI>>HandleKeysMap;
 
 	};
 

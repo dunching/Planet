@@ -133,8 +133,8 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 
 	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 
-	TSharedPtr<FWeaponSocket > FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FWeaponSocket > SecondWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
 
 	EICPtr->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 
@@ -158,7 +158,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(
 				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->UnitPtr.IsValid() ?
-				FirstWeaponSocketInfoSPtr->UnitPtr.Pin()->FirstSkill.Pin() :
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
 				nullptr
 			);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -185,7 +185,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(
 				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->UnitPtr.IsValid() ?
-				SecondWeaponSocketInfoSPtr->UnitPtr.Pin()->FirstSkill.Pin() :
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
 				nullptr
 			);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -216,7 +216,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
 			if (IconPtr)
 			{
-				auto Result = EICPtr->FindSkill(IconPtr->IconSocket);
+				auto Result = EICPtr->FindSocket(IconPtr->IconSocket);
 
 				IconPtr->bPaseInvokeOnResetUnitEvent = true;
 				IconPtr->ResetToolUIByData(Result ? Result->UnitPtr.Pin() : nullptr);
@@ -237,14 +237,14 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 	};
 
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	auto AllocationSkills = CharacterPtr->GetInteractiveSkillComponent()->GetAllocationSkills();
+	auto InteractiveSkillComponentPtr = CharacterPtr->GetInteractiveSkillComponent();
 
 	for (const auto& Iter : Ary)
 	{
 		auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
 		if (IconPtr)
 		{
-			auto Result = AllocationSkills->FindConsumable(IconPtr->IconSocket);
+			auto Result = InteractiveSkillComponentPtr->FindSocket(IconPtr->IconSocket);
 
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(Result ? Result->UnitPtr.Pin() : nullptr);
@@ -270,7 +270,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 	{
 		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 		{
-			auto FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocket>();
+			auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
 			FirstWeaponSocketInfoSPtr->Key = WeaponActiveSkills_Key;
 			FirstWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
@@ -281,7 +281,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr);
 		}
 		{
-			auto SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocket>();
+			auto SecondWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
 			SecondWeaponSocketInfoSPtr->Key = WeaponActiveSkills_Key;
 			SecondWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
@@ -321,7 +321,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
 			if (IconPtr)
 			{
-				auto SkillsSocketInfo = MakeShared<FSkillSocket>();
+				auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 				SkillsSocketInfo->Socket = IconPtr->IconSocket;
 				SkillsSocketInfo->Key = Iter.Key;
 				if (IconPtr->BasicUnitPtr)
@@ -355,7 +355,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter.Name));
 			if (IconPtr)
 			{
-				auto SkillsSocketInfo = MakeShared<FConsumableSocket>();
+				auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 				SkillsSocketInfo->Socket = IconPtr->IconSocket;
 				SkillsSocketInfo->Key = Iter.Key;
 				if (IconPtr->BasicUnitPtr)
@@ -363,7 +363,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 					SkillsSocketInfo->UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(IconPtr->BasicUnitPtr);
 
 				}
-				EICPtr->GetAllocationSkills()->Update(SkillsSocketInfo);
+				EICPtr->Update(SkillsSocketInfo);
 			}
 		}
 	}
@@ -579,7 +579,7 @@ void UAllocationSkillsMenu::OnMainWeaponChanged(const TSharedPtr<FWeaponProxy>& 
 		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill1));
 		if (IconPtr)
 		{
-			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill.Pin() : nullptr);
+			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill : nullptr);
 		}
 	}
 }
@@ -596,7 +596,7 @@ void UAllocationSkillsMenu::OnSecondaryWeaponChanged(const TSharedPtr<FWeaponPro
 			{
 			}
 
-			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill.Pin() : nullptr);
+			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill : nullptr);
 		}
 	}
 }

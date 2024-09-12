@@ -21,8 +21,6 @@ void UHoldingItemsComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Proxy_Container.HoldingItemsComponentPtr = this;
-
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
@@ -91,6 +89,7 @@ void UHoldingItemsComponent::SetAllocationCharacterUnit_Implementation(
 	{
 		return;
 	}
+
 	auto TargetCharacterProxySPtr = FindUnit_Character(CharacterProxy_ID);
 	if (TargetCharacterProxySPtr)
 	{
@@ -99,6 +98,15 @@ void UHoldingItemsComponent::SetAllocationCharacterUnit_Implementation(
 	else
 	{
 		ProxySPtr->SetAllocationCharacterUnit(nullptr);
+	}
+
+	if (ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	{
+		// 此项是跟 Weapon 绑定的，所以不必复制
+	}
+	else
+	{
+		Proxy_Container.UpdateItem(ProxySPtr);
 	}
 }
 
@@ -396,6 +404,12 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::FindUnit_Character(const IDT
 	{
 		return DynamicCastSharedPtr<FCharacterProxy>(SceneMetaMap[ID]);
 	}
+
+	if (CharacterProxySPtr->GetID() == ID)
+	{
+		return CharacterProxySPtr;
+	}
+
 	return nullptr;
 }
 
@@ -485,7 +499,7 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddUnit_Character(const FGam
 
 TSharedPtr<FCharacterProxy> UHoldingItemsComponent::Update_Character(const TSharedPtr<FCharacterProxy>& UnitSPtr)
 {
-	CharacterCoinUnitMap.Add(UnitSPtr->GetID(), UnitSPtr);
+	CharacterUnitMap.Add(UnitSPtr->GetID(), UnitSPtr);
 	SceneMetaMap.Add(UnitSPtr->ID, UnitSPtr);
 	SceneToolsAry.Add(UnitSPtr);
 

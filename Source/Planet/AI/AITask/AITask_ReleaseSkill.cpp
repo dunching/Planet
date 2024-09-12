@@ -71,13 +71,8 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket)
 						)
 					{
-						auto Skills = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
-						auto SkillIter = Skills.Find(Iter->Socket);
-						if (!SkillIter)
-						{
-							continue;
-						}
-						auto GAInsPtr = Cast<USkill_Base>((*SkillIter)->UnitPtr.Pin()->GetGAInst());
+						auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter->UnitPtr.Pin());
+						auto GAInsPtr = Cast<USkill_Base>(SkillProxySPtr->GetGAInst());
 						if (!GAInsPtr)
 						{
 							continue;
@@ -111,7 +106,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					{
 						continue;
 					}
-					auto GAInsPtr = Cast<USkill_Base>(WeaponSPtr->FirstSkill.Pin()->GetGAInst());
+					auto GAInsPtr = Cast<USkill_Base>(WeaponSPtr->FirstSkill->GetGAInst());
 					if (!GAInsPtr)
 					{
 						continue;

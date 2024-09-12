@@ -48,7 +48,7 @@ void UPawnStateConsumablesHUD::ResetUIByData()
 		return;
 	}
 
- 	auto AllocationSkills = CharacterPtr->GetInteractiveSkillComponent()->GetAllocationSkills();
+ 	auto InteractiveSkillComponentPtr = CharacterPtr->GetInteractiveSkillComponent();
  
  	auto UIPtr = Cast<UGridPanel>(GetWidgetFromName(FPawnStateConsumablesHUD::Get().GridPanel));
  	auto Ary = UIPtr->GetAllChildren();
@@ -58,7 +58,7 @@ void UPawnStateConsumablesHUD::ResetUIByData()
  		auto IconPtr = Cast<UActionConsumablesIcon>(Iter);
  		if (IconPtr)
  		{
- 			const auto ConsumableSocketInfoSPtr = AllocationSkills->FindConsumable(IconPtr->IconSocket);
+ 			const auto ConsumableSocketInfoSPtr = InteractiveSkillComponentPtr->FindSocket(IconPtr->IconSocket);
  			if (ConsumableSocketInfoSPtr)
  			{
  				IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr->UnitPtr.Pin());

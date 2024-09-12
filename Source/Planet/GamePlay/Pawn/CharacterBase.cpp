@@ -94,7 +94,6 @@ void ACharacterBase::BeginPlay()
 		}
 	}
 #endif
-	
 
 	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
@@ -293,7 +292,6 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 #endif
 	
 	// 
-	GetInteractiveSkillComponent()->GetAllocationSkills()->OwnerCharacter = CharacterUnitPtr;
 
 	// 
 	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();

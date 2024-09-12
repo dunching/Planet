@@ -113,15 +113,15 @@ void UActionSkillsIcon::UpdateSkillState()
 	}
 
 	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-	const auto SkillSocketInfoSPtr = EICPtr->FindSkill(IconSocket);
+	const auto SkillSocketInfoSPtr = EICPtr->FindActiveSkillSocket(IconSocket);
 	if (!SkillSocketInfoSPtr)
 	{
 		return;
 	}
 
-	const auto SKillUnitType = SkillSocketInfoSPtr->UnitPtr.Pin()->GetUnitType();
+	const auto SKillUnitType = SkillSocketInfoSPtr->GetUnitType();
 	{
-		auto GAInsPtr = SkillSocketInfoSPtr->UnitPtr.Pin()->GetGAInst();
+		auto GAInsPtr = SkillSocketInfoSPtr->GetGAInst();
 		if (!GAInsPtr)
 		{
 			return;
@@ -135,7 +135,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SkillSocketInfoSPtr->UnitPtr.Pin());
+		auto ActiveSkillUnitPtr = SkillSocketInfoSPtr;
 		if (!ActiveSkillUnitPtr)
 		{
 			return;
@@ -147,7 +147,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		bool bIsAcceptInput = false;
 		float Percent = 0.f;
 
-		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->UnitPtr.Pin()->GetGAInst());
+		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->GetGAInst());
 		if (!GAInsPtr)
 		{
 			return;

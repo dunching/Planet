@@ -5,6 +5,8 @@
 #include <map>
 
 #include "GameplayAbilitySpec.h"
+#include "Net/UnrealNetwork.h"
+
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -44,7 +46,9 @@ FName UUnitProxyProcessComponent::ComponentName = TEXT("InteractiveSkillComponen
 UUnitProxyProcessComponent::UUnitProxyProcessComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	AllocationSkills_Member = MakeShared<FAllocationSkills>();
+	SetIsReplicatedByDefault(true);
+
+	AllocationSkills_Container.UnitProxyProcessComponentPtr = this;
 }
 
 void UUnitProxyProcessComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -57,8 +61,19 @@ void UUnitProxyProcessComponent::TickComponent(float DeltaTime, enum ELevelTick 
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UUnitProxyProcessComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+
+	Params.Condition = COND_SkipReplay;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, AllocationSkills_Container, Params);
+}
+
 void UUnitProxyProcessComponent::RegisterWeapon(
-	const TSharedPtr<FWeaponSocket>& WeaponSocket
+	const TSharedPtr<FSocket_FASI>& WeaponSocket
 )
 {
 #if UE_EDITOR || UE_CLIENT
@@ -68,13 +83,11 @@ void UUnitProxyProcessComponent::RegisterWeapon(
 	}
 #endif
 
-	auto AllocationSkills = GetAllocationSkills();
-
-	AllocationSkills->Update(WeaponSocket);
+	Update(WeaponSocket);
 }
 
 void UUnitProxyProcessComponent::RegisterMultiGAs(
-	const TSharedPtr<FSkillSocket>& SkillSocket
+	const TSharedPtr<FSocket_FASI>& SkillSocket
 )
 {
 #if UE_EDITOR || UE_CLIENT
@@ -84,53 +97,41 @@ void UUnitProxyProcessComponent::RegisterMultiGAs(
 	}
 #endif
 
-	auto AllocationSkills = GetAllocationSkills();
-
-	AllocationSkills->Update(SkillSocket);
+	Update(SkillSocket);
 }
 
-void UUnitProxyProcessComponent::RegisterMultiGAs_Server_Implementation(const FSkillSocket& SkillSocket)
+void UUnitProxyProcessComponent::RegisterMultiGAs_Server_Implementation(const FSocket_FASI& SkillSocket)
 {
-	auto SkillsSocketInfo = MakeShared<FSkillSocket>();
+	auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 	*SkillsSocketInfo = SkillSocket;
 
-	auto AllocationSkills = GetAllocationSkills();
-
-	AllocationSkills->Update(SkillsSocketInfo);
+	Update(SkillsSocketInfo);
 }
 
-void UUnitProxyProcessComponent::RegisterWeapon_Server_Implementation(const FWeaponSocket& Socket)
+void UUnitProxyProcessComponent::RegisterWeapon_Server_Implementation(const FSocket_FASI& Socket)
 {
-	auto SkillsSocketInfo = MakeShared<FWeaponSocket>();
+	auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 	*SkillsSocketInfo = Socket;
 
-	auto AllocationSkills = GetAllocationSkills();
-
-	AllocationSkills->Update(SkillsSocketInfo);
+	Update(SkillsSocketInfo);
 }
 
 void UUnitProxyProcessComponent::ActiveAction_Server_Implementation(
-	const FSocketBase& Socket,
+	const FSocket_FASI& Socket,
 	bool bIsAutomaticStop
 )
 {
-	auto AllocationSkills = GetAllocationSkills();
-
-	AllocationSkills->Active(Socket.Socket);
+	Active(Socket.Socket);
 }
 
-void UUnitProxyProcessComponent::CancelAction_Server_Implementation(const FSocketBase& Socket)
+void UUnitProxyProcessComponent::CancelAction_Server_Implementation(const FSocket_FASI& Socket)
 {
-	auto AllocationSkills = GetAllocationSkills();
-
-	AllocationSkills->Cancel(Socket.Socket);
+	Cancel(Socket.Socket);
 }
 
 void UUnitProxyProcessComponent::ActiveWeapon()
 {
-	auto AllocationSkills = GetAllocationSkills();
-
-	auto WeaponsMap = AllocationSkills->GetWeaponsMap();
+	const auto WeaponsMap = SkillsMap;
 
 	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1))
 	{
@@ -146,9 +147,7 @@ void UUnitProxyProcessComponent::ActiveWeapon()
 
 void UUnitProxyProcessComponent::SwitchWeapon()
 {
-	auto AllocationSkills = GetAllocationSkills();
-
-	auto WeaponsMap = AllocationSkills->GetWeaponsMap();
+	const auto WeaponsMap = SkillsMap;
 	if (
 		(WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1)) ||
 		(WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2))
@@ -176,13 +175,11 @@ int32 UUnitProxyProcessComponent::GetCurrentWeaponAttackDistance() const
 }
 
 void UUnitProxyProcessComponent::GetWeapon(
-	TSharedPtr<FWeaponSocket>& FirstWeaponSocketInfoSPtr,
-	TSharedPtr<FWeaponSocket>& SecondWeaponSocketInfoSPtr
+	TSharedPtr<FSocket_FASI>& FirstWeaponSocketInfoSPtr,
+	TSharedPtr<FSocket_FASI>& SecondWeaponSocketInfoSPtr
 )
 {
-	auto AllocationSkills = GetAllocationSkills();
-
-	auto WeaponsMap = AllocationSkills->GetWeaponsMap();
+	const auto WeaponsMap = SkillsMap;
 	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1))
 	{
 		FirstWeaponSocketInfoSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1];
@@ -195,22 +192,21 @@ void UUnitProxyProcessComponent::GetWeapon(
 
 TSharedPtr<FWeaponProxy> UUnitProxyProcessComponent::GetActivedWeapon() const
 {
-	auto PreviousWeaponSocketSPtr = AllocationSkills_Member->FindWeapon(PreviousWeaponSocket);
-	if (PreviousWeaponSocketSPtr)
+	return FindWeaponSocket(PreviousWeaponSocket);
+}
+
+TSharedPtr<FWeaponProxy> UUnitProxyProcessComponent::FindWeaponSocket(const FGameplayTag& Tag) const
+{
+	if (SkillsMap.Contains(Tag))
 	{
-		return PreviousWeaponSocketSPtr->UnitPtr.Pin();
+		return DynamicCastSharedPtr<FWeaponProxy>(SkillsMap[Tag]->UnitPtr.Pin());
 	}
 
 	return nullptr;
 }
 
-TSharedPtr<FAllocationSkills> UUnitProxyProcessComponent::GetAllocationSkills() const
-{
-	return AllocationSkills_Member;
-}
-
 bool UUnitProxyProcessComponent::ActiveAction(
-	const TSharedPtr<FSocketBase>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
+	const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
 )
 {
 	ActiveAction_Server(*CanbeActivedInfoSPtr, bIsAutomaticStop);
@@ -218,26 +214,16 @@ bool UUnitProxyProcessComponent::ActiveAction(
 	return true;
 }
 
-void UUnitProxyProcessComponent::CancelAction(const TSharedPtr<FSocketBase>& CanbeActivedInfoSPtr)
+void UUnitProxyProcessComponent::CancelAction(const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr)
 {
 	CancelAction_Server(*CanbeActivedInfoSPtr);
 }
 
-TArray<TSharedPtr<FSocketBase>> UUnitProxyProcessComponent::GetCanbeActiveAction() const
+TArray<TSharedPtr<FSocket_FASI>> UUnitProxyProcessComponent::GetCanbeActiveAction() const
 {
-	TArray<TSharedPtr<FSocketBase>>Result;
-
-	auto AllocationSkills = GetAllocationSkills();
-
-	auto SkillsMap = AllocationSkills->GetSkillsMap();
-	auto WeaponsMap = AllocationSkills->GetWeaponsMap();
+	TArray<TSharedPtr<FSocket_FASI>>Result;
 
 	for (auto Iter : SkillsMap)
-	{
-		Result.Add(Iter.Value);
-	}
-
-	for (auto Iter : WeaponsMap)
 	{
 		Result.Add(Iter.Value);
 	}
@@ -249,9 +235,7 @@ bool UUnitProxyProcessComponent::ActivedCorrespondingWeapon(const TSharedPtr<FAc
 {
 	const auto RequireWeaponUnitType = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->RequireWeaponUnitType;
 
-	auto AllocationSkills = GetAllocationSkills();
-
-	auto WeaponsMap = AllocationSkills->GetWeaponsMap();
+	const auto WeaponsMap = SkillsMap;
 
 	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1))
 	{
@@ -279,6 +263,11 @@ bool UUnitProxyProcessComponent::ActivedCorrespondingWeapon(const TSharedPtr<FAc
 	return false;
 }
 
+void UUnitProxyProcessComponent::OnRep_ProxyChanged()
+{
+
+}
+
 void UUnitProxyProcessComponent::SwitchWeaponImp_Implementation(const FGameplayTag& NewWeaponSocket)
 {
 	if (NewWeaponSocket == PreviousWeaponSocket)
@@ -286,16 +275,16 @@ void UUnitProxyProcessComponent::SwitchWeaponImp_Implementation(const FGameplayT
 	}
 	else
 	{
-		auto PreviousWeaponSocketSPtr = AllocationSkills_Member->FindWeapon(PreviousWeaponSocket);
+		auto PreviousWeaponSocketSPtr = FindWeaponSocket(PreviousWeaponSocket);
 		if (PreviousWeaponSocketSPtr)
 		{
-			PreviousWeaponSocketSPtr->UnitPtr.Pin()->RetractputWeapon();
+			PreviousWeaponSocketSPtr->RetractputWeapon();
 		}
 
-		auto NewWeaponSocketSPtr = AllocationSkills_Member->FindWeapon(NewWeaponSocket);
+		auto NewWeaponSocketSPtr = FindWeaponSocket(NewWeaponSocket);
 		if (NewWeaponSocketSPtr)
 		{
-			NewWeaponSocketSPtr->UnitPtr.Pin()->ActiveWeapon();
+			NewWeaponSocketSPtr->ActiveWeapon();
 		}
 		PreviousWeaponSocketSPtr = NewWeaponSocketSPtr;
 
@@ -303,16 +292,59 @@ void UUnitProxyProcessComponent::SwitchWeaponImp_Implementation(const FGameplayT
 	}
 }
 
-TSharedPtr<FSkillSocket>UUnitProxyProcessComponent::FindSkill(const FGameplayTag& Tag)
+TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> UUnitProxyProcessComponent::GetSkills() const
 {
-	auto AllocationSkills = GetAllocationSkills();
-
-	return AllocationSkills->FindSkill(Tag);
+	return SkillsMap;
 }
 
-TMap<FGameplayTag, TSharedPtr<FSkillSocket>> UUnitProxyProcessComponent::GetSkills() const
+TSharedPtr<FSocket_FASI> UUnitProxyProcessComponent::FindSocket(const FGameplayTag& Tag) const
 {
-	auto AllocationSkills = GetAllocationSkills();
+	if (SkillsMap.Contains(Tag))
+	{
+		return SkillsMap[Tag];
+	}
 
-	return AllocationSkills->GetSkillsMap();
+	return nullptr;
+}
+
+TSharedPtr<FActiveSkillProxy> UUnitProxyProcessComponent::FindActiveSkillSocket(const FGameplayTag& Tag)const
+{
+	if (SkillsMap.Contains(Tag))
+	{ 
+		return DynamicCastSharedPtr<FActiveSkillProxy>(SkillsMap[Tag]->UnitPtr.Pin());
+	}
+
+	return nullptr;
+}
+
+void UUnitProxyProcessComponent::Update(const TSharedPtr<FSocket_FASI>& Socket)
+{
+}
+
+bool UUnitProxyProcessComponent::Active(const TSharedPtr<FSocket_FASI>& Socket)
+{
+	return Active(Socket->Socket);
+}
+
+bool UUnitProxyProcessComponent::Active(const FGameplayTag& Socket)
+{
+	if (SkillsMap.Contains(Socket))
+	{
+		return SkillsMap[Socket]->UnitPtr.Pin()->Active();
+	}
+
+	return false;
+}
+
+void UUnitProxyProcessComponent::Cancel(const TSharedPtr<FSocket_FASI>& Socket)
+{
+	Cancel(Socket->Socket);
+}
+
+void UUnitProxyProcessComponent::Cancel(const FGameplayTag& Socket)
+{
+	if (SkillsMap.Contains(Socket))
+	{
+		SkillsMap[Socket]->UnitPtr.Pin()->Cancel();
+	}
 }
