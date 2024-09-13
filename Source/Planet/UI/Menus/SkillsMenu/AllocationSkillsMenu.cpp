@@ -146,7 +146,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 				IconPtr->bPaseInvokeOnResetUnitEvent = true;
 				IconPtr->ResetToolUIByData(
 					FirstWeaponSocketInfoSPtr ?
-					FirstWeaponSocketInfoSPtr->UnitPtr.Pin() :
+					FirstWeaponSocketInfoSPtr->ProxySPtr :
 					nullptr
 				);
 				IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -157,8 +157,8 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 		{
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(
-				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->UnitPtr.IsValid() ?
-				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
+				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr ?
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
 				nullptr
 			);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -173,7 +173,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 				IconPtr->bPaseInvokeOnResetUnitEvent = true;
 				IconPtr->ResetToolUIByData(
 					SecondWeaponSocketInfoSPtr ?
-					SecondWeaponSocketInfoSPtr->UnitPtr.Pin() :
+					SecondWeaponSocketInfoSPtr->ProxySPtr :
 					nullptr
 				);
 				IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -184,8 +184,8 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 		{
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(
-				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->UnitPtr.IsValid() ?
-				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
+				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr ?
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
 				nullptr
 			);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -219,7 +219,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 				auto Result = EICPtr->FindSocket(IconPtr->IconSocket);
 
 				IconPtr->bPaseInvokeOnResetUnitEvent = true;
-				IconPtr->ResetToolUIByData(Result ? Result->UnitPtr.Pin() : nullptr);
+				IconPtr->ResetToolUIByData(Result ? Result->ProxySPtr : nullptr);
 				IconPtr->bPaseInvokeOnResetUnitEvent = false;
 			}
 		}
@@ -247,7 +247,7 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 			auto Result = InteractiveSkillComponentPtr->FindSocket(IconPtr->IconSocket);
 
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
-			IconPtr->ResetToolUIByData(Result ? Result->UnitPtr.Pin() : nullptr);
+			IconPtr->ResetToolUIByData(Result ? Result->ProxySPtr : nullptr);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
 		}
 	}
@@ -276,7 +276,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			FirstWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
 			if (IconPtr)
 			{
-				FirstWeaponSocketInfoSPtr->UnitPtr = IconPtr->UnitPtr;
+				FirstWeaponSocketInfoSPtr->ProxySPtr = IconPtr->UnitPtr;
 			}
 			EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr);
 		}
@@ -287,7 +287,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			SecondWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
 			if (IconPtr)
 			{
-				SecondWeaponSocketInfoSPtr->UnitPtr = IconPtr->UnitPtr;
+				SecondWeaponSocketInfoSPtr->ProxySPtr = IconPtr->UnitPtr;
 			}
 			EICPtr->RegisterWeapon(SecondWeaponSocketInfoSPtr);
 		}
@@ -326,7 +326,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 				SkillsSocketInfo->Key = Iter.Key;
 				if (IconPtr->BasicUnitPtr)
 				{
-					SkillsSocketInfo->UnitPtr = DynamicCastSharedPtr<FSkillProxy>(IconPtr->BasicUnitPtr);
+					SkillsSocketInfo->ProxySPtr = DynamicCastSharedPtr<FSkillProxy>(IconPtr->BasicUnitPtr);
 				}
 				EICPtr->RegisterMultiGAs(SkillsSocketInfo);
 			}
@@ -360,7 +360,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 				SkillsSocketInfo->Key = Iter.Key;
 				if (IconPtr->BasicUnitPtr)
 				{
-					SkillsSocketInfo->UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(IconPtr->BasicUnitPtr);
+					SkillsSocketInfo->ProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(IconPtr->BasicUnitPtr);
 
 				}
 				EICPtr->Update(SkillsSocketInfo);

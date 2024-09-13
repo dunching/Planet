@@ -56,14 +56,6 @@ void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 )
 {
 	// Ins Or Spec
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-	if (CharacterPtr)
-	{
-		if (CharacterPtr->GetCharacterAttributesComponent())
-		{
-			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
-		}
-	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }

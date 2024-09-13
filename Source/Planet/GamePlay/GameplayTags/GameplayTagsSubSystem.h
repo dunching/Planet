@@ -163,55 +163,67 @@ public:
 #pragma region Socket Tags
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ConsumableSocket1 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket1")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.1")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ConsumableSocket2 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket2")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.2")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ConsumableSocket3 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket3")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.3")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ConsumableSocket4 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ConsumableSocket4")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.4")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag WeaponSocket =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponSocket")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag WeaponSocket_1 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponSocket.1")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag WeaponSocket_2 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponSocket.2")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag WeaponActiveSocket =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.WeaponActiveSocket")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponActiveSocket")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag WeaponActiveSocket1 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.WeaponActiveSocket.1")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponActiveSocket.1")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag WeaponActiveSocket2 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.WeaponActiveSocket.2")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponActiveSocket.2")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ActiveSocket =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ActiveSocket1 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket.1")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.1")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ActiveSocket2 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket.2")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.2")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ActiveSocket3 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket.3")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.3")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag ActiveSocket4 =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.ActiveSocket.4")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.4")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag TalentSocket =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("UI.SkillSocket.Talent")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.Talent")));
 #pragma endregion 
 
 #pragma region UnitType

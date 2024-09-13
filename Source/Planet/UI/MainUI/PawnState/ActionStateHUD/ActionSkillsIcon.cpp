@@ -311,7 +311,7 @@ bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
  		if (WidgetDragPtr)
 		{
 			auto OtherUnitPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
-// 			if (UnitPtr && UnitPtr.Pin()->GetUnitType().MatchesTag(SkillUnitType))
+// 			if (UnitPtr && ProxySPtr->GetUnitType().MatchesTag(SkillUnitType))
 // 			{
 // 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
 // 			}

@@ -71,7 +71,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket)
 						)
 					{
-						auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter->UnitPtr.Pin());
+						auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter->ProxySPtr);
 						auto GAInsPtr = Cast<USkill_Base>(SkillProxySPtr->GetGAInst());
 						if (!GAInsPtr)
 						{
@@ -98,7 +98,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 			for (const auto& Iter : CanbeActivedInfo)
 			{
 				if (
-					Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket)
+					Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponSocket)
 					)
 				{
 					auto WeaponSPtr = CharacterPtr->GetInteractiveSkillComponent()->GetActivedWeapon();

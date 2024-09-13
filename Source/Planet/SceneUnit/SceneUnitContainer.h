@@ -49,11 +49,11 @@ struct PLANET_API FProxy_FASI : public FFastArraySerializerItem
 {
 	GENERATED_USTRUCT_BODY()
 
-	void PreReplicatedRemove(const struct FProxy_FASI_Container& InArraySerializer);
+	void PreReplicatedRemove(const FProxy_FASI_Container& InArraySerializer);
 
-	void PostReplicatedAdd(const struct FProxy_FASI_Container& InArraySerializer);
+	void PostReplicatedAdd(const FProxy_FASI_Container& InArraySerializer);
 
-	void PostReplicatedChange(const struct FProxy_FASI_Container& InArraySerializer);
+	void PostReplicatedChange(const FProxy_FASI_Container& InArraySerializer);
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
@@ -98,6 +98,12 @@ struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
 
 		return true;
 	}
+
+	 void PreReplicatedRemove(const TArrayView<int32>& RemovedIndices, int32 FinalSize);
+
+	 void PostReplicatedAdd(const TArrayView<int32>& AddedIndices, int32 FinalSize);
+
+	 void PostReplicatedChange(const TArrayView<int32>& ChangedIndices, int32 FinalSize);
 
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 

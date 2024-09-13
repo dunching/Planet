@@ -31,6 +31,21 @@ bool FProxy_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms
 	return Result;
 }
 
+void FProxy_FASI_Container::PreReplicatedRemove(const TArrayView<int32>& RemovedIndices, int32 FinalSize)
+{
+
+}
+
+void FProxy_FASI_Container::PostReplicatedAdd(const TArrayView<int32>& AddedIndices, int32 FinalSize)
+{
+
+}
+
+void FProxy_FASI_Container::PostReplicatedChange(const TArrayView<int32>& ChangedIndices, int32 FinalSize)
+{
+
+}
+
 void FProxy_FASI_Container::AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 {
 #if UE_EDITOR || UE_SERVER
@@ -61,6 +76,8 @@ void FProxy_FASI_Container::UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 			{
 				if (Items[Index].ProxySPtr == ProxySPtr)
 				{
+					// 注意：ProxySPtr 这个指针已经在外部进行了修改，在这部我们不必再对 Items[Index] 进行修改
+
 					MarkItemDirty(Items[Index]);
 					return;
 				}
@@ -130,7 +147,51 @@ void FProxy_FASI::PreReplicatedRemove(const struct FProxy_FASI_Container& InArra
 
 void FProxy_FASI::PostReplicatedAdd(const struct FProxy_FASI_Container& InArraySerializer)
 {
-	PostReplicatedChange(InArraySerializer);
+	// 在这里 我们对本地的数据进行绑定
+
+	const auto UnitType = ProxySPtr->GetUnitType();
+
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+	{
+//		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player))
+	{
+		// 本地有一个默认的
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+	}
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+	}
 }
 
 void FProxy_FASI::PostReplicatedChange(const struct FProxy_FASI_Container& InArraySerializer)
@@ -141,62 +202,43 @@ void FProxy_FASI::PostReplicatedChange(const struct FProxy_FASI_Container& InArr
 
 	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 	{
-
+//		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
-		auto WeaponSPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
-
-		auto FirstSkillPtr = InArraySerializer.HoldingItemsComponentPtr->FindUnit_Skill(WeaponSPtr->FirstSkill->GetID());
-		if (FirstSkillPtr)
-		{
-			WeaponSPtr->FirstSkill = DynamicCastSharedPtr<FWeaponSkillProxy>(FirstSkillPtr);
-		}
-		else
-		{
-			InArraySerializer.HoldingItemsComponentPtr->Update_Skill(WeaponSPtr->FirstSkill);
-		}
-
-		InArraySerializer.HoldingItemsComponentPtr->Update_Weapon(WeaponSPtr);
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
 	{
-		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FActiveSkillProxy>(ProxySPtr));
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
 	{
-		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr));
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
 	{
-		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FTalentSkillProxy>(ProxySPtr));
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 	{
-		InArraySerializer.HoldingItemsComponentPtr->Update_Skill(DynamicCastSharedPtr<FWeaponSkillProxy>(ProxySPtr));
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
 	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 	{
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player))
 	{
-		// 1.使用远程的数据
-		*InArraySerializer.HoldingItemsComponentPtr->CharacterProxySPtr = *DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
-
-		// 2.
-		InArraySerializer.HoldingItemsComponentPtr->Update_Character(
-			InArraySerializer.HoldingItemsComponentPtr->CharacterProxySPtr
-		);
-
-		// 3.替换 Caontainer 下的副本
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->CharacterProxySPtr;
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
-		InArraySerializer.HoldingItemsComponentPtr->Update_Character(DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr));
+		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 }
 

@@ -27,8 +27,8 @@ class PLANET_API UPawnStateActionHUD : public UMyUserWidget, public IMenuInterfa
 
 public:
 
-	using FOnActivedWeaponChangedContainerHandle =
-		TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>::FCallbackHandleSPtr;
+	using FOnAllocationSkillChangedHandle =
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -45,11 +45,11 @@ protected:
 
 	void InitialTalentUI();
 
-	void InitialSkillIcon();
+	void InitialActiveSkillIcon();
 
-	void OnActivedWeaponChanged(const TSharedPtr<FWeaponProxy>&CurrentWeaponSocketSPtr);
+	void InitialWeaponSkillIcon();
 
-	FOnActivedWeaponChangedContainerHandle ActivedWeaponChangedDelegate;
+	FOnAllocationSkillChangedHandle OnAllocationSkillChangedDelegate;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UState_Talent_NuQi>State_Talent_NuQi_Class;

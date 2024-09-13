@@ -184,10 +184,10 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
+			OnwerActorPtr->GetInteractiveSkillComponent()->ActiveWeapon();
+
 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
 			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
-
-			OnwerActorPtr->GetInteractiveSkillComponent()->ActiveWeapon();
 		}
 	}
 
@@ -240,7 +240,7 @@ namespace HumanProcessor
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (
-					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket)
+					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponSocket)
 					)
 				{
 					OnwerActorPtr->GetInteractiveSkillComponent()->CancelAction(*SkillIter);

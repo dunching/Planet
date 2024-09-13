@@ -30,10 +30,10 @@ public:
 
 	static FName ComponentName;
 
-	using FOwnerPawnType = ACharacterBase;
+	using FOwnerType = ACharacterBase;
 
-	using FOnActivedWeaponChangedContainer =
-		TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>;
+	using FOnAllocationChanged =
+		TCallbackHandleContainer<void()>;
 
 	UUnitProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
 
@@ -47,7 +47,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual bool ActiveAction(
+	bool ActiveAction(
 		const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr,
 		bool bIsAutomaticStop = false
 	);
@@ -86,7 +86,7 @@ public:
 		TSharedPtr<FSocket_FASI>& SecondWeaponSocketInfoSPtr
 	);
 
-	TSharedPtr<FWeaponProxy>GetActivedWeapon()const;
+	TSharedPtr<FWeaponProxy> GetActivedWeapon()const;
 
 	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& Tag)const;
 #pragma endregion 
@@ -108,12 +108,13 @@ public:
 
 	void Cancel(const FGameplayTag& Socket);
 
-	TSharedPtr<FCharacterProxy>OwnerCharacter = nullptr;
+	FOnAllocationChanged OnAllocationChanged;
 
-	FOnActivedWeaponChangedContainer OnActivedWeaponChangedContainer;
+	UPROPERTY(ReplicatedUsing = OnRep_AllocationChanged)
+	FAllocation_FASI_Container AllocationSkills_Container;
 	
-	UPROPERTY(ReplicatedUsing = OnRep_ProxyChanged)
-	FAllocationSkills_FASI AllocationSkills_Container;
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
+	FGameplayTag CurrentWeaponSocket;
 
 protected:
 	
@@ -128,6 +129,12 @@ protected:
 	);
 	
 	UFUNCTION(Server, Reliable)
+	void ActiveWeapon_Server();
+
+	UFUNCTION(Server, Reliable)
+	void SwitchWeapon_Server();
+
+	UFUNCTION(Server, Reliable)
 	void ActiveAction_Server(
 		const FSocket_FASI& Socket,
 		bool bIsAutomaticStop
@@ -138,15 +145,15 @@ protected:
 		const FSocket_FASI& Socket
 	);
 
-	UFUNCTION(Server, Reliable)
 	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
 
 	bool ActivedCorrespondingWeapon(const TSharedPtr<FActiveSkillProxy>& ActiveSkillUnitPtr);
 	
 	UFUNCTION()
-	void OnRep_ProxyChanged();
+	void OnRep_AllocationChanged();
 
-	FGameplayTag PreviousWeaponSocket;
+	UFUNCTION()
+	void OnRep_CurrentActivedSocketChanged();
 
 	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>SkillsMap;
 

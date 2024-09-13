@@ -1,3 +1,4 @@
+#include "PawnStateActionHUD.h"
 
 #include "PawnStateActionHUD.h"
 
@@ -71,9 +72,9 @@ void UPawnStateActionHUD::NativeConstruct()
 
 void UPawnStateActionHUD::NativeDestruct()
 {
-	if (ActivedWeaponChangedDelegate)
+	if (OnAllocationSkillChangedDelegate)
 	{
-		ActivedWeaponChangedDelegate->UnBindCallback();
+		OnAllocationSkillChangedDelegate->UnBindCallback();
 	}
 
 	Super::NativeDestruct();
@@ -211,7 +212,15 @@ void UPawnStateActionHUD::ResetUIByData()
 		}
 	}
 	InitialTalentUI();
-	InitialSkillIcon();
+
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback(
+		std::bind(&ThisClass::InitialActiveSkillIcon, this)
+	);
+	InitialActiveSkillIcon();
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback(
+		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
+	);
+	InitialWeaponSkillIcon();
 }
 
 void UPawnStateActionHUD::InitialTalentUI()
@@ -232,10 +241,10 @@ void UPawnStateActionHUD::InitialTalentUI()
 	{
 		bool bIsGiveTalentPassive = false;
 		if (
-			Iter.Value->UnitPtr.IsValid() 
+			Iter.Value->ProxySPtr
 			)
 		{
-			if (Iter.Value->UnitPtr.Pin()->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi))
+			if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 				if (UIPtr)
@@ -244,7 +253,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 					bIsGiveTalentPassive = true;
 				}
 			}
-			else if (Iter.Value->UnitPtr.Pin()->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang))
+			else if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
 				if (UIPtr)
@@ -258,7 +267,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 	}
 }
 
-void UPawnStateActionHUD::InitialSkillIcon()
+void UPawnStateActionHUD::InitialActiveSkillIcon()
 {
 	if (!CharacterPtr)
 	{
@@ -282,7 +291,7 @@ void UPawnStateActionHUD::InitialSkillIcon()
 			auto SocketIter = SkillsMap.Find(SkillIcon->IconSocket);
 			if (SocketIter)
 			{
-				SkillIcon->ResetToolUIByData((*SocketIter)->UnitPtr.Pin());
+				SkillIcon->ResetToolUIByData((*SocketIter)->ProxySPtr);
 			}
 			else
 			{
@@ -290,15 +299,9 @@ void UPawnStateActionHUD::InitialSkillIcon()
 			}
 		}
 	}
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-
-	ActivedWeaponChangedDelegate = EICPtr->OnActivedWeaponChangedContainer.AddCallback(
-		std::bind(&ThisClass::OnActivedWeaponChanged, this, std::placeholders::_1)
-	);
-	OnActivedWeaponChanged(nullptr);
 }
 
-void UPawnStateActionHUD::OnActivedWeaponChanged(const TSharedPtr<FWeaponProxy>& CurrentWeaponSocketSPtr)
+void UPawnStateActionHUD::InitialWeaponSkillIcon()
 {
 	if (!CharacterPtr)
 	{
@@ -307,15 +310,35 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(const TSharedPtr<FWeaponProxy>&
 
 	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
 	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
-	CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+
+	const auto CurrentWeaponSocket = CharacterPtr->GetInteractiveSkillComponent()->CurrentWeaponSocket;
+
+	if (
+		CurrentWeaponSocket ==
+		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1
+		)
+	{
+		CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+	}
+	else if (
+		CurrentWeaponSocket ==
+		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2
+		)
+	{
+		CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
+	}
+	else
+	{
+		return;
+	}
 
 	{
 		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
-				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->UnitPtr.Pin() ?
-				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
+				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr ?
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
 				nullptr
 			);
 		}
@@ -325,8 +348,8 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(const TSharedPtr<FWeaponProxy>&
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
-				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->UnitPtr.Pin() ?
-				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->UnitPtr.Pin())->FirstSkill :
+				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr ?
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
 				nullptr
 			);
 		}

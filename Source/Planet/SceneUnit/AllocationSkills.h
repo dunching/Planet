@@ -15,12 +15,21 @@
 struct FSkillProxy;
 struct FWeaponProxy;
 struct FConsumableProxy;
+struct FAllocation_FASI_Container;
+
 class UUnitProxyProcessComponent;
+class UHoldingItemsComponent;
 
 USTRUCT(BlueprintType)
 struct FSocket_FASI : public FFastArraySerializerItem
 {
 	GENERATED_USTRUCT_BODY()
+
+	void PreReplicatedRemove(const FAllocation_FASI_Container& InArraySerializer);
+
+	void PostReplicatedAdd(const FAllocation_FASI_Container& InArraySerializer);
+
+	void PostReplicatedChange(const FAllocation_FASI_Container& InArraySerializer);
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
@@ -28,7 +37,7 @@ struct FSocket_FASI : public FFastArraySerializerItem
 
 	FGameplayTag Socket;
 
-	TWeakPtr<FBasicProxy> UnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> ProxySPtr = nullptr;
 
 };
 
@@ -43,14 +52,14 @@ struct TStructOpsTypeTraits<FSocket_FASI> :
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FAllocationSkills_FASI : public FFastArraySerializer
+struct PLANET_API FAllocation_FASI_Container : public FFastArraySerializer
 {
 	GENERATED_USTRUCT_BODY()
 	
 	friend ACharacterBase;
 
 	using FItemType = FSocket_FASI;
-	using FContainerType = FAllocationSkills_FASI;
+	using FContainerType = FAllocation_FASI_Container;
 	
 	UPROPERTY()
 	TArray<FSocket_FASI> Items;
@@ -68,11 +77,11 @@ struct PLANET_API FAllocationSkills_FASI : public FFastArraySerializer
 		return true;
 	}
 
+	void AddItem(const TSharedPtr<FItemType>& ProxySPtr);
+
+	void UpdateItem(const TSharedPtr<FItemType>& ProxySPtr);
+
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
-
-	void AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
-
-	void UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	UUnitProxyProcessComponent* UnitProxyProcessComponentPtr = nullptr;
 
@@ -81,8 +90,8 @@ private:
 };
 
 template<>
-struct TStructOpsTypeTraits< FAllocationSkills_FASI > :
-	public TStructOpsTypeTraitsBase2< FAllocationSkills_FASI >
+struct TStructOpsTypeTraits< FAllocation_FASI_Container > :
+	public TStructOpsTypeTraitsBase2< FAllocation_FASI_Container >
 {
 	enum
 	{

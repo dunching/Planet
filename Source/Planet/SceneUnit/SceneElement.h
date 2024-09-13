@@ -124,6 +124,8 @@ public:
 
 	ACharacterBase* GetProxyCharacter()const;
 
+	void Update2Client();
+
 	TSharedPtr<FBasicProxy> GetThisSPtr()const;
 
 	// 这个物品所在的对象
@@ -407,6 +409,8 @@ public:
 
 	FWeaponSkillProxy();
 
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)override;
 
 	virtual bool Active()override;
@@ -421,6 +425,16 @@ public:
 
 protected:
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FWeaponSkillProxy> :
+	public TStructOpsTypeTraitsBase2<FWeaponSkillProxy>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 USTRUCT()
@@ -440,6 +454,12 @@ public:
 
 	virtual void Cancel()override;
 
+	// 装备至插槽
+	virtual void Allocation()override;
+
+	// 从插槽移除
+	virtual void UnAllocation()override;
+
 	virtual void SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& InAllocationCharacterUnitPtr)override;
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
@@ -447,16 +467,10 @@ public:
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
 
 	// 切换至当前武器
-	virtual void ActiveWeapon();
+	void ActiveWeapon();
 
 	// 收回武器
-	virtual void RetractputWeapon();
-
-	// 装备武器
-	virtual void EquippingWeapons();
-
-	// 卸下武器
-	virtual void RemoveWeapons();
+	void RetractputWeapon();
 
 	// 主词条
 	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;

@@ -83,7 +83,7 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 			auto TempPtr = MakeShared<FCharacterProxy>();
 			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
 
-			OwnerCharacterUnitPtr = 
+			OwnerCharacterUnitPtr =
 				TempPtr->ProxyCharacterPtr->GetHoldingItemsComponent()->FindUnit_Character(TempPtr->GetID());
 		}
 	}
@@ -136,6 +136,11 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 ACharacterBase* FBasicProxy::GetProxyCharacter() const
 {
 	return OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+}
+
+void FBasicProxy::Update2Client()
+{
+	OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetHoldingItemsComponent()->Proxy_Container.UpdateItem(GetThisSPtr());
 }
 
 TSharedPtr<FBasicProxy> FBasicProxy::GetThisSPtr() const
@@ -347,6 +352,8 @@ bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOut
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
+	Ar << ActivedWeaponPtr;
+
 	if (Ar.IsSaving())
 	{
 		bool bIsValid = FirstSkill.IsValid();
@@ -408,6 +415,28 @@ FTableRowUnit_WeaponExtendInfo* FWeaponProxy::GetTableRowUnit_WeaponExtendInfo()
 
 	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_WeaponExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
+}
+
+void FWeaponProxy::Allocation()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		FirstSkill->RegisterSkill();
+	}
+#endif
+}
+
+void FWeaponProxy::UnAllocation()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		FirstSkill->UnRegisterSkill();
+	}
+#endif
 }
 
 FTableRowUnit_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
@@ -525,41 +554,49 @@ void FWeaponSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacter
 
 bool FWeaponSkillProxy::Active()
 {
-	auto InGaInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
-	if (!InGaInsPtr)
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		return false;
+		auto InGaInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
+		if (!InGaInsPtr)
+		{
+			return false;
+		}
+
+		if (InGaInsPtr->IsActive())
+		{
+			InGaInsPtr->SetContinuePerform(true);
+			return true;
+		}
+
+		FGameplayEventData Payload;
+		if (
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Axe) ||
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_HandProtection) ||
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_RangeTest)
+			)
+		{
+			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_Weapon;
+			GameplayAbilityTargetDashPtr->SkillUnitPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(GetThisSPtr());
+			GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
+			GameplayAbilityTargetDashPtr->bIsAutoContinue = true;
+			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+		}
+
+		auto ASCPtr = GetProxyCharacter()->GetAbilitySystemComponent();
+
+		return ASCPtr->TriggerAbilityFromGameplayEvent(
+			InGaInsPtr->GetCurrentAbilitySpecHandle(),
+			ASCPtr->AbilityActorInfo.Get(),
+			GetUnitType(),
+			&Payload,
+			*ASCPtr
+		);
 	}
+#endif
 
-	if (InGaInsPtr->IsActive())
-	{
-		InGaInsPtr->SetContinuePerform(true);
-		return true;
-	}
-
-	FGameplayEventData Payload;
-	if (
-		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Axe) ||
-		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_HandProtection) ||
-		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_RangeTest)
-		)
-	{
-		auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_Weapon;
-		GameplayAbilityTargetDashPtr->SkillUnitPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(GetThisSPtr());
-		GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
-		GameplayAbilityTargetDashPtr->bIsAutoContinue = true;
-		Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
-	}
-
-	auto ASCPtr = GetProxyCharacter()->GetAbilitySystemComponent();
-
-	return ASCPtr->TriggerAbilityFromGameplayEvent(
-		InGaInsPtr->GetCurrentAbilitySpecHandle(),
-		ASCPtr->AbilityActorInfo.Get(),
-		GetUnitType(),
-		&Payload,
-		*ASCPtr
-	);
+	return true;
 }
 
 void FWeaponSkillProxy::Cancel()
@@ -575,37 +612,50 @@ void FWeaponSkillProxy::Cancel()
 
 void FSkillProxy::RegisterSkill()
 {
-	FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
-
-	GameplayAbilityTargetDataPtr->SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(GetThisSPtr());
-
-	FGameplayAbilitySpec GameplayAbilitySpec(
-		GetSkillClass(),
-		Level
-	);
-
-	GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
-	GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
-	GameplayAbilitySpec.GameplayEventData->EventTag = GetUnitType();
-
+#if UE_EDITOR || UE_SERVER
 	auto ProxyCharacterPtr = GetProxyCharacter();
-	GameplayAbilitySpecHandle = ProxyCharacterPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
+
+		GameplayAbilityTargetDataPtr->SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(GetThisSPtr());
+
+		FGameplayAbilitySpec GameplayAbilitySpec(
+			GetSkillClass(),
+			Level
+		);
+
+		GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
+		GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+		GameplayAbilitySpec.GameplayEventData->EventTag = GetUnitType();
+
+		auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+
+		GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+	}
+#endif
 }
 
 void FSkillProxy::UnRegisterSkill()
 {
-	if (GetAllocationCharacterUnit().IsValid())
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto ProxyCharacterPtr = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
-
-		if (ProxyCharacterPtr.IsValid())
+		if (GetAllocationCharacterUnit().IsValid())
 		{
-			auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
 
-			ASCPtr->CancelAbilityHandle(GameplayAbilitySpecHandle);
-			ASCPtr->ClearAbility(GameplayAbilitySpecHandle);
+			if (AllocationCharacter.IsValid())
+			{
+				auto ASCPtr = AllocationCharacter->GetAbilitySystemComponent();
+
+				ASCPtr->CancelAbilityHandle(GameplayAbilitySpecHandle);
+				ASCPtr->ClearAbility(GameplayAbilitySpecHandle);
+			}
 		}
 	}
+#endif
 
 	GameplayAbilitySpecHandle = FGameplayAbilitySpecHandle();
 }
@@ -644,6 +694,15 @@ FGameplayAbilitySpecHandle FSkillProxy::GetGAHandle() const
 
 FWeaponSkillProxy::FWeaponSkillProxy()
 {
+}
+
+bool FWeaponSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << ActivedWeaponPtr;
+
+	return true;
 }
 
 FTableRowUnit_WeaponSkillExtendInfo* FWeaponSkillProxy::GetTableRowUnit_WeaponSkillExtendInfo() const
@@ -897,7 +956,9 @@ void FWeaponProxy::ActiveWeapon()
 
 			FActorSpawnParameters SpawnParameters;
 
-			SpawnParameters.Owner = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+
+			SpawnParameters.Owner = AllocationCharacter.Get();
 
 			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
 			ActivedWeaponPtr->SetWeaponUnit(*this);
@@ -914,19 +975,17 @@ void FWeaponProxy::RetractputWeapon()
 	{
 		ActivedWeaponPtr->Destroy();
 		ActivedWeaponPtr = nullptr;
+
+		FirstSkill->Cancel();
 		FirstSkill->ActivedWeaponPtr = nullptr;
 	}
 
-	auto OnwerActorPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
-	OnwerActorPtr->SwitchAnimLink_Client(EAnimLinkClassType::kUnarmed);
-}
-
-void FWeaponProxy::EquippingWeapons()
-{
-	FirstSkill->RegisterSkill();
-}
-
-void FWeaponProxy::RemoveWeapons()
-{
-	FirstSkill->UnRegisterSkill();
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		auto OnwerActorPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+		OnwerActorPtr->SwitchAnimLink_Client(EAnimLinkClassType::kUnarmed);
+	}
+#endif
 }

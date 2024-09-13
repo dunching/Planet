@@ -61,7 +61,7 @@ void UPawnStateConsumablesHUD::ResetUIByData()
  			const auto ConsumableSocketInfoSPtr = InteractiveSkillComponentPtr->FindSocket(IconPtr->IconSocket);
  			if (ConsumableSocketInfoSPtr)
  			{
- 				IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr->UnitPtr.Pin());
+ 				IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr->ProxySPtr);
  			}
  		}
  	}

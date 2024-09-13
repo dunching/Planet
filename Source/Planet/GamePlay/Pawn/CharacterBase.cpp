@@ -171,6 +171,14 @@ void ACharacterBase::PostInitializeComponents()
 	}
 
 	Super::PostInitializeComponents();
+
+	if ((World->IsGameWorld()))
+	{
+		HoldingItemsComponentPtr->Proxy_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
+
+		InteractiveSkillComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
+		InteractiveSkillComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = InteractiveSkillComponentPtr;
+	}
 }
 
 void ACharacterBase::PossessedBy(AController* NewController)

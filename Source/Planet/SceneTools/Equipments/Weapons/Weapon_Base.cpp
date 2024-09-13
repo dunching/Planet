@@ -10,10 +10,15 @@
 
 void AWeapon_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (auto OwnerCharacterPtr = GetOwner<FOwnerPawnType>())
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		OwnerCharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(GetAllData(), WeaponUnitPtr->GetUnitType());
+		if (auto OwnerCharacterPtr = GetOwner<FOwnerPawnType>())
+		{
+			OwnerCharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(GetAllData(), WeaponUnitPtr->GetUnitType());
+		}
 	}
+#endif
 
 	Super::EndPlay(EndPlayReason);
 }
