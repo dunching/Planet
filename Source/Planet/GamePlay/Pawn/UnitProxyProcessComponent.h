@@ -22,7 +22,7 @@ class ACharacterBase;
 	技能配置相关
 */
 UCLASS(BlueprintType, Blueprintable)
-class UUnitProxyProcessComponent : public UActorComponent
+class PLANET_API UUnitProxyProcessComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -133,6 +133,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void SwitchWeapon_Server();
+
+	UFUNCTION(Server, Reliable)
+	void RetractputWeapon_Server();
 
 	UFUNCTION(Server, Reliable)
 	void ActiveAction_Server(

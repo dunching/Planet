@@ -127,6 +127,11 @@ void UUnitProxyProcessComponent::SwitchWeapon_Server_Implementation()
 	SwitchWeapon();
 }
 
+void UUnitProxyProcessComponent::RetractputWeapon_Server_Implementation()
+{
+	RetractputWeapon();
+}
+
 void UUnitProxyProcessComponent::ActiveAction_Server_Implementation(
 	const FSocket_FASI& Socket,
 	bool bIsAutomaticStop
@@ -192,6 +197,12 @@ void UUnitProxyProcessComponent::SwitchWeapon()
 void UUnitProxyProcessComponent::RetractputWeapon()
 {
 	SwitchWeaponImp(FGameplayTag::EmptyTag);
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		RetractputWeapon_Server();
+	}
+#endif
 }
 
 int32 UUnitProxyProcessComponent::GetCurrentWeaponAttackDistance() const
@@ -249,7 +260,15 @@ bool UUnitProxyProcessComponent::ActiveAction(
 
 void UUnitProxyProcessComponent::CancelAction(const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr)
 {
-	CancelAction_Server(*CanbeActivedInfoSPtr);
+	auto WeaponSPtr = FindSocket(CurrentWeaponSocket);
+	if (WeaponSPtr->Key == CanbeActivedInfoSPtr->Key)
+	{
+		CancelAction_Server(*WeaponSPtr);
+	}
+	else
+	{
+		CancelAction_Server(*CanbeActivedInfoSPtr);
+	}
 }
 
 TArray<TSharedPtr<FSocket_FASI>> UUnitProxyProcessComponent::GetCanbeActiveAction() const
@@ -310,7 +329,6 @@ void UUnitProxyProcessComponent::OnRep_AllocationChanged()
 
 void UUnitProxyProcessComponent::OnRep_CurrentActivedSocketChanged()
 {
-	OnAllocationChanged();
 }
 
 void UUnitProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket)
@@ -323,10 +341,10 @@ void UUnitProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSo
 		auto PreviousWeaponSocketSPtr = FindWeaponSocket(CurrentWeaponSocket);
 		if (PreviousWeaponSocketSPtr)
 		{
-			PreviousWeaponSocketSPtr->RetractputWeapon();
 #if UE_EDITOR || UE_SERVER
 			if (GetNetMode() == NM_DedicatedServer)
 			{
+				PreviousWeaponSocketSPtr->RetractputWeapon();
 				PreviousWeaponSocketSPtr->Update2Client();
 			}
 #endif
@@ -335,16 +353,16 @@ void UUnitProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSo
 		auto NewWeaponSocketSPtr = FindWeaponSocket(NewWeaponSocket);
 		if (NewWeaponSocketSPtr)
 		{
-			NewWeaponSocketSPtr->ActiveWeapon();
 #if UE_EDITOR || UE_SERVER
 			if (GetNetMode() == NM_DedicatedServer)
 			{
+				NewWeaponSocketSPtr->ActiveWeapon();
 				NewWeaponSocketSPtr->Update2Client();
 			}
 #endif
-			CurrentWeaponSocket = NewWeaponSocket;
-
 		}
+
+		CurrentWeaponSocket = NewWeaponSocket;
 
 		OnAllocationChanged();
 	}

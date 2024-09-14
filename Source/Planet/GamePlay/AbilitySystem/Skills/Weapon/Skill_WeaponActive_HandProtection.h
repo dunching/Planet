@@ -78,6 +78,9 @@ protected:
 
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
+	
+	UFUNCTION()
+	void OnMontateComplete();
 
 	void MakeDamage();
 

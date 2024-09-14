@@ -159,8 +159,6 @@ void USkill_WeaponActive_HandProtection::ResetPreviousStageActions()
 
 void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 {
-	IncrementListLock();
-
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 
 	TaskPtr->SetDuration(InputRangeInSecond);
@@ -168,7 +166,6 @@ void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 	TaskPtr->OnFinished.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr) {
 		CurrentIndex = 0;
 
-		DecrementListLockOverride();
 		return true;
 		});
 
@@ -203,8 +200,19 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_WeaponHandProtection::AttackEnd)
 	{
-		MakeDamage();
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			MakeDamage();
+		}
+#endif
+
+		CheckInContinue();
 	}
+}
+
+void USkill_WeaponActive_HandProtection::OnMontateComplete()
+{
 }
 
 void USkill_WeaponActive_HandProtection::MakeDamage()
@@ -309,13 +317,11 @@ void USkill_WeaponActive_HandProtection::PlayMontage()
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
 		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }
