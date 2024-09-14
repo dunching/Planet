@@ -14,7 +14,7 @@
 
 #include "SceneElement.generated.h"
 
-struct FGameplayAbilityTargetData_Skill;
+struct FGameplayAbilityTargetData_RegisterParam;
 struct FTableRowUnit_CommonCooldownInfo;
 struct FTableRowUnit;
 struct FTableRowUnit_WeaponExtendInfo;
@@ -301,9 +301,11 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
-	void RegisterSkill();
+	// 装备至插槽
+	virtual void Allocation()override;
 
-	void UnRegisterSkill();
+	// 从插槽移除
+	virtual void UnAllocation()override;
 
 	TArray<USkill_Base*> GetGAInstAry()const;
 
@@ -314,6 +316,10 @@ public:
 	int32 Level = 1;
 
 protected:
+
+	void RegisterSkill();
+
+	void UnRegisterSkill();
 
 	FGameplayAbilitySpecHandle GameplayAbilitySpecHandle;
 

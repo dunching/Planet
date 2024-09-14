@@ -97,6 +97,10 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 
 	virtual bool Matches(const FRootMotionSource* Other) const override;
 
+	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
 	virtual void PrepareRootMotion(
 		float SimulationTime,
 		float MovementTickTime,
@@ -118,6 +122,17 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 
 private:
 
+};
+
+template<>
+struct TStructOpsTypeTraits< FRootMotionSource_BySpline > :
+	public TStructOpsTypeTraitsBase2< FRootMotionSource_BySpline >
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
 };
 
 USTRUCT()

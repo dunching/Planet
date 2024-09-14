@@ -53,6 +53,8 @@ public:
 
 protected:
 
+	void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const;
+
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -98,7 +100,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ASPlineActor>SPlineActorClass;
-
+	
+	//UPROPERTY(Replicated)
 	ASPlineActor* SPlineActorPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")

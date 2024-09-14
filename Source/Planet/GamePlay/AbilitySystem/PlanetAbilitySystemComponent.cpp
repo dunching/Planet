@@ -11,6 +11,22 @@ void UPlanetAbilitySystemComponent::TickComponent(
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UPlanetAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
+{
+	if (GameplayEventDataMap.Find(AbilitySpec.InputID))
+	{
+		if (AbilitySpec.Ability)
+		{
+			AbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
+
+			*AbilitySpec.GameplayEventData = GameplayEventDataMap[AbilitySpec.InputID];
+			GameplayEventDataMap.Remove(AbilitySpec.InputID);
+		}
+	}
+
+	Super::OnGiveAbility(AbilitySpec);
+}
+
 void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 	FGameplayAbilitySpecHandle Handle,
 	FGameplayAbilityActivationInfo ActivationInfo, 
@@ -30,13 +46,18 @@ void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 
 			for (auto Instance : Instances)
 			{
-				if (Instance->GetCurrentActivationInfoRef().bCanBeEndedByOtherInstance)
-				{
-					Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerformImp(bIsContinue);
-				}
+				Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerformImp(bIsContinue);
 			}
 		}
 	}
+}
+
+void UPlanetAbilitySystemComponent::ReplicateEventData_Implementation(
+	int32 InputID,
+	const FGameplayEventData& TriggerEventData
+)
+{
+	GameplayEventDataMap.Add(InputID, TriggerEventData);
 }
 
 bool UPlanetAbilitySystemComponent::K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const

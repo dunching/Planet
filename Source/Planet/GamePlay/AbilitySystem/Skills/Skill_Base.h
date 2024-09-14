@@ -14,7 +14,7 @@ struct FSkillProxy;
 class UInteractiveComponent;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Skill :
+struct FGameplayAbilityTargetData_RegisterParam :
 	public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
@@ -23,14 +23,41 @@ struct FGameplayAbilityTargetData_Skill :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	virtual FGameplayAbilityTargetData_Skill* Clone()const;
+	virtual FGameplayAbilityTargetData_RegisterParam* Clone()const;
 
-	TSharedPtr<FSkillProxy> SkillUnitPtr = nullptr;
+	FGuid ProxyID;
+
+private:
+
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Skill> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Skill>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RegisterParam>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
+USTRUCT()
+struct FGameplayAbilityTargetData_ActiveParam :
+	public FGameplayAbilityTargetData
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
+	virtual FGameplayAbilityTargetData_ActiveParam* Clone()const;
+
+	int32 ID = 0;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam>
 {
 	enum
 	{
@@ -44,6 +71,8 @@ class PLANET_API USkill_Base : public UPlanetGameplayAbility
 	GENERATED_BODY()
 
 public:
+
+	using FRegisterParamType = FGameplayAbilityTargetData_RegisterParam;
 
 	friend UInteractiveComponent;
 
@@ -82,7 +111,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
+	)override;
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,

@@ -8,6 +8,7 @@
 #include "UnitProxyProcessComponent.h"
 #include "BaseFeatureGAComponent.h"
 #include "GameOptions.h"
+#include "HoldingItemsComponent.h"
 
 USkill_Base::USkill_Base() :
 	Super()
@@ -29,14 +30,14 @@ void USkill_Base::OnAvatarSet(
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
 	// 远程不能复制这个参数？
-// 	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
-// 	{
-// 		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill*>(Spec.GameplayEventData->TargetData.Get(0));
-// 		if (GameplayAbilityTargetPtr)
-// 		{
-// 			SkillUnitPtr = GameplayAbilityTargetPtr->SkillUnitPtr;
-// 		}
-// 	}
+	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetPtr = dynamic_cast<const FRegisterParamType*>(Spec.GameplayEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetPtr)
+		{
+			SkillUnitPtr = CharacterPtr->GetHoldingItemsComponent()->FindUnit_Skill(GameplayAbilityTargetPtr->ProxyID);
+		}
+	}
 }
 
 void USkill_Base::PreActivate(
@@ -49,8 +50,7 @@ void USkill_Base::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
-	// Inst
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	ResetPreviousStageActions();
 }
 
 void USkill_Base::ActivateAbility(
@@ -122,32 +122,46 @@ void USkill_Base::ResetPreviousStageActions()
 	ResetListLock();
 }
 
-UScriptStruct* FGameplayAbilityTargetData_Skill::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_RegisterParam::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_Skill::StaticStruct();
+	return FGameplayAbilityTargetData_RegisterParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_Skill::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	if (Ar.IsSaving())
 	{
-		SkillUnitPtr->NetSerialize(Ar, Map, bOutSuccess);
+		Ar << ProxyID;
 	}
 	else if (Ar.IsLoading())
 	{
-		auto TempPtr = MakeShared<FSkillProxy>();
-		TempPtr->NetSerialize(Ar, Map, bOutSuccess);
-
-		SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(TempPtr->GetThisSPtr());
+		Ar << ProxyID;
 	}
 
 	return true;
 }
 
-FGameplayAbilityTargetData_Skill* FGameplayAbilityTargetData_Skill::Clone() const
+FGameplayAbilityTargetData_RegisterParam* FGameplayAbilityTargetData_RegisterParam::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_Skill;
+		new FGameplayAbilityTargetData_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
+bool FGameplayAbilityTargetData_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << ID;
+
+	return true;
+}
+
+FGameplayAbilityTargetData_ActiveParam* FGameplayAbilityTargetData_ActiveParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_ActiveParam;
 
 	*ResultPtr = *this;
 

@@ -429,14 +429,18 @@ void UBaseFeatureGAComponent::Dash_Implementation(EDashDirection DashDirection)
 // 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 // 
 // 		ASCPtr->TriggerAbilityFromGameplayEvent(
-// 			FGameplayAbilitySpecHandle (),
+// 			FGameplayAbilitySpecHandle(),
 // 			ASCPtr->AbilityActorInfo.Get(),
 // 			UGameplayTagsSubSystem::GetInstance()->Dash,
-// 			&Payload, 
+// 			&Payload,
 // 			*ASCPtr
-// 		);
-
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Dash, Payload);
+// 		);	
+		
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+			OnwerActorPtr, 
+			UGameplayTagsSubSystem::GetInstance()->Dash,
+			Payload
+		);
 	}
 }
 

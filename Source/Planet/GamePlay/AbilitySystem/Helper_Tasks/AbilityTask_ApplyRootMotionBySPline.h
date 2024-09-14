@@ -60,15 +60,20 @@ protected:
 	virtual void SharedInitAndApply() override;
 
 protected:
-
+	
+	UPROPERTY(Replicated)
 	float StartDistance = 0.f;
-
+	
+	UPROPERTY(Replicated)
 	float EndDistance = 0.f;
-
+	
+	UPROPERTY(Replicated)
 	float Duration = 1.f;
-
+	
+	UPROPERTY(Replicated)
 	ASPlineActor* SPlineActorPtr = nullptr;
-
+	
+	UPROPERTY(Replicated)
 	ACharacterBase* TargetCharacterPtr = nullptr;
 
 };

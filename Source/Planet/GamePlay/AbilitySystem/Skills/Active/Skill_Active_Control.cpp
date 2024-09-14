@@ -47,6 +47,18 @@ void USkill_Active_Control::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamPtr)
+		{
+		}
+		else
+		{
+			return;
+		}
+	}
 }
 
 void USkill_Active_Control::ActivateAbility(
@@ -189,6 +201,20 @@ void USkill_Active_Control::PlayMontage()
 
 		TaskPtr->ReadyForActivation();
 	}
+}
+
+UScriptStruct* FGameplayAbilityTargetData_Control::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Control::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Control::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << TargetCharacterPtr;
+
+	return true;
 }
 
 FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_Control::Clone() const

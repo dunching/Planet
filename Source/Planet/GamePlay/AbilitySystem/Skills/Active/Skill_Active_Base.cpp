@@ -23,8 +23,6 @@ void USkill_Active_Base::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
 	if (SkillUnitPtr)
 	{
 		DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->OffsetCooldownTime();
@@ -251,6 +249,20 @@ void USkill_Active_Base::PerformAction(
 )
 {
 
+}
+
+UScriptStruct* FGameplayAbilityTargetData_ActiveSkill::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_ActiveSkill::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_ActiveSkill::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << bIsAutoContinue;
+
+	return true;
 }
 
 FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_ActiveSkill::Clone() const

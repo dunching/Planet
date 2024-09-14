@@ -15,7 +15,7 @@ class AWeapon_Base;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_Skill_Weapon : 
-	public FGameplayAbilityTargetData_Skill
+	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -116,8 +116,10 @@ protected:
 
 	float WaitInputPercent = 1.f;
 
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
+
 	const ActiveParamType* ActiveParamPtr = nullptr;
 
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
+private:
 
 };

@@ -22,24 +22,19 @@ void USkill_WeaponActive_Base::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
+	WaitInputTaskPtr = nullptr;
+
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
 		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
 		if (ActiveParamPtr)
 		{
-			SkillUnitPtr = ActiveParamPtr->SkillUnitPtr;
 		}
 		else
 		{
 			return;
 		}
 	}
-
-	ResetPreviousStageActions();
-
-	WaitInputTaskPtr = nullptr;
 }
 
 void USkill_WeaponActive_Base::ActivateAbility(

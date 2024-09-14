@@ -166,3 +166,13 @@ void UAbilityTask_ApplyRootMotionBySPline::OnDestroy(bool AbilityIsEnding)
 	Super::OnDestroy(AbilityIsEnding);
 }
 
+void UAbilityTask_ApplyRootMotionBySPline::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, StartDistance);
+	DOREPLIFETIME(ThisClass, EndDistance);
+	DOREPLIFETIME(ThisClass, Duration);
+// 	DOREPLIFETIME(ThisClass, SPlineActorPtr);
+// 	DOREPLIFETIME(ThisClass, TargetCharacterPtr);
+}

@@ -423,7 +423,7 @@ void FWeaponProxy::Allocation()
 	auto ProxyCharacterPtr = GetProxyCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		FirstSkill->RegisterSkill();
+		FirstSkill->Allocation();
 	}
 #endif
 }
@@ -434,7 +434,7 @@ void FWeaponProxy::UnAllocation()
 	auto ProxyCharacterPtr = GetProxyCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		FirstSkill->UnRegisterSkill();
+		FirstSkill->UnAllocation();
 	}
 #endif
 }
@@ -475,70 +475,86 @@ TSubclassOf<USkill_Base> FSkillProxy::GetSkillClass() const
 	return nullptr;
 }
 
+void FSkillProxy::Allocation()
+{
+	RegisterSkill();
+}
+
+void FSkillProxy::UnAllocation()
+{
+	UnRegisterSkill();
+}
+
 bool FActiveSkillProxy::Active()
 {
-	// 	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
-	// 	if (!InGAInsPtr)
-	// 	{
-	// 		return false;
-	// 	}
-	// 
-	// 	auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
-	// 
-	// 	// 需要特殊参数的
-	// 	if (
-	// 		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
-	// 		)
-	// 	{
-	// 		if (InGAInsPtr->IsActive())
-	// 		{
-	// 			InGAInsPtr->ContinueActive();
-	// 			return true;
-	// 		}
-	// 		else
-	// 		{
-	// 			auto GameplayAbilityTargetPtr =
-	// 				new FGameplayAbilityTargetData_Control;
-	// 
-	// 			// Test
-	// 			GameplayAbilityTargetPtr->TargetCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
-	// 
-	// 			FGameplayEventData Payload;
-	// 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
-	// 
-	// 			return ASCPtr->TriggerAbilityFromGameplayEvent(
-	// 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
-	// 				ASCPtr->AbilityActorInfo.Get(),
-	// 				FGameplayTag(),
-	// 				&Payload,
-	// 				*ASCPtr
-	// 			);
-	// 		}
-	// 	}
-	// 	else
-	// 	{
-	// 		if (InGAInsPtr->IsActive())
-	// 		{
-	// 			InGAInsPtr->ContinueActive();
-	// 			return true;
-	// 		}
-	// 		else
-	// 		{
-	// 			auto GameplayAbilityTargetPtr =
-	// 				new FGameplayAbilityTargetData_ActiveSkill;
-	// 
-	// 			FGameplayEventData Payload;
-	// 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
-	// 
-	// 			return ASCPtr->TriggerAbilityFromGameplayEvent(
-	// 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
-	// 				ASCPtr->AbilityActorInfo.Get(),
-	// 				FGameplayTag(),
-	// 				&Payload,
-	// 				*ASCPtr
-	// 			);
-	// 		}
-	// 	}
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+	 	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
+	 	if (!InGAInsPtr)
+	 	{
+	 		return false;
+	 	}
+	 
+	 	auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
+	 
+	 	// 需要特殊参数的
+	 	if (
+	 		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
+	 		)
+	 	{
+	 		if (InGAInsPtr->IsActive())
+	 		{
+	 			InGAInsPtr->ContinueActive();
+	 			return true;
+	 		}
+	 		else
+	 		{
+	 			auto GameplayAbilityTargetPtr =
+	 				new FGameplayAbilityTargetData_Control;
+	 
+	 			// Test
+	 			GameplayAbilityTargetPtr->TargetCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+	 
+	 			FGameplayEventData Payload;
+	 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
+	 
+	 			return ASCPtr->TriggerAbilityFromGameplayEvent(
+	 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
+	 				ASCPtr->AbilityActorInfo.Get(),
+					GetUnitType(),
+	 				&Payload,
+	 				*ASCPtr
+	 			);
+	 		}
+	 	}
+	 	else
+	 	{
+	 		if (InGAInsPtr->IsActive())
+	 		{
+	 			InGAInsPtr->ContinueActive();
+	 			return true;
+	 		}
+	 		else
+	 		{
+	 			auto GameplayAbilityTargetPtr =
+	 				new FGameplayAbilityTargetData_ActiveSkill;
+	 
+	 			FGameplayEventData Payload;
+	 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
+	 
+	 			return ASCPtr->TriggerAbilityFromGameplayEvent(
+	 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
+	 				ASCPtr->AbilityActorInfo.Get(),
+					GetUnitType(),
+	 				&Payload,
+	 				*ASCPtr
+	 			);
+	 		}
+	 	}
+	}
+#endif
 
 	return true;
 }
@@ -578,7 +594,6 @@ bool FWeaponSkillProxy::Active()
 			)
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_Weapon;
-			GameplayAbilityTargetDashPtr->SkillUnitPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(GetThisSPtr());
 			GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
 			GameplayAbilityTargetDashPtr->bIsAutoContinue = true;
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
@@ -616,21 +631,26 @@ void FSkillProxy::RegisterSkill()
 	auto ProxyCharacterPtr = GetProxyCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
+		FGameplayAbilityTargetData_RegisterParam* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RegisterParam;
 
-		GameplayAbilityTargetDataPtr->SkillUnitPtr = DynamicCastSharedPtr<FSkillProxy>(GetThisSPtr());
+		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 
+		const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
 		FGameplayAbilitySpec GameplayAbilitySpec(
 			GetSkillClass(),
-			Level
+			Level,
+			InputID
 		);
 
-		GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
-		GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
-		GameplayAbilitySpec.GameplayEventData->EventTag = GetUnitType();
+		auto GameplayEventData = MakeShared<FGameplayEventData>();
+		GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
 
+		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+			InputID,
+			*GameplayEventData
+		);
 		GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 	}
 #endif

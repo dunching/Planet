@@ -31,8 +31,6 @@ public:
 
 	using FOwnerType = ACharacterBase;
 
-	using FPawnType = ACharacterBase;
-
 	using IDType = FGuid;
 
 	using FOnSkillUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FSkillProxy>&, bool)>;

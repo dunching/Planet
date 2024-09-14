@@ -15,6 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include <Engine/OverlapResult.h>
 #include <GameFramework/SpringArmComponent.h>
+#include "Net/UnrealNetwork.h"
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -40,8 +41,6 @@ USkill_Active_XYFH::USkill_Active_XYFH() :
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
-	bRetriggerInstancedAbility = true;
-
 	CurrentWaitInputTime = 1.f;
 }
 
@@ -57,12 +56,17 @@ void USkill_Active_XYFH::PreActivate(
 
 	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
 
-	if (!SPlineActorPtr)
+#if UE_EDITOR || UE_SERVER
+	//if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		SPlineActorPtr = GetWorld()->SpawnActor<ASPlineActor>(
-			SPlineActorClass, CharacterPtr->GetActorTransform()
-		);
+		if (!SPlineActorPtr)
+		{
+			SPlineActorPtr = GetWorld()->SpawnActor<ASPlineActor>(
+				SPlineActorClass, CharacterPtr->GetActorTransform()
+			);
+		}
 	}
+#endif
 
 	if (!CameraTrailHelperPtr)
 	{
@@ -101,11 +105,16 @@ void USkill_Active_XYFH::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (SPlineActorPtr)
+#if UE_EDITOR || UE_SERVER
+	//if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		SPlineActorPtr->Destroy();
-		SPlineActorPtr = nullptr;
+		if (SPlineActorPtr)
+		{
+			SPlineActorPtr->Destroy();
+			SPlineActorPtr = nullptr;
+		}
 	}
+#endif
 
 	if (CameraTrailHelperPtr)
 	{
@@ -118,7 +127,12 @@ void USkill_Active_XYFH::EndAbility(
 
 	TargetOffsetValue.ReStore();
 
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -224,6 +238,9 @@ void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, flo
 		{
 			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
 		}
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+
 		TaskPtr->ReadyForActivation();
 	}
 
@@ -261,6 +278,9 @@ void USkill_Active_XYFH::PlayMontage()
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
+
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}
@@ -319,4 +339,11 @@ UAnimMontage* USkill_Active_XYFH::GetCurrentMontage() const
 	}
 
 	return HumanMontage;
+}
+
+void USkill_Active_XYFH::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+//	DOREPLIFETIME(ThisClass, SPlineActorPtr);
 }

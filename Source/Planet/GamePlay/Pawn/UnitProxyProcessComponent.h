@@ -117,10 +117,17 @@ public:
 	FGameplayTag CurrentWeaponSocket;
 
 protected:
+
+	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
+
+	bool ActivedCorrespondingWeapon(const FSocket_FASI& Socket);
 	
 	UFUNCTION(Server, Reliable)
+	void ActivedCorrespondingWeapon_Server(const FSocket_FASI& Socket);
+
+	UFUNCTION(Server, Reliable)
 	void RegisterMultiGAs_Server(
-		const FSocket_FASI& SkillSocket
+		const FSocket_FASI& Socket
 	);
 	
 	UFUNCTION(Server, Reliable)
@@ -148,10 +155,6 @@ protected:
 		const FSocket_FASI& Socket
 	);
 
-	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
-
-	bool ActivedCorrespondingWeapon(const TSharedPtr<FActiveSkillProxy>& ActiveSkillUnitPtr);
-	
 	UFUNCTION()
 	void OnRep_AllocationChanged();
 

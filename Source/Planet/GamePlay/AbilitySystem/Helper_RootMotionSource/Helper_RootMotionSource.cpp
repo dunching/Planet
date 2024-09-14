@@ -80,7 +80,34 @@ bool FRootMotionSource_BySpline::Matches(const FRootMotionSource* Other) const
 
 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(Other);
 
-	return SPlineActorPtr == OtherCast->SPlineActorPtr;
+	return 
+		(StartPtIndex == OtherCast->StartPtIndex) &&
+		(EndPtIndex == OtherCast->EndPtIndex) &&
+		FMath::IsNearlyEqual(StartDistance, OtherCast->StartDistance) &&
+		FMath::IsNearlyEqual(EndDistance, OtherCast->EndDistance) ;
+}
+
+bool FRootMotionSource_BySpline::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
+	{
+		return false;
+	}
+
+	Ar << StartPtIndex; 
+	Ar << EndPtIndex;
+	Ar << StartDistance;
+	Ar << EndDistance;
+// 	Ar << SPlineActorPtr;
+// 	Ar << TargetCharacterPtr;
+
+	bOutSuccess = true;
+	return true;
+}
+
+UScriptStruct* FRootMotionSource_BySpline::GetScriptStruct() const
+{
+	return FRootMotionSource_BySpline::StaticStruct();
 }
 
 void FRootMotionSource_BySpline::PrepareRootMotion
