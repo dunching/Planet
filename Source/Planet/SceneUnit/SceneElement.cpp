@@ -26,6 +26,7 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "HoldingItemsComponent.h"
+#include "CDCaculatorComponent.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -466,6 +467,7 @@ bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
 	Ar << Level;
+	Ar << GameplayAbilitySpecHandle;
 
 	return true;
 }
@@ -506,7 +508,7 @@ bool FActiveSkillProxy::Active()
 	 	{
 	 		if (InGAInsPtr->IsActive())
 	 		{
-	 			InGAInsPtr->ContinueActive();
+	 			InGAInsPtr->SetContinuePerform(true);
 	 			return true;
 	 		}
 	 		else
@@ -533,7 +535,7 @@ bool FActiveSkillProxy::Active()
 	 	{
 	 		if (InGAInsPtr->IsActive())
 	 		{
-	 			InGAInsPtr->ContinueActive();
+	 			InGAInsPtr->SetContinuePerform(true);
 	 			return true;
 	 		}
 	 		else
@@ -852,56 +854,27 @@ int32 FCoinProxy::GetCurrentValue() const
 
 bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	auto MaxRemainingCooldown = -1.f;
-	auto MaxRemainingCooldownPercent = -1.f;
-
-	auto CurResult = true;
-	auto CurRemainingCooldown = -1.f;
-	auto CurRemainingCooldownPercent = -1.f;
-
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CDSPtr = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->GetCooldown(
 		this
 	);
 
-	for (auto Iter : CooldownMap)
+	if (CDSPtr)
 	{
-		if (Iter.Value.IsValid())
-		{
-			CurResult = Iter.Value.Pin()->GetRemainingCooldown(CurRemainingCooldown, CurRemainingCooldownPercent);
-			if (CurResult)
-			{
-				continue;
-			}
-
-			if (CurRemainingCooldown > MaxRemainingCooldown)
-			{
-				MaxRemainingCooldown = CurRemainingCooldown;
-				MaxRemainingCooldownPercent = CurRemainingCooldownPercent;
-			}
-		}
+		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 	}
 
-	RemainingCooldown = MaxRemainingCooldown;
-	RemainingCooldownPercent = MaxRemainingCooldownPercent;
-
-	return CurResult;
+	return true;
 }
 
 bool FActiveSkillProxy::CheckCooldown() const
 {
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CDSPtr = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->GetCooldown(
 		this
 	);
 
-	for (auto Iter : CooldownMap)
+	if (CDSPtr)
 	{
-		if (Iter.Value.IsValid())
-		{
-			if (!Iter.Value.Pin()->CheckCooldown())
-			{
-				return false;
-			}
-		}
+		return CDSPtr->CheckCooldown();
 	}
 
 	return true;
@@ -909,51 +882,21 @@ bool FActiveSkillProxy::CheckCooldown() const
 
 void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
 {
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
-		this
-	);
-
-	if (CooldownMap.Contains(GetUnitType()))
-	{
-		CooldownMap[GetUnitType()].Pin()->AddCooldownConsumeTime(NewTime);
-	}
 }
 
 void FActiveSkillProxy::FreshUniqueCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
-		this
-	);
-
-	// 获取当前技能CD
-	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
-	{
-		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
-	}
 }
 
 void FActiveSkillProxy::ApplyCooldown()
 {
-	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->ApplyCooldown(
 		this
 	);
 }
 
 void FActiveSkillProxy::OffsetCooldownTime()
 {
-	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyUniqueCooldown(
-		this
-	);
-
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
-		this
-	);
-
-	// 获取当前技能CD
-	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
-	{
-		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
-	}
 }
 
 void FWeaponProxy::ActiveWeapon()

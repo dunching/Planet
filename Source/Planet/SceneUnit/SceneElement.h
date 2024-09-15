@@ -64,9 +64,9 @@ public:
 
 	virtual void FreshUniqueCooldownTime() = 0;
 
-	virtual void ApplyCooldown() = 0;
-
 	virtual void OffsetCooldownTime() = 0;
+
+	virtual void ApplyCooldown() = 0;
 
 };
 

@@ -18,6 +18,14 @@ DECLARE_DELEGATE_TwoParams(TimerHelper_Tick_Delegate, UAbilityTask_TimerHelper*,
 
 DECLARE_DELEGATE_ThreeParams(TimerHelper_Interval_Tick_Delegate, UAbilityTask_TimerHelper*, float, float);
 
+UENUM()
+enum class ETaskTimerType : uint8
+{
+	kDuration,
+	kCount,
+	kInfinite,
+};
+
 UCLASS()
 class PLANET_API UAbilityTask_TimerHelper : public UAbilityTask
 {
@@ -52,29 +60,31 @@ public:
 
 protected:
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void Activate() override;
 
 	virtual void TickTask(float DeltaTime) override;
 
-	enum class EType
-	{
-		kDuration,
-		kCount,
-		kInfinite,
-	};
-
-	EType Type = EType::kInfinite;
-
+	UPROPERTY(Replicated)
+	ETaskTimerType Type = ETaskTimerType::kInfinite;
+	
+	UPROPERTY(Replicated)
 	float Duration = -1.f;
-
+	
+	UPROPERTY(Replicated)
 	float Duration_TotalTime = 0.f;
 	
+	UPROPERTY(Replicated)
 	float IntervalTime = -1.f;
-
+	
+	UPROPERTY(Replicated)
 	float CurrentIntervalTime = 0.f;
-
+	
+	UPROPERTY(Replicated)
 	int32 Count = 1;
-
+	
+	UPROPERTY(Replicated)
 	int32 CurrentCount = 0;
 
 };

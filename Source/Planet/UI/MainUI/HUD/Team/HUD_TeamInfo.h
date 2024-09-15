@@ -7,7 +7,7 @@
 #include "MyUserWidget.h"
 
 #include "UIInterfaces.h"
-#include "GroupsManaggerSubSystem.h"
+
 
 #include "HUD_TeamInfo.generated.h"
 

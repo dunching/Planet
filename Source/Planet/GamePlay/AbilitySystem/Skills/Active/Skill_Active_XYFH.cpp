@@ -56,8 +56,8 @@ void USkill_Active_XYFH::PreActivate(
 
 	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
 
-#if UE_EDITOR || UE_SERVER
-	//if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+//#if UE_EDITOR || UE_SERVER
+//	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (!SPlineActorPtr)
 		{
@@ -65,15 +65,15 @@ void USkill_Active_XYFH::PreActivate(
 				SPlineActorClass, CharacterPtr->GetActorTransform()
 			);
 		}
-	}
-#endif
 
-	if (!CameraTrailHelperPtr)
-	{
-		CameraTrailHelperPtr = GetWorld()->SpawnActor<ACameraTrailHelper>(
-			CameraTrailHelperClass, CharacterPtr->GetActorTransform()
-		);
+		if (!CameraTrailHelperPtr)
+		{
+			CameraTrailHelperPtr = GetWorld()->SpawnActor<ACameraTrailHelper>(
+				CameraTrailHelperClass, CharacterPtr->GetActorTransform()
+			);
+		}
 	}
+//#endif
 }
 
 void USkill_Active_XYFH::ActivateAbility(
@@ -105,22 +105,22 @@ void USkill_Active_XYFH::EndAbility(
 	bool bWasCancelled
 )
 {
-#if UE_EDITOR || UE_SERVER
-	//if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+//#if UE_EDITOR || UE_SERVER
+//	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (SPlineActorPtr)
 		{
 			SPlineActorPtr->Destroy();
 			SPlineActorPtr = nullptr;
 		}
-	}
-#endif
 
-	if (CameraTrailHelperPtr)
-	{
-		CameraTrailHelperPtr->Destroy();
-		CameraTrailHelperPtr = nullptr;
+		if (CameraTrailHelperPtr)
+		{
+			CameraTrailHelperPtr->Destroy();
+			CameraTrailHelperPtr = nullptr;
+		}
 	}
+//#endif
 
 	StepIndex = 0;
 	SubStepIndex = 0;
@@ -150,16 +150,16 @@ void USkill_Active_XYFH::PerformAction(
 		{
 		case 0:
 		{
-			const auto StartDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
-			const auto EndDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
-
 			PlayMontage();
 
 			auto HumanMontage = GetCurrentMontage();
 
 			const auto Duration = HumanMontage->CalculateSequenceLength();
+
+			const auto StartDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+			const auto EndDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
 
 			ExcuteTasks(StartDistance, EndDistance, Duration, false);
 		}
@@ -168,18 +168,18 @@ void USkill_Active_XYFH::PerformAction(
 		case 2:
 		case 3:
 		{
-			const auto StartDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
-			const auto EndDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
-
-			const auto Offset = (EndDistance - StartDistance) * 0.8f;
-
 			switch (SubStepIndex)
 			{
 			case 0:
 			{
 				CharacterPtr->GetMesh()->SetHiddenInGame(true);
+
+				const auto StartDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+				const auto EndDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
+
+				const auto Offset = (EndDistance - StartDistance) * 0.8f;
 
 				ExcuteTasks(StartDistance, StartDistance + Offset, SubStepMoveDuration, true);
 			}
@@ -191,6 +191,13 @@ void USkill_Active_XYFH::PerformAction(
 				auto HumanMontage = GetCurrentMontage();
 
 				const auto Duration = HumanMontage->CalculateSequenceLength();
+
+				const auto StartDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+				const auto EndDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
+
+				const auto Offset = (EndDistance - StartDistance) * 0.8f;
 
 				ExcuteTasks(StartDistance + Offset, EndDistance, Duration, false);
 			}
@@ -207,7 +214,12 @@ void USkill_Active_XYFH::PerformAction(
 	}
 }
 
-void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, float Duration, bool bIsSubMoveStep)
+void USkill_Active_XYFH::ExcuteTasks(
+	float StartDistance,
+	float EndDistance,
+	float Duration,
+	bool bIsSubMoveStep
+)
 {
 	if (bIsSubMoveStep)
 	{
@@ -220,47 +232,35 @@ void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, flo
 	}
 
 	// 角色移动
+	auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
+		this,
+		TEXT(""),
+		Duration,
+		SPlineActorPtr,
+		CharacterPtr,
+		StartDistance,
+		EndDistance
+	);
+	if (bIsSubMoveStep)
 	{
-		auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
-			this,
-			TEXT(""),
-			Duration,
-			SPlineActorPtr,
-			CharacterPtr,
-			StartDistance,
-			EndDistance
-		);
-		if (bIsSubMoveStep)
-		{
-			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnSubMoveStepComplete);
-		}
-		else
-		{
-			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
-		}
-		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-
-		TaskPtr->ReadyForActivation();
+		TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnSubMoveStepComplete);
 	}
-
-	// 镜头控制
+	else
 	{
-		auto TaskPtr = UAbilityTask_ControlCameraBySpline::NewTask(
-			this,
-			TEXT(""),
-			Duration,
-			CameraTrailHelperPtr,
-			CharacterPtr,
-			StartDistance,
-			EndDistance
-		);
-//		TaskPtr->ReadyForActivation();
+		TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
 	}
+	TaskPtr->Ability = this;
+	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+
+	TaskPtr->ReadyForActivation();
 }
 
 void USkill_Active_XYFH::PlayMontage()
 {
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
 		const float InPlayRate = 1.f;
 
@@ -292,11 +292,16 @@ void USkill_Active_XYFH::OnPlayMontageEnd()
 
 void USkill_Active_XYFH::OnMoveStepComplete()
 {
-	if (StepIndex >= MaxIndex)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		K2_CancelAbility();
-		return;
+		if (StepIndex >= MaxIndex)
+		{
+			K2_CancelAbility();
+			return;
+		}
 	}
+#endif
 
 	CheckInContinue();
 }
@@ -344,6 +349,4 @@ UAnimMontage* USkill_Active_XYFH::GetCurrentMontage() const
 void USkill_Active_XYFH::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-//	DOREPLIFETIME(ThisClass, SPlineActorPtr);
 }

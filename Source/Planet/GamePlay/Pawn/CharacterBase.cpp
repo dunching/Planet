@@ -33,8 +33,8 @@
 #include "GameplayTagsSubSystem.h"
 #include "StateProcessorComponent.h"
 #include "BaseFeatureGAComponent.h"
-
 #include "UnitProxyProcessComponent.h"
+#include "CDCaculatorComponent.h"
 
 #include "CharacterTitle.h"
 #include "UICommon.h"
@@ -65,6 +65,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UBaseFeatureGAComponent>(UBaseFeatureGAComponent::ComponentName);
 	InteractiveSkillComponentPtr = CreateDefaultSubobject<UUnitProxyProcessComponent>(UUnitProxyProcessComponent::ComponentName);
+	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -177,6 +178,8 @@ void ACharacterBase::PostInitializeComponents()
 
 		InteractiveSkillComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
 		InteractiveSkillComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = InteractiveSkillComponentPtr;
+
+		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
 	}
 }
 
@@ -272,6 +275,11 @@ UUnitProxyProcessComponent* ACharacterBase::GetInteractiveSkillComponent()const
 UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 {
 	return GroupMnaggerComponentPtr;
+}
+
+UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
+{
+	return CDCaculatorComponentPtr;
 }
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const

@@ -170,9 +170,9 @@ void UAbilityTask_ApplyRootMotionBySPline::GetLifetimeReplicatedProps(TArray< FL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, StartDistance);
-	DOREPLIFETIME(ThisClass, EndDistance);
-	DOREPLIFETIME(ThisClass, Duration);
+// 	DOREPLIFETIME(ThisClass, StartDistance);
+// 	DOREPLIFETIME(ThisClass, EndDistance);
+// 	DOREPLIFETIME(ThisClass, Duration);
 // 	DOREPLIFETIME(ThisClass, SPlineActorPtr);
 // 	DOREPLIFETIME(ThisClass, TargetCharacterPtr);
 }

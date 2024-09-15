@@ -101,13 +101,13 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	)override;
+
+	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
 	virtual void Tick(float DeltaTime);
 
 	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
-
-	void ContinueActive();
 
 	// 确认是否有锁定的目标
 	ACharacterBase* HasFocusActor()const;
@@ -120,6 +120,8 @@ public:
 
 protected:
 
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -127,11 +129,13 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
+	void ContinueActive();
+
 	void CheckInContinue();
 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
-
+	
 	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
 
 	bool bIsPreviouInput = false;

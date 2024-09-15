@@ -100,6 +100,7 @@ struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowUnit_Ski
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSet<FGameplayTag>SkillCommonCooldownInfoMap;
 
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<int32, int32>SkillCooldownInfoMap;
 

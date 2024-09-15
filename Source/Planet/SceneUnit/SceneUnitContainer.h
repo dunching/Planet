@@ -105,13 +105,13 @@ struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
 
 	 void PostReplicatedChange(const TArrayView<int32>& ChangedIndices, int32 FinalSize);
 
-	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
-
 	void AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	void UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	void RemoveItem(const FItemType& Item);
+
+	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
 protected:
 

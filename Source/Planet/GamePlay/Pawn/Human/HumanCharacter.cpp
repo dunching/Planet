@@ -44,7 +44,7 @@
 #include "GroupMnaggerComponent.h"
 #include "SceneElement.h"
 #include "GetItemInfos.h"
-#include "GroupsManaggerSubSystem.h"
+
 #include "SceneUnitContainer.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :

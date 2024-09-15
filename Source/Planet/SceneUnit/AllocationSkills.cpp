@@ -27,11 +27,11 @@ void FAllocation_FASI_Container::AddItem(const TSharedPtr<FItemType>& ProxySPtr)
 	{
 		if (ProxySPtr)
 		{
-			FItemType Proxy_FASI;
+			FItemType Item;
 
-			Proxy_FASI = *ProxySPtr;
+			Item = *ProxySPtr;
 
-			auto& Ref = Items.Add_GetRef(Proxy_FASI);
+			auto& Ref = Items.Add_GetRef(Item);
 
 			MarkItemDirty(Ref);
 		}

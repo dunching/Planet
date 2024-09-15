@@ -40,6 +40,7 @@ class UBaseFeatureGAComponent;
 class UInteractiveConsumablesComponent;
 class UUnitProxyProcessComponent;
 class UInteractiveToolComponent;
+class UCDCaculatorComponent;
 
 UCLASS()
 class PLANET_API ACharacterBase : 
@@ -95,6 +96,8 @@ public:
 	UUnitProxyProcessComponent* GetInteractiveSkillComponent()const;
 
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
+	
+	UCDCaculatorComponent* GetCDCaculatorComponent()const;
 
 	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
 	
@@ -169,6 +172,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UUnitProxyProcessComponent> InteractiveSkillComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFightingTips>FightingTipsClass;

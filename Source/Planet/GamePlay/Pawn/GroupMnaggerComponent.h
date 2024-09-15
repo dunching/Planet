@@ -5,15 +5,17 @@
 #include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
 
-#include "GroupsManaggerSubSystem.h"
+#include "GenerateType.h"
 
 #include "GroupMnaggerComponent.generated.h"
 
 class AHumanCharacter;
+class ACharacterBase;
 class IPlanetControllerInterface;
 struct FSkillProxy;
 struct FActiveSkillProxy;
 struct FConsumableProxy;
+struct FCharacterProxy;
 
 struct FSkillCooldownHelper
 {
@@ -37,13 +39,20 @@ struct FSkillCooldownHelper
 
 	void SetCooldown(float CooldDown);
 
-private:
+	// 独立的CD
+	FGuid SkillProxy_ID;
+
+	// 类型的CD
+	FGameplayTag SkillType;
 
 	// 
 	int32 CooldownTime = -1;
 
 	// 
 	float CooldownConsumeTime = 0.f;
+
+private:
+
 };
 
 class PLANET_API FGroupMatesHelper

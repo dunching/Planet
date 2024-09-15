@@ -267,6 +267,10 @@ void UBasicFutures_Dash::DoDash(
 
 void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
+	if (
+	 (CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+	 (CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy) 
+	)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
@@ -285,6 +289,10 @@ void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 
 void UBasicFutures_Dash::Displacement(const FVector& Direction)
 {
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
 		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
 			this,

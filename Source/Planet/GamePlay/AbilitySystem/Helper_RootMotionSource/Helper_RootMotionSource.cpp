@@ -80,11 +80,13 @@ bool FRootMotionSource_BySpline::Matches(const FRootMotionSource* Other) const
 
 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(Other);
 
-	return 
-		(StartPtIndex == OtherCast->StartPtIndex) &&
-		(EndPtIndex == OtherCast->EndPtIndex) &&
-		FMath::IsNearlyEqual(StartDistance, OtherCast->StartDistance) &&
-		FMath::IsNearlyEqual(EndDistance, OtherCast->EndDistance) ;
+	return true;
+// 		(StartPtIndex == OtherCast->StartPtIndex) &&
+// 		(EndPtIndex == OtherCast->EndPtIndex) &&
+// 		(SPlineActorPtr == OtherCast->SPlineActorPtr) &&
+// 		(TargetCharacterPtr == OtherCast->TargetCharacterPtr) &&
+// 		FMath::IsNearlyEqual(StartDistance, OtherCast->StartDistance) &&
+// 		FMath::IsNearlyEqual(EndDistance, OtherCast->EndDistance) ;
 }
 
 bool FRootMotionSource_BySpline::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
@@ -94,20 +96,42 @@ bool FRootMotionSource_BySpline::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		return false;
 	}
 
-	Ar << StartPtIndex; 
-	Ar << EndPtIndex;
-	Ar << StartDistance;
-	Ar << EndDistance;
+// 	Ar << StartPtIndex; 
+// 	Ar << EndPtIndex;
+// 	Ar << StartDistance;
+// 	Ar << EndDistance;
 // 	Ar << SPlineActorPtr;
 // 	Ar << TargetCharacterPtr;
-
-	bOutSuccess = true;
+// 
+// 	bOutSuccess = true;
 	return true;
 }
 
 UScriptStruct* FRootMotionSource_BySpline::GetScriptStruct() const
 {
 	return FRootMotionSource_BySpline::StaticStruct();
+}
+
+bool FRootMotionSource_BySpline::UpdateStateFrom(
+	const FRootMotionSource* SourceToTakeStateFrom,
+	bool bMarkForSimulatedCatchup /*= false*/
+)
+{
+	if (!FRootMotionSource::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
+	{
+		return false;
+	}
+
+// 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(SourceToTakeStateFrom);
+// 
+// 	StartPtIndex = OtherCast->StartPtIndex;
+// 	EndPtIndex = OtherCast->EndPtIndex;
+// 	StartDistance = OtherCast->StartDistance;
+// 	StartPtIndex = OtherCast->StartPtIndex;
+// 	SPlineActorPtr = OtherCast->SPlineActorPtr;
+// 	TargetCharacterPtr = OtherCast->TargetCharacterPtr;
+
+	return true;
 }
 
 void FRootMotionSource_BySpline::PrepareRootMotion

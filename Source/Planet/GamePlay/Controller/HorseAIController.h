@@ -9,7 +9,7 @@
 #include "GravityAIController.h"
 #include "GenerateType.h"
 #include "PlanetAIController.h"
-#include "GroupsManaggerSubSystem.h"
+
 #include "GroupMnaggerComponent.h"
 
 #include "HorseAIController.generated.h"

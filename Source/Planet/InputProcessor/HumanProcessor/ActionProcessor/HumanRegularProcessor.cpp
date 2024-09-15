@@ -60,7 +60,7 @@
 #include "HumanViewTalentAllocation.h"
 #include "HumanViewGroupManagger.h"
 #include "GroupMnaggerComponent.h"
-#include "GroupsManaggerSubSystem.h"
+
 #include "GameplayTagsSubSystem.h"
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"

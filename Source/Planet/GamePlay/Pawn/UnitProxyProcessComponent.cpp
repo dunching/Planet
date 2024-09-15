@@ -47,8 +47,6 @@ UUnitProxyProcessComponent::UUnitProxyProcessComponent(const FObjectInitializer&
 	Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
-
-	AllocationSkills_Container.UnitProxyProcessComponentPtr = this;
 }
 
 void UUnitProxyProcessComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)

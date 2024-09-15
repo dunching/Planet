@@ -101,6 +101,8 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
+	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+
 	virtual void PrepareRootMotion(
 		float SimulationTime,
 		float MovementTickTime,

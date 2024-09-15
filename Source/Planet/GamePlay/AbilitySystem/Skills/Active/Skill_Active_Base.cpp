@@ -1,6 +1,8 @@
 
 #include "Skill_Active_Base.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "SceneElement.h"
 #include "CharacterBase.h"
 #include "UnitProxyProcessComponent.h"
@@ -116,6 +118,11 @@ void USkill_Active_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+void USkill_Active_Base::SetContinuePerformImp(bool bIsContinue)
+{
+	ContinueActive();
+}
+
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const
 {
 	if (WaitInputTaskPtr)
@@ -143,7 +150,7 @@ void USkill_Active_Base::CheckInContinue()
 
 		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 		WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
-		WaitInputTaskPtr->DurationDelegate.BindUObject(this , &ThisClass::WaitInputTick);
+		WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
 		WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
 			return true;
@@ -239,6 +246,11 @@ void USkill_Active_Base::WaitInputTick(UAbilityTask_TimerHelper*, float Interval
 
 void USkill_Active_Base::Tick(float DeltaTime)
 {
+}
+
+void USkill_Active_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
 
 void USkill_Active_Base::PerformAction(

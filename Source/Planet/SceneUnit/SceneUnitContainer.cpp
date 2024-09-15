@@ -53,11 +53,11 @@ void FProxy_FASI_Container::AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 	{
 		if (ProxySPtr)
 		{
-			FProxy_FASI Proxy_FASI;
+			FItemType Item;
 
-			Proxy_FASI.ProxySPtr = ProxySPtr;
+			Item.ProxySPtr = ProxySPtr;
 
-			auto& Ref = Items.Add_GetRef(Proxy_FASI);
+			auto& Ref = Items.Add_GetRef(Item);
 
 			MarkItemDirty(Ref);
 		}
@@ -89,11 +89,11 @@ void FProxy_FASI_Container::UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 
 void FProxy_FASI_Container::RemoveItem(const FItemType& Item)
 {
-	for (int32 Idx = 0; Idx < Items.Num(); ++Idx)
+	for (int32 Index = 0; Index < Items.Num(); ++Index)
 	{
-		if (Items[Idx] == Item)
+		if (Items[Index] == Item)
 		{
-			Items.RemoveAt(Idx);
+			Items.RemoveAt(Index);
 
 			MarkArrayDirty();
 			return;

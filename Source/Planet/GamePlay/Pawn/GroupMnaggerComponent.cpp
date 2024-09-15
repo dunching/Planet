@@ -4,7 +4,7 @@
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "GroupsManaggerSubSystem.h"
+
 #include "CharacterBase.h"
 #include "HumanCharacter.h"
 #include "CharacterTitle.h"

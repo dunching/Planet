@@ -7,7 +7,7 @@
 #include "MyUserWidget.h"
 
 #include "UIInterfaces.h"
-#include "GroupsManaggerSubSystem.h"
+
 
 #include "GetItemInfos.generated.h"
 
