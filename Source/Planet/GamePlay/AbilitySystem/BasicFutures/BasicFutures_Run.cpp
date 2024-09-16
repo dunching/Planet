@@ -73,7 +73,7 @@ void UBasicFutures_Run::ActivateAbility(
 
 			ModifyPropertyMap.Add(
 				ECharacterPropertyType::MoveSpeed,
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->RunningSpeedOffset.GetCurrentValue()
+				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().RunningSpeedOffset.GetCurrentValue()
 			);
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
@@ -121,9 +121,9 @@ bool UBasicFutures_Run::CanActivateAbility(
 	{
 		if (CharacterPtr->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
 		{
-			auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			if (CharacterAttributesSPtr->PP.GetCurrentValue() >=
-				CharacterAttributesSPtr->RunningConsume.GetCurrentValue())
+			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			if (CharacterAttributes.PP.GetCurrentValue() >=
+				CharacterAttributes.RunningConsume.GetCurrentValue())
 			{
 				return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 			}

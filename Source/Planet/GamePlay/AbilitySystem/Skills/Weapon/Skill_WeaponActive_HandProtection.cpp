@@ -279,7 +279,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 
 void USkill_WeaponActive_HandProtection::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{

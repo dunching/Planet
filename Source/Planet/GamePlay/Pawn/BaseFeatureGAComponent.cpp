@@ -525,15 +525,15 @@ void UBaseFeatureGAComponent::AddSendWuXingModify()
 			{
 				if (Iter.ElementSet.IsEmpty())
 				{
-					auto CharacterAttributesSPtr =
+					auto CharacterAttributes =
 						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 					std::map<int32, EWuXingType, std::greater<int>> ElementMap;
-					ElementMap.emplace(CharacterAttributesSPtr->GoldElement.GetCurrentValue(), EWuXingType::kGold);
-					ElementMap.emplace(CharacterAttributesSPtr->WoodElement.GetCurrentValue(), EWuXingType::kWood);
-					ElementMap.emplace(CharacterAttributesSPtr->WaterElement.GetCurrentValue(), EWuXingType::kWater);
-					ElementMap.emplace(CharacterAttributesSPtr->FireElement.GetCurrentValue(), EWuXingType::kFire);
-					ElementMap.emplace(CharacterAttributesSPtr->SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+					ElementMap.emplace(CharacterAttributes.GoldElement.GetCurrentValue(), EWuXingType::kGold);
+					ElementMap.emplace(CharacterAttributes.WoodElement.GetCurrentValue(), EWuXingType::kWood);
+					ElementMap.emplace(CharacterAttributes.WaterElement.GetCurrentValue(), EWuXingType::kWater);
+					ElementMap.emplace(CharacterAttributes.FireElement.GetCurrentValue(), EWuXingType::kFire);
+					ElementMap.emplace(CharacterAttributes.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
 
 					if (ElementMap.begin()->first > 0)
 					{
@@ -573,15 +573,15 @@ void UBaseFeatureGAComponent::AddReceivedWuXingModify()
 			auto& DataRef = GameplayAbilityTargetData_GAEvent.Data;
 			if (DataRef.ElementSet.IsEmpty() && DataRef.TargetCharacterPtr.IsValid())
 			{
-				auto CharacterAttributesSPtr =
+				auto CharacterAttributes =
 					DataRef.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
-				ElementMap.emplace(CharacterAttributesSPtr->GoldElement.GetCurrentValue(), EWuXingType::kGold);
-				ElementMap.emplace(CharacterAttributesSPtr->WoodElement.GetCurrentValue(), EWuXingType::kWood);
-				ElementMap.emplace(CharacterAttributesSPtr->WaterElement.GetCurrentValue(), EWuXingType::kWater);
-				ElementMap.emplace(CharacterAttributesSPtr->FireElement.GetCurrentValue(), EWuXingType::kFire);
-				ElementMap.emplace(CharacterAttributesSPtr->SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+				ElementMap.emplace(CharacterAttributes.GoldElement.GetCurrentValue(), EWuXingType::kGold);
+				ElementMap.emplace(CharacterAttributes.WoodElement.GetCurrentValue(), EWuXingType::kWood);
+				ElementMap.emplace(CharacterAttributes.WaterElement.GetCurrentValue(), EWuXingType::kWater);
+				ElementMap.emplace(CharacterAttributes.FireElement.GetCurrentValue(), EWuXingType::kFire);
+				ElementMap.emplace(CharacterAttributes.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
 
 				const auto Effective_Rate = Caculation_Effective_Rate(ElementMap.begin()->first, 0);
 
@@ -589,7 +589,7 @@ void UBaseFeatureGAComponent::AddReceivedWuXingModify()
 			}
 			else
 			{
-				auto CharacterAttributesSPtr =
+				auto CharacterAttributes =
 					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				for (auto& ElementIter : DataRef.ElementSet)
@@ -599,31 +599,31 @@ void UBaseFeatureGAComponent::AddReceivedWuXingModify()
 					{
 					case EWuXingType::kGold:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->FireElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.FireElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kWood:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->GoldElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.GoldElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kWater:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->SoilElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.SoilElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kFire:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->WaterElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.WaterElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
 					case EWuXingType::kSoil:
 					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributesSPtr->WoodElement.GetCurrentValue(), ElementIter.Get<1>());
+						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.WoodElement.GetCurrentValue(), ElementIter.Get<1>());
 						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
 					}
 					break;
@@ -657,8 +657,8 @@ void UBaseFeatureGAComponent::AddReceivedModify()
 					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				{
-					const auto Rate = (TargetCharacterAttributesSPtr->HitRate.GetCurrentValue() - TargetCharacterAttributesSPtr->Evade.GetCurrentValue()) /
-						static_cast<float>(TargetCharacterAttributesSPtr->HitRate.GetMaxValue());
+					const auto Rate = (TargetCharacterAttributesSPtr.HitRate.GetCurrentValue() - TargetCharacterAttributesSPtr.Evade.GetCurrentValue()) /
+						static_cast<float>(TargetCharacterAttributesSPtr.HitRate.GetMaxValue());
 
 					GameplayAbilityTargetData_GAEvent.Data.HitRate = FMath::FRand() <= Rate ? 100 : 0;
 				}

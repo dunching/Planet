@@ -71,7 +71,7 @@ FGameplayAbilityTargetData_GASendEvent::FGameplayAbilityTargetData_GASendEvent()
 IGAEventModifyInterface::IGAEventModifyInterface(int32 InPriority) :
 	Priority(InPriority)
 {
-
+	ID = FMath::Rand32();
 }
 
 bool IGAEventModifyInterface::operator<(const IGAEventModifyInterface& RightValue)const
@@ -111,7 +111,7 @@ void FGAEventData::SetBaseDamage(int32 Value)
 void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 {
 	const auto CharacterAttributesComponentPtr = TriggerCharacterPtr->GetCharacterAttributesComponent();
-	 auto CharacterAttributesSPtr =
+	 auto & CharacterAttributes =
 		CharacterAttributesComponentPtr->GetCharacterAttributes();
 
 	int32 Level = 0;
@@ -119,27 +119,27 @@ void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 	{
 	case EWuXingType::kGold:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWood:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWater:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kFire:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kSoil:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	}

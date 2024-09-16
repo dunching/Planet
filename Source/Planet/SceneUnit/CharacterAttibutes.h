@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include <set>
+
 #include "CoreMinimal.h"
 
 #include "GenerateType.h"
@@ -12,26 +14,55 @@
 
 class FTalent_Base;
 
-#pragma region CharacterAttributesSPtr
+#pragma region CharacterAttributes
 
 struct FCharacterAttributes;
 
+struct FPropertySettlementModify
+{
+	FPropertySettlementModify(int32 InPriority = 1);
+
+	virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const;
+
+	// 仅使用优先级最高的
+	// 越大的越先算
+	int32 Priority = -1;
+
+	int32 ID = -1;
+
+private:
+
+};
+
+struct FPropertySettlementModify_Compare
+{
+	bool operator()(
+		const TSharedPtr<FPropertySettlementModify>& lhs, 
+		const TSharedPtr<FPropertySettlementModify>& rhs
+		) const
+	{
+		return lhs->Priority > rhs->Priority;
+	}
+};
+
 USTRUCT(BlueprintType)
-struct PLANET_API FBasePropertySet 
+struct PLANET_API FBasePropertySet
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	void AddCurrentValue(int32 NewValue, const FGameplayTag&DataSource);
+	FBasePropertySet();
+
+	void AddCurrentValue(int32 NewValue, const FGameplayTag& DataSource);
 
 	void RemoveCurrentValue(const FGameplayTag& DataSource);
 
 	void SetCurrentValue(int32 NewValue, const FGameplayTag& DataSource);
 
 	int32 GetCurrentValue()const;
-	
-	const FBaseProperty & GetCurrentProperty()const;
+
+	const FBaseProperty& GetCurrentProperty()const;
 
 	int32 GetMaxValue()const;
 
@@ -50,6 +81,10 @@ public:
 	{
 		return MaxValue.CallbackContainerHelper.AddOnValueChanged(Func);
 	}
+
+	int32 AddSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify);
+
+	void RemoveSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify);
 
 protected:
 
@@ -71,8 +106,10 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty MaxValue;
-	
+
 	TMap<FGameplayTag, int32>ValueMap;
+
+	std::multiset<TSharedPtr<FPropertySettlementModify>, FPropertySettlementModify_Compare>PropertySettlementModifySet;
 
 };
 
@@ -87,9 +124,15 @@ struct PLANET_API FCharacterAttributes final
 
 	virtual ~FCharacterAttributes();
 
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	void InitialData();
 
 	void ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
+
+	bool Identical(const FCharacterAttributes* Other, uint32 PortFlags) const;
+
+	bool operator==(const FCharacterAttributes& RightValue) const;
 
 	const FBasePropertySet& GetHPReply()const;
 
@@ -120,7 +163,7 @@ struct PLANET_API FCharacterAttributes final
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet TianZi;
 #pragma endregion
-	
+
 	// 五行、天赋属性
 #pragma region 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -205,11 +248,28 @@ struct PLANET_API FCharacterAttributes final
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet RunningConsume;
+
+private:
+
+	bool bIsNotChanged = true;
+
+};
+
+template<>
+struct TStructOpsTypeTraits< FCharacterAttributes > :
+	public TStructOpsTypeTraitsBase2< FCharacterAttributes >
+{
+	enum
+	{
+		WithNetSerializer = true,
+//		WithIdenticalViaEquality = true,
+		WithIdentical = true,
+	};
 };
 
 struct PLANET_API FScopeCharacterAttributes
 {
-	FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributesSPtr);
+	FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes);
 };
 
-#pragma endregion CharacterAttributesSPtr
+#pragma endregion CharacterAttributes

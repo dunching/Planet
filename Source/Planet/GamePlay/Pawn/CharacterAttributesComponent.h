@@ -33,14 +33,19 @@ public:
 
 	static FName ComponentName;
 
-	TSharedPtr<FCharacterAttributes> GetCharacterAttributes()const;
+	const FCharacterAttributes& GetCharacterAttributes()const;
+
+	FCharacterAttributes& GetCharacterAttributes();
 
 	// 基础状态回复
 	void ProcessCharacterAttributes();
 
-	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr;
+	UPROPERTY(Replicated)
+	FCharacterAttributes CharacterAttributes;
 
 protected:
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void BeginPlay()override;
 
@@ -49,13 +54,6 @@ protected:
 		enum ELevelTick TickType,
 		FActorComponentTickFunction* ThisTickFunction
 	)override;
-
-	// 将Client需要（显示）的数据从Server上同步过去
-	UFUNCTION(Client, Reliable)
-	void OnPropertyChanged(
-		ECharacterPropertyType CharacterPropertyType,
-		int32 CurrentValue
-	);
 
 private:
 

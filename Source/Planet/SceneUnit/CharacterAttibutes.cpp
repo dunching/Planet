@@ -14,6 +14,11 @@ static TAutoConsoleVariable<int32> DebugPrintCAB(
 	TEXT("")
 	TEXT(" default: 0"));
 
+FBasePropertySet::FBasePropertySet()
+{
+	PropertySettlementModifySet.emplace(MakeShared<FPropertySettlementModify>());
+}
+
 void FBasePropertySet::AddCurrentValue(int32 NewValue, const FGameplayTag& DataSource)
 {
 	if (ValueMap.Contains(DataSource))
@@ -66,18 +71,32 @@ const FBaseProperty& FBasePropertySet::GetMaxProperty()const
 
 void FBasePropertySet::Update()
 {
-	int32 TatolValue = 0;
-	for (const auto& Iter : ValueMap)
+	for (const auto& Iter : PropertySettlementModifySet)
 	{
-		TatolValue += Iter.Value;
+		CurrentValue.SetCurrentValue(FMath::Clamp(Iter->SettlementModify(ValueMap), MinValue.GetCurrentValue(), MaxValue.GetCurrentValue()));
+		return;
 	}
-
-	CurrentValue.SetCurrentValue(FMath::Clamp(TatolValue, MinValue.GetCurrentValue(), MaxValue.GetCurrentValue()));
 }
 
 const FBaseProperty& FBasePropertySet::GetMinProperty()const
 {
 	return MinValue;
+}
+
+int32 FBasePropertySet::AddSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify)
+{
+	PropertySettlementModifySet.emplace(PropertySettlementModify);
+
+	Update();
+
+	return PropertySettlementModify->ID;
+}
+
+void FBasePropertySet::RemoveSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify)
+{
+	PropertySettlementModifySet.erase(PropertySettlementModify);
+
+	Update();
 }
 
 FBaseProperty& FBasePropertySet::GetMaxProperty()
@@ -93,6 +112,62 @@ FCharacterAttributes::FCharacterAttributes()
 FCharacterAttributes::~FCharacterAttributes()
 {
 
+}
+
+bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	if (Ar.IsSaving())
+	{
+		Ar << Name;
+		Ar << Level;
+
+		Ar << LiDao.CurrentValue.CurrentValue;
+		Ar << GenGu.CurrentValue.CurrentValue;
+		Ar << ShenFa.CurrentValue.CurrentValue;
+		Ar << DongCha.CurrentValue.CurrentValue;
+		Ar << TianZi.CurrentValue.CurrentValue;
+
+		Ar << HP.CurrentValue.CurrentValue;
+		Ar << PP.CurrentValue.CurrentValue;
+
+		Ar << BaseAttackPower.CurrentValue.CurrentValue;
+		Ar << Penetration.CurrentValue.CurrentValue;
+		Ar << GAPerformSpeed.CurrentValue.CurrentValue;
+		Ar << MoveSpeed.CurrentValue.CurrentValue;
+
+	}
+	else if (Ar.IsLoading())
+	{
+		auto Lambda = [&](FBaseProperty& Value)
+			{
+				int32 TempValue;
+				Ar << TempValue;
+				if (TempValue != Value.CurrentValue)
+				{
+					Value.SetCurrentValue(TempValue);
+				}
+			};
+
+		Ar << Name;
+		Ar << Level;
+		Lambda(LiDao.CurrentValue);
+		Lambda(GenGu.CurrentValue);
+		Lambda(ShenFa.CurrentValue);
+		Lambda(DongCha.CurrentValue);
+		Lambda(TianZi.CurrentValue);
+
+		Lambda(HP.CurrentValue);
+		Lambda(PP.CurrentValue);
+
+		Lambda(BaseAttackPower.CurrentValue);
+		Lambda(Penetration.CurrentValue);
+		Lambda(GAPerformSpeed.CurrentValue);
+		Lambda(MoveSpeed.CurrentValue);
+
+		bIsNotChanged = true;
+	}
+
+	return true;
 }
 
 void FCharacterAttributes::InitialData()
@@ -176,6 +251,11 @@ void FCharacterAttributes::InitialData()
 
 void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
+	ON_SCOPE_EXIT
+	{
+	bIsNotChanged = false;
+	};
+
 	// 处理数据
 	const auto& Ref = GAEvent.Data;
 
@@ -312,6 +392,16 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	ProcessedGAEvent(GAEvent);
 }
 
+bool FCharacterAttributes::Identical(const FCharacterAttributes* Other, uint32 PortFlags) const
+{
+	return Other->bIsNotChanged;
+}
+
+bool FCharacterAttributes::operator==(const FCharacterAttributes& RightValue) const
+{
+	return true;
+}
+
 const FBasePropertySet& FCharacterAttributes::GetHPReply() const
 {
 	return HPReplay;
@@ -322,7 +412,23 @@ const FBasePropertySet& FCharacterAttributes::GetPPReply() const
 	return PPReplay;
 }
 
-FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributesSPtr)
+FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)
 {
 
+}
+
+FPropertySettlementModify::FPropertySettlementModify(int32 InPriority /*= 1*/) :
+	Priority(InPriority)
+{
+	ID = FMath::Rand32();
+}
+
+int32 FPropertySettlementModify::SettlementModify(const TMap<FGameplayTag, int32>& ValueMap) const
+{
+	int32 TatolValue = 0;
+	for (const auto& Iter : ValueMap)
+	{
+		TatolValue += Iter.Value;
+	}
+	return TatolValue;
 }

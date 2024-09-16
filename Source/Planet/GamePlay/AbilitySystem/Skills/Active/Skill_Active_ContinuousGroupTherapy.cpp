@@ -169,7 +169,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 
 void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{

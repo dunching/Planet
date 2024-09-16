@@ -1,6 +1,8 @@
 
 #include "CharacterAttributesComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "CharacterBase.h"
 #include "UnitProxyProcessComponent.h"
 #include "GravityMovementComponent.h"
@@ -16,7 +18,7 @@ UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitia
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickInterval = 1.f;
 
-	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
+	SetIsReplicatedByDefault(true);
 }
 
 void UCharacterAttributesComponent::TickComponent(
@@ -35,9 +37,14 @@ void UCharacterAttributesComponent::TickComponent(
 #endif
 }
 
-TSharedPtr<FCharacterAttributes> UCharacterAttributesComponent::GetCharacterAttributes() const
+const FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes() const
 {
-	return CharacterAttributesSPtr;
+	return CharacterAttributes;
+}
+
+FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes()
+{
+	return CharacterAttributes;
 }
 
 void UCharacterAttributesComponent::ProcessCharacterAttributes()
@@ -59,7 +66,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		// 基础回复
 		{
-			GAEventData.HP = CharacterAttributesSPtr->HPReplay.GetCurrentValue();
+			GAEventData.HP = CharacterAttributes.HPReplay.GetCurrentValue();
 
 			if (
 				CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
@@ -75,12 +82,12 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 			{
 				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
 				{
-					GAEventData.PP = CharacterAttributesSPtr->RunningConsume.GetCurrentValue();
+					GAEventData.PP = CharacterAttributes.RunningConsume.GetCurrentValue();
 				}
 			}
 			else
 			{
-				GAEventData.PP = CharacterAttributesSPtr->PPReplay.GetCurrentValue();
+				GAEventData.PP = CharacterAttributes.PPReplay.GetCurrentValue();
 			}
 		}
 
@@ -93,77 +100,18 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesComponent");
 
+void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+
+	Params.Condition = COND_OwnerOnly;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterAttributes, Params);
+}
+
 void UCharacterAttributesComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto SPtr = GetCharacterAttributes();
-		auto HPChangedHandle = SPtr->HP.AddOnValueChanged(std::bind(&ThisClass::OnPropertyChanged, this, ECharacterPropertyType::HP, std::placeholders::_2));
-		HPChangedHandle->bIsAutoUnregister = false;
-	}
-#endif
-}
-
-void UCharacterAttributesComponent::OnPropertyChanged_Implementation(
-	ECharacterPropertyType CharacterPropertyType,
-	int32 CurrentValue
-)
-{
-	const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
-
-	switch (CharacterPropertyType)
-	{
-	case ECharacterPropertyType::LiDao:
-		break;
-	case ECharacterPropertyType::GenGu:
-		break;
-	case ECharacterPropertyType::ShenFa:
-		break;
-	case ECharacterPropertyType::DongCha:
-		break;
-	case ECharacterPropertyType::TianZi:
-		break;
-	case ECharacterPropertyType::GoldElement:
-		break;
-	case ECharacterPropertyType::WoodElement:
-		break;
-	case ECharacterPropertyType::WaterElement:
-		break;
-	case ECharacterPropertyType::FireElement:
-		break;
-	case ECharacterPropertyType::SoilElement:
-		break;
-	case ECharacterPropertyType::HP:
-	{
-		CharacterAttributesSPtr->HP.SetCurrentValue(CurrentValue, DataSource);
-	}
-	break;
-	case ECharacterPropertyType::BaseAttackPower:
-		break;
-	case ECharacterPropertyType::Penetration:
-		break;
-	case ECharacterPropertyType::PercentPenetration:
-		break;
-	case ECharacterPropertyType::Resistance:
-		break;
-	case ECharacterPropertyType::GAPerformSpeed:
-		break;
-	case ECharacterPropertyType::Evade:
-		break;
-	case ECharacterPropertyType::HitRate:
-		break;
-	case ECharacterPropertyType::Toughness:
-		break;
-	case ECharacterPropertyType::CriticalHitRate:
-		break;
-	case ECharacterPropertyType::CriticalDamage:
-		break;
-	case ECharacterPropertyType::MoveSpeed:
-		break;
-	default:
-		break;
-	}
 }

@@ -113,14 +113,14 @@ void UPawnStateActionHUD::ResetUIByData()
 		return;
 	}
 	{
-		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
 			if (!UIPtr)
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->HP);
+			UIPtr->SetDataSource(CharacterAttributes.HP);
 		}
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
@@ -128,7 +128,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->PP);
+			UIPtr->SetDataSource(CharacterAttributes.PP);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().BaseAttackPower));
@@ -136,7 +136,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->BaseAttackPower);
+			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Penetration));
@@ -144,7 +144,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Penetration, CharacterAttributesSPtr->PercentPenetration);
+			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Resistance));
@@ -152,7 +152,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Resistance);
+			UIPtr->SetDataSource(CharacterAttributes.Resistance);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
@@ -160,7 +160,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->MoveSpeed);
+			UIPtr->SetDataSource(CharacterAttributes.MoveSpeed);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
@@ -168,7 +168,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->GAPerformSpeed);
+			UIPtr->SetDataSource(CharacterAttributes.GAPerformSpeed);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Gold));
@@ -176,7 +176,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->GoldElement);
+			UIPtr->SetDataSource(CharacterAttributes.GoldElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
@@ -184,7 +184,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->WoodElement);
+			UIPtr->SetDataSource(CharacterAttributes.WoodElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
@@ -192,7 +192,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->WaterElement);
+			UIPtr->SetDataSource(CharacterAttributes.WaterElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
@@ -200,7 +200,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->FireElement);
+			UIPtr->SetDataSource(CharacterAttributes.FireElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Soil));
@@ -208,7 +208,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->SoilElement);
+			UIPtr->SetDataSource(CharacterAttributes.SoilElement);
 		}
 	}
 	InitialTalentUI();

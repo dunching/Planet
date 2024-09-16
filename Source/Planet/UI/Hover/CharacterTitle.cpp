@@ -41,7 +41,7 @@ void UCharacterTitle::NativeConstruct()
 			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent(); 
 			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
 		}
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->HP;
+		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
 		{
 			OnHPMaxValueChanged(Ref.GetMaxValue());
 			MaxHPValueChanged = Ref.AddOnMaxValueChanged(
@@ -153,7 +153,7 @@ void UCharacterTitle::ApplyCharaterNameToTitle()
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Title));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->Name));
+			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
 		}
 	}
 }

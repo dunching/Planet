@@ -25,10 +25,10 @@ void UState_Talent_YinYang::NativeConstruct()
 	PRINTINVOKEINFO();
 	if (TargetCharacterPtr)
 	{
-		auto CharacterAttributesSPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributesSPtr->TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributesSPtr->TalentSPtr.Get())
+			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
 		);
 
 		if (TalentSPtr)
@@ -58,7 +58,7 @@ void UState_Talent_YinYang::OnCurrentValueChanged(int32 CurrentValue)
 
 void UState_Talent_YinYang::OnValueChanged()
 {
-	TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->TalentSPtr;
+	TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr;
 
 	const auto CurentType = TalentSPtr->CurentType;
 	const auto CurrentValue = TalentSPtr->GetCurrentValue();

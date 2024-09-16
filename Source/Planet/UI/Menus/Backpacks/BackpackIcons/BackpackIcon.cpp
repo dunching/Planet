@@ -154,11 +154,11 @@ void UBackpackIcon::OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterPr
 			return;
 		}
 
-		auto CharacterAttributesSPtr =
-			AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributesSPtr;
+		auto CharacterAttributes =
+			AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
 
 		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		UIPtr->SetText(FText::FromName(CharacterAttributesSPtr->Name));
+		UIPtr->SetText(FText::FromName(CharacterAttributes.Name));
 	}
 	else
 	{

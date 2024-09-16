@@ -163,8 +163,8 @@ bool UBasicFutures_Dash::CanActivateAbility(
 
 	if (CharacterPtr)
 	{
-		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		if (CharacterAttributesSPtr->PP.GetCurrentValue() >= Consume)
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		if (CharacterAttributes.PP.GetCurrentValue() >= Consume)
 		{
 			return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 		}

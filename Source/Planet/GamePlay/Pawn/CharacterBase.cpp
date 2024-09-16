@@ -95,26 +95,26 @@ void ACharacterBase::BeginPlay()
 	}
 #endif
 
-	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
+	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		HPChangedHandle = CharacterAttributesSPtr->HP.AddOnValueChanged(
+		HPChangedHandle = CharacterAttributes.HP.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
 		);
 
-		MoveSpeedChangedHandle = CharacterAttributesSPtr->MoveSpeed.AddOnValueChanged(
+		MoveSpeedChangedHandle = CharacterAttributes.MoveSpeed.AddOnValueChanged(
 			std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
 		);
 
-		ProcessedGAEventHandle = CharacterAttributesSPtr->ProcessedGAEvent.AddCallback(
+		ProcessedGAEventHandle = CharacterAttributes.ProcessedGAEvent.AddCallback(
 			std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
 		);
 	}
 #endif
 
-	OnMoveSpeedChanged(CharacterAttributesSPtr->MoveSpeed.GetCurrentValue());
+	OnMoveSpeedChanged(CharacterAttributes.MoveSpeed.GetCurrentValue());
 }
 
 void ACharacterBase::Destroyed()
@@ -297,7 +297,7 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 	}
 #endif
 
-	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
+	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -310,7 +310,7 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 
 	// 
 	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
-	*GetCharacterAttributesComponent()->CharacterAttributesSPtr = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
+	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const

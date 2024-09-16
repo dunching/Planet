@@ -122,12 +122,12 @@ void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitP
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(GroupMateInfo::Text));
 			if (UIPtr)
 			{
-				auto CharacterAttributesSPtr =
-					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributesSPtr;
+				auto CharacterAttributes =
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
 				UIPtr->SetText(
 					FText::FromString(FString::Printf(TEXT("%s(%d)"), 
-						*CharacterAttributesSPtr->Name.ToString(),
-						CharacterAttributesSPtr->Level))
+						*CharacterAttributes.Name.ToString(),
+						CharacterAttributes.Level))
 				);
 			}
 		}

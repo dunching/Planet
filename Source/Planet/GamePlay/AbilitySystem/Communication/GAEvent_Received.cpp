@@ -61,7 +61,7 @@ void UGAEvent_Received::ActivateAbility(
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*CloneSPtr);
 
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->ProcessGAEVent(*CloneSPtr);
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 
 			CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 

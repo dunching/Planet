@@ -200,7 +200,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 void USkill_WeaponActive_PickAxe::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{
