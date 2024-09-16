@@ -83,9 +83,11 @@ void UCS_PeriodicPropertyModify::UpdateDuration()
 			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 		}
 
+		// 更新计时
 		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 		TaskPtr->UpdateDuration();
 
+		// 更新显示的信息
 		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
 		StateDisplayInfoSPtr->Num = GameplayAbilityTargetDataAry.Num();
 		StateDisplayInfoSPtr->DataChanged();

@@ -48,4 +48,6 @@ public:
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
 
+	virtual void UpdateDuration()override;
+
 };

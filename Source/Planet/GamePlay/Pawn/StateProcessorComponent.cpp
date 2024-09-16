@@ -51,6 +51,7 @@
 #include "CS_PeriodicStateModify_Charm.h"
 #include "CS_PeriodicStateModify_Ice.h"
 #include "CS_PeriodicPropertyTag.h"
+#include "CS_PeriodicStateModify_Slow.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
@@ -238,6 +239,15 @@ void UStateProcessorComponent::ExcuteEffects(
 		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Ice))
 		{
 			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Ice::StaticClass(), 1);
+
+			ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				MkeSpec(GameplayAbilityTargetDataSPtr)
+			);
+		}
+		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow))
+		{
+			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Slow::StaticClass(), 1);
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,

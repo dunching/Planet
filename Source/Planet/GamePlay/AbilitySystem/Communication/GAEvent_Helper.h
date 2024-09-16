@@ -84,12 +84,16 @@ struct PLANET_API FGAEventData
 	
 	UPROPERTY()
 	FGameplayTag DataSource;
-	
-	UPROPERTY()
+
 	// 是否 清空DataModify的 DataSource
+	UPROPERTY()
 	bool bIsClearData = false;
 	
-	// 直接修改的数据
+	// 是否 覆盖DataModify的 DataSource
+	UPROPERTY()
+	bool bIsOverlapData = false;
+	
+	// 直接修改的数据,累加到 DataSource
 	TMap<ECharacterPropertyType, FBaseProperty>DataModify;
 	
 	UPROPERTY()

@@ -88,9 +88,17 @@ protected:
 
 	void ExcuteTasks();
 
-	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+	virtual void OnInterval(
+		UAbilityTask_TimerHelper* TaskPtr,
+		float CurrentInterval,
+		float Interval
+	);
 
-	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+	virtual void OnDuration(
+		UAbilityTask_TimerHelper* TaskPtr,
+		float CurrentInterval, 
+		float Interval
+	);
 
 	void OnTaskComplete();
 

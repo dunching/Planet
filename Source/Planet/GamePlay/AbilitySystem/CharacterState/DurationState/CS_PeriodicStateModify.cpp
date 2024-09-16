@@ -81,14 +81,6 @@ void UCS_PeriodicStateModify::EndAbility(
 
 void UCS_PeriodicStateModify::UpdateDuration()
 {
-	if (TaskPtr)
-	{
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		TaskPtr->UpdateDuration();
-
-		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		StateDisplayInfoSPtr->DataChanged();
-	}
 }
 
 void UCS_PeriodicStateModify::SetCache(const TSharedPtr<FGameplayAbilityTargetData_StateModify>& InGameplayAbilityTargetDataSPtr)

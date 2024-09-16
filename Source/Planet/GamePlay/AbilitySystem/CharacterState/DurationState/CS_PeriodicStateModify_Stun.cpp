@@ -53,3 +53,15 @@ void UCS_PeriodicStateModify_Stun::PreActivate(
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
+
+void UCS_PeriodicStateModify_Stun::UpdateDuration()
+{
+	if (TaskPtr)
+	{
+		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TaskPtr->UpdateDuration();
+
+		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		StateDisplayInfoSPtr->DataChanged();
+	}
+}

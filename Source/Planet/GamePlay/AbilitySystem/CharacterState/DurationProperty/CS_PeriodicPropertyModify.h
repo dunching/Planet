@@ -129,6 +129,7 @@ protected:
 
 	TSharedPtr<FGameplayAbilityTargetData_PropertyModify>CacheSPtr;
 
+	// 计时Task
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
 
 };
