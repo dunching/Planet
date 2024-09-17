@@ -180,6 +180,8 @@ void ACharacterBase::PostInitializeComponents()
 		InteractiveSkillComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = InteractiveSkillComponentPtr;
 
 		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
+
+		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent = StateProcessorComponentPtr;
 	}
 }
 

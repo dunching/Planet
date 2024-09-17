@@ -25,6 +25,7 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+#include "CharacterStateInfo.h"
 
 void UCS_RootMotion_FlyAway::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
@@ -79,25 +80,11 @@ void UCS_RootMotion_FlyAway::UpdateDuration()
 	{
 		RootMotionTaskPtr->UpdateDuration();
 	}
-
-	StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-	StateDisplayInfoSPtr->DataChanged();
 }
 
 void UCS_RootMotion_FlyAway::SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& InGameplayAbilityTargetDataSPtr)
 {
 	GameplayAbilityTargetDataSPtr = InGameplayAbilityTargetDataSPtr;
-}
-
-void UCS_RootMotion_FlyAway::InitialStateDisplayInfo()
-{
-	Super::InitialStateDisplayInfo();
-
-	if (GameplayAbilityTargetDataSPtr)
-	{
-		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		StateDisplayInfoSPtr->TotalTime = 0.f;
-	}
 }
 
 void UCS_RootMotion_FlyAway::PerformAction()
@@ -168,8 +155,6 @@ void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, flo
 	}
 	else
 	{
-		StateDisplayInfoSPtr->TotalTime = CurrentInterval;
-		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 

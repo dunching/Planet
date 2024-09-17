@@ -25,6 +25,7 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+#include "CharacterStateInfo.h"
 
 FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun(
 	float Duration
@@ -33,7 +34,7 @@ FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateMod
 {
 }
 
-FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun()
+FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun() 
 {
 
 }
@@ -60,8 +61,5 @@ void UCS_PeriodicStateModify_Stun::UpdateDuration()
 	{
 		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		TaskPtr->UpdateDuration();
-
-		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		StateDisplayInfoSPtr->DataChanged();
 	}
 }

@@ -12,33 +12,7 @@ class UTexture2D;
 class UCS_Base;
 class ACharacterBase;
 
-USTRUCT()
-struct PLANET_API FStateDisplayInfo
-{
-	GENERATED_USTRUCT_BODY()
-
-	using FDataChanged = TCallbackHandleContainer<void()>;
-
-	FStateDisplayInfo();
-
-	// 总时间
-	float Duration = -1.f;
-
-	// 已过去的时间
-	float TotalTime = 0.f;
-
-	// 层数 <= 0 不显示
-	int32 Num = 0;
-
-	FString Text = TEXT("");
-
-	FGameplayTag Tag;
-
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
-
-	FDataChanged DataChanged;
-
-};
+struct FCharacterStateInfo;
 
 /*
 	一般为debuff
@@ -81,6 +55,8 @@ class PLANET_API UCS_Base : public UPlanetGameplayAbility
 
 public:
 
+	UCS_Base();
+
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
@@ -104,15 +80,9 @@ public:
 
 	virtual void UpdateDuration();
 
-	virtual TWeakPtr<FStateDisplayInfo> GetStateDisplayInfo()const;
-
 	TSharedPtr<FGameplayAbilityTargetData_CS_Base>GameplayAbilityTargetDataBaseSPtr;
 
 protected:
-
-	virtual void InitialStateDisplayInfo();
-
-	TSharedPtr<FStateDisplayInfo>StateDisplayInfoSPtr;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

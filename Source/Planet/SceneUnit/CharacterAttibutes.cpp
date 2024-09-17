@@ -315,6 +315,10 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 				{
 					PropertySetRef.RemoveCurrentValue(Ref.DataSource);
 				}
+				else if (Ref.bIsOverlapData)
+				{
+					PropertySetRef.SetCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+				}
 				else
 				{
 					PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), Ref.DataSource);

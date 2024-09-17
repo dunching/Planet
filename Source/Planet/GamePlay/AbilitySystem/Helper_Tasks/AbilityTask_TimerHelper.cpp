@@ -152,14 +152,7 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 	break;
 	case ETaskTimerType::kInfinite:
 	{
-		if (IntervalTime > 0.f)
-		{
-			UpdateIntervalTime();
-		}
-		else
-		{
-			EndTask();
-		}
+		UpdateIntervalTime();
 	}
 	break;
 	}

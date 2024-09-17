@@ -9,14 +9,15 @@
 
 #include "CS_PeriodicStateModify_Slow.generated.h"
 
-class UAbilityTask_TimerHelper;
-class UTexture2D;
+struct FStreamableHandle;
 struct FConsumableProxy;
+struct FCharacterStateInfo;
+
+class UTexture2D;
+class UAbilityTask_TimerHelper;
 class UEffectItem;
 class ASPlineActor;
 class ATornado;
-
-struct FStreamableHandle;
 
 USTRUCT()
 struct PLANET_API FGameplayAbilityTargetData_StateModify_Slow : public FGameplayAbilityTargetData_StateModify
@@ -78,19 +79,13 @@ protected:
 	
 	virtual void PerformAction()override;
 
-	virtual void OnDuration(
-		UAbilityTask_TimerHelper* TaskPtr,
-		float CurrentInterval,
-		float Interval
-	)override;
-
 	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
 
 	struct FMyStruct
 	{
-		TSharedPtr<FGameplayAbilityTargetData_StateModify>SPtr;
+		TSharedPtr<FCharacterStateInfo> StateDisplayInfoSPtr;
 
-		float RemainTime = 0.f;
+		TSharedPtr<FGameplayAbilityTargetData_StateModify>SPtr;
 	};
 
 	// 减速速率,源,剩餘持续时间

@@ -45,6 +45,7 @@ public:
 	// 如果 InIntervalTime > 0；则count会在累计时间大于InIntervalTime才会+1，否则每次tick+1
 	void SetCount(int32 InCount, float InIntervalTime = -1.f);
 	
+	// InIntervalTime < 0 
 	void SetInfinite(float InIntervalTime = -1.f);
 
 	void SetFinished();

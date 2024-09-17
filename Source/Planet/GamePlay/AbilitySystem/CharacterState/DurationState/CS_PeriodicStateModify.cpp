@@ -25,6 +25,7 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+#include "CharacterStateInfo.h"
 
 UCS_PeriodicStateModify::UCS_PeriodicStateModify() :
 	Super()
@@ -65,6 +66,7 @@ void UCS_PeriodicStateModify::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
 	ExcuteTasks();
 }
 
@@ -86,17 +88,6 @@ void UCS_PeriodicStateModify::UpdateDuration()
 void UCS_PeriodicStateModify::SetCache(const TSharedPtr<FGameplayAbilityTargetData_StateModify>& InGameplayAbilityTargetDataSPtr)
 {
 	GameplayAbilityTargetDataSPtr = InGameplayAbilityTargetDataSPtr;
-}
-
-void UCS_PeriodicStateModify::InitialStateDisplayInfo()
-{
-	Super::InitialStateDisplayInfo();
-
-	if (GameplayAbilityTargetDataSPtr)
-	{
-		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		StateDisplayInfoSPtr->TotalTime = 0.f;
-	}
 }
 
 void UCS_PeriodicStateModify::PerformAction()
@@ -147,8 +138,6 @@ void UCS_PeriodicStateModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, fl
 	}
 	else
 	{
-		StateDisplayInfoSPtr->TotalTime = CurrentInterval;
-		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 

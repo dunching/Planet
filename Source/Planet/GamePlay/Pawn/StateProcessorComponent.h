@@ -6,6 +6,7 @@
 
 #include "TalentUnit.h"
 #include "GenerateType.h"
+#include "CharacterStateInfo.h"
 
 #include "StateProcessorComponent.generated.h"
 
@@ -26,6 +27,7 @@ struct FGameplayAbilityTargetData_StateModify;
 struct FGameplayAbilityTargetData_PeriodicPropertyTag;
 struct FGameplayAbilityTargetData_MoveToAttaclArea;
 struct FGameplayAbilityTargetData;
+struct FCharacterStateInfo;
 
 UCLASS(BlueprintType, Blueprintable)
 class UStateProcessorComponent : public UActorComponent
@@ -35,24 +37,39 @@ class UStateProcessorComponent : public UActorComponent
 public:
 
 	friend UGAEvent_Received;
+	friend ACharacterBase;
 
 	using FOwnerPawnType = ACharacterBase;
 
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
+	using FCharacterStateMapChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterStateInfo>&, bool)>;
+
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(FOwnerPawnType*, const FGAEventData&)>;
 
 	static FName ComponentName;
 
-	UCS_Base* GetCharacterState(const FGameplayTag& CSTag)const;
+	UStateProcessorComponent(const FObjectInitializer& ObjectInitializer);
+
+	TSharedPtr<FCharacterStateInfo> GetCharacterState(const FGameplayTag& CSTag)const;
+	
+	void AddStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo);
+
+	void ChangeStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo);
+
+	void RemoveStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo);
 
 	FCharacterStateChanged CharacterStateChangedContainer;
+
+	FCharacterStateMapChanged CharacterStateMapChanged;
 
 	TMap<FGameplayTag, UCS_Base*>CharacterStateMap;
 
 protected:
 
 	virtual void BeginPlay()override;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void BreakOhterState(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
@@ -94,5 +111,10 @@ protected:
 #pragma endregion GAs
 
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
+	
+	UPROPERTY(Replicated)
+	FCharacterStateInfo_FASI_Container CharacterStateInfo_FASI_Container;
+
+	TMap<FGameplayTag, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
 
 };

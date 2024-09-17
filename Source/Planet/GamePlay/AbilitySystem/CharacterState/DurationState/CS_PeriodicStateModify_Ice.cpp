@@ -25,6 +25,7 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+#include "CharacterStateInfo.h"
 
 FGameplayAbilityTargetData_StateModify_Ice::FGameplayAbilityTargetData_StateModify_Ice(
 		int32 InCount,
@@ -122,7 +123,6 @@ void UCS_PeriodicStateModify_Ice::PerformAction()
 	if (CurrentGameplayAbilityTargetDataSPtr)
 	{
 		CurrentCount += CurrentGameplayAbilityTargetDataSPtr->Count;
-		StateDisplayInfoSPtr->Num = CurrentCount;
 	}
 
 	if (CurrentCount > MaxCount)
@@ -189,7 +189,4 @@ void UCS_PeriodicStateModify_Ice::AddTags(const TSharedPtr<FGameplayAbilityTarge
 	TaskPtr->UpdateDuration();
 
 	bIsImmune = true;
-
-	StateDisplayInfoSPtr->Duration = CurrentGameplayAbilityTargetDataSPtr->Duration;
-	StateDisplayInfoSPtr->DataChanged();
 }

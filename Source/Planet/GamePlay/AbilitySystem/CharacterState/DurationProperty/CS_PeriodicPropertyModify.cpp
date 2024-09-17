@@ -16,6 +16,7 @@
 #include "EffectItem.h"
 #include "BaseFeatureGAComponent.h"
 #include "SceneUnitTable.h"
+#include "CharacterStateInfo.h"
 
 UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify():
 	Super()
@@ -86,11 +87,6 @@ void UCS_PeriodicPropertyModify::UpdateDuration()
 		// 更新计时
 		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
 		TaskPtr->UpdateDuration();
-
-		// 更新显示的信息
-		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		StateDisplayInfoSPtr->Num = GameplayAbilityTargetDataAry.Num();
-		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 
@@ -103,17 +99,6 @@ void UCS_PeriodicPropertyModify::SetCache(const TSharedPtr<FGameplayAbilityTarge
 	else
 	{
 		GameplayAbilityTargetDataAry.Add(GameplayAbilityTargetDataSPtr);
-	}
-}
-
-void UCS_PeriodicPropertyModify::InitialStateDisplayInfo()
-{
-	Super::InitialStateDisplayInfo();
-
-	if (GameplayAbilityTargetDataAry.IsValidIndex(0))
-	{
-		StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1]->Duration;
-		StateDisplayInfoSPtr->TotalTime = 0.f;
 	}
 }
 
@@ -197,8 +182,6 @@ void UCS_PeriodicPropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr,
 	}
 	else
 	{
-		StateDisplayInfoSPtr->TotalTime = CurrentInterval;
-		StateDisplayInfoSPtr->DataChanged();
 	}
 }
 
@@ -234,10 +217,6 @@ bool UCS_PeriodicPropertyModify::OnTaskFinished_Continue(UAbilityTask_TimerHelpe
 		{
 			TaskPtr->UpdateDuration();
 			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->LosePropertyNumInterval);
-
-			StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->LosePropertyNumInterval;
-			StateDisplayInfoSPtr->Num = GameplayAbilityTargetDataAry.Num();
-			StateDisplayInfoSPtr->DataChanged();
 		}
 
 		return false;

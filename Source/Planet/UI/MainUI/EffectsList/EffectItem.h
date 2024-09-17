@@ -12,6 +12,7 @@
 #include "EffectItem.generated.h"
 
 struct FStreamableHandle;
+struct FCharacterStateInfo;
 class UCS_Base;
 
 UCLASS()
@@ -25,7 +26,7 @@ public:
 
 	using FDataChangedHandle = TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-	void SetData(UCS_Base* CharacterStatePtr);
+	void SetData(const TSharedPtr<FCharacterStateInfo> &InCharacterStateInfoSPtr);
 
 protected:
 
@@ -39,14 +40,14 @@ protected:
 
 	void SetSetNumIsDisplay(bool bIsDisplay);
 
-	// 冷却 false 1~0 持续时间 true 1~0
+	// 鍐峰嵈 false 1~0 鎸佺画鏃堕棿 true 1~0
 	void SetPercent(bool bIsInversion, float Percent);
 
 	void SetPercentIsDisplay(bool bIsDisplay);
 
 	void SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr);
 
-	UCS_Base* CharacterStatePtr = nullptr;
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 
 	FDataChangedHandle DataChangedHandle;
 

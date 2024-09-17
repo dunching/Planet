@@ -25,11 +25,13 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+#include "CharacterStateInfo.h"
+#include "StateProcessorComponent.h"
 
 FGameplayAbilityTargetData_StateModify_Slow::FGameplayAbilityTargetData_StateModify_Slow(
 	int32 InSpeedOffset
 ):
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Ice, 5.f),
+	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow, 5.f),
 	SpeedOffset(InSpeedOffset)
 {
 }
@@ -63,8 +65,9 @@ void UCS_PeriodicStateModify_Slow::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);
 
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
 void UCS_PeriodicStateModify_Slow::ActivateAbility(
@@ -75,6 +78,9 @@ void UCS_PeriodicStateModify_Slow::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
+	TaskPtr->SetInfinite();
 
 	PerformAction();
 }
@@ -92,9 +98,14 @@ void UCS_PeriodicStateModify_Slow::EndAbility(
 
 void UCS_PeriodicStateModify_Slow::UpdateDuration()
 {
-	PerformAction();
-
 	Super::UpdateDuration();
+
+	PerformAction();
+}
+
+void UCS_PeriodicStateModify_Slow::PerformAction()
+{
+	Super::PerformAction();
 
 	if (TaskPtr)
 	{
@@ -106,7 +117,7 @@ void UCS_PeriodicStateModify_Slow::UpdateDuration()
 		if (MoveSpeedOffsetMap.Contains(CurrentGameplayAbilityTargetDataSPtr->SpeedOffset))
 		{
 			if (
-				MoveSpeedOffsetMap[CurrentGameplayAbilityTargetDataSPtr->SpeedOffset].RemainTime >
+				MoveSpeedOffsetMap[CurrentGameplayAbilityTargetDataSPtr->SpeedOffset].StateDisplayInfoSPtr->GetRemainTime() >
 				CurrentGameplayAbilityTargetDataSPtr->Duration
 				)
 			{
@@ -116,53 +127,33 @@ void UCS_PeriodicStateModify_Slow::UpdateDuration()
 
 		FMyStruct MyStruct;
 
-		MyStruct.RemainTime = CurrentGameplayAbilityTargetDataSPtr->Duration;
+		MyStruct.StateDisplayInfoSPtr = MakeShared<FCharacterStateInfo>();
+		MyStruct.StateDisplayInfoSPtr->Tag = CurrentGameplayAbilityTargetDataSPtr->Tag;
+		MyStruct.StateDisplayInfoSPtr->Duration = CurrentGameplayAbilityTargetDataSPtr->Duration;
+		MyStruct.StateDisplayInfoSPtr->DefaultIcon = CurrentGameplayAbilityTargetDataSPtr->DefaultIcon;
+		MyStruct.StateDisplayInfoSPtr->DataChanged();
 		MyStruct.SPtr = CurrentGameplayAbilityTargetDataSPtr;
+
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(MyStruct.StateDisplayInfoSPtr);
 
 		MoveSpeedOffsetMap.Add(
 			CurrentGameplayAbilityTargetDataSPtr->SpeedOffset,
 			MyStruct
 		);
-
-		auto MaxDuration = GameplayAbilityTargetDataSPtr->Duration;
-		for (const auto Iter : MoveSpeedOffsetMap)
-		{
-			if (Iter.Value.RemainTime > MaxDuration)
-			{
-				MaxDuration = Iter.Value.RemainTime;
-			}
-		}
-
-		TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
-		TaskPtr->SetDuration(MaxDuration);
-		TaskPtr->UpdateDuration();
-
-		StateDisplayInfoSPtr->Duration = MaxDuration;
-		StateDisplayInfoSPtr->DataChanged();
 	}
-}
-
-void UCS_PeriodicStateModify_Slow::PerformAction()
-{
-	Super::PerformAction();
-}
-
-void UCS_PeriodicStateModify_Slow::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
-{
-	Super::OnDuration(InTaskPtr, CurrentInterval, Interval);
 }
 
 void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
 {
 	for (auto & Iter : MoveSpeedOffsetMap)
 	{
-		Iter.Value.RemainTime -= DeltaTime;
+		Iter.Value.StateDisplayInfoSPtr->TotalTime += DeltaTime;
 	}
 	const auto Temp = MoveSpeedOffsetMap;
 	for (auto Iter : Temp)
 	{
 		// 移除不生效的
-		if (Iter.Value.RemainTime < 0.f)
+		if (Iter.Value.StateDisplayInfoSPtr->GetRemainTime() < 0.f)
 		{
 			MoveSpeedOffsetMap.Remove(Iter.Key);
 
@@ -174,12 +165,24 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			GAEventData.DataSource = Iter.Value.SPtr->Tag;
 			GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,0 } };
-			GAEventData.bIsOverlapData = true;
+			GAEventData.bIsClearData = true;
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+
+			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.StateDisplayInfoSPtr);
 		}
+		else
+		{
+			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Iter.Value.StateDisplayInfoSPtr);
+		}
+	}
+
+	if (MoveSpeedOffsetMap.IsEmpty())
+	{
+		K2_CancelAbility();
+		return;
 	}
 
 	for (const auto Iter : MoveSpeedOffsetMap)
@@ -192,6 +195,7 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 		GAEventData.DataSource = Iter.Value.SPtr->Tag;
 		GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,Iter.Key } };
+		GAEventData.bIsOverlapData = true;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 

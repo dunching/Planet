@@ -6,6 +6,7 @@
 
 #include "GameplayAbilitySpec.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 #include "GravityMovementComponent.h"
 #include "GAEvent_Helper.h"
@@ -55,6 +56,12 @@
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
+UStateProcessorComponent::UStateProcessorComponent(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	SetIsReplicatedByDefault(true);
+}
+
 void UStateProcessorComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -69,14 +76,87 @@ void UStateProcessorComponent::BeginPlay()
 	}
 }
 
-UCS_Base* UStateProcessorComponent::GetCharacterState(const FGameplayTag& CSTag) const
+void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	if (CharacterStateMap.Contains(CSTag))
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+
+	Params.Condition = COND_OwnerOnly;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterStateInfo_FASI_Container, Params);
+}
+
+TSharedPtr<FCharacterStateInfo>  UStateProcessorComponent::GetCharacterState(const FGameplayTag& CSTag) const
+{
+	if (StateDisplayMap.Contains(CSTag))
 	{
-		return CharacterStateMap[CSTag];
+		return StateDisplayMap[CSTag];
 	}
 
 	return nullptr;
+}
+
+void UStateProcessorComponent::AddStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		CharacterStateInfo_FASI_Container.AddItem(StateDisplayInfo);
+	}
+#endif
+
+	StateDisplayMap.Add(StateDisplayInfo->Tag, StateDisplayInfo);
+	CharacterStateMapChanged(StateDisplayInfo, true);
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
+}
+
+void UStateProcessorComponent::ChangeStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		CharacterStateInfo_FASI_Container.UpdateItem(StateDisplayInfo);
+	}
+#endif
+
+	if (StateDisplayMap.Contains(StateDisplayInfo->Tag))
+	{
+		StateDisplayMap[StateDisplayInfo->Tag]->DataChanged();
+	}
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
+}
+
+void UStateProcessorComponent::RemoveStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		CharacterStateInfo_FASI_Container.RemoveItem(StateDisplayInfo);
+	}
+#endif
+
+	if (StateDisplayMap.Contains(StateDisplayInfo->Tag))
+	{
+		StateDisplayMap.Remove(StateDisplayInfo->Tag);
+		CharacterStateMapChanged(StateDisplayInfo, false);
+	}
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
 }
 
 void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)

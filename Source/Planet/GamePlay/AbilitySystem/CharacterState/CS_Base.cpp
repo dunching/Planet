@@ -2,11 +2,8 @@
 #include "CS_Base.h"
 
 #include "CharacterBase.h"
-
-FStateDisplayInfo::FStateDisplayInfo()
-{
-
-}
+#include "CharacterStateInfo.h"
+#include "StateProcessorComponent.h"
 
 FGameplayAbilityTargetData_CS_Base::FGameplayAbilityTargetData_CS_Base(
 	const FGameplayTag& InTag
@@ -29,6 +26,15 @@ FGameplayAbilityTargetData_CS_Base* FGameplayAbilityTargetData_CS_Base::Clone() 
 	*ResultPtr = *this;
 
 	return ResultPtr;
+}
+
+UCS_Base::UCS_Base() :
+	Super()
+{
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateNo;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
 void UCS_Base::OnAvatarSet(
@@ -59,8 +65,6 @@ void UCS_Base::PreActivate(
 		{
 			GameplayAbilityTargetDataBaseSPtr = TSharedPtr<FGameplayAbilityTargetData_CS_Base>(GameplayAbilityTargetDataBasePtr->Clone());
 
-			InitialStateDisplayInfo();
-
 			GameplayAbilityTargetDataBaseSPtr->CharacterStateChanged.ExcuteCallback(ECharacterStateType::kActive, this);
 		}
 	}
@@ -85,16 +89,4 @@ void UCS_Base::EndAbility(
 void UCS_Base::UpdateDuration()
 {
 
-}
-
-TWeakPtr<FStateDisplayInfo> UCS_Base::GetStateDisplayInfo() const
-{
-	return StateDisplayInfoSPtr;
-}
-
-void UCS_Base::InitialStateDisplayInfo()
-{
-	StateDisplayInfoSPtr = MakeShared<FStateDisplayInfo>();
-
-	StateDisplayInfoSPtr->DefaultIcon = GameplayAbilityTargetDataBaseSPtr->DefaultIcon;
 }

@@ -32,6 +32,29 @@ UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
 
 	MyTask->ForceName = TaskInstanceName;
 	MyTask->FinishVelocityMode = ERootMotionFinishVelocityMode::SetVelocity;
+	MyTask->RootMotionAccumulateMode = ERootMotionAccumulateMode::Override;
+	MyTask->FinishSetVelocity = FVector::ZeroVector;
+	MyTask->FinishClampVelocity = 0.f;
+
+	MyTask->Duration = InDuration;
+	MyTask->Height = InHeight;
+
+	return MyTask;
+}
+
+UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
+	UGameplayAbility* OwningAbility,
+	FName TaskInstanceName,
+	ERootMotionAccumulateMode RootMotionAccumulateMode,
+	float InDuration,
+	float InHeight
+)
+{
+	UAbilityTask_FlyAway* MyTask = NewAbilityTask<UAbilityTask_FlyAway>(OwningAbility);
+
+	MyTask->ForceName = TaskInstanceName;
+	MyTask->FinishVelocityMode = ERootMotionFinishVelocityMode::SetVelocity;
+	MyTask->RootMotionAccumulateMode = RootMotionAccumulateMode;
 	MyTask->FinishSetVelocity = FVector::ZeroVector;
 	MyTask->FinishClampVelocity = 0.f;
 
@@ -60,7 +83,7 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 			auto RootMotionSourceSPtr = MakeShared<FRootMotionSource_FlyAway>();
 
 			RootMotionSourceSPtr->InstanceName = ForceName;
-			RootMotionSourceSPtr->AccumulateMode = ERootMotionAccumulateMode::Override;
+			RootMotionSourceSPtr->AccumulateMode = RootMotionAccumulateMode;
 			RootMotionSourceSPtr->Priority = ERootMotionSource_Priority::kFlyAway;
 			RootMotionSourceSPtr->FinishVelocityParams.Mode = FinishVelocityMode;
 			RootMotionSourceSPtr->FinishVelocityParams.SetVelocity = FinishSetVelocity;

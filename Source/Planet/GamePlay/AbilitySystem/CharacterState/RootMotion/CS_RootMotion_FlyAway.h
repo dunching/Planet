@@ -74,8 +74,6 @@ public:
 
 protected:
 
-	virtual void InitialStateDisplayInfo()override;
-
 	virtual void PerformAction()override;
 
 	void ExcuteTasks();

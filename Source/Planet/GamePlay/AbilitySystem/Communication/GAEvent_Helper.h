@@ -93,7 +93,7 @@ struct PLANET_API FGAEventData
 	UPROPERTY()
 	bool bIsOverlapData = false;
 	
-	// 直接修改的数据,累加到 DataSource
+	// 直接修改的数据, 累加到 DataSource
 	TMap<ECharacterPropertyType, FBaseProperty>DataModify;
 	
 	UPROPERTY()

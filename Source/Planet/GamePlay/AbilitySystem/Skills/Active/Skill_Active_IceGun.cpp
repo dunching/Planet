@@ -26,6 +26,7 @@
 #include "ToolBuilderUtil.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicStateModify_Ice.h"
+#include "CharacterStateInfo.h"
 
 
 namespace Skill_IceGun_Notify
@@ -243,7 +244,7 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 		
 		// debuff
 		auto CSPtr = OtherCharacterPtr->GetStateProcessorComponent()->GetCharacterState(GameplayAbilityTargetDataPtr->Tag);
-		if ((CSPtr && CSPtr->GetStateDisplayInfo().Pin()->Num < 3) || !CSPtr)
+		if ((CSPtr && CSPtr->Num < 3) || !CSPtr)
 		{
 			if (HitSound.IsValid())
 				UGameplayStatics::PlaySoundAtLocation(OtherActor,HitSound.LoadSynchronous(),OtherActor->GetActorLocation());	
