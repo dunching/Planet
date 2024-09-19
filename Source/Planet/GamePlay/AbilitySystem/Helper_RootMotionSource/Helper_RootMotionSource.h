@@ -27,7 +27,7 @@ class ASPlineActor;
 class ATornado;
 class ACharacterBase;
 
-void SetRootMotionFinished(FRootMotionSource & RootMotionSource);
+void SetRootMotionFinished(FRootMotionSource& RootMotionSource);
 
 USTRUCT()
 struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForce
@@ -55,6 +55,10 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 
 	virtual bool Matches(const FRootMotionSource* Other) const override;
 
+	virtual bool MatchesAndHasSameState(const FRootMotionSource* Other) const override;
+
+	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+
 	virtual void PrepareRootMotion(
 		float SimulationTime,
 		float MovementTickTime,
@@ -62,10 +66,15 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
+	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
 	void Initial(
 		float Height,
 		float Duration,
-		const FVector& OriginalPt
+		const FVector& OriginalPt,
+		ACharacter*CharacterPtr
 	);
 
 	void UpdateDuration(
@@ -76,12 +85,22 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 
 	float RiseDuration = .75f;
 
-	FVector TargetPt = FVector::ZeroVector;
+	int32 Height = 100;
 
-	FVector CurrentStartPt = FVector::ZeroVector;
+	float Radius = 0.f;
 
-	FVector OriginalLandingPt = FVector::ZeroVector;
+	float HalfHeight = 0.f;
+};
 
+template<>
+struct TStructOpsTypeTraits< FRootMotionSource_FlyAway > :
+	public TStructOpsTypeTraitsBase2< FRootMotionSource_FlyAway >
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
 };
 
 USTRUCT()

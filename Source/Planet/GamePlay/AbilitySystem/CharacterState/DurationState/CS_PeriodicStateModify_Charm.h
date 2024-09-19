@@ -4,22 +4,27 @@
 #include "CoreMinimal.h"
 
 #include <GameplayTagContainer.h>
+#include "AITypes.h"
+#include <Navigation/PathFollowingComponent.h>
+#include <NavigationSystemTypes.h>
 
 #include "CS_PeriodicStateModify.h"
 
 #include "CS_PeriodicStateModify_Charm.generated.h"
 
+struct FStreamableHandle;
+struct FConsumableProxy;
+struct FCharacterStateInfo;
+
 class UAbilityTask_TimerHelper;
 class UTexture2D;
-struct FConsumableProxy;
 class UEffectItem;
 class ASPlineActor;
 class ATornado;
 
-struct FStreamableHandle;
-
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_StateModify_Charm : public FGameplayAbilityTargetData_StateModify
+struct PLANET_API FGameplayAbilityTargetData_StateModify_Charm : 
+	public FGameplayAbilityTargetData_StateModify
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -65,6 +70,19 @@ public:
 		bool bWasCancelled
 	)override;
 
+	virtual void UpdateDuration()override;
+
 protected:
+
+	virtual void PerformAction()override;
+
+	UFUNCTION()
+	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
+
+	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
+
+	TSharedPtr<FCharacterStateInfo> StateDisplayInfoSPtr = nullptr;
+
+	float AcceptanceRadius = 50.f;
 
 };

@@ -1,5 +1,5 @@
 
-#include "Skill_Active_Charm.h"
+#include "Skill_Active_Fear.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -30,9 +30,9 @@
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicStateModify_Charm.h"
+#include "CS_PeriodicStateModify_Fear.h"
 
-bool USkill_Active_Charm::CanActivateAbility(
+bool USkill_Active_Fear::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
@@ -50,7 +50,7 @@ bool USkill_Active_Charm::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void USkill_Active_Charm::PerformAction(
+void USkill_Active_Fear::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -70,7 +70,7 @@ void USkill_Active_Charm::PerformAction(
 #endif
 }
 
-void USkill_Active_Charm::ExcuteTasks()
+void USkill_Active_Fear::ExcuteTasks()
 {
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
@@ -97,7 +97,7 @@ void USkill_Active_Charm::ExcuteTasks()
 				Params
 			);
 
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
 			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
@@ -126,7 +126,7 @@ void USkill_Active_Charm::ExcuteTasks()
 			// 控制效果
 			for (const auto& Iter : TargetSet)
 			{
-				auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Charm(Duration);
+				auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Fear(Duration);
 
 				GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 				GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
@@ -138,7 +138,7 @@ void USkill_Active_Charm::ExcuteTasks()
 #endif
 }
 
-void USkill_Active_Charm::PlayMontage()
+void USkill_Active_Fear::PlayMontage()
 {
 	if (
 		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||

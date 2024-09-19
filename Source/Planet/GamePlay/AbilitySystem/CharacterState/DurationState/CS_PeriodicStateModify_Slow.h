@@ -20,7 +20,8 @@ class ASPlineActor;
 class ATornado;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_StateModify_Slow : public FGameplayAbilityTargetData_StateModify
+struct PLANET_API FGameplayAbilityTargetData_StateModify_Slow :
+	public FGameplayAbilityTargetData_StateModify
 {
 	GENERATED_USTRUCT_BODY()
 

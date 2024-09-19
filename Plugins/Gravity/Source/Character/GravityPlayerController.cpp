@@ -16,11 +16,13 @@
 AGravityPlayerController::AGravityPlayerController(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/):
     Super(ObjectInitializer)
 {
-    PathFollowingComponent = CreateOptionalDefaultSubobject<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"));
-    if (PathFollowingComponent)
-    {
-        PathFollowingComponent->OnRequestFinished.AddUObject(this, &ThisClass::OnMoveCompleted);
-    }
+	// 这个在 “ROLE_AutonomousProxy”上不正确？
+	// PathFollowingComponent = CreateOptionalDefaultSubobject<UCrowdFollowingComponent>(TEXT("PathFollowingComponent"));
+	PathFollowingComponent = CreateOptionalDefaultSubobject<UPathFollowingComponent>(TEXT("PathFollowingComponent"));
+	if (PathFollowingComponent)
+	{
+	PathFollowingComponent->OnRequestFinished.AddUObject(this, &ThisClass::OnMoveCompleted);
+	}
 }
 
 #if USECUSTOMEGRAVITY
@@ -67,8 +69,9 @@ void AGravityPlayerController::UpdateRotation(float DeltaTime)
 }
 #endif
 
-EPathFollowingRequestResult::Type AGravityPlayerController::MoveToLocation(
+void AGravityPlayerController::MoveToLocation_RPC_Implementation(
     const FVector& Dest,
+	const AActor* InGoalActor,
     float AcceptanceRadius, 
     bool bStopOnOverlap, 
     bool bUsePathfinding, 
@@ -78,23 +81,120 @@ EPathFollowingRequestResult::Type AGravityPlayerController::MoveToLocation(
     bool bAllowPartialPaths
 )
 {
-    // abort active movement to keep only one request running
-    if (PathFollowingComponent && PathFollowingComponent->GetStatus() != EPathFollowingStatus::Idle)
-    {
-        PathFollowingComponent->AbortMove(*this, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest
-            , FAIRequestID::CurrentRequest, EPathFollowingVelocityMode::Keep);
-    }
+//	// abort active movement to keep only one request running
+//	if (PathFollowingComponent && PathFollowingComponent->GetStatus() != EPathFollowingStatus::Idle)
+//	{
+//		PathFollowingComponent->AbortMove(*this, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest
+//			, FAIRequestID::CurrentRequest, EPathFollowingVelocityMode::Keep);
+//	}
+//
+//	FAIMoveRequest MoveReq;
+//	if (InGoalActor)
+//	{
+//		MoveReq.SetGoalActor(InGoalActor);
+//	}
+//	else
+//	{
+//		MoveReq.SetGoalLocation(Dest);
+//	}
+//
+//	MoveReq.SetAcceptanceRadius(AcceptanceRadius);
+//	MoveReq.SetUsePathfinding(bUsePathfinding);
+//	MoveReq.SetAllowPartialPath(bAllowPartialPaths);
+//	MoveReq.SetProjectGoalLocation(bProjectDestinationToNavigation);
+////	MoveReq.SetNavigationFilter(*FilterClass ? FilterClass : DefaultNavigationFilterClass);
+//	MoveReq.SetReachTestIncludesAgentRadius(bStopOnOverlap);
+//	MoveReq.SetCanStrafe(bCanStrafe);
+//
+///*	return */MoveTo(MoveReq);
 
-    FAIMoveRequest MoveReq(Dest);
-    MoveReq.SetUsePathfinding(bUsePathfinding);
-    MoveReq.SetAllowPartialPath(bAllowPartialPaths);
-    MoveReq.SetProjectGoalLocation(bProjectDestinationToNavigation);
-    MoveReq.SetNavigationFilter(*FilterClass ? FilterClass : DefaultNavigationFilterClass);
-    MoveReq.SetAcceptanceRadius(AcceptanceRadius);
-    MoveReq.SetReachTestIncludesAgentRadius(bStopOnOverlap);
-    MoveReq.SetCanStrafe(bCanStrafe);
+  	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+  	if (NavSys == nullptr || GetPawn() == nullptr)
+  	{
+  		return;
+  	}
+  
+ 	UPathFollowingComponent* PFollowComp = PathFollowingComponent;
+  
+  	if (PFollowComp == nullptr)
+  	{
+  		return;
+  	}
+  
+  	if (!PFollowComp->IsPathFollowingAllowed())
+  	{
+  		return;
+  	}
+  
+  	const bool bAlreadyAtGoal = InGoalActor ?
+  		PFollowComp->HasReached(*InGoalActor, EPathFollowingReachMode::OverlapAgentAndGoal) :
+  		PFollowComp->HasReached(Dest, EPathFollowingReachMode::OverlapAgentAndGoal);
+  
+  
+  	// script source, keep only one move request at time
+  	if (PFollowComp->GetStatus() != EPathFollowingStatus::Idle)
+  	{
+  		PFollowComp->AbortMove(*NavSys, FPathFollowingResultFlags::ForcedScript | FPathFollowingResultFlags::NewRequest
+  			, FAIRequestID::AnyRequest, bAlreadyAtGoal ? EPathFollowingVelocityMode::Reset : EPathFollowingVelocityMode::Keep);
+  	}
+  
+  	if (bAlreadyAtGoal)
+  	{
+  		PFollowComp->RequestMoveWithImmediateFinish(EPathFollowingResult::Success);
+  	}
+  	else
+  	{
+  		const FVector AgentNavLocation = GetNavAgentLocation();
+  		const ANavigationData* NavData = NavSys->GetNavDataForProps(GetNavAgentPropertiesRef(), AgentNavLocation);
+  		if (NavData)
+  		{
+  			if (InGoalActor)
+  			{
+  				FPathFindingQuery Query(this, *NavData, AgentNavLocation, InGoalActor->GetActorLocation());
+  				FPathFindingResult Result = NavSys->FindPathSync(Query);
+  				if (Result.IsSuccessful())
+  				{
+  					Result.Path->SetGoalActorObservation(*InGoalActor, 100.0f);
+  					PFollowComp->RequestMove(FAIMoveRequest(InGoalActor), Result.Path);
+  				}
+  				else if (PFollowComp->GetStatus() != EPathFollowingStatus::Idle)
+  				{
+  					PFollowComp->RequestMoveWithImmediateFinish(EPathFollowingResult::Invalid);
+  				}
+  			}
+  			else
+  			{
+  				FPathFindingQuery Query(this, *NavData, AgentNavLocation, Dest);
+  				FPathFindingResult Result = NavSys->FindPathSync(Query);
+  				if (Result.IsSuccessful())
+  				{
+  					PFollowComp->RequestMove(FAIMoveRequest(Dest), Result.Path);
+  				}
+  				else if (PFollowComp->GetStatus() != EPathFollowingStatus::Idle)
+  				{
+  					PFollowComp->RequestMoveWithImmediateFinish(EPathFollowingResult::Invalid);
+  				}
+  			}
+  		}
+  	}
+}
 
-    return MoveTo(MoveReq);
+void AGravityPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void AGravityPlayerController::OnRep_Pawn()
+{
+	Super::OnRep_Pawn();
+
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		if (PathFollowingComponent)
+		{
+			PathFollowingComponent->Initialize();
+		}
+	}
 }
 
 void AGravityPlayerController::OnPossess(APawn* InPawn)
@@ -106,12 +206,12 @@ void AGravityPlayerController::OnPossess(APawn* InPawn)
 		return;
 	}
 
-	// not calling UpdateNavigationComponents() anymore. The PathFollowingComponent 
-	// is now observing newly possessed pawns (via OnNewPawn)
-
-	if (PathFollowingComponent)
+	if (GetLocalRole() == ROLE_Authority)
 	{
-		PathFollowingComponent->Initialize();
+		if (PathFollowingComponent)
+		{
+			PathFollowingComponent->Initialize();
+		}
 	}
 }
 
@@ -119,10 +219,10 @@ void AGravityPlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
 
-	if (PathFollowingComponent)
-	{
-		PathFollowingComponent->Cleanup();
-	}
+ 	if (PathFollowingComponent)
+ 	{
+ 		PathFollowingComponent->Cleanup();
+ 	}
 }
 
 FPathFollowingRequestResult AGravityPlayerController::MoveTo(const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath)
@@ -324,7 +424,12 @@ void AGravityPlayerController::StopMovement()
 // 	}
 }
 
+void AGravityPlayerController::StopMovement_RPC_Implementation()
+{
+	StopMovement();
+}
+
 void AGravityPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
-	ReceiveMoveCompleted.Broadcast(RequestID, Result.Code);
+	ReceiveMoveCompleted.ExecuteIfBound(RequestID, Result.Code);
 }

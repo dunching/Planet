@@ -345,8 +345,3 @@ UAnimMontage* USkill_Active_XYFH::GetCurrentMontage() const
 
 	return HumanMontage;
 }
-
-void USkill_Active_XYFH::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-}

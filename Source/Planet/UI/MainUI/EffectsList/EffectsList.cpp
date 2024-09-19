@@ -52,31 +52,6 @@ void UEffectsList::BindCharacterState(ACharacterBase* TargetCharacterPtr)
 
 void UEffectsList::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)
 {
-// 	switch (CharacterStateType)
-// 	{
-// 	case ECharacterStateType::kActive:
-// 	{
-// 		auto ItemPtr = AddEffectItem();
-// 
-// 		EffectItemMap.Add(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag, ItemPtr);
-// 	}
-// 	break;
-// 	case ECharacterStateType::kEnd:
-// 	{
-// 		if (EffectItemMap.Contains(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag))
-// 		{
-// 			if (EffectItemMap[CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag])
-// 			{
-// 				EffectItemMap[CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag]->RemoveFromParent();
-// 			}
-// 
-// 			EffectItemMap.Remove(CharacterStatePtr->GameplayAbilityTargetDataBaseSPtr->Tag);
-// 		}
-// 	}
-// 	break;
-// 	default:
-// 		break;
-// 	}
 }
 
 void UEffectsList::OnCharacterStateMapChanged(const TSharedPtr<FCharacterStateInfo>& CharacterStatePtr, bool bIsAdd)

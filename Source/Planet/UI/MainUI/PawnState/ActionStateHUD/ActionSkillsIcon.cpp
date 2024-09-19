@@ -30,6 +30,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
 #include "SceneElement.h"
+#include "StateProcessorComponent.h"
 
 struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 {
@@ -96,6 +97,8 @@ void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 	SetItemType();
 	SetCanRelease(true);
 	SetRemainingCooldown(true, 0.f, 0.f);
+
+	// 
 	SetInputRemainPercent(false, 0.f);
 }
 
@@ -113,15 +116,15 @@ void UActionSkillsIcon::UpdateSkillState()
 	}
 
 	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-	const auto SkillSocketInfoSPtr = EICPtr->FindActiveSkillSocket(IconSocket);
-	if (!SkillSocketInfoSPtr)
+	const auto SkillProxySPtr = EICPtr->FindActiveSkillSocket(IconSocket);
+	if (!SkillProxySPtr)
 	{
 		return;
 	}
 
-	const auto SKillUnitType = SkillSocketInfoSPtr->GetUnitType();
+	const auto SKillUnitType = SkillProxySPtr->GetUnitType();
 	{
-		auto GAInsPtr = SkillSocketInfoSPtr->GetGAInst();
+		auto GAInsPtr = SkillProxySPtr->GetGAInst();
 		if (!GAInsPtr)
 		{
 			return;
@@ -135,7 +138,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto ActiveSkillUnitPtr = SkillSocketInfoSPtr;
+		auto ActiveSkillUnitPtr = SkillProxySPtr;
 		if (!ActiveSkillUnitPtr)
 		{
 			return;
@@ -147,15 +150,24 @@ void UActionSkillsIcon::UpdateSkillState()
 		bool bIsAcceptInput = false;
 		float Percent = 0.f;
 
-		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->GetGAInst());
+		auto GAInsPtr = Cast<USkill_Active_Base>(SkillProxySPtr->GetGAInst());
 		if (!GAInsPtr)
 		{
 			return;
 		}
 
-		GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
-
-		SetInputRemainPercent(bIsAcceptInput, Percent);
+		auto CSSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(SKillUnitType);
+		if (CSSPtr)
+		{
+			//
+			SetDurationPercent(true, CSSPtr->GetRemainTimePercent());
+		}
+		else
+		{
+			// 
+			GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
+			SetInputRemainPercent(bIsAcceptInput, Percent);
+		}
 	}
 	else if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 	{
@@ -278,13 +290,19 @@ void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent
 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
 	if (UIPtr)
 	{
-		UIPtr->SetVisibility(bIsAcceptInput ?  ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UIPtr->SetVisibility(bIsAcceptInput ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 		UIPtr->SetPercent(Percent);
 	}
 }
 
 void UActionSkillsIcon::SetDurationPercent(bool bIsHaveDuration, float Percent)
 {
+	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
+	if (UIPtr)
+	{
+		UIPtr->SetVisibility(bIsHaveDuration ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UIPtr->SetPercent(Percent);
+	}
 }
 
 void UActionSkillsIcon::NativeConstruct()

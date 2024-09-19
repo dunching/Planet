@@ -41,6 +41,8 @@ public:
 		float Height
 	);
 
+	virtual void TickTask(float DeltaTime) override;
+
 	virtual void Activate() override;
 
 	virtual void OnDestroy(bool AbilityIsEnding) override;
@@ -54,11 +56,11 @@ protected:
 	virtual void SharedInitAndApply() override;
 
 protected:
-
-	int32 Height = 300;
-
-	float Duration = 2.f;
-
+	
+	int32 Height = 100;
+	
+	float Duration = 1.f;
+	
 	ERootMotionAccumulateMode RootMotionAccumulateMode = ERootMotionAccumulateMode::Additive;
 
 };

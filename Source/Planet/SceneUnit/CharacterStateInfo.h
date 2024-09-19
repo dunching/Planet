@@ -28,6 +28,8 @@ struct PLANET_API FCharacterStateInfo
 
 	float GetRemainTime()const ;
 
+	float GetRemainTimePercent()const;
+
 	// 总时间
 	float Duration = -1.f;
 

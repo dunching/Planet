@@ -80,6 +80,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FGameplayTag MovementStateAble_CantRotation =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantRotation")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_IntoFly =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.IntoFly")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_Orient2Acce =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Orient2Acce")));
 #pragma endregion 
 	
 #pragma region State Tags
@@ -106,6 +114,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag State_Debuff_Charm =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Charm")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_Debuff_Fear =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Fear")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Silent =

@@ -24,6 +24,12 @@ static TAutoConsoleVariable<int32> GravityMovementComponent_Debug(
     TEXT("")
     TEXT(" default: 0"));
 
+UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& ObjectInitializer) :
+    Super(ObjectInitializer)
+{
+//    SetIsReplicatedByDefault(true);
+}
+
 const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
 {
     if (!CharacterOwner || (GFrameCounter == CachedGroundInfo.LastUpdateFrame))
@@ -69,6 +75,11 @@ const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
     CachedGroundInfo.LastUpdateFrame = GFrameCounter;
 
     return CachedGroundInfo;
+}
+
+void UGravityMovementComponent::SetIsOrientRotationToMovement_RPC_Implementation(bool bIsOrientRotationToMovement)
+{
+    bOrientRotationToMovement = bIsOrientRotationToMovement;
 }
 
 void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
@@ -234,11 +245,6 @@ DECLARE_CYCLE_STAT(TEXT("Char ProcessLanded"), STAT_CharProcessLanded, STATGROUP
 #else
 #define devCode(...)
 #endif
-
-UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& ObjectInitializer):
-    Super(ObjectInitializer)
-{
-}
 
 void UGravityMovementComponent::BeginPlay()
 {

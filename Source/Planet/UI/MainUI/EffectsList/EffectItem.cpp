@@ -128,7 +128,7 @@ void UEffectItem::OnUpdate()
 
 	if (CharacterStateInfoSPtr->Duration > 0.f)
 	{
-		SetPercent(true, 1 - (CharacterStateInfoSPtr->TotalTime / CharacterStateInfoSPtr->Duration));
+		SetPercent(true, CharacterStateInfoSPtr->GetRemainTimePercent());
 	}
 	else
 	{

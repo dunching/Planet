@@ -153,7 +153,6 @@ void USkill_WeaponActive_Base::CheckInContinue()
 		}
 		else
 		{
-			check(0);
 			WaitInputTaskPtr->SetInfinite();
 		}
 

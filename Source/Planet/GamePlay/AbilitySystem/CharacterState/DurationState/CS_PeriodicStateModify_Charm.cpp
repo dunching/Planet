@@ -23,51 +23,9 @@
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "AbilityTask_Tornado.h"
-#include "Skill_Active_Tornado.h"
-
-UCS_PeriodicStateModify_Charm::UCS_PeriodicStateModify_Charm() :
-	Super()
-{
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-}
-
-void UCS_PeriodicStateModify_Charm::PreActivate(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
-{
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
-}
-
-void UCS_PeriodicStateModify_Charm::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-}
-
-void UCS_PeriodicStateModify_Charm::EndAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility,
-	bool bWasCancelled
-)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
+#include "StateProcessorComponent.h"
+#include "CharacterStateInfo.h"
+#include "PlanetPlayerController.h"
 
 FGameplayAbilityTargetData_StateModify_Charm::FGameplayAbilityTargetData_StateModify_Charm(
 	float Duration
@@ -79,4 +37,159 @@ FGameplayAbilityTargetData_StateModify_Charm::FGameplayAbilityTargetData_StateMo
 FGameplayAbilityTargetData_StateModify_Charm::FGameplayAbilityTargetData_StateModify_Charm()
 {
 
+}
+
+UCS_PeriodicStateModify_Charm::UCS_PeriodicStateModify_Charm() :
+	Super()
+{
+}
+
+void UCS_PeriodicStateModify_Charm::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
+{
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+}
+
+void UCS_PeriodicStateModify_Charm::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
+
+	PerformAction();
+}
+
+void UCS_PeriodicStateModify_Charm::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+	//
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(StateDisplayInfoSPtr);
+
+	//
+	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
+
+	GAEventDataPtr->TriggerCharacterPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr;
+
+	FGAEventData GAEventData(
+		GameplayAbilityTargetDataSPtr->TargetCharacterPtr,
+		GameplayAbilityTargetDataSPtr->TargetCharacterPtr
+	);
+
+	GAEventData.DataSource = GameplayAbilityTargetDataSPtr->Tag;
+	GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,0 } };
+	GAEventData.bIsClearData = true;
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+
+	//
+	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+	PCPtr->ReceiveMoveCompleted.Unbind();
+	PCPtr->StopMovement_RPC();
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void UCS_PeriodicStateModify_Charm::UpdateDuration()
+{
+	Super::UpdateDuration();
+
+	PerformAction();
+}
+
+void UCS_PeriodicStateModify_Charm::PerformAction()
+{
+	// 
+	StateDisplayInfoSPtr = MakeShared<FCharacterStateInfo>();
+	StateDisplayInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+	StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+	StateDisplayInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+	StateDisplayInfoSPtr->DataChanged();
+	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(StateDisplayInfoSPtr);
+
+	//
+	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
+
+	GAEventDataPtr->TriggerCharacterPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr;
+
+	FGAEventData GAEventData(
+		GameplayAbilityTargetDataSPtr->TargetCharacterPtr,
+		GameplayAbilityTargetDataSPtr->TargetCharacterPtr
+	);
+
+	GAEventData.DataSource = GameplayAbilityTargetDataSPtr->Tag;
+	GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,0 } };
+	GAEventData.bIsOverlapData = true;
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+
+	//
+	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+	PCPtr->MoveToLocation_RPC(
+		FVector::ZeroVector,
+		GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
+		AcceptanceRadius
+	);
+	PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::OnMoveCompleted);
+}
+
+void UCS_PeriodicStateModify_Charm::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+{
+	switch (Result)
+	{
+	case EPathFollowingResult::Success: 
+	{
+		//
+		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+		PCPtr->MoveToLocation_RPC(
+			FVector::ZeroVector,
+			GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
+			AcceptanceRadius
+		);
+		PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::OnMoveCompleted);
+	}
+		break;
+	case EPathFollowingResult::Blocked:
+		break;
+	case EPathFollowingResult::OffPath:
+		break;
+	case EPathFollowingResult::Aborted:
+		break;
+	case EPathFollowingResult::Skipped_DEPRECATED:
+		break;
+	case EPathFollowingResult::Invalid:
+		break;
+	default:
+		break;
+	}
+}
+
+void UCS_PeriodicStateModify_Charm::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
+{
+	StateDisplayInfoSPtr->TotalTime += DeltaTime;
+
+	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(StateDisplayInfoSPtr);
 }

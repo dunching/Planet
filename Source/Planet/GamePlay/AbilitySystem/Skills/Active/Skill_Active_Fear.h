@@ -5,7 +5,7 @@
 
 #include "Skill_Active_Base.h"
 
-#include "Skill_Active_Charm.generated.h"
+#include "Skill_Active_Fear.generated.h"
 
 class UAnimMontage;
 
@@ -16,7 +16,7 @@ class ASPlineActor;
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_Active_Charm : public USkill_Active_Base
+class PLANET_API USkill_Active_Fear : public USkill_Active_Base
 {
 	GENERATED_BODY()
 

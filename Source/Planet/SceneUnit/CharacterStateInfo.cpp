@@ -13,6 +13,11 @@ float FCharacterStateInfo::GetRemainTime() const
 	return Duration - TotalTime;
 }
 
+float FCharacterStateInfo::GetRemainTimePercent() const
+{
+	return (Duration - TotalTime) / Duration;
+}
+
 bool FCharacterStateInfo_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
 {
 	const auto Result =

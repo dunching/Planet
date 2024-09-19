@@ -112,7 +112,7 @@ protected:
 	bool bIsContinue = true;
 
 	// < 0 则为不限时间，在显式结束前就可以再次输入
-	float CurrentWaitInputTime = -1.f;
+	float CurrentWaitInputTime = 1.f;
 
 	float WaitInputPercent = 1.f;
 

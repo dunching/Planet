@@ -81,12 +81,12 @@ bool FRootMotionSource_BySpline::Matches(const FRootMotionSource* Other) const
 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(Other);
 
 	return true;
-// 		(StartPtIndex == OtherCast->StartPtIndex) &&
-// 		(EndPtIndex == OtherCast->EndPtIndex) &&
-// 		(SPlineActorPtr == OtherCast->SPlineActorPtr) &&
-// 		(TargetCharacterPtr == OtherCast->TargetCharacterPtr) &&
-// 		FMath::IsNearlyEqual(StartDistance, OtherCast->StartDistance) &&
-// 		FMath::IsNearlyEqual(EndDistance, OtherCast->EndDistance) ;
+	// 		(StartPtIndex == OtherCast->StartPtIndex) &&
+	// 		(EndPtIndex == OtherCast->EndPtIndex) &&
+	// 		(SPlineActorPtr == OtherCast->SPlineActorPtr) &&
+	// 		(TargetCharacterPtr == OtherCast->TargetCharacterPtr) &&
+	// 		FMath::IsNearlyEqual(StartDistance, OtherCast->StartDistance) &&
+	// 		FMath::IsNearlyEqual(EndDistance, OtherCast->EndDistance) ;
 }
 
 bool FRootMotionSource_BySpline::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
@@ -96,14 +96,14 @@ bool FRootMotionSource_BySpline::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		return false;
 	}
 
-// 	Ar << StartPtIndex; 
-// 	Ar << EndPtIndex;
-// 	Ar << StartDistance;
-// 	Ar << EndDistance;
-// 	Ar << SPlineActorPtr;
-// 	Ar << TargetCharacterPtr;
-// 
-// 	bOutSuccess = true;
+	// 	Ar << StartPtIndex; 
+	// 	Ar << EndPtIndex;
+	// 	Ar << StartDistance;
+	// 	Ar << EndDistance;
+	// 	Ar << SPlineActorPtr;
+	// 	Ar << TargetCharacterPtr;
+	// 
+	// 	bOutSuccess = true;
 	return true;
 }
 
@@ -122,14 +122,14 @@ bool FRootMotionSource_BySpline::UpdateStateFrom(
 		return false;
 	}
 
-// 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(SourceToTakeStateFrom);
-// 
-// 	StartPtIndex = OtherCast->StartPtIndex;
-// 	EndPtIndex = OtherCast->EndPtIndex;
-// 	StartDistance = OtherCast->StartDistance;
-// 	StartPtIndex = OtherCast->StartPtIndex;
-// 	SPlineActorPtr = OtherCast->SPlineActorPtr;
-// 	TargetCharacterPtr = OtherCast->TargetCharacterPtr;
+	// 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(SourceToTakeStateFrom);
+	// 
+	// 	StartPtIndex = OtherCast->StartPtIndex;
+	// 	EndPtIndex = OtherCast->EndPtIndex;
+	// 	StartDistance = OtherCast->StartDistance;
+	// 	StartPtIndex = OtherCast->StartPtIndex;
+	// 	SPlineActorPtr = OtherCast->SPlineActorPtr;
+	// 	TargetCharacterPtr = OtherCast->TargetCharacterPtr;
 
 	return true;
 }
@@ -295,11 +295,34 @@ bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
 
 	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
 
-	return 
-		FMath::IsNearlyEqual(RiseDuration, OtherCast->RiseDuration) ||
-		TargetPt == OtherCast->TargetPt ||
-		CurrentStartPt == OtherCast->CurrentStartPt ||
-		OriginalLandingPt == OtherCast->OriginalLandingPt;
+	return
+		FMath::IsNearlyEqual(RiseDuration, OtherCast->RiseDuration) &&
+		Height == OtherCast->Height;
+}
+
+bool FRootMotionSource_FlyAway::MatchesAndHasSameState(const FRootMotionSource* Other) const
+{
+	if (!FRootMotionSource::MatchesAndHasSameState(Other))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool FRootMotionSource_FlyAway::UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup /*= false*/)
+{
+	if (!FRootMotionSource::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
+	{
+		return false;
+	}
+
+	auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(SourceToTakeStateFrom);
+
+	RiseDuration = OtherCast->RiseDuration;
+	Height = OtherCast->Height;
+
+	return true;
 }
 
 void FRootMotionSource_FlyAway::PrepareRootMotion(
@@ -314,19 +337,34 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	FTransform NewTransform = FTransform::Identity;
 
 	const FVector CurrentLocation = Character.GetActorLocation();
+	const FVector GravityDir = UKismetGravityLibrary::GetGravity(FVector::ZeroVector);
 
-	if (GetTime() < RiseDuration)
+	FCollisionQueryParams Params;
+	Params.bTraceComplex = false;
+	Params.AddIgnoredActor(&Character);
+
+	const ECollisionChannel CollisionChannel = MoveComponent.UpdatedComponent->GetCollisionObjectType();
+	FHitResult Result;
+	if (Character.GetWorld()->LineTraceSingleByChannel(
+		Result,
+		CurrentLocation,
+		CurrentLocation + (GravityDir * Height * 2), // * 2， 避免找不到
+		CollisionChannel,
+		Params
+	))
 	{
-		float MoveFraction = (GetTime() + SimulationTime) / RiseDuration;
+		auto TargetPt = FVector::ZeroVector;
+		if (GetTime() < RiseDuration)
+		{
+			float MoveFraction = (GetTime() + SimulationTime) / RiseDuration;
 
-		FVector CurrentTargetLocation = FMath::Lerp<FVector, float>(CurrentStartPt, TargetPt, MoveFraction);
+			TargetPt = Result.ImpactPoint - (GravityDir * FMath::Lerp<float, float>(0, Height + HalfHeight, MoveFraction));
 
-		FVector Force = (CurrentTargetLocation - CurrentLocation) / MovementTickTime;
-
-		NewTransform.SetTranslation(Force);
-	}
-	else
-	{
+		}
+		else
+		{
+			TargetPt = Result.ImpactPoint - (GravityDir * (Height + HalfHeight));
+		}
 		FVector Force = (TargetPt - CurrentLocation) / MovementTickTime;
 
 		NewTransform.SetTranslation(Force);
@@ -340,14 +378,36 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	SetTime(GetTime() + SimulationTime);
 }
 
+bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+	if (!FRootMotionSource::NetSerialize(Ar, Map, bOutSuccess))
+	{
+		return false;
+	}
+
+	Ar << RiseDuration;
+	Ar << Height;
+
+	bOutSuccess = true;
+	return true;
+}
+
+UScriptStruct* FRootMotionSource_FlyAway::GetScriptStruct() const
+{
+	return FRootMotionSource_FlyAway::StaticStruct();
+}
+
 void FRootMotionSource_FlyAway::Initial(
-	float Height,
+	float InHeight,
 	float InDuration,
-	const FVector& OriginalPt
+	const FVector& OriginalPt,
+	ACharacter* CharacterPtr
 )
 {
-	OriginalLandingPt = OriginalPt;
-	UpdateDuration(Height, InDuration, OriginalPt);
+	CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
+	FVector CapsuleExtent(Radius, Radius, HalfHeight);
+
+	UpdateDuration(InHeight, InDuration, OriginalPt);
 }
 
 void FRootMotionSource_FlyAway::UpdateDuration(
@@ -356,13 +416,11 @@ void FRootMotionSource_FlyAway::UpdateDuration(
 	const FVector& InOriginalPt
 )
 {
-	Duration = InDuration;
-
 	SetTime(0.f);
 
-	CurrentStartPt = InOriginalPt;
+	Duration = InDuration;
 
-	TargetPt = OriginalLandingPt - (UKismetGravityLibrary::GetGravity(OriginalLandingPt) * InHeight);
+	Height = InHeight;
 }
 
 void SetRootMotionFinished(FRootMotionSource& RootMotionSource)

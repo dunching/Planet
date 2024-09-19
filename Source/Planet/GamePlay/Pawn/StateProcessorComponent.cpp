@@ -53,6 +53,7 @@
 #include "CS_PeriodicStateModify_Ice.h"
 #include "CS_PeriodicPropertyTag.h"
 #include "CS_PeriodicStateModify_Slow.h"
+#include "CS_PeriodicStateModify_Fear.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
@@ -204,13 +205,27 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->bSkipRootMotion = Value;
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkipRotation = Value;
+				CharacterMovementPtr->SetMovementMode(Value ? EMovementMode::MOVE_Flying : EMovementMode::MOVE_Falling);
+				if (Value)
+				{
+					CharacterMovementPtr->MaxFlySpeed = CharacterMovementPtr->MaxWalkSpeed;
+					CharacterMovementPtr->BrakingDecelerationFlying = 2048;
+				}
+			}
+		}
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce))
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->SetIsOrientRotationToMovement_RPC(Value);
 			}
 		}
 	}
@@ -310,6 +325,15 @@ void UStateProcessorComponent::ExcuteEffects(
 		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
 		{
 			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Charm::StaticClass(), 1);
+
+			ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				MkeSpec(GameplayAbilityTargetDataSPtr)
+			);
+		}
+		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear))
+		{
+			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Fear::StaticClass(), 1);
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,

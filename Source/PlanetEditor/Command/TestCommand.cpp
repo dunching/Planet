@@ -64,7 +64,7 @@ void TestCommand::TestPlayerCharacterMoveTo(const TArray< FString >& Args)
 			auto PCPtr = Cast<AGravityPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
 			if (PCPtr)
 			{
-				PCPtr->MoveToLocation(OutActors[0]->GetActorLocation(), 50);
+//				PCPtr->MoveToLocation(OutActors[0]->GetActorLocation(), 50);
 			}
 		}
 	}

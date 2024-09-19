@@ -107,8 +107,9 @@ public:
 
 	virtual void Tick(float DeltaTime);
 
+	// 获取 “等待输入”时长
 	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
-
+	
 	// 确认是否有锁定的目标
 	ACharacterBase* HasFocusActor()const;
 	
@@ -129,10 +130,13 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
+	// 进入等待多段输入
 	void ContinueActive();
 
+	// 
 	void CheckInContinue();
 
+	// 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
 	
@@ -140,6 +144,7 @@ protected:
 
 	bool bIsPreviouInput = false;
 
+	// 等待输入时常
 	float CurrentWaitInputTime = 3.f;
 
 	float WaitInputPercent = 1.f;

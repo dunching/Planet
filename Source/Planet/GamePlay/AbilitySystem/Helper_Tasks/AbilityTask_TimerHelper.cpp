@@ -108,10 +108,11 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 			DurationDelegate.ExecuteIfBound(this, Duration_TotalTime, Duration);
 			if (Duration_TotalTime >= Duration)
 			{
-				if (OnFinished.Execute(this))
+				if (OnFinished.IsBound() && OnFinished.Execute(this))
 				{
 					EndTask();
 				}
+				EndTask();
 			}
 		}
 		else
@@ -137,7 +138,7 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 		{
 			if (CurrentCount >= Count)
 			{
-				if (OnFinished.Execute(this))
+				if (OnFinished.IsBound() && OnFinished.Execute(this))
 				{
 					EndTask();
 				}

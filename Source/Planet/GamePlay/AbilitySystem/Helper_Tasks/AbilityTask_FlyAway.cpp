@@ -14,6 +14,7 @@
 
 #include "Helper_RootMotionSource.h"
 #include "CharacterBase.h"
+#include "GameplayTagsSubSystem.h"
 
 UAbilityTask_FlyAway::UAbilityTask_FlyAway(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -64,6 +65,19 @@ UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
 	return MyTask;
 }
 
+void UAbilityTask_FlyAway::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+
+	const bool bTimedOut = HasTimedOut();
+	if (bTimedOut)
+	{
+		bIsFinished = true;
+		OnFinish.ExecuteIfBound();
+		EndTask();
+	}
+}
+
 void UAbilityTask_FlyAway::Activate()
 {
 	Super::Activate();
@@ -76,6 +90,8 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
+		ASC->AddLooseGameplayTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
+
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
 		if (MovementComponent)
 		{
@@ -89,7 +105,12 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 			RootMotionSourceSPtr->FinishVelocityParams.SetVelocity = FinishSetVelocity;
 			RootMotionSourceSPtr->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
 
-			RootMotionSourceSPtr->Initial(Height, Duration, ASC->AbilityActorInfo->AvatarActor->GetActorLocation());
+			RootMotionSourceSPtr->Initial(
+				Height, 
+				Duration, 
+				ASC->AbilityActorInfo->AvatarActor->GetActorLocation(),
+				Cast<ACharacter>(ASC->AbilityActorInfo->AvatarActor)
+			);
 
 			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RootMotionSourceSPtr);
 		}
@@ -98,6 +119,12 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 
 void UAbilityTask_FlyAway::OnDestroy(bool AbilityIsEnding)
 {
+	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
+	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
+	{
+		ASC->RemoveLooseGameplayTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
+	}
+
 	if (MovementComponent)
 	{
 		MovementComponent->RemoveRootMotionSourceByID(RootMotionSourceID);
@@ -116,4 +143,3 @@ void UAbilityTask_FlyAway::UpdateDuration()
 		RootMotionSourceSPtr->UpdateDuration(Height, Duration, MovementComponent->GetActorLocation());
 	}
 }
-
