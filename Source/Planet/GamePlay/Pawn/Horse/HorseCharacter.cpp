@@ -17,7 +17,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayTagsSubSystem.h"
 
-#include "GameMode/PlanetGameMode.h"
+#include "GameMode_Main.h"
 #include "PlanetPlayerState.h"
 #include "GenerateType.h"
 #include "Command/TestCommand.h"
@@ -35,7 +35,7 @@
 #include "ActionStairBase.h"
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "HoldingItemsComponent.h"
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"

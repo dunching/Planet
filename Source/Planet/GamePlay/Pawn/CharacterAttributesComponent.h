@@ -16,6 +16,8 @@
 class IPlanetControllerInterface;
 class UGAEvent_Received;
 
+struct FCharacterAttributes;
+
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterAttributesComponent : public UActorComponent
 {
@@ -31,15 +33,27 @@ public:
 
 	static FName ComponentName;
 
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)override;
+	const FCharacterAttributes& GetCharacterAttributes()const;
 
-	TSharedPtr<FCharacterAttributes> GetCharacterAttributes()const;
+	FCharacterAttributes& GetCharacterAttributes();
 
+	// 基础状态回复
 	void ProcessCharacterAttributes();
+
+	UPROPERTY(Replicated)
+	FCharacterAttributes CharacterAttributes;
 
 protected:
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void BeginPlay()override;
+
+	virtual void TickComponent(
+		float DeltaTime,
+		enum ELevelTick TickType,
+		FActorComponentTickFunction* ThisTickFunction
+	)override;
 
 private:
 

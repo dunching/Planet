@@ -11,8 +11,8 @@
 #include "SceneUnitTable.h"
 #include "SceneElement.h"
 
-APlanetPlayerState::APlanetPlayerState() :
-	Super()
+APlanetPlayerState::APlanetPlayerState(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
 {
 }
 

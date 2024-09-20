@@ -5,11 +5,11 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
+#include "UnitProxyProcessComponent.h"
+
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "Planet_Tools.h"
@@ -66,14 +66,19 @@ void UBasicFutures_Run::ActivateAbility(
 	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-		
-		ModifyPropertyMap.Add(
-			ECharacterPropertyType::MoveSpeed,
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->RunningSpeedOffset.GetCurrentValue()
-		);
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+			ModifyPropertyMap.Add(
+				ECharacterPropertyType::MoveSpeed,
+				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().RunningSpeedOffset.GetCurrentValue()
+			);
+
+			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+		}
+#endif
 	}
 }
 
@@ -85,14 +90,19 @@ void UBasicFutures_Run::EndAbility(
 	bool bWasCancelled
 )
 {
-	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());	
+	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
 
 		CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+		}
+#endif
 	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -111,9 +121,9 @@ bool UBasicFutures_Run::CanActivateAbility(
 	{
 		if (CharacterPtr->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
 		{
-			auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			if (CharacterAttributesSPtr->PP.GetCurrentValue() >=
-				CharacterAttributesSPtr->RunningConsume.GetCurrentValue())
+			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			if (CharacterAttributes.PP.GetCurrentValue() >=
+				CharacterAttributes.RunningConsume.GetCurrentValue())
 			{
 				return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 			}

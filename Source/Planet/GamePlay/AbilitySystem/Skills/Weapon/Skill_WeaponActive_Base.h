@@ -9,12 +9,33 @@
 
 #include "Skill_WeaponActive_Base.generated.h"
 
-class UBasicUnit;
+struct FBasicProxy;
 class UAbilityTask_TimerHelper;
+class AWeapon_Base;
 
-struct FGameplayAbilityTargetData_Skill_Weapon : public FGameplayAbilityTargetData
+USTRUCT()
+struct FGameplayAbilityTargetData_Skill_Weapon : 
+	public FGameplayAbilityTargetData_ActiveParam
 {
+	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	bool bIsAutoContinue = false;
+
+	AWeapon_Base* WeaponPtr = nullptr;
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Skill_Weapon> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Skill_Weapon>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()
@@ -66,9 +87,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	void ContinueActive();
-
-	void StopContinueActive();
+	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
 protected:
 	
@@ -78,6 +97,10 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	);
+
+	void ContinueActive();
+
+	void StopContinueActive();
 
 	void CheckInContinue();
 
@@ -89,12 +112,14 @@ protected:
 	bool bIsContinue = true;
 
 	// < 0 则为不限时间，在显式结束前就可以再次输入
-	float CurrentWaitInputTime = -1.f;
+	float CurrentWaitInputTime = 1.f;
 
 	float WaitInputPercent = 1.f;
 
+	FGuid PropertuModify_GUID = FGuid::NewGuid();
+
 	const ActiveParamType* ActiveParamPtr = nullptr;
 
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
+private:
 
 };

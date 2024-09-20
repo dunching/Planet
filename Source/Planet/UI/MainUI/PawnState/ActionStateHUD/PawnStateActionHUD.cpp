@@ -1,3 +1,4 @@
+#include "PawnStateActionHUD.h"
 
 #include "PawnStateActionHUD.h"
 
@@ -8,7 +9,7 @@
 #include "PlanetPlayerState.h"
 #include "Planet.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ActionSkillsIcon.h"
 #include "CharacterAttibutes.h"
 #include "AssetRefMap.h"
@@ -71,9 +72,9 @@ void UPawnStateActionHUD::NativeConstruct()
 
 void UPawnStateActionHUD::NativeDestruct()
 {
-	if (ActivedWeaponChangedDelegate)
+	if (OnAllocationSkillChangedDelegate)
 	{
-		ActivedWeaponChangedDelegate->UnBindCallback();
+		OnAllocationSkillChangedDelegate->UnBindCallback();
 	}
 
 	Super::NativeDestruct();
@@ -112,14 +113,14 @@ void UPawnStateActionHUD::ResetUIByData()
 		return;
 	}
 	{
-		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
 			if (!UIPtr)
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->HP);
+			UIPtr->SetDataSource(CharacterAttributes.HP);
 		}
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
@@ -127,7 +128,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->PP);
+			UIPtr->SetDataSource(CharacterAttributes.PP);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().BaseAttackPower));
@@ -135,7 +136,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->BaseAttackPower);
+			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Penetration));
@@ -143,7 +144,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Penetration, CharacterAttributesSPtr->PercentPenetration);
+			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Resistance));
@@ -151,7 +152,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->Resistance);
+			UIPtr->SetDataSource(CharacterAttributes.Resistance);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
@@ -159,7 +160,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->MoveSpeed);
+			UIPtr->SetDataSource(CharacterAttributes.MoveSpeed);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
@@ -167,7 +168,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->GAPerformSpeed);
+			UIPtr->SetDataSource(CharacterAttributes.GAPerformSpeed);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Gold));
@@ -175,7 +176,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->GoldElement);
+			UIPtr->SetDataSource(CharacterAttributes.GoldElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
@@ -183,7 +184,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->WoodElement);
+			UIPtr->SetDataSource(CharacterAttributes.WoodElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
@@ -191,7 +192,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->WaterElement);
+			UIPtr->SetDataSource(CharacterAttributes.WaterElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
@@ -199,7 +200,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->FireElement);
+			UIPtr->SetDataSource(CharacterAttributes.FireElement);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Soil));
@@ -207,11 +208,19 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributesSPtr->SoilElement);
+			UIPtr->SetDataSource(CharacterAttributes.SoilElement);
 		}
 	}
 	InitialTalentUI();
-	InitialSkillIcon();
+
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback(
+		std::bind(&ThisClass::InitialActiveSkillIcon, this)
+	);
+	InitialActiveSkillIcon();
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback(
+		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
+	);
+	InitialWeaponSkillIcon();
 }
 
 void UPawnStateActionHUD::InitialTalentUI()
@@ -232,11 +241,10 @@ void UPawnStateActionHUD::InitialTalentUI()
 	{
 		bool bIsGiveTalentPassive = false;
 		if (
-			Iter.Value->SkillUnitPtr && 
-			(Iter.Value->SkillUnitPtr->Level > 0)
+			Iter.Value->ProxySPtr
 			)
 		{
-			if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi))
+			if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 				if (UIPtr)
@@ -245,7 +253,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 					bIsGiveTalentPassive = true;
 				}
 			}
-			else if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang))
+			else if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
 				if (UIPtr)
@@ -259,7 +267,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 	}
 }
 
-void UPawnStateActionHUD::InitialSkillIcon()
+void UPawnStateActionHUD::InitialActiveSkillIcon()
 {
 	if (!CharacterPtr)
 	{
@@ -283,7 +291,7 @@ void UPawnStateActionHUD::InitialSkillIcon()
 			auto SocketIter = SkillsMap.Find(SkillIcon->IconSocket);
 			if (SocketIter)
 			{
-				SkillIcon->ResetToolUIByData((*SocketIter)->SkillUnitPtr);
+				SkillIcon->ResetToolUIByData((*SocketIter)->ProxySPtr);
 			}
 			else
 			{
@@ -291,45 +299,46 @@ void UPawnStateActionHUD::InitialSkillIcon()
 			}
 		}
 	}
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-
-	ActivedWeaponChangedDelegate = EICPtr->OnActivedWeaponChangedContainer.AddCallback(
-		std::bind(&ThisClass::OnActivedWeaponChanged, this, std::placeholders::_1)
-	);
-	OnActivedWeaponChanged(EICPtr->GetActivedWeaponType());
 }
 
-void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
+void UPawnStateActionHUD::InitialWeaponSkillIcon()
 {
 	if (!CharacterPtr)
 	{
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
 
-	TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr;
-	switch (WeaponSocket)
+	const auto CurrentWeaponSocket = CharacterPtr->GetInteractiveSkillComponent()->CurrentWeaponSocket;
+
+	if (
+		CurrentWeaponSocket ==
+		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1
+		)
 	{
-	case EWeaponSocket::kMain:
+		CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+	}
+	else if (
+		CurrentWeaponSocket ==
+		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2
+		)
 	{
-		EICPtr->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+		CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
 	}
-	break;
-	case EWeaponSocket::kSecondary:
+	else
 	{
-		EICPtr->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
+		return;
 	}
-	break;
-	}
+
 	{
 		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
-				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->WeaponUnitPtr ?
-				FirstWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill :
+				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr ?
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
 				nullptr
 			);
 		}
@@ -339,8 +348,8 @@ void UPawnStateActionHUD::OnActivedWeaponChanged(EWeaponSocket WeaponSocket)
 		if (IconPtr)
 		{
 			IconPtr->ResetToolUIByData(
-				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->WeaponUnitPtr ?
-				SecondWeaponSocketInfoSPtr->WeaponUnitPtr->FirstSkill : 
+				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr ?
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
 				nullptr
 			);
 		}

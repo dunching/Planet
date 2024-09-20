@@ -36,11 +36,30 @@ public:
 	virtual void TickComponent(
 		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
 	)override;
+	
+	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)override;
+
+	UFUNCTION(Client, Reliable)
+	void ReplicateContinues(
+		FGameplayAbilitySpecHandle Handle,
+		FGameplayAbilityActivationInfo ActivationInfo,
+		bool bIsContinue
+	);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReplicateEventData(
+		int32 InputID,
+		const FGameplayEventData&TriggerEventData
+	);
 
 	UFUNCTION(BlueprintCallable, Category = "ASC")
 	bool K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASC")
 	bool K2_HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const;
+
+private:
+
+	TMap<int32, FGameplayEventData>GameplayEventDataMap;
 
 };

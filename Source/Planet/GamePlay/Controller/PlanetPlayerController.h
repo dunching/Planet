@@ -15,7 +15,7 @@
 
 class ACharacterBase;
 class IPlanetControllerInterface;
-class UCharacterUnit;
+struct FCharacterProxy;
 class UFocusIcon;
 class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
@@ -60,7 +60,7 @@ public:
 
 	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
 
-	virtual UCharacterUnit* GetCharacterUnit() override;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterUnit() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;
 
@@ -82,11 +82,11 @@ protected:
 
 	virtual bool InputKey(const FInputKeyParams& Params)override;
 
-	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)override;
+	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)override;
 
 	virtual void BindPCWithCharacter()override;
 
-	virtual UCharacterUnit* InitialCharacterUnit(ACharacterBase * CharaterPtr)override;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase * CharaterPtr)override;
 
 	UFUNCTION()
 	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);

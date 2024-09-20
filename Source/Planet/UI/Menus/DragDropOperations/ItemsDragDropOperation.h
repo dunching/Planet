@@ -23,7 +23,7 @@ class PLANET_API UItemsDragDropOperation : public UDragDropOperation
 
 public:
 
-	UBasicUnit* SceneToolSPtr;
+	TSharedPtr<FBasicProxy> SceneToolSPtr;
 
 	bool bIsInBackpakc = false;
 

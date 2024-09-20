@@ -11,8 +11,6 @@
 
 #include "GravityPlayerController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FMoveCompletedSignature, FAIRequestID, RequestID, EPathFollowingResult::Type, Result);
-
 class UPathFollowingComponent;
 class UNavigationQueryFilter;
 
@@ -23,35 +21,45 @@ class GRAVITY_API AGravityPlayerController : public APlayerController
 
 public:
 
+	DECLARE_DELEGATE_TwoParams(FMoveCompletedSignature, FAIRequestID, EPathFollowingResult::Type);
+
 	AGravityPlayerController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 #if USECUSTOMEGRAVITY
 	virtual void UpdateRotation(float DeltaTime)override;
 
-	// ��¼Player��Yaw��Pitch
+	// 记录Player的Yaw和Pitch
 	FRotator ControlRotationWithoutGravityTrans = FRotator::ZeroRotator;
 #endif
 
-	EPathFollowingRequestResult::Type MoveToLocation(
+	UFUNCTION(NetMulticast, Reliable)
+	void MoveToLocation_RPC(
 		const FVector& Dest, 
+		const AActor* InGoalActor,
 		float AcceptanceRadius = -1, 
 		bool bStopOnOverlap = true,
 		bool bUsePathfinding = true,
 		bool bProjectDestinationToNavigation = false,
-		bool bCanStrafe = true,
+		bool bCanStrafe = false,
 		TSubclassOf<UNavigationQueryFilter> FilterClass = NULL, 
 		bool bAllowPartialPath = true
 	);
-
+	
 	virtual void StopMovement() override;
 
-	/** Blueprint notification that we've completed the current movement request */
-	UPROPERTY(BlueprintAssignable, meta = (DisplayName = "MoveCompleted"))
+	UFUNCTION(NetMulticast, Reliable)
+	void StopMovement_RPC();
+
 	FMoveCompletedSignature ReceiveMoveCompleted;
 
 protected:
 
+	 virtual void BeginPlay() override;
+
+	 virtual void OnRep_Pawn()override;
+
 	 virtual void OnPossess(APawn* InPawn) override;
+
 	 virtual void OnUnPossess() override;
 
 	virtual FPathFollowingRequestResult MoveTo(const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath = nullptr);
@@ -66,15 +74,16 @@ protected:
 		const FAIMoveRequest& MoveRequest, FPathFindingQuery& Query, FNavPathSharedPtr& OutPath
 	) const;
 
-	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
+	void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TSubclassOf<UNavigationQueryFilter> DefaultNavigationFilterClass;
 
 	/** Component used for moving along a path. */
-	UPROPERTY(VisibleDefaultsOnly, Category = AI)
-	TObjectPtr<UPathFollowingComponent> PathFollowingComponent;
-	
+	// 这个组件在PlayerController上时网络复制的问题解决不掉 暂时不使用
+ 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = AI)
+ 	TObjectPtr<UPathFollowingComponent> PathFollowingComponent;
+
 	/** Is strafing allowed during movement? */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	uint32 bAllowStrafe : 1;

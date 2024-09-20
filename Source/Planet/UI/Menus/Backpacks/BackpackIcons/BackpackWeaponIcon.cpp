@@ -40,13 +40,13 @@ void UBackpackWeaponIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackWeaponIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UBackpackWeaponIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
 	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
-		UnitPtr = Cast<UWeaponUnit>(InBasicUnitPtr);
+		UnitPtr = DynamicCastSharedPtr<FWeaponProxy>(InBasicUnitPtr);
 	}
 }
 

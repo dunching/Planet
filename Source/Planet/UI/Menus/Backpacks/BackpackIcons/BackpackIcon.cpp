@@ -23,6 +23,9 @@
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
 #include "CharacterAttibutes.h"
+#include "GameplayTagsSubSystem.h"
+#include "CharacterBase.h"
+#include "CharacterAttributesComponent.h"
 
 struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 {
@@ -45,13 +48,13 @@ void UBackpackIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
 }
 
-void UBackpackIcon::ResetToolUIByData(UBasicUnit * InBasicUnitPtr)
+void UBackpackIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	BasicUnitPtr = InBasicUnitPtr;
 
 	if (BasicUnitPtr)
 	{
-		SetItemType(BasicUnitPtr);
+		SetItemType(BasicUnitPtr.Get());
 
 		OnAllocationCharacterUnitChangedHandle = BasicUnitPtr->OnAllocationCharacterUnitChanged.AddCallback(
 			std::bind(&ThisClass::OnAllocationCharacterUnitChanged, this, std::placeholders::_1)
@@ -119,7 +122,7 @@ void UBackpackIcon::OnDroped(UDragDropOperation* Operation)
 	OnDragDelegate.ExcuteCallback(false, nullptr);
 }
 
-void UBackpackIcon::SetItemType(UBasicUnit* InBasicUnitPtr)
+void UBackpackIcon::SetItemType(FBasicProxy* InBasicUnitPtr)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FBackpackIcon::Get().Icon));
 	if (ImagePtr)
@@ -141,9 +144,9 @@ void UBackpackIcon::SetItemType(UBasicUnit* InBasicUnitPtr)
 	}
 }
 
-void UBackpackIcon::OnAllocationCharacterUnitChanged(UCharacterUnit* AllocationCharacterUnitPtr)
+void UBackpackIcon::OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterProxy>& AllocationCharacterUnitPtr)
 {
-	if (AllocationCharacterUnitPtr)
+	if (AllocationCharacterUnitPtr.IsValid())
 	{
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FBackpackIcon::Get().AllocationCharacterUnit));
 		if (!UIPtr)
@@ -151,8 +154,11 @@ void UBackpackIcon::OnAllocationCharacterUnitChanged(UCharacterUnit* AllocationC
 			return;
 		}
 
+		auto CharacterAttributes =
+			AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
+
 		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		UIPtr->SetText(FText::FromName(AllocationCharacterUnitPtr->CharacterAttributesSPtr->Name));
+		UIPtr->SetText(FText::FromName(CharacterAttributes.Name));
 	}
 	else
 	{

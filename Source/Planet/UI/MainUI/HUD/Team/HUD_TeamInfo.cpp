@@ -92,7 +92,7 @@ void UHUD_TeamInfo::ResetUIByData()
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(
 	ETeammateOption TeammateOption,
-	FCharacterUnitType* LeaderPCPtr
+	const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
 )
 {
 	{

@@ -15,47 +15,149 @@
 #include "GroupMnaggerComponent.h"
 #include "PropertyEntrys.h"
 #include "Skill_Base.h"
+#include "Weapon_Base.h"
+#include "Skill_Active_Base.h"
+#include "Skill_Active_Control.h"
+#include "Skill_WeaponActive_Base.h"
+#include "Skill_WeaponActive_PickAxe.h"
+#include "Skill_WeaponActive_HandProtection.h"
+#include "Skill_WeaponActive_RangeTest.h"
+#include "Weapon_HandProtection.h"
+#include "Weapon_PickAxe.h"
+#include "Weapon_RangeTest.h"
+#include "HoldingItemsComponent.h"
+#include "CDCaculatorComponent.h"
 
-UBasicUnit::UBasicUnit()
+FBasicProxy::FBasicProxy()
 {
 
 }
 
-UBasicUnit::~UBasicUnit()
+FBasicProxy::~FBasicProxy()
 {
 
 }
 
-void UBasicUnit::InitialUnit()
+bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << UnitType;
+	Ar << ID;
+
+	if (Ar.IsSaving())
+	{
+		bool bIsValid = AllocationCharacterUnitPtr.IsValid();
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			AllocationCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		bool bIsValid = false;
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			auto TempPtr = MakeShared<FCharacterProxy>();
+			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			AllocationCharacterUnitPtr =
+				TempPtr->ProxyCharacterPtr->GetHoldingItemsComponent()->FindUnit_Character(TempPtr->GetID());
+		}
+	}
+
+	if (Ar.IsSaving())
+	{
+		bool bIsValid = OwnerCharacterUnitPtr.IsValid();
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			OwnerCharacterUnitPtr.Pin()->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		bool bIsValid = false;
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			auto TempPtr = MakeShared<FCharacterProxy>();
+			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			OwnerCharacterUnitPtr =
+				TempPtr->ProxyCharacterPtr->GetHoldingItemsComponent()->FindUnit_Character(TempPtr->GetID());
+		}
+	}
+
+	return true;
+}
+
+void FBasicProxy::InitialUnit()
+{
+	ID = FGuid::NewGuid();
+}
+
+bool FBasicProxy::Active()
+{
+	return true;
+}
+
+void FBasicProxy::Cancel()
 {
 
 }
 
-UBasicUnit::IDType UBasicUnit::GetID()const
+void FBasicProxy::Allocation()
+{
+
+}
+
+void FBasicProxy::UnAllocation()
+{
+
+}
+
+FBasicProxy::IDType FBasicProxy::GetID()const
 {
 	return ID;
 }
 
-FGameplayTag UBasicUnit::GetUnitType() const
+FGameplayTag FBasicProxy::GetUnitType() const
 {
 	return UnitType;
 }
 
-TSoftObjectPtr<UTexture2D> UBasicUnit::GetIcon() const
+TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
 
 	return SceneUnitExtendInfoPtr->DefaultIcon;
 }
 
-FString UBasicUnit::GetUnitName() const
+ACharacterBase* FBasicProxy::GetProxyCharacter() const
+{
+	return OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+}
+
+void FBasicProxy::Update2Client()
+{
+	OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetHoldingItemsComponent()->Proxy_Container.UpdateItem(GetThisSPtr());
+}
+
+TSharedPtr<FBasicProxy> FBasicProxy::GetThisSPtr() const
+{
+	return
+		OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetHoldingItemsComponent()->FindProxy(ID);
+}
+
+FString FBasicProxy::GetUnitName() const
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
 
 	return SceneUnitExtendInfoPtr->UnitName;
 }
 
-void UBasicUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
 {
 	if (AllocationCharacterUnitPtr == InAllocationCharacterUnitPtr)
 	{
@@ -64,15 +166,31 @@ void UBasicUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacte
 
 	AllocationCharacterUnitPtr = InAllocationCharacterUnitPtr;
 
-	OnAllocationCharacterUnitChanged.ExcuteCallback(AllocationCharacterUnitPtr);
+#if UE_EDITOR || UE_CLIENT
+	auto ProxyCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr;
+	if (GetProxyCharacter()->GetNetMode() == NM_Client)
+	{
+		auto HoldingItemsComponentPtr = ProxyCharacterPtr->GetHoldingItemsComponent();
+		if (AllocationCharacterUnitPtr.IsValid())
+		{
+			HoldingItemsComponentPtr->SetAllocationCharacterUnit(this->GetID(), AllocationCharacterUnitPtr.Pin()->GetID());
+		}
+		else
+		{
+			HoldingItemsComponentPtr->SetAllocationCharacterUnit(this->GetID(), FGuid());
+		}
+	}
+#endif
+
+	OnAllocationCharacterUnitChanged.ExcuteCallback(nullptr);
 }
 
-UCharacterUnit* UBasicUnit::GetAllocationCharacterUnit() const
+TWeakPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterUnit() const
 {
 	return AllocationCharacterUnitPtr;
 }
 
-FTableRowUnit* UBasicUnit::GetTableRowUnit() const
+FTableRowUnit* FBasicProxy::GetTableRowUnit() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
@@ -81,12 +199,17 @@ FTableRowUnit* UBasicUnit::GetTableRowUnit() const
 	return SceneUnitExtendInfoPtr;
 }
 
-UConsumableUnit::UConsumableUnit()
+FConsumableProxy::FConsumableProxy()
 {
 
 }
 
-void UConsumableUnit::AddCurrentValue(int32 val)
+bool FConsumableProxy::Active()
+{
+	return true;
+}
+
+void FConsumableProxy::AddCurrentValue(int32 val)
 {
 	const auto Old = Num;
 	Num += val;
@@ -94,12 +217,12 @@ void UConsumableUnit::AddCurrentValue(int32 val)
 	CallbackContainerHelper.ValueChanged(Old, Num);
 }
 
-int32 UConsumableUnit::GetCurrentValue() const
+int32 FConsumableProxy::GetCurrentValue() const
 {
 	return Num;
 }
 
-FTableRowUnit_Consumable* UConsumableUnit::GetTableRowUnit_Consumable() const
+FTableRowUnit_Consumable* FConsumableProxy::GetTableRowUnit_Consumable() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_Consumable.LoadSynchronous();
@@ -108,7 +231,7 @@ FTableRowUnit_Consumable* UConsumableUnit::GetTableRowUnit_Consumable() const
 	return SceneUnitExtendInfoPtr;
 }
 
-bool UConsumableUnit::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
 	auto MaxRemainingCooldown = -1.f;
 	auto MaxRemainingCooldownPercent = -1.f;
@@ -117,7 +240,7 @@ bool UConsumableUnit::GetRemainingCooldown(float& RemainingCooldown, float& Rema
 	auto CurRemainingCooldown = -1.f;
 	auto CurRemainingCooldownPercent = -1.f;
 
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -145,9 +268,9 @@ bool UConsumableUnit::GetRemainingCooldown(float& RemainingCooldown, float& Rema
 	return CurResult;
 }
 
-bool UConsumableUnit::CheckCooldown() const
+bool FConsumableProxy::CheckCooldown() const
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -165,13 +288,13 @@ bool UConsumableUnit::CheckCooldown() const
 	return true;
 }
 
-void UConsumableUnit::AddCooldownConsumeTime(float NewTime)
+void FConsumableProxy::AddCooldownConsumeTime(float NewTime)
 {
 }
 
-void UConsumableUnit::FreshUniqueCooldownTime()
+void FConsumableProxy::FreshUniqueCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
 		this
 	);
 
@@ -182,16 +305,16 @@ void UConsumableUnit::FreshUniqueCooldownTime()
 	}
 }
 
-void UConsumableUnit::ApplyCooldown()
+void FConsumableProxy::ApplyCooldown()
 {
-	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
 	);
 }
 
-void UConsumableUnit::OffsetCooldownTime()
+void FConsumableProxy::OffsetCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
 		this
 	);
 
@@ -211,22 +334,53 @@ FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGame
 	return SceneUnitExtendInfoPtr;
 }
 
-UToolUnit::UToolUnit()
+FToolProxy::FToolProxy()
 {
 
 }
 
-int32 UToolUnit::GetNum() const
+int32 FToolProxy::GetNum() const
 {
 	return Num;
 }
 
-UWeaponUnit::UWeaponUnit()
+FWeaponProxy::FWeaponProxy()
 {
 
 }
 
-void UWeaponUnit::InitialUnit()
+bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << ActivedWeaponPtr;
+
+	if (Ar.IsSaving())
+	{
+		bool bIsValid = FirstSkill.IsValid();
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			FirstSkill->NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		bool bIsValid = false;
+		Ar << bIsValid;
+		if (bIsValid)
+		{
+			auto TempPtr = MakeShared<FWeaponSkillProxy>();
+			TempPtr->NetSerialize(Ar, Map, bOutSuccess);
+
+			FirstSkill = TempPtr;
+		}
+	}
+
+	return true;
+}
+
+void FWeaponProxy::InitialUnit()
 {
 	Super::InitialUnit();
 	{
@@ -234,17 +388,28 @@ void UWeaponUnit::InitialUnit()
 	}
 }
 
-void UWeaponUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+bool FWeaponProxy::Active()
+{
+	Super::Active();
+
+	return FirstSkill->Active();
+}
+
+void FWeaponProxy::Cancel()
+{
+	Super::Cancel();
+
+	FirstSkill->Cancel();
+}
+
+void FWeaponProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
 {
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 
-	if (FirstSkill)
-	{
-		FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
-	}
+	FirstSkill->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
 }
 
-FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() const
+FTableRowUnit_WeaponExtendInfo* FWeaponProxy::GetTableRowUnit_WeaponExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponExtendInfo.LoadSynchronous();
@@ -253,7 +418,29 @@ FTableRowUnit_WeaponExtendInfo* UWeaponUnit::GetTableRowUnit_WeaponExtendInfo() 
 	return SceneUnitExtendInfoPtr;
 }
 
-FTableRowUnit_PropertyEntrys* UWeaponUnit::GetMainPropertyEntry() const
+void FWeaponProxy::Allocation()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		FirstSkill->Allocation();
+	}
+#endif
+}
+
+void FWeaponProxy::UnAllocation()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		FirstSkill->UnAllocation();
+	}
+#endif
+}
+
+FTableRowUnit_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
@@ -264,76 +451,254 @@ FTableRowUnit_PropertyEntrys* UWeaponUnit::GetMainPropertyEntry() const
 	return SceneUnitExtendInfoPtr;
 }
 
-int32 UWeaponUnit::GetMaxAttackDistance() const
+int32 FWeaponProxy::GetMaxAttackDistance() const
 {
 	return MaxAttackDistance;
 }
 
-USkillUnit::USkillUnit() :
+FSkillProxy::FSkillProxy() :
 	Super()
 {
 
 }
 
-TSubclassOf<USkill_Base> USkillUnit::GetSkillClass() const
+bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << Level;
+	Ar << GameplayAbilitySpecHandle;
+
+	return true;
+}
+
+TSubclassOf<USkill_Base> FSkillProxy::GetSkillClass() const
 {
 	return nullptr;
 }
 
-void USkillUnit::SetAllocationCharacterUnit(UCharacterUnit* InAllocationCharacterUnitPtr)
+void FSkillProxy::Allocation()
 {
-	if (!InAllocationCharacterUnitPtr)
-	{
-		UnRegisterSkill();
-	}
+	RegisterSkill();
+}
 
+void FSkillProxy::UnAllocation()
+{
+	UnRegisterSkill();
+}
+
+bool FActiveSkillProxy::Active()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+	 	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
+	 	if (!InGAInsPtr)
+	 	{
+	 		return false;
+	 	}
+	 
+	 	auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
+	 
+	 	// 需要特殊参数的
+	 	if (
+	 		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
+	 		)
+	 	{
+	 		if (InGAInsPtr->IsActive())
+	 		{
+	 			InGAInsPtr->SetContinuePerform(true);
+	 			return true;
+	 		}
+	 		else
+	 		{
+	 			auto GameplayAbilityTargetPtr =
+	 				new FGameplayAbilityTargetData_Control;
+	 
+	 			// Test
+	 			GameplayAbilityTargetPtr->TargetCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+	 
+	 			FGameplayEventData Payload;
+	 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
+	 
+	 			return ASCPtr->TriggerAbilityFromGameplayEvent(
+	 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
+	 				ASCPtr->AbilityActorInfo.Get(),
+					GetUnitType(),
+	 				&Payload,
+	 				*ASCPtr
+	 			);
+	 		}
+	 	}
+	 	else
+	 	{
+	 		if (InGAInsPtr->IsActive())
+	 		{
+	 			InGAInsPtr->SetContinuePerform(true);
+	 			return true;
+	 		}
+	 		else
+	 		{
+	 			auto GameplayAbilityTargetPtr =
+	 				new FGameplayAbilityTargetData_ActiveSkill;
+	 
+	 			FGameplayEventData Payload;
+	 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
+	 
+	 			return ASCPtr->TriggerAbilityFromGameplayEvent(
+	 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
+	 				ASCPtr->AbilityActorInfo.Get(),
+					GetUnitType(),
+	 				&Payload,
+	 				*ASCPtr
+	 			);
+	 		}
+	 	}
+	}
+#endif
+
+	return true;
+}
+
+void FActiveSkillProxy::Cancel()
+{
+}
+
+void FWeaponSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
+{
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
-
-	if (AllocationCharacterUnitPtr)
-	{
-		RegisterSkill();
-	}
 }
 
-void USkillUnit::RegisterSkill()
+bool FWeaponSkillProxy::Active()
 {
-	FGameplayAbilityTargetData_Skill* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Skill;
-
-	GameplayAbilityTargetDataPtr->SkillUnitPtr = this;
-
-	FGameplayAbilitySpec GameplayAbilitySpec(
-		GetSkillClass(),
-		Level
-	);
-
-	GameplayAbilitySpec.GameplayEventData = MakeShared<FGameplayEventData>();
-	GameplayAbilitySpec.GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
-
-	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
-	GameplayAbilitySpecHandle = ProxyCharacterPtr->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
-}
-
-void USkillUnit::UnRegisterSkill()
-{
-	if (GetAllocationCharacterUnit())
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
-
-		if (ProxyCharacterPtr)
+		auto InGaInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
+		if (!InGaInsPtr)
 		{
-			auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+			return false;
+		}
 
-			ASCPtr->CancelAbilityHandle(GameplayAbilitySpecHandle);
-			ASCPtr->ClearAbility(GameplayAbilitySpecHandle);
+		if (InGaInsPtr->IsActive())
+		{
+			InGaInsPtr->SetContinuePerform(true);
+			return true;
+		}
+
+		FGameplayEventData Payload;
+		if (
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Axe) ||
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_HandProtection) ||
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_RangeTest)
+			)
+		{
+			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_Weapon;
+			GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
+			GameplayAbilityTargetDashPtr->bIsAutoContinue = true;
+			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
+		}
+
+		auto ASCPtr = GetProxyCharacter()->GetAbilitySystemComponent();
+
+		return ASCPtr->TriggerAbilityFromGameplayEvent(
+			InGaInsPtr->GetCurrentAbilitySpecHandle(),
+			ASCPtr->AbilityActorInfo.Get(),
+			GetUnitType(),
+			&Payload,
+			*ASCPtr
+		);
+	}
+#endif
+
+	return true;
+}
+
+void FWeaponSkillProxy::Cancel()
+{
+	auto InGAInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
+	if (!InGAInsPtr)
+	{
+		return;
+	}
+
+	InGAInsPtr->SetContinuePerform(false);
+}
+
+void FSkillProxy::RegisterSkill()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		FGameplayAbilityTargetData_RegisterParam* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RegisterParam;
+
+		GameplayAbilityTargetDataPtr->ProxyID = GetID();
+
+		const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
+		FGameplayAbilitySpec GameplayAbilitySpec(
+			GetSkillClass(),
+			Level,
+			InputID
+		);
+
+		auto GameplayEventData = MakeShared<FGameplayEventData>();
+		GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+
+		auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+
+		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+			InputID,
+			*GameplayEventData
+		);
+		GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+	}
+#endif
+}
+
+void FSkillProxy::UnRegisterSkill()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (GetAllocationCharacterUnit().IsValid())
+		{
+			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+
+			if (AllocationCharacter.IsValid())
+			{
+				auto ASCPtr = AllocationCharacter->GetAbilitySystemComponent();
+
+				ASCPtr->CancelAbilityHandle(GameplayAbilitySpecHandle);
+				ASCPtr->ClearAbility(GameplayAbilitySpecHandle);
+			}
 		}
 	}
+#endif
 
 	GameplayAbilitySpecHandle = FGameplayAbilitySpecHandle();
 }
 
-USkill_Base* USkillUnit::GetGAInst()const
+TArray<USkill_Base*> FSkillProxy::GetGAInstAry()const
 {
-	auto ProxyCharacterPtr = GetAllocationCharacterUnit()->ProxyCharacterPtr;
+	TArray<USkill_Base*>ResultAry;
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
+	if (GameplayAbilitySpecPtr)
+	{
+		ResultAry.Add(Cast<USkill_Base>(GameplayAbilitySpecPtr->GetPrimaryInstance()));
+	}
+
+	return ResultAry;
+}
+
+USkill_Base* FSkillProxy::GetGAInst()const
+{
+	auto ProxyCharacterPtr = GetProxyCharacter();
 	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
 	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
 	if (GameplayAbilitySpecPtr)
@@ -344,16 +709,25 @@ USkill_Base* USkillUnit::GetGAInst()const
 	return nullptr;
 }
 
-FGameplayAbilitySpecHandle USkillUnit::GetGAHandle() const
+FGameplayAbilitySpecHandle FSkillProxy::GetGAHandle() const
 {
 	return GameplayAbilitySpecHandle;
 }
 
-UWeaponSkillUnit::UWeaponSkillUnit()
+FWeaponSkillProxy::FWeaponSkillProxy()
 {
 }
 
-FTableRowUnit_WeaponSkillExtendInfo* UWeaponSkillUnit::GetTableRowUnit_WeaponSkillExtendInfo() const
+bool FWeaponSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << ActivedWeaponPtr;
+
+	return true;
+}
+
+FTableRowUnit_WeaponSkillExtendInfo* FWeaponSkillProxy::GetTableRowUnit_WeaponSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponSkillExtendInfo.LoadSynchronous();
@@ -362,20 +736,20 @@ FTableRowUnit_WeaponSkillExtendInfo* UWeaponSkillUnit::GetTableRowUnit_WeaponSki
 	return SceneUnitExtendInfoPtr;
 }
 
-TSubclassOf<USkill_Base> UWeaponSkillUnit::GetSkillClass() const
+TSubclassOf<USkill_Base> FWeaponSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_WeaponSkillExtendInfo()->SkillClass;
 }
 
-UTalentSkillUnit::UTalentSkillUnit()
+FTalentSkillProxy::FTalentSkillProxy()
 {
 }
 
-UActiveSkillUnit::UActiveSkillUnit()
+FActiveSkillProxy::FActiveSkillProxy()
 {
 }
 
-FTableRowUnit_ActiveSkillExtendInfo* UActiveSkillUnit::GetTableRowUnit_ActiveSkillExtendInfo() const
+FTableRowUnit_ActiveSkillExtendInfo* FActiveSkillProxy::GetTableRowUnit_ActiveSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_ActiveSkillExtendInfo.LoadSynchronous();
@@ -384,20 +758,20 @@ FTableRowUnit_ActiveSkillExtendInfo* UActiveSkillUnit::GetTableRowUnit_ActiveSki
 	return SceneUnitExtendInfoPtr;
 }
 
-TSubclassOf<USkill_Base> UActiveSkillUnit::GetSkillClass() const
+TSubclassOf<USkill_Base> FActiveSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_ActiveSkillExtendInfo()->SkillClass;
 }
 
-UPassiveSkillUnit::UPassiveSkillUnit()
+FPassiveSkillProxy::FPassiveSkillProxy()
 {
 }
 
-void UPassiveSkillUnit::InitialUnit()
+void FPassiveSkillProxy::InitialUnit()
 {
 }
 
-FTableRowUnit_PassiveSkillExtendInfo* UPassiveSkillUnit::GetTableRowUnit_PassiveSkillExtendInfo() const
+FTableRowUnit_PassiveSkillExtendInfo* FPassiveSkillProxy::GetTableRowUnit_PassiveSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_PassiveSkillExtendInfo.LoadSynchronous();
@@ -406,7 +780,7 @@ FTableRowUnit_PassiveSkillExtendInfo* UPassiveSkillUnit::GetTableRowUnit_Passive
 	return SceneUnitExtendInfoPtr;
 }
 
-FTableRowUnit_PropertyEntrys* UPassiveSkillUnit::GetMainPropertyEntry() const
+FTableRowUnit_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
@@ -423,19 +797,31 @@ FTableRowUnit_PropertyEntrys* UPassiveSkillUnit::GetMainPropertyEntry() const
 	return SceneUnitExtendInfoPtr;
 }
 
-TSubclassOf<USkill_Base> UPassiveSkillUnit::GetSkillClass() const
+TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_PassiveSkillExtendInfo()->SkillClass;
 }
 
-UCharacterUnit::UCharacterUnit()
+FCharacterProxy::FCharacterProxy()
 {
-	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
-	AllocationSkills = MakeShared<FAllocationSkills>();
-	SceneUnitContainer = MakeShared<FSceneUnitContainer>();
 }
 
-FTableRowUnit_CharacterInfo* UCharacterUnit::GetTableRowUnit_CharacterInfo() const
+bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << ProxyCharacterPtr;
+
+	return true;
+}
+
+void FCharacterProxy::InitialUnit()
+{
+	Super::InitialUnit();
+
+}
+
+FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
@@ -444,17 +830,16 @@ FTableRowUnit_CharacterInfo* UCharacterUnit::GetTableRowUnit_CharacterInfo() con
 	return SceneUnitExtendInfoPtr;
 }
 
-void UCharacterUnit::RelieveRootBind()
+void FCharacterProxy::RelieveRootBind()
 {
-	SceneUnitContainer.Reset();
 }
 
-UCoinUnit::UCoinUnit()
+FCoinProxy::FCoinProxy()
 {
 
 }
 
-void UCoinUnit::AddCurrentValue(int32 val)
+void FCoinProxy::AddCurrentValue(int32 val)
 {
 	const auto Old = Num;
 	Num += val;
@@ -462,113 +847,108 @@ void UCoinUnit::AddCurrentValue(int32 val)
 	CallbackContainerHelper.ValueChanged(Old, Num);
 }
 
-int32 UCoinUnit::GetCurrentValue() const
+int32 FCoinProxy::GetCurrentValue() const
 {
 	return Num;
 }
 
-bool UActiveSkillUnit::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	auto MaxRemainingCooldown = -1.f;
-	auto MaxRemainingCooldownPercent = -1.f;
-
-	auto CurResult = true;
-	auto CurRemainingCooldown = -1.f;
-	auto CurRemainingCooldownPercent = -1.f;
-
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CDSPtr = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->GetCooldown(
 		this
 	);
 
-	for (auto Iter : CooldownMap)
+	if (CDSPtr)
 	{
-		if (Iter.Value.IsValid())
-		{
-			CurResult = Iter.Value.Pin()->GetRemainingCooldown(CurRemainingCooldown, CurRemainingCooldownPercent);
-			if (CurResult)
-			{
-				continue;
-			}
-
-			if (CurRemainingCooldown > MaxRemainingCooldown)
-			{
-				MaxRemainingCooldown = CurRemainingCooldown;
-				MaxRemainingCooldownPercent = CurRemainingCooldownPercent;
-			}
-		}
-	}
-
-	RemainingCooldown = MaxRemainingCooldown;
-	RemainingCooldownPercent = MaxRemainingCooldownPercent;
-
-	return CurResult;
-}
-
-bool UActiveSkillUnit::CheckCooldown() const
-{
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
-		this
-	);
-
-	for (auto Iter : CooldownMap)
-	{
-		if (Iter.Value.IsValid())
-		{
-			if (!Iter.Value.Pin()->CheckCooldown())
-			{
-				return false;
-			}
-		}
+		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 	}
 
 	return true;
 }
 
-void UActiveSkillUnit::AddCooldownConsumeTime(float NewTime)
+bool FActiveSkillProxy::CheckCooldown() const
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CDSPtr = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->GetCooldown(
 		this
 	);
 
-	if (CooldownMap.Contains(GetUnitType()))
+	if (CDSPtr)
 	{
-		CooldownMap[GetUnitType()].Pin()->AddCooldownConsumeTime(NewTime);
+		return CDSPtr->CheckCooldown();
 	}
+
+	return true;
 }
 
-void UActiveSkillUnit::FreshUniqueCooldownTime()
+void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
 {
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
-		this
-	);
-
-	// 获取当前技能CD
-	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
-	{
-		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
-	}
 }
 
-void UActiveSkillUnit::ApplyCooldown()
+void FActiveSkillProxy::FreshUniqueCooldownTime()
 {
-	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+}
+
+void FActiveSkillProxy::ApplyCooldown()
+{
+	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->ApplyCooldown(
 		this
 	);
 }
 
-void UActiveSkillUnit::OffsetCooldownTime()
+void FActiveSkillProxy::OffsetCooldownTime()
 {
-	AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyUniqueCooldown(
-		this
-	);
+}
 
-	auto CooldownMap = AllocationCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
-		this
-	);
-
-	// 获取当前技能CD
-	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
+void FWeaponProxy::ActiveWeapon()
+{
+	if (ActivedWeaponPtr)
 	{
-		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
+		check(0);
 	}
+	else
+	{
+#if UE_EDITOR || UE_SERVER
+		auto ProxyCharacterPtr = GetProxyCharacter();
+		if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			auto TableRowUnit_WeaponExtendInfoPtr = GetTableRowUnit_WeaponExtendInfo();
+
+			ProxyCharacterPtr->SwitchAnimLink_Client(TableRowUnit_WeaponExtendInfoPtr->AnimLinkClassType);
+
+			auto ToolActorClass = TableRowUnit_WeaponExtendInfoPtr->ToolActorClass;
+
+			FActorSpawnParameters SpawnParameters;
+
+			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+
+			SpawnParameters.Owner = AllocationCharacter.Get();
+
+			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
+			ActivedWeaponPtr->SetWeaponUnit(*this);
+
+			FirstSkill->ActivedWeaponPtr = ActivedWeaponPtr;
+		}
+#endif
+	}
+}
+
+void FWeaponProxy::RetractputWeapon()
+{
+	if (ActivedWeaponPtr)
+	{
+		ActivedWeaponPtr->Destroy();
+		ActivedWeaponPtr = nullptr;
+
+		FirstSkill->Cancel();
+		FirstSkill->ActivedWeaponPtr = nullptr;
+	}
+
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		auto OnwerActorPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+		OnwerActorPtr->SwitchAnimLink_Client(EAnimLinkClassType::kUnarmed);
+	}
+#endif
 }

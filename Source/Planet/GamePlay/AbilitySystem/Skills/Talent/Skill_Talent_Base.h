@@ -9,7 +9,7 @@
 
 #include "Skill_Talent_Base.generated.h"
 
-class UBasicUnit;
+struct FBasicProxy;
 
 // 是否应该为 UObject ？
 class FTalent_Base

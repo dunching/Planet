@@ -17,7 +17,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -25,7 +25,7 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
@@ -47,6 +47,18 @@ void USkill_Active_Control::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
+	{
+		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamPtr)
+		{
+		}
+		else
+		{
+			return;
+		}
+	}
 }
 
 void USkill_Active_Control::ActivateAbility(
@@ -125,7 +137,6 @@ void USkill_Active_Control::PerformAction(
 			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
 			MoveToAttaclAreaPtr->DataPtr = DataPtr->Clone();
 			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
-			MoveToAttaclAreaPtr->CanbeActivedInfoSPtr = DataPtr->CanbeActivedInfoSPtr;
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->MoveToAttackDistance(
 				MoveToAttaclAreaPtr
@@ -190,6 +201,20 @@ void USkill_Active_Control::PlayMontage()
 
 		TaskPtr->ReadyForActivation();
 	}
+}
+
+UScriptStruct* FGameplayAbilityTargetData_Control::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Control::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Control::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << TargetCharacterPtr;
+
+	return true;
 }
 
 FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_Control::Clone() const

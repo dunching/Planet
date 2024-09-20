@@ -40,7 +40,7 @@ void UBackpackSkillIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackSkillIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UBackpackSkillIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
@@ -51,7 +51,7 @@ void UBackpackSkillIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
 			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve)
 			)
 		{
-			UnitPtr = Cast<USkillUnit>(InBasicUnitPtr);
+			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(InBasicUnitPtr);
 		}
 	}
 }

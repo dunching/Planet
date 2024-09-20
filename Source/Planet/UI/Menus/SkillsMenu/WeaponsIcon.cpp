@@ -37,14 +37,14 @@ UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UWeaponsIcon::ResetToolUIByData(UBasicUnit * InBasicUnitPtr)
+void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
 	UnitPtr = nullptr;
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
-		UnitPtr = Cast<UWeaponUnit>(BasicUnitPtr);
+		UnitPtr = DynamicCastSharedPtr<FWeaponProxy>(BasicUnitPtr);
 	}
 
 	OnResetUnit_Weapon.ExcuteCallback(UnitPtr);

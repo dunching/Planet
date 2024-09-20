@@ -7,7 +7,7 @@
 
 #include "Character/GravityMovementComponent.h"
 
-#include "GameMode/PlanetGameMode.h"
+#include "GameMode_Main.h"
 #include "ToolsLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"

@@ -53,6 +53,8 @@ public:
 
 	virtual void OnDestroy(bool AbilityIsEnding) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
 	FOnTaskFinished OnFinish;
 
 protected:
@@ -60,15 +62,15 @@ protected:
 	virtual void SharedInitAndApply() override;
 
 protected:
-
+	
 	float StartDistance = 0.f;
-
+	
 	float EndDistance = 0.f;
-
+	
 	float Duration = 1.f;
-
+	
 	ASPlineActor* SPlineActorPtr = nullptr;
-
+	
 	ACharacterBase* TargetCharacterPtr = nullptr;
 
 };

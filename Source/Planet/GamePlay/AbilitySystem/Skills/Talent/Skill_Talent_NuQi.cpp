@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 int32 FTalent_NuQi::GetCurrentValue() const
 {
@@ -57,13 +57,13 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 	{
 		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
-		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributesSPtr->HP.AddOnValueChanged(
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 
 		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributesSPtr->TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributesSPtr->TalentSPtr.Get())
+			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
 		);
 	}
 }
@@ -172,8 +172,8 @@ void USkill_Talent_NuQi::AddNuQi()
 
 void USkill_Talent_NuQi::SubNuQi(float Inveral)
 {
-	auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributesSPtr->TalentSPtr.Get());
+	auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+	auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
 	if (TalentPtr)
 	{
 		if (bIsInWeak)

@@ -22,12 +22,12 @@ class PLANET_API AResourceBox : public AResourceBoxBase
 
 public:
 
-	AResourceBox(const FObjectInitializer& ObjectInitializer);
+	AResourceBox(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void OnConstruction(const FTransform& Transform)override;
-
+	
 	virtual void Interaction(ACharacterBase* CharacterPtr)override;
-
+	
 	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
 
 	virtual void EndLookAt()override;
@@ -35,6 +35,11 @@ public:
 protected:
 
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaSeconds)override;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void InteractionImp();
 
 	UFUNCTION()
 	void OnAnimationFinished();

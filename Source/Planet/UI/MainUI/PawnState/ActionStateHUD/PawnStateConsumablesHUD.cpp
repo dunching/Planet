@@ -6,7 +6,8 @@
 
 #include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
-#include "InteractiveConsumablesComponent.h"
+#include "UnitProxyProcessComponent.h"
+
 
 struct FPawnStateConsumablesHUD : public TStructVariable<FPawnStateConsumablesHUD>
 {
@@ -47,21 +48,21 @@ void UPawnStateConsumablesHUD::ResetUIByData()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
-
-	auto UIPtr = Cast<UGridPanel>(GetWidgetFromName(FPawnStateConsumablesHUD::Get().GridPanel));
-	auto Ary = UIPtr->GetAllChildren();
-
-	for (const auto& Iter : Ary)
-	{
-		auto IconPtr = Cast<UActionConsumablesIcon>(Iter);
-		if (IconPtr)
-		{
-			const auto ConsumableSocketInfoSPtr = EICPtr->FindConsumable(IconPtr->IconSocket);
-			if (ConsumableSocketInfoSPtr)
-			{
-				IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr->UnitPtr);
-			}
-		}
-	}
+ 	auto InteractiveSkillComponentPtr = CharacterPtr->GetInteractiveSkillComponent();
+ 
+ 	auto UIPtr = Cast<UGridPanel>(GetWidgetFromName(FPawnStateConsumablesHUD::Get().GridPanel));
+ 	auto Ary = UIPtr->GetAllChildren();
+ 
+ 	for (const auto& Iter : Ary)
+ 	{
+ 		auto IconPtr = Cast<UActionConsumablesIcon>(Iter);
+ 		if (IconPtr)
+ 		{
+ 			const auto ConsumableSocketInfoSPtr = InteractiveSkillComponentPtr->FindSocket(IconPtr->IconSocket);
+ 			if (ConsumableSocketInfoSPtr)
+ 			{
+ 				IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr->ProxySPtr);
+ 			}
+ 		}
+ 	}
 }

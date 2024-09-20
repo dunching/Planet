@@ -23,6 +23,7 @@
 #include "PlanetControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
 #include "GameplayTagsSubSystem.h"
+#include "CharacterBase.h"
 
 namespace HUD_TeamMateInfo
 {
@@ -49,7 +50,7 @@ void UHUD_TeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
@@ -68,7 +69,7 @@ void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 
-		GroupMateUnitPtr = Cast<UCharacterUnit>(BasicUnitPtr);
+		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(HUD_TeamMateInfo::Texture));
 			if (UIPtr)
@@ -84,8 +85,10 @@ void UHUD_TeamMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(HUD_TeamMateInfo::Text));
 			if (UIPtr)
 			{
+				auto CharacterAttributes = 
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
 				UIPtr->SetText(FText::FromString(
-					FString::Printf(TEXT("%s(%d)"), *GroupMateUnitPtr->CharacterAttributesSPtr->Name.ToString(), GroupMateUnitPtr->CharacterAttributesSPtr->Level)
+					FString::Printf(TEXT("%s(%d)"), *CharacterAttributes.Name.ToString(), CharacterAttributes.Level)
 				));
 			}
 		}

@@ -7,11 +7,11 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameMode/PlanetGameMode.h"
 #include "DrawDebugHelpers.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystemComponent.h"
 
+#include "GameMode_Main.h"
 #include "ToolsLibrary.h"
 #include "Animation/AnimInstanceBase.h"
 #include "Component/ItemInteractionComponent.h"
@@ -32,16 +32,19 @@
 #include "PlanetControllerInterface.h"
 #include "GameplayTagsSubSystem.h"
 #include "StateProcessorComponent.h"
-#include "InteractiveBaseGAComponent.h"
-#include "InteractiveConsumablesComponent.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
+#include "BaseFeatureGAComponent.h"
+#include "UnitProxyProcessComponent.h"
+#include "CDCaculatorComponent.h"
+
 #include "CharacterTitle.h"
 #include "UICommon.h"
 #include "HumanAIController.h"
 #include "PlanetPlayerController.h"
 #include "GAEvent_Helper.h"
 #include "FightingTips.h"
+#include "SceneObj.h"
+#include "SceneUnitContainer.h"
+#include "SceneUnitTable.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -60,11 +63,9 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
-	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UInteractiveBaseGAComponent>(UInteractiveBaseGAComponent::ComponentName);
-	InteractiveConsumablesComponentPtr = CreateDefaultSubobject<UInteractiveConsumablesComponent>(UInteractiveConsumablesComponent::ComponentName);
-	InteractiveSkillComponentPtr = CreateDefaultSubobject<UInteractiveSkillComponent>(UInteractiveSkillComponent::ComponentName);
-	InteractiveToolComponentPtr = CreateDefaultSubobject<UInteractiveToolComponent>(UInteractiveToolComponent::ComponentName);
-
+	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UBaseFeatureGAComponent>(UBaseFeatureGAComponent::ComponentName);
+	InteractiveSkillComponentPtr = CreateDefaultSubobject<UUnitProxyProcessComponent>(UUnitProxyProcessComponent::ComponentName);
+	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -78,32 +79,42 @@ void ACharacterBase::BeginPlay()
 
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
-	auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-
-	if (!CharacterTitlePtr)
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-		if (CharacterTitlePtr)
+		if (!CharacterTitlePtr)
 		{
-			CharacterTitlePtr->CharacterPtr = this;
-			CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+			if (CharacterTitlePtr)
+			{
+				CharacterTitlePtr->CharacterPtr = this;
+				CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+			}
 		}
 	}
+#endif
 
-	auto CharacterAttributesSPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
-	OnMoveSpeedChanged(CharacterAttributesSPtr->MoveSpeed.GetCurrentValue());
+	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-	HPChangedHandle = CharacterAttributesSPtr->HP.AddOnValueChanged(
-		std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-	);
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		HPChangedHandle = CharacterAttributes.HP.AddOnValueChanged(
+			std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
+		);
 
-	MoveSpeedChangedHandle = CharacterAttributesSPtr->MoveSpeed.AddOnValueChanged(
-		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-	);
+		MoveSpeedChangedHandle = CharacterAttributes.MoveSpeed.AddOnValueChanged(
+			std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
+		);
 
-	ProcessedGAEventHandle = CharacterAttributesSPtr->ProcessedGAEvent.AddCallback(
-		std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
-	);
+		ProcessedGAEventHandle = CharacterAttributes.ProcessedGAEvent.AddCallback(
+			std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
+		);
+	}
+#endif
+
+	OnMoveSpeedChanged(CharacterAttributes.MoveSpeed.GetCurrentValue());
 }
 
 void ACharacterBase::Destroyed()
@@ -141,7 +152,37 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 
 void ACharacterBase::PostInitializeComponents()
 {
+	UWorld* World = GetWorld();
+	if ((World->IsGameWorld()))
+	{
+		InitialDefaultCharacterUnit();
+
+#if UE_EDITOR || UE_SERVER
+		if (GetNetMode() == NM_DedicatedServer)
+		{
+			// GA全部通过Server注册
+			auto GASPtr = GetAbilitySystemComponent();
+
+			GASPtr->ClearAllAbilities();
+			GASPtr->InitAbilityActorInfo(this, this);
+			GetInteractiveBaseGAComponent()->InitialBaseGAs();
+		}
+#endif
+	}
+
 	Super::PostInitializeComponents();
+
+	if ((World->IsGameWorld()))
+	{
+		HoldingItemsComponentPtr->Proxy_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
+
+		InteractiveSkillComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
+		InteractiveSkillComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = InteractiveSkillComponentPtr;
+
+		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
+
+		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent = StateProcessorComponentPtr;
+	}
 }
 
 void ACharacterBase::PossessedBy(AController* NewController)
@@ -157,9 +198,9 @@ void ACharacterBase::UnPossessed()
 
 	if (IsActorBeingDestroyed())
 	{
-//		SpawnDefaultController();
+		//		SpawnDefaultController();
 	}
-	else if(OriginalAIController)
+	else if (OriginalAIController)
 	{
 		if (OldController)
 		{
@@ -172,6 +213,14 @@ void ACharacterBase::UnPossessed()
 				OriginalAIController->Possess(this);
 			}
 		}
+	}
+}
+
+void ACharacterBase::InteractionSceneObj_Implementation(ASceneObj* SceneObjPtr)
+{
+	if (SceneObjPtr)
+	{
+		SceneObjPtr->Interaction(this);
 	}
 }
 
@@ -210,24 +259,19 @@ UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
 	return TalentAllocationComponentPtr;
 }
 
-UInteractiveBaseGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
+UBaseFeatureGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
 {
 	return InteractiveBaseGAComponentPtr;
 }
 
-UInteractiveConsumablesComponent* ACharacterBase::GetInteractiveConsumablesComponent()const
+UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
 {
-	return InteractiveConsumablesComponentPtr;
+	return StateProcessorComponentPtr;
 }
 
-UInteractiveSkillComponent* ACharacterBase::GetInteractiveSkillComponent()const
+UUnitProxyProcessComponent* ACharacterBase::GetInteractiveSkillComponent()const
 {
 	return InteractiveSkillComponentPtr;
-}
-
-UInteractiveToolComponent* ACharacterBase::GetInteractiveToolComponent()const
-{
-	return InteractiveToolComponentPtr;
 }
 
 UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
@@ -235,15 +279,40 @@ UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
 	return GroupMnaggerComponentPtr;
 }
 
-UCharacterUnit* ACharacterBase::GetCharacterUnit()const
+UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
 {
-	return CharacterUnitPtr;
+	return CDCaculatorComponentPtr;
 }
 
-void ACharacterBase::SetCharacterUnit(UCharacterUnit* InCharacterUnitPtr)
+TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 {
-	CharacterUnitPtr = InCharacterUnitPtr;
-	CharacterUnitPtr->ProxyCharacterPtr = this;
+	return HoldingItemsComponentPtr->CharacterProxySPtr;
+}
+
+void ACharacterBase::InitialDefaultCharacterUnit()
+{
+	TSharedPtr<FCharacterProxy>CharacterUnitPtr = nullptr;
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
+	}
+#endif
+
+	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
+	}
+#endif
+	
+	// 
+
+	// 
+	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
+	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -256,6 +325,11 @@ bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 	return GetGroupMnaggerComponent()->GetTeamHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
 }
 
+void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType AnimLinkClassType)
+{
+	SwitchAnimLink(AnimLinkClassType);
+}
+
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -265,63 +339,54 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 void ACharacterBase::SpawnDefaultController()
 {
-#if WITH_EDITOR
-	UWorld* World = GetWorld();
-	if ((GIsEditor == false || World->IsGameWorld()))
-#endif // WITH_EDITOR
-	{
-	}
-	const auto NewCharacterUnitPtr =
-		Cast<APlanetGameMode>(UGameplayStatics::GetGameMode(GetWorld()))->AddCharacterUnit(RowName);
-
-	SetCharacterUnit(NewCharacterUnitPtr);
-
-	auto GASPtr = GetAbilitySystemComponent();
-
-	GASPtr->ClearAllAbilities();
-	GASPtr->InitAbilityActorInfo(this, this);
-	GetInteractiveSkillComponent()->InitialBaseGAs();
-	GetInteractiveBaseGAComponent()->InitialBaseGAs();
-	GetInteractiveConsumablesComponent()->InitialBaseGAs();
-
 	Super::SpawnDefaultController();
 
 	OriginalAIController = Controller;
 }
 
-void ACharacterBase::OnHPChanged(int32 CurrentValue)
+void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
 {
-	if (CurrentValue <= 0)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
-		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
-			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
-			{
-				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+		if (CurrentValue <= 0)
+		{
+			GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
+			GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
+				for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 				{
-					Destroy();
+					if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+					{
+						Destroy();
+					}
 				}
-			}
-			});
+				});
+		}
 	}
+#endif
 }
 
-void ACharacterBase::OnMoveSpeedChanged(int32 CurrentValue)
+void ACharacterBase::OnMoveSpeedChanged_Implementation(int32 CurrentValue)
 {
 	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
 }
 
-void ACharacterBase::OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
+void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	// 显示对应的浮动UI
-	auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
-	UIPtr->ProcessGAEVent(GAEvent);
-	UIPtr->AddToViewport(EUIOrder::kFightingTips);
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		// 显示对应的浮动UI
+		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
+		UIPtr->ProcessGAEVent(GAEvent);
+		UIPtr->AddToViewport(EUIOrder::kFightingTips);
+	}
+#endif
 }
 
 void ACharacterBase::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
-	FCharacterUnitType* TargetCharacterUnitPtr
+	const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
 )
 {
 	switch (GroupMateChangeType)

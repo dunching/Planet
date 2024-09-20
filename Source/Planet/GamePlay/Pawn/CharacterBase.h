@@ -36,10 +36,11 @@ class UPlanetAbilitySystemInterface;
 class UTalentAllocationComponent;
 class UStateProcessorComponent;
 class UGroupMnaggerComponent;
-class UInteractiveBaseGAComponent;
+class UBaseFeatureGAComponent;
 class UInteractiveConsumablesComponent;
-class UInteractiveSkillComponent;
+class UUnitProxyProcessComponent;
 class UInteractiveToolComponent;
+class UCDCaculatorComponent;
 
 UCLASS()
 class PLANET_API ACharacterBase : 
@@ -51,10 +52,10 @@ class PLANET_API ACharacterBase :
 
 public:
 
-	using FCharacterUnitType = UCharacterUnit;
+	using FCharacterUnitType = FCharacterProxy;
 
 	using FTeamMembersChangedDelegateHandle = 
-		TCallbackHandleContainer<void(EGroupMateChangeType, FCharacterUnitType*)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
 
 	using FValueChangedDelegateHandle =
 		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
@@ -69,7 +70,10 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void UnPossessed() override;
-
+	
+	UFUNCTION(Server, Reliable)
+	virtual void InteractionSceneObj(ASceneObj* SceneObjPtr);
+	
 	virtual void Interaction(ACharacterBase* CharacterPtr) override;
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr) override;
@@ -85,30 +89,29 @@ public:
 
 	UTalentAllocationComponent* GetTalentAllocationComponent()const;
 
-	UInteractiveBaseGAComponent* GetInteractiveBaseGAComponent()const;
+	UBaseFeatureGAComponent* GetInteractiveBaseGAComponent()const;
+	
+	UStateProcessorComponent* GetStateProcessorComponent()const;
 
-	UInteractiveConsumablesComponent* GetInteractiveConsumablesComponent()const;
-
-	UInteractiveSkillComponent* GetInteractiveSkillComponent()const;
-
-	UInteractiveToolComponent* GetInteractiveToolComponent()const;
+	UUnitProxyProcessComponent* GetInteractiveSkillComponent()const;
 
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
+	
+	UCDCaculatorComponent* GetCDCaculatorComponent()const;
 
-	UCharacterUnit* GetCharacterUnit()const;
-
-	void SetCharacterUnit(UCharacterUnit* CharacterUnitPtr);
-
+	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
+	
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
 	virtual bool IsGroupmate(ACharacterBase*TargetCharacterPtr)const;
 
 	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
-
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
+	
+	UPROPERTY(Transient)
 	UCharacterTitle* CharacterTitlePtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
@@ -130,9 +133,14 @@ protected:
 
 	virtual void SpawnDefaultController()override;
 
+	void InitialDefaultCharacterUnit();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
+	
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
-		FCharacterUnitType* TargetCharacterUnitPtr
+		const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
 	);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
@@ -159,17 +167,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveBaseGAComponent> InteractiveBaseGAComponentPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UBaseFeatureGAComponent> InteractiveBaseGAComponentPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveConsumablesComponent> InteractiveConsumablesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveSkillComponent> InteractiveSkillComponentPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UUnitProxyProcessComponent> InteractiveSkillComponentPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Item)
-	TObjectPtr<UInteractiveToolComponent> InteractiveToolComponentPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFightingTips>FightingTipsClass;
@@ -178,10 +183,13 @@ protected:
 
 private:
 
+	UFUNCTION(NetMulticast, Reliable)
 	void OnHPChanged(int32 CurrentValue);
-
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void OnMoveSpeedChanged(int32 CurrentValue);
-
+	
+	UFUNCTION(NetMulticast, Reliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	FValueChangedDelegateHandle HPChangedHandle;
@@ -189,9 +197,6 @@ private:
 	FValueChangedDelegateHandle MoveSpeedChangedHandle;
 
 	FProcessedGAEventHandle ProcessedGAEventHandle;
-	
-	UPROPERTY(Transient)
-	TObjectPtr<UCharacterUnit> CharacterUnitPtr = nullptr;
 	
 	UPROPERTY(Transient)
 	TObjectPtr<AController> OriginalAIController;

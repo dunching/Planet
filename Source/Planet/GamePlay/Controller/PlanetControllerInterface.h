@@ -11,7 +11,7 @@ class UPlanetAbilitySystemComponent;
 class UHoldingItemsComponent;
 class UCharacterAttributesComponent;
 class UTalentAllocationComponent;
-class UCharacterUnit;
+struct FCharacterProxy;
 class AHumanCharacter;
 class ACharacterBase;
 
@@ -41,11 +41,11 @@ public:
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const = 0;
 
-	virtual UCharacterUnit* GetCharacterUnit() = 0;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterUnit() = 0;
 
 	virtual ACharacterBase* GetRealCharacter()const = 0;
 
-	virtual void ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr) = 0;
+	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr) = 0;
 
 	// 我们设定每个PC只对应一个Character，
 	// 如：Player在骑乘“马”时，PC会控制到“马”Character，
@@ -54,7 +54,7 @@ public:
 
 protected:
 
-	virtual UCharacterUnit* InitialCharacterUnit(ACharacterBase * CharaterPtr) = 0;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase * CharaterPtr) = 0;
 
 private:
 

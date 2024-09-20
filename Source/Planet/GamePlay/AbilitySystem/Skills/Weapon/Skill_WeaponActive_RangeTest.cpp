@@ -14,7 +14,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -27,7 +27,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 namespace Skill_WeaponActive_RangeTest
 {
@@ -53,14 +53,9 @@ void USkill_WeaponActive_RangeTest::PreActivate(const FGameplayAbilitySpecHandle
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetData_DashPtr)
+		if (ActiveParamPtr)
 		{
-			EquipmentAxePtr = GameplayAbilityTargetData_DashPtr->WeaponPtr;
-			if (GameplayAbilityTargetData_DashPtr->WeaponPtr)
-			{
-				return;
-			}
+			WeaponPtr = Cast<AWeapon_RangeTest>(ActiveParamPtr->WeaponPtr);
 		}
 	}
 }
@@ -74,7 +69,7 @@ void USkill_WeaponActive_RangeTest::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (EquipmentAxePtr)
+	if (WeaponPtr)
 	{
 		return;
 	}
@@ -102,7 +97,7 @@ void USkill_WeaponActive_RangeTest::PerformAction(
 
 void USkill_WeaponActive_RangeTest::StartTasksLink()
 {
-	if (EquipmentAxePtr && CharacterPtr)
+	if (WeaponPtr && CharacterPtr)
 	{
 		PlayMontage();
 	}
@@ -180,7 +175,7 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 
 void USkill_WeaponActive_RangeTest::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{

@@ -29,8 +29,4 @@ void AToolUnitBase::AttachToCharacter(ACharacterBase* CharacterPtr)
 void AToolUnitBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	auto CharacterPtr = Cast<AHumanCharacter>(GetOwner());
-
-	AttachToCharacter(CharacterPtr);
 }

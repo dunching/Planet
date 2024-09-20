@@ -9,22 +9,35 @@
 
 #include "Skill_Active_Base.generated.h"
 
-class UBasicUnit;
-class UActiveSkillUnit;
+struct FBasicProxy;
+struct FActiveSkillProxy;
 class UAbilityTask_TimerHelper;
 struct FCanbeInteractionInfo;
 struct FSkillCooldownHelper;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_ActiveSkill : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_ActiveSkill : 
+	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
-	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const;
+	virtual UScriptStruct* GetScriptStruct() const override;
 
-	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
+	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const override;
 
 	bool bIsAutoContinue = false;
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveSkill> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveSkill>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 /**
@@ -88,14 +101,15 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	)override;
+
+	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
 	virtual void Tick(float DeltaTime);
 
+	// 获取 “等待输入”时长
 	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
-
-	void ContinueActive();
-
+	
 	// 确认是否有锁定的目标
 	ACharacterBase* HasFocusActor()const;
 	
@@ -105,9 +119,9 @@ public:
 	// 获取范围内任意可攻击的目标
 	ACharacterBase* GetTargetInDistance(int32 Distance)const;
 
-	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
-
 protected:
+
+	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
@@ -116,15 +130,21 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
+	// 进入等待多段输入
+	void ContinueActive();
+
+	// 
 	void CheckInContinue();
 
+	// 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
-
+	
 	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
 
 	bool bIsPreviouInput = false;
 
+	// 等待输入时常
 	float CurrentWaitInputTime = 3.f;
 
 	float WaitInputPercent = 1.f;

@@ -15,8 +15,8 @@ struct FSceneObjContainer;
 struct FSceneUnitContainer;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
-class USkillUnit;
-class UWeaponUnit;
+struct FSkillProxy;
+struct FWeaponProxy;
 
 /**
  *
@@ -28,15 +28,11 @@ class PLANET_API UBackpackMenu : public UMyUserWidget, public IMenuInterface
 
 public:
 
-	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, UBasicUnit*)>;
+	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
 	
 	virtual void NativeConstruct()override;
 
 	virtual void ResetUIByData()override;
-
-	void SetHoldItemProperty(
-		const TSharedPtr<FSceneUnitContainer> & SceneUnitContariner
-	);
 
 	bool bIsPlayerMenu = true;
 
@@ -60,6 +56,8 @@ protected:
 
 private:
 
+	TArray<TSharedPtr<FBasicProxy>>GetProxys()const;
+
 	void ResetUIByData_Skill();
 
 	void ResetUIByData_Weapon();
@@ -67,7 +65,5 @@ private:
 	void ResetUIByData_Consumable();
 
 	void ResetUIByData_All();
-
-	TWeakPtr<FSceneUnitContainer> SceneUnitContariner;
 
 };

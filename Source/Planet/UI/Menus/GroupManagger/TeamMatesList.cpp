@@ -19,7 +19,7 @@
 #include "PlanetControllerInterface.h"
 #include "SceneElement.h"
 #include "HumanCharacter.h"
-#include "GroupsManaggerSubSystem.h"
+
 #include "TeamMateInfo.h"
 
 namespace TeanMatesList

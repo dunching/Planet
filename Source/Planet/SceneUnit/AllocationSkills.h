@@ -12,30 +12,89 @@
 
 #include "AllocationSkills.generated.h"
 
-class USkillUnit;
-class UWeaponUnit;
+struct FSkillProxy;
+struct FWeaponProxy;
+struct FConsumableProxy;
+struct FAllocation_FASI_Container;
 
-struct FSkillSocket
-{
-	FGameplayTag SkillSocket;
-
-	USkillUnit* SkillUnit = nullptr;
-};
-
-struct FWeaponSocket
-{
-	FGameplayTag SkillSocket;
-
-	UWeaponUnit* WeaponUnitPtr = nullptr;
-};
+class UUnitProxyProcessComponent;
+class UHoldingItemsComponent;
 
 USTRUCT(BlueprintType)
-struct PLANET_API FAllocationSkills final
+struct FSocket_FASI : public FFastArraySerializerItem
 {
 	GENERATED_USTRUCT_BODY()
 
-	TMap<FGameplayTag, TSharedPtr<FSkillSocket>>SkillsMap;
-	
-	TMap<FGameplayTag, TSharedPtr<FWeaponSocket>>WeaponsMap;
+	void PreReplicatedRemove(const FAllocation_FASI_Container& InArraySerializer);
 
+	void PostReplicatedAdd(const FAllocation_FASI_Container& InArraySerializer);
+
+	void PostReplicatedChange(const FAllocation_FASI_Container& InArraySerializer);
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
+	FKey Key;
+
+	FGameplayTag Socket;
+
+	TSharedPtr<FBasicProxy> ProxySPtr = nullptr;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FSocket_FASI> :
+	public TStructOpsTypeTraitsBase2<FSocket_FASI>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FAllocation_FASI_Container : public FFastArraySerializer
+{
+	GENERATED_USTRUCT_BODY()
+	
+	friend ACharacterBase;
+
+	using FItemType = FSocket_FASI;
+	using FContainerType = FAllocation_FASI_Container;
+	
+	UPROPERTY()
+	TArray<FSocket_FASI> Items;
+
+	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms);
+
+	template< typename Type, typename SerializerType >
+	bool ShouldWriteFastArrayItem(const Type& Item, const bool bIsWritingOnClient)
+	{
+		if (bIsWritingOnClient)
+		{
+			return Item.ReplicationID != INDEX_NONE;
+		}
+
+		return true;
+	}
+
+	void AddItem(const TSharedPtr<FItemType>& ProxySPtr);
+
+	void UpdateItem(const TSharedPtr<FItemType>& ProxySPtr);
+
+	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
+
+	UUnitProxyProcessComponent* UnitProxyProcessComponentPtr = nullptr;
+
+private:
+
+};
+
+template<>
+struct TStructOpsTypeTraits< FAllocation_FASI_Container > :
+	public TStructOpsTypeTraitsBase2< FAllocation_FASI_Container >
+{
+	enum
+	{
+		WithNetDeltaSerializer = true,
+	};
 };

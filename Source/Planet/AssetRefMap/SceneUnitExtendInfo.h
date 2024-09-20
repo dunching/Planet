@@ -14,11 +14,11 @@
 
 class UDataTable;
 
-class UToolUnit;
-class UWeaponUnit;
-class USkillUnit;
-class UCoinUnit;
-class UBasicUnit;
+struct FToolProxy;
+struct FWeaponProxy;
+struct FSkillProxy;
+struct FCoinProxy;
+struct FBasicProxy;
 
 struct FTableRowUnit_TagExtendInfo;
 

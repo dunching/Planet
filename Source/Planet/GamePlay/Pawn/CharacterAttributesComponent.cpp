@@ -1,36 +1,50 @@
 
 #include "CharacterAttributesComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "PlanetControllerInterface.h"
+#include "CharacterAttibutes.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickInterval = 1.f;
+
+	SetIsReplicatedByDefault(true);
 }
 
-void UCharacterAttributesComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UCharacterAttributesComponent::TickComponent(
+	float DeltaTime,
+	enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction
+)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	ProcessCharacterAttributes();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		ProcessCharacterAttributes();
+	}
+#endif
 }
 
-TSharedPtr<FCharacterAttributes> UCharacterAttributesComponent::GetCharacterAttributes() const
+const FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes() const
 {
-	auto CharacterPtr = GetOwner<FOwnerType>();
-	if (CharacterPtr)
-	{
-		return CharacterPtr->GetCharacterUnit()->CharacterAttributesSPtr;
-	}
-	return nullptr;
+	return CharacterAttributes;
+}
+
+FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes()
+{
+	return CharacterAttributes;
 }
 
 void UCharacterAttributesComponent::ProcessCharacterAttributes()
@@ -50,11 +64,9 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
 
-		auto CharacterAttributesSPtr = GetCharacterAttributes();
-
 		// 基础回复
 		{
-			GAEventData.HP = CharacterAttributesSPtr->HPReplay.GetCurrentValue();
+			GAEventData.HP = CharacterAttributes.HPReplay.GetCurrentValue();
 
 			if (
 				CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
@@ -70,12 +82,12 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 			{
 				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
 				{
-					GAEventData.PP = CharacterAttributesSPtr->RunningConsume.GetCurrentValue();
+					GAEventData.PP = CharacterAttributes.RunningConsume.GetCurrentValue();
 				}
 			}
 			else
 			{
-				GAEventData.PP = CharacterAttributesSPtr->PPReplay.GetCurrentValue();
+				GAEventData.PP = CharacterAttributes.PPReplay.GetCurrentValue();
 			}
 		}
 
@@ -88,9 +100,18 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesComponent");
 
+void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+
+	Params.Condition = COND_OwnerOnly;
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterAttributes, Params);
+}
+
 void UCharacterAttributesComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-//	CharacterAttributesSPtr->InitialData();
 }

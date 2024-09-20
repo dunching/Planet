@@ -17,8 +17,8 @@
 struct FStreamableHandle;
 class UDragDropOperation;
 
-class UBasicUnit;
-class UCharacterUnit;
+struct FBasicProxy;
+struct FCharacterProxy;
 
 UCLASS()
 class PLANET_API UAllocationIconBase :
@@ -30,8 +30,8 @@ class PLANET_API UAllocationIconBase :
 
 public:
 
-	// ¾ÉµÄUnit£¬ÐÂµÄUnit
-	using FOnResetUnit = TCallbackHandleContainer<void(UBasicUnit*, UBasicUnit*)>;
+	// æ—§çš„Unitï¼Œæ–°çš„Unit
+	using FOnResetUnit = TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&, const TSharedPtr<FBasicProxy>&)>;
 
 	UAllocationIconBase(const FObjectInitializer& ObjectInitializer);
 
@@ -39,13 +39,13 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	virtual void OnDragIcon(bool bIsDragging, UBasicUnit* UnitPtr);
+	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr);
 
-	virtual void SublingIconUnitChanged(UBasicUnit* UnitPtr);
+	virtual void SublingIconUnitChanged(const TSharedPtr<FBasicProxy>& UnitPtr);
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 
@@ -60,7 +60,7 @@ public:
 
 	bool bPaseInvokeOnResetUnitEvent = false;
 
-	UBasicUnit* BasicUnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> BasicUnitPtr = nullptr;
 
 protected:
 

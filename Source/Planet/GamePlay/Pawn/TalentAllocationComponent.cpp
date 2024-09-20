@@ -6,12 +6,12 @@
 #include "HoldingItemsComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitContainer.h"
 #include "PlanetControllerInterface.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
@@ -177,53 +177,53 @@ void UTalentAllocationComponent::SyncToHolding()
 				auto CharacterPtr = GetOwner<FOwnerType>();
 				if (CharacterPtr)
 				{
-					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
-					auto HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
-					switch (std::get<EPointSkillType>(Iter.Value.Type))
-					{
-					case EPointSkillType::kNuQi:
-					{
-						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
-						if (!SkillUnitPtr)
-						{
-							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
-						}
-						if (SkillUnitPtr)
-						{
-							SkillUnitPtr->Level = Iter.Value.Level;
-						}
-
-						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
-						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
-						SkillsSocketInfo->Key = EKeys::Invalid;
-
-						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
-					}
-					break;
-					case EPointSkillType::kYinYang:
-					{
-						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
-						if (!SkillUnitPtr)
-						{
-							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
-						}
-						if (SkillUnitPtr)
-						{
-							SkillUnitPtr->Level = Iter.Value.Level;
-						}
-
-						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-
-						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
-						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
-						SkillsSocketInfo->Key = EKeys::Invalid;
-
-						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
-					}
-					break;
-					}
+// 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
+// 					auto HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
+// 					switch (std::get<EPointSkillType>(Iter.Value.Type))
+// 					{
+// 					case EPointSkillType::kNuQi:
+// 					{
+// 						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
+// 						if (!SkillUnitPtr)
+// 						{
+// 							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
+// 						}
+// 						if (SkillUnitPtr)
+// 						{
+// 							SkillUnitPtr->Level = Iter.Value.Level;
+// 						}
+// 
+// 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+// 
+// 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
+// 						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
+// 						SkillsSocketInfo->Key = EKeys::Invalid;
+// 
+// 						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+// 					}
+// 					break;
+// 					case EPointSkillType::kYinYang:
+// 					{
+// 						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
+// 						if (!SkillUnitPtr)
+// 						{
+// 							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
+// 						}
+// 						if (SkillUnitPtr)
+// 						{
+// 							SkillUnitPtr->Level = Iter.Value.Level;
+// 						}
+// 
+// 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
+// 
+// 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
+// 						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
+// 						SkillsSocketInfo->Key = EKeys::Invalid;
+// 
+// 						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
+// 					}
+// 					break;
+// 					}
 // 					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
 // 					EICPtr->RegisterMultiGAs(SkillsMap);
 				}

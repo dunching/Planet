@@ -9,14 +9,14 @@
 #include "GravityAIController.h"
 #include "GenerateType.h"
 #include "PlanetAIController.h"
-#include "GroupsManaggerSubSystem.h"
+
 #include "GroupMnaggerComponent.h"
 
 #include "HorseAIController.generated.h"
 
 class UCharacterTitle;
 class UGroupMnaggerComponent;
-class UCharacterUnit;
+struct FCharacterProxy;
 class ACharacterBase;
 class AHorseCharacter;
 class AHumanCharacter;
@@ -34,12 +34,12 @@ class PLANET_API AHorseAIController : public APlanetAIController
 
 public:
 
-	using FCharacterUnitType = UCharacterUnit;
+	using FCharacterUnitType = FCharacterProxy;
 
 	using FPawnType = AHorseCharacter;
 
 	using FTeammateOptionChangedDelegate =
-		TCallbackHandleContainer<void(ETeammateOption, FCharacterUnitType*)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
 
 	using FTeamHelperChangedDelegate =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
@@ -59,7 +59,7 @@ protected:
 
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		FCharacterUnitType* LeaderPCPtr
+		const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
 	);
 
 	void OnDeathing(const FGameplayTag Tag, int32 Count);

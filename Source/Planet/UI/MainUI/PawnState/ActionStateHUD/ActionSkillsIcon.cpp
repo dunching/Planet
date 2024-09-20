@@ -25,10 +25,12 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
+#include "SceneElement.h"
+#include "StateProcessorComponent.h"
 
 struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 {
@@ -74,7 +76,7 @@ void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
+void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
@@ -87,7 +89,7 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 			)
 		{
-			UnitPtr = Cast<USkillUnit>(BasicUnitPtr);
+			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(BasicUnitPtr);
 		}
 	}
 
@@ -95,6 +97,8 @@ void UActionSkillsIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 	SetItemType();
 	SetCanRelease(true);
 	SetRemainingCooldown(true, 0.f, 0.f);
+
+	// 
 	SetInputRemainPercent(false, 0.f);
 }
 
@@ -112,15 +116,15 @@ void UActionSkillsIcon::UpdateSkillState()
 	}
 
 	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-	const auto SkillSocketInfoSPtr = EICPtr->FindSkill(IconSocket);
-	if (!SkillSocketInfoSPtr)
+	const auto SkillProxySPtr = EICPtr->FindActiveSkillSocket(IconSocket);
+	if (!SkillProxySPtr)
 	{
 		return;
 	}
 
-	const auto SKillUnitType = SkillSocketInfoSPtr->SkillUnitPtr->GetUnitType();
+	const auto SKillUnitType = SkillProxySPtr->GetUnitType();
 	{
-		auto GAInsPtr = SkillSocketInfoSPtr->SkillUnitPtr->GetGAInst();
+		auto GAInsPtr = SkillProxySPtr->GetGAInst();
 		if (!GAInsPtr)
 		{
 			return;
@@ -134,7 +138,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto ActiveSkillUnitPtr = Cast<UActiveSkillUnit>(SkillSocketInfoSPtr->SkillUnitPtr);
+		auto ActiveSkillUnitPtr = SkillProxySPtr;
 		if (!ActiveSkillUnitPtr)
 		{
 			return;
@@ -146,15 +150,24 @@ void UActionSkillsIcon::UpdateSkillState()
 		bool bIsAcceptInput = false;
 		float Percent = 0.f;
 
-		auto GAInsPtr = Cast<USkill_Active_Base>(SkillSocketInfoSPtr->SkillUnitPtr->GetGAInst());
+		auto GAInsPtr = Cast<USkill_Active_Base>(SkillProxySPtr->GetGAInst());
 		if (!GAInsPtr)
 		{
 			return;
 		}
 
-		GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
-
-		SetInputRemainPercent(bIsAcceptInput, Percent);
+		auto CSSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(SKillUnitType);
+		if (CSSPtr)
+		{
+			//
+			SetDurationPercent(true, CSSPtr->GetRemainTimePercent());
+		}
+		else
+		{
+			// 
+			GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
+			SetInputRemainPercent(bIsAcceptInput, Percent);
+		}
 	}
 	else if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 	{
@@ -277,13 +290,19 @@ void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent
 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
 	if (UIPtr)
 	{
-		UIPtr->SetVisibility(bIsAcceptInput ?  ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UIPtr->SetVisibility(bIsAcceptInput ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 		UIPtr->SetPercent(Percent);
 	}
 }
 
 void UActionSkillsIcon::SetDurationPercent(bool bIsHaveDuration, float Percent)
 {
+	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
+	if (UIPtr)
+	{
+		UIPtr->SetVisibility(bIsHaveDuration ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UIPtr->SetPercent(Percent);
+	}
 }
 
 void UActionSkillsIcon::NativeConstruct()
@@ -309,8 +328,8 @@ bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
  		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
  		if (WidgetDragPtr)
 		{
-			auto SkillUnitPtr = Cast<USkillUnit>(WidgetDragPtr->SceneToolSPtr);
-// 			if (SkillUnitPtr && SkillUnitPtr->GetUnitType().MatchesTag(SkillUnitType))
+			auto OtherUnitPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
+// 			if (UnitPtr && ProxySPtr->GetUnitType().MatchesTag(SkillUnitType))
 // 			{
 // 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
 // 			}

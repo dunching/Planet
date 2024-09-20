@@ -13,11 +13,6 @@ class AWeapon_PickAxe;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
 
-struct FGameplayAbilityTargetData_Skill_PickAxe : public FGameplayAbilityTargetData_Skill_Weapon
-{
-	AWeapon_PickAxe* WeaponPtr = nullptr;
-};
-
 UCLASS()
 class PLANET_API USkill_WeaponActive_PickAxe : public USkill_WeaponActive_Base
 {

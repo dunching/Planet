@@ -30,12 +30,12 @@ void UDragDropOperationWidget::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UDragDropOperationWidget::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UDragDropOperationWidget::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	if (InBasicUnitPtr)
 	{
 		BasicUnitPtr = InBasicUnitPtr;
-		SetItemType(BasicUnitPtr);
+		SetItemType(BasicUnitPtr.Get());
 	}
 }
 
@@ -63,7 +63,7 @@ void UDragDropOperationWidget::SetNum(int32 NewNum)
 	}
 }
 
-void UDragDropOperationWidget::SetItemType(UBasicUnit* ToolSPtr)
+void UDragDropOperationWidget::SetItemType(FBasicProxy* ToolSPtr)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
 	if (ImagePtr)

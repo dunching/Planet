@@ -4,7 +4,7 @@
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "GroupsManaggerSubSystem.h"
+
 #include "CharacterBase.h"
 #include "HumanCharacter.h"
 #include "CharacterTitle.h"
@@ -149,18 +149,18 @@ void UGroupMnaggerComponent::TickComponent(
 	CaculationCooldownLambda(GetGroupHelper()->CommonCooldownMap);
 }
 
-void UGroupMnaggerComponent::AddCharacterToGroup(FCharacterUnitType* CharacterUnitPtr)
+void UGroupMnaggerComponent::AddCharacterToGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
 	//
 	GetGroupHelper()->AddCharacter(CharacterUnitPtr);
 }
 
-void UGroupMnaggerComponent::AddCharacterToTeam(FCharacterUnitType* CharacterUnitPtr)
+void UGroupMnaggerComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
 	GetGroupHelper()->AddCharacter(CharacterUnitPtr);
 }
 
-void UGroupMnaggerComponent::OnAddToNewGroup(FCharacterUnitType* CharacterUnitPtr)
+void UGroupMnaggerComponent::OnAddToNewGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
 	GroupHelperSPtr = CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 
@@ -172,7 +172,7 @@ void UGroupMnaggerComponent::OnAddToNewGroup(FCharacterUnitType* CharacterUnitPt
 	GroupHelperChangedDelegateContainer.ExcuteCallback();
 }
 
-void UGroupMnaggerComponent::OnAddToNewTeam(FCharacterUnitType* CharacterUnitPtr)
+void UGroupMnaggerComponent::OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
 	TeamHelperSPtr = CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 
@@ -197,7 +197,7 @@ const TSharedPtr<FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
 	return TeamHelperSPtr;
 }
 
-TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::ApplyCooldown(UActiveSkillUnit* ActiveSkillUnitPtr)
+TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr)
 {
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> Result;
 
@@ -221,7 +221,7 @@ TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::Apply
 	return Result;
 }
 
-TWeakPtr<FSkillCooldownHelper> UGroupMnaggerComponent::ApplyUniqueCooldown(UActiveSkillUnit* ActiveSkillUnitPtr)
+TWeakPtr<FSkillCooldownHelper> UGroupMnaggerComponent::ApplyUniqueCooldown(FActiveSkillProxy* ActiveSkillUnitPtr)
 {
 	TWeakPtr<FSkillCooldownHelper> Result;
 	if (ActiveSkillUnitPtr)
@@ -253,7 +253,7 @@ TWeakPtr<FSkillCooldownHelper> UGroupMnaggerComponent::ApplyUniqueCooldown(UActi
 	return Result;
 }
 
-TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCooldown(const UActiveSkillUnit* ActiveSkillUnitPtr)
+TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCooldown(const FActiveSkillProxy* ActiveSkillUnitPtr)
 {
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> Result;
 
@@ -276,7 +276,7 @@ TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCo
 	return Result;
 }
 
-TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCooldown(const UConsumableUnit* ConsumableUnitPtr)
+TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCooldown(const FConsumableProxy* ConsumableUnitPtr)
 {
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> Result;
 
@@ -293,7 +293,7 @@ TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::GetCo
 	return Result;
 }
 
-TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::ApplyCooldown(UConsumableUnit* ConsumableUnitPtr)
+TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> UGroupMnaggerComponent::ApplyCooldown(FConsumableProxy* ConsumableUnitPtr)
 {
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>> Result;
 	if (ConsumableUnitPtr)
@@ -383,7 +383,7 @@ void FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
 	AddCharacter(CharacterUnitPtr);
 }
 
-void FGroupMatesHelper::AddCharacter(FCharacterUnitType* CharacterUnitPtr)
+void FGroupMatesHelper::AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
 	MembersSet.Add(CharacterUnitPtr);
 
@@ -392,7 +392,7 @@ void FGroupMatesHelper::AddCharacter(FCharacterUnitType* CharacterUnitPtr)
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterUnitPtr);
 }
 
-bool FGroupMatesHelper::IsMember(FCharacterUnitType* CharacterUnitPtr) const
+bool FGroupMatesHelper::IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr) const
 {
 	for (auto Iter : MembersSet)
 	{

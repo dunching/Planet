@@ -15,7 +15,7 @@
 
 struct FStreamableHandle;
 
-class USkillUnit;
+struct FSkillProxy;
 
 /**
  *
@@ -33,13 +33,13 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
 	void UpdateState();
 
-	UConsumableUnit* UnitPtr = nullptr;
+	TSharedPtr < FConsumableProxy> UnitPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;

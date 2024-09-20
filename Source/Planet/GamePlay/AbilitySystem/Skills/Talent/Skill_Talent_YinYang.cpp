@@ -5,7 +5,7 @@
 #include <Engine/OverlapResult.h>
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -17,7 +17,7 @@
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneObjSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {
@@ -63,13 +63,13 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 	{
 		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
-		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributesSPtr->HP.AddOnValueChanged(
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 
 		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributesSPtr->TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributesSPtr->TalentSPtr.Get())
+			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
 		);
 	}
 
@@ -249,8 +249,8 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 				{
 					FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
-					auto CharacterAttributesSPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-					GAEventData.HP = CharacterAttributesSPtr->HP.GetMaxValue() * (TreatmentVolumePercent / 100.f);
+					auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+					GAEventData.HP = CharacterAttributes.HP.GetMaxValue() * (TreatmentVolumePercent / 100.f);
 
 					GAEventDataPtr->DataAry.Add(GAEventData);
 				}

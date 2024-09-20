@@ -15,11 +15,6 @@ class AWeapon_RangeTest;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
 
-struct FGameplayAbilityTargetData_Skill_WeaponActive_RangeTest : public FGameplayAbilityTargetData_Skill_Weapon
-{
-	AWeapon_RangeTest* WeaponPtr = nullptr;
-};
-
 UCLASS()
 class PLANET_API ASkill_WeaponActive_RangeTest_Projectile : public AProjectileBase
 {
@@ -107,6 +102,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<ASkill_WeaponActive_RangeTest_Projectile>Skill_WeaponActive_RangeTest_ProjectileClass;
 
-	AWeapon_RangeTest* EquipmentAxePtr = nullptr;
+	AWeapon_RangeTest* WeaponPtr = nullptr;
 
 };

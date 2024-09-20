@@ -12,8 +12,8 @@
 
 struct FStreamableHandle;
 
-class UBasicUnit;
-class UCharacterUnit;
+struct FBasicProxy;
+struct FCharacterProxy;
 class UTeamMateInfo;
 class AHumanCharacter;
 

@@ -5,14 +5,18 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveBaseGAComponent.h"
+#include "UnitProxyProcessComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameOptions.h"
+#include "HoldingItemsComponent.h"
 
 USkill_Base::USkill_Base() :
 	Super()
 {
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerExecution;
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 }
 
 void USkill_Base::OnAvatarSet(
@@ -25,12 +29,13 @@ void USkill_Base::OnAvatarSet(
 	// CDO
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
+	// 远程不能复制这个参数？
 	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill*>(Spec.GameplayEventData->TargetData.Get(0));
+		auto GameplayAbilityTargetPtr = dynamic_cast<const FRegisterParamType*>(Spec.GameplayEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetPtr)
 		{
-			SkillUnitPtr = GameplayAbilityTargetPtr->SkillUnitPtr;
+			SkillUnitPtr = CharacterPtr->GetHoldingItemsComponent()->FindUnit_Skill(GameplayAbilityTargetPtr->ProxyID);
 		}
 	}
 }
@@ -45,8 +50,7 @@ void USkill_Base::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
-	// Inst
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	ResetPreviousStageActions();
 }
 
 void USkill_Base::ActivateAbility(
@@ -118,10 +122,46 @@ void USkill_Base::ResetPreviousStageActions()
 	ResetListLock();
 }
 
-FGameplayAbilityTargetData_Skill* FGameplayAbilityTargetData_Skill::Clone() const
+UScriptStruct* FGameplayAbilityTargetData_RegisterParam::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_RegisterParam::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	if (Ar.IsSaving())
+	{
+		Ar << ProxyID;
+	}
+	else if (Ar.IsLoading())
+	{
+		Ar << ProxyID;
+	}
+
+	return true;
+}
+
+FGameplayAbilityTargetData_RegisterParam* FGameplayAbilityTargetData_RegisterParam::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_Skill;
+		new FGameplayAbilityTargetData_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
+bool FGameplayAbilityTargetData_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << ID;
+
+	return true;
+}
+
+FGameplayAbilityTargetData_ActiveParam* FGameplayAbilityTargetData_ActiveParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_ActiveParam;
 
 	*ResultPtr = *this;
 

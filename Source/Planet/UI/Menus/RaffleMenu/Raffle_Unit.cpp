@@ -37,7 +37,7 @@ void URaffle_Unit::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
 }
 
-void URaffle_Unit::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void URaffle_Unit::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	// 
 }

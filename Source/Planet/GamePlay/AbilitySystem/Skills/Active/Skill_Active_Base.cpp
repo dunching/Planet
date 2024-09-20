@@ -1,9 +1,11 @@
 
 #include "Skill_Active_Base.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"
@@ -23,11 +25,9 @@ void USkill_Active_Base::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
 	if (SkillUnitPtr)
 	{
-		Cast<UActiveSkillUnit>(SkillUnitPtr)->OffsetCooldownTime();
+		DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->OffsetCooldownTime();
 	}
 }
 
@@ -46,7 +46,6 @@ void USkill_Active_Base::PreActivate(
 		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetPtr)
 		{
-			CanbeActivedInfoSPtr = GameplayAbilityTargetPtr->CanbeActivedInfoSPtr;
 		}
 	}
 }
@@ -70,7 +69,7 @@ bool USkill_Active_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	Cast<UActiveSkillUnit>(SkillUnitPtr)->ApplyCooldown();
+	DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->ApplyCooldown();
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
@@ -83,7 +82,7 @@ bool USkill_Active_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (!Cast<UActiveSkillUnit>(SkillUnitPtr)->CheckCooldown())
+	if (!DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->CheckCooldown())
 	{
 		return false;
 	}
@@ -119,6 +118,11 @@ void USkill_Active_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+void USkill_Active_Base::SetContinuePerformImp(bool bIsContinue)
+{
+	ContinueActive();
+}
+
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const
 {
 	if (WaitInputTaskPtr)
@@ -146,7 +150,7 @@ void USkill_Active_Base::CheckInContinue()
 
 		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 		WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
-		WaitInputTaskPtr->DurationDelegate.BindUObject(this , &ThisClass::WaitInputTick);
+		WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
 		WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
 			return true;
@@ -244,6 +248,11 @@ void USkill_Active_Base::Tick(float DeltaTime)
 {
 }
 
+void USkill_Active_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
 void USkill_Active_Base::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -252,6 +261,20 @@ void USkill_Active_Base::PerformAction(
 )
 {
 
+}
+
+UScriptStruct* FGameplayAbilityTargetData_ActiveSkill::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_ActiveSkill::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_ActiveSkill::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << bIsAutoContinue;
+
+	return true;
 }
 
 FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_ActiveSkill::Clone() const

@@ -13,7 +13,8 @@
 
 class UPlanetAbilitySystemComponent;
 class UHoldingItemsComponent;
-class UCharacterUnit;
+struct FCharacterProxy;
+struct FSceneUnitContainer;
 
 UCLASS()
 class PLANET_API APlanetPlayerState : public APlayerState
@@ -22,8 +23,8 @@ class PLANET_API APlanetPlayerState : public APlayerState
 
 public:
 
-	APlanetPlayerState();
-	
+	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 protected:
 
 	virtual void BeginPlay() override;

@@ -31,6 +31,8 @@ public:
 
 	void UnBindCallback();
 
+	bool bIsAutoUnregister = true;
+
 protected:
 
 private:
@@ -44,7 +46,10 @@ private:
 template<typename ValueType>
 TOnValueChangedCallbackHandle<ValueType>::~TOnValueChangedCallbackHandle()
 {
-	UnBindCallback();
+	if (bIsAutoUnregister)
+	{
+		UnBindCallback();
+	}
 }
 
 template<typename ValueType>
@@ -340,6 +345,12 @@ struct TStructVariable
 		return InheritsTypeIns;
 	}
 };
+
+template<typename ChildType, typename ParentType>
+TSharedPtr<ChildType> DynamicCastSharedPtr(const TSharedPtr<ParentType>& SPtr)
+{
+	return TSharedPtr<ChildType>(SPtr, dynamic_cast<ChildType*>(SPtr.Get()));
+}
 
 class ABuildingBase;
 class UPlanetGameplayAbility;

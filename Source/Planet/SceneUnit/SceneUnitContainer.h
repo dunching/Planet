@@ -7,6 +7,7 @@
 
 #include "CoreMinimal.h"
 #include <GameplayTagContainer.h>
+#include "Net/Serialization/FastArraySerializer.h"
 
 #include "GenerateType.h"
 #include "BaseData.h"
@@ -26,107 +27,104 @@ class IPlanetControllerInterface;
 class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter;
-class UBasicUnit;
-class USkillUnit;
-class UCoinUnit;
-class UConsumableUnit;
-class UToolUnit;
-class UCharacterUnit;
-class USkillUnit;
-class UWeaponUnit;
+class UHoldingItemsComponent;
+struct FBasicProxy;
+struct FSkillProxy;
+struct FCoinProxy;
+struct FConsumableProxy;
+struct FToolProxy;
+struct FCharacterProxy;
+struct FSkillProxy;
+struct FWeaponProxy;
 
 struct FSceneUnitContainer;
+struct FProxy_FASI_Container;
 
 enum class ECharacterPropertyType : uint8;
 
-FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType);
+FTableRowUnit* GetTableRowUnit(const FGameplayTag &UnitType);
 
-#pragma region HoldItem
-USTRUCT(BlueprintType)
-struct FSceneUnitContainer final
+USTRUCT()
+struct PLANET_API FProxy_FASI : public FFastArraySerializerItem
 {
 	GENERATED_USTRUCT_BODY()
 
-	using FOnSkillUnitChanged = TCallbackHandleContainer<void(USkillUnit*, bool)>;
+	void PreReplicatedRemove(const FProxy_FASI_Container& InArraySerializer);
 
-	using FOnToolUnitChanged = TCallbackHandleContainer<void(UToolUnit*)>;
-	
-	using FOnGroupmateUnitChanged = TCallbackHandleContainer<void(UCharacterUnit*, bool)>;
-	
-	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(UConsumableUnit*, bool, int32)>;
+	void PostReplicatedAdd(const FProxy_FASI_Container& InArraySerializer);
 
-	using FOnCoinUnitChanged = TCallbackHandleContainer<void(UCoinUnit*, bool, int32)>;
+	void PostReplicatedChange(const FProxy_FASI_Container& InArraySerializer);
 
-	~FSceneUnitContainer();
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	UBasicUnit* AddUnit(FGameplayTag UnitType, int32 Num);
+	bool operator==(const FProxy_FASI& Right)const;
 
-	UBasicUnit* FindUnit(int32 ID);
+	TSharedPtr<FBasicProxy> ProxySPtr = nullptr;
 
-	void RemoveUnit(int32 ID);
-
-
-	UCoinUnit* AddUnit_Coin(FGameplayTag UnitType, int32 Num);
-	
-	UCoinUnit* FindUnit_Coin(FGameplayTag UnitType);
-
-
-	UConsumableUnit* AddUnit_Consumable(FGameplayTag UnitType, int32 Num = 1);
-
-	void RemoveUnit_Consumable(UConsumableUnit*UnitPtr, int32 Num = 1);
-
-
-	UToolUnit* AddUnit_ToolUnit(FGameplayTag UnitType);
-
-
-	UWeaponUnit* AddUnit_Weapon(FGameplayTag UnitType);
-
-	UWeaponUnit* FindUnit_Weapon(FGameplayTag UnitType);
-
-
-	USkillUnit* AddUnit_Skill(FGameplayTag UnitType);
-
-	USkillUnit* FindUnit_Skill(FGameplayTag UnitType);
-
-
-	void AddUnit_Groupmate(UCharacterUnit* UnitPtr);
-
-
-	const TArray<UBasicUnit*>& GetSceneUintAry()const;
-
-	const TMap<FGameplayTag, UCoinUnit*>& GetCoinUintAry()const;
-
-	TArray<UCharacterUnit*> GetGourpmateUintAry()const;
-
-	FOnSkillUnitChanged OnSkillUnitChanged;
-
-	FOnToolUnitChanged OnToolUnitChanged;
-
-	FOnConsumableUnitChanged OnConsumableUnitChanged;
-
-	FOnCoinUnitChanged OnCoinUnitChanged;
-
-	FOnGroupmateUnitChanged OnGroupmateUnitChanged;
-
-private:
-
-	int32 GetValidID()const;
-
-	// 自定义的“排列方式”
-	UPROPERTY(Transient)
-	TArray<UBasicUnit*> SceneToolsAry;
-	
-	UPROPERTY(Transient)
-	TMap<int32, UBasicUnit*> SceneMetaMap;
-	
-	UPROPERTY(Transient)
-	TMap<FGameplayTag, UConsumableUnit*> ConsumablesUnitMap;
-	
-	UPROPERTY(Transient)
-	TMap<FGameplayTag, USkillUnit*> SkillUnitMap;
-	
-	UPROPERTY(Transient)
-	TMap<FGameplayTag, UCoinUnit*> CoinUnitMap;
 };
 
-#pragma endregion HoldingItems
+ template<>
+ struct TStructOpsTypeTraits< FProxy_FASI > :
+ 	public TStructOpsTypeTraitsBase2< FProxy_FASI >
+ {
+ 	enum
+ 	{
+		WithNetSerializer = true,
+ 	};
+ };
+
+USTRUCT()
+struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
+{
+	GENERATED_USTRUCT_BODY()
+
+	friend ACharacterBase;
+
+	using FItemType = FProxy_FASI;
+	using FContainerType = FProxy_FASI_Container;
+
+	UPROPERTY()
+	TArray<FProxy_FASI> Items;
+
+	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms);
+
+	template< typename Type, typename SerializerType >
+	bool ShouldWriteFastArrayItem(const Type& Item, const bool bIsWritingOnClient)
+	{
+		if (bIsWritingOnClient)
+		{
+			return Item.ReplicationID != INDEX_NONE;
+		}
+
+		return true;
+	}
+
+	 void PreReplicatedRemove(const TArrayView<int32>& RemovedIndices, int32 FinalSize);
+
+	 void PostReplicatedAdd(const TArrayView<int32>& AddedIndices, int32 FinalSize);
+
+	 void PostReplicatedChange(const TArrayView<int32>& ChangedIndices, int32 FinalSize);
+
+	void AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
+
+	void UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
+
+	void RemoveItem(const FItemType& Item);
+
+	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
+
+protected:
+
+	TSharedPtr<FBasicProxy> GetProxyType(const FGameplayTag& UnitType);
+
+};
+
+template<>
+struct TStructOpsTypeTraits< FProxy_FASI_Container > :
+	public TStructOpsTypeTraitsBase2< FProxy_FASI_Container >
+{
+	enum
+	{
+		WithNetDeltaSerializer = true,
+	};
+};

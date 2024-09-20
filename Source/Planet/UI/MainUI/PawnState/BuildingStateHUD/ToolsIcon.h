@@ -13,8 +13,8 @@
 
 #include "ToolsIcon.generated.h"
 
-class UBasicUnit;
-class UToolUnit;
+struct FBasicProxy;
+struct FToolProxy;
 
 struct FStreamableHandle;
 
@@ -25,21 +25,21 @@ class PLANET_API UToolIcon : public UMyUserWidget, public IUnitIconInterface
 
 public:
 
-	using FOnResetUnit = TCallbackHandleContainer<void(UBasicUnit*)>;
+	using FOnResetUnit = TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&)>;
 
 	UToolIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit * BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	UToolUnit* GetToolUnit()const;
+	TSharedPtr<FToolProxy> GetToolUnit()const;
 
-	UConsumableUnit* GetConsumablesUnit()const;
+	TSharedPtr<FConsumableProxy> GetConsumablesUnit()const;
 
-	void OnSublingIconReset(UBasicUnit* InToolUnitPtr);
+	void OnSublingIconReset(const TSharedPtr<FBasicProxy>& InToolUnitPtr);
 
 	FOnResetUnit OnResetUnit;
 
@@ -66,6 +66,6 @@ protected:
 
 private:
 
-	UBasicUnit*UnitPtr = nullptr;
+	TSharedPtr<FBasicProxy>UnitPtr = nullptr;
 
 };

@@ -9,18 +9,60 @@
 
 #include "Skill_Base.generated.h"
 
-class UBasicUnit;
-class USkillUnit;
+struct FBasicProxy;
+struct FSkillProxy;
 class UInteractiveComponent;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Skill : public FGameplayAbilityTargetData
+struct FGameplayAbilityTargetData_RegisterParam :
+	public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
 
-	virtual FGameplayAbilityTargetData_Skill* Clone()const;
+	virtual UScriptStruct* GetScriptStruct() const override;
 
-	USkillUnit* SkillUnitPtr = nullptr;
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
+	virtual FGameplayAbilityTargetData_RegisterParam* Clone()const;
+
+	FGuid ProxyID;
+
+private:
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RegisterParam>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
+USTRUCT()
+struct FGameplayAbilityTargetData_ActiveParam :
+	public FGameplayAbilityTargetData
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
+	virtual FGameplayAbilityTargetData_ActiveParam* Clone()const;
+
+	int32 ID = 0;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()
@@ -29,6 +71,8 @@ class PLANET_API USkill_Base : public UPlanetGameplayAbility
 	GENERATED_BODY()
 
 public:
+
+	using FRegisterParamType = FGameplayAbilityTargetData_RegisterParam;
 
 	friend UInteractiveComponent;
 
@@ -67,7 +111,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
+	)override;
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -89,6 +133,6 @@ protected:
 
 	ACharacterBase* CharacterPtr = nullptr;
 
-	USkillUnit* SkillUnitPtr = nullptr;
+	TSharedPtr<FSkillProxy> SkillUnitPtr = nullptr;
 
 };

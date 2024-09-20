@@ -53,6 +53,8 @@ public:
 
 protected:
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -60,7 +62,12 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	void ExcuteTasks(float StartDistance, float EndDistance, float Duration, bool bIsSubMoveStep);
+	void ExcuteTasks(
+		float StartDistance,
+		float EndDistance,
+		float Duration,
+		bool bIsSubMoveStep
+	);
 
 	void PlayMontage();
 
@@ -72,21 +79,24 @@ protected:
 
 	UAnimMontage* GetCurrentMontage()const;
 
-	int32 StepIndex = 0;
-	
-	int32 SubStepIndex = 0;
-
 	const int32 MaxIndex = 4;
 
 	float SubStepMoveDuration = 0.1f;
-	
+
 	float SubStepPercent = 0.8f;
 
+	UPROPERTY(Replicated)
+	int32 StepIndex = 0;
+	
+	UPROPERTY(Replicated)
+	int32 SubStepIndex = 0;
+	
+	UPROPERTY(Replicated)
 	bool bIsContinue = true;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage1 = nullptr;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage2 = nullptr;
 
@@ -99,11 +109,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ASPlineActor>SPlineActorClass;
 
+	UPROPERTY(Replicated)
 	ASPlineActor* SPlineActorPtr = nullptr;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ACameraTrailHelper>CameraTrailHelperClass;
-
+	
 	ACameraTrailHelper* CameraTrailHelperPtr = nullptr;
 
 	TScopeValue<FVector> TargetOffsetValue;

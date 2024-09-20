@@ -16,9 +16,9 @@
 struct FStreamableHandle;
 class UDragDropOperation;
 
-class USkillUnit;
-class UConsumableUnit;
-class UBasicUnit;
+struct FSkillProxy;
+struct FConsumableProxy;
+struct FBasicProxy;
 
 UCLASS()
 class PLANET_API UConsumableIcon : public UAllocationIconBase
@@ -29,7 +29,7 @@ public:
 
 	UConsumableIcon(const FObjectInitializer& ObjectInitializer);
 	
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 

@@ -14,7 +14,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -26,7 +26,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 namespace Skill_GroupTherapy
 {
@@ -121,15 +121,15 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
 		if (TeamsHelperSPtr)
 		{
-			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterUnitPtr->ProxyCharacterPtr);
+			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterUnitPtr->ProxyCharacterPtr.Get());
 			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				TeammatesSet.Add(Iter->ProxyCharacterPtr);
+				TeammatesSet.Add(Iter->ProxyCharacterPtr.Get());
 			}
 		}
 	}
 
-	// Test:°´ĞÎ×´²éÕÒ£¬·ñÔòÖ±½Ó»ñÈ¡¡°¶ÓÔ±¡±¼ÆËã¾àÀë¼´¿É
+	// Test:æŒ‰å½¢çŠ¶æŸ¥æ‰¾ï¼Œå¦åˆ™ç›´æ¥è·å–â€œé˜Ÿå‘˜â€è®¡ç®—è·ç¦»å³å¯
 	TArray<struct FOverlapResult> OutOverlaps;
 	if (GetWorldImp()->OverlapMultiByObjectType(
 		OutOverlaps,
@@ -169,7 +169,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 
 void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{

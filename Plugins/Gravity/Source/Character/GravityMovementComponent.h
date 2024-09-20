@@ -34,26 +34,35 @@ class GRAVITY_API UGravityMovementComponent : public UCharacterMovementComponent
 
 public:
 
-    // RootMotion或者AinMotion时被物体阻挡
+    // RootMotion鎴栬�匒inMotion鏃惰鐗╀綋闃绘尅
     FHitResult PerformBlockResult;
+
+    UGravityMovementComponent(const FObjectInitializer& ObjectInitializer);
 
     const FLyraCharacterGroundInfo& GetGroundInfo();
 
     // 
+    UPROPERTY(Replicated)
     bool bSkipRotation = false;
     
     // 
+    UPROPERTY(Replicated)
     bool bSkipRootMotion = false;
     
     // 
+    UPROPERTY(Replicated)
     bool bSkip_PlayerInput = false;
     
     // 
+    UPROPERTY(Replicated)
     bool bSkip_PathFollow = false;
     
+	UFUNCTION(NetMulticast, Reliable)
+	void SetIsOrientRotationToMovement_RPC(bool bIsOrientRotationToMovement);
+	
 protected:
 
-    FLyraCharacterGroundInfo CachedGroundInfo;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     virtual void PhysicsRotation(float DeltaTime)override;
 
@@ -89,9 +98,9 @@ protected:
         FActorComponentTickFunction* ThisTickFunction
     ) override;
 
-#if USECUSTOMEGRAVITY
-    UGravityMovementComponent(const FObjectInitializer& ObjectInitializer);
+    FLyraCharacterGroundInfo CachedGroundInfo;
 
+#if USECUSTOMEGRAVITY
     virtual void BeginPlay() override;
 
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
@@ -116,7 +125,7 @@ protected:
 
     FTSTicker::FDelegateHandle TickDelegateHandle;
 
-    // 通过这个向量获取连续的Transform
+    // 閫氳繃杩欎釜鍚戦噺鑾峰彇杩炵画鐨凾ransform
     FVector PreviousGravityTransformForward = FVector::ForwardVector;
 #endif
 

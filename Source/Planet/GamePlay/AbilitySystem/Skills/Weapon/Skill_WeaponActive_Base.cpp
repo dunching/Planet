@@ -4,11 +4,12 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "LogWriter.h"
+#include "Weapon_Base.h"
 
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
-	bRetriggerInstancedAbility = true;
+//	bRetriggerInstancedAbility = true;
 }
 
 void USkill_WeaponActive_Base::PreActivate(
@@ -21,10 +22,10 @@ void USkill_WeaponActive_Base::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
+	WaitInputTaskPtr = nullptr;
+
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-
 		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
 		if (ActiveParamPtr)
 		{
@@ -34,10 +35,6 @@ void USkill_WeaponActive_Base::PreActivate(
 			return;
 		}
 	}
-
-	ResetPreviousStageActions();
-
-	WaitInputTaskPtr = nullptr;
 }
 
 void USkill_WeaponActive_Base::ActivateAbility(
@@ -83,6 +80,18 @@ void USkill_WeaponActive_Base::EndAbility(
 )
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
+{
+	if (bIsContinue_)
+	{
+		ContinueActive();
+	}
+	else
+	{
+		StopContinueActive();
+	}
 }
 
 void USkill_WeaponActive_Base::ContinueActive()
@@ -162,4 +171,19 @@ void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInp
 		check(0);
 		WaitInputPercent = 1.f;
 	}
+}
+
+UScriptStruct* FGameplayAbilityTargetData_Skill_Weapon::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Skill_Weapon::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Skill_Weapon::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << bIsAutoContinue;
+	Ar << WeaponPtr;
+
+	return true;
 }

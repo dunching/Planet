@@ -4,7 +4,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 
 void USkill_Element_Gold::ActivateAbility(
@@ -26,8 +26,8 @@ void USkill_Element_Gold::ActivateAbility(
 
 	if (CharacterPtr)
 	{
-		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributesSPtr->GoldElement.AddOnValueChanged(
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		OnValueChanged = CharacterAttributes.GoldElement.AddOnValueChanged(
 			std::bind(&ThisClass::OnElementLevelChanged, this, std::placeholders::_1, std::placeholders::_2)
 		);
 

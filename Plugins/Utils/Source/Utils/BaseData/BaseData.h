@@ -30,13 +30,13 @@ public:
 	void AddCurrentValue(int32 val);
 
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
-
-protected:
-
+	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 CurrentValue = 0;
 
 	bool bIsSaveUpdate = false;
+
+protected:
 
 };
 

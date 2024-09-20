@@ -1,6 +1,38 @@
         // b*[^:b#/]+.*$
+		
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_SERVER
+	if (GetLocalRole() == ROLE_Authority)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_SimulatedProxy)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+	}
+#endif
 
 Going to:
+
+	联网
 
 	O 资源管理
 		技能分配至团队
@@ -19,6 +51,7 @@ Going to:
 	天赋设计
 	切换技能的主动技能（豹女的变形）
 	菜单之间的跳转
+	
 
 Next:
 

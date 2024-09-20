@@ -4,6 +4,7 @@
 
 #include <functional>
 
+#include "Net/UnrealNetwork.h"
 #include "TimerManager.h"
 #include "Engine/World.h"
 
@@ -27,7 +28,7 @@ void UAbilityTask_TimerHelper::UpdateDuration()
 
 void UAbilityTask_TimerHelper::SetDuration(float InDuration, float InIntervalTime)
 {
-	Type = EType::kDuration;
+	Type = ETaskTimerType::kDuration;
 
 	Duration = InDuration;
 	IntervalTime = InIntervalTime;
@@ -35,7 +36,7 @@ void UAbilityTask_TimerHelper::SetDuration(float InDuration, float InIntervalTim
 
 void UAbilityTask_TimerHelper::SetCount(int32 InCount, float InIntervalTime)
 {
-	Type = EType::kCount;
+	Type = ETaskTimerType::kCount;
 
 	Count = InCount;
 	IntervalTime = InIntervalTime;
@@ -43,7 +44,7 @@ void UAbilityTask_TimerHelper::SetCount(int32 InCount, float InIntervalTime)
 
 void UAbilityTask_TimerHelper::SetInfinite(float InIntervalTime)
 {
-	Type = EType::kInfinite;
+	Type = ETaskTimerType::kInfinite;
 
 	IntervalTime = InIntervalTime;
 }
@@ -51,6 +52,19 @@ void UAbilityTask_TimerHelper::SetInfinite(float InIntervalTime)
 void UAbilityTask_TimerHelper::SetFinished()
 {
 	Duration_TotalTime = Duration;
+}
+
+void UAbilityTask_TimerHelper::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Type);
+	DOREPLIFETIME(ThisClass, Duration);
+	DOREPLIFETIME(ThisClass, Duration_TotalTime);
+	DOREPLIFETIME(ThisClass, IntervalTime);
+	DOREPLIFETIME(ThisClass, CurrentIntervalTime);
+	DOREPLIFETIME(ThisClass, Count);
+	DOREPLIFETIME(ThisClass, CurrentCount);
 }
 
 void UAbilityTask_TimerHelper::Activate()
@@ -81,7 +95,7 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 
 	switch (Type)
 	{
-	case EType::kDuration:
+	case ETaskTimerType::kDuration:
 	{
 		if (IntervalTime > 0.f)
 		{
@@ -94,10 +108,11 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 			DurationDelegate.ExecuteIfBound(this, Duration_TotalTime, Duration);
 			if (Duration_TotalTime >= Duration)
 			{
-				if (OnFinished.Execute(this))
+				if (OnFinished.IsBound() && OnFinished.Execute(this))
 				{
 					EndTask();
 				}
+				EndTask();
 			}
 		}
 		else
@@ -106,7 +121,7 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 		}
 	}
 	break;
-	case EType::kCount:
+	case ETaskTimerType::kCount:
 	{
 		if (IntervalTime > 0.f)
 		{
@@ -123,7 +138,7 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 		{
 			if (CurrentCount >= Count)
 			{
-				if (OnFinished.Execute(this))
+				if (OnFinished.IsBound() && OnFinished.Execute(this))
 				{
 					EndTask();
 				}
@@ -136,16 +151,9 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 		}
 	}
 	break;
-	case EType::kInfinite:
+	case ETaskTimerType::kInfinite:
 	{
-		if (IntervalTime > 0.f)
-		{
-			UpdateIntervalTime();
-		}
-		else
-		{
-			EndTask();
-		}
+		UpdateIntervalTime();
 	}
 	break;
 	}

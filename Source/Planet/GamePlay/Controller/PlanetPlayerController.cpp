@@ -33,10 +33,10 @@
 #include "CharacterAttributesComponent.h"
 #include "TalentAllocationComponent.h"
 #include "SceneUnitContainer.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "EffectsList.h"
 #include "PlanetPlayerState.h"
-#include "PlanetGameMode.h"
+#include "GameMode_Main.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -140,20 +140,43 @@ void APlanetPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
 	{
-		Subsystem->AddMappingContext(
-			UInputProcessorSubSystem::GetInstance()->InputActionsPtr->InputMappingContext,
-			0
-		);
+		// 因为Pawn是通过网络同步过来的，所以不在OnPoss里面去做
+		auto CurrentPawn = GetPawn();
+		if (CurrentPawn->IsA(AHumanCharacter::StaticClass()))
+		{
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+			{
+				Subsystem->AddMappingContext(
+					UInputProcessorSubSystem::GetInstance()->InputActionsPtr->InputMappingContext,
+					0
+				);
+			}
+
+			FInputModeGameOnly InputMode;
+			SetInputMode(InputMode);
+
+			UNavgationSubSystem::GetInstance();
+
+			// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
+			// 
+			// 在SetPawn之后调用
+			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, CurrentPawn](auto NewProcessor) {
+				NewProcessor->SetPawn(Cast<AHumanCharacter>(CurrentPawn));
+				});
+
+			// 绑定效果状态栏
+			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+			if (EffectPtr)
+			{
+				EffectPtr->BindCharacterState(GetRealCharacter());
+			}
+		}
 	}
+#endif
 
-	FInputModeGameOnly InputMode;
-	SetInputMode(InputMode);
-
-	UNavgationSubSystem::GetInstance();
-
-	// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
 }
 
 void APlanetPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -234,7 +257,6 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 
 	if (bIsNewPawn)
 	{
-		InitialCharacterUnit(Cast<ACharacterBase>(InPawn));
 	}
 
 	Super::OnPossess(InPawn);
@@ -250,19 +272,18 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
-			// 在SetPawn之后调用
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, InPawn](auto NewProcessor) {
-				NewProcessor->SetPawn(Cast<AHumanCharacter>(InPawn));
-				});
-
-			GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
-
-			// 绑定效果状态栏
-			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-			if (EffectPtr)
+#if UE_EDITOR || UE_SERVER
+			if (InPawn)
 			{
-				EffectPtr->BindCharacterState(GetRealCharacter());
+				if (InPawn->IsA(AHumanCharacter::StaticClass()))
+				{
+					if (GetNetMode() == NM_DedicatedServer)
+					{
+						GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
+					}
+				}
 			}
+#endif
 		}
 		else if (InPawn->IsA(AHorseCharacter::StaticClass()))
 		{
@@ -301,7 +322,7 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 	return Result;
 }
 
-void APlanetPlayerController::ResetGroupmateUnit(UCharacterUnit* NewGourpMateUnitPtr)
+void APlanetPlayerController::ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)
 {
 }
 
@@ -340,7 +361,7 @@ TWeakObjectPtr<ACharacterBase> APlanetPlayerController::GetTeamFocusTarget() con
 	return nullptr;
 }
 
-UCharacterUnit* APlanetPlayerController::GetCharacterUnit()
+TSharedPtr<FCharacterProxy> APlanetPlayerController::GetCharacterUnit()
 {
 	return GetPawn<FPawnType>()->GetCharacterUnit();
 }
@@ -354,7 +375,7 @@ void APlanetPlayerController::BindPCWithCharacter()
 {
 }
 
-UCharacterUnit* APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
+TSharedPtr<FCharacterProxy> APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
 	return CharaterPtr->GetCharacterUnit();
 }

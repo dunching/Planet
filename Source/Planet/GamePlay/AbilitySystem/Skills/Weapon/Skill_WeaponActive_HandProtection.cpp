@@ -12,7 +12,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
 #include "Planet.h"
@@ -23,8 +23,9 @@
 #include "UIManagerSubSystem.h"
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameplayTagsSubSystem.h"
+#include "TemplateHelper.h"
 
 namespace Skill_WeaponHandProtection
 {
@@ -60,16 +61,12 @@ void USkill_WeaponActive_HandProtection::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_WeaponHandProtection*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetData_DashPtr)
+		if (ActiveParamPtr)
 		{
-			WeaponPtr = GameplayAbilityTargetData_DashPtr->WeaponPtr;
-			if (GameplayAbilityTargetData_DashPtr->WeaponPtr)
-			{
-				return;
-			}
+			WeaponPtr = Cast<AWeapon_HandProtection>(ActiveParamPtr->WeaponPtr);
 		}
 	}
 }
@@ -162,8 +159,6 @@ void USkill_WeaponActive_HandProtection::ResetPreviousStageActions()
 
 void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 {
-	IncrementListLock();
-
 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 
 	TaskPtr->SetDuration(InputRangeInSecond);
@@ -171,7 +166,6 @@ void USkill_WeaponActive_HandProtection::ExcuteStopStep()
 	TaskPtr->OnFinished.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr) {
 		CurrentIndex = 0;
 
-		DecrementListLockOverride();
 		return true;
 		});
 
@@ -206,8 +200,19 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_WeaponHandProtection::AttackEnd)
 	{
-		MakeDamage();
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			MakeDamage();
+		}
+#endif
+
+		CheckInContinue();
 	}
+}
+
+void USkill_WeaponActive_HandProtection::OnMontateComplete()
+{
 }
 
 void USkill_WeaponActive_HandProtection::MakeDamage()
@@ -252,19 +257,19 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{
-			if (Iter.Value->SkillUnitPtr)
-			{
-				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
-				{
-					auto ActiveSkillUnitPtr = Cast<UActiveSkillUnit>(Iter.Value->SkillUnitPtr);
-					if (!ActiveSkillUnitPtr)
-					{
-						continue;
-					}
-
-					ActiveSkillUnitPtr->AddCooldownConsumeTime(1.f);
-				}
-			}
+// 			if (Iter.Value->SkillUnitPtr)
+// 			{
+// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+// 				{
+// 					auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillUnitPtr);
+// 					if (!ActiveSkillUnitPtr)
+// 					{
+// 						continue;
+// 					}
+// 
+// 					ActiveSkillUnitPtr->AddCooldownConsumeTime(1.f);
+// 				}
+// 			}
 		}
 
 		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
@@ -274,7 +279,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 
 void USkill_WeaponActive_HandProtection::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{
@@ -312,13 +317,11 @@ void USkill_WeaponActive_HandProtection::PlayMontage()
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
 		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
+		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }

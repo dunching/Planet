@@ -33,7 +33,7 @@ void UPlanetGameInstance::Shutdown()
 
 #if WITH_EDITOR
 	auto TestMap1 = TestGCUnitMap;
-	check(TestMap1.IsEmpty());
+//	check(TestMap1.IsEmpty());
 #endif
 
 	UInputProcessorSubSystem::GetInstance()->ResetProcessor();

@@ -21,10 +21,57 @@ FGameplayAbilityTargetData_GASendEvent::FGameplayAbilityTargetData_GASendEvent(
 {
 }
 
+UScriptStruct* FGameplayAbilityTargetData_GASendEvent::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_GASendEvent::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_GASendEvent::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+	if (Ar.IsSaving())
+	{
+		Ar << TriggerCharacterName;
+
+		int32 Num = DataAry.Num();
+
+		Ar << Num;
+
+		for (auto& Iter : DataAry)
+		{
+			Iter.NetSerialize(Ar, Map, bOutSuccess);
+		}
+
+		return true;
+	}
+	else if (Ar.IsLoading())
+	{
+		Ar << TriggerCharacterName;
+
+		int32 Num = 0;
+
+		Ar << Num;
+
+		DataAry.SetNumZeroed(Num);
+		for (int32 Index = 0;Index < Num;Index++)
+		{
+			DataAry[Index].NetSerialize(Ar, Map, bOutSuccess);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+FGameplayAbilityTargetData_GASendEvent::FGameplayAbilityTargetData_GASendEvent()
+{
+
+}
+
 IGAEventModifyInterface::IGAEventModifyInterface(int32 InPriority) :
 	Priority(InPriority)
 {
-
+	ID = FMath::Rand32();
 }
 
 bool IGAEventModifyInterface::operator<(const IGAEventModifyInterface& RightValue)const
@@ -42,6 +89,20 @@ FGAEventData::FGAEventData(
 
 }
 
+bool FGAEventData::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << HP;
+	Ar << TriggerCharacterPtr;
+	Ar << TargetCharacterPtr;
+
+	return true;
+}
+
+FGAEventData::FGAEventData()
+{
+
+}
+
 void FGAEventData::SetBaseDamage(int32 Value)
 {
 	BaseDamage = Value;
@@ -50,7 +111,7 @@ void FGAEventData::SetBaseDamage(int32 Value)
 void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 {
 	const auto CharacterAttributesComponentPtr = TriggerCharacterPtr->GetCharacterAttributesComponent();
-	 auto CharacterAttributesSPtr =
+	 auto & CharacterAttributes =
 		CharacterAttributesComponentPtr->GetCharacterAttributes();
 
 	int32 Level = 0;
@@ -58,27 +119,27 @@ void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 	{
 	case EWuXingType::kGold:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWood:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kWater:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kFire:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	case EWuXingType::kSoil:
 	{
-		Level = CharacterAttributesSPtr->GoldElement.GetCurrentValue();
+		Level = CharacterAttributes.GoldElement.GetCurrentValue();
 	}
 	break;
 	}
@@ -90,6 +151,10 @@ void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 	ElementSet.Add(Tuple);
 }
 
+FGameplayAbilityTargetData_GAReceivedEvent::FGameplayAbilityTargetData_GAReceivedEvent()
+{
+}
+
 FGameplayAbilityTargetData_GAReceivedEvent::FGameplayAbilityTargetData_GAReceivedEvent(
 	TWeakObjectPtr<ACharacterBase>  InTargetCharacterPtr,
 	TWeakObjectPtr<ACharacterBase>  InTriggerCharacterPtr
@@ -98,6 +163,20 @@ FGameplayAbilityTargetData_GAReceivedEvent::FGameplayAbilityTargetData_GAReceive
 	TriggerCharacterPtr(InTriggerCharacterPtr)
 {
 
+}
+
+UScriptStruct* FGameplayAbilityTargetData_GAReceivedEvent::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_GAReceivedEvent::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_GAReceivedEvent::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Data.NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << TriggerCharacterPtr;
+
+	return true;
 }
 
 FGameplayAbilityTargetData_GAReceivedEvent* FGameplayAbilityTargetData_GAReceivedEvent::Clone() const
@@ -143,6 +222,11 @@ FGameplayAbilityTargetData_GAEventType::FGameplayAbilityTargetData_GAEventType(E
 
 }
 
+UScriptStruct* FGameplayAbilityTargetData_GAEventType::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_GAEventType::StaticStruct();
+}
+
 FGameplayAbilityTargetData_GAEventType::FGameplayAbilityTargetData_GAEventType()
 {
 
@@ -156,4 +240,19 @@ FGameplayAbilityTargetData_GAEventType* FGameplayAbilityTargetData_GAEventType::
 	*ResultPtr = *this;
 
 	return ResultPtr;
+}
+
+bool FGameplayAbilityTargetData_GAEventType::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	if (Ar.IsSaving())
+	{
+		Ar << EventType;
+		return true;
+	}
+	else if (Ar.IsLoading())
+	{
+		Ar << EventType;
+		return true;
+	}
+	return false;
 }

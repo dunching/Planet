@@ -15,10 +15,11 @@
 #include "Kismet/KismetMathLibrary.h"
 #include <Engine/OverlapResult.h>
 #include <GameFramework/SpringArmComponent.h>
+#include "Net/UnrealNetwork.h"
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -31,7 +32,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 
@@ -39,8 +40,6 @@ USkill_Active_XYFH::USkill_Active_XYFH() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-
-	bRetriggerInstancedAbility = true;
 
 	CurrentWaitInputTime = 1.f;
 }
@@ -56,6 +55,12 @@ void USkill_Active_XYFH::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
 	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
+
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+	}
+#endif
 
 	if (!SPlineActorPtr)
 	{
@@ -101,6 +106,12 @@ void USkill_Active_XYFH::EndAbility(
 	bool bWasCancelled
 )
 {
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+	}
+#endif
+
 	if (SPlineActorPtr)
 	{
 		SPlineActorPtr->Destroy();
@@ -118,9 +129,24 @@ void USkill_Active_XYFH::EndAbility(
 
 	TargetOffsetValue.ReStore();
 
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void USkill_Active_XYFH::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+// 	DOREPLIFETIME_CONDITION(ThisClass, SPlineActorPtr, COND_None);
+// 	DOREPLIFETIME_CONDITION(ThisClass, StepIndex, COND_SkipOwner);
+// 	DOREPLIFETIME_CONDITION(ThisClass, SubStepIndex, COND_SkipOwner);
+// 	DOREPLIFETIME_CONDITION(ThisClass, bIsContinue, COND_SkipOwner);
 }
 
 void USkill_Active_XYFH::PerformAction(
@@ -136,16 +162,16 @@ void USkill_Active_XYFH::PerformAction(
 		{
 		case 0:
 		{
-			const auto StartDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
-			const auto EndDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
-
 			PlayMontage();
 
 			auto HumanMontage = GetCurrentMontage();
 
 			const auto Duration = HumanMontage->CalculateSequenceLength();
+
+			const auto StartDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+			const auto EndDistance =
+				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
 
 			ExcuteTasks(StartDistance, EndDistance, Duration, false);
 		}
@@ -154,18 +180,18 @@ void USkill_Active_XYFH::PerformAction(
 		case 2:
 		case 3:
 		{
-			const auto StartDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
-			const auto EndDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
-
-			const auto Offset = (EndDistance - StartDistance) * 0.8f;
-
 			switch (SubStepIndex)
 			{
 			case 0:
 			{
 				CharacterPtr->GetMesh()->SetHiddenInGame(true);
+
+				const auto StartDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+				const auto EndDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
+
+				const auto Offset = (EndDistance - StartDistance) * 0.8f;
 
 				ExcuteTasks(StartDistance, StartDistance + Offset, SubStepMoveDuration, true);
 			}
@@ -177,6 +203,13 @@ void USkill_Active_XYFH::PerformAction(
 				auto HumanMontage = GetCurrentMontage();
 
 				const auto Duration = HumanMontage->CalculateSequenceLength();
+
+				const auto StartDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
+				const auto EndDistance =
+					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
+
+				const auto Offset = (EndDistance - StartDistance) * 0.8f;
 
 				ExcuteTasks(StartDistance + Offset, EndDistance, Duration, false);
 			}
@@ -193,20 +226,29 @@ void USkill_Active_XYFH::PerformAction(
 	}
 }
 
-void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, float Duration, bool bIsSubMoveStep)
+void USkill_Active_XYFH::ExcuteTasks(
+	float StartDistance,
+	float EndDistance,
+	float Duration,
+	bool bIsSubMoveStep
+)
 {
-	if (bIsSubMoveStep)
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
-		SubStepIndex++;
-	}
-	else
-	{
-		StepIndex++;
-		SubStepIndex = 0;
-	}
+		if (bIsSubMoveStep)
+		{
+			SubStepIndex++;
+		}
+		else
+		{
+			StepIndex++;
+			SubStepIndex = 0;
+		}
 
-	// 角色移动
-	{
+		// 角色移动
 		auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
 			this,
 			TEXT(""),
@@ -224,26 +266,19 @@ void USkill_Active_XYFH::ExcuteTasks(float StartDistance, float EndDistance, flo
 		{
 			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
 		}
-		TaskPtr->ReadyForActivation();
-	}
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-	// 镜头控制
-	{
-		auto TaskPtr = UAbilityTask_ControlCameraBySpline::NewTask(
-			this,
-			TEXT(""),
-			Duration,
-			CameraTrailHelperPtr,
-			CharacterPtr,
-			StartDistance,
-			EndDistance
-		);
-//		TaskPtr->ReadyForActivation();
+		TaskPtr->ReadyForActivation();
 	}
 }
 
 void USkill_Active_XYFH::PlayMontage()
 {
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
 		const float InPlayRate = 1.f;
 
@@ -262,6 +297,9 @@ void USkill_Active_XYFH::PlayMontage()
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+
 		TaskPtr->ReadyForActivation();
 	}
 }
@@ -272,11 +310,16 @@ void USkill_Active_XYFH::OnPlayMontageEnd()
 
 void USkill_Active_XYFH::OnMoveStepComplete()
 {
-	if (StepIndex >= MaxIndex)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		K2_CancelAbility();
-		return;
+		if (StepIndex >= MaxIndex)
+		{
+			K2_CancelAbility();
+			return;
+		}
 	}
+#endif
 
 	CheckInContinue();
 }

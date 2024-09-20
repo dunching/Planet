@@ -13,9 +13,26 @@ class UAnimMontage;
 
 class UAbilityTask_PlayMontage;
 
-struct FGameplayAbilityTargetData_Dash : public FGameplayAbilityTargetData
+USTRUCT()
+struct PLANET_API FGameplayAbilityTargetData_Dash : public FGameplayAbilityTargetData
 {
+	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	EDashDirection DashDirection = EDashDirection::kForward;
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Dash> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Dash>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 /**

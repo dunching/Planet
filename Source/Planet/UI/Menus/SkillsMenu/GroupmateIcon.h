@@ -16,9 +16,9 @@
 struct FStreamableHandle;
 class UDragDropOperation;
 
-class USkillUnit;
-class UCharacterUnit;
-class UBasicUnit;
+struct FSkillProxy;
+struct FCharacterProxy;
+struct FBasicProxy;
 
 UCLASS()
 class PLANET_API UGroupmateIcon :
@@ -29,11 +29,11 @@ class PLANET_API UGroupmateIcon :
 
 public:
 
-	using FOnSelected = TCallbackHandleContainer<void(UCharacterUnit*)>;
+	using FOnSelected = TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&)>;
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -41,7 +41,7 @@ public:
 
 	FOnSelected OnSelected;
 
-	UCharacterUnit* UnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> UnitPtr = nullptr;
 
 protected:
 

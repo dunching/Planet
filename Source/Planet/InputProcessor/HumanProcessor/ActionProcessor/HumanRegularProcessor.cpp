@@ -30,7 +30,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolsMenu.h"
 #include <BackpackMenu.h>
 #include "UIManagerSubSystem.h"
@@ -60,13 +60,14 @@
 #include "HumanViewTalentAllocation.h"
 #include "HumanViewGroupManagger.h"
 #include "GroupMnaggerComponent.h"
-#include "GroupsManaggerSubSystem.h"
+
 #include "GameplayTagsSubSystem.h"
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
-#include "InteractiveBaseGAComponent.h"
-#include "InteractiveConsumablesComponent.h"
+#include "BaseFeatureGAComponent.h"
+
+#include "ResourceBox.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
@@ -132,7 +133,7 @@ namespace HumanProcessor
 			StopPt,
 			SceneObj_Channel,
 			Params
-			)
+		)
 			)
 		{
 #ifdef WITH_EDITOR
@@ -183,10 +184,10 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
+			OnwerActorPtr->GetInteractiveSkillComponent()->ActiveWeapon();
+
 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
 			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
-
-			OnwerActorPtr->GetInteractiveSkillComponent()->ActiveWeapon();
 		}
 	}
 
@@ -217,30 +218,15 @@ namespace HumanProcessor
 
 				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
 
-				switch ((*SkillIter)->Type)
-				{
-				case FCanbeInteractionInfo::EType::kActiveSkill:
-				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
-				{
-					OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
-				}
-				break;
-				case FCanbeInteractionInfo::EType::kConsumables:
-				{
-					OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
-				}
-				break;
-				default:
-					break;
-				}
+				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
 			}
 
-			// ÕâÀïÓ¦¸ÃÊÇÌØ¶¨µÄÊäÈë»á´ò¶Ï »¹ÊÇÈÎÒâÊäÈë¶¼»á´ò¶Ï£¿
+			// è¿™é‡Œåº”è¯¥æ˜¯ç‰¹å®šçš„è¾“å…¥ä¼šæ‰“æ–­ è¿˜æ˜¯ä»»æ„è¾“å…¥éƒ½ä¼šæ‰“æ–­ï¼Ÿ
 			else if (
 				(Params.Key == EKeys::W) ||
 				(Params.Key == EKeys::A) ||
 				(Params.Key == EKeys::S) ||
-				(Params.Key == EKeys::D) 
+				(Params.Key == EKeys::D)
 				)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
@@ -253,15 +239,11 @@ namespace HumanProcessor
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				switch ((*SkillIter)->Type)
-				{
-				case FCanbeInteractionInfo::EType::kWeaponActiveSkill:
+				if (
+					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponSocket)
+					)
 				{
 					OnwerActorPtr->GetInteractiveSkillComponent()->CancelAction(*SkillIter);
-				}
-				break;
-				default:
-					break;
 				}
 			}
 		}
@@ -295,7 +277,8 @@ namespace HumanProcessor
 		if (LookAtSceneObjPtr)
 		{
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			LookAtSceneObjPtr->Interaction(OnwerActorPtr);
+
+			OnwerActorPtr->InteractionSceneObj(Cast<ASceneObj>(LookAtSceneObjPtr));
 		}
 	}
 
@@ -472,7 +455,6 @@ namespace HumanProcessor
 			if (OnwerActorPtr)
 			{
 				auto CanbeActivedInfoAry = OnwerActorPtr->GetInteractiveSkillComponent()->GetCanbeActiveAction();
-				CanbeActivedInfoAry.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction()); 
 				for (const auto& Iter : CanbeActivedInfoAry)
 				{
 					HandleKeysMap.Add(Iter->Key, Iter);

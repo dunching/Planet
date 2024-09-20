@@ -34,7 +34,7 @@ void UGetItemInfos::ResetUIByData()
 {
 }
 
-void UGetItemInfos::OnSkillUnitChanged(USkillUnit* UnitPtr, bool bIsAdd)
+void UGetItemInfos::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
 	if (UIPtr)
@@ -49,7 +49,7 @@ void UGetItemInfos::OnSkillUnitChanged(USkillUnit* UnitPtr, bool bIsAdd)
 	}
 }
 
-void UGetItemInfos::OnCoinUnitChanged(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfos::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
 	if (UIPtr)
@@ -64,7 +64,7 @@ void UGetItemInfos::OnCoinUnitChanged(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num
 	}
 }
 
-void UGetItemInfos::OnConsumableUnitChanged(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfos::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
 	if (UIPtr)
@@ -79,7 +79,7 @@ void UGetItemInfos::OnConsumableUnitChanged(UConsumableUnit* UnitPtr, bool bIsAd
 	}
 }
 
-void UGetItemInfos::OnGourpmateUnitChanged(UCharacterUnit* UnitPtr, bool bIsAdd)
+void UGetItemInfos::OnGourpmateUnitChanged(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
 	if (UIPtr)

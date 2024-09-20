@@ -9,7 +9,7 @@
 
 #include "Skill_Element_Base.generated.h"
 
-class UBasicUnit;
+struct FBasicProxy;
 
 UCLASS()
 class USkill_Element_Base : public USkill_Base

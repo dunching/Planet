@@ -20,6 +20,10 @@ struct FGameplayAbilityTargetData_Control : public FGameplayAbilityTargetData_Ac
 {
 	GENERATED_USTRUCT_BODY()
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const override;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
@@ -32,6 +36,8 @@ class PLANET_API USkill_Active_Control : public USkill_Active_Base
 	GENERATED_BODY()
 
 public:
+
+	using ActiveParamType = FGameplayAbilityTargetData_Control;
 
 	USkill_Active_Control();
 
@@ -92,5 +98,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 AttackDistance = 500;
+
+private:
+
+	const ActiveParamType* ActiveParamPtr = nullptr;
 
 };

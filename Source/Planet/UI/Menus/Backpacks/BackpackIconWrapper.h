@@ -13,8 +13,8 @@
 
 struct FStreamableHandle;
 
-class UBasicUnit;
-class UToolUnit;
+struct FBasicProxy;
+struct FToolProxy;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
 class UBackpackSkillIcon;
@@ -33,7 +33,7 @@ class PLANET_API UBackpackIconWrapper :
 
 public:
 
-	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, UBasicUnit*)>;
+	using FOnDragIconDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
 
 	UBackpackIconWrapper(const FObjectInitializer& ObjectInitializer);
 
@@ -41,11 +41,11 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	UBasicUnit* TargetBasicUnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> TargetBasicUnitPtr = nullptr;
 
 	FOnDragIconDelegate OnDragIconDelegate;
 

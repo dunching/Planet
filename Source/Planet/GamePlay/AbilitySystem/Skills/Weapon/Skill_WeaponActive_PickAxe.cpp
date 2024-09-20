@@ -13,7 +13,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -25,7 +25,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 
 namespace Skill_WeaponActive_PickAxe
 {
@@ -56,14 +56,6 @@ void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 )
 {
 	// Ins Or Spec
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-	if (CharacterPtr)
-	{
-		if (CharacterPtr->GetCharacterAttributesComponent())
-		{
-			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
-		}
-	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
@@ -78,14 +70,9 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Skill_PickAxe*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetData_DashPtr)
+		if (ActiveParamPtr)
 		{
-			EquipmentAxePtr = GameplayAbilityTargetData_DashPtr->WeaponPtr;
-			if (GameplayAbilityTargetData_DashPtr->WeaponPtr)
-			{
-				return;
-			}
+			EquipmentAxePtr = Cast<AWeapon_PickAxe>(ActiveParamPtr->WeaponPtr);
 		}
 	}
 }
@@ -134,7 +121,12 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
 	{
-		MakeDamage();
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			MakeDamage();
+		}
+#endif
 
 		CheckInContinue();
 	}
@@ -167,7 +159,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		{
 			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				CapsuleParams.AddIgnoredActor(Iter->ProxyCharacterPtr);
+				CapsuleParams.AddIgnoredActor(Iter->ProxyCharacterPtr.Get());
 			}
 		}
 	}
@@ -208,7 +200,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 void USkill_WeaponActive_PickAxe::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{

@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "AI/Navigation/NavigationDataInterface.h"
 #include <Kismet/KismetStringLibrary.h>
+#include "Net/UnrealNetwork.h"
 
 #include "LogWriter.h"
 
@@ -23,6 +24,12 @@ static TAutoConsoleVariable<int32> GravityMovementComponent_Debug(
     0,
     TEXT("")
     TEXT(" default: 0"));
+
+UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& ObjectInitializer) :
+    Super(ObjectInitializer)
+{
+    SetIsReplicatedByDefault(true);
+}
 
 const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
 {
@@ -69,6 +76,11 @@ const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
     CachedGroundInfo.LastUpdateFrame = GFrameCounter;
 
     return CachedGroundInfo;
+}
+
+void UGravityMovementComponent::SetIsOrientRotationToMovement_RPC_Implementation(bool bIsOrientRotationToMovement)
+{
+    bOrientRotationToMovement = bIsOrientRotationToMovement;
 }
 
 void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
@@ -194,6 +206,16 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 #endif
 }
 
+void UGravityMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkipRotation, COND_None);
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkipRootMotion, COND_None);
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkip_PlayerInput, COND_None);
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkip_PathFollow, COND_None);
+}
+
 #if USECUSTOMEGRAVITY
 DEFINE_LOG_CATEGORY_STATIC(LogGravityCharacterMovement, Log, All);
 DEFINE_LOG_CATEGORY_STATIC(LogNavMeshMovement, Log, All);
@@ -234,11 +256,6 @@ DECLARE_CYCLE_STAT(TEXT("Char ProcessLanded"), STAT_CharProcessLanded, STATGROUP
 #else
 #define devCode(...)
 #endif
-
-UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& ObjectInitializer):
-    Super(ObjectInitializer)
-{
-}
 
 void UGravityMovementComponent::BeginPlay()
 {

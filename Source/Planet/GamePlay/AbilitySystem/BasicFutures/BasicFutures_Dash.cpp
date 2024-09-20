@@ -12,9 +12,9 @@
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
-#include "InteractiveBaseGAComponent.h"
+#include "UnitProxyProcessComponent.h"
+
+#include "BaseFeatureGAComponent.h"
 #include "Planet_Tools.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(
@@ -50,10 +50,10 @@ void UBasicFutures_Dash::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 }
 
 void UBasicFutures_Dash::PreActivate(
-	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, 
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
@@ -84,14 +84,19 @@ void UBasicFutures_Dash::ActivateAbility(
 	}
 #endif
 
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
 
 	DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool UBasicFutures_Dash::CommitAbility(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
@@ -121,8 +126,8 @@ bool UBasicFutures_Dash::CommitAbility(
 }
 
 void UBasicFutures_Dash::EndAbility(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateEndAbility,
 	bool bWasCancelled
@@ -145,9 +150,9 @@ void UBasicFutures_Dash::EndAbility(
 
 bool UBasicFutures_Dash::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayTagContainer* SourceTags, 
-	const FGameplayTagContainer* TargetTags, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags,
+	const FGameplayTagContainer* TargetTags,
 	OUT FGameplayTagContainer* OptionalRelevantTags
 ) const
 {
@@ -158,8 +163,8 @@ bool UBasicFutures_Dash::CanActivateAbility(
 
 	if (CharacterPtr)
 	{
-		auto CharacterAttributesSPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		if (CharacterAttributesSPtr->PP.GetCurrentValue() >= Consume)
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		if (CharacterAttributes.PP.GetCurrentValue() >= Consume)
 		{
 			return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 		}
@@ -182,7 +187,7 @@ void UBasicFutures_Dash::InitialTags()
 {
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
 
-	// ÔÚÔË¶¯Ê±²»¼¤»î
+	// åœ¨è¿åŠ¨æ—¶ä¸æ¿€æ´»
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
 
 	FAbilityTriggerData AbilityTriggerData;
@@ -262,6 +267,10 @@ void UBasicFutures_Dash::DoDash(
 
 void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
+	if (
+	 (CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+	 (CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy) 
+	)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
@@ -280,6 +289,10 @@ void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 
 void UBasicFutures_Dash::Displacement(const FVector& Direction)
 {
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
 		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
 			this,
@@ -306,4 +319,16 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 void UBasicFutures_Dash::OnLanded(const FHitResult&)
 {
 	DashInAir = 0;
+}
+
+UScriptStruct* FGameplayAbilityTargetData_Dash::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Dash::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Dash::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar<< DashDirection;
+
+	return true;
 }

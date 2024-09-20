@@ -8,4 +8,6 @@ ASPlineActor::ASPlineActor(const FObjectInitializer& ObjectInitializer) :
 {
 	SplineComponentPtr = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
 	RootComponent = SplineComponentPtr;
+
+//	SetReplicatingMovement(true);
 }

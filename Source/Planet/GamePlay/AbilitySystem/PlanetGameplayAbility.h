@@ -8,6 +8,8 @@
 #include "SceneElement.h"
 #include "PlanetGameplayAbility.generated.h"
 
+class UPlanetAbilitySystemComponent;
+
 /**
  *
  */
@@ -18,7 +20,11 @@ class PLANET_API UPlanetGameplayAbility : public UGameplayAbility
 
 public:
 
+	friend UPlanetAbilitySystemComponent;
+
 	UPlanetGameplayAbility();
+
+	void SetContinuePerform(bool bIsContinue);
 
 #if WITH_EDITOR
 	virtual void OnAvatarSet(
@@ -79,6 +85,8 @@ public:
 #endif
 
 protected:
+
+	virtual void SetContinuePerformImp(bool bIsContinue);
 
 	void RunIfListLock()const;
 

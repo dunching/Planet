@@ -13,9 +13,9 @@
 
 struct FStreamableHandle;
 
-class UBasicUnit;
-class UToolUnit;
-class UCharacterUnit;
+struct FBasicProxy;
+struct FToolProxy;
+struct FCharacterProxy;
 
 /**
  *
@@ -29,15 +29,15 @@ class PLANET_API UBackpackIcon :
 
 public:
 
-	using FOnDragDelegate = TCallbackHandleContainer<void(bool, UBasicUnit*)>;
+	using FOnDragDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
 
-	using FOnAllocationCharacterUnitChangedHandle = TCallbackHandleContainer<void(UCharacterUnit*)>::FCallbackHandleSPtr;
+	using FOnAllocationCharacterUnitChangedHandle = TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>::FCallbackHandleSPtr;
 
 	UBackpackIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 	
@@ -56,11 +56,11 @@ protected:
 	UFUNCTION()
 	virtual void OnDroped(UDragDropOperation* Operation);
 
-	virtual	void SetItemType(UBasicUnit* BasicUnitPtr);
+	virtual	void SetItemType(FBasicProxy* BasicUnitPtr);
 
-	virtual void OnAllocationCharacterUnitChanged(UCharacterUnit* AllocationCharacterUnitPtr);
+	virtual void OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterProxy>& AllocationCharacterUnitPtr);
 
-	UBasicUnit* BasicUnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> BasicUnitPtr = nullptr;
 
 	FOnAllocationCharacterUnitChangedHandle OnAllocationCharacterUnitChangedHandle;
 

@@ -29,7 +29,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "ToolsMenu.h"
 #include "BackpackMenu.h"
 #include "UIManagerSubSystem.h"

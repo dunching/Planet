@@ -24,11 +24,11 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
-#include "InteractiveConsumablesComponent.h"
+
 #include "Skill_Consumable_Generic.h"
 
 struct FActionConsumablesIcon : public TStructVariable<FActionConsumablesIcon>
@@ -68,7 +68,7 @@ void UActionConsumablesIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UActionConsumablesIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
+void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	bIsReady_Previous = false;
 
@@ -80,7 +80,7 @@ void UActionConsumablesIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
 			BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
 			)
 		{
-			UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
+			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);
 		}
 	}
 

@@ -15,7 +15,7 @@
 #include "ArticleBase.h"
 #include "ArticleStone.h"
 #include "ArticleTree.h"
-#include "GameMode/PlanetGameMode.h"
+#include "GameMode_Main.h"
 #include "CollisionDataStruct.h"
 #include <HumanCharacter.h>
 #include <Character/GravityMovementComponent.h>

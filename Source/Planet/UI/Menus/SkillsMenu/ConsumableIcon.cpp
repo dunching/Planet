@@ -24,7 +24,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
@@ -44,7 +44,7 @@ UConsumableIcon::UConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UConsumableIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 

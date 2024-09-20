@@ -7,6 +7,7 @@
 #include "Engine/EngineTypes.h"
 #include "Abilities/Tasks/AbilityTask.h"
 #include "Abilities/Tasks/AbilityTask_ApplyRootMotion_Base.h"
+#include "GameFramework/RootMotionSource.h"
 
 #include "AbilityTask_FlyAway.generated.h"
 
@@ -25,13 +26,22 @@ public:
 
 	UAbilityTask_FlyAway(const FObjectInitializer& ObjectInitializer);
 
-	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
 	static UAbilityTask_FlyAway* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
 		float Duration,
 		float Height
 	);
+	
+	static UAbilityTask_FlyAway* NewTask(
+		UGameplayAbility* OwningAbility,
+		FName TaskInstanceName,
+		ERootMotionAccumulateMode RootMotionAccumulateMode,
+		float Duration,
+		float Height
+	);
+
+	virtual void TickTask(float DeltaTime) override;
 
 	virtual void Activate() override;
 
@@ -46,9 +56,11 @@ protected:
 	virtual void SharedInitAndApply() override;
 
 protected:
-
-	int32 Height = 300;
-
-	float Duration = 2.f;
+	
+	int32 Height = 100;
+	
+	float Duration = 1.f;
+	
+	ERootMotionAccumulateMode RootMotionAccumulateMode = ERootMotionAccumulateMode::Additive;
 
 };

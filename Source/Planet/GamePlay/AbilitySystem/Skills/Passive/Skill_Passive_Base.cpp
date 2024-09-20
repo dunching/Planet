@@ -3,11 +3,12 @@
 
 #include "SceneUnitTable.h"
 #include "CharacterBase.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "CharacterAttibutes.h"
 #include "GenerateType.h"
 #include "CharacterAttributesComponent.h"
 #include "PropertyEntrys.h"
+#include "TemplateHelper.h"
 
 USkill_Passive_Base::USkill_Passive_Base() :
 	Super()
@@ -23,7 +24,7 @@ void USkill_Passive_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 
 	if (CharacterPtr)
 	{
-		auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>(SkillUnitPtr);
+		auto PassiveSkillUnitPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(SkillUnitPtr);
 
 		// 元素
 		auto PassiveSkillExtendInfoPtr = PassiveSkillUnitPtr->GetTableRowUnit_PassiveSkillExtendInfo();
@@ -65,7 +66,7 @@ void USkill_Passive_Base::OnRemoveAbility(
 {
 	if (CharacterPtr)
 	{
-		auto PassiveSkillUnitPtr = Cast<UPassiveSkillUnit>(SkillUnitPtr);
+		auto PassiveSkillUnitPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(SkillUnitPtr);
 		CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(
 			GetAllData(), PassiveSkillUnitPtr->GetUnitType()
 		);

@@ -22,6 +22,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "GameplayTagsSubSystem.h"
+#include "TemplateHelper.h"
 
 namespace ToolsIcon
 {
@@ -57,17 +58,17 @@ void UToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UToolIcon::ResetToolUIByData(UBasicUnit * BasicUnitPtr)
+void UToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr)
 	{
 		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 		{
-			UnitPtr = Cast<UToolUnit>(BasicUnitPtr);
+			UnitPtr = DynamicCastSharedPtr<FToolProxy>(BasicUnitPtr);
 		}
 		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 		{
-			UnitPtr = Cast<UConsumableUnit>(BasicUnitPtr);
+			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);
 		}
 	}
 	else
@@ -99,17 +100,17 @@ void UToolIcon::EnableIcon(bool bIsEnable)
 
 }
 
-UToolUnit* UToolIcon::GetToolUnit() const
+TSharedPtr<FToolProxy> UToolIcon::GetToolUnit() const
 {
-	return Cast<UToolUnit>(UnitPtr);
+	return DynamicCastSharedPtr<FToolProxy>(UnitPtr);
 }
 
-UConsumableUnit* UToolIcon::GetConsumablesUnit() const
+TSharedPtr<FConsumableProxy> UToolIcon::GetConsumablesUnit() const
 {
-	return Cast<UConsumableUnit>(UnitPtr);
+	return DynamicCastSharedPtr<FConsumableProxy>(UnitPtr);
 }
 
-void UToolIcon::OnSublingIconReset(UBasicUnit* InToolUnitPtr)
+void UToolIcon::OnSublingIconReset(const TSharedPtr<FBasicProxy>& InToolUnitPtr)
 {
 	if (InToolUnitPtr && (InToolUnitPtr == UnitPtr))
 	{
@@ -125,7 +126,7 @@ void UToolIcon::SetNum()
 	{
 		if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 		{
-			auto TempUnitPtr = Cast<UToolUnit>(UnitPtr);
+			auto TempUnitPtr = DynamicCastSharedPtr<FToolProxy>(UnitPtr);
 			if (TempUnitPtr)
 			{
 				NewNum = TempUnitPtr->GetNum();
@@ -133,7 +134,7 @@ void UToolIcon::SetNum()
 		}
 		else if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
 		{
-			auto TempUnitPtr = Cast<UConsumableUnit>(UnitPtr);
+			auto TempUnitPtr = DynamicCastSharedPtr<FConsumableProxy>(UnitPtr);
 			if (TempUnitPtr)
 			{
 				NewNum = TempUnitPtr->GetCurrentValue();

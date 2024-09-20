@@ -14,6 +14,7 @@
 
 #include "Helper_RootMotionSource.h"
 #include "CharacterBase.h"
+#include "GameplayTagsSubSystem.h"
 
 UAbilityTask_FlyAway::UAbilityTask_FlyAway(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -32,6 +33,7 @@ UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
 
 	MyTask->ForceName = TaskInstanceName;
 	MyTask->FinishVelocityMode = ERootMotionFinishVelocityMode::SetVelocity;
+	MyTask->RootMotionAccumulateMode = ERootMotionAccumulateMode::Override;
 	MyTask->FinishSetVelocity = FVector::ZeroVector;
 	MyTask->FinishClampVelocity = 0.f;
 
@@ -39,6 +41,41 @@ UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
 	MyTask->Height = InHeight;
 
 	return MyTask;
+}
+
+UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
+	UGameplayAbility* OwningAbility,
+	FName TaskInstanceName,
+	ERootMotionAccumulateMode RootMotionAccumulateMode,
+	float InDuration,
+	float InHeight
+)
+{
+	UAbilityTask_FlyAway* MyTask = NewAbilityTask<UAbilityTask_FlyAway>(OwningAbility);
+
+	MyTask->ForceName = TaskInstanceName;
+	MyTask->FinishVelocityMode = ERootMotionFinishVelocityMode::SetVelocity;
+	MyTask->RootMotionAccumulateMode = RootMotionAccumulateMode;
+	MyTask->FinishSetVelocity = FVector::ZeroVector;
+	MyTask->FinishClampVelocity = 0.f;
+
+	MyTask->Duration = InDuration;
+	MyTask->Height = InHeight;
+
+	return MyTask;
+}
+
+void UAbilityTask_FlyAway::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+
+	const bool bTimedOut = HasTimedOut();
+	if (bTimedOut)
+	{
+		bIsFinished = true;
+		OnFinish.ExecuteIfBound();
+		EndTask();
+	}
 }
 
 void UAbilityTask_FlyAway::Activate()
@@ -53,6 +90,8 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
+		ASC->AddLooseGameplayTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
+
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
 		if (MovementComponent)
 		{
@@ -60,13 +99,18 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 			auto RootMotionSourceSPtr = MakeShared<FRootMotionSource_FlyAway>();
 
 			RootMotionSourceSPtr->InstanceName = ForceName;
-			RootMotionSourceSPtr->AccumulateMode = ERootMotionAccumulateMode::Override;
+			RootMotionSourceSPtr->AccumulateMode = RootMotionAccumulateMode;
 			RootMotionSourceSPtr->Priority = ERootMotionSource_Priority::kFlyAway;
 			RootMotionSourceSPtr->FinishVelocityParams.Mode = FinishVelocityMode;
 			RootMotionSourceSPtr->FinishVelocityParams.SetVelocity = FinishSetVelocity;
 			RootMotionSourceSPtr->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
 
-			RootMotionSourceSPtr->Initial(Height, Duration, ASC->AbilityActorInfo->AvatarActor->GetActorLocation());
+			RootMotionSourceSPtr->Initial(
+				Height, 
+				Duration, 
+				ASC->AbilityActorInfo->AvatarActor->GetActorLocation(),
+				Cast<ACharacter>(ASC->AbilityActorInfo->AvatarActor)
+			);
 
 			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RootMotionSourceSPtr);
 		}
@@ -75,6 +119,12 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 
 void UAbilityTask_FlyAway::OnDestroy(bool AbilityIsEnding)
 {
+	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
+	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
+	{
+		ASC->RemoveLooseGameplayTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
+	}
+
 	if (MovementComponent)
 	{
 		MovementComponent->RemoveRootMotionSourceByID(RootMotionSourceID);
@@ -93,4 +143,3 @@ void UAbilityTask_FlyAway::UpdateDuration()
 		RootMotionSourceSPtr->UpdateDuration(Height, Duration, MovementComponent->GetActorLocation());
 	}
 }
-

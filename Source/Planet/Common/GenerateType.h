@@ -27,6 +27,8 @@ enum class ECharacterPropertyType : uint8
 	FireElement,
 	SoilElement,
 	
+	HP,
+
 	BaseAttackPower,
 	Penetration,
 	PercentPenetration,
@@ -40,6 +42,7 @@ enum class ECharacterPropertyType : uint8
 	MoveSpeed,
 };
 
+UENUM()
 enum class EDashDirection : uint8
 {
 	kForward,

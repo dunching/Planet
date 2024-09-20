@@ -23,6 +23,8 @@
 #include "SceneElement.h"
 #include "GameplayTagsSubSystem.h"
 #include "CharacterAttibutes.h"
+#include "CharacterBase.h"
+#include "CharacterAttributesComponent.h"
 
 namespace GroupMateInfo
 {
@@ -85,7 +87,7 @@ void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
+void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
@@ -104,7 +106,7 @@ void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			}
 		}
 		
-		GroupMateUnitPtr = Cast<UCharacterUnit>(BasicUnitPtr);
+		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Texture));
 			if (UIPtr)
@@ -120,10 +122,12 @@ void UGroupMateInfo::ResetToolUIByData(UBasicUnit* BasicUnitPtr)
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(GroupMateInfo::Text));
 			if (UIPtr)
 			{
+				auto CharacterAttributes =
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
 				UIPtr->SetText(
 					FText::FromString(FString::Printf(TEXT("%s(%d)"), 
-						*GroupMateUnitPtr->CharacterAttributesSPtr->Name.ToString(),
-						GroupMateUnitPtr->CharacterAttributesSPtr->Level))
+						*CharacterAttributes.Name.ToString(),
+						CharacterAttributes.Level))
 				);
 			}
 		}

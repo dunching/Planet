@@ -21,17 +21,17 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(UBasicUnit* BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	void ResetToolUIByData(USkillUnit* UnitPtr, bool bIsAdd);
+	void ResetToolUIByData(const TSharedPtr<FSkillProxy>& UnitPtr, bool bIsAdd);
 	
-	void ResetToolUIByData(UCoinUnit* UnitPtr, bool bIsAdd, int32 Num);
+	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
 	
-	void ResetToolUIByData(UConsumableUnit* UnitPtr, bool bIsAdd, int32 Num);
+	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num);
 	
-	void ResetToolUIByData(UCharacterUnit* UnitPtr, bool bIsAdd);
+	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd);
 
 protected:
 

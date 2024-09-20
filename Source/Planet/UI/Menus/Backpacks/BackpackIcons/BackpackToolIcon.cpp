@@ -40,13 +40,13 @@ void UBackpackToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UBackpackToolIcon::ResetToolUIByData(UBasicUnit* InBasicUnitPtr)
+void UBackpackToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
 	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 	{
-		UnitPtr = Cast<UToolUnit>(InBasicUnitPtr);
+		UnitPtr = DynamicCastSharedPtr<FToolProxy>(InBasicUnitPtr);
 		SetNum(UnitPtr->GetNum());
 	}
 }

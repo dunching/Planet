@@ -18,7 +18,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -26,46 +26,11 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_PeriodicStateModify_Charm.h"
-
-static TAutoConsoleVariable<int32> Skill_Active_Charm_DrawDebug(
-	TEXT("Skill_Active_FlyAway.DrawDebug"),
-	0,
-	TEXT("")
-	TEXT(" default: 0"));
-
-USkill_Active_Charm::USkill_Active_Charm() :
-	Super()
-{
-	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
-}
-
-void USkill_Active_Charm::PreActivate(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
-{
-	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-}
-
-void USkill_Active_Charm::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
-}
 
 bool USkill_Active_Charm::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -85,17 +50,6 @@ bool USkill_Active_Charm::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void USkill_Active_Charm::EndAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility,
-	bool bWasCancelled
-)
-{
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
 void USkill_Active_Charm::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -108,92 +62,88 @@ void USkill_Active_Charm::PerformAction(
 		ExcuteTasks();
 		PlayMontage();
 	}
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
 }
 
 void USkill_Active_Charm::ExcuteTasks()
 {
-	if (CharacterPtr)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(CharacterPtr);
-
-#ifdef WITH_EDITOR
-		if (Skill_Active_Charm_DrawDebug.GetValueOnGameThread())
+		if (CharacterPtr)
 		{
-			DrawDebugLine(
+			FCollisionObjectQueryParams ObjectQueryParams;
+			ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(CharacterPtr);
+
+			const auto Dir = UKismetMathLibrary::MakeRotFromZX(
+				UKismetGravityLibrary::GetGravity(CharacterPtr->GetActorLocation()), CharacterPtr->GetControlRotation().Vector()
+			).Vector();
+
+			auto Result = UKismetCollisionHelper::OverlapMultiSectorByObjectType(
 				GetWorld(),
 				CharacterPtr->GetActorLocation(),
-				CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorRotation().Vector() * 100),
-				FColor::Red, false, 3
+				CharacterPtr->GetActorLocation() + (Dir * Radius),
+				Angle,
+				9,
+				ObjectQueryParams,
+				Params
 			);
 
-			DrawDebugLine(
-				GetWorld(),
-				CharacterPtr->GetActorLocation(),
-				CharacterPtr->GetActorLocation() + (CharacterPtr->GetControlRotation().Vector() * 100),
-				FColor::Yellow, false, 3
-			);
-		}
-#endif
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
-		const auto Dir = UKismetMathLibrary::MakeRotFromZX(
-			UKismetGravityLibrary::GetGravity(CharacterPtr->GetActorLocation()), CharacterPtr->GetControlRotation().Vector()
-		).Vector();
+			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
 
-		auto Result = UKismetCollisionHelper::OverlapMultiSectorByObjectType(
-			GetWorld(),
-			CharacterPtr->GetActorLocation(),
-			CharacterPtr->GetActorLocation() + (Dir * Radius),
-			Angle,
-			9,
-			ObjectQueryParams,
-			Params
-		);
-
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-
-		TSet<ACharacterBase*>TargetSet;
-		for (const auto& Iter : Result)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
+			TSet<ACharacterBase*>TargetSet;
+			for (const auto& Iter : Result)
 			{
-				TargetSet.Add(TargetCharacterPtr);
+				auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+				if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
+				{
+					TargetSet.Add(TargetCharacterPtr);
+				}
+			}
+
+			// 伤害
+			for (const auto& Iter : TargetSet)
+			{
+				FGAEventData GAEventData(Iter, CharacterPtr);
+
+				GAEventData.SetBaseDamage(Damage);
+
+				GAEventDataPtr->DataAry.Add(GAEventData);
+			}
+			ICPtr->SendEventImp(GAEventDataPtr);
+
+			// 控制效果
+			for (const auto& Iter : TargetSet)
+			{
+				auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Charm(Duration);
+
+				GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
+				GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
+
+				ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 			}
 		}
-
-		// 伤害
-		for (const auto& Iter : TargetSet)
-		{
-			FGAEventData GAEventData(Iter, CharacterPtr);
-
-			GAEventData.SetBaseDamage(Damage);
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-		}
-		ICPtr->SendEventImp(GAEventDataPtr);
-
-		// 控制效果
-		for (const auto& Iter : TargetSet)
-		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Charm(Duration);
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
-
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-		}
 	}
+#endif
 }
 
 void USkill_Active_Charm::PlayMontage()
 {
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
 		const float InPlayRate = 1.f;
 

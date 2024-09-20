@@ -14,9 +14,9 @@
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "InteractiveSkillComponent.h"
-#include "InteractiveToolComponent.h"
-#include "InteractiveBaseGAComponent.h"
+#include "UnitProxyProcessComponent.h"
+
+#include "BaseFeatureGAComponent.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
@@ -117,7 +117,7 @@ void UBasicFutures_MoveToAttaclArea::CancelAbility(
 		{
 			auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
 			PCPtr->StopMovement();
-			PCPtr->ReceiveMoveCompleted.RemoveDynamic(this, &ThisClass::MoveCompletedSignature);
+			PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::MoveCompletedSignature);
 		}
 		else
 		{
@@ -151,15 +151,7 @@ void UBasicFutures_MoveToAttaclArea::OnQueryFinished(TSharedPtr<FEnvQueryResult>
 		{
 			auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
 
-			const auto Result = PCPtr->MoveToLocation(DestLocation);
-			if (Result == EPathFollowingRequestResult::RequestSuccessful)
-			{
-				PCPtr->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::MoveCompletedSignature);
-			}
-			else
-			{
-				K2_CancelAbility();
-			}
+			PCPtr->MoveToLocation_RPC(DestLocation, nullptr);
 		}
 		else
 		{
@@ -177,7 +169,7 @@ void UBasicFutures_MoveToAttaclArea::MoveCompletedSignature(FAIRequestID InReque
 
 	if (Result == EPathFollowingResult::Success)
 	{
-		AvatorCharacterPtr->GetInteractiveSkillComponent()->ActiveAction(CanbeActivedInfoSPtr);
+	//	AvatorCharacterPtr->GetInteractiveSkillComponent()->ActiveAction(CanbeActivedInfoSPtr);
 	}
 	else
 	{

@@ -6,7 +6,7 @@
 #include "Engine/AssetManager.h"
 
 #include "CharacterBase.h"
-#include "InteractiveSkillComponent.h"
+#include "UnitProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"
@@ -14,9 +14,11 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "InteractiveBaseGAComponent.h"
+#include "BaseFeatureGAComponent.h"
+#include "StateProcessorComponent.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_Base.h"
+#include "CharacterStateInfo.h"
 
 void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -73,10 +75,10 @@ void USkill_Passive_ZMJZ::PerformAction()
 {
 	if (CharacterPtr)
 	{
-		auto CSPtr = CharacterPtr->GetInteractiveBaseGAComponent()->GetCharacterState(SkillUnitPtr->GetUnitType());
+		auto CSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(SkillUnitPtr->GetUnitType());
 		if (CSPtr)
 		{
-			if (CSPtr->GetStateDisplayInfo().Pin()->Num < MaxCount)
+			if (CSPtr->Num < MaxCount)
 			{
 				TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
 

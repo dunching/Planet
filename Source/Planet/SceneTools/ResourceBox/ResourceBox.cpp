@@ -7,7 +7,7 @@
 #include <Components/WidgetComponent.h>
 #include "ActorSequencePlayer.h"
 
-AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer):
+AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	BoxComponentPtr = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
@@ -15,20 +15,13 @@ AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer):
 
 	InteractionWidgetCompoentPtr = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 	InteractionWidgetCompoentPtr->SetupAttachment(RootComponent);
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AResourceBox::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-}
-
-void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
-{
-	Super::Interaction(InCharacterPtr);
-	if (ActorSequenceComponent)
-	{
-		ActorSequenceComponent->PlaySequence();
-	}
 }
 
 void AResourceBox::EndLookAt()
@@ -51,17 +44,47 @@ void AResourceBox::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (ActorSequenceComponent && ActorSequenceComponent->GetSequence())
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		ActorSequenceComponent->GetSequencePlayer()->OnFinished.AddDynamic(this, &ThisClass::OnAnimationFinished);
+		if (ActorSequenceComponent && ActorSequenceComponent->GetSequence())
+		{
+			ActorSequenceComponent->GetSequencePlayer()->OnFinished.AddDynamic(this, &ThisClass::OnAnimationFinished);
+		}
 	}
+#endif
 
 	EndLookAt();
 }
 
+void AResourceBox::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}
+
+void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
+{
+	Super::Interaction(InCharacterPtr);
+
+	InteractionImp();
+}
+
+void AResourceBox::InteractionImp_Implementation()
+{
+	if (ActorSequenceComponent)
+	{
+		ActorSequenceComponent->PlaySequence();
+	}
+}
+
 void AResourceBox::OnAnimationFinished()
 {
-	AddItemsToTarget();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		AddItemsToTarget();
 
-	Destroy();
+		Destroy();
+	}
+#endif
 }
