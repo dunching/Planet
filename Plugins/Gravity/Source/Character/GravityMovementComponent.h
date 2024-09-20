@@ -42,15 +42,19 @@ public:
     const FLyraCharacterGroundInfo& GetGroundInfo();
 
     // 
+    UPROPERTY(Replicated)
     bool bSkipRotation = false;
     
     // 
+    UPROPERTY(Replicated)
     bool bSkipRootMotion = false;
     
     // 
+    UPROPERTY(Replicated)
     bool bSkip_PlayerInput = false;
     
     // 
+    UPROPERTY(Replicated)
     bool bSkip_PathFollow = false;
     
 	UFUNCTION(NetMulticast, Reliable)
@@ -58,7 +62,7 @@ public:
 	
 protected:
 
-    FLyraCharacterGroundInfo CachedGroundInfo;
+    virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
     virtual void PhysicsRotation(float DeltaTime)override;
 
@@ -93,6 +97,8 @@ protected:
         enum ELevelTick TickType,
         FActorComponentTickFunction* ThisTickFunction
     ) override;
+
+    FLyraCharacterGroundInfo CachedGroundInfo;
 
 #if USECUSTOMEGRAVITY
     virtual void BeginPlay() override;

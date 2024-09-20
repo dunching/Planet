@@ -56,24 +56,25 @@ void USkill_Active_XYFH::PreActivate(
 
 	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
 
-//#if UE_EDITOR || UE_SERVER
-//	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		if (!SPlineActorPtr)
-		{
-			SPlineActorPtr = GetWorld()->SpawnActor<ASPlineActor>(
-				SPlineActorClass, CharacterPtr->GetActorTransform()
-			);
-		}
-
-		if (!CameraTrailHelperPtr)
-		{
-			CameraTrailHelperPtr = GetWorld()->SpawnActor<ACameraTrailHelper>(
-				CameraTrailHelperClass, CharacterPtr->GetActorTransform()
-			);
-		}
 	}
-//#endif
+#endif
+
+	if (!SPlineActorPtr)
+	{
+		SPlineActorPtr = GetWorld()->SpawnActor<ASPlineActor>(
+			SPlineActorClass, CharacterPtr->GetActorTransform()
+		);
+	}
+
+	if (!CameraTrailHelperPtr)
+	{
+		CameraTrailHelperPtr = GetWorld()->SpawnActor<ACameraTrailHelper>(
+			CameraTrailHelperClass, CharacterPtr->GetActorTransform()
+		);
+	}
 }
 
 void USkill_Active_XYFH::ActivateAbility(
@@ -105,22 +106,23 @@ void USkill_Active_XYFH::EndAbility(
 	bool bWasCancelled
 )
 {
-//#if UE_EDITOR || UE_SERVER
-//	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		if (SPlineActorPtr)
-		{
-			SPlineActorPtr->Destroy();
-			SPlineActorPtr = nullptr;
-		}
-
-		if (CameraTrailHelperPtr)
-		{
-			CameraTrailHelperPtr->Destroy();
-			CameraTrailHelperPtr = nullptr;
-		}
 	}
-//#endif
+#endif
+
+	if (SPlineActorPtr)
+	{
+		SPlineActorPtr->Destroy();
+		SPlineActorPtr = nullptr;
+	}
+
+	if (CameraTrailHelperPtr)
+	{
+		CameraTrailHelperPtr->Destroy();
+		CameraTrailHelperPtr = nullptr;
+	}
 
 	StepIndex = 0;
 	SubStepIndex = 0;
@@ -135,6 +137,16 @@ void USkill_Active_XYFH::EndAbility(
 #endif
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void USkill_Active_XYFH::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+// 	DOREPLIFETIME_CONDITION(ThisClass, SPlineActorPtr, COND_None);
+// 	DOREPLIFETIME_CONDITION(ThisClass, StepIndex, COND_SkipOwner);
+// 	DOREPLIFETIME_CONDITION(ThisClass, SubStepIndex, COND_SkipOwner);
+// 	DOREPLIFETIME_CONDITION(ThisClass, bIsContinue, COND_SkipOwner);
 }
 
 void USkill_Active_XYFH::PerformAction(
@@ -221,38 +233,44 @@ void USkill_Active_XYFH::ExcuteTasks(
 	bool bIsSubMoveStep
 )
 {
-	if (bIsSubMoveStep)
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
-		SubStepIndex++;
-	}
-	else
-	{
-		StepIndex++;
-		SubStepIndex = 0;
-	}
+		if (bIsSubMoveStep)
+		{
+			SubStepIndex++;
+		}
+		else
+		{
+			StepIndex++;
+			SubStepIndex = 0;
+		}
 
-	// 角色移动
-	auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
-		this,
-		TEXT(""),
-		Duration,
-		SPlineActorPtr,
-		CharacterPtr,
-		StartDistance,
-		EndDistance
-	);
-	if (bIsSubMoveStep)
-	{
-		TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnSubMoveStepComplete);
-	}
-	else
-	{
-		TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
-	}
-	TaskPtr->Ability = this;
-	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		// 角色移动
+		auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
+			this,
+			TEXT(""),
+			Duration,
+			SPlineActorPtr,
+			CharacterPtr,
+			StartDistance,
+			EndDistance
+		);
+		if (bIsSubMoveStep)
+		{
+			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnSubMoveStepComplete);
+		}
+		else
+		{
+			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
+		}
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-	TaskPtr->ReadyForActivation();
+		TaskPtr->ReadyForActivation();
+	}
 }
 
 void USkill_Active_XYFH::PlayMontage()

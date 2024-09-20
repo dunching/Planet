@@ -98,6 +98,11 @@ protected:
 		float Interval
 	);
 
+	virtual void OnTaskTick(
+		UAbilityTask_TimerHelper*, 
+		float DeltaTime
+	);
+
 	void OnTaskComplete();
 
 	TSharedPtr<FGameplayAbilityTargetData_StateModify> GameplayAbilityTargetDataSPtr = nullptr;

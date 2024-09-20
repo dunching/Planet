@@ -69,8 +69,6 @@ void UCS_PeriodicStateModify_Charm::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
-
 	PerformAction();
 }
 
@@ -83,7 +81,7 @@ void UCS_PeriodicStateModify_Charm::EndAbility(
 )
 {
 	//
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(StateDisplayInfoSPtr);
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	//
 	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
@@ -121,12 +119,12 @@ void UCS_PeriodicStateModify_Charm::UpdateDuration()
 void UCS_PeriodicStateModify_Charm::PerformAction()
 {
 	// 
-	StateDisplayInfoSPtr = MakeShared<FCharacterStateInfo>();
-	StateDisplayInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
-	StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-	StateDisplayInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
-	StateDisplayInfoSPtr->DataChanged();
-	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(StateDisplayInfoSPtr);
+	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+	CharacterStateInfoSPtr->DataChanged();
+	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 	//
 	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
@@ -189,7 +187,7 @@ void UCS_PeriodicStateModify_Charm::OnMoveCompleted(FAIRequestID RequestID, EPat
 
 void UCS_PeriodicStateModify_Charm::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
 {
-	StateDisplayInfoSPtr->TotalTime += DeltaTime;
+	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
-	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(StateDisplayInfoSPtr);
+	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }

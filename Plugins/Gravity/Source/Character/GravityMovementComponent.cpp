@@ -9,6 +9,7 @@
 #include "Components/CapsuleComponent.h"
 #include "AI/Navigation/NavigationDataInterface.h"
 #include <Kismet/KismetStringLibrary.h>
+#include "Net/UnrealNetwork.h"
 
 #include "LogWriter.h"
 
@@ -27,7 +28,7 @@ static TAutoConsoleVariable<int32> GravityMovementComponent_Debug(
 UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
 {
-//    SetIsReplicatedByDefault(true);
+    SetIsReplicatedByDefault(true);
 }
 
 const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
@@ -203,6 +204,16 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
         }
     }
 #endif
+}
+
+void UGravityMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkipRotation, COND_None);
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkipRootMotion, COND_None);
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkip_PlayerInput, COND_None);
+//     DOREPLIFETIME_CONDITION(ThisClass, bSkip_PathFollow, COND_None);
 }
 
 #if USECUSTOMEGRAVITY

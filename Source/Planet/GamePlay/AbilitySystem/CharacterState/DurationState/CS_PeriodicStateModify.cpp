@@ -116,6 +116,7 @@ void UCS_PeriodicStateModify::ExcuteTasks()
 		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
 		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+		TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
 		TaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
 			return true;
@@ -139,6 +140,14 @@ void UCS_PeriodicStateModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, fl
 	else
 	{
 	}
+}
+
+void UCS_PeriodicStateModify::OnTaskTick(
+	UAbilityTask_TimerHelper*, 
+	float DeltaTime
+)
+{
+
 }
 
 void UCS_PeriodicStateModify::OnTaskComplete()

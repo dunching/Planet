@@ -76,12 +76,12 @@ protected:
 
 	virtual void PerformAction()override;
 
+	virtual void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)override;
+
 	UFUNCTION()
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
-	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
-
-	TSharedPtr<FCharacterStateInfo> StateDisplayInfoSPtr = nullptr;
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 
 	float AcceptanceRadius = 50.f;
 

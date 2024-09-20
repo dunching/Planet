@@ -31,13 +31,13 @@ void USkill_Active_BYWD::ActivateAbility(
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		StateDisplayInfoSPtr = MakeShared<FCharacterStateInfo>();
-		StateDisplayInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
-		StateDisplayInfoSPtr->Duration = Duration;
-		StateDisplayInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
-		StateDisplayInfoSPtr->DataChanged();
+		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CharacterStateInfoSPtr->Duration = Duration;
+		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CharacterStateInfoSPtr->DataChanged();
 
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(StateDisplayInfoSPtr);
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -67,7 +67,7 @@ void USkill_Active_BYWD::ActivateAbility(
 			{
 				TaskPtr->OnFinish.BindLambda([this]
 					{
-						CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(StateDisplayInfoSPtr);
+						CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 						K2_CancelAbility();
 					});
@@ -84,11 +84,11 @@ void USkill_Active_BYWD::TimerTick(UAbilityTask_TimerHelper*, float Interval)
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		if (StateDisplayInfoSPtr)
+		if (CharacterStateInfoSPtr)
 		{
-			StateDisplayInfoSPtr->TotalTime += Interval;
-			StateDisplayInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(StateDisplayInfoSPtr);
+			CharacterStateInfoSPtr->TotalTime += Interval;
+			CharacterStateInfoSPtr->DataChanged();
+			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}
 	}
 #endif

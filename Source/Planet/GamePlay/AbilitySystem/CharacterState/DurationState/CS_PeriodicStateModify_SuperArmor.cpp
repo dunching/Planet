@@ -1,5 +1,5 @@
 
-#include "CS_PeriodicStateModify_Stun.h"
+#include "CS_PeriodicStateModify_SuperArmor.h"
 
 #include <Engine/AssetManager.h>
 #include <Engine/StreamableManager.h>
@@ -7,6 +7,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 
 #include "KismetGravityLibrary.h"
+#include "NavigationSystem.h"
 
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterBase.h"
@@ -23,37 +24,35 @@
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "AbilityTask_Tornado.h"
-#include "Skill_Active_Tornado.h"
-#include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
+#include "CharacterStateInfo.h"
+#include "PlanetPlayerController.h"
+#include "CharacterAttibutes.h"
 
-FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun(
+FGameplayAbilityTargetData_StateModify_SuperArmor::FGameplayAbilityTargetData_StateModify_SuperArmor(
 	float Duration
-):
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun, Duration)
+) :
+	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear, Duration)
 {
 }
 
-FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun() 
+FGameplayAbilityTargetData_StateModify_SuperArmor::FGameplayAbilityTargetData_StateModify_SuperArmor()
 {
 
 }
 
-void UCS_PeriodicStateModify_Stun::OnAvatarSet(
+void UCS_PeriodicStateModify_SuperArmor::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilitySpec& Spec
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	Super::OnAvatarSet(ActorInfo, Spec);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void UCS_PeriodicStateModify_Stun::ActivateAbility(
+void UCS_PeriodicStateModify_SuperArmor::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -62,10 +61,12 @@ void UCS_PeriodicStateModify_Stun::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
+
 	PerformAction();
 }
 
-void UCS_PeriodicStateModify_Stun::EndAbility(
+void UCS_PeriodicStateModify_SuperArmor::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -73,26 +74,20 @@ void UCS_PeriodicStateModify_Stun::EndAbility(
 	bool bWasCancelled
 )
 {
+	//
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UCS_PeriodicStateModify_Stun::UpdateDuration()
+void UCS_PeriodicStateModify_SuperArmor::UpdateDuration()
 {
 	Super::UpdateDuration();
-
-	if (TaskPtr)
-	{
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		TaskPtr->UpdateDuration();
-	}
 
 	PerformAction();
 }
 
-void UCS_PeriodicStateModify_Stun::PerformAction()
+void UCS_PeriodicStateModify_SuperArmor::PerformAction()
 {
+	// 
 	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
 	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
 	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
@@ -101,7 +96,7 @@ void UCS_PeriodicStateModify_Stun::PerformAction()
 	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_Stun::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
+void UCS_PeriodicStateModify_SuperArmor::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
 {
 	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 

@@ -44,7 +44,12 @@ class PLANET_API UCS_PeriodicStateModify_Fear : public UCS_PeriodicStateModify
 	GENERATED_BODY()
 
 public:
-	
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -74,14 +79,14 @@ protected:
 
 	virtual void PerformAction()override;
 
+	virtual void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)override;
+
 	UFUNCTION()
 	void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result);
 
-	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
-
 	void MoveImp();
 
-	TSharedPtr<FCharacterStateInfo> StateDisplayInfoSPtr = nullptr;
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 
 	float AcceptanceRadius = 50.f;
 

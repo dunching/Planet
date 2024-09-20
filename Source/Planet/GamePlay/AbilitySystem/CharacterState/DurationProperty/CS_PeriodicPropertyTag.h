@@ -17,7 +17,7 @@ class UEffectItem;
 struct FStreamableHandle;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_PeriodicPropertyTag : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_TagModify : public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
 

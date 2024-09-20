@@ -41,6 +41,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Duration = 3.f;
 
-	TSharedPtr<FCharacterStateInfo> StateDisplayInfoSPtr;
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr;
 
 };

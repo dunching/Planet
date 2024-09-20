@@ -84,7 +84,7 @@ protected:
 
 	struct FMyStruct
 	{
-		TSharedPtr<FCharacterStateInfo> StateDisplayInfoSPtr;
+		TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr;
 
 		TSharedPtr<FGameplayAbilityTargetData_StateModify>SPtr;
 	};

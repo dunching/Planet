@@ -58,6 +58,20 @@ FGameplayAbilityTargetData_StateModify_Fear::FGameplayAbilityTargetData_StateMod
 
 }
 
+void UCS_PeriodicStateModify_Fear::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+}
+
 void UCS_PeriodicStateModify_Fear::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -66,12 +80,6 @@ void UCS_PeriodicStateModify_Fear::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
-
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
@@ -83,8 +91,6 @@ void UCS_PeriodicStateModify_Fear::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
 
 	PerformAction();
 }
@@ -98,7 +104,7 @@ void UCS_PeriodicStateModify_Fear::EndAbility(
 )
 {
 	//
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(StateDisplayInfoSPtr);
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	//
 	CharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes.MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
@@ -115,18 +121,24 @@ void UCS_PeriodicStateModify_Fear::UpdateDuration()
 {
 	Super::UpdateDuration();
 
+	if (TaskPtr)
+	{
+		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TaskPtr->UpdateDuration();
+	}
+
 	PerformAction();
 }
 
 void UCS_PeriodicStateModify_Fear::PerformAction()
 {
 	// 
-	StateDisplayInfoSPtr = MakeShared<FCharacterStateInfo>();
-	StateDisplayInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
-	StateDisplayInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-	StateDisplayInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
-	StateDisplayInfoSPtr->DataChanged();
-	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(StateDisplayInfoSPtr);
+	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+	CharacterStateInfoSPtr->DataChanged();
+	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 	//
 	MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
@@ -163,9 +175,9 @@ void UCS_PeriodicStateModify_Fear::OnMoveCompleted(FAIRequestID RequestID, EPath
 
 void UCS_PeriodicStateModify_Fear::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
 {
-	StateDisplayInfoSPtr->TotalTime += DeltaTime;
+	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
-	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(StateDisplayInfoSPtr);
+	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
 void UCS_PeriodicStateModify_Fear::MoveImp()

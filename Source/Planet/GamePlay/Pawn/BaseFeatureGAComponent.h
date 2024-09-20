@@ -25,8 +25,8 @@ struct FGameplayAbilityTargetData_CS_Base;
 struct FGameplayAbilityTargetData_RootMotion;
 struct FGameplayAbilityTargetData_PropertyModify;
 struct FGameplayAbilityTargetData_StateModify;
-struct FGameplayAbilityTargetData_PeriodicPropertyTag;
 struct FGameplayAbilityTargetData_MoveToAttaclArea;
+struct FGameplayAbilityTargetData_TagModify;
 struct FGameplayAbilityTargetData;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
@@ -90,8 +90,8 @@ public:
 	/*
 		周期类的标签
 	*/
-	FGameplayAbilitySpecHandle AddPeriodicPropertyTag(
-		FGameplayAbilityTargetData_PeriodicPropertyTag* GameplayAbilityTargetDataPtr
+	void SendEventImp(
+		FGameplayAbilityTargetData_TagModify* GameplayAbilityTargetDataPtr
 	);
 
 	/*

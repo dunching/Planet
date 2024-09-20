@@ -205,6 +205,15 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->bSkipRootMotion = Value;
 			}
 		}
+		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation))
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkipRotation = Value;
+			}
+		}
 		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();

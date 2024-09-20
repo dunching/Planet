@@ -79,7 +79,6 @@ void UCS_PeriodicStateModify_Slow::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
 	TaskPtr->SetInfinite();
 
 	PerformAction();
@@ -117,7 +116,7 @@ void UCS_PeriodicStateModify_Slow::PerformAction()
 		if (MoveSpeedOffsetMap.Contains(CurrentGameplayAbilityTargetDataSPtr->SpeedOffset))
 		{
 			if (
-				MoveSpeedOffsetMap[CurrentGameplayAbilityTargetDataSPtr->SpeedOffset].StateDisplayInfoSPtr->GetRemainTime() >
+				MoveSpeedOffsetMap[CurrentGameplayAbilityTargetDataSPtr->SpeedOffset].CharacterStateInfoSPtr->GetRemainTime() >
 				CurrentGameplayAbilityTargetDataSPtr->Duration
 				)
 			{
@@ -127,14 +126,14 @@ void UCS_PeriodicStateModify_Slow::PerformAction()
 
 		FMyStruct MyStruct;
 
-		MyStruct.StateDisplayInfoSPtr = MakeShared<FCharacterStateInfo>();
-		MyStruct.StateDisplayInfoSPtr->Tag = CurrentGameplayAbilityTargetDataSPtr->Tag;
-		MyStruct.StateDisplayInfoSPtr->Duration = CurrentGameplayAbilityTargetDataSPtr->Duration;
-		MyStruct.StateDisplayInfoSPtr->DefaultIcon = CurrentGameplayAbilityTargetDataSPtr->DefaultIcon;
-		MyStruct.StateDisplayInfoSPtr->DataChanged();
+		MyStruct.CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		MyStruct.CharacterStateInfoSPtr->Tag = CurrentGameplayAbilityTargetDataSPtr->Tag;
+		MyStruct.CharacterStateInfoSPtr->Duration = CurrentGameplayAbilityTargetDataSPtr->Duration;
+		MyStruct.CharacterStateInfoSPtr->DefaultIcon = CurrentGameplayAbilityTargetDataSPtr->DefaultIcon;
+		MyStruct.CharacterStateInfoSPtr->DataChanged();
 		MyStruct.SPtr = CurrentGameplayAbilityTargetDataSPtr;
 
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(MyStruct.StateDisplayInfoSPtr);
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(MyStruct.CharacterStateInfoSPtr);
 
 		MoveSpeedOffsetMap.Add(
 			CurrentGameplayAbilityTargetDataSPtr->SpeedOffset,
@@ -147,13 +146,13 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 {
 	for (auto & Iter : MoveSpeedOffsetMap)
 	{
-		Iter.Value.StateDisplayInfoSPtr->TotalTime += DeltaTime;
+		Iter.Value.CharacterStateInfoSPtr->TotalTime += DeltaTime;
 	}
 	const auto Temp = MoveSpeedOffsetMap;
 	for (auto Iter : Temp)
 	{
 		// 移除不生效的
-		if (Iter.Value.StateDisplayInfoSPtr->GetRemainTime() < 0.f)
+		if (Iter.Value.CharacterStateInfoSPtr->GetRemainTime() < 0.f)
 		{
 			MoveSpeedOffsetMap.Remove(Iter.Key);
 
@@ -171,11 +170,11 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
 
-			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.StateDisplayInfoSPtr);
+			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
 		}
 		else
 		{
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Iter.Value.StateDisplayInfoSPtr);
+			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Iter.Value.CharacterStateInfoSPtr);
 		}
 	}
 

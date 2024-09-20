@@ -37,7 +37,7 @@ void UCS_PeriodicPropertyTag::PreActivate(
 {
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_PeriodicPropertyTag*>(TriggerEventData->TargetData.Get(0));
+		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_TagModify*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
 			ActivationOwnedTags.AppendTags(ActivationOwnedTags);
