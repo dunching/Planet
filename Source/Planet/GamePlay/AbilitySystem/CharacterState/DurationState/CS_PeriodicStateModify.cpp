@@ -109,6 +109,14 @@ void UCS_PeriodicStateModify::ExcuteTasks()
 
 	if (GameplayAbilityTargetDataSPtr->Duration < 0.f)
 	{
+		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		TaskPtr->SetInfinite();
+		TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
+		TaskPtr->OnFinished.BindLambda([this](auto) {
+			K2_CancelAbility();
+			return true;
+			});
+		TaskPtr->ReadyForActivation();
 	}
 	else
 	{

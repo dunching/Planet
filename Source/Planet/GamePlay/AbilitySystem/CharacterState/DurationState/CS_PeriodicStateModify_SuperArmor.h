@@ -47,7 +47,12 @@ class PLANET_API UCS_PeriodicStateModify_SuperArmor : public UCS_PeriodicStateMo
 	GENERATED_BODY()
 
 public:
-	
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
+
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -77,7 +82,7 @@ protected:
 
 	virtual void PerformAction()override;
 
-	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
+	virtual void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)override;
 
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 

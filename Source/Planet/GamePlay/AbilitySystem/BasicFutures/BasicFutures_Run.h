@@ -21,8 +21,6 @@ public:
 
 	UBasicFutures_Run();
 
-	virtual void PostCDOContruct() override;
-
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -53,5 +51,9 @@ public:
 		const FGameplayTagContainer* TargetTags = nullptr,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
-	
+
+private:
+
+	virtual void InitialTags() override;
+
 };

@@ -113,10 +113,11 @@ enum class ETeammateOption : uint8
 	kTest,
 };
 
-enum class EItemChangeType
+enum class EProxyModifyType
 {
 	kAdd,
-	kSub,
+	kChange,
+	kRemove,
 };
 
 enum class EWeaponSocket

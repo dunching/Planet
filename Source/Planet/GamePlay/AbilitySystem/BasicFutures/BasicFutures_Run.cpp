@@ -20,21 +20,14 @@ UBasicFutures_Run::UBasicFutures_Run() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Run::PostCDOContruct()
+void UBasicFutures_Run::InitialTags()
 {
-	Super::PostCDOContruct();
+	Super::InitialTags();
 
 	if (GetWorldImp())
 	{
 		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Running);
 		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Running);
-
-		FAbilityTriggerData AbilityTriggerData;
-
-		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Running;
-		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-		AbilityTriggers.Add(AbilityTriggerData);
 	}
 }
 

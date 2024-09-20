@@ -136,7 +136,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
+			UIPtr->SetDataSource(CharacterAttributes.AD);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Penetration));
@@ -144,7 +144,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
+			UIPtr->SetDataSource(CharacterAttributes.ADPenetration, CharacterAttributes.ADPercentPenetration);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Resistance));

@@ -32,13 +32,39 @@
 FGameplayAbilityTargetData_StateModify_SuperArmor::FGameplayAbilityTargetData_StateModify_SuperArmor(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear, Duration)
+	Super(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor, Duration)
 {
 }
 
 FGameplayAbilityTargetData_StateModify_SuperArmor::FGameplayAbilityTargetData_StateModify_SuperArmor()
 {
 
+}
+
+void UCS_PeriodicStateModify_SuperArmor::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	TArray<FGameplayTag>Ary{
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Silent,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow,
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		CancelAbilitiesWithTag.AddTag(Iter);
+	}
+
+	for (const auto& Iter : Ary)
+	{
+		BlockAbilitiesWithTag.AddTag(Iter);
+	}
 }
 
 void UCS_PeriodicStateModify_SuperArmor::PreActivate(
@@ -61,8 +87,6 @@ void UCS_PeriodicStateModify_SuperArmor::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
-
 	PerformAction();
 }
 
@@ -74,15 +98,26 @@ void UCS_PeriodicStateModify_SuperArmor::EndAbility(
 	bool bWasCancelled
 )
 {
-	//
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UCS_PeriodicStateModify_SuperArmor::UpdateDuration()
 {
 	Super::UpdateDuration();
 
-	PerformAction();
+	if (TaskPtr)
+	{
+		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TaskPtr->UpdateDuration();
+	}
+
+	if (CharacterStateInfoSPtr)
+	{
+		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		CharacterStateInfoSPtr->TotalTime = 0.f;
+	}
 }
 
 void UCS_PeriodicStateModify_SuperArmor::PerformAction()

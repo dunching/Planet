@@ -5,7 +5,7 @@
 
 #include "Skill_Active_Base.h"
 
-#include "Skill_Active_Stun.generated.h"
+#include "Skill_Active_SuperArmor.generated.h"
 
 class UAnimMontage;
 
@@ -16,13 +16,13 @@ class ASPlineActor;
 struct FGameplayAbilityTargetData_PickAxe;
 
 UCLASS()
-class PLANET_API USkill_Active_Stun : public USkill_Active_Base
+class PLANET_API USkill_Active_SuperArmor : public USkill_Active_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	USkill_Active_Stun();
+	USkill_Active_SuperArmor();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,

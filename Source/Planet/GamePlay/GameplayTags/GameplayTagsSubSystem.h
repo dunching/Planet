@@ -100,8 +100,12 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Ridering")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag SuperArmor =
+	FGameplayTag State_Buff_SuperArmor =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.SuperArmor")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_Buff_CantBeSlected =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.CantBeSlected")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Debuff =
@@ -120,7 +124,7 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Fear")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag Silent =
+	FGameplayTag State_Debuff_Silent =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Silent")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")

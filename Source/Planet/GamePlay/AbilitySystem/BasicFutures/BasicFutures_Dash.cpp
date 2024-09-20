@@ -189,13 +189,6 @@ void UBasicFutures_Dash::InitialTags()
 
 	// 在运动时不激活
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
-
-	FAbilityTriggerData AbilityTriggerData;
-
-	AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Dash;
-	AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-	AbilityTriggers.Add(AbilityTriggerData);
 }
 
 void UBasicFutures_Dash::OnRemoveAbility(

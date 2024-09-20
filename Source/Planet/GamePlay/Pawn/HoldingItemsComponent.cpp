@@ -39,11 +39,6 @@ void UHoldingItemsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, Proxy_Container, Params);
 }
 
-void UHoldingItemsComponent::OnRep_ProxyChanged()
-{
-
-}
-
 void UHoldingItemsComponent::AddUnit_Apending(FGameplayTag UnitType, int32 Num, FGuid Guid)
 {
 	if (SkillUnitApendingMap.Contains(Guid))
@@ -126,10 +121,6 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 
 	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
 	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
-
-		Result = ProxySPtr;
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
@@ -137,34 +128,17 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 		SceneToolsAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
+
+		OnWeaponUnitChanged(DynamicCastSharedPtr<FWeaponProxy>(Result), true);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
 	{
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
-	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
 
-		Result = ProxySPtr;
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
-	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
-
-		Result = ProxySPtr;
-	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
-	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
-
-		Result = ProxySPtr;
+		OnSkillUnitChanged(DynamicCastSharedPtr<FSkillProxy>(Result), true);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
 	{
@@ -179,6 +153,8 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 		SceneToolsAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
+
+		OnConsumableUnitChanged(DynamicCastSharedPtr<FConsumableProxy>(Result), EProxyModifyType::kAdd);
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
 	{
@@ -430,7 +406,7 @@ TSharedPtr <FConsumableProxy> UHoldingItemsComponent::AddUnit_Consumable(const F
 	SceneToolsAry.Add(ResultPtr);
 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 
-	OnConsumableUnitChanged.ExcuteCallback(ResultPtr, true, Num);
+	OnConsumableUnitChanged.ExcuteCallback(ResultPtr, EProxyModifyType::kRemove);
 
 	return ResultPtr;
 }
@@ -518,7 +494,7 @@ void UHoldingItemsComponent::RemoveUnit_Consumable(const TSharedPtr<FConsumableP
 	{
 		UnitPtr->Num -= Num;
 
-		OnConsumableUnitChanged.ExcuteCallback(UnitPtr, false, Num);
+		OnConsumableUnitChanged.ExcuteCallback(UnitPtr, EProxyModifyType::kRemove);
 	}
 }
 

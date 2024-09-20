@@ -30,12 +30,24 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& UnitP
 	ResetToolUIByData(UnitPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType)
 {
 	SetTexutre(UnitPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s %dX%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), UnitPtr->GetCurrentValue(), *UnitPtr->GetUnitName()));
-
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kAdd:
+	{
+		SetText(FString::Printf(TEXT("Get:%dX%s"), UnitPtr->GetCurrentValue(), *UnitPtr->GetUnitName()));
+	}
+		break;
+	case EProxyModifyType::kChange:
+		break;
+	case EProxyModifyType::kRemove:
+		break;
+	default:
+		break;
+	}
 	ResetToolUIByData(UnitPtr);
 }
 

@@ -94,7 +94,7 @@ void AHumanCharacter::BeginPlay()
 				{
 					auto Handle =
 						GetHoldingItemsComponent()->OnConsumableUnitChanged.AddCallback(
-							std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+							std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
 							));
 					Handle->bIsAutoUnregister = false;
 				}

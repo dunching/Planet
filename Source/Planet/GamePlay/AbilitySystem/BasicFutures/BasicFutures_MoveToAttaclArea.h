@@ -29,7 +29,7 @@ struct FGameplayAbilityTargetData_MoveToAttaclArea : public FGameplayAbilityTarg
 };
 
 /**
- * �ͷ���Ҫѡ�С�Ŀ�ꡱʱ���������벻������Ҫ���ƶ�����Χ��
+ * 释放需要选中“目标”时，攻击距离不够，需要先移动至范围内
  */
 
 UCLASS()
@@ -38,8 +38,6 @@ class PLANET_API UBasicFutures_MoveToAttaclArea : public UBasicFuturesBase
 	GENERATED_BODY()
 
 public:
-
-	virtual void PostCDOContruct() override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -64,6 +62,8 @@ public:
 	)override;
 
 protected:
+
+	virtual void InitialTags() override;
 
 	void OnQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 

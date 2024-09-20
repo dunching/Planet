@@ -99,17 +99,11 @@ struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
 		return true;
 	}
 
-	 void PreReplicatedRemove(const TArrayView<int32>& RemovedIndices, int32 FinalSize);
-
-	 void PostReplicatedAdd(const TArrayView<int32>& AddedIndices, int32 FinalSize);
-
-	 void PostReplicatedChange(const TArrayView<int32>& ChangedIndices, int32 FinalSize);
-
 	void AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	void UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
-	void RemoveItem(const FItemType& Item);
+	void RemoveItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 

@@ -39,7 +39,7 @@ public:
 
 	void OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
 
-	void OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num);
+	void OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
 	
 	void OnGourpmateUnitChanged(const TSharedPtr< FCharacterProxy>& UnitPtr, bool bIsAdd);
 

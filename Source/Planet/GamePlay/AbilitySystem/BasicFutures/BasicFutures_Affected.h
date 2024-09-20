@@ -17,7 +17,7 @@ struct FGameplayAbilityTargetData_Affected : public FGameplayAbilityTargetData
 };
 
 /**
- * ÊÜ»÷Ê±µÄ¡°½©Ö±Ğ§¹û¡±
+ * å—å‡»æ—¶çš„â€œåƒµç›´æ•ˆæœâ€
  */
 
 UCLASS()
@@ -28,8 +28,6 @@ class PLANET_API UBasicFutures_Affected : public UBasicFuturesBase
 public:
 
 	UBasicFutures_Affected();
-
-	virtual void PostCDOContruct() override;
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,

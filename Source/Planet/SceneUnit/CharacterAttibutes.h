@@ -186,14 +186,30 @@ struct PLANET_API FCharacterAttributes final
 
 	// 基础属性
 #pragma region 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet BaseAttackPower;
 
+	// 攻击力
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet Penetration;
+	FBasePropertySet AD;
 
+	// 攻击力穿透
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet PercentPenetration;
+	FBasePropertySet ADPenetration;
+
+	// 攻击力百分比穿透
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet ADPercentPenetration;
+	
+	// 元素强度
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet AP;
+
+	// 元素穿透
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet APPenetration;
+
+	// 元素百分比穿透
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet APPercentPenetration;
 
 	// 护甲
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -218,6 +234,14 @@ struct PLANET_API FCharacterAttributes final
 	// 体力回复速率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet PPReplay;
+	
+	// 法力值
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet Mana;
+
+	// 法力速率
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet ManaReplay;
 
 	// 闪避几率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

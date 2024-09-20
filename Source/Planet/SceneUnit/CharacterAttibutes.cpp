@@ -130,8 +130,8 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Ar << HP.CurrentValue.CurrentValue;
 		Ar << PP.CurrentValue.CurrentValue;
 
-		Ar << BaseAttackPower.CurrentValue.CurrentValue;
-		Ar << Penetration.CurrentValue.CurrentValue;
+		Ar << AD.CurrentValue.CurrentValue;
+		Ar << ADPenetration.CurrentValue.CurrentValue;
 		Ar << GAPerformSpeed.CurrentValue.CurrentValue;
 		Ar << MoveSpeed.CurrentValue.CurrentValue;
 
@@ -159,8 +159,8 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Lambda(HP.CurrentValue);
 		Lambda(PP.CurrentValue);
 
-		Lambda(BaseAttackPower.CurrentValue);
-		Lambda(Penetration.CurrentValue);
+		Lambda(AD.CurrentValue);
+		Lambda(ADPenetration.CurrentValue);
 		Lambda(GAPerformSpeed.CurrentValue);
 		Lambda(MoveSpeed.CurrentValue);
 
@@ -197,14 +197,14 @@ void FCharacterAttributes::InitialData()
 	const auto DataSource = FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
 	//UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
 
-	BaseAttackPower.GetMaxProperty().SetCurrentValue(3000);
-	BaseAttackPower.SetCurrentValue(100, DataSource);
+	AD.GetMaxProperty().SetCurrentValue(3000);
+	AD.SetCurrentValue(100, DataSource);
 
-	Penetration.GetMaxProperty().SetCurrentValue(1000);
-	Penetration.SetCurrentValue(0, DataSource);
+	ADPenetration.GetMaxProperty().SetCurrentValue(1000);
+	ADPenetration.SetCurrentValue(0, DataSource);
 
-	PercentPenetration.GetMaxProperty().SetCurrentValue(100);
-	PercentPenetration.SetCurrentValue(0, DataSource);
+	ADPercentPenetration.GetMaxProperty().SetCurrentValue(100);
+	ADPercentPenetration.SetCurrentValue(0, DataSource);
 
 	Resistance.GetMaxProperty().SetCurrentValue(1000);
 	Resistance.SetCurrentValue(20, DataSource);
@@ -356,17 +356,17 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 			break;
 			case ECharacterPropertyType::BaseAttackPower:
 			{
-				Lambda(BaseAttackPower, Iter.Value);
+				Lambda(AD, Iter.Value);
 			}
 			break;
 			case ECharacterPropertyType::Penetration:
 			{
-				Lambda(Penetration, Iter.Value);
+				Lambda(ADPenetration, Iter.Value);
 			}
 			break;
 			case ECharacterPropertyType::PercentPenetration:
 			{
-				Lambda(PercentPenetration, Iter.Value);
+				Lambda(ADPercentPenetration, Iter.Value);
 			}
 			break;
 			case ECharacterPropertyType::GAPerformSpeed:
