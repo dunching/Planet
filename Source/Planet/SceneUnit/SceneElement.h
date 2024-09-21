@@ -197,6 +197,8 @@ public:
 
 	FConsumableProxy();
 
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	virtual bool Active()override;
 
 	FTableRowUnit_Consumable* GetTableRowUnit_Consumable()const;
@@ -225,6 +227,16 @@ protected:
 
 	int32 Num = 1;
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FConsumableProxy> :
+	public TStructOpsTypeTraitsBase2<FConsumableProxy>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 USTRUCT()

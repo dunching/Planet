@@ -297,7 +297,7 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 
 		if (Args.IsValidIndex(0))
 		{
-			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HPReplay.AddCurrentValue(
+			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP_Replay.AddCurrentValue(
 				UKismetStringLibrary::Conv_StringToInt(Args[0]),
 				UGameplayTagsSubSystem::GetInstance()->DataSource_Regular
 			);

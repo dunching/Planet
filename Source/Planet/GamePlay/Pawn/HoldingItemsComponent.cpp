@@ -406,6 +406,8 @@ TSharedPtr <FConsumableProxy> UHoldingItemsComponent::AddUnit_Consumable(const F
 	SceneToolsAry.Add(ResultPtr);
 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 
+	Proxy_Container.AddItem(ResultPtr);
+
 	OnConsumableUnitChanged.ExcuteCallback(ResultPtr, EProxyModifyType::kRemove);
 
 	return ResultPtr;

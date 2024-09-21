@@ -97,10 +97,11 @@ struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowUnit_Ski
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag RequireWeaponUnitType = FGameplayTag::EmptyTag;
 
+	// 技能公共CD
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSet<FGameplayTag>SkillCommonCooldownInfoMap;
 
-
+	// 技能CD
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<int32, int32>SkillCooldownInfoMap;
 
@@ -167,9 +168,14 @@ struct PLANET_API FTableRowUnit_Consumable : public FTableRowBase
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
-	
+
+	// 消耗品公共CD
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSet<FGameplayTag>CommonCooldownInfoMap;
+
+	// 消耗品独立CD
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	int32 CD = 1;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	float Duration = 3.f;

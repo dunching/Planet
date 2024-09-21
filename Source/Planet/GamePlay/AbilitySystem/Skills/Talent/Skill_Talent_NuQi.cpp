@@ -211,7 +211,7 @@ void USkill_Talent_NuQi::StartFuryState()
 	{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
-		ModifyPropertyMap.Add(ECharacterPropertyType::BaseAttackPower, 50);
+		ModifyPropertyMap.Add(ECharacterPropertyType::AD, 50);
 
 		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 	}

@@ -30,7 +30,11 @@ struct PLANET_API FGAEventData
 	);
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
-	
+
+	void SetBaseDamage(int32 Value);
+
+	void AddWuXingDamage(EWuXingType WuXingType, int32 Value);
+
 	UPROPERTY()
 	// 是否是武器造成的伤害
 	bool bIsWeaponAttack = false;
@@ -71,18 +75,6 @@ struct PLANET_API FGAEventData
 	TSet<TTuple<EWuXingType, int32, int32>>ElementSet;
 	
 	UPROPERTY()
-	// 回复：HP
-	int32 HP = 0;
-	
-	UPROPERTY()
-	// 回复：PP
-	int32 PP = 0;
-
-	void SetBaseDamage(int32 Value);
-
-	void AddWuXingDamage(EWuXingType WuXingType, int32 Value);
-	
-	UPROPERTY()
 	FGameplayTag DataSource;
 
 	// 是否 清空DataModify的 DataSource
@@ -117,7 +109,8 @@ enum class EEventType : uint8
 };
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_GAEventType : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_GAEventType : 
+	public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -148,7 +141,8 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_GAEventType> :
 };
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_GASendEvent : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_GASendEvent : 
+	public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -190,7 +184,8 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_GASendEvent> :
 };
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_GAReceivedEvent : public FGameplayAbilityTargetData
+struct PLANET_API FGameplayAbilityTargetData_GAReceivedEvent : 
+	public FGameplayAbilityTargetData
 {
 	GENERATED_USTRUCT_BODY()
 

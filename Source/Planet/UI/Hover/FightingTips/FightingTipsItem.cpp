@@ -228,7 +228,7 @@ void UFightingTipsItem::ProcessGAEVent(UFightingTipsItem::EType Type, const FGam
 			{
 				return;
 			}
-			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Ref.HP)));
+			UIPtr->SetText(FText::FromString(FString::Printf(TEXT("+%d"), Ref.DataModify[ECharacterPropertyType::HP].GetCurrentValue())));
 			UIPtr->SetColorAndOpacity(FSlateColor(FLinearColor(0.000000, 1.000000, 0.191129, 1.000000)));
 		}
 		break;

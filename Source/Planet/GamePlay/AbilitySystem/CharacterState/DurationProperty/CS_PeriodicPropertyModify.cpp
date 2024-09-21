@@ -17,11 +17,78 @@
 #include "BaseFeatureGAComponent.h"
 #include "SceneUnitTable.h"
 #include "CharacterStateInfo.h"
+#include "StateProcessorComponent.h"
 
-UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify():
+UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+}
+
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal) :
+	Super(RightVal->GetUnitType())
+{
+	Duration = RightVal->GetTableRowUnit_Consumable()->Duration;
+	PerformActionInterval = RightVal->GetTableRowUnit_Consumable()->PerformActionInterval;
+	ModifyPropertyPerLayer = { RightVal->GetTableRowUnit_Consumable()->ModifyPropertyMap };
+	DefaultIcon = RightVal->GetIcon();
+	LosePropertyNumInterval = -1.f;
+}
+
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify()
+{
+
+}
+
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
+	const FGameplayTag& Tag,
+	TSoftObjectPtr<UTexture2D>Icon,
+	float InDuration,
+	float InPerformActionInterval,
+	float InLosePropertyNumInterval,
+	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap
+) :
+	Super(Tag),
+	Duration(InDuration),
+	PerformActionInterval(InPerformActionInterval),
+	LosePropertyNumInterval(InLosePropertyNumInterval),
+	ModifyPropertyPerLayer{ InModifyPropertyMap }
+{
+	DefaultIcon = Icon;
+}
+
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
+	const FGameplayTag& Tag,
+	bool bInOnluReFreshTime,
+	float InDuration,
+	float InLosePropertyNumInterval
+) :
+	Super(Tag),
+	Duration(InDuration),
+	LosePropertyNumInterval(InLosePropertyNumInterval),
+	bIsOnlyReFreshTime(bInOnluReFreshTime)
+{
+}
+
+FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
+	const FGameplayTag& Tag,
+	bool bClear
+) :
+	Super(Tag)
+{
+	bIsOnlyReFreshTime = true;
+	Duration = 0.f;
+	bIsClear = bClear;
+}
+
+FGameplayAbilityTargetData_PropertyModify* FGameplayAbilityTargetData_PropertyModify::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_PropertyModify;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
 }
 
 void UCS_PeriodicPropertyModify::PreActivate(
@@ -73,33 +140,55 @@ void UCS_PeriodicPropertyModify::UpdateDuration()
 	{
 		auto GameplayAbilityTargetDataSPtr = CacheSPtr;
 
-		if (GameplayAbilityTargetDataSPtr->bIsClear)
+		if (DurationEffectMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
-			TaskPtr->SetFinished();
-			return; 
-		}
+			if (GameplayAbilityTargetDataSPtr->bIsClear)
+			{
+				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->SetFinished();
+			}
+			else if (GameplayAbilityTargetDataSPtr->bIsOnlyReFreshTime)
+			{
+				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->RefreshTime();
+			}
+			else
+			{
+				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->Duration =
+					GameplayAbilityTargetDataSPtr->Duration;
+				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->RefreshTime();
+				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].SPtr = GameplayAbilityTargetDataSPtr;
 
-		if ((GameplayAbilityTargetDataSPtr->PerformActionInterval < 0.f) && !GameplayAbilityTargetDataSPtr->bOnluReFreshTime)
+				if (GameplayAbilityTargetDataSPtr->LosePropertyNumInterval < 0.f)
+				{
+					PerformPropertyModify(GameplayAbilityTargetDataSPtr);
+				}
+			}
+		}
+		else
 		{
-			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
-		}
+			FMyStruct MyStruct;
 
-		// 更新计时
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
-		TaskPtr->UpdateDuration();
+			MyStruct.CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+			MyStruct.CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+			MyStruct.CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+			MyStruct.CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+			MyStruct.CharacterStateInfoSPtr->DataChanged();
+			MyStruct.SPtr = GameplayAbilityTargetDataSPtr;
+
+			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(MyStruct.CharacterStateInfoSPtr);
+
+			DurationEffectMap.Add(
+				GameplayAbilityTargetDataSPtr->Tag,
+				MyStruct
+			);
+
+			PerformPropertyModify(GameplayAbilityTargetDataSPtr);
+		}
 	}
 }
 
 void UCS_PeriodicPropertyModify::SetCache(const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataSPtr)
 {
 	CacheSPtr = GameplayAbilityTargetDataSPtr;
-	if (GameplayAbilityTargetDataSPtr->bOnluReFreshTime)
-	{
-	}
-	else
-	{
-		GameplayAbilityTargetDataAry.Add(GameplayAbilityTargetDataSPtr);
-	}
 }
 
 void UCS_PeriodicPropertyModify::PerformAction()
@@ -112,190 +201,106 @@ void UCS_PeriodicPropertyModify::PerformAction()
 
 void UCS_PeriodicPropertyModify::ExcuteTasks()
 {
-	if (GameplayAbilityTargetDataAry.IsValidIndex(0))
+	TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
+	TaskPtr->SetInfinite();
+	TaskPtr->ReadyForActivation();
+
+	UpdateDuration();
+}
+
+void UCS_PeriodicPropertyModify::OnTaskTick(
+	UAbilityTask_TimerHelper*,
+	float DeltaTime
+)
+{
+	for (auto& Iter : DurationEffectMap)
 	{
-		auto GameplayAbilityTargetDataSPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
-		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-
-		if (GameplayAbilityTargetDataSPtr->PerformActionInterval < 0.f)
-		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-
-			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
-		}
-		else
-		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
-			TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
-
-			OnInterval(TaskPtr, GameplayAbilityTargetDataSPtr->PerformActionInterval, GameplayAbilityTargetDataSPtr->PerformActionInterval);
-		}
-		
-		if (GameplayAbilityTargetDataSPtr->LosePropertyNumInterval < 0.f)
-		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
-			TaskPtr->OnFinished.BindLambda(std::bind(&ThisClass::OnTaskFinished, this, std::placeholders::_1));
-		}
-		else
-		{
-			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration, GameplayAbilityTargetDataSPtr->PerformActionInterval);
-			TaskPtr->OnFinished.BindLambda(std::bind(&ThisClass::OnTaskFinished_Continue, this, std::placeholders::_1));
-		}
-
-		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
-		TaskPtr->ReadyForActivation();
+		Iter.Value.EffectTime += DeltaTime;
+		Iter.Value.CharacterStateInfoSPtr->IncreaseCooldownTime(DeltaTime);
 	}
-	else
+
+	const auto Temp = DurationEffectMap;
+	for (const auto& Iter : Temp)
+	{
+		// 到期的
+		if (Iter.Value.CharacterStateInfoSPtr->GetIsFinished())
+		{
+			if ((Iter.Value.SPtr->LosePropertyNumInterval < 0.f) || Iter.Value.SPtr->bIsClear)
+			{
+				PerformPropertyModify(Iter.Value.SPtr);
+
+				DurationEffectMap.Remove(Iter.Key);
+
+				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
+			}
+			else
+			{
+				if (Iter.Value.SPtr->ModifyPropertyPerLayer.IsEmpty())
+				{
+					PerformPropertyModify(Iter.Value.SPtr);
+
+					DurationEffectMap.Remove(Iter.Key);
+					CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
+				}
+				else
+				{
+					Iter.Value.SPtr->ModifyPropertyPerLayer.RemoveAt(Iter.Value.SPtr->ModifyPropertyPerLayer.Num() - 1);
+					Iter.Value.CharacterStateInfoSPtr->Duration = Iter.Value.SPtr->LosePropertyNumInterval;
+					Iter.Value.CharacterStateInfoSPtr->RefreshTime();
+
+					PerformPropertyModify(Iter.Value.SPtr);
+				}
+			}
+		}
+		else
+		{
+			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Iter.Value.CharacterStateInfoSPtr);
+		}
+	}
+
+	// 修改属性
+	for (auto& Iter : DurationEffectMap)
+	{
+		if (Iter.Value.SPtr->PerformActionInterval < 0.f)
+		{
+
+		}
+		else if (Iter.Value.EffectTime >= Iter.Value.SPtr->PerformActionInterval)
+		{
+			Iter.Value.EffectTime = 0.f;
+			PerformPropertyModify(Iter.Value.SPtr);
+		}
+	}
+
+	if (DurationEffectMap.IsEmpty())
 	{
 		K2_CancelAbility();
 	}
 }
 
-void UCS_PeriodicPropertyModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& SPtr)
 {
-	if (CurrentInterval >= Interval)
+	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
+
+	GAEventDataPtr->TriggerCharacterPtr = SPtr->TriggerCharacterPtr;
+
+	FGAEventData GAEventData(SPtr->TargetCharacterPtr, SPtr->TriggerCharacterPtr);
+
+	GAEventData.DataSource = SPtr->Tag;
+	GAEventData.bIsOverlapData = !SPtr->bIsAdd;
+
+	if (SPtr->ModifyPropertyPerLayer.IsEmpty())
 	{
-		if (GameplayAbilityTargetDataAry.IsValidIndex(0))
-		{
-			// 数值修改 不会被移除
-
-
-			// 直接修改的属性，会移除
-			{
-				auto GameplayAbilityTargetDataSPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
-
-				GameplayAbilityTargetDataSPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
-					GameplayAbilityTargetDataSPtr->ModifyPropertyMap, GameplayAbilityTargetDataSPtr->Tag
-				);
-			}
-		}
-	}
-}
-
-void UCS_PeriodicPropertyModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Duration)
-{
-	if (CurrentInterval > Duration)
-	{
-		if (GameplayAbilityTargetDataAry.IsValidIndex(0))
-		{
-		}
+		// 
+		GAEventData.bIsClearData = true;
 	}
 	else
 	{
+		GAEventData.DataModify = SPtr->ModifyPropertyPerLayer[SPtr->ModifyPropertyPerLayer.Num() - 1];
 	}
-}
 
-bool UCS_PeriodicPropertyModify::OnTaskFinished_Continue(UAbilityTask_TimerHelper* InTaskPtr)
-{
-	if (GameplayAbilityTargetDataAry.IsValidIndex(0))
-	{
-		auto GameplayAbilityTargetDataSPtr = GameplayAbilityTargetDataAry[GameplayAbilityTargetDataAry.Num() - 1];
+	GAEventDataPtr->DataAry.Add(GAEventData);
 
-		GameplayAbilityTargetDataAry.RemoveAt(GameplayAbilityTargetDataAry.Num() - 1);
-
-
-		// 移除周期内的属性(按层数)
-		{
-			for (auto& Iter : GameplayAbilityTargetDataSPtr->ModifyPropertyMap)
-			{
-				Iter.Value.SetCurrentValue(-Iter.Value.GetCurrentValue());
-			}
-
-			GameplayAbilityTargetDataSPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
-				GameplayAbilityTargetDataSPtr->ModifyPropertyMap, GameplayAbilityTargetDataSPtr->Tag
-			);
-		}
-
-		if (GameplayAbilityTargetDataAry.IsEmpty())
-		{
-			// 
-			GameplayAbilityTargetDataSPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(
-				GameplayAbilityTargetDataSPtr->ModifyPropertyMap, GameplayAbilityTargetDataSPtr->Tag
-			);
-		}
-		else
-		{
-			TaskPtr->UpdateDuration();
-			TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->LosePropertyNumInterval);
-		}
-
-		return false;
-	}
-	else
-	{
-		K2_CancelAbility();
-		return true;
-	}
-}
-
-bool UCS_PeriodicPropertyModify::OnTaskFinished(UAbilityTask_TimerHelper* InTaskPtr)
-{
-	K2_CancelAbility();
-	return true;
-}
-
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal) :
-	Super(RightVal->GetUnitType())
-{
-	Duration = RightVal->GetTableRowUnit_Consumable()->Duration;
-	PerformActionInterval = RightVal->GetTableRowUnit_Consumable()->PerformActionInterval;
-	ModifyPropertyMap = RightVal->GetTableRowUnit_Consumable()->ModifyPropertyMap;
-	DefaultIcon = RightVal->GetIcon();
-	LosePropertyNumInterval = -1.f;
-}
-
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify()
-{
-
-}
-
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
-	const FGameplayTag& Tag,
-	TSoftObjectPtr<UTexture2D>Icon,
-	float InDuration,
-	float InPerformActionInterval,
-	float InLosePropertyNumInterval,
-	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap
-):
-	Super(Tag),
-	Duration(InDuration),
-	PerformActionInterval(InPerformActionInterval),
-	LosePropertyNumInterval(InLosePropertyNumInterval),
-	ModifyPropertyMap(InModifyPropertyMap)
-{
-	DefaultIcon = Icon;
-}
-
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
-	const FGameplayTag& Tag,
-	bool bInOnluReFreshTime,
-	float InDuration,
-	float InLosePropertyNumInterval
-) :
-	Super(Tag),
-	Duration(InDuration),
-	LosePropertyNumInterval(InLosePropertyNumInterval),
-	bOnluReFreshTime(bInOnluReFreshTime)
-{
-}
-
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
-	const FGameplayTag& Tag,
-	bool bClear
-	):
-	Super(Tag)
-{
-	bOnluReFreshTime = true;
-	Duration = 0.f;
-	bIsClear = bClear;
-}
-
-FGameplayAbilityTargetData_PropertyModify* FGameplayAbilityTargetData_PropertyModify::Clone() const
-{
-	auto ResultPtr =
-		new FGameplayAbilityTargetData_PropertyModify;
-
-	*ResultPtr = *this;
-
-	return ResultPtr;
+	CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
 }

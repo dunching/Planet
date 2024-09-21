@@ -110,7 +110,7 @@ void USkill_Consumable_Test::EmitEffect()
 
 	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-	GAEventData.HP = HP;
+	GAEventData.DataModify.Add(ECharacterPropertyType::HP, HP);
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 

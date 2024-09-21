@@ -94,7 +94,7 @@ public:
 	TSharedPtr<FCoinProxy> AddUnit_Coin(const FGameplayTag& UnitType, int32 Num);
 
 
-	TSharedPtr <FConsumableProxy> AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num = 1);
+	TSharedPtr<FConsumableProxy> AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num = 1);
 
 	void RemoveUnit_Consumable(const TSharedPtr <FConsumableProxy>& UnitPtr, int32 Num = 1);
 

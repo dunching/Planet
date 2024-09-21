@@ -23,6 +23,8 @@ public:
 
 	FBaseProperty(int32 Value);
 
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	int32 GetCurrentValue() const;
 
 	void SetCurrentValue(int32 val);

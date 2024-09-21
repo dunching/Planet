@@ -18,11 +18,6 @@ struct FConsumableProxy;
 class UGA_Tool_Periodic;
 class UGameplayAbility;
 
-struct FGameplayAbilityTargetData_Consumable : public FGameplayAbilityTargetData
-{
-	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
-};
-
 UCLASS()
 class USkill_Consumable_Generic : public USkill_Consumable_Base
 {

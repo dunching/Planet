@@ -122,13 +122,15 @@ void USkill_Base::ResetPreviousStageActions()
 	ResetListLock();
 }
 
-UScriptStruct* FGameplayAbilityTargetData_RegisterParam::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_SkillBase::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_RegisterParam::StaticStruct();
+	return FGameplayAbilityTargetData_SkillBase::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_SkillBase::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
 	if (Ar.IsSaving())
 	{
 		Ar << ProxyID;
@@ -139,31 +141,4 @@ bool FGameplayAbilityTargetData_RegisterParam::NetSerialize(FArchive& Ar, class 
 	}
 
 	return true;
-}
-
-FGameplayAbilityTargetData_RegisterParam* FGameplayAbilityTargetData_RegisterParam::Clone() const
-{
-	auto ResultPtr =
-		new FGameplayAbilityTargetData_RegisterParam;
-
-	*ResultPtr = *this;
-
-	return ResultPtr;
-}
-
-bool FGameplayAbilityTargetData_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
-{
-	Ar << ID;
-
-	return true;
-}
-
-FGameplayAbilityTargetData_ActiveParam* FGameplayAbilityTargetData_ActiveParam::Clone() const
-{
-	auto ResultPtr =
-		new FGameplayAbilityTargetData_ActiveParam;
-
-	*ResultPtr = *this;
-
-	return ResultPtr;
 }

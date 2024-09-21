@@ -21,6 +21,97 @@
 
 FName UCDCaculatorComponent::ComponentName = TEXT("CDCaculatorComponent");
 
+FSkillCooldownHelper::FSkillCooldownHelper()
+{
+
+}
+
+bool FSkillCooldownHelper::CheckCooldown() const
+{
+	if (CooldownTime > 0.f)
+	{
+		return CooldownConsumeTime > CooldownTime;
+	}
+	else
+	{
+		return true;
+	}
+}
+
+void FSkillCooldownHelper::IncreaseCooldownTime(float DeltaTime)
+{
+	CooldownConsumeTime += DeltaTime;
+}
+
+void FSkillCooldownHelper::AddCooldownConsumeTime(float NewTime)
+{
+	IncreaseCooldownTime(NewTime);
+}
+
+void FSkillCooldownHelper::FreshCooldownTime()
+{
+	CooldownConsumeTime = CooldownTime + UGameOptions::GetInstance()->ResetCooldownTime;
+}
+
+void FSkillCooldownHelper::ResetCooldownTime()
+{
+	CooldownConsumeTime = 0.f;
+}
+
+void FSkillCooldownHelper::OffsetCooldownTime()
+{
+	CooldownConsumeTime = CooldownTime - UGameOptions::GetInstance()->ResetCooldownTime;
+}
+
+void FSkillCooldownHelper::SetCooldown(float CooldDown)
+{
+	CooldownTime = CooldDown;
+}
+
+bool FSkillCooldownHelper::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+{
+	if (CooldownTime < 0.f)
+	{
+		const auto Remaining = CooldownTime - CooldownConsumeTime;
+
+		if (Remaining <= 0.f)
+		{
+			RemainingCooldown = 0.f;
+
+			RemainingCooldownPercent = 1.f;
+
+			return true;
+		}
+		else
+		{
+			RemainingCooldown = Remaining;
+
+			RemainingCooldownPercent = RemainingCooldown / UGameOptions::GetInstance()->ResetCooldownTime;
+
+			return false;
+		}
+	}
+
+	const auto Remaining = CooldownTime - CooldownConsumeTime;
+
+	if (Remaining <= 0.f)
+	{
+		RemainingCooldown = 0.f;
+
+		RemainingCooldownPercent = 1.f;
+
+		return true;
+	}
+	else
+	{
+		RemainingCooldown = Remaining;
+
+		RemainingCooldownPercent = RemainingCooldown / CooldownTime;
+
+		return false;
+	}
+}
+
 UCDCaculatorComponent::UCDCaculatorComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
@@ -149,6 +240,7 @@ void UCDCaculatorComponent::ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr)
 TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FActiveSkillProxy* ActiveSkillUnitPtr) const
 {
 	TSharedPtr<FSkillCooldownHelper> MaxCD = nullptr;
+
 	// 独立CD
 	{
 		auto SkillCooldownInfoMap = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->SkillCooldownInfoMap;
@@ -160,6 +252,104 @@ TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FActiv
 
 	// 公共CD
 	auto SkillCommonCooldownInfoMap = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->SkillCommonCooldownInfoMap;
+	for (const auto Iter : SkillCommonCooldownInfoMap)
+	{
+		if (Common_Map.Contains(Iter))
+		{
+			auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+			if (CommonCooldownInfoPtr)
+			{
+				return Common_Map[Iter];
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+void UCDCaculatorComponent::ApplyCooldown(FConsumableProxy* ConsumableProxySPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		// 独立CD
+		{
+			const auto CD = ConsumableProxySPtr->GetTableRowUnit_Consumable()->CD;
+			if (Separate_Map.Contains(ConsumableProxySPtr->GetID()))
+			{
+				auto CDSPtr = Separate_Map[ConsumableProxySPtr->GetID()];
+				CDSPtr->SetCooldown(CD);
+				CDSPtr->ResetCooldownTime();
+
+				CD_FASI_Container.UpdateItem(CDSPtr);
+			}
+			else
+			{
+				TSharedPtr<FSkillCooldownHelper> SkillCooldownHelperSPtr = MakeShared<FSkillCooldownHelper>();
+
+				SkillCooldownHelperSPtr->SkillProxy_ID = ConsumableProxySPtr->GetID();
+
+				SkillCooldownHelperSPtr->SetCooldown(CD);
+				SkillCooldownHelperSPtr->ResetCooldownTime();
+
+				Separate_Map.Add(ConsumableProxySPtr->GetID(), SkillCooldownHelperSPtr);
+
+				CD_FASI_Container.AddItem(SkillCooldownHelperSPtr);
+			}
+		}
+
+		// 公共CD
+		auto SkillCommonCooldownInfoMap = ConsumableProxySPtr->GetTableRowUnit_Consumable()->CommonCooldownInfoMap;
+		for (const auto Iter : SkillCommonCooldownInfoMap)
+		{
+			if (Common_Map.Contains(Iter))
+			{
+				auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+				if (CommonCooldownInfoPtr)
+				{
+					auto CDSPtr = Common_Map[Iter];
+					CDSPtr->SetCooldown(CommonCooldownInfoPtr->CoolDownTime);
+					CDSPtr->ResetCooldownTime();
+
+					CD_FASI_Container.UpdateItem(CDSPtr);
+				}
+			}
+			else
+			{
+				TSharedPtr<FSkillCooldownHelper> SkillCooldownHelperSPtr = MakeShared<FSkillCooldownHelper>();
+
+				SkillCooldownHelperSPtr->SkillType = Iter;
+
+				auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+				if (CommonCooldownInfoPtr)
+				{
+					SkillCooldownHelperSPtr->SetCooldown(CommonCooldownInfoPtr->CoolDownTime);
+					SkillCooldownHelperSPtr->ResetCooldownTime();
+				}
+
+				Common_Map.Add(Iter, SkillCooldownHelperSPtr);
+
+				CD_FASI_Container.AddItem(SkillCooldownHelperSPtr);
+			}
+		}
+	}
+#endif
+}
+
+TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FConsumableProxy* ConsumableProxySPtr) const
+{
+	TSharedPtr<FSkillCooldownHelper> MaxCD = nullptr;
+
+	// 独立CD
+	{
+		if (Separate_Map.Contains(ConsumableProxySPtr->GetID()))
+		{
+			return Separate_Map[ConsumableProxySPtr->GetID()];
+		}
+	}
+
+	// 公共CD
+	auto SkillCommonCooldownInfoMap = ConsumableProxySPtr->GetTableRowUnit_Consumable()->CommonCooldownInfoMap;
 	for (const auto Iter : SkillCommonCooldownInfoMap)
 	{
 		if (Common_Map.Contains(Iter))

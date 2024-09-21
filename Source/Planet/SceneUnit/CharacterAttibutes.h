@@ -193,11 +193,15 @@ struct PLANET_API FCharacterAttributes final
 
 	// 攻击力穿透
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet ADPenetration;
+	FBasePropertySet AD_Penetration;
 
 	// 攻击力百分比穿透
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet ADPercentPenetration;
+	FBasePropertySet AD_PercentPenetration;
+	
+	// AD 抗性
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet AD_Resistance;
 	
 	// 元素强度
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -205,15 +209,15 @@ struct PLANET_API FCharacterAttributes final
 
 	// 元素穿透
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet APPenetration;
+	FBasePropertySet AP_Penetration;
 
 	// 元素百分比穿透
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet APPercentPenetration;
+	FBasePropertySet AP_PercentPenetration;
 
-	// 护甲
+	// 元素 抗性
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet Resistance;
+	FBasePropertySet AP_Resistance;
 
 	// 攻击速度、技能释放速度
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -225,7 +229,7 @@ struct PLANET_API FCharacterAttributes final
 
 	// 生命值回复速率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet HPReplay;
+	FBasePropertySet HP_Replay;
 
 	// 体力
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -233,7 +237,7 @@ struct PLANET_API FCharacterAttributes final
 
 	// 体力回复速率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet PPReplay;
+	FBasePropertySet PP_Replay;
 	
 	// 法力值
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -241,7 +245,7 @@ struct PLANET_API FCharacterAttributes final
 
 	// 法力速率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet ManaReplay;
+	FBasePropertySet Mana_Replay;
 
 	// 闪避几率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

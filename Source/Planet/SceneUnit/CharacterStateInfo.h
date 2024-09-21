@@ -26,11 +26,19 @@ struct PLANET_API FCharacterStateInfo
 
 	FCharacterStateInfo();
 
+	bool GetIsFinished()const;
+
 	float GetRemainTime()const ;
 
 	float GetRemainTimePercent()const;
 
-	// 总时间
+	void SetFinished();
+
+	void RefreshTime();
+
+	void IncreaseCooldownTime(float DeltaTime);
+
+	// 总时间. 若 < 0 则为永久
 	float Duration = -1.f;
 
 	// 已过去的时间

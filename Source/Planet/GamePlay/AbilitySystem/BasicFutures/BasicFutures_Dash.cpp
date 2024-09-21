@@ -109,7 +109,7 @@ bool UBasicFutures_Dash::CommitAbility(
 
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-		GAEventData.PP = Consume;
+		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -Consume);
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 

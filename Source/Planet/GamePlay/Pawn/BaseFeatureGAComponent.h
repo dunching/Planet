@@ -143,13 +143,9 @@ public:
 
 protected:
 
-	void AddSendGroupEffectModify();
+	void AddSendBaseModify();
 
-	void AddSendWuXingModify();
-
-	void AddReceivedWuXingModify();
-
-	void AddReceivedModify();
+	void AddReceivedBaseModify();
 
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")

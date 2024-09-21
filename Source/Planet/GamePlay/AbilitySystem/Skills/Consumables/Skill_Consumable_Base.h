@@ -11,14 +11,41 @@
 #include "Skill_Consumable_Base.generated.h"
 
 class AConsumable_Base;
+class ACharacterBase;
+
+USTRUCT()
+struct FGameplayAbilityTargetData_Consumable : 
+	public FGameplayAbilityTargetData_RegisterParam
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
+	FGuid ProxyID;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Consumable> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Consumable>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
 
 UCLASS()
 class USkill_Consumable_Base : 
-	public USkill_Base
+	public UPlanetGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
+
+	using FRegisterParamType = FGameplayAbilityTargetData_Consumable;
 
 	USkill_Consumable_Base();
 
@@ -69,6 +96,8 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	);
+
+	ACharacterBase* CharacterPtr = nullptr;
 
 	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
 

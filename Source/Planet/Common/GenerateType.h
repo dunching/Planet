@@ -28,10 +28,17 @@ enum class ECharacterPropertyType : uint8
 	SoilElement,
 	
 	HP,
+	PP,
+	Mana,
 
-	BaseAttackPower,
-	Penetration,
-	PercentPenetration,
+	AD,
+	AD_Penetration,
+	AD_PercentPenetration,
+
+	AP,
+	AP_Penetration,
+	AP_PercentPenetration,
+
 	Resistance,
 	GAPerformSpeed,
 	Evade,

@@ -32,12 +32,6 @@
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_PeriodicStateModify_SuperArmor.h"
 
-static TAutoConsoleVariable<int32> Skill_Active_Stun_DrawDebug(
-	TEXT("Skill_Active_Stun.DrawDebug"),
-	0,
-	TEXT("")
-	TEXT(" default: 0"));
-
 USkill_Active_SuperArmor::USkill_Active_SuperArmor() :
 	Super()
 {

@@ -278,7 +278,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			{
 				FirstWeaponSocketInfoSPtr->ProxySPtr = IconPtr->UnitPtr;
 			}
-			EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr);
+			EICPtr->UpdateSocket(FirstWeaponSocketInfoSPtr);
 		}
 		{
 			auto SecondWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
@@ -289,7 +289,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			{
 				SecondWeaponSocketInfoSPtr->ProxySPtr = IconPtr->UnitPtr;
 			}
-			EICPtr->RegisterWeapon(SecondWeaponSocketInfoSPtr);
+			EICPtr->UpdateSocket(SecondWeaponSocketInfoSPtr);
 		}
 	}
 
@@ -328,7 +328,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 				{
 					SkillsSocketInfo->ProxySPtr = DynamicCastSharedPtr<FSkillProxy>(IconPtr->BasicUnitPtr);
 				}
-				EICPtr->RegisterMultiGAs(SkillsSocketInfo);
+				EICPtr->UpdateSocket(SkillsSocketInfo);
 			}
 		}
 	}
@@ -363,7 +363,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 					SkillsSocketInfo->ProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(IconPtr->BasicUnitPtr);
 
 				}
-				EICPtr->Update(SkillsSocketInfo);
+				EICPtr->UpdateSocket(SkillsSocketInfo);
 			}
 		}
 	}
@@ -537,7 +537,7 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 }
 
 void UAllocationSkillsMenu::ResetBackpack(
-	const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr, 
+	const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr,
 	const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
 )
 {

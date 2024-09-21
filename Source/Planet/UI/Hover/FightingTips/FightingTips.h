@@ -18,7 +18,7 @@ class UFightingTipsItem;
 class UToolIcon;
 
 /**
- *
+ * 浮动跳字
  */
 UCLASS()
 class PLANET_API UFightingTips : public UMyUserWidget

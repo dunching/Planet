@@ -12,55 +12,6 @@
 #include "SceneUnitContainer.h"
 #include "HoldingItemsComponent.h"
 
-bool FAllocation_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
-{
-	const auto Result =
-		FFastArraySerializer::FastArrayDeltaSerialize<FItemType, FContainerType>(Items, DeltaParms, *this);
-
-	return Result;
-}
-
-void FAllocation_FASI_Container::AddItem(const TSharedPtr<FItemType>& ProxySPtr)
-{
-#if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
-	{
-		if (ProxySPtr)
-		{
-			FItemType Item;
-
-			Item = *ProxySPtr;
-
-			auto& Ref = Items.Add_GetRef(Item);
-
-			MarkItemDirty(Ref);
-		}
-	}
-#endif
-}
-
-void FAllocation_FASI_Container::UpdateItem(const TSharedPtr<FItemType>& ProxySPtr)
-{
-#if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
-	{
-		if (ProxySPtr)
-		{
-			for (int32 Index = 0; Index < Items.Num(); Index++)
-			{
-				if (Items[Index].Socket == ProxySPtr->Socket)
-				{
-					Items[Index] = *ProxySPtr;
-
-					MarkItemDirty(Items[Index]);
-					return;
-				}
-			}
-		}
-	}
-#endif
-}
-
 void FSocket_FASI::PreReplicatedRemove(const FAllocation_FASI_Container& InArraySerializer)
 {
 
@@ -68,7 +19,49 @@ void FSocket_FASI::PreReplicatedRemove(const FAllocation_FASI_Container& InArray
 
 void FSocket_FASI::PostReplicatedAdd(const FAllocation_FASI_Container& InArraySerializer)
 {
-	PostReplicatedChange(InArraySerializer);
+	// 在这里 我们对本地的数据进行绑定
+
+	TSharedPtr<FSocket_FASI> SPtr = MakeShared<FSocket_FASI>();
+
+	if (ProxySPtr)
+	{
+		const auto UnitType = ProxySPtr->GetUnitType();
+
+		if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+		{
+			auto TempProxySPtr = InArraySerializer.HoldingItemsComponentPtr->FindUnit_Weapon(ProxySPtr->GetID());
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+		{
+			auto TempProxySPtr = InArraySerializer.HoldingItemsComponentPtr->FindUnit_Skill(ProxySPtr->GetID());
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+		{
+			auto TempProxySPtr = InArraySerializer.HoldingItemsComponentPtr->FindUnit_Skill(ProxySPtr->GetID());
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+		{
+			auto TempProxySPtr = InArraySerializer.HoldingItemsComponentPtr->FindProxy(ProxySPtr->GetID());
+
+			ProxySPtr = TempProxySPtr;
+		}
+
+		*SPtr = *this;
+
+		InArraySerializer.UnitProxyProcessComponentPtr->Add(SPtr);
+	}
+	else
+	{
+		*SPtr = *this;
+
+		InArraySerializer.UnitProxyProcessComponentPtr->Add(SPtr);
+	}
 }
 
 void FSocket_FASI::PostReplicatedChange(const FAllocation_FASI_Container& InArraySerializer)
@@ -96,6 +89,12 @@ void FSocket_FASI::PostReplicatedChange(const FAllocation_FASI_Container& InArra
 		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
 		{
 			auto TempProxySPtr = InArraySerializer.HoldingItemsComponentPtr->FindUnit_Skill(ProxySPtr->GetID());
+
+			ProxySPtr = TempProxySPtr;
+		}
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+		{
+			auto TempProxySPtr = InArraySerializer.HoldingItemsComponentPtr->FindProxy(ProxySPtr->GetID());
 
 			ProxySPtr = TempProxySPtr;
 		}
@@ -195,4 +194,58 @@ bool FSocket_FASI::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 	}
 
 	return true;
+}
+
+bool FSocket_FASI::operator==(const FSocket_FASI& Right) const
+{
+	return true;
+}
+
+bool FAllocation_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
+{
+	const auto Result =
+		FFastArraySerializer::FastArrayDeltaSerialize<FItemType, FContainerType>(Items, DeltaParms, *this);
+
+	return Result;
+}
+
+void FAllocation_FASI_Container::AddItem(const TSharedPtr<FItemType>& ProxySPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (ProxySPtr)
+		{
+			FItemType Item;
+
+			Item = *ProxySPtr;
+
+			auto& Ref = Items.Add_GetRef(Item);
+
+			MarkItemDirty(Ref);
+		}
+	}
+#endif
+}
+
+void FAllocation_FASI_Container::UpdateItem(const TSharedPtr<FItemType>& ProxySPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (ProxySPtr)
+		{
+			for (int32 Index = 0; Index < Items.Num(); Index++)
+			{
+				if (Items[Index].Socket == ProxySPtr->Socket)
+				{
+					Items[Index] = *ProxySPtr;
+
+					MarkItemDirty(Items[Index]);
+					return;
+				}
+			}
+		}
+	}
+#endif
 }

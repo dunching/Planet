@@ -154,7 +154,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 				{
 					FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-					GAEventData.HP = TreatmentVolume;
+					GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
 
 					GAEventDataPtr->DataAry.Add(GAEventData);
 
