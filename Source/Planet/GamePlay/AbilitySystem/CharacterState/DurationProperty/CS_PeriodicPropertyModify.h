@@ -34,7 +34,7 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 		float InPerformActionInterval,
 		float InLosePropertyNumInterval,
 		const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap
-		);
+	);
 
 	FGameplayAbilityTargetData_PropertyModify(
 		const FGameplayTag& Tag,
@@ -44,7 +44,7 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 	);
 
 	FGameplayAbilityTargetData_PropertyModify(
-		const FGameplayTag& Tag,bool bClear
+		const FGameplayTag& Tag, bool bClear
 	);
 
 	FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal);
@@ -62,14 +62,18 @@ private:
 	// < 0 为只执行一次 属性修改
 	float PerformActionInterval = -1.f;
 
-	// < 0 为移除所有层数
+	// 到期之后每层的移除间隔。 < 0 为移除所有层数
 	float LosePropertyNumInterval = -1.f;
 
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+	// 层数, 仅会使用最后一位
+	TArray<TMap<ECharacterPropertyType, FBaseProperty>>ModifyPropertyPerLayer;
 
+	bool bIsAdd = true;
+
+	// 清除所有层数
 	bool bIsClear = false;
 
-	bool bOnluReFreshTime = false;
+	bool bIsOnlyReFreshTime = false;
 
 };
 
@@ -115,17 +119,27 @@ protected:
 
 	void ExcuteTasks();
 
-	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+	virtual void OnTaskTick(
+		UAbilityTask_TimerHelper*,
+		float DeltaTime
+	);
 
-	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
+	void PerformPropertyModify(const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& SPtr);
 
-	bool OnTaskFinished_Continue(UAbilityTask_TimerHelper* TaskPtr);
-
-	bool OnTaskFinished(UAbilityTask_TimerHelper* TaskPtr);
-
-	TArray<TSharedPtr<FGameplayAbilityTargetData_PropertyModify>>GameplayAbilityTargetDataAry;
-
+	// Transient
 	TSharedPtr<FGameplayAbilityTargetData_PropertyModify>CacheSPtr;
+
+	struct FMyStruct
+	{
+		TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr;
+
+		float EffectTime = 0.f;
+
+		TSharedPtr<FGameplayAbilityTargetData_PropertyModify> SPtr;
+	};
+
+	// 
+	TMap<FGameplayTag, FMyStruct>DurationEffectMap;
 
 	// 计时Task
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;

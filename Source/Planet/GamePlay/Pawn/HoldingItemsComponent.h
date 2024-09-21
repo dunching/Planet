@@ -39,7 +39,7 @@ public:
 
 	using FOnGroupmateUnitChanged = TCallbackHandleContainer<void(const TSharedPtr < FCharacterProxy>&, bool)>;
 
-	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(const TSharedPtr < FConsumableProxy>&, bool, int32)>;
+	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(const TSharedPtr < FConsumableProxy>&, EProxyModifyType)>;
 
 	using FOnCoinUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FCoinProxy>&, bool, int32)>;
 
@@ -48,6 +48,8 @@ public:
 	static FName ComponentName;
 
 	UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer);
+
+	TSharedPtr<FCharacterProxy> InitialDefaultCharacter();
 
 #if UE_EDITOR || UE_CLIENT
 	TSharedPtr<FBasicProxy> AddProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
@@ -61,8 +63,6 @@ public:
 
 	TSharedPtr<FBasicProxy> FindProxy(const IDType& ID);
 
-
-	TSharedPtr<FCharacterProxy> InitialDefaultCharacter();
 
 	TSharedPtr<FCharacterProxy> AddUnit_Character(const FGameplayTag& UnitType);
 
@@ -94,11 +94,13 @@ public:
 	TSharedPtr<FCoinProxy> AddUnit_Coin(const FGameplayTag& UnitType, int32 Num);
 
 
-	TSharedPtr <FConsumableProxy> AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num = 1);
+	TSharedPtr<FConsumableProxy> AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num = 1);
 
 	void RemoveUnit_Consumable(const TSharedPtr <FConsumableProxy>& UnitPtr, int32 Num = 1);
 
+
 	TSharedPtr<FToolProxy> AddUnit_ToolUnit(const FGameplayTag& UnitType);
+
 
 	const TArray<TSharedPtr<FBasicProxy>>& GetSceneUintAry()const;
 
@@ -111,15 +113,16 @@ public:
 	void AddUnit_Apending(FGameplayTag UnitType, int32 Num, FGuid Guid);
 
 	void SyncApendingUnit(FGuid Guid);
-	
+
+
 	// 同步到服務器
 	UFUNCTION(Server, Reliable)
 	void SetAllocationCharacterUnit(
 		const FGuid& Proxy_ID,
 		const FGuid& CharacterProxy_ID
 	);
-	
-	UPROPERTY(ReplicatedUsing = OnRep_ProxyChanged)
+
+	UPROPERTY(Replicated)
 	FProxy_FASI_Container Proxy_Container;
 
 	FOnSkillUnitChanged OnSkillUnitChanged;
@@ -139,9 +142,6 @@ protected:
 	virtual void BeginPlay()override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	UFUNCTION()
-	void OnRep_ProxyChanged();
 
 private:
 

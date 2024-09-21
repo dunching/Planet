@@ -15,15 +15,6 @@ UBasicFutures_Affected::UBasicFutures_Affected() :
 
 }
 
-void UBasicFutures_Affected::PostCDOContruct()
-{
-	Super::PostCDOContruct();
-
-	if (GetWorldImp())
-	{
-	}
-}
-
 void UBasicFutures_Affected::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
@@ -87,14 +78,7 @@ void UBasicFutures_Affected::InitialTags()
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
 
 	// 在“霸体”时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->SuperArmor);
-
-	FAbilityTriggerData AbilityTriggerData;
-
-	AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Affected;
-	AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-	AbilityTriggers.Add(AbilityTriggerData);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
 }
 
 void UBasicFutures_Affected::PerformAction(EAffectedDirection AffectedDirection)

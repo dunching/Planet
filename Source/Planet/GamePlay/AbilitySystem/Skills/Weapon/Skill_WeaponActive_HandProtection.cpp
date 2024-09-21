@@ -253,7 +253,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 			}
 		}
 
-		auto SkillsAry = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
+		auto SkillsAry = CharacterPtr->GetInteractiveSkillComponent()->GetAllSocket();
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{

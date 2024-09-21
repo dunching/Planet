@@ -10,6 +10,8 @@ AConsumable_Test::AConsumable_Test(const FObjectInitializer& ObjectInitializer) 
 {
 	StaticComponentPtr = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticComponentPtr->SetupAttachment(RootComponent);
+
+	SetReplicates(true);
 }
 
 void AConsumable_Test::Interaction(ACharacterBase* CharacterPtr)

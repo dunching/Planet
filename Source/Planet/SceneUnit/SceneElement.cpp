@@ -1,6 +1,8 @@
 
 #include "SceneElement.h"
 
+#include "AbilitySystemComponent.h"
+
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "CharacterBase.h"
@@ -27,6 +29,7 @@
 #include "Weapon_RangeTest.h"
 #include "HoldingItemsComponent.h"
 #include "CDCaculatorComponent.h"
+#include "Skill_Consumable_Generic.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -204,8 +207,50 @@ FConsumableProxy::FConsumableProxy()
 
 }
 
+bool FConsumableProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << Num;
+
+	return true;
+}
+
 bool FConsumableProxy::Active()
 {
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		auto GameplayAbilityTargetPtr =
+			new FGameplayAbilityTargetData_Consumable;
+
+		// Test
+		GameplayAbilityTargetPtr->ProxyID = GetID();
+
+		const auto InputID = FMath::Rand32();
+		FGameplayAbilitySpec AbilitySpec(
+			USkill_Consumable_Generic::StaticClass(),
+			1,
+			InputID
+		);
+
+		auto GameplayEventData = MakeShared<FGameplayEventData>();
+		GameplayEventData->TargetData.Add(GameplayAbilityTargetPtr);
+
+		auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+			InputID,
+			*GameplayEventData
+		);
+
+		auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+		ASCPtr->GiveAbilityAndActivateOnce(
+			AbilitySpec
+		);
+	}
+#endif
+
 	return true;
 }
 
@@ -233,56 +278,27 @@ FTableRowUnit_Consumable* FConsumableProxy::GetTableRowUnit_Consumable() const
 
 bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	auto MaxRemainingCooldown = -1.f;
-	auto MaxRemainingCooldownPercent = -1.f;
-
-	auto CurResult = true;
-	auto CurRemainingCooldown = -1.f;
-	auto CurRemainingCooldownPercent = -1.f;
-
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CDSPtr = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->GetCooldown(
 		this
 	);
 
-	for (auto Iter : CooldownMap)
+	if (CDSPtr)
 	{
-		if (Iter.Value.IsValid())
-		{
-			CurResult = Iter.Value.Pin()->GetRemainingCooldown(CurRemainingCooldown, CurRemainingCooldownPercent);
-			if (CurResult)
-			{
-				continue;
-			}
-
-			if (CurRemainingCooldown > MaxRemainingCooldown)
-			{
-				MaxRemainingCooldown = CurRemainingCooldown;
-				MaxRemainingCooldownPercent = CurRemainingCooldownPercent;
-			}
-		}
+		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 	}
 
-	RemainingCooldown = MaxRemainingCooldown;
-	RemainingCooldownPercent = MaxRemainingCooldownPercent;
-
-	return CurResult;
+	return true;
 }
 
 bool FConsumableProxy::CheckCooldown() const
 {
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
+	auto CDSPtr = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->GetCooldown(
 		this
 	);
 
-	for (auto Iter : CooldownMap)
+	if (CDSPtr)
 	{
-		if (Iter.Value.IsValid())
-		{
-			if (!Iter.Value.Pin()->CheckCooldown())
-			{
-				return false;
-			}
-		}
+		return CDSPtr->CheckCooldown();
 	}
 
 	return true;
@@ -294,35 +310,17 @@ void FConsumableProxy::AddCooldownConsumeTime(float NewTime)
 
 void FConsumableProxy::FreshUniqueCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetCooldown(
-		this
-	);
-
-	// 获取当前技能CD
-	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
-	{
-		CooldownMap[GetUnitType()].Pin()->FreshCooldownTime();
-	}
 }
 
 void FConsumableProxy::ApplyCooldown()
 {
-	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
+	AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCDCaculatorComponent()->ApplyCooldown(
 		this
 	);
 }
 
 void FConsumableProxy::OffsetCooldownTime()
 {
-	auto CooldownMap = AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetGroupMnaggerComponent()->ApplyCooldown(
-		this
-	);
-
-	// 获取当前技能CD
-	if (CooldownMap.Contains(GetUnitType()) && CooldownMap[GetUnitType()].IsValid())
-	{
-		CooldownMap[GetUnitType()].Pin()->OffsetCooldownTime();
-	}
 }
 
 FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag)
@@ -633,7 +631,7 @@ void FSkillProxy::RegisterSkill()
 	auto ProxyCharacterPtr = GetProxyCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		FGameplayAbilityTargetData_RegisterParam* GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RegisterParam;
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase;
 
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 

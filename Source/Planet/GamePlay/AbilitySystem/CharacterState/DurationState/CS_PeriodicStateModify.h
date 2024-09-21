@@ -33,8 +33,11 @@ struct PLANET_API FGameplayAbilityTargetData_StateModify : public FGameplayAbili
 
 	virtual FGameplayAbilityTargetData_StateModify* Clone()const override;
 
-	// < 0 则意味着由Task取消
+	// < 0 则意味着由Task/bIsCancelState 取消
 	float Duration = 3.f;
+	
+	// < 0 则意味着由Task取消
+	bool bIsCancelState = false;
 
 	TWeakObjectPtr<ACharacterBase> TriggerCharacterPtr = nullptr;
 

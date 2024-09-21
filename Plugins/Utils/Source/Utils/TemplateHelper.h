@@ -352,6 +352,16 @@ TSharedPtr<ChildType> DynamicCastSharedPtr(const TSharedPtr<ParentType>& SPtr)
 	return TSharedPtr<ChildType>(SPtr, dynamic_cast<ChildType*>(SPtr.Get()));
 }
 
+template<typename GameplayAbilityTargetDataType>
+GameplayAbilityTargetDataType* DeepCloneGameplayAbilityTargetDataType(const GameplayAbilityTargetDataType* GameplayAbilityTargetDataPtr)
+{
+	auto ResultPtr = new GameplayAbilityTargetDataType;
+
+	*ResultPtr = *GameplayAbilityTargetDataPtr;
+
+	return ResultPtr;
+}
+
 class ABuildingBase;
 class UPlanetGameplayAbility;
 class UPlanetGameplayAbility_SkillBase;

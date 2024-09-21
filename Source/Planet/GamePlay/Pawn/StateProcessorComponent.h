@@ -1,8 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "Components/ActorComponent.h"
 #include <GameplayTagContainer.h>
+#include "GameplayAbilitySpec.h"
 
 #include "TalentUnit.h"
 #include "GenerateType.h"
@@ -76,8 +78,13 @@ protected:
 		const FGameplayTag& ThisTag,
 		const TArray<FGameplayTag>& CancelTags);
 
-	FGameplayEventData* MkeSpec(
+	FGameplayEventData* MakeTargetData(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
+	);
+	
+	FGameplayAbilitySpec MakeSpec(
+		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
+		TSubclassOf<UGameplayAbility> InAbilityClass
 	);
 
 	// 注意：如果是RootMotion类型的状态修改，则此类型的子状态只会为一种，比如：人物先被击飞2s，1s之后又被击飞2s，则刷新击飞时间为2s

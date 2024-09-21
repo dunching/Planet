@@ -106,7 +106,7 @@ void UFightingTips::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEv
 			PanelPtr->AddChild(UIPtr);
 		}
 
-		if (Ref.HP > 0)
+		if (Ref.DataModify.Contains(ECharacterPropertyType::HP)  && Ref.DataModify[ECharacterPropertyType::HP].GetCurrentValue() > 0)
 		{
 			auto UIPtr = CreateWidget<UFightingTipsItem>(GetWorldImp(), FightingTipsItemClass);
 			UIPtr->ProcessGAEVent(UFightingTipsItem::EType::kTreatment, GAEvent);

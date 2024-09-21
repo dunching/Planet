@@ -28,10 +28,17 @@ enum class ECharacterPropertyType : uint8
 	SoilElement,
 	
 	HP,
+	PP,
+	Mana,
 
-	BaseAttackPower,
-	Penetration,
-	PercentPenetration,
+	AD,
+	AD_Penetration,
+	AD_PercentPenetration,
+
+	AP,
+	AP_Penetration,
+	AP_PercentPenetration,
+
 	Resistance,
 	GAPerformSpeed,
 	Evade,
@@ -113,10 +120,11 @@ enum class ETeammateOption : uint8
 	kTest,
 };
 
-enum class EItemChangeType
+enum class EProxyModifyType
 {
 	kAdd,
-	kSub,
+	kChange,
+	kRemove,
 };
 
 enum class EWeaponSocket

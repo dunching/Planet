@@ -250,7 +250,6 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 					FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
 					auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-					GAEventData.HP = CharacterAttributes.HP.GetMaxValue() * (TreatmentVolumePercent / 100.f);
 
 					GAEventDataPtr->DataAry.Add(GAEventData);
 				}

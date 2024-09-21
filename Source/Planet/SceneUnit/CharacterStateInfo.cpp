@@ -8,6 +8,18 @@ FCharacterStateInfo::FCharacterStateInfo()
 
 }
 
+bool FCharacterStateInfo::GetIsFinished() const
+{
+	if (Duration < 0.f)
+	{
+		return true;
+	}
+	else
+	{
+		return TotalTime >= Duration;
+	}
+}
+
 float FCharacterStateInfo::GetRemainTime() const
 {
 	return Duration - TotalTime;
@@ -16,6 +28,22 @@ float FCharacterStateInfo::GetRemainTime() const
 float FCharacterStateInfo::GetRemainTimePercent() const
 {
 	return (Duration - TotalTime) / Duration;
+}
+
+void FCharacterStateInfo::SetFinished()
+{
+	Duration = 0.f;
+	TotalTime = Duration + 1.f;
+}
+
+void FCharacterStateInfo::RefreshTime()
+{
+	TotalTime = 0.f;
+}
+
+void FCharacterStateInfo::IncreaseCooldownTime(float DeltaTime)
+{
+	TotalTime += DeltaTime;
 }
 
 bool FCharacterStateInfo_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)

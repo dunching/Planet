@@ -109,7 +109,7 @@ bool UBasicFutures_Dash::CommitAbility(
 
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-		GAEventData.PP = Consume;
+		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -Consume);
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
@@ -189,13 +189,6 @@ void UBasicFutures_Dash::InitialTags()
 
 	// 在运动时不激活
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
-
-	FAbilityTriggerData AbilityTriggerData;
-
-	AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Dash;
-	AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-	AbilityTriggers.Add(AbilityTriggerData);
 }
 
 void UBasicFutures_Dash::OnRemoveAbility(

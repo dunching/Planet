@@ -99,54 +99,69 @@ void USkill_Consumable_Generic::PerformAction(
 
 void USkill_Consumable_Generic::SpawnActor()
 {
-	FActorSpawnParameters ActorSpawnParameters;
-	ActorSpawnParameters.Owner = CharacterPtr;
-	ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(
-		UnitPtr->GetTableRowUnit_Consumable()->Consumable_Class, ActorSpawnParameters
-	);
-
-	if (ConsumableActorPtr)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		ConsumableActorPtr->Interaction(CharacterPtr);
+		FActorSpawnParameters ActorSpawnParameters;
+		ActorSpawnParameters.Owner = CharacterPtr;
+		ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(
+			UnitPtr->GetTableRowUnit_Consumable()->Consumable_Class, ActorSpawnParameters
+		);
+
+		if (ConsumableActorPtr)
+		{
+			ConsumableActorPtr->Interaction(CharacterPtr);
+		}
 	}
+#endif
 }
 
 void USkill_Consumable_Generic::ExcuteTasks()
 {
-	if (CharacterPtr)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(UnitPtr);
+		if (CharacterPtr)
+		{
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(UnitPtr);
 
-		GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-		GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+		}
 	}
+#endif
 }
 
 void USkill_Consumable_Generic::PlayMontage()
 {
-	auto HumanMontage = UnitPtr->GetTableRowUnit_Consumable()->HumanMontage;
-	if (HumanMontage)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		const float InPlayRate = 1.f;
+		auto HumanMontage = UnitPtr->GetTableRowUnit_Consumable()->HumanMontage;
+		if (HumanMontage)
+		{
+			const float InPlayRate = 1.f;
 
-		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-			this,
-			TEXT(""),
-			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
-			InPlayRate
-		);
+			auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+				this,
+				TEXT(""),
+				HumanMontage,
+				CharacterPtr->GetMesh()->GetAnimInstance(),
+				InPlayRate
+			);
 
-		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
-		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
+			TaskPtr->Ability = this;
+			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
+			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 
-		TaskPtr->ReadyForActivation();
+			TaskPtr->ReadyForActivation();
+		}
 	}
+#endif
 }
 
 void USkill_Consumable_Generic::OnPlayMontageEnd()

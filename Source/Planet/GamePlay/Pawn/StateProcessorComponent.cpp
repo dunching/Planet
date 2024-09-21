@@ -54,6 +54,7 @@
 #include "CS_PeriodicPropertyTag.h"
 #include "CS_PeriodicStateModify_Slow.h"
 #include "CS_PeriodicStateModify_Fear.h"
+#include "CS_PeriodicStateModify_SuperArmor.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
@@ -286,7 +287,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 		auto GAHandle = ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,
-			MkeSpec(GameplayAbilityTargetDataSPtr)
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 
 		// 为什么不在此处直接获取 GetPrimaryInstance？因为在GA过程中调用时会pending，导致返回为nullptr
@@ -314,7 +315,7 @@ void UStateProcessorComponent::ExcuteEffects(
 		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
 			auto GAPtr = Cast<UCS_PeriodicStateModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
-			if (GAPtr)
+			if (GAPtr && GAPtr->CanActivateAbility(GAPtr->GetCurrentAbilitySpecHandle(), GAPtr->GetCurrentActorInfo()))
 			{
 				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
 				GAPtr->UpdateDuration();
@@ -324,11 +325,10 @@ void UStateProcessorComponent::ExcuteEffects(
 
 		if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun))
 		{
-			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_Stun::StaticClass(), 1);
-
+			auto  Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Stun::StaticClass());
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
+				MakeTargetData(GameplayAbilityTargetDataSPtr)
 			);
 		}
 		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
@@ -337,7 +337,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
+				MakeTargetData(GameplayAbilityTargetDataSPtr)
 			);
 		}
 		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear))
@@ -346,7 +346,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
+				MakeTargetData(GameplayAbilityTargetDataSPtr)
 			);
 		}
 		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Ice))
@@ -355,7 +355,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
+				MakeTargetData(GameplayAbilityTargetDataSPtr)
 			);
 		}
 		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow))
@@ -364,7 +364,16 @@ void UStateProcessorComponent::ExcuteEffects(
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,
-				MkeSpec(GameplayAbilityTargetDataSPtr)
+				MakeTargetData(GameplayAbilityTargetDataSPtr)
+			);
+		}
+		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor))
+		{
+			FGameplayAbilitySpec Spec(UCS_PeriodicStateModify_SuperArmor::StaticClass(), 1);
+
+			ASCPtr->GiveAbilityAndActivateOnce(
+				Spec,
+				MakeTargetData(GameplayAbilityTargetDataSPtr)
 			);
 		}
 	}
@@ -407,7 +416,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
+						MakeTargetData(GameplayAbilityTargetDataSPtr)
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
@@ -426,7 +435,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
+						MakeTargetData(GameplayAbilityTargetDataSPtr)
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
@@ -435,7 +444,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
+						MakeTargetData(GameplayAbilityTargetDataSPtr)
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
@@ -444,7 +453,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
+						MakeTargetData(GameplayAbilityTargetDataSPtr)
 					);
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Traction))
@@ -453,7 +462,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,
-						MkeSpec(GameplayAbilityTargetDataSPtr)
+						MakeTargetData(GameplayAbilityTargetDataSPtr)
 					);
 				}
 			}
@@ -461,7 +470,7 @@ void UStateProcessorComponent::ExcuteEffects(
 	}
 }
 
-FGameplayEventData* UStateProcessorComponent::MkeSpec(
+FGameplayEventData* UStateProcessorComponent::MakeTargetData(
 	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
 )
 {
@@ -482,6 +491,20 @@ FGameplayEventData* UStateProcessorComponent::MkeSpec(
 	Payload->TargetData.Add(ClonePtr);
 
 	return Payload;
+}
+
+FGameplayAbilitySpec UStateProcessorComponent::MakeSpec(
+	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
+	TSubclassOf<UGameplayAbility> InAbilityClass
+)
+{
+	auto GACDOPtr = InAbilityClass.GetDefaultObject();
+
+	GACDOPtr->AbilityTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
+
+	FGameplayAbilitySpec Spec(GACDOPtr, 1);
+
+	return Spec;
 }
 
 void UStateProcessorComponent::BreakOhterState(

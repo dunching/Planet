@@ -7,6 +7,7 @@
 #include "MyUserWidget.h"
 
 #include "UIInterfaces.h"
+#include "GenerateType.h"
 
 #include "GetItemInfosItem.generated.h"
 
@@ -29,7 +30,7 @@ public:
 	
 	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
 	
-	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num);
+	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
 	
 	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd);
 

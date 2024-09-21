@@ -13,15 +13,6 @@ UBasicFutures_Jump::UBasicFutures_Jump() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Jump::PostCDOContruct()
-{
-	Super::PostCDOContruct();
-
-	if (GetWorldImp())
-	{
-	}
-}
-
 void UBasicFutures_Jump::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
@@ -93,13 +84,6 @@ void UBasicFutures_Jump::InitialTags()
 
 	// 在运动时不激活
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
-
-	FAbilityTriggerData AbilityTriggerData;
-
-	AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->Jump;
-	AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-	AbilityTriggers.Add(AbilityTriggerData);
 }
 
 void UBasicFutures_Jump::OnLanded(const FHitResult& Hit)

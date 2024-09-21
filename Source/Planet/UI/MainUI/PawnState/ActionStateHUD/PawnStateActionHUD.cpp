@@ -136,7 +136,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.BaseAttackPower);
+			UIPtr->SetDataSource(CharacterAttributes.AD);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Penetration));
@@ -144,7 +144,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Penetration, CharacterAttributes.PercentPenetration);
+			UIPtr->SetDataSource(CharacterAttributes.AD_Penetration, CharacterAttributes.AD_PercentPenetration);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Resistance));
@@ -152,7 +152,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			{
 				return;
 			}
-			UIPtr->SetDataSource(CharacterAttributes.Resistance);
+			UIPtr->SetDataSource(CharacterAttributes.AD_Resistance);
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
@@ -236,7 +236,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 	{
 		return;
 	}
-	const auto& SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
+	const auto& SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetAllSocket();
 	for (auto Iter : SkillsMap)
 	{
 		bool bIsGiveTalentPassive = false;
@@ -274,7 +274,7 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 		return;
 	}
 
-	auto SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetSkills();
+	auto SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetAllSocket();
 	TArray<FName>Ary
 	{
 		FPawnStateActionHUD::Get().ActiveSkill1,

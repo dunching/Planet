@@ -17,44 +17,6 @@ struct FActiveSkillProxy;
 struct FConsumableProxy;
 struct FCharacterProxy;
 
-struct FSkillCooldownHelper
-{
-	FSkillCooldownHelper();
-
-	virtual bool CheckCooldown()const;
-
-	void IncreaseCooldownTime(float DeltaTime);
-
-	void AddCooldownConsumeTime(float NewTime);
-
-	void FreshCooldownTime();
-
-	void ResetCooldownTime();
-
-	void OffsetCooldownTime();
-
-	bool GetRemainingCooldown(
-		float& RemainingCooldown, float& RemainingCooldownPercent
-	)const;
-
-	void SetCooldown(float CooldDown);
-
-	// 独立的CD
-	FGuid SkillProxy_ID;
-
-	// 类型的CD
-	FGameplayTag SkillType;
-
-	// 
-	int32 CooldownTime = -1;
-
-	// 
-	float CooldownConsumeTime = 0.f;
-
-private:
-
-};
-
 class PLANET_API FGroupMatesHelper
 {
 public:
@@ -78,10 +40,6 @@ public:
 	TSharedPtr<FCharacterUnitType> OwnerCharacterUnitPtr = nullptr;
 
 	TSet<TSharedPtr<FCharacterUnitType>> MembersSet;
-
-	// 公共的冷却，如：团队里面的复活技能
-	TMap<FGameplayTag, TSharedPtr<FSkillCooldownHelper>>CommonCooldownMap;
-
 };
 
 class PLANET_API FTeamMatesHelper : public FGroupMatesHelper
@@ -155,18 +113,6 @@ public:
 
 	const TSharedPtr<FTeamMatesHelper>& GetTeamHelper();
 
-	// 重置技能CD（包含公共CD）至满CD
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr);
-
-	// 重置技能CD 至满CD
-	TWeakPtr<FSkillCooldownHelper> ApplyUniqueCooldown(FActiveSkillProxy* ActiveSkillUnitPtr);
-
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const FActiveSkillProxy* ActiveSkillUnitPtr);
-
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>ApplyCooldown(FConsumableProxy* UnitPtr);
-
-	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>GetCooldown(const FConsumableProxy* ConsumableUnitPtr);
-
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
 	FTeamHelperChangedDelegateContainer GroupHelperChangedDelegateContainer;
@@ -177,17 +123,10 @@ protected:
 
 	virtual void BeginPlay()override;
 
-	TWeakPtr<FSkillCooldownHelper> ApplyCommonCooldownTime(
-		const FGameplayTag& CommonCooldownTag
-	);
-
 private:
 
 	TSharedPtr<FGroupMatesHelper> GroupHelperSPtr;
 
 	TSharedPtr<FTeamMatesHelper> TeamHelperSPtr;
-
-	// 角色的技能冷却
-	TMap<FGameplayTag, TSharedPtr<FSkillCooldownHelper>>UniqueCooldownMap;
 
 };

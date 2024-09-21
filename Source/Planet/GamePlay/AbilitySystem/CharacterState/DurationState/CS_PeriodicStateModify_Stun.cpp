@@ -47,6 +47,8 @@ void UCS_PeriodicStateModify_Stun::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
+	AbilityTags.AppendTags(Spec.Ability->AbilityTags);
+
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
@@ -88,7 +90,11 @@ void UCS_PeriodicStateModify_Stun::UpdateDuration()
 		TaskPtr->UpdateDuration();
 	}
 
-	PerformAction();
+	if (CharacterStateInfoSPtr)
+	{
+		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		CharacterStateInfoSPtr->TotalTime = 0.f;
+	}
 }
 
 void UCS_PeriodicStateModify_Stun::PerformAction()

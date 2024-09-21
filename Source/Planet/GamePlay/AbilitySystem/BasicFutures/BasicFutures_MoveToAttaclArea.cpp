@@ -37,21 +37,14 @@ struct FBasicFutures_MoveToAttaclArea : public TStructVariable<FBasicFutures_Mov
 	FName Donut_OuterRadius = TEXT("Donut.OuterRadius");
 };
 
-void UBasicFutures_MoveToAttaclArea::PostCDOContruct()
+void UBasicFutures_MoveToAttaclArea::InitialTags()
 {
-	Super::PostCDOContruct();
+	Super::InitialTags();
 
 	if (GetWorldImp())
 	{
 		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
 		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
-
-		FAbilityTriggerData AbilityTriggerData;
-
-		AbilityTriggerData.TriggerTag = UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea;
-		AbilityTriggerData.TriggerSource = EGameplayAbilityTriggerSource::GameplayEvent;
-
-		AbilityTriggers.Add(AbilityTriggerData);
 	}
 }
 

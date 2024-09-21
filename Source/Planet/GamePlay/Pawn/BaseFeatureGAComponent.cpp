@@ -389,17 +389,13 @@ void UBaseFeatureGAComponent::InitialBaseGAs()
 		// 输出
 
 		// 群体伤害或治疗减益
-		AddSendGroupEffectModify();
 		// 伤害类型
-		AddSendWuXingModify();
+		AddSendBaseModify();
 
 		// 接收
 
-		// 五行之间的减免
-		AddReceivedWuXingModify();
-
 		// 基础属性
-		AddReceivedModify();
+		AddReceivedBaseModify();
 #pragma endregion 结算效果修正
 	}
 #endif
@@ -499,59 +495,112 @@ void UBaseFeatureGAComponent::BreakMoveToAttackDistance()
 	}
 }
 
-void UBaseFeatureGAComponent::AddSendGroupEffectModify()
-{
-	struct GAEventModify_MultyTarget : public IGAEventModifySendInterface
+void UBaseFeatureGAComponent::AddSendBaseModify()
+{ 
 	{
-		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifySendInterface(InPriority)
+		struct FMyStruct : public IGAEventModifySendInterface
 		{
-		}
+			FMyStruct(int32 InPriority) :
+				IGAEventModifySendInterface(InPriority)
+			{
+			}
 
-		virtual void Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
+			virtual void Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
+			{
+				if (GameplayAbilityTargetData_GAEvent.DataAry.Num() > 1)
+				{
+					for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
+					{
+						Iter.TrueDamage =
+							Iter.TrueDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+
+						Iter.BaseDamage =
+							Iter.BaseDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+
+						for (auto& ElementIter : Iter.ElementSet)
+						{
+							ElementIter.Get<2>() =
+								ElementIter.Get<2>() / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+						}
+
+						if (Iter.DataModify.Contains(ECharacterPropertyType::HP))
+						{
+							Iter.DataModify[ECharacterPropertyType::HP].CurrentValue =
+								Iter.DataModify[ECharacterPropertyType::HP].CurrentValue / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+						}
+					}
+				}
+			}
+		};
+		AddSendEventModify(MakeShared<FMyStruct>(9999));
+	}
+	{
+		struct FMyStruct : public IGAEventModifySendInterface
 		{
-			if (GameplayAbilityTargetData_GAEvent.DataAry.Num() > 1)
+			FMyStruct(int32 InPriority) :
+				IGAEventModifySendInterface(InPriority)
+			{
+			}
+
+			virtual void Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
 			{
 				for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
 				{
-					Iter.TrueDamage =
-						Iter.TrueDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
-
-					Iter.BaseDamage =
-						Iter.BaseDamage / GameplayAbilityTargetData_GAEvent.DataAry.Num();
-
-					for (auto& ElementIter : Iter.ElementSet)
+					if (Iter.ElementSet.IsEmpty())
 					{
-						ElementIter.Get<2>() =
-							ElementIter.Get<2>() / GameplayAbilityTargetData_GAEvent.DataAry.Num();
-					}
+						auto CharacterAttributes =
+							GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-					Iter.HP =
-						Iter.HP / GameplayAbilityTargetData_GAEvent.DataAry.Num();
+						std::map<int32, EWuXingType, std::greater<int>> ElementMap;
+						ElementMap.emplace(CharacterAttributes.GoldElement.GetCurrentValue(), EWuXingType::kGold);
+						ElementMap.emplace(CharacterAttributes.WoodElement.GetCurrentValue(), EWuXingType::kWood);
+						ElementMap.emplace(CharacterAttributes.WaterElement.GetCurrentValue(), EWuXingType::kWater);
+						ElementMap.emplace(CharacterAttributes.FireElement.GetCurrentValue(), EWuXingType::kFire);
+						ElementMap.emplace(CharacterAttributes.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
+
+						if (ElementMap.begin()->first > 0)
+						{
+							const auto Tuple = MakeTuple(
+								ElementMap.begin()->second,
+								ElementMap.begin()->first,
+								Iter.BaseDamage
+							);
+							Iter.ElementSet.Add(Tuple);
+						}
+					}
 				}
 			}
-		}
-	};
-	AddSendEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
+		};
+		AddSendEventModify(MakeShared<FMyStruct>(9998));
+	}
 }
 
-void UBaseFeatureGAComponent::AddSendWuXingModify()
+void UBaseFeatureGAComponent::AddReceivedBaseModify()
 {
-	struct GAEventModify_MultyTarget : public IGAEventModifySendInterface
+	// 元素克制衰减
 	{
-		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifySendInterface(InPriority)
+		struct FMyStruct : public IGAEventModifyReceivedInterface
 		{
-		}
-
-		virtual void Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
-		{
-			for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
+			FMyStruct(int32 InPriority) :
+				IGAEventModifyReceivedInterface(InPriority)
 			{
-				if (Iter.ElementSet.IsEmpty())
+			}
+
+			virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
+			{
+				const auto Caculation_Effective_Rate = [](int32 SelfLevel, int32 TargetLevel) {
+
+					// 
+					const auto Offset = (SelfLevel - TargetLevel) / 3;
+					const auto Effective_Rate = 1.f + (Offset * 0.25f);
+					return Effective_Rate;
+					};
+
+				auto& DataRef = GameplayAbilityTargetData_GAEvent.Data;
+				if (DataRef.ElementSet.IsEmpty() && DataRef.TargetCharacterPtr.IsValid())
 				{
 					auto CharacterAttributes =
-						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+						DataRef.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 					std::map<int32, EWuXingType, std::greater<int>> ElementMap;
 					ElementMap.emplace(CharacterAttributes.GoldElement.GetCurrentValue(), EWuXingType::kGold);
@@ -560,137 +609,90 @@ void UBaseFeatureGAComponent::AddSendWuXingModify()
 					ElementMap.emplace(CharacterAttributes.FireElement.GetCurrentValue(), EWuXingType::kFire);
 					ElementMap.emplace(CharacterAttributes.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
 
-					if (ElementMap.begin()->first > 0)
-					{
-						const auto Tuple = MakeTuple(
-							ElementMap.begin()->second,
-							ElementMap.begin()->first,
-							Iter.BaseDamage
-						);
-						Iter.ElementSet.Add(Tuple);
-					}
+					const auto Effective_Rate = Caculation_Effective_Rate(ElementMap.begin()->first, 0);
+
+					DataRef.BaseDamage = DataRef.BaseDamage * Effective_Rate;
 				}
-			}
-		}
-	};
-	AddSendEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
-}
-
-void UBaseFeatureGAComponent::AddReceivedWuXingModify()
-{
-	struct GAEventModify_MultyTarget : public IGAEventModifyReceivedInterface
-	{
-		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifyReceivedInterface(InPriority)
-		{
-		}
-
-		virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
-		{
-			const auto Caculation_Effective_Rate = [](int32 SelfLevel, int32 TargetLevel) {
-
-				// 
-				const auto Offset = (SelfLevel - TargetLevel) / 3;
-				const auto Effective_Rate = 1.f + (Offset * 0.25f);
-				return Effective_Rate;
-				};
-
-			auto& DataRef = GameplayAbilityTargetData_GAEvent.Data;
-			if (DataRef.ElementSet.IsEmpty() && DataRef.TargetCharacterPtr.IsValid())
-			{
-				auto CharacterAttributes =
-					DataRef.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-				std::map<int32, EWuXingType, std::greater<int>> ElementMap;
-				ElementMap.emplace(CharacterAttributes.GoldElement.GetCurrentValue(), EWuXingType::kGold);
-				ElementMap.emplace(CharacterAttributes.WoodElement.GetCurrentValue(), EWuXingType::kWood);
-				ElementMap.emplace(CharacterAttributes.WaterElement.GetCurrentValue(), EWuXingType::kWater);
-				ElementMap.emplace(CharacterAttributes.FireElement.GetCurrentValue(), EWuXingType::kFire);
-				ElementMap.emplace(CharacterAttributes.SoilElement.GetCurrentValue(), EWuXingType::kSoil);
-
-				const auto Effective_Rate = Caculation_Effective_Rate(ElementMap.begin()->first, 0);
-
-				DataRef.BaseDamage = DataRef.BaseDamage * Effective_Rate;
-			}
-			else
-			{
-				auto CharacterAttributes =
-					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-				for (auto& ElementIter : DataRef.ElementSet)
+				else
 				{
-					// ľ          ˮ  ˮ ˻𣬻 ˽𣬽  ľ
-					switch (ElementIter.Get<0>())
+					auto CharacterAttributes =
+						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+					for (auto& ElementIter : DataRef.ElementSet)
 					{
-					case EWuXingType::kGold:
-					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.FireElement.GetCurrentValue(), ElementIter.Get<1>());
-						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
-					}
-					break;
-					case EWuXingType::kWood:
-					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.GoldElement.GetCurrentValue(), ElementIter.Get<1>());
-						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
-					}
-					break;
-					case EWuXingType::kWater:
-					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.SoilElement.GetCurrentValue(), ElementIter.Get<1>());
-						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
-					}
-					break;
-					case EWuXingType::kFire:
-					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.WaterElement.GetCurrentValue(), ElementIter.Get<1>());
-						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
-					}
-					break;
-					case EWuXingType::kSoil:
-					{
-						const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.WoodElement.GetCurrentValue(), ElementIter.Get<1>());
-						ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
-					}
-					break;
-					default:
+						// ľ          ˮ  ˮ ˻𣬻 ˽𣬽  ľ
+						switch (ElementIter.Get<0>())
+						{
+						case EWuXingType::kGold:
+						{
+							const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.FireElement.GetCurrentValue(), ElementIter.Get<1>());
+							ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
+						}
 						break;
+						case EWuXingType::kWood:
+						{
+							const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.GoldElement.GetCurrentValue(), ElementIter.Get<1>());
+							ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
+						}
+						break;
+						case EWuXingType::kWater:
+						{
+							const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.SoilElement.GetCurrentValue(), ElementIter.Get<1>());
+							ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
+						}
+						break;
+						case EWuXingType::kFire:
+						{
+							const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.WaterElement.GetCurrentValue(), ElementIter.Get<1>());
+							ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
+						}
+						break;
+						case EWuXingType::kSoil:
+						{
+							const auto Effective_Rate = Caculation_Effective_Rate(CharacterAttributes.WoodElement.GetCurrentValue(), ElementIter.Get<1>());
+							ElementIter.Get<2>() = ElementIter.Get<2>() * Effective_Rate;
+						}
+						break;
+						default:
+							break;
+						}
 					}
 				}
 			}
-		}
-	};
-	AddReceviedEventModify(MakeShared<GAEventModify_MultyTarget>(9999));
-}
+		};
+		AddReceviedEventModify(MakeShared<FMyStruct>(9999));
+	}
 
-void UBaseFeatureGAComponent::AddReceivedModify()
-{
-	struct GAEventModify_MultyTarget : public IGAEventModifyReceivedInterface
+	// 群体效果衰减
 	{
-		GAEventModify_MultyTarget(int32 InPriority) :
-			IGAEventModifyReceivedInterface(InPriority)
+		struct FMyStruct : public IGAEventModifyReceivedInterface
 		{
-		}
-
-		virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
-		{
-			if (GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr.IsValid())
+			FMyStruct(int32 InPriority) :
+				IGAEventModifyReceivedInterface(InPriority)
 			{
-				auto SelfCharacterAttributesSPtr =
-					GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			}
 
-				auto TargetCharacterAttributesSPtr =
-					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
+			virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
+			{
+				if (GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr.IsValid())
 				{
-					const auto Rate = (TargetCharacterAttributesSPtr.HitRate.GetCurrentValue() - TargetCharacterAttributesSPtr.Evade.GetCurrentValue()) /
-						static_cast<float>(TargetCharacterAttributesSPtr.HitRate.GetMaxValue());
+					auto SelfCharacterAttributesSPtr =
+						GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-					GameplayAbilityTargetData_GAEvent.Data.HitRate = FMath::FRand() <= Rate ? 100 : 0;
+					auto TargetCharacterAttributesSPtr =
+						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+					{
+						const auto Rate = (TargetCharacterAttributesSPtr.HitRate.GetCurrentValue() - TargetCharacterAttributesSPtr.Evade.GetCurrentValue()) /
+							static_cast<float>(TargetCharacterAttributesSPtr.HitRate.GetMaxValue());
+
+						GameplayAbilityTargetData_GAEvent.Data.HitRate = FMath::FRand() <= Rate ? 100 : 0;
+					}
 				}
 			}
-		}
-	};
-	AddReceviedEventModify(MakeShared<GAEventModify_MultyTarget>(9998));
+		};
+		AddReceviedEventModify(MakeShared<FMyStruct>(9998));
+	}
 }
 
 void UBaseFeatureGAComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData)
@@ -725,9 +727,9 @@ TMap<ECharacterPropertyType, FBaseProperty> GetAllData()
 	Result.Add(ECharacterPropertyType::FireElement, 0);
 	Result.Add(ECharacterPropertyType::SoilElement, 0);
 
-	Result.Add(ECharacterPropertyType::BaseAttackPower, 0);
-	Result.Add(ECharacterPropertyType::Penetration, 0);
-	Result.Add(ECharacterPropertyType::PercentPenetration, 0);
+	Result.Add(ECharacterPropertyType::AD, 0);
+	Result.Add(ECharacterPropertyType::AD_Penetration, 0);
+	Result.Add(ECharacterPropertyType::AD_PercentPenetration, 0);
 	Result.Add(ECharacterPropertyType::Resistance, 0);
 	Result.Add(ECharacterPropertyType::GAPerformSpeed, 0);
 	Result.Add(ECharacterPropertyType::Evade, 0);

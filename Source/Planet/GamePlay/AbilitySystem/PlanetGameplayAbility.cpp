@@ -8,6 +8,43 @@
 
 #include "PlanetAbilitySystemComponent.h"
 
+UScriptStruct* FGameplayAbilityTargetData_RegisterParam::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_RegisterParam::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	return true;
+}
+
+FGameplayAbilityTargetData_RegisterParam* FGameplayAbilityTargetData_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
+bool FGameplayAbilityTargetData_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << ID;
+
+	return true;
+}
+
+FGameplayAbilityTargetData_ActiveParam* FGameplayAbilityTargetData_ActiveParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_ActiveParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 UPlanetGameplayAbility::UPlanetGameplayAbility() :
 	Super()
 {

@@ -21,8 +21,6 @@ public:
 
 	UBasicFutures_Jump();
 
-	virtual void PostCDOContruct() override;
-
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec

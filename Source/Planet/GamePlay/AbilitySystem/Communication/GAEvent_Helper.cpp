@@ -52,7 +52,7 @@ bool FGameplayAbilityTargetData_GASendEvent::NetSerialize(FArchive& Ar, UPackage
 		Ar << Num;
 
 		DataAry.SetNumZeroed(Num);
-		for (int32 Index = 0;Index < Num;Index++)
+		for (int32 Index = 0; Index < Num; Index++)
 		{
 			DataAry[Index].NetSerialize(Ar, Map, bOutSuccess);
 		}
@@ -91,9 +91,40 @@ FGAEventData::FGAEventData(
 
 bool FGAEventData::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
 {
-	Ar << HP;
+	Ar << bIsWeaponAttack;
+	Ar << bIsMakeAttackEffect;
+
+	Ar << Penetration;
+
+	Ar << DataSource;
+
 	Ar << TriggerCharacterPtr;
 	Ar << TargetCharacterPtr;
+
+	if (Ar.IsSaving())
+	{
+		int32 Num = DataModify.Num();
+		Ar << Num;
+		for (auto Iter : DataModify)
+		{
+			Ar << Iter.Key;
+			Iter.Value.NetSerialize(Ar, Map, bOutSuccess);
+		}
+	}
+	else if (Ar.IsLoading())
+	{
+		int32 Num = 0;
+		Ar << Num;
+		for (int32 Index = 0; Index < Num; Index++)
+		{
+			ECharacterPropertyType Key;
+			FBaseProperty Value;
+			Ar << Key;
+			Value.NetSerialize(Ar, Map, bOutSuccess);
+
+			DataModify.Add(Key, Value);
+		}
+	}
 
 	return true;
 }
@@ -111,7 +142,7 @@ void FGAEventData::SetBaseDamage(int32 Value)
 void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 {
 	const auto CharacterAttributesComponentPtr = TriggerCharacterPtr->GetCharacterAttributesComponent();
-	 auto & CharacterAttributes =
+	auto& CharacterAttributes =
 		CharacterAttributesComponentPtr->GetCharacterAttributes();
 
 	int32 Level = 0;
@@ -181,7 +212,7 @@ bool FGameplayAbilityTargetData_GAReceivedEvent::NetSerialize(FArchive& Ar, clas
 
 FGameplayAbilityTargetData_GAReceivedEvent* FGameplayAbilityTargetData_GAReceivedEvent::Clone() const
 {
-	auto ResultPtr = 
+	auto ResultPtr =
 		new FGameplayAbilityTargetData_GAReceivedEvent(Data.TargetCharacterPtr, TriggerCharacterPtr.Get());
 
 	*ResultPtr = *this;

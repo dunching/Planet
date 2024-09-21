@@ -28,6 +28,9 @@ class PLANET_API UUnitProxyProcessComponent : public UActorComponent
 
 public:
 
+	friend FSocket_FASI;
+	friend ACharacterBase;
+
 	static FName ComponentName;
 
 	using FOwnerType = ACharacterBase;
@@ -58,19 +61,19 @@ public:
 
 	TArray<TSharedPtr<FSocket_FASI>> GetCanbeActiveAction()const;
 
-#pragma region Skills
-	TSharedPtr<FActiveSkillProxy> FindActiveSkillSocket(const FGameplayTag& Tag)const;
-
-	void RegisterMultiGAs(
-		const TSharedPtr<FSocket_FASI>& SkillSocket
-	);
-#pragma endregion 
-
-#pragma region Weapon
-	void RegisterWeapon(
+	void UpdateSocket(
 		const TSharedPtr<FSocket_FASI>& WeaponSocket
 	);
 
+	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> GetAllSocket()const;
+
+	TSharedPtr<FSocket_FASI> FindSocket(const FGameplayTag& Tag)const;
+
+#pragma region Skills
+	TSharedPtr<FActiveSkillProxy> FindActiveSkillSocket(const FGameplayTag& Tag)const;
+#pragma endregion 
+
+#pragma region Weapon
 	// 激活可用的武器
 	void ActiveWeapon();
 
@@ -94,9 +97,14 @@ public:
 #pragma region Consumables
 #pragma endregion 
 
-	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> GetSkills()const;
+	FOnAllocationChanged OnAllocationChanged;
 
-	TSharedPtr<FSocket_FASI> FindSocket(const FGameplayTag& Tag)const;
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
+	FGameplayTag CurrentWeaponSocket;
+
+protected:
+
+	void Add(const TSharedPtr<FSocket_FASI>& Socket);
 
 	void Update(const TSharedPtr<FSocket_FASI>& Socket);
 
@@ -108,30 +116,16 @@ public:
 
 	void Cancel(const FGameplayTag& Socket);
 
-	FOnAllocationChanged OnAllocationChanged;
-
-	UPROPERTY(ReplicatedUsing = OnRep_AllocationChanged)
-	FAllocation_FASI_Container AllocationSkills_Container;
-	
-	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
-	FGameplayTag CurrentWeaponSocket;
-
-protected:
-
 	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
 
 	bool ActivedCorrespondingWeapon(const FSocket_FASI& Socket);
 	
+#pragma region RPC
 	UFUNCTION(Server, Reliable)
 	void ActivedCorrespondingWeapon_Server(const FSocket_FASI& Socket);
 
 	UFUNCTION(Server, Reliable)
-	void RegisterMultiGAs_Server(
-		const FSocket_FASI& Socket
-	);
-	
-	UFUNCTION(Server, Reliable)
-	void RegisterWeapon_Server(
+	void UpdateSocket_Server(
 		const FSocket_FASI& Socket
 	);
 	
@@ -160,7 +154,11 @@ protected:
 
 	UFUNCTION()
 	void OnRep_CurrentActivedSocketChanged();
-
-	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>SkillsMap;
+#pragma endregion 
+	
+	UPROPERTY(ReplicatedUsing = OnRep_AllocationChanged)
+	FAllocation_FASI_Container AllocationSkills_Container;
+	
+	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>SocketMap;
 
 };

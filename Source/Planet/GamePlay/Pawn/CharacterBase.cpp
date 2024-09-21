@@ -100,6 +100,7 @@ void ACharacterBase::BeginPlay()
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
+		// 绑定一些会影响到 Character行动的数据
 		HPChangedHandle = CharacterAttributes.HP.AddOnValueChanged(
 			std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
 		);
@@ -108,6 +109,7 @@ void ACharacterBase::BeginPlay()
 			std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
 		);
 
+		// 绑定 Character收到的效果回调(收到的是“最终结算效果”)
 		ProcessedGAEventHandle = CharacterAttributes.ProcessedGAEvent.AddCallback(
 			std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
 		);

@@ -66,7 +66,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		// 基础回复
 		{
-			GAEventData.HP = CharacterAttributes.HPReplay.GetCurrentValue();
+			GAEventData.DataModify.Add(ECharacterPropertyType::HP, CharacterAttributes.HP_Replay.GetCurrentValue());
 
 			if (
 				CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
@@ -82,12 +82,12 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 			{
 				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
 				{
-					GAEventData.PP = CharacterAttributes.RunningConsume.GetCurrentValue();
+					GAEventData.DataModify.Add(ECharacterPropertyType::PP, CharacterAttributes.RunningConsume.GetCurrentValue());
 				}
 			}
 			else
 			{
-				GAEventData.PP = CharacterAttributes.PPReplay.GetCurrentValue();
+				GAEventData.DataModify.Add(ECharacterPropertyType::PP, CharacterAttributes.PP_Replay.GetCurrentValue());
 			}
 		}
 

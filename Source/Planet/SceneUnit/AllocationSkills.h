@@ -33,6 +33,8 @@ struct FSocket_FASI : public FFastArraySerializerItem
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
+	bool operator==(const FSocket_FASI& Right)const;
+
 	FKey Key;
 
 	FGameplayTag Socket;
@@ -61,9 +63,6 @@ struct PLANET_API FAllocation_FASI_Container : public FFastArraySerializer
 	using FItemType = FSocket_FASI;
 	using FContainerType = FAllocation_FASI_Container;
 	
-	UPROPERTY()
-	TArray<FSocket_FASI> Items;
-
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms);
 
 	template< typename Type, typename SerializerType >
@@ -84,6 +83,11 @@ struct PLANET_API FAllocation_FASI_Container : public FFastArraySerializer
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
 	UUnitProxyProcessComponent* UnitProxyProcessComponentPtr = nullptr;
+
+protected:
+	
+	UPROPERTY()
+	TArray<FSocket_FASI> Items;
 
 private:
 

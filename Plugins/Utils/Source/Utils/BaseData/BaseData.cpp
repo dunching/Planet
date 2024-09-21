@@ -10,6 +10,13 @@ FBaseProperty::FBaseProperty(int32 Value)
 	SetCurrentValue(Value);
 }
 
+bool FBaseProperty::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << CurrentValue;
+
+	return true;
+}
+
 int32 FBaseProperty::GetCurrentValue() const
 {
 	return CurrentValue;

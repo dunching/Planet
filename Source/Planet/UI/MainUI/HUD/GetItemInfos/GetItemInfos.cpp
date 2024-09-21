@@ -64,7 +64,7 @@ void UGetItemInfos::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, b
 	}
 }
 
-void UGetItemInfos::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfos::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
 	if (UIPtr)
@@ -72,7 +72,7 @@ void UGetItemInfos::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>
 		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
 		if (WidgetPtr)
 		{
-			WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd, Num);
+			WidgetPtr->ResetToolUIByData(UnitPtr, ProxyModifyType);
 
 			UIPtr->AddChild(WidgetPtr);
 		}

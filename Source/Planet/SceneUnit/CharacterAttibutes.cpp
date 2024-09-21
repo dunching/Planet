@@ -130,8 +130,8 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Ar << HP.CurrentValue.CurrentValue;
 		Ar << PP.CurrentValue.CurrentValue;
 
-		Ar << BaseAttackPower.CurrentValue.CurrentValue;
-		Ar << Penetration.CurrentValue.CurrentValue;
+		Ar << AD.CurrentValue.CurrentValue;
+		Ar << AD_Penetration.CurrentValue.CurrentValue;
 		Ar << GAPerformSpeed.CurrentValue.CurrentValue;
 		Ar << MoveSpeed.CurrentValue.CurrentValue;
 
@@ -159,8 +159,8 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Lambda(HP.CurrentValue);
 		Lambda(PP.CurrentValue);
 
-		Lambda(BaseAttackPower.CurrentValue);
-		Lambda(Penetration.CurrentValue);
+		Lambda(AD.CurrentValue);
+		Lambda(AD_Penetration.CurrentValue);
 		Lambda(GAPerformSpeed.CurrentValue);
 		Lambda(MoveSpeed.CurrentValue);
 
@@ -197,17 +197,17 @@ void FCharacterAttributes::InitialData()
 	const auto DataSource = FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
 	//UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
 
-	BaseAttackPower.GetMaxProperty().SetCurrentValue(3000);
-	BaseAttackPower.SetCurrentValue(100, DataSource);
+	AD.GetMaxProperty().SetCurrentValue(3000);
+	AD.SetCurrentValue(100, DataSource);
 
-	Penetration.GetMaxProperty().SetCurrentValue(1000);
-	Penetration.SetCurrentValue(0, DataSource);
+	AD_Penetration.GetMaxProperty().SetCurrentValue(1000);
+	AD_Penetration.SetCurrentValue(0, DataSource);
 
-	PercentPenetration.GetMaxProperty().SetCurrentValue(100);
-	PercentPenetration.SetCurrentValue(0, DataSource);
+	AD_PercentPenetration.GetMaxProperty().SetCurrentValue(100);
+	AD_PercentPenetration.SetCurrentValue(0, DataSource);
 
-	Resistance.GetMaxProperty().SetCurrentValue(1000);
-	Resistance.SetCurrentValue(20, DataSource);
+	AD_Resistance.GetMaxProperty().SetCurrentValue(1000);
+	AD_Resistance.SetCurrentValue(20, DataSource);
 
 	GAPerformSpeed.GetMaxProperty().SetCurrentValue(500);
 	GAPerformSpeed.SetCurrentValue(100, DataSource);
@@ -215,14 +215,14 @@ void FCharacterAttributes::InitialData()
 	HP.GetMaxProperty().SetCurrentValue(5000);
 	HP.SetCurrentValue(100, DataSource);
 
-	HPReplay.GetMaxProperty().SetCurrentValue(1000);
-	HPReplay.SetCurrentValue(1, DataSource);
+	HP_Replay.GetMaxProperty().SetCurrentValue(1000);
+	HP_Replay.SetCurrentValue(1, DataSource);
 
 	PP.GetMaxProperty().SetCurrentValue(1000);
 	PP.SetCurrentValue(100, DataSource);
 
-	PPReplay.GetMaxProperty().SetCurrentValue(1000);
-	PPReplay.SetCurrentValue(1, DataSource);
+	PP_Replay.GetMaxProperty().SetCurrentValue(1000);
+	PP_Replay.SetCurrentValue(1, DataSource);
 
 	Evade.GetMaxProperty().SetCurrentValue(100);
 	Evade.SetCurrentValue(20, DataSource);
@@ -273,122 +273,143 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 
 	// HP
 	{
-		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(HP.GetCurrentProperty());
-		HP.AddCurrentValue(Ref.HP, Ref.DataSource);
+		FScoped_BaseProperty_SaveUpdate HP_Scope(HP.GetCurrentProperty());
+		FScoped_BaseProperty_SaveUpdate PP_Scope(PP.GetCurrentProperty());
 
 		if (Ref.HitRate > 0)
 		{
 			if (Ref.ElementSet.IsEmpty())
 			{
+				// 基础伤害
 				HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage, Ref.DataSource);
 			}
 			else
 			{
+				// 元素伤害
 				for (const auto& Iter : Ref.ElementSet)
 				{
 					HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage, Ref.DataSource);
 				}
 			}
 
+			// 真实伤害
 			HP.AddCurrentValue(Ref.TrueDamage, Ref.DataSource);
 		}
-	}
 
-	// PP
-	{
-		FScoped_BaseProperty_SaveUpdate Scoped_BaseProperty_SaveUpdate(PP.GetCurrentProperty());
-		PP.AddCurrentValue(Ref.PP, Ref.DataSource);
-
-		if (Ref.HitRate > 0)
 		{
+			auto Lambda = [&Ref](
+				FBasePropertySet& PropertySetRef,
+				const FBaseProperty& Property
+				)
+				{
+					if (Ref.bIsClearData)
+					{
+						PropertySetRef.RemoveCurrentValue(Ref.DataSource);
+					}
+					else if (Ref.bIsOverlapData)
+					{
+						PropertySetRef.SetCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+					}
+					else
+					{
+						PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+					}
+				};
+
+			for (const auto Iter : Ref.DataModify)
+			{
+				switch (Iter.Key)
+				{
+
+#pragma region 
+				case ECharacterPropertyType::GoldElement:
+				{
+					Lambda(GoldElement, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::WoodElement:
+				{
+					Lambda(WoodElement, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::WaterElement:
+				{
+					Lambda(WaterElement, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::FireElement:
+				{
+					Lambda(FireElement, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::SoilElement:
+				{
+					Lambda(SoilElement, Iter.Value);
+				}
+				break;
+#pragma endregion
+
+#pragma region 
+				case ECharacterPropertyType::HP:
+				{
+					Lambda(HP, Iter.Value);
+				}
+				break;
+
+				case ECharacterPropertyType::PP:
+				{
+					Lambda(PP, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::Mana:
+				{
+					Lambda(Mana, Iter.Value);
+				}
+				break;
+#pragma endregion
+
+
+#pragma region 
+				case ECharacterPropertyType::AD:
+				{
+					Lambda(AD, Iter.Value);
+				}
+				break;
+
+				case ECharacterPropertyType::AD_Penetration:
+				{
+					Lambda(AD_Penetration, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::AD_PercentPenetration:
+				{
+					Lambda(AD_PercentPenetration, Iter.Value);
+				}
+				break;
+#pragma endregion
+
+				case ECharacterPropertyType::GAPerformSpeed:
+				{
+					Lambda(GAPerformSpeed, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::MoveSpeed:
+				{
+					Lambda(MoveSpeed, Iter.Value);
+				}
+				break;
+				}
+			}
 		}
 	}
 
-	// 
-	{
-		auto Lambda = [&Ref](
-				FBasePropertySet& PropertySetRef, 
-				const FBaseProperty &Property
-			)
-			{
-				if (Ref.bIsClearData)
-				{
-					PropertySetRef.RemoveCurrentValue(Ref.DataSource);
-				}
-				else if (Ref.bIsOverlapData)
-				{
-					PropertySetRef.SetCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
-				}
-				else
-				{
-					PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
-				}
-			};
-
-		for (const auto Iter : Ref.DataModify)
-		{
-			switch (Iter.Key)
-			{
-			case ECharacterPropertyType::GoldElement:
-			{
-				Lambda(GoldElement, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::WoodElement:
-			{
-				Lambda(WoodElement, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::WaterElement:
-			{
-				Lambda(WaterElement, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::FireElement:
-			{
-				Lambda(FireElement, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::SoilElement:
-			{
-				Lambda(SoilElement, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::BaseAttackPower:
-			{
-				Lambda(BaseAttackPower, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::Penetration:
-			{
-				Lambda(Penetration, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::PercentPenetration:
-			{
-				Lambda(PercentPenetration, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::GAPerformSpeed:
-			{
-				Lambda(GAPerformSpeed, Iter.Value);
-			}
-			break;
-			case ECharacterPropertyType::MoveSpeed:
-			{
-				Lambda(MoveSpeed, Iter.Value);
-			}
-			break;
-			}
-		}
-	}
 #ifdef WITH_EDITOR
 	if (DebugPrintCAB.GetValueOnGameThread())
 	{
 		PRINTINVOKEWITHSTR(
 			FString::Printf(TEXT("MoveSpeed %d GAPerformSpeed %d"),
-			MoveSpeed.GetCurrentValue(),
-			GAPerformSpeed.GetCurrentValue()
+				MoveSpeed.GetCurrentValue(),
+				GAPerformSpeed.GetCurrentValue()
 			));
 	}
 #endif
@@ -408,12 +429,12 @@ bool FCharacterAttributes::operator==(const FCharacterAttributes& RightValue) co
 
 const FBasePropertySet& FCharacterAttributes::GetHPReply() const
 {
-	return HPReplay;
+	return HP_Replay;
 }
 
 const FBasePropertySet& FCharacterAttributes::GetPPReply() const
 {
-	return PPReplay;
+	return PP_Replay;
 }
 
 FScopeCharacterAttributes::FScopeCharacterAttributes(FCharacterAttributes& CharacterAttributes)
