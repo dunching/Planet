@@ -48,6 +48,16 @@ public:
 
 	static FName ComponentName;
 
+	bool IsInDeath()const;
+	
+	bool IsUnSelected()const;
+
+	bool IsRunning()const;
+
+	bool IsRootMotion()const;
+
+	bool IsInFighting()const;
+
 	void OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData);
 
 	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAReceivedEvent& OutGAEventData);
@@ -122,6 +132,8 @@ public:
 	// 冲刺/闪避
 	UFUNCTION(Server, Reliable)
 	void Dash(EDashDirection DashDirection);
+	
+	void Respawn();
 
 	// 移动至攻击范围内
 	void MoveToAttackDistance(

@@ -80,7 +80,7 @@ void ACharacterBase::BeginPlay()
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 #if UE_EDITOR || UE_CLIENT
-	if (GetLocalRole() == ROLE_AutonomousProxy)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		if (!CharacterTitlePtr)
 		{
@@ -89,7 +89,14 @@ void ACharacterBase::BeginPlay()
 			if (CharacterTitlePtr)
 			{
 				CharacterTitlePtr->CharacterPtr = this;
-				CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+				if (GetLocalRole() == ROLE_AutonomousProxy)
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
+				}
+				else
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+				}
 			}
 		}
 	}
@@ -314,7 +321,7 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 
 	// 
 	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
-	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
+//	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -351,18 +358,13 @@ void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		if (CurrentValue <= 0)
+		if (IsPlayerControlled())
 		{
-			GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
-			GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
-				for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
-				{
-					if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
-					{
-						Destroy();
-					}
-				}
-				});
+			GetController<APlanetPlayerController>()->OnHPChanged(CurrentValue);
+		}
+		else
+		{
+			GetController<APlanetAIController>()->OnHPChanged(CurrentValue);
 		}
 	}
 #endif

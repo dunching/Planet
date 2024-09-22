@@ -134,7 +134,6 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Ar << AD_Penetration.CurrentValue.CurrentValue;
 		Ar << GAPerformSpeed.CurrentValue.CurrentValue;
 		Ar << MoveSpeed.CurrentValue.CurrentValue;
-
 	}
 	else if (Ar.IsLoading())
 	{
@@ -150,6 +149,7 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 
 		Ar << Name;
 		Ar << Level;
+
 		Lambda(LiDao.CurrentValue);
 		Lambda(GenGu.CurrentValue);
 		Lambda(ShenFa.CurrentValue);
@@ -212,18 +212,27 @@ void FCharacterAttributes::InitialData()
 	GAPerformSpeed.GetMaxProperty().SetCurrentValue(500);
 	GAPerformSpeed.SetCurrentValue(100, DataSource);
 
-	HP.GetMaxProperty().SetCurrentValue(5000);
-	HP.SetCurrentValue(100, DataSource);
+	Shield.GetMaxProperty().SetCurrentValue(200);
+	Shield.SetCurrentValue(0, DataSource);
+
+	HP.GetMaxProperty().SetCurrentValue(200);
+	HP.SetCurrentValue(200, DataSource);
 
 	HP_Replay.GetMaxProperty().SetCurrentValue(1000);
 	HP_Replay.SetCurrentValue(1, DataSource);
 
-	PP.GetMaxProperty().SetCurrentValue(1000);
+	PP.GetMaxProperty().SetCurrentValue(100);
 	PP.SetCurrentValue(100, DataSource);
 
 	PP_Replay.GetMaxProperty().SetCurrentValue(1000);
 	PP_Replay.SetCurrentValue(1, DataSource);
 
+	Mana.GetMaxProperty().SetCurrentValue(500);
+	Mana.SetCurrentValue(500, DataSource);
+
+	Mana_Replay.GetMaxProperty().SetCurrentValue(1000);
+	Mana_Replay.SetCurrentValue(1, DataSource);
+	
 	Evade.GetMaxProperty().SetCurrentValue(100);
 	Evade.SetCurrentValue(20, DataSource);
 

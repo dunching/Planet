@@ -157,3 +157,20 @@ bool APlanetAIController::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
 	return GetPawn<FPawnType>()->IsTeammate(TargetCharacterPtr);
 }
+
+void APlanetAIController::OnHPChanged(int32 CurrentValue)
+{
+	if (CurrentValue <= 0)
+	{
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
+		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
+			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
+			{
+				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+				{
+//					Destroy();
+				}
+			}
+			});
+	}
+}

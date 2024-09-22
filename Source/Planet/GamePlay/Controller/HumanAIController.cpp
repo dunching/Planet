@@ -78,16 +78,7 @@ void AHumanAIController::OnTeammateOptionChangedImp(
 
 void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 {
-	if (Count > 0)
-	{
-		GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
-			OnOwnedDeathTagDelegateHandle,
-			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
-			EGameplayTagEventType::NewOrRemoved
-		);
 
-		DoDeathing();
-	}
 }
 
 void AHumanAIController::DoDeathing()

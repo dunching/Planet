@@ -44,15 +44,22 @@ struct PLANET_API FGAEventData
 	bool bIsMakeAttackEffect = false;
 	
 	UPROPERTY()
+	// 是否是“复活”技能
+	bool bIsRespawn = false;
+	
+#pragma region 
+	// 这组数据 为基础值（即在SendEventImp之前填写的值） + 人物属性
+
+	UPROPERTY()
 	// 本次攻击的 穿透
-	int32 Penetration = 0;
+	int32 AD_Penetration = 0;
 	
 	UPROPERTY()
 	// 本次攻击的 百分比穿透
-	int32 PercentPenetration = 0;
+	int32 AD_PercentPenetration = 0;
 	
 	UPROPERTY()
-	// 本次攻击的 命中率(0则为此次被闪避)
+	// 本次攻击的 命中率(0则为此次被闪避)，若大于 100，则为不可被闪避
 	int32 HitRate = 0;
 	
 	UPROPERTY()
@@ -62,7 +69,8 @@ struct PLANET_API FGAEventData
 	UPROPERTY()
 	// 本次攻击的 会心伤害
 	int32 CriticalDamage = 0;
-	
+#pragma endregion
+
 	UPROPERTY()
 	// 造成的真实伤害
 	int32 TrueDamage = 0;

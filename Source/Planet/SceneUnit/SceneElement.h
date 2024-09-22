@@ -124,6 +124,8 @@ public:
 
 	ACharacterBase* GetProxyCharacter()const;
 
+	ACharacterBase* GetAllocationCharacter()const;
+
 	void Update2Client();
 
 	TSharedPtr<FBasicProxy> GetThisSPtr()const;
@@ -357,6 +359,12 @@ public:
 	FPassiveSkillProxy();
 
 	virtual void InitialUnit()override;
+
+	// 装备至插槽
+	virtual void Allocation()override;
+
+	// 从插槽移除
+	virtual void UnAllocation()override;
 
 	FTableRowUnit_PassiveSkillExtendInfo* GetTableRowUnit_PassiveSkillExtendInfo()const;
 

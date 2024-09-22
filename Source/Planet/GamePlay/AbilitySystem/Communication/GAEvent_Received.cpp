@@ -13,6 +13,7 @@
 #include "CS_RootMotion.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_PeriodicStateModify.h"
+#include "GameplayTagsSubSystem.h"
 
 UGAEvent_Received::UGAEvent_Received() :
 	Super()
@@ -58,18 +59,26 @@ void UGAEvent_Received::ActivateAbility(
 			}
 
 			auto CloneSPtr = GAEventDataPtr->Clone_SmartPtr();
-
-			CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*CloneSPtr);
-
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
-
-			CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
-
-			GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
-
-			if (GAEventDataPtr->Data.bIsMakeAttackEffect)
+			if (CloneSPtr->Data.bIsRespawn)
 			{
-				CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteAttackedEffect(EAffectedDirection::kForward);
+				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
+			}
+			else
+			{
+				CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*CloneSPtr);
+
+				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
+
+				CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
+
+				GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
+
+				const auto IsNotDeathingTag =
+					!CharacterPtr->GetInteractiveBaseGAComponent()->IsInDeath();
+				if (GAEventDataPtr->Data.bIsMakeAttackEffect && IsNotDeathingTag)
+				{
+					CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteAttackedEffect(EAffectedDirection::kForward);
+				}
 			}
 		}
 		break;

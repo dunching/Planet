@@ -6,6 +6,21 @@
 #include "LogWriter.h"
 #include "Weapon_Base.h"
 
+UScriptStruct* FGameplayAbilityTargetData_Skill_Weapon::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Skill_Weapon::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Skill_Weapon::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << bIsAutoContinue;
+	Ar << WeaponPtr;
+
+	return true;
+}
+
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
@@ -171,19 +186,4 @@ void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInp
 		check(0);
 		WaitInputPercent = 1.f;
 	}
-}
-
-UScriptStruct* FGameplayAbilityTargetData_Skill_Weapon::GetScriptStruct() const
-{
-	return FGameplayAbilityTargetData_Skill_Weapon::StaticStruct();
-}
-
-bool FGameplayAbilityTargetData_Skill_Weapon::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
-{
-	Super::NetSerialize(Ar, Map, bOutSuccess);
-
-	Ar << bIsAutoContinue;
-	Ar << WeaponPtr;
-
-	return true;
 }

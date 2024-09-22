@@ -94,7 +94,10 @@ bool FGAEventData::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 	Ar << bIsWeaponAttack;
 	Ar << bIsMakeAttackEffect;
 
-	Ar << Penetration;
+	Ar << AD_Penetration;
+
+	Ar << TrueDamage;
+	Ar << BaseDamage;
 
 	Ar << DataSource;
 

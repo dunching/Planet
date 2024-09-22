@@ -1,5 +1,5 @@
 
-#include "BasicFutures_Death.h"
+#include "BasicFutures_Respawn.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
@@ -10,7 +10,14 @@
 #include "GameplayTagsSubSystem.h"
 #include "Planet_Tools.h"
 
-void UBasicFutures_Death::ActivateAbility(
+void UBasicFutures_Respawn::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	CancelAbilitiesWithTag.AddTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag);
+}
+
+void UBasicFutures_Respawn::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -29,7 +36,7 @@ void UBasicFutures_Death::ActivateAbility(
 	}
 }
 
-void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
+void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
 		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||

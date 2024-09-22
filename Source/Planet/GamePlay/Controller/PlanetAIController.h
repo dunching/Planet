@@ -57,6 +57,8 @@ public:
 
 	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
 
+	void OnHPChanged(int32 CurrentValue);
+
 protected:
 
 	virtual void BeginPlay() override;

@@ -189,7 +189,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void OnMoveSpeedChanged(int32 CurrentValue);
 	
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast, Unreliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	FValueChangedDelegateHandle HPChangedHandle;

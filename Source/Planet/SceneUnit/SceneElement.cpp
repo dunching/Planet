@@ -30,6 +30,7 @@
 #include "HoldingItemsComponent.h"
 #include "CDCaculatorComponent.h"
 #include "Skill_Consumable_Generic.h"
+#include "BaseFeatureGAComponent.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -140,6 +141,11 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 ACharacterBase* FBasicProxy::GetProxyCharacter() const
 {
 	return OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+}
+
+ACharacterBase* FBasicProxy::GetAllocationCharacter() const
+{
+	return AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
 }
 
 void FBasicProxy::Update2Client()
@@ -769,6 +775,52 @@ void FPassiveSkillProxy::InitialUnit()
 {
 }
 
+void FPassiveSkillProxy::Allocation()
+{
+	Super::Allocation();
+
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		auto AllocationCharacter = GetAllocationCharacter();
+		// 词条
+		{
+			auto MainPropertyEntryPtr = GetMainPropertyEntry();
+			if (MainPropertyEntryPtr)
+			{
+				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+				for (const auto &Iter : MainPropertyEntryPtr->Map)
+				{
+					ModifyPropertyMap.Add(Iter);
+				}
+
+				AllocationCharacter->GetInteractiveBaseGAComponent()->SendEvent2Self(
+					ModifyPropertyMap, GetUnitType()
+				);
+			}
+		}
+	}
+#endif
+}
+
+void FPassiveSkillProxy::UnAllocation()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		auto AllocationCharacter = GetAllocationCharacter();
+		AllocationCharacter->GetInteractiveBaseGAComponent()->ClearData2Self(
+			GetAllData(), GetUnitType()
+		);
+	}
+#endif
+
+	Super::UnAllocation();
+}
+
 FTableRowUnit_PassiveSkillExtendInfo* FPassiveSkillProxy::GetTableRowUnit_PassiveSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
@@ -909,12 +961,31 @@ void FWeaponProxy::ActiveWeapon()
 		auto ProxyCharacterPtr = GetProxyCharacter();
 		if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
+			// 添加武器给的属性词条
+			auto PropertyEntrysPtr = GetMainPropertyEntry();
+			if (PropertyEntrysPtr)
+			{
+				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+				for (const auto& Iter : PropertyEntrysPtr->Map)
+				{
+					ModifyPropertyMap.Add(Iter);
+				}
+
+				auto AllocationCharacter = GetAllocationCharacter();
+				AllocationCharacter->GetInteractiveBaseGAComponent()->SendEvent2Self(
+					ModifyPropertyMap, GetUnitType()
+				);
+			}
+
+			// 
 			auto TableRowUnit_WeaponExtendInfoPtr = GetTableRowUnit_WeaponExtendInfo();
 
 			ProxyCharacterPtr->SwitchAnimLink_Client(TableRowUnit_WeaponExtendInfoPtr->AnimLinkClassType);
 
 			auto ToolActorClass = TableRowUnit_WeaponExtendInfoPtr->ToolActorClass;
 
+			// 生成对应的武器Actor
 			FActorSpawnParameters SpawnParameters;
 
 			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
@@ -934,6 +1005,15 @@ void FWeaponProxy::RetractputWeapon()
 {
 	if (ActivedWeaponPtr)
 	{
+		// 移除武器给的属性词条
+#if UE_EDITOR || UE_SERVER
+		auto AllocationCharacter = GetAllocationCharacter();
+		if (AllocationCharacter->GetNetMode() == NM_DedicatedServer)
+		{
+			AllocationCharacter->GetInteractiveBaseGAComponent()->ClearData2Self(GetAllData(), GetUnitType());
+		}
+#endif
+
 		ActivedWeaponPtr->Destroy();
 		ActivedWeaponPtr = nullptr;
 

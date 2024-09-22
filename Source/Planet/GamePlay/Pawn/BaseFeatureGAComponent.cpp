@@ -6,6 +6,7 @@
 
 #include "GameplayAbilitySpec.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -53,6 +54,41 @@
 #include "CS_PeriodicPropertyTag.h"
 
 FName UBaseFeatureGAComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
+
+bool UBaseFeatureGAComponent::IsInDeath() const
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	return OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(
+		UGameplayTagsSubSystem::GetInstance()->DeathingTag
+	);
+}
+
+bool UBaseFeatureGAComponent::IsUnSelected() const
+{
+	return false;
+}
+
+bool UBaseFeatureGAComponent::IsRunning() const
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	return OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(
+		UGameplayTagsSubSystem::GetInstance()->Running
+	);
+}
+
+bool UBaseFeatureGAComponent::IsRootMotion() const
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	return OnwerActorPtr->GetCharacterMovement()->HasRootMotionSources();
+}
+
+bool UBaseFeatureGAComponent::IsInFighting() const
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	return OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(
+		UGameplayTagsSubSystem::GetInstance()->InFightingTag
+	);
+}
 
 void UBaseFeatureGAComponent::AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
 {
@@ -126,7 +162,7 @@ void UBaseFeatureGAComponent::SendEventImp(
 		FGameplayEventData* Payload = new FGameplayEventData;
 		Payload->TargetData.Add(GameplayAbilityTargetDataSPtr);
 
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 		ASCPtr->GiveAbilityAndActivateOnce(
 			Spec,
@@ -143,7 +179,7 @@ void UBaseFeatureGAComponent::SendEventImp(
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
 			FGameplayEventData Payload;
@@ -171,7 +207,7 @@ void UBaseFeatureGAComponent::SendEventImp(
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
 			FGameplayEventData Payload;
@@ -199,7 +235,7 @@ void UBaseFeatureGAComponent::SendEventImp(
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
 			FGameplayEventData Payload;
@@ -227,7 +263,7 @@ void UBaseFeatureGAComponent::SendEventImp(
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
 			FGameplayEventData Payload;
@@ -249,10 +285,10 @@ void UBaseFeatureGAComponent::SendEventImp(
 }
 
 void UBaseFeatureGAComponent::ClearData2Other(
-	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap, const FGameplayTag& DataSource
+	const TMap<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap, const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (!OnwerActorPtr)
 	{
 		return;
@@ -279,13 +315,13 @@ void UBaseFeatureGAComponent::ClearData2Self(
 	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap, const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (!OnwerActorPtr)
 	{
 		return;
 	}
 
-	TPair<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>ModifyPropertyMap{ OnwerActorPtr, InModifyPropertyMap };
+	TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>>ModifyPropertyMap{ OnwerActorPtr, InModifyPropertyMap };
 
 	ClearData2Other({ ModifyPropertyMap }, DataSource);
 }
@@ -306,11 +342,11 @@ void UBaseFeatureGAComponent::ExcuteAttackedEffect(EAffectedDirection AffectedDi
 }
 
 void UBaseFeatureGAComponent::SendEvent2Other(
-	const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
+	const TMap<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
 	const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (!OnwerActorPtr)
 	{
 		return;
@@ -337,13 +373,13 @@ void UBaseFeatureGAComponent::SendEvent2Self(
 	const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (!OnwerActorPtr)
 	{
 		return;
 	}
 
-	TPair<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>ModifyPropertyMap{ OnwerActorPtr, InModifyPropertyMap };
+	TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>>ModifyPropertyMap{ OnwerActorPtr, InModifyPropertyMap };
 
 	SendEvent2Other({ ModifyPropertyMap }, DataSource);
 }
@@ -353,7 +389,7 @@ void UBaseFeatureGAComponent::InitialBaseGAs()
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto OnwerActorPtr = GetOwner<ACharacterBase>();
+		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
 			auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
@@ -465,6 +501,20 @@ void UBaseFeatureGAComponent::Dash_Implementation(EDashDirection DashDirection)
 	}
 }
 
+void UBaseFeatureGAComponent::Respawn()
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+			OnwerActorPtr,
+			UGameplayTagsSubSystem::GetInstance()->BaseFeature_Respawn,
+			Payload
+		);
+	}
+}
+
 void UBaseFeatureGAComponent::MoveToAttackDistance(
 	FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
 )
@@ -485,7 +535,7 @@ void UBaseFeatureGAComponent::MoveToAttackDistance(
 
 void UBaseFeatureGAComponent::BreakMoveToAttackDistance()
 {
-	auto OnwerActorPtr = GetOwner<ACharacterBase>();
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
@@ -572,6 +622,30 @@ void UBaseFeatureGAComponent::AddSendBaseModify()
 			}
 		};
 		AddSendEventModify(MakeShared<FMyStruct>(9998));
+	}
+	{
+		struct FMyStruct : public IGAEventModifySendInterface
+		{
+			FMyStruct(int32 InPriority) :
+				IGAEventModifySendInterface(InPriority)
+			{
+			}
+
+			virtual void Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
+			{
+				const auto & CharacterAttributes =
+					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr.Get()->GetCharacterAttributesComponent()->GetCharacterAttributes();
+				for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
+				{
+					Iter.AD_Penetration += CharacterAttributes.AD_Penetration.GetCurrentValue();
+					Iter.AD_PercentPenetration += CharacterAttributes.AD_PercentPenetration.GetCurrentValue();
+					Iter.HitRate += CharacterAttributes.HitRate.GetCurrentValue();
+					Iter.CriticalHitRate += CharacterAttributes.CriticalHitRate.GetCurrentValue();
+					Iter.CriticalDamage += CharacterAttributes.CriticalDamage.GetCurrentValue();
+				}
+			}
+		};
+		AddSendEventModify(MakeShared<FMyStruct>(0));
 	}
 }
 

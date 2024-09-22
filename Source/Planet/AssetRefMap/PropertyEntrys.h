@@ -18,10 +18,8 @@ struct PLANET_API FTableRowUnit_PropertyEntrys : public FTableRowBase
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString ExtendText;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
-	ECharacterPropertyType CharacterPropertyType = ECharacterPropertyType::AD;
+	// 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
+	TMap<ECharacterPropertyType, int32>Map;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
-	int32 Value = 0;
-
 };

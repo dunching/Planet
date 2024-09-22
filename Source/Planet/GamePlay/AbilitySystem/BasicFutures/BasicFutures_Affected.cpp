@@ -6,13 +6,24 @@
 #include "GameplayTagsSubSystem.h"
 #include "Planet_Tools.h"
 
+UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Affected::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Affected::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << AffectedDirection;
+
+	return true;
+}
+
 UBasicFutures_Affected::UBasicFutures_Affected() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
 	bRetriggerInstancedAbility = true;
-
 }
 
 void UBasicFutures_Affected::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
@@ -118,19 +129,25 @@ void UBasicFutures_Affected::PerformAction(EAffectedDirection AffectedDirection)
 
 void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
-	auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-		this,
-		TEXT(""),
-		CurMontagePtr,
-		CharacterPtr->GetMesh()->GetAnimInstance(),
-		Rate
-	);
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
+	{
+		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+			this,
+			TEXT(""),
+			CurMontagePtr,
+			CharacterPtr->GetMesh()->GetAnimInstance(),
+			Rate
+		);
 
-	TaskPtr->Ability = this;
-	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-	TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
-	TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
+		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
-	TaskPtr->ReadyForActivation();
+		TaskPtr->ReadyForActivation();
+	}
 }

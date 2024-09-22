@@ -49,7 +49,7 @@ void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type 
 
 	if (NewFocus)
 	{
-		BindRemove(NewFocus);
+		BindOnFocusRemove(NewFocus);
 
 		if (InPriority >= FocusInformation.Priorities.Num())
 		{
@@ -371,6 +371,23 @@ ACharacterBase* APlanetPlayerController::GetRealCharacter()const
 	return Cast<ACharacterBase>(GetPawn());
 }
 
+void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
+{
+	if (CurrentValue <= 0)
+	{
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
+		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
+			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
+			{
+				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+				{
+//					Destroy();
+				}
+			}
+			});
+	}
+}
+
 void APlanetPlayerController::BindPCWithCharacter()
 {
 }
@@ -411,7 +428,7 @@ void APlanetPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Coun
 	}
 }
 
-void APlanetPlayerController::BindRemove(AActor* Actor)
+void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 {
 	if (!Actor)
 	{

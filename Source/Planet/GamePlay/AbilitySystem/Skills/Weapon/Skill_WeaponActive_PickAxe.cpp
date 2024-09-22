@@ -174,6 +174,9 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		CapsuleParams
 	))
 	{
+		const auto & CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		const auto BaseDamage = Damage + CharacterAttributes.AD.GetCurrentValue();
+
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
 		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
@@ -187,7 +190,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 				GAEventData.bIsWeaponAttack = true;
 				GAEventData.bIsMakeAttackEffect = true;
-				GAEventData.SetBaseDamage(Damage);
+				GAEventData.SetBaseDamage(BaseDamage);
 
 				GAEventDataPtr->DataAry.Add(GAEventData);
 			}
@@ -200,45 +203,51 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 void USkill_WeaponActive_PickAxe::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
-	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
-
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
-		auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
-			this,
-			TEXT(""),
-			PickAxeMontage,
-			EquipmentAxePtr->GetMesh()->GetAnimInstance(),
-			Rate
-		);
-		
-		AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-		AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
-		AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
+		const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+		const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
-		AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
+		{
+			auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+				this,
+				TEXT(""),
+				PickAxeMontage,
+				EquipmentAxePtr->GetMesh()->GetAnimInstance(),
+				Rate
+			);
 
-		MontageNum++;
-	}
-	{
-		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-			this,
-			TEXT(""),
-			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
-			Rate
-		);
+			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
+			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
-		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
 
-		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
+			MontageNum++;
+		}
+		{
+			auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+				this,
+				TEXT(""),
+				HumanMontage,
+				CharacterPtr->GetMesh()->GetAnimInstance(),
+				Rate
+			);
 
-		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
+			AbilityTask_PlayMontage_HumanPtr->Ability = this;
+			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
-		MontageNum++;
+			AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
+
+			AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
+
+			MontageNum++;
+		}
 	}
 }

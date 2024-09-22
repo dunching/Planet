@@ -40,7 +40,7 @@ public:
 	// 基础状态回复
 	void ProcessCharacterAttributes();
 
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, EditDefaultsOnly)
 	FCharacterAttributes CharacterAttributes;
 
 protected:
