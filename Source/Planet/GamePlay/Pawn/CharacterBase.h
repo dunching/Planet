@@ -111,6 +111,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
 	
+	UFUNCTION(NetMulticast, Reliable)
+	void SetCampType(ECharacterCampType CharacterCampType);
+
 	UPROPERTY(Transient)
 	UCharacterTitle* CharacterTitlePtr = nullptr;
 	
@@ -175,9 +178,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UFightingTips>FightingTipsClass;
 	
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 

@@ -876,7 +876,8 @@ FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() co
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_CharacterInfo>(*UnitType.ToString(), TEXT("GetUnit"));
+	auto SceneUnitExtendInfoPtr = 
+		DataTable->FindRow<FTableRowUnit_CharacterInfo>(*ProxyCharacterPtr->RowName.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
 }
 

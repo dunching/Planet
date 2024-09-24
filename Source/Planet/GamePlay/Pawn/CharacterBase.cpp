@@ -44,7 +44,6 @@
 #include "FightingTips.h"
 #include "SceneObj.h"
 #include "SceneUnitContainer.h"
-#include "SceneUnitTable.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -96,6 +95,14 @@ void ACharacterBase::BeginPlay()
 				else
 				{
 					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+				}
+
+				auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+				if (PlayerCharacterPtr)
+				{
+					SetCampType(
+						IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+					);
 				}
 			}
 		}
@@ -179,8 +186,6 @@ void ACharacterBase::PostInitializeComponents()
 #endif
 	}
 
-	Super::PostInitializeComponents();
-
 	if ((World->IsGameWorld()))
 	{
 		HoldingItemsComponentPtr->Proxy_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
@@ -192,6 +197,8 @@ void ACharacterBase::PostInitializeComponents()
 
 		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent = StateProcessorComponentPtr;
 	}
+
+	Super::PostInitializeComponents();
 }
 
 void ACharacterBase::PossessedBy(AController* NewController)
@@ -301,6 +308,7 @@ TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 void ACharacterBase::InitialDefaultCharacterUnit()
 {
 	TSharedPtr<FCharacterProxy>CharacterUnitPtr = nullptr;
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -337,6 +345,14 @@ bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType AnimLinkClassType)
 {
 	SwitchAnimLink(AnimLinkClassType);
+}
+
+void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCampType)
+{
+	if (CharacterTitlePtr)
+	{
+		CharacterTitlePtr->SetCampType(CharacterCampType);
+	}
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -381,7 +397,7 @@ void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTar
 	if (GetNetMode() == NM_Client)
 	{
 		// 显示对应的浮动UI
-		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
+		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
 		UIPtr->ProcessGAEVent(GAEvent);
 		UIPtr->AddToViewport(EUIOrder::kFightingTips);
 	}

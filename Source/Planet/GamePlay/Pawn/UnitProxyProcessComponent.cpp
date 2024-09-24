@@ -190,6 +190,12 @@ void UUnitProxyProcessComponent::RetractputWeapon()
 
 int32 UUnitProxyProcessComponent::GetCurrentWeaponAttackDistance() const
 {
+	auto SPtr = GetActivedWeapon();
+	if (SPtr)
+	{
+		return SPtr->GetMaxAttackDistance();
+	}
+
 	return 100;
 }
 
@@ -456,10 +462,18 @@ void UUnitProxyProcessComponent::Update(const TSharedPtr<FSocket_FASI>& Socket)
 	else
 	{
 		SocketMap.Add(Socket->Socket, Socket);
+		if (Socket->ProxySPtr)
+		{
+			Socket->ProxySPtr->Allocation();
+		}
 
 #if UE_EDITOR || UE_SERVER
 		if (GetNetMode() == NM_DedicatedServer)
 		{
+			if (Socket->ProxySPtr)
+			{
+				Socket->ProxySPtr->Update2Client();
+			}
 			AllocationSkills_Container.AddItem(Socket);
 		}
 #endif

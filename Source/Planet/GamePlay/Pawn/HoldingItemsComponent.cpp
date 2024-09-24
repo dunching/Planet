@@ -597,7 +597,6 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialDefaultCharacter()
 
 	CharacterProxySPtr->UnitType = UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player;
 	CharacterProxySPtr->ProxyCharacterPtr = GetOwner<FOwnerType>();
-
 	CharacterProxySPtr->InitialUnit();
 
 	SceneToolsAry.Add(CharacterProxySPtr);

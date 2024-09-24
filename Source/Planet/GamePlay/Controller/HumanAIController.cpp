@@ -52,10 +52,7 @@ void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
-		if (CharacterPtr->CharacterTitlePtr)
-		{
-			CharacterPtr->CharacterTitlePtr->SetCampType(CharacterCampType);
-		}
+		CharacterPtr->SetCampType(CharacterCampType);
 	}
 }
 
@@ -184,11 +181,12 @@ void AHumanAIController::InitialCharacter()
 	TeamHelperChangedDelegate =
 		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
 	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
-
-	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
-	{
-		StateTreeAIComponentPtr->StartLogic();
-	}
+ 
+	// 组件自动调用条件不成功，原因未知
+ 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
+ 	{
+ 		StateTreeAIComponentPtr->StartLogic();
+ 	}
 
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
@@ -198,36 +196,38 @@ void AHumanAIController::InitialCharacter()
 #endif
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
 		{
-// 			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
-// 			if (TableRowUnit_CharacterInfoPtr)
+			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
+			if (TableRowUnit_CharacterInfoPtr)
 			{
 				// 武器
 				{
-// 					TSharedPtr<FWeaponSocketInfo > FirstWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
-// 					{
-// 						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo, 1));
-// 						if (WeaponUnitPtr)
-// 						{
-// 							FirstWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket1;
-// 							FirstWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
-// 							FirstWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-// 						}
-// 					}
-// 
-// 					TSharedPtr<FWeaponSocketInfo > SecondWeaponSocketInfoSPtr = MakeShared<FWeaponSocketInfo>();
-// 					{
-// 						auto WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(HICPtr->AddUnit(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo, 1));
-// 						if (WeaponUnitPtr)
-// 						{
-// 							SecondWeaponSocketInfoSPtr->WeaponSocket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket2;
-// 							SecondWeaponSocketInfoSPtr->WeaponUnitPtr = WeaponUnitPtr;
-// 							SecondWeaponSocketInfoSPtr->WeaponUnitPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-// 						}
-// 					}
-// 
-// 					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
-// 					EICPtr->RegisterWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
-// 					EICPtr->ActiveWeapon(EWeaponSocket::kMain);
+					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+
+					auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
+					{
+						auto WeaponUnitPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
+						if (WeaponUnitPtr)
+						{
+							FirstWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1;
+							FirstWeaponSocketInfoSPtr->ProxySPtr = WeaponUnitPtr;
+							FirstWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
+						}
+					}
+					EICPtr->UpdateSocket(FirstWeaponSocketInfoSPtr);
+
+					auto SecondWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
+					{
+						auto WeaponUnitPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo);
+						if (WeaponUnitPtr)
+						{
+							SecondWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2;
+							SecondWeaponSocketInfoSPtr->ProxySPtr = WeaponUnitPtr;
+							SecondWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
+						}
+					}
+					EICPtr->UpdateSocket(SecondWeaponSocketInfoSPtr);
+
+					EICPtr->ActiveWeapon();
 				}
 
 				// 技能

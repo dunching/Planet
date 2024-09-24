@@ -74,6 +74,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UFocusIcon>FocusIconClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UFightingTips>FightingTipsClass;
 #pragma endregion MenusUI
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

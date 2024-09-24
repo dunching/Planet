@@ -372,6 +372,15 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
+	// 元素词条
+	FGameplayTag ElementPropertyEntry;
+
+	// 主词条
+	FGameplayTag MainPropertyEntry;
+	
+	// 副词条
+	FGameplayTag SecondPropertyEntry;
+
 protected:
 
 };
