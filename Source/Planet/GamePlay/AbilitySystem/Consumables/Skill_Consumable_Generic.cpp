@@ -9,7 +9,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "SceneUnitTable.h"
@@ -128,7 +128,7 @@ void USkill_Consumable_Generic::ExcuteTasks()
 			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		}
 	}

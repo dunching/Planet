@@ -51,6 +51,8 @@ class USkill_Active_Base :
 
 public:
 
+	using ActiveParamType = FGameplayAbilityTargetData_ActiveSkill;
+
 	USkill_Active_Base();
 
 	virtual void OnAvatarSet(
@@ -141,6 +143,8 @@ protected:
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
 	
 	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
+
+	const ActiveParamType* ActiveParamPtr = nullptr;
 
 	// 是否需要等待输入以继续
 	bool bIsPreviouInput = false;

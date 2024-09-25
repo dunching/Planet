@@ -36,7 +36,7 @@ class UPlanetAbilitySystemInterface;
 class UTalentAllocationComponent;
 class UStateProcessorComponent;
 class UGroupMnaggerComponent;
-class UBaseFeatureGAComponent;
+class UBaseFeatureComponent;
 class UInteractiveConsumablesComponent;
 class UUnitProxyProcessComponent;
 class UInteractiveToolComponent;
@@ -89,7 +89,7 @@ public:
 
 	UTalentAllocationComponent* GetTalentAllocationComponent()const;
 
-	UBaseFeatureGAComponent* GetInteractiveBaseGAComponent()const;
+	UBaseFeatureComponent* GetBaseFeatureComponent()const;
 	
 	UStateProcessorComponent* GetStateProcessorComponent()const;
 
@@ -157,26 +157,26 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UBaseFeatureGAComponent> InteractiveBaseGAComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UBaseFeatureComponent> BaseFeatureComponentPtr = nullptr;
+	
+	UPROPERTY()
 	TObjectPtr<UUnitProxyProcessComponent> InteractiveSkillComponentPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	UPROPERTY()
 	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;
 	
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;

@@ -25,7 +25,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 namespace Skill_WeaponActive_PickAxe
 {
@@ -196,7 +196,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }

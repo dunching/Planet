@@ -37,7 +37,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitTable.h"
 #include "Skill_Active_Control.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "Skill_WeaponActive_Base.h"
 #include "HoldingItemsComponent.h"
 

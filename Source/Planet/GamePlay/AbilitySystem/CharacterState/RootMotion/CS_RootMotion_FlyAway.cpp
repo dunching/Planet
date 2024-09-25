@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -26,6 +26,23 @@
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
 #include "CharacterStateInfo.h"
+#include "StateProcessorComponent.h"
+
+FGameplayAbilityTargetData_RootMotion_FlyAway::FGameplayAbilityTargetData_RootMotion_FlyAway() :
+	Super(UGameplayTagsSubSystem::GetInstance()->FlyAway)
+{
+
+}
+
+FGameplayAbilityTargetData_RootMotion_FlyAway* FGameplayAbilityTargetData_RootMotion_FlyAway::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_RootMotion_FlyAway;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
 
 void UCS_RootMotion_FlyAway::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
@@ -67,19 +84,36 @@ void UCS_RootMotion_FlyAway::EndAbility(
 	bool bWasCancelled
 )
 {
+	//
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void UCS_RootMotion_FlyAway::UpdateDuration()
 {
+	Super::UpdateDuration();
+
 	if (AbilityTask_TimerHelperPtr)
 	{
+		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		AbilityTask_TimerHelperPtr->UpdateDuration();
 	}
+	
+	if (CharacterStateInfoSPtr)
+	{
+		CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+		CharacterStateInfoSPtr->RefreshTime();
+		CharacterStateInfoSPtr->DataChanged();
+	}
+
 	if (RootMotionTaskPtr)
 	{
-		RootMotionTaskPtr->UpdateDuration();
+		RootMotionTaskPtr->UpdateDuration(GameplayAbilityTargetDataSPtr->Height, GameplayAbilityTargetDataSPtr->Duration);
 	}
+
 }
 
 void UCS_RootMotion_FlyAway::SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& InGameplayAbilityTargetDataSPtr)
@@ -92,20 +126,6 @@ void UCS_RootMotion_FlyAway::PerformAction()
 	if (CharacterPtr)
 	{
 		ExcuteTasks();
-
-		RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
-			this,
-			TEXT(""),
-			GameplayAbilityTargetDataSPtr->Duration,
-			GameplayAbilityTargetDataSPtr->Height
-		);
-
-		RootMotionTaskPtr->Ability = this;
-		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-
-		RootMotionTaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementToZeroListLock);
-
-		RootMotionTaskPtr->ReadyForActivation();
 	}
 }
 
@@ -124,6 +144,27 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 	}
 	else
 	{
+		// 
+		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+		CharacterStateInfoSPtr->DataChanged();
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+
+		// 
+		RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
+			this,
+			TEXT(""),
+			GameplayAbilityTargetDataSPtr->Duration,
+			GameplayAbilityTargetDataSPtr->Height
+		);
+
+		RootMotionTaskPtr->Ability = this;
+		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		RootMotionTaskPtr->ReadyForActivation();
+
+		// 
 		AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
 		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		AbilityTask_TimerHelperPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
@@ -155,21 +196,8 @@ void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, flo
 	}
 	else
 	{
+		CharacterStateInfoSPtr->TotalTime = CurrentInterval;
+
+		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 	}
-}
-
-FGameplayAbilityTargetData_RootMotion_FlyAway::FGameplayAbilityTargetData_RootMotion_FlyAway():
-	Super(UGameplayTagsSubSystem::GetInstance()->FlyAway)
-{
-
-}
-
-FGameplayAbilityTargetData_RootMotion_FlyAway* FGameplayAbilityTargetData_RootMotion_FlyAway::Clone() const
-{
-	auto ResultPtr =
-		new FGameplayAbilityTargetData_RootMotion_FlyAway;
-
-	*ResultPtr = *this;
-
-	return ResultPtr;
 }

@@ -27,7 +27,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 namespace Skill_WeaponActive_RangeTest
 {
@@ -169,7 +169,7 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
 
-	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 

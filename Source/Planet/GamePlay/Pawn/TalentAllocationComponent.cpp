@@ -11,7 +11,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitContainer.h"
 #include "PlanetControllerInterface.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
@@ -263,7 +263,7 @@ void UTalentAllocationComponent::SyncToHolding()
 				break;
 				}
 				
-				CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+				CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
 			}
 		}
 		break;

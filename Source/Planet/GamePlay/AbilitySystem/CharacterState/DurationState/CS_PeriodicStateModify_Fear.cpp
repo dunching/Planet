@@ -18,7 +18,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -107,7 +107,7 @@ void UCS_PeriodicStateModify_Fear::EndAbility(
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	//
-	CharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes.MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
+	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
 
 	//
 	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
@@ -142,7 +142,7 @@ void UCS_PeriodicStateModify_Fear::PerformAction()
 
 	//
 	MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
-	CharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes.MoveSpeed.AddSettlementModify(MyPropertySettlementModify);
+	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddSettlementModify(MyPropertySettlementModify);
 
 	//
 	MoveImp();

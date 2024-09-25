@@ -123,7 +123,7 @@ void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitP
 			if (UIPtr)
 			{
 				auto CharacterAttributes =
-					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 				UIPtr->SetText(
 					FText::FromString(FString::Printf(TEXT("%s(%d)"), 
 						*CharacterAttributes.Name.ToString(),

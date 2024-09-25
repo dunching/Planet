@@ -27,7 +27,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "PlanetControllerInterface.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
 #include "CS_RootMotion.h"
@@ -237,18 +237,18 @@ void TestCommand::TestGAEventModify()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		auto InteractiveBaseGAComponentPtr = CharacterPtr->GetInteractiveBaseGAComponent();
-		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(123, 523));
-		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(1, 423));
-		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(12, 323));
-		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(13, 223));
+		auto BaseFeatureComponentPtr = CharacterPtr->GetBaseFeatureComponent();
+		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(123, 523));
+		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(1, 423));
+		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(12, 323));
+		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(13, 223));
 
 		auto d = MakeShared<MyStruct>(14, 1231);
-		InteractiveBaseGAComponentPtr->AddSendEventModify(d);
-		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1232));
-		InteractiveBaseGAComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1233));
+		BaseFeatureComponentPtr->AddSendEventModify(d);
+		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1232));
+		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1233));
 
-		InteractiveBaseGAComponentPtr->RemoveSendEventModify(d);
+		BaseFeatureComponentPtr->RemoveSendEventModify(d);
 
 
 	}
@@ -464,7 +464,7 @@ void TestCommand::TestGAState2Self(const TArray< FString >& Args)
 	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 	GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 
@@ -508,7 +508,7 @@ void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = TargetCharacterPtr;
 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-				auto ICPtr = TargetCharacterPtr->GetInteractiveBaseGAComponent();
+				auto ICPtr = TargetCharacterPtr->GetBaseFeatureComponent();
 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 		}

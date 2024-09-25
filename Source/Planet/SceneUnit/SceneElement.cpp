@@ -30,7 +30,7 @@
 #include "HoldingItemsComponent.h"
 #include "CDCaculatorComponent.h"
 #include "Skill_Consumable_Generic.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -99,6 +99,14 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 void FBasicProxy::InitialUnit()
 {
 	ID = FGuid::NewGuid();
+}
+
+void FBasicProxy::UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr)
+{
+	ID = RemoteSPtr->ID;
+	UnitType = RemoteSPtr->UnitType;
+	OwnerCharacterUnitPtr = RemoteSPtr->OwnerCharacterUnitPtr;
+	AllocationCharacterUnitPtr = RemoteSPtr->AllocationCharacterUnitPtr;
 }
 
 bool FBasicProxy::Active()
@@ -191,7 +199,7 @@ void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>
 	}
 #endif
 
-	OnAllocationCharacterUnitChanged.ExcuteCallback(nullptr);
+	OnAllocationCharacterUnitChanged.ExcuteCallback(AllocationCharacterUnitPtr);
 }
 
 TWeakPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterUnit() const
@@ -353,6 +361,13 @@ FWeaponProxy::FWeaponProxy()
 
 }
 
+void FWeaponProxy::UpdateByRemote(const TSharedPtr<FWeaponProxy>& RemoteSPtr)
+{
+	Super::UpdateByRemote(RemoteSPtr);
+
+	MaxAttackDistance = RemoteSPtr->MaxAttackDistance;
+}
+
 bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
@@ -476,6 +491,23 @@ bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 	return true;
 }
 
+void FSkillProxy::SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& InAllocationCharacterUnitPtr)
+{
+	if (!InAllocationCharacterUnitPtr)
+	{
+		UnAllocation();
+	}
+
+	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+}
+
+void FSkillProxy::UpdateByRemote(const TSharedPtr<FSkillProxy>& RemoteSPtr)
+{
+	Super::UpdateByRemote(RemoteSPtr);
+
+	Level = RemoteSPtr->Level;
+}
+
 TSubclassOf<USkill_Base> FSkillProxy::GetSkillClass() const
 {
 	return nullptr;
@@ -497,71 +529,71 @@ bool FActiveSkillProxy::Active()
 	auto ProxyCharacterPtr = GetProxyCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-	 	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
-	 	if (!InGAInsPtr)
-	 	{
-	 		return false;
-	 	}
-	 
-	 	auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
-	 
-	 	// 需要特殊参数的
-	 	if (
-	 		GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
-	 		)
-	 	{
-	 		if (InGAInsPtr->IsActive())
-	 		{
-	 			InGAInsPtr->SetContinuePerform(true);
-	 			return true;
-	 		}
-	 		else
-	 		{
-	 			auto GameplayAbilityTargetPtr =
-	 				new FGameplayAbilityTargetData_Control;
-	 
-	 			// Test
-	 			GameplayAbilityTargetPtr->TargetCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
-	 
-	 			FGameplayEventData Payload;
-	 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
-	 
-	 			return ASCPtr->TriggerAbilityFromGameplayEvent(
-	 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
-	 				ASCPtr->AbilityActorInfo.Get(),
-					GetUnitType(),
-	 				&Payload,
-	 				*ASCPtr
-	 			);
-	 		}
-	 	}
-	 	else
-	 	{
-	 		if (InGAInsPtr->IsActive())
-	 		{
-	 			InGAInsPtr->SetContinuePerform(true);
-	 			return true;
-	 		}
-	 		else
-	 		{
-	 			auto GameplayAbilityTargetPtr =
-	 				new FGameplayAbilityTargetData_ActiveSkill;
+		auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
+		if (!InGAInsPtr)
+		{
+			return false;
+		}
 
-				GameplayAbilityTargetPtr->bIsAutoContinue = 
-					ProxyCharacterPtr->GetRemoteRole() == ROLE_AutonomousProxy ? false : true;
-	 
-	 			FGameplayEventData Payload;
-	 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
-	 
-	 			return ASCPtr->TriggerAbilityFromGameplayEvent(
-	 				InGAInsPtr->GetCurrentAbilitySpecHandle(),
-	 				ASCPtr->AbilityActorInfo.Get(),
+		auto ASCPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetAbilitySystemComponent();
+
+		// 需要特殊参数的
+		if (
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
+			)
+		{
+			if (InGAInsPtr->IsActive())
+			{
+				InGAInsPtr->SetContinuePerform(true);
+				return true;
+			}
+			else
+			{
+				auto GameplayAbilityTargetPtr =
+					new FGameplayAbilityTargetData_Control;
+
+				// Test
+				GameplayAbilityTargetPtr->TargetCharacterPtr = OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get();
+
+				FGameplayEventData Payload;
+				Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+				return ASCPtr->TriggerAbilityFromGameplayEvent(
+					InGAInsPtr->GetCurrentAbilitySpecHandle(),
+					ASCPtr->AbilityActorInfo.Get(),
 					GetUnitType(),
-	 				&Payload,
-	 				*ASCPtr
-	 			);
-	 		}
-	 	}
+					&Payload,
+					*ASCPtr
+				);
+			}
+		}
+		else
+		{
+			if (InGAInsPtr->IsActive())
+			{
+				InGAInsPtr->SetContinuePerform(true);
+				return true;
+			}
+			else
+			{
+				auto GameplayAbilityTargetPtr =
+					new FGameplayAbilityTargetData_ActiveSkill;
+
+				GameplayAbilityTargetPtr->bIsAutoContinue =
+					ProxyCharacterPtr->GetRemoteRole() == ROLE_AutonomousProxy ? false : true;
+
+				FGameplayEventData Payload;
+				Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+				return ASCPtr->TriggerAbilityFromGameplayEvent(
+					InGAInsPtr->GetCurrentAbilitySpecHandle(),
+					ASCPtr->AbilityActorInfo.Get(),
+					GetUnitType(),
+					&Payload,
+					*ASCPtr
+				);
+			}
+		}
 	}
 #endif
 
@@ -776,6 +808,7 @@ FPassiveSkillProxy::FPassiveSkillProxy()
 
 void FPassiveSkillProxy::InitialUnit()
 {
+	Super::InitialUnit();
 }
 
 void FPassiveSkillProxy::Allocation()
@@ -794,12 +827,12 @@ void FPassiveSkillProxy::Allocation()
 			{
 				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
-				for (const auto &Iter : MainPropertyEntryPtr->Map)
+				for (const auto& Iter : MainPropertyEntryPtr->Map)
 				{
 					ModifyPropertyMap.Add(Iter);
 				}
 
-				AllocationCharacter->GetInteractiveBaseGAComponent()->SendEvent2Self(
+				AllocationCharacter->GetBaseFeatureComponent()->SendEvent2Self(
 					ModifyPropertyMap, GetUnitType()
 				);
 			}
@@ -815,7 +848,7 @@ void FPassiveSkillProxy::UnAllocation()
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto AllocationCharacter = GetAllocationCharacter();
-		AllocationCharacter->GetInteractiveBaseGAComponent()->ClearData2Self(
+		AllocationCharacter->GetBaseFeatureComponent()->ClearData2Self(
 			GetAllData(), GetUnitType()
 		);
 	}
@@ -879,7 +912,7 @@ FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() co
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr = 
+	auto SceneUnitExtendInfoPtr =
 		DataTable->FindRow<FTableRowUnit_CharacterInfo>(*ProxyCharacterPtr->RowName.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
 }
@@ -891,6 +924,13 @@ void FCharacterProxy::RelieveRootBind()
 FCoinProxy::FCoinProxy()
 {
 
+}
+
+void FCoinProxy::UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr)
+{
+	Super::UpdateByRemote(RemoteSPtr);
+
+	Num = RemoteSPtr->Num;
 }
 
 void FCoinProxy::AddCurrentValue(int32 val)
@@ -977,7 +1017,7 @@ void FWeaponProxy::ActiveWeapon()
 				}
 
 				auto AllocationCharacter = GetAllocationCharacter();
-				AllocationCharacter->GetInteractiveBaseGAComponent()->SendEvent2Self(
+				AllocationCharacter->GetBaseFeatureComponent()->SendEvent2Self(
 					ModifyPropertyMap, GetUnitType()
 				);
 			}
@@ -1014,7 +1054,7 @@ void FWeaponProxy::RetractputWeapon()
 		auto AllocationCharacter = GetAllocationCharacter();
 		if (AllocationCharacter->GetNetMode() == NM_DedicatedServer)
 		{
-			AllocationCharacter->GetInteractiveBaseGAComponent()->ClearData2Self(GetAllData(), GetUnitType());
+			AllocationCharacter->GetBaseFeatureComponent()->ClearData2Self(GetAllData(), GetUnitType());
 		}
 #endif
 

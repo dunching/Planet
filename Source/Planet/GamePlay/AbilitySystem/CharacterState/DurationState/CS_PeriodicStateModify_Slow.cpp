@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -168,7 +168,7 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+			CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 
 			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
 		}
@@ -198,7 +198,7 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+		CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 		break;
 	}
 }

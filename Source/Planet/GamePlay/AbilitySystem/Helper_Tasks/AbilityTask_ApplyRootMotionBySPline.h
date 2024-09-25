@@ -16,7 +16,7 @@ class ACharacterBase;
 DECLARE_DELEGATE(FOnTaskFinished);
 
 /**
- *	Applies force to character's movement
+ *
  */
 UCLASS()
 class PLANET_API UAbilityTask_ApplyRootMotionBySPline : public UAbilityTask_ApplyRootMotion_Base
@@ -24,7 +24,6 @@ class PLANET_API UAbilityTask_ApplyRootMotionBySPline : public UAbilityTask_Appl
 	GENERATED_BODY()
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "Ability|Tasks", meta = (HidePin = "OwningAbility", DefaultToSelf = "OwningAbility", BlueprintInternalUseOnly = "TRUE"))
 	static UAbilityTask_ApplyRootMotionBySPline* NewTask
 	(
 		UGameplayAbility* OwningAbility,
@@ -32,8 +31,10 @@ public:
 		float Duration,
 		ASPlineActor* InSPlineActorPtr,
 		ACharacterBase* InTargetCharacterPtr,
-		int32 StartPtIndex = 0,
-		int32 EndPtIndex = -1
+		int32 StartPtIndex,
+		float StartOffset,
+		int32 EndPtIndex,
+		float EndOffset
 	);
 
 	static UAbilityTask_ApplyRootMotionBySPline* NewTask
@@ -41,10 +42,8 @@ public:
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
 		float Duration,
-		ASPlineActor* InSPlineActorPtr,
-		ACharacterBase* InTargetCharacterPtr,
-		float StartDistance,
-		float EndDistance
+		ASPlineActor * InSPlineActorPtr,
+		ACharacterBase* InTargetCharacterPtr
 	);
 
 	virtual void Activate() override;
@@ -62,15 +61,20 @@ protected:
 	virtual void SharedInitAndApply() override;
 
 protected:
-	
+
+	UPROPERTY(Replicated)
 	float StartDistance = 0.f;
-	
+
+	UPROPERTY(Replicated)
 	float EndDistance = 0.f;
-	
+
+	UPROPERTY(Replicated)
 	float Duration = 1.f;
-	
+
+	UPROPERTY(Replicated)
 	ASPlineActor* SPlineActorPtr = nullptr;
-	
+
+	UPROPERTY(Replicated)
 	ACharacterBase* TargetCharacterPtr = nullptr;
 
 };

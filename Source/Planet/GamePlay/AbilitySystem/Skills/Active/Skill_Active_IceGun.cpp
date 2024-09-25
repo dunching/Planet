@@ -22,7 +22,7 @@
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_PeriodicStateModify.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "ToolBuilderUtil.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicStateModify_Ice.h"
@@ -236,7 +236,7 @@ void USkill_Active_IceGun::OnOverlap(AActor* OtherActor)
 			return;
 		}
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_StateModify_Ice();
 		GameplayAbilityTargetDataPtr->TargetCharacterPtr=OtherCharacterPtr;
 		GameplayAbilityTargetDataPtr->TriggerCharacterPtr=CharacterPtr;

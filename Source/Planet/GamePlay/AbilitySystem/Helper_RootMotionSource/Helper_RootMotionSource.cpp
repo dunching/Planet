@@ -297,6 +297,8 @@ bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
 
 	return
 		FMath::IsNearlyEqual(RiseDuration, OtherCast->RiseDuration) &&
+		FMath::IsNearlyEqual(Radius, OtherCast->Radius) &&
+		FMath::IsNearlyEqual(HalfHeight, OtherCast->HalfHeight) &&
 		Height == OtherCast->Height;
 }
 
@@ -321,6 +323,8 @@ bool FRootMotionSource_FlyAway::UpdateStateFrom(const FRootMotionSource* SourceT
 
 	RiseDuration = OtherCast->RiseDuration;
 	Height = OtherCast->Height;
+	Height = OtherCast->Radius;
+	Height = OtherCast->HalfHeight;
 
 	return true;
 }
@@ -387,6 +391,8 @@ bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 
 	Ar << RiseDuration;
 	Ar << Height;
+	Ar << Radius;
+	Ar << HalfHeight;
 
 	bOutSuccess = true;
 	return true;

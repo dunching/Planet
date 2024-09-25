@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -99,7 +99,7 @@ void UCS_PeriodicStateModify_Charm::EndAbility(
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 
 	//
 	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
@@ -142,7 +142,7 @@ void UCS_PeriodicStateModify_Charm::PerformAction()
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 
 	//
 	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();

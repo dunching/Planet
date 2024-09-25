@@ -32,7 +32,7 @@
 #include "PlanetControllerInterface.h"
 #include "GameplayTagsSubSystem.h"
 #include "StateProcessorComponent.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "UnitProxyProcessComponent.h"
 #include "CDCaculatorComponent.h"
 
@@ -62,7 +62,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
-	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UBaseFeatureGAComponent>(UBaseFeatureGAComponent::ComponentName);
+	BaseFeatureComponentPtr = CreateDefaultSubobject<UBaseFeatureComponent>(UBaseFeatureComponent::ComponentName);
 	InteractiveSkillComponentPtr = CreateDefaultSubobject<UUnitProxyProcessComponent>(UUnitProxyProcessComponent::ComponentName);
 	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
 }
@@ -181,7 +181,7 @@ void ACharacterBase::PostInitializeComponents()
 
 			GASPtr->ClearAllAbilities();
 			GASPtr->InitAbilityActorInfo(this, this);
-			GetInteractiveBaseGAComponent()->InitialBaseGAs();
+			GetBaseFeatureComponent()->InitialBaseGAs();
 		}
 #endif
 	}
@@ -275,9 +275,9 @@ UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
 	return TalentAllocationComponentPtr;
 }
 
-UBaseFeatureGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
+UBaseFeatureComponent* ACharacterBase::GetBaseFeatureComponent()const
 {
-	return InteractiveBaseGAComponentPtr;
+	return BaseFeatureComponentPtr;
 }
 
 UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
@@ -374,6 +374,10 @@ void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
+		if (!GetController())
+		{
+			return;
+		}
 		if (IsPlayerControlled())
 		{
 			GetController<APlanetPlayerController>()->OnHPChanged(CurrentValue);

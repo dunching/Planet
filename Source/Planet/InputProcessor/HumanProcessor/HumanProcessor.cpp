@@ -52,7 +52,7 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttibutes.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "HumanRegularProcessor.h"
 
 #ifdef WITH_EDITOR
@@ -137,11 +137,11 @@ namespace HumanProcessor
 		{
 			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
 			{
-				OnwerActorPtr->GetInteractiveBaseGAComponent()->SwitchWalkState(false);
+				OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(false);
 			}
 			else
 			{
-				OnwerActorPtr->GetInteractiveBaseGAComponent()->SwitchWalkState(true);
+				OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(true);
 			}
 		}
 	}
@@ -184,7 +184,7 @@ namespace HumanProcessor
 				DashDirection = EDashDirection::kForward;
 			}
 
-			OnwerActorPtr->GetInteractiveBaseGAComponent()->Dash(DashDirection);
+			OnwerActorPtr->GetBaseFeatureComponent()->Dash(DashDirection);
 		}
 	}
 

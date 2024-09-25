@@ -7,7 +7,7 @@
 #include "CharacterBase.h"
 #include "UnitProxyProcessComponent.h"
 
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicStateModify.h"
@@ -59,7 +59,7 @@ void UGAEvent_Send::ActivateAbility(
 
 			auto ClonePtr = GAEventDataPtr->Clone();
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->OnSendEventModifyData(*ClonePtr);
+			CharacterPtr->GetBaseFeatureComponent()->OnSendEventModifyData(*ClonePtr);
 
 			for (const auto& Iter : GAEventDataPtr->DataAry)
 			{
@@ -78,7 +78,7 @@ void UGAEvent_Send::ActivateAbility(
 				}
 				auto ASCPtr = Iter.TargetCharacterPtr->GetAbilitySystemComponent();
 				ASCPtr->TriggerAbilityFromGameplayEvent(
-					Iter.TargetCharacterPtr->GetInteractiveBaseGAComponent()->ReceivedEventHandle,
+					Iter.TargetCharacterPtr->GetBaseFeatureComponent()->ReceivedEventHandle,
 					ASCPtr->AbilityActorInfo.Get(),
 					FGameplayTag(),
 					&Payload,
@@ -113,7 +113,7 @@ void UGAEvent_Send::ActivateAbility(
 			}
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(
-				GAEventDataPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->ReceivedEventHandle,
+				GAEventDataPtr->TargetCharacterPtr->GetBaseFeatureComponent()->ReceivedEventHandle,
 				ASCPtr->AbilityActorInfo.Get(),
 				FGameplayTag(),
 				&Payload,
@@ -147,7 +147,7 @@ void UGAEvent_Send::ActivateAbility(
 			}
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(
-				GAEventDataPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->ReceivedEventHandle,
+				GAEventDataPtr->TargetCharacterPtr->GetBaseFeatureComponent()->ReceivedEventHandle,
 				ASCPtr->AbilityActorInfo.Get(),
 				FGameplayTag(),
 				&Payload,
@@ -181,7 +181,7 @@ void UGAEvent_Send::ActivateAbility(
 			}
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetAbilitySystemComponent();
 			ASCPtr->TriggerAbilityFromGameplayEvent(
-				GAEventDataPtr->TargetCharacterPtr->GetInteractiveBaseGAComponent()->ReceivedEventHandle,
+				GAEventDataPtr->TargetCharacterPtr->GetBaseFeatureComponent()->ReceivedEventHandle,
 				ASCPtr->AbilityActorInfo.Get(),
 				FGameplayTag(),
 				&Payload,

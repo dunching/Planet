@@ -5,7 +5,7 @@
 
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "HumanCharacter.h"
 
 void AWeapon_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)

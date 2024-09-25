@@ -8,7 +8,7 @@
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "PlanetControllerInterface.h"
 #include "CharacterAttibutes.h"
 
@@ -82,7 +82,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 			}
 
 			if (
-				CharacterPtr->GetInteractiveBaseGAComponent()->IsInFighting()
+				CharacterPtr->GetBaseFeatureComponent()->IsInFighting()
 				)
 			{
 			}
@@ -94,7 +94,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }

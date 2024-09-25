@@ -28,7 +28,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "PlanetControllerInterface.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "HorseCharacter.h"
 
 void TestCommand::AddCahracterTestData()

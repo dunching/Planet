@@ -65,7 +65,7 @@
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 #include "ResourceBox.h"
 
@@ -226,7 +226,7 @@ namespace HumanProcessor
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
-				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
+				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
 
 				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
 			}
@@ -240,7 +240,7 @@ namespace HumanProcessor
 				)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
+				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
 			}
 		}
 		else

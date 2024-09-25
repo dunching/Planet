@@ -5,7 +5,7 @@
 #include "EffectItem.h"
 #include "CS_Base.h"
 #include "CharacterBase.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "StateProcessorComponent.h"
 
 void UEffectsList::NativeConstruct()

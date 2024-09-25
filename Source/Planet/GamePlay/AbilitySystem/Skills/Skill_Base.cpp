@@ -6,7 +6,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
 #include "UnitProxyProcessComponent.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameOptions.h"
 #include "HoldingItemsComponent.h"
 

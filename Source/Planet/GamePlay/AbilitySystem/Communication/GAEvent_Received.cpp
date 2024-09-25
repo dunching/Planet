@@ -8,7 +8,7 @@
 #include "UnitProxyProcessComponent.h"
 
 #include "CharacterAttributesComponent.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "StateProcessorComponent.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicPropertyModify.h"
@@ -65,19 +65,19 @@ void UGAEvent_Received::ActivateAbility(
 			}
 			else
 			{
-				CharacterPtr->GetInteractiveBaseGAComponent()->OnReceivedEventModifyData(*CloneSPtr);
+				CharacterPtr->GetBaseFeatureComponent()->OnReceivedEventModifyData(*CloneSPtr);
 
 				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 
 				CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
-				GAEventDataPtr->TriggerCharacterPtr->GetInteractiveBaseGAComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
+				GAEventDataPtr->TriggerCharacterPtr->GetBaseFeatureComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
 				const auto IsNotDeathingTag =
-					!CharacterPtr->GetInteractiveBaseGAComponent()->IsInDeath();
+					!CharacterPtr->GetBaseFeatureComponent()->IsInDeath();
 				if (GAEventDataPtr->Data.bIsMakeAttackEffect && IsNotDeathingTag)
 				{
-					CharacterPtr->GetInteractiveBaseGAComponent()->ExcuteAttackedEffect(EAffectedDirection::kForward);
+					CharacterPtr->GetBaseFeatureComponent()->ExcuteAttackedEffect(EAffectedDirection::kForward);
 				}
 			}
 		}

@@ -9,7 +9,7 @@
 #include "UnitProxyProcessComponent.h"
 #include "GAEvent_Helper.h"
 
-#include "BaseFeatureGAComponent.generated.h"
+#include "BaseFeatureComponent.generated.h"
 
 class UGAEvent_Received;
 struct FConsumableProxy;
@@ -32,7 +32,7 @@ struct FGameplayAbilityTargetData;
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
 UCLASS()
-class PLANET_API UBaseFeatureGAComponent : public UActorComponent
+class PLANET_API UBaseFeatureComponent : public UActorComponent
 {
 	GENERATED_BODY()
 

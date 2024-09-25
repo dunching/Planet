@@ -93,4 +93,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	float FlyAwayHeight = 250.f;
 
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
+
 };

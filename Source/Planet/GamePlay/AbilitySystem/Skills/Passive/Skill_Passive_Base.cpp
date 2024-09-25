@@ -3,7 +3,7 @@
 
 #include "SceneUnitTable.h"
 #include "CharacterBase.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "CharacterAttibutes.h"
 #include "GenerateType.h"
 #include "CharacterAttributesComponent.h"

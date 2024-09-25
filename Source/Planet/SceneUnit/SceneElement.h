@@ -95,6 +95,8 @@ public:
 
 	virtual void InitialUnit();
 
+	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
+
 	// 激活
 	virtual bool Active();
 
@@ -171,6 +173,8 @@ public:
 	friend UHoldingItemsComponent;
 
 	FCoinProxy();
+
+	void UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr);
 
 	void AddCurrentValue(int32 val);
 
@@ -313,6 +317,10 @@ public:
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
+	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)override;
+
+	void UpdateByRemote(const TSharedPtr<FSkillProxy>& RemoteSPtr);
+
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
 	// 装备至插槽
@@ -377,7 +385,7 @@ public:
 
 	// 主词条
 	FGameplayTag MainPropertyEntry;
-	
+
 	// 副词条
 	FGameplayTag SecondPropertyEntry;
 
@@ -482,6 +490,8 @@ public:
 	friend FSceneUnitContainer;
 
 	FWeaponProxy();
+
+	void UpdateByRemote(const TSharedPtr<FWeaponProxy>& RemoteSPtr);
 
 	virtual void InitialUnit()override;
 

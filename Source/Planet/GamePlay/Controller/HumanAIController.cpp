@@ -183,7 +183,7 @@ void AHumanAIController::InitialCharacter()
 	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
  
 	// 组件自动调用条件不成功，原因未知
- 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
+ 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning() && bStartAILogicOnPossess)
  	{
  		StateTreeAIComponentPtr->StartLogic();
  	}

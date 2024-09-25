@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -137,7 +137,7 @@ void UCS_PeriodicStateModify_Ice::PerformAction()
 		ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, ActuallyCount * -10);
 		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, ActuallyCount * -10);
 	
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(
+		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(
 			ModifyPropertyMap, GameplayAbilityTargetDataSPtr->Tag
 		);
 	
@@ -182,7 +182,7 @@ void UCS_PeriodicStateModify_Ice::AddTags(const TSharedPtr<FGameplayAbilityTarge
 		Comp->AddReplicatedLooseGameplayTags(ActivationOwnedTags);
 	}
 
-	CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(
+	CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(
 		GetAllData(), CurrentGameplayAbilityTargetDataSPtr->Tag
 	);
 	TaskPtr->SetDuration(CurrentGameplayAbilityTargetDataSPtr->ImmuneTime);

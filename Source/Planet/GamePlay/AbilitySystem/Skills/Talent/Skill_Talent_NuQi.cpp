@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 int32 FTalent_NuQi::GetCurrentValue() const
 {
@@ -213,7 +213,7 @@ void USkill_Talent_NuQi::StartFuryState()
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::AD, 50);
 
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 	}
 
 	auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
@@ -229,7 +229,7 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
 	}
 
 	if (EffectItemPtr)
@@ -269,7 +269,7 @@ void USkill_Talent_NuQi::OnSendDamage(UGameplayAbility* GAPtr)
 	{
 		if (
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
 			)
 		{
 			AddNuQi();

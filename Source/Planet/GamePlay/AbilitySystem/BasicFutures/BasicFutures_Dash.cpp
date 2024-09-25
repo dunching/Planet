@@ -14,7 +14,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "UnitProxyProcessComponent.h"
 
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "Planet_Tools.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(
@@ -113,7 +113,7 @@ bool UBasicFutures_Dash::CommitAbility(
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 
 		if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())

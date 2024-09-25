@@ -143,3 +143,19 @@ void UAbilityTask_FlyAway::UpdateDuration()
 		RootMotionSourceSPtr->UpdateDuration(Height, Duration, MovementComponent->GetActorLocation());
 	}
 }
+
+void UAbilityTask_FlyAway::UpdateDuration(int32 InHeight, float InDuration)
+{
+	Height = InHeight;
+	Duration = InDuration;
+
+	UpdateDuration();
+}
+
+void UAbilityTask_FlyAway::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Height);
+	DOREPLIFETIME(ThisClass, Duration);
+}

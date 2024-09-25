@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 
 void USkill_Element_Gold::ActivateAbility(
@@ -61,7 +61,7 @@ void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 	{
 		if (!(
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
 			))
 		{
 			return;
@@ -135,7 +135,7 @@ void USkill_Element_Gold::AddBuff()
 			ModifyPropertyMap.Add(ECharacterPropertyType::CriticalHitRate, CurrentBuffLevel * CriticalHitRate);
 			ModifyPropertyMap.Add(ECharacterPropertyType::Evade, CurrentBuffLevel * Evade);
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
+			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 		}
 	}
 	break;
@@ -154,6 +154,6 @@ void USkill_Element_Gold::RemoveBuff()
 {
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
 	}
 }

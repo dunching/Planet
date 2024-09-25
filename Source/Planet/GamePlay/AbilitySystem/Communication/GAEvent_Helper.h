@@ -13,7 +13,7 @@
 
 class ACharacterBase;
 class UInteractiveComponent;
-class UBaseFeatureGAComponent;
+class UBaseFeatureComponent;
 
 struct FCharacterAttributes;
 
@@ -239,16 +239,20 @@ class PLANET_API IGAEventModifyInterface
 {
 public:
 
-	friend UBaseFeatureGAComponent;
+	friend UBaseFeatureComponent;
 	friend FGAEventModify_key_compare;
 
 	IGAEventModifyInterface(int32 InPriority = 1);
 
 	bool operator<(const IGAEventModifyInterface& RightValue)const;
 
+protected:
+
+	bool bIsOnceTime = false;
+
 private:
 
-	// 越小的越先算
+	// 越小的越先算, 100~200 用于基础功能
 	int32 Priority = -1;
 
 	int32 ID = -1;
@@ -261,7 +265,7 @@ public:
 
 	IGAEventModifySendInterface(int32 InPriority = 1);
 
-	virtual void Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent);
+	virtual bool Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent);
 
 };
 
@@ -271,7 +275,7 @@ public:
 
 	IGAEventModifyReceivedInterface(int32 InPriority = 1);
 
-	virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent);
+	virtual bool Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent);
 
 };
 

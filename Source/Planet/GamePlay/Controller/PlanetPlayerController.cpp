@@ -33,7 +33,7 @@
 #include "CharacterAttributesComponent.h"
 #include "TalentAllocationComponent.h"
 #include "SceneUnitContainer.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "EffectsList.h"
 #include "PlanetPlayerState.h"
 #include "GameMode_Main.h"

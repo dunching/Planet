@@ -43,10 +43,10 @@ void USkill_Active_Base::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetPtr)
+		ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamPtr)
 		{
-			bIsPreviouInput = GameplayAbilityTargetPtr->bIsAutoContinue;
+			bIsPreviouInput = ActiveParamPtr->bIsAutoContinue;
 		}
 	}
 }
@@ -140,9 +140,10 @@ void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Perc
 
 void USkill_Active_Base::CheckInContinue()
 {
-	if (bIsPreviouInput)
+	if (bIsPreviouInput || ActiveParamPtr->bIsAutoContinue)
 	{
 		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+		bIsPreviouInput = false;
 	}
 	else
 	{

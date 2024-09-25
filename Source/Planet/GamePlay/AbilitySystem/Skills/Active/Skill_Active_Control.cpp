@@ -25,7 +25,7 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
@@ -138,7 +138,7 @@ void USkill_Active_Control::PerformAction(
 			MoveToAttaclAreaPtr->DataPtr = DataPtr->Clone();
 			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->MoveToAttackDistance(
+			CharacterPtr->GetBaseFeatureComponent()->MoveToAttackDistance(
 				MoveToAttaclAreaPtr
 			);
 
@@ -156,7 +156,7 @@ void USkill_Active_Control::ExcuteTasks()
 	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
-	auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 
 	// 伤害
 	{

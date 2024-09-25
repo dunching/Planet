@@ -96,7 +96,7 @@ void UBasicFutures_Affected::PerformAction(EAffectedDirection AffectedDirection)
 {
 	UAnimMontage* CurMontagePtr = nullptr;
 
-	const FRotator Rotation = CharacterPtr->Controller->GetControlRotation();
+	const FRotator Rotation = CharacterPtr->GetActorRotation();
 	FVector Direction = FVector::ZeroVector;
 
 	switch (AffectedDirection)
