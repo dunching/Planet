@@ -130,10 +130,10 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	// 进入等待多段输入
+	// 继续下一段技能
 	void ContinueActive();
 
-	// 
+	// 进入等待输入以进入下一段
 	void CheckInContinue();
 
 	// 
@@ -142,6 +142,7 @@ protected:
 	
 	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
 
+	// 是否需要等待输入以继续
 	bool bIsPreviouInput = false;
 
 	// 等待输入时常

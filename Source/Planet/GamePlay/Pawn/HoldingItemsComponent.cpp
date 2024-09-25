@@ -335,6 +335,10 @@ TSharedPtr<FSkillProxy>  UHoldingItemsComponent::AddUnit_Skill(const FGameplayTa
 	{
 		ResultPtr = MakeShared<FPassiveSkillProxy>();
 	}
+	else
+	{
+		return nullptr;
+	}
 
 #if WITH_EDITOR
 #endif

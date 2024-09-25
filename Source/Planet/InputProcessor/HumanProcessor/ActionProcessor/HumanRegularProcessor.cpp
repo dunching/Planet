@@ -97,7 +97,15 @@ namespace HumanProcessor
 
 		SwitchCurrentWeapon();
 
-		AddOrRemoveUseMenuItemEvent(true);
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (OnwerActorPtr)
+		{
+			OnAllocationChangedHandle = OnwerActorPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback([this]() {
+				AddOrRemoveUseMenuItemEvent(true);
+				});
+
+			AddOrRemoveUseMenuItemEvent(true);
+		}
 	}
 
 	void FHumanRegularProcessor::TickImp(float Delta)
@@ -203,6 +211,8 @@ namespace HumanProcessor
 		{
 			OnwerActorPtr->GetInteractiveSkillComponent()->RetractputWeapon();
 		}
+
+		OnAllocationChangedHandle->UnBindCallback();
 
 		Super::QuitAction();
 	}

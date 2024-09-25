@@ -235,7 +235,7 @@ bool UUnitProxyProcessComponent::ActiveAction(
 )
 {
 	auto WeaponSPtr = FindSocket(CurrentWeaponSocket);
-	if (WeaponSPtr->Key == CanbeActivedInfoSPtr->Key)
+	if (WeaponSPtr->Socket == CanbeActivedInfoSPtr->Socket)
 	{
 		ActiveAction_Server(*WeaponSPtr, bIsAutomaticStop);
 	}

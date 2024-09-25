@@ -91,9 +91,6 @@ protected:
 	UPROPERTY(Replicated)
 	int32 SubStepIndex = 0;
 	
-	UPROPERTY(Replicated)
-	bool bIsContinue = true;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage1 = nullptr;
 

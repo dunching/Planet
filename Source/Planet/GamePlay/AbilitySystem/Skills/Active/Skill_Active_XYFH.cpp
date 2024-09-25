@@ -156,7 +156,7 @@ void USkill_Active_XYFH::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
-	if (CharacterPtr && bIsContinue)
+	if (CharacterPtr)
 	{
 		switch (StepIndex)
 		{

@@ -546,6 +546,9 @@ bool FActiveSkillProxy::Active()
 	 		{
 	 			auto GameplayAbilityTargetPtr =
 	 				new FGameplayAbilityTargetData_ActiveSkill;
+
+				GameplayAbilityTargetPtr->bIsAutoContinue = 
+					ProxyCharacterPtr->GetRemoteRole() == ROLE_AutonomousProxy ? false : true;
 	 
 	 			FGameplayEventData Payload;
 	 			Payload.TargetData.Add(GameplayAbilityTargetPtr);
