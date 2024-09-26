@@ -66,7 +66,8 @@ protected:
 	
 	UPROPERTY(Replicated)
 	float Duration = 1.f;
-
+	
+	UPROPERTY(Replicated)
 	ERootMotionAccumulateMode RootMotionAccumulateMode = ERootMotionAccumulateMode::Additive;
 
 };

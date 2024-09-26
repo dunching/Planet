@@ -48,10 +48,7 @@ void USkill_Active_BYWD::ActivateAbility(
 	}
 #endif
 
-	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
-		)
+	if (CharacterPtr->GetLocalRole() > ROLE_SimulatedProxy)
 	{
 		{
 			auto TaskPtr = UAbilityTask_FlyAway::NewTask(

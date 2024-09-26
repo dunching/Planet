@@ -158,4 +158,5 @@ void UAbilityTask_FlyAway::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
 
 	DOREPLIFETIME(ThisClass, Height);
 	DOREPLIFETIME(ThisClass, Duration);
+	DOREPLIFETIME(ThisClass, RootMotionAccumulateMode);
 }
