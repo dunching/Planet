@@ -31,6 +31,7 @@
 #include "CDCaculatorComponent.h"
 #include "Skill_Consumable_Generic.h"
 #include "BaseFeatureComponent.h"
+#include "Weapon_Bow.h"
 
 FBasicProxy::FBasicProxy()
 {

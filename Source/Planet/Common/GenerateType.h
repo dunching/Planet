@@ -73,6 +73,7 @@ enum class EAnimLinkClassType : uint8
 {
 	kUnarmed,
 	kPickAxe,
+	kBow,
 };
 
 UENUM(BlueprintType)

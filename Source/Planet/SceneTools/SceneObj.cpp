@@ -16,9 +16,10 @@ ASceneObj::ASceneObj(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
 {
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
-	bReplicates = true;
 	NetPriority = 3.0f;
 	NetUpdateFrequency = 100.f;
+
+	SetReplicates(true);
 	SetReplicatingMovement(true);
 
 	PropertyComponentPtr = CreateDefaultSubobject<USceneObjPropertyComponent>(USceneObjPropertyComponent::ComponentName);

@@ -18,11 +18,11 @@ void AWeapon_Base::AttachToCharacter(ACharacterBase* CharacterPtr)
 	Super::AttachToCharacter(CharacterPtr);
 }
 
-void AWeapon_Base::SetWeaponUnit_Implementation(const FWeaponProxy& WeaponProxy)
+void AWeapon_Base::SetWeaponUnit/*_Implementation*/(const FWeaponProxy& WeaponProxy)
 {
 	WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(WeaponProxy.GetThisSPtr());
 	if (WeaponUnitPtr)
 	{
-		AttachToCharacter(WeaponUnitPtr->OwnerCharacterUnitPtr.Pin()->ProxyCharacterPtr.Get());
+		AttachToCharacter(WeaponUnitPtr->GetAllocationCharacter());
 	}
 }
