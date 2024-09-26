@@ -17,5 +17,6 @@ class UKismetGravityLibrary : public UBlueprintFunctionLibrary
 
 public:
 
-	static GRAVITY_API FVector GetGravity(const FVector& Location);
+	static GRAVITY_API FVector GetGravity(const FVector& Location = FVector::ZeroVector);
+
 };

@@ -9,6 +9,7 @@
 #include <Engine/Engine.h>
 #include <IXRTrackingSystem.h>
 #include <IXRCamera.h>
+#include "Kismet/KismetMathLibrary.h"
 
 #include "InputProcessorSubSystem.h"
 #include "HorseCharacter.h"
@@ -37,6 +38,7 @@
 #include "EffectsList.h"
 #include "PlanetPlayerState.h"
 #include "GameMode_Main.h"
+#include "KismetGravityLibrary.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -194,37 +196,31 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 	APawn* const MyPawn = GetPawnOrSpectator();
 	if (MyPawn)
 	{
+		FRotator DeltaRot(RotationInput);
 		FRotator ViewRotation = GetControlRotation();
 
 		const FVector FocalPoint = GetFocalPoint();
 		if (FAISystem::IsValidLocation(FocalPoint))
 		{
-			const auto FocusRotation = (FocalPoint - MyPawn->GetPawnViewLocation()).Rotation();
+			const auto FocusRotation = UKismetMathLibrary::Quat_FindBetweenVectors(
+				UKismetMathLibrary::MakeRotFromZX(UKismetGravityLibrary::GetGravity(), ViewRotation.Vector()).Vector(),
+				UKismetMathLibrary::MakeRotFromZX(UKismetGravityLibrary::GetGravity(), FocalPoint - MyPawn->GetPawnViewLocation()).Vector()
+			).Rotator();
 
-			const auto DeltaRot = DeltaTime * 120.f;
 			const float AngleTolerance = 1e-3f;
-
-			// PITCH
-			if (!FMath::IsNearlyEqual(ViewRotation.Pitch, FocusRotation.Pitch, AngleTolerance))
+			if (FMath::IsNearlyZero(FocusRotation.Yaw, AngleTolerance))
 			{
-				ViewRotation.Pitch = FMath::FixedTurn(ViewRotation.Pitch, FocusRotation.Pitch, DeltaRot);
+				DeltaRot.Yaw = 0.f;
 			}
-
-			// YAW
-			if (!FMath::IsNearlyEqual(ViewRotation.Yaw, FocusRotation.Yaw, AngleTolerance))
+			else
 			{
-				ViewRotation.Yaw = FMath::FixedTurn(ViewRotation.Yaw, FocusRotation.Yaw, DeltaRot);
+				DeltaRot.Yaw = FocusRotation.Yaw;
 			}
-
-			ViewRotation.Roll = 0.f;
-
-			RotationInput = FRotator::ZeroRotator;
 		}
+		DeltaRot.Roll = 0.f;
 
 		if (PlayerCameraManager)
 		{
-			// Calculate Delta to be applied on ViewRotation
-			FRotator DeltaRot(RotationInput);
 			PlayerCameraManager->ProcessViewRotation(DeltaTime, ViewRotation, DeltaRot);
 		}
 
