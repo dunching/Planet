@@ -9,6 +9,28 @@
 #include "BaseFeatureComponent.h"
 #include "GameOptions.h"
 #include "HoldingItemsComponent.h"
+#include "PlanetPlayerController.h"
+
+UScriptStruct* FGameplayAbilityTargetData_SkillBase::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_SkillBase::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_SkillBase::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	if (Ar.IsSaving())
+	{
+		Ar << ProxyID;
+	}
+	else if (Ar.IsLoading())
+	{
+		Ar << ProxyID;
+	}
+
+	return true;
+}
 
 USkill_Base::USkill_Base() :
 	Super()
@@ -122,23 +144,54 @@ void USkill_Base::ResetPreviousStageActions()
 	ResetListLock();
 }
 
-UScriptStruct* FGameplayAbilityTargetData_SkillBase::GetScriptStruct() const
+ACharacterBase* USkill_Base::HasFocusActor() const
 {
-	return FGameplayAbilityTargetData_SkillBase::StaticStruct();
+	if (CharacterPtr->IsPlayerControlled())
+	{
+		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+	else
+	{
+		auto ACPtr = CharacterPtr->GetController<AAIController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+	return nullptr;
 }
 
-bool FGameplayAbilityTargetData_SkillBase::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool USkill_Base::CheckTargetInDistance(int32 InDistance)const
 {
-	Super::NetSerialize(Ar, Map, bOutSuccess);
-
-	if (Ar.IsSaving())
+	if (CharacterPtr->IsPlayerControlled())
 	{
-		Ar << ProxyID;
+		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+		}
 	}
-	else if (Ar.IsLoading())
+	else
 	{
-		Ar << ProxyID;
+		auto ACPtr = CharacterPtr->GetController<AAIController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+		}
 	}
 
-	return true;
+	return false;
+}
+
+ACharacterBase* USkill_Base::GetTargetInDistance(int32 Distance) const
+{
+	return nullptr;
 }

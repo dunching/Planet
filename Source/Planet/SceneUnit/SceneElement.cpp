@@ -630,9 +630,7 @@ bool FWeaponSkillProxy::Active()
 
 		FGameplayEventData Payload;
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Axe) ||
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_HandProtection) ||
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_RangeTest)
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon) 
 			)
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_Weapon;
@@ -1035,7 +1033,7 @@ void FWeaponProxy::ActiveWeapon()
 
 			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
 
-			SpawnParameters.Owner = AllocationCharacter.Get();
+			SpawnParameters.Owner = ProxyCharacterPtr;
 
 			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
 			ActivedWeaponPtr->SetWeaponUnit(*this);

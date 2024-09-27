@@ -10,6 +10,8 @@
 
 #include "Weapon_Bow.generated.h"
 
+class AStaticMeshActor;
+class ASkeletalMeshActor;
 class UStaticMeshComponent;
 class UPrimitiveComponent;
 class UNiagaraComponent;
@@ -27,14 +29,49 @@ public:
 
 	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
-	USkeletalMeshComponent* GetMesh();
+	USkeletalMeshComponent* GetMesh()const;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Equiment")
-	FName Socket;
+	FTransform GetEmitTransform()const;
 
 protected:
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USkeletalMeshComponent* SkeletalComponentPtr = nullptr;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FTransform BowTransform = FTransform::Identity;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FName Bow_Socket;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<ASkeletalMeshActor> Bow_Class= nullptr;
+	
+	UPROPERTY(Replicated)
+	ASkeletalMeshActor* BowActorPtr = nullptr;
+	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FName Quiver_Socket;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<AStaticMeshActor> Quiver_Class= nullptr;
+	
+	UPROPERTY(Replicated)
+	AStaticMeshActor* QuiverActorPtr = nullptr;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FTransform ArrowTransform = FTransform::Identity;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FName Arrow_Socket;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<AStaticMeshActor> Arrow_Class = nullptr;
+	
+	UPROPERTY(Replicated)
+	AStaticMeshActor* ArrowActorPtr = nullptr;
 };

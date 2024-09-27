@@ -11,6 +11,7 @@
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -28,12 +29,24 @@
 #include "GroupMnaggerComponent.h"
 #include "Weapon_Bow.h"
 #include "BaseFeatureComponent.h"
+#include "KismetGravityLibrary.h"
 
-namespace Skill_WeaponActive_RangeTest
+namespace Skill_WeaponActive_Bow
 {
 	const FName Hit = TEXT("Hit");
 
 	const FName AttackEnd = TEXT("AttackEnd");
+}
+
+ASkill_WeaponActive_Bow_Projectile::ASkill_WeaponActive_Bow_Projectile(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraComponent->SetupAttachment(CollisionComp);
+
+	ProjectileMovementCompPtr->InitialSpeed = 100.f;
+	ProjectileMovementCompPtr->MaxSpeed = 100.f;
+	InitialLifeSpan = 10.f;
 }
 
 USkill_WeaponActive_Bow::USkill_WeaponActive_Bow() :
@@ -42,12 +55,20 @@ USkill_WeaponActive_Bow::USkill_WeaponActive_Bow() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void USkill_WeaponActive_Bow::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_WeaponActive_Bow::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilitySpec& Spec
+)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 }
 
-void USkill_WeaponActive_Bow::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
+void USkill_WeaponActive_Bow::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -78,7 +99,10 @@ void USkill_WeaponActive_Bow::ActivateAbility(
 	K2_EndAbility();
 }
 
-void USkill_WeaponActive_Bow::OnRemoveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_WeaponActive_Bow::OnRemoveAbility(
+	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilitySpec& Spec
+)
 {
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
@@ -93,6 +117,24 @@ void USkill_WeaponActive_Bow::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	StartTasksLink();
+}
+
+void USkill_WeaponActive_Bow::CheckInContinue()
+{
+	if (bIsContinue)
+	{
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+	}
+	else
+	{
+		if (
+			(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+			(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+			)
+		{
+			K2_CancelAbility();
+		}
+	}
 }
 
 void USkill_WeaponActive_Bow::StartTasksLink()
@@ -128,25 +170,47 @@ void USkill_WeaponActive_Bow::OnProjectileBounce(
 
 void USkill_WeaponActive_Bow::OnNotifyBeginReceived(FName NotifyName)
 {
-	if (NotifyName == Skill_WeaponActive_RangeTest::AttackEnd)
+	if (NotifyName == Skill_WeaponActive_Bow::AttackEnd)
 	{
-		EmitProjectile();
-
-		CheckInContinue();
 	}
 }
 
 void USkill_WeaponActive_Bow::OnMontateComplete()
 {
-	K2_CancelAbility();
+	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	{
+		EmitProjectile();
+	}
+
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
+	{
+		CheckInContinue();
+	}
 }
 
-void USkill_WeaponActive_Bow::EmitProjectile()
+void USkill_WeaponActive_Bow::EmitProjectile()const
 {
+	auto EmitTransform = WeaponPtr->GetEmitTransform();
+
+	auto FocusActorPtr = HasFocusActor();
+	if (FocusActorPtr)
+	{
+		EmitTransform.SetRotation((FocusActorPtr->GetActorLocation() - EmitTransform.GetLocation()).ToOrientationQuat());
+	}
+	else
+	{
+		EmitTransform.SetRotation(UKismetMathLibrary::MakeRotFromZX(
+			-UKismetGravityLibrary::GetGravity(), 
+			CharacterPtr->GetActorForwardVector()
+		).Quaternion());
+	}
+
 	auto ProjectilePtr = GetWorld()->SpawnActor<ASkill_WeaponActive_Bow_Projectile>(
 		Skill_WeaponActive_RangeTest_ProjectileClass,
-		CharacterPtr->GetActorLocation(),
-		CharacterPtr->GetActorRotation()
+		EmitTransform
 	);
 	if (ProjectilePtr)
 	{
@@ -178,22 +242,40 @@ void USkill_WeaponActive_Bow::PlayMontage()
 	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
-	{
-		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-			this,
-			TEXT(""),
-			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
-			Rate
-		);
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
+	{ 
+		{
+			auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+				this,
+				TEXT(""),
+				HumanMontage,
+				CharacterPtr->GetMesh()->GetAnimInstance(),
+				Rate
+			);
 
-		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
-		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_HumanPtr->Ability = this;
+			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
-		AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
+			AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
+		}
+		{
+			auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+				this,
+				TEXT(""),
+				BowMontage,
+				WeaponPtr->GetMesh()->GetAnimInstance(),
+				Rate
+			);
 
-		AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
+			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
+			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+
+			AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
+		}
 	}
 }

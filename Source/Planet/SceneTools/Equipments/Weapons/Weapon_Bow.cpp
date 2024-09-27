@@ -8,6 +8,9 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
+#include "Animation/SkeletalMeshActor.h"
+#include "Engine/StaticMeshActor.h"
+#include "Net/UnrealNetwork.h"
 
 #include "CollisionDataStruct.h"
 #include "CharacterBase.h"
@@ -22,8 +25,8 @@
 AWeapon_Bow::AWeapon_Bow(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	SkeletalComponentPtr = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"));
-	SkeletalComponentPtr->SetupAttachment(SceneCompPtr);
+	SetReplicates(true);
+	SetReplicatingMovement(true);
 }
 
 void AWeapon_Bow::AttachToCharacter(ACharacterBase* CharacterPtr)
@@ -31,10 +34,62 @@ void AWeapon_Bow::AttachToCharacter(ACharacterBase* CharacterPtr)
 	Super::AttachToCharacter(CharacterPtr);
 
 	// 注意：这里使用Lyra动画，添加到这个插槽之后Transform不正确，还不知道怎么改
-	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
+	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
+
+	BowActorPtr = GetWorld()->SpawnActor<ASkeletalMeshActor>(Bow_Class, BowTransform);
+	BowActorPtr->SetReplicates(true);
+	BowActorPtr->SetReplicatingMovement(true);
+	BowActorPtr->AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Bow_Socket);
+
+	QuiverActorPtr = GetWorld()->SpawnActor<AStaticMeshActor>(Quiver_Class);
+	QuiverActorPtr->SetReplicates(true);
+	QuiverActorPtr->SetReplicatingMovement(true);
+	QuiverActorPtr->AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Quiver_Socket);
+
+	ArrowActorPtr = GetWorld()->SpawnActor<AStaticMeshActor>(Arrow_Class, ArrowTransform);
+	ArrowActorPtr->SetReplicates(true);
+	ArrowActorPtr->SetReplicatingMovement(true);
+	ArrowActorPtr->AttachToComponent(BowActorPtr->GetSkeletalMeshComponent(), FAttachmentTransformRules::KeepRelativeTransform, Arrow_Socket);
 }
 
-USkeletalMeshComponent* AWeapon_Bow::GetMesh()
+USkeletalMeshComponent* AWeapon_Bow::GetMesh()const
 {
-	return SkeletalComponentPtr;
+	return BowActorPtr->GetSkeletalMeshComponent();
+}
+
+FTransform AWeapon_Bow::GetEmitTransform() const
+{
+	return GetMesh()->GetSocketTransform(Arrow_Socket, ERelativeTransformSpace::RTS_World);
+}
+
+void AWeapon_Bow::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (BowActorPtr)
+	{
+		BowActorPtr->Destroy();
+		BowActorPtr = nullptr;
+	}
+
+	if (QuiverActorPtr)
+	{
+		QuiverActorPtr->Destroy();
+		QuiverActorPtr = nullptr;
+	}
+
+	if (ArrowActorPtr)
+	{
+		ArrowActorPtr->Destroy();
+		ArrowActorPtr = nullptr;
+	}
+}
+
+void AWeapon_Bow::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, BowActorPtr);
+	DOREPLIFETIME(ThisClass, QuiverActorPtr);
+	DOREPLIFETIME(ThisClass, ArrowActorPtr);
 }

@@ -135,7 +135,7 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 void USkill_WeaponActive_PickAxe::OnMontateComplete()
 {
 	MontageNum--;
-	if (MontageNum <= 0)
+	if ((MontageNum <= 0) && (CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy))
 	{
 		K2_CancelAbility();
 	}
@@ -212,24 +212,6 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 		const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 		{
-			auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
-				this,
-				TEXT(""),
-				PickAxeMontage,
-				EquipmentAxePtr->GetMesh()->GetAnimInstance(),
-				Rate
-			);
-
-			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
-			AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
-			AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
-
-			AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
-
-			MontageNum++;
-		}
-		{
 			auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 				this,
 				TEXT(""),
@@ -246,6 +228,24 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 			AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 			AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
+
+			MontageNum++;
+		}
+		{
+			auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
+				this,
+				TEXT(""),
+				PickAxeMontage,
+				EquipmentAxePtr->GetMesh()->GetAnimInstance(),
+				Rate
+			);
+
+			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
+			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
+
+			AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
 
 			MontageNum++;
 		}

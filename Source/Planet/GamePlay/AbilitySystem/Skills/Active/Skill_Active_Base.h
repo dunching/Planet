@@ -112,15 +112,6 @@ public:
 	// 获取 “等待输入”时长
 	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
 	
-	// 确认是否有锁定的目标
-	ACharacterBase* HasFocusActor()const;
-	
-	// 确认锁定的目标是否在范围内
-	bool CheckTargetInDistance(int32 Distance)const;
-
-	// 获取范围内任意可攻击的目标
-	ACharacterBase* GetTargetInDistance(int32 Distance)const;
-
 protected:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

@@ -9,6 +9,7 @@
 #include "Skill_WeaponActive_Bow.generated.h"
 
 class UPrimitiveComponent;
+class UNiagaraComponent;
 class UAnimMontage;
 
 class AWeapon_Bow;
@@ -21,6 +22,13 @@ class PLANET_API ASkill_WeaponActive_Bow_Projectile : public AProjectileBase
 	GENERATED_BODY()
 
 public:
+
+	ASkill_WeaponActive_Bow_Projectile(const FObjectInitializer& ObjectInitializer);
+	
+protected:
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Niagara")
+	UNiagaraComponent* NiagaraComponent = nullptr;
 
 };
 
@@ -68,6 +76,8 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
+	virtual void CheckInContinue()override;
+
 	void PlayMontage();
 
 	UFUNCTION()
@@ -76,7 +86,7 @@ protected:
 	UFUNCTION()
 	void OnMontateComplete();
 
-	void EmitProjectile();
+	void EmitProjectile()const;
 
 	void MakeDamage(ACharacterBase * TargetCharacterPtr);
 
@@ -94,9 +104,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
-
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float Distance = 100.f;
+	UAnimMontage* BowMontage = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Damage = 10;
