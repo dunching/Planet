@@ -6,7 +6,7 @@ public class Planet : ModuleRules
 {
 	public Planet(ReadOnlyTargetRules Target) : base(Target)
     {
-        PCHUsage = PCHUsageMode.UseSharedPCHs;
+        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
         bEnableUndefinedIdentifierWarnings = false;
         bWarningsAsErrors = true;

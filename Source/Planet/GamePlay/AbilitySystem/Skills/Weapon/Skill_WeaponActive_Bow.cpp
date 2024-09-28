@@ -259,7 +259,7 @@ void USkill_WeaponActive_Bow::PlayMontage()
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
 			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
-			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
 			AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
 		}
