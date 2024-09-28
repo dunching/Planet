@@ -32,6 +32,7 @@
 #include "Skill_Consumable_Generic.h"
 #include "BaseFeatureComponent.h"
 #include "Weapon_Bow.h"
+#include "Skill_WeaponActive_Bow.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -578,7 +579,7 @@ bool FActiveSkillProxy::Active()
 			else
 			{
 				auto GameplayAbilityTargetPtr =
-					new FGameplayAbilityTargetData_ActiveSkill;
+					new FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
 
 				GameplayAbilityTargetPtr->bIsAutoContinue =
 					ProxyCharacterPtr->GetRemoteRole() == ROLE_AutonomousProxy ? false : true;
@@ -633,7 +634,7 @@ bool FWeaponSkillProxy::Active()
 			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon) 
 			)
 		{
-			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_Skill_Weapon;
+			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
 			GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
 			GameplayAbilityTargetDashPtr->bIsAutoContinue = true;
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
@@ -671,7 +672,7 @@ void FSkillProxy::RegisterSkill()
 	auto ProxyCharacterPtr = GetProxyCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase;
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;
 
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 
@@ -777,6 +778,67 @@ FTableRowUnit_WeaponSkillExtendInfo* FWeaponSkillProxy::GetTableRowUnit_WeaponSk
 TSubclassOf<USkill_Base> FWeaponSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_WeaponSkillExtendInfo()->SkillClass;
+}
+
+void FWeaponSkillProxy::RegisterSkill()
+{
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		// 需要特殊参数的
+		if (
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow)
+			)
+		{
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Bow_RegisterParam;
+
+			GameplayAbilityTargetDataPtr->ProxyID = GetID();
+
+			const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
+			FGameplayAbilitySpec GameplayAbilitySpec(
+				GetSkillClass(),
+				Level,
+				InputID
+			);
+
+			auto GameplayEventData = MakeShared<FGameplayEventData>();
+			GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+
+			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+
+			AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+				InputID,
+				*GameplayEventData
+			);
+			GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+		}
+		else
+		{
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;
+
+			GameplayAbilityTargetDataPtr->ProxyID = GetID();
+
+			const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
+			FGameplayAbilitySpec GameplayAbilitySpec(
+				GetSkillClass(),
+				Level,
+				InputID
+			);
+
+			auto GameplayEventData = MakeShared<FGameplayEventData>();
+			GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+
+			auto AllocationCharacter = GetAllocationCharacterUnit().Pin()->ProxyCharacterPtr;
+
+			AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+				InputID,
+				*GameplayEventData
+			);
+			GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+		}
+	}
+#endif
 }
 
 FTalentSkillProxy::FTalentSkillProxy()

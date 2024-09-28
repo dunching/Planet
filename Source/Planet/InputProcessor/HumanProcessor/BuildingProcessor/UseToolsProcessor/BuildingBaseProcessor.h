@@ -9,7 +9,7 @@
 
 #include "HumanProcessor.h"
 #include <SceneElement.h>
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 class AHumanCharacter;
 class ABuildingBase;

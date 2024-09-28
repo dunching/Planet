@@ -14,7 +14,7 @@ class UAbilityTask_TimerHelper;
 class AWeapon_Base;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Skill_Weapon : 
+struct FGameplayAbilityTargetData_WeaponActive_ActiveParam :
 	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -29,8 +29,8 @@ struct FGameplayAbilityTargetData_Skill_Weapon :
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Skill_Weapon> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Skill_Weapon>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_WeaponActive_ActiveParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_WeaponActive_ActiveParam>
 {
 	enum
 	{
@@ -45,9 +45,14 @@ class USkill_WeaponActive_Base : public USkill_Base
 
 public:
 
-	using ActiveParamType = FGameplayAbilityTargetData_Skill_Weapon;
+	using FActiveParamType = FGameplayAbilityTargetData_WeaponActive_ActiveParam;
 
 	USkill_WeaponActive_Base();
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -118,7 +123,7 @@ protected:
 
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
-	const ActiveParamType* ActiveParamPtr = nullptr;
+	TSharedPtr<FActiveParamType> ActiveParamSPtr = nullptr;
 
 private:
 

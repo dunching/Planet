@@ -25,7 +25,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
@@ -115,7 +115,7 @@ void UActionSkillsIcon::UpdateSkillState()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 	const auto SkillProxySPtr = EICPtr->FindActiveSkillSocket(IconSocket);
 	if (!SkillProxySPtr)
 	{

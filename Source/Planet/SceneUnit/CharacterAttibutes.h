@@ -275,12 +275,6 @@ struct PLANET_API FCharacterAttributes final
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet MoveSpeed;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet RunningSpeedOffset;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FBasePropertySet RunningConsume;
-
 private:
 
 	bool bIsNotChanged = true;

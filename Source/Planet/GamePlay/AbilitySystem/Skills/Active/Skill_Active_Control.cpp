@@ -17,7 +17,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -217,7 +217,7 @@ bool FGameplayAbilityTargetData_Control::NetSerialize(FArchive& Ar, class UPacka
 	return true;
 }
 
-FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_Control::Clone() const
+FGameplayAbilityTargetData_ActiveSkill_ActiveParam* FGameplayAbilityTargetData_Control::Clone() const
 {
 	auto ResultPtr =
 		new FGameplayAbilityTargetData_Control;

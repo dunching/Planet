@@ -6,7 +6,7 @@
 
 #include "CharacterBase.h"
 #include <SceneElement.h>
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "HorseCharacter.generated.h"
 

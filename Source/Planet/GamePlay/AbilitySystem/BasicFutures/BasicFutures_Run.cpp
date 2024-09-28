@@ -5,7 +5,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
@@ -13,6 +13,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "Planet_Tools.h"
+#include "AbilityTask_TimerHelper.h"
 
 UBasicFutures_Run::UBasicFutures_Run() :
 	Super()
@@ -26,8 +27,42 @@ void UBasicFutures_Run::InitialTags()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Running);
-		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Running);
+		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run);
+		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run);
+	}
+}
+
+void UBasicFutures_Run::IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
+{
+	if (Interval > InDuration)
+	{
+		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		if (
+			CharacterAttributes.PP.GetCurrentValue() >=
+			RunningConsume.GetCurrentValue()
+			)
+		{
+			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+			FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+			GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+
+			GAEventData.DataModify.Add(ECharacterPropertyType::PP, -RunningConsume.GetCurrentValue());
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			ICPtr->SendEventImp(GAEventDataPtr);
+		}
+		else
+		{
+			K2_CancelAbility();
+		}
 	}
 }
 
@@ -41,10 +76,6 @@ void UBasicFutures_Run::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
-	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-	if (CharacterPtr)
-	{
-	}
 }
 
 void UBasicFutures_Run::ActivateAbility(
@@ -56,20 +87,30 @@ void UBasicFutures_Run::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
 #if UE_EDITOR || UE_SERVER
 		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
+			//
+			{
+				auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+				TaskPtr->SetInfinite(1.f);
+				TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalTick);
+				TaskPtr->ReadyForActivation();
+			}
+
 			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
 			ModifyPropertyMap.Add(
 				ECharacterPropertyType::MoveSpeed,
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().RunningSpeedOffset.GetCurrentValue()
+				RunningSpeedOffset.GetCurrentValue()
 			);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(
+				ModifyPropertyMap,
+				UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run
+			);
 		}
 #endif
 	}
@@ -83,7 +124,6 @@ void UBasicFutures_Run::EndAbility(
 	bool bWasCancelled
 )
 {
-	auto CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
 #if UE_EDITOR || UE_SERVER
@@ -93,7 +133,10 @@ void UBasicFutures_Run::EndAbility(
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
 
-		CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+		CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(
+			ModifyPropertyMap, 
+			UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run
+		);
 		}
 #endif
 	}
@@ -109,14 +152,15 @@ bool UBasicFutures_Run::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	auto CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
 		if (CharacterPtr->GetCharacterMovement()->MovementMode == EMovementMode::MOVE_Walking)
 		{
 			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-			if (CharacterAttributes.PP.GetCurrentValue() >=
-				CharacterAttributes.RunningConsume.GetCurrentValue())
+			if (
+				CharacterAttributes.PP.GetCurrentValue() >=
+				RunningConsume.GetCurrentValue()
+				)
 			{
 				return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 			}

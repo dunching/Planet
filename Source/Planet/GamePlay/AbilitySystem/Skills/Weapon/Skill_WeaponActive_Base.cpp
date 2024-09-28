@@ -5,13 +5,14 @@
 #include "AbilityTask_TimerHelper.h"
 #include "LogWriter.h"
 #include "Weapon_Base.h"
+#include "GameplayTagsSubSystem.h"
 
-UScriptStruct* FGameplayAbilityTargetData_Skill_Weapon::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_WeaponActive_ActiveParam::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_Skill_Weapon::StaticStruct();
+	return FGameplayAbilityTargetData_WeaponActive_ActiveParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_Skill_Weapon::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -25,6 +26,16 @@ USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
 //	bRetriggerInstancedAbility = true;
+}
+
+void USkill_WeaponActive_Base::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
 }
 
 void USkill_WeaponActive_Base::PreActivate(
@@ -41,8 +52,8 @@ void USkill_WeaponActive_Base::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		ActiveParamPtr = dynamic_cast<const ActiveParamType*>(TriggerEventData->TargetData.Get(0));
-		if (ActiveParamPtr)
+		ActiveParamSPtr = MakeSPtr_GameplayAbilityTargetData<FActiveParamType>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamSPtr)
 		{
 		}
 		else

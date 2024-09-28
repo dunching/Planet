@@ -15,7 +15,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -38,12 +38,28 @@ namespace Skill_WeaponActive_Bow
 	const FName AttackEnd = TEXT("AttackEnd");
 }
 
+UScriptStruct* FGameplayAbilityTargetData_Bow_RegisterParam::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Bow_RegisterParam::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Bow_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << bIsHomingTowards;
+	Ar << bIsMultiple;
+
+	return true;
+}
+
 ASkill_WeaponActive_Bow_Projectile::ASkill_WeaponActive_Bow_Projectile(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
 	NiagaraComponent->SetupAttachment(CollisionComp);
 
+	ProjectileMovementCompPtr->HomingAccelerationMagnitude = 2000.f;
 	ProjectileMovementCompPtr->InitialSpeed = 100.f;
 	ProjectileMovementCompPtr->MaxSpeed = 100.f;
 	InitialLifeSpan = 10.f;
@@ -74,9 +90,9 @@ void USkill_WeaponActive_Bow::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		if (ActiveParamPtr)
+		if (ActiveParamSPtr)
 		{
-			WeaponPtr = Cast<FWeaponActorType>(ActiveParamPtr->WeaponPtr);
+			WeaponPtr = Cast<FWeaponActorType>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
 }
@@ -105,6 +121,16 @@ void USkill_WeaponActive_Bow::OnRemoveAbility(
 )
 {
 	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
+void USkill_WeaponActive_Bow::UpdateParam(const FGameplayEventData& GameplayEventData)
+{
+	Super::UpdateParam(GameplayEventData);
+
+	if (GameplayEventData.TargetData.IsValid(0))
+	{
+		RegisterParamSPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
+	}
 }
 
 void USkill_WeaponActive_Bow::PerformAction(
@@ -195,25 +221,86 @@ void USkill_WeaponActive_Bow::EmitProjectile()const
 {
 	auto EmitTransform = WeaponPtr->GetEmitTransform();
 
-	auto FocusActorPtr = HasFocusActor();
-	if (FocusActorPtr)
+	const auto AttackDistance = WeaponPtr->WeaponUnitPtr->GetMaxAttackDistance();
+
+	ACharacterBase* HomingTarget = nullptr;
+	if (RegisterParamSPtr && RegisterParamSPtr->bIsHomingTowards)
 	{
-		EmitTransform.SetRotation((FocusActorPtr->GetActorLocation() - EmitTransform.GetLocation()).ToOrientationQuat());
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SweepWidth);
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(CharacterPtr);
+
+		TArray<struct FHitResult> OutHits;
+		if (CharacterPtr->GetWorld()->SweepMultiByObjectType(
+			OutHits,
+			EmitTransform.GetLocation(),
+			EmitTransform.GetLocation() + (CharacterPtr->GetActorForwardVector() * AttackDistance),
+			FQuat::Identity,
+			ObjectQueryParams,
+			CollisionShape,
+			Params
+		))
+		{
+			for (const auto& Iter : OutHits)
+			{
+				auto OtherCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+				if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
+				{
+					continue;
+				}
+				else if (FVector::Distance(OtherCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < SweepWidth)
+				{
+					continue;
+				}
+				EmitTransform.SetRotation(UKismetMathLibrary::MakeRotFromZX(
+					-UKismetGravityLibrary::GetGravity(),
+					CharacterPtr->GetActorForwardVector()
+				).Quaternion());
+
+				HomingTarget = OtherCharacterPtr;
+
+				break;
+			}
+		}
 	}
 	else
 	{
-		EmitTransform.SetRotation(UKismetMathLibrary::MakeRotFromZX(
-			-UKismetGravityLibrary::GetGravity(), 
-			CharacterPtr->GetActorForwardVector()
-		).Quaternion());
+		auto FocusActorPtr = HasFocusActor();
+		if (FocusActorPtr)
+		{
+			EmitTransform.SetRotation((FocusActorPtr->GetActorLocation() - EmitTransform.GetLocation()).ToOrientationQuat());
+		}
+		else
+		{
+			EmitTransform.SetRotation(UKismetMathLibrary::MakeRotFromZX(
+				-UKismetGravityLibrary::GetGravity(),
+				CharacterPtr->GetActorForwardVector()
+			).Quaternion());
+		}
 	}
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.CustomPreSpawnInitalization = [AttackDistance](AActor* ActorPtr)
+		{
+			Cast<ASkill_WeaponActive_Bow_Projectile>(ActorPtr)->MaxMoveRange = AttackDistance;
+		};
 
 	auto ProjectilePtr = GetWorld()->SpawnActor<ASkill_WeaponActive_Bow_Projectile>(
 		Skill_WeaponActive_RangeTest_ProjectileClass,
-		EmitTransform
+		EmitTransform,
+		SpawnParameters
 	);
+
 	if (ProjectilePtr)
 	{
+		if (HomingTarget)
+		{
+			ProjectilePtr->SetHomingTarget(HomingTarget);
+		}
 		ProjectilePtr->CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnProjectileBounce);
 	}
 }

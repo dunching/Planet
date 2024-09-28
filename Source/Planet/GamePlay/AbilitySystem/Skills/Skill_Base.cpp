@@ -5,18 +5,18 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "BaseFeatureComponent.h"
 #include "GameOptions.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
 
-UScriptStruct* FGameplayAbilityTargetData_SkillBase::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_SkillBase_RegisterParam::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_SkillBase::StaticStruct();
+	return FGameplayAbilityTargetData_SkillBase_RegisterParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_SkillBase::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_SkillBase_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -52,13 +52,9 @@ void USkill_Base::OnAvatarSet(
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
 	// 远程不能复制这个参数？
-	if (Spec.GameplayEventData.IsValid() && Spec.GameplayEventData->TargetData.IsValid(0))
+	if (Spec.GameplayEventData)
 	{
-		auto GameplayAbilityTargetPtr = dynamic_cast<const FRegisterParamType*>(Spec.GameplayEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetPtr)
-		{
-			SkillUnitPtr = CharacterPtr->GetHoldingItemsComponent()->FindUnit_Skill(GameplayAbilityTargetPtr->ProxyID);
-		}
+		UpdateParam(*Spec.GameplayEventData);
 	}
 }
 
@@ -127,6 +123,18 @@ void USkill_Base::OnRemoveAbility(
 const TArray<FAbilityTriggerData>& USkill_Base::GetTriggers() const
 {
 	return AbilityTriggers;
+}
+
+void USkill_Base::UpdateParam(const FGameplayEventData& GameplayEventData)
+{
+	if (GameplayEventData.TargetData.IsValid(0))
+	{
+		auto GameplayAbilityTargetPtr = dynamic_cast<const FRegisterParamType*>(GameplayEventData.TargetData.Get(0));
+		if (GameplayAbilityTargetPtr)
+		{
+			SkillUnitPtr = CharacterPtr->GetHoldingItemsComponent()->FindUnit_Skill(GameplayAbilityTargetPtr->ProxyID);
+		}
+	}
 }
 
 void USkill_Base::ResetPreviousStageActions()

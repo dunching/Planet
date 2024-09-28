@@ -171,7 +171,7 @@ void AHorseAIController::InitialCharacter()
 			AIHumanInfoPtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
 		}
 
-		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
 
 	}

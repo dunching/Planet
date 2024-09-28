@@ -12,7 +12,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
 #include "Planet.h"
@@ -64,9 +64,9 @@ void USkill_WeaponActive_HandProtection::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		if (ActiveParamPtr)
+		if (ActiveParamSPtr)
 		{
-			WeaponPtr = Cast<AWeapon_HandProtection>(ActiveParamPtr->WeaponPtr);
+			WeaponPtr = Cast<AWeapon_HandProtection>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
 }
@@ -253,7 +253,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 			}
 		}
 
-		auto SkillsAry = CharacterPtr->GetInteractiveSkillComponent()->GetAllSocket();
+		auto SkillsAry = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{

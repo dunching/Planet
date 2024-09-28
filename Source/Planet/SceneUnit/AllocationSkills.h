@@ -17,7 +17,7 @@ struct FWeaponProxy;
 struct FConsumableProxy;
 struct FAllocation_FASI_Container;
 
-class UUnitProxyProcessComponent;
+class UProxyProcessComponent;
 class UHoldingItemsComponent;
 
 USTRUCT(BlueprintType)
@@ -83,7 +83,7 @@ struct PLANET_API FAllocation_FASI_Container : public FFastArraySerializer
 
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
-	UUnitProxyProcessComponent* UnitProxyProcessComponentPtr = nullptr;
+	UProxyProcessComponent* UnitProxyProcessComponentPtr = nullptr;
 
 protected:
 	

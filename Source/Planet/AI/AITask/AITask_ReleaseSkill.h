@@ -9,7 +9,7 @@
 #include "AITypes.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Tasks/AITask.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "AITask_ReleaseSkill.generated.h"
 

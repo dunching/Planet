@@ -24,6 +24,9 @@ class PLANET_API UHumanAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetIsMelee(bool bIsMeele);
 
 	UPROPERTY(BlueprintReadWrite, Category = "Character State Data")
 	EAnimationType AnimationType = EAnimationType::kNormal;
@@ -38,7 +41,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASC")
 	bool HasAnyMatchingGameplayTags() const;
-
+	
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const ;
 

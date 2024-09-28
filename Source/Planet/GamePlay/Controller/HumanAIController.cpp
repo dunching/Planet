@@ -183,7 +183,7 @@ void AHumanAIController::InitialCharacter()
 	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
  
 	// 组件自动调用条件不成功，原因未知
- 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning() && bStartAILogicOnPossess)
+ 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
  	{
  		StateTreeAIComponentPtr->StartLogic();
  	}
@@ -201,7 +201,7 @@ void AHumanAIController::InitialCharacter()
 			{
 				// 武器
 				{
-					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 
 					auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
 					if (TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
@@ -234,7 +234,7 @@ void AHumanAIController::InitialCharacter()
 
 				// 技能
 				{
-					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 
 					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
 					{

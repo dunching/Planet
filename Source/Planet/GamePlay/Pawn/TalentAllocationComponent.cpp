@@ -6,7 +6,7 @@
 #include "HoldingItemsComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitContainer.h"
@@ -224,7 +224,7 @@ void UTalentAllocationComponent::SyncToHolding()
 // 					}
 // 					break;
 // 					}
-// 					auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+// 					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 // 					EICPtr->RegisterMultiGAs(SkillsMap);
 				}
 			}

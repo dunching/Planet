@@ -6,7 +6,7 @@
 
 #include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 
 struct FPawnStateConsumablesHUD : public TStructVariable<FPawnStateConsumablesHUD>
@@ -48,7 +48,7 @@ void UPawnStateConsumablesHUD::ResetUIByData()
 		return;
 	}
 
- 	auto InteractiveSkillComponentPtr = CharacterPtr->GetInteractiveSkillComponent();
+ 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
  
  	auto UIPtr = Cast<UGridPanel>(GetWidgetFromName(FPawnStateConsumablesHUD::Get().GridPanel));
  	auto Ary = UIPtr->GetAllChildren();
@@ -58,7 +58,7 @@ void UPawnStateConsumablesHUD::ResetUIByData()
  		auto IconPtr = Cast<UActionConsumablesIcon>(Iter);
  		if (IconPtr)
  		{
- 			const auto ConsumableSocketInfoSPtr = InteractiveSkillComponentPtr->FindSocket(IconPtr->IconSocket);
+ 			const auto ConsumableSocketInfoSPtr = ProxyProcessComponentPtr->FindSocket(IconPtr->IconSocket);
  			if (ConsumableSocketInfoSPtr)
  			{
  				IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr->ProxySPtr);

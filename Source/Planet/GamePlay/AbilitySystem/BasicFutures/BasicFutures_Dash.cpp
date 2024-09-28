@@ -12,7 +12,7 @@
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "BaseFeatureComponent.h"
 #include "Planet_Tools.h"

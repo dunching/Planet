@@ -9,6 +9,7 @@
 class USphereComponent;
 class USceneComponent;
 class UProjectileMovementComponent;
+class ACharacterBase;
 
 UCLASS()
 class PLANET_API AProjectileBase : public ASceneObj
@@ -19,9 +20,14 @@ public:
 
 	AProjectileBase(const FObjectInitializer& ObjectInitializer);
 
+	virtual void BeginPlay() override;
+
 #ifdef WITH_EDITOR
-	virtual void Tick(float DeltaSeconds)override;
 #endif
+	virtual void Tick(float DeltaSeconds)override;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void SetHomingTarget(ACharacterBase* TargetPtr);
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Projectile")
 	USphereComponent* CollisionComp = nullptr;
@@ -31,7 +37,14 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")
 	UProjectileMovementComponent* ProjectileMovementCompPtr = nullptr;
+	
+	UPROPERTY(Replicated)
+	int32 MaxMoveRange = -1;
 
 protected:
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	FVector StartPt = FVector::ZeroVector;
 
 };

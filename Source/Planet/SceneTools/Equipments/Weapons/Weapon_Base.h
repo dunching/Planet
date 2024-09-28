@@ -22,10 +22,10 @@ public:
 	
 	//UFUNCTION(NetMulticast, Reliable)
 	void SetWeaponUnit(const FWeaponProxy& WeaponProxy);
-	
-protected:
 
 	TSharedPtr<FWeaponProxy> WeaponUnitPtr = nullptr;
+
+protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 

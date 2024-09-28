@@ -9,7 +9,7 @@
 #include "PlanetPlayerState.h"
 #include "Planet.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "ActionSkillsIcon.h"
 #include "CharacterAttibutes.h"
 #include "AssetRefMap.h"
@@ -231,11 +231,11 @@ void UPawnStateActionHUD::ResetUIByData()
 	}
 	InitialTalentUI();
 
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback(
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback(
 		std::bind(&ThisClass::InitialActiveSkillIcon, this)
 	);
 	InitialActiveSkillIcon();
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback(
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback(
 		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
 	);
 	InitialWeaponSkillIcon();
@@ -254,7 +254,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 	{
 		return;
 	}
-	const auto& SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetAllSocket();
+	const auto& SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
 	for (auto Iter : SkillsMap)
 	{
 		bool bIsGiveTalentPassive = false;
@@ -292,7 +292,7 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 		return;
 	}
 
-	auto SkillsMap = CharacterPtr->GetInteractiveSkillComponent()->GetAllSocket();
+	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
 	TArray<FName>Ary
 	{
 		FPawnStateActionHUD::Get().ActiveSkill1,
@@ -329,21 +329,21 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
 	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
 
-	const auto CurrentWeaponSocket = CharacterPtr->GetInteractiveSkillComponent()->CurrentWeaponSocket;
+	const auto CurrentWeaponSocket = CharacterPtr->GetProxyProcessComponent()->CurrentWeaponSocket;
 
 	if (
 		CurrentWeaponSocket ==
 		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1
 		)
 	{
-		CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+		CharacterPtr->GetProxyProcessComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	else if (
 		CurrentWeaponSocket ==
 		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2
 		)
 	{
-		CharacterPtr->GetInteractiveSkillComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
+		CharacterPtr->GetProxyProcessComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
 	}
 	else
 	{

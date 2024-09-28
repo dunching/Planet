@@ -14,7 +14,7 @@
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "BaseFeatureComponent.h"
 #include "UICommon.h"
@@ -162,7 +162,7 @@ void UBasicFutures_MoveToAttaclArea::MoveCompletedSignature(FAIRequestID InReque
 
 	if (Result == EPathFollowingResult::Success)
 	{
-	//	AvatorCharacterPtr->GetInteractiveSkillComponent()->ActiveAction(CanbeActivedInfoSPtr);
+	//	AvatorCharacterPtr->GetProxyProcessComponent()->ActiveAction(CanbeActivedInfoSPtr);
 	}
 	else
 	{

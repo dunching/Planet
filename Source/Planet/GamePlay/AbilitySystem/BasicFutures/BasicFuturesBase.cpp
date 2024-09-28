@@ -1,6 +1,8 @@
 
 #include "BasicFuturesBase.h"
 
+#include "CharacterBase.h"
+
 UBasicFuturesBase::UBasicFuturesBase() :
 	Super()
 {
@@ -14,6 +16,10 @@ void UBasicFuturesBase::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, 
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
+	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+	if (CharacterPtr)
+	{
+	}
 	InitialTags();
 }
 

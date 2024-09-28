@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "GAEvent_Helper.h"
 
 #include "BaseFeatureComponent.generated.h"
@@ -126,8 +126,9 @@ public:
 	);
 
 	void InitialBaseGAs();
-
-	bool SwitchWalkState(bool bIsRun);
+	
+	UFUNCTION(Server, Reliable)
+	void SwitchWalkState(bool bIsRun);
 	
 	// 冲刺/闪避
 	UFUNCTION(Server, Reliable)
