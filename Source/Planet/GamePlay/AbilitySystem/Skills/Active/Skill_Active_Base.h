@@ -51,6 +51,8 @@ class USkill_Active_Base :
 
 public:
 
+	using ActiveParamType = FGameplayAbilityTargetData_ActiveSkill;
+
 	USkill_Active_Base();
 
 	virtual void OnAvatarSet(
@@ -110,15 +112,6 @@ public:
 	// 获取 “等待输入”时长
 	void GetInputRemainPercent(bool& bIsAcceptInput, float& Percent)const;
 	
-	// 确认是否有锁定的目标
-	ACharacterBase* HasFocusActor()const;
-	
-	// 确认锁定的目标是否在范围内
-	bool CheckTargetInDistance(int32 Distance)const;
-
-	// 获取范围内任意可攻击的目标
-	ACharacterBase* GetTargetInDistance(int32 Distance)const;
-
 protected:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -130,10 +123,10 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	// 进入等待多段输入
+	// 继续下一段技能
 	void ContinueActive();
 
-	// 
+	// 进入等待输入以进入下一段
 	void CheckInContinue();
 
 	// 
@@ -142,6 +135,9 @@ protected:
 	
 	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
 
+	const ActiveParamType* ActiveParamPtr = nullptr;
+
+	// 是否需要等待输入以继续
 	bool bIsPreviouInput = false;
 
 	// 等待输入时常

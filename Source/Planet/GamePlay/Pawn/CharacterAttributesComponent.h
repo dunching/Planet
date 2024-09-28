@@ -40,10 +40,10 @@ public:
 	// 基础状态回复
 	void ProcessCharacterAttributes();
 
-	UPROPERTY(Replicated)
-	FCharacterAttributes CharacterAttributes;
-
 protected:
+	
+	UPROPERTY(Replicated, EditDefaultsOnly)
+	FCharacterAttributes CharacterAttributes;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

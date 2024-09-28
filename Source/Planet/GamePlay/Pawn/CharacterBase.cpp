@@ -32,7 +32,7 @@
 #include "PlanetControllerInterface.h"
 #include "GameplayTagsSubSystem.h"
 #include "StateProcessorComponent.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "UnitProxyProcessComponent.h"
 #include "CDCaculatorComponent.h"
 
@@ -44,7 +44,6 @@
 #include "FightingTips.h"
 #include "SceneObj.h"
 #include "SceneUnitContainer.h"
-#include "SceneUnitTable.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -63,7 +62,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
-	InteractiveBaseGAComponentPtr = CreateDefaultSubobject<UBaseFeatureGAComponent>(UBaseFeatureGAComponent::ComponentName);
+	BaseFeatureComponentPtr = CreateDefaultSubobject<UBaseFeatureComponent>(UBaseFeatureComponent::ComponentName);
 	InteractiveSkillComponentPtr = CreateDefaultSubobject<UUnitProxyProcessComponent>(UUnitProxyProcessComponent::ComponentName);
 	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
 }
@@ -80,7 +79,7 @@ void ACharacterBase::BeginPlay()
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 #if UE_EDITOR || UE_CLIENT
-	if (GetLocalRole() == ROLE_AutonomousProxy)
+	if (GetLocalRole() < ROLE_Authority)
 	{
 		if (!CharacterTitlePtr)
 		{
@@ -89,7 +88,22 @@ void ACharacterBase::BeginPlay()
 			if (CharacterTitlePtr)
 			{
 				CharacterTitlePtr->CharacterPtr = this;
-				CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+				if (GetLocalRole() == ROLE_AutonomousProxy)
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
+				}
+				else
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+				}
+
+				auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+				if (PlayerCharacterPtr)
+				{
+					SetCampType(
+						IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+					);
+				}
 			}
 		}
 	}
@@ -167,12 +181,10 @@ void ACharacterBase::PostInitializeComponents()
 
 			GASPtr->ClearAllAbilities();
 			GASPtr->InitAbilityActorInfo(this, this);
-			GetInteractiveBaseGAComponent()->InitialBaseGAs();
+			GetBaseFeatureComponent()->InitialBaseGAs();
 		}
 #endif
 	}
-
-	Super::PostInitializeComponents();
 
 	if ((World->IsGameWorld()))
 	{
@@ -185,6 +197,8 @@ void ACharacterBase::PostInitializeComponents()
 
 		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent = StateProcessorComponentPtr;
 	}
+
+	Super::PostInitializeComponents();
 }
 
 void ACharacterBase::PossessedBy(AController* NewController)
@@ -261,9 +275,9 @@ UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
 	return TalentAllocationComponentPtr;
 }
 
-UBaseFeatureGAComponent* ACharacterBase::GetInteractiveBaseGAComponent()const
+UBaseFeatureComponent* ACharacterBase::GetBaseFeatureComponent()const
 {
-	return InteractiveBaseGAComponentPtr;
+	return BaseFeatureComponentPtr;
 }
 
 UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
@@ -294,6 +308,7 @@ TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
 void ACharacterBase::InitialDefaultCharacterUnit()
 {
 	TSharedPtr<FCharacterProxy>CharacterUnitPtr = nullptr;
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -314,7 +329,7 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 
 	// 
 	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
-	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
+//	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -330,6 +345,14 @@ bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType AnimLinkClassType)
 {
 	SwitchAnimLink(AnimLinkClassType);
+}
+
+void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCampType)
+{
+	if (CharacterTitlePtr)
+	{
+		CharacterTitlePtr->SetCampType(CharacterCampType);
+	}
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -351,18 +374,17 @@ void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		if (CurrentValue <= 0)
+		if (!GetController())
 		{
-			GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
-			GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
-				for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
-				{
-					if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
-					{
-						Destroy();
-					}
-				}
-				});
+			return;
+		}
+		if (IsPlayerControlled())
+		{
+			GetController<APlanetPlayerController>()->OnHPChanged(CurrentValue);
+		}
+		else
+		{
+			GetController<APlanetAIController>()->OnHPChanged(CurrentValue);
 		}
 	}
 #endif
@@ -379,7 +401,7 @@ void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTar
 	if (GetNetMode() == NM_Client)
 	{
 		// 显示对应的浮动UI
-		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), FightingTipsClass);
+		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
 		UIPtr->ProcessGAEVent(GAEvent);
 		UIPtr->AddToViewport(EUIOrder::kFightingTips);
 	}

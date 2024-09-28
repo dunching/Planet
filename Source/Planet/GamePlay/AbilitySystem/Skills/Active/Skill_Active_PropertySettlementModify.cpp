@@ -32,7 +32,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
@@ -66,13 +66,13 @@ void USkill_Active_PropertySettlementModify::ActivateAbility(
 		};
 
 		const auto MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
-		CharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes.MoveSpeed.AddSettlementModify(MyPropertySettlementModify);
+		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddSettlementModify(MyPropertySettlementModify);
 
 		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 		TaskPtr->SetDuration(Duration);
 		TaskPtr->OnFinished.BindLambda([MyPropertySettlementModify, this](auto)
 			{
-				CharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes.MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
+				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
 
 				CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
 

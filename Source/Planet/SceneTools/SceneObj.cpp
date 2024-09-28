@@ -19,6 +19,7 @@ ASceneObj::ASceneObj(const FObjectInitializer& ObjectInitializer) :
 	bReplicates = true;
 	NetPriority = 3.0f;
 	NetUpdateFrequency = 100.f;
+
 	SetReplicatingMovement(true);
 
 	PropertyComponentPtr = CreateDefaultSubobject<USceneObjPropertyComponent>(USceneObjPropertyComponent::ComponentName);

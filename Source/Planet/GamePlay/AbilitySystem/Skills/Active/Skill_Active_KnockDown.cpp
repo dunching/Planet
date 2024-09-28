@@ -26,7 +26,7 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
@@ -128,7 +128,7 @@ void USkill_Active_KnockDown::ExcuteTasks()
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 
 		TSet <ACharacterBase*>TargetSet;
 		for (const auto & Iter : Result)

@@ -36,11 +36,11 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 
 	const FName TalentStateSocket = TEXT("TalentStateSocket");
 
-	const FName BaseAttackPower = TEXT("BaseAttackPower");
+	const FName AD = TEXT("AD");
 
-	const FName Penetration = TEXT("Penetration");
+	const FName AD_Penetration = TEXT("AD_Penetration");
 
-	const FName Resistance = TEXT("Resistance");
+	const FName AD_Resistance = TEXT("AD_Resistance");
 
 	const FName MoveSpeed = TEXT("MoveSpeed");
 
@@ -49,6 +49,8 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 	const FName HP = TEXT("HP");
 
 	const FName PP = TEXT("PP");
+
+	const FName Mana = TEXT("Mana");
 
 	const FName Shield = TEXT("Shield");
 
@@ -131,7 +133,23 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.PP);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().BaseAttackPower));
+			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Mana));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Mana);
+		}
+		{
+			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Shield));
+			if (!UIPtr)
+			{
+				return;
+			}
+			UIPtr->SetDataSource(CharacterAttributes.Shield);
+		}
+		{
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD));
 			if (!UIPtr)
 			{
 				return;
@@ -139,7 +157,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.AD);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Penetration));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Penetration));
 			if (!UIPtr)
 			{
 				return;
@@ -147,7 +165,7 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.AD_Penetration, CharacterAttributes.AD_PercentPenetration);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Resistance));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Resistance));
 			if (!UIPtr)
 			{
 				return;

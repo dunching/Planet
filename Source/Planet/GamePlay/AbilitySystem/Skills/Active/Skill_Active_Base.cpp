@@ -43,9 +43,10 @@ void USkill_Active_Base::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetPtr)
+		ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamPtr)
 		{
+			bIsPreviouInput = ActiveParamPtr->bIsAutoContinue;
 		}
 	}
 }
@@ -139,7 +140,7 @@ void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Perc
 
 void USkill_Active_Base::CheckInContinue()
 {
-	if (bIsPreviouInput)
+	if (bIsPreviouInput || ActiveParamPtr->bIsAutoContinue)
 	{
 		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 		bIsPreviouInput = false;
@@ -177,58 +178,6 @@ void USkill_Active_Base::ContinueActive()
 	{
 		bIsPreviouInput = true;
 	}
-}
-
-ACharacterBase * USkill_Active_Base::HasFocusActor() const
-{
-	if (CharacterPtr->IsPlayerControlled())
-	{
-		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
-		if (TargetCharacterPtr)
-		{
-			return TargetCharacterPtr;
-		}
-	}
-	else
-	{
-		auto ACPtr = CharacterPtr->GetController<AAIController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
-		if (TargetCharacterPtr)
-		{
-			return TargetCharacterPtr;
-		}
-	}
-	return nullptr;
-}
-
-bool USkill_Active_Base::CheckTargetInDistance(int32 InDistance)const
-{
-	if (CharacterPtr->IsPlayerControlled())
-	{
-		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
-		if (TargetCharacterPtr)
-		{
-			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
-		}
-	}
-	else
-	{
-		auto ACPtr = CharacterPtr->GetController<AAIController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
-		if (TargetCharacterPtr)
-		{
-			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
-		}
-	}
-
-	return false;
-}
-
-ACharacterBase* USkill_Active_Base::GetTargetInDistance(int32 Distance) const
-{
-	return nullptr;
 }
 
 void USkill_Active_Base::WaitInputTick(UAbilityTask_TimerHelper*, float Interval, float Duration)

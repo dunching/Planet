@@ -36,6 +36,7 @@ AProjectileBase::AProjectileBase(const FObjectInitializer& ObjectInitializer) :
     ProjectileMovementCompPtr->MaxSpeed = 10000.f;
     ProjectileMovementCompPtr->bRotationFollowsVelocity = true;
     ProjectileMovementCompPtr->bShouldBounce = true;
+    ProjectileMovementCompPtr->ProjectileGravityScale = 0.f;
 
     // Die after 3 seconds by default
     InitialLifeSpan = 1.5f;

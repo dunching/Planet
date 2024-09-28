@@ -96,7 +96,7 @@ void UGroupmateIcon::SetName()
 	if (UIPtr)
 	{
 		auto CharacterAttributes =
-			UnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
+			UnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		UIPtr->SetText(FText::FromName(CharacterAttributes.Name));
 	}
 }

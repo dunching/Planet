@@ -112,10 +112,6 @@ struct PLANET_API FTableRowUnit_PassiveSkillExtendInfo : public FTableRowUnit_Sk
 {
 	GENERATED_USTRUCT_BODY()
 	
-	// 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Addtional Element")
-	TMap<ECharacterPropertyType, int32>AddtionalElementMap;
-	
 };
 
 USTRUCT(BlueprintType)
@@ -144,11 +140,12 @@ struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag ActiveSkillSet_2;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FCharacterAttributes CharacterAttributes;
+// 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+// 	FCharacterAttributes CharacterAttributes;
 
+	// 每级增加的属性
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FCharacterAttributes CharacterAttributesPerLevel;
+	TArray<FCharacterAttributes> CharacterAttributesPerLevel;
 
 };
 

@@ -25,7 +25,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag BaseFeature_Received =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Received")));
-
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag BaseFeature_Respawn =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Respawn")));
+	
 #pragma region Locomotion
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Jump =

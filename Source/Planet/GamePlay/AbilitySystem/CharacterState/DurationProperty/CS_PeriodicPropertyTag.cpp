@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "AbilityTask_MyApplyRootMotionConstantForce.h"
 

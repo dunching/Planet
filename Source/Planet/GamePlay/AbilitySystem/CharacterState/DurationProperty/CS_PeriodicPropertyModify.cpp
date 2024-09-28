@@ -14,7 +14,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "SceneUnitTable.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
@@ -302,5 +302,5 @@ void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGamepla
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetInteractiveBaseGAComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 }

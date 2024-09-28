@@ -17,7 +17,7 @@
 #include "HumanCharacter.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneObjSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {
@@ -256,7 +256,7 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
@@ -279,7 +279,7 @@ void USkill_Talent_YinYang::OnSendDamage(UGameplayAbility* GAPtr)
 	{
 		if (
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetInteractiveBaseGAComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
 			)
 		{
 			auto SendGaPtr = Cast<UGAEvent_Send>(GAPtr);

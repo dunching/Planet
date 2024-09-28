@@ -7,6 +7,7 @@
 #include "Templates/SubclassOf.h"
 #include <Perception/AIPerceptionTypes.h>
 #include "Blueprint/StateTreeEvaluatorBlueprintBase.h"
+#include "StateTreeEvaluatorBase.h"
 #include "StateTreeExecutionContext.h"
 
 #include "GenerateType.h"
@@ -90,6 +91,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
 	int32 MaxDistanceToPatrolSpline = 1000;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
+	int32 MinAttackDistance = 50;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kFollow;

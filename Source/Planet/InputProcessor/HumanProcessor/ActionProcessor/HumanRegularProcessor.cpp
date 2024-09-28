@@ -65,7 +65,7 @@
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 #include "ResourceBox.h"
 
@@ -97,7 +97,15 @@ namespace HumanProcessor
 
 		SwitchCurrentWeapon();
 
-		AddOrRemoveUseMenuItemEvent(true);
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (OnwerActorPtr)
+		{
+			OnAllocationChangedHandle = OnwerActorPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback([this]() {
+				AddOrRemoveUseMenuItemEvent(true);
+				});
+
+			AddOrRemoveUseMenuItemEvent(true);
+		}
 	}
 
 	void FHumanRegularProcessor::TickImp(float Delta)
@@ -204,6 +212,8 @@ namespace HumanProcessor
 			OnwerActorPtr->GetInteractiveSkillComponent()->RetractputWeapon();
 		}
 
+		OnAllocationChangedHandle->UnBindCallback();
+
 		Super::QuitAction();
 	}
 
@@ -216,7 +226,7 @@ namespace HumanProcessor
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
-				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
+				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
 
 				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
 			}
@@ -230,7 +240,7 @@ namespace HumanProcessor
 				)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
+				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
 			}
 		}
 		else

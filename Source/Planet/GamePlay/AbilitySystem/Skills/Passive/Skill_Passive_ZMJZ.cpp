@@ -14,7 +14,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_Base.h"
@@ -28,7 +28,7 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	if (CharacterPtr)
 	{
 		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetInteractiveBaseGAComponent()->MakedDamageDelegate.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
+			CharacterPtr->GetBaseFeatureComponent()->MakedDamageDelegate.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
 	}
 }
 
@@ -97,7 +97,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-				auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 			else
@@ -112,7 +112,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-				auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 		}
@@ -134,7 +134,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-			auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		}
 	}

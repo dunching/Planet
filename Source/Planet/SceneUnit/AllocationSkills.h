@@ -26,7 +26,8 @@ struct FSocket_FASI : public FFastArraySerializerItem
 	GENERATED_USTRUCT_BODY()
 
 	void PreReplicatedRemove(const FAllocation_FASI_Container& InArraySerializer);
-
+	
+	// 注意：这里在UpdateItem时 有时也会进入这个函数？而且Items会增加，具体原因未知
 	void PostReplicatedAdd(const FAllocation_FASI_Container& InArraySerializer);
 
 	void PostReplicatedChange(const FAllocation_FASI_Container& InArraySerializer);

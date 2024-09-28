@@ -9,7 +9,7 @@
 
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "Planet_Tools.h"
@@ -69,7 +69,7 @@ void UBasicFutures_Run::ActivateAbility(
 				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().RunningSpeedOffset.GetCurrentValue()
 			);
 
-			CharacterPtr->GetInteractiveBaseGAComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
 		}
 #endif
 	}
@@ -93,7 +93,7 @@ void UBasicFutures_Run::EndAbility(
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
 
-		CharacterPtr->GetInteractiveBaseGAComponent()->ClearData2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
+		CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->Running);
 		}
 #endif
 	}

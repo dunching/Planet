@@ -91,9 +91,11 @@ public:
 
 	virtual ~FBasicProxy();
 
-	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	virtual void InitialUnit();
+
+	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
 
 	// 激活
 	virtual bool Active();
@@ -123,6 +125,8 @@ public:
 	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr);
 
 	ACharacterBase* GetProxyCharacter()const;
+
+	ACharacterBase* GetAllocationCharacter()const;
 
 	void Update2Client();
 
@@ -170,6 +174,8 @@ public:
 
 	FCoinProxy();
 
+	void UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr);
+
 	void AddCurrentValue(int32 val);
 
 	int32 GetCurrentValue()const;
@@ -197,7 +203,7 @@ public:
 
 	FConsumableProxy();
 
-	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
 	virtual bool Active()override;
 
@@ -274,7 +280,7 @@ public:
 
 	virtual void InitialUnit()override;
 
-	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
 	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
 
@@ -309,7 +315,11 @@ public:
 
 	FSkillProxy();
 
-	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
+	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)override;
+
+	void UpdateByRemote(const TSharedPtr<FSkillProxy>& RemoteSPtr);
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
@@ -358,11 +368,26 @@ public:
 
 	virtual void InitialUnit()override;
 
+	// 装备至插槽
+	virtual void Allocation()override;
+
+	// 从插槽移除
+	virtual void UnAllocation()override;
+
 	FTableRowUnit_PassiveSkillExtendInfo* GetTableRowUnit_PassiveSkillExtendInfo()const;
 
 	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
+
+	// 元素词条
+	FGameplayTag ElementPropertyEntry;
+
+	// 主词条
+	FGameplayTag MainPropertyEntry;
+
+	// 副词条
+	FGameplayTag SecondPropertyEntry;
 
 protected:
 
@@ -427,7 +452,7 @@ public:
 
 	FWeaponSkillProxy();
 
-	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
 	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)override;
 
@@ -466,6 +491,8 @@ public:
 
 	FWeaponProxy();
 
+	void UpdateByRemote(const TSharedPtr<FWeaponProxy>& RemoteSPtr);
+
 	virtual void InitialUnit()override;
 
 	virtual bool Active()override;
@@ -480,7 +507,7 @@ public:
 
 	virtual void SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& InAllocationCharacterUnitPtr)override;
 
-	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
 	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
 

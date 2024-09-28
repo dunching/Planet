@@ -102,7 +102,7 @@ protected:
 
 	void StopContinueActive();
 
-	void CheckInContinue();
+	virtual void CheckInContinue();
 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);

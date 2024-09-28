@@ -16,7 +16,7 @@
 #include "Skill_Base.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -134,7 +134,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 void UAITask_ReleaseSkill::StopReleaseSkill()
 {
 	// 结束移动释放至范围内释放
-	CharacterPtr->GetInteractiveBaseGAComponent()->BreakMoveToAttackDistance();
+	CharacterPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
 
 	for (const auto Iter : ReleasingSkillMap)
 	{

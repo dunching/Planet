@@ -23,7 +23,7 @@
 #include "UIManagerSubSystem.h"
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "TemplateHelper.h"
 
@@ -272,7 +272,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 // 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }

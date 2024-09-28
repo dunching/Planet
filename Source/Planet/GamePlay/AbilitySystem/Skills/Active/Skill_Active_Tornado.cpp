@@ -30,7 +30,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "CS_RootMotion_TornadoTraction.h"
 
 ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/) :
@@ -237,7 +237,7 @@ void USkill_Active_Tornado::OnOverlap(AActor* OtherActor)
 			return;
 		}
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 
 		// 控制效果
 		{

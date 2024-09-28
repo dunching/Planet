@@ -14,7 +14,7 @@
 
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"

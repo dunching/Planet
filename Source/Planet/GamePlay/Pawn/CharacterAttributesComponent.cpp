@@ -8,7 +8,7 @@
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "PlanetControllerInterface.h"
 #include "CharacterAttibutes.h"
 
@@ -50,7 +50,10 @@ FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes()
 void UCharacterAttributesComponent::ProcessCharacterAttributes()
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
-	if (CharacterPtr)
+	if (
+		CharacterPtr && 
+		!CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+		)
 	{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
@@ -72,28 +75,26 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 				CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
 				)
 			{
-				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
-				{
-				}
-			}
-			else if (
-				CharacterPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running)
-				)
-			{
-				if (!CharacterPtr->GetCharacterMovement()->HasRootMotionSources())
-				{
-					GAEventData.DataModify.Add(ECharacterPropertyType::PP, CharacterAttributes.RunningConsume.GetCurrentValue());
-				}
 			}
 			else
 			{
 				GAEventData.DataModify.Add(ECharacterPropertyType::PP, CharacterAttributes.PP_Replay.GetCurrentValue());
 			}
+
+			if (
+				CharacterPtr->GetBaseFeatureComponent()->IsInFighting()
+				)
+			{
+			}
+			else
+			{
+				GAEventData.DataModify.Add(ECharacterPropertyType::Mana, CharacterAttributes.Mana_Replay.GetCurrentValue());
+			}
 		}
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
@@ -104,11 +105,8 @@ void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	FDoRepLifetimeParams Params;
-	Params.bIsPushBased = true;
-
-	Params.Condition = COND_OwnerOnly;
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterAttributes, Params);
+	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);
+	DOREPLIFETIME(ThisClass, CharacterAttributes);
 }
 
 void UCharacterAttributesComponent::BeginPlay()

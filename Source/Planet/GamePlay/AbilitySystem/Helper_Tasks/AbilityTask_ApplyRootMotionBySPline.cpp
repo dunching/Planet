@@ -15,49 +15,16 @@
 #include "CharacterBase.h"
 #include "SPlineActor.h"
 
-UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewTask
-(
+UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewTask(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,
 	float Duration,
 	ASPlineActor* InSPlineActorPtr,
 	ACharacterBase* InTargetCharacterPtr,
 	int32 StartPtIndex,
-	int32 EndPtIndex
-)
-{
-	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
-
-	const auto StartDistance =
-		InSPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StartPtIndex);
-
-	if (EndPtIndex < 0)
-	{
-		EndPtIndex = InSPlineActorPtr->SplineComponentPtr->GetNumberOfSplinePoints() - 1;
-	}
-
-	const auto EndDistance =
-		InSPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(EndPtIndex);
-
-	return ThisClass::NewTask(
-		OwningAbility, 
-		TaskInstanceName,
-		Duration, 
-		InSPlineActorPtr, 
-		InTargetCharacterPtr, 
-		StartDistance,
-		EndDistance
-	);
-}
-
-UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewTask(
-	UGameplayAbility* OwningAbility,
-	FName TaskInstanceName, 
-	float Duration, 
-	ASPlineActor* InSPlineActorPtr, 
-	ACharacterBase* InTargetCharacterPtr, 
-	float StartDistance,
-	float EndDistance
+	float StartOffset,
+	int32 EndPtIndex,
+	float EndOffset
 )
 {
 	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
@@ -72,6 +39,51 @@ UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewT
 	MyTask->Duration = Duration;
 	MyTask->SPlineActorPtr = InSPlineActorPtr;
 	MyTask->TargetCharacterPtr = InTargetCharacterPtr;
+
+	const auto StartDistance =
+		MyTask->SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StartPtIndex);
+
+	const auto EndDistance =
+		MyTask->SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(EndPtIndex);
+
+	const auto V1 = ((EndDistance - StartDistance) * (StartOffset > 0.f ? StartOffset : 1.f));
+	MyTask->StartDistance = StartDistance + V1;
+
+	const auto V2 = ((EndDistance - StartDistance) * (EndOffset > 0.f ? EndOffset : 1.f));
+	MyTask->EndDistance = StartDistance + V2;
+
+	return MyTask;
+}
+
+UAbilityTask_ApplyRootMotionBySPline* UAbilityTask_ApplyRootMotionBySPline::NewTask(
+	UGameplayAbility* OwningAbility,
+	FName TaskInstanceName,
+	float Duration,
+	ASPlineActor* InSPlineActorPtr,
+	ACharacterBase* InTargetCharacterPtr
+)
+{
+	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
+
+	UAbilityTask_ApplyRootMotionBySPline* MyTask = NewAbilityTask<UAbilityTask_ApplyRootMotionBySPline>(OwningAbility, TaskInstanceName);
+
+	MyTask->ForceName = TaskInstanceName;
+	MyTask->FinishVelocityMode = ERootMotionFinishVelocityMode::SetVelocity;
+	MyTask->FinishSetVelocity = FVector::ZeroVector;
+	MyTask->FinishClampVelocity = 0.f;
+
+	MyTask->Duration = Duration;
+	MyTask->SPlineActorPtr = InSPlineActorPtr;
+	MyTask->TargetCharacterPtr = InTargetCharacterPtr;
+
+	const auto PointNum =
+		MyTask->SPlineActorPtr->SplineComponentPtr->GetNumberOfSplinePoints();
+
+	const auto StartDistance =
+		MyTask->SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(0);
+
+	const auto EndDistance =
+		MyTask->SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(PointNum - 1);
 
 	MyTask->StartDistance = StartDistance;
 	MyTask->EndDistance = EndDistance;
@@ -92,7 +104,7 @@ void UAbilityTask_ApplyRootMotionBySPline::SharedInitAndApply()
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
-		StartTime = GetWorld()->GetTimeSeconds(); 
+		StartTime = GetWorld()->GetTimeSeconds();
 		EndTime = StartTime + Duration;
 
 		if (MovementComponent)
@@ -170,9 +182,9 @@ void UAbilityTask_ApplyRootMotionBySPline::GetLifetimeReplicatedProps(TArray< FL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-// 	DOREPLIFETIME(ThisClass, StartDistance);
-// 	DOREPLIFETIME(ThisClass, EndDistance);
-// 	DOREPLIFETIME(ThisClass, Duration);
-// 	DOREPLIFETIME(ThisClass, SPlineActorPtr);
-// 	DOREPLIFETIME(ThisClass, TargetCharacterPtr);
+	DOREPLIFETIME(ThisClass, StartDistance);
+	DOREPLIFETIME(ThisClass, EndDistance);
+	DOREPLIFETIME(ThisClass, Duration);
+	DOREPLIFETIME(ThisClass, SPlineActorPtr);
+	DOREPLIFETIME(ThisClass, TargetCharacterPtr);
 }

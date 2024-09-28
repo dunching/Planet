@@ -86,7 +86,7 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 			if (UIPtr)
 			{
 				auto CharacterAttributes = 
-					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterAttributes;
+					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 				UIPtr->SetText(FText::FromString(
 					FString::Printf(TEXT("%s(%d)"), *CharacterAttributes.Name.ToString(), CharacterAttributes.Level)
 				));

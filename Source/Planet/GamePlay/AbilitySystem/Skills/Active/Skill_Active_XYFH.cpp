@@ -32,7 +32,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsSubSystem.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 
@@ -56,24 +56,24 @@ void USkill_Active_XYFH::PreActivate(
 
 	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
 
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
-	}
-#endif
+		if (!SPlineActorPtr)
+		{
+			SPlineActorPtr = GetWorld()->SpawnActor<ASPlineActor>(
+				SPlineActorClass, CharacterPtr->GetActorTransform()
+			);
+		}
 
-	if (!SPlineActorPtr)
-	{
-		SPlineActorPtr = GetWorld()->SpawnActor<ASPlineActor>(
-			SPlineActorClass, CharacterPtr->GetActorTransform()
-		);
-	}
-
-	if (!CameraTrailHelperPtr)
-	{
-		CameraTrailHelperPtr = GetWorld()->SpawnActor<ACameraTrailHelper>(
-			CameraTrailHelperClass, CharacterPtr->GetActorTransform()
-		);
+		if (!CameraTrailHelperPtr)
+		{
+			CameraTrailHelperPtr = GetWorld()->SpawnActor<ACameraTrailHelper>(
+				CameraTrailHelperClass, CharacterPtr->GetActorTransform()
+			);
+		}
 	}
 }
 
@@ -106,22 +106,22 @@ void USkill_Active_XYFH::EndAbility(
 	bool bWasCancelled
 )
 {
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
-	}
-#endif
+		if (SPlineActorPtr)
+		{
+			SPlineActorPtr->Destroy();
+			SPlineActorPtr = nullptr;
+		}
 
-	if (SPlineActorPtr)
-	{
-		SPlineActorPtr->Destroy();
-		SPlineActorPtr = nullptr;
-	}
-
-	if (CameraTrailHelperPtr)
-	{
-		CameraTrailHelperPtr->Destroy();
-		CameraTrailHelperPtr = nullptr;
+		if (CameraTrailHelperPtr)
+		{
+			CameraTrailHelperPtr->Destroy();
+			CameraTrailHelperPtr = nullptr;
+		}
 	}
 
 	StepIndex = 0;
@@ -143,10 +143,9 @@ void USkill_Active_XYFH::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-// 	DOREPLIFETIME_CONDITION(ThisClass, SPlineActorPtr, COND_None);
-// 	DOREPLIFETIME_CONDITION(ThisClass, StepIndex, COND_SkipOwner);
-// 	DOREPLIFETIME_CONDITION(ThisClass, SubStepIndex, COND_SkipOwner);
-// 	DOREPLIFETIME_CONDITION(ThisClass, bIsContinue, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ThisClass, SPlineActorPtr, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, StepIndex, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ThisClass, SubStepIndex, COND_SkipOwner);
 }
 
 void USkill_Active_XYFH::PerformAction(
@@ -156,7 +155,7 @@ void USkill_Active_XYFH::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
-	if (CharacterPtr && bIsContinue)
+	if (CharacterPtr)
 	{
 		switch (StepIndex)
 		{
@@ -168,12 +167,7 @@ void USkill_Active_XYFH::PerformAction(
 
 			const auto Duration = HumanMontage->CalculateSequenceLength();
 
-			const auto StartDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
-			const auto EndDistance =
-				SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
-
-			ExcuteTasks(StartDistance, EndDistance, Duration, false);
+			ExcuteTasks(StepIndex, -1.f, StepIndex + 1, -1.f, Duration, false);
 		}
 		break;
 		case 1:
@@ -186,14 +180,7 @@ void USkill_Active_XYFH::PerformAction(
 			{
 				CharacterPtr->GetMesh()->SetHiddenInGame(true);
 
-				const auto StartDistance =
-					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
-				const auto EndDistance =
-					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
-
-				const auto Offset = (EndDistance - StartDistance) * 0.8f;
-
-				ExcuteTasks(StartDistance, StartDistance + Offset, SubStepMoveDuration, true);
+				ExcuteTasks(StepIndex,-1.f, StepIndex + 1, .8f, SubStepMoveDuration, true);
 			}
 			break;
 			case 1:
@@ -204,14 +191,7 @@ void USkill_Active_XYFH::PerformAction(
 
 				const auto Duration = HumanMontage->CalculateSequenceLength();
 
-				const auto StartDistance =
-					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex);
-				const auto EndDistance =
-					SPlineActorPtr->SplineComponentPtr->GetDistanceAlongSplineAtSplinePoint(StepIndex + 1);
-
-				const auto Offset = (EndDistance - StartDistance) * 0.8f;
-
-				ExcuteTasks(StartDistance + Offset, EndDistance, Duration, false);
+				ExcuteTasks(StepIndex, .8f, StepIndex + 1, -1.f, Duration, false);
 			}
 			break;
 			}
@@ -227,8 +207,10 @@ void USkill_Active_XYFH::PerformAction(
 }
 
 void USkill_Active_XYFH::ExcuteTasks(
-	float StartDistance,
-	float EndDistance,
+	int32 StartPtIndex,
+	float StartOffset,
+	int32 EndPtIndex,
+	float EndOffset,
 	float Duration,
 	bool bIsSubMoveStep
 )
@@ -255,8 +237,10 @@ void USkill_Active_XYFH::ExcuteTasks(
 			Duration,
 			SPlineActorPtr,
 			CharacterPtr,
-			StartDistance,
-			EndDistance
+			StartPtIndex,
+			StartOffset,
+			EndPtIndex,
+			EndOffset
 		);
 		if (bIsSubMoveStep)
 		{

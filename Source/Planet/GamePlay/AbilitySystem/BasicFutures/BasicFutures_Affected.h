@@ -11,9 +11,27 @@
 class UAnimMontage;
 class ACharacterBase;
 
-struct FGameplayAbilityTargetData_Affected : public FGameplayAbilityTargetData
+USTRUCT()
+struct FGameplayAbilityTargetData_Affected :
+	public FGameplayAbilityTargetData
 {
+	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	EAffectedDirection AffectedDirection = EAffectedDirection::kForward;
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Affected> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Affected>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 /**

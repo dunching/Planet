@@ -63,8 +63,10 @@ protected:
 	);
 
 	void ExcuteTasks(
-		float StartDistance,
-		float EndDistance,
+		int32 StartPtIndex,
+		float StartOffset,
+		int32 EndPtIndex,
+		float EndOffset,
 		float Duration,
 		bool bIsSubMoveStep
 	);
@@ -87,12 +89,9 @@ protected:
 
 	UPROPERTY(Replicated)
 	int32 StepIndex = 0;
-	
+
 	UPROPERTY(Replicated)
 	int32 SubStepIndex = 0;
-	
-	UPROPERTY(Replicated)
-	bool bIsContinue = true;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage1 = nullptr;
@@ -114,7 +113,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ACameraTrailHelper>CameraTrailHelperClass;
-	
+
 	ACameraTrailHelper* CameraTrailHelperPtr = nullptr;
 
 	TScopeValue<FVector> TargetOffsetValue;

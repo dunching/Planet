@@ -37,7 +37,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitTable.h"
 #include "Skill_Active_Control.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "Skill_WeaponActive_Base.h"
 #include "HoldingItemsComponent.h"
 
@@ -190,6 +190,12 @@ void UUnitProxyProcessComponent::RetractputWeapon()
 
 int32 UUnitProxyProcessComponent::GetCurrentWeaponAttackDistance() const
 {
+	auto SPtr = GetActivedWeapon();
+	if (SPtr)
+	{
+		return SPtr->GetMaxAttackDistance();
+	}
+
 	return 100;
 }
 
@@ -229,7 +235,7 @@ bool UUnitProxyProcessComponent::ActiveAction(
 )
 {
 	auto WeaponSPtr = FindSocket(CurrentWeaponSocket);
-	if (WeaponSPtr->Key == CanbeActivedInfoSPtr->Key)
+	if (WeaponSPtr->Socket == CanbeActivedInfoSPtr->Socket)
 	{
 		ActiveAction_Server(*WeaponSPtr, bIsAutomaticStop);
 	}
@@ -456,10 +462,18 @@ void UUnitProxyProcessComponent::Update(const TSharedPtr<FSocket_FASI>& Socket)
 	else
 	{
 		SocketMap.Add(Socket->Socket, Socket);
+		if (Socket->ProxySPtr)
+		{
+			Socket->ProxySPtr->Allocation();
+		}
 
 #if UE_EDITOR || UE_SERVER
 		if (GetNetMode() == NM_DedicatedServer)
 		{
+			if (Socket->ProxySPtr)
+			{
+				Socket->ProxySPtr->Update2Client();
+			}
 			AllocationSkills_Container.AddItem(Socket);
 		}
 #endif

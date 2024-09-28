@@ -94,7 +94,10 @@ bool FGAEventData::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 	Ar << bIsWeaponAttack;
 	Ar << bIsMakeAttackEffect;
 
-	Ar << Penetration;
+	Ar << AD_Penetration;
+
+	Ar << TrueDamage;
+	Ar << BaseDamage;
 
 	Ar << DataSource;
 
@@ -231,9 +234,9 @@ IGAEventModifySendInterface::IGAEventModifySendInterface(int32 InPriority /*= 1*
 
 }
 
-void IGAEventModifySendInterface::Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent)
+bool IGAEventModifySendInterface::Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent)
 {
-
+	return true;
 }
 
 IGAEventModifyReceivedInterface::IGAEventModifyReceivedInterface(int32 InPriority /*= 1*/) :
@@ -242,9 +245,9 @@ IGAEventModifyReceivedInterface::IGAEventModifyReceivedInterface(int32 InPriorit
 
 }
 
-void IGAEventModifyReceivedInterface::Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent)
+bool IGAEventModifyReceivedInterface::Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent)
 {
-
+	return true;
 }
 
 FGameplayAbilityTargetData_GAEventType::FGameplayAbilityTargetData_GAEventType(EEventType InEventType) :

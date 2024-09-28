@@ -30,6 +30,8 @@ namespace HumanProcessor
 		GENERATIONCLASSINFO(FHumanRegularProcessor, FHumanProcessor);
 
 	public:
+		using FOnAllocationChangedHandle =
+			TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 		FHumanRegularProcessor(FOwnerPawnType* CharacterPtr);
 
@@ -84,6 +86,8 @@ namespace HumanProcessor
 		TMap<FKey, TSharedPtr<FSocket_FASI>>HandleKeysMap;
 
 		ISceneObjInteractionInterface* LookAtSceneObjPtr = nullptr;
+
+		FOnAllocationChangedHandle OnAllocationChangedHandle;
 
 	};
 }

@@ -13,7 +13,7 @@
 
 class ACharacterBase;
 class UInteractiveComponent;
-class UBaseFeatureGAComponent;
+class UBaseFeatureComponent;
 
 struct FCharacterAttributes;
 
@@ -44,15 +44,22 @@ struct PLANET_API FGAEventData
 	bool bIsMakeAttackEffect = false;
 	
 	UPROPERTY()
+	// 是否是“复活”技能
+	bool bIsRespawn = false;
+	
+#pragma region 
+	// 这组数据 为基础值（即在SendEventImp之前填写的值） + 人物属性
+
+	UPROPERTY()
 	// 本次攻击的 穿透
-	int32 Penetration = 0;
+	int32 AD_Penetration = 0;
 	
 	UPROPERTY()
 	// 本次攻击的 百分比穿透
-	int32 PercentPenetration = 0;
+	int32 AD_PercentPenetration = 0;
 	
 	UPROPERTY()
-	// 本次攻击的 命中率(0则为此次被闪避)
+	// 本次攻击的 命中率(0则为此次被闪避)，若大于 100，则为不可被闪避
 	int32 HitRate = 0;
 	
 	UPROPERTY()
@@ -62,7 +69,8 @@ struct PLANET_API FGAEventData
 	UPROPERTY()
 	// 本次攻击的 会心伤害
 	int32 CriticalDamage = 0;
-	
+#pragma endregion
+
 	UPROPERTY()
 	// 造成的真实伤害
 	int32 TrueDamage = 0;
@@ -231,16 +239,20 @@ class PLANET_API IGAEventModifyInterface
 {
 public:
 
-	friend UBaseFeatureGAComponent;
+	friend UBaseFeatureComponent;
 	friend FGAEventModify_key_compare;
 
 	IGAEventModifyInterface(int32 InPriority = 1);
 
 	bool operator<(const IGAEventModifyInterface& RightValue)const;
 
+protected:
+
+	bool bIsOnceTime = false;
+
 private:
 
-	// 越小的越先算
+	// 越小的越先算, 100~200 用于基础功能
 	int32 Priority = -1;
 
 	int32 ID = -1;
@@ -253,7 +265,7 @@ public:
 
 	IGAEventModifySendInterface(int32 InPriority = 1);
 
-	virtual void Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent);
+	virtual bool Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent);
 
 };
 
@@ -263,7 +275,7 @@ public:
 
 	IGAEventModifyReceivedInterface(int32 InPriority = 1);
 
-	virtual void Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent);
+	virtual bool Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent);
 
 };
 

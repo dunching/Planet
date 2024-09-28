@@ -223,6 +223,10 @@ struct PLANET_API FCharacterAttributes final
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet GAPerformSpeed;
 
+	// 当前护盾值
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBasePropertySet Shield;
+	
 	// 生命值
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet HP;
@@ -231,7 +235,7 @@ struct PLANET_API FCharacterAttributes final
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet HP_Replay;
 
-	// 体力
+	// 体力,用于冲刺、奔跑
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet PP;
 
@@ -239,7 +243,7 @@ struct PLANET_API FCharacterAttributes final
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet PP_Replay;
 	
-	// 法力值
+	// 法力值，用于释放技能
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet Mana;
 

@@ -16,7 +16,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "UnitProxyProcessComponent.h"
 
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"

@@ -64,6 +64,8 @@ public:
 
 	virtual ACharacterBase* GetRealCharacter()const override;
 
+	void OnHPChanged(int32 CurrentValue);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -91,9 +93,11 @@ protected:
 	UFUNCTION()
 	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);
 
+	// 目标进入死亡状态
 	void OnFocusDeathing(const FGameplayTag Tag, int32 Count);
 
-	void BindRemove(AActor* Actor);
+	// 给被锁定的目标绑定一些回调，比如目标进入“死亡”、“隐身”、“不可选中”时
+	void BindOnFocusRemove(AActor* Actor);
 
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 

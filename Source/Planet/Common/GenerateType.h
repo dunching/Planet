@@ -31,6 +31,8 @@ enum class ECharacterPropertyType : uint8
 	PP,
 	Mana,
 
+	Shield,
+
 	AD,
 	AD_Penetration,
 	AD_PercentPenetration,
@@ -71,6 +73,7 @@ enum class EAnimLinkClassType : uint8
 {
 	kUnarmed,
 	kPickAxe,
+	kBow,
 };
 
 UENUM(BlueprintType)

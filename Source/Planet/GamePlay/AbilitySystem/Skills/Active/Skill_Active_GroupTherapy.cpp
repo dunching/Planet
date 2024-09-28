@@ -26,7 +26,7 @@
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
-#include "BaseFeatureGAComponent.h"
+#include "BaseFeatureComponent.h"
 
 namespace Skill_Active_ContinuousGroupTherapy
 {
@@ -145,7 +145,7 @@ void USkill_Active_GroupTherapy::EmitEffect()
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetInteractiveBaseGAComponent();
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }

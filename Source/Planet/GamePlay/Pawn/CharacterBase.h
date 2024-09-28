@@ -36,7 +36,7 @@ class UPlanetAbilitySystemInterface;
 class UTalentAllocationComponent;
 class UStateProcessorComponent;
 class UGroupMnaggerComponent;
-class UBaseFeatureGAComponent;
+class UBaseFeatureComponent;
 class UInteractiveConsumablesComponent;
 class UUnitProxyProcessComponent;
 class UInteractiveToolComponent;
@@ -89,7 +89,7 @@ public:
 
 	UTalentAllocationComponent* GetTalentAllocationComponent()const;
 
-	UBaseFeatureGAComponent* GetInteractiveBaseGAComponent()const;
+	UBaseFeatureComponent* GetBaseFeatureComponent()const;
 	
 	UStateProcessorComponent* GetStateProcessorComponent()const;
 
@@ -111,6 +111,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
 	
+	UFUNCTION(NetMulticast, Reliable)
+	void SetCampType(ECharacterCampType CharacterCampType);
+
 	UPROPERTY(Transient)
 	UCharacterTitle* CharacterTitlePtr = nullptr;
 	
@@ -154,30 +157,27 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	
+	UPROPERTY()
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UBaseFeatureGAComponent> InteractiveBaseGAComponentPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UBaseFeatureComponent> BaseFeatureComponentPtr = nullptr;
+	
+	UPROPERTY()
 	TObjectPtr<UUnitProxyProcessComponent> InteractiveSkillComponentPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
+	UPROPERTY()
 	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UFightingTips>FightingTipsClass;
 	
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
@@ -189,7 +189,7 @@ private:
 	UFUNCTION(NetMulticast, Reliable)
 	void OnMoveSpeedChanged(int32 CurrentValue);
 	
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(NetMulticast, Unreliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	FValueChangedDelegateHandle HPChangedHandle;

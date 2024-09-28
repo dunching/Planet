@@ -177,7 +177,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FToolProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FToolProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -185,7 +185,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -193,7 +193,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -201,7 +201,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -209,7 +209,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -217,7 +217,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -225,7 +225,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCoinProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -233,7 +233,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -241,7 +241,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(CharacterProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -249,7 +249,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(ProxySPtr->GetID()));
-		*LeftProxySPtr = *RightProxySPtr;
+		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
@@ -334,6 +334,10 @@ TSharedPtr<FSkillProxy>  UHoldingItemsComponent::AddUnit_Skill(const FGameplayTa
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
 	{
 		ResultPtr = MakeShared<FPassiveSkillProxy>();
+	}
+	else
+	{
+		return nullptr;
 	}
 
 #if WITH_EDITOR
@@ -597,7 +601,6 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialDefaultCharacter()
 
 	CharacterProxySPtr->UnitType = UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player;
 	CharacterProxySPtr->ProxyCharacterPtr = GetOwner<FOwnerType>();
-
 	CharacterProxySPtr->InitialUnit();
 
 	SceneToolsAry.Add(CharacterProxySPtr);

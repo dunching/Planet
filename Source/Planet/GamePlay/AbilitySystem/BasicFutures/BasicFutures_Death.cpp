@@ -21,10 +21,6 @@ void UBasicFutures_Death::ActivateAbility(
 
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
-	WaitingToExecute.Add(FPostLockDelegate::CreateLambda([this]() {
-		K2_EndAbility();
-		}));
-
 	PlayMontage(DeathMontage, 1.f);
 
 	if (auto AIPCPtr = CharacterPtr->GetController<AHumanAIController>())
@@ -35,6 +31,10 @@ void UBasicFutures_Death::ActivateAbility(
 
 void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
@@ -47,11 +47,6 @@ void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
-		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
-
 		TaskPtr->ReadyForActivation();
-
-		IncrementListLock();
 	}
 }

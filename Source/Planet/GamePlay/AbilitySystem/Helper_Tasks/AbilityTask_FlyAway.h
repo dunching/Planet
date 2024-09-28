@@ -26,6 +26,8 @@ public:
 
 	UAbilityTask_FlyAway(const FObjectInitializer& ObjectInitializer);
 
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
 	static UAbilityTask_FlyAway* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
@@ -47,6 +49,8 @@ public:
 
 	virtual void OnDestroy(bool AbilityIsEnding) override;
 
+	void UpdateDuration(int32 InHeight, float InDuration);
+	
 	void UpdateDuration();
 
 	FOnTaskFinished OnFinish;
@@ -57,10 +61,13 @@ protected:
 
 protected:
 	
+	UPROPERTY(Replicated)
 	int32 Height = 100;
 	
+	UPROPERTY(Replicated)
 	float Duration = 1.f;
 	
+	UPROPERTY(Replicated)
 	ERootMotionAccumulateMode RootMotionAccumulateMode = ERootMotionAccumulateMode::Additive;
 
 };
