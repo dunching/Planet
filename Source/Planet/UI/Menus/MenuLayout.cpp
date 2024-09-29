@@ -9,3 +9,8 @@ void UMenuLayout::NativeConstruct()
 
 
 }
+
+void UMenuLayout::SwitchViewer(EMenuType MenuType)
+{
+
+}

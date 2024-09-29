@@ -14,6 +14,14 @@ class UTalentAllocation;
 class UGroupManaggerMenu;
 class UAllocationSkillsMenu;
 
+enum class EMenuType : uint8
+{
+	kAllocationSkill,
+	kAllocationTalent,
+	kGroupManagger,
+	kRaffle,
+};
+
 /**
  *
  */
@@ -26,6 +34,8 @@ public:
 
 	virtual void NativeConstruct()override;
 	
+	void SwitchViewer(EMenuType MenuType);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<URaffleMenu>RaffleMenuClass;
 	

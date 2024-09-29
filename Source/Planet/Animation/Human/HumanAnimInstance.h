@@ -7,6 +7,8 @@
 
 #include "Animation/AnimInstance.h"
 
+#include "TemplateHelper.h"
+
 #include "HumanAnimInstance.generated.h"
 
 class UAbilitySystemComponent;
@@ -24,7 +26,13 @@ class PLANET_API UHumanAnimInstance : public UAnimInstance
 	GENERATED_BODY()
 
 public:
-	
+	using FValueChangedDelegateHandle =
+		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+
+	virtual void NativeBeginPlay()override;
+
+	virtual void BeginDestroy() override;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetIsMelee(bool bIsMeele);
 
@@ -32,7 +40,10 @@ public:
 	EAnimationType AnimationType = EAnimationType::kNormal;
 
 protected:
-
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnMoveSpeedChanged(int32 CurrentValue);
+	
 	UFUNCTION(BlueprintCallable)
 	FQuat GetGravityToWorldTransform() const;
 
@@ -47,6 +58,9 @@ protected:
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Character State Data")
+	int32 JogSpeed = 350;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Character State Data")
 	float GroundDistance = -1.0f;
 
@@ -58,5 +72,7 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ASC")
 	FGameplayTagContainer TagContainer;
+
+	FValueChangedDelegateHandle MoveSpeedChangedHandle;
 
 };

@@ -49,6 +49,8 @@ struct FMainUILayout : public TStructVariable<FMainUILayout>
 	FName PawnStateConsumablesHUD_Socket = TEXT("PawnStateConsumablesHUD_Socket");
 
 	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
+
+	FName WidgetSwitcher = TEXT("WidgetSwitcher");
 };
 
 struct FMenuLayout : public TStructVariable<FMenuLayout>
