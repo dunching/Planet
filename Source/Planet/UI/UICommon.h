@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "UICommon.generated.h"
+
 enum EUIOrder :uint8
 {
 	// 
@@ -14,4 +16,13 @@ enum EUIOrder :uint8
 	kFocus,
 	kMainUI,
 	kTableMenu,
+};
+
+UENUM(BlueprintType)
+enum class EMenuType : uint8
+{
+	kAllocationSkill,
+	kAllocationTalent,
+	kGroupManagger,
+	kRaffle,
 };

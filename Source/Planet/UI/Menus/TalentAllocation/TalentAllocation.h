@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "MenuInterface.h"
 
 #include "TalentAllocation.generated.h"
 
@@ -15,16 +16,18 @@ class UTalentIcon;
  *
  */
 UCLASS()
-class PLANET_API UTalentAllocation : public UMyUserWidget
+class PLANET_API UTalentAllocation :
+	public UMyUserWidget,
+	public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	// ¿ÉÓÃµÄ×ÜµãÊı±ä¸ü
+	// å¯ç”¨çš„æ€»ç‚¹æ•°å˜æ›´
 	using FPointsDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
-	// ·ÖÅäµÄµãÊı±ä¸ü
+	// åˆ†é…çš„ç‚¹æ•°å˜æ›´
 	using FPointDelegateHandle = TCallbackHandleContainer<void(UTalentIcon*, bool)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
@@ -32,6 +35,8 @@ public:
 	virtual void NativeDestruct()override;
 
 protected:
+
+	virtual void ResetUIByData()override;
 
 	void OnUsedTalentNumChanged(int32 OldNum, int32 NewNum);
 	

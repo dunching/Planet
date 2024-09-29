@@ -21,4 +21,6 @@ class PLANET_API UMenuNavgation : public UMyUserWidget
 
 public:
 
+	virtual void NativeConstruct()override;
+
 };

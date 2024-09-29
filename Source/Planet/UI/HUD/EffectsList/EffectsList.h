@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
+#include "HUDInterface.h"
 
 #include "EffectsList.generated.h"
 
@@ -19,7 +20,7 @@ class UCS_Base;
 UCLASS()
 class PLANET_API UEffectsList : 
 	public UMyUserWidget, 
-	public IMenuInterface
+	public IHUDInterface
 {
 	GENERATED_BODY()
 

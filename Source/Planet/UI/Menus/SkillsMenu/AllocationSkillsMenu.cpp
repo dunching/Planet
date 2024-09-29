@@ -99,8 +99,6 @@ void UAllocationSkillsMenu::NativeConstruct()
 		return;
 	}
 
-	ResetUIByData();
-
 	BindEvent();
 }
 
@@ -121,6 +119,19 @@ void UAllocationSkillsMenu::NativeDestruct()
 	}
 
 	SyncAllocation2Character();
+}
+
+void UAllocationSkillsMenu::ResetUIByData()
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	InitialGroupmateList();
+
+	ResetUI(CharacterPtr->GetCharacterUnit(), CharacterPtr->GetCharacterUnit());
 }
 
 void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
@@ -477,19 +488,6 @@ void UAllocationSkillsMenu::ResetUI(const TSharedPtr<FCharacterProxy>& TargetCha
 	}
 	ResetUIByData_Skills(CurrentUnitPtr);
 	ResetUIByData_Consumable(CurrentUnitPtr);
-}
-
-void UAllocationSkillsMenu::ResetUIByData()
-{
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (!CharacterPtr)
-	{
-		return;
-	}
-
-	InitialGroupmateList();
-
-	ResetUI(CharacterPtr->GetCharacterUnit(), CharacterPtr->GetCharacterUnit());
 }
 
 void UAllocationSkillsMenu::InitialGroupmateList()

@@ -7,7 +7,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
-#include "UIInterfaces.h"
+#include "HUDInterface.h"
 
 
 #include "PawnStateBuildingHUD.generated.h"
@@ -23,7 +23,9 @@ struct FConsumableSocketInfo;
  *
  */
 UCLASS()
-class PLANET_API UPawnStateBuildingHUD : public UMyUserWidget, public IMenuInterface
+class PLANET_API UPawnStateBuildingHUD :
+	public UMyUserWidget,
+	public IHUDInterface
 {
 	GENERATED_BODY()
 

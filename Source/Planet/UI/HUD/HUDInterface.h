@@ -11,28 +11,21 @@
 #include "GenerateType.h"
 #include "SceneElement.h"
 
-#include "UIInterfaces.generated.h"
-
-struct FBasicProxy;
+#include "HUDInterface.generated.h"
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UUnitIconInterface : public UInterface
+class  UHUDInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class PLANET_API IUnitIconInterface
+class PLANET_API IHUDInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	UFUNCTION(BlueprintCallable)
-	virtual void InvokeReset(UUserWidget* BaseWidgetPtr) = 0;
-	
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr) = 0;
-
-	virtual void EnableIcon(bool bIsEnable) = 0;
+	virtual void ResetUIByData() = 0;
 
 protected:
 

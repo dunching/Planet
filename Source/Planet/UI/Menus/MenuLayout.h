@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "UICommon.h"
 
 #include "MenuLayout.generated.h"
 
@@ -13,14 +14,6 @@ class URaffleMenu;
 class UTalentAllocation;
 class UGroupManaggerMenu;
 class UAllocationSkillsMenu;
-
-enum class EMenuType : uint8
-{
-	kAllocationSkill,
-	kAllocationTalent,
-	kGroupManagger,
-	kRaffle,
-};
 
 /**
  *

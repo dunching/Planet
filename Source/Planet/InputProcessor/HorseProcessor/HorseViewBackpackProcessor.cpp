@@ -10,7 +10,6 @@
 #include "HumanCharacter.h"
 #include "HorseCharacter.h"
 #include "UI/UIManagerSubSystem.h"
-#include "InteractionToAIMenu.h"
 #include "BackpackMenu.h"
 #include "CreateMenu.h"
 #include "InputProcessorSubSystem.h"
