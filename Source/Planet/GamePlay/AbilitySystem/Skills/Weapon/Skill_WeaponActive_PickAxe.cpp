@@ -13,7 +13,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -70,9 +70,9 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		if (ActiveParamPtr)
+		if (ActiveParamSPtr)
 		{
-			EquipmentAxePtr = Cast<AWeapon_PickAxe>(ActiveParamPtr->WeaponPtr);
+			EquipmentAxePtr = Cast<AWeapon_PickAxe>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
 }

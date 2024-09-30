@@ -9,6 +9,7 @@
 #include "Common/GenerateType.h"
 #include "HoldingItemsComponent.h"
 #include <SceneElement.h>
+#include "MenuInterface.h"
 
 #include "AllocationSkillsMenu.generated.h"
 
@@ -21,7 +22,9 @@ struct FCharacterProxy;
  *
  */
 UCLASS()
-class PLANET_API UAllocationSkillsMenu : public UMyUserWidget, public IMenuInterface
+class PLANET_API UAllocationSkillsMenu : 
+	public UMyUserWidget,
+	public IMenuInterface
 {
 	GENERATED_BODY()
 

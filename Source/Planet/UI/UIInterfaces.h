@@ -39,24 +39,3 @@ protected:
 private:
 
 };
-
-UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UMenuInterface : public UInterface
-{
-	GENERATED_BODY()
-};
-
-
-class PLANET_API IMenuInterface
-{
-	GENERATED_BODY()
-
-public:
-
-	virtual void ResetUIByData() = 0;
-
-protected:
-
-private:
-
-};

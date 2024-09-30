@@ -10,7 +10,7 @@
 
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"

@@ -8,7 +8,6 @@
 
 #include "GameMode_Main.h"
 #include "Kismet/GameplayStatics.h"
-#include "InteractionToAIMenu.h"
 #include "CreateMenu.h"
 #include "PromptBox.h"
 #include "backpackMenu.h"
@@ -200,34 +199,13 @@ void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
 		return;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
-	if (!BorderPtr)
+	MenuLayoutPtr->SetVisibility(bIsDisplay ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	if (bIsDisplay)
 	{
-		return;
-	}
-
-	auto UIPtr = Cast<UAllocationSkillsMenu>(BorderPtr->GetContent());
-	if (UIPtr)
-	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
+		MenuLayoutPtr->SwitchViewer(EMenuType::kAllocationSkill);
 	}
 	else
 	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<UAllocationSkillsMenu>(GetWorldImp(), MenuLayoutPtr->AllocationSkillsMenuClass);
-			if (UIPtr)
-			{
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
 	}
 }
 
@@ -239,75 +217,18 @@ void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 		return;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
-	if (!BorderPtr)
+	MenuLayoutPtr->SetVisibility(bIsDisplay ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	if (bIsDisplay)
 	{
-		return;
-	}
-
-	auto UIPtr = Cast<UTalentAllocation>(BorderPtr->GetContent());
-	if (UIPtr)
-	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
+		MenuLayoutPtr->SwitchViewer(EMenuType::kAllocationTalent);
 	}
 	else
 	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<UTalentAllocation>(GetWorldImp(), MenuLayoutPtr->TalentAllocationClass);
-			if (UIPtr)
-			{
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
 	}
 }
 
 void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
 {
-	MenuLayoutPtr = GetMenuLayout();
-	if (!MenuLayoutPtr)
-	{
-		return;
-	}
-
-	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	auto UIPtr = Cast<UGroupManaggerMenu>(BorderPtr->GetContent());
-	if (UIPtr)
-	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
-	}
-	else
-	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<UGroupManaggerMenu>(GetWorldImp(), MenuLayoutPtr->GroupManaggerMenuClass);
-			if (UIPtr)
-			{
-				UIPtr->HumanCharacterPtr = HumanCharacterPtr;
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
-	}
 }
 
 void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
@@ -351,41 +272,6 @@ void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* Huma
 
 void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 {
-	MenuLayoutPtr = GetMenuLayout();
-	if (!MenuLayoutPtr)
-	{
-		return;
-	}
-
-	auto BorderPtr = Cast<UBorder>(MenuLayoutPtr->GetWidgetFromName(FMenuLayout::Get().Content));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	auto UIPtr = Cast<URaffleMenu>(BorderPtr->GetContent());
-	if (UIPtr)
-	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
-	}
-	else
-	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<URaffleMenu>(GetWorldImp(), MenuLayoutPtr->RaffleMenuClass);
-			if (UIPtr)
-			{
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
-	}
 }
 
 UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)

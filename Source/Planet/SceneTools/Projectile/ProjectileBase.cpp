@@ -3,11 +3,14 @@
 
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "CollisionDataStruct.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include <DrawDebugHelpers.h>
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
+
+#include "CollisionDataStruct.h"
+#include "CharacterBase.h"
 
 static TAutoConsoleVariable<int32> ProjectileBase(
     TEXT("Skill.DrawDebug.ProjectileBase"),
@@ -18,6 +21,9 @@ static TAutoConsoleVariable<int32> ProjectileBase(
 AProjectileBase::AProjectileBase(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
 {
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.TickInterval = 1.f / 60;
+
     CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	RootComponent = CollisionComp;
 
@@ -42,11 +48,24 @@ AProjectileBase::AProjectileBase(const FObjectInitializer& ObjectInitializer) :
     InitialLifeSpan = 1.5f;
 }
 
+void AProjectileBase::BeginPlay()
+{
+    Super::BeginPlay();
+
+    StartPt = GetActorLocation();
+}
+
 #ifdef WITH_EDITOR
+#endif
+
 void AProjectileBase::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds);
+    Super::Tick(DeltaSeconds);
 
+    if ((MaxMoveRange > 0) && (FVector::Distance(StartPt, GetActorLocation()) >= MaxMoveRange))
+    {
+        Destroy();
+    }
 
 #ifdef WITH_EDITOR
     if (ProjectileBase.GetValueOnGameThread())
@@ -55,4 +74,16 @@ void AProjectileBase::Tick(float DeltaSeconds)
     }
 #endif
 }
-#endif
+
+void AProjectileBase::SetHomingTarget_Implementation(ACharacterBase* TargetPtr)
+{
+    ProjectileMovementCompPtr->bIsHomingProjectile = true;
+    ProjectileMovementCompPtr->HomingTargetComponent = TargetPtr->GetRootComponent();
+}
+
+void AProjectileBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME_CONDITION(ThisClass, MaxMoveRange, COND_InitialOnly);
+}

@@ -8,6 +8,7 @@
 
 #include "Common/GenerateType.h"
 #include <SceneElement.h>
+#include <MenuInterface.h>
 
 #include "BackpackMenu.generated.h"
 
@@ -22,7 +23,9 @@ struct FWeaponProxy;
  *
  */
 UCLASS()
-class PLANET_API UBackpackMenu : public UMyUserWidget, public IMenuInterface
+class PLANET_API UBackpackMenu : 
+	public UMyUserWidget, 
+	public IMenuInterface
 {
 	GENERATED_BODY()
 

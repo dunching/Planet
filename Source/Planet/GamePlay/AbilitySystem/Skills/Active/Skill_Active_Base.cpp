@@ -5,12 +5,13 @@
 
 #include "SceneElement.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
 #include "GroupMnaggerComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 USkill_Active_Base::USkill_Active_Base():
 	Super()
@@ -24,6 +25,8 @@ void USkill_Active_Base::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
 
 	if (SkillUnitPtr)
 	{
@@ -43,7 +46,7 @@ void USkill_Active_Base::PreActivate(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill*>(TriggerEventData->TargetData.Get(0));
+		ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_ActiveSkill_ActiveParam*>(TriggerEventData->TargetData.Get(0));
 		if (ActiveParamPtr)
 		{
 			bIsPreviouInput = ActiveParamPtr->bIsAutoContinue;
@@ -212,12 +215,12 @@ void USkill_Active_Base::PerformAction(
 
 }
 
-UScriptStruct* FGameplayAbilityTargetData_ActiveSkill::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_ActiveSkill::StaticStruct();
+	return FGameplayAbilityTargetData_ActiveSkill_ActiveParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_ActiveSkill::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_ActiveSkill_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -226,10 +229,10 @@ bool FGameplayAbilityTargetData_ActiveSkill::NetSerialize(FArchive& Ar, class UP
 	return true;
 }
 
-FGameplayAbilityTargetData_ActiveSkill* FGameplayAbilityTargetData_ActiveSkill::Clone() const
+FGameplayAbilityTargetData_ActiveSkill_ActiveParam* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_ActiveSkill;
+		new FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
 
 	*ResultPtr = *this;
 

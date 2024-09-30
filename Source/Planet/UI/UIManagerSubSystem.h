@@ -56,44 +56,49 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	// ÆÕÍ¨½çÃæ(¼¼ÄÜ×´Ì¬HUD)¡¢
-	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*CharacterPtr = nullptr);
-	
-	// ¹¤¾ß¡¢
-	void DisplayBuildingStateHUD(bool bIsDisplay);
+#pragma region  ProcessMode
+	// æ™®é€šç•Œé¢(æŠ€èƒ½çŠ¶æ€HUD)ã€
+	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr = nullptr);
 
-	// ä¯ÀÀ ±³°ü¡¢×°Åä¼¼ÄÜ
+	// å·¥å…·ã€
+	void DisplayBuildingStateHUD(bool bIsDisplay);
+#pragma endregion  ProcessMode
+
+#pragma region Menu
+	// æµè§ˆ èƒŒåŒ…ã€è£…é…æŠ€èƒ½
 	void ViewBackpack(bool bIsDisplay);
 
-	// ä¯ÀÀ Ìì¸³½çÃæ
+	// æµè§ˆ å¤©èµ‹ç•Œé¢
 	void ViewTalentAllocation(bool bIsDisplay);
-	
-	// ä¯ÀÀ ³ÉÔ±¹ÜÀí½çÃæ
+
+	// æµè§ˆ æˆå‘˜ç®¡ç†ç•Œé¢
 	void ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
-	
-	// ³öÕ½¶ÓÔ±ÁĞ±í
+
+	// å‡ºæˆ˜é˜Ÿå‘˜åˆ—è¡¨
 	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
 
-	// ³é¿¨½çÃæ
+	// æŠ½å¡ç•Œé¢
 	void ViewRaffleMenu(bool bIsDisplay);
 
-	// Ğ§¹ûÀ¸£¨buff¡¢debuff£©
+#pragma endregion Menu
+
+	// æ•ˆæœæ ï¼ˆbuffã€debuffï¼‰
 	UEffectsList* ViewEffectsList(bool bIsViewMenus);
-	
-	// ½ø¶ÈÌõ ¹¤¾ß
+
+	// è¿›åº¦æ¡/å·¥å…·
 	UProgressTips* ViewProgressTips(bool bIsViewMenus);
-	
-	// ½ø¶ÈÌõ ¹¤¾ß
+
+	// è·å–ç‰©å“çš„æç¤º
 	UGetItemInfos* GetItemInfos();
 
 protected:
 
 	UMainUILayout* GetMainUILAyout();
 
+	UMenuLayout* GetMenuLayout();
+	
 	UPROPERTY(Transient)
 	UMainUILayout* MainUILayoutPtr = nullptr;
-
-	UMenuLayout* GetMenuLayout();
 
 	UPROPERTY()
 	UMenuLayout* MenuLayoutPtr = nullptr;

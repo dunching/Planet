@@ -9,7 +9,7 @@
 #include "MyUserWidget.h"
 #include "SceneElement.h"
 #include "HoldingItemsComponent.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "ToolsMenu.generated.h"
 

@@ -55,6 +55,7 @@
 #include "CS_PeriodicStateModify_Slow.h"
 #include "CS_PeriodicStateModify_Fear.h"
 #include "CS_PeriodicStateModify_SuperArmor.h"
+#include "HumanAnimInstance.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
@@ -163,7 +164,12 @@ void UStateProcessorComponent::RemoveStateDisplay(const TSharedPtr<FCharacterSta
 
 void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	const auto Value = Count > 0;
+	auto Lambda = [&]
+		{
+			const auto Value = Count > 0;
+			return Value;
+		};
+
 	if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
 	{
 
@@ -176,7 +182,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->MovementState.bCanJump = !Value;
+				CharacterMovementPtr->MovementState.bCanJump = !Lambda();
 			}
 		}
 		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove))
@@ -185,7 +191,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkip_PathFollow = Value;
+				CharacterMovementPtr->bSkip_PathFollow = Lambda();
 			}
 		}
 		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove))
@@ -194,7 +200,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkip_PlayerInput = Value;
+				CharacterMovementPtr->bSkip_PlayerInput = Lambda();
 			}
 		}
 		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion))
@@ -203,7 +209,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkipRootMotion = Value;
+				CharacterMovementPtr->bSkipRootMotion = Lambda();
 			}
 		}
 		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation))
@@ -212,7 +218,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkipRotation = Value;
+				CharacterMovementPtr->bSkipRotation = Lambda();
 			}
 		}
 		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly))
@@ -221,8 +227,8 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->SetMovementMode(Value ? EMovementMode::MOVE_Flying : EMovementMode::MOVE_Falling);
-				if (Value)
+				CharacterMovementPtr->SetMovementMode(Lambda() ? EMovementMode::MOVE_Flying : EMovementMode::MOVE_Falling);
+				if (Lambda())
 				{
 					CharacterMovementPtr->MaxFlySpeed = CharacterMovementPtr->MaxWalkSpeed;
 					CharacterMovementPtr->BrakingDecelerationFlying = 2048;
@@ -235,8 +241,17 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->SetIsOrientRotationToMovement_RPC(Value);
+				CharacterMovementPtr->SetIsOrientRotationToMovement_RPC(Lambda());
 			}
+		}
+	}
+	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill))
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+			auto AnimInsPtr = CharacterPtr->GetAnimationIns<UHumanAnimInstance>();
+			AnimInsPtr->SetIsMelee(Lambda());
 		}
 	}
 }

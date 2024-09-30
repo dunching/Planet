@@ -36,7 +36,7 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Jump")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag Running =
+	FGameplayTag State_Locomotion_Run =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Run")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
@@ -172,9 +172,13 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.InFighting")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	FGameplayTag State_ReleasingSkill=
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
 	FGameplayTag State_ReleasingSkill_Continuous =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Continuous")));
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
 	FGameplayTag State_ReleasingSkill_Active =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Active")));
@@ -318,7 +322,11 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Weapon_RangeTest =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.RangeTest")));
-	
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Weapon_Bow =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.Bow")));
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Active =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active")));

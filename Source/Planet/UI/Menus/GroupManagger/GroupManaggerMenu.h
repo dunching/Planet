@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "UIInterfaces.h"
-
+#include "MenuInterface.h"
 #include "Common/GenerateType.h"
 #include <SceneElement.h>
 
@@ -17,7 +16,9 @@ struct FSceneObjContainer;
  *
  */
 UCLASS()
-class PLANET_API UGroupManaggerMenu : public UMyUserWidget, public IMenuInterface
+class PLANET_API UGroupManaggerMenu :
+	public UMyUserWidget, 
+	public IMenuInterface
 {
 	GENERATED_BODY()
 

@@ -14,7 +14,7 @@ struct FSkillProxy;
 class UInteractiveComponent;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_SkillBase : 
+struct FGameplayAbilityTargetData_SkillBase_RegisterParam : 
 	public FGameplayAbilityTargetData_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -28,8 +28,8 @@ struct FGameplayAbilityTargetData_SkillBase :
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_SkillBase> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_SkillBase>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_SkillBase_RegisterParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_SkillBase_RegisterParam>
 {
 	enum
 	{
@@ -44,7 +44,7 @@ class PLANET_API USkill_Base : public UPlanetGameplayAbility
 
 public:
 
-	using FRegisterParamType = FGameplayAbilityTargetData_SkillBase;
+	using FRegisterParamType = FGameplayAbilityTargetData_SkillBase_RegisterParam;
 
 	friend UInteractiveComponent;
 
@@ -98,6 +98,8 @@ public:
 	)override;
 
 	const TArray<FAbilityTriggerData>& GetTriggers()const;
+
+	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData);
 
 protected:
 

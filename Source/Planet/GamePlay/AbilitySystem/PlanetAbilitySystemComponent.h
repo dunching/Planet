@@ -51,6 +51,12 @@ public:
 		int32 InputID,
 		const FGameplayEventData&TriggerEventData
 	);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void Replicate_UpdateGAParam(
+		FGameplayAbilitySpecHandle Handle,
+		const FGameplayEventData&TriggerEventData
+	);
 
 	UFUNCTION(BlueprintCallable, Category = "ASC")
 	bool K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const;

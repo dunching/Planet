@@ -8,7 +8,7 @@
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
 #include "STE_Human.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 EStateTreeRunStatus FSTT_UpdateQueryDistance::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -28,7 +28,7 @@ EStateTreeRunStatus FSTT_UpdateQueryDistance::EnterState(
 	}
 
 	InstanceData.GloabVariable->QueryDistance =
-		InstanceData.CharacterPtr->GetInteractiveSkillComponent()->GetCurrentWeaponAttackDistance();
+		InstanceData.CharacterPtr->GetProxyProcessComponent()->GetCurrentWeaponAttackDistance();
 
 	return EStateTreeRunStatus::Succeeded;
 }

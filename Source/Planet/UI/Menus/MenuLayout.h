@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "UICommon.h"
 
 #include "MenuLayout.generated.h"
 
@@ -26,6 +27,8 @@ public:
 
 	virtual void NativeConstruct()override;
 	
+	void SwitchViewer(EMenuType MenuType);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<URaffleMenu>RaffleMenuClass;
 	

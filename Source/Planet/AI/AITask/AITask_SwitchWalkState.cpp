@@ -79,7 +79,8 @@ bool UAITask_SwitchWalkState::SwitchWalkState()
 
 	if (OnwerActorPtr)
 	{
-		return OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(bIsSwitchToRun);
+		OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(bIsSwitchToRun);
+		return true;
 	}
 
 	return false;

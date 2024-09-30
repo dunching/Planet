@@ -10,7 +10,7 @@
 
 #include "AllocationSkills.h"
 
-#include "UnitProxyProcessComponent.generated.h"
+#include "ProxyProcessComponent.generated.h"
 
 struct FActiveSkillProxy;
 struct FWeaponSocket;
@@ -22,7 +22,7 @@ class ACharacterBase;
 	技能配置相关
 */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UUnitProxyProcessComponent : public UActorComponent
+class PLANET_API UProxyProcessComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -38,7 +38,7 @@ public:
 	using FOnAllocationChanged =
 		TCallbackHandleContainer<void()>;
 
-	UUnitProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
+	UProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
@@ -87,6 +87,11 @@ public:
 	void GetWeapon(
 		TSharedPtr<FSocket_FASI>& FirstWeaponSocketInfoSPtr,
 		TSharedPtr<FSocket_FASI>& SecondWeaponSocketInfoSPtr
+	);
+
+	void GetWeaponSkills(
+		TSharedPtr<FWeaponSkillProxy>& FirstWeaponSkillSPtr,
+		TSharedPtr<FWeaponSkillProxy>& SecondWeaponSkillSPtr
 	);
 
 	TSharedPtr<FWeaponProxy> GetActivedWeapon()const;

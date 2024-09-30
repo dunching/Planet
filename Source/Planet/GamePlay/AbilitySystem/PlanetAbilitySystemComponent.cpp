@@ -3,6 +3,7 @@
 
 #include "GameOptions.h"
 #include "PlanetGameplayAbility.h"
+#include "Skill_Base.h"
 
 void UPlanetAbilitySystemComponent::TickComponent(
 	float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
@@ -36,7 +37,6 @@ void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Ability && AbilitySpec->IsActive())
 	{
-		// Handle non-instanced case, which cannot perform prediction key validation
 		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
 		{
 		}
@@ -58,6 +58,29 @@ void UPlanetAbilitySystemComponent::ReplicateEventData_Implementation(
 )
 {
 	GameplayEventDataMap.Add(InputID, TriggerEventData);
+}
+
+void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
+	FGameplayAbilitySpecHandle Handle,
+	const FGameplayEventData& TriggerEventData
+)
+{
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
+	if (AbilitySpec && AbilitySpec->Ability)
+	{
+		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
+		{
+		}
+		else
+		{
+			TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
+
+			for (auto Instance : Instances)
+			{
+				Cast<USkill_Base>(Instance)->UpdateParam(TriggerEventData);
+			}
+		}
+	}
 }
 
 bool UPlanetAbilitySystemComponent::K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const

@@ -353,13 +353,23 @@ TSharedPtr<ChildType> DynamicCastSharedPtr(const TSharedPtr<ParentType>& SPtr)
 }
 
 template<typename GameplayAbilityTargetDataType>
-GameplayAbilityTargetDataType* DeepCloneGameplayAbilityTargetDataType(const GameplayAbilityTargetDataType* GameplayAbilityTargetDataPtr)
+GameplayAbilityTargetDataType* DeepClone_GameplayAbilityTargetData(const GameplayAbilityTargetDataType* GameplayAbilityTargetDataPtr)
 {
 	auto ResultPtr = new GameplayAbilityTargetDataType;
 
 	*ResultPtr = *GameplayAbilityTargetDataPtr;
 
 	return ResultPtr;
+}
+
+template<typename GameplayAbilityTargetDataType, typename OtherType>
+TSharedPtr<GameplayAbilityTargetDataType> MakeSPtr_GameplayAbilityTargetData(const OtherType* GameplayAbilityTargetDataPtr)
+{
+	auto ResultSPtr = MakeShared<GameplayAbilityTargetDataType>();
+
+	*ResultSPtr = *dynamic_cast<const GameplayAbilityTargetDataType*>(GameplayAbilityTargetDataPtr);
+
+	return ResultSPtr;
 }
 
 class ABuildingBase;

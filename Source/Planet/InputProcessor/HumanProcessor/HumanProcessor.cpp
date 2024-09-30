@@ -29,7 +29,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "ToolsMenu.h"
 #include <BackpackMenu.h>
 #include "UIManagerSubSystem.h"
@@ -135,7 +135,7 @@ namespace HumanProcessor
 
 		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run))
 			{
 				OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(false);
 			}

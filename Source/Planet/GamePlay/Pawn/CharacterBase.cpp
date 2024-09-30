@@ -33,7 +33,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "StateProcessorComponent.h"
 #include "BaseFeatureComponent.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "CDCaculatorComponent.h"
 
 #include "CharacterTitle.h"
@@ -63,7 +63,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
 
 	BaseFeatureComponentPtr = CreateDefaultSubobject<UBaseFeatureComponent>(UBaseFeatureComponent::ComponentName);
-	InteractiveSkillComponentPtr = CreateDefaultSubobject<UUnitProxyProcessComponent>(UUnitProxyProcessComponent::ComponentName);
+	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
 	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
 }
 
@@ -190,8 +190,8 @@ void ACharacterBase::PostInitializeComponents()
 	{
 		HoldingItemsComponentPtr->Proxy_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
 
-		InteractiveSkillComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
-		InteractiveSkillComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = InteractiveSkillComponentPtr;
+		ProxyProcessComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
+		ProxyProcessComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = ProxyProcessComponentPtr;
 
 		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
 
@@ -285,9 +285,9 @@ UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
 	return StateProcessorComponentPtr;
 }
 
-UUnitProxyProcessComponent* ACharacterBase::GetInteractiveSkillComponent()const
+UProxyProcessComponent* ACharacterBase::GetProxyProcessComponent()const
 {
-	return InteractiveSkillComponentPtr;
+	return ProxyProcessComponentPtr;
 }
 
 UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const

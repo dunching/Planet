@@ -5,7 +5,7 @@
 #include <Engine/OverlapResult.h>
 
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "GAEvent_Send.h"

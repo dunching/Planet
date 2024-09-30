@@ -14,7 +14,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"

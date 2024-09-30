@@ -16,7 +16,7 @@ class ASPlineActor;
 struct FGameplayAbilityTargetData_PickAxe;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Control : public FGameplayAbilityTargetData_ActiveSkill
+struct FGameplayAbilityTargetData_Control : public FGameplayAbilityTargetData_ActiveSkill_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -24,7 +24,7 @@ struct FGameplayAbilityTargetData_Control : public FGameplayAbilityTargetData_Ac
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const override;
+	virtual FGameplayAbilityTargetData_ActiveSkill_ActiveParam* Clone()const override;
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 

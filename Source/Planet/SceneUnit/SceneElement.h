@@ -339,7 +339,7 @@ public:
 
 protected:
 
-	void RegisterSkill();
+	virtual void RegisterSkill();
 
 	void UnRegisterSkill();
 
@@ -467,6 +467,8 @@ public:
 	AWeapon_Base* ActivedWeaponPtr = nullptr;
 
 protected:
+
+	virtual void RegisterSkill()override;
 
 };
 

@@ -7,6 +7,7 @@
 #include "MyUserWidget.h"
 
 #include "UIInterfaces.h"
+#include "HUDInterface.h"
 
 
 #include "HUD_TeamInfo.generated.h"
@@ -16,7 +17,7 @@ class UHUD_TeamMateInfo;
 UCLASS()
 class PLANET_API UHUD_TeamInfo :
 	public UMyUserWidget,
-	public IMenuInterface
+	public IHUDInterface
 {
 	GENERATED_BODY()
 

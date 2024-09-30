@@ -9,7 +9,7 @@
 
 #include "SceneElement.h"
 #include "HumanProcessor.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 struct FSkillSocketInfo;
 

@@ -17,7 +17,7 @@
 #include "SkillsIcon.h"
 #include "WeaponsIcon.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "UICommon.h"
 #include "GameplayTagsSubSystem.h"
 #include "BackpackMenu.h"
@@ -99,8 +99,6 @@ void UAllocationSkillsMenu::NativeConstruct()
 		return;
 	}
 
-	ResetUIByData();
-
 	BindEvent();
 }
 
@@ -123,6 +121,19 @@ void UAllocationSkillsMenu::NativeDestruct()
 	SyncAllocation2Character();
 }
 
+void UAllocationSkillsMenu::ResetUIByData()
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	InitialGroupmateList();
+
+	ResetUI(CharacterPtr->GetCharacterUnit(), CharacterPtr->GetCharacterUnit());
+}
+
 void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
 {
 	auto CharacterPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr;
@@ -131,7 +142,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 
 	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
 	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
@@ -210,7 +221,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 			FAllocationSkillsMenu::Get().TalentPassivSkill,
 		};
 
-		auto EICPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr->GetInteractiveSkillComponent();
+		auto EICPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr->GetProxyProcessComponent();
 		for (const auto& Iter : Ary)
 		{
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
@@ -237,14 +248,14 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 	};
 
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	auto InteractiveSkillComponentPtr = CharacterPtr->GetInteractiveSkillComponent();
+	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
 
 	for (const auto& Iter : Ary)
 	{
 		auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
 		if (IconPtr)
 		{
-			auto Result = InteractiveSkillComponentPtr->FindSocket(IconPtr->IconSocket);
+			auto Result = ProxyProcessComponentPtr->FindSocket(IconPtr->IconSocket);
 
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(Result ? Result->ProxySPtr : nullptr);
@@ -268,7 +279,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 
 	// 武器
 	{
-		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 		{
 			auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
@@ -315,7 +326,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			//			{FAllocationSkillsMenu::Get().TalentPassivSkill,EKeys::Invalid},
 		};
 
-		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 		for (auto Iter : Ary)
 		{
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
@@ -349,7 +360,7 @@ void UAllocationSkillsMenu::SyncAllocation2Character()
 			{FAllocationSkillsMenu::Get().Consumable4,Consumable_4_Key},
 		};
 
-		auto EICPtr = CharacterPtr->GetInteractiveSkillComponent();
+		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 		for (auto Iter : Ary)
 		{
 			auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter.Name));
@@ -477,19 +488,6 @@ void UAllocationSkillsMenu::ResetUI(const TSharedPtr<FCharacterProxy>& TargetCha
 	}
 	ResetUIByData_Skills(CurrentUnitPtr);
 	ResetUIByData_Consumable(CurrentUnitPtr);
-}
-
-void UAllocationSkillsMenu::ResetUIByData()
-{
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (!CharacterPtr)
-	{
-		return;
-	}
-
-	InitialGroupmateList();
-
-	ResetUI(CharacterPtr->GetCharacterUnit(), CharacterPtr->GetCharacterUnit());
 }
 
 void UAllocationSkillsMenu::InitialGroupmateList()

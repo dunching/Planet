@@ -4,7 +4,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
@@ -75,6 +75,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 				CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
 				)
 			{
+				GAEventData.DataModify.Add(ECharacterPropertyType::PP, FMath::Max(1, CharacterAttributes.PP_Replay.GetCurrentValue() / 2));
 			}
 			else
 			{

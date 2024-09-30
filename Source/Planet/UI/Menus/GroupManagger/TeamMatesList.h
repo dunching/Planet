@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "UIInterfaces.h"
 #include "Common/GenerateType.h"
 #include "SceneElement.h"
+#include "MenuInterface.h"
 
 #include "TeamMatesList.generated.h"
 
@@ -21,7 +21,9 @@ class AHumanCharacter;
  *
  */
 UCLASS()
-class PLANET_API UTeamMatesList : public UMyUserWidget, public IMenuInterface
+class PLANET_API UTeamMatesList : 
+	public UMyUserWidget, 
+	public IMenuInterface
 {
 	GENERATED_BODY()
 

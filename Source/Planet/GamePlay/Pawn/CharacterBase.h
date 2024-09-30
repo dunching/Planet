@@ -38,7 +38,7 @@ class UStateProcessorComponent;
 class UGroupMnaggerComponent;
 class UBaseFeatureComponent;
 class UInteractiveConsumablesComponent;
-class UUnitProxyProcessComponent;
+class UProxyProcessComponent;
 class UInteractiveToolComponent;
 class UCDCaculatorComponent;
 
@@ -93,7 +93,7 @@ public:
 	
 	UStateProcessorComponent* GetStateProcessorComponent()const;
 
-	UUnitProxyProcessComponent* GetInteractiveSkillComponent()const;
+	UProxyProcessComponent* GetProxyProcessComponent()const;
 
 	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
 	
@@ -174,7 +174,7 @@ protected:
 	TObjectPtr<UBaseFeatureComponent> BaseFeatureComponentPtr = nullptr;
 	
 	UPROPERTY()
-	TObjectPtr<UUnitProxyProcessComponent> InteractiveSkillComponentPtr = nullptr;
+	TObjectPtr<UProxyProcessComponent> ProxyProcessComponentPtr = nullptr;
 	
 	UPROPERTY()
 	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;

@@ -16,7 +16,7 @@ struct FCanbeInteractionInfo;
 struct FSkillCooldownHelper;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_ActiveSkill : 
+struct FGameplayAbilityTargetData_ActiveSkill_ActiveParam : 
 	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -25,14 +25,14 @@ struct FGameplayAbilityTargetData_ActiveSkill :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	virtual FGameplayAbilityTargetData_ActiveSkill* Clone()const override;
+	virtual FGameplayAbilityTargetData_ActiveSkill_ActiveParam* Clone()const override;
 
 	bool bIsAutoContinue = false;
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveSkill> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveSkill>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveSkill_ActiveParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveSkill_ActiveParam>
 {
 	enum
 	{
@@ -51,7 +51,7 @@ class USkill_Active_Base :
 
 public:
 
-	using ActiveParamType = FGameplayAbilityTargetData_ActiveSkill;
+	using ActiveParamType = FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
 
 	USkill_Active_Base();
 

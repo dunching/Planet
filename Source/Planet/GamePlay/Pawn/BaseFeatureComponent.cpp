@@ -72,7 +72,7 @@ bool UBaseFeatureComponent::IsRunning() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-		UGameplayTagsSubSystem::GetInstance()->Running
+		UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run
 	);
 }
 
@@ -437,20 +437,20 @@ void UBaseFeatureComponent::InitialBaseGAs()
 #endif
 }
 
-bool UBaseFeatureComponent::SwitchWalkState(bool bIsRun)
+void UBaseFeatureComponent::SwitchWalkState_Implementation(bool bIsRun)
 {
 	if (bIsRun)
 	{
 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run))
 			{
-				return true;
+				return;
 			}
 
-			return OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running }
+			OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
+				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run }
 			);
 		}
 	}
@@ -459,17 +459,15 @@ bool UBaseFeatureComponent::SwitchWalkState(bool bIsRun)
 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running))
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run))
 			{
-				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Running };
+				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run };
 				OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 			}
 
-			return !OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Running);
+			OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run);
 		}
 	}
-
-	return false;
 }
 
 void UBaseFeatureComponent::Dash_Implementation(EDashDirection DashDirection)

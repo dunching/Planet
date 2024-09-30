@@ -250,12 +250,6 @@ void FCharacterAttributes::InitialData()
 
 	MoveSpeed.GetMaxProperty().SetCurrentValue(800);
 	MoveSpeed.SetCurrentValue(250, DataSource);
-
-	RunningSpeedOffset.GetMaxProperty().SetCurrentValue(100);
-	RunningSpeedOffset.SetCurrentValue(100, DataSource);
-
-	RunningConsume.GetMaxProperty().SetCurrentValue(100);
-	RunningConsume.SetCurrentValue(3, DataSource);
 }
 
 void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)

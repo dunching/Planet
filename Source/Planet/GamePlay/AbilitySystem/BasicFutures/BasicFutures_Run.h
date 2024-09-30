@@ -6,11 +6,14 @@
 
 #include "BasicFuturesBase.h"
 #include "GenerateType.h"
+#include "BaseData.h"
 
 #include "BasicFutures_Run.generated.h"
 
+class UAbilityTask_TimerHelper;
+
 /**
- * Makes the Character try to jump using the standard Character->Jump. This is an example of a non-instanced ability.
+ *
  */
 UCLASS()
 class PLANET_API UBasicFutures_Run : public UBasicFuturesBase
@@ -52,8 +55,18 @@ public:
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
 	) const override;
 
+protected:
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBaseProperty RunningSpeedOffset;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FBaseProperty RunningConsume;
+
 private:
 
 	virtual void InitialTags() override;
 
+	void IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);
+	
 };

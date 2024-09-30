@@ -30,7 +30,7 @@
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"
 #include "PlacingGroundProcessor.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "ToolsMenu.h"
 #include <BackpackMenu.h>
 #include "UIManagerSubSystem.h"
@@ -100,7 +100,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnAllocationChangedHandle = OnwerActorPtr->GetInteractiveSkillComponent()->OnAllocationChanged.AddCallback([this]() {
+			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback([this]() {
 				AddOrRemoveUseMenuItemEvent(true);
 				});
 
@@ -192,7 +192,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetInteractiveSkillComponent()->ActiveWeapon();
+			OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
 
 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
 			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
@@ -209,7 +209,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetInteractiveSkillComponent()->RetractputWeapon();
+			OnwerActorPtr->GetProxyProcessComponent()->RetractputWeapon();
 		}
 
 		OnAllocationChangedHandle->UnBindCallback();
@@ -228,7 +228,7 @@ namespace HumanProcessor
 
 				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
 
-				OnwerActorPtr->GetInteractiveSkillComponent()->ActiveAction(*SkillIter);
+				OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(*SkillIter);
 			}
 
 			// 这里应该是特定的输入会打断 还是任意输入都会打断？
@@ -253,7 +253,7 @@ namespace HumanProcessor
 					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponSocket)
 					)
 				{
-					OnwerActorPtr->GetInteractiveSkillComponent()->CancelAction(*SkillIter);
+					OnwerActorPtr->GetProxyProcessComponent()->CancelAction(*SkillIter);
 				}
 			}
 		}
@@ -452,7 +452,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetInteractiveSkillComponent()->SwitchWeapon();
+			OnwerActorPtr->GetProxyProcessComponent()->SwitchWeapon();
 		}
 	}
 
@@ -464,7 +464,7 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				auto CanbeActivedInfoAry = OnwerActorPtr->GetInteractiveSkillComponent()->GetCanbeActiveAction();
+				auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveAction();
 				for (const auto& Iter : CanbeActivedInfoAry)
 				{
 					HandleKeysMap.Add(Iter->Key, Iter);

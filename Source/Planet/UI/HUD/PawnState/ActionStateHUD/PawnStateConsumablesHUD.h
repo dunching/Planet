@@ -7,14 +7,14 @@
 #include "MyUserWidget.h"
 
 #include "CharacterAttributesComponent.h"
-#include "UIInterfaces.h"
+#include "HUDInterface.h"
 
 #include "PawnStateConsumablesHUD.generated.h"
 
 UCLASS()
 class PLANET_API UPawnStateConsumablesHUD :
 	public UMyUserWidget, 
-	public IMenuInterface
+	public IHUDInterface
 {
 	GENERATED_BODY()
 

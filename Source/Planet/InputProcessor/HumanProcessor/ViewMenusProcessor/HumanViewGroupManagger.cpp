@@ -10,7 +10,6 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "HumanCharacter.h"
 #include "UI/UIManagerSubSystem.h"
-#include "InteractionToAIMenu.h"
 #include "BackpackMenu.h"
 #include "CreateMenu.h"
 #include "InputProcessorSubSystem.h"

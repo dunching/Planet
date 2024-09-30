@@ -5,7 +5,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 
 #include "BaseFeatureComponent.h"
 #include "CS_PeriodicPropertyModify.h"

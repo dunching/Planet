@@ -14,7 +14,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -53,9 +53,9 @@ void USkill_WeaponActive_RangeTest::PreActivate(const FGameplayAbilitySpecHandle
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		if (ActiveParamPtr)
+		if (ActiveParamSPtr)
 		{
-			WeaponPtr = Cast<AWeapon_RangeTest>(ActiveParamPtr->WeaponPtr);
+			WeaponPtr = Cast<AWeapon_RangeTest>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
 }

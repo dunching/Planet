@@ -7,7 +7,7 @@
 #include "MyUserWidget.h"
 
 #include "CharacterAttributesComponent.h"
-#include "UIInterfaces.h"
+#include "HUDInterface.h"
 
 #include "PawnStateActionHUD.generated.h"
 
@@ -21,7 +21,9 @@ class UState_Talent_YinYang;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API UPawnStateActionHUD : public UMyUserWidget, public IMenuInterface
+class PLANET_API UPawnStateActionHUD :
+	public UMyUserWidget, 
+	public IHUDInterface
 {
 	GENERATED_BODY()
 

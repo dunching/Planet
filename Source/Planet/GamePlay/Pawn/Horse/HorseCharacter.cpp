@@ -35,7 +35,7 @@
 #include "ActionStairBase.h"
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
-#include "UnitProxyProcessComponent.h"
+#include "ProxyProcessComponent.h"
 #include "HoldingItemsComponent.h"
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"

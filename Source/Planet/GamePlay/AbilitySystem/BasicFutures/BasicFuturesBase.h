@@ -7,6 +7,8 @@
 
 #include "BasicFuturesBase.generated.h"
 
+class ACharacterBase;
+
 UCLASS()
 class PLANET_API UBasicFuturesBase : public UPlanetGameplayAbility
 {
@@ -24,5 +26,7 @@ public:
 protected:
 
 	virtual void InitialTags();
+
+	ACharacterBase* CharacterPtr = nullptr;
 
 };

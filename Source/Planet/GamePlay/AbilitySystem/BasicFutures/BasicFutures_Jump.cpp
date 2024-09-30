@@ -33,7 +33,6 @@ void UBasicFutures_Jump::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	ACharacterBase* CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	CharacterPtr->Jump();
 }
 
@@ -47,7 +46,6 @@ bool UBasicFutures_Jump::CanActivateAbility(
 {
 	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
 	{
-		const ACharacterBase* CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get(), ECastCheckedType::NullAllowed);
 		return CharacterPtr && CharacterPtr->CanJump();
 	}
 	return false;
@@ -60,7 +58,6 @@ void UBasicFutures_Jump::CancelAbility(
 	bool bReplicateCancelAbility
 )
 {
-	ACharacterBase* CharacterPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	CharacterPtr->StopJumping();
 
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
@@ -70,10 +67,9 @@ void UBasicFutures_Jump::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 )
 {
-	ACharacterBase* CharacterPtrPtr = CastChecked<ACharacterBase>(ActorInfo->AvatarActor.Get());
-	if (CharacterPtrPtr)
+	if (CharacterPtr)
 	{
-		CharacterPtrPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
+		CharacterPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
 	}
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
