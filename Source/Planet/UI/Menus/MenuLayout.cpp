@@ -41,6 +41,11 @@ void UMenuLayout::SwitchViewer(EMenuType MenuType)
 		if (UIPtr)
 		{
 			UIPtr->SetActiveWidgetIndex(1);
+			auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(0));
+			if (MenuInterfacePtr)
+			{
+				MenuInterfacePtr->ResetUIByData();
+			}
 		}
 	}
 	break;
