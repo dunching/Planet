@@ -1,6 +1,8 @@
 
 #include "TalentAllocationComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "CharacterBase.h"
 #include "SceneElement.h"
 #include "HoldingItemsComponent.h"
@@ -12,15 +14,37 @@
 #include "SceneUnitContainer.h"
 #include "PlanetControllerInterface.h"
 #include "BaseFeatureComponent.h"
+#include "SceneUnitExtendInfo.h"
+#include "TalentInfo.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
-FTalentHelper UTalentAllocationComponent::AddCheck(FTalentHelper& TalentHelper)
+struct FPropertySettlementModify_Talent : public FPropertySettlementModify
 {
-	FTalentHelper Result;
-	Result.PointType = EPointType::kNone;
+	float Multiple = 1.f;
+	FPropertySettlementModify_Talent(float InMultiple) :
+		FPropertySettlementModify(10),
+		Multiple(InMultiple)
+	{
 
-	auto Iter = GetCheck(TalentHelper);
+	}
+
+	virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const override
+	{
+		const auto Result = FPropertySettlementModify::SettlementModify(ValueMap);
+		return Result * Multiple;
+	}
+};
+
+UTalentAllocationComponent::UTalentAllocationComponent(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	SetIsReplicatedByDefault(true);
+}
+
+void UTalentAllocationComponent::AddCheck(const FTalentHelper& TalentHelper)
+{
+	auto Iter = TalentMap.Find(TalentHelper.IconSocket);
 	if (Iter)
 	{
 		if (GetUsedTalentPointNum() < GetTotalTalentPointNum())
@@ -29,51 +53,204 @@ FTalentHelper UTalentAllocationComponent::AddCheck(FTalentHelper& TalentHelper)
 			{
 				auto OldValue = *Iter;
 				Iter->Level++;
-				Result = *Iter;
 
 				CalculorUsedTalentPointNum();
+#if UE_EDITOR || UE_SERVER
+				if (GetNetMode() == NM_DedicatedServer)
+				{
+					Talent_FASI_Container.UpdateItem(*Iter);
+				}
+#endif
 			}
 		}
-		Result = *Iter;
 	}
 
-	return Result;
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		AddCheck_Server(TalentHelper);
+	}
+#endif
 }
 
-FTalentHelper UTalentAllocationComponent::SubCheck(FTalentHelper& TalentHelper)
+void UTalentAllocationComponent::AddCheck_Server_Implementation(const FTalentHelper& TalentHelper)
 {
-	FTalentHelper Result;
-	Result.PointType = EPointType::kNone;
+	AddCheck(TalentHelper);
+	UpdateTalent(TalentHelper);
+}
 
-	auto Iter = GetCheck(TalentHelper);
+void UTalentAllocationComponent::SubCheck(const FTalentHelper& TalentHelper)
+{
+	auto Iter = TalentMap.Find(TalentHelper.IconSocket);
 	if (Iter)
 	{
 		if (Iter->Level > 0)
 		{
 			auto OldValue = *Iter;
 			Iter->Level--;
-			Result = *Iter;
 
 			CalculorUsedTalentPointNum();
 		}
-		Result = *Iter;
+#if UE_EDITOR || UE_SERVER
+		if (GetNetMode() == NM_DedicatedServer)
+		{
+			Talent_FASI_Container.UpdateItem(*Iter);
+		}
+#endif
 	}
 
-	return Result;
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		SubCheck_Server(TalentHelper);
+	}
+#endif
+}
+
+void UTalentAllocationComponent::SubCheck_Server_Implementation(const FTalentHelper& TalentHelper)
+{
+	SubCheck(TalentHelper);
+	UpdateTalent(TalentHelper);
+}
+
+void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
+{
+	auto TalentHelper_Iter = TalentMap.Find(TalentHelper.IconSocket);
+	if (!TalentHelper_Iter)
+	{
+		return;
+	}
+	switch (TalentHelper_Iter->PointType)
+	{
+	case EPointType::kSkill:
+	{
+		if (std::get<EPointSkillType>(TalentHelper_Iter->Type) == PreviousSkillType)
+		{
+		}
+		else
+		{
+			auto CharacterPtr = GetOwner<FOwnerType>();
+			if (CharacterPtr)
+			{
+			}
+		}
+	}
+	break;
+	case EPointType::kProperty:
+	{
+		auto CharacterPtr = GetOwner<FOwnerType>();
+		if (CharacterPtr)
+		{
+			const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_TalentModify;
+
+			const auto PointPropertyType = std::get<EPointPropertyType>(TalentHelper_Iter->Type);
+			switch (PointPropertyType)
+			{
+			case EPointPropertyType::kLiDao:
+			{
+				auto PAD_Talent_PropertyPtr = USceneUnitExtendInfoMap::GetInstance()->GetTalent_Property(PointPropertyType);
+
+				if (TalentHelper_Iter->Level > 0)
+				{
+					// 增加的数据
+					auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
+
+					GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+					FGAEventData GAEventData(
+						CharacterPtr,
+						CharacterPtr
+					);
+
+					GAEventData.DataSource = DataSource;
+					GAEventData.DataModify = {
+						{ECharacterPropertyType::LiDao,TalentHelper_Iter->Level }
+					};
+					for (const auto& Iter : PAD_Talent_PropertyPtr->AddValueMap)
+					{
+						GAEventData.DataModify.Add(Iter.Key, TalentHelper_Iter->Level * Iter.Value);
+					}
+					GAEventData.bIsOverlapData = true;
+
+					GAEventDataPtr->DataAry.Add(GAEventData);
+
+					CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+
+					// 数据修正
+					for (const auto& Iter : PAD_Talent_PropertyPtr->ModifyValueMap)
+					{
+						const auto MultipleValue = 1 + (TalentHelper_Iter->Level * Iter.Value);
+
+						if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
+						{
+							ModifyMap[PointPropertyType].Pin()->Multiple = MultipleValue;
+							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.UpdateSettlementModify(
+								ModifyMap[PointPropertyType].Pin()
+							);
+						}
+						else
+						{
+							auto SPtr = MakeShared<FPropertySettlementModify_Talent>(MultipleValue);
+							ModifyMap.Add(PointPropertyType, SPtr);
+							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddSettlementModify(SPtr);
+						}
+					}
+				}
+				else
+				{
+					CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(GetAllData(), DataSource);
+					for (const auto& Iter : PAD_Talent_PropertyPtr->ModifyValueMap)
+					{
+						if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
+						{
+							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.RemoveSettlementModify(
+								ModifyMap[PointPropertyType].Pin()
+							);
+						}
+					}
+				}
+			}
+			break;
+			case EPointPropertyType::kGenGu:
+			{
+			}
+			break;
+			case EPointPropertyType::kShenFa:
+			{
+			}
+			break;
+			case EPointPropertyType::kDongCha:
+			{
+			}
+			break;
+			case EPointPropertyType::kTianZi:
+			{
+			}
+			break;
+			}
+		}
+	}
+	break;
+	}
 }
 
 void UTalentAllocationComponent::Clear(FTalentHelper& TalentHelper)
 {
-	FTalentHelper * Iter = GetCheck(TalentHelper);
+	auto Iter = TalentMap.Find(TalentHelper.IconSocket);
 	if (Iter)
 	{
 		Iter->Level = 0;
+		Talent_FASI_Container.UpdateItem(*Iter);
 	}
 }
 
-FTalentHelper* UTalentAllocationComponent::GetCheck(FTalentHelper& TalentHelper)
+FTalentHelper UTalentAllocationComponent::GetCheck(const FTalentHelper& TalentHelper)
 {
-	return TalentMap.Find(TalentHelper.IconSocket);
+	if (auto Iter = TalentMap.Find(TalentHelper.IconSocket))
+	{
+		return *Iter;
+	}
+	return FTalentHelper();
 }
 
 int32 UTalentAllocationComponent::GetTotalTalentPointNum() const
@@ -86,11 +263,23 @@ int32 UTalentAllocationComponent::GetUsedTalentPointNum() const
 	return UsedTalentPointNum;
 }
 
+void UTalentAllocationComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Talent_FASI_Container);
+}
+
 void UTalentAllocationComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitialTalentData();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		InitialTalentData();
+	}
+#endif
 
 	CalculorUsedTalentPointNum();
 }
@@ -123,6 +312,7 @@ void UTalentAllocationComponent::InitialTalentData()
 		TalentHelper.TotalLevel = 3;
 
 		TalentMap.Add(GameplayTag, TalentHelper);
+		Talent_FASI_Container.AddItem(TalentHelper);
 	}
 
 	struct FPropertyHelper
@@ -132,17 +322,17 @@ void UTalentAllocationComponent::InitialTalentData()
 	};
 	TArray<FPropertyHelper>PropertyAry
 	{
-		{TEXT("Talent.Level1.LiDao"), EPointPropertyType::kLiDao },
-		{TEXT("Talent.Level1.GenGu"), EPointPropertyType::kGenGu },
-		{TEXT("Talent.Level1.ShenFa"), EPointPropertyType::kShenFa },
-		{TEXT("Talent.Level1.DongCha"), EPointPropertyType::kDongCha },
-		{TEXT("Talent.Level1.TianZi"), EPointPropertyType::kTianZi },
+		{TEXT("Talent.LiDao.1"), EPointPropertyType::kLiDao },
+		{TEXT("Talent.GenGu.1"), EPointPropertyType::kGenGu },
+		{TEXT("Talent.ShenFa.1"), EPointPropertyType::kShenFa },
+		{TEXT("Talent.DongCha.1"), EPointPropertyType::kDongCha },
+		{TEXT("Talent.TianZi.1"), EPointPropertyType::kTianZi },
 
-		{TEXT("Talent.Level2.LiDao"), EPointPropertyType::kLiDao },
-		{TEXT("Talent.Level2.GenGu"), EPointPropertyType::kGenGu },
-		{TEXT("Talent.Level2.ShenFa"), EPointPropertyType::kShenFa },
-		{TEXT("Talent.Level2.DongCha"), EPointPropertyType::kDongCha },
-		{TEXT("Talent.Level2.TianZi"), EPointPropertyType::kTianZi },
+		{TEXT("Talent.LiDao.2"), EPointPropertyType::kLiDao },
+		{TEXT("Talent.GenGu.2"), EPointPropertyType::kGenGu },
+		{TEXT("Talent.ShenFa.2"), EPointPropertyType::kShenFa },
+		{TEXT("Talent.DongCha.2"), EPointPropertyType::kDongCha },
+		{TEXT("Talent.TianZi.2"), EPointPropertyType::kTianZi },
 	};
 	for (auto Iter : PropertyAry)
 	{
@@ -157,118 +347,17 @@ void UTalentAllocationComponent::InitialTalentData()
 		TalentHelper.TotalLevel = 3;
 
 		TalentMap.Add(GameplayTag, TalentHelper);
+		Talent_FASI_Container.AddItem(TalentHelper);
 	}
 }
 
 void UTalentAllocationComponent::SyncToHolding()
 {
-	for (const auto& Iter : TalentMap)
-	{
-		switch (Iter.Value.PointType)
-		{
-		case EPointType::kSkill:
-		{
-			if (std::get<EPointSkillType>(Iter.Value.Type) == PreviousSkillType)
-			{
-				continue;
-			}
-			else
-			{
-				auto CharacterPtr = GetOwner<FOwnerType>();
-				if (CharacterPtr)
-				{
-// 					TMap<FGameplayTag, TSharedPtr<FSkillSocketInfo>> SkillsMap;
-// 					auto HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneUnitContainer();
-// 					switch (std::get<EPointSkillType>(Iter.Value.Type))
-// 					{
-// 					case EPointSkillType::kNuQi:
-// 					{
-// 						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
-// 						if (!SkillUnitPtr)
-// 						{
-// 							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi);
-// 						}
-// 						if (SkillUnitPtr)
-// 						{
-// 							SkillUnitPtr->Level = Iter.Value.Level;
-// 						}
-// 
-// 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-// 
-// 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
-// 						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
-// 						SkillsSocketInfo->Key = EKeys::Invalid;
-// 
-// 						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
-// 					}
-// 					break;
-// 					case EPointSkillType::kYinYang:
-// 					{
-// 						auto SkillUnitPtr = HoldItemComponent->FindUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
-// 						if (!SkillUnitPtr)
-// 						{
-// 							SkillUnitPtr = HoldItemComponent->AddUnit_Skill(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang);
-// 						}
-// 						if (SkillUnitPtr)
-// 						{
-// 							SkillUnitPtr->Level = Iter.Value.Level;
-// 						}
-// 
-// 						TSharedPtr<FSkillSocketInfo >SkillsSocketInfo = MakeShared<FSkillSocketInfo>();
-// 
-// 						SkillsSocketInfo->SkillSocket = UGameplayTagsSubSystem::GetInstance()->TalentSocket;
-// 						SkillsSocketInfo->SkillUnitPtr = SkillUnitPtr;
-// 						SkillsSocketInfo->Key = EKeys::Invalid;
-// 
-// 						SkillsMap.Add(SkillsSocketInfo->SkillSocket, SkillsSocketInfo);
-// 					}
-// 					break;
-// 					}
-// 					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-// 					EICPtr->RegisterMultiGAs(SkillsMap);
-				}
-			}
-		}
-		break;
-		case EPointType::kProperty:
-		{
-			auto CharacterPtr = GetOwner<FOwnerType>();
-			if (CharacterPtr)
-			{
-				const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Regular;
-				TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-				
-				switch (std::get<EPointPropertyType>(Iter.Value.Type))
-				{
-				case EPointPropertyType::kLiDao:
-				{
-					ModifyPropertyMap.Add(ECharacterPropertyType::LiDao, Iter.Value.Level);
-				}
-				break;
-				case EPointPropertyType::kGenGu:
-				{
-				}
-				break;
-				case EPointPropertyType::kShenFa:
-				{
-				}
-				break;
-				case EPointPropertyType::kDongCha:
-				{
-				}
-				break;
-				case EPointPropertyType::kTianZi:
-				{
-				}
-				break;
-				}
-				
-				CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-			}
-		}
-		break;
-		}
-	}
+}
+
+void UTalentAllocationComponent::UpdateTalent_Client(const FTalentHelper& TalentHelper)
+{
+	TalentMap.Add(TalentHelper.IconSocket, TalentHelper);
 }
 
 void UTalentAllocationComponent::CalculorUsedTalentPointNum()

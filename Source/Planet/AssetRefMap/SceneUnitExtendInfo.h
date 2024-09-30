@@ -9,10 +9,12 @@
 
 #include "SceneElement.h"
 #include "SceneUnitTable.h"
+#include "TalentInfo.h"
 
 #include "SceneUnitExtendInfo.generated.h"
 
 class UDataTable;
+class UPAD_Talent_Property;
 
 struct FToolProxy;
 struct FWeaponProxy;
@@ -37,6 +39,8 @@ public:
 	FTableRowUnit* GetTableRowUnit(FGameplayTag UnitType)const;
 	
 	FTableRowUnit_TagExtendInfo* GetTableRowUnit_TagExtendInfo(FGameplayTag UnitType)const;
+
+	const UPAD_Talent_Property* GetTalent_Property(EPointPropertyType PointPropertyType)const;
 
 	void InitialData();
 
@@ -69,5 +73,8 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_PropertyEntrys;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Talent")
+	TMap<EPointPropertyType, UPAD_Talent_Property*> PAD_Talent_PropertyMap;
 	
 };

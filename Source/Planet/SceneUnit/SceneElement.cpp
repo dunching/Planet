@@ -232,6 +232,17 @@ bool FConsumableProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& 
 	return true;
 }
 
+void FConsumableProxy::UpdateByRemote(const TSharedPtr<FConsumableProxy>& RemoteSPtr)
+{
+	Super::UpdateByRemote(RemoteSPtr);
+
+	const auto OldValue = Num;
+
+	Num = RemoteSPtr->Num;
+
+	CallbackContainerHelper.ValueChanged(OldValue, Num);
+}
+
 bool FConsumableProxy::Active()
 {
 #if UE_EDITOR || UE_SERVER

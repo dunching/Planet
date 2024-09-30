@@ -205,6 +205,8 @@ public:
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
+	void UpdateByRemote(const TSharedPtr<FConsumableProxy>& RemoteSPtr);
+
 	virtual bool Active()override;
 
 	FTableRowUnit_Consumable* GetTableRowUnit_Consumable()const;
@@ -227,11 +229,11 @@ public:
 
 	int32 GetCurrentValue()const;
 
-protected:
-
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 
 	int32 Num = 1;
+
+protected:
 
 };
 

@@ -37,6 +37,8 @@ struct FActionConsumablesIcon : public TStructVariable<FActionConsumablesIcon>
 
 	const FName Content = TEXT("Content");
 
+	const FName Number = TEXT("Number");
+
 	const FName StateOverlap = TEXT("StateOverlap");
 
 	const FName Icon = TEXT("Icon");
@@ -81,11 +83,29 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 			)
 		{
 			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);
+
+			if (UnitPtr && UnitPtr->Num > 0)
+			{
+				OnValueChangedDelegateHandle =
+					UnitPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
+
+				SetLevel();
+				SetItemType();
+				SetNum(UnitPtr->Num);
+				SetCanRelease(true);
+				SetRemainingCooldown(true, 0.f, 0.f);
+				SetInputRemainPercent(false, 0.f);
+
+				return;
+			}
 		}
 	}
 
+	// 不放置消耗品的情况
+	OnValueChangedDelegateHandle.Reset();
 	SetLevel();
 	SetItemType();
+	SetNum(0);
 	SetCanRelease(true);
 	SetRemainingCooldown(true, 0.f, 0.f);
 	SetInputRemainPercent(false, 0.f);
@@ -221,6 +241,25 @@ void UActionConsumablesIcon::SetItemType()
 	}
 }
 
+void UActionConsumablesIcon::SetNum(int32 NewNum)
+{
+	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FActionConsumablesIcon::Get().Number));
+	if (!NumTextPtr)
+	{
+		return;
+	}
+	if (NewNum > 0)
+	{
+		const auto NumStr = FString::Printf(TEXT("%d"), NewNum);
+
+		NumTextPtr->SetText(FText::FromString(NumStr));
+	}
+	else
+	{
+		NumTextPtr->SetText(FText::FromString(TEXT("")));
+	}
+}
+
 void UActionConsumablesIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)
 {
 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionConsumablesIcon::Get().WaitInputPercent));
@@ -240,4 +279,14 @@ void UActionConsumablesIcon::NativeConstruct()
 	Super::NativeConstruct();
 
 	ResetToolUIByData(nullptr);
+}
+
+void UActionConsumablesIcon::NativeDestruct()
+{
+	if (OnValueChangedDelegateHandle)
+	{
+		OnValueChangedDelegateHandle->UnBindCallback();
+	}
+
+	Super::NativeDestruct();
 }

@@ -29,6 +29,8 @@ class PLANET_API UActionConsumablesIcon :
 
 public:
 
+	using FOnValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+
 	UActionConsumablesIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
@@ -60,11 +62,15 @@ protected:
 
 	void SetItemType();
 
+	void SetNum(int32 NewNum);
+
 	void SetInputRemainPercent(bool bIsAcceptInput, float Percent);
 
 	void SetDurationPercent(bool bIsHaveDuration, float Percent);
 
 	virtual void NativeConstruct()override;
+
+	virtual void NativeDestruct()override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlaySkillIsReady();
@@ -72,5 +78,7 @@ protected:
 private:
 
 	bool bIsReady_Previous = false;
+
+	FOnValueChangedDelegateHandle OnValueChangedDelegateHandle;
 
 };

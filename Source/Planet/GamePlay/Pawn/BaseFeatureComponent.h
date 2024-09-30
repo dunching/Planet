@@ -85,6 +85,7 @@ public:
 		const FGameplayTag& DataSource
 	);
 
+	// 增加
 	void SendEvent2Self(
 		const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap,
 		const FGameplayTag& DataSource

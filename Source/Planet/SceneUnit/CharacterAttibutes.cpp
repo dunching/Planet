@@ -71,9 +71,13 @@ const FBaseProperty& FBasePropertySet::GetMaxProperty()const
 
 void FBasePropertySet::Update()
 {
+	check(PropertySettlementModifySet.size() > 0);
+
 	for (const auto& Iter : PropertySettlementModifySet)
 	{
-		CurrentValue.SetCurrentValue(FMath::Clamp(Iter->SettlementModify(ValueMap), MinValue.GetCurrentValue(), MaxValue.GetCurrentValue()));
+		const auto& Value = Iter->SettlementModify(ValueMap);
+
+		CurrentValue.SetCurrentValue(FMath::Clamp(Value, MinValue.GetCurrentValue(), MaxValue.GetCurrentValue()));
 		return;
 	}
 }
@@ -85,18 +89,38 @@ const FBaseProperty& FBasePropertySet::GetMinProperty()const
 
 int32 FBasePropertySet::AddSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify)
 {
-	PropertySettlementModifySet.emplace(PropertySettlementModify);
+	if (PropertySettlementModify)
+	{
+		PropertySettlementModifySet.emplace(PropertySettlementModify);
 
-	Update();
+		Update();
 
-	return PropertySettlementModify->ID;
+		return PropertySettlementModify->ID;
+	}
+
+	return -1;
+}
+
+int32 FBasePropertySet::UpdateSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify)
+{
+	if (PropertySettlementModify)
+	{
+		Update();
+
+		return PropertySettlementModify->ID;
+	}
+
+	return -1;
 }
 
 void FBasePropertySet::RemoveSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify)
 {
-	PropertySettlementModifySet.erase(PropertySettlementModify);
+	if (PropertySettlementModify)
+	{
+		PropertySettlementModifySet.erase(PropertySettlementModify);
 
-	Update();
+		Update();
+	}
 }
 
 FBaseProperty& FBasePropertySet::GetMaxProperty()

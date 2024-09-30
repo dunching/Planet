@@ -6,7 +6,7 @@
 #include <GameplayTagContainer.h>
 #include "GameplayAbilitySpec.h"
 
-#include "TalentUnit.h"
+#include "Talent_FASI.h"
 #include "GenerateType.h"
 #include "CharacterStateInfo.h"
 

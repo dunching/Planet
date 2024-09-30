@@ -37,7 +37,7 @@
 #include "MenuLayout.h"
 #include "PawnStateConsumablesHUD.h"
 
-struct FMainUILayout : public TStructVariable<FMainUILayout>
+struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>
 {
 	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
 
@@ -87,7 +87,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 
 	// 技能HUD
 	{
-		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnActionStateHUDSocket));
+		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().PawnActionStateHUDSocket));
 		if (!BorderPtr)
 		{
 			return;
@@ -121,7 +121,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 
 	// 消耗品HUD
 	{
-		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnStateConsumablesHUD_Socket));
+		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().PawnStateConsumablesHUD_Socket));
 		if (!BorderPtr)
 		{
 			return;
@@ -353,7 +353,7 @@ UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
 		return nullptr;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().GetItemInfos_Socket));
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().GetItemInfos_Socket));
 	if (!BorderPtr)
 	{
 		return nullptr;

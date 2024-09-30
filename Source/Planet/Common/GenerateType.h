@@ -166,6 +166,41 @@ enum class EWuXingType : uint8
 	kSoil,
 };
 
+UENUM(BlueprintType)
+enum class EPointSkillType :uint8
+{
+	kNuQi,
+	kYinYang,
+	kDuXing,
+	kFaLi,
+	kGongMing,
+};
+
+UENUM(BlueprintType)
+enum class EPointPropertyType :uint8
+{
+	// + 1X AD、3x AD穿透
+	// + 0.1 AD 结算修正
+	kLiDao,
+	// + 50X HP
+	// + 0.1 HP 结算修正
+	kGenGu,
+	// + 0.1 闪避 结算修正
+	kShenFa,
+	// + 0.1 命中、会心率 结算修正
+	kDongCha,
+	// + 0.1 AP 结算修正
+	kTianZi,
+};
+
+UENUM(BlueprintType)
+enum class EPointType :uint8
+{
+	kNone,
+	kSkill,
+	kProperty,
+};
+
 // 以前的？
 #pragma region DEPRECATED
 UENUM(BlueprintType)

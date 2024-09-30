@@ -28,6 +28,7 @@ struct FPropertySettlementModify
 	// 越大的越先算
 	int32 Priority = -1;
 
+	// -1 为无效
 	int32 ID = -1;
 
 private:
@@ -84,6 +85,8 @@ public:
 
 	int32 AddSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify);
 
+	int32 UpdateSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify);
+
 	void RemoveSettlementModify(const TSharedPtr<FPropertySettlementModify>& PropertySettlementModify);
 
 protected:
@@ -109,6 +112,8 @@ protected:
 
 	TMap<FGameplayTag, int32>ValueMap;
 
+	// 只会使用优先级最高的.
+	// 有一个默认的结算类
 	std::multiset<TSharedPtr<FPropertySettlementModify>, FPropertySettlementModify_Compare>PropertySettlementModifySet;
 
 };

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "UIInterfaces.h"
-#include "TalentUnit.h"
+#include "Talent_FASI.h"
 
 #include "TalentIcon.generated.h"
 

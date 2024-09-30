@@ -42,9 +42,9 @@ void UTalentIcon::NativeConstruct()
 			FTalentHelper TalentHelper = GetTalentHelper();
 
 			auto ResultPtr = TalentAllocationComponentPtr->GetCheck(TalentHelper);
-			if (ResultPtr)
+			if (ResultPtr.IconSocket.IsValid())
 			{
-				ResetUI(*ResultPtr);
+				ResetUI(ResultPtr);
 			}
 			else
 			{
@@ -69,7 +69,8 @@ FReply UTalentIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const F
 			{
 				FTalentHelper TalentHelper = GetTalentHelper();
 
-				auto Result = TalentAllocationComponentPtr->AddCheck(TalentHelper);
+				TalentAllocationComponentPtr->AddCheck(TalentHelper);
+				auto Result = TalentAllocationComponentPtr->GetCheck(TalentHelper);
 
 				ResetUI(Result);
 
@@ -79,7 +80,8 @@ FReply UTalentIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const F
 			{
 				FTalentHelper TalentHelper = GetTalentHelper();
 
-				auto Result = TalentAllocationComponentPtr->SubCheck(TalentHelper);
+				TalentAllocationComponentPtr->SubCheck(TalentHelper);
+				auto Result = TalentAllocationComponentPtr->GetCheck(TalentHelper);
 
 				ResetUI(Result);
 			}
