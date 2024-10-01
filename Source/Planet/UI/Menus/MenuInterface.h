@@ -26,6 +26,8 @@ class PLANET_API IMenuInterface
 public:
 
 	virtual void ResetUIByData() = 0;
+	
+	virtual void SyncData() = 0;
 
 protected:
 

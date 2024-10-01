@@ -66,21 +66,14 @@ namespace HumanProcessor
 
 	void FHumanViewRaffleMenuProcessor::F10KeyPressed()
 	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewRaffleMenuProcessor::VKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 	}
 
 	void FHumanViewRaffleMenuProcessor::BKeyPressed()
 	{
-	}
-
-	void FHumanViewRaffleMenuProcessor::ESCKeyPressed()
-	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewRaffleMenuProcessor::PressedNumKey(int32 NumKey)

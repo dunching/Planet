@@ -32,6 +32,8 @@ protected:
 
 	virtual void ResetUIByData()override;
 
+	virtual void SyncData()override;
+
 private:
 
 	void ResetGroupmates();

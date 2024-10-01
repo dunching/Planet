@@ -29,7 +29,8 @@ class PLANET_API UActionConsumablesIcon :
 
 public:
 
-	using FOnValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
+	using FOnValueChangedDelegateHandle = 
+		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
 	UActionConsumablesIcon(const FObjectInitializer& ObjectInitializer);
 

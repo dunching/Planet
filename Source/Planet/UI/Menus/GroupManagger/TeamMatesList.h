@@ -41,6 +41,8 @@ protected:
 
 	virtual void ResetUIByData()override;
 
+	virtual void SyncData()override;
+
 	void OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")

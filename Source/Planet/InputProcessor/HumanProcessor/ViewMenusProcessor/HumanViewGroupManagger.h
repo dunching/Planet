@@ -32,8 +32,6 @@ namespace HumanProcessor
 
 		virtual void HKeyPressed()override;
 
-		virtual void ESCKeyPressed()override;
-
 		virtual void PressedNumKey(int32 NumKey)override;
 
 	protected:

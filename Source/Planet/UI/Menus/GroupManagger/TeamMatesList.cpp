@@ -90,6 +90,11 @@ void UTeamMatesList::ResetUIByData()
 	}
 }
 
+void UTeamMatesList::SyncData()
+{
+
+}
+
 void UTeamMatesList::OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr)
 {
 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::VerticalBox));

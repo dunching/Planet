@@ -81,6 +81,10 @@ void UTalentAllocation::ResetUIByData()
 	}
 }
 
+void UTalentAllocation::SyncData()
+{
+}
+
 void UTalentAllocation::OnUsedTalentNumChanged(int32 OldNum, int32 NewNum)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(UsedNum));

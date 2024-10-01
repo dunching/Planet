@@ -60,7 +60,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
+	)override;
 
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,

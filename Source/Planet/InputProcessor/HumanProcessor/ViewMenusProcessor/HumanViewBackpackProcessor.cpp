@@ -72,12 +72,11 @@ namespace HumanProcessor
 
 	void FViewBackpackProcessor::BKeyPressed()
 	{
-		QuitCurrentState();
 	}
 
 	void FViewBackpackProcessor::ESCKeyPressed()
 	{
-		QuitCurrentState();
+		Super::ESCKeyPressed();
 	}
 
 	void FViewBackpackProcessor::PressedNumKey(int32 NumKey)

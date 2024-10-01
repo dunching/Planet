@@ -63,21 +63,14 @@ namespace HumanProcessor
 
 	void FHumanViewTalentAllocation::GKeyPressed()
 	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewTalentAllocation::VKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 	}
 
 	void FHumanViewTalentAllocation::BKeyPressed()
 	{
-	}
-
-	void FHumanViewTalentAllocation::ESCKeyPressed()
-	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewTalentAllocation::PressedNumKey(int32 NumKey)

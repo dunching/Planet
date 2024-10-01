@@ -22,6 +22,8 @@ namespace HumanProcessor
 
 		FHumanViewMenuBase(FOwnerPawnType* CharacterPtr);
 
+		virtual void ESCKeyPressed()override;
+
 	protected:
 
 		void Switch2RegularProcessor();

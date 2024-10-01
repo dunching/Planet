@@ -95,6 +95,7 @@ public:
 
 	virtual void InitialUnit();
 
+	// 通过远程的更新客户端的数据
 	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
 
 	// 激活

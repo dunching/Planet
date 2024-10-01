@@ -65,6 +65,8 @@ public:
 #pragma endregion  ProcessMode
 
 #pragma region Menu
+	void SwitchMenu(bool bIsShow);
+
 	// 浏览 背包、装配技能
 	void ViewBackpack(bool bIsDisplay);
 
@@ -74,13 +76,12 @@ public:
 	// 浏览 成员管理界面
 	void ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
 
-	// 出战队员列表
-	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
-
 	// 抽卡界面
 	void ViewRaffleMenu(bool bIsDisplay);
-
 #pragma endregion Menu
+
+	// 出战队员列表
+	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
 
 	// 效果栏（buff、debuff）
 	UEffectsList* ViewEffectsList(bool bIsViewMenus);
@@ -93,9 +94,9 @@ public:
 
 protected:
 
-	UMainUILayout* GetMainUILAyout();
+	UMainUILayout* GetMainHUD();
 
-	UMenuLayout* GetMenuLayout();
+	UMenuLayout* GetMainMenu();
 	
 	UPROPERTY(Transient)
 	UMainUILayout* MainUILayoutPtr = nullptr;

@@ -7,7 +7,7 @@
 #include "MyUserWidget.h"
 
 #include "UIInterfaces.h"
-#include "MenuInterface.h"
+#include "HUDInterface.h"
 
 #include "GetItemInfos.generated.h"
 
@@ -23,7 +23,7 @@ struct FConsumableProxy;
 UCLASS()
 class PLANET_API UGetItemInfos :
 	public UMyUserWidget, 
-	public IMenuInterface
+	public IHUDInterface
 {
 	GENERATED_BODY()
 

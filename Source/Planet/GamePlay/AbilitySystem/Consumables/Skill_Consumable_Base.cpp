@@ -139,5 +139,4 @@ void USkill_Consumable_Base::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
 }

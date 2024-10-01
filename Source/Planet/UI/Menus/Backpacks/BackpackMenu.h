@@ -37,6 +37,8 @@ public:
 
 	virtual void ResetUIByData()override;
 
+	virtual void SyncData()override;
+
 	bool bIsPlayerMenu = true;
 
 	FOnDragIconDelegate OnDragIconDelegate;

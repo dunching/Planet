@@ -86,8 +86,8 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 
 			if (UnitPtr && UnitPtr->Num > 0)
 			{
-				OnValueChangedDelegateHandle =
-					UnitPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
+// 				OnValueChangedDelegateHandle =
+// 					UnitPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
 
 				SetLevel();
 				SetItemType();
@@ -102,7 +102,7 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 	}
 
 	// 不放置消耗品的情况
-	OnValueChangedDelegateHandle.Reset();
+//	OnValueChangedDelegateHandle.Reset();
 	SetLevel();
 	SetItemType();
 	SetNum(0);
@@ -126,7 +126,7 @@ void UActionConsumablesIcon::UpdateState()
 		auto bCooldownIsReady = UnitPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 
-		SetCanRelease(bCooldownIsReady);
+		SetCanRelease(bCooldownIsReady && (UnitPtr->Num > 0));
 	}
 }
 

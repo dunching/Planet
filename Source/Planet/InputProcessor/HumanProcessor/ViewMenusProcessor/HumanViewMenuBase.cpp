@@ -28,6 +28,11 @@ namespace HumanProcessor
 
 	}
 
+	void FHumanViewMenuBase::ESCKeyPressed()
+	{
+		Switch2RegularProcessor();
+	}
+
 	void FHumanViewMenuBase::Switch2RegularProcessor()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
