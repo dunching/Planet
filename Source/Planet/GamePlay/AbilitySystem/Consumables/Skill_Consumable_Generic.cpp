@@ -46,6 +46,8 @@ void USkill_Consumable_Generic::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	CommitAbility(Handle, ActorInfo, ActivationInfo);
 }
 
 bool USkill_Consumable_Generic::CanActivateAbility(
@@ -56,6 +58,11 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
+	if (UnitPtr->Num <= 0)
+	{
+		return false;
+	}
+
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -66,6 +73,14 @@ bool USkill_Consumable_Generic::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		UnitPtr->Num--;
+		UnitPtr->Update2Client();
+	}
+#endif
+
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 

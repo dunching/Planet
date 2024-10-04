@@ -196,6 +196,8 @@ void ACharacterBase::PostInitializeComponents()
 		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
 
 		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent = StateProcessorComponentPtr;
+
+		TalentAllocationComponentPtr->Talent_FASI_Container.TalentAllocationComponentPtr = TalentAllocationComponentPtr;
 	}
 
 	Super::PostInitializeComponents();

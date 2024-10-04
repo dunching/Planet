@@ -38,6 +38,10 @@ void UGroupManaggerMenu::ResetUIByData()
 	ResetGroupmates();
 }
 
+void UGroupManaggerMenu::SyncData()
+{
+}
+
 void UGroupManaggerMenu::ResetGroupmates()
 {
 	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(GroupManaggerMenu::GroupMatesTileView));

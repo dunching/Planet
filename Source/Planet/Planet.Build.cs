@@ -6,7 +6,8 @@ public class Planet : ModuleRules
 {
 	public Planet(ReadOnlyTargetRules Target) : base(Target)
     {
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        PCHUsage = PCHUsageMode.UseSharedPCHs;
 
         bEnableUndefinedIdentifierWarnings = false;
         bWarningsAsErrors = true;
@@ -25,8 +26,8 @@ public class Planet : ModuleRules
         PublicDefinitions.Add("TESTRAFFLE = 1");
 
         PublicIncludePaths.Add("Planet");
+        PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_RootMotionSource");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Tasks");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Async");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/BasicFutures");
@@ -44,6 +45,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState/DurationState");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState/RootMotion");
         PublicIncludePaths.Add("Planet/GamePlay/Controller");
+        PublicIncludePaths.Add("Planet/GamePlay/Component");
         PublicIncludePaths.Add("Planet/GamePlay/GameInstance");
         PublicIncludePaths.Add("Planet/GamePlay/GameMode");
         PublicIncludePaths.Add("Planet/GamePlay/GameState");
@@ -55,6 +57,9 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human");
         PublicIncludePaths.Add("Planet/GamePlay/WorldSetting");
         PublicIncludePaths.Add("Planet/GamePlay/PlayerCameraManager");
+        PublicIncludePaths.Add("Planet/RootMotionSource");
+        PublicIncludePaths.Add("Planet/Generator");
+        PublicIncludePaths.Add("Planet/Generator/AI_Colony");
         PublicIncludePaths.Add("Planet/Animation");
         PublicIncludePaths.Add("Planet/Animation/Horse");
         PublicIncludePaths.Add("Planet/Animation/Human");
@@ -80,7 +85,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/HUD/PawnState/ActionStateHUD");
         PublicIncludePaths.Add("Planet/UI/HUD/PawnState/BuildingStateHUD");
         PublicIncludePaths.Add("Planet/UI/UMGs");
-        PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");
         PublicIncludePaths.Add("Planet/AI/EQS");
@@ -103,7 +107,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");
         PublicIncludePaths.Add("Planet/DelayTask");
-        PublicIncludePaths.Add("Planet/SceneUnit");
+        PublicIncludePaths.Add("Planet/NetReplicateData");
         PublicIncludePaths.Add("Planet/AssetRefMap");
         PublicIncludePaths.Add("Planet/GameOptions");
         PublicIncludePaths.Add("Planet/CameraTrailHelper");

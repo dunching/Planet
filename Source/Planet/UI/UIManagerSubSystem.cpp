@@ -37,7 +37,7 @@
 #include "MenuLayout.h"
 #include "PawnStateConsumablesHUD.h"
 
-struct FMainUILayout : public TStructVariable<FMainUILayout>
+struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>
 {
 	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
 
@@ -48,11 +48,6 @@ struct FMainUILayout : public TStructVariable<FMainUILayout>
 	FName PawnStateConsumablesHUD_Socket = TEXT("PawnStateConsumablesHUD_Socket");
 
 	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
-};
-
-struct FMenuLayout : public TStructVariable<FMenuLayout>
-{
-	FName Content = TEXT("Content");
 };
 
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
@@ -79,7 +74,7 @@ void UUIManagerSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr)
 {
-	MainUILayoutPtr = GetMainUILAyout();
+	MainUILayoutPtr = GetMainHUD();
 	if (!MainUILayoutPtr)
 	{
 		return;
@@ -87,7 +82,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 
 	// 技能HUD
 	{
-		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnActionStateHUDSocket));
+		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().PawnActionStateHUDSocket));
 		if (!BorderPtr)
 		{
 			return;
@@ -121,7 +116,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 
 	// 消耗品HUD
 	{
-		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().PawnStateConsumablesHUD_Socket));
+		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().PawnStateConsumablesHUD_Socket));
 		if (!BorderPtr)
 		{
 			return;
@@ -155,7 +150,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 
 void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
 {
-	MainUILayoutPtr = GetMainUILAyout();
+	MainUILayoutPtr = GetMainHUD();
 	if (!MainUILayoutPtr)
 	{
 		return;
@@ -191,17 +186,30 @@ void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
 	}
 }
 
-void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
+void UUIManagerSubSystem::SwitchMenu(bool bIsShow)
 {
-	MenuLayoutPtr = GetMenuLayout();
+	MenuLayoutPtr = GetMainMenu();
 	if (!MenuLayoutPtr)
 	{
 		return;
 	}
 
-	MenuLayoutPtr->SetVisibility(bIsDisplay ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	MenuLayoutPtr->SetVisibility(bIsShow ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	if (bIsShow)
+	{
+	}
+	else
+	{
+		MenuLayoutPtr->SyncData();
+	}
+}
+
+void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
+{
+	SwitchMenu(bIsDisplay);
 	if (bIsDisplay)
 	{
+		MenuLayoutPtr = GetMainMenu();
 		MenuLayoutPtr->SwitchViewer(EMenuType::kAllocationSkill);
 	}
 	else
@@ -211,15 +219,10 @@ void UUIManagerSubSystem::ViewBackpack(bool bIsDisplay)
 
 void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 {
-	MenuLayoutPtr = GetMenuLayout();
-	if (!MenuLayoutPtr)
-	{
-		return;
-	}
-
-	MenuLayoutPtr->SetVisibility(bIsDisplay ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+	SwitchMenu(bIsDisplay);
 	if (bIsDisplay)
 	{
+		MenuLayoutPtr = GetMainMenu();
 		MenuLayoutPtr->SwitchViewer(EMenuType::kAllocationTalent);
 	}
 	else
@@ -233,7 +236,7 @@ void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacte
 
 void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
 {
-	MainUILayoutPtr = GetMainUILAyout();
+	MainUILayoutPtr = GetMainHUD();
 	if (!MainUILayoutPtr)
 	{
 		return;
@@ -276,7 +279,7 @@ void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 
 UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
 {
-	MainUILayoutPtr = GetMainUILAyout();
+	MainUILayoutPtr = GetMainHUD();
 	if (!MainUILayoutPtr)
 	{
 		return nullptr;
@@ -347,13 +350,13 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 
 UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
 {
-	MainUILayoutPtr = GetMainUILAyout();
+	MainUILayoutPtr = GetMainHUD();
 	if (!MainUILayoutPtr)
 	{
 		return nullptr;
 	}
 
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FMainUILayout::Get().GetItemInfos_Socket));
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().GetItemInfos_Socket));
 	if (!BorderPtr)
 	{
 		return nullptr;
@@ -371,7 +374,7 @@ UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
 	return nullptr;
 }
 
-UMainUILayout* UUIManagerSubSystem::GetMainUILAyout()
+UMainUILayout* UUIManagerSubSystem::GetMainHUD()
 {
 	if (!MainUILayoutPtr)
 	{
@@ -391,7 +394,7 @@ UMainUILayout* UUIManagerSubSystem::GetMainUILAyout()
 	return MainUILayoutPtr;
 }
 
-UMenuLayout* UUIManagerSubSystem::GetMenuLayout()
+UMenuLayout* UUIManagerSubSystem::GetMainMenu()
 {
 	if (!MenuLayoutPtr)
 	{

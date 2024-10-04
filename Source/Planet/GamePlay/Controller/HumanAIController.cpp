@@ -20,6 +20,9 @@
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
 #include "SceneUnitTable.h"
+#include "GeneratorNPCs_Patrol.h"
+#include "GeneratorColony.h"
+#include "NPCComponent.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -114,6 +117,8 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	
+	InitialAILogic();
 
 	InitialCharacter();
 }
@@ -266,6 +271,30 @@ void AHumanAIController::InitialCharacter()
 					}
 				}
 			}
+		}
+	}
+}
+
+void AHumanAIController::InitialAILogic()
+{
+	if (GetPawn())
+	{
+		auto ParentPtr = GetPawn()->GetAttachParentActor();
+		if (!ParentPtr)
+		{
+			return;
+		}
+
+		if (auto PatrolPtr = Cast<AGeneratorNPCs_Patrol>(ParentPtr))
+		{
+			PatrolSPlinePtr = PatrolPtr->SplineComponentPtr;
+		}
+		else if (auto ColonyPtr = Cast<AGeneratorColony>(ParentPtr))
+		{
+// 			// 这里按次序获取要追踪的位置
+// 			auto NPCComponentPtr = GetPawn()->GetComponentByClass<UNPCComponent>();
+// 
+// 			PathFollowComponentPtr = NPCComponentPtr->PathFollowComponentPtr;
 		}
 	}
 }

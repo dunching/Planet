@@ -46,6 +46,11 @@ void UBackpackMenu::ResetUIByData()
 	ResetUIByData_All();
 }
 
+void UBackpackMenu::SyncData()
+{
+
+}
+
 TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GWorld, 0));

@@ -43,11 +43,11 @@ public:
 
     // 
     UPROPERTY(Replicated)
-    bool bSkipRotation = false;
+    bool bSkip_Rotation = false;
     
     // 
     UPROPERTY(Replicated)
-    bool bSkipRootMotion = false;
+    bool bSkip_RootMotion = false;
     
     // 
     UPROPERTY(Replicated)
@@ -56,6 +56,10 @@ public:
     // 
     UPROPERTY(Replicated)
     bool bSkip_PathFollow = false;
+    
+    // 
+    UPROPERTY(Replicated)
+    bool bForceRotation = false;
     
 	UFUNCTION(NetMulticast, Reliable)
 	void SetIsOrientRotationToMovement_RPC(bool bIsOrientRotationToMovement);
@@ -97,6 +101,8 @@ protected:
         enum ELevelTick TickType,
         FActorComponentTickFunction* ThisTickFunction
     ) override;
+
+    FRotator ComputeRootMotionToMovementRotation(const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation) const;
 
     FLyraCharacterGroundInfo CachedGroundInfo;
 

@@ -44,6 +44,8 @@ protected:
 
 	virtual void ResetUIByData()override;
 
+	virtual void SyncData()override;
+
 	void BindEvent();
 
 	void ResetUI(const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr, const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
@@ -76,8 +78,6 @@ protected:
 	void OnConsumableUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr);
 	
 	void SetAllocation(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr, bool bIsReplaced);
-
-	void SyncAllocation2Character();
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 

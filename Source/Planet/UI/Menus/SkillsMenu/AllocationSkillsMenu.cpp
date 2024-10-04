@@ -99,6 +99,8 @@ void UAllocationSkillsMenu::NativeConstruct()
 		return;
 	}
 
+	ResetUIByData();
+
 	BindEvent();
 }
 
@@ -118,7 +120,7 @@ void UAllocationSkillsMenu::NativeDestruct()
 		SecondaryDelegateHandleSPtr->UnBindCallback();
 	}
 
-	SyncAllocation2Character();
+	SyncData();
 }
 
 void UAllocationSkillsMenu::ResetUIByData()
@@ -264,7 +266,7 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 	}
 }
 
-void UAllocationSkillsMenu::SyncAllocation2Character()
+void UAllocationSkillsMenu::SyncData()
 {
 	if (!CurrentUnitPtr)
 	{
@@ -690,7 +692,7 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(const TSharedPtr<FCharacterP
 					return;
 				}
 
-				SyncAllocation2Character();
+				SyncData();
 
 				ResetUI(UnitPtr, CharacterPtr->GetCharacterUnit());
 

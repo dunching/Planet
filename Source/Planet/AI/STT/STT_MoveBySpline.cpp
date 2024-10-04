@@ -119,7 +119,9 @@ EStateTreeRunStatus FSTT_MoveBySpline::PerformMoveTask(
 		.SetUsePathfinding(true);
 
 	const auto SPlinePoint = InstanceData.SPlinePtr->GetWorldLocationAtSplinePoint(InstanceData.PointIndex);
+	const auto SPlinePointNum = InstanceData.SPlinePtr->GetNumberOfSplinePoints();
 	InstanceData.PointIndex++;
+	InstanceData.PointIndex = InstanceData.PointIndex % SPlinePointNum;
 
 #ifdef WITH_EDITOR
 	if (DrawDebugSTT_MoveBySpline.GetValueOnGameThread())
@@ -150,7 +152,7 @@ EStateTreeRunStatus FSTT_MoveBySpline::PerformMoveTask(
 
 			if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
 			{
-				return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
+//				return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
 			}
 
 			return EStateTreeRunStatus::Running;

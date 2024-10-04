@@ -140,9 +140,7 @@ void UCS_PeriodicStateModify_Fear::PerformAction()
 	CharacterStateInfoSPtr->DataChanged();
 	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
-	//
-	MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
-	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddSettlementModify(MyPropertySettlementModify);
+	//TalentHelper.Level > 
 
 	//
 	MoveImp();

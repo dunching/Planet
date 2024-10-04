@@ -19,7 +19,7 @@
 #include "SPlineActor.h"
 #include "SceneElement.h"
 #include "Skill_Base.h"
-#include "TalentUnit.h"
+#include "Talent_FASI.h"
 #include "TalentAllocationComponent.h"
 #include "CharacterBase.h"
 #include "CollisionDataStruct.h"

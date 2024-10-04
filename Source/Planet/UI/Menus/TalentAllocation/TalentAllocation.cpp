@@ -26,6 +26,24 @@ void UTalentAllocation::NativeConstruct()
 			);
 		}
 	}
+
+	if (WidgetTree)
+	{
+		WidgetTree->ForEachWidget([this](UWidget* Widget) {
+			if (Widget && Widget->IsA<UTalentIcon>())
+			{
+				auto UIPtr = Cast<UTalentIcon>(Widget);
+				if (!UIPtr)
+				{
+					return;
+				}
+
+				OnPointChangedHandleAry.Add(UIPtr->OnValueChanged.AddCallback(
+					std::bind(&ThisClass::OnAddPoint, this, std::placeholders::_1, std::placeholders::_2)
+				));
+			}
+			});
+	}
 }
 
 void UTalentAllocation::NativeDestruct()
@@ -60,21 +78,11 @@ void UTalentAllocation::ResetUIByData()
 {
 	if (WidgetTree)
 	{
-		WidgetTree->ForEachWidget([this](UWidget* Widget) {
-			if (Widget && Widget->IsA<UTalentIcon>())
-			{
-				auto UIPtr = Cast<UTalentIcon>(Widget);
-				if (!UIPtr)
-				{
-					return;
-				}
-
-				OnPointChangedHandleAry.Add(UIPtr->OnValueChanged.AddCallback(
-					std::bind(&ThisClass::OnAddPoint, this, std::placeholders::_1, std::placeholders::_2)
-				));
-			}
-			});
 	}
+}
+
+void UTalentAllocation::SyncData()
+{
 }
 
 void UTalentAllocation::OnUsedTalentNumChanged(int32 OldNum, int32 NewNum)

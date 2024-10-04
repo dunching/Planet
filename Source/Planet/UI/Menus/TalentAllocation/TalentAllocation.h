@@ -38,6 +38,8 @@ protected:
 
 	virtual void ResetUIByData()override;
 
+	virtual void SyncData()override;
+
 	void OnUsedTalentNumChanged(int32 OldNum, int32 NewNum);
 	
 	void OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);

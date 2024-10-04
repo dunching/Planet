@@ -7,6 +7,7 @@
 #include "Planet.h"
 #include "PlanetWorldSettings.h"
 #include "StateTagExtendInfo.h"
+#include "TalentInfo.h"
 
 USceneUnitExtendInfoMap::USceneUnitExtendInfoMap() :
 	Super()
@@ -48,6 +49,16 @@ FTableRowUnit_TagExtendInfo* USceneUnitExtendInfoMap::GetTableRowUnit_TagExtendI
 	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowUnit_TagExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
 
 	return SceneUnitExtendInfoPtr;
+}
+
+const UPAD_Talent_Property* USceneUnitExtendInfoMap::GetTalent_Property(EPointPropertyType PointPropertyType) const
+{
+	if (PAD_Talent_PropertyMap.Contains(PointPropertyType))
+	{
+		return PAD_Talent_PropertyMap[PointPropertyType];
+	}
+
+	return nullptr;
 }
 
 void USceneUnitExtendInfoMap::InitialData()

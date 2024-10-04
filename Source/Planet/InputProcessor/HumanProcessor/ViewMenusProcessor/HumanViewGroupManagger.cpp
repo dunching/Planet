@@ -76,12 +76,6 @@ namespace HumanProcessor
 
 	void FHumanViewGroupManagger::HKeyPressed()
 	{
-		QuitCurrentState();
-	}
-
-	void FHumanViewGroupManagger::ESCKeyPressed()
-	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewGroupManagger::PressedNumKey(int32 NumKey)

@@ -3,13 +3,14 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "TalentUnit.h"
+#include "Talent_FASI.h"
 #include "GenerateType.h"
 
 #include "TalentAllocationComponent.generated.h"
 
 class IPlanetControllerInterface;
 class ACharacterBase;
+struct FPropertySettlementModify_Talent;
 
 UCLASS(BlueprintType, Blueprintable)
 class UTalentAllocationComponent : public UActorComponent
@@ -22,11 +23,13 @@ public:
 
 	static FName ComponentName;
 
-	FTalentHelper AddCheck(FTalentHelper& TalentHelper);
+	UTalentAllocationComponent(const FObjectInitializer& ObjectInitializer);
 
-	FTalentHelper SubCheck(FTalentHelper& TalentHelper);
-	
-	FTalentHelper* GetCheck(FTalentHelper& TalentHelper);
+	void AddCheck(const FTalentHelper& TalentHelper);
+
+	void SubCheck(const FTalentHelper& TalentHelper);
+
+	FTalentHelper GetCheck(const FTalentHelper& TalentHelper);
 
 	void Clear(FTalentHelper& TalentHelper);
 
@@ -36,9 +39,16 @@ public:
 
 	void SyncToHolding();
 
-	TOnValueChangedCallbackContainer<int32>CallbackContainerHelper;
+	void UpdateTalent_Client(const FTalentHelper& TalentHelper);
 
+	TOnValueChangedCallbackContainer<int32>CallbackContainerHelper;
+	
+	UPROPERTY(Replicated)
+	FTalent_FASI_Container Talent_FASI_Container;
+	
 protected:
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void BeginPlay()override;
 
@@ -46,20 +56,25 @@ protected:
 
 	void CalculorUsedTalentPointNum();
 
+	UFUNCTION(Server, Reliable)
+	void AddCheck_Server(const FTalentHelper& TalentHelper);
+
+	UFUNCTION(Server, Reliable)
+	void SubCheck_Server(const FTalentHelper& TalentHelper);
+
+	void UpdateTalent(const FTalentHelper& TalentHelper);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "TalentAry")
 	TMap<FGameplayTag, FTalentHelper>TalentMap;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
+	int32 UsedTalentPointNum = 0;
+
 	int32 MaxTalentLevel = 3;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
 	int32 TotalTalentPointNum = 18;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities Tag")
-	int32 UsedTalentPointNum = 0;
 
 	EPointSkillType PreviousSkillType = EPointSkillType::kDuXing;
 
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
+	TMap<EPointPropertyType, TWeakPtr<FPropertySettlementModify_Talent>>ModifyMap;
 
 };

@@ -14,7 +14,7 @@
 #include "HUDInterface.generated.h"
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class  UHUDInterface : public UInterface
+class UHUDInterface : public UInterface
 {
 	GENERATED_BODY()
 };

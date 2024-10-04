@@ -64,17 +64,10 @@ namespace HumanProcessor
 
 	void FHumanViewAlloctionSkillsProcessor::VKeyPressed()
 	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewAlloctionSkillsProcessor::BKeyPressed()
 	{
-		QuitCurrentState();
-	}
-
-	void FHumanViewAlloctionSkillsProcessor::ESCKeyPressed()
-	{
-		QuitCurrentState();
 	}
 
 	void FHumanViewAlloctionSkillsProcessor::PressedNumKey(int32 NumKey)
