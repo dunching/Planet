@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "SceneObj.h"
+
 #include "ProjectileBase.generated.h"
 
 class USphereComponent;

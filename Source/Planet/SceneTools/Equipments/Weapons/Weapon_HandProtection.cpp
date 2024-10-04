@@ -22,10 +22,10 @@ AWeapon_HandProtection::AWeapon_HandProtection(const FObjectInitializer& ObjectI
 	Super(ObjectInitializer)
 {
 	LeftSkeletalComponentPtr = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("LeftSkeletalComponentPtr"));
-	LeftSkeletalComponentPtr->SetupAttachment(SceneCompPtr);
+	LeftSkeletalComponentPtr->SetupAttachment(RootComponent);
 
 	RightSkeletalComponentPtr = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RightSkeletalComponentPtr"));
-	RightSkeletalComponentPtr->SetupAttachment(SceneCompPtr);
+	RightSkeletalComponentPtr->SetupAttachment(RootComponent);
 }
 
 void AWeapon_HandProtection::AttachToCharacter(ACharacterBase* CharacterPtr)

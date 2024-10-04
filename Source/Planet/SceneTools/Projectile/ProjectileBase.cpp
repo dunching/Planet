@@ -62,10 +62,15 @@ void AProjectileBase::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-    if ((MaxMoveRange > 0) && (FVector::Distance(StartPt, GetActorLocation()) >= MaxMoveRange))
+#if UE_EDITOR || UE_SERVER
+    if (GetLocalRole() == ROLE_Authority)
     {
-        Destroy();
+        if ((MaxMoveRange > 0) && (FVector::Distance(StartPt, GetActorLocation()) >= MaxMoveRange))
+        {
+            Destroy();
+        }
     }
+#endif
 
 #ifdef WITH_EDITOR
     if (ProjectileBase.GetValueOnGameThread())

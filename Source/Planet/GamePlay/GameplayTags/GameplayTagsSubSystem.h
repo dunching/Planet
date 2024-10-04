@@ -326,6 +326,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Weapon_Bow =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.Bow")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Weapon_FoldingFan =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.FoldingFan")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Active =

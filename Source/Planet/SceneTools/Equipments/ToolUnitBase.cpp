@@ -11,10 +11,12 @@
 #include "PlanetGameplayAbility.h"
 #include "ToolFuture_Base.h"
 
+FName AToolUnitBase::RootComponentName = TEXT("RootComponent");
+
 AToolUnitBase::AToolUnitBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	SceneCompPtr = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+	SceneCompPtr = CreateDefaultSubobject<USceneComponent>(ThisClass::RootComponentName);
 
 	SceneCompPtr->SetShouldUpdatePhysicsVolume(true);
 	SceneCompPtr->SetCanEverAffectNavigation(false);

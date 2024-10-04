@@ -11,6 +11,8 @@
 #include "Animation/SkeletalMeshActor.h"
 #include "Engine/StaticMeshActor.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/SphereComponent.h"
 
 #include "CollisionDataStruct.h"
 #include "CharacterBase.h"
@@ -21,6 +23,18 @@
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
 #include "Skill_WeaponActive_PickAxe.h"
+
+ASkill_WeaponActive_Bow_Projectile::ASkill_WeaponActive_Bow_Projectile(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraComponent->SetupAttachment(CollisionComp);
+
+	ProjectileMovementCompPtr->HomingAccelerationMagnitude = 2000.f;
+	ProjectileMovementCompPtr->InitialSpeed = 100.f;
+	ProjectileMovementCompPtr->MaxSpeed = 100.f;
+	InitialLifeSpan = 10.f;
+}
 
 AWeapon_Bow::AWeapon_Bow(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

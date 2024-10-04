@@ -22,7 +22,7 @@ ATool_PickAxe::ATool_PickAxe(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	SkeletalComponentPtr = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"));
-	SkeletalComponentPtr->SetupAttachment(SceneCompPtr);
+	SkeletalComponentPtr->SetupAttachment(RootComponent);
 }
 
 void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentActionType ActionType)

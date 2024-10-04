@@ -7,6 +7,7 @@
 #include "Weapon_Base.h"
 #include "PlanetGameplayAbility.h"
 #include "Skill_Base.h"
+#include "ProjectileBase.h"
 
 #include "Weapon_Bow.generated.h"
 
@@ -17,6 +18,22 @@ class UPrimitiveComponent;
 class UNiagaraComponent;
 class AHumanCharacter;
 class ATool_PickAxe;
+
+UCLASS()
+class PLANET_API ASkill_WeaponActive_Bow_Projectile : public AProjectileBase
+{
+	GENERATED_BODY()
+
+public:
+
+	ASkill_WeaponActive_Bow_Projectile(const FObjectInitializer& ObjectInitializer);
+	
+protected:
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Niagara")
+	UNiagaraComponent* NiagaraComponent = nullptr;
+
+};
 
 UCLASS()
 class PLANET_API AWeapon_Bow : public AWeapon_Base

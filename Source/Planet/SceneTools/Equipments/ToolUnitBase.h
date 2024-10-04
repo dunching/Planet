@@ -20,6 +20,8 @@ class UClass;
 class UToolFuture_Base;
 class USkill_Base;
 
+static FName RootComponentName;
+
 UCLASS()
 class PLANET_API AToolUnitBase : public ASceneObj
 {
@@ -39,6 +41,8 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equiment")
 	USceneComponent* SceneCompPtr = nullptr;
+
+	static FName RootComponentName;
 
 private:
 

@@ -499,6 +499,17 @@ void UBaseFeatureComponent::Dash_Implementation(EDashDirection DashDirection)
 	}
 }
 
+void UBaseFeatureComponent::Jump_Implementation()
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
+			FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump }
+		);
+	}
+}
+
 void UBaseFeatureComponent::Respawn()
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();

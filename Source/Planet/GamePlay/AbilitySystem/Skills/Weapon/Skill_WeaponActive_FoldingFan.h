@@ -6,19 +6,19 @@
 #include "ProjectileBase.h"
 #include "Skill_WeaponActive_Base.h"
 
-#include "Skill_WeaponActive_Bow.generated.h"
+#include "Skill_WeaponActive_FoldingFan.generated.h"
 
 class UPrimitiveComponent;
 class UNiagaraComponent;
 class UAnimMontage;
 
-class AWeapon_Bow;
+class AWeapon_FoldingFan;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
-class ASkill_WeaponActive_Bow_Projectile;
+class ASkill_WeaponActive_FoldingFan_Projectile;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Bow_RegisterParam :
+struct FGameplayAbilityTargetData_FoldingFan_RegisterParam :
 	public FGameplayAbilityTargetData_SkillBase_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -34,8 +34,8 @@ struct FGameplayAbilityTargetData_Bow_RegisterParam :
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Bow_RegisterParam> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Bow_RegisterParam>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_FoldingFan_RegisterParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_FoldingFan_RegisterParam>
 {
 	enum
 	{
@@ -44,17 +44,17 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Bow_RegisterParam> :
 };
 
 UCLASS()
-class PLANET_API USkill_WeaponActive_Bow : public USkill_WeaponActive_Base
+class PLANET_API USkill_WeaponActive_FoldingFan : public USkill_WeaponActive_Base
 {
 	GENERATED_BODY()
 
 public:
 
-	using FRegisterParamType = FGameplayAbilityTargetData_Bow_RegisterParam;
+	using FRegisterParamType = FGameplayAbilityTargetData_FoldingFan_RegisterParam;
 
-	using FWeaponActorType = AWeapon_Bow;
+	using FWeaponActorType = AWeapon_FoldingFan;
 
-	USkill_WeaponActive_Bow();
+	USkill_WeaponActive_FoldingFan();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -76,6 +76,21 @@ public:
 		const FGameplayEventData* TriggerEventData
 	);
 
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr,
+		const FGameplayTagContainer* TargetTags = nullptr,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
+
+	virtual bool CommitAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	)override;
+
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 	) override;
@@ -93,9 +108,9 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
-	virtual void CheckInContinue()override;
-
 	void PlayMontage();
+
+	void RootMotion();
 
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
@@ -103,7 +118,7 @@ protected:
 	UFUNCTION()
 	void OnMontateComplete();
 
-	void EmitProjectile()const;
+	void EmitProjectile();
 
 	void MakeDamage(ACharacterBase * TargetCharacterPtr);
 
@@ -123,17 +138,13 @@ protected:
 	UAnimMontage* HumanMontage = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	UAnimMontage* BowMontage = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Damage = 10;
-
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 SweepWidth = 500;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<ASkill_WeaponActive_Bow_Projectile>Skill_WeaponActive_RangeTest_ProjectileClass;
+	int32 Height = 100;
 
 	FWeaponActorType* WeaponPtr = nullptr;
+
+	int32 CurrentFanNum = 1;
 
 };

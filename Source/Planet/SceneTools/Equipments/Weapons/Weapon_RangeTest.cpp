@@ -23,7 +23,7 @@ AWeapon_RangeTest::AWeapon_RangeTest(const FObjectInitializer& ObjectInitializer
 	Super(ObjectInitializer)
 {
 	SkeletalComponentPtr = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"));
-	SkeletalComponentPtr->SetupAttachment(SceneCompPtr);
+	SkeletalComponentPtr->SetupAttachment(RootComponent);
 }
 
 void AWeapon_RangeTest::AttachToCharacter(ACharacterBase* CharacterPtr)

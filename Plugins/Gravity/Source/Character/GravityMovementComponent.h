@@ -104,6 +104,8 @@ protected:
 
     FRotator ComputeRootMotionToMovementRotation(const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation) const;
 
+    virtual void PhysFlying(float deltaTime, int32 Iterations)override;
+
     FLyraCharacterGroundInfo CachedGroundInfo;
 
 #if USECUSTOMEGRAVITY
