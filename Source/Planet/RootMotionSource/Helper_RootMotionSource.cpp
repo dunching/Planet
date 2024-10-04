@@ -45,7 +45,7 @@ void FRootMotionSource_MyConstantForce::PrepareRootMotion
 	RootMotionParams.Clear();
 
 	auto GravityMoveComponentPtr = Cast<UGravityMovementComponent>(&MoveComponent);
-	if (GravityMoveComponentPtr->bSkipRootMotion)
+	if (GravityMoveComponentPtr->bSkip_RootMotion)
 	{
 		SetTime(GetTime() + Duration);
 
@@ -184,6 +184,93 @@ void FRootMotionSource_BySpline::PrepareRootMotion
 	RootMotionParams.Set(NewTransform);
 
 	SetTime(GetTime() + SimulationTime);
+}
+
+FRootMotionSource* FRootMotionSource_Formation::Clone() const
+{
+	FRootMotionSource_Formation* CopyPtr = new FRootMotionSource_Formation(*this);
+	return CopyPtr;
+}
+
+bool FRootMotionSource_Formation::Matches(const FRootMotionSource* Other) const
+{
+	if (!FRootMotionSource::Matches(Other))
+	{
+		return false;
+	}
+
+	const FRootMotionSource_Formation* OtherCast = static_cast<const FRootMotionSource_Formation*>(Other);
+
+	return FormationPtr == OtherCast->FormationPtr;
+}
+
+bool FRootMotionSource_Formation::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
+	{
+		return false;
+	}
+
+	Ar << FormationPtr;
+
+	bOutSuccess = true;
+	return true;
+}
+
+UScriptStruct* FRootMotionSource_Formation::GetScriptStruct() const
+{
+	return FRootMotionSource_Formation::StaticStruct();
+}
+
+bool FRootMotionSource_Formation::UpdateStateFrom(
+	const FRootMotionSource* SourceToTakeStateFrom,
+	bool bMarkForSimulatedCatchup /*= false*/
+)
+{
+	if (!FRootMotionSource::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
+	{
+		return false;
+	}
+
+	const FRootMotionSource_Formation* OtherCast = static_cast<const FRootMotionSource_Formation*>(SourceToTakeStateFrom);
+
+	FormationPtr = OtherCast->FormationPtr;
+
+	return true;
+}
+
+void FRootMotionSource_Formation::PrepareRootMotion
+(
+	float SimulationTime,
+	float MovementTickTime,
+	const ACharacter& Character,
+	const UCharacterMovementComponent& MoveComponent
+)
+{
+	RootMotionParams.Clear();
+
+	if (FormationPtr)
+	{
+		const FVector CurrentLocation = Character.GetActorLocation();
+		const FVector TargetLocation = FormationPtr->GetComponentLocation();
+
+		FVector Distance = (TargetLocation - CurrentLocation) / MovementTickTime;
+
+		FTransform NewTransform;
+
+		NewTransform.SetTranslation(Distance);
+
+		const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
+		NewTransform.ScaleTranslation(Multiplier);
+
+		RootMotionParams.Set(NewTransform);
+
+		SetTime(GetTime() + SimulationTime);
+	}
+	else
+	{
+		SetRootMotionFinished(*this);
+	}
 }
 
 FRootMotionSource_ByTornado::FRootMotionSource_ByTornado()

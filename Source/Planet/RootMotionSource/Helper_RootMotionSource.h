@@ -17,6 +17,9 @@
 enum ERootMotionSource_Priority : uint16
 {
 	kDefault = 1,
+
+	kAIMove,
+
 	kMove,			// 位移
 	kFlyAway,		// 击飞
 	kTraction,		// 牵引
@@ -148,6 +151,45 @@ private:
 template<>
 struct TStructOpsTypeTraits< FRootMotionSource_BySpline > :
 	public TStructOpsTypeTraitsBase2< FRootMotionSource_BySpline >
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
+};
+
+USTRUCT()
+struct FRootMotionSource_Formation : public FRootMotionSource
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual FRootMotionSource* Clone() const override;
+
+	virtual bool Matches(const FRootMotionSource* Other) const override;
+
+	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+
+	virtual void PrepareRootMotion(
+		float SimulationTime,
+		float MovementTickTime,
+		const ACharacter& Character,
+		const UCharacterMovementComponent& MoveComponent
+	) override;
+
+	USceneComponent* FormationPtr = nullptr;
+
+private:
+
+};
+
+template<>
+struct TStructOpsTypeTraits< FRootMotionSource_Formation > :
+	public TStructOpsTypeTraitsBase2< FRootMotionSource_Formation >
 {
 	enum
 	{

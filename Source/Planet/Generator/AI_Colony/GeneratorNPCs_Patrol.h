@@ -25,15 +25,9 @@ public:
 
 	virtual void BeginPlay() override;
 	
-protected:
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Spline")
 	TObjectPtr<USplineComponent> SplineComponentPtr;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 SampleNum = 3;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	int32 Offset = 100;
+protected:
 
 };

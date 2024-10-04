@@ -15,6 +15,8 @@ class PLANET_API AHumanCharacter_NPC : public AHumanCharacter
 
 public:
 
+	virtual void BeginPlay() override;
+
 protected:
 	
 #if WITH_EDITORONLY_DATA

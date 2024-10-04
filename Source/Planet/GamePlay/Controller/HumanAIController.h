@@ -55,7 +55,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USplineComponent> PatrolSPlinePtr = nullptr;
-	
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
 
@@ -85,6 +88,8 @@ protected:
 	void OnTeamChanged();
 
 	void InitialCharacter();
+
+	void InitialAILogic();
 
 	void InitialSenseConfig();
 

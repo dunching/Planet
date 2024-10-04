@@ -16,4 +16,6 @@ class PLANET_API AGeneratorBase : public AActor
 
 public:
 
+	AGeneratorBase(const FObjectInitializer& ObjectInitializer);
+
 };

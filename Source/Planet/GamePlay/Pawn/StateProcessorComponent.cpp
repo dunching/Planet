@@ -209,7 +209,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkipRootMotion = Lambda();
+				CharacterMovementPtr->bSkip_RootMotion = Lambda();
 			}
 		}
 		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation))
@@ -218,7 +218,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkipRotation = Lambda();
+				CharacterMovementPtr->bSkip_Rotation = Lambda();
 			}
 		}
 		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly))
