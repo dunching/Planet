@@ -440,29 +440,63 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 		Params
 	))
 	{
-		auto TargetPt = FVector::ZeroVector;
-		if (GetTime() < RiseDuration)
+	}
+
+	FVector Force = FVector::ZeroVector;
+
+	// 下降
+	if (GetTime() >= GetDuration())
+	{
+		if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
 		{
-			float MoveFraction = (GetTime() + SimulationTime) / RiseDuration;
-
-			TargetPt = Result.ImpactPoint - (GravityDir * FMath::Lerp<float, float>(0, Height + HalfHeight, MoveFraction));
-
+			bIsFalling = false;
 		}
 		else
 		{
-			TargetPt = Result.ImpactPoint - (GravityDir * (Height + HalfHeight));
+			const FVector Gravity = -MoveComponent.GetGravityDirection() * MoveComponent.GetGravityZ();
+			Force = MoveComponent.NewFallVelocity(Force, Gravity, SimulationTime) / MovementTickTime;
 		}
-		FVector Force = (TargetPt - CurrentLocation) / MovementTickTime;
+	}
+	// 上升
+	else if (GetTime() < RiseDuration)
+	{
+		const float MoveFraction = (Height + HalfHeight) / RiseDuration;
 
-		NewTransform.SetTranslation(Force);
+		//		auto TargetPt = FVector::ZeroVector;
+
+	//			TargetPt = Result.ImpactPoint - (GravityDir * );
+
+		Force.Z = MoveFraction * SimulationTime / MovementTickTime;
+		//			FVector Force = (TargetPt - CurrentLocation) / MovementTickTime;
+	}
+	// 维持高度
+	else
+	{
+		// 			TargetPt = Result.ImpactPoint - (GravityDir * (Height + HalfHeight));
+		// 
+		// 			FVector Force = (TargetPt - CurrentLocation) / MovementTickTime;
 	}
 
+	NewTransform.SetTranslation(Force);
 	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
 	NewTransform.ScaleTranslation(Multiplier);
 
 	RootMotionParams.Set(NewTransform);
 
-	SetTime(GetTime() + SimulationTime);
+	const auto NewTime = GetTime() + SimulationTime;
+	if (NewTime >= GetDuration())
+	{
+		if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
+		{
+			PRINTINVOKEINFO();
+		}
+		else
+		{
+			bIsFalling = true;
+		}
+	}
+
+	SetTime(NewTime);
 }
 
 bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
@@ -482,6 +516,18 @@ bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 UScriptStruct* FRootMotionSource_FlyAway::GetScriptStruct() const
 {
 	return FRootMotionSource_FlyAway::StaticStruct();
+}
+
+void FRootMotionSource_FlyAway::CheckTimeOut()
+{
+	if (bIsFalling)
+	{
+		PRINTINVOKEINFO();
+	}
+	else
+	{
+		Super::CheckTimeOut();
+	}
 }
 
 void FRootMotionSource_FlyAway::Initial(
