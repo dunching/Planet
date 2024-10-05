@@ -461,20 +461,11 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	else if (GetTime() < RiseDuration)
 	{
 		const float MoveFraction = (Height + HalfHeight) / RiseDuration;
-
-		//		auto TargetPt = FVector::ZeroVector;
-
-	//			TargetPt = Result.ImpactPoint - (GravityDir * );
-
 		Force.Z = MoveFraction * SimulationTime / MovementTickTime;
-		//			FVector Force = (TargetPt - CurrentLocation) / MovementTickTime;
 	}
 	// 维持高度
 	else
 	{
-		// 			TargetPt = Result.ImpactPoint - (GravityDir * (Height + HalfHeight));
-		// 
-		// 			FVector Force = (TargetPt - CurrentLocation) / MovementTickTime;
 	}
 
 	NewTransform.SetTranslation(Force);

@@ -171,6 +171,7 @@ void UActionSkillsIcon::UpdateSkillState()
 	}
 	else if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 	{
+		SetNum();
 	}
 }
 
@@ -283,6 +284,11 @@ void UActionSkillsIcon::SetItemType()
 			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void UActionSkillsIcon::SetNum()
+{
+
 }
 
 void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)

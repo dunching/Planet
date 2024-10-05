@@ -41,8 +41,8 @@ AWeapon_FoldingFan::AWeapon_FoldingFan(const FObjectInitializer& ObjectInitializ
 	ProjectileMovementCompPtr = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovementCompPtr->UpdatedComponent = RootComponent;
 	ProjectileMovementCompPtr->HomingAccelerationMagnitude = 2000.f;
-	ProjectileMovementCompPtr->InitialSpeed = 200.f;
-	ProjectileMovementCompPtr->MaxSpeed = 200.f;
+	ProjectileMovementCompPtr->InitialSpeed = 1000.f;
+	ProjectileMovementCompPtr->MaxSpeed = 1000.f;
 	ProjectileMovementCompPtr->bRotationFollowsVelocity = true;
 	ProjectileMovementCompPtr->bShouldBounce = true;
 	ProjectileMovementCompPtr->ProjectileGravityScale = 0.f;

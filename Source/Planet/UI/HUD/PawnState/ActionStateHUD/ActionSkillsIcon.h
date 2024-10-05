@@ -63,6 +63,8 @@ protected:
 
 	void SetItemType();
 
+	void SetNum();
+
 	void SetInputRemainPercent(bool bIsAcceptInput, float Percent);
 
 	void SetDurationPercent(bool bIsHaveDuration, float Percent);
