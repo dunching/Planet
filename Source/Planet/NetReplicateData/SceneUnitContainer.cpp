@@ -318,6 +318,24 @@ void FProxy_FASI_Container::UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 #endif
 }
 
+void FProxy_FASI_Container::UpdateItem(const FGuid& Proxy_ID)
+{
+#if UE_EDITOR || UE_SERVER
+	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		for (int32 Index = 0; Index < Items.Num(); Index++)
+		{
+			if (Items[Index].ProxySPtr->GetID() == Proxy_ID)
+			{
+				// 注意：ProxySPtr 这个指针已经在外部进行了修改，在这部我们不必再对 Items[Index] 进行修改
+				MarkItemDirty(Items[Index]);
+				return;
+			}
+		}
+	}
+#endif
+}
+
 void FProxy_FASI_Container::RemoveItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 {
 #if UE_EDITOR || UE_SERVER
@@ -345,15 +363,15 @@ TSharedPtr<FBasicProxy> FProxy_FASI_Container::GetProxyType(const FGameplayTag& 
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
 	{
-		return  MakeShared<FWeaponProxy>();
+		return MakeShared<FWeaponProxy>();
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
 	{
-		return  MakeShared<FActiveSkillProxy>();
+		return MakeShared<FActiveSkillProxy>();
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
 	{
-		return  MakeShared<FPassiveSkillProxy>();
+		return MakeShared<FPassiveSkillProxy>();
 	}
 	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
 	{

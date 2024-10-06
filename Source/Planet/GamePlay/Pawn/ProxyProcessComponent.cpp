@@ -49,6 +49,50 @@ UProxyProcessComponent::UProxyProcessComponent(const FObjectInitializer& ObjectI
 	SetIsReplicatedByDefault(true);
 }
 
+void UProxyProcessComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		TArray<FGameplayTag>Ary
+		{
+			UGameplayTagsSubSystem::GetInstance()->ActiveSocket1,
+			UGameplayTagsSubSystem::GetInstance()->ActiveSocket2,
+			UGameplayTagsSubSystem::GetInstance()->ActiveSocket3,
+			UGameplayTagsSubSystem::GetInstance()->ActiveSocket4,
+
+			UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1,
+			UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2,
+
+			UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket_1,
+			UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket_2,
+
+			UGameplayTagsSubSystem::GetInstance()->ConsumableSocket1,
+			UGameplayTagsSubSystem::GetInstance()->ConsumableSocket2,
+			UGameplayTagsSubSystem::GetInstance()->ConsumableSocket3,
+			UGameplayTagsSubSystem::GetInstance()->ConsumableSocket4,
+
+			UGameplayTagsSubSystem::GetInstance()->PassiveSocket_1,
+			UGameplayTagsSubSystem::GetInstance()->PassiveSocket_2,
+			UGameplayTagsSubSystem::GetInstance()->PassiveSocket_3,
+			UGameplayTagsSubSystem::GetInstance()->PassiveSocket_4,
+			UGameplayTagsSubSystem::GetInstance()->PassiveSocket_5,
+		};
+
+		for (const auto& Iter : Ary)
+		{
+			auto SocketSPtr = MakeShared<FSocket_FASI>();
+			SocketSPtr->Socket = Iter;
+
+			SocketMap.Add(SocketSPtr->Socket, SocketSPtr);
+			AllocationSkills_Container.AddItem(SocketSPtr);
+		}
+	}
+#endif
+}
+
 void UProxyProcessComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
@@ -77,6 +121,11 @@ void UProxyProcessComponent::UpdateSocket(
 	const TSharedPtr<FSocket_FASI>& SkillsSocketInfo
 )
 {
+	if (SkillsSocketInfo->ProxySPtr)
+	{
+		SkillsSocketInfo->ProxyID = SkillsSocketInfo->ProxySPtr->GetID();
+	}
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -92,10 +141,7 @@ void UProxyProcessComponent::UpdateSocket_Server_Implementation(const FSocket_FA
 	auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 	*SkillsSocketInfo = Socket;
 
-	if (Socket.ProxySPtr)
-	{
-		SkillsSocketInfo->ProxySPtr = Socket.ProxySPtr->GetThisSPtr();
-	}
+	SkillsSocketInfo->ProxySPtr = AllocationSkills_Container.HoldingItemsComponentPtr->FindProxy(Socket.ProxyID);
 
 	Update(SkillsSocketInfo);
 }
@@ -226,12 +272,12 @@ void UProxyProcessComponent::GetWeaponSkills(
 	if (FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr)
 	{
 		auto WeaponSPtr = DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr);
-		FirstWeaponSkillSPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(WeaponSPtr->FirstSkill);
+		FirstWeaponSkillSPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(WeaponSPtr->GetWeaponSkill());
 	}
 	if (SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr)
 	{
 		auto WeaponSPtr = DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr);
-		SecondWeaponSkillSPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(WeaponSPtr->FirstSkill);
+		SecondWeaponSkillSPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(WeaponSPtr->GetWeaponSkill());
 	}
 }
 
@@ -245,6 +291,16 @@ TSharedPtr<FWeaponProxy> UProxyProcessComponent::FindWeaponSocket(const FGamepla
 	if (SocketMap.Contains(Tag))
 	{
 		return DynamicCastSharedPtr<FWeaponProxy>(SocketMap[Tag]->ProxySPtr);
+	}
+
+	return nullptr;
+}
+
+TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::FindWeaponSkillSocket(const FGameplayTag& Tag) const
+{
+	if (SocketMap.Contains(Tag))
+	{
+		return DynamicCastSharedPtr<FWeaponSkillProxy>(SocketMap[Tag]->ProxySPtr);
 	}
 
 	return nullptr;
@@ -415,7 +471,7 @@ TSharedPtr<FSocket_FASI> UProxyProcessComponent::FindSocket(const FGameplayTag& 
 TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillSocket(const FGameplayTag& Tag)const
 {
 	if (SocketMap.Contains(Tag))
-	{ 
+	{
 		return DynamicCastSharedPtr<FActiveSkillProxy>(SocketMap[Tag]->ProxySPtr);
 	}
 
@@ -478,25 +534,6 @@ void UProxyProcessComponent::Update(const TSharedPtr<FSocket_FASI>& Socket)
 			}
 #endif
 		}
-	}
-	else
-	{
-		SocketMap.Add(Socket->Socket, Socket);
-		if (Socket->ProxySPtr)
-		{
-			Socket->ProxySPtr->Allocation();
-		}
-
-#if UE_EDITOR || UE_SERVER
-		if (GetNetMode() == NM_DedicatedServer)
-		{
-			if (Socket->ProxySPtr)
-			{
-				Socket->ProxySPtr->Update2Client();
-			}
-			AllocationSkills_Container.AddItem(Socket);
-		}
-#endif
 	}
 }
 

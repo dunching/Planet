@@ -109,6 +109,18 @@ void UActionSkillsIcon::EnableIcon(bool bIsEnable)
 
 void UActionSkillsIcon::UpdateSkillState()
 {
+	if (IconSocket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket))
+	{
+		UpdateSkillState_ActiveSkill();
+	}
+	else if (IconSocket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket))
+	{
+		UpdateSkillState_ActiveWeapon();
+	}
+}
+
+void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
+{
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
 	{
@@ -169,9 +181,38 @@ void UActionSkillsIcon::UpdateSkillState()
 			SetInputRemainPercent(bIsAcceptInput, Percent);
 		}
 	}
-	else if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+}
+
+void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
 	{
+		return;
+	}
+
+	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
+	const auto SkillProxySPtr = EICPtr->FindWeaponSkillSocket(IconSocket);
+	if (!SkillProxySPtr)
+	{
+		return;
+	}
+
+	const auto SKillUnitType = SkillProxySPtr->GetUnitType();
+	{
+		auto GAInsPtr = SkillProxySPtr->GetGAInst();
+		if (!GAInsPtr)
+		{
+			return;
+		}
+
+		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+		SetCanRelease(bIsReady);
 		SetNum();
+	}
+
+	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	{
 	}
 }
 

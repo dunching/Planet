@@ -12,6 +12,7 @@
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
@@ -139,6 +140,14 @@ void USkill_WeaponActive_FoldingFan::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
+void USkill_WeaponActive_FoldingFan::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);
+	DOREPLIFETIME(ThisClass, CurrentFanNum);
+}
+
 void USkill_WeaponActive_FoldingFan::UpdateParam(const FGameplayEventData& GameplayEventData)
 {
 	Super::UpdateParam(GameplayEventData);
@@ -165,6 +174,13 @@ void USkill_WeaponActive_FoldingFan::StartTasksLink()
 {
 	if (WeaponPtr && CharacterPtr)
 	{
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+		{
+			CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
+		}
+#endif
+
 		PlayMontage();
 		RootMotion();
 	}
@@ -218,12 +234,6 @@ void USkill_WeaponActive_FoldingFan::OnNotifyBeginReceived(FName NotifyName)
 void USkill_WeaponActive_FoldingFan::OnMontateComplete()
 {
 	EmitProjectile();
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
-	{
-		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
-	}
-#endif
 }
 
 void USkill_WeaponActive_FoldingFan::EmitProjectile()

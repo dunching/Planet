@@ -40,6 +40,8 @@ public:
 
 	UProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
 
+	virtual void BeginPlay()override;
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
 	virtual void TickComponent(
@@ -97,6 +99,8 @@ public:
 	TSharedPtr<FWeaponProxy> GetActivedWeapon()const;
 
 	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& Tag)const;
+
+	TSharedPtr<FWeaponSkillProxy> FindWeaponSkillSocket(const FGameplayTag& Tag)const;
 #pragma endregion 
 
 #pragma region Consumables

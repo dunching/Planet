@@ -20,6 +20,7 @@ struct FAllocation_FASI_Container;
 class UProxyProcessComponent;
 class UHoldingItemsComponent;
 
+// 如果直接复制这个结构 访问ProxyID时需要特殊处理一下
 USTRUCT(BlueprintType)
 struct FSocket_FASI : public FFastArraySerializerItem
 {
@@ -40,7 +41,11 @@ struct FSocket_FASI : public FFastArraySerializerItem
 
 	FGameplayTag Socket;
 
-	TSharedPtr<FBasicProxy> ProxySPtr = nullptr;
+	FGuid ProxyID;
+
+	TSharedPtr<FBasicProxy>ProxySPtr = nullptr;
+
+	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
 };
 

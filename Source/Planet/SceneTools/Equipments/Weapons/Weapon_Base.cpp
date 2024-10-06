@@ -7,6 +7,8 @@
 #include "CharacterBase.h"
 #include "BaseFeatureComponent.h"
 #include "HumanCharacter.h"
+#include "HoldingItemsComponent.h"
+#include "PlanetPlayerController.h"
 
 void AWeapon_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
@@ -18,11 +20,31 @@ void AWeapon_Base::AttachToCharacter(ACharacterBase* CharacterPtr)
 	Super::AttachToCharacter(CharacterPtr);
 }
 
-void AWeapon_Base::SetWeaponUnit_Implementation(const FWeaponProxy& WeaponProxy)
+void AWeapon_Base::SetWeaponUnit_Implementation(const FGuid& WeaponProxy_ID)
 {
-	WeaponUnitPtr = DynamicCastSharedPtr<FWeaponProxy>(WeaponProxy.GetThisSPtr());
-	if (WeaponUnitPtr)
+	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
+
+	// 这里设置了 Owner。第一次掉取到的还是PC？
+	auto OwnerPtr = GetOwner<ACharacterBase>();
+	if (OwnerPtr)
 	{
-		AttachToCharacter(WeaponUnitPtr->GetAllocationCharacter());
+		HoldingItemsComponentPtr = OwnerPtr->GetHoldingItemsComponent();
+	}
+	else
+	{
+		auto OwnerPCPtr = GetOwner<APlanetPlayerController>();
+		if (OwnerPCPtr)
+		{
+			HoldingItemsComponentPtr = OwnerPCPtr->GetHoldingItemsComponent();
+		}
+	}
+
+	if (HoldingItemsComponentPtr)
+	{
+		WeaponUnitPtr = HoldingItemsComponentPtr->FindUnit_Weapon(WeaponProxy_ID);
+		if (WeaponUnitPtr)
+		{
+			AttachToCharacter(WeaponUnitPtr->GetAllocationCharacter());
+		}
 	}
 }

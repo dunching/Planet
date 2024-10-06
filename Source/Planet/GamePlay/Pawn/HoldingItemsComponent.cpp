@@ -113,6 +113,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 	TSharedPtr<FBasicProxy> Result;
 
 	const auto UnitType = ProxySPtr->GetUnitType();
+	ProxySPtr->HoldingItemsComponentPtr = this;
 
 	if (Result = FindProxy(ProxySPtr->GetID()))
 	{
@@ -269,10 +270,10 @@ TSharedPtr<FWeaponProxy> UHoldingItemsComponent::AddUnit_Weapon(const FGameplayT
 #endif
 
 	ResultPtr->UnitType = UnitType;
-	ResultPtr->OwnerCharacterUnitPtr = CharacterProxySPtr;
-	ResultPtr->FirstSkill = DynamicCastSharedPtr<FWeaponSkillProxy>(
-		AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType)
-	);
+	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+	ResultPtr->HoldingItemsComponentPtr = this;
+	ResultPtr->WeaponSkillID = 
+		AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType)->GetID();
 
 	ResultPtr->InitialUnit();
 
@@ -293,7 +294,7 @@ TSharedPtr<FWeaponProxy> UHoldingItemsComponent::Update_Weapon(const TSharedPtr<
 #if WITH_EDITOR
 #endif
 
-	ResultPtr->OwnerCharacterUnitPtr = CharacterProxySPtr;
+	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
 
 	SceneToolsAry.Add(ResultPtr);
 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -344,7 +345,8 @@ TSharedPtr<FSkillProxy>  UHoldingItemsComponent::AddUnit_Skill(const FGameplayTa
 #endif
 
 	ResultPtr->UnitType = UnitType;
-	ResultPtr->OwnerCharacterUnitPtr = CharacterProxySPtr;
+	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+	ResultPtr->HoldingItemsComponentPtr = this;
 
 	ResultPtr->InitialUnit();
 
@@ -403,7 +405,8 @@ TSharedPtr <FConsumableProxy> UHoldingItemsComponent::AddUnit_Consumable(const F
 
 	ResultPtr->Num = Num;
 	ResultPtr->UnitType = UnitType;
-	ResultPtr->OwnerCharacterUnitPtr = CharacterProxySPtr;
+	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+	ResultPtr->HoldingItemsComponentPtr = this;
 
 	ResultPtr->InitialUnit();
 
@@ -427,7 +430,8 @@ TSharedPtr<FToolProxy> UHoldingItemsComponent::AddUnit_ToolUnit(const FGameplayT
 #endif
 
 	ResultPtr->UnitType = UnitType;
-	ResultPtr->OwnerCharacterUnitPtr = CharacterProxySPtr;
+	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+	ResultPtr->HoldingItemsComponentPtr = this;
 
 	ResultPtr->InitialUnit();
 
@@ -461,7 +465,8 @@ TSharedPtr<FCoinProxy> UHoldingItemsComponent::AddUnit_Coin(const FGameplayTag& 
 #endif
 
 		ResultPtr->UnitType = UnitType;
-		ResultPtr->OwnerCharacterUnitPtr = CharacterProxySPtr;
+		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+		ResultPtr->HoldingItemsComponentPtr = this;
 		ResultPtr->Num = Num;
 
 		ResultPtr->InitialUnit();
@@ -625,7 +630,7 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddUnit_Character(const FGam
 #endif
 
 		ResultPtr->UnitType = UnitType;
-		ResultPtr->OwnerCharacterUnitPtr = CharacterProxySPtr;
+		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
 
 		ResultPtr->InitialUnit();
 

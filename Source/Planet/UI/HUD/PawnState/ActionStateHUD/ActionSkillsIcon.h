@@ -49,6 +49,10 @@ public:
 
 protected:
 
+	void UpdateSkillState_ActiveSkill();
+
+	void UpdateSkillState_ActiveWeapon();
+
 	void SetLevel();
 
 	void SetRemainingCooldown(

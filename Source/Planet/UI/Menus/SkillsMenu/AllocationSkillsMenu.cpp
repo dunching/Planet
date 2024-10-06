@@ -171,7 +171,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(
 				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
 				nullptr
 			);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -198,7 +198,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 			IconPtr->bPaseInvokeOnResetUnitEvent = true;
 			IconPtr->ResetToolUIByData(
 				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
 				nullptr
 			);
 			IconPtr->bPaseInvokeOnResetUnitEvent = false;
@@ -282,27 +282,60 @@ void UAllocationSkillsMenu::SyncData()
 	// 武器
 	{
 		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
+
+		// 主武器
+		// 
 		{
-			auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
-			FirstWeaponSocketInfoSPtr->Key = WeaponActiveSkills_Key;
-			FirstWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
 			if (IconPtr)
 			{
-				FirstWeaponSocketInfoSPtr->ProxySPtr = IconPtr->UnitPtr;
+				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
+				SocketSPtr->Key = WeaponActiveSkills_Key;
+				SocketSPtr->Socket = IconPtr->IconSocket;
+				SocketSPtr->ProxySPtr = IconPtr->UnitPtr;
+
+				EICPtr->UpdateSocket(SocketSPtr);
 			}
-			EICPtr->UpdateSocket(FirstWeaponSocketInfoSPtr);
 		}
+		// 武器技能
 		{
-			auto SecondWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
-			SecondWeaponSocketInfoSPtr->Key = WeaponActiveSkills_Key;
-			SecondWeaponSocketInfoSPtr->Socket = IconPtr->IconSocket;
+			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill1));
 			if (IconPtr)
 			{
-				SecondWeaponSocketInfoSPtr->ProxySPtr = IconPtr->UnitPtr;
+				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
+				SocketSPtr->Key = WeaponActiveSkills_Key;
+				SocketSPtr->Socket = IconPtr->IconSocket;
+				SocketSPtr->ProxySPtr = IconPtr->BasicUnitPtr;
+
+				EICPtr->UpdateSocket(SocketSPtr);
 			}
-			EICPtr->UpdateSocket(SecondWeaponSocketInfoSPtr);
+		}
+
+		// 副武器
+		{
+			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
+			if (IconPtr)
+			{
+				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
+				SocketSPtr->Key = WeaponActiveSkills_Key;
+				SocketSPtr->Socket = IconPtr->IconSocket;
+				SocketSPtr->ProxySPtr = IconPtr->UnitPtr;
+
+				EICPtr->UpdateSocket(SocketSPtr);
+			}
+		}
+		// 武器技能
+		{
+			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill2));
+			if (IconPtr)
+			{
+				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
+				SocketSPtr->Key = WeaponActiveSkills_Key;
+				SocketSPtr->Socket = IconPtr->IconSocket;
+				SocketSPtr->ProxySPtr = IconPtr->BasicUnitPtr;
+
+				EICPtr->UpdateSocket(SocketSPtr);
+			}
 		}
 	}
 
@@ -579,7 +612,7 @@ void UAllocationSkillsMenu::OnMainWeaponChanged(const TSharedPtr<FWeaponProxy>& 
 		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill1));
 		if (IconPtr)
 		{
-			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill : nullptr);
+			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->GetWeaponSkill() : nullptr);
 		}
 	}
 }
@@ -592,11 +625,11 @@ void UAllocationSkillsMenu::OnSecondaryWeaponChanged(const TSharedPtr<FWeaponPro
 		auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill2));
 		if (IconPtr)
 		{
-			if (ToolSPtr && !ToolSPtr->FirstSkill.IsValid())
+			if (ToolSPtr && !ToolSPtr->GetWeaponSkill().IsValid())
 			{
 			}
 
-			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->FirstSkill : nullptr);
+			IconPtr->ResetToolUIByData(ToolSPtr ? ToolSPtr->GetWeaponSkill() : nullptr);
 		}
 	}
 }

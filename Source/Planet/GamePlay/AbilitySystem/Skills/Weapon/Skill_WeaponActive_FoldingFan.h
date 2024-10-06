@@ -95,6 +95,8 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 	) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData)override;
 
 	TSharedPtr<FRegisterParamType> RegisterParamSPtr = nullptr;
@@ -142,9 +144,10 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Height = 100;
+	
+	UPROPERTY(Replicated)
+	int32 CurrentFanNum = 1;
 
 	FWeaponActorType* WeaponPtr = nullptr;
-
-	int32 CurrentFanNum = 1;
 
 };

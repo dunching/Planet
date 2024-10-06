@@ -21,7 +21,7 @@ class PLANET_API AWeapon_Base : public AToolUnitBase
 public:
 	
 	UFUNCTION(NetMulticast, Reliable)
-	void SetWeaponUnit(const FWeaponProxy& WeaponProxy);
+	void SetWeaponUnit(const FGuid& WeaponProxy_ID);
 
 	TSharedPtr<FWeaponProxy> WeaponUnitPtr = nullptr;
 

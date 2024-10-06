@@ -356,7 +356,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		{
 			IconPtr->ResetToolUIByData(
 				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
 				nullptr
 			);
 		}
@@ -367,7 +367,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		{
 			IconPtr->ResetToolUIByData(
 				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
 				nullptr
 			);
 		}
