@@ -231,11 +231,11 @@ void UPawnStateActionHUD::ResetUIByData()
 	}
 	InitialTalentUI();
 
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback(
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
 		std::bind(&ThisClass::InitialActiveSkillIcon, this)
 	);
 	InitialActiveSkillIcon();
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback(
+	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
 		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
 	);
 	InitialWeaponSkillIcon();
@@ -326,8 +326,8 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		return;
 	}
 
-	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI> FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI> SecondWeaponSocketInfoSPtr;
 
 	const auto CurrentWeaponSocket = CharacterPtr->GetProxyProcessComponent()->CurrentWeaponSocket;
 

@@ -78,6 +78,11 @@ void FBasicProxy::Cancel()
 
 }
 
+void FBasicProxy::End()
+{
+
+}
+
 void FBasicProxy::Allocation()
 {
 
@@ -624,6 +629,17 @@ void FWeaponSkillProxy::Cancel()
 	InGAInsPtr->SetContinuePerform(false);
 }
 
+void FWeaponSkillProxy::End()
+{
+	auto InGAInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
+	if (!InGAInsPtr)
+	{
+		return;
+	}
+
+	InGAInsPtr->K2_CancelAbility();
+}
+
 void FSkillProxy::RegisterSkill()
 {
 #if UE_EDITOR || UE_SERVER
@@ -1066,7 +1082,7 @@ void FWeaponProxy::RetractputWeapon()
 		ActivedWeaponPtr->Destroy();
 		ActivedWeaponPtr = nullptr;
 
-		GetWeaponSkill()->Cancel();
+		GetWeaponSkill()->End();
 		GetWeaponSkill()->ActivedWeaponPtr = nullptr;
 	}
 

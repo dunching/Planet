@@ -30,7 +30,7 @@ ASkill_WeaponActive_Bow_Projectile::ASkill_WeaponActive_Bow_Projectile(const FOb
 	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
 	NiagaraComponent->SetupAttachment(CollisionComp);
 
-	ProjectileMovementCompPtr->HomingAccelerationMagnitude = 2000.f;
+	ProjectileMovementCompPtr->HomingAccelerationMagnitude = 10000.f;
 	ProjectileMovementCompPtr->InitialSpeed = 100.f;
 	ProjectileMovementCompPtr->MaxSpeed = 100.f;
 	InitialLifeSpan = 10.f;

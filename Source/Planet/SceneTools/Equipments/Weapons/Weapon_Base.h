@@ -23,7 +23,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SetWeaponUnit(const FGuid& WeaponProxy_ID);
 
-	TSharedPtr<FWeaponProxy> WeaponUnitPtr = nullptr;
+	TSharedPtr<FWeaponProxy> WeaponProxyPtr = nullptr;
 
 protected:
 

@@ -129,6 +129,12 @@ bool USkill_WeaponActive_FoldingFan::CommitAbility(
 {
 	CurrentFanNum--;
 
+	if (CurrentFanNum < 0)
+	{
+		check(0);
+		CurrentFanNum = 0;
+	}
+
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
@@ -156,6 +162,13 @@ void USkill_WeaponActive_FoldingFan::UpdateParam(const FGameplayEventData& Gamep
 	{
 		RegisterParamSPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
 	}
+}
+
+bool USkill_WeaponActive_FoldingFan::GetNum(int32& Num) const
+{
+	Num = CurrentFanNum;
+
+	return true;
 }
 
 void USkill_WeaponActive_FoldingFan::PerformAction(
@@ -200,19 +213,20 @@ void USkill_WeaponActive_FoldingFan::OnProjectileBounce(
 		auto OtherCharacterPtr = Cast<ACharacterBase>(OtherActor);
 		if (OtherCharacterPtr == CharacterPtr)
 		{
-			CurrentFanNum++;
-			if (WeaponPtr)
+			auto ActivedWeaponPtr = Cast<FWeaponActorType>(OverlappedComponent->GetOwner());
+			if (ActivedWeaponPtr && ActivedWeaponPtr->bIsReachFarestPoint)
 			{
-				OverlappedComponent->GetOwner()->Destroy();
-			}
-			else
-			{
-				WeaponPtr = Cast<FWeaponActorType>(OverlappedComponent->GetOwner());
-				WeaponPtr->AttachToCharacter(CharacterPtr);
-			}
+				CurrentFanNum++;
+				if (WeaponPtr)
+				{
+					WeaponPtr->SetActorHiddenInGame(false);
+				}
 
-			K2_CancelAbility();
-			return;
+				ActivedWeaponPtr->Destroy();
+
+				K2_CancelAbility();
+				return;
+			}
 		}
 		
 		if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
@@ -222,6 +236,11 @@ void USkill_WeaponActive_FoldingFan::OnProjectileBounce(
 
 		MakeDamage(OtherCharacterPtr);
 	}
+}
+
+void USkill_WeaponActive_FoldingFan::OnCurrentFanNumChanged()
+{
+//	WeaponPtr->SetActorHiddenInGame(CurrentFanNum <= 0);
 }
 
 void USkill_WeaponActive_FoldingFan::OnNotifyBeginReceived(FName NotifyName)
@@ -238,17 +257,31 @@ void USkill_WeaponActive_FoldingFan::OnMontateComplete()
 
 void USkill_WeaponActive_FoldingFan::EmitProjectile()
 {
-	if (WeaponPtr)
-	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	{
+		FActorSpawnParameters SpawnParameters;
+
+		SpawnParameters.Owner = CharacterPtr;
+
+		auto ActivedWeaponPtr = GWorld->SpawnActor<FWeaponActorType>(
+			WeaponPtr->GetClass(),
+			WeaponPtr->GetTransform(),
+			SpawnParameters
+		);
+		if (ActivedWeaponPtr)
 		{
-			WeaponPtr->GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnProjectileBounce);
+			ActivedWeaponPtr->SetWeaponUnit(WeaponPtr->WeaponProxyPtr->GetID());
+			ActivedWeaponPtr->GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnProjectileBounce);
+			ActivedWeaponPtr->BeginAttack();
 		}
-#endif
-		WeaponPtr->BeginAttack();
-		WeaponPtr = nullptr;
+
+		if (CurrentFanNum <= 0)
+		{
+			WeaponPtr->SetActorHiddenInGame(true);
+		}
 	}
+#endif
 }
 
 void USkill_WeaponActive_FoldingFan::MakeDamage(ACharacterBase* TargetCharacterPtr)

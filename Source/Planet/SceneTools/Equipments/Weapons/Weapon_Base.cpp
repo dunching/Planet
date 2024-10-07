@@ -41,10 +41,10 @@ void AWeapon_Base::SetWeaponUnit_Implementation(const FGuid& WeaponProxy_ID)
 
 	if (HoldingItemsComponentPtr)
 	{
-		WeaponUnitPtr = HoldingItemsComponentPtr->FindUnit_Weapon(WeaponProxy_ID);
-		if (WeaponUnitPtr)
+		WeaponProxyPtr = HoldingItemsComponentPtr->FindUnit_Weapon(WeaponProxy_ID);
+		if (WeaponProxyPtr)
 		{
-			AttachToCharacter(WeaponUnitPtr->GetAllocationCharacter());
+			AttachToCharacter(WeaponProxyPtr->GetAllocationCharacter());
 		}
 	}
 }

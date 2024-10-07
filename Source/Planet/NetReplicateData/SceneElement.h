@@ -103,6 +103,9 @@ public:
 
 	//  取消 激活
 	virtual void Cancel();
+	
+	//  取消
+	virtual void End();
 
 	// 装备至插槽
 	virtual void Allocation();
@@ -466,6 +469,8 @@ public:
 	virtual bool Active()override;
 
 	virtual void Cancel()override;
+
+	virtual void End()override;
 
 	FTableRowUnit_WeaponSkillExtendInfo* GetTableRowUnit_WeaponSkillExtendInfo()const;
 

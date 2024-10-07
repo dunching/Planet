@@ -209,7 +209,7 @@ void USkill_WeaponActive_Bow::EmitProjectile()const
 {
 	auto EmitTransform = WeaponPtr->GetEmitTransform();
 
-	const auto AttackDistance = WeaponPtr->WeaponUnitPtr->GetMaxAttackDistance();
+	const auto AttackDistance = WeaponPtr->WeaponProxyPtr->GetMaxAttackDistance();
 
 	ACharacterBase* HomingTarget = nullptr;
 	if (RegisterParamSPtr && RegisterParamSPtr->bIsHomingTowards)

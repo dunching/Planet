@@ -35,7 +35,7 @@ public:
 
 	using FOwnerType = ACharacterBase;
 
-	using FOnAllocationChanged =
+	using FOnCurrentWeaponChanged =
 		TCallbackHandleContainer<void()>;
 
 	UProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
@@ -106,7 +106,7 @@ public:
 #pragma region Consumables
 #pragma endregion 
 
-	FOnAllocationChanged OnAllocationChanged;
+	FOnCurrentWeaponChanged OnCurrentWeaponChanged;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
 	FGameplayTag CurrentWeaponSocket;

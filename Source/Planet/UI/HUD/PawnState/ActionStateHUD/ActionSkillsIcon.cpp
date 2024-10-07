@@ -17,6 +17,7 @@
 #include "Engine/Texture2D.h"
 #include "ToolsLibrary.h"
 #include "BackpackIcon.h"
+#include "Kismet/KismetStringLibrary.h"
 
 #include "TemplateHelper.h"
 
@@ -29,6 +30,7 @@
 #include "Skill_Base.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_Active_Base.h"
+#include "Skill_WeaponActive_Base.h"
 #include "SceneElement.h"
 #include "StateProcessorComponent.h"
 
@@ -41,6 +43,8 @@ struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 	const FName StateOverlap = TEXT("StateOverlap");
 
 	const FName Icon = TEXT("Icon");
+
+	const FName Number = TEXT("Number");
 
 	const FName CooldownProgress = TEXT("CooldownProgress");
 
@@ -127,16 +131,10 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-	const auto SkillProxySPtr = EICPtr->FindActiveSkillSocket(IconSocket);
-	if (!SkillProxySPtr)
-	{
-		return;
-	}
 
-	const auto SKillUnitType = SkillProxySPtr->GetUnitType();
+	const auto SKillUnitType = UnitPtr->GetUnitType();
 	{
-		auto GAInsPtr = SkillProxySPtr->GetGAInst();
+		auto GAInsPtr = UnitPtr->GetGAInst();
 		if (!GAInsPtr)
 		{
 			return;
@@ -147,6 +145,12 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 	}
 	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
 	{
+		const auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(UnitPtr);
+		if (!SkillProxySPtr)
+		{
+			return;
+		}
+
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
@@ -191,8 +195,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		return;
 	}
 
-	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-	const auto SkillProxySPtr = EICPtr->FindWeaponSkillSocket(IconSocket);
+	const auto SkillProxySPtr = UnitPtr;
 	if (!SkillProxySPtr)
 	{
 		return;
@@ -205,14 +208,21 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		{
 			return;
 		}
-
 		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
 		SetCanRelease(bIsReady);
-		SetNum();
 	}
 
 	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
 	{
+		auto GAInsPtr = Cast<USkill_WeaponActive_Base>(SkillProxySPtr->GetGAInst());
+		if (!GAInsPtr)
+		{
+			return;
+		}
+
+		int32 Num = 0;
+		const auto bIsDisplay = GAInsPtr->GetNum(Num);
+		SetNum(bIsDisplay, Num);
 	}
 }
 
@@ -327,9 +337,17 @@ void UActionSkillsIcon::SetItemType()
 	}
 }
 
-void UActionSkillsIcon::SetNum()
+void UActionSkillsIcon::SetNum(bool bIsDisplay, int32 Num)
 {
-
+	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FActionSkillsIcon::Get().Number));
+	if (UIPtr)
+	{
+		UIPtr->SetVisibility(bIsDisplay ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		if (bIsDisplay)
+		{
+			UIPtr->SetText(FText::FromString(UKismetStringLibrary::Conv_IntToString(Num)));
+		}
+	}
 }
 
 void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)

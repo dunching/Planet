@@ -119,6 +119,11 @@ void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
 	}
 }
 
+bool USkill_WeaponActive_Base::GetNum(int32& Num) const
+{
+	return false;
+}
+
 void USkill_WeaponActive_Base::ContinueActive()
 {
 	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))

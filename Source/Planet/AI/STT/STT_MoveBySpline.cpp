@@ -119,46 +119,59 @@ EStateTreeRunStatus FSTT_MoveBySpline::PerformMoveTask(
 		.SetUsePathfinding(true);
 
 	const auto SPlinePoint = InstanceData.SPlinePtr->GetWorldLocationAtSplinePoint(InstanceData.PointIndex);
-	const auto SPlinePointNum = InstanceData.SPlinePtr->GetNumberOfSplinePoints();
-	InstanceData.PointIndex++;
-	InstanceData.PointIndex = InstanceData.PointIndex % SPlinePointNum;
+	FNavLocation OutLocation;
 
-#ifdef WITH_EDITOR
-	if (DrawDebugSTT_MoveBySpline.GetValueOnGameThread())
+	auto NavSysPtr = UNavigationSystemV1::GetNavigationSystem(&Controller);
+	ANavigationData* UseNavData = NavSysPtr->GetDefaultNavDataInstance(FNavigationSystem::DontCreate);
+	if (NavSysPtr->ProjectPointToNavigation(
+		SPlinePoint,
+		OutLocation,
+		INVALID_NAVEXTENT, 
+		UseNavData
+	))
 	{
-		DrawDebugSphere(InstanceData.SPlinePtr->GetWorld(), SPlinePoint, 20, 20, FColor::Yellow, false, 5);
-	}
+		const auto SPlinePointNum = InstanceData.SPlinePtr->GetNumberOfSplinePoints();
+		InstanceData.PointIndex++;
+		InstanceData.PointIndex = InstanceData.PointIndex % SPlinePointNum;
+
+		const auto TargetPt = OutLocation.Location;
+#ifdef WITH_EDITOR
+		if (DrawDebugSTT_MoveBySpline.GetValueOnGameThread())
+		{
+			DrawDebugSphere(InstanceData.SPlinePtr->GetWorld(), TargetPt, 20, 20, FColor::Yellow, false, 5);
+		}
 #endif
 
-	MoveReq.SetGoalLocation(SPlinePoint);
+		MoveReq.SetGoalLocation(TargetPt);
 
-	if (MoveReq.IsValid())
-	{
-		InstanceData.AITaskPtr = nullptr;
-		InstanceData.AITaskPtr = PrepareMoveToTask(Context, Controller, InstanceData.AITaskPtr, MoveReq);
-		if (InstanceData.AITaskPtr)
+		if (MoveReq.IsValid())
 		{
-			if (
-				InstanceData.AITaskPtr->IsActive() || 
-				InstanceData.AITaskPtr->IsFinished()
-				)
+			InstanceData.AITaskPtr = nullptr;
+			InstanceData.AITaskPtr = PrepareMoveToTask(Context, Controller, InstanceData.AITaskPtr, MoveReq);
+			if (InstanceData.AITaskPtr)
 			{
-				InstanceData.AITaskPtr->ConditionalPerformMove();
-			}
-			else
-			{
-				InstanceData.AITaskPtr->ReadyForActivation();
-			}
+				if (
+					InstanceData.AITaskPtr->IsActive() ||
+					InstanceData.AITaskPtr->IsFinished()
+					)
+				{
+					InstanceData.AITaskPtr->ConditionalPerformMove();
+				}
+				else
+				{
+					InstanceData.AITaskPtr->ReadyForActivation();
+				}
 
-			if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
-			{
-//				return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
-			}
+				if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
+				{
+					//				return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
+				}
 
-			return EStateTreeRunStatus::Running;
+				return EStateTreeRunStatus::Running;
+			}
 		}
-	}
 
+	}
 	UE_VLOG(Context.GetOwner(), LogStateTree, Error, TEXT("FStateTreeMoveToTask failed because it doesn't have a destination."));
 	return EStateTreeRunStatus::Failed;
 }

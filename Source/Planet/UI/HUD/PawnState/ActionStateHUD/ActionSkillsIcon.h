@@ -67,7 +67,7 @@ protected:
 
 	void SetItemType();
 
-	void SetNum();
+	void SetNum(bool bIsDisplay, int32 Num);
 
 	void SetInputRemainPercent(bool bIsAcceptInput, float Percent);
 

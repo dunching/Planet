@@ -81,13 +81,24 @@ bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward)
 {
 	// 找到当前装备的 弓箭类武器
+	TSharedPtr<FWeaponSkillProxy> TargetSkillSPtr = nullptr;
+
 	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr;
 	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr;
 	CharacterPtr->GetProxyProcessComponent()->GetWeaponSkills(FirstWeaponSkillSPtr, SecondWeaponSkillSPtr);
-	if (FirstWeaponSkillSPtr)
+	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetUnitType() == UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow)
+	{
+		TargetSkillSPtr = FirstWeaponSkillSPtr;
+	}
+	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetUnitType() == UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow)
+	{
+		TargetSkillSPtr = SecondWeaponSkillSPtr;
+	}
+
+	if (TargetSkillSPtr)
 	{
 		auto RegisterParamPtr =
-			Cast<USkill_WeaponActive_Bow>(FirstWeaponSkillSPtr->GetGAInst())->RegisterParamSPtr;
+			Cast<USkill_WeaponActive_Bow>(TargetSkillSPtr->GetGAInst())->RegisterParamSPtr;
 		auto GameplayAbilityTargetPtr =
 			DeepClone_GameplayAbilityTargetData<FGameplayAbilityTargetData_Bow_RegisterParam>(RegisterParamPtr.Get());
 
@@ -97,7 +108,7 @@ void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward
 		GameplayEventData.TargetData.Add(GameplayAbilityTargetPtr);
 
 		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->Replicate_UpdateGAParam(
-			FirstWeaponSkillSPtr->GetGAHandle(),
+			TargetSkillSPtr->GetGAHandle(),
 			GameplayEventData
 		);
 	}

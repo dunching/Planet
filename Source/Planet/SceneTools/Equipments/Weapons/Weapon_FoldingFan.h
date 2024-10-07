@@ -32,12 +32,15 @@ public:
 
 	USkeletalMeshComponent* GetMesh()const;
 	
+	UFUNCTION(NetMulticast, Reliable)
 	void BeginAttack();
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void EndAttack();
 	
 	USphereComponent* GetCollisionComponent();
+
+	bool bIsReachFarestPoint = false;
 
 protected:
 

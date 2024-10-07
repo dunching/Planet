@@ -100,7 +100,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback([this]() {
+			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback([this]() {
 				AddOrRemoveUseMenuItemEvent(true);
 				});
 

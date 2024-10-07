@@ -211,11 +211,11 @@ void AHumanAIController::InitialCharacter()
 					auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
 					if (TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
 					{
-						auto WeaponUnitPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
-						if (WeaponUnitPtr)
+						auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
+						if (WeaponProxyPtr)
 						{
 							FirstWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1;
-							FirstWeaponSocketInfoSPtr->ProxySPtr = WeaponUnitPtr;
+							FirstWeaponSocketInfoSPtr->ProxySPtr = WeaponProxyPtr;
 							FirstWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
 						}
 					}
@@ -224,11 +224,11 @@ void AHumanAIController::InitialCharacter()
 					auto SecondWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
 					if (TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo.IsValid())
 					{
-						auto WeaponUnitPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo);
-						if (WeaponUnitPtr)
+						auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo);
+						if (WeaponProxyPtr)
 						{
 							SecondWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2;
-							SecondWeaponSocketInfoSPtr->ProxySPtr = WeaponUnitPtr;
+							SecondWeaponSocketInfoSPtr->ProxySPtr = WeaponProxyPtr;
 							SecondWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
 						}
 					}

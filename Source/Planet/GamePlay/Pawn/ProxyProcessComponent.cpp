@@ -125,6 +125,10 @@ void UProxyProcessComponent::UpdateSocket(
 	{
 		SkillsSocketInfo->ProxyID = SkillsSocketInfo->ProxySPtr->GetID();
 	}
+	else
+	{
+		SkillsSocketInfo->ProxyID = FGuid();
+	}
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
@@ -144,6 +148,12 @@ void UProxyProcessComponent::UpdateSocket_Server_Implementation(const FSocket_FA
 	SkillsSocketInfo->ProxySPtr = AllocationSkills_Container.HoldingItemsComponentPtr->FindProxy(Socket.ProxyID);
 
 	Update(SkillsSocketInfo);
+// 	if (SocketMap.Contains(Socket.Socket))
+// 	{
+// 		SocketMap[Socket.Socket]->ProxySPtr = AllocationSkills_Container.HoldingItemsComponentPtr->FindProxy(Socket.ProxyID);
+// 
+// 		Update(SocketMap[Socket.Socket]);
+// 	}
 }
 
 void UProxyProcessComponent::ActiveWeapon_Server_Implementation()
@@ -181,12 +191,18 @@ void UProxyProcessComponent::ActiveWeapon()
 	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
 	{
 		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1];
-		SwitchWeaponImp(WeaponSocketSPtr->Socket);
+		if (WeaponSocketSPtr->ProxyID.IsValid())
+		{
+			SwitchWeaponImp(WeaponSocketSPtr->Socket);
+		}
 	}
 	else if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
 	{
 		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
-		SwitchWeaponImp(WeaponSocketSPtr->Socket);
+		if (WeaponSocketSPtr->ProxyID.IsValid())
+		{
+			SwitchWeaponImp(WeaponSocketSPtr->Socket);
+		}
 	}
 
 #if UE_EDITOR || UE_CLIENT
@@ -449,7 +465,7 @@ void UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket
 
 		CurrentWeaponSocket = NewWeaponSocket;
 
-		OnAllocationChanged();
+		OnCurrentWeaponChanged();
 	}
 }
 
@@ -525,6 +541,7 @@ void UProxyProcessComponent::Update(const TSharedPtr<FSocket_FASI>& Socket)
 #endif
 			}
 
+			SocketMap[Socket->Socket]->ProxyID = Socket->ProxyID;
 			SocketMap[Socket->Socket]->ProxySPtr = Socket->ProxySPtr;
 
 #if UE_EDITOR || UE_SERVER

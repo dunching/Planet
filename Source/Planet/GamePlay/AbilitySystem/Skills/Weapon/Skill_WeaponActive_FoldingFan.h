@@ -99,6 +99,8 @@ public:
 
 	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData)override;
 
+	virtual bool GetNum(int32& Num)const override;
+
 	TSharedPtr<FRegisterParamType> RegisterParamSPtr = nullptr;
 
 protected:
@@ -135,6 +137,9 @@ protected:
 		bool bFromSweep, 
 		const FHitResult& SweepResult
 	);
+	
+	UFUNCTION()
+	void OnCurrentFanNumChanged();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
@@ -145,7 +150,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Height = 100;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnCurrentFanNumChanged)
 	int32 CurrentFanNum = 1;
 
 	FWeaponActorType* WeaponPtr = nullptr;

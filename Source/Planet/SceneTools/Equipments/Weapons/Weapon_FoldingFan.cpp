@@ -63,7 +63,7 @@ USkeletalMeshComponent* AWeapon_FoldingFan::GetMesh()const
 	return SkeletalComponentPtr;
 }
 
-void AWeapon_FoldingFan::BeginAttack()
+void AWeapon_FoldingFan::BeginAttack_Implementation()
 {
 	ProjectileMovementCompPtr->bIsHomingProjectile = false;
 	ProjectileMovementCompPtr->SetActive(true);
@@ -73,10 +73,10 @@ void AWeapon_FoldingFan::BeginAttack()
 #if UE_EDITOR || UE_SERVER
 	if (GetLocalRole() == ROLE_Authority)
 	{
-		auto Vec = WeaponUnitPtr->GetAllocationCharacter()->GetActorRotation().Vector();
+		auto Vec = WeaponProxyPtr->GetAllocationCharacter()->GetActorRotation().Vector();
 // 		auto Vec = UKismetMathLibrary::MakeRotFromZX(
 // 			-UKismetGravityLibrary::GetGravity(), 
-// 			WeaponUnitPtr->GetAllocationCharacter()->GetControlRotation().Vector()
+// 			WeaponProxyPtr->GetAllocationCharacter()->GetControlRotation().Vector()
 // 		).Vector();
 		Vec = Vec.RotateAngleAxis(10.f, Vec.ToOrientationQuat().GetRightVector()) * ProjectileMovementCompPtr->InitialSpeed;
 // 
@@ -85,7 +85,7 @@ void AWeapon_FoldingFan::BeginAttack()
 //		ProjectileMovementCompPtr->SetVelocityInLocalSpace(Vec);
 
 		StartPt = GetActorLocation();
-		MaxMoveRange = WeaponUnitPtr->GetMaxAttackDistance();
+		MaxMoveRange = WeaponProxyPtr->GetMaxAttackDistance();
 	}
 #endif
 }
@@ -140,6 +140,13 @@ void AWeapon_FoldingFan::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 void AWeapon_FoldingFan::OnReachFarestPoint_Implementation()
 {
-	ProjectileMovementCompPtr->bIsHomingProjectile = true;
-	ProjectileMovementCompPtr->HomingTargetComponent = WeaponUnitPtr->GetAllocationCharacter()->GetRootComponent();
+#if UE_EDITOR || UE_SERVER
+	if (GetLocalRole() > ROLE_SimulatedProxy)
+	{
+		bIsReachFarestPoint = true;
+
+		ProjectileMovementCompPtr->bIsHomingProjectile = true;
+		ProjectileMovementCompPtr->HomingTargetComponent = WeaponProxyPtr->GetAllocationCharacter()->GetRootComponent();
+	}
+#endif
 }
