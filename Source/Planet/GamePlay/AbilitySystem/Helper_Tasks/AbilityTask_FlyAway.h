@@ -43,6 +43,16 @@ public:
 		float Height
 	);
 
+	static UAbilityTask_FlyAway* NewTask(
+		UGameplayAbility* OwningAbility,
+		FName TaskInstanceName,
+		ERootMotionAccumulateMode RootMotionAccumulateMode,
+		float Duration,
+		float Height,
+		int32 ResingSpeed,
+		int32 FallingSpeed
+	);
+
 	virtual void TickTask(float DeltaTime) override;
 
 	virtual void Activate() override;
@@ -66,6 +76,12 @@ protected:
 	
 	UPROPERTY(Replicated)
 	float Duration = 1.f;
+	
+	UPROPERTY(Replicated)
+	int32 ResingSpeed = 100;
+	
+	UPROPERTY(Replicated)
+	int32 FallingSpeed = 100;
 	
 	UPROPERTY(Replicated)
 	ERootMotionAccumulateMode RootMotionAccumulateMode = ERootMotionAccumulateMode::Additive;

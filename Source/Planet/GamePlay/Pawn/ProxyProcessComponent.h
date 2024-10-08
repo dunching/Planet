@@ -95,6 +95,10 @@ public:
 		TSharedPtr<FWeaponSkillProxy>& FirstWeaponSkillSPtr,
 		TSharedPtr<FWeaponSkillProxy>& SecondWeaponSkillSPtr
 	);
+	
+	TSharedPtr<FWeaponSkillProxy> GetWeaponSkillByType(
+		const FGameplayTag&TypeTag
+	);
 
 	TSharedPtr<FWeaponProxy> GetActivedWeapon()const;
 

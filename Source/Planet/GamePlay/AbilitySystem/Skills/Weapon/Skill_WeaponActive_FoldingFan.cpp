@@ -32,6 +32,7 @@
 #include "BaseFeatureComponent.h"
 #include "KismetGravityLibrary.h"
 #include "AbilityTask_FlyAway.h"
+#include "LogWriter.h"
 
 namespace Skill_WeaponActive_FoldingFan
 {
@@ -49,8 +50,7 @@ bool FGameplayAbilityTargetData_FoldingFan_RegisterParam::NetSerialize(FArchive&
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
-	Ar << bIsHomingTowards;
-	Ar << bIsMultiple;
+	Ar << IncreaseNum;
 
 	return true;
 }
@@ -77,6 +77,8 @@ void USkill_WeaponActive_FoldingFan::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	AbilityTask_PlayMontage_HumanPtr = nullptr;
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
@@ -150,17 +152,43 @@ void USkill_WeaponActive_FoldingFan::GetLifetimeReplicatedProps(TArray<FLifetime
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);
-	DOREPLIFETIME(ThisClass, CurrentFanNum);
+	DOREPLIFETIME_CONDITION(ThisClass, CurrentFanNum, COND_AutonomousOnly);
 }
 
 void USkill_WeaponActive_FoldingFan::UpdateParam(const FGameplayEventData& GameplayEventData)
 {
 	Super::UpdateParam(GameplayEventData);
 
-	if (GameplayEventData.TargetData.IsValid(0))
+	if (!GameplayEventData.TargetData.IsValid(0))
 	{
-		RegisterParamSPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
+		check(0);
+	}
+	RegisterParamSPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
+	if (!RegisterParamSPtr)
+	{
+		check(0);
+	}
+
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	{
+		CurrentFanNum += RegisterParamSPtr->IncreaseNum;
+	}
+#endif
+}
+
+void USkill_WeaponActive_FoldingFan::CheckInContinue()
+{
+	if (
+		bIsContinue && 
+		!RootMotionPtr &&
+		CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()) 
+		)
+	{
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+	}
+	else
+	{
 	}
 }
 
@@ -187,13 +215,6 @@ void USkill_WeaponActive_FoldingFan::StartTasksLink()
 {
 	if (WeaponPtr && CharacterPtr)
 	{
-#if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetLocalRole() == ROLE_Authority)
-		{
-			CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
-		}
-#endif
-
 		PlayMontage();
 		RootMotion();
 	}
@@ -224,7 +245,12 @@ void USkill_WeaponActive_FoldingFan::OnProjectileBounce(
 
 				ActivedWeaponPtr->Destroy();
 
-				K2_CancelAbility();
+#if UE_EDITOR || UE_SERVER
+				if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+				{
+					OnCurrentFanNumChanged();
+				}
+#endif
 				return;
 			}
 		}
@@ -252,7 +278,35 @@ void USkill_WeaponActive_FoldingFan::OnNotifyBeginReceived(FName NotifyName)
 
 void USkill_WeaponActive_FoldingFan::OnMontateComplete()
 {
+	AbilityTask_PlayMontage_HumanPtr = nullptr;
+
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	{
+		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
+	}
+#endif
+
 	EmitProjectile();
+}
+
+void USkill_WeaponActive_FoldingFan::OnMotionComplete()
+{
+	RootMotionPtr = nullptr;
+
+	if (bIsContinue)
+	{
+		CheckInContinue();
+	}
+	else
+	{
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+		{
+			K2_CancelAbility();
+		}
+#endif
+	}
 }
 
 void USkill_WeaponActive_FoldingFan::EmitProjectile()
@@ -313,7 +367,7 @@ void USkill_WeaponActive_FoldingFan::PlayMontage()
 		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 		)
 	{
-		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+		AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
 			TEXT(""),
 			HumanMontage,
@@ -335,14 +389,18 @@ void USkill_WeaponActive_FoldingFan::RootMotion()
 	if (CharacterPtr->GetLocalRole() > ROLE_SimulatedProxy)
 	{
 		const auto Lenth = HumanMontage->CalculateSequenceLength();
-		auto TaskPtr = UAbilityTask_FlyAway::NewTask(
+
+		RootMotionPtr = UAbilityTask_FlyAway::NewTask(
 			this,
 			TEXT(""),
 			ERootMotionAccumulateMode::Additive,
 			Lenth,
-			Height
+			Height,
+			ResingSpeed,
+			FallingSpeed
 		);
 
-		TaskPtr->ReadyForActivation();
+		RootMotionPtr->OnFinish.BindUObject(this, &ThisClass::OnMotionComplete);
+		RootMotionPtr->ReadyForActivation();
 	}
 }

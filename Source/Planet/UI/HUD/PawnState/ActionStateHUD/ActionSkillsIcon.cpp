@@ -104,6 +104,7 @@ void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 
 	// 
 	SetInputRemainPercent(false, 0.f);
+	SetNum(false, 0);
 }
 
 void UActionSkillsIcon::EnableIcon(bool bIsEnable)

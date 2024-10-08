@@ -56,7 +56,9 @@ void USkill_Active_BYWD::ActivateAbility(
 				TEXT(""),
 				ERootMotionAccumulateMode::Additive,
 				Duration,
-				Height
+				Height,
+				Height,
+				-1
 			);
 
 #if UE_EDITOR || UE_SERVER

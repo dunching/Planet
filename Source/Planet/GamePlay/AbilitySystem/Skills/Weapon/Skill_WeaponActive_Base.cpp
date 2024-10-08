@@ -162,7 +162,7 @@ void USkill_WeaponActive_Base::PerformAction(
 
 void USkill_WeaponActive_Base::CheckInContinue()
 {
-	if (bIsContinue)
+	if (bIsContinue && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
 	{
 		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 	}
@@ -177,7 +177,12 @@ void USkill_WeaponActive_Base::CheckInContinue()
 			WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
 			WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
 			WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
-				K2_CancelAbility();
+#if UE_EDITOR || UE_SERVER
+				if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+				{
+					K2_CancelAbility();
+				}
+#endif
 				return true;
 				});
 		}

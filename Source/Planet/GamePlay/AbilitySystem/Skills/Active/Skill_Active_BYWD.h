@@ -36,7 +36,7 @@ protected:
 	UAnimMontage* HumanMontage1 = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Height = 300;
+	int32 Height = 500;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Duration = 3.f;

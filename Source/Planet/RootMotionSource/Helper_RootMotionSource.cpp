@@ -383,7 +383,8 @@ bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
 	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
 
 	return
-		FMath::IsNearlyEqual(RiseDuration, OtherCast->RiseDuration) &&
+		RisingSpeed == OtherCast->RisingSpeed &&
+		FallingSpeed == OtherCast->FallingSpeed &&
 		Height == OtherCast->Height;
 }
 
@@ -406,7 +407,8 @@ bool FRootMotionSource_FlyAway::UpdateStateFrom(const FRootMotionSource* SourceT
 
 	auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(SourceToTakeStateFrom);
 
-	RiseDuration = OtherCast->RiseDuration;
+	RisingSpeed = OtherCast->RisingSpeed;
+	FallingSpeed = OtherCast->FallingSpeed;
 	Height = OtherCast->Height;
 
 	return true;
@@ -435,44 +437,48 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	if (Character.GetWorld()->LineTraceSingleByChannel(
 		Result,
 		CurrentLocation,
-		CurrentLocation + (GravityDir * Height * 2), // * 2， 避免找不到
+		CurrentLocation + (GravityDir * Line), // 避免找不到
 		CollisionChannel,
 		Params
 	))
 	{
-	}
+		const auto CurrentHeight = FVector::Distance(Result.ImpactPoint, CurrentLocation);
 
-	FVector Force = FVector::ZeroVector;
+		FVector Force = FVector::ZeroVector;
 
-	// 下降
-	if (GetTime() >= GetDuration())
-	{
-		if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
+		// 下降
+		if (GetTime() >= GetDuration())
 		{
-			bIsFalling = false;
+			if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
+			{
+				bIsFalling = false;
+			}
+			else if(FallingSpeed > 0)
+			{
+				Force.Z = -FallingSpeed;
+			}
+			else
+			{
+				const FVector Gravity = -MoveComponent.GetGravityDirection() * MoveComponent.GetGravityZ();
+				Force = MoveComponent.NewFallVelocity(Force, Gravity, SimulationTime) / MovementTickTime;
+			}
 		}
+		// 上升
+		else if (CurrentHeight < (Height + HalfHeight))
+		{
+			Force.Z = RisingSpeed;
+		}
+		// 维持高度
 		else
 		{
-			const FVector Gravity = -MoveComponent.GetGravityDirection() * MoveComponent.GetGravityZ();
-			Force = MoveComponent.NewFallVelocity(Force, Gravity, SimulationTime) / MovementTickTime;
 		}
-	}
-	// 上升
-	else if (GetTime() < RiseDuration)
-	{
-		const float MoveFraction = (Height + HalfHeight) / RiseDuration;
-		Force.Z = MoveFraction * SimulationTime / MovementTickTime;
-	}
-	// 维持高度
-	else
-	{
-	}
 
-	NewTransform.SetTranslation(Force);
-	const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
-	NewTransform.ScaleTranslation(Multiplier);
+		NewTransform.SetTranslation(Force);
+		const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
+		NewTransform.ScaleTranslation(Multiplier);
 
-	RootMotionParams.Set(NewTransform);
+		RootMotionParams.Set(NewTransform);
+	}
 
 	const auto NewTime = GetTime() + SimulationTime;
 	if (NewTime >= GetDuration())
@@ -497,7 +503,8 @@ bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 		return false;
 	}
 
-	Ar << RiseDuration;
+	Ar << RisingSpeed;
+	Ar << FallingSpeed;
 	Ar << Height;
 
 	bOutSuccess = true;
@@ -524,6 +531,8 @@ void FRootMotionSource_FlyAway::CheckTimeOut()
 void FRootMotionSource_FlyAway::Initial(
 	float InHeight,
 	float InDuration,
+	int32 InRisingSpeed,
+	int32 InFallingSpeed,
 	const FVector& OriginalPt,
 	ACharacter* CharacterPtr
 )
@@ -531,20 +540,29 @@ void FRootMotionSource_FlyAway::Initial(
 	CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
 	FVector CapsuleExtent(Radius, Radius, HalfHeight);
 
-	UpdateDuration(InHeight, InDuration, OriginalPt);
+	UpdateDuration(
+		InHeight,
+		InDuration,
+		InRisingSpeed,
+		InFallingSpeed,
+		OriginalPt
+	);
 }
 
 void FRootMotionSource_FlyAway::UpdateDuration(
 	float InHeight,
 	float InDuration,
+	int32 InRisingSpeed,
+	int32 InFallingSpeed,
 	const FVector& InOriginalPt
 )
 {
 	SetTime(0.f);
 
 	Duration = InDuration;
-
 	Height = InHeight;
+	RisingSpeed = InRisingSpeed;
+	FallingSpeed = InFallingSpeed;
 }
 
 void SetRootMotionFinished(FRootMotionSource& RootMotionSource)

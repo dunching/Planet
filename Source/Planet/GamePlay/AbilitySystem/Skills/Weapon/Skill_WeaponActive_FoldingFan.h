@@ -15,6 +15,8 @@ class UAnimMontage;
 class AWeapon_FoldingFan;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
+class UAbilityTask_FlyAway;
+class UAbilityTask_ASCPlayMontage;
 class ASkill_WeaponActive_FoldingFan_Projectile;
 
 USTRUCT()
@@ -27,9 +29,7 @@ struct FGameplayAbilityTargetData_FoldingFan_RegisterParam :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	bool bIsHomingTowards = false;
-
-	bool bIsMultiple = false;
+	int32 IncreaseNum = 1;
 
 };
 
@@ -97,8 +97,6 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData)override;
-
 	virtual bool GetNum(int32& Num)const override;
 
 	TSharedPtr<FRegisterParamType> RegisterParamSPtr = nullptr;
@@ -112,6 +110,10 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
+	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData)override;
+
+	virtual void CheckInContinue()override;
+
 	void PlayMontage();
 
 	void RootMotion();
@@ -121,6 +123,9 @@ protected:
 	
 	UFUNCTION()
 	void OnMontateComplete();
+
+	UFUNCTION()
+	void OnMotionComplete();
 
 	void EmitProjectile();
 
@@ -148,11 +153,21 @@ protected:
 	int32 Damage = 10;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Height = 100;
-	
+	int32 Height = 80;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	int32 ResingSpeed = 200;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	int32 FallingSpeed = 100;
+
 	UPROPERTY(ReplicatedUsing = OnCurrentFanNumChanged)
-	int32 CurrentFanNum = 1;
+	int32 CurrentFanNum = 0;
 
 	FWeaponActorType* WeaponPtr = nullptr;
+
+	UAbilityTask_ASCPlayMontage* AbilityTask_PlayMontage_HumanPtr = nullptr;
+
+	UAbilityTask_FlyAway* RootMotionPtr = nullptr;
 
 };

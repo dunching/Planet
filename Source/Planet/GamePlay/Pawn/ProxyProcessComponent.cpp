@@ -297,6 +297,25 @@ void UProxyProcessComponent::GetWeaponSkills(
 	}
 }
 
+TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::GetWeaponSkillByType(const FGameplayTag& TypeTag)
+{
+	// 找到当前装备的 弓箭类武器
+	TSharedPtr<FWeaponSkillProxy> TargetSkillSPtr = nullptr;
+
+	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr;
+	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr;
+	GetWeaponSkills(FirstWeaponSkillSPtr, SecondWeaponSkillSPtr);
+	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetUnitType() == TypeTag)
+	{
+		TargetSkillSPtr = FirstWeaponSkillSPtr;
+	}
+	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetUnitType() == TypeTag)
+	{
+		TargetSkillSPtr = SecondWeaponSkillSPtr;
+	}
+	return TargetSkillSPtr;
+}
+
 TSharedPtr<FWeaponProxy> UProxyProcessComponent::GetActivedWeapon() const
 {
 	return FindWeaponSocket(CurrentWeaponSocket);
@@ -541,8 +560,7 @@ void UProxyProcessComponent::Update(const TSharedPtr<FSocket_FASI>& Socket)
 #endif
 			}
 
-			SocketMap[Socket->Socket]->ProxyID = Socket->ProxyID;
-			SocketMap[Socket->Socket]->ProxySPtr = Socket->ProxySPtr;
+			*SocketMap[Socket->Socket] = *Socket;
 
 #if UE_EDITOR || UE_SERVER
 			if (GetNetMode() == NM_DedicatedServer)

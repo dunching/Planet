@@ -48,6 +48,8 @@ void USkill_Active_Arrow_HomingToward::ActivateAbility(
 		}
 
 		SwitchIsHomingToward(true);
+
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
 #endif
 }
@@ -73,27 +75,16 @@ bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
-	ThisClass::K2_CancelAbility();
+	K2_CancelAbility();
 
 	return true;
 }
 
 void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward)
 {
-	// 找到当前装备的 弓箭类武器
-	TSharedPtr<FWeaponSkillProxy> TargetSkillSPtr = nullptr;
-
-	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr;
-	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr;
-	CharacterPtr->GetProxyProcessComponent()->GetWeaponSkills(FirstWeaponSkillSPtr, SecondWeaponSkillSPtr);
-	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetUnitType() == UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow)
-	{
-		TargetSkillSPtr = FirstWeaponSkillSPtr;
-	}
-	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetUnitType() == UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow)
-	{
-		TargetSkillSPtr = SecondWeaponSkillSPtr;
-	}
+	auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
+		UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow
+	);
 
 	if (TargetSkillSPtr)
 	{

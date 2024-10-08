@@ -30,15 +30,4 @@ public:
 
 protected:
 
-	void DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);
-
-	bool OnFinished(UAbilityTask_TimerHelper*);
-
-	void SwitchIsHomingToward(bool bIsHomingToward);
-
-	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Duration = 5;
-	
 };

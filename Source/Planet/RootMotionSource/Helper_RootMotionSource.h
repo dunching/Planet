@@ -78,6 +78,8 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 	void Initial(
 		float Height,
 		float Duration,
+		int32 RisingSpeed,
+		int32 FallingSpeed,
 		const FVector& OriginalPt,
 		ACharacter*CharacterPtr
 	);
@@ -85,11 +87,16 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 	void UpdateDuration(
 		float Height,
 		float Duration,
+		int32 RisingSpeed,
+		int32 FallingSpeed,
 		const FVector& OriginalPt
 	);
 
-	// 在这个时间内上升到指定高度
-	float RiseDuration = .75f;
+	// 上升速度 
+	int32 RisingSpeed = 100;
+	
+	// 下降速度 < 0则使用默认的速度
+	int32 FallingSpeed = -1;
 
 	// 高度
 	int32 Height = 100;
@@ -99,6 +106,8 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 	float HalfHeight = 0.f;
 
 	bool bIsFalling = false;
+
+	int32 Line = 10000;
 };
 
 template<>
