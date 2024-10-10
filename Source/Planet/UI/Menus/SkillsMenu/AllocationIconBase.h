@@ -31,7 +31,11 @@ class PLANET_API UAllocationIconBase :
 public:
 
 	// 旧的Unit，新的Unit
-	using FOnResetUnit = TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&, const TSharedPtr<FBasicProxy>&)>;
+	using FOnResetProxy =
+		TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&, const TSharedPtr<FBasicProxy>&)>;
+
+	using FOnResetData =
+		TCallbackHandleContainer<void(UAllocationIconBase*)>;
 
 	UAllocationIconBase(const FObjectInitializer& ObjectInitializer);
 
@@ -56,7 +60,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Socket")
 	FGameplayTag IconSocket;
 
-	FOnResetUnit OnResetUnit;
+	FOnResetProxy OnResetProxy;
+
+	FOnResetData OnResetData;
 
 	bool bPaseInvokeOnResetUnitEvent = false;
 

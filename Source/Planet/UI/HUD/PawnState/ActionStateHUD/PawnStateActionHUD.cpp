@@ -69,14 +69,20 @@ void UPawnStateActionHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	BindEvent();
 	ResetUIByData();
 }
 
 void UPawnStateActionHUD::NativeDestruct()
 {
-	if (OnAllocationSkillChangedDelegate)
+	for (auto Iter : OnAllocationSkillChangedDelegateAry)
 	{
-		OnAllocationSkillChangedDelegate->UnBindCallback();
+		Iter->UnBindCallback();
+	}
+	
+	if (OnCanAciveSkillChangedHandle)
+	{
+		OnCanAciveSkillChangedHandle->UnBindCallback();
 	}
 
 	Super::NativeDestruct();
@@ -229,16 +235,30 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.SoilElement);
 		}
 	}
-	InitialTalentUI();
 
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+	InitialTalentUI();
+	InitialActiveSkillIcon();
+	InitialWeaponSkillIcon();
+}
+
+void UPawnStateActionHUD::BindEvent()
+{
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	OnAllocationSkillChangedDelegateAry.Add(CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+		std::bind(&ThisClass::InitialActiveSkillIcon, this)
+	));
+
+	OnAllocationSkillChangedDelegateAry.Add(CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
+	));
+
+	OnCanAciveSkillChangedHandle = CharacterPtr->GetProxyProcessComponent()->OnCanAciveSkillChanged.AddCallback(
 		std::bind(&ThisClass::InitialActiveSkillIcon, this)
 	);
-	InitialActiveSkillIcon();
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
-		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
-	);
-	InitialWeaponSkillIcon();
 }
 
 void UPawnStateActionHUD::InitialTalentUI()
@@ -292,7 +312,7 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 		return;
 	}
 
-	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
+	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
 	TArray<FName>Ary
 	{
 		FPawnStateActionHUD::Get().ActiveSkill1,

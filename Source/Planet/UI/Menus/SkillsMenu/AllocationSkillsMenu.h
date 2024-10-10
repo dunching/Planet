@@ -14,6 +14,7 @@
 #include "AllocationSkillsMenu.generated.h"
 
 class UGroupmateIcon;
+class UAllocationIconBase;
 struct FWeaponProxy;
 struct FBasicProxy;
 struct FCharacterProxy;
@@ -22,7 +23,7 @@ struct FCharacterProxy;
  *
  */
 UCLASS()
-class PLANET_API UAllocationSkillsMenu : 
+class PLANET_API UAllocationSkillsMenu :
 	public UMyUserWidget,
 	public IMenuInterface
 {
@@ -30,7 +31,11 @@ class PLANET_API UAllocationSkillsMenu :
 
 public:
 
-	using FOnWeaponChangedDelegate = TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>::FCallbackHandleSPtr;
+	using FOnWeaponChangedDelegate = 
+		TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>::FCallbackHandleSPtr;
+
+	using FOnResetDataDelegate =
+		TCallbackHandleContainer<void(UAllocationIconBase*)>::FCallbackHandleSPtr;
 
 	UAllocationSkillsMenu(const FObjectInitializer& ObjectInitializer);
 
@@ -48,7 +53,10 @@ protected:
 
 	void BindEvent();
 
-	void ResetUI(const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr, const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
+	void ResetUI(
+		const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr, 
+		const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+	);
 
 	void InitialGroupmateList();
 
@@ -64,20 +72,37 @@ protected:
 	void ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
 
 	void OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr);
-	
+
 	void OnSelectedCharacterUnit(const TSharedPtr<FCharacterProxy>& UnitPtr);
 
 	void OnMainWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr);
 
 	void OnSecondaryWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr);
 
-	void OnWeaponUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr);
+	void OnResetData(
+		UAllocationIconBase* UAllocationIconPtr
+	);
 
-	void OnSkillUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr);
-	
-	void OnConsumableUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr);
-	
-	void SetAllocation(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr, bool bIsReplaced);
+	void OnWeaponUnitChanged(
+		const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
+		const TSharedPtr<FBasicProxy>& NewUnitPtr
+	);
+
+	void OnSkillUnitChanged(
+		const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
+		const TSharedPtr<FBasicProxy>& NewUnitPtr
+	);
+
+	void OnConsumableUnitChanged(
+		const TSharedPtr<FBasicProxy>& PreviousUnitPtr, 
+		const TSharedPtr<FBasicProxy>& NewUnitPtr
+	);
+
+	void SetAllocation(
+		const TSharedPtr<FBasicProxy>& PreviousUnitPtr, 
+		const TSharedPtr<FBasicProxy>& NewUnitPtr, 
+		bool bIsReplaced
+	);
 
 	FOnWeaponChangedDelegate MainDelegateHandleSPtr;
 
@@ -85,36 +110,36 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ActiveSkills_1_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ActiveSkills_2_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ActiveSkills_3_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ActiveSkills_4_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey WeaponActiveSkills_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey Consumable_1_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey Consumable_2_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey Consumable_3_Key;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey Consumable_4_Key;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGroupmateIcon>GroupmateIconClass;
-	
+
 private:
 
-	 TSharedPtr<FCharacterProxy> CurrentUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> CurrentUnitPtr = nullptr;
 
 };

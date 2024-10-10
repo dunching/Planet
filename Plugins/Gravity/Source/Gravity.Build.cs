@@ -11,6 +11,8 @@ public class Gravity : ModuleRules
 
         CppStandard = CppStandardVersion.Cpp17;
 
+        bUseRTTI = true;
+
         PublicDefinitions.Add("USECUSTOMEGRAVITY = 0");
 
         PublicIncludePaths.AddRange(

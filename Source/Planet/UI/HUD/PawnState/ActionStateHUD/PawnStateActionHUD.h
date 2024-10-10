@@ -32,6 +32,9 @@ public:
 	using FOnAllocationSkillChangedHandle =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
+	using FOnCanAciveSkillChangedHandle =
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
@@ -45,13 +48,17 @@ public:
 
 protected:
 
+	void BindEvent();
+
 	void InitialTalentUI();
 
 	void InitialActiveSkillIcon();
 
 	void InitialWeaponSkillIcon();
 
-	FOnAllocationSkillChangedHandle OnAllocationSkillChangedDelegate;
+	TArray<FOnAllocationSkillChangedHandle> OnAllocationSkillChangedDelegateAry;
+
+	FOnCanAciveSkillChangedHandle OnCanAciveSkillChangedHandle;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UState_Talent_NuQi>State_Talent_NuQi_Class;

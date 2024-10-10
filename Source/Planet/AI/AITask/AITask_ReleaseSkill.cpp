@@ -63,15 +63,15 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 		}
 		else
 		{
-			auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveAction();
 			{
+				auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
 				for (const auto& Iter : CanbeActivedInfo)
 				{
 					if (
-						Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket)
+						Iter.Value->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket)
 						)
 					{
-						auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter->ProxySPtr);
+						auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->ProxySPtr);
 						auto GAInsPtr = Cast<USkill_Base>(SkillProxySPtr->GetGAInst());
 						if (!GAInsPtr)
 						{
@@ -84,9 +84,9 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						);
 						if (bIsReady)
 						{
-							if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter))
+							if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Value))
 							{
-								ReleasingSkillMap.Add(GAInsPtr, Iter);
+								ReleasingSkillMap.Add(GAInsPtr, Iter.Value);
 								return true;
 							}
 						}
@@ -95,6 +95,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 			}
 
 			// 未释放主动技能
+			auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
 			for (const auto& Iter : CanbeActivedInfo)
 			{
 				if (

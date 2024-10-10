@@ -50,7 +50,7 @@ void UAllocationIconBase::InvokeReset(UUserWidget* InBasicUnitPtr)
 		auto NewPtr = Cast<ThisClass>(InBasicUnitPtr);
 		if (NewPtr)
 		{
-			OnResetUnit = NewPtr->OnResetUnit;
+			OnResetProxy = NewPtr->OnResetProxy;
 			UnitType = NewPtr->UnitType;
 		}
 	}
@@ -72,10 +72,15 @@ void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBas
 
 	if (!bPaseInvokeOnResetUnitEvent)
 	{
-		OnResetUnit.ExcuteCallback(PreviousUnitPtr, NewUnitPtr);
+		OnResetProxy.ExcuteCallback(PreviousUnitPtr, NewUnitPtr);
 	}
 
 	BasicUnitPtr = NewUnitPtr;
+
+	if (!bPaseInvokeOnResetUnitEvent)
+	{
+		OnResetData(this);
+	}
 
 	SetItemType();
 }

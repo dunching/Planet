@@ -248,7 +248,7 @@ void AHumanAIController::InitialCharacter()
 						{
 							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket1;
+							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1;
 							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
 							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
 
@@ -262,7 +262,7 @@ void AHumanAIController::InitialCharacter()
 						{
 							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket2;
+							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2;
 							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
 							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
 

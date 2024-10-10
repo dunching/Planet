@@ -17,14 +17,14 @@
 #include "SceneElement.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 
-void USkill_Active_FoldingFan_AddNum::ActivateAbility(
+void USkill_Active_FoldingFan_AddNum::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
 )
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)

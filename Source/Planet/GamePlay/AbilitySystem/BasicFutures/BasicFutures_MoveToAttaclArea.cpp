@@ -144,7 +144,7 @@ void UBasicFutures_MoveToAttaclArea::OnQueryFinished(TSharedPtr<FEnvQueryResult>
 		{
 			auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
 
-			PCPtr->MoveToLocation_RPC(DestLocation, nullptr);
+			PCPtr->MoveToLocation(DestLocation, nullptr);
 		}
 		else
 		{

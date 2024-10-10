@@ -69,7 +69,7 @@ void AGravityPlayerController::UpdateRotation(float DeltaTime)
 }
 #endif
 
-void AGravityPlayerController::MoveToLocation_RPC_Implementation(
+void AGravityPlayerController::MoveToLocation/*_Implementation*/(
     const FVector& Dest,
 	const AActor* InGoalActor,
     float AcceptanceRadius, 
@@ -422,11 +422,6 @@ void AGravityPlayerController::StopMovement()
 // 	{
 // 		PathFollowingComponent->AbortMove(*this, FPathFollowingResultFlags::MovementStop | FPathFollowingResultFlags::ForcedScript);
 // 	}
-}
-
-void AGravityPlayerController::StopMovement_RPC_Implementation()
-{
-	StopMovement();
 }
 
 void AGravityPlayerController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)

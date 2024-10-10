@@ -26,6 +26,7 @@
 #include "StateProcessorComponent.h"
 #include "CharacterStateInfo.h"
 #include "PlanetPlayerController.h"
+#include "PlanetAIController.h"
 
 FGameplayAbilityTargetData_StateModify_Charm::FGameplayAbilityTargetData_StateModify_Charm(
 	float Duration
@@ -55,7 +56,8 @@ void UCS_PeriodicStateModify_Charm::PreActivate(
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);;
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
@@ -102,9 +104,16 @@ void UCS_PeriodicStateModify_Charm::EndAbility(
 	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 
 	//
-	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-	PCPtr->ReceiveMoveCompleted.Unbind();
-	PCPtr->StopMovement_RPC();
+	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
+	{
+		PCPtr->ReceiveMoveCompleted.Unbind();
+		PCPtr->StopMovement();
+	}
+	else if (auto AICPtr = CharacterPtr->GetController<APlanetAIController>())
+	{
+		AICPtr->ReceiveMoveCompleted.RemoveDynamic(this, &ThisClass::OnMoveCompleted);
+		AICPtr->StopMovement();
+	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -145,13 +154,24 @@ void UCS_PeriodicStateModify_Charm::PerformAction()
 	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 
 	//
-	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-	PCPtr->MoveToLocation_RPC(
-		FVector::ZeroVector,
-		GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
-		AcceptanceRadius
-	);
-	PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::OnMoveCompleted);
+	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
+	{
+		PCPtr->MoveToLocation(
+			FVector::ZeroVector,
+			GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
+			AcceptanceRadius
+		);
+		PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::OnMoveCompleted);
+	}
+	else if (auto AICPtr = CharacterPtr->GetController<APlanetAIController>())
+	{
+		AICPtr->MoveToActor(
+			GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
+			AcceptanceRadius
+		);
+		AICPtr->ReceiveMoveCompleted.RemoveDynamic(this, &ThisClass::OnMoveCompleted);
+		AICPtr->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::OnMoveCompleted);
+	}
 }
 
 void UCS_PeriodicStateModify_Charm::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
@@ -161,13 +181,21 @@ void UCS_PeriodicStateModify_Charm::OnMoveCompleted(FAIRequestID RequestID, EPat
 	case EPathFollowingResult::Success: 
 	{
 		//
-		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-		PCPtr->MoveToLocation_RPC(
-			FVector::ZeroVector,
-			GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
-			AcceptanceRadius
-		);
-		PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::OnMoveCompleted);
+		if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
+		{
+			PCPtr->MoveToLocation(
+				FVector::ZeroVector,
+				GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
+				AcceptanceRadius
+			);
+		}
+		else if (auto AICPtr = CharacterPtr->GetController<APlanetAIController>())
+		{
+			AICPtr->MoveToActor(
+				GameplayAbilityTargetDataSPtr->TriggerCharacterPtr.Get(),
+				AcceptanceRadius
+			);
+		}
 	}
 		break;
 	case EPathFollowingResult::Blocked:

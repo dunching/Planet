@@ -278,141 +278,8 @@ void UAllocationSkillsMenu::SyncData()
 	{
 		return;
 	}
-
-	// 武器
-	{
-		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-
-		// 主武器
-		// 
-		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().MainWeapon));
-			if (IconPtr)
-			{
-				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
-				SocketSPtr->Key = WeaponActiveSkills_Key;
-				SocketSPtr->Socket = IconPtr->IconSocket;
-				SocketSPtr->ProxySPtr = IconPtr->UnitPtr;
-
-				EICPtr->UpdateSocket(SocketSPtr);
-			}
-		}
-		// 武器技能
-		{
-			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill1));
-			if (IconPtr)
-			{
-				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
-				SocketSPtr->Key = WeaponActiveSkills_Key;
-				SocketSPtr->Socket = IconPtr->IconSocket;
-				SocketSPtr->ProxySPtr = IconPtr->BasicUnitPtr;
-
-				EICPtr->UpdateSocket(SocketSPtr);
-			}
-		}
-
-		// 副武器
-		{
-			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().SecondaryWeapon));
-			if (IconPtr)
-			{
-				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
-				SocketSPtr->Key = WeaponActiveSkills_Key;
-				SocketSPtr->Socket = IconPtr->IconSocket;
-				SocketSPtr->ProxySPtr = IconPtr->UnitPtr;
-
-				EICPtr->UpdateSocket(SocketSPtr);
-			}
-		}
-		// 武器技能
-		{
-			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponActiveSkill2));
-			if (IconPtr)
-			{
-				auto SocketSPtr = EICPtr->FindSocket(IconPtr->IconSocket);
-				SocketSPtr->Key = WeaponActiveSkills_Key;
-				SocketSPtr->Socket = IconPtr->IconSocket;
-				SocketSPtr->ProxySPtr = IconPtr->BasicUnitPtr;
-
-				EICPtr->UpdateSocket(SocketSPtr);
-			}
-		}
-	}
-
-	// 技能
-	{
-		struct FHelper
-		{
-			FName Name;
-			FKey Key;
-		};
-
-		TArray<FHelper>Ary
-		{
-			{FAllocationSkillsMenu::Get().ActiveSkill1,ActiveSkills_1_Key},
-			{FAllocationSkillsMenu::Get().ActiveSkill2,ActiveSkills_2_Key},
-			{FAllocationSkillsMenu::Get().ActiveSkill3,ActiveSkills_3_Key},
-			{FAllocationSkillsMenu::Get().ActiveSkill4,ActiveSkills_4_Key},
-			{FAllocationSkillsMenu::Get().PassivSkill1,EKeys::Invalid},
-			{FAllocationSkillsMenu::Get().PassivSkill2,EKeys::Invalid},
-			{FAllocationSkillsMenu::Get().PassivSkill3,EKeys::Invalid},
-			{FAllocationSkillsMenu::Get().PassivSkill4,EKeys::Invalid},
-			{FAllocationSkillsMenu::Get().PassivSkill5,EKeys::Invalid},
-			//			{FAllocationSkillsMenu::Get().TalentPassivSkill,EKeys::Invalid},
-		};
-
-		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-		for (auto Iter : Ary)
-		{
-			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.Name));
-			if (IconPtr)
-			{
-				auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-				SkillsSocketInfo->Socket = IconPtr->IconSocket;
-				SkillsSocketInfo->Key = Iter.Key;
-				if (IconPtr->BasicUnitPtr)
-				{
-					SkillsSocketInfo->ProxySPtr = DynamicCastSharedPtr<FSkillProxy>(IconPtr->BasicUnitPtr);
-				}
-				EICPtr->UpdateSocket(SkillsSocketInfo);
-			}
-		}
-	}
-
-	// 消耗品
-	{
-		struct FHelper
-		{
-			FName Name;
-			FKey Key;
-		};
-
-		TArray<FHelper>Ary
-		{
-			{FAllocationSkillsMenu::Get().Consumable1,Consumable_1_Key},
-			{FAllocationSkillsMenu::Get().Consumable2,Consumable_2_Key},
-			{FAllocationSkillsMenu::Get().Consumable3,Consumable_3_Key},
-			{FAllocationSkillsMenu::Get().Consumable4,Consumable_4_Key},
-		};
-
-		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-		for (auto Iter : Ary)
-		{
-			auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter.Name));
-			if (IconPtr)
-			{
-				auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-				SkillsSocketInfo->Socket = IconPtr->IconSocket;
-				SkillsSocketInfo->Key = Iter.Key;
-				if (IconPtr->BasicUnitPtr)
-				{
-					SkillsSocketInfo->ProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(IconPtr->BasicUnitPtr);
-
-				}
-				EICPtr->UpdateSocket(SkillsSocketInfo);
-			}
-		}
-	}
+	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
+	EICPtr->UpdateCanbeActiveSkills();
 }
 
 void UAllocationSkillsMenu::BindEvent()
@@ -456,12 +323,21 @@ void UAllocationSkillsMenu::BindEvent()
 		{
 			auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
 			if (UIPtr)
-			{
-				auto Result = UIPtr->OnResetUnit.AddCallback(
-					std::bind(&ThisClass::OnSkillUnitChanged, this, std::placeholders::_1, std::placeholders::_2
-					)
-				);
-				Result->bIsAutoUnregister = false;
+			{ 
+				{
+					auto Result = UIPtr->OnResetProxy.AddCallback(
+						std::bind(&ThisClass::OnSkillUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+						)
+					);
+					Result->bIsAutoUnregister = false;
+				}
+				{
+					auto Result = UIPtr->OnResetData.AddCallback(
+						std::bind(&ThisClass::OnResetData, this, std::placeholders::_1
+						)
+					);
+					Result->bIsAutoUnregister = false;
+				}
 			}
 		}
 	}
@@ -479,8 +355,15 @@ void UAllocationSkillsMenu::BindEvent()
 			auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
 			if (UIPtr)
 			{
-				auto Result = UIPtr->OnResetUnit.AddCallback(
+				auto Result = UIPtr->OnResetProxy.AddCallback(
 					std::bind(&ThisClass::OnConsumableUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+					)
+				);
+				Result->bIsAutoUnregister = false;
+			}
+			{
+				auto Result = UIPtr->OnResetData.AddCallback(
+					std::bind(&ThisClass::OnResetData, this, std::placeholders::_1
 					)
 				);
 				Result->bIsAutoUnregister = false;
@@ -498,18 +381,30 @@ void UAllocationSkillsMenu::BindEvent()
 		{
 			auto UIPtr = Cast<UWeaponsIcon>(GetWidgetFromName(Iter));
 			if (UIPtr)
-			{
-				auto Result = UIPtr->OnResetUnit.AddCallback(
-					std::bind(&ThisClass::OnWeaponUnitChanged, this, std::placeholders::_1, std::placeholders::_2
-					)
-				);
-				Result->bIsAutoUnregister = false;
+			{ 
+				{
+					auto Result = UIPtr->OnResetProxy.AddCallback(
+						std::bind(&ThisClass::OnWeaponUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+						)
+					);
+					Result->bIsAutoUnregister = false;
+				}
+				{
+					auto Result = UIPtr->OnResetData.AddCallback(
+						std::bind(&ThisClass::OnResetData, this, std::placeholders::_1
+						)
+					);
+					Result->bIsAutoUnregister = false;
+				}
 			}
 		}
 	}
 }
 
-void UAllocationSkillsMenu::ResetUI(const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr, const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetUI(
+	const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr,
+	const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+)
 {
 	CurrentUnitPtr = TargetCharacterUnitPtr;
 	ResetUIByData_WeaponSkills(CurrentUnitPtr);
@@ -634,6 +529,26 @@ void UAllocationSkillsMenu::OnSecondaryWeaponChanged(const TSharedPtr<FWeaponPro
 	}
 }
 
+void UAllocationSkillsMenu::OnResetData(UAllocationIconBase* UAllocationIconPtr)
+{
+	if (!UAllocationIconPtr)
+	{
+		return;
+	}
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
+	auto SocketSPtr = EICPtr->FindSocket(UAllocationIconPtr->IconSocket);
+
+	SocketSPtr->ProxySPtr = UAllocationIconPtr->BasicUnitPtr;
+
+	EICPtr->UpdateSocket(SocketSPtr);
+}
+
 void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)
 {
 	{
@@ -739,7 +654,10 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(const TSharedPtr<FCharacterP
 	}
 }
 
-void UAllocationSkillsMenu::OnSkillUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr)
+void UAllocationSkillsMenu::OnSkillUnitChanged(
+	const TSharedPtr<FBasicProxy>& PreviousUnitPtr, 
+	const TSharedPtr<FBasicProxy>& NewUnitPtr
+)
 {
 	TArray<FName>Ary
 	{
@@ -782,7 +700,10 @@ void UAllocationSkillsMenu::OnSkillUnitChanged(const TSharedPtr<FBasicProxy>& Pr
 	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::OnWeaponUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr)
+void UAllocationSkillsMenu::OnWeaponUnitChanged(
+	const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
+	const TSharedPtr<FBasicProxy>& NewUnitPtr
+)
 {
 	TArray<FName>Ary
 	{
@@ -815,7 +736,10 @@ void UAllocationSkillsMenu::OnWeaponUnitChanged(const TSharedPtr<FBasicProxy>& P
 	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::OnConsumableUnitChanged(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr)
+void UAllocationSkillsMenu::OnConsumableUnitChanged(
+	const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
+	const TSharedPtr<FBasicProxy>& NewUnitPtr
+)
 {
 	TArray<FName>Ary
 	{
@@ -850,7 +774,11 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(const TSharedPtr<FBasicProxy
 	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::SetAllocation(const TSharedPtr<FBasicProxy>& PreviousUnitPtr, const TSharedPtr<FBasicProxy>& NewUnitPtr, bool bIsReplaced)
+void UAllocationSkillsMenu::SetAllocation(
+	const TSharedPtr<FBasicProxy>& PreviousUnitPtr
+	, const TSharedPtr<FBasicProxy>& NewUnitPtr,
+	bool bIsReplaced
+)
 {
 	if (NewUnitPtr)
 	{

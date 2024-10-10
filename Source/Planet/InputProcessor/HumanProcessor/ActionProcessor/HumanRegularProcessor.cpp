@@ -100,6 +100,9 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
+			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
+			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
+
 			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback([this]() {
 				AddOrRemoveUseMenuItemEvent(true);
 				});
@@ -193,9 +196,6 @@ namespace HumanProcessor
 		if (OnwerActorPtr)
 		{
 			OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
-
-			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
-			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
 		}
 	}
 
@@ -463,11 +463,27 @@ namespace HumanProcessor
 		{
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
-			{
-				auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveAction();
-				for (const auto& Iter : CanbeActivedInfoAry)
+			{ 
 				{
-					HandleKeysMap.Add(Iter->Key, Iter);
+					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveConsumable();
+					for (const auto& Iter : CanbeActivedInfoAry)
+					{
+						HandleKeysMap.Add(Iter->Key, Iter);
+					}
+				}
+				{
+					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
+					for (const auto& Iter : CanbeActivedInfoAry)
+					{
+						HandleKeysMap.Add(Iter->Key, Iter);
+					}
+				}
+				{
+					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
+					for (const auto& Iter : CanbeActivedInfoAry)
+					{
+						HandleKeysMap.Add(Iter.Value->Key, Iter.Value);
+					}
 				}
 			}
 		}

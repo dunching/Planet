@@ -238,19 +238,19 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket1 =
+	FGameplayTag ActiveSocket_1 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.1")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket2 =
+	FGameplayTag ActiveSocket_2 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.2")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket3 =
+	FGameplayTag ActiveSocket_3 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.3")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket4 =
+	FGameplayTag ActiveSocket_4 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.4")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
@@ -355,6 +355,14 @@ public:
 	FGameplayTag Unit_Skill_Active =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active")));
 	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Switch=
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Switch")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Switch_Test =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Switch.Test")));
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Active_Control =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Control")));

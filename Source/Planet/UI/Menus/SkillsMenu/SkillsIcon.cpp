@@ -44,7 +44,51 @@ USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
 
 void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
-	Super::ResetToolUIByData(InBasicUnitPtr);
+	if (InBasicUnitPtr == BasicUnitPtr)
+	{
+		return;
+	}
+
+	auto PreviousUnitPtr = BasicUnitPtr;
+	TSharedPtr<FBasicProxy> NewUnitPtr = nullptr;
+	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UnitType))
+	{
+		NewUnitPtr = InBasicUnitPtr;
+	}
+	else
+	{
+		if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+		{
+			auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+			if (!CharacterPtr)
+			{
+				return;
+			}
+
+			// 装备了可以在“被动”槽上备注“主动技能”的主动技能
+			if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
+				UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Switch
+			))
+			{
+				NewUnitPtr = InBasicUnitPtr;
+			}
+		}
+
+	}
+
+	if (!bPaseInvokeOnResetUnitEvent)
+	{
+		OnResetProxy.ExcuteCallback(PreviousUnitPtr, NewUnitPtr);
+	}
+
+	BasicUnitPtr = NewUnitPtr;
+
+	if (!bPaseInvokeOnResetUnitEvent)
+	{
+		OnResetData(this);
+	}
+
+	SetItemType();
 
 	SetLevel();
 }
@@ -72,4 +116,45 @@ void USkillsIcon::NativeConstruct()
 void USkillsIcon::NativeDestruct()
 {
 	Super::NativeDestruct();
+}
+
+void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)
+{
+	if (bIsDragging)
+	{
+		if (UnitPtr && UnitPtr->GetUnitType().MatchesTag(UnitType))
+		{
+			EnableIcon(true);
+		}
+		else
+		{
+			if (
+				UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) &&
+				UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
+				)
+			{
+				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+				if (!CharacterPtr)
+				{
+					return;
+				}
+
+				// 装备了可以在“被动”槽上备注“主动技能”的主动技能
+				if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
+					UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Switch
+				))
+				{
+					EnableIcon(true);
+
+					return;
+				}
+			}
+
+			EnableIcon(false);
+		}
+	}
+	else
+	{
+		EnableIcon(true);
+	}
 }

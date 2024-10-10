@@ -28,6 +28,7 @@
 #include "CharacterStateInfo.h"
 #include "PlanetPlayerController.h"
 #include "CharacterAttibutes.h"
+#include "PlanetAIController.h"
 
 struct FMyPropertySettlementModify : public FPropertySettlementModify
 {
@@ -110,9 +111,16 @@ void UCS_PeriodicStateModify_Fear::EndAbility(
 	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
 
 	//
-	auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-	PCPtr->ReceiveMoveCompleted.Unbind();
-	PCPtr->StopMovement_RPC();
+	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
+	{
+		PCPtr->ReceiveMoveCompleted.Unbind();
+		PCPtr->StopMovement();
+	}
+	else if (auto AICPtr = CharacterPtr->GetController<APlanetAIController>())
+	{
+		AICPtr->ReceiveMoveCompleted.RemoveDynamic(this, &ThisClass::OnMoveCompleted);
+		AICPtr->StopMovement();
+	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -188,12 +196,23 @@ void UCS_PeriodicStateModify_Fear::MoveImp()
 		800.f
 	))
 	{
-		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-		PCPtr->MoveToLocation_RPC(
-			TargetPt,
-			nullptr,
-			AcceptanceRadius
-		);
-		PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::OnMoveCompleted);
+		if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
+		{
+			PCPtr->MoveToLocation(
+				TargetPt,
+				nullptr,
+				AcceptanceRadius
+			);
+			PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::OnMoveCompleted);
+		}
+		else if (auto AICPtr = CharacterPtr->GetController<APlanetAIController>())
+		{
+			AICPtr->MoveToLocation(
+				TargetPt,
+				AcceptanceRadius
+			);
+			AICPtr->ReceiveMoveCompleted.RemoveDynamic(this, &ThisClass::OnMoveCompleted);
+			AICPtr->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::OnMoveCompleted);
+		}
 	}
 }
