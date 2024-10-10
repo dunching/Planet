@@ -14,6 +14,8 @@ static TAutoConsoleVariable<int32> DebugPrintCAB(
 	TEXT("")
 	TEXT(" default: 0"));
 
+const FGameplayTag DataSource_Character = FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
+
 FBasePropertySet::FBasePropertySet()
 {
 	PropertySettlementModifySet.emplace(MakeShared<FPropertySettlementModify>());
@@ -72,6 +74,13 @@ const FBaseProperty& FBasePropertySet::GetMaxProperty()const
 void FBasePropertySet::Update()
 {
 	check(PropertySettlementModifySet.size() > 0);
+
+	// 人物身上自带的属性
+	auto Character_Value_Iter = ValueMap.Find(DataSource_Character);
+	if (Character_Value_Iter)
+	{
+		*Character_Value_Iter = FMath::Clamp(*Character_Value_Iter, MinValue.GetCurrentValue(), MaxValue.GetCurrentValue());
+	}
 
 	for (const auto& Iter : PropertySettlementModifySet)
 	{
@@ -218,62 +227,59 @@ void FCharacterAttributes::InitialData()
 
 	SoilElement.GetMaxProperty().SetCurrentValue(9);
 
-	const auto DataSource = FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
-	//UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
-
 	AD.GetMaxProperty().SetCurrentValue(3000);
-	AD.SetCurrentValue(100, DataSource);
+	AD.SetCurrentValue(100, DataSource_Character);
 
 	AD_Penetration.GetMaxProperty().SetCurrentValue(1000);
-	AD_Penetration.SetCurrentValue(0, DataSource);
+	AD_Penetration.SetCurrentValue(0, DataSource_Character);
 
 	AD_PercentPenetration.GetMaxProperty().SetCurrentValue(100);
-	AD_PercentPenetration.SetCurrentValue(0, DataSource);
+	AD_PercentPenetration.SetCurrentValue(0, DataSource_Character);
 
 	AD_Resistance.GetMaxProperty().SetCurrentValue(1000);
-	AD_Resistance.SetCurrentValue(20, DataSource);
+	AD_Resistance.SetCurrentValue(20, DataSource_Character);
 
 	GAPerformSpeed.GetMaxProperty().SetCurrentValue(500);
-	GAPerformSpeed.SetCurrentValue(100, DataSource);
+	GAPerformSpeed.SetCurrentValue(100, DataSource_Character);
 
 	Shield.GetMaxProperty().SetCurrentValue(200);
-	Shield.SetCurrentValue(0, DataSource);
+	Shield.SetCurrentValue(0, DataSource_Character);
 
 	HP.GetMaxProperty().SetCurrentValue(200);
-	HP.SetCurrentValue(200, DataSource);
+	HP.SetCurrentValue(200, DataSource_Character);
 
 	HP_Replay.GetMaxProperty().SetCurrentValue(1000);
-	HP_Replay.SetCurrentValue(1, DataSource);
+	HP_Replay.SetCurrentValue(1, DataSource_Character);
 
 	PP.GetMaxProperty().SetCurrentValue(100);
-	PP.SetCurrentValue(100, DataSource);
+	PP.SetCurrentValue(100, DataSource_Character);
 
 	PP_Replay.GetMaxProperty().SetCurrentValue(1000);
-	PP_Replay.SetCurrentValue(1, DataSource);
+	PP_Replay.SetCurrentValue(1, DataSource_Character);
 
 	Mana.GetMaxProperty().SetCurrentValue(500);
-	Mana.SetCurrentValue(500, DataSource);
+	Mana.SetCurrentValue(500, DataSource_Character);
 
 	Mana_Replay.GetMaxProperty().SetCurrentValue(1000);
-	Mana_Replay.SetCurrentValue(1, DataSource);
+	Mana_Replay.SetCurrentValue(1, DataSource_Character);
 	
 	Evade.GetMaxProperty().SetCurrentValue(100);
-	Evade.SetCurrentValue(20, DataSource);
+	Evade.SetCurrentValue(20, DataSource_Character);
 
 	HitRate.GetMaxProperty().SetCurrentValue(100);
-	HitRate.SetCurrentValue(50, DataSource);
+	HitRate.SetCurrentValue(50, DataSource_Character);
 
 	Toughness.GetMaxProperty().SetCurrentValue(100);
-	Toughness.SetCurrentValue(0, DataSource);
+	Toughness.SetCurrentValue(0, DataSource_Character);
 
 	CriticalHitRate.GetMaxProperty().SetCurrentValue(100);
-	CriticalHitRate.SetCurrentValue(0, DataSource);
+	CriticalHitRate.SetCurrentValue(0, DataSource_Character);
 
 	CriticalDamage.GetMaxProperty().SetCurrentValue(100);
-	CriticalDamage.SetCurrentValue(50, DataSource);
+	CriticalDamage.SetCurrentValue(50, DataSource_Character);
 
 	MoveSpeed.GetMaxProperty().SetCurrentValue(800);
-	MoveSpeed.SetCurrentValue(250, DataSource);
+	MoveSpeed.SetCurrentValue(250, DataSource_Character);
 }
 
 void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)

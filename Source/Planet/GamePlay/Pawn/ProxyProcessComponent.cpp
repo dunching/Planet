@@ -192,6 +192,13 @@ void UProxyProcessComponent::CancelAction_Server_Implementation(
 
 void UProxyProcessComponent::ActiveWeapon()
 {
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		ActiveWeapon_Server();
+	}
+#endif
+
 	const auto WeaponsMap = SocketMap;
 
 	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
@@ -200,24 +207,19 @@ void UProxyProcessComponent::ActiveWeapon()
 		if (WeaponSocketSPtr->ProxyID.IsValid())
 		{
 			SwitchWeaponImp(WeaponSocketSPtr->Socket);
+			return;
 		}
 	}
-	else if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
+	
+	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
 	{
 		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
 		if (WeaponSocketSPtr->ProxyID.IsValid())
 		{
 			SwitchWeaponImp(WeaponSocketSPtr->Socket);
+			return;
 		}
 	}
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		ActiveWeapon_Server();
-	}
-#endif
-
 }
 
 void UProxyProcessComponent::SwitchWeapon()

@@ -106,6 +106,7 @@ void UCS_PeriodicStateModify_Fear::EndAbility(
 {
 	//
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+	CharacterStateInfoSPtr = nullptr;
 
 	//
 	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
@@ -140,18 +141,26 @@ void UCS_PeriodicStateModify_Fear::UpdateDuration()
 
 void UCS_PeriodicStateModify_Fear::PerformAction()
 {
-	// 
-	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
-	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
-	CharacterStateInfoSPtr->DataChanged();
-	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+	if (CharacterStateInfoSPtr)
+	{
+		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		CharacterStateInfoSPtr->RefreshTime();
+	}
+	else
+	{
+		// 
+		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+		CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+		CharacterStateInfoSPtr->DataChanged();
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
-	//TalentHelper.Level > 
+		//TalentHelper.Level > 
 
-	//
-	MoveImp();
+		//
+		MoveImp();
+	}
 }
 
 void UCS_PeriodicStateModify_Fear::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)

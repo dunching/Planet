@@ -179,6 +179,17 @@ void UBaseFeatureComponent::SendEventImp(
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
+		if (GAEventDataPtr)
+		{
+			for (auto& Iter : GAEventDataPtr->DataAry)
+			{
+				if (!Iter.DataSource.IsValid())
+				{
+					Iter.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;;
+				}
+			}
+		}
+
 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{

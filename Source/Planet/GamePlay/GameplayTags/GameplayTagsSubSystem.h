@@ -428,7 +428,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
 	FGameplayTag DataSource_Regular =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Regular")));
-	
+
+	// 人物身上自带的属性
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
 	FGameplayTag DataSource_Character =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
