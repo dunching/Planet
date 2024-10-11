@@ -395,6 +395,7 @@ void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
 void ACharacterBase::OnMoveSpeedChanged_Implementation(int32 CurrentValue)
 {
 	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
+	GetCharacterMovement()->MaxFlySpeed = CurrentValue;
 }
 
 void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)

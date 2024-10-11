@@ -99,7 +99,7 @@ void UAbilityTask_FlyAway::TickTask(float DeltaTime)
 	if (bTimedOut)
 	{
 		bIsFinished = true;
-		OnFinish.ExecuteIfBound();
+		OnFinished.ExecuteIfBound();
 		EndTask();
 	}
 }

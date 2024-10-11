@@ -367,7 +367,7 @@ bool UProxyProcessComponent::ActiveAction(
 {
 	// 使用武器
 	auto WeaponSPtr = FindSocket(CurrentWeaponSocket);
-	if (WeaponSPtr->Socket == CanbeActivedInfoSPtr->Socket)
+	if (WeaponSPtr && (WeaponSPtr->Socket == CanbeActivedInfoSPtr->Socket))
 	{
 		ActiveAction_Server(WeaponSPtr->Socket, bIsAutomaticStop);
 	}

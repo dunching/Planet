@@ -64,7 +64,7 @@ void USkill_Active_BYWD::ActivateAbility(
 #if UE_EDITOR || UE_SERVER
 			if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 			{
-				TaskPtr->OnFinish.BindLambda([this]
+				TaskPtr->OnFinished.BindLambda([this]
 					{
 						CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 

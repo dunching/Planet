@@ -63,7 +63,7 @@ public:
 	
 	void UpdateDuration();
 
-	FOnTaskFinished OnFinish;
+	FOnTaskFinished OnFinished;
 
 protected:
 

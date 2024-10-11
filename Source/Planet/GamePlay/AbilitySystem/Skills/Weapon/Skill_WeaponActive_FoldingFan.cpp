@@ -400,7 +400,7 @@ void USkill_WeaponActive_FoldingFan::RootMotion()
 			FallingSpeed
 		);
 
-		RootMotionPtr->OnFinish.BindUObject(this, &ThisClass::OnMotionComplete);
+		RootMotionPtr->OnFinished.BindUObject(this, &ThisClass::OnMotionComplete);
 		RootMotionPtr->ReadyForActivation();
 	}
 }

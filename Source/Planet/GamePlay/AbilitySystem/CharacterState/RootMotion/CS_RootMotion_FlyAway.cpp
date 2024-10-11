@@ -44,6 +44,20 @@ FGameplayAbilityTargetData_RootMotion_FlyAway* FGameplayAbilityTargetData_RootMo
 	return ResultPtr;
 }
 
+void UCS_RootMotion_FlyAway::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+}
+
 void UCS_RootMotion_FlyAway::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -160,8 +174,7 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 			GameplayAbilityTargetDataSPtr->Height
 		);
 
-		RootMotionTaskPtr->Ability = this;
-		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		RootMotionTaskPtr->OnFinished.BindUObject(this, &ThisClass::K2_CancelAbility);
 		RootMotionTaskPtr->ReadyForActivation();
 
 		// 
@@ -169,10 +182,6 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		AbilityTask_TimerHelperPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
 		AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
-		AbilityTask_TimerHelperPtr->OnFinished.BindLambda([this](auto) {
-			K2_CancelAbility();
-			return true;
-			});
 		AbilityTask_TimerHelperPtr->ReadyForActivation();
 	}
 }

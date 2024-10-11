@@ -55,6 +55,6 @@ protected:
 
 	FCharacterStateMapHandle CharacterStateMapHandle;
 
-	TMap<FGameplayTag, UEffectItem*>EffectItemMap;
+	TMap<FGuid, UEffectItem*>EffectItemMap;
 
 };

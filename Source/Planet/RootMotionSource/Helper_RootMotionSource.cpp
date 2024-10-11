@@ -383,6 +383,7 @@ bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
 	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
 
 	return
+		bIsFalling == OtherCast->bIsFalling &&
 		RisingSpeed == OtherCast->RisingSpeed &&
 		FallingSpeed == OtherCast->FallingSpeed &&
 		Height == OtherCast->Height;
@@ -407,6 +408,7 @@ bool FRootMotionSource_FlyAway::UpdateStateFrom(const FRootMotionSource* SourceT
 
 	auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(SourceToTakeStateFrom);
 
+	bIsFalling = OtherCast->bIsFalling;
 	RisingSpeed = OtherCast->RisingSpeed;
 	FallingSpeed = OtherCast->FallingSpeed;
 	Height = OtherCast->Height;
@@ -506,6 +508,7 @@ bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 	Ar << RisingSpeed;
 	Ar << FallingSpeed;
 	Ar << Height;
+	Ar << bIsFalling;
 
 	bOutSuccess = true;
 	return true;

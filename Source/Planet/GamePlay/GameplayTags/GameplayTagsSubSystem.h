@@ -152,7 +152,7 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.KnockDown")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag Traction =
+	FGameplayTag State_RootMotion_Traction =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.Traction")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
@@ -162,6 +162,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag MoveAlongSpline =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveAlongSpline")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_RootMotion_MoveTo =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveTo")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DeathingTag = 

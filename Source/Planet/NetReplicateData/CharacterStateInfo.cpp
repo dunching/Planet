@@ -5,7 +5,7 @@
 
 FCharacterStateInfo::FCharacterStateInfo()
 {
-
+	Guid = FGuid::NewGuid();
 }
 
 bool FCharacterStateInfo::GetIsFinished() const
@@ -137,6 +137,7 @@ bool FCharacterStateInfo_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map
 		Ar << CharacterStateInfoSPtr->Num;
 		Ar << CharacterStateInfoSPtr->Text;
 		Ar << CharacterStateInfoSPtr->Tag;
+		Ar << CharacterStateInfoSPtr->Guid;
 		Ar << CharacterStateInfoSPtr->DefaultIcon;
 	}
 	else if (Ar.IsLoading())
@@ -150,6 +151,7 @@ bool FCharacterStateInfo_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map
 		Ar << CharacterStateInfoSPtr->Num;
 		Ar << CharacterStateInfoSPtr->Text;
 		Ar << CharacterStateInfoSPtr->Tag;
+		Ar << CharacterStateInfoSPtr->Guid;
 		Ar << CharacterStateInfoSPtr->DefaultIcon;
 	}
 

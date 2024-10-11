@@ -221,6 +221,12 @@ namespace HumanProcessor
 	{
 		if (Params.Event == EInputEvent::IE_Pressed)
 		{
+			// 特殊处理一下
+			if (LookAtSceneObjPtr && (Params.Key == EKeys::E))
+			{
+				return;
+			}
+			
 			auto SkillIter = HandleKeysMap.Find(Params.Key);
 			if (SkillIter)
 			{

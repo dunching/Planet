@@ -122,6 +122,6 @@ protected:
 	UPROPERTY(Replicated)
 	FCharacterStateInfo_FASI_Container CharacterStateInfo_FASI_Container;
 
-	TMap<FGameplayTag, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
+	TMap<FGuid, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
 
 };

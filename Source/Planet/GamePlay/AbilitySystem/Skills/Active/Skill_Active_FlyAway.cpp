@@ -183,10 +183,11 @@ void USkill_Active_FlyAway::ExcuteTasks()
 		{
 			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_FlyAway;
 
-			GameplayAbilityTargetData_RootMotionPtr->Height = Height;
-
 			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
+
+			GameplayAbilityTargetData_RootMotionPtr->Height = Height;
+			GameplayAbilityTargetData_RootMotionPtr->Duration = FlyAwayTime;
 
 			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}

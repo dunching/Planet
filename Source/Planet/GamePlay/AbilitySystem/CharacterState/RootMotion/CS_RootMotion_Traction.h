@@ -8,43 +8,50 @@
 #include "Skill_Base.h"
 #include "CS_RootMotion.h"
 
-#include "CS_RootMotion_FlyAway.generated.h"
+#include "CS_RootMotion_Traction.generated.h"
 
 class UAbilityTask_TimerHelper;
-class UAbilityTask_FlyAway;
 class UTexture2D;
 struct FConsumableProxy;
 class UEffectItem;
 class ASPlineActor;
-class ATornado;
+class UAbilityTask_MyApplyRootMotionRadialForce;
 
 struct FStreamableHandle;
 struct FCharacterStateInfo;
 
+// 参考龙王E
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_RootMotion_FlyAway : 
+struct PLANET_API FGameplayAbilityTargetData_RootMotion_Traction  :
 	public FGameplayAbilityTargetData_RootMotion
 {
 	GENERATED_USTRUCT_BODY()
 
-	FGameplayAbilityTargetData_RootMotion_FlyAway();
+	FGameplayAbilityTargetData_RootMotion_Traction();
 
-	virtual FGameplayAbilityTargetData_RootMotion_FlyAway* Clone()const override;
+	virtual FGameplayAbilityTargetData_RootMotion_Traction* Clone()const override;
 
-	float Duration = 3.f;
+	bool bIsEnd = false;
 
-	int32 Height = 100;
+	int32 MoveSpeed = 100;
+	
+	// 
+	int32 Radius = 100;
+
+	FVector TaretPt = FVector::ZeroVector;
 
 private:
 
 };
 
 UCLASS()
-class PLANET_API UCS_RootMotion_FlyAway : public UCS_RootMotion
+class PLANET_API UCS_RootMotion_Traction : public UCS_RootMotion
 {
 	GENERATED_BODY()
 
 public:
+
+	using FRootMotionParam = FGameplayAbilityTargetData_RootMotion_Traction;
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -76,7 +83,7 @@ public:
 
 	virtual void UpdateDuration()override;
 
-	void SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& GameplayAbilityTargetDataPtr);
+	void SetCache(const TSharedPtr<FRootMotionParam>& GameplayAbilityTargetDataPtr);
 
 protected:
 
@@ -84,21 +91,12 @@ protected:
 
 	void ExcuteTasks();
 
-	void OnInterval(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
-	void OnDuration(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-
 	void OnTaskComplete();
 
-	TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>GameplayAbilityTargetDataSPtr;
+	TSharedPtr<FRootMotionParam>GameplayAbilityTargetDataSPtr;
 
-	UAbilityTask_FlyAway* RootMotionTaskPtr = nullptr;
+	UAbilityTask_MyApplyRootMotionRadialForce* RootMotionTaskPtr = nullptr;
 	
-	UAbilityTask_TimerHelper* AbilityTask_TimerHelperPtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float FlyAwayHeight = 250.f;
-
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 
 };
