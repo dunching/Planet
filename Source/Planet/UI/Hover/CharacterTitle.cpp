@@ -7,6 +7,8 @@
 #include <Components/CanvasPanel.h>
 #include <Components/CanvasPanelSlot.h>
 #include <GameplayTagsManager.h>
+#include "Components/CapsuleComponent.h"
+#include "Components/Border.h"
 
 #include "HumanCharacter.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -18,7 +20,13 @@
 
 namespace CharacterTitle
 {
-	const FName ProgressBar = TEXT("ProgressBar");
+	const FName HP_ProgressBar = TEXT("HP_ProgressBar");
+	
+	const FName PP_ProgressBar = TEXT("PP_ProgressBar");
+	
+	const FName Shield_ProgressBar = TEXT("Shield_ProgressBar");
+
+	const FName Border = TEXT("Border");
 
 	const FName Text = TEXT("Text");
 
@@ -34,27 +42,55 @@ void UCharacterTitle::NativeConstruct()
 	Scale = UWidgetLayoutLibrary::GetViewportScale(this);
 
 	SetAnchorsInViewport(FAnchors(.5f));
+	SetAlignmentInViewport(FVector2D(.5f, 1.f));
 
 	if (CharacterPtr)
 	{
+		float Radius = 0.f;
+		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
+
 		{
 			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent(); 
 			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
 		}
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
 		{
-			OnHPMaxValueChanged(Ref.GetMaxValue());
-			MaxHPValueChanged = Ref.AddOnMaxValueChanged(
-				std::bind(&ThisClass::OnHPMaxValueChanged, this, std::placeholders::_2)
-			);
+			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
+			{
+				OnHPMaxValueChanged(Ref.GetMaxValue());
+				MaxHPValueChanged = Ref.AddOnMaxValueChanged(
+					std::bind(&ThisClass::OnHPMaxValueChanged, this, std::placeholders::_2)
+				);
+			}
+			{
+				OnHPCurrentValueChanged(Ref.GetCurrentValue());
+				CurrentHPValueChanged = Ref.AddOnValueChanged(
+					std::bind(&ThisClass::OnHPCurrentValueChanged, this, std::placeholders::_2)
+				);
+			}
 		}
 		{
-			OnHPCurrentValueChanged(Ref.GetCurrentValue());
-			CurrentHPValueChanged = Ref.AddOnValueChanged(
-				std::bind(&ThisClass::OnHPCurrentValueChanged, this, std::placeholders::_2)
-			);
+			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
+			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
+				std::bind(&ThisClass::OnPPChanged, this)
+			));
+			ValueChangedAry.Add(Ref.AddOnValueChanged(
+				std::bind(&ThisClass::OnPPChanged, this)
+			));
+			OnPPChanged();
+		}
+		{
+			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
+			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
+				std::bind(&ThisClass::OnShieldChanged, this)
+			));
+			ValueChangedAry.Add(Ref.AddOnValueChanged(
+				std::bind(&ThisClass::OnShieldChanged, this)
+			));
+			OnShieldChanged();
 		}
 	}
+	SwitchCantBeSelect(false);
+
 	ApplyCharaterNameToTitle();
 
 	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
@@ -74,6 +110,14 @@ void UCharacterTitle::NativeDestruct()
 		CurrentHPValueChanged->UnBindCallback();
 	}
 
+	for (auto Iter : ValueChangedAry)
+	{
+		if (Iter)
+		{
+			Iter->UnBindCallback();
+		}
+	}
+
 	if (CharacterPtr)
 	{
 		{
@@ -88,6 +132,15 @@ void UCharacterTitle::NativeDestruct()
 void UCharacterTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
+}
+
+void UCharacterTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
+{
+	auto WidgetPtr = Cast<UBorder>(GetWidgetFromName(CharacterTitle::Border));
+	if (WidgetPtr)
+	{
+		WidgetPtr->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, bIsCanBeSelect ? .3f: 1.f));
+	}
 }
 
 void UCharacterTitle::OnHPCurrentValueChanged(int32 NewVal)
@@ -132,7 +185,7 @@ void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, in
 void UCharacterTitle::OnHPChanged()
 {
 	{
-		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::ProgressBar));
+		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::HP_ProgressBar));
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetPercent(static_cast<float>(CurrentHP) / MaxHP);
@@ -144,6 +197,26 @@ void UCharacterTitle::OnHPChanged()
 		{
 			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), CurrentHP, MaxHP)));
 		}
+	}
+}
+
+void UCharacterTitle::OnPPChanged()
+{
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::PP_ProgressBar));
+	if (WidgetPtr)
+	{
+		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
+		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
+	}
+}
+
+void UCharacterTitle::OnShieldChanged()
+{
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::Shield_ProgressBar));
+	if (WidgetPtr)
+	{
+		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
+		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
 	}
 }
 
@@ -189,27 +262,11 @@ bool UCharacterTitle::ResetPosition(float InDeltaTime)
 	FVector2D ScreenPosition = FVector2D::ZeroVector;
 	UGameplayStatics::ProjectWorldToScreen(
 		UGameplayStatics::GetPlayerController(this, 0),
-		CharacterPtr->GetActorLocation() - (CharacterPtr->GetGravityDirection() * Offset),
+		CharacterPtr->GetActorLocation() - (CharacterPtr->GetGravityDirection() * (Offset + HalfHeight)),
 		ScreenPosition
 	);
 
-	if (Size.IsNearlyZero())
-	{
-		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(CharacterTitle::CanvasPanel));
-		if (UIPtr)
-		{
-			TSharedPtr<SPanel> PanelSPtr = UIPtr->GetCanvasWidget();
-			Size = PanelSPtr->ComputeDesiredSize(0.f);
-		}
-	}
-
-	const auto TempWidgetSize = Size * Scale;
-
-	ScreenPosition.X -= (TempWidgetSize.X / 2);
-
-	DesiredPt = ScreenPosition;
-
-	SetPositionInViewport(DesiredPt);
+	SetPositionInViewport(ScreenPosition);
 
 	return true;
 }

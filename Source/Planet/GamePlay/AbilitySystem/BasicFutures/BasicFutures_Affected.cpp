@@ -138,7 +138,6 @@ void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate
 			this,
 			TEXT(""),
 			CurMontagePtr,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

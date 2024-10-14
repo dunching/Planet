@@ -183,7 +183,6 @@ void USkill_WeaponActive_RangeTest::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

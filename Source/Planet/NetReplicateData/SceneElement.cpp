@@ -650,9 +650,12 @@ void FSkillProxy::RegisterSkill()
 
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 
+		auto CODPtr = GetSkillClass().GetDefaultObject();
+		CODPtr->InitalTags();
+
 		const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
 		FGameplayAbilitySpec GameplayAbilitySpec(
-			GetSkillClass(),
+			CODPtr,
 			Level,
 			InputID
 		);
@@ -780,9 +783,12 @@ void FWeaponSkillProxy::RegisterSkill()
 		}
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 
+		auto CODPtr = GetSkillClass().GetDefaultObject();
+		CODPtr->InitalTags();
+
 		const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
 		FGameplayAbilitySpec GameplayAbilitySpec(
-			GetSkillClass(),
+			CODPtr,
 			Level,
 			InputID
 		);

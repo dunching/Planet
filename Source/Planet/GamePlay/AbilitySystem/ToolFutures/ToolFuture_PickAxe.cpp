@@ -16,6 +16,7 @@
 #include "HumanCharacter.h"
 #include "Animation/AnimInstanceBase.h"
 #include "AbilityTask_PlayMontage.h"
+#include "AbilityTask_PlayAnimAndWaitOverride.h"
 #include "ToolUnitBase.h"
 #include "Tool_PickAxe.h"
 
@@ -97,7 +98,6 @@ void UToolFuture_PickAxe::PerformAction()
 				this,
 				TEXT(""),
 				HumanMontage,
-				CharacterPtr->GetMesh()->GetAnimInstance(),
 				Rate
 			);
 

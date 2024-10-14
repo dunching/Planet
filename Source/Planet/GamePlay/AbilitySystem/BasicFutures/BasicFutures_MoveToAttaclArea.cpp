@@ -70,7 +70,8 @@ void UBasicFutures_MoveToAttaclArea::ActivateAbility(
 
 			QueryRequest.SetFloatParam(FBasicFutures_MoveToAttaclArea::Get().Donut_InnerRadius, MinDistance);
 			QueryRequest.SetFloatParam(
-				FBasicFutures_MoveToAttaclArea::Get().Donut_OuterRadius, DataPtr->AttackDistance - UGameOptions::GetInstance()->MoveToAttaclAreaOffset
+				FBasicFutures_MoveToAttaclArea::Get().Donut_OuterRadius,
+				DataPtr->AttackDistance - UGameOptions::GetInstance()->MoveToAttaclAreaOffset
 			);
 
 			auto QueryFinishedDelegate = FQueryFinishedSignature::CreateUObject(this, &ThisClass::OnQueryFinished);

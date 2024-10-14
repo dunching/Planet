@@ -164,7 +164,6 @@ void USkill_Consumable_Generic::PlayMontage()
 				this,
 				TEXT(""),
 				HumanMontage,
-				CharacterPtr->GetMesh()->GetAnimInstance(),
 				InPlayRate
 			);
 

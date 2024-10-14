@@ -371,7 +371,6 @@ void USkill_WeaponActive_FoldingFan::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

@@ -18,6 +18,7 @@
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
+#include "AbilityTask_PlayAnimAndWaitOverride.h"
 #include "ToolFuture_PickAxe.h"
 #include "Planet.h"
 #include "CollisionDataStruct.h"
@@ -327,7 +328,6 @@ void USkill_WeaponActive_Bow::PlayMontage()
 				this,
 				TEXT(""),
 				HumanMontage,
-				CharacterPtr->GetMesh()->GetAnimInstance(),
 				Rate
 			);
 

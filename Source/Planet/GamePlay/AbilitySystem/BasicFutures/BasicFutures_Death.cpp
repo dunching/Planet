@@ -40,7 +40,6 @@ void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 			this,
 			TEXT(""),
 			CurMontagePtr,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

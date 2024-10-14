@@ -26,6 +26,7 @@
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
 #include "AbilityTask_PlayMontage.h"
+#include "AbilityTask_PlayAnimAndWaitOverride.h"
 
 void UCS_RootMotion_KnockDown::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,

@@ -99,7 +99,6 @@ void UBasicFutures_DisMount::PlayMontage()
 		this,
 		TEXT(""),
 		MontagePtr,
-		CharacterPtr->GetMesh()->GetAnimInstance(),
 		1.f
 	);
 

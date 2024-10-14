@@ -52,6 +52,7 @@
 #include "CS_PeriodicStateModify_Charm.h"
 #include "CS_PeriodicStateModify_Ice.h"
 #include "CS_PeriodicPropertyTag.h"
+#include "CharacterTitle.h"
 
 FName UBaseFeatureComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -518,6 +519,23 @@ void UBaseFeatureComponent::Jump_Implementation()
 		OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
 			FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump }
 		);
+	}
+}
+
+void UBaseFeatureComponent::SwitchCantBeSelect(bool bIsCanBeSelect)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+#if UE_EDITOR || UE_CLIENT
+		if (GetOwnerRole() < ROLE_Authority)
+		{
+			if (OnwerActorPtr->CharacterTitlePtr)
+			{
+				OnwerActorPtr->CharacterTitlePtr->SwitchCantBeSelect(bIsCanBeSelect);
+			}
+		}
+#endif
 	}
 }
 

@@ -34,8 +34,6 @@ void USkill_WeaponActive_Base::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
 }
 
 void USkill_WeaponActive_Base::PreActivate(
@@ -117,6 +115,21 @@ void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
 	{
 		StopContinueActive();
 	}
+}
+
+void USkill_WeaponActive_Base::InitalTags()
+{
+	Super::InitalTags();
+
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
+
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
 }
 
 bool USkill_WeaponActive_Base::GetNum(int32& Num) const

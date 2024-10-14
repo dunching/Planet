@@ -151,7 +151,6 @@ void USkill_Active_Charm::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			InPlayRate
 		);
 

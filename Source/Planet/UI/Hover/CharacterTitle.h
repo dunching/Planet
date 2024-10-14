@@ -36,6 +36,8 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetCampType(ECharacterCampType CharacterCampType);
 
+	void SwitchCantBeSelect(bool bIsCanBeSelect);
+
 	ACharacterBase* CharacterPtr = nullptr;
 
 protected:
@@ -49,6 +51,10 @@ protected:
 	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
 
 	void OnHPChanged();
+	
+	void OnPPChanged();
+
+	void OnShieldChanged();
 
 	void ApplyCharaterNameToTitle();
 
@@ -71,13 +77,17 @@ protected:
 	float CurrentInterval = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Offset = 150.f;
+	float Offset = 20.f;
+
+	float HalfHeight = 0.f;
 
 	float Scale = 1.f;
 
 	FOnValueChangedDelegateHandle CurrentHPValueChanged;
 
 	FOnValueChangedDelegateHandle MaxHPValueChanged;
+
+	TArray<FOnValueChangedDelegateHandle> ValueChangedAry;
 
 	FTSTicker::FDelegateHandle TickDelegateHandle;
 

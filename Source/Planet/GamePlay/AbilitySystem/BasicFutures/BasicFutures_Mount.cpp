@@ -95,7 +95,6 @@ void UBasicFutures_Mount::PlayMontage()
 		this,
 		TEXT(""),
 		MontagePtr,
-		CharacterPtr->GetMesh()->GetAnimInstance(),
 		1.f
 	);
 

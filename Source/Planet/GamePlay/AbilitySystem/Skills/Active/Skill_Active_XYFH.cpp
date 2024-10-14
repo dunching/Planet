@@ -272,7 +272,6 @@ void USkill_Active_XYFH::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			InPlayRate
 		);
 

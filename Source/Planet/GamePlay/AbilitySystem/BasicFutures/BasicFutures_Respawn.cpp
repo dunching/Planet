@@ -47,7 +47,6 @@ void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 			this,
 			TEXT(""),
 			CurMontagePtr,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

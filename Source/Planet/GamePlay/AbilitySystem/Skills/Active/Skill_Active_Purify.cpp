@@ -1,5 +1,5 @@
 
-#include "Skill_Active_FlyAway.h"
+#include "Skill_Active_Purify.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -30,20 +30,15 @@
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
+#include "CS_PeriodicStateModify_SuperArmor.h"
 
-static TAutoConsoleVariable<int32> Skill_Active_FlyAway_DrawDebug(
-	TEXT("Skill_Active_FlyAway.DrawDebug"),
-	0,
-	TEXT("")
-	TEXT(" default: 0"));
-
-USkill_Active_FlyAway::USkill_Active_FlyAway() :
+USkill_Active_Purify::USkill_Active_Purify() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void USkill_Active_FlyAway::PreActivate(
+void USkill_Active_Purify::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -54,7 +49,7 @@ void USkill_Active_FlyAway::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void USkill_Active_FlyAway::ActivateAbility(
+void USkill_Active_Purify::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -66,7 +61,7 @@ void USkill_Active_FlyAway::ActivateAbility(
 	CommitAbility(Handle, ActorInfo, ActivationInfo);
 }
 
-bool USkill_Active_FlyAway::CanActivateAbility(
+bool USkill_Active_Purify::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
@@ -76,7 +71,7 @@ bool USkill_Active_FlyAway::CanActivateAbility(
 {
 	if (
 		CharacterPtr->GetCharacterMovement()->IsFlying() ||
-		CharacterPtr->GetCharacterMovement()->IsFalling() 
+		CharacterPtr->GetCharacterMovement()->IsFalling()
 		)
 	{
 		return false;
@@ -84,7 +79,7 @@ bool USkill_Active_FlyAway::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void USkill_Active_FlyAway::EndAbility(
+void USkill_Active_Purify::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -95,7 +90,7 @@ void USkill_Active_FlyAway::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_FlyAway::PerformAction(
+void USkill_Active_Purify::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -109,93 +104,25 @@ void USkill_Active_FlyAway::PerformAction(
 	}
 }
 
-void USkill_Active_FlyAway::ExcuteTasks()
+void USkill_Active_Purify::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_SuperArmor(.1f);
 
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(CharacterPtr);
-
-#ifdef WITH_EDITOR
-		if (Skill_Active_FlyAway_DrawDebug.GetValueOnGameThread())
-		{
-			DrawDebugLine(
-				GetWorld(),
-				CharacterPtr->GetActorLocation(),
-				CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorRotation().Vector() * 100),
-				FColor::Red, false, 3
-			);
-
-			DrawDebugLine(
-				GetWorld(),
-				CharacterPtr->GetActorLocation(),
-				CharacterPtr->GetActorLocation() + (CharacterPtr->GetControlRotation().Vector() * 100),
-				FColor::Yellow, false, 3
-			);
-		}
-#endif
-
-		const auto Dir = UKismetMathLibrary::MakeRotFromZX(
-			UKismetGravityLibrary::GetGravity(CharacterPtr->GetActorLocation()), CharacterPtr->GetControlRotation().Vector()
-		).Vector();
-
-		auto Result = UKismetCollisionHelper::OverlapMultiSectorByObjectType(
-			GetWorld(),
-			CharacterPtr->GetActorLocation(),
-			CharacterPtr->GetActorLocation() + (Dir * Radius),
-			Angle,
-			9,
-			ObjectQueryParams,
-			Params
-		);
-
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
+		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
 
 		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 
-		TSet<ACharacterBase*>TargetSet;
-		for (const auto & Iter : Result)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
-			{
-				TargetSet.Add(TargetCharacterPtr);
-			}
-		}
-
-		// 伤害
-		for (const auto& Iter : TargetSet)
-		{
-			FGAEventData GAEventData(Iter, CharacterPtr);
-
-			GAEventData.SetBaseDamage(Damage);
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-		}
-		ICPtr->SendEventImp(GAEventDataPtr);
-
-		// 控制效果
-		for (const auto& Iter : TargetSet)
-		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_FlyAway;
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
-
-			GameplayAbilityTargetData_RootMotionPtr->Height = Height;
-			GameplayAbilityTargetData_RootMotionPtr->Duration = FlyAwayTime;
-
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-		}
+		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 	}
 }
 
-void USkill_Active_FlyAway::PlayMontage()
+void USkill_Active_Purify::PlayMontage()
 {
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		const float InPlayRate = 1.f;
 
@@ -213,4 +140,5 @@ void USkill_Active_FlyAway::PlayMontage()
 
 		TaskPtr->ReadyForActivation();
 	}
+#endif
 }

@@ -109,7 +109,11 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag State_Buff_CantBeSlected =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.CantBeSlected")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.CantBeSelected")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_Buff_Stagnation =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.Stagnation")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Debuff =
@@ -445,4 +449,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
 	FGameplayTag DataSource_TalentModify =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.TalentModify")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag Skill_CanBeInterrupted=
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag Skill_CanBeInterrupted_Stagnation =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted.Stagnation")));
 };

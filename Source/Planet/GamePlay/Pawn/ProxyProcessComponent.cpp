@@ -437,7 +437,10 @@ bool UProxyProcessComponent::ActivedCorrespondingWeapon(const FGameplayTag& Acti
 		{
 			auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1];
 
-			if (WeaponSocketSPtr->ProxySPtr->GetUnitType() == RequireWeaponUnitType)
+			if (
+				WeaponSocketSPtr->ProxySPtr && 
+				(WeaponSocketSPtr->ProxySPtr->GetUnitType() == RequireWeaponUnitType)
+				)
 			{
 				SwitchWeaponImp(WeaponSocketSPtr->Socket);
 
@@ -449,7 +452,10 @@ bool UProxyProcessComponent::ActivedCorrespondingWeapon(const FGameplayTag& Acti
 		{
 			auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
 
-			if (WeaponSocketSPtr->ProxySPtr->GetUnitType() == RequireWeaponUnitType)
+			if (
+				WeaponSocketSPtr->ProxySPtr &&
+				(WeaponSocketSPtr->ProxySPtr->GetUnitType() == RequireWeaponUnitType)
+				)
 			{
 				SwitchWeaponImp(WeaponSocketSPtr->Socket);
 

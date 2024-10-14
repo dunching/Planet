@@ -180,7 +180,6 @@ void USkill_Active_Displacement::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			InPlayRate
 		);
 
