@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include <GameFramework/CharacterMovementComponent.h>
+#include "GameFramework/CharacterMovementReplication.h"
 
 #include "GravityMovementComponent.generated.h"
 
@@ -25,6 +26,21 @@ struct GRAVITY_API FLyraCharacterGroundInfo
 
     UPROPERTY(BlueprintReadOnly)
     float GroundDistance;
+};
+
+struct FMyCharacterMoveResponseDataContainer : 
+    public FCharacterMoveResponseDataContainer
+{
+public:
+
+    virtual bool Serialize(
+        UCharacterMovementComponent& CharacterMovement,
+        FArchive& Ar, 
+        UPackageMap* PackageMap
+    )override;
+
+    bool bPathFollow = false;
+
 };
 
 UCLASS(config = Game)
@@ -72,6 +88,8 @@ protected:
 
     virtual FVector ConsumeInputVector()override;
 
+    virtual void ControlledCharacterMove(const FVector& InputVector, float DeltaSeconds)override;
+
     virtual void CalcVelocity(
         float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration
     )override;
@@ -104,7 +122,29 @@ protected:
 
     FRotator ComputeRootMotionToMovementRotation(const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation) const;
 
+    virtual void PhysFlying(float deltaTime, int32 Iterations)override;
+
+    virtual void ServerAutonomousProxyTick(float DeltaSeconds)override;
+
+    virtual void ClientHandleMoveResponse(const FCharacterMoveResponseDataContainer& MoveResponse)override;
+
+    virtual void ClientAdjustPosition_Implementation(
+        float TimeStamp, 
+        FVector NewLoc,
+        FVector NewVel,
+        UPrimitiveComponent* NewBase, 
+        FName NewBaseBoneName,
+        bool bHasBase, 
+        bool bBaseRelativePosition, 
+        uint8 ServerMovementMode,
+        TOptional<FRotator> OptionalRotation = TOptional<FRotator>()
+    );
+
+    FMyCharacterMoveResponseDataContainer * GetMyMoveResponseDataContainer() const;
+
     FLyraCharacterGroundInfo CachedGroundInfo;
+
+    FMyCharacterMoveResponseDataContainer MyDefaultMoveResponseDataContainer;
 
 #if USECUSTOMEGRAVITY
     virtual void BeginPlay() override;

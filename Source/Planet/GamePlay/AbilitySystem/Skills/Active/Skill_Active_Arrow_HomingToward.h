@@ -21,7 +21,7 @@ class PLANET_API USkill_Active_Arrow_HomingToward : public USkill_Active_Base
 
 public:
 
-	virtual void ActivateAbility(
+	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,

@@ -18,6 +18,7 @@
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
+#include "AbilityTask_PlayAnimAndWaitOverride.h"
 #include "ToolFuture_PickAxe.h"
 #include "Planet.h"
 #include "CollisionDataStruct.h"
@@ -51,18 +52,6 @@ bool FGameplayAbilityTargetData_Bow_RegisterParam::NetSerialize(FArchive& Ar, cl
 	Ar << bIsMultiple;
 
 	return true;
-}
-
-ASkill_WeaponActive_Bow_Projectile::ASkill_WeaponActive_Bow_Projectile(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
-{
-	NiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
-	NiagaraComponent->SetupAttachment(CollisionComp);
-
-	ProjectileMovementCompPtr->HomingAccelerationMagnitude = 2000.f;
-	ProjectileMovementCompPtr->InitialSpeed = 100.f;
-	ProjectileMovementCompPtr->MaxSpeed = 100.f;
-	InitialLifeSpan = 10.f;
 }
 
 USkill_WeaponActive_Bow::USkill_WeaponActive_Bow() :
@@ -221,7 +210,7 @@ void USkill_WeaponActive_Bow::EmitProjectile()const
 {
 	auto EmitTransform = WeaponPtr->GetEmitTransform();
 
-	const auto AttackDistance = WeaponPtr->WeaponUnitPtr->GetMaxAttackDistance();
+	const auto AttackDistance = WeaponPtr->WeaponProxyPtr->GetMaxAttackDistance();
 
 	ACharacterBase* HomingTarget = nullptr;
 	if (RegisterParamSPtr && RegisterParamSPtr->bIsHomingTowards)
@@ -339,7 +328,6 @@ void USkill_WeaponActive_Bow::PlayMontage()
 				this,
 				TEXT(""),
 				HumanMontage,
-				CharacterPtr->GetMesh()->GetAnimInstance(),
 				Rate
 			);
 

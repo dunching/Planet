@@ -115,30 +115,39 @@ void UCS_PeriodicStateModify_Slow::PerformAction()
 
 		if (MoveSpeedOffsetMap.Contains(CurrentGameplayAbilityTargetDataSPtr->SpeedOffset))
 		{
+			auto TargetCharacterStateInfoSPtr =
+				MoveSpeedOffsetMap[CurrentGameplayAbilityTargetDataSPtr->SpeedOffset].CharacterStateInfoSPtr;
 			if (
-				MoveSpeedOffsetMap[CurrentGameplayAbilityTargetDataSPtr->SpeedOffset].CharacterStateInfoSPtr->GetRemainTime() >
+				TargetCharacterStateInfoSPtr->GetRemainTime() >
 				CurrentGameplayAbilityTargetDataSPtr->Duration
 				)
 			{
-				return;
+			}
+			else
+			{
+				TargetCharacterStateInfoSPtr->Duration  =
+					CurrentGameplayAbilityTargetDataSPtr->Duration;
+				TargetCharacterStateInfoSPtr->RefreshTime();
 			}
 		}
+		else
+		{
+			FMyStruct MyStruct;
 
-		FMyStruct MyStruct;
+			MyStruct.CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+			MyStruct.CharacterStateInfoSPtr->Tag = CurrentGameplayAbilityTargetDataSPtr->Tag;
+			MyStruct.CharacterStateInfoSPtr->Duration = CurrentGameplayAbilityTargetDataSPtr->Duration;
+			MyStruct.CharacterStateInfoSPtr->DefaultIcon = CurrentGameplayAbilityTargetDataSPtr->DefaultIcon;
+			MyStruct.CharacterStateInfoSPtr->DataChanged();
+			MyStruct.SPtr = CurrentGameplayAbilityTargetDataSPtr;
 
-		MyStruct.CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		MyStruct.CharacterStateInfoSPtr->Tag = CurrentGameplayAbilityTargetDataSPtr->Tag;
-		MyStruct.CharacterStateInfoSPtr->Duration = CurrentGameplayAbilityTargetDataSPtr->Duration;
-		MyStruct.CharacterStateInfoSPtr->DefaultIcon = CurrentGameplayAbilityTargetDataSPtr->DefaultIcon;
-		MyStruct.CharacterStateInfoSPtr->DataChanged();
-		MyStruct.SPtr = CurrentGameplayAbilityTargetDataSPtr;
+			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(MyStruct.CharacterStateInfoSPtr);
 
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(MyStruct.CharacterStateInfoSPtr);
-
-		MoveSpeedOffsetMap.Add(
-			CurrentGameplayAbilityTargetDataSPtr->SpeedOffset,
-			MyStruct
-		);
+			MoveSpeedOffsetMap.Add(
+				CurrentGameplayAbilityTargetDataSPtr->SpeedOffset,
+				MyStruct
+			);
+		}
 	}
 }
 
@@ -184,6 +193,9 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 		return;
 	}
 
+	MoveSpeedOffsetMap.KeySort([](const auto & Left, const auto& Right) {
+		return Left < Right;
+		});
 	for (const auto Iter : MoveSpeedOffsetMap)
 	{
 		auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;

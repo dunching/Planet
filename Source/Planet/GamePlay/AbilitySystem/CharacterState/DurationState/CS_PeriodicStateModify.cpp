@@ -50,8 +50,8 @@ void UCS_PeriodicStateModify::PreActivate(
 
 			AbilityTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
 			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
-			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
-			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
+// 			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
+// 			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
 		}
 	}
 

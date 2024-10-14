@@ -38,6 +38,18 @@ public:
 	)override;
 	
 	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)override;
+	
+	virtual void CurrentMontageStop(float OverrideBlendOutTime)override;
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void CurrentMontageStopImp(float OverrideBlendOutTime);
+	
+	// 我们直接使用 AddLooseGameplayTag ，GAS也会同步到每个连接，但是顺序并不能满足要求，有些地方我们需要用RPC固定顺序
+	UFUNCTION(Client, Reliable)
+	void AddLooseGameplayTag_2_Client(const FGameplayTag& GameplayTag);
+	
+	UFUNCTION(Client, Reliable)
+	void RemoveLooseGameplayTag_2_Client(const FGameplayTag& GameplayTag);
 
 	UFUNCTION(Client, Reliable)
 	void ReplicateContinues(

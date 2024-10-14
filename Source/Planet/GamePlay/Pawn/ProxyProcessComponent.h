@@ -35,10 +35,15 @@ public:
 
 	using FOwnerType = ACharacterBase;
 
-	using FOnAllocationChanged =
+	using FOnCurrentWeaponChanged =
+		TCallbackHandleContainer<void()>;
+
+	using FOnCanAciveSkillChanged =
 		TCallbackHandleContainer<void()>;
 
 	UProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
+
+	virtual void BeginPlay()override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
@@ -59,18 +64,25 @@ public:
 		const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr
 	);
 
-	TArray<TSharedPtr<FSocket_FASI>> GetCanbeActiveAction()const;
-
 	void UpdateSocket(
 		const TSharedPtr<FSocket_FASI>& WeaponSocket
 	);
 
 	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> GetAllSocket()const;
 
-	TSharedPtr<FSocket_FASI> FindSocket(const FGameplayTag& Tag)const;
-
+	TSharedPtr<FSocket_FASI> FindSocket(const FGameplayTag& SocketTag)const;
 #pragma region Skills
-	TSharedPtr<FActiveSkillProxy> FindActiveSkillSocket(const FGameplayTag& Tag)const;
+	void UpdateCanbeActiveSkills();
+	
+	void UpdateCanbeActiveSkills_UsePassiveSocket(
+		const TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>&CanActiveSocketMap
+	);
+
+	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> GetCanbeActiveSkills()const;
+
+	TSharedPtr<FActiveSkillProxy> FindActiveSkillBySocket(const FGameplayTag& SocketTag)const;
+
+	TSharedPtr<FSocket_FASI> FindActiveSkillByType(const FGameplayTag& TypeTag)const;
 #pragma endregion 
 
 #pragma region Weapon
@@ -93,20 +105,31 @@ public:
 		TSharedPtr<FWeaponSkillProxy>& FirstWeaponSkillSPtr,
 		TSharedPtr<FWeaponSkillProxy>& SecondWeaponSkillSPtr
 	);
+	
+	TSharedPtr<FWeaponSkillProxy> GetWeaponSkillByType(
+		const FGameplayTag&TypeTag
+	);
 
 	TSharedPtr<FWeaponProxy> GetActivedWeapon()const;
 
 	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& Tag)const;
+
+	TSharedPtr<FWeaponSkillProxy> FindWeaponSkillSocket(const FGameplayTag& Tag)const;
+
+	TArray<TSharedPtr<FSocket_FASI>> GetCanbeActiveWeapon()const;
 #pragma endregion 
 
 #pragma region Consumables
+	TArray<TSharedPtr<FSocket_FASI>> GetCanbeActiveConsumable()const;
 #pragma endregion 
 
-	FOnAllocationChanged OnAllocationChanged;
+	FOnCurrentWeaponChanged OnCurrentWeaponChanged;
+
+	FOnCanAciveSkillChanged OnCanAciveSkillChanged;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
 	FGameplayTag CurrentWeaponSocket;
-
+	
 protected:
 
 	void Add(const TSharedPtr<FSocket_FASI>& Socket);
@@ -123,11 +146,11 @@ protected:
 
 	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
 
-	bool ActivedCorrespondingWeapon(const FSocket_FASI& Socket);
+	bool ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag);
 	
 #pragma region RPC
 	UFUNCTION(Server, Reliable)
-	void ActivedCorrespondingWeapon_Server(const FSocket_FASI& Socket);
+	void ActivedCorrespondingWeapon_Server(const FGameplayTag& ActiveSkillSocketTag);
 
 	UFUNCTION(Server, Reliable)
 	void UpdateSocket_Server(
@@ -145,13 +168,13 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ActiveAction_Server(
-		const FSocket_FASI& Socket,
+		const FGameplayTag& SocketTag,
 		bool bIsAutomaticStop
 	);
 
 	UFUNCTION(Server, Reliable)
 	void CancelAction_Server(
-		const FSocket_FASI& Socket
+		const FGameplayTag& SocketTag
 	);
 
 	UFUNCTION()
@@ -165,5 +188,7 @@ protected:
 	FAllocation_FASI_Container AllocationSkills_Container;
 	
 	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>SocketMap;
+
+	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>CanActiveSocketMap;
 
 };

@@ -35,6 +35,8 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
+	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)override;
+
 protected:
 
 	virtual void NativeConstruct()override;

@@ -65,6 +65,32 @@ UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
 	return MyTask;
 }
 
+UAbilityTask_FlyAway* UAbilityTask_FlyAway::NewTask(
+	UGameplayAbility* OwningAbility,
+	FName TaskInstanceName,
+	ERootMotionAccumulateMode RootMotionAccumulateMode,
+	float InDuration,
+	float InHeight,
+	int32 InResingSpeed,
+	int32 InFallingSpeed
+)
+{
+	UAbilityTask_FlyAway* MyTask = NewAbilityTask<UAbilityTask_FlyAway>(OwningAbility);
+
+	MyTask->ForceName = TaskInstanceName;
+	MyTask->FinishVelocityMode = ERootMotionFinishVelocityMode::SetVelocity;
+	MyTask->RootMotionAccumulateMode = RootMotionAccumulateMode;
+	MyTask->FinishSetVelocity = FVector::ZeroVector;
+	MyTask->FinishClampVelocity = 0.f;
+
+	MyTask->Duration = InDuration;
+	MyTask->Height = InHeight;
+	MyTask->ResingSpeed = InResingSpeed;
+	MyTask->FallingSpeed = InFallingSpeed;
+
+	return MyTask;
+}
+
 void UAbilityTask_FlyAway::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
@@ -73,7 +99,7 @@ void UAbilityTask_FlyAway::TickTask(float DeltaTime)
 	if (bTimedOut)
 	{
 		bIsFinished = true;
-		OnFinish.ExecuteIfBound();
+		OnFinished.ExecuteIfBound();
 		EndTask();
 	}
 }
@@ -108,6 +134,8 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 			RootMotionSourceSPtr->Initial(
 				Height, 
 				Duration, 
+				ResingSpeed, 
+				FallingSpeed,
 				ASC->AbilityActorInfo->AvatarActor->GetActorLocation(),
 				Cast<ACharacter>(ASC->AbilityActorInfo->AvatarActor)
 			);
@@ -140,7 +168,13 @@ void UAbilityTask_FlyAway::UpdateDuration()
 		auto Ptr = MovementComponent->GetRootMotionSourceByID(RootMotionSourceID);
 		TSharedPtr<FRootMotionSource_FlyAway>RootMotionSourceSPtr(Ptr, dynamic_cast<FRootMotionSource_FlyAway*>(Ptr.Get()));
 
-		RootMotionSourceSPtr->UpdateDuration(Height, Duration, MovementComponent->GetActorLocation());
+		RootMotionSourceSPtr->UpdateDuration(
+			Height, 
+			Duration,
+			ResingSpeed,
+			FallingSpeed,
+			MovementComponent->GetActorLocation()
+		);
 	}
 }
 
@@ -158,5 +192,7 @@ void UAbilityTask_FlyAway::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
 
 	DOREPLIFETIME(ThisClass, Height);
 	DOREPLIFETIME(ThisClass, Duration);
+	DOREPLIFETIME(ThisClass, ResingSpeed);
+	DOREPLIFETIME(ThisClass, FallingSpeed);
 	DOREPLIFETIME(ThisClass, RootMotionAccumulateMode);
 }

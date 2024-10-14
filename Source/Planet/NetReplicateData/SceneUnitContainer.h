@@ -101,6 +101,8 @@ struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
 
 	void AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
+	void UpdateItem(const FGuid& Proxy_ID);
+
 	void UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	void RemoveItem(const TSharedPtr<FBasicProxy>& ProxySPtr);

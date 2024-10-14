@@ -87,7 +87,6 @@ void USkill_Active_IceGun::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			InPlayRate
 		);
 

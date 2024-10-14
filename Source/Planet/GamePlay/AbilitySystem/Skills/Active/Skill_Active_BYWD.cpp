@@ -56,13 +56,15 @@ void USkill_Active_BYWD::ActivateAbility(
 				TEXT(""),
 				ERootMotionAccumulateMode::Additive,
 				Duration,
-				Height
+				Height,
+				Height,
+				-1
 			);
 
 #if UE_EDITOR || UE_SERVER
 			if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 			{
-				TaskPtr->OnFinish.BindLambda([this]
+				TaskPtr->OnFinished.BindLambda([this]
 					{
 						CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 

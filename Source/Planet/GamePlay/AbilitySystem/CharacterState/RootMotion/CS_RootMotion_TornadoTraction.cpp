@@ -26,6 +26,22 @@
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
 
+FGameplayAbilityTargetData_RootMotion_TornadoTraction::FGameplayAbilityTargetData_RootMotion_TornadoTraction() :
+	Super(UGameplayTagsSubSystem::GetInstance()->TornadoTraction)
+{
+
+}
+
+FGameplayAbilityTargetData_RootMotion_TornadoTraction* FGameplayAbilityTargetData_RootMotion_TornadoTraction::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_RootMotion_TornadoTraction;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 void UCS_RootMotion_TornadoTraction::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -167,20 +183,4 @@ void UCS_RootMotion_TornadoTraction::OnDuration(UAbilityTask_TimerHelper* InTask
 	{
 
 	}
-}
-
-FGameplayAbilityTargetData_RootMotion_TornadoTraction::FGameplayAbilityTargetData_RootMotion_TornadoTraction() :
-	Super(UGameplayTagsSubSystem::GetInstance()->TornadoTraction)
-{
-
-}
-
-FGameplayAbilityTargetData_RootMotion_TornadoTraction* FGameplayAbilityTargetData_RootMotion_TornadoTraction::Clone() const
-{
-	auto ResultPtr =
-		new FGameplayAbilityTargetData_RootMotion_TornadoTraction;
-
-	*ResultPtr = *this;
-
-	return ResultPtr;
 }

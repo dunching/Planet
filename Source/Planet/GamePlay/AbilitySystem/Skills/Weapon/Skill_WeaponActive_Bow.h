@@ -15,22 +15,7 @@ class UAnimMontage;
 class AWeapon_Bow;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
-
-UCLASS()
-class PLANET_API ASkill_WeaponActive_Bow_Projectile : public AProjectileBase
-{
-	GENERATED_BODY()
-
-public:
-
-	ASkill_WeaponActive_Bow_Projectile(const FObjectInitializer& ObjectInitializer);
-	
-protected:
-
-	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly, Category = "Niagara")
-	UNiagaraComponent* NiagaraComponent = nullptr;
-
-};
+class ASkill_WeaponActive_Bow_Projectile;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_Bow_RegisterParam :

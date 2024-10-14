@@ -22,7 +22,8 @@ struct FStreamableHandle;
 struct FGameplayAbilityTargetData_RootMotion;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_RootMotion : public FGameplayAbilityTargetData_CS_Base
+struct PLANET_API FGameplayAbilityTargetData_RootMotion : 
+	public FGameplayAbilityTargetData_CS_Base
 {
 	GENERATED_USTRUCT_BODY()
 

@@ -31,9 +31,8 @@ public:
 	// 记录Player的Yaw和Pitch
 	FRotator ControlRotationWithoutGravityTrans = FRotator::ZeroRotator;
 #endif
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MoveToLocation_RPC(
+	
+	void MoveToLocation(
 		const FVector& Dest, 
 		const AActor* InGoalActor,
 		float AcceptanceRadius = -1, 
@@ -47,11 +46,8 @@ public:
 	
 	virtual void StopMovement() override;
 
-	UFUNCTION(NetMulticast, Reliable)
-	void StopMovement_RPC();
-
 	FMoveCompletedSignature ReceiveMoveCompleted;
-
+	
 protected:
 
 	 virtual void BeginPlay() override;

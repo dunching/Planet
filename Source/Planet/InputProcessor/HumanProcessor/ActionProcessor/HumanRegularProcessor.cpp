@@ -100,7 +100,10 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback([this]() {
+			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
+			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
+
+			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback([this]() {
 				AddOrRemoveUseMenuItemEvent(true);
 				});
 
@@ -193,9 +196,6 @@ namespace HumanProcessor
 		if (OnwerActorPtr)
 		{
 			OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
-
-			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
-			UUIManagerSubSystem::GetInstance()->DisplayTeamInfo(true);
 		}
 	}
 
@@ -221,6 +221,12 @@ namespace HumanProcessor
 	{
 		if (Params.Event == EInputEvent::IE_Pressed)
 		{
+			// 特殊处理一下
+			if (LookAtSceneObjPtr && (Params.Key == EKeys::E))
+			{
+				return;
+			}
+			
 			auto SkillIter = HandleKeysMap.Find(Params.Key);
 			if (SkillIter)
 			{
@@ -463,11 +469,27 @@ namespace HumanProcessor
 		{
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
-			{
-				auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveAction();
-				for (const auto& Iter : CanbeActivedInfoAry)
+			{ 
 				{
-					HandleKeysMap.Add(Iter->Key, Iter);
+					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveConsumable();
+					for (const auto& Iter : CanbeActivedInfoAry)
+					{
+						HandleKeysMap.Add(Iter->Key, Iter);
+					}
+				}
+				{
+					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
+					for (const auto& Iter : CanbeActivedInfoAry)
+					{
+						HandleKeysMap.Add(Iter->Key, Iter);
+					}
+				}
+				{
+					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
+					for (const auto& Iter : CanbeActivedInfoAry)
+					{
+						HandleKeysMap.Add(Iter.Value->Key, Iter.Value);
+					}
 				}
 			}
 		}

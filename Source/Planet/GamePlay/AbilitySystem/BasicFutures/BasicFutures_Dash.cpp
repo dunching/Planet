@@ -109,6 +109,8 @@ bool UBasicFutures_Dash::CommitAbility(
 
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
+		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+
 		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -Consume);
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
@@ -269,7 +271,6 @@ void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 			this,
 			TEXT(""),
 			CurMontagePtr,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

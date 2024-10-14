@@ -23,7 +23,7 @@ AWeapon_PickAxe::AWeapon_PickAxe(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	SkeletalComponentPtr = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("MeshComponent"));
-	SkeletalComponentPtr->SetupAttachment(SceneCompPtr);
+	SkeletalComponentPtr->SetupAttachment(RootComponent);
 }
 
 void AWeapon_PickAxe::AttachToCharacter(ACharacterBase* CharacterPtr)

@@ -135,6 +135,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Dash(EDashDirection DashDirection);
 	
+	// 
+	UFUNCTION(Server, Reliable)
+	void Jump();
+
+	void SwitchCantBeSelect(bool bIsCanBeSelect);
+
 	void Respawn();
 
 	// 移动至攻击范围内

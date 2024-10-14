@@ -73,9 +73,13 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
+	virtual void CheckTimeOut()override;
+
 	void Initial(
 		float Height,
 		float Duration,
+		int32 RisingSpeed,
+		int32 FallingSpeed,
 		const FVector& OriginalPt,
 		ACharacter*CharacterPtr
 	);
@@ -83,16 +87,27 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 	void UpdateDuration(
 		float Height,
 		float Duration,
+		int32 RisingSpeed,
+		int32 FallingSpeed,
 		const FVector& OriginalPt
 	);
 
-	float RiseDuration = .75f;
+	// 上升速度 
+	int32 RisingSpeed = 100;
+	
+	// 下降速度 < 0则使用默认的速度
+	int32 FallingSpeed = -1;
 
+	// 高度
 	int32 Height = 100;
 
 	float Radius = 0.f;
 
 	float HalfHeight = 0.f;
+
+	bool bIsFalling = false;
+
+	int32 Line = 10000;
 };
 
 template<>

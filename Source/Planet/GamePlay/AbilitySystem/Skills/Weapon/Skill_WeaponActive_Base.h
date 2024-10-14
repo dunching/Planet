@@ -94,6 +94,10 @@ public:
 
 	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
+	virtual	void InitalTags()override;
+
+	virtual bool GetNum(int32 & Num)const;
+
 protected:
 	
 	virtual void PerformAction(

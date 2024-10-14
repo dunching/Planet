@@ -69,14 +69,20 @@ void UPawnStateActionHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	BindEvent();
 	ResetUIByData();
 }
 
 void UPawnStateActionHUD::NativeDestruct()
 {
-	if (OnAllocationSkillChangedDelegate)
+	for (auto Iter : OnAllocationSkillChangedDelegateAry)
 	{
-		OnAllocationSkillChangedDelegate->UnBindCallback();
+		Iter->UnBindCallback();
+	}
+	
+	if (OnCanAciveSkillChangedHandle)
+	{
+		OnCanAciveSkillChangedHandle->UnBindCallback();
 	}
 
 	Super::NativeDestruct();
@@ -229,16 +235,30 @@ void UPawnStateActionHUD::ResetUIByData()
 			UIPtr->SetDataSource(CharacterAttributes.SoilElement);
 		}
 	}
-	InitialTalentUI();
 
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback(
+	InitialTalentUI();
+	InitialActiveSkillIcon();
+	InitialWeaponSkillIcon();
+}
+
+void UPawnStateActionHUD::BindEvent()
+{
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	OnAllocationSkillChangedDelegateAry.Add(CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+		std::bind(&ThisClass::InitialActiveSkillIcon, this)
+	));
+
+	OnAllocationSkillChangedDelegateAry.Add(CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
+	));
+
+	OnCanAciveSkillChangedHandle = CharacterPtr->GetProxyProcessComponent()->OnCanAciveSkillChanged.AddCallback(
 		std::bind(&ThisClass::InitialActiveSkillIcon, this)
 	);
-	InitialActiveSkillIcon();
-	OnAllocationSkillChangedDelegate = CharacterPtr->GetProxyProcessComponent()->OnAllocationChanged.AddCallback(
-		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
-	);
-	InitialWeaponSkillIcon();
 }
 
 void UPawnStateActionHUD::InitialTalentUI()
@@ -292,7 +312,7 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 		return;
 	}
 
-	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
+	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
 	TArray<FName>Ary
 	{
 		FPawnStateActionHUD::Get().ActiveSkill1,
@@ -326,8 +346,8 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		return;
 	}
 
-	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI> FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI> SecondWeaponSocketInfoSPtr;
 
 	const auto CurrentWeaponSocket = CharacterPtr->GetProxyProcessComponent()->CurrentWeaponSocket;
 
@@ -356,7 +376,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		{
 			IconPtr->ResetToolUIByData(
 				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
+				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
 				nullptr
 			);
 		}
@@ -367,7 +387,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		{
 			IconPtr->ResetToolUIByData(
 				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->FirstSkill :
+				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
 				nullptr
 			);
 		}

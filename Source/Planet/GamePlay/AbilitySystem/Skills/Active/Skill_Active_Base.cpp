@@ -26,8 +26,6 @@ void USkill_Active_Base::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
-
 	if (SkillUnitPtr)
 	{
 		DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->OffsetCooldownTime();
@@ -125,6 +123,16 @@ void USkill_Active_Base::EndAbility(
 void USkill_Active_Base::SetContinuePerformImp(bool bIsContinue)
 {
 	ContinueActive();
+}
+
+void USkill_Active_Base::InitalTags()
+{
+	Super::InitalTags();
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
+
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
 }
 
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const

@@ -52,6 +52,7 @@
 #include "CS_PeriodicStateModify_Charm.h"
 #include "CS_PeriodicStateModify_Ice.h"
 #include "CS_PeriodicPropertyTag.h"
+#include "CharacterTitle.h"
 
 FName UBaseFeatureComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -179,6 +180,17 @@ void UBaseFeatureComponent::SendEventImp(
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
+		if (GAEventDataPtr)
+		{
+			for (auto& Iter : GAEventDataPtr->DataAry)
+			{
+				if (!Iter.DataSource.IsValid())
+				{
+					Iter.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;;
+				}
+			}
+		}
+
 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
@@ -496,6 +508,34 @@ void UBaseFeatureComponent::Dash_Implementation(EDashDirection DashDirection)
 			UGameplayTagsSubSystem::GetInstance()->Dash,
 			Payload
 		);
+	}
+}
+
+void UBaseFeatureComponent::Jump_Implementation()
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
+			FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump }
+		);
+	}
+}
+
+void UBaseFeatureComponent::SwitchCantBeSelect(bool bIsCanBeSelect)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+#if UE_EDITOR || UE_CLIENT
+		if (GetOwnerRole() < ROLE_Authority)
+		{
+			if (OnwerActorPtr->CharacterTitlePtr)
+			{
+				OnwerActorPtr->CharacterTitlePtr->SwitchCantBeSelect(bIsCanBeSelect);
+			}
+		}
+#endif
 	}
 }
 

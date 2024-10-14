@@ -134,6 +134,9 @@ public:
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
 #endif
 
+	// 通过此函数修改GAS上记录的CDO的Tags
+	virtual	void InitalTags();
+
 protected:
 
 	virtual void SetContinuePerformImp(bool bIsContinue);

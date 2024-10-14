@@ -34,8 +34,6 @@ void USkill_WeaponActive_Base::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
 }
 
 void USkill_WeaponActive_Base::PreActivate(
@@ -119,6 +117,26 @@ void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
 	}
 }
 
+void USkill_WeaponActive_Base::InitalTags()
+{
+	Super::InitalTags();
+
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
+
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
+}
+
+bool USkill_WeaponActive_Base::GetNum(int32& Num) const
+{
+	return false;
+}
+
 void USkill_WeaponActive_Base::ContinueActive()
 {
 	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
@@ -157,7 +175,7 @@ void USkill_WeaponActive_Base::PerformAction(
 
 void USkill_WeaponActive_Base::CheckInContinue()
 {
-	if (bIsContinue)
+	if (bIsContinue && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
 	{
 		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 	}
@@ -172,7 +190,12 @@ void USkill_WeaponActive_Base::CheckInContinue()
 			WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
 			WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
 			WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
-				K2_CancelAbility();
+#if UE_EDITOR || UE_SERVER
+				if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+				{
+					K2_CancelAbility();
+				}
+#endif
 				return true;
 				});
 		}

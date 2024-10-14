@@ -19,6 +19,7 @@ class ASPlineActor;
 class ATornado;
 
 struct FStreamableHandle;
+struct FCharacterStateInfo;
 
 USTRUCT()
 struct PLANET_API FGameplayAbilityTargetData_RootMotion_FlyAway : 
@@ -44,6 +45,11 @@ class PLANET_API UCS_RootMotion_FlyAway : public UCS_RootMotion
 	GENERATED_BODY()
 
 public:
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,

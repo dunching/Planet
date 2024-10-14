@@ -61,18 +61,18 @@ void UEffectsList::OnCharacterStateMapChanged(const TSharedPtr<FCharacterStateIn
 		auto ItemPtr = AddEffectItem();
 		ItemPtr->SetData(CharacterStatePtr);
 
-		EffectItemMap.Add(CharacterStatePtr->Tag, ItemPtr);
+		EffectItemMap.Add(CharacterStatePtr->Guid, ItemPtr);
 	}
 	else
 	{
-		if (EffectItemMap.Contains(CharacterStatePtr->Tag))
+		if (EffectItemMap.Contains(CharacterStatePtr->Guid))
 		{
-			if (EffectItemMap[CharacterStatePtr->Tag])
+			if (EffectItemMap[CharacterStatePtr->Guid])
 			{
-				EffectItemMap[CharacterStatePtr->Tag]->RemoveFromParent();
+				EffectItemMap[CharacterStatePtr->Guid]->RemoveFromParent();
 			}
 
-			EffectItemMap.Remove(CharacterStatePtr->Tag);
+			EffectItemMap.Remove(CharacterStatePtr->Guid);
 		}
 	}
 }

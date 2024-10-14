@@ -203,7 +203,6 @@ void USkill_Active_Stun::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			InPlayRate
 		);
 

@@ -103,6 +103,9 @@ public:
 
 	//  取消 激活
 	virtual void Cancel();
+	
+	//  取消
+	virtual void End();
 
 	// 装备至插槽
 	virtual void Allocation();
@@ -121,20 +124,21 @@ public:
 
 	TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)> OnAllocationCharacterUnitChanged;
 
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterUnit()const;
-
 	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr);
 
 	ACharacterBase* GetProxyCharacter()const;
 
 	ACharacterBase* GetAllocationCharacter()const;
 
-	void Update2Client();
-
-	TSharedPtr<FBasicProxy> GetThisSPtr()const;
-
 	// 这个物品所在的对象
-	TWeakPtr<FCharacterProxy> OwnerCharacterUnitPtr = nullptr;
+	TWeakPtr<FCharacterProxy> GetOwnerCharacterProxy();
+
+	// 这个物品被分配给的对象
+	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy();
+
+	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy()const;
+
+	void Update2Client();
 
 protected:
 
@@ -143,10 +147,13 @@ protected:
 	UPROPERTY(Transient)
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
 
-	// 这个物品被分配给的对象
-	TWeakPtr<FCharacterProxy> AllocationCharacterUnitPtr = nullptr;
-
 	IDType ID;
+	
+	IDType OwnerCharacter_ID;
+
+	IDType AllocationCharacter_ID;
+
+	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
 private:
 
@@ -463,6 +470,8 @@ public:
 
 	virtual void Cancel()override;
 
+	virtual void End()override;
+
 	FTableRowUnit_WeaponSkillExtendInfo* GetTableRowUnit_WeaponSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
@@ -493,6 +502,7 @@ struct PLANET_API FWeaponProxy : public FBasicProxy
 public:
 
 	friend FSceneUnitContainer;
+	friend UHoldingItemsComponent;
 
 	FWeaponProxy();
 
@@ -528,7 +538,7 @@ public:
 	int32 GetMaxAttackDistance()const;
 
 	// 注意：因为不能确定 “复制顺序”，所以这里不能用 WeakPtr
-	TSharedPtr<FWeaponSkillProxy>FirstSkill;
+	TSharedPtr<FWeaponSkillProxy>GetWeaponSkill();
 
 protected:
 
@@ -536,6 +546,8 @@ protected:
 	int32 MaxAttackDistance = 100;
 
 	AWeapon_Base* ActivedWeaponPtr = nullptr;
+
+	FGuid WeaponSkillID;
 
 };
 

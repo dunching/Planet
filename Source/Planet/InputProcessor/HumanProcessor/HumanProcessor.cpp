@@ -198,9 +198,7 @@ namespace HumanProcessor
 
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump }
-			);
+			OnwerActorPtr->GetBaseFeatureComponent()->Jump();
 		}
 	}
 

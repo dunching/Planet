@@ -70,7 +70,8 @@ void UBasicFutures_MoveToAttaclArea::ActivateAbility(
 
 			QueryRequest.SetFloatParam(FBasicFutures_MoveToAttaclArea::Get().Donut_InnerRadius, MinDistance);
 			QueryRequest.SetFloatParam(
-				FBasicFutures_MoveToAttaclArea::Get().Donut_OuterRadius, DataPtr->AttackDistance - UGameOptions::GetInstance()->MoveToAttaclAreaOffset
+				FBasicFutures_MoveToAttaclArea::Get().Donut_OuterRadius,
+				DataPtr->AttackDistance - UGameOptions::GetInstance()->MoveToAttaclAreaOffset
 			);
 
 			auto QueryFinishedDelegate = FQueryFinishedSignature::CreateUObject(this, &ThisClass::OnQueryFinished);
@@ -144,7 +145,7 @@ void UBasicFutures_MoveToAttaclArea::OnQueryFinished(TSharedPtr<FEnvQueryResult>
 		{
 			auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
 
-			PCPtr->MoveToLocation_RPC(DestLocation, nullptr);
+			PCPtr->MoveToLocation(DestLocation, nullptr);
 		}
 		else
 		{

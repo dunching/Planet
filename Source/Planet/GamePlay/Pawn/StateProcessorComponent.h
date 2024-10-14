@@ -19,6 +19,7 @@ class UCS_RootMotion;
 class UCS_Base;
 class UCS_RootMotion_KnockDown;
 class ACharacterBase;
+class UPlanetGameplayAbility;
 
 struct FGAEventData;
 struct FGameplayEventData;
@@ -84,7 +85,7 @@ protected:
 	
 	FGameplayAbilitySpec MakeSpec(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
-		TSubclassOf<UGameplayAbility> InAbilityClass
+		TSubclassOf<UPlanetGameplayAbility> InAbilityClass
 	);
 
 	// 注意：如果是RootMotion类型的状态修改，则此类型的子状态只会为一种，比如：人物先被击飞2s，1s之后又被击飞2s，则刷新击飞时间为2s
@@ -122,6 +123,6 @@ protected:
 	UPROPERTY(Replicated)
 	FCharacterStateInfo_FASI_Container CharacterStateInfo_FASI_Container;
 
-	TMap<FGameplayTag, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
+	TMap<FGuid, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
 
 };

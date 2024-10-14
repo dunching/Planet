@@ -1,0 +1,34 @@
+
+1.DetourCrowdAIController.h
+	class AIMODULE_API ADetourCrowdAIController : public AAIController
+
+2.CharacterMovementComponent.h
+	bool bMovementModeDirty = false; // Gamethread changed movement mode, need to update sim.
+protected:
+
+3.StateTreeAIComponent.h
+	class UStateTreeAIComponent : public UStateTreeComponent
+
+4.StateTreeMoveToTask.cpp
+	const FVector CurrentDestination = InstanceData.MoveToTask->GetMoveRequestRef().GetDestination();
+	if (FVector::DistSquared(CurrentDestination, InstanceData.Destination) > (InstanceData.DestinationMoveTolerance * InstanceData.DestinationMoveTolerance))
+	=>
+	auto Distance = CurrentDestination - InstanceData.Destination;
+
+	Distance.Z = 0.f;
+
+	if (Distance.Length() > (InstanceData.DestinationMoveTolerance))
+
+5.SWrapBox.h
+	
+	/** How to distribute the elements among any extra space in a given row */
+	SLATE_API void SetHorizontalAlignment(TAttribute<EHorizontalAlignment> InHAlignment);
+
+private:
+
+=>
+
+	/** How to distribute the elements among any extra space in a given row */
+	SLATE_API void SetHorizontalAlignment(TAttribute<EHorizontalAlignment> InHAlignment);
+
+public:

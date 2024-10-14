@@ -60,7 +60,7 @@ void UBackpackIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnit
 			std::bind(&ThisClass::OnAllocationCharacterUnitChanged, this, std::placeholders::_1)
 		);
 
-		OnAllocationCharacterUnitChanged(InBasicUnitPtr->GetAllocationCharacterUnit());
+		OnAllocationCharacterUnitChanged(InBasicUnitPtr->GetAllocationCharacterProxy());
 	}
 }
 

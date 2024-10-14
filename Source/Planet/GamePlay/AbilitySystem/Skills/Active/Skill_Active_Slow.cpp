@@ -89,7 +89,7 @@ void USkill_Active_Slow::ActivateAbility(
 		for (const auto& Iter : TargetSet)
 		{
 			auto GameplayAbilityTargetData_StateModifyPtr = new FGameplayAbilityTargetData_StateModify_Slow(
-				MoveSpeedOffset
+				-MoveSpeedOffset
 			);
 
 			GameplayAbilityTargetData_StateModifyPtr->TriggerCharacterPtr = CharacterPtr;

@@ -72,6 +72,9 @@ void UPlanetGameplayAbility::SetContinuePerform(bool bIsContinue)
 void UPlanetGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
+
+	// 确认和我们运行的GA标签一致
+	InitalTags();
 }
 
 void UPlanetGameplayAbility::PreActivate(
@@ -192,3 +195,9 @@ void UPlanetGameplayAbility::DecrementListLockOverride() const
 	ScopeLockCount--;
 	RunIfListLock();
 }
+
+void UPlanetGameplayAbility::InitalTags()
+{
+
+}
+

@@ -177,7 +177,6 @@ void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

@@ -9,6 +9,7 @@
 #include "GenerateType.h"
 #include "BaseData.h"
 #include "GAEvent_Helper.h"
+#include "GameplayTagContainer.h"
 
 #include "CharacterAttibutes.generated.h"
 

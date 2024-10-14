@@ -17,14 +17,14 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "SceneElement.h"
 
-void USkill_Active_Arrow_HomingToward::ActivateAbility(
+void USkill_Active_Arrow_HomingToward::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
 )
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
@@ -48,6 +48,8 @@ void USkill_Active_Arrow_HomingToward::ActivateAbility(
 		}
 
 		SwitchIsHomingToward(true);
+
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
 #endif
 }
@@ -73,21 +75,21 @@ bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
-	ThisClass::K2_CancelAbility();
+	K2_CancelAbility();
 
 	return true;
 }
 
 void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward)
 {
-	// 找到当前装备的 弓箭类武器
-	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr;
-	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr;
-	CharacterPtr->GetProxyProcessComponent()->GetWeaponSkills(FirstWeaponSkillSPtr, SecondWeaponSkillSPtr);
-	if (FirstWeaponSkillSPtr)
+	auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
+		UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow
+	);
+
+	if (TargetSkillSPtr)
 	{
 		auto RegisterParamPtr =
-			Cast<USkill_WeaponActive_Bow>(FirstWeaponSkillSPtr->GetGAInst())->RegisterParamSPtr;
+			Cast<USkill_WeaponActive_Bow>(TargetSkillSPtr->GetGAInst())->RegisterParamSPtr;
 		auto GameplayAbilityTargetPtr =
 			DeepClone_GameplayAbilityTargetData<FGameplayAbilityTargetData_Bow_RegisterParam>(RegisterParamPtr.Get());
 
@@ -97,7 +99,7 @@ void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward
 		GameplayEventData.TargetData.Add(GameplayAbilityTargetPtr);
 
 		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->Replicate_UpdateGAParam(
-			FirstWeaponSkillSPtr->GetGAHandle(),
+			TargetSkillSPtr->GetGAHandle(),
 			GameplayEventData
 		);
 	}

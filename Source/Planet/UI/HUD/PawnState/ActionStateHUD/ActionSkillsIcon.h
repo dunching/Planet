@@ -49,6 +49,10 @@ public:
 
 protected:
 
+	void UpdateSkillState_ActiveSkill();
+
+	void UpdateSkillState_ActiveWeapon();
+
 	void SetLevel();
 
 	void SetRemainingCooldown(
@@ -62,6 +66,8 @@ protected:
 	);
 
 	void SetItemType();
+
+	void SetNum(bool bIsDisplay, int32 Num);
 
 	void SetInputRemainPercent(bool bIsAcceptInput, float Percent);
 

@@ -51,6 +51,8 @@ struct PLANET_API FCharacterStateInfo
 
 	FGameplayTag Tag;
 
+	FGuid Guid;
+
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
 	FDataChanged DataChanged;

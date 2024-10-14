@@ -107,6 +107,8 @@ public:
 
 	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
+	virtual	void InitalTags()override;
+
 	virtual void Tick(float DeltaTime);
 
 	// 获取 “等待输入”时长

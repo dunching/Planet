@@ -311,7 +311,6 @@ void USkill_WeaponActive_HandProtection::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(),
 			Rate
 		);
 

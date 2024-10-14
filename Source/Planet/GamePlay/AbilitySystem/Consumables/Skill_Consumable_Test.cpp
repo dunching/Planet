@@ -77,7 +77,6 @@ void USkill_Consumable_Test::PlayMontage()
 			this,
 			TEXT(""),
 			HumanMontage,
-			CharacterPtr->GetMesh()->GetAnimInstance(), 
 			InPlayRate
 		);
 

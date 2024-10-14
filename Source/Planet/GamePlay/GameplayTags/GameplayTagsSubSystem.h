@@ -109,7 +109,11 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag State_Buff_CantBeSlected =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.CantBeSlected")));
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.CantBeSelected")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_Buff_Stagnation =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.Stagnation")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag Debuff =
@@ -152,7 +156,7 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.KnockDown")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag Traction =
+	FGameplayTag State_RootMotion_Traction =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.Traction")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
@@ -162,6 +166,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag MoveAlongSpline =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveAlongSpline")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	FGameplayTag State_RootMotion_MoveTo =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveTo")));
 	
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
 	FGameplayTag DeathingTag = 
@@ -226,11 +234,11 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponActiveSocket")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag WeaponActiveSocket1 =
+	FGameplayTag WeaponActiveSocket_1 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponActiveSocket.1")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag WeaponActiveSocket2 =
+	FGameplayTag WeaponActiveSocket_2 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponActiveSocket.2")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
@@ -238,21 +246,41 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket1 =
+	FGameplayTag ActiveSocket_1 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.1")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket2 =
+	FGameplayTag ActiveSocket_2 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.2")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket3 =
+	FGameplayTag ActiveSocket_3 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.3")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
-	FGameplayTag ActiveSocket4 =
+	FGameplayTag ActiveSocket_4 =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.4")));
 	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag PassiveSocket_1 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.PassiveSocket.1")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag PassiveSocket_2 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.PassiveSocket.2")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag PassiveSocket_3 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.PassiveSocket.3")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag PassiveSocket_4 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.PassiveSocket.4")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
+	FGameplayTag PassiveSocket_5 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.PassiveSocket.5")));
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UI Socket Tag")
 	FGameplayTag TalentSocket =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.Talent")));
@@ -326,11 +354,23 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Weapon_Bow =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.Bow")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Weapon_FoldingFan =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.FoldingFan")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Active =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active")));
 	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Switch=
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Switch")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Skill_Active_Switch_Test =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Switch.Test")));
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
 	FGameplayTag Unit_Skill_Active_Control =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Control")));
@@ -396,7 +436,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
 	FGameplayTag DataSource_Regular =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Regular")));
-	
+
+	// 人物身上自带的属性
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
 	FGameplayTag DataSource_Character =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));
@@ -408,4 +449,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
 	FGameplayTag DataSource_TalentModify =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.TalentModify")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag Skill_CanBeInterrupted=
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DataSource")
+	FGameplayTag Skill_CanBeInterrupted_Stagnation =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted.Stagnation")));
 };
