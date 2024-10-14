@@ -855,6 +855,8 @@ TMap<ECharacterPropertyType, FBaseProperty> GetAllData()
 	Result.Add(ECharacterPropertyType::FireElement, 0);
 	Result.Add(ECharacterPropertyType::SoilElement, 0);
 
+	Result.Add(ECharacterPropertyType::Shield, 0);
+
 	Result.Add(ECharacterPropertyType::AD, 0);
 	Result.Add(ECharacterPropertyType::AD_Penetration, 0);
 	Result.Add(ECharacterPropertyType::AD_PercentPenetration, 0);
@@ -866,6 +868,11 @@ TMap<ECharacterPropertyType, FBaseProperty> GetAllData()
 	Result.Add(ECharacterPropertyType::CriticalHitRate, 0);
 	Result.Add(ECharacterPropertyType::CriticalDamage, 0);
 	Result.Add(ECharacterPropertyType::MoveSpeed, 0);
+
+	for (int32 Index = 0; Index < static_cast<int32>(ECharacterPropertyType::kMax); Index++)
+	{
+		Result.Add(static_cast<ECharacterPropertyType>(Index), 0);
+	}
 
 	return Result;
 }

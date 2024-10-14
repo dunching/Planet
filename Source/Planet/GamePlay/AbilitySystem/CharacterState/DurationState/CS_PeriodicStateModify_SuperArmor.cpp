@@ -107,10 +107,10 @@ void UCS_PeriodicStateModify_SuperArmor::UpdateDuration()
 {
 	Super::UpdateDuration();
 
-	if (TaskPtr)
+	if (TimerTaskPtr)
 	{
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		TaskPtr->UpdateDuration();
+		TimerTaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TimerTaskPtr->UpdateDuration();
 	}
 
 	if (CharacterStateInfoSPtr)

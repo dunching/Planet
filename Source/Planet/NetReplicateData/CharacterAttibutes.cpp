@@ -160,6 +160,7 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Ar << DongCha.CurrentValue.CurrentValue;
 		Ar << TianZi.CurrentValue.CurrentValue;
 
+		Ar << Shield.CurrentValue.CurrentValue;
 		Ar << HP.CurrentValue.CurrentValue;
 		Ar << PP.CurrentValue.CurrentValue;
 
@@ -189,6 +190,7 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Lambda(DongCha.CurrentValue);
 		Lambda(TianZi.CurrentValue);
 
+		Lambda(Shield.CurrentValue);
 		Lambda(HP.CurrentValue);
 		Lambda(PP.CurrentValue);
 
@@ -397,6 +399,11 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 				case ECharacterPropertyType::Mana:
 				{
 					Lambda(Mana, Iter.Value);
+				}
+				break;
+				case ECharacterPropertyType::Shield:
+				{
+					Lambda(Shield, Iter.Value);
 				}
 				break;
 #pragma endregion

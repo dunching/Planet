@@ -79,7 +79,7 @@ void UCS_PeriodicStateModify_Slow::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	TaskPtr->SetInfinite();
+	TimerTaskPtr->SetInfinite();
 
 	PerformAction();
 }
@@ -106,7 +106,7 @@ void UCS_PeriodicStateModify_Slow::PerformAction()
 {
 	Super::PerformAction();
 
-	if (TaskPtr)
+	if (TimerTaskPtr)
 	{
 		TSharedPtr<FGameplayAbilityTargetData_StateModify_Slow> CurrentGameplayAbilityTargetDataSPtr(
 			GameplayAbilityTargetDataSPtr,

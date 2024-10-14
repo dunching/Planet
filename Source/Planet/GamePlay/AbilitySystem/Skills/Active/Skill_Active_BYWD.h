@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	void TimerTick(UAbilityTask_TimerHelper*, float Interval);
+	void DurationDelegate(UAbilityTask_TimerHelper*, float CurrentInterval, float Interval);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage1 = nullptr;

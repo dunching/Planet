@@ -84,10 +84,10 @@ void UCS_PeriodicStateModify_Stun::UpdateDuration()
 {
 	Super::UpdateDuration();
 
-	if (TaskPtr)
+	if (TimerTaskPtr)
 	{
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		TaskPtr->UpdateDuration();
+		TimerTaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TimerTaskPtr->UpdateDuration();
 	}
 
 	if (CharacterStateInfoSPtr)
@@ -99,6 +99,8 @@ void UCS_PeriodicStateModify_Stun::UpdateDuration()
 
 void UCS_PeriodicStateModify_Stun::PerformAction()
 {
+	Super::PerformAction();
+
 	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
 	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
 	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;

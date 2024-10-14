@@ -109,27 +109,27 @@ void UCS_PeriodicStateModify::ExcuteTasks()
 
 	if (GameplayAbilityTargetDataSPtr->Duration < 0.f)
 	{
-		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetInfinite();
-		TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
-		TaskPtr->OnFinished.BindLambda([this](auto) {
+		TimerTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		TimerTaskPtr->SetInfinite();
+		TimerTaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
+		TimerTaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
 			return true;
 			});
-		TaskPtr->ReadyForActivation();
+		TimerTaskPtr->ReadyForActivation();
 	}
 	else
 	{
-		TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
-		TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
-		TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
-		TaskPtr->OnFinished.BindLambda([this](auto) {
+		TimerTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		TimerTaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TimerTaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
+		TimerTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+		TimerTaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
+		TimerTaskPtr->OnFinished.BindLambda([this](auto) {
 			K2_CancelAbility();
 			return true;
 			});
-		TaskPtr->ReadyForActivation();
+		TimerTaskPtr->ReadyForActivation();
 	}
 }
 
@@ -140,9 +140,13 @@ void UCS_PeriodicStateModify::OnInterval(UAbilityTask_TimerHelper* InTaskPtr, fl
 	}
 }
 
-void UCS_PeriodicStateModify::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, float CurrentInterval, float Interval)
+void UCS_PeriodicStateModify::OnDuration(
+	UAbilityTask_TimerHelper* ,
+	float CurrentTime,
+	float DurationTime
+)
 {
-	if (CurrentInterval > Interval)
+	if (CurrentTime > DurationTime)
 	{
 	}
 	else

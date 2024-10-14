@@ -25,6 +25,8 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+#include "CharacterStateInfo.h"
+#include "StateProcessorComponent.h"
 
 FGameplayAbilityTargetData_StateModify_CantBeSelected::FGameplayAbilityTargetData_StateModify_CantBeSelected()
 {
@@ -43,7 +45,61 @@ void UCS_PeriodicStateModify_CantBeSelected::OnAvatarSet(
 	const FGameplayAbilitySpec& Spec
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
-
 	Super::OnAvatarSet(ActorInfo, Spec);
+}
+
+void UCS_PeriodicStateModify_CantBeSelected::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	PerformAction();
+}
+
+void UCS_PeriodicStateModify_CantBeSelected::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void UCS_PeriodicStateModify_CantBeSelected::PerformAction()
+{
+	Super::PerformAction();
+
+	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+	CharacterStateInfoSPtr->DataChanged();
+	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+}
+
+void UCS_PeriodicStateModify_CantBeSelected::InitalTags()
+{
+	Super::InitalTags();
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
+}
+
+void UCS_PeriodicStateModify_CantBeSelected::OnDuration(
+	UAbilityTask_TimerHelper* TaskPtr,
+	float CurrentTime,
+	float DurationTime
+)
+{
+	CharacterStateInfoSPtr->TotalTime = CurrentTime;
+	CharacterStateInfoSPtr->DataChanged();
+
+	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }

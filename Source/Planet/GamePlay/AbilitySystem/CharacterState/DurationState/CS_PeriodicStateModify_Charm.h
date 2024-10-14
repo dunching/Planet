@@ -74,6 +74,8 @@ public:
 
 protected:
 
+	virtual	void InitalTags()override;
+
 	virtual void PerformAction()override;
 
 	virtual void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)override;

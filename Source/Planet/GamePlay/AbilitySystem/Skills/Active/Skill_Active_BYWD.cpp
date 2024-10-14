@@ -42,7 +42,7 @@ void USkill_Active_BYWD::ActivateAbility(
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 			TaskPtr->SetDuration(Duration, 0.1f);
-			TaskPtr->TickDelegate.BindUObject(this, &ThisClass::TimerTick);
+			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationDelegate);
 			TaskPtr->ReadyForActivation();
 		}
 	}
@@ -78,14 +78,14 @@ void USkill_Active_BYWD::ActivateAbility(
 	}
 }
 
-void USkill_Active_BYWD::TimerTick(UAbilityTask_TimerHelper*, float Interval)
+void USkill_Active_BYWD::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentInterval, float Interval)
 {
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{
-			CharacterStateInfoSPtr->TotalTime += Interval;
+			CharacterStateInfoSPtr->TotalTime = CurrentInterval;
 			CharacterStateInfoSPtr->DataChanged();
 			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}

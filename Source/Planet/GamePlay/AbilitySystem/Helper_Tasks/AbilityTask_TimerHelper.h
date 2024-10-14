@@ -52,11 +52,13 @@ public:
 	
 	TimerHelper_Finished_Delegate OnFinished;
 	
+	// 
 	TimerHelper_Tick_Delegate TickDelegate;
 
 	// 当前时间 总时间
 	TimerHelper_Interval_Tick_Delegate DurationDelegate;
 
+	// 当前时间 间隔时间
 	TimerHelper_Interval_Tick_Delegate IntervalDelegate;
 
 protected:

@@ -185,8 +185,8 @@ void UCS_PeriodicStateModify_Ice::AddTags(const TSharedPtr<FGameplayAbilityTarge
 	CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(
 		GetAllData(), CurrentGameplayAbilityTargetDataSPtr->Tag
 	);
-	TaskPtr->SetDuration(CurrentGameplayAbilityTargetDataSPtr->ImmuneTime);
-	TaskPtr->UpdateDuration();
+	TimerTaskPtr->SetDuration(CurrentGameplayAbilityTargetDataSPtr->ImmuneTime);
+	TimerTaskPtr->UpdateDuration();
 
 	bIsImmune = true;
 }

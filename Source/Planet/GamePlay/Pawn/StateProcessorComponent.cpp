@@ -7,6 +7,7 @@
 #include "GameplayAbilitySpec.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "Components/CapsuleComponent.h"
 
 #include "GravityMovementComponent.h"
 #include "GAEvent_Helper.h"
@@ -60,6 +61,7 @@
 #include "CS_RootMotion_Traction.h"
 #include "HumanAnimInstance.h"
 #include "BaseFeatureComponent.h"
+#include "CollisionDataStruct.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
@@ -268,6 +270,16 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 		{
 			auto BaseFeatureComponentPtr = CharacterPtr->GetBaseFeatureComponent();
 			BaseFeatureComponentPtr->SwitchCantBeSelect(Lambda());
+		}
+	}
+	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_NoPhy))
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+			CharacterPtr->GetCapsuleComponent()->SetCollisionResponseToChannel(
+				Pawn_Object, Lambda() ? ECollisionResponse::ECR_Overlap : ECollisionResponse::ECR_Block
+			);
 		}
 	}
 }

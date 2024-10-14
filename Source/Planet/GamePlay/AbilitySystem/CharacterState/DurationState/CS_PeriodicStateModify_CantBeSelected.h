@@ -16,6 +16,7 @@ class UEffectItem;
 class ASPlineActor;
 class ATornado;
 
+struct FCharacterStateInfo;
 struct FStreamableHandle;
 
 USTRUCT()
@@ -46,5 +47,32 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
+
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
+
+	virtual void EndAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		bool bReplicateEndAbility,
+		bool bWasCancelled
+	);
+
+	virtual	void InitalTags()override;
+
+	virtual void PerformAction()override;
+
+	void OnDuration(
+		UAbilityTask_TimerHelper* TaskPtr,
+		float CurrentTime,
+		float DurationTime
+	);
+
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 
 };

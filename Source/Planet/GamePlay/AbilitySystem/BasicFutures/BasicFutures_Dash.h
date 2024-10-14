@@ -131,7 +131,7 @@ protected:
 	float Duration = .5f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float MoveLength = 800.f;
+	float MoveLength = 500.f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 Consume = 10;
