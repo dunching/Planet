@@ -40,6 +40,31 @@ void FBasePropertySet::SetCurrentValue(int32 NewValue, const FGameplayTag& DataS
 	Update();
 }
 
+void FBasePropertySet::SetValue(int32 NewValue)
+{
+	if (NewValue == 0)
+	{
+		ValueMap.Empty();
+	}
+	else
+	{
+		for (auto &Iter : ValueMap)
+		{
+			if (Iter.Value >= NewValue)
+			{
+				Iter.Value = NewValue;
+				NewValue = 0;
+			}
+			else
+			{
+				NewValue = NewValue - Iter.Value;
+			}
+		}
+	}
+
+	Update();
+}
+
 void FBasePropertySet::RemoveCurrentValue(const FGameplayTag& DataSource)
 {
 	ValueMap.Remove(DataSource);
@@ -80,6 +105,15 @@ void FBasePropertySet::Update()
 	if (Character_Value_Iter)
 	{
 		*Character_Value_Iter = FMath::Clamp(*Character_Value_Iter, MinValue.GetCurrentValue(), MaxValue.GetCurrentValue());
+	}
+
+	const auto Temp = ValueMap;
+	for (const auto& Iter : Temp)
+	{
+		if (Iter.Value <= 0)
+		{
+			ValueMap.Remove(Iter.Key);
+		}
 	}
 
 	for (const auto& Iter : PropertySettlementModifySet)
@@ -299,13 +333,6 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		// 未命中
 	}
 
-	// 会心伤害
-	float CurCriticalDamage = 1.f;
-	if (Ref.CriticalHitRate >= 100)
-	{
-		CurCriticalDamage = (100 + Ref.CriticalDamage) / 100.f;
-	}
-
 	// HP
 	{
 		FScoped_BaseProperty_SaveUpdate HP_Scope(HP.GetCurrentProperty());
@@ -313,17 +340,18 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 
 		if (Ref.HitRate > 0)
 		{
+			check(Ref.DataSource == UGameplayTagsSubSystem::GetInstance()->DataSource_Character);
 			if (Ref.ElementSet.IsEmpty())
 			{
 				// 基础伤害
-				HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage, Ref.DataSource);
+				HP.AddCurrentValue(-Ref.BaseDamage, Ref.DataSource);
 			}
 			else
 			{
 				// 元素伤害
 				for (const auto& Iter : Ref.ElementSet)
 				{
-					HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage, Ref.DataSource);
+					HP.AddCurrentValue(-Iter.Get<2>(), Ref.DataSource);
 				}
 			}
 

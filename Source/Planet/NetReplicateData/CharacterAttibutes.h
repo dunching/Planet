@@ -62,6 +62,9 @@ public:
 
 	void SetCurrentValue(int32 NewValue, const FGameplayTag& DataSource);
 
+	// 设置 ValueMap 下的“值总和”为指定的值
+	void SetValue(int32 NewValue);
+
 	int32 GetCurrentValue()const;
 
 	const FBaseProperty& GetCurrentProperty()const;
@@ -262,6 +265,7 @@ struct PLANET_API FCharacterAttributes final
 	FBasePropertySet Evade;
 
 	// 命中率
+	// 目标 闪避值 为0时命中的概率
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBasePropertySet HitRate;
 

@@ -60,6 +60,7 @@ struct PLANET_API FGAEventData
 	
 	UPROPERTY()
 	// 本次攻击的 命中率(0则为此次被闪避)，若大于 100，则为不可被闪避
+	// 最终结算时：0 未命中 100 命中
 	int32 HitRate = 0;
 	
 	UPROPERTY()

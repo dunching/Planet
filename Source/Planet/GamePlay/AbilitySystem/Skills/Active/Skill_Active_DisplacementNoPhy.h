@@ -110,8 +110,3 @@ protected:
 	ATool_PickAxe* EquipmentAxePtr = nullptr;
 
 };
-
-struct FGameplayAbilityTargetData_Displacement : public FGameplayAbilityTargetData
-{
-	ACharacterBase* TargetCharacterPtr = nullptr;
-};

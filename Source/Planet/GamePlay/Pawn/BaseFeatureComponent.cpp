@@ -584,8 +584,9 @@ void UBaseFeatureComponent::BreakMoveToAttackDistance()
 }
 
 void UBaseFeatureComponent::AddSendBaseModify()
-{ 
+{
 	{
+		// 群体伤害衰减
 		struct FMyStruct : public IGAEventModifySendInterface
 		{
 			FMyStruct(int32 InPriority) :
@@ -624,6 +625,7 @@ void UBaseFeatureComponent::AddSendBaseModify()
 		AddSendEventModify(MakeShared<FMyStruct>(100));
 	}
 	{
+		// 元素伤害
 		struct FMyStruct : public IGAEventModifySendInterface
 		{
 			FMyStruct(int32 InPriority) :
@@ -637,7 +639,7 @@ void UBaseFeatureComponent::AddSendBaseModify()
 				{
 					if (Iter.ElementSet.IsEmpty())
 					{
-						auto CharacterAttributes =
+						const auto& CharacterAttributes =
 							GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 						std::map<int32, EWuXingType, std::greater<int>> ElementMap;
@@ -664,6 +666,7 @@ void UBaseFeatureComponent::AddSendBaseModify()
 		AddSendEventModify(MakeShared<FMyStruct>(101));
 	}
 	{
+		// 自身属性
 		struct FMyStruct : public IGAEventModifySendInterface
 		{
 			FMyStruct(int32 InPriority) :
@@ -673,7 +676,7 @@ void UBaseFeatureComponent::AddSendBaseModify()
 
 			virtual bool Modify(FGameplayAbilityTargetData_GASendEvent& GameplayAbilityTargetData_GAEvent)override
 			{
-				const auto & CharacterAttributes =
+				const auto& CharacterAttributes =
 					GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr.Get()->GetCharacterAttributesComponent()->GetCharacterAttributes();
 				for (auto& Iter : GameplayAbilityTargetData_GAEvent.DataAry)
 				{
@@ -730,7 +733,7 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 				}
 				else
 				{
-					auto CharacterAttributes =
+					const auto& CharacterAttributes =
 						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 					for (auto& ElementIter : DataRef.ElementSet)
@@ -779,7 +782,7 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 		AddReceviedEventModify(MakeShared<FMyStruct>(100));
 	}
 
-	// 群体效果衰减
+	// 确认概率类型数值
 	{
 		struct FMyStruct : public IGAEventModifyReceivedInterface
 		{
@@ -792,17 +795,64 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 			{
 				if (GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr.IsValid())
 				{
-					auto SelfCharacterAttributesSPtr =
-						GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+					auto Lambda = [&GameplayAbilityTargetData_GAEvent]
+						{
+							auto& SelfCharacterAttributesRef =
+								GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-					auto TargetCharacterAttributesSPtr =
-						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+							const auto& TargetCharacterAttributesRef =
+								GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
+							// 命中率
+							{
+								const auto HitRate =
+									TargetCharacterAttributesRef.HitRate.GetCurrentValue() *
+									(100 - TargetCharacterAttributesRef.Evade.GetCurrentValue());
+
+								GameplayAbilityTargetData_GAEvent.Data.HitRate =
+									((FMath::RandRange(0, 100) <= HitRate) ? 100 : 0);
+							}
+
+							// 会心伤害
+							{
+								if (GameplayAbilityTargetData_GAEvent.Data.HitRate >= 100)
+								{
+									GameplayAbilityTargetData_GAEvent.Data.CriticalHitRate =
+										((FMath::RandRange(0, 100) <= TargetCharacterAttributesRef.CriticalHitRate.GetCurrentValue()) ? 100 : 0);
+
+									if (GameplayAbilityTargetData_GAEvent.Data.CriticalHitRate >= 100)
+									{
+										const float CurCriticalDamage = (100 + GameplayAbilityTargetData_GAEvent.Data.CriticalDamage) / 100.f;
+
+										GameplayAbilityTargetData_GAEvent.Data.BaseDamage = GameplayAbilityTargetData_GAEvent.Data.BaseDamage * CurCriticalDamage;
+										GameplayAbilityTargetData_GAEvent.Data.TrueDamage = GameplayAbilityTargetData_GAEvent.Data.TrueDamage * CurCriticalDamage;
+										for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+										{
+											Iter.Get<2>() = Iter.Get<2>() * CurCriticalDamage;
+										}
+									}
+								}
+							}
+						};
+
+					if (GameplayAbilityTargetData_GAEvent.Data.BaseDamage > 0)
 					{
-						const auto Rate = (TargetCharacterAttributesSPtr.HitRate.GetCurrentValue() - TargetCharacterAttributesSPtr.Evade.GetCurrentValue()) /
-							static_cast<float>(TargetCharacterAttributesSPtr.HitRate.GetMaxValue());
-
-						GameplayAbilityTargetData_GAEvent.Data.HitRate = FMath::FRand() <= Rate ? 100 : 0;
+						Lambda();
+					}
+					else if (GameplayAbilityTargetData_GAEvent.Data.TrueDamage > 0)
+					{
+						Lambda();
+					}
+					else
+					{
+						for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+						{
+							if (Iter.Get<2>() > 0)
+							{
+								Lambda();
+								break;;
+							}
+						}
 					}
 				}
 
@@ -810,6 +860,103 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 			}
 		};
 		AddReceviedEventModify(MakeShared<FMyStruct>(101));
+	}
+
+	// 抗性
+	{
+		struct FMyStruct : public IGAEventModifyReceivedInterface
+		{
+			FMyStruct(int32 InPriority) :
+				IGAEventModifyReceivedInterface(InPriority)
+			{
+			}
+
+			virtual bool Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
+			{
+				if (GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr.IsValid())
+				{
+					auto& SelfCharacterAttributesRef =
+						GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+					const auto& TargetCharacterAttributesRef =
+						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+					if (
+						(GameplayAbilityTargetData_GAEvent.Data.HitRate >= 100)
+						)
+					{
+						const auto Self_Resistance = SelfCharacterAttributesRef.AD_Resistance.GetCurrentValue();
+						const auto SelfCurrent_Resistance = FMath::Max(
+							0,
+							Self_Resistance -
+							TargetCharacterAttributesRef.AD_Penetration.GetCurrentValue() -
+							((TargetCharacterAttributesRef.AD_PercentPenetration.GetCurrentValue() / 100.f) * Self_Resistance)
+						);
+						const float DR = 1 - (SelfCurrent_Resistance / (SelfCurrent_Resistance + 100.f));
+
+						auto & Ref = GameplayAbilityTargetData_GAEvent.Data.BaseDamage;
+						if (Ref > 0)
+						{
+							Ref = Ref * DR;
+						}
+					}
+				}
+
+				return true;
+			}
+		};
+		AddReceviedEventModify(MakeShared<FMyStruct>(102));
+	}
+
+	// 护盾扣除
+	{
+		struct FMyStruct : public IGAEventModifyReceivedInterface
+		{
+			FMyStruct(int32 InPriority) :
+				IGAEventModifyReceivedInterface(InPriority)
+			{
+			}
+
+			virtual bool Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override
+			{
+				if (GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr.IsValid())
+				{
+					auto& SelfCharacterAttributesRef =
+						GameplayAbilityTargetData_GAEvent.Data.TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+					const auto& TargetCharacterAttributesRef =
+						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+					auto ShieldValue = SelfCharacterAttributesRef.Shield.GetCurrentValue();
+
+					if (
+						(ShieldValue > 0) &&
+						(GameplayAbilityTargetData_GAEvent.Data.HitRate >= 100)
+						)
+					{
+						auto& Ref = GameplayAbilityTargetData_GAEvent.Data.BaseDamage;
+						if (Ref > 0)
+						{
+							if (ShieldValue > Ref)
+							{
+								Ref = 0;
+								ShieldValue = ShieldValue - Ref;
+							}
+							else if (ShieldValue <= Ref)
+							{
+								Ref = Ref - ShieldValue;
+								ShieldValue = 0;
+							}
+						}
+
+						SelfCharacterAttributesRef.Shield.SetValue(ShieldValue);
+					}
+				}
+
+				return true;
+			}
+		};
+		AddReceviedEventModify(MakeShared<FMyStruct>(150));
 	}
 }
 
@@ -825,7 +972,7 @@ void UBaseFeatureComponent::OnReceivedEventModifyData(FGameplayAbilityTargetData
 {
 	TArray<decltype(ReceivedEventModifysMap)::iterator> NeedRemoveIterAry;;
 
-	for (auto Iter = ReceivedEventModifysMap.begin();Iter != ReceivedEventModifysMap.end(); Iter++)
+	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
 	{
 		if ((*Iter)->Modify(OutGAEventData) && (*Iter)->bIsOnceTime)
 		{
