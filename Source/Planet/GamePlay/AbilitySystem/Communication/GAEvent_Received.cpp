@@ -73,12 +73,7 @@ void UGAEvent_Received::ActivateAbility(
 
 				GAEventDataPtr->TriggerCharacterPtr->GetBaseFeatureComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
-				const auto IsNotDeathingTag =
-					!CharacterPtr->GetBaseFeatureComponent()->IsInDeath();
-				if (GAEventDataPtr->Data.bIsMakeAttackEffect && IsNotDeathingTag)
-				{
-					CharacterPtr->GetBaseFeatureComponent()->ExcuteAttackedEffect(EAffectedDirection::kForward);
-				}
+				CharacterPtr->GetBaseFeatureComponent()->ExcuteAttackedEffect(*CloneSPtr);
 			}
 		}
 		break;

@@ -328,7 +328,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	// 处理数据
 	const auto& Ref = GAEvent.Data;
 
-	if (Ref.HitRate <= 0)
+	if (Ref.GetIsHited())
 	{
 		// 未命中
 	}
@@ -338,7 +338,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		FScoped_BaseProperty_SaveUpdate HP_Scope(HP.GetCurrentProperty());
 		FScoped_BaseProperty_SaveUpdate PP_Scope(PP.GetCurrentProperty());
 
-		if (Ref.HitRate > 0)
+		if (Ref.GetIsHited())
 		{
 			check(Ref.DataSource == UGameplayTagsSubSystem::GetInstance()->DataSource_Character);
 			if (Ref.ElementSet.IsEmpty())

@@ -92,7 +92,7 @@ FGAEventData::FGAEventData(
 bool FGAEventData::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
 {
 	Ar << bIsWeaponAttack;
-	Ar << bIsMakeAttackEffect;
+	Ar << AttackEffectType;
 
 	Ar << AD_Penetration;
 
@@ -183,6 +183,16 @@ void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 		Value
 	);
 	ElementSet.Add(Tuple);
+}
+
+bool FGAEventData::GetIsHited() const
+{
+	return HitRate >= 100;
+}
+
+bool FGAEventData::GetIsCriticalHited() const
+{
+	return CriticalHitRate >= 100;
 }
 
 FGameplayAbilityTargetData_GAReceivedEvent::FGameplayAbilityTargetData_GAReceivedEvent()

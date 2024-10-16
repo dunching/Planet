@@ -198,7 +198,7 @@ USkill_Passive_XS::FMyStruct::FMyStruct(int32 InPriority, USkill_Passive_XS* InG
 bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)
 {
 	if (
-		(GameplayAbilityTargetData_GAEvent.Data.HitRate < 100)
+		(!GameplayAbilityTargetData_GAEvent.Data.GetIsHited())
 		)
 	{
 		return false;

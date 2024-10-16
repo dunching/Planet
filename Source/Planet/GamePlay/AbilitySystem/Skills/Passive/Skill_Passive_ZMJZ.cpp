@@ -144,7 +144,7 @@ void USkill_Passive_ZMJZ::OnSendAttack(const FGAEventData& GAEventData)
 {
 	if (CharacterPtr)
 	{
-		if ((GAEventData.HitRate > 0) && GAEventData.bIsWeaponAttack)
+		if ((GAEventData.GetIsHited()) && GAEventData.bIsWeaponAttack)
 		{
 			PerformAction();
 		}

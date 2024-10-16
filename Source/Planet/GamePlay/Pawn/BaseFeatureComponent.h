@@ -152,7 +152,7 @@ public:
 	void BreakMoveToAttackDistance();
 
 	// “受击”效果
-	void ExcuteAttackedEffect(EAffectedDirection AffectedDirection);
+	void ExcuteAttackedEffect(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	FGameplayAbilitySpecHandle SendEventHandle;
 
@@ -166,6 +166,11 @@ protected:
 	void AddSendBaseModify();
 
 	void AddReceivedBaseModify();
+
+	EAffectedDirection GetAffectedDirection(
+		ACharacterBase*TargetCharacterPtr,
+		ACharacterBase*TriggerCharacterPtr
+	);
 
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")

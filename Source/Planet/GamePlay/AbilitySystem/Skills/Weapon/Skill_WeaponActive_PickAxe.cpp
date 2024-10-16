@@ -190,7 +190,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
 				GAEventData.bIsWeaponAttack = true;
-				GAEventData.bIsMakeAttackEffect = true;
+				GAEventData.AttackEffectType = EAttackEffectType::kNormalAttackEffect;
 				GAEventData.SetBaseDamage(BaseDamage);
 
 				GAEventDataPtr->DataAry.Add(GAEventData);

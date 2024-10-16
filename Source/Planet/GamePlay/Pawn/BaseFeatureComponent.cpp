@@ -338,18 +338,48 @@ void UBaseFeatureComponent::ClearData2Self(
 	ClearData2Other({ ModifyPropertyMap }, DataSource);
 }
 
-void UBaseFeatureComponent::ExcuteAttackedEffect(EAffectedDirection AffectedDirection)
+void UBaseFeatureComponent::ExcuteAttackedEffect(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	FGameplayEventData Payload;
-	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
-	GameplayAbilityTargetDataPtr->AffectedDirection = AffectedDirection;
-
-	Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (OnwerActorPtr)
+	const auto IsNotDeathingTag = !IsInDeath();
+	if (IsNotDeathingTag && GAEvent.Data.GetIsHited())
 	{
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload);
+		switch (GAEvent.Data.AttackEffectType)
+		{
+		case EAttackEffectType::kNone:
+			break;
+		case EAttackEffectType::kNormalAttackEffect:
+		{
+			FGameplayEventData Payload;
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
+			GameplayAbilityTargetDataPtr->AffectedDirection = 
+				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
+
+			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+
+			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+			if (OnwerActorPtr)
+			{
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload);
+			}
+		}
+		break;
+		case EAttackEffectType::kRepel:
+		{
+			FGameplayEventData Payload;
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
+			GameplayAbilityTargetDataPtr->AffectedDirection =
+				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
+
+			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+
+			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+			if (OnwerActorPtr)
+			{
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload);
+			}
+		}
+		break;
+		}
 	}
 }
 
@@ -823,7 +853,7 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 									(
 										TargetCharacterAttributesRef.HitRate.GetCurrentValue() *
 										(100 - TargetCharacterAttributesRef.Evade.GetCurrentValue())
-									) / 100;
+										) / 100;
 
 								GameplayAbilityTargetData_GAEvent.Data.HitRate =
 									((FMath::RandRange(0, 100) <= HitRate) ? 100 : 0);
@@ -831,12 +861,12 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 
 							// 会心伤害
 							{
-								if (GameplayAbilityTargetData_GAEvent.Data.HitRate >= 100)
+								if (GameplayAbilityTargetData_GAEvent.Data.GetIsHited())
 								{
 									GameplayAbilityTargetData_GAEvent.Data.CriticalHitRate =
 										((FMath::RandRange(0, 100) <= TargetCharacterAttributesRef.CriticalHitRate.GetCurrentValue()) ? 100 : 0);
 
-									if (GameplayAbilityTargetData_GAEvent.Data.CriticalHitRate >= 100)
+									if (GameplayAbilityTargetData_GAEvent.Data.GetIsCriticalHited())
 									{
 										const float CurCriticalDamage = (100 + GameplayAbilityTargetData_GAEvent.Data.CriticalDamage) / 100.f;
 
@@ -898,7 +928,7 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 						GameplayAbilityTargetData_GAEvent.TriggerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 					if (
-						(GameplayAbilityTargetData_GAEvent.Data.HitRate >= 100)
+						(GameplayAbilityTargetData_GAEvent.Data.GetIsHited())
 						)
 					{
 						const auto Self_Resistance = SelfCharacterAttributesRef.AD_Resistance.GetCurrentValue();
@@ -910,7 +940,7 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 						);
 						const float DR = 1 - (SelfCurrent_Resistance / (SelfCurrent_Resistance + 100.f));
 
-						auto & Ref = GameplayAbilityTargetData_GAEvent.Data.BaseDamage;
+						auto& Ref = GameplayAbilityTargetData_GAEvent.Data.BaseDamage;
 						if (Ref > 0)
 						{
 							Ref = Ref * DR;
@@ -947,7 +977,7 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 
 					if (
 						(ShieldValue > 0) &&
-						(GameplayAbilityTargetData_GAEvent.Data.HitRate >= 100)
+						(GameplayAbilityTargetData_GAEvent.Data.GetIsHited())
 						)
 					{
 						auto& Ref = GameplayAbilityTargetData_GAEvent.Data.BaseDamage;
@@ -974,6 +1004,33 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 		};
 		AddReceviedEventModify(MakeShared<FMyStruct>(150));
 	}
+}
+
+EAffectedDirection UBaseFeatureComponent::GetAffectedDirection(ACharacterBase* TargetCharacterPtr, ACharacterBase* TriggerCharacterPtr)
+{
+	const FVector Vec = (TriggerCharacterPtr->GetActorLocation() - TargetCharacterPtr->GetActorLocation()).GetSafeNormal();
+
+	auto ForwardDot = FVector::DotProduct(Vec, TargetCharacterPtr->GetActorForwardVector());
+	if (ForwardDot > .5f)
+	{
+		return EAffectedDirection::kForward;
+	}
+	else if (ForwardDot < -.5f)
+	{
+		return EAffectedDirection::kBackward;
+	}
+
+	auto RightDot = FVector::DotProduct(Vec, TargetCharacterPtr->GetActorRightVector());
+	if (RightDot > .5f)
+	{
+		return EAffectedDirection::kRight;
+	}
+	else if (RightDot < -.5f)
+	{
+		return EAffectedDirection::kLeft;
+	}
+	
+	return EAffectedDirection::kForward;
 }
 
 void UBaseFeatureComponent::OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData)

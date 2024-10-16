@@ -17,6 +17,14 @@ class UBaseFeatureComponent;
 
 struct FCharacterAttributes;
 
+UENUM()
+enum class EAttackEffectType : uint8
+{
+	kNone,
+	kNormalAttackEffect,
+	kRepel,
+};
+
 USTRUCT()
 struct PLANET_API FGAEventData
 {
@@ -35,13 +43,17 @@ struct PLANET_API FGAEventData
 
 	void AddWuXingDamage(EWuXingType WuXingType, int32 Value);
 
+	bool GetIsHited()const;
+
+	bool GetIsCriticalHited()const;
+
 	UPROPERTY()
 	// 是否是武器造成的伤害
 	bool bIsWeaponAttack = false;
 	
 	UPROPERTY()
 	// 是否会造成“受击”效果
-	bool bIsMakeAttackEffect = false;
+	EAttackEffectType AttackEffectType = EAttackEffectType::kNone;
 	
 	UPROPERTY()
 	// 是否是“复活”技能

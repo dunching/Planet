@@ -169,8 +169,8 @@ void UCharacterRisingTips::ProcessGAEVentImp(EType Type, const FGameplayAbilityT
 			{
 				if 
 					(
-						(Ref.CriticalHitRate >= 100) &&
-						(Ref.HitRate >= 100)
+						(Ref.GetIsCriticalHited()) &&
+						(Ref.GetIsHited())
 					)
 				{
 					bIsCritical = true;
@@ -188,7 +188,7 @@ void UCharacterRisingTips::ProcessGAEVentImp(EType Type, const FGameplayAbilityT
 					}
 				}
 				else if (
-					(Ref.HitRate >= 100)
+					(Ref.GetIsHited())
 					)
 				{
 					{
@@ -202,7 +202,7 @@ void UCharacterRisingTips::ProcessGAEVentImp(EType Type, const FGameplayAbilityT
 					}
 				}
 				// 
-				else if (Ref.HitRate <= 0)
+				else if (!Ref.GetIsHited())
 				{
 					{
 						auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
