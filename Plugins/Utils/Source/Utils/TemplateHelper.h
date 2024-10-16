@@ -382,7 +382,7 @@ struct FMaterialAry
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY()
-	TArray<UMaterialInterface*>MaterialsAry;
+	TArray<class UMaterialInterface*>MaterialsAry;
 };
 
 struct FCapturesInfo

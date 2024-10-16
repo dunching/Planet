@@ -6,6 +6,7 @@
 #include <mutex>
 
 #include "CoreMinimal.h"
+#include "Engine/GameInstance.h"
 
 #include "PlanetGameInstance.generated.h"
 

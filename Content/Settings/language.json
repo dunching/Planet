@@ -1,0 +1,27 @@
+{
+  "Test": {
+    "Default": "Test",
+    "Chinese": "测试",
+    "English": "Test"
+  },
+  "BaseDamage": {
+    "Default": "-",
+    "Chinese": "-",
+    "English": "-"
+  },
+  "Critical": {
+    "Default": "Critical",
+    "Chinese": "会心",
+    "English": "Critical"
+  },
+  "Evade": {
+    "Default": "Evade",
+    "Chinese": "闪避",
+    "English": "Evade"
+  },
+  "Treatment": {
+    "Default": "Treatment",
+    "Chinese": "治疗",
+    "English": "Treatment"
+  }
+}

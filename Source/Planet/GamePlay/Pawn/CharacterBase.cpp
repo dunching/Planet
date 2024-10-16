@@ -41,7 +41,7 @@
 #include "HumanAIController.h"
 #include "PlanetPlayerController.h"
 #include "GAEvent_Helper.h"
-#include "FightingTips.h"
+#include "CharacterRisingTips.h"
 #include "SceneObj.h"
 #include "SceneUnitContainer.h"
 
@@ -414,9 +414,11 @@ void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTar
 	if (GetNetMode() == NM_Client)
 	{
 		// 显示对应的浮动UI
-		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
-		UIPtr->ProcessGAEVent(GAEvent);
-		UIPtr->AddToViewport(EUIOrder::kFightingTips);
+		auto UIPtr = CreateWidget<UCharacterRisingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
+		if (UIPtr->ProcessGAEVent(GAEvent))
+		{
+			UIPtr->AddToViewport(EUIOrder::kFightingTips);
+		}
 	}
 #endif
 }

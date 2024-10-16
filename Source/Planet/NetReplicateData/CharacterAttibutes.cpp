@@ -2,7 +2,7 @@
 #include "CharacterAttibutes.h"
 
 #include "AssetRefMap.h"
-#include "FightingTips.h"
+#include "CharacterRisingTips.h"
 #include "Planet.h"
 #include "UICommon.h"
 #include "GameplayTagsSubSystem.h"

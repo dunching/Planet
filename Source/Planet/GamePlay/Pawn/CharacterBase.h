@@ -21,7 +21,7 @@ struct FGameplayAbilityTargetData_GAReceivedEvent;
 class AEquipmentBase;
 class ASceneObj;
 class UCharacterTitle;
-class UFightingTips;
+class UCharacterRisingTips;
 
 class UAnimInstanceBase;
 class UEquipmentInteractionComponent;
