@@ -56,10 +56,10 @@ protected:
 	void DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 PP = 50;
+	int32 PP = 25;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 ShieldValue = 100;
+	int32 ShieldValue = 30;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Duration = 5;

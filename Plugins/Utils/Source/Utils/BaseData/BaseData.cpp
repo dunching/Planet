@@ -22,19 +22,19 @@ int32 FBaseProperty::GetCurrentValue() const
 	return CurrentValue;
 }
 
-void FBaseProperty::SetCurrentValue(int32 val)
+void FBaseProperty::SetCurrentValue(int32 NewValue)
 {
-	if (CurrentValue != val)
+	if (CurrentValue != NewValue)
 	{
+		const auto OldValue = CurrentValue;
+		CurrentValue = NewValue;
 		if (bIsSaveUpdate)
 		{
 		}
 		else
 		{
-			CallbackContainerHelper.ValueChanged(CurrentValue, val);
+			CallbackContainerHelper.ValueChanged(OldValue, CurrentValue);
 		}
-
-		CurrentValue = val;
 	}
 }
 

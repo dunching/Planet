@@ -234,15 +234,17 @@ void ACharacterBase::UnPossessed()
 	}
 }
 
-void ACharacterBase::InteractionSceneObj_Implementation(ASceneObj* SceneObjPtr)
+void ACharacterBase::InteractionSceneObj(ASceneObj* SceneObjPtr)
 {
-	if (SceneObjPtr)
-	{
-		SceneObjPtr->Interaction(this);
-	}
+	InteractionSceneObj_Server(SceneObjPtr);
 }
 
 void ACharacterBase::Interaction(ACharacterBase* CharacterPtr)
+{
+
+}
+
+void ACharacterBase::LookingAt(ACharacterBase* CharacterPtr)
 {
 
 }
@@ -332,6 +334,14 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 	// 
 	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
 //	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
+}
+
+void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneObjPtr)
+{
+	if (SceneObjPtr)
+	{
+		SceneObjPtr->Interaction(this);
+	}
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const

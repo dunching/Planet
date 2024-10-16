@@ -585,6 +585,13 @@ void UBaseFeatureComponent::BreakMoveToAttackDistance()
 
 void UBaseFeatureComponent::AddSendBaseModify()
 {
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() < NM_DedicatedServer)
+	{
+		return;
+	}
+#endif
+
 	{
 		// 群体伤害衰减
 		struct FMyStruct : public IGAEventModifySendInterface
@@ -695,6 +702,13 @@ void UBaseFeatureComponent::AddSendBaseModify()
 
 void UBaseFeatureComponent::AddReceivedBaseModify()
 {
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() < NM_DedicatedServer)
+	{
+		return;
+	}
+#endif
+
 	// 元素克制衰减
 	{
 		struct FMyStruct : public IGAEventModifyReceivedInterface
@@ -806,8 +820,10 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 							// 命中率
 							{
 								const auto HitRate =
-									TargetCharacterAttributesRef.HitRate.GetCurrentValue() *
-									(100 - TargetCharacterAttributesRef.Evade.GetCurrentValue());
+									(
+										TargetCharacterAttributesRef.HitRate.GetCurrentValue() *
+										(100 - TargetCharacterAttributesRef.Evade.GetCurrentValue())
+									) / 100;
 
 								GameplayAbilityTargetData_GAEvent.Data.HitRate =
 									((FMath::RandRange(0, 100) <= HitRate) ? 100 : 0);

@@ -63,9 +63,13 @@ public:
 
 protected:
 
+	void PerformAction();
+
 	void ReigsterEffect();
 
-	void PerformAction();
+	void AddShield(int32 Value);
+	
+	void RemoveShield();
 
 	void OnSendAttack(const FGAEventData& GAEventData);
 
@@ -76,9 +80,11 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
 
+	// 生命值低于此百分比的时候触发
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float MinGPPercent = .2f;
 
+	// 可以生成的盾，最大生命值的百分比
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float ShieldValue_HP_Percent = .4f;
 

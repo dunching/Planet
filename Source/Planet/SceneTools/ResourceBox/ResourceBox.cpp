@@ -6,6 +6,7 @@
 #include <Components/BoxComponent.h>
 #include <Components/WidgetComponent.h>
 #include "ActorSequencePlayer.h"
+#include "CharacterBase.h"
 
 AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -34,9 +35,22 @@ void AResourceBox::EndLookAt()
 
 void AResourceBox::StartLookAt(ACharacterBase* InCharacterPtr)
 {
-	if (InteractionWidgetCompoentPtr)
+	LookingAt(InCharacterPtr);
+}
+
+void AResourceBox::LookingAt(ACharacterBase* InCharacterPtr)
+{
+	if (
+		InteractionWidgetCompoentPtr &&
+		!bIsOpend &&
+		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < Range)
+		)
 	{
 		InteractionWidgetCompoentPtr->SetVisibility(true);
+	}
+	else
+	{
+		EndLookAt();
 	}
 }
 
@@ -64,9 +78,15 @@ void AResourceBox::Tick(float DeltaSeconds)
 
 void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
 {
-	Super::Interaction(InCharacterPtr);
+	if (bIsOpend)
+	{
+	}
+	else
+	{
+		InteractionImp();
+	}
 
-	InteractionImp();
+	Super::Interaction(InCharacterPtr);
 }
 
 void AResourceBox::InteractionImp_Implementation()

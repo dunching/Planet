@@ -71,10 +71,11 @@ public:
 
 	virtual void UnPossessed() override;
 	
-	UFUNCTION(Server, Reliable)
 	virtual void InteractionSceneObj(ASceneObj* SceneObjPtr);
 	
 	virtual void Interaction(ACharacterBase* CharacterPtr) override;
+
+	virtual void LookingAt(ACharacterBase* CharacterPtr)override;
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr) override;
 
@@ -137,6 +138,9 @@ protected:
 	virtual void SpawnDefaultController()override;
 
 	void InitialDefaultCharacterUnit();
+	
+	UFUNCTION(Server, Reliable)
+	virtual void InteractionSceneObj_Server(ASceneObj* SceneObjPtr);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);

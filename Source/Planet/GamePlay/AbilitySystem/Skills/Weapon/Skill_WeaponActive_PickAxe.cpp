@@ -176,7 +176,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	))
 	{
 		const auto & CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		const auto BaseDamage = Damage + CharacterAttributes.AD.GetCurrentValue();
+		const int32 BaseDamage = Damage + (CharacterAttributes.AD.GetCurrentValue() * AD_Damage_Magnification);
 
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 

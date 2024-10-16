@@ -29,6 +29,9 @@ protected:
 	virtual void Interaction(ACharacterBase* CharacterPtr)override;
 
 protected:
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void InteractionImp_BoxBase(ACharacterBase* CharacterPtr);
 
 	void AddItemsToTarget();
 
@@ -41,4 +44,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, int32> UnitMap;
 	
+	bool bIsOpend = false;
+
 };

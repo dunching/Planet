@@ -48,6 +48,8 @@ public:
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
 
+	virtual void LookingAt(ACharacterBase* CharacterPtr)override;
+
 	virtual void EndLookAt()override;
 
 	template<typename Type = USceneObjPropertyComponent>

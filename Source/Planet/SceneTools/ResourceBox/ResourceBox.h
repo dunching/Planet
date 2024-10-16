@@ -30,6 +30,8 @@ public:
 	
 	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
 
+	virtual void LookingAt(ACharacterBase* CharacterPtr)override;
+
 	virtual void EndLookAt()override;
 
 protected:
@@ -52,5 +54,8 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* BoxComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Range = 200;
 
 };

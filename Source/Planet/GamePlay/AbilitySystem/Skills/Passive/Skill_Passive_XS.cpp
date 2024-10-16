@@ -47,6 +47,7 @@ void USkill_Passive_XS::OnRemoveAbility(
 	const FGameplayAbilitySpec& Spec
 )
 {
+	RemoveShield();
 	CharacterPtr->GetBaseFeatureComponent()->RemoveReceviedEventModify(EventModifyReceivedSPtr);
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -73,6 +74,44 @@ void USkill_Passive_XS::ReigsterEffect()
 	}
 }
 
+void USkill_Passive_XS::AddShield(int32 ShieldValue)
+{
+	// 数值修改
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+	{
+		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+		GAEventData.DataModify.Add(ECharacterPropertyType::Shield, ShieldValue);
+		GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+		GAEventData.bIsOverlapData = true;
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+	}
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	ICPtr->SendEventImp(GAEventDataPtr);
+}
+
+void USkill_Passive_XS::RemoveShield()
+{
+	// 清空 数值修改
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+	GAEventData.DataModify = GetAllData();
+	GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+	GAEventData.bIsClearData = true;
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	ICPtr->SendEventImp(GAEventDataPtr);
+}
+
 void USkill_Passive_XS::PerformAction()
 {
 #if UE_EDITOR || UE_SERVER
@@ -96,6 +135,7 @@ void USkill_Passive_XS::PerformAction()
 			TaskPtr->SetDuration(ShieldDuration, 0.1f);
 			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::Duration_DurationDelegate);
 			TaskPtr->OnFinished.BindLambda([this](auto) {
+				RemoveShield();
 				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Duration_CharacterStateInfoSPtr);
 				Duration_CharacterStateInfoSPtr = nullptr;
 				return true;
@@ -157,6 +197,13 @@ USkill_Passive_XS::FMyStruct::FMyStruct(int32 InPriority, USkill_Passive_XS* InG
 
 bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)
 {
+	if (
+		(GameplayAbilityTargetData_GAEvent.Data.HitRate < 100)
+		)
+	{
+		return false;
+	}
+
 	const auto OrginalDamage =
 		GameplayAbilityTargetData_GAEvent.Data.TrueDamage +
 		GameplayAbilityTargetData_GAEvent.Data.BaseDamage +
@@ -179,9 +226,12 @@ bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedE
 
 	const auto Threshold = MaxHP * GAInsPtr->MinGPPercent;
 
-	if ((CurrentHP - OrginalDamage) < Threshold)
+	if (
+		(OrginalDamage > 0) && 
+		((CurrentHP - OrginalDamage) < Threshold)
+		)
 	{
-		// 触发阈值 HP
+		// 阈值 之上的 HP
 		const auto GreaterThresholdValue = FMath::Max(0, CurrentHP - Threshold);
 		
 		// 先减去阈值之上的 HP
@@ -196,6 +246,8 @@ bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedE
 		int32 ActulyDamage = 0;
 		if (RemaindShield > 0)
 		{
+			GAInsPtr->AddShield(RemaindShield);
+
 			ActulyDamage = OrginalDamage - FMath::Max(0, ShieldValue - RemaindShield);
 		}
 		else
