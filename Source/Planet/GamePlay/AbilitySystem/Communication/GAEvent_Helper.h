@@ -22,7 +22,7 @@ enum class EAttackEffectType : uint8
 {
 	kNone,
 	kNormalAttackEffect,
-	kRepel,
+	kAttackEffectAndRepel,
 };
 
 USTRUCT()
@@ -55,6 +55,11 @@ struct PLANET_API FGAEventData
 	// 是否会造成“受击”效果
 	EAttackEffectType AttackEffectType = EAttackEffectType::kNone;
 	
+	// == 0则为 根据目标和tigger位置计算
+	FVector RepelDirection = FVector::ZeroVector;
+
+	int32 RepelDistance = -1;
+
 	UPROPERTY()
 	// 是否是“复活”技能
 	bool bIsRespawn = false;

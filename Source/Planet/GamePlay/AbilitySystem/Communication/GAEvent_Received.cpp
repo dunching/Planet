@@ -65,14 +65,19 @@ void UGAEvent_Received::ActivateAbility(
 			}
 			else
 			{
+				// 受击的角色会对数据做出的修正
 				CharacterPtr->GetBaseFeatureComponent()->OnReceivedEventModifyData(*CloneSPtr);
 
+				// 将数据应用到角色
 				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 
+				// 
 				CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
+				//
 				GAEventDataPtr->TriggerCharacterPtr->GetBaseFeatureComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
+				// 角色根据数据作出相应的反馈（如播放通用的动画或位移效果）
 				CharacterPtr->GetBaseFeatureComponent()->ExcuteAttackedEffect(*CloneSPtr);
 			}
 		}

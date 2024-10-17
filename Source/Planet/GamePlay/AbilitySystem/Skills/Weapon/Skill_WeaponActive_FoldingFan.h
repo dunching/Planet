@@ -129,7 +129,7 @@ protected:
 
 	void EmitProjectile();
 
-	void MakeDamage(ACharacterBase * TargetCharacterPtr);
+	void MakeDamage(ACharacterBase * TargetCharacterPtr, FWeaponActorType* WeaponProjectilePtr);
 
 	void StartTasksLink();
 

@@ -41,7 +41,10 @@ public:
 	USphereComponent* GetCollisionComponent();
 
 	bool bIsReachFarestPoint = false;
-
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")
+	UProjectileMovementComponent* ProjectileMovementCompPtr = nullptr;
+	
 protected:
 
 	virtual void BeginPlay()override;
@@ -57,9 +60,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName Socket;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Movement")
-	UProjectileMovementComponent* ProjectileMovementCompPtr = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USkeletalMeshComponent* SkeletalComponentPtr = nullptr;

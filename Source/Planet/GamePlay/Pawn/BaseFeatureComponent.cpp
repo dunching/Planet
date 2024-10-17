@@ -359,23 +359,33 @@ void UBaseFeatureComponent::ExcuteAttackedEffect(const FGameplayAbilityTargetDat
 			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload);
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+					OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload
+				);
 			}
 		}
 		break;
-		case EAttackEffectType::kRepel:
+		case EAttackEffectType::kAttackEffectAndRepel:
 		{
 			FGameplayEventData Payload;
 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
 			GameplayAbilityTargetDataPtr->AffectedDirection =
 				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
+			GameplayAbilityTargetDataPtr->RepelDistance = GAEvent.Data.RepelDistance > 0 ? GAEvent.Data.RepelDistance : 50;
+			if (!GAEvent.Data.RepelDirection.IsNearlyZero())
+			{
+				GameplayAbilityTargetDataPtr->RepelDirection = GAEvent.Data.RepelDirection;
+			}
+			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = GAEvent.Data.TriggerCharacterPtr.Get();
 
 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{
-				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload);
+				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+					OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload
+				);
 			}
 		}
 		break;

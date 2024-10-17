@@ -22,6 +22,13 @@ struct FGameplayAbilityTargetData_Affected :
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	EAffectedDirection AffectedDirection = EAffectedDirection::kForward;
+
+	int32 RepelDistance = -1;
+
+	FVector RepelDirection = FVector::ZeroVector;
+
+	ACharacterBase* TriggerCharacterPtr = nullptr;
+
 };
 
 template<>
@@ -44,6 +51,8 @@ class PLANET_API UBasicFutures_Affected : public UBasicFuturesBase
 	GENERATED_BODY()
 
 public:
+
+	using ActiveParamType = FGameplayAbilityTargetData_Affected;
 
 	UBasicFutures_Affected();
 
@@ -79,9 +88,11 @@ protected:
 
 	virtual void InitialTags()override;
 
-	void PerformAction(EAffectedDirection AffectedDirection);
+	void PerformAction();
 
 	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
+
+	void Move(UAnimMontage* CurMontagePtr, float Rate);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* ForwardMontage = nullptr;
@@ -96,5 +107,7 @@ protected:
 	UAnimMontage* RightMontage = nullptr;
 
 	ACharacterBase* CharacterPtr = nullptr;
+
+	const ActiveParamType* ActiveParamPtr = nullptr;
 
 };

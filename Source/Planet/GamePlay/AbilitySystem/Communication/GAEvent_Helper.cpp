@@ -93,8 +93,15 @@ bool FGAEventData::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 {
 	Ar << bIsWeaponAttack;
 	Ar << AttackEffectType;
+	Ar << RepelDirection;
+	Ar << RepelDistance;
+	Ar << bIsRespawn;
 
 	Ar << AD_Penetration;
+	Ar << AD_PercentPenetration;
+	Ar << HitRate;
+	Ar << CriticalHitRate;
+	Ar << CriticalDamage;
 
 	Ar << TrueDamage;
 	Ar << BaseDamage;
