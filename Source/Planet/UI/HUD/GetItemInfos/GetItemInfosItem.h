@@ -12,6 +12,7 @@
 #include "GetItemInfosItem.generated.h"
 
 struct FStreamableHandle;
+struct FBasicProxy;
 
 UCLASS()
 class PLANET_API UGetItemInfosItem : public UMyUserWidget, public IUnitIconInterface
@@ -27,11 +28,11 @@ public:
 	virtual void EnableIcon(bool bIsEnable)override;
 
 	void ResetToolUIByData(const TSharedPtr<FSkillProxy>& UnitPtr, bool bIsAdd);
-	
+
 	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
-	
+
 	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
-	
+
 	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd);
 
 protected:

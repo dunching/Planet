@@ -1,20 +1,21 @@
 
-#include "GetItemInfos.h"
+#include "GetItemInfosList.h"
 
 #include <Components/VerticalBox.h>
 
 #include "SceneElement.h"
 #include "GetItemInfosItem.h"
+#include "TemplateHelper.h"
 
-namespace GetItemInfos
+struct FGetItemInfosList : public TStructVariable<FGetItemInfosList>
 {
 	const FName VerticalBox = TEXT("VerticalBox");
-}
+};
 
 #if WITH_EDITOR
-void UGetItemInfos::NativeConstruct()
+void UGetItemInfosList::NativeConstruct()
 #else
-void UGetItemInfos::NativePreConstruct()
+void UGetItemInfosList::NativePreConstruct()
 #endif
 {
 #if WITH_EDITOR
@@ -23,20 +24,20 @@ void UGetItemInfos::NativePreConstruct()
 	Super::NativePreConstruct();
 #endif
 
-	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
 		UIPtr->ClearChildren();
 	}
 }
 
-void UGetItemInfos::ResetUIByData()
+void UGetItemInfosList::ResetUIByData()
 {
 }
 
-void UGetItemInfos::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd)
+void UGetItemInfosList::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd)
 {
-	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
 		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
@@ -49,9 +50,9 @@ void UGetItemInfos::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& UnitPtr,
 	}
 }
 
-void UGetItemInfos::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosList::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num)
 {
-	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
 		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
@@ -64,9 +65,9 @@ void UGetItemInfos::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, b
 	}
 }
 
-void UGetItemInfos::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType)
+void UGetItemInfosList::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType)
 {
-	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
 		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
@@ -79,9 +80,9 @@ void UGetItemInfos::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>
 	}
 }
 
-void UGetItemInfos::OnGourpmateUnitChanged(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd)
+void UGetItemInfosList::OnGourpmateUnitChanged(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd)
 {
-	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(GetItemInfos::VerticalBox));
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
 		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);

@@ -43,7 +43,7 @@
 #include "CharacterTitle.h"
 #include "GroupMnaggerComponent.h"
 #include "SceneElement.h"
-#include "GetItemInfos.h"
+#include "GetItemInfosList.h"
 
 #include "SceneUnitContainer.h"
 
@@ -80,28 +80,28 @@ void AHumanCharacter::BeginPlay()
 				{
 					auto Handle =
 						GetHoldingItemsComponent()->OnSkillUnitChanged.AddCallback(
-							std::bind(&UGetItemInfos::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+							std::bind(&UGetItemInfosList::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
 							));
 					Handle->bIsAutoUnregister = false;
 				}
 				{
 					auto Handle =
 						GetHoldingItemsComponent()->OnCoinUnitChanged.AddCallback(
-							std::bind(&UGetItemInfos::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+							std::bind(&UGetItemInfosList::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 							));
 					Handle->bIsAutoUnregister = false;
 				}
 				{
 					auto Handle =
 						GetHoldingItemsComponent()->OnConsumableUnitChanged.AddCallback(
-							std::bind(&UGetItemInfos::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+							std::bind(&UGetItemInfosList::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
 							));
 					Handle->bIsAutoUnregister = false;
 				}
 				{
 					auto Handle =
 						GetHoldingItemsComponent()->OnGroupmateUnitChanged.AddCallback(
-							std::bind(&UGetItemInfos::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
+							std::bind(&UGetItemInfosList::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
 							));
 					Handle->bIsAutoUnregister = false;
 				}

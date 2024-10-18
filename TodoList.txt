@@ -1,5 +1,6 @@
         // b*[^:b#/]+.*$
-		
+		// E:\Projects\Planet_Dev\Source;E:\Projects\Planet_Dev\Plugins
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{

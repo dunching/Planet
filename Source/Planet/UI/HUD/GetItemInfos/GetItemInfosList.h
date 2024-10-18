@@ -9,7 +9,7 @@
 #include "UIInterfaces.h"
 #include "HUDInterface.h"
 
-#include "GetItemInfos.generated.h"
+#include "GetItemInfosList.generated.h"
 
 class UHUD_TeamMateInfo;
 
@@ -21,8 +21,8 @@ struct FSkillProxy;
 struct FConsumableProxy;
 
 UCLASS()
-class PLANET_API UGetItemInfos :
-	public UMyUserWidget, 
+class PLANET_API UGetItemInfosList :
+	public UMyUserWidget,
 	public IHUDInterface
 {
 	GENERATED_BODY()
@@ -42,12 +42,17 @@ public:
 	void OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
 
 	void OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
-	
+
 	void OnGourpmateUnitChanged(const TSharedPtr< FCharacterProxy>& UnitPtr, bool bIsAdd);
 
 protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGetItemInfosItem>GetItemInfosClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	int32 MaxDisplayNum = 8;
+
+	TArray<TSharedPtr < FBasicProxy>> PendingAry;
 
 };

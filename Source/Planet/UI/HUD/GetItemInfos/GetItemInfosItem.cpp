@@ -5,12 +5,14 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 
-namespace GetItemInfosItem
+#include "TemplateHelper.h"
+
+struct FGetItemInfosItem : public TStructVariable<FGetItemInfosItem>
 {
 	const FName Texture = TEXT("Texture");
 
 	const FName Text = TEXT("Text");
-}
+};
 
 void UGetItemInfosItem::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
@@ -71,7 +73,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCharacterProxy>& U
 
 void UGetItemInfosItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(GetItemInfosItem::Texture));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FGetItemInfosItem::Get().Texture));
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
@@ -84,7 +86,7 @@ void UGetItemInfosItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 
 void UGetItemInfosItem::SetText(const FString& Text)
 {
-	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(GetItemInfosItem::Text));
+	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FGetItemInfosItem::Get().Text));
 	if (!NumTextPtr)
 	{
 		return;
