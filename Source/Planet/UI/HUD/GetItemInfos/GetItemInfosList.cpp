@@ -40,12 +40,22 @@ void UGetItemInfosList::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& Unit
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
-		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
-		if (WidgetPtr)
+		const auto ChildNum = UIPtr->GetChildrenCount();
+		if (ChildNum >= MaxDisplayNum)
 		{
-			WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd);
+			OrderAry.Add(UnitPtr);
+			SkillPendingAry.Add({ UnitPtr, bIsAdd });
+		}
+		else
+		{
+			auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
+				WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd);
 
-			UIPtr->AddChild(WidgetPtr);
+				UIPtr->AddChild(WidgetPtr);
+			}
 		}
 	}
 }
@@ -55,12 +65,22 @@ void UGetItemInfosList::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPt
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
-		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
-		if (WidgetPtr)
+		const auto ChildNum = UIPtr->GetChildrenCount();
+		if (ChildNum >= MaxDisplayNum)
 		{
-			WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd, Num);
+			OrderAry.Add(UnitPtr);
+			CoinPendingAry.Add({ UnitPtr, bIsAdd ,Num });
+		}
+		else
+		{
+			auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
+				WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd, Num);
 
-			UIPtr->AddChild(WidgetPtr);
+				UIPtr->AddChild(WidgetPtr);
+			}
 		}
 	}
 }
@@ -70,12 +90,22 @@ void UGetItemInfosList::OnConsumableUnitChanged(const TSharedPtr < FConsumablePr
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
-		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
-		if (WidgetPtr)
+		const auto ChildNum = UIPtr->GetChildrenCount();
+		if (ChildNum >= MaxDisplayNum)
 		{
-			WidgetPtr->ResetToolUIByData(UnitPtr, ProxyModifyType);
+			OrderAry.Add(UnitPtr);
+			ConsumablePendingAry.Add({ UnitPtr, ProxyModifyType });
+		}
+		else
+		{
+			auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
+				WidgetPtr->ResetToolUIByData(UnitPtr, ProxyModifyType);
 
-			UIPtr->AddChild(WidgetPtr);
+				UIPtr->AddChild(WidgetPtr);
+			}
 		}
 	}
 }
@@ -85,12 +115,78 @@ void UGetItemInfosList::OnGourpmateUnitChanged(const TSharedPtr < FCharacterProx
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
 	{
-		auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
-		if (WidgetPtr)
+		const auto ChildNum = UIPtr->GetChildrenCount();
+		if (ChildNum >= MaxDisplayNum)
 		{
-			WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd);
+			OrderAry.Add(UnitPtr);
+			CharacterPendingAry.Add({ UnitPtr, bIsAdd });
+		}
+		else
+		{
+			auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
+				WidgetPtr->ResetToolUIByData(UnitPtr, bIsAdd);
 
-			UIPtr->AddChild(WidgetPtr);
+				UIPtr->AddChild(WidgetPtr);
+			}
+		}
+	}
+}
+
+void UGetItemInfosList::OnRemovedItem()
+{
+	for (int32 Index = OrderAry.Num() - 1; Index >= 0; Index--)
+	{
+		for (int32 SecondIndex = 0; SecondIndex < SkillPendingAry.Num(); SecondIndex++)
+		{
+			if (OrderAry[Index] == SkillPendingAry[SecondIndex].Get<0>())
+			{
+				OnSkillUnitChanged(SkillPendingAry[SecondIndex].Get<0>().Pin(), SkillPendingAry[SecondIndex].Get<1>());
+
+				OrderAry.RemoveAt(Index);
+				SkillPendingAry.RemoveAt(SecondIndex);
+				return;
+			}
+		}
+		
+		for (int32 SecondIndex = 0; SecondIndex < CoinPendingAry.Num(); SecondIndex++)
+		{
+			if (OrderAry[Index] == CoinPendingAry[SecondIndex].Get<0>())
+			{
+				OnCoinUnitChanged(CoinPendingAry[
+					SecondIndex].Get<0>().Pin(), CoinPendingAry[SecondIndex].Get<1>(), CoinPendingAry[SecondIndex].Get<2>()
+						);
+
+				OrderAry.RemoveAt(Index);
+				SkillPendingAry.RemoveAt(SecondIndex);
+				return;
+			}
+		}
+		
+		for (int32 SecondIndex = 0; SecondIndex < ConsumablePendingAry.Num(); SecondIndex++)
+		{
+			if (OrderAry[Index] == ConsumablePendingAry[SecondIndex].Get<0>())
+			{
+				OnConsumableUnitChanged(ConsumablePendingAry[SecondIndex].Get<0>().Pin(), ConsumablePendingAry[SecondIndex].Get<1>());
+
+				OrderAry.RemoveAt(Index);
+				ConsumablePendingAry.RemoveAt(SecondIndex);
+				return;
+			}
+		}
+
+		for (int32 SecondIndex = 0; SecondIndex < CharacterPendingAry.Num(); SecondIndex++)
+		{
+			if (OrderAry[Index] == CharacterPendingAry[SecondIndex].Get<0>())
+			{
+				OnGourpmateUnitChanged(CharacterPendingAry[SecondIndex].Get<0>().Pin(), CharacterPendingAry[SecondIndex].Get<1>());
+
+				OrderAry.RemoveAt(Index);
+				CharacterPendingAry.RemoveAt(SecondIndex);
+				return;
+			}
 		}
 	}
 }

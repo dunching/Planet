@@ -15,4 +15,8 @@ namespace TextCollect
 	TEXTCOLLECT(Evade);
 
 	TEXTCOLLECT(Critical);
+
+	TEXTCOLLECT(GetSkill);
+
+	TEXTCOLLECT(LoseSkill);
 }

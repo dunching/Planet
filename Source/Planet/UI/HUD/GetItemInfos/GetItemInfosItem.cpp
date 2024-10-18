@@ -6,6 +6,8 @@
 #include "Components/Image.h"
 
 #include "TemplateHelper.h"
+#include "TextSubSystem.h"
+#include "TextCollect.h"
 
 struct FGetItemInfosItem : public TStructVariable<FGetItemInfosItem>
 {
@@ -27,7 +29,13 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& UnitP
 {
 	SetTexutre(UnitPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s %s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), *UnitPtr->GetUnitName()));
+	const auto Text =
+		FString::Printf(
+			TEXT("%s:%s"),
+			bIsAdd ? *UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+			*UnitPtr->GetUnitName()
+		);
+	SetText(Text);
 
 	ResetToolUIByData(UnitPtr);
 }
@@ -42,7 +50,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& 
 	{
 		SetText(FString::Printf(TEXT("Get:%dX%s"), UnitPtr->GetCurrentValue(), *UnitPtr->GetUnitName()));
 	}
-		break;
+	break;
 	case EProxyModifyType::kChange:
 		break;
 	case EProxyModifyType::kRemove:
@@ -97,6 +105,7 @@ void UGetItemInfosItem::SetText(const FString& Text)
 void UGetItemInfosItem::OnAnimationComplete()
 {
 	RemoveFromParent();
+	OnFinished.ExecuteIfBound();
 }
 
 void UGetItemInfosItem::EnableIcon(bool bIsEnable)

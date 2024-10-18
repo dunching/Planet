@@ -23,5 +23,45 @@
     "Default": "Treatment",
     "Chinese": "治疗",
     "English": "Treatment"
+  },
+  "GetSkill": {
+    "Default": "Get",
+    "Chinese": "获取",
+    "English": "Get"
+  },
+  "LoseSkill": {
+    "Default": "Lose",
+    "Chinese": "失去",
+    "English": "Lose"
+  },
+  "GetCoin": {
+    "Default": "Get",
+    "Chinese": "获取",
+    "English": "Get"
+  },
+  "LoseCoin": {
+    "Default": "Lose",
+    "Chinese": "失去",
+    "English": "Lose"
+  },
+  "GetConsumable": {
+    "Default": "Get",
+    "Chinese": "获取",
+    "English": "Get"
+  },
+  "LoseConsumable": {
+    "Default": "Lose",
+    "Chinese": "失去",
+    "English": "Lose"
+  },
+  "GetCharacter": {
+    "Default": "Get",
+    "Chinese": "获取",
+    "English": "Get"
+  },
+  "LoseCharacter": {
+    "Default": "Lose",
+    "Chinese": "失去",
+    "English": "Lose"
   }
 }

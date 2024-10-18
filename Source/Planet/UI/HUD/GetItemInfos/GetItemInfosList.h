@@ -47,12 +47,22 @@ public:
 
 protected:
 
+	void OnRemovedItem();
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGetItemInfosItem>GetItemInfosClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	int32 MaxDisplayNum = 8;
 
-	TArray<TSharedPtr < FBasicProxy>> PendingAry;
+	TArray<TSharedPtr < FBasicProxy>> OrderAry;
+
+	TArray<TPair<TWeakPtr < FSkillProxy>, bool>> SkillPendingAry;
+
+	TArray<TTuple<TWeakPtr < FCoinProxy>, bool, int32>> CoinPendingAry;
+
+	TArray<TPair<TWeakPtr < FConsumableProxy>, EProxyModifyType>> ConsumablePendingAry;
+
+	TArray<TPair<TWeakPtr < FCharacterProxy>, bool>> CharacterPendingAry;
 
 };

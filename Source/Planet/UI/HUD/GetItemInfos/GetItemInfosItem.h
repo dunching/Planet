@@ -21,6 +21,8 @@ class PLANET_API UGetItemInfosItem : public UMyUserWidget, public IUnitIconInter
 
 public:
 
+	using FOnFinished = TDelegate<void()>;
+
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
 	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
@@ -34,6 +36,8 @@ public:
 	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
 
 	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd);
+
+	FOnFinished OnFinished;
 
 protected:
 
