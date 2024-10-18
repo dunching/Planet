@@ -362,20 +362,21 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		{
 			auto Lambda = [&Ref](
 				FBasePropertySet& PropertySetRef,
-				const FBaseProperty& Property
+				const FBaseProperty& Property,
+				const FGameplayTag&InDataSource
 				)
 				{
 					if (Ref.bIsClearData)
 					{
-						PropertySetRef.RemoveCurrentValue(Ref.DataSource);
+						PropertySetRef.RemoveCurrentValue(InDataSource);
 					}
 					else if (Ref.bIsOverlapData)
 					{
-						PropertySetRef.SetCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+						PropertySetRef.SetCurrentValue(Property.GetCurrentValue(), InDataSource);
 					}
 					else
 					{
-						PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+						PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), InDataSource);
 					}
 				};
 
@@ -387,27 +388,27 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #pragma region 
 				case ECharacterPropertyType::GoldElement:
 				{
-					Lambda(GoldElement, Iter.Value);
+					Lambda(GoldElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::WoodElement:
 				{
-					Lambda(WoodElement, Iter.Value);
+					Lambda(WoodElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::WaterElement:
 				{
-					Lambda(WaterElement, Iter.Value);
+					Lambda(WaterElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::FireElement:
 				{
-					Lambda(FireElement, Iter.Value);
+					Lambda(FireElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::SoilElement:
 				{
-					Lambda(SoilElement, Iter.Value);
+					Lambda(SoilElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 #pragma endregion
@@ -415,23 +416,23 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #pragma region 
 				case ECharacterPropertyType::HP:
 				{
-					Lambda(HP, Iter.Value);
+					Lambda(HP, Iter.Value, DataSource_Character);
 				}
 				break;
 
 				case ECharacterPropertyType::PP:
 				{
-					Lambda(PP, Iter.Value);
+					Lambda(PP, Iter.Value, DataSource_Character);
 				}
 				break;
 				case ECharacterPropertyType::Mana:
 				{
-					Lambda(Mana, Iter.Value);
+					Lambda(Mana, Iter.Value, DataSource_Character);
 				}
 				break;
 				case ECharacterPropertyType::Shield:
 				{
-					Lambda(Shield, Iter.Value);
+					Lambda(Shield, Iter.Value, Ref.DataSource);
 				}
 				break;
 #pragma endregion
@@ -440,30 +441,30 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #pragma region 
 				case ECharacterPropertyType::AD:
 				{
-					Lambda(AD, Iter.Value);
+					Lambda(AD, Iter.Value, Ref.DataSource);
 				}
 				break;
 
 				case ECharacterPropertyType::AD_Penetration:
 				{
-					Lambda(AD_Penetration, Iter.Value);
+					Lambda(AD_Penetration, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::AD_PercentPenetration:
 				{
-					Lambda(AD_PercentPenetration, Iter.Value);
+					Lambda(AD_PercentPenetration, Iter.Value, Ref.DataSource);
 				}
 				break;
 #pragma endregion
 
 				case ECharacterPropertyType::GAPerformSpeed:
 				{
-					Lambda(GAPerformSpeed, Iter.Value);
+					Lambda(GAPerformSpeed, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::MoveSpeed:
 				{
-					Lambda(MoveSpeed, Iter.Value);
+					Lambda(MoveSpeed, Iter.Value, Ref.DataSource);
 				}
 				break;
 				}

@@ -47,11 +47,6 @@ void UCS_PeriodicStateModify::PreActivate(
 		if (GameplayAbilityTargetDataPtr)
 		{
 			SetCache(TSharedPtr<FGameplayAbilityTargetData_StateModify>(GameplayAbilityTargetDataPtr->Clone()));
-
-			AbilityTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
-			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
-// 			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
-// 			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataSPtr->Tag);
 		}
 	}
 

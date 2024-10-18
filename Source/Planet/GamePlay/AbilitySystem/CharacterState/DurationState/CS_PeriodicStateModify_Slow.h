@@ -80,6 +80,8 @@ protected:
 	
 	virtual void PerformAction()override;
 
+	virtual	void InitalTags()override;
+
 	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
 
 	struct FMyStruct

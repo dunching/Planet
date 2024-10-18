@@ -108,6 +108,10 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.NoPhy")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
+	FGameplayTag State_Buff_Purify =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.Purify")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Buff_SuperArmor =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.SuperArmor")));
 	
@@ -124,9 +128,13 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
+	FGameplayTag State_Debuff_Fire =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Fire")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Stun =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Stun")));
-	
+
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Charm =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Charm")));
@@ -139,10 +147,6 @@ public:
 	FGameplayTag State_Debuff_Silent =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Silent")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
-	FGameplayTag State_Debuff_Ice =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Ice")));
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Slow =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Slow")));

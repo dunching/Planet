@@ -4,49 +4,50 @@
 #include "CoreMinimal.h"
 
 #include <GameplayTagContainer.h>
+#include "AITypes.h"
+#include <Navigation/PathFollowingComponent.h>
+#include <NavigationSystemTypes.h>
 
 #include "CS_PeriodicStateModify.h"
 
-#include "CS_PeriodicStateModify_Ice.generated.h"
+#include "CS_PeriodicStateModify_Purify.generated.h"
+
+struct FStreamableHandle;
+struct FMyPropertySettlementModify;
+struct FConsumableProxy;
 
 class UAbilityTask_TimerHelper;
 class UTexture2D;
-struct FConsumableProxy;
 class UEffectItem;
 class ASPlineActor;
 class ATornado;
 
-struct FStreamableHandle;
-
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_StateModify_Ice : public FGameplayAbilityTargetData_StateModify
+struct PLANET_API FGameplayAbilityTargetData_StateModify_Purify :
+	public FGameplayAbilityTargetData_StateModify
 {
 	GENERATED_USTRUCT_BODY()
 
-	FGameplayAbilityTargetData_StateModify_Ice(
-		int32 Count = 1,
-		float ImmuneTime =8.0f
-	);
-	
-	virtual FGameplayAbilityTargetData_StateModify_Ice* Clone()const override;
+	FGameplayAbilityTargetData_StateModify_Purify();
 
-	float ImmuneTime = 8.f;
-	
-	int32 Count = 1;
-	
 private:
 
 };
 
+/*
+	霸体
+*/
 UCLASS()
-class PLANET_API UCS_PeriodicStateModify_Ice :
-	public UCS_PeriodicStateModify
+class PLANET_API UCS_PeriodicStateModify_Purify : public UCS_PeriodicStateModify
 {
 	GENERATED_BODY()
 
 public:
 
-	UCS_PeriodicStateModify_Ice();;
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -55,13 +56,14 @@ public:
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
+
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	) override;
-	
+
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -73,17 +75,13 @@ public:
 	virtual void UpdateDuration()override;
 
 protected:
-	
+
 	virtual void PerformAction()override;
 
-	int MaxCount = 3;
-		
-	int CurrentCount = 0;
+	virtual	void InitalTags()override;
 
-	bool bIsImmune = false;
-	
-	void ModifyMaterials();
+	virtual void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)override;
 
-	void AddTags(const TSharedPtr<FGameplayAbilityTargetData_StateModify_Ice> & CurrentGameplayAbilityTargetDataSPtr);
-	
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
+
 };

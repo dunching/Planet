@@ -123,6 +123,9 @@ void UCS_PeriodicStateModify_Charm::InitalTags()
 {
 	Super::InitalTags();
 
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
+
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);

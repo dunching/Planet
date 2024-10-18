@@ -97,6 +97,9 @@ void UCS_PeriodicStateModify_Stagnation::InitalTags()
 {
 	Super::InitalTags();
 
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+
 	CancelAbilitiesWithTag.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
 
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
@@ -104,9 +107,6 @@ void UCS_PeriodicStateModify_Stagnation::InitalTags()
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
-
 }
 
 void UCS_PeriodicStateModify_Stagnation::PerformAction()

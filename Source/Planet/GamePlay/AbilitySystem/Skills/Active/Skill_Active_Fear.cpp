@@ -97,11 +97,6 @@ void USkill_Active_Fear::ExcuteTasks()
 				Params
 			);
 
-			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-
 			TSet<ACharacterBase*>TargetSet;
 			for (const auto& Iter : Result)
 			{
@@ -113,6 +108,11 @@ void USkill_Active_Fear::ExcuteTasks()
 			}
 
 			// 伤害
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+
+			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
 			for (const auto& Iter : TargetSet)
 			{
 				FGAEventData GAEventData(Iter, CharacterPtr);

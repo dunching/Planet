@@ -18,6 +18,7 @@
 #include "SceneUnitTable.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
+#include "GameplayTagsSubSystem.h"
 
 UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify() :
 	Super()
@@ -30,9 +31,7 @@ FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyMo
 {
 	Duration = RightVal->GetTableRowUnit_Consumable()->Duration;
 	PerformActionInterval = RightVal->GetTableRowUnit_Consumable()->PerformActionInterval;
-	ModifyPropertyPerLayer = { RightVal->GetTableRowUnit_Consumable()->ModifyPropertyMap };
 	DefaultIcon = RightVal->GetIcon();
-	LosePropertyNumInterval = -1.f;
 }
 
 FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify()
@@ -45,40 +44,28 @@ FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyMo
 	TSoftObjectPtr<UTexture2D>Icon,
 	float InDuration,
 	float InPerformActionInterval,
-	float InLosePropertyNumInterval,
 	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap
 ) :
 	Super(Tag),
 	Duration(InDuration),
 	PerformActionInterval(InPerformActionInterval),
-	LosePropertyNumInterval(InLosePropertyNumInterval),
-	ModifyPropertyPerLayer{ InModifyPropertyMap }
+	CharacterPropertyMap(InModifyPropertyMap)
 {
 	DefaultIcon = Icon;
 }
 
 FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
-	const FGameplayTag& Tag,
-	bool bInOnluReFreshTime,
+	const FGameplayTag& Tag, 
 	float InDuration,
-	float InLosePropertyNumInterval
+	float InPerformActionInterval,
+	const TMap<ECharacterPropertyType, 
+	FBaseProperty>& InModifyPropertyMap
 ) :
 	Super(Tag),
 	Duration(InDuration),
-	LosePropertyNumInterval(InLosePropertyNumInterval),
-	bIsOnlyReFreshTime(bInOnluReFreshTime)
+	PerformActionInterval(InPerformActionInterval),
+	CharacterPropertyMap(InModifyPropertyMap)
 {
-}
-
-FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(
-	const FGameplayTag& Tag,
-	bool bClear
-) :
-	Super(Tag)
-{
-	bIsOnlyReFreshTime = true;
-	Duration = 0.f;
-	bIsClear = bClear;
 }
 
 FGameplayAbilityTargetData_PropertyModify* FGameplayAbilityTargetData_PropertyModify::Clone() const
@@ -108,6 +95,10 @@ void UCS_PeriodicPropertyModify::PreActivate(
 		}
 	}
 
+	OnGameplayEffectTagCountChangedHandle = GetAbilitySystemComponentFromActorInfo()->RegisterGenericGameplayTagEvent().AddUObject(
+		this, &ThisClass::OnGameplayEffectTagCountChanged
+	);
+
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
@@ -131,6 +122,8 @@ void UCS_PeriodicPropertyModify::EndAbility(
 	bool bWasCancelled
 )
 {
+	GetAbilitySystemComponentFromActorInfo()->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -142,26 +135,10 @@ void UCS_PeriodicPropertyModify::UpdateDuration()
 
 		if (DurationEffectMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
-			if (GameplayAbilityTargetDataSPtr->bIsClear)
-			{
-				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->SetFinished();
-			}
-			else if (GameplayAbilityTargetDataSPtr->bIsOnlyReFreshTime)
-			{
-				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->RefreshTime();
-			}
-			else
-			{
-				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->Duration =
-					GameplayAbilityTargetDataSPtr->Duration;
-				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->RefreshTime();
-				DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].SPtr = GameplayAbilityTargetDataSPtr;
-
-				if (GameplayAbilityTargetDataSPtr->LosePropertyNumInterval < 0.f)
-				{
-					PerformPropertyModify(GameplayAbilityTargetDataSPtr);
-				}
-			}
+			DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->Duration =
+				GameplayAbilityTargetDataSPtr->Duration;
+			DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].CharacterStateInfoSPtr->RefreshTime();
+			DurationEffectMap[GameplayAbilityTargetDataSPtr->Tag].SPtr = GameplayAbilityTargetDataSPtr;
 		}
 		else
 		{
@@ -202,8 +179,8 @@ void UCS_PeriodicPropertyModify::PerformAction()
 void UCS_PeriodicPropertyModify::ExcuteTasks()
 {
 	TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
 	TaskPtr->SetInfinite();
+	TaskPtr->TickDelegate.BindUObject(this, &ThisClass::OnTaskTick);
 	TaskPtr->ReadyForActivation();
 
 	UpdateDuration();
@@ -220,44 +197,31 @@ void UCS_PeriodicPropertyModify::OnTaskTick(
 		Iter.Value.CharacterStateInfoSPtr->IncreaseCooldownTime(DeltaTime);
 	}
 
+	const auto DebuffTag = UGameplayTagsSubSystem::GetInstance()->Debuff;
 	const auto Temp = DurationEffectMap;
 	for (const auto& Iter : Temp)
 	{
 		// 到期的
 		if (Iter.Value.CharacterStateInfoSPtr->GetIsFinished())
 		{
-			if ((Iter.Value.SPtr->LosePropertyNumInterval < 0.f) || Iter.Value.SPtr->bIsClear)
-			{
-				PerformPropertyModify(Iter.Value.SPtr);
-
-				DurationEffectMap.Remove(Iter.Key);
-
-				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
-			}
-			else
-			{
-				if (Iter.Value.SPtr->ModifyPropertyPerLayer.IsEmpty())
-				{
-					PerformPropertyModify(Iter.Value.SPtr);
-
-					DurationEffectMap.Remove(Iter.Key);
-					CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
-				}
-				else
-				{
-					Iter.Value.SPtr->ModifyPropertyPerLayer.RemoveAt(Iter.Value.SPtr->ModifyPropertyPerLayer.Num() - 1);
-					Iter.Value.CharacterStateInfoSPtr->Duration = Iter.Value.SPtr->LosePropertyNumInterval;
-					Iter.Value.CharacterStateInfoSPtr->RefreshTime();
-
-					PerformPropertyModify(Iter.Value.SPtr);
-				}
-			}
+			DurationEffectMap.Remove(Iter.Key);
+			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
+			continue;
 		}
-		else
+		
+		// 被“净化”的
+		if (bIsPurify && Iter.Value.SPtr->Tag.MatchesTag(DebuffTag))
 		{
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Iter.Value.CharacterStateInfoSPtr);
+			DurationEffectMap.Remove(Iter.Key);
+
+			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
+			continue;
 		}
+
+		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Iter.Value.CharacterStateInfoSPtr);
 	}
+
+	bIsPurify = false;
 
 	// 修改属性
 	for (auto& Iter : DurationEffectMap)
@@ -288,19 +252,17 @@ void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGamepla
 	FGAEventData GAEventData(SPtr->TargetCharacterPtr, SPtr->TriggerCharacterPtr);
 
 	GAEventData.DataSource = SPtr->Tag;
-	GAEventData.bIsOverlapData = !SPtr->bIsAdd;
-
-	if (SPtr->ModifyPropertyPerLayer.IsEmpty())
-	{
-		// 
-		GAEventData.bIsClearData = true;
-	}
-	else
-	{
-		GAEventData.DataModify = SPtr->ModifyPropertyPerLayer[SPtr->ModifyPropertyPerLayer.Num() - 1];
-	}
+	GAEventData.DataModify = SPtr->CharacterPropertyMap;
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
 	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+}
+
+void UCS_PeriodicPropertyModify::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
+{
+	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify) && (Count > 0))
+	{
+		bIsPurify = true;
+	}
 }

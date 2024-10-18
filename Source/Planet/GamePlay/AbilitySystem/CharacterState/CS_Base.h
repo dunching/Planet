@@ -16,7 +16,7 @@ struct FCharacterStateInfo;
 
 /*
 	一般为debuff
-	给目标单位使用持续性的效果
+	给目标单位使用持续性的、脱手的效果
 
 	如果对自己使用，则直接在GA里面使用UBaseFeatureComponent
 */

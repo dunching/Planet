@@ -80,62 +80,62 @@ void USkill_Passive_ZMJZ::PerformAction()
 		{
 			if (CSPtr->Num < MaxCount)
 			{
-				TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
-				ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
-				ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, SpeedOffset);
-
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-					SkillUnitPtr->GetUnitType(),
-					SkillUnitPtr->GetIcon(),
-					DecreamTime,
-					-1.f,
-					SecondaryDecreamTime,
-					ModifyPropertyMap
-				);
-
-				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
-
-				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+// 				TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+// 
+// 				ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
+// 				ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, SpeedOffset);
+// 
+// 				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+// 					SkillUnitPtr->GetUnitType(),
+// 					SkillUnitPtr->GetIcon(),
+// 					DecreamTime,
+// 					-1.f,
+// 					SecondaryDecreamTime,
+// 					ModifyPropertyMap
+// 				);
+// 
+// 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+// 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+// 
+// 				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+// 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 			else
 			{
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-					SkillUnitPtr->GetUnitType(),
-					true,
-					DecreamTime,
-					SecondaryDecreamTime
-				);
-
-				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
-
-				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+// 				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+// 					SkillUnitPtr->GetUnitType(),
+// 					true,
+// 					DecreamTime,
+// 					SecondaryDecreamTime
+// 				);
+// 
+// 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+// 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+// 
+// 				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+// 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 		}
 		else
 		{
-			TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
-			ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
-
-			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-				SkillUnitPtr->GetUnitType(),
-				SkillUnitPtr->GetIcon(),
-				DecreamTime,
-				-1.f,
-				SecondaryDecreamTime,
-				ModifyPropertyMap
-			);
-
-			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+// 			TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+// 
+// 			ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
+// 
+// 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
+// 				SkillUnitPtr->GetUnitType(),
+// 				SkillUnitPtr->GetIcon(),
+// 				DecreamTime,
+// 				-1.f,
+// 				SecondaryDecreamTime,
+// 				ModifyPropertyMap
+// 			);
+// 
+// 			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+// 			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+// 
+// 			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+// 			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		}
 	}
 }

@@ -51,7 +51,7 @@
 #include "CS_RootMotion_KnockDown.h"
 #include "CS_PeriodicStateModify_Stun.h"
 #include "CS_PeriodicStateModify_Charm.h"
-#include "CS_PeriodicStateModify_Ice.h"
+#include "CS_PeriodicStateModify_Purify.h"
 #include "CS_PeriodicPropertyTag.h"
 #include "CS_PeriodicStateModify_Slow.h"
 #include "CS_PeriodicStateModify_Fear.h"
@@ -83,6 +83,18 @@ void UStateProcessorComponent::BeginPlay()
 			this, &ThisClass::OnGameplayEffectTagCountChanged
 		);
 	}
+}
+
+void UStateProcessorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+		GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -398,9 +410,9 @@ void UStateProcessorComponent::ExcuteEffects(
 				MakeTargetData(GameplayAbilityTargetDataSPtr)
 			);
 		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Ice))
+		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify))
 		{
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Ice::StaticClass());
+			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Purify::StaticClass());
 
 			ASCPtr->GiveAbilityAndActivateOnce(
 				Spec,

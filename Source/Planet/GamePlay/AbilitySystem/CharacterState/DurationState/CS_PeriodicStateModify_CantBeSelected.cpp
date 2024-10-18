@@ -89,6 +89,7 @@ void UCS_PeriodicStateModify_CantBeSelected::InitalTags()
 {
 	Super::InitalTags();
 
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
 }
 

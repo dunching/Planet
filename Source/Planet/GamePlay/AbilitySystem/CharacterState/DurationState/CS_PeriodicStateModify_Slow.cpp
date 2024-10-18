@@ -65,8 +65,6 @@ void UCS_PeriodicStateModify_Slow::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);
-
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
@@ -213,4 +211,12 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 		CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
 		break;
 	}
+}
+
+void UCS_PeriodicStateModify_Slow::InitalTags()
+{
+	Super::InitalTags();
+
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);
 }

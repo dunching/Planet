@@ -1,5 +1,5 @@
 
-#include "CS_PeriodicStateModify_SuperArmor.h"
+#include "CS_PeriodicStateModify_Purify.h"
 
 #include <Engine/AssetManager.h>
 #include <Engine/StreamableManager.h>
@@ -29,19 +29,12 @@
 #include "PlanetPlayerController.h"
 #include "CharacterAttibutes.h"
 
-FGameplayAbilityTargetData_StateModify_SuperArmor::FGameplayAbilityTargetData_StateModify_SuperArmor(
-	float Duration
-) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor, Duration)
+FGameplayAbilityTargetData_StateModify_Purify::FGameplayAbilityTargetData_StateModify_Purify() :
+	Super(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify, .1f)
 {
 }
 
-FGameplayAbilityTargetData_StateModify_SuperArmor::FGameplayAbilityTargetData_StateModify_SuperArmor()
-{
-
-}
-
-void UCS_PeriodicStateModify_SuperArmor::OnAvatarSet(
+void UCS_PeriodicStateModify_Purify::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
 )
@@ -49,7 +42,7 @@ void UCS_PeriodicStateModify_SuperArmor::OnAvatarSet(
 	Super::OnAvatarSet(ActorInfo, Spec);
 }
 
-void UCS_PeriodicStateModify_SuperArmor::PreActivate(
+void UCS_PeriodicStateModify_Purify::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -60,7 +53,7 @@ void UCS_PeriodicStateModify_SuperArmor::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void UCS_PeriodicStateModify_SuperArmor::ActivateAbility(
+void UCS_PeriodicStateModify_Purify::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -72,7 +65,7 @@ void UCS_PeriodicStateModify_SuperArmor::ActivateAbility(
 	PerformAction();
 }
 
-void UCS_PeriodicStateModify_SuperArmor::EndAbility(
+void UCS_PeriodicStateModify_Purify::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -80,12 +73,10 @@ void UCS_PeriodicStateModify_SuperArmor::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UCS_PeriodicStateModify_SuperArmor::UpdateDuration()
+void UCS_PeriodicStateModify_Purify::UpdateDuration()
 {
 	Super::UpdateDuration();
 
@@ -94,38 +85,22 @@ void UCS_PeriodicStateModify_SuperArmor::UpdateDuration()
 		TimerTaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		TimerTaskPtr->UpdateDuration();
 	}
-
-	if (CharacterStateInfoSPtr)
-	{
-		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		CharacterStateInfoSPtr->TotalTime = 0.f;
-	}
 }
 
-void UCS_PeriodicStateModify_SuperArmor::PerformAction()
+void UCS_PeriodicStateModify_Purify::PerformAction()
 {
-	// 
-	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
-	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
-	CharacterStateInfoSPtr->DataChanged();
-	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_SuperArmor::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
+void UCS_PeriodicStateModify_Purify::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
 {
-	CharacterStateInfoSPtr->TotalTime += DeltaTime;
-
-	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_SuperArmor::InitalTags()
+void UCS_PeriodicStateModify_Purify::InitalTags()
 {
 	Super::InitalTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify);
 
 	TArray<FGameplayTag>Ary{
 		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun,

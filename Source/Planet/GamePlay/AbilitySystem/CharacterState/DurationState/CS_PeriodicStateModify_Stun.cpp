@@ -46,13 +46,6 @@ void UCS_PeriodicStateModify_Stun::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	AbilityTags.AppendTags(Spec.Ability->AbilityTags);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
 }
 
 void UCS_PeriodicStateModify_Stun::ActivateAbility(
@@ -114,4 +107,17 @@ void UCS_PeriodicStateModify_Stun::OnTaskTick(UAbilityTask_TimerHelper*, float D
 	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
 	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+}
+
+void UCS_PeriodicStateModify_Stun::InitalTags()
+{
+	Super::InitalTags();
+
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
 }

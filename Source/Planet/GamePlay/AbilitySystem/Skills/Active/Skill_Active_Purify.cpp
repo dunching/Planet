@@ -30,7 +30,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicStateModify_SuperArmor.h"
+#include "CS_PeriodicStateModify_Purify.h"
 
 USkill_Active_Purify::USkill_Active_Purify() :
 	Super()
@@ -108,7 +108,7 @@ void USkill_Active_Purify::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_SuperArmor(.1f);
+		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Purify;
 
 		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
