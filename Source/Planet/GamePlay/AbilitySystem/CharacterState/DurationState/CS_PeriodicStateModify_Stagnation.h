@@ -74,7 +74,7 @@ public:
 
 	virtual void PerformAction()override;
 
-	virtual	void InitalTags()override;
+	virtual	void InitalDefaultTags()override;
 
 	void OnDuration(
 		UAbilityTask_TimerHelper* TaskPtr,

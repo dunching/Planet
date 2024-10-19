@@ -119,9 +119,9 @@ void UCS_PeriodicStateModify_Charm::UpdateDuration()
 	PerformAction();
 }
 
-void UCS_PeriodicStateModify_Charm::InitalTags()
+void UCS_PeriodicStateModify_Charm::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);

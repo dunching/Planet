@@ -251,7 +251,7 @@ void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGamepla
 
 	FGAEventData GAEventData(SPtr->TargetCharacterPtr, SPtr->TriggerCharacterPtr);
 
-	GAEventData.DataSource = SPtr->Tag;
+	GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
 	GAEventData.DataModify = SPtr->CharacterPropertyMap;
 
 	GAEventDataPtr->DataAry.Add(GAEventData);

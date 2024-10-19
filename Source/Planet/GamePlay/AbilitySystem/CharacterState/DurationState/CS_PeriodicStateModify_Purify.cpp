@@ -95,9 +95,9 @@ void UCS_PeriodicStateModify_Purify::OnTaskTick(UAbilityTask_TimerHelper*, float
 {
 }
 
-void UCS_PeriodicStateModify_Purify::InitalTags()
+void UCS_PeriodicStateModify_Purify::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify);

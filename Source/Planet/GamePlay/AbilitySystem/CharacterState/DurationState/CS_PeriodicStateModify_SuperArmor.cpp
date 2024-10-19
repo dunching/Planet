@@ -120,9 +120,9 @@ void UCS_PeriodicStateModify_SuperArmor::OnTaskTick(UAbilityTask_TimerHelper*, f
 	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_SuperArmor::InitalTags()
+void UCS_PeriodicStateModify_SuperArmor::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);

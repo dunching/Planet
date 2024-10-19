@@ -125,9 +125,9 @@ void USkill_Active_Base::SetContinuePerformImp(bool bIsContinue)
 	ContinueActive();
 }
 
-void USkill_Active_Base::InitalTags()
+void USkill_Active_Base::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
 

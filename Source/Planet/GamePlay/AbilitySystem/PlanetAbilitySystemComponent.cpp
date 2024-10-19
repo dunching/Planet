@@ -57,6 +57,33 @@ void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTim
 	}
 }
 
+UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(FGameplayAbilitySpec& Spec, const UGameplayAbility* Ability)
+{
+	check(Ability);
+	check(Ability->HasAllFlags(RF_ClassDefaultObject));
+
+	AActor* Owner = GetOwner();
+	check(Owner);
+
+	Cast<UPlanetGameplayAbility>(Spec.Ability)->InitalDefaultTags();
+
+	auto AbilityInstance = NewObject<UPlanetGameplayAbility>(Owner, Ability->GetClass());
+	check(AbilityInstance);
+
+	// Add it to one of our instance lists so that it doesn't GC.
+	if (AbilityInstance->GetReplicationPolicy() != EGameplayAbilityReplicationPolicy::ReplicateNo)
+	{
+		Spec.ReplicatedInstances.Add(AbilityInstance);
+		AddReplicatedInstancedAbility(AbilityInstance);
+	}
+	else
+	{
+		Spec.NonReplicatedInstances.Add(AbilityInstance);
+	}
+
+	return AbilityInstance;
+}
+
 void UPlanetAbilitySystemComponent::CurrentMontageStopImp_Implementation(float OverrideBlendOutTime)
 {
 	CurrentMontageStop(OverrideBlendOutTime);

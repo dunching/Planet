@@ -157,9 +157,9 @@ void UCS_PeriodicStateModify_Fear::PerformAction()
 	}
 }
 
-void UCS_PeriodicStateModify_Fear::InitalTags()
+void UCS_PeriodicStateModify_Fear::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);

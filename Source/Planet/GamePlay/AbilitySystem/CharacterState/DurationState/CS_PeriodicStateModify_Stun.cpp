@@ -109,9 +109,9 @@ void UCS_PeriodicStateModify_Stun::OnTaskTick(UAbilityTask_TimerHelper*, float D
 	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_Stun::InitalTags()
+void UCS_PeriodicStateModify_Stun::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);

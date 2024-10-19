@@ -40,7 +40,11 @@ public:
 	virtual void OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)override;
 	
 	virtual void CurrentMontageStop(float OverrideBlendOutTime)override;
-	
+
+	virtual UGameplayAbility* CreateNewInstanceOfAbility(
+		FGameplayAbilitySpec& Spec, const UGameplayAbility* Ability
+	)override;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void CurrentMontageStopImp(float OverrideBlendOutTime);
 	

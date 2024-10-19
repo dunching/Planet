@@ -161,9 +161,9 @@ void USkill_Active_DisplacementNoPhy::Move()
 	}
 }
 
-void USkill_Active_DisplacementNoPhy::InitalTags()
+void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_NoPhy);
 }

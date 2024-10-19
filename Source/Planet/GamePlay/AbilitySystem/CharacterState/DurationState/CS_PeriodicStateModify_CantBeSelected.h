@@ -63,7 +63,7 @@ public:
 		bool bWasCancelled
 	);
 
-	virtual	void InitalTags()override;
+	virtual	void InitalDefaultTags()override;
 
 	virtual void PerformAction()override;
 

@@ -85,9 +85,9 @@ void UCS_PeriodicStateModify_CantBeSelected::PerformAction()
 	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_CantBeSelected::InitalTags()
+void UCS_PeriodicStateModify_CantBeSelected::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);

@@ -117,9 +117,9 @@ void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
 	}
 }
 
-void USkill_WeaponActive_Base::InitalTags()
+void USkill_WeaponActive_Base::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
 

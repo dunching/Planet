@@ -90,6 +90,25 @@ void UCS_PeriodicStateModify_Slow::EndAbility(
 	bool bWasCancelled
 )
 {
+	for (const auto & Iter : MoveSpeedOffsetMap)
+	{
+		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
+	}
+
+	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
+
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+	GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow;
+	GAEventData.DataModify = GetAllData();
+	GAEventData.bIsClearData = true;
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -194,28 +213,37 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 	MoveSpeedOffsetMap.KeySort([](const auto & Left, const auto& Right) {
 		return Left < Right;
 		});
+
 	for (const auto Iter : MoveSpeedOffsetMap)
 	{
-		auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
+		if (PreviouSpeed == Iter.Key)
+		{
+		}
+		else
+		{
+			PreviouSpeed = Iter.Key;
 
-		GAEventDataPtr->TriggerCharacterPtr = Iter.Value.SPtr->TriggerCharacterPtr;
+			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
 
-		FGAEventData GAEventData(Iter.Value.SPtr->TargetCharacterPtr, Iter.Value.SPtr->TriggerCharacterPtr);
+			GAEventDataPtr->TriggerCharacterPtr = Iter.Value.SPtr->TriggerCharacterPtr;
 
-		GAEventData.DataSource = Iter.Value.SPtr->Tag;
-		GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,Iter.Key } };
-		GAEventData.bIsOverlapData = true;
+			FGAEventData GAEventData(Iter.Value.SPtr->TargetCharacterPtr, Iter.Value.SPtr->TriggerCharacterPtr);
 
-		GAEventDataPtr->DataAry.Add(GAEventData);
+			GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow;
+			GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed, Iter.Key } };
+			GAEventData.bIsOverlapData = true;
 
-		CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+		}
 		break;
 	}
 }
 
-void UCS_PeriodicStateModify_Slow::InitalTags()
+void UCS_PeriodicStateModify_Slow::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);

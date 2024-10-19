@@ -80,7 +80,7 @@ protected:
 	
 	virtual void PerformAction()override;
 
-	virtual	void InitalTags()override;
+	virtual	void InitalDefaultTags()override;
 
 	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
 
@@ -93,5 +93,7 @@ protected:
 
 	// 减速速率,源,剩餘持续时间
 	TMap<int32, FMyStruct>MoveSpeedOffsetMap;
+
+	int32 PreviouSpeed = 0;
 
 };

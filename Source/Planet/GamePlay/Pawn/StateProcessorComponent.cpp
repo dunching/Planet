@@ -608,12 +608,12 @@ FGameplayAbilitySpec UStateProcessorComponent::MakeSpec(
 	TSubclassOf<UPlanetGameplayAbility> InAbilityClass
 )
 {
-	auto GACDOPtr = InAbilityClass.GetDefaultObject();
+// 	auto GACDOPtr = InAbilityClass.GetDefaultObject();
+// 
+// 	// 仅针对
+// 	GACDOPtr->InitalDefaultTags();
 
-	GACDOPtr->InitalTags();
-	GACDOPtr->AbilityTags.AddTag(GameplayAbilityTargetDataSPtr->Tag);
-
-	FGameplayAbilitySpec Spec(GACDOPtr);
+	FGameplayAbilitySpec Spec(InAbilityClass);
 
 	return Spec;
 }

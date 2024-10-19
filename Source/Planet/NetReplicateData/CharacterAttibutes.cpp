@@ -110,7 +110,7 @@ void FBasePropertySet::Update()
 	const auto Temp = ValueMap;
 	for (const auto& Iter : Temp)
 	{
-		if (Iter.Value <= 0)
+		if (Iter.Value == 0)
 		{
 			ValueMap.Remove(Iter.Key);
 		}
@@ -416,18 +416,27 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #pragma region 
 				case ECharacterPropertyType::HP:
 				{
-					Lambda(HP, Iter.Value, DataSource_Character);
+					if (Ref.DataSource == DataSource_Character)
+					{
+						Lambda(HP, Iter.Value, DataSource_Character);
+					}
 				}
 				break;
 
 				case ECharacterPropertyType::PP:
 				{
-					Lambda(PP, Iter.Value, DataSource_Character);
+					if (Ref.DataSource == DataSource_Character)
+					{
+						Lambda(PP, Iter.Value, DataSource_Character);
+					}
 				}
 				break;
 				case ECharacterPropertyType::Mana:
 				{
-					Lambda(Mana, Iter.Value, DataSource_Character);
+					if (Ref.DataSource == DataSource_Character)
+					{
+						Lambda(Mana, Iter.Value, DataSource_Character);
+					}
 				}
 				break;
 				case ECharacterPropertyType::Shield:

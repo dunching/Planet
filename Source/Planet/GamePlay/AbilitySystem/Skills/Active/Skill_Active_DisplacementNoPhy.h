@@ -71,7 +71,7 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	virtual	void InitalTags()override;
+	virtual	void InitalDefaultTags()override;
 
 	void Move();
 
