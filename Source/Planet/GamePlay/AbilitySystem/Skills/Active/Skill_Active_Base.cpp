@@ -10,7 +10,7 @@
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
-#include "GroupMnaggerComponent.h"
+#include "SceneUnitTable.h"
 #include "GameplayTagsSubSystem.h"
 
 USkill_Active_Base::USkill_Active_Base():
@@ -84,7 +84,38 @@ bool USkill_Active_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (!DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->CheckCooldown())
+	auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr);
+	if (!ActiveSkillUnitPtr)
+	{
+		return false;
+	}
+	if (!ActiveSkillUnitPtr->CheckCooldown())
+	{
+		return false;
+	}
+
+	const auto RequireWeaponUnitType = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->RequireWeaponUnitType;
+
+	TSharedPtr<FWeaponProxy>FirstWeaponProxySPtr = nullptr;
+	TSharedPtr<FWeaponProxy>SecondWeaponProxySPtr = nullptr;
+	CharacterPtr->GetProxyProcessComponent()->GetWeaponProxy(
+		FirstWeaponProxySPtr,
+		SecondWeaponProxySPtr
+	);
+
+	if (
+		FirstWeaponProxySPtr &&
+		(FirstWeaponProxySPtr->GetUnitType() == RequireWeaponUnitType)
+		)
+	{
+	}
+	else if (
+		SecondWeaponProxySPtr &&
+		(SecondWeaponProxySPtr->GetUnitType() == RequireWeaponUnitType)
+		)
+	{
+	}
+	else
 	{
 		return false;
 	}

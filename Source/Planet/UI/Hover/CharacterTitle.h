@@ -77,7 +77,7 @@ protected:
 	float CurrentInterval = 0.f;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float Offset = 20.f;
+	float Offset = 0.f;
 
 	float HalfHeight = 0.f;
 

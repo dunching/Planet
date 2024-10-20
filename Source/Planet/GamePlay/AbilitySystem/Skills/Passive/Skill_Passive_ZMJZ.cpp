@@ -17,7 +17,7 @@
 #include "BaseFeatureComponent.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicPropertyModify.h"
-#include "CS_Base.h"
+#include "GAEvent_Helper.h"
 #include "CharacterStateInfo.h"
 
 void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
@@ -68,76 +68,68 @@ void USkill_Passive_ZMJZ::EndAbility(
 	bool bWasCancelled
 )
 {
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+	CharacterStateInfoSPtr = nullptr;
+
+	const auto UnitType = SkillUnitPtr->GetUnitType();
+	ModifyCharacterData(UnitType, true);
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void USkill_Passive_ZMJZ::PerformAction()
 {
-	if (CharacterPtr)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto CSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(SkillUnitPtr->GetUnitType());
-		if (CSPtr)
+		if (CharacterPtr)
 		{
-			if (CSPtr->Num < MaxCount)
+			const auto UnitType = SkillUnitPtr->GetUnitType();
+			CharacterStateInfoSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(UnitType);
+			if (CharacterStateInfoSPtr)
 			{
-// 				TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-// 
-// 				ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
-// 				ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, SpeedOffset);
-// 
-// 				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-// 					SkillUnitPtr->GetUnitType(),
-// 					SkillUnitPtr->GetIcon(),
-// 					DecreamTime,
-// 					-1.f,
-// 					SecondaryDecreamTime,
-// 					ModifyPropertyMap
-// 				);
-// 
-// 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-// 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
-// 
-// 				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-// 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+				if (CharacterStateInfoSPtr->Num < MaxCount)
+				{
+					CharacterStateInfoSPtr->Num++;
+					CharacterStateInfoSPtr->DataChanged();
+					CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+
+					ModifyCharacterData(UnitType, SpeedOffset);
+				}
+				else
+				{
+				}
+
+				if (TimerTaskPtr)
+				{
+					TimerTaskPtr->SetDuration(DecreamTime, 0.1f);
+					TimerTaskPtr->UpdateDuration();
+				}
 			}
 			else
 			{
-// 				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-// 					SkillUnitPtr->GetUnitType(),
-// 					true,
-// 					DecreamTime,
-// 					SecondaryDecreamTime
-// 				);
-// 
-// 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-// 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
-// 
-// 				auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-// 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+				CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+				CharacterStateInfoSPtr->Num = 1;
+				CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+				CharacterStateInfoSPtr->Duration = DecreamTime;
+				CharacterStateInfoSPtr->DefaultIcon = BuffIcon;
+				CharacterStateInfoSPtr->DataChanged();
+
+				CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+
+				ModifyCharacterData(UnitType, SpeedOffset);
+
+				{
+					TimerTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+					TimerTaskPtr->SetDuration(DecreamTime, 0.1f);
+					TimerTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationDelegate);
+					TimerTaskPtr->OnFinished.BindUObject(this, &ThisClass::OnTimerTaskFinished);
+					TimerTaskPtr->ReadyForActivation();
+				}
 			}
 		}
-		else
-		{
-// 			TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-// 
-// 			ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, SpeedOffset);
-// 
-// 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-// 				SkillUnitPtr->GetUnitType(),
-// 				SkillUnitPtr->GetIcon(),
-// 				DecreamTime,
-// 				-1.f,
-// 				SecondaryDecreamTime,
-// 				ModifyPropertyMap
-// 			);
-// 
-// 			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-// 			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
-// 
-// 			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-// 			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
-		}
 	}
+#endif
 }
 
 void USkill_Passive_ZMJZ::OnSendAttack(const FGAEventData& GAEventData)
@@ -151,7 +143,90 @@ void USkill_Passive_ZMJZ::OnSendAttack(const FGAEventData& GAEventData)
 	}
 }
 
-void USkill_Passive_ZMJZ::OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
+void USkill_Passive_ZMJZ::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration)
 {
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (CharacterStateInfoSPtr)
+		{
+			CharacterStateInfoSPtr->TotalTime = Duration - CurrentInterval;
+			CharacterStateInfoSPtr->DataChanged();
+			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+		}
+	}
+#endif
+}
+
+bool USkill_Passive_ZMJZ::OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (CharacterStateInfoSPtr)
+		{
+			const auto UnitType = SkillUnitPtr->GetUnitType();
+
+			CharacterStateInfoSPtr->Num--;
+			if (CharacterStateInfoSPtr->Num <= 0)
+			{
+				ModifyCharacterData(UnitType, 0, true);
+
+				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+				CharacterStateInfoSPtr = nullptr;
+				return true;
+			}
+			else
+			{
+				ModifyCharacterData(UnitType, -SpeedOffset);
+
+				CharacterStateInfoSPtr->Duration = SecondaryDecreamTime;
+				CharacterStateInfoSPtr->RefreshTime();
+				CharacterStateInfoSPtr->DataChanged();
+				CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+
+				TimerTaskPtr->SetDuration(SecondaryDecreamTime, 0.1f);
+				TimerTaskPtr->UpdateDuration();
+
+				return false;
+			}
+		}
+	}
+#endif
+	return true;
+}
+
+void USkill_Passive_ZMJZ::ModifyCharacterData(
+	const FGameplayTag& DataSource,
+	int32 Value, 
+	bool bIsClear
+)
+{
+	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+	GAEventData.TriggerCharacterPtr = CharacterPtr;
+	GAEventData.TargetCharacterPtr = CharacterPtr;
+
+	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+
+	ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, Value);
+
+	GAEventData.DataSource = DataSource;
+	if (bIsClear)
+	{
+		GAEventData.DataModify = GetAllData();
+		GAEventData.bIsClearData = true;
+	}
+	else
+	{
+		GAEventData.DataModify = ModifyPropertyMap;
+	}
+
+	GameplayAbilityTargetDataPtr->DataAry.Add(GAEventData);
+
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 

@@ -112,7 +112,9 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 				{
 					EndTask();
 				}
-				EndTask();
+				else
+				{
+				}
 			}
 		}
 		else
@@ -142,7 +144,9 @@ void UAbilityTask_TimerHelper::TickTask(float DeltaTime)
 				{
 					EndTask();
 				}
-				EndTask();
+				else
+				{
+				}
 			}
 		}
 		else

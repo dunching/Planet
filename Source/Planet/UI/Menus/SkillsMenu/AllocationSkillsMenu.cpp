@@ -149,7 +149,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(const TSharedPtr<FCharact
 	TSharedPtr<FSocket_FASI > FirstWeaponSocketInfoSPtr;
 	TSharedPtr<FSocket_FASI > SecondWeaponSocketInfoSPtr;
 
-	EICPtr->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+	EICPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 
 	{
 		{
