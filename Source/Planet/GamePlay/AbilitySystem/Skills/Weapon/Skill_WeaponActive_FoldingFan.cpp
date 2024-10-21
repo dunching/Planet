@@ -155,9 +155,9 @@ void USkill_WeaponActive_FoldingFan::GetLifetimeReplicatedProps(TArray<FLifetime
 	DOREPLIFETIME_CONDITION(ThisClass, CurrentFanNum, COND_AutonomousOnly);
 }
 
-void USkill_WeaponActive_FoldingFan::UpdateParam(const FGameplayEventData& GameplayEventData)
+void USkill_WeaponActive_FoldingFan::UpdateRegisterParam(const FGameplayEventData& GameplayEventData)
 {
-	Super::UpdateParam(GameplayEventData);
+	Super::UpdateRegisterParam(GameplayEventData);
 
 	if (!GameplayEventData.TargetData.IsValid(0))
 	{

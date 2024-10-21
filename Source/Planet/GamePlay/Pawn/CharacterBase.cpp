@@ -332,7 +332,15 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 	// 
 
 	// 
-	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
+	if (CharacterUnitPtr)
+	{
+		auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
+	}
+	else
+	{
+		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
+		check(0);
+	}
 //	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
 

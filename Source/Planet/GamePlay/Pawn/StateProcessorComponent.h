@@ -87,7 +87,8 @@ protected:
 	
 	FGameplayAbilitySpec MakeSpec(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
-		TSubclassOf<UPlanetGameplayAbility> InAbilityClass
+		TSubclassOf<UPlanetGameplayAbility> InAbilityClass,
+		int32 InputID
 	);
 
 	// 注意：如果是RootMotion类型的状态修改，则此类型的子状态只会为一种，比如：人物先被击飞2s，1s之后又被击飞2s，则刷新击飞时间为2s

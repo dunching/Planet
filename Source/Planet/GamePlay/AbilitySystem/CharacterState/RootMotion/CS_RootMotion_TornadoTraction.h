@@ -10,6 +10,7 @@
 
 #include "CS_RootMotion_TornadoTraction.generated.h"
 
+class UCapsuleComponent;
 class UAbilityTask_TimerHelper;
 class UTexture2D;
 struct FConsumableProxy;
@@ -18,6 +19,20 @@ class ASPlineActor;
 class ATornado;
 
 struct FStreamableHandle;
+
+UCLASS()
+class PLANET_API ATornado : public AActor
+{
+	GENERATED_BODY()
+
+public:
+
+	ATornado(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+ 
+ 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+ 	TObjectPtr<UCapsuleComponent> CapsuleComponentPtr = nullptr;
+
+};
 
 USTRUCT()
 struct PLANET_API FGameplayAbilityTargetData_RootMotion_TornadoTraction  :
@@ -66,12 +81,14 @@ public:
 		bool bReplicateEndAbility,
 		bool bWasCancelled
 	)override;
-
-	virtual void UpdateDuration()override;
+// 
+// 	virtual void UpdateDurationImp()override;
 
 protected:
 
 	virtual void PerformAction()override;
+
+	virtual	void InitalDefaultTags()override;
 
 	void ExcuteTasks();
 

@@ -125,10 +125,10 @@ void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 
 void UPlanetAbilitySystemComponent::ReplicateEventData_Implementation(
 	int32 InputID,
-	const FGameplayEventData& TriggerEventData
+	const FGameplayEventData& GameplayEventData
 )
 {
-	GameplayEventDataMap.Add(InputID, TriggerEventData);
+	GameplayEventDataMap.Add(InputID, GameplayEventData);
 }
 
 void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
@@ -148,7 +148,7 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 
 			for (auto Instance : Instances)
 			{
-				Cast<USkill_Base>(Instance)->UpdateParam(TriggerEventData);
+				Cast<USkill_Base>(Instance)->UpdateRegisterParam(TriggerEventData);
 			}
 		}
 	}

@@ -13,7 +13,7 @@
 
 #include "Helper_RootMotionSource.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "CS_RootMotion_Traction.h"
 
 UAbilityTask_MyApplyRootMotionRadialForce::UAbilityTask_MyApplyRootMotionRadialForce(
 	const FObjectInitializer& ObjectInitializer
@@ -22,47 +22,86 @@ UAbilityTask_MyApplyRootMotionRadialForce::UAbilityTask_MyApplyRootMotionRadialF
 {
 }
 
+void UAbilityTask_MyApplyRootMotionRadialForce::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, TractionPointPtr);
+}
+
 UAbilityTask_MyApplyRootMotionRadialForce* UAbilityTask_MyApplyRootMotionRadialForce::MyApplyRootMotionRadialForce(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName, 
-	FVector Location, 
-	AActor* LocationActor, 
-	float Strength,
-	float Duration,
-	float Radius,
-	bool bIsPush,
-	bool bIsAdditive,
-	bool bNoZForce,
-	UCurveFloat* StrengthDistanceFalloff, 
-	UCurveFloat* StrengthOverTime,
-	bool bUseFixedWorldDirection, 
-	FRotator FixedWorldDirection, 
-	ERootMotionFinishVelocityMode VelocityOnFinishMode,
-	FVector SetVelocityOnFinish, 
-	float ClampVelocityOnFinish
+	TWeakObjectPtr<ATractionPoint>InTractionPointPtr
 )
 {
 	auto MyTask = NewAbilityTask<UAbilityTask_MyApplyRootMotionRadialForce>(OwningAbility, TaskInstanceName);
 
 	MyTask->ForceName = TaskInstanceName;
-	MyTask->Location = Location;
-	MyTask->LocationActor = LocationActor;
-	MyTask->Strength = Strength;
-	MyTask->Radius = FMath::Max(Radius, SMALL_NUMBER); // No zero radius
-	MyTask->Duration = Duration;
-	MyTask->bIsPush = bIsPush;
-	MyTask->bIsAdditive = bIsAdditive;
-	MyTask->bNoZForce = bNoZForce;
-	MyTask->StrengthDistanceFalloff = StrengthDistanceFalloff;
-	MyTask->StrengthOverTime = StrengthOverTime;
-	MyTask->bUseFixedWorldDirection = bUseFixedWorldDirection;
-	MyTask->FixedWorldDirection = FixedWorldDirection;
-	MyTask->FinishVelocityMode = VelocityOnFinishMode;
-	MyTask->FinishSetVelocity = SetVelocityOnFinish;
-	MyTask->FinishClampVelocity = ClampVelocityOnFinish;
+
+	MyTask->Location = InTractionPointPtr->GetActorLocation();
+	MyTask->Strength = InTractionPointPtr->Strength;
+	MyTask->Radius = FMath::Max(InTractionPointPtr->Radius, SMALL_NUMBER); // No zero radius
+	MyTask->Duration = InTractionPointPtr->PrimaryActorTick.TickInterval;
+	MyTask->bIsPush = InTractionPointPtr->bIsPush;
+	MyTask->bIsAdditive = InTractionPointPtr->bIsAdditive;
+	MyTask->bNoZForce = InTractionPointPtr->bNoZForce;
+	MyTask->StrengthDistanceFalloff = InTractionPointPtr->StrengthDistanceFalloff;
+	MyTask->StrengthOverTime = InTractionPointPtr->StrengthOverTime;
+	MyTask->bUseFixedWorldDirection = InTractionPointPtr->bUseFixedWorldDirection;
+	MyTask->FixedWorldDirection = InTractionPointPtr->FixedWorldDirection;
+	MyTask->FinishVelocityMode = InTractionPointPtr->VelocityOnFinishMode;
+	MyTask->FinishSetVelocity = InTractionPointPtr->SetVelocityOnFinish;
+	MyTask->FinishClampVelocity = InTractionPointPtr->ClampVelocityOnFinished;
+
+	MyTask->TractionPointPtr = InTractionPointPtr;
+
 	MyTask->SharedInitAndApply();
 
 	return MyTask;
+}
+
+void UAbilityTask_MyApplyRootMotionRadialForce::SharedInitAndApply()
+{
+	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
+	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
+	{
+		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
+		StartTime = GetWorld()->GetTimeSeconds();
+		EndTime = StartTime + Duration;
+
+		if (MovementComponent)
+		{
+			ForceName = ForceName.IsNone() ? FName("AbilityTaskApplyRootMotionRadialForce") : ForceName;
+			TSharedPtr<FRootMotionSource_MyRadialForce> RadialForce = MakeShared<FRootMotionSource_MyRadialForce>();
+			RadialForce->InstanceName = ForceName;
+			RadialForce->AccumulateMode = bIsAdditive ? ERootMotionAccumulateMode::Additive : ERootMotionAccumulateMode::Override;
+			RadialForce->Priority = ERootMotionSource_Priority::kTraction;
+			RadialForce->Location = Location;
+			RadialForce->Duration = -1.f;
+			RadialForce->Radius = Radius;
+			RadialForce->Strength = Strength;
+			RadialForce->bIsPush = bIsPush;
+			RadialForce->bNoZForce = bNoZForce;
+			RadialForce->StrengthDistanceFalloff = StrengthDistanceFalloff;
+			RadialForce->StrengthOverTime = StrengthOverTime;
+			RadialForce->bUseFixedWorldDirection = bUseFixedWorldDirection;
+			RadialForce->FixedWorldDirection = FixedWorldDirection;
+			RadialForce->FinishVelocityParams.Mode = FinishVelocityMode;
+			RadialForce->FinishVelocityParams.SetVelocity = FinishSetVelocity;
+			RadialForce->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
+
+			RadialForce->TractionPointPtr = TractionPointPtr;
+
+			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RadialForce);
+		}
+	}
+	else
+	{
+		ABILITY_LOG(Warning, TEXT("UAbilityTask_ApplyRootMotionRadialForce called in Ability %s with null MovementComponent; Task Instance Name %s."),
+			Ability ? *Ability->GetName() : TEXT("NULL"),
+			*InstanceName.ToString());
+	}
 }
 
 void UAbilityTask_MyApplyRootMotionRadialForce::TickTask(float DeltaTime)
@@ -71,22 +110,22 @@ void UAbilityTask_MyApplyRootMotionRadialForce::TickTask(float DeltaTime)
 
 	const bool bTimedOut = HasTimedOut();
 	const auto Distance = FVector::Distance(Location, MovementComponent->GetActorLocation());
-	if (bTimedOut || (Distance > Radius))
+	if (
+		bTimedOut ||
+		(Distance > Radius)
+		)
 	{
 		bIsFinished = true;
 		OnFinish.ExecuteIfBound();
 		EndTask();
 	}
+	else
+	{
+	}
 }
 
 void UAbilityTask_MyApplyRootMotionRadialForce::OnDestroy(bool AbilityIsEnding)
 {
-	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
-	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
-	{
-		ASC->RemoveLooseGameplayTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
-	}
-
 	if (MovementComponent)
 	{
 		MovementComponent->RemoveRootMotionSourceByID(RootMotionSourceID);
@@ -95,7 +134,7 @@ void UAbilityTask_MyApplyRootMotionRadialForce::OnDestroy(bool AbilityIsEnding)
 	Super::OnDestroy(AbilityIsEnding);
 }
 
-void UAbilityTask_MyApplyRootMotionRadialForce::UpdateLocation(const FVector& InLocation)
+void UAbilityTask_MyApplyRootMotionRadialForce::UpdateLocation(TWeakObjectPtr<ATractionPoint>InTractionPointPtr)
 {
 	if (MovementComponent)
 	{
@@ -104,10 +143,10 @@ void UAbilityTask_MyApplyRootMotionRadialForce::UpdateLocation(const FVector& In
 		{
 			if (RMS->GetScriptStruct() == FRootMotionSource_RadialForce::StaticStruct())
 			{
-				FRootMotionSource_RadialForce* RootMotionSourceSPtr = static_cast<FRootMotionSource_RadialForce*>(RMS.Get());
+				auto RootMotionSourceSPtr = static_cast<FRootMotionSource_MyRadialForce*>(RMS.Get());
 				if (RootMotionSourceSPtr)
 				{
-					RootMotionSourceSPtr->Location = InLocation;
+					RootMotionSourceSPtr->LocationActor = InTractionPointPtr.Get();
 				}
 			}
 		}

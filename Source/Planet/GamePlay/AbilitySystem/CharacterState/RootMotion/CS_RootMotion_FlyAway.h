@@ -46,6 +46,8 @@ class PLANET_API UCS_RootMotion_FlyAway : public UCS_RootMotion
 
 public:
 
+	using FRootMotionParam = FGameplayAbilityTargetData_RootMotion_FlyAway;
+
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
@@ -74,13 +76,13 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void UpdateDuration()override;
-
-	void SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& GameplayAbilityTargetDataPtr);
-
 protected:
 
+	virtual void InitalDefaultTags()override;
+
 	virtual void PerformAction()override;
+
+	virtual void UpdateRootMotionImp(const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& DataSPtr)override;
 
 	void ExcuteTasks();
 

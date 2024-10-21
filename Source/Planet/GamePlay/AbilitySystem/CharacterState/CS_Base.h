@@ -29,6 +29,10 @@ struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTa
 
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
 	FGameplayAbilityTargetData_CS_Base();
 
 	FGameplayAbilityTargetData_CS_Base(
@@ -46,6 +50,16 @@ struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTa
 
 protected:
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_CS_Base> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_CS_Base>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()
@@ -80,7 +94,7 @@ public:
 
 	virtual void UpdateDuration();
 
-	TSharedPtr<FGameplayAbilityTargetData_CS_Base>GameplayAbilityTargetDataBaseSPtr;
+	TSharedPtr<FGameplayAbilityTargetData_CS_Base>GameplayAbilityTargetDataBaseSPtr = nullptr;
 
 protected:
 

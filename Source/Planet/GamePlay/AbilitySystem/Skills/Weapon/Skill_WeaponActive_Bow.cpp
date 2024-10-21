@@ -112,9 +112,9 @@ void USkill_WeaponActive_Bow::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void USkill_WeaponActive_Bow::UpdateParam(const FGameplayEventData& GameplayEventData)
+void USkill_WeaponActive_Bow::UpdateRegisterParam(const FGameplayEventData& GameplayEventData)
 {
-	Super::UpdateParam(GameplayEventData);
+	Super::UpdateRegisterParam(GameplayEventData);
 
 	if (GameplayEventData.TargetData.IsValid(0))
 	{

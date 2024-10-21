@@ -88,10 +88,12 @@ void UCS_RootMotion_KnockDown::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UCS_RootMotion_KnockDown::UpdateDuration()
-{
-	PerformAction();
-}
+// void UCS_RootMotion_KnockDown::UpdateDurationImp()
+// {
+// 	Super::UpdateDurationImp();
+// 
+// 	PerformAction();
+// }
 
 void UCS_RootMotion_KnockDown::PerformAction()
 {

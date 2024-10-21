@@ -110,7 +110,7 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
-	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData)override;
+	virtual	void UpdateRegisterParam(const FGameplayEventData& GameplayEventData)override;
 
 	virtual void CheckInContinue()override;
 

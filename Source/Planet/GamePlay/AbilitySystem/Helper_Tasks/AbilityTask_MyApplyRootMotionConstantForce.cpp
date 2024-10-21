@@ -76,7 +76,7 @@ void UAbilityTask_MyApplyRootMotionConstantForce::SharedInitAndApply()
 			TSharedPtr<FRootMotionSource_MyConstantForce> ConstantForce = MakeShared<FRootMotionSource_MyConstantForce>();
 			ConstantForce->InstanceName = ForceName;
 			ConstantForce->AccumulateMode = bIsAdditive ? ERootMotionAccumulateMode::Additive : ERootMotionAccumulateMode::Override;
-			ConstantForce->Priority = ERootMotionSource_Priority::kTraction;
+			ConstantForce->Priority = ERootMotionSource_Priority::kMove;
 			ConstantForce->Force = WorldDirection * Strength;
 			ConstantForce->Duration = Duration;
 			ConstantForce->StrengthOverTime = StrengthOverTime;

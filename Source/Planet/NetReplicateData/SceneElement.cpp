@@ -657,14 +657,14 @@ void FSkillProxy::RegisterSkill()
 			InputID
 		);
 
-		auto GameplayEventData = MakeShared<FGameplayEventData>();
-		GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+		FGameplayEventData GameplayEventData;
+		GameplayEventData.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
 
 		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
 			InputID,
-			*GameplayEventData
+			GameplayEventData
 		);
 		GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 	}

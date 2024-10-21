@@ -65,7 +65,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void ReplicateEventData(
 		int32 InputID,
-		const FGameplayEventData&TriggerEventData
+		const FGameplayEventData& GameplayEventData
 	);
 	
 	UFUNCTION(NetMulticast, Reliable)

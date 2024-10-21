@@ -185,12 +185,13 @@ void UBasicFutures_Dash::OnGameplayTaskDeactivated(UGameplayTask& Task)
 	}
 }
 
-void UBasicFutures_Dash::InitialTags()
+void UBasicFutures_Dash::InitalDefaultTags()
 {
+	Super::InitalDefaultTags();
+
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
 
 	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
 }
 
 void UBasicFutures_Dash::OnRemoveAbility(

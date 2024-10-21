@@ -99,7 +99,7 @@ public:
 
 	const TArray<FAbilityTriggerData>& GetTriggers()const;
 
-	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData);
+	virtual	void UpdateRegisterParam(const FGameplayEventData& GameplayEventData);
 
 protected:
 

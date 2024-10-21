@@ -148,7 +148,7 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 	{
 	}
 	else if (
-		HasRootMotionSources() ||
+//		HasRootMotionSources() ||
 		HasAnimRootMotion()
 		)
 	{

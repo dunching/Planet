@@ -8,7 +8,9 @@
 
 #include "Skill_Active_Traction.generated.h"
 
+class ATractionPoint;
 class ACameraTrailHelper;
+class UAnimMontage;
 class ASPlineActor;
 
 struct FCharacterStateInfo;
@@ -20,13 +22,6 @@ class PLANET_API USkill_Active_Traction : public USkill_Active_Base
 
 public:
 
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	) override;
-
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -37,6 +32,13 @@ public:
 
 protected:
 
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	) override;
+
 	void IntervalDelegate(
 		UAbilityTask_TimerHelper*, 
 		float CurrentIntervalTime,
@@ -46,7 +48,15 @@ protected:
 
 	void DurationDelegate(UAbilityTask_TimerHelper*, float CurrentIntervalTime, float IntervalTime);
 
+	void PlayMontage();
+
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	UAnimMontage* HumanMontagePtr = nullptr;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	FName StartSection = TEXT("Start");
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 MoveSpeed = 100;
@@ -55,6 +65,8 @@ protected:
 	int32 Duration = 5;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Radius = 250;
+	int32 Radius = 600;
 	
+	TWeakObjectPtr<ATractionPoint>TractionPointPtr = nullptr;
+
 };

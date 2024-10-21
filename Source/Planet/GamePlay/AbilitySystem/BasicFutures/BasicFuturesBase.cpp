@@ -20,10 +20,9 @@ void UBasicFuturesBase::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, 
 	if (CharacterPtr)
 	{
 	}
-	InitialTags();
 }
 
-void UBasicFuturesBase::InitialTags()
+void UBasicFuturesBase::InitalDefaultTags()
 {
 
 }

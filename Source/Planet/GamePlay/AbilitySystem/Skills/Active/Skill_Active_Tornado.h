@@ -15,22 +15,9 @@ class ATool_PickAxe;
 class ACharacterBase;
 class ASPlineActor;
 class UAbilityTask_TimerHelper;
+class ATornado;
 
 struct FGameplayAbilityTargetData_PickAxe;
-
-UCLASS()
-class PLANET_API ATornado : public AActor
-{
-	GENERATED_BODY()
-
-public:
-
-	ATornado(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
- 
- 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
- 	TObjectPtr<UCapsuleComponent> CapsuleComponentPtr = nullptr;
-
-};
 
 struct FGameplayAbilityTargetData_Tornado : public FGameplayAbilityTargetData
 {

@@ -121,7 +121,9 @@ void UAbilityTask_ASCPlayMontage::Activate()
 			if (ASC->PlayMontage(
 				Ability, Ability->GetCurrentActivationInfo(),
 				MontageToPlay,
-				Rate))
+				Rate,
+				StartSection
+			))
 			{
 				// Playing a montage could potentially fire off a callback into game code which could kill this ability! Early out if we are  pending kill.
 				if (ShouldBroadcastAbilityTaskDelegates() == false)

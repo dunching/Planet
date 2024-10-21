@@ -5,6 +5,27 @@
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 
+UScriptStruct* FGameplayAbilityTargetData_CS_Base::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_CS_Base::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_CS_Base::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	if (Ar.IsSaving())
+	{
+		Ar << Tag;
+		Ar << DefaultIcon;
+	}
+	else if (Ar.IsLoading())
+	{
+		Ar << Tag;
+		Ar << DefaultIcon;
+	}
+
+	return true;
+}
+
 FGameplayAbilityTargetData_CS_Base::FGameplayAbilityTargetData_CS_Base(
 	const FGameplayTag& InTag
 ) :

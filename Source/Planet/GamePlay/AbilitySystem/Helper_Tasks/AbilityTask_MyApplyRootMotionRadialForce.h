@@ -9,6 +9,8 @@
 
 DECLARE_DELEGATE(FOnTaskFinished);
 
+class ATractionPoint;
+
 /**
  *	Applies force to character's movement
  */
@@ -17,33 +19,26 @@ class PLANET_API UAbilityTask_MyApplyRootMotionRadialForce :
 	public UAbilityTask_ApplyRootMotionRadialForce
 {
 	GENERATED_UCLASS_BODY()	
-	
+
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
 	static UAbilityTask_MyApplyRootMotionRadialForce* MyApplyRootMotionRadialForce(
 		UGameplayAbility* OwningAbility, 
 		FName TaskInstanceName, 
-		FVector Location, 
-		AActor* LocationActor,
-		float Strength, 
-		float Duration, 
-		float Radius,
-		bool bIsPush,
-		bool bIsAdditive,
-		bool bNoZForce,
-		UCurveFloat* StrengthDistanceFalloff,
-		UCurveFloat* StrengthOverTime,
-		bool bUseFixedWorldDirection, 
-		FRotator FixedWorldDirection, 
-		ERootMotionFinishVelocityMode VelocityOnFinishMode, 
-		FVector SetVelocityOnFinish, 
-		float ClampVelocityOnFinish
+		TWeakObjectPtr<ATractionPoint>TractionPointPtr
 	);
+
+	virtual void SharedInitAndApply() override;
 
 	virtual void TickTask(float DeltaTime) override;
 
 	virtual void OnDestroy(bool AbilityIsEnding) override;
 
-	void UpdateLocation(const FVector &Location);
+	void UpdateLocation(TWeakObjectPtr<ATractionPoint>TractionPointPtr);
 
 	FOnTaskFinished OnFinish;
+	
+	UPROPERTY(Replicated)
+	TWeakObjectPtr<ATractionPoint>TractionPointPtr = nullptr;
 
 };

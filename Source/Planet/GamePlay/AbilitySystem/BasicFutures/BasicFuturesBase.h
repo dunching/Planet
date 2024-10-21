@@ -25,7 +25,7 @@ public:
 
 protected:
 
-	virtual void InitialTags();
+	virtual void InitalDefaultTags()override;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

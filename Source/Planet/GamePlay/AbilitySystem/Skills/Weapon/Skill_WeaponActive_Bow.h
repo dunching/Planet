@@ -80,7 +80,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 	) override;
 
-	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData)override;
+	virtual	void UpdateRegisterParam(const FGameplayEventData& GameplayEventData)override;
 
 	TSharedPtr<FRegisterParamType> RegisterParamSPtr = nullptr;
 

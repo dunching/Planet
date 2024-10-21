@@ -5,6 +5,7 @@
 #include <Engine/StreamableManager.h>
 #include "AbilitySystemGlobals.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <Components/CapsuleComponent.h>
 
 #include "KismetGravityLibrary.h"
 
@@ -25,6 +26,24 @@
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
 #include "Skill_Active_Tornado.h"
+
+ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/) :
+	Super(ObjectInitializer)
+{
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	CapsuleComponentPtr = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
+	CapsuleComponentPtr->InitCapsuleSize(34.0f, 88.0f);
+	CapsuleComponentPtr->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+	CapsuleComponentPtr->CanCharacterStepUpOn = ECB_No;
+	CapsuleComponentPtr->SetShouldUpdatePhysicsVolume(true);
+	CapsuleComponentPtr->SetCanEverAffectNavigation(false);
+	CapsuleComponentPtr->bDynamicObstacle = true;
+	CapsuleComponentPtr->SetupAttachment(RootComponent);
+
+	bReplicates = true;
+	SetReplicatingMovement(true);
+}
 
 FGameplayAbilityTargetData_RootMotion_TornadoTraction::FGameplayAbilityTargetData_RootMotion_TornadoTraction() :
 	Super(UGameplayTagsSubSystem::GetInstance()->TornadoTraction)
@@ -55,10 +74,6 @@ void UCS_RootMotion_TornadoTraction::PreActivate(
 		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion_TornadoTraction*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
 		}
 	}
 
@@ -94,26 +109,28 @@ void UCS_RootMotion_TornadoTraction::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UCS_RootMotion_TornadoTraction::UpdateDuration()
-{
-	if (TaskPtr)
-	{
-		TaskPtr->UpdateDuration();
-	}
-	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-	{
-		for (auto Iter : ActiveTasks)
-		{
-			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
-			{
-				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
-
-				RootMotionTaskPtr->UpdateDuration();
-				break;
-			}
-		}
-	}
-}
+// void UCS_RootMotion_TornadoTraction::UpdateDurationImp()
+// {
+// 	Super::UpdateDurationImp();
+// 
+// 	if (TaskPtr)
+// 	{
+// 		TaskPtr->UpdateDuration();
+// 	}
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+// 	{
+// 		for (auto Iter : ActiveTasks)
+// 		{
+// 			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
+// 			{
+// 				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
+// 
+// 				RootMotionTaskPtr->UpdateDuration();
+// 				break;
+// 			}
+// 		}
+// 	}
+// }
 
 void UCS_RootMotion_TornadoTraction::PerformAction()
 {
@@ -135,6 +152,11 @@ void UCS_RootMotion_TornadoTraction::PerformAction()
 
 		RootMotionTaskPtr->ReadyForActivation();
 	}
+}
+
+void UCS_RootMotion_TornadoTraction::InitalDefaultTags()
+{
+	Super::InitalDefaultTags();
 }
 
 void UCS_RootMotion_TornadoTraction::ExcuteTasks()

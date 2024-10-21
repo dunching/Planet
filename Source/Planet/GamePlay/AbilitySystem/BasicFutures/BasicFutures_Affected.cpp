@@ -88,7 +88,7 @@ bool UBasicFutures_Affected::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void UBasicFutures_Affected::InitialTags()
+void UBasicFutures_Affected::InitalDefaultTags()
 {
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
 

@@ -50,12 +50,6 @@ void UCS_RootMotion_FlyAway::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
 }
 
 void UCS_RootMotion_FlyAway::PreActivate(
@@ -68,11 +62,8 @@ void UCS_RootMotion_FlyAway::PreActivate(
 {
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion_FlyAway*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetDataPtr)
-		{
-			SetCache(TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>(GameplayAbilityTargetDataPtr->Clone()));
-		}
+		GameplayAbilityTargetDataSPtr =
+			MakeSPtr_GameplayAbilityTargetData<FRootMotionParam>(TriggerEventData->TargetData.Get(0));
 	}
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
@@ -104,16 +95,35 @@ void UCS_RootMotion_FlyAway::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UCS_RootMotion_FlyAway::UpdateDuration()
+void UCS_RootMotion_FlyAway::InitalDefaultTags()
 {
-	Super::UpdateDuration();
+	Super::InitalDefaultTags();
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+}
+
+void UCS_RootMotion_FlyAway::PerformAction()
+{
+	if (CharacterPtr)
+	{
+		ExcuteTasks();
+	}
+}
+
+void UCS_RootMotion_FlyAway::UpdateRootMotionImp(const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& DataSPtr)
+{
+	Super::UpdateRootMotionImp(DataSPtr);
 
 	if (AbilityTask_TimerHelperPtr)
 	{
 		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
 		AbilityTask_TimerHelperPtr->UpdateDuration();
 	}
-	
+
 	if (CharacterStateInfoSPtr)
 	{
 		CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
@@ -126,20 +136,6 @@ void UCS_RootMotion_FlyAway::UpdateDuration()
 	if (RootMotionTaskPtr)
 	{
 		RootMotionTaskPtr->UpdateDuration(GameplayAbilityTargetDataSPtr->Height, GameplayAbilityTargetDataSPtr->Duration);
-	}
-
-}
-
-void UCS_RootMotion_FlyAway::SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& InGameplayAbilityTargetDataSPtr)
-{
-	GameplayAbilityTargetDataSPtr = InGameplayAbilityTargetDataSPtr;
-}
-
-void UCS_RootMotion_FlyAway::PerformAction()
-{
-	if (CharacterPtr)
-	{
-		ExcuteTasks();
 	}
 }
 

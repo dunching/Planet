@@ -35,6 +35,10 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion :
 		const FGameplayTag& Tag
 	);
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	virtual FGameplayAbilityTargetData_RootMotion* Clone()const override;
 
 	TSharedPtr<FGameplayAbilityTargetData_RootMotion> Clone_SmartPtr()const ;
@@ -45,6 +49,16 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion :
 
 private:
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RootMotion> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RootMotion>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()
@@ -63,10 +77,17 @@ public:
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
-
-	virtual void UpdateDuration()override;
+	
+	UFUNCTION(Client, Reliable)
+	void UpdateRootMotion(
+		const FGameplayEventData& GameplayEventData
+	);
 
 protected:
+
+	virtual void InitalDefaultTags()override;
+
+	virtual void UpdateRootMotionImp(const TSharedPtr<FGameplayAbilityTargetData_RootMotion>&DataSPtr);
 
 	virtual void PerformAction();
 

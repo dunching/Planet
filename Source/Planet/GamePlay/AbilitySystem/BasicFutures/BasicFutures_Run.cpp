@@ -21,9 +21,9 @@ UBasicFutures_Run::UBasicFutures_Run() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Run::InitialTags()
+void UBasicFutures_Run::InitalDefaultTags()
 {
-	Super::InitialTags();
+	Super::InitalDefaultTags();
 
 	if (GetWorldImp())
 	{

@@ -86,7 +86,7 @@ public:
 
 protected:
 
-	virtual void InitialTags()override;
+	virtual void InitalDefaultTags()override;
 
 	void PerformAction();
 

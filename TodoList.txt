@@ -31,6 +31,8 @@
 	}
 #endif
 
+	DOREPLIFETIME_CONDITION(ThisClass, Radius, COND_None);
+
 Going to:
 
 	联网
