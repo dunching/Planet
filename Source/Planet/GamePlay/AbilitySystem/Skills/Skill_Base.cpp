@@ -32,6 +32,16 @@ bool FGameplayAbilityTargetData_SkillBase_RegisterParam::NetSerialize(FArchive& 
 	return true;
 }
 
+FGameplayAbilityTargetData_SkillBase_RegisterParam* FGameplayAbilityTargetData_SkillBase_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_SkillBase_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_Base::USkill_Base() :
 	Super()
 {

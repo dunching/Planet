@@ -29,6 +29,10 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion_FlyAway :
 
 	FGameplayAbilityTargetData_RootMotion_FlyAway();
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	virtual FGameplayAbilityTargetData_RootMotion_FlyAway* Clone()const override;
 
 	float Duration = 3.f;
@@ -37,6 +41,16 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion_FlyAway :
 
 private:
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RootMotion_FlyAway> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RootMotion_FlyAway>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()
@@ -92,7 +106,7 @@ protected:
 
 	void OnTaskComplete();
 
-	TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>GameplayAbilityTargetDataSPtr;
+	TSharedPtr<FRootMotionParam>GameplayAbilityTargetDataSPtr;
 
 	UAbilityTask_FlyAway* RootMotionTaskPtr = nullptr;
 	

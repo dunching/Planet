@@ -54,30 +54,29 @@ void UCS_RootMotion::PreActivate(
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void UCS_RootMotion::UpdateRootMotion_Implementation(
+void UCS_RootMotion::UpdateRootMotion(
 	const FGameplayEventData& GameplayEventData
 )
 {
-	auto tDataSPtr =
+	auto DataSPtr = 
 		MakeSPtr_GameplayAbilityTargetData<FGameplayAbilityTargetData_RootMotion>(GameplayEventData.TargetData.Get(0));
-	if (CharacterPtr->GetNetMode() == ENetMode::NM_DedicatedServer)
-	{
-		TArray<UGameplayAbility*> Instances = GetCurrentAbilitySpec()->GetAbilityInstances();
 
-		for (auto Instance : Instances)
-		{
-			Cast<UCS_RootMotion>(Instance)->UpdateRootMotionImp(tDataSPtr);
-		}
-	}
-	else
-	{
-		UpdateRootMotionImp(tDataSPtr);
-	}
+	UpdateRootMotionImp(DataSPtr);
+
+	UpdateRootMotion_Client(GameplayEventData);
 }
 
 void UCS_RootMotion::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
+}
+
+void UCS_RootMotion::UpdateRootMotion_Client_Implementation(const FGameplayEventData& GameplayEventData)
+{
+	auto DataSPtr =
+		MakeSPtr_GameplayAbilityTargetData<FGameplayAbilityTargetData_RootMotion>(GameplayEventData.TargetData.Get(0));
+
+	UpdateRootMotionImp(DataSPtr);
 }
 
 void UCS_RootMotion::UpdateRootMotionImp(const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& DataSPtr)

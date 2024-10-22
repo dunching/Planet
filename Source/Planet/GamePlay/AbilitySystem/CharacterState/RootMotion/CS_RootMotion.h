@@ -78,7 +78,6 @@ public:
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
 	
-	UFUNCTION(Client, Reliable)
 	void UpdateRootMotion(
 		const FGameplayEventData& GameplayEventData
 	);
@@ -86,6 +85,11 @@ public:
 protected:
 
 	virtual void InitalDefaultTags()override;
+	
+	UFUNCTION(Client, Reliable)
+	void UpdateRootMotion_Client(
+		const FGameplayEventData& GameplayEventData
+	);
 
 	virtual void UpdateRootMotionImp(const TSharedPtr<FGameplayAbilityTargetData_RootMotion>&DataSPtr);
 

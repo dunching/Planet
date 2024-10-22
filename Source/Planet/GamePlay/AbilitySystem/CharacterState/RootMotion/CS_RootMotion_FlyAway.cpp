@@ -34,6 +34,21 @@ FGameplayAbilityTargetData_RootMotion_FlyAway::FGameplayAbilityTargetData_RootMo
 
 }
 
+UScriptStruct* FGameplayAbilityTargetData_RootMotion_FlyAway::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_RootMotion_FlyAway::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_RootMotion_FlyAway::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << Duration;
+	Ar << Height;
+
+	return true;
+}
+
 FGameplayAbilityTargetData_RootMotion_FlyAway* FGameplayAbilityTargetData_RootMotion_FlyAway::Clone() const
 {
 	auto ResultPtr =
@@ -50,6 +65,12 @@ void UCS_RootMotion_FlyAway::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (Spec.GameplayEventData)
+	{
+		GameplayAbilityTargetDataSPtr =
+			MakeSPtr_GameplayAbilityTargetData<FRootMotionParam>(Spec.GameplayEventData->TargetData.Get(0));
+	}
 }
 
 void UCS_RootMotion_FlyAway::PreActivate(
@@ -60,12 +81,6 @@ void UCS_RootMotion_FlyAway::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
-	{
-		GameplayAbilityTargetDataSPtr =
-			MakeSPtr_GameplayAbilityTargetData<FRootMotionParam>(TriggerEventData->TargetData.Get(0));
-	}
-
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
@@ -118,20 +133,45 @@ void UCS_RootMotion_FlyAway::UpdateRootMotionImp(const TSharedPtr<FGameplayAbili
 {
 	Super::UpdateRootMotionImp(DataSPtr);
 
-	if (AbilityTask_TimerHelperPtr)
-	{
-		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		AbilityTask_TimerHelperPtr->UpdateDuration();
-	}
+	GameplayAbilityTargetDataSPtr = DynamicCastSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>(DataSPtr);
 
-	if (CharacterStateInfoSPtr)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
-		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
-		CharacterStateInfoSPtr->RefreshTime();
-		CharacterStateInfoSPtr->DataChanged();
+		if (CharacterStateInfoSPtr)
+		{
+			CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+			CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+			CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+			CharacterStateInfoSPtr->RefreshTime();
+			CharacterStateInfoSPtr->DataChanged();
+			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+
+			if (AbilityTask_TimerHelperPtr)
+			{
+				AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+				AbilityTask_TimerHelperPtr->UpdateDuration();
+			}
+		}
+		else 
+		{
+			// 
+			CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+			CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+			CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+			CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+			CharacterStateInfoSPtr->DataChanged();
+			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+
+			// 
+			AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+			AbilityTask_TimerHelperPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
+			AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+			AbilityTask_TimerHelperPtr->ReadyForActivation();
+		}
 	}
+#endif
 
 	if (RootMotionTaskPtr)
 	{
@@ -154,13 +194,25 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 	}
 	else
 	{
-		// 
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
-		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-		CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
-		CharacterStateInfoSPtr->DataChanged();
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			// 
+			CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+			CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
+			CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
+			CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
+			CharacterStateInfoSPtr->DataChanged();
+			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+
+			// 
+			AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+			AbilityTask_TimerHelperPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
+			AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+			AbilityTask_TimerHelperPtr->ReadyForActivation();
+		}
+#endif
 
 		// 
 		RootMotionTaskPtr = UAbilityTask_FlyAway::NewTask(
@@ -172,13 +224,6 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 
 		RootMotionTaskPtr->OnFinished.BindUObject(this, &ThisClass::K2_CancelAbility);
 		RootMotionTaskPtr->ReadyForActivation();
-
-		// 
-		AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		AbilityTask_TimerHelperPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		AbilityTask_TimerHelperPtr->IntervalDelegate.BindUObject(this, &ThisClass::OnInterval);
-		AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
-		AbilityTask_TimerHelperPtr->ReadyForActivation();
 	}
 }
 
@@ -198,6 +243,9 @@ void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, flo
 {
 	if (CurrentInterval > Interval)
 	{
+		//
+		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+		CharacterStateInfoSPtr = nullptr;
 	}
 	else
 	{

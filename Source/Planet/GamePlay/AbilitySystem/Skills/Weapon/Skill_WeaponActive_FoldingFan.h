@@ -29,6 +29,8 @@ struct FGameplayAbilityTargetData_FoldingFan_RegisterParam :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
+	virtual FGameplayAbilityTargetData_FoldingFan_RegisterParam* Clone()const override;
+
 	int32 IncreaseNum = 1;
 
 };

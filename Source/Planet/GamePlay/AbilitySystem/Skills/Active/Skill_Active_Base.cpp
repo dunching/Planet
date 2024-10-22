@@ -13,6 +13,30 @@
 #include "SceneUnitTable.h"
 #include "GameplayTagsSubSystem.h"
 
+UScriptStruct* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_ActiveSkill_ActiveParam::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_ActiveSkill_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << bIsAutoContinue;
+
+	return true;
+}
+
+FGameplayAbilityTargetData_ActiveSkill_ActiveParam* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_Active_Base::USkill_Active_Base():
 	Super()
 {
@@ -252,28 +276,4 @@ void USkill_Active_Base::PerformAction(
 )
 {
 
-}
-
-UScriptStruct* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::GetScriptStruct() const
-{
-	return FGameplayAbilityTargetData_ActiveSkill_ActiveParam::StaticStruct();
-}
-
-bool FGameplayAbilityTargetData_ActiveSkill_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
-{
-	Super::NetSerialize(Ar, Map, bOutSuccess);
-
-	Ar << bIsAutoContinue;
-
-	return true;
-}
-
-FGameplayAbilityTargetData_ActiveSkill_ActiveParam* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::Clone() const
-{
-	auto ResultPtr =
-		new FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
-
-	*ResultPtr = *this;
-
-	return ResultPtr;
 }

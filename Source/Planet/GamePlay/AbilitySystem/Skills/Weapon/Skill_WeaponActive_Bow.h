@@ -27,6 +27,8 @@ struct FGameplayAbilityTargetData_Bow_RegisterParam :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
+	virtual FGameplayAbilityTargetData_Bow_RegisterParam* Clone()const override;
+
 	bool bIsHomingTowards = false;
 
 	bool bIsMultiple = false;

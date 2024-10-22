@@ -23,6 +23,8 @@ struct FGameplayAbilityTargetData_SkillBase_RegisterParam :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
+	virtual FGameplayAbilityTargetData_SkillBase_RegisterParam* Clone()const override;
+
 	FGuid ProxyID;
 
 };

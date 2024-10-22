@@ -365,9 +365,9 @@ GameplayAbilityTargetDataType* DeepClone_GameplayAbilityTargetData(const Gamepla
 template<typename GameplayAbilityTargetDataType, typename OtherType>
 TSharedPtr<GameplayAbilityTargetDataType> MakeSPtr_GameplayAbilityTargetData(const OtherType* GameplayAbilityTargetDataPtr)
 {
-	auto ResultSPtr = MakeShared<GameplayAbilityTargetDataType>();
+	auto ParentPtr = dynamic_cast<const GameplayAbilityTargetDataType*>(GameplayAbilityTargetDataPtr);
 
-	*ResultSPtr = *dynamic_cast<const GameplayAbilityTargetDataType*>(GameplayAbilityTargetDataPtr);
+	auto ResultSPtr = TSharedPtr<GameplayAbilityTargetDataType>(ParentPtr->Clone());
 
 	return ResultSPtr;
 }

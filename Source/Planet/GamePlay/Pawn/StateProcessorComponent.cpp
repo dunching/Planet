@@ -487,14 +487,14 @@ void UStateProcessorComponent::ExcuteEffects(
 					auto GAPtr = Cast<UCS_RootMotion_FlyAway>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
 					if (GAPtr)
 					{
-						FGameplayEventData GameplayEventData;
-						GameplayEventData.TargetData.Add(GameplayAbilityTargetDataSPtr->Clone());
-
 						if (!GameplayAbilityTargetDataSPtr->DefaultIcon)
 						{
 							GameplayAbilityTargetDataSPtr->DefaultIcon =
 								USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
 						}
+
+						FGameplayEventData GameplayEventData;
+						GameplayEventData.TargetData.Add(GameplayAbilityTargetDataSPtr->Clone());
 
 						GAPtr->UpdateRootMotion(GameplayEventData);
 					}
@@ -513,7 +513,19 @@ void UStateProcessorComponent::ExcuteEffects(
 				}
 				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
 				{
-					FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass());
+					const auto InputID = FMath::Rand32();
+
+					const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
+
+					// 有标签时Active时能拿到参数
+					GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
+
+					FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass(), 1, InputID);
+
+					ASCPtr->ReplicateEventData(
+						InputID,
+						*GameplayEventDataPtr
+					);
 
 					ASCPtr->GiveAbilityAndActivateOnce(
 						Spec,

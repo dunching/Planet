@@ -460,7 +460,10 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 		{
 			if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
 			{
-				bIsFalling = false;
+				if (Character.GetLocalRole() > ROLE_SimulatedProxy)
+				{
+					bIsFalling = false;
+				}
 			}
 			else if (FallingSpeed > 0)
 			{
@@ -490,15 +493,19 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	}
 
 	const auto NewTime = GetTime() + SimulationTime;
-	if (NewTime >= GetDuration())
+
+	if (Character.GetLocalRole() > ROLE_SimulatedProxy)
 	{
-		if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
+		if (NewTime >= GetDuration())
 		{
-			PRINTINVOKEINFO();
-		}
-		else
-		{
-			bIsFalling = true;
+			if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
+			{
+				PRINTINVOKEINFO();
+			}
+			else
+			{
+				bIsFalling = true;
+			}
 		}
 	}
 

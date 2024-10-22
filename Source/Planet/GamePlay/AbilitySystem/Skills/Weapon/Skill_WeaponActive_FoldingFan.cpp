@@ -55,6 +55,16 @@ bool FGameplayAbilityTargetData_FoldingFan_RegisterParam::NetSerialize(FArchive&
 	return true;
 }
 
+FGameplayAbilityTargetData_FoldingFan_RegisterParam* FGameplayAbilityTargetData_FoldingFan_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_FoldingFan_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_WeaponActive_FoldingFan::USkill_WeaponActive_FoldingFan() :
 	Super()
 {

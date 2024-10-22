@@ -54,6 +54,16 @@ bool FGameplayAbilityTargetData_Bow_RegisterParam::NetSerialize(FArchive& Ar, cl
 	return true;
 }
 
+FGameplayAbilityTargetData_Bow_RegisterParam* FGameplayAbilityTargetData_Bow_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_Bow_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_WeaponActive_Bow::USkill_WeaponActive_Bow() :
 	Super()
 {
