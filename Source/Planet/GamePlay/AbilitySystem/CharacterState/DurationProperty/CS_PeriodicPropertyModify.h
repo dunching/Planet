@@ -19,7 +19,8 @@ class UEffectItem;
 struct FStreamableHandle;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAbilityTargetData_CS_Base
+struct PLANET_API FGameplayAbilityTargetData_PropertyModify : 
+	public FGameplayAbilityTargetData_CS_Base
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -32,19 +33,14 @@ struct PLANET_API FGameplayAbilityTargetData_PropertyModify : public FGameplayAb
 		TSoftObjectPtr<UTexture2D>Icon,
 		float InDuration,
 		float InPerformActionInterval,
-		float InLosePropertyNumInterval,
 		const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap
 	);
 
 	FGameplayAbilityTargetData_PropertyModify(
 		const FGameplayTag& Tag,
-		bool bOnluReFreshTime,
 		float InDuration,
-		float InLosePropertyNumInterval
-	);
-
-	FGameplayAbilityTargetData_PropertyModify(
-		const FGameplayTag& Tag, bool bClear
+		float InPerformActionInterval,
+		const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap
 	);
 
 	FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal);
@@ -59,22 +55,10 @@ private:
 
 	float Duration = 3.f;
 
-	// < 0 为只执行一次 属性修改
-	float PerformActionInterval = -1.f;
+	// 间隔
+	float PerformActionInterval = 1.f;
 
-	// 到期之后每层的移除间隔。 < 0 为移除所有层数
-	float LosePropertyNumInterval = -1.f;
-
-	// 层数, 仅会使用最后一位
-	TArray<TMap<ECharacterPropertyType, FBaseProperty>>ModifyPropertyPerLayer;
-
-	bool bIsAdd = true;
-
-	// 清除所有层数
-	bool bIsClear = false;
-
-	bool bIsOnlyReFreshTime = false;
-
+	TMap<ECharacterPropertyType, FBaseProperty>CharacterPropertyMap;
 };
 
 UCLASS()
@@ -126,6 +110,8 @@ protected:
 
 	void PerformPropertyModify(const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& SPtr);
 
+	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
+
 	// Transient
 	TSharedPtr<FGameplayAbilityTargetData_PropertyModify>CacheSPtr;
 
@@ -143,5 +129,10 @@ protected:
 
 	// 计时Task
 	UAbilityTask_TimerHelper* TaskPtr = nullptr;
+
+	// 是否使用的净化状态。如果是则移除Debuff类的持续效果
+	bool bIsPurify = false;
+
+	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
 
 };

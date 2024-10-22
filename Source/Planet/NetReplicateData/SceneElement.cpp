@@ -650,24 +650,21 @@ void FSkillProxy::RegisterSkill()
 
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 
-		auto CODPtr = GetSkillClass().GetDefaultObject();
-		CODPtr->InitalTags();
-
 		const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
 		FGameplayAbilitySpec GameplayAbilitySpec(
-			CODPtr,
+			GetSkillClass(),
 			Level,
 			InputID
 		);
 
-		auto GameplayEventData = MakeShared<FGameplayEventData>();
-		GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
+		FGameplayEventData GameplayEventData;
+		GameplayEventData.TargetData.Add(GameplayAbilityTargetDataPtr);
 
 		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
 
 		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
 			InputID,
-			*GameplayEventData
+			GameplayEventData
 		);
 		GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 	}
@@ -783,12 +780,9 @@ void FWeaponSkillProxy::RegisterSkill()
 		}
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 
-		auto CODPtr = GetSkillClass().GetDefaultObject();
-		CODPtr->InitalTags();
-
 		const auto InputID = FMath::RandHelper(std::numeric_limits<int32>::max());
 		FGameplayAbilitySpec GameplayAbilitySpec(
-			CODPtr,
+			GetSkillClass(),
 			Level,
 			InputID
 		);

@@ -356,14 +356,14 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1
 		)
 	{
-		CharacterPtr->GetProxyProcessComponent()->GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+		CharacterPtr->GetProxyProcessComponent()->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	else if (
 		CurrentWeaponSocket ==
 		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2
 		)
 	{
-		CharacterPtr->GetProxyProcessComponent()->GetWeapon(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
+		CharacterPtr->GetProxyProcessComponent()->GetWeaponSocket(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
 	}
 	else
 	{

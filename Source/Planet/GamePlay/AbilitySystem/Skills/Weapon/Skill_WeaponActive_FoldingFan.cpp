@@ -55,6 +55,16 @@ bool FGameplayAbilityTargetData_FoldingFan_RegisterParam::NetSerialize(FArchive&
 	return true;
 }
 
+FGameplayAbilityTargetData_FoldingFan_RegisterParam* FGameplayAbilityTargetData_FoldingFan_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_FoldingFan_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_WeaponActive_FoldingFan::USkill_WeaponActive_FoldingFan() :
 	Super()
 {
@@ -155,9 +165,9 @@ void USkill_WeaponActive_FoldingFan::GetLifetimeReplicatedProps(TArray<FLifetime
 	DOREPLIFETIME_CONDITION(ThisClass, CurrentFanNum, COND_AutonomousOnly);
 }
 
-void USkill_WeaponActive_FoldingFan::UpdateParam(const FGameplayEventData& GameplayEventData)
+void USkill_WeaponActive_FoldingFan::UpdateRegisterParam(const FGameplayEventData& GameplayEventData)
 {
-	Super::UpdateParam(GameplayEventData);
+	Super::UpdateRegisterParam(GameplayEventData);
 
 	if (!GameplayEventData.TargetData.IsValid(0))
 	{
@@ -232,35 +242,48 @@ void USkill_WeaponActive_FoldingFan::OnProjectileBounce(
 	if (OtherActor && OtherActor->IsA(ACharacterBase::StaticClass()))
 	{
 		auto OtherCharacterPtr = Cast<ACharacterBase>(OtherActor);
-		if (OtherCharacterPtr == CharacterPtr)
+		if (OtherCharacterPtr)
 		{
 			auto ActivedWeaponPtr = Cast<FWeaponActorType>(OverlappedComponent->GetOwner());
-			if (ActivedWeaponPtr && ActivedWeaponPtr->bIsReachFarestPoint)
+			if (!ActivedWeaponPtr)
 			{
-				CurrentFanNum++;
-				if (WeaponPtr)
-				{
-					WeaponPtr->SetActorHiddenInGame(false);
-				}
-
-				ActivedWeaponPtr->Destroy();
-
-#if UE_EDITOR || UE_SERVER
-				if (CharacterPtr->GetLocalRole() == ROLE_Authority)
-				{
-					OnCurrentFanNumChanged();
-				}
-#endif
 				return;
 			}
-		}
-		
-		if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
-		{
-			return;
-		}
 
-		MakeDamage(OtherCharacterPtr);
+			if (OtherCharacterPtr == CharacterPtr)
+			{
+				if (ActivedWeaponPtr && ActivedWeaponPtr->bIsReachFarestPoint)
+				{
+					CurrentFanNum++;
+					if (WeaponPtr)
+					{
+						WeaponPtr->SetActorHiddenInGame(false);
+					}
+
+					ActivedWeaponPtr->Destroy();
+
+#if UE_EDITOR || UE_SERVER
+					if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+					{
+						OnCurrentFanNumChanged();
+					}
+#endif
+					return;
+				}
+			}
+			else 
+			{
+				if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
+				{
+					return;
+				}
+
+				MakeDamage(OtherCharacterPtr, ActivedWeaponPtr);
+			}
+		}
+		else
+		{
+		}
 	}
 }
 
@@ -338,23 +361,27 @@ void USkill_WeaponActive_FoldingFan::EmitProjectile()
 #endif
 }
 
-void USkill_WeaponActive_FoldingFan::MakeDamage(ACharacterBase* TargetCharacterPtr)
+void USkill_WeaponActive_FoldingFan::MakeDamage(ACharacterBase* TargetCharacterPtr, FWeaponActorType* WeaponProjectilePtr)
 {
-	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	if (TargetCharacterPtr)
+	if (TargetCharacterPtr && WeaponProjectilePtr)
 	{
+		auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
 		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
 		GAEventData.SetBaseDamage(Damage);
 
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
+		GAEventData.AttackEffectType = EAttackEffectType::kAttackEffectAndRepel;
+		GAEventData.RepelDirection = WeaponProjectilePtr->GetVelocity().GetSafeNormal();
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+
+		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		ICPtr->SendEventImp(GAEventDataPtr);
+	}
 }
 
 void USkill_WeaponActive_FoldingFan::PlayMontage()

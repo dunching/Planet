@@ -69,6 +69,8 @@ protected:
 
 	virtual void PerformAction()override;
 
+	virtual	void InitalDefaultTags()override;
+
 	virtual void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)override;
 
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;

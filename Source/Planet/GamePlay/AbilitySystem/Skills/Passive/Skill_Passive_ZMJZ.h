@@ -15,6 +15,7 @@ class UEffectItem;
 class ACharacterBase;
 
 struct FGAEventData;
+struct FCharacterStateInfo;
 
 UCLASS()
 class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
@@ -65,7 +66,15 @@ protected:
 
 	void OnSendAttack(const FGAEventData& GAEventData);
 
-	void OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
+	void DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
+
+	bool OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr);
+
+	void ModifyCharacterData(
+		const FGameplayTag&DataSource,
+		int32 Value,
+		bool bIsClear = false
+	);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
@@ -81,5 +90,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 SpeedOffset = 10;
+
+	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
+
+	UAbilityTask_TimerHelper* TimerTaskPtr = nullptr;
 
 };

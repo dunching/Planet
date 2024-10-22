@@ -18,6 +18,7 @@ public class Utils : ModuleRules
                    Path.Combine(PluginDirectory, "Source/Utils/ThreadPoolHelper"),
                    Path.Combine(PluginDirectory, "Source/Utils/BaseData"),
                    Path.Combine(PluginDirectory, "Source/Utils/ScopeEvent"),
+                   Path.Combine(PluginDirectory, "Source/Utils/Language"),
             }
 			);
 				
@@ -45,6 +46,7 @@ public class Utils : ModuleRules
 				"CoreUObject",
 				"Engine",
                 "GameplayTags",
+                "Json",
             }
 			);
 

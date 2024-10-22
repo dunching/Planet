@@ -29,6 +29,10 @@ struct PLANET_API FGameplayAbilityTargetData_RootMotion_FlyAway :
 
 	FGameplayAbilityTargetData_RootMotion_FlyAway();
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	virtual FGameplayAbilityTargetData_RootMotion_FlyAway* Clone()const override;
 
 	float Duration = 3.f;
@@ -39,12 +43,24 @@ private:
 
 };
 
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RootMotion_FlyAway> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RootMotion_FlyAway>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
 UCLASS()
 class PLANET_API UCS_RootMotion_FlyAway : public UCS_RootMotion
 {
 	GENERATED_BODY()
 
 public:
+
+	using FRootMotionParam = FGameplayAbilityTargetData_RootMotion_FlyAway;
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -74,13 +90,13 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void UpdateDuration()override;
-
-	void SetCache(const TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>& GameplayAbilityTargetDataPtr);
-
 protected:
 
+	virtual void InitalDefaultTags()override;
+
 	virtual void PerformAction()override;
+
+	virtual void UpdateRootMotionImp(const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& DataSPtr)override;
 
 	void ExcuteTasks();
 
@@ -90,7 +106,7 @@ protected:
 
 	void OnTaskComplete();
 
-	TSharedPtr<FGameplayAbilityTargetData_RootMotion_FlyAway>GameplayAbilityTargetDataSPtr;
+	TSharedPtr<FRootMotionParam>GameplayAbilityTargetDataSPtr;
 
 	UAbilityTask_FlyAway* RootMotionTaskPtr = nullptr;
 	

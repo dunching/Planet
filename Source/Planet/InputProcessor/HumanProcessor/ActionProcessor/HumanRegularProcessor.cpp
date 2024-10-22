@@ -179,6 +179,7 @@ namespace HumanProcessor
 				TempLookAtSceneObjPtr->StartLookAt(OnwerActorPtr);
 				LookAtSceneObjPtr = TempLookAtSceneObjPtr;
 			}
+			TempLookAtSceneObjPtr->LookingAt(OnwerActorPtr);
 		}
 		else
 		{

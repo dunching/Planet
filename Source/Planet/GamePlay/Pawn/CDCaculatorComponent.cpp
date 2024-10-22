@@ -122,8 +122,8 @@ UCDCaculatorComponent::UCDCaculatorComponent(const FObjectInitializer& ObjectIni
 }
 
 void UCDCaculatorComponent::TickComponent(
-	float DeltaTime, 
-	enum ELevelTick TickType, 
+	float DeltaTime,
+	enum ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction
 )
 {
@@ -340,11 +340,15 @@ TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FConsu
 {
 	TSharedPtr<FSkillCooldownHelper> MaxCD = nullptr;
 
+	float RemainingCooldown = 0.f;
+	float RemainingCooldownPercent = 0.f;
+
 	// 独立CD
 	{
 		if (Separate_Map.Contains(ConsumableProxySPtr->GetID()))
 		{
-			return Separate_Map[ConsumableProxySPtr->GetID()];
+			MaxCD = Separate_Map[ConsumableProxySPtr->GetID()];
+			MaxCD->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 		}
 	}
 
@@ -357,10 +361,21 @@ TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FConsu
 			auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
 			if (CommonCooldownInfoPtr)
 			{
-				return Common_Map[Iter];
+				auto TempSPtr = Common_Map[Iter];
+
+				float TempRemainingCooldown = 0.f;
+				float TempRemainingCooldownPercent = 0.f;
+				TempSPtr->GetRemainingCooldown(TempRemainingCooldown, TempRemainingCooldownPercent);
+
+				if (TempRemainingCooldown > RemainingCooldown)
+				{
+					MaxCD = TempSPtr;
+					RemainingCooldown = TempRemainingCooldown;
+					RemainingCooldownPercent = TempRemainingCooldownPercent;
+				}
 			}
 		}
 	}
 
-	return nullptr;
+	return MaxCD;
 }

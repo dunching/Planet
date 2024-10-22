@@ -4,7 +4,7 @@
 #include "CharacterBase.h"
 #include "AbilityTask_PlayMontage.h"
 #include "GameplayTagsSubSystem.h"
-#include "Planet_Tools.h"
+#include "AbilityTask_MyApplyRootMotionConstantForce.h"
 
 UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
 {
@@ -14,6 +14,8 @@ UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
 bool FGameplayAbilityTargetData_Affected::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Ar << AffectedDirection;
+	Ar << RepelDistance;
+	Ar << TriggerCharacterPtr;
 
 	return true;
 }
@@ -63,10 +65,15 @@ void UBasicFutures_Affected::ActivateAbility(
 #ifdef WITH_EDITOR
 #endif
 
-	auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Affected*>(TriggerEventData->TargetData.Get(0));
-	if (GameplayAbilityTargetDataPtr)
+	ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_Affected*>(TriggerEventData->TargetData.Get(0));
+	if (ActiveParamPtr)
 	{
-		PerformAction(GameplayAbilityTargetDataPtr->AffectedDirection);
+		PerformAction();
+	}
+	else
+	{
+		check(0);
+		K2_CancelAbility();
 	}
 }
 
@@ -81,7 +88,7 @@ bool UBasicFutures_Affected::CanActivateAbility(
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
-void UBasicFutures_Affected::InitialTags()
+void UBasicFutures_Affected::InitalDefaultTags()
 {
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
 
@@ -92,14 +99,14 @@ void UBasicFutures_Affected::InitialTags()
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
 }
 
-void UBasicFutures_Affected::PerformAction(EAffectedDirection AffectedDirection)
+void UBasicFutures_Affected::PerformAction()
 {
 	UAnimMontage* CurMontagePtr = nullptr;
 
 	const FRotator Rotation = CharacterPtr->GetActorRotation();
 	FVector Direction = FVector::ZeroVector;
 
-	switch (AffectedDirection)
+	switch (ActiveParamPtr->AffectedDirection)
 	{
 	case EAffectedDirection::kForward:
 	{
@@ -125,6 +132,11 @@ void UBasicFutures_Affected::PerformAction(EAffectedDirection AffectedDirection)
 
 	const auto Rate = 1.f;
 	PlayMontage(CurMontagePtr, Rate);
+
+	if (ActiveParamPtr->RepelDistance > 0)
+	{
+		Move(CurMontagePtr, Rate);
+	}
 }
 
 void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
@@ -146,6 +158,41 @@ void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate
 
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
+
+		TaskPtr->ReadyForActivation();
+	}
+}
+
+void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
+{
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
+	{
+		const auto Duration = CurMontagePtr->CalculateSequenceLength();
+		const auto Direction =
+			ActiveParamPtr->RepelDirection.IsNearlyZero() ?
+			(ActiveParamPtr->TriggerCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).GetSafeNormal() :
+			ActiveParamPtr->RepelDirection;
+
+		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+			this,
+			TEXT(""),
+			Direction,
+			ActiveParamPtr->RepelDistance / Duration,
+			Duration,
+			false,
+			false,
+			nullptr,
+			ERootMotionFinishVelocityMode::ClampVelocity,
+			FVector::ZeroVector,
+			0.f,// 受击后 速度降为0
+			false
+		);
+
+		TaskPtr->Ability = this;
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}

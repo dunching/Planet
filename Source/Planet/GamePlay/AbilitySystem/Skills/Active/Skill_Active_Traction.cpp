@@ -17,15 +17,35 @@
 #include "CS_RootMotion_Traction.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
+#include "AbilityTask_PlayMontage.h"
 
-void USkill_Active_Traction::ActivateAbility(
+void USkill_Active_Traction::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+	if (TractionPointPtr.IsValid())
+	{
+		TractionPointPtr->Destroy();
+		TractionPointPtr = nullptr;
+	}
+
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+void USkill_Active_Traction::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
 )
 {
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
@@ -44,33 +64,27 @@ void USkill_Active_Traction::ActivateAbility(
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 			TaskPtr->SetDuration(Duration, 0.1f);
 			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationDelegate);
-			TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalDelegate, false);
 			TaskPtr->OnFinished.BindLambda([this](auto)
 				{
-					IntervalDelegate(nullptr, 0.f, 0.f, true);
-
 					K2_CancelAbility();
 					return true;
 				});
 			TaskPtr->ReadyForActivation();
 		}
 
-		IntervalDelegate(nullptr, 0.f, 0.f, false);
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = CharacterPtr;
+
+		TractionPointPtr = CharacterPtr->GetWorld()->SpawnActor<ATractionPoint>(
+			CharacterPtr->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters
+		);
+
+		TractionPointPtr->Strength = MoveSpeed;
+		TractionPointPtr->Radius = Radius;
 	}
 #endif
-}
 
-void USkill_Active_Traction::EndAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility,
-	bool bWasCancelled
-)
-{
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+	PlayMontage();
 }
 
 void USkill_Active_Traction::IntervalDelegate(
@@ -80,57 +94,6 @@ void USkill_Active_Traction::IntervalDelegate(
 	bool bIsEnd
 )
 {
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
-	{
-		if (CurrentIntervalTime >= IntervalTime)
-		{
-			FCollisionObjectQueryParams ObjectQueryParams;
-			ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
-
-			FCollisionQueryParams Params;
-			Params.AddIgnoredActor(CharacterPtr);
-
-			TArray<FOverlapResult> Result;
-			CharacterPtr->GetWorld()->OverlapMultiByObjectType(
-				Result,
-				CharacterPtr->GetActorLocation(),
-				FQuat::Identity,
-				ObjectQueryParams,
-				FCollisionShape::MakeSphere(Radius),
-				Params
-			);
-
-			TSet<ACharacterBase*>TargetSet;
-			for (const auto& Iter : Result)
-			{
-				auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-				if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
-				{
-					TargetSet.Add(TargetCharacterPtr);
-				}
-			}
-
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-
-			// 控制效果
-			for (const auto& Iter : TargetSet)
-			{
-				auto GameplayAbilityTargetData_StateModifyPtr = new FGameplayAbilityTargetData_RootMotion_Traction;
-
-				GameplayAbilityTargetData_StateModifyPtr->TriggerCharacterPtr = CharacterPtr;
-				GameplayAbilityTargetData_StateModifyPtr->TargetCharacterPtr = Iter;
-
-				GameplayAbilityTargetData_StateModifyPtr->MoveSpeed = MoveSpeed;
-				GameplayAbilityTargetData_StateModifyPtr->Radius = Radius;
-				GameplayAbilityTargetData_StateModifyPtr->TaretPt = CharacterPtr->GetActorLocation();
-				GameplayAbilityTargetData_StateModifyPtr->bIsEnd = bIsEnd;
-
-				ICPtr->SendEventImp(GameplayAbilityTargetData_StateModifyPtr);
-			}
-		}
-	}
-#endif
 }
 
 void USkill_Active_Traction::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentIntervalTime, float IntervalTime)
@@ -146,4 +109,22 @@ void USkill_Active_Traction::DurationDelegate(UAbilityTask_TimerHelper*, float C
 		}
 	}
 #endif
+}
+
+void USkill_Active_Traction::PlayMontage()
+{
+	const float InPlayRate = 1.f;
+
+	auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
+		this,
+		TEXT(""),
+		HumanMontagePtr,
+		InPlayRate,
+		StartSection
+	);
+
+	TaskPtr->Ability = this;
+	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+
+	TaskPtr->ReadyForActivation();
 }

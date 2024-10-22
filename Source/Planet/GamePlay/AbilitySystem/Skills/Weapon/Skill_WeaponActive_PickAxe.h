@@ -78,6 +78,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Damage = 10;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	float AD_Damage_Magnification = .5f;
 
 	AWeapon_PickAxe* EquipmentAxePtr = nullptr;
 

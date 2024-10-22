@@ -7,7 +7,8 @@ public class Planet : ModuleRules
 	public Planet(ReadOnlyTargetRules Target) : base(Target)
     {
         //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PCHUsage = PCHUsageMode.UseSharedPCHs;
+        //PCHUsage = PCHUsageMode.UseSharedPCHs;
+        PCHUsage = PCHUsageMode.Default;
 
         bEnableUndefinedIdentifierWarnings = false;
         bWarningsAsErrors = true;
@@ -31,7 +32,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Tasks");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Async");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/BasicFutures");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Communication");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/EffectsCirculation");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Active");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Passive");
@@ -66,7 +67,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI");
         PublicIncludePaths.Add("Planet/UI/Hover");
         PublicIncludePaths.Add("Planet/UI/Hover/DestroyProgress");
-        PublicIncludePaths.Add("Planet/UI/Hover/FightingTips");
+        PublicIncludePaths.Add("Planet/UI/Hover/CharacterRisingTips");
         PublicIncludePaths.Add("Planet/UI/Menus");
         PublicIncludePaths.Add("Planet/UI/Menus/GroupManagger");
         PublicIncludePaths.Add("Planet/UI/Menus/Backpacks");

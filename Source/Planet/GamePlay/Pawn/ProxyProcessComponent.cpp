@@ -269,7 +269,7 @@ int32 UProxyProcessComponent::GetCurrentWeaponAttackDistance() const
 	return 100;
 }
 
-void UProxyProcessComponent::GetWeapon(
+void UProxyProcessComponent::GetWeaponSocket(
 	TSharedPtr<FSocket_FASI>& FirstWeaponSocketInfoSPtr,
 	TSharedPtr<FSocket_FASI>& SecondWeaponSocketInfoSPtr
 )
@@ -285,6 +285,24 @@ void UProxyProcessComponent::GetWeapon(
 	}
 }
 
+void UProxyProcessComponent::GetWeaponProxy(
+	TSharedPtr<FWeaponProxy>& FirstWeaponProxySPtr,
+	TSharedPtr<FWeaponProxy>& SecondWeaponProxySPtr
+)
+{
+	TSharedPtr<FSocket_FASI> FirstWeaponSocketInfoSPtr;
+	TSharedPtr<FSocket_FASI> SecondWeaponSocketInfoSPtr;
+	GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+	if (FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr)
+	{
+		FirstWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr);
+	}
+	if (SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr)
+	{
+		SecondWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr);
+	}
+}
+
 void UProxyProcessComponent::GetWeaponSkills(
 	TSharedPtr<FWeaponSkillProxy>& FirstWeaponSkillSPtr,
 	TSharedPtr<FWeaponSkillProxy>& SecondWeaponSkillSPtr
@@ -292,7 +310,7 @@ void UProxyProcessComponent::GetWeaponSkills(
 {
 	TSharedPtr<FSocket_FASI> FirstWeaponSocketInfoSPtr;
 	TSharedPtr<FSocket_FASI> SecondWeaponSocketInfoSPtr;
-	GetWeapon(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+	GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	if (FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr)
 	{
 		auto WeaponSPtr = DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr);

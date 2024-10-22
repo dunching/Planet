@@ -30,6 +30,9 @@ UCS_RootMotion::UCS_RootMotion() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 }
 
 void UCS_RootMotion::PreActivate(
@@ -45,18 +48,40 @@ void UCS_RootMotion::PreActivate(
 		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
-			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
 		}
 	}
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
-void UCS_RootMotion::UpdateDuration()
+void UCS_RootMotion::UpdateRootMotion(
+	const FGameplayEventData& GameplayEventData
+)
 {
+	auto DataSPtr = 
+		MakeSPtr_GameplayAbilityTargetData<FGameplayAbilityTargetData_RootMotion>(GameplayEventData.TargetData.Get(0));
+
+	UpdateRootMotionImp(DataSPtr);
+
+	UpdateRootMotion_Client(GameplayEventData);
+}
+
+void UCS_RootMotion::InitalDefaultTags()
+{
+	Super::InitalDefaultTags();
+}
+
+void UCS_RootMotion::UpdateRootMotion_Client_Implementation(const FGameplayEventData& GameplayEventData)
+{
+	auto DataSPtr =
+		MakeSPtr_GameplayAbilityTargetData<FGameplayAbilityTargetData_RootMotion>(GameplayEventData.TargetData.Get(0));
+
+	UpdateRootMotionImp(DataSPtr);
+}
+
+void UCS_RootMotion::UpdateRootMotionImp(const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& DataSPtr)
+{
+
 }
 
 void UCS_RootMotion::PerformAction()
@@ -77,6 +102,31 @@ FGameplayAbilityTargetData_RootMotion::FGameplayAbilityTargetData_RootMotion(
 FGameplayAbilityTargetData_RootMotion::FGameplayAbilityTargetData_RootMotion()
 {
 
+}
+
+UScriptStruct* FGameplayAbilityTargetData_RootMotion::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_RootMotion::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_RootMotion::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	if (Ar.IsSaving())
+	{
+		Ar << TriggerCharacterPtr;
+		Ar << TargetCharacterPtr;
+
+	}
+	else if (Ar.IsLoading())
+	{
+		Ar << TriggerCharacterPtr;
+		Ar << TargetCharacterPtr;
+
+	}
+
+	return true;
 }
 
 FGameplayAbilityTargetData_RootMotion* FGameplayAbilityTargetData_RootMotion::Clone() const

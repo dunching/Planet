@@ -29,12 +29,7 @@ void USkill_Passive_XS::PreActivate(const FGameplayAbilitySpecHandle Handle, con
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
-	if (CharacterPtr)
-	{
-		EventModifyReceivedSPtr = MakeShared<FMyStruct>(300, this);
-
-		CharacterPtr->GetBaseFeatureComponent()->AddReceviedEventModify(EventModifyReceivedSPtr);
-	}
+	ReigsterEffect();
 }
 
 void USkill_Passive_XS::ActivateAbility(
@@ -52,6 +47,7 @@ void USkill_Passive_XS::OnRemoveAbility(
 	const FGameplayAbilitySpec& Spec
 )
 {
+	RemoveShield();
 	CharacterPtr->GetBaseFeatureComponent()->RemoveReceviedEventModify(EventModifyReceivedSPtr);
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -68,16 +64,128 @@ void USkill_Passive_XS::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+void USkill_Passive_XS::ReigsterEffect()
+{
+	if (CharacterPtr)
+	{
+		EventModifyReceivedSPtr = MakeShared<FMyStruct>(300, this);
+
+		CharacterPtr->GetBaseFeatureComponent()->AddReceviedEventModify(EventModifyReceivedSPtr);
+	}
+}
+
+void USkill_Passive_XS::AddShield(int32 ShieldValue)
+{
+	// 数值修改
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+	{
+		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+		GAEventData.DataModify.Add(ECharacterPropertyType::Shield, ShieldValue);
+		GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+		GAEventData.bIsOverlapData = true;
+
+		GAEventDataPtr->DataAry.Add(GAEventData);
+	}
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	ICPtr->SendEventImp(GAEventDataPtr);
+}
+
+void USkill_Passive_XS::RemoveShield()
+{
+	// 清空 数值修改
+	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+
+	GAEventData.DataModify = GetAllData();
+	GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+	GAEventData.bIsClearData = true;
+
+	GAEventDataPtr->DataAry.Add(GAEventData);
+
+	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	ICPtr->SendEventImp(GAEventDataPtr);
+}
+
 void USkill_Passive_XS::PerformAction()
 {
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		{
+			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			TaskPtr->SetDuration(CD, 0.1f);
+			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::CD_DurationDelegate);
+			TaskPtr->OnFinished.BindLambda([this](auto) {
+				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CD_CharacterStateInfoSPtr);
+				CD_CharacterStateInfoSPtr = nullptr;
+
+				ReigsterEffect();
+				return true;
+				});
+			TaskPtr->ReadyForActivation();
+		}
+		{
+			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			TaskPtr->SetDuration(ShieldDuration, 0.1f);
+			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::Duration_DurationDelegate);
+			TaskPtr->OnFinished.BindLambda([this](auto) {
+				RemoveShield();
+				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Duration_CharacterStateInfoSPtr);
+				Duration_CharacterStateInfoSPtr = nullptr;
+				return true;
+				});
+			TaskPtr->ReadyForActivation();
+		}
+	}
+#endif
 }
 
 void USkill_Passive_XS::OnSendAttack(const FGAEventData& GAEventData)
 {
 }
 
-void USkill_Passive_XS::OnIntervalTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
+void USkill_Passive_XS::CD_DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentTime, float Duration)
 {
+	if (CD_CharacterStateInfoSPtr)
+	{
+		CD_CharacterStateInfoSPtr->TotalTime = Duration - CurrentTime;
+		CD_CharacterStateInfoSPtr->DataChanged();
+		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CD_CharacterStateInfoSPtr);
+	}
+	else
+	{
+		CD_CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		CD_CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CD_CharacterStateInfoSPtr->Duration = Duration;
+		CD_CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CD_CharacterStateInfoSPtr->DataChanged();
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CD_CharacterStateInfoSPtr);
+	}
+}
+
+void USkill_Passive_XS::Duration_DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentTime, float Duration)
+{
+	if (Duration_CharacterStateInfoSPtr)
+	{
+		Duration_CharacterStateInfoSPtr->TotalTime = CurrentTime;
+		Duration_CharacterStateInfoSPtr->DataChanged();
+		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Duration_CharacterStateInfoSPtr);
+	}
+	else
+	{
+		Duration_CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		Duration_CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		Duration_CharacterStateInfoSPtr->Duration = Duration;
+		Duration_CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		Duration_CharacterStateInfoSPtr->DataChanged();
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(Duration_CharacterStateInfoSPtr);
+	}
 }
 
 USkill_Passive_XS::FMyStruct::FMyStruct(int32 InPriority, USkill_Passive_XS* InGAInsPtr) :
@@ -89,6 +197,13 @@ USkill_Passive_XS::FMyStruct::FMyStruct(int32 InPriority, USkill_Passive_XS* InG
 
 bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)
 {
+	if (
+		(!GameplayAbilityTargetData_GAEvent.Data.GetIsHited())
+		)
+	{
+		return false;
+	}
+
 	const auto OrginalDamage =
 		GameplayAbilityTargetData_GAEvent.Data.TrueDamage +
 		GameplayAbilityTargetData_GAEvent.Data.BaseDamage +
@@ -111,9 +226,12 @@ bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedE
 
 	const auto Threshold = MaxHP * GAInsPtr->MinGPPercent;
 
-	if ((CurrentHP - OrginalDamage) < Threshold)
+	if (
+		(OrginalDamage > 0) && 
+		((CurrentHP - OrginalDamage) < Threshold)
+		)
 	{
-		// 触发阈值 HP
+		// 阈值 之上的 HP
 		const auto GreaterThresholdValue = FMath::Max(0, CurrentHP - Threshold);
 		
 		// 先减去阈值之上的 HP
@@ -128,6 +246,8 @@ bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedE
 		int32 ActulyDamage = 0;
 		if (RemaindShield > 0)
 		{
+			GAInsPtr->AddShield(RemaindShield);
+
 			ActulyDamage = OrginalDamage - FMath::Max(0, ShieldValue - RemaindShield);
 		}
 		else
@@ -144,6 +264,8 @@ bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedE
 		{
 			Iter.Get<2>() = Iter.Get<2>() * Percent;
 		}
+
+		GAInsPtr->PerformAction();
 
 		return true;
 	}

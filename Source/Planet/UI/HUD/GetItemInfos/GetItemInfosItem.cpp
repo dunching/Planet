@@ -5,12 +5,16 @@
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
 
-namespace GetItemInfosItem
+#include "TemplateHelper.h"
+#include "TextSubSystem.h"
+#include "TextCollect.h"
+
+struct FGetItemInfosItem : public TStructVariable<FGetItemInfosItem>
 {
 	const FName Texture = TEXT("Texture");
 
 	const FName Text = TEXT("Text");
-}
+};
 
 void UGetItemInfosItem::InvokeReset(UUserWidget* BaseWidgetPtr)
 {
@@ -25,7 +29,13 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& UnitP
 {
 	SetTexutre(UnitPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s %s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), *UnitPtr->GetUnitName()));
+	const auto Text =
+		FString::Printf(
+			TEXT("%s:%s"),
+			bIsAdd ? *UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+			*UnitPtr->GetUnitName()
+		);
+	SetText(Text);
 
 	ResetToolUIByData(UnitPtr);
 }
@@ -40,7 +50,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& 
 	{
 		SetText(FString::Printf(TEXT("Get:%dX%s"), UnitPtr->GetCurrentValue(), *UnitPtr->GetUnitName()));
 	}
-		break;
+	break;
 	case EProxyModifyType::kChange:
 		break;
 	case EProxyModifyType::kRemove:
@@ -71,7 +81,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCharacterProxy>& U
 
 void UGetItemInfosItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(GetItemInfosItem::Texture));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FGetItemInfosItem::Get().Texture));
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
@@ -84,7 +94,7 @@ void UGetItemInfosItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 
 void UGetItemInfosItem::SetText(const FString& Text)
 {
-	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(GetItemInfosItem::Text));
+	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FGetItemInfosItem::Get().Text));
 	if (!NumTextPtr)
 	{
 		return;
@@ -95,6 +105,7 @@ void UGetItemInfosItem::SetText(const FString& Text)
 void UGetItemInfosItem::OnAnimationComplete()
 {
 	RemoveFromParent();
+	OnFinished.ExecuteIfBound();
 }
 
 void UGetItemInfosItem::EnableIcon(bool bIsEnable)

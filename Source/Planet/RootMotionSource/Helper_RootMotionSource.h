@@ -29,6 +29,7 @@ enum ERootMotionSource_Priority : uint16
 class ASPlineActor;
 class ATornado;
 class ACharacterBase;
+class ATractionPoint;
 
 void SetRootMotionFinished(FRootMotionSource& RootMotionSource);
 
@@ -37,12 +38,68 @@ struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForc
 {
 	GENERATED_USTRUCT_BODY()
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
 	virtual void PrepareRootMotion(
 		float SimulationTime,
 		float MovementTickTime,
 		const ACharacter& Character,
 		const UCharacterMovementComponent& MoveComponent
 	) override;
+};
+
+template<>
+struct TStructOpsTypeTraits< FRootMotionSource_MyConstantForce > :
+	public TStructOpsTypeTraitsBase2< FRootMotionSource_MyConstantForce >
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
+};
+
+USTRUCT()
+struct FRootMotionSource_MyRadialForce : public FRootMotionSource_RadialForce
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual FRootMotionSource* Clone() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool Matches(const FRootMotionSource* Other) const override;
+
+	virtual bool MatchesAndHasSameState(const FRootMotionSource* Other) const override;
+
+	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+
+	virtual void PrepareRootMotion(
+		float SimulationTime,
+		float MovementTickTime,
+		const ACharacter& Character,
+		const UCharacterMovementComponent& MoveComponent
+	) override;
+
+	virtual void CheckTimeOut()override;
+
+	TWeakObjectPtr<ATractionPoint> TractionPointPtr = nullptr;
+
+	int32 AcceptableRadius = 10;
+
+};
+
+template<>
+struct TStructOpsTypeTraits< FRootMotionSource_MyRadialForce > :
+	public TStructOpsTypeTraitsBase2< FRootMotionSource_MyRadialForce >
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
 };
 
 USTRUCT()

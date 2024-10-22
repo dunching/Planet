@@ -97,8 +97,8 @@ protected:
 
 	virtual void OnDuration(
 		UAbilityTask_TimerHelper* TaskPtr,
-		float CurrentInterval, 
-		float Interval
+		float CurrentTime, 
+		float DurationTime
 	);
 
 	virtual void OnTaskTick(
@@ -110,6 +110,6 @@ protected:
 
 	TSharedPtr<FGameplayAbilityTargetData_StateModify> GameplayAbilityTargetDataSPtr = nullptr;
 
-	UAbilityTask_TimerHelper* TaskPtr = nullptr;
+	UAbilityTask_TimerHelper* TimerTaskPtr = nullptr;
 	
 };

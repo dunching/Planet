@@ -47,25 +47,36 @@ void AResourceBoxBase::Interaction(ACharacterBase* InCharacterPtr)
 {
 	Super::Interaction(InCharacterPtr);
 
+	InteractionImp_BoxBase(InCharacterPtr);
+}
+
+void AResourceBoxBase::InteractionImp_BoxBase_Implementation(ACharacterBase* InCharacterPtr)
+{
 	TargetCharacterPtr = InCharacterPtr;
+	bIsOpend = true;
 }
 
 void AResourceBoxBase::AddItemsToTarget()
 {
-	if (TargetCharacterPtr)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
+		if (TargetCharacterPtr)
 		{
-			FGuid Guid  = FGuid::NewGuid();
-			auto HICPtr = TargetCharacterPtr->GetHoldingItemsComponent();
-			for (const auto Iter : UnitMap)
 			{
-				HICPtr->AddUnit_Apending(Iter.Key, Iter.Value, Guid);
-			}
+				FGuid Guid = FGuid::NewGuid();
+				auto HICPtr = TargetCharacterPtr->GetHoldingItemsComponent();
+				for (const auto Iter : UnitMap)
+				{
+					HICPtr->AddUnit_Apending(Iter.Key, Iter.Value, Guid);
+				}
 
-			HICPtr->SyncApendingUnit(Guid);
+				HICPtr->SyncApendingUnit(Guid);
 #if WITH_EDITORONLY_DATA
 #endif
+			}
 		}
 	}
+#endif
 }
 

@@ -20,6 +20,10 @@ class ATornado;
 
 struct FStreamableHandle;
 
+/*
+	击落目标
+	仅对处于 Flying或Falling的目标 造成移动效果
+*/
 USTRUCT()
 struct PLANET_API FGameplayAbilityTargetData_RootMotion_KnockDown :
 	public FGameplayAbilityTargetData_RootMotion
@@ -71,7 +75,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void UpdateDuration()override;
+// 	virtual void UpdateDurationImp()override;
 
 protected:
 

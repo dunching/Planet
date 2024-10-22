@@ -49,6 +49,8 @@ enum class ECharacterPropertyType : uint8
 	CriticalHitRate,
 	CriticalDamage,
 	MoveSpeed,
+
+	kMax,
 };
 
 UENUM()

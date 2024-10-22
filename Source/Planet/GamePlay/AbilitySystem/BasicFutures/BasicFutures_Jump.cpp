@@ -74,7 +74,7 @@ void UBasicFutures_Jump::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void UBasicFutures_Jump::InitialTags()
+void UBasicFutures_Jump::InitalDefaultTags()
 {
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Jump);
 

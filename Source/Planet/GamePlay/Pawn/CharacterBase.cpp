@@ -41,7 +41,7 @@
 #include "HumanAIController.h"
 #include "PlanetPlayerController.h"
 #include "GAEvent_Helper.h"
-#include "FightingTips.h"
+#include "CharacterRisingTips.h"
 #include "SceneObj.h"
 #include "SceneUnitContainer.h"
 
@@ -234,15 +234,17 @@ void ACharacterBase::UnPossessed()
 	}
 }
 
-void ACharacterBase::InteractionSceneObj_Implementation(ASceneObj* SceneObjPtr)
+void ACharacterBase::InteractionSceneObj(ASceneObj* SceneObjPtr)
 {
-	if (SceneObjPtr)
-	{
-		SceneObjPtr->Interaction(this);
-	}
+	InteractionSceneObj_Server(SceneObjPtr);
 }
 
 void ACharacterBase::Interaction(ACharacterBase* CharacterPtr)
+{
+
+}
+
+void ACharacterBase::LookingAt(ACharacterBase* CharacterPtr)
 {
 
 }
@@ -330,8 +332,24 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 	// 
 
 	// 
-	auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
+	if (CharacterUnitPtr)
+	{
+		auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
+	}
+	else
+	{
+		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
+		check(0);
+	}
 //	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
+}
+
+void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneObjPtr)
+{
+	if (SceneObjPtr)
+	{
+		SceneObjPtr->Interaction(this);
+	}
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -404,9 +422,11 @@ void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTar
 	if (GetNetMode() == NM_Client)
 	{
 		// 显示对应的浮动UI
-		auto UIPtr = CreateWidget<UFightingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
-		UIPtr->ProcessGAEVent(GAEvent);
-		UIPtr->AddToViewport(EUIOrder::kFightingTips);
+		auto UIPtr = CreateWidget<UCharacterRisingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
+		if (UIPtr->ProcessGAEVent(GAEvent))
+		{
+			UIPtr->AddToViewport(EUIOrder::kFightingTips);
+		}
 	}
 #endif
 }

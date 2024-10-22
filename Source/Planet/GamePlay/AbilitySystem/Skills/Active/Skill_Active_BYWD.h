@@ -21,7 +21,7 @@ class PLANET_API USkill_Active_BYWD : public USkill_Active_Base
 
 public:
 
-	virtual void ActivateAbility(
+	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
@@ -30,7 +30,7 @@ public:
 
 protected:
 
-	void TimerTick(UAbilityTask_TimerHelper*, float Interval);
+	void DurationDelegate(UAbilityTask_TimerHelper*, float CurrentInterval, float Interval);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage1 = nullptr;

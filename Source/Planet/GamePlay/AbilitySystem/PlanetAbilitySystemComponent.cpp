@@ -57,6 +57,33 @@ void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTim
 	}
 }
 
+UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(FGameplayAbilitySpec& Spec, const UGameplayAbility* Ability)
+{
+	check(Ability);
+	check(Ability->HasAllFlags(RF_ClassDefaultObject));
+
+	AActor* Owner = GetOwner();
+	check(Owner);
+
+	Cast<UPlanetGameplayAbility>(Spec.Ability)->InitalDefaultTags();
+
+	auto AbilityInstance = NewObject<UPlanetGameplayAbility>(Owner, Ability->GetClass());
+	check(AbilityInstance);
+
+	// Add it to one of our instance lists so that it doesn't GC.
+	if (AbilityInstance->GetReplicationPolicy() != EGameplayAbilityReplicationPolicy::ReplicateNo)
+	{
+		Spec.ReplicatedInstances.Add(AbilityInstance);
+		AddReplicatedInstancedAbility(AbilityInstance);
+	}
+	else
+	{
+		Spec.NonReplicatedInstances.Add(AbilityInstance);
+	}
+
+	return AbilityInstance;
+}
+
 void UPlanetAbilitySystemComponent::CurrentMontageStopImp_Implementation(float OverrideBlendOutTime)
 {
 	CurrentMontageStop(OverrideBlendOutTime);
@@ -98,10 +125,10 @@ void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 
 void UPlanetAbilitySystemComponent::ReplicateEventData_Implementation(
 	int32 InputID,
-	const FGameplayEventData& TriggerEventData
+	const FGameplayEventData& GameplayEventData
 )
 {
-	GameplayEventDataMap.Add(InputID, TriggerEventData);
+	GameplayEventDataMap.Add(InputID, GameplayEventData);
 }
 
 void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
@@ -121,7 +148,7 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 
 			for (auto Instance : Instances)
 			{
-				Cast<USkill_Base>(Instance)->UpdateParam(TriggerEventData);
+				Cast<USkill_Base>(Instance)->UpdateRegisterParam(TriggerEventData);
 			}
 		}
 	}

@@ -67,7 +67,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void UpdateDuration()override;
+// 	virtual void UpdateDurationImp()override;
 
 protected:
 

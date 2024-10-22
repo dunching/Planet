@@ -46,13 +46,6 @@ void UCS_PeriodicStateModify_Stun::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	AbilityTags.AppendTags(Spec.Ability->AbilityTags);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
 }
 
 void UCS_PeriodicStateModify_Stun::ActivateAbility(
@@ -84,10 +77,10 @@ void UCS_PeriodicStateModify_Stun::UpdateDuration()
 {
 	Super::UpdateDuration();
 
-	if (TaskPtr)
+	if (TimerTaskPtr)
 	{
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		TaskPtr->UpdateDuration();
+		TimerTaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TimerTaskPtr->UpdateDuration();
 	}
 
 	if (CharacterStateInfoSPtr)
@@ -99,6 +92,8 @@ void UCS_PeriodicStateModify_Stun::UpdateDuration()
 
 void UCS_PeriodicStateModify_Stun::PerformAction()
 {
+	Super::PerformAction();
+
 	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
 	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
 	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
@@ -112,4 +107,17 @@ void UCS_PeriodicStateModify_Stun::OnTaskTick(UAbilityTask_TimerHelper*, float D
 	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
 	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+}
+
+void UCS_PeriodicStateModify_Stun::InitalDefaultTags()
+{
+	Super::InitalDefaultTags();
+
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
 }

@@ -135,7 +135,7 @@ public:
 #endif
 
 	// 通过此函数修改GAS上记录的CDO的Tags
-	virtual	void InitalTags();
+	virtual	void InitalDefaultTags();
 
 protected:
 

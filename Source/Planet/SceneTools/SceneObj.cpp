@@ -83,3 +83,8 @@ void ASceneObj::StartLookAt(ACharacterBase* CharacterPtr)
 {
 
 }
+
+void ASceneObj::LookingAt(ACharacterBase* CharacterPtr)
+{
+
+}

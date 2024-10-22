@@ -2,7 +2,7 @@
 #include "CharacterAttibutes.h"
 
 #include "AssetRefMap.h"
-#include "FightingTips.h"
+#include "CharacterRisingTips.h"
 #include "Planet.h"
 #include "UICommon.h"
 #include "GameplayTagsSubSystem.h"
@@ -37,6 +37,31 @@ void FBasePropertySet::AddCurrentValue(int32 NewValue, const FGameplayTag& DataS
 void FBasePropertySet::SetCurrentValue(int32 NewValue, const FGameplayTag& DataSource)
 {
 	ValueMap.Add(DataSource, NewValue);
+	Update();
+}
+
+void FBasePropertySet::SetValue(int32 NewValue)
+{
+	if (NewValue == 0)
+	{
+		ValueMap.Empty();
+	}
+	else
+	{
+		for (auto &Iter : ValueMap)
+		{
+			if (Iter.Value >= NewValue)
+			{
+				Iter.Value = NewValue;
+				NewValue = 0;
+			}
+			else
+			{
+				NewValue = NewValue - Iter.Value;
+			}
+		}
+	}
+
 	Update();
 }
 
@@ -80,6 +105,15 @@ void FBasePropertySet::Update()
 	if (Character_Value_Iter)
 	{
 		*Character_Value_Iter = FMath::Clamp(*Character_Value_Iter, MinValue.GetCurrentValue(), MaxValue.GetCurrentValue());
+	}
+
+	const auto Temp = ValueMap;
+	for (const auto& Iter : Temp)
+	{
+		if (Iter.Value == 0)
+		{
+			ValueMap.Remove(Iter.Key);
+		}
 	}
 
 	for (const auto& Iter : PropertySettlementModifySet)
@@ -160,6 +194,7 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Ar << DongCha.CurrentValue.CurrentValue;
 		Ar << TianZi.CurrentValue.CurrentValue;
 
+		Ar << Shield.CurrentValue.CurrentValue;
 		Ar << HP.CurrentValue.CurrentValue;
 		Ar << PP.CurrentValue.CurrentValue;
 
@@ -189,6 +224,7 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 		Lambda(DongCha.CurrentValue);
 		Lambda(TianZi.CurrentValue);
 
+		Lambda(Shield.CurrentValue);
 		Lambda(HP.CurrentValue);
 		Lambda(PP.CurrentValue);
 
@@ -292,16 +328,9 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	// 处理数据
 	const auto& Ref = GAEvent.Data;
 
-	if (Ref.HitRate <= 0)
+	if (Ref.GetIsHited())
 	{
 		// 未命中
-	}
-
-	// 会心伤害
-	float CurCriticalDamage = 1.f;
-	if (Ref.CriticalHitRate >= 100)
-	{
-		CurCriticalDamage = (100 + Ref.CriticalDamage) / 100.f;
 	}
 
 	// HP
@@ -309,19 +338,20 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		FScoped_BaseProperty_SaveUpdate HP_Scope(HP.GetCurrentProperty());
 		FScoped_BaseProperty_SaveUpdate PP_Scope(PP.GetCurrentProperty());
 
-		if (Ref.HitRate > 0)
+		if (Ref.GetIsHited())
 		{
+			check(Ref.DataSource == UGameplayTagsSubSystem::GetInstance()->DataSource_Character);
 			if (Ref.ElementSet.IsEmpty())
 			{
 				// 基础伤害
-				HP.AddCurrentValue(-Ref.BaseDamage * CurCriticalDamage, Ref.DataSource);
+				HP.AddCurrentValue(-Ref.BaseDamage, Ref.DataSource);
 			}
 			else
 			{
 				// 元素伤害
 				for (const auto& Iter : Ref.ElementSet)
 				{
-					HP.AddCurrentValue(-Iter.Get<2>() * CurCriticalDamage, Ref.DataSource);
+					HP.AddCurrentValue(-Iter.Get<2>(), Ref.DataSource);
 				}
 			}
 
@@ -332,20 +362,21 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		{
 			auto Lambda = [&Ref](
 				FBasePropertySet& PropertySetRef,
-				const FBaseProperty& Property
+				const FBaseProperty& Property,
+				const FGameplayTag&InDataSource
 				)
 				{
 					if (Ref.bIsClearData)
 					{
-						PropertySetRef.RemoveCurrentValue(Ref.DataSource);
+						PropertySetRef.RemoveCurrentValue(InDataSource);
 					}
 					else if (Ref.bIsOverlapData)
 					{
-						PropertySetRef.SetCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+						PropertySetRef.SetCurrentValue(Property.GetCurrentValue(), InDataSource);
 					}
 					else
 					{
-						PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), Ref.DataSource);
+						PropertySetRef.AddCurrentValue(Property.GetCurrentValue(), InDataSource);
 					}
 				};
 
@@ -357,27 +388,27 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #pragma region 
 				case ECharacterPropertyType::GoldElement:
 				{
-					Lambda(GoldElement, Iter.Value);
+					Lambda(GoldElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::WoodElement:
 				{
-					Lambda(WoodElement, Iter.Value);
+					Lambda(WoodElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::WaterElement:
 				{
-					Lambda(WaterElement, Iter.Value);
+					Lambda(WaterElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::FireElement:
 				{
-					Lambda(FireElement, Iter.Value);
+					Lambda(FireElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::SoilElement:
 				{
-					Lambda(SoilElement, Iter.Value);
+					Lambda(SoilElement, Iter.Value, Ref.DataSource);
 				}
 				break;
 #pragma endregion
@@ -385,18 +416,32 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #pragma region 
 				case ECharacterPropertyType::HP:
 				{
-					Lambda(HP, Iter.Value);
+					if (Ref.DataSource == DataSource_Character)
+					{
+						Lambda(HP, Iter.Value, DataSource_Character);
+					}
 				}
 				break;
 
 				case ECharacterPropertyType::PP:
 				{
-					Lambda(PP, Iter.Value);
+					if (Ref.DataSource == DataSource_Character)
+					{
+						Lambda(PP, Iter.Value, DataSource_Character);
+					}
 				}
 				break;
 				case ECharacterPropertyType::Mana:
 				{
-					Lambda(Mana, Iter.Value);
+					if (Ref.DataSource == DataSource_Character)
+					{
+						Lambda(Mana, Iter.Value, DataSource_Character);
+					}
+				}
+				break;
+				case ECharacterPropertyType::Shield:
+				{
+					Lambda(Shield, Iter.Value, Ref.DataSource);
 				}
 				break;
 #pragma endregion
@@ -405,30 +450,30 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 #pragma region 
 				case ECharacterPropertyType::AD:
 				{
-					Lambda(AD, Iter.Value);
+					Lambda(AD, Iter.Value, Ref.DataSource);
 				}
 				break;
 
 				case ECharacterPropertyType::AD_Penetration:
 				{
-					Lambda(AD_Penetration, Iter.Value);
+					Lambda(AD_Penetration, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::AD_PercentPenetration:
 				{
-					Lambda(AD_PercentPenetration, Iter.Value);
+					Lambda(AD_PercentPenetration, Iter.Value, Ref.DataSource);
 				}
 				break;
 #pragma endregion
 
 				case ECharacterPropertyType::GAPerformSpeed:
 				{
-					Lambda(GAPerformSpeed, Iter.Value);
+					Lambda(GAPerformSpeed, Iter.Value, Ref.DataSource);
 				}
 				break;
 				case ECharacterPropertyType::MoveSpeed:
 				{
-					Lambda(MoveSpeed, Iter.Value);
+					Lambda(MoveSpeed, Iter.Value, Ref.DataSource);
 				}
 				break;
 				}

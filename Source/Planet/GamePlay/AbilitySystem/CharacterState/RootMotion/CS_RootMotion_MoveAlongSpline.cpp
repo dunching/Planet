@@ -78,26 +78,28 @@ void UCS_RootMotion_MoveAlongSpline::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UCS_RootMotion_MoveAlongSpline::UpdateDuration()
-{
-	if (TaskPtr)
-	{
-		TaskPtr->UpdateDuration();
-	}
-	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-	{
-		for (auto Iter : ActiveTasks)
-		{
-			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
-			{
-				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
-
-				RootMotionTaskPtr->UpdateDuration();
-				break;
-			}
-		}
-	}
-}
+// void UCS_RootMotion_MoveAlongSpline::UpdateDurationImp()
+// {
+// 	Super::UpdateDurationImp();
+// 
+// 	if (TaskPtr)
+// 	{
+// 		TaskPtr->UpdateDuration();
+// 	}
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+// 	{
+// 		for (auto Iter : ActiveTasks)
+// 		{
+// 			if (Iter->IsA(UAbilityTask_FlyAway::StaticClass()))
+// 			{
+// 				auto RootMotionTaskPtr = Cast<UAbilityTask_FlyAway>(Iter);
+// 
+// 				RootMotionTaskPtr->UpdateDuration();
+// 				break;
+// 			}
+// 		}
+// 	}
+// }
 
 void UCS_RootMotion_MoveAlongSpline::PerformAction()
 {

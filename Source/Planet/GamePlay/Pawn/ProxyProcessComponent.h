@@ -96,16 +96,21 @@ public:
 
 	int32 GetCurrentWeaponAttackDistance()const;
 
-	void GetWeapon(
+	void GetWeaponSocket(
 		TSharedPtr<FSocket_FASI>& FirstWeaponSocketInfoSPtr,
 		TSharedPtr<FSocket_FASI>& SecondWeaponSocketInfoSPtr
+	);
+
+	void GetWeaponProxy(
+		TSharedPtr<FWeaponProxy>& FirstWeaponProxySPtr,
+		TSharedPtr<FWeaponProxy>& SecondWeaponProxySPtr
 	);
 
 	void GetWeaponSkills(
 		TSharedPtr<FWeaponSkillProxy>& FirstWeaponSkillSPtr,
 		TSharedPtr<FWeaponSkillProxy>& SecondWeaponSkillSPtr
 	);
-	
+
 	TSharedPtr<FWeaponSkillProxy> GetWeaponSkillByType(
 		const FGameplayTag&TypeTag
 	);

@@ -107,7 +107,7 @@ public:
 
 	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
-	virtual	void InitalTags()override;
+	virtual	void InitalDefaultTags()override;
 
 	virtual void Tick(float DeltaTime);
 

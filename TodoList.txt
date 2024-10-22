@@ -1,5 +1,6 @@
         // b*[^:b#/]+.*$
-		
+		// E:\Projects\Planet_Dev\Source;E:\Projects\Planet_Dev\Plugins
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -30,8 +31,7 @@
 	}
 #endif
 
-引擎修改：
-	1.
+	DOREPLIFETIME_CONDITION(ThisClass, Radius, COND_None);
 
 Going to:
 

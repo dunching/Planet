@@ -27,7 +27,7 @@ public:
 
 	int32 GetCurrentValue() const;
 
-	void SetCurrentValue(int32 val);
+	void SetCurrentValue(int32 NewValue);
 
 	void AddCurrentValue(int32 val);
 

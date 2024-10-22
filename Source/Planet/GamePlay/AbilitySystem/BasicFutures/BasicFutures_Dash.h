@@ -99,7 +99,7 @@ protected:
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
 
-	virtual void InitialTags()override;
+	virtual void InitalDefaultTags()override;
 
 	void DoDash(
 		const FGameplayAbilitySpecHandle Handle,
@@ -131,7 +131,7 @@ protected:
 	float Duration = .5f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float MoveLength = 800.f;
+	float MoveLength = 500.f;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	int32 Consume = 10;

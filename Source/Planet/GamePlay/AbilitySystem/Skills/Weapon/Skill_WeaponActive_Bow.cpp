@@ -54,6 +54,16 @@ bool FGameplayAbilityTargetData_Bow_RegisterParam::NetSerialize(FArchive& Ar, cl
 	return true;
 }
 
+FGameplayAbilityTargetData_Bow_RegisterParam* FGameplayAbilityTargetData_Bow_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_Bow_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_WeaponActive_Bow::USkill_WeaponActive_Bow() :
 	Super()
 {
@@ -112,9 +122,9 @@ void USkill_WeaponActive_Bow::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void USkill_WeaponActive_Bow::UpdateParam(const FGameplayEventData& GameplayEventData)
+void USkill_WeaponActive_Bow::UpdateRegisterParam(const FGameplayEventData& GameplayEventData)
 {
-	Super::UpdateParam(GameplayEventData);
+	Super::UpdateRegisterParam(GameplayEventData);
 
 	if (GameplayEventData.TargetData.IsValid(0))
 	{

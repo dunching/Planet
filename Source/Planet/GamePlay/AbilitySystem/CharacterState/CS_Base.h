@@ -16,7 +16,7 @@ struct FCharacterStateInfo;
 
 /*
 	一般为debuff
-	给目标单位使用持续性的效果
+	给目标单位使用持续性的、脱手的效果
 
 	如果对自己使用，则直接在GA里面使用UBaseFeatureComponent
 */
@@ -28,6 +28,10 @@ struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTa
 	friend UCS_Base;
 
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	FGameplayAbilityTargetData_CS_Base();
 
@@ -46,6 +50,16 @@ struct PLANET_API FGameplayAbilityTargetData_CS_Base : public FGameplayAbilityTa
 
 protected:
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_CS_Base> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_CS_Base>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 UCLASS()
@@ -80,7 +94,7 @@ public:
 
 	virtual void UpdateDuration();
 
-	TSharedPtr<FGameplayAbilityTargetData_CS_Base>GameplayAbilityTargetDataBaseSPtr;
+	TSharedPtr<FGameplayAbilityTargetData_CS_Base>GameplayAbilityTargetDataBaseSPtr = nullptr;
 
 protected:
 

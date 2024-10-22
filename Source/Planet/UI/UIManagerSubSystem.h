@@ -30,7 +30,7 @@ class UMainUILayout;
 class UEffectsList;
 class UProgressTips;
 class UHUD_TeamInfo;
-class UGetItemInfos;
+class UGetItemInfosList;
 class URaffleMenu;
 class UMenuLayout;
 
@@ -90,7 +90,7 @@ public:
 	UProgressTips* ViewProgressTips(bool bIsViewMenus);
 
 	// 获取物品的提示
-	UGetItemInfos* GetItemInfos();
+	UGetItemInfosList* GetItemInfos();
 
 protected:
 

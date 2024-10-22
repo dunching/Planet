@@ -18,20 +18,20 @@ public:
 
 	static UGameplayTagsSubSystem* GetInstance();
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "BaseFeature Tag")
 	FGameplayTag BaseFeature_Send =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Send")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "BaseFeature Tag")
 	FGameplayTag BaseFeature_Received =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Received")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "BaseFeature Tag")
 	FGameplayTag BaseFeature_Respawn =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Respawn")));
 	
 #pragma region Locomotion
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "BaseFeature Tag")
 	FGameplayTag Jump =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Jump")));
 
@@ -95,103 +95,111 @@ public:
 #pragma endregion 
 	
 #pragma region State Tags
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag UsingConsumable =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.IsUsingConsumable")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag Ridering =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Ridering")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
+	FGameplayTag State_NoPhy =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.NoPhy")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
+	FGameplayTag State_Buff_Purify =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.Purify")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Buff_SuperArmor =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.SuperArmor")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Buff_CantBeSlected =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.CantBeSelected")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Buff_Stagnation =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.Stagnation")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag Debuff =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
+	FGameplayTag State_Debuff_Fire =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Fire")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Stun =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Stun")));
-	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Charm =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Charm")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Fear =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Fear")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Silent =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Silent")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
-	FGameplayTag State_Debuff_Ice =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Ice")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Slow =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Slow")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag RootMotion =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag FlyAway =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.FlyAway")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag KnockDown =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.KnockDown")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_RootMotion_Traction =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.Traction")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag TornadoTraction =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.TornadoTraction")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag MoveAlongSpline =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveAlongSpline")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_RootMotion_MoveTo =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveTo")));
 	
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag DeathingTag = 
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Deathing")));
 
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Abilities Tag")
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag InFightingTag = 
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.InFighting")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_ReleasingSkill=
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_ReleasingSkill_Continuous =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Continuous")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_ReleasingSkill_Active =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.Active")));
-
-	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Gameplay Tag")
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_ReleasingSkil_WeaponActive =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill.WeaponActive")));
 #pragma endregion 

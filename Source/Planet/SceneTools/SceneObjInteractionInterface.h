@@ -31,6 +31,8 @@ public:
 
 	virtual void StartLookAt(ACharacterBase* CharacterPtr) = 0;
 
+	virtual void LookingAt(ACharacterBase* CharacterPtr) = 0;
+
 	virtual void EndLookAt() = 0;
 
 protected:

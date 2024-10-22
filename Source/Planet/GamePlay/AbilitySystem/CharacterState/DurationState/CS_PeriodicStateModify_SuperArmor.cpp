@@ -47,24 +47,6 @@ void UCS_PeriodicStateModify_SuperArmor::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	TArray<FGameplayTag>Ary{
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Silent,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow,
-	};
-
-	for (const auto& Iter : Ary)
-	{
-		CancelAbilitiesWithTag.AddTag(Iter);
-	}
-
-	for (const auto& Iter : Ary)
-	{
-		BlockAbilitiesWithTag.AddTag(Iter);
-	}
 }
 
 void UCS_PeriodicStateModify_SuperArmor::PreActivate(
@@ -107,10 +89,10 @@ void UCS_PeriodicStateModify_SuperArmor::UpdateDuration()
 {
 	Super::UpdateDuration();
 
-	if (TaskPtr)
+	if (TimerTaskPtr)
 	{
-		TaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
-		TaskPtr->UpdateDuration();
+		TimerTaskPtr->SetDuration(GameplayAbilityTargetDataSPtr->Duration);
+		TimerTaskPtr->UpdateDuration();
 	}
 
 	if (CharacterStateInfoSPtr)
@@ -136,4 +118,30 @@ void UCS_PeriodicStateModify_SuperArmor::OnTaskTick(UAbilityTask_TimerHelper*, f
 	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
 	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+}
+
+void UCS_PeriodicStateModify_SuperArmor::InitalDefaultTags()
+{
+	Super::InitalDefaultTags();
+
+	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
+
+	TArray<FGameplayTag>Ary{
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Silent,
+		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow,
+	};
+
+	for (const auto& Iter : Ary)
+	{
+		CancelAbilitiesWithTag.AddTag(Iter);
+	}
+
+	for (const auto& Iter : Ary)
+	{
+		BlockAbilitiesWithTag.AddTag(Iter);
+	}
 }

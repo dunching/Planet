@@ -79,7 +79,7 @@ void UCharacterTitle::NativeConstruct()
 			OnPPChanged();
 		}
 		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
+			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
 			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
 				std::bind(&ThisClass::OnShieldChanged, this)
 			));

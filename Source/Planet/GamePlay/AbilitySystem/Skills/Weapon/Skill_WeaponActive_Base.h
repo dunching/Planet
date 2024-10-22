@@ -23,6 +23,8 @@ struct FGameplayAbilityTargetData_WeaponActive_ActiveParam :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
+	virtual FGameplayAbilityTargetData_WeaponActive_ActiveParam* Clone()const override;
+
 	bool bIsAutoContinue = false;
 
 	AWeapon_Base* WeaponPtr = nullptr;
@@ -94,7 +96,7 @@ public:
 
 	virtual void SetContinuePerformImp(bool bIsContinue)override;
 
-	virtual	void InitalTags()override;
+	virtual	void InitalDefaultTags()override;
 
 	virtual bool GetNum(int32 & Num)const;
 

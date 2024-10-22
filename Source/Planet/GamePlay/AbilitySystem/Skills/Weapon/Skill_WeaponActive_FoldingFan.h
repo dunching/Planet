@@ -29,6 +29,8 @@ struct FGameplayAbilityTargetData_FoldingFan_RegisterParam :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
+	virtual FGameplayAbilityTargetData_FoldingFan_RegisterParam* Clone()const override;
+
 	int32 IncreaseNum = 1;
 
 };
@@ -110,7 +112,7 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
-	virtual	void UpdateParam(const FGameplayEventData& GameplayEventData)override;
+	virtual	void UpdateRegisterParam(const FGameplayEventData& GameplayEventData)override;
 
 	virtual void CheckInContinue()override;
 
@@ -129,7 +131,7 @@ protected:
 
 	void EmitProjectile();
 
-	void MakeDamage(ACharacterBase * TargetCharacterPtr);
+	void MakeDamage(ACharacterBase * TargetCharacterPtr, FWeaponActorType* WeaponProjectilePtr);
 
 	void StartTasksLink();
 

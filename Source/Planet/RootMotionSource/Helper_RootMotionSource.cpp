@@ -21,6 +21,8 @@
 #include "Skill_Active_tornado.h"
 #include "CharacterBase.h"
 #include "LogWriter.h"
+#include "CS_RootMotion_TornadoTraction.h"
+#include "CS_RootMotion_Traction.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
 	TEXT("Skill.DrawDebug.Tornado"),
@@ -33,6 +35,11 @@ static TAutoConsoleVariable<int32> SkillDrawDebugSpline(
 	0,
 	TEXT("")
 	TEXT(" default: 0"));
+
+UScriptStruct* FRootMotionSource_MyConstantForce::GetScriptStruct() const
+{
+	return FRootMotionSource_MyConstantForce::StaticStruct();
+}
 
 void FRootMotionSource_MyConstantForce::PrepareRootMotion
 (
@@ -453,9 +460,12 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 		{
 			if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
 			{
-				bIsFalling = false;
+				if (Character.GetLocalRole() > ROLE_SimulatedProxy)
+				{
+					bIsFalling = false;
+				}
 			}
-			else if(FallingSpeed > 0)
+			else if (FallingSpeed > 0)
 			{
 				Force.Z = -FallingSpeed;
 			}
@@ -483,15 +493,19 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	}
 
 	const auto NewTime = GetTime() + SimulationTime;
-	if (NewTime >= GetDuration())
+
+	if (Character.GetLocalRole() > ROLE_SimulatedProxy)
 	{
-		if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
+		if (NewTime >= GetDuration())
 		{
-			PRINTINVOKEINFO();
-		}
-		else
-		{
-			bIsFalling = true;
+			if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
+			{
+				PRINTINVOKEINFO();
+			}
+			else
+			{
+				bIsFalling = true;
+			}
 		}
 	}
 
@@ -571,4 +585,159 @@ void FRootMotionSource_FlyAway::UpdateDuration(
 void SetRootMotionFinished(FRootMotionSource& RootMotionSource)
 {
 	RootMotionSource.Status.SetFlag(ERootMotionSourceStatusFlags::Finished);
+}
+
+void FRootMotionSource_MyRadialForce::PrepareRootMotion
+(
+	float SimulationTime,
+	float MovementTickTime,
+	const ACharacter& Character,
+	const UCharacterMovementComponent& MoveComponent
+)
+{
+	if (TractionPointPtr.IsValid())
+	{
+		Location = TractionPointPtr->GetActorLocation();
+	}
+
+	RootMotionParams.Clear();
+
+	const FVector CharacterLocation = Character.GetActorLocation();
+	FVector Force = FVector::ZeroVector;
+	const FVector ForceLocation = LocationActor ? LocationActor->GetActorLocation() : Location;
+	float Distance = FVector::Dist(ForceLocation, CharacterLocation);
+	if (
+		(Distance < Radius) && 
+		(Distance > AcceptableRadius)
+		)
+	{
+		// Calculate strength
+		float CurrentStrength = Strength;
+		{
+			float AdditiveStrengthFactor = 1.f;
+			if (StrengthDistanceFalloff)
+			{
+				const float DistanceFactor = StrengthDistanceFalloff->GetFloatValue(FMath::Clamp(Distance / Radius, 0.f, 1.f));
+				AdditiveStrengthFactor -= (1.f - DistanceFactor);
+			}
+
+			if (StrengthOverTime)
+			{
+				const float TimeValue = Duration > 0.f ? FMath::Clamp(GetTime() / Duration, 0.f, 1.f) : GetTime();
+				const float TimeFactor = StrengthOverTime->GetFloatValue(TimeValue);
+				AdditiveStrengthFactor -= (1.f - TimeFactor);
+			}
+
+			CurrentStrength = Strength * FMath::Clamp(AdditiveStrengthFactor, 0.f, 1.f);
+		}
+
+		if (bUseFixedWorldDirection)
+		{
+			Force = FixedWorldDirection.Vector() * CurrentStrength;
+		}
+		else
+		{
+			Force = (ForceLocation - CharacterLocation).GetSafeNormal() * CurrentStrength;
+
+			if (bIsPush)
+			{
+				Force *= -1.f;
+			}
+		}
+	}
+
+	if (bNoZForce)
+	{
+		Force.Z = 0.f;
+	}
+
+	FTransform NewTransform(Force);
+
+	// Scale force based on Simulation/MovementTime differences
+	// Ex: Force is to go 200 cm per second forward.
+	//     To catch up with server state we need to apply
+	//     3 seconds of this root motion in 1 second of
+	//     movement tick time -> we apply 600 cm for this frame
+	if (SimulationTime != MovementTickTime && MovementTickTime > UE_SMALL_NUMBER)
+	{
+		const float Multiplier = SimulationTime / MovementTickTime;
+		NewTransform.ScaleTranslation(Multiplier);
+	}
+
+	RootMotionParams.Set(NewTransform);
+
+	SetTime(GetTime() + SimulationTime);
+}
+
+void FRootMotionSource_MyRadialForce::CheckTimeOut()
+{
+	if (TractionPointPtr.IsValid())
+	{
+		Super::CheckTimeOut();
+	}
+	else
+	{
+		Status.SetFlag(ERootMotionSourceStatusFlags::Finished);
+	}
+}
+
+bool FRootMotionSource_MyRadialForce::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+{
+	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
+	{
+		return false;
+	}
+
+	Ar << TractionPointPtr;
+
+	bOutSuccess = true;
+	return true;
+}
+
+UScriptStruct* FRootMotionSource_MyRadialForce::GetScriptStruct() const
+{
+	return FRootMotionSource_MyRadialForce::StaticStruct();
+}
+
+FRootMotionSource* FRootMotionSource_MyRadialForce::Clone() const
+{
+	FRootMotionSource_MyRadialForce* CopyPtr = new FRootMotionSource_MyRadialForce(*this);
+	return CopyPtr;
+}
+
+bool FRootMotionSource_MyRadialForce::Matches(const FRootMotionSource* Other) const
+{
+	if (!Super::Matches(Other))
+	{
+		return false;
+	}
+
+	const auto OtherCast = static_cast<const FRootMotionSource_MyRadialForce*>(Other);
+
+	return
+		TractionPointPtr == OtherCast->TractionPointPtr;
+}
+
+bool FRootMotionSource_MyRadialForce::MatchesAndHasSameState(const FRootMotionSource* Other) const
+{
+	if (!Super::MatchesAndHasSameState(Other))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool FRootMotionSource_MyRadialForce::UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup /*= false*/)
+{
+	if (!Super::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
+	{
+		return false;
+	}
+
+	auto OtherCast = static_cast<const FRootMotionSource_MyRadialForce*>(SourceToTakeStateFrom);
+
+	TractionPointPtr = OtherCast->TractionPointPtr;
+
+	return true;
 }

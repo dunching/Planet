@@ -37,9 +37,9 @@ struct FBasicFutures_MoveToAttaclArea : public TStructVariable<FBasicFutures_Mov
 	FName Donut_OuterRadius = TEXT("Donut.OuterRadius");
 };
 
-void UBasicFutures_MoveToAttaclArea::InitialTags()
+void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
 {
-	Super::InitialTags();
+	Super::InitalDefaultTags();
 
 	if (GetWorldImp())
 	{

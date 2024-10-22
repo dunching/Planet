@@ -32,6 +32,16 @@ bool FGameplayAbilityTargetData_SkillBase_RegisterParam::NetSerialize(FArchive& 
 	return true;
 }
 
+FGameplayAbilityTargetData_SkillBase_RegisterParam* FGameplayAbilityTargetData_SkillBase_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_SkillBase_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_Base::USkill_Base() :
 	Super()
 {
@@ -54,7 +64,7 @@ void USkill_Base::OnAvatarSet(
 	// 远程不能复制这个参数？
 	if (Spec.GameplayEventData)
 	{
-		UpdateParam(*Spec.GameplayEventData);
+		UpdateRegisterParam(*Spec.GameplayEventData);
 	}
 }
 
@@ -125,11 +135,11 @@ const TArray<FAbilityTriggerData>& USkill_Base::GetTriggers() const
 	return AbilityTriggers;
 }
 
-void USkill_Base::UpdateParam(const FGameplayEventData& GameplayEventData)
+void USkill_Base::UpdateRegisterParam(const FGameplayEventData& GameplayEventData)
 {
 	if (GameplayEventData.TargetData.IsValid(0))
 	{
-		auto GameplayAbilityTargetPtr = dynamic_cast<const FRegisterParamType*>(GameplayEventData.TargetData.Get(0));
+		auto GameplayAbilityTargetPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
 		if (GameplayAbilityTargetPtr)
 		{
 			SkillUnitPtr = CharacterPtr->GetHoldingItemsComponent()->FindUnit_Skill(GameplayAbilityTargetPtr->ProxyID);

@@ -25,7 +25,7 @@ class UTalentAllocation;
 class UGroupManaggerMenu;
 class UHUD_TeamInfo;
 class UFocusIcon;
-class UFightingTips;
+class UCharacterRisingTips;
 class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;

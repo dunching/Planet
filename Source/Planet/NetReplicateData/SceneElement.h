@@ -24,6 +24,7 @@ struct FTableRowUnit_WeaponSkillExtendInfo;
 struct FTableRowUnit_CharacterInfo;
 struct FTableRowUnit_Consumable;
 struct FTableRowUnit_PropertyEntrys;
+class UTexture2D;
 class AToolUnitBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;

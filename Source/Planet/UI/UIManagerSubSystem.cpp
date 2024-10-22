@@ -30,7 +30,7 @@
 #include "TalentAllocation.h"
 #include "GroupManaggerMenu.h"
 #include "HUD_TeamInfo.h"
-#include "GetItemInfos.h"
+#include "GetItemInfosList.h"
 #include "RaffleMenu.h"
 #include "PlanetPlayerState.h"
 #include "UICommon.h"
@@ -348,7 +348,7 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 	return nullptr;
 }
 
-UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
+UGetItemInfosList* UUIManagerSubSystem::GetItemInfos()
 {
 	MainUILayoutPtr = GetMainHUD();
 	if (!MainUILayoutPtr)
@@ -364,7 +364,7 @@ UGetItemInfos* UUIManagerSubSystem::GetItemInfos()
 
 	for (auto Iter : BorderPtr->GetAllChildren())
 	{
-		auto UIPtr = Cast<UGetItemInfos>(Iter);
+		auto UIPtr = Cast<UGetItemInfosList>(Iter);
 		if (UIPtr)
 		{
 			return UIPtr;

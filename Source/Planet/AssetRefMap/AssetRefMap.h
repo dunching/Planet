@@ -31,7 +31,7 @@ class UTalentAllocation;
 class UGroupManaggerMenu;
 class UHUD_TeamInfo;
 class UFocusIcon;
-class UFightingTips;
+class UCharacterRisingTips;
 class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
@@ -76,7 +76,7 @@ public:
 	TSubclassOf<UFocusIcon>FocusIconClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UFightingTips>FightingTipsClass;
+	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
 #pragma endregion MenusUI
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

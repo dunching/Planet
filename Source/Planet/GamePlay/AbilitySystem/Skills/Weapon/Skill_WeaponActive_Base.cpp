@@ -22,6 +22,16 @@ bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(FArchive&
 	return true;
 }
 
+FGameplayAbilityTargetData_WeaponActive_ActiveParam* FGameplayAbilityTargetData_WeaponActive_ActiveParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
+}
+
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
@@ -117,9 +127,9 @@ void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
 	}
 }
 
-void USkill_WeaponActive_Base::InitalTags()
+void USkill_WeaponActive_Base::InitalDefaultTags()
 {
-	Super::InitalTags();
+	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
 
