@@ -85,6 +85,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/HUD/PawnState");
         PublicIncludePaths.Add("Planet/UI/HUD/PawnState/ActionStateHUD");
         PublicIncludePaths.Add("Planet/UI/HUD/PawnState/BuildingStateHUD");
+        PublicIncludePaths.Add("Planet/UI/HUD/FocusTitle");
         PublicIncludePaths.Add("Planet/UI/UMGs");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");

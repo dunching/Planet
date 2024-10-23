@@ -1,5 +1,5 @@
 
-#include "CharacterTitle.h"
+#include "FocusTitle.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/ProgressBar.h"
@@ -18,7 +18,7 @@
 #include "CharacterBase.h"
 #include "GameplayTagsSubSystem.h"
 
-struct FCharacterTitle : public TStructVariable<FCharacterTitle>
+struct FFocusTitle : public TStructVariable<FFocusTitle>
 {
 	const FName HP_ProgressBar = TEXT("HP_ProgressBar");
 
@@ -35,22 +35,58 @@ struct FCharacterTitle : public TStructVariable<FCharacterTitle>
 	const FName CanvasPanel = TEXT("CanvasPanel");
 };
 
-void UCharacterTitle::NativeConstruct()
+void UFocusTitle::NativeConstruct()
 {
 	Super::NativeConstruct();
+}
 
-	Scale = UWidgetLayoutLibrary::GetViewportScale(this);
+void UFocusTitle::NativeDestruct()
+{
+	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
 
-	SetAnchorsInViewport(FAnchors(.5f));
-	SetAlignmentInViewport(FVector2D(.5f, 1.f));
+	if (MaxHPValueChanged)
+	{
+		MaxHPValueChanged->UnBindCallback();
+	}
+	if (CurrentHPValueChanged)
+	{
+		CurrentHPValueChanged->UnBindCallback();
+	}
 
+	for (auto Iter : ValueChangedAry)
+	{
+		if (Iter)
+		{
+			Iter->UnBindCallback();
+		}
+	}
+
+	if (CharacterPtr)
+	{
+		{
+			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
+		}
+	}
+
+	Super::NativeDestruct();
+}
+
+void UFocusTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+}
+
+void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
+{
+	CharacterPtr = TargetCharacterPtr;
 	if (CharacterPtr)
 	{
 		float Radius = 0.f;
 		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
 
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent(); 
+			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
 			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
 		}
 		{
@@ -92,70 +128,30 @@ void UCharacterTitle::NativeConstruct()
 	SwitchCantBeSelect(false);
 
 	ApplyCharaterNameToTitle();
-
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
-	ResetPosition(0.f);
 }
 
-void UCharacterTitle::NativeDestruct()
+void UFocusTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
 {
-	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
-
-	if (MaxHPValueChanged)
-	{
-		MaxHPValueChanged->UnBindCallback();
-	}
-	if (CurrentHPValueChanged)
-	{
-		CurrentHPValueChanged->UnBindCallback();
-	}
-
-	for (auto Iter : ValueChangedAry)
-	{
-		if (Iter)
-		{
-			Iter->UnBindCallback();
-		}
-	}
-
-	if (CharacterPtr)
-	{
-		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
-			GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
-		}
-	}
-
-	Super::NativeDestruct();
-}
-
-void UCharacterTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
-}
-
-void UCharacterTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
-{
-	auto WidgetPtr = Cast<UBorder>(GetWidgetFromName(FCharacterTitle::Get().Border));
+	auto WidgetPtr = Cast<UBorder>(GetWidgetFromName(FFocusTitle::Get().Border));
 	if (WidgetPtr)
 	{
-		WidgetPtr->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, bIsCanBeSelect ? .3f: 1.f));
+		WidgetPtr->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, bIsCanBeSelect ? .3f : 1.f));
 	}
 }
 
-void UCharacterTitle::OnHPCurrentValueChanged(int32 NewVal)
+void UFocusTitle::OnHPCurrentValueChanged(int32 NewVal)
 {
 	CurrentHP = NewVal;
 	OnHPChanged();
 }
 
-void UCharacterTitle::OnHPMaxValueChanged(int32 NewVal)
+void UFocusTitle::OnHPMaxValueChanged(int32 NewVal)
 {
 	MaxHP = NewVal;
 	OnHPChanged();
 }
 
-void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
+void UFocusTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
 	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Debuff))
 	{
@@ -182,17 +178,17 @@ void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, in
 	}
 }
 
-void UCharacterTitle::OnHPChanged()
+void UFocusTitle::OnHPChanged()
 {
 	{
-		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().HP_ProgressBar));
+		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FFocusTitle::Get().HP_ProgressBar));
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetPercent(static_cast<float>(CurrentHP) / MaxHP);
 		}
 	}
 	{
-		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Text));
+		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FFocusTitle::Get().Text));
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), CurrentHP, MaxHP)));
@@ -200,9 +196,9 @@ void UCharacterTitle::OnHPChanged()
 	}
 }
 
-void UCharacterTitle::OnPPChanged()
+void UFocusTitle::OnPPChanged()
 {
-	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().PP_ProgressBar));
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FFocusTitle::Get().PP_ProgressBar));
 	if (WidgetPtr)
 	{
 		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
@@ -210,9 +206,9 @@ void UCharacterTitle::OnPPChanged()
 	}
 }
 
-void UCharacterTitle::OnShieldChanged()
+void UFocusTitle::OnShieldChanged()
 {
-	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().Shield_ProgressBar));
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FFocusTitle::Get().Shield_ProgressBar));
 	if (WidgetPtr)
 	{
 		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
@@ -220,10 +216,10 @@ void UCharacterTitle::OnShieldChanged()
 	}
 }
 
-void UCharacterTitle::ApplyCharaterNameToTitle()
+void UFocusTitle::ApplyCharaterNameToTitle()
 {
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Title));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FFocusTitle::Get().Title));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
@@ -231,7 +227,7 @@ void UCharacterTitle::ApplyCharaterNameToTitle()
 	}
 }
 
-void UCharacterTitle::ApplyStatesToTitle()
+void UFocusTitle::ApplyStatesToTitle()
 {
 	FString Title;
 	for (const auto Iter : TagSet)
@@ -249,7 +245,7 @@ void UCharacterTitle::ApplyStatesToTitle()
 	}
 
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Title));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FFocusTitle::Get().Title));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromString(Title));
@@ -257,7 +253,7 @@ void UCharacterTitle::ApplyStatesToTitle()
 	}
 }
 
-bool UCharacterTitle::ResetPosition(float InDeltaTime)
+bool UFocusTitle::ResetPosition(float InDeltaTime)
 {
 	FVector2D ScreenPosition = FVector2D::ZeroVector;
 	UGameplayStatics::ProjectWorldToScreen(

@@ -29,6 +29,7 @@ class UCharacterRisingTips;
 class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
+class UFocusTitle;
 
 /**
  *
@@ -40,12 +41,8 @@ class PLANET_API UMainUILayout : public UMyUserWidget
 
 public:
 
-#if WITH_EDITOR
 	virtual void NativeConstruct()override;
-#else
-	virtual void NativePreConstruct()override;
-#endif
-	
+
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UBackpackMenu>BackpackMenuClass;
@@ -64,6 +61,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UProgressTips>ProgressTipsClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UFocusTitle>FocusTitleClass;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
@@ -87,4 +87,13 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName HUD_TeamSocket;
 	
+};
+
+UCLASS()
+class PLANET_API UMainHUD : public UMainUILayout
+{
+	GENERATED_BODY()
+
+public:
+
 };

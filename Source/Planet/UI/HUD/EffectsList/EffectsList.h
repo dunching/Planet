@@ -36,9 +36,14 @@ public:
 
 	virtual void NativeDestruct()override;
 
+	virtual void SynchronizeProperties()override;
+
 	UEffectItem* AddEffectItem();
 
 	void BindCharacterState(ACharacterBase*TargetCharacterPtr);
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "WrapBox Settings")
+	bool bIsPositiveSequence = true;
 
 protected:
 
@@ -50,7 +55,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Class")
 	TSubclassOf<UEffectItem>EffectItemClass;
-
+	
 	FCallbackHandle CallbackHandle;
 
 	FCharacterStateMapHandle CharacterStateMapHandle;

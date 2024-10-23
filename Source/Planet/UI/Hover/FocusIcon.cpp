@@ -5,6 +5,8 @@
 #include <Blueprint/WidgetLayoutLibrary.h>
 #include <Components/SizeBox.h>
 
+#include "CharacterBase.h"
+
 void UFocusIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -41,7 +43,7 @@ bool UFocusIcon::ResetPosition(float InDeltaTime)
 	FVector2D ScreenPosition = FVector2D::ZeroVector;
 	UGameplayStatics::ProjectWorldToScreen(
 		UGameplayStatics::GetPlayerController(this, 0),
-		FocusItem.Actor->GetActorLocation(),
+		TargetCharacterPtr->GetActorLocation(),
 		ScreenPosition
 	);
 

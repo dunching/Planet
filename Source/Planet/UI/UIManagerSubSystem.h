@@ -33,6 +33,7 @@ class UHUD_TeamInfo;
 class UGetItemInfosList;
 class URaffleMenu;
 class UMenuLayout;
+class UFocusIcon;
 
 struct FPawnDataStruct;
 struct FSceneTool;
@@ -91,8 +92,15 @@ public:
 
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
+	
+	// 锁定目标时
+	void OnFocusCharacter(ACharacterBase*TargetCharacterPtr);
+
+	void InitialUI();
 
 protected:
+
+	void InitialHoverUI();
 
 	UMainUILayout* GetMainHUD();
 
@@ -105,5 +113,7 @@ protected:
 	UMenuLayout* MenuLayoutPtr = nullptr;
 
 private:
+
+	UFocusIcon* FocusIconPtr = nullptr;
 
 };

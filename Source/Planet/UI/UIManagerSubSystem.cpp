@@ -36,6 +36,9 @@
 #include "UICommon.h"
 #include "MenuLayout.h"
 #include "PawnStateConsumablesHUD.h"
+#include "FocusTitle.h"
+#include "PlanetPlayerController.h"
+#include "FocusIcon.h"
 
 struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>
 {
@@ -48,6 +51,8 @@ struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>
 	FName PawnStateConsumablesHUD_Socket = TEXT("PawnStateConsumablesHUD_Socket");
 
 	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
+
+	FName FocusCharacterSocket = TEXT("FocusCharacterSocket");
 };
 
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
@@ -304,6 +309,7 @@ UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
 		auto UIPtr = CreateWidget<UEffectsList>(GetWorldImp(), MainUILayoutPtr->EffectsListClass);
 		if (UIPtr)
 		{
+			UIPtr->bIsPositiveSequence = false;
 			BorderPtr->AddChild(UIPtr);
 
 			return UIPtr;
@@ -374,20 +380,111 @@ UGetItemInfosList* UUIManagerSubSystem::GetItemInfos()
 	return nullptr;
 }
 
+void UUIManagerSubSystem::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)
+{
+	// 
+	if (TargetCharacterPtr)
+	{
+		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+		FocusIconPtr = CreateWidget<UFocusIcon>(GetWorldImp(), AssetRefMapPtr->FocusIconClass);
+		if (FocusIconPtr)
+		{
+			FocusIconPtr->TargetCharacterPtr = TargetCharacterPtr;
+			FocusIconPtr->AddToViewport(EUIOrder::kFocus);
+		}
+	}
+	else
+	{
+		if (FocusIconPtr)
+		{
+			FocusIconPtr->RemoveFromParent();
+			FocusIconPtr = nullptr;
+		}
+	}
+
+	MainUILayoutPtr = GetMainHUD();
+	if (!MainUILayoutPtr)
+	{
+		return;
+	}
+
+	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().FocusCharacterSocket));
+	if (!BorderPtr)
+	{
+		return;
+	}
+
+	if (TargetCharacterPtr)
+	{
+		// 
+		UFocusTitle* UIPtr = nullptr;
+		for (auto Iter : BorderPtr->GetAllChildren())
+		{
+			UIPtr = Cast<UFocusTitle>(Iter);
+			if (UIPtr)
+			{
+				break;
+			}
+		}
+		if (!UIPtr)
+		{
+			UIPtr = CreateWidget<UFocusTitle>(GetWorldImp(), MainUILayoutPtr->FocusTitleClass);
+			BorderPtr->AddChild(UIPtr);
+		}
+		if (UIPtr)
+		{
+			UIPtr->SetTargetCharacter(TargetCharacterPtr);
+		}
+	}
+	else
+	{
+		BorderPtr->ClearChildren();
+	}
+}
+
+void UUIManagerSubSystem::InitialUI()
+{
+	DisplayActionStateHUD(false);
+	DisplayBuildingStateHUD(false);
+	DisplayTeamInfo(false);
+	ViewEffectsList(false);
+	ViewProgressTips(false);
+	OnFocusCharacter(nullptr);
+
+	InitialHoverUI();
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	if (PCPtr)
+	{
+		// 绑定效果状态栏
+		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
+		if (EffectPtr)
+		{
+			EffectPtr->BindCharacterState(PCPtr->GetPawn<ACharacterBase>());
+		}
+	}
+}
+
+void UUIManagerSubSystem::InitialHoverUI()
+{
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	if (PCPtr)
+	{
+		auto DelegateHandle = 
+			PCPtr->OnFocusCharacterDelegate.AddCallback(std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1));
+		DelegateHandle->bIsAutoUnregister = false;
+	}
+}
+
 UMainUILayout* UUIManagerSubSystem::GetMainHUD()
 {
 	if (!MainUILayoutPtr)
 	{
+		// 初始化
 		MainUILayoutPtr = CreateWidget<UMainUILayout>(GetWorldImp(), UAssetRefMap::GetInstance()->MainUILayoutClass);
 		if (MainUILayoutPtr)
 		{
 			MainUILayoutPtr->AddToViewport(EUIOrder::kMainUI);
-
-			DisplayActionStateHUD(false);
-			DisplayBuildingStateHUD(false);
-			DisplayTeamInfo(false);
-			ViewEffectsList(false);
-			ViewProgressTips(false);
 		}
 	}
 

@@ -58,4 +58,6 @@ protected:
 
 private:
 
+	int32 Value = 0;
+
 };

@@ -13,9 +13,13 @@ class UMyWrapBox : public UWrapBox
 	GENERATED_BODY()
 
 public:
-
-protected:
+	
+	bool bIsPositiveSequence = true;
 
 	virtual TSharedRef<SWidget> RebuildWidget() override;
+
+	virtual void SynchronizeProperties()override;
+
+protected:
 
 };

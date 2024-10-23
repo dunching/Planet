@@ -31,7 +31,7 @@ public:
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
-	FFocusKnowledge::FFocusItem FocusItem;
+	ACharacterBase* TargetCharacterPtr = nullptr;
 
 protected:
 

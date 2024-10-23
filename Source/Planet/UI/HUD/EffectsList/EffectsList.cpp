@@ -1,12 +1,35 @@
 
 #include "EffectsList.h"
 
+#include "Blueprint\WidgetTree.h"
+
 #include "MyWrapBox.h"
 #include "EffectItem.h"
 #include "CS_Base.h"
 #include "CharacterBase.h"
 #include "BaseFeatureComponent.h"
 #include "StateProcessorComponent.h"
+#include "TemplateHelper.h"
+
+struct FEffectsList : public TStructVariable<FEffectsList>
+{
+	const FName WrapBox = TEXT("WrapBox");
+};
+
+PRAGMA_DISABLE_DEPRECATION_WARNINGS
+void UEffectsList::SynchronizeProperties()
+{
+	Super::SynchronizeProperties();
+
+	WidgetTree->ForEachWidget([&](UWidget* Widget) {
+		if (auto UserWidget = Cast<UMyWrapBox>(Widget))
+		{
+			UserWidget->bIsPositiveSequence = bIsPositiveSequence;
+			UserWidget->SynchronizeProperties();
+		}
+		});
+}
+PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 void UEffectsList::NativeConstruct()
 {
@@ -27,7 +50,7 @@ void UEffectsList::NativeDestruct()
 
 UEffectItem* UEffectsList::AddEffectItem()
 {
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(TEXT("WrapBox")));
+	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
 	if (UIPtr)
 	{
 		auto ChildPtr = CreateWidget<UEffectItem>(this, EffectItemClass);
@@ -79,7 +102,7 @@ void UEffectsList::OnCharacterStateMapChanged(const TSharedPtr<FCharacterStateIn
 
 void UEffectsList::ResetUIByData()
 {
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(TEXT("WrapBox")));
+	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
 	if (UIPtr)
 	{
 		UIPtr->ClearChildren();

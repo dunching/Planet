@@ -49,23 +49,17 @@ void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type 
 {
 	ClearFocus(InPriority);
 
-	if (NewFocus)
+	if (auto TargetCharacterPtr = Cast<ACharacterBase>(NewFocus))
 	{
-		BindOnFocusRemove(NewFocus);
+		BindOnFocusRemove(TargetCharacterPtr);
 
 		if (InPriority >= FocusInformation.Priorities.Num())
 		{
 			FocusInformation.Priorities.SetNum(InPriority + 1);
 		}
-		FocusInformation.Priorities[InPriority].Actor = NewFocus;
+		FocusInformation.Priorities[InPriority].Actor = TargetCharacterPtr;
 
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-		FocusIconPtr = CreateWidget<UFocusIcon>(GetWorldImp(), AssetRefMapPtr->FocusIconClass);
-		if (FocusIconPtr)
-		{
-			FocusIconPtr->FocusItem = FocusInformation.Priorities[InPriority];
-			FocusIconPtr->AddToViewport(EUIOrder::kFocus);
-		}
+		OnFocusCharacterDelegate(TargetCharacterPtr);
 	}
 }
 
@@ -102,11 +96,7 @@ void APlanetPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
 		FocusInformation.Priorities[InPriority].Position = FAISystem::InvalidLocation;
 	}
 
-	if (FocusIconPtr)
-	{
-		FocusIconPtr->RemoveFromParent();
-		FocusIconPtr = nullptr;
-	}
+	OnFocusCharacterDelegate(nullptr);
 }
 
 FVector APlanetPlayerController::GetFocalPoint() const
@@ -169,12 +159,7 @@ void APlanetPlayerController::BeginPlay()
 				NewProcessor->SetPawn(Cast<AHumanCharacter>(CurrentPawn));
 				});
 
-			// 绑定效果状态栏
-			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-			if (EffectPtr)
-			{
-				EffectPtr->BindCharacterState(GetRealCharacter());
-			}
+			UUIManagerSubSystem::GetInstance()->InitialUI();
 		}
 	}
 #endif
@@ -431,6 +416,7 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 		return;
 	}
 
+	// “消失”时
 	Actor->OnEndPlay.AddDynamic(this, &ThisClass::OnFocusEndplay);
 
 	auto CharacterPtr = Cast<ACharacterBase>(Actor);
@@ -445,6 +431,7 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 		return;
 	}
 
+	// 目标进入“死亡”标签
 	auto& DelegateRef = AIPCPtr->GetAbilitySystemComponent()->RegisterGameplayTagEvent(
 		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
 		EGameplayTagEventType::NewOrRemoved

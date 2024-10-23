@@ -36,6 +36,9 @@ public:
 
 	using FPawnType = ACharacterBase;
 
+	using FOnFocusCharacterDelegate =
+		TCallbackHandleContainer<void(ACharacterBase*)>;
+
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
 
 	virtual void SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
@@ -65,6 +68,8 @@ public:
 	virtual ACharacterBase* GetRealCharacter()const override;
 
 	void OnHPChanged(int32 CurrentValue);
+
+	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
 protected:
 
@@ -102,6 +107,4 @@ protected:
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge	FocusInformation;
-
-	UFocusIcon* FocusIconPtr = nullptr;
 };
