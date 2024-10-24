@@ -152,14 +152,14 @@ void APlanetPlayerController::BeginPlay()
 
 			UNavgationSubSystem::GetInstance();
 
+			UUIManagerSubSystem::GetInstance()->InitialUI();
+
 			// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
 			// 
 			// 在SetPawn之后调用
 			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, CurrentPawn](auto NewProcessor) {
 				NewProcessor->SetPawn(Cast<AHumanCharacter>(CurrentPawn));
 				});
-
-			UUIManagerSubSystem::GetInstance()->InitialUI();
 		}
 	}
 #endif

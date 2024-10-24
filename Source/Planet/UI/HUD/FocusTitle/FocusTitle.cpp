@@ -17,6 +17,7 @@
 #include "GenerateType.h"
 #include "CharacterBase.h"
 #include "GameplayTagsSubSystem.h"
+#include "EffectsList.h"
 
 struct FFocusTitle : public TStructVariable<FFocusTitle>
 {
@@ -33,6 +34,8 @@ struct FFocusTitle : public TStructVariable<FFocusTitle>
 	const FName Title = TEXT("Title");
 
 	const FName CanvasPanel = TEXT("CanvasPanel");
+
+	const FName EffectsList = TEXT("EffectsList");
 };
 
 void UFocusTitle::NativeConstruct()
@@ -123,6 +126,12 @@ void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
 				std::bind(&ThisClass::OnShieldChanged, this)
 			));
 			OnShieldChanged();
+		}
+
+		auto EffectPtr = Cast<UEffectsList>(GetWidgetFromName(FFocusTitle::Get().EffectsList));
+		if (EffectPtr)
+		{
+			EffectPtr->BindCharacterState(TargetCharacterPtr);
 		}
 	}
 	SwitchCantBeSelect(false);

@@ -104,7 +104,7 @@ void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	FDoRepLifetimeParams Params;
 	Params.bIsPushBased = true;
 
-	Params.Condition = COND_OwnerOnly;
+	Params.Condition = COND_None;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterStateInfo_FASI_Container, Params);
 }
 
@@ -181,6 +181,32 @@ void UStateProcessorComponent::RemoveStateDisplay(const TSharedPtr<FCharacterSta
 	{
 	}
 #endif
+}
+
+auto UStateProcessorComponent::BindCharacterStateChanged(const std::function<void(ECharacterStateType, UCS_Base*)>& Func)
+->UStateProcessorComponent::FCharacterStateChanged::FCallbackHandleSPtr
+{
+	auto CallbackHandle = CharacterStateChangedContainer.AddCallback(Func);
+
+	for (const auto& Iter : CharacterStateMap)
+	{
+		CharacterStateChangedContainer(ECharacterStateType::kActive, Iter.Value);
+	}
+
+	return CallbackHandle;
+}
+
+auto UStateProcessorComponent::BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func) 
+-> UStateProcessorComponent::FCharacterStateMapChanged::FCallbackHandleSPtr
+{
+	auto CallbackHandle = CharacterStateMapChanged.AddCallback(Func);
+
+	for (const auto& Iter : StateDisplayMap)
+	{
+		CharacterStateMapChanged(Iter.Value, true);
+	}
+
+	return CallbackHandle;
 }
 
 void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
@@ -605,10 +631,10 @@ FGameplayAbilitySpec UStateProcessorComponent::MakeSpec(
 	int32 InputID
 )
 {
-// 	auto GACDOPtr = InAbilityClass.GetDefaultObject();
-// 
-// 	// 仅针对
-// 	GACDOPtr->InitalDefaultTags();
+	// 	auto GACDOPtr = InAbilityClass.GetDefaultObject();
+	// 
+	// 	// 仅针对
+	// 	GACDOPtr->InitalDefaultTags();
 
 	FGameplayAbilitySpec Spec(InAbilityClass, 1, InputID);
 

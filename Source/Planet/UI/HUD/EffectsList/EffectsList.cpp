@@ -64,11 +64,11 @@ UEffectItem* UEffectsList::AddEffectItem()
 
 void UEffectsList::BindCharacterState(ACharacterBase* TargetCharacterPtr)
 {
-	CallbackHandle = TargetCharacterPtr->GetStateProcessorComponent()->CharacterStateChangedContainer.AddCallback(
+	CallbackHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateChanged(
 		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
 	);
 
-	CharacterStateMapHandle = TargetCharacterPtr->GetStateProcessorComponent()->CharacterStateMapChanged.AddCallback(
+	CharacterStateMapHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateMapChanged(
 		std::bind(&ThisClass::OnCharacterStateMapChanged, this, std::placeholders::_1, std::placeholders::_2)
 	);
 }
