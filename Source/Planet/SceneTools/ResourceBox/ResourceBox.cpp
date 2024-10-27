@@ -6,6 +6,9 @@
 #include <Components/BoxComponent.h>
 #include <Components/WidgetComponent.h>
 #include "ActorSequencePlayer.h"
+
+#include "LogWriter.h"
+
 #include "CharacterBase.h"
 
 AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer) :
@@ -78,15 +81,19 @@ void AResourceBox::Tick(float DeltaSeconds)
 
 void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
 {
-	if (bIsOpend)
+	if (
+		!bIsOpend &&
+		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < Range)
+		)
 	{
+		InteractionImp();
+
+		Super::Interaction(InCharacterPtr);
 	}
 	else
 	{
-		InteractionImp();
+		PRINTINVOKEWITHSTR(FString(TEXT("Box ss Opening")));
 	}
-
-	Super::Interaction(InCharacterPtr);
 }
 
 void AResourceBox::InteractionImp_Implementation()

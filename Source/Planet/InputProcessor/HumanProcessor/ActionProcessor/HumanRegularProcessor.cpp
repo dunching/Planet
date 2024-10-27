@@ -186,8 +186,8 @@ namespace HumanProcessor
 			if (LookAtSceneObjPtr)
 			{
 				LookAtSceneObjPtr->EndLookAt();
-				LookAtSceneObjPtr = nullptr;
 			}
+			LookAtSceneObjPtr = nullptr;
 		}
 	}
 
