@@ -354,32 +354,6 @@ UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 	return nullptr;
 }
 
-UGetItemInfosList* UUIManagerSubSystem::GetItemInfos()
-{
-	MainUILayoutPtr = GetMainHUD();
-	if (!MainUILayoutPtr)
-	{
-		return nullptr;
-	}
-
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().GetItemInfos_Socket));
-	if (!BorderPtr)
-	{
-		return nullptr;
-	}
-
-	for (auto Iter : BorderPtr->GetAllChildren())
-	{
-		auto UIPtr = Cast<UGetItemInfosList>(Iter);
-		if (UIPtr)
-		{
-			return UIPtr;
-		}
-	}
-
-	return nullptr;
-}
-
 void UUIManagerSubSystem::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)
 {
 	// 

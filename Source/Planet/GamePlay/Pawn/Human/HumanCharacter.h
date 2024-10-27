@@ -33,8 +33,6 @@ public:
 
 	AHumanCharacter(const FObjectInitializer& ObjectInitializer);
 
-	virtual TPair<FVector, FVector>GetCharacterViewInfo();
-
 protected:
 
 	virtual void BeginPlay() override;

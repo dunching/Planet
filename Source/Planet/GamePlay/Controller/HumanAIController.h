@@ -19,7 +19,7 @@ class UCharacterTitle;
 class UGroupMnaggerComponent;
 struct FCharacterProxy;
 class ACharacterBase;
-class AHumanCharacter;
+class AHumanCharacter_NPC;
 class UStateTreeComponent;
 class UStateTreeAIComponent;
 class UAIPerceptionComponent;
@@ -37,7 +37,7 @@ public:
 
 	using FCharacterUnitType = FCharacterProxy;
 
-	using FPawnType = AHumanCharacter;
+	using FPawnType = AHumanCharacter_NPC;
 
 	using FTeamHelperChangedDelegate =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;

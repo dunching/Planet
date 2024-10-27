@@ -52,19 +52,6 @@ AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 {
 }
 
-TPair<FVector, FVector> AHumanCharacter::GetCharacterViewInfo()
-{
-	FMinimalViewInfo DesiredView;
-
-	GetCameraComp()->GetCameraView(0, DesiredView);
-
-	TPair<FVector, FVector>Result(
-		DesiredView.Location, DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
-	);
-
-	return Result;
-}
-
 void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -76,38 +63,6 @@ void AHumanCharacter::BeginPlay()
 		{
 			if (GetController()->IsA(APlanetPlayerController::StaticClass()))
 			{
-				auto UIPtr = UUIManagerSubSystem::GetInstance()->GetItemInfos();
-				{
-					auto Handle =
-						GetHoldingItemsComponent()->OnSkillUnitChanged.AddCallback(
-							std::bind(&UGetItemInfosList::OnSkillUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-							));
-					Handle->bIsAutoUnregister = false;
-				}
-				{
-					auto Handle =
-						GetHoldingItemsComponent()->OnCoinUnitChanged.AddCallback(
-							std::bind(&UGetItemInfosList::OnCoinUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
-							));
-					Handle->bIsAutoUnregister = false;
-				}
-				{
-					auto Handle =
-						GetHoldingItemsComponent()->OnConsumableUnitChanged.AddCallback(
-							std::bind(&UGetItemInfosList::OnConsumableUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-							));
-					Handle->bIsAutoUnregister = false;
-				}
-				{
-					auto Handle =
-						GetHoldingItemsComponent()->OnGroupmateUnitChanged.AddCallback(
-							std::bind(&UGetItemInfosList::OnGourpmateUnitChanged, UIPtr, std::placeholders::_1, std::placeholders::_2
-							));
-					Handle->bIsAutoUnregister = false;
-				}
-#if TESTPLAYERCHARACTERHOLDDATA
-				TestCommand::AddPlayerCharacterTestDataImp(this);
-#endif
 			}
 			else if (GetController()->IsA(AHumanAIController::StaticClass()))
 			{

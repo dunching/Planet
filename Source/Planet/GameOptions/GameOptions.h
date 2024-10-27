@@ -30,6 +30,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
 	int32 NPC_HP_Display_MoveToAttaclAreaOffset = 10;
 	
+	// 生命值低于此百分比时，显示‘重伤“效果
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
+	int32 LowerHP_Percent = 20;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
 	bool bIsAllowAdjustTime = true;
 

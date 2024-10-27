@@ -24,7 +24,7 @@
 #include "PlanetPlayerState.h"
 #include "CharacterBase.h"
 #include "ArticleBase.h"
-#include "HumanCharacter.h"
+#include "HumanCharacter_Player.h"
 #include "PlacingBuildingAreaProcessor.h"
 #include "ActionTrackVehiclePlace.h"
 #include "PlacingWallProcessor.h"

@@ -58,15 +58,15 @@ AHorseCharacter::AHorseCharacter(const FObjectInitializer& ObjectInitializer) :
 
 TPair<FVector, FVector> AHorseCharacter::GetCharacterViewInfo()
 {
-	FMinimalViewInfo DesiredView;
+// 	FMinimalViewInfo DesiredView;
+// 
+// 	GetCameraComp()->GetCameraView(0, DesiredView);
+// 
+// 	TPair<FVector, FVector>Result(
+// 		DesiredView.Location, DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
+// 	);
 
-	GetCameraComp()->GetCameraView(0, DesiredView);
-
-	TPair<FVector, FVector>Result(
-		DesiredView.Location, DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
-	);
-
-	return Result;
+	return {};
 }
 
 void AHorseCharacter::SwitchDisplayMountTips(bool bIsDisplay)

@@ -80,13 +80,14 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Menus/RaffleMenu");
         PublicIncludePaths.Add("Planet/UI/HUD");
         PublicIncludePaths.Add("Planet/UI/HUD/EffectsList");
-        PublicIncludePaths.Add("Planet/UI/HUD/Team");
         PublicIncludePaths.Add("Planet/UI/HUD/GetItemInfos");
-        PublicIncludePaths.Add("Planet/UI/HUD/PawnState");
-        PublicIncludePaths.Add("Planet/UI/HUD/PawnState/ActionStateHUD");
-        PublicIncludePaths.Add("Planet/UI/HUD/PawnState/BuildingStateHUD");
         PublicIncludePaths.Add("Planet/UI/HUD/FocusTitle");
         PublicIncludePaths.Add("Planet/UI/UMGs");
+        PublicIncludePaths.Add("Planet/UI/UILayout");
+        PublicIncludePaths.Add("Planet/UI/UILayout/Team");
+        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState");
+        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/ActionStateHUD");
+        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/BuildingStateHUD");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");
         PublicIncludePaths.Add("Planet/AI/EQS");

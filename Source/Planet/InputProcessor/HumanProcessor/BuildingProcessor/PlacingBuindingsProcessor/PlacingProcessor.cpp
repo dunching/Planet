@@ -12,9 +12,8 @@
 #include "Character/GravityMovementComponent.h"
 //#include "VoxelSceneActor.h"
 
-#include "HumanCharacter.h"
+#include "HumanCharacter_Player.h"
 #include "Animation/AnimInstanceBase.h"
-
 
 #include "LogHelper/LogWriter.h"
 #include "UIManagerSubSystem.h"
@@ -27,6 +26,7 @@
 #include "BuildingBase.h"
 #include "CollisionDataStruct.h"
 #include "ThreadLibrary.h"
+#include "HumanCharacter_Player.h"
 
 namespace HumanProcessor
 {
@@ -162,7 +162,7 @@ namespace HumanProcessor
 	{
 		FMinimalViewInfo DesiredView;
 
-		GetOwnerActor<AHumanCharacter>()->GetCameraComp()->GetCameraView(0, DesiredView);
+		GetOwnerActor<FOwnerPawnType>()->GetCameraComp()->GetCameraView(0, DesiredView);
 
 		auto StartPt = DesiredView.Location;
 		auto StopPt = DesiredView.Location + (DesiredView.Rotation.Vector() * 1000);

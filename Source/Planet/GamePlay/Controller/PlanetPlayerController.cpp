@@ -37,7 +37,7 @@
 #include "BaseFeatureComponent.h"
 #include "EffectsList.h"
 #include "PlanetPlayerState.h"
-#include "GameMode_Main.h"
+#include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
@@ -158,7 +158,7 @@ void APlanetPlayerController::BeginPlay()
 			// 
 			// 在SetPawn之后调用
 			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, CurrentPawn](auto NewProcessor) {
-				NewProcessor->SetPawn(Cast<AHumanCharacter>(CurrentPawn));
+				NewProcessor->SetPawn(Cast<FPawnType>(CurrentPawn));
 				});
 		}
 	}

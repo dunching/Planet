@@ -6,7 +6,7 @@
 
 #include "InputProcessor.h"
 
-class AHumanCharacter;
+class AHumanCharacter_Player;
 
 namespace HumanProcessor
 {
@@ -18,7 +18,7 @@ namespace HumanProcessor
 
 	public:
 
-		using FOwnerPawnType = AHumanCharacter;
+		using FOwnerPawnType = AHumanCharacter_Player;
 
 		FHumanViewMenuBase(FOwnerPawnType* CharacterPtr);
 

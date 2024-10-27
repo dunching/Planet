@@ -22,7 +22,7 @@
 #include "SceneUnitTable.h"
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
-#include "NPCComponent.h"
+#include "HumanCharacter_AI.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -117,7 +117,7 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	
+
 	InitialAILogic();
 
 	InitialCharacter();
@@ -173,29 +173,34 @@ void AHumanAIController::OnTeamChanged()
 
 void AHumanAIController::InitialCharacter()
 {
-	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
-		EGameplayTagEventType::NewOrRemoved
-	);
-	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
-
-	GroupHelperChangedDelegate =
-		GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
-	OnGroupChanged();
-
-	TeamHelperChangedDelegate =
-		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
-	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
- 
-	// 组件自动调用条件不成功，原因未知
- 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
- 	{
- 		StateTreeAIComponentPtr->StartLogic();
- 	}
-
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
+		auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
+			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+			EGameplayTagEventType::NewOrRemoved
+		);
+		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
+
+		GroupHelperChangedDelegate =
+			GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
+		OnGroupChanged();
+
+		TeamHelperChangedDelegate =
+			GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+		
+#if WITH_EDITORONLY_DATA
+		GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
+#else
+		GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+#endif
+
+		// 组件自动调用条件不成功，原因未知
+		if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
+		{
+			StateTreeAIComponentPtr->StartLogic();
+		}
+
 #if TESTAICHARACTERHOLDDATA
 		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
 #endif
@@ -291,10 +296,10 @@ void AHumanAIController::InitialAILogic()
 		}
 		else if (auto ColonyPtr = Cast<AGeneratorColony>(ParentPtr))
 		{
-// 			// 这里按次序获取要追踪的位置
-// 			auto NPCComponentPtr = GetPawn()->GetComponentByClass<UNPCComponent>();
-// 
-// 			PathFollowComponentPtr = NPCComponentPtr->PathFollowComponentPtr;
+			// 			// 这里按次序获取要追踪的位置
+			// 			auto NPCComponentPtr = GetPawn()->GetComponentByClass<UNPCComponent>();
+			// 
+			// 			PathFollowComponentPtr = NPCComponentPtr->PathFollowComponentPtr;
 		}
 	}
 }

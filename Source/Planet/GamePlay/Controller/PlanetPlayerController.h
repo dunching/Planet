@@ -14,6 +14,7 @@
 #include "PlanetPlayerController.generated.h"
 
 class ACharacterBase;
+class AHumanCharacter_Player;
 class IPlanetControllerInterface;
 struct FCharacterProxy;
 class UFocusIcon;
@@ -34,7 +35,7 @@ class PLANET_API APlanetPlayerController :
 
 public:
 
-	using FPawnType = ACharacterBase;
+	using FPawnType = AHumanCharacter_Player;
 
 	using FOnFocusCharacterDelegate =
 		TCallbackHandleContainer<void(ACharacterBase*)>;

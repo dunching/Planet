@@ -14,7 +14,7 @@
 #include "Character/GravityMovementComponent.h"
 //#include "VoxelSceneActor.h"
 
-#include "HumanCharacter.h"
+#include "HumanCharacter_Player.h"
 
 #include "GameplayAbilitySpec.h"
 #include "AbilitySystemComponent.h"

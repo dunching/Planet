@@ -103,7 +103,7 @@ void UAbilityTask_ControlCameraBySpline::TickTask(float DeltaTime)
 
 		const auto Pt = CameraTrailHelperPtr->SplineComponentPtr->GetWorldLocationAtDistanceAlongSpline(LerpValue);
 
-		TargetCharacterPtr->GetCameraBoom()->TargetOffset = Pt - TargetCharacterPtr->GetActorLocation();
+//		TargetCharacterPtr->GetCameraBoom()->TargetOffset = Pt - TargetCharacterPtr->GetActorLocation();
 		};
 
 	CurrentTime += DeltaTime;

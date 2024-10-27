@@ -8,7 +8,7 @@
 #include "BuildingArea.h"
 #include "HumanCharacter.h"
 #include "HumanAIController.h"
-#include "NPCComponent.h"
+#include "AIComponent.h"
 
 AGeneratorColony::AGeneratorColony(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

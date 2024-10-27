@@ -90,9 +90,6 @@ public:
 	// 进度条/工具
 	UProgressTips* ViewProgressTips(bool bIsViewMenus);
 
-	// 获取物品的提示
-	UGetItemInfosList* GetItemInfos();
-	
 	// 锁定目标时
 	void OnFocusCharacter(ACharacterBase*TargetCharacterPtr);
 
