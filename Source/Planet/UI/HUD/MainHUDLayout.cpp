@@ -45,7 +45,7 @@ UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 
 void UMainHUDLayout::SwitchIsLowerHP(bool bIsLowerHP)
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FMainHUDLayout::Get().GetItemInfos_Socket));
+	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FMainHUDLayout::Get().LowerHPSocket));
 	if (!BorderPtr)
 	{
 		return;

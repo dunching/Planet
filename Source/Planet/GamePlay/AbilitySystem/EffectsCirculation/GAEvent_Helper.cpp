@@ -96,6 +96,7 @@ bool FGAEventData::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 	Ar << RepelDirection;
 	Ar << RepelDistance;
 	Ar << bIsRespawn;
+	Ar << bIsCantEvade;
 
 	Ar << AD_Penetration;
 	Ar << AD_PercentPenetration;

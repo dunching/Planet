@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/HorizontalBox.h"
 #include "Components/Border.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "PlanetPlayerState.h"
 #include "Planet.h"
@@ -69,6 +70,12 @@ void UPawnStateActionHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
 	BindEvent();
 	ResetUIByData();
 }
@@ -79,7 +86,7 @@ void UPawnStateActionHUD::NativeDestruct()
 	{
 		Iter->UnBindCallback();
 	}
-	
+
 	if (OnCanAciveSkillChangedHandle)
 	{
 		OnCanAciveSkillChangedHandle->UnBindCallback();

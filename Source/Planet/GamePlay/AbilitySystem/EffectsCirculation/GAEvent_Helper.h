@@ -47,9 +47,13 @@ struct PLANET_API FGAEventData
 
 	bool GetIsCriticalHited()const;
 
-	UPROPERTY()
 	// 是否是武器造成的伤害
+	UPROPERTY()
 	bool bIsWeaponAttack = false;
+
+	// 是否是武器造成的伤害
+	UPROPERTY()
+	bool bIsCantEvade = false;
 	
 	UPROPERTY()
 	// 是否会造成“受击”效果
@@ -60,41 +64,41 @@ struct PLANET_API FGAEventData
 
 	int32 RepelDistance = -1;
 
-	UPROPERTY()
 	// 是否是“复活”技能
+	UPROPERTY()
 	bool bIsRespawn = false;
 	
 #pragma region 
 	// 这组数据 为基础值（即在SendEventImp之前填写的值） + 人物属性
 
-	UPROPERTY()
 	// 本次攻击的 穿透
+	UPROPERTY()
 	int32 AD_Penetration = 0;
-	
-	UPROPERTY()
+
 	// 本次攻击的 百分比穿透
-	int32 AD_PercentPenetration = 0;
-	
 	UPROPERTY()
+	int32 AD_PercentPenetration = 0;
+
 	// 本次攻击的 命中率(0则为此次被闪避)，若大于 100，则为不可被闪避
 	// 最终结算时：0 未命中 100 命中
+	UPROPERTY()
 	int32 HitRate = 0;
-	
-	UPROPERTY()
+
 	// 本次攻击的 会心率(100则为此次被会心)
-	int32 CriticalHitRate = 0;
-	
 	UPROPERTY()
+	int32 CriticalHitRate = 0;
+
 	// 本次攻击的 会心伤害
+	UPROPERTY()
 	int32 CriticalDamage = 0;
 #pragma endregion
 
-	UPROPERTY()
 	// 造成的真实伤害
-	int32 TrueDamage = 0;
-	
 	UPROPERTY()
+	int32 TrueDamage = 0;
+
 	// 造成的基础伤害
+	UPROPERTY()
 	int32 BaseDamage = 0;
 	
 	// 伤害分布：类型、等级、伤害量

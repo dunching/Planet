@@ -26,7 +26,7 @@ class UPromptBox;
 class AHumanCharacter;
 class UPiginteraction;
 class UDestroyProgress;
-class UMainUILayout;
+class URegularActionLayout;
 class UEffectsList;
 class UProgressTips;
 class UHUD_TeamInfo;
@@ -39,6 +39,9 @@ struct FPawnDataStruct;
 struct FSceneTool;
 struct FCharacterAttributes;
 
+/*
+	HUD、UI
+*/
 UCLASS()
 class PLANET_API UUIManagerSubSystem : public UGameInstanceSubsystem
 {
@@ -60,6 +63,9 @@ public:
 #pragma region  ProcessMode
 	// 普通界面(技能状态HUD)、
 	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr = nullptr);
+	
+	// 重伤状态
+	void DisplayEndangeredState(bool bIsDisplay);
 
 	// 工具、
 	void DisplayBuildingStateHUD(bool bIsDisplay);
@@ -99,13 +105,10 @@ protected:
 
 	void InitialHoverUI();
 
-	UMainUILayout* GetMainHUD();
+	URegularActionLayout* GetRegularActionState();
 
 	UMenuLayout* GetMainMenu();
 	
-	UPROPERTY(Transient)
-	UMainUILayout* MainUILayoutPtr = nullptr;
-
 	UPROPERTY()
 	UMenuLayout* MenuLayoutPtr = nullptr;
 

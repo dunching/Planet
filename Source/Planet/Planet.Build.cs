@@ -7,8 +7,8 @@ public class Planet : ModuleRules
 	public Planet(ReadOnlyTargetRules Target) : base(Target)
     {
         //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        //PCHUsage = PCHUsageMode.UseSharedPCHs;
-        PCHUsage = PCHUsageMode.Default;
+        PCHUsage = PCHUsageMode.UseSharedPCHs;
+        //PCHUsage = PCHUsageMode.Default;
 
         bEnableUndefinedIdentifierWarnings = false;
         bWarningsAsErrors = true;
@@ -88,6 +88,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/UILayout/PawnState");
         PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/ActionStateHUD");
         PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/BuildingStateHUD");
+        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/EndangeredState");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");
         PublicIncludePaths.Add("Planet/AI/EQS");

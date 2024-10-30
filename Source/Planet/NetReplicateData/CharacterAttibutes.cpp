@@ -356,7 +356,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 			}
 
 			// 真实伤害
-			HP.AddCurrentValue(Ref.TrueDamage, Ref.DataSource);
+			HP.AddCurrentValue(-Ref.TrueDamage, Ref.DataSource);
 		}
 
 		{

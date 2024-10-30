@@ -147,8 +147,6 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
-	FCollisionShape  CollisionShape = FCollisionShape::MakeCapsule(45, 90);
-
 	FCollisionQueryParams CapsuleParams;
 	CapsuleParams.AddIgnoredActor(CharacterPtr);
 
@@ -164,6 +162,9 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			}
 		}
 	}
+
+	FCollisionShape CollisionShape = FCollisionShape::MakeCapsule(45, 90);
+
 	TArray<struct FHitResult> OutHits;
 	if (GetWorldImp()->SweepMultiByObjectType(
 		OutHits,
@@ -182,19 +183,25 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
+		TSet<ACharacterBase*>TargetCharacterSet;
 		for (auto Iter : OutHits)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
 			if (TargetCharacterPtr)
 			{
-				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-				GAEventData.bIsWeaponAttack = true;
-				GAEventData.AttackEffectType = EAttackEffectType::kNormalAttackEffect;
-				GAEventData.SetBaseDamage(BaseDamage);
-
-				GAEventDataPtr->DataAry.Add(GAEventData);
+				TargetCharacterSet.Add(TargetCharacterPtr);
 			}
+		}
+
+		for (auto Iter : TargetCharacterSet)
+		{
+			FGAEventData GAEventData(Iter, CharacterPtr);
+
+			GAEventData.bIsWeaponAttack = true;
+			GAEventData.AttackEffectType = EAttackEffectType::kNormalAttackEffect;
+			GAEventData.SetBaseDamage(BaseDamage);
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
 		}
 
 		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();

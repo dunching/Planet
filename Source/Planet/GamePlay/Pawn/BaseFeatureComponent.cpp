@@ -350,7 +350,7 @@ void UBaseFeatureComponent::ExcuteAttackedEffect(const FGameplayAbilityTargetDat
 		{
 			FGameplayEventData Payload;
 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
-			GameplayAbilityTargetDataPtr->AffectedDirection = 
+			GameplayAbilityTargetDataPtr->AffectedDirection =
 				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
 
 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
@@ -858,14 +858,33 @@ void UBaseFeatureComponent::AddReceivedBaseModify()
 
 							// 命中率
 							{
-								const auto HitRate =
-									(
-										TargetCharacterAttributesRef.HitRate.GetCurrentValue() *
-										(100 - TargetCharacterAttributesRef.Evade.GetCurrentValue())
-										) / 100;
+								if (GameplayAbilityTargetData_GAEvent.Data.bIsCantEvade)
+								{
+									const auto TrigggerHitRate = TargetCharacterAttributesRef.HitRate.GetCurrentValue() + GameplayAbilityTargetData_GAEvent.Data.HitRate;
+									const auto SelfEvadeRate = TargetCharacterAttributesRef.Evade.GetCurrentValue();
 
-								GameplayAbilityTargetData_GAEvent.Data.HitRate =
-									((FMath::RandRange(0, 100) <= HitRate) ? 100 : 0);
+									const auto HitRate =
+										(
+											TrigggerHitRate *
+											(100 - SelfEvadeRate)
+											) / 100;
+
+									GameplayAbilityTargetData_GAEvent.Data.HitRate = 100;
+								}
+								else
+								{
+									const auto TrigggerHitRate = TargetCharacterAttributesRef.HitRate.GetCurrentValue() + GameplayAbilityTargetData_GAEvent.Data.HitRate;
+									const auto SelfEvadeRate = TargetCharacterAttributesRef.Evade.GetCurrentValue();
+
+									const auto HitRate =
+										(
+											TrigggerHitRate *
+											(100 - SelfEvadeRate)
+											) / 100;
+
+									GameplayAbilityTargetData_GAEvent.Data.HitRate =
+										((FMath::RandRange(0, 100) <= HitRate) ? 100 : 0);
+								}
 							}
 
 							// 会心伤害
@@ -1038,7 +1057,7 @@ EAffectedDirection UBaseFeatureComponent::GetAffectedDirection(ACharacterBase* T
 	{
 		return EAffectedDirection::kLeft;
 	}
-	
+
 	return EAffectedDirection::kForward;
 }
 

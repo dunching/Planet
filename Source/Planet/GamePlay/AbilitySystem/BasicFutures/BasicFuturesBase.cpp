@@ -24,5 +24,5 @@ void UBasicFuturesBase::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, 
 
 void UBasicFuturesBase::InitalDefaultTags()
 {
-
+	Super::InitalDefaultTags();
 }

@@ -13,8 +13,6 @@
 void UBasicFutures_Respawn::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	CancelAbilitiesWithTag.AddTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag);
 }
 
 void UBasicFutures_Respawn::ActivateAbility(
@@ -30,9 +28,10 @@ void UBasicFutures_Respawn::ActivateAbility(
 
 	PlayMontage(DeathMontage, 1.f);
 
-	if (auto AIPCPtr = CharacterPtr->GetController<AHumanAIController>())
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
 	{
-
 	}
 }
 
@@ -52,7 +51,23 @@ void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
 
 		TaskPtr->ReadyForActivation();
+	}
+}
+
+void UBasicFutures_Respawn::OnMontageComplete()
+{
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority)
+		)
+	{
+	}
+
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
+	{
 	}
 }

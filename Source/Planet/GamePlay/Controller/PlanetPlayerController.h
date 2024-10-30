@@ -72,6 +72,20 @@ public:
 
 	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
+#pragma region CMD
+	
+	UFUNCTION(Server, Reliable)
+	void MakeTrueDamege(const TArray< FString >& Args);
+
+	UFUNCTION(Server, Reliable)
+	void MakeTherapy(const TArray< FString >& Args);
+
+	UFUNCTION(Server, Reliable)
+	void MakeRespawn(const TArray< FString >& Args);
+
+#pragma endregion
+
+
 protected:
 
 	virtual void BeginPlay() override;

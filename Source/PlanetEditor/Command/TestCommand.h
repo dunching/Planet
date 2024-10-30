@@ -215,5 +215,44 @@ namespace TestCommand
 		//可选标志位掩码
 		EConsoleVariableFlags::ECVF_Default
 	);
+	
+	void MakeTrueDamege(const TArray< FString >& Args);
+
+	static FAutoConsoleCommand MakeTrueDamegeCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("MakeTrueDamegeCMD"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandWithArgsDelegate::CreateStatic(MakeTrueDamege),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
+	void MakeTherapy(const TArray< FString >& Args);
+
+	static FAutoConsoleCommand MakeTherapyCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("MakeTherapyCMD"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandWithArgsDelegate::CreateStatic(MakeTherapy),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
+	void MakeRespawn(const TArray< FString >& Args);
+
+	static FAutoConsoleCommand MakeRespawnCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("MakeRespawnCMD"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandWithArgsDelegate::CreateStatic(MakeRespawn),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
 
 };

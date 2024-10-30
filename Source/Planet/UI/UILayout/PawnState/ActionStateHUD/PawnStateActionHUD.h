@@ -43,7 +43,6 @@ public:
 
 	virtual void ResetUIByData()override;
 
-	// 外部初始化
 	ACharacterBase* CharacterPtr = nullptr;
 
 protected:

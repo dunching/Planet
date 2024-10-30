@@ -67,7 +67,6 @@
 #include "HumanViewRaffleMenu.h"
 #include "BaseFeatureComponent.h"
 #include "HumanCharacter_Player.h"
-
 #include "ResourceBox.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(

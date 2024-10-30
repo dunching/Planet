@@ -16,7 +16,7 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "DestroyProgress.h"
-#include "MainUILayout.h"
+#include "RegularActionLayout.h"
 #include "PawnStateActionHUD.h"
 #include "PawnStateBuildingHUD.h"
 #include "BackpackIcon.h"
@@ -32,7 +32,7 @@
 #include "HUD_TeamInfo.h"
 #include "GetItemInfosList.h"
 #include "RaffleMenu.h"
-#include "PlanetPlayerState.h"
+#include "MainHUD.h"
 #include "UICommon.h"
 #include "MenuLayout.h"
 #include "PawnStateConsumablesHUD.h"
@@ -79,116 +79,25 @@ void UUIManagerSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 
 void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr)
 {
-	MainUILayoutPtr = GetMainHUD();
-	if (!MainUILayoutPtr)
+	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
+	if (!MainHUDPtr)
 	{
 		return;
 	}
+	MainHUDPtr->SwitchState(bIsDisplay ? EMainHUDType::kRegularAction : EMainHUDType::kNone);
+}
 
-	// 技能HUD
+void UUIManagerSubSystem::DisplayEndangeredState(bool bIsDisplay)
+{
+	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
+	if (MainHUDPtr)
 	{
-		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().PawnActionStateHUDSocket));
-		if (!BorderPtr)
-		{
-			return;
-		}
-
-		auto UIPtr = Cast<UPawnStateActionHUD>(BorderPtr->GetContent());
-		if (UIPtr)
-		{
-			if (bIsDisplay)
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-			else
-			{
-				UIPtr->RemoveFromParent();
-			}
-		}
-		else
-		{
-			if (bIsDisplay)
-			{
-				UIPtr = CreateWidget<UPawnStateActionHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateActionHUDClass);
-				if (UIPtr)
-				{
-					UIPtr->CharacterPtr = CharacterPtr;
-					BorderPtr->AddChild(UIPtr);
-				}
-			}
-		}
-	}
-
-	// 消耗品HUD
-	{
-		auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().PawnStateConsumablesHUD_Socket));
-		if (!BorderPtr)
-		{
-			return;
-		}
-
-		auto UIPtr = Cast<UPawnStateConsumablesHUD>(BorderPtr->GetContent());
-		if (UIPtr)
-		{
-			if (bIsDisplay)
-			{
-				UIPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-			else
-			{
-				UIPtr->RemoveFromParent();
-			}
-		}
-		else
-		{
-			if (bIsDisplay)
-			{
-				UIPtr = CreateWidget<UPawnStateConsumablesHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateConsumablesHUDClass);
-				if (UIPtr)
-				{
-					BorderPtr->AddChild(UIPtr);
-				}
-			}
-		}
+		MainHUDPtr->SwitchState(bIsDisplay ? EMainHUDType::kEndangered : EMainHUDType::kNone);
 	}
 }
 
 void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
 {
-	MainUILayoutPtr = GetMainHUD();
-	if (!MainUILayoutPtr)
-	{
-		return;
-	}
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->PawnBuildingStateHUDSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	auto UIPtr = Cast<UPawnStateBuildingHUD>(BorderPtr->GetContent());
-	if (UIPtr)
-	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
-	}
-	else
-	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<UPawnStateBuildingHUD>(GetWorldImp(), MainUILayoutPtr->PawnStateBuildingHUDClass);
-			if (UIPtr)
-			{
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
-	}
 }
 
 void UUIManagerSubSystem::SwitchMenu(bool bIsShow)
@@ -241,7 +150,7 @@ void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacte
 
 void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
 {
-	MainUILayoutPtr = GetMainHUD();
+	auto MainUILayoutPtr = GetRegularActionState();
 	if (!MainUILayoutPtr)
 	{
 		return;
@@ -284,7 +193,7 @@ void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 
 UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
 {
-	MainUILayoutPtr = GetMainHUD();
+	auto MainUILayoutPtr = GetRegularActionState();
 	if (!MainUILayoutPtr)
 	{
 		return nullptr;
@@ -327,6 +236,12 @@ UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
 
 UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
 {
+	auto MainUILayoutPtr = GetRegularActionState();
+	if (!MainUILayoutPtr)
+	{
+		return nullptr;
+	}
+
 	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->ProgressTipsSocket));
 	if (!BorderPtr)
 	{
@@ -376,7 +291,7 @@ void UUIManagerSubSystem::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)
 		}
 	}
 
-	MainUILayoutPtr = GetMainHUD();
+	auto MainUILayoutPtr = GetRegularActionState();
 	if (!MainUILayoutPtr)
 	{
 		return;
@@ -426,17 +341,6 @@ void UUIManagerSubSystem::InitialUI()
 	OnFocusCharacter(nullptr);
 
 	InitialHoverUI();
-
-	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-	if (PCPtr)
-	{
-		// 绑定效果状态栏
-		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-		if (EffectPtr)
-		{
-			EffectPtr->BindCharacterState(PCPtr->GetPawn<ACharacterBase>());
-		}
-	}
 }
 
 void UUIManagerSubSystem::InitialHoverUI()
@@ -450,19 +354,15 @@ void UUIManagerSubSystem::InitialHoverUI()
 	}
 }
 
-UMainUILayout* UUIManagerSubSystem::GetMainHUD()
+URegularActionLayout* UUIManagerSubSystem::GetRegularActionState()
 {
-	if (!MainUILayoutPtr)
+	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
+	if (MainHUDPtr)
 	{
-		// 初始化
-		MainUILayoutPtr = CreateWidget<UMainUILayout>(GetWorldImp(), UAssetRefMap::GetInstance()->MainUILayoutClass);
-		if (MainUILayoutPtr)
-		{
-			MainUILayoutPtr->AddToViewport(EUIOrder::kMainUI);
-		}
+		return MainHUDPtr->RegularActionStatePtr;
 	}
 
-	return MainUILayoutPtr;
+	return nullptr;
 }
 
 UMenuLayout* UUIManagerSubSystem::GetMainMenu()

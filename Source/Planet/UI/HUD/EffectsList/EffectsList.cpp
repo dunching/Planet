@@ -45,6 +45,11 @@ void UEffectsList::NativeDestruct()
 		CallbackHandle->UnBindCallback();
 	}
 
+	if (CharacterStateMapHandle)
+	{
+		CharacterStateMapHandle->UnBindCallback();
+	}
+
 	Super::NativeDestruct();
 }
 

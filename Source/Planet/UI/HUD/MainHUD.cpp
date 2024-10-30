@@ -12,6 +12,8 @@
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "GameOptions.h"
+#include "RegularActionLayout.h"
+#include "EndangeredStateLayout.h"
 
 struct FMainHUD : public TStructVariable<FMainHUD>
 {
@@ -32,6 +34,104 @@ void AMainHUD::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitMainHUDLayout();
+	SwitchState(EMainHUDType::kRegularAction);
+}
+
+void AMainHUD::ShowHUD()
+{
+	Super::ShowHUD();
+}
+
+void AMainHUD::SwitchState(EMainHUDType MainHUDType)
+{
+	if (bShowHUD && PlayerOwner)
+	{
+		switch (MainHUDType)
+		{
+		default:
+		{
+			if (EndangeredStatePtr)
+			{
+				EndangeredStatePtr->RemoveFromParent();
+				EndangeredStatePtr = nullptr;
+			}
+			if (RegularActionStatePtr)
+			{
+				RegularActionStatePtr->RemoveFromParent();
+				RegularActionStatePtr = nullptr;
+			}
+		}
+		break;
+		case EMainHUDType::kRegularAction:
+		{
+			if (EndangeredStatePtr)
+			{
+				EndangeredStatePtr->RemoveFromParent();
+				EndangeredStatePtr = nullptr;
+			}
+
+			if (!RegularActionStatePtr)
+			{
+				RegularActionStatePtr = CreateWidget<URegularActionLayout>(GetWorld(), RegularActionStateClass);
+				if (RegularActionStatePtr)
+				{
+					RegularActionStatePtr->AddToViewport(EUIOrder::kHUD);
+				}
+			}
+		}
+		break;
+		case EMainHUDType::kEndangered:
+		{
+			if (RegularActionStatePtr)
+			{
+				RegularActionStatePtr->RemoveFromParent();
+				RegularActionStatePtr = nullptr;
+			}
+
+			if (!EndangeredStatePtr)
+			{
+				EndangeredStatePtr = CreateWidget<UEndangeredStateLayout>(GetWorld(), EndangeredStateClass);
+				if (EndangeredStatePtr)
+				{
+					EndangeredStatePtr->AddToViewport(EUIOrder::kHUD);
+				}
+			}
+		}
+		break;
+		}
+	}
+}
+
+void AMainHUD::OnHPChanged(int32 InCurrentValue)
+{
+	if (bShowHUD && PlayerOwner)
+	{
+		if (PlayerOwner->IsA(APlanetPlayerController::StaticClass()))
+		{
+			auto PCPtr = Cast<APlanetPlayerController>(PlayerOwner);
+			if (!PCPtr)
+			{
+				return;
+			}
+
+			auto& CharacterAttributesRef =
+				PCPtr->GetPawn<ACharacterBase>()->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+			const auto CurrentValue =
+				CharacterAttributesRef.HP.GetCurrentValue();
+			const auto MaxValue =
+				CharacterAttributesRef.HP.GetMaxValue();
+			const auto LowerHP_Percent =
+				UGameOptions::GetInstance()->LowerHP_Percent;
+
+			MainHUDLayoutPtr->SwitchIsLowerHP(CurrentValue < (MaxValue * (LowerHP_Percent / 100.f)));
+		}
+	}
+}
+
+void AMainHUD::InitMainHUDLayout()
+{
 	if (bShowHUD && PlayerOwner)
 	{
 		MainHUDLayoutPtr = CreateWidget<UMainHUDLayout>(GetWorld(), MainHUDLayoutClass);
@@ -49,7 +149,7 @@ void AMainHUD::BeginPlay()
 			}
 
 			{
-				auto& CharacterAttributesRef = 
+				auto& CharacterAttributesRef =
 					PCPtr->GetPawn<ACharacterBase>()->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				auto Handle =
@@ -103,38 +203,6 @@ void AMainHUD::BeginPlay()
 		{
 			MainHUDLayoutPtr->RemoveFromParent();
 			MainHUDLayoutPtr = nullptr;
-		}
-	}
-}
-
-void AMainHUD::ShowHUD()
-{
-	Super::ShowHUD();
-}
-
-void AMainHUD::OnHPChanged(int32 InCurrentValue)
-{
-	if (bShowHUD && PlayerOwner)
-	{
-		if (PlayerOwner->IsA(APlanetPlayerController::StaticClass()))
-		{
-			auto PCPtr = Cast<APlanetPlayerController>(PlayerOwner);
-			if (!PCPtr)
-			{
-				return;
-			}
-
-			auto& CharacterAttributesRef =
-				PCPtr->GetPawn<ACharacterBase>()->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-			const auto CurrentValue = 
-				CharacterAttributesRef.HP.GetCurrentValue();
-			const auto MaxValue =
-				CharacterAttributesRef.HP.GetMaxValue();
-			const auto LowerHP_Percent =
-				UGameOptions::GetInstance()->LowerHP_Percent;
-
-			MainHUDLayoutPtr->SwitchIsLowerHP(CurrentValue < (MaxValue * (LowerHP_Percent / 100.f)));
 		}
 	}
 }

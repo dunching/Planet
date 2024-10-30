@@ -39,6 +39,7 @@
 #include "PlanetPlayerState.h"
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
+#include "CollisionDataStruct.h"
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -438,3 +439,131 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnFocusDeathing);
 }
+
+void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray< FString >& Args)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+			GAEventData.bIsWeaponAttack = true;
+			GAEventData.bIsCantEvade = true;
+			LexFromString(GAEventData.TrueDamage, *Args[0]);
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			ICPtr->SendEventImp(GAEventDataPtr);
+		}
+	}
+}
+
+void APlanetPlayerController::MakeTherapy_Implementation(const TArray< FString >& Args)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+			int32 TreatmentVolume = 0;
+			LexFromString(TreatmentVolume, *Args[0]);
+
+			GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			ICPtr->SendEventImp(GAEventDataPtr);
+		}
+	}
+}
+
+void APlanetPlayerController::MakeRespawn_Implementation(const TArray< FString >& Args)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+			int32 TreatmentVolume = 0;
+			LexFromString(TreatmentVolume, *Args[0]);
+
+			GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
+
+			GAEventData.bIsRespawn = true;
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			ICPtr->SendEventImp(GAEventDataPtr);
+		}
+	}
+}
+

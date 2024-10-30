@@ -64,9 +64,6 @@ public:
 	TSubclassOf<UItemsDragDropOperation>ItemsDragDropOperationClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UMainUILayout>MainUILayoutClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UMenuLayout>MenuLayoutClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")

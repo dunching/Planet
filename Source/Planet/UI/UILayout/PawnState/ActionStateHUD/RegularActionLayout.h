@@ -8,7 +8,7 @@
 
 #include "MyUserWidget.h"
 
-#include "MainUILAyout.generated.h"
+#include "RegularActionLayout.generated.h"
 
 class UMainUILayout;
 class URaffleMenu;
@@ -37,7 +37,8 @@ class UFocusTitle;
  *
  */
 UCLASS()
-class PLANET_API UMainUILayout : public UMyUserWidget
+class PLANET_API URegularActionLayout :
+	public UMyUserWidget
 {
 	GENERATED_BODY()
 
