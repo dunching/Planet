@@ -65,6 +65,8 @@ protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn)override;
+
 	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)override;
 
 	virtual void BindPCWithCharacter()override;
@@ -78,5 +80,7 @@ protected:
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 private:
+
+	void LimitViewYaw(FRotator& ViewRotation, float InViewYawMin, float InViewYawMax);
 
 };

@@ -6,6 +6,7 @@
 #include "Components/StateTreeAIComponent.h"
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
+#include "Kismet/KismetMathLibrary.h"
 
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
@@ -23,6 +24,7 @@
 #include "TalentAllocationComponent.h"
 #include "SceneUnitContainer.h"
 #include "GameMode_Main.h"
+#include "KismetGravityLibrary.h"
 
 APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -173,4 +175,69 @@ void APlanetAIController::OnHPChanged(int32 CurrentValue)
 			}
 			});
 	}
+}
+
+void APlanetAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
+{
+	APawn* const MyPawn = GetPawn();
+	if (MyPawn)
+	{
+		FRotator DeltaRot = FRotator::ZeroRotator;
+		FRotator ViewRotation = GetControlRotation();
+
+		// Look toward focus
+		const FVector FocalPoint = GetFocalPoint();
+		if (FAISystem::IsValidLocation(FocalPoint))
+		{
+			const auto Z = -UKismetGravityLibrary::GetGravity();
+			const auto FocusRotation = UKismetMathLibrary::Quat_FindBetweenVectors(
+				UKismetMathLibrary::MakeRotFromZX(Z, ViewRotation.Vector()).Vector(),
+				UKismetMathLibrary::MakeRotFromZX(Z, FocalPoint - MyPawn->GetActorLocation()).Vector()
+			).Rotator();
+
+			const float AngleTolerance = 1e-3f;
+			if (FMath::IsNearlyZero(FocusRotation.Yaw, AngleTolerance))
+			{
+				DeltaRot.Yaw = 0.f;
+			}
+			else
+			{
+				const float RotationRate_Yaw = 120.f * DeltaTime;
+				DeltaRot.Yaw = FMath::FixedTurn(0.f, FocusRotation.Yaw, RotationRate_Yaw);
+
+				ViewRotation += DeltaRot;
+				DeltaRot = FRotator::ZeroRotator;
+			}
+		}
+		else if (bSetControlRotationFromPawnOrientation)
+		{
+			ViewRotation = MyPawn->GetActorRotation();
+		}
+
+		LimitViewYaw(ViewRotation, 0.f, 360.f - 0.1f);
+		ViewRotation.Pitch = 0.f;
+		ViewRotation.Roll = 0.f;
+
+		SetControlRotation(ViewRotation);
+
+		if (bUpdatePawn)
+		{
+			const FRotator CurrentPawnRotation = MyPawn->GetActorRotation();
+
+			if (CurrentPawnRotation.Equals(ViewRotation, 1e-3f) == false)
+			{
+#if WITH_EDITOR
+				RootComponent->SetWorldLocation(MyPawn->GetActorLocation());
+#endif
+
+				MyPawn->FaceRotation(ViewRotation, DeltaTime);
+			}
+		}
+	}
+}
+
+void APlanetAIController::LimitViewYaw(FRotator& ViewRotation, float InViewYawMin, float InViewYawMax)
+{
+	ViewRotation.Yaw = FMath::ClampAngle(ViewRotation.Yaw, InViewYawMin, InViewYawMax);
+	ViewRotation.Yaw = FRotator::ClampAxis(ViewRotation.Yaw);
 }
