@@ -7,6 +7,7 @@
 #include "UICommon.h"
 #include "GameplayTagsSubSystem.h"
 #include "LogWriter.h"
+#include "CharacterBase.h"
 
 static TAutoConsoleVariable<int32> DebugPrintCAB(
 	TEXT("DebugPrintCAB"),
@@ -48,7 +49,7 @@ void FBasePropertySet::SetValue(int32 NewValue)
 	}
 	else
 	{
-		for (auto &Iter : ValueMap)
+		for (auto& Iter : ValueMap)
 		{
 			if (Iter.Value >= NewValue)
 			{
@@ -298,7 +299,7 @@ void FCharacterAttributes::InitialData()
 
 	Mana_Replay.GetMaxProperty().SetCurrentValue(1000);
 	Mana_Replay.SetCurrentValue(1, DataSource_Character);
-	
+
 	Evade.GetMaxProperty().SetCurrentValue(100);
 	Evade.SetCurrentValue(20, DataSource_Character);
 
@@ -324,6 +325,31 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	{
 	bIsNotChanged = false;
 	};
+
+	if (
+		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+		)
+	{
+		if (GAEvent.Data.bIsRespawn)
+		{
+			GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
+				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Respawning }
+			);
+		}
+		else
+		{
+			return;
+		}
+	}
+	else if (
+		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		)
+	{
+		return;
+	}
+	else
+	{
+	}
 
 	// 处理数据
 	const auto& Ref = GAEvent.Data;
@@ -363,7 +389,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 			auto Lambda = [&Ref](
 				FBasePropertySet& PropertySetRef,
 				const FBaseProperty& Property,
-				const FGameplayTag&InDataSource
+				const FGameplayTag& InDataSource
 				)
 				{
 					if (Ref.bIsClearData)
@@ -445,7 +471,6 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 				}
 				break;
 #pragma endregion
-
 
 #pragma region 
 				case ECharacterPropertyType::AD:

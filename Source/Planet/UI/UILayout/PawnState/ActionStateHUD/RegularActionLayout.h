@@ -32,6 +32,7 @@ class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
 class UFocusTitle;
+class ACharacterBase;
 
 /**
  *
@@ -45,6 +46,18 @@ class PLANET_API URegularActionLayout :
 public:
 
 	virtual void NativeConstruct()override;
+
+	// 锁定目标时,上方显示的状态栏
+	void OnFocusCharacter(ACharacterBase* TargetCharacterPtr);
+
+	// 出战队员列表
+	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
+
+	// 效果栏（buff、debuff）
+	UEffectsList* ViewEffectsList(bool bIsViewMenus);
+
+	// 进度条/工具
+	UProgressTips* ViewProgressTips(bool bIsViewMenus);
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
@@ -89,5 +102,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName HUD_TeamSocket;
-	
+
+protected:
+
+	UFocusIcon* FocusIconPtr = nullptr;
+
 };

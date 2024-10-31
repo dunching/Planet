@@ -39,8 +39,6 @@ void UCharacterTitle::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	Scale = UWidgetLayoutLibrary::GetViewportScale(this);
-
 	SetAnchorsInViewport(FAnchors(.5f));
 	SetAlignmentInViewport(FVector2D(.5f, 1.f));
 
@@ -88,13 +86,13 @@ void UCharacterTitle::NativeConstruct()
 			));
 			OnShieldChanged();
 		}
+		SwitchCantBeSelect(false);
+
+		ApplyCharaterNameToTitle();
+
+		TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
+		ResetPosition(0.f);
 	}
-	SwitchCantBeSelect(false);
-
-	ApplyCharaterNameToTitle();
-
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
-	ResetPosition(0.f);
 }
 
 void UCharacterTitle::NativeDestruct()

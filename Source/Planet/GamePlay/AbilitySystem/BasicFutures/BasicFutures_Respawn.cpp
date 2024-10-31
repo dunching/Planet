@@ -8,7 +8,9 @@
 #include "CharacterBase.h"
 #include "HumanAIController.h"
 #include "GameplayTagsSubSystem.h"
-#include "Planet_Tools.h"
+#include "HumanRegularProcessor.h"
+#include "InputProcessorSubSystem.h"
+#include "HumanCharacter_Player.h"
 
 void UBasicFutures_Respawn::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -35,6 +37,19 @@ void UBasicFutures_Respawn::ActivateAbility(
 	}
 }
 
+void UBasicFutures_Respawn::InitalDefaultTags()
+{
+	Super::InitalDefaultTags();
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
+}
+
 void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
@@ -52,6 +67,7 @@ void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
+		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 
 		TaskPtr->ReadyForActivation();
 	}
@@ -63,11 +79,13 @@ void UBasicFutures_Respawn::OnMontageComplete()
 		(CharacterPtr->GetLocalRole() == ROLE_Authority)
 		)
 	{
+		K2_CancelAbility();
 	}
 
 	if (
 		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 		)
 	{
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 	}
 }

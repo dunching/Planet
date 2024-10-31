@@ -77,29 +77,6 @@ void UUIManagerSubSystem::Initialize(FSubsystemCollectionBase& Collection)
 	Super::Initialize(Collection);
 }
 
-void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr)
-{
-	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
-	if (!MainHUDPtr)
-	{
-		return;
-	}
-	MainHUDPtr->SwitchState(bIsDisplay ? EMainHUDType::kRegularAction : EMainHUDType::kNone);
-}
-
-void UUIManagerSubSystem::DisplayEndangeredState(bool bIsDisplay)
-{
-	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
-	if (MainHUDPtr)
-	{
-		MainHUDPtr->SwitchState(bIsDisplay ? EMainHUDType::kEndangered : EMainHUDType::kNone);
-	}
-}
-
-void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
-{
-}
-
 void UUIManagerSubSystem::SwitchMenu(bool bIsShow)
 {
 	MenuLayoutPtr = GetMainMenu();
@@ -148,210 +125,37 @@ void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacte
 {
 }
 
-void UUIManagerSubSystem::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
-{
-	auto MainUILayoutPtr = GetRegularActionState();
-	if (!MainUILayoutPtr)
-	{
-		return;
-	}
-
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->HUD_TeamSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	auto UIPtr = Cast<UHUD_TeamInfo>(BorderPtr->GetContent());
-	if (UIPtr)
-	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
-	}
-	else
-	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<UHUD_TeamInfo>(GetWorldImp(), MainUILayoutPtr->HUD_TeamInfoClass);
-			if (UIPtr)
-			{
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
-	}
-}
-
 void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 {
-}
-
-UEffectsList* UUIManagerSubSystem::ViewEffectsList(bool bIsViewMenus)
-{
-	auto MainUILayoutPtr = GetRegularActionState();
-	if (!MainUILayoutPtr)
-	{
-		return nullptr;
-	}
-
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->EffectsListSocket));
-	if (!BorderPtr)
-	{
-		return nullptr;
-	}
-
-	if (bIsViewMenus)
-	{
-		for (auto Iter : BorderPtr->GetAllChildren())
-		{
-			auto UIPtr = Cast<UEffectsList>(Iter);
-			if (UIPtr)
-			{
-				return UIPtr;
-			}
-		}
-		auto UIPtr = CreateWidget<UEffectsList>(GetWorldImp(), MainUILayoutPtr->EffectsListClass);
-		if (UIPtr)
-		{
-			UIPtr->bIsPositiveSequence = false;
-			BorderPtr->AddChild(UIPtr);
-
-			return UIPtr;
-		}
-	}
-	else
-	{
-		BorderPtr->ClearChildren();
-
-		return nullptr;
-	}
-
-	return nullptr;
-}
-
-UProgressTips* UUIManagerSubSystem::ViewProgressTips(bool bIsViewMenus)
-{
-	auto MainUILayoutPtr = GetRegularActionState();
-	if (!MainUILayoutPtr)
-	{
-		return nullptr;
-	}
-
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(MainUILayoutPtr->ProgressTipsSocket));
-	if (!BorderPtr)
-	{
-		return nullptr;
-	}
-
-	if (bIsViewMenus)
-	{
-		if (BorderPtr->HasAnyChildren())
-		{
-			return nullptr;
-		}
-
-		auto UIPtr = CreateWidget<UProgressTips>(GetWorldImp(), MainUILayoutPtr->ProgressTipsClass);
-		if (UIPtr)
-		{
-			BorderPtr->AddChild(UIPtr);
-
-			return UIPtr;
-		}
-	}
-
-	BorderPtr->ClearChildren();
-
-	return nullptr;
-}
-
-void UUIManagerSubSystem::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)
-{
-	// 
-	if (TargetCharacterPtr)
-	{
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-		FocusIconPtr = CreateWidget<UFocusIcon>(GetWorldImp(), AssetRefMapPtr->FocusIconClass);
-		if (FocusIconPtr)
-		{
-			FocusIconPtr->TargetCharacterPtr = TargetCharacterPtr;
-			FocusIconPtr->AddToViewport(EUIOrder::kFocus);
-		}
-	}
-	else
-	{
-		if (FocusIconPtr)
-		{
-			FocusIconPtr->RemoveFromParent();
-			FocusIconPtr = nullptr;
-		}
-	}
-
-	auto MainUILayoutPtr = GetRegularActionState();
-	if (!MainUILayoutPtr)
-	{
-		return;
-	}
-
-	auto BorderPtr = Cast<UBorder>(MainUILayoutPtr->GetWidgetFromName(FUIManagerSubSystem::Get().FocusCharacterSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	if (TargetCharacterPtr)
-	{
-		// 
-		UFocusTitle* UIPtr = nullptr;
-		for (auto Iter : BorderPtr->GetAllChildren())
-		{
-			UIPtr = Cast<UFocusTitle>(Iter);
-			if (UIPtr)
-			{
-				break;
-			}
-		}
-		if (!UIPtr)
-		{
-			UIPtr = CreateWidget<UFocusTitle>(GetWorldImp(), MainUILayoutPtr->FocusTitleClass);
-			BorderPtr->AddChild(UIPtr);
-		}
-		if (UIPtr)
-		{
-			UIPtr->SetTargetCharacter(TargetCharacterPtr);
-		}
-	}
-	else
-	{
-		BorderPtr->ClearChildren();
-	}
 }
 
 void UUIManagerSubSystem::InitialUI()
 {
 	DisplayActionStateHUD(false);
 	DisplayBuildingStateHUD(false);
-	DisplayTeamInfo(false);
-	ViewEffectsList(false);
-	ViewProgressTips(false);
-	OnFocusCharacter(nullptr);
-
-	InitialHoverUI();
 }
 
-void UUIManagerSubSystem::InitialHoverUI()
+void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr)
 {
-	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-	if (PCPtr)
+	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
+	if (!MainHUDPtr)
 	{
-		auto DelegateHandle = 
-			PCPtr->OnFocusCharacterDelegate.AddCallback(std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1));
-		DelegateHandle->bIsAutoUnregister = false;
+		return;
 	}
+	MainHUDPtr->SwitchState(bIsDisplay ? EMainHUDType::kRegularAction : EMainHUDType::kNone);
+}
+
+void UUIManagerSubSystem::DisplayEndangeredState(bool bIsDisplay)
+{
+	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
+	if (MainHUDPtr)
+	{
+		MainHUDPtr->SwitchState(bIsDisplay ? EMainHUDType::kEndangered : EMainHUDType::kNone);
+	}
+}
+
+void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
+{
 }
 
 URegularActionLayout* UUIManagerSubSystem::GetRegularActionState()

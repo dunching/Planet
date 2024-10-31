@@ -184,6 +184,10 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Deathing")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
+	FGameplayTag Respawning =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Respawning")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag InFightingTag = 
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.InFighting")));
 	

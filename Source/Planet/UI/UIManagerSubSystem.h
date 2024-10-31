@@ -63,7 +63,7 @@ public:
 #pragma region  ProcessMode
 	// 普通界面(技能状态HUD)、
 	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr = nullptr);
-	
+
 	// 重伤状态
 	void DisplayEndangeredState(bool bIsDisplay);
 
@@ -87,25 +87,11 @@ public:
 	void ViewRaffleMenu(bool bIsDisplay);
 #pragma endregion Menu
 
-	// 出战队员列表
-	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
-
-	// 效果栏（buff、debuff）
-	UEffectsList* ViewEffectsList(bool bIsViewMenus);
-
-	// 进度条/工具
-	UProgressTips* ViewProgressTips(bool bIsViewMenus);
-
-	// 锁定目标时
-	void OnFocusCharacter(ACharacterBase*TargetCharacterPtr);
-
 	void InitialUI();
 
-protected:
-
-	void InitialHoverUI();
-
 	URegularActionLayout* GetRegularActionState();
+
+protected:
 
 	UMenuLayout* GetMainMenu();
 	
@@ -113,7 +99,5 @@ protected:
 	UMenuLayout* MenuLayoutPtr = nullptr;
 
 private:
-
-	UFocusIcon* FocusIconPtr = nullptr;
 
 };

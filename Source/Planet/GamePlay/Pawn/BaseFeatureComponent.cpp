@@ -569,10 +569,10 @@ void UBaseFeatureComponent::SwitchCantBeSelect(bool bIsCanBeSelect)
 #if UE_EDITOR || UE_CLIENT
 		if (GetOwnerRole() < ROLE_Authority)
 		{
-			if (OnwerActorPtr->CharacterTitlePtr)
-			{
-				OnwerActorPtr->CharacterTitlePtr->SwitchCantBeSelect(bIsCanBeSelect);
-			}
+ 			if (OnwerActorPtr->CharacterTitlePtr)
+ 			{
+ 				OnwerActorPtr->CharacterTitlePtr->SwitchCantBeSelect(bIsCanBeSelect);
+ 			}
 		}
 #endif
 	}

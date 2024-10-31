@@ -6,19 +6,14 @@
 #include <Components/SizeBox.h>
 
 #include "CharacterBase.h"
+#include "LogWriter.h"
 
 void UFocusIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	SetAnchorsInViewport(FAnchors(.5f));
-
-	auto SizeBoxPtr = Cast<USizeBox>(GetWidgetFromName(TEXT("SizeBox")));
-	if (SizeBoxPtr)
-	{
-		SizeBox.X = SizeBoxPtr->GetWidthOverride();
-		SizeBox.Y = SizeBoxPtr->GetHeightOverride();
-	}
+	SetAlignmentInViewport(FVector2D(.5f, .5f));
 
 	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(
 		FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition)
@@ -44,14 +39,9 @@ bool UFocusIcon::ResetPosition(float InDeltaTime)
 	UGameplayStatics::ProjectWorldToScreen(
 		UGameplayStatics::GetPlayerController(this, 0),
 		TargetCharacterPtr->GetActorLocation(),
-		ScreenPosition
+		ScreenPosition,
+		true
 	);
-
-	const auto Scale = UWidgetLayoutLibrary::GetViewportScale(this);
-
-	const auto TempWidgetSize = SizeBox * Scale;
-
-	ScreenPosition -= TempWidgetSize / 2;
 
 	SetPositionInViewport(ScreenPosition);
 

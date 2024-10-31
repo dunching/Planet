@@ -39,6 +39,19 @@ void UBasicFutures_Death::ActivateAbility(
 	}
 }
 
+void UBasicFutures_Death::InitalDefaultTags()
+{
+	Super::InitalDefaultTags();
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
+}
+
 void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (

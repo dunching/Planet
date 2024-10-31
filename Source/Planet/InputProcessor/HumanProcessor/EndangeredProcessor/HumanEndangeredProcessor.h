@@ -8,7 +8,7 @@
 #include "GameplayAbilitySpecHandle.h"
 
 #include "SceneElement.h"
-#include "HumanProcessor.h"
+#include "InputProcessor.h"
 #include "ProxyProcessComponent.h"
 
 struct FSkillSocketInfo;
@@ -23,11 +23,11 @@ struct FWeaponProxy;
 
 namespace HumanProcessor
 {
-	class FHumanEndangeredProcessor : public FHumanProcessor
+	class FHumanEndangeredProcessor : public FInputProcessor
 	{
 	private:
 
-		GENERATIONCLASSINFO(FHumanEndangeredProcessor, FHumanProcessor);
+		GENERATIONCLASSINFO(FHumanEndangeredProcessor, FInputProcessor);
 
 	public:
 		using FOnAllocationChangedHandle =

@@ -120,6 +120,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/InputProcessor/HorseProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/ActionProcessor");
+        PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/EndangeredProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/InteractionProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/BuildingProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/BuildingProcessor/PlacingBuindingsProcessor");

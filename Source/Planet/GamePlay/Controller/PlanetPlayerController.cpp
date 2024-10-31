@@ -40,6 +40,13 @@
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "CollisionDataStruct.h"
+#include "LogWriter.h"
+
+static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
+	TEXT("PlanetPlayerController.DrawControllerRotation"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -48,7 +55,10 @@ APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& Objec
 
 void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
 {
-	ClearFocus(InPriority);
+	if (NewFocus == GetFocusActor())
+	{
+		return;
+	}
 
 	if (auto TargetCharacterPtr = Cast<ACharacterBase>(NewFocus))
 	{
@@ -184,13 +194,13 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 	{
 		FRotator DeltaRot(RotationInput);
 		FRotator ViewRotation = GetControlRotation();
-
 		const FVector FocalPoint = GetFocalPoint();
 		if (FAISystem::IsValidLocation(FocalPoint))
 		{
+			const auto Z = -UKismetGravityLibrary::GetGravity();
 			const auto FocusRotation = UKismetMathLibrary::Quat_FindBetweenVectors(
-				UKismetMathLibrary::MakeRotFromZX(UKismetGravityLibrary::GetGravity(), ViewRotation.Vector()).Vector(),
-				UKismetMathLibrary::MakeRotFromZX(UKismetGravityLibrary::GetGravity(), FocalPoint - MyPawn->GetPawnViewLocation()).Vector()
+				UKismetMathLibrary::MakeRotFromZX(Z, ViewRotation.Vector()).Vector(),
+				UKismetMathLibrary::MakeRotFromZX(Z, FocalPoint - MyPawn->GetActorLocation()).Vector()
 			).Rotator();
 
 			const float AngleTolerance = 1e-3f;
@@ -200,7 +210,8 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 			}
 			else
 			{
-				DeltaRot.Yaw = FocusRotation.Yaw;
+				const float RotationRate_Yaw = 120.f * DeltaTime;
+				DeltaRot.Yaw = FMath::FixedTurn(0.f, FocusRotation.Yaw, RotationRate_Yaw);
 			}
 		}
 		DeltaRot.Roll = 0.f;
@@ -224,6 +235,16 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 		}
 
 		SetControlRotation(ViewRotation);
+
+#ifdef WITH_EDITOR
+		if (PlanetPlayerController_DrawControllerRotation.GetValueOnGameThread())
+		{
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				DrawDebugLine(GetWorld(), MyPawn->GetActorLocation(), MyPawn->GetActorLocation() + (ViewRotation.Vector() * 500), FColor::Red, false, 3);
+			}
+		}
+#endif
 
 #if WITH_EDITOR
 		RootComponent->SetWorldLocation(MyPawn->GetActorLocation());

@@ -41,6 +41,7 @@ class UInteractiveConsumablesComponent;
 class UProxyProcessComponent;
 class UInteractiveToolComponent;
 class UCDCaculatorComponent;
+class UWidgetComponent;
 
 UCLASS()
 class PLANET_API ACharacterBase : 
@@ -115,9 +116,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SetCampType(ECharacterCampType CharacterCampType);
 
-	UPROPERTY(Transient)
-	UCharacterTitle* CharacterTitlePtr = nullptr;
-	
+ 	UPROPERTY(Transient)
+ 	UCharacterTitle* CharacterTitlePtr = nullptr;
+ 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
 	FGameplayTag RowName = FGameplayTag::EmptyTag;
 	

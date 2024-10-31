@@ -86,11 +86,11 @@ void AHumanAIController::DoDeathing()
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
-		if (CharacterPtr->CharacterTitlePtr)
-		{
-			CharacterPtr->CharacterTitlePtr->RemoveFromParent();
-			CharacterPtr->CharacterTitlePtr = nullptr;
-		}
+ 		if (CharacterPtr->CharacterTitlePtr)
+ 		{
+ 			CharacterPtr->CharacterTitlePtr->RemoveFromParent();
+ 			CharacterPtr->CharacterTitlePtr = nullptr;
+ 		}
 	}
 }
 
