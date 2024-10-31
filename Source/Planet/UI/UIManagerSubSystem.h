@@ -26,18 +26,22 @@ class UPromptBox;
 class AHumanCharacter;
 class UPiginteraction;
 class UDestroyProgress;
-class UMainUILayout;
+class URegularActionLayout;
 class UEffectsList;
 class UProgressTips;
 class UHUD_TeamInfo;
 class UGetItemInfosList;
 class URaffleMenu;
 class UMenuLayout;
+class UFocusIcon;
 
 struct FPawnDataStruct;
 struct FSceneTool;
 struct FCharacterAttributes;
 
+/*
+	HUD、UI
+*/
 UCLASS()
 class PLANET_API UUIManagerSubSystem : public UGameInstanceSubsystem
 {
@@ -60,6 +64,9 @@ public:
 	// 普通界面(技能状态HUD)、
 	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr = nullptr);
 
+	// 重伤状态
+	void DisplayEndangeredState(bool bIsDisplay);
+
 	// 工具、
 	void DisplayBuildingStateHUD(bool bIsDisplay);
 #pragma endregion  ProcessMode
@@ -80,27 +87,14 @@ public:
 	void ViewRaffleMenu(bool bIsDisplay);
 #pragma endregion Menu
 
-	// 出战队员列表
-	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
+	void InitialUI();
 
-	// 效果栏（buff、debuff）
-	UEffectsList* ViewEffectsList(bool bIsViewMenus);
-
-	// 进度条/工具
-	UProgressTips* ViewProgressTips(bool bIsViewMenus);
-
-	// 获取物品的提示
-	UGetItemInfosList* GetItemInfos();
+	URegularActionLayout* GetRegularActionState();
 
 protected:
 
-	UMainUILayout* GetMainHUD();
-
 	UMenuLayout* GetMainMenu();
 	
-	UPROPERTY(Transient)
-	UMainUILayout* MainUILayoutPtr = nullptr;
-
 	UPROPERTY()
 	UMenuLayout* MenuLayoutPtr = nullptr;
 

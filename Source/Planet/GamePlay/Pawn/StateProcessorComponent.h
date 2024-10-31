@@ -55,18 +55,18 @@ public:
 	UStateProcessorComponent(const FObjectInitializer& ObjectInitializer);
 
 	TSharedPtr<FCharacterStateInfo> GetCharacterState(const FGameplayTag& CSTag)const;
-	
+
 	void AddStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo);
 
 	void ChangeStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo);
 
 	void RemoveStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo);
 
-	FCharacterStateChanged CharacterStateChangedContainer;
+	auto BindCharacterStateChanged(const std::function<void(ECharacterStateType, UCS_Base*)>& Func)
+		-> FCharacterStateChanged::FCallbackHandleSPtr;
 
-	FCharacterStateMapChanged CharacterStateMapChanged;
-
-	TMap<FGameplayTag, UCS_Base*>CharacterStateMap;
+	auto BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func)
+		-> FCharacterStateMapChanged::FCallbackHandleSPtr;
 
 protected:
 
@@ -84,7 +84,7 @@ protected:
 	FGameplayEventData* MakeTargetData(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
 	);
-	
+
 	FGameplayAbilitySpec MakeSpec(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
 		TSubclassOf<UPlanetGameplayAbility> InAbilityClass,
@@ -115,17 +115,25 @@ protected:
 	void OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr);
 
 	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
-	
+
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TSubclassOf<UCS_RootMotion_KnockDown> CS_RootMotion_KnockDownClass;
 #pragma endregion GAs
 
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
-	
+
 	UPROPERTY(Replicated)
 	FCharacterStateInfo_FASI_Container CharacterStateInfo_FASI_Container;
 
+	// 每个连接都会有的 “状态信息”
 	TMap<FGuid, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
+
+	// Server 上存在的 GA状态信息
+	TMap<FGameplayTag, UCS_Base*>CharacterStateMap;
+
+	FCharacterStateChanged CharacterStateChangedContainer;
+
+	FCharacterStateMapChanged CharacterStateMapChanged;
 
 };

@@ -19,6 +19,7 @@
 #include "HoldingItemsComponent.h"
 #include "BuildingBaseProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
+#include "HumanCharacter_Player.h"
 
 namespace HumanProcessor
 {

@@ -37,6 +37,7 @@
 #include "GravityPlayerController.h"
 #include "SceneUnitExtendInfo.h"
 #include "GameplayTagsSubSystem.h"
+#include "PlanetPlayerController.h"
 
 void TestCommand::CopyID2RowName()
 {
@@ -513,4 +514,52 @@ void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 			}
 		}
 	}
+}
+
+void TestCommand::MakeTrueDamege(const TArray< FString >& Args)
+{
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->MakeTrueDamege(Args);
+}
+
+void TestCommand::MakeTherapy(const TArray< FString >& Args)
+{
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->MakeTherapy(Args);
+}
+
+void TestCommand::MakeRespawn(const TArray< FString >& Args)
+{
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->MakeRespawn(Args);
 }

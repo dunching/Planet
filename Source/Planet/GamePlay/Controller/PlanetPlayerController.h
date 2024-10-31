@@ -14,6 +14,7 @@
 #include "PlanetPlayerController.generated.h"
 
 class ACharacterBase;
+class AHumanCharacter_Player;
 class IPlanetControllerInterface;
 struct FCharacterProxy;
 class UFocusIcon;
@@ -34,7 +35,10 @@ class PLANET_API APlanetPlayerController :
 
 public:
 
-	using FPawnType = ACharacterBase;
+	using FPawnType = AHumanCharacter_Player;
+
+	using FOnFocusCharacterDelegate =
+		TCallbackHandleContainer<void(ACharacterBase*)>;
 
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -65,6 +69,22 @@ public:
 	virtual ACharacterBase* GetRealCharacter()const override;
 
 	void OnHPChanged(int32 CurrentValue);
+
+	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
+
+#pragma region CMD
+	
+	UFUNCTION(Server, Reliable)
+	void MakeTrueDamege(const TArray< FString >& Args);
+
+	UFUNCTION(Server, Reliable)
+	void MakeTherapy(const TArray< FString >& Args);
+
+	UFUNCTION(Server, Reliable)
+	void MakeRespawn(const TArray< FString >& Args);
+
+#pragma endregion
+
 
 protected:
 
@@ -102,6 +122,4 @@ protected:
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge	FocusInformation;
-
-	UFocusIcon* FocusIconPtr = nullptr;
 };

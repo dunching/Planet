@@ -54,7 +54,7 @@ void USkill_Active_XYFH::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
-	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
+//	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
 
 	if (
 		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||

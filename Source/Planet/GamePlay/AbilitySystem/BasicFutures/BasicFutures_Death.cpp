@@ -9,6 +9,9 @@
 #include "HumanAIController.h"
 #include "GameplayTagsSubSystem.h"
 #include "Planet_Tools.h"
+#include "HumanEndangeredProcessor.h"
+#include "InputProcessorSubSystem.h"
+#include "HumanCharacter_Player.h"
 
 void UBasicFutures_Death::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -27,6 +30,26 @@ void UBasicFutures_Death::ActivateAbility(
 	{
 
 	}
+
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		)
+	{
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanEndangeredProcessor>();
+	}
+}
+
+void UBasicFutures_Death::InitalDefaultTags()
+{
+	Super::InitalDefaultTags();
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
 }
 
 void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
@@ -45,7 +68,17 @@ void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
 
 		TaskPtr->ReadyForActivation();
+	}
+}
+
+void UBasicFutures_Death::OnMontageComplete()
+{
+	if (
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) 
+		)
+	{
 	}
 }

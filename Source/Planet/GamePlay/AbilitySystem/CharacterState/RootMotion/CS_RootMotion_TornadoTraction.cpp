@@ -163,11 +163,6 @@ void UCS_RootMotion_TornadoTraction::ExcuteTasks()
 {
 	if (CharacterPtr->IsPlayerControlled())
 	{
-		auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-		if (EffectPtr)
-		{
-			EffectItemPtr = EffectPtr->AddEffectItem();
-		}
 	}
 	else
 	{

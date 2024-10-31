@@ -18,12 +18,12 @@
 #include "CharacterBase.h"
 #include "GameplayTagsSubSystem.h"
 
-namespace CharacterTitle
+struct FCharacterTitle : public TStructVariable<FCharacterTitle>
 {
 	const FName HP_ProgressBar = TEXT("HP_ProgressBar");
-	
+
 	const FName PP_ProgressBar = TEXT("PP_ProgressBar");
-	
+
 	const FName Shield_ProgressBar = TEXT("Shield_ProgressBar");
 
 	const FName Border = TEXT("Border");
@@ -33,13 +33,11 @@ namespace CharacterTitle
 	const FName Title = TEXT("Title");
 
 	const FName CanvasPanel = TEXT("CanvasPanel");
-}
+};
 
 void UCharacterTitle::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	Scale = UWidgetLayoutLibrary::GetViewportScale(this);
 
 	SetAnchorsInViewport(FAnchors(.5f));
 	SetAlignmentInViewport(FVector2D(.5f, 1.f));
@@ -88,13 +86,13 @@ void UCharacterTitle::NativeConstruct()
 			));
 			OnShieldChanged();
 		}
+		SwitchCantBeSelect(false);
+
+		ApplyCharaterNameToTitle();
+
+		TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
+		ResetPosition(0.f);
 	}
-	SwitchCantBeSelect(false);
-
-	ApplyCharaterNameToTitle();
-
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
-	ResetPosition(0.f);
 }
 
 void UCharacterTitle::NativeDestruct()
@@ -136,7 +134,7 @@ void UCharacterTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 
 void UCharacterTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
 {
-	auto WidgetPtr = Cast<UBorder>(GetWidgetFromName(CharacterTitle::Border));
+	auto WidgetPtr = Cast<UBorder>(GetWidgetFromName(FCharacterTitle::Get().Border));
 	if (WidgetPtr)
 	{
 		WidgetPtr->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, bIsCanBeSelect ? .3f: 1.f));
@@ -185,14 +183,14 @@ void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, in
 void UCharacterTitle::OnHPChanged()
 {
 	{
-		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::HP_ProgressBar));
+		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().HP_ProgressBar));
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetPercent(static_cast<float>(CurrentHP) / MaxHP);
 		}
 	}
 	{
-		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Text));
+		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Text));
 		if (WidgetPtr)
 		{
 			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), CurrentHP, MaxHP)));
@@ -202,7 +200,7 @@ void UCharacterTitle::OnHPChanged()
 
 void UCharacterTitle::OnPPChanged()
 {
-	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::PP_ProgressBar));
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().PP_ProgressBar));
 	if (WidgetPtr)
 	{
 		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
@@ -212,7 +210,7 @@ void UCharacterTitle::OnPPChanged()
 
 void UCharacterTitle::OnShieldChanged()
 {
-	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(CharacterTitle::Shield_ProgressBar));
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().Shield_ProgressBar));
 	if (WidgetPtr)
 	{
 		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
@@ -223,7 +221,7 @@ void UCharacterTitle::OnShieldChanged()
 void UCharacterTitle::ApplyCharaterNameToTitle()
 {
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Title));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Title));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
@@ -249,7 +247,7 @@ void UCharacterTitle::ApplyStatesToTitle()
 	}
 
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(CharacterTitle::Title));
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Title));
 		if (UIPtr)
 		{
 			UIPtr->SetText(FText::FromString(Title));

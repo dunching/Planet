@@ -215,12 +215,6 @@ void USkill_Talent_NuQi::StartFuryState()
 
 		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
 	}
-
-	auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-	if (EffectPtr)
-	{
-		EffectItemPtr = EffectPtr->AddEffectItem();
-	}
 }
 
 void USkill_Talent_NuQi::StopFuryState()
@@ -244,12 +238,6 @@ void USkill_Talent_NuQi::StartForceWeakState()
 	bIsInWeak = true;
 
 	WeakDuration_Accumulate = 0.f;
-
-	auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-	if (EffectPtr)
-	{
-		EffectItemPtr = EffectPtr->AddEffectItem();
-	}
 }
 
 void USkill_Talent_NuQi::StopForceWeakState()

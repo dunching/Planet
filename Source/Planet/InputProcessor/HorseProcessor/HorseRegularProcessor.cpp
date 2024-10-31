@@ -216,7 +216,7 @@ namespace HorseProcessor
 		}
 
 		FMinimalViewInfo DesiredView;
-		PlayerCharacterPtr->GetCameraComp()->GetCameraView(0, DesiredView);
+//		PlayerCharacterPtr->GetCameraComp()->GetCameraView(0, DesiredView);
 
 		auto StartPt = DesiredView.Location;
 		auto StopPt = DesiredView.Location + (DesiredView.Rotation.Vector() * 1000);

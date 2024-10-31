@@ -37,8 +37,16 @@
 #include "BaseFeatureComponent.h"
 #include "EffectsList.h"
 #include "PlanetPlayerState.h"
-#include "GameMode_Main.h"
+#include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
+#include "CollisionDataStruct.h"
+#include "LogWriter.h"
+
+static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
+	TEXT("PlanetPlayerController.DrawControllerRotation"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
 
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -47,25 +55,22 @@ APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& Objec
 
 void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
 {
-	ClearFocus(InPriority);
-
-	if (NewFocus)
+	if (NewFocus == GetFocusActor())
 	{
-		BindOnFocusRemove(NewFocus);
+		return;
+	}
+
+	if (auto TargetCharacterPtr = Cast<ACharacterBase>(NewFocus))
+	{
+		BindOnFocusRemove(TargetCharacterPtr);
 
 		if (InPriority >= FocusInformation.Priorities.Num())
 		{
 			FocusInformation.Priorities.SetNum(InPriority + 1);
 		}
-		FocusInformation.Priorities[InPriority].Actor = NewFocus;
+		FocusInformation.Priorities[InPriority].Actor = TargetCharacterPtr;
 
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-		FocusIconPtr = CreateWidget<UFocusIcon>(GetWorldImp(), AssetRefMapPtr->FocusIconClass);
-		if (FocusIconPtr)
-		{
-			FocusIconPtr->FocusItem = FocusInformation.Priorities[InPriority];
-			FocusIconPtr->AddToViewport(EUIOrder::kFocus);
-		}
+		OnFocusCharacterDelegate(TargetCharacterPtr);
 	}
 }
 
@@ -102,11 +107,7 @@ void APlanetPlayerController::ClearFocus(EAIFocusPriority::Type InPriority)
 		FocusInformation.Priorities[InPriority].Position = FAISystem::InvalidLocation;
 	}
 
-	if (FocusIconPtr)
-	{
-		FocusIconPtr->RemoveFromParent();
-		FocusIconPtr = nullptr;
-	}
+	OnFocusCharacterDelegate(nullptr);
 }
 
 FVector APlanetPlayerController::GetFocalPoint() const
@@ -162,19 +163,14 @@ void APlanetPlayerController::BeginPlay()
 
 			UNavgationSubSystem::GetInstance();
 
+			UUIManagerSubSystem::GetInstance()->InitialUI();
+
 			// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
 			// 
 			// 在SetPawn之后调用
 			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, CurrentPawn](auto NewProcessor) {
-				NewProcessor->SetPawn(Cast<AHumanCharacter>(CurrentPawn));
+				NewProcessor->SetPawn(Cast<FPawnType>(CurrentPawn));
 				});
-
-			// 绑定效果状态栏
-			auto EffectPtr = UUIManagerSubSystem::GetInstance()->ViewEffectsList(true);
-			if (EffectPtr)
-			{
-				EffectPtr->BindCharacterState(GetRealCharacter());
-			}
 		}
 	}
 #endif
@@ -198,13 +194,13 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 	{
 		FRotator DeltaRot(RotationInput);
 		FRotator ViewRotation = GetControlRotation();
-
 		const FVector FocalPoint = GetFocalPoint();
 		if (FAISystem::IsValidLocation(FocalPoint))
 		{
+			const auto Z = -UKismetGravityLibrary::GetGravity();
 			const auto FocusRotation = UKismetMathLibrary::Quat_FindBetweenVectors(
-				UKismetMathLibrary::MakeRotFromZX(UKismetGravityLibrary::GetGravity(), ViewRotation.Vector()).Vector(),
-				UKismetMathLibrary::MakeRotFromZX(UKismetGravityLibrary::GetGravity(), FocalPoint - MyPawn->GetPawnViewLocation()).Vector()
+				UKismetMathLibrary::MakeRotFromZX(Z, ViewRotation.Vector()).Vector(),
+				UKismetMathLibrary::MakeRotFromZX(Z, FocalPoint - MyPawn->GetActorLocation()).Vector()
 			).Rotator();
 
 			const float AngleTolerance = 1e-3f;
@@ -214,7 +210,8 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 			}
 			else
 			{
-				DeltaRot.Yaw = FocusRotation.Yaw;
+				const float RotationRate_Yaw = 120.f * DeltaTime;
+				DeltaRot.Yaw = FMath::FixedTurn(0.f, FocusRotation.Yaw, RotationRate_Yaw);
 			}
 		}
 		DeltaRot.Roll = 0.f;
@@ -238,6 +235,16 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 		}
 
 		SetControlRotation(ViewRotation);
+
+#ifdef WITH_EDITOR
+		if (PlanetPlayerController_DrawControllerRotation.GetValueOnGameThread())
+		{
+			if (GetLocalRole() == ROLE_AutonomousProxy)
+			{
+				DrawDebugLine(GetWorld(), MyPawn->GetActorLocation(), MyPawn->GetActorLocation() + (ViewRotation.Vector() * 500), FColor::Red, false, 3);
+			}
+		}
+#endif
 
 #if WITH_EDITOR
 		RootComponent->SetWorldLocation(MyPawn->GetActorLocation());
@@ -431,6 +438,7 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 		return;
 	}
 
+	// “消失”时
 	Actor->OnEndPlay.AddDynamic(this, &ThisClass::OnFocusEndplay);
 
 	auto CharacterPtr = Cast<ACharacterBase>(Actor);
@@ -445,9 +453,138 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 		return;
 	}
 
+	// 目标进入“死亡”标签
 	auto& DelegateRef = AIPCPtr->GetAbilitySystemComponent()->RegisterGameplayTagEvent(
 		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnFocusDeathing);
 }
+
+void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray< FString >& Args)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+			GAEventData.bIsWeaponAttack = true;
+			GAEventData.bIsCantEvade = true;
+			LexFromString(GAEventData.TrueDamage, *Args[0]);
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			ICPtr->SendEventImp(GAEventDataPtr);
+		}
+	}
+}
+
+void APlanetPlayerController::MakeTherapy_Implementation(const TArray< FString >& Args)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+			int32 TreatmentVolume = 0;
+			LexFromString(TreatmentVolume, *Args[0]);
+
+			GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			ICPtr->SendEventImp(GAEventDataPtr);
+		}
+	}
+}
+
+void APlanetPlayerController::MakeRespawn_Implementation(const TArray< FString >& Args)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+
+			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+
+			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
+
+			int32 TreatmentVolume = 0;
+			LexFromString(TreatmentVolume, *Args[0]);
+
+			GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
+
+			GAEventData.bIsRespawn = true;
+
+			GAEventDataPtr->DataAry.Add(GAEventData);
+
+			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			ICPtr->SendEventImp(GAEventDataPtr);
+		}
+	}
+}
+

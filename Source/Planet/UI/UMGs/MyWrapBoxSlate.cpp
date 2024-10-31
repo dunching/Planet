@@ -1,7 +1,7 @@
 
 #include "MyWrapBoxSlate.h"
 
-class SMyWrapBox::FChildArranger
+class SMyWrapBox::FMyChildArranger
 {
 public:
 	struct FArrangementData
@@ -17,7 +17,7 @@ public:
 	static void Arrange(const SMyWrapBox& WrapBox, const FOnSlotArranged& OnSlotArranged);
 
 private:
-	FChildArranger(const SMyWrapBox& WrapBox, const FOnSlotArranged& OnSlotArranged);
+	FMyChildArranger(const SMyWrapBox& WrapBox, const FOnSlotArranged& OnSlotArranged);
 	void Arrange();
 	void FinalizeLine(int32 IndexOfLastChildInCurrentLine);
 
@@ -31,7 +31,7 @@ private:
 };
 
 
-SMyWrapBox::FChildArranger::FChildArranger(const SMyWrapBox& InWrapBox, const FOnSlotArranged& InOnSlotArranged)
+SMyWrapBox::FMyChildArranger::FMyChildArranger(const SMyWrapBox& InWrapBox, const FOnSlotArranged& InOnSlotArranged)
 	: WrapBox(InWrapBox)
 	, OnSlotArranged(InOnSlotArranged)
 	, Offset(FVector2D::ZeroVector)
@@ -42,7 +42,7 @@ SMyWrapBox::FChildArranger::FChildArranger(const SMyWrapBox& InWrapBox, const FO
 	OngoingArrangementDataMap.Reserve(WrapBox.Slots.Num());
 }
 
-void SMyWrapBox::FChildArranger::Arrange()
+void SMyWrapBox::FMyChildArranger::Arrange()
 {
 	int32 ChildIndex;
 	for (ChildIndex = 0; ChildIndex < WrapBox.Slots.Num(); ++ChildIndex)
@@ -199,7 +199,7 @@ void SMyWrapBox::FChildArranger::Arrange()
 	}
 }
 
-void SMyWrapBox::FChildArranger::FinalizeLine(int32 IndexOfLastChildInCurrentLine)
+void SMyWrapBox::FMyChildArranger::FinalizeLine(int32 IndexOfLastChildInCurrentLine)
 {
 	// Iterate backwards through children in this line. Iterate backwards because the last uncollapsed child may wish to fill the remaining empty space of the line.
 	for (; IndexOfLastChildInCurrentLine >= IndexOfFirstChildInCurrentLine; --IndexOfLastChildInCurrentLine)
@@ -286,58 +286,65 @@ void SMyWrapBox::FChildArranger::FinalizeLine(int32 IndexOfLastChildInCurrentLin
 	IndexOfFirstChildInCurrentLine = INDEX_NONE;
 }
 
-void SMyWrapBox::FChildArranger::Arrange(const SMyWrapBox& WrapBox, const FOnSlotArranged& OnSlotArranged)
+void SMyWrapBox::FMyChildArranger::Arrange(const SMyWrapBox& WrapBox, const FOnSlotArranged& OnSlotArranged)
 {
-	FChildArranger(WrapBox, OnSlotArranged).Arrange();
+	FMyChildArranger(WrapBox, OnSlotArranged).Arrange();
 }
 
 void SMyWrapBox::OnArrangeChildren(const FGeometry& AllottedGeometry, FArrangedChildren& ArrangedChildren) const
 {
-	const EHorizontalAlignment HAlignment = HAlign.Get();
+	if (bIsPositiveSequence)
+	{
+		SWrapBox::OnArrangeChildren(AllottedGeometry, ArrangedChildren);
+	}
+	else
+	{
+		const EHorizontalAlignment HAlignment = HAlign.Get();
 
-	float LeftStop = 0;
-	FChildArranger::Arrange(*this, [&](const FSlot& Slot, const FChildArranger::FArrangementData& ArrangementData)
-		{
-			FVector2D AllottedSlotSize = ArrangementData.SlotSize;
-			float SlotSizeAdjustment = 0;
-			if (Orientation == EOrientation::Orient_Horizontal)
+		float LeftStop = 0;
+		FMyChildArranger::Arrange(*this, [&](const FSlot& Slot, const FMyChildArranger::FArrangementData& ArrangementData)
 			{
-				// Reset leftstop when the line changes.
-				if (ArrangementData.ChildIndexRelativeToLine == 0)
+				FVector2D AllottedSlotSize = ArrangementData.SlotSize;
+				float SlotSizeAdjustment = 0;
+				if (Orientation == EOrientation::Orient_Horizontal)
 				{
-					LeftStop = 0;
+					// Reset leftstop when the line changes.
+					if (ArrangementData.ChildIndexRelativeToLine == 0)
+					{
+						LeftStop = 0;
+					}
+
+					switch (HAlignment)
+					{
+					case HAlign_Right:
+						LeftStop = FMath::FloorToFloat(AllottedGeometry.GetLocalSize().X - ArrangementData.WidthOfCurrentLine);
+						break;
+					case HAlign_Center:
+						LeftStop = FMath::FloorToFloat((AllottedGeometry.GetLocalSize().X - ArrangementData.WidthOfCurrentLine) / 2.0f);
+						break;
+					case HAlign_Fill:
+						const float NewSlotSize = AllottedSlotSize.X / ArrangementData.WidthOfCurrentLine * AllottedGeometry.GetLocalSize().X;
+						SlotSizeAdjustment = NewSlotSize - AllottedSlotSize.X;
+						AllottedSlotSize.X = NewSlotSize;
+						break;
+					}
 				}
 
-				switch (HAlignment)
-				{
-				case HAlign_Right:
-					LeftStop = FMath::FloorToFloat(AllottedGeometry.GetLocalSize().X - ArrangementData.WidthOfCurrentLine);
-					break;
-				case HAlign_Center:
-					LeftStop = FMath::FloorToFloat((AllottedGeometry.GetLocalSize().X - ArrangementData.WidthOfCurrentLine) / 2.0f);
-					break;
-				case HAlign_Fill:
-					const float NewSlotSize = AllottedSlotSize.X / ArrangementData.WidthOfCurrentLine * AllottedGeometry.GetLocalSize().X;
-					SlotSizeAdjustment = NewSlotSize - AllottedSlotSize.X;
-					AllottedSlotSize.X = NewSlotSize;
-					break;
-				}
-			}
+				// Calculate offset and size in slot using alignment.
+				const AlignmentArrangeResult XResult = AlignChild<Orient_Horizontal>(AllottedSlotSize.X, Slot, Slot.GetPadding());
+				const AlignmentArrangeResult YResult = AlignChild<Orient_Vertical>(AllottedSlotSize.Y, Slot, Slot.GetPadding());
 
-			// Calculate offset and size in slot using alignment.
-			const AlignmentArrangeResult XResult = AlignChild<Orient_Horizontal>(AllottedSlotSize.X, Slot, Slot.GetPadding());
-			const AlignmentArrangeResult YResult = AlignChild<Orient_Vertical>(AllottedSlotSize.Y, Slot, Slot.GetPadding());
+				// Note: Alignment offset is relative to slot offset.
+				const FVector2D PostAlignmentOffset =
+					FVector2D(ArrangementData.SlotOffset.X + XResult.Offset, YResult.Offset) +
+					FVector2D(LeftStop, AllottedGeometry.GetLocalSize().Y - ArrangementData.SlotOffset.Y - AllottedSlotSize.Y);
 
-			// Note: Alignment offset is relative to slot offset.
-			const FVector2D PostAlignmentOffset =
-				FVector2D(ArrangementData.SlotOffset.X + XResult.Offset, YResult.Offset) + 
-				FVector2D(LeftStop, AllottedGeometry.GetLocalSize().Y - ArrangementData.SlotOffset.Y - AllottedSlotSize.Y);
+				const FVector2D PostAlignmentSize = FVector2D(XResult.Size, YResult.Size);
 
-			const FVector2D PostAlignmentSize = FVector2D(XResult.Size, YResult.Size);
+				ArrangedChildren.AddWidget(AllottedGeometry.MakeChild(Slot.GetWidget(), PostAlignmentOffset, PostAlignmentSize));
 
-			ArrangedChildren.AddWidget(AllottedGeometry.MakeChild(Slot.GetWidget(), PostAlignmentOffset, PostAlignmentSize));
-
-			LeftStop += SlotSizeAdjustment;
-		});
+				LeftStop += SlotSizeAdjustment;
+			});
+	}
 }
 

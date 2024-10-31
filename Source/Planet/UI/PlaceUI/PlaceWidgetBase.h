@@ -12,7 +12,7 @@
  *
  */
 UCLASS()
-class PLANET_API UPlaceWidgetBase: public UMyUserWidget
+class PLANET_API UPlaceWidgetBase : public UMyUserWidget
 {
 	GENERATED_BODY()
 
@@ -20,16 +20,16 @@ public:
 
 	virtual void NativeConstruct()override;
 
-	void SetPromtStr(const FString&PromPtStr);
+	void SetPromtStr(const FString& PromPtStr);
 
 	void DisablePromt();
 
 protected:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FName BorderName;
+	FName BorderName;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FName TextName;
+	FName TextName;
 
 };

@@ -9,6 +9,7 @@
 enum EUIOrder :uint8
 {
 	// 
+	kHUD,
 	kPlayer_Character_State_HUD,
 	kCharacter_State_HUD,
 

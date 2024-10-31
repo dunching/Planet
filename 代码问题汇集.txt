@@ -4,3 +4,5 @@
 
 2.AbilityTask_MyApplyRootMotionRadialForce.h
 	UAbilityTask_MyApplyRootMotionRadialForce::UpdateLocation 获取RootMotin的方式看不懂,
+
+3.锁定目标时，会出现抖动？

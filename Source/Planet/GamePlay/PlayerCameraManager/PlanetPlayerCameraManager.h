@@ -15,5 +15,5 @@ class PLANET_API APlanetPlayerCameraManager : public APlayerCameraManager
 	GENERATED_BODY()
 
 public:
-
+	virtual void UpdateCamera(float DeltaTime)override;
 };

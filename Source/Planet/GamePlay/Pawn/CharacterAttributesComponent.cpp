@@ -50,10 +50,18 @@ FCharacterAttributes& UCharacterAttributesComponent::GetCharacterAttributes()
 void UCharacterAttributesComponent::ProcessCharacterAttributes()
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
 	if (
-		CharacterPtr && 
-		!CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
+		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning) 
 		)
+	{
+	}
+	else
 	{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 

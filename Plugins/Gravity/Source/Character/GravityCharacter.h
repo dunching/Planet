@@ -28,20 +28,8 @@ public:
 
     FQuat GetGravityToWorldTransform() const;
 
-    UCameraComponent* GetCameraComp();;
-
-    USpringArmComponent* GetCameraBoom();;
-
     virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false)override;
 
 protected:
-
-    /** Camera boom positioning the camera behind the character */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-    class USpringArmComponent* CameraBoom;
-
-    /** Follow camera */
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-    class UCameraComponent* FollowCamera;
 
 };

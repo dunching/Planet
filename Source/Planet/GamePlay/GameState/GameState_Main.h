@@ -17,5 +17,5 @@ class PLANET_API AGameState_Main : public AGameState
 	GENERATED_BODY()
 
 public:
-
+	
 };

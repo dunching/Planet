@@ -11,8 +11,11 @@ public:
 
 	virtual void OnArrangeChildren(const FGeometry& AllottedGeometry, FArrangedChildren& ArrangedChildren) const override;
 
+	bool bIsPositiveSequence = true;
+
 private:
 
-	class FChildArranger;
-	friend class SMyWrapBox::FChildArranger;
+	class FMyChildArranger;
+	friend class SMyWrapBox::FMyChildArranger;
+
 };

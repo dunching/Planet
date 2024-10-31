@@ -29,7 +29,11 @@ public:
 
 protected:
 
+	virtual void InitalDefaultTags()override;
+
 	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
+
+	void OnMontageComplete();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* DeathMontage = nullptr;

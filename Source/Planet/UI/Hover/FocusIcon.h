@@ -31,7 +31,7 @@ public:
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
-	FFocusKnowledge::FFocusItem FocusItem;
+	ACharacterBase* TargetCharacterPtr = nullptr;
 
 protected:
 
@@ -41,6 +41,8 @@ private:
 
 	FTSTicker::FDelegateHandle TickDelegateHandle;
 
-	FVector2D SizeBox = FVector2D::ZeroVector;
+	FVector2D MoveSpeed = FVector2D(100.f, 100.f);
+
+	FVector2D PreviousPosition = FVector2D::ZeroVector;
 
 };

@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "EnhancedInputSubsystems.h"
@@ -81,31 +82,31 @@ void ACharacterBase::BeginPlay()
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() < ROLE_Authority)
 	{
-		if (!CharacterTitlePtr)
-		{
-			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-			if (CharacterTitlePtr)
-			{
-				CharacterTitlePtr->CharacterPtr = this;
-				if (GetLocalRole() == ROLE_AutonomousProxy)
-				{
-					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
-				}
-				else
-				{
-					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
-				}
-
-				auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-				if (PlayerCharacterPtr)
-				{
-					SetCampType(
-						IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
-					);
-				}
-			}
-		}
+ 		if (!CharacterTitlePtr)
+ 		{
+ 			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+ 			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+ 			if (CharacterTitlePtr)
+ 			{
+ 				CharacterTitlePtr->CharacterPtr = this;
+ 				if (GetLocalRole() == ROLE_AutonomousProxy)
+ 				{
+ 					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
+ 				}
+ 				else
+ 				{
+ 					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+ 				}
+ 
+ 				auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+ 				if (PlayerCharacterPtr)
+ 				{
+ 					SetCampType(
+ 						IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+ 					);
+ 				}
+ 			}
+ 		}
 	}
 #endif
 
@@ -150,11 +151,11 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		MoveSpeedChangedHandle->UnBindCallback();
 	}
 
-	if (CharacterTitlePtr)
-	{
-		CharacterTitlePtr->RemoveFromParent();
-		CharacterTitlePtr = nullptr;
-	}
+ 	if (CharacterTitlePtr)
+ 	{
+ 		CharacterTitlePtr->RemoveFromParent();
+ 		CharacterTitlePtr = nullptr;
+ 	}
 
 	OriginalAIController = nullptr;
 
@@ -369,10 +370,10 @@ void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType Ani
 
 void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCampType)
 {
-	if (CharacterTitlePtr)
-	{
-		CharacterTitlePtr->SetCampType(CharacterCampType);
-	}
+ 	if (CharacterTitlePtr)
+ 	{
+ 		CharacterTitlePtr->SetCampType(CharacterCampType);
+ 	}
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

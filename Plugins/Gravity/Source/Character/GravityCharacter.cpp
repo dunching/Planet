@@ -3,10 +3,10 @@
 #include "GravityCharacter.h"
 
 #include "Camera/CameraComponent.h"
-
-#include "GravityMovementComponent.h"
 #include "GameFramework/PlayerInput.h"
 #include "GravitySpringArmComponent.h"
+
+#include "GravityMovementComponent.h"
 
 static TAutoConsoleVariable<int32> GravityCharacter(
 	TEXT("Skill.DrawDebug.GravityCharacter"),
@@ -25,17 +25,6 @@ AGravityCharacter::AGravityCharacter(const FObjectInitializer& ObjectInitializer
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 180.0f, 0.0f); // ...at this rotation rate
-
-	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<UGravitySpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-
-	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 }
 
 UGravityMovementComponent* AGravityCharacter::GetGravityMovementComponent()
@@ -53,16 +42,6 @@ FQuat AGravityCharacter::GetGravityToWorldTransform() const
 	}
 
 	return GravityTransform;
-}
-
-UCameraComponent* AGravityCharacter::GetCameraComp()
-{
-	return FollowCamera;
-}
-
-USpringArmComponent* AGravityCharacter::GetCameraBoom()
-{
-	return CameraBoom;
 }
 
 void AGravityCharacter::AddMovementInput(FVector WorldDirection, float ScaleValue /*= 1.0f*/, bool bForce /*= false*/)

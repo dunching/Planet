@@ -4,6 +4,31 @@
 #include <PhysicsEngine/PhysicsSettings.h>
 #include <GameFramework/Character.h>
 
+static TAutoConsoleVariable<int32> GravitySpringArmComponent_Draw(
+	TEXT("UGravitySpringArmComponent.Draw"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
+
+void UGravitySpringArmComponent::UpdateDesiredArmLocation(
+	bool bDoTrace, bool bDoLocationLag, bool bDoRotationLag, float DeltaTime
+)
+{
+	Super::UpdateDesiredArmLocation(bDoTrace, bDoLocationLag, bDoRotationLag, DeltaTime);
+
+#ifdef WITH_EDITOR
+	if (GravitySpringArmComponent_Draw.GetValueOnGameThread())
+	{
+		const auto T = GetComponentToWorld();
+		DrawDebugLine(GetWorld(), 
+			T.TransformPosition(RelativeSocketLocation),
+			T.TransformPosition(RelativeSocketLocation) + (T.TransformVector(RelativeSocketRotation.Vector()) * 500),
+			FColor::Green, false, 3);
+	}
+#endif
+
+}
+
 #if USECUSTOMEGRAVITY
 void UGravitySpringArmComponent::UpdateDesiredArmLocation(
 	bool bDoTrace, bool bDoLocationLag, bool bDoRotationLag, float DeltaTime

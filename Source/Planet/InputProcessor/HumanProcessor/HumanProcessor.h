@@ -11,7 +11,7 @@
 #include "CharacterBase.h"
 
 class ATrackVehicleBase;
-class AHumanCharacter;
+class AHumanCharacter_Player;
 class AHorseCharacter;
 class ABuildingBase;
 
@@ -39,7 +39,7 @@ namespace HumanProcessor
 
 	public:
 
-		using FOwnerPawnType = AHumanCharacter;
+		using FOwnerPawnType = AHumanCharacter_Player;
 
 		FHumanProcessor(FOwnerPawnType* CharacterPtr);
 

@@ -104,7 +104,7 @@ void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 	FDoRepLifetimeParams Params;
 	Params.bIsPushBased = true;
 
-	Params.Condition = COND_OwnerOnly;
+	Params.Condition = COND_None;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterStateInfo_FASI_Container, Params);
 }
 
@@ -181,6 +181,32 @@ void UStateProcessorComponent::RemoveStateDisplay(const TSharedPtr<FCharacterSta
 	{
 	}
 #endif
+}
+
+auto UStateProcessorComponent::BindCharacterStateChanged(const std::function<void(ECharacterStateType, UCS_Base*)>& Func)
+->UStateProcessorComponent::FCharacterStateChanged::FCallbackHandleSPtr
+{
+	auto CallbackHandle = CharacterStateChangedContainer.AddCallback(Func);
+
+	for (const auto& Iter : CharacterStateMap)
+	{
+		CharacterStateChangedContainer(ECharacterStateType::kActive, Iter.Value);
+	}
+
+	return CallbackHandle;
+}
+
+auto UStateProcessorComponent::BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func) 
+-> UStateProcessorComponent::FCharacterStateMapChanged::FCallbackHandleSPtr
+{
+	auto CallbackHandle = CharacterStateMapChanged.AddCallback(Func);
+
+	for (const auto& Iter : StateDisplayMap)
+	{
+		CharacterStateMapChanged(Iter.Value, true);
+	}
+
+	return CallbackHandle;
 }
 
 void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
@@ -324,28 +350,39 @@ void UStateProcessorComponent::ExcuteEffects(
 )
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (OnwerActorPtr)
+	if (!OnwerActorPtr)
 	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
-		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
+		return;
+	}
+
+	if (
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		)
+	{
+		return;
+	}
+
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
+	{
+		auto GAPtr = Cast<UCS_PeriodicPropertyModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
+		if (GAPtr)
 		{
-			auto GAPtr = Cast<UCS_PeriodicPropertyModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
-			if (GAPtr)
-			{
-				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
-				GAPtr->UpdateDuration();
-				return;
-			}
+			GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
+			GAPtr->UpdateDuration();
+			return;
 		}
+	}
 
-		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass());
+	FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass());
 
-		auto GAHandle = ASCPtr->GiveAbilityAndActivateOnce(
-			Spec,
-			MakeTargetData(GameplayAbilityTargetDataSPtr)
-		);
+	auto GAHandle = ASCPtr->GiveAbilityAndActivateOnce(
+		Spec,
+		MakeTargetData(GameplayAbilityTargetDataSPtr)
+	);
 
-		// 为什么不在此处直接获取 GetPrimaryInstance？因为在GA过程中调用时会pending，导致返回为nullptr
+	// 为什么不在此处直接获取 GetPrimaryInstance？因为在GA过程中调用时会pending，导致返回为nullptr
 // 		auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GAHandle);
 // 		if (GameplayAbilitySpecPtr)
 // 		{
@@ -355,7 +392,6 @@ void UStateProcessorComponent::ExcuteEffects(
 // 				PeriodicPropertyModifyMap.Add(GameplayAbilityTargetDataSPtr->Tag, ResultPtr);
 // 			}
 // 		}
-	}
 }
 
 void UStateProcessorComponent::ExcuteEffects(
@@ -363,107 +399,117 @@ void UStateProcessorComponent::ExcuteEffects(
 )
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (OnwerActorPtr)
+	if (!OnwerActorPtr)
 	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		return;
+	}
 
-		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
+	if (
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		)
+	{
+		return;
+	}
+
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+	if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
+	{
+		auto GAPtr = Cast<UCS_PeriodicStateModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
+		if (GAPtr && GAPtr->CanActivateAbility(GAPtr->GetCurrentAbilitySpecHandle(), GAPtr->GetCurrentActorInfo()))
 		{
-			auto GAPtr = Cast<UCS_PeriodicStateModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
-			if (GAPtr && GAPtr->CanActivateAbility(GAPtr->GetCurrentAbilitySpecHandle(), GAPtr->GetCurrentActorInfo()))
+			if (!GameplayAbilityTargetDataSPtr->DefaultIcon)
 			{
-				if (!GameplayAbilityTargetDataSPtr->DefaultIcon)
-				{
-					GameplayAbilityTargetDataSPtr->DefaultIcon =
-						USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
-				}
-
-				GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
-				GAPtr->UpdateDuration();
-				return;
+				GameplayAbilityTargetDataSPtr->DefaultIcon =
+					USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
 			}
-		}
 
-		if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Stun::StaticClass(), InputID);
-
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
+			GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
+			GAPtr->UpdateDuration();
+			return;
 		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Charm::StaticClass(), InputID);
+	}
 
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Fear::StaticClass(), InputID);
+	if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Stun::StaticClass(), InputID);
 
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Purify::StaticClass(), InputID);
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
+	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Charm::StaticClass(), InputID);
 
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Slow::StaticClass(), InputID);
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
+	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Fear::StaticClass(), InputID);
 
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_SuperArmor::StaticClass(), InputID);
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
+	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Purify::StaticClass(), InputID);
 
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_CantBeSelected::StaticClass(), InputID);
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
+	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Slow::StaticClass(), InputID);
 
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
-		}
-		else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation))
-		{
-			const auto InputID = FMath::Rand32();
-			auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Stagnation::StaticClass(), InputID);
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
+	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_SuperArmor::StaticClass(), InputID);
 
-			ASCPtr->GiveAbilityAndActivateOnce(
-				Spec,
-				MakeTargetData(GameplayAbilityTargetDataSPtr)
-			);
-		}
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
+	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_CantBeSelected::StaticClass(), InputID);
+
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
+	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Stagnation::StaticClass(), InputID);
+
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			MakeTargetData(GameplayAbilityTargetDataSPtr)
+		);
 	}
 }
 
@@ -472,105 +518,115 @@ void UStateProcessorComponent::ExcuteEffects(
 )
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (OnwerActorPtr)
+	if (!OnwerActorPtr)
 	{
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		return;
+	}
 
-		if (GameplayAbilityTargetDataSPtr->Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
+	if (
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		)
+	{
+		return;
+	}
+
+	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+
+	if (GameplayAbilityTargetDataSPtr->Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
+	{
+		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
-			if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
+			// 仅部分 RootMotion 可以被更新
+
+			if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
 			{
-				// 仅部分 RootMotion 可以被更新
-
-				if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+				auto GAPtr = Cast<UCS_RootMotion_FlyAway>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
+				if (GAPtr)
 				{
-					auto GAPtr = Cast<UCS_RootMotion_FlyAway>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
-					if (GAPtr)
+					if (!GameplayAbilityTargetDataSPtr->DefaultIcon)
 					{
-						if (!GameplayAbilityTargetDataSPtr->DefaultIcon)
-						{
-							GameplayAbilityTargetDataSPtr->DefaultIcon =
-								USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
-						}
-
-						FGameplayEventData GameplayEventData;
-						GameplayEventData.TargetData.Add(GameplayAbilityTargetDataSPtr->Clone());
-
-						GAPtr->UpdateRootMotion(GameplayEventData);
+						GameplayAbilityTargetDataSPtr->DefaultIcon =
+							USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
 					}
+
+					FGameplayEventData GameplayEventData;
+					GameplayEventData.TargetData.Add(GameplayAbilityTargetDataSPtr->Clone());
+
+					GAPtr->UpdateRootMotion(GameplayEventData);
 				}
 			}
-			else
+		}
+		else
+		{
+			if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->KnockDown))
 			{
-				if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->KnockDown))
-				{
-					FGameplayAbilitySpec Spec(CS_RootMotion_KnockDownClass);
+				FGameplayAbilitySpec Spec(CS_RootMotion_KnockDownClass);
 
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MakeTargetData(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
-				{
-					const auto InputID = FMath::Rand32();
+				ASCPtr->GiveAbilityAndActivateOnce(
+					Spec,
+					MakeTargetData(GameplayAbilityTargetDataSPtr)
+				);
+			}
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+			{
+				const auto InputID = FMath::Rand32();
 
-					const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
+				const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
 
-					// 有标签时Active时能拿到参数
-					GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
+				// 有标签时Active时能拿到参数
+				GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
 
-					FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass(), 1, InputID);
+				FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass(), 1, InputID);
 
-					ASCPtr->ReplicateEventData(
-						InputID,
-						*GameplayEventDataPtr
-					);
+				ASCPtr->ReplicateEventData(
+					InputID,
+					*GameplayEventDataPtr
+				);
 
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MakeTargetData(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
-				{
-					FGameplayAbilitySpec Spec(UCS_RootMotion_TornadoTraction::StaticClass());
+				ASCPtr->GiveAbilityAndActivateOnce(
+					Spec,
+					MakeTargetData(GameplayAbilityTargetDataSPtr)
+				);
+			}
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
+			{
+				FGameplayAbilitySpec Spec(UCS_RootMotion_TornadoTraction::StaticClass());
 
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MakeTargetData(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
-				{
-					FGameplayAbilitySpec Spec(UCS_RootMotion_MoveAlongSpline::StaticClass());
+				ASCPtr->GiveAbilityAndActivateOnce(
+					Spec,
+					MakeTargetData(GameplayAbilityTargetDataSPtr)
+				);
+			}
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
+			{
+				FGameplayAbilitySpec Spec(UCS_RootMotion_MoveAlongSpline::StaticClass());
 
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						MakeTargetData(GameplayAbilityTargetDataSPtr)
-					);
-				}
-				else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_RootMotion_Traction))
-				{
-					const auto InputID = FMath::Rand32();
+				ASCPtr->GiveAbilityAndActivateOnce(
+					Spec,
+					MakeTargetData(GameplayAbilityTargetDataSPtr)
+				);
+			}
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_RootMotion_Traction))
+			{
+				const auto InputID = FMath::Rand32();
 
-					const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
+				const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
 
-					// 有标签时Active时能拿到参数
-					GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
+				// 有标签时Active时能拿到参数
+				GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
 
-					FGameplayAbilitySpec Spec(UCS_RootMotion_Traction::StaticClass(), 1, InputID);
+				FGameplayAbilitySpec Spec(UCS_RootMotion_Traction::StaticClass(), 1, InputID);
 
-					ASCPtr->ReplicateEventData(
-						InputID,
-						*GameplayEventDataPtr
-					);
+				ASCPtr->ReplicateEventData(
+					InputID,
+					*GameplayEventDataPtr
+				);
 
-					ASCPtr->GiveAbilityAndActivateOnce(
-						Spec,
-						GameplayEventDataPtr
-					);
-				}
+				ASCPtr->GiveAbilityAndActivateOnce(
+					Spec,
+					GameplayEventDataPtr
+				);
 			}
 		}
 	}
@@ -605,10 +661,10 @@ FGameplayAbilitySpec UStateProcessorComponent::MakeSpec(
 	int32 InputID
 )
 {
-// 	auto GACDOPtr = InAbilityClass.GetDefaultObject();
-// 
-// 	// 仅针对
-// 	GACDOPtr->InitalDefaultTags();
+	// 	auto GACDOPtr = InAbilityClass.GetDefaultObject();
+	// 
+	// 	// 仅针对
+	// 	GACDOPtr->InitalDefaultTags();
 
 	FGameplayAbilitySpec Spec(InAbilityClass, 1, InputID);
 

@@ -19,7 +19,7 @@
 #include "HoldingItemsComponent.h"
 #include "BuildingBaseProcessor.h"
 #include "CharacterAttributesComponent.h"
-#include "HumanViewBackpackProcessor.h"
+#include "HumanCharacter_Player.h"
 
 namespace HumanProcessor
 {
