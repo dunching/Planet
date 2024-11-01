@@ -43,6 +43,8 @@ public:
 
 	UProxyProcessComponent(const FObjectInitializer& ObjectInitializer);
 
+	virtual void InitializeComponent()override;
+
 	virtual void BeginPlay()override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
@@ -165,6 +167,8 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ActiveWeapon_Server();
 
+	void ActiveWeaponImp();
+
 	UFUNCTION(Server, Reliable)
 	void SwitchWeapon_Server();
 
@@ -186,7 +190,7 @@ protected:
 	void OnRep_AllocationChanged();
 
 	UFUNCTION()
-	void OnRep_CurrentActivedSocketChanged();
+	void OnRep_CurrentActivedSocketChanged(const FGameplayTag& NewWeaponSocket);
 #pragma endregion 
 	
 	UPROPERTY(ReplicatedUsing = OnRep_AllocationChanged)

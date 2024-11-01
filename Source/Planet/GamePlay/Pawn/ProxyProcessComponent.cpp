@@ -49,6 +49,11 @@ UProxyProcessComponent::UProxyProcessComponent(const FObjectInitializer& ObjectI
 	SetIsReplicatedByDefault(true);
 }
 
+void UProxyProcessComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+}
+
 void UProxyProcessComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -117,8 +122,8 @@ void UProxyProcessComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	FDoRepLifetimeParams Params;
 	Params.bIsPushBased = true;
 
-	DOREPLIFETIME_CONDITION(ThisClass, AllocationSkills_Container, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, CurrentWeaponSocket, COND_OwnerOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, AllocationSkills_Container, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, CurrentWeaponSocket, COND_None);
 }
 
 void UProxyProcessComponent::UpdateSocket(
@@ -162,7 +167,32 @@ void UProxyProcessComponent::UpdateSocket_Server_Implementation(const FSocket_FA
 
 void UProxyProcessComponent::ActiveWeapon_Server_Implementation()
 {
-	ActiveWeapon();
+	ActiveWeaponImp();
+}
+
+void UProxyProcessComponent::ActiveWeaponImp()
+{
+	const auto WeaponsMap = SocketMap;
+
+	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
+	{
+		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1];
+		if (WeaponSocketSPtr->ProxyID.IsValid())
+		{
+			SwitchWeaponImp(WeaponSocketSPtr->Socket);
+			return;
+		}
+	}
+
+	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
+	{
+		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
+		if (WeaponSocketSPtr->ProxyID.IsValid())
+		{
+			SwitchWeaponImp(WeaponSocketSPtr->Socket);
+			return;
+		}
+	}
 }
 
 void UProxyProcessComponent::SwitchWeapon_Server_Implementation()
@@ -196,30 +226,16 @@ void UProxyProcessComponent::ActiveWeapon()
 	if (GetNetMode() == NM_Client)
 	{
 		ActiveWeapon_Server();
+		ActiveWeaponImp();
 	}
 #endif
 
-	const auto WeaponsMap = SocketMap;
-
-	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1];
-		if (WeaponSocketSPtr->ProxyID.IsValid())
-		{
-			SwitchWeaponImp(WeaponSocketSPtr->Socket);
-			return;
-		}
+		ActiveWeaponImp();
 	}
-	
-	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
-	{
-		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
-		if (WeaponSocketSPtr->ProxyID.IsValid())
-		{
-			SwitchWeaponImp(WeaponSocketSPtr->Socket);
-			return;
-		}
-	}
+#endif
 }
 
 void UProxyProcessComponent::SwitchWeapon()
@@ -498,8 +514,15 @@ void UProxyProcessComponent::OnRep_AllocationChanged()
 {
 }
 
-void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged()
+void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged(const FGameplayTag& NewWeaponSocket)
 {
+	if (CurrentWeaponSocket == NewWeaponSocket)
+	{
+	}
+	else
+	{
+		SwitchWeaponImp(NewWeaponSocket);
+	}
 }
 
 void UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket)

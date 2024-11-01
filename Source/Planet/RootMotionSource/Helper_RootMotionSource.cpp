@@ -390,7 +390,7 @@ bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
 	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
 
 	return
-//		bIsFalling == OtherCast->bIsFalling &&
+		bIsFalling == OtherCast->bIsFalling &&
 		RisingSpeed == OtherCast->RisingSpeed &&
 		FallingSpeed == OtherCast->FallingSpeed &&
 		Height == OtherCast->Height;

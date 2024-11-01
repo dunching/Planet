@@ -93,6 +93,8 @@ protected:
 
 	void InitialSenseConfig();
 
+	void InitialAllocations();
+
 	FTeammateOptionChangedDelegate TeammateOptionChangedDelegate;
 
 	FTeamHelperChangedDelegate TeamHelperChangedDelegate;

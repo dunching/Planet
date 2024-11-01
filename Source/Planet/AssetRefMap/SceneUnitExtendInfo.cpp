@@ -51,6 +51,15 @@ FTableRowUnit_TagExtendInfo* USceneUnitExtendInfoMap::GetTableRowUnit_TagExtendI
 	return SceneUnitExtendInfoPtr;
 }
 
+FTableRowUnit_AICharacter_Allocation* USceneUnitExtendInfoMap::GetTableRowUnit_AICharacter_Allocation(FGameplayTag UnitType) const
+{
+	auto DataTablePtr = DataTable_AICharacter_Allocation.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowUnit_AICharacter_Allocation>(*UnitType.ToString(), TEXT("GetUnit"));
+
+	return SceneUnitExtendInfoPtr;
+}
+
 const UPAD_Talent_Property* USceneUnitExtendInfoMap::GetTalent_Property(EPointPropertyType PointPropertyType) const
 {
 	if (PAD_Talent_PropertyMap.Contains(PointPropertyType))

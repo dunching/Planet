@@ -106,6 +106,7 @@ void UCS_RootMotion_FlyAway::EndAbility(
 {
 	//
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+	CharacterStateInfoSPtr = nullptr;
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -243,9 +244,10 @@ void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, flo
 {
 	if (CurrentInterval > Interval)
 	{
-		//
-		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-		CharacterStateInfoSPtr = nullptr;
+		// 进入下落的状态
+
+// 		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+// 		CharacterStateInfoSPtr = nullptr;
 	}
 	else
 	{

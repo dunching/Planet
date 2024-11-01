@@ -74,6 +74,7 @@ private:
 
 };
 
+// Character之间共享的信息
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UGroupMnaggerComponent : public UActorComponent
 {

@@ -191,6 +191,14 @@ void UBasicFutures_Dash::InitalDefaultTags()
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
 
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
+
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->FlyAway);
+
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
+
 	// 在运动时不激活
 }
 

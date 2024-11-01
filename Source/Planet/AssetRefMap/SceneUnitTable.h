@@ -128,6 +128,20 @@ struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
 	
 	FTableRowUnit_CharacterInfo();
 
+// 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+// 	FCharacterAttributes CharacterAttributes;
+
+	// 每级增加的属性
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TArray<FCharacterAttributes> CharacterAttributesPerLevel;
+
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRowUnit_AICharacter_Allocation : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag FirstWeaponSocketInfo;
 	
@@ -139,13 +153,6 @@ struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag ActiveSkillSet_2;
-
-// 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-// 	FCharacterAttributes CharacterAttributes;
-
-	// 每级增加的属性
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TArray<FCharacterAttributes> CharacterAttributesPerLevel;
 
 };
 

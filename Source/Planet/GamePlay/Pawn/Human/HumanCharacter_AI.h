@@ -26,12 +26,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
 #endif
-
-protected:
 	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
+	FGameplayTag AI_Allocation_RowName = FGameplayTag::EmptyTag;
+	
+protected:
+
+	void InitialAllocations();
+
 	UPROPERTY()
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
-	
+
 };
 
 UCLASS()

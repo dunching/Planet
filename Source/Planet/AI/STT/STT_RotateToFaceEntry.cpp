@@ -72,7 +72,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 		const auto PawnRot = InstanceData.CharacterPtr->GetActorRotation();
 
 		// Gravity?
-		if (FMath::IsNearlyEqual(PCRot.Yaw, PawnRot.Yaw, AngleTolerance))
+		if (PCRot.EqualsOrientation(PawnRot, AngleTolerance))
 		{
 			return EStateTreeRunStatus::Succeeded;
 		}

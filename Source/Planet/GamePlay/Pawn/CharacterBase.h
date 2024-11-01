@@ -119,7 +119,7 @@ public:
  	UPROPERTY(Transient)
  	UCharacterTitle* CharacterTitlePtr = nullptr;
  	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RowName")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "RowName")
 	FGameplayTag RowName = FGameplayTag::EmptyTag;
 	
 protected:

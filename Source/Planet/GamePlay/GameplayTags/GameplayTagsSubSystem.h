@@ -85,6 +85,7 @@ public:
 	FGameplayTag MovementStateAble_CantRotation =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantRotation")));
 
+	// 浮空状态（被动）
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FGameplayTag MovementStateAble_IntoFly =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.IntoFly")));
@@ -155,6 +156,7 @@ public:
 	FGameplayTag RootMotion =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion")));
 	
+	// 浮空状态（主动）
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag FlyAway =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.FlyAway")));

@@ -39,8 +39,8 @@ void AHumanAIController::InitialSenseConfig()
 {
 	auto SightConfig = NewObject<UAISenseConfig_Sight>();
 	check(SightConfig);
-	SightConfig->SightRadius = 50000;
-	SightConfig->LoseSightRadius = 53000;
+	SightConfig->SightRadius = 1000;
+	SightConfig->LoseSightRadius = 1000;
 	SightConfig->PeripheralVisionAngleDegrees = 120.f;
 	SightConfig->AutoSuccessRangeFromLastSeenLocation = FAISystem::InvalidRange;
 	SightConfig->SetMaxAge(1.f);
@@ -48,6 +48,15 @@ void AHumanAIController::InitialSenseConfig()
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = 1;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = 1;
 	AIPerceptionComponentPtr->ConfigureSense(*SightConfig);
+}
+
+void AHumanAIController::InitialAllocations()
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr)
+	{
+		return;
+	}
 }
 
 void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
@@ -105,6 +114,10 @@ void AHumanAIController::BeginPlay()
 
 	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
 	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
+
+	InitialAILogic();
+
+	InitialCharacter();
 }
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -117,10 +130,6 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
-	InitialAILogic();
-
-	InitialCharacter();
 }
 
 void AHumanAIController::OnUnPossess()
@@ -201,82 +210,7 @@ void AHumanAIController::InitialCharacter()
 			StateTreeAIComponentPtr->StartLogic();
 		}
 
-#if TESTAICHARACTERHOLDDATA
-		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
-#endif
-		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
-		{
-			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
-			if (TableRowUnit_CharacterInfoPtr)
-			{
-				// 武器
-				{
-					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-
-					auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
-					if (TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
-					{
-						auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
-						if (WeaponProxyPtr)
-						{
-							FirstWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1;
-							FirstWeaponSocketInfoSPtr->ProxySPtr = WeaponProxyPtr;
-							FirstWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-						}
-					}
-					EICPtr->UpdateSocket(FirstWeaponSocketInfoSPtr);
-
-					auto SecondWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
-					if (TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo.IsValid())
-					{
-						auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo);
-						if (WeaponProxyPtr)
-						{
-							SecondWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2;
-							SecondWeaponSocketInfoSPtr->ProxySPtr = WeaponProxyPtr;
-							SecondWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-						}
-					}
-					EICPtr->UpdateSocket(SecondWeaponSocketInfoSPtr);
-
-					EICPtr->ActiveWeapon();
-				}
-
-				// 技能
-				{
-					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-
-					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
-					{
-						auto SkillUnitPtr = HICPtr->AddUnit_Skill(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1);
-						if (SkillUnitPtr)
-						{
-							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1;
-							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
-							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-
-							EICPtr->UpdateSocket(SkillsSocketInfo);
-						}
-					}
-					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2.IsValid())
-					{
-						auto SkillUnitPtr = HICPtr->AddUnit_Skill(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2);
-						if (SkillUnitPtr)
-						{
-							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2;
-							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
-							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-
-							EICPtr->UpdateSocket(SkillsSocketInfo);
-						}
-					}
-				}
-			}
-		}
+		InitialAllocations();
 	}
 }
 

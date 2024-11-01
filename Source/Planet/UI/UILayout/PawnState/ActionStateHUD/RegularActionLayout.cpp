@@ -38,15 +38,8 @@ void URegularActionLayout::NativeConstruct()
 	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 	if (PCPtr)
 	{
-		// 绑定效果状态栏
-		auto EffectPtr = ViewEffectsList(true);
-		if (EffectPtr)
-		{
-			EffectPtr->BindCharacterState(PCPtr->GetPawn<ACharacterBase>());
-		}
-
-		DisplayTeamInfo(false);
-		ViewEffectsList(false);
+		DisplayTeamInfo(true);
+		InitialEffectsList();
 		ViewProgressTips(false);
 
 		OnFocusCharacter(nullptr);
@@ -112,7 +105,7 @@ void URegularActionLayout::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)
 	}
 }
 
-UEffectsList* URegularActionLayout::ViewEffectsList(bool bIsViewMenus)
+UEffectsList* URegularActionLayout::InitialEffectsList()
 {
 	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(EffectsListSocket));
 	if (!BorderPtr)
@@ -120,32 +113,21 @@ UEffectsList* URegularActionLayout::ViewEffectsList(bool bIsViewMenus)
 		return nullptr;
 	}
 
-	if (bIsViewMenus)
+	for (auto Iter : BorderPtr->GetAllChildren())
 	{
-		for (auto Iter : BorderPtr->GetAllChildren())
-		{
-			auto UIPtr = Cast<UEffectsList>(Iter);
-			if (UIPtr)
-			{
-				return UIPtr;
-			}
-		}
-		auto UIPtr = CreateWidget<UEffectsList>(GetWorldImp(), EffectsListClass);
+		auto UIPtr = Cast<UEffectsList>(Iter);
 		if (UIPtr)
 		{
-			UIPtr->bIsPositiveSequence = false;
-			BorderPtr->AddChild(UIPtr);
+			// 绑定效果状态栏
+			auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+			if (CharacterPtr)
+			{
+				UIPtr->BindCharacterState(CharacterPtr);
+			}
 
 			return UIPtr;
 		}
 	}
-	else
-	{
-		BorderPtr->ClearChildren();
-
-		return nullptr;
-	}
-
 	return nullptr;
 }
 
