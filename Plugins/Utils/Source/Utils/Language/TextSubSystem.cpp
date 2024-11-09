@@ -79,7 +79,7 @@ FString UTextSubSystem::GetText(const FString& Text) const
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		return Text;
 	}
 }

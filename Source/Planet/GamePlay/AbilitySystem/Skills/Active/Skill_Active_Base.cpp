@@ -254,7 +254,7 @@ void USkill_Active_Base::WaitInputTick(UAbilityTask_TimerHelper*, float Interval
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		WaitInputPercent = 1.f;
 	}
 }

@@ -110,7 +110,7 @@ void USkill_WeaponActive_Bow::ActivateAbility(
 		return;
 	}
 
-	check(0);
+	checkNoEntry();
 	K2_EndAbility();
 }
 

@@ -23,6 +23,49 @@ struct FAIMoveRequest;
 class UAITask_MoveBySpline;
 class AHumanCharacter;
 class AHumanAIController;
+class UGloabVariable;
+
+namespace EPathFollowingResult { enum Type : int; }
+
+USTRUCT()
+struct PLANET_API FStateTreeCheckTarget_SplineTaskInstanceData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = Context)
+	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Context)
+	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = Context)
+	UGloabVariable* GloabVariable = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	USplineComponent* SPlinePtr = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	int32 MaxDistance = 1000;
+
+};
+
+USTRUCT()
+struct PLANET_API FSTT_CheckTarget_Spline : public FStateTreeAIActionTaskBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FStateTreeCheckTarget_SplineTaskInstanceData;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	EStateTreeRunStatus PerformAction(FStateTreeExecutionContext& Context) const;
+
+};
 
 USTRUCT()
 struct PLANET_API FStateTreeMoveBySplineTaskInstanceData
@@ -34,7 +77,7 @@ struct PLANET_API FStateTreeMoveBySplineTaskInstanceData
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-
+	
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	USplineComponent* SPlinePtr = nullptr;
 
@@ -76,11 +119,11 @@ struct PLANET_API FStateTreeMoveBySplineTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	bool bReachTestIncludesGoalRadius = GET_AI_CONFIG_VAR(bFinishMoveOnGoalOverlap);
 
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	float StepLength = 100.f;
 
 	UPROPERTY(Transient)
-	int32 PointIndex = 0;
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 
 };
 
@@ -121,5 +164,7 @@ struct PLANET_API FSTT_MoveBySpline : public FStateTreeAIActionTaskBase
 		FStateTreeExecutionContext& Context, 
 		AAIController& Controller
 	) const;
+
+//	void MoveTaskCompletedSignature(TEnumAsByte<EPathFollowingResult::Type> Result)const;
 
 };

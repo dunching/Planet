@@ -46,6 +46,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	int32 ForwardSpeed = 250;
+	
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	int32 MaxDistance = 1000;
 
 	int32 CurrentLength = 0;
 

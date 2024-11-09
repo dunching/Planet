@@ -7,6 +7,7 @@
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Perception/AISenseConfig_Sight.h>
+#include <Components/SplineComponent.h>
 
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
@@ -19,7 +20,7 @@
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
-#include "SceneUnitTable.h"
+#include "BuildingArea.h"
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
 #include "HumanCharacter_AI.h"
@@ -43,7 +44,7 @@ void AHumanAIController::InitialSenseConfig()
 	SightConfig->LoseSightRadius = 1000;
 	SightConfig->PeripheralVisionAngleDegrees = 120.f;
 	SightConfig->AutoSuccessRangeFromLastSeenLocation = FAISystem::InvalidRange;
-	SightConfig->SetMaxAge(1.f);
+	SightConfig->SetMaxAge(5.f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = 1;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = 1;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = 1;
@@ -75,6 +76,20 @@ UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
 
 bool AHumanAIController::CheckIsFarawayOriginal() const
 {
+	if (BuildingAreaPtr)
+	{
+		return (FVector::Distance(BuildingAreaPtr->GetActorLocation(), GetPawn()->GetActorLocation()) > 1000);
+	}
+	
+	if (GeneratorNPCs_PatrolPtr)
+	{
+		auto CharacterPtr = GetPawn<FPawnType>();
+		if (CharacterPtr)
+		{
+			return GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(CharacterPtr);
+		}
+	}
+
 	return false;
 }
 
@@ -226,7 +241,7 @@ void AHumanAIController::InitialAILogic()
 
 		if (auto PatrolPtr = Cast<AGeneratorNPCs_Patrol>(ParentPtr))
 		{
-			PatrolSPlinePtr = PatrolPtr->SplineComponentPtr;
+			GeneratorNPCs_PatrolPtr = PatrolPtr;
 		}
 		else if (auto ColonyPtr = Cast<AGeneratorColony>(ParentPtr))
 		{

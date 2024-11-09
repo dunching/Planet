@@ -31,8 +31,6 @@ public:
 
 	void SetUp(ACharacterBase* InChracterPtr);
 
-	bool bIsPauseRelease = true;
-
 protected:
 
 	virtual void Activate() override;

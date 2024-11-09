@@ -113,7 +113,7 @@ void USkill_WeaponActive_FoldingFan::ActivateAbility(
 		return;
 	}
 
-	check(0);
+	checkNoEntry();
 	K2_EndAbility();
 }
 
@@ -143,7 +143,7 @@ bool USkill_WeaponActive_FoldingFan::CommitAbility(
 
 	if (CurrentFanNum < 0)
 	{
-		check(0);
+		checkNoEntry();
 		CurrentFanNum = 0;
 	}
 
@@ -171,12 +171,12 @@ void USkill_WeaponActive_FoldingFan::UpdateRegisterParam(const FGameplayEventDat
 
 	if (!GameplayEventData.TargetData.IsValid(0))
 	{
-		check(0);
+		checkNoEntry();
 	}
 	RegisterParamSPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
 	if (!RegisterParamSPtr)
 	{
-		check(0);
+		checkNoEntry();
 	}
 
 #if UE_EDITOR || UE_SERVER

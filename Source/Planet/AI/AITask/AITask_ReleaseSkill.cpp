@@ -43,12 +43,6 @@ void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
 
 bool UAITask_ReleaseSkill::PerformTask(float)
 {
-	if (bIsPauseRelease)
-	{
-		StopReleaseSkill();
-		return true;
-	}
-
 	if (CharacterPtr)
 	{
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();

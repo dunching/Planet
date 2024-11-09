@@ -340,7 +340,7 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 	else
 	{
 		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
-		check(0);
+		checkNoEntry();
 	}
 //	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
@@ -374,6 +374,16 @@ void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCamp
  	{
  		CharacterTitlePtr->SetCampType(CharacterCampType);
  	}
+}
+
+bool ACharacterBase::GetIsValidTarget() const
+{
+	TArray<FGameplayTag>Ary{
+		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+			UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected
+	};
+	const auto TagContainer = FGameplayTagContainer::CreateFromArray(Ary);
+	return !AbilitySystemComponentPtr->HasAnyMatchingGameplayTags(TagContainer);
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)

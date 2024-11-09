@@ -92,7 +92,7 @@ void USkill_WeaponActive_PickAxe::ActivateAbility(
 		return;
 	}
 
-	check(0);
+	checkNoEntry();
 	K2_EndAbility();
 }
 

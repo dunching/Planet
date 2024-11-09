@@ -75,7 +75,7 @@ void UCoinInfo::SetNum(int32 NewNum)
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		NumTextPtr->SetText(FText::FromString(TEXT("无效")));
 	}
 }

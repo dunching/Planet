@@ -45,7 +45,7 @@ void UToolFuture_PickAxe::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		K2_EndAbility();
 	}
 }

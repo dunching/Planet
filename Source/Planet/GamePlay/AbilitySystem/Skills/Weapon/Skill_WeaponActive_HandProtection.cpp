@@ -85,7 +85,7 @@ void USkill_WeaponActive_HandProtection::ActivateAbility(
 		return;
 	}
 
-	check(0);
+	checkNoEntry();
 	K2_EndAbility();
 }
 

@@ -151,6 +151,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag State_Debuff_Slow =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Slow")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
+	FGameplayTag State_Debuff_Suppress =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Suppress")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "State Tag")
 	FGameplayTag RootMotion =

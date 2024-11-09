@@ -24,6 +24,8 @@ class UStateTreeComponent;
 class UStateTreeAIComponent;
 class UAIPerceptionComponent;
 class ABuildingArea;
+class AGeneratorColony;
+class AGeneratorNPCs_Patrol;
 
 /**
  *
@@ -54,7 +56,7 @@ public:
 	virtual bool CheckIsFarawayOriginal() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<USplineComponent> PatrolSPlinePtr = nullptr;
+	TObjectPtr<AGeneratorNPCs_Patrol> GeneratorNPCs_PatrolPtr = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;

@@ -8,6 +8,8 @@
 #include "AITask_MoveBySpline.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
+#include "STE_Human.h"
+#include "GeneratorNPCs_Patrol.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_MoveBySpline(
@@ -16,6 +18,42 @@ static TAutoConsoleVariable<int32> DrawDebugSTT_MoveBySpline(
 	TEXT("")
 	TEXT(" default: 0"));
 #endif
+
+EStateTreeRunStatus FSTT_CheckTarget_Spline::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (!InstanceData.CharacterPtr)
+	{
+		return EStateTreeRunStatus::Failed;
+	}
+
+	return PerformAction(Context);
+}
+
+EStateTreeRunStatus FSTT_CheckTarget_Spline::PerformAction(FStateTreeExecutionContext& Context) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (InstanceData.GloabVariable->TargetCharacterPtr.IsValid())
+	{
+		if (InstanceData.AIControllerPtr->GeneratorNPCs_PatrolPtr)
+		{
+			return
+				InstanceData.AIControllerPtr->GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(
+					InstanceData.GloabVariable->TargetCharacterPtr.Get()
+				) ?
+				EStateTreeRunStatus::Running : 
+				EStateTreeRunStatus::Failed;
+		}
+		return InstanceData.AIControllerPtr->CheckIsFarawayOriginal() ? EStateTreeRunStatus::Running : EStateTreeRunStatus::Failed;
+	}
+	else
+	{
+		return EStateTreeRunStatus::Running;
+	}
+}
 
 EStateTreeRunStatus FSTT_MoveBySpline::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -34,8 +72,7 @@ EStateTreeRunStatus FSTT_MoveBySpline::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	InstanceData.PointIndex = 0;
-	return PerformMoveTask(Context, *InstanceData.AIControllerPtr); 
+	return PerformMoveTask(Context, *InstanceData.AIControllerPtr);
 }
 
 void FSTT_MoveBySpline::ExitState(
@@ -65,14 +102,7 @@ EStateTreeRunStatus FSTT_MoveBySpline::Tick(
 		{
 			if (InstanceData.AITaskPtr->WasMoveSuccessful())
 			{
-				if (InstanceData.PointIndex < InstanceData.SPlinePtr->GetNumberOfSplinePoints())
-				{
-					return PerformMoveTask(Context, *InstanceData.AIControllerPtr);
-				}
-				else
-				{
-					return EStateTreeRunStatus::Succeeded;
-				}
+				return EStateTreeRunStatus::Succeeded;
 			}
 			else
 			{
@@ -87,14 +117,29 @@ EStateTreeRunStatus FSTT_MoveBySpline::Tick(
 
 FSTT_MoveBySpline::FAITaskType* FSTT_MoveBySpline::PrepareMoveToTask(
 	FStateTreeExecutionContext& Context,
-	AAIController& Controller, 
-	FAITaskType* ExistingTask, 
+	AAIController& Controller,
+	FAITaskType* ExistingTask,
 	FAIMoveRequest& MoveRequest) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	auto MoveTask = ExistingTask ? ExistingTask : UAITask::NewAITask<UAITask_MoveBySpline>(Controller, *InstanceData.TaskOwner);
 	if (MoveTask)
 	{
+		const auto Length = InstanceData.SPlinePtr->GetSplineLength();
+		float CurrentLength = 0.f;
+		for (;;)
+		{
+			const auto Pt = InstanceData.SPlinePtr->GetLocationAtDistanceAlongSpline(CurrentLength, ESplineCoordinateSpace::World);
+			MoveTask->Pts.Add(Pt);
+
+			CurrentLength += InstanceData.StepLength;
+			if (CurrentLength > Length)
+			{
+				break;
+			}
+		}
+
+		MoveTask->Index = 0;
 		MoveTask->SetUp(&Controller, MoveRequest);
 	}
 
@@ -118,60 +163,66 @@ EStateTreeRunStatus FSTT_MoveBySpline::PerformMoveTask(
 		.SetProjectGoalLocation(InstanceData.bProjectGoalLocation)
 		.SetUsePathfinding(true);
 
-	const auto SPlinePoint = InstanceData.SPlinePtr->GetWorldLocationAtSplinePoint(InstanceData.PointIndex);
-	FNavLocation OutLocation;
+	const auto Pt = InstanceData.SPlinePtr->GetLocationAtDistanceAlongSpline(0.f, ESplineCoordinateSpace::World);
+	MoveReq.SetGoalLocation(Pt);
 
-	auto NavSysPtr = UNavigationSystemV1::GetNavigationSystem(&Controller);
-	ANavigationData* UseNavData = NavSysPtr->GetDefaultNavDataInstance(FNavigationSystem::DontCreate);
-	if (NavSysPtr->ProjectPointToNavigation(
-		SPlinePoint,
-		OutLocation,
-		INVALID_NAVEXTENT, 
-		UseNavData
-	))
-	{
-		const auto SPlinePointNum = InstanceData.SPlinePtr->GetNumberOfSplinePoints();
-		InstanceData.PointIndex++;
-		InstanceData.PointIndex = InstanceData.PointIndex % SPlinePointNum;
+	// FNavLocation OutLocation;
+	//auto NavSysPtr = UNavigationSystemV1::GetNavigationSystem(&Controller);
+	//ANavigationData* UseNavData = NavSysPtr->GetDefaultNavDataInstance(FNavigationSystem::DontCreate);
+	//if (NavSysPtr->ProjectPointToNavigation(
+	//	SPlinePoint,
+	//	OutLocation,
+	//	INVALID_NAVEXTENT,
+	//	UseNavData
+	//))
+	//{
+	//}
 
-		const auto TargetPt = OutLocation.Location;
 #ifdef WITH_EDITOR
-		if (DrawDebugSTT_MoveBySpline.GetValueOnGameThread())
-		{
-			DrawDebugSphere(InstanceData.SPlinePtr->GetWorld(), TargetPt, 20, 20, FColor::Yellow, false, 5);
-		}
+	if (DrawDebugSTT_MoveBySpline.GetValueOnGameThread())
+	{
+	}
 #endif
 
-		MoveReq.SetGoalLocation(TargetPt);
-
-		if (MoveReq.IsValid())
+	if (MoveReq.IsValid())
+	{
+		InstanceData.AITaskPtr = nullptr;
+		InstanceData.AITaskPtr = PrepareMoveToTask(Context, Controller, InstanceData.AITaskPtr, MoveReq);
+		if (InstanceData.AITaskPtr)
 		{
-			InstanceData.AITaskPtr = nullptr;
-			InstanceData.AITaskPtr = PrepareMoveToTask(Context, Controller, InstanceData.AITaskPtr, MoveReq);
-			if (InstanceData.AITaskPtr)
+			if (
+				InstanceData.AITaskPtr->IsActive() ||
+				InstanceData.AITaskPtr->IsFinished()
+				)
 			{
-				if (
-					InstanceData.AITaskPtr->IsActive() ||
-					InstanceData.AITaskPtr->IsFinished()
-					)
-				{
-					InstanceData.AITaskPtr->ConditionalPerformMove();
-				}
-				else
-				{
-					InstanceData.AITaskPtr->ReadyForActivation();
-				}
-
-				if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
-				{
-					//				return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
-				}
-
-				return EStateTreeRunStatus::Running;
+				InstanceData.AITaskPtr->ConditionalPerformMove();
 			}
-		}
+			else
+			{
+				InstanceData.AITaskPtr->ReadyForActivation();
+			}
 
+			if (InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
+			{
+				//				return InstanceData.AITaskPtr->WasMoveSuccessful() ? EStateTreeRunStatus::Succeeded : EStateTreeRunStatus::Failed;
+			}
+
+			return EStateTreeRunStatus::Running;
+		}
 	}
+
 	UE_VLOG(Context.GetOwner(), LogStateTree, Error, TEXT("FStateTreeMoveToTask failed because it doesn't have a destination."));
 	return EStateTreeRunStatus::Failed;
 }
+
+// void FSTT_MoveBySpline::MoveTaskCompletedSignature(TEnumAsByte<EPathFollowingResult::Type> Result)const
+// {
+// 	switch (Result)
+// 	{
+// 	case EPathFollowingResult::Success:
+// 	{
+// 
+// 	}
+// 	break;
+// 	}
+// }

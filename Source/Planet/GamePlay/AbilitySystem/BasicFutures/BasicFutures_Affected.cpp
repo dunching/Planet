@@ -72,7 +72,7 @@ void UBasicFutures_Affected::ActivateAbility(
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		K2_CancelAbility();
 	}
 }

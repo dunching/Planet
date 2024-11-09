@@ -116,6 +116,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void SetCampType(ECharacterCampType CharacterCampType);
 
+	// 确认是否是一个有效的选中目标，比如目标在隐身、或“无法选中”、重伤倒地状态时为不可已被选中
+	bool GetIsValidTarget()const;
+
  	UPROPERTY(Transient)
  	UCharacterTitle* CharacterTitlePtr = nullptr;
  	

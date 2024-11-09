@@ -27,8 +27,18 @@ EStateTreeRunStatus FSTT_UpdateQueryDistance::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
+	return Super::EnterState(Context, Transition);
+}
+
+EStateTreeRunStatus FSTT_UpdateQueryDistance::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+
 	InstanceData.GloabVariable->QueryDistance =
 		InstanceData.CharacterPtr->GetProxyProcessComponent()->GetCurrentWeaponAttackDistance();
 
-	return EStateTreeRunStatus::Succeeded;
+	return Super::Tick(Context, DeltaTime);
 }

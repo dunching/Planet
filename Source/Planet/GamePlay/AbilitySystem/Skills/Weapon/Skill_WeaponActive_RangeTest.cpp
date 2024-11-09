@@ -74,7 +74,7 @@ void USkill_WeaponActive_RangeTest::ActivateAbility(
 		return;
 	}
 
-	check(0);
+	checkNoEntry();
 	K2_EndAbility();
 }
 

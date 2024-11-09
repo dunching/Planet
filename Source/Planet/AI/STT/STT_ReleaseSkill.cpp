@@ -2,17 +2,19 @@
 #include "STT_ReleaseSkill.h"
 
 #include <NavigationSystem.h>
+#include <Components/CapsuleComponent.h>
 
 #include "LogWriter.h"
 
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
+#include "STE_Human.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> Skill_DrawDebug_FSTT_ReleaseSkill(
 	TEXT("Skill.DrawDebug.FSTT_ReleaseSkill"),
-	1,
+	0,
 	TEXT("")
 	TEXT(" default: 0"));
 #endif
@@ -40,7 +42,6 @@ EStateTreeRunStatus FSTT_ReleaseSkill::EnterState(
 	{
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
-	InstanceData.GloabVariable = NewObject<UReleaseSkillGloabVariable>();
 
 	return PerformMoveTask(Context);
 }
@@ -72,11 +73,36 @@ EStateTreeRunStatus FSTT_ReleaseSkill::Tick(
 	const float DeltaTime
 ) const
 {
-
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (InstanceData.AITaskPtr && InstanceData.AITaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
-		InstanceData.AITaskPtr->bIsPauseRelease = !InstanceData.GloabVariable->bIsNeedRelease;
+		if (InstanceData.GloabVariable->bIsFarawayOriginal)
+		{
+			return EStateTreeRunStatus::Failed;
+		}
+		else if
+			(
+				InstanceData.GloabVariable->TargetCharacterPtr.IsValid() &&
+				InstanceData.GloabVariable->TargetCharacterPtr->GetIsValidTarget()
+				)
+		{
+			const auto Pt1 = InstanceData.GloabVariable->TargetCharacterPtr->GetActorLocation();
+			const auto Pt2 = InstanceData.CharacterPtr->GetActorLocation();
+
+			float OutRadius1 = InstanceData.GloabVariable->TargetCharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
+			float OutRadius2 = InstanceData.CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
+
+			const auto Distance = FVector::Distance(Pt1, Pt2);
+
+			if (Distance > (InstanceData.GloabVariable->QueryDistance + OutRadius1 + OutRadius2))
+			{
+				return EStateTreeRunStatus::Failed;
+			}
+		}
+		else
+		{
+			return EStateTreeRunStatus::Failed;
+		}
 	}
 
 	return Super::Tick(Context, DeltaTime);
@@ -107,58 +133,3 @@ EStateTreeRunStatus FSTT_ReleaseSkill::PerformMoveTask(FStateTreeExecutionContex
 	}
 	return EStateTreeRunStatus::Running;
 }
-
-EStateTreeRunStatus FSTT_UpdateReleaseSkillStuta::EnterState(
-	FStateTreeExecutionContext& Context,
-	const FStateTreeTransitionResult& Transition
-)const
-{
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	if (!InstanceData.CharacterPtr)
-	{
-		return EStateTreeRunStatus::Failed;
-	}
-
-	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
-	if (!InstanceData.TaskOwner)
-	{
-		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
-	}
-
-	if (InstanceData.GloabVariable)
-	{
-		switch (InstanceData.CurrentState)
-		{
-		case EUpdateReleaseSkillStuteType::kCheck:
-		{
-			InstanceData.GloabVariable->bIsNeedRelease =
-				InstanceData.GloabVariable->UpdateReleaseSkillStuteType == EUpdateReleaseSkillStuteType::kRelease;
-		}
-		break;
-		}
-
-		InstanceData.GloabVariable->UpdateReleaseSkillStuteType = InstanceData.CurrentState;
-
-		switch (InstanceData.CurrentState)
-		{
-		case EUpdateReleaseSkillStuteType::kMoveTo:
-		{
-			const auto Distance = FVector::Distance(InstanceData.TargetLocation, InstanceData.CharacterPtr->GetActorLocation());
-			const auto bIsInDistance = (Distance < (InstanceData.AcceptableRadius + 100.f));
-			InstanceData.GloabVariable->bIsNeedRelease = bIsInDistance;
-			if (bIsInDistance)
-			{
-				return EStateTreeRunStatus::Succeeded;
-			}
-			else
-			{
-				return EStateTreeRunStatus::Failed;
-			}
-		}
-		break;
-		}
-	}
-
-	return EStateTreeRunStatus::Succeeded;
-}
-

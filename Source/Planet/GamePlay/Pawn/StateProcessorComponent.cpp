@@ -52,7 +52,7 @@
 #include "CS_PeriodicStateModify_Stun.h"
 #include "CS_PeriodicStateModify_Charm.h"
 #include "CS_PeriodicStateModify_Purify.h"
-#include "CS_PeriodicPropertyTag.h"
+#include "CS_PeriodicStateModify_Suppress.h"
 #include "CS_PeriodicStateModify_Slow.h"
 #include "CS_PeriodicStateModify_Fear.h"
 #include "CS_PeriodicStateModify_SuperArmor.h"
@@ -511,6 +511,26 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Suppress))
+	{
+		const auto InputID = FMath::Rand32();
+		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Suppress::StaticClass(), InputID);
+
+		const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
+
+		// 有标签时OnAvatarSet时能拿到参数
+		GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
+
+		ASCPtr->ReplicateEventData(
+			InputID,
+			*GameplayEventDataPtr
+		);
+
+		ASCPtr->GiveAbilityAndActivateOnce(
+			Spec,
+			GameplayEventDataPtr
+		);
+	}
 }
 
 void UStateProcessorComponent::ExcuteEffects(
@@ -574,7 +594,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 				const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
 
-				// 有标签时Active时能拿到参数
+				// 有标签时OnAvatarSet时能拿到参数
 				GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
 
 				FGameplayAbilitySpec Spec(UCS_RootMotion_FlyAway::StaticClass(), 1, InputID);
@@ -613,7 +633,7 @@ void UStateProcessorComponent::ExcuteEffects(
 
 				const auto GameplayEventDataPtr = MakeTargetData(GameplayAbilityTargetDataSPtr);
 
-				// 有标签时Active时能拿到参数
+				// 有标签时OnAvatarSet时能拿到参数
 				GameplayEventDataPtr->EventTag = GameplayAbilityTargetDataSPtr->Tag;
 
 				FGameplayAbilitySpec Spec(UCS_RootMotion_Traction::StaticClass(), 1, InputID);

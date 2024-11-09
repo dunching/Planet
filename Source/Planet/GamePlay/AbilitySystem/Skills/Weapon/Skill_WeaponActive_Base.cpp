@@ -226,7 +226,7 @@ void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInp
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		WaitInputPercent = 1.f;
 	}
 }

@@ -22,3 +22,21 @@ void AGeneratorNPCs_Patrol::BeginPlay()
 	Super::BeginPlay();
 }
 
+bool AGeneratorNPCs_Patrol::CheckIsFarawayOriginal(ACharacterBase* TargetCharacterPtr) const
+{
+	if (TargetCharacterPtr)
+	{
+		const auto CharacterPt = TargetCharacterPtr->GetActorLocation();
+		const auto Pt = SplineComponentPtr->FindLocationClosestToWorldLocation(
+			CharacterPt, ESplineCoordinateSpace::World
+		);
+		const auto Distance = FVector::Distance(Pt, CharacterPt);
+
+		return Distance > MaxDistance;
+	}
+	else
+	{
+		return false;
+	}
+}
+

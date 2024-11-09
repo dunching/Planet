@@ -53,4 +53,9 @@ struct PLANET_API FSTT_UpdateQueryDistance : public FStateTreeAIActionTaskBase
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
 };

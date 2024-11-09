@@ -1018,7 +1018,7 @@ void FWeaponProxy::ActiveWeapon()
 {
 	if (ActivedWeaponPtr)
 	{
-		check(0);
+		checkNoEntry();
 	}
 	else
 	{
