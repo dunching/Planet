@@ -110,7 +110,6 @@ void USkill_Active_Control::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
-
 	if (!HasFocusActor())
 	{
 		K2_CancelAbility();
@@ -135,14 +134,11 @@ void USkill_Active_Control::PerformAction(
 			auto MoveToAttaclAreaPtr = new FGameplayAbilityTargetData_MoveToAttaclArea;
 
 			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
-			MoveToAttaclAreaPtr->DataPtr = DataPtr->Clone();
 			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
 
 			CharacterPtr->GetBaseFeatureComponent()->MoveToAttackDistance(
 				MoveToAttaclAreaPtr
 			);
-
-			K2_CancelAbility();
 		}
 	}
 }

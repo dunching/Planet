@@ -460,9 +460,9 @@ void UBaseFeatureComponent::InitialBaseGAs()
 				)
 			);
 
-			GASPtr->GiveAbility(
-				FGameplayAbilitySpec(UBasicFutures_MoveToAttaclArea::StaticClass(), 1)
-			);
+// 			MoveToAttaclAreaHandle = GASPtr->GiveAbility(
+// 				FGameplayAbilitySpec(UBasicFutures_MoveToAttaclArea::StaticClass(), 1)
+// 			);
 
 			for (auto Iter : CharacterAbilities)
 			{
@@ -602,6 +602,15 @@ void UBaseFeatureComponent::MoveToAttackDistance(
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
+// 		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+// 		ASCPtr->TriggerAbilityFromGameplayEvent(
+// 			MoveToAttaclAreaHandle,
+// 			ASCPtr->AbilityActorInfo.Get(),
+// 			UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea,
+// 			&Payload,
+// 			*ASCPtr
+// 		);
+
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
 			UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea,

@@ -363,6 +363,30 @@ bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 	return GetGroupMnaggerComponent()->GetTeamHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
 }
 
+ACharacterBase* ACharacterBase::GetFocusActor() const
+{
+	if (IsPlayerControlled())
+	{
+		auto PCPtr = GetController<APlanetPlayerController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+	else
+	{
+		auto ACPtr = GetController<AAIController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+
+	return nullptr;
+}
+
 void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType AnimLinkClassType)
 {
 	SwitchAnimLink(AnimLinkClassType);

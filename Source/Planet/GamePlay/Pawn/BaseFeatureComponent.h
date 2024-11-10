@@ -158,6 +158,8 @@ public:
 
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
 
+	FGameplayAbilitySpecHandle MoveToAttaclAreaHandle;
+
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;
 

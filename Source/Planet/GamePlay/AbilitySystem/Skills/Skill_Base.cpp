@@ -164,25 +164,7 @@ void USkill_Base::ResetPreviousStageActions()
 
 ACharacterBase* USkill_Base::HasFocusActor() const
 {
-	if (CharacterPtr->IsPlayerControlled())
-	{
-		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
-		if (TargetCharacterPtr)
-		{
-			return TargetCharacterPtr;
-		}
-	}
-	else
-	{
-		auto ACPtr = CharacterPtr->GetController<AAIController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
-		if (TargetCharacterPtr)
-		{
-			return TargetCharacterPtr;
-		}
-	}
-	return nullptr;
+	return CharacterPtr->GetFocusActor();
 }
 
 bool USkill_Base::CheckTargetInDistance(int32 InDistance)const

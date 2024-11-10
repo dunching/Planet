@@ -109,7 +109,9 @@ public:
 	virtual bool IsGroupmate(ACharacterBase*TargetCharacterPtr)const;
 
 	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr)const;
-	
+
+	ACharacterBase* GetFocusActor() const;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
 	

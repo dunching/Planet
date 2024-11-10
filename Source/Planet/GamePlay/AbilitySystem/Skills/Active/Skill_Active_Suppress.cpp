@@ -30,7 +30,8 @@
 #include "GameplayTagsSubSystem.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicStateModify_Suppress.h"
-#include "CS_PeriodicStateModify_Fear.h"
+#include "BasicFutures_MoveToAttaclArea.h"
+#include "Skill_Active_Control.h"
 
 bool USkill_Active_Suppress::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -47,7 +48,44 @@ bool USkill_Active_Suppress::CanActivateAbility(
 	{
 		return false;
 	}
+#if UE_EDITOR || UE_CLIENT
+	if (CharacterPtr->GetLocalRole() < ROLE_Authority)
+	{
+		if (HasFocusActor())
+		{
+			auto bIsHaveTargetInDistance = CheckTargetInDistance(MaxDistance);
+			if (bIsHaveTargetInDistance)
+			{
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
+	}
+#endif
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
+}
+
+void USkill_Active_Suppress::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+	if (MoveCompletedSignatureHandle)
+	{
+		MoveCompletedSignatureHandle->UnBindCallback();
+		MoveCompletedSignatureHandle = nullptr;
+	}
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
 void USkill_Active_Suppress::PerformAction(
@@ -59,15 +97,16 @@ void USkill_Active_Suppress::PerformAction(
 {
 	if (CharacterPtr)
 	{
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
+		}
+#endif
+
 		ExcuteTasks();
 		PlayMontage();
 	}
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
-	{
-		CommitAbility(Handle, ActorInfo, ActivationInfo);
-	}
-#endif
 }
 
 void USkill_Active_Suppress::ExcuteTasks()
@@ -160,5 +199,21 @@ void USkill_Active_Suppress::PlayMontage()
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
 		TaskPtr->ReadyForActivation();
+	}
+}
+
+void USkill_Active_Suppress::MoveCompletedSignature(EPathFollowingResult::Type PathFollowingResult)
+{
+	switch (PathFollowingResult)
+	{
+	case EPathFollowingResult::Success:
+	{
+	}
+	break;
+	default:
+	{
+		K2_CancelAbility();
+	}
+	break;
 	}
 }
