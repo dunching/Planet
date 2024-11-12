@@ -181,6 +181,11 @@ protected:
 		bool bIsAutomaticStop
 	);
 
+	bool ActiveActionImp(
+		const FGameplayTag& SocketTag,
+		bool bIsAutomaticStop
+	);
+
 	UFUNCTION(Server, Reliable)
 	void CancelAction_Server(
 		const FGameplayTag& SocketTag

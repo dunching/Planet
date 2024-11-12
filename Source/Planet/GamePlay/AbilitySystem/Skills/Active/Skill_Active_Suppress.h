@@ -52,11 +52,27 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 	
+	UFUNCTION(Server, Reliable)
+	void CancelAbility_Server();
+
+	UFUNCTION(Server, Reliable)
+	void PerformAction_Server();
+
+	void PerformActionImp();
+	
+	UFUNCTION(Server, Reliable)
+	void PerformMove_Server(const FVector& StartPt, const FVector& TargetPt);
+
+	void PerformMoveImp(const FVector &StartPt, const FVector& TargetPt);
+	
 	void ExcuteTasks();
+	
+	UFUNCTION(Server, Reliable)
+	void ExcuteTasksImp(ACharacterBase*TargetCharacterPtr);
 
 	void PlayMontage();
 
-	void MoveCompletedSignature(EPathFollowingResult::Type PathFollowingResult);
+	void MoveCompletedSignature();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
@@ -75,6 +91,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 MaxDistance = 300;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	float Duration = .1f;
 
 	// 在播放动画师角色离目标距离
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")

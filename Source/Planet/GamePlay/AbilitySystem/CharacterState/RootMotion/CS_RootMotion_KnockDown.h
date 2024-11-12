@@ -11,7 +11,7 @@
 #include "CS_RootMotion_KnockDown.generated.h"
 
 class UAbilityTask_TimerHelper;
-class UAbilityTask_MyApplyRootMotionConstantForce;
+class UAbilityTask_ARM_ConstantForce;
 class UTexture2D;
 struct FConsumableProxy;
 class UEffectItem;
@@ -94,7 +94,7 @@ protected:
 
 	const FGameplayAbilityTargetData_RootMotion_KnockDown* GameplayAbilityTargetDataPtr = nullptr;
 	
-	UAbilityTask_MyApplyRootMotionConstantForce* TaskPtr = nullptr;
+	UAbilityTask_ARM_ConstantForce* TaskPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontagePtr = nullptr;

@@ -196,7 +196,7 @@ auto UStateProcessorComponent::BindCharacterStateChanged(const std::function<voi
 	return CallbackHandle;
 }
 
-auto UStateProcessorComponent::BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func) 
+auto UStateProcessorComponent::BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func)
 -> UStateProcessorComponent::FCharacterStateMapChanged::FCallbackHandleSPtr
 {
 	auto CallbackHandle = CharacterStateMapChanged.AddCallback(Func);
@@ -289,6 +289,14 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
 				CharacterMovementPtr->SetIsOrientRotationToMovement_RPC(Lambda());
+			}
+		}
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_UseCustomRotation))
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				CharacterPtr->bUseCustomRotation = Lambda();
 			}
 		}
 	}

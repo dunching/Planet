@@ -22,7 +22,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 
 USkill_Active_DisplacementNoPhy::USkill_Active_DisplacementNoPhy() :
 	Super()
@@ -139,7 +139,7 @@ void USkill_Active_DisplacementNoPhy::Move()
 		const auto Direction =
 			UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
 
-		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			this,
 			TEXT(""),
 			Direction,

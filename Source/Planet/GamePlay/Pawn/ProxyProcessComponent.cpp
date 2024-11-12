@@ -172,6 +172,18 @@ void UProxyProcessComponent::ActiveWeapon_Server_Implementation()
 
 void UProxyProcessComponent::ActiveWeaponImp()
 {
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+	}
+#endif
+
 	const auto WeaponsMap = SocketMap;
 
 	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
@@ -211,6 +223,37 @@ void UProxyProcessComponent::ActiveAction_Server_Implementation(
 )
 {
 	Active(SocketTag);
+}
+
+bool UProxyProcessComponent::ActiveActionImp(
+	const FGameplayTag& SocketTag, 
+	bool bIsAutomaticStop
+)
+{
+	if (CanActiveSocketMap.Contains(SocketTag))
+	{
+		if (CanActiveSocketMap[SocketTag]->ProxySPtr)
+		{
+			if (CanActiveSocketMap[SocketTag]->ProxySPtr->CanActive())
+			{
+				ActiveAction_Server(SocketTag, bIsAutomaticStop);
+				return true;
+			}
+		}
+	}
+	else if (SocketMap.Contains(SocketTag))
+	{
+		if (SocketMap[SocketTag]->ProxySPtr)
+		{
+			if (SocketMap[SocketTag]->ProxySPtr->CanActive())
+			{
+				ActiveAction_Server(SocketTag, bIsAutomaticStop);
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
 void UProxyProcessComponent::CancelAction_Server_Implementation(
@@ -403,20 +446,20 @@ bool UProxyProcessComponent::ActiveAction(
 	auto WeaponSPtr = FindSocket(CurrentWeaponSocket);
 	if (WeaponSPtr && (WeaponSPtr->Socket == CanbeActivedInfoSPtr->Socket))
 	{
-		ActiveAction_Server(WeaponSPtr->Socket, bIsAutomaticStop);
+		ActiveActionImp(WeaponSPtr->Socket, bIsAutomaticStop);
 	}
 	// 使用主动技能
 	else if (CanActiveSocketMap.Contains(CanbeActivedInfoSPtr->Socket))
 	{
 		if (ActivedCorrespondingWeapon(CanbeActivedInfoSPtr->Socket))
 		{
-			ActiveAction_Server(CanbeActivedInfoSPtr->Socket, bIsAutomaticStop);
+			ActiveActionImp(CanbeActivedInfoSPtr->Socket, bIsAutomaticStop);
 		}
 	}
 	// 使用消耗品
 	else
 	{
-		ActiveAction_Server(CanbeActivedInfoSPtr->Socket, bIsAutomaticStop);
+		ActiveActionImp(CanbeActivedInfoSPtr->Socket, bIsAutomaticStop);
 	}
 
 	return true;

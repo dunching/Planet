@@ -1,4 +1,4 @@
-dian1
+
 #include "PlanetPlayerController.h"
 
 #include "GameFramework/PlayerState.h"
@@ -250,7 +250,8 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 		RootComponent->SetWorldLocation(MyPawn->GetActorLocation());
 #endif
 
-		MyPawn->FaceRotation(ViewRotation, DeltaTime);
+		// 不要直接使用Controller上的旋转
+		// MyPawn->FaceRotation(ViewRotation, DeltaTime);
 	}
 }
 
@@ -587,4 +588,3 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray< FString >
 		}
 	}
 }
-

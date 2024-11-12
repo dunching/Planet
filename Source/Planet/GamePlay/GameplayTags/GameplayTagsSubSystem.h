@@ -93,6 +93,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FGameplayTag MovementStateAble_Orient2Acce =
 		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Orient2Acce")));
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FGameplayTag MovementStateAble_UseCustomRotation =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.UseCustomRotation")));
 #pragma endregion 
 	
 #pragma region State Tags

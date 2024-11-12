@@ -5,7 +5,7 @@
 
 #include "Abilities/Tasks/AbilityTask_ApplyRootMotionRadialForce.h"
 
-#include "AbilityTask_MyApplyRootMotionRadialForce.generated.h"
+#include "AbilityTask_ARM_RadialForce.generated.h"
 
 DECLARE_DELEGATE(FOnTaskFinished);
 
@@ -15,14 +15,14 @@ class ATractionPoint;
  *	Applies force to character's movement
  */
 UCLASS()
-class PLANET_API UAbilityTask_MyApplyRootMotionRadialForce :
+class PLANET_API UAbilityTask_ARM_RadialForce :
 	public UAbilityTask_ApplyRootMotionRadialForce
 {
 	GENERATED_UCLASS_BODY()	
 
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
-	static UAbilityTask_MyApplyRootMotionRadialForce* MyApplyRootMotionRadialForce(
+	static UAbilityTask_ARM_RadialForce* MyApplyRootMotionRadialForce(
 		UGameplayAbility* OwningAbility, 
 		FName TaskInstanceName, 
 		TWeakObjectPtr<ATractionPoint>TractionPointPtr

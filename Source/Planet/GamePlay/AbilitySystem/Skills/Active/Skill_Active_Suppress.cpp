@@ -31,7 +31,13 @@
 #include "CS_RootMotion.h"
 #include "CS_PeriodicStateModify_Suppress.h"
 #include "BasicFutures_MoveToAttaclArea.h"
-#include "Skill_Active_Control.h"
+#include "AbilityTask_ARM_MoveToForce.h"
+
+static TAutoConsoleVariable<int32> Skill_Active_Suppress_Debug(
+	TEXT("Skill_Active_Suppress.Debug"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
 
 bool USkill_Active_Suppress::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -53,7 +59,7 @@ bool USkill_Active_Suppress::CanActivateAbility(
 	{
 		if (HasFocusActor())
 		{
-			auto bIsHaveTargetInDistance = CheckTargetInDistance(MaxDistance);
+			const auto bIsHaveTargetInDistance = CheckTargetInDistance(MaxDistance);
 			if (bIsHaveTargetInDistance)
 			{
 			}
@@ -104,77 +110,121 @@ void USkill_Active_Suppress::PerformAction(
 		}
 #endif
 
-		ExcuteTasks();
-		PlayMontage();
+#if UE_EDITOR || UE_CLIENT
+		if (CharacterPtr->GetLocalRole() < ROLE_Authority)
+		{
+			const auto bIsHaveTargetInDistance = CheckTargetIsEqualDistance(Distance);
+			if (bIsHaveTargetInDistance)
+			{
+				PerformAction_Server();
+				PerformActionImp();
+			}
+			else
+			{
+				auto FocusCharacterPtr = HasFocusActor();
+
+				const auto FocusCharacterPt = FocusCharacterPtr->GetActorLocation();
+
+				const auto StartPt = CharacterPtr->GetActorLocation();
+				const auto TargetPt = FocusCharacterPt + ((StartPt - FocusCharacterPt).GetSafeNormal() * Distance);
+
+#ifdef WITH_EDITOR
+				if (Skill_Active_Suppress_Debug.GetValueOnGameThread())
+				{
+					DrawDebugSphere(GetWorld(), TargetPt, 10, 24, FColor::Red, false, 10);
+				}
+#endif
+
+				PerformMove_Server(StartPt, TargetPt);
+				PerformMoveImp(StartPt, TargetPt);
+			}
+		}
+#endif
 	}
+}
+
+void USkill_Active_Suppress::PerformAction_Server_Implementation()
+{
+	PerformActionImp();
+}
+
+void USkill_Active_Suppress::PerformActionImp()
+{
+	ExcuteTasks();
+	PlayMontage();
+}
+
+void USkill_Active_Suppress::PerformMove_Server_Implementation(const FVector& StartPt, const FVector& TargetPt)
+{
+	PerformMoveImp(StartPt, TargetPt);
+}
+
+void USkill_Active_Suppress::PerformMoveImp(const FVector& StartPt, const FVector& TargetPt)
+{
+	auto TaskPtr = UAbilityTask_ARM_MoveToForce::ApplyRootMotionMoveToForce(
+		this,
+		TEXT(""),
+		StartPt,
+		TargetPt,
+		Duration
+	);
+
+	TaskPtr->Ability = this;
+	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	TaskPtr->OnFinished.BindUObject(this, &ThisClass::MoveCompletedSignature);
+
+	TaskPtr->ReadyForActivation();
+}
+
+void USkill_Active_Suppress::CancelAbility_Server_Implementation()
+{
+	K2_CancelAbility();
 }
 
 void USkill_Active_Suppress::ExcuteTasks()
 {
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (CharacterPtr)
 	{
-		if (CharacterPtr)
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 		{
-			FCollisionObjectQueryParams ObjectQueryParams;
-			ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
+			auto TargetCharacter = HasFocusActor();
+			ExcuteTasksImp(TargetCharacter);
+		}
+#endif
+	}
+}
 
-			FCollisionQueryParams Params;
-			Params.AddIgnoredActor(CharacterPtr);
-
-			const auto Dir = UKismetMathLibrary::MakeRotFromZX(
-				UKismetGravityLibrary::GetGravity(CharacterPtr->GetActorLocation()), CharacterPtr->GetControlRotation().Vector()
-			).Vector();
-
-			auto Result = UKismetCollisionHelper::OverlapMultiSectorByObjectType(
-				GetWorld(),
-				CharacterPtr->GetActorLocation(),
-				CharacterPtr->GetActorLocation() + (Dir * Radius),
-				Angle,
-				9,
-				ObjectQueryParams,
-				Params
-			);
-
-			TSet<ACharacterBase*>TargetSet;
-			for (const auto& Iter : Result)
-			{
-				auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-				if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
-				{
-					TargetSet.Add(TargetCharacterPtr);
-				}
-			}
-
+void USkill_Active_Suppress::ExcuteTasksImp_Implementation(ACharacterBase* TargetCharacterPtr)
+{
+	if (CharacterPtr)
+	{
+#if UE_EDITOR || UE_SERVER
+		if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+		{
 			// 伤害
 			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
 
 			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
-			for (const auto& Iter : TargetSet)
-			{
-				FGAEventData GAEventData(Iter, CharacterPtr);
+			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
 
-				GAEventData.SetBaseDamage(Damage);
+			GAEventData.SetBaseDamage(Damage);
 
-				GAEventDataPtr->DataAry.Add(GAEventData);
-			}
+			GAEventDataPtr->DataAry.Add(GAEventData);
 			ICPtr->SendEventImp(GAEventDataPtr);
 
 			// 控制效果,压制
-			for (const auto& Iter : TargetSet)
-			{
-				auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Suppress(TargetMontage);
+			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Suppress(TargetMontage);
 
-				GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-				GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
+			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
+			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = TargetCharacterPtr;
 
-				ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-			}
+			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
-	}
 #endif
+	}
 }
 
 void USkill_Active_Suppress::PlayMontage()
@@ -202,18 +252,22 @@ void USkill_Active_Suppress::PlayMontage()
 	}
 }
 
-void USkill_Active_Suppress::MoveCompletedSignature(EPathFollowingResult::Type PathFollowingResult)
+void USkill_Active_Suppress::MoveCompletedSignature()
 {
-	switch (PathFollowingResult)
+#if UE_EDITOR || UE_CLIENT
+	if (CharacterPtr->GetLocalRole() < ROLE_Authority)
 	{
-	case EPathFollowingResult::Success:
-	{
+		const auto bIsHaveTargetInDistance = CheckTargetIsEqualDistance(Distance);
+		if (bIsHaveTargetInDistance)
+		{
+			PerformAction_Server();
+			PerformActionImp();
+		}
+		else
+		{
+			// 未能达到需要的距离
+			CancelAbility_Server();
+		}
 	}
-	break;
-	default:
-	{
-		K2_CancelAbility();
-	}
-	break;
-	}
+#endif
 }

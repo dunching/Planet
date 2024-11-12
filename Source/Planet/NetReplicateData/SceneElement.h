@@ -99,6 +99,9 @@ public:
 	// 通过远程的更新客户端的数据
 	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
 
+	// 是否可以激活
+	virtual bool CanActive()const;
+	
 	// 激活
 	virtual bool Active();
 
@@ -414,6 +417,9 @@ struct PLANET_API FActiveSkillProxy :
 public:
 
 	FActiveSkillProxy();
+
+	// 是否可以激活
+	virtual bool CanActive()const;
 
 	virtual bool Active()override;
 

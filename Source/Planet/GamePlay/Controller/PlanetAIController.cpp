@@ -230,7 +230,8 @@ void APlanetAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePaw
 				RootComponent->SetWorldLocation(MyPawn->GetActorLocation());
 #endif
 
-				MyPawn->FaceRotation(ViewRotation, DeltaTime);
+				// 不要直接使用Controller上的旋转
+				// MyPawn->FaceRotation(ViewRotation, DeltaTime);
 			}
 		}
 	}

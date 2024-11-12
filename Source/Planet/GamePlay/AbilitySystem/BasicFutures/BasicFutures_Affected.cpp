@@ -4,7 +4,7 @@
 #include "CharacterBase.h"
 #include "AbilityTask_PlayMontage.h"
 #include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 
 UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
 {
@@ -176,7 +176,7 @@ void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
 			(ActiveParamPtr->TriggerCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).GetSafeNormal() :
 			ActiveParamPtr->RepelDirection;
 
-		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			this,
 			TEXT(""),
 			Direction,

@@ -68,6 +68,11 @@ void FBasicProxy::UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr)
 	UnitType = RemoteSPtr->UnitType;
 }
 
+bool FBasicProxy::CanActive() const
+{
+	return true;
+}
+
 bool FBasicProxy::Active()
 {
 	return true;
@@ -488,87 +493,6 @@ void FSkillProxy::UnAllocation()
 	UnRegisterSkill();
 }
 
-bool FActiveSkillProxy::Active()
-{
-#if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetProxyCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
-	{
-		auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
-		if (!InGAInsPtr)
-		{
-			return false;
-		}
-
-		auto ASCPtr = GetProxyCharacter()->GetAbilitySystemComponent();
-
-		// 需要特殊参数的
-		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
-			)
-		{
-			if (InGAInsPtr->IsActive())
-			{
-				InGAInsPtr->SetContinuePerform(true);
-				return true;
-			}
-			else
-			{
-				auto GameplayAbilityTargetPtr =
-					new FGameplayAbilityTargetData_Control;
-
-				// Test
-				GameplayAbilityTargetPtr->TargetCharacterPtr = GetAllocationCharacter();
-
-				FGameplayEventData Payload;
-				Payload.TargetData.Add(GameplayAbilityTargetPtr);
-
-				return ASCPtr->TriggerAbilityFromGameplayEvent(
-					InGAInsPtr->GetCurrentAbilitySpecHandle(),
-					ASCPtr->AbilityActorInfo.Get(),
-					GetUnitType(),
-					&Payload,
-					*ASCPtr
-				);
-			}
-		}
-		else
-		{
-			if (InGAInsPtr->IsActive())
-			{
-				InGAInsPtr->SetContinuePerform(true);
-				return true;
-			}
-			else
-			{
-				auto GameplayAbilityTargetPtr =
-					new FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
-
-				GameplayAbilityTargetPtr->bIsAutoContinue =
-					ProxyCharacterPtr->GetRemoteRole() == ROLE_AutonomousProxy ? false : true;
-
-				FGameplayEventData Payload;
-				Payload.TargetData.Add(GameplayAbilityTargetPtr);
-
-				return ASCPtr->TriggerAbilityFromGameplayEvent(
-					InGAInsPtr->GetCurrentAbilitySpecHandle(),
-					ASCPtr->AbilityActorInfo.Get(),
-					GetUnitType(),
-					&Payload,
-					*ASCPtr
-				);
-			}
-		}
-	}
-#endif
-
-	return true;
-}
-
-void FActiveSkillProxy::Cancel()
-{
-}
-
 void FWeaponSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
 {
 	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
@@ -809,6 +733,156 @@ FActiveSkillProxy::FActiveSkillProxy()
 {
 }
 
+bool FActiveSkillProxy::CanActive() const
+{
+	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
+	if (!InGAInsPtr)
+	{
+		return false;
+	}
+
+	// 本地判断是否能释放（有些条件仅本地存在，比如是否锁定了目标）
+	if (
+		InGAInsPtr->CanActivateAbility(InGAInsPtr->GetCurrentAbilitySpecHandle(),
+			InGAInsPtr->GetCurrentActorInfo())
+		)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+bool FActiveSkillProxy::Active()
+{
+	// #if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetProxyCharacter();
+	// 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
+		if (!InGAInsPtr)
+		{
+			return false;
+		}
+
+		auto ASCPtr = GetProxyCharacter()->GetAbilitySystemComponent();
+
+		// 需要特殊参数的
+		if (
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
+			)
+		{
+			if (InGAInsPtr->IsActive())
+			{
+				InGAInsPtr->SetContinuePerform(true);
+				return true;
+			}
+			else
+			{
+				auto GameplayAbilityTargetPtr =
+					new FGameplayAbilityTargetData_Control;
+
+				// Test
+				GameplayAbilityTargetPtr->TargetCharacterPtr = GetAllocationCharacter();
+
+				FGameplayEventData Payload;
+				Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+				return ASCPtr->TriggerAbilityFromGameplayEvent(
+					InGAInsPtr->GetCurrentAbilitySpecHandle(),
+					ASCPtr->AbilityActorInfo.Get(),
+					GetUnitType(),
+					&Payload,
+					*ASCPtr
+				);
+			}
+		}
+		else
+		{
+			if (InGAInsPtr->IsActive())
+			{
+				InGAInsPtr->SetContinuePerform(true);
+				return true;
+			}
+			else
+			{
+				auto GameplayAbilityTargetPtr =
+					new FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
+
+				GameplayAbilityTargetPtr->bIsAutoContinue =
+					ProxyCharacterPtr->GetRemoteRole() == ROLE_AutonomousProxy ? false : true;
+
+				FGameplayEventData Payload;
+				Payload.TargetData.Add(GameplayAbilityTargetPtr);
+
+				return ASCPtr->TriggerAbilityFromGameplayEvent(
+					InGAInsPtr->GetCurrentAbilitySpecHandle(),
+					ASCPtr->AbilityActorInfo.Get(),
+					GetUnitType(),
+					&Payload,
+					*ASCPtr
+				);
+			}
+		}
+	}
+	//#endif
+
+	//	return true;
+}
+
+void FActiveSkillProxy::Cancel()
+{
+}
+
+bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+{
+	auto CDSPtr = GetProxyCharacter()->GetCDCaculatorComponent()->GetCooldown(
+		this
+	);
+
+	if (CDSPtr)
+	{
+		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+	}
+
+	return true;
+}
+
+bool FActiveSkillProxy::CheckCooldown() const
+{
+	auto CDSPtr = GetProxyCharacter()->GetCDCaculatorComponent()->GetCooldown(
+		this
+	);
+
+	if (CDSPtr)
+	{
+		return CDSPtr->CheckCooldown();
+	}
+
+	return true;
+}
+
+void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
+{
+}
+
+void FActiveSkillProxy::FreshUniqueCooldownTime()
+{
+}
+
+void FActiveSkillProxy::ApplyCooldown()
+{
+	GetProxyCharacter()->GetCDCaculatorComponent()->ApplyCooldown(
+		this
+	);
+}
+
+void FActiveSkillProxy::OffsetCooldownTime()
+{
+}
+
 FTableRowUnit_ActiveSkillExtendInfo* FActiveSkillProxy::GetTableRowUnit_ActiveSkillExtendInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
@@ -965,53 +1039,6 @@ void FCoinProxy::AddCurrentValue(int32 val)
 int32 FCoinProxy::GetCurrentValue() const
 {
 	return Num;
-}
-
-bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
-{
-	auto CDSPtr = GetProxyCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
-	);
-
-	if (CDSPtr)
-	{
-		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-	}
-
-	return true;
-}
-
-bool FActiveSkillProxy::CheckCooldown() const
-{
-	auto CDSPtr = GetProxyCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
-	);
-
-	if (CDSPtr)
-	{
-		return CDSPtr->CheckCooldown();
-	}
-
-	return true;
-}
-
-void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
-{
-}
-
-void FActiveSkillProxy::FreshUniqueCooldownTime()
-{
-}
-
-void FActiveSkillProxy::ApplyCooldown()
-{
-	GetProxyCharacter()->GetCDCaculatorComponent()->ApplyCooldown(
-		this
-	);
-}
-
-void FActiveSkillProxy::OffsetCooldownTime()
-{
 }
 
 void FWeaponProxy::ActiveWeapon()

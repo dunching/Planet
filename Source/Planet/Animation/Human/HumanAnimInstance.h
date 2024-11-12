@@ -33,6 +33,7 @@ public:
 
 	virtual void BeginDestroy() override;
 
+	// 角度旋转还是不正确？不确定
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetIsMelee(bool bIsMeele);
 

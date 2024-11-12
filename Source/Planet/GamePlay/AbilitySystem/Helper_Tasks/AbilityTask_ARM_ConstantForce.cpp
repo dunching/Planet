@@ -1,6 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 
 #include "GameFramework/RootMotionSource.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -13,13 +13,13 @@
 
 #include "Helper_RootMotionSource.h"
 
-UAbilityTask_MyApplyRootMotionConstantForce::UAbilityTask_MyApplyRootMotionConstantForce(const FObjectInitializer& ObjectInitializer)
+UAbilityTask_ARM_ConstantForce::UAbilityTask_ARM_ConstantForce(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
 	StrengthOverTime = nullptr;
 }
 
-UAbilityTask_MyApplyRootMotionConstantForce* UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce
+UAbilityTask_ARM_ConstantForce* UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce
 (
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,
@@ -37,7 +37,7 @@ UAbilityTask_MyApplyRootMotionConstantForce* UAbilityTask_MyApplyRootMotionConst
 {
 	UAbilitySystemGlobals::NonShipping_ApplyGlobalAbilityScaler_Duration(Duration);
 
-	UAbilityTask_MyApplyRootMotionConstantForce* MyTask = NewAbilityTask<UAbilityTask_MyApplyRootMotionConstantForce>(OwningAbility, TaskInstanceName);
+	UAbilityTask_ARM_ConstantForce* MyTask = NewAbilityTask<UAbilityTask_ARM_ConstantForce>(OwningAbility, TaskInstanceName);
 
 	MyTask->Priority = bIsForceMove ? ERootMotionSource_Priority::kForceMove: ERootMotionSource_Priority::kMove;
 	MyTask->ForceName = TaskInstanceName;
@@ -54,14 +54,14 @@ UAbilityTask_MyApplyRootMotionConstantForce* UAbilityTask_MyApplyRootMotionConst
 	return MyTask;
 }
 
-void UAbilityTask_MyApplyRootMotionConstantForce::Activate()
+void UAbilityTask_ARM_ConstantForce::Activate()
 {
 	Super::Activate();
 
 	SharedInitAndApply();
 }
 
-void UAbilityTask_MyApplyRootMotionConstantForce::SharedInitAndApply()
+void UAbilityTask_ARM_ConstantForce::SharedInitAndApply()
 {
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
@@ -92,13 +92,13 @@ void UAbilityTask_MyApplyRootMotionConstantForce::SharedInitAndApply()
 	}
 	else
 	{
-		ABILITY_LOG(Warning, TEXT("UAbilityTask_MyApplyRootMotionConstantForce called in Ability %s with null MovementComponent; Task Instance Name %s."),
+		ABILITY_LOG(Warning, TEXT("UAbilityTask_ARM_ConstantForce called in Ability %s with null MovementComponent; Task Instance Name %s."),
 			Ability ? *Ability->GetName() : TEXT("NULL"),
 			*InstanceName.ToString());
 	}
 }
 
-void UAbilityTask_MyApplyRootMotionConstantForce::TickTask(float DeltaTime)
+void UAbilityTask_ARM_ConstantForce::TickTask(float DeltaTime)
 {
 	if (bIsFinished)
 	{
@@ -122,7 +122,7 @@ void UAbilityTask_MyApplyRootMotionConstantForce::TickTask(float DeltaTime)
 				MyActor->ForceNetUpdate();
 				if (ShouldBroadcastAbilityTaskDelegates())
 				{
-					OnFinish.ExecuteIfBound();
+					OnFinished.ExecuteIfBound();
 				}
 				EndTask();
 			}
@@ -135,25 +135,25 @@ void UAbilityTask_MyApplyRootMotionConstantForce::TickTask(float DeltaTime)
 	}
 }
 
-void UAbilityTask_MyApplyRootMotionConstantForce::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+void UAbilityTask_ARM_ConstantForce::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UAbilityTask_MyApplyRootMotionConstantForce, WorldDirection);
-	DOREPLIFETIME(UAbilityTask_MyApplyRootMotionConstantForce, Strength);
-	DOREPLIFETIME(UAbilityTask_MyApplyRootMotionConstantForce, Duration);
-	DOREPLIFETIME(UAbilityTask_MyApplyRootMotionConstantForce, bIsAdditive);
-	DOREPLIFETIME(UAbilityTask_MyApplyRootMotionConstantForce, StrengthOverTime);
-	DOREPLIFETIME(UAbilityTask_MyApplyRootMotionConstantForce, bEnableGravity);
+	DOREPLIFETIME(UAbilityTask_ARM_ConstantForce, WorldDirection);
+	DOREPLIFETIME(UAbilityTask_ARM_ConstantForce, Strength);
+	DOREPLIFETIME(UAbilityTask_ARM_ConstantForce, Duration);
+	DOREPLIFETIME(UAbilityTask_ARM_ConstantForce, bIsAdditive);
+	DOREPLIFETIME(UAbilityTask_ARM_ConstantForce, StrengthOverTime);
+	DOREPLIFETIME(UAbilityTask_ARM_ConstantForce, bEnableGravity);
 }
 
-void UAbilityTask_MyApplyRootMotionConstantForce::PreDestroyFromReplication()
+void UAbilityTask_ARM_ConstantForce::PreDestroyFromReplication()
 {
 	bIsFinished = true;
 	EndTask();
 }
 
-void UAbilityTask_MyApplyRootMotionConstantForce::OnDestroy(bool AbilityIsEnding)
+void UAbilityTask_ARM_ConstantForce::OnDestroy(bool AbilityIsEnding)
 {
 	if (MovementComponent)
 	{

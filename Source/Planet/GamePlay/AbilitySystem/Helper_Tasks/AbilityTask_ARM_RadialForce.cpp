@@ -1,5 +1,5 @@
 
-#include "AbilityTask_MyApplyRootMotionRadialForce.h"
+#include "AbilityTask_ARM_RadialForce.h"
 
 #include "TimerManager.h"
 #include "Engine/World.h"
@@ -15,27 +15,27 @@
 #include "CharacterBase.h"
 #include "CS_RootMotion_Traction.h"
 
-UAbilityTask_MyApplyRootMotionRadialForce::UAbilityTask_MyApplyRootMotionRadialForce(
+UAbilityTask_ARM_RadialForce::UAbilityTask_ARM_RadialForce(
 	const FObjectInitializer& ObjectInitializer
 )
 	: Super(ObjectInitializer)
 {
 }
 
-void UAbilityTask_MyApplyRootMotionRadialForce::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+void UAbilityTask_ARM_RadialForce::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, TractionPointPtr);
 }
 
-UAbilityTask_MyApplyRootMotionRadialForce* UAbilityTask_MyApplyRootMotionRadialForce::MyApplyRootMotionRadialForce(
+UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRadialForce(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName, 
 	TWeakObjectPtr<ATractionPoint>InTractionPointPtr
 )
 {
-	auto MyTask = NewAbilityTask<UAbilityTask_MyApplyRootMotionRadialForce>(OwningAbility, TaskInstanceName);
+	auto MyTask = NewAbilityTask<UAbilityTask_ARM_RadialForce>(OwningAbility, TaskInstanceName);
 
 	MyTask->ForceName = TaskInstanceName;
 
@@ -61,7 +61,7 @@ UAbilityTask_MyApplyRootMotionRadialForce* UAbilityTask_MyApplyRootMotionRadialF
 	return MyTask;
 }
 
-void UAbilityTask_MyApplyRootMotionRadialForce::SharedInitAndApply()
+void UAbilityTask_ARM_RadialForce::SharedInitAndApply()
 {
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
@@ -104,7 +104,7 @@ void UAbilityTask_MyApplyRootMotionRadialForce::SharedInitAndApply()
 	}
 }
 
-void UAbilityTask_MyApplyRootMotionRadialForce::TickTask(float DeltaTime)
+void UAbilityTask_ARM_RadialForce::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
 
@@ -124,7 +124,7 @@ void UAbilityTask_MyApplyRootMotionRadialForce::TickTask(float DeltaTime)
 	}
 }
 
-void UAbilityTask_MyApplyRootMotionRadialForce::OnDestroy(bool AbilityIsEnding)
+void UAbilityTask_ARM_RadialForce::OnDestroy(bool AbilityIsEnding)
 {
 	if (MovementComponent)
 	{
@@ -134,7 +134,7 @@ void UAbilityTask_MyApplyRootMotionRadialForce::OnDestroy(bool AbilityIsEnding)
 	Super::OnDestroy(AbilityIsEnding);
 }
 
-void UAbilityTask_MyApplyRootMotionRadialForce::UpdateLocation(TWeakObjectPtr<ATractionPoint>InTractionPointPtr)
+void UAbilityTask_ARM_RadialForce::UpdateLocation(TWeakObjectPtr<ATractionPoint>InTractionPointPtr)
 {
 	if (MovementComponent)
 	{

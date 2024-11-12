@@ -9,7 +9,7 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_PlayMontage.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
 #include "ProxyProcessComponent.h"
@@ -191,6 +191,8 @@ void UBasicFutures_Dash::InitalDefaultTags()
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Dash);
 
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
+
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
 
 	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->FlyAway);
@@ -297,7 +299,7 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 		)
 	{
-		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			this,
 			TEXT(""),
 			Direction,

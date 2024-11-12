@@ -175,7 +175,8 @@ bool USkill_Base::CheckTargetInDistance(int32 InDistance)const
 		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
 		if (TargetCharacterPtr)
 		{
-			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+			const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation());
+			return Distance < InDistance;
 		}
 	}
 	else
@@ -184,7 +185,35 @@ bool USkill_Base::CheckTargetInDistance(int32 InDistance)const
 		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
 		if (TargetCharacterPtr)
 		{
-			return FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < InDistance;
+			const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation());
+			return Distance < InDistance;
+		}
+	}
+
+	return false;
+}
+
+bool USkill_Base::CheckTargetIsEqualDistance(int32 InDistance) const
+{
+	const float Tolerance = 5.f;
+	if (CharacterPtr->IsPlayerControlled())
+	{
+		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation());
+			return FMath::IsNearlyEqual(Distance, InDistance, Tolerance);
+		}
+	}
+	else
+	{
+		auto ACPtr = CharacterPtr->GetController<AAIController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation());
+			return FMath::IsNearlyEqual(Distance, InDistance, Tolerance);
 		}
 	}
 

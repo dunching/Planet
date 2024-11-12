@@ -19,7 +19,7 @@
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -107,7 +107,7 @@ void UCS_RootMotion_KnockDown::ExcuteTasks()
 {
 	if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
 	{
-		TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+		TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			this,
 			TEXT(""),
 			UKismetGravityLibrary::GetGravity(FVector::ZeroVector),

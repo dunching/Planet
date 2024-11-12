@@ -24,12 +24,12 @@
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
-#include "AbilityTask_MyApplyRootMotionRadialForce.h"
+#include "AbilityTask_ARM_RadialForce.h"
 #include "StateProcessorComponent.h"
 
 ATractionPoint::ATractionPoint(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -294,7 +294,7 @@ void UCS_RootMotion_Traction::ExcuteTasks()
 #endif
 
 	// 
-	RootMotionTaskPtr = UAbilityTask_MyApplyRootMotionRadialForce::MyApplyRootMotionRadialForce(
+	RootMotionTaskPtr = UAbilityTask_ARM_RadialForce::MyApplyRootMotionRadialForce(
 		this,
 		TEXT(""),
 		GameplayAbilityTargetDataSPtr->TractionPointPtr

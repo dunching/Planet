@@ -17,7 +17,7 @@ class UTexture2D;
 struct FConsumableProxy;
 class UEffectItem;
 class ASPlineActor;
-class UAbilityTask_MyApplyRootMotionRadialForce;
+class UAbilityTask_ARM_RadialForce;
 class UNetConnection;
 
 struct FStreamableHandle;
@@ -165,7 +165,7 @@ protected:
 	
 	TSharedPtr<FRootMotionParam>GameplayAbilityTargetDataSPtr = nullptr;
 
-	UAbilityTask_MyApplyRootMotionRadialForce* RootMotionTaskPtr = nullptr;
+	UAbilityTask_ARM_RadialForce* RootMotionTaskPtr = nullptr;
 	
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 

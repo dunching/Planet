@@ -6,6 +6,7 @@
 #include "AbilitySystemGlobals.h"
 #include <GameFramework/CharacterMovementComponent.h>
 #include "Animation/AnimMontage.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "KismetGravityLibrary.h"
 
@@ -20,7 +21,7 @@
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -29,6 +30,12 @@
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "AbilityTask_PlayMontage.h"
+
+static TAutoConsoleVariable<int32> CS_PeriodicStateModify_Suppress(
+	TEXT("CS_PeriodicStateModify_Suppress"),
+	0,
+	TEXT("")
+	TEXT(" default: 0"));
 
 FGameplayAbilityTargetData_StateModify_Suppress::FGameplayAbilityTargetData_StateModify_Suppress(
 	float InDuration
@@ -169,6 +176,28 @@ void UCS_PeriodicStateModify_Suppress::PerformAction()
 
 		}
 #endif
+		const auto Z = -UKismetGravityLibrary::GetGravity();
+		const auto Dir =
+			StateParamSPtr->TriggerCharacterPtr->GetActorLocation() -
+			CharacterPtr->GetActorLocation();
+		const auto FocusRotation = UKismetMathLibrary::MakeRotFromZX(Z, Dir);
+		
+		CharacterPtr->FaceRotation(FocusRotation);
+
+#ifdef WITH_EDITOR
+		if (CS_PeriodicStateModify_Suppress.GetValueOnGameThread())
+		{
+			DrawDebugLine(
+				GetWorld(), 
+				CharacterPtr->GetActorLocation(),
+				CharacterPtr->GetActorLocation() + (FocusRotation.Vector() * 200),
+				FColor::Red, 
+				false, 
+				10
+			);
+		}
+#endif
+
 		PlayMontage();
 	}
 	else
@@ -215,10 +244,14 @@ void UCS_PeriodicStateModify_Suppress::InitalDefaultTags()
 	Super::InitalDefaultTags();
 
 	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Suppress);
+
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
+
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Suppress);
 
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
 	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_UseCustomRotation);
 }
