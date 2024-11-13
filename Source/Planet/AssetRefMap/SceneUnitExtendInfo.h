@@ -23,6 +23,8 @@ struct FCoinProxy;
 struct FBasicProxy;
 
 struct FTableRowUnit_TagExtendInfo;
+struct FTableRowUnit_CharacterGrowthAttribute;
+struct FTableRowUnit_AICharacter_Allocation;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API USceneUnitExtendInfoMap : public UObject
@@ -46,26 +48,33 @@ public:
 
 	void InitialData();
 
+	// 可被持有的“物品”基础信息
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit;
-	
+
+	// 可被持有的“武器”
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_WeaponExtendInfo;
-	
+
+	// 可被持有的“主动技能”
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_ActiveSkillExtendInfo;
 
+	// 可被持有的“被动技能”
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_PassiveSkillExtendInfo;
-	
+
+	// 可被持有的“武器技能”
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_WeaponSkillExtendInfo;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Unit_CharacterInfo;
-	
+	// 可被持有的“消耗品”
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Unit_Consumable;
+	
+	// 可被持有的“队友/角色”
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_Unit_CharacterInfo;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_TagExtendInfo;
@@ -76,9 +85,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_PropertyEntrys;
 
+	// AICharacter的技能配分
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_AICharacter_Allocation;
-
+	TSoftObjectPtr<UDataTable> DataTable_Character_Allocation;
+	
+	// Character的成长属性
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
+	TSoftObjectPtr<UDataTable> DataTable_Character_GrowthAttribute;
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Talent")
 	TMap<EPointPropertyType, UPAD_Talent_Property*> PAD_Talent_PropertyMap;
 	

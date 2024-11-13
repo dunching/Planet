@@ -275,7 +275,7 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 				auto CharacterPtr = Cast<AHumanCharacter>(ActorPtr);
 				if (Args.IsValidIndex(3))
 				{
-					CharacterPtr->RowName = FGameplayTag::RequestGameplayTag(*Args[3]);
+					CharacterPtr->CharacterGrowthAttribute = FGameplayTag::RequestGameplayTag(*Args[3]);
 				}
 			};
 

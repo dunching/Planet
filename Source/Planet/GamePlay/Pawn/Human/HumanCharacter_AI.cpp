@@ -25,21 +25,22 @@
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
 #include "SceneUnitExtendInfo.h"
+#include "CharactersInfo.h"
 
-AHumanCharacter_NPC::AHumanCharacter_NPC(const FObjectInitializer& ObjectInitializer) :
+AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	AIComponentPtr = CreateDefaultSubobject<UAIComponent>(TEXT("AIComponent"));
 }
 
-void AHumanCharacter_NPC::BeginPlay()
+void AHumanCharacter_AI::BeginPlay()
 {
 	Super::BeginPlay();
 
 	InitialAllocations();
 }
 
-void AHumanCharacter_NPC::InitialAllocations()
+void AHumanCharacter_AI::InitialAllocations()
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)

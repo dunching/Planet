@@ -21,9 +21,10 @@ struct FTableRowUnit_WeaponExtendInfo;
 struct FTableRowUnit_ActiveSkillExtendInfo;
 struct FTableRowUnit_PassiveSkillExtendInfo;
 struct FTableRowUnit_WeaponSkillExtendInfo;
-struct FTableRowUnit_CharacterInfo;
+struct FTableRowUnit_CharacterGrowthAttribute;
 struct FTableRowUnit_Consumable;
 struct FTableRowUnit_PropertyEntrys;
+struct FTableRowUnit_CharacterType;
 class UTexture2D;
 class AToolUnitBase;
 class AWeapon_Base;
@@ -296,12 +297,16 @@ public:
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	FTableRowUnit_CharacterInfo* GetTableRowUnit_CharacterInfo()const;
+	FTableRowUnit_CharacterGrowthAttribute* GetTableRowUnit_CharacterInfo()const;
+	
+	FTableRowUnit_CharacterType* GetDT_CharacterType()const;
 
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();
 
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
+
+	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
 
 protected:
 

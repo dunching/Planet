@@ -17,7 +17,6 @@
 struct FTableRowUnit;
 struct FTableRowUnit_WeaponExtendInfo;
 struct FTableRowUnit_ActiveSkillExtendInfo;
-struct FTableRowUnit_CharacterInfo;
 class AToolUnitBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;

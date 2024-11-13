@@ -12,6 +12,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "SceneElement.h"
 #include "TemplateHelper.h"
+#include "CharactersInfo.h"
 
 FTableRowUnit* GetTableRowUnit(const FGameplayTag& UnitType)
 {

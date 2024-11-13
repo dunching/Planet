@@ -77,6 +77,18 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		// GA全部通过Server注册
+		auto GASPtr = GetAbilitySystemComponent();
+
+		GASPtr->ClearAllAbilities();
+		GASPtr->InitAbilityActorInfo(this, this);
+		GetBaseFeatureComponent()->InitialBaseGAs();
+	}
+#endif
+
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 #if UE_EDITOR || UE_CLIENT
@@ -169,26 +181,13 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 
 void ACharacterBase::PostInitializeComponents()
 {
+	Super::PostInitializeComponents();
+
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
 		InitialDefaultCharacterUnit();
 
-#if UE_EDITOR || UE_SERVER
-		if (GetNetMode() == NM_DedicatedServer)
-		{
-			// GA全部通过Server注册
-			auto GASPtr = GetAbilitySystemComponent();
-
-			GASPtr->ClearAllAbilities();
-			GASPtr->InitAbilityActorInfo(this, this);
-			GetBaseFeatureComponent()->InitialBaseGAs();
-		}
-#endif
-	}
-
-	if ((World->IsGameWorld()))
-	{
 		HoldingItemsComponentPtr->Proxy_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
 
 		ProxyProcessComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
@@ -200,8 +199,6 @@ void ACharacterBase::PostInitializeComponents()
 
 		TalentAllocationComponentPtr->Talent_FASI_Container.TalentAllocationComponentPtr = TalentAllocationComponentPtr;
 	}
-
-	Super::PostInitializeComponents();
 }
 
 void ACharacterBase::PossessedBy(AController* NewController)
@@ -321,28 +318,12 @@ void ACharacterBase::InitialDefaultCharacterUnit()
 	}
 #endif
 
-	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
-
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
 	}
 #endif
-	
-	// 
-
-	// 
-	if (CharacterUnitPtr)
-	{
-		auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
-	}
-	else
-	{
-		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
-		checkNoEntry();
-	}
-//	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
 }
 
 void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneObjPtr)

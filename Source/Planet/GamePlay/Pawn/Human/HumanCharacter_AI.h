@@ -12,13 +12,13 @@
 class UAIComponent;
 
 UCLASS()
-class PLANET_API AHumanCharacter_NPC : public AHumanCharacter
+class PLANET_API AHumanCharacter_AI : public AHumanCharacter
 {
 	GENERATED_BODY()
 
 public:
 
-	AHumanCharacter_NPC(const FObjectInitializer& ObjectInitializer);
+	AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 	
@@ -29,21 +29,15 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag AI_Allocation_RowName = FGameplayTag::EmptyTag;
-	
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
+	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
+
 protected:
 
 	void InitialAllocations();
 
 	UPROPERTY()
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
-
-};
-
-UCLASS()
-class PLANET_API AHumanCharacter_AI : public AHumanCharacter_NPC
-{
-	GENERATED_BODY()
-
-public:
 
 };

@@ -16,6 +16,7 @@
 #include "SceneUnitContainer.h"
 #include "GroupMnaggerComponent.h"
 #include "PropertyEntrys.h"
+#include "CharactersInfo.h"
 #include "Skill_Base.h"
 #include "Weapon_Base.h"
 #include "Skill_Active_Base.h"
@@ -1002,13 +1003,23 @@ void FCharacterProxy::InitialUnit()
 
 }
 
-FTableRowUnit_CharacterInfo* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
+FTableRowUnit_CharacterGrowthAttribute* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
+{
+	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Character_GrowthAttribute.LoadSynchronous();
+
+	auto SceneUnitExtendInfoPtr =
+		DataTable->FindRow<FTableRowUnit_CharacterGrowthAttribute>(*ProxyCharacterPtr->CharacterGrowthAttribute.ToString(), TEXT("GetUnit"));
+	return SceneUnitExtendInfoPtr;
+}
+
+FTableRowUnit_CharacterType* FCharacterProxy::GetDT_CharacterType() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
 
 	auto SceneUnitExtendInfoPtr =
-		DataTable->FindRow<FTableRowUnit_CharacterInfo>(*ProxyCharacterPtr->RowName.ToString(), TEXT("GetUnit"));
+		DataTable->FindRow<FTableRowUnit_CharacterType>(*AI_CharacterType.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
 }
 

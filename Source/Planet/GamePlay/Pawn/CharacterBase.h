@@ -124,9 +124,9 @@ public:
  	UPROPERTY(Transient)
  	UCharacterTitle* CharacterTitlePtr = nullptr;
  	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "RowName")
-	FGameplayTag RowName = FGameplayTag::EmptyTag;
-	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
+	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
+
 protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;

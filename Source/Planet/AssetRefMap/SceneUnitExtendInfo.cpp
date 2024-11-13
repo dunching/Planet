@@ -8,6 +8,7 @@
 #include "PlanetWorldSettings.h"
 #include "StateTagExtendInfo.h"
 #include "TalentInfo.h"
+#include "CharactersInfo.h"
 
 USceneUnitExtendInfoMap::USceneUnitExtendInfoMap() :
 	Super()
@@ -53,7 +54,7 @@ FTableRowUnit_TagExtendInfo* USceneUnitExtendInfoMap::GetTableRowUnit_TagExtendI
 
 FTableRowUnit_AICharacter_Allocation* USceneUnitExtendInfoMap::GetTableRowUnit_AICharacter_Allocation(FGameplayTag UnitType) const
 {
-	auto DataTablePtr = DataTable_AICharacter_Allocation.LoadSynchronous();
+	auto DataTablePtr = DataTable_Character_Allocation.LoadSynchronous();
 
 	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowUnit_AICharacter_Allocation>(*UnitType.ToString(), TEXT("GetUnit"));
 

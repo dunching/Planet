@@ -122,41 +122,6 @@ struct PLANET_API FTableRowUnit_WeaponSkillExtendInfo : public FTableRowUnit_Ski
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_CharacterInfo : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-	
-	FTableRowUnit_CharacterInfo();
-
-// 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-// 	FCharacterAttributes CharacterAttributes;
-
-	// 每级增加的属性
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TArray<FCharacterAttributes> CharacterAttributesPerLevel;
-
-};
-
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_AICharacter_Allocation : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag FirstWeaponSocketInfo;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag SecondWeaponSocketInfo;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag ActiveSkillSet_1;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag ActiveSkillSet_2;
-
-};
-
-USTRUCT(BlueprintType)
 struct PLANET_API FTableRowUnit_Consumable : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
