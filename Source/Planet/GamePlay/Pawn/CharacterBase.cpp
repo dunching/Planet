@@ -44,7 +44,7 @@
 #include "GAEvent_Helper.h"
 #include "CharacterRisingTips.h"
 #include "SceneObj.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -336,12 +336,12 @@ void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneO
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupMnaggerComponent()->GetGroupHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+	return GetGroupMnaggerComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit());
 }
 
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupMnaggerComponent()->GetTeamHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+	return GetGroupMnaggerComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit());
 }
 
 ACharacterBase* ACharacterBase::GetFocusActor() const
@@ -458,7 +458,7 @@ void ACharacterBase::OnCharacterGroupMateChanged(
 	{
 		if (TargetCharacterUnitPtr)
 		{
-			if (TargetCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerCharacterUnitPtr == GetCharacterUnit())
+			if (TargetCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->OwnerCharacterUnitPtr == GetCharacterUnit())
 			{
 				auto AIPCPtr = TargetCharacterUnitPtr->ProxyCharacterPtr->GetController<AHumanAIController>();
 				if (AIPCPtr)

@@ -24,7 +24,7 @@
 #include "PlanetPlayerState.h"
 #include "ConsumableIcon.h"
 #include "GroupmateIcon.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "GroupMnaggerComponent.h"
 #include "AllocationSkills.h"
 
@@ -444,9 +444,9 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 				WidgetPtr->SwitchSelectState(true);
 			}
 		}
-		auto GroupHelperSPtr = CharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
 
-		auto GroupmateUnitAry = GroupHelperSPtr->MembersSet;
+		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
+		auto GroupmateUnitAry = HICPtr->GetCharacterProxyAry();
 
 		for (auto Iter : GroupmateUnitAry)
 		{

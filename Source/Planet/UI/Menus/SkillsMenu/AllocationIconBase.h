@@ -10,7 +10,7 @@
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "AllocationIconBase.generated.h"
 

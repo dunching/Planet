@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "CharacterBase.h"
-#include <SceneElement.h>
+#include "ItemProxy.h"
 #include "ProxyProcessComponent.h"
 
 #include "HorseCharacter.generated.h"

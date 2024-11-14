@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 
 #include "MyUserWidget.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "HoldingItemsComponent.h"
 #include "ProxyProcessComponent.h"
 

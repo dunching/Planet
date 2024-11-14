@@ -8,7 +8,7 @@
 #include "UIInterfaces.h"
 #include "MyUserWidget.h"
 #include "Common/GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "TeamMateInfo.generated.h"
 

@@ -7,7 +7,7 @@
 
 #include "GameplayTagContainer.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "CharacterAttibutes.h"
 
 #include "SceneUnitTable.generated.h"

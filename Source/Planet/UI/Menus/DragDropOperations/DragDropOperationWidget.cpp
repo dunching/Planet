@@ -17,7 +17,7 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 UDragDropOperationWidget::UDragDropOperationWidget(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

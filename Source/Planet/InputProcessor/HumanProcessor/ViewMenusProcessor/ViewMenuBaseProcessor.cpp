@@ -1,5 +1,5 @@
 
-#include "HumanViewMenuBase.h"
+#include "ViewMenuBaseProcessor.h"
 
 #include <Kismet/GameplayStatics.h>
 #include "CharacterBase.h"
@@ -23,18 +23,18 @@
 
 namespace HumanProcessor
 {
-	FHumanViewMenuBase::FHumanViewMenuBase(FOwnerPawnType* CharacterPtr) :
+	FViewMenuBaseProcessor::FViewMenuBaseProcessor(FOwnerPawnType* CharacterPtr) :
 		Super(CharacterPtr)
 	{
 
 	}
 
-	void FHumanViewMenuBase::ESCKeyPressed()
+	void FViewMenuBaseProcessor::ESCKeyPressed()
 	{
 		Switch2RegularProcessor();
 	}
 
-	void FHumanViewMenuBase::Switch2RegularProcessor()
+	void FViewMenuBaseProcessor::Switch2RegularProcessor()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
 	}

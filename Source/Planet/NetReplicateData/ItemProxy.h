@@ -9,10 +9,9 @@
 #include <GameplayTagContainer.h>
 #include "GameplayAbilitySpecHandle.h"
 
-#include "GenerateType.h"
-#include "BaseData.h"
+#include "TemplateHelper.h"
 
-#include "SceneElement.generated.h"
+#include "ItemProxy.generated.h"
 
 struct FGameplayAbilityTargetData_RegisterParam;
 struct FTableRowUnit_CommonCooldownInfo;
@@ -82,6 +81,9 @@ struct PLANET_API FBasicProxy
 
 public:
 
+	using FOnAllocationCharacterUnitChanged =
+		TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>;
+
 	friend FSceneUnitContainer;
 	friend FProxy_FASI_Container;
 	friend UHoldingItemsComponent;
@@ -127,7 +129,7 @@ public:
 	// 
 	FString GetUnitName()const;
 
-	TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)> OnAllocationCharacterUnitChanged;
+	FOnAllocationCharacterUnitChanged OnAllocationCharacterUnitChanged;
 
 	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr);
 
@@ -306,7 +308,7 @@ public:
 
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
-	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
+	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 
 protected:
 

@@ -8,7 +8,7 @@
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
 #include "SceneUnitExtendInfo.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "PlanetControllerInterface.h"
 
 UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer) :
@@ -20,7 +20,7 @@ UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectI
 void UHoldingItemsComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
@@ -157,7 +157,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 
 		OnConsumableUnitChanged(DynamicCastSharedPtr<FConsumableProxy>(Result), EProxyModifyType::kAdd);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
@@ -238,7 +238,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(CharacterProxySPtr->GetID()));
@@ -246,7 +246,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(ProxySPtr->GetID()));
@@ -272,7 +272,7 @@ TSharedPtr<FWeaponProxy> UHoldingItemsComponent::AddUnit_Weapon(const FGameplayT
 	ResultPtr->UnitType = UnitType;
 	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
 	ResultPtr->HoldingItemsComponentPtr = this;
-	ResultPtr->WeaponSkillID = 
+	ResultPtr->WeaponSkillID =
 		AddUnit_Skill(ResultPtr->GetTableRowUnit_WeaponExtendInfo()->WeaponSkillUnitType)->GetID();
 
 	ResultPtr->InitialUnit();
@@ -525,7 +525,7 @@ TArray<TSharedPtr<FCharacterProxy>> UHoldingItemsComponent::GetCharacterProxyAry
 
 	for (auto Iter : SceneToolsAry)
 	{
-		if (Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+		if (Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 		{
 			auto GroupmateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(Iter);
 			check(GroupmateUnitPtr);
@@ -580,9 +580,9 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy(const FGameplayTag& Uni
 	{
 		ResultSPtr = AddUnit_Consumable(UnitType);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->DataSource_Character))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
-		ResultSPtr = AddUnit_Consumable(UnitType);
+		ResultSPtr = AddUnit_Character(UnitType);
 	}
 
 	return ResultSPtr;
@@ -604,7 +604,7 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialDefaultCharacter()
 
 	CharacterProxySPtr = MakeShared<FCharacterProxy>();
 
-	CharacterProxySPtr->UnitType = UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player;
+	CharacterProxySPtr->UnitType = UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player;
 	CharacterProxySPtr->ProxyCharacterPtr = GetOwner<FOwnerType>();
 	CharacterProxySPtr->InitialUnit();
 
@@ -622,12 +622,23 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddUnit_Character(const FGam
 
 	TSharedPtr<FCharacterProxy>  ResultPtr = nullptr;
 
-	if (UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player == UnitType)
+	if (UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player == UnitType)
 	{
 		ResultPtr = MakeShared<FCharacterProxy>();
 
 #if WITH_EDITOR
 #endif
+
+		ResultPtr->UnitType = UnitType;
+		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+
+		ResultPtr->InitialUnit();
+
+		Proxy_Container.AddItem(ResultPtr);
+	}
+	else
+	{
+		ResultPtr = MakeShared<FCharacterProxy>();
 
 		ResultPtr->UnitType = UnitType;
 		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();

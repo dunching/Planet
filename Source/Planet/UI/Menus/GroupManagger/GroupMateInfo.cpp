@@ -15,26 +15,28 @@
 #include "Engine/AssetManager.h"
 #include "Components/Border.h"
 
-
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "GameplayTagsSubSystem.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 
-namespace GroupMateInfo
+struct FGroupMateInfo : public TStructVariable<FGroupMateInfo>
 {
-	const FName Texture = TEXT("Texture");
+	const FName Icon = TEXT("Icon");
 
 	const FName Text = TEXT("Text");
+};
 
-	const FName Content = TEXT("Content");
+void UGroupMateInfo::NativeOnListItemObjectSet(UObject* ListItemObject)
+{
+	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 
-	const FName Default = TEXT("Default");
+	InvokeReset(Cast<ThisClass>(ListItemObject));
 }
 
 FReply UGroupMateInfo::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -89,26 +91,11 @@ void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupMateInfo::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Default));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-		
 		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Texture));
+			auto UIPtr = Cast<UImage>(GetWidgetFromName(FGroupMateInfo::Get().Icon));
 			if (UIPtr)
 			{
 				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
@@ -119,33 +106,29 @@ void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitP
 			}
 		}
 		{
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(GroupMateInfo::Text));
+			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGroupMateInfo::Get().Text));
 			if (UIPtr)
 			{
-				auto CharacterAttributes =
-					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-				UIPtr->SetText(
-					FText::FromString(FString::Printf(TEXT("%s(%d)"), 
-						*CharacterAttributes.Name.ToString(),
-						CharacterAttributes.Level))
-				);
-			}
-		}
-	}
-	else
-	{
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupMateInfo::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(GroupMateInfo::Default));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Visible);
+				auto CharacterAttributesSPtr =
+					GroupMateUnitPtr->CharacterAttributesSPtr;
+
+				if (CharacterAttributesSPtr->Name.IsEmpty())
+				{
+					UIPtr->SetText(
+						FText::FromString(FString::Printf(TEXT("%s(%d)"),
+							*CharacterAttributesSPtr->Title,
+							CharacterAttributesSPtr->Level))
+					);
+				}
+				else
+				{
+					UIPtr->SetText(
+						FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
+							*CharacterAttributesSPtr->Title,
+							*CharacterAttributesSPtr->Name,
+							CharacterAttributesSPtr->Level))
+					);
+				}
 			}
 		}
 	}

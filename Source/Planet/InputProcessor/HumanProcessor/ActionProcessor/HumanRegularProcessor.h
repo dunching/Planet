@@ -7,7 +7,7 @@
 #include "CoreMinimal.h"
 #include "GameplayAbilitySpecHandle.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "HumanProcessor.h"
 #include "ProxyProcessComponent.h"
 

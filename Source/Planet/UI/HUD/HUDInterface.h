@@ -9,7 +9,7 @@
 #include "UObject/Interface.h"
 
 #include "GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "HUDInterface.generated.h"
 

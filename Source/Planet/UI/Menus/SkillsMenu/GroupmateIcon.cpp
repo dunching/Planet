@@ -10,7 +10,7 @@
 
 #include "UICommon.h"
 #include "CharacterAttributesComponent.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "CharacterAttibutes.h"
 #include "TemplateHelper.h"
 #include "CharacterBase.h"
@@ -95,9 +95,9 @@ void UGroupmateIcon::SetName()
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGroupmateIcon::Get().Text));
 	if (UIPtr)
 	{
-		auto CharacterAttributes =
-			UnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		UIPtr->SetText(FText::FromName(CharacterAttributes.Name));
+		auto CharacterAttributesSPtr =
+			UnitPtr->CharacterAttributesSPtr;
+		UIPtr->SetText(FText::FromString(CharacterAttributesSPtr->Name));
 	}
 }
 

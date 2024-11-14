@@ -58,7 +58,7 @@
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "HumanViewTalentAllocation.h"
-#include "HumanViewGroupManagger.h"
+#include "ViewGroupsProcessor.h"
 #include "GroupMnaggerComponent.h"
 
 #include "GameplayTagsSubSystem.h"
@@ -449,7 +449,7 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::HKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewGroupManagger>();
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewGroupsProcessor>();
 	}
 
 	void FHumanRegularProcessor::XKeyPressed()

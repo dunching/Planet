@@ -1,5 +1,5 @@
 
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 
 #include "AssetRefMap.h"
 #include "Planet.h"
@@ -10,7 +10,7 @@
 #include "SceneUnitExtendInfo.h"
 #include "HoldingItemsComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "TemplateHelper.h"
 #include "CharactersInfo.h"
 
@@ -67,12 +67,12 @@ void FProxy_FASI::PostReplicatedAdd(const struct FProxy_FASI_Container& InArrayS
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player))
 	{
 		// 本地有一个默认的
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
@@ -116,11 +116,11 @@ void FProxy_FASI::PostReplicatedChange(const struct FProxy_FASI_Container& InArr
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate_Player))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
@@ -173,7 +173,7 @@ bool FProxy_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 			auto TempProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
@@ -246,7 +246,7 @@ bool FProxy_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 			{
 				auto TempProxySPtr = MakeShared<FCharacterProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);

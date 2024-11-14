@@ -17,7 +17,7 @@
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "HumanCharacter.h"
 
 #include "TeamMateInfo.h"

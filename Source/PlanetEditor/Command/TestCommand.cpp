@@ -17,7 +17,7 @@
 #include <StateTagExtendInfo.h>
 #include "HumanCharacter.h"
 #include "SPlineActor.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "Skill_Base.h"
 #include "Talent_FASI.h"
 #include "TalentAllocationComponent.h"
@@ -360,7 +360,6 @@ void TestCommand::RecruitCharacter()
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 			if (TargetCharacterPtr)
 			{
-				CharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(TargetCharacterPtr->GetCharacterUnit());
 			}
 		}
 	}

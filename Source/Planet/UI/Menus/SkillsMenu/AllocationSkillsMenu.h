@@ -8,7 +8,7 @@
 
 #include "Common/GenerateType.h"
 #include "HoldingItemsComponent.h"
-#include <SceneElement.h>
+#include "ItemProxy.h"
 #include "MenuInterface.h"
 
 #include "AllocationSkillsMenu.generated.h"

@@ -10,7 +10,7 @@
 #include "HoldingItemsComponent.h"
 #include "SceneUnitExtendInfo.h"
 #include "GameplayTagsSubSystem.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 
 URaffleSubSystem* URaffleSubSystem::GetInstance()
 {

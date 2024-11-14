@@ -150,7 +150,10 @@ struct PLANET_API FCharacterAttributes final
 	FProcessedGAEvent ProcessedGAEvent;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName Name;
+	FString Title;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	FString Name;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 Level = 1;

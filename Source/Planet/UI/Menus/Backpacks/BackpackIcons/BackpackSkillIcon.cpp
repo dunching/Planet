@@ -19,7 +19,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "GameplayTagsSubSystem.h"
 
 UBackpackSkillIcon::UBackpackSkillIcon(const FObjectInitializer& ObjectInitializer) :

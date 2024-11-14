@@ -1,5 +1,5 @@
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "AbilitySystemComponent.h"
 
@@ -13,7 +13,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "GroupMnaggerComponent.h"
 #include "PropertyEntrys.h"
 #include "CharactersInfo.h"
@@ -986,6 +986,7 @@ TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 
 FCharacterProxy::FCharacterProxy()
 {
+	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
 }
 
 bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
@@ -993,6 +994,7 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
 	Ar << ProxyCharacterPtr;
+	CharacterAttributesSPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 	return true;
 }
@@ -1001,6 +1003,7 @@ void FCharacterProxy::InitialUnit()
 {
 	Super::InitialUnit();
 
+	CharacterAttributesSPtr->Title = GetDT_CharacterType()->Title;
 }
 
 FTableRowUnit_CharacterGrowthAttribute* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
@@ -1019,7 +1022,7 @@ FTableRowUnit_CharacterType* FCharacterProxy::GetDT_CharacterType() const
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
 
 	auto SceneUnitExtendInfoPtr =
-		DataTable->FindRow<FTableRowUnit_CharacterType>(*AI_CharacterType.ToString(), TEXT("GetUnit"));
+		DataTable->FindRow<FTableRowUnit_CharacterType>(*UnitType.ToString(), TEXT("GetUnit"));
 	return SceneUnitExtendInfoPtr;
 }
 

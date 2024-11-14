@@ -1,5 +1,5 @@
 
-#include "HumanViewGroupManagger.h"
+#include "ViewGroupsProcessor.h"
 
 #include <Kismet/GameplayStatics.h>
 
@@ -23,12 +23,12 @@
 
 namespace HumanProcessor
 {
-	FHumanViewGroupManagger::FHumanViewGroupManagger(FOwnerPawnType* CharacterPtr) :
+	FViewGroupsProcessor::FViewGroupsProcessor(FOwnerPawnType* CharacterPtr) :
 		Super(CharacterPtr)
 	{
 	}
 
-	void FHumanViewGroupManagger::EnterAction()
+	void FViewGroupsProcessor::EnterAction()
 	{
 		Super::EnterAction();
 
@@ -45,7 +45,7 @@ namespace HumanProcessor
 		}
 	}
 
-	void FHumanViewGroupManagger::QuitAction()
+	void FViewGroupsProcessor::QuitAction()
 	{
 		UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(false);
 
@@ -62,33 +62,33 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FHumanViewGroupManagger::GKeyPressed()
+	void FViewGroupsProcessor::GKeyPressed()
 	{
 	}
 
-	void FHumanViewGroupManagger::VKeyPressed()
+	void FViewGroupsProcessor::VKeyPressed()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 	}
 
-	void FHumanViewGroupManagger::BKeyPressed()
+	void FViewGroupsProcessor::BKeyPressed()
 	{
 	}
 
-	void FHumanViewGroupManagger::HKeyPressed()
+	void FViewGroupsProcessor::HKeyPressed()
 	{
 	}
 
-	void FHumanViewGroupManagger::PressedNumKey(int32 NumKey)
+	void FViewGroupsProcessor::PressedNumKey(int32 NumKey)
 	{
 
 	}
 
-	void FHumanViewGroupManagger::CheckInteraction()
+	void FViewGroupsProcessor::CheckInteraction()
 	{
 	}
 
-	void FHumanViewGroupManagger::QuitCurrentState()
+	void FViewGroupsProcessor::QuitCurrentState()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
 	}

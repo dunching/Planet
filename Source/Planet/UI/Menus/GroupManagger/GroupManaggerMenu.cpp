@@ -16,8 +16,9 @@
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "HumanCharacter.h"
+#include "GameplayTagsSubSystem.h"
 
 namespace GroupManaggerMenu
 {
@@ -60,24 +61,21 @@ void UGroupManaggerMenu::ResetGroupmates()
 	}
 
 	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
+	auto HICPtr = PCPtr->GetHoldingItemsComponent();
 
-	auto GroupsHelperSPtr = GMCPtr->GetGroupHelper();
-	if (GroupsHelperSPtr)
+	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
+	for (auto Iter : CharacterProxyAry)
 	{
-		for (auto Iter : GroupsHelperSPtr->MembersSet)
+		if (UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player == Iter->GetUnitType())
 		{
-			if (Iter == GroupsHelperSPtr->OwnerCharacterUnitPtr)
-			{
-				continue;
-			}
+			continue;
+		}
+		auto WidgetPtr = CreateWidget<UGroupMateInfo>(this, EntryClass);
+		if (WidgetPtr)
+		{
+			TileViewPtr->AddItem(WidgetPtr);
 
-			auto WidgetPtr = CreateWidget<UGroupMateInfo>(this, EntryClass);
-			if (WidgetPtr)
-			{
-				TileViewPtr->AddItem(WidgetPtr);
-
-				WidgetPtr->ResetToolUIByData(Iter);
-			}
+			WidgetPtr->ResetToolUIByData(Iter);
 		}
 	}
 }

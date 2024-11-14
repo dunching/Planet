@@ -12,10 +12,10 @@
 #include "PlanetControllerInterface.h"
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "Planet.h"
 #include "LogWriter.h"
 
@@ -43,27 +43,9 @@ void UGroupMnaggerComponent::TickComponent(
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UGroupMnaggerComponent::AddCharacterToGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
-{
-	//
-	GetGroupHelper()->AddCharacter(CharacterUnitPtr);
-}
-
 void UGroupMnaggerComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
-	GetGroupHelper()->AddCharacter(CharacterUnitPtr);
-}
-
-void UGroupMnaggerComponent::OnAddToNewGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
-{
-	GroupHelperSPtr = CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper();
-
-	if (CharacterUnitPtr->ProxyCharacterPtr->IsPlayerControlled())
-	{
-		TeamHelperSPtr->SwitchTeammateOption(ETeammateOption::kFree);
-	}
-
-	GroupHelperChangedDelegateContainer.ExcuteCallback();
+	GetTeamHelper()->AddCharacter(CharacterUnitPtr);
 }
 
 void UGroupMnaggerComponent::OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
@@ -71,15 +53,6 @@ void UGroupMnaggerComponent::OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>
 	TeamHelperSPtr = CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
 
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
-}
-
-const TSharedPtr<FGroupMatesHelper>& UGroupMnaggerComponent::GetGroupHelper()
-{
-	if (!GroupHelperSPtr)
-	{
-		CreateGroup();
-	}
-	return GroupHelperSPtr;
 }
 
 const TSharedPtr<FTeamMatesHelper>& UGroupMnaggerComponent::GetTeamHelper()
@@ -96,64 +69,41 @@ void UGroupMnaggerComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-TSharedPtr<FGroupMatesHelper> UGroupMnaggerComponent::CreateGroup()
-{
-	GroupHelperSPtr = MakeShared<FGroupMatesHelper>();
-	GroupHelperSPtr->OwnerCharacterUnitPtr = GetOwner<FOwnerType>()->GetCharacterUnit();
-	for (;;)
-	{
-		GroupHelperSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-		break;
-	}
-
-	GroupHelperChangedDelegateContainer.ExcuteCallback();
-
-	return GroupHelperSPtr;
-}
-
 TSharedPtr<FTeamMatesHelper> UGroupMnaggerComponent::CreateTeam()
 {
 	TeamHelperSPtr = MakeShared<FTeamMatesHelper>();
 	TeamHelperSPtr->OwnerCharacterUnitPtr = GetOwner<FOwnerType>()->GetCharacterUnit();
-	for (;;)
-	{
-		TeamHelperSPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-		break;
-	}
+	
+	TeamHelperSPtr->Guid = FGuid::NewGuid();
 
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 
 	return TeamHelperSPtr;
 }
 
-void FGroupMatesHelper::AddCharacter(FPawnType* PCPtr)
+void FTeamMatesHelper::AddCharacter(FPawnType* PCPtr)
 {
 	auto CharacterUnitPtr = PCPtr->GetCharacterUnit();
 	AddCharacter(CharacterUnitPtr);
 }
 
-void FGroupMatesHelper::AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
+void FTeamMatesHelper::AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
 	MembersSet.Add(CharacterUnitPtr);
-
-	CharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->OnAddToNewGroup(OwnerCharacterUnitPtr);
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterUnitPtr);
 }
 
-bool FGroupMatesHelper::IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr) const
+bool UGroupMnaggerComponent::IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr) const
 {
+	const auto MembersSet = GetOwner<FOwnerType>()->GetHoldingItemsComponent()->GetCharacterProxyAry();
+
 	for (auto Iter : MembersSet)
 	{
 		if (Iter == CharacterUnitPtr)
 		{
 			return true;
 		}
-	}
-
-	if (CharacterUnitPtr == OwnerCharacterUnitPtr)
-	{
-		return true;
 	}
 
 	return false;

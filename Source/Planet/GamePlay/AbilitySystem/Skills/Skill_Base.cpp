@@ -1,7 +1,7 @@
 
 #include "Skill_Base.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"

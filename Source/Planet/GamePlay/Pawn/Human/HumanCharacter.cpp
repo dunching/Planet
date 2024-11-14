@@ -42,10 +42,10 @@
 #include "HumanAIController.h"
 #include "CharacterTitle.h"
 #include "GroupMnaggerComponent.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "GetItemInfosList.h"
 
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -88,7 +88,7 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
-		auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupHelper();
+		auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetTeamHelper();
 		if (GroupsHelperSPtr)
 		{
 			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(

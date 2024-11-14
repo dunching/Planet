@@ -19,7 +19,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
 #include "CharacterAttibutes.h"
@@ -158,7 +158,7 @@ void UBackpackIcon::OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterPr
 			AllocationCharacterUnitPtr.Pin()->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		UIPtr->SetText(FText::FromName(CharacterAttributes.Name));
+		UIPtr->SetText(FText::FromString(CharacterAttributes.Name));
 	}
 	else
 	{

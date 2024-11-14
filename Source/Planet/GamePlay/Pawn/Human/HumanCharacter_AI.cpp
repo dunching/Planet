@@ -15,7 +15,7 @@
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "GroupMnaggerComponent.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"

@@ -41,12 +41,12 @@ void UMenuNavgationItem::OnClicked()
 	break;
 	case EMenuType::kGroupManagger:
 	{
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(true);
+		UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(true);
 	}
 	break;
 	case EMenuType::kRaffle:
 	{
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(true);
+		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(true);
 	}
 	break;
 	}

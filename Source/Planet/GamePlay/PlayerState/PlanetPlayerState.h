@@ -7,7 +7,7 @@
 #include "GameFramework/PlayerState.h"
 
 #include "PlanetAbilitySystemComponent.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "PlanetPlayerState.generated.h"
 

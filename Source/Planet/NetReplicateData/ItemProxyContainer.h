@@ -12,7 +12,7 @@
 #include "GenerateType.h"
 #include "BaseData.h"
 
-#include "SceneUnitContainer.generated.h"
+#include "ItemProxyContainer.generated.h"
 
 struct FTableRowUnit;
 struct FTableRowUnit_WeaponExtendInfo;

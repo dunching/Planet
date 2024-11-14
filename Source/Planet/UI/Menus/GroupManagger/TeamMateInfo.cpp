@@ -14,13 +14,14 @@
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
 #include "Components/Border.h"
+#include "Components/WidgetSwitcher.h"
 
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "CharacterBase.h"
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
@@ -29,16 +30,16 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 
-namespace TeamMateInfo
+struct FTeamMateInfo : public TStructVariable<FTeamMateInfo>
 {
-	const FName Texture = TEXT("Texture");
+	const FName Content = TEXT("Content");
+
+	const FName Icon = TEXT("Icon");
 
 	const FName Text = TEXT("Text");
 
-	const FName Content = TEXT("Content");
-
-	const FName Default = TEXT("Default");
-}
+	const FName WidgetSwitcher = TEXT("WidgetSwitcher");
+};
 
 void UTeamMateInfo::NativeOnListItemObjectSet(UObject* ListItemObject)
 {
@@ -95,62 +96,40 @@ void UTeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	auto WidgetSwitcherPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FTeamMateInfo::Get().WidgetSwitcher));
+	if (WidgetSwitcherPtr)
 	{
+		if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TeamMateInfo::Content));
-			if (BorderPtr)
+			WidgetSwitcherPtr->SetActiveWidgetIndex(0);
+
+			GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 			{
-				BorderPtr->SetVisibility(ESlateVisibility::Visible);
+				auto UIPtr = Cast<UImage>(GetWidgetFromName(FTeamMateInfo::Get().Icon));
+				if (UIPtr)
+				{
+					FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+					AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateUnitPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
+						{
+							UIPtr->SetBrushFromTexture(GroupMateUnitPtr->GetIcon().Get());
+						}));
+				}
+			}
+			{
+				auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FTeamMateInfo::Get().Text));
+				if (UIPtr)
+				{
+					auto CharacterAttributes =
+						GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+					UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"),
+						*CharacterAttributes.Name, CharacterAttributes.Level
+					)));
+				}
 			}
 		}
+		else
 		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(TeamMateInfo::Default));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-		
-		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
-		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(TeamMateInfo::Texture));
-			if (UIPtr)
-			{
-				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-				AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateUnitPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
-					{
-						UIPtr->SetBrushFromTexture(GroupMateUnitPtr->GetIcon().Get());
-					}));
-			}
-		}
-		{
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(TeamMateInfo::Text));
-			if (UIPtr)
-			{
-				auto CharacterAttributes =
-					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-				UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"), 
-					*CharacterAttributes.Name.ToString(), CharacterAttributes.Level
-				)));
-			}
-		}
-	}
-	else
-	{
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(TeamMateInfo::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(TeamMateInfo::Default));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Visible);
-			}
+			WidgetSwitcherPtr->SetActiveWidgetIndex(1);
 		}
 	}
 }

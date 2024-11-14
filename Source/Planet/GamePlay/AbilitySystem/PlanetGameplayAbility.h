@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "PlanetGameplayAbility.generated.h"
 
 class UPlanetAbilitySystemComponent;

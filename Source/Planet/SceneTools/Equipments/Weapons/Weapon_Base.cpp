@@ -3,7 +3,7 @@
 
 #include "PropertyEntrys.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "CharacterBase.h"
 #include "BaseFeatureComponent.h"
 #include "HumanCharacter.h"

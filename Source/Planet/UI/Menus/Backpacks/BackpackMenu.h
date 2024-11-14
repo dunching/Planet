@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 
 #include "Common/GenerateType.h"
-#include <SceneElement.h>
+#include "ItemProxy.h"
 #include <MenuInterface.h>
 
 #include "BackpackMenu.generated.h"

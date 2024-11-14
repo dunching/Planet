@@ -9,7 +9,7 @@
 
 #include "UICommon.h"
 #include "RaffleCommon.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "SceneUnitExtendInfo.h"
 
 #include "RaffleSubSystem.generated.h"

@@ -12,7 +12,7 @@
 #include "CharacterBase.h"
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "CoinList.h"
 #include "RaffleType.h"
 #include "RaffleBtn.h"
@@ -20,7 +20,7 @@
 #include "RaffleSubSystem.h"
 #include "Raffle_Unit.h"
 #include "SceneUnitExtendInfo.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "HoldingItemsComponent.h"
 
 struct FRaffleMenu : public TStructVariable<FRaffleMenu>

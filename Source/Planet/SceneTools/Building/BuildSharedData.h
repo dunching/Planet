@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "BuildSharedData.generated.h"
 

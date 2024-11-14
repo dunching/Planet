@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Common/GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "MenuInterface.h"
 
 #include "TeamMatesList.generated.h"

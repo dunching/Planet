@@ -8,7 +8,7 @@
 #include "CoreMinimal.h"
 
 #include "HumanProcessor.h"
-#include <SceneElement.h>
+#include "ItemProxy.h"
 #include "ProxyProcessComponent.h"
 
 class AHumanCharacter;

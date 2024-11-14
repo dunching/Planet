@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "Skill_Consumable_Base.h"
 
 #include "Skill_Consumable_Test.generated.h"

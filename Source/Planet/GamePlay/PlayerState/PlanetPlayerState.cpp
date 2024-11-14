@@ -7,9 +7,9 @@
 #include "CharacterAttributesComponent.h"
 #include "HoldingItemsComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "SceneUnitTable.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 APlanetPlayerState::APlanetPlayerState(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

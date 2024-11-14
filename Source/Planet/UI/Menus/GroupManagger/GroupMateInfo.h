@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 
+#include "Blueprint/IUserObjectListEntry.h"
+
 #include "MyUserWidget.h"
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "GroupMateInfo.generated.h"
 
@@ -22,11 +24,14 @@ struct FCharacterProxy;
 UCLASS()
 class PLANET_API UGroupMateInfo :
 	public UMyUserWidget,
-	public IUnitIconInterface
+	public IUnitIconInterface,
+	public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
 public:
+
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 

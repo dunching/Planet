@@ -18,7 +18,7 @@
 #include "BackpackIconWrapper.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "CharacterBase.h"
 
 struct FBackpackMenu : public TStructVariable<FBackpackMenu>

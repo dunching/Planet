@@ -13,7 +13,7 @@
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "GroupMnaggerComponent.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
@@ -22,7 +22,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "TalentAllocationComponent.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "GameMode_Main.h"
 #include "KismetGravityLibrary.h"
 

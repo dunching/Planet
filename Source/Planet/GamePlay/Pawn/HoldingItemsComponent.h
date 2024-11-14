@@ -6,8 +6,8 @@
 #include "Components/ActorComponent.h"
 
 #include "GenerateType.h"
-#include <SceneElement.h>
-#include "SceneUnitContainer.h"
+#include "ItemProxy.h"
+#include "ItemProxyContainer.h"
 
 #include "HoldingItemsComponent.generated.h"
 
@@ -155,7 +155,7 @@ private:
 
 	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinUnitMap;
 
-	// 默认的
+	// 默认的，表示Player自身的Proxy
 	TSharedPtr<FCharacterProxy> CharacterProxySPtr = nullptr;
 
 };

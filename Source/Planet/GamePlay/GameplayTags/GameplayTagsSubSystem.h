@@ -446,12 +446,16 @@ public:
 		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent.YinYang")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
-	FGameplayTag Unit_GroupMate=
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.GroupMate")));
+	FGameplayTag Unit_Character =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Character")));
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
-	FGameplayTag Unit_GroupMate_Player =
-		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.GroupMate.Player")));
+	FGameplayTag Unit_Character_Player =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Character.Player")));
+	
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "UnitType")
+	FGameplayTag Unit_Character_TestNPC_1 =
+		FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Character.TestNPC.1")));
 
 #pragma endregion 
 	

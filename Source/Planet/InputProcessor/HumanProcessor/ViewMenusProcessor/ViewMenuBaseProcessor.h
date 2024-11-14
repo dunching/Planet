@@ -10,17 +10,17 @@ class AHumanCharacter_Player;
 
 namespace HumanProcessor
 {
-	class FHumanViewMenuBase : public FInputProcessor
+	class FViewMenuBaseProcessor : public FInputProcessor
 	{
 	private:
 
-		GENERATIONCLASSINFO(FHumanViewMenuBase, FInputProcessor);
+		GENERATIONCLASSINFO(FViewMenuBaseProcessor, FInputProcessor);
 
 	public:
 
 		using FOwnerPawnType = AHumanCharacter_Player;
 
-		FHumanViewMenuBase(FOwnerPawnType* CharacterPtr);
+		FViewMenuBaseProcessor(FOwnerPawnType* CharacterPtr);
 
 		virtual void ESCKeyPressed()override;
 

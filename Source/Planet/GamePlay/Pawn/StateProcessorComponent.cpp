@@ -18,7 +18,7 @@
 #include "BasicFuturesBase.h"
 #include "GAEvent_Send.h"
 #include "GAEvent_Received.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "Weapon_Base.h"
 #include "Skill_Base.h"
 #include "Skill_Active_Base.h"

@@ -8,7 +8,7 @@
 
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "AllocationIconBase.h"
 
 #include "GroupmateIcon.generated.h"

@@ -7,7 +7,7 @@
 
 #include "MyUserWidget.h"
 #include "GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 #include "CoinList.generated.h"
 

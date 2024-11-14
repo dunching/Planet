@@ -8,7 +8,7 @@
 #include "Components/ActorComponent.h"
 
 #include "GenerateType.h"
-#include <SceneElement.h>
+#include "ItemProxy.h"
 #include "CharacterAttibutes.h"
 
 #include "CharacterAttributesComponent.generated.h"

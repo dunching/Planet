@@ -186,6 +186,7 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 {
 	if (Ar.IsSaving())
 	{
+		Ar << Title;
 		Ar << Name;
 		Ar << Level;
 
@@ -216,6 +217,7 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 				}
 			};
 
+		Ar << Title;
 		Ar << Name;
 		Ar << Level;
 
@@ -242,7 +244,9 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 
 void FCharacterAttributes::InitialData()
 {
-	Name = TEXT("Player");
+	Name = TEXT("");
+
+	Title = TEXT("");
 
 	LiDao.GetMaxProperty().SetCurrentValue(6);
 

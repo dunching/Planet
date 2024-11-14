@@ -19,7 +19,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "PlanetControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
 #include "GameplayTagsSubSystem.h"
@@ -52,7 +52,7 @@ void UHUD_TeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_GroupMate))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
 		{
 			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(HUD_TeamMateInfo::Content));
@@ -88,7 +88,7 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 				auto CharacterAttributes = 
 					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 				UIPtr->SetText(FText::FromString(
-					FString::Printf(TEXT("%s(%d)"), *CharacterAttributes.Name.ToString(), CharacterAttributes.Level)
+					FString::Printf(TEXT("%s(%d)"), *CharacterAttributes.Name, CharacterAttributes.Level)
 				));
 			}
 		}

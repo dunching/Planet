@@ -3,7 +3,7 @@
 
 #include <Components/VerticalBox.h>
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "GetItemInfosItem.h"
 #include "TemplateHelper.h"
 

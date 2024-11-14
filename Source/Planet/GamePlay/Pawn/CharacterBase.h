@@ -8,7 +8,7 @@
 
 #include "Character/GravityCharacter.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "SceneObjInteractionInterface.h"
 

@@ -32,8 +32,11 @@ struct PLANET_API FTableRowUnit_CharacterType : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AHumanCharacter_AI>CharacterClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FString Title;
 };
 
 // NPC分配的技能

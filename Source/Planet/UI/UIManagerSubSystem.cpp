@@ -123,6 +123,15 @@ void UUIManagerSubSystem::ViewTalentAllocation(bool bIsDisplay)
 
 void UUIManagerSubSystem::ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
 {
+	SwitchMenu(bIsDisplay);
+	if (bIsDisplay)
+	{
+		MenuLayoutPtr = GetMainMenu();
+		MenuLayoutPtr->SwitchViewer(EMenuType::kGroupManagger);
+	}
+	else
+	{
+	}
 }
 
 void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)

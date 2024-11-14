@@ -3,7 +3,7 @@
 
 #include "Net/UnrealNetwork.h"
 
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "AbilityTask_TimerHelper.h"

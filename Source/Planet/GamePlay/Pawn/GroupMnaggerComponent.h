@@ -12,43 +12,34 @@
 class AHumanCharacter;
 class ACharacterBase;
 class IPlanetControllerInterface;
+class UGroupMnaggerComponent;
 struct FSkillProxy;
 struct FActiveSkillProxy;
 struct FConsumableProxy;
 struct FCharacterProxy;
 
-class PLANET_API FGroupMatesHelper
+class PLANET_API FTeamMatesHelper
 {
 public:
+
+	friend UGroupMnaggerComponent;
 
 	using FCharacterUnitType = FCharacterProxy;
 
 	using FPawnType = ACharacterBase;
 
-	using FMemberChangedDelegateContainer = TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>;
+	using FMemberChangedDelegateContainer =
+		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>;
+
+	using FTeammateOptionChangedDelegateContainer = 
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>;
+
+	using FKnowCharaterChanged = 
+		TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>;
 
 	void AddCharacter(FPawnType* PCPtr);
 
 	void AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
-
-	bool IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)const;
-
-	int32 ID = 1;
-
-	FMemberChangedDelegateContainer MembersChanged;
-
-	TSharedPtr<FCharacterUnitType> OwnerCharacterUnitPtr = nullptr;
-
-	TSet<TSharedPtr<FCharacterUnitType>> MembersSet;
-};
-
-class PLANET_API FTeamMatesHelper : public FGroupMatesHelper
-{
-public:
-
-	using FTeammateOptionChangedDelegateContainer = TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>;
-
-	using FKnowCharaterChanged = TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>;
 
 	void SwitchTeammateOption(ETeammateOption InTeammateOption);
 
@@ -64,7 +55,16 @@ public:
 
 	FKnowCharaterChanged KnowCharaterChanged;
 
+	FMemberChangedDelegateContainer MembersChanged;
+
+	TSharedPtr<FCharacterUnitType> OwnerCharacterUnitPtr = nullptr;
+
+	// 分配的小队
+	TSet<TSharedPtr<FCharacterUnitType>> MembersSet;
+
 private:
+
+	FGuid Guid = FGuid();
 
 	TWeakObjectPtr<ACharacterBase>ForceKnowCharater;
 
@@ -98,21 +98,15 @@ public:
 		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
 	)override;
 
-	void AddCharacterToGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
-
 	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
-
-	TSharedPtr<FGroupMatesHelper> CreateGroup();
 
 	TSharedPtr<FTeamMatesHelper> CreateTeam();
 
-	void OnAddToNewGroup(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
-
 	void OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
-	const TSharedPtr<FGroupMatesHelper>& GetGroupHelper();
-
 	const TSharedPtr<FTeamMatesHelper>& GetTeamHelper();
+
+	bool IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)const;
 
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
@@ -125,8 +119,6 @@ protected:
 	virtual void BeginPlay()override;
 
 private:
-
-	TSharedPtr<FGroupMatesHelper> GroupHelperSPtr;
 
 	TSharedPtr<FTeamMatesHelper> TeamHelperSPtr;
 

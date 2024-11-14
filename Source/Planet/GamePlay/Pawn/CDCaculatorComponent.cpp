@@ -12,10 +12,10 @@
 #include "PlanetControllerInterface.h"
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 #include "Planet.h"
 #include "LogWriter.h"
 

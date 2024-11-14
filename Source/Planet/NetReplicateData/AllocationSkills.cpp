@@ -9,7 +9,7 @@
 #include "HumanCharacter.h"
 #include "SceneUnitExtendInfo.h"
 #include "GameplayTagsSubSystem.h"
-#include "SceneUnitContainer.h"
+#include "ItemProxyContainer.h"
 #include "HoldingItemsComponent.h"
 
 void FSocket_FASI::PreReplicatedRemove(const FAllocation_FASI_Container& InArraySerializer)

@@ -7,7 +7,8 @@
 #include "Abilities/GameplayAbilityTargetTypes.h"
 
 #include "GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
+#include "BaseData.h"
 
 #include "GAEvent_Helper.generated.h"
 

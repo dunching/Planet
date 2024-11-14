@@ -48,7 +48,7 @@ void UMenuLayout::SyncData()
 
 void UMenuLayout::SwitchViewer(EMenuType MenuType)
 {
-	auto Lambda = [this](int32 Index) 
+	auto Lambda = [this](int32 Index)
 		{
 			auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMenuLayout::Get().WidgetSwitcher));
 			if (UIPtr)
@@ -56,6 +56,7 @@ void UMenuLayout::SwitchViewer(EMenuType MenuType)
 				const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
 				if (CurrentIndex == Index)
 				{
+					// 这里不太对啊？
 					auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(Index));
 					if (MenuInterfacePtr)
 					{
@@ -93,9 +94,15 @@ void UMenuLayout::SwitchViewer(EMenuType MenuType)
 	}
 	break;
 	case EMenuType::kGroupManagger:
-		break;
+	{
+		Lambda(2);
+	}
+	break;
 	case EMenuType::kRaffle:
-		break;
+	{
+		Lambda(1);
+	}
+	break;
 	default:
 		break;
 	}

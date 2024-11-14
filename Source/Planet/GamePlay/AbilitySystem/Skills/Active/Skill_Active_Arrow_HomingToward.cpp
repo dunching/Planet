@@ -15,7 +15,7 @@
 #include "ProxyProcessComponent.h"
 #include "GameplayTagsSubSystem.h"
 #include "Skill_WeaponActive_Bow.h"
-#include "SceneElement.h"
+#include "ItemProxy.h"
 
 void USkill_Active_Arrow_HomingToward::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,

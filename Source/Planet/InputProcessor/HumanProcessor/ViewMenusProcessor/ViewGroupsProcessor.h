@@ -4,21 +4,21 @@
 
 #include "CoreMinimal.h"
 
-#include "HumanViewMenuBase.h"
+#include "ViewMenuBaseProcessor.h"
 
 class AHumanCharacter;
 
 namespace HumanProcessor
 {
-	class FHumanViewGroupManagger : public FHumanViewMenuBase
+	class FViewGroupsProcessor : public FViewMenuBaseProcessor
 	{
 	private:
 
-		GENERATIONCLASSINFO(FHumanViewGroupManagger, FHumanViewMenuBase);
+		GENERATIONCLASSINFO(FViewGroupsProcessor, FViewMenuBaseProcessor);
 
 	public:
 
-		FHumanViewGroupManagger(FOwnerPawnType* CharacterPtr);
+		FViewGroupsProcessor(FOwnerPawnType* CharacterPtr);
 
 		virtual void EnterAction()override;
 
