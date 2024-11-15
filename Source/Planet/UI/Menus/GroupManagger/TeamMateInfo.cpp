@@ -119,11 +119,25 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPt
 				auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FTeamMateInfo::Get().Text));
 				if (UIPtr)
 				{
-					auto CharacterAttributes =
-						GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-					UIPtr->SetText(FText::FromString(FString::Printf(TEXT("%s(%d)"),
-						*CharacterAttributes.Name, CharacterAttributes.Level
-					)));
+					auto CharacterAttributesSPtr =
+						GroupMateUnitPtr->CharacterAttributesSPtr;
+					if (CharacterAttributesSPtr->Name.IsEmpty())
+					{
+						UIPtr->SetText(
+							FText::FromString(FString::Printf(TEXT("%s(%d)"),
+								*CharacterAttributesSPtr->Title,
+								CharacterAttributesSPtr->Level))
+						);
+					}
+					else
+					{
+						UIPtr->SetText(
+							FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
+								*CharacterAttributesSPtr->Title,
+								*CharacterAttributesSPtr->Name,
+								CharacterAttributesSPtr->Level))
+						);
+					}
 				}
 			}
 		}

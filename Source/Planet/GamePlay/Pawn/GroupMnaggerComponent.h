@@ -98,7 +98,9 @@ public:
 		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
 	)override;
 
-	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
+	void SpwanTeammateCharacter();
+
+	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index);
 
 	TSharedPtr<FTeamMatesHelper> CreateTeam();
 
@@ -117,7 +119,10 @@ public:
 protected:
 
 	virtual void BeginPlay()override;
-
+	
+	UFUNCTION(Server, Reliable)
+	virtual void AddCharacterToTeam_Server(const FGuid&ProxtID, int32 Index);
+	
 private:
 
 	TSharedPtr<FTeamMatesHelper> TeamHelperSPtr;

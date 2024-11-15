@@ -24,8 +24,9 @@
 #include "HUD_TeamMateInfo.h"
 #include "GameplayTagsSubSystem.h"
 #include "CharacterBase.h"
+#include "TemplateHelper.h"
 
-namespace HUD_TeamMateInfo
+struct FHUD_TeamMateInfo : public TStructVariable<FHUD_TeamMateInfo>
 {
 	const FName Texture = TEXT("Texture");
 
@@ -36,7 +37,7 @@ namespace HUD_TeamMateInfo
 	const FName Default = TEXT("Default");
 
 	const FName TalentStateSocket = TEXT("TalentStateSocket");
-}
+};
 
 void UHUD_TeamMateInfo::NativeConstruct()
 {
@@ -54,24 +55,9 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 {
 	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
 	{
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(HUD_TeamMateInfo::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Visible);
-			}
-		}
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(HUD_TeamMateInfo::Default));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-
 		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{
-			auto UIPtr = Cast<UImage>(GetWidgetFromName(HUD_TeamMateInfo::Texture));
+			auto UIPtr = Cast<UImage>(GetWidgetFromName(FHUD_TeamMateInfo::Get().Texture));
 			if (UIPtr)
 			{
 				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
@@ -82,14 +68,28 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 			}
 		}
 		{
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(HUD_TeamMateInfo::Text));
+			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FHUD_TeamMateInfo::Get().Text));
 			if (UIPtr)
 			{
-				auto CharacterAttributes = 
-					GroupMateUnitPtr->ProxyCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-				UIPtr->SetText(FText::FromString(
-					FString::Printf(TEXT("%s(%d)"), *CharacterAttributes.Name, CharacterAttributes.Level)
-				));
+				auto CharacterAttributesSPtr =
+					GroupMateUnitPtr->CharacterAttributesSPtr;
+				if (CharacterAttributesSPtr->Name.IsEmpty())
+				{
+					UIPtr->SetText(
+						FText::FromString(FString::Printf(TEXT("%s(%d)"),
+							*CharacterAttributesSPtr->Title,
+							CharacterAttributesSPtr->Level))
+					);
+				}
+				else
+				{
+					UIPtr->SetText(
+						FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
+							*CharacterAttributesSPtr->Title,
+							*CharacterAttributesSPtr->Name,
+							CharacterAttributesSPtr->Level))
+					);
+				}
 			}
 		}
 
@@ -97,23 +97,6 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 		if (!PCPtr)
 		{
 			return;
-		}
-	}
-	else
-	{
-		{
-			auto BorderPtr = Cast<UBorder>(GetWidgetFromName(HUD_TeamMateInfo::Content));
-			if (BorderPtr)
-			{
-				BorderPtr->SetVisibility(ESlateVisibility::Hidden);
-			}
-		}
-		{
-			auto ImagePtr = Cast<UImage>(GetWidgetFromName(HUD_TeamMateInfo::Default));
-			if (ImagePtr)
-			{
-				ImagePtr->SetVisibility(ESlateVisibility::Visible);
-			}
 		}
 	}
 }

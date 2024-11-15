@@ -10,15 +10,16 @@
 #include "TeamMateInfo.h"
 #include "HUD_TeamMateInfo.h"
 #include "CharacterBase.h"
+#include "TemplateHelper.h"
 
-namespace GroupManaggerMenu
+struct FHUD_TeamInfo : public TStructVariable<FHUD_TeamInfo>
 {
 	const FName VerticalBox = TEXT("VerticalBox");
 
 	const FName FollowOpetion = TEXT("FollowOpetion");
 
 	const FName AssistanceOption = TEXT("AssistanceOption");
-}
+};
 
 void UHUD_TeamInfo::NativeConstruct()
 {
@@ -53,18 +54,19 @@ FReply UHUD_TeamInfo::NativeOnKeyDown(const FGeometry& InGeometry, const FKeyEve
 
 void UHUD_TeamInfo::ResetUIByData()
 {
-	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(GroupManaggerMenu::VerticalBox));
+	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(FHUD_TeamInfo::Get().VerticalBox));
 	if (!PanelPtr)
 	{
 		return;
 	}
-	PanelPtr->ClearChildren();
-
 	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;
 	}
+
+	auto ChidrensAry = PanelPtr->GetAllChildren();
+	int32 Index = 0;
 
 	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
 
@@ -73,14 +75,22 @@ void UHUD_TeamInfo::ResetUIByData()
 	{
 		for (auto Iter : MembersHelperSPtr->MembersSet)
 		{
-			auto WidgetPtr = CreateWidget<UHUD_TeamMateInfo>(this, TeamMateInfoClass);
-			if (WidgetPtr)
+			if (Index < ChidrensAry.Num())
 			{
-				PanelPtr->AddChild(WidgetPtr);
-
-				WidgetPtr->ResetToolUIByData(Iter);
+				ChidrensAry[Index]->SetVisibility(ESlateVisibility::Visible);
+				auto WidgetPtr = Cast<UHUD_TeamMateInfo>(ChidrensAry[Index]);
+				if (WidgetPtr)
+				{
+					WidgetPtr->ResetToolUIByData(Iter);
+				}
 			}
+			Index++;
 		}
+	}
+
+	for (; Index < ChidrensAry.Num(); Index++)
+	{
+		ChidrensAry[Index]->SetVisibility(ESlateVisibility::Hidden);
 	}
 
 	TeammateOptionChangedDelegateContainer = MembersHelperSPtr->TeammateOptionChanged.AddCallback(
@@ -96,7 +106,7 @@ void UHUD_TeamInfo::OnTeammateOptionChanged(
 )
 {
 	{
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupManaggerMenu::FollowOpetion));
+		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().FollowOpetion));
 		if (BorderPtr)
 		{
 			switch (TeammateOption)
@@ -115,7 +125,7 @@ void UHUD_TeamInfo::OnTeammateOptionChanged(
 		}
 	}
 	{
-		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(GroupManaggerMenu::AssistanceOption));
+		auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FHUD_TeamInfo::Get().AssistanceOption));
 		if (BorderPtr)
 		{
 			switch (TeammateOption)

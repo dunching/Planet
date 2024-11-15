@@ -45,49 +45,49 @@ void UTeamMatesList::NativeDestruct()
 
 void UTeamMatesList::ResetUIByData()
 {
-	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::VerticalBox));
-	if (!PanelPtr)
-	{
-		return;
-	}
-	PanelPtr->ClearChildren();
-	DelegateAry.Empty();
-
-	if (!HumanCharacterPtr)
-	{
-		return;
-	}
-
-	auto GMCPtr = HumanCharacterPtr->GetGroupMnaggerComponent();
-
-	int32 CurrentMemberNum = 0;
-	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
-	if (MembersHelperSPtr)
-	{
-		for (auto Iter : MembersHelperSPtr->MembersSet)
-		{
-			CurrentMemberNum++;
-			auto WidgetPtr = CreateWidget<UTeamMateInfo>(this, TeamMateInfoClass);
-			if (WidgetPtr)
-			{
-				PanelPtr->AddChild(WidgetPtr);
-
-				WidgetPtr->ResetToolUIByData(Iter);
-				DelegateAry.Add(WidgetPtr->OnDroped.AddCallback(std::bind(&ThisClass::OnTeammateChanged, this, std::placeholders::_1)));
-			}
-		}
-	}
-	for (; CurrentMemberNum < MaxMemberNum; CurrentMemberNum++)
-	{
-		auto WidgetPtr = CreateWidget<UTeamMateInfo>(this, TeamMateInfoClass);
-		if (WidgetPtr)
-		{
-			PanelPtr->AddChild(WidgetPtr);
-
-			WidgetPtr->ResetToolUIByData(nullptr);
-			DelegateAry.Add(WidgetPtr->OnDroped.AddCallback(std::bind(&ThisClass::OnTeammateChanged, this, std::placeholders::_1)));
-		}
-	}
+// 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::VerticalBox));
+// 	if (!PanelPtr)
+// 	{
+// 		return;
+// 	}
+// 	PanelPtr->ClearChildren();
+// 	DelegateAry.Empty();
+// 
+// 	if (!HumanCharacterPtr)
+// 	{
+// 		return;
+// 	}
+// 
+// 	auto GMCPtr = HumanCharacterPtr->GetGroupMnaggerComponent();
+// 
+// 	int32 CurrentMemberNum = 0;
+// 	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
+// 	if (MembersHelperSPtr)
+// 	{
+// 		for (auto Iter : MembersHelperSPtr->MembersSet)
+// 		{
+// 			CurrentMemberNum++;
+// 			auto WidgetPtr = CreateWidget<UTeamMateInfo>(this, TeamMateInfoClass);
+// 			if (WidgetPtr)
+// 			{
+// 				PanelPtr->AddChild(WidgetPtr);
+// 
+// 				WidgetPtr->ResetToolUIByData(Iter);
+// 				DelegateAry.Add(WidgetPtr->OnDroped.AddCallback(std::bind(&ThisClass::OnTeammateChanged, this, std::placeholders::_1)));
+// 			}
+// 		}
+// 	}
+// 	for (; CurrentMemberNum < MaxMemberNum; CurrentMemberNum++)
+// 	{
+// 		auto WidgetPtr = CreateWidget<UTeamMateInfo>(this, TeamMateInfoClass);
+// 		if (WidgetPtr)
+// 		{
+// 			PanelPtr->AddChild(WidgetPtr);
+// 
+// 			WidgetPtr->ResetToolUIByData(nullptr);
+// 			DelegateAry.Add(WidgetPtr->OnDroped.AddCallback(std::bind(&ThisClass::OnTeammateChanged, this, std::placeholders::_1)));
+// 		}
+// 	}
 }
 
 void UTeamMatesList::SyncData()

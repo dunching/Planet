@@ -41,6 +41,7 @@ struct FSocket_FASI : public FFastArraySerializerItem
 
 	FGameplayTag Socket;
 
+	// 
 	FGuid ProxyID;
 
 	TSharedPtr<FBasicProxy>ProxySPtr = nullptr;

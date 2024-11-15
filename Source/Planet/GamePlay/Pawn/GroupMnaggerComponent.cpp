@@ -18,6 +18,8 @@
 #include "ItemProxy.h"
 #include "Planet.h"
 #include "LogWriter.h"
+#include "TeamConfigureomponent.h"
+#include "TeamConfigure.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
@@ -43,9 +45,30 @@ void UGroupMnaggerComponent::TickComponent(
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UGroupMnaggerComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
+void UGroupMnaggerComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index)
 {
-	GetTeamHelper()->AddCharacter(CharacterUnitPtr);
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		GetTeamHelper()->AddCharacter(CharacterUnitPtr);
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		GetTeamHelper()->AddCharacter(CharacterUnitPtr);
+		AddCharacterToTeam_Server(CharacterUnitPtr->GetID(), Index);
+	}
+#endif
+
+	FTeammate_FASI Teammate_FASI;
+
+	Teammate_FASI.Index = Index;
+	Teammate_FASI.CharacterProxyID = CharacterUnitPtr->GetID();
+
+	auto PSPtr = GetOwner<FOwnerType>()->GetPlayerState<APlanetPlayerState>();
+	PSPtr->GetTeamConfigureomponent()->UpdateConfigure(Teammate_FASI);
 }
 
 void UGroupMnaggerComponent::OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
@@ -69,6 +92,13 @@ void UGroupMnaggerComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UGroupMnaggerComponent::AddCharacterToTeam_Server_Implementation(const FGuid& ProxtID, int32 Index)
+{
+	const auto CharacterProxySPtr = GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindUnit_Character(ProxtID);
+
+	AddCharacterToTeam(CharacterProxySPtr, Index);
+}
+
 TSharedPtr<FTeamMatesHelper> UGroupMnaggerComponent::CreateTeam()
 {
 	TeamHelperSPtr = MakeShared<FTeamMatesHelper>();
@@ -79,6 +109,11 @@ TSharedPtr<FTeamMatesHelper> UGroupMnaggerComponent::CreateTeam()
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 
 	return TeamHelperSPtr;
+}
+
+void UGroupMnaggerComponent::SpwanTeammateCharacter()
+{
+
 }
 
 void FTeamMatesHelper::AddCharacter(FPawnType* PCPtr)

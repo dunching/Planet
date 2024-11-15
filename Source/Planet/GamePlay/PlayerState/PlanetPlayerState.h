@@ -12,7 +12,7 @@
 #include "PlanetPlayerState.generated.h"
 
 class UPlanetAbilitySystemComponent;
-class UHoldingItemsComponent;
+class UTeamConfigureComponent;
 struct FCharacterProxy;
 struct FSceneUnitContainer;
 
@@ -25,12 +25,17 @@ public:
 
 	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
+	UTeamConfigureComponent* GetTeamConfigureomponent()const;
+
 protected:
 
 	virtual void BeginPlay() override;
 
 	void InitialData();
-
+	
+	UPROPERTY()
+	TObjectPtr<UTeamConfigureComponent> TeamConfigureompConentPtr = nullptr;
+	
 private:
 
 };
