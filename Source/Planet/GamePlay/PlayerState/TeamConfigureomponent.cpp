@@ -3,11 +3,16 @@
 
 #include "Net/UnrealNetwork.h"
 
+#include "PlanetPlayerState.h"
+#include "CharacterBase.h"
+
 FName UTeamConfigureComponent::ComponentName = TEXT("TeamConfigureomponent");
 
 UTeamConfigureComponent::UTeamConfigureComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	bWantsInitializeComponent = true;
+
 	SetIsReplicatedByDefault(true);
 }
 
@@ -20,5 +25,12 @@ void UTeamConfigureComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, Teammate_FASI_Container);
+//	DOREPLIFETIME(ThisClass, Teammate_FASI_Container);
+}
+
+void UTeamConfigureComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	Teammate_FASI_Container.OwnerPtr = GetOwner<FOwnerType>();
 }

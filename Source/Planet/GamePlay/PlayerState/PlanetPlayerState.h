@@ -26,15 +26,17 @@ public:
 	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	UTeamConfigureComponent* GetTeamConfigureomponent()const;
-
+	
+	UPROPERTY()
+	TObjectPtr<UTeamConfigureComponent> TeamConfigureompConentPtr = nullptr;
+	
 protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
 	void InitialData();
-	
-	UPROPERTY()
-	TObjectPtr<UTeamConfigureComponent> TeamConfigureompConentPtr = nullptr;
 	
 private:
 

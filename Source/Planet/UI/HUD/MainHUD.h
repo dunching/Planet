@@ -35,6 +35,10 @@ public:
 
 	void SwitchState(EMainHUDType MainHUDType);
 
+	URegularActionLayout* RegularActionStatePtr = nullptr;
+	
+protected:
+	
 	void OnHPChanged(int32 CurrentValue);
 
 	void InitMainHUDLayout();
@@ -43,12 +47,12 @@ public:
 	TSubclassOf<UMainHUDLayout>MainHUDLayoutClass;
 	
 	UMainHUDLayout* MainHUDLayoutPtr = nullptr;
-	
+
+	// 常规状态下显示的的HUD	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<URegularActionLayout>RegularActionStateClass;
-	
-	URegularActionLayout* RegularActionStatePtr = nullptr;
-	
+
+	// 重伤时要显示的HUD
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UEndangeredStateLayout>EndangeredStateClass;
 	

@@ -43,8 +43,8 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-private:
-
 	TSharedPtr < FCharacterProxy> GroupMateUnitPtr = nullptr;
+
+private:
 
 };

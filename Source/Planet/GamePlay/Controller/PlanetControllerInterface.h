@@ -6,7 +6,7 @@
 
 #include "PlanetControllerInterface.generated.h"
 
-class UGroupMnaggerComponent;
+class AGroupSharedInfo;
 class UPlanetAbilitySystemComponent;
 class UHoldingItemsComponent;
 class UCharacterAttributesComponent;
@@ -33,7 +33,7 @@ public:
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
 
 	// “成员管理”记录了成员信息，因为
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const = 0;
+	virtual AGroupSharedInfo* GetGroupSharedInfo() const = 0;
 
 	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const = 0;
 

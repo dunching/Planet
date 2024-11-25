@@ -27,6 +27,7 @@
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
 #include "BaseFeatureComponent.h"
+#include "GroupSharedInfo.h"
 
 namespace Skill_Active_ContinuousGroupTherapy
 {
@@ -100,10 +101,10 @@ void USkill_Active_GroupTherapy::EmitEffect()
 
 	TSet<ACharacterBase*>TeammatesSet;
 	TeammatesSet.Add(CharacterPtr);
-	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
+	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupSharedInfo();
 	if (GroupMnaggerComponent)
 	{
-		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
+		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
 			for (auto Iter : TeamsHelperSPtr->MembersSet)

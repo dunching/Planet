@@ -37,7 +37,7 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
+	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
 
 	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
 

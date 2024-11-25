@@ -36,6 +36,7 @@ class APlanetGameMode;
 
 class USkill_Base;
 class ACharacterBase;
+class AHumanCharacter_AI;
 class AHumanCharacter;
 class UHoldingItemsComponent;
 struct FCharacterProxy;
@@ -299,12 +300,16 @@ public:
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	FTableRowUnit_CharacterGrowthAttribute* GetTableRowUnit_CharacterInfo()const;
+	FTableRowUnit_CharacterGrowthAttribute* GetDT_CharacterInfo()const;
 	
 	FTableRowUnit_CharacterType* GetDT_CharacterType()const;
 
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();
+
+	AHumanCharacter_AI * SpwanCharacter(const FTransform&Transform);
+
+	void DestroyCharacter();
 
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 

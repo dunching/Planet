@@ -49,8 +49,6 @@ public:
 
 	AHumanAIController(const FObjectInitializer& ObjectInitializer);
 
-	void SetCampType(ECharacterCampType CharacterCampType);
-
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
 
 	virtual bool CheckIsFarawayOriginal() const;

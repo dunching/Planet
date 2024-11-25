@@ -110,9 +110,9 @@ public:
 #endif
 
 
-	void AddUnit_Apending(FGameplayTag UnitType, int32 Num, FGuid Guid);
+	void AddUnit_Pending(FGameplayTag UnitType, int32 Num, FGuid Guid);
 
-	void SyncApendingUnit(FGuid Guid);
+	void SyncPendingUnit(FGuid Guid);
 
 
 	// 同步到服務器
@@ -124,6 +124,9 @@ public:
 
 	UPROPERTY(Replicated)
 	FProxy_FASI_Container Proxy_Container;
+
+	UPROPERTY(ReplicatedUsing = OnRep_GetCharacterProxyID)
+	FGuid CharacterProxyID_Container;
 
 	FOnSkillUnitChanged OnSkillUnitChanged;
 
@@ -143,10 +146,13 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION()
+	void OnRep_GetCharacterProxyID();
+	
 private:
 
 	// 等待加入“库存”的物品
-	TMap<FGuid, TMap<FGameplayTag, int32>> SkillUnitApendingMap;
+	TMap<FGuid, TMap<FGameplayTag, int32>> PendingMap;
 
 	// 自定义的“排列方式”
 	TArray<TSharedPtr<FBasicProxy>> SceneToolsAry;
@@ -155,7 +161,7 @@ private:
 
 	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinUnitMap;
 
-	// 默认的，表示Player自身的Proxy
+	// 默认的，表示Character自身的Proxy
 	TSharedPtr<FCharacterProxy> CharacterProxySPtr = nullptr;
 
 };

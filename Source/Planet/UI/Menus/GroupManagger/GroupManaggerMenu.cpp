@@ -19,6 +19,7 @@
 #include "ItemProxy.h"
 #include "HumanCharacter.h"
 #include "GameplayTagsSubSystem.h"
+#include "GroupSharedInfo.h"
 
 namespace GroupManaggerMenu
 {
@@ -41,6 +42,14 @@ void UGroupManaggerMenu::ResetUIByData()
 
 void UGroupManaggerMenu::SyncData()
 {
+	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	auto GMCPtr = PCPtr->GetGroupSharedInfo();
+	GMCPtr->TeamMatesHelperComponentPtr->SpwanTeammateCharacter();
 }
 
 void UGroupManaggerMenu::ResetGroupmates()
@@ -60,7 +69,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 		return;
 	}
 
-	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
+	auto GMCPtr = PCPtr->GetGroupSharedInfo();
 	auto HICPtr = PCPtr->GetHoldingItemsComponent();
 
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();

@@ -42,6 +42,7 @@ class UProxyProcessComponent;
 class UInteractiveToolComponent;
 class UCDCaculatorComponent;
 class UWidgetComponent;
+class AGroupSharedInfo;
 
 UCLASS()
 class PLANET_API ACharacterBase : 
@@ -72,6 +73,8 @@ public:
 
 	virtual void UnPossessed() override;
 	
+	virtual void OnRep_Controller()override;
+	
 	virtual void InteractionSceneObj(ASceneObj* SceneObjPtr);
 	
 	virtual void Interaction(ACharacterBase* CharacterPtr) override;
@@ -85,6 +88,8 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	AGroupSharedInfo* GetGroupSharedInfo()const;
+
 	UHoldingItemsComponent* GetHoldingItemsComponent()const;
 
 	UCharacterAttributesComponent* GetCharacterAttributesComponent()const;
@@ -97,8 +102,6 @@ public:
 
 	UProxyProcessComponent* GetProxyProcessComponent()const;
 
-	UGroupMnaggerComponent* GetGroupMnaggerComponent()const;
-	
 	UCDCaculatorComponent* GetCDCaculatorComponent()const;
 
 	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
@@ -141,6 +144,8 @@ protected:
 
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void SpawnDefaultController()override;
 
 	void InitialDefaultCharacterUnit();
@@ -175,9 +180,6 @@ protected:
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;
 	
 	UPROPERTY()
-	TObjectPtr<UGroupMnaggerComponent> GroupMnaggerComponentPtr = nullptr;
-	
-	UPROPERTY()
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
@@ -189,6 +191,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;
 	
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
+
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 
 private:
@@ -201,6 +206,9 @@ private:
 	
 	UFUNCTION(NetMulticast, Unreliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
+
+	UFUNCTION()
+	void OnRep_GroupSharedInfoChanged();
 
 	FValueChangedDelegateHandle HPChangedHandle;
 

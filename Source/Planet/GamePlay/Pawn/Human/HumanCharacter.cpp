@@ -46,6 +46,7 @@
 #include "GetItemInfosList.h"
 
 #include "ItemProxyContainer.h"
+#include "GroupSharedInfo.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -88,13 +89,6 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
-		auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetTeamHelper();
-		if (GroupsHelperSPtr)
-		{
-			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
-				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
-			);
-		}
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{

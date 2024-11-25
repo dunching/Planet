@@ -8,6 +8,7 @@
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
 #include "STE_Human.h"
+#include "GroupSharedInfo.h"
 
 EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -44,7 +45,7 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformMoveTask(FStateTreeExecut
 	}
 
 	InstanceData.GloabVariable->TargetCharacterPtr =
-		InstanceData.CharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
+		InstanceData.CharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
 
 	return EStateTreeRunStatus::Running;
 }

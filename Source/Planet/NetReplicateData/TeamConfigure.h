@@ -11,6 +11,7 @@
 #include "TeamConfigure.generated.h"
 
 class ACharacterBase;
+class APlanetPlayerState;
 class UGroupMnaggerComponent;
 
 struct FAllocation_FASI_Container;
@@ -68,10 +69,10 @@ struct FTeammate_FASI : public FFastArraySerializerItem
 	int32 Index = 0;
 
 	FGuid CharacterProxyID;
+	
+	FGuid PreviousCharacterProxyID;
 
-	TSharedPtr<FCharacterProxy>CharacterProxySPtr = nullptr;
-
-	ACharacterBase* OwnerCharacterPtr= nullptr;
+	ACharacterBase* OwnerCharacterPtr = nullptr;
 
 };
 
@@ -90,7 +91,7 @@ struct PLANET_API FTeammate_FASI_Container : public FFastArraySerializer
 {
 	GENERATED_USTRUCT_BODY()
 	
-	friend ACharacterBase;
+	friend APlanetPlayerState;
 
 	using FItemType = FTeammate_FASI;
 	using FContainerType = FTeammate_FASI_Container;
@@ -110,15 +111,15 @@ struct PLANET_API FTeammate_FASI_Container : public FFastArraySerializer
 
 	void UpdateItem(const FItemType& Item);
 
-	ACharacterBase* OwnerCharacterPtr = nullptr;
-	
-protected:
-	
-private:
+	APlanetPlayerState* OwnerPtr = nullptr;
 	
 	UPROPERTY()
 	TArray<FTeammate_FASI> Items;
 
+protected:
+	
+private:
+	
 };
 
 template<>

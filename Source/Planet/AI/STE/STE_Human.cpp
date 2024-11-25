@@ -12,6 +12,7 @@
 #include "PlanetPlayerController.h"
 #include "LogWriter.h"
 #include "BuildingArea.h"
+#include "GroupSharedInfo.h"
 
 void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 {
@@ -22,14 +23,14 @@ void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 	if (HumanAIControllerPtr)
 	{
 		KownCharacterChangedHandle =
-			HumanCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->KnowCharaterChanged.AddCallback(
+			HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->KnowCharaterChanged.AddCallback(
 				std::bind(&ThisClass::KnowCharaterChanged, this, std::placeholders::_1, std::placeholders::_2)
 			);
 
 		HumanCharacterPtr = HumanAIControllerPtr->GetPawn<AHumanCharacter>();
 		if (HumanCharacterPtr)
 		{
-			TeammateChangedDelegate = HumanCharacterPtr->GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(
+			TeammateChangedDelegate = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(
 				std::bind(&ThisClass::OnTeamChanged, this)
 			);
 			OnTeamChanged();
@@ -81,7 +82,7 @@ void USTE_Human::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 
 void USTE_Human::OnTeamChanged()
 {
-	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper();
+	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamHelperSPtr)
 	{
 		LeaderCharacterPtr = TeamHelperSPtr->OwnerCharacterUnitPtr->ProxyCharacterPtr.Get();

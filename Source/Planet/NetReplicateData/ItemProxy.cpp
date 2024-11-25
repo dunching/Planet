@@ -6,6 +6,7 @@
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "CharacterBase.h"
+#include "HumanCharacter_AI.h"
 #include "CharacterAttributesComponent.h"
 #include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
@@ -1006,7 +1007,7 @@ void FCharacterProxy::InitialUnit()
 	CharacterAttributesSPtr->Title = GetDT_CharacterType()->Title;
 }
 
-FTableRowUnit_CharacterGrowthAttribute* FCharacterProxy::GetTableRowUnit_CharacterInfo() const
+FTableRowUnit_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() const
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Character_GrowthAttribute.LoadSynchronous();
@@ -1028,6 +1029,36 @@ FTableRowUnit_CharacterType* FCharacterProxy::GetDT_CharacterType() const
 
 void FCharacterProxy::RelieveRootBind()
 {
+}
+
+AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
+{
+	AHumanCharacter_AI* Result = nullptr;
+	if (ProxyCharacterPtr.IsValid())
+	{
+	}
+	else
+	{
+		FActorSpawnParameters SpawnParameters;
+
+		SpawnParameters.Owner = GetOwnerCharacterProxy().Pin()->ProxyCharacterPtr.Get();
+		
+		Result =
+			HoldingItemsComponentPtr->GetWorld()->SpawnActor<AHumanCharacter_AI>(GetDT_CharacterType()->CharacterClass, Transform, SpawnParameters);
+
+		ProxyCharacterPtr = Result;
+	}
+	return Result;
+}
+
+void FCharacterProxy::DestroyCharacter()
+{
+	if (ProxyCharacterPtr.IsValid())
+	{
+		ProxyCharacterPtr->Destroy();
+	}
+
+	ProxyCharacterPtr = nullptr;
 }
 
 FCoinProxy::FCoinProxy()

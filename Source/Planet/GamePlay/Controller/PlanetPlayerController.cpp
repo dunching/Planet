@@ -1,15 +1,12 @@
-
 #include "PlanetPlayerController.h"
 
-#include "GameFramework/PlayerState.h"
-#include "Interfaces/NetworkPredictionInterface.h"
 #include "GameFramework/Pawn.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include <Engine/Engine.h>
 #include <IXRTrackingSystem.h>
 #include <IXRCamera.h>
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 #include "InputProcessorSubSystem.h"
 #include "HorseCharacter.h"
@@ -19,28 +16,21 @@
 #include "InputActions.h"
 #include "UIManagerSubSystem.h"
 #include "CharacterBase.h"
-#include "HoldingItemsComponent.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanAIController.h"
 #include "ItemProxy.h"
-#include "HumanCharacter.h"
 #include "PlanetControllerInterface.h"
 #include "NavgationSubSysetem.h"
-#include "AssetRefMap.h"
 #include "FocusIcon.h"
-#include "TestCommand.h"
 #include "GameplayTagsSubSystem.h"
-#include "UICommon.h"
-#include "CharacterAttributesComponent.h"
-#include "TalentAllocationComponent.h"
 #include "ItemProxyContainer.h"
 #include "BaseFeatureComponent.h"
-#include "EffectsList.h"
-#include "PlanetPlayerState.h"
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "CollisionDataStruct.h"
 #include "LogWriter.h"
+#include "GroupSharedInfo.h"
+#include "GameFramework/HUD.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
 	TEXT("PlanetPlayerController.DrawControllerRotation"),
@@ -114,7 +104,7 @@ FVector APlanetPlayerController::GetFocalPoint() const
 {
 	FVector Result = FAISystem::InvalidLocation;
 
-	// find focus with highest priority
+	// find focus with the highest priority
 	for (int32 Index = FocusInformation.Priorities.Num() - 1; Index >= 0; --Index)
 	{
 		const FFocusKnowledge::FFocusItem& FocusItem = FocusInformation.Priorities[Index];
@@ -139,6 +129,13 @@ FVector APlanetPlayerController::GetFocalPointOnActor(const AActor* Actor) const
 	return Actor != nullptr ? Actor->GetActorLocation() : FAISystem::InvalidLocation;
 }
 
+void APlanetPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
+}
+
 void APlanetPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -150,7 +147,8 @@ void APlanetPlayerController::BeginPlay()
 		auto CurrentPawn = GetPawn();
 		if (CurrentPawn->IsA(AHumanCharacter::StaticClass()))
 		{
-			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
+				UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 			{
 				Subsystem->AddMappingContext(
 					UInputProcessorSubSystem::GetInstance()->InputActionsPtr->InputMappingContext,
@@ -160,21 +158,16 @@ void APlanetPlayerController::BeginPlay()
 
 			FInputModeGameOnly InputMode;
 			SetInputMode(InputMode);
-
-			UNavgationSubSystem::GetInstance();
-
-			UUIManagerSubSystem::GetInstance()->InitialUI();
-
-			// ResetGroupmateUnit(HoldingItemsComponentPtr->GetSceneUnitContainer()->AddUnit_Groupmate(RowName));
-			// 
-			// 在SetPawn之后调用
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>([this, CurrentPawn](auto NewProcessor) {
-				NewProcessor->SetPawn(Cast<FPawnType>(CurrentPawn));
-				});
 		}
 	}
 #endif
+}
 
+void APlanetPlayerController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	InitialGroupSharedInfo();
 }
 
 void APlanetPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -222,9 +215,11 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 		}
 
 		AActor* ViewTarget = GetViewTarget();
-		if (!PlayerCameraManager || !ViewTarget || !ViewTarget->HasActiveCameraComponent() || ViewTarget->HasActivePawnControlCameraComponent())
+		if (!PlayerCameraManager || !ViewTarget || !ViewTarget->HasActiveCameraComponent() || ViewTarget->
+			HasActivePawnControlCameraComponent())
 		{
-			if (IsLocalPlayerController() && GEngine->XRSystem.IsValid() && GetWorld() != nullptr && GEngine->XRSystem->IsHeadTrackingAllowedForWorld(*GetWorld()))
+			if (IsLocalPlayerController() && GEngine->XRSystem.IsValid() && GetWorld() != nullptr && GEngine->XRSystem->
+				IsHeadTrackingAllowedForWorld(*GetWorld()))
 			{
 				auto XRCamera = GEngine->XRSystem->GetXRCamera();
 				if (XRCamera.IsValid())
@@ -241,7 +236,8 @@ void APlanetPlayerController::UpdateRotation(float DeltaTime)
 		{
 			if (GetLocalRole() == ROLE_AutonomousProxy)
 			{
-				DrawDebugLine(GetWorld(), MyPawn->GetActorLocation(), MyPawn->GetActorLocation() + (ViewRotation.Vector() * 500), FColor::Red, false, 3);
+				DrawDebugLine(GetWorld(), MyPawn->GetActorLocation(),
+				              MyPawn->GetActorLocation() + (ViewRotation.Vector() * 500), FColor::Red, false, 3);
 			}
 		}
 #endif
@@ -277,13 +273,17 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
 #if UE_EDITOR || UE_SERVER
-			if (InPawn)
+			if (GetNetMode() == NM_DedicatedServer)
 			{
-				if (InPawn->IsA(AHumanCharacter::StaticClass()))
+				if (InPawn)
 				{
-					if (GetNetMode() == NM_DedicatedServer)
+					if (InPawn->IsA(AHumanCharacter::StaticClass()))
 					{
-						GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kFollow);
+						if (GetNetMode() == NM_DedicatedServer)
+						{
+							GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+								ETeammateOption::kFollow);
+						}
 					}
 				}
 			}
@@ -293,8 +293,10 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 		{
 			auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
 
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>([this, InPawn](auto NewProcessor) {
-				NewProcessor->SetPawn(Cast<AHorseCharacter>(InPawn));
+			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>(
+				[this, InPawn](auto NewProcessor)
+				{
+					NewProcessor->SetPawn(Cast<AHorseCharacter>(InPawn));
 				});
 		}
 	}
@@ -335,9 +337,9 @@ UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponen
 	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
 }
 
-UGroupMnaggerComponent* APlanetPlayerController::GetGroupMnaggerComponent()const
+AGroupSharedInfo* APlanetPlayerController::GetGroupSharedInfo() const
 {
-	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
+	return GroupSharedInfoPtr;
 }
 
 UHoldingItemsComponent* APlanetPlayerController::GetHoldingItemsComponent() const
@@ -357,9 +359,9 @@ UTalentAllocationComponent* APlanetPlayerController::GetTalentAllocationComponen
 
 TWeakObjectPtr<ACharacterBase> APlanetPlayerController::GetTeamFocusTarget() const
 {
-	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
+	if (GetGroupSharedInfo() && GetGroupSharedInfo()->GetTeamMatesHelperComponent())
 	{
-		return GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
+		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
 	}
 
 	return nullptr;
@@ -370,7 +372,7 @@ TSharedPtr<FCharacterProxy> APlanetPlayerController::GetCharacterUnit()
 	return GetPawn<FPawnType>()->GetCharacterUnit();
 }
 
-ACharacterBase* APlanetPlayerController::GetRealCharacter()const
+ACharacterBase* APlanetPlayerController::GetRealCharacter() const
 {
 	return Cast<ACharacterBase>(GetPawn());
 }
@@ -379,16 +381,19 @@ void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
 {
 	if (CurrentValue <= 0)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
-		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{
+			UGameplayTagsSubSystem::GetInstance()->DeathingTag
+		});
+		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData)
+		{
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			{
 				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
 				{
-//					Destroy();
+					//					Destroy();
 				}
 			}
-			});
+		});
 	}
 }
 
@@ -399,6 +404,31 @@ void APlanetPlayerController::BindPCWithCharacter()
 TSharedPtr<FCharacterProxy> APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
 	return CharaterPtr->GetCharacterUnit();
+}
+
+void APlanetPlayerController::InitialGroupSharedInfo()
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		FActorSpawnParameters SpawnParameters;
+
+		SpawnParameters.Owner = this;
+		SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
+		{
+			PRINTINVOKEINFO();
+			auto GroupSharedInfoPtr = Cast<AGroupSharedInfo>(ActorPtr);
+			if (GroupSharedInfoPtr)
+			{
+				GroupSharedInfoPtr->GroupID = FGuid::NewGuid();
+			}
+		};
+
+		GroupSharedInfoPtr = GetWorld()->SpawnActor<AGroupSharedInfo>(
+			AGroupSharedInfo::StaticClass(), SpawnParameters
+		);
+	}
+#endif
 }
 
 void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)
@@ -462,7 +492,7 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnFocusDeathing);
 }
 
-void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray< FString >& Args)
+void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray<FString>& Args)
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (!CharacterPtr && !Args.IsValidIndex(0))
@@ -480,12 +510,14 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray< FStrin
 	FRotator OutCamRot = CharacterPtr->GetActorRotation();
 
 	FHitResult OutHit;
-	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams, Params))
 	{
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
 		{
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
+				CharacterPtr);
 
 			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
@@ -503,7 +535,7 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray< FStrin
 	}
 }
 
-void APlanetPlayerController::MakeTherapy_Implementation(const TArray< FString >& Args)
+void APlanetPlayerController::MakeTherapy_Implementation(const TArray<FString>& Args)
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (!CharacterPtr && !Args.IsValidIndex(0))
@@ -521,12 +553,14 @@ void APlanetPlayerController::MakeTherapy_Implementation(const TArray< FString >
 	FRotator OutCamRot = CharacterPtr->GetActorRotation();
 
 	FHitResult OutHit;
-	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams, Params))
 	{
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
 		{
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
+				CharacterPtr);
 
 			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
@@ -545,7 +579,7 @@ void APlanetPlayerController::MakeTherapy_Implementation(const TArray< FString >
 	}
 }
 
-void APlanetPlayerController::MakeRespawn_Implementation(const TArray< FString >& Args)
+void APlanetPlayerController::MakeRespawn_Implementation(const TArray<FString>& Args)
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (!CharacterPtr && !Args.IsValidIndex(0))
@@ -563,12 +597,14 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray< FString >
 	FRotator OutCamRot = CharacterPtr->GetActorRotation();
 
 	FHitResult OutHit;
-	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+	if (GetWorld()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams, Params))
 	{
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
 		{
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
+				CharacterPtr);
 
 			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
@@ -587,4 +623,30 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray< FString >
 			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 	}
+}
+
+void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
+{
+	// auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	// if (PlayerCharacterPtr)
+	// {
+	// 	SetCampType(
+	// 		IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+	// 	);
+	// }
+
+	UUIManagerSubSystem::GetInstance()->InitialUI();
+
+	// 在SetPawn之后调用
+	auto CurrentPawn = GetPawn();
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
+		[this, CurrentPawn](auto NewProcessor)
+		{
+			NewProcessor->SetPawn(Cast<FPawnType>(CurrentPawn));
+		});
+
+	// 隐藏
+	MyHUD->ShowHUD();
+	// 显示
+	MyHUD->ShowHUD();
 }

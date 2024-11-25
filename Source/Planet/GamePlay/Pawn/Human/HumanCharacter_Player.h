@@ -21,8 +21,6 @@ public:
 
 	AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer);
 
-	virtual void BeginPlay() override;
-
 	UCameraComponent* GetCameraComp();;
 
 	USpringArmComponent* GetCameraBoom();;
@@ -31,6 +29,14 @@ public:
 
 protected:
 	
+	virtual void BeginPlay() override;
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void UnPossessed() override;
+	
+	virtual void InitialGroupSharedInfo();
+
 #if WITH_EDITORONLY_DATA
 
 #endif

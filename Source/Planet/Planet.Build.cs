@@ -52,6 +52,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/GameState");
         PublicIncludePaths.Add("Planet/GamePlay/GameplayTags");
         PublicIncludePaths.Add("Planet/GamePlay/PlayerState");
+        PublicIncludePaths.Add("Planet/GamePlay/GroupSharedInfo");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/ToolsInteractiveComponent");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse");

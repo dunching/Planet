@@ -24,12 +24,14 @@ public:
 	UTeamConfigureComponent(const FObjectInitializer& ObjectInitializer);
 
 	void UpdateConfigure(const FTeammate_FASI& Teammate_FASI);
-
-protected:
-
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	UPROPERTY(Replicated)
 	FTeammate_FASI_Container Teammate_FASI_Container;
 	
+protected:
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void InitializeComponent()override;
+
 };

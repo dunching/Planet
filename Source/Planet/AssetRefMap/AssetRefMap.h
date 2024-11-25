@@ -16,6 +16,7 @@ class UMaterialInstance;
 class USkeletalMesh;
 
 class UMainUILayout;
+class AGroupSharedInfo;
 class URaffleMenu;
 class UPawnStateActionHUD;
 class UPawnStateBuildingHUD;
@@ -55,6 +56,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "PawnClass")
 	TSubclassOf<AHorseCharacter>HorseClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GroupSharedInfoClass")
+	TSubclassOf<AGroupSharedInfo>GroupSharedInfoClass;
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")

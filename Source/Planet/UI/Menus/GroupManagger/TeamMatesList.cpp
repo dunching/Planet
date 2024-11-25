@@ -58,7 +58,7 @@ void UTeamMatesList::ResetUIByData()
 // 		return;
 // 	}
 // 
-// 	auto GMCPtr = HumanCharacterPtr->GetGroupMnaggerComponent();
+// 	auto GMCPtr = HumanCharacterPtr->GetGroupSharedInfo();
 // 
 // 	int32 CurrentMemberNum = 0;
 // 	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();

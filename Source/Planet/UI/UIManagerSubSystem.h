@@ -93,6 +93,7 @@ public:
 
 protected:
 
+	// 菜单UI
 	UMenuLayout* GetMainMenu();
 	
 	UPROPERTY()

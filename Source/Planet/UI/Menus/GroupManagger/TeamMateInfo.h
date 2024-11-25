@@ -48,6 +48,9 @@ public:
 	virtual void EnableIcon(bool bIsEnable)override;
 
 	FCallbackHandleContainer OnDroped;
+	
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Index)
+	int32 Index = 0;
 
 private:
 

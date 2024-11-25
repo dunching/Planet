@@ -25,6 +25,11 @@ void APlanetPlayerState::BeginPlay()
 	InitialData();
 }
 
+void APlanetPlayerState::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
 void APlanetPlayerState::InitialData()
 {
 }

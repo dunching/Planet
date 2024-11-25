@@ -68,10 +68,10 @@ void AResourceBoxBase::AddItemsToTarget()
 				auto HICPtr = TargetCharacterPtr->GetHoldingItemsComponent();
 				for (const auto Iter : UnitMap)
 				{
-					HICPtr->AddUnit_Apending(Iter.Key, Iter.Value, Guid);
+					HICPtr->AddUnit_Pending(Iter.Key, Iter.Value, Guid);
 				}
 
-				HICPtr->SyncApendingUnit(Guid);
+				HICPtr->SyncPendingUnit(Guid);
 #if WITH_EDITORONLY_DATA
 #endif
 			}

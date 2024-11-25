@@ -20,6 +20,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
 #include "HorseCharacter.h"
+#include "GroupSharedInfo.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -101,13 +102,9 @@ void AHorseAIController::OnPossess(APawn* InPawn)
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
 
-	GroupHelperChangedDelegate =
-		GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
-	OnGroupChanged();
-
 	TeamHelperChangedDelegate =
-		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
-	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+	GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kEnemy);
 
 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
 	{
@@ -143,7 +140,7 @@ void AHorseAIController::OnGroupChanged()
 
 void AHorseAIController::OnTeamChanged()
 {
-	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
+	auto TeamsHelper = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamsHelper)
 	{
 		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(

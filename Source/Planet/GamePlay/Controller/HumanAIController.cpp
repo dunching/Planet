@@ -24,6 +24,7 @@
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
 #include "HumanCharacter_AI.h"
+#include "GroupSharedInfo.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -57,15 +58,6 @@ void AHumanAIController::InitialAllocations()
 	if (!CharacterPtr)
 	{
 		return;
-	}
-}
-
-void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
-{
-	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
-	{
-		CharacterPtr->SetCampType(CharacterCampType);
 	}
 }
 
@@ -175,7 +167,7 @@ void AHumanAIController::OnGroupChanged()
 		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 		if (PlayerCharacterPtr)
 		{
-			SetCampType(
+			CharacterPtr->SetCampType(
 				CharacterPtr->IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
 			);
 		}
@@ -184,7 +176,7 @@ void AHumanAIController::OnGroupChanged()
 
 void AHumanAIController::OnTeamChanged()
 {
-	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
+	auto TeamsHelper = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamsHelper)
 	{
 		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(
@@ -206,17 +198,13 @@ void AHumanAIController::InitialCharacter()
 		);
 		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
 
-		GroupHelperChangedDelegate =
-			GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
-		OnGroupChanged();
-
 		TeamHelperChangedDelegate =
-			GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+			GetGroupSharedInfo()->TeamMatesHelperComponentPtr->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
 		
 #if WITH_EDITORONLY_DATA
-		GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
 #else
-		GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kEnemy);
 #endif
 
 		// 组件自动调用条件不成功，原因未知

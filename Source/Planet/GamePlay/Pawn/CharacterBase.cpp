@@ -11,6 +11,7 @@
 #include "DrawDebugHelpers.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystemComponent.h"
+#include "Net/UnrealNetwork.h"
 
 #include "GameMode_Main.h"
 #include "ToolsLibrary.h"
@@ -45,6 +46,7 @@
 #include "CharacterRisingTips.h"
 #include "SceneObj.h"
 #include "ItemProxyContainer.h"
+#include "GroupSharedInfo.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -56,12 +58,14 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	AbilitySystemComponentPtr->SetIsReplicated(true);
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
-	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
+	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
+		UCharacterAttributesComponent::ComponentName);
 	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
-	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
-	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
+	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(
+		UTalentAllocationComponent::ComponentName);
 
-	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
+	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(
+		UStateProcessorComponent::ComponentName);
 
 	BaseFeatureComponentPtr = CreateDefaultSubobject<UBaseFeatureComponent>(UBaseFeatureComponent::ComponentName);
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
@@ -70,7 +74,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 ACharacterBase::~ACharacterBase()
 {
-
 }
 
 void ACharacterBase::BeginPlay()
@@ -94,31 +97,25 @@ void ACharacterBase::BeginPlay()
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() < ROLE_Authority)
 	{
- 		if (!CharacterTitlePtr)
- 		{
- 			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
- 			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
- 			if (CharacterTitlePtr)
- 			{
- 				CharacterTitlePtr->CharacterPtr = this;
- 				if (GetLocalRole() == ROLE_AutonomousProxy)
- 				{
- 					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
- 				}
- 				else
- 				{
- 					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
- 				}
- 
- 				auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
- 				if (PlayerCharacterPtr)
- 				{
- 					SetCampType(
- 						IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
- 					);
- 				}
- 			}
- 		}
+		if (!CharacterTitlePtr)
+		{
+			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+			if (CharacterTitlePtr)
+			{
+				CharacterTitlePtr->CharacterPtr = this;
+				if (GetLocalRole() == ROLE_AutonomousProxy)
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
+				}
+				else
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+				}
+
+				OnRep_GroupSharedInfoChanged();
+			}
+		}
 	}
 #endif
 
@@ -144,6 +141,7 @@ void ACharacterBase::BeginPlay()
 #endif
 
 	OnMoveSpeedChanged(CharacterAttributes.MoveSpeed.GetCurrentValue());
+
 }
 
 void ACharacterBase::Destroyed()
@@ -163,11 +161,11 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		MoveSpeedChangedHandle->UnBindCallback();
 	}
 
- 	if (CharacterTitlePtr)
- 	{
- 		CharacterTitlePtr->RemoveFromParent();
- 		CharacterTitlePtr = nullptr;
- 	}
+	if (CharacterTitlePtr)
+	{
+		CharacterTitlePtr->RemoveFromParent();
+		CharacterTitlePtr = nullptr;
+	}
 
 	OriginalAIController = nullptr;
 
@@ -195,7 +193,8 @@ void ACharacterBase::PostInitializeComponents()
 
 		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
 
-		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent = StateProcessorComponentPtr;
+		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent =
+			StateProcessorComponentPtr;
 
 		TalentAllocationComponentPtr->Talent_FASI_Container.TalentAllocationComponentPtr = TalentAllocationComponentPtr;
 	}
@@ -204,6 +203,27 @@ void ACharacterBase::PostInitializeComponents()
 void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+
+	if (NewController->IsA(APlanetPlayerController::StaticClass()))
+	{
+		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GroupSharedInfoPtr;
+	}
+	else if (NewController->IsA(AHumanAIController::StaticClass()))
+	{
+	}
+	
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		auto GroupsHelperSPtr = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
+		if (GroupsHelperSPtr)
+		{
+			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
+				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
+			);
+		}
+	}
+#endif
 }
 
 void ACharacterBase::UnPossessed()
@@ -232,6 +252,11 @@ void ACharacterBase::UnPossessed()
 	}
 }
 
+void ACharacterBase::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+}
+
 void ACharacterBase::InteractionSceneObj(ASceneObj* SceneObjPtr)
 {
 	InteractionSceneObj_Server(SceneObjPtr);
@@ -239,22 +264,18 @@ void ACharacterBase::InteractionSceneObj(ASceneObj* SceneObjPtr)
 
 void ACharacterBase::Interaction(ACharacterBase* CharacterPtr)
 {
-
 }
 
 void ACharacterBase::LookingAt(ACharacterBase* CharacterPtr)
 {
-
 }
 
 void ACharacterBase::StartLookAt(ACharacterBase* CharacterPtr)
 {
-
 }
 
 void ACharacterBase::EndLookAt()
 {
-
 }
 
 class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
@@ -262,22 +283,27 @@ class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent()
 	return AbilitySystemComponentPtr;
 }
 
-UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent()const
+AGroupSharedInfo* ACharacterBase::GetGroupSharedInfo() const
+{
+	return GroupSharedInfoPtr;
+}
+
+UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent() const
 {
 	return HoldingItemsComponentPtr;
 }
 
-UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent()const
+UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent() const
 {
 	return CharacterAttributesComponentPtr;
 }
 
-UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
+UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent() const
 {
 	return TalentAllocationComponentPtr;
 }
 
-UBaseFeatureComponent* ACharacterBase::GetBaseFeatureComponent()const
+UBaseFeatureComponent* ACharacterBase::GetBaseFeatureComponent() const
 {
 	return BaseFeatureComponentPtr;
 }
@@ -287,14 +313,9 @@ UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
 	return StateProcessorComponentPtr;
 }
 
-UProxyProcessComponent* ACharacterBase::GetProxyProcessComponent()const
+UProxyProcessComponent* ACharacterBase::GetProxyProcessComponent() const
 {
 	return ProxyProcessComponentPtr;
-}
-
-UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
-{
-	return GroupMnaggerComponentPtr;
 }
 
 UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
@@ -302,14 +323,14 @@ UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
 	return CDCaculatorComponentPtr;
 }
 
-TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
+TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit() const
 {
 	return HoldingItemsComponentPtr->CharacterProxySPtr;
 }
 
 void ACharacterBase::InitialDefaultCharacterUnit()
 {
-	TSharedPtr<FCharacterProxy>CharacterUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> CharacterUnitPtr = nullptr;
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
@@ -336,12 +357,14 @@ void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneO
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupMnaggerComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+	return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit());
 }
 
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupMnaggerComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+	return
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit()) ||
+		TargetCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(GetCharacterUnit());
 }
 
 ACharacterBase* ACharacterBase::GetFocusActor() const
@@ -375,17 +398,17 @@ void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType Ani
 
 void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCampType)
 {
- 	if (CharacterTitlePtr)
- 	{
- 		CharacterTitlePtr->SetCampType(CharacterCampType);
- 	}
+	if (CharacterTitlePtr)
+	{
+		CharacterTitlePtr->SetCampType(CharacterCampType);
+	}
 }
 
 bool ACharacterBase::GetIsValidTarget() const
 {
-	TArray<FGameplayTag>Ary{
+	TArray<FGameplayTag> Ary{
 		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
-			UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected
+		UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected
 	};
 	const auto TagContainer = FGameplayTagContainer::CreateFromArray(Ary);
 	return !AbilitySystemComponentPtr->HasAnyMatchingGameplayTags(TagContainer);
@@ -396,6 +419,13 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UInputProcessorSubSystem::GetInstance()->BindAction(InputComponent);
+}
+
+void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
 }
 
 void ACharacterBase::SpawnDefaultController()
@@ -455,19 +485,12 @@ void ACharacterBase::OnCharacterGroupMateChanged(
 	switch (GroupMateChangeType)
 	{
 	case EGroupMateChangeType::kAdd:
-	{
-		if (TargetCharacterUnitPtr)
 		{
-			if (TargetCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->OwnerCharacterUnitPtr == GetCharacterUnit())
-			{
-				auto AIPCPtr = TargetCharacterUnitPtr->ProxyCharacterPtr->GetController<AHumanAIController>();
-				if (AIPCPtr)
-				{
-					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
-				}
-			}
 		}
+		break;
 	}
-	break;
-	}
+}
+
+void ACharacterBase::OnRep_GroupSharedInfoChanged()
+{
 }

@@ -22,6 +22,7 @@ class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
 class UTalentAllocationComponent;
 class UGroupMnaggerComponent;
+class AGroupSharedInfo;
 
 /**
  *
@@ -54,7 +55,7 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
+	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
 
 	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
 
@@ -85,11 +86,17 @@ public:
 
 #pragma endregion
 
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
 
 protected:
 
-	virtual void BeginPlay() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	virtual void BeginPlay() override;
+	
+	virtual void PostInitializeComponents() override;
+	
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	virtual void PlayerTick(float DeltaTime)override;
@@ -109,6 +116,11 @@ protected:
 	virtual void BindPCWithCharacter()override;
 
 	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase * CharaterPtr)override;
+
+	virtual void InitialGroupSharedInfo();
+
+	UFUNCTION()
+	void OnRep_GroupSharedInfoChanged();
 
 	UFUNCTION()
 	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);

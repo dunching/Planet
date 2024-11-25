@@ -1,4 +1,3 @@
-
 #include "HoldingItemsComponent.h"
 
 #include <GameFramework/PlayerState.h>
@@ -32,45 +31,57 @@ void UHoldingItemsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	FDoRepLifetimeParams Params;
-	Params.bIsPushBased = true;
-
-	Params.Condition = COND_SkipReplay;
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, Proxy_Container, Params);
+	DOREPLIFETIME_CONDITION(ThisClass, Proxy_Container, COND_SkipReplay);
+	DOREPLIFETIME_CONDITION(ThisClass, CharacterProxyID_Container, COND_InitialOnly);
 }
 
-void UHoldingItemsComponent::AddUnit_Apending(FGameplayTag UnitType, int32 Num, FGuid Guid)
+void UHoldingItemsComponent::OnRep_GetCharacterProxyID()
 {
-	if (SkillUnitApendingMap.Contains(Guid))
+	if (CharacterProxySPtr)
 	{
-		if (SkillUnitApendingMap[Guid].Contains(UnitType))
+		if (SceneMetaMap.Contains(CharacterProxySPtr->GetID()))
 		{
-			SkillUnitApendingMap[Guid][UnitType] += Num;
+			SceneMetaMap.Remove(CharacterProxySPtr->GetID());
+			
+			CharacterProxySPtr->ID = CharacterProxyID_Container;
+			
+			SceneMetaMap.Add(CharacterProxySPtr->GetID());
+		}
+	}
+}
+
+void UHoldingItemsComponent::AddUnit_Pending(FGameplayTag UnitType, int32 Num, FGuid Guid)
+{
+	if (PendingMap.Contains(Guid))
+	{
+		if (PendingMap[Guid].Contains(UnitType))
+		{
+			PendingMap[Guid][UnitType] += Num;
 		}
 		else
 		{
-			SkillUnitApendingMap[Guid].Add(UnitType, Num);
+			PendingMap[Guid].Add(UnitType, Num);
 		}
 	}
 	else
 	{
 		auto SceneUnitExtendInfoPtr = USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit(UnitType);
-		SkillUnitApendingMap.Add(Guid, { {UnitType, 1} });
+		PendingMap.Add(Guid, {{UnitType, 1}});
 	}
 }
 
-void UHoldingItemsComponent::SyncApendingUnit(FGuid Guid)
+void UHoldingItemsComponent::SyncPendingUnit(FGuid Guid)
 {
-	if (SkillUnitApendingMap.Contains(Guid))
+	if (PendingMap.Contains(Guid))
 	{
-		for (const auto& Iter : SkillUnitApendingMap)
+		for (const auto& Iter : PendingMap)
 		{
 			for (const auto& SecondIter : Iter.Value)
 			{
 				AddProxy(SecondIter.Key, SecondIter.Value);
 			}
 		}
-		SkillUnitApendingMap.Remove(Guid);
+		PendingMap.Remove(Guid);
 	}
 }
 
@@ -315,7 +326,7 @@ TSharedPtr<FWeaponProxy> UHoldingItemsComponent::FindUnit_Weapon(const IDType& I
 	return nullptr;
 }
 
-TSharedPtr<FSkillProxy>  UHoldingItemsComponent::AddUnit_Skill(const FGameplayTag& UnitType)
+TSharedPtr<FSkillProxy> UHoldingItemsComponent::AddUnit_Skill(const FGameplayTag& UnitType)
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
@@ -360,7 +371,7 @@ TSharedPtr<FSkillProxy>  UHoldingItemsComponent::AddUnit_Skill(const FGameplayTa
 	return ResultPtr;
 }
 
-TSharedPtr<FSkillProxy>  UHoldingItemsComponent::Update_Skill(const TSharedPtr<FSkillProxy>& UnitSPtr)
+TSharedPtr<FSkillProxy> UHoldingItemsComponent::Update_Skill(const TSharedPtr<FSkillProxy>& UnitSPtr)
 {
 	if (SceneMetaMap.Contains(UnitSPtr->GetID()))
 	{
@@ -392,7 +403,7 @@ TSharedPtr<FSkillProxy> UHoldingItemsComponent::FindUnit_Skill(const IDType& ID)
 	return nullptr;
 }
 
-TSharedPtr <FConsumableProxy> UHoldingItemsComponent::AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num)
+TSharedPtr<FConsumableProxy> UHoldingItemsComponent::AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num)
 {
 	check(Num > 0);
 
@@ -483,7 +494,7 @@ TSharedPtr<FCoinProxy> UHoldingItemsComponent::AddUnit_Coin(const FGameplayTag& 
 	}
 }
 
-TSharedPtr<FCoinProxy> UHoldingItemsComponent::FindUnit_Coin(const FGameplayTag& UnitType)const
+TSharedPtr<FCoinProxy> UHoldingItemsComponent::FindUnit_Coin(const FGameplayTag& UnitType) const
 {
 	auto Iter = CoinUnitMap.Find(UnitType);
 	if (Iter)
@@ -613,6 +624,13 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialDefaultCharacter()
 
 	Proxy_Container.AddItem(CharacterProxySPtr);
 
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		CharacterProxyID_Container = CharacterProxySPtr->ID;
+	}
+#endif
+
 	return CharacterProxySPtr;
 }
 
@@ -620,7 +638,7 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddUnit_Character(const FGam
 {
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-	TSharedPtr<FCharacterProxy>  ResultPtr = nullptr;
+	TSharedPtr<FCharacterProxy> ResultPtr = nullptr;
 
 	if (UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player == UnitType)
 	{
@@ -631,8 +649,12 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddUnit_Character(const FGam
 
 		ResultPtr->UnitType = UnitType;
 		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+		ResultPtr->HoldingItemsComponentPtr = this;
 
 		ResultPtr->InitialUnit();
+
+		SceneToolsAry.Add(ResultPtr);
+		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 
 		Proxy_Container.AddItem(ResultPtr);
 	}
@@ -642,8 +664,12 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddUnit_Character(const FGam
 
 		ResultPtr->UnitType = UnitType;
 		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
+		ResultPtr->HoldingItemsComponentPtr = this;
 
 		ResultPtr->InitialUnit();
+
+		SceneToolsAry.Add(ResultPtr);
+		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
 
 		Proxy_Container.AddItem(ResultPtr);
 	}

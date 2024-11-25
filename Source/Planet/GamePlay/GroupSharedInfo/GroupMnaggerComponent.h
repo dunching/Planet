@@ -1,32 +1,46 @@
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+
 #pragma once
 
 #include "CoreMinimal.h"
-
-#include "Components/ActorComponent.h"
-#include "GameplayTagContainer.h"
-
 #include "GenerateType.h"
+
+#include "GameFramework/PlayerState.h"
+
+#include "PlanetAbilitySystemComponent.h"
+#include "ItemProxy.h"
 
 #include "GroupMnaggerComponent.generated.h"
 
 class AHumanCharacter;
 class ACharacterBase;
 class IPlanetControllerInterface;
-class UGroupMnaggerComponent;
+class AGroupSharedInfo;
 struct FSkillProxy;
 struct FActiveSkillProxy;
 struct FConsumableProxy;
 struct FCharacterProxy;
+class UPlanetAbilitySystemComponent;
+class UTeamConfigureComponent;
+struct FSceneUnitContainer;
 
-class PLANET_API FTeamMatesHelper
+UCLASS(BlueprintType, Blueprintable)
+class UTeamMatesHelperComponent : public UActorComponent
 {
+	GENERATED_BODY()
 public:
 
-	friend UGroupMnaggerComponent;
+	friend AGroupSharedInfo;
 
 	using FCharacterUnitType = FCharacterProxy;
 
+	static FName ComponentName;
+
 	using FPawnType = ACharacterBase;
+
+	using FCharacterUnitType = FCharacterProxy;
+
+	using FOwnerType = ACharacterBase;
 
 	using FMemberChangedDelegateContainer =
 		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>;
@@ -37,9 +51,9 @@ public:
 	using FKnowCharaterChanged = 
 		TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>;
 
-	void AddCharacter(FPawnType* PCPtr);
+	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
 
-	void AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
+	UTeamMatesHelperComponent(const FObjectInitializer& ObjectInitializer);
 
 	void SwitchTeammateOption(ETeammateOption InTeammateOption);
 
@@ -48,6 +62,12 @@ public:
 	void AddKnowCharacter(ACharacterBase*CharacterPtr);
 
 	void RemoveKnowCharacter(ACharacterBase* CharacterPtr);
+
+	void SpwanTeammateCharacter();
+
+	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index);
+
+	bool IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)const;
 
 	TWeakObjectPtr<ACharacterBase> GetKnowCharacter()const;
 
@@ -62,9 +82,8 @@ public:
 	// 分配的小队
 	TSet<TSharedPtr<FCharacterUnitType>> MembersSet;
 
-private:
-
-	FGuid Guid = FGuid();
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	TArray<FGuid> CharactersAry;
 
 	TWeakObjectPtr<ACharacterBase>ForceKnowCharater;
 
@@ -72,47 +91,7 @@ private:
 
 	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
 
-};
-
-// Character之间共享的信息
-UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UGroupMnaggerComponent : public UActorComponent
-{
-	GENERATED_BODY()
-
-public:
-
-	using FCharacterUnitType = FCharacterProxy;
-
-	using FOwnerType = ACharacterBase;
-
-	using FPawnType = ACharacterBase;
-
-	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
-
-	static FName ComponentName;
-
-	UGroupMnaggerComponent(const FObjectInitializer& ObjectInitializer);
-
-	virtual void TickComponent(
-		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
-	)override;
-
-	void SpwanTeammateCharacter();
-
-	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index);
-
-	TSharedPtr<FTeamMatesHelper> CreateTeam();
-
-	void OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
-
-	const TSharedPtr<FTeamMatesHelper>& GetTeamHelper();
-
-	bool IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)const;
-
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
-
-	FTeamHelperChangedDelegateContainer GroupHelperChangedDelegateContainer;
 
 	TSet<AHumanCharacter*>TargetSet;
 
@@ -120,11 +99,23 @@ protected:
 
 	virtual void BeginPlay()override;
 	
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	UFUNCTION(Server, Reliable)
 	virtual void AddCharacterToTeam_Server(const FGuid&ProxtID, int32 Index);
-	
-private:
 
-	TSharedPtr<FTeamMatesHelper> TeamHelperSPtr;
+	UFUNCTION(Server, Reliable)
+	virtual void SpwanTeammateCharacter_Server();
+
+private:
+	
+	UFUNCTION()
+	void OnRep_GroupSharedInfoChanged();
+
+	void OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
+
+	void AddCharacter(FPawnType* PCPtr);
+
+	void AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
 
 };

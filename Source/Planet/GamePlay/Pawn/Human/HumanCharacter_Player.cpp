@@ -1,12 +1,16 @@
 
 #include "HumanCharacter_Player.h"
 
+#include "AssetRefMap.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerInput.h"
 #include "GravitySpringArmComponent.h"
 
 #include "GeneratorNPCs_Patrol.h"
 #include "PlayerComponent.h"
+#include "GroupSharedInfo.h"
+#include "HumanAIController.h"
+#include "PlanetPlayerController.h"
 
 AHumanCharacter_Player::AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -28,6 +32,20 @@ AHumanCharacter_Player::AHumanCharacter_Player(const FObjectInitializer& ObjectI
 void AHumanCharacter_Player::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AHumanCharacter_Player::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
+void AHumanCharacter_Player::UnPossessed()
+{
+	Super::UnPossessed();
+}
+
+void AHumanCharacter_Player::InitialGroupSharedInfo()
+{
 }
 
 UCameraComponent* AHumanCharacter_Player::GetCameraComp()

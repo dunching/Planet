@@ -27,6 +27,7 @@
 #include "GroupMnaggerComponent.h"
 #include "HumanCharacter.h"
 #include "BaseFeatureComponent.h"
+#include "GroupSharedInfo.h"
 
 namespace Skill_WeaponActive_PickAxe
 {
@@ -150,10 +151,10 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	FCollisionQueryParams CapsuleParams;
 	CapsuleParams.AddIgnoredActor(CharacterPtr);
 
-	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
+	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupSharedInfo();
 	if (GroupMnaggerComponent)
 	{
-		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
+		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
 			for (auto Iter : TeamsHelperSPtr->MembersSet)

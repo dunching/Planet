@@ -25,6 +25,7 @@
 #include "ItemProxyContainer.h"
 #include "GameMode_Main.h"
 #include "KismetGravityLibrary.h"
+#include "GroupSharedInfo.h"
 
 APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -55,9 +56,9 @@ UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() 
 	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
 }
 
-UGroupMnaggerComponent* APlanetAIController::GetGroupMnaggerComponent() const
+AGroupSharedInfo* APlanetAIController::GetGroupSharedInfo() const
 {
-	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
+	return GetPawn<FPawnType>()->GetGroupSharedInfo();
 }
 
 UHoldingItemsComponent* APlanetAIController::GetHoldingItemsComponent() const
@@ -97,9 +98,9 @@ void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 TWeakObjectPtr<ACharacterBase> APlanetAIController::GetTeamFocusTarget() const
 {
-	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
+	if (GetGroupSharedInfo() && GetGroupSharedInfo()->GetTeamMatesHelperComponent())
 	{
-		return GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
+		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
 	}
 
 	return nullptr;
@@ -136,11 +137,11 @@ void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		{
 			if (Stimulus.WasSuccessfullySensed())
 			{
-				GetGroupMnaggerComponent()->GetTeamHelper()->AddKnowCharacter(CharacterPtr);
+				GetGroupSharedInfo()->GetTeamMatesHelperComponent()->AddKnowCharacter(CharacterPtr);
 			}
 			else
 			{
-				GetGroupMnaggerComponent()->GetTeamHelper()->RemoveKnowCharacter(CharacterPtr);
+				GetGroupSharedInfo()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
 			}
 		}
 	}

@@ -33,14 +33,14 @@ struct FMainHUD : public TStructVariable<FMainHUD>
 void AMainHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InitMainHUDLayout();
-	SwitchState(EMainHUDType::kRegularAction);
 }
 
 void AMainHUD::ShowHUD()
 {
 	Super::ShowHUD();
+
+	InitMainHUDLayout();
+	SwitchState(EMainHUDType::kRegularAction);
 }
 
 void AMainHUD::SwitchState(EMainHUDType MainHUDType)

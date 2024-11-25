@@ -72,7 +72,7 @@ void URaffleSubSystem::SyncUnits2Player()const
 	{
 		return;
 	}
-	CharacterPtr->GetHoldingItemsComponent()->SyncApendingUnit(ApendingID);
+	CharacterPtr->GetHoldingItemsComponent()->SyncPendingUnit(ApendingID);
 }
 
 bool URaffleSubSystem::RafflePermanent(int32 Count)const
@@ -125,7 +125,7 @@ void URaffleSubSystem::RafflePermanentComplete(
 	{
 		auto RowPtr = DataTable->FindRow<FTableRowUnit>(*Iter.ToString(), TEXT("GetUnit"));
 
-		CharacterPtr->GetHoldingItemsComponent()->AddUnit_Apending(Iter, 1, ApendingID);
+		CharacterPtr->GetHoldingItemsComponent()->AddUnit_Pending(Iter, 1, ApendingID);
  
  		GetUnitAry.Add(SceneUnitExtendInfoMapPtr->GetTableRowUnit(Iter));
 	}

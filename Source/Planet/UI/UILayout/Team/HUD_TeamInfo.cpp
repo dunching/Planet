@@ -11,6 +11,7 @@
 #include "HUD_TeamMateInfo.h"
 #include "CharacterBase.h"
 #include "TemplateHelper.h"
+#include "GroupSharedInfo.h"
 
 struct FHUD_TeamInfo : public TStructVariable<FHUD_TeamInfo>
 {
@@ -68,9 +69,9 @@ void UHUD_TeamInfo::ResetUIByData()
 	auto ChidrensAry = PanelPtr->GetAllChildren();
 	int32 Index = 0;
 
-	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
+	auto GMCPtr = PCPtr->GetGroupSharedInfo();
 
-	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
+	auto MembersHelperSPtr = GMCPtr->GetTeamMatesHelperComponent();
 	if (MembersHelperSPtr)
 	{
 		for (auto Iter : MembersHelperSPtr->MembersSet)
@@ -97,7 +98,7 @@ void UHUD_TeamInfo::ResetUIByData()
 		std::bind(&ThisClass::OnTeammateOptionChanged, this, std::placeholders::_1, std::placeholders::_2
 		));
 
-	OnTeammateOptionChanged(GMCPtr->GetTeamHelper()->GetTeammateOption(), GMCPtr->GetTeamHelper()->OwnerCharacterUnitPtr);
+	OnTeammateOptionChanged(GMCPtr->GetTeamMatesHelperComponent()->GetTeammateOption(), GMCPtr->GetTeamMatesHelperComponent()->OwnerCharacterUnitPtr);
 }
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(

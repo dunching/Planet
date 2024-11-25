@@ -29,6 +29,7 @@
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
+#include "GroupSharedInfo.h"
 
 struct FTeamMateInfo : public TStructVariable<FTeamMateInfo>
 {
@@ -160,11 +161,6 @@ void UTeamMateInfo::AddMember()
 	{
 		return;
 	}
-	auto GMCPtr = PCPtr->GetGroupMnaggerComponent();
-
-	auto TeamsHelperSPtr = GMCPtr->GetTeamHelper();
-	if (TeamsHelperSPtr)
-	{
-		TeamsHelperSPtr->AddCharacter(GroupMateUnitPtr);
-	}
+	auto GMCPtr = PCPtr->GetGroupSharedInfo();
+	GMCPtr->GetTeamMatesHelperComponent()->AddCharacterToTeam(GroupMateUnitPtr, Index);
 }
