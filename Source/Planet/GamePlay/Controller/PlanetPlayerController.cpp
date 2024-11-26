@@ -23,13 +23,14 @@
 #include "NavgationSubSysetem.h"
 #include "FocusIcon.h"
 #include "GameplayTagsSubSystem.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "BaseFeatureComponent.h"
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "CollisionDataStruct.h"
 #include "LogWriter.h"
 #include "GroupSharedInfo.h"
+#include "HoldingItemsComponent.h"
 #include "GameFramework/HUD.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
@@ -344,7 +345,7 @@ AGroupSharedInfo* APlanetPlayerController::GetGroupSharedInfo() const
 
 UHoldingItemsComponent* APlanetPlayerController::GetHoldingItemsComponent() const
 {
-	return GetPawn<FPawnType>()->GetHoldingItemsComponent();
+	return GroupSharedInfoPtr ? GroupSharedInfoPtr->HoldingItemsComponentPtr : nullptr;
 }
 
 UCharacterAttributesComponent* APlanetPlayerController::GetCharacterAttributesComponent() const
@@ -382,13 +383,13 @@ void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
 	if (CurrentValue <= 0)
 	{
 		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{
-			UGameplayTagsSubSystem::GetInstance()->DeathingTag
+			UGameplayTagsSubSystem::DeathingTag
 		});
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData)
 		{
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			{
-				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+				if (Iter == UGameplayTagsSubSystem::DeathingTag)
 				{
 					//					Destroy();
 				}
@@ -427,6 +428,7 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		GroupSharedInfoPtr = GetWorld()->SpawnActor<AGroupSharedInfo>(
 			AGroupSharedInfo::StaticClass(), SpawnParameters
 		);
+		GetHoldingItemsComponent()->OnGroupSharedInfoReady();
 	}
 #endif
 }
@@ -456,7 +458,7 @@ void APlanetPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Coun
 
 		AIPCPtr->GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+			UGameplayTagsSubSystem::DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 	}
@@ -486,7 +488,7 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 
 	// 目标进入“死亡”标签
 	auto& DelegateRef = AIPCPtr->GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+		UGameplayTagsSubSystem::DeathingTag,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnFocusDeathing);
@@ -627,6 +629,8 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray<FString>& 
 
 void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 {
+	GetHoldingItemsComponent()->OnGroupSharedInfoReady();
+	
 	// auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	// if (PlayerCharacterPtr)
 	// {

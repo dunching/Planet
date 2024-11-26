@@ -1,0 +1,34 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+#include "MyUserWidget.h"
+#include "UObject/ObjectMacros.h"
+#include "UObject/Interface.h"
+
+#include "GenerateType.h"
+#include "ItemProxy.h"
+
+#include "GroupSharedInterface.generated.h"
+
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class UGroupSharedInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class PLANET_API IGroupSharedInterface
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void OnGroupSharedInfoReady() = 0;
+
+protected:
+
+private:
+
+};

@@ -24,6 +24,7 @@
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
+#include "ItemProxy_Character.h"
 
 struct FGroupMateInfo : public TStructVariable<FGroupMateInfo>
 {
@@ -91,7 +92,7 @@ void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Character))
 	{
 		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{

@@ -13,7 +13,7 @@
 #include "PlanetControllerInterface.h"
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
 #include "ItemProxy.h"
@@ -21,7 +21,8 @@
 #include "LogWriter.h"
 #include "TeamConfigureomponent.h"
 #include "TeamConfigure.h"
-#include "HumanCharacter_AI.h"
+#include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
@@ -55,7 +56,7 @@ void UTeamMatesHelperComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUn
 	}
 #endif
 
-	FTeammate_FASI Teammate_FASI;
+	FTeamConfigure_FASI Teammate_FASI;
 
 	Teammate_FASI.Index = Index;
 	if (CharacterUnitPtr)
@@ -67,13 +68,18 @@ void UTeamMatesHelperComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUn
 		Teammate_FASI.CharacterProxyID = FGuid();
 	}
 
-	auto PSPtr = GetOwner<FOwnerType>()->GetPlayerState<APlanetPlayerState>();
-	PSPtr->GetTeamConfigureomponent()->UpdateConfigure(Teammate_FASI);
+	auto GroupSharedInfoPtr = GetOwner<FOwnerType>()->GetGroupSharedInfo();
+	GroupSharedInfoPtr->GetTeamConfigureomponent()->UpdateConfigure(Teammate_FASI);
 }
 
 void UTeamMatesHelperComponent::OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
 {
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
+}
+
+void UTeamMatesHelperComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
 }
 
 void UTeamMatesHelperComponent::BeginPlay()
@@ -92,10 +98,10 @@ void UTeamMatesHelperComponent::AddCharacterToTeam_Server_Implementation(const F
 void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 {
 	const auto OwnerPtr = GetOwner<FOwnerType>();
-	auto PSPtr = GetOwner<FOwnerType>()->GetPlayerState<APlanetPlayerState>();
-	if (PSPtr)
+	auto GroupSharedInfoPtr = GetOwner<FOwnerType>()->GetGroupSharedInfo();
+	if (GroupSharedInfoPtr)
 	{
-		auto& Ref = PSPtr->TeamConfigureompConentPtr->Teammate_FASI_Container.Items;
+		auto& Ref = GroupSharedInfoPtr->TeamConfigureompConentPtr->Teammate_FASI_Container.Items;
 		for (auto& Iter : Ref)
 		{
 			auto CharacterProxySPtr =

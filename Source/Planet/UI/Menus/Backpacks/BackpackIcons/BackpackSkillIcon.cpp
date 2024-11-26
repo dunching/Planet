@@ -47,8 +47,8 @@ void UBackpackSkillIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasi
 	if (InBasicUnitPtr)
 	{
 		if (
-			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve)
+			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active) ||
+			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve)
 			)
 		{
 			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(InBasicUnitPtr);

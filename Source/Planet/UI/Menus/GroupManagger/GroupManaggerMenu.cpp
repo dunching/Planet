@@ -20,6 +20,7 @@
 #include "HumanCharacter.h"
 #include "GameplayTagsSubSystem.h"
 #include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 namespace GroupManaggerMenu
 {
@@ -75,7 +76,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)
 	{
-		if (UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player == Iter->GetUnitType())
+		if (UGameplayTagsSubSystem::Unit_Character_Player == Iter->GetUnitType())
 		{
 			continue;
 		}

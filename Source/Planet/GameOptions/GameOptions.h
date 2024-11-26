@@ -11,12 +11,16 @@
 #include "GameOptions.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UGameOptions : public UObject
+class PLANET_API UGameOptions : public UDataAsset
 {
 	GENERATED_BODY()
 public:
 
 	static UGameOptions* GetInstance();
+	
+	virtual void PostCDOContruct() override;
+	
+	virtual void PostInitProperties()override;
 	
 	// 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ActiveSkill")
@@ -36,5 +40,8 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
 	bool bIsAllowAdjustTime = true;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TMap<FGameplayTag, FKey>ActionKeyMap;
 
 };

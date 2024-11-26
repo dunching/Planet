@@ -12,7 +12,7 @@
 #include "PlanetControllerInterface.h"
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
 #include "ItemProxy.h"
@@ -117,6 +117,8 @@ UCDCaculatorComponent::UCDCaculatorComponent(const FObjectInitializer& ObjectIni
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickInterval = 1.f / 10;
+
+	bWantsInitializeComponent = true;
 
 	SetIsReplicatedByDefault(true);
 }
@@ -378,4 +380,15 @@ TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FConsu
 	}
 
 	return MaxCD;
+}
+
+void UCDCaculatorComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	UWorld* World = GetWorld();
+	if ((World->IsGameWorld()))
+	{
+		CD_FASI_Container.CDCaculatorComponentPtr = this;
+	}
 }

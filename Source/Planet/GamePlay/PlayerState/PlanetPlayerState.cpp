@@ -7,7 +7,7 @@
 #include "CharacterAttributesComponent.h"
 #include "HoldingItemsComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "SceneUnitTable.h"
 #include "ItemProxy.h"
 #include "TeamConfigureomponent.h"
@@ -15,7 +15,6 @@
 APlanetPlayerState::APlanetPlayerState(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	TeamConfigureompConentPtr = CreateDefaultSubobject<UTeamConfigureComponent>(UTeamConfigureComponent::ComponentName);
 }
 
 void APlanetPlayerState::BeginPlay()
@@ -32,9 +31,4 @@ void APlanetPlayerState::PostInitializeComponents()
 
 void APlanetPlayerState::InitialData()
 {
-}
-
-UTeamConfigureComponent* APlanetPlayerState::GetTeamConfigureomponent() const
-{
-	return TeamConfigureompConentPtr;
 }

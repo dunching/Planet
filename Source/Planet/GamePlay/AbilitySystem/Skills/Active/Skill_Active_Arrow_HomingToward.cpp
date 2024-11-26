@@ -83,7 +83,7 @@ bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward)
 {
 	auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
-		UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow
+		UGameplayTagsSubSystem::Unit_Skill_Weapon_Bow
 	);
 
 	if (TargetSkillSPtr)

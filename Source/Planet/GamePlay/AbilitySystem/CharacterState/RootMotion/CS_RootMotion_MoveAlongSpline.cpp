@@ -86,7 +86,7 @@ void UCS_RootMotion_MoveAlongSpline::EndAbility(
 // 	{
 // 		TaskPtr->UpdateDuration();
 // 	}
-// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::FlyAway))
 // 	{
 // 		for (auto Iter : ActiveTasks)
 // 		{
@@ -184,7 +184,7 @@ void UCS_RootMotion_MoveAlongSpline::OnDuration(UAbilityTask_TimerHelper* InTask
 }
 
 FGameplayAbilityTargetData_RootMotion_MoveAlongSpline::FGameplayAbilityTargetData_RootMotion_MoveAlongSpline() :
-	Super(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline)
+	Super(UGameplayTagsSubSystem::MoveAlongSpline)
 {
 
 }

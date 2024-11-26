@@ -31,7 +31,7 @@
 FGameplayAbilityTargetData_StateModify_Charm::FGameplayAbilityTargetData_StateModify_Charm(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm, Duration)
+	Super(UGameplayTagsSubSystem::State_Debuff_Charm, Duration)
 {
 }
 
@@ -123,14 +123,14 @@ void UCS_PeriodicStateModify_Charm::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
+	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Charm);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Charm);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);;
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);;
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_Orient2Acce);
 }
 
 void UCS_PeriodicStateModify_Charm::PerformAction()

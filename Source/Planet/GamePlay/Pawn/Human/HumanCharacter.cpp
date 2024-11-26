@@ -45,7 +45,7 @@
 #include "ItemProxy.h"
 #include "GetItemInfosList.h"
 
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "GroupSharedInfo.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :

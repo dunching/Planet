@@ -102,7 +102,7 @@ bool USkill_Active_DisplacementNoPhy::CommitAbility(
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -PP);
-		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
@@ -165,7 +165,7 @@ void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_NoPhy);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_NoPhy);
 }
 
 void USkill_Active_DisplacementNoPhy::PlayMontage()

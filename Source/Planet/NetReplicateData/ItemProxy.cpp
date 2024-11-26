@@ -14,7 +14,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "GroupMnaggerComponent.h"
 #include "PropertyEntrys.h"
 #include "CharactersInfo.h"
@@ -36,6 +36,7 @@
 #include "Weapon_Bow.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
+#include "ItemProxy_Character.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -59,7 +60,10 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 
 void FBasicProxy::InitialUnit()
 {
-	ID = FGuid::NewGuid();
+	if (!ID.IsValid())
+	{
+		ID = FGuid::NewGuid();
+	}
 }
 
 void FBasicProxy::UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr)
@@ -520,7 +524,7 @@ bool FWeaponSkillProxy::Active()
 
 		FGameplayEventData Payload;
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon) 
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon) 
 			)
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
@@ -689,13 +693,13 @@ void FWeaponSkillProxy::RegisterSkill()
 		FGameplayAbilityTargetData_SkillBase_RegisterParam* GameplayAbilityTargetDataPtr = nullptr;
 		// 需要特殊参数的
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow)
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon_Bow)
 			)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Bow_RegisterParam;
 		}
 		else if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_FoldingFan)
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon_FoldingFan)
 			)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_FoldingFan_RegisterParam;
@@ -773,7 +777,7 @@ bool FActiveSkillProxy::Active()
 
 		// 需要特殊参数的
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Control)
+			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active_Control)
 			)
 		{
 			if (InGAInsPtr->IsActive())
@@ -983,82 +987,6 @@ FTableRowUnit_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 {
 	return GetTableRowUnit_PassiveSkillExtendInfo()->SkillClass;
-}
-
-FCharacterProxy::FCharacterProxy()
-{
-	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
-}
-
-bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
-{
-	Super::NetSerialize(Ar, Map, bOutSuccess);
-
-	Ar << ProxyCharacterPtr;
-	CharacterAttributesSPtr->NetSerialize(Ar, Map, bOutSuccess);
-
-	return true;
-}
-
-void FCharacterProxy::InitialUnit()
-{
-	Super::InitialUnit();
-
-	CharacterAttributesSPtr->Title = GetDT_CharacterType()->Title;
-}
-
-FTableRowUnit_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() const
-{
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Character_GrowthAttribute.LoadSynchronous();
-
-	auto SceneUnitExtendInfoPtr =
-		DataTable->FindRow<FTableRowUnit_CharacterGrowthAttribute>(*ProxyCharacterPtr->CharacterGrowthAttribute.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
-}
-
-FTableRowUnit_CharacterType* FCharacterProxy::GetDT_CharacterType() const
-{
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
-
-	auto SceneUnitExtendInfoPtr =
-		DataTable->FindRow<FTableRowUnit_CharacterType>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
-}
-
-void FCharacterProxy::RelieveRootBind()
-{
-}
-
-AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
-{
-	AHumanCharacter_AI* Result = nullptr;
-	if (ProxyCharacterPtr.IsValid())
-	{
-	}
-	else
-	{
-		FActorSpawnParameters SpawnParameters;
-
-		SpawnParameters.Owner = GetOwnerCharacterProxy().Pin()->ProxyCharacterPtr.Get();
-		
-		Result =
-			HoldingItemsComponentPtr->GetWorld()->SpawnActor<AHumanCharacter_AI>(GetDT_CharacterType()->CharacterClass, Transform, SpawnParameters);
-
-		ProxyCharacterPtr = Result;
-	}
-	return Result;
-}
-
-void FCharacterProxy::DestroyCharacter()
-{
-	if (ProxyCharacterPtr.IsValid())
-	{
-		ProxyCharacterPtr->Destroy();
-	}
-
-	ProxyCharacterPtr = nullptr;
 }
 
 FCoinProxy::FCoinProxy()

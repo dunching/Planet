@@ -259,7 +259,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		{
 // 			if (Iter.Value->SkillUnitPtr)
 // 			{
-// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
 // 				{
 // 					auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillUnitPtr);
 // 					if (!ActiveSkillUnitPtr)

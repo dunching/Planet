@@ -27,8 +27,8 @@ void UBasicFutures_Run::InitalDefaultTags()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run);
-		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run);
+		AbilityTags.AddTag(UGameplayTagsSubSystem::State_Locomotion_Run);
+		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Locomotion_Run);
 	}
 }
 
@@ -50,7 +50,7 @@ void UBasicFutures_Run::IntervalTick(UAbilityTask_TimerHelper*, float Interval, 
 
 			FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-			GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+			GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
 
 			GAEventData.DataModify.Add(ECharacterPropertyType::PP, -RunningConsume.GetCurrentValue());
 
@@ -109,7 +109,7 @@ void UBasicFutures_Run::ActivateAbility(
 
 			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(
 				ModifyPropertyMap,
-				UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run
+				UGameplayTagsSubSystem::State_Locomotion_Run
 			);
 		}
 #endif
@@ -135,7 +135,7 @@ void UBasicFutures_Run::EndAbility(
 
 		CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(
 			ModifyPropertyMap, 
-			UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run
+			UGameplayTagsSubSystem::State_Locomotion_Run
 		);
 		}
 #endif

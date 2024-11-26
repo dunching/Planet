@@ -89,8 +89,8 @@ void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 	if (BasicUnitPtr)
 	{
 		if (
-			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)) ||
-			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active)) ||
+			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
 			)
 		{
 			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(BasicUnitPtr);
@@ -114,11 +114,11 @@ void UActionSkillsIcon::EnableIcon(bool bIsEnable)
 
 void UActionSkillsIcon::UpdateSkillState()
 {
-	if (IconSocket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket))
+	if (IconSocket.MatchesTag(UGameplayTagsSubSystem::ActiveSocket))
 	{
 		UpdateSkillState_ActiveSkill();
 	}
-	else if (IconSocket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket))
+	else if (IconSocket.MatchesTag(UGameplayTagsSubSystem::WeaponActiveSocket))
 	{
 		UpdateSkillState_ActiveWeapon();
 	}
@@ -144,7 +144,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
 		SetCanRelease(bIsReady);
 	}
-	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
 	{
 		const auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(UnitPtr);
 		if (!SkillProxySPtr)
@@ -213,7 +213,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		SetCanRelease(bIsReady);
 	}
 
-	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
 	{
 		auto GAInsPtr = Cast<USkill_WeaponActive_Base>(SkillProxySPtr->GetGAInst());
 		if (!GAInsPtr)

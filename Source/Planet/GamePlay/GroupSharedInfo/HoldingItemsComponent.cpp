@@ -7,13 +7,27 @@
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
 #include "SceneUnitExtendInfo.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
+#include "ItemProxy_Character.h"
 
 UHoldingItemsComponent::UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	bWantsInitializeComponent = true;
+
 	SetIsReplicatedByDefault(true);
+}
+
+void UHoldingItemsComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	
+	UWorld* World = GetWorld();
+	if ((World->IsGameWorld()))
+	{
+		Proxy_Container.HoldingItemsComponentPtr = this;
+	}
 }
 
 void UHoldingItemsComponent::BeginPlay()
@@ -35,19 +49,14 @@ void UHoldingItemsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_CONDITION(ThisClass, CharacterProxyID_Container, COND_InitialOnly);
 }
 
+void UHoldingItemsComponent::OnGroupSharedInfoReady()
+{
+	
+}
+
 void UHoldingItemsComponent::OnRep_GetCharacterProxyID()
 {
-	if (CharacterProxySPtr)
-	{
-		if (SceneMetaMap.Contains(CharacterProxySPtr->GetID()))
-		{
-			SceneMetaMap.Remove(CharacterProxySPtr->GetID());
-			
-			CharacterProxySPtr->ID = CharacterProxyID_Container;
-			
-			SceneMetaMap.Add(CharacterProxySPtr->GetID());
-		}
-	}
+	CharacterProxySPtr = FindUnit_Character(CharacterProxyID_Container);
 }
 
 void UHoldingItemsComponent::AddUnit_Pending(FGameplayTag UnitType, int32 Num, FGuid Guid)
@@ -106,7 +115,7 @@ void UHoldingItemsComponent::SetAllocationCharacterUnit_Implementation(
 		ProxySPtr->SetAllocationCharacterUnit(nullptr);
 	}
 
-	if (ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	if (ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
 	{
 		// 此项是跟 Weapon 绑定的，所以不必复制
 	}
@@ -131,10 +140,10 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 		return Result;
 	}
 
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
 	{
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
 	{
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
@@ -143,7 +152,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 
 		OnWeaponUnitChanged(DynamicCastSharedPtr<FWeaponProxy>(Result), true);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill))
 	{
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
@@ -152,14 +161,14 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 
 		OnSkillUnitChanged(DynamicCastSharedPtr<FSkillProxy>(Result), true);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
 	{
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
 	{
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
@@ -168,7 +177,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy_SyncHelper(const TShare
 
 		OnConsumableUnitChanged(DynamicCastSharedPtr<FConsumableProxy>(Result), EProxyModifyType::kAdd);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character))
 	{
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
@@ -185,7 +194,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 	const auto UnitType = ProxySPtr->GetUnitType();
 
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FToolProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FToolProxy>(FindProxy(ProxySPtr->GetID()));
@@ -193,7 +202,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(FindProxy(ProxySPtr->GetID()));
@@ -201,7 +210,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(FindProxy(ProxySPtr->GetID()));
@@ -209,7 +218,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(FindProxy(ProxySPtr->GetID()));
@@ -217,7 +226,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(FindProxy(ProxySPtr->GetID()));
@@ -225,7 +234,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(FindProxy(ProxySPtr->GetID()));
@@ -233,7 +242,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCoinProxy>(FindProxy(ProxySPtr->GetID()));
@@ -241,7 +250,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(FindProxy(ProxySPtr->GetID()));
@@ -249,7 +258,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character_Player))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(CharacterProxySPtr->GetID()));
@@ -257,7 +266,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 
 		Result = LeftProxySPtr;
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(ProxySPtr->GetID()));
@@ -331,19 +340,19 @@ TSharedPtr<FSkillProxy> UHoldingItemsComponent::AddUnit_Skill(const FGameplayTag
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
 	TSharedPtr<FSkillProxy> ResultPtr = nullptr;
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon))
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
 	{
 		ResultPtr = MakeShared<FWeaponSkillProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent))
 	{
 		ResultPtr = MakeShared<FTalentSkillProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
 	{
 		ResultPtr = MakeShared<FActiveSkillProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
 	{
 		ResultPtr = MakeShared<FPassiveSkillProxy>();
 	}
@@ -536,7 +545,7 @@ TArray<TSharedPtr<FCharacterProxy>> UHoldingItemsComponent::GetCharacterProxyAry
 
 	for (auto Iter : SceneToolsAry)
 	{
-		if (Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
+		if (Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Character))
 		{
 			auto GroupmateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(Iter);
 			check(GroupmateUnitPtr);
@@ -571,27 +580,27 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy(const FGameplayTag& Uni
 
 	auto SceneUnitExtendInfoPtr = GetTableRowUnit(UnitType);
 
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool))
+	if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
 	{
 		ResultSPtr = AddUnit_ToolUnit(UnitType);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
 	{
 		ResultSPtr = AddUnit_Weapon(UnitType);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill))
 	{
 		ResultSPtr = AddUnit_Skill(UnitType);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
 	{
 		ResultSPtr = AddUnit_Coin(UnitType, Num);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
 	{
 		ResultSPtr = AddUnit_Consumable(UnitType);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
+	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character))
 	{
 		ResultSPtr = AddUnit_Character(UnitType);
 	}
@@ -609,14 +618,30 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::FindProxy(const IDType& ID)
 	return nullptr;
 }
 
-TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialDefaultCharacter()
+TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialOwnerCharacterProxy(ACharacterBase*OwnerCharacterPtr)
 {
 	Proxy_Container.HoldingItemsComponentPtr = this;
 
+#if UE_EDITOR
+	if (GetNetMode() == NM_Client)
+	{
+		CharacterProxySPtr = MakeShared<FCharacterProxy>(CharacterProxyID_Container);
+	}
+	else
+	{
+		CharacterProxySPtr = MakeShared<FCharacterProxy>();
+	}
+#elif UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		CharacterProxySPtr = MakeShared<FCharacterProxy>(CharacterProxyID_Container);
+	}
+#else
 	CharacterProxySPtr = MakeShared<FCharacterProxy>();
+#endif
 
-	CharacterProxySPtr->UnitType = UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player;
-	CharacterProxySPtr->ProxyCharacterPtr = GetOwner<FOwnerType>();
+	CharacterProxySPtr->UnitType = UGameplayTagsSubSystem::Unit_Character_Player;
+	CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
 	CharacterProxySPtr->InitialUnit();
 
 	SceneToolsAry.Add(CharacterProxySPtr);
@@ -624,7 +649,7 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialDefaultCharacter()
 
 	Proxy_Container.AddItem(CharacterProxySPtr);
 
-#if UE_EDITOR || UE_CLIENT
+#if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		CharacterProxyID_Container = CharacterProxySPtr->ID;
@@ -640,7 +665,7 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddUnit_Character(const FGam
 
 	TSharedPtr<FCharacterProxy> ResultPtr = nullptr;
 
-	if (UGameplayTagsSubSystem::GetInstance()->Unit_Character_Player == UnitType)
+	if (UGameplayTagsSubSystem::Unit_Character_Player == UnitType)
 	{
 		ResultPtr = MakeShared<FCharacterProxy>();
 

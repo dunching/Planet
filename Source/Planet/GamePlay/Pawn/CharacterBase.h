@@ -148,8 +148,6 @@ protected:
 
 	virtual void SpawnDefaultController()override;
 
-	void InitialDefaultCharacterUnit();
-	
 	UFUNCTION(Server, Reliable)
 	virtual void InteractionSceneObj_Server(ASceneObj* SceneObjPtr);
 	
@@ -172,9 +170,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
-	
-	UPROPERTY()
-	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
 	
 	UPROPERTY()
 	TObjectPtr<UTalentAllocationComponent> TalentAllocationComponentPtr = nullptr;

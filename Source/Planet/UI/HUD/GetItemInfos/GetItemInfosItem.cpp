@@ -8,6 +8,7 @@
 #include "TemplateHelper.h"
 #include "TextSubSystem.h"
 #include "TextCollect.h"
+#include "ItemProxy_Character.h"
 
 struct FGetItemInfosItem : public TStructVariable<FGetItemInfosItem>
 {

@@ -1,4 +1,3 @@
-
 #include "GetItemInfosList.h"
 
 #include <Components/VerticalBox.h>
@@ -6,6 +5,7 @@
 #include "ItemProxy.h"
 #include "GetItemInfosItem.h"
 #include "TemplateHelper.h"
+#include "ItemProxy_Character.h"
 
 struct FGetItemInfosList : public TStructVariable<FGetItemInfosList>
 {
@@ -35,7 +35,7 @@ void UGetItemInfosList::ResetUIByData()
 {
 }
 
-void UGetItemInfosList::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd)
+void UGetItemInfosList::OnSkillUnitChanged(const TSharedPtr<FSkillProxy>& UnitPtr, bool bIsAdd)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
@@ -44,7 +44,7 @@ void UGetItemInfosList::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& Unit
 		if (ChildNum >= MaxDisplayNum)
 		{
 			OrderAry.Add(UnitPtr);
-			SkillPendingAry.Add({ UnitPtr, bIsAdd });
+			SkillPendingAry.Add({UnitPtr, bIsAdd});
 		}
 		else
 		{
@@ -60,7 +60,7 @@ void UGetItemInfosList::OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& Unit
 	}
 }
 
-void UGetItemInfosList::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosList::OnCoinUnitChanged(const TSharedPtr<FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
@@ -69,7 +69,7 @@ void UGetItemInfosList::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPt
 		if (ChildNum >= MaxDisplayNum)
 		{
 			OrderAry.Add(UnitPtr);
-			CoinPendingAry.Add({ UnitPtr, bIsAdd ,Num });
+			CoinPendingAry.Add({UnitPtr, bIsAdd, Num});
 		}
 		else
 		{
@@ -85,7 +85,8 @@ void UGetItemInfosList::OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPt
 	}
 }
 
-void UGetItemInfosList::OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType)
+void UGetItemInfosList::OnConsumableUnitChanged(const TSharedPtr<FConsumableProxy>& UnitPtr,
+                                                EProxyModifyType ProxyModifyType)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
@@ -94,7 +95,7 @@ void UGetItemInfosList::OnConsumableUnitChanged(const TSharedPtr < FConsumablePr
 		if (ChildNum >= MaxDisplayNum)
 		{
 			OrderAry.Add(UnitPtr);
-			ConsumablePendingAry.Add({ UnitPtr, ProxyModifyType });
+			ConsumablePendingAry.Add({UnitPtr, ProxyModifyType});
 		}
 		else
 		{
@@ -110,7 +111,7 @@ void UGetItemInfosList::OnConsumableUnitChanged(const TSharedPtr < FConsumablePr
 	}
 }
 
-void UGetItemInfosList::OnGourpmateUnitChanged(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd)
+void UGetItemInfosList::OnGourpmateUnitChanged(const TSharedPtr<FCharacterProxy>& UnitPtr, bool bIsAdd)
 {
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
 	if (UIPtr)
@@ -119,7 +120,7 @@ void UGetItemInfosList::OnGourpmateUnitChanged(const TSharedPtr < FCharacterProx
 		if (ChildNum >= MaxDisplayNum)
 		{
 			OrderAry.Add(UnitPtr);
-			CharacterPendingAry.Add({ UnitPtr, bIsAdd });
+			CharacterPendingAry.Add({UnitPtr, bIsAdd});
 		}
 		else
 		{
@@ -150,26 +151,28 @@ void UGetItemInfosList::OnRemovedItem()
 				return;
 			}
 		}
-		
+
 		for (int32 SecondIndex = 0; SecondIndex < CoinPendingAry.Num(); SecondIndex++)
 		{
 			if (OrderAry[Index] == CoinPendingAry[SecondIndex].Get<0>())
 			{
 				OnCoinUnitChanged(CoinPendingAry[
-					SecondIndex].Get<0>().Pin(), CoinPendingAry[SecondIndex].Get<1>(), CoinPendingAry[SecondIndex].Get<2>()
-						);
+					                  SecondIndex].Get<0>().Pin(), CoinPendingAry[SecondIndex].Get<1>(),
+				                  CoinPendingAry[SecondIndex].Get<2>()
+				);
 
 				OrderAry.RemoveAt(Index);
 				SkillPendingAry.RemoveAt(SecondIndex);
 				return;
 			}
 		}
-		
+
 		for (int32 SecondIndex = 0; SecondIndex < ConsumablePendingAry.Num(); SecondIndex++)
 		{
 			if (OrderAry[Index] == ConsumablePendingAry[SecondIndex].Get<0>())
 			{
-				OnConsumableUnitChanged(ConsumablePendingAry[SecondIndex].Get<0>().Pin(), ConsumablePendingAry[SecondIndex].Get<1>());
+				OnConsumableUnitChanged(ConsumablePendingAry[SecondIndex].Get<0>().Pin(),
+				                        ConsumablePendingAry[SecondIndex].Get<1>());
 
 				OrderAry.RemoveAt(Index);
 				ConsumablePendingAry.RemoveAt(SecondIndex);
@@ -181,7 +184,8 @@ void UGetItemInfosList::OnRemovedItem()
 		{
 			if (OrderAry[Index] == CharacterPendingAry[SecondIndex].Get<0>())
 			{
-				OnGourpmateUnitChanged(CharacterPendingAry[SecondIndex].Get<0>().Pin(), CharacterPendingAry[SecondIndex].Get<1>());
+				OnGourpmateUnitChanged(CharacterPendingAry[SecondIndex].Get<0>().Pin(),
+				                       CharacterPendingAry[SecondIndex].Get<1>());
 
 				OrderAry.RemoveAt(Index);
 				CharacterPendingAry.RemoveAt(SecondIndex);

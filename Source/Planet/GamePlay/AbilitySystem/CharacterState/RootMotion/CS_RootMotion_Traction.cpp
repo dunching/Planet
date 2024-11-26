@@ -134,7 +134,7 @@ void ATractionPoint::Tick(float DeltaSeconds)
 }
 
 FGameplayAbilityTargetData_RootMotion_Traction::FGameplayAbilityTargetData_RootMotion_Traction() :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_RootMotion_Traction)
+	Super(UGameplayTagsSubSystem::State_RootMotion_Traction)
 {
 
 }

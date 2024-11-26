@@ -158,7 +158,7 @@ bool USkill_Active_Shield::CommitAbility(
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -PP);
-		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}

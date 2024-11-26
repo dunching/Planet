@@ -71,7 +71,7 @@ void USkill_Consumable_Base::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->UsingConsumable);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::UsingConsumable);
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 

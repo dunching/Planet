@@ -87,6 +87,10 @@ public:
 	UPROPERTY(Replicated)
 	FCD_FASI_Container CD_FASI_Container;
 	
+protected:
+	
+	virtual void InitializeComponent()override;
+
 private:
 
 	// 独立CD

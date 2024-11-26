@@ -16,6 +16,9 @@ class UTeamConfigureComponent;
 struct FCharacterProxy;
 struct FSceneUnitContainer;
 
+/*
+ *	玩家数据
+ */
 UCLASS()
 class PLANET_API APlanetPlayerState : public APlayerState
 {
@@ -25,11 +28,6 @@ public:
 
 	APlanetPlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
-	UTeamConfigureComponent* GetTeamConfigureomponent()const;
-	
-	UPROPERTY()
-	TObjectPtr<UTeamConfigureComponent> TeamConfigureompConentPtr = nullptr;
-	
 protected:
 
 	virtual void BeginPlay() override;
@@ -40,4 +38,6 @@ protected:
 	
 private:
 
+	FString PlayerName;
+	
 };

@@ -31,7 +31,7 @@
 FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun(
 	float Duration
 ):
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun, Duration)
+	Super(UGameplayTagsSubSystem::State_Debuff_Stun, Duration)
 {
 }
 
@@ -113,11 +113,11 @@ void UCS_PeriodicStateModify_Stun::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Buff_Stagnation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Buff_Stagnation);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);
 }

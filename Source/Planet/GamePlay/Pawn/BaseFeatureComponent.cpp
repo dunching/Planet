@@ -59,7 +59,7 @@ bool UBaseFeatureComponent::IsInDeath() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsSubSystem::GetInstance()->DeathingTag
+		UGameplayTagsSubSystem::DeathingTag
 	);
 }
 
@@ -72,7 +72,7 @@ bool UBaseFeatureComponent::IsRunning() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-		UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run
+		UGameplayTagsSubSystem::State_Locomotion_Run
 	);
 }
 
@@ -86,7 +86,7 @@ bool UBaseFeatureComponent::IsInFighting() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsSubSystem::GetInstance()->InFightingTag
+		UGameplayTagsSubSystem::InFightingTag
 	);
 }
 
@@ -185,7 +185,7 @@ void UBaseFeatureComponent::SendEventImp(
 			{
 				if (!Iter.DataSource.IsValid())
 				{
-					Iter.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;;
+					Iter.DataSource = UGameplayTagsSubSystem::DataSource_Character;;
 				}
 			}
 		}
@@ -202,7 +202,7 @@ void UBaseFeatureComponent::SendEventImp(
 			ASCPtr->TriggerAbilityFromGameplayEvent(
 				SendEventHandle,
 				ASCPtr->AbilityActorInfo.Get(),
-				UGameplayTagsSubSystem::GetInstance()->BaseFeature_Send,
+				UGameplayTagsSubSystem::BaseFeature_Send,
 				&Payload,
 				*ASCPtr
 			);
@@ -359,7 +359,7 @@ void UBaseFeatureComponent::ExcuteAttackedEffect(const FGameplayAbilityTargetDat
 			if (OnwerActorPtr)
 			{
 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-					OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload
+					OnwerActorPtr, UGameplayTagsSubSystem::Affected, Payload
 				);
 			}
 		}
@@ -383,7 +383,7 @@ void UBaseFeatureComponent::ExcuteAttackedEffect(const FGameplayAbilityTargetDat
 			if (OnwerActorPtr)
 			{
 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-					OnwerActorPtr, UGameplayTagsSubSystem::GetInstance()->Affected, Payload
+					OnwerActorPtr, UGameplayTagsSubSystem::Affected, Payload
 				);
 			}
 		}
@@ -495,13 +495,13 @@ void UBaseFeatureComponent::SwitchWalkState_Implementation(bool bIsRun)
 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run))
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::State_Locomotion_Run))
 			{
 				return;
 			}
 
 			OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run }
+				FGameplayTagContainer{ UGameplayTagsSubSystem::State_Locomotion_Run }
 			);
 		}
 	}
@@ -510,13 +510,13 @@ void UBaseFeatureComponent::SwitchWalkState_Implementation(bool bIsRun)
 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run))
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::State_Locomotion_Run))
 			{
-				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run };
+				FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::State_Locomotion_Run };
 				OnwerActorPtr->GetAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 			}
 
-			OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run);
+			OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::State_Locomotion_Run);
 		}
 	}
 }
@@ -537,14 +537,14 @@ void UBaseFeatureComponent::Dash_Implementation(EDashDirection DashDirection)
 		// 		ASCPtr->TriggerAbilityFromGameplayEvent(
 		// 			FGameplayAbilitySpecHandle(),
 		// 			ASCPtr->AbilityActorInfo.Get(),
-		// 			UGameplayTagsSubSystem::GetInstance()->Dash,
+		// 			UGameplayTagsSubSystem::Dash,
 		// 			&Payload,
 		// 			*ASCPtr
 		// 		);	
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
-			UGameplayTagsSubSystem::GetInstance()->Dash,
+			UGameplayTagsSubSystem::Dash,
 			Payload
 		);
 	}
@@ -556,7 +556,7 @@ void UBaseFeatureComponent::Jump_Implementation()
 	if (OnwerActorPtr)
 	{
 		OnwerActorPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-			FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Jump }
+			FGameplayTagContainer{ UGameplayTagsSubSystem::Jump }
 		);
 	}
 }
@@ -586,7 +586,7 @@ void UBaseFeatureComponent::Respawn()
 		FGameplayEventData Payload;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
-			UGameplayTagsSubSystem::GetInstance()->BaseFeature_Respawn,
+			UGameplayTagsSubSystem::BaseFeature_Respawn,
 			Payload
 		);
 	}
@@ -606,14 +606,14 @@ void UBaseFeatureComponent::MoveToAttackDistance(
 // 		ASCPtr->TriggerAbilityFromGameplayEvent(
 // 			MoveToAttaclAreaHandle,
 // 			ASCPtr->AbilityActorInfo.Get(),
-// 			UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea,
+// 			UGameplayTagsSubSystem::State_MoveToAttaclArea,
 // 			&Payload,
 // 			*ASCPtr
 // 		);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
-			UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea,
+			UGameplayTagsSubSystem::State_MoveToAttaclArea,
 			Payload
 		);
 	}
@@ -626,7 +626,7 @@ void UBaseFeatureComponent::BreakMoveToAttackDistance()
 	{
 		auto GASPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-		FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea };
+		FGameplayTagContainer GameplayTagContainer{ UGameplayTagsSubSystem::State_MoveToAttaclArea };
 		GASPtr->CancelAbilities(&GameplayTagContainer);
 	}
 }

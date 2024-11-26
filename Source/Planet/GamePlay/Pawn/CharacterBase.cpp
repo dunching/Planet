@@ -45,7 +45,7 @@
 #include "GAEvent_Helper.h"
 #include "CharacterRisingTips.h"
 #include "SceneObj.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "GroupSharedInfo.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
@@ -60,7 +60,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
 		UCharacterAttributesComponent::ComponentName);
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
 	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(
 		UTalentAllocationComponent::ComponentName);
 
@@ -112,8 +111,6 @@ void ACharacterBase::BeginPlay()
 				{
 					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
 				}
-
-				OnRep_GroupSharedInfoChanged();
 			}
 		}
 	}
@@ -141,7 +138,6 @@ void ACharacterBase::BeginPlay()
 #endif
 
 	OnMoveSpeedChanged(CharacterAttributes.MoveSpeed.GetCurrentValue());
-
 }
 
 void ACharacterBase::Destroyed()
@@ -184,19 +180,6 @@ void ACharacterBase::PostInitializeComponents()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
-		InitialDefaultCharacterUnit();
-
-		HoldingItemsComponentPtr->Proxy_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
-
-		ProxyProcessComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
-		ProxyProcessComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = ProxyProcessComponentPtr;
-
-		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
-
-		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent =
-			StateProcessorComponentPtr;
-
-		TalentAllocationComponentPtr->Talent_FASI_Container.TalentAllocationComponentPtr = TalentAllocationComponentPtr;
 	}
 }
 
@@ -207,11 +190,13 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
 		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GroupSharedInfoPtr;
+		
+		GetHoldingItemsComponent()->InitialOwnerCharacterProxy(this);
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
 	}
-	
+
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
@@ -290,7 +275,7 @@ AGroupSharedInfo* ACharacterBase::GetGroupSharedInfo() const
 
 UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent() const
 {
-	return HoldingItemsComponentPtr;
+	return GroupSharedInfoPtr ? GroupSharedInfoPtr->HoldingItemsComponentPtr : nullptr;
 }
 
 UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent() const
@@ -325,26 +310,7 @@ UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit() const
 {
-	return HoldingItemsComponentPtr->CharacterProxySPtr;
-}
-
-void ACharacterBase::InitialDefaultCharacterUnit()
-{
-	TSharedPtr<FCharacterProxy> CharacterUnitPtr = nullptr;
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
-	}
-#endif
-
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
-	}
-#endif
+	return GetHoldingItemsComponent()->CharacterProxySPtr;
 }
 
 void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneObjPtr)
@@ -407,8 +373,8 @@ void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCamp
 bool ACharacterBase::GetIsValidTarget() const
 {
 	TArray<FGameplayTag> Ary{
-		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
-		UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected
+		UGameplayTagsSubSystem::DeathingTag,
+		UGameplayTagsSubSystem::State_Buff_CantBeSlected
 	};
 	const auto TagContainer = FGameplayTagContainer::CreateFromArray(Ary);
 	return !AbilitySystemComponentPtr->HasAnyMatchingGameplayTags(TagContainer);
@@ -488,6 +454,10 @@ void ACharacterBase::OnCharacterGroupMateChanged(
 		{
 		}
 		break;
+	default:
+		{
+			
+		};
 	}
 }
 

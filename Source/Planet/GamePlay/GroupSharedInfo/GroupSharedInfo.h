@@ -23,10 +23,12 @@ struct FCharacterProxy;
 class UPlanetAbilitySystemComponent;
 class UTeamConfigureComponent;
 class UTeamMatesHelperComponent;
+class UHoldingItemsComponent;
 struct FSceneUnitContainer;
 
 /*
- *	贡献的资源
+ *	对局内每个组群共享的资源
+ *	例如每个Player控制的Pawn和AI队友、群落AI
  *	一个组的持有的物品的信息
  */
 UCLASS()
@@ -40,10 +42,20 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
 	UTeamMatesHelperComponent* GetTeamMatesHelperComponent();
 
+	UTeamConfigureComponent* GetTeamConfigureomponent()const;
+	
 	UPROPERTY()
 	TObjectPtr<UTeamMatesHelperComponent> TeamMatesHelperComponentPtr = nullptr;
+	
+	UPROPERTY()
+	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
+	
+	UPROPERTY()
+	TObjectPtr<UTeamConfigureComponent> TeamConfigureompConentPtr = nullptr;
 	
 	FGuid GroupID;
 	

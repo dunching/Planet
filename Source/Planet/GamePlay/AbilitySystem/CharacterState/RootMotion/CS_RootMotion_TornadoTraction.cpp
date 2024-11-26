@@ -46,7 +46,7 @@ ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitia
 }
 
 FGameplayAbilityTargetData_RootMotion_TornadoTraction::FGameplayAbilityTargetData_RootMotion_TornadoTraction() :
-	Super(UGameplayTagsSubSystem::GetInstance()->TornadoTraction)
+	Super(UGameplayTagsSubSystem::TornadoTraction)
 {
 
 }
@@ -117,7 +117,7 @@ void UCS_RootMotion_TornadoTraction::EndAbility(
 // 	{
 // 		TaskPtr->UpdateDuration();
 // 	}
-// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::FlyAway))
 // 	{
 // 		for (auto Iter : ActiveTasks)
 // 		{

@@ -22,7 +22,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "TalentAllocationComponent.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "GameMode_Main.h"
 #include "KismetGravityLibrary.h"
 #include "GroupSharedInfo.h"
@@ -165,11 +165,11 @@ void APlanetAIController::OnHPChanged(int32 CurrentValue)
 {
 	if (CurrentValue <= 0)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::DeathingTag });
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			{
-				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+				if (Iter == UGameplayTagsSubSystem::DeathingTag)
 				{
 //					Destroy();
 				}

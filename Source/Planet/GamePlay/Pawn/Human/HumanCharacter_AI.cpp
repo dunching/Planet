@@ -64,13 +64,13 @@ void AHumanCharacter_AI::InitialAllocations()
 							if (WeaponProxyPtr)
 							{
 								auto WeaponSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSocketSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1;
+								WeaponSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponSocket_1;
 								WeaponSocketSPtr->ProxySPtr = WeaponProxyPtr;
 								WeaponSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
 								EICPtr->UpdateSocket(WeaponSocketSPtr);
 
 								auto WeaponSkillSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSkillSocketSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket_1;
+								WeaponSkillSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponActiveSocket_1;
 								WeaponSkillSocketSPtr->ProxySPtr = WeaponProxyPtr->GetWeaponSkill();
 								WeaponSkillSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
 								EICPtr->UpdateSocket(WeaponSkillSocketSPtr);
@@ -84,13 +84,13 @@ void AHumanCharacter_AI::InitialAllocations()
 							if (WeaponProxyPtr)
 							{
 								auto WeaponSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSocketSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2;
+								WeaponSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponSocket_2;
 								WeaponSocketSPtr->ProxySPtr = WeaponProxyPtr;
 								WeaponSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
 								EICPtr->UpdateSocket(WeaponSocketSPtr);
 
 								auto WeaponSkillSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSkillSocketSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket_2;
+								WeaponSkillSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponActiveSocket_2;
 								WeaponSkillSocketSPtr->ProxySPtr = WeaponProxyPtr->GetWeaponSkill();
 								WeaponSkillSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
 								EICPtr->UpdateSocket(WeaponSkillSocketSPtr);
@@ -111,7 +111,7 @@ void AHumanCharacter_AI::InitialAllocations()
 						{
 							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1;
+							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::ActiveSocket_1;
 							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
 							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
 
@@ -125,7 +125,7 @@ void AHumanCharacter_AI::InitialAllocations()
 						{
 							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
 
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2;
+							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::ActiveSocket_2;
 							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
 							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
 

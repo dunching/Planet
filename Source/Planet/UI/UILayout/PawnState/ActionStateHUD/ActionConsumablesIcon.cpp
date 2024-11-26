@@ -79,7 +79,7 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 	if (BasicUnitPtr)
 	{
 		if (
-			BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
+			BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables)
 			)
 		{
 			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);

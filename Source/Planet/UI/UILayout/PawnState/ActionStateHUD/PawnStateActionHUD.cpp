@@ -289,7 +289,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 			Iter.Value->ProxySPtr
 			)
 		{
-			if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_NuQi))
+			if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent_NuQi))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 				if (UIPtr)
@@ -298,7 +298,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 					bIsGiveTalentPassive = true;
 				}
 			}
-			else if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Talent_YinYang))
+			else if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent_YinYang))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
 				if (UIPtr)
@@ -360,14 +360,14 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 
 	if (
 		CurrentWeaponSocket ==
-		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1
+		UGameplayTagsSubSystem::WeaponSocket_1
 		)
 	{
 		CharacterPtr->GetProxyProcessComponent()->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	else if (
 		CurrentWeaponSocket ==
-		UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2
+		UGameplayTagsSubSystem::WeaponSocket_2
 		)
 	{
 		CharacterPtr->GetProxyProcessComponent()->GetWeaponSocket(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);

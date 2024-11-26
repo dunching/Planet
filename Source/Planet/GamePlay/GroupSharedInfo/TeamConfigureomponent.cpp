@@ -16,7 +16,7 @@ UTeamConfigureComponent::UTeamConfigureComponent(const FObjectInitializer& Objec
 	SetIsReplicatedByDefault(true);
 }
 
-void UTeamConfigureComponent::UpdateConfigure(const FTeammate_FASI& Teammate_FASI)
+void UTeamConfigureComponent::UpdateConfigure(const FTeamConfigure_FASI& Teammate_FASI)
 {
 	Teammate_FASI_Container.UpdateItem(Teammate_FASI);
 }
@@ -25,7 +25,7 @@ void UTeamConfigureComponent::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-//	DOREPLIFETIME(ThisClass, Teammate_FASI_Container);
+	DOREPLIFETIME(ThisClass, Teammate_FASI_Container);
 }
 
 void UTeamConfigureComponent::InitializeComponent()

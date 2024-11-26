@@ -25,6 +25,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "CharacterBase.h"
 #include "TemplateHelper.h"
+#include "ItemProxy_Character.h"
 
 struct FHUD_TeamMateInfo : public TStructVariable<FHUD_TeamMateInfo>
 {
@@ -53,7 +54,7 @@ void UHUD_TeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Character))
 	{
 		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{

@@ -30,6 +30,7 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 struct FTeamMateInfo : public TStructVariable<FTeamMateInfo>
 {
@@ -100,7 +101,7 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPt
 	auto WidgetSwitcherPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FTeamMateInfo::Get().WidgetSwitcher));
 	if (WidgetSwitcherPtr)
 	{
-		if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Character))
+		if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Character))
 		{
 			WidgetSwitcherPtr->SetActiveWidgetIndex(0);
 

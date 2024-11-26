@@ -27,7 +27,7 @@
 #include "Skill_Active_Tornado.h"
 
 FGameplayAbilityTargetData_RootMotion_MoveTo::FGameplayAbilityTargetData_RootMotion_MoveTo() :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_RootMotion_MoveTo)
+	Super(UGameplayTagsSubSystem::State_RootMotion_MoveTo)
 {
 
 }

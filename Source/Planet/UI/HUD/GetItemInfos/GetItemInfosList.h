@@ -28,41 +28,38 @@ class PLANET_API UGetItemInfosList :
 	GENERATED_BODY()
 
 public:
-
 #if WITH_EDITOR
-	virtual void NativeConstruct()override;
+	virtual void NativeConstruct() override;
 #else
 	virtual void NativePreConstruct()override;
 #endif
 
-	virtual void ResetUIByData()override;
+	virtual void ResetUIByData() override;
 
-	void OnSkillUnitChanged(const TSharedPtr < FSkillProxy>& UnitPtr, bool bIsAdd);
+	void OnSkillUnitChanged(const TSharedPtr<FSkillProxy>& UnitPtr, bool bIsAdd);
 
-	void OnCoinUnitChanged(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
+	void OnCoinUnitChanged(const TSharedPtr<FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
 
-	void OnConsumableUnitChanged(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
+	void OnConsumableUnitChanged(const TSharedPtr<FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
 
-	void OnGourpmateUnitChanged(const TSharedPtr< FCharacterProxy>& UnitPtr, bool bIsAdd);
+	void OnGourpmateUnitChanged(const TSharedPtr<FCharacterProxy>& UnitPtr, bool bIsAdd);
 
 protected:
-
 	void OnRemovedItem();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UGetItemInfosItem>GetItemInfosClass;
+	TSubclassOf<UGetItemInfosItem> GetItemInfosClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	int32 MaxDisplayNum = 8;
 
-	TArray<TSharedPtr < FBasicProxy>> OrderAry;
+	TArray<TSharedPtr<FBasicProxy>> OrderAry;
 
-	TArray<TPair<TWeakPtr < FSkillProxy>, bool>> SkillPendingAry;
+	TArray<TPair<TWeakPtr<FSkillProxy>, bool>> SkillPendingAry;
 
-	TArray<TTuple<TWeakPtr < FCoinProxy>, bool, int32>> CoinPendingAry;
+	TArray<TTuple<TWeakPtr<FCoinProxy>, bool, int32>> CoinPendingAry;
 
-	TArray<TPair<TWeakPtr < FConsumableProxy>, EProxyModifyType>> ConsumablePendingAry;
+	TArray<TPair<TWeakPtr<FConsumableProxy>, EProxyModifyType>> ConsumablePendingAry;
 
-	TArray<TPair<TWeakPtr < FCharacterProxy>, bool>> CharacterPendingAry;
-
+	TArray<TPair<TWeakPtr<FCharacterProxy>, bool>> CharacterPendingAry;
 };

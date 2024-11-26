@@ -68,6 +68,8 @@ FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 UStateProcessorComponent::UStateProcessorComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	bWantsInitializeComponent = true;
+	
 	SetIsReplicatedByDefault(true);
 }
 
@@ -209,6 +211,17 @@ auto UStateProcessorComponent::BindCharacterStateMapChanged(const std::function<
 	return CallbackHandle;
 }
 
+void UStateProcessorComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	UWorld* World = GetWorld();
+	if ((World->IsGameWorld()))
+	{
+		CharacterStateInfo_FASI_Container.StateProcessorComponent = this;
+	}
+}
+
 void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
 	auto Lambda = [&]
@@ -217,13 +230,13 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			return Value;
 		};
 
-	if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
+	if (Tag.MatchesTag(UGameplayTagsSubSystem::RootMotion))
 	{
 
 	}
-	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble))
+	else if (Tag.MatchesTag(UGameplayTagsSubSystem::MovementStateAble))
 	{
-		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump))
+		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_CantJump))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -232,7 +245,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->MovementState.bCanJump = !Lambda();
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_CantPathFollowMove))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -241,7 +254,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->bSkip_PathFollow = Lambda();
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -250,7 +263,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->bSkip_PlayerInput = Lambda();
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_CantRootMotion))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -259,7 +272,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->bSkip_RootMotion = Lambda();
 			}
 		}
-		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation))
+		if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_CantRotation))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -268,7 +281,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->bSkip_Rotation = Lambda();
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_IntoFly))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -282,7 +295,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				}
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_Orient2Acce))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -291,7 +304,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 				CharacterMovementPtr->SetIsOrientRotationToMovement_RPC(Lambda());
 			}
 		}
-		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_UseCustomRotation))
+		else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::MovementStateAble_UseCustomRotation))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -300,7 +313,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			}
 		}
 	}
-	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill))
+	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::State_ReleasingSkill))
 	{
 		auto CharacterPtr = GetOwner<FOwnerPawnType>();
 		if (CharacterPtr)
@@ -309,7 +322,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			AnimInsPtr->SetIsMelee(Lambda());
 		}
 	}
-	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected))
+	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Buff_CantBeSlected))
 	{
 		auto CharacterPtr = GetOwner<FOwnerPawnType>();
 		if (CharacterPtr)
@@ -318,7 +331,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			BaseFeatureComponentPtr->SwitchCantBeSelect(Lambda());
 		}
 	}
-	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_NoPhy))
+	else if (Tag.MatchesTagExact(UGameplayTagsSubSystem::State_NoPhy))
 	{
 		auto CharacterPtr = GetOwner<FOwnerPawnType>();
 		if (CharacterPtr)
@@ -364,8 +377,8 @@ void UStateProcessorComponent::ExcuteEffects(
 	}
 
 	if (
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::DeathingTag) ||
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::Respawning)
 		)
 	{
 		return;
@@ -413,8 +426,8 @@ void UStateProcessorComponent::ExcuteEffects(
 	}
 
 	if (
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::DeathingTag) ||
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::Respawning)
 		)
 	{
 		return;
@@ -439,7 +452,7 @@ void UStateProcessorComponent::ExcuteEffects(
 		}
 	}
 
-	if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun))
+	if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Debuff_Stun))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Stun::StaticClass(), InputID);
@@ -449,7 +462,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Debuff_Charm))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Charm::StaticClass(), InputID);
@@ -459,7 +472,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Debuff_Fear))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Fear::StaticClass(), InputID);
@@ -469,7 +482,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Buff_Purify))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Purify::StaticClass(), InputID);
@@ -479,7 +492,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Debuff_Slow))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Slow::StaticClass(), InputID);
@@ -489,7 +502,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Buff_SuperArmor))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_SuperArmor::StaticClass(), InputID);
@@ -499,7 +512,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Buff_CantBeSlected))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_CantBeSelected::StaticClass(), InputID);
@@ -509,7 +522,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Buff_Stagnation))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Stagnation::StaticClass(), InputID);
@@ -519,7 +532,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			MakeTargetData(GameplayAbilityTargetDataSPtr)
 		);
 	}
-	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Suppress))
+	else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Debuff_Suppress))
 	{
 		const auto InputID = FMath::Rand32();
 		auto Spec = MakeSpec(GameplayAbilityTargetDataSPtr, UCS_PeriodicStateModify_Suppress::StaticClass(), InputID);
@@ -552,8 +565,8 @@ void UStateProcessorComponent::ExcuteEffects(
 	}
 
 	if (
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::DeathingTag) ||
+		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::Respawning)
 		)
 	{
 		return;
@@ -561,13 +574,13 @@ void UStateProcessorComponent::ExcuteEffects(
 
 	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
 
-	if (GameplayAbilityTargetDataSPtr->Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->RootMotion))
+	if (GameplayAbilityTargetDataSPtr->Tag.MatchesTag(UGameplayTagsSubSystem::RootMotion))
 	{
 		if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 		{
 			// 仅部分 RootMotion 可以被更新
 
-			if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+			if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::FlyAway))
 			{
 				auto GAPtr = Cast<UCS_RootMotion_FlyAway>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
 				if (GAPtr)
@@ -587,7 +600,7 @@ void UStateProcessorComponent::ExcuteEffects(
 		}
 		else
 		{
-			if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->KnockDown))
+			if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::KnockDown))
 			{
 				FGameplayAbilitySpec Spec(CS_RootMotion_KnockDownClass);
 
@@ -596,7 +609,7 @@ void UStateProcessorComponent::ExcuteEffects(
 					MakeTargetData(GameplayAbilityTargetDataSPtr)
 				);
 			}
-			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::FlyAway))
 			{
 				const auto InputID = FMath::Rand32();
 
@@ -617,7 +630,7 @@ void UStateProcessorComponent::ExcuteEffects(
 					MakeTargetData(GameplayAbilityTargetDataSPtr)
 				);
 			}
-			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->TornadoTraction))
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::TornadoTraction))
 			{
 				FGameplayAbilitySpec Spec(UCS_RootMotion_TornadoTraction::StaticClass());
 
@@ -626,7 +639,7 @@ void UStateProcessorComponent::ExcuteEffects(
 					MakeTargetData(GameplayAbilityTargetDataSPtr)
 				);
 			}
-			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline))
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::MoveAlongSpline))
 			{
 				FGameplayAbilitySpec Spec(UCS_RootMotion_MoveAlongSpline::StaticClass());
 
@@ -635,7 +648,7 @@ void UStateProcessorComponent::ExcuteEffects(
 					MakeTargetData(GameplayAbilityTargetDataSPtr)
 				);
 			}
-			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_RootMotion_Traction))
+			else if (GameplayAbilityTargetDataSPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::State_RootMotion_Traction))
 			{
 				const auto InputID = FMath::Rand32();
 
@@ -719,7 +732,7 @@ void UStateProcessorComponent::BreakOhterState(
 		const auto TempCharacterStateMap = OnwerActorPtr->GetStateProcessorComponent()->CharacterStateMap;
 		for (const auto Iter : TempCharacterStateMap)
 		{
-			if (Iter.Key.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+			if (Iter.Key.MatchesTagExact(UGameplayTagsSubSystem::FlyAway))
 			{
 				ASCPtr->CancelAbilityHandle(
 					Iter.Value->GetCurrentAbilitySpecHandle()

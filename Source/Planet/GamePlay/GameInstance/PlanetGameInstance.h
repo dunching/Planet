@@ -11,6 +11,7 @@
 #include "PlanetGameInstance.generated.h"
 
 class UAssetRefMap;
+class UGameOptions;
 
 /**
  *
@@ -33,6 +34,9 @@ public:
 	virtual ~UPlanetGameInstance();
 
 protected:
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GameOptions")
+	TSoftObjectPtr<UGameOptions> GameOptions;
 
 	std::mutex SingletonMutex;
 

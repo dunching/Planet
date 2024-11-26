@@ -26,6 +26,7 @@
 #include "GameplayTagsSubSystem.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
+#include "ItemProxy_Character.h"
 
 struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 {

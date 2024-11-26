@@ -57,7 +57,7 @@ void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPt
 	}
 	else
 	{
-		if (UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve))
+		if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
 		{
 			auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 			if (!CharacterPtr)
@@ -67,7 +67,7 @@ void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPt
 
 			// 装备了可以在“被动”槽上备注“主动技能”的主动技能
 			if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
-				UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Switch
+				UGameplayTagsSubSystem::Unit_Skill_Active_Switch
 			))
 			{
 				NewUnitPtr = InBasicUnitPtr;
@@ -129,8 +129,8 @@ void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& Un
 		else
 		{
 			if (
-				UnitType.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) &&
-				UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
+				UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve) &&
+				UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active)
 				)
 			{
 				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
@@ -141,7 +141,7 @@ void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& Un
 
 				// 装备了可以在“被动”槽上备注“主动技能”的主动技能
 				if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
-					UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Switch
+					UGameplayTagsSubSystem::Unit_Skill_Active_Switch
 				))
 				{
 					EnableIcon(true);

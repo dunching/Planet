@@ -48,8 +48,8 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 
 		FGameplayTagContainer GameplayTagContainer;
-		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill_Continuous);
-		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
+		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::State_ReleasingSkill_Continuous);
+		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::State_MoveToAttaclArea);
 
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{
@@ -62,7 +62,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 				for (const auto& Iter : CanbeActivedInfo)
 				{
 					if (
-						Iter.Value->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket)
+						Iter.Value->Socket.MatchesTag(UGameplayTagsSubSystem::ActiveSocket)
 						)
 					{
 						auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->ProxySPtr);
@@ -93,7 +93,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 			for (const auto& Iter : CanbeActivedInfo)
 			{
 				if (
-					Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponSocket)
+					Iter->Socket.MatchesTag(UGameplayTagsSubSystem::WeaponSocket)
 					)
 				{
 					auto WeaponSPtr = CharacterPtr->GetProxyProcessComponent()->GetActivedWeapon();

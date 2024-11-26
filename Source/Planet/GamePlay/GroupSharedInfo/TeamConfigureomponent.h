@@ -10,6 +10,9 @@
 
 class APlanetPlayerState;
 
+/*
+ *	群组内每个Pawn分配的技能或天赋（包括玩家的Pawn）
+ */
 UCLASS(BlueprintType, Blueprintable)
 class UTeamConfigureComponent : public UActorComponent
 {
@@ -23,10 +26,10 @@ public:
 
 	UTeamConfigureComponent(const FObjectInitializer& ObjectInitializer);
 
-	void UpdateConfigure(const FTeammate_FASI& Teammate_FASI);
+	void UpdateConfigure(const FTeamConfigure_FASI& Teammate_FASI);
 	
 	UPROPERTY(Replicated)
-	FTeammate_FASI_Container Teammate_FASI_Container;
+	FTeamConfigure_FASI_Container Teammate_FASI_Container;
 	
 protected:
 

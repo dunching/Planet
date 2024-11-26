@@ -300,7 +300,7 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 		{
 			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP_Replay.AddCurrentValue(
 				UKismetStringLibrary::Conv_StringToInt(Args[0]),
-				UGameplayTagsSubSystem::GetInstance()->DataSource_Regular
+				UGameplayTagsSubSystem::DataSource_Regular
 			);
 		}
 
@@ -414,35 +414,35 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 	if (Args[1] == TEXT("1"))
 	{
-		CharacterAttributes.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("2"))
 	{
-		CharacterAttributes.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("3"))
 	{
-		CharacterAttributes.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("4"))
 	{
-		CharacterAttributes.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("5"))
 	{
-		CharacterAttributes.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("6"))
 	{
-		CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("7"))
 	{
-		CharacterAttributes.HitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.HitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 	else if (Args[1] == TEXT("8"))
 	{
-		CharacterAttributes.Evade.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
+		CharacterAttributes.Evade.SetCurrentValue(Value, UGameplayTagsSubSystem::DataSource_Regular);
 	}
 }
 

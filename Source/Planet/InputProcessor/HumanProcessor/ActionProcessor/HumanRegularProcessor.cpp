@@ -256,7 +256,7 @@ namespace HumanProcessor
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (
-					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponSocket)
+					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::WeaponSocket)
 					)
 				{
 					OnwerActorPtr->GetProxyProcessComponent()->CancelAction(*SkillIter);

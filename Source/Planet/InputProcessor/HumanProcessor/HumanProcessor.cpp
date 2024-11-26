@@ -135,7 +135,7 @@ namespace HumanProcessor
 
 		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Locomotion_Run))
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::State_Locomotion_Run))
 			{
 				OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(false);
 			}

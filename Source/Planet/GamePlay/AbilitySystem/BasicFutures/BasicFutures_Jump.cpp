@@ -76,10 +76,10 @@ void UBasicFutures_Jump::OnRemoveAbility(
 
 void UBasicFutures_Jump::InitalDefaultTags()
 {
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Jump);
+	AbilityTags.AddTag(UGameplayTagsSubSystem::Jump);
 
 	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::RootMotion);
 }
 
 void UBasicFutures_Jump::OnLanded(const FHitResult& Hit)

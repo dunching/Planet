@@ -182,7 +182,7 @@ namespace HorseProcessor
 
 			Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr->RiderPtr, UGameplayTagsSubSystem::GetInstance()->DisMount, Payload);
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr->RiderPtr, UGameplayTagsSubSystem::DisMount, Payload);
 		}
 	}
 

@@ -24,6 +24,9 @@ class UPlanetAbilitySystemComponent;
 class UTeamConfigureComponent;
 struct FSceneUnitContainer;
 
+/*
+ *	“小队”信息
+ */
 UCLASS(BlueprintType, Blueprintable)
 class UTeamMatesHelperComponent : public UActorComponent
 {
@@ -96,6 +99,8 @@ public:
 	TSet<AHumanCharacter*>TargetSet;
 
 protected:
+
+	virtual void InitializeComponent()override;
 
 	virtual void BeginPlay()override;
 	

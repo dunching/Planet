@@ -12,11 +12,8 @@
 #include "GenerateType.h"
 #include "BaseData.h"
 
-#include "ItemProxyContainer.generated.h"
+#include "ItemProxy_Container.generated.h"
 
-struct FTableRowUnit;
-struct FTableRowUnit_WeaponExtendInfo;
-struct FTableRowUnit_ActiveSkillExtendInfo;
 class AToolUnitBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;
@@ -27,19 +24,9 @@ class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter;
 class UHoldingItemsComponent;
+
 struct FBasicProxy;
-struct FSkillProxy;
-struct FCoinProxy;
-struct FConsumableProxy;
-struct FToolProxy;
-struct FCharacterProxy;
-struct FSkillProxy;
-struct FWeaponProxy;
-
-struct FSceneUnitContainer;
-struct FProxy_FASI_Container;
-
-enum class ECharacterPropertyType : uint8;
+struct FTableRowUnit;
 
 FTableRowUnit* GetTableRowUnit(const FGameplayTag &UnitType);
 

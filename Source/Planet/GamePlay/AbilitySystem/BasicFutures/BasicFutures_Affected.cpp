@@ -90,13 +90,13 @@ bool UBasicFutures_Affected::CanActivateAbility(
 
 void UBasicFutures_Affected::InitalDefaultTags()
 {
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
+	AbilityTags.AddTag(UGameplayTagsSubSystem::Affected);
 
 	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::RootMotion);
 
 	// 在“霸体”时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Buff_SuperArmor);
 }
 
 void UBasicFutures_Affected::PerformAction()

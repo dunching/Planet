@@ -286,50 +286,6 @@ protected:
 };
 
 USTRUCT()
-struct PLANET_API FCharacterProxy : public FBasicProxy
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	using FPawnType = ACharacterBase;
-
-	FCharacterProxy();
-
-	virtual void InitialUnit()override;
-
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
-
-	FTableRowUnit_CharacterGrowthAttribute* GetDT_CharacterInfo()const;
-	
-	FTableRowUnit_CharacterType* GetDT_CharacterType()const;
-
-	// 解除这个类下AddToRoot的对象
-	void RelieveRootBind();
-
-	AHumanCharacter_AI * SpwanCharacter(const FTransform&Transform);
-
-	void DestroyCharacter();
-
-	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
-
-	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
-
-protected:
-
-};
-
-template<>
-struct TStructOpsTypeTraits<FCharacterProxy> :
-	public TStructOpsTypeTraitsBase2<FCharacterProxy>
-{
-	enum
-	{
-		WithNetSerializer = true,
-	};
-};
-
-USTRUCT()
 struct PLANET_API FSkillProxy : public FBasicProxy
 {
 	GENERATED_USTRUCT_BODY()

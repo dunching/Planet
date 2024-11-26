@@ -19,6 +19,7 @@ struct FAllocation_FASI_Container;
 
 class UProxyProcessComponent;
 class UHoldingItemsComponent;
+class ACharacterBase;
 
 // 如果直接复制这个结构 访问ProxyID时需要特殊处理一下
 USTRUCT(BlueprintType)
@@ -42,12 +43,12 @@ struct FSocket_FASI : public FFastArraySerializerItem
 	FGameplayTag Socket;
 
 	// 
-	FGuid ProxyID;
+	FGuid SkillProxyID;
 
 	TSharedPtr<FBasicProxy>ProxySPtr = nullptr;
 
-	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
-
+	ACharacterBase*CharacterPtr = nullptr;
+	
 };
 
 template<>
@@ -56,6 +57,7 @@ struct TStructOpsTypeTraits<FSocket_FASI> :
 {
 	enum
 	{
+		WithIdenticalViaEquality = true,
 		WithNetSerializer = true,
 	};
 };
@@ -87,10 +89,8 @@ struct PLANET_API FAllocation_FASI_Container : public FFastArraySerializer
 
 	void UpdateItem(const TSharedPtr<FItemType>& ProxySPtr);
 
-	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
-
-	UProxyProcessComponent* UnitProxyProcessComponentPtr = nullptr;
-
+	ACharacterBase*CharacterPtr = nullptr;
+	
 protected:
 	
 	UPROPERTY()

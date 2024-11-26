@@ -31,10 +31,10 @@ void USkill_Active_Switch_Test::PerformAction(
 	};
 	TArray<FMyStruct> Ary
 	{
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_1 },
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_2 },
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_3,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_3 },
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_4,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_4 },
+		{UGameplayTagsSubSystem::ActiveSocket_1,UGameplayTagsSubSystem::PassiveSocket_1 },
+		{UGameplayTagsSubSystem::ActiveSocket_2,UGameplayTagsSubSystem::PassiveSocket_2 },
+		{UGameplayTagsSubSystem::ActiveSocket_3,UGameplayTagsSubSystem::PassiveSocket_3 },
+		{UGameplayTagsSubSystem::ActiveSocket_4,UGameplayTagsSubSystem::PassiveSocket_4 },
 	};
 
 	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>CanActiveSocketMap;
@@ -59,7 +59,7 @@ void USkill_Active_Switch_Test::PerformAction(
 				auto PassiveSocketSPtr = ProxyProcessComponentPtr->FindSocket(Iter.PassiveSocketTag);
 				if (
 					PassiveSocketSPtr->ProxySPtr &&
-					PassiveSocketSPtr->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
+					PassiveSocketSPtr->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active)
 					)
 				{
 					TempSocketSPtr = MakeShared<FSocket_FASI>();

@@ -52,8 +52,8 @@ void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
-		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
+		AbilityTags.AddTag(UGameplayTagsSubSystem::State_MoveToAttaclArea);
+		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_MoveToAttaclArea);
 	}
 }
 

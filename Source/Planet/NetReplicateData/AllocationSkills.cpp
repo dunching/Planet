@@ -1,4 +1,3 @@
-
 #include "AllocationSkills.h"
 
 #include "AssetRefMap.h"
@@ -9,38 +8,43 @@
 #include "HumanCharacter.h"
 #include "SceneUnitExtendInfo.h"
 #include "GameplayTagsSubSystem.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "HoldingItemsComponent.h"
 
 void FSocket_FASI::PreReplicatedRemove(const FAllocation_FASI_Container& InArraySerializer)
 {
-
 }
 
 void FSocket_FASI::PostReplicatedAdd(const FAllocation_FASI_Container& InArraySerializer)
 {
 	// 在这里 我们对本地的数据进行绑定
-	HoldingItemsComponentPtr = InArraySerializer.HoldingItemsComponentPtr;
-	ProxySPtr = HoldingItemsComponentPtr->FindProxy(ProxyID);
+	CharacterPtr = InArraySerializer.CharacterPtr;
+	if (CharacterPtr->GetHoldingItemsComponent())
+	{
+		ProxySPtr = CharacterPtr->GetHoldingItemsComponent()->FindProxy(SkillProxyID);
 
-	TSharedPtr<FSocket_FASI> SPtr = MakeShared<FSocket_FASI>();
+		TSharedPtr<FSocket_FASI> SPtr = MakeShared<FSocket_FASI>();
 
-	*SPtr = *this;
+		*SPtr = *this;
 
-	InArraySerializer.UnitProxyProcessComponentPtr->Add(SPtr);
+		InArraySerializer.CharacterPtr->GetProxyProcessComponent()->Add(SPtr);
+	}
 }
 
 void FSocket_FASI::PostReplicatedChange(const FAllocation_FASI_Container& InArraySerializer)
 {
 	// 在这里 我们对本地的数据进行绑定
-	HoldingItemsComponentPtr = InArraySerializer.HoldingItemsComponentPtr;
-	ProxySPtr = HoldingItemsComponentPtr->FindProxy(ProxyID);
+	CharacterPtr = InArraySerializer.CharacterPtr;
+	if (CharacterPtr->GetHoldingItemsComponent())
+	{
+		ProxySPtr = CharacterPtr->GetHoldingItemsComponent()->FindProxy(SkillProxyID);
 
-	TSharedPtr<FSocket_FASI> SPtr = MakeShared<FSocket_FASI>();
+		TSharedPtr<FSocket_FASI> SPtr = MakeShared<FSocket_FASI>();
 
-	*SPtr = *this;
+		*SPtr = *this;
 
-	InArraySerializer.UnitProxyProcessComponentPtr->Update(SPtr);
+		InArraySerializer.CharacterPtr->GetProxyProcessComponent()->Update(SPtr);
+	}
 }
 
 bool FSocket_FASI::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
@@ -50,7 +54,7 @@ bool FSocket_FASI::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 		auto KeyStr = Key.ToString();
 		Ar << KeyStr;
 		Ar << Socket;
-		Ar << ProxyID;
+		Ar << SkillProxyID;
 	}
 	else if (Ar.IsLoading())
 	{
@@ -59,7 +63,7 @@ bool FSocket_FASI::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 		Key = FKey(*KeyStr);
 
 		Ar << Socket;
-		Ar << ProxyID;
+		Ar << SkillProxyID;
 	}
 
 	return true;
@@ -67,7 +71,7 @@ bool FSocket_FASI::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSucces
 
 bool FSocket_FASI::operator==(const FSocket_FASI& Right) const
 {
-	return true;
+	return SkillProxyID == Right.SkillProxyID;
 }
 
 bool FAllocation_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
@@ -81,7 +85,7 @@ bool FAllocation_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& Delta
 void FAllocation_FASI_Container::AddItem(const TSharedPtr<FItemType>& ProxySPtr)
 {
 #if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (ProxySPtr)
 		{
@@ -100,7 +104,7 @@ void FAllocation_FASI_Container::AddItem(const TSharedPtr<FItemType>& ProxySPtr)
 void FAllocation_FASI_Container::UpdateItem(const TSharedPtr<FItemType>& ProxySPtr)
 {
 #if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (ProxySPtr)
 		{

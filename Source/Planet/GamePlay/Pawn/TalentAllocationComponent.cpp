@@ -11,7 +11,7 @@
 #include "ProxyProcessComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsSubSystem.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
 #include "BaseFeatureComponent.h"
 #include "SceneUnitExtendInfo.h"
@@ -39,6 +39,8 @@ struct FPropertySettlementModify_Talent : public FPropertySettlementModify
 UTalentAllocationComponent::UTalentAllocationComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	bWantsInitializeComponent = true;
+	
 	SetIsReplicatedByDefault(true);
 }
 
@@ -141,7 +143,7 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 		auto CharacterPtr = GetOwner<FOwnerType>();
 		if (CharacterPtr)
 		{
-			const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_TalentModify;
+			const auto DataSource = UGameplayTagsSubSystem::DataSource_TalentModify;
 
 			const auto PointPropertyType = std::get<EPointPropertyType>(TalentHelper_Iter->Type);
 			switch (PointPropertyType)
@@ -268,6 +270,17 @@ void UTalentAllocationComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, Talent_FASI_Container);
+}
+
+void UTalentAllocationComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	UWorld* World = GetWorld();
+	if ((World->IsGameWorld()))
+	{
+		Talent_FASI_Container.TalentAllocationComponentPtr = this;
+	}
 }
 
 void UTalentAllocationComponent::BeginPlay()

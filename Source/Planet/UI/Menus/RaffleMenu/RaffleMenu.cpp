@@ -20,7 +20,7 @@
 #include "RaffleSubSystem.h"
 #include "Raffle_Unit.h"
 #include "SceneUnitExtendInfo.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "HoldingItemsComponent.h"
 
 struct FRaffleMenu : public TStructVariable<FRaffleMenu>

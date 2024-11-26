@@ -18,7 +18,7 @@
 #include "BackpackIconWrapper.h"
 #include "GameplayTagsSubSystem.h"
 #include "UICommon.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "CharacterBase.h"
 
 struct FBackpackMenu : public TStructVariable<FBackpackMenu>
@@ -78,8 +78,8 @@ void UBackpackMenu::ResetUIByData_Skill()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) 
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve) 
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
@@ -111,7 +111,7 @@ void UBackpackMenu::ResetUIByData_Weapon()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon)
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Weapon)
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
@@ -143,7 +143,7 @@ void UBackpackMenu::ResetUIByData_Consumable()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables)
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
@@ -175,11 +175,11 @@ void UBackpackMenu::ResetUIByData_All()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Passve) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Tool) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Consumables)
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Weapon) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Tool) ||
+			Iter->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables)
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);

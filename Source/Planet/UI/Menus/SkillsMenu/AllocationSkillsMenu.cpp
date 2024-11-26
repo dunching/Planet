@@ -24,10 +24,10 @@
 #include "PlanetPlayerState.h"
 #include "ConsumableIcon.h"
 #include "GroupmateIcon.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "GroupMnaggerComponent.h"
 #include "AllocationSkills.h"
-
+#include "ItemProxy_Character.h"
 
 struct FAllocationSkillsMenu : public TStructVariable<FAllocationSkillsMenu>
 {

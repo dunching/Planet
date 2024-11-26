@@ -116,7 +116,7 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
-		ASC->AddLooseGameplayTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
+		ASC->AddLooseGameplayTag(UGameplayTagsSubSystem::MovementStateAble_IntoFly);
 
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
 		if (MovementComponent)
@@ -150,7 +150,7 @@ void UAbilityTask_FlyAway::OnDestroy(bool AbilityIsEnding)
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
-		ASC->RemoveLooseGameplayTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_IntoFly);
+		ASC->RemoveLooseGameplayTag(UGameplayTagsSubSystem::MovementStateAble_IntoFly);
 	}
 
 	if (MovementComponent)

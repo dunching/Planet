@@ -50,7 +50,7 @@ struct FMyPropertySettlementModify : public FPropertySettlementModify
 FGameplayAbilityTargetData_StateModify_Fear::FGameplayAbilityTargetData_StateModify_Fear(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear, Duration)
+	Super(UGameplayTagsSubSystem::State_Debuff_Fear, Duration)
 {
 }
 
@@ -161,14 +161,14 @@ void UCS_PeriodicStateModify_Fear::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);
+	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Fear);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Fear);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_Orient2Acce);
 }
 
 void UCS_PeriodicStateModify_Fear::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)

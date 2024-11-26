@@ -15,6 +15,7 @@
 #include "TemplateHelper.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
+#include "ItemProxy_Character.h"
 
 struct FGroupmateIcon : public TStructVariable<FGroupmateIcon>
 {

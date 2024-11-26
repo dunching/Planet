@@ -193,7 +193,7 @@ void AHumanAIController::InitialCharacter()
 	if (CharacterPtr)
 	{
 		auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+			UGameplayTagsSubSystem::DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);

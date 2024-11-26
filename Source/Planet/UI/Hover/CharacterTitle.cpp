@@ -155,10 +155,10 @@ void UCharacterTitle::OnHPMaxValueChanged(int32 NewVal)
 
 void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::Debuff))
 	{
 	}
-	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	else if (Tag.MatchesTag(UGameplayTagsSubSystem::Debuff))
 	{
 		if (Count > 0)
 		{

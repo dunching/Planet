@@ -44,7 +44,7 @@ void UBackpackWeaponIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBas
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
-	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Weapon))
+	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
 	{
 		UnitPtr = DynamicCastSharedPtr<FWeaponProxy>(InBasicUnitPtr);
 	}

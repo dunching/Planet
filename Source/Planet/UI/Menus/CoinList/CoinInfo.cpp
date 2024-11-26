@@ -44,7 +44,7 @@ void UCoinInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UCoinInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Coin))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
 	{
 		UnitPtr = DynamicCastSharedPtr<FCoinProxy>(BasicUnitPtr);
 

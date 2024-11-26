@@ -28,6 +28,7 @@
 #include "HumanCharacter.h"
 #include "BaseFeatureComponent.h"
 #include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 namespace Skill_GroupTherapy
 {

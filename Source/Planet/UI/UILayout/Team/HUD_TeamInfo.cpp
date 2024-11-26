@@ -12,6 +12,7 @@
 #include "CharacterBase.h"
 #include "TemplateHelper.h"
 #include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 struct FHUD_TeamInfo : public TStructVariable<FHUD_TeamInfo>
 {

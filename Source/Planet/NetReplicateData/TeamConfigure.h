@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "GameplayTagContainer.h"
+
 #include "Net/Serialization/FastArraySerializer.h"
 
 #include "GenerateType.h"
@@ -16,6 +18,7 @@ class UGroupMnaggerComponent;
 
 struct FAllocation_FASI_Container;
 struct FCharacterProxy;
+struct FBasicProxy;
 
 USTRUCT(BlueprintType)
 struct PLANET_API FTeamConfigure final
@@ -53,15 +56,17 @@ struct TStructOpsTypeTraits< FTeamConfigure > :
 };
 
 USTRUCT(BlueprintType)
-struct FTeammate_FASI : public FFastArraySerializerItem
+struct FTeamConfigure_FASI : public FFastArraySerializerItem
 {
 	GENERATED_USTRUCT_BODY()
 
-	void PreReplicatedRemove(const FTeammate_FASI_Container& InArraySerializer);
+	FTeamConfigure_FASI();
 	
-	void PostReplicatedAdd(const FTeammate_FASI_Container& InArraySerializer);
+	void PreReplicatedRemove(const FTeamConfigure_FASI_Container& InArraySerializer);
+	
+	void PostReplicatedAdd(const FTeamConfigure_FASI_Container& InArraySerializer);
 
-	void PostReplicatedChange(const FTeammate_FASI_Container& InArraySerializer);
+	void PostReplicatedChange(const FTeamConfigure_FASI_Container& InArraySerializer);
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
@@ -77,8 +82,8 @@ struct FTeammate_FASI : public FFastArraySerializerItem
 };
 
 template<>
-struct TStructOpsTypeTraits<FTeammate_FASI> :
-	public TStructOpsTypeTraitsBase2<FTeammate_FASI>
+struct TStructOpsTypeTraits<FTeamConfigure_FASI> :
+	public TStructOpsTypeTraitsBase2<FTeamConfigure_FASI>
 {
 	enum
 	{
@@ -87,14 +92,14 @@ struct TStructOpsTypeTraits<FTeammate_FASI> :
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTeammate_FASI_Container : public FFastArraySerializer
+struct PLANET_API FTeamConfigure_FASI_Container : public FFastArraySerializer
 {
 	GENERATED_USTRUCT_BODY()
 	
 	friend APlanetPlayerState;
 
-	using FItemType = FTeammate_FASI;
-	using FContainerType = FTeammate_FASI_Container;
+	using FItemType = FTeamConfigure_FASI;
+	using FContainerType = FTeamConfigure_FASI_Container;
 	
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms);
 
@@ -114,7 +119,7 @@ struct PLANET_API FTeammate_FASI_Container : public FFastArraySerializer
 	APlanetPlayerState* OwnerPtr = nullptr;
 	
 	UPROPERTY()
-	TArray<FTeammate_FASI> Items;
+	TArray<FTeamConfigure_FASI> Items;
 
 protected:
 	
@@ -123,8 +128,8 @@ private:
 };
 
 template<>
-struct TStructOpsTypeTraits< FTeammate_FASI_Container > :
-	public TStructOpsTypeTraitsBase2< FTeammate_FASI_Container >
+struct TStructOpsTypeTraits< FTeamConfigure_FASI_Container > :
+	public TStructOpsTypeTraitsBase2< FTeamConfigure_FASI_Container >
 {
 	enum
 	{

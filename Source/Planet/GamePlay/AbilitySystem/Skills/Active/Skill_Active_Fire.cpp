@@ -117,7 +117,7 @@ void USkill_Active_Fire::ExcuteTasks()
 					{ECharacterPropertyType::HP, -Damage}
 				};
 				auto GAEventDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-					UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fire,
+					UGameplayTagsSubSystem::State_Debuff_Fire,
 					Duration,
 					PerformActionInterval,
 					InModifyPropertyMap

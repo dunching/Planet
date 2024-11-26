@@ -331,13 +331,13 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	};
 
 	if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::DeathingTag)
 		)
 	{
 		if (GAEvent.Data.bIsRespawn)
 		{
 			GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Respawning }
+				FGameplayTagContainer{ UGameplayTagsSubSystem::Respawning }
 			);
 		}
 		else
@@ -346,7 +346,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		}
 	}
 	else if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::Respawning)
 		)
 	{
 		return;
@@ -370,7 +370,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 
 		if (Ref.GetIsHited())
 		{
-			check(Ref.DataSource == UGameplayTagsSubSystem::GetInstance()->DataSource_Character);
+			check(Ref.DataSource == UGameplayTagsSubSystem::DataSource_Character);
 			if (Ref.ElementSet.IsEmpty())
 			{
 				// 基础伤害

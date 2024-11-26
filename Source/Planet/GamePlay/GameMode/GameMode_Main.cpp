@@ -23,9 +23,10 @@
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GameplayTagsSubSystem.h"
-#include "ItemProxyContainer.h"
+#include "ItemProxy_Container.h"
 #include "SceneUnitTable.h"
 #include "ItemProxy.h"
+#include "ItemProxy_Character.h"
 
 AGameMode_Main::AGameMode_Main() :
 	Super()

@@ -56,8 +56,8 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	}
 
 	if (
-		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag) ||
-		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning) 
+		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::DeathingTag) ||
+		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::Respawning) 
 		)
 	{
 	}
@@ -65,7 +65,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
-		const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Regular;
+		const auto DataSource = UGameplayTagsSubSystem::DataSource_Regular;
 
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
@@ -73,7 +73,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
 
 		// 基础回复
 		{

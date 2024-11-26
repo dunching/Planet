@@ -184,10 +184,10 @@ void USkill_Active_Base::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_ReleasingSkill);
 
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::Skill_CanBeInterrupted_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Buff_Stagnation);
 }
 
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const

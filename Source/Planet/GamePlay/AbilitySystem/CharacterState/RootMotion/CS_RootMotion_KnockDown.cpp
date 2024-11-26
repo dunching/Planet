@@ -166,7 +166,7 @@ void UCS_RootMotion_KnockDown::OnMontageComplete()
 }
 
 FGameplayAbilityTargetData_RootMotion_KnockDown::FGameplayAbilityTargetData_RootMotion_KnockDown() :
-	Super(UGameplayTagsSubSystem::GetInstance()->KnockDown)
+	Super(UGameplayTagsSubSystem::KnockDown)
 {
 
 }

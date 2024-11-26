@@ -36,7 +36,7 @@ FGameplayAbilityTargetData_StateModify_CantBeSelected::FGameplayAbilityTargetDat
 FGameplayAbilityTargetData_StateModify_CantBeSelected::FGameplayAbilityTargetData_StateModify_CantBeSelected(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected, Duration)
+	Super(UGameplayTagsSubSystem::State_Buff_CantBeSlected, Duration)
 {
 }
 
@@ -89,8 +89,8 @@ void UCS_PeriodicStateModify_CantBeSelected::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
+	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Buff_CantBeSlected);
+	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Buff_CantBeSlected);
 }
 
 void UCS_PeriodicStateModify_CantBeSelected::OnDuration(

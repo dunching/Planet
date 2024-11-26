@@ -35,7 +35,7 @@ void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTim
 	UAnimMontage* MontageToStop = LocalAnimMontageInfo.AnimMontage;
 	bool bShouldStopMontage = AnimInstance && MontageToStop && !AnimInstance->Montage_GetIsStopped(MontageToStop);
 
-	if (HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation))
+	if (HasMatchingGameplayTag(UGameplayTagsSubSystem::State_Buff_Stagnation))
 	{
 		AnimInstance->Montage_Pause(MontageToStop);
 

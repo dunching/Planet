@@ -13,6 +13,7 @@
 #include "LogWriter.h"
 #include "BuildingArea.h"
 #include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 {

@@ -1,8 +1,8 @@
-
 #include "TeamConfigure.h"
 
 #include "GroupMnaggerComponent.h"
 #include "CharacterBase.h"
+#include "GameplayTagsSubSystem.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerState.h"
 
@@ -16,23 +16,26 @@ bool FTeamConfigure::Identical(const FTeamConfigure* Other, uint32 PortFlags) co
 	return Other->bIsNotChanged;
 }
 
-void FTeammate_FASI::PreReplicatedRemove(const FTeammate_FASI_Container& InArraySerializer)
+FTeamConfigure_FASI::FTeamConfigure_FASI()
 {
-
 }
 
-void FTeammate_FASI::PostReplicatedAdd(const FTeammate_FASI_Container& InArraySerializer)
+void FTeamConfigure_FASI::PreReplicatedRemove(const FTeamConfigure_FASI_Container& InArraySerializer)
+{
+}
+
+void FTeamConfigure_FASI::PostReplicatedAdd(const FTeamConfigure_FASI_Container& InArraySerializer)
 {
 	// 在这里 我们对本地的数据进行绑定
 	OwnerCharacterPtr = Cast<ACharacterBase>(InArraySerializer.OwnerPtr->GetPawn());
 }
 
-void FTeammate_FASI::PostReplicatedChange(const FTeammate_FASI_Container& InArraySerializer)
+void FTeamConfigure_FASI::PostReplicatedChange(const FTeamConfigure_FASI_Container& InArraySerializer)
 {
 	PostReplicatedAdd(InArraySerializer);
 }
 
-bool FTeammate_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FTeamConfigure_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	if (Ar.IsSaving())
 	{
@@ -50,7 +53,7 @@ bool FTeammate_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bO
 	return true;
 }
 
-bool FTeammate_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
+bool FTeamConfigure_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms)
 {
 	const auto Result =
 		FFastArraySerializer::FastArrayDeltaSerialize<FItemType, FContainerType>(Items, DeltaParms, *this);
@@ -58,7 +61,7 @@ bool FTeammate_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaPa
 	return Result;
 }
 
-void FTeammate_FASI_Container::UpdateItem(const FItemType& Item)
+void FTeamConfigure_FASI_Container::UpdateItem(const FItemType& Item)
 {
 #if UE_EDITOR || UE_SERVER
 	if (OwnerPtr->GetNetMode() == NM_DedicatedServer)
