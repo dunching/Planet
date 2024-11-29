@@ -21,7 +21,7 @@ struct FActiveSkillProxy;
 struct FConsumableProxy;
 struct FCharacterProxy;
 class UPlanetAbilitySystemComponent;
-class UTeamConfigureComponent;
+class UProxySycHelperComponent;
 struct FSceneUnitContainer;
 
 /*

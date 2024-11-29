@@ -29,7 +29,7 @@
 #include "Helper_RootMotionSource.h"
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 #include "CS_RootMotion_TornadoTraction.h"
 

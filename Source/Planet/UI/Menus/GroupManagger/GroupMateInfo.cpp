@@ -20,7 +20,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "ItemProxy.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
@@ -92,7 +92,7 @@ void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Character))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Character))
 	{
 		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{

@@ -4,7 +4,7 @@
 #include "GameOptions.h"
 #include "PlanetGameplayAbility.h"
 #include "Skill_Base.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 void UPlanetAbilitySystemComponent::TickComponent(
 	float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
@@ -35,7 +35,7 @@ void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTim
 	UAnimMontage* MontageToStop = LocalAnimMontageInfo.AnimMontage;
 	bool bShouldStopMontage = AnimInstance && MontageToStop && !AnimInstance->Montage_GetIsStopped(MontageToStop);
 
-	if (HasMatchingGameplayTag(UGameplayTagsSubSystem::State_Buff_Stagnation))
+	if (HasMatchingGameplayTag(UGameplayTagsLibrary::State_Buff_Stagnation))
 	{
 		AnimInstance->Montage_Pause(MontageToStop);
 

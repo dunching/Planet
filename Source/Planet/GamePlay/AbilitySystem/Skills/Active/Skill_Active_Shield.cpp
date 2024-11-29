@@ -31,7 +31,7 @@
 #include "Helper_RootMotionSource.h"
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
@@ -158,7 +158,7 @@ bool USkill_Active_Shield::CommitAbility(
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -PP);
-		GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}

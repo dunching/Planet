@@ -18,7 +18,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -31,7 +31,7 @@
 FGameplayAbilityTargetData_StateModify_Stun::FGameplayAbilityTargetData_StateModify_Stun(
 	float Duration
 ):
-	Super(UGameplayTagsSubSystem::State_Debuff_Stun, Duration)
+	Super(UGameplayTagsLibrary::State_Debuff_Stun, Duration)
 {
 }
 
@@ -113,11 +113,11 @@ void UCS_PeriodicStateModify_Stun::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Buff_Stagnation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Buff_Stagnation);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
 }

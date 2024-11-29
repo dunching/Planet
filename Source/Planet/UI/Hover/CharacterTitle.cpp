@@ -16,7 +16,7 @@
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 struct FCharacterTitle : public TStructVariable<FCharacterTitle>
 {
@@ -155,10 +155,10 @@ void UCharacterTitle::OnHPMaxValueChanged(int32 NewVal)
 
 void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::Debuff))
+	if (Tag.MatchesTagExact(UGameplayTagsLibrary::Debuff))
 	{
 	}
-	else if (Tag.MatchesTag(UGameplayTagsSubSystem::Debuff))
+	else if (Tag.MatchesTag(UGameplayTagsLibrary::Debuff))
 	{
 		if (Count > 0)
 		{

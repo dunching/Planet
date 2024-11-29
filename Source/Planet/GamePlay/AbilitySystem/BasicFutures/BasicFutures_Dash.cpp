@@ -11,7 +11,7 @@
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ProxyProcessComponent.h"
 
 #include "BaseFeatureComponent.h"
@@ -109,7 +109,7 @@ bool UBasicFutures_Dash::CommitAbility(
 
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-		GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
 
 		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -Consume);
 
@@ -189,17 +189,17 @@ void UBasicFutures_Dash::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::Dash);
+	AbilityTags.AddTag(UGameplayTagsLibrary::Dash);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_ReleasingSkill);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_IntoFly);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
 
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::FlyAway);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::FlyAway);
 
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Stun);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Fear);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Charm);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
 
 	// 在运动时不激活
 }

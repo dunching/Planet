@@ -24,7 +24,7 @@
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
 
 namespace Skill_WeaponHandProtection
@@ -259,7 +259,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		{
 // 			if (Iter.Value->SkillUnitPtr)
 // 			{
-// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
+// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
 // 				{
 // 					auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillUnitPtr);
 // 					if (!ActiveSkillUnitPtr)

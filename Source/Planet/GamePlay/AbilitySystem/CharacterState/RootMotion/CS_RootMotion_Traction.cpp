@@ -23,7 +23,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -134,7 +134,7 @@ void ATractionPoint::Tick(float DeltaSeconds)
 }
 
 FGameplayAbilityTargetData_RootMotion_Traction::FGameplayAbilityTargetData_RootMotion_Traction() :
-	Super(UGameplayTagsSubSystem::State_RootMotion_Traction)
+	Super(UGameplayTagsLibrary::State_RootMotion_Traction)
 {
 
 }

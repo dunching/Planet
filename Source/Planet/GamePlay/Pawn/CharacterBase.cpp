@@ -32,7 +32,7 @@
 #include "GroupMnaggerComponent.h"
 #include "AssetRefMap.h"
 #include "PlanetControllerInterface.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "StateProcessorComponent.h"
 #include "BaseFeatureComponent.h"
 #include "ProxyProcessComponent.h"
@@ -373,8 +373,8 @@ void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCamp
 bool ACharacterBase::GetIsValidTarget() const
 {
 	TArray<FGameplayTag> Ary{
-		UGameplayTagsSubSystem::DeathingTag,
-		UGameplayTagsSubSystem::State_Buff_CantBeSlected
+		UGameplayTagsLibrary::DeathingTag,
+		UGameplayTagsLibrary::State_Buff_CantBeSlected
 	};
 	const auto TagContainer = FGameplayTagContainer::CreateFromArray(Ary);
 	return !AbilitySystemComponentPtr->HasAnyMatchingGameplayTags(TagContainer);

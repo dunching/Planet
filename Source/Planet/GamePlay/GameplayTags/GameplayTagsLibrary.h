@@ -7,10 +7,10 @@
 #include <Subsystems/GameInstanceSubsystem.h>
 #include <Subsystems/EngineSubsystem.h>
 
-#include "GameplayTagsSubSystem.generated.h"
+#include "GameplayTagsLibrary.generated.h"
 
 UCLASS()
-class PLANET_API UGameplayTagsSubSystem : public UBlueprintFunctionLibrary
+class PLANET_API UGameplayTagsLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
@@ -136,12 +136,6 @@ public:
 	
 	static FGameplayTag WeaponSocket_2;
 
-	static FGameplayTag WeaponActiveSocket;
-	
-	static FGameplayTag WeaponActiveSocket_1;
-	
-	static FGameplayTag WeaponActiveSocket_2;
-	
 	static FGameplayTag ActiveSocket;
 	
 	static FGameplayTag ActiveSocket_1;

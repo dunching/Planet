@@ -19,7 +19,7 @@
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BuildingArea.h"
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
@@ -193,7 +193,7 @@ void AHumanAIController::InitialCharacter()
 	if (CharacterPtr)
 	{
 		auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-			UGameplayTagsSubSystem::DeathingTag,
+			UGameplayTagsLibrary::DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);

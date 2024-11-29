@@ -6,11 +6,11 @@
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "HoldingItemsComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "SceneUnitTable.h"
 #include "ItemProxy.h"
-#include "TeamConfigureomponent.h"
+#include "ProxySycHelperComponent.h"
 
 APlanetPlayerState::APlanetPlayerState(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

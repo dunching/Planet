@@ -18,7 +18,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -31,7 +31,7 @@
 FGameplayAbilityTargetData_StateModify_Slow::FGameplayAbilityTargetData_StateModify_Slow(
 	int32 InSpeedOffset
 ):
-	Super(UGameplayTagsSubSystem::State_Debuff_Slow, 5.f),
+	Super(UGameplayTagsLibrary::State_Debuff_Slow, 5.f),
 	SpeedOffset(InSpeedOffset)
 {
 }
@@ -101,7 +101,7 @@ void UCS_PeriodicStateModify_Slow::EndAbility(
 
 	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-	GAEventData.DataSource = UGameplayTagsSubSystem::State_Debuff_Slow;
+	GAEventData.DataSource = UGameplayTagsLibrary::State_Debuff_Slow;
 	GAEventData.DataModify = GetAllData();
 	GAEventData.bIsClearData = true;
 
@@ -229,7 +229,7 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			FGAEventData GAEventData(Iter.Value.SPtr->TargetCharacterPtr, Iter.Value.SPtr->TriggerCharacterPtr);
 
-			GAEventData.DataSource = UGameplayTagsSubSystem::State_Debuff_Slow;
+			GAEventData.DataSource = UGameplayTagsLibrary::State_Debuff_Slow;
 			GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed, Iter.Key } };
 			GAEventData.bIsOverlapData = true;
 
@@ -245,6 +245,6 @@ void UCS_PeriodicStateModify_Slow::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Slow);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Slow);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Slow);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Slow);
 }

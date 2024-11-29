@@ -1,5 +1,5 @@
 
-#include "WeaponsIcon.h"
+#include "ConsumableIcon.h"
 
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
@@ -9,6 +9,9 @@
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
 #include "Components/Border.h"
+#include "Components/Overlay.h"
+#include "Components/ProgressBar.h"
+#include "Kismet/KismetStringLibrary.h"
 
 #include "Components/SizeBox.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
@@ -20,48 +23,55 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "GameplayTagsSubSystem.h"
+#include "CharacterBase.h"
+#include "ProxyProcessComponent.h"
+#include "Skill_Base.h"
+#include "GameplayTagsLibrary.h"
+#include "UICommon.h"
 
-namespace WeaponsIcon
+struct FConsumableIcon : public TStructVariable<FConsumableIcon>
 {
 	const FName Content = TEXT("Content");
 
 	const FName Enable = TEXT("Enable");
 
 	const FName Icon = TEXT("Icon");
-}
+};
 
-UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
+UConsumableIcon::UConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 
 }
 
-void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
+void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
-	UnitPtr = nullptr;
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
-	{
-		UnitPtr = DynamicCastSharedPtr<FWeaponProxy>(BasicUnitPtr);
-	}
-
-	OnResetUnit_Weapon.ExcuteCallback(UnitPtr);
+	SetLevel();
 }
 
-void UWeaponsIcon::EnableIcon(bool bIsEnable)
+void UConsumableIcon::EnableIcon(bool bIsEnable)
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(WeaponsIcon::Enable));
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FConsumableIcon::Get().Enable));
 	if (ImagePtr)
 	{
 		ImagePtr->SetVisibility(bIsEnable ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
 	}
 }
 
-void UWeaponsIcon::NativeConstruct()
+void UConsumableIcon::SetLevel()
+{
+}
+
+void UConsumableIcon::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	ResetToolUIByData(nullptr);
+}
+
+void UConsumableIcon::NativeDestruct()
+{
+	Super::NativeDestruct();
 }

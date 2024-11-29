@@ -5,7 +5,8 @@
 
 #include "ProxyProcessComponent.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
+#include "HoldingItemsComponent.h"
 
 void USkill_Active_Switch_Test::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -31,21 +32,22 @@ void USkill_Active_Switch_Test::PerformAction(
 	};
 	TArray<FMyStruct> Ary
 	{
-		{UGameplayTagsSubSystem::ActiveSocket_1,UGameplayTagsSubSystem::PassiveSocket_1 },
-		{UGameplayTagsSubSystem::ActiveSocket_2,UGameplayTagsSubSystem::PassiveSocket_2 },
-		{UGameplayTagsSubSystem::ActiveSocket_3,UGameplayTagsSubSystem::PassiveSocket_3 },
-		{UGameplayTagsSubSystem::ActiveSocket_4,UGameplayTagsSubSystem::PassiveSocket_4 },
+		{UGameplayTagsLibrary::ActiveSocket_1,UGameplayTagsLibrary::PassiveSocket_1 },
+		{UGameplayTagsLibrary::ActiveSocket_2,UGameplayTagsLibrary::PassiveSocket_2 },
+		{UGameplayTagsLibrary::ActiveSocket_3,UGameplayTagsLibrary::PassiveSocket_3 },
+		{UGameplayTagsLibrary::ActiveSocket_4,UGameplayTagsLibrary::PassiveSocket_4 },
 	};
 
-	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>CanActiveSocketMap;
+	TMap<FGameplayTag, FMySocket_FASI>CanActiveSocketMap;
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
+	auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
 	for (const auto& Iter : Ary)
 	{
 		auto SocketSPtr = ProxyProcessComponentPtr->FindSocket(Iter.ActiveSocketTag);
-		TSharedPtr<FSocket_FASI> TempSocketSPtr = SocketSPtr;
+		auto TempSocketSPtr = HoldingItemsComponentPtr->FindProxy_BySocket(SocketSPtr);
 		if (
-			SocketSPtr->ProxySPtr &&
-			(SocketSPtr->ProxySPtr == SkillUnitPtr)
+			TempSocketSPtr &&
+			(TempSocketSPtr == SkillUnitPtr)
 			)
 		{
 		}
@@ -56,20 +58,9 @@ void USkill_Active_Switch_Test::PerformAction(
 			}
 			else
 			{
-				auto PassiveSocketSPtr = ProxyProcessComponentPtr->FindSocket(Iter.PassiveSocketTag);
-				if (
-					PassiveSocketSPtr->ProxySPtr &&
-					PassiveSocketSPtr->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active)
-					)
-				{
-					TempSocketSPtr = MakeShared<FSocket_FASI>();
-					*TempSocketSPtr = *SocketSPtr;
 
-					TempSocketSPtr->ProxySPtr = PassiveSocketSPtr->ProxySPtr;
-				}
 			}
 		}
-		CanActiveSocketMap.Add(Iter.ActiveSocketTag, TempSocketSPtr);
 	}
 	ProxyProcessComponentPtr->UpdateCanbeActiveSkills_UsePassiveSocket(CanActiveSocketMap);
 

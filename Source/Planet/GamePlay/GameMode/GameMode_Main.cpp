@@ -22,7 +22,7 @@
 #include "HoldingItemsComponent.h"
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "SceneUnitTable.h"
 #include "ItemProxy.h"

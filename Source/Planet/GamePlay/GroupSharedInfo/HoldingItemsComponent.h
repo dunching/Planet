@@ -14,6 +14,7 @@
 
 struct FSceneUnitContainer;
 struct FProxy_FASI;
+struct FMySocket_FASI;
 class IPlanetControllerInterface;
 class ACharacterBase;
 
@@ -56,6 +57,11 @@ public:
 	TSharedPtr<FBasicProxy> AddProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	TSharedPtr<FBasicProxy> UpdateProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
+	
+	void SetAllocationCharacterUnit(
+		const FGuid& Proxy_ID,
+		const FGuid& CharacterProxy_ID
+	);
 #endif
 
 
@@ -64,16 +70,24 @@ public:
 
 	TSharedPtr<FBasicProxy> FindProxy(const IDType& ID);
 
+	TSharedPtr<FBasicProxy> FindProxy_BySocket(const FMySocket_FASI& Socket);
 
-	TSharedPtr<FCharacterProxy> AddUnit_Character(const FGameplayTag& UnitType);
+
+	TSharedPtr<FCharacterProxy> AddProxy_Character(const FGameplayTag& UnitType);
 
 	TSharedPtr<FCharacterProxy> Update_Character(const TSharedPtr<FCharacterProxy>& Unit);
 
-	TSharedPtr<FCharacterProxy> FindUnit_Character(const IDType& ID) const;
+	TSharedPtr<FCharacterProxy> FindProxy_Character(const IDType& ID) const;
+
+	TSharedPtr<FCharacterProxy> InitialOwnerCharacterProxy(ACharacterBase*OwnerCharacterPtr);
 
 	TArray<TSharedPtr<FCharacterProxy>> GetCharacterProxyAry() const;
 
+	TSharedPtr<FCharacterProxy> GetOwnerCharacterProxy() const;
 
+	void UpdateSocket(const TSharedPtr<FCharacterProxy>&CharacterProxySPtr, const FMySocket_FASI&Socket);
+
+	
 	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FGameplayTag& UnitType);
 
 	TSharedPtr<FWeaponProxy> Update_Weapon(const TSharedPtr<FWeaponProxy>& Unit);
@@ -115,14 +129,7 @@ public:
 
 	void SyncPendingUnit(FGuid Guid);
 
-
-	// 同步到服務器
-	UFUNCTION(Server, Reliable)
-	void SetAllocationCharacterUnit(
-		const FGuid& Proxy_ID,
-		const FGuid& CharacterProxy_ID
-	);
-
+	
 	UPROPERTY(Replicated)
 	FProxy_FASI_Container Proxy_Container;
 
@@ -156,7 +163,15 @@ protected:
 
 private:
 	
-	TSharedPtr<FCharacterProxy> InitialOwnerCharacterProxy(ACharacterBase*OwnerCharacterPtr);
+	UFUNCTION(Server, Reliable)
+	void UpdateSocket_Server(const FGuid&CharacterProxyID, const FMySocket_FASI&Socket);
+	
+	// 同步到服務器
+	UFUNCTION(Server, Reliable)
+	void SetAllocationCharacterUnit_Server(
+		const FGuid& Proxy_ID,
+		const FGuid& CharacterProxy_ID
+	);
 
 	// 等待加入“库存”的物品
 	TMap<FGuid, TMap<FGameplayTag, int32>> PendingMap;

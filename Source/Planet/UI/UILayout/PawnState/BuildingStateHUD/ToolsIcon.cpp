@@ -21,7 +21,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
 
 namespace ToolsIcon
@@ -62,11 +62,11 @@ void UToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
 	if (BasicUnitPtr)
 	{
-		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 		{
 			UnitPtr = DynamicCastSharedPtr<FToolProxy>(BasicUnitPtr);
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 		{
 			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);
 		}
@@ -124,7 +124,7 @@ void UToolIcon::SetNum()
 
 	if (UnitPtr)
 	{
-		if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+		if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 		{
 			auto TempUnitPtr = DynamicCastSharedPtr<FToolProxy>(UnitPtr);
 			if (TempUnitPtr)
@@ -132,7 +132,7 @@ void UToolIcon::SetNum()
 				NewNum = TempUnitPtr->GetNum();
 			}
 		}
-		else if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+		else if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 		{
 			auto TempUnitPtr = DynamicCastSharedPtr<FConsumableProxy>(UnitPtr);
 			if (TempUnitPtr)

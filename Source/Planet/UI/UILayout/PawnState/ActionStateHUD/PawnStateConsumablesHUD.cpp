@@ -1,4 +1,3 @@
-
 #include "PawnStateConsumablesHUD.h"
 
 #include <Components/GridPanel.h>
@@ -48,21 +47,22 @@ void UPawnStateConsumablesHUD::ResetUIByData()
 		return;
 	}
 
- 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
- 
- 	auto UIPtr = Cast<UGridPanel>(GetWidgetFromName(FPawnStateConsumablesHUD::Get().GridPanel));
- 	auto Ary = UIPtr->GetAllChildren();
- 
- 	for (const auto& Iter : Ary)
- 	{
- 		auto IconPtr = Cast<UActionConsumablesIcon>(Iter);
- 		if (IconPtr)
- 		{
- 			const auto ConsumableSocketInfoSPtr = ProxyProcessComponentPtr->FindSocket(IconPtr->IconSocket);
- 			if (ConsumableSocketInfoSPtr)
- 			{
- 				IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr->ProxySPtr);
- 			}
- 		}
- 	}
+	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
+
+	auto UIPtr = Cast<UGridPanel>(GetWidgetFromName(FPawnStateConsumablesHUD::Get().GridPanel));
+	auto Ary = UIPtr->GetAllChildren();
+
+	for (const auto& Iter : Ary)
+	{
+		auto IconPtr = Cast<UActionConsumablesIcon>(Iter);
+		if (IconPtr)
+		{
+			const auto ConsumableSocketInfoSPtr = ProxyProcessComponentPtr->
+				FindActiveSkillBySocket(IconPtr->IconSocket);
+			if (ConsumableSocketInfoSPtr)
+			{
+			}
+			IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr);
+		}
+	}
 }

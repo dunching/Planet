@@ -44,7 +44,7 @@ protected:
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
-	TMap<UGameplayAbility*, TSharedPtr<FSocket_FASI>>ReleasingSkillMap;
+	TMap<UGameplayAbility*, FGameplayTag>ReleasingSkillMap;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

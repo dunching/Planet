@@ -75,7 +75,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Menus/Backpacks/BackpackIcons");
         PublicIncludePaths.Add("Planet/UI/MenuS/CreateMenuS");
         PublicIncludePaths.Add("Planet/UI/MenuS/DragDropOperations");
-        PublicIncludePaths.Add("Planet/UI/Menus/SkillsMenu");
+        PublicIncludePaths.Add("Planet/UI/Menus/AllocationMenu");
         PublicIncludePaths.Add("Planet/UI/Menus/TalentAllocation");
         PublicIncludePaths.Add("Planet/UI/Menus/CoinList");
         PublicIncludePaths.Add("Planet/UI/Menus/RaffleMenu");

@@ -139,7 +139,7 @@ public:
 	ACharacterBase* GetAllocationCharacter()const;
 
 	// 这个物品所在的对象
-	TWeakPtr<FCharacterProxy> GetOwnerCharacterProxy();
+	TWeakPtr<FCharacterProxy> GetOwnerCharacterProxy()const;
 
 	// 这个物品被分配给的对象
 	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy();
@@ -156,11 +156,14 @@ protected:
 	FGameplayTag UnitType = FGameplayTag::EmptyTag;
 
 	IDType ID;
-	
+
+	// 
 	IDType OwnerCharacter_ID;
 
+	// 被分配给的对象ID
 	IDType AllocationCharacter_ID;
 
+	// Root组件,不为空
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
 private:

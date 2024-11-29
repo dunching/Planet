@@ -9,7 +9,7 @@
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
 #include "SceneUnitExtendInfo.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 
 URaffleSubSystem* URaffleSubSystem::GetInstance()
@@ -39,7 +39,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	{
 	case ERaffleType::kRafflePermanent:
 	{
-		auto CoinUnitPtr = HoldItemPropertyRef->FindUnit_Coin(UGameplayTagsSubSystem::Unit_Coin_RaffleLimit);
+		auto CoinUnitPtr = HoldItemPropertyRef->FindUnit_Coin(UGameplayTagsLibrary::Unit_Coin_RaffleLimit);
 		if (CoinUnitPtr)
 		{
 			if (CoinUnitPtr->GetCurrentValue() > Count)
@@ -98,13 +98,13 @@ void URaffleSubSystem::RafflePermanentComplete(
 #if TESTRAFFLE
 	Ary.Append(
 		{
-			UGameplayTagsSubSystem::Unit_Skill_Active_Displacement,
-			UGameplayTagsSubSystem::Unit_Skill_Active_GroupTherapy,
-			UGameplayTagsSubSystem::Unit_Skill_Active_ContinuousGroupTherapy,
-			UGameplayTagsSubSystem::Unit_Skill_Active_Tornado,
-			UGameplayTagsSubSystem::Unit_Skill_Active_FlyAway,
+			UGameplayTagsLibrary::Unit_Skill_Active_Displacement,
+			UGameplayTagsLibrary::Unit_Skill_Active_GroupTherapy,
+			UGameplayTagsLibrary::Unit_Skill_Active_ContinuousGroupTherapy,
+			UGameplayTagsLibrary::Unit_Skill_Active_Tornado,
+			UGameplayTagsLibrary::Unit_Skill_Active_FlyAway,
 
-			UGameplayTagsSubSystem::Unit_Skill_Passve_ZMJZ,
+			UGameplayTagsLibrary::Unit_Skill_Passve_ZMJZ,
 		}
 		);
 #else

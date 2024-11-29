@@ -5,7 +5,7 @@
 #include "CharacterRisingTips.h"
 #include "Planet.h"
 #include "UICommon.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "LogWriter.h"
 #include "CharacterBase.h"
 
@@ -331,13 +331,13 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	};
 
 	if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::DeathingTag)
+		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag)
 		)
 	{
 		if (GAEvent.Data.bIsRespawn)
 		{
 			GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{ UGameplayTagsSubSystem::Respawning }
+				FGameplayTagContainer{ UGameplayTagsLibrary::Respawning }
 			);
 		}
 		else
@@ -346,7 +346,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		}
 	}
 	else if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::Respawning)
+		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 		)
 	{
 		return;
@@ -370,7 +370,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 
 		if (Ref.GetIsHited())
 		{
-			check(Ref.DataSource == UGameplayTagsSubSystem::DataSource_Character);
+			check(Ref.DataSource == UGameplayTagsLibrary::DataSource_Character);
 			if (Ref.ElementSet.IsEmpty())
 			{
 				// 基础伤害

@@ -28,7 +28,7 @@
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "Skill_Active_Base.h"
 #include "Skill_WeaponActive_Base.h"
 #include "ItemProxy.h"
@@ -89,8 +89,8 @@ void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 	if (BasicUnitPtr)
 	{
 		if (
-			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active)) ||
-			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
+			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active)) ||
+			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
 			)
 		{
 			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(BasicUnitPtr);
@@ -114,13 +114,9 @@ void UActionSkillsIcon::EnableIcon(bool bIsEnable)
 
 void UActionSkillsIcon::UpdateSkillState()
 {
-	if (IconSocket.MatchesTag(UGameplayTagsSubSystem::ActiveSocket))
+	if (IconSocket.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
 	{
 		UpdateSkillState_ActiveSkill();
-	}
-	else if (IconSocket.MatchesTag(UGameplayTagsSubSystem::WeaponActiveSocket))
-	{
-		UpdateSkillState_ActiveWeapon();
 	}
 }
 
@@ -144,7 +140,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
 		SetCanRelease(bIsReady);
 	}
-	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
+	if (SKillUnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
 	{
 		const auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(UnitPtr);
 		if (!SkillProxySPtr)
@@ -213,7 +209,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		SetCanRelease(bIsReady);
 	}
 
-	if (SKillUnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
+	if (SKillUnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
 	{
 		auto GAInsPtr = Cast<USkill_WeaponActive_Base>(SkillProxySPtr->GetGAInst());
 		if (!GAInsPtr)

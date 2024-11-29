@@ -1,7 +1,7 @@
 #include "GameOptions.h"
 
 #include <Kismet/GameplayStatics.h>
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 #include "GameInstance/PlanetGameInstance.h"
 #include "StateTagExtendInfo.h"
@@ -30,27 +30,24 @@ void UGameOptions::PostInitProperties()
 	};
 	TArray<FMyStruct> Ary
 	{
-			{UGameplayTagsSubSystem::ActiveSocket_1, EKeys::Q},
-			{UGameplayTagsSubSystem::ActiveSocket_2, EKeys::E},
-			{UGameplayTagsSubSystem::ActiveSocket_3, EKeys::R},
-			{UGameplayTagsSubSystem::ActiveSocket_4, EKeys::F},
+			{UGameplayTagsLibrary::ActiveSocket_1, EKeys::Q},
+			{UGameplayTagsLibrary::ActiveSocket_2, EKeys::E},
+			{UGameplayTagsLibrary::ActiveSocket_3, EKeys::R},
+			{UGameplayTagsLibrary::ActiveSocket_4, EKeys::F},
 		
-			{UGameplayTagsSubSystem::WeaponSocket_1, EKeys::LeftMouseButton},
-			{UGameplayTagsSubSystem::WeaponSocket_2, EKeys::LeftMouseButton},
+			{UGameplayTagsLibrary::WeaponSocket_1, EKeys::LeftMouseButton},
+			{UGameplayTagsLibrary::WeaponSocket_2, EKeys::LeftMouseButton},
 		
-			{UGameplayTagsSubSystem::WeaponActiveSocket_1, EKeys::LeftMouseButton},
-			{UGameplayTagsSubSystem::WeaponActiveSocket_2, EKeys::LeftMouseButton},
+			{UGameplayTagsLibrary::ConsumableSocket1, EKeys::One},
+			{UGameplayTagsLibrary::ConsumableSocket2, EKeys::Two},
+			{UGameplayTagsLibrary::ConsumableSocket3, EKeys::Three},
+			{UGameplayTagsLibrary::ConsumableSocket4, EKeys::Four},
 		
-			{UGameplayTagsSubSystem::ConsumableSocket1, EKeys::One},
-			{UGameplayTagsSubSystem::ConsumableSocket2, EKeys::Two},
-			{UGameplayTagsSubSystem::ConsumableSocket3, EKeys::Three},
-			{UGameplayTagsSubSystem::ConsumableSocket4, EKeys::Four},
-		
-			{UGameplayTagsSubSystem::PassiveSocket_1, EKeys::Invalid},
-			{UGameplayTagsSubSystem::PassiveSocket_2, EKeys::Invalid},
-			{UGameplayTagsSubSystem::PassiveSocket_3, EKeys::Invalid},
-			{UGameplayTagsSubSystem::PassiveSocket_4, EKeys::Invalid},
-			{UGameplayTagsSubSystem::PassiveSocket_5, EKeys::Invalid},
+			{UGameplayTagsLibrary::PassiveSocket_1, EKeys::Invalid},
+			{UGameplayTagsLibrary::PassiveSocket_2, EKeys::Invalid},
+			{UGameplayTagsLibrary::PassiveSocket_3, EKeys::Invalid},
+			{UGameplayTagsLibrary::PassiveSocket_4, EKeys::Invalid},
+			{UGameplayTagsLibrary::PassiveSocket_5, EKeys::Invalid},
 		};
 
 	for (const auto& Iter : Ary)

@@ -13,7 +13,7 @@
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ProxyProcessComponent.h"
 
 #include "BaseFeatureComponent.h"
@@ -52,8 +52,8 @@ void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::State_MoveToAttaclArea);
-		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_MoveToAttaclArea);
+		AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
 	}
 }
 

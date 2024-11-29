@@ -4,7 +4,7 @@
 #include "GroupMnaggerComponent.h"
 
 #include "HoldingItemsComponent.h"
-#include "TeamConfigureomponent.h"
+#include "ProxySycHelperComponent.h"
 
 AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
@@ -13,7 +13,6 @@ AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
 	
 	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(UTeamMatesHelperComponent::ComponentName);
 	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
-	TeamConfigureompConentPtr = CreateDefaultSubobject<UTeamConfigureComponent>(UTeamConfigureComponent::ComponentName);
 }
 
 void AGroupSharedInfo::BeginPlay()
@@ -34,9 +33,4 @@ void AGroupSharedInfo::PostInitializeComponents()
 UTeamMatesHelperComponent* AGroupSharedInfo::GetTeamMatesHelperComponent()
 {
 	return TeamMatesHelperComponentPtr;
-}
-
-UTeamConfigureComponent* AGroupSharedInfo::GetTeamConfigureomponent() const
-{
-	return TeamConfigureompConentPtr;
 }

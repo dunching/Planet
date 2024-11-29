@@ -18,7 +18,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -166,7 +166,7 @@ void UCS_RootMotion_KnockDown::OnMontageComplete()
 }
 
 FGameplayAbilityTargetData_RootMotion_KnockDown::FGameplayAbilityTargetData_RootMotion_KnockDown() :
-	Super(UGameplayTagsSubSystem::KnockDown)
+	Super(UGameplayTagsLibrary::KnockDown)
 {
 
 }

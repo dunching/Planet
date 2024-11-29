@@ -10,7 +10,7 @@
 #include "CharacterAttibutes.h"
 #include "ProxyProcessComponent.h"
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
 #include "BaseFeatureComponent.h"
@@ -143,7 +143,7 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 		auto CharacterPtr = GetOwner<FOwnerType>();
 		if (CharacterPtr)
 		{
-			const auto DataSource = UGameplayTagsSubSystem::DataSource_TalentModify;
+			const auto DataSource = UGameplayTagsLibrary::DataSource_TalentModify;
 
 			const auto PointPropertyType = std::get<EPointPropertyType>(TalentHelper_Iter->Type);
 			switch (PointPropertyType)

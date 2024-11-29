@@ -10,7 +10,7 @@
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "SceneUnitTable.h"
 

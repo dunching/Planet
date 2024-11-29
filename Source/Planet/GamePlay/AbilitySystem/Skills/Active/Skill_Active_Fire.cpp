@@ -27,7 +27,7 @@
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_PeriodicPropertyModify.h"
@@ -117,7 +117,7 @@ void USkill_Active_Fire::ExcuteTasks()
 					{ECharacterPropertyType::HP, -Damage}
 				};
 				auto GAEventDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-					UGameplayTagsSubSystem::State_Debuff_Fire,
+					UGameplayTagsLibrary::State_Debuff_Fire,
 					Duration,
 					PerformActionInterval,
 					InModifyPropertyMap

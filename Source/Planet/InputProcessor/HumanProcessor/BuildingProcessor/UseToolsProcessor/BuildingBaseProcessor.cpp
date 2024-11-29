@@ -76,60 +76,60 @@ namespace HumanProcessor
 
 	void FBuildingBaseProcessor::InputKey(const FInputKeyParams& Params)
 	{
-		if (Params.Event == EInputEvent::IE_Pressed)
-		{
-			auto SkillIter = HandleKeysMap.Find(Params.Key);
-			if (SkillIter)
-			{
-				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				if (OnwerActorPtr)
-				{
-// 					switch ((*SkillIter)->Type)
-// 					{
-// 					case FCanbeInteractionInfo::EType::kSwitchToTool:
-// 					case FCanbeInteractionInfo::EType::kActiveTool:
-// 					{
-// 		//				OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
-// 					}
-// 					break;
-// 					case FCanbeInteractionInfo::EType::kConsumables:
-// 					{
-// 						OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
-// 					}
-// 					break;
-// 					default:
-// 						break;
-// 					}
-				}
-			}
-		}
-		else
-		{
-			auto SkillIter = HandleKeysMap.Find(Params.Key);
-			if (SkillIter)
-			{
-				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				if (OnwerActorPtr)
-				{
-// 					switch ((*SkillIter)->Type)
-// 					{
-// 					case FCanbeInteractionInfo::EType::kSwitchToTool:
-// 					case FCanbeInteractionInfo::EType::kActiveTool:
-// 					{
-// 						OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter);
-// 					}
-// 					break;
-// 					case FCanbeInteractionInfo::EType::kConsumables:
-// 					{
-// 						OnwerActorPtr->GetInteractiveConsumablesComponent()->CancelAction(*SkillIter);
-// 					}
-// 					break;
-// 					default:
-// 						break;
-// 					}
-				}
-			}
-		}
+// 		if (Params.Event == EInputEvent::IE_Pressed)
+// 		{
+// 			auto SkillIter = HandleKeysMap.Find(Params.Key);
+// 			if (SkillIter)
+// 			{
+// 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+// 				if (OnwerActorPtr)
+// 				{
+// // 					switch ((*SkillIter)->Type)
+// // 					{
+// // 					case FCanbeInteractionInfo::EType::kSwitchToTool:
+// // 					case FCanbeInteractionInfo::EType::kActiveTool:
+// // 					{
+// // 		//				OnwerActorPtr->GetInteractiveToolComponent()->ActiveAction(*SkillIter);
+// // 					}
+// // 					break;
+// // 					case FCanbeInteractionInfo::EType::kConsumables:
+// // 					{
+// // 						OnwerActorPtr->GetInteractiveConsumablesComponent()->ActiveAction(*SkillIter);
+// // 					}
+// // 					break;
+// // 					default:
+// // 						break;
+// // 					}
+// 				}
+// 			}
+// 		}
+// 		else
+// 		{
+// 			auto SkillIter = HandleKeysMap.Find(Params.Key);
+// 			if (SkillIter)
+// 			{
+// 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+// 				if (OnwerActorPtr)
+// 				{
+// // 					switch ((*SkillIter)->Type)
+// // 					{
+// // 					case FCanbeInteractionInfo::EType::kSwitchToTool:
+// // 					case FCanbeInteractionInfo::EType::kActiveTool:
+// // 					{
+// // 						OnwerActorPtr->GetInteractiveToolComponent()->CancelAction(*SkillIter);
+// // 					}
+// // 					break;
+// // 					case FCanbeInteractionInfo::EType::kConsumables:
+// // 					{
+// // 						OnwerActorPtr->GetInteractiveConsumablesComponent()->CancelAction(*SkillIter);
+// // 					}
+// // 					break;
+// // 					default:
+// // 						break;
+// // 					}
+// 				}
+// 			}
+// 		}
 	}
 
 	void FBuildingBaseProcessor::QKeyPressed()
@@ -201,29 +201,29 @@ namespace HumanProcessor
 
 	void FBuildingBaseProcessor::AddOrRemoveUseMenuItemEvent(bool bIsAdd)
 	{
-		HandleKeysMap.Empty();
-		if (bIsAdd)
-		{
-			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			if (OnwerActorPtr)
-			{
-// 				auto CanbeActiveInfos = OnwerActorPtr->GetInteractiveToolComponent()->GetCanbeActiveAction();
-// 				CanbeActiveInfos.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction());
-// 				for (const auto& Iter : CanbeActiveInfos)
-// 				{
-// 					switch (Iter->Type)
-// 					{
-// 					case FCanbeInteractionInfo::EType::kNone:
-// 					{}
-// 					break;
-// 					default:
-// 					{
-// 						HandleKeysMap.Add(Iter->Key, Iter);
-// 					}
-// 					break;
-// 					}
-// 				}
-			}
-		}
+// 		HandleKeysMap.Empty();
+// 		if (bIsAdd)
+// 		{
+// 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+// 			if (OnwerActorPtr)
+// 			{
+// // 				auto CanbeActiveInfos = OnwerActorPtr->GetInteractiveToolComponent()->GetCanbeActiveAction();
+// // 				CanbeActiveInfos.Append(OnwerActorPtr->GetInteractiveConsumablesComponent()->GetCanbeActiveAction());
+// // 				for (const auto& Iter : CanbeActiveInfos)
+// // 				{
+// // 					switch (Iter->Type)
+// // 					{
+// // 					case FCanbeInteractionInfo::EType::kNone:
+// // 					{}
+// // 					break;
+// // 					default:
+// // 					{
+// // 						HandleKeysMap.Add(Iter->Key, Iter);
+// // 					}
+// // 					break;
+// // 					}
+// // 				}
+// 			}
+// 		}
 	}
 }

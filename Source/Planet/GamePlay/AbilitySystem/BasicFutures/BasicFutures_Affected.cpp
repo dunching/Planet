@@ -3,7 +3,7 @@
 
 #include "CharacterBase.h"
 #include "AbilityTask_PlayMontage.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 
 UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
@@ -90,13 +90,13 @@ bool UBasicFutures_Affected::CanActivateAbility(
 
 void UBasicFutures_Affected::InitalDefaultTags()
 {
-	AbilityTags.AddTag(UGameplayTagsSubSystem::Affected);
+	AbilityTags.AddTag(UGameplayTagsLibrary::Affected);
 
 	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::RootMotion);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);
 
 	// 在“霸体”时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Buff_SuperArmor);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
 }
 
 void UBasicFutures_Affected::PerformAction()

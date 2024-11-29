@@ -6,7 +6,7 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CS_RootMotion.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"

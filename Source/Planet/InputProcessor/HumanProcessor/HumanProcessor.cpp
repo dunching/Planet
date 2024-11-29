@@ -51,7 +51,7 @@
 #include "BuildingBase.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttibutes.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 #include "HumanRegularProcessor.h"
 
@@ -135,7 +135,7 @@ namespace HumanProcessor
 
 		if (OnwerActorPtr)
 		{
-			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsSubSystem::State_Locomotion_Run))
+			if (OnwerActorPtr->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(UGameplayTagsLibrary::State_Locomotion_Run))
 			{
 				OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(false);
 			}

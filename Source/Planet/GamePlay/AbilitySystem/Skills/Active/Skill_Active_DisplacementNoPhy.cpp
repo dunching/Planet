@@ -19,7 +19,7 @@
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_ARM_ConstantForce.h"
@@ -102,7 +102,7 @@ bool USkill_Active_DisplacementNoPhy::CommitAbility(
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -PP);
-		GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
@@ -165,7 +165,7 @@ void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_NoPhy);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_NoPhy);
 }
 
 void USkill_Active_DisplacementNoPhy::PlayMontage()

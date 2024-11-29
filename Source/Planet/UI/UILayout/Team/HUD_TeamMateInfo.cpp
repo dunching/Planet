@@ -22,7 +22,7 @@
 #include "ItemProxy.h"
 #include "PlanetControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CharacterBase.h"
 #include "TemplateHelper.h"
 #include "ItemProxy_Character.h"
@@ -54,7 +54,7 @@ void UHUD_TeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Character))
+	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Character))
 	{
 		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
 		{

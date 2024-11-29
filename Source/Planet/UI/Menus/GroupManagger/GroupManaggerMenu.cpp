@@ -18,7 +18,7 @@
 #include "PlanetControllerInterface.h"
 #include "ItemProxy.h"
 #include "HumanCharacter.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
 #include "ItemProxy_Character.h"
 
@@ -76,7 +76,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)
 	{
-		if (UGameplayTagsSubSystem::Unit_Character_Player == Iter->GetUnitType())
+		if (UGameplayTagsLibrary::Unit_Character_Player == Iter->GetUnitType())
 		{
 			continue;
 		}

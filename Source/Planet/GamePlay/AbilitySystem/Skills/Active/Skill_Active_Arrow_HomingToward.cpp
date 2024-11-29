@@ -13,7 +13,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "AllocationSkills.h"
 #include "ProxyProcessComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "ItemProxy.h"
 
@@ -83,7 +83,7 @@ bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward)
 {
 	auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
-		UGameplayTagsSubSystem::Unit_Skill_Weapon_Bow
+		UGameplayTagsLibrary::Unit_Skill_Weapon_Bow
 	);
 
 	if (TargetSkillSPtr)

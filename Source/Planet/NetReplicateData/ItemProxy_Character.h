@@ -37,9 +37,28 @@ struct PLANET_API FMySocket_FASI
 	
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
+	void UpdateProxy(const TSharedPtr<FBasicProxy>&ProxySPtr);
+
+	bool operator()() const;
+	
+	bool IsValid() const;
+	
+	void ResetSocket();
+	
 	FGameplayTag Socket;
 
 	FGuid SkillProxyID;
+	
+};
+
+template<>
+struct TStructOpsTypeTraits<FMySocket_FASI> :
+	public TStructOpsTypeTraitsBase2<FMySocket_FASI>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
 };
 
 USTRUCT()
@@ -49,6 +68,8 @@ struct PLANET_API FCharacterProxy : public FBasicProxy
 
 public:
 
+	friend UHoldingItemsComponent;
+	
 	using FPawnType = ACharacterBase;
 
 	FCharacterProxy();
@@ -70,13 +91,21 @@ public:
 
 	void DestroyCharacter();
 
+	// 通过插槽
+	FMySocket_FASI FindSocket(const FGameplayTag&SocketID)const;
+
+	// 通过指定代理类型，比如我们需要查询我们的插槽里面是否使用了“换技能”的代理
+	FMySocket_FASI FindSocketByType(const FGameplayTag&ProxyType)const;
+
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 
+	TMap<FGameplayTag, FMySocket_FASI>TeammateConfigureMap;
+	
 protected:
 
-	TMap<FGameplayTag, FMySocket_FASI>TeammateConfigureMap;
+	void UpdateSocket(const FMySocket_FASI&Socket);
 	
 };
 

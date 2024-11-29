@@ -2,7 +2,7 @@
 #include "Skill_Consumable_Base.h"
 
 #include "AbilitySystemComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "Skill_Consumable_Generic.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "CharacterBase.h"
@@ -71,7 +71,7 @@ void USkill_Consumable_Base::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::UsingConsumable);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::UsingConsumable);
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 

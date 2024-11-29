@@ -1,4 +1,3 @@
-
 #include "HumanCharacter_AI.h"
 
 #include <GameFramework/CharacterMovementComponent.h>
@@ -20,7 +19,7 @@
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "SceneUnitTable.h"
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
@@ -49,8 +48,9 @@ void AHumanCharacter_AI::InitialAllocations()
 		TestCommand::AddAICharacterTestDataImp(this);
 #endif
 		{
-			auto TableRowUnit_CharacterInfoPtr = 
+			auto TableRowUnit_CharacterInfoPtr =
 				USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_AICharacter_Allocation(AI_Allocation_RowName);
+			auto HoldingItemsComponentPtr = GetHoldingItemsComponent();
 			if (TableRowUnit_CharacterInfoPtr)
 			{
 				auto HICPtr = GetHoldingItemsComponent();
@@ -60,40 +60,17 @@ void AHumanCharacter_AI::InitialAllocations()
 					{
 						if (TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
 						{
-							auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
+							auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(
+								TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
 							if (WeaponProxyPtr)
 							{
-								auto WeaponSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponSocket_1;
-								WeaponSocketSPtr->ProxySPtr = WeaponProxyPtr;
-								WeaponSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
-								EICPtr->UpdateSocket(WeaponSocketSPtr);
+								FMySocket_FASI SkillsSocketInfo;
+								SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
+								SkillsSocketInfo.UpdateProxy(
+									HoldingItemsComponentPtr->AddUnit_Weapon(
+										TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo));;
 
-								auto WeaponSkillSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSkillSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponActiveSocket_1;
-								WeaponSkillSocketSPtr->ProxySPtr = WeaponProxyPtr->GetWeaponSkill();
-								WeaponSkillSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
-								EICPtr->UpdateSocket(WeaponSkillSocketSPtr);
-							}
-						}
-					}
-					{
-						if (TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo.IsValid())
-						{
-							auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo);
-							if (WeaponProxyPtr)
-							{
-								auto WeaponSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponSocket_2;
-								WeaponSocketSPtr->ProxySPtr = WeaponProxyPtr;
-								WeaponSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
-								EICPtr->UpdateSocket(WeaponSocketSPtr);
-
-								auto WeaponSkillSocketSPtr = MakeShared<FSocket_FASI>();
-								WeaponSkillSocketSPtr->Socket = UGameplayTagsSubSystem::WeaponActiveSocket_2;
-								WeaponSkillSocketSPtr->ProxySPtr = WeaponProxyPtr->GetWeaponSkill();
-								WeaponSkillSocketSPtr->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
-								EICPtr->UpdateSocket(WeaponSkillSocketSPtr);
+								HoldingItemsComponentPtr->UpdateSocket(GetCharacterUnit(), SkillsSocketInfo);
 							}
 						}
 					}
@@ -109,27 +86,11 @@ void AHumanCharacter_AI::InitialAllocations()
 						auto SkillUnitPtr = HICPtr->AddUnit_Skill(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1);
 						if (SkillUnitPtr)
 						{
-							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
+							FMySocket_FASI SkillsSocketInfo;
 
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::ActiveSocket_1;
-							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
-							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
+							SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
 
-							EICPtr->UpdateSocket(SkillsSocketInfo);
-						}
-					}
-					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2.IsValid())
-					{
-						auto SkillUnitPtr = HICPtr->AddUnit_Skill(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2);
-						if (SkillUnitPtr)
-						{
-							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::ActiveSocket_2;
-							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
-							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(GetCharacterUnit());
-
-							EICPtr->UpdateSocket(SkillsSocketInfo);
+							HoldingItemsComponentPtr->UpdateSocket(GetCharacterUnit(), SkillsSocketInfo);
 						}
 					}
 
@@ -140,4 +101,3 @@ void AHumanCharacter_AI::InitialAllocations()
 	}
 #endif
 }
-

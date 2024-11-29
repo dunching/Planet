@@ -20,7 +20,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -40,14 +40,14 @@ static TAutoConsoleVariable<int32> CS_PeriodicStateModify_Suppress(
 FGameplayAbilityTargetData_StateModify_Suppress::FGameplayAbilityTargetData_StateModify_Suppress(
 	float InDuration
 ) :
-	Super(UGameplayTagsSubSystem::State_Debuff_Suppress, InDuration)
+	Super(UGameplayTagsLibrary::State_Debuff_Suppress, InDuration)
 {
 }
 
 FGameplayAbilityTargetData_StateModify_Suppress::FGameplayAbilityTargetData_StateModify_Suppress(
 	UAnimMontage* InHumanMontagePtr
 ) :
-	Super(UGameplayTagsSubSystem::State_Debuff_Suppress, InHumanMontagePtr->CalculateSequenceLength())
+	Super(UGameplayTagsLibrary::State_Debuff_Suppress, InHumanMontagePtr->CalculateSequenceLength())
 {
 	HumanMontagePtr = InHumanMontagePtr;
 }
@@ -243,15 +243,15 @@ void UCS_PeriodicStateModify_Suppress::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Suppress);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_ReleasingSkill);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Suppress);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_UseCustomRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_UseCustomRotation);
 }

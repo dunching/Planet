@@ -18,7 +18,7 @@
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "TalentAllocationComponent.h"
@@ -165,11 +165,11 @@ void APlanetAIController::OnHPChanged(int32 CurrentValue)
 {
 	if (CurrentValue <= 0)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::DeathingTag });
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsLibrary::DeathingTag });
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			{
-				if (Iter == UGameplayTagsSubSystem::DeathingTag)
+				if (Iter == UGameplayTagsLibrary::DeathingTag)
 				{
 //					Destroy();
 				}

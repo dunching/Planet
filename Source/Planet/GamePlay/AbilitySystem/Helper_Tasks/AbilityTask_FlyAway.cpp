@@ -14,7 +14,7 @@
 
 #include "Helper_RootMotionSource.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UAbilityTask_FlyAway::UAbilityTask_FlyAway(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -116,7 +116,7 @@ void UAbilityTask_FlyAway::SharedInitAndApply()
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
-		ASC->AddLooseGameplayTag(UGameplayTagsSubSystem::MovementStateAble_IntoFly);
+		ASC->AddLooseGameplayTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
 
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
 		if (MovementComponent)
@@ -150,7 +150,7 @@ void UAbilityTask_FlyAway::OnDestroy(bool AbilityIsEnding)
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
-		ASC->RemoveLooseGameplayTag(UGameplayTagsSubSystem::MovementStateAble_IntoFly);
+		ASC->RemoveLooseGameplayTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
 	}
 
 	if (MovementComponent)

@@ -13,7 +13,7 @@
 #include "CS_RootMotion.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_PeriodicStateModify.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UGAEvent_Received::UGAEvent_Received() :
 	Super()

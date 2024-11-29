@@ -21,7 +21,7 @@ struct FActiveSkillProxy;
 struct FConsumableProxy;
 struct FCharacterProxy;
 class UPlanetAbilitySystemComponent;
-class UTeamConfigureComponent;
+class UProxySycHelperComponent;
 class UTeamMatesHelperComponent;
 class UHoldingItemsComponent;
 struct FSceneUnitContainer;
@@ -46,16 +46,11 @@ public:
 
 	UTeamMatesHelperComponent* GetTeamMatesHelperComponent();
 
-	UTeamConfigureComponent* GetTeamConfigureomponent()const;
-	
 	UPROPERTY()
 	TObjectPtr<UTeamMatesHelperComponent> TeamMatesHelperComponentPtr = nullptr;
 	
 	UPROPERTY()
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-	
-	UPROPERTY()
-	TObjectPtr<UTeamConfigureComponent> TeamConfigureompConentPtr = nullptr;
 	
 	FGuid GroupID;
 	

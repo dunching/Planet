@@ -19,7 +19,7 @@
 #include "ItemProxy.h"
 #include "Planet.h"
 #include "LogWriter.h"
-#include "TeamConfigureomponent.h"
+#include "ProxySycHelperComponent.h"
 #include "TeamConfigure.h"
 #include "GroupSharedInfo.h"
 #include "ItemProxy_Character.h"
@@ -55,21 +55,6 @@ void UTeamMatesHelperComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUn
 		}
 	}
 #endif
-
-	FTeamConfigure_FASI Teammate_FASI;
-
-	Teammate_FASI.Index = Index;
-	if (CharacterUnitPtr)
-	{
-		Teammate_FASI.CharacterProxyID = CharacterUnitPtr->GetID();
-	}
-	else
-	{
-		Teammate_FASI.CharacterProxyID = FGuid();
-	}
-
-	auto GroupSharedInfoPtr = GetOwner<FOwnerType>()->GetGroupSharedInfo();
-	GroupSharedInfoPtr->GetTeamConfigureomponent()->UpdateConfigure(Teammate_FASI);
 }
 
 void UTeamMatesHelperComponent::OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)
@@ -90,7 +75,7 @@ void UTeamMatesHelperComponent::BeginPlay()
 void UTeamMatesHelperComponent::AddCharacterToTeam_Server_Implementation(const FGuid& ProxtID, int32 Index)
 {
 	const auto CharacterProxySPtr =
-		GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindUnit_Character(ProxtID);
+		GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(ProxtID);
 
 	AddCharacterToTeam(CharacterProxySPtr, Index);
 }
@@ -101,32 +86,6 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 	auto GroupSharedInfoPtr = GetOwner<FOwnerType>()->GetGroupSharedInfo();
 	if (GroupSharedInfoPtr)
 	{
-		auto& Ref = GroupSharedInfoPtr->TeamConfigureompConentPtr->Teammate_FASI_Container.Items;
-		for (auto& Iter : Ref)
-		{
-			auto CharacterProxySPtr =
-				OwnerPtr->GetHoldingItemsComponent()->FindUnit_Character(Iter.CharacterProxyID);
-
-			if (CharacterProxySPtr)
-			{
-				const auto Pt = OwnerPtr->GetActorLocation();
-				const auto Rot = OwnerPtr->GetActorRotation();
-				FTransform Transform(Pt + (Rot.Vector() * 100));
-
-				CharacterProxySPtr->SpwanCharacter(Transform);
-			}
-
-			auto PreviousCharacterProxySPtr =
-				OwnerPtr->GetHoldingItemsComponent()->FindUnit_Character(Iter.PreviousCharacterProxyID);
-
-			if (CharacterProxySPtr != PreviousCharacterProxySPtr)
-			{
-				if (PreviousCharacterProxySPtr)
-				{
-					PreviousCharacterProxySPtr->DestroyCharacter();
-				}
-			}
-		}
 	}
 }
 

@@ -18,7 +18,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -27,7 +27,7 @@
 #include "Skill_Active_Tornado.h"
 
 FGameplayAbilityTargetData_RootMotion_MoveTo::FGameplayAbilityTargetData_RootMotion_MoveTo() :
-	Super(UGameplayTagsSubSystem::State_RootMotion_MoveTo)
+	Super(UGameplayTagsLibrary::State_RootMotion_MoveTo)
 {
 
 }

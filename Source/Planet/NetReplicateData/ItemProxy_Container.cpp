@@ -9,7 +9,7 @@
 #include "HumanCharacter.h"
 #include "SceneUnitExtendInfo.h"
 #include "HoldingItemsComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy.h"
 #include "TemplateHelper.h"
 #include "CharactersInfo.h"
@@ -36,39 +36,39 @@ void FProxy_FASI::PostReplicatedAdd(const struct FProxy_FASI_Container& InArrayS
 
 	const auto UnitType = ProxySPtr->GetUnitType();
 
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+	if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 	{
 		//		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Coin))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Character))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
@@ -80,39 +80,39 @@ void FProxy_FASI::PostReplicatedChange(const struct FProxy_FASI_Container& InArr
 
 	const auto UnitType = ProxySPtr->GetUnitType();
 
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+	if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 	{
 		//		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Coin))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Character))
 	{
 		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
@@ -125,47 +125,47 @@ bool FProxy_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 		auto UnitType = ProxySPtr->GetUnitType();
 		Ar << UnitType;
 
-		if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+		if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FToolProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Coin))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
-		else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character))
+		else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Character))
 		{
 			auto TempProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
 			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
@@ -182,63 +182,63 @@ bool FProxy_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 		}
 		else
 		{
-			if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+			if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 			{
 				auto TempProxySPtr = MakeShared<FToolProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
 			{
 				auto TempProxySPtr = MakeShared<FWeaponProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
 			{
 				auto TempProxySPtr = MakeShared<FActiveSkillProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve))
 			{
 				auto TempProxySPtr = MakeShared<FPassiveSkillProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent))
 			{
 				auto TempProxySPtr = MakeShared<FTalentSkillProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
 			{
 				auto TempProxySPtr = MakeShared<FWeaponSkillProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Coin))
 			{
 				auto TempProxySPtr = MakeShared<FCoinProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 			{
 				auto TempProxySPtr = MakeShared<FConsumableProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 				ProxySPtr = TempProxySPtr;
 			}
-			else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Character))
+			else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Character))
 			{
 				auto TempProxySPtr = MakeShared<FCharacterProxy>();
 				TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
@@ -350,37 +350,37 @@ void FProxy_FASI_Container::RemoveItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 
 TSharedPtr<FBasicProxy> FProxy_FASI_Container::GetProxyType(const FGameplayTag& UnitType)
 {
-	if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+	if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 	{
 		return MakeShared<FToolProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
 	{
 		return MakeShared<FWeaponProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
 	{
 		return MakeShared<FActiveSkillProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve))
 	{
 		return MakeShared<FPassiveSkillProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent))
 	{
 		return MakeShared<FTalentSkillProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
 	{
 		return MakeShared<FWeaponSkillProxy>();
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Coin))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Coin))
 	{
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 	{
 	}
-	else if (UnitType.MatchesTag(UGameplayTagsSubSystem::DataSource_Character))
+	else if (UnitType.MatchesTag(UGameplayTagsLibrary::DataSource_Character))
 	{
 	}
 

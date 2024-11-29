@@ -18,7 +18,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -86,7 +86,7 @@ void UCS_RootMotion_MoveAlongSpline::EndAbility(
 // 	{
 // 		TaskPtr->UpdateDuration();
 // 	}
-// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::FlyAway))
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsLibrary::FlyAway))
 // 	{
 // 		for (auto Iter : ActiveTasks)
 // 		{
@@ -184,7 +184,7 @@ void UCS_RootMotion_MoveAlongSpline::OnDuration(UAbilityTask_TimerHelper* InTask
 }
 
 FGameplayAbilityTargetData_RootMotion_MoveAlongSpline::FGameplayAbilityTargetData_RootMotion_MoveAlongSpline() :
-	Super(UGameplayTagsSubSystem::MoveAlongSpline)
+	Super(UGameplayTagsLibrary::MoveAlongSpline)
 {
 
 }

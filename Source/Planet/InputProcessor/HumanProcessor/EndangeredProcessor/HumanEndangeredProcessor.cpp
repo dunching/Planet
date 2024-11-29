@@ -61,7 +61,7 @@
 #include "ViewGroupsProcessor.h"
 #include "GroupMnaggerComponent.h"
 
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"

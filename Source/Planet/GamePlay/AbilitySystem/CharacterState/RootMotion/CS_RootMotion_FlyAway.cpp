@@ -18,7 +18,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -29,7 +29,7 @@
 #include "StateProcessorComponent.h"
 
 FGameplayAbilityTargetData_RootMotion_FlyAway::FGameplayAbilityTargetData_RootMotion_FlyAway() :
-	Super(UGameplayTagsSubSystem::FlyAway)
+	Super(UGameplayTagsLibrary::FlyAway)
 {
 
 }
@@ -115,11 +115,11 @@ void UCS_RootMotion_FlyAway::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_Orient2Acce);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
 }
 
 void UCS_RootMotion_FlyAway::PerformAction()

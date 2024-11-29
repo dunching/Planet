@@ -18,7 +18,7 @@
 #include "SceneUnitTable.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify() :
 	Super()
@@ -197,7 +197,7 @@ void UCS_PeriodicPropertyModify::OnTaskTick(
 		Iter.Value.CharacterStateInfoSPtr->IncreaseCooldownTime(DeltaTime);
 	}
 
-	const auto DebuffTag = UGameplayTagsSubSystem::Debuff;
+	const auto DebuffTag = UGameplayTagsLibrary::Debuff;
 	const auto Temp = DurationEffectMap;
 	for (const auto& Iter : Temp)
 	{
@@ -251,7 +251,7 @@ void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGamepla
 
 	FGAEventData GAEventData(SPtr->TargetCharacterPtr, SPtr->TriggerCharacterPtr);
 
-	GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
+	GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
 	GAEventData.DataModify = SPtr->CharacterPropertyMap;
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
@@ -261,7 +261,7 @@ void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGamepla
 
 void UCS_PeriodicPropertyModify::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::State_Buff_Purify) && (Count > 0))
+	if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Buff_Purify) && (Count > 0))
 	{
 		bIsPurify = true;
 	}

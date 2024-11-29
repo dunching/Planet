@@ -20,7 +20,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "ItemProxy.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UBackpackSkillIcon::UBackpackSkillIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -47,8 +47,8 @@ void UBackpackSkillIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasi
 	if (InBasicUnitPtr)
 	{
 		if (
-			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active) ||
-			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Passve)
+			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active) ||
+			InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve)
 			)
 		{
 			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(InBasicUnitPtr);

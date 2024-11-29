@@ -7,7 +7,7 @@
 #include "ProxyProcessComponent.h"
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 #include "PlanetControllerInterface.h"
 #include "CharacterAttibutes.h"
@@ -56,8 +56,8 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	}
 
 	if (
-		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::DeathingTag) ||
-		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::Respawning) 
+		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning) 
 		)
 	{
 	}
@@ -65,7 +65,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	{
 		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
-		const auto DataSource = UGameplayTagsSubSystem::DataSource_Regular;
+		const auto DataSource = UGameplayTagsLibrary::DataSource_Regular;
 
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
@@ -73,7 +73,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-		GAEventData.DataSource = UGameplayTagsSubSystem::DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
 
 		// 基础回复
 		{

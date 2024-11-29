@@ -19,7 +19,8 @@
 #include "LogWriter.h"
 #include "State_Talent_NuQi.h"
 #include "State_Talent_YinYang.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
+#include "HoldingItemsComponent.h"
 
 struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 {
@@ -100,12 +101,12 @@ void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
 	{
-		TArray<FName>Ary
+		TArray<FName> Ary
 		{
 			FPawnStateActionHUD::Get().ActiveSkill1,
 			FPawnStateActionHUD::Get().ActiveSkill2,
 			FPawnStateActionHUD::Get().ActiveSkill3,
-			FPawnStateActionHUD::Get().ActiveSkill4 ,
+			FPawnStateActionHUD::Get().ActiveSkill4,
 			FPawnStateActionHUD::Get().WeaponActiveSkill1,
 			FPawnStateActionHUD::Get().WeaponActiveSkill2,
 		};
@@ -255,13 +256,15 @@ void UPawnStateActionHUD::BindEvent()
 		return;
 	}
 
-	OnAllocationSkillChangedDelegateAry.Add(CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
-		std::bind(&ThisClass::InitialActiveSkillIcon, this)
-	));
+	OnAllocationSkillChangedDelegateAry.Add(
+		CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+			std::bind(&ThisClass::InitialActiveSkillIcon, this)
+		));
 
-	OnAllocationSkillChangedDelegateAry.Add(CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
-		std::bind(&ThisClass::InitialWeaponSkillIcon, this)
-	));
+	OnAllocationSkillChangedDelegateAry.Add(
+		CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+			std::bind(&ThisClass::InitialWeaponSkillIcon, this)
+		));
 
 	OnCanAciveSkillChangedHandle = CharacterPtr->GetProxyProcessComponent()->OnCanAciveSkillChanged.AddCallback(
 		std::bind(&ThisClass::InitialActiveSkillIcon, this)
@@ -282,14 +285,16 @@ void UPawnStateActionHUD::InitialTalentUI()
 		return;
 	}
 	const auto& SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
+	const auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
 	for (auto Iter : SkillsMap)
 	{
+		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy_BySocket(Iter.Value);
 		bool bIsGiveTalentPassive = false;
 		if (
-			Iter.Value->ProxySPtr
-			)
+			ProxySPtr
+		)
 		{
-			if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent_NuQi))
+			if (ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent_NuQi))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 				if (UIPtr)
@@ -298,7 +303,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 					bIsGiveTalentPassive = true;
 				}
 			}
-			else if (Iter.Value->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Talent_YinYang))
+			else if (ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent_YinYang))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
 				if (UIPtr)
@@ -320,12 +325,12 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 	}
 
 	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
-	TArray<FName>Ary
+	TArray<FName> Ary
 	{
 		FPawnStateActionHUD::Get().ActiveSkill1,
 		FPawnStateActionHUD::Get().ActiveSkill2,
 		FPawnStateActionHUD::Get().ActiveSkill3,
-		FPawnStateActionHUD::Get().ActiveSkill4 ,
+		FPawnStateActionHUD::Get().ActiveSkill4,
 	};
 
 	for (const auto& Iter : Ary)
@@ -333,15 +338,14 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 		auto SkillIcon = Cast<UActionSkillsIcon>(GetWidgetFromName(Iter));
 		if (SkillIcon)
 		{
-			auto SocketIter = SkillsMap.Find(SkillIcon->IconSocket);
+			auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindActiveSkillBySocket(SkillIcon->IconSocket);
 			if (SocketIter)
 			{
-				SkillIcon->ResetToolUIByData((*SocketIter)->ProxySPtr);
 			}
 			else
 			{
-				SkillIcon->ResetToolUIByData(nullptr);
 			}
+			SkillIcon->ResetToolUIByData(SocketIter);
 		}
 	}
 }
@@ -353,50 +357,29 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		return;
 	}
 
-	TSharedPtr<FSocket_FASI> FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FSocket_FASI> SecondWeaponSocketInfoSPtr;
+	FMySocket_FASI FirstWeaponSocketInfoSPtr;
+	FMySocket_FASI SecondWeaponSocketInfoSPtr;
 
 	const auto CurrentWeaponSocket = CharacterPtr->GetProxyProcessComponent()->CurrentWeaponSocket;
 
 	if (
 		CurrentWeaponSocket ==
-		UGameplayTagsSubSystem::WeaponSocket_1
-		)
+		UGameplayTagsLibrary::WeaponSocket_1
+	)
 	{
-		CharacterPtr->GetProxyProcessComponent()->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+		CharacterPtr->GetProxyProcessComponent()->
+		              GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	else if (
 		CurrentWeaponSocket ==
-		UGameplayTagsSubSystem::WeaponSocket_2
-		)
+		UGameplayTagsLibrary::WeaponSocket_2
+	)
 	{
-		CharacterPtr->GetProxyProcessComponent()->GetWeaponSocket(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
+		CharacterPtr->GetProxyProcessComponent()->
+		              GetWeaponSocket(SecondWeaponSocketInfoSPtr, FirstWeaponSocketInfoSPtr);
 	}
 	else
 	{
 		return;
-	}
-
-	{
-		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
-		if (IconPtr)
-		{
-			IconPtr->ResetToolUIByData(
-				FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
-				nullptr
-			);
-		}
-	}
-	{
-		auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2));
-		if (IconPtr)
-		{
-			IconPtr->ResetToolUIByData(
-				SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr ?
-				DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr)->GetWeaponSkill() :
-				nullptr
-			);
-		}
 	}
 }

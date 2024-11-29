@@ -22,7 +22,7 @@
 #include "PlanetControllerInterface.h"
 #include "NavgationSubSysetem.h"
 #include "FocusIcon.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "BaseFeatureComponent.h"
 #include "HumanCharacter_Player.h"
@@ -383,13 +383,13 @@ void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
 	if (CurrentValue <= 0)
 	{
 		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{
-			UGameplayTagsSubSystem::DeathingTag
+			UGameplayTagsLibrary::DeathingTag
 		});
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData)
 		{
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			{
-				if (Iter == UGameplayTagsSubSystem::DeathingTag)
+				if (Iter == UGameplayTagsLibrary::DeathingTag)
 				{
 					//					Destroy();
 				}
@@ -458,7 +458,7 @@ void APlanetPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Coun
 
 		AIPCPtr->GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UGameplayTagsSubSystem::DeathingTag,
+			UGameplayTagsLibrary::DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 	}
@@ -488,7 +488,7 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 
 	// 目标进入“死亡”标签
 	auto& DelegateRef = AIPCPtr->GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsSubSystem::DeathingTag,
+		UGameplayTagsLibrary::DeathingTag,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnFocusDeathing);

@@ -13,7 +13,7 @@
 #include "ProxyProcessComponent.h"
 
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"

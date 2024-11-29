@@ -11,7 +11,7 @@
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UScriptStruct* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::GetScriptStruct() const
 {
@@ -184,10 +184,10 @@ void USkill_Active_Base::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_ReleasingSkill);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::Skill_CanBeInterrupted_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Buff_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
 }
 
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const

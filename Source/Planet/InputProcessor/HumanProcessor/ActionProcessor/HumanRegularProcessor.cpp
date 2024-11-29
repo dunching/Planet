@@ -61,7 +61,7 @@
 #include "ViewGroupsProcessor.h"
 #include "GroupMnaggerComponent.h"
 
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
@@ -69,6 +69,7 @@
 #include "HumanCharacter_Player.h"
 #include "ResourceBox.h"
 #include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
@@ -234,7 +235,7 @@ namespace HumanProcessor
 
 				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
 
-				OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(*SkillIter);
+				OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(SkillIter->Socket);
 			}
 
 			// 这里应该是特定的输入会打断 还是任意输入都会打断？
@@ -256,10 +257,10 @@ namespace HumanProcessor
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (
-					(*SkillIter)->Socket.MatchesTag(UGameplayTagsSubSystem::WeaponSocket)
+					SkillIter->Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
 					)
 				{
-					OnwerActorPtr->GetProxyProcessComponent()->CancelAction(*SkillIter);
+					OnwerActorPtr->GetProxyProcessComponent()->CancelAction(SkillIter->Socket);
 				}
 			}
 		}
@@ -471,24 +472,24 @@ namespace HumanProcessor
 			if (OnwerActorPtr)
 			{ 
 				{
-					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveConsumable();
+					const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveConsumable();
 					for (const auto& Iter : CanbeActivedInfoAry)
 					{
-						HandleKeysMap.Add(Iter->Key, Iter);
+						HandleKeysMap.Add(Iter.Key, Iter.Value);
 					}
 				}
 				{
-					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
+					const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
 					for (const auto& Iter : CanbeActivedInfoAry)
 					{
-						HandleKeysMap.Add(Iter->Key, Iter);
+						HandleKeysMap.Add(Iter.Key, Iter.Value);
 					}
 				}
 				{
-					auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
+					const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
 					for (const auto& Iter : CanbeActivedInfoAry)
 					{
-						HandleKeysMap.Add(Iter.Value->Key, Iter.Value);
+						HandleKeysMap.Add(Iter.Key, Iter.Value);
 					}
 				}
 			}

@@ -26,7 +26,7 @@
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "Skill_Active_Base.h"
 
 #include "Skill_Consumable_Generic.h"
@@ -79,7 +79,7 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 	if (BasicUnitPtr)
 	{
 		if (
-			BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables)
+			BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables)
 			)
 		{
 			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);

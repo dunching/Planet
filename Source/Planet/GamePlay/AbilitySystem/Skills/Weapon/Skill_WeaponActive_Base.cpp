@@ -5,7 +5,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "LogWriter.h"
 #include "Weapon_Base.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UScriptStruct* FGameplayAbilityTargetData_WeaponActive_ActiveParam::GetScriptStruct() const
 {
@@ -131,15 +131,15 @@ void USkill_WeaponActive_Base::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::Skill_CanBeInterrupted_Stagnation);
+	AbilityTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
 
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::Skill_CanBeInterrupted_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Buff_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Stun);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Charm);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Fear);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_ReleasingSkill);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 }
 
 bool USkill_WeaponActive_Base::GetNum(int32& Num) const

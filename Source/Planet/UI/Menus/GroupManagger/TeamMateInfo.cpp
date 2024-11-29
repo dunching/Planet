@@ -25,7 +25,7 @@
 #include "CharacterBase.h"
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
@@ -101,7 +101,7 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPt
 	auto WidgetSwitcherPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FTeamMateInfo::Get().WidgetSwitcher));
 	if (WidgetSwitcherPtr)
 	{
-		if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Character))
+		if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Character))
 		{
 			WidgetSwitcherPtr->SetActiveWidgetIndex(0);
 

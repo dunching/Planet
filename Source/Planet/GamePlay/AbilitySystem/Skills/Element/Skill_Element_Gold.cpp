@@ -13,7 +13,7 @@
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 void USkill_Element_Gold::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

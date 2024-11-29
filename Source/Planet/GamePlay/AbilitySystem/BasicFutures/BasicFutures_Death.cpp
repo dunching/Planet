@@ -7,7 +7,7 @@
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "Planet_Tools.h"
 #include "HumanEndangeredProcessor.h"
 #include "InputProcessorSubSystem.h"
@@ -43,13 +43,13 @@ void UBasicFutures_Death::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_Orient2Acce);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Buff_CantBeSlected);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
 }
 
 void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)

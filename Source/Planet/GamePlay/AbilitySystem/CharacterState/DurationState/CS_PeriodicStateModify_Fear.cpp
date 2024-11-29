@@ -19,7 +19,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -50,7 +50,7 @@ struct FMyPropertySettlementModify : public FPropertySettlementModify
 FGameplayAbilityTargetData_StateModify_Fear::FGameplayAbilityTargetData_StateModify_Fear(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::State_Debuff_Fear, Duration)
+	Super(UGameplayTagsLibrary::State_Debuff_Fear, Duration)
 {
 }
 
@@ -161,14 +161,14 @@ void UCS_PeriodicStateModify_Fear::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Fear);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::State_Debuff_Fear);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::MovementStateAble_Orient2Acce);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
 }
 
 void UCS_PeriodicStateModify_Fear::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)

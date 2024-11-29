@@ -17,7 +17,7 @@
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "UICommon.h"
 #include "HorseCharacter.h"
 #include "GroupSharedInfo.h"
@@ -56,7 +56,7 @@ void AHorseAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 	{
 		GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UGameplayTagsSubSystem::DeathingTag,
+			UGameplayTagsLibrary::DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 
@@ -97,7 +97,7 @@ void AHorseAIController::OnPossess(APawn* InPawn)
 	InitialCharacter();
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsSubSystem::DeathingTag,
+		UGameplayTagsLibrary::DeathingTag,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);

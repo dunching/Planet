@@ -11,7 +11,7 @@
 #include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
 #include "SceneUnitExtendInfo.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
 #include "ItemProxy_Container.h"
@@ -123,12 +123,12 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 
 ACharacterBase* FBasicProxy::GetProxyCharacter() const
 {
-	return HoldingItemsComponentPtr->FindUnit_Character(OwnerCharacter_ID)->ProxyCharacterPtr.Get();
+	return HoldingItemsComponentPtr->FindProxy_Character(OwnerCharacter_ID)->ProxyCharacterPtr.Get();
 }
 
 ACharacterBase* FBasicProxy::GetAllocationCharacter() const
 {
-	return HoldingItemsComponentPtr->FindUnit_Character(AllocationCharacter_ID)->ProxyCharacterPtr.Get();
+	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID)->ProxyCharacterPtr.Get();
 }
 
 void FBasicProxy::Update2Client()
@@ -136,14 +136,14 @@ void FBasicProxy::Update2Client()
 	HoldingItemsComponentPtr->Proxy_Container.UpdateItem(GetID());
 }
 
-TWeakPtr<FCharacterProxy> FBasicProxy::GetOwnerCharacterProxy()
+TWeakPtr<FCharacterProxy> FBasicProxy::GetOwnerCharacterProxy()const
 {
-	return HoldingItemsComponentPtr->FindUnit_Character(OwnerCharacter_ID);
+	return HoldingItemsComponentPtr->FindProxy_Character(OwnerCharacter_ID);
 }
 
 TWeakPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterProxy()
 {
-	return HoldingItemsComponentPtr->FindUnit_Character(AllocationCharacter_ID);
+	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
 
 FString FBasicProxy::GetUnitName() const
@@ -182,7 +182,7 @@ void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>
 
 TWeakPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterProxy() const
 {
-	return HoldingItemsComponentPtr->FindUnit_Character(AllocationCharacter_ID);
+	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
 
 FTableRowUnit* FBasicProxy::GetTableRowUnit() const
@@ -524,7 +524,7 @@ bool FWeaponSkillProxy::Active()
 
 		FGameplayEventData Payload;
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon) 
+			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon) 
 			)
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
@@ -693,13 +693,13 @@ void FWeaponSkillProxy::RegisterSkill()
 		FGameplayAbilityTargetData_SkillBase_RegisterParam* GameplayAbilityTargetDataPtr = nullptr;
 		// 需要特殊参数的
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon_Bow)
+			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon_Bow)
 			)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Bow_RegisterParam;
 		}
 		else if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Weapon_FoldingFan)
+			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon_FoldingFan)
 			)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_FoldingFan_RegisterParam;
@@ -777,7 +777,7 @@ bool FActiveSkillProxy::Active()
 
 		// 需要特殊参数的
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill_Active_Control)
+			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active_Control)
 			)
 		{
 			if (InGAInsPtr->IsActive())

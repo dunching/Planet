@@ -13,7 +13,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "AllocationSkills.h"
 #include "ProxyProcessComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 
@@ -30,7 +30,7 @@ void USkill_Active_FoldingFan_AddNum::PerformAction(
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
-			UGameplayTagsSubSystem::Unit_Skill_Weapon_FoldingFan
+			UGameplayTagsLibrary::Unit_Skill_Weapon_FoldingFan
 		);
 
 		if (TargetSkillSPtr)

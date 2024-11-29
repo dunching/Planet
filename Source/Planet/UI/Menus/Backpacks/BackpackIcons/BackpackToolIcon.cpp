@@ -20,7 +20,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "ItemProxy.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UBackpackToolIcon::UBackpackToolIcon(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -44,7 +44,7 @@ void UBackpackToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasic
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
-	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 	{
 		UnitPtr = DynamicCastSharedPtr<FToolProxy>(InBasicUnitPtr);
 		SetNum(UnitPtr->GetNum());

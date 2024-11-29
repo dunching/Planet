@@ -19,7 +19,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
@@ -46,7 +46,7 @@ ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitia
 }
 
 FGameplayAbilityTargetData_RootMotion_TornadoTraction::FGameplayAbilityTargetData_RootMotion_TornadoTraction() :
-	Super(UGameplayTagsSubSystem::TornadoTraction)
+	Super(UGameplayTagsLibrary::TornadoTraction)
 {
 
 }
@@ -117,7 +117,7 @@ void UCS_RootMotion_TornadoTraction::EndAbility(
 // 	{
 // 		TaskPtr->UpdateDuration();
 // 	}
-// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::FlyAway))
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsLibrary::FlyAway))
 // 	{
 // 		for (auto Iter : ActiveTasks)
 // 		{

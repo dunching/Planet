@@ -10,7 +10,7 @@
 #include "AIResources.h"
 #include "GameplayTasksComponent.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 
 UAITask_SwitchWalkState::UAITask_SwitchWalkState(const FObjectInitializer& ObjectInitializer)

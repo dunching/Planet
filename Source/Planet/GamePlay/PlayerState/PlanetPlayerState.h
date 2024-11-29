@@ -12,7 +12,7 @@
 #include "PlanetPlayerState.generated.h"
 
 class UPlanetAbilitySystemComponent;
-class UTeamConfigureComponent;
+class UProxySycHelperComponent;
 struct FCharacterProxy;
 struct FSceneUnitContainer;
 

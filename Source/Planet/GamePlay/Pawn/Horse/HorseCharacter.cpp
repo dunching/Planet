@@ -15,7 +15,7 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "AbilitySystemBlueprintLibrary.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 #include "GameMode_Main.h"
 #include "PlanetPlayerState.h"
@@ -112,7 +112,7 @@ void AHorseCharacter::Interaction(ACharacterBase* CharacterPtr)
 
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(CharacterPtr, UGameplayTagsSubSystem::Mount, Payload);
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(CharacterPtr, UGameplayTagsLibrary::Mount, Payload);
 	}
 }
 

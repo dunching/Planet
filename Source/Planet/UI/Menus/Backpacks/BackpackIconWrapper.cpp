@@ -23,7 +23,7 @@
 #include "ItemProxy.h"
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BackpackSkillIcon.h"
 #include "BackpackWeaponIcon.h"
 
@@ -62,7 +62,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 {
 	if (BasicUnitPtr)
 	{
-		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Tool))
+		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -79,7 +79,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -96,7 +96,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Skill))
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -113,7 +113,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
 			}
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Weapon))
+		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)

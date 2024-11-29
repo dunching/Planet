@@ -26,7 +26,7 @@
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "PlanetPlayerController.h"

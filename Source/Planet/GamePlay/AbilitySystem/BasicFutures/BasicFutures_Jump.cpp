@@ -5,7 +5,7 @@
 #include "GenerateType.h"
 #include "CharacterBase.h"
 #include "Planet_Tools.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UBasicFutures_Jump::UBasicFutures_Jump() :
 	Super()
@@ -76,10 +76,10 @@ void UBasicFutures_Jump::OnRemoveAbility(
 
 void UBasicFutures_Jump::InitalDefaultTags()
 {
-	AbilityTags.AddTag(UGameplayTagsSubSystem::Jump);
+	AbilityTags.AddTag(UGameplayTagsLibrary::Jump);
 
 	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::RootMotion);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);
 }
 
 void UBasicFutures_Jump::OnLanded(const FHitResult& Hit)

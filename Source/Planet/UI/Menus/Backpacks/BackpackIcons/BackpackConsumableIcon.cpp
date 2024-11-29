@@ -20,7 +20,7 @@
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
 #include "ItemProxy.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "UICommon.h"
 
 struct FBackpackConsumableIcon : public TStructVariable<FBackpackConsumableIcon>
@@ -50,7 +50,7 @@ void UBackpackConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& I
 {
 	Super::ResetToolUIByData(InBasicUnitPtr);
 
-	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::Unit_Consumables))
+	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
 	{
 		UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(InBasicUnitPtr);
 		SetNum(UnitPtr->GetCurrentValue());

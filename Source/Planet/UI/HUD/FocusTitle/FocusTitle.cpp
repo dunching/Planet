@@ -16,7 +16,7 @@
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "EffectsList.h"
 
 struct FFocusTitle : public TStructVariable<FFocusTitle>
@@ -162,10 +162,10 @@ void UFocusTitle::OnHPMaxValueChanged(int32 NewVal)
 
 void UFocusTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::Debuff))
+	if (Tag.MatchesTagExact(UGameplayTagsLibrary::Debuff))
 	{
 	}
-	else if (Tag.MatchesTag(UGameplayTagsSubSystem::Debuff))
+	else if (Tag.MatchesTag(UGameplayTagsLibrary::Debuff))
 	{
 		if (Count > 0)
 		{
