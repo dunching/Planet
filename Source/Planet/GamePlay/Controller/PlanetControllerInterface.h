@@ -35,6 +35,8 @@ public:
 	// “成员管理”记录了成员信息，因为
 	virtual AGroupSharedInfo* GetGroupSharedInfo() const = 0;
 
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) = 0;
+
 	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const = 0;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const = 0;

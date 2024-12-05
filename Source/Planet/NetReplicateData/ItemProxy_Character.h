@@ -97,12 +97,23 @@ public:
 	// 通过指定代理类型，比如我们需要查询我们的插槽里面是否使用了“换技能”的代理
 	FMySocket_FASI FindSocketByType(const FGameplayTag&ProxyType)const;
 
+	void GetWeaponSocket(
+		FMySocket_FASI& FirstWeaponSocketInfoSPtr,
+		FMySocket_FASI& SecondWeaponSocketInfoSPtr
+	);
+
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 
 	TMap<FGameplayTag, FMySocket_FASI>TeammateConfigureMap;
 	
+	FString Title;
+
+	FString Name;
+
+	int32 Level = 1;
+
 protected:
 
 	void UpdateSocket(const FMySocket_FASI&Socket);

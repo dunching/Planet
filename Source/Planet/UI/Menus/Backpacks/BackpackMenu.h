@@ -41,6 +41,8 @@ public:
 
 	bool bIsPlayerMenu = true;
 
+	TSharedPtr<FCharacterProxy> CurrentUnitPtr = nullptr;
+
 	FOnDragIconDelegate OnDragIconDelegate;
 
 protected:

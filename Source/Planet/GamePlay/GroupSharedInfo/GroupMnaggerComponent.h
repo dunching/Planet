@@ -43,7 +43,7 @@ public:
 
 	using FCharacterUnitType = FCharacterProxy;
 
-	using FOwnerType = ACharacterBase;
+	using FOwnerType = AGroupSharedInfo;
 
 	using FMemberChangedDelegateContainer =
 		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>;

@@ -17,7 +17,7 @@
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
 #include "ItemProxy.h"
-#include "Planet.h"
+#include "HumanCharacter_AI.h"
 #include "LogWriter.h"
 #include "ProxySycHelperComponent.h"
 #include "TeamConfigure.h"
@@ -35,14 +35,14 @@ static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
 void UTeamMatesHelperComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index)
 {
 #if UE_EDITOR || UE_SERVER
-	if (GetOwnerRole() == ROLE_Authority)
+	if (GetNetMode() == NM_DedicatedServer)
 	{
 		AddCharacter(CharacterUnitPtr);
 	}
 #endif
 
 #if UE_EDITOR || UE_CLIENT
-	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	if (GetNetMode() == NM_Client)
 	{
 		AddCharacter(CharacterUnitPtr);
 		if (CharacterUnitPtr)
@@ -82,10 +82,31 @@ void UTeamMatesHelperComponent::AddCharacterToTeam_Server_Implementation(const F
 
 void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 {
-	const auto OwnerPtr = GetOwner<FOwnerType>();
-	auto GroupSharedInfoPtr = GetOwner<FOwnerType>()->GetGroupSharedInfo();
-	if (GroupSharedInfoPtr)
+	auto PlayerCharacterPtr = UGameplayStatics::GetPlayerCharacter(this, 0);
+	if (!PlayerCharacterPtr)
 	{
+		return;
+	}
+	
+	const auto PlayerCharacterLocation = PlayerCharacterPtr->GetActorLocation();
+	const auto PlayerCharacterRotation = PlayerCharacterPtr->GetActorRotation();
+
+	FTransform Transform;
+	
+	const auto OwnerPtr = GetOwner<FOwnerType>();
+	for (int32 Index = 0;Index < CharactersAry.Num(); Index++)
+	{
+		const auto CharacterProxySPtr =
+			GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(CharactersAry[Index]);
+		if (CharacterProxySPtr)
+		{
+			Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
+			auto AICharacterPtr = CharacterProxySPtr->SpwanCharacter(Transform);
+			if (AICharacterPtr )
+			{
+				AICharacterPtr ->SetGroupSharedInfo(OwnerPtr);
+			}
+		}
 	}
 }
 
@@ -102,7 +123,7 @@ UTeamMatesHelperComponent::UTeamMatesHelperComponent(const FObjectInitializer& O
 
 void UTeamMatesHelperComponent::AddCharacter(FPawnType* PCPtr)
 {
-	auto CharacterUnitPtr = PCPtr->GetCharacterUnit();
+	auto CharacterUnitPtr = PCPtr->GetCharacterProxy();
 	AddCharacter(CharacterUnitPtr);
 }
 

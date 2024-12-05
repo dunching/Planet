@@ -25,6 +25,7 @@
 #include "GeneratorColony.h"
 #include "SceneUnitExtendInfo.h"
 #include "CharactersInfo.h"
+#include "HumanAIController.h"
 
 AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -37,6 +38,21 @@ void AHumanCharacter_AI::BeginPlay()
 	Super::BeginPlay();
 
 	InitialAllocations();
+}
+
+void AHumanCharacter_AI::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
+void AHumanCharacter_AI::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+{
+	GroupSharedInfoPtr = InGroupSharedInfoPtr;
+
+	if (auto ControllerPtr = GetController<AHumanAIController>())
+	{
+		ControllerPtr->SetGroupSharedInfo(InGroupSharedInfoPtr);
+	}
 }
 
 void AHumanCharacter_AI::InitialAllocations()
@@ -70,7 +86,7 @@ void AHumanCharacter_AI::InitialAllocations()
 									HoldingItemsComponentPtr->AddUnit_Weapon(
 										TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo));;
 
-								HoldingItemsComponentPtr->UpdateSocket(GetCharacterUnit(), SkillsSocketInfo);
+								HoldingItemsComponentPtr->UpdateSocket(GetCharacterProxy(), SkillsSocketInfo);
 							}
 						}
 					}
@@ -90,7 +106,7 @@ void AHumanCharacter_AI::InitialAllocations()
 
 							SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
 
-							HoldingItemsComponentPtr->UpdateSocket(GetCharacterUnit(), SkillsSocketInfo);
+							HoldingItemsComponentPtr->UpdateSocket(GetCharacterProxy(), SkillsSocketInfo);
 						}
 					}
 

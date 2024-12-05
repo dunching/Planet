@@ -10,6 +10,8 @@
 #include "PlayerComponent.h"
 #include "GroupSharedInfo.h"
 #include "HumanAIController.h"
+#include "HumanRegularProcessor.h"
+#include "InputProcessorSubSystem.h"
 #include "PlanetPlayerController.h"
 
 AHumanCharacter_Player::AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer) :
@@ -37,11 +39,42 @@ void AHumanCharacter_Player::BeginPlay()
 void AHumanCharacter_Player::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		auto GroupsHelperSPtr = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
+		if (GroupsHelperSPtr)
+		{
+			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
+				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
+			);
+		}
+	}
+#endif
 }
 
 void AHumanCharacter_Player::UnPossessed()
 {
 	Super::UnPossessed();
+}
+
+void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
+{
+	Super::OnRep_GroupSharedInfoChanged();
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
+	
+	// 在SetPawn之后调用
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
+		[this](auto NewProcessor)
+		{
+			NewProcessor->SetPawn(Cast<ThisClass>(this));
+		});
 }
 
 void AHumanCharacter_Player::InitialGroupSharedInfo()

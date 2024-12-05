@@ -93,29 +93,6 @@ void ACharacterBase::BeginPlay()
 
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
-#if UE_EDITOR || UE_CLIENT
-	if (GetLocalRole() < ROLE_Authority)
-	{
-		if (!CharacterTitlePtr)
-		{
-			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-			if (CharacterTitlePtr)
-			{
-				CharacterTitlePtr->CharacterPtr = this;
-				if (GetLocalRole() == ROLE_AutonomousProxy)
-				{
-					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
-				}
-				else
-				{
-					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
-				}
-			}
-		}
-	}
-#endif
-
 	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 #if UE_EDITOR || UE_SERVER
@@ -196,19 +173,6 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
 	}
-
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto GroupsHelperSPtr = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
-		if (GroupsHelperSPtr)
-		{
-			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
-				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
-			);
-		}
-	}
-#endif
 }
 
 void ACharacterBase::UnPossessed()
@@ -275,7 +239,7 @@ AGroupSharedInfo* ACharacterBase::GetGroupSharedInfo() const
 
 UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent() const
 {
-	return GroupSharedInfoPtr ? GroupSharedInfoPtr->HoldingItemsComponentPtr : nullptr;
+	return GroupSharedInfoPtr ? GroupSharedInfoPtr->GetHoldingItemsComponent() : nullptr;
 }
 
 UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent() const
@@ -308,7 +272,7 @@ UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
 	return CDCaculatorComponentPtr;
 }
 
-TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit() const
+TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
 	return GetHoldingItemsComponent()->CharacterProxySPtr;
 }
@@ -323,14 +287,14 @@ void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneO
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+	return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
 	return
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterUnit()) ||
-		TargetCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(GetCharacterUnit());
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy()) ||
+		TargetCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(GetCharacterProxy());
 }
 
 ACharacterBase* ACharacterBase::GetFocusActor() const
@@ -463,4 +427,26 @@ void ACharacterBase::OnCharacterGroupMateChanged(
 
 void ACharacterBase::OnRep_GroupSharedInfoChanged()
 {
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() < ROLE_Authority)
+	{
+		if (!CharacterTitlePtr)
+		{
+			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
+			if (CharacterTitlePtr)
+			{
+				CharacterTitlePtr->CharacterPtr = this;
+				if (GetLocalRole() == ROLE_AutonomousProxy)
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
+				}
+				else
+				{
+					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+				}
+			}
+		}
+	}
+#endif
 }

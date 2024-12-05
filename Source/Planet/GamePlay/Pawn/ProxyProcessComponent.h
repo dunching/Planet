@@ -130,6 +130,7 @@ public:
 	FGameplayTag CurrentWeaponSocket;
 
 protected:
+	
 	void Add(const FMySocket_FASI& Socket);
 
 	void Update(const FMySocket_FASI& Socket);

@@ -186,11 +186,6 @@ UMenuLayout* UUIManagerSubSystem::GetMainMenu()
 		if (MenuLayoutPtr)
 		{
 			MenuLayoutPtr->AddToViewport(EUIOrder::kTableMenu);
-
-			ViewBackpack(false);
-			ViewTalentAllocation(false);
-			ViewGroupMatesManagger(false);
-			ViewRaffleMenu(false);
 		}
 	}
 

@@ -46,12 +46,16 @@ public:
 
 	UTeamMatesHelperComponent* GetTeamMatesHelperComponent();
 
+	UHoldingItemsComponent* GetHoldingItemsComponent();
+
+	FGuid GroupID;
+	
+protected:
+	
 	UPROPERTY()
 	TObjectPtr<UTeamMatesHelperComponent> TeamMatesHelperComponentPtr = nullptr;
 	
 	UPROPERTY()
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
-	
-	FGuid GroupID;
 	
 };

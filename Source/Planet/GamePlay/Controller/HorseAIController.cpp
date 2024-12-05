@@ -30,6 +30,11 @@ AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializ
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 }
 
+void AHorseAIController::SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr)
+{
+	Super::SetGroupSharedInfo(GroupSharedInfoPtr);
+}
+
 void AHorseAIController::SetCampType(ECharacterCampType CharacterCampType)
 {
 	if (AIHumanInfoPtr)

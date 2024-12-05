@@ -65,6 +65,22 @@ void UProxyProcessComponent::ActiveWeapon_Server_Implementation()
 
 void UProxyProcessComponent::ActiveWeaponImp()
 {
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
+	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
+	
+	if (WeaponSocket_1.SkillProxyID.IsValid())
+	{
+		SwitchWeaponImp(UGameplayTagsLibrary::WeaponSocket_1);
+	}
+	else if (WeaponSocket_2.SkillProxyID.IsValid())
+	{
+		SwitchWeaponImp(UGameplayTagsLibrary::WeaponSocket_2);
+	}
+	
 }
 
 void UProxyProcessComponent::SwitchWeapon_Server_Implementation()
@@ -120,6 +136,28 @@ void UProxyProcessComponent::ActiveWeapon()
 
 void UProxyProcessComponent::SwitchWeapon()
 {
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
+	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
+	
+	if (WeaponSocket_1.Socket == CurrentWeaponSocket)
+	{
+		SwitchWeaponImp(UGameplayTagsLibrary::WeaponSocket_2);
+	}
+	else
+	{
+		SwitchWeaponImp(UGameplayTagsLibrary::WeaponSocket_1);
+	}
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		SwitchWeapon_Server();
+	}
+#endif
 }
 
 void UProxyProcessComponent::RetractputWeapon()
@@ -155,8 +193,7 @@ void UProxyProcessComponent::GetWeaponSocket(
 	auto OwnerCharacterProxyPtr = HoldingItemsComponentPtr->GetOwnerCharacterProxy();
 	if (OwnerCharacterProxyPtr)
 	{
-		FirstWeaponSocketInfoSPtr = OwnerCharacterProxyPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
-		SecondWeaponSocketInfoSPtr = OwnerCharacterProxyPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
+		OwnerCharacterProxyPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr,SecondWeaponSocketInfoSPtr);
 	}
 }
 

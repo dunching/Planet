@@ -50,7 +50,7 @@ void UGroupManaggerMenu::SyncData()
 	}
 
 	auto GMCPtr = PCPtr->GetGroupSharedInfo();
-	GMCPtr->TeamMatesHelperComponentPtr->SpwanTeammateCharacter();
+	GMCPtr->GetTeamMatesHelperComponent()->SpwanTeammateCharacter();
 }
 
 void UGroupManaggerMenu::ResetGroupmates()

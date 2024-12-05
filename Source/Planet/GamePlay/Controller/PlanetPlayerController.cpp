@@ -343,9 +343,13 @@ AGroupSharedInfo* APlanetPlayerController::GetGroupSharedInfo() const
 	return GroupSharedInfoPtr;
 }
 
+void APlanetPlayerController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+{
+}
+
 UHoldingItemsComponent* APlanetPlayerController::GetHoldingItemsComponent() const
 {
-	return GroupSharedInfoPtr ? GroupSharedInfoPtr->HoldingItemsComponentPtr : nullptr;
+	return GroupSharedInfoPtr ? GroupSharedInfoPtr->GetHoldingItemsComponent() : nullptr;
 }
 
 UCharacterAttributesComponent* APlanetPlayerController::GetCharacterAttributesComponent() const
@@ -370,7 +374,7 @@ TWeakObjectPtr<ACharacterBase> APlanetPlayerController::GetTeamFocusTarget() con
 
 TSharedPtr<FCharacterProxy> APlanetPlayerController::GetCharacterUnit()
 {
-	return GetPawn<FPawnType>()->GetCharacterUnit();
+	return GetPawn<FPawnType>()->GetCharacterProxy();
 }
 
 ACharacterBase* APlanetPlayerController::GetRealCharacter() const
@@ -404,7 +408,7 @@ void APlanetPlayerController::BindPCWithCharacter()
 
 TSharedPtr<FCharacterProxy> APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
-	return CharaterPtr->GetCharacterUnit();
+	return CharaterPtr->GetCharacterProxy();
 }
 
 void APlanetPlayerController::InitialGroupSharedInfo()
@@ -640,14 +644,6 @@ void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 	// }
 
 	UUIManagerSubSystem::GetInstance()->InitialUI();
-
-	// 在SetPawn之后调用
-	auto CurrentPawn = GetPawn();
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
-		[this, CurrentPawn](auto NewProcessor)
-		{
-			NewProcessor->SetPawn(Cast<FPawnType>(CurrentPawn));
-		});
 
 	// 隐藏
 	MyHUD->ShowHUD();

@@ -57,6 +57,8 @@ public:
 
 	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
 
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
+
 	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;

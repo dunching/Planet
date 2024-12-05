@@ -65,6 +65,9 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
+	Ar << Title;
+	Ar << Name;
+	Ar << Level;
 	Ar << ProxyCharacterPtr;
 	CharacterAttributesSPtr->NetSerialize(Ar, Map, bOutSuccess);
 
@@ -99,7 +102,7 @@ void FCharacterProxy::InitialUnit()
 {
 	Super::InitialUnit();
 
-	CharacterAttributesSPtr->Title = GetDT_CharacterType()->Title;
+	Title = GetDT_CharacterType()->Title;
 
 	struct FMyStruct
 	{
@@ -219,6 +222,13 @@ FMySocket_FASI FCharacterProxy::FindSocketByType(const FGameplayTag& ProxyType) 
 	}
 
 	return FMySocket_FASI();
+}
+
+void FCharacterProxy::GetWeaponSocket(FMySocket_FASI& FirstWeaponSocketInfoSPtr,
+	FMySocket_FASI& SecondWeaponSocketInfoSPtr)
+{
+	FirstWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
+	SecondWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
 }
 
 void FCharacterProxy::UpdateSocket(const FMySocket_FASI& Socket)

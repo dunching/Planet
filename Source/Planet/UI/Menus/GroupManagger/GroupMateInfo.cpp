@@ -113,21 +113,21 @@ void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitP
 				auto CharacterAttributesSPtr =
 					GroupMateUnitPtr->CharacterAttributesSPtr;
 
-				if (CharacterAttributesSPtr->Name.IsEmpty())
+				if (GroupMateUnitPtr->Name.IsEmpty())
 				{
 					UIPtr->SetText(
 						FText::FromString(FString::Printf(TEXT("%s(%d)"),
-							*CharacterAttributesSPtr->Title,
-							CharacterAttributesSPtr->Level))
+							*GroupMateUnitPtr->Title,
+							GroupMateUnitPtr->Level))
 					);
 				}
 				else
 				{
 					UIPtr->SetText(
 						FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
-							*CharacterAttributesSPtr->Title,
-							*CharacterAttributesSPtr->Name,
-							CharacterAttributesSPtr->Level))
+							*GroupMateUnitPtr->Title,
+							*GroupMateUnitPtr->Name,
+							GroupMateUnitPtr->Level))
 					);
 				}
 			}

@@ -21,6 +21,10 @@ public:
 	AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
+
+	virtual void PossessedBy(AController* NewController) override;
+
+	void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr);
 	
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

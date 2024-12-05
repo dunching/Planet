@@ -35,7 +35,7 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	TSharedPtr<FWeaponProxy> UnitPtr = nullptr;
+	TSharedPtr<FWeaponProxy> WeaponProxyPtr = nullptr;
 
 	FOnResetUnit_Weapon OnResetUnit_Weapon;
 

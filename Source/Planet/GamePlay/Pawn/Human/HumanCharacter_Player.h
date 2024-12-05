@@ -35,6 +35,8 @@ protected:
 
 	virtual void UnPossessed() override;
 	
+	virtual void OnRep_GroupSharedInfoChanged()override;
+	
 	virtual void InitialGroupSharedInfo();
 
 #if WITH_EDITORONLY_DATA

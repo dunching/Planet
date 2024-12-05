@@ -26,6 +26,7 @@ class UAIPerceptionComponent;
 class ABuildingArea;
 class AGeneratorColony;
 class AGeneratorNPCs_Patrol;
+class AGroupSharedInfo;
 
 /**
  *
@@ -48,6 +49,8 @@ public:
 		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr < FCharacterUnitType>&)>::FCallbackHandleSPtr;
 
 	AHumanAIController(const FObjectInitializer& ObjectInitializer);
+
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
 
@@ -108,5 +111,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponentPtr = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
 
 };

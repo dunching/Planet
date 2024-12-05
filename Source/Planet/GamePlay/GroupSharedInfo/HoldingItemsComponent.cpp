@@ -689,10 +689,10 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::InitialOwnerCharacterProxy(A
 #endif
 
 	CharacterProxySPtr->UnitType = UGameplayTagsLibrary::Unit_Character_Player;
+	CharacterProxySPtr->InitialUnit();
 	CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
 	CharacterProxySPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
 	CharacterProxySPtr->HoldingItemsComponentPtr = this;
-	CharacterProxySPtr->InitialUnit();
 
 	SceneToolsAry.Add(CharacterProxySPtr);
 	SceneMetaMap.Add(CharacterProxySPtr->ID, CharacterProxySPtr);
@@ -723,10 +723,10 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddProxy_Character(const FGa
 #endif
 
 		ResultPtr->UnitType = UnitType;
+		ResultPtr->InitialUnit();
+
 		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
 		ResultPtr->HoldingItemsComponentPtr = this;
-
-		ResultPtr->InitialUnit();
 
 		SceneToolsAry.Add(ResultPtr);
 		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -738,10 +738,10 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::AddProxy_Character(const FGa
 		ResultPtr = MakeShared<FCharacterProxy>();
 
 		ResultPtr->UnitType = UnitType;
+		ResultPtr->InitialUnit();
+
 		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
 		ResultPtr->HoldingItemsComponentPtr = this;
-
-		ResultPtr->InitialUnit();
 
 		SceneToolsAry.Add(ResultPtr);
 		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);

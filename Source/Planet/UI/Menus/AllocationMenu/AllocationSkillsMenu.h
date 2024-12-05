@@ -65,7 +65,10 @@ protected:
 		const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
 	);
 
-	void ResetUIByData_WeaponSkills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
+	void ResetUIByData_WeaponSkills(
+		const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr,
+		const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+		);
 
 	void ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
 

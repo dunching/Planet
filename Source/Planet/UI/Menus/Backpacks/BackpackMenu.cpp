@@ -20,6 +20,7 @@
 #include "UICommon.h"
 #include "ItemProxy_Container.h"
 #include "CharacterBase.h"
+#include "ItemProxy_Character.h"
 
 struct FBackpackMenu : public TStructVariable<FBackpackMenu>
 {
@@ -53,10 +54,12 @@ void UBackpackMenu::SyncData()
 
 TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
 {
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GWorld, 0));
-	auto ItemAryRef = CharacterPtr->GetHoldingItemsComponent()->GetProxys();
-
-	return ItemAryRef;
+	TArray<TSharedPtr<FBasicProxy>> Result;
+	if (CurrentUnitPtr)
+	{
+		 Result = CurrentUnitPtr->GetProxyCharacter()->GetHoldingItemsComponent()->GetProxys();
+	}
+	return Result;
 }
 
 void UBackpackMenu::ResetUIByData_Skill()

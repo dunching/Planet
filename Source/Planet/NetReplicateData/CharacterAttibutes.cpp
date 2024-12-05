@@ -186,10 +186,6 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 {
 	if (Ar.IsSaving())
 	{
-		Ar << Title;
-		Ar << Name;
-		Ar << Level;
-
 		Ar << LiDao.CurrentValue.CurrentValue;
 		Ar << GenGu.CurrentValue.CurrentValue;
 		Ar << ShenFa.CurrentValue.CurrentValue;
@@ -217,10 +213,6 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 				}
 			};
 
-		Ar << Title;
-		Ar << Name;
-		Ar << Level;
-
 		Lambda(LiDao.CurrentValue);
 		Lambda(GenGu.CurrentValue);
 		Lambda(ShenFa.CurrentValue);
@@ -244,10 +236,6 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 
 void FCharacterAttributes::InitialData()
 {
-	Name = TEXT("");
-
-	Title = TEXT("");
-
 	LiDao.GetMaxProperty().SetCurrentValue(6);
 
 	GenGu.GetMaxProperty().SetCurrentValue(6);

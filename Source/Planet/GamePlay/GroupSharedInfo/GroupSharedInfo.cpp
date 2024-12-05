@@ -34,3 +34,8 @@ UTeamMatesHelperComponent* AGroupSharedInfo::GetTeamMatesHelperComponent()
 {
 	return TeamMatesHelperComponentPtr;
 }
+
+UHoldingItemsComponent* AGroupSharedInfo::GetHoldingItemsComponent()
+{
+	return HoldingItemsComponentPtr;
+}

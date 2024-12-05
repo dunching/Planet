@@ -104,7 +104,7 @@ public:
 
 	UCDCaculatorComponent* GetCDCaculatorComponent()const;
 
-	TSharedPtr<FCharacterProxy> GetCharacterUnit()const;
+	TSharedPtr<FCharacterProxy> GetCharacterProxy()const;
 	
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
@@ -147,6 +147,9 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void SpawnDefaultController()override;
+
+	UFUNCTION()
+	virtual void OnRep_GroupSharedInfoChanged();
 
 	UFUNCTION(Server, Reliable)
 	virtual void InteractionSceneObj_Server(ASceneObj* SceneObjPtr);
@@ -201,9 +204,6 @@ private:
 	
 	UFUNCTION(NetMulticast, Unreliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
-
-	UFUNCTION()
-	void OnRep_GroupSharedInfoChanged();
 
 	FValueChangedDelegateHandle HPChangedHandle;
 

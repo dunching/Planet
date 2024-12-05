@@ -37,6 +37,11 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 	InitialSenseConfig();
 }
 
+void AHumanAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+{
+	GroupSharedInfoPtr = InGroupSharedInfoPtr;
+}
+
 void AHumanAIController::InitialSenseConfig()
 {
 	auto SightConfig = NewObject<UAISenseConfig_Sight>();
@@ -199,7 +204,7 @@ void AHumanAIController::InitialCharacter()
 		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
 
 		TeamHelperChangedDelegate =
-			GetGroupSharedInfo()->TeamMatesHelperComponentPtr->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+			GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
 		
 #if WITH_EDITORONLY_DATA
 		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);

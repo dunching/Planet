@@ -78,7 +78,7 @@ UTalentAllocationComponent* APlanetAIController::GetTalentAllocationComponent() 
 
 TSharedPtr<FCharacterProxy> APlanetAIController::GetCharacterUnit()
 {
-	return GetPawn<FPawnType>()->GetCharacterUnit();
+	return GetPawn<FPawnType>()->GetCharacterProxy();
 }
 
 ACharacterBase* APlanetAIController::GetRealCharacter()const
@@ -121,7 +121,7 @@ void APlanetAIController::BindPCWithCharacter()
 
 TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
 {
-	return CharaterPtr->GetCharacterUnit();
+	return CharaterPtr->GetCharacterProxy();
 }
 
 void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)

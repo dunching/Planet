@@ -18,6 +18,7 @@ class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
 class UTalentAllocationComponent;
 class UGroupMnaggerComponent;
+class AGroupSharedInfo;
 
 
 UCLASS()
@@ -38,6 +39,8 @@ public:
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
+
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
 
 	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
 

@@ -46,6 +46,8 @@ public:
 
 	AHorseAIController(const FObjectInitializer& ObjectInitializer);
 
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
+
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent() ;
