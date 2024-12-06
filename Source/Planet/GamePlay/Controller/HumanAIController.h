@@ -67,6 +67,11 @@ public:
 
 protected:
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION()
+	void OnRep_GroupSharedInfoChanged();
+
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
 		const TSharedPtr < FCharacterUnitType>& LeaderCharacterUnitPtr
@@ -112,7 +117,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponentPtr = nullptr;
 
-	UPROPERTY()
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
 
 };

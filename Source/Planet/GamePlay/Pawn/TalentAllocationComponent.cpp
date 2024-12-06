@@ -4,7 +4,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "CharacterBase.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HoldingItemsComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"

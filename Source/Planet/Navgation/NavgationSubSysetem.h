@@ -10,7 +10,7 @@
 #include "GenerateType.h"
 #include <GameInstance/PlanetGameInstance.h>
 #include "Planet.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "NavgationSubSysetem.generated.h"
 

@@ -12,7 +12,7 @@
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "GroupMnaggerComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"

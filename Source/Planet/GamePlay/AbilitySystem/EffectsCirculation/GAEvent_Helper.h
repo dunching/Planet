@@ -7,7 +7,7 @@
 #include "Abilities/GameplayAbilityTargetTypes.h"
 
 #include "GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "BaseData.h"
 
 #include "GAEvent_Helper.generated.h"

@@ -20,15 +20,21 @@ class PLANET_API AWeapon_Base : public AToolUnitBase
 
 public:
 	
-	UFUNCTION(NetMulticast, Reliable)
-	void SetWeaponUnit(const FGuid& WeaponProxy_ID);
+	void SetWeaponProxy(const FGuid& WeaponProxy_ID);
 
-	TSharedPtr<FWeaponProxy> WeaponProxyPtr = nullptr;
-
+	TSharedPtr<FWeaponProxy>GetWeaponProxy()const;
+	
 protected:
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void SetWeaponProxyImp(ACharacterBase* AllocationCharacterPtr);
+
+	TSharedPtr<FWeaponProxy> WeaponProxyPtr = nullptr;
 
 };

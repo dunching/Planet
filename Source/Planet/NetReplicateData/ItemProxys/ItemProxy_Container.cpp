@@ -10,7 +10,7 @@
 #include "SceneUnitExtendInfo.h"
 #include "HoldingItemsComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "TemplateHelper.h"
 #include "CharactersInfo.h"
 #include "ItemProxy_Character.h"

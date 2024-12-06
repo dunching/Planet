@@ -6,7 +6,7 @@
 
 #include "MenuInterface.h"
 #include "Common/GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "GroupManaggerMenu.generated.h"
 

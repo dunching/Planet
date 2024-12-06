@@ -16,7 +16,7 @@
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"

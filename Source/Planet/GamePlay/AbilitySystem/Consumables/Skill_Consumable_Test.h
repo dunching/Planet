@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_Consumable_Base.h"
 
 #include "Skill_Consumable_Test.generated.h"

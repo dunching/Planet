@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "CharacterBase.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "ProxyProcessComponent.h"
 
 #include "HumanCharacter.generated.h"

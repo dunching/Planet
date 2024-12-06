@@ -8,7 +8,7 @@
 #include "GameFramework/PlayerState.h"
 
 #include "PlanetAbilitySystemComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "GroupSharedInfo.generated.h"
 

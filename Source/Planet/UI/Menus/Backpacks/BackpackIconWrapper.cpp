@@ -20,7 +20,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
 #include "GameplayTagsLibrary.h"

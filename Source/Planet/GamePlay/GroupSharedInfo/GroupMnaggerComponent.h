@@ -8,7 +8,7 @@
 #include "GameFramework/PlayerState.h"
 
 #include "PlanetAbilitySystemComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "GroupMnaggerComponent.generated.h"
 
@@ -71,6 +71,8 @@ public:
 	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index);
 
 	bool IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)const;
+
+	bool IsMember(const FGuid& CharacterID)const;
 
 	TWeakObjectPtr<ACharacterBase> GetKnowCharacter()const;
 

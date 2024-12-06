@@ -6,7 +6,7 @@
 
 #include "SceneObj.h"
 #include "GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "BuildSharedData.h"
 
 #include "BuildingBase.generated.h"

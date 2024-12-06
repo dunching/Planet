@@ -9,7 +9,7 @@
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "SceneUnitTable.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "ProxySycHelperComponent.h"
 
 APlanetPlayerState::APlanetPlayerState(const FObjectInitializer& ObjectInitializer) :

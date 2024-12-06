@@ -25,7 +25,7 @@
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "SceneUnitTable.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "ItemProxy_Character.h"
 
 AGameMode_Main::AGameMode_Main() :

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Base.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "Skill_WeaponActive_Base.generated.h"
 

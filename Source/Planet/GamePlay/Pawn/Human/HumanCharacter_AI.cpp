@@ -1,31 +1,20 @@
 #include "HumanCharacter_AI.h"
 
-#include <GameFramework/CharacterMovementComponent.h>
-#include "Components/StateTreeComponent.h"
-#include "Components/StateTreeAIComponent.h"
-#include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
-#include <Perception/AISenseConfig_Sight.h>
+#include "Net/UnrealNetwork.h"
 
-#include "GeneratorNPCs_Patrol.h"
 #include "AIComponent.h"
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
-#include "AssetRefMap.h"
-#include "Planet.h"
-#include "GroupMnaggerComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
-#include "PlanetPlayerController.h"
 #include "TestCommand.h"
 #include "GameplayTagsLibrary.h"
-#include "SceneUnitTable.h"
-#include "GeneratorNPCs_Patrol.h"
-#include "GeneratorColony.h"
 #include "SceneUnitExtendInfo.h"
 #include "CharactersInfo.h"
 #include "HumanAIController.h"
+#include "GroupSharedInfo.h"
 
 AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -36,8 +25,6 @@ AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializ
 void AHumanCharacter_AI::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InitialAllocations();
 }
 
 void AHumanCharacter_AI::PossessedBy(AController* NewController)
@@ -55,7 +42,54 @@ void AHumanCharacter_AI::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoP
 	}
 }
 
-void AHumanCharacter_AI::InitialAllocations()
+void AHumanCharacter_AI::SetCharacterID(const FGuid& InCharacterID)
+{
+	CharacterID = InCharacterID;
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		InitialAllocationsByProxy();
+	}
+#endif
+}
+
+void AHumanCharacter_AI::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_None);
+}
+
+void AHumanCharacter_AI::OnRep_GroupSharedInfoChanged()
+{
+	Super::OnRep_GroupSharedInfoChanged();
+}
+
+TSharedPtr<FCharacterProxy> AHumanCharacter_AI::GetCharacterProxy() const
+{
+	return GetGroupSharedInfo()->GetHoldingItemsComponent()->FindProxy_Character(CharacterID);
+}
+
+void AHumanCharacter_AI::OnRep_CharacterID()
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (PlayerCharacterPtr)
+		{
+			const auto bIsMember = PlayerCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(
+				CharacterID);
+			SetCampType(
+				bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+			);
+		}
+	}
+#endif
+}
+
+void AHumanCharacter_AI::InitialAllocationsRowName()
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -69,18 +103,16 @@ void AHumanCharacter_AI::InitialAllocations()
 			auto HoldingItemsComponentPtr = GetHoldingItemsComponent();
 			if (TableRowUnit_CharacterInfoPtr)
 			{
-				auto HICPtr = GetHoldingItemsComponent();
 				// 武器
 				{
-					auto EICPtr = GetProxyProcessComponent();
 					{
 						if (TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
 						{
-							auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(
+							auto WeaponProxyPtr = HoldingItemsComponentPtr->AddUnit_Weapon(
 								TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
 							if (WeaponProxyPtr)
 							{
-								FMySocket_FASI SkillsSocketInfo;
+								FCharacterSocket SkillsSocketInfo;
 								SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
 								SkillsSocketInfo.UpdateProxy(
 									HoldingItemsComponentPtr->AddUnit_Weapon(
@@ -90,19 +122,18 @@ void AHumanCharacter_AI::InitialAllocations()
 							}
 						}
 					}
-					EICPtr->ActiveWeapon();
+					GetProxyProcessComponent()->ActiveWeapon();
 				}
 
 				// 技能
 				{
-					auto EICPtr = GetProxyProcessComponent();
-
 					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
 					{
-						auto SkillUnitPtr = HICPtr->AddUnit_Skill(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1);
+						auto SkillUnitPtr = HoldingItemsComponentPtr->AddUnit_Skill(
+							TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1);
 						if (SkillUnitPtr)
 						{
-							FMySocket_FASI SkillsSocketInfo;
+							FCharacterSocket SkillsSocketInfo;
 
 							SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
 
@@ -110,10 +141,15 @@ void AHumanCharacter_AI::InitialAllocations()
 						}
 					}
 
-					EICPtr->UpdateCanbeActiveSkills();
+					GetProxyProcessComponent()->UpdateCanbeActiveSkills();
 				}
 			}
 		}
 	}
 #endif
+}
+
+void AHumanCharacter_AI::InitialAllocationsByProxy()
+{
+	GetProxyProcessComponent()->ActiveWeapon();
 }

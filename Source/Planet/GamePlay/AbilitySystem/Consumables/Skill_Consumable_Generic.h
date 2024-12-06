@@ -6,7 +6,7 @@
 
 #include "GameplayAbilitySpecHandle.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_Consumable_Base.h"
 #include "CharacterAttibutes.h"
 

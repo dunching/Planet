@@ -8,7 +8,7 @@
 
 #include "UIInterfaces.h"
 #include "GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "AllocationIconBase.h"
 
 #include "SkillsIcon.generated.h"

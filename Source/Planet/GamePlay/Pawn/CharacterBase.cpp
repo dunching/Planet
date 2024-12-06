@@ -167,7 +167,7 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
 		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GroupSharedInfoPtr;
-		
+
 		GetHoldingItemsComponent()->InitialOwnerCharacterProxy(this);
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
@@ -287,14 +287,14 @@ void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneO
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
+	return
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
 	return
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy()) ||
-		TargetCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(GetCharacterProxy());
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
 ACharacterBase* ACharacterBase::GetFocusActor() const
@@ -420,7 +420,6 @@ void ACharacterBase::OnCharacterGroupMateChanged(
 		break;
 	default:
 		{
-			
 		};
 	}
 }

@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 
 #include "InputProcessor.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "GenerateType.h"
 #include "CharacterBase.h"
 

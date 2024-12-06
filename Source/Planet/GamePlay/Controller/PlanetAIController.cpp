@@ -13,7 +13,7 @@
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "GroupMnaggerComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
@@ -59,6 +59,10 @@ UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() 
 AGroupSharedInfo* APlanetAIController::GetGroupSharedInfo() const
 {
 	return GetPawn<FPawnType>()->GetGroupSharedInfo();
+}
+
+void APlanetAIController::SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr)
+{
 }
 
 UHoldingItemsComponent* APlanetAIController::GetHoldingItemsComponent() const

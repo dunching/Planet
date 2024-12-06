@@ -8,7 +8,7 @@
 #include "Components/ActorComponent.h"
 
 #include "GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "CharacterAttibutes.h"
 
 #include "CharacterAttributesComponent.generated.h"

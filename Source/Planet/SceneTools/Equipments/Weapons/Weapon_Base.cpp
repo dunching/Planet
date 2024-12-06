@@ -1,9 +1,9 @@
-
 #include "Weapon_Base.h"
 
 #include "PropertyEntrys.h"
+#include "Net/UnrealNetwork.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
 #include "BaseFeatureComponent.h"
 #include "HumanCharacter.h"
@@ -15,12 +15,22 @@ void AWeapon_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
+void AWeapon_Base::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
 void AWeapon_Base::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 }
 
-void AWeapon_Base::SetWeaponUnit_Implementation(const FGuid& WeaponProxy_ID)
+void AWeapon_Base::SetWeaponProxyImp_Implementation(ACharacterBase* AllocationCharacterPtr)
+{
+	AttachToCharacter(AllocationCharacterPtr);
+}
+
+void AWeapon_Base::SetWeaponProxy(const FGuid& InWeaponProxy_ID)
 {
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
 
@@ -41,10 +51,21 @@ void AWeapon_Base::SetWeaponUnit_Implementation(const FGuid& WeaponProxy_ID)
 
 	if (HoldingItemsComponentPtr)
 	{
-		WeaponProxyPtr = HoldingItemsComponentPtr->FindUnit_Weapon(WeaponProxy_ID);
+		WeaponProxyPtr = HoldingItemsComponentPtr->FindUnit_Weapon(InWeaponProxy_ID);
 		if (WeaponProxyPtr)
 		{
-			AttachToCharacter(WeaponProxyPtr->GetAllocationCharacter());
+#if UE_EDITOR || UE_SERVER
+			if (GetNetMode() == NM_DedicatedServer)
+			{
+				auto AllocationCharacterPtr = WeaponProxyPtr->GetAllocationCharacter();
+				SetWeaponProxyImp(AllocationCharacterPtr);
+			}
+#endif
 		}
 	}
+}
+
+TSharedPtr<FWeaponProxy> AWeapon_Base::GetWeaponProxy() const
+{
+	return WeaponProxyPtr;
 }

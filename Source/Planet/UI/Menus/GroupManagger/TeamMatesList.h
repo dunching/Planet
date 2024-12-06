@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Common/GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "MenuInterface.h"
 
 #include "TeamMatesList.generated.h"

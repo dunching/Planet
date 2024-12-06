@@ -15,8 +15,8 @@
 
 struct FActiveSkillProxy;
 struct FWeaponSocket;
-struct FMySocket_FASI;
-struct FMySocket_FASI;
+struct FCharacterSocket;
+struct FCharacterSocket;
 class ACharacterBase;
 
 /*
@@ -30,7 +30,7 @@ class PLANET_API UProxyProcessComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	friend FMySocket_FASI;
+	friend FCharacterSocket;
 	friend ACharacterBase;
 
 	static FName ComponentName;
@@ -68,22 +68,23 @@ public:
 		const FGameplayTag& CanbeActivedInfoSPtr
 	);
 
-	TMap<FGameplayTag, FMySocket_FASI> GetAllSocket() const;
+	TMap<FGameplayTag, FCharacterSocket> GetAllSocket() const;
 
-	FMySocket_FASI FindSocket(const FGameplayTag& SocketTag) const;
+	FCharacterSocket FindSocket(const FGameplayTag& SocketTag) const;
 
 #pragma region Skills
+	// 通过配置更新技能
 	void UpdateCanbeActiveSkills();
 
 	void UpdateCanbeActiveSkills_UsePassiveSocket(
-		const TMap<FGameplayTag, FMySocket_FASI>& CanActiveSocketMap
+		const TMap<FGameplayTag, FCharacterSocket>& CanActiveSocketMap
 	);
 
-	TMap<FKey, FMySocket_FASI> GetCanbeActiveSkills() const;
+	TMap<FKey, FCharacterSocket> GetCanbeActiveSkills() const;
 
 	TSharedPtr<FActiveSkillProxy> FindActiveSkillBySocket(const FGameplayTag& SocketTag) const;
 
-	FMySocket_FASI FindActiveSkillByType(const FGameplayTag& TypeTag) const;
+	FCharacterSocket FindActiveSkillByType(const FGameplayTag& TypeTag) const;
 #pragma endregion
 
 #pragma region Weapon
@@ -98,8 +99,8 @@ public:
 	int32 GetCurrentWeaponAttackDistance() const;
 
 	void GetWeaponSocket(
-		FMySocket_FASI& FirstWeaponSocketInfoSPtr,
-		FMySocket_FASI& SecondWeaponSocketInfoSPtr
+		FCharacterSocket& FirstWeaponSocketInfoSPtr,
+		FCharacterSocket& SecondWeaponSocketInfoSPtr
 	);
 
 	void GetWeaponProxy(
@@ -113,13 +114,13 @@ public:
 
 	TSharedPtr<FWeaponProxy> GetActivedWeapon() const;
 
-	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& Tag) const;
+	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& SocketTag) const;
 
-	TMap<FKey, FMySocket_FASI> GetCanbeActiveWeapon() const;
+	TMap<FKey, FCharacterSocket> GetCanbeActiveWeapon() const;
 #pragma endregion
 
 #pragma region Consumables
-	TMap<FKey, FMySocket_FASI> GetCanbeActiveConsumable() const;
+	TMap<FKey, FCharacterSocket> GetCanbeActiveConsumable() const;
 #pragma endregion
 
 	FOnCurrentWeaponChanged OnCurrentWeaponChanged;
@@ -131,17 +132,19 @@ public:
 
 protected:
 	
-	void Add(const FMySocket_FASI& Socket);
+	void Add(const FCharacterSocket& Socket);
 
-	void Update(const FMySocket_FASI& Socket);
+	void Update(const FCharacterSocket& Socket);
 
-	bool Active(const FMySocket_FASI& Socket);
+	bool Active(const FCharacterSocket& Socket);
 
 	bool Active(const FGameplayTag& Socket);
 
-	void Cancel(const FMySocket_FASI& Socket);
+	void Cancel(const FCharacterSocket& Socket);
 
 	void Cancel(const FGameplayTag& Socket);
+
+	void SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket);
 
 	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
 
@@ -182,6 +185,6 @@ protected:
 	void OnRep_AllocationChanged();
 
 	UFUNCTION()
-	void OnRep_CurrentActivedSocketChanged(const FGameplayTag& NewWeaponSocket);
+	void OnRep_CurrentActivedSocketChanged(const FGameplayTag& OldWeaponSocket);
 #pragma endregion
 };

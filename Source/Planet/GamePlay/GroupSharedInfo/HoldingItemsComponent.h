@@ -7,14 +7,16 @@
 
 #include "GenerateType.h"
 #include "GroupSharedInterface.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "ItemProxy_Container.h"
 
 #include "HoldingItemsComponent.generated.h"
 
 struct FSceneUnitContainer;
 struct FProxy_FASI;
-struct FMySocket_FASI;
+struct FCharacterSocket;
+struct FSkillProxy;
+struct FWeaponProxy;
 class IPlanetControllerInterface;
 class ACharacterBase;
 
@@ -70,7 +72,7 @@ public:
 
 	TSharedPtr<FBasicProxy> FindProxy(const IDType& ID);
 
-	TSharedPtr<FBasicProxy> FindProxy_BySocket(const FMySocket_FASI& Socket);
+	TSharedPtr<FBasicProxy> FindProxy_BySocket(const FCharacterSocket& Socket);
 
 
 	TSharedPtr<FCharacterProxy> AddProxy_Character(const FGameplayTag& UnitType);
@@ -85,7 +87,7 @@ public:
 
 	TSharedPtr<FCharacterProxy> GetOwnerCharacterProxy() const;
 
-	void UpdateSocket(const TSharedPtr<FCharacterProxy>&CharacterProxySPtr, const FMySocket_FASI&Socket);
+	void UpdateSocket(const TSharedPtr<FCharacterProxy>&CharacterProxySPtr, const FCharacterSocket&Socket);
 
 	
 	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FGameplayTag& UnitType);
@@ -164,7 +166,7 @@ protected:
 private:
 	
 	UFUNCTION(Server, Reliable)
-	void UpdateSocket_Server(const FGuid&CharacterProxyID, const FMySocket_FASI&Socket);
+	void UpdateSocket_Server(const FGuid&CharacterProxyID, const FCharacterSocket&Socket);
 	
 	// 同步到服務器
 	UFUNCTION(Server, Reliable)

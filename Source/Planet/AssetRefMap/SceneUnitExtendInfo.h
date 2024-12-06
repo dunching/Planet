@@ -7,7 +7,7 @@
 
 #include "GameplayTagContainer.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "SceneUnitTable.h"
 #include "TalentInfo.h"
 

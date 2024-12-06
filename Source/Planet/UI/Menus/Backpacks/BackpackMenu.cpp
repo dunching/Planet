@@ -57,7 +57,7 @@ TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
 	TArray<TSharedPtr<FBasicProxy>> Result;
 	if (CurrentUnitPtr)
 	{
-		 Result = CurrentUnitPtr->GetProxyCharacter()->GetHoldingItemsComponent()->GetProxys();
+		 Result = CurrentUnitPtr->GetOwnerCharacter()->GetHoldingItemsComponent()->GetProxys();
 	}
 	return Result;
 }

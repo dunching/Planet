@@ -10,7 +10,7 @@
 #include "UIInterfaces.h"
 #include "Common/GenerateType.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "AllocationIconBase.generated.h"
 

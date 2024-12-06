@@ -30,8 +30,12 @@ struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 struct FBasicProxy;
 
+/*
+ * 角色的配置
+ * 比如角色的武器插槽，技能插槽分配
+ */ 
 USTRUCT()
-struct PLANET_API FMySocket_FASI 
+struct PLANET_API FCharacterSocket 
 {
 	GENERATED_USTRUCT_BODY()
 	
@@ -52,8 +56,8 @@ struct PLANET_API FMySocket_FASI
 };
 
 template<>
-struct TStructOpsTypeTraits<FMySocket_FASI> :
-	public TStructOpsTypeTraitsBase2<FMySocket_FASI>
+struct TStructOpsTypeTraits<FCharacterSocket> :
+	public TStructOpsTypeTraitsBase2<FCharacterSocket>
 {
 	enum
 	{
@@ -76,6 +80,8 @@ public:
 
 	FCharacterProxy(const IDType&ID);
 
+	void UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSPtr);
+
 	virtual void InitialUnit()override;
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
@@ -92,21 +98,21 @@ public:
 	void DestroyCharacter();
 
 	// 通过插槽
-	FMySocket_FASI FindSocket(const FGameplayTag&SocketID)const;
+	FCharacterSocket FindSocket(const FGameplayTag&SocketID)const;
 
 	// 通过指定代理类型，比如我们需要查询我们的插槽里面是否使用了“换技能”的代理
-	FMySocket_FASI FindSocketByType(const FGameplayTag&ProxyType)const;
+	FCharacterSocket FindSocketByType(const FGameplayTag&ProxyType)const;
 
 	void GetWeaponSocket(
-		FMySocket_FASI& FirstWeaponSocketInfoSPtr,
-		FMySocket_FASI& SecondWeaponSocketInfoSPtr
+		FCharacterSocket& FirstWeaponSocketInfoSPtr,
+		FCharacterSocket& SecondWeaponSocketInfoSPtr
 	);
 
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 
-	TMap<FGameplayTag, FMySocket_FASI>TeammateConfigureMap;
+	TMap<FGameplayTag, FCharacterSocket>TeammateConfigureMap;
 	
 	FString Title;
 
@@ -116,7 +122,7 @@ public:
 
 protected:
 
-	void UpdateSocket(const FMySocket_FASI&Socket);
+	void UpdateSocket(const FCharacterSocket&Socket);
 	
 };
 

@@ -38,7 +38,7 @@ void USkill_Active_Switch_Test::PerformAction(
 		{UGameplayTagsLibrary::ActiveSocket_4,UGameplayTagsLibrary::PassiveSocket_4 },
 	};
 
-	TMap<FGameplayTag, FMySocket_FASI>CanActiveSocketMap;
+	TMap<FGameplayTag, FCharacterSocket>CanActiveSocketMap;
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
 	auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
 	for (const auto& Iter : Ary)

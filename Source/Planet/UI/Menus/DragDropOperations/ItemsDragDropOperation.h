@@ -6,7 +6,7 @@
 
 #include "Blueprint/DragDropOperation.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HoldingItemsComponent.h"
 
 #include "ItemsDragDropOperation.generated.h"

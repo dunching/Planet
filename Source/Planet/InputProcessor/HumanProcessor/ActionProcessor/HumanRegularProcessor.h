@@ -7,7 +7,7 @@
 #include "CoreMinimal.h"
 #include "GameplayAbilitySpecHandle.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanProcessor.h"
 #include "ProxyProcessComponent.h"
 
@@ -83,7 +83,7 @@ namespace HumanProcessor
 
 		bool bIsPressdLeftAlt = false;
 
-		TMap<FKey, FMySocket_FASI>HandleKeysMap;
+		TMap<FKey, FCharacterSocket>HandleKeysMap;
 
 		ISceneObjInteractionInterface* LookAtSceneObjPtr = nullptr;
 

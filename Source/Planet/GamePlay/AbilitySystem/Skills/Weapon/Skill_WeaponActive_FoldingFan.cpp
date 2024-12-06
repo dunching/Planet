@@ -348,7 +348,7 @@ void USkill_WeaponActive_FoldingFan::EmitProjectile()
 		);
 		if (ActivedWeaponPtr)
 		{
-			ActivedWeaponPtr->SetWeaponUnit(WeaponPtr->WeaponProxyPtr->GetID());
+			ActivedWeaponPtr->SetWeaponProxy(WeaponPtr->GetWeaponProxy()->GetID());
 			ActivedWeaponPtr->GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnProjectileBounce);
 			ActivedWeaponPtr->BeginAttack();
 		}

@@ -8,7 +8,7 @@
 
 #include "Character/GravityCharacter.h"
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "SceneObjInteractionInterface.h"
 
@@ -104,7 +104,7 @@ public:
 
 	UCDCaculatorComponent* GetCDCaculatorComponent()const;
 
-	TSharedPtr<FCharacterProxy> GetCharacterProxy()const;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const;
 	
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();

@@ -18,7 +18,7 @@
 #include "CharacterBase.h"
 #include "GroupMnaggerComponent.h"
 #include "HumanAIController.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "PlanetControllerInterface.h"
 #include "NavgationSubSysetem.h"
 #include "FocusIcon.h"

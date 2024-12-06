@@ -145,8 +145,8 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
 	auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
 
-	FMySocket_FASI FirstWeaponSocketInfoSPtr;
-	FMySocket_FASI SecondWeaponSocketInfoSPtr;
+	FCharacterSocket FirstWeaponSocketInfoSPtr;
+	FCharacterSocket SecondWeaponSocketInfoSPtr;
 
 	TargetCharacterUnitPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 

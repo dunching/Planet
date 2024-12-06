@@ -21,7 +21,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
 #include "PlanetControllerInterface.h"
 #include "GroupMnaggerComponent.h"

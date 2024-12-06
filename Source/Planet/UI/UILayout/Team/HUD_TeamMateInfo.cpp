@@ -19,7 +19,7 @@
 #include "AssetRefMap.h"
 #include "ItemsDragDropOperation.h"
 #include "DragDropOperationWidget.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "PlanetControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
 #include "GameplayTagsLibrary.h"

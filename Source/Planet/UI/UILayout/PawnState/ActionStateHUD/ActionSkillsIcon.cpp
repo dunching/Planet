@@ -31,7 +31,7 @@
 #include "GameplayTagsLibrary.h"
 #include "Skill_Active_Base.h"
 #include "Skill_WeaponActive_Base.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "StateProcessorComponent.h"
 
 struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>

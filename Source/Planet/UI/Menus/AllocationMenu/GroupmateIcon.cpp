@@ -10,7 +10,7 @@
 
 #include "UICommon.h"
 #include "CharacterAttributesComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "CharacterAttibutes.h"
 #include "TemplateHelper.h"
 #include "CharacterBase.h"

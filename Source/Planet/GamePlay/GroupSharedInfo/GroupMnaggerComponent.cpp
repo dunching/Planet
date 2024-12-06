@@ -1,4 +1,3 @@
-
 #include "GroupMnaggerComponent.h"
 
 #include "Net/UnrealNetwork.h"
@@ -16,7 +15,7 @@
 #include "ItemProxy_Container.h"
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter_AI.h"
 #include "LogWriter.h"
 #include "ProxySycHelperComponent.h"
@@ -31,6 +30,12 @@ static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
 	TEXT("")
 	TEXT(" default: 0"));
 #endif
+
+UTeamMatesHelperComponent::UTeamMatesHelperComponent(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
+{
+	SetIsReplicatedByDefault(true);
+}
 
 void UTeamMatesHelperComponent::AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index)
 {
@@ -87,14 +92,14 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 	{
 		return;
 	}
-	
+
 	const auto PlayerCharacterLocation = PlayerCharacterPtr->GetActorLocation();
 	const auto PlayerCharacterRotation = PlayerCharacterPtr->GetActorRotation();
 
 	FTransform Transform;
-	
+
 	const auto OwnerPtr = GetOwner<FOwnerType>();
-	for (int32 Index = 0;Index < CharactersAry.Num(); Index++)
+	for (int32 Index = 0; Index < CharactersAry.Num(); Index++)
 	{
 		const auto CharacterProxySPtr =
 			GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(CharactersAry[Index]);
@@ -102,9 +107,10 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 		{
 			Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
 			auto AICharacterPtr = CharacterProxySPtr->SpwanCharacter(Transform);
-			if (AICharacterPtr )
+			if (AICharacterPtr)
 			{
-				AICharacterPtr ->SetGroupSharedInfo(OwnerPtr);
+				AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
+				AICharacterPtr->SetCharacterID(CharacterProxySPtr->GetID());
 			}
 		}
 	}
@@ -113,12 +119,6 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 void UTeamMatesHelperComponent::SpwanTeammateCharacter()
 {
 	SpwanTeammateCharacter_Server();
-}
-
-UTeamMatesHelperComponent::UTeamMatesHelperComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
-{
-	SetIsReplicatedByDefault(true);
 }
 
 void UTeamMatesHelperComponent::AddCharacter(FPawnType* PCPtr)
@@ -140,6 +140,19 @@ bool UTeamMatesHelperComponent::IsMember(const TSharedPtr<FCharacterUnitType>& C
 	for (auto Iter : MembersSet)
 	{
 		if (Iter == CharacterUnitPtr)
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool UTeamMatesHelperComponent::IsMember(const FGuid& CharacterID) const
+{
+	for (auto Iter : MembersSet)
+	{
+		if (Iter->GetID() == CharacterID)
 		{
 			return true;
 		}
@@ -172,7 +185,7 @@ void UTeamMatesHelperComponent::AddKnowCharacter(ACharacterBase* CharacterPtr)
 		}
 	}
 
-	KnowCharatersSet.Add({ CharacterPtr, 1 });
+	KnowCharatersSet.Add({CharacterPtr, 1});
 	KnowCharaterChanged(CharacterPtr, true);
 #ifdef WITH_EDITOR
 	if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())

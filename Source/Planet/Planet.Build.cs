@@ -113,6 +113,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Common");
         PublicIncludePaths.Add("Planet/DelayTask");
         PublicIncludePaths.Add("Planet/NetReplicateData");
+        PublicIncludePaths.Add("Planet/NetReplicateData/ItemProxys");
         PublicIncludePaths.Add("Planet/AssetRefMap");
         PublicIncludePaths.Add("Planet/GameOptions");
         PublicIncludePaths.Add("Planet/CameraTrailHelper");

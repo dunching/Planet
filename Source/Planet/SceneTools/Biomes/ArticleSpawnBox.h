@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 
 #include "Common/GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "ArticleSpawnBox.generated.h"
 

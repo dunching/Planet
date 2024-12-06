@@ -25,6 +25,8 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 
 	void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr);
+
+	void SetCharacterID(const FGuid& InCharacterID);
 	
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -39,9 +41,23 @@ public:
 
 protected:
 
-	void InitialAllocations();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void OnRep_GroupSharedInfoChanged()override;
+
+	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
+	
+	UFUNCTION()
+	void OnRep_CharacterID();
+	
+	void InitialAllocationsRowName();
+
+	void InitialAllocationsByProxy();
 
 	UPROPERTY()
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
 
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterID)
+	FGuid CharacterID;
+	
 };

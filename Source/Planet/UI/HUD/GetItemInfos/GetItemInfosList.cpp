@@ -2,7 +2,7 @@
 
 #include <Components/VerticalBox.h>
 
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "GetItemInfosItem.h"
 #include "TemplateHelper.h"
 #include "ItemProxy_Character.h"

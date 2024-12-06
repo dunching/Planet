@@ -9,7 +9,7 @@
 #include "UObject/Interface.h"
 
 #include "GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "MenuInterface.generated.h"
 

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Base.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_Active_Base.h"
 
 #include "Skill_Consumable_Base.generated.h"

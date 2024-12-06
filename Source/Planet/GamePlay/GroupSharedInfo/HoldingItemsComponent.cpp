@@ -60,7 +60,7 @@ void UHoldingItemsComponent::OnRep_GetCharacterProxyID()
 
 void UHoldingItemsComponent::UpdateSocket_Server_Implementation(
 	const FGuid& CharacterProxyID,
-	const FMySocket_FASI& Socket
+	const FCharacterSocket& Socket
 )
 {
 	UpdateSocket(FindProxy_Character(CharacterProxyID), Socket);
@@ -547,7 +547,7 @@ TSharedPtr<FCharacterProxy> UHoldingItemsComponent::GetOwnerCharacterProxy() con
 
 void UHoldingItemsComponent::UpdateSocket(
 	const TSharedPtr<FCharacterProxy>& InCharacterProxySPtr,
-	const FMySocket_FASI& Socket
+	const FCharacterSocket& Socket
 )
 {
 #if UE_EDITOR || UE_SERVER
@@ -625,7 +625,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::FindProxy(const IDType& ID)
 	return nullptr;
 }
 
-TSharedPtr<FBasicProxy> UHoldingItemsComponent::FindProxy_BySocket(const FMySocket_FASI& Socket)
+TSharedPtr<FBasicProxy> UHoldingItemsComponent::FindProxy_BySocket(const FCharacterSocket& Socket)
 {
 	if (SceneMetaMap.Contains(Socket.SkillProxyID))
 	{

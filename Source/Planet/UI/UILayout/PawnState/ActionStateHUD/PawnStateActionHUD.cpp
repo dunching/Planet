@@ -357,8 +357,8 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		return;
 	}
 
-	FMySocket_FASI FirstWeaponSocketInfoSPtr;
-	FMySocket_FASI SecondWeaponSocketInfoSPtr;
+	FCharacterSocket FirstWeaponSocketInfoSPtr;
+	FCharacterSocket SecondWeaponSocketInfoSPtr;
 
 	const auto CurrentWeaponSocket = CharacterPtr->GetProxyProcessComponent()->CurrentWeaponSocket;
 

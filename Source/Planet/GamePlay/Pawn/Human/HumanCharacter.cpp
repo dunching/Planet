@@ -42,7 +42,7 @@
 #include "HumanAIController.h"
 #include "CharacterTitle.h"
 #include "GroupMnaggerComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "GetItemInfosList.h"
 
 #include "ItemProxy_Container.h"

@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 
 #include "MyUserWidget.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HoldingItemsComponent.h"
 #include "ProxyProcessComponent.h"
 

@@ -14,7 +14,7 @@
 #include "AllocationSkills.h"
 #include "ProxyProcessComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 
 void USkill_Active_FoldingFan_AddNum::PerformAction(

@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 
 #include "Common/GenerateType.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include <MenuInterface.h>
 
 #include "BackpackMenu.generated.h"

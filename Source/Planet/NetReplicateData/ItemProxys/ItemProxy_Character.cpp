@@ -11,7 +11,7 @@
 #include "CharactersInfo.h"
 #include "HoldingItemsComponent.h"
 
-bool FMySocket_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FCharacterSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	if (Ar.IsSaving())
 	{
@@ -27,7 +27,7 @@ bool FMySocket_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bO
 	return true;
 }
 
-void FMySocket_FASI::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
+void FCharacterSocket::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
 {
 	if (ProxySPtr)
 	{
@@ -35,17 +35,17 @@ void FMySocket_FASI::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
 	}
 }
 
-bool FMySocket_FASI::operator()() const
+bool FCharacterSocket::operator()() const
 {
 	return SkillProxyID.IsValid();
 }
 
-bool FMySocket_FASI::IsValid() const
+bool FCharacterSocket::IsValid() const
 {
 	return SkillProxyID.IsValid();
 }
 
-void FMySocket_FASI::ResetSocket()
+void FCharacterSocket::ResetSocket()
 {
 	SkillProxyID = FGuid();
 }
@@ -59,6 +59,13 @@ FCharacterProxy::FCharacterProxy(const IDType& InID):
 	FCharacterProxy()
 {
 	ID = InID;
+}
+
+void FCharacterProxy::UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSPtr)
+{
+	Super::UpdateByRemote(RemoteSPtr);
+
+	ProxyCharacterPtr = RemoteSPtr->ProxyCharacterPtr;
 }
 
 bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
@@ -88,7 +95,7 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 		Ar << Num;
 		for (int32 Index = 0; Index < Num; Index++)
 		{
-			FMySocket_FASI MySocket_FASI;
+			FCharacterSocket MySocket_FASI;
 			MySocket_FASI.NetSerialize(Ar, Map, bOutSuccess);
 
 			TeammateConfigureMap.Add(MySocket_FASI.Socket, MySocket_FASI);
@@ -133,7 +140,7 @@ void FCharacterProxy::InitialUnit()
 
 	for (const auto& Iter : Ary)
 	{
-		FMySocket_FASI MySocket_FASI;
+		FCharacterSocket MySocket_FASI;
 
 		MySocket_FASI.Socket = Iter.SocketTag;
 
@@ -183,6 +190,8 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 				GetDT_CharacterType()->CharacterClass, Transform, SpawnParameters);
 
 		ProxyCharacterPtr = Result;
+
+		Update2Client();
 	}
 	return Result;
 }
@@ -197,17 +206,17 @@ void FCharacterProxy::DestroyCharacter()
 	ProxyCharacterPtr = nullptr;
 }
 
-FMySocket_FASI FCharacterProxy::FindSocket(const FGameplayTag& SocketID) const
+FCharacterSocket FCharacterProxy::FindSocket(const FGameplayTag& SocketID) const
 {
 	if (TeammateConfigureMap.Contains(SocketID))
 	{
 		return TeammateConfigureMap[SocketID];
 	}
 
-	return FMySocket_FASI();
+	return FCharacterSocket();
 }
 
-FMySocket_FASI FCharacterProxy::FindSocketByType(const FGameplayTag& ProxyType) const
+FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& ProxyType) const
 {
 	if (ProxyCharacterPtr.IsValid())
 	{
@@ -221,17 +230,17 @@ FMySocket_FASI FCharacterProxy::FindSocketByType(const FGameplayTag& ProxyType) 
 		}
 	}
 
-	return FMySocket_FASI();
+	return FCharacterSocket();
 }
 
-void FCharacterProxy::GetWeaponSocket(FMySocket_FASI& FirstWeaponSocketInfoSPtr,
-	FMySocket_FASI& SecondWeaponSocketInfoSPtr)
+void FCharacterProxy::GetWeaponSocket(FCharacterSocket& FirstWeaponSocketInfoSPtr,
+	FCharacterSocket& SecondWeaponSocketInfoSPtr)
 {
 	FirstWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	SecondWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
 }
 
-void FCharacterProxy::UpdateSocket(const FMySocket_FASI& Socket)
+void FCharacterProxy::UpdateSocket(const FCharacterSocket& Socket)
 {
 	if (TeammateConfigureMap.Contains(Socket.Socket))
 	{

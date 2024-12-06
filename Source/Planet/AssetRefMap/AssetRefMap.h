@@ -6,7 +6,7 @@
 #include <GenerateType.h>
 
 #include "GameplayTagContainer.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 #include "AssetRefMap.generated.h"
 

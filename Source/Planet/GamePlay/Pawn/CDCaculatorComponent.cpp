@@ -15,7 +15,7 @@
 #include "ItemProxy_Container.h"
 #include "GameOptions.h"
 #include "SceneUnitTable.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "Planet.h"
 #include "LogWriter.h"
 

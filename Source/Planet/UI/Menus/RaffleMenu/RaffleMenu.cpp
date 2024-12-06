@@ -12,7 +12,7 @@
 #include "CharacterBase.h"
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "CoinList.h"
 #include "RaffleType.h"
 #include "RaffleBtn.h"

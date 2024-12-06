@@ -8,7 +8,7 @@
 #include "CoreMinimal.h"
 
 #include "HumanProcessor.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 
 class AHumanCharacter;
 class ABuildingBase;

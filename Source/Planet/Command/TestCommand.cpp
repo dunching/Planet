@@ -18,7 +18,7 @@
 #include "Planet.h"
 #include "HumanCharacter.h"
 #include "SPlineActor.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_Base.h"
 #include "Talent_FASI.h"
 #include "TalentAllocationComponent.h"

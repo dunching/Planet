@@ -1,24 +1,20 @@
 
 #include "HumanAIController.h"
 
-#include <GameFramework/CharacterMovementComponent.h>
 #include "Components/StateTreeComponent.h"
 #include "Components/StateTreeAIComponent.h"
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Perception/AISenseConfig_Sight.h>
-#include <Components/SplineComponent.h>
+#include "Net/UnrealNetwork.h"
 
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
-#include "AssetRefMap.h"
-#include "Planet.h"
 #include "GroupMnaggerComponent.h"
-#include "ItemProxy.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"
-#include "TestCommand.h"
 #include "GameplayTagsLibrary.h"
 #include "BuildingArea.h"
 #include "GeneratorNPCs_Patrol.h"
@@ -88,6 +84,10 @@ bool AHumanAIController::CheckIsFarawayOriginal() const
 	}
 
 	return false;
+}
+
+void AHumanAIController::OnRep_GroupSharedInfoChanged()
+{
 }
 
 void AHumanAIController::OnTeammateOptionChangedImp(
@@ -162,6 +162,13 @@ void AHumanAIController::OnUnPossess()
 	}
 
 	Super::OnUnPossess();
+}
+
+void AHumanAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
 }
 
 void AHumanAIController::OnGroupChanged()
