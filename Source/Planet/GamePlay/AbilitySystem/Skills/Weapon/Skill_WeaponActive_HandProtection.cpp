@@ -257,17 +257,17 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{
-// 			if (Iter.Value->SkillUnitPtr)
+// 			if (Iter.Value->SkillProxyPtr)
 // 			{
-// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
+// 				if (Iter.Value->SkillProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 // 				{
-// 					auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillUnitPtr);
-// 					if (!ActiveSkillUnitPtr)
+// 					auto ActiveSkillProxyPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillProxyPtr);
+// 					if (!ActiveSkillProxyPtr)
 // 					{
 // 						continue;
 // 					}
 // 
-// 					ActiveSkillUnitPtr->AddCooldownConsumeTime(1.f);
+// 					ActiveSkillProxyPtr->AddCooldownConsumeTime(1.f);
 // 				}
 // 			}
 		}

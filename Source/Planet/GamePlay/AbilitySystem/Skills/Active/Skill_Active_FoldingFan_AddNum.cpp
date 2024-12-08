@@ -30,7 +30,7 @@ void USkill_Active_FoldingFan_AddNum::PerformAction(
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
-			UGameplayTagsLibrary::Unit_Skill_Weapon_FoldingFan
+			UGameplayTagsLibrary::Proxy_Skill_Weapon_FoldingFan
 		);
 
 		if (TargetSkillSPtr)

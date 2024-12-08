@@ -14,7 +14,7 @@
 #include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
 #include "BaseFeatureComponent.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "TalentInfo.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
@@ -150,7 +150,7 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 			{
 			case EPointPropertyType::kLiDao:
 			{
-				auto PAD_Talent_PropertyPtr = USceneUnitExtendInfoMap::GetInstance()->GetTalent_Property(PointPropertyType);
+				auto PAD_Talent_PropertyPtr = USceneProxyExtendInfoMap::GetInstance()->GetTalent_Property(PointPropertyType);
 
 				if (TalentHelper_Iter->Level > 0)
 				{

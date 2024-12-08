@@ -10,7 +10,7 @@
 #include "CharacterAttributesComponent.h"
 #include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
@@ -37,6 +37,10 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 FSkillProxy::FSkillProxy() :
 	Super()
@@ -54,14 +58,14 @@ bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 	return true;
 }
 
-void FSkillProxy::SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& InAllocationCharacterUnitPtr)
+void FSkillProxy::SetAllocationCharacterProxy(const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
 {
-	if (!InAllocationCharacterUnitPtr)
+	if (!InAllocationCharacterProxyPtr)
 	{
 		UnAllocation();
 	}
 
-	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
 void FSkillProxy::UpdateByRemote(const TSharedPtr<FSkillProxy>& RemoteSPtr)
@@ -220,7 +224,7 @@ bool FActiveSkillProxy::Active()
 
 		// 需要特殊参数的
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active_Control)
+			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active_Control)
 			)
 		{
 			if (InGAInsPtr->IsActive())
@@ -242,7 +246,7 @@ bool FActiveSkillProxy::Active()
 				return ASCPtr->TriggerAbilityFromGameplayEvent(
 					InGAInsPtr->GetCurrentAbilitySpecHandle(),
 					ASCPtr->AbilityActorInfo.Get(),
-					GetUnitType(),
+					GetProxyType(),
 					&Payload,
 					*ASCPtr
 				);
@@ -269,7 +273,7 @@ bool FActiveSkillProxy::Active()
 				return ASCPtr->TriggerAbilityFromGameplayEvent(
 					InGAInsPtr->GetCurrentAbilitySpecHandle(),
 					ASCPtr->AbilityActorInfo.Get(),
-					GetUnitType(),
+					GetProxyType(),
 					&Payload,
 					*ASCPtr
 				);
@@ -332,27 +336,27 @@ void FActiveSkillProxy::OffsetCooldownTime()
 {
 }
 
-FTableRowUnit_ActiveSkillExtendInfo* FActiveSkillProxy::GetTableRowUnit_ActiveSkillExtendInfo() const
+FTableRowProxy_ActiveSkillExtendInfo* FActiveSkillProxy::GetTableRowProxy_ActiveSkillExtendInfo() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_ActiveSkillExtendInfo.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_ActiveSkillExtendInfo.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_ActiveSkillExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_ActiveSkillExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
 TSubclassOf<USkill_Base> FActiveSkillProxy::GetSkillClass() const
 {
-	return GetTableRowUnit_ActiveSkillExtendInfo()->SkillClass;
+	return GetTableRowProxy_ActiveSkillExtendInfo()->SkillClass;
 }
 
 FPassiveSkillProxy::FPassiveSkillProxy()
 {
 }
 
-void FPassiveSkillProxy::InitialUnit()
+void FPassiveSkillProxy::InitialProxy(const FGameplayTag& InProxyType)
 {
-	Super::InitialUnit();
+	Super::InitialProxy(InProxyType);
 }
 
 void FPassiveSkillProxy::Allocation()
@@ -377,7 +381,7 @@ void FPassiveSkillProxy::Allocation()
 				}
 
 				AllocationCharacter->GetBaseFeatureComponent()->SendEvent2Self(
-					ModifyPropertyMap, GetUnitType()
+					ModifyPropertyMap, GetProxyType()
 				);
 			}
 		}
@@ -393,7 +397,7 @@ void FPassiveSkillProxy::UnAllocation()
 	{
 		auto AllocationCharacter = GetAllocationCharacter();
 		AllocationCharacter->GetBaseFeatureComponent()->ClearData2Self(
-			GetAllData(), GetUnitType()
+			GetAllData(), GetProxyType()
 		);
 	}
 #endif
@@ -401,40 +405,40 @@ void FPassiveSkillProxy::UnAllocation()
 	Super::UnAllocation();
 }
 
-FTableRowUnit_PassiveSkillExtendInfo* FPassiveSkillProxy::GetTableRowUnit_PassiveSkillExtendInfo() const
+FTableRowProxy_PassiveSkillExtendInfo* FPassiveSkillProxy::GetTableRowProxy_PassiveSkillExtendInfo() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_PassiveSkillExtendInfo.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_PassiveSkillExtendInfo.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PassiveSkillExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PassiveSkillExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
-FTableRowUnit_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
+FTableRowProxy_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
 	// 
-	TArray<FTableRowUnit_PropertyEntrys*>ResultAry;
-	DataTable->GetAllRows(TEXT("GetUnit"), ResultAry);
+	TArray<FTableRowProxy_PropertyEntrys*>ResultAry;
+	DataTable->GetAllRows(TEXT("GetProxy"), ResultAry);
 	if (!ResultAry.IsEmpty())
 	{
 		return ResultAry[FMath::RandRange(0, ResultAry.Num() - 1)];
 	}
 
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PropertyEntrys>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(*ProxyType.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
 TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 {
-	return GetTableRowUnit_PassiveSkillExtendInfo()->SkillClass;
+	return GetTableRowProxy_PassiveSkillExtendInfo()->SkillClass;
 }
 
-void FWeaponSkillProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
+void FWeaponSkillProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
 {
-	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
 bool FWeaponSkillProxy::Active()
@@ -457,7 +461,7 @@ bool FWeaponSkillProxy::Active()
 
 		FGameplayEventData Payload;
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon) 
+			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon) 
 			)
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
@@ -471,7 +475,7 @@ bool FWeaponSkillProxy::Active()
 		return ASCPtr->TriggerAbilityFromGameplayEvent(
 			InGaInsPtr->GetCurrentAbilitySpecHandle(),
 			ASCPtr->AbilityActorInfo.Get(),
-			GetUnitType(),
+			GetProxyType(),
 			&Payload,
 			*ASCPtr
 		);
@@ -516,18 +520,18 @@ bool FWeaponSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool&
 	return true;
 }
 
-FTableRowUnit_WeaponSkillExtendInfo* FWeaponSkillProxy::GetTableRowUnit_WeaponSkillExtendInfo() const
+FTableRowProxy_WeaponSkillExtendInfo* FWeaponSkillProxy::GetTableRowProxy_WeaponSkillExtendInfo() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponSkillExtendInfo.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_WeaponSkillExtendInfo.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_WeaponSkillExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_WeaponSkillExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
 TSubclassOf<USkill_Base> FWeaponSkillProxy::GetSkillClass() const
 {
-	return GetTableRowUnit_WeaponSkillExtendInfo()->SkillClass;
+	return GetTableRowProxy_WeaponSkillExtendInfo()->SkillClass;
 }
 
 void FWeaponSkillProxy::RegisterSkill()
@@ -539,13 +543,13 @@ void FWeaponSkillProxy::RegisterSkill()
 		FGameplayAbilityTargetData_SkillBase_RegisterParam* GameplayAbilityTargetDataPtr = nullptr;
 		// 需要特殊参数的
 		if (
-			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon_Bow)
+			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon_Bow)
 			)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Bow_RegisterParam;
 		}
 		else if (
-			GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon_FoldingFan)
+			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon_FoldingFan)
 			)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_FoldingFan_RegisterParam;

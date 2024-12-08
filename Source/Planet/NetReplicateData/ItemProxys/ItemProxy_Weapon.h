@@ -10,47 +10,49 @@
 #include "GameplayAbilitySpecHandle.h"
 
 #include "ItemProxy.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 #include "ItemProxy_Weapon.generated.h"
 
 struct FGameplayAbilityTargetData_RegisterParam;
-struct FTableRowUnit_CommonCooldownInfo;
-struct FTableRowUnit;
-struct FTableRowUnit_WeaponExtendInfo;
-struct FTableRowUnit_ActiveSkillExtendInfo;
-struct FTableRowUnit_PassiveSkillExtendInfo;
-struct FTableRowUnit_WeaponSkillExtendInfo;
-struct FTableRowUnit_CharacterGrowthAttribute;
-struct FTableRowUnit_Consumable;
-struct FTableRowUnit_PropertyEntrys;
-struct FTableRowUnit_CharacterType;
+struct FTableRowProxy_CommonCooldownInfo;
+struct FTableRowProxy;
+struct FTableRowProxy_WeaponExtendInfo;
+struct FTableRowProxy_ActiveSkillExtendInfo;
+struct FTableRowProxy_PassiveSkillExtendInfo;
+struct FTableRowProxy_WeaponSkillExtendInfo;
+struct FTableRowProxy_CharacterGrowthAttribute;
+struct FTableRowProxy_Consumable;
+struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_CharacterType;
 struct FCharacterProxy;
 struct FWeaponSkillProxy;
 
 struct FAllocationSkills;
 struct FCharacterAttributes;
 struct FTalentHelper;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
 enum struct ECharacterPropertyType : uint8;
 
 USTRUCT()
-struct PLANET_API FWeaponProxy : public FBasicProxy
+struct PLANET_API FWeaponProxy : public FAllocationbleProxy
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	friend FSceneUnitContainer;
+	friend FSceneProxyContainer;
 	friend UHoldingItemsComponent;
 
 	FWeaponProxy();
 
 	void UpdateByRemote(const TSharedPtr<FWeaponProxy>& RemoteSPtr);
 
-	virtual void InitialUnit()override;
+	virtual void InitialProxy(const FGameplayTag& ProxyType)override;
 
 	virtual bool Active()override;
 
@@ -62,11 +64,11 @@ public:
 	// 从插槽移除
 	virtual void UnAllocation()override;
 
-	virtual void SetAllocationCharacterUnit(const TSharedPtr<FCharacterProxy>& InAllocationCharacterUnitPtr)override;
+	virtual void SetAllocationCharacterProxy(const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)override;
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	FTableRowUnit_WeaponExtendInfo* GetTableRowUnit_WeaponExtendInfo()const;
+	FTableRowProxy_WeaponExtendInfo* GetTableRowProxy_WeaponExtendInfo()const;
 
 	// 切换至当前武器
 	void ActiveWeapon();
@@ -75,7 +77,7 @@ public:
 	void RetractputWeapon();
 
 	// 主词条
-	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
+	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry()const;
 
 	int32 GetMaxAttackDistance()const;
 

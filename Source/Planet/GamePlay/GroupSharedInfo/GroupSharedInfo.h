@@ -24,7 +24,7 @@ class UPlanetAbilitySystemComponent;
 class UProxySycHelperComponent;
 class UTeamMatesHelperComponent;
 class UHoldingItemsComponent;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 
 /*
  *	对局内每个组群共享的资源

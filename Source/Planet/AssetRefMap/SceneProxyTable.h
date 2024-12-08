@@ -10,7 +10,7 @@
 #include "ItemProxy_Minimal.h"
 #include "CharacterAttibutes.h"
 
-#include "SceneUnitTable.generated.h"
+#include "SceneProxyTable.generated.h"
 
 class UDataTable;
 
@@ -24,7 +24,7 @@ class AWeapon_Base;
 class AConsumable_Base;
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_CommonCooldownInfo : public FTableRowBase
+struct PLANET_API FTableRowProxy_CommonCooldownInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
@@ -34,7 +34,7 @@ struct PLANET_API FTableRowUnit_CommonCooldownInfo : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit : public FTableRowBase
+struct PLANET_API FTableRowProxy : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -45,7 +45,7 @@ struct PLANET_API FTableRowUnit : public FTableRowBase
 	TSoftObjectPtr<UTexture2D> DefaultIcon;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FString UnitName = TEXT("UnitName");
+	FString ProxyName = TEXT("ProxyName");
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<UTexture2D> RaffleIcon;
@@ -56,7 +56,7 @@ struct PLANET_API FTableRowUnit : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
+struct PLANET_API FTableRowProxy_WeaponExtendInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -64,7 +64,7 @@ struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
 	TSubclassOf<AWeapon_Base> ToolActorClass;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag WeaponSkillUnitType = FGameplayTag::EmptyTag;
+	FGameplayTag WeaponSkillProxyType = FGameplayTag::EmptyTag;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	EAnimLinkClassType AnimLinkClassType = EAnimLinkClassType::kUnarmed;
@@ -80,7 +80,7 @@ struct PLANET_API FTableRowUnit_WeaponExtendInfo : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_SkillExtendInfo : public FTableRowBase
+struct PLANET_API FTableRowProxy_SkillExtendInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
@@ -90,12 +90,12 @@ struct PLANET_API FTableRowUnit_SkillExtendInfo : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
+struct PLANET_API FTableRowProxy_ActiveSkillExtendInfo : public FTableRowProxy_SkillExtendInfo
 {
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag RequireWeaponUnitType = FGameplayTag::EmptyTag;
+	FGameplayTag RequireWeaponProxyType = FGameplayTag::EmptyTag;
 
 	// 技能公共CD
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
@@ -108,21 +108,21 @@ struct PLANET_API FTableRowUnit_ActiveSkillExtendInfo : public FTableRowUnit_Ski
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_PassiveSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
+struct PLANET_API FTableRowProxy_PassiveSkillExtendInfo : public FTableRowProxy_SkillExtendInfo
 {
 	GENERATED_USTRUCT_BODY()
 	
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_WeaponSkillExtendInfo : public FTableRowUnit_SkillExtendInfo
+struct PLANET_API FTableRowProxy_WeaponSkillExtendInfo : public FTableRowProxy_SkillExtendInfo
 {
 	GENERATED_USTRUCT_BODY()
 	
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_Consumable : public FTableRowBase
+struct PLANET_API FTableRowProxy_Consumable : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	

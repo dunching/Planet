@@ -33,10 +33,10 @@ void UGroupmateIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UGroupmateIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
+void UGroupmateIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
 {
-	UnitPtr = nullptr;
-	UnitPtr = DynamicCastSharedPtr<FCharacterProxy>(InBasicUnitPtr);
+	ProxyPtr = nullptr;
+	ProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(InBasicProxyPtr);
 
 	SetItemType();
 	SetName();
@@ -74,14 +74,14 @@ void UGroupmateIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FGroupmateIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		if (UnitPtr)
+		if (ProxyPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
-					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
+					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
 				}));
 		}
 		else
@@ -96,12 +96,12 @@ void UGroupmateIcon::SetName()
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGroupmateIcon::Get().Text));
 	if (UIPtr)
 	{
-		UIPtr->SetText(FText::FromString(UnitPtr->Name));
+		UIPtr->SetText(FText::FromString(ProxyPtr->Name));
 	}
 }
 
 void UGroupmateIcon::OnBtnCliked()
 {
 	SwitchSelectState(true);
-	OnSelected.ExcuteCallback(UnitPtr);
+	OnSelected.ExcuteCallback(ProxyPtr);
 }

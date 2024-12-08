@@ -54,10 +54,10 @@ class PLANET_API ACharacterBase :
 
 public:
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
 	using FTeamMembersChangedDelegateHandle = 
-		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterProxyType>&)>::FCallbackHandleSPtr;
 
 	using FValueChangedDelegateHandle =
 		TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
@@ -159,7 +159,7 @@ protected:
 	
 	void OnCharacterGroupMateChanged(
 		EGroupMateChangeType GroupMateChangeType,
-		const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
+		const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
 	);
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")

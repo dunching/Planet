@@ -206,115 +206,115 @@ FGameplayTag UGameplayTagsLibrary::TalentSocket =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.Talent")));
 #pragma endregion
 
-#pragma region UnitTyp
-FGameplayTag UGameplayTagsLibrary::Unit_Weapon =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Weapon")));
+#pragma region ProxyTyp
+FGameplayTag UGameplayTagsLibrary::Proxy_Weapon =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Weapon")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Weapon_Axe =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Weapon.Axe")));
-FGameplayTag UGameplayTagsLibrary::Unit_Tool =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Tool")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Weapon_Axe =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Weapon.Axe")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Tool =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Tool")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Tool_Axe =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Tool.Axe")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Tool_Axe =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Tool.Axe")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Consumables =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Consumables")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Consumables =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Consumables")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Consumables_HP =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Consumables.HP")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Consumables_HP =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Consumables.HP")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Consumables_PP =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Consumables.PP")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Consumables_PP =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Consumables.PP")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Coin =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Coin =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Coin")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Coin_Regular =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin.Regular")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Coin_Regular =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Coin.Regular")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Coin_RafflePermanent =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin.RafflePermanent")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Coin_RafflePermanent =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Coin.RafflePermanent")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Coin_RaffleLimit =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Coin.RaffleLimit")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Coin_RaffleLimit =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Coin.RaffleLimit")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Weapon =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Weapon =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Weapon")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Weapon_Axe =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.Axe")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Weapon_Axe =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Weapon.Axe")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Weapon_HandProtection =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.HandProtection")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Weapon_HandProtection =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Weapon.HandProtection")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Weapon_RangeTest =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.RangeTest")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Weapon_RangeTest =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Weapon.RangeTest")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Weapon_Bow =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.Bow")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Weapon_Bow =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Weapon.Bow")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Weapon_FoldingFan =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Weapon.FoldingFan")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Weapon_FoldingFan =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Weapon.FoldingFan")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_Switch =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Switch")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_Switch =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.Switch")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_Switch_Test =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Switch.Test")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_Switch_Test =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.Switch.Test")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_Control =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Control")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_Control =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.Control")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_Displacement =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Displacement")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_Displacement =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.Displacement")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_GroupTherapy =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.GroupTherapy")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_GroupTherapy =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.GroupTherapy")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_ContinuousGroupTherapy =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.ContinuousGroupTherapy")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_ContinuousGroupTherapy =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.ContinuousGroupTherapy")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_Tornado =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Tornado")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_Tornado =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.Tornado")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_FlyAway =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.FlyAway")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_FlyAway =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.FlyAway")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_Stun =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Stun")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_Stun =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.Stun")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Active_Charm =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Active.Charm")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Active_Charm =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Active.Charm")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Passve =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Passve")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Passve =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Passve")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Passve_ZMJZ =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Passve.ZMJZ")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Passve_ZMJZ =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Passve.ZMJZ")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Talent =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent")));
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Talent_NuQi =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent.NuQi")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Talent =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Talent")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Talent.NuQi")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Skill_Talent_YinYang =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Skill.Talent.YinYang")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Skill.Talent.YinYang")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Character =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Character")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Character =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Character_Player =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Character.Player")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Character_Player =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.Player")));
 
-FGameplayTag UGameplayTagsLibrary::Unit_Character_TestNPC_1 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Unit.Character.TestNPC.1")));
+FGameplayTag UGameplayTagsLibrary::Proxy_Character_TestNPC_1 =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.TestNPC.1")));
 
 #pragma endregion
 

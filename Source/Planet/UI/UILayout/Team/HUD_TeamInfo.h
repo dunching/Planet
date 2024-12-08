@@ -23,10 +23,10 @@ class PLANET_API UHUD_TeamInfo :
 
 public:
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
 	using FTeammateOptionChangedDelegate =
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterProxyType>&)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -45,7 +45,7 @@ private:
 
 	void OnTeammateOptionChanged(
 		ETeammateOption TeammateOption, 
-		const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
+		const TSharedPtr<FCharacterProxyType>& LeaderPCPtr
 	);
 
 	FTeammateOptionChangedDelegate TeammateOptionChangedDelegateContainer;

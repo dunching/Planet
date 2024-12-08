@@ -48,7 +48,7 @@ public:
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
 
-	virtual TSharedPtr<FCharacterProxy> GetCharacterUnit() override;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;
 	
@@ -70,11 +70,11 @@ protected:
 
 	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn)override;
 
-	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)override;
+	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)override;
 
 	virtual void BindPCWithCharacter()override;
 
-	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase* CharaterPtr)override;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase* CharaterPtr)override;
 	
 	UFUNCTION()
 	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);

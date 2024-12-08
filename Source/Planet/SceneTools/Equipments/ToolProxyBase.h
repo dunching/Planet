@@ -10,7 +10,7 @@
 #include "SceneObj.h"
 #include "Common/GenerateType.h"
 
-#include "ToolUnitBase.generated.h"
+#include "ToolProxyBase.generated.h"
 
 class UNiagaraComponent;
 
@@ -23,7 +23,7 @@ class USkill_Base;
 static FName RootComponentName;
 
 UCLASS()
-class PLANET_API AToolUnitBase : public ASceneObj
+class PLANET_API AToolProxyBase : public ASceneObj
 {
 	GENERATED_BODY()
 
@@ -31,7 +31,7 @@ public:
 
 	using FOwnerPawnType = ACharacterBase;
 
-	AToolUnitBase(const FObjectInitializer& ObjectInitializer);
+	AToolProxyBase(const FObjectInitializer& ObjectInitializer);
 
 protected:
 

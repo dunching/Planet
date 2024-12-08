@@ -10,7 +10,7 @@
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
-#include "SceneUnitTable.h"
+#include "SceneProxyTable.h"
 #include "GameplayTagsLibrary.h"
 
 UScriptStruct* FGameplayAbilityTargetData_ActiveSkill_ActiveParam::GetScriptStruct() const
@@ -50,9 +50,9 @@ void USkill_Active_Base::OnAvatarSet(
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	if (SkillUnitPtr)
+	if (SkillProxyPtr)
 	{
-		DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->OffsetCooldownTime();
+		DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->OffsetCooldownTime();
 	}
 }
 
@@ -95,7 +95,7 @@ bool USkill_Active_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr)->ApplyCooldown();
+	DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->ApplyCooldown();
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
@@ -108,17 +108,17 @@ bool USkill_Active_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SkillUnitPtr);
-	if (!ActiveSkillUnitPtr)
+	auto ActiveSkillProxyPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr);
+	if (!ActiveSkillProxyPtr)
 	{
 		return false;
 	}
-	if (!ActiveSkillUnitPtr->CheckCooldown())
+	if (!ActiveSkillProxyPtr->CheckCooldown())
 	{
 		return false;
 	}
 
-	const auto RequireWeaponUnitType = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->RequireWeaponUnitType;
+	const auto RequireWeaponProxyType = ActiveSkillProxyPtr->GetTableRowProxy_ActiveSkillExtendInfo()->RequireWeaponProxyType;
 
 	TSharedPtr<FWeaponProxy>FirstWeaponProxySPtr = nullptr;
 	TSharedPtr<FWeaponProxy>SecondWeaponProxySPtr = nullptr;
@@ -129,13 +129,13 @@ bool USkill_Active_Base::CanActivateAbility(
 
 	if (
 		FirstWeaponProxySPtr &&
-		(FirstWeaponProxySPtr->GetUnitType() == RequireWeaponUnitType)
+		(FirstWeaponProxySPtr->GetProxyType() == RequireWeaponProxyType)
 		)
 	{
 	}
 	else if (
 		SecondWeaponProxySPtr &&
-		(SecondWeaponProxySPtr->GetUnitType() == RequireWeaponUnitType)
+		(SecondWeaponProxySPtr->GetProxyType() == RequireWeaponProxyType)
 		)
 	{
 	}

@@ -80,7 +80,7 @@ UTalentAllocationComponent* APlanetAIController::GetTalentAllocationComponent() 
 	return GetPawn<FPawnType>()->GetTalentAllocationComponent();
 }
 
-TSharedPtr<FCharacterProxy> APlanetAIController::GetCharacterUnit()
+TSharedPtr<FCharacterProxy> APlanetAIController::GetCharacterProxy()
 {
 	return GetPawn<FPawnType>()->GetCharacterProxy();
 }
@@ -115,7 +115,7 @@ bool APlanetAIController::CheckIsFarawayOriginal() const
 	return false;
 }
 
-void APlanetAIController::ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)
+void APlanetAIController::ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)
 {
 }
 
@@ -123,7 +123,7 @@ void APlanetAIController::BindPCWithCharacter()
 {
 }
 
-TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
+TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterProxy(ACharacterBase* CharaterPtr)
 {
 	return CharaterPtr->GetCharacterProxy();
 }

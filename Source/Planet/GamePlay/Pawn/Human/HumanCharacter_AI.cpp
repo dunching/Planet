@@ -11,7 +11,7 @@
 #include "HoldingItemsComponent.h"
 #include "TestCommand.h"
 #include "GameplayTagsLibrary.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "CharactersInfo.h"
 #include "HumanAIController.h"
 #include "GroupSharedInfo.h"
@@ -98,25 +98,25 @@ void AHumanCharacter_AI::InitialAllocationsRowName()
 		TestCommand::AddAICharacterTestDataImp(this);
 #endif
 		{
-			auto TableRowUnit_CharacterInfoPtr =
-				USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_AICharacter_Allocation(AI_Allocation_RowName);
+			auto TableRowProxy_CharacterInfoPtr =
+				USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_AICharacter_Allocation(AI_Allocation_RowName);
 			auto HoldingItemsComponentPtr = GetHoldingItemsComponent();
-			if (TableRowUnit_CharacterInfoPtr)
+			if (TableRowProxy_CharacterInfoPtr)
 			{
 				// 武器
 				{
 					{
-						if (TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
+						if (TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
 						{
-							auto WeaponProxyPtr = HoldingItemsComponentPtr->AddUnit_Weapon(
-								TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
+							auto WeaponProxyPtr = HoldingItemsComponentPtr->AddProxy_Weapon(
+								TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo);
 							if (WeaponProxyPtr)
 							{
 								FCharacterSocket SkillsSocketInfo;
 								SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
 								SkillsSocketInfo.UpdateProxy(
-									HoldingItemsComponentPtr->AddUnit_Weapon(
-										TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo));;
+									HoldingItemsComponentPtr->AddProxy_Weapon(
+										TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo));;
 
 								HoldingItemsComponentPtr->UpdateSocket(GetCharacterProxy(), SkillsSocketInfo);
 							}
@@ -127,11 +127,11 @@ void AHumanCharacter_AI::InitialAllocationsRowName()
 
 				// 技能
 				{
-					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
+					if (TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
 					{
-						auto SkillUnitPtr = HoldingItemsComponentPtr->AddUnit_Skill(
-							TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1);
-						if (SkillUnitPtr)
+						auto SkillProxyPtr = HoldingItemsComponentPtr->AddProxy_Skill(
+							TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1);
+						if (SkillProxyPtr)
 						{
 							FCharacterSocket SkillsSocketInfo;
 

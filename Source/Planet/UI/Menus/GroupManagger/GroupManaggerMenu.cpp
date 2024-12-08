@@ -43,7 +43,8 @@ void UGroupManaggerMenu::ResetUIByData()
 
 void UGroupManaggerMenu::SyncData()
 {
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	auto PCPtr =
+		Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;
@@ -76,7 +77,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)
 	{
-		if (UGameplayTagsLibrary::Unit_Character_Player == Iter->GetUnitType())
+		if (UGameplayTagsLibrary::Proxy_Character_Player == Iter->GetProxyType())
 		{
 			continue;
 		}

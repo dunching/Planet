@@ -51,7 +51,7 @@ void AWeapon_Base::SetWeaponProxy(const FGuid& InWeaponProxy_ID)
 
 	if (HoldingItemsComponentPtr)
 	{
-		WeaponProxyPtr = HoldingItemsComponentPtr->FindUnit_Weapon(InWeaponProxy_ID);
+		WeaponProxyPtr = HoldingItemsComponentPtr->FindProxy_Weapon(InWeaponProxy_ID);
 		if (WeaponProxyPtr)
 		{
 #if UE_EDITOR || UE_SERVER

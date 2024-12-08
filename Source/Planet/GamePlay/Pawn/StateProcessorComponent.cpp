@@ -42,7 +42,7 @@
 #include "BasicFutures_Dash.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "BasicFutures_Affected.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "StateTagExtendInfo.h"
 #include "CS_PeriodicStateModify.h"
 #include "CS_RootMotion_FlyAway.h"
@@ -443,7 +443,7 @@ void UStateProcessorComponent::ExcuteEffects(
 			if (!GameplayAbilityTargetDataSPtr->DefaultIcon)
 			{
 				GameplayAbilityTargetDataSPtr->DefaultIcon =
-					USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
+					USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
 			}
 
 			GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
@@ -588,7 +588,7 @@ void UStateProcessorComponent::ExcuteEffects(
 					if (!GameplayAbilityTargetDataSPtr->DefaultIcon)
 					{
 						GameplayAbilityTargetDataSPtr->DefaultIcon =
-							USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
+							USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_TagExtendInfo(GameplayAbilityTargetDataSPtr->Tag)->DefaultIcon;
 					}
 
 					FGameplayEventData GameplayEventData;
@@ -682,7 +682,7 @@ FGameplayEventData* UStateProcessorComponent::MakeTargetData(
 	if (!ClonePtr->DefaultIcon)
 	{
 		ClonePtr->DefaultIcon =
-			USceneUnitExtendInfoMap::GetInstance()->GetTableRowUnit_TagExtendInfo(ClonePtr->Tag)->DefaultIcon;
+			USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_TagExtendInfo(ClonePtr->Tag)->DefaultIcon;
 	}
 
 	auto Handle = ClonePtr->CharacterStateChanged.AddCallback(

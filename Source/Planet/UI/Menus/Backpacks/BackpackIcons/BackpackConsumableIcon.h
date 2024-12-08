@@ -28,7 +28,7 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -44,6 +44,6 @@ protected:
 
 private:
 
-	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
+	TSharedPtr<FConsumableProxy> ProxyPtr = nullptr;
 
 };

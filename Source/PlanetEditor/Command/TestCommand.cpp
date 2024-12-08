@@ -35,7 +35,7 @@
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "PlanetPlayerController.h"
 
@@ -43,10 +43,10 @@ void TestCommand::CopyID2RowName()
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
 
-	TArray<FTableRowUnit*> OutRowArray;
-	DataTable->GetAllRows<FTableRowUnit>(TEXT("FPCGDataTableRowToParamDataTest"), OutRowArray);
+	TArray<FTableRowProxy*> OutRowArray;
+	DataTable->GetAllRows<FTableRowProxy>(TEXT("FPCGDataTableRowToParamDataTest"), OutRowArray);
 
 	for (const auto Iter : OutRowArray)
 	{

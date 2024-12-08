@@ -132,7 +132,7 @@ void USkill_Consumable_Test::PreActivate(
 		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable_Test*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			UnitPtr = GameplayAbilityTargetDataPtr->UnitPtr;
+			ProxyPtr = GameplayAbilityTargetDataPtr->ProxyPtr;
 		}
 	}
 }

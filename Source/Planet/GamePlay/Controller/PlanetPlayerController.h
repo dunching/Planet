@@ -67,7 +67,7 @@ public:
 
 	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
 
-	virtual TSharedPtr<FCharacterProxy> GetCharacterUnit() override;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;
 
@@ -113,11 +113,11 @@ protected:
 
 	virtual bool InputKey(const FInputKeyParams& Params)override;
 
-	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)override;
+	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)override;
 
 	virtual void BindPCWithCharacter()override;
 
-	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase * CharaterPtr)override;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase * CharaterPtr)override;
 
 	virtual void InitialGroupSharedInfo();
 

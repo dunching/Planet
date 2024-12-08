@@ -34,12 +34,12 @@ class PLANET_API AHorseAIController : public APlanetAIController
 
 public:
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
 	using FPawnType = AHorseCharacter;
 
 	using FTeammateOptionChangedDelegate =
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterProxyType>&)>::FCallbackHandleSPtr;
 
 	using FTeamHelperChangedDelegate =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
@@ -61,7 +61,7 @@ protected:
 
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
+		const TSharedPtr<FCharacterProxyType>& LeaderPCPtr
 	);
 
 	void OnDeathing(const FGameplayTag Tag, int32 Count);

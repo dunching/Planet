@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayAbilitySpecHandle.h"
 
-#include "ToolUnitBase.h"
+#include "ToolProxyBase.h"
 #include "PlanetGameplayAbility.h"
 #include "Skill_Base.h"
 
@@ -14,7 +14,7 @@
 class USkill_Consumable_Base;
 
 UCLASS()
-class PLANET_API AConsumable_Base : public AToolUnitBase
+class PLANET_API AConsumable_Base : public AToolProxyBase
 {
 	GENERATED_BODY()
 

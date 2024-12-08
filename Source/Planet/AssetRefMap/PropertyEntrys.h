@@ -11,7 +11,7 @@
 #include "PropertyEntrys.generated.h"
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_PropertyEntrys : public FTableRowBase
+struct PLANET_API FTableRowProxy_PropertyEntrys : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 

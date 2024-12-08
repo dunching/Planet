@@ -17,8 +17,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
@@ -60,17 +60,17 @@ void UGroupMateInfo::NativeOnDragDetected(const FGeometry& InGeometry, const FPo
 
 	if (BaseItemClassPtr)
 	{
-		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);
+		auto DragWidgetPtr = CreateWidget<UItemProxyDragDropOperationWidget>(this, BaseItemClassPtr);
 		if (DragWidgetPtr)
 		{
 			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(GroupMateUnitPtr);
+			DragWidgetPtr->ResetToolUIByData(GroupMateProxyPtr);
 
-			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
+			auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemProxyDragDropOperation::StaticClass()));
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = GroupMateUnitPtr;
+				WidgetDragPtr->SceneToolSPtr = GroupMateProxyPtr;
 
 				OutOperation = WidgetDragPtr;
 			}
@@ -85,24 +85,24 @@ void UGroupMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->GroupMateUnitPtr);
+			ResetToolUIByData(NewPtr->GroupMateProxyPtr);
 		}
 	}
 }
 
-void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Character))
+	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
-		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
+		GroupMateProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicProxyPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(FGroupMateInfo::Get().Icon));
 			if (UIPtr)
 			{
 				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-				AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateUnitPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
+				AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateProxyPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
 					{
-						UIPtr->SetBrushFromTexture(GroupMateUnitPtr->GetIcon().Get());
+						UIPtr->SetBrushFromTexture(GroupMateProxyPtr->GetIcon().Get());
 					}));
 			}
 		}
@@ -111,23 +111,23 @@ void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitP
 			if (UIPtr)
 			{
 				auto CharacterAttributesSPtr =
-					GroupMateUnitPtr->CharacterAttributesSPtr;
+					GroupMateProxyPtr->CharacterAttributesSPtr;
 
-				if (GroupMateUnitPtr->Name.IsEmpty())
+				if (GroupMateProxyPtr->Name.IsEmpty())
 				{
 					UIPtr->SetText(
 						FText::FromString(FString::Printf(TEXT("%s(%d)"),
-							*GroupMateUnitPtr->Title,
-							GroupMateUnitPtr->Level))
+							*GroupMateProxyPtr->Title,
+							GroupMateProxyPtr->Level))
 					);
 				}
 				else
 				{
 					UIPtr->SetText(
 						FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
-							*GroupMateUnitPtr->Title,
-							*GroupMateUnitPtr->Name,
-							GroupMateUnitPtr->Level))
+							*GroupMateProxyPtr->Title,
+							*GroupMateProxyPtr->Name,
+							GroupMateProxyPtr->Level))
 					);
 				}
 			}

@@ -18,8 +18,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
@@ -53,16 +53,16 @@ void UBackpackIconWrapper::InvokeReset(UUserWidget* BaseWidgetPtr)
 		if (NewPtr)
 		{
 			OnDragIconDelegate = NewPtr->OnDragIconDelegate;
-			ResetToolUIByData(NewPtr->TargetBasicUnitPtr);
+			ResetToolUIByData(NewPtr->TargetBasicProxyPtr);
 		}
 	}
 }
 
-void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
-	if (BasicUnitPtr)
+	if (BasicProxyPtr)
 	{
-		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool))
+		if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -70,16 +70,16 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 				UIPtr->ClearChildren();
 			}
 
-			auto WidgetPtr = CreateWidget<UBackpackToolIcon>(this, ToolUnitClass);
+			auto WidgetPtr = CreateWidget<UBackpackToolIcon>(this, ToolProxyClass);
 			if (WidgetPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
 
 				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
-				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
+				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
+		else if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -87,16 +87,16 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 				UIPtr->ClearChildren();
 			}
 
-			auto WidgetPtr = CreateWidget<UBackpackConsumableIcon>(this, ConsumableUnitClass);
+			auto WidgetPtr = CreateWidget<UBackpackConsumableIcon>(this, ConsumableProxyClass);
 			if (WidgetPtr)
 			{
 				UIPtr->AddChild(WidgetPtr);
 
 				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
-				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
+				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill))
+		else if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -110,10 +110,10 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 				UIPtr->AddChild(WidgetPtr);
 
 				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
-				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
+				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
+		else if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 		{
 			auto UIPtr = Cast<UBorder>(GetWidgetFromName(BackpackIconWrapper::Border));
 			if (UIPtr)
@@ -127,7 +127,7 @@ void UBackpackIconWrapper::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Basi
 				UIPtr->AddChild(WidgetPtr);
 
 				WidgetPtr->OnDragDelegate = OnDragIconDelegate;
-				WidgetPtr->ResetToolUIByData(BasicUnitPtr);
+				WidgetPtr->ResetToolUIByData(BasicProxyPtr);
 			}
 		}
 	}

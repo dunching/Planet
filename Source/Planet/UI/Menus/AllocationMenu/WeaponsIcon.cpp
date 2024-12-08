@@ -18,8 +18,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "GameplayTagsLibrary.h"
 
 namespace WeaponsIcon
@@ -37,17 +37,17 @@ UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
+void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
 {
-	Super::ResetToolUIByData(InBasicUnitPtr);
+	Super::ResetToolUIByData(InBasicProxyPtr);
 
 	WeaponProxyPtr = nullptr;
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
+	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
-		WeaponProxyPtr = DynamicCastSharedPtr<FWeaponProxy>(BasicUnitPtr);
+		WeaponProxyPtr = DynamicCastSharedPtr<FWeaponProxy>(BasicProxyPtr);
 	}
 
-	OnResetUnit_Weapon.ExcuteCallback(WeaponProxyPtr);
+	OnResetProxy_Weapon.ExcuteCallback(WeaponProxyPtr);
 }
 
 void UWeaponsIcon::EnableIcon(bool bIsEnable)

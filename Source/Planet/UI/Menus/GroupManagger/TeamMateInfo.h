@@ -24,7 +24,7 @@ class UTeamMatesList;
 UCLASS()
 class PLANET_API UTeamMateInfo :
 	public UMyUserWidget,
-	public IUnitIconInterface,
+	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {
 	GENERATED_BODY()
@@ -33,7 +33,12 @@ public:
 
 	friend UTeamMatesList;
 
-	using FCallbackHandleContainer = TCallbackHandleContainer<void(UTeamMateInfo*)>;
+	using FCallbackHandleContainer =
+		TCallbackHandleContainer<void(
+			UTeamMateInfo*,
+			const TSharedPtr<FCharacterProxy>&,
+			const TSharedPtr<FCharacterProxy>&
+			)>;
 
 	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
 
@@ -43,21 +48,23 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
+
+	void SynMember2Config();
 
 	FCallbackHandleContainer OnDroped;
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Index)
 	int32 Index = 0;
 
+	bool bPaseInvokeOnResetProxyEvent = false;
+	
 private:
-
-	void AddMember();
 
 	bool bIsInBackpakc = false;
 
-	TSharedPtr<FCharacterProxy> GroupMateUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> GroupMateProxyPtr = nullptr;
 
 };

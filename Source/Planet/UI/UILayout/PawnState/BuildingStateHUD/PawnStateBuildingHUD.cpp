@@ -98,9 +98,9 @@ void UPawnStateBuildingHUD::ResetUIByData()
 // 				if (IconPtr)
 // 				{
 // 					auto Result = EICPtr->FindTool(IconPtr->IconSocket);
-// 					if (Result && Result->UnitPtr)
+// 					if (Result && Result->ProxyPtr)
 // 					{
-// //						IconPtr->ResetToolUIByData(Result->UnitPtr);
+// //						IconPtr->ResetToolUIByData(Result->ProxyPtr);
 // 					}
 // 				}
 // 			}
@@ -113,9 +113,9 @@ void UPawnStateBuildingHUD::ResetUIByData()
 // 				if (IconPtr)
 // 				{
 // 					auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
-// 					if (Result && Result->UnitPtr)
+// 					if (Result && Result->ProxyPtr)
 // 					{
-// 		//				IconPtr->ResetToolUIByData(Result->UnitPtr);
+// 		//				IconPtr->ResetToolUIByData(Result->ProxyPtr);
 // 					}
 // 				}
 // 			}
@@ -132,7 +132,7 @@ void UPawnStateBuildingHUD::ResetUIByData()
 				auto SecondPtr = Cast<UToolIcon>(GetWidgetFromName(SecondIter));
 				if (FirstPtr && SecondPtr)
 				{
-					auto Result = SecondPtr->OnResetUnit.AddCallback(
+					auto Result = SecondPtr->OnResetProxy.AddCallback(
 						std::bind(&UToolIcon::OnSublingIconReset, FirstPtr, std::placeholders::_1));
 					Result->bIsAutoUnregister = false;
 				}
@@ -171,7 +171,7 @@ UToolsMenu* UPawnStateBuildingHUD::GetEquipMenu()
 // 
 // // 			SocketInfoSPtr->Key = Iter.Get<0>();
 // // 			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
-// // //			SocketInfoSPtr->UnitPtr = UIPtr->GetToolUnit();
+// // //			SocketInfoSPtr->ProxyPtr = UIPtr->GetToolProxy();
 // // 
 // // 			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
 // 		}
@@ -204,7 +204,7 @@ UToolsMenu* UPawnStateBuildingHUD::GetEquipMenu()
 // 
 // // 			SocketInfoSPtr->Key = Iter.Get<0>();
 // // 			SocketInfoSPtr->SkillSocket = UIPtr->IconSocket;
-// // 			SocketInfoSPtr->UnitPtr = UIPtr->GetConsumablesUnit();
+// // 			SocketInfoSPtr->ProxyPtr = UIPtr->GetConsumablesProxy();
 // // 
 // // 			Result.Add(SocketInfoSPtr->SkillSocket, SocketInfoSPtr);
 // 		}

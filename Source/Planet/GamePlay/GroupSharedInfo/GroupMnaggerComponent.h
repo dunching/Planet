@@ -9,6 +9,7 @@
 
 #include "PlanetAbilitySystemComponent.h"
 #include "ItemProxy_Minimal.h"
+#include "TeamConfigure.h"
 
 #include "GroupMnaggerComponent.generated.h"
 
@@ -22,7 +23,7 @@ struct FConsumableProxy;
 struct FCharacterProxy;
 class UPlanetAbilitySystemComponent;
 class UProxySycHelperComponent;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 
 /*
  *	“小队”信息
@@ -35,21 +36,21 @@ public:
 
 	friend AGroupSharedInfo;
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
 	static FName ComponentName;
 
 	using FPawnType = ACharacterBase;
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
 	using FOwnerType = AGroupSharedInfo;
 
 	using FMemberChangedDelegateContainer =
-		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterUnitType>&)>;
+		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterProxyType>&)>;
 
 	using FTeammateOptionChangedDelegateContainer = 
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterProxyType>&)>;
 
 	using FKnowCharaterChanged = 
 		TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>;
@@ -68,9 +69,9 @@ public:
 
 	void SpwanTeammateCharacter();
 
-	void AddCharacterToTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr, int32 Index);
+	void AddCharacterToTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
 
-	bool IsMember(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr)const;
+	bool IsMember(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr)const;
 
 	bool IsMember(const FGuid& CharacterID)const;
 
@@ -82,13 +83,10 @@ public:
 
 	FMemberChangedDelegateContainer MembersChanged;
 
-	TSharedPtr<FCharacterUnitType> OwnerCharacterUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxyType> OwnerCharacterProxyPtr = nullptr;
 
 	// 分配的小队
-	TSet<TSharedPtr<FCharacterUnitType>> MembersSet;
-
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	TArray<FGuid> CharactersAry;
+	TSet<TSharedPtr<FCharacterProxyType>> MembersSet;
 
 	TWeakObjectPtr<ACharacterBase>ForceKnowCharater;
 
@@ -114,15 +112,18 @@ protected:
 	UFUNCTION(Server, Reliable)
 	virtual void SpwanTeammateCharacter_Server();
 
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	FTeamConfigure TeamConfigure;
+
 private:
 	
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
 
-	void OnAddToNewTeam(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
+	void OnAddToNewTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr);
 
 	void AddCharacter(FPawnType* PCPtr);
 
-	void AddCharacter(const TSharedPtr<FCharacterUnitType>& CharacterUnitPtr);
+	void AddCharacter(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr);
 
 };

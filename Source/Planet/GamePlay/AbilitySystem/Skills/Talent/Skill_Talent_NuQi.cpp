@@ -213,7 +213,7 @@ void USkill_Talent_NuQi::StartFuryState()
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::AD, 50);
 
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
 	}
 }
 
@@ -223,7 +223,7 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
 	}
 
 	if (EffectItemPtr)

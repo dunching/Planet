@@ -23,7 +23,7 @@ struct FSkillProxy;
 UCLASS()
 class PLANET_API UActionSkillsIcon : 
 	public UMyUserWidget,
-	public IUnitIconInterface,
+	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {
 	GENERATED_BODY()
@@ -36,13 +36,13 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
 	void UpdateSkillState();
 
-	TSharedPtr<FSkillProxy> UnitPtr = nullptr;
+	TSharedPtr<FSkillProxy> ProxyPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;

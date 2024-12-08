@@ -19,8 +19,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
 #include "PlanetControllerInterface.h"
@@ -67,16 +67,16 @@ bool UTeamMateInfo::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEve
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	if (InOperation->IsA(UItemsDragDropOperation::StaticClass()))
+	if (InOperation->IsA(UItemProxyDragDropOperation::StaticClass()))
 	{
-		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
+		auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(InOperation);
 		if (WidgetDragPtr)
 		{
+			auto PrevProxySPtr = GroupMateProxyPtr;
 			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
-			AddMember();
-			if (GroupMateUnitPtr)
+			if (GroupMateProxyPtr && !bPaseInvokeOnResetProxyEvent)
 			{
-				OnDroped.ExcuteCallback(this);
+				OnDroped.ExcuteCallback(this, PrevProxySPtr, GroupMateProxyPtr);
 			}
 		}
 	}
@@ -91,29 +91,29 @@ void UTeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->GroupMateUnitPtr);
+			ResetToolUIByData(NewPtr->GroupMateProxyPtr);
 		}
 	}
 }
 
-void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
 	auto WidgetSwitcherPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FTeamMateInfo::Get().WidgetSwitcher));
 	if (WidgetSwitcherPtr)
 	{
-		if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Character))
+		if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 		{
 			WidgetSwitcherPtr->SetActiveWidgetIndex(0);
 
-			GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
+			GroupMateProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicProxyPtr);
 			{
 				auto UIPtr = Cast<UImage>(GetWidgetFromName(FTeamMateInfo::Get().Icon));
 				if (UIPtr)
 				{
 					FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-					AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateUnitPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
+					AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateProxyPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
 						{
-							UIPtr->SetBrushFromTexture(GroupMateUnitPtr->GetIcon().Get());
+							UIPtr->SetBrushFromTexture(GroupMateProxyPtr->GetIcon().Get());
 						}));
 				}
 			}
@@ -122,22 +122,22 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPt
 				if (UIPtr)
 				{
 					auto CharacterAttributesSPtr =
-						GroupMateUnitPtr->CharacterAttributesSPtr;
-					if (GroupMateUnitPtr->Name.IsEmpty())
+						GroupMateProxyPtr->CharacterAttributesSPtr;
+					if (GroupMateProxyPtr->Name.IsEmpty())
 					{
 						UIPtr->SetText(
 							FText::FromString(FString::Printf(TEXT("%s(%d)"),
-								*GroupMateUnitPtr->Title,
-								GroupMateUnitPtr->Level))
+								*GroupMateProxyPtr->Title,
+								GroupMateProxyPtr->Level))
 						);
 					}
 					else
 					{
 						UIPtr->SetText(
 							FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
-								*GroupMateUnitPtr->Title,
-								*GroupMateUnitPtr->Name,
-								GroupMateUnitPtr->Level))
+								*GroupMateProxyPtr->Title,
+								*GroupMateProxyPtr->Name,
+								GroupMateProxyPtr->Level))
 						);
 					}
 				}
@@ -145,6 +145,7 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPt
 		}
 		else
 		{
+			GroupMateProxyPtr = nullptr;
 			WidgetSwitcherPtr->SetActiveWidgetIndex(1);
 		}
 	}
@@ -155,7 +156,7 @@ void UTeamMateInfo::EnableIcon(bool bIsEnable)
 
 }
 
-void UTeamMateInfo::AddMember()
+void UTeamMateInfo::SynMember2Config()
 {
 	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
@@ -163,5 +164,5 @@ void UTeamMateInfo::AddMember()
 		return;
 	}
 	auto GMCPtr = PCPtr->GetGroupSharedInfo();
-	GMCPtr->GetTeamMatesHelperComponent()->AddCharacterToTeam(GroupMateUnitPtr, Index);
+	GMCPtr->GetTeamMatesHelperComponent()->AddCharacterToTeam(GroupMateProxyPtr, Index);
 }

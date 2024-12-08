@@ -166,29 +166,29 @@ void AMainHUD::InitMainHUDLayout()
 			auto ItemInfosPtr = MainHUDLayoutPtr->GetItemInfos();
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnSkillUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnSkillUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+					PCPtr->GetHoldingItemsComponent()->OnSkillProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnSkillProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnCoinUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnCoinUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+					PCPtr->GetHoldingItemsComponent()->OnCoinProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnCoinProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnConsumableUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnConsumableUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+					PCPtr->GetHoldingItemsComponent()->OnConsumableProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnConsumableProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnGroupmateUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnGourpmateUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+					PCPtr->GetHoldingItemsComponent()->OnGroupmateProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnGourpmateProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}

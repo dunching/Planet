@@ -11,7 +11,7 @@
 #include "StateTagExtendInfo.generated.h"
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_TagExtendInfo : public FTableRowBase
+struct PLANET_API FTableRowProxy_TagExtendInfo : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 

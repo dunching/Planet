@@ -21,8 +21,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
@@ -65,33 +65,33 @@ void UActionConsumablesIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->UnitPtr);
+			ResetToolUIByData(NewPtr->ProxyPtr);
 		}
 	}
 }
 
-void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
 	bIsReady_Previous = false;
 
-	UnitPtr = nullptr;
+	ProxyPtr = nullptr;
 
-	if (BasicUnitPtr)
+	if (BasicProxyPtr)
 	{
 		if (
-			BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables)
+			BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables)
 			)
 		{
-			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);
+			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicProxyPtr);
 
-			if (UnitPtr && UnitPtr->Num > 0)
+			if (ProxyPtr && ProxyPtr->Num > 0)
 			{
 				OnValueChangedDelegateHandle =
-					UnitPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
+					ProxyPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
 
 				SetLevel();
 				SetItemType();
-				SetNum(UnitPtr->Num);
+				SetNum(ProxyPtr->Num);
 				SetCanRelease(true);
 				SetRemainingCooldown(true, 0.f, 0.f);
 				SetInputRemainPercent(false, 0.f);
@@ -118,15 +118,15 @@ void UActionConsumablesIcon::EnableIcon(bool bIsEnable)
 
 void UActionConsumablesIcon::UpdateState()
 {
-	if (UnitPtr)
+	if (ProxyPtr)
 	{
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto bCooldownIsReady = UnitPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		auto bCooldownIsReady = ProxyPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 
-		SetCanRelease(bCooldownIsReady && (UnitPtr->Num > 0));
+		SetCanRelease(bCooldownIsReady && (ProxyPtr->Num > 0));
 	}
 }
 
@@ -224,14 +224,14 @@ void UActionConsumablesIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FActionConsumablesIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		if (UnitPtr)
+		if (ProxyPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
-					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
+					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
 				}));
 		}
 		else

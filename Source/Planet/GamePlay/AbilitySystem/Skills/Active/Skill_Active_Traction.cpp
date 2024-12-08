@@ -53,9 +53,9 @@ void USkill_Active_Traction::PerformAction(
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 
 		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);

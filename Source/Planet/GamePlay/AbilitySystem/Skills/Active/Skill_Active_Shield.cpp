@@ -63,7 +63,7 @@ void USkill_Active_Shield::PerformAction(
 			FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 			GAEventData.DataModify.Add(ECharacterPropertyType::Shield, ShieldValue);
-			GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+			GAEventData.DataSource = SkillProxyPtr->GetProxyType();
 			GAEventData.bIsOverlapData = true;
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
@@ -73,9 +73,9 @@ void USkill_Active_Shield::PerformAction(
 
 		// 状态
 		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
@@ -128,7 +128,7 @@ void USkill_Active_Shield::EndAbility(
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify = GetAllData();
-		GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+		GAEventData.DataSource = SkillProxyPtr->GetProxyType();
 		GAEventData.bIsClearData = true;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);

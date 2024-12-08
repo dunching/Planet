@@ -36,13 +36,13 @@ public:
 
 	virtual void ResetUIByData() override;
 
-	void OnSkillUnitChanged(const TSharedPtr<FSkillProxy>& UnitPtr, bool bIsAdd);
+	void OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& ProxyPtr, bool bIsAdd);
 
-	void OnCoinUnitChanged(const TSharedPtr<FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
+	void OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num);
 
-	void OnConsumableUnitChanged(const TSharedPtr<FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
+	void OnConsumableProxyChanged(const TSharedPtr<FConsumableProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
-	void OnGourpmateUnitChanged(const TSharedPtr<FCharacterProxy>& UnitPtr, bool bIsAdd);
+	void OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy>& ProxyPtr, bool bIsAdd);
 
 protected:
 	void OnRemovedItem();

@@ -1,5 +1,5 @@
 
-#include "ToolUnitBase.h"
+#include "ToolProxyBase.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
@@ -11,9 +11,9 @@
 #include "PlanetGameplayAbility.h"
 #include "ToolFuture_Base.h"
 
-FName AToolUnitBase::RootComponentName = TEXT("RootComponent");
+FName AToolProxyBase::RootComponentName = TEXT("RootComponent");
 
-AToolUnitBase::AToolUnitBase(const FObjectInitializer& ObjectInitializer) :
+AToolProxyBase::AToolProxyBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	SceneCompPtr = CreateDefaultSubobject<USceneComponent>(ThisClass::RootComponentName);
@@ -24,11 +24,11 @@ AToolUnitBase::AToolUnitBase(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void AToolUnitBase::AttachToCharacter(ACharacterBase* CharacterPtr)
+void AToolProxyBase::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 }
 
-void AToolUnitBase::BeginPlay()
+void AToolProxyBase::BeginPlay()
 {
 	Super::BeginPlay();
 }

@@ -42,7 +42,7 @@ protected:
 #endif
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TMap<FGameplayTag, int32> UnitMap;
+	TMap<FGameplayTag, int32> ProxyMap;
 	
 	bool bIsOpend = false;
 

@@ -9,7 +9,7 @@
 #include "ItemProxy_Minimal.h"
 #include "HoldingItemsComponent.h"
 
-#include "ItemsDragDropOperation.generated.h"
+#include "ItemProxyDragDropOperation.generated.h"
 
 class UToolIcon;
 
@@ -17,13 +17,26 @@ class UToolIcon;
  *
  */
 UCLASS()
-class PLANET_API UItemsDragDropOperation : public UDragDropOperation
+class PLANET_API UItemProxyDragDropOperation : public UDragDropOperation
 {
 	GENERATED_BODY()
 
 public:
 
 	TSharedPtr<FBasicProxy> SceneToolSPtr;
+
+	bool bIsInBackpakc = false;
+
+};
+
+UCLASS()
+class PLANET_API UAllocationableProxyDragDropOperation : public UDragDropOperation
+{
+	GENERATED_BODY()
+
+public:
+
+	TSharedPtr<FAllocationbleProxy> SceneToolSPtr;
 
 	bool bIsInBackpakc = false;
 

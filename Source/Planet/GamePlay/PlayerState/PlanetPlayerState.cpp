@@ -8,7 +8,7 @@
 #include "HoldingItemsComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
-#include "SceneUnitTable.h"
+#include "SceneProxyTable.h"
 #include "ItemProxy_Minimal.h"
 #include "ProxySycHelperComponent.h"
 

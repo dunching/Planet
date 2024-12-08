@@ -55,9 +55,9 @@ void UBackpackMenu::SyncData()
 TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
 {
 	TArray<TSharedPtr<FBasicProxy>> Result;
-	if (CurrentUnitPtr)
+	if (CurrentProxyPtr)
 	{
-		 Result = CurrentUnitPtr->GetOwnerCharacter()->GetHoldingItemsComponent()->GetProxys();
+		 Result = CurrentProxyPtr->GetOwnerCharacter()->GetHoldingItemsComponent()->GetProxys();
 	}
 	return Result;
 }
@@ -81,14 +81,14 @@ void UBackpackMenu::ResetUIByData_Skill()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve) 
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active) ||
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve) 
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
 			if (WidgetPtr)
 			{
-				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->TargetBasicProxyPtr = Iter;
 				WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
 				TileViewPtr->AddItem(WidgetPtr);
 			}
@@ -114,13 +114,13 @@ void UBackpackMenu::ResetUIByData_Weapon()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Weapon)
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon)
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
 			if (WidgetPtr)
 			{
-				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->TargetBasicProxyPtr = Iter;
 				WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
 				TileViewPtr->AddItem(WidgetPtr);
 			}
@@ -146,13 +146,13 @@ void UBackpackMenu::ResetUIByData_Consumable()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables)
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables)
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
 			if (WidgetPtr)
 			{
-				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->TargetBasicProxyPtr = Iter;
 				WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
 				TileViewPtr->AddItem(WidgetPtr);
 			}
@@ -178,17 +178,17 @@ void UBackpackMenu::ResetUIByData_All()
 			continue;
 		}
 		if (
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Weapon) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool) ||
-			Iter->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables)
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon) ||
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active) ||
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve) ||
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool) ||
+			Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables)
 			)
 		{
 			auto WidgetPtr = CreateWidget<UBackpackIconWrapper>(this, EntryClass);
 			if (WidgetPtr)
 			{
-				WidgetPtr->TargetBasicUnitPtr = Iter;
+				WidgetPtr->TargetBasicProxyPtr = Iter;
 				WidgetPtr->OnDragIconDelegate = OnDragIconDelegate;
 				TileViewPtr->AddItem(WidgetPtr);
 			}

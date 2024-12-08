@@ -5,7 +5,7 @@
 #include "AssetRefMap.h"
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "CharactersInfo.h"
@@ -105,9 +105,9 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 	return true;
 }
 
-void FCharacterProxy::InitialUnit()
+void FCharacterProxy::InitialProxy(const FGameplayTag& InProxyType)
 {
-	Super::InitialUnit();
+	Super::InitialProxy(InProxyType);
 
 	Title = GetDT_CharacterType()->Title;
 
@@ -148,25 +148,25 @@ void FCharacterProxy::InitialUnit()
 	}
 }
 
-FTableRowUnit_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() const
+FTableRowProxy_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Character_GrowthAttribute.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Character_GrowthAttribute.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr =
-		DataTable->FindRow<FTableRowUnit_CharacterGrowthAttribute>(
-			*ProxyCharacterPtr->CharacterGrowthAttribute.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr =
+		DataTable->FindRow<FTableRowProxy_CharacterGrowthAttribute>(
+			*ProxyCharacterPtr->CharacterGrowthAttribute.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
-FTableRowUnit_CharacterType* FCharacterProxy::GetDT_CharacterType() const
+FTableRowProxy_CharacterType* FCharacterProxy::GetDT_CharacterType() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_CharacterInfo.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_CharacterInfo.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr =
-		DataTable->FindRow<FTableRowUnit_CharacterType>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr =
+		DataTable->FindRow<FTableRowProxy_CharacterType>(*ProxyType.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
 void FCharacterProxy::RelieveRootBind()
@@ -216,14 +216,14 @@ FCharacterSocket FCharacterProxy::FindSocket(const FGameplayTag& SocketID) const
 	return FCharacterSocket();
 }
 
-FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& ProxyType) const
+FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& InProxyType) const
 {
 	if (ProxyCharacterPtr.IsValid())
 	{
 		for (const auto& Iter : TeammateConfigureMap)
 		{
 			auto ProxySPtr = HoldingItemsComponentPtr->FindProxy_BySocket(Iter.Value);
-			if (ProxySPtr && ProxySPtr->GetUnitType() == ProxyType)
+			if (ProxySPtr && ProxySPtr->GetProxyType() == ProxyType)
 			{
 				return Iter.Value;
 			}

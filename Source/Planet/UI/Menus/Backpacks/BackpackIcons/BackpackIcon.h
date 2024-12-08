@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 
+#include "Blueprint/IUserObjectListEntry.h"
+
 #include "UIInterfaces.h"
 #include "MyUserWidget.h"
 #include "Common/GenerateType.h"
@@ -23,7 +25,8 @@ struct FCharacterProxy;
 UCLASS()
 class PLANET_API UBackpackIcon :
 	public UMyUserWidget,
-	public IUnitIconInterface
+	public IItemProxyIconInterface,
+	public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
@@ -31,13 +34,15 @@ public:
 
 	using FOnDragDelegate = TCallbackHandleContainer<void(bool, const TSharedPtr<FBasicProxy>&)>;
 
-	using FOnAllocationCharacterUnitChangedHandle = TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>::FCallbackHandleSPtr;
+	using FOnAllocationCharacterProxyChangedHandle = TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>::FCallbackHandleSPtr;
 
 	UBackpackIcon(const FObjectInitializer& ObjectInitializer);
 
+	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
+
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 	
@@ -56,12 +61,12 @@ protected:
 	UFUNCTION()
 	virtual void OnDroped(UDragDropOperation* Operation);
 
-	virtual	void SetItemType(FBasicProxy* BasicUnitPtr);
+	virtual	void SetItemType(FBasicProxy* BasicProxyPtr);
 
-	virtual void OnAllocationCharacterUnitChanged(const TWeakPtr<FCharacterProxy>& AllocationCharacterUnitPtr);
+	virtual void OnAllocationCharacterProxyChanged(const TWeakPtr<FCharacterProxy>& AllocationCharacterProxyPtr);
 
-	TSharedPtr<FBasicProxy> BasicUnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> BasicProxyPtr = nullptr;
 
-	FOnAllocationCharacterUnitChangedHandle OnAllocationCharacterUnitChangedHandle;
+	FOnAllocationCharacterProxyChangedHandle OnAllocationCharacterProxyChangedHandle;
 
 };

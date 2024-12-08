@@ -99,12 +99,12 @@ void UHUD_TeamInfo::ResetUIByData()
 		std::bind(&ThisClass::OnTeammateOptionChanged, this, std::placeholders::_1, std::placeholders::_2
 		));
 
-	OnTeammateOptionChanged(GMCPtr->GetTeamMatesHelperComponent()->GetTeammateOption(), GMCPtr->GetTeamMatesHelperComponent()->OwnerCharacterUnitPtr);
+	OnTeammateOptionChanged(GMCPtr->GetTeamMatesHelperComponent()->GetTeammateOption(), GMCPtr->GetTeamMatesHelperComponent()->OwnerCharacterProxyPtr);
 }
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(
 	ETeammateOption TeammateOption,
-	const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
+	const TSharedPtr<FCharacterProxyType>& LeaderPCPtr
 )
 {
 	{

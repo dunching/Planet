@@ -50,7 +50,7 @@ namespace HumanProcessor
 	{
 		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(false);
 		
-		URaffleSubSystem::GetInstance()->SyncUnits2Player();
+		URaffleSubSystem::GetInstance()->SyncProxys2Player();
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 

@@ -18,7 +18,7 @@ struct FCoinProxy;
 UCLASS()
 class PLANET_API UCoinInfo : 
 	public UMyUserWidget,
-	public IUnitIconInterface
+	public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 
@@ -32,7 +32,7 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -42,7 +42,7 @@ protected:
 
 	void SetItemType();
 
-	TSharedPtr<FCoinProxy> UnitPtr = nullptr;
+	TSharedPtr<FCoinProxy> ProxyPtr = nullptr;
 
 	FValueChangedDelegateHandle OnNumChanged;
 

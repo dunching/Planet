@@ -17,8 +17,8 @@
 
 #include <StateTagExtendInfo.h>
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "PlanetControllerInterface.h"
 #include "HUD_TeamMateInfo.h"
@@ -52,19 +52,19 @@ void UHUD_TeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Character))
+	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
-		GroupMateUnitPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicUnitPtr);
+		GroupMateProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicProxyPtr);
 		{
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(FHUD_TeamMateInfo::Get().Texture));
 			if (UIPtr)
 			{
 				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-				AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateUnitPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
+				AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateProxyPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
 					{
-						UIPtr->SetBrushFromTexture(GroupMateUnitPtr->GetIcon().Get());
+						UIPtr->SetBrushFromTexture(GroupMateProxyPtr->GetIcon().Get());
 					}));
 			}
 		}
@@ -73,22 +73,22 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUn
 			if (UIPtr)
 			{
 				auto CharacterAttributesSPtr =
-					GroupMateUnitPtr->CharacterAttributesSPtr;
-				if (GroupMateUnitPtr->Name.IsEmpty())
+					GroupMateProxyPtr->CharacterAttributesSPtr;
+				if (GroupMateProxyPtr->Name.IsEmpty())
 				{
 					UIPtr->SetText(
 						FText::FromString(FString::Printf(TEXT("%s(%d)"),
-							*GroupMateUnitPtr->Title,
-							GroupMateUnitPtr->Level))
+							*GroupMateProxyPtr->Title,
+							GroupMateProxyPtr->Level))
 					);
 				}
 				else
 				{
 					UIPtr->SetText(
 						FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
-							*GroupMateUnitPtr->Title,
-							*GroupMateUnitPtr->Name,
-							GroupMateUnitPtr->Level))
+							*GroupMateProxyPtr->Title,
+							*GroupMateProxyPtr->Name,
+							GroupMateProxyPtr->Level))
 					);
 				}
 			}

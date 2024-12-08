@@ -24,7 +24,7 @@
 #include "CharacterAttributesComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
-#include "SceneUnitTable.h"
+#include "SceneProxyTable.h"
 #include "ItemProxy_Minimal.h"
 #include "ItemProxy_Character.h"
 
@@ -54,7 +54,7 @@ void AGameMode_Main::BeginPlay()
 
 void AGameMode_Main::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	for (auto Iter : CharacterUnitMap)
+	for (auto Iter : CharacterProxyMap)
 	{
 		if (Iter.Value)
 		{
@@ -87,16 +87,16 @@ void AGameMode_Main::OnVoxelWorldLoad()
 {
 }
 
-FCharacterProxy* AGameMode_Main::AddCharacterUnit(FGameplayTag UnitType)
+FCharacterProxy* AGameMode_Main::AddCharacterProxy(FGameplayTag ProxyType)
 {
 	return nullptr;
 }
 
-FCharacterProxy* AGameMode_Main::FindCharacterUnit(int32 ID)
+FCharacterProxy* AGameMode_Main::FindCharacterProxy(int32 ID)
 {
-	if (CharacterUnitMap.Contains(ID))
+	if (CharacterProxyMap.Contains(ID))
 	{
-		return CharacterUnitMap[ID];
+		return CharacterProxyMap[ID];
 	}
 
 	return nullptr;

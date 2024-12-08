@@ -42,15 +42,15 @@ void UCoinInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UCoinInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UCoinInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
-	if (BasicUnitPtr && BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Coin))
+	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
-		UnitPtr = DynamicCastSharedPtr<FCoinProxy>(BasicUnitPtr);
+		ProxyPtr = DynamicCastSharedPtr<FCoinProxy>(BasicProxyPtr);
 
-		OnNumChanged = UnitPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
+		OnNumChanged = ProxyPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
 
-		SetNum(UnitPtr->GetCurrentValue());
+		SetNum(ProxyPtr->GetCurrentValue());
 		SetItemType();
 	}
 }
@@ -86,9 +86,9 @@ void UCoinInfo::SetItemType()
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 			{
-				ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
+				ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
 			}));
 	}
 }

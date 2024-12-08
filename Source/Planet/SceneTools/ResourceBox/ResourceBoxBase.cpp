@@ -66,12 +66,12 @@ void AResourceBoxBase::AddItemsToTarget()
 			{
 				FGuid Guid = FGuid::NewGuid();
 				auto HICPtr = TargetCharacterPtr->GetHoldingItemsComponent();
-				for (const auto Iter : UnitMap)
+				for (const auto Iter : ProxyMap)
 				{
-					HICPtr->AddUnit_Pending(Iter.Key, Iter.Value, Guid);
+					HICPtr->AddProxy_Pending(Iter.Key, Iter.Value, Guid);
 				}
 
-				HICPtr->SyncPendingUnit(Guid);
+				HICPtr->SyncPendingProxy(Guid);
 #if WITH_EDITORONLY_DATA
 #endif
 			}

@@ -132,11 +132,11 @@ void UAllocationSkillsMenu::ResetUIByData()
 }
 
 void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
-	const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr,
-	const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+	const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr,
+	const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 )
 {
-	auto CharacterPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr;
+	auto CharacterPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr;
 	if (!CharacterPtr.IsValid())
 	{
 		return;
@@ -148,18 +148,18 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 	FCharacterSocket FirstWeaponSocketInfoSPtr;
 	FCharacterSocket SecondWeaponSocketInfoSPtr;
 
-	TargetCharacterUnitPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+	TargetCharacterProxyPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 
 	{
 		{
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponSocket_1));
 			if (IconPtr)
 			{
-				IconPtr->bPaseInvokeOnResetUnitEvent = true;
+				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
 					HoldingItemsComponentPtr->FindProxy_BySocket(FirstWeaponSocketInfoSPtr)
 				);
-				IconPtr->bPaseInvokeOnResetUnitEvent = false;
+				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
 		}
 	}
@@ -169,17 +169,17 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponSocket_2));
 			if (IconPtr)
 			{
-				IconPtr->bPaseInvokeOnResetUnitEvent = true;
+				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
 					HoldingItemsComponentPtr->FindProxy_BySocket(SecondWeaponSocketInfoSPtr)
 				);
-				IconPtr->bPaseInvokeOnResetUnitEvent = false;
+				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
 		}
 	}
 }
 
-void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr)
 {
 	{
 		TArray<FName> Ary
@@ -196,7 +196,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 			FAllocationSkillsMenu::Get().TalentPassivSkill,
 		};
 
-		auto CharacterPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr;
+		auto CharacterPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr;
 		if (!CharacterPtr.IsValid())
 		{
 			return;
@@ -211,17 +211,17 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 			{
 				auto Result = EICPtr->FindSocket(IconPtr->IconSocket);
 
-				IconPtr->bPaseInvokeOnResetUnitEvent = true;
+				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
 					HoldingItemsComponentPtr->FindProxy_BySocket(Result)
 				);
-				IconPtr->bPaseInvokeOnResetUnitEvent = false;
+				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
 		}
 	}
 }
 
-void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr)
+void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr)
 {
 	TArray<FName> Ary
 	{
@@ -231,14 +231,14 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 		FAllocationSkillsMenu::Get().Consumable4,
 	};
 
-	auto CharacterPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr;
+	auto CharacterPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr;
 	if (!CharacterPtr.IsValid())
 	{
 		return;
 	}
 
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
-	auto HoldingItemsComponentPtr = PlayerCharacterUnitPtr->ProxyCharacterPtr->GetHoldingItemsComponent();
+	auto HoldingItemsComponentPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr->GetHoldingItemsComponent();
 
 	for (const auto& Iter : Ary)
 	{
@@ -247,11 +247,11 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 		{
 			auto Result = ProxyProcessComponentPtr->FindSocket(IconPtr->IconSocket);
 
-			IconPtr->bPaseInvokeOnResetUnitEvent = true;
+			IconPtr->bPaseInvokeOnResetProxyEvent = true;
 			IconPtr->ResetToolUIByData(
 				HoldingItemsComponentPtr->FindProxy_BySocket(Result)
 			);
-			IconPtr->bPaseInvokeOnResetUnitEvent = false;
+			IconPtr->bPaseInvokeOnResetProxyEvent = false;
 		}
 	}
 }
@@ -260,7 +260,7 @@ void UAllocationSkillsMenu::SyncData()
 {
 	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
-	if (!CurrentUnitPtr || !PCPtr)
+	if (!CurrentProxyPtr || !PCPtr)
 	{
 		return;
 	}
@@ -279,11 +279,11 @@ void UAllocationSkillsMenu::SyncData()
 
 		for (const auto& Iter : Ary)
 		{
-			auto Socket = CurrentUnitPtr->FindSocket(Iter.Socket);
+			auto Socket = CurrentProxyPtr->FindSocket(Iter.Socket);
 			auto UIPtr = Cast<UWeaponsIcon>(GetWidgetFromName(Iter.UIName));
 			if (UIPtr)
 			{
-				if (UIPtr->BasicUnitPtr)
+				if (UIPtr->BasicProxyPtr)
 				{
 					Socket.SkillProxyID = UIPtr->WeaponProxyPtr->GetID();
 				}
@@ -291,7 +291,7 @@ void UAllocationSkillsMenu::SyncData()
 				{
 					Socket.ResetSocket();
 				}
-				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentUnitPtr, Socket);
+				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
 			}
 		}
 	}
@@ -303,19 +303,19 @@ void UAllocationSkillsMenu::SyncData()
 
 		for (const auto& Iter : Ary)
 		{
-			auto Socket = CurrentUnitPtr->FindSocket(Iter.Socket);
+			auto Socket = CurrentProxyPtr->FindSocket(Iter.Socket);
 			auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.UIName));
 			if (UIPtr)
 			{
-				if (UIPtr->BasicUnitPtr)
+				if (UIPtr->BasicProxyPtr)
 				{
-					Socket.SkillProxyID = UIPtr->BasicUnitPtr->GetID();
+					Socket.SkillProxyID = UIPtr->BasicProxyPtr->GetID();
 				}
 				else
 				{
 					Socket.ResetSocket();
 				}
-				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentUnitPtr, Socket);
+				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
 			}
 		}
 	}
@@ -327,7 +327,7 @@ void UAllocationSkillsMenu::BindEvent()
 		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponSocket_1));
 		if (WeaponIconPtr)
 		{
-			MainDelegateHandleSPtr = WeaponIconPtr->OnResetUnit_Weapon.AddCallback(
+			MainDelegateHandleSPtr = WeaponIconPtr->OnResetProxy_Weapon.AddCallback(
 				std::bind(&ThisClass::OnMainWeaponChanged, this, std::placeholders::_1)
 			);
 		}
@@ -336,7 +336,7 @@ void UAllocationSkillsMenu::BindEvent()
 		auto WeaponIconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(FAllocationSkillsMenu::Get().WeaponSocket_2));
 		if (WeaponIconPtr)
 		{
-			SecondaryDelegateHandleSPtr = WeaponIconPtr->OnResetUnit_Weapon.AddCallback(
+			SecondaryDelegateHandleSPtr = WeaponIconPtr->OnResetProxy_Weapon.AddCallback(
 				std::bind(&ThisClass::OnSecondaryWeaponChanged, this, std::placeholders::_1)
 			);
 		}
@@ -363,7 +363,8 @@ void UAllocationSkillsMenu::BindEvent()
 			{
 				{
 					auto Result = UIPtr->OnResetProxy.AddCallback(
-						std::bind(&ThisClass::OnSkillUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+						std::bind(
+							&ThisClass::OnSkillProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 						)
 					);
 					Result->bIsAutoUnregister = false;
@@ -393,7 +394,8 @@ void UAllocationSkillsMenu::BindEvent()
 			if (UIPtr)
 			{
 				auto Result = UIPtr->OnResetProxy.AddCallback(
-					std::bind(&ThisClass::OnConsumableUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+					std::bind(
+						&ThisClass::OnConsumableProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 					)
 				);
 				Result->bIsAutoUnregister = false;
@@ -421,7 +423,8 @@ void UAllocationSkillsMenu::BindEvent()
 			{
 				{
 					auto Result = UIPtr->OnResetProxy.AddCallback(
-						std::bind(&ThisClass::OnWeaponUnitChanged, this, std::placeholders::_1, std::placeholders::_2
+						std::bind(
+							&ThisClass::OnWeaponProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
 						)
 					);
 					Result->bIsAutoUnregister = false;
@@ -439,22 +442,22 @@ void UAllocationSkillsMenu::BindEvent()
 }
 
 void UAllocationSkillsMenu::ResetUI(
-	const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr,
-	const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+	const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr,
+	const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 )
 {
-	CurrentUnitPtr = TargetCharacterUnitPtr;
-	ResetUIByData_WeaponSkills(TargetCharacterUnitPtr, PlayerCharacterUnitPtr);
-	if (TargetCharacterUnitPtr == PlayerCharacterUnitPtr)
+	CurrentProxyPtr = TargetCharacterProxyPtr;
+	ResetUIByData_WeaponSkills(TargetCharacterProxyPtr, PlayerCharacterProxyPtr);
+	if (TargetCharacterProxyPtr == PlayerCharacterProxyPtr)
 	{
-		ResetBackpack(nullptr, PlayerCharacterUnitPtr);
+		ResetBackpack(nullptr, PlayerCharacterProxyPtr);
 	}
 	else
 	{
-		ResetBackpack(nullptr, PlayerCharacterUnitPtr);
+		ResetBackpack(nullptr, PlayerCharacterProxyPtr);
 	}
-	ResetUIByData_Skills(CurrentUnitPtr);
-	ResetUIByData_Consumable(CurrentUnitPtr);
+	ResetUIByData_Skills(CurrentProxyPtr);
+	ResetUIByData_Consumable(CurrentProxyPtr);
 }
 
 void UAllocationSkillsMenu::InitialGroupmateList()
@@ -469,17 +472,17 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 		UIPtr->ClearChildren();
 
 		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
-		auto GroupmateUnitAry = HICPtr->GetCharacterProxyAry();
+		auto GroupmateProxyAry = HICPtr->GetCharacterProxyAry();
 
-		for (int32 Index = 0; Index < GroupmateUnitAry.Num(); Index++)
+		for (int32 Index = 0; Index < GroupmateProxyAry.Num(); Index++)
 		{
 			auto WidgetPtr = CreateWidget<UGroupmateIcon>(this, GroupmateIconClass);
 			if (WidgetPtr)
 			{
-				WidgetPtr->ResetToolUIByData(GroupmateUnitAry[Index]);
+				WidgetPtr->ResetToolUIByData(GroupmateProxyAry[Index]);
 				{
 					auto Handle = WidgetPtr->OnSelected.AddCallback(
-						std::bind(&ThisClass::OnSelectedCharacterUnit, this, std::placeholders::_1));
+						std::bind(&ThisClass::OnSelectedCharacterProxy, this, std::placeholders::_1));
 					Handle->bIsAutoUnregister = false;
 				}
 				UIPtr->AddChild(WidgetPtr);
@@ -494,39 +497,39 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 }
 
 void UAllocationSkillsMenu::ResetBackpack(
-	const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr,
-	const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+	const TSharedPtr<FCharacterProxy>& AICharacterProxyPtr,
+	const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 )
 {
-	if (AICharacterUnitPtr)
+	if (AICharacterProxyPtr)
 	{
 	}
 	{
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().TargetBackpack));
 
-		UIPtr->CurrentUnitPtr = AICharacterUnitPtr;
+		UIPtr->CurrentProxyPtr = AICharacterProxyPtr;
 
 		{
 			auto Delegate =
 				UIPtr->OnDragIconDelegate.AddCallback(
-					std::bind(&ThisClass::OnDragIcon, this, std::placeholders::_1, std::placeholders::_2));
+					std::bind(&ThisClass::OnItemProxyDragIcon, this, std::placeholders::_1, std::placeholders::_2));
 			Delegate->bIsAutoUnregister = false;
 		}
 
 		UIPtr->ResetUIByData();
 	}
-	if (PlayerCharacterUnitPtr)
+	if (PlayerCharacterProxyPtr)
 	{
 	}
 	{
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
 
-		UIPtr->CurrentUnitPtr = PlayerCharacterUnitPtr;
+		UIPtr->CurrentProxyPtr = PlayerCharacterProxyPtr;
 
 		{
 			auto Delegate =
 				UIPtr->OnDragIconDelegate.AddCallback(
-					std::bind(&ThisClass::OnDragIcon, this, std::placeholders::_1, std::placeholders::_2));
+					std::bind(&ThisClass::OnItemProxyDragIcon, this, std::placeholders::_1, std::placeholders::_2));
 			Delegate->bIsAutoUnregister = false;
 		}
 
@@ -549,11 +552,16 @@ void UAllocationSkillsMenu::OnResetData(UAllocationIconBase* UAllocationIconPtr)
 		return;
 	}
 
-	auto SocketSPtr = CurrentUnitPtr->FindSocket(UAllocationIconPtr->IconSocket);
-	SocketSPtr.SkillProxyID = UAllocationIconPtr->BasicUnitPtr->GetID();
+	auto SocketSPtr = CurrentProxyPtr->FindSocket(UAllocationIconPtr->IconSocket);
+	SocketSPtr.SkillProxyID = UAllocationIconPtr->BasicProxyPtr->GetID();
 }
 
-void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)
+void UAllocationSkillsMenu::OnItemProxyDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& ProxyPtr)
+{
+	OnAllocationbableDragIcon(bIsDragging, DynamicCastSharedPtr<FAllocationbleProxy>(ProxyPtr));
+}
+
+void UAllocationSkillsMenu::OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
 {
 	{
 		TArray<FName> Ary
@@ -576,7 +584,7 @@ void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasic
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(IconIter));
 			if (IconPtr)
 			{
-				IconPtr->OnDragIcon(bIsDragging, UnitPtr);
+				IconPtr->OnDragIcon(bIsDragging, ProxyPtr);
 			}
 		}
 	}
@@ -594,7 +602,7 @@ void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasic
 			auto IconPtr = Cast<UConsumableIcon>(GetWidgetFromName(IconIter));
 			if (IconPtr)
 			{
-				IconPtr->OnDragIcon(bIsDragging, UnitPtr);
+				IconPtr->OnDragIcon(bIsDragging, ProxyPtr);
 			}
 		}
 	}
@@ -610,15 +618,15 @@ void UAllocationSkillsMenu::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasic
 			auto IconPtr = Cast<UWeaponsIcon>(GetWidgetFromName(IconIter));
 			if (IconPtr)
 			{
-				IconPtr->OnDragIcon(bIsDragging, UnitPtr);
+				IconPtr->OnDragIcon(bIsDragging, ProxyPtr);
 			}
 		}
 	}
 }
 
-void UAllocationSkillsMenu::OnSelectedCharacterUnit(const TSharedPtr<FCharacterProxy>& UnitPtr)
+void UAllocationSkillsMenu::OnSelectedCharacterProxy(const TSharedPtr<FCharacterProxy>& ProxyPtr)
 {
-	if (CurrentUnitPtr == UnitPtr)
+	if (CurrentProxyPtr == ProxyPtr)
 	{
 		return;
 	}
@@ -634,7 +642,7 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(const TSharedPtr<FCharacterP
 		auto CharacterIconPtr = Cast<UGroupmateIcon>(Iter);
 		if (CharacterIconPtr)
 		{
-			if (CharacterIconPtr->UnitPtr == UnitPtr)
+			if (CharacterIconPtr->ProxyPtr == ProxyPtr)
 			{
 				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 				if (!CharacterPtr)
@@ -644,7 +652,7 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(const TSharedPtr<FCharacterP
 
 				SyncData();
 
-				ResetUI(UnitPtr, CharacterPtr->GetCharacterProxy());
+				ResetUI(ProxyPtr, CharacterPtr->GetCharacterProxy());
 
 				continue;
 			}
@@ -656,9 +664,10 @@ void UAllocationSkillsMenu::OnSelectedCharacterUnit(const TSharedPtr<FCharacterP
 	}
 }
 
-void UAllocationSkillsMenu::OnSkillUnitChanged(
-	const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
-	const TSharedPtr<FBasicProxy>& NewUnitPtr
+void UAllocationSkillsMenu::OnSkillProxyChanged(
+	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
+	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const FGameplayTag& SocketTag
 )
 {
 	TArray<FName> Ary
@@ -681,11 +690,11 @@ void UAllocationSkillsMenu::OnSkillUnitChanged(
 		auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
 		if (UIPtr)
 		{
-			if (NewUnitPtr && (NewUnitPtr == UIPtr->BasicUnitPtr))
+			if (NewProxyPtr && (NewProxyPtr == UIPtr->BasicProxyPtr))
 			{
-				UIPtr->bPaseInvokeOnResetUnitEvent = true;
-				UIPtr->ResetToolUIByData(PreviousUnitPtr);
-				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+				UIPtr->bPaseInvokeOnResetProxyEvent = true;
+				UIPtr->ResetToolUIByData(PreviousProxyPtr);
+				UIPtr->bPaseInvokeOnResetProxyEvent = false;
 
 				bIsReplaced = true;
 
@@ -697,12 +706,13 @@ void UAllocationSkillsMenu::OnSkillUnitChanged(
 		}
 	}
 
-	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
+	SetAllocation(PreviousProxyPtr, NewProxyPtr, SocketTag, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::OnWeaponUnitChanged(
-	const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
-	const TSharedPtr<FBasicProxy>& NewUnitPtr
+void UAllocationSkillsMenu::OnWeaponProxyChanged(
+	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
+	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const FGameplayTag& SocketTag
 )
 {
 	TArray<FName> Ary
@@ -717,11 +727,11 @@ void UAllocationSkillsMenu::OnWeaponUnitChanged(
 		auto UIPtr = Cast<UWeaponsIcon>(GetWidgetFromName(Iter));
 		if (UIPtr)
 		{
-			if (NewUnitPtr && (NewUnitPtr == UIPtr->BasicUnitPtr))
+			if (NewProxyPtr && (NewProxyPtr == UIPtr->BasicProxyPtr))
 			{
-				UIPtr->bPaseInvokeOnResetUnitEvent = true;
-				UIPtr->ResetToolUIByData(PreviousUnitPtr);
-				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+				UIPtr->bPaseInvokeOnResetProxyEvent = true;
+				UIPtr->ResetToolUIByData(PreviousProxyPtr);
+				UIPtr->bPaseInvokeOnResetProxyEvent = false;
 
 				bIsReplaced = true;
 
@@ -733,12 +743,13 @@ void UAllocationSkillsMenu::OnWeaponUnitChanged(
 		}
 	}
 
-	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
+	SetAllocation(PreviousProxyPtr, NewProxyPtr, SocketTag, bIsReplaced);
 }
 
-void UAllocationSkillsMenu::OnConsumableUnitChanged(
-	const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
-	const TSharedPtr<FBasicProxy>& NewUnitPtr
+void UAllocationSkillsMenu::OnConsumableProxyChanged(
+	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
+	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const FGameplayTag& SocketTag
 )
 {
 	TArray<FName> Ary
@@ -755,11 +766,11 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(
 		auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter));
 		if (UIPtr)
 		{
-			if (NewUnitPtr && (NewUnitPtr == UIPtr->BasicUnitPtr))
+			if (NewProxyPtr && (NewProxyPtr == UIPtr->BasicProxyPtr))
 			{
-				UIPtr->bPaseInvokeOnResetUnitEvent = true;
-				UIPtr->ResetToolUIByData(PreviousUnitPtr);
-				UIPtr->bPaseInvokeOnResetUnitEvent = false;
+				UIPtr->bPaseInvokeOnResetProxyEvent = true;
+				UIPtr->ResetToolUIByData(PreviousProxyPtr);
+				UIPtr->bPaseInvokeOnResetProxyEvent = false;
 
 				bIsReplaced = true;
 
@@ -771,29 +782,30 @@ void UAllocationSkillsMenu::OnConsumableUnitChanged(
 		}
 	}
 
-	SetAllocation(PreviousUnitPtr, NewUnitPtr, bIsReplaced);
+	SetAllocation(PreviousProxyPtr, NewProxyPtr, SocketTag, bIsReplaced);
 }
 
 void UAllocationSkillsMenu::SetAllocation(
-	const TSharedPtr<FBasicProxy>& PreviousUnitPtr
-	, const TSharedPtr<FBasicProxy>& NewUnitPtr,
+	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
+	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const FGameplayTag& SocketTag,
 	bool bIsReplaced
 )
 {
-	if (NewUnitPtr)
+	if (NewProxyPtr)
 	{
-		NewUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+		NewProxyPtr->SetAllocationCharacterProxy(CurrentProxyPtr, SocketTag);
 	}
 
-	if (PreviousUnitPtr)
+	if (PreviousProxyPtr)
 	{
 		if (bIsReplaced)
 		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(CurrentUnitPtr);
+			PreviousProxyPtr->SetAllocationCharacterProxy(CurrentProxyPtr, SocketTag);
 		}
 		else
 		{
-			PreviousUnitPtr->SetAllocationCharacterUnit(nullptr);
+			PreviousProxyPtr->SetAllocationCharacterProxy(nullptr, SocketTag);
 		}
 	}
 }

@@ -135,7 +135,7 @@ void USkill_Element_Gold::AddBuff()
 			ModifyPropertyMap.Add(ECharacterPropertyType::CriticalHitRate, CurrentBuffLevel * CriticalHitRate);
 			ModifyPropertyMap.Add(ECharacterPropertyType::Evade, CurrentBuffLevel * Evade);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
+			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
 		}
 	}
 	break;
@@ -154,6 +154,6 @@ void USkill_Element_Gold::RemoveBuff()
 {
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
 	}
 }

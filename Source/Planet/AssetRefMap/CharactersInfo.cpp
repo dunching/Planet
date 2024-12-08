@@ -1,7 +1,7 @@
 
 #include "CharactersInfo.h"
 
-FTableRowUnit_CharacterGrowthAttribute::FTableRowUnit_CharacterGrowthAttribute()
+FTableRowProxy_CharacterGrowthAttribute::FTableRowProxy_CharacterGrowthAttribute()
 {
 	//	CharacterAttributes.InitialData();
 }

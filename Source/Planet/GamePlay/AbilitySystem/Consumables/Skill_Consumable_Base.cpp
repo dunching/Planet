@@ -51,7 +51,7 @@ void USkill_Consumable_Base::OnAvatarSet(
 		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FRegisterParamType*>(Spec.GameplayEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(
+			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(
 				CharacterPtr->GetHoldingItemsComponent()->FindProxy(GameplayAbilityTargetDataPtr->ProxyID)
 			);
 		}
@@ -100,7 +100,7 @@ bool USkill_Consumable_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (UnitPtr && UnitPtr->CheckCooldown())
+	if (ProxyPtr && ProxyPtr->CheckCooldown())
 	{
 		return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 	}
@@ -115,19 +115,19 @@ bool USkill_Consumable_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	UnitPtr->ApplyCooldown();
+	ProxyPtr->ApplyCooldown();
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
-void USkill_Consumable_Base::ContinueActive(const TSharedPtr<FConsumableProxy>& InUnitPtr)
+void USkill_Consumable_Base::ContinueActive(const TSharedPtr<FConsumableProxy>& InProxyPtr)
 {
 	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
 	{
 		return;
 	}
 
- 	UnitPtr = InUnitPtr;
+ 	ProxyPtr = InProxyPtr;
  
  	PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 }

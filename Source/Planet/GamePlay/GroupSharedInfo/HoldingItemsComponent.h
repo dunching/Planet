@@ -12,7 +12,7 @@
 
 #include "HoldingItemsComponent.generated.h"
 
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 struct FProxy_FASI;
 struct FCharacterSocket;
 struct FSkillProxy;
@@ -38,18 +38,18 @@ public:
 
 	using IDType = FGuid;
 
-	using FOnSkillUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FSkillProxy>&, bool)>;
+	using FOnSkillProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FSkillProxy>&, bool)>;
 
-	using FOnToolUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FToolProxy>&)>;
+	using FOnToolProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FToolProxy>&)>;
 
-	using FOnGroupmateUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&, bool)>;
+	using FOnGroupmateProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&, bool)>;
 
-	using FOnConsumableUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FConsumableProxy>&,
+	using FOnConsumableProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FConsumableProxy>&,
 	                                                               EProxyModifyType)>;
 
-	using FOnCoinUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FCoinProxy>&, bool, int32)>;
+	using FOnCoinProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FCoinProxy>&, bool, int32)>;
 
-	using FOnWeaponUnitChanged = TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&, bool)>;
+	using FOnWeaponProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&, bool)>;
 
 	static FName ComponentName;
 
@@ -60,7 +60,7 @@ public:
 
 	TSharedPtr<FBasicProxy> UpdateProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
 	
-	void SetAllocationCharacterUnit(
+	void SetAllocationCharacterProxy(
 		const FGuid& Proxy_ID,
 		const FGuid& CharacterProxy_ID
 	);
@@ -68,16 +68,18 @@ public:
 
 
 #if UE_EDITOR || UE_SERVER
-	TSharedPtr<FBasicProxy> AddProxy(const FGameplayTag& UnitType, int32 Num);
+	TSharedPtr<FBasicProxy> AddProxy(const FGameplayTag& ProxyType, int32 Num);
 
 	TSharedPtr<FBasicProxy> FindProxy(const IDType& ID);
 
-	TSharedPtr<FBasicProxy> FindProxy_BySocket(const FCharacterSocket& Socket);
+	TSharedPtr<FAllocationbleProxy> FindAllocationableProxy(const IDType& ID);
+
+	TSharedPtr<FAllocationbleProxy> FindProxy_BySocket(const FCharacterSocket& Socket);
 
 
-	TSharedPtr<FCharacterProxy> AddProxy_Character(const FGameplayTag& UnitType);
+	TSharedPtr<FCharacterProxy> AddProxy_Character(const FGameplayTag& ProxyType);
 
-	TSharedPtr<FCharacterProxy> Update_Character(const TSharedPtr<FCharacterProxy>& Unit);
+	TSharedPtr<FCharacterProxy> Update_Character(const TSharedPtr<FCharacterProxy>& Proxy);
 
 	TSharedPtr<FCharacterProxy> FindProxy_Character(const IDType& ID) const;
 
@@ -90,33 +92,33 @@ public:
 	void UpdateSocket(const TSharedPtr<FCharacterProxy>&CharacterProxySPtr, const FCharacterSocket&Socket);
 
 	
-	TSharedPtr<FWeaponProxy> AddUnit_Weapon(const FGameplayTag& UnitType);
+	TSharedPtr<FWeaponProxy> AddProxy_Weapon(const FGameplayTag& ProxyType);
 
-	TSharedPtr<FWeaponProxy> Update_Weapon(const TSharedPtr<FWeaponProxy>& Unit);
+	TSharedPtr<FWeaponProxy> Update_Weapon(const TSharedPtr<FWeaponProxy>& Proxy);
 
-	TSharedPtr<FWeaponProxy> FindUnit_Weapon(const IDType& ID);
-
-
-	TSharedPtr<FSkillProxy> FindUnit_Skill(const FGameplayTag& UnitType);
-
-	TSharedPtr<FSkillProxy> FindUnit_Skill(const IDType& ID) const;
-
-	TSharedPtr<FSkillProxy> AddUnit_Skill(const FGameplayTag& UnitType);
-
-	TSharedPtr<FSkillProxy> Update_Skill(const TSharedPtr<FSkillProxy>& Unit);
+	TSharedPtr<FWeaponProxy> FindProxy_Weapon(const IDType& ID);
 
 
-	TSharedPtr<FCoinProxy> FindUnit_Coin(const FGameplayTag& UnitType) const;
+	TSharedPtr<FSkillProxy> FindProxy_Skill(const FGameplayTag& ProxyType);
 
-	TSharedPtr<FCoinProxy> AddUnit_Coin(const FGameplayTag& UnitType, int32 Num);
+	TSharedPtr<FSkillProxy> FindProxy_Skill(const IDType& ID) const;
+
+	TSharedPtr<FSkillProxy> AddProxy_Skill(const FGameplayTag& ProxyType);
+
+	TSharedPtr<FSkillProxy> Update_Skill(const TSharedPtr<FSkillProxy>& Proxy);
 
 
-	TSharedPtr<FConsumableProxy> AddUnit_Consumable(const FGameplayTag& UnitType, int32 Num = 1);
+	TSharedPtr<FCoinProxy> FindProxy_Coin(const FGameplayTag& ProxyType) const;
 
-	void RemoveUnit_Consumable(const TSharedPtr<FConsumableProxy>& UnitPtr, int32 Num = 1);
+	TSharedPtr<FCoinProxy> AddProxy_Coin(const FGameplayTag& ProxyType, int32 Num);
 
 
-	TSharedPtr<FToolProxy> AddUnit_ToolUnit(const FGameplayTag& UnitType);
+	TSharedPtr<FConsumableProxy> AddProxy_Consumable(const FGameplayTag& ProxyType, int32 Num = 1);
+
+	void RemoveProxy_Consumable(const TSharedPtr<FConsumableProxy>& ProxyPtr, int32 Num = 1);
+
+
+	TSharedPtr<FToolProxy> AddProxy_ToolProxy(const FGameplayTag& ProxyType);
 
 
 	const TArray<TSharedPtr<FBasicProxy>>& GetSceneUintAry() const;
@@ -127,9 +129,9 @@ public:
 #endif
 
 
-	void AddUnit_Pending(FGameplayTag UnitType, int32 Num, FGuid Guid);
+	void AddProxy_Pending(FGameplayTag ProxyType, int32 Num, FGuid Guid);
 
-	void SyncPendingUnit(FGuid Guid);
+	void SyncPendingProxy(FGuid Guid);
 
 	
 	UPROPERTY(Replicated)
@@ -138,17 +140,17 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_GetCharacterProxyID)
 	FGuid CharacterProxyID_Container;
 
-	FOnSkillUnitChanged OnSkillUnitChanged;
+	FOnSkillProxyChanged OnSkillProxyChanged;
 
-	FOnToolUnitChanged OnToolUnitChanged;
+	FOnToolProxyChanged OnToolProxyChanged;
 
-	FOnConsumableUnitChanged OnConsumableUnitChanged;
+	FOnConsumableProxyChanged OnConsumableProxyChanged;
 
-	FOnCoinUnitChanged OnCoinUnitChanged;
+	FOnCoinProxyChanged OnCoinProxyChanged;
 
-	FOnGroupmateUnitChanged OnGroupmateUnitChanged;
+	FOnGroupmateProxyChanged OnGroupmateProxyChanged;
 
-	FOnWeaponUnitChanged OnWeaponUnitChanged;
+	FOnWeaponProxyChanged OnWeaponProxyChanged;
 
 	virtual void OnGroupSharedInfoReady()override;
 
@@ -170,7 +172,7 @@ private:
 	
 	// 同步到服務器
 	UFUNCTION(Server, Reliable)
-	void SetAllocationCharacterUnit_Server(
+	void SetAllocationCharacterProxy_Server(
 		const FGuid& Proxy_ID,
 		const FGuid& CharacterProxy_ID
 	);
@@ -183,7 +185,7 @@ private:
 
 	TMap<IDType, TSharedPtr<FBasicProxy>> SceneMetaMap;
 
-	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinUnitMap;
+	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinProxyMap;
 
 	// 默认的，表示Character自身的Proxy
 	TSharedPtr<FCharacterProxy> CharacterProxySPtr = nullptr;

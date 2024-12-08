@@ -8,7 +8,7 @@
 
 class UAssetRefMap;
 class UStateTagExtendInfoMap;
-class USceneUnitExtendInfoMap;
+class USceneProxyExtendInfoMap;
 class UGameOptions;
 
 /**
@@ -23,7 +23,7 @@ public:
 
 	UAssetRefMap* GetAssetRefMapInstance();
 
-	USceneUnitExtendInfoMap* GetSceneUnitExtendInfoMap();
+	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap();
 	
 	UGameOptions* GetGameOptions();
 
@@ -36,10 +36,10 @@ protected:
 	TSubclassOf<UAssetRefMap>AssetRefMapClass;
 	
 	UPROPERTY(Transient)
-	USceneUnitExtendInfoMap* SceneUnitExtendInfoMapPtr = nullptr;
+	USceneProxyExtendInfoMap* SceneProxyExtendInfoMapPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<USceneUnitExtendInfoMap>SceneUnitExtendInfoMapPtrClass;
+	TSubclassOf<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtrClass;
 	
 	UPROPERTY(Transient)
 	UGameOptions* GameOptionsPtr = nullptr;

@@ -86,7 +86,7 @@ public:
 
 	virtual bool CanUse()const;
 
-	void ContinueActive(const TSharedPtr<FConsumableProxy>& UnitPtr);
+	void ContinueActive(const TSharedPtr<FConsumableProxy>& ProxyPtr);
 
 protected:
 
@@ -99,7 +99,7 @@ protected:
 
 	ACharacterBase* CharacterPtr = nullptr;
 
-	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
+	TSharedPtr<FConsumableProxy> ProxyPtr = nullptr;
 
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>CooldownMap;
 

@@ -13,7 +13,7 @@
 #include "BackpackMenu.generated.h"
 
 struct FSceneObjContainer;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
 struct FSkillProxy;
@@ -41,7 +41,7 @@ public:
 
 	bool bIsPlayerMenu = true;
 
-	TSharedPtr<FCharacterProxy> CurrentUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
 
 	FOnDragIconDelegate OnDragIconDelegate;
 

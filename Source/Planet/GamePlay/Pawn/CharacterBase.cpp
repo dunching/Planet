@@ -409,7 +409,7 @@ void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTar
 
 void ACharacterBase::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
-	const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
+	const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
 )
 {
 	switch (GroupMateChangeType)

@@ -14,18 +14,18 @@
 #include "ItemProxy.generated.h"
 
 struct FGameplayAbilityTargetData_RegisterParam;
-struct FTableRowUnit_CommonCooldownInfo;
-struct FTableRowUnit;
-struct FTableRowUnit_WeaponExtendInfo;
-struct FTableRowUnit_ActiveSkillExtendInfo;
-struct FTableRowUnit_PassiveSkillExtendInfo;
-struct FTableRowUnit_WeaponSkillExtendInfo;
-struct FTableRowUnit_CharacterGrowthAttribute;
-struct FTableRowUnit_Consumable;
-struct FTableRowUnit_PropertyEntrys;
-struct FTableRowUnit_CharacterType;
+struct FTableRowProxy_CommonCooldownInfo;
+struct FTableRowProxy;
+struct FTableRowProxy_WeaponExtendInfo;
+struct FTableRowProxy_ActiveSkillExtendInfo;
+struct FTableRowProxy_PassiveSkillExtendInfo;
+struct FTableRowProxy_WeaponSkillExtendInfo;
+struct FTableRowProxy_CharacterGrowthAttribute;
+struct FTableRowProxy_Consumable;
+struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_CharacterType;
 class UTexture2D;
-class AToolUnitBase;
+class AToolProxyBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;
 class USkill_Consumable_Generic;
@@ -44,15 +44,15 @@ struct FCharacterProxy;
 struct FAllocationSkills;
 struct FCharacterAttributes;
 struct FTalentHelper;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
 enum struct ECharacterPropertyType : uint8;
 
-FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag);
+FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag);
 
-struct PLANET_API IUnit_Cooldown
+struct PLANET_API IProxy_Cooldown
 {
 public:
 
@@ -82,10 +82,10 @@ struct PLANET_API FBasicProxy
 
 public:
 
-	using FOnAllocationCharacterUnitChanged =
+	using FOnAllocationCharacterProxyChanged =
 		TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>;
 
-	friend FSceneUnitContainer;
+	friend FSceneProxyContainer;
 	friend FProxy_FASI_Container;
 	friend UHoldingItemsComponent;
 	friend APlanetGameMode;
@@ -98,7 +98,7 @@ public:
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	virtual void InitialUnit();
+	virtual void InitialProxy(const FGameplayTag& ProxyType);
 
 	// 通过远程的更新客户端的数据
 	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
@@ -123,45 +123,33 @@ public:
 
 	IDType GetID()const;
 
-	FGameplayTag GetUnitType()const;
+	FGameplayTag GetProxyType()const;
 
 	TSoftObjectPtr<UTexture2D> GetIcon()const;
 
 	// 
-	FString GetUnitName()const;
+	FString GetProxyName()const;
 
-	FOnAllocationCharacterUnitChanged OnAllocationCharacterUnitChanged;
-
-	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr);
+	FOnAllocationCharacterProxyChanged OnAllocationCharacterProxyChanged;
 
 	ACharacterBase* GetOwnerCharacter()const;
 
-	ACharacterBase* GetAllocationCharacter()const;
-
 	// 这个物品所在的对象
 	TWeakPtr<FCharacterProxy> GetOwnerCharacterProxy()const;
-
-	// 这个物品被分配给的对象
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy();
-
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy()const;
 
 	void Update2Client();
 
 protected:
 
-	FTableRowUnit* GetTableRowUnit()const;
+	FTableRowProxy* GetTableRowProxy()const;
 
 	UPROPERTY(Transient)
-	FGameplayTag UnitType = FGameplayTag::EmptyTag;
+	FGameplayTag ProxyType = FGameplayTag::EmptyTag;
 
 	IDType ID;
 
 	// 
 	IDType OwnerCharacter_ID;
-
-	// 被分配给的对象ID
-	IDType AllocationCharacter_ID;
 
 	// Root组件,不为空
 	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
@@ -180,85 +168,46 @@ struct TStructOpsTypeTraits<FBasicProxy> :
 	};
 };
 
+/*
+ *	可被分配至插槽的物品 
+ */
 USTRUCT()
-struct PLANET_API FCoinProxy : public FBasicProxy
+struct PLANET_API FAllocationbleProxy : public FBasicProxy
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	friend FSceneUnitContainer;
-	friend FProxy_FASI_Container;
-	friend UHoldingItemsComponent;
-
-	FCoinProxy();
-
-	void UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr);
-
-	void AddCurrentValue(int32 val);
-
-	int32 GetCurrentValue()const;
-
-	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
-
-protected:
-
-	int32 Num = 1;
-
-};
-
-USTRUCT()
-struct PLANET_API FConsumableProxy :
-	public FBasicProxy,
-	public IUnit_Cooldown
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	friend FSceneUnitContainer;
-	friend FProxy_FASI_Container;
-	friend UHoldingItemsComponent;
-
-	FConsumableProxy();
+	FAllocationbleProxy();
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	void UpdateByRemote(const TSharedPtr<FConsumableProxy>& RemoteSPtr);
+	void UpdateByRemote(const TSharedPtr<FAllocationbleProxy>& RemoteSPtr);
 
-	virtual bool Active()override;
+	// 这个物品被分配给的对象
+	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy();
 
-	FTableRowUnit_Consumable* GetTableRowUnit_Consumable()const;
+	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy()const;
 
-	virtual bool GetRemainingCooldown(
-		float& RemainingCooldown, float& RemainingCooldownPercent
-	)const override;
+	ACharacterBase* GetAllocationCharacter()const;
 
-	virtual bool CheckCooldown()const override;
-
-	virtual void AddCooldownConsumeTime(float NewTime)override;
-
-	virtual void FreshUniqueCooldownTime()override;
-
-	virtual void ApplyCooldown()override;
-
-	virtual void OffsetCooldownTime()override;
-
-	void AddCurrentValue(int32 val);
-
-	int32 GetCurrentValue()const;
-
-	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
-
-	int32 Num = 1;
+	virtual void SetAllocationCharacterProxy(
+		const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr,
+		const FGameplayTag& InSocketTag
+		);
 
 protected:
 
+	// 被分配给的对象ID
+	IDType AllocationCharacter_ID;
+
+	// 所在插槽
+	FGameplayTag SocketTag;
 };
 
 template<>
-struct TStructOpsTypeTraits<FConsumableProxy> :
-	public TStructOpsTypeTraitsBase2<FConsumableProxy>
+struct TStructOpsTypeTraits<FAllocationbleProxy> :
+	public TStructOpsTypeTraitsBase2<FAllocationbleProxy>
 {
 	enum
 	{
@@ -273,7 +222,7 @@ struct PLANET_API FToolProxy : public FBasicProxy
 
 public:
 
-	friend FSceneUnitContainer;
+	friend FSceneProxyContainer;
 	friend UHoldingItemsComponent;
 
 	FToolProxy();

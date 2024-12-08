@@ -114,7 +114,7 @@ void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaT
 		for (const auto& Iter : Ary)
 		{
 			auto IconPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(Iter));
-			if (IconPtr && IconPtr->UnitPtr)
+			if (IconPtr && IconPtr->ProxyPtr)
 			{
 				IconPtr->UpdateSkillState();
 			}
@@ -294,7 +294,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 			ProxySPtr
 		)
 		{
-			if (ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent_NuQi))
+			if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 				if (UIPtr)
@@ -303,7 +303,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 					bIsGiveTalentPassive = true;
 				}
 			}
-			else if (ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Talent_YinYang))
+			else if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
 				if (UIPtr)

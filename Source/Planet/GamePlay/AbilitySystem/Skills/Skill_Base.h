@@ -121,6 +121,6 @@ protected:
 
 	ACharacterBase* CharacterPtr = nullptr;
 
-	TSharedPtr<FSkillProxy> SkillUnitPtr = nullptr;
+	TSharedPtr<FSkillProxy> SkillProxyPtr = nullptr;
 
 };

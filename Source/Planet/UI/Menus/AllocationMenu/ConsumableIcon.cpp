@@ -21,8 +21,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
@@ -44,9 +44,9 @@ UConsumableIcon::UConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
+void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
 {
-	Super::ResetToolUIByData(InBasicUnitPtr);
+	Super::ResetToolUIByData(InBasicProxyPtr);
 
 	SetLevel();
 }

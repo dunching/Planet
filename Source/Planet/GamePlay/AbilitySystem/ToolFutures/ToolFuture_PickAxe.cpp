@@ -17,7 +17,7 @@
 #include "Animation/AnimInstanceBase.h"
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_PlayAnimAndWaitOverride.h"
-#include "ToolUnitBase.h"
+#include "ToolProxyBase.h"
 #include "Tool_PickAxe.h"
 
 UToolFuture_PickAxe::UToolFuture_PickAxe() :

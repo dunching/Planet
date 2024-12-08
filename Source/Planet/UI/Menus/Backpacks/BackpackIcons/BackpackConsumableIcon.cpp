@@ -17,8 +17,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
 #include "UICommon.h"
@@ -34,26 +34,26 @@ UBackpackConsumableIcon::UBackpackConsumableIcon(const FObjectInitializer& Objec
 
 }
 
-void UBackpackConsumableIcon::InvokeReset(UUserWidget* InBasicUnitPtr)
+void UBackpackConsumableIcon::InvokeReset(UUserWidget* InBasicProxyPtr)
 {
-	if (InBasicUnitPtr)
+	if (InBasicProxyPtr)
 	{
-		auto NewPtr = Cast<ThisClass>(InBasicUnitPtr);
+		auto NewPtr = Cast<ThisClass>(InBasicProxyPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->UnitPtr);
+			ResetToolUIByData(NewPtr->ProxyPtr);
 		}
 	}
 }
 
-void UBackpackConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
+void UBackpackConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
-	Super::ResetToolUIByData(InBasicUnitPtr);
+	Super::ResetToolUIByData(InBasicProxyPtr);
 
-	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
+	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(InBasicUnitPtr);
-		SetNum(UnitPtr->GetCurrentValue());
+		ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(InBasicProxyPtr);
+		SetNum(ProxyPtr->GetCurrentValue());
 	}
 }
 

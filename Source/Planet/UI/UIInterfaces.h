@@ -16,12 +16,12 @@
 struct FBasicProxy;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UUnitIconInterface : public UInterface
+class UItemProxyIconInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class PLANET_API IUnitIconInterface
+class PLANET_API IItemProxyIconInterface
 {
 	GENERATED_BODY()
 
@@ -30,7 +30,32 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr) = 0;
 	
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr) = 0;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr) = 0;
+
+	virtual void EnableIcon(bool bIsEnable) = 0;
+
+protected:
+
+private:
+
+};
+
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class UAllocationableProxyIconInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class PLANET_API IAllocationableProxyIconInterface
+{
+	GENERATED_BODY()
+
+public:
+
+	UFUNCTION(BlueprintCallable)
+	virtual void InvokeReset(UUserWidget* BaseWidgetPtr) = 0;
+	
+	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr) = 0;
 
 	virtual void EnableIcon(bool bIsEnable) = 0;
 

@@ -10,22 +10,26 @@
 #include "GameplayAbilitySpecHandle.h"
 
 #include "ItemProxy.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 #include "ItemProxy_Skills.generated.h"
 
 struct FGameplayAbilityTargetData_RegisterParam;
-struct FTableRowUnit_CommonCooldownInfo;
-struct FTableRowUnit;
-struct FTableRowUnit_WeaponExtendInfo;
-struct FTableRowUnit_ActiveSkillExtendInfo;
-struct FTableRowUnit_PassiveSkillExtendInfo;
-struct FTableRowUnit_WeaponSkillExtendInfo;
-struct FTableRowUnit_CharacterGrowthAttribute;
-struct FTableRowUnit_Consumable;
-struct FTableRowUnit_PropertyEntrys;
-struct FTableRowUnit_CharacterType;
+struct FTableRowProxy_CommonCooldownInfo;
+struct FTableRowProxy;
+struct FTableRowProxy_WeaponExtendInfo;
+struct FTableRowProxy_ActiveSkillExtendInfo;
+struct FTableRowProxy_PassiveSkillExtendInfo;
+struct FTableRowProxy_WeaponSkillExtendInfo;
+struct FTableRowProxy_CharacterGrowthAttribute;
+struct FTableRowProxy_Consumable;
+struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_CharacterType;
 class UTexture2D;
-class AToolUnitBase;
+class AToolProxyBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;
 class USkill_Consumable_Generic;
@@ -44,27 +48,27 @@ struct FCharacterProxy;
 struct FAllocationSkills;
 struct FCharacterAttributes;
 struct FTalentHelper;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
 enum struct ECharacterPropertyType : uint8;
 
 USTRUCT()
-struct PLANET_API FSkillProxy : public FBasicProxy
+struct PLANET_API FSkillProxy : public FAllocationbleProxy
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	friend FSceneUnitContainer;
+	friend FSceneProxyContainer;
 	friend UHoldingItemsComponent;
 
 	FSkillProxy();
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)override;
+	virtual void SetAllocationCharacterProxy(const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)override;
 
 	void UpdateByRemote(const TSharedPtr<FSkillProxy>& RemoteSPtr);
 
@@ -113,7 +117,7 @@ public:
 
 	FPassiveSkillProxy();
 
-	virtual void InitialUnit()override;
+	virtual void InitialProxy(const FGameplayTag& ProxyType)override;
 
 	// 装备至插槽
 	virtual void Allocation()override;
@@ -121,9 +125,9 @@ public:
 	// 从插槽移除
 	virtual void UnAllocation()override;
 
-	FTableRowUnit_PassiveSkillExtendInfo* GetTableRowUnit_PassiveSkillExtendInfo()const;
+	FTableRowProxy_PassiveSkillExtendInfo* GetTableRowProxy_PassiveSkillExtendInfo()const;
 
-	FTableRowUnit_PropertyEntrys* GetMainPropertyEntry()const;
+	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
@@ -143,7 +147,7 @@ protected:
 USTRUCT()
 struct PLANET_API FActiveSkillProxy :
 	public FSkillProxy,
-	public IUnit_Cooldown
+	public IProxy_Cooldown
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -158,7 +162,7 @@ public:
 
 	virtual void Cancel()override;
 
-	FTableRowUnit_ActiveSkillExtendInfo* GetTableRowUnit_ActiveSkillExtendInfo()const;
+	FTableRowProxy_ActiveSkillExtendInfo* GetTableRowProxy_ActiveSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
@@ -204,7 +208,7 @@ public:
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	virtual void SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)override;
+	virtual void SetAllocationCharacterProxy(const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)override;
 
 	virtual bool Active()override;
 
@@ -212,7 +216,7 @@ public:
 
 	virtual void End()override;
 
-	FTableRowUnit_WeaponSkillExtendInfo* GetTableRowUnit_WeaponSkillExtendInfo()const;
+	FTableRowProxy_WeaponSkillExtendInfo* GetTableRowProxy_WeaponSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 

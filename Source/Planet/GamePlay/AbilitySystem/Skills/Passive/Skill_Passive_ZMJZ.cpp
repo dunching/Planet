@@ -71,8 +71,8 @@ void USkill_Passive_ZMJZ::EndAbility(
 	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 	CharacterStateInfoSPtr = nullptr;
 
-	const auto UnitType = SkillUnitPtr->GetUnitType();
-	ModifyCharacterData(UnitType, true);
+	const auto ProxyType = SkillProxyPtr->GetProxyType();
+	ModifyCharacterData(ProxyType, true);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -84,8 +84,8 @@ void USkill_Passive_ZMJZ::PerformAction()
 	{
 		if (CharacterPtr)
 		{
-			const auto UnitType = SkillUnitPtr->GetUnitType();
-			CharacterStateInfoSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(UnitType);
+			const auto ProxyType = SkillProxyPtr->GetProxyType();
+			CharacterStateInfoSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(ProxyType);
 			if (CharacterStateInfoSPtr)
 			{
 				if (CharacterStateInfoSPtr->Num < MaxCount)
@@ -94,7 +94,7 @@ void USkill_Passive_ZMJZ::PerformAction()
 					CharacterStateInfoSPtr->DataChanged();
 					CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 
-					ModifyCharacterData(UnitType, SpeedOffset);
+					ModifyCharacterData(ProxyType, SpeedOffset);
 				}
 				else
 				{
@@ -110,14 +110,14 @@ void USkill_Passive_ZMJZ::PerformAction()
 			{
 				CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
 				CharacterStateInfoSPtr->Num = 1;
-				CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+				CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 				CharacterStateInfoSPtr->Duration = DecreamTime;
 				CharacterStateInfoSPtr->DefaultIcon = BuffIcon;
 				CharacterStateInfoSPtr->DataChanged();
 
 				CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
-				ModifyCharacterData(UnitType, SpeedOffset);
+				ModifyCharacterData(ProxyType, SpeedOffset);
 
 				{
 					TimerTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -165,12 +165,12 @@ bool USkill_Passive_ZMJZ::OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr)
 	{
 		if (CharacterStateInfoSPtr)
 		{
-			const auto UnitType = SkillUnitPtr->GetUnitType();
+			const auto ProxyType = SkillProxyPtr->GetProxyType();
 
 			CharacterStateInfoSPtr->Num--;
 			if (CharacterStateInfoSPtr->Num <= 0)
 			{
-				ModifyCharacterData(UnitType, 0, true);
+				ModifyCharacterData(ProxyType, 0, true);
 
 				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 				CharacterStateInfoSPtr = nullptr;
@@ -178,7 +178,7 @@ bool USkill_Passive_ZMJZ::OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr)
 			}
 			else
 			{
-				ModifyCharacterData(UnitType, -SpeedOffset);
+				ModifyCharacterData(ProxyType, -SpeedOffset);
 
 				CharacterStateInfoSPtr->Duration = SecondaryDecreamTime;
 				CharacterStateInfoSPtr->RefreshTime();

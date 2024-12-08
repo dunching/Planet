@@ -14,7 +14,7 @@
 class UPlanetAbilitySystemComponent;
 class UProxySycHelperComponent;
 struct FCharacterProxy;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 
 /*
  *	玩家数据

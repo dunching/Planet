@@ -9,18 +9,18 @@
 #include "RaffleCommon.h"
 #include "UIInterfaces.h"
 
-#include "Raffle_Unit.generated.h"
+#include "Raffle_Proxy.generated.h"
 
 class UTalentIcon;
-struct FTableRowUnit;
+struct FTableRowProxy;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API URaffle_Unit :
+class PLANET_API URaffle_Proxy :
 	public UMyUserWidget,
-	public IUnitIconInterface
+	public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 
@@ -32,10 +32,18 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 	
-	virtual void ResetToolUIByData(FTableRowUnit * TableRowUnitPtr);
+	virtual void ResetToolUIByData(FTableRowProxy * TableRowProxyPtr);
 
 	virtual void EnableIcon(bool bIsEnable)override;
+
+};
+
+UCLASS()
+class PLANET_API URaffle_Unit :
+	public URaffle_Proxy
+{
+	GENERATED_BODY()
 
 };

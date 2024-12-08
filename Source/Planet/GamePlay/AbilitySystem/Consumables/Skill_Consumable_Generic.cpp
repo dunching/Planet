@@ -12,7 +12,7 @@
 #include "BaseFeatureComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "CS_PeriodicPropertyModify.h"
-#include "SceneUnitTable.h"
+#include "SceneProxyTable.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :
 	Super()
@@ -58,7 +58,7 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (UnitPtr->Num <= 0)
+	if (ProxyPtr->Num <= 0)
 	{
 		return false;
 	}
@@ -76,8 +76,8 @@ bool USkill_Consumable_Generic::CommitAbility(
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		UnitPtr->Num--;
-		UnitPtr->Update2Client();
+		ProxyPtr->Num--;
+		ProxyPtr->Update2Client();
 	}
 #endif
 
@@ -120,7 +120,7 @@ void USkill_Consumable_Generic::SpawnActor()
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = CharacterPtr;
 		ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(
-			UnitPtr->GetTableRowUnit_Consumable()->Consumable_Class, ActorSpawnParameters
+			ProxyPtr->GetTableRowProxy_Consumable()->Consumable_Class, ActorSpawnParameters
 		);
 
 		if (ConsumableActorPtr)
@@ -138,7 +138,7 @@ void USkill_Consumable_Generic::ExcuteTasks()
 	{
 		if (CharacterPtr)
 		{
-			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(UnitPtr);
+			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(ProxyPtr);
 
 			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
@@ -155,7 +155,7 @@ void USkill_Consumable_Generic::PlayMontage()
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto HumanMontage = UnitPtr->GetTableRowUnit_Consumable()->HumanMontage;
+		auto HumanMontage = ProxyPtr->GetTableRowProxy_Consumable()->HumanMontage;
 		if (HumanMontage)
 		{
 			const float InPlayRate = 1.f;

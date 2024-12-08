@@ -50,7 +50,7 @@ UAIPerceptionComponent* AHorseAIController::GetAIPerceptionComponent()
 
 void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
+	const TSharedPtr<FCharacterProxyType>& LeaderPCPtr
 )
 {
 }
@@ -152,7 +152,7 @@ void AHorseAIController::OnTeamChanged()
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterUnitPtr);
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterProxyPtr);
 	}
 }
 

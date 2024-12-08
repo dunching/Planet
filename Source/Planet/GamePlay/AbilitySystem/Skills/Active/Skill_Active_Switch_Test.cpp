@@ -47,7 +47,7 @@ void USkill_Active_Switch_Test::PerformAction(
 		auto TempSocketSPtr = HoldingItemsComponentPtr->FindProxy_BySocket(SocketSPtr);
 		if (
 			TempSocketSPtr &&
-			(TempSocketSPtr == SkillUnitPtr)
+			(TempSocketSPtr == SkillProxyPtr)
 			)
 		{
 		}

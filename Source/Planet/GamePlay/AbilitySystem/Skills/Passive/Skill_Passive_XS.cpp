@@ -84,7 +84,7 @@ void USkill_Passive_XS::AddShield(int32 ShieldValue)
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify.Add(ECharacterPropertyType::Shield, ShieldValue);
-		GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+		GAEventData.DataSource = SkillProxyPtr->GetProxyType();
 		GAEventData.bIsOverlapData = true;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
@@ -103,7 +103,7 @@ void USkill_Passive_XS::RemoveShield()
 	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 	GAEventData.DataModify = GetAllData();
-	GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+	GAEventData.DataSource = SkillProxyPtr->GetProxyType();
 	GAEventData.bIsClearData = true;
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
@@ -161,9 +161,9 @@ void USkill_Passive_XS::CD_DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, f
 	else
 	{
 		CD_CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CD_CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CD_CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		CD_CharacterStateInfoSPtr->Duration = Duration;
-		CD_CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CD_CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CD_CharacterStateInfoSPtr->DataChanged();
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CD_CharacterStateInfoSPtr);
 	}
@@ -180,9 +180,9 @@ void USkill_Passive_XS::Duration_DurationDelegate(UAbilityTask_TimerHelper* Task
 	else
 	{
 		Duration_CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		Duration_CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		Duration_CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		Duration_CharacterStateInfoSPtr->Duration = Duration;
-		Duration_CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		Duration_CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		Duration_CharacterStateInfoSPtr->DataChanged();
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(Duration_CharacterStateInfoSPtr);
 	}

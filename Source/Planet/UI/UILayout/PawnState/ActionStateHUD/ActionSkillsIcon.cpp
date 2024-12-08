@@ -23,8 +23,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
@@ -75,25 +75,25 @@ void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->UnitPtr);
+			ResetToolUIByData(NewPtr->ProxyPtr);
 		}
 	}
 }
 
-void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
 	bIsReady_Previous = false;
 
-	UnitPtr = nullptr;
+	ProxyPtr = nullptr;
 
-	if (BasicUnitPtr)
+	if (BasicProxyPtr)
 	{
 		if (
-			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active)) ||
-			(BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
+			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)) ||
+			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 			)
 		{
-			UnitPtr = DynamicCastSharedPtr<FSkillProxy>(BasicUnitPtr);
+			ProxyPtr = DynamicCastSharedPtr<FSkillProxy>(BasicProxyPtr);
 		}
 	}
 
@@ -129,9 +129,9 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 	}
 
 
-	const auto SKillUnitType = UnitPtr->GetUnitType();
+	const auto SKillProxyType = ProxyPtr->GetProxyType();
 	{
-		auto GAInsPtr = UnitPtr->GetGAInst();
+		auto GAInsPtr = ProxyPtr->GetGAInst();
 		if (!GAInsPtr)
 		{
 			return;
@@ -140,9 +140,9 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
 		SetCanRelease(bIsReady);
 	}
-	if (SKillUnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active))
+	if (SKillProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 	{
-		const auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(UnitPtr);
+		const auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(ProxyPtr);
 		if (!SkillProxySPtr)
 		{
 			return;
@@ -151,13 +151,13 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 		float RemainingCooldown = 0.f;
 		float RemainingCooldownPercent = 0.f;
 
-		auto ActiveSkillUnitPtr = SkillProxySPtr;
-		if (!ActiveSkillUnitPtr)
+		auto ActiveSkillProxyPtr = SkillProxySPtr;
+		if (!ActiveSkillProxyPtr)
 		{
 			return;
 		}
 
-		auto bCooldownIsReady = ActiveSkillUnitPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		auto bCooldownIsReady = ActiveSkillProxyPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 
 		bool bIsAcceptInput = false;
@@ -169,7 +169,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 			return;
 		}
 
-		auto CSSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(SKillUnitType);
+		auto CSSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(SKillProxyType);
 		if (CSSPtr)
 		{
 			//
@@ -192,13 +192,13 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		return;
 	}
 
-	const auto SkillProxySPtr = UnitPtr;
+	const auto SkillProxySPtr = ProxyPtr;
 	if (!SkillProxySPtr)
 	{
 		return;
 	}
 
-	const auto SKillUnitType = SkillProxySPtr->GetUnitType();
+	const auto SKillProxyType = SkillProxySPtr->GetProxyType();
 	{
 		auto GAInsPtr = SkillProxySPtr->GetGAInst();
 		if (!GAInsPtr)
@@ -209,7 +209,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		SetCanRelease(bIsReady);
 	}
 
-	if (SKillUnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Weapon))
+	if (SKillProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 	{
 		auto GAInsPtr = Cast<USkill_WeaponActive_Base>(SkillProxySPtr->GetGAInst());
 		if (!GAInsPtr)
@@ -317,14 +317,14 @@ void UActionSkillsIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FActionSkillsIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		if (UnitPtr)
+		if (ProxyPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
-					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
+					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
 				}));
 		}
 		else
@@ -385,13 +385,13 @@ bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDro
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	if (InOperation->IsA(UItemsDragDropOperation::StaticClass()))
+	if (InOperation->IsA(UItemProxyDragDropOperation::StaticClass()))
 	{
- 		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
+ 		auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(InOperation);
  		if (WidgetDragPtr)
 		{
-			auto OtherUnitPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
-// 			if (UnitPtr && ProxySPtr->GetUnitType().MatchesTag(SkillUnitType))
+			auto OtherProxyPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
+// 			if (ProxyPtr && ProxySPtr->GetProxyType().MatchesTag(SkillProxyType))
 // 			{
 // 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
 // 			}
@@ -409,17 +409,17 @@ void UActionSkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const 
 	
 	if (BaseItemClassPtr)
 	{
-		auto DragWidgetPtr = CreateWidget<UDragDropOperationWidget>(this, BaseItemClassPtr);
+		auto DragWidgetPtr = CreateWidget<UItemProxyDragDropOperationWidget>(this, BaseItemClassPtr);
 		if (DragWidgetPtr)
 		{
 			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(UnitPtr);
+			DragWidgetPtr->ResetToolUIByData(ProxyPtr);
 
-			auto WidgetDragPtr = Cast<UItemsDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemsDragDropOperation::StaticClass()));
+			auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemProxyDragDropOperation::StaticClass()));
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;
-				WidgetDragPtr->SceneToolSPtr = UnitPtr;
+				WidgetDragPtr->SceneToolSPtr = ProxyPtr;
 
 				OutOperation = WidgetDragPtr;
 			}

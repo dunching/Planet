@@ -18,21 +18,26 @@ struct FStreamableHandle;
 class UDragDropOperation;
 
 struct FBasicProxy;
+struct FAllocationbleProxy;
 struct FCharacterProxy;
 
 UCLASS()
 class PLANET_API UAllocationIconBase :
 	public UMyUserWidget,
-	public IUnitIconInterface,
+	public IAllocationableProxyIconInterface,
 	public IUserObjectListEntry
 {
 	GENERATED_BODY()
 
 public:
 
-	// 旧的Unit，新的Unit
+	// 旧的Proxy，新的Proxy
 	using FOnResetProxy =
-		TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&, const TSharedPtr<FBasicProxy>&)>;
+		TCallbackHandleContainer<void(
+			const TSharedPtr<FAllocationbleProxy>&,
+			const TSharedPtr<FAllocationbleProxy>&,
+			const FGameplayTag&
+			)>;
 
 	using FOnResetData =
 		TCallbackHandleContainer<void(UAllocationIconBase*)>;
@@ -43,13 +48,13 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr);
+	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
 
-	virtual void SublingIconUnitChanged(const TSharedPtr<FBasicProxy>& UnitPtr);
+	virtual void SublingIconProxyChanged(const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
 
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
 
@@ -64,15 +69,15 @@ public:
 
 	FOnResetData OnResetData;
 
-	bool bPaseInvokeOnResetUnitEvent = false;
+	bool bPaseInvokeOnResetProxyEvent = false;
 
-	TSharedPtr<FBasicProxy> BasicUnitPtr = nullptr;
+	TSharedPtr<FAllocationbleProxy> BasicProxyPtr = nullptr;
 
 protected:
 
 	virtual void SetItemType();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Adaptation UnitType")
-	FGameplayTag UnitType = FGameplayTag::EmptyTag;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Adaptation ProxyType")
+	FGameplayTag ProxyType = FGameplayTag::EmptyTag;
 
 };

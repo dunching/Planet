@@ -75,9 +75,9 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	// 重置技能CD（包含公共CD）至满CD
-	void ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr);
+	void ApplyCooldown(FActiveSkillProxy* ActiveSkillProxyPtr);
 
-	TSharedPtr<FSkillCooldownHelper> GetCooldown(const FActiveSkillProxy* ActiveSkillUnitPtr)const;
+	TSharedPtr<FSkillCooldownHelper> GetCooldown(const FActiveSkillProxy* ActiveSkillProxyPtr)const;
 
 	// 重置技能CD（包含公共CD）至满CD
 	void ApplyCooldown(FConsumableProxy* ConsumableProxySPtr);

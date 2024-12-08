@@ -18,7 +18,7 @@ class UDragDropOperation;
 
 struct FSkillProxy;
 struct FWeaponProxy;
-struct FBasicProxy;
+struct FAllocationbleProxy;
 
 UCLASS()
 class PLANET_API UWeaponsIcon : public UAllocationIconBase
@@ -27,17 +27,17 @@ class PLANET_API UWeaponsIcon : public UAllocationIconBase
 
 public:
 
-	using FOnResetUnit_Weapon = TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>;
+	using FOnResetProxy_Weapon = TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&)>;
 
 	UWeaponsIcon(const FObjectInitializer& ObjectInitializer);
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
 	TSharedPtr<FWeaponProxy> WeaponProxyPtr = nullptr;
 
-	FOnResetUnit_Weapon OnResetUnit_Weapon;
+	FOnResetProxy_Weapon OnResetProxy_Weapon;
 
 protected:
 

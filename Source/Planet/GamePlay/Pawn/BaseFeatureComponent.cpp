@@ -40,7 +40,7 @@
 #include "BasicFutures_Dash.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "BasicFutures_Affected.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "StateTagExtendInfo.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicStateModify.h"

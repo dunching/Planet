@@ -19,8 +19,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
 
@@ -52,36 +52,36 @@ void UToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			OnResetUnit = NewPtr->OnResetUnit;
-			ResetToolUIByData(NewPtr->UnitPtr);
+			OnResetProxy = NewPtr->OnResetProxy;
+			ResetToolUIByData(NewPtr->ProxyPtr);
 		}
 	}
 }
 
-void UToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)
+void UToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 {
-	if (BasicUnitPtr)
+	if (BasicProxyPtr)
 	{
-		if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool))
+		if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
-			UnitPtr = DynamicCastSharedPtr<FToolProxy>(BasicUnitPtr);
+			ProxyPtr = DynamicCastSharedPtr<FToolProxy>(BasicProxyPtr);
 		}
-		else if (BasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
+		else if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
-			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicUnitPtr);
+			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicProxyPtr);
 		}
 	}
 	else
 	{
-		UnitPtr = nullptr;
+		ProxyPtr = nullptr;
 	}
 
-	OnResetUnit.ExcuteCallback(UnitPtr);
+	OnResetProxy.ExcuteCallback(ProxyPtr);
 
 	auto UIPtr = Cast<UOverlay>(GetWidgetFromName(ToolsIcon::Overlay));
 	if (UIPtr)
 	{
-		if (UnitPtr)
+		if (ProxyPtr)
 		{
 			UIPtr->SetVisibility(ESlateVisibility::Visible);
 		}
@@ -100,19 +100,19 @@ void UToolIcon::EnableIcon(bool bIsEnable)
 
 }
 
-TSharedPtr<FToolProxy> UToolIcon::GetToolUnit() const
+TSharedPtr<FToolProxy> UToolIcon::GetToolProxy() const
 {
-	return DynamicCastSharedPtr<FToolProxy>(UnitPtr);
+	return DynamicCastSharedPtr<FToolProxy>(ProxyPtr);
 }
 
-TSharedPtr<FConsumableProxy> UToolIcon::GetConsumablesUnit() const
+TSharedPtr<FConsumableProxy> UToolIcon::GetConsumablesProxy() const
 {
-	return DynamicCastSharedPtr<FConsumableProxy>(UnitPtr);
+	return DynamicCastSharedPtr<FConsumableProxy>(ProxyPtr);
 }
 
-void UToolIcon::OnSublingIconReset(const TSharedPtr<FBasicProxy>& InToolUnitPtr)
+void UToolIcon::OnSublingIconReset(const TSharedPtr<FBasicProxy>& InToolProxyPtr)
 {
-	if (InToolUnitPtr && (InToolUnitPtr == UnitPtr))
+	if (InToolProxyPtr && (InToolProxyPtr == ProxyPtr))
 	{
 		ResetToolUIByData(nullptr);
 	}
@@ -122,22 +122,22 @@ void UToolIcon::SetNum()
 {
 	int32 NewNum = 0;
 
-	if (UnitPtr)
+	if (ProxyPtr)
 	{
-		if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Tool))
+		if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
-			auto TempUnitPtr = DynamicCastSharedPtr<FToolProxy>(UnitPtr);
-			if (TempUnitPtr)
+			auto TempProxyPtr = DynamicCastSharedPtr<FToolProxy>(ProxyPtr);
+			if (TempProxyPtr)
 			{
-				NewNum = TempUnitPtr->GetNum();
+				NewNum = TempProxyPtr->GetNum();
 			}
 		}
-		else if (UnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Consumables))
+		else if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
-			auto TempUnitPtr = DynamicCastSharedPtr<FConsumableProxy>(UnitPtr);
-			if (TempUnitPtr)
+			auto TempProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxyPtr);
+			if (TempProxyPtr)
 			{
-				NewNum = TempUnitPtr->GetCurrentValue();
+				NewNum = TempProxyPtr->GetCurrentValue();
 			}
 		}
 	}
@@ -164,14 +164,14 @@ void UToolIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(ToolsIcon::Icon));
 	if (ImagePtr)
 	{
-		if (UnitPtr)
+		if (ProxyPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(UnitPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
+			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
 				{
-					ImagePtr->SetBrushFromTexture(UnitPtr->GetIcon().Get());
+					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
 				}));
 		}
 		else
@@ -209,9 +209,9 @@ bool UToolIcon::NativeOnDrop(
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
-	if (InOperation->IsA(UItemsDragDropOperation::StaticClass()))
+	if (InOperation->IsA(UItemProxyDragDropOperation::StaticClass()))
 	{
- 		auto WidgetDragPtr = Cast<UItemsDragDropOperation>(InOperation);
+ 		auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(InOperation);
  		if (WidgetDragPtr)
 		{
 			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);

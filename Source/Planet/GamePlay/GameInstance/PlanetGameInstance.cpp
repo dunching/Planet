@@ -32,7 +32,7 @@ void UPlanetGameInstance::Shutdown()
 	GUObjectArray.ShutdownUObjectArray();
 
 #if WITH_EDITOR
-	auto TestMap1 = TestGCUnitMap;
+	auto TestMap1 = TestGCProxyMap;
 //	check(TestMap1.IsEmpty());
 #endif
 

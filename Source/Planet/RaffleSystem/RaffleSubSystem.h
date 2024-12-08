@@ -10,7 +10,7 @@
 #include "UICommon.h"
 #include "RaffleCommon.h"
 #include "ItemProxy_Minimal.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 
 #include "RaffleSubSystem.generated.h"
 
@@ -23,8 +23,8 @@ class PLANET_API URaffleSubSystem : public UGameInstanceSubsystem
 
 public:
 
-	using FOnGetUnitAry = 
-		TCallbackHandleContainer<void(const TArray<FTableRowUnit*>&)>;
+	using FOnGetProxyAry = 
+		TCallbackHandleContainer<void(const TArray<FTableRowProxy*>&)>;
 
 	static URaffleSubSystem* GetInstance();
 
@@ -32,9 +32,9 @@ public:
 
 	bool Raffle(ERaffleType RaffleType, int32 Count)const;
 
-	void SyncUnits2Player()const;
+	void SyncProxys2Player()const;
 
-	FOnGetUnitAry OnGetUnitAry;
+	FOnGetProxyAry OnGetProxyAry;
 
 protected:
 

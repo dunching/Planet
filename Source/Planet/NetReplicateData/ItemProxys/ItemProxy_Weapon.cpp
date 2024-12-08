@@ -7,7 +7,7 @@
 #include "Planet.h"
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "AllocationSkills.h"
 #include "ItemProxy_Container.h"
 #include "PropertyEntrys.h"
@@ -15,10 +15,12 @@
 #include "HoldingItemsComponent.h"
 #include "BaseFeatureComponent.h"
 #include "ItemProxy_Minimal.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 TSharedPtr<FWeaponSkillProxy> FWeaponProxy::GetWeaponSkill()
 {
-	return DynamicCastSharedPtr<FWeaponSkillProxy>(HoldingItemsComponentPtr->FindUnit_Skill(WeaponSkillID));
+	return DynamicCastSharedPtr<FWeaponSkillProxy>(HoldingItemsComponentPtr->FindProxy_Skill(WeaponSkillID));
 }
 
 FWeaponProxy::FWeaponProxy()
@@ -43,11 +45,11 @@ bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOut
 	return true;
 }
 
-void FWeaponProxy::InitialUnit()
+void FWeaponProxy::InitialProxy(const FGameplayTag& InProxyType)
 {
-	Super::InitialUnit();
+	Super::InitialProxy(InProxyType);
 	{
-		MaxAttackDistance = GetTableRowUnit_WeaponExtendInfo()->MaxAttackDistance;
+		MaxAttackDistance = GetTableRowProxy_WeaponExtendInfo()->MaxAttackDistance;
 	}
 }
 
@@ -65,20 +67,20 @@ void FWeaponProxy::Cancel()
 	GetWeaponSkill()->Cancel();
 }
 
-void FWeaponProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
+void FWeaponProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
 {
-	Super::SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 
-	GetWeaponSkill()->SetAllocationCharacterUnit(InAllocationCharacterUnitPtr);
+	GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
-FTableRowUnit_WeaponExtendInfo* FWeaponProxy::GetTableRowUnit_WeaponExtendInfo() const
+FTableRowProxy_WeaponExtendInfo* FWeaponProxy::GetTableRowProxy_WeaponExtendInfo() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_WeaponExtendInfo.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_WeaponExtendInfo.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_WeaponExtendInfo>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_WeaponExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
 void FWeaponProxy::Allocation()
@@ -105,15 +107,15 @@ void FWeaponProxy::UnAllocation()
 	Super::UnAllocation();
 }
 
-FTableRowUnit_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
+FTableRowProxy_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
 {
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_PropertyEntrys>(
-		*GetTableRowUnit_WeaponExtendInfo()->PropertyEntry.ToString(), TEXT("GetUnit")
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(
+		*GetTableRowProxy_WeaponExtendInfo()->PropertyEntry.ToString(), TEXT("GetProxy")
 	);
-	return SceneUnitExtendInfoPtr;
+	return SceneProxyExtendInfoPtr;
 }
 
 int32 FWeaponProxy::GetMaxAttackDistance() const
@@ -146,18 +148,19 @@ void FWeaponProxy::ActiveWeapon()
 
 				auto AllocationCharacter = GetAllocationCharacter();
 				AllocationCharacter->GetBaseFeatureComponent()->SendEvent2Self(
-					ModifyPropertyMap, GetUnitType()
+					ModifyPropertyMap, GetProxyType()
 				);
 			}
 
-			// 
-			auto TableRowUnit_WeaponExtendInfoPtr = GetTableRowUnit_WeaponExtendInfo();
+			// 切换人物姿势
+			auto TableRowProxy_WeaponExtendInfoPtr = GetTableRowProxy_WeaponExtendInfo();
 
-			ProxyCharacterPtr->SwitchAnimLink_Client(TableRowUnit_WeaponExtendInfoPtr->AnimLinkClassType);
-
-			auto ToolActorClass = TableRowUnit_WeaponExtendInfoPtr->ToolActorClass;
+			auto AllocationCharacterPtr = GetAllocationCharacter();
+			AllocationCharacterPtr->SwitchAnimLink_Client(TableRowProxy_WeaponExtendInfoPtr->AnimLinkClassType);
 
 			// 生成对应的武器Actor
+			auto ToolActorClass = TableRowProxy_WeaponExtendInfoPtr->ToolActorClass;
+
 			FActorSpawnParameters SpawnParameters;
 
 			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
@@ -185,7 +188,7 @@ void FWeaponProxy::RetractputWeapon()
 			auto AllocationCharacter = GetAllocationCharacter();
 			if (AllocationCharacter->GetNetMode() == NM_DedicatedServer)
 			{
-				AllocationCharacter->GetBaseFeatureComponent()->ClearData2Self(GetAllData(), GetUnitType());
+				AllocationCharacter->GetBaseFeatureComponent()->ClearData2Self(GetAllData(), GetProxyType());
 			}
 		}
 #endif

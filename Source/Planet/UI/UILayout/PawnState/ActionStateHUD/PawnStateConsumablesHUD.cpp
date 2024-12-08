@@ -31,7 +31,7 @@ void UPawnStateConsumablesHUD::NativeTick(const FGeometry& MyGeometry, float InD
 		for (const auto& Iter : Ary)
 		{
 			auto IconPtr = Cast<UActionConsumablesIcon>(Iter);
-			if (IconPtr && IconPtr->UnitPtr)
+			if (IconPtr && IconPtr->ProxyPtr)
 			{
 				IconPtr->UpdateState();
 			}

@@ -13,11 +13,11 @@
 class AHumanCharacter_AI;
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_CharacterGrowthAttribute : public FTableRowBase
+struct PLANET_API FTableRowProxy_CharacterGrowthAttribute : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
-	FTableRowUnit_CharacterGrowthAttribute();
+	FTableRowProxy_CharacterGrowthAttribute();
 
 // 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 // 	FCharacterAttributes CharacterAttributes;
@@ -28,7 +28,7 @@ struct PLANET_API FTableRowUnit_CharacterGrowthAttribute : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_CharacterType : public FTableRowBase
+struct PLANET_API FTableRowProxy_CharacterType : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
@@ -41,7 +41,7 @@ struct PLANET_API FTableRowUnit_CharacterType : public FTableRowBase
 
 // NPC分配的技能
 USTRUCT(BlueprintType)
-struct PLANET_API FTableRowUnit_AICharacter_Allocation : public FTableRowBase
+struct PLANET_API FTableRowProxy_AICharacter_Allocation : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	

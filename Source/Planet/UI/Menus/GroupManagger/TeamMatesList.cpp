@@ -1,4 +1,3 @@
-
 #include "TeamMatesList.h"
 
 #include <Kismet/GameplayStatics.h>
@@ -19,17 +18,37 @@
 #include "PlanetControllerInterface.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
+#include "ScopeValue.h"
 
 #include "TeamMateInfo.h"
 
-namespace TeanMatesList
+struct TeanMatesList : public TStructVariable<TeanMatesList>
 {
 	const FName VerticalBox = TEXT("VerticalBox");
-}
+};
 
 void UTeamMatesList::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::Get().VerticalBox));
+	if (!PanelPtr)
+	{
+		return;
+	}
+	auto ChildrensAry = PanelPtr->GetAllChildren();
+	for (auto Iter : ChildrensAry)
+	{
+		auto WidgetPtr = Cast<UTeamMateInfo>(Iter);
+		if (WidgetPtr)
+		{
+			DelegateAry.Add(
+				WidgetPtr->OnDroped.AddCallback(
+					std::bind(&ThisClass::OnWeaponProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+					)
+			);
+		}
+	}
 
 	HumanCharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
@@ -45,59 +64,62 @@ void UTeamMatesList::NativeDestruct()
 
 void UTeamMatesList::ResetUIByData()
 {
-// 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::VerticalBox));
-// 	if (!PanelPtr)
-// 	{
-// 		return;
-// 	}
-// 	PanelPtr->ClearChildren();
-// 	DelegateAry.Empty();
-// 
-// 	if (!HumanCharacterPtr)
-// 	{
-// 		return;
-// 	}
-// 
-// 	auto GMCPtr = HumanCharacterPtr->GetGroupSharedInfo();
-// 
-// 	int32 CurrentMemberNum = 0;
-// 	auto MembersHelperSPtr = GMCPtr->GetTeamHelper();
-// 	if (MembersHelperSPtr)
-// 	{
-// 		for (auto Iter : MembersHelperSPtr->MembersSet)
-// 		{
-// 			CurrentMemberNum++;
-// 			auto WidgetPtr = CreateWidget<UTeamMateInfo>(this, TeamMateInfoClass);
-// 			if (WidgetPtr)
-// 			{
-// 				PanelPtr->AddChild(WidgetPtr);
-// 
-// 				WidgetPtr->ResetToolUIByData(Iter);
-// 				DelegateAry.Add(WidgetPtr->OnDroped.AddCallback(std::bind(&ThisClass::OnTeammateChanged, this, std::placeholders::_1)));
-// 			}
-// 		}
-// 	}
-// 	for (; CurrentMemberNum < MaxMemberNum; CurrentMemberNum++)
-// 	{
-// 		auto WidgetPtr = CreateWidget<UTeamMateInfo>(this, TeamMateInfoClass);
-// 		if (WidgetPtr)
-// 		{
-// 			PanelPtr->AddChild(WidgetPtr);
-// 
-// 			WidgetPtr->ResetToolUIByData(nullptr);
-// 			DelegateAry.Add(WidgetPtr->OnDroped.AddCallback(std::bind(&ThisClass::OnTeammateChanged, this, std::placeholders::_1)));
-// 		}
-// 	}
 }
 
 void UTeamMatesList::SyncData()
 {
-
+	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::Get().VerticalBox));
+	if (!PanelPtr)
+	{
+		return;
+	}
+	auto ChildrensAry = PanelPtr->GetAllChildren();
+	for (auto Iter : ChildrensAry)
+	{
+		auto WidgetPtr = Cast<UTeamMateInfo>(Iter);
+		if (WidgetPtr)
+		{
+			WidgetPtr->SynMember2Config();
+		}
+	}
 }
 
-void UTeamMatesList::OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr)
+void UTeamMatesList::OnWeaponProxyChanged(
+	UTeamMateInfo*UIPtr,
+	const TSharedPtr<FCharacterProxy>& PrevProxycharacterSPtr,
+	const TSharedPtr<FCharacterProxy>& NewProxycharacterSPtr
+)
 {
-	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::VerticalBox));
+	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::Get().VerticalBox));
+	if (!PanelPtr)
+	{
+		return;
+	}
+	auto ChildrensAry = PanelPtr->GetAllChildren();
+	for (auto Iter : ChildrensAry)
+	{
+		auto WidgetPtr = Cast<UTeamMateInfo>(Iter);
+		if (WidgetPtr)
+		{
+			if (UIPtr == WidgetPtr)
+			{
+				continue;
+			}
+			if (NewProxycharacterSPtr && (NewProxycharacterSPtr == WidgetPtr->GroupMateProxyPtr))
+			{
+				{
+					TScopeValue ScopeValue(WidgetPtr->bPaseInvokeOnResetProxyEvent, true, false);
+					WidgetPtr->ResetToolUIByData(PrevProxycharacterSPtr);
+				}
+				break;
+			}
+		}
+	}
+}
+
+void UTeamMatesList::OnTeammateChanged(UTeamMateInfo* GourpMateProxyPtr)
+{
+	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::Get().VerticalBox));
 	if (!PanelPtr)
 	{
 		return;
@@ -109,18 +131,17 @@ void UTeamMatesList::OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr)
 		auto TeamMateInfoPtr = Cast<UTeamMateInfo>(Iter);
 		if (TeamMateInfoPtr)
 		{
-			if (TeamMateInfoPtr == GourpMateUnitPtr)
+			if (TeamMateInfoPtr == GourpMateProxyPtr)
 			{
 				continue;
 			}
 			else
 			{
-				if (TeamMateInfoPtr->GroupMateUnitPtr == GourpMateUnitPtr->GroupMateUnitPtr)
+				if (TeamMateInfoPtr->GroupMateProxyPtr == GourpMateProxyPtr->GroupMateProxyPtr)
 				{
 					TeamMateInfoPtr->ResetToolUIByData(nullptr);
 				}
 			}
-
 		}
 	}
 }

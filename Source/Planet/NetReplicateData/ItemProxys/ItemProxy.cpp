@@ -10,7 +10,7 @@
 #include "CharacterAttributesComponent.h"
 #include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
@@ -37,6 +37,8 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
+#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -50,16 +52,16 @@ FBasicProxy::~FBasicProxy()
 
 bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
-	Ar << UnitType;
+	Ar << ProxyType;
 	Ar << ID;
 	Ar << OwnerCharacter_ID;
-	Ar << AllocationCharacter_ID;
 
 	return true;
 }
 
-void FBasicProxy::InitialUnit()
+void FBasicProxy::InitialProxy(const FGameplayTag& InProxyType)
 {
+	ProxyType = InProxyType;
 	if (!ID.IsValid())
 	{
 		ID = FGuid::NewGuid();
@@ -70,8 +72,7 @@ void FBasicProxy::UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr)
 {
 	ID = RemoteSPtr->ID;
 	OwnerCharacter_ID = RemoteSPtr->OwnerCharacter_ID;
-	AllocationCharacter_ID = RemoteSPtr->AllocationCharacter_ID;
-	UnitType = RemoteSPtr->UnitType;
+	ProxyType = RemoteSPtr->ProxyType;
 }
 
 bool FBasicProxy::CanActive() const
@@ -109,26 +110,16 @@ FBasicProxy::IDType FBasicProxy::GetID()const
 	return ID;
 }
 
-FGameplayTag FBasicProxy::GetUnitType() const
+FGameplayTag FBasicProxy::GetProxyType() const
 {
-	return UnitType;
+	return ProxyType;
 }
 
 TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
+	auto SceneProxyExtendInfoPtr = GetTableRowProxy();
 
-	return SceneUnitExtendInfoPtr->DefaultIcon;
-}
-
-ACharacterBase* FBasicProxy::GetOwnerCharacter() const
-{
-	return HoldingItemsComponentPtr->FindProxy_Character(OwnerCharacter_ID)->ProxyCharacterPtr.Get();
-}
-
-ACharacterBase* FBasicProxy::GetAllocationCharacter() const
-{
-	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID)->ProxyCharacterPtr.Get();
+	return SceneProxyExtendInfoPtr->DefaultIcon;
 }
 
 void FBasicProxy::Update2Client()
@@ -136,203 +127,61 @@ void FBasicProxy::Update2Client()
 	HoldingItemsComponentPtr->Proxy_Container.UpdateItem(GetID());
 }
 
+ACharacterBase* FBasicProxy::GetOwnerCharacter() const
+{
+	return GetOwnerCharacterProxy().Pin()->ProxyCharacterPtr.Get();
+}
+
 TWeakPtr<FCharacterProxy> FBasicProxy::GetOwnerCharacterProxy()const
 {
 	return HoldingItemsComponentPtr->FindProxy_Character(OwnerCharacter_ID);
 }
 
-TWeakPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterProxy()
+FString FBasicProxy::GetProxyName() const
 {
-	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+	auto SceneProxyExtendInfoPtr = GetTableRowProxy();
+
+	return SceneProxyExtendInfoPtr->ProxyName;
 }
 
-FString FBasicProxy::GetUnitName() const
+FTableRowProxy* FBasicProxy::GetTableRowProxy() const
 {
-	auto SceneUnitExtendInfoPtr = GetTableRowUnit();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
 
-	return SceneUnitExtendInfoPtr->UnitName;
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy>(*ProxyType.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
-void FBasicProxy::SetAllocationCharacterUnit(const TSharedPtr < FCharacterProxy>& InAllocationCharacterUnitPtr)
+FAllocationbleProxy::FAllocationbleProxy()
 {
-	if (InAllocationCharacterUnitPtr)
-	{
-		if (AllocationCharacter_ID == InAllocationCharacterUnitPtr->GetID())
-		{
-			return;
-		}
-
-		AllocationCharacter_ID = InAllocationCharacterUnitPtr->GetID();
-	}
-	else
-	{
-		AllocationCharacter_ID = FGuid();
-	}
-
-#if UE_EDITOR || UE_CLIENT
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (GetOwnerCharacter()->GetNetMode() == NM_Client)
-	{
-	HoldingItemsComponentPtr->SetAllocationCharacterUnit(this->GetID(), AllocationCharacter_ID);
-	}
-#endif
-
-	OnAllocationCharacterUnitChanged.ExcuteCallback(GetAllocationCharacterProxy());
 }
 
-TWeakPtr<FCharacterProxy> FBasicProxy::GetAllocationCharacterProxy() const
-{
-	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
-}
-
-FTableRowUnit* FBasicProxy::GetTableRowUnit() const
-{
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
-
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
-}
-
-FConsumableProxy::FConsumableProxy()
-{
-
-}
-
-bool FConsumableProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FAllocationbleProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
-	Ar << Num;
-
+	Ar << AllocationCharacter_ID;
+	Ar << SocketTag;
+	
 	return true;
 }
 
-void FConsumableProxy::UpdateByRemote(const TSharedPtr<FConsumableProxy>& RemoteSPtr)
+void FAllocationbleProxy::UpdateByRemote(const TSharedPtr<FAllocationbleProxy>& RemoteSPtr)
 {
 	Super::UpdateByRemote(RemoteSPtr);
-
-	const auto OldValue = Num;
-
-	Num = RemoteSPtr->Num;
-
-	CallbackContainerHelper.ValueChanged(OldValue, Num);
+	
+	AllocationCharacter_ID = RemoteSPtr->AllocationCharacter_ID;
+	SocketTag = RemoteSPtr->SocketTag;
 }
 
-bool FConsumableProxy::Active()
+FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag)
 {
-#if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
-	{
-		auto GameplayAbilityTargetPtr =
-			new FGameplayAbilityTargetData_Consumable;
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_CommonCooldownInfo.LoadSynchronous();
 
-		// Test
-		GameplayAbilityTargetPtr->ProxyID = GetID();
-
-		const auto InputID = FMath::Rand32();
-		FGameplayAbilitySpec AbilitySpec(
-			USkill_Consumable_Generic::StaticClass(),
-			1,
-			InputID
-		);
-
-		auto GameplayEventData = MakeShared<FGameplayEventData>();
-		GameplayEventData->TargetData.Add(GameplayAbilityTargetPtr);
-
-		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
-		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
-			InputID,
-			*GameplayEventData
-		);
-
-		auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
-		ASCPtr->GiveAbilityAndActivateOnce(
-			AbilitySpec
-		);
-	}
-#endif
-
-	return true;
-}
-
-void FConsumableProxy::AddCurrentValue(int32 val)
-{
-	const auto Old = Num;
-	Num += val;
-
-	CallbackContainerHelper.ValueChanged(Old, Num);
-}
-
-int32 FConsumableProxy::GetCurrentValue() const
-{
-	return Num;
-}
-
-FTableRowUnit_Consumable* FConsumableProxy::GetTableRowUnit_Consumable() const
-{
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit_Consumable.LoadSynchronous();
-
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_Consumable>(*UnitType.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
-}
-
-bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
-{
-	auto CDSPtr = GetAllocationCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
-	);
-
-	if (CDSPtr)
-	{
-		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-	}
-
-	return true;
-}
-
-bool FConsumableProxy::CheckCooldown() const
-{
-	auto CDSPtr = GetAllocationCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
-	);
-
-	if (CDSPtr)
-	{
-		return CDSPtr->CheckCooldown();
-	}
-
-	return true;
-}
-
-void FConsumableProxy::AddCooldownConsumeTime(float NewTime)
-{
-}
-
-void FConsumableProxy::FreshUniqueCooldownTime()
-{
-}
-
-void FConsumableProxy::ApplyCooldown()
-{
-	GetAllocationCharacter()->GetCDCaculatorComponent()->ApplyCooldown(
-		this
-	);
-}
-
-void FConsumableProxy::OffsetCooldownTime()
-{
-}
-
-FTableRowUnit_CommonCooldownInfo* GetTableRowUnit_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag)
-{
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_CommonCooldownInfo.LoadSynchronous();
-
-	auto SceneUnitExtendInfoPtr = DataTable->FindRow<FTableRowUnit_CommonCooldownInfo>(*CommonCooldownTag.ToString(), TEXT("GetUnit"));
-	return SceneUnitExtendInfoPtr;
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_CommonCooldownInfo>(*CommonCooldownTag.ToString(), TEXT("GetProxy"));
+	return SceneProxyExtendInfoPtr;
 }
 
 FToolProxy::FToolProxy()
@@ -345,27 +194,47 @@ int32 FToolProxy::GetNum() const
 	return Num;
 }
 
-FCoinProxy::FCoinProxy()
+TWeakPtr<FCharacterProxy> FAllocationbleProxy::GetAllocationCharacterProxy()
 {
-
+	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
 
-void FCoinProxy::UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr)
+TWeakPtr<FCharacterProxy> FAllocationbleProxy::GetAllocationCharacterProxy() const
 {
-	Super::UpdateByRemote(RemoteSPtr);
-
-	Num = RemoteSPtr->Num;
+	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
 
-void FCoinProxy::AddCurrentValue(int32 val)
+void FAllocationbleProxy::SetAllocationCharacterProxy(
+	const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag
+	)
 {
-	const auto Old = Num;
-	Num += val;
+	SocketTag = InSocketTag;
+	if (InAllocationCharacterProxyPtr)
+	{
+		if (AllocationCharacter_ID == InAllocationCharacterProxyPtr->GetID())
+		{
+			return;
+		}
 
-	CallbackContainerHelper.ValueChanged(Old, Num);
+		AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
+	}
+	else
+	{
+		AllocationCharacter_ID = FGuid();
+	}
+
+#if UE_EDITOR || UE_CLIENT
+	auto ProxyCharacterPtr = GetOwnerCharacter();
+	if (GetOwnerCharacter()->GetNetMode() == NM_Client)
+	{
+		HoldingItemsComponentPtr->SetAllocationCharacterProxy(this->GetID(), AllocationCharacter_ID);
+	}
+#endif
+
+	OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
 }
 
-int32 FCoinProxy::GetCurrentValue() const
+ACharacterBase* FAllocationbleProxy::GetAllocationCharacter() const
 {
-	return Num;
+	return GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr.Get();
 }

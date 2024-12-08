@@ -19,29 +19,29 @@ struct FToolProxy;
 struct FStreamableHandle;
 
 UCLASS()
-class PLANET_API UToolIcon : public UMyUserWidget, public IUnitIconInterface
+class PLANET_API UToolIcon : public UMyUserWidget, public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 
 public:
 
-	using FOnResetUnit = TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&)>;
+	using FOnResetProxy = TCallbackHandleContainer<void(const TSharedPtr<FBasicProxy>&)>;
 
 	UToolIcon(const FObjectInitializer& ObjectInitializer);
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	TSharedPtr<FToolProxy> GetToolUnit()const;
+	TSharedPtr<FToolProxy> GetToolProxy()const;
 
-	TSharedPtr<FConsumableProxy> GetConsumablesUnit()const;
+	TSharedPtr<FConsumableProxy> GetConsumablesProxy()const;
 
-	void OnSublingIconReset(const TSharedPtr<FBasicProxy>& InToolUnitPtr);
+	void OnSublingIconReset(const TSharedPtr<FBasicProxy>& InToolProxyPtr);
 
-	FOnResetUnit OnResetUnit;
+	FOnResetProxy OnResetProxy;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
 	FGameplayTag IconSocket;
@@ -66,6 +66,6 @@ protected:
 
 private:
 
-	TSharedPtr<FBasicProxy>UnitPtr = nullptr;
+	TSharedPtr<FBasicProxy>ProxyPtr = nullptr;
 
 };

@@ -18,8 +18,8 @@
 #include "RaffleBtn.h"
 #include "UICommon.h"
 #include "RaffleSubSystem.h"
-#include "Raffle_Unit.h"
-#include "SceneUnitExtendInfo.h"
+#include "Raffle_Proxy.h"
+#include "SceneProxyExtendInfo.h"
 #include "ItemProxy_Container.h"
 #include "HoldingItemsComponent.h"
 
@@ -31,9 +31,9 @@ struct FRaffleMenu : public TStructVariable<FRaffleMenu>
 
 	FName RaffleBtn_VerticalBox = TEXT("RaffleBtn_VerticalBox");
 
-	FName GetUnit_HorizaltalBox = TEXT("GetUnit_HorizaltalBox");
+	FName GetProxy_HorizaltalBox = TEXT("GetProxy_HorizaltalBox");
 	
-	FName GetUnitUI = TEXT("GetUnitUI");
+	FName GetProxyUI = TEXT("GetProxyUI");
 
 	FName RaffleUI = TEXT("RaffleUI");
 
@@ -52,11 +52,11 @@ void URaffleMenu::NativeConstruct()
 	auto UIPtr = Cast<UButton>(GetWidgetFromName(FRaffleMenu::Get().ConfirmBtn));
 	if (UIPtr)
 	{
-		UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnClickedConfirmGetUnitBtn);
+		UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnClickedConfirmGetProxyBtn);
 	}
 
-	OnGetUnitDelegateHandle = URaffleSubSystem::GetInstance()->OnGetUnitAry.AddCallback(
-		std::bind(&ThisClass::ResetGetUnitAry, this, std::placeholders::_1)
+	OnGetProxyDelegateHandle = URaffleSubSystem::GetInstance()->OnGetProxyAry.AddCallback(
+		std::bind(&ThisClass::ResetGetProxyAry, this, std::placeholders::_1)
 	);
 }
 
@@ -64,7 +64,7 @@ void URaffleMenu::NativeDestruct()
 {
 	Super::NativeDestruct();
 
-	OnGetUnitDelegateHandle->UnBindCallback();
+	OnGetProxyDelegateHandle->UnBindCallback();
 }
 
 void URaffleMenu::InitialRaffleType()
@@ -114,7 +114,7 @@ void URaffleMenu::InitialRaffleBtn()
 	}
 }
 
-void URaffleMenu::SetHoldItemProperty(const TSharedPtr<FSceneUnitContainer>& NewSPHoldItemPerperty)
+void URaffleMenu::SetHoldItemProperty(const TSharedPtr<FSceneProxyContainer>& NewSPHoldItemPerperty)
 {
 	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FRaffleMenu::Get().CoinList));
 	if (UIPtr)
@@ -143,7 +143,7 @@ void URaffleMenu::SwitchDisplay(bool bIsDisplayRaffleUI)
 		}
 	}
 	{
-		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FRaffleMenu::Get().GetUnitUI));
+		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FRaffleMenu::Get().GetProxyUI));
 		if (UIPtr)
 		{
 			if (bIsDisplayRaffleUI)
@@ -158,21 +158,21 @@ void URaffleMenu::SwitchDisplay(bool bIsDisplayRaffleUI)
 	}
 }
 
-void URaffleMenu::ResetGetUnitAry(const TArray<FTableRowUnit*>& Ary)
+void URaffleMenu::ResetGetProxyAry(const TArray<FTableRowProxy*>& Ary)
 {
 	SwitchDisplay(false);
-	auto HorizotalUIPtr = Cast<UHorizontalBox>(GetWidgetFromName(FRaffleMenu::Get().GetUnit_HorizaltalBox));
+	auto HorizotalUIPtr = Cast<UHorizontalBox>(GetWidgetFromName(FRaffleMenu::Get().GetProxy_HorizaltalBox));
 	if (HorizotalUIPtr)
 	{
 		HorizotalUIPtr->ClearChildren();
 
 		for (const auto& Iter : Ary)
 		{
-			auto NewUnitPtr = CreateWidget<URaffle_Unit>(GetWorld(), Raffle_UnitClass);
-			if (NewUnitPtr)
+			auto NewProxyPtr = CreateWidget<URaffle_Proxy>(GetWorld(), Raffle_ProxyClass);
+			if (NewProxyPtr)
 			{
-				NewUnitPtr->ResetToolUIByData(Iter);
-				HorizotalUIPtr->AddChild(NewUnitPtr);
+				NewProxyPtr->ResetToolUIByData(Iter);
+				HorizotalUIPtr->AddChild(NewProxyPtr);
 			}
 		}
 	}
@@ -196,7 +196,7 @@ void URaffleMenu::OnRaffleBtnSelected(URaffleBtn* RaffleTypePtr)
 	URaffleSubSystem::GetInstance()->Raffle(LastRaffleType, RaffleTypePtr->ReffleCount);
 }
 
-void URaffleMenu::OnClickedConfirmGetUnitBtn()
+void URaffleMenu::OnClickedConfirmGetProxyBtn()
 {
 	SwitchDisplay(true);
 }

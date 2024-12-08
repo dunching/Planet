@@ -10,22 +10,22 @@
 #include "ItemProxy_Character.generated.h"
 
 struct FGameplayAbilityTargetData_RegisterParam;
-struct FTableRowUnit_CommonCooldownInfo;
-struct FTableRowUnit;
-struct FTableRowUnit_WeaponExtendInfo;
-struct FTableRowUnit_ActiveSkillExtendInfo;
-struct FTableRowUnit_PassiveSkillExtendInfo;
-struct FTableRowUnit_WeaponSkillExtendInfo;
-struct FTableRowUnit_CharacterGrowthAttribute;
-struct FTableRowUnit_Consumable;
-struct FTableRowUnit_PropertyEntrys;
-struct FTableRowUnit_CharacterType;
+struct FTableRowProxy_CommonCooldownInfo;
+struct FTableRowProxy;
+struct FTableRowProxy_WeaponExtendInfo;
+struct FTableRowProxy_ActiveSkillExtendInfo;
+struct FTableRowProxy_PassiveSkillExtendInfo;
+struct FTableRowProxy_WeaponSkillExtendInfo;
+struct FTableRowProxy_CharacterGrowthAttribute;
+struct FTableRowProxy_Consumable;
+struct FTableRowProxy_PropertyEntrys;
+struct FTableRowProxy_CharacterType;
 struct FCharacterProxy;
 
 struct FAllocationSkills;
 struct FCharacterAttributes;
 struct FTalentHelper;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 struct FBasicProxy;
@@ -66,7 +66,7 @@ struct TStructOpsTypeTraits<FCharacterSocket> :
 };
 
 USTRUCT()
-struct PLANET_API FCharacterProxy : public FBasicProxy
+struct PLANET_API FCharacterProxy : public FAllocationbleProxy
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -82,13 +82,13 @@ public:
 
 	void UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSPtr);
 
-	virtual void InitialUnit()override;
+	virtual void InitialProxy(const FGameplayTag& ProxyType)override;
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
-	FTableRowUnit_CharacterGrowthAttribute* GetDT_CharacterInfo()const;
+	FTableRowProxy_CharacterGrowthAttribute* GetDT_CharacterInfo()const;
 	
-	FTableRowUnit_CharacterType* GetDT_CharacterType()const;
+	FTableRowProxy_CharacterType* GetDT_CharacterType()const;
 
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();

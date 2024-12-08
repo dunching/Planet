@@ -20,8 +20,9 @@ class AGroupSharedInfo;
 class URaffleMenu;
 class UPawnStateActionHUD;
 class UPawnStateBuildingHUD;
-class UItemsDragDropOperation;
-class UDragDropOperationWidget;
+class UItemProxyDragDropOperation;
+class UItemProxyDragDropOperationWidget;
+class UAllocationableProxyDragDropOperationWidget;
 class UAllocationToolsMenu;
 class UAllocationSkillsMenu;
 class UBackpackMenu;
@@ -62,10 +63,13 @@ public:
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UDragDropOperationWidget>DragDropOperationWidgetClass;
+	TSubclassOf<UItemProxyDragDropOperationWidget>DragDropOperationWidgetClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UItemsDragDropOperation>ItemsDragDropOperationClass;
+	TSubclassOf<UAllocationableProxyDragDropOperationWidget>AllocationableProxyDragDropOperationWidgetClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UItemProxyDragDropOperation>ItemsDragDropOperationClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UMenuLayout>MenuLayoutClass;

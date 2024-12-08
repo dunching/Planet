@@ -9,19 +9,19 @@ class TScopeValue
 {
 public:
 
-	TScopeValue()
+	TScopeValue(ValueType& ValueRef):
+		ValueRef(ValueRef)
 	{
-
+		OriginalValue = ValueRef;
 	}
 
-	TScopeValue(const ValueType& ValueRef)
+	TScopeValue(ValueType& ValueRef, ValueType&& NewValue,ValueType&& Value):
+		ValueRef(ValueRef),
+		OriginalValue(Value)
 	{
-		OriginalValue = &ValueRef;
-	}
-
-	TScopeValue(ValueType&& ValueRef)
-	{
-
+		OriginalValue = ValueRef;
+		ValueRef = NewValue;
+		bUesCustomValue = true;
 	}
 
 	~TScopeValue()
@@ -29,27 +29,16 @@ public:
 		ReStore();
 	}
 
-	void SetValue(ValueType& ValueRef)
-	{
-		OriginalValue = ValueRef;
-		ValuePtr = &ValueRef;
-	}
-
 	void ReStore()
 	{
-		if (ValuePtr)
-		{
-			*ValuePtr = OriginalValue;
-		}
-		else
-		{
-			ValuePtr = nullptr;
-		}
+		ValueRef = OriginalValue;
 	}
 
 private:
 
-	ValueType* ValuePtr = nullptr;
+	bool bUesCustomValue = false;
+
+	ValueType & ValueRef;
 
 	ValueType OriginalValue;
 

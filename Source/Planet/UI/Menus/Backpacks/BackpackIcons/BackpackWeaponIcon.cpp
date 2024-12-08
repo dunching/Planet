@@ -17,8 +17,8 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
 
@@ -35,18 +35,18 @@ void UBackpackWeaponIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->UnitPtr);
+			ResetToolUIByData(NewPtr->ProxyPtr);
 		}
 	}
 }
 
-void UBackpackWeaponIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
+void UBackpackWeaponIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
-	Super::ResetToolUIByData(InBasicUnitPtr);
+	Super::ResetToolUIByData(InBasicProxyPtr);
 
-	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Weapon))
+	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
-		UnitPtr = DynamicCastSharedPtr<FWeaponProxy>(InBasicUnitPtr);
+		ProxyPtr = DynamicCastSharedPtr<FWeaponProxy>(InBasicProxyPtr);
 	}
 }
 

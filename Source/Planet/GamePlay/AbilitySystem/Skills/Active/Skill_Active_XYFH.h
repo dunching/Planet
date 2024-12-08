@@ -116,6 +116,6 @@ protected:
 
 	ACameraTrailHelper* CameraTrailHelperPtr = nullptr;
 
-	TScopeValue<FVector> TargetOffsetValue;
+//	TScopeValue<FVector> TargetOffsetValue;
 
 };

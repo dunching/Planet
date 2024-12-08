@@ -18,12 +18,12 @@ class UDragDropOperation;
 
 struct FSkillProxy;
 struct FCharacterProxy;
-struct FBasicProxy;
+struct FAllocationbleProxy;
 
 UCLASS()
 class PLANET_API UGroupmateIcon :
 	public UMyUserWidget,
-	public IUnitIconInterface
+	public IAllocationableProxyIconInterface
 {
 	GENERATED_BODY()
 
@@ -33,7 +33,7 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -41,7 +41,7 @@ public:
 
 	FOnSelected OnSelected;
 
-	TSharedPtr<FCharacterProxy> UnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> ProxyPtr = nullptr;
 
 protected:
 

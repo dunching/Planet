@@ -29,9 +29,9 @@ public:
 
 	AGameMode_Main();
 	
-	FCharacterProxy* AddCharacterUnit(FGameplayTag UnitType);
+	FCharacterProxy* AddCharacterProxy(FGameplayTag ProxyType);
 
-	FCharacterProxy* FindCharacterUnit(int32 ID);
+	FCharacterProxy* FindCharacterProxy(int32 ID);
 
 protected:
 
@@ -62,7 +62,7 @@ private:
 	FDelegateHandle Delegate;
 	
 	// 角色序列,第0个为Player
-	TMap<int32, FCharacterProxy*> CharacterUnitMap;
+	TMap<int32, FCharacterProxy*> CharacterProxyMap;
 
 };
 

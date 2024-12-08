@@ -79,11 +79,11 @@ protected:
 
 	AConsumable_Test* ConsumableActorPtr = nullptr;
 
-	FConsumableProxy* UnitPtr = nullptr;
+	FConsumableProxy* ProxyPtr = nullptr;
 
 };
 
 struct FGameplayAbilityTargetData_Consumable_Test : public FGameplayAbilityTargetData
 {
-	FConsumableProxy* UnitPtr = nullptr;
+	FConsumableProxy* ProxyPtr = nullptr;
 };

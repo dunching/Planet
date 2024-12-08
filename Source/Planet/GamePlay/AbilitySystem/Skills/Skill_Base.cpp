@@ -142,7 +142,7 @@ void USkill_Base::UpdateRegisterParam(const FGameplayEventData& GameplayEventDat
 		auto GameplayAbilityTargetPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
 		if (GameplayAbilityTargetPtr)
 		{
-			SkillUnitPtr = CharacterPtr->GetHoldingItemsComponent()->FindUnit_Skill(GameplayAbilityTargetPtr->ProxyID);
+			SkillProxyPtr = CharacterPtr->GetHoldingItemsComponent()->FindProxy_Skill(GameplayAbilityTargetPtr->ProxyID);
 		}
 	}
 }

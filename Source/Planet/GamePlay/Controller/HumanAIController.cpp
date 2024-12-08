@@ -92,7 +92,7 @@ void AHumanAIController::OnRep_GroupSharedInfoChanged()
 
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	const TSharedPtr < FCharacterUnitType>& LeaderCharacterUnitPtr
+	const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
 )
 {
 }
@@ -195,7 +195,7 @@ void AHumanAIController::OnTeamChanged()
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterUnitPtr);
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterProxyPtr);
 	}
 }
 

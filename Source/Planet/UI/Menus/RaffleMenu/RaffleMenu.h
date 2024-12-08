@@ -13,10 +13,10 @@
 class UTalentIcon;
 class URaffleType;
 class URaffleBtn;
-class URaffle_Unit;
+class URaffle_Proxy;
 struct FBasicProxy;
-struct FSceneUnitContainer;
-struct FTableRowUnit;
+struct FSceneProxyContainer;
+struct FTableRowProxy;
 
 /**
  *
@@ -28,8 +28,8 @@ class PLANET_API URaffleMenu : public UMyUserWidget
 
 public:
 
-	using FOnGetUnitDelegateHandle =
-		TCallbackHandleContainer<void(const TArray<FTableRowUnit*>&)>::FCallbackHandleSPtr;
+	using FOnGetProxyDelegateHandle =
+		TCallbackHandleContainer<void(const TArray<FTableRowProxy*>&)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -39,28 +39,28 @@ public:
 
 	void InitialRaffleBtn();
 
-	void SetHoldItemProperty(const TSharedPtr<FSceneUnitContainer>& NewSPHoldItemPerperty);
+	void SetHoldItemProperty(const TSharedPtr<FSceneProxyContainer>& NewSPHoldItemPerperty);
 
 	void SwitchDisplay(bool bIsDisplayRaffleUI);
 
-	void ResetGetUnitAry(const TArray<FTableRowUnit*>&Ary);
+	void ResetGetProxyAry(const TArray<FTableRowProxy*>&Ary);
 
 protected:
 
-	FOnGetUnitDelegateHandle OnGetUnitDelegateHandle;
+	FOnGetProxyDelegateHandle OnGetProxyDelegateHandle;
 
 	void OnRaffleTypeSelected(URaffleType* RaffleTypePtr);
 	
 	void OnRaffleBtnSelected(URaffleBtn* RaffleTypePtr);
 
 	UFUNCTION()
-	void OnClickedConfirmGetUnitBtn();
+	void OnClickedConfirmGetProxyBtn();
 
 	URaffleType* PreviouRaffleTypePtr = nullptr;
 
 	ERaffleType LastRaffleType = ERaffleType::kRafflePermanent;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
-	TSubclassOf<URaffle_Unit>Raffle_UnitClass;
+	TSubclassOf<URaffle_Proxy>Raffle_ProxyClass;
 	
 };

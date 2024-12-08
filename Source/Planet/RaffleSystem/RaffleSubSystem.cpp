@@ -8,7 +8,7 @@
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
 #include "HoldingItemsComponent.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 
@@ -39,12 +39,12 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	{
 	case ERaffleType::kRafflePermanent:
 	{
-		auto CoinUnitPtr = HoldItemPropertyRef->FindUnit_Coin(UGameplayTagsLibrary::Unit_Coin_RaffleLimit);
-		if (CoinUnitPtr)
+		auto CoinProxyPtr = HoldItemPropertyRef->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_RaffleLimit);
+		if (CoinProxyPtr)
 		{
-			if (CoinUnitPtr->GetCurrentValue() > Count)
+			if (CoinProxyPtr->GetCurrentValue() > Count)
 			{
-				CoinUnitPtr->AddCurrentValue(-Count);
+				CoinProxyPtr->AddCurrentValue(-Count);
 				return RafflePermanent(Count);
 			}
 		}
@@ -65,14 +65,14 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	return false;
 }
 
-void URaffleSubSystem::SyncUnits2Player()const
+void URaffleSubSystem::SyncProxys2Player()const
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
 	{
 		return;
 	}
-	CharacterPtr->GetHoldingItemsComponent()->SyncPendingUnit(ApendingID);
+	CharacterPtr->GetHoldingItemsComponent()->SyncPendingProxy(ApendingID);
 }
 
 bool URaffleSubSystem::RafflePermanent(int32 Count)const
@@ -98,13 +98,13 @@ void URaffleSubSystem::RafflePermanentComplete(
 #if TESTRAFFLE
 	Ary.Append(
 		{
-			UGameplayTagsLibrary::Unit_Skill_Active_Displacement,
-			UGameplayTagsLibrary::Unit_Skill_Active_GroupTherapy,
-			UGameplayTagsLibrary::Unit_Skill_Active_ContinuousGroupTherapy,
-			UGameplayTagsLibrary::Unit_Skill_Active_Tornado,
-			UGameplayTagsLibrary::Unit_Skill_Active_FlyAway,
+			UGameplayTagsLibrary::Proxy_Skill_Active_Displacement,
+			UGameplayTagsLibrary::Proxy_Skill_Active_GroupTherapy,
+			UGameplayTagsLibrary::Proxy_Skill_Active_ContinuousGroupTherapy,
+			UGameplayTagsLibrary::Proxy_Skill_Active_Tornado,
+			UGameplayTagsLibrary::Proxy_Skill_Active_FlyAway,
 
-			UGameplayTagsLibrary::Unit_Skill_Passve_ZMJZ,
+			UGameplayTagsLibrary::Proxy_Skill_Passve_ZMJZ,
 		}
 		);
 #else
@@ -116,19 +116,19 @@ void URaffleSubSystem::RafflePermanentComplete(
 		return;
 	}
 
-	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
 
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
 
-	TArray<FTableRowUnit*>GetUnitAry;
+	TArray<FTableRowProxy*>GetProxyAry;
 	for (const auto& Iter : Ary)
 	{
-		auto RowPtr = DataTable->FindRow<FTableRowUnit>(*Iter.ToString(), TEXT("GetUnit"));
+		auto RowPtr = DataTable->FindRow<FTableRowProxy>(*Iter.ToString(), TEXT("GetProxy"));
 
-		CharacterPtr->GetHoldingItemsComponent()->AddUnit_Pending(Iter, 1, ApendingID);
+		CharacterPtr->GetHoldingItemsComponent()->AddProxy_Pending(Iter, 1, ApendingID);
  
- 		GetUnitAry.Add(SceneUnitExtendInfoMapPtr->GetTableRowUnit(Iter));
+ 		GetProxyAry.Add(SceneProxyExtendInfoMapPtr->GetTableRowProxy(Iter));
 	}
 
-	OnGetUnitAry.ExcuteCallback(GetUnitAry);
+	OnGetProxyAry.ExcuteCallback(GetProxyAry);
 }

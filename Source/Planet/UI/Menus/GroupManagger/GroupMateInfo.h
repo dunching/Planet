@@ -24,7 +24,7 @@ struct FCharacterProxy;
 UCLASS()
 class PLANET_API UGroupMateInfo :
 	public UMyUserWidget,
-	public IUnitIconInterface,
+	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {
 	GENERATED_BODY()
@@ -39,11 +39,11 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	TSharedPtr < FCharacterProxy> GroupMateUnitPtr = nullptr;
+	TSharedPtr < FCharacterProxy> GroupMateProxyPtr = nullptr;
 
 private:
 

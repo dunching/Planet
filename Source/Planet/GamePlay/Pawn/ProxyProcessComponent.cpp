@@ -228,11 +228,11 @@ TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::GetWeaponSkillByType(const
 	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr = FirstWeaponProxySPtr->GetWeaponSkill();
 	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr = SecondWeaponProxySPtr->GetWeaponSkill();
 
-	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetUnitType() == TypeTag)
+	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetProxyType() == TypeTag)
 	{
 		TargetSkillSPtr = FirstWeaponSkillSPtr;
 	}
-	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetUnitType() == TypeTag)
+	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetProxyType() == TypeTag)
 	{
 		TargetSkillSPtr = SecondWeaponSkillSPtr;
 	}

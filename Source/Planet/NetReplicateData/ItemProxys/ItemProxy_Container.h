@@ -14,7 +14,7 @@
 
 #include "ItemProxy_Container.generated.h"
 
-class AToolUnitBase;
+class AToolProxyBase;
 class AWeapon_Base;
 class USkill_Consumable_Base;
 class AConsumable_Base;
@@ -26,9 +26,9 @@ class AHumanCharacter;
 class UHoldingItemsComponent;
 
 struct FBasicProxy;
-struct FTableRowUnit;
+struct FTableRowProxy;
 
-FTableRowUnit* GetTableRowUnit(const FGameplayTag &UnitType);
+FTableRowProxy* GetTableRowProxy(const FGameplayTag &ProxyType);
 
 USTRUCT()
 struct PLANET_API FProxy_FASI : public FFastArraySerializerItem
@@ -97,7 +97,7 @@ struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
 
 protected:
 
-	TSharedPtr<FBasicProxy> GetProxyType(const FGameplayTag& UnitType);
+	TSharedPtr<FBasicProxy> GetProxyType(const FGameplayTag& ProxyType);
 
 };
 

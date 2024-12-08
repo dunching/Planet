@@ -31,11 +31,11 @@ public:
 
 	USkillsIcon(const FObjectInitializer& ObjectInitializer);
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)override;
+	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)override;
 
 protected:
 

@@ -15,7 +15,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "BaseFeatureComponent.h"
-#include "SceneUnitTable.h"
+#include "SceneProxyTable.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "GameplayTagsLibrary.h"
@@ -27,10 +27,10 @@ UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify() :
 }
 
 FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal) :
-	Super(RightVal->GetUnitType())
+	Super(RightVal->GetProxyType())
 {
-	Duration = RightVal->GetTableRowUnit_Consumable()->Duration;
-	PerformActionInterval = RightVal->GetTableRowUnit_Consumable()->PerformActionInterval;
+	Duration = RightVal->GetTableRowProxy_Consumable()->Duration;
+	PerformActionInterval = RightVal->GetTableRowProxy_Consumable()->PerformActionInterval;
 	DefaultIcon = RightVal->GetIcon();
 }
 

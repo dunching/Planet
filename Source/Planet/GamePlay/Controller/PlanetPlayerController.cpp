@@ -329,7 +329,7 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 	return Result;
 }
 
-void APlanetPlayerController::ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)
+void APlanetPlayerController::ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)
 {
 }
 
@@ -372,7 +372,7 @@ TWeakObjectPtr<ACharacterBase> APlanetPlayerController::GetTeamFocusTarget() con
 	return nullptr;
 }
 
-TSharedPtr<FCharacterProxy> APlanetPlayerController::GetCharacterUnit()
+TSharedPtr<FCharacterProxy> APlanetPlayerController::GetCharacterProxy()
 {
 	return GetPawn<FPawnType>()->GetCharacterProxy();
 }
@@ -406,7 +406,7 @@ void APlanetPlayerController::BindPCWithCharacter()
 {
 }
 
-TSharedPtr<FCharacterProxy> APlanetPlayerController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
+TSharedPtr<FCharacterProxy> APlanetPlayerController::InitialCharacterProxy(ACharacterBase* CharaterPtr)
 {
 	return CharaterPtr->GetCharacterProxy();
 }

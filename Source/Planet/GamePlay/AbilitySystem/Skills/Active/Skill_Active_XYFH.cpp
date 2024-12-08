@@ -127,7 +127,7 @@ void USkill_Active_XYFH::EndAbility(
 	StepIndex = 0;
 	SubStepIndex = 0;
 
-	TargetOffsetValue.ReStore();
+//	TargetOffsetValue.ReStore();
 
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)

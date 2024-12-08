@@ -16,7 +16,7 @@
 class UGroupmateIcon;
 class UAllocationIconBase;
 struct FWeaponProxy;
-struct FBasicProxy;
+struct FAllocationbleProxy;
 struct FCharacterProxy;
 
 /**
@@ -54,29 +54,31 @@ protected:
 	void BindEvent();
 
 	void ResetUI(
-		const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr, 
-		const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr, 
+		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 	);
 
 	void InitialGroupmateList();
 
 	void ResetBackpack(
-		const TSharedPtr<FCharacterProxy>& AICharacterUnitPtr,
-		const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+		const TSharedPtr<FCharacterProxy>& AICharacterProxyPtr,
+		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 	);
 
 	void ResetUIByData_WeaponSkills(
-		const TSharedPtr<FCharacterProxy>& TargetCharacterUnitPtr,
-		const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr
+		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr,
+		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 		);
 
-	void ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
+	void ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr);
 
-	void ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterUnitPtr);
+	void ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr);
 
-	void OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr);
+	void OnItemProxyDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& ProxyPtr);
 
-	void OnSelectedCharacterUnit(const TSharedPtr<FCharacterProxy>& UnitPtr);
+	void OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
+
+	void OnSelectedCharacterProxy(const TSharedPtr<FCharacterProxy>& ProxyPtr);
 
 	void OnMainWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr);
 
@@ -86,24 +88,28 @@ protected:
 		UAllocationIconBase* UAllocationIconPtr
 	);
 
-	void OnWeaponUnitChanged(
-		const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
-		const TSharedPtr<FBasicProxy>& NewUnitPtr
+	void OnWeaponProxyChanged(
+		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
+		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+		const FGameplayTag&SocketTag
 	);
 
-	void OnSkillUnitChanged(
-		const TSharedPtr<FBasicProxy>& PreviousUnitPtr,
-		const TSharedPtr<FBasicProxy>& NewUnitPtr
+	void OnSkillProxyChanged(
+		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
+		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+		const FGameplayTag&SocketTag
 	);
 
-	void OnConsumableUnitChanged(
-		const TSharedPtr<FBasicProxy>& PreviousUnitPtr, 
-		const TSharedPtr<FBasicProxy>& NewUnitPtr
+	void OnConsumableProxyChanged(
+		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr, 
+		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+		const FGameplayTag&SocketTag
 	);
 
 	void SetAllocation(
-		const TSharedPtr<FBasicProxy>& PreviousUnitPtr, 
-		const TSharedPtr<FBasicProxy>& NewUnitPtr, 
+		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr, 
+		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr, 
+		const FGameplayTag&SocketTag,
 		bool bIsReplaced
 	);
 
@@ -143,6 +149,6 @@ protected:
 
 private:
 
-	TSharedPtr<FCharacterProxy> CurrentUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
 
 };

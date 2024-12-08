@@ -26,7 +26,7 @@ class UBackpackWeaponIcon;
 UCLASS()
 class PLANET_API UBackpackIconWrapper :
 	public UMyUserWidget,
-	public IUnitIconInterface,
+	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {
 	GENERATED_BODY()
@@ -41,21 +41,21 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	TSharedPtr<FBasicProxy> TargetBasicUnitPtr = nullptr;
+	TSharedPtr<FBasicProxy> TargetBasicProxyPtr = nullptr;
 
 	FOnDragIconDelegate OnDragIconDelegate;
 
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
-	TSubclassOf<UBackpackToolIcon> ToolUnitClass;
+	TSubclassOf<UBackpackToolIcon> ToolProxyClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
-	TSubclassOf<UBackpackConsumableIcon> ConsumableUnitClass;
+	TSubclassOf<UBackpackConsumableIcon> ConsumableProxyClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Icon Class")
 	TSubclassOf<UBackpackSkillIcon> BackpackSkillIconClass;

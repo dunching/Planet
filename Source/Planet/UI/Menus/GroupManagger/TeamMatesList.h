@@ -21,38 +21,46 @@ class AHumanCharacter;
  *
  */
 UCLASS()
-class PLANET_API UTeamMatesList : 
-	public UMyUserWidget, 
+class PLANET_API UTeamMatesList :
+	public UMyUserWidget,
 	public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
+	using FDelegateHandle =
+	TCallbackHandleContainer<void(
+		UTeamMateInfo*,
+		const TSharedPtr<FCharacterProxy>&,
+		const TSharedPtr<FCharacterProxy>&
+	)>::FCallbackHandleSPtr;
 
-	using FDelegateHandle = TCallbackHandleContainer<void(UTeamMateInfo*)>::FCallbackHandleSPtr;
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
-
-	virtual void NativeDestruct()override;
+	virtual void NativeDestruct() override;
 
 	AHumanCharacter* HumanCharacterPtr = nullptr;
 
 protected:
+	virtual void ResetUIByData() override;
 
-	virtual void ResetUIByData()override;
+	virtual void SyncData() override;
 
-	virtual void SyncData()override;
+	void OnWeaponProxyChanged(
+		UTeamMateInfo*UIPtr,
+		const TSharedPtr<FCharacterProxy>& PrevProxycharacterSPtr,
+		const TSharedPtr<FCharacterProxy>& NewProxycharacterSPtr
+	);
 
-	void OnTeammateChanged(UTeamMateInfo* GourpMateUnitPtr);
+	void OnTeammateChanged(UTeamMateInfo* GourpMateProxyPtr);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UTeamMateInfo>TeamMateInfoClass;
+	TSubclassOf<UTeamMateInfo> TeamMateInfoClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	int32 MaxMemberNum = 6;
 
-	TArray<FDelegateHandle>DelegateAry;
-
+	TArray<FDelegateHandle> DelegateAry;
 };
 
 UCLASS()

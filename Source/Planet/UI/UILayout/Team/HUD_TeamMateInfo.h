@@ -19,7 +19,7 @@ struct FCharacterProxy;
 UCLASS()
 class PLANET_API UHUD_TeamMateInfo :
 	public UMyUserWidget,
-	public IUnitIconInterface
+	public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 
@@ -27,7 +27,7 @@ public:
 
 	virtual void NativeConstruct()override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
@@ -37,6 +37,6 @@ protected:
 
 private:
 
-	TSharedPtr<FCharacterProxy> GroupMateUnitPtr = nullptr;
+	TSharedPtr<FCharacterProxy> GroupMateProxyPtr = nullptr;
 
 };

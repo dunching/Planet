@@ -49,10 +49,10 @@ class PLANET_API USTE_Human : public UStateTreeEvaluatorBlueprintBase
 
 public:
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
 	using FTeamOptionChangedHandle =
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterProxyType>&)>::FCallbackHandleSPtr;
 
 	using FTeammateChangedHandle =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;

@@ -20,8 +20,8 @@
 #include "BackpackIcon.h"
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "ItemsDragDropOperation.h"
-#include "DragDropOperationWidget.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
@@ -42,22 +42,22 @@ USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPtr)
+void USkillsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
 {
-	if (InBasicUnitPtr == BasicUnitPtr)
+	if (InBasicProxyPtr == BasicProxyPtr)
 	{
 		return;
 	}
 
-	auto PreviousUnitPtr = BasicUnitPtr;
-	TSharedPtr<FBasicProxy> NewUnitPtr = nullptr;
-	if (InBasicUnitPtr && InBasicUnitPtr->GetUnitType().MatchesTag(UnitType))
+	auto PreviousProxyPtr = BasicProxyPtr;
+	TSharedPtr<FAllocationbleProxy> NewProxyPtr = nullptr;
+	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(ProxyType))
 	{
-		NewUnitPtr = InBasicUnitPtr;
+		NewProxyPtr = InBasicProxyPtr;
 	}
 	else
 	{
-		if (UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve))
+		if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
 		{
 			auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 			if (!CharacterPtr)
@@ -67,23 +67,23 @@ void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicUnitPt
 
 			// 装备了可以在“被动”槽上备注“主动技能”的主动技能
 			if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
-				UGameplayTagsLibrary::Unit_Skill_Active_Switch
+				UGameplayTagsLibrary::Proxy_Skill_Active_Switch
 			).IsValid())
 			{
-				NewUnitPtr = InBasicUnitPtr;
+				NewProxyPtr = InBasicProxyPtr;
 			}
 		}
 
 	}
 
-	if (!bPaseInvokeOnResetUnitEvent)
+	if (!bPaseInvokeOnResetProxyEvent)
 	{
-		OnResetProxy.ExcuteCallback(PreviousUnitPtr, NewUnitPtr);
+		OnResetProxy.ExcuteCallback(PreviousProxyPtr, NewProxyPtr);
 	}
 
-	BasicUnitPtr = NewUnitPtr;
+	BasicProxyPtr = NewProxyPtr;
 
-	if (!bPaseInvokeOnResetUnitEvent)
+	if (!bPaseInvokeOnResetProxyEvent)
 	{
 		OnResetData(this);
 	}
@@ -118,19 +118,19 @@ void USkillsIcon::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& UnitPtr)
+void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
 {
 	if (bIsDragging)
 	{
-		if (UnitPtr && UnitPtr->GetUnitType().MatchesTag(UnitType))
+		if (ProxyPtr && ProxyPtr->GetProxyType().MatchesTag(ProxyType))
 		{
 			EnableIcon(true);
 		}
 		else
 		{
 			if (
-				UnitType.MatchesTag(UGameplayTagsLibrary::Unit_Skill_Passve) &&
-				UnitPtr->GetUnitType().MatchesTag(UGameplayTagsLibrary::Unit_Skill_Active)
+				ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve) &&
+				ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)
 				)
 			{
 				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
@@ -141,7 +141,7 @@ void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& Un
 
 				// 装备了可以在“被动”槽上备注“主动技能”的主动技能
 				if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
-					UGameplayTagsLibrary::Unit_Skill_Active_Switch
+					UGameplayTagsLibrary::Proxy_Skill_Active_Switch
 				).IsValid())
 				{
 					EnableIcon(true);

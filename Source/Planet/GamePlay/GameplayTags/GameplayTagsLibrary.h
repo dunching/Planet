@@ -159,80 +159,80 @@ public:
 	static FGameplayTag TalentSocket;
 #pragma endregion
 
-#pragma region UnitTyp
-	static FGameplayTag Unit_Weapon;
+#pragma region ProxyTyp
+	static FGameplayTag Proxy_Weapon;
 
-	static FGameplayTag Unit_Weapon_Axe;
+	static FGameplayTag Proxy_Weapon_Axe;
 	
-	static FGameplayTag Unit_Tool;
+	static FGameplayTag Proxy_Tool;
 
-	static FGameplayTag Unit_Tool_Axe;
+	static FGameplayTag Proxy_Tool_Axe;
 
-	static FGameplayTag Unit_Consumables;
+	static FGameplayTag Proxy_Consumables;
 
-	static FGameplayTag Unit_Consumables_HP;
+	static FGameplayTag Proxy_Consumables_HP;
 
-	static FGameplayTag Unit_Consumables_PP;
+	static FGameplayTag Proxy_Consumables_PP;
 
-	static FGameplayTag Unit_Coin;
+	static FGameplayTag Proxy_Coin;
 
-	static FGameplayTag Unit_Coin_Regular;
+	static FGameplayTag Proxy_Coin_Regular;
 
-	static FGameplayTag Unit_Coin_RafflePermanent;
+	static FGameplayTag Proxy_Coin_RafflePermanent;
 
-	static FGameplayTag Unit_Coin_RaffleLimit;
+	static FGameplayTag Proxy_Coin_RaffleLimit;
 
-	static FGameplayTag Unit_Skill;
+	static FGameplayTag Proxy_Skill;
 
-	static FGameplayTag Unit_Skill_Weapon;
+	static FGameplayTag Proxy_Skill_Weapon;
 
-	static FGameplayTag Unit_Skill_Weapon_Axe;
+	static FGameplayTag Proxy_Skill_Weapon_Axe;
 
-	static FGameplayTag Unit_Skill_Weapon_HandProtection;
+	static FGameplayTag Proxy_Skill_Weapon_HandProtection;
 
-	static FGameplayTag Unit_Skill_Weapon_RangeTest;
+	static FGameplayTag Proxy_Skill_Weapon_RangeTest;
 	
-	static FGameplayTag Unit_Skill_Weapon_Bow;
+	static FGameplayTag Proxy_Skill_Weapon_Bow;
 
-	static FGameplayTag Unit_Skill_Weapon_FoldingFan;
+	static FGameplayTag Proxy_Skill_Weapon_FoldingFan;
 	
-	static FGameplayTag Unit_Skill_Active;
+	static FGameplayTag Proxy_Skill_Active;
 
-	static FGameplayTag Unit_Skill_Active_Switch;
+	static FGameplayTag Proxy_Skill_Active_Switch;
 	
-	static FGameplayTag Unit_Skill_Active_Switch_Test;
+	static FGameplayTag Proxy_Skill_Active_Switch_Test;
 	
-	static FGameplayTag Unit_Skill_Active_Control;
+	static FGameplayTag Proxy_Skill_Active_Control;
 
-	static FGameplayTag Unit_Skill_Active_Displacement;
+	static FGameplayTag Proxy_Skill_Active_Displacement;
 
-	static FGameplayTag Unit_Skill_Active_GroupTherapy;
+	static FGameplayTag Proxy_Skill_Active_GroupTherapy;
 
-	static FGameplayTag Unit_Skill_Active_ContinuousGroupTherapy;
+	static FGameplayTag Proxy_Skill_Active_ContinuousGroupTherapy;
 
-	static FGameplayTag Unit_Skill_Active_Tornado;
+	static FGameplayTag Proxy_Skill_Active_Tornado;
 
-	static FGameplayTag Unit_Skill_Active_FlyAway;
+	static FGameplayTag Proxy_Skill_Active_FlyAway;
 
-	static FGameplayTag Unit_Skill_Active_Stun;
+	static FGameplayTag Proxy_Skill_Active_Stun;
 
-	static FGameplayTag Unit_Skill_Active_Charm;
+	static FGameplayTag Proxy_Skill_Active_Charm;
 
-	static FGameplayTag Unit_Skill_Passve;
+	static FGameplayTag Proxy_Skill_Passve;
 
-	static FGameplayTag Unit_Skill_Passve_ZMJZ;
+	static FGameplayTag Proxy_Skill_Passve_ZMJZ;
 
-	static FGameplayTag Unit_Skill_Talent;
+	static FGameplayTag Proxy_Skill_Talent;
 	
-	static FGameplayTag Unit_Skill_Talent_NuQi;
+	static FGameplayTag Proxy_Skill_Talent_NuQi;
 
-	static FGameplayTag Unit_Skill_Talent_YinYang;
+	static FGameplayTag Proxy_Skill_Talent_YinYang;
 
-	static FGameplayTag Unit_Character;
+	static FGameplayTag Proxy_Character;
 
-	static FGameplayTag Unit_Character_Player;
+	static FGameplayTag Proxy_Character_Player;
 
-	static FGameplayTag Unit_Character_TestNPC_1;
+	static FGameplayTag Proxy_Character_TestNPC_1;
 
 #pragma endregion
 

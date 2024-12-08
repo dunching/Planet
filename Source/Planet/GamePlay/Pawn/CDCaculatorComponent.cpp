@@ -14,7 +14,7 @@
 #include "HoldingItemsComponent.h"
 #include "ItemProxy_Container.h"
 #include "GameOptions.h"
-#include "SceneUnitTable.h"
+#include "SceneProxyTable.h"
 #include "ItemProxy_Minimal.h"
 #include "Planet.h"
 #include "LogWriter.h"
@@ -166,19 +166,19 @@ void UCDCaculatorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CD_FASI_Container, Params);
 }
 
-void UCDCaculatorComponent::ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr)
+void UCDCaculatorComponent::ApplyCooldown(FActiveSkillProxy* ActiveSkillProxyPtr)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		// 独立CD
 		{
-			auto SkillCooldownInfoMap = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->SkillCooldownInfoMap;
-			if (Separate_Map.Contains(ActiveSkillUnitPtr->GetID()))
+			auto SkillCooldownInfoMap = ActiveSkillProxyPtr->GetTableRowProxy_ActiveSkillExtendInfo()->SkillCooldownInfoMap;
+			if (Separate_Map.Contains(ActiveSkillProxyPtr->GetID()))
 			{
-				auto CDSPtr = Separate_Map[ActiveSkillUnitPtr->GetID()];
+				auto CDSPtr = Separate_Map[ActiveSkillProxyPtr->GetID()];
 				CDSPtr->SetCooldown(
-					SkillCooldownInfoMap[ActiveSkillUnitPtr->Level]
+					SkillCooldownInfoMap[ActiveSkillProxyPtr->Level]
 				);
 				CDSPtr->ResetCooldownTime();
 
@@ -188,26 +188,26 @@ void UCDCaculatorComponent::ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr)
 			{
 				TSharedPtr<FSkillCooldownHelper> SkillCooldownHelperSPtr = MakeShared<FSkillCooldownHelper>();
 
-				SkillCooldownHelperSPtr->SkillProxy_ID = ActiveSkillUnitPtr->GetID();
+				SkillCooldownHelperSPtr->SkillProxy_ID = ActiveSkillProxyPtr->GetID();
 
 				SkillCooldownHelperSPtr->SetCooldown(
-					SkillCooldownInfoMap[ActiveSkillUnitPtr->Level]
+					SkillCooldownInfoMap[ActiveSkillProxyPtr->Level]
 				);
 				SkillCooldownHelperSPtr->ResetCooldownTime();
 
-				Separate_Map.Add(ActiveSkillUnitPtr->GetID(), SkillCooldownHelperSPtr);
+				Separate_Map.Add(ActiveSkillProxyPtr->GetID(), SkillCooldownHelperSPtr);
 
 				CD_FASI_Container.AddItem(SkillCooldownHelperSPtr);
 			}
 		}
 
 		// 公共CD
-		auto SkillCommonCooldownInfoMap = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->SkillCommonCooldownInfoMap;
+		auto SkillCommonCooldownInfoMap = ActiveSkillProxyPtr->GetTableRowProxy_ActiveSkillExtendInfo()->SkillCommonCooldownInfoMap;
 		for (const auto Iter : SkillCommonCooldownInfoMap)
 		{
 			if (Common_Map.Contains(Iter))
 			{
-				auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+				auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
 				if (CommonCooldownInfoPtr)
 				{
 					auto CDSPtr = Common_Map[Iter];
@@ -223,7 +223,7 @@ void UCDCaculatorComponent::ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr)
 
 				SkillCooldownHelperSPtr->SkillType = Iter;
 
-				auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+				auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
 				if (CommonCooldownInfoPtr)
 				{
 					SkillCooldownHelperSPtr->SetCooldown(CommonCooldownInfoPtr->CoolDownTime);
@@ -239,26 +239,26 @@ void UCDCaculatorComponent::ApplyCooldown(FActiveSkillProxy* ActiveSkillUnitPtr)
 #endif
 }
 
-TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FActiveSkillProxy* ActiveSkillUnitPtr) const
+TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FActiveSkillProxy* ActiveSkillProxyPtr) const
 {
 	TSharedPtr<FSkillCooldownHelper> MaxCD = nullptr;
 
 	// 独立CD
 	{
-		auto SkillCooldownInfoMap = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->SkillCooldownInfoMap;
-		if (Separate_Map.Contains(ActiveSkillUnitPtr->GetID()))
+		auto SkillCooldownInfoMap = ActiveSkillProxyPtr->GetTableRowProxy_ActiveSkillExtendInfo()->SkillCooldownInfoMap;
+		if (Separate_Map.Contains(ActiveSkillProxyPtr->GetID()))
 		{
-			return Separate_Map[ActiveSkillUnitPtr->GetID()];
+			return Separate_Map[ActiveSkillProxyPtr->GetID()];
 		}
 	}
 
 	// 公共CD
-	auto SkillCommonCooldownInfoMap = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->SkillCommonCooldownInfoMap;
+	auto SkillCommonCooldownInfoMap = ActiveSkillProxyPtr->GetTableRowProxy_ActiveSkillExtendInfo()->SkillCommonCooldownInfoMap;
 	for (const auto Iter : SkillCommonCooldownInfoMap)
 	{
 		if (Common_Map.Contains(Iter))
 		{
-			auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+			auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
 			if (CommonCooldownInfoPtr)
 			{
 				return Common_Map[Iter];
@@ -276,7 +276,7 @@ void UCDCaculatorComponent::ApplyCooldown(FConsumableProxy* ConsumableProxySPtr)
 	{
 		// 独立CD
 		{
-			const auto CD = ConsumableProxySPtr->GetTableRowUnit_Consumable()->CD;
+			const auto CD = ConsumableProxySPtr->GetTableRowProxy_Consumable()->CD;
 			if (Separate_Map.Contains(ConsumableProxySPtr->GetID()))
 			{
 				auto CDSPtr = Separate_Map[ConsumableProxySPtr->GetID()];
@@ -301,12 +301,12 @@ void UCDCaculatorComponent::ApplyCooldown(FConsumableProxy* ConsumableProxySPtr)
 		}
 
 		// 公共CD
-		auto SkillCommonCooldownInfoMap = ConsumableProxySPtr->GetTableRowUnit_Consumable()->CommonCooldownInfoMap;
+		auto SkillCommonCooldownInfoMap = ConsumableProxySPtr->GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 		for (const auto Iter : SkillCommonCooldownInfoMap)
 		{
 			if (Common_Map.Contains(Iter))
 			{
-				auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+				auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
 				if (CommonCooldownInfoPtr)
 				{
 					auto CDSPtr = Common_Map[Iter];
@@ -322,7 +322,7 @@ void UCDCaculatorComponent::ApplyCooldown(FConsumableProxy* ConsumableProxySPtr)
 
 				SkillCooldownHelperSPtr->SkillType = Iter;
 
-				auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+				auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
 				if (CommonCooldownInfoPtr)
 				{
 					SkillCooldownHelperSPtr->SetCooldown(CommonCooldownInfoPtr->CoolDownTime);
@@ -355,12 +355,12 @@ TSharedPtr<FSkillCooldownHelper> UCDCaculatorComponent::GetCooldown(const FConsu
 	}
 
 	// 公共CD
-	auto SkillCommonCooldownInfoMap = ConsumableProxySPtr->GetTableRowUnit_Consumable()->CommonCooldownInfoMap;
+	auto SkillCommonCooldownInfoMap = ConsumableProxySPtr->GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 	for (const auto Iter : SkillCommonCooldownInfoMap)
 	{
 		if (Common_Map.Contains(Iter))
 		{
-			auto CommonCooldownInfoPtr = GetTableRowUnit_CommonCooldownInfo(Iter);
+			auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
 			if (CommonCooldownInfoPtr)
 			{
 				auto TempSPtr = Common_Map[Iter];

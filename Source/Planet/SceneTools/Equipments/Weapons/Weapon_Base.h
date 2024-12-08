@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "ToolUnitBase.h"
+#include "ToolProxyBase.h"
 #include "PlanetGameplayAbility.h"
 #include "Skill_Base.h"
 
@@ -14,7 +14,7 @@ class AHumanCharacter;
 struct FWeaponProxy;
 
 UCLASS()
-class PLANET_API AWeapon_Base : public AToolUnitBase
+class PLANET_API AWeapon_Base : public AToolProxyBase
 {
 	GENERATED_BODY()
 
