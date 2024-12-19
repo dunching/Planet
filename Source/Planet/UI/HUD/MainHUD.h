@@ -7,6 +7,7 @@
 #include "GameFramework/HUD.h"
 
 #include "MyUserWidget.h"
+#include "TemplateHelper.h"
 
 #include "MainHUD.generated.h"
 
@@ -14,6 +15,7 @@ class UMainHUDLayout;
 class URegularActionLayout;
 class UEndangeredStateLayout;
 class UGetItemInfosList;
+struct FOnAttributeChangeData;
 
 enum class EMainHUDType : uint8 
 {
@@ -29,17 +31,24 @@ class PLANET_API AMainHUD : public AHUD
 
 public:
 
+	using FOnInitaliedGroupSharedInfo =
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
 	virtual void BeginPlay()override;
 
 	virtual void ShowHUD()override;
 
+	void InitalHUD();
+	
 	void SwitchState(EMainHUDType MainHUDType);
 
 	URegularActionLayout* RegularActionStatePtr = nullptr;
 	
 protected:
 	
-	void OnHPChanged(int32 CurrentValue);
+	void OnHPChanged(const FOnAttributeChangeData&);
+
+	void OnHPChangedImp();
 
 	void InitMainHUDLayout();
 

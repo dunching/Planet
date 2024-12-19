@@ -1,10 +1,9 @@
 
 #include "GroupSharedInfo.h"
 
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 #include "HoldingItemsComponent.h"
-#include "ProxySycHelperComponent.h"
 
 AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
@@ -13,6 +12,10 @@ AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
 	
 	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(UTeamMatesHelperComponent::ComponentName);
 	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
+	
+	AbilitySystemComponentPtr = CreateDefaultSubobject<UPlanetAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponentPtr->SetIsReplicated(true);
+	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }
 
 void AGroupSharedInfo::BeginPlay()
@@ -28,6 +31,11 @@ void AGroupSharedInfo::PostInitializeComponents()
 	if ((World->IsGameWorld()))
 	{
 	}
+}
+
+UPlanetAbilitySystemComponent* AGroupSharedInfo::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponentPtr;
 }
 
 UTeamMatesHelperComponent* AGroupSharedInfo::GetTeamMatesHelperComponent()

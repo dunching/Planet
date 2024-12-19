@@ -52,13 +52,10 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	void SynMember2Config();
+	void SynMember2Config(int32 Index );
 
 	FCallbackHandleContainer OnDroped;
 	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Index)
-	int32 Index = 0;
-
 	bool bPaseInvokeOnResetProxyEvent = false;
 	
 private:

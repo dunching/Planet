@@ -78,7 +78,7 @@ void USkillsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBas
 
 	if (!bPaseInvokeOnResetProxyEvent)
 	{
-		OnResetProxy.ExcuteCallback(PreviousProxyPtr, NewProxyPtr);
+		OnResetProxy.ExcuteCallback(PreviousProxyPtr, NewProxyPtr, IconSocket);
 	}
 
 	BasicProxyPtr = NewProxyPtr;

@@ -15,7 +15,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "CollisionDataStruct.h"
 #include "HumanCharacter.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "SceneObjSubSystem.h"
 #include "BaseFeatureComponent.h"
 
@@ -64,13 +64,13 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
-			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
-
-		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
-		);
+		// OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
+		// 	std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
+		// );
+		//
+		// TalentSPtr = TSharedPtr<FCurrentTalentType>(
+		// 	CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
+		// );
 	}
 
 	TargetPostPtr = USceneObjSubSystem::GetInstance()->GetSkillPost();

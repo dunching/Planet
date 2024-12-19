@@ -38,6 +38,7 @@ class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
 class UMenuLayout;
+class UGameplayEffect;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UObject
@@ -83,6 +84,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
 #pragma endregion MenusUI
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<UGameplayEffect>DurationGEClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<EMaterialParamNameType, FName>MatParamNameMap;

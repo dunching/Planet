@@ -11,7 +11,7 @@
 #include "ItemProxy_Minimal.h"
 #include "TeamConfigure.h"
 
-#include "GroupMnaggerComponent.generated.h"
+#include "TeamMatesHelperComponent.generated.h"
 
 class AHumanCharacter;
 class ACharacterBase;
@@ -69,7 +69,7 @@ public:
 
 	void SpwanTeammateCharacter();
 
-	void AddCharacterToTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
+	void UpdateTeammateConfig(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
 
 	bool IsMember(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr)const;
 
@@ -107,7 +107,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	UFUNCTION(Server, Reliable)
-	virtual void AddCharacterToTeam_Server(const FGuid&ProxtID, int32 Index);
+	virtual void UpdateTeammateConfig_Server(const FGuid&ProxtID, int32 Index);
 
 	UFUNCTION(Server, Reliable)
 	virtual void SpwanTeammateCharacter_Server();
@@ -122,8 +122,8 @@ private:
 
 	void OnAddToNewTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr);
 
-	void AddCharacter(FPawnType* PCPtr);
+	void UpdateTeammateConfigImp(FPawnType* PCPtr, int32 Index);
 
-	void AddCharacter(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr);
+	void UpdateTeammateConfigImp(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
 
 };

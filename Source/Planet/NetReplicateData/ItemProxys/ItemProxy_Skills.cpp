@@ -15,7 +15,7 @@
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
 #include "ItemProxy_Container.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "PropertyEntrys.h"
 #include "CharactersInfo.h"
 #include "Skill_Base.h"
@@ -37,11 +37,6 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-
 FSkillProxy::FSkillProxy() :
 	Super()
 {
@@ -186,6 +181,25 @@ FActiveSkillProxy::FActiveSkillProxy()
 {
 }
 
+bool FActiveSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	// if (Ar.IsSaving())
+	// {
+	// 	auto Handle = GetTypeHash(CD_GE_Handle);
+	// 	Ar << Handle;
+	// }
+	// else if (Ar.IsLoading())
+	// {
+	// 	int32 Handle= 0;
+	// 	Ar << Handle;
+	// 	CD_GE_Handle = FActiveGameplayEffectHandle(Handle);
+	// }
+
+	return true;
+}
+
 bool FActiveSkillProxy::CanActive() const
 {
 	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
@@ -291,30 +305,34 @@ void FActiveSkillProxy::Cancel()
 
 bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	auto CDSPtr = GetOwnerCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
+	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetAbilitySystemComponent()->GetActiveEffects(
+	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
 	);
 
-	if (CDSPtr)
+	if (!GameplayEffectHandleAry.IsEmpty())
 	{
-		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-	}
+		auto GameplayEffectPtr = GetOwnerCharacter()->GetAbilitySystemComponent()->GetActiveGameplayEffect(
+		GameplayEffectHandleAry[0]
+		);
 
+		if (GameplayEffectPtr)
+		{
+			RemainingCooldown = GameplayEffectPtr->GetTimeRemaining(GetWorldImp()->GetTimeSeconds());
+			RemainingCooldownPercent = RemainingCooldown / GameplayEffectPtr->GetDuration(); 
+
+			return false;
+		}
+	}
 	return true;
 }
 
 bool FActiveSkillProxy::CheckCooldown() const
 {
-	auto CDSPtr = GetOwnerCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
+	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetAbilitySystemComponent()->GetActiveEffects(
+	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
 	);
 
-	if (CDSPtr)
-	{
-		return CDSPtr->CheckCooldown();
-	}
-
-	return true;
+	return GameplayEffectHandleAry.IsEmpty();
 }
 
 void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
@@ -327,14 +345,18 @@ void FActiveSkillProxy::FreshUniqueCooldownTime()
 
 void FActiveSkillProxy::ApplyCooldown()
 {
-	GetOwnerCharacter()->GetCDCaculatorComponent()->ApplyCooldown(
-		this
-	);
 }
 
 void FActiveSkillProxy::OffsetCooldownTime()
 {
 }
+
+// void FActiveSkillProxy::SetCDGEChandle(FActiveGameplayEffectHandle InCD_GE_Handle)
+// {
+// 	CD_GE_Handle = InCD_GE_Handle;
+//
+// 	Update2Client();
+// }
 
 FTableRowProxy_ActiveSkillExtendInfo* FActiveSkillProxy::GetTableRowProxy_ActiveSkillExtendInfo() const
 {

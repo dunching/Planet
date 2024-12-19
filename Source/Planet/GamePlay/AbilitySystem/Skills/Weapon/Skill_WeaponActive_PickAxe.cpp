@@ -22,9 +22,10 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 #include "Weapon_PickAxe.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
 #include "BaseFeatureComponent.h"
 #include "GroupSharedInfo.h"
@@ -179,7 +180,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	))
 	{
 		const auto & CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		const int32 BaseDamage = Damage + (CharacterAttributes.AD.GetCurrentValue() * AD_Damage_Magnification);
+		const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
 
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 
@@ -218,7 +219,7 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 		)
 	{
-		const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+		const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 		const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 		{

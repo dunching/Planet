@@ -41,7 +41,7 @@
 #include "PlanetPlayerState.h"
 #include "HumanAIController.h"
 #include "CharacterTitle.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "GetItemInfosList.h"
 

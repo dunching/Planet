@@ -22,9 +22,10 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 #include "Weapon_PickAxe.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
 #include "BaseFeatureComponent.h"
 #include "GroupSharedInfo.h"
@@ -171,7 +172,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 
 void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{

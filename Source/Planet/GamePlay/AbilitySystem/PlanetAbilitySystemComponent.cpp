@@ -6,6 +6,8 @@
 #include "Skill_Base.h"
 #include "GameplayTagsLibrary.h"
 
+FName UPlanetAbilitySystemComponent::ComponentName = TEXT("AbilitySystemComponent");
+
 void UPlanetAbilitySystemComponent::TickComponent(
 	float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
 )

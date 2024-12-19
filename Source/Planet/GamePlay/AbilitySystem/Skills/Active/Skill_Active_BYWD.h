@@ -29,6 +29,19 @@ public:
 	) override;
 
 protected:
+	
+	virtual bool CommitAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	)override;
+
+	virtual void ApplyCooldown(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo
+		) const override;
 
 	void DurationDelegate(UAbilityTask_TimerHelper*, float CurrentInterval, float Interval);
 

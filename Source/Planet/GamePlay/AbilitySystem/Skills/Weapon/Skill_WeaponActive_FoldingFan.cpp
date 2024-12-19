@@ -27,11 +27,12 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "Weapon_FoldingFan.h"
 #include "BaseFeatureComponent.h"
 #include "KismetGravityLibrary.h"
 #include "AbilityTask_FlyAway.h"
+#include "AS_Character.h"
 #include "LogWriter.h"
 
 namespace Skill_WeaponActive_FoldingFan
@@ -386,7 +387,7 @@ void USkill_WeaponActive_FoldingFan::MakeDamage(ACharacterBase* TargetCharacterP
 
 void USkill_WeaponActive_FoldingFan::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	if (

@@ -9,6 +9,7 @@
 
 #include "GravityPlayerController.h"
 #include "GenerateType.h"
+#include "GroupSharedInterface.h"
 #include "PlanetControllerInterface.h"
 
 #include "PlanetPlayerController.generated.h"
@@ -21,25 +22,25 @@ class UFocusIcon;
 class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
 class UTalentAllocationComponent;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
 class AGroupSharedInfo;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API APlanetPlayerController : 
+class PLANET_API APlanetPlayerController :
 	public AGravityPlayerController,
-	public IPlanetControllerInterface
+	public IPlanetControllerInterface,
+	public IGroupSharedInterface
 {
 	GENERATED_BODY()
 
 public:
-
 	using FPawnType = AHumanCharacter_Player;
 
 	using FOnFocusCharacterDelegate =
-		TCallbackHandleContainer<void(ACharacterBase*)>;
+	TCallbackHandleContainer<void(ACharacterBase*)>;
 
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
 
@@ -57,34 +58,34 @@ public:
 
 	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
 
-	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
+	virtual void SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr) override;
 
-	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
+	virtual UHoldingItemsComponent* GetHoldingItemsComponent() const override;
 
-	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;
+	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent() const override;
 
-	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
+	virtual UTalentAllocationComponent* GetTalentAllocationComponent() const override;
 
 	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
 
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() override;
 
-	virtual ACharacterBase* GetRealCharacter()const override;
+	virtual ACharacterBase* GetRealCharacter() const override;
 
 	void OnHPChanged(int32 CurrentValue);
 
 	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
 #pragma region CMD
-	
-	UFUNCTION(Server, Reliable)
-	void MakeTrueDamege(const TArray< FString >& Args);
 
 	UFUNCTION(Server, Reliable)
-	void MakeTherapy(const TArray< FString >& Args);
+	void MakeTrueDamege(const TArray<FString>& Args);
 
 	UFUNCTION(Server, Reliable)
-	void MakeRespawn(const TArray< FString >& Args);
+	void MakeTherapy(const TArray<FString>& Args);
+
+	UFUNCTION(Server, Reliable)
+	void MakeRespawn(const TArray<FString>& Args);
 
 #pragma endregion
 
@@ -92,18 +93,17 @@ public:
 	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
 
 protected:
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void BeginPlay() override;
-	
+
 	virtual void PostInitializeComponents() override;
-	
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual void PlayerTick(float DeltaTime)override;
+	virtual void PlayerTick(float DeltaTime) override;
 
-	virtual void UpdateRotation(float DeltaTime)override;
+	virtual void UpdateRotation(float DeltaTime) override;
 
 	virtual void OnPossess(APawn* InPawn) override;
 
@@ -111,13 +111,15 @@ protected:
 
 	virtual void SetPawn(APawn* InPawn) override;
 
-	virtual bool InputKey(const FInputKeyParams& Params)override;
+	virtual bool InputKey(const FInputKeyParams& Params) override;
 
-	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)override;
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
 
-	virtual void BindPCWithCharacter()override;
+	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr) override;
 
-	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase * CharaterPtr)override;
+	virtual void BindPCWithCharacter() override;
+
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase* CharaterPtr) override;
 
 	virtual void InitialGroupSharedInfo();
 
@@ -135,5 +137,5 @@ protected:
 
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
-	FFocusKnowledge	FocusInformation;
+	FFocusKnowledge FocusInformation;
 };

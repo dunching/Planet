@@ -11,6 +11,8 @@
 
 #include "MyBaseProperty.generated.h"
 
+class UAbilitySystemComponent;
+
 UCLASS()
 class PLANET_API UMyBaseProperty : public UMyUserWidget
 {
@@ -24,15 +26,31 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	void SetDataSource(FBasePropertySet& Property);
+	void SetDataSource(
+		UAbilitySystemComponent*AbilitySystemComponentPtr,
+		FGameplayAttribute Attribute,
+		float Value
+		);
 
-	void SetDataSource(FBasePropertySet& Property1, FBasePropertySet& Property2);
+	void SetDataSource(
+		UAbilitySystemComponent*AbilitySystemComponentPtr,
+		FGameplayAttribute Attribute,
+		float Value,
+		FGameplayAttribute MaxAttribute,
+		float MaxValue
+		);
 
 private:
 
+	void SetCurrentValue_Re(const FOnAttributeChangeData& CurrentValue);
+
 	void SetCurrentValue(int32 InCurrentValue);
 
+	void SetCurrentValue1_Re(const FOnAttributeChangeData& CurrentValue);
+
 	void SetCurrentValue1(int32 InCurrentValue);
+
+	void SetCurrentValue2_Re(const FOnAttributeChangeData& CurrentValue);
 
 	void SetCurrentValue2(int32 InCurrentValue);
 

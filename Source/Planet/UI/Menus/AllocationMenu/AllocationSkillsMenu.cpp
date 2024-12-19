@@ -285,7 +285,7 @@ void UAllocationSkillsMenu::SyncData()
 			{
 				if (UIPtr->BasicProxyPtr)
 				{
-					Socket.SkillProxyID = UIPtr->WeaponProxyPtr->GetID();
+					Socket.AllocationedProxyID = UIPtr->WeaponProxyPtr->GetID();
 				}
 				else
 				{
@@ -309,7 +309,7 @@ void UAllocationSkillsMenu::SyncData()
 			{
 				if (UIPtr->BasicProxyPtr)
 				{
-					Socket.SkillProxyID = UIPtr->BasicProxyPtr->GetID();
+					Socket.AllocationedProxyID = UIPtr->BasicProxyPtr->GetID();
 				}
 				else
 				{
@@ -364,7 +364,8 @@ void UAllocationSkillsMenu::BindEvent()
 				{
 					auto Result = UIPtr->OnResetProxy.AddCallback(
 						std::bind(
-							&ThisClass::OnSkillProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+							&ThisClass::OnSkillProxyChanged, this, std::placeholders::_1, std::placeholders::_2,
+							std::placeholders::_3
 						)
 					);
 					Result->bIsAutoUnregister = false;
@@ -395,7 +396,8 @@ void UAllocationSkillsMenu::BindEvent()
 			{
 				auto Result = UIPtr->OnResetProxy.AddCallback(
 					std::bind(
-						&ThisClass::OnConsumableProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+						&ThisClass::OnConsumableProxyChanged, this, std::placeholders::_1, std::placeholders::_2,
+						std::placeholders::_3
 					)
 				);
 				Result->bIsAutoUnregister = false;
@@ -424,7 +426,8 @@ void UAllocationSkillsMenu::BindEvent()
 				{
 					auto Result = UIPtr->OnResetProxy.AddCallback(
 						std::bind(
-							&ThisClass::OnWeaponProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+							&ThisClass::OnWeaponProxyChanged, this, std::placeholders::_1, std::placeholders::_2,
+							std::placeholders::_3
 						)
 					);
 					Result->bIsAutoUnregister = false;
@@ -553,7 +556,10 @@ void UAllocationSkillsMenu::OnResetData(UAllocationIconBase* UAllocationIconPtr)
 	}
 
 	auto SocketSPtr = CurrentProxyPtr->FindSocket(UAllocationIconPtr->IconSocket);
-	SocketSPtr.SkillProxyID = UAllocationIconPtr->BasicProxyPtr->GetID();
+	if (UAllocationIconPtr->BasicProxyPtr)
+	{
+		SocketSPtr.AllocationedProxyID = UAllocationIconPtr->BasicProxyPtr->GetID();
+	}
 }
 
 void UAllocationSkillsMenu::OnItemProxyDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& ProxyPtr)

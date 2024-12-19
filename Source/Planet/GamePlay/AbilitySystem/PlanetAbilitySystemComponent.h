@@ -24,6 +24,7 @@ class PLANET_API IPlanetAbilitySystemInterface
 public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
+	
 };
 
 UCLASS(BlueprintType, Blueprintable)
@@ -32,6 +33,8 @@ class PLANET_API UPlanetAbilitySystemComponent : public UAbilitySystemComponent
 	GENERATED_BODY()
 
 public:
+
+	static FName ComponentName;
 
 	virtual void TickComponent(
 		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction

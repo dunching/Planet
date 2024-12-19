@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 
 #include "MyUserWidget.h"
 
@@ -26,9 +27,21 @@ public:
 
 	void SetDataSource(FBasePropertySet & Property);
 
+	void SetDataSource(
+		UAbilitySystemComponent*AbilitySystemComponentPtr,
+		FGameplayAttribute Attribute,
+		float Value,
+		FGameplayAttribute MaxAttribute,
+		float MaxValue
+		);
+
 	void SetCurrentValue(int32 InCurrentValue);
 
+	void SetCurrentValue_Re(const FOnAttributeChangeData& CurrentValue);
+
 	void SetMaxValue(int32 InMaxValue);
+
+	void SetMaxValue_Re(const FOnAttributeChangeData& CurrentValue);
 
 private:
 

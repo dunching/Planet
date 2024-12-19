@@ -12,6 +12,7 @@
 #include "HumanAnimInstance.generated.h"
 
 class UAbilitySystemComponent;
+struct FOnAttributeChangeData;
 
 UENUM(BlueprintType)
 enum class EAnimationType : uint8
@@ -42,8 +43,10 @@ public:
 
 protected:
 	
+	void OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue);
+	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnMoveSpeedChanged(int32 CurrentValue);
+	void SetMoveSpeedChanged(int32 CurrentValue);
 	
 	UFUNCTION(BlueprintCallable)
 	FQuat GetGravityToWorldTransform() const;

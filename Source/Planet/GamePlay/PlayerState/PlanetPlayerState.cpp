@@ -10,7 +10,6 @@
 #include "ItemProxy_Container.h"
 #include "SceneProxyTable.h"
 #include "ItemProxy_Minimal.h"
-#include "ProxySycHelperComponent.h"
 
 APlanetPlayerState::APlanetPlayerState(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

@@ -14,6 +14,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 #include "BaseFeatureComponent.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicPropertyModify.h"
@@ -48,7 +49,7 @@ void USkill_Passive_XS::OnRemoveAbility(
 )
 {
 	RemoveShield();
-	CharacterPtr->GetBaseFeatureComponent()->RemoveReceviedEventModify(EventModifyReceivedSPtr);
+	// CharacterPtr->GetBaseFeatureComponent()->RemoveReceviedEventModify(EventModifyReceivedSPtr);
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
@@ -68,9 +69,9 @@ void USkill_Passive_XS::ReigsterEffect()
 {
 	if (CharacterPtr)
 	{
-		EventModifyReceivedSPtr = MakeShared<FMyStruct>(300, this);
-
-		CharacterPtr->GetBaseFeatureComponent()->AddReceviedEventModify(EventModifyReceivedSPtr);
+		// EventModifyReceivedSPtr = MakeShared<FMyStruct>(300, this);
+		//
+		// CharacterPtr->GetBaseFeatureComponent()->AddReceviedEventModify(EventModifyReceivedSPtr);
 	}
 }
 
@@ -188,89 +189,89 @@ void USkill_Passive_XS::Duration_DurationDelegate(UAbilityTask_TimerHelper* Task
 	}
 }
 
-USkill_Passive_XS::FMyStruct::FMyStruct(int32 InPriority, USkill_Passive_XS* InGAInsPtr) :
-	IGAEventModifyReceivedInterface(InPriority),
-	GAInsPtr(InGAInsPtr)
-{
-	bIsOnceTime = true;
-}
-
-bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)
-{
-	if (
-		(!GameplayAbilityTargetData_GAEvent.Data.GetIsHited())
-		)
-	{
-		return false;
-	}
-
-	const auto OrginalDamage =
-		GameplayAbilityTargetData_GAEvent.Data.TrueDamage +
-		GameplayAbilityTargetData_GAEvent.Data.BaseDamage +
-		[&] {
-		int32 Value = 0;
-
-		for (const auto Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
-		{
-			Value += Iter.Get<2>();
-		}
-
-		return Value;
-		}();
-
-	const auto MaxHP =
-		GAInsPtr->CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP.GetMaxValue();
-
-	const auto CurrentHP =
-		GAInsPtr->CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP.GetCurrentValue();
-
-	const auto Threshold = MaxHP * GAInsPtr->MinGPPercent;
-
-	if (
-		(OrginalDamage > 0) && 
-		((CurrentHP - OrginalDamage) < Threshold)
-		)
-	{
-		// 阈值 之上的 HP
-		const auto GreaterThresholdValue = FMath::Max(0, CurrentHP - Threshold);
-		
-		// 先减去阈值之上的 HP
-		const auto OffsetValue = OrginalDamage - GreaterThresholdValue;
-
-		// 可以生成的盾的值
-		const auto ShieldValue = MaxHP * GAInsPtr->ShieldValue_HP_Percent;
-
-		// 剩余的盾
-		const auto RemaindShield = ShieldValue - OffsetValue;
-
-		int32 ActulyDamage = 0;
-		if (RemaindShield > 0)
-		{
-			GAInsPtr->AddShield(RemaindShield);
-
-			ActulyDamage = OrginalDamage - FMath::Max(0, ShieldValue - RemaindShield);
-		}
-		else
-		{
-			ActulyDamage = OrginalDamage - ShieldValue;
-		}
-
-		// 折算伤害
-		const auto Percent = static_cast<float>(ActulyDamage) / OrginalDamage;
-
-		GameplayAbilityTargetData_GAEvent.Data.TrueDamage = GameplayAbilityTargetData_GAEvent.Data.TrueDamage * Percent;
-		GameplayAbilityTargetData_GAEvent.Data.BaseDamage = GameplayAbilityTargetData_GAEvent.Data.BaseDamage * Percent;
-		for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
-		{
-			Iter.Get<2>() = Iter.Get<2>() * Percent;
-		}
-
-		GAInsPtr->PerformAction();
-
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
+// USkill_Passive_XS::FMyStruct::FMyStruct(int32 InPriority, USkill_Passive_XS* InGAInsPtr) :
+// 	IGAEventModifyReceivedInterface(InPriority),
+// 	GAInsPtr(InGAInsPtr)
+// {
+// 	bIsOnceTime = true;
+// }
+//
+// bool USkill_Passive_XS::FMyStruct::Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)
+// {
+// 	if (
+// 		(!GameplayAbilityTargetData_GAEvent.Data.GetIsHited())
+// 		)
+// 	{
+// 		return false;
+// 	}
+//
+// 	const auto OrginalDamage =
+// 		GameplayAbilityTargetData_GAEvent.Data.TrueDamage +
+// 		GameplayAbilityTargetData_GAEvent.Data.BaseDamage +
+// 		[&] {
+// 		int32 Value = 0;
+//
+// 		for (const auto Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+// 		{
+// 			Value += Iter.Get<2>();
+// 		}
+//
+// 		return Value;
+// 		}();
+//
+// 	const auto MaxHP =
+// 		GAInsPtr->CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
+//
+// 	const auto CurrentHP =
+// 		GAInsPtr->CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetHP();
+//
+// 	const auto Threshold = MaxHP * GAInsPtr->MinGPPercent;
+//
+// 	if (
+// 		(OrginalDamage > 0) && 
+// 		((CurrentHP - OrginalDamage) < Threshold)
+// 		)
+// 	{
+// 		// 阈值 之上的 HP
+// 		const auto GreaterThresholdValue = FMath::Max(0, CurrentHP - Threshold);
+// 		
+// 		// 先减去阈值之上的 HP
+// 		const auto OffsetValue = OrginalDamage - GreaterThresholdValue;
+//
+// 		// 可以生成的盾的值
+// 		const auto ShieldValue = MaxHP * GAInsPtr->ShieldValue_HP_Percent;
+//
+// 		// 剩余的盾
+// 		const auto RemaindShield = ShieldValue - OffsetValue;
+//
+// 		int32 ActulyDamage = 0;
+// 		if (RemaindShield > 0)
+// 		{
+// 			GAInsPtr->AddShield(RemaindShield);
+//
+// 			ActulyDamage = OrginalDamage - FMath::Max(0, ShieldValue - RemaindShield);
+// 		}
+// 		else
+// 		{
+// 			ActulyDamage = OrginalDamage - ShieldValue;
+// 		}
+//
+// 		// 折算伤害
+// 		const auto Percent = static_cast<float>(ActulyDamage) / OrginalDamage;
+//
+// 		GameplayAbilityTargetData_GAEvent.Data.TrueDamage = GameplayAbilityTargetData_GAEvent.Data.TrueDamage * Percent;
+// 		GameplayAbilityTargetData_GAEvent.Data.BaseDamage = GameplayAbilityTargetData_GAEvent.Data.BaseDamage * Percent;
+// 		for (auto& Iter : GameplayAbilityTargetData_GAEvent.Data.ElementSet)
+// 		{
+// 			Iter.Get<2>() = Iter.Get<2>() * Percent;
+// 		}
+//
+// 		GAInsPtr->PerformAction();
+//
+// 		return true;
+// 	}
+// 	else
+// 	{
+// 		return false;
+// 	}
+// }

@@ -245,7 +245,24 @@ public:
 
 	static FGameplayTag DataSource_TalentModify;
 
+	
 	static FGameplayTag Skill_CanBeInterrupted;
 
 	static FGameplayTag Skill_CanBeInterrupted_Stagnation;
+
+	
+	static FGameplayTag GEData_Immediate;
+	
+	static FGameplayTag GEData_Temporary;
+	
+	static FGameplayTag GEData_Duration;
+	
+	static FGameplayTag GEData_Info;
+	
+	static FGameplayTag GEData_HP;
+	
+	static FGameplayTag GEData_Damage_Base;
+	
+	static FGameplayTag GEData_MoveSpeed;
+	
 };

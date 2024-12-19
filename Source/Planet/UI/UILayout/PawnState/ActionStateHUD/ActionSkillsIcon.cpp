@@ -240,6 +240,7 @@ void UActionSkillsIcon::SetRemainingCooldown(
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Hidden);
+				return;
 			}
 		}
 	}

@@ -17,7 +17,7 @@ class ACharacterBase;
 class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
 class UTalentAllocationComponent;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
 class AGroupSharedInfo;
 
 

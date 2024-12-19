@@ -1,22 +1,14 @@
 
 #include "AllocationIconBase.h"
 
-#include "Components/TextBlock.h"
 #include "Components/Image.h"
 #include "Containers/UnrealString.h"
-#include <Kismet/GameplayStatics.h>
-#include "Components/CanvasPanel.h"
 #include "Engine/StreamableManager.h"
 #include "Engine/AssetManager.h"
-#include "Components/Border.h"
 #include "Components/Overlay.h"
-#include "Components/ProgressBar.h"
-#include "Kismet/KismetStringLibrary.h"
-#include "Components/SizeBox.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/Texture2D.h"
 
-#include "UICommon.h"
 #include "AssetRefMap.h"
 #include "ItemProxyDragDropOperation.h"
 #include "ItemProxyDragDropOperationWidget.h"
@@ -72,7 +64,7 @@ void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy
 
 	if (!bPaseInvokeOnResetProxyEvent)
 	{
-		OnResetProxy.ExcuteCallback(PreviousProxyPtr, NewProxyPtr);
+		OnResetProxy.ExcuteCallback(PreviousProxyPtr, NewProxyPtr, IconSocket);
 	}
 
 	BasicProxyPtr = NewProxyPtr;
@@ -179,16 +171,16 @@ void UAllocationIconBase::NativeOnDragDetected(const FGeometry& InGeometry, cons
 
 	if (BaseItemClassPtr)
 	{
-		auto DragWidgetPtr = CreateWidget<UAllocationableProxyDragDropOperationWidget>(this, BaseItemClassPtr);
-		if (DragWidgetPtr)
-		{
-			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(BasicProxyPtr);
-
-			auto WidgetDragPtr = Cast<UAllocationableProxyDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UAllocationableProxyDragDropOperation::StaticClass()));
-			if (WidgetDragPtr)
-			{
-			}
-		}
+		// auto DragWidgetPtr = CreateWidget<UAllocationableProxyDragDropOperationWidget>(this, BaseItemClassPtr);
+		// if (DragWidgetPtr)
+		// {
+		// 	DragWidgetPtr->ResetSize(InGeometry.Size);
+		// 	DragWidgetPtr->ResetToolUIByData(BasicProxyPtr);
+		//
+		// 	auto WidgetDragPtr = Cast<UAllocationableProxyDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UAllocationableProxyDragDropOperation::StaticClass()));
+		// 	if (WidgetDragPtr)
+		// 	{
+		// 	}
+		// }
 	}
 }

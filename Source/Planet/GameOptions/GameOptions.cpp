@@ -14,6 +14,8 @@ UGameOptions* UGameOptions::GetInstance()
 	return WorldSetting->GetGameOptions();
 }
 
+int32 UGameOptions::MaxTeammateNum = 4;
+
 void UGameOptions::PostCDOContruct()
 {
 	Super::PostCDOContruct();

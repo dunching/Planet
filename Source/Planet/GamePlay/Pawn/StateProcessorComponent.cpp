@@ -76,15 +76,6 @@ UStateProcessorComponent::UStateProcessorComponent(const FObjectInitializer& Obj
 void UStateProcessorComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	auto CharacterPtr = GetOwner<FOwnerPawnType>();
-	if (CharacterPtr)
-	{
-		auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
-		OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
-			this, &ThisClass::OnGameplayEffectTagCountChanged
-		);
-	}
 }
 
 void UStateProcessorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -108,6 +99,23 @@ void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	Params.Condition = COND_None;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterStateInfo_FASI_Container, Params);
+}
+
+void UStateProcessorComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
+				this, &ThisClass::OnGameplayEffectTagCountChanged
+			);
+		}
+	}
+#endif
 }
 
 TSharedPtr<FCharacterStateInfo> UStateProcessorComponent::GetCharacterState(const FGameplayTag& CSTag) const

@@ -22,10 +22,11 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
 #include "BaseFeatureComponent.h"
 
@@ -175,7 +176,7 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 
 void USkill_WeaponActive_RangeTest::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{

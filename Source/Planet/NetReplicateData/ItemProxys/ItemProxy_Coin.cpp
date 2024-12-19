@@ -3,7 +3,7 @@
 
 #include "AllocationSkills.h"
 #include "ItemProxy_Container.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 FCoinProxy::FCoinProxy()
 {

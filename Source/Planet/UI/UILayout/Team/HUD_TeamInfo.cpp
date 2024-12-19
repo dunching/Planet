@@ -6,7 +6,7 @@
 #include <Components/Border.h>
 
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "TeamMateInfo.h"
 #include "HUD_TeamMateInfo.h"
 #include "CharacterBase.h"

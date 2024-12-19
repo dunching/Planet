@@ -8,6 +8,7 @@
 
 #include "ProxyProcessComponent.h"
 #include "GAEvent_Helper.h"
+#include "GroupSharedInterface.h"
 
 #include "BaseFeatureComponent.generated.h"
 
@@ -28,11 +29,15 @@ struct FGameplayAbilityTargetData_StateModify;
 struct FGameplayAbilityTargetData_MoveToAttaclArea;
 struct FGameplayAbilityTargetData_TagModify;
 struct FGameplayAbilityTargetData;
+struct FGameplayEffectCustomExecutionParameters;
+struct FGameplayEffectCustomExecutionOutput;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
 UCLASS()
-class PLANET_API UBaseFeatureComponent : public UActorComponent
+class PLANET_API UBaseFeatureComponent :
+	public UActorComponent,
+	public IGroupSharedInterface
 {
 	GENERATED_BODY()
 
@@ -60,7 +65,11 @@ public:
 
 	void OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData);
 
-	void OnReceivedEventModifyData(FGameplayAbilityTargetData_GAReceivedEvent& OutGAEventData);
+	void OnReceivedEventModifyData(
+		const TMap<FGameplayTag, float>&CustomMagnitudes,
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+		);
 
 	void AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
 
@@ -164,6 +173,8 @@ public:
 	FMakedDamageDelegate MakedDamageDelegate;
 
 protected:
+
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
 
 	void AddSendBaseModify();
 

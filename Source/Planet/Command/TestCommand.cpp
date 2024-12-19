@@ -24,7 +24,7 @@
 #include "TalentAllocationComponent.h"
 #include "CharacterBase.h"
 #include "CollisionDataStruct.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "PlanetControllerInterface.h"

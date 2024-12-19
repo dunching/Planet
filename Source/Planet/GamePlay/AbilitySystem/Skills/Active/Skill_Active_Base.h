@@ -66,21 +66,21 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	)override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	);
+	)override;
 
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
+	)override;
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,

@@ -44,4 +44,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TMap<FGameplayTag, FKey>ActionKeyMap;
 
+	static int32 MaxTeammateNum;
+
 };

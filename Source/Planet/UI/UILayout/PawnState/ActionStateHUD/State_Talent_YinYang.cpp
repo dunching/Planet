@@ -27,9 +27,9 @@ void UState_Talent_YinYang::NativeConstruct()
 	{
 		auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
-		);
+		// TalentSPtr = TSharedPtr<FCurrentTalentType>(
+		// 	CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
+		// );
 
 		if (TalentSPtr)
 		{
@@ -58,30 +58,30 @@ void UState_Talent_YinYang::OnCurrentValueChanged(int32 CurrentValue)
 
 void UState_Talent_YinYang::OnValueChanged()
 {
-	TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr;
-
-	const auto CurentType = TalentSPtr->CurentType;
-	const auto CurrentValue = TalentSPtr->GetCurrentValue();
-	const auto MaxValue = TalentSPtr->GetMaxValue();
-
-	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(State_Talent_YinYang::Text));
-		if (UIPtr)
-		{
-			UIPtr->SetText(
-				FText::FromString(*FString::Printf(TEXT("%d/%d"),
-					CurrentValue, MaxValue))
-			);
-		}
-	}
-	const auto Percent = static_cast<float>(CurrentValue) / MaxValue;
-	{
-		auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(State_Talent_YinYang::ProgressBar));
-		if (UIPtr)
-		{
-			UIPtr->SetPercent(Percent);
-		}
-	}
-
-	SetValue(CurentType, CurrentValue, MaxValue);
+	// TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().TalentSPtr;
+	//
+	// const auto CurentType = TalentSPtr->CurentType;
+	// const auto CurrentValue = TalentSPtr->GetCurrentValue();
+	// const auto MaxValue = TalentSPtr->GetMaxValue();
+	//
+	// {
+	// 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(State_Talent_YinYang::Text));
+	// 	if (UIPtr)
+	// 	{
+	// 		UIPtr->SetText(
+	// 			FText::FromString(*FString::Printf(TEXT("%d/%d"),
+	// 				CurrentValue, MaxValue))
+	// 		);
+	// 	}
+	// }
+	// const auto Percent = static_cast<float>(CurrentValue) / MaxValue;
+	// {
+	// 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(State_Talent_YinYang::ProgressBar));
+	// 	if (UIPtr)
+	// 	{
+	// 		UIPtr->SetPercent(Percent);
+	// 	}
+	// }
+	//
+	// SetValue(CurentType, CurrentValue, MaxValue);
 }

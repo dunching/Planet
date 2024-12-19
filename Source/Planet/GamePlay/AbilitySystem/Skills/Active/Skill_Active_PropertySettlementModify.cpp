@@ -65,21 +65,21 @@ void USkill_Active_PropertySettlementModify::ActivateAbility(
 			}
 		};
 
-		const auto MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
-		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddSettlementModify(MyPropertySettlementModify);
-
-		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		TaskPtr->SetDuration(Duration);
-		TaskPtr->OnFinished.BindLambda([MyPropertySettlementModify, this](auto)
-			{
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
-
-				CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
-
-				K2_CancelAbility();
-				return true;
-			});
-		TaskPtr->ReadyForActivation();
+		// const auto MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
+		// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddSettlementModify(MyPropertySettlementModify);
+		//
+		// auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		// TaskPtr->SetDuration(Duration);
+		// TaskPtr->OnFinished.BindLambda([MyPropertySettlementModify, this](auto)
+		// 	{
+		// 		CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
+		//
+		// 		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
+		//
+		// 		K2_CancelAbility();
+		// 		return true;
+		// 	});
+		// TaskPtr->ReadyForActivation();
 	}
 #endif
 }

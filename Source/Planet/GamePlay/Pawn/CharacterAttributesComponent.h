@@ -15,6 +15,8 @@
 
 class IPlanetControllerInterface;
 class UGAEvent_Received;
+class UAS_Character;
+class UGE_CharacterInitail;
 
 struct FCharacterAttributes;
 
@@ -33,18 +35,13 @@ public:
 
 	static FName ComponentName;
 
-	const FCharacterAttributes& GetCharacterAttributes()const;
-
-	FCharacterAttributes& GetCharacterAttributes();
+	const UAS_Character * GetCharacterAttributes()const;
 
 	// 基础状态回复
 	void ProcessCharacterAttributes();
 
 protected:
 	
-	UPROPERTY(Replicated, EditDefaultsOnly)
-	FCharacterAttributes CharacterAttributes;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void BeginPlay()override;
@@ -55,6 +52,14 @@ protected:
 		FActorComponentTickFunction* ThisTickFunction
 	)override;
 
+	// 初始化GE
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGE_CharacterInitail>GE_InitailCharacterClass;
+
+	// 自动回复GE
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGameplayEffect>GE_CharacterReplyClass;
+   
 private:
 
 };

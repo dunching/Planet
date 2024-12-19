@@ -11,7 +11,7 @@
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
 #include "Planet.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"

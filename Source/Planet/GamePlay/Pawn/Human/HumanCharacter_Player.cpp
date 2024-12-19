@@ -12,6 +12,7 @@
 #include "HumanAIController.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
+#include "MainHUD.h"
 #include "PlanetPlayerController.h"
 
 AHumanCharacter_Player::AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer) :
@@ -68,6 +69,9 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 	{
 	}
 #endif
+
+	// 显示
+	Cast<AMainHUD>(GetController<APlanetPlayerController>()->MyHUD)->InitalHUD();
 	
 	// 在SetPawn之后调用
 	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(

@@ -14,6 +14,7 @@
 class ACharacterBase;
 
 class UToolIcon;
+struct FOnAttributeChangeData;
 
 /**
  *
@@ -24,12 +25,11 @@ class PLANET_API UCharacterTitle : public UMyUserWidget
 	GENERATED_BODY()
 
 public:
-
 	using FOnValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeConstruct() override;
 
-	virtual void NativeDestruct()override;
+	virtual void NativeDestruct() override;
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
@@ -42,19 +42,20 @@ public:
 
 protected:
 
-	void OnHPCurrentValueChanged(int32 NewVal);
-
-	void OnHPMaxValueChanged(int32 NewVal);
-
 protected:
-
 	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
 
-	void OnHPChanged();
-	
-	void OnPPChanged();
+	void OnHPChanged(const FOnAttributeChangeData&);
 
-	void OnShieldChanged();
+	void SetHPChanged(float Value, float MaxValue);
+
+	void OnPPChanged(const FOnAttributeChangeData&);
+
+	void SetPPChanged(float Value, float MaxValue);
+
+	void OnShieldChanged(const FOnAttributeChangeData&);
+
+	void SetShieldChanged(float Value, float MaxValue);
 
 	void ApplyCharaterNameToTitle();
 
@@ -93,6 +94,5 @@ protected:
 
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
 
-	TSet<FGameplayTag>TagSet;
-
+	TSet<FGameplayTag> TagSet;
 };

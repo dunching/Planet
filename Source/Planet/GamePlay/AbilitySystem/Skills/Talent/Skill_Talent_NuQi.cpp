@@ -58,13 +58,13 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
-			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
-
-		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
-		);
+		// OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
+		// 	std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
+		// );
+		//
+		// TalentSPtr = TSharedPtr<FCurrentTalentType>(
+		// 	CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
+		// );
 	}
 }
 
@@ -173,23 +173,23 @@ void USkill_Talent_NuQi::AddNuQi()
 void USkill_Talent_NuQi::SubNuQi(float Inveral)
 {
 	auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
-	if (TalentPtr)
-	{
-		if (bIsInWeak)
-		{
-			const auto Value = TalentPtr->GetMaxValue() / FMath::FloorToFloat(WeakDuration);
-			TalentPtr->AddCurrentValue(-Value);
-		}
-		else
-		{
-			DecrementTime_Accumulate += Inveral;
-			if (DecrementTime_Accumulate > DecrementTime)
-			{
-				TalentPtr->AddCurrentValue(-Decrement);
-			}
-		}
-	}
+	// auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
+	// if (TalentPtr)
+	// {
+	// 	if (bIsInWeak)
+	// 	{
+	// 		const auto Value = TalentPtr->GetMaxValue() / FMath::FloorToFloat(WeakDuration);
+	// 		TalentPtr->AddCurrentValue(-Value);
+	// 	}
+	// 	else
+	// 	{
+	// 		DecrementTime_Accumulate += Inveral;
+	// 		if (DecrementTime_Accumulate > DecrementTime)
+	// 		{
+	// 			TalentPtr->AddCurrentValue(-Decrement);
+	// 		}
+	// 	}
+	// }
 }
 
 void USkill_Talent_NuQi::OnHPValueChanged(int32 OldValue, int32 NewValue)

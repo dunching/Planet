@@ -59,7 +59,7 @@
 #include "Weapon_PickAxe.h"
 #include "HumanViewTalentAllocation.h"
 #include "ViewGroupsProcessor.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 #include "GameplayTagsLibrary.h"
 #include "BasicFutures_Mount.h"

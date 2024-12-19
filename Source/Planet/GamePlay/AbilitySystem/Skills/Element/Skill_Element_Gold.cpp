@@ -26,10 +26,10 @@ void USkill_Element_Gold::ActivateAbility(
 
 	if (CharacterPtr)
 	{
-		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.GoldElement.AddOnValueChanged(
-			std::bind(&ThisClass::OnElementLevelChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
+		// auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		// OnValueChanged = CharacterAttributes.GoldElement.AddOnValueChanged(
+		// 	std::bind(&ThisClass::OnElementLevelChanged, this, std::placeholders::_1, std::placeholders::_2)
+		// );
 
 		AbilityActivatedCallbacksHandle =
 			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendAttack);

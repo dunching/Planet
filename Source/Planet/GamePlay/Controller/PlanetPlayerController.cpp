@@ -16,7 +16,7 @@
 #include "InputActions.h"
 #include "UIManagerSubSystem.h"
 #include "CharacterBase.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "HumanAIController.h"
 #include "ItemProxy_Minimal.h"
 #include "PlanetControllerInterface.h"
@@ -31,6 +31,7 @@
 #include "LogWriter.h"
 #include "GroupSharedInfo.h"
 #include "HoldingItemsComponent.h"
+#include "MainHUD.h"
 #include "GameFramework/HUD.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
@@ -329,6 +330,18 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 	return Result;
 }
 
+void APlanetPlayerController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
+	{
+		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		if (GroupSharedInterfacePtr)
+		{
+			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		}
+	});
+}
+
 void APlanetPlayerController::ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)
 {
 }
@@ -432,7 +445,7 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		GroupSharedInfoPtr = GetWorld()->SpawnActor<AGroupSharedInfo>(
 			AGroupSharedInfo::StaticClass(), SpawnParameters
 		);
-		GetHoldingItemsComponent()->OnGroupSharedInfoReady();
+		OnGroupSharedInfoReady(GroupSharedInfoPtr);
 	}
 #endif
 }
@@ -633,8 +646,8 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray<FString>& 
 
 void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 {
-	GetHoldingItemsComponent()->OnGroupSharedInfoReady();
-	
+	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+
 	// auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	// if (PlayerCharacterPtr)
 	// {
@@ -644,9 +657,4 @@ void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 	// }
 
 	UUIManagerSubSystem::GetInstance()->InitialUI();
-
-	// 隐藏
-	MyHUD->ShowHUD();
-	// 显示
-	MyHUD->ShowHUD();
 }

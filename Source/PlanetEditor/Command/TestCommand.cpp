@@ -23,7 +23,7 @@
 #include "TalentAllocationComponent.h"
 #include "CharacterBase.h"
 #include "CollisionDataStruct.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "PlanetControllerInterface.h"
@@ -298,10 +298,10 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 
 		if (Args.IsValidIndex(0))
 		{
-			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP_Replay.AddCurrentValue(
-				UKismetStringLibrary::Conv_StringToInt(Args[0]),
-				UGameplayTagsLibrary::DataSource_Regular
-			);
+			// NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP_Replay.AddCurrentValue(
+			// 	UKismetStringLibrary::Conv_StringToInt(Args[0]),
+			// 	UGameplayTagsLibrary::DataSource_Regular
+			// );
 		}
 
 		if (Args.IsValidIndex(2))
@@ -412,38 +412,38 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 
 	auto Value = UKismetStringLibrary::Conv_StringToInt(Args[2]);
 	auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	if (Args[1] == TEXT("1"))
-	{
-		CharacterAttributes.GoldElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("2"))
-	{
-		CharacterAttributes.WoodElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("3"))
-	{
-		CharacterAttributes.WaterElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("4"))
-	{
-		CharacterAttributes.FireElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("5"))
-	{
-		CharacterAttributes.SoilElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("6"))
-	{
-		CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("7"))
-	{
-		CharacterAttributes.HitRate.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("8"))
-	{
-		CharacterAttributes.Evade.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
-	}
+	// if (Args[1] == TEXT("1"))
+	// {
+	// 	CharacterAttributes.GoldElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("2"))
+	// {
+	// 	CharacterAttributes.WoodElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("3"))
+	// {
+	// 	CharacterAttributes.WaterElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("4"))
+	// {
+	// 	CharacterAttributes.FireElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("5"))
+	// {
+	// 	CharacterAttributes.SoilElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("6"))
+	// {
+	// 	CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("7"))
+	// {
+	// 	CharacterAttributes.HitRate.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("8"))
+	// {
+	// 	CharacterAttributes.Evade.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
 }
 
 void TestCommand::TestGAState2Self(const TArray< FString >& Args)

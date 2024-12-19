@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include <Blueprint/IUserObjectListEntry.h>
 
+#include <Blueprint/IUserObjectListEntry.h>
 #include "GameplayTagContainer.h"
 
 #include "UIInterfaces.h"
-#include "Common/GenerateType.h"
+#include "MyUserWidget.h"
 
 #include "ItemProxy_Minimal.h"
 
@@ -24,8 +24,8 @@ struct FCharacterProxy;
 UCLASS()
 class PLANET_API UAllocationIconBase :
 	public UMyUserWidget,
-	public IAllocationableProxyIconInterface,
-	public IUserObjectListEntry
+	public IUserObjectListEntry,
+	public IAllocationableProxyIconInterface
 {
 	GENERATED_BODY()
 

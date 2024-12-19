@@ -29,8 +29,9 @@
 #include "TestCommand.h"
 #include "BasicFuturesBase.h"
 #include "TalentAllocationComponent.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "AssetRefMap.h"
+#include "AS_Character.h"
 #include "PlanetControllerInterface.h"
 #include "GameplayTagsLibrary.h"
 #include "StateProcessorComponent.h"
@@ -45,7 +46,7 @@
 #include "GAEvent_Helper.h"
 #include "CharacterRisingTips.h"
 #include "SceneObj.h"
-#include "ItemProxy_Container.h"
+#include "GE_CharacterInitail.h"
 #include "GroupSharedInfo.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
@@ -54,12 +55,20 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
-	AbilitySystemComponentPtr = CreateDefaultSubobject<UPlanetAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
+		UCharacterAttributesComponent::ComponentName
+	);
+	// CharacterAttributesComponentPtr->CharacterAttributeSetPtr = ;
+
+	AbilitySystemComponentPtr = CreateDefaultSubobject<UPlanetAbilitySystemComponent>(
+		UPlanetAbilitySystemComponent::ComponentName
+	);
 	AbilitySystemComponentPtr->SetIsReplicated(true);
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	AbilitySystemComponentPtr->AddSpawnedAttribute(CreateDefaultSubobject<UAS_Character>(
+		TEXT("CharacterAttributes1")
+		));
 
-	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
-		UCharacterAttributesComponent::ComponentName);
 	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(
 		UTalentAllocationComponent::ComponentName);
 
@@ -79,42 +88,30 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		// GA全部通过Server注册
-		auto GASPtr = GetAbilitySystemComponent();
-
-		GASPtr->ClearAllAbilities();
-		GASPtr->InitAbilityActorInfo(this, this);
-		GetBaseFeatureComponent()->InitialBaseGAs();
-	}
-#endif
-
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
-	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
+	auto CharacterAttributeSetPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
+	// 绑定一些会影响到 Character行动的数据
+
+	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		CharacterAttributeSetPtr->GetHPAttribute()
+		).AddUObject(this, &ThisClass::OnHPChanged);
+
+	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		CharacterAttributeSetPtr->GetMoveSpeedAttribute()
+		).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		// 绑定一些会影响到 Character行动的数据
-		HPChangedHandle = CharacterAttributes.HP.AddOnValueChanged(
-			std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-		);
-
-		MoveSpeedChangedHandle = CharacterAttributes.MoveSpeed.AddOnValueChanged(
-			std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-		);
-
 		// 绑定 Character收到的效果回调(收到的是“最终结算效果”)
-		ProcessedGAEventHandle = CharacterAttributes.ProcessedGAEvent.AddCallback(
-			std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
-		);
+		// ProcessedGAEventHandle = CharacterAttributes.ProcessedGAEvent.AddCallback(
+		// 	std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
+		// );
 	}
 #endif
 
-	OnMoveSpeedChanged(CharacterAttributes.MoveSpeed.GetCurrentValue());
+	OnMoveSpeedChangedImp(CharacterAttributeSetPtr->GetMoveSpeed());
 }
 
 void ACharacterBase::Destroyed()
@@ -157,6 +154,7 @@ void ACharacterBase::PostInitializeComponents()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
+		GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 	}
 }
 
@@ -167,8 +165,7 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
 		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GroupSharedInfoPtr;
-
-		GetHoldingItemsComponent()->InitialOwnerCharacterProxy(this);
+		OnGroupSharedInfoReady(GroupSharedInfoPtr);
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
@@ -365,31 +362,33 @@ void ACharacterBase::SpawnDefaultController()
 	OriginalAIController = Controller;
 }
 
-void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
+void ACharacterBase::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
+	OnInitaliedGroupSharedInfo();
+	
+	auto NewController = GetController();
+
+	GetHoldingItemsComponent()->InitialOwnerCharacterProxy(this);
+
+	ForEachComponent(false, [this](UActorComponent* ComponentPtr)
 	{
-		if (!GetController())
+		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		if (GroupSharedInterfacePtr)
 		{
-			return;
+			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
 		}
-		if (IsPlayerControlled())
-		{
-			GetController<APlanetPlayerController>()->OnHPChanged(CurrentValue);
-		}
-		else
-		{
-			GetController<APlanetAIController>()->OnHPChanged(CurrentValue);
-		}
-	}
-#endif
+	});
 }
 
-void ACharacterBase::OnMoveSpeedChanged_Implementation(int32 CurrentValue)
+void ACharacterBase::OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue)
 {
-	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
-	GetCharacterMovement()->MaxFlySpeed = CurrentValue;
+	OnMoveSpeedChangedImp(CurrentValue.NewValue);
+}
+
+void ACharacterBase::OnMoveSpeedChangedImp(float Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = Value;
+	GetCharacterMovement()->MaxFlySpeed = Value;
 }
 
 void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
@@ -424,8 +423,31 @@ void ACharacterBase::OnCharacterGroupMateChanged(
 	}
 }
 
+void ACharacterBase::OnHPChanged(const FOnAttributeChangeData& CurrentValue)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		if (!GetController())
+		{
+			return;
+		}
+		if (IsPlayerControlled())
+		{
+			GetController<APlanetPlayerController>()->OnHPChanged(CurrentValue.NewValue);
+		}
+		else
+		{
+			GetController<APlanetAIController>()->OnHPChanged(CurrentValue.NewValue);
+		}
+	}
+#endif
+}
+
 void ACharacterBase::OnRep_GroupSharedInfoChanged()
 {
+	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() < ROLE_Authority)
 	{

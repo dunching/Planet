@@ -15,7 +15,7 @@
 #include "CharacterAttibutes.h"
 #include "AllocationSkills.h"
 #include "ItemProxy_Container.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "PropertyEntrys.h"
 #include "CharactersInfo.h"
 #include "Skill_Base.h"
@@ -37,8 +37,6 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -227,11 +225,21 @@ void FAllocationbleProxy::SetAllocationCharacterProxy(
 	auto ProxyCharacterPtr = GetOwnerCharacter();
 	if (GetOwnerCharacter()->GetNetMode() == NM_Client)
 	{
-		HoldingItemsComponentPtr->SetAllocationCharacterProxy(this->GetID(), AllocationCharacter_ID);
+		HoldingItemsComponentPtr->SetAllocationCharacterProxy(this->GetID(), AllocationCharacter_ID, InSocketTag);
 	}
 #endif
 
 	OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
+}
+
+FGameplayTag FAllocationbleProxy::GetCurrentSocketTag() const
+{
+	return  SocketTag;
+}
+
+FBasicProxy::IDType FAllocationbleProxy::GetAllocationCharacterID() const
+{
+	return  AllocationCharacter_ID;
 }
 
 ACharacterBase* FAllocationbleProxy::GetAllocationCharacter() const

@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenerateType.h"
+
+#include "AbilitySystemInterface.h"
 
 #include "GameFramework/PlayerState.h"
 
@@ -32,7 +33,9 @@ struct FSceneProxyContainer;
  *	一个组的持有的物品的信息
  */
 UCLASS()
-class PLANET_API AGroupSharedInfo: public AInfo
+class PLANET_API AGroupSharedInfo:
+	public AInfo,
+	public IPlanetAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -43,6 +46,8 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void PostInitializeComponents() override;
+	
+	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UTeamMatesHelperComponent* GetTeamMatesHelperComponent();
 
@@ -57,5 +62,8 @@ protected:
 	
 	UPROPERTY()
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr;
 	
 };

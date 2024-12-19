@@ -39,12 +39,13 @@ public:
 
 	virtual void NativeDestruct() override;
 
+	virtual void SyncData() override;
+
 	AHumanCharacter* HumanCharacterPtr = nullptr;
 
 protected:
+	
 	virtual void ResetUIByData() override;
-
-	virtual void SyncData() override;
 
 	void OnWeaponProxyChanged(
 		UTeamMateInfo*UIPtr,

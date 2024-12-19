@@ -11,6 +11,7 @@
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AssetRefMap.h"
+#include "AS_Character.h"
 #include "GameplayTagsLibrary.h"
 #include "ProxyProcessComponent.h"
 
@@ -166,7 +167,7 @@ bool UBasicFutures_Dash::CanActivateAbility(
 	if (CharacterPtr)
 	{
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		if (CharacterAttributes.PP.GetCurrentValue() >= Consume)
+		if (CharacterAttributes->GetPP() >= Consume)
 		{
 			return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 		}

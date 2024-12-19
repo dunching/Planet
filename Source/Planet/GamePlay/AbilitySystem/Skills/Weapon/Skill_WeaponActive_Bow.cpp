@@ -24,10 +24,11 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "Weapon_Bow.h"
 #include "BaseFeatureComponent.h"
 #include "KismetGravityLibrary.h"
@@ -325,7 +326,7 @@ void USkill_WeaponActive_Bow::MakeDamage(ACharacterBase* TargetCharacterPtr)
 
 void USkill_WeaponActive_Bow::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	if (

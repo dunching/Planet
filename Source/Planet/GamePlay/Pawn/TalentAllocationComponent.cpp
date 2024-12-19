@@ -183,19 +183,19 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 					{
 						const auto MultipleValue = 1 + (TalentHelper_Iter->Level * Iter.Value);
 
-						if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
-						{
-							ModifyMap[PointPropertyType].Pin()->Multiple = MultipleValue;
-							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.UpdateSettlementModify(
-								ModifyMap[PointPropertyType].Pin()
-							);
-						}
-						else
-						{
-							auto SPtr = MakeShared<FPropertySettlementModify_Talent>(MultipleValue);
-							ModifyMap.Add(PointPropertyType, SPtr);
-							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddSettlementModify(SPtr);
-						}
+						// if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
+						// {
+						// 	ModifyMap[PointPropertyType].Pin()->Multiple = MultipleValue;
+						// 	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.UpdateSettlementModify(
+						// 		ModifyMap[PointPropertyType].Pin()
+						// 	);
+						// }
+						// else
+						// {
+						// 	auto SPtr = MakeShared<FPropertySettlementModify_Talent>(MultipleValue);
+						// 	ModifyMap.Add(PointPropertyType, SPtr);
+						// 	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddSettlementModify(SPtr);
+						// }
 					}
 				}
 				else
@@ -205,9 +205,9 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 					{
 						if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
 						{
-							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.RemoveSettlementModify(
-								ModifyMap[PointPropertyType].Pin()
-							);
+							// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.RemoveSettlementModify(
+							// 	ModifyMap[PointPropertyType].Pin()
+							// );
 						}
 					}
 				}

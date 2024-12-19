@@ -13,6 +13,8 @@
 
 #include "GroupSharedInterface.generated.h"
 
+class AGroupSharedInfo;
+
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class UGroupSharedInterface : public UInterface
 {
@@ -25,7 +27,7 @@ class PLANET_API IGroupSharedInterface
 
 public:
 
-	virtual void OnGroupSharedInfoReady() = 0;
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) = 0;
 
 protected:
 

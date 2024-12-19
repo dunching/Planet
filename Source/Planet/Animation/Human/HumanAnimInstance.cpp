@@ -2,6 +2,7 @@
 
 #include "HumanAnimInstance.h"
 
+#include "AS_Character.h"
 #include "CharacterBase.h"
 #include "GravityMovementComponent.h"
 #include "HorseCharacter.h"
@@ -23,10 +24,11 @@ void UHumanAnimInstance::NativeBeginPlay()
 #endif
 
 	// 绑定一些会影响到 Character行动的数据
-	MoveSpeedChangedHandle = PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddOnValueChanged(
-		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-	);
-	OnMoveSpeedChanged(PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue());
+	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMoveSpeedAttribute()
+		).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
+
+	SetMoveSpeedChanged(PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMoveSpeed());
 }
 
 void UHumanAnimInstance::BeginDestroy()
@@ -37,6 +39,11 @@ void UHumanAnimInstance::BeginDestroy()
 	}
 
 	Super::BeginDestroy();
+}
+
+void UHumanAnimInstance::OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue)
+{
+	SetMoveSpeedChanged(CurrentValue.NewValue);
 }
 
 FQuat UHumanAnimInstance::GetGravityToWorldTransform() const

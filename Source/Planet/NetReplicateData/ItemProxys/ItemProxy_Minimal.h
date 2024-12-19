@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "ItemProxy.h"
 #include "ItemProxy_Character.h"
 #include "ItemProxy_Container.h"
 #include "ItemProxy_Skills.h"

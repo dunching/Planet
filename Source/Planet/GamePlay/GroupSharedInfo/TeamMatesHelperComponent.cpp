@@ -1,8 +1,8 @@
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 #include "Net/UnrealNetwork.h"
 
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "CharacterBase.h"
@@ -18,7 +18,6 @@
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter_AI.h"
 #include "LogWriter.h"
-#include "ProxySycHelperComponent.h"
 #include "TeamConfigure.h"
 #include "GroupSharedInfo.h"
 #include "ItemProxy_Character.h"
@@ -37,26 +36,26 @@ UTeamMatesHelperComponent::UTeamMatesHelperComponent(const FObjectInitializer& O
 	SetIsReplicatedByDefault(true);
 }
 
-void UTeamMatesHelperComponent::AddCharacterToTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index)
+void UTeamMatesHelperComponent::UpdateTeammateConfig(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		AddCharacter(CharacterProxyPtr);
+		UpdateTeammateConfigImp(CharacterProxyPtr,Index);
 	}
 #endif
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
-		AddCharacter(CharacterProxyPtr);
+		UpdateTeammateConfigImp(CharacterProxyPtr,Index);
 		if (CharacterProxyPtr)
 		{
-			AddCharacterToTeam_Server(CharacterProxyPtr->GetID(), Index);
+			UpdateTeammateConfig_Server(CharacterProxyPtr->GetID(), Index);
 		}
 		else
 		{
-			AddCharacterToTeam_Server(FGuid(), Index);
+			UpdateTeammateConfig_Server(FGuid(), Index);
 		}
 	}
 #endif
@@ -77,12 +76,12 @@ void UTeamMatesHelperComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UTeamMatesHelperComponent::AddCharacterToTeam_Server_Implementation(const FGuid& ProxtID, int32 Index)
+void UTeamMatesHelperComponent::UpdateTeammateConfig_Server_Implementation(const FGuid& ProxtID, int32 Index)
 {
 	const auto CharacterProxySPtr =
 		GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(ProxtID);
 
-	AddCharacterToTeam(CharacterProxySPtr, Index);
+	UpdateTeammateConfig(CharacterProxySPtr, Index);
 }
 
 void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
@@ -99,10 +98,11 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 	FTransform Transform;
 
 	const auto OwnerPtr = GetOwner<FOwnerType>();
-	for (int32 Index = 0; Index < TeamConfigure.CharactersAry.Num(); Index++)
+	const auto CharactersAry= TeamConfigure.GetCharactersAry();
+	for (int32 Index = 0; Index < CharactersAry.Num(); Index++)
 	{
 		const auto CharacterProxySPtr =
-			GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(TeamConfigure.CharactersAry[Index]);
+			GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(CharactersAry[Index]);
 		if (CharacterProxySPtr)
 		{
 			Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
@@ -121,16 +121,23 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter()
 	SpwanTeammateCharacter_Server();
 }
 
-void UTeamMatesHelperComponent::AddCharacter(FPawnType* PCPtr)
+void UTeamMatesHelperComponent::UpdateTeammateConfigImp(FPawnType* PCPtr, int32 Index)
 {
 	auto CharacterProxyPtr = PCPtr->GetCharacterProxy();
-	AddCharacter(CharacterProxyPtr);
+	UpdateTeammateConfigImp(CharacterProxyPtr,Index);
 }
 
-void UTeamMatesHelperComponent::AddCharacter(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr)
+void UTeamMatesHelperComponent::UpdateTeammateConfigImp(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index)
 {
-	MembersSet.Add(CharacterProxyPtr);
-	TeamConfigure.CharactersAry.Add(CharacterProxyPtr->GetID());
+	if (CharacterProxyPtr)
+	{
+		MembersSet.Add(CharacterProxyPtr);
+		TeamConfigure.UpdateTeammateConfig(CharacterProxyPtr->GetID(),Index);
+	}
+	else
+	{
+		TeamConfigure.UpdateTeammateConfig(FGuid(),Index);
+	}
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterProxyPtr);
 }

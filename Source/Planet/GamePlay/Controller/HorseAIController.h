@@ -10,12 +10,12 @@
 #include "GenerateType.h"
 #include "PlanetAIController.h"
 
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 #include "HorseAIController.generated.h"
 
 class UCharacterTitle;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
 struct FCharacterProxy;
 class ACharacterBase;
 class AHorseCharacter;

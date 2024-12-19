@@ -24,7 +24,7 @@
 #include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
@@ -156,7 +156,7 @@ void UTeamMateInfo::EnableIcon(bool bIsEnable)
 
 }
 
-void UTeamMateInfo::SynMember2Config()
+void UTeamMateInfo::SynMember2Config(int32 Index )
 {
 	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
@@ -164,5 +164,5 @@ void UTeamMateInfo::SynMember2Config()
 		return;
 	}
 	auto GMCPtr = PCPtr->GetGroupSharedInfo();
-	GMCPtr->GetTeamMatesHelperComponent()->AddCharacterToTeam(GroupMateProxyPtr, Index);
+	GMCPtr->GetTeamMatesHelperComponent()->UpdateTeammateConfig(GroupMateProxyPtr, Index);
 }

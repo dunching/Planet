@@ -8,28 +8,22 @@
 #include "GenerateType.h"
 #include "BaseData.h"
 
-#include "BasicFutures_Run.generated.h"
+#include "BasicFutures_Running.generated.h"
 
 class UAbilityTask_TimerHelper;
+class UGE_Running;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API UBasicFutures_Run : public UBasicFuturesBase
+class PLANET_API UBasicFutures_Running : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
 public:
 
-	UBasicFutures_Run();
-
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	) override;
+	UBasicFutures_Running();
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -37,7 +31,14 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	)override;
+
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	) override;
 
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -63,6 +64,11 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty RunningConsume;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGE_Running>GE_UGE_RunningClass;
+
+	FActiveGameplayEffectHandle ActiveGameplayEffectHandle;
+	
 private:
 
 	virtual void InitalDefaultTags() override;

@@ -14,6 +14,7 @@
 class ACharacterBase;
 
 class UToolIcon;
+struct FOnAttributeChangeData;
 
 /**
  *
@@ -44,20 +45,22 @@ public:
 
 protected:
 
-	void OnHPCurrentValueChanged(int32 NewVal);
-
-	void OnHPMaxValueChanged(int32 NewVal);
-
 protected:
 
 	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
 
-	void OnHPChanged();
+	void OnHPChanged(const FOnAttributeChangeData& CurrentValue);
 	
-	void OnPPChanged();
+	void SetHPChanged(float Value, float MaxValue);
+	
+	void OnPPChanged(const FOnAttributeChangeData& CurrentValue);
 
-	void OnShieldChanged();
+	void SetPP(float Value, float MaxValue);
+	
+	void OnShieldChanged(const FOnAttributeChangeData& CurrentValue);
 
+	void SetShild(float Value, float MaxValue);
+	
 	void ApplyCharaterNameToTitle();
 
 	void ApplyStatesToTitle();

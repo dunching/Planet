@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 
+#include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
+#include "GroupSharedInterface.h"
 
 #include "Character/GravityCharacter.h"
 
@@ -32,10 +34,10 @@ class USceneObjPropertyComponent;
 class UPlanetGameplayAbility;
 class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
-class UPlanetAbilitySystemInterface;
+class UPlanetAbilitySystemComponent;
 class UTalentAllocationComponent;
 class UStateProcessorComponent;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
 class UBaseFeatureComponent;
 class UInteractiveConsumablesComponent;
 class UProxyProcessComponent;
@@ -48,7 +50,8 @@ UCLASS()
 class PLANET_API ACharacterBase : 
 	public AGravityCharacter,
 	public IPlanetAbilitySystemInterface,
-	public ISceneObjInteractionInterface
+	public ISceneObjInteractionInterface,
+	public IGroupSharedInterface
 {
 	GENERATED_BODY()
 
@@ -64,6 +67,9 @@ public:
 
 	using FProcessedGAEventHandle = 
 		TCallbackHandleContainer<void(const FGameplayAbilityTargetData_GAReceivedEvent&)>::FCallbackHandleSPtr;
+
+	using FOnInitaliedGroupSharedInfo = 
+		TCallbackHandleContainer<void()>;
 
 	ACharacterBase(const FObjectInitializer& ObjectInitializer);
 
@@ -130,6 +136,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
 
+	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfo;
+	
 protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -147,6 +155,8 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void SpawnDefaultController()override;
+
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
 
 	UFUNCTION()
 	virtual void OnRep_GroupSharedInfoChanged();
@@ -168,8 +178,8 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
 	float BaseLookUpRate = 45.f;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr;
+	UPROPERTY()
+	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
@@ -196,11 +206,11 @@ protected:
 
 private:
 
-	UFUNCTION(NetMulticast, Reliable)
-	void OnHPChanged(int32 CurrentValue);
+	void OnHPChanged(const FOnAttributeChangeData& CurrentValue);
 	
-	UFUNCTION(NetMulticast, Reliable)
-	void OnMoveSpeedChanged(int32 CurrentValue);
+	void OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue);
+	
+	void OnMoveSpeedChangedImp(float Value);
 	
 	UFUNCTION(NetMulticast, Unreliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);

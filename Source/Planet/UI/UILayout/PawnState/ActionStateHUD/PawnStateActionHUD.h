@@ -29,6 +29,9 @@ class PLANET_API UPawnStateActionHUD :
 
 public:
 
+	using FOnInitaliedGroupSharedInfo =
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
 	using FOnAllocationSkillChangedHandle =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
@@ -55,6 +58,8 @@ protected:
 
 	void InitialWeaponSkillIcon();
 
+	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfoHandle;
+	
 	TArray<FOnAllocationSkillChangedHandle> OnAllocationSkillChangedDelegateAry;
 
 	FOnCanAciveSkillChangedHandle OnCanAciveSkillChangedHandle;

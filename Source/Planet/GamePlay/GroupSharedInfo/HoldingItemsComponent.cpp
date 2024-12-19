@@ -49,7 +49,7 @@ void UHoldingItemsComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_CONDITION(ThisClass, CharacterProxyID_Container, COND_InitialOnly);
 }
 
-void UHoldingItemsComponent::OnGroupSharedInfoReady()
+void UHoldingItemsComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
 }
 
@@ -254,9 +254,13 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::UpdateProxy_SyncHelper(const TSh
 	return Result;
 }
 
-void UHoldingItemsComponent::SetAllocationCharacterProxy(const FGuid& Proxy_ID, const FGuid& CharacterProxy_ID)
+void UHoldingItemsComponent::SetAllocationCharacterProxy(
+	const FGuid& Proxy_ID,
+	const FGuid& CharacterProxy_ID,
+	const FGameplayTag& InSocketTag
+)
 {
-	SetAllocationCharacterProxy_Server(Proxy_ID, CharacterProxy_ID);
+	SetAllocationCharacterProxy_Server(Proxy_ID, CharacterProxy_ID, InSocketTag);
 }
 #endif
 
@@ -559,6 +563,10 @@ void UHoldingItemsComponent::UpdateSocket(
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
+		// 本地直接更新一次
+		InCharacterProxySPtr->UpdateSocket(Socket);
+
+		// Server
 		UpdateSocket_Server(InCharacterProxySPtr->GetID(), Socket);
 	}
 #endif
@@ -630,12 +638,13 @@ TSharedPtr<FAllocationbleProxy> UHoldingItemsComponent::FindAllocationableProxy(
 
 TSharedPtr<FAllocationbleProxy> UHoldingItemsComponent::FindProxy_BySocket(const FCharacterSocket& Socket)
 {
-	return FindAllocationableProxy(Socket.SkillProxyID);
+	return FindAllocationableProxy(Socket.AllocationedProxyID);
 }
 
 void UHoldingItemsComponent::SetAllocationCharacterProxy_Server_Implementation(
 	const FGuid& Proxy_ID,
-	const FGuid& CharacterProxy_ID
+	const FGuid& CharacterProxy_ID,
+	const FGameplayTag& InSocketTag
 )
 {
 	auto ProxySPtr = FindAllocationableProxy(Proxy_ID);
@@ -644,14 +653,31 @@ void UHoldingItemsComponent::SetAllocationCharacterProxy_Server_Implementation(
 		return;
 	}
 
+	// 找到这个物品之前被分配的插槽
+	const auto AllocationCharacterID = ProxySPtr->GetAllocationCharacterID();
+	auto AllocationCharacterSPtr = FindProxy_Character(AllocationCharacterID);
+	if (AllocationCharacterSPtr)
+	{
+		const auto PrevSocketTag = ProxySPtr->GetCurrentSocketTag();
+		auto CharacterSocket= AllocationCharacterSPtr->FindSocket(PrevSocketTag);
+		auto PrevProxySPtr = FindProxy(CharacterSocket.AllocationedProxyID);
+		if (PrevProxySPtr)
+		{
+			PrevProxySPtr->UnAllocation();
+		}
+		CharacterSocket.AllocationedProxyID = FGuid();
+		UpdateSocket(AllocationCharacterSPtr, CharacterSocket);
+	}
+
 	auto TargetCharacterProxySPtr = FindProxy_Character(CharacterProxy_ID);
 	if (TargetCharacterProxySPtr)
 	{
-		ProxySPtr->SetAllocationCharacterProxy(TargetCharacterProxySPtr, TODO);
+		ProxySPtr->SetAllocationCharacterProxy(TargetCharacterProxySPtr, InSocketTag);
+		ProxySPtr->Allocation();
 	}
 	else
 	{
-		ProxySPtr->SetAllocationCharacterProxy(nullptr, TODO);
+		ProxySPtr->SetAllocationCharacterProxy(nullptr, InSocketTag);
 	}
 
 	if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))

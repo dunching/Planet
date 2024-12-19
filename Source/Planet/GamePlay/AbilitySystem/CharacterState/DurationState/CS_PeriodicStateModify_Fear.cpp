@@ -103,7 +103,7 @@ void UCS_PeriodicStateModify_Fear::EndAbility(
 	CharacterStateInfoSPtr = nullptr;
 
 	//
-	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
+	// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.RemoveSettlementModify(MyPropertySettlementModify);
 
 	//
 	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())

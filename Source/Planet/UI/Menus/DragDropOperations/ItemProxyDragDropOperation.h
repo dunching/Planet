@@ -12,6 +12,8 @@
 #include "ItemProxyDragDropOperation.generated.h"
 
 class UToolIcon;
+struct FBasicProxy;
+struct FAllocationbleProxy;
 
 /**
  *

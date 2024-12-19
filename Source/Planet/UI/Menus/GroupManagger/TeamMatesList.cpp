@@ -12,7 +12,7 @@
 #include "AssetRefMap.h"
 #include "HoldingItemsComponent.h"
 #include "GenerateType.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
@@ -74,12 +74,12 @@ void UTeamMatesList::SyncData()
 		return;
 	}
 	auto ChildrensAry = PanelPtr->GetAllChildren();
-	for (auto Iter : ChildrensAry)
+	for (int32 Index = 0; Index < ChildrensAry.Num(); Index++)
 	{
-		auto WidgetPtr = Cast<UTeamMateInfo>(Iter);
+		auto WidgetPtr = Cast<UTeamMateInfo>(ChildrensAry[Index]);
 		if (WidgetPtr)
 		{
-			WidgetPtr->SynMember2Config();
+			WidgetPtr->SynMember2Config(Index);
 		}
 	}
 }

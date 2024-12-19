@@ -15,8 +15,6 @@
 #include "HoldingItemsComponent.h"
 #include "BaseFeatureComponent.h"
 #include "ItemProxy_Minimal.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 TSharedPtr<FWeaponSkillProxy> FWeaponProxy::GetWeaponSkill()
 {
@@ -71,7 +69,13 @@ void FWeaponProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProx
 {
 	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 
-	GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
+#if UE_EDITOR || UE_SERVER
+	auto ProxyCharacterPtr = GetOwnerCharacter();
+	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
+	}
+#endif
 }
 
 FTableRowProxy_WeaponExtendInfo* FWeaponProxy::GetTableRowProxy_WeaponExtendInfo() const

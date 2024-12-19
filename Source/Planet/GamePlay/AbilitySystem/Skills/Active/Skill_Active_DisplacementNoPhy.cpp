@@ -23,6 +23,7 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_ARM_ConstantForce.h"
+#include "AS_Character.h"
 
 USkill_Active_DisplacementNoPhy::USkill_Active_DisplacementNoPhy() :
 	Super()
@@ -66,7 +67,7 @@ bool USkill_Active_DisplacementNoPhy::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP.GetCurrentValue())
+	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP())
 	{
 		return false;
 	}
@@ -150,7 +151,7 @@ void USkill_Active_DisplacementNoPhy::Move()
 			nullptr,
 			ERootMotionFinishVelocityMode::ClampVelocity,
 			FVector::ZeroVector,
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue(),
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMoveSpeed(),
 			false
 		);
 

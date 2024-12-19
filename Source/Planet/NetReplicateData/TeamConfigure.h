@@ -14,11 +14,20 @@ struct PLANET_API FTeamConfigure final
 {
 	GENERATED_USTRUCT_BODY()
 
+	FTeamConfigure();
+	
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	bool operator==(const FTeamConfigure& RightValue) const;
 
+	void UpdateTeammateConfig(const FGuid&ID, int32 Index);
+
+	TArray<FGuid> GetCharactersAry()const;
+	
+private:
+	
 	TArray<FGuid> CharactersAry;
+	
 };
 
 template <>

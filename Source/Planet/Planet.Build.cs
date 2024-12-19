@@ -29,6 +29,8 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet");
         PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/AttributeSet");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/GameplayEffects");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Tasks");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Async");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/BasicFutures");

@@ -4,6 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
+#include "AbilitySystemComponent.h"
 
 namespace MyBaseProperty
 {
@@ -27,24 +28,41 @@ void UMyBaseProperty::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UMyBaseProperty::SetDataSource(FBasePropertySet& Property)
+void UMyBaseProperty::SetDataSource(
+	UAbilitySystemComponent* AbilitySystemComponentPtr,
+	FGameplayAttribute Attribute,
+	float Value
+	)
 {
-	SetCurrentValue(Property.GetCurrentValue());
-	OnValueChanged = Property.AddOnValueChanged(
-		std::bind(&ThisClass::SetCurrentValue, this, std::placeholders::_2)
-	);
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+	Attribute
+		).AddUObject(this, &ThisClass::SetCurrentValue_Re);
+	SetCurrentValue(Value);
 }
 
-void UMyBaseProperty::SetDataSource(FBasePropertySet& Property1, FBasePropertySet& Property2)
+void UMyBaseProperty::SetDataSource(
+	UAbilitySystemComponent* AbilitySystemComponentPtr,
+	FGameplayAttribute Attribute,
+	float Value,
+	FGameplayAttribute MaxAttribute,
+	float MaxValue
+	)
 {
-	SetCurrentValue1(Property1.GetCurrentValue());
-	OnValueChanged = Property1.AddOnValueChanged(
-		std::bind(&ThisClass::SetCurrentValue1, this, std::placeholders::_2)
-	);
-	SetCurrentValue2(Property2.GetCurrentValue());
-	OnValueChanged = Property2.AddOnValueChanged(
-		std::bind(&ThisClass::SetCurrentValue2, this, std::placeholders::_2)
-	);
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+	Attribute
+		).AddUObject(this, &ThisClass::SetCurrentValue1_Re);
+	Value1 = Value;
+
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+	MaxAttribute
+		).AddUObject(this, &ThisClass::SetCurrentValue2_Re);
+	Value2 = MaxValue;
+
+	ValueChanged();
+}
+
+void UMyBaseProperty::SetCurrentValue_Re(const FOnAttributeChangeData& CurrentValue)
+{
 }
 
 void UMyBaseProperty::SetCurrentValue(int32 InCurrentValue)
@@ -56,10 +74,18 @@ void UMyBaseProperty::SetCurrentValue(int32 InCurrentValue)
 	}
 }
 
+void UMyBaseProperty::SetCurrentValue1_Re(const FOnAttributeChangeData& CurrentValue)
+{
+}
+
 void UMyBaseProperty::SetCurrentValue1(int32 InCurrentValue)
 {
 	Value1 = InCurrentValue;
 	ValueChanged();
+}
+
+void UMyBaseProperty::SetCurrentValue2_Re(const FOnAttributeChangeData& CurrentValue)
+{
 }
 
 void UMyBaseProperty::SetCurrentValue2(int32 InCurrentValue)

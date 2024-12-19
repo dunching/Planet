@@ -3,6 +3,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "CharacterBase.h"
+#include "GameOptions.h"
 #include "GameplayTagsManager.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
@@ -71,16 +72,15 @@ void UProxyProcessComponent::ActiveWeaponImp()
 
 	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
-	
-	if (WeaponSocket_1.SkillProxyID.IsValid())
+
+	if (WeaponSocket_1.AllocationedProxyID.IsValid())
 	{
 		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
 	}
-	else if (WeaponSocket_2.SkillProxyID.IsValid())
+	else if (WeaponSocket_2.AllocationedProxyID.IsValid())
 	{
 		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
 	}
-	
 }
 
 void UProxyProcessComponent::SwitchWeapon_Server_Implementation()
@@ -106,6 +106,21 @@ bool UProxyProcessComponent::ActiveActionImp(
 	bool bIsAutomaticStop
 )
 {
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
+	if (CanActiveSocketMap.Contains(SocketTag))
+	{
+		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy_Skill(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		if (ProxySPtr)
+		{
+			return ProxySPtr->Active();
+		}
+	}
+
 	return false;
 }
 
@@ -142,7 +157,7 @@ void UProxyProcessComponent::SwitchWeapon()
 
 	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
-	
+
 	if (WeaponSocket_1.Socket == CurrentWeaponSocket)
 	{
 		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
@@ -151,7 +166,7 @@ void UProxyProcessComponent::SwitchWeapon()
 	{
 		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
 	}
-	
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -193,7 +208,7 @@ void UProxyProcessComponent::GetWeaponSocket(
 	auto OwnerCharacterProxyPtr = HoldingItemsComponentPtr->GetOwnerCharacterProxy();
 	if (OwnerCharacterProxyPtr)
 	{
-		OwnerCharacterProxyPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr,SecondWeaponSocketInfoSPtr);
+		OwnerCharacterProxyPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 }
 
@@ -271,6 +286,25 @@ bool UProxyProcessComponent::ActiveAction(
 	bool bIsAutomaticStop /*= false */
 )
 {
+	// 使用武器
+	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
+	{
+		ActiveAction_Server(CanbeActivedInfoSPtr, bIsAutomaticStop);
+	}
+	// 使用主动技能
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
+	{
+		if (ActivedCorrespondingWeapon(CanbeActivedInfoSPtr))
+		{
+			ActiveAction_Server(CanbeActivedInfoSPtr, bIsAutomaticStop);
+		}
+	}
+	// 使用消耗品
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ConsumableSocket))
+	{
+		ActiveAction_Server(CanbeActivedInfoSPtr, bIsAutomaticStop);
+	}
+
 	return true;
 }
 
@@ -287,7 +321,7 @@ TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveConsumable() 
 
 bool UProxyProcessComponent::ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag)
 {
-	return false;
+	return true;
 }
 
 void UProxyProcessComponent::ActivedCorrespondingWeapon_Server_Implementation(const FGameplayTag& ActiveSkillSocketTag)
@@ -349,14 +383,14 @@ void UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket
 TMap<FGameplayTag, FCharacterSocket> UProxyProcessComponent::GetAllSocket() const
 {
 	TMap<FGameplayTag, FCharacterSocket> Result;
-	
+
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
 	auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
 	auto OwnerCharacterProxyPtr = HoldingItemsComponentPtr->GetOwnerCharacterProxy();
 	if (OwnerCharacterProxyPtr)
 	{
-		 Result= OwnerCharacterProxyPtr->TeammateConfigureMap;
+		Result = OwnerCharacterProxyPtr->GetSockets();
 	}
 	return Result;
 }
@@ -396,11 +430,34 @@ TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveSkills() cons
 {
 	TMap<FKey, FCharacterSocket> Result;
 
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
+
+	const auto Sockets = CharacterPtr->GetCharacterProxy()->GetSockets();
+
+	for (const auto& Iter : Sockets)
+	{
+		if (ActionKeyMap.Contains(Iter.Key))
+		{
+			Result.Add(ActionKeyMap[Iter.Key], Iter.Value);
+		}
+	}
+
 	return Result;
 }
 
-TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(const FGameplayTag& Tag) const
+TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(const FGameplayTag& SocketTag) const
 {
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
+
+	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
+
+	auto SkillProxySPtr = CharacterPtr->GetHoldingItemsComponent()->FindProxy_Skill(Sockets.AllocationedProxyID);
+	if (SkillProxySPtr)
+	{
+		return DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxySPtr);
+	}
 	return nullptr;
 }
 
@@ -428,7 +485,7 @@ bool UProxyProcessComponent::Active(const FCharacterSocket& Socket)
 
 bool UProxyProcessComponent::Active(const FGameplayTag& Socket)
 {
-	return false;
+	return ActiveActionImp(Socket, true);
 }
 
 void UProxyProcessComponent::Cancel(const FCharacterSocket& Socket)

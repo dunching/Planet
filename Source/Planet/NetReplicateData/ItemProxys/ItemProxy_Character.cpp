@@ -16,12 +16,12 @@ bool FCharacterSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& 
 	if (Ar.IsSaving())
 	{
 		Ar << Socket;
-		Ar << SkillProxyID;
+		Ar << AllocationedProxyID;
 	}
 	else if (Ar.IsLoading())
 	{
 		Ar << Socket;
-		Ar << SkillProxyID;
+		Ar << AllocationedProxyID;
 	}
 
 	return true;
@@ -31,23 +31,23 @@ void FCharacterSocket::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
 {
 	if (ProxySPtr)
 	{
-		SkillProxyID = ProxySPtr->GetID();
+		AllocationedProxyID = ProxySPtr->GetID();
 	}
 }
 
 bool FCharacterSocket::operator()() const
 {
-	return SkillProxyID.IsValid();
+	return AllocationedProxyID.IsValid();
 }
 
 bool FCharacterSocket::IsValid() const
 {
-	return SkillProxyID.IsValid();
+	return AllocationedProxyID.IsValid();
 }
 
 void FCharacterSocket::ResetSocket()
 {
-	SkillProxyID = FGuid();
+	AllocationedProxyID = FGuid();
 }
 
 FCharacterProxy::FCharacterProxy()
@@ -238,6 +238,11 @@ void FCharacterProxy::GetWeaponSocket(FCharacterSocket& FirstWeaponSocketInfoSPt
 {
 	FirstWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	SecondWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
+}
+
+TMap<FGameplayTag, FCharacterSocket> FCharacterProxy::GetSockets() const
+{
+	return  TeammateConfigureMap;
 }
 
 void FCharacterProxy::UpdateSocket(const FCharacterSocket& Socket)

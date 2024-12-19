@@ -19,7 +19,7 @@ class FInputProcessor;
 class UAnimInstanceCharacter;
 class UZYInputComponent;
 class UCharacterTitle;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
 struct FCharacterProxy;
 struct FSkillProxy;
 struct FConsumableProxy;

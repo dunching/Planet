@@ -26,15 +26,15 @@ void UState_Talent_NuQi::NativeConstruct()
 	if (CharacterPtr)
 	{
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
-		if (TalentPtr)
-		{
-			OnValueChanged = TalentPtr->CallbackContainerHelper.AddOnValueChanged(
-				std::bind(&ThisClass::OnNuQiCurrentValueChanged, this, std::placeholders::_2)
-			);
-			NuQiMaxValue = TalentPtr->GetMaxValue();
-			OnNuQiCurrentValueChanged(0);
-		}
+		// auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
+		// if (TalentPtr)
+		// {
+		// 	OnValueChanged = TalentPtr->CallbackContainerHelper.AddOnValueChanged(
+		// 		std::bind(&ThisClass::OnNuQiCurrentValueChanged, this, std::placeholders::_2)
+		// 	);
+		// 	NuQiMaxValue = TalentPtr->GetMaxValue();
+		// 	OnNuQiCurrentValueChanged(0);
+		// }
 	}
 }
 

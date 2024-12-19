@@ -7,6 +7,8 @@
 #include <Components/CanvasPanel.h>
 #include <Components/CanvasPanelSlot.h>
 #include <GameplayTagsManager.h>
+
+#include "AS_Character.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Border.h"
 
@@ -51,40 +53,41 @@ void UCharacterTitle::NativeConstruct()
 			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent(); 
 			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
 		}
+		
+		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto AbilitySystemComponentPtr = CharacterPtr->GetAbilitySystemComponent();
 		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
-			{
-				OnHPMaxValueChanged(Ref.GetMaxValue());
-				MaxHPValueChanged = Ref.AddOnMaxValueChanged(
-					std::bind(&ThisClass::OnHPMaxValueChanged, this, std::placeholders::_2)
-				);
-			}
-			{
-				OnHPCurrentValueChanged(Ref.GetCurrentValue());
-				CurrentHPValueChanged = Ref.AddOnValueChanged(
-					std::bind(&ThisClass::OnHPCurrentValueChanged, this, std::placeholders::_2)
-				);
-			}
+			CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetHPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_HPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
+			SetHPChanged(CharacterAttributeSetPtr->GetHP(), CharacterAttributeSetPtr->GetMax_HP());
 		}
 		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
-			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
-				std::bind(&ThisClass::OnPPChanged, this)
-			));
-			ValueChangedAry.Add(Ref.AddOnValueChanged(
-				std::bind(&ThisClass::OnPPChanged, this)
-			));
-			OnPPChanged();
+			CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetPPAttribute()
+				).AddUObject(this, &ThisClass::OnPPChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_PPAttribute()
+				).AddUObject(this, &ThisClass::OnPPChanged);
+
+			SetPPChanged(CharacterAttributeSetPtr->GetPP(), CharacterAttributeSetPtr->GetMax_PP());
 		}
 		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
-			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
-				std::bind(&ThisClass::OnShieldChanged, this)
-			));
-			ValueChangedAry.Add(Ref.AddOnValueChanged(
-				std::bind(&ThisClass::OnShieldChanged, this)
-			));
-			OnShieldChanged();
+			CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetShieldAttribute()
+				).AddUObject(this, &ThisClass::OnShieldChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_HPAttribute()
+				).AddUObject(this, &ThisClass::OnShieldChanged);
+
+			SetShieldChanged(CharacterAttributeSetPtr->GetShield(), CharacterAttributeSetPtr->GetMax_HP());
 		}
 		SwitchCantBeSelect(false);
 
@@ -141,18 +144,6 @@ void UCharacterTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
 	}
 }
 
-void UCharacterTitle::OnHPCurrentValueChanged(int32 NewVal)
-{
-	CurrentHP = NewVal;
-	OnHPChanged();
-}
-
-void UCharacterTitle::OnHPMaxValueChanged(int32 NewVal)
-{
-	MaxHP = NewVal;
-	OnHPChanged();
-}
-
 void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
 	if (Tag.MatchesTagExact(UGameplayTagsLibrary::Debuff))
@@ -180,7 +171,7 @@ void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, in
 	}
 }
 
-void UCharacterTitle::OnHPChanged()
+void UCharacterTitle::OnHPChanged(const FOnAttributeChangeData& )
 {
 	{
 		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().HP_ProgressBar));
@@ -198,24 +189,38 @@ void UCharacterTitle::OnHPChanged()
 	}
 }
 
-void UCharacterTitle::OnPPChanged()
+void UCharacterTitle::SetHPChanged(float Value, float MaxValue)
+{
+}
+
+void UCharacterTitle::OnPPChanged(const FOnAttributeChangeData&)
 {
 	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().PP_ProgressBar));
 	if (WidgetPtr)
 	{
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
-		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
+		auto Max_PP = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_PP();
+		auto PP = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP();
+		WidgetPtr->SetPercent(static_cast<float>(PP) / Max_PP);
 	}
 }
 
-void UCharacterTitle::OnShieldChanged()
+void UCharacterTitle::SetPPChanged(float Value, float MaxValue)
+{
+}
+
+void UCharacterTitle::OnShieldChanged(const FOnAttributeChangeData&)
 {
 	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().Shield_ProgressBar));
 	if (WidgetPtr)
 	{
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
-		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
+		auto Shield = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetShield();
+		auto Max_HP = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
+		WidgetPtr->SetPercent(static_cast<float>(Shield) / Max_HP);
 	}
+}
+
+void UCharacterTitle::SetShieldChanged(float Value, float MaxValue)
+{
 }
 
 void UCharacterTitle::ApplyCharaterNameToTitle()

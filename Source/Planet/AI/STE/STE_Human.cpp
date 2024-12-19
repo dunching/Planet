@@ -7,7 +7,7 @@
 #include <Components/SplineComponent.h>
 
 #include "HumanCharacter.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "HumanAIController.h"
 #include "PlanetPlayerController.h"
 #include "LogWriter.h"

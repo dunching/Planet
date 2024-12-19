@@ -1,6 +1,6 @@
 // Copyright 2020 Dan Kestranek.
 
-#include "BasicFutures_Run.h"
+#include "BasicFutures_Running.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -11,17 +11,18 @@
 #include "GameplayTagsLibrary.h"
 #include "BaseFeatureComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "CharacterAttibutes.h"
+#include "GE_Common.h"
 #include "Planet_Tools.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 
-UBasicFutures_Run::UBasicFutures_Run() :
+UBasicFutures_Running::UBasicFutures_Running() :
 	Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Run::InitalDefaultTags()
+void UBasicFutures_Running::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
@@ -32,19 +33,20 @@ void UBasicFutures_Run::InitalDefaultTags()
 	}
 }
 
-void UBasicFutures_Run::IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
+void UBasicFutures_Running::IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
 {
 	if (Interval > InDuration)
 	{
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		if (
-			CharacterAttributes.PP.GetCurrentValue() >=
+			CharacterAttributes->GetPP() >=
 			RunningConsume.GetCurrentValue()
-			)
+		)
 		{
 			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
 
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
+				CharacterPtr);
 
 			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
@@ -66,7 +68,7 @@ void UBasicFutures_Run::IntervalTick(UAbilityTask_TimerHelper*, float Interval, 
 	}
 }
 
-void UBasicFutures_Run::PreActivate(
+void UBasicFutures_Running::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -75,10 +77,9 @@ void UBasicFutures_Run::PreActivate(
 )
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
-
 }
 
-void UBasicFutures_Run::ActivateAbility(
+void UBasicFutures_Running::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -92,31 +93,40 @@ void UBasicFutures_Run::ActivateAbility(
 #if UE_EDITOR || UE_SERVER
 		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
+			// //
+			// {
+			// 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			// 	TaskPtr->SetInfinite(1.f);
+			// 	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalTick);
+			// 	TaskPtr->ReadyForActivation();
+			// }
 			//
-			{
-				auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-				TaskPtr->SetInfinite(1.f);
-				TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalTick);
-				TaskPtr->ReadyForActivation();
-			}
+			// TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+			//
+			// ModifyPropertyMap.Add(
+			// 	ECharacterPropertyType::MoveSpeed,
+			// 	RunningSpeedOffset.GetCurrentValue()
+			// );
+			//
+			// CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(
+			// 	ModifyPropertyMap,
+			// 	UGameplayTagsLibrary::State_Locomotion_Run
+			// );
 
-			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+			FGameplayEffectSpecHandle SpecHandle =
+				MakeOutgoingGameplayEffectSpec(GE_UGE_RunningClass, GetAbilityLevel());
 
-			ModifyPropertyMap.Add(
-				ECharacterPropertyType::MoveSpeed,
-				RunningSpeedOffset.GetCurrentValue()
-			);
+			SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Immediate);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_MoveSpeed, RunningSpeedOffset.CurrentValue);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(
-				ModifyPropertyMap,
-				UGameplayTagsLibrary::State_Locomotion_Run
-			);
+			ActiveGameplayEffectHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 		}
 #endif
 	}
 }
 
-void UBasicFutures_Run::EndAbility(
+void UBasicFutures_Running::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -129,14 +139,16 @@ void UBasicFutures_Run::EndAbility(
 #if UE_EDITOR || UE_SERVER
 		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
-		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+			// TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
+			//
+			// ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
+			//
+			// CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(
+			// 	ModifyPropertyMap, 
+			// 	UGameplayTagsLibrary::State_Locomotion_Run
+			// );
 
-		ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
-
-		CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(
-			ModifyPropertyMap, 
-			UGameplayTagsLibrary::State_Locomotion_Run
-		);
+			GetAbilitySystemComponentFromActorInfo()->RemoveActiveGameplayEffect(ActiveGameplayEffectHandle);
 		}
 #endif
 	}
@@ -144,7 +156,7 @@ void UBasicFutures_Run::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-bool UBasicFutures_Run::CanActivateAbility(
+bool UBasicFutures_Running::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
@@ -158,9 +170,9 @@ bool UBasicFutures_Run::CanActivateAbility(
 		{
 			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 			if (
-				CharacterAttributes.PP.GetCurrentValue() >=
+				CharacterAttributes->GetPP() >=
 				RunningConsume.GetCurrentValue()
-				)
+			)
 			{
 				return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 			}

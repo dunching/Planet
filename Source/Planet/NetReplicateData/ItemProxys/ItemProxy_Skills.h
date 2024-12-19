@@ -2,18 +2,14 @@
 
 #pragma once
 
-#include <functional>
-#include <variant>
-
 #include "CoreMinimal.h"
+
 #include <GameplayTagContainer.h>
+
+#include "ActiveGameplayEffectHandle.h"
 #include "GameplayAbilitySpecHandle.h"
 
 #include "ItemProxy.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 #include "ItemProxy_Skills.generated.h"
 
@@ -155,6 +151,8 @@ public:
 
 	FActiveSkillProxy();
 
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	// 是否可以激活
 	virtual bool CanActive()const;
 
@@ -166,10 +164,12 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
+	// return 是否在冷却
 	virtual bool GetRemainingCooldown(
 		float& RemainingCooldown, float& RemainingCooldownPercent
 	)const override;
 
+	// return 是否在冷却
 	virtual bool CheckCooldown()const override;
 
 	virtual void AddCooldownConsumeTime(float NewTime)override;
@@ -180,8 +180,12 @@ public:
 
 	virtual void OffsetCooldownTime()override;
 
+	// void SetCDGEChandle(FActiveGameplayEffectHandle InCD_GE_Handle);
+	
 protected:
 
+	// FActiveGameplayEffectHandle CD_GE_Handle;
+	
 };
 
 USTRUCT()

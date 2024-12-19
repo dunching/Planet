@@ -45,7 +45,7 @@ public:
 	using FOnGroupmateProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&, bool)>;
 
 	using FOnConsumableProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FConsumableProxy>&,
-	                                                               EProxyModifyType)>;
+	                                                                EProxyModifyType)>;
 
 	using FOnCoinProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FCoinProxy>&, bool, int32)>;
 
@@ -59,10 +59,11 @@ public:
 	TSharedPtr<FBasicProxy> AddProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	TSharedPtr<FBasicProxy> UpdateProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
-	
+
 	void SetAllocationCharacterProxy(
 		const FGuid& Proxy_ID,
-		const FGuid& CharacterProxy_ID
+		const FGuid& CharacterProxy_ID,
+		const FGameplayTag& InSocketTag
 	);
 #endif
 
@@ -83,15 +84,15 @@ public:
 
 	TSharedPtr<FCharacterProxy> FindProxy_Character(const IDType& ID) const;
 
-	TSharedPtr<FCharacterProxy> InitialOwnerCharacterProxy(ACharacterBase*OwnerCharacterPtr);
+	TSharedPtr<FCharacterProxy> InitialOwnerCharacterProxy(ACharacterBase* OwnerCharacterPtr);
 
 	TArray<TSharedPtr<FCharacterProxy>> GetCharacterProxyAry() const;
 
 	TSharedPtr<FCharacterProxy> GetOwnerCharacterProxy() const;
 
-	void UpdateSocket(const TSharedPtr<FCharacterProxy>&CharacterProxySPtr, const FCharacterSocket&Socket);
+	void UpdateSocket(const TSharedPtr<FCharacterProxy>& CharacterProxySPtr, const FCharacterSocket& Socket);
 
-	
+
 	TSharedPtr<FWeaponProxy> AddProxy_Weapon(const FGameplayTag& ProxyType);
 
 	TSharedPtr<FWeaponProxy> Update_Weapon(const TSharedPtr<FWeaponProxy>& Proxy);
@@ -133,7 +134,9 @@ public:
 
 	void SyncPendingProxy(FGuid Guid);
 
-	
+
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+
 	UPROPERTY(Replicated)
 	FProxy_FASI_Container Proxy_Container;
 
@@ -152,10 +155,7 @@ public:
 
 	FOnWeaponProxyChanged OnWeaponProxyChanged;
 
-	virtual void OnGroupSharedInfoReady()override;
-
 protected:
-	
 	virtual void InitializeComponent() override;
 
 	virtual void BeginPlay() override;
@@ -166,15 +166,15 @@ protected:
 	void OnRep_GetCharacterProxyID();
 
 private:
-	
 	UFUNCTION(Server, Reliable)
-	void UpdateSocket_Server(const FGuid&CharacterProxyID, const FCharacterSocket&Socket);
-	
+	void UpdateSocket_Server(const FGuid& CharacterProxyID, const FCharacterSocket& Socket);
+
 	// 同步到服務器
 	UFUNCTION(Server, Reliable)
 	void SetAllocationCharacterProxy_Server(
 		const FGuid& Proxy_ID,
-		const FGuid& CharacterProxy_ID
+		const FGuid& CharacterProxy_ID,
+		const FGameplayTag& InSocketTag
 	);
 
 	// 等待加入“库存”的物品

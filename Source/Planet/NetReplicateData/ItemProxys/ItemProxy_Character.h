@@ -51,7 +51,8 @@ struct PLANET_API FCharacterSocket
 	
 	FGameplayTag Socket;
 
-	FGuid SkillProxyID;
+	// 分配的物品ID
+	FGuid AllocationedProxyID;
 	
 };
 
@@ -108,12 +109,12 @@ public:
 		FCharacterSocket& SecondWeaponSocketInfoSPtr
 	);
 
+	TMap<FGameplayTag, FCharacterSocket>GetSockets()const;;
+	
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 
-	TMap<FGameplayTag, FCharacterSocket>TeammateConfigureMap;
-	
 	FString Title;
 
 	FString Name;
@@ -123,6 +124,8 @@ public:
 protected:
 
 	void UpdateSocket(const FCharacterSocket&Socket);
+	
+	TMap<FGameplayTag, FCharacterSocket>TeammateConfigureMap;
 	
 };
 

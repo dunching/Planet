@@ -10,8 +10,6 @@
 #include "GameplayAbilitySpecHandle.h"
 
 #include "ItemProxy.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
-#include "Editor/Experimental/EditorInteractiveToolsFramework/Public/Behaviors/2DViewportBehaviorTargets.h"
 
 #include "ItemProxy_Weapon.generated.h"
 

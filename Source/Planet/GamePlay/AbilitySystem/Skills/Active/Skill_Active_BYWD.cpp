@@ -11,6 +11,8 @@
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AssetRefMap.h"
+#include "GameplayTagsLibrary.h"
 
 void USkill_Active_BYWD::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
@@ -31,13 +33,13 @@ void USkill_Active_BYWD::PerformAction(
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
-
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+		// CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		// CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
+		// CharacterStateInfoSPtr->Duration = Duration;
+		// CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
+		// CharacterStateInfoSPtr->DataChanged();
+		//
+		// CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -76,6 +78,49 @@ void USkill_Active_BYWD::PerformAction(
 			TaskPtr->ReadyForActivation();
 		}
 	}
+}
+
+bool USkill_Active_BYWD::CommitAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+)
+{
+	UGameplayEffect* DurationGEPtr = UAssetRefMap::GetInstance()->DurationGEClass->GetDefaultObject<UGameplayEffect>();
+	if (DurationGEPtr)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+		   MakeOutgoingGameplayEffectSpec(DurationGEPtr->GetClass(), GetAbilityLevel());
+
+		SpecHandle.Data.Get()->SetDuration(Duration, true);
+		SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,1);
+				
+		const auto GEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+	
+	
+	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
+}
+
+void USkill_Active_BYWD::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+		   MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(SkillProxyPtr->GetProxyType());
+		// SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		// SpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Cooldown")),1);
+				
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+		// DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->SetCDGEChandle(CDGEHandle);
+	}
+	
+	// 公共冷却
 }
 
 void USkill_Active_BYWD::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentInterval, float Interval)

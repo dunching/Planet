@@ -96,16 +96,16 @@ protected:
 
 	// 因为我们给的优先级很高，所以这个数据是结算靠后的，经过了基础的伤害折算
 	// 这里的伤害量则为实际的伤害值，这里直接判断伤害是否会让角色HP低于一定阈值
-	struct FMyStruct : public IGAEventModifyReceivedInterface
-	{
-		FMyStruct(int32 InPriority, USkill_Passive_XS* InGAInsPtr);
+	// struct FMyStruct : public IGAEventModifyReceivedInterface
+	// {
+	// 	FMyStruct(int32 InPriority, USkill_Passive_XS* InGAInsPtr);
+	//
+	// 	virtual bool Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override;
+	//
+	// 	USkill_Passive_XS* GAInsPtr = nullptr;
+	// };
 
-		virtual bool Modify(FGameplayAbilityTargetData_GAReceivedEvent& GameplayAbilityTargetData_GAEvent)override;
-
-		USkill_Passive_XS* GAInsPtr = nullptr;
-	};
-
-	TSharedPtr<FMyStruct>EventModifyReceivedSPtr = nullptr;
+	// TSharedPtr<FMyStruct>EventModifyReceivedSPtr = nullptr;
 
 	TSharedPtr<FCharacterStateInfo> CD_CharacterStateInfoSPtr = nullptr;
 

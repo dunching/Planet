@@ -61,15 +61,15 @@ void UGAEvent_Received::ActivateAbility(
 			auto CloneSPtr = GAEventDataPtr->Clone_SmartPtr();
 			if (CloneSPtr->Data.bIsRespawn)
 			{
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
+				// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 			}
 			else
 			{
 				// 受击的角色会对数据做出的修正
-				CharacterPtr->GetBaseFeatureComponent()->OnReceivedEventModifyData(*CloneSPtr);
+				// CharacterPtr->GetBaseFeatureComponent()->OnReceivedEventModifyData(*CloneSPtr);
 
 				// 将数据应用到角色
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
+				// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 
 				// 
 				CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);

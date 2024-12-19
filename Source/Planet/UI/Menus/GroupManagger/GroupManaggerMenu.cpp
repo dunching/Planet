@@ -12,7 +12,7 @@
 #include "AssetRefMap.h"
 #include "HoldingItemsComponent.h"
 #include "GenerateType.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
@@ -21,6 +21,7 @@
 #include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
 #include "ItemProxy_Character.h"
+#include "TeamMatesList.h"
 
 namespace GroupManaggerMenu
 {
@@ -48,6 +49,12 @@ void UGroupManaggerMenu::SyncData()
 	if (!PCPtr)
 	{
 		return;
+	}
+
+	auto TeamMatesListPtr = Cast<UTeamMatesList>(GetWidgetFromName(GroupManaggerMenu::TeamMatesList));
+	if (TeamMatesListPtr)
+	{
+		TeamMatesListPtr->SyncData();
 	}
 
 	auto GMCPtr = PCPtr->GetGroupSharedInfo();

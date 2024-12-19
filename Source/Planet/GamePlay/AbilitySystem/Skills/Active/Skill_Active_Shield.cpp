@@ -35,6 +35,7 @@
 #include "BaseFeatureComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
+#include "AS_Character.h"
 #include "CharacterAttibutes.h"
 #include "CharacterAttributesComponent.h"
 #include "KismetGravityLibrary.h"
@@ -101,7 +102,7 @@ bool USkill_Active_Shield::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP.GetCurrentValue())
+	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP())
 	{
 		return false;
 	}

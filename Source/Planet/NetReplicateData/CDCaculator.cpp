@@ -2,7 +2,7 @@
 #include "CDCaculator.h"
 
 #include "CDcaculatorComponent.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 void FCDItem_FASI::PreReplicatedRemove(const FCD_FASI_Container& InArraySerializer)
 {

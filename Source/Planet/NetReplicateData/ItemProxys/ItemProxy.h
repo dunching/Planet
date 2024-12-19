@@ -196,6 +196,10 @@ public:
 		const FGameplayTag& InSocketTag
 		);
 
+	FGameplayTag GetCurrentSocketTag()const;
+
+	IDType GetAllocationCharacterID()const;
+	
 protected:
 
 	// 被分配给的对象ID

@@ -7,6 +7,7 @@
 #include <GameFramework/CharacterMovementComponent.h>
 
 #include "AITask_MoveBySpline.h"
+#include "AS_Character.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "Helper_RootMotionSource.h"
@@ -82,7 +83,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::PerformMoveTask(
 	RootMotionSourcePtr->Priority = ERootMotionSource_Priority::kAIMove;
 	RootMotionSourcePtr->FinishVelocityParams.Mode = ERootMotionFinishVelocityMode::ClampVelocity;
 	RootMotionSourcePtr->FinishVelocityParams.ClampVelocity =
-		InstanceData.CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue();
+		InstanceData.CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	RootMotionSourcePtr->Settings.SetFlag(ERootMotionSourceSettingsFlags::IgnoreZAccumulate);
 
 	RootMotionSourcePtr->FormationPtr = InstanceData.AIControllerPtr->PathFollowComponentPtr;

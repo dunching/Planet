@@ -1,4 +1,3 @@
-
 #include "EffectItem.h"
 
 #include "Engine/AssetManager.h"
@@ -30,6 +29,13 @@ void UEffectItem::SetData(const TSharedPtr<FCharacterStateInfo>& InCharacterStat
 	SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
 
 	OnUpdate();
+}
+
+void UEffectItem::SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr)
+{
+	ActiveGameplayEffectPtr = InActiveGameplayEffectPtr;
+
+	Handle = ActiveGameplayEffectPtr->Handle;
 }
 
 void UEffectItem::SetNum(int32 NewNum)
@@ -97,7 +103,8 @@ void UEffectItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
+		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(
+			TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
 			{
 				ImagePtr->SetBrushFromTexture(TexturePtr.Get());
 			}));
@@ -122,17 +129,59 @@ void UEffectItem::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UEffectItem::OnUpdate()
+void UEffectItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	SetNum(CharacterStateInfoSPtr->Num);
+	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	if (CharacterStateInfoSPtr->Duration > 0.f)
+	FGameplayTagContainer OutContainer;
+	ActiveGameplayEffectPtr->Spec.GetAllGrantedTags(OutContainer);
+	if (!OutContainer.IsEmpty())
 	{
-		SetPercent(true, CharacterStateInfoSPtr->GetRemainTimePercent());
-	}
-	else
-	{
-		SetPercentIsDisplay(false);
+		// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
+
+		OnUpdate();
 	}
 }
 
+void UEffectItem::OnUpdate()
+{
+	if (ActiveGameplayEffectPtr->Handle != Handle)
+	{
+		RemoveFromParent();
+		return;
+	}
+	
+	SetNum(ActiveGameplayEffectPtr->Spec.GetStackCount());
+
+	switch (ActiveGameplayEffectPtr->Spec.Def->DurationPolicy)
+	{
+	case EGameplayEffectDurationType::HasDuration:
+		{
+			const auto Duration = ActiveGameplayEffectPtr->GetDuration();
+			const auto TimeRemaining = ActiveGameplayEffectPtr->GetTimeRemaining(GetWorld()->GetTimeSeconds());
+			if (TimeRemaining > 0.f)
+			{
+				SetPercent(true, TimeRemaining / Duration);
+			}
+			else
+			{
+				RemoveFromParent();
+			}
+		}
+	break;
+	default:
+		{
+			// 没写
+			const auto TimeRemaining = ActiveGameplayEffectPtr->GetTimeRemaining(GetWorld()->GetTimeSeconds());
+			if (TimeRemaining > 0.f)
+			{
+				SetPercent(true, TimeRemaining);
+			}
+			else
+			{
+				SetPercentIsDisplay(false);
+			}
+		}
+	break;
+	}
+}
