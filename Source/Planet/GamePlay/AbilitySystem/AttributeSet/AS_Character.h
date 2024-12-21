@@ -24,8 +24,6 @@ struct PLANET_API FMyGameplayAttributeData : public FGameplayAttributeData
 {
 	GENERATED_USTRUCT_BODY()
 
-	TMap<FGameplayTag, float>ValueMap;
-	
 };
 
 /**

@@ -1,5 +1,7 @@
 #include "AS_Character.h"
 
+#include <functional>
+
 #include "Net/UnrealNetwork.h"
 #include "GameplayEffectExtension.h"
 
@@ -14,59 +16,16 @@ void UAS_Character::PostGameplayEffectExecute(const FGameplayEffectModCallbackDa
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	FGameplayTagContainer AllAssetTags;
-	Data.EffectSpec.GetAllAssetTags(AllAssetTags);
-
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_Immediate))
-	{
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_Temporary))
-	{
-	}
-	else
-	{
-		if (Data.EvaluatedData.Attribute == GetHPAttribute())
-		{
-			auto GameplayAttributeData = dynamic_cast<FMyGameplayAttributeData*>(
-				GetHPAttribute().GetGameplayAttributeData(this)
-				);
-			GameplayAttributeData->ValueMap.Add(UGameplayTagsLibrary::GEData_Immediate, GetHP());
-		}
-		else if (Data.EvaluatedData.Attribute == GetMoveSpeedAttribute())
-		{
-			auto GameplayAttributeData = dynamic_cast<FMyGameplayAttributeData*>(
-				GetMoveSpeedAttribute().GetGameplayAttributeData(this)
-				);
-			GameplayAttributeData->ValueMap.Add(UGameplayTagsLibrary::GEData_Immediate, GetMoveSpeed());
-		}
-	}
-
-	auto Lamda = [&Data, this](FGameplayAttributeData*GameplayAttributeDataPtr)->float
-	{
-		auto GameplayAttributeData = dynamic_cast<FMyGameplayAttributeData*>(
-			GameplayAttributeDataPtr
-			);
-		GameplayAttributeData->ValueMap.Append(Data.EffectSpec.SetByCallerTagMagnitudes);
-
-		float NewValue = 0.f;
-		for (auto Iter : GameplayAttributeData->ValueMap)
-		{
-			NewValue +=Iter.Value;
-		}
-		return  NewValue;
-	};
-	
 	// 通过使用属性获取器来查看这个调用是否会影响生命值。
 	if (Data.EvaluatedData.Attribute == GetHPAttribute())
 	{
 		// 这个游戏玩法效果是改变生命值。应用它，但要先限制数值。
 		// 在这种情况下，生命值的基础值不可是负值。
-		const auto NewValue = Lamda(GetHPAttribute().GetGameplayAttributeData(this));
-		SetHP(FMath::Clamp(NewValue, 0.0f, GetMax_HP()));
+		SetHP(FMath::Clamp(GetHP(), 0.0f, GetMax_HP()));
 	}
 	else if (Data.EvaluatedData.Attribute == GetMoveSpeedAttribute())
 	{
-		SetMoveSpeed(Lamda(GetMoveSpeedAttribute().GetGameplayAttributeData(this)));
+		SetMoveSpeed(GetMoveSpeed());
 	}
 }
 

@@ -12,6 +12,7 @@
 
 class UAbilityTask_TimerHelper;
 class UGE_Running;
+class UGE_CancelRunning;
 
 /**
  *
@@ -65,10 +66,11 @@ protected:
 	FBaseProperty RunningConsume;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
-	TSubclassOf<UGE_Running>GE_UGE_RunningClass;
+	TSubclassOf<UGE_Running>GE_RunningClass;
 
-	FActiveGameplayEffectHandle ActiveGameplayEffectHandle;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGE_CancelRunning>GE_CancelRunningClass;
+
 private:
 
 	virtual void InitalDefaultTags() override;

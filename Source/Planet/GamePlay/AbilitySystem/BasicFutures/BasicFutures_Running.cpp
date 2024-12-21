@@ -114,13 +114,14 @@ void UBasicFutures_Running::ActivateAbility(
 			// );
 
 			FGameplayEffectSpecHandle SpecHandle =
-				MakeOutgoingGameplayEffectSpec(GE_UGE_RunningClass, GetAbilityLevel());
+				MakeOutgoingGameplayEffectSpec(GE_RunningClass, GetAbilityLevel());
 
-			SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Immediate);
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_MoveSpeed, RunningSpeedOffset.CurrentValue);
+			// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyDuration_Temporary);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
 
-			ActiveGameplayEffectHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 		}
 #endif
 	}
@@ -148,7 +149,14 @@ void UBasicFutures_Running::EndAbility(
 			// 	UGameplayTagsLibrary::State_Locomotion_Run
 			// );
 
-			GetAbilitySystemComponentFromActorInfo()->RemoveActiveGameplayEffect(ActiveGameplayEffectHandle);
+			FGameplayEffectSpecHandle SpecHandle =
+				MakeOutgoingGameplayEffectSpec(GE_CancelRunningClass, GetAbilityLevel());
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyDuration_RemoveTemporary);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
+
+			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 		}
 #endif
 	}

@@ -148,8 +148,12 @@ void UCharacterAttributesComponent::BeginPlay()
 		}
 		// 自动回复
 		{
-			auto Spec = GASPtr->MakeOutgoingSpec(GE_CharacterReplyClass, 1, GASPtr->MakeEffectContext());
-			const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*Spec.Data.Get());
+			auto SpecHandle = GASPtr->MakeOutgoingSpec(GE_CharacterReplyClass, 1, GASPtr->MakeEffectContext());
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyDuration_Immediate);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_HP);
+
+			const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			if (!GEHandle.IsValid())
 			{
 				// checkNoEntry();

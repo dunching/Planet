@@ -338,23 +338,29 @@ FGameplayTag UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted.Stagnation")));
 
 
-FGameplayTag UGameplayTagsLibrary::GEData_Immediate =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Immediate")));
+FGameplayTag UGameplayTagsLibrary::GEData_Info =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Info")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_Temporary =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Temporary")));
 
 FGameplayTag UGameplayTagsLibrary::GEData_Duration =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Duration")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_Info =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Info")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_HP =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.HP")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyDuration_Immediate =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyDuration.Immediate")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_Damage_Base =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Damage.Base")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyDuration_Temporary =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyDuration.Temporary")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_MoveSpeed =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.MoveSpeed")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyDuration_RemoveTemporary =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyDuration.RemoveTemporary")));
+
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_HP =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.HP")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Damage_Base =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Damage.Base")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.MoveSpeed")));

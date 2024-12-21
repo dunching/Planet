@@ -42,3 +42,18 @@ public:
 protected:
 	
 };
+
+UCLASS()
+class PLANET_API UGEEC_CancelRunning : public UGameplayEffectExecutionCalculation
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Execute_Implementation(
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+	) const;
+
+protected:
+	
+};

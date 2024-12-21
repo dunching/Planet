@@ -12,6 +12,8 @@
 
 #include "BaseFeatureComponent.generated.h"
 
+struct FGameplayAttributeData;
+
 class UGAEvent_Received;
 struct FConsumableProxy;
 class UCS_PeriodicPropertyModify;
@@ -42,7 +44,6 @@ class PLANET_API UBaseFeatureComponent :
 	GENERATED_BODY()
 
 public:
-
 	friend UGAEvent_Received;
 
 	using FOwnerPawnType = ACharacterBase;
@@ -53,23 +54,23 @@ public:
 
 	static FName ComponentName;
 
-	bool IsInDeath()const;
-	
-	bool IsUnSelected()const;
+	bool IsInDeath() const;
 
-	bool IsRunning()const;
+	bool IsUnSelected() const;
 
-	bool IsRootMotion()const;
+	bool IsRunning() const;
 
-	bool IsInFighting()const;
+	bool IsRootMotion() const;
+
+	bool IsInFighting() const;
 
 	void OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData);
 
 	void OnReceivedEventModifyData(
-		const TMap<FGameplayTag, float>&CustomMagnitudes,
+		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-		);
+	);
 
 	void AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
 
@@ -136,14 +137,14 @@ public:
 	);
 
 	void InitialBaseGAs();
-	
+
 	UFUNCTION(Server, Reliable)
 	void SwitchWalkState(bool bIsRun);
-	
+
 	// 冲刺/闪避
 	UFUNCTION(Server, Reliable)
 	void Dash(EDashDirection DashDirection);
-	
+
 	// 
 	UFUNCTION(Server, Reliable)
 	void Jump();
@@ -154,7 +155,7 @@ public:
 
 	// 移动至攻击范围内
 	void MoveToAttackDistance(
-		FGameplayAbilityTargetData_MoveToAttaclArea * MoveToAttaclAreaPtr
+		FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
 	);
 
 	// 取消 移动至攻击范围内
@@ -173,7 +174,6 @@ public:
 	FMakedDamageDelegate MakedDamageDelegate;
 
 protected:
-
 	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
 
 	void AddSendBaseModify();
@@ -181,21 +181,34 @@ protected:
 	void AddReceivedBaseModify();
 
 	EAffectedDirection GetAffectedDirection(
-		ACharacterBase*TargetCharacterPtr,
-		ACharacterBase*TriggerCharacterPtr
+		ACharacterBase* TargetCharacterPtr,
+		ACharacterBase* TriggerCharacterPtr
 	);
+
+	void UpdateMap(
+		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const FGameplayEffectSpec& Spec,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
+
+	float GetMapValue(
+		const FGameplayEffectSpec& Spec,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+	) const;
 
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilities;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
-	TSubclassOf<USkill_Element_Gold>Skill_Element_GoldClass;
+	TSubclassOf<USkill_Element_Gold> Skill_Element_GoldClass;
 #pragma endregion GAs
 
 	// 从小到大
-	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare>SendEventModifysMap;
+	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare> SendEventModifysMap;
 
-	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare>ReceivedEventModifysMap;
+	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare> ReceivedEventModifysMap;
 
+	// GameplayAttributeData的组成
+	TMap<const FGameplayAttributeData*, TMap<FGameplayTag, float>> ValueMap;
 };

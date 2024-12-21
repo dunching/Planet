@@ -27,3 +27,11 @@ public:
 	FScalableFloat MoveSpeedOffset;
 
 };
+
+UCLASS()
+class PLANET_API UGE_CancelRunning : public UGameplayEffect
+{
+	GENERATED_BODY()
+public:
+	
+};
