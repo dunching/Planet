@@ -7,7 +7,7 @@
 protected:
 
 3.StateTreeAIComponent.h
-	class UStateTreeAIComponent : public UStateTreeComponent
+	class GAMEPLAYSTATETREEMODULE_API UStateTreeAIComponent : public UStateTreeComponent
 
 4.StateTreeMoveToTask.cpp
 	const FVector CurrentDestination = InstanceData.MoveToTask->GetMoveRequestRef().GetDestination();
