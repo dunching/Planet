@@ -151,16 +151,16 @@ FGameplayTag UGameplayTagsLibrary::State_ReleasingSkil_WeaponActive =
 FGameplayTag UGameplayTagsLibrary::ConsumableSocket =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket")));
 
-FGameplayTag UGameplayTagsLibrary::ConsumableSocket1 =
+FGameplayTag UGameplayTagsLibrary::ConsumableSocket_1 =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.1")));
 
-FGameplayTag UGameplayTagsLibrary::ConsumableSocket2 =
+FGameplayTag UGameplayTagsLibrary::ConsumableSocket_2 =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.2")));
 
-FGameplayTag UGameplayTagsLibrary::ConsumableSocket3 =
+FGameplayTag UGameplayTagsLibrary::ConsumableSocket_3 =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.3")));
 
-FGameplayTag UGameplayTagsLibrary::ConsumableSocket4 =
+FGameplayTag UGameplayTagsLibrary::ConsumableSocket_4 =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.4")));
 
 FGameplayTag UGameplayTagsLibrary::WeaponSocket =
@@ -341,26 +341,38 @@ FGameplayTag UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation =
 FGameplayTag UGameplayTagsLibrary::GEData_Info =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Info")));
 
+FGameplayTag UGameplayTagsLibrary::GEData_CD =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.CD")));
+
 
 FGameplayTag UGameplayTagsLibrary::GEData_Duration =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Duration")));
 
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyDuration_Immediate =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyDuration.Immediate")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Addtive")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyDuration_Temporary =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyDuration.Temporary")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Override")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyDuration_RemoveTemporary =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyDuration.RemoveTemporary")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary")));
 
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_HP =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.HP")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_HP =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.HP")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Damage_Base =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Damage.Base")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_PP =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.PP")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.MoveSpeed")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Mana =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Mana")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Base")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.MoveSpeed")));

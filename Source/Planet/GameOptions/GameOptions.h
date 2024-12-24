@@ -41,6 +41,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
 	bool bIsAllowAdjustTime = true;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveSpeed")
+	int32 MaxMoveSpeed = 1000;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TMap<FGameplayTag, FKey>ActionKeyMap;
 

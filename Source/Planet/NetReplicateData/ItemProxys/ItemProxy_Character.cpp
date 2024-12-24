@@ -126,10 +126,10 @@ void FCharacterProxy::InitialProxy(const FGameplayTag& InProxyType)
 		{UGameplayTagsLibrary::WeaponSocket_1, EKeys::LeftMouseButton},
 		{UGameplayTagsLibrary::WeaponSocket_2, EKeys::LeftMouseButton},
 
-		{UGameplayTagsLibrary::ConsumableSocket1, EKeys::One},
-		{UGameplayTagsLibrary::ConsumableSocket2, EKeys::Two},
-		{UGameplayTagsLibrary::ConsumableSocket3, EKeys::Three},
-		{UGameplayTagsLibrary::ConsumableSocket4, EKeys::Four},
+		{UGameplayTagsLibrary::ConsumableSocket_1, EKeys::One},
+		{UGameplayTagsLibrary::ConsumableSocket_2, EKeys::Two},
+		{UGameplayTagsLibrary::ConsumableSocket_3, EKeys::Three},
+		{UGameplayTagsLibrary::ConsumableSocket_4, EKeys::Four},
 
 		{UGameplayTagsLibrary::PassiveSocket_1, EKeys::Invalid},
 		{UGameplayTagsLibrary::PassiveSocket_2, EKeys::Invalid},

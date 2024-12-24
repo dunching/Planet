@@ -95,6 +95,25 @@ void UBasicFutures_Dash::ActivateAbility(
 	DoDash(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
+void UBasicFutures_Dash::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+) const
+{
+	UGameplayEffect* CostGE = GetCostGameplayEffect();
+	if (CostGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
+
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_PP, -Consume);
+
+		ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
+
 bool UBasicFutures_Dash::CommitAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -104,20 +123,21 @@ bool UBasicFutures_Dash::CommitAbility(
 {
 	if (CharacterPtr)
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-
-		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -Consume);
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
+		// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
+		// 	CharacterPtr);
+		//
+		// GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
+		//
+		// FGAEventData GAEventData(CharacterPtr, CharacterPtr);
+		//
+		// GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
+		//
+		// GAEventData.DataModify.Add(ECharacterPropertyType::PP, -Consume);
+		//
+		// GAEventDataPtr->DataAry.Add(GAEventData);
+		//
+		// auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		// ICPtr->SendEventImp(GAEventDataPtr);
 
 		if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
 		{
@@ -227,7 +247,8 @@ void UBasicFutures_Dash::DoDash(
 	{
 		if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 		{
-			auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Dash*>(TriggerEventData->TargetData.Get(0));
+			auto GameplayAbilityTargetData_DashPtr = dynamic_cast<const FGameplayAbilityTargetData_Dash*>(
+				TriggerEventData->TargetData.Get(0));
 			if (GameplayAbilityTargetData_DashPtr)
 			{
 				UAnimMontage* CurMontagePtr = nullptr;
@@ -238,32 +259,40 @@ void UBasicFutures_Dash::DoDash(
 				switch (GameplayAbilityTargetData_DashPtr->DashDirection)
 				{
 				case EDashDirection::kForward:
-				{
-					CurMontagePtr = ForwardMontage;
-					Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
-				}
-				break;
+					{
+						CurMontagePtr = ForwardMontage;
+						Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(),
+						                                              Rotation.Quaternion().GetForwardVector()).
+							Vector();
+					}
+					break;
 				case EDashDirection::kBackward:
-				{
-					CurMontagePtr = BackwardMontage;
-					Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(), -Rotation.Quaternion().GetForwardVector()).Vector();
-				}
-				break;
+					{
+						CurMontagePtr = BackwardMontage;
+						Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(),
+						                                              -Rotation.Quaternion().GetForwardVector()).
+							Vector();
+					}
+					break;
 				case EDashDirection::kLeft:
-				{
-					CurMontagePtr = LeftMontage;
-					Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(), -Rotation.Quaternion().GetRightVector()).Vector();
-				}
-				break;
+					{
+						CurMontagePtr = LeftMontage;
+						Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(),
+						                                              -Rotation.Quaternion().GetRightVector()).Vector();
+					}
+					break;
 				case EDashDirection::kRight:
-				{
-					CurMontagePtr = RightMontage;
-					Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(), Rotation.Quaternion().GetRightVector()).Vector();
-				}
-				break;
+					{
+						CurMontagePtr = RightMontage;
+						Direction = UKismetMathLibrary::MakeRotFromZX(-CharacterPtr->GetGravityDirection(),
+						                                              Rotation.Quaternion().GetRightVector()).Vector();
+					}
+					break;
 				}
 
-				const auto Rate = FMath::IsNearlyZero(Duration) ? CurMontagePtr->CalculateSequenceLength() / Duration : 1.f;
+				const auto Rate = FMath::IsNearlyZero(Duration)
+					                  ? CurMontagePtr->CalculateSequenceLength() / Duration
+					                  : 1.f;
 				PlayMontage(CurMontagePtr, Rate);
 
 				Displacement(Direction);
@@ -275,8 +304,8 @@ void UBasicFutures_Dash::DoDash(
 void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-	 (CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-	 (CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy) 
+		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
+		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 	)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -298,7 +327,7 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 	if (
 		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
 		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
-		)
+	)
 	{
 		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			this,
@@ -334,7 +363,7 @@ UScriptStruct* FGameplayAbilityTargetData_Dash::GetScriptStruct() const
 
 bool FGameplayAbilityTargetData_Dash::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
-	Ar<< DashDirection;
+	Ar << DashDirection;
 
 	return true;
 }

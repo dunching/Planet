@@ -82,7 +82,7 @@ void UHoldingItemsComponent::AddProxy_Pending(FGameplayTag ProxyType, int32 Num,
 	else
 	{
 		auto SceneProxyExtendInfoPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(ProxyType);
-		PendingMap.Add(Guid, {{ProxyType, 1}});
+		PendingMap.Add(Guid, {{ProxyType, Num}});
 	}
 }
 
@@ -424,6 +424,15 @@ TSharedPtr<FConsumableProxy> UHoldingItemsComponent::AddProxy_Consumable(const F
 	return ResultPtr;
 }
 
+TSharedPtr<FConsumableProxy> UHoldingItemsComponent::FindProxy_Consumable(const IDType& ID) const
+{
+	if (SceneMetaMap.Contains(ID))
+	{
+		return DynamicCastSharedPtr<FConsumableProxy>(SceneMetaMap[ID]);
+	}
+	return nullptr;
+}
+
 TSharedPtr<FToolProxy> UHoldingItemsComponent::AddProxy_ToolProxy(const FGameplayTag& ProxyType)
 {
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
@@ -611,7 +620,7 @@ TSharedPtr<FBasicProxy> UHoldingItemsComponent::AddProxy(const FGameplayTag& Pro
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		ResultSPtr = AddProxy_Consumable(ProxyType);
+		ResultSPtr = AddProxy_Consumable(ProxyType,Num);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{

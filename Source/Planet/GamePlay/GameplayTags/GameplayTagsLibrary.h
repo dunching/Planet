@@ -122,13 +122,13 @@ public:
 #pragma region Socket Tags
 	static FGameplayTag ConsumableSocket;
 	
-	static FGameplayTag ConsumableSocket1;
+	static FGameplayTag ConsumableSocket_1;
 	
-	static FGameplayTag ConsumableSocket2;
+	static FGameplayTag ConsumableSocket_2;
 
-	static FGameplayTag ConsumableSocket3;
+	static FGameplayTag ConsumableSocket_3;
 	
-	static FGameplayTag ConsumableSocket4;
+	static FGameplayTag ConsumableSocket_4;
 	
 	static FGameplayTag WeaponSocket;
 	
@@ -242,6 +242,7 @@ public:
 	static FGameplayTag Skill_CanBeInterrupted_Stagnation;
 
 	
+	// 人物身上自带的属性
 	static FGameplayTag DataSource_Regular;
 
 	// 人物身上自带的属性
@@ -257,18 +258,26 @@ public:
 	
 	static FGameplayTag GEData_Info;
 
-	
-	static FGameplayTag GEData_ModifyDuration_Immediate;
-	
-	static FGameplayTag GEData_ModifyDuration_Temporary;
-	
-	static FGameplayTag GEData_ModifyDuration_RemoveTemporary;
+	static FGameplayTag GEData_CD;
 
 	
-	static FGameplayTag GEData_ModifyType_HP;
+	static FGameplayTag GEData_ModifyType_BaseValue_Addtive;
 	
-	static FGameplayTag GEData_ModifyType_Damage_Base;
+	static FGameplayTag GEData_ModifyType_Immediate_Override;
 	
-	static FGameplayTag GEData_ModifyType_MoveSpeed;
+	static FGameplayTag GEData_ModifyType_Temporary;
+	
+	static FGameplayTag GEData_ModifyType_RemoveTemporary;
+
+	
+	static FGameplayTag GEData_ModifyItem_HP;
+	
+	static FGameplayTag GEData_ModifyItem_PP;
+	
+	static FGameplayTag GEData_ModifyItem_Mana;
+	
+	static FGameplayTag GEData_ModifyItem_Damage_Base;
+	
+	static FGameplayTag GEData_ModifyItem_MoveSpeed;
 	
 };

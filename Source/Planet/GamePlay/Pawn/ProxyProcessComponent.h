@@ -72,6 +72,8 @@ public:
 
 	FCharacterSocket FindSocket(const FGameplayTag& SocketTag) const;
 
+	TMap<FKey, FCharacterSocket> GetCanbeActiveSocket() const;
+
 #pragma region Skills
 	// 通过配置更新技能
 	void UpdateCanbeActiveSkills();
@@ -79,8 +81,6 @@ public:
 	void UpdateCanbeActiveSkills_UsePassiveSocket(
 		const TMap<FGameplayTag, FCharacterSocket>& CanActiveSocketMap
 	);
-
-	TMap<FKey, FCharacterSocket> GetCanbeActiveSkills() const;
 
 	TSharedPtr<FActiveSkillProxy> FindActiveSkillBySocket(const FGameplayTag& SocketTag) const;
 
@@ -115,12 +115,10 @@ public:
 	TSharedPtr<FWeaponProxy> GetActivedWeapon() const;
 
 	TSharedPtr<FWeaponProxy> FindWeaponSocket(const FGameplayTag& SocketTag) const;
-
-	TMap<FKey, FCharacterSocket> GetCanbeActiveWeapon() const;
 #pragma endregion
 
 #pragma region Consumables
-	TMap<FKey, FCharacterSocket> GetCanbeActiveConsumable() const;
+	TSharedPtr<FConsumableProxy> FindConsumablesBySocket(const FGameplayTag& SocketTag) const;
 #pragma endregion
 
 	FOnCurrentWeaponChanged OnCurrentWeaponChanged;

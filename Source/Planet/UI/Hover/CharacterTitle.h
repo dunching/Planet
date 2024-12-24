@@ -61,10 +61,6 @@ protected:
 
 	void ApplyStatesToTitle();
 
-	int32 CurrentHP = 0;
-
-	int32 MaxHP = 0;
-
 	bool ResetPosition(float InDeltaTime);
 
 	FVector2D PreviousPt = FVector2D::ZeroVector;

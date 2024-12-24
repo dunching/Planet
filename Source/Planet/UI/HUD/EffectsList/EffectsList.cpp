@@ -48,10 +48,10 @@ void UEffectsList::NativeDestruct()
 		CallbackHandle->UnBindCallback();
 	}
 
-	if (CharacterStateMapHandle)
-	{
-		CharacterStateMapHandle->UnBindCallback();
-	}
+	// if (CharacterStateMapHandle)
+	// {
+	// 	CharacterStateMapHandle->UnBindCallback();
+	// }
 
 #if UE_EDITOR || UE_SERVER
 	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
@@ -85,9 +85,9 @@ void UEffectsList::BindCharacterState(ACharacterBase* InTargetCharacterPtr)
 		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
 	);
 
-	CharacterStateMapHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateMapChanged(
-		std::bind(&ThisClass::OnCharacterStateMapChanged, this, std::placeholders::_1, std::placeholders::_2)
-	);
+	// CharacterStateMapHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateMapChanged(
+	// 	std::bind(&ThisClass::OnCharacterStateMapChanged, this, std::placeholders::_1, std::placeholders::_2)
+	// );
 
 #if UE_EDITOR || UE_SERVER
 	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
@@ -104,25 +104,25 @@ void UEffectsList::OnCharacterStateChanged(ECharacterStateType CharacterStateTyp
 
 void UEffectsList::OnCharacterStateMapChanged(const TSharedPtr<FCharacterStateInfo>& CharacterStatePtr, bool bIsAdd)
 {
-	if (bIsAdd)
-	{
-		auto ItemPtr = AddEffectItem();
-		ItemPtr->SetData(CharacterStatePtr);
-
-		EffectItemMap.Add(CharacterStatePtr->Guid, ItemPtr);
-	}
-	else
-	{
-		if (EffectItemMap.Contains(CharacterStatePtr->Guid))
-		{
-			if (EffectItemMap[CharacterStatePtr->Guid])
-			{
-				EffectItemMap[CharacterStatePtr->Guid]->RemoveFromParent();
-			}
-
-			EffectItemMap.Remove(CharacterStatePtr->Guid);
-		}
-	}
+	// if (bIsAdd)
+	// {
+	// 	auto ItemPtr = AddEffectItem();
+	// 	ItemPtr->SetData(CharacterStatePtr);
+	//
+	// 	EffectItemMap.Add(CharacterStatePtr->Guid, ItemPtr);
+	// }
+	// else
+	// {
+	// 	if (EffectItemMap.Contains(CharacterStatePtr->Guid))
+	// 	{
+	// 		if (EffectItemMap[CharacterStatePtr->Guid])
+	// 		{
+	// 			EffectItemMap[CharacterStatePtr->Guid]->RemoveFromParent();
+	// 		}
+	//
+	// 		EffectItemMap.Remove(CharacterStatePtr->Guid);
+	// 	}
+	// }
 }
 
 void UEffectsList::OnActiveGameplayEffect(
@@ -134,7 +134,7 @@ void UEffectsList::OnActiveGameplayEffect(
 	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(InActiveGameplayEffectHandle);
 
 	FGameplayTagContainer OutContainer;
-	GameplayEffectSpec.GetAllGrantedTags(OutContainer);
+	GameplayEffectSpec.GetAllAssetTags(OutContainer);
 
 	if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Info))
 	{

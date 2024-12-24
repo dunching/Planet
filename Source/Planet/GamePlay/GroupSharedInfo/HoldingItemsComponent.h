@@ -114,9 +114,11 @@ public:
 	TSharedPtr<FCoinProxy> AddProxy_Coin(const FGameplayTag& ProxyType, int32 Num);
 
 
-	TSharedPtr<FConsumableProxy> AddProxy_Consumable(const FGameplayTag& ProxyType, int32 Num = 1);
+	TSharedPtr<FConsumableProxy> AddProxy_Consumable(const FGameplayTag& ProxyType, int32 Num);
 
-	void RemoveProxy_Consumable(const TSharedPtr<FConsumableProxy>& ProxyPtr, int32 Num = 1);
+	TSharedPtr<FConsumableProxy> FindProxy_Consumable(const IDType& ID) const;
+
+	void RemoveProxy_Consumable(const TSharedPtr<FConsumableProxy>& ProxyPtr, int32 Num);
 
 
 	TSharedPtr<FToolProxy> AddProxy_ToolProxy(const FGameplayTag& ProxyType);

@@ -379,7 +379,7 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 		return;
 	}
 
-	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
+	auto SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSocket();
 	TArray<FName> Ary
 	{
 		FPawnStateActionHUD::Get().ActiveSkill1,

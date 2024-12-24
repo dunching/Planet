@@ -61,8 +61,8 @@ void UHUD_TeamInfo::ResetUIByData()
 	{
 		return;
 	}
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
-	if (!PCPtr)
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
 	{
 		return;
 	}
@@ -70,7 +70,7 @@ void UHUD_TeamInfo::ResetUIByData()
 	auto ChidrensAry = PanelPtr->GetAllChildren();
 	int32 Index = 0;
 
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
+	auto GMCPtr = CharacterPtr->GetGroupSharedInfo();
 
 	auto MembersHelperSPtr = GMCPtr->GetTeamMatesHelperComponent();
 	if (MembersHelperSPtr)

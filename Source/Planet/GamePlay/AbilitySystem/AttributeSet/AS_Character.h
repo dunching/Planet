@@ -68,10 +68,13 @@ public:
 	ATTRIBUTE_ACCESSORS(UAS_Character, Max_PP);
 	
 	// 体力,用于冲刺、奔跑
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UPROPERTY(ReplicatedUsing = OnRep_PP, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData PP;
 	ATTRIBUTE_ACCESSORS(UAS_Character, PP);
 	
+	UFUNCTION()
+	virtual void OnRep_PP(const FMyGameplayAttributeData& OldHealth);
+
 	// 体力回复速率
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData PP_Replay;
@@ -82,10 +85,13 @@ public:
 	ATTRIBUTE_ACCESSORS(UAS_Character, Max_Mana);
 	
 	// 法力值，用于释放技能
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UPROPERTY(ReplicatedUsing = OnRep_Mana, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana);
 	
+	UFUNCTION()
+	virtual void OnRep_Mana(const FMyGameplayAttributeData& OldHealth);
+
 	// 法力回复速率
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData Mana_Replay;

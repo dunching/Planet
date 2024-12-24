@@ -275,6 +275,7 @@ void UAllocationSkillsMenu::SyncData()
 		TArray<FMyStruct> Ary
 		{
 			{FAllocationSkillsMenu::Get().WeaponSocket_1, UGameplayTagsLibrary::WeaponSocket_1},
+			{FAllocationSkillsMenu::Get().WeaponSocket_2, UGameplayTagsLibrary::WeaponSocket_2},
 		};
 
 		for (const auto& Iter : Ary)
@@ -299,12 +300,69 @@ void UAllocationSkillsMenu::SyncData()
 		TArray<FMyStruct> Ary
 		{
 			{FAllocationSkillsMenu::Get().ActiveSkill1, UGameplayTagsLibrary::ActiveSocket_1},
+			{FAllocationSkillsMenu::Get().ActiveSkill2, UGameplayTagsLibrary::ActiveSocket_2},
+			{FAllocationSkillsMenu::Get().ActiveSkill3, UGameplayTagsLibrary::ActiveSocket_3},
+			{FAllocationSkillsMenu::Get().ActiveSkill4, UGameplayTagsLibrary::ActiveSocket_4},
 		};
 
 		for (const auto& Iter : Ary)
 		{
 			auto Socket = CurrentProxyPtr->FindSocket(Iter.Socket);
 			auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.UIName));
+			if (UIPtr)
+			{
+				if (UIPtr->BasicProxyPtr)
+				{
+					Socket.AllocationedProxyID = UIPtr->BasicProxyPtr->GetID();
+				}
+				else
+				{
+					Socket.ResetSocket();
+				}
+				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
+			}
+		}
+	}
+	{
+		TArray<FMyStruct> Ary
+		{
+			{FAllocationSkillsMenu::Get().PassivSkill1, UGameplayTagsLibrary::PassiveSocket_1},
+			{FAllocationSkillsMenu::Get().PassivSkill2, UGameplayTagsLibrary::PassiveSocket_2},
+			{FAllocationSkillsMenu::Get().PassivSkill3, UGameplayTagsLibrary::PassiveSocket_3},
+			{FAllocationSkillsMenu::Get().PassivSkill4, UGameplayTagsLibrary::PassiveSocket_4},
+		};
+
+		for (const auto& Iter : Ary)
+		{
+			auto Socket = CurrentProxyPtr->FindSocket(Iter.Socket);
+			auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.UIName));
+			if (UIPtr)
+			{
+				if (UIPtr->BasicProxyPtr)
+				{
+					Socket.AllocationedProxyID = UIPtr->BasicProxyPtr->GetID();
+				}
+				else
+				{
+					Socket.ResetSocket();
+				}
+				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
+			}
+		}
+	}
+	{
+		TArray<FMyStruct> Ary
+		{
+			{FAllocationSkillsMenu::Get().Consumable1, UGameplayTagsLibrary::ConsumableSocket_1},
+			{FAllocationSkillsMenu::Get().Consumable2, UGameplayTagsLibrary::ConsumableSocket_2},
+			{FAllocationSkillsMenu::Get().Consumable3, UGameplayTagsLibrary::ConsumableSocket_3},
+			{FAllocationSkillsMenu::Get().Consumable4, UGameplayTagsLibrary::ConsumableSocket_4},
+		};
+
+		for (const auto& Iter : Ary)
+		{
+			auto Socket = CurrentProxyPtr->FindSocket(Iter.Socket);
+			auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter.UIName));
 			if (UIPtr)
 			{
 				if (UIPtr->BasicProxyPtr)

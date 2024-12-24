@@ -115,7 +115,7 @@ bool USkill_Consumable_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	ProxyPtr->ApplyCooldown();
+	// ProxyPtr->ApplyCooldown();
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }

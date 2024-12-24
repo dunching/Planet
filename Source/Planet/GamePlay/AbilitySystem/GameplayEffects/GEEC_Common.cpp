@@ -6,6 +6,38 @@
 #include "BaseFeatureComponent.h"
 #include "GE_Common.h"
 
+void UGEEC_Base::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+{
+	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
+
+	// 获得对应GE对象
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
+
+	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
+	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
+
+	if (
+		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+	)
+	{
+		return;
+	}
+	else
+	{
+	}
+
+	TMap<FGameplayTag, float> CustomMagnitudes;
+
+	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(
+		CustomMagnitudes,
+		ExecutionParams,
+		OutExecutionOutput
+	);
+}
+
 void UGEEC_Reply::Execute_Implementation(
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
@@ -37,10 +69,15 @@ void UGEEC_Reply::Execute_Implementation(
 	const auto SourceSet = Cast<UAS_Character>(
 		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
 
-	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, SourceSet->GetHP_Replay());
+	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_HP, SourceSet->GetHP_Replay());
+	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_PP, SourceSet->GetPP_Replay());
+	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_Mana, SourceSet->GetMana_Replay());
 
-	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
-	                                                                 OutExecutionOutput);
+	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(
+		CustomMagnitudes,
+		ExecutionParams,
+		OutExecutionOutput
+	);
 }
 
 void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -80,7 +117,7 @@ void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionP
 }
 
 void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+                                                 FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
@@ -111,5 +148,5 @@ void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExec
 	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, 0);
 
 	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
-																	 OutExecutionOutput);
+	                                                                 OutExecutionOutput);
 }

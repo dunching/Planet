@@ -117,8 +117,8 @@ void UBasicFutures_Running::ActivateAbility(
 				MakeOutgoingGameplayEffectSpec(GE_RunningClass, GetAbilityLevel());
 
 			// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyDuration_Temporary);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
 
 			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
@@ -152,8 +152,8 @@ void UBasicFutures_Running::EndAbility(
 			FGameplayEffectSpecHandle SpecHandle =
 				MakeOutgoingGameplayEffectSpec(GE_CancelRunningClass, GetAbilityLevel());
 
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyDuration_RemoveTemporary);
-			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
 
 			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);

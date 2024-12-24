@@ -28,6 +28,7 @@
 #include "CS_PeriodicStateModify.h"
 #include "CS_PeriodicPropertyTag.h"
 #include "CharacterTitle.h"
+#include "GameOptions.h"
 
 FName UBaseFeatureComponent::ComponentName = TEXT("InteractiveBaseGAComponent");
 
@@ -1079,7 +1080,10 @@ EAffectedDirection UBaseFeatureComponent::GetAffectedDirection(ACharacterBase* T
 }
 
 void UBaseFeatureComponent::UpdateMap(
-	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const FGameplayTag& Tag,
+	float Value,
+	int32 MinValue,
+	int32 MaxValue,
 	const FGameplayEffectSpec& Spec,
 	const FGameplayAttributeData* GameplayAttributeDataPtr
 )
@@ -1091,40 +1095,58 @@ void UBaseFeatureComponent::UpdateMap(
 	{
 		ValueMap.Add(
 			GameplayAttributeDataPtr,
-			{{UGameplayTagsLibrary::GEData_ModifyDuration_Immediate, GameplayAttributeDataPtr->GetCurrentValue()}}
+			{
+				{
+					UGameplayTagsLibrary::DataSource_Regular,
+					FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
+				}
+			}
 		);
 	}
 
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyDuration_Immediate))
+	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-		GameplayAttributeDataMap.Append(CustomMagnitudes);
 
-		float Result = 0.f;
-		for (auto Iter : GameplayAttributeDataMap)
+		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Regular))
 		{
-			Result += Iter.Value;
+			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] += Value;
+		}
+		else
+		{
+			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Regular, Value);
 		}
 
-		GameplayAttributeDataMap = TMap<FGameplayTag, float>{
-			{UGameplayTagsLibrary::GEData_ModifyDuration_Immediate, Result}
-		};
+		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] =
+			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular], MinValue, MaxValue);
 	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyDuration_Temporary))
-	{
-		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
-		GameplayAttributeDataMap.Append(CustomMagnitudes);
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyDuration_RemoveTemporary))
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override))
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-		for (const auto& Iter : CustomMagnitudes)
+		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Regular))
 		{
-			if (GameplayAttributeDataMap.Contains(Iter.Key))
-			{
-				GameplayAttributeDataMap.Remove(Iter.Key);
-			}
+			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] = Value;
+		}
+		else
+		{
+			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Regular, Value);
+		}
+
+		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] =
+			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular], MinValue, MaxValue);
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary))
+	{
+		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+		GameplayAttributeDataMap.Add(Tag, Value);
+	}
+	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary))
+	{
+		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+		if (GameplayAttributeDataMap.Contains(Tag))
+		{
+			GameplayAttributeDataMap.Remove(Tag);
 		}
 	}
 }
@@ -1193,19 +1215,68 @@ void UBaseFeatureComponent::OnReceivedEventModifyData(
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
 
-	for (const auto& Iter : AllAssetTags)
+	// 如果是此类，数据在 SetByCallerTagMagnitudes
+	if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override)
+	)
 	{
-		if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_HP))
+		for (const auto& Iter : SetByCallerTagMagnitudes)
 		{
-			UpdateMap(SetByCallerTagMagnitudes, Spec,
-			          UAS_Character::GetHPAttribute().GetGameplayAttributeData(SourceSet));
-			break;
+			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
+			{
+				UpdateMap(
+					Iter.Key,
+					Iter.Value,
+					0.f,
+					SourceSet->GetMax_HP(),
+					Spec,
+					UAS_Character::GetHPAttribute().GetGameplayAttributeData(SourceSet)
+				);
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
+			{
+				UpdateMap(
+					Iter.Key,
+					Iter.Value,
+					0.f,
+					SourceSet->GetMax_PP(),
+					Spec,
+					UAS_Character::GetPPAttribute().GetGameplayAttributeData(SourceSet)
+				);
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+			{
+				UpdateMap(
+					Iter.Key,
+					Iter.Value,
+					0.f,
+					SourceSet->GetMax_Mana(),
+					Spec,
+					UAS_Character::GetManaAttribute().GetGameplayAttributeData(SourceSet)
+				);
+			}
 		}
-		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed))
+	}
+	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
+	else if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary)
+	)
+	{
+		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
 		{
-			UpdateMap(SetByCallerTagMagnitudes, Spec,
-			          UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(SourceSet));
-			break;
+			for (const auto& Iter : SetByCallerTagMagnitudes)
+			{
+				UpdateMap(
+					Iter.Key,
+					Iter.Value,
+					0.f,
+					UGameOptions::GetInstance()->MaxMoveSpeed,
+					Spec,
+					UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(SourceSet)
+				);
+			}
 		}
 	}
 
@@ -1225,11 +1296,15 @@ void UBaseFeatureComponent::OnReceivedEventModifyData(
 		ReceivedEventModifysMap.erase(Iter);
 	}
 
-	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyDuration_Immediate))
+	// 如果是此类，数据在 SetByCallerTagMagnitudes
+	if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override)
+	)
 	{
-		for (const auto& Iter : AllAssetTags)
+		for (const auto& Iter : SetByCallerTagMagnitudes)
 		{
-			if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_HP))
+			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
@@ -1238,42 +1313,44 @@ void UBaseFeatureComponent::OnReceivedEventModifyData(
 						GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(SourceSet))
 					)
 				);
-				break;
 			}
-		}
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyDuration_Temporary))
-	{
-		for (const auto& Iter : AllAssetTags)
-		{
-			if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed))
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
-						UAS_Character::GetMoveSpeedAttribute(),
+						UAS_Character::GetPPAttribute(),
 						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(SourceSet))
+						GetMapValue(Spec, UAS_Character::GetPPAttribute().GetGameplayAttributeData(SourceSet))
 					)
 				);
-				break;
 			}
-		}
-	}
-	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyDuration_RemoveTemporary))
-	{
-		for (const auto& Iter : AllAssetTags)
-		{
-			if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_MoveSpeed))
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 			{
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
-						UAS_Character::GetMoveSpeedAttribute(),
+						UAS_Character::GetManaAttribute(),
 						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(SourceSet))
+						GetMapValue(Spec, UAS_Character::GetManaAttribute().GetGameplayAttributeData(SourceSet))
 					)
 				);
-				break;
 			}
+		}
+	}
+	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
+	else if (
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary) ||
+		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary)
+	)
+	{
+		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		{
+			OutExecutionOutput.AddOutputModifier(
+				FGameplayModifierEvaluatedData(
+					UAS_Character::GetMoveSpeedAttribute(),
+					EGameplayModOp::Override,
+					GetMapValue(Spec, UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(SourceSet))
+				)
+			);
 		}
 	}
 }

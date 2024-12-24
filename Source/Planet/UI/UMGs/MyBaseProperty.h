@@ -42,26 +42,18 @@ public:
 
 private:
 
-	void SetCurrentValue_Re(const FOnAttributeChangeData& CurrentValue);
+	void OnValueChanged(const FOnAttributeChangeData& CurrentValue);
 
 	void SetCurrentValue(int32 InCurrentValue);
 
-	void SetCurrentValue1_Re(const FOnAttributeChangeData& CurrentValue);
+	void OnValue1Changed(const FOnAttributeChangeData& CurrentValue);
 
-	void SetCurrentValue1(int32 InCurrentValue);
+	void OnValue2Changed(const FOnAttributeChangeData& CurrentValue);
 
-	void SetCurrentValue2_Re(const FOnAttributeChangeData& CurrentValue);
-
-	void SetCurrentValue2(int32 InCurrentValue);
-
-	void ValueChanged();
+	void SetCurrentValue(int32 InValue1, int32 InValue2);
 
 	int32 Value1 = 0;
 
 	int32 Value2 = 0;
-
-	FValueChangedDelegateHandle OnValueChanged;
-
-	FValueChangedDelegateHandle OnValueChanged2;
 
 };

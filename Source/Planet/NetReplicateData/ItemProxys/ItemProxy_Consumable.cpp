@@ -1,4 +1,3 @@
-
 #include "ItemProxy_Consumable.h"
 
 #include "HumanCharacter_AI.h"
@@ -10,10 +9,12 @@
 #include "Skill_Consumable_Generic.h"
 #include "BaseFeatureComponent.h"
 #include "CDcaculatorComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "GroupSharedInfo.h"
+#include "Planet_Tools.h"
 
 FConsumableProxy::FConsumableProxy()
 {
-
 }
 
 bool FConsumableProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
@@ -50,7 +51,7 @@ bool FConsumableProxy::Active()
 
 		const auto InputID = FMath::Rand32();
 		FGameplayAbilitySpec AbilitySpec(
-			USkill_Consumable_Generic::StaticClass(),
+			GetTableRowProxy_Consumable()->Skill_Consumable_Class,
 			1,
 			InputID
 		);
@@ -92,19 +93,81 @@ FTableRowProxy_Consumable* FConsumableProxy::GetTableRowProxy_Consumable() const
 	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_Consumable.LoadSynchronous();
 
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_Consumable>(*ProxyType.ToString(), TEXT("GetProxy"));
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_Consumable>(
+		*ProxyType.ToString(), TEXT("GetProxy"));
 	return SceneProxyExtendInfoPtr;
 }
 
 bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	auto CDSPtr = GetAllocationCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
-	);
+	RemainingCooldown = -1.f;
 
-	if (CDSPtr)
+	// 独立冷却
 	{
-		return CDSPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetAbilitySystemComponent();
+		auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
+		GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
+		GameplayTagContainer.AddTag(GetProxyType());
+		const auto GameplayEffectHandleAry = AbilitySystemComponentPtr->GetActiveEffects(
+			FGameplayEffectQuery::MakeQuery_MatchAllOwningTags(GameplayTagContainer)
+		);
+
+		if (!GameplayEffectHandleAry.IsEmpty())
+		{
+			auto GameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(
+				GameplayEffectHandleAry[0]
+			);
+
+			if (GameplayEffectPtr)
+			{
+				RemainingCooldown = GameplayEffectPtr->GetTimeRemaining(GetWorldImp()->GetTimeSeconds());
+				RemainingCooldownPercent = RemainingCooldown / GameplayEffectPtr->GetDuration();
+			}
+		}
+	}
+
+	// 公共冷却
+	{
+		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetGroupSharedInfo()->GetAbilitySystemComponent();
+		auto SkillCommonCooldownInfoMap = GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
+		for (const auto Iter : SkillCommonCooldownInfoMap)
+		{
+			auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
+			if (CommonCooldownInfoPtr)
+			{
+				auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
+				GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
+				GameplayTagContainer.AddTag(Iter);
+		
+				const auto GameplayEffectHandleAry = AbilitySystemComponentPtr->GetActiveEffects(
+					FGameplayEffectQuery::MakeQuery_MatchAllOwningTags(GameplayTagContainer)
+				);
+
+				for (const auto GEIter : GameplayEffectHandleAry)
+				{
+					auto GameplayEffectPtr =
+						AbilitySystemComponentPtr->GetActiveGameplayEffect(
+							GEIter
+						);
+
+					if (GameplayEffectPtr)
+					{
+						const auto TempRemainingCooldown = GameplayEffectPtr->GetTimeRemaining(
+							GetWorldImp()->GetTimeSeconds());
+						if (TempRemainingCooldown > RemainingCooldown)
+						{
+							RemainingCooldown = TempRemainingCooldown;
+							RemainingCooldownPercent = RemainingCooldown / GameplayEffectPtr->GetDuration();
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (RemainingCooldown > 0.f)
+	{
+		return false;
 	}
 
 	return true;
@@ -112,15 +175,46 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 
 bool FConsumableProxy::CheckCooldown() const
 {
-	auto CDSPtr = GetAllocationCharacter()->GetCDCaculatorComponent()->GetCooldown(
-		this
-	);
-
-	if (CDSPtr)
+	// 独立冷却
 	{
-		return CDSPtr->CheckCooldown();
-	}
+		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetAbilitySystemComponent();
+		auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
+		GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
+		GameplayTagContainer.AddTag(GetProxyType());
+		const auto GameplayEffectHandleAry = AbilitySystemComponentPtr->GetActiveEffects(
+			FGameplayEffectQuery::MakeQuery_MatchAllOwningTags(GameplayTagContainer)
+		);
 
+		if (!GameplayEffectHandleAry.IsEmpty())
+		{
+			return false;
+		}
+	}
+	// 公共冷却
+	{
+		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetGroupSharedInfo()->GetAbilitySystemComponent();
+		auto SkillCommonCooldownInfoMap = GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
+		for (const auto Iter : SkillCommonCooldownInfoMap)
+		{
+			auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
+			if (CommonCooldownInfoPtr)
+			{
+				auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
+				GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
+				GameplayTagContainer.AddTag(Iter);
+		
+				const auto GameplayEffectHandleAry =
+					AbilitySystemComponentPtr->GetActiveEffects(
+						FGameplayEffectQuery::MakeQuery_MatchAllOwningTags(GameplayTagContainer)
+					);
+
+				if (!GameplayEffectHandleAry.IsEmpty())
+				{
+					return false;
+				}
+			}
+		}
+	}
 	return true;
 }
 

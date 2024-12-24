@@ -186,7 +186,10 @@ protected:
 	);
 
 	void UpdateMap(
-		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const FGameplayTag& Tag,
+		float Value,
+		int32 MinValue,
+		int32 MaxValue,
 		const FGameplayEffectSpec& Spec,
 		const FGameplayAttributeData* GameplayAttributeDataPtr
 		);

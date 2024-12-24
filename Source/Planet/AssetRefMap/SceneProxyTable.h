@@ -131,9 +131,12 @@ struct PLANET_API FTableRowProxy_Consumable : public FTableRowBase
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<USkill_Consumable_Base> Skill_Consumable_Class;
-
+	
+	// UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	// TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+	TMap<FGameplayTag, int32>ModifyPropertyMap;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;

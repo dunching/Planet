@@ -94,7 +94,7 @@ bool USkill_Active_BYWD::CommitAbility(
 		   MakeOutgoingGameplayEffectSpec(DurationGEPtr->GetClass(), GetAbilityLevel());
 
 		SpecHandle.Data.Get()->SetDuration(Duration, true);
-		SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,1);
 				
 		const auto GEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
@@ -112,12 +112,9 @@ void USkill_Active_BYWD::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 	{
 		FGameplayEffectSpecHandle SpecHandle =
 		   MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
-		SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(SkillProxyPtr->GetProxyType());
-		// SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-		// SpecHandle.Data.Get()->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Data.Cooldown")),1);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 				
 		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-		// DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->SetCDGEChandle(CDGEHandle);
 	}
 	
 	// 公共冷却

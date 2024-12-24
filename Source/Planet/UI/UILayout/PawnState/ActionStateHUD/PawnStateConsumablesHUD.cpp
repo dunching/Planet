@@ -58,7 +58,7 @@ void UPawnStateConsumablesHUD::ResetUIByData()
 		if (IconPtr)
 		{
 			const auto ConsumableSocketInfoSPtr = ProxyProcessComponentPtr->
-				FindActiveSkillBySocket(IconPtr->IconSocket);
+				FindConsumablesBySocket(IconPtr->IconSocket);
 			if (ConsumableSocketInfoSPtr)
 			{
 			}

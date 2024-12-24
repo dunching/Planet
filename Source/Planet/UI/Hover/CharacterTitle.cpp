@@ -173,54 +173,59 @@ void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, in
 
 void UCharacterTitle::OnHPChanged(const FOnAttributeChangeData& )
 {
+	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetHP();
+	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
+	SetHPChanged(Value, MaxValue);
+}
+
+void UCharacterTitle::SetHPChanged(float Value, float MaxValue)
+{
 	{
 		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().HP_ProgressBar));
 		if (WidgetPtr)
 		{
-			WidgetPtr->SetPercent(static_cast<float>(CurrentHP) / MaxHP);
+			WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
 		}
 	}
 	{
 		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Text));
 		if (WidgetPtr)
 		{
-			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), CurrentHP, MaxHP)));
+			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%.0lf/%.0lf"), Value, MaxValue)));
 		}
 	}
 }
 
-void UCharacterTitle::SetHPChanged(float Value, float MaxValue)
-{
-}
-
 void UCharacterTitle::OnPPChanged(const FOnAttributeChangeData&)
 {
-	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().PP_ProgressBar));
-	if (WidgetPtr)
-	{
-		auto Max_PP = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_PP();
-		auto PP = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP();
-		WidgetPtr->SetPercent(static_cast<float>(PP) / Max_PP);
-	}
+	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP();
+	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_PP();
+	SetPPChanged(Value, MaxValue);
 }
 
 void UCharacterTitle::SetPPChanged(float Value, float MaxValue)
 {
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().PP_ProgressBar));
+	if (WidgetPtr)
+	{
+		WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
+	}
 }
 
 void UCharacterTitle::OnShieldChanged(const FOnAttributeChangeData&)
 {
-	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().Shield_ProgressBar));
-	if (WidgetPtr)
-	{
-		auto Shield = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetShield();
-		auto Max_HP = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
-		WidgetPtr->SetPercent(static_cast<float>(Shield) / Max_HP);
-	}
+	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetShield();
+	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
+	SetPPChanged(Value, MaxValue);
 }
 
 void UCharacterTitle::SetShieldChanged(float Value, float MaxValue)
 {
+	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().Shield_ProgressBar));
+	if (WidgetPtr)
+	{
+		WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
+	}
 }
 
 void UCharacterTitle::ApplyCharaterNameToTitle()

@@ -60,6 +60,18 @@ void UAS_Character::OnRep_HP(const FMyGameplayAttributeData& OldHealth)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HP, OldHealth);
 }
 
+void UAS_Character::OnRep_PP(const FMyGameplayAttributeData& OldHealth)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PP, OldHealth);
+}
+
+void UAS_Character::OnRep_Mana(const FMyGameplayAttributeData& OldHealth)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana, OldHealth);
+}
+
 void UAS_Character::OnRep_MoveSpeed(const FMyGameplayAttributeData& OldHealth)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。

@@ -471,26 +471,10 @@ namespace HumanProcessor
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
 			{ 
+				const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveSocket();
+				for (const auto& Iter : CanbeActivedInfoAry)
 				{
-					const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveConsumable();
-					for (const auto& Iter : CanbeActivedInfoAry)
-					{
-						HandleKeysMap.Add(Iter.Key, Iter.Value);
-					}
-				}
-				{
-					const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
-					for (const auto& Iter : CanbeActivedInfoAry)
-					{
-						HandleKeysMap.Add(Iter.Key, Iter.Value);
-					}
-				}
-				{
-					const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
-					for (const auto& Iter : CanbeActivedInfoAry)
-					{
-						HandleKeysMap.Add(Iter.Key, Iter.Value);
-					}
+					HandleKeysMap.Add(Iter.Key, Iter.Value);
 				}
 			}
 		}

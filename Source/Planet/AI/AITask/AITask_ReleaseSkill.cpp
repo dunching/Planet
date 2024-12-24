@@ -57,8 +57,8 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 		}
 		else
 		{
+			const auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSocket();
 			{
-				const auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
 				for (const auto& Iter : CanbeActivedInfo)
 				{
 					if (
@@ -89,7 +89,6 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 			}
 
 			// 未释放主动技能
-			const auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
 			for (const auto& Iter : CanbeActivedInfo)
 			{
 				if (

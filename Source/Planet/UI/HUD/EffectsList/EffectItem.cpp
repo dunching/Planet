@@ -22,13 +22,13 @@ namespace EffectItem
 
 void UEffectItem::SetData(const TSharedPtr<FCharacterStateInfo>& InCharacterStateInfoSPtr)
 {
-	CharacterStateInfoSPtr = InCharacterStateInfoSPtr;
-
-	DataChangedHandle = CharacterStateInfoSPtr->DataChanged.AddCallback(std::bind(&ThisClass::OnUpdate, this));
-
-	SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
-
-	OnUpdate();
+	// CharacterStateInfoSPtr = InCharacterStateInfoSPtr;
+	//
+	// DataChangedHandle = CharacterStateInfoSPtr->DataChanged.AddCallback(std::bind(&ThisClass::OnUpdate, this));
+	//
+	// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
+	//
+	// OnUpdate();
 }
 
 void UEffectItem::SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr)
@@ -134,7 +134,7 @@ void UEffectItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
 	FGameplayTagContainer OutContainer;
-	ActiveGameplayEffectPtr->Spec.GetAllGrantedTags(OutContainer);
+	ActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
 	if (!OutContainer.IsEmpty())
 	{
 		// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);

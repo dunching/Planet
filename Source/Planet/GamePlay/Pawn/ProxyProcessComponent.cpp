@@ -114,7 +114,7 @@ bool UProxyProcessComponent::ActiveActionImp(
 	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
 	if (CanActiveSocketMap.Contains(SocketTag))
 	{
-		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy_Skill(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
 		if (ProxySPtr)
 		{
 			return ProxySPtr->Active();
@@ -274,11 +274,19 @@ TSharedPtr<FWeaponProxy> UProxyProcessComponent::FindWeaponSocket(const FGamepla
 	return nullptr;
 }
 
-TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveWeapon() const
+TSharedPtr<FConsumableProxy> UProxyProcessComponent::FindConsumablesBySocket(const FGameplayTag& SocketTag) const
 {
-	TMap<FKey, FCharacterSocket> Result;
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
 
-	return Result;
+	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
+
+	auto SkillProxySPtr = CharacterPtr->GetHoldingItemsComponent()->FindProxy_Consumable(Sockets.AllocationedProxyID);
+	if (SkillProxySPtr)
+	{
+		return DynamicCastSharedPtr<FConsumableProxy>(SkillProxySPtr);
+	}
+	return nullptr;
 }
 
 bool UProxyProcessComponent::ActiveAction(
@@ -310,13 +318,6 @@ bool UProxyProcessComponent::ActiveAction(
 
 void UProxyProcessComponent::CancelAction(const FGameplayTag& CanbeActivedInfoSPtr)
 {
-}
-
-TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveConsumable() const
-{
-	TMap<FKey, FCharacterSocket> Result;
-
-	return Result;
 }
 
 bool UProxyProcessComponent::ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag)
@@ -426,7 +427,7 @@ void UProxyProcessComponent::UpdateCanbeActiveSkills_UsePassiveSocket(
 	OnCanAciveSkillChanged();
 }
 
-TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveSkills() const
+TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveSocket() const
 {
 	TMap<FKey, FCharacterSocket> Result;
 
