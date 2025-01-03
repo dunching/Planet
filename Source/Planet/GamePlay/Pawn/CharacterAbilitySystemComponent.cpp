@@ -1226,6 +1226,8 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+	
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
@@ -1235,6 +1237,10 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 	FAggregatorEvaluateParameters EvaluateParameters;
 	EvaluateParameters.SourceTags = SourceTags;
 	EvaluateParameters.TargetTags = TargetTags;
+
+	// 获得来源AttributeSet
+	const auto SourceASCPtr = Cast<ThisClass>(
+		ExecutionParams.GetSourceAbilitySystemComponent());
 
 	// 获得来源AttributeSet
 	const auto SourceSet = Cast<UAS_Character>(
@@ -1359,6 +1365,8 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 						GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet))
 					)
 				);
+
+				
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
@@ -1389,6 +1397,10 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 						GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet))
 					)
 				);
+				if (SourceASCPtr)
+				{
+					SourceASCPtr->MakedDamageDelegate(GetOwner<ACharacterBase>(), SetByCallerTagMagnitudes);
+				}
 			}
 		}
 	}

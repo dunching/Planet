@@ -52,7 +52,7 @@ void USkill_Active_Shield::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
 
@@ -119,7 +119,7 @@ void USkill_Active_Shield::EndAbility(
 )
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		// 清空 数值修改
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
@@ -172,7 +172,7 @@ bool USkill_Active_Shield::CommitAbility(
 void USkill_Active_Shield::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{

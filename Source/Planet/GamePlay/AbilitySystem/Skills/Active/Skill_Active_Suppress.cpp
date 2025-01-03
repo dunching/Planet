@@ -104,7 +104,7 @@ void USkill_Active_Suppress::PerformAction(
 	if (CharacterPtr)
 	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 		{
 			CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
 		}

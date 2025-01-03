@@ -58,6 +58,7 @@ void UEffectsList::NativeDestruct()
 	{
 		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 		GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.Remove(ActiveGameplayEffectHandle);
+		GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.Remove(AppliedGameplayEffectHandle);
 	}
 #endif
 	
@@ -94,6 +95,7 @@ void UEffectsList::BindCharacterState(ACharacterBase* InTargetCharacterPtr)
 	{
 		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 		ActiveGameplayEffectHandle = GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
+		AppliedGameplayEffectHandle = GASCompPtr->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
 	}
 #endif
 }

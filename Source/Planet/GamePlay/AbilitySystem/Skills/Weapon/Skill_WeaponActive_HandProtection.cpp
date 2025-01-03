@@ -202,7 +202,7 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 	if (NotifyName == Skill_WeaponHandProtection::AttackEnd)
 	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 		{
 			MakeDamage();
 		}

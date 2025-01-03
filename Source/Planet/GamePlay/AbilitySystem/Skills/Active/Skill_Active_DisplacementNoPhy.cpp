@@ -52,7 +52,7 @@ void USkill_Active_DisplacementNoPhy::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}

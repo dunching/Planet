@@ -24,14 +24,14 @@ void USkill_Active_BYWD::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
 #endif
 	
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		// CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
 		// CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
@@ -64,7 +64,7 @@ void USkill_Active_BYWD::PerformAction(
 			);
 
 #if UE_EDITOR || UE_SERVER
-			if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+			if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 			{
 				TaskPtr->OnFinished.BindLambda([this]
 					{
@@ -123,7 +123,7 @@ void USkill_Active_BYWD::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
 void USkill_Active_BYWD::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentInterval, float Interval)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{

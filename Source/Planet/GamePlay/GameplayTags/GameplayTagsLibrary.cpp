@@ -379,3 +379,6 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base =
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.MoveSpeed")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.PerformSpeed")));

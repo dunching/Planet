@@ -53,7 +53,9 @@ public:
 
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
+	using FMakedDamageDelegate_Deprecated = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
+
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(ACharacterBase*, const TMap<FGameplayTag, float>&)>;
 
 	virtual void BeginPlay()override;
 
@@ -177,6 +179,9 @@ public:
 	FGameplayAbilitySpecHandle ReceivedEventHandle;
 
 	FGameplayAbilitySpecHandle MoveToAttaclAreaHandle;
+
+	// 对“其他”角色造成的影响（伤害、控制）
+	FMakedDamageDelegate_Deprecated MakedDamageDelegate_Deprecated;
 
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;

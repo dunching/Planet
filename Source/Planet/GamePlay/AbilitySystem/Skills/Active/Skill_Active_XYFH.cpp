@@ -130,7 +130,7 @@ void USkill_Active_XYFH::EndAbility(
 //	TargetOffsetValue.ReStore();
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
@@ -294,7 +294,7 @@ void USkill_Active_XYFH::OnPlayMontageEnd()
 void USkill_Active_XYFH::OnMoveStepComplete()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (StepIndex >= MaxIndex)
 		{

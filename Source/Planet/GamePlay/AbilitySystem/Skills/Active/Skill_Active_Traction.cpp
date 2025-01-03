@@ -48,7 +48,7 @@ void USkill_Active_Traction::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 
@@ -99,7 +99,7 @@ void USkill_Active_Traction::IntervalDelegate(
 void USkill_Active_Traction::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentIntervalTime, float IntervalTime)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{

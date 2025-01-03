@@ -122,7 +122,7 @@ void USkill_Active_SuperArmor::ExcuteTasks()
 void USkill_Active_SuperArmor::PlayMontage()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		const float InPlayRate = 1.f;
 

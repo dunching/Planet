@@ -116,7 +116,7 @@ void USkill_Passive_XS::RemoveShield()
 void USkill_Passive_XS::PerformAction()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);

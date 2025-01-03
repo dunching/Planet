@@ -88,6 +88,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASC")
 	bool K2_HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const;
+	
+	virtual void ModifyActiveEffectDuration(FActiveGameplayEffectHandle Handle, float Duration);
 
 private:
 

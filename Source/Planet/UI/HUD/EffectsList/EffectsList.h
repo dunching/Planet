@@ -67,6 +67,8 @@ protected:
 
 	FDelegateHandle ActiveGameplayEffectHandle;
 	
+	FDelegateHandle AppliedGameplayEffectHandle;
+	
 	// FCharacterStateMapHandle CharacterStateMapHandle;
 
 	// TMap<FGuid, UEffectItem*>EffectItemMap;

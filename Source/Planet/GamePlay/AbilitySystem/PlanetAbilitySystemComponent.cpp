@@ -172,3 +172,25 @@ bool UPlanetAbilitySystemComponent::K2_HasAnyMatchingGameplayTags(const FGamepla
 {
 	return HasAnyMatchingGameplayTags(TagContainer);
 }
+
+void UPlanetAbilitySystemComponent::ModifyActiveEffectDuration(FActiveGameplayEffectHandle Handle, float Duration)
+{
+	FActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+	
+	if (Effect)
+	{
+		//  bDurationLocked 为什么是true？
+		// Effect->Spec.SetDuration(Duration, false);
+	
+		Effect->Spec.Duration = Duration;
+		// Effect->Spec.bDurationLocked = bLockDuration;
+		if (Duration > 0.f)
+		{
+			// We may have potential problems one day if a game is applying duration based gameplay effects from instantaneous effects
+			// (E.g., every time fire damage is applied, a DOT is also applied). We may need to for Duration to always be captured.
+			Effect->Spec.CapturedRelevantAttributes.AddCaptureDefinition(UAbilitySystemComponent::GetOutgoingDurationCapture());
+		}
+		
+		ActiveGameplayEffects.MarkItemDirty(*Effect);
+	}
+}

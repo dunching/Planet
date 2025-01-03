@@ -282,4 +282,6 @@ public:
 	
 	static FGameplayTag GEData_ModifyItem_MoveSpeed;
 	
+	static FGameplayTag GEData_ModifyItem_PerformSpeed;
+	
 };

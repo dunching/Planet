@@ -75,7 +75,7 @@ void UGAEvent_Received::ActivateAbility(
 				CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
 				//
-				GAEventDataPtr->TriggerCharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
+				GAEventDataPtr->TriggerCharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate_Deprecated.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
 				// 角色根据数据作出相应的反馈（如播放通用的动画或位移效果）
 				CharacterPtr->GetCharacterAbilitySystemComponent()->ExcuteAttackedEffect(*CloneSPtr);

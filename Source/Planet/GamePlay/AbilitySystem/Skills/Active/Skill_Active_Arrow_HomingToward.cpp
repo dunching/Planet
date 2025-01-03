@@ -27,7 +27,7 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		// 状态信息
 		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
@@ -57,7 +57,7 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 void USkill_Active_Arrow_HomingToward::DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{

@@ -150,8 +150,9 @@ void UEffectItem::OnUpdate()
 		RemoveFromParent();
 		return;
 	}
-	
-	SetNum(ActiveGameplayEffectPtr->Spec.GetStackCount());
+
+	const auto Count = ActiveGameplayEffectPtr->Spec.GetStackCount();
+	SetNum(Count);
 
 	switch (ActiveGameplayEffectPtr->Spec.Def->DurationPolicy)
 	{
@@ -159,7 +160,7 @@ void UEffectItem::OnUpdate()
 		{
 			const auto Duration = ActiveGameplayEffectPtr->GetDuration();
 			const auto TimeRemaining = ActiveGameplayEffectPtr->GetTimeRemaining(GetWorld()->GetTimeSeconds());
-			if (TimeRemaining > 0.f)
+			if (TimeRemaining > 0.f || Count > 1)
 			{
 				SetPercent(true, TimeRemaining / Duration);
 			}

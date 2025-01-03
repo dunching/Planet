@@ -1,4 +1,3 @@
-
 #include "Skill_Passive_ZMJZ.h"
 
 #include "AbilitySystemComponent.h"
@@ -18,21 +17,34 @@
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "GAEvent_Helper.h"
-#include "CharacterStateInfo.h"
+#include "GameplayTagsLibrary.h"
+#include "GE_Common.h"
 
 void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
-	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
-	if (CharacterPtr)
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
 	{
-		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
+		CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
+		if (CharacterPtr)
+		{
+			AbilityActivatedCallbacksHandle =
+				CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
+					std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
+		}
 	}
+#endif
 }
 
-void USkill_Passive_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData /*= nullptr */)
+void USkill_Passive_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle,
+                                      const FGameplayAbilityActorInfo* ActorInfo,
+                                      const FGameplayAbilityActivationInfo ActivationInfo,
+                                      FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+                                      const FGameplayEventData* TriggerEventData /*= nullptr */)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
@@ -68,9 +80,6 @@ void USkill_Passive_ZMJZ::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-	CharacterStateInfoSPtr = nullptr;
-
 	const auto ProxyType = SkillProxyPtr->GetProxyType();
 	ModifyCharacterData(ProxyType, true);
 
@@ -80,51 +89,48 @@ void USkill_Passive_ZMJZ::EndAbility(
 void USkill_Passive_ZMJZ::PerformAction()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
 		if (CharacterPtr)
 		{
-			const auto ProxyType = SkillProxyPtr->GetProxyType();
-			CharacterStateInfoSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(ProxyType);
-			if (CharacterStateInfoSPtr)
+			FGameplayEffectSpecHandle SpecHandle =
+				MakeOutgoingGameplayEffectSpec(GE_ZMJZClass, GetAbilityLevel());
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, DecreamTime);
+
+			const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
+			                                                     GetCurrentActivationInfo(), SpecHandle);
+
 			{
-				if (CharacterStateInfoSPtr->Num < MaxCount)
+				auto OnActiveGameplayEffectStackChangePtr = GetAbilitySystemComponentFromActorInfo()->
+					OnGameplayEffectStackChangeDelegate(GEHandle);
+				if (OnActiveGameplayEffectStackChangePtr)
 				{
-					CharacterStateInfoSPtr->Num++;
-					CharacterStateInfoSPtr->DataChanged();
-					CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
-
-					ModifyCharacterData(ProxyType, SpeedOffset);
-				}
-				else
-				{
-				}
-
-				if (TimerTaskPtr)
-				{
-					TimerTaskPtr->SetDuration(DecreamTime, 0.1f);
-					TimerTaskPtr->UpdateDuration();
+					if (OnActiveGameplayEffectStackChangePtr->IsBound())
+					{
+					}
+					else
+					{
+						OnActiveGameplayEffectStackChange(GEHandle, 1, 0);
+						OnActiveGameplayEffectStackChangePtr->AddUObject(
+							this, &ThisClass::OnActiveGameplayEffectStackChange);
+					}
 				}
 			}
-			else
 			{
-				CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-				CharacterStateInfoSPtr->Num = 1;
-				CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-				CharacterStateInfoSPtr->Duration = DecreamTime;
-				CharacterStateInfoSPtr->DefaultIcon = BuffIcon;
-				CharacterStateInfoSPtr->DataChanged();
-
-				CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
-
-				ModifyCharacterData(ProxyType, SpeedOffset);
-
+				auto OnGameplayEffectRemoved_InfoDelegatePtr = GetAbilitySystemComponentFromActorInfo()->
+					OnGameplayEffectRemoved_InfoDelegate(GEHandle);
+				if (OnGameplayEffectRemoved_InfoDelegatePtr)
 				{
-					TimerTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-					TimerTaskPtr->SetDuration(DecreamTime, 0.1f);
-					TimerTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationDelegate);
-					TimerTaskPtr->OnFinished.BindUObject(this, &ThisClass::OnTimerTaskFinished);
-					TimerTaskPtr->ReadyForActivation();
+					if (OnGameplayEffectRemoved_InfoDelegatePtr->IsBound())
+					{
+					}
+					else
+					{
+						OnGameplayEffectRemoved_InfoDelegatePtr->AddUObject(
+							this, &ThisClass::OnGameplayEffectRemoved_InfoDelegate);
+					}
 				}
 			}
 		}
@@ -132,28 +138,19 @@ void USkill_Passive_ZMJZ::PerformAction()
 #endif
 }
 
-void USkill_Passive_ZMJZ::OnSendAttack(const FGAEventData& GAEventData)
+void USkill_Passive_ZMJZ::OnSendAttack(const TMap<FGameplayTag, float>&)
 {
 	if (CharacterPtr)
 	{
-		if ((GAEventData.GetIsHited()) && GAEventData.bIsWeaponAttack)
-		{
-			PerformAction();
-		}
+		PerformAction();
 	}
 }
 
 void USkill_Passive_ZMJZ::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		if (CharacterStateInfoSPtr)
-		{
-			CharacterStateInfoSPtr->TotalTime = Duration - CurrentInterval;
-			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
-		}
 	}
 #endif
 }
@@ -161,36 +158,8 @@ void USkill_Passive_ZMJZ::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, fl
 bool USkill_Passive_ZMJZ::OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		if (CharacterStateInfoSPtr)
-		{
-			const auto ProxyType = SkillProxyPtr->GetProxyType();
-
-			CharacterStateInfoSPtr->Num--;
-			if (CharacterStateInfoSPtr->Num <= 0)
-			{
-				ModifyCharacterData(ProxyType, 0, true);
-
-				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-				CharacterStateInfoSPtr = nullptr;
-				return true;
-			}
-			else
-			{
-				ModifyCharacterData(ProxyType, -SpeedOffset);
-
-				CharacterStateInfoSPtr->Duration = SecondaryDecreamTime;
-				CharacterStateInfoSPtr->RefreshTime();
-				CharacterStateInfoSPtr->DataChanged();
-				CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
-
-				TimerTaskPtr->SetDuration(SecondaryDecreamTime, 0.1f);
-				TimerTaskPtr->UpdateDuration();
-
-				return false;
-			}
-		}
 	}
 #endif
 	return true;
@@ -198,35 +167,65 @@ bool USkill_Passive_ZMJZ::OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr)
 
 void USkill_Passive_ZMJZ::ModifyCharacterData(
 	const FGameplayTag& DataSource,
-	int32 Value, 
+	int32 Value,
 	bool bIsClear
 )
 {
-	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-	GAEventData.TriggerCharacterPtr = CharacterPtr;
-	GAEventData.TargetCharacterPtr = CharacterPtr;
-
-	TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-
-	ModifyPropertyMap.Add(ECharacterPropertyType::GAPerformSpeed, Value);
-
-	GAEventData.DataSource = DataSource;
-	if (bIsClear)
-	{
-		GAEventData.DataModify = GetAllData();
-		GAEventData.bIsClearData = true;
-	}
-	else
-	{
-		GAEventData.DataModify = ModifyPropertyMap;
-	}
-
-	GameplayAbilityTargetDataPtr->DataAry.Add(GAEventData);
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 
+void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
+	FActiveGameplayEffectHandle Handle,
+	int32 NewStackCount,
+	int32 PreviousStackCount)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
+	{
+		if (NewStackCount > PreviousStackCount)
+		{
+			FGameplayEffectSpecHandle SpecHandle =
+				MakeOutgoingGameplayEffectSpec(GE_ZMJZImpClass, GetAbilityLevel());
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(SkillProxyPtr->GetProxyType(), NewStackCount * 10);
+
+			const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
+			                                                     GetCurrentActivationInfo(), SpecHandle);
+		}
+		else if (NewStackCount == PreviousStackCount)
+		{}
+		else
+		{
+			if (NewStackCount > 0)
+			{
+				//
+				FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([this](auto)
+				{
+					FGameplayEffectSpecHandle SpecHandle =
+						MakeOutgoingGameplayEffectSpec(GE_ZMJZClass, GetAbilityLevel());
+
+					SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+					SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,
+					                                               SecondaryDecreamTime);
+					SpecHandle.Data.Get()->SetStackCount(0);
+
+					const auto GEHandle = ApplyGameplayEffectSpecToOwner(
+						GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), SpecHandle);
+
+					return false;
+				}), 0);
+			}
+		}
+	}
+#endif
+}
+
+void USkill_Passive_ZMJZ::OnGameplayEffectRemoved_InfoDelegate(const FGameplayEffectRemovalInfo&)
+{
+#if UE_EDITOR || UE_SERVER
+	// if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)                                                                                                                                                                                                                                                                                                     itySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	// {
+	// }
+#endif
+}

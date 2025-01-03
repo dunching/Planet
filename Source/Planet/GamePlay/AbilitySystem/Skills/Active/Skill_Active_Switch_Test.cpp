@@ -65,7 +65,7 @@ void USkill_Active_Switch_Test::PerformAction(
 	ProxyProcessComponentPtr->UpdateCanbeActiveSkills_UsePassiveSocket(CanActiveSocketMap);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 		K2_CancelAbility();

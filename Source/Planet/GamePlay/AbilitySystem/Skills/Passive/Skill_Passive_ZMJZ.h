@@ -13,6 +13,8 @@ struct FStreamableHandle;
 class UAbilityTask_TimerHelper;
 class UEffectItem;
 class ACharacterBase;
+class UGE_ZMJZ;
+class UGE_ZMJZImp;
 
 struct FGAEventData;
 struct FCharacterStateInfo;
@@ -25,7 +27,7 @@ class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 public:
 
 	using FMakedDamageHandle = 
-		TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ACharacterBase*, const TMap<FGameplayTag, float>&)>::FCallbackHandleSPtr;
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -64,7 +66,7 @@ protected:
 
 	void PerformAction();
 
-	void OnSendAttack(const FGAEventData& GAEventData);
+	void OnSendAttack(const TMap<FGameplayTag, float>&);
 
 	void DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
 
@@ -76,6 +78,16 @@ protected:
 		bool bIsClear = false
 	);
 
+	void OnActiveGameplayEffectStackChange(
+		FActiveGameplayEffectHandle,
+		int32 NewStackCount,
+		int32 PreviousStackCount
+		);
+
+	void OnGameplayEffectRemoved_InfoDelegate(
+		const FGameplayEffectRemovalInfo&
+		);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
 	TSoftObjectPtr<UTexture2D> BuffIcon;
 
@@ -86,13 +98,10 @@ protected:
 
 	FMakedDamageHandle AbilityActivatedCallbacksHandle;
 
-	uint8 MaxCount = 5;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGE_ZMJZ>GE_ZMJZClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 SpeedOffset = 10;
-
-	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
-
-	UAbilityTask_TimerHelper* TimerTaskPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGE_ZMJZImp>GE_ZMJZImpClass;
 
 };

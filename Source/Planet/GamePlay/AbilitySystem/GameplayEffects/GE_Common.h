@@ -43,3 +43,25 @@ class PLANET_API UGE_CancelRunning : public UGameplayEffect
 public:
 	
 };
+
+UCLASS()
+class PLANET_API UGE_ZMJZ : public UGameplayEffect
+{
+	GENERATED_BODY()
+public:
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FScalableFloat MoveSpeedOffset;
+
+};
+
+UCLASS()
+class PLANET_API UGE_ZMJZImp : public UGameplayEffect
+{
+	GENERATED_BODY()
+public:
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FScalableFloat MoveSpeedOffset;
+
+};

@@ -126,7 +126,7 @@ void USkill_WeaponActive_PickAxe::StartTasksLink()
 void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
 		{
@@ -142,6 +142,7 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 
 void USkill_WeaponActive_PickAxe::OnMontateComplete()
 {
+#if UE_EDITOR || UE_SERVER
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
@@ -151,6 +152,7 @@ void USkill_WeaponActive_PickAxe::OnMontateComplete()
 			CancelAbility_Server();
 		}
 	}
+#endif
 }
 
 void USkill_WeaponActive_PickAxe::MakeDamage()

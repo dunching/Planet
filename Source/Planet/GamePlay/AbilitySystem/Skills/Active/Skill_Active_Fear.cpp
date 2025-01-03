@@ -63,7 +63,7 @@ void USkill_Active_Fear::PerformAction(
 		PlayMontage();
 	}
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
@@ -73,7 +73,7 @@ void USkill_Active_Fear::PerformAction(
 void USkill_Active_Fear::ExcuteTasks()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterPtr)
 		{

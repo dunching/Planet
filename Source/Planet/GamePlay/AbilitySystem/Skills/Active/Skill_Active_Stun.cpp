@@ -195,7 +195,7 @@ void USkill_Active_Stun::ExcuteTasks()
 void USkill_Active_Stun::PlayMontage()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		const float InPlayRate = 1.f;
 
