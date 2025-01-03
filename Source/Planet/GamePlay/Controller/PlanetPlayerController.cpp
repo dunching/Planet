@@ -24,7 +24,7 @@
 #include "FocusIcon.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "CollisionDataStruct.h"
@@ -348,7 +348,7 @@ void APlanetPlayerController::ResetGroupmateProxy(FCharacterProxy* NewGourpMateP
 
 UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponent() const
 {
-	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
+	return GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
 }
 
 AGroupSharedInfo* APlanetPlayerController::GetGroupSharedInfo() const
@@ -548,7 +548,7 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray<FString
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 	}
@@ -592,7 +592,7 @@ void APlanetPlayerController::MakeTherapy_Implementation(const TArray<FString>& 
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 	}
@@ -638,7 +638,7 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray<FString>& 
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 	}

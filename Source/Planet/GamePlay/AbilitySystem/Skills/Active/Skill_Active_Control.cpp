@@ -25,7 +25,7 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
@@ -136,7 +136,7 @@ void USkill_Active_Control::PerformAction(
 			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
 			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
 
-			CharacterPtr->GetBaseFeatureComponent()->MoveToAttackDistance(
+			CharacterPtr->GetCharacterAbilitySystemComponent()->MoveToAttackDistance(
 				MoveToAttaclAreaPtr
 			);
 		}
@@ -152,7 +152,7 @@ void USkill_Active_Control::ExcuteTasks()
 	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 	// 伤害
 	{
@@ -190,7 +190,7 @@ void USkill_Active_Control::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 

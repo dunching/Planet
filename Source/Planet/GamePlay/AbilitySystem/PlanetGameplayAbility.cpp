@@ -54,16 +54,16 @@ UPlanetGameplayAbility::UPlanetGameplayAbility() :
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 }
 
-void UPlanetGameplayAbility::SetContinuePerform(bool bIsContinue)
+void UPlanetGameplayAbility::SetContinuePerform_Implementation(bool bIsContinue)
 {
-	if (CurrentActorInfo && CurrentActorInfo->AbilitySystemComponent.IsValid())
-	{
-		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->ReplicateContinues(
-			CurrentSpecHandle, 
-			CurrentActivationInfo, 
-			bIsContinue
-		);
-	}
+	// if (CurrentActorInfo && CurrentActorInfo->AbilitySystemComponent.IsValid())
+	// {
+	// 	Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->ReplicateContinues(
+	// 		CurrentSpecHandle, 
+	// 		CurrentActivationInfo, 
+	// 		bIsContinue
+	// 	);
+	// }
 
 	SetContinuePerformImp(bIsContinue);
 }
@@ -201,3 +201,7 @@ void UPlanetGameplayAbility::InitalDefaultTags()
 
 }
 
+void UPlanetGameplayAbility::CancelAbility_Server_Implementation()
+{
+	K2_CancelAbility();
+}

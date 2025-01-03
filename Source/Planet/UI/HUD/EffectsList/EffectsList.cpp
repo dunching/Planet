@@ -6,7 +6,7 @@
 #include "EffectItem.h"
 #include "CS_Base.h"
 #include "CharacterBase.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "StateProcessorComponent.h"
 #include "TemplateHelper.h"
@@ -56,7 +56,7 @@ void UEffectsList::NativeDestruct()
 #if UE_EDITOR || UE_SERVER
 	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		auto GASCompPtr = TargetCharacterPtr->GetAbilitySystemComponent();
+		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 		GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.Remove(ActiveGameplayEffectHandle);
 	}
 #endif
@@ -92,7 +92,7 @@ void UEffectsList::BindCharacterState(ACharacterBase* InTargetCharacterPtr)
 #if UE_EDITOR || UE_SERVER
 	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		auto GASCompPtr = TargetCharacterPtr->GetAbilitySystemComponent();
+		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 		ActiveGameplayEffectHandle = GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
 	}
 #endif

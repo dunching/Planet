@@ -16,6 +16,7 @@
 #include "HumanCharacter.h"
 #include "Animation/AnimInstanceBase.h"
 #include "AbilityTask_PlayMontage.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "ToolFuture_PickAxe.h"
 
 ATool_PickAxe::ATool_PickAxe(const FObjectInitializer& ObjectInitializer) :
@@ -38,7 +39,7 @@ void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmen
 		GameplayAbilityTargetDataPtr->EquipmentAxePtr = this;
 		Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-		auto ASCPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto ASCPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ASCPtr->TriggerAbilityFromGameplayEvent(
 			EquipmentAbilitieHandle,
 			ASCPtr->AbilityActorInfo.Get(),
@@ -50,7 +51,7 @@ void ATool_PickAxe::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmen
 	break;
 	case EEquipmentActionType::kStopAction:
 	{
-		CharacterPtr->GetAbilitySystemComponent()->CancelAbilityHandle(EquipmentAbilitieHandle);
+		CharacterPtr->GetCharacterAbilitySystemComponent()->CancelAbilityHandle(EquipmentAbilitieHandle);
 	}
 	break;
 	}

@@ -32,7 +32,7 @@
 #include "HoldingItemsComponent.h"
 #include "CDCaculatorComponent.h"
 #include "Skill_Consumable_Generic.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Weapon_Bow.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"

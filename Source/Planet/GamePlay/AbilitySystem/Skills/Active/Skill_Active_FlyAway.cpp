@@ -26,7 +26,7 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
@@ -155,7 +155,7 @@ void USkill_Active_FlyAway::ExcuteTasks()
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		TSet<ACharacterBase*>TargetSet;
 		for (const auto & Iter : Result)
@@ -207,7 +207,7 @@ void USkill_Active_FlyAway::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 

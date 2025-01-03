@@ -3,7 +3,7 @@
 #include "AS_Character.h"
 #include "CharacterBase.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GE_Common.h"
 
 void UGEEC_Base::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -15,12 +15,14 @@ void UGEEC_Base::Execute_Implementation(const FGameplayEffectCustomExecutionPara
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+	
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
 		return;
@@ -31,7 +33,7 @@ void UGEEC_Base::Execute_Implementation(const FGameplayEffectCustomExecutionPara
 
 	TMap<FGameplayTag, float> CustomMagnitudes;
 
-	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(
 		CustomMagnitudes,
 		ExecutionParams,
 		OutExecutionOutput
@@ -49,12 +51,14 @@ void UGEEC_Reply::Execute_Implementation(
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+	
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
 		return;
@@ -73,7 +77,7 @@ void UGEEC_Reply::Execute_Implementation(
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_PP, SourceSet->GetPP_Replay());
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_Mana, SourceSet->GetMana_Replay());
 
-	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(
 		CustomMagnitudes,
 		ExecutionParams,
 		OutExecutionOutput
@@ -89,12 +93,14 @@ void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionP
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+	
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
 		return;
@@ -112,7 +118,7 @@ void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionP
 	const auto MoveSpeedOffset = Cast<UGE_Running>(Spec.Def)->MoveSpeedOffset.GetValue();
 	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, MoveSpeedOffset);
 
-	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
 	                                                                 OutExecutionOutput);
 }
 
@@ -125,12 +131,14 @@ void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExec
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+	
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		Instigator->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
 		return;
@@ -147,6 +155,6 @@ void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExec
 
 	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, 0);
 
-	Instigator->GetBaseFeatureComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
 	                                                                 OutExecutionOutput);
 }

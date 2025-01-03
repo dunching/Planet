@@ -12,7 +12,7 @@
 
 class ACharacterBase;
 class UInteractiveComponent;
-class UBaseFeatureComponent;
+class UCharacterAbilitySystemComponent;
 
 struct FCharacterAttributes;
 
@@ -258,7 +258,7 @@ struct FGAEventModify_key_compare;
 class PLANET_API IGAEventModifyInterface
 {
 public:
-	friend UBaseFeatureComponent;
+	friend UCharacterAbilitySystemComponent;
 	friend FGAEventModify_key_compare;
 
 	IGAEventModifyInterface(int32 InPriority = 1);
@@ -280,7 +280,10 @@ class PLANET_API IGAEventModifySendInterface : public IGAEventModifyInterface
 public:
 	IGAEventModifySendInterface(int32 InPriority = 1);
 
-	virtual bool Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent);
+	// Return：本次修改完是否移除本【修正方式】
+	virtual bool Modify(
+		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
+		);
 };
 
 class PLANET_API IGAEventModifyReceivedInterface : public IGAEventModifyInterface

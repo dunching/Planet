@@ -113,6 +113,7 @@ protected:
 
 	void StopContinueActive();
 
+	// UFUNCTION(NetMulticast, Reliable)
 	virtual void CheckInContinue();
 
 	UFUNCTION()

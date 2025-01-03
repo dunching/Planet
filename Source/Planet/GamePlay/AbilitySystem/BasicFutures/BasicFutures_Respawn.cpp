@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "AbilityTask_PlayMontage.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
 #include "GameplayTagsLibrary.h"
@@ -31,7 +32,7 @@ void UBasicFutures_Respawn::ActivateAbility(
 	PlayMontage(DeathMontage, 1.f);
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 	}
@@ -53,8 +54,8 @@ void UBasicFutures_Respawn::InitalDefaultTags()
 void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -65,7 +66,7 @@ void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 
@@ -76,14 +77,14 @@ void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 void UBasicFutures_Respawn::OnMontageComplete()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		)
 	{
 		K2_CancelAbility();
 	}
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();

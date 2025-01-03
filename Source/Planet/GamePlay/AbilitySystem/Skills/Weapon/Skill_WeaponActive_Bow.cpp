@@ -30,7 +30,7 @@
 #include "PlanetControllerInterface.h"
 #include "TeamMatesHelperComponent.h"
 #include "Weapon_Bow.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "KismetGravityLibrary.h"
 
 namespace Skill_WeaponActive_Bow
@@ -154,8 +154,8 @@ void USkill_WeaponActive_Bow::CheckInContinue()
 	else
 	{
 		if (
-			(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-			(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 			)
 		{
 			K2_CancelAbility();
@@ -203,14 +203,14 @@ void USkill_WeaponActive_Bow::OnNotifyBeginReceived(FName NotifyName)
 
 void USkill_WeaponActive_Bow::OnMontateComplete()
 {
-	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	{
 		EmitProjectile();
 	}
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		CheckInContinue();
@@ -320,7 +320,7 @@ void USkill_WeaponActive_Bow::MakeDamage(ACharacterBase* TargetCharacterPtr)
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
@@ -330,8 +330,8 @@ void USkill_WeaponActive_Bow::PlayMontage()
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{ 
 		{
@@ -343,7 +343,7 @@ void USkill_WeaponActive_Bow::PlayMontage()
 			);
 
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
-			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
@@ -359,7 +359,7 @@ void USkill_WeaponActive_Bow::PlayMontage()
 			);
 
 			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 			AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
 		}

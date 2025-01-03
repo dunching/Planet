@@ -32,7 +32,7 @@
 #include "HoldingItemsComponent.h"
 #include "CDCaculatorComponent.h"
 #include "Skill_Consumable_Generic.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Weapon_Bow.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
@@ -108,11 +108,11 @@ void FSkillProxy::RegisterSkill()
 
 		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
 
-		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,
 			GameplayEventData
 		);
-		GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+		GameplayAbilitySpecHandle = AllocationCharacter->GetCharacterAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 	}
 #endif
 }
@@ -129,7 +129,7 @@ void FSkillProxy::UnRegisterSkill()
 
 			if (AllocationCharacter.IsValid())
 			{
-				auto ASCPtr = AllocationCharacter->GetAbilitySystemComponent();
+				auto ASCPtr = AllocationCharacter->GetCharacterAbilitySystemComponent();
 
 				ASCPtr->CancelAbilityHandle(GameplayAbilitySpecHandle);
 				ASCPtr->ClearAbility(GameplayAbilitySpecHandle);
@@ -145,7 +145,7 @@ TArray<USkill_Base*> FSkillProxy::GetGAInstAry()const
 {
 	TArray<USkill_Base*>ResultAry;
 	auto ProxyCharacterPtr = GetOwnerCharacter();
-	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+	auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
 	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
 	if (GameplayAbilitySpecPtr)
 	{
@@ -158,7 +158,7 @@ TArray<USkill_Base*> FSkillProxy::GetGAInstAry()const
 USkill_Base* FSkillProxy::GetGAInst()const
 {
 	auto ProxyCharacterPtr = GetOwnerCharacter();
-	auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+	auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
 	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
 	if (GameplayAbilitySpecPtr)
 	{
@@ -234,7 +234,7 @@ bool FActiveSkillProxy::Active()
 			return false;
 		}
 
-		auto ASCPtr = GetOwnerCharacter()->GetAbilitySystemComponent();
+		auto ASCPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
 
 		// 需要特殊参数的
 		if (
@@ -305,13 +305,13 @@ void FActiveSkillProxy::Cancel()
 
 bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetAbilitySystemComponent()->GetActiveEffects(
+	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
 	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
 	);
 
 	if (!GameplayEffectHandleAry.IsEmpty())
 	{
-		auto GameplayEffectPtr = GetOwnerCharacter()->GetAbilitySystemComponent()->GetActiveGameplayEffect(
+		auto GameplayEffectPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent()->GetActiveGameplayEffect(
 		GameplayEffectHandleAry[0]
 		);
 
@@ -328,7 +328,7 @@ bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& Re
 
 bool FActiveSkillProxy::CheckCooldown() const
 {
-	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetAbilitySystemComponent()->GetActiveEffects(
+	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
 	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
 	);
 
@@ -402,7 +402,7 @@ void FPassiveSkillProxy::Allocation()
 					ModifyPropertyMap.Add(Iter);
 				}
 
-				AllocationCharacter->GetBaseFeatureComponent()->SendEvent2Self(
+				AllocationCharacter->GetCharacterAbilitySystemComponent()->SendEvent2Self(
 					ModifyPropertyMap, GetProxyType()
 				);
 			}
@@ -418,7 +418,7 @@ void FPassiveSkillProxy::UnAllocation()
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto AllocationCharacter = GetAllocationCharacter();
-		AllocationCharacter->GetBaseFeatureComponent()->ClearData2Self(
+		AllocationCharacter->GetCharacterAbilitySystemComponent()->ClearData2Self(
 			GetAllData(), GetProxyType()
 		);
 	}
@@ -492,7 +492,7 @@ bool FWeaponSkillProxy::Active()
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 		}
 
-		auto ASCPtr = GetOwnerCharacter()->GetAbilitySystemComponent();
+		auto ASCPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
 
 		return ASCPtr->TriggerAbilityFromGameplayEvent(
 			InGaInsPtr->GetCurrentAbilitySpecHandle(),
@@ -594,11 +594,11 @@ void FWeaponSkillProxy::RegisterSkill()
 
 		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
 
-		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,
 			*GameplayEventData
 		);
-		GameplayAbilitySpecHandle = AllocationCharacter->GetAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+		GameplayAbilitySpecHandle = AllocationCharacter->GetCharacterAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
 	}
 #endif
 }

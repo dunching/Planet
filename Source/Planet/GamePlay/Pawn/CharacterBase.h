@@ -38,7 +38,7 @@ class UPlanetAbilitySystemComponent;
 class UTalentAllocationComponent;
 class UStateProcessorComponent;
 class UTeamMatesHelperComponent;
-class UBaseFeatureComponent;
+class UCharacterAbilitySystemComponent;
 class UInteractiveConsumablesComponent;
 class UProxyProcessComponent;
 class UInteractiveToolComponent;
@@ -102,7 +102,7 @@ public:
 
 	UTalentAllocationComponent* GetTalentAllocationComponent()const;
 
-	UBaseFeatureComponent* GetBaseFeatureComponent()const;
+	UCharacterAbilitySystemComponent* GetCharacterAbilitySystemComponent()const;
 	
 	UStateProcessorComponent* GetStateProcessorComponent()const;
 
@@ -178,9 +178,6 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
 	float BaseLookUpRate = 45.f;
 
-	UPROPERTY()
-	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
 	
@@ -191,7 +188,7 @@ protected:
 	TObjectPtr<UStateProcessorComponent> StateProcessorComponentPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
-	TObjectPtr<UBaseFeatureComponent> BaseFeatureComponentPtr = nullptr;
+	TObjectPtr<UCharacterAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
 	
 	UPROPERTY()
 	TObjectPtr<UProxyProcessComponent> ProxyProcessComponentPtr = nullptr;

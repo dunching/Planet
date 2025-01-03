@@ -32,7 +32,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
@@ -83,7 +83,7 @@ void USkill_Active_Slow::PerformAction(
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		// 控制效果
 		for (const auto& Iter : TargetSet)

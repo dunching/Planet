@@ -15,7 +15,7 @@
 
 #include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
@@ -107,7 +107,7 @@ bool USkill_Active_DisplacementNoPhy::CommitAbility(
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
@@ -132,8 +132,8 @@ void USkill_Active_DisplacementNoPhy::PerformAction(
 void USkill_Active_DisplacementNoPhy::Move()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		const FRotator Rotation = CharacterPtr->Controller->GetControlRotation();
@@ -156,7 +156,7 @@ void USkill_Active_DisplacementNoPhy::Move()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}
@@ -172,8 +172,8 @@ void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
 void USkill_Active_DisplacementNoPhy::PlayMontage()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		const float InPlayRate = HumanMontage->CalculateSequenceLength() / Duration;
@@ -186,7 +186,7 @@ void USkill_Active_DisplacementNoPhy::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
@@ -230,6 +230,6 @@ void USkill_Active_DisplacementNoPhy::MakeDamage(ACharacterBase* TargetCharacter
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }

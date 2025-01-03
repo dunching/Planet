@@ -22,7 +22,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -112,7 +112,7 @@ void ATractionPoint::Tick(float DeltaSeconds)
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		// 控制效果
 		for (const auto& Iter : TargetSet)
@@ -273,7 +273,7 @@ void UCS_RootMotion_Traction::ExcuteTasks()
 #endif
 	
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ENetRole::ROLE_AutonomousProxy)
 	{
 		TArray<AActor*> OutActors;
 		UGameplayStatics::GetAllActorsOfClass(CharacterPtr, ATractionPoint::StaticClass(), OutActors);

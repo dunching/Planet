@@ -172,6 +172,42 @@ void USkill_WeaponActive_Base::StopContinueActive()
 	bIsContinue = false;
 }
 
+void USkill_WeaponActive_Base::CheckInContinue//_Implementation
+()
+{
+	if (bIsContinue && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
+	{
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+	}
+	else
+	{
+#if UE_EDITOR || UE_SERVER
+		if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		{
+			WaitInputPercent = 1.f;
+
+			WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+
+			if (CurrentWaitInputTime > 0.f)
+			{
+				WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
+				WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
+				WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
+					CancelAbility_Server();
+					return true;
+					});
+			}
+			else
+			{
+				WaitInputTaskPtr->SetInfinite();
+			}
+
+			WaitInputTaskPtr->ReadyForActivation();
+		}
+#endif
+	}
+}
+
 void USkill_WeaponActive_Base::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -181,41 +217,6 @@ void USkill_WeaponActive_Base::PerformAction(
 {
 	ResetPreviousStageActions();
 	bIsContinue = true;
-}
-
-void USkill_WeaponActive_Base::CheckInContinue()
-{
-	if (bIsContinue && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
-	{
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
-	}
-	else
-	{
-		WaitInputPercent = 1.f;
-
-		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-
-		if (CurrentWaitInputTime > 0.f)
-		{
-			WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
-			WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
-			WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
-#if UE_EDITOR || UE_SERVER
-				if (CharacterPtr->GetLocalRole() == ROLE_Authority)
-				{
-					K2_CancelAbility();
-				}
-#endif
-				return true;
-				});
-		}
-		else
-		{
-			WaitInputTaskPtr->SetInfinite();
-		}
-
-		WaitInputTaskPtr->ReadyForActivation();
-	}
 }
 
 void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInputTaskPtr, float Interval, float Duration)

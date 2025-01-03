@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -123,7 +123,7 @@ void UCS_RootMotion_KnockDown::ExcuteTasks()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->ReadyForActivation();
 	}
 	else
@@ -153,7 +153,7 @@ void UCS_RootMotion_KnockDown::PlayMontage(UAnimMontage* CurMontagePtr, float Ra
 	);
 
 	AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-	AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 	AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 	AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
 

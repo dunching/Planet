@@ -13,7 +13,7 @@
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "SceneProxyExtendInfo.h"
 #include "TalentInfo.h"
 
@@ -176,7 +176,7 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 
 					GAEventDataPtr->DataAry.Add(GAEventData);
 
-					CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+					CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 					// 数据修正
 					for (const auto& Iter : PAD_Talent_PropertyPtr->ModifyValueMap)
@@ -200,7 +200,7 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 				}
 				else
 				{
-					CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(GetAllData(), DataSource);
+					CharacterPtr->GetCharacterAbilitySystemComponent()->ClearData2Self(GetAllData(), DataSource);
 					for (const auto& Iter : PAD_Talent_PropertyPtr->ModifyValueMap)
 					{
 						if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())

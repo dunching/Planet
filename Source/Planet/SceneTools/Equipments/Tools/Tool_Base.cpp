@@ -3,6 +3,7 @@
 
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayAbilitySpec.h"
 
 #include "CharacterBase.h"
@@ -17,7 +18,7 @@ void ATool_Base::DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentAc
 
 void ATool_Base::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
-	EquipmentAbilitieHandle = CharacterPtr->GetAbilitySystemComponent()->GiveAbility(
+	EquipmentAbilitieHandle = CharacterPtr->GetCharacterAbilitySystemComponent()->GiveAbility(
 		FGameplayAbilitySpec(
 			EquipmentAbilities,
 			1
@@ -31,7 +32,7 @@ void ATool_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	{
 		auto CharacterPtr = Cast<AHumanCharacter>(GetOwner());
 
-		CharacterPtr->GetAbilitySystemComponent()->ClearAbility(EquipmentAbilitieHandle);
+		CharacterPtr->GetCharacterAbilitySystemComponent()->ClearAbility(EquipmentAbilitieHandle);
 	}
 
 	Super::EndPlay(EndPlayReason);

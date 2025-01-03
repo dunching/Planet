@@ -40,6 +40,8 @@ public:
 	// 基础状态回复
 	void ProcessCharacterAttributes();
 
+	float GetRate()const;
+	
 protected:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

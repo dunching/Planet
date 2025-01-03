@@ -2,6 +2,7 @@
 #include "MainHUD.h"
 
 #include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Components/Border.h"
 
 #include "MainHUDLayout.h"
@@ -160,11 +161,11 @@ void AMainHUD::InitMainHUDLayout()
 				auto CharacterAttributesRef =
 					CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-				CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 					CharacterAttributesRef->GetMax_HPAttribute()
 					).AddUObject(this, &ThisClass::OnHPChanged);
 
-				CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 					CharacterAttributesRef->GetHPAttribute()
 					).AddUObject(this, &ThisClass::OnHPChanged);
 				

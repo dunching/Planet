@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 
 void USkill_Element_Gold::ActivateAbility(
@@ -32,7 +32,7 @@ void USkill_Element_Gold::ActivateAbility(
 		// );
 
 		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendAttack);
+			CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendAttack);
 	}
 }
 
@@ -45,7 +45,7 @@ void USkill_Element_Gold::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
+	CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -61,7 +61,7 @@ void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 	{
 		if (!(
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
 			))
 		{
 			return;
@@ -135,7 +135,7 @@ void USkill_Element_Gold::AddBuff()
 			ModifyPropertyMap.Add(ECharacterPropertyType::CriticalHitRate, CurrentBuffLevel * CriticalHitRate);
 			ModifyPropertyMap.Add(ECharacterPropertyType::Evade, CurrentBuffLevel * Evade);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
+			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
 		}
 	}
 	break;
@@ -154,6 +154,6 @@ void USkill_Element_Gold::RemoveBuff()
 {
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
+		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
 	}
 }

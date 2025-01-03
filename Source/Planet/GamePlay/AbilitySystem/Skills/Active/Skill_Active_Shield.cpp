@@ -32,7 +32,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "AS_Character.h"
@@ -69,7 +69,7 @@ void USkill_Active_Shield::PerformAction(
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 		}
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 
 		// 状态
@@ -134,7 +134,7 @@ void USkill_Active_Shield::EndAbility(
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 
 		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
@@ -163,7 +163,7 @@ bool USkill_Active_Shield::CommitAbility(
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);

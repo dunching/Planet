@@ -26,7 +26,7 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicStateModify_Suppress.h"
@@ -55,7 +55,7 @@ bool USkill_Active_Suppress::CanActivateAbility(
 		return false;
 	}
 #if UE_EDITOR || UE_CLIENT
-	if (CharacterPtr->GetLocalRole() < ROLE_Authority)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() < ROLE_Authority)
 	{
 		if (HasFocusActor())
 		{
@@ -111,7 +111,7 @@ void USkill_Active_Suppress::PerformAction(
 #endif
 
 #if UE_EDITOR || UE_CLIENT
-		if (CharacterPtr->GetLocalRole() < ROLE_Authority)
+		if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() < ROLE_Authority)
 		{
 			const auto bIsHaveTargetInDistance = CheckTargetIsEqualDistance(Distance);
 			if (bIsHaveTargetInDistance)
@@ -170,15 +170,10 @@ void USkill_Active_Suppress::PerformMoveImp(const FVector& StartPt, const FVecto
 	);
 
 	TaskPtr->Ability = this;
-	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 	TaskPtr->OnFinished.BindUObject(this, &ThisClass::MoveCompletedSignature);
 
 	TaskPtr->ReadyForActivation();
-}
-
-void USkill_Active_Suppress::CancelAbility_Server_Implementation()
-{
-	K2_CancelAbility();
 }
 
 void USkill_Active_Suppress::ExcuteTasks()
@@ -186,7 +181,7 @@ void USkill_Active_Suppress::ExcuteTasks()
 	if (CharacterPtr)
 	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		{
 			auto TargetCharacter = HasFocusActor();
 			ExcuteTasksImp(TargetCharacter);
@@ -200,10 +195,10 @@ void USkill_Active_Suppress::ExcuteTasksImp_Implementation(ACharacterBase* Targe
 	if (CharacterPtr)
 	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+		if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		{
 			// 伤害
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
 			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
@@ -230,8 +225,8 @@ void USkill_Active_Suppress::ExcuteTasksImp_Implementation(ACharacterBase* Targe
 void USkill_Active_Suppress::PlayMontage()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		const float InPlayRate = 1.f;
@@ -244,7 +239,7 @@ void USkill_Active_Suppress::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
@@ -255,7 +250,7 @@ void USkill_Active_Suppress::PlayMontage()
 void USkill_Active_Suppress::MoveCompletedSignature()
 {
 #if UE_EDITOR || UE_CLIENT
-	if (CharacterPtr->GetLocalRole() < ROLE_Authority)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() < ROLE_Authority)
 	{
 		const auto bIsHaveTargetInDistance = CheckTargetIsEqualDistance(Distance);
 		if (bIsHaveTargetInDistance)

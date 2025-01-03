@@ -7,7 +7,7 @@
 #include "Skill_Base.h"
 #include "Weapon_Base.h"
 #include "Skill_Consumable_Generic.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CDcaculatorComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
@@ -60,12 +60,12 @@ bool FConsumableProxy::Active()
 		GameplayEventData->TargetData.Add(GameplayAbilityTargetPtr);
 
 		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
-		AllocationCharacter->GetAbilitySystemComponent()->ReplicateEventData(
+		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,
 			*GameplayEventData
 		);
 
-		auto ASCPtr = ProxyCharacterPtr->GetAbilitySystemComponent();
+		auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
 		ASCPtr->GiveAbilityAndActivateOnce(
 			AbilitySpec
 		);
@@ -104,7 +104,7 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 
 	// 独立冷却
 	{
-		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
 		auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
 		GameplayTagContainer.AddTag(GetProxyType());
@@ -177,7 +177,7 @@ bool FConsumableProxy::CheckCooldown() const
 {
 	// 独立冷却
 	{
-		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
 		auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
 		GameplayTagContainer.AddTag(GetProxyType());

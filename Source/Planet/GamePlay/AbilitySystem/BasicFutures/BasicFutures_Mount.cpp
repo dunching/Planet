@@ -14,7 +14,7 @@
 
 #include "AssetRefMap.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
@@ -99,7 +99,7 @@ void UBasicFutures_Mount::PlayMontage()
 	);
 
 	TaskPtr->Ability = this;
-	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 	TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 	TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);

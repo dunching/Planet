@@ -45,7 +45,15 @@ void UAS_Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana_Replay, COND_None, REPNOTIFY_Always);
 
+	DOREPLIFETIME_CONDITION(ThisClass, AD, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, AD_Penetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, AD_Resistance, COND_None);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION(ThisClass, CriticalDamage, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, HitRate, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, Evade, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, PerformSpeed, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, Shield, COND_None);
 }
 
 void UAS_Character::OnRep_Max_HP(const FMyGameplayAttributeData& OldHealth)

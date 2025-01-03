@@ -24,7 +24,7 @@
 #include "UIManagerSubSystem.h"
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
 
@@ -255,7 +255,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		}
 
 		auto SkillsAry = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{
 // 			if (Iter.Value->SkillProxyPtr)
@@ -273,7 +273,7 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 // 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
@@ -316,7 +316,7 @@ void USkill_WeaponActive_HandProtection::PlayMontage()
 		);
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 

@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"

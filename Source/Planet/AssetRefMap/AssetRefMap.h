@@ -39,6 +39,7 @@ class AHorseCharacter;
 class AGeneratorNPC;
 class UMenuLayout;
 class UGameplayEffect;
+class UGE_Damage;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UObject
@@ -87,6 +88,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<UGameplayEffect>DurationGEClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<UGE_Damage>DamageClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<EMaterialParamNameType, FName>MatParamNameMap;

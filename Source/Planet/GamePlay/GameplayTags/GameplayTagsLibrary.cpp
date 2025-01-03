@@ -344,6 +344,9 @@ FGameplayTag UGameplayTagsLibrary::GEData_Info =
 FGameplayTag UGameplayTagsLibrary::GEData_CD =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.CD")));
 
+FGameplayTag UGameplayTagsLibrary::GEData_Damage =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Damage")));
+
 
 FGameplayTag UGameplayTagsLibrary::GEData_Duration =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Duration")));

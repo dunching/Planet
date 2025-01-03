@@ -1,6 +1,8 @@
 
 #include "PlanetAbilitySystemComponent.h"
 
+#include "CharacterAbilitySystemComponent.h"
+#include "CharacterBase.h"
 #include "GameOptions.h"
 #include "PlanetGameplayAbility.h"
 #include "Skill_Base.h"
@@ -84,6 +86,11 @@ UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(FGam
 	}
 
 	return AbilityInstance;
+}
+
+FActiveGameplayEffectHandle UPlanetAbilitySystemComponent::ApplyGameplayEffectSpecToTarget(const FGameplayEffectSpec &Spec, UAbilitySystemComponent *Target, FPredictionKey PredictionKey)
+{
+	return Super::ApplyGameplayEffectSpecToTarget(Spec,Target , PredictionKey);
 }
 
 void UPlanetAbilitySystemComponent::CurrentMontageStopImp_Implementation(float OverrideBlendOutTime)

@@ -318,6 +318,24 @@ bool UProxyProcessComponent::ActiveAction(
 
 void UProxyProcessComponent::CancelAction(const FGameplayTag& CanbeActivedInfoSPtr)
 {
+	// 使用武器
+	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
+	{
+		CancelAction_Server(CanbeActivedInfoSPtr);
+	}
+	// 使用主动技能
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
+	{
+		if (ActivedCorrespondingWeapon(CanbeActivedInfoSPtr))
+		{
+			CancelAction_Server(CanbeActivedInfoSPtr);
+		}
+	}
+	// 使用消耗品
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ConsumableSocket))
+	{
+		CancelAction_Server(CanbeActivedInfoSPtr);
+	}
 }
 
 bool UProxyProcessComponent::ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag)
@@ -427,9 +445,9 @@ void UProxyProcessComponent::UpdateCanbeActiveSkills_UsePassiveSocket(
 	OnCanAciveSkillChanged();
 }
 
-TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveSocket() const
+TMap<FCharacterSocket, FKey> UProxyProcessComponent::GetCanbeActiveSocket() const
 {
-	TMap<FKey, FCharacterSocket> Result;
+	TMap<FCharacterSocket, FKey> Result;
 
 	auto CharacterPtr = GetOwner<FOwnerType>();
 	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
@@ -438,9 +456,9 @@ TMap<FKey, FCharacterSocket> UProxyProcessComponent::GetCanbeActiveSocket() cons
 
 	for (const auto& Iter : Sockets)
 	{
-		if (ActionKeyMap.Contains(Iter.Key))
+		if (ActionKeyMap.Contains(Iter.Key) && Iter.Value.AllocationedProxyID.IsValid())
 		{
-			Result.Add(ActionKeyMap[Iter.Key], Iter.Value);
+			Result.Add(Iter.Value,ActionKeyMap[Iter.Key]);
 		}
 	}
 
@@ -494,6 +512,20 @@ void UProxyProcessComponent::Cancel(const FCharacterSocket& Socket)
 	Cancel(Socket.Socket);
 }
 
-void UProxyProcessComponent::Cancel(const FGameplayTag& Socket)
+void UProxyProcessComponent::Cancel(const FGameplayTag& SocketTag)
 {
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
+	if (CanActiveSocketMap.Contains(SocketTag))
+	{
+		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		if (ProxySPtr)
+		{
+			ProxySPtr->Cancel();
+		}
+	}
 }

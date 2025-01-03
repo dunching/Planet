@@ -2,6 +2,7 @@
 #include "CharacterAttibutes.h"
 
 #include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterRisingTips.h"
 #include "Planet.h"
 #include "UICommon.h"
@@ -319,12 +320,12 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	};
 
 	if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag)
+		GAEvent.Data.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag)
 		)
 	{
 		if (GAEvent.Data.bIsRespawn)
 		{
-			GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
+			GAEvent.Data.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
 				FGameplayTagContainer{ UGameplayTagsLibrary::Respawning }
 			);
 		}
@@ -334,7 +335,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		}
 	}
 	else if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		GAEvent.Data.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 		)
 	{
 		return;

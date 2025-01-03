@@ -252,7 +252,9 @@ IGAEventModifySendInterface::IGAEventModifySendInterface(int32 InPriority /*= 1*
 
 }
 
-bool IGAEventModifySendInterface::Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent)
+bool IGAEventModifySendInterface::Modify(
+		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
+		)
 {
 	return true;
 }

@@ -60,7 +60,7 @@
 #include "CS_PeriodicStateModify_Stagnation.h"
 #include "CS_RootMotion_Traction.h"
 #include "HumanAnimInstance.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CollisionDataStruct.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
@@ -83,7 +83,7 @@ void UStateProcessorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	auto CharacterPtr = GetOwner<FOwnerPawnType>();
 	if (CharacterPtr)
 	{
-		auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
 	}
 
@@ -109,7 +109,7 @@ void UStateProcessorComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroup
 		auto CharacterPtr = GetOwner<FOwnerPawnType>();
 		if (CharacterPtr)
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
 				this, &ThisClass::OnGameplayEffectTagCountChanged
 			);
@@ -335,7 +335,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 		auto CharacterPtr = GetOwner<FOwnerPawnType>();
 		if (CharacterPtr)
 		{
-			auto BaseFeatureComponentPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto BaseFeatureComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			BaseFeatureComponentPtr->SwitchCantBeSelect(Lambda());
 		}
 	}
@@ -385,14 +385,14 @@ void UStateProcessorComponent::ExcuteEffects(
 	}
 
 	if (
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 		)
 	{
 		return;
 	}
 
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 	if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 	{
 		auto GAPtr = Cast<UCS_PeriodicPropertyModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
@@ -434,14 +434,14 @@ void UStateProcessorComponent::ExcuteEffects(
 	}
 
 	if (
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 		)
 	{
 		return;
 	}
 
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 
 	if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
 	{
@@ -573,14 +573,14 @@ void UStateProcessorComponent::ExcuteEffects(
 	}
 
 	if (
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		OnwerActorPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 		)
 	{
 		return;
 	}
 
-	auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+	auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 
 	if (GameplayAbilityTargetDataSPtr->Tag.MatchesTag(UGameplayTagsLibrary::RootMotion))
 	{
@@ -735,7 +735,7 @@ void UStateProcessorComponent::BreakOhterState(
 	if (GameplayAbilityTargetDataSPtr->Tag.MatchesAnyExact(GameplayTagContainer))
 	{
 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		auto ASCPtr = OnwerActorPtr->GetAbilitySystemComponent();
+		auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 
 		const auto TempCharacterStateMap = OnwerActorPtr->GetStateProcessorComponent()->CharacterStateMap;
 		for (const auto Iter : TempCharacterStateMap)

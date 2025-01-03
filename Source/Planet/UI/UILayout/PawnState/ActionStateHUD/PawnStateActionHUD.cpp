@@ -15,6 +15,7 @@
 #include "CharacterAttibutes.h"
 #include "AssetRefMap.h"
 #include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "MyProgressBar.h"
 #include "MyBaseProperty.h"
 #include "LogWriter.h"
@@ -131,7 +132,7 @@ void UPawnStateActionHUD::ResetUIByData()
 	}
 	{
 		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		auto AbilitySystemComponentPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
 			if (!UIPtr)

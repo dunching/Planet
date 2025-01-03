@@ -72,7 +72,7 @@ public:
 
 	FCharacterSocket FindSocket(const FGameplayTag& SocketTag) const;
 
-	TMap<FKey, FCharacterSocket> GetCanbeActiveSocket() const;
+	TMap<FCharacterSocket, FKey> GetCanbeActiveSocket() const;
 
 #pragma region Skills
 	// 通过配置更新技能

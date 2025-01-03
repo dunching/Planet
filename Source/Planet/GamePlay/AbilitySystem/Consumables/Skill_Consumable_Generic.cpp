@@ -8,7 +8,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "GroupSharedInfo.h"
@@ -169,7 +169,7 @@ void USkill_Consumable_Generic::PerformAction(
 void USkill_Consumable_Generic::SpawnActor()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetLocalRole() > ROLE_SimulatedProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
 	{
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = CharacterPtr;
@@ -223,7 +223,7 @@ void USkill_Consumable_Generic::ExcuteTasks()
 			// GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 			// GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 			//
-			// auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			// auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			// ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		}
 	}
@@ -248,7 +248,7 @@ void USkill_Consumable_Generic::PlayMontage()
 			);
 
 			TaskPtr->Ability = this;
-			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 

@@ -28,7 +28,7 @@
 #include "PlanetControllerInterface.h"
 #include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 namespace Skill_WeaponActive_RangeTest
 {
@@ -170,7 +170,7 @@ void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPt
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
@@ -188,7 +188,7 @@ void USkill_WeaponActive_RangeTest::PlayMontage()
 		);
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 

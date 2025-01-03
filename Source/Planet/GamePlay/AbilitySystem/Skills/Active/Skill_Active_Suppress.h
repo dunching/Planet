@@ -53,9 +53,6 @@ protected:
 	);
 	
 	UFUNCTION(Server, Reliable)
-	void CancelAbility_Server();
-
-	UFUNCTION(Server, Reliable)
 	void PerformAction_Server();
 
 	void PerformActionImp();

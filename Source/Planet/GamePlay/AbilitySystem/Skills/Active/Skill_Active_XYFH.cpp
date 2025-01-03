@@ -32,7 +32,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 
@@ -57,8 +57,8 @@ void USkill_Active_XYFH::PreActivate(
 //	TargetOffsetValue.SetValue(CharacterPtr->GetCameraBoom()->TargetOffset);
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		if (!SPlineActorPtr)
@@ -107,8 +107,8 @@ void USkill_Active_XYFH::EndAbility(
 )
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		if (SPlineActorPtr)
@@ -216,8 +216,8 @@ void USkill_Active_XYFH::ExcuteTasks(
 )
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		if (bIsSubMoveStep)
@@ -251,7 +251,7 @@ void USkill_Active_XYFH::ExcuteTasks(
 			TaskPtr->OnFinish.BindUObject(this, &ThisClass::OnMoveStepComplete);
 		}
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}
@@ -260,8 +260,8 @@ void USkill_Active_XYFH::ExcuteTasks(
 void USkill_Active_XYFH::PlayMontage()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		const float InPlayRate = 1.f;
@@ -276,12 +276,12 @@ void USkill_Active_XYFH::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}

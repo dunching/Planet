@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -14,22 +13,21 @@ struct FSkillProxy;
 class UInteractiveComponent;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_SkillBase_RegisterParam : 
+struct FGameplayAbilityTargetData_SkillBase_RegisterParam :
 	public FGameplayAbilityTargetData_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
 
-	virtual FGameplayAbilityTargetData_SkillBase_RegisterParam* Clone()const override;
+	virtual FGameplayAbilityTargetData_SkillBase_RegisterParam* Clone() const override;
 
 	FGuid ProxyID;
-
 };
 
-template<>
+template <>
 struct TStructOpsTypeTraits<FGameplayAbilityTargetData_SkillBase_RegisterParam> :
 	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_SkillBase_RegisterParam>
 {
@@ -45,7 +43,6 @@ class PLANET_API USkill_Base : public UPlanetGameplayAbility
 	GENERATED_BODY()
 
 public:
-
 	using FRegisterParamType = FGameplayAbilityTargetData_SkillBase_RegisterParam;
 
 	friend UInteractiveComponent;
@@ -85,42 +82,48 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	)override;
+	) override;
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateCancelAbility
-	)override;
+	) override;
 
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
-	)override;
+	) override;
 
-	const TArray<FAbilityTriggerData>& GetTriggers()const;
+	TArray<FActiveGameplayEffectHandle> MyApplyGameplayEffectSpecToTarget(
+		const FGameplayAbilitySpecHandle AbilityHandle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		FGameplayEffectSpecHandle SpecHandle,
+		const FGameplayAbilityTargetDataHandle& TargetData
+	) const;
 
-	virtual	void UpdateRegisterParam(const FGameplayEventData& GameplayEventData);
+	const TArray<FAbilityTriggerData>& GetTriggers() const;
+
+	virtual void UpdateRegisterParam(const FGameplayEventData& GameplayEventData);
 
 protected:
-
 	virtual void ResetPreviousStageActions();
 
 	// 确认是否有锁定的目标
-	ACharacterBase* HasFocusActor()const;
+	ACharacterBase* HasFocusActor() const;
 
 	// 确认锁定的目标是否在范围内
-	bool CheckTargetInDistance(int32 Distance)const;
-	
+	bool CheckTargetInDistance(int32 Distance) const;
+
 	// 确认锁定的目标是否在范围山（需要跟目标保持一定距离）
-	bool CheckTargetIsEqualDistance(int32 Distance)const;
+	bool CheckTargetIsEqualDistance(int32 Distance) const;
 
 	// 获取范围内任意可攻击的目标
-	ACharacterBase* GetTargetInDistance(int32 Distance)const;
+	ACharacterBase* GetTargetInDistance(int32 Distance) const;
 
 	ACharacterBase* CharacterPtr = nullptr;
 
 	TSharedPtr<FSkillProxy> SkillProxyPtr = nullptr;
-
 };

@@ -65,7 +65,7 @@
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter_Player.h"
 
 #include "ResourceBox.h"

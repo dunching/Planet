@@ -15,7 +15,7 @@
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 #include "AS_Character.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_Base.h"
@@ -49,7 +49,7 @@ void USkill_Passive_XS::OnRemoveAbility(
 )
 {
 	RemoveShield();
-	// CharacterPtr->GetBaseFeatureComponent()->RemoveReceviedEventModify(EventModifyReceivedSPtr);
+	// CharacterPtr->GetCharacterAbilitySystemComponent()->RemoveReceviedEventModify(EventModifyReceivedSPtr);
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
@@ -71,7 +71,7 @@ void USkill_Passive_XS::ReigsterEffect()
 	{
 		// EventModifyReceivedSPtr = MakeShared<FMyStruct>(300, this);
 		//
-		// CharacterPtr->GetBaseFeatureComponent()->AddReceviedEventModify(EventModifyReceivedSPtr);
+		// CharacterPtr->GetCharacterAbilitySystemComponent()->AddReceviedEventModify(EventModifyReceivedSPtr);
 	}
 }
 
@@ -90,7 +90,7 @@ void USkill_Passive_XS::AddShield(int32 ShieldValue)
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
@@ -109,7 +109,7 @@ void USkill_Passive_XS::RemoveShield()
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 

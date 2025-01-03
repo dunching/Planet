@@ -27,7 +27,7 @@
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "PlanetControllerInterface.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
 #include "CS_RootMotion.h"
@@ -207,8 +207,8 @@ void TestCommand::TestDisplacementSkill()
 	{
 		// 		auto UnitClass = USceneUnitExtendInfoMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
 		// 
-		// 		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
-		// 		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);
+		// 		Handle1 = CharacterPtr->GetCharacterAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
+		// 		CharacterPtr->GetCharacterAbilitySystemComponent()->TryActivateAbility(Handle1);
 	}
 }
 
@@ -238,7 +238,7 @@ void TestCommand::TestGAEventModify()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		auto BaseFeatureComponentPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto BaseFeatureComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(123, 523));
 		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(1, 423));
 		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(12, 323));
@@ -464,7 +464,7 @@ void TestCommand::TestGAState2Self(const TArray< FString >& Args)
 	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 	GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 
@@ -508,7 +508,7 @@ void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = TargetCharacterPtr;
 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-				auto ICPtr = TargetCharacterPtr->GetBaseFeatureComponent();
+				auto ICPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 		}

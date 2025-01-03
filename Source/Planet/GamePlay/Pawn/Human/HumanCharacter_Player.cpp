@@ -70,15 +70,20 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 	}
 #endif
 
-	// 显示
-	Cast<AMainHUD>(GetController<APlanetPlayerController>()->MyHUD)->InitalHUD();
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// 显示
+		Cast<AMainHUD>(GetController<APlanetPlayerController>()->MyHUD)->InitalHUD();
 	
-	// 在SetPawn之后调用
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
-		[this](auto NewProcessor)
-		{
-			NewProcessor->SetPawn(Cast<ThisClass>(this));
-		});
+		// 在SetPawn之后调用
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
+			[this](auto NewProcessor)
+			{
+				NewProcessor->SetPawn(Cast<ThisClass>(this));
+			});
+	}
+#endif
 }
 
 void AHumanCharacter_Player::InitialGroupSharedInfo()

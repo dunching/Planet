@@ -16,7 +16,7 @@
 #include "Skill_Base.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -45,7 +45,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 {
 	if (CharacterPtr)
 	{
-		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		FGameplayTagContainer GameplayTagContainer;
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_ReleasingSkill_Continuous);
@@ -62,10 +62,10 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 				for (const auto& Iter : CanbeActivedInfo)
 				{
 					if (
-						Iter.Value.Socket.MatchesTag(UGameplayTagsLibrary::ActiveSocket)
+						Iter.Key.Socket.MatchesTag(UGameplayTagsLibrary::ActiveSocket)
 						)
 					{
-						auto SkillProxySPtr = CharacterPtr->GetProxyProcessComponent()->FindActiveSkillBySocket(Iter.Value.Socket);
+						auto SkillProxySPtr = CharacterPtr->GetProxyProcessComponent()->FindActiveSkillBySocket(Iter.Key.Socket);
 						auto GAInsPtr = Cast<USkill_Base>(SkillProxySPtr->GetGAInst());
 						if (!GAInsPtr)
 						{
@@ -78,9 +78,9 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						);
 						if (bIsReady)
 						{
-							if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Value.Socket))
+							if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Key.Socket))
 							{
-								ReleasingSkillMap.Add(GAInsPtr, Iter.Value.Socket);
+								ReleasingSkillMap.Add(GAInsPtr, Iter.Key.Socket);
 								return true;
 							}
 						}
@@ -92,7 +92,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 			for (const auto& Iter : CanbeActivedInfo)
 			{
 				if (
-					Iter.Value.Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
+					Iter.Key.Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
 					)
 				{
 					auto WeaponSPtr = CharacterPtr->GetProxyProcessComponent()->GetActivedWeapon();
@@ -112,9 +112,9 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					);
 					if (bIsReady)
 					{
-						if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Value.Socket, true))
+						if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Key.Socket, true))
 						{
-							ReleasingSkillMap.Add(GAInsPtr, Iter.Value.Socket);
+							ReleasingSkillMap.Add(GAInsPtr, Iter.Key.Socket);
 							return true;
 						}
 					}
@@ -128,7 +128,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 void UAITask_ReleaseSkill::StopReleaseSkill()
 {
 	// 结束移动释放至范围内释放
-	CharacterPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
+	CharacterPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 
 	for (const auto Iter : ReleasingSkillMap)
 	{

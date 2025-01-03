@@ -9,7 +9,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 void USkill_Consumable_Test::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -81,7 +81,7 @@ void USkill_Consumable_Test::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 
@@ -113,7 +113,7 @@ void USkill_Consumable_Test::EmitEffect()
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 

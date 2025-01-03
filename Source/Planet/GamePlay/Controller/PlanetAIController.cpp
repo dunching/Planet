@@ -11,6 +11,7 @@
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Planet.h"
 #include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
@@ -53,7 +54,7 @@ void APlanetAIController::OnPossess(APawn* InPawn)
 
 UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() const
 {
-	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
+	return GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
 }
 
 AGroupSharedInfo* APlanetAIController::GetGroupSharedInfo() const

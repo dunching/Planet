@@ -22,6 +22,7 @@ struct FActiveSkillProxy;
 struct FConsumableProxy;
 struct FCharacterProxy;
 class UPlanetAbilitySystemComponent;
+class UGSAbilitySystemComponent;
 class UProxySycHelperComponent;
 class UTeamMatesHelperComponent;
 class UHoldingItemsComponent;
@@ -64,6 +65,6 @@ protected:
 	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TObjectPtr<UPlanetAbilitySystemComponent> AbilitySystemComponentPtr;
+	TObjectPtr<UGSAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
 	
 };

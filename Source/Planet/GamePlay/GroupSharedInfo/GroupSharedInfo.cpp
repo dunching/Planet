@@ -4,16 +4,21 @@
 #include "TeamMatesHelperComponent.h"
 
 #include "HoldingItemsComponent.h"
+#include "UGSAbilitySystemComponent.h"
 
 AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
 {
+	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
-	
+	bAlwaysRelevant = true;
+	SetReplicatingMovement(false);
+	NetUpdateFrequency = 1;
+
 	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(UTeamMatesHelperComponent::ComponentName);
 	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
 	
-	AbilitySystemComponentPtr = CreateDefaultSubobject<UPlanetAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
+	AbilitySystemComponentPtr = CreateDefaultSubobject<UGSAbilitySystemComponent>(UGSAbilitySystemComponent::ComponentName);
 	AbilitySystemComponentPtr->SetIsReplicated(true);
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }

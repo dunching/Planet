@@ -5,7 +5,7 @@
 
 #include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter.h"
 #include "HoldingItemsComponent.h"
 #include "PlanetPlayerController.h"

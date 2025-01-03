@@ -1,4 +1,3 @@
-
 #include "Skill_WeaponActive_PickAxe.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
@@ -22,12 +21,14 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AssetRefMap.h"
 #include "AS_Character.h"
 #include "Weapon_PickAxe.h"
-#include "PlanetControllerInterface.h"
+#include "GE_Common.h"
 #include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
 #include "ItemProxy_Character.h"
 
@@ -65,9 +66,10 @@ void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 }
 
 void USkill_WeaponActive_PickAxe::PreActivate(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayAbilityActivationInfo ActivationInfo, FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
@@ -123,25 +125,31 @@ void USkill_WeaponActive_PickAxe::StartTasksLink()
 
 void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 {
-	if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
-	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
+		{
+			CheckInContinue();
+		}
+		else if (NotifyName == Skill_WeaponActive_PickAxe::Hit)
 		{
 			MakeDamage();
 		}
-#endif
-
-		CheckInContinue();
 	}
+#endif
 }
 
 void USkill_WeaponActive_PickAxe::OnMontateComplete()
 {
-	MontageNum--;
-	if ((MontageNum <= 0) && (CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy))
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
 	{
-		K2_CancelAbility();
+		// if ((MontageNum <= 0) && (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy))
+		{
+			CancelAbility_Server();
+		}
 	}
 }
 
@@ -179,14 +187,15 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		CapsuleParams
 	))
 	{
-		const auto & CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
 
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
+		// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
+		// 	CharacterPtr);
+		//
+		// GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
 
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		TSet<ACharacterBase*>TargetCharacterSet;
+		TSet<ACharacterBase*> TargetCharacterSet;
 		for (auto Iter : OutHits)
 		{
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
@@ -196,31 +205,58 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			}
 		}
 
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->DamageClass, GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+													   BaseDamage);
+
+		TArray<TWeakObjectPtr<AActor> >Ary;
+		for (auto Iter:TargetCharacterSet)
+		{
+			Ary.Add(Iter);
+		}
+		FGameplayAbilityTargetDataHandle TargetData;
+
+		auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_ActorArray;
+		GameplayAbilityTargetData_ActorArrayPtr->SetActors(Ary);
+
+		TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
+		const auto GEHandleAry = MyApplyGameplayEffectSpecToTarget(
+			GetCurrentAbilitySpecHandle(),
+			GetCurrentActorInfo(),
+			GetCurrentActivationInfo(),
+			SpecHandle,
+			TargetData
+		);
 		for (auto Iter : TargetCharacterSet)
 		{
-			FGAEventData GAEventData(Iter, CharacterPtr);
+			// FGAEventData GAEventData(Iter, CharacterPtr);
+			//
+			// GAEventData.bIsWeaponAttack = true;
+			// GAEventData.AttackEffectType = EAttackEffectType::kNormalAttackEffect;
+			// GAEventData.SetBaseDamage(BaseDamage);
+			//
+			// GAEventDataPtr->DataAry.Add(GAEventData);
 
-			GAEventData.bIsWeaponAttack = true;
-			GAEventData.AttackEffectType = EAttackEffectType::kNormalAttackEffect;
-			GAEventData.SetBaseDamage(BaseDamage);
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
+		// auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		// ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 
 void USkill_WeaponActive_PickAxe::PlayMontage()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
-		)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
-		const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
-		const float Rate = static_cast<float>(GAPerformSpeed) / 100;
+		const float Rate = CharacterPtr->GetCharacterAttributesComponent()->GetRate();
 
 		{
 			auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -231,15 +267,13 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 			);
 
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
-			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 			AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 			AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
-
-			MontageNum++;
 		}
 		{
 			auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
@@ -251,13 +285,11 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 			);
 
 			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 			AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 			AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
-
-			MontageNum++;
 		}
 	}
 }

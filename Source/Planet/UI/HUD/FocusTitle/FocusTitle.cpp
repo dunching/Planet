@@ -8,6 +8,7 @@
 #include <GameplayTagsManager.h>
 
 #include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Border.h"
 
@@ -68,7 +69,7 @@ void UFocusTitle::NativeDestruct()
 	if (CharacterPtr)
 	{
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
 		}
 	}
@@ -90,13 +91,13 @@ void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
 		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
 
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
 				this, &ThisClass::OnGameplayEffectTagCountChanged);
 		}
 
 		auto CharacterAttributesPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		auto AbilitySystemComponentPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		{
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
 				CharacterAttributesPtr->GetHPAttribute()

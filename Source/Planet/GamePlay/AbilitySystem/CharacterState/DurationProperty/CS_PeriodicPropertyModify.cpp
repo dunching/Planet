@@ -14,7 +14,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "SceneProxyTable.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
@@ -256,7 +256,7 @@ void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGamepla
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 }
 
 void UCS_PeriodicPropertyModify::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)

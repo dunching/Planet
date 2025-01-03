@@ -13,4 +13,4 @@
 #include "HumanCharacter.h"
 #include "CharacterBase.h"
 #include "CollisionDataStruct.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"

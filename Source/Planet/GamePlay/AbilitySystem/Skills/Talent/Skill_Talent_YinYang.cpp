@@ -17,7 +17,7 @@
 #include "HumanCharacter.h"
 #include "TeamMatesHelperComponent.h"
 #include "SceneObjSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {
@@ -61,7 +61,7 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
+		AbilityActivatedCallbacksHandle = CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		// OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
@@ -93,7 +93,7 @@ void USkill_Talent_YinYang::OnRemoveAbility(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
+		CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -256,7 +256,7 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
@@ -279,7 +279,7 @@ void USkill_Talent_YinYang::OnSendDamage(UGameplayAbility* GAPtr)
 	{
 		if (
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
 			)
 		{
 			auto SendGaPtr = Cast<UGAEvent_Send>(GAPtr);

@@ -260,6 +260,8 @@ public:
 
 	static FGameplayTag GEData_CD;
 
+	static FGameplayTag GEData_Damage;
+
 	
 	static FGameplayTag GEData_ModifyType_BaseValue_Addtive;
 	

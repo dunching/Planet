@@ -49,6 +49,24 @@ struct PLANET_API FCharacterSocket
 	
 	void ResetSocket();
 	
+	bool operator==(const FCharacterSocket& Other) const
+	{
+		return Socket == Other.Socket && AllocationedProxyID == Other.AllocationedProxyID;
+	}
+
+	bool operator!=(const FCharacterSocket& Other) const
+	{
+		return !(*this == Other);
+	}
+
+	friend inline uint32 GetTypeHash( const FCharacterSocket& Key )
+	{
+		uint32 Hash = 0;
+		Hash = HashCombine(Hash, GetTypeHash(Key.Socket));
+		Hash = HashCombine(Hash, GetTypeHash(Key.AllocationedProxyID));
+		return Hash;
+	}
+
 	FGameplayTag Socket;
 
 	// 分配的物品ID

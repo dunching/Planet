@@ -74,6 +74,7 @@ public:
 
 	UPlanetGameplayAbility();
 
+	UFUNCTION(NetMulticast, Reliable)
 	void SetContinuePerform(bool bIsContinue);
 
 #if WITH_EDITOR
@@ -132,11 +133,15 @@ public:
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+	
 #endif
 
 	// 通过此函数修改GAS上记录的CDO的Tags
 	virtual	void InitalDefaultTags();
 
+	UFUNCTION(Server, Reliable)
+	void CancelAbility_Server();
+	
 protected:
 
 	virtual void SetContinuePerformImp(bool bIsContinue);

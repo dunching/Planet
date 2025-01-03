@@ -9,7 +9,7 @@
 
 #include "AssetRefMap.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GE_Common.h"
 #include "Planet_Tools.h"
@@ -58,7 +58,7 @@ void UBasicFutures_Running::IntervalTick(UAbilityTask_TimerHelper*, float Interv
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 		else
@@ -108,7 +108,7 @@ void UBasicFutures_Running::ActivateAbility(
 			// 	RunningSpeedOffset.GetCurrentValue()
 			// );
 			//
-			// CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(
+			// CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(
 			// 	ModifyPropertyMap,
 			// 	UGameplayTagsLibrary::State_Locomotion_Run
 			// );
@@ -144,7 +144,7 @@ void UBasicFutures_Running::EndAbility(
 			//
 			// ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
 			//
-			// CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(
+			// CharacterPtr->GetCharacterAbilitySystemComponent()->ClearData2Self(
 			// 	ModifyPropertyMap, 
 			// 	UGameplayTagsLibrary::State_Locomotion_Run
 			// );

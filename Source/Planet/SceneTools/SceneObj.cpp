@@ -27,11 +27,11 @@ ASceneObj::ASceneObj(const FObjectInitializer& ObjectInitializer) :
 
 UNetConnection* ASceneObj::GetNetConnection() const
 {
-	auto Controller = UGameplayStatics::GetPlayerController(GWorld, 0);
-	if (Controller)
-	{
-		return Controller->GetNetConnection();
-	}
+	// auto Controller = UGameplayStatics::GetPlayerController(GWorld, 0);
+	// if (Controller)
+	// {
+	// 	return Controller->GetNetConnection();
+	// }
 	return Super::GetNetConnection();
 }
 
@@ -45,7 +45,7 @@ void ASceneObj::BeginPlay()
 		auto Controller = UGameplayStatics::GetPlayerController(GWorld, 0);
 		if (Controller)
 		{
-			SetOwner(Controller);
+			// SetOwner(Controller);
 			// SetAutonomousProxy(true);
 		}
 	}

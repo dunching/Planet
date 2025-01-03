@@ -50,7 +50,7 @@ void USkill_Active_BYWD::PerformAction(
 	}
 #endif
 
-	if (CharacterPtr->GetLocalRole() > ROLE_SimulatedProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
 	{
 		{
 			auto TaskPtr = UAbilityTask_FlyAway::NewTask(

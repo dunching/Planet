@@ -17,7 +17,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -107,7 +107,7 @@ void UCS_PeriodicStateModify_Slow::EndAbility(
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -194,7 +194,7 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
 		}
@@ -235,7 +235,7 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 		}
 		break;
 	}

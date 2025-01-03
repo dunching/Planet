@@ -35,7 +35,7 @@
 #include "PlanetControllerInterface.h"
 #include "GameplayTagsLibrary.h"
 #include "StateProcessorComponent.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "ProxyProcessComponent.h"
 #include "CDCaculatorComponent.h"
 
@@ -60,8 +60,8 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	);
 	// CharacterAttributesComponentPtr->CharacterAttributeSetPtr = ;
 
-	AbilitySystemComponentPtr = CreateDefaultSubobject<UPlanetAbilitySystemComponent>(
-		UPlanetAbilitySystemComponent::ComponentName
+	AbilitySystemComponentPtr = CreateDefaultSubobject<UCharacterAbilitySystemComponent>(
+		UCharacterAbilitySystemComponent::ComponentName
 	);
 	AbilitySystemComponentPtr->SetIsReplicated(true);
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -75,7 +75,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(
 		UStateProcessorComponent::ComponentName);
 
-	BaseFeatureComponentPtr = CreateDefaultSubobject<UBaseFeatureComponent>(UBaseFeatureComponent::ComponentName);
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
 	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
 }
@@ -94,11 +93,11 @@ void ACharacterBase::BeginPlay()
 
 	// 绑定一些会影响到 Character行动的数据
 
-	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 		CharacterAttributeSetPtr->GetHPAttribute()
 		).AddUObject(this, &ThisClass::OnHPChanged);
 
-	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 		CharacterAttributeSetPtr->GetMoveSpeedAttribute()
 		).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
 #if UE_EDITOR || UE_SERVER
@@ -154,7 +153,7 @@ void ACharacterBase::PostInitializeComponents()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
-		GetAbilitySystemComponent()->InitAbilityActorInfo(this, this);
+		GetCharacterAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 	}
 }
 
@@ -249,9 +248,9 @@ UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent() const
 	return TalentAllocationComponentPtr;
 }
 
-UBaseFeatureComponent* ACharacterBase::GetBaseFeatureComponent() const
+UCharacterAbilitySystemComponent* ACharacterBase::GetCharacterAbilitySystemComponent() const
 {
-	return BaseFeatureComponentPtr;
+	return AbilitySystemComponentPtr;
 }
 
 UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const

@@ -14,7 +14,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "StateProcessorComponent.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "GAEvent_Helper.h"
@@ -28,7 +28,7 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 	if (CharacterPtr)
 	{
 		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetBaseFeatureComponent()->MakedDamageDelegate.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
+			CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
 	}
 }
 
@@ -226,7 +226,7 @@ void USkill_Passive_ZMJZ::ModifyCharacterData(
 
 	GameplayAbilityTargetDataPtr->DataAry.Add(GAEventData);
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 

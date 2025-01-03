@@ -3,6 +3,7 @@
 #include "HumanAnimInstance.h"
 
 #include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "GravityMovementComponent.h"
 #include "HorseCharacter.h"
@@ -63,7 +64,7 @@ bool UHumanAnimInstance::HasMatchingGameplayTag() const
 	{
 		return false;
 	}
-	return Character->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(TagToCheck);
+	return Character->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(TagToCheck);
 }
 
 bool UHumanAnimInstance::HasAnyMatchingGameplayTags() const
@@ -73,7 +74,7 @@ bool UHumanAnimInstance::HasAnyMatchingGameplayTags() const
 	{
 		return false;
 	}
-	return Character->GetAbilitySystemComponent()->K2_HasAnyMatchingGameplayTags(TagContainer);
+	return Character->GetCharacterAbilitySystemComponent()->K2_HasAnyMatchingGameplayTags(TagContainer);
 }
 
 UPlanetAbilitySystemComponent* UHumanAnimInstance::GetAbilitySystemComponent() const
@@ -83,7 +84,7 @@ UPlanetAbilitySystemComponent* UHumanAnimInstance::GetAbilitySystemComponent() c
 	{
 		return nullptr;
 	}
-	return Character->GetAbilitySystemComponent();
+	return Character->GetCharacterAbilitySystemComponent();
 }
 
 void UHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

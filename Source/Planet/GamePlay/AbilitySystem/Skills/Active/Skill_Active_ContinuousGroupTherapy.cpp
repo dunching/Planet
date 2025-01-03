@@ -27,7 +27,7 @@
 #include "PlanetControllerInterface.h"
 #include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GroupSharedInfo.h"
 #include "ItemProxy_Character.h"
 
@@ -165,7 +165,7 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
@@ -184,7 +184,7 @@ void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 		);
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 

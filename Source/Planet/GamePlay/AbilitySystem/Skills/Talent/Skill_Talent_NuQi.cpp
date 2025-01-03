@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 int32 FTalent_NuQi::GetCurrentValue() const
 {
@@ -55,7 +55,7 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
+		AbilityActivatedCallbacksHandle = CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		// OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
@@ -80,7 +80,7 @@ void USkill_Talent_NuQi::OnRemoveAbility(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
+		CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -213,7 +213,7 @@ void USkill_Talent_NuQi::StartFuryState()
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::AD, 50);
 
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
+		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
 	}
 }
 
@@ -223,7 +223,7 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
+		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
 	}
 
 	if (EffectItemPtr)
@@ -257,7 +257,7 @@ void USkill_Talent_NuQi::OnSendDamage(UGameplayAbility* GAPtr)
 	{
 		if (
 			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
+			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
 			)
 		{
 			AddNuQi();

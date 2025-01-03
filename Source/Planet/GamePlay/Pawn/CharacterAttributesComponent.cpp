@@ -7,7 +7,7 @@
 #include "GravityMovementComponent.h"
 #include "AssetRefMap.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GE_CharacterInitail.h"
 #include "CharacterAttibutes.h"
 #include "AS_Character.h"
@@ -45,7 +45,7 @@ const UAS_Character* UCharacterAttributesComponent::GetCharacterAttributes() con
 		return nullptr;
 	}
 
-	auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+	auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 	return Cast<const UAS_Character>(GASPtr->GetAttributeSet(UAS_Character::StaticClass()));
 }
@@ -59,8 +59,8 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	}
 
 	if (
-		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		CharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
 	}
@@ -95,7 +95,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 			// }
 			//
 			// if (
-			// 	CharacterPtr->GetBaseFeatureComponent()->IsInFighting()
+			// 	CharacterPtr->GetCharacterAbilitySystemComponent()->IsInFighting()
 			// 	)
 			// {
 			// }
@@ -107,9 +107,17 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
+}
+
+float UCharacterAttributesComponent::GetRate() const
+{
+	const auto GAPerformSpeed = GetCharacterAttributes()->GetPerformSpeed();
+	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
+
+	return Rate;
 }
 
 FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesComponent");
@@ -135,7 +143,7 @@ void UCharacterAttributesComponent::BeginPlay()
 			return;
 		}
 
-		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		// 初始化
 		{

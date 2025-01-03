@@ -3,7 +3,7 @@
 
 #include "SceneProxyTable.h"
 #include "CharacterBase.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttibutes.h"
 #include "GenerateType.h"
 #include "CharacterAttributesComponent.h"

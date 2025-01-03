@@ -18,7 +18,7 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
@@ -146,7 +146,7 @@ void UCS_RootMotion_TornadoTraction::PerformAction()
 		);
 
 		RootMotionTaskPtr->Ability = this;
-		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		RootMotionTaskPtr->OnFinish.BindUObject(this, &ThisClass::OnTaskComplete);
 

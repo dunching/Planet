@@ -1,4 +1,3 @@
-
 #include "HumanRegularProcessor.h"
 
 #include "DrawDebugHelpers.h"
@@ -65,7 +64,7 @@
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter_Player.h"
 #include "ResourceBox.h"
 #include "GroupSharedInfo.h"
@@ -104,8 +103,10 @@ namespace HumanProcessor
 		{
 			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
 
-			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback([this]() {
-				AddOrRemoveUseMenuItemEvent(true);
+			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
+				[this]()
+				{
+					AddOrRemoveUseMenuItemEvent(true);
 				});
 
 			AddOrRemoveUseMenuItemEvent(true);
@@ -140,13 +141,13 @@ namespace HumanProcessor
 
 		ISceneObjInteractionInterface* TempLookAtSceneObjPtr = nullptr;
 		if (OnwerActorPtr->GetWorld()->LineTraceSingleByChannel(
-			Result,
-			StartPt,
-			StopPt,
-			SceneObj_Channel,
-			Params
-		)
+				Result,
+				StartPt,
+				StopPt,
+				SceneObj_Channel,
+				Params
 			)
+		)
 		{
 #ifdef WITH_EDITOR
 			if (HumanRegularProcessor.GetValueOnGameThread())
@@ -227,13 +228,13 @@ namespace HumanProcessor
 			{
 				return;
 			}
-			
+
 			auto SkillIter = HandleKeysMap.Find(Params.Key);
 			if (SkillIter)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
-				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
+				OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 
 				OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(SkillIter->Socket);
 			}
@@ -244,10 +245,10 @@ namespace HumanProcessor
 				(Params.Key == EKeys::A) ||
 				(Params.Key == EKeys::S) ||
 				(Params.Key == EKeys::D)
-				)
+			)
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				OnwerActorPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
+				OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 			}
 		}
 		else
@@ -258,7 +259,7 @@ namespace HumanProcessor
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				if (
 					SkillIter->Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
-					)
+				)
 				{
 					OnwerActorPtr->GetProxyProcessComponent()->CancelAction(SkillIter->Socket);
 				}
@@ -271,7 +272,8 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kFollow);
+			OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+				ETeammateOption::kFollow);
 		}
 	}
 
@@ -280,7 +282,8 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kAssistance);
+			OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+				ETeammateOption::kAssistance);
 		}
 	}
 
@@ -301,7 +304,6 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::EKeyReleased()
 	{
-
 	}
 
 	void FHumanRegularProcessor::QKeyPressed()
@@ -351,7 +353,8 @@ namespace HumanProcessor
 			Params.AddIgnoredActor(OnwerActorPtr);
 
 			FHitResult OutHit;
-			if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+			if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
+			                                               ObjectQueryParams, Params))
 			{
 				if (PCPtr->GetFocusActor() == OutHit.GetActor())
 				{
@@ -433,12 +436,12 @@ namespace HumanProcessor
 		Params.bTraceComplex = false;
 
 		if (OnwerActorPtr->GetWorld()->LineTraceSingleByObjectType(
-			Result,
-			StartPt,
-			StopPt,
-			ObjectQueryParams,
-			Params)
-			)
+				Result,
+				StartPt,
+				StopPt,
+				ObjectQueryParams,
+				Params)
+		)
 		{
 #ifdef WITH_EDITOR
 			if (HumanRegularProcessor.GetValueOnGameThread())
@@ -470,11 +473,11 @@ namespace HumanProcessor
 		{
 			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 			if (OnwerActorPtr)
-			{ 
+			{
 				const auto CanbeActivedInfoAry = OnwerActorPtr->GetProxyProcessComponent()->GetCanbeActiveSocket();
 				for (const auto& Iter : CanbeActivedInfoAry)
 				{
-					HandleKeysMap.Add(Iter.Key, Iter.Value);
+					HandleKeysMap.Add(Iter.Value, Iter.Key);
 				}
 			}
 		}
@@ -485,7 +488,7 @@ namespace HumanProcessor
 		IncreaseAsyncTaskNum();
 		ON_SCOPE_EXIT
 		{
-		ReduceAsyncTaskNum();
+			ReduceAsyncTaskNum();
 		};
 	}
 }

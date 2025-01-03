@@ -7,7 +7,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
@@ -87,7 +87,7 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
@@ -97,7 +97,7 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}

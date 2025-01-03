@@ -48,6 +48,12 @@ public:
 		FGameplayAbilitySpec& Spec, const UGameplayAbility* Ability
 	)override;
 
+	virtual FActiveGameplayEffectHandle ApplyGameplayEffectSpecToTarget(
+		const FGameplayEffectSpec& GameplayEffect,
+		UAbilitySystemComponent *Target,
+		FPredictionKey PredictionKey=FPredictionKey()
+		)override;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void CurrentMontageStopImp(float OverrideBlendOutTime);
 	

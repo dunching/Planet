@@ -7,7 +7,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
@@ -124,7 +124,7 @@ void USkill_Active_Traction::PlayMontage()
 	);
 
 	TaskPtr->Ability = this;
-	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 	TaskPtr->ReadyForActivation();
 }

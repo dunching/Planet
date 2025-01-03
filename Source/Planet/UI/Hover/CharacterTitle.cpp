@@ -9,6 +9,7 @@
 #include <GameplayTagsManager.h>
 
 #include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Border.h"
 
@@ -50,14 +51,14 @@ void UCharacterTitle::NativeConstruct()
 		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
 
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent(); 
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent(); 
 			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
 		}
 		
 		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		auto AbilitySystemComponentPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		{
-			CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 				CharacterAttributeSetPtr->GetHPAttribute()
 				).AddUObject(this, &ThisClass::OnHPChanged);
 
@@ -68,7 +69,7 @@ void UCharacterTitle::NativeConstruct()
 			SetHPChanged(CharacterAttributeSetPtr->GetHP(), CharacterAttributeSetPtr->GetMax_HP());
 		}
 		{
-			CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 				CharacterAttributeSetPtr->GetPPAttribute()
 				).AddUObject(this, &ThisClass::OnPPChanged);
 
@@ -79,7 +80,7 @@ void UCharacterTitle::NativeConstruct()
 			SetPPChanged(CharacterAttributeSetPtr->GetPP(), CharacterAttributeSetPtr->GetMax_PP());
 		}
 		{
-			CharacterPtr->GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 				CharacterAttributeSetPtr->GetShieldAttribute()
 				).AddUObject(this, &ThisClass::OnShieldChanged);
 
@@ -122,7 +123,7 @@ void UCharacterTitle::NativeDestruct()
 	if (CharacterPtr)
 	{
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
 		}
 	}

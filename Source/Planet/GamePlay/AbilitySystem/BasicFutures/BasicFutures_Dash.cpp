@@ -15,7 +15,7 @@
 #include "GameplayTagsLibrary.h"
 #include "ProxyProcessComponent.h"
 
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Planet_Tools.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(
@@ -136,7 +136,7 @@ bool UBasicFutures_Dash::CommitAbility(
 		//
 		// GAEventDataPtr->DataAry.Add(GAEventData);
 		//
-		// auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		// auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		// ICPtr->SendEventImp(GAEventDataPtr);
 
 		if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
@@ -304,8 +304,8 @@ void UBasicFutures_Dash::DoDash(
 void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 	)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -316,7 +316,7 @@ void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}
@@ -325,8 +325,8 @@ void UBasicFutures_Dash::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 void UBasicFutures_Dash::Displacement(const FVector& Direction)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 	)
 	{
 		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
@@ -345,7 +345,7 @@ void UBasicFutures_Dash::Displacement(const FVector& Direction)
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}

@@ -4,13 +4,15 @@
 #include <set>
 
 #include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
 #include "Components/ActorComponent.h"
 
 #include "ProxyProcessComponent.h"
 #include "GAEvent_Helper.h"
 #include "GroupSharedInterface.h"
+#include "PlanetAbilitySystemComponent.h"
 
-#include "BaseFeatureComponent.generated.h"
+#include "CharacterAbilitySystemComponent.generated.h"
 
 struct FGameplayAttributeData;
 
@@ -22,6 +24,7 @@ class UCS_Base;
 class UCS_RootMotion_KnockDown;
 class USkill_Element_Gold;
 class UBasicFuturesBase;
+class UAbilitySystemComponent;
 
 struct FGameplayEventData;
 struct FGameplayAbilityTargetData_CS_Base;
@@ -37,8 +40,8 @@ struct FGameplayEffectCustomExecutionOutput;
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
 UCLASS()
-class PLANET_API UBaseFeatureComponent :
-	public UActorComponent,
+class PLANET_API UCharacterAbilitySystemComponent :
+	public UPlanetAbilitySystemComponent,
 	public IGroupSharedInterface
 {
 	GENERATED_BODY()
@@ -52,7 +55,7 @@ public:
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
 
-	static FName ComponentName;
+	virtual void BeginPlay()override;
 
 	bool IsInDeath() const;
 
@@ -65,6 +68,11 @@ public:
 	bool IsInFighting() const;
 
 	void OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData);
+
+	void OnSendEventModifyData(
+		UAbilitySystemComponent*AbilitySystemComponentPtr,
+		FGameplayEffectSpecHandle GameplayEffectSpecHandle
+	);
 
 	void OnReceivedEventModifyData(
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
@@ -174,7 +182,20 @@ public:
 	FMakedDamageDelegate MakedDamageDelegate;
 
 protected:
+	
 	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+
+	void OnGEAppliedDelegateToTarget(
+		UAbilitySystemComponent*,
+		const FGameplayEffectSpec&,
+		FActiveGameplayEffectHandle
+		);
+
+	void OnActiveGEAddedDelegateToSelf(
+		UAbilitySystemComponent*,
+		const FGameplayEffectSpec&,
+		FActiveGameplayEffectHandle
+		);
 
 	void AddSendBaseModify();
 
@@ -214,4 +235,5 @@ protected:
 
 	// GameplayAttributeData的组成
 	TMap<const FGameplayAttributeData*, TMap<FGameplayTag, float>> ValueMap;
+	
 };

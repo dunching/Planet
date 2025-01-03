@@ -30,7 +30,7 @@
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CS_RootMotion_TornadoTraction.h"
 
 USkill_Active_Tornado::USkill_Active_Tornado() :
@@ -150,7 +150,7 @@ void USkill_Active_Tornado::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 
@@ -221,7 +221,7 @@ void USkill_Active_Tornado::OnOverlap(AActor* OtherActor)
 			return;
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		// 控制效果
 		{

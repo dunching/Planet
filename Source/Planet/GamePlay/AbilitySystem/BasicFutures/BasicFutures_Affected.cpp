@@ -5,6 +5,7 @@
 #include "AbilityTask_PlayMontage.h"
 #include "GameplayTagsLibrary.h"
 #include "AbilityTask_ARM_ConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
 
 UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
 {
@@ -142,8 +143,8 @@ void UBasicFutures_Affected::PerformAction()
 void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -154,7 +155,7 @@ void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
@@ -166,8 +167,8 @@ void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate
 void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		const auto Duration = CurMontagePtr->CalculateSequenceLength();
@@ -192,7 +193,7 @@ void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}

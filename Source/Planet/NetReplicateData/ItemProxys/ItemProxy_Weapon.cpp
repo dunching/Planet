@@ -13,7 +13,7 @@
 #include "PropertyEntrys.h"
 #include "Weapon_Base.h"
 #include "HoldingItemsComponent.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "ItemProxy_Minimal.h"
 
 TSharedPtr<FWeaponSkillProxy> FWeaponProxy::GetWeaponSkill()
@@ -94,7 +94,7 @@ void FWeaponProxy::Allocation()
 	auto ProxyCharacterPtr = GetOwnerCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-//		GetWeaponSkill()->Allocation();
+		GetWeaponSkill()->Allocation();
 	}
 #endif
 }
@@ -105,7 +105,7 @@ void FWeaponProxy::UnAllocation()
 	auto ProxyCharacterPtr = GetOwnerCharacter();
 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-//		GetWeaponSkill()->UnAllocation();
+		GetWeaponSkill()->UnAllocation();
 	}
 #endif
 	Super::UnAllocation();
@@ -151,7 +151,7 @@ void FWeaponProxy::ActiveWeapon()
 				}
 
 				auto AllocationCharacter = GetAllocationCharacter();
-				AllocationCharacter->GetBaseFeatureComponent()->SendEvent2Self(
+				AllocationCharacter->GetCharacterAbilitySystemComponent()->SendEvent2Self(
 					ModifyPropertyMap, GetProxyType()
 				);
 			}
@@ -192,7 +192,7 @@ void FWeaponProxy::RetractputWeapon()
 			auto AllocationCharacter = GetAllocationCharacter();
 			if (AllocationCharacter->GetNetMode() == NM_DedicatedServer)
 			{
-				AllocationCharacter->GetBaseFeatureComponent()->ClearData2Self(GetAllData(), GetProxyType());
+				AllocationCharacter->GetCharacterAbilitySystemComponent()->ClearData2Self(GetAllData(), GetProxyType());
 			}
 		}
 #endif
