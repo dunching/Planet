@@ -23,6 +23,8 @@ USTRUCT(BlueprintType)
 struct PLANET_API FMyGameplayAttributeData : public FGameplayAttributeData
 {
 	GENERATED_USTRUCT_BODY()
+	
+	virtual void SetBaseValue(float NewValue)override;
 
 };
 
@@ -146,10 +148,13 @@ public:
 	ATTRIBUTE_ACCESSORS(UAS_Character, Evade);
 	
 	// 攻击速度、技能释放速度
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UPROPERTY(ReplicatedUsing = OnRep_PerformSpeed, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData PerformSpeed;
 	ATTRIBUTE_ACCESSORS(UAS_Character, PerformSpeed);
 	
+	UFUNCTION()
+	virtual void OnRep_PerformSpeed(const FMyGameplayAttributeData& OldHealth);
+
 	// 当前护盾值
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData Shield;

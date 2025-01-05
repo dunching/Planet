@@ -163,6 +163,41 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 	}
 }
 
+ void UPlanetAbilitySystemComponent::ReplicatePerformAction_Server_Implementation(
+	FGameplayAbilitySpecHandle Handle, FGameplayAbilityActivationInfo ActivationInfo
+	)
+{
+	ReplicatePerformAction(Handle, ActivationInfo);
+}
+
+void UPlanetAbilitySystemComponent::ReplicatePerformAction_Implementation(
+	FGameplayAbilitySpecHandle Handle,
+	FGameplayAbilityActivationInfo ActivationInfo
+	)
+{
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
+	if (AbilitySpec && AbilitySpec->Ability)
+	{
+		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
+		{
+		}
+		else
+		{
+			TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
+
+			for (auto Instance : Instances)
+			{
+				Cast<USkill_Base>(Instance)->PerformAction(
+					Handle,
+					Instance->GetCurrentActorInfo(),
+					Instance->GetCurrentActivationInfo(),
+					nullptr
+					);
+			}
+		}
+	}
+}
+
 bool UPlanetAbilitySystemComponent::K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const
 {
 	return HasMatchingGameplayTag(TagToCheck);

@@ -7,6 +7,11 @@
 
 #include "GameplayTagsLibrary.h"
 
+void FMyGameplayAttributeData::SetBaseValue(float NewValue)
+{
+	FGameplayAttributeData::SetBaseValue(NewValue);
+}
+
 void UAS_Character::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
@@ -52,7 +57,7 @@ void UAS_Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION(ThisClass, CriticalDamage, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, HitRate, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, Evade, COND_None);
-	DOREPLIFETIME_CONDITION(ThisClass, PerformSpeed, COND_None);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, PerformSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION(ThisClass, Shield, COND_None);
 }
 
@@ -84,4 +89,10 @@ void UAS_Character::OnRep_MoveSpeed(const FMyGameplayAttributeData& OldHealth)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MoveSpeed, OldHealth);
+}
+
+void UAS_Character::OnRep_PerformSpeed(const FMyGameplayAttributeData& OldHealth)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PerformSpeed, OldHealth);
 }

@@ -125,14 +125,22 @@ void USkill_WeaponActive_PickAxe::StartTasksLink()
 
 void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+#if UE_EDITOR || UE_CLIENT
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
 		if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
 		{
-			CheckInContinue();
+			CheckInContinue(-1.f);
 		}
-		else if (NotifyName == Skill_WeaponActive_PickAxe::Hit)
+	}
+#endif
+	
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	{
+		if (NotifyName == Skill_WeaponActive_PickAxe::Hit)
 		{
 			MakeDamage();
 		}
@@ -140,16 +148,32 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 #endif
 }
 
-void USkill_WeaponActive_PickAxe::OnMontateComplete()
+void USkill_WeaponActive_PickAxe::OnMontageComplete()
 {
 #if UE_EDITOR || UE_SERVER
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		// if ((MontageNum <= 0) && (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy))
+		// 确认是不在输入，而不是再次输入
+		if (!bIsContinue)
 		{
-			CancelAbility_Server();
+		}
+		K2_CancelAbility();
+	}
+#endif
+}
+
+void USkill_WeaponActive_PickAxe::OnMontageOnInterrupted()
+{
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		// 确认是不在输入，而不是再次输入
+		if (!bIsContinue)
+		{
 		}
 	}
 #endif
@@ -270,8 +294,8 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
 			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
-			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
-			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
+			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
+			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageOnInterrupted);
 
 			AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
@@ -288,8 +312,8 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 
 			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
 			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
-			AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
-			AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
+			// AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
+			// AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 
 			AbilityTask_PlayMontage_PickAxePtr->ReadyForActivation();
 		}

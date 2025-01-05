@@ -44,6 +44,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveSpeed")
 	int32 MaxMoveSpeed = 1000;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveSpeed")
+	int32 MaxPerformSpeed = 300;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TMap<FGameplayTag, FKey>ActionKeyMap;
 

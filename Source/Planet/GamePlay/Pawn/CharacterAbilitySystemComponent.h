@@ -227,7 +227,7 @@ protected:
 
 #pragma region GAs
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilities;
+	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilitiesAry;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
 	TSubclassOf<USkill_Element_Gold> Skill_Element_GoldClass;

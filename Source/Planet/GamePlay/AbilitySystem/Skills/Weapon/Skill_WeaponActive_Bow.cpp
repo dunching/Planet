@@ -145,7 +145,7 @@ void USkill_WeaponActive_Bow::PerformAction(
 	StartTasksLink();
 }
 
-void USkill_WeaponActive_Bow::CheckInContinue()
+void USkill_WeaponActive_Bow::CheckInContinue(float InWaitInputTime)
 {
 	if (bIsContinue)
 	{
@@ -213,7 +213,7 @@ void USkill_WeaponActive_Bow::OnMontateComplete()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
-		CheckInContinue();
+		CheckInContinue(-1.f);
 	}
 }
 

@@ -108,6 +108,13 @@ public:
 
 	virtual void UpdateRegisterParam(const FGameplayEventData& GameplayEventData);
 
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
+
 protected:
 	virtual void ResetPreviousStageActions();
 

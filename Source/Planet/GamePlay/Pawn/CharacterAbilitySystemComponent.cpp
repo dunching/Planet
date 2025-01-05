@@ -443,13 +443,13 @@ void UCharacterAbilitySystemComponent::InitialBaseGAs()
 		{
 			auto GASPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 
-			SendEventHandle = GASPtr->GiveAbility(
-				FGameplayAbilitySpec(UGAEvent_Send::StaticClass(), 1)
-			);
-
-			ReceivedEventHandle = GASPtr->GiveAbility(
-				FGameplayAbilitySpec(UGAEvent_Received::StaticClass(), 1)
-			);
+			// SendEventHandle = GASPtr->GiveAbility(
+			// 	FGameplayAbilitySpec(UGAEvent_Send::StaticClass(), 1)
+			// );
+			//
+			// ReceivedEventHandle = GASPtr->GiveAbility(
+			// 	FGameplayAbilitySpec(UGAEvent_Received::StaticClass(), 1)
+			// );
 
 			// 五行技能
 			// GASPtr->GiveAbility(
@@ -461,15 +461,14 @@ void UCharacterAbilitySystemComponent::InitialBaseGAs()
 			// 			MoveToAttaclAreaHandle = GASPtr->GiveAbility(
 			// 				FGameplayAbilitySpec(UBasicFutures_MoveToAttaclArea::StaticClass(), 1)
 			// 			);
-
-			for (auto Iter : CharacterAbilities)
-			{
-				GASPtr->GiveAbility(
-					FGameplayAbilitySpec(Iter, 1)
-				);
-			}
 		}
 
+		for (auto Iter : CharacterAbilitiesAry)
+		{
+			GiveAbility(
+				FGameplayAbilitySpec(Iter, 1)
+			);
+		}
 #pragma region 结算效果修正
 		// 输出
 
@@ -1330,6 +1329,20 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 				);
 			}
 		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
+		{
+			for (const auto& Iter : SetByCallerTagMagnitudes)
+			{
+				UpdateMap(
+					Iter.Key,
+					Iter.Value,
+					0.f,
+					UGameOptions::GetInstance()->MaxPerformSpeed,
+					Spec,
+					UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet)
+				);
+			}
+		}
 	}
 
 	// 根据自身的效果对【输入】进行一些修正
@@ -1417,6 +1430,16 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 					UAS_Character::GetMoveSpeedAttribute(),
 					EGameplayModOp::Override,
 					GetMapValue(Spec, UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet))
+				)
+			);
+		}
+		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
+		{
+			OutExecutionOutput.AddOutputModifier(
+				FGameplayModifierEvaluatedData(
+					UAS_Character::GetPerformSpeedAttribute(),
+					EGameplayModOp::Override,
+					GetMapValue(Spec, UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet))
 				)
 			);
 		}

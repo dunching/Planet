@@ -113,8 +113,8 @@ protected:
 
 	void StopContinueActive();
 
-	// UFUNCTION(NetMulticast, Reliable)
-	virtual void CheckInContinue();
+	// < 0 则为不限时间，在显式结束前就可以再次输入
+	virtual void CheckInContinue(float InWaitInputTime);
 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
@@ -123,15 +123,12 @@ protected:
 
 	bool bIsContinue = true;
 
-	// < 0 则为不限时间，在显式结束前就可以再次输入
-	float CurrentWaitInputTime = 1.f;
-
-	float WaitInputPercent = 1.f;
-
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 	TSharedPtr<FActiveParamType> ActiveParamSPtr = nullptr;
 
 private:
+
+	float WaitInputPercent = 1.f;
 
 };

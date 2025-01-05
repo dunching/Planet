@@ -61,7 +61,10 @@ protected:
 	void OnNotifyBeginReceived(FName NotifyName);
 
 	UFUNCTION()
-	void OnMontateComplete();
+	void OnMontageComplete();
+
+	UFUNCTION()
+	void OnMontageOnInterrupted();
 
 	void MakeDamage();
 

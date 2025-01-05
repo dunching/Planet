@@ -99,6 +99,13 @@ void USkill_Talent_YinYang::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
+void USkill_Talent_YinYang::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
 void USkill_Talent_YinYang::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -132,22 +139,12 @@ void USkill_Talent_YinYang::Tick(float DeltaTime)
 		{
 			Tick_Buff_Accumulate = 0.f;
 
-			PerformAction();
+			// PerformAction();
 		}
 	}
 	if (EffectItemPtr)
 	{
 	}
-}
-
-void USkill_Talent_YinYang::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void USkill_Talent_YinYang::AddValue(int32 Value)
@@ -199,7 +196,12 @@ void USkill_Talent_YinYang::AddValue(int32 Value)
 	}
 }
 
-void USkill_Talent_YinYang::PerformAction()
+void USkill_Talent_YinYang::PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+		)
 {
 	switch (TalentSPtr->CurentType)
 	{

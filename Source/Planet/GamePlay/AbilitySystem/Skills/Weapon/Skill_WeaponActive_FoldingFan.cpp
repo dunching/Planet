@@ -188,7 +188,7 @@ void USkill_WeaponActive_FoldingFan::UpdateRegisterParam(const FGameplayEventDat
 #endif
 }
 
-void USkill_WeaponActive_FoldingFan::CheckInContinue()
+void USkill_WeaponActive_FoldingFan::CheckInContinue(float InWaitInputTime)
 {
 	if (
 		bIsContinue && 
@@ -320,7 +320,7 @@ void USkill_WeaponActive_FoldingFan::OnMotionComplete()
 
 	if (bIsContinue)
 	{
-		CheckInContinue();
+		CheckInContinue(-1.f);
 	}
 	else
 	{

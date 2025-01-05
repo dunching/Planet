@@ -208,7 +208,7 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 		}
 #endif
 
-		CheckInContinue();
+		CheckInContinue(-1.f);
 	}
 }
 

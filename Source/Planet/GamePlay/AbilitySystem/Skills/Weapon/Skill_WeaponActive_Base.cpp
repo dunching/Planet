@@ -172,12 +172,14 @@ void USkill_WeaponActive_Base::StopContinueActive()
 	bIsContinue = false;
 }
 
-void USkill_WeaponActive_Base::CheckInContinue//_Implementation
-()
+void USkill_WeaponActive_Base::CheckInContinue(float InWaitInputTime)
 {
 	if (bIsContinue && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
 	{
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+		Cast<UPlanetAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo())->ReplicatePerformAction_Server(
+			GetCurrentAbilitySpecHandle(),
+			GetCurrentActivationInfo()
+			);
 	}
 	else
 	{
@@ -188,9 +190,9 @@ void USkill_WeaponActive_Base::CheckInContinue//_Implementation
 
 			WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 
-			if (CurrentWaitInputTime > 0.f)
+			if (InWaitInputTime > 0.f)
 			{
-				WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
+				WaitInputTaskPtr->SetDuration(InWaitInputTime, 0.1f);
 				WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
 				WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
 					CancelAbility_Server();

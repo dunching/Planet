@@ -246,3 +246,12 @@ ACharacterBase* USkill_Base::GetTargetInDistance(int32 Distance) const
 {
 	return nullptr;
 }
+
+void USkill_Base::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+	)
+{
+}

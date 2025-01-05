@@ -64,7 +64,12 @@ public:
 
 protected:
 
-	void PerformAction();
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	)override;
 
 	void OnSendAttack(const TMap<FGameplayTag, float>&);
 

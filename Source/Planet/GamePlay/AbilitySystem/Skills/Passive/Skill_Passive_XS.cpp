@@ -113,7 +113,12 @@ void USkill_Passive_XS::RemoveShield()
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
-void USkill_Passive_XS::PerformAction()
+void USkill_Passive_XS::PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+		)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)

@@ -56,16 +56,14 @@ UPlanetGameplayAbility::UPlanetGameplayAbility() :
 
 void UPlanetGameplayAbility::SetContinuePerform_Implementation(bool bIsContinue)
 {
-	// if (CurrentActorInfo && CurrentActorInfo->AbilitySystemComponent.IsValid())
-	// {
-	// 	Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->ReplicateContinues(
-	// 		CurrentSpecHandle, 
-	// 		CurrentActivationInfo, 
-	// 		bIsContinue
-	// 	);
-	// }
-
-	SetContinuePerformImp(bIsContinue);
+	if (CurrentActorInfo && CurrentActorInfo->AbilitySystemComponent.IsValid())
+	{
+		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->ReplicateContinues(
+			CurrentSpecHandle, 
+			CurrentActivationInfo, 
+			bIsContinue
+		);
+	}
 }
 
 #if WITH_EDITOR
@@ -154,6 +152,7 @@ void UPlanetGameplayAbility::OnGameplayTaskDeactivated(UGameplayTask& Task)
 {
 	Super::OnGameplayTaskDeactivated(Task);
 }
+
 #endif
 
 void UPlanetGameplayAbility::SetContinuePerformImp(bool bIsContinue)

@@ -74,7 +74,7 @@ public:
 
 	UPlanetGameplayAbility();
 
-	UFUNCTION(NetMulticast, Reliable)
+	UFUNCTION(Server, Reliable)
 	void SetContinuePerform(bool bIsContinue);
 
 #if WITH_EDITOR

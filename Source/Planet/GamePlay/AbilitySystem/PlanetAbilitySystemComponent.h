@@ -27,6 +27,10 @@ public:
 	
 };
 
+/*
+ *	在GA里面使用RPC的NetMulticast蓝图会有警告，所以我们在这里转发一下
+ * 
+ */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UPlanetAbilitySystemComponent : public UAbilitySystemComponent
 {
@@ -64,11 +68,24 @@ public:
 	UFUNCTION(Client, Reliable)
 	void RemoveLooseGameplayTag_2_Client(const FGameplayTag& GameplayTag);
 
+	// 仅 ROLE_AutonomousProxy
 	UFUNCTION(Client, Reliable)
 	void ReplicateContinues(
 		FGameplayAbilitySpecHandle Handle,
 		FGameplayAbilityActivationInfo ActivationInfo,
 		bool bIsContinue
+	);
+
+	UFUNCTION(Server, Reliable)
+	void ReplicatePerformAction_Server(
+		FGameplayAbilitySpecHandle Handle,
+		FGameplayAbilityActivationInfo ActivationInfo
+	);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReplicatePerformAction(
+		FGameplayAbilitySpecHandle Handle,
+		FGameplayAbilityActivationInfo ActivationInfo
 	);
 
 	UFUNCTION(NetMulticast, Reliable)

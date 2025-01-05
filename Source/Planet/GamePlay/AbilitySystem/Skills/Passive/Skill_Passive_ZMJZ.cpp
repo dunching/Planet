@@ -86,8 +86,14 @@ void USkill_Passive_ZMJZ::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Passive_ZMJZ::PerformAction()
+void USkill_Passive_ZMJZ::PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+		)
 {
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
@@ -142,7 +148,7 @@ void USkill_Passive_ZMJZ::OnSendAttack(const TMap<FGameplayTag, float>&)
 {
 	if (CharacterPtr)
 	{
-		PerformAction();
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 	}
 }
 
@@ -181,7 +187,7 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		if (NewStackCount > PreviousStackCount)
+		auto UpdateGELmbda = [this,NewStackCount]
 		{
 			FGameplayEffectSpecHandle SpecHandle =
 				MakeOutgoingGameplayEffectSpec(GE_ZMJZImpClass, GetAbilityLevel());
@@ -192,14 +198,19 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 
 			const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
 			                                                     GetCurrentActivationInfo(), SpecHandle);
+		};
+		if (NewStackCount > PreviousStackCount)
+		{
+			UpdateGELmbda();
 		}
 		else if (NewStackCount == PreviousStackCount)
-		{}
+		{
+		}
 		else
 		{
 			if (NewStackCount > 0)
 			{
-				//
+				// 当地一层小时候更新后续的消失时间
 				FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([this](auto)
 				{
 					FGameplayEffectSpecHandle SpecHandle =
@@ -215,6 +226,12 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 
 					return false;
 				}), 0);
+
+				// 
+				UpdateGELmbda();
+			}
+			else
+			{
 			}
 		}
 	}
@@ -224,8 +241,18 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 void USkill_Passive_ZMJZ::OnGameplayEffectRemoved_InfoDelegate(const FGameplayEffectRemovalInfo&)
 {
 #if UE_EDITOR || UE_SERVER
-	// if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)                                                                                                                                                                                                                                                                                                     itySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
-	// {
-	// }
+
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(GE_ZMJZImpClass, GetAbilityLevel());
+
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(SkillProxyPtr->GetProxyType(), 0);
+
+		const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
+		                                                     GetCurrentActivationInfo(), SpecHandle);
+	}
 #endif
 }
