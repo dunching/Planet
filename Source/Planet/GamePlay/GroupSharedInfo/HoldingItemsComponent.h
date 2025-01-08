@@ -158,6 +158,7 @@ public:
 	FOnWeaponProxyChanged OnWeaponProxyChanged;
 
 protected:
+	
 	virtual void InitializeComponent() override;
 
 	virtual void BeginPlay() override;
@@ -168,6 +169,7 @@ protected:
 	void OnRep_GetCharacterProxyID();
 
 private:
+	
 	UFUNCTION(Server, Reliable)
 	void UpdateSocket_Server(const FGuid& CharacterProxyID, const FCharacterSocket& Socket);
 
@@ -179,6 +181,9 @@ private:
 		const FGameplayTag& InSocketTag
 	);
 
+	// 默认的，表示Character自身的Proxy
+	TSharedPtr<FCharacterProxy> CharacterProxySPtr = nullptr;
+	
 	// 等待加入“库存”的物品
 	TMap<FGuid, TMap<FGameplayTag, int32>> PendingMap;
 
@@ -189,6 +194,4 @@ private:
 
 	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinProxyMap;
 
-	// 默认的，表示Character自身的Proxy
-	TSharedPtr<FCharacterProxy> CharacterProxySPtr = nullptr;
 };

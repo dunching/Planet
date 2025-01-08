@@ -1,32 +1,20 @@
 
 #include "PlanetAIController.h"
 
-#include <GameFramework/CharacterMovementComponent.h>
 #include "Components/StateTreeComponent.h"
-#include "Components/StateTreeAIComponent.h"
 #include <Perception/AIPerceptionComponent.h>
-#include <Kismet/GameplayStatics.h>
 #include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
-#include "CharacterTitle.h"
 #include "CharacterBase.h"
-#include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "Planet.h"
 #include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
-#include "HoldingItemsComponent.h"
-#include "PlanetPlayerController.h"
-#include "TestCommand.h"
 #include "GameplayTagsLibrary.h"
-#include "CharacterAttributesComponent.h"
-#include "CharacterAttibutes.h"
-#include "TalentAllocationComponent.h"
-#include "ItemProxy_Container.h"
-#include "GameMode_Main.h"
 #include "KismetGravityLibrary.h"
 #include "GroupSharedInfo.h"
+#include "LogWriter.h"
 
 APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -57,13 +45,23 @@ UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() 
 	return GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
 }
 
-AGroupSharedInfo* APlanetAIController::GetGroupSharedInfo() const
+void APlanetAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	return GetPawn<FPawnType>()->GetGroupSharedInfo();
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
 }
 
-void APlanetAIController::SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr)
+AGroupSharedInfo* APlanetAIController::GetGroupSharedInfo() const
 {
+	return GroupSharedInfoPtr;
+}
+
+void APlanetAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+{
+	GroupSharedInfoPtr = InGroupSharedInfoPtr;
+
+	OnGroupSharedInfoReady(GroupSharedInfoPtr);
 }
 
 UHoldingItemsComponent* APlanetAIController::GetHoldingItemsComponent() const
@@ -96,9 +94,51 @@ void APlanetAIController::BeginPlay()
 	Super::BeginPlay();
 }
 
+void APlanetAIController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	//
+	InitialGroupSharedInfo();
+}
+
 void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
+}
+
+void APlanetAIController::InitialGroupSharedInfo()
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		if (GetInstigator()->GetParentActor())
+		{
+		}
+		// 如果这个Character是单独的，则直接生成 
+		else
+		{
+			FActorSpawnParameters SpawnParameters;
+
+			SpawnParameters.Owner = this;
+			SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
+			{
+				PRINTINVOKEINFO();
+				auto GroupSharedInfoPtr = Cast<AGroupSharedInfo>(ActorPtr);
+				if (GroupSharedInfoPtr)
+				{
+					GroupSharedInfoPtr->GroupID = FGuid::NewGuid();
+				}
+			};
+
+			GroupSharedInfoPtr = GetWorld()->SpawnActor<AGroupSharedInfo>(
+				AGroupSharedInfo::StaticClass(), SpawnParameters
+			);
+
+			OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		}
+	}
+#endif
 }
 
 TWeakObjectPtr<ACharacterBase> APlanetAIController::GetTeamFocusTarget() const
@@ -127,6 +167,23 @@ void APlanetAIController::BindPCWithCharacter()
 TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterProxy(ACharacterBase* CharaterPtr)
 {
 	return CharaterPtr->GetCharacterProxy();
+}
+
+void APlanetAIController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
+	{
+		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		if (GroupSharedInterfacePtr)
+		{
+			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		}
+	});
+}
+
+void APlanetAIController::OnRep_GroupSharedInfoChanged()
+{
+	OnGroupSharedInfoReady(GroupSharedInfoPtr);
 }
 
 void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)

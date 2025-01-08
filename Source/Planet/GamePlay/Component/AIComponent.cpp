@@ -3,9 +3,18 @@
 
 #include "GeneratorColony.h"
 #include "CharacterBase.h"
+
+#include "Net/UnrealNetwork.h"
+
 #include "HumanAIController.h"
 
-void UNPCComponent::BeginPlay()
+UAIComponent::UAIComponent(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
+{
+	SetIsReplicatedByDefault(true);
+}
+
+void UAIComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -40,3 +49,5 @@ void UNPCComponent::BeginPlay()
 
 	OwnerPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
+
+FName UAIComponent::ComponentName = TEXT("AIComponent");

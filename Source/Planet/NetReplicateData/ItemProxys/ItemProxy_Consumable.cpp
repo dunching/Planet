@@ -8,7 +8,7 @@
 #include "Weapon_Base.h"
 #include "Skill_Consumable_Generic.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "CDcaculatorComponent.h"
+#include "ConversationComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
 #include "Planet_Tools.h"
@@ -228,9 +228,9 @@ void FConsumableProxy::FreshUniqueCooldownTime()
 
 void FConsumableProxy::ApplyCooldown()
 {
-	GetAllocationCharacter()->GetCDCaculatorComponent()->ApplyCooldown(
-		this
-	);
+	// GetAllocationCharacter()->GetConversationComponent()->ApplyCooldown(
+	// 	this
+	// );
 }
 
 void FConsumableProxy::OffsetCooldownTime()

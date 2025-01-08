@@ -19,7 +19,7 @@ class UAITask_SwitchWalkState;
 class AHumanCharacter;
 class AHumanAIController;
 class UGloabVariable;
-class USTE_Human;
+class USTE_AICharacterController;
 
 USTRUCT()
 struct PLANET_API FStateTreeUpdateQueryDistanceTaskInstanceData

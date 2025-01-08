@@ -32,7 +32,7 @@ void UCharacterAttributesComponent::TickComponent(
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		ProcessCharacterAttributes();
+		// ProcessCharacterAttributes();
 	}
 #endif
 }

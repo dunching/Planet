@@ -9,7 +9,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
-#include "STE_Human.h"
+#include "STE_AICharacterController.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> Skill_DrawDebug_FSTT_ReleaseSkill(
@@ -37,7 +37,9 @@ EStateTreeRunStatus FSTT_ReleaseSkill::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass())
+		);
 	if (!InstanceData.TaskOwner)
 	{
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;

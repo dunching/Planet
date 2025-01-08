@@ -8,6 +8,7 @@
 
 #include "GravityAIController.h"
 #include "GenerateType.h"
+#include "GroupSharedInterface.h"
 #include "PlanetAIController.h"
 
 #include "TeamMatesHelperComponent.h"
@@ -21,7 +22,7 @@ struct FCharacterProxy;
 class ACharacterBase;
 class AHumanCharacter_AI;
 class UStateTreeComponent;
-class UStateTreeAIComponent;
+class UAIControllerStateTreeAIComponent;
 class UAIPerceptionComponent;
 class ABuildingArea;
 class AGeneratorColony;
@@ -32,7 +33,8 @@ class AGroupSharedInfo;
  *
  */
 UCLASS()
-class PLANET_API AHumanAIController : public APlanetAIController
+class PLANET_API AHumanAIController :
+	public APlanetAIController
 {
 	GENERATED_BODY()
 
@@ -69,9 +71,6 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION()
-	void OnRep_GroupSharedInfoChanged();
-
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
 		const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
@@ -91,13 +90,15 @@ protected:
 
 	virtual void OnUnPossess() override;
 
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+
 	void OnGroupChanged();
 
 	void OnTeamChanged();
 
 	void InitialCharacter();
 
-	void InitialAILogic();
+	void InitialGroupInfo();
 
 	void InitialSenseConfig();
 
@@ -112,12 +113,9 @@ protected:
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-	TObjectPtr<UStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;
+	TObjectPtr<UAIControllerStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponentPtr = nullptr;
-
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
 
 };

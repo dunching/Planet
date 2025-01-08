@@ -42,7 +42,7 @@ class UCharacterAbilitySystemComponent;
 class UInteractiveConsumablesComponent;
 class UProxyProcessComponent;
 class UInteractiveToolComponent;
-class UCDCaculatorComponent;
+class UConversationComponent;
 class UWidgetComponent;
 class AGroupSharedInfo;
 
@@ -108,7 +108,7 @@ public:
 
 	UProxyProcessComponent* GetProxyProcessComponent()const;
 
-	UCDCaculatorComponent* GetCDCaculatorComponent()const;
+	UConversationComponent* GetConversationComponent()const;
 
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const;
 	
@@ -193,8 +193,8 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UProxyProcessComponent> ProxyProcessComponentPtr = nullptr;
 	
-	UPROPERTY()
-	TObjectPtr<UCDCaculatorComponent> CDCaculatorComponentPtr = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ConversationBorder)
+	TObjectPtr<UConversationComponent> ConversationComponentPtr = nullptr;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;

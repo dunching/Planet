@@ -27,6 +27,7 @@ public class Planet : ModuleRules
         PublicDefinitions.Add("TESTRAFFLE = 1");
 
         PublicIncludePaths.Add("Planet");
+        PublicIncludePaths.Add("Planet/WolrdProcessStateTree");
         PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/AttributeSet");
@@ -97,6 +98,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/AI/EQS");
         PublicIncludePaths.Add("Planet/AI/STE");
         PublicIncludePaths.Add("Planet/AI/STT");
+        PublicIncludePaths.Add("Planet/AI/StateTreeComponent");
         PublicIncludePaths.Add("Planet/Navgation");
         PublicIncludePaths.Add("Planet/GroupsManagger");
         PublicIncludePaths.Add("Planet/SPlineActor");

@@ -89,10 +89,8 @@ public:
 
 #pragma endregion
 
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
-
 protected:
+	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void BeginPlay() override;
@@ -135,7 +133,11 @@ protected:
 	// 给被锁定的目标绑定一些回调，比如目标进入“死亡”、“隐身”、“不可选中”时
 	void BindOnFocusRemove(AActor* Actor);
 
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
+
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge FocusInformation;
+	
 };

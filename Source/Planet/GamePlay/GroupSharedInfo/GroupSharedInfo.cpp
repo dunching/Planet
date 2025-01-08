@@ -35,6 +35,8 @@ void AGroupSharedInfo::PostInitializeComponents()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
+		//
+		GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kInitialize);
 	}
 }
 

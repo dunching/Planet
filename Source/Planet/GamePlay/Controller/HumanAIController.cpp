@@ -21,12 +21,14 @@
 #include "GeneratorColony.h"
 #include "HumanCharacter_AI.h"
 #include "GroupSharedInfo.h"
+#include "AIControllerStateTreeAIComponent.h"
+#include "LogWriter.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
-	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
+	StateTreeAIComponentPtr = CreateDefaultSubobject<UAIControllerStateTreeAIComponent>(UAIControllerStateTreeAIComponent::ComponentName);
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 
 	// 设置这个之后BP不能保存？
@@ -35,7 +37,7 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 
 void AHumanAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
 {
-	GroupSharedInfoPtr = InGroupSharedInfoPtr;
+	Super::SetGroupSharedInfo(InGroupSharedInfoPtr);
 }
 
 void AHumanAIController::InitialSenseConfig()
@@ -86,10 +88,6 @@ bool AHumanAIController::CheckIsFarawayOriginal() const
 	return false;
 }
 
-void AHumanAIController::OnRep_GroupSharedInfoChanged()
-{
-}
-
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
 	const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
@@ -127,8 +125,18 @@ void AHumanAIController::BeginPlay()
 	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
 	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
 
-	InitialAILogic();
-
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (CharacterPtr)
+	{
+		auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
+			UGameplayTagsLibrary::DeathingTag,
+			EGameplayTagEventType::NewOrRemoved
+		);
+		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
+	}
+	
+	InitialGroupInfo();
+	
 	InitialCharacter();
 }
 
@@ -142,6 +150,17 @@ void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (CharacterPtr)
+	{
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
+#if WITH_EDITORONLY_DATA
+#else
+#endif
+	}
+
+	InitialAllocations();
 }
 
 void AHumanAIController::OnUnPossess()
@@ -201,35 +220,22 @@ void AHumanAIController::OnTeamChanged()
 
 void AHumanAIController::InitialCharacter()
 {
-	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
-	{
-		auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-			UGameplayTagsLibrary::DeathingTag,
-			EGameplayTagEventType::NewOrRemoved
-		);
-		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
-
-		TeamHelperChangedDelegate =
-			GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+	TeamHelperChangedDelegate =
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
 		
-#if WITH_EDITORONLY_DATA
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
-#else
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kEnemy);
-#endif
-
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
 		// 组件自动调用条件不成功，原因未知
 		if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
 		{
 			StateTreeAIComponentPtr->StartLogic();
 		}
-
-		InitialAllocations();
 	}
+#endif
 }
 
-void AHumanAIController::InitialAILogic()
+void AHumanAIController::InitialGroupInfo()
 {
 	if (GetPawn())
 	{
@@ -251,4 +257,9 @@ void AHumanAIController::InitialAILogic()
 			// 			PathFollowComponentPtr = NPCComponentPtr->PathFollowComponentPtr;
 		}
 	}
+}
+
+void AHumanAIController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+	Super::OnGroupSharedInfoReady(NewGroupSharedInfoPtr);
 }

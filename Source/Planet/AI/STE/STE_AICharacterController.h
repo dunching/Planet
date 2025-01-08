@@ -12,13 +12,14 @@
 
 #include "GenerateType.h"
 
-#include "STE_Human.generated.h"
+#include "STE_AICharacterController.generated.h"
 
 class AActor;
 
 struct FCharacterProxy;
 class ACharacterBase;
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
 
 UCLASS(Blueprintable)
@@ -43,7 +44,7 @@ public:
 };
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_Human : public UStateTreeEvaluatorBlueprintBase
+class PLANET_API USTE_AICharacterController : public UStateTreeEvaluatorBlueprintBase
 {
 	GENERATED_BODY()
 
@@ -84,7 +85,7 @@ public:
 	FTSTicker::FDelegateHandle CaculationDistance2AreaHandle;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
-	ACharacterBase* HumanCharacterPtr = nullptr;
+	AHumanCharacter_AI* HumanCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanAIController* HumanAIControllerPtr = nullptr;
@@ -96,7 +97,7 @@ public:
 	int32 MinAttackDistance = 50;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	ETeammateOption TeammateOption = ETeammateOption::kFollow;
+	ETeammateOption TeammateOption = ETeammateOption::kInitialize;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ACharacterBase* LeaderCharacterPtr = nullptr;

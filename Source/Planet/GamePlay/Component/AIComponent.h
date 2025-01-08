@@ -9,29 +9,29 @@
 #include "AIComponent.generated.h"
 
 class USceneComponent;
+class ACharacterBase;
+class UPAD_TaskNode;
 
 /**
  *
  */
 UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
-class PLANET_API UNPCComponent : public UActorComponent
+class PLANET_API UAIComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
+
+	static FName ComponentName;
+
+	UAIComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay()override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
 
-};
-
-UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
-class PLANET_API UAIComponent : public UNPCComponent
-{
-	GENERATED_BODY()
-
-public:
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<UPAD_TaskNode*> TaskNodesAry;
+	
 };

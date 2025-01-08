@@ -19,7 +19,7 @@ class ACharacterBase;
 class AHumanCharacter;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
-class USTE_Human;
+class USTE_AICharacterController;
 class UGloabVariable;
 
 USTRUCT()

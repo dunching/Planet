@@ -37,7 +37,7 @@
 #include "StateProcessorComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "ProxyProcessComponent.h"
-#include "CDCaculatorComponent.h"
+#include "ConversationComponent.h"
 
 #include "CharacterTitle.h"
 #include "UICommon.h"
@@ -63,8 +63,6 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	AbilitySystemComponentPtr = CreateDefaultSubobject<UCharacterAbilitySystemComponent>(
 		UCharacterAbilitySystemComponent::ComponentName
 	);
-	AbilitySystemComponentPtr->SetIsReplicated(true);
-	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	AbilitySystemComponentPtr->AddSpawnedAttribute(CreateDefaultSubobject<UAS_Character>(
 		TEXT("CharacterAttributes1")
 		));
@@ -76,7 +74,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 		UStateProcessorComponent::ComponentName);
 
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
-	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
+	ConversationComponentPtr = CreateDefaultSubobject<UConversationComponent>(UConversationComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -163,11 +161,13 @@ void ACharacterBase::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
-		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GroupSharedInfoPtr;
+		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GetGroupSharedInfo();
 		OnGroupSharedInfoReady(GroupSharedInfoPtr);
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
+		GroupSharedInfoPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
+		OnGroupSharedInfoReady(GroupSharedInfoPtr);
 	}
 }
 
@@ -263,9 +263,9 @@ UProxyProcessComponent* ACharacterBase::GetProxyProcessComponent() const
 	return ProxyProcessComponentPtr;
 }
 
-UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
+UConversationComponent* ACharacterBase::GetConversationComponent() const
 {
-	return CDCaculatorComponentPtr;
+	return ConversationComponentPtr;
 }
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
@@ -463,7 +463,7 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 				}
 				else
 				{
-					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+					CharacterTitlePtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
 				}
 			}
 		}

@@ -30,6 +30,13 @@
 #include "CharacterTitle.h"
 #include "GameOptions.h"
 
+UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
+{
+	SetIsReplicatedByDefault(true);
+	SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+}
+
 void UCharacterAbilitySystemComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -636,11 +643,11 @@ void UCharacterAbilitySystemComponent::OnGroupSharedInfoReady(AGroupSharedInfo* 
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		// GA全部通过Server注册
-		auto GASPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
+		// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+		// auto GASPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 
-		GASPtr->ClearAllAbilities();
+		// GA全部通过Server注册
+		ClearAllAbilities();
 		InitialBaseGAs();
 	}
 #endif

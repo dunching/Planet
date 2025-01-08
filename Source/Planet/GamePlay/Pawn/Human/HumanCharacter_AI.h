@@ -10,6 +10,7 @@
 #include "HumanCharacter_AI.generated.h"
 
 class UAIComponent;
+class UResourceBoxStateTreeComponent;
 
 UCLASS()
 class PLANET_API AHumanCharacter_AI : public AHumanCharacter
@@ -29,7 +30,7 @@ public:
 	void SetCharacterID(const FGuid& InCharacterID);
 	
 #if WITH_EDITORONLY_DATA
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
 #endif
 	
@@ -39,23 +40,25 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
+	TObjectPtr<UAIComponent> AIComponentPtr= nullptr;
+
 protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void OnRep_GroupSharedInfoChanged()override;
 
-	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
+	// virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
 	
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+
 	UFUNCTION()
 	void OnRep_CharacterID();
 	
 	void InitialAllocationsRowName();
 
 	void InitialAllocationsByProxy();
-
-	UPROPERTY()
-	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterID)
 	FGuid CharacterID;

@@ -8,7 +8,7 @@
 #include "AITask_MoveBySpline.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
-#include "STE_Human.h"
+#include "STE_AICharacterController.h"
 #include "GeneratorNPCs_Patrol.h"
 
 #ifdef WITH_EDITOR
@@ -223,6 +223,7 @@ EStateTreeRunStatus FSTT_MoveBySpline::PerformMoveTask(
 // 	{
 // 
 // 	}
-// 	break;
+// 	break;
+
 // 	}
 // }

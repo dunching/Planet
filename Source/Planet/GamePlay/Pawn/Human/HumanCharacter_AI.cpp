@@ -15,11 +15,12 @@
 #include "CharactersInfo.h"
 #include "HumanAIController.h"
 #include "GroupSharedInfo.h"
+#include "AIControllerStateTreeAIComponent.h"
 
 AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	AIComponentPtr = CreateDefaultSubobject<UAIComponent>(TEXT("AIComponent"));
+	AIComponentPtr = CreateDefaultSubobject<UAIComponent>(UAIComponent::ComponentName);
 }
 
 void AHumanCharacter_AI::BeginPlay()
@@ -66,9 +67,28 @@ void AHumanCharacter_AI::OnRep_GroupSharedInfoChanged()
 	Super::OnRep_GroupSharedInfoChanged();
 }
 
-TSharedPtr<FCharacterProxy> AHumanCharacter_AI::GetCharacterProxy() const
+// TSharedPtr<FCharacterProxy> AHumanCharacter_AI::GetCharacterProxy() const
+// {
+// 	return GetGroupSharedInfo()->GetHoldingItemsComponent()->FindProxy_Character(CharacterID);
+// }
+
+void AHumanCharacter_AI::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
-	return GetGroupSharedInfo()->GetHoldingItemsComponent()->FindProxy_Character(CharacterID);
+	Super::OnGroupSharedInfoReady(NewGroupSharedInfoPtr);
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		if (GetParentActor())
+		{
+		}
+		// 如果这个Character是单独的，则直接生成 
+		else
+		{
+			GetGroupSharedInfo()->GetTeamMatesHelperComponent()->OwnerCharacterProxyPtr = GetCharacterProxy();
+		}
+	}
+#endif
 }
 
 void AHumanCharacter_AI::OnRep_CharacterID()

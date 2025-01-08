@@ -9,7 +9,7 @@
 
 #include "CDCaculator.generated.h"
 
-class UCDCaculatorComponent;
+class UConversationComponent;
 
 struct FSkillCooldownHelper;
 struct FCDItem_FASI;
@@ -71,7 +71,7 @@ struct PLANET_API FCD_FASI_Container : public FFastArraySerializer
 
 	void RemoveItem(const TSharedPtr<FSkillCooldownHelper>& SkillCooldownHelper);
 
-	UCDCaculatorComponent* CDCaculatorComponentPtr= nullptr;
+	UConversationComponent* CDCaculatorComponentPtr= nullptr;
 
 protected:
 

@@ -30,9 +30,9 @@ AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializ
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 }
 
-void AHorseAIController::SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr)
+void AHorseAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
 {
-	Super::SetGroupSharedInfo(GroupSharedInfoPtr);
+	Super::SetGroupSharedInfo(InGroupSharedInfoPtr);
 }
 
 void AHorseAIController::SetCampType(ECharacterCampType CharacterCampType)
@@ -170,7 +170,7 @@ void AHorseAIController::InitialCharacter()
 		if (AIHumanInfoPtr)
 		{
 			AIHumanInfoPtr->CharacterPtr = CharacterPtr;
-			AIHumanInfoPtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+			AIHumanInfoPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
 		}
 
 		auto EICPtr = CharacterPtr->GetProxyProcessComponent();

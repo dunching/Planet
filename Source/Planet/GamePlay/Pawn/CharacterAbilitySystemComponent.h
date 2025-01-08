@@ -57,6 +57,8 @@ public:
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(ACharacterBase*, const TMap<FGameplayTag, float>&)>;
 
+	UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer);
+
 	virtual void BeginPlay()override;
 
 	bool IsInDeath() const;

@@ -1,5 +1,5 @@
 
-#include "STE_Human.h"
+#include "STE_AICharacterController.h"
 
 #include <NavigationSystem.h>
 #include <Perception/AIPerceptionComponent.h>
@@ -13,9 +13,10 @@
 #include "LogWriter.h"
 #include "BuildingArea.h"
 #include "GroupSharedInfo.h"
+#include "HumanCharacter_AI.h"
 #include "ItemProxy_Character.h"
 
-void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
+void USTE_AICharacterController::TreeStart(FStateTreeExecutionContext& Context)
 {
 	Super::TreeStart(Context);
 
@@ -28,7 +29,7 @@ void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 				std::bind(&ThisClass::KnowCharaterChanged, this, std::placeholders::_1, std::placeholders::_2)
 			);
 
-		HumanCharacterPtr = HumanAIControllerPtr->GetPawn<AHumanCharacter>();
+		HumanCharacterPtr = HumanAIControllerPtr->GetPawn<AHumanCharacter_AI>();
 		if (HumanCharacterPtr)
 		{
 			TeammateChangedDelegate = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(
@@ -39,7 +40,7 @@ void USTE_Human::TreeStart(FStateTreeExecutionContext& Context)
 	}
 }
 
-void USTE_Human::TreeStop(FStateTreeExecutionContext& Context)
+void USTE_AICharacterController::TreeStop(FStateTreeExecutionContext& Context)
 {
 	if (TeammateOptionChangedDelegate)
 	{
@@ -54,12 +55,12 @@ void USTE_Human::TreeStop(FStateTreeExecutionContext& Context)
 	Super::TreeStop(Context);
 }
 
-void USTE_Human::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
+void USTE_AICharacterController::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
 	Super::Tick(Context, DeltaTime);
 }
 
-void USTE_Human::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
+void USTE_AICharacterController::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 {
 	TeammateOption = NewTeammateOption;
 
@@ -81,7 +82,7 @@ void USTE_Human::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 	}
 }
 
-void USTE_Human::OnTeamChanged()
+void USTE_AICharacterController::OnTeamChanged()
 {
 	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamHelperSPtr)
@@ -95,6 +96,6 @@ void USTE_Human::OnTeamChanged()
 	}
 }
 
-void USTE_Human::KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd)
+void USTE_AICharacterController::KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd)
 {
 }
