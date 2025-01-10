@@ -55,6 +55,11 @@ void AHumanCharacter_AI::SetCharacterID(const FGuid& InCharacterID)
 #endif
 }
 
+UAIComponent* AHumanCharacter_AI::GetAIComponent() const
+{
+	return  AIComponentPtr;
+}
+
 void AHumanCharacter_AI::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

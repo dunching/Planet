@@ -56,3 +56,13 @@ protected:
 	int32 Num = 1;
 
 };
+
+template<>
+struct TStructOpsTypeTraits<FCoinProxy> :
+	public TStructOpsTypeTraitsBase2<FCoinProxy>
+{
+	enum
+	{
+		WithNetSerializer = false,
+	};
+};

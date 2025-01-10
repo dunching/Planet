@@ -29,19 +29,15 @@ void UConversationComponent::CloseConversationborder_Implementation()
 }
 
 void UConversationComponent::DisplaySentence_Implementation(
-	UPAD_TaskNode_Conversation* InPAD_TaskNode_ConversationPtr,
-	int32 InSentenceIndex
+		const FTaskNode_Conversation_SentenceInfo&Sentence
 	)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
-		PAD_TaskNode_ConversationPtr = InPAD_TaskNode_ConversationPtr;
-		SentenceIndex = InSentenceIndex;
-
 		if (ConversationBorderPtr)
 		{
-			ConversationBorderPtr->SetSentence(InPAD_TaskNode_ConversationPtr->ConversationsAry[SentenceIndex]);
+			ConversationBorderPtr->SetSentence(Sentence);
 		}
 		else
 		{
@@ -49,7 +45,7 @@ void UConversationComponent::DisplaySentence_Implementation(
 			if (ConversationBorderPtr)
 			{
 				ConversationBorderPtr->CharacterPtr = GetOwner<ACharacterBase>();
-				ConversationBorderPtr->SetSentence(InPAD_TaskNode_ConversationPtr->ConversationsAry[SentenceIndex]);
+				ConversationBorderPtr->SetSentence(Sentence);
 				ConversationBorderPtr->AddToViewport(EUIOrder::kConversationBorder);
 			}
 		}

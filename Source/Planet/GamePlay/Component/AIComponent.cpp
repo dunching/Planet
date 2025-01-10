@@ -50,4 +50,9 @@ void UAIComponent::BeginPlay()
 	OwnerPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
+void UAIComponent::AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr)
+{
+	TemporaryTaskNodesAry.Add(TaskNodePtr);
+}
+
 FName UAIComponent::ComponentName = TEXT("AIComponent");

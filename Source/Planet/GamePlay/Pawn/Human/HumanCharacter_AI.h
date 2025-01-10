@@ -29,6 +29,8 @@ public:
 
 	void SetCharacterID(const FGuid& InCharacterID);
 	
+	UAIComponent* GetAIComponent()const;
+
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
@@ -39,9 +41,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
-	TObjectPtr<UAIComponent> AIComponentPtr= nullptr;
 
 protected:
 
@@ -63,4 +62,7 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterID)
 	FGuid CharacterID;
 	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
+	TObjectPtr<UAIComponent> AIComponentPtr= nullptr;
+
 };

@@ -9,7 +9,7 @@
 
 #include "ConversationComponent.generated.h"
 
-class UPAD_TaskNode_Conversation;
+class UPAD_TaskNode_Preset_Conversation;
 class UConversationBorder;
 
 /* 角色的会话组件
@@ -28,8 +28,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void DisplaySentence(
-		UPAD_TaskNode_Conversation* InPAD_TaskNode_ConversationPtr,
-		int32 InSentenceIndex
+		const FTaskNode_Conversation_SentenceInfo&Sentence
 		);
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -40,11 +39,6 @@ protected:
 	TSubclassOf<UConversationBorder> UConversationBorderClass;
 
 	UPROPERTY(Transient)
-	UPAD_TaskNode_Conversation* PAD_TaskNode_ConversationPtr = nullptr;
-
-	UPROPERTY(Transient)
 	UConversationBorder* ConversationBorderPtr = nullptr;
 
-	int32 SentenceIndex = 0;
-	
 };
