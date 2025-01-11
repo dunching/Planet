@@ -227,6 +227,8 @@ void AHumanAIController::InitialCharacter()
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		// 组件自动调用条件不成功，原因未知
+		// 👆
+		// AI Comtroller下的需要显式调用
 		if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
 		{
 			StateTreeAIComponentPtr->StartLogic();

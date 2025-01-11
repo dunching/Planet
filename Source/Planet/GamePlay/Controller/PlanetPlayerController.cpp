@@ -7,6 +7,7 @@
 #include <IXRCamera.h>
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/HUD.h"
 
 #include "InputProcessorSubSystem.h"
 #include "HorseCharacter.h"
@@ -28,11 +29,13 @@
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "CollisionDataStruct.h"
+#include "GameMode_Main.h"
 #include "LogWriter.h"
 #include "GroupSharedInfo.h"
 #include "HoldingItemsComponent.h"
 #include "MainHUD.h"
-#include "GameFramework/HUD.h"
+#include "PlanetWorldSettings.h"
+#include "WolrdProcess.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
 	TEXT("PlanetPlayerController.DrawControllerRotation"),
@@ -136,6 +139,7 @@ void APlanetPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
+	// DOREPLIFETIME_CONDITION(ThisClass, WolrdProcessPtr, COND_AutonomousOnly);
 }
 
 void APlanetPlayerController::BeginPlay()
@@ -330,6 +334,13 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 	return Result;
 }
 
+void APlanetPlayerController::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	
+	InitialWorldPrcess();
+}
+
 void APlanetPlayerController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
 	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
@@ -408,6 +419,7 @@ void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
 			{
 				if (Iter == UGameplayTagsLibrary::DeathingTag)
 				{
+					// TODO 
 					//					Destroy();
 				}
 			}
@@ -448,6 +460,19 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		OnGroupSharedInfoReady(GroupSharedInfoPtr);
 	}
 #endif
+}
+
+void APlanetPlayerController::InitialWorldPrcess()
+{
+	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
+	
+	FActorSpawnParameters SpawnParameters;
+
+	SpawnParameters.Owner = this;
+
+	WolrdProcessPtr = GetWorld()->SpawnActor<AWolrdProcess>(
+		WorldSetting->WolrdProcessClass, SpawnParameters
+	);
 }
 
 void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)
@@ -657,4 +682,8 @@ void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 	// }
 
 	UUIManagerSubSystem::GetInstance()->InitialUI();
+}
+
+void APlanetPlayerController::OnRep_WolrdProcess()
+{
 }

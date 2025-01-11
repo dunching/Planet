@@ -10,6 +10,7 @@ class UAssetRefMap;
 class UStateTagExtendInfoMap;
 class USceneProxyExtendInfoMap;
 class UGameOptions;
+class AWolrdProcess;
 
 /**
  *
@@ -27,19 +28,16 @@ public:
 	
 	UGameOptions* GetGameOptions();
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<AWolrdProcess>WolrdProcessClass;
+
 protected:
 
-	UPROPERTY(Transient)
-	UAssetRefMap* AssetRefMapPtr = nullptr;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<UAssetRefMap>AssetRefMapClass;
+	TSoftObjectPtr<UAssetRefMap>AssetRefMapClass;
 	
-	UPROPERTY(Transient)
-	USceneProxyExtendInfoMap* SceneProxyExtendInfoMapPtr = nullptr;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtrClass;
+	TSoftObjectPtr<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtrClass;
 	
 	UPROPERTY(Transient)
 	UGameOptions* GameOptionsPtr = nullptr;

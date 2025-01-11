@@ -24,6 +24,7 @@ class UHoldingItemsComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class AGroupSharedInfo;
+class AWolrdProcess;
 
 /**
  *
@@ -111,6 +112,8 @@ protected:
 
 	virtual bool InputKey(const FInputKeyParams& Params) override;
 
+	virtual void OnRep_PlayerState()override;
+	
 	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
 
 	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr) override;
@@ -119,10 +122,17 @@ protected:
 
 	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase* CharaterPtr) override;
 
+	// 初始化共享信息相关的内容
 	virtual void InitialGroupSharedInfo();
+
+	// 初始化该玩家的任务系统
+	virtual void InitialWorldPrcess();
 
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
+
+	UFUNCTION()
+	void OnRep_WolrdProcess();
 
 	UFUNCTION()
 	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);
@@ -135,6 +145,9 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
+
+	// UPROPERTY(ReplicatedUsing = OnRep_WolrdProcess)
+	TObjectPtr<AWolrdProcess> WolrdProcessPtr = nullptr;
 
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 

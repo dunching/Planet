@@ -14,6 +14,7 @@ class UTexture2D;
 class UStaticMesh;
 class UMaterialInstance;
 class USkeletalMesh;
+class UGameplayEffect;
 
 class UMainUILayout;
 class AGroupSharedInfo;
@@ -38,11 +39,11 @@ class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
 class UMenuLayout;
-class UGameplayEffect;
 class UGE_Damage;
+class ATargetPoint_Runtime;
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UAssetRefMap : public UObject
+class PLANET_API UAssetRefMap : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
@@ -91,6 +92,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<UGE_Damage>DamageClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<EMaterialParamNameType, FName>MatParamNameMap;

@@ -8,22 +8,12 @@
 
 UAssetRefMap* APlanetWorldSettings::GetAssetRefMapInstance()
 {
-	if (!AssetRefMapPtr)
-	{
-		AssetRefMapPtr = NewObject<UAssetRefMap>(GetWorld(), AssetRefMapClass);
-	}
-
-	return AssetRefMapPtr;
+	return AssetRefMapClass.LoadSynchronous();
 }
 
 USceneProxyExtendInfoMap* APlanetWorldSettings::GetSceneProxyExtendInfoMap()
 {
-	if (!SceneProxyExtendInfoMapPtr)
-	{
-		SceneProxyExtendInfoMapPtr = NewObject<USceneProxyExtendInfoMap>(GetWorld(), SceneProxyExtendInfoMapPtrClass);
-	}
-
-	return SceneProxyExtendInfoMapPtr;
+	return SceneProxyExtendInfoMapPtrClass.LoadSynchronous();
 }
 
 UGameOptions* APlanetWorldSettings::GetGameOptions()

@@ -27,7 +27,7 @@ struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_AICharacter_Allocation;
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API USceneProxyExtendInfoMap : public UObject
+class PLANET_API USceneProxyExtendInfoMap : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 public:
