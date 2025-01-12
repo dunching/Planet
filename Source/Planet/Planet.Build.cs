@@ -27,11 +27,11 @@ public class Planet : ModuleRules
         PublicDefinitions.Add("TESTRAFFLE = 1");
 
         PublicIncludePaths.Add("Planet");
-        PublicIncludePaths.Add("Planet/WolrdProcessStateTree");
-        PublicIncludePaths.Add("Planet/WolrdProcessStateTree/TaskNode_Character");
-        PublicIncludePaths.Add("Planet/WolrdProcessStateTree/TaskNode_WorldProcess");
-        PublicIncludePaths.Add("Planet/WolrdProcessStateTree/STT");
-        PublicIncludePaths.Add("Planet/WolrdProcessStateTree/WorldProcessGameplayTask");
+        PublicIncludePaths.Add("Planet/GuideSystem");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_Character");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_GuideSystem");
+        PublicIncludePaths.Add("Planet/GuideSystem/STT");
+        PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask");
         PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/AttributeSet");

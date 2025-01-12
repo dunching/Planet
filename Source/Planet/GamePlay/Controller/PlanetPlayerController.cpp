@@ -35,7 +35,8 @@
 #include "HoldingItemsComponent.h"
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
-#include "WolrdProcess.h"
+#include "GuideActor.h"
+#include "GuideSubSystem.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
 	TEXT("PlanetPlayerController.DrawControllerRotation"),
@@ -139,7 +140,7 @@ void APlanetPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
-	// DOREPLIFETIME_CONDITION(ThisClass, WolrdProcessPtr, COND_AutonomousOnly);
+	// DOREPLIFETIME_CONDITION(ThisClass, MainLineGuidePtr, COND_AutonomousOnly);
 }
 
 void APlanetPlayerController::BeginPlay()
@@ -337,8 +338,6 @@ bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 void APlanetPlayerController::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
-	
-	InitialWorldPrcess();
 }
 
 void APlanetPlayerController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
@@ -460,19 +459,6 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		OnGroupSharedInfoReady(GroupSharedInfoPtr);
 	}
 #endif
-}
-
-void APlanetPlayerController::InitialWorldPrcess()
-{
-	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
-	
-	FActorSpawnParameters SpawnParameters;
-
-	SpawnParameters.Owner = this;
-
-	WolrdProcessPtr = GetWorld()->SpawnActor<AWolrdProcess>(
-		WorldSetting->WolrdProcessClass, SpawnParameters
-	);
 }
 
 void APlanetPlayerController::OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason)

@@ -13,6 +13,9 @@
 #include "AssetRefMap.h"
 #include "UICommon.h"
 #include "FocusTitle.h"
+#include "GuideActor.h"
+#include "GuideList.h"
+#include "GuideSubSystem.h"
 #include "HUD_TeamInfo.h"
 #include "ProgressTips.h"
 
@@ -29,6 +32,8 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
 
 	FName FocusCharacterSocket = TEXT("FocusCharacterSocket");
+
+	FName GuideList = TEXT("GuideList");
 };
 
 void URegularActionLayout::NativeConstruct()

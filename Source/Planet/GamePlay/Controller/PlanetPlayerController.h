@@ -24,7 +24,7 @@ class UHoldingItemsComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class AGroupSharedInfo;
-class AWolrdProcess;
+class AGuideActor;
 
 /**
  *
@@ -125,9 +125,6 @@ protected:
 	// 初始化共享信息相关的内容
 	virtual void InitialGroupSharedInfo();
 
-	// 初始化该玩家的任务系统
-	virtual void InitialWorldPrcess();
-
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
 
@@ -145,9 +142,6 @@ protected:
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
-
-	// UPROPERTY(ReplicatedUsing = OnRep_WolrdProcess)
-	TObjectPtr<AWolrdProcess> WolrdProcessPtr = nullptr;
 
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 

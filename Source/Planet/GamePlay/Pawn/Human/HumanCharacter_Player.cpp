@@ -9,6 +9,7 @@
 #include "GeneratorNPCs_Patrol.h"
 #include "PlayerComponent.h"
 #include "GroupSharedInfo.h"
+#include "GuideSubSystem.h"
 #include "HumanAIController.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
@@ -82,6 +83,10 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 			{
 				NewProcessor->SetPawn(Cast<ThisClass>(this));
 			});
+
+		// 
+		UGuideSubSystem::GetInstance()->InitializeMainLine();
+		UGuideSubSystem::GetInstance()->ActiveMainLine();
 	}
 #endif
 }

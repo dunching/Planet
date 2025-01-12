@@ -10,7 +10,7 @@ class UAssetRefMap;
 class UStateTagExtendInfoMap;
 class USceneProxyExtendInfoMap;
 class UGameOptions;
-class AWolrdProcess;
+class AGuideActor;
 
 /**
  *
@@ -29,7 +29,7 @@ public:
 	UGameOptions* GetGameOptions();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<AWolrdProcess>WolrdProcessClass;
+	TSubclassOf<AGuideActor>MainLineGuideClass;
 
 protected:
 
