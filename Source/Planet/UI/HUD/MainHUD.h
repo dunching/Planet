@@ -15,12 +15,14 @@ class UMainHUDLayout;
 class URegularActionLayout;
 class UEndangeredStateLayout;
 class UGetItemInfosList;
+class UUIManagerSubSystem;
 struct FOnAttributeChangeData;
 
 enum class EMainHUDType : uint8 
 {
 	kRegularAction,
 	kEndangered,
+	kBuilding,
 	kNone,
 };
 
@@ -31,6 +33,8 @@ class PLANET_API AMainHUD : public AHUD
 
 public:
 
+	friend UUIManagerSubSystem;
+	
 	using FOnInitaliedGroupSharedInfo =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
@@ -42,7 +46,7 @@ public:
 	
 	void SwitchState(EMainHUDType MainHUDType);
 
-	URegularActionLayout* RegularActionStatePtr = nullptr;
+	UMainHUDLayout*GetMainHUDLayout()const;
 	
 protected:
 	
@@ -61,6 +65,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<URegularActionLayout>RegularActionStateClass;
 
+	URegularActionLayout* RegularActionStatePtr = nullptr;
+	
 	// 重伤时要显示的HUD
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UEndangeredStateLayout>EndangeredStateClass;

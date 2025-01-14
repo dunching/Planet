@@ -91,12 +91,12 @@ namespace HumanProcessor
 	{
 		Super::EnterAction();
 
-		UUIManagerSubSystem::GetInstance()->DisplayEndangeredState(true);
+		UUIManagerSubSystem::GetInstance()->DisplayEndangeredLayout(true);
 	}
 
 	void FHumanEndangeredProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->DisplayEndangeredState(false);
+		UUIManagerSubSystem::GetInstance()->DisplayEndangeredLayout(false);
 
 		Super::QuitAction();
 	}

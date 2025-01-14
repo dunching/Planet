@@ -43,7 +43,7 @@ void USkill_Consumable_Test::SpawnActor()
 	ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(Consumable_Class, ActorSpawnParameters);
 	if (ConsumableActorPtr)
 	{
-		ConsumableActorPtr->Interaction(CharacterPtr);
+		ConsumableActorPtr->HasbeenInteracted(CharacterPtr);
 	}
 }
 

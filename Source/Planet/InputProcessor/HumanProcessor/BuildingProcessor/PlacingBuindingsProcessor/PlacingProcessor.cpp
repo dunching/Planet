@@ -39,7 +39,7 @@ namespace HumanProcessor
 	{
 		Super::EnterAction();
 
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
+		UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(true);
 
 		if (!BuildTargetPtr)
 		{

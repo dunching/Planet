@@ -28,20 +28,17 @@ void AResourceBox::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
-void AResourceBox::EndLookAt()
+void AResourceBox::HasBeenEndedLookAt()
 {
 	if (InteractionWidgetCompoentPtr)
 	{
 		InteractionWidgetCompoentPtr->SetVisibility(false);
 	}
+	
+	Super::HasBeenEndedLookAt();
 }
 
-void AResourceBox::StartLookAt(ACharacterBase* InCharacterPtr)
-{
-	LookingAt(InCharacterPtr);
-}
-
-void AResourceBox::LookingAt(ACharacterBase* InCharacterPtr)
+void AResourceBox::HasBeenLookingAt(ACharacterBase* InCharacterPtr)
 {
 	if (
 		InteractionWidgetCompoentPtr &&
@@ -53,8 +50,10 @@ void AResourceBox::LookingAt(ACharacterBase* InCharacterPtr)
 	}
 	else
 	{
-		EndLookAt();
+		HasBeenEndedLookAt();
 	}
+	
+	Super::HasBeenEndedLookAt();
 }
 
 void AResourceBox::BeginPlay()
@@ -70,8 +69,6 @@ void AResourceBox::BeginPlay()
 		}
 	}
 #endif
-
-	EndLookAt();
 }
 
 void AResourceBox::Tick(float DeltaSeconds)
@@ -79,7 +76,7 @@ void AResourceBox::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 }
 
-void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
+void AResourceBox::HasbeenInteracted(ACharacterBase* InCharacterPtr)
 {
 	if (
 		!bIsOpend &&
@@ -87,13 +84,20 @@ void AResourceBox::Interaction(ACharacterBase* InCharacterPtr)
 		)
 	{
 		InteractionImp();
-
-		Super::Interaction(InCharacterPtr);
+		
+		Super::HasbeenInteracted(InCharacterPtr);
 	}
 	else
 	{
 		PRINTINVOKEWITHSTR(FString(TEXT("Box ss Opening")));
 	}
+}
+
+void AResourceBox::HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)
+{
+	Super::HasBeenStartedLookAt(InCharacterPtr);
+	
+	HasBeenLookingAt(InCharacterPtr);
 }
 
 void AResourceBox::InteractionImp_Implementation()

@@ -14,12 +14,13 @@ class UInputComponent;
 class UGravitySpringComponent;
 class UCameraComponent;
 class FProcessActionBase;
-class USceneObjPropertyComponent;
+class USceneActorPropertyComponent;
 class FInputProcessor;
 class UAnimInstanceCharacter;
 class UZYInputComponent;
 class UCharacterTitle;
 class UTeamMatesHelperComponent;
+class USceneActorInteractionComponent;
 struct FCharacterProxy;
 struct FSkillProxy;
 struct FConsumableProxy;
@@ -33,6 +34,8 @@ public:
 
 	AHumanCharacter(const FObjectInitializer& ObjectInitializer);
 
+	USceneActorInteractionComponent*GetSceneActorInteractionComponent()const;
+	
 protected:
 
 	virtual void BeginPlay() override;
@@ -47,6 +50,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	TSoftObjectPtr<UTexture2D> CharacterIcon;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
+	TObjectPtr<USceneActorInteractionComponent> SceneActorInteractionComponentPtr = nullptr;
 	
 private:
 

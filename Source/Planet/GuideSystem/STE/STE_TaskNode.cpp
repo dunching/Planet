@@ -23,3 +23,15 @@ void USTE_TaskNode::Tick(FStateTreeExecutionContext& Context, const float DeltaT
 {
 	Super::Tick(Context, DeltaTime);
 }
+
+void USTE_TaskNode_Interaction::TreeStop(FStateTreeExecutionContext& Context)
+{
+	if (GuideActorPtr)
+	{
+		GuideActorPtr->OnGuideInteractionEnd.Broadcast();
+
+		GuideActorPtr->Destroy();
+	}
+	
+	Super::TreeStop(Context);
+}

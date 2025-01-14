@@ -20,6 +20,6 @@ class PLANET_API AConsumable_Base : public AToolProxyBase
 
 public:
 
-	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
 
 };

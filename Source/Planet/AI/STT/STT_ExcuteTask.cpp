@@ -71,6 +71,7 @@ EStateTreeRunStatus FSTT_ExcuteTask_Automatic::PerformMoveTask(FStateTreeExecuti
 		{
 			for (auto Iter : InstanceData.TaskNodesAry)
 			{
+				Iter.LoadSynchronous();
 				if (Iter->TaskNodeState == ETaskNodeState::kWaitExcute)
 				{
 					switch (Iter->TaskNodeType)

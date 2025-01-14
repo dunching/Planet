@@ -16,7 +16,7 @@ class USceneComponent;
 class USplineComponent;
 
 UCLASS()
-class PLANET_API UTrackBasePropertyComponent : public USceneObjPropertyComponent
+class PLANET_API UTrackBasePropertyComponent : public USceneActorPropertyComponent
 {
 	GENERATED_BODY()
 
@@ -43,7 +43,7 @@ public:
 
 	bool Attack(int32 Val);
 
-	virtual void Interaction(ACharacterBase* CharacterPtr);
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr);
 
 	void UpdateSpline(const FTransform& StartTransForm, const FTransform& StopTransForm, bool bIsUseCutomTan);
 

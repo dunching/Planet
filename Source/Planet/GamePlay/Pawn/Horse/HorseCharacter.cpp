@@ -21,7 +21,7 @@
 #include "PlanetPlayerState.h"
 #include "GenerateType.h"
 #include "Command/TestCommand.h"
-#include "HumanActionPigInteractionUI.h"
+#include "HumanInteractionWithNPC.h"
 #include "HorseViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"
 #include "HorseRegularProcessor.h"
@@ -101,7 +101,7 @@ void AHorseCharacter::PossessedBy(AController* NewController)
 	}
 }
 
-void AHorseCharacter::Interaction(ACharacterBase* CharacterPtr)
+void AHorseCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
 	if (CharacterPtr)
 	{
@@ -116,12 +116,12 @@ void AHorseCharacter::Interaction(ACharacterBase* CharacterPtr)
 	}
 }
 
-void AHorseCharacter::StartLookAt(ACharacterBase* CharacterPtr)
+void AHorseCharacter::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
 {
 	SwitchDisplayMountTips(true);
 }
 
-void AHorseCharacter::EndLookAt()
+void AHorseCharacter::HasBeenEndedLookAt()
 {
 	SwitchDisplayMountTips(false);
 }

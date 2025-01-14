@@ -35,6 +35,7 @@ class UGroupManaggerMenu;
 class UHUD_TeamInfo;
 class UFocusIcon;
 class UCharacterRisingTips;
+class UInteractionList;
 class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
@@ -85,6 +86,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UInteractionList>InteractionList;
 #pragma endregion MenusUI
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")

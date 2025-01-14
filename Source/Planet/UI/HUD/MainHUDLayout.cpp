@@ -1,4 +1,3 @@
-
 #include "MainHUD.h"
 
 #include "Components/Border.h"
@@ -7,6 +6,7 @@
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
+#include "InteractionList.h"
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
@@ -21,6 +21,8 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
 
 	FName LowerHPSocket = TEXT("LowerHPSocket");
+
+	FName InteractionList = TEXT("InteractionList");
 };
 
 UGetItemInfosList* UMainHUDLayout::GetItemInfos()
@@ -52,4 +54,15 @@ void UMainHUDLayout::SwitchIsLowerHP(bool bIsLowerHP)
 	}
 
 	BorderPtr->SetVisibility(bIsLowerHP ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+UInteractionList* UMainHUDLayout::GetInteractionList()
+{
+	auto UIPtr = Cast<UInteractionList>(GetWidgetFromName(FMainHUDLayout::Get().InteractionList));
+	if (!UIPtr)
+	{
+		return nullptr;
+	}
+
+	return UIPtr;
 }

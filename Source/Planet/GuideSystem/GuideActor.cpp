@@ -34,3 +34,9 @@ void AGuideActor::UpdateCurrentTaskNode(const TSoftObjectPtr<UPAD_TaskNode_Guide
 	TaskNodeRef = InTaskNode;
 	OnCurrentTaskNodeChanged.Broadcast(TaskNodeRef);
 }
+
+AGuideInteractionActor::AGuideInteractionActor(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
+{
+	GuideStateTreeComponentPtr->SetStartLogicAutomatically(true);
+}

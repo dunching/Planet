@@ -179,7 +179,7 @@ void USkill_Consumable_Generic::SpawnActor()
 
 		if (ConsumableActorPtr)
 		{
-			ConsumableActorPtr->Interaction(CharacterPtr);
+			ConsumableActorPtr->HasbeenInteracted(CharacterPtr);
 		}
 	}
 #endif

@@ -1,4 +1,3 @@
-
 #include "MainHUD.h"
 
 #include "AS_Character.h"
@@ -55,57 +54,77 @@ void AMainHUD::SwitchState(EMainHUDType MainHUDType)
 		switch (MainHUDType)
 		{
 		default:
-		{
-			if (EndangeredStatePtr)
 			{
-				EndangeredStatePtr->RemoveFromParent();
-				EndangeredStatePtr = nullptr;
-			}
-			if (RegularActionStatePtr)
-			{
-				RegularActionStatePtr->RemoveFromParent();
-				RegularActionStatePtr = nullptr;
-			}
-		}
-		break;
-		case EMainHUDType::kRegularAction:
-		{
-			if (EndangeredStatePtr)
-			{
-				EndangeredStatePtr->RemoveFromParent();
-				EndangeredStatePtr = nullptr;
-			}
-
-			if (!RegularActionStatePtr)
-			{
-				RegularActionStatePtr = CreateWidget<URegularActionLayout>(GetWorld(), RegularActionStateClass);
-				if (RegularActionStatePtr)
-				{
-					RegularActionStatePtr->AddToViewport(EUIOrder::kHUD);
-				}
-			}
-		}
-		break;
-		case EMainHUDType::kEndangered:
-		{
-			if (RegularActionStatePtr)
-			{
-				RegularActionStatePtr->RemoveFromParent();
-				RegularActionStatePtr = nullptr;
-			}
-
-			if (!EndangeredStatePtr)
-			{
-				EndangeredStatePtr = CreateWidget<UEndangeredStateLayout>(GetWorld(), EndangeredStateClass);
 				if (EndangeredStatePtr)
 				{
-					EndangeredStatePtr->AddToViewport(EUIOrder::kHUD);
+					EndangeredStatePtr->RemoveFromParent();
+					EndangeredStatePtr = nullptr;
+				}
+				if (RegularActionStatePtr)
+				{
+					RegularActionStatePtr->RemoveFromParent();
+					RegularActionStatePtr = nullptr;
 				}
 			}
-		}
-		break;
+			break;
+		case EMainHUDType::kRegularAction:
+			{
+				if (EndangeredStatePtr)
+				{
+					EndangeredStatePtr->RemoveFromParent();
+					EndangeredStatePtr = nullptr;
+				}
+
+				if (!RegularActionStatePtr)
+				{
+					RegularActionStatePtr = CreateWidget<URegularActionLayout>(GetWorld(), RegularActionStateClass);
+					if (RegularActionStatePtr)
+					{
+						RegularActionStatePtr->AddToViewport(EUIOrder::kHUD);
+					}
+				}
+			}
+			break;
+		case EMainHUDType::kEndangered:
+			{
+				if (RegularActionStatePtr)
+				{
+					RegularActionStatePtr->RemoveFromParent();
+					RegularActionStatePtr = nullptr;
+				}
+
+				if (!EndangeredStatePtr)
+				{
+					EndangeredStatePtr = CreateWidget<UEndangeredStateLayout>(GetWorld(), EndangeredStateClass);
+					if (EndangeredStatePtr)
+					{
+						EndangeredStatePtr->AddToViewport(EUIOrder::kHUD);
+					}
+				}
+			}
+			break;
+		case EMainHUDType::kNone:
+			{
+				if (RegularActionStatePtr)
+				{
+					RegularActionStatePtr->RemoveFromParent();
+					RegularActionStatePtr = nullptr;
+				}
+
+				if (EndangeredStatePtr)
+				{
+					EndangeredStatePtr->RemoveFromParent();
+					EndangeredStatePtr = nullptr;
+				}
+			}
+			break;
 		}
 	}
+}
+
+UMainHUDLayout* AMainHUD::GetMainHUDLayout() const
+{
+	return MainHUDLayoutPtr;
 }
 
 void AMainHUD::OnHPChanged(const FOnAttributeChangeData&)
@@ -163,12 +182,12 @@ void AMainHUD::InitMainHUDLayout()
 
 				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 					CharacterAttributesRef->GetMax_HPAttribute()
-					).AddUObject(this, &ThisClass::OnHPChanged);
+				).AddUObject(this, &ThisClass::OnHPChanged);
 
 				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 					CharacterAttributesRef->GetHPAttribute()
-					).AddUObject(this, &ThisClass::OnHPChanged);
-				
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
 				OnHPChangedImp();
 			}
 
@@ -176,28 +195,32 @@ void AMainHUD::InitMainHUDLayout()
 			{
 				auto Handle =
 					CharacterPtr->GetHoldingItemsComponent()->OnSkillProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnSkillProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+						std::bind(&UGetItemInfosList::OnSkillProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
 					CharacterPtr->GetHoldingItemsComponent()->OnCoinProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnCoinProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+						std::bind(&UGetItemInfosList::OnCoinProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2, std::placeholders::_3
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
 					CharacterPtr->GetHoldingItemsComponent()->OnConsumableProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnConsumableProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+						std::bind(&UGetItemInfosList::OnConsumableProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
 					CharacterPtr->GetHoldingItemsComponent()->OnGroupmateProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnGourpmateProxyChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+						std::bind(&UGetItemInfosList::OnGourpmateProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}

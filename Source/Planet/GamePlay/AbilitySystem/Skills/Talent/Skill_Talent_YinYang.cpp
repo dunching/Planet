@@ -16,7 +16,7 @@
 #include "CollisionDataStruct.h"
 #include "HumanCharacter.h"
 #include "TeamMatesHelperComponent.h"
-#include "SceneObjSubSystem.h"
+#include "SceneActorSubSystem.h"
 #include "CharacterAbilitySystemComponent.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
@@ -73,7 +73,7 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 		// );
 	}
 
-	TargetPostPtr = USceneObjSubSystem::GetInstance()->GetSkillPost();
+	TargetPostPtr = USceneActorSubSystem::GetInstance()->GetSkillPost();
 	if (TargetPostPtr)
 	{
 		WhiteTemp = TargetPostPtr->Settings.WhiteTemp;

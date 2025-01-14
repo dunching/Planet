@@ -6,9 +6,9 @@
 #include "GameFramework/Pawn.h"
 
 #include "Common/GenerateType.h"
-#include "Component/ItemInteractionComponent.h"
+#include "Component/SceneActorInteractionComponent.h"
 #include "CharacterBase.h"
-#include "SceneObj.h"
+#include "SceneActor.h"
 
 #include "TrackVehicleBase.generated.h"
 
@@ -19,7 +19,7 @@ class ATrackBase;
 class UHoldItemComponent;
 
 UCLASS()
-class PLANET_API UTrackVehicleItemPropertyComponent : public USceneObjPropertyComponent
+class PLANET_API UTrackVehicleItemPropertyComponent : public USceneActorPropertyComponent
 {
 	GENERATED_BODY()
 
@@ -72,7 +72,7 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 
-	USceneObjPropertyComponent* GetDynamicCommonproperty()const { return ItemPropertyComponentPtr; }
+	USceneActorPropertyComponent* GetDynamicCommonproperty()const { return ItemPropertyComponentPtr; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
 		USceneComponent* RootCompPtr = nullptr;

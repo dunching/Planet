@@ -30,6 +30,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GuideSystem");
         PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_Character");
         PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_GuideSystem");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_SceneActor");
         PublicIncludePaths.Add("Planet/GuideSystem/STT");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask");
         PublicIncludePaths.Add("Planet/GamePlay");
@@ -90,13 +91,15 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/HUD/EffectsList");
         PublicIncludePaths.Add("Planet/UI/HUD/GetItemInfos");
         PublicIncludePaths.Add("Planet/UI/HUD/FocusTitle");
+        PublicIncludePaths.Add("Planet/UI/HUD/PlayerConversationBorder");
         PublicIncludePaths.Add("Planet/UI/UMGs");
         PublicIncludePaths.Add("Planet/UI/UILayout");
+        PublicIncludePaths.Add("Planet/UI/UILayout/InteractionList");
         PublicIncludePaths.Add("Planet/UI/UILayout/Team");
-        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState");
-        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/ActionStateHUD");
-        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/BuildingStateHUD");
-        PublicIncludePaths.Add("Planet/UI/UILayout/PawnState/EndangeredState");
+        PublicIncludePaths.Add("Planet/UI/UILayout/Layout");
+        PublicIncludePaths.Add("Planet/UI/UILayout/Layout/ActionStateLayout");
+        PublicIncludePaths.Add("Planet/UI/UILayout/Layout/BuildingStateLayout");
+        PublicIncludePaths.Add("Planet/UI/UILayout/Layout/EndangeredStateLayout");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");
         PublicIncludePaths.Add("Planet/AI/EQS");

@@ -7,7 +7,7 @@
 #include "CharacterBase.h"
 #include "Skill_Consumable_Base.h"
 
-void AConsumable_Base::Interaction(ACharacterBase* CharacterPtr)
+void AConsumable_Base::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
 }
 

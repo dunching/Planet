@@ -60,16 +60,20 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-#pragma region  ProcessMode
+#pragma region  Layout
+	// Layout一次只会显示一种👇
+	
 	// 普通界面(技能状态HUD)、
-	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr = nullptr);
+	void DisplayActionLayout(bool bIsDisplay, ACharacterBase* CharacterPtr = nullptr);
 
 	// 重伤状态
-	void DisplayEndangeredState(bool bIsDisplay);
+	void DisplayEndangeredLayout(bool bIsDisplay);
 
 	// 工具、
-	void DisplayBuildingStateHUD(bool bIsDisplay);
-#pragma endregion  ProcessMode
+	void DisplayBuildingLayout(bool bIsDisplay);
+
+	void CloseLayout();
+#pragma endregion  
 
 #pragma region Menu
 	void SwitchMenu(bool bIsShow);

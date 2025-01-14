@@ -12,6 +12,8 @@ enum EUIOrder : int8
 	kUIOrderDefault = -99,
 
 	kConversationBorder = 1,
+	
+	kInteractionList,
 
 	kFightingTips,
 	kFocus,

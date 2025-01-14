@@ -44,7 +44,7 @@ protected:
 
 	virtual void TickTask(float DeltaTime)override;
 
-	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void OnDestroy(bool bInOwnerFinished) override;
 
 	virtual void PerformTask();
 

@@ -60,7 +60,7 @@ void UAITask_Conversation::ConditionalPerformTask()
 {
 	if (CurrentTaskNodePtr->IsA(UPAD_TaskNode_Preset_Conversation::StaticClass()))
 	{
-		auto ConversationTaskNodePtr = Cast<UPAD_TaskNode_Preset_Conversation>(CurrentTaskNodePtr);
+		auto ConversationTaskNodePtr = Cast<UPAD_TaskNode_Preset_Conversation>(CurrentTaskNodePtr.LoadSynchronous());
 		if (ConversationTaskNodePtr)
 		{
 			if (SentenceIndex < ConversationTaskNodePtr->ConversationsAry.Num())

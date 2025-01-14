@@ -18,7 +18,7 @@
 #include "GameMode_Main.h"
 #include "GenerateType.h"
 #include "Command/TestCommand.h"
-#include "HumanActionPigInteractionUI.h"
+#include "HumanInteractionWithNPC.h"
 #include "HumanViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"
 #include "ToolsLibrary.h"
@@ -47,10 +47,17 @@
 
 #include "ItemProxy_Container.h"
 #include "GroupSharedInfo.h"
+#include "SceneActorInteractionComponent.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(USceneActorInteractionComponent::ComponentName);
+}
+
+USceneActorInteractionComponent* AHumanCharacter::GetSceneActorInteractionComponent() const
+{
+	return SceneActorInteractionComponentPtr;
 }
 
 void AHumanCharacter::BeginPlay()

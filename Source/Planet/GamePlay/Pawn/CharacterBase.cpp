@@ -16,11 +16,10 @@
 #include "GameMode_Main.h"
 #include "ToolsLibrary.h"
 #include "Animation/AnimInstanceBase.h"
-#include "Component/ItemInteractionComponent.h"
+#include "Component/SceneActorInteractionComponent.h"
 #include "HoldingItemsComponent.h"
 #include "GenerateType.h"
 #include "InputProcessor.h"
-#include <ToolsMenu.h>
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "CharacterAttributesComponent.h"
@@ -45,7 +44,7 @@
 #include "PlanetPlayerController.h"
 #include "GAEvent_Helper.h"
 #include "CharacterRisingTips.h"
-#include "SceneObj.h"
+#include "SceneActor.h"
 #include "GE_CharacterInitail.h"
 #include "GroupSharedInfo.h"
 
@@ -85,6 +84,8 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	HasBeenEndedLookAt();
+	
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 	auto CharacterAttributeSetPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
@@ -202,24 +203,28 @@ void ACharacterBase::OnRep_Controller()
 	Super::OnRep_Controller();
 }
 
-void ACharacterBase::InteractionSceneObj(ASceneObj* SceneObjPtr)
+void ACharacterBase::InteractionSceneActor(ASceneActor* SceneObjPtr)
 {
 	InteractionSceneObj_Server(SceneObjPtr);
 }
 
-void ACharacterBase::Interaction(ACharacterBase* CharacterPtr)
+void ACharacterBase::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
 {
 }
 
-void ACharacterBase::LookingAt(ACharacterBase* CharacterPtr)
+void ACharacterBase::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
 }
 
-void ACharacterBase::StartLookAt(ACharacterBase* CharacterPtr)
+void ACharacterBase::HasBeenLookingAt(ACharacterBase* CharacterPtr)
 {
 }
 
-void ACharacterBase::EndLookAt()
+void ACharacterBase::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
+{
+}
+
+void ACharacterBase::HasBeenEndedLookAt()
 {
 }
 
@@ -273,11 +278,11 @@ TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 	return GetHoldingItemsComponent()->CharacterProxySPtr;
 }
 
-void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneObjPtr)
+void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)
 {
 	if (SceneObjPtr)
 	{
-		SceneObjPtr->Interaction(this);
+		SceneObjPtr->HasbeenInteracted(this);
 	}
 }
 
@@ -342,6 +347,7 @@ bool ACharacterBase::GetIsValidTarget() const
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	// 只在 ROLE_AutonomousProxy 运行
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UInputProcessorSubSystem::GetInstance()->BindAction(InputComponent);

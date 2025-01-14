@@ -35,17 +35,17 @@ public:
 
 	void ConditionalPerformTask();
 
-	void SetUp(UPAD_TaskNode_Preset* CurrentTaskNodePtr, AHumanCharacter_AI* InCharacterPtr);
+	void SetUp(const TSoftObjectPtr<UPAD_TaskNode_Preset>& CurrentTaskNodePtr, AHumanCharacter_AI* InCharacterPtr);
 
 protected:
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void OnDestroy(bool bInOwnerFinished) override;
 
 	AHumanCharacter_AI* CharacterPtr = nullptr;
 
 	UPROPERTY(Transient)
-	UPAD_TaskNode_Preset* CurrentTaskNodePtr = nullptr;
+	TSoftObjectPtr<UPAD_TaskNode_Preset> CurrentTaskNodePtr = nullptr;
 };
 
 UCLASS()
@@ -63,7 +63,7 @@ public:
 protected:
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void OnDestroy(bool bInOwnerFinished) override;
 
 	AHumanCharacter_AI* CharacterPtr = nullptr;
 

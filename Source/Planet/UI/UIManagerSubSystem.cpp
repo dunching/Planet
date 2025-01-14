@@ -140,11 +140,11 @@ void UUIManagerSubSystem::ViewRaffleMenu(bool bIsDisplay)
 
 void UUIManagerSubSystem::InitialUI()
 {
-	DisplayActionStateHUD(false);
-	DisplayBuildingStateHUD(false);
+	DisplayActionLayout(false);
+	DisplayBuildingLayout(false);
 }
 
-void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr)
+void UUIManagerSubSystem::DisplayActionLayout(bool bIsDisplay, ACharacterBase* CharacterPtr)
 {
 	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
 	if (!MainHUDPtr)
@@ -154,7 +154,7 @@ void UUIManagerSubSystem::DisplayActionStateHUD(bool bIsDisplay, ACharacterBase*
 	MainHUDPtr->SwitchState(bIsDisplay ? EMainHUDType::kRegularAction : EMainHUDType::kNone);
 }
 
-void UUIManagerSubSystem::DisplayEndangeredState(bool bIsDisplay)
+void UUIManagerSubSystem::DisplayEndangeredLayout(bool bIsDisplay)
 {
 	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
 	if (MainHUDPtr)
@@ -163,8 +163,17 @@ void UUIManagerSubSystem::DisplayEndangeredState(bool bIsDisplay)
 	}
 }
 
-void UUIManagerSubSystem::DisplayBuildingStateHUD(bool bIsDisplay)
+void UUIManagerSubSystem::DisplayBuildingLayout(bool bIsDisplay)
 {
+}
+
+void UUIManagerSubSystem::CloseLayout()
+{
+	auto MainHUDPtr = Cast<AMainHUD>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0)->GetHUD());
+	if (MainHUDPtr)
+	{
+		MainHUDPtr->SwitchState(EMainHUDType::kNone);
+	}
 }
 
 URegularActionLayout* UUIManagerSubSystem::GetRegularActionState()

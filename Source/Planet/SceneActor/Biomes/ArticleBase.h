@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SceneObj.h"
+#include "SceneActor.h"
 #include "ArticleBase.generated.h"
 
 class UStaticMesh;
@@ -11,7 +11,7 @@ class UStaticMeshComponent;
 class USceneComponent;
 
 UCLASS()
-class PLANET_API URawMaterialInteractionComponent : public USceneObjPropertyComponent
+class PLANET_API URawMaterialInteractionComponent : public USceneActorPropertyComponent
 {
 	GENERATED_BODY()
 
@@ -29,7 +29,7 @@ protected:
 };
 
 UCLASS()
-class PLANET_API ARawMaterialBase : public ASceneObj
+class PLANET_API ARawMaterialBase : public ASceneActor
 {
 	GENERATED_BODY()
 

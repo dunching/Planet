@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "GameplayAbilitySpecHandle.h"
 
-#include "SceneObj.h"
+#include "SceneActor.h"
 #include "Common/GenerateType.h"
 
 #include "ToolProxyBase.generated.h"
@@ -23,7 +23,7 @@ class USkill_Base;
 static FName RootComponentName;
 
 UCLASS()
-class PLANET_API AToolProxyBase : public ASceneObj
+class PLANET_API AToolProxyBase : public ASceneActor
 {
 	GENERATED_BODY()
 

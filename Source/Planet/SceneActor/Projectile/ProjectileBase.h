@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "SceneObj.h"
+#include "SceneActor.h"
 
 #include "ProjectileBase.generated.h"
 
@@ -14,7 +14,7 @@ class UProjectileMovementComponent;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API AProjectileBase : public ASceneObj
+class PLANET_API AProjectileBase : public ASceneActor
 {
 	GENERATED_BODY()
 

@@ -20,7 +20,7 @@ public:
 
 	AConsumable_Test(const FObjectInitializer& ObjectInitializer);
 
-	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
 
 protected:
 

@@ -11,6 +11,7 @@
 #include "MainHUDLayout.generated.h"
 
 class UGetItemInfosList;
+class UInteractionList;
 
 UCLASS()
 class PLANET_API UMainHUDLayout : public UMyUserWidget
@@ -23,5 +24,7 @@ public:
 	UGetItemInfosList* GetItemInfos();
 
 	void SwitchIsLowerHP(bool bIsLowerHP);
+
+	UInteractionList* GetInteractionList();
 
 };

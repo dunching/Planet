@@ -34,7 +34,7 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
+		UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(true);
 		UUIManagerSubSystem::GetInstance()->ViewBackpack(
 			true
 		);
@@ -50,7 +50,7 @@ namespace HumanProcessor
 
 	void FViewBackpackProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
+		UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(false);
 		UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();

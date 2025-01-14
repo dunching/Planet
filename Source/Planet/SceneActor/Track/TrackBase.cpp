@@ -79,7 +79,7 @@ bool ATrackBase::Attack(int32 Val)
     return false;
 }
 
-void ATrackBase::Interaction(ACharacterBase* CharacterPtr)
+void ATrackBase::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
 
 }

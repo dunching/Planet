@@ -27,7 +27,7 @@ public:
 	UConversationComponent(const FObjectInitializer& ObjectInitializer);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void DisplaySentence(
+	virtual void DisplaySentence(
 		const FTaskNode_Conversation_SentenceInfo&Sentence
 		);
 

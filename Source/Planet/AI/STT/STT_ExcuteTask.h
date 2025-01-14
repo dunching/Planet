@@ -45,7 +45,7 @@ struct PLANET_API FStateTreeExcuteTaskAutomaticInstanceData
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 
 	UPROPERTY(Transient)
-	TArray<UPAD_TaskNode_Preset*> TaskNodesAry;
+	TArray<TSoftObjectPtr<UPAD_TaskNode_Preset>> TaskNodesAry;
 
 	UPROPERTY(Transient)
 	UPAD_TaskNode_Preset* CurrentTaskNodePtr = nullptr;

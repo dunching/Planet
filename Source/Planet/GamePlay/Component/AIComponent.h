@@ -31,10 +31,11 @@ public:
 
 	void AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr);
 
-
+	// 预置的任务，如自动播放的对话
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<UPAD_TaskNode_Preset*> PresetTaskNodesAry;
+	TArray<TSoftObjectPtr<UPAD_TaskNode_Preset>> PresetTaskNodesAry;
 
+	// 临时的任务，需要立即执行，比如多人对话时 A结束 B马上开始下一句，下一句则为临时任务被添加到此
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<UTaskNode_Temporary*> TemporaryTaskNodesAry;
 	

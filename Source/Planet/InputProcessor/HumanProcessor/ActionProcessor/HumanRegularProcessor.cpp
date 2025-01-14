@@ -68,6 +68,7 @@
 #include "HumanCharacter_Player.h"
 #include "ResourceBox.h"
 #include "GroupSharedInfo.h"
+#include "HumanCharacter_AI.h"
 #include "ItemProxy_Character.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
@@ -101,7 +102,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(true, OnwerActorPtr);
+			UUIManagerSubSystem::GetInstance()->DisplayActionLayout(true, OnwerActorPtr);
 
 			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
 				[this]()
@@ -123,74 +124,7 @@ namespace HumanProcessor
 			return;
 		}
 
-		FVector OutCamLoc = FVector::ZeroVector;
-		FRotator OutCamRot = FRotator::ZeroRotator;
-		auto CameraManagerPtr = UGameplayStatics::GetPlayerCameraManager(OnwerActorPtr->GetWorld(), 0);
-		if (CameraManagerPtr)
-		{
-			CameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
-		}
-
-		auto StartPt = OutCamLoc;
-		auto StopPt = OutCamLoc + (OutCamRot.Vector() * 1000);
-
-		FHitResult Result;
-
-		FCollisionQueryParams Params;
-		Params.bTraceComplex = false;
-
-		ISceneObjInteractionInterface* TempLookAtSceneObjPtr = nullptr;
-		if (OnwerActorPtr->GetWorld()->LineTraceSingleByChannel(
-				Result,
-				StartPt,
-				StopPt,
-				SceneObj_Channel,
-				Params
-			)
-		)
-		{
-#ifdef WITH_EDITOR
-			if (HumanRegularProcessor.GetValueOnGameThread())
-			{
-				DrawDebugSphere(OnwerActorPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
-			}
-#endif
-
-			if (Cast<ISceneObjInteractionInterface>(Result.GetActor()))
-			{
-				TempLookAtSceneObjPtr = Cast<ISceneObjInteractionInterface>(Result.GetActor());
-			}
-		}
-
-		if (TempLookAtSceneObjPtr)
-		{
-			if (LookAtSceneObjPtr)
-			{
-				if (TempLookAtSceneObjPtr == LookAtSceneObjPtr)
-				{
-				}
-				else
-				{
-					TempLookAtSceneObjPtr->StartLookAt(OnwerActorPtr);
-					LookAtSceneObjPtr->EndLookAt();
-					LookAtSceneObjPtr = TempLookAtSceneObjPtr;
-				}
-			}
-			else
-			{
-				TempLookAtSceneObjPtr->StartLookAt(OnwerActorPtr);
-				LookAtSceneObjPtr = TempLookAtSceneObjPtr;
-			}
-			TempLookAtSceneObjPtr->LookingAt(OnwerActorPtr);
-		}
-		else
-		{
-			if (LookAtSceneObjPtr)
-			{
-				LookAtSceneObjPtr->EndLookAt();
-			}
-			LookAtSceneObjPtr = nullptr;
-		}
+		OnwerActorPtr->UpdateSightActor();
 	}
 
 	void FHumanRegularProcessor::SwitchCurrentWeapon()
@@ -206,7 +140,7 @@ namespace HumanProcessor
 	{
 		AddOrRemoveUseMenuItemEvent(false);
 
-		UUIManagerSubSystem::GetInstance()->DisplayActionStateHUD(false);
+		UUIManagerSubSystem::GetInstance()->DisplayActionLayout(false);
 
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
@@ -223,8 +157,10 @@ namespace HumanProcessor
 	{
 		if (Params.Event == EInputEvent::IE_Pressed)
 		{
+			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+
 			// 特殊处理一下
-			if (LookAtSceneObjPtr && (Params.Key == EKeys::E))
+			if (OnwerActorPtr->LookAtSceneActorPtr && (Params.Key == EKeys::E))
 			{
 				return;
 			}
@@ -232,8 +168,6 @@ namespace HumanProcessor
 			auto SkillIter = HandleKeysMap.Find(Params.Key);
 			if (SkillIter)
 			{
-				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
 				OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 
 				OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(SkillIter->Socket);
@@ -247,7 +181,6 @@ namespace HumanProcessor
 				(Params.Key == EKeys::D)
 			)
 			{
-				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 				OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 			}
 		}
@@ -294,16 +227,29 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::EKeyPressed()
 	{
-		if (LookAtSceneObjPtr)
-		{
-			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
-			OnwerActorPtr->InteractionSceneObj(Cast<ASceneObj>(LookAtSceneObjPtr));
+		if (OnwerActorPtr->LookAtSceneActorPtr)
+		{
+			OnwerActorPtr->InteractionSceneActor(Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr));
 		}
 	}
 
 	void FHumanRegularProcessor::EKeyReleased()
 	{
+	}
+
+	void FHumanRegularProcessor::FKeyPressed()
+	{
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+
+		if (OnwerActorPtr->LookAtSceneActorPtr)
+		{
+			if (auto CharacterPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
+			{
+				OnwerActorPtr->InteractionSceneCharacter(CharacterPtr);
+			}
+		}
 	}
 
 	void FHumanRegularProcessor::QKeyPressed()

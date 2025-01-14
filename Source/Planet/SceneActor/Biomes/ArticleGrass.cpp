@@ -11,9 +11,9 @@ AArticleGrass::AArticleGrass(const FObjectInitializer& ObjectInitializer) :
 {
 }
 
-void AArticleGrass::Interaction(ACharacterBase* CharacterPtr)
+void AArticleGrass::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
-	Super::Interaction(CharacterPtr);
+	Super::HasbeenInteracted(CharacterPtr);
 
 	if (CharacterPtr)
 	{

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
+#include "Components/StateTreeComponent.h"
 
 #include "GenerateType.h"
 
@@ -21,6 +22,10 @@ class PLANET_API UPlayerComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+
+	static FName ComponentName;
+	
+	UPlayerComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay()override;
 	

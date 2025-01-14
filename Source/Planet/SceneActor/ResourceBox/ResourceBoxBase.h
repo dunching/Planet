@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "SceneObj.h"
+#include "SceneActor.h"
 
 #include "ResourceBoxBase.generated.h"
 
@@ -12,7 +12,7 @@ class UHoldingItemsComponent;
 class ACharacterBase;
 
 UCLASS()
-class PLANET_API AResourceBoxBase : public ASceneObj
+class PLANET_API AResourceBoxBase : public ASceneActor
 {
 	GENERATED_BODY()
 
@@ -26,7 +26,7 @@ protected:
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 	
-	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
 
 protected:
 	

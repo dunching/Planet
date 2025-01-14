@@ -35,7 +35,7 @@ protected:
 
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
 	UFUNCTION()
 	bool PerformTask(float Delta);

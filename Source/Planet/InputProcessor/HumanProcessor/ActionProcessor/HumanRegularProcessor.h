@@ -14,9 +14,9 @@
 struct FSkillSocketInfo;
 
 class AWeapon_Base;
-class ASceneObj;
+class ASceneActor;
 class AHorseCharacter;
-class ISceneObjInteractionInterface;
+class ISceneActorInteractionInterface;
 
 struct FSocketBase;
 struct FWeaponProxy;
@@ -53,6 +53,8 @@ namespace HumanProcessor
 
 		virtual void EKeyReleased()override;
 
+		virtual void FKeyPressed()override;
+
 		virtual void QKeyPressed()override;
 
 		virtual void GKeyPressed()override;
@@ -84,8 +86,6 @@ namespace HumanProcessor
 		bool bIsPressdLeftAlt = false;
 
 		TMap<FKey, FCharacterSocket>HandleKeysMap;
-
-		ISceneObjInteractionInterface* LookAtSceneObjPtr = nullptr;
 
 		FOnAllocationChangedHandle OnAllocationChangedHandle;
 

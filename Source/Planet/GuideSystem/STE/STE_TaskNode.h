@@ -15,6 +15,9 @@
 #include "STE_TaskNode.generated.h"
 
 class AGuideActor;
+class AGuideInteractionActor;
+class ACharacterBase;
+class AHumanCharacter_Player;
 
 UCLASS(Blueprintable)
 class PLANET_API USTE_TaskNode : public UStateTreeEvaluatorBlueprintBase
@@ -31,6 +34,28 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
 	AGuideActor* GuideActorPtr = nullptr;
+
+protected:
+
+};
+
+UCLASS(Blueprintable)
+class PLANET_API USTE_TaskNode_Interaction : public UStateTreeEvaluatorBlueprintBase
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void TreeStop(FStateTreeExecutionContext& Context)override;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
+	AGuideInteractionActor* GuideActorPtr = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
+	AHumanCharacter_Player* PlayerCharacter = nullptr;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
+	ACharacterBase* TargetCharacter = nullptr;
 
 protected:
 

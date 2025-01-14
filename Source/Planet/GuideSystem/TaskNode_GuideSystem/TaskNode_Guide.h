@@ -32,11 +32,16 @@ public:
 	// 当任务完成时玩家会得到的物品
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, int32> GetItemWhenComplete;
+
+	// 执行此节点时，是否刷新上一条的描述？
+	// 在执行某些H节点时，是不需要刷新的
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsFreshPreviouDescription = true;
 	
 };
 
 /*
- * 角色去往指定地点
+ * 引导玩家去往指定地点
  */
 UCLASS(Blueprintable, BlueprintType)
 class PLANET_API UPAD_TaskNode_Guide_MoveToLocation : public UPAD_TaskNode_Guide
@@ -72,4 +77,75 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	FString Description;
+};
+
+/*
+ * 引导玩家按下某个按键
+ */
+UCLASS(Blueprintable, BlueprintType)
+class PLANET_API UPAD_TaskNode_Guide_PressKey : public UPAD_TaskNode_Guide
+{
+	GENERATED_BODY()
+
+public:
+	UPAD_TaskNode_Guide_PressKey(const FObjectInitializer& ObjectInitializer);
+
+	virtual FString GetDescription() const override;
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
+	FKey Key = EKeys::AnyKey;
+
+};
+
+/*
+ * 玩家独白
+ */
+UCLASS(Blueprintable, BlueprintType)
+class PLANET_API UPAD_TaskNode_Guide_Monologue : public UPAD_TaskNode_Guide
+{
+	GENERATED_BODY()
+
+public:
+	UPAD_TaskNode_Guide_Monologue(const FObjectInitializer& ObjectInitializer);
+
+	virtual FString GetDescription() const override;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
+	
+};
+
+/*
+ * 向目标添加可交互内容
+ * 比如NPC原本只有固定对话内容，添加之后可增加新的内容，如接取支线、交付结果等
+ */
+UCLASS(Blueprintable, BlueprintType)
+class PLANET_API UPAD_TaskNode_Guide_AddToTarget : public UPAD_TaskNode_Guide
+{
+	GENERATED_BODY()
+
+public:
+	UPAD_TaskNode_Guide_AddToTarget(const FObjectInitializer& ObjectInitializer);
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSoftObjectPtr<AHumanCharacter_AI>TargetCharacterPtr = nullptr;
+	
+};
+
+/*
+ * 引导玩家与目标对话
+ */
+UCLASS(Blueprintable, BlueprintType)
+class PLANET_API UPAD_TaskNode_Guide_ConversationWithTarget : public UPAD_TaskNode_Guide
+{
+	GENERATED_BODY()
+
+public:
+	UPAD_TaskNode_Guide_ConversationWithTarget(const FObjectInitializer& ObjectInitializer);
+
+	virtual FString GetDescription() const override;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSoftObjectPtr<AHumanCharacter_AI>TargetCharacterPtr = nullptr;
+	
 };

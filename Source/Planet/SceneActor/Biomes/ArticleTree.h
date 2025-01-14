@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "ArticleBase.h"
-#include "Component/ItemInteractionComponent.h"
+#include "Component/SceneActorInteractionComponent.h"
 
 #include "ArticleTree.generated.h"
 

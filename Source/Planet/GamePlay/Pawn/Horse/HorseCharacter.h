@@ -17,7 +17,7 @@ class UCameraComponent;
 class UGravitySpringComponent;
 
 class FProcessActionBase;
-class USceneObjPropertyComponent;
+class USceneActorPropertyComponent;
 class FInputProcessor;
 class UAnimInstanceCharacter;
 class AHumanCharacter;
@@ -34,11 +34,11 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
 
-	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
+	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr)override;
 
-	virtual void EndLookAt()override;
+	virtual void HasBeenEndedLookAt()override;
 
 	virtual TPair<FVector, FVector>GetCharacterViewInfo();
 

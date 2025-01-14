@@ -43,9 +43,9 @@ void AResourceBoxBase::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
-void AResourceBoxBase::Interaction(ACharacterBase* InCharacterPtr)
+void AResourceBoxBase::HasbeenInteracted(ACharacterBase* InCharacterPtr)
 {
-	Super::Interaction(InCharacterPtr);
+	Super::HasbeenInteracted(InCharacterPtr);
 
 	InteractionImp_BoxBase(InCharacterPtr);
 }

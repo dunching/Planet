@@ -2,6 +2,7 @@
 
 #include <Kismet/GameplayStatics.h>
 #include "Net/UnrealNetwork.h"
+#include "Components/WidgetComponent.h"
 
 #include "AIComponent.h"
 #include "CharacterTitle.h"
@@ -16,11 +17,21 @@
 #include "HumanAIController.h"
 #include "GroupSharedInfo.h"
 #include "AIControllerStateTreeAIComponent.h"
+#include "CharacterAbilitySystemComponent.h"
+
+// UGameplayTasksComponent* USceneCharacterAIInteractionComponent::GetGameplayTasksComponent(
+// 	const UGameplayTask& Task) const
+// {
+// 	return GetOwner<AHumanCharacter_AI>()->GetCharacterAbilitySystemComponent();
+// }
 
 AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	AIComponentPtr = CreateDefaultSubobject<UAIComponent>(UAIComponent::ComponentName);
+	
+	InteractionWidgetCompoentPtr = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
+	InteractionWidgetCompoentPtr->SetupAttachment(RootComponent);
 }
 
 void AHumanCharacter_AI::BeginPlay()
@@ -31,6 +42,41 @@ void AHumanCharacter_AI::BeginPlay()
 void AHumanCharacter_AI::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+}
+
+void AHumanCharacter_AI::HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)
+{
+	Super::HasBeenStartedLookAt(InCharacterPtr);
+	
+	HasBeenLookingAt(InCharacterPtr);
+}
+
+void AHumanCharacter_AI::HasBeenLookingAt(ACharacterBase* InCharacterPtr)
+{
+	Super::HasBeenLookingAt(InCharacterPtr);
+	
+	if (
+		InteractionWidgetCompoentPtr &&
+		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < SceneActorInteractionComponentPtr->Range)
+		)
+	{
+		InteractionWidgetCompoentPtr->SetVisibility(true);
+	}
+	else
+	{
+		HasBeenEndedLookAt();
+	}
+	
+}
+
+void AHumanCharacter_AI::HasBeenEndedLookAt()
+{	
+	if (InteractionWidgetCompoentPtr)
+	{
+		InteractionWidgetCompoentPtr->SetVisibility(false);
+	}
+	
+	Super::HasBeenEndedLookAt();
 }
 
 void AHumanCharacter_AI::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)

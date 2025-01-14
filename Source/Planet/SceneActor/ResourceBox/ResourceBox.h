@@ -26,13 +26,13 @@ public:
 
 	virtual void OnConstruction(const FTransform& Transform)override;
 	
-	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
 	
-	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
+	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr)override;
 
-	virtual void LookingAt(ACharacterBase* CharacterPtr)override;
+	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
 
-	virtual void EndLookAt()override;
+	virtual void HasBeenEndedLookAt()override;
 
 protected:
 

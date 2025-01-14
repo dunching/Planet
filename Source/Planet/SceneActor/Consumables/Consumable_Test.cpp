@@ -14,9 +14,9 @@ AConsumable_Test::AConsumable_Test(const FObjectInitializer& ObjectInitializer) 
 	SetReplicates(true);
 }
 
-void AConsumable_Test::Interaction(ACharacterBase* CharacterPtr)
+void AConsumable_Test::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
-	Super::Interaction(CharacterPtr);
+	Super::HasbeenInteracted(CharacterPtr);
 
 	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
 }

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "SceneObj.h"
+#include "SceneActor.h"
 #include "GenerateType.h"
 #include "ItemProxy_Minimal.h"
 #include "BuildSharedData.h"
@@ -69,7 +69,7 @@ Type* UStateSwitchComponent::GetBuildItem()
 }
 
 UCLASS()
-class PLANET_API UBuildingPropertyComponent : public USceneObjPropertyComponent
+class PLANET_API UBuildingPropertyComponent : public USceneActorPropertyComponent
 {
 	GENERATED_BODY()
 
@@ -95,7 +95,7 @@ protected:
 };
 
 UCLASS()
-class PLANET_API ABuildingBase : public ASceneObj
+class PLANET_API ABuildingBase : public ASceneActor
 {
 	GENERATED_BODY()
 

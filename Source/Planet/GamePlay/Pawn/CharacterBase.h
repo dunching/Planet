@@ -12,7 +12,7 @@
 
 #include "ItemProxy_Minimal.h"
 #include "PlanetAbilitySystemComponent.h"
-#include "SceneObjInteractionInterface.h"
+#include "SceneActorInteractionInterface.h"
 
 #include "CharacterBase.generated.h"
 
@@ -21,7 +21,7 @@ class UAbilitySystemComponent;
 struct FGameplayAbilityTargetData_GAReceivedEvent;
 
 class AEquipmentBase;
-class ASceneObj;
+class ASceneActor;
 class UCharacterTitle;
 class UCharacterRisingTips;
 
@@ -30,7 +30,7 @@ class UEquipmentInteractionComponent;
 class UHoldItemComponent;
 class UInputProcessorSubSystem;
 class UZYInputComponent;
-class USceneObjPropertyComponent;
+class USceneActorPropertyComponent;
 class UPlanetGameplayAbility;
 class UCharacterAttributesComponent;
 class UHoldingItemsComponent;
@@ -50,7 +50,7 @@ UCLASS()
 class PLANET_API ACharacterBase : 
 	public AGravityCharacter,
 	public IPlanetAbilitySystemInterface,
-	public ISceneObjInteractionInterface,
+	public ISceneActorInteractionInterface,
 	public IGroupSharedInterface
 {
 	GENERATED_BODY()
@@ -81,15 +81,17 @@ public:
 	
 	virtual void OnRep_Controller()override;
 	
-	virtual void InteractionSceneObj(ASceneObj* SceneObjPtr);
+	virtual void InteractionSceneActor(ASceneActor* SceneObjPtr);
 	
-	virtual void Interaction(ACharacterBase* CharacterPtr) override;
+	virtual void InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr);
+	
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) override;
 
-	virtual void LookingAt(ACharacterBase* CharacterPtr)override;
+	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
 
-	virtual void StartLookAt(ACharacterBase* CharacterPtr) override;
+	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr) override;
 
-	virtual void EndLookAt() override;
+	virtual void HasBeenEndedLookAt() override;
 
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -162,7 +164,7 @@ protected:
 	virtual void OnRep_GroupSharedInfoChanged();
 
 	UFUNCTION(Server, Reliable)
-	virtual void InteractionSceneObj_Server(ASceneObj* SceneObjPtr);
+	virtual void InteractionSceneObj_Server(ASceneActor* SceneObjPtr);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);

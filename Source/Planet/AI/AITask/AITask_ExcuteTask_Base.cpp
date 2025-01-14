@@ -37,7 +37,7 @@ void UAITask_ExcuteTask_Base::ConditionalPerformTask()
 {
 }
 
-void UAITask_ExcuteTask_Base::SetUp(UPAD_TaskNode_Preset* InCurrentTaskNodePtr, AHumanCharacter_AI* InCharacterPtr)
+void UAITask_ExcuteTask_Base::SetUp(const TSoftObjectPtr<UPAD_TaskNode_Preset>& InCurrentTaskNodePtr, AHumanCharacter_AI* InCharacterPtr)
 {
 	CurrentTaskNodePtr = InCurrentTaskNodePtr;
 	CharacterPtr = InCharacterPtr;
