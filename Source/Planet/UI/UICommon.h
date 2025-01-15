@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 
-#include "UICommon.generated.h"
-
 enum EUIOrder : int8
 {
 	// WidgetComponent默认为-100
@@ -24,13 +22,4 @@ enum EUIOrder : int8
 
 	kMainUI,
 	kTableMenu,
-};
-
-UENUM(BlueprintType)
-enum class EMenuType : uint8
-{
-	kAllocationSkill,
-	kAllocationTalent,
-	kGroupManagger,
-	kRaffle,
 };

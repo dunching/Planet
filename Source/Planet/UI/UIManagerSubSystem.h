@@ -32,7 +32,7 @@ class UProgressTips;
 class UHUD_TeamInfo;
 class UGetItemInfosList;
 class URaffleMenu;
-class UMenuLayout;
+class UMainMenuLayout;
 class UFocusIcon;
 
 struct FPawnDataStruct;
@@ -69,7 +69,7 @@ public:
 	// 重伤状态
 	void DisplayEndangeredLayout(bool bIsDisplay);
 
-	// 工具、
+	// 工具、建造模式
 	void DisplayBuildingLayout(bool bIsDisplay);
 
 	void CloseLayout();
@@ -98,10 +98,10 @@ public:
 protected:
 
 	// 菜单UI
-	UMenuLayout* GetMainMenu();
+	UMainMenuLayout* GetMainMenu();
 	
 	UPROPERTY()
-	UMenuLayout* MenuLayoutPtr = nullptr;
+	UMainMenuLayout* MenuLayoutPtr = nullptr;
 
 private:
 

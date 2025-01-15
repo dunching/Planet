@@ -1,12 +1,14 @@
 #include "MainHUD.h"
 
 #include "Components/Border.h"
+#include "Components/WidgetSwitcher.h"
 
 #include "MainHUDLayout.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
 #include "InteractionList.h"
+#include "LayoutInterfacetion.h"
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
@@ -23,7 +25,65 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 	FName LowerHPSocket = TEXT("LowerHPSocket");
 
 	FName InteractionList = TEXT("InteractionList");
+
+	FName Layout_WidgetSwichter = TEXT("Layout_WidgetSwichter");
 };
+
+void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
+{
+	auto Lambda = [this](int32 Index)
+	{
+		auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwichter));
+		if (UIPtr)
+		{
+			const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+			if (CurrentIndex == Index)
+			{
+				auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(Index));
+				if (MenuInterfacePtr)
+				{
+					MenuInterfacePtr->Enable();
+				}
+
+				return;
+			}
+			UIPtr->SetActiveWidgetIndex(Index);
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(Index));
+			if (MenuInterfacePtr)
+			{
+				MenuInterfacePtr->DisEnable();
+			}
+		}
+	};
+
+	switch (LayoutCommon)
+	{
+	case ELayoutCommon::kActionLayout:
+		{
+			Lambda(0);
+		}
+		break;
+	case ELayoutCommon::kMenuLayout:
+		{
+			Lambda(1);
+		}
+		break;
+	case ELayoutCommon::KConversationLayout:
+		{
+			Lambda(2);
+		}
+		break;
+	case ELayoutCommon::kEndangeredLayout:
+		{
+			Lambda(3);
+		}
+		break;
+	default:
+		{
+		}
+		break;
+	}
+}
 
 UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 {

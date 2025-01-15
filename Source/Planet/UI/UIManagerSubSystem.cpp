@@ -34,7 +34,7 @@
 #include "RaffleMenu.h"
 #include "MainHUD.h"
 #include "UICommon.h"
-#include "MenuLayout.h"
+#include "MainMenuLayout.h"
 #include "PawnStateConsumablesHUD.h"
 #include "FocusTitle.h"
 #include "PlanetPlayerController.h"
@@ -187,11 +187,11 @@ URegularActionLayout* UUIManagerSubSystem::GetRegularActionState()
 	return nullptr;
 }
 
-UMenuLayout* UUIManagerSubSystem::GetMainMenu()
+UMainMenuLayout* UUIManagerSubSystem::GetMainMenu()
 {
 	if (!MenuLayoutPtr)
 	{
-		MenuLayoutPtr = CreateWidget<UMenuLayout>(GetWorldImp(), UAssetRefMap::GetInstance()->MenuLayoutClass);
+		MenuLayoutPtr = CreateWidget<UMainMenuLayout>(GetWorldImp(), UAssetRefMap::GetInstance()->MenuLayoutClass);
 		if (MenuLayoutPtr)
 		{
 			MenuLayoutPtr->AddToViewport(EUIOrder::kTableMenu);

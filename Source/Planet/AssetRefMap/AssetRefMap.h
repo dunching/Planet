@@ -39,7 +39,7 @@ class UInteractionList;
 class AHumanCharacter;
 class AHorseCharacter;
 class AGeneratorNPC;
-class UMenuLayout;
+class UMainMenuLayout;
 class UGE_Damage;
 class ATargetPoint_Runtime;
 
@@ -76,7 +76,7 @@ public:
 	TSubclassOf<UItemProxyDragDropOperation>ItemsDragDropOperationClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UMenuLayout>MenuLayoutClass;
+	TSubclassOf<UMainMenuLayout>MenuLayoutClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UCharacterTitle>AIHumanInfoClass;

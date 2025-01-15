@@ -20,6 +20,9 @@ class PLANET_API UMainHUDLayout : public UMyUserWidget
 
 public:
 
+	// 
+	void SwitchToNewLayout(ELayoutCommon LayoutCommon);
+
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
 
