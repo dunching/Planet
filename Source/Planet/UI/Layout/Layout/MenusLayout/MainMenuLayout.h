@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "LayoutInterfacetion.h"
 #include "UICommon.h"
 #include "MenuInterface.h"
 #include "MainMenuCommon.h"
@@ -23,7 +24,7 @@ class UAllocationSkillsMenu;
 UCLASS()
 class PLANET_API UMainMenuLayout :
 	public UMyUserWidget,
-	public IMenuInterface
+	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
@@ -33,9 +34,9 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	virtual void ResetUIByData()override;
-
-	virtual void SyncData()override;
+	virtual void Enable()override;
+	
+	virtual void DisEnable()override;
 
 	void SwitchViewer(EMenuType MenuType);
 

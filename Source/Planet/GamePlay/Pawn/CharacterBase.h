@@ -40,6 +40,7 @@ class UStateProcessorComponent;
 class UTeamMatesHelperComponent;
 class UCharacterAbilitySystemComponent;
 class UInteractiveConsumablesComponent;
+class UCharacterTitleComponent;
 class UProxyProcessComponent;
 class UInteractiveToolComponent;
 class UConversationComponent;
@@ -112,6 +113,8 @@ public:
 
 	UConversationComponent* GetConversationComponent()const;
 
+	UCharacterTitleComponent* GetCharacterTitleComponent()const;
+
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const;
 	
 	template<typename Type = UAnimInstanceBase>
@@ -132,9 +135,6 @@ public:
 	// 确认是否是一个有效的选中目标，比如目标在隐身、或“无法选中”、重伤倒地状态时为不可已被选中
 	bool GetIsValidTarget()const;
 
- 	UPROPERTY(Transient)
- 	UCharacterTitle* CharacterTitlePtr = nullptr;
- 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
 
@@ -192,6 +192,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCharacterAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Data)
+	TObjectPtr<UCharacterTitleComponent> CharacterTitleComponentPtr = nullptr;
+	
 	UPROPERTY()
 	TObjectPtr<UProxyProcessComponent> ProxyProcessComponentPtr = nullptr;
 	
@@ -214,12 +217,18 @@ private:
 	UFUNCTION(NetMulticast, Unreliable)
 	void OnProcessedGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
+	void OnDeathing(const FGameplayTag Tag, int32 Count);
+
+	void DoDeathing();
+
 	FValueChangedDelegateHandle HPChangedHandle;
 
 	FValueChangedDelegateHandle MoveSpeedChangedHandle;
 
 	FProcessedGAEventHandle ProcessedGAEventHandle;
 	
+	FDelegateHandle OnOwnedDeathTagDelegateHandle;
+
 	UPROPERTY(Transient)
 	TObjectPtr<AController> OriginalAIController;
 

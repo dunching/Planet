@@ -42,61 +42,8 @@ void UCharacterTitle::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	SetAnchorsInViewport(FAnchors(.5f));
-	SetAlignmentInViewport(FVector2D(.5f, 1.f));
-
-	if (CharacterPtr)
-	{
-		float Radius = 0.f;
-		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
-
-		{
-			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent(); 
-			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
-		}
-		
-		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		{
-			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetHPAttribute()
-				).AddUObject(this, &ThisClass::OnHPChanged);
-
-			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetMax_HPAttribute()
-				).AddUObject(this, &ThisClass::OnHPChanged);
-
-			SetHPChanged(CharacterAttributeSetPtr->GetHP(), CharacterAttributeSetPtr->GetMax_HP());
-		}
-		{
-			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetPPAttribute()
-				).AddUObject(this, &ThisClass::OnPPChanged);
-
-			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetMax_PPAttribute()
-				).AddUObject(this, &ThisClass::OnPPChanged);
-
-			SetPPChanged(CharacterAttributeSetPtr->GetPP(), CharacterAttributeSetPtr->GetMax_PP());
-		}
-		{
-			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetShieldAttribute()
-				).AddUObject(this, &ThisClass::OnShieldChanged);
-
-			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetMax_HPAttribute()
-				).AddUObject(this, &ThisClass::OnShieldChanged);
-
-			SetShieldChanged(CharacterAttributeSetPtr->GetShield(), CharacterAttributeSetPtr->GetMax_HP());
-		}
-		SwitchCantBeSelect(false);
-
-		ApplyCharaterNameToTitle();
-
-		TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
-		ResetPosition(0.f);
-	}
+	// SetAnchorsInViewport(FAnchors(.5f));
+	// SetAlignmentInViewport(FVector2D(.5f, 1.f));
 }
 
 void UCharacterTitle::NativeDestruct()
@@ -278,4 +225,61 @@ bool UCharacterTitle::ResetPosition(float InDeltaTime)
 	SetPositionInViewport(ScreenPosition);
 
 	return true;
+}
+
+void UCharacterTitle::SetData(ACharacterBase* InCharacterPtr)
+{
+	CharacterPtr = InCharacterPtr;
+	if (CharacterPtr)
+	{
+		float Radius = 0.f;
+		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
+
+		{
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent(); 
+			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
+		}
+		
+		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetHPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_HPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
+			SetHPChanged(CharacterAttributeSetPtr->GetHP(), CharacterAttributeSetPtr->GetMax_HP());
+		}
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetPPAttribute()
+				).AddUObject(this, &ThisClass::OnPPChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_PPAttribute()
+				).AddUObject(this, &ThisClass::OnPPChanged);
+
+			SetPPChanged(CharacterAttributeSetPtr->GetPP(), CharacterAttributeSetPtr->GetMax_PP());
+		}
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetShieldAttribute()
+				).AddUObject(this, &ThisClass::OnShieldChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_HPAttribute()
+				).AddUObject(this, &ThisClass::OnShieldChanged);
+
+			SetShieldChanged(CharacterAttributeSetPtr->GetShield(), CharacterAttributeSetPtr->GetMax_HP());
+		}
+		SwitchCantBeSelect(false);
+
+		ApplyCharaterNameToTitle();
+
+		// TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
+		// ResetPosition(0.f);
+	}
 }

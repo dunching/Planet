@@ -7,11 +7,13 @@
 #include "GameFramework/HUD.h"
 
 #include "MyUserWidget.h"
+#include "LayoutCommon.h"
 
 #include "MainHUDLayout.generated.h"
 
 class UGetItemInfosList;
 class UInteractionList;
+class UMainMenuLayout;
 
 UCLASS()
 class PLANET_API UMainHUDLayout : public UMyUserWidget
@@ -23,6 +25,8 @@ public:
 	// 
 	void SwitchToNewLayout(ELayoutCommon LayoutCommon);
 
+	UMainMenuLayout *GetMenuLayout();
+	
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
 

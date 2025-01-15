@@ -8,6 +8,7 @@
 
 #include "MyUserWidget.h"
 #include "TemplateHelper.h"
+#include "LayoutCommon.h"
 
 #include "MainHUD.generated.h"
 
@@ -17,14 +18,6 @@ class UEndangeredStateLayout;
 class UGetItemInfosList;
 class UUIManagerSubSystem;
 struct FOnAttributeChangeData;
-
-enum class EMainHUDType : uint8 
-{
-	kRegularAction,
-	kEndangered,
-	kBuilding,
-	kNone,
-};
 
 UCLASS()
 class PLANET_API AMainHUD : public AHUD
@@ -44,7 +37,7 @@ public:
 
 	void InitalHUD();
 	
-	void SwitchState(EMainHUDType MainHUDType);
+	void SwitchLayout(ELayoutCommon MainHUDType);
 
 	UMainHUDLayout*GetMainHUDLayout()const;
 	
@@ -60,17 +53,5 @@ protected:
 	TSubclassOf<UMainHUDLayout>MainHUDLayoutClass;
 	
 	UMainHUDLayout* MainHUDLayoutPtr = nullptr;
-
-	// 常规状态下显示的的HUD	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<URegularActionLayout>RegularActionStateClass;
-
-	URegularActionLayout* RegularActionStatePtr = nullptr;
-	
-	// 重伤时要显示的HUD
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UEndangeredStateLayout>EndangeredStateClass;
-	
-	UEndangeredStateLayout* EndangeredStatePtr = nullptr;
 
 };

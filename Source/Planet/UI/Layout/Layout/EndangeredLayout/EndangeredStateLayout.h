@@ -8,6 +8,7 @@
 
 #include "GenerateType.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 
 #include "EndangeredStateLayout.generated.h"
@@ -24,10 +25,15 @@ struct FConsumableSocketInfo;
  */
 UCLASS()
 class PLANET_API UEndangeredStateLayout :
-	public UMyUserWidget
+	public UMyUserWidget,
+	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
+
+	virtual void Enable()override;
+	
+	virtual void DisEnable()override;
 
 };

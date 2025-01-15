@@ -13,6 +13,7 @@
 #include "MainHUD.h"
 #include "MainHUDLayout.h"
 #include "PlanetPlayerController.h"
+#include "UIManagerSubSystem.h"
 
 namespace HumanProcessor
 {
@@ -26,26 +27,30 @@ namespace HumanProcessor
 	{
 		FInputProcessor::EnterAction();
 
-		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+		if (OnwerActorPtr)
 		{
-			PlayerPCPtr->bShowMouseCursor = true;
+			UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kConversationLayout);
 
-			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
-		}
+			auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
+			if (PlayerPCPtr)
+			{
+				PlayerPCPtr->bShowMouseCursor = true;
 
-		// Player对应的操作
-		if (auto Character_NPCPtr = Cast<AHumanCharacter_AI>(HumanCharaterPtr->LookAtSceneActorPtr))
-		{
-			// 显示对应的UI
-			HumanCharaterPtr
-				->GetController<APlanetPlayerController>()
-				->GetHUD<AMainHUD>()
-				->GetMainHUDLayout()
-				->GetInteractionList()
-				->UpdateDisplay(Character_NPCPtr);
+				UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
+			}
+
+			// Player对应的操作
+			if (auto Character_NPCPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
+			{
+				// 显示对应的UI
+				OnwerActorPtr
+					->GetController<APlanetPlayerController>()
+					->GetHUD<AMainHUD>()
+					->GetMainHUDLayout()
+					->GetInteractionList()
+					->UpdateDisplay(Character_NPCPtr);
+			}
 		}
 	}
 

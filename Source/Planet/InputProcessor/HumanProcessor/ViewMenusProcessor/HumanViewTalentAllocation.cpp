@@ -34,7 +34,7 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(true);
+		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(true);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
@@ -47,7 +47,7 @@ namespace HumanProcessor
 
 	void FHumanViewTalentAllocation::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(false);
+		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(false);
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 

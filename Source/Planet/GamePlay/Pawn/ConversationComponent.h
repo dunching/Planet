@@ -11,8 +11,10 @@
 
 class UPAD_TaskNode_Preset_Conversation;
 class UConversationBorder;
+class ACharacterBase;
 
-/* 角色的会话组件
+/*
+ * 角色的会话组件
  * 比如角色在念某一段台词是需要显示一个气泡和音频播放
  */
 UCLASS(BlueprintType, Blueprintable)
@@ -23,6 +25,8 @@ class PLANET_API UConversationComponent : public UActorComponent
 public:
 	
 	static FName ComponentName;
+
+	using FOwnerType = ACharacterBase;
 
 	UConversationComponent(const FObjectInitializer& ObjectInitializer);
 
@@ -35,10 +39,4 @@ public:
 	void CloseConversationborder();
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UConversationBorder> UConversationBorderClass;
-
-	UPROPERTY(Transient)
-	UConversationBorder* ConversationBorderPtr = nullptr;
-
 };

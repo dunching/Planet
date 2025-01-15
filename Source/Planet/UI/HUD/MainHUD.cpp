@@ -44,82 +44,12 @@ void AMainHUD::ShowHUD()
 void AMainHUD::InitalHUD()
 {
 	InitMainHUDLayout();
-	SwitchState(EMainHUDType::kRegularAction);
+	SwitchLayout(ELayoutCommon::kActionLayout);
 }
 
-void AMainHUD::SwitchState(EMainHUDType MainHUDType)
+void AMainHUD::SwitchLayout(ELayoutCommon MainHUDType)
 {
-	if (bShowHUD && PlayerOwner)
-	{
-		switch (MainHUDType)
-		{
-		default:
-			{
-				if (EndangeredStatePtr)
-				{
-					EndangeredStatePtr->RemoveFromParent();
-					EndangeredStatePtr = nullptr;
-				}
-				if (RegularActionStatePtr)
-				{
-					RegularActionStatePtr->RemoveFromParent();
-					RegularActionStatePtr = nullptr;
-				}
-			}
-			break;
-		case EMainHUDType::kRegularAction:
-			{
-				if (EndangeredStatePtr)
-				{
-					EndangeredStatePtr->RemoveFromParent();
-					EndangeredStatePtr = nullptr;
-				}
-
-				if (!RegularActionStatePtr)
-				{
-					RegularActionStatePtr = CreateWidget<URegularActionLayout>(GetWorld(), RegularActionStateClass);
-					if (RegularActionStatePtr)
-					{
-						RegularActionStatePtr->AddToViewport(EUIOrder::kHUD);
-					}
-				}
-			}
-			break;
-		case EMainHUDType::kEndangered:
-			{
-				if (RegularActionStatePtr)
-				{
-					RegularActionStatePtr->RemoveFromParent();
-					RegularActionStatePtr = nullptr;
-				}
-
-				if (!EndangeredStatePtr)
-				{
-					EndangeredStatePtr = CreateWidget<UEndangeredStateLayout>(GetWorld(), EndangeredStateClass);
-					if (EndangeredStatePtr)
-					{
-						EndangeredStatePtr->AddToViewport(EUIOrder::kHUD);
-					}
-				}
-			}
-			break;
-		case EMainHUDType::kNone:
-			{
-				if (RegularActionStatePtr)
-				{
-					RegularActionStatePtr->RemoveFromParent();
-					RegularActionStatePtr = nullptr;
-				}
-
-				if (EndangeredStatePtr)
-				{
-					EndangeredStatePtr->RemoveFromParent();
-					EndangeredStatePtr = nullptr;
-				}
-			}
-			break;
-		}
-	}
+	GetMainHUDLayout()->SwitchToNewLayout(MainHUDType);
 }
 
 UMainHUDLayout* AMainHUD::GetMainHUDLayout() const

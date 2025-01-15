@@ -16,16 +16,16 @@ void UConversationBorder::NativeConstruct()
 {
 	Super::NativeConstruct();
  	
-	SetAnchorsInViewport(FAnchors(.5f, 1.f));
-	SetAlignmentInViewport(FVector2D(.5f, 1.f));
+	// SetAnchorsInViewport(FAnchors(.5f, 1.f));
+	// SetAlignmentInViewport(FVector2D(.5f, 1.f));
+	//
+	// if (CharacterPtr)
+	// {
+	// 	float Radius = 0.f;
+	// 	CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
+	// }
 
-	if (CharacterPtr)
-	{
-		float Radius = 0.f;
-		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
-	}
-
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
+	// TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
 }
 
 void UConversationBorder::NativeDestruct()

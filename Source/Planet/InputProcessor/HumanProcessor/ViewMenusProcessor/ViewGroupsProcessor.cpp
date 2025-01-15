@@ -34,7 +34,7 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(true);
+		// UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(true);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
@@ -47,7 +47,7 @@ namespace HumanProcessor
 
 	void FViewGroupsProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(false);
+		// UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(false);
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 

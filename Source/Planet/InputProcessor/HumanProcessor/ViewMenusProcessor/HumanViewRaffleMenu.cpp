@@ -35,7 +35,7 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(true);
+		// UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(true);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
@@ -48,7 +48,7 @@ namespace HumanProcessor
 
 	void FHumanViewRaffleMenuProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(false);
+		// UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(false);
 		
 		URaffleSubSystem::GetInstance()->SyncProxys2Player();
 

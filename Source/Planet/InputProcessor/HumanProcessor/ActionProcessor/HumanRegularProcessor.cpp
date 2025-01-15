@@ -102,7 +102,7 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			UUIManagerSubSystem::GetInstance()->DisplayActionLayout(true, OnwerActorPtr);
+			UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kActionLayout);
 
 			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
 				[this]()
@@ -140,7 +140,7 @@ namespace HumanProcessor
 	{
 		AddOrRemoveUseMenuItemEvent(false);
 
-		UUIManagerSubSystem::GetInstance()->DisplayActionLayout(false);
+		// UUIManagerSubSystem::GetInstance()->DisplayActionLayout(false);
 
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)

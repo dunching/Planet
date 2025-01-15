@@ -38,9 +38,11 @@ public:
 
 	void SwitchCantBeSelect(bool bIsCanBeSelect);
 
-	ACharacterBase* CharacterPtr = nullptr;
-
+	void SetData(ACharacterBase* CharacterPtr);
+	
 protected:
+
+	ACharacterBase* CharacterPtr = nullptr;
 
 protected:
 	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);

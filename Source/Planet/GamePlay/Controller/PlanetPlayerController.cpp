@@ -666,8 +666,6 @@ void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 	// 		IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
 	// 	);
 	// }
-
-	UUIManagerSubSystem::GetInstance()->InitialUI();
 }
 
 void APlanetPlayerController::OnRep_WolrdProcess()

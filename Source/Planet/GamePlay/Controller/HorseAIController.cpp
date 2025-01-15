@@ -169,7 +169,7 @@ void AHorseAIController::InitialCharacter()
 		AIHumanInfoPtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
 		if (AIHumanInfoPtr)
 		{
-			AIHumanInfoPtr->CharacterPtr = CharacterPtr;
+			// AIHumanInfoPtr->CharacterPtr = CharacterPtr;
 			AIHumanInfoPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
 		}
 

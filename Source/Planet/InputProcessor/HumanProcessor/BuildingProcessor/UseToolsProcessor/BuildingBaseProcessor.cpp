@@ -54,7 +54,7 @@ namespace HumanProcessor
 	{
 		Super::EnterAction();
 
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(true);
+		// UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(true);
 
 		AddOrRemoveUseMenuItemEvent(true);
 	}
@@ -69,7 +69,7 @@ namespace HumanProcessor
 //			OnwerActorPtr->GetInteractiveToolComponent()->RetractputTool();
 		}
 
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(false);
+		// UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(false);
 
 		Super::QuitAction();
 	}

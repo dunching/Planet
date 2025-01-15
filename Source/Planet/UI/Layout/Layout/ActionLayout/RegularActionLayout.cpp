@@ -54,6 +54,14 @@ void URegularActionLayout::NativeConstruct()
 	}
 }
 
+void URegularActionLayout::Enable()
+{
+}
+
+void URegularActionLayout::DisEnable()
+{
+}
+
 void URegularActionLayout::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)
 {
 	// 

@@ -76,10 +76,6 @@ protected:
 		const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
 	);
 
-	void OnDeathing(const FGameplayTag Tag, int32 Count);
-
-	void DoDeathing();
-
 	virtual void OnConstruction(const FTransform& Transform)override;
 
 	virtual void BeginPlay() override;
@@ -109,8 +105,6 @@ protected:
 	FTeamHelperChangedDelegate TeamHelperChangedDelegate;
 
 	FTeamHelperChangedDelegate GroupHelperChangedDelegate;
-
-	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIControllerStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;

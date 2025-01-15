@@ -95,24 +95,6 @@ void AHumanAIController::OnTeammateOptionChangedImp(
 {
 }
 
-void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
-{
-
-}
-
-void AHumanAIController::DoDeathing()
-{
-	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
-	{
- 		if (CharacterPtr->CharacterTitlePtr)
- 		{
- 			CharacterPtr->CharacterTitlePtr->RemoveFromParent();
- 			CharacterPtr->CharacterTitlePtr = nullptr;
- 		}
-	}
-}
-
 void AHumanAIController::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
@@ -125,16 +107,6 @@ void AHumanAIController::BeginPlay()
 	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
 	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
 
-	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
-	{
-		auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-			UGameplayTagsLibrary::DeathingTag,
-			EGameplayTagEventType::NewOrRemoved
-		);
-		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
-	}
-	
 	InitialGroupInfo();
 	
 	InitialCharacter();
@@ -142,8 +114,6 @@ void AHumanAIController::BeginPlay()
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	DoDeathing();
-
 	Super::EndPlay(EndPlayReason);
 }
 

@@ -23,16 +23,13 @@ void UMainMenuLayout::NativeDestruct()
 	{
 		Super::NativeDestruct();
 	};
-
-	SyncData();
 }
 
-void UMainMenuLayout::ResetUIByData()
+void UMainMenuLayout::Enable()
 {
-
 }
 
-void UMainMenuLayout::SyncData()
+void UMainMenuLayout::DisEnable()
 {
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMenuLayout::Get().WidgetSwitcher));
 	if (UIPtr)

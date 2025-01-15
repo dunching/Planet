@@ -8,7 +8,9 @@
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
 #include "InteractionList.h"
+#include "LayoutCommon.h"
 #include "LayoutInterfacetion.h"
+#include "MainMenuLayout.h"
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
@@ -26,14 +28,14 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 
 	FName InteractionList = TEXT("InteractionList");
 
-	FName Layout_WidgetSwichter = TEXT("Layout_WidgetSwichter");
+	FName Layout_WidgetSwitcher = TEXT("Layout_WidgetSwitcher");
 };
 
 void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 {
 	auto Lambda = [this](int32 Index)
 	{
-		auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwichter));
+		auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
 		if (UIPtr)
 		{
 			const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
@@ -68,7 +70,7 @@ void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 			Lambda(1);
 		}
 		break;
-	case ELayoutCommon::KConversationLayout:
+	case ELayoutCommon::kConversationLayout:
 		{
 			Lambda(2);
 		}
@@ -83,6 +85,24 @@ void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 		}
 		break;
 	}
+}
+
+UMainMenuLayout* UMainHUDLayout::GetMenuLayout()
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
+	{
+		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kMenuLayout))
+		{
+			auto MenuInterfacePtr = Cast<UMainMenuLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			if (MenuInterfacePtr)
+			{
+				return MenuInterfacePtr;
+			}
+		}
+	}
+	return nullptr;
 }
 
 UGetItemInfosList* UMainHUDLayout::GetItemInfos()

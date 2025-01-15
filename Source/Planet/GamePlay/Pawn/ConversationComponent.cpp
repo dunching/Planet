@@ -6,6 +6,7 @@
 #include "ConversationBorder.h"
 #include "UICommon.h"
 #include "CharacterBase.h"
+#include "CharacterTitleComponent.h"
 #include "TaskNode.h"
 
 UConversationComponent::UConversationComponent(const FObjectInitializer& ObjectInitializer):
@@ -19,11 +20,8 @@ void UConversationComponent::CloseConversationborder_Implementation()
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
-		if (ConversationBorderPtr)
-		{
-			ConversationBorderPtr->RemoveFromParent();
-			ConversationBorderPtr = nullptr;
-		}
+		auto OwnerCharacterOtr = GetOwner<FOwnerType>();
+		OwnerCharacterOtr->GetCharacterTitleComponent()->CloseConversationborder();
 	}
 #endif
 }
@@ -35,20 +33,8 @@ void UConversationComponent::DisplaySentence_Implementation(
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
-		if (ConversationBorderPtr)
-		{
-			ConversationBorderPtr->SetSentence(Sentence);
-		}
-		else
-		{
-			ConversationBorderPtr = CreateWidget<UConversationBorder>(GetWorldImp(), UConversationBorderClass);
-			if (ConversationBorderPtr)
-			{
-				ConversationBorderPtr->CharacterPtr = GetOwner<ACharacterBase>();
-				ConversationBorderPtr->SetSentence(Sentence);
-				ConversationBorderPtr->AddToViewport(EUIOrder::kConversationBorder);
-			}
-		}
+		auto OwnerCharacterOtr = GetOwner<FOwnerType>();
+		OwnerCharacterOtr->GetCharacterTitleComponent()->DisplaySentence(Sentence);
 	}
 #endif
 }

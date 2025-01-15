@@ -7,6 +7,7 @@
 #include "GameFramework/HUD.h"
 
 #include "MyUserWidget.h"
+#include "LayoutInterfacetion.h"
 
 #include "RegularActionLayout.generated.h"
 
@@ -39,13 +40,18 @@ class ACharacterBase;
  */
 UCLASS()
 class PLANET_API URegularActionLayout :
-	public UMyUserWidget
+	public UMyUserWidget,
+	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
 
 	virtual void NativeConstruct()override;
+
+	virtual void Enable()override;
+	
+	virtual void DisEnable()override;
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")

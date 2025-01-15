@@ -44,6 +44,7 @@
 #include "PlanetPlayerController.h"
 #include "GAEvent_Helper.h"
 #include "CharacterRisingTips.h"
+#include "CharacterTitleComponent.h"
 #include "SceneActor.h"
 #include "GE_CharacterInitail.h"
 #include "GroupSharedInfo.h"
@@ -71,6 +72,9 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(
 		UStateProcessorComponent::ComponentName);
+
+	CharacterTitleComponentPtr = CreateDefaultSubobject<UCharacterTitleComponent>(
+		UCharacterTitleComponent::ComponentName);
 
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
 	ConversationComponentPtr = CreateDefaultSubobject<UConversationComponent>(UConversationComponent::ComponentName);
@@ -109,6 +113,12 @@ void ACharacterBase::BeginPlay()
 	}
 #endif
 
+	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
+		UGameplayTagsLibrary::DeathingTag,
+		EGameplayTagEventType::NewOrRemoved
+	);
+	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
+	
 	OnMoveSpeedChangedImp(CharacterAttributeSetPtr->GetMoveSpeed());
 }
 
@@ -127,12 +137,6 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	if (MoveSpeedChangedHandle)
 	{
 		MoveSpeedChangedHandle->UnBindCallback();
-	}
-
-	if (CharacterTitlePtr)
-	{
-		CharacterTitlePtr->RemoveFromParent();
-		CharacterTitlePtr = nullptr;
 	}
 
 	OriginalAIController = nullptr;
@@ -273,6 +277,11 @@ UConversationComponent* ACharacterBase::GetConversationComponent() const
 	return ConversationComponentPtr;
 }
 
+UCharacterTitleComponent* ACharacterBase::GetCharacterTitleComponent() const
+{
+	return CharacterTitleComponentPtr;
+}
+
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
 	return GetHoldingItemsComponent()->CharacterProxySPtr;
@@ -329,10 +338,7 @@ void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType Ani
 
 void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCampType)
 {
-	if (CharacterTitlePtr)
-	{
-		CharacterTitlePtr->SetCampType(CharacterCampType);
-	}
+	CharacterTitleComponentPtr->SetCampType(CharacterCampType);
 }
 
 bool ACharacterBase::GetIsValidTarget() const
@@ -456,23 +462,19 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() < ROLE_Authority)
 	{
-		if (!CharacterTitlePtr)
-		{
-			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
-			if (CharacterTitlePtr)
-			{
-				CharacterTitlePtr->CharacterPtr = this;
-				if (GetLocalRole() == ROLE_AutonomousProxy)
-				{
-					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
-				}
-				else
-				{
-					CharacterTitlePtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
-				}
-			}
-		}
 	}
 #endif
+}
+
+void ACharacterBase::OnDeathing(const FGameplayTag Tag, int32 Count)
+{
+
+}
+
+void ACharacterBase::DoDeathing()
+{
+	// auto CharacterPtr = GetPawn<FPawnType>();
+	// if (CharacterPtr)
+	// {
+	// }
 }

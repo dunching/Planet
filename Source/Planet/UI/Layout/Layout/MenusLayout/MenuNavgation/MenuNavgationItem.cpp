@@ -31,22 +31,22 @@ void UMenuNavgationItem::OnClicked()
 	{
 	case EMenuType::kAllocationSkill:
 	{
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(true);
+		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kAllocationSkill);
 	}
 	break;
 	case EMenuType::kAllocationTalent:
 	{
-		UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(true);
+		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kAllocationTalent);
 	}
 	break;
 	case EMenuType::kGroupManagger:
 	{
-		UUIManagerSubSystem::GetInstance()->ViewGroupMatesManagger(true);
+		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kGroupManagger);
 	}
 	break;
 	case EMenuType::kRaffle:
 	{
-		UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(true);
+		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kRaffle);
 	}
 	break;
 	}
