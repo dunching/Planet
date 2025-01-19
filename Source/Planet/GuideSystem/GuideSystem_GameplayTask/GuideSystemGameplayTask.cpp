@@ -227,3 +227,38 @@ void UGameplayTask_Interaction_Conversation::ConditionalPerformTask()
 	
 	SentenceIndex++;
 }
+
+UGameplayTask_Interaction_Option::UGameplayTask_Interaction_Option(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	bTickingTask = true;
+	bIsPausable = true;
+}
+
+void UGameplayTask_Interaction_Option::Activate()
+{
+	Super::Activate();
+}
+
+void UGameplayTask_Interaction_Option::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+}
+
+void UGameplayTask_Interaction_Option::OnDestroy(bool bInOwnerFinished)
+{
+	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_Interaction_Option::SetUp(
+		const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef,
+                                             ACharacterBase* InTargetCharacterPtr
+                                             )
+{
+	TaskNodeRef = InTaskNodeRef;
+	TargetCharacterPtr = InTargetCharacterPtr;
+}
+
+void UGameplayTask_Interaction_Option::ConditionalPerformTask()
+{
+}

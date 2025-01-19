@@ -4,7 +4,7 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "TaskNode_SceneActor.h"
+#include "TaskNode_Interaction.h"
 #include "GuideActor.h"
 #include "InputProcessorSubSystem.h"
 #include "InteractionList.h"
@@ -13,6 +13,8 @@
 #include "PlanetPlayerController.h"
 #include "HumanRegularProcessor.h"
 #include "HumanCharacter_Player.h"
+#include "TextCollect.h"
+#include "TextSubSystem.h"
 
 namespace HumanProcessor
 {
@@ -45,43 +47,18 @@ void UInteractionItem::ResetUIByData()
 {
 }
 
-void UInteractionItem::SetData(const TSubclassOf<AGuideInteractionActor>& InTaskNode)
+void UInteractionItem::SetData(const FOnInteractionItemClicked & InOnInteractionItemClicked)
 {
-	if (!InTaskNode.Get())
-	{
-		return;
-	}
-
-	TaskNode = InTaskNode;
-
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FInteractionItem::Get().Text));
 	if (!UIPtr)
 	{
 		return;
 	}
 
-	UIPtr->SetText(FText::FromString(TaskNode.GetDefaultObject()->TaskName));
+	UIPtr->SetText(FText::FromString(UTextSubSystem::GetInstance()->GetText(TextCollect::CharacterInteraction)));
 }
 
 void UInteractionItem::OnClicked()
 {
-	FActorSpawnParameters SpawnParameters;
-
-	auto GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteractionActor>(
-		TaskNode, SpawnParameters
-	);
-
-	if (GuideInteractionActorPtr)
-	{
-		GuideInteractionActorPtr->OnGuideInteractionEnd.AddLambda([]
-		{
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-		});
-		
-		Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
-			->GetHUD<AMainHUD>()
-			->GetMainHUDLayout()
-			->GetInteractionList()
-			->CloseUI();
-	}
+	OnInteractionItemClicked.Broadcast();
 }

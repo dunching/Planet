@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "HumanCharacter_AI.h"
 
 #include "InputProcessor.h"
 
 class AHumanCharacter_Player;
+class AHumanCharacter_AI;
 
 namespace HumanProcessor
 {
@@ -28,6 +30,8 @@ namespace HumanProcessor
 
 		virtual void ESCKeyPressed()override;
 
+		AHumanCharacter_AI* CharacterPtr = nullptr;
+		
 	protected:
 
 		void Switch2RegularProcessor();

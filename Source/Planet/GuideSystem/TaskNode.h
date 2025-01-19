@@ -31,6 +31,7 @@ enum class ETaskNodeType : uint8
 	kGuide_AddToTarget, //
 	
 	kInteraction_Conversation, //
+	kInteraction_Option, //
 	
 	kNone,
 };
@@ -99,7 +100,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float DelayTime = 1.f;
 
-	// 念这句词的角色，为空则是“自己”念，否则把这句推送给 AvatorCharacterPtr 念
+	// 念这句词的角色，为空则是“自己”念，否则把这句推送给 PlayerCharacter 念
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSoftObjectPtr<AHumanCharacter_AI>AvatorCharacterPtr = nullptr;
 	

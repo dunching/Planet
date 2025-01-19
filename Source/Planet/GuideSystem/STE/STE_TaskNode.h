@@ -40,6 +40,17 @@ protected:
 };
 
 UCLASS(Blueprintable)
+class PLANET_API USTE_TaskNode_Guide : public USTE_TaskNode
+{
+	GENERATED_BODY()
+
+public:
+
+protected:
+
+};
+
+UCLASS(Blueprintable)
 class PLANET_API USTE_TaskNode_Interaction : public UStateTreeEvaluatorBlueprintBase
 {
 	GENERATED_BODY()
@@ -56,6 +67,10 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
 	ACharacterBase* TargetCharacter = nullptr;
+
+	// 上条任务的输出参数
+	UPROPERTY(EditAnywhere, Category = Output)
+	int32 LastTaskOut = 0;
 
 protected:
 

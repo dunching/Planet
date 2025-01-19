@@ -16,6 +16,7 @@
 
 class AHumanCharacter_Player;
 class ATargetPoint_Runtime;
+class UPAD_TaskNode_Interaction_Option;
 
 UCLASS()
 class PLANET_API UGameplayTask_Base : public UGameplayTask
@@ -33,6 +34,8 @@ protected:
 	EStateTreeRunStatus StateTreeRunStatus = EStateTreeRunStatus::Running;
 	
 	AHumanCharacter_Player* PlayerCharacterPtr = nullptr;
+
+	
 };
 
 UCLASS()
@@ -127,7 +130,8 @@ class PLANET_API UGameplayTask_Interaction  : public UGameplayTask_Base
 	GENERATED_BODY()
 
 public:
-	
+
+	// 激活互动的Character
 	ACharacterBase* TargetCharacterPtr = nullptr;
 };
 
@@ -160,5 +164,35 @@ protected:
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
 	
 	int32 SentenceIndex = 0;
+	
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Interaction_Option : public UGameplayTask_Interaction
+{
+	GENERATED_BODY()
+
+public:
+	
+	UGameplayTask_Interaction_Option(const FObjectInitializer& ObjectInitializer);
+
+	virtual void Activate() override;
+	
+	virtual void TickTask(float DeltaTime)override;
+
+	virtual void OnDestroy(bool bInOwnerFinished) override;
+	
+	void SetUp(
+		const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef,
+		ACharacterBase* InTargetCharacterPtr
+		);
+
+protected:
+	
+	void ConditionalPerformTask();
+
+	float RemainingTime = 0.f;
+	
+	TSoftObjectPtr<UPAD_TaskNode_Interaction_Option> TaskNodeRef;
 	
 };

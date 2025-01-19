@@ -44,12 +44,12 @@ namespace HumanProcessor
 			if (auto Character_NPCPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
 			{
 				// 显示对应的UI
-				OnwerActorPtr
-					->GetController<APlanetPlayerController>()
-					->GetHUD<AMainHUD>()
-					->GetMainHUDLayout()
-					->GetInteractionList()
-					->UpdateDisplay(Character_NPCPtr);
+				// OnwerActorPtr
+				// 	->GetController<APlanetPlayerController>()
+				// 	->GetHUD<AMainHUD>()
+				// 	->GetMainHUDLayout()
+				// 	->GetInteractionList()
+				// 	->UpdateDisplay(Character_NPCPtr);
 			}
 		}
 	}
@@ -70,12 +70,12 @@ namespace HumanProcessor
 		if (auto Character_NPCPtr = Cast<AHumanCharacter_AI>(HumanCharaterPtr->LookAtSceneActorPtr))
 		{
 			// 显示对应的UI
-			HumanCharaterPtr
-				->GetController<APlanetPlayerController>()
-				->GetHUD<AMainHUD>()
-				->GetMainHUDLayout()
-				->GetInteractionList()
-				->CloseUI();
+			// HumanCharaterPtr
+			// 	->GetController<APlanetPlayerController>()
+			// 	->GetHUD<AMainHUD>()
+			// 	->GetMainHUDLayout()
+			// 	->GetInteractionList()
+			// 	->CloseUI();
 		}
 
 		FInputProcessor::QuitAction();

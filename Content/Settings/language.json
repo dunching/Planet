@@ -63,5 +63,10 @@
     "Default": "Lose",
     "Chinese": "失去",
     "English": "Lose"
+  },
+  "CharacterInteraction": {
+    "Default": "按F互动",
+    "Chinese": "按F互动",
+    "English": "Press F to talk"
   }
 }

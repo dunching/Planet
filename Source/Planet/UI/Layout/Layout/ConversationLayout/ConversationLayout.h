@@ -32,9 +32,13 @@ class PLANET_API UConversationLayout :
 
 public:
 
+	virtual void NativeConstruct()override;
+
 	virtual void Enable()override;
 	
 	virtual void DisEnable()override;
 
+	void CloseOption();
+	
 };
 

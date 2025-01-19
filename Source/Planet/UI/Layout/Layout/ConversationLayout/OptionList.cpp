@@ -1,18 +1,18 @@
-#include "InteractionList.h"
+#include "OptionList.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/VerticalBox.h"
 
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
-#include "InteractionItem.h"
+#include "OptionItem.h"
 
 struct FInteractionList : public TStructVariable<FInteractionList>
 {
 	const FName VerticalBox = TEXT("VerticalBox");
 };
 
-void UInteractionList::NativeConstruct()
+void UOptionList::NativeConstruct()
 {
 	Super::NativeConstruct();
 
@@ -25,16 +25,16 @@ void UInteractionList::NativeConstruct()
 	// ResetPosition(0.f);
 }
 
-void UInteractionList::NativeDestruct()
+void UOptionList::NativeDestruct()
 {
 	Super::NativeDestruct();
 }
 
-void UInteractionList::ResetUIByData()
+void UOptionList::ResetUIByData()
 {
 }
 
-void UInteractionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
+void UOptionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
 	if (!TargetCharacterPtr)
@@ -55,25 +55,21 @@ void UInteractionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
 	const auto TaskNodes = TargetCharacterPtr->GetSceneActorInteractionComponent()->GetTaskNodes();
 	for (const auto& Iter : TaskNodes)
 	{
-	}
-
-	// 按F互动的条目
-	{
-		auto ItemUIPtr = CreateWidget<UInteractionItem>(GetWorld(), InteractionItemClass);
+		auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
 		if (ItemUIPtr)
 		{
-			// ItemUIPtr->SetData(Iter);
+			ItemUIPtr->SetData(Iter);
 			UIPtr->AddChild(ItemUIPtr);
 		}
 	}
 }
 
-void UInteractionList::CloseUI()
+void UOptionList::CloseUI()
 {
 	SetVisibility(ESlateVisibility::Hidden);
 }
 
-bool UInteractionList::ResetPosition(float InDeltaTime)
+bool UOptionList::ResetPosition(float InDeltaTime)
 {
 	FVector2D ScreenPosition = FVector2D::ZeroVector;
 	// UGameplayStatics::ProjectWorldToScreen(

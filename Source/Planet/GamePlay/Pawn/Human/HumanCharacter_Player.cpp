@@ -131,8 +131,18 @@ void AHumanCharacter_Player::InteractionSceneCharacter(AHumanCharacter_AI* Chara
 {
 	Super::InteractionSceneCharacter(CharacterPtr);
 
+	// 隐藏交互提示
+	if (CharacterPtr)
+	{
+		CharacterPtr->HasBeenEndedLookAt();
+	}
+	
 	// 
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>();
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>(
+		[CharacterPtr](auto NewProcessor)
+		{
+			NewProcessor->CharacterPtr = CharacterPtr;
+		});
 }
 
 void AHumanCharacter_Player::InitialGroupSharedInfo()

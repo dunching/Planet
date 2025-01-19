@@ -9,17 +9,15 @@
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
 
-#include "InteractionItem.generated.h"
+#include "OptionItem.generated.h"
 
 class AGuideActor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
 class AGuideInteractionActor;
 
-using FOnInteractionItemClicked = TMulticastDelegate<void()>;
-
 UCLASS()
-class PLANET_API UInteractionItem :
+class PLANET_API UOptionItem :
 	public UMyUserWidget,
 	public IHUDInterface
 {
@@ -31,13 +29,13 @@ public:
 
 	virtual void ResetUIByData() override;
 
-	void SetData(const FOnInteractionItemClicked &InOnInteractionItemClicked);
+	void SetData(const TSubclassOf<AGuideInteractionActor>&TaskNode);
 
 protected:
 
 	UFUNCTION()
 	void OnClicked();
 	
-	FOnInteractionItemClicked OnInteractionItemClicked;
-	
+	TSubclassOf<AGuideInteractionActor> TaskNode;
+
 };

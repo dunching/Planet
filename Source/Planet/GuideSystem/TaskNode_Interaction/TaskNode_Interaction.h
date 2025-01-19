@@ -9,7 +9,7 @@
 
 #include "TaskNode.h"
 
-#include "TaskNode_SceneActor.generated.h"
+#include "TaskNode_Interaction.generated.h"
 
 class USceneComponent;
 class ACharacterBase;
@@ -27,8 +27,6 @@ class PLANET_API UPAD_TaskNode_Interaction : public UPAD_TaskNode_Preset
 
 public:
 
-	virtual FString GetName() const;
-
 	// 当任务完成时玩家会得到的物品
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, int32> GetItemWhenComplete;
@@ -40,6 +38,9 @@ public:
 	
 };
 
+/*
+ * 对话
+ */
 UCLASS(Blueprintable, BlueprintType)
 class PLANET_API UPAD_TaskNode_Interaction_Conversation : public UPAD_TaskNode_Interaction
 {
@@ -49,13 +50,25 @@ public:
 
 	UPAD_TaskNode_Interaction_Conversation(const FObjectInitializer& ObjectInitializer);
 
-	virtual FString GetName() const;
-
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
 	
-	// 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString Name;
+};
 
+/*
+ * 选择
+ */
+UCLASS(Blueprintable, BlueprintType)
+class PLANET_API UPAD_TaskNode_Interaction_Option : public UPAD_TaskNode_Interaction
+{
+	GENERATED_BODY()
+
+public:
+
+	UPAD_TaskNode_Interaction_Option(const FObjectInitializer& ObjectInitializer);
+
+	// 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TArray<FString> OptionAry;
+	
 };

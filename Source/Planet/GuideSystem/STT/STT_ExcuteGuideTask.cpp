@@ -6,7 +6,7 @@
 #include "TaskNode_Guide.h"
 #include "GuideActor.h"
 #include "GuideSystemGameplayTask.h"
-#include "TaskNode_SceneActor.h"
+#include "TaskNode_Interaction.h"
 
 FSTT_ExcuteGuideTask::FSTT_ExcuteGuideTask()
 {
@@ -251,7 +251,7 @@ EStateTreeRunStatus FSTT_ExcuteGuideInteractionTask::PerformMoveTask(FStateTreeE
 			{
 			case ETaskNodeType::kInteraction_Conversation:
 				{
-					auto TaskNodeRef = Cast<UPAD_TaskNode_Interaction_Conversation>(InstanceData.TaskNodeRef.Get());
+					auto TaskNodeRef = Cast<UPAD_TaskNode_Interaction_Conversation>(InstanceData.TaskNodeRef.LoadSynchronous());
 					if (!TaskNodeRef)
 					{
 						return EStateTreeRunStatus::Failed;
@@ -263,7 +263,30 @@ EStateTreeRunStatus FSTT_ExcuteGuideInteractionTask::PerformMoveTask(FStateTreeE
 					if (GameplayTaskPtr)
 					{
 						GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
-						GameplayTaskPtr->SetUp(TaskNodeRef->ConversationsAry, InstanceData.TargetCharacterOtr);
+						GameplayTaskPtr->SetUp(TaskNodeRef->ConversationsAry, InstanceData.TargetCharacterPtr);
+						GameplayTaskPtr->ReadyForActivation();
+
+						InstanceData.GameplayTaskPtr = GameplayTaskPtr;
+					}
+
+					return EStateTreeRunStatus::Running;
+				}
+				break;
+			case ETaskNodeType::kInteraction_Option:
+				{
+					auto TaskNodeRef = Cast<UPAD_TaskNode_Interaction_Option>(InstanceData.TaskNodeRef.LoadSynchronous());
+					if (!TaskNodeRef)
+					{
+						return EStateTreeRunStatus::Failed;
+					}
+
+					auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Interaction_Option>(
+						*InstanceData.TaskOwner);
+
+					if (GameplayTaskPtr)
+					{
+						GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+						GameplayTaskPtr->SetUp(InstanceData.TaskNodeRef.LoadSynchronous(), InstanceData.TargetCharacterPtr);
 						GameplayTaskPtr->ReadyForActivation();
 
 						InstanceData.GameplayTaskPtr = GameplayTaskPtr;

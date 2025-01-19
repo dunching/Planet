@@ -33,7 +33,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& Proxy
 	const auto Text =
 		FString::Printf(
 			TEXT("%s:%s"),
-			bIsAdd ? *UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+			bIsAdd ? * UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
 			*ProxyPtr->GetProxyName()
 		);
 	SetText(Text);

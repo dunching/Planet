@@ -30,7 +30,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GuideSystem");
         PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_Character");
         PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_GuideSystem");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_SceneActor");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_Interaction");
         PublicIncludePaths.Add("Planet/GuideSystem/STT");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask");
         PublicIncludePaths.Add("Planet/GamePlay");

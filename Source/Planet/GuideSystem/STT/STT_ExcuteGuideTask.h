@@ -14,6 +14,7 @@
 #include "STT_ExcuteGuideTask.generated.h"
 
 class AGuideActor;
+class AGuideInteractionActor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
 class ACharacterBase;
@@ -79,13 +80,13 @@ struct PLANET_API FStateTreeExcuteGuideInteractionTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AGuideActor> GuideActorPtr = nullptr;
+	TObjectPtr<AGuideInteractionActor> GuideActorPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanCharacter_Player> PlayerCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<ACharacterBase> TargetCharacterOtr = nullptr;
+	TObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	TSoftObjectPtr<UPAD_TaskNode_Interaction> TaskNodeRef;

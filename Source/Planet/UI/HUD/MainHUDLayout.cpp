@@ -4,6 +4,8 @@
 #include "Components/WidgetSwitcher.h"
 
 #include "MainHUDLayout.h"
+
+#include "ConversationLayout.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
@@ -41,19 +43,18 @@ void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 			const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
 			if (CurrentIndex == Index)
 			{
-				auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(Index));
-				if (MenuInterfacePtr)
-				{
-					MenuInterfacePtr->Enable();
-				}
-
 				return;
 			}
-			UIPtr->SetActiveWidgetIndex(Index);
-			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(Index));
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(CurrentIndex));
 			if (MenuInterfacePtr)
 			{
 				MenuInterfacePtr->DisEnable();
+			}
+			UIPtr->SetActiveWidgetIndex(Index);
+			MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(Index));
+			if (MenuInterfacePtr)
+			{
+				MenuInterfacePtr->Enable();
 			}
 		}
 	};
@@ -105,6 +106,24 @@ UMainMenuLayout* UMainHUDLayout::GetMenuLayout()
 	return nullptr;
 }
 
+UConversationLayout* UMainHUDLayout::GetConversationLayout()
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
+	{
+		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kConversationLayout))
+		{
+			auto LayoutUIPtr = Cast<UConversationLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			if (LayoutUIPtr)
+			{
+				return LayoutUIPtr;
+			}
+		}
+	}
+	return nullptr;
+}
+
 UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 {
 	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FMainHUDLayout::Get().GetItemInfos_Socket));
@@ -136,13 +155,13 @@ void UMainHUDLayout::SwitchIsLowerHP(bool bIsLowerHP)
 	BorderPtr->SetVisibility(bIsLowerHP ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
-UInteractionList* UMainHUDLayout::GetInteractionList()
-{
-	auto UIPtr = Cast<UInteractionList>(GetWidgetFromName(FMainHUDLayout::Get().InteractionList));
-	if (!UIPtr)
-	{
-		return nullptr;
-	}
-
-	return UIPtr;
-}
+// UInteractionList* UMainHUDLayout::GetInteractionList()
+// {
+// 	auto UIPtr = Cast<UInteractionList>(GetWidgetFromName(FMainHUDLayout::Get().InteractionList));
+// 	if (!UIPtr)
+// 	{
+// 		return nullptr;
+// 	}
+//
+// 	return UIPtr;
+// }
