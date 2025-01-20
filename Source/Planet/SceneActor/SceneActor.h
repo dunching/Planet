@@ -44,6 +44,8 @@ public:
 
 	virtual UNetConnection* GetNetConnection() const override;
 
+	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const override;
+	
 	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
 
 	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr)override;

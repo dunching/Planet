@@ -32,14 +32,18 @@ public:
 
 	USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer);
 
-	TArray<TSubclassOf<AGuideInteractionActor>>  GetTaskNodes()const;
-	
+	TArray<TSubclassOf<AGuideInteractionActor>> GetTaskNodes() const;
+
+	void AddGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass);
+
+	void RemoveGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Range = 200;
 
 protected:
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TSubclassOf<AGuideInteractionActor>> GuideInteractionAry;
-	
+
+	TArray<TSubclassOf<AGuideInteractionActor>> TemporaryGuideInteractionAry;
 };

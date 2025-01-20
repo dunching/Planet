@@ -37,7 +37,7 @@ void UGuideList::ResetUIByData()
 	UGuideSubSystem::GetInstance()->OnGuideEnd.AddUObject(this, &ThisClass::OnGuideEnd);
 }
 
-void UGuideList::OnCurrentGuideChagned(AGuideActor* NewGuidePtr)
+void UGuideList::OnCurrentGuideChagned(AGuideThread* NewGuidePtr)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGuideList::Get().Name));
 	if (!UIPtr)
@@ -59,7 +59,7 @@ void UGuideList::OnCurrentGuideChagned(AGuideActor* NewGuidePtr)
 	}
 }
 
-void UGuideList::OnGuideEnd(AGuideActor* NewGuidePtr)
+void UGuideList::OnGuideEnd(AGuideThread* NewGuidePtr)
 {
 	if (CurrentLineGuidePtr == NewGuidePtr)
 	{

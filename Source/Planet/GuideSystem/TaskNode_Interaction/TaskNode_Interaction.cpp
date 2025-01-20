@@ -15,3 +15,9 @@ UPAD_TaskNode_Interaction_Option::UPAD_TaskNode_Interaction_Option(
 {
 	TaskNodeType = ETaskNodeType::kInteraction_Option;
 }
+
+UPAD_TaskNode_Interaction_NotifyGuideThread::UPAD_TaskNode_Interaction_NotifyGuideThread(
+	const FObjectInitializer& ObjectInitializer)
+{
+	TaskNodeType = ETaskNodeType::kInteraction_NotifyGuideThread;
+}

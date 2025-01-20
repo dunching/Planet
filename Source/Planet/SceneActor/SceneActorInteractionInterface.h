@@ -14,6 +14,7 @@
 #include "SceneActorInteractionInterface.generated.h"
 
 class ACharacterBase;
+class USceneActorInteractionComponent;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class USceneActorInteractionInterface : public UInterface
@@ -35,6 +36,8 @@ public:
 
 	virtual void HasBeenEndedLookAt() = 0;
 
+	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const = 0;
+	
 protected:
 
 private:

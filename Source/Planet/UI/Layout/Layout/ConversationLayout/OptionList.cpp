@@ -6,6 +6,9 @@
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
 #include "OptionItem.h"
+#include "TaskNode_Interaction.h"
+#include "TextCollect.h"
+#include "TextSubSystem.h"
 
 struct FInteractionList : public TStructVariable<FInteractionList>
 {
@@ -34,7 +37,10 @@ void UOptionList::ResetUIByData()
 {
 }
 
-void UOptionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
+void UOptionList::UpdateDisplay(
+	AHumanCharacter_AI* InTargetCharacterPtr,
+	const std::function<void(const TSubclassOf<AGuideInteractionActor>&)>& InCallback
+)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
 	if (!TargetCharacterPtr)
@@ -58,7 +64,49 @@ void UOptionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
 		auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
 		if (ItemUIPtr)
 		{
-			ItemUIPtr->SetData(Iter);
+			ItemUIPtr->SetData(Iter, InCallback);
+			UIPtr->AddChild(ItemUIPtr);
+		}
+	}
+}
+
+void UOptionList::UpdateDisplay(
+	const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef,
+	const std::function<void(int32)>& InCallback
+)
+{
+	TaskNodeRef = InTaskNodeRef;
+	if (TaskNodeRef.IsValid())
+	{
+		SetVisibility(ESlateVisibility::Visible);
+
+		auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FInteractionList::Get().VerticalBox));
+		if (!UIPtr)
+		{
+			return;
+		}
+
+		UIPtr->ClearChildren();
+
+		// 选项
+		int32 Index = 1;
+		for (const auto& Iter : TaskNodeRef.LoadSynchronous()->OptionAry)
+		{
+			auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
+			if (ItemUIPtr)
+			{
+				ItemUIPtr->SetData(Iter, Index, InCallback);
+				UIPtr->AddChild(ItemUIPtr);
+			}
+			Index++;
+		}
+
+		// “取消”选项
+		Index = 0;
+		auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
+		if (ItemUIPtr)
+		{
+			ItemUIPtr->SetData(UTextSubSystem::GetInstance()->GetText(TextCollect::Return), Index, InCallback);
 			UIPtr->AddChild(ItemUIPtr);
 		}
 	}
@@ -67,6 +115,14 @@ void UOptionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
 void UOptionList::CloseUI()
 {
 	SetVisibility(ESlateVisibility::Hidden);
+
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FInteractionList::Get().VerticalBox));
+	if (!UIPtr)
+	{
+		return;
+	}
+
+	UIPtr->ClearChildren();
 }
 
 bool UOptionList::ResetPosition(float InDeltaTime)

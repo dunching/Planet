@@ -14,6 +14,7 @@
 enum class EStateTreeRunStatus : uint8;
 
 class ATargetPoint;
+class AGuideInteractionActor;
 class AHumanCharacter_Player;
 
 /*
@@ -125,8 +126,12 @@ class PLANET_API UPAD_TaskNode_Guide_AddToTarget : public UPAD_TaskNode_Guide
 	GENERATED_BODY()
 
 public:
+	
 	UPAD_TaskNode_Guide_AddToTarget(const FObjectInitializer& ObjectInitializer);
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSoftObjectPtr<AHumanCharacter_AI>TargetCharacterPtr = nullptr;
 	

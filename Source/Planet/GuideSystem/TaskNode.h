@@ -32,6 +32,7 @@ enum class ETaskNodeType : uint8
 	
 	kInteraction_Conversation, //
 	kInteraction_Option, //
+	kInteraction_NotifyGuideThread, //
 	
 	kNone,
 };
@@ -54,6 +55,8 @@ class PLANET_API UPAD_TaskNode_Preset : public UDataAsset
 	GENERATED_BODY()
 
 public:
+
+	virtual void PostCDOContruct() override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

@@ -7,6 +7,11 @@
 
 #include "HumanAIController.h"
 
+void UPAD_TaskNode_Preset::PostCDOContruct()
+{
+	Super::PostCDOContruct();
+}
+
 void UPAD_TaskNode_Preset::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

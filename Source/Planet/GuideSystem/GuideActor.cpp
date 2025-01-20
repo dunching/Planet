@@ -29,10 +29,25 @@ UGuideSystemStateTreeComponent* AGuideActor::GetGuideSystemStateTreeComponent() 
 	return GuideStateTreeComponentPtr;
 }
 
-void AGuideActor::UpdateCurrentTaskNode(const TSoftObjectPtr<UPAD_TaskNode_Guide>& InTaskNode)
+void AGuideThread::UpdateCurrentTaskNode(const TSoftObjectPtr<UPAD_TaskNode_Guide>& InTaskNode)
 {
 	TaskNodeRef = InTaskNode;
 	OnCurrentTaskNodeChanged.Broadcast(TaskNodeRef);
+}
+
+void AGuideThread::AddEvent(const FGuid& InGuid)
+{
+	EventsSet.Add(InGuid);
+}
+
+bool AGuideThread::ConsumeEvent(const FGuid& InGuid)
+{
+	if (EventsSet.Contains(InGuid))
+	{
+		EventsSet.Remove(InGuid);
+		return true;
+	}
+	return false;
 }
 
 AGuideInteractionActor::AGuideInteractionActor(const FObjectInitializer& ObjectInitializer):

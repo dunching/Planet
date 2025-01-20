@@ -88,8 +88,6 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HasBeenEndedLookAt();
-	
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 	auto CharacterAttributeSetPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
@@ -213,22 +211,6 @@ void ACharacterBase::InteractionSceneActor(ASceneActor* SceneObjPtr)
 }
 
 void ACharacterBase::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
-{
-}
-
-void ACharacterBase::HasbeenInteracted(ACharacterBase* CharacterPtr)
-{
-}
-
-void ACharacterBase::HasBeenLookingAt(ACharacterBase* CharacterPtr)
-{
-}
-
-void ACharacterBase::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
-{
-}
-
-void ACharacterBase::HasBeenEndedLookAt()
 {
 }
 

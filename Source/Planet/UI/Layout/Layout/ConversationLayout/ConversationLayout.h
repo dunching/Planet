@@ -14,6 +14,8 @@
 #include "ConversationLayout.generated.h"
 
 class UToolsMenu;
+class UOptionList;
+class AGuideInteractionActor;
 
 struct FCharacterAttributes;
 
@@ -31,14 +33,19 @@ class PLANET_API UConversationLayout :
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual void Enable() override;
 
-	virtual void Enable()override;
-	
-	virtual void DisEnable()override;
+	virtual void DisEnable() override;
+
+	UOptionList* GetOptions() const;
 
 	void CloseOption();
+
+protected:
+	void SelectedInteractionItem(const TSubclassOf<AGuideInteractionActor>&GuideInteractionClass);
+	
+	AGuideInteractionActor*GuideInteractionActorPtr = nullptr;
 	
 };
-

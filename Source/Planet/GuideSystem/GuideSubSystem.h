@@ -9,10 +9,13 @@
 #include "GuideSubSystem.generated.h"
 
 class AGuideActor;
+class AGuideThread;
+class AGuideMainThread;
+class AGuideBranchThread;
 
-using FOnCurrentGuideChagned = TMulticastDelegate<void(AGuideActor*)>;
+using FOnCurrentGuideChagned = TMulticastDelegate<void(AGuideThread*)>;
 
-using FOnGuideEnd = TMulticastDelegate<void(AGuideActor*)>;
+using FOnGuideEnd = TMulticastDelegate<void(AGuideThread*)>;
 
 /**
  *	引导/任务系统
@@ -32,20 +35,22 @@ public:
 	void ActiveMainLine();
 	
 	// 添加支线内容
-	void AddBranchLine(const TSubclassOf<AGuideActor>& BranchLineGuideClass);
+	void AddBranchLine(const TSubclassOf<AGuideBranchThread>& BranchLineGuideClass);
 
+	TObjectPtr<AGuideThread>GetCurrentGuideThread()const;
+	
 	FOnCurrentGuideChagned OnCurrentGuideChagned;
 
 	// TODO 选中其他任务
 	FOnGuideEnd OnGuideEnd;
 	
-	// 当前追踪的引导
-	TObjectPtr<AGuideActor> CurrentLineGuidePtr = nullptr;
-
 private:
 
-	// UPROPERTY(ReplicatedUsing = OnRep_WolrdProcess)
-	TObjectPtr<AGuideActor> MainLineGuidePtr = nullptr;
+	// 当前追踪的引导
+	TObjectPtr<AGuideThread> CurrentLineGuidePtr = nullptr;
 
-	TArray<TObjectPtr<AGuideActor>> BranchLineAry;
+	// UPROPERTY(ReplicatedUsing = OnRep_WolrdProcess)
+	TObjectPtr<AGuideMainThread> MainLineGuidePtr = nullptr;
+
+	TArray<TObjectPtr<AGuideBranchThread>> BranchLineAry;
 };

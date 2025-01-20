@@ -12,6 +12,7 @@
 #include "GuideList.generated.h"
 
 class AGuideActor;
+class AGuideThread;
 class UPAD_TaskNode_Guide;
 
 UCLASS()
@@ -29,14 +30,14 @@ public:
 	virtual void ResetUIByData() override;
 
 protected:
-	void OnCurrentGuideChagned(AGuideActor* NewGuidePtr);
+	void OnCurrentGuideChagned(AGuideThread* NewGuidePtr);
 
-	void OnGuideEnd(AGuideActor* NewGuidePtr);
+	void OnGuideEnd(AGuideThread* NewGuidePtr);
 
 	void OnCurrentTaskNodeChanged(const TSoftObjectPtr<UPAD_TaskNode_Guide>& CurrentTaskNode);
 
 	// 当前追踪的引导
-	TObjectPtr<AGuideActor> CurrentLineGuidePtr = nullptr;
+	TObjectPtr<AGuideThread> CurrentLineGuidePtr = nullptr;
 
 	
 };

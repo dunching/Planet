@@ -3,12 +3,12 @@
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
 
-void USTE_TaskNode::TreeStart(FStateTreeExecutionContext& Context)
+void USTE_TaskNode_GuideMainThread::TreeStart(FStateTreeExecutionContext& Context)
 {
 	Super::TreeStart(Context);
 }
 
-void USTE_TaskNode::TreeStop(FStateTreeExecutionContext& Context)
+void USTE_TaskNode_GuideMainThread::TreeStop(FStateTreeExecutionContext& Context)
 {
 	if (GuideActorPtr)
 	{
@@ -19,7 +19,7 @@ void USTE_TaskNode::TreeStop(FStateTreeExecutionContext& Context)
 	Super::TreeStop(Context);
 }
 
-void USTE_TaskNode::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
+void USTE_TaskNode_GuideMainThread::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
 	Super::Tick(Context, DeltaTime);
 }

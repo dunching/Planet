@@ -42,17 +42,26 @@ void UOptionItem::NativeConstruct()
 	UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnClicked);
 }
 
+void UOptionItem::NativeDestruct()
+{
+	Super::NativeDestruct();
+}
+
 void UOptionItem::ResetUIByData()
 {
 }
 
-void UOptionItem::SetData(const TSubclassOf<AGuideInteractionActor>& InTaskNode)
+void UOptionItem::SetData(
+	const TSubclassOf<AGuideInteractionActor>& InTaskNode,
+	const std::function<void(const TSubclassOf<AGuideInteractionActor>&)>& InCallback
+)
 {
 	if (!InTaskNode.Get())
 	{
 		return;
 	}
 
+	OnClickedInteractionItem.AddLambda(InCallback);
 	TaskNode = InTaskNode;
 
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FInteractionItem::Get().Text));
@@ -64,25 +73,29 @@ void UOptionItem::SetData(const TSubclassOf<AGuideInteractionActor>& InTaskNode)
 	UIPtr->SetText(FText::FromString(TaskNode.GetDefaultObject()->TaskName));
 }
 
+void UOptionItem::SetData(const FString& InOption, int32 InIndex, const std::function<void(int32)>& InOnClickedIndex)
+{
+	OnClickedIndex.AddLambda(InOnClickedIndex);
+	Option = InOption;
+	Index = InIndex;
+
+	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FInteractionItem::Get().Text));
+	if (!UIPtr)
+	{
+		return;
+	}
+
+	UIPtr->SetText(FText::FromString(Option));
+}
+
 void UOptionItem::OnClicked()
 {
-	FActorSpawnParameters SpawnParameters;
-
-	auto GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteractionActor>(
-		TaskNode, SpawnParameters
-	);
-
-	if (GuideInteractionActorPtr)
+	if (TaskNode)
 	{
-		GuideInteractionActorPtr->OnGuideInteractionEnd.AddLambda([]
-		{
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-		});
-		
-		Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
-			->GetHUD<AMainHUD>()
-			->GetMainHUDLayout()
-			->GetConversationLayout()
-		 	->CloseOption();
+		OnClickedInteractionItem.Broadcast(TaskNode);
+	}
+	else
+	{
+		OnClickedIndex.Broadcast(Index);
 	}
 }

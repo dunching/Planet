@@ -13,6 +13,7 @@
 
 class USceneComponent;
 class ACharacterBase;
+class AGuideInteractionActor;
 class UPAD_TaskNode;
 class UPAD_TaskNode_Preset;
 class UTaskNode_Temporary;
@@ -26,7 +27,6 @@ class PLANET_API UPAD_TaskNode_Interaction : public UPAD_TaskNode_Preset
 	GENERATED_BODY()
 
 public:
-
 	// 当任务完成时玩家会得到的物品
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, int32> GetItemWhenComplete;
@@ -35,7 +35,6 @@ public:
 	// 在执行某些H节点时，是不需要刷新的
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsFreshPreviouDescription = true;
-	
 };
 
 /*
@@ -47,12 +46,10 @@ class PLANET_API UPAD_TaskNode_Interaction_Conversation : public UPAD_TaskNode_I
 	GENERATED_BODY()
 
 public:
-
 	UPAD_TaskNode_Interaction_Conversation(const FObjectInitializer& ObjectInitializer);
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
-	
 };
 
 /*
@@ -64,11 +61,34 @@ class PLANET_API UPAD_TaskNode_Interaction_Option : public UPAD_TaskNode_Interac
 	GENERATED_BODY()
 
 public:
-
 	UPAD_TaskNode_Interaction_Option(const FObjectInitializer& ObjectInitializer);
 
 	// 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<FString> OptionAry;
+
+	// 时间限制，<0为无限制
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	float DelayTime = -1.f;
+};
+
+/*
+ * 通知任务引导系统，这条任务完成了
+ */
+UCLASS(Blueprintable, BlueprintType)
+class PLANET_API UPAD_TaskNode_Interaction_NotifyGuideThread : public UPAD_TaskNode_Interaction
+{
+	GENERATED_BODY()
+
+public:
+	UPAD_TaskNode_Interaction_NotifyGuideThread(const FObjectInitializer& ObjectInitializer);
+
+	// 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FGuid TaskID;
+
+	//结束时移除这个节点
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
 	
 };

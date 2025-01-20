@@ -1,15 +1,24 @@
 #include "ConversationLayout.h"
 
+#include "GuideActor.h"
+#include "GuideSystemStateTreeComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "HumanCharacter_Player.h"
 #include "HumanInteractionWithNPC.h"
 #include "InputProcessorSubSystem.h"
+#include "MainHUD.h"
+#include "MainHUDLayout.h"
 #include "OptionList.h"
+#include "PlanetPlayerController.h"
 #include "PlayerConversationBorder.h"
+#include "HumanRegularProcessor.h"
+
+class AMainHUD;
 
 namespace HumanProcessor
 {
+	class FHumanRegularProcessor;
 	class FHumanInteractionWithNPCProcessor;
 }
 
@@ -38,8 +47,6 @@ void UConversationLayout::Enable()
 		}
 	}
 	{
-		auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
-
 		auto CurrentActionSPtr =
 			DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithNPCProcessor>(
 				UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
@@ -51,7 +58,10 @@ void UConversationLayout::Enable()
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
-				UIPtr->UpdateDisplay(CurrentActionSPtr->CharacterPtr);
+				UIPtr->UpdateDisplay(
+					CurrentActionSPtr->CharacterPtr,
+					std::bind(&ThisClass::SelectedInteractionItem, this, std::placeholders::_1)
+				);
 			}
 		}
 	}
@@ -59,11 +69,25 @@ void UConversationLayout::Enable()
 
 void UConversationLayout::DisEnable()
 {
+	GetOptions()->CloseUI();
+
+	if (GuideInteractionActorPtr)
+	{
+		GuideInteractionActorPtr->OnGuideInteractionEnd.Clear();
+		GuideInteractionActorPtr->GetGuideSystemStateTreeComponent()->Cleanup();
+		GuideInteractionActorPtr = nullptr;
+	}
+}
+
+UOptionList* UConversationLayout::GetOptions() const
+{
 	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
 	if (UIPtr)
 	{
-		UIPtr->SetVisibility(ESlateVisibility::Hidden);
+		return UIPtr;
 	}
+
+	return nullptr;
 }
 
 void UConversationLayout::CloseOption()
@@ -72,5 +96,40 @@ void UConversationLayout::CloseOption()
 	if (UIPtr)
 	{
 		UIPtr->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void UConversationLayout::SelectedInteractionItem(const TSubclassOf<AGuideInteractionActor>& GuideInteractionClass)
+{
+	auto CurrentActionSPtr =
+		DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithNPCProcessor>(
+			UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
+		);
+	if (CurrentActionSPtr)
+	{
+		FActorSpawnParameters SpawnParameters;
+
+		GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteractionActor>(
+			GuideInteractionClass, SpawnParameters
+		);
+
+		if (GuideInteractionActorPtr)
+		{
+			auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+			GuideInteractionActorPtr->PlayerCharacter = PlayerCharacterPtr;
+		}
+		GuideInteractionActorPtr->TargetCharacter = CurrentActionSPtr->CharacterPtr;
+
+		GuideInteractionActorPtr->OnGuideInteractionEnd.AddLambda([]
+		{
+			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+		});
+
+		Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
+			->GetHUD<AMainHUD>()
+			->GetMainHUDLayout()
+			->GetConversationLayout()
+			->CloseOption();
 	}
 }

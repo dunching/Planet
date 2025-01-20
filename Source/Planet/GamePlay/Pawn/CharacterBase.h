@@ -51,7 +51,6 @@ UCLASS()
 class PLANET_API ACharacterBase : 
 	public AGravityCharacter,
 	public IPlanetAbilitySystemInterface,
-	public ISceneActorInteractionInterface,
 	public IGroupSharedInterface
 {
 	GENERATED_BODY()
@@ -86,14 +85,6 @@ public:
 	
 	virtual void InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr);
 	
-	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) override;
-
-	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
-
-	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr) override;
-
-	virtual void HasBeenEndedLookAt() override;
-
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 

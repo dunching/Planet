@@ -1,5 +1,7 @@
 #include "SceneActorInteractionComponent.h"
 
+#include "GuideActor.h"
+
 FName USceneActorInteractionComponent::ComponentName = TEXT("SceneActorInteractionComponent");
 
 USceneActorInteractionComponent::USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer):
@@ -11,5 +13,27 @@ USceneActorInteractionComponent::USceneActorInteractionComponent(const FObjectIn
 
 TArray<TSubclassOf<AGuideInteractionActor>>  USceneActorInteractionComponent::GetTaskNodes() const
 {
-	return GuideInteractionAry;
+	TArray<TSubclassOf<AGuideInteractionActor>> Results;
+	
+	Results.Append(GuideInteractionAry);
+	Results.Append(TemporaryGuideInteractionAry);
+	
+	return Results;
+}
+
+void USceneActorInteractionComponent::AddGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass)
+{
+	TemporaryGuideInteractionAry.Add(GuideActorClass);
+}
+
+ void USceneActorInteractionComponent::RemoveGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass)
+{
+	for (int32 Index = 0; Index < TemporaryGuideInteractionAry.Num(); Index++)
+	{
+		if (TemporaryGuideInteractionAry[Index] == GuideActorClass)
+		{
+			TemporaryGuideInteractionAry.RemoveAt(Index);
+			break;
+		}
+	}
 }

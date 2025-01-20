@@ -16,6 +16,10 @@ class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
 class AGuideInteractionActor;
 
+using FOnClickedInteractionItem =  TMulticastDelegate<void(const TSubclassOf<AGuideInteractionActor>&)>;
+
+using FOnClickedIndex =  TMulticastDelegate<void(int32)>;
+
 UCLASS()
 class PLANET_API UOptionItem :
 	public UMyUserWidget,
@@ -27,9 +31,18 @@ public:
 	
 	virtual void NativeConstruct() override;
 
+	virtual void NativeDestruct() override;
+
 	virtual void ResetUIByData() override;
 
-	void SetData(const TSubclassOf<AGuideInteractionActor>&TaskNode);
+	void SetData(
+		const TSubclassOf<AGuideInteractionActor>&TaskNode,
+		const std::function<void(const TSubclassOf<AGuideInteractionActor>&)>& InCallback
+		);
+
+	void SetData(
+		const FString&InOption, int32 InIndex, const std::function<void(int32)>& InOnClickedIndex
+		);
 
 protected:
 
@@ -38,4 +51,12 @@ protected:
 	
 	TSubclassOf<AGuideInteractionActor> TaskNode;
 
+	FOnClickedInteractionItem OnClickedInteractionItem;
+	
+	FOnClickedIndex OnClickedIndex;
+	
+	FString Option;
+
+	int32 Index = 0;
+	
 };

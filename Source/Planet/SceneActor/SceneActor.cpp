@@ -35,6 +35,12 @@ UNetConnection* ASceneActor::GetNetConnection() const
 	return Super::GetNetConnection();
 }
 
+USceneActorInteractionComponent* ASceneActor::GetSceneActorInteractionComponent() const
+{
+	// TODO 添加交互组件
+	return nullptr;
+}
+
 void ASceneActor::BeginPlay()
 {
 	Super::BeginPlay();

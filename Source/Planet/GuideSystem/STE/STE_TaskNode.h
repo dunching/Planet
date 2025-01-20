@@ -15,12 +15,25 @@
 #include "STE_TaskNode.generated.h"
 
 class AGuideActor;
+class AGuideMainThread;
 class AGuideInteractionActor;
 class ACharacterBase;
+class AHumanCharacter;
 class AHumanCharacter_Player;
 
 UCLASS(Blueprintable)
 class PLANET_API USTE_TaskNode : public UStateTreeEvaluatorBlueprintBase
+{
+	GENERATED_BODY()
+
+public:
+
+protected:
+
+};
+
+UCLASS(Blueprintable)
+class PLANET_API USTE_TaskNode_GuideMainThread : public USTE_TaskNode
 {
 	GENERATED_BODY()
 
@@ -33,18 +46,7 @@ public:
 	virtual void Tick(FStateTreeExecutionContext& Context, const float DeltaTime)override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
-	AGuideActor* GuideActorPtr = nullptr;
-
-protected:
-
-};
-
-UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode_Guide : public USTE_TaskNode
-{
-	GENERATED_BODY()
-
-public:
+	AGuideMainThread* GuideActorPtr = nullptr;
 
 protected:
 
@@ -66,11 +68,11 @@ public:
 	AHumanCharacter_Player* PlayerCharacter = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
-	ACharacterBase* TargetCharacter = nullptr;
+	AHumanCharacter* TargetCharacter = nullptr;
 
-	// 上条任务的输出参数
-	UPROPERTY(EditAnywhere, Category = Output)
-	int32 LastTaskOut = 0;
+	// // 上条任务的输出参数
+	// UPROPERTY(EditAnywhere, Category = Output)
+	// int32 LastTaskOut = 0;
 
 protected:
 

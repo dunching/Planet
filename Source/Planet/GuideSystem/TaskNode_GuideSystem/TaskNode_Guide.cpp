@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 
 #include "HumanAIController.h"
+#include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
 
 FString UPAD_TaskNode_Guide::GetDescription() const
@@ -102,5 +103,5 @@ Super(ObjectInitializer)
 
 FString UPAD_TaskNode_Guide_ConversationWithTarget::GetDescription() const
 {
-	return Super::GetDescription();
+	return FString::Printf(TEXT("前往与【%s】对话"), *TargetCharacterPtr->GetName());
 }

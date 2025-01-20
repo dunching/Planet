@@ -11,6 +11,7 @@ class UStateTagExtendInfoMap;
 class USceneProxyExtendInfoMap;
 class UGameOptions;
 class AGuideActor;
+class AGuideMainThread;
 
 /**
  *
@@ -29,7 +30,7 @@ public:
 	UGameOptions* GetGameOptions();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<AGuideActor>MainLineGuideClass;
+	TSubclassOf<AGuideMainThread>MainLineGuideClass;
 
 protected:
 

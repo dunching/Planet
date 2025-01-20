@@ -20,7 +20,7 @@ void UGuideSubSystem::InitializeMainLine()
 
 	FActorSpawnParameters SpawnParameters;
 
-	MainLineGuidePtr = GetWorld()->SpawnActor<AGuideActor>(
+	MainLineGuidePtr = GetWorld()->SpawnActor<AGuideMainThread>(
 		WorldSetting->MainLineGuideClass, SpawnParameters
 	);
 }
@@ -31,20 +31,25 @@ void UGuideSubSystem::ActiveMainLine()
 	{
 		CurrentLineGuidePtr->GetGuideSystemStateTreeComponent()->StopLogic(TEXT(""));
 	}
-	
+
 	CurrentLineGuidePtr = MainLineGuidePtr;
 	CurrentLineGuidePtr->GetGuideSystemStateTreeComponent()->StartLogic();
-	
+
 	OnCurrentGuideChagned.Broadcast(CurrentLineGuidePtr);
 }
 
-void UGuideSubSystem::AddBranchLine(const TSubclassOf<AGuideActor>& BranchLineGuideClass)
+void UGuideSubSystem::AddBranchLine(const TSubclassOf<AGuideBranchThread>& BranchLineGuideClass)
 {
 	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
 
 	FActorSpawnParameters SpawnParameters;
 
-	BranchLineAry.Add(GetWorld()->SpawnActor<AGuideActor>(
+	BranchLineAry.Add(GetWorld()->SpawnActor<AGuideBranchThread>(
 		WorldSetting->MainLineGuideClass, SpawnParameters
 	));
+}
+
+TObjectPtr<AGuideThread> UGuideSubSystem::GetCurrentGuideThread() const
+{
+	return CurrentLineGuidePtr;
 }

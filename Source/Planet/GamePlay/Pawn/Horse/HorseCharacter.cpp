@@ -101,6 +101,12 @@ void AHorseCharacter::PossessedBy(AController* NewController)
 	}
 }
 
+USceneActorInteractionComponent* AHorseCharacter::GetSceneActorInteractionComponent() const
+{
+	// TODO 添加组件
+	return nullptr;
+}
+
 void AHorseCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
 	if (CharacterPtr)
@@ -119,6 +125,10 @@ void AHorseCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
 void AHorseCharacter::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
 {
 	SwitchDisplayMountTips(true);
+}
+
+void AHorseCharacter::HasBeenLookingAt(ACharacterBase* CharacterPtr)
+{
 }
 
 void AHorseCharacter::HasBeenEndedLookAt()

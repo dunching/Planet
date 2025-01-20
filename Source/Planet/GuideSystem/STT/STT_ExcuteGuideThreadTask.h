@@ -11,13 +11,16 @@
 
 #include "GenerateType.h"
 
-#include "STT_ExcuteGuideTask.generated.h"
+#include "STT_ExcuteGuideThreadTask.generated.h"
 
 class AGuideActor;
+class AGuideThread;
+class AGuideMainThread;
 class AGuideInteractionActor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
 class ACharacterBase;
+class AHumanCharacter;
 class AHumanCharacter_Player;
 class UGameplayTask_Base;
 
@@ -26,12 +29,17 @@ struct PLANET_API FStateTreeExcuteGuideTaskTaskInstanceData
 {
 	GENERATED_BODY()
 
+	FStateTreeExcuteGuideTaskTaskInstanceData();
+	
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AGuideActor> GuideActorPtr = nullptr;
+	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	TSoftObjectPtr<UPAD_TaskNode_Guide> TaskNodeRef;
 
+	UPROPERTY(VisibleAnywhere, Category = Param)
+	FGuid TaskID;
+	
 	UPROPERTY(Transient)
 	TObjectPtr<UGameplayTask_Base> GameplayTaskPtr = nullptr;
 
@@ -44,13 +52,13 @@ struct PLANET_API FStateTreeExcuteGuideTaskTaskInstanceData
 };
 
 USTRUCT()
-struct PLANET_API FSTT_ExcuteGuideTask : public FStateTreeTaskCommonBase
+struct PLANET_API FSTT_ExcuteGuideThreadTask : public FStateTreeTaskCommonBase
 {
 	GENERATED_BODY()
 
 	using FInstanceDataType = FStateTreeExcuteGuideTaskTaskInstanceData;
 
-	FSTT_ExcuteGuideTask();
+	FSTT_ExcuteGuideThreadTask();
 
 	virtual const UStruct* GetInstanceDataType() const override;
 
@@ -86,7 +94,11 @@ struct PLANET_API FStateTreeExcuteGuideInteractionTaskInstanceData
 	TObjectPtr<AHumanCharacter_Player> PlayerCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
+
+	// 上条任务的输出参数
+	UPROPERTY(EditAnywhere, Category = Output)
+	int32 LastTaskOut = 0;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	TSoftObjectPtr<UPAD_TaskNode_Interaction> TaskNodeRef;

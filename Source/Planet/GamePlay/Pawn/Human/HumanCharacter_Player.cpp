@@ -30,6 +30,7 @@ namespace HumanProcessor
 
 void UPlayerConversationComponent::DisplaySentence_Implementation(const FTaskNode_Conversation_SentenceInfo& Sentence)
 {
+	Super::DisplaySentence_Implementation(Sentence);
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
@@ -40,6 +41,7 @@ void UPlayerConversationComponent::DisplaySentence_Implementation(const FTaskNod
 
 void UPlayerConversationComponent::CloseConversationborder_Implementation()
 {
+	Super::CloseConversationborder_Implementation();
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{

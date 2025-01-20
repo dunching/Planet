@@ -16,7 +16,11 @@
 
 class AHumanCharacter_Player;
 class ATargetPoint_Runtime;
+class AGuideThread;
+class UPAD_TaskNode_Guide_AddToTarget;
+class UPAD_TaskNode_Guide_ConversationWithTarget;
 class UPAD_TaskNode_Interaction_Option;
+class UPAD_TaskNode_Interaction_NotifyGuideThread;
 
 UCLASS()
 class PLANET_API UGameplayTask_Base : public UGameplayTask
@@ -27,6 +31,10 @@ public:
 	
 	void SetPlayerCharacter(AHumanCharacter_Player* PlayerCharacterPtr);
 
+	void SetTaskID(const FGuid& InTaskID);
+
+	void SetGuideActor(TObjectPtr<AGuideThread> InGuideActorPtr);
+
 	EStateTreeRunStatus GetStateTreeRunStatus()const;
 	
 protected:
@@ -35,6 +43,9 @@ protected:
 	
 	AHumanCharacter_Player* PlayerCharacterPtr = nullptr;
 
+	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
+
+	FGuid TaskID;
 	
 };
 
@@ -45,6 +56,8 @@ class PLANET_API UGameplayTask_Guide : public UGameplayTask_Base
 
 public:
 	
+	UGameplayTask_Guide(const FObjectInitializer& ObjectInitializer);
+
 };
 
 UCLASS()
@@ -125,14 +138,64 @@ protected:
 };
 
 UCLASS()
+class PLANET_API UGameplayTask_Guide_AddToTarget : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+
+public:
+	
+	UGameplayTask_Guide_AddToTarget(const FObjectInitializer& ObjectInitializer);
+
+	virtual void Activate() override;
+	
+	void SetUp(UPAD_TaskNode_Guide_AddToTarget* InTaskNodePtr);
+
+protected:
+	
+	void ConditionalPerformTask();
+
+	UPAD_TaskNode_Guide_AddToTarget* TaskNodePtr = nullptr;
+	
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Guide_ConversationWithTarget : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+
+public:
+	
+	virtual void Activate() override;
+	
+	virtual void TickTask(float DeltaTime)override;
+
+	virtual void OnDestroy(bool bInOwnerFinished) override;
+	
+	void SetUp(UPAD_TaskNode_Guide_ConversationWithTarget* InTaskNodePtr);
+
+protected:
+	
+	void ConditionalPerformTask();
+
+	UPAD_TaskNode_Guide_ConversationWithTarget* TaskNodePtr = nullptr;
+	
+	ATargetPoint_Runtime* TargetPointPtr = nullptr;
+	
+};
+
+UCLASS()
 class PLANET_API UGameplayTask_Interaction  : public UGameplayTask_Base
 {
 	GENERATED_BODY()
 
 public:
 
+	UGameplayTask_Interaction(const FObjectInitializer& ObjectInitializer);
+
+	void SetTargetCharacterPtr(AHumanCharacter* InTargetCharacterPtr);
+
 	// 激活互动的Character
-	ACharacterBase* TargetCharacterPtr = nullptr;
+	AHumanCharacter* TargetCharacterPtr = nullptr;
 };
 
 UCLASS()
@@ -151,8 +214,7 @@ public:
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
 	void SetUp(
-		const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry,
-		ACharacterBase* InTargetCharacterPtr
+		const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry
 		);
 
 protected:
@@ -183,16 +245,40 @@ public:
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
 	void SetUp(
-		const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef,
-		ACharacterBase* InTargetCharacterPtr
+		const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef
+		);
+
+	int32 SelectedIndex = 0;
+	
+protected:
+	
+	void ConditionalPerformTask();
+
+	void OnSelected(int32 Index);
+	
+	float RemainingTime = 0.f;
+	
+	TSoftObjectPtr<UPAD_TaskNode_Interaction_Option> TaskNodeRef;
+	
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Interaction_NotifyGuideThread : public UGameplayTask_Interaction
+{
+	GENERATED_BODY()
+
+public:
+	
+	virtual void Activate() override;
+	
+	void SetUp(
+		const TSoftObjectPtr<UPAD_TaskNode_Interaction_NotifyGuideThread>& InTaskNodeRef
 		);
 
 protected:
 	
 	void ConditionalPerformTask();
 
-	float RemainingTime = 0.f;
-	
-	TSoftObjectPtr<UPAD_TaskNode_Interaction_Option> TaskNodeRef;
+	TSoftObjectPtr<UPAD_TaskNode_Interaction_NotifyGuideThread> TaskNodeRef;
 	
 };

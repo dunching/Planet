@@ -26,7 +26,9 @@ struct FSkillProxy;
 struct FConsumableProxy;
 
 UCLASS()
-class PLANET_API AHumanCharacter : public ACharacterBase
+class PLANET_API AHumanCharacter :
+	public ACharacterBase,
+	public ISceneActorInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -34,7 +36,7 @@ public:
 
 	AHumanCharacter(const FObjectInitializer& ObjectInitializer);
 
-	USceneActorInteractionComponent*GetSceneActorInteractionComponent()const;
+	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const override;
 	
 protected:
 
@@ -47,6 +49,14 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void UnPossessed() override;
+
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) override;
+
+	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
+
+	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr) override;
+
+	virtual void HasBeenEndedLookAt() override;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	TSoftObjectPtr<UTexture2D> CharacterIcon;

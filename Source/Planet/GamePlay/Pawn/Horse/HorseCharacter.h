@@ -24,7 +24,8 @@ class AHumanCharacter;
 
 UCLASS()
 class PLANET_API AHorseCharacter : 
-	public ACharacterBase
+	public ACharacterBase,
+	public ISceneActorInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -34,10 +35,14 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const override;
+	
 	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
+	
+	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
 
 	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr)override;
-
+	
 	virtual void HasBeenEndedLookAt()override;
 
 	virtual TPair<FVector, FVector>GetCharacterViewInfo();
