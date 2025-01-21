@@ -9,6 +9,7 @@
 #include "CharacterBase.h"
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
+#include "GuideThreadActor.h"
 #include "ProxyProcessComponent.h"
 #include "TaskNode_Guide.h"
 

@@ -2,6 +2,8 @@
 
 #include "GuideActor.h"
 
+#include "GuideInteractionActor.h"
+
 FName USceneActorInteractionComponent::ComponentName = TEXT("SceneActorInteractionComponent");
 
 USceneActorInteractionComponent::USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer):

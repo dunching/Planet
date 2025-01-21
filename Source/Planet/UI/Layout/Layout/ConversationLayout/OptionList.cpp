@@ -10,7 +10,7 @@
 #include "TextCollect.h"
 #include "TextSubSystem.h"
 
-struct FInteractionList : public TStructVariable<FInteractionList>
+struct FOptionList : public TStructVariable<FOptionList>
 {
 	const FName VerticalBox = TEXT("VerticalBox");
 };
@@ -50,7 +50,7 @@ void UOptionList::UpdateDisplay(
 
 	SetVisibility(ESlateVisibility::Visible);
 
-	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FInteractionList::Get().VerticalBox));
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FOptionList::Get().VerticalBox));
 	if (!UIPtr)
 	{
 		return;
@@ -80,7 +80,7 @@ void UOptionList::UpdateDisplay(
 	{
 		SetVisibility(ESlateVisibility::Visible);
 
-		auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FInteractionList::Get().VerticalBox));
+		auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FOptionList::Get().VerticalBox));
 		if (!UIPtr)
 		{
 			return;
@@ -116,7 +116,7 @@ void UOptionList::CloseUI()
 {
 	SetVisibility(ESlateVisibility::Hidden);
 
-	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FInteractionList::Get().VerticalBox));
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FOptionList::Get().VerticalBox));
 	if (!UIPtr)
 	{
 		return;

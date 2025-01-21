@@ -6,6 +6,7 @@
 #include "PlanetWorldSettings.h"
 #include "GuideActor.h"
 #include "GuideSystemStateTreeComponent.h"
+#include "GuideThreadActor.h"
 
 UGuideSubSystem* UGuideSubSystem::GetInstance()
 {

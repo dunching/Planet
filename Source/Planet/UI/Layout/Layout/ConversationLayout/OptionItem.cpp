@@ -7,6 +7,7 @@
 
 #include "TaskNode_Interaction.h"
 #include "GuideActor.h"
+#include "GuideInteractionActor.h"
 #include "InputProcessorSubSystem.h"
 #include "InteractionList.h"
 #include "MainHUD.h"
@@ -22,7 +23,7 @@ namespace HumanProcessor
 
 class AMainHUD;
 
-struct FInteractionItem : public TStructVariable<FInteractionItem>
+struct FOptionItem : public TStructVariable<FOptionItem>
 {
 	const FName Text = TEXT("Text");
 
@@ -33,7 +34,7 @@ void UOptionItem::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	auto UIPtr = Cast<UButton>(GetWidgetFromName(FInteractionItem::Get().Btn));
+	auto UIPtr = Cast<UButton>(GetWidgetFromName(FOptionItem::Get().Btn));
 	if (!UIPtr)
 	{
 		return;
@@ -64,7 +65,7 @@ void UOptionItem::SetData(
 	OnClickedInteractionItem.AddLambda(InCallback);
 	TaskNode = InTaskNode;
 
-	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FInteractionItem::Get().Text));
+	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FOptionItem::Get().Text));
 	if (!UIPtr)
 	{
 		return;
@@ -79,7 +80,7 @@ void UOptionItem::SetData(const FString& InOption, int32 InIndex, const std::fun
 	Option = InOption;
 	Index = InIndex;
 
-	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FInteractionItem::Get().Text));
+	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FOptionItem::Get().Text));
 	if (!UIPtr)
 	{
 		return;

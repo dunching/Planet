@@ -1,6 +1,7 @@
 #include "ConversationLayout.h"
 
 #include "GuideActor.h"
+#include "GuideInteractionActor.h"
 #include "GuideSystemStateTreeComponent.h"
 #include "Kismet/GameplayStatics.h"
 

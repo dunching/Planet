@@ -28,11 +28,22 @@ public class Planet : ModuleRules
 
         PublicIncludePaths.Add("Planet");
         PublicIncludePaths.Add("Planet/GuideSystem");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_Character");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_GuideSystem");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode_Interaction");
+        PublicIncludePaths.Add("Planet/GuideSystem/GuideActor");
+        PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideInteraction");
+        PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideThread");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode/TaskNode_Character");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode/TaskNode_GuideSystem");
+        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode/TaskNode_Interaction");
         PublicIncludePaths.Add("Planet/GuideSystem/STT");
+        PublicIncludePaths.Add("Planet/GuideSystem/STT/GuideInteraction");
+        PublicIncludePaths.Add("Planet/GuideSystem/STT/GuideThread");
+        PublicIncludePaths.Add("Planet/GuideSystem/STE");
+        PublicIncludePaths.Add("Planet/GuideSystem/STE/GuideInteraction");
+        PublicIncludePaths.Add("Planet/GuideSystem/STE/GuideThread");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask");
+        PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask/GuideThread");
+        PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask/GuideInteraction");
         PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/AttributeSet");
