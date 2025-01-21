@@ -18,7 +18,19 @@ class ACharacterBase;
 class AHumanCharacter;
 class AHumanCharacter_Player;
 
-using FOnCurrentTaskNodeChanged = TMulticastDelegate<void(const TSoftObjectPtr<UPAD_TaskNode_Guide>&)>;
+struct FTaskNodeDescript
+{
+	// 执行此节点时，是否刷新上一条的描述？
+	// 在执行某些H节点时，是不需要刷新的
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsFreshPreviouDescription = true;
+	
+	FString Name;
+	
+	FString Description;
+};
+
+using FOnCurrentTaskNodeChanged = TMulticastDelegate<void(const FTaskNodeDescript&)>;
 
 using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
 
@@ -41,9 +53,9 @@ public:
 	FOnCurrentTaskNodeChanged OnCurrentTaskNodeChanged;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GuideST)
 	TObjectPtr<UGuideSystemStateTreeComponent> GuideStateTreeComponentPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
+	UPROPERTY()
 	TObjectPtr<UGameplayTasksComponent> GameplayTasksComponentPtr = nullptr;
 };

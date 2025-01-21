@@ -71,7 +71,7 @@ void UOptionItem::SetData(
 		return;
 	}
 
-	UIPtr->SetText(FText::FromString(TaskNode.GetDefaultObject()->TaskName));
+	UIPtr->SetText(FText::FromString(TaskNode.GetDefaultObject()->InteractionNodeName));
 }
 
 void UOptionItem::SetData(const FString& InOption, int32 InIndex, const std::function<void(int32)>& InOnClickedIndex)

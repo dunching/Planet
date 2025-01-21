@@ -1,9 +1,11 @@
 
 #include "GuideSystemStateTreeComponent.h"
 
+#include "StateTreeExecutionContext.h"
+
 #include "GuideActor.h"
 
-FName UGuideSystemStateTreeComponent::ComponentName = TEXT("WolrdProcessStateTreeComponent");
+FName UGuideSystemStateTreeComponent::ComponentName = TEXT("GuideSystemStateTreeComponent");
 
 UGuideSystemStateTreeComponent::UGuideSystemStateTreeComponent(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)

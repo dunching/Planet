@@ -221,8 +221,11 @@ void UGameplayTask_Guide_ConversationWithTarget::TickTask(float DeltaTime)
 
 	if (GuideActorPtr)
 	{
-		if (GuideActorPtr->ConsumeEvent(TaskID).Output_1 > 0)
+		const auto Result = GuideActorPtr->ConsumeEvent(TaskID);
+		if (Result.GetIsValid())
 		{
+			SelectedIndex = Result.Output_1;
+			
 			StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 			EndTask();
 		}

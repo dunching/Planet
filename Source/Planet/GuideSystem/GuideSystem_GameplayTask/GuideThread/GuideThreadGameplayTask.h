@@ -148,6 +148,8 @@ public:
 	
 	void SetUp(UPAD_TaskNode_Guide_ConversationWithTarget* InTaskNodePtr);
 
+	int32 SelectedIndex = -1;
+	
 protected:
 	
 	void ConditionalPerformTask();

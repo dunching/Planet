@@ -15,6 +15,8 @@ class AGuideActor;
 class AGuideThread;
 class UPAD_TaskNode_Guide;
 
+struct FTaskNodeDescript;
+
 UCLASS()
 class PLANET_API UGuideList :
 	public UMyUserWidget,
@@ -34,7 +36,7 @@ protected:
 
 	void OnGuideEnd(AGuideThread* NewGuidePtr);
 
-	void OnCurrentTaskNodeChanged(const TSoftObjectPtr<UPAD_TaskNode_Guide>& CurrentTaskNode);
+	void OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNode);
 
 	// 当前追踪的引导
 	TObjectPtr<AGuideThread> CurrentLineGuidePtr = nullptr;

@@ -11,6 +11,7 @@
 #include "GuideSubSystem.h"
 #include "GuideThreadActor.h"
 #include "ProxyProcessComponent.h"
+#include "STT_ExcuteGuideThreadTask.h"
 #include "TaskNode_Guide.h"
 
 struct FGuideList : public TStructVariable<FGuideList>
@@ -74,7 +75,7 @@ void UGuideList::OnGuideEnd(AGuideThread* NewGuidePtr)
 	}
 }
 
-void UGuideList::OnCurrentTaskNodeChanged(const TSoftObjectPtr<UPAD_TaskNode_Guide>& CurrentTaskNode)
+void UGuideList::OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNode)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGuideList::Get().Description));
 	if (!UIPtr)
@@ -82,12 +83,6 @@ void UGuideList::OnCurrentTaskNodeChanged(const TSoftObjectPtr<UPAD_TaskNode_Gui
 		return;
 	}
 
-	if (CurrentTaskNode.IsNull())
-	{
-	}
-	else
-	{
-		const auto Description = CurrentTaskNode.LoadSynchronous()->GetDescription();
-		UIPtr->SetText(FText::FromString(Description));
-	}
+	const auto Description = CurrentTaskNode.Description;
+	UIPtr->SetText(FText::FromString(Description));
 }

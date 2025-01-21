@@ -10,6 +10,8 @@
 #include <EnvironmentQuery/EnvQueryTypes.h>
 
 #include "GenerateType.h"
+#include "GuideActor.h"
+#include "STT_ExcuteGuideTask.h"
 
 #include "STT_ExcuteGuideThreadTask.generated.h"
 
@@ -24,21 +26,55 @@ class AHumanCharacter;
 class AHumanCharacter_Player;
 class UGameplayTask_Base;
 
+struct FTaskNode_Conversation_SentenceInfo;
+
 USTRUCT()
-struct PLANET_API FStateTreeExcuteGuideTaskTaskInstanceData
+struct PLANET_API FStateTreeExcuteGuideThreadBaseTaskInstanceData :
+	public FStateTreeExcuteGuideTaskTaskInstanceData
 {
 	GENERATED_BODY()
-
-	FStateTreeExcuteGuideTaskTaskInstanceData();
 	
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
 
+};
+
+// 执行引导任务 
+USTRUCT()
+struct PLANET_API FSTT_ExcuteGuideThreadBaseTask :
+	public FStateTreeTaskBase
+{
+	GENERATED_BODY()
+	
+	using FInstanceDataType = FStateTreeExcuteGuideThreadBaseTaskInstanceData;
+
+	virtual const UStruct* GetInstanceDataType() const override;
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	protected:
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const;
+	
+};
+
+USTRUCT()
+struct PLANET_API FStateTreeExcuteGuideThreadGenericTaskInstanceData :
+	public FStateTreeExcuteGuideThreadBaseTaskInstanceData
+{
+	GENERATED_BODY()
+
 	UPROPERTY(EditAnywhere, Category = Param)
 	TSoftObjectPtr<UPAD_TaskNode_Guide> TaskNodeRef;
 
-	UPROPERTY(VisibleAnywhere, Category = Param)
-	FGuid TaskID;
+	UPROPERTY(EditAnywhere, Category = Param)
+	FString Name;
+	
+	UPROPERTY(EditAnywhere, Category = Param)
+	FString Description;
 	
 	UPROPERTY(Transient)
 	TObjectPtr<UGameplayTask_Base> GameplayTaskPtr = nullptr;
@@ -48,17 +84,16 @@ struct PLANET_API FStateTreeExcuteGuideTaskTaskInstanceData
 
 	UPROPERTY(Transient)
 	AHumanCharacter_Player* PlayerCharacterPtr = nullptr;
-
 };
 
+// 执行引导任务 
 USTRUCT()
-struct PLANET_API FSTT_ExcuteGuideThreadTask : public FStateTreeTaskCommonBase
+struct PLANET_API FSTT_ExcuteGuideThreadGenraricTask :
+	public FSTT_ExcuteGuideThreadBaseTask
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeExcuteGuideTaskTaskInstanceData;
-
-	FSTT_ExcuteGuideThreadTask();
+	using FInstanceDataType = FStateTreeExcuteGuideThreadGenericTaskInstanceData;
 
 	virtual const UStruct* GetInstanceDataType() const override;
 
@@ -77,6 +112,82 @@ struct PLANET_API FSTT_ExcuteGuideThreadTask : public FStateTreeTaskCommonBase
 		const float DeltaTime
 	) const override;
 
-	virtual EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context)const;
+protected:
 
+	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	
+	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	
+};
+
+USTRUCT()
+struct PLANET_API FStateTreeExcuteGuideThreadFaileTaskInstanceData :
+	public FStateTreeExcuteGuideThreadBaseTaskInstanceData
+{
+	GENERATED_BODY()
+
+};
+
+// 执行引导任务 失败时
+USTRUCT()
+struct PLANET_API FSTT_ExcuteGuideThreadFaileTask :
+	public FSTT_ExcuteGuideThreadBaseTask
+{
+	GENERATED_BODY()
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+};
+
+USTRUCT()
+struct PLANET_API FStateTreeExcuteGuideThreadMonologueTaskInstanceData :
+	public FStateTreeExcuteGuideThreadBaseTaskInstanceData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UGameplayTask_Base> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(Transient)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+
+	UPROPERTY(Transient)
+	AHumanCharacter_Player* PlayerCharacterPtr = nullptr;
+};
+
+// 执行引导任务 对话
+USTRUCT()
+struct PLANET_API FSTT_ExcuteGuideThreadMonologueTask :
+	public FSTT_ExcuteGuideThreadBaseTask
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FStateTreeExcuteGuideThreadMonologueTaskInstanceData;
+
+	virtual const UStruct* GetInstanceDataType() const override;
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+	
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+protected:
+	
+	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	
+	float RemainingTime = 0.f;
+
+	int32 SentenceIndex = 0;
 };

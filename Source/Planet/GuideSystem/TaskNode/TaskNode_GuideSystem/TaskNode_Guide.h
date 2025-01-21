@@ -28,17 +28,10 @@ class PLANET_API UPAD_TaskNode_Guide : public UPAD_TaskNode_Preset
 
 public:
 
-	virtual FString GetDescription() const;
-
 	// 当任务完成时玩家会得到的物品
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, int32> GetItemWhenComplete;
 
-	// 执行此节点时，是否刷新上一条的描述？
-	// 在执行某些H节点时，是不需要刷新的
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bIsFreshPreviouDescription = true;
-	
 };
 
 /*
@@ -60,8 +53,6 @@ public:
 	
 	virtual void PostLoad()override;
 	
-	virtual FString GetDescription() const override;
-
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FVector TargetLocation = FVector::ZeroVector;
 
@@ -75,9 +66,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSoftObjectPtr<ATargetPoint> TargetPointPtr = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	FString Description;
 };
 
 /*
@@ -90,8 +78,6 @@ class PLANET_API UPAD_TaskNode_Guide_PressKey : public UPAD_TaskNode_Guide
 
 public:
 	UPAD_TaskNode_Guide_PressKey(const FObjectInitializer& ObjectInitializer);
-
-	virtual FString GetDescription() const override;
 
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	FKey Key = EKeys::AnyKey;
@@ -108,8 +94,6 @@ class PLANET_API UPAD_TaskNode_Guide_Monologue : public UPAD_TaskNode_Guide
 
 public:
 	UPAD_TaskNode_Guide_Monologue(const FObjectInitializer& ObjectInitializer);
-
-	virtual FString GetDescription() const override;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
@@ -147,8 +131,6 @@ class PLANET_API UPAD_TaskNode_Guide_ConversationWithTarget : public UPAD_TaskNo
 
 public:
 	UPAD_TaskNode_Guide_ConversationWithTarget(const FObjectInitializer& ObjectInitializer);
-
-	virtual FString GetDescription() const override;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSoftObjectPtr<AHumanCharacter_AI>TargetCharacterPtr = nullptr;

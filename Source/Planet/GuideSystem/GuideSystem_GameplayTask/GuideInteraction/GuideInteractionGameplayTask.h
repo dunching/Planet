@@ -19,6 +19,7 @@
 class AHumanCharacter_Player;
 class ATargetPoint_Runtime;
 class AGuideThread;
+class AGuideInteractionActor;
 class UPAD_TaskNode_Guide_AddToTarget;
 class UPAD_TaskNode_Guide_ConversationWithTarget;
 class UPAD_TaskNode_Interaction_Option;
@@ -113,13 +114,20 @@ public:
 	virtual void Activate() override;
 	
 	void SetUp(
-		const TSoftObjectPtr<UPAD_TaskNode_Interaction_NotifyGuideThread>& InTaskNodeRef
+		const TSubclassOf<AGuideInteractionActor> &GuideInteractionActorClass,
+		FGuid TaskID,
+		int32 SelectedIndex
 		);
 
 protected:
 	
 	void ConditionalPerformTask();
+	
+	FGuid TaskID;
 
-	TSoftObjectPtr<UPAD_TaskNode_Interaction_NotifyGuideThread> TaskNodeRef;
+	//结束时移除这个节点
+	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
+	
+	int32 SelectedIndex = -1;
 	
 };

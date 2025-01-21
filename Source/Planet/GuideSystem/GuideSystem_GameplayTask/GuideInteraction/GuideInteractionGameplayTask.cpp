@@ -178,24 +178,30 @@ void UGameplayTask_Interaction_NotifyGuideThread::Activate()
 }
 
 void UGameplayTask_Interaction_NotifyGuideThread::SetUp(
-	const TSoftObjectPtr<UPAD_TaskNode_Interaction_NotifyGuideThread>& InTaskNodeRef
+		const TSubclassOf<AGuideInteractionActor> &InGuideInteractionActorClass,
+		FGuid InTaskID,
+		int32 InSelectedIndex
 	)
 {
-	TaskNodeRef = InTaskNodeRef;
+	GuideInteractionActorClass = InGuideInteractionActorClass;
+	
+	TaskID = InTaskID;
+	
+	SelectedIndex = InSelectedIndex;
 }
 
 void UGameplayTask_Interaction_NotifyGuideThread::ConditionalPerformTask()
 {
 	FTaskNodeResuleHelper TaskNodeResuleHelper;
 
-	TaskNodeResuleHelper.TaskId = TaskNodeRef->TaskID;
-	TaskNodeResuleHelper.Output_1 = 1;
+	TaskNodeResuleHelper.TaskId = TaskID;
+	TaskNodeResuleHelper.Output_1 = SelectedIndex;
 	
 	UGuideSubSystem::GetInstance()->GetCurrentGuideThread()->AddEvent(TaskNodeResuleHelper);
 
 	if (TargetCharacterPtr)
 	{
-		TargetCharacterPtr->GetSceneActorInteractionComponent()->RemoveGuideActor(TaskNodeRef->GuideInteractionActorClass);
+		TargetCharacterPtr->GetSceneActorInteractionComponent()->RemoveGuideActor(GuideInteractionActorClass);
 	}
 	
 	StateTreeRunStatus = EStateTreeRunStatus::Succeeded;

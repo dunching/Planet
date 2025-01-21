@@ -6,7 +6,10 @@
 
 #include "BrainComponent.h"
 #include "GameplayTagContainer.h"
+#include "Components/StateTreeComponentSchema.h"
+
 #include "GuideActor.h"
+#include "GuideSystemStateTreeComponent.h"
 
 #include "GuideThreadActor.generated.h"
 
@@ -19,17 +22,41 @@ class ACharacterBase;
 class AHumanCharacter;
 class AHumanCharacter_Player;
 
-using FOnCurrentTaskNodeChanged = TMulticastDelegate<void(const TSoftObjectPtr<UPAD_TaskNode_Guide>&)>;
+struct FTaskNodeDescript;
 
 using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
 
 struct FTaskNodeResuleHelper
 {
+	bool GetIsValid() const;
+
 	// 任务ID
 	FGuid TaskId;
 
 	// 执行结果 (-1表示无效)
 	int32 Output_1 = -1;
+};
+
+UCLASS()
+class UStateTreeGuideThreadComponentSchema : public UStateTreeComponentSchema
+{
+	GENERATED_BODY()
+public:
+	virtual bool IsStructAllowed(const UScriptStruct* InScriptStruct) const override;
+
+};
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API UGuideThreadSystemStateTreeComponent : public UGuideSystemStateTreeComponent
+{
+	GENERATED_BODY()
+
+public:
+	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
+	
 };
 
 /**
@@ -41,16 +68,17 @@ class PLANET_API AGuideThread : public AGuideActor
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(Transient)
-	TSoftObjectPtr<UPAD_TaskNode_Guide> TaskNodeRef;
+	AGuideThread(const FObjectInitializer& ObjectInitializer);
 
 	void UpdateCurrentTaskNode(const TSoftObjectPtr<UPAD_TaskNode_Guide>& InTaskNode);
+
+	void UpdateCurrentTaskNode(const FTaskNodeDescript& TaskNodeDescript);
 
 	// 添加任务执行结果
 	void AddEvent(const FTaskNodeResuleHelper& TaskNodeResuleHelper);
 
 	FTaskNodeResuleHelper ConsumeEvent(const FGuid& InGuid);
-	
+
 	// 任务节点类型：支线/支线
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag TaskNodeCategory;
@@ -65,6 +93,11 @@ public:
 
 protected:
 	TMap<FGuid, FTaskNodeResuleHelper> EventsSet;
+
+	UPROPERTY(Transient)
+	TSoftObjectPtr<UPAD_TaskNode_Guide> TaskNodeRef;
+
+	FTaskNodeDescript CurrentTaskNodeDescript;
 };
 
 /**
