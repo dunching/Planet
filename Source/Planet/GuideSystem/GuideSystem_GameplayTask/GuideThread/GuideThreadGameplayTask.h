@@ -11,6 +11,7 @@
 #include "BehaviorTree/Tasks/BTTask_RunDynamicStateTree.h"
 
 #include "GuideInteractionGameplayTask.h"
+#include "GuideThreadActor.h"
 #include "ProxyProcessComponent.h"
 #include "TaskNode.h"
 
@@ -142,20 +143,37 @@ public:
 	
 	virtual void Activate() override;
 	
-	virtual void TickTask(float DeltaTime)override;
-
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
 	void SetUp(UPAD_TaskNode_Guide_ConversationWithTarget* InTaskNodePtr);
 
-	int32 SelectedIndex = -1;
-	
+	void SetUp(const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr);
+
 protected:
 	
 	void ConditionalPerformTask();
 
-	UPAD_TaskNode_Guide_ConversationWithTarget* TaskNodePtr = nullptr;
+	TSoftObjectPtr<AHumanCharacter_AI> TargetCharacterPtr;
 	
 	ATargetPoint_Runtime* TargetPointPtr = nullptr;
+	
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Guide_WaitComplete : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+
+public:
+	
+	virtual void TickTask(float DeltaTime)override;
+
+	void SetUp(const FGuid& InTaskID);
+	
+	FTaskNodeResuleHelper TaskNodeResuleHelper;
+	
+protected:
+	
+	FGuid TaskID;
 	
 };

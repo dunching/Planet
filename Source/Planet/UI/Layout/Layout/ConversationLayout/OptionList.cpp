@@ -75,8 +75,7 @@ void UOptionList::UpdateDisplay(
 	const std::function<void(int32)>& InCallback
 )
 {
-	TaskNodeRef = InTaskNodeRef;
-	if (TaskNodeRef.IsValid())
+	if (InTaskNodeRef.IsValid())
 	{
 		SetVisibility(ESlateVisibility::Visible);
 
@@ -90,7 +89,7 @@ void UOptionList::UpdateDisplay(
 
 		// 选项
 		int32 Index = 1;
-		for (const auto& Iter : TaskNodeRef.LoadSynchronous()->OptionAry)
+		for (const auto& Iter : InTaskNodeRef.LoadSynchronous()->OptionAry)
 		{
 			auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
 			if (ItemUIPtr)
@@ -109,6 +108,41 @@ void UOptionList::UpdateDisplay(
 			ItemUIPtr->SetData(UTextSubSystem::GetInstance()->GetText(TextCollect::Return), Index, InCallback);
 			UIPtr->AddChild(ItemUIPtr);
 		}
+	}
+}
+
+void UOptionList::UpdateDisplay(const TArray<FString>& OptionAry, const std::function<void(int32)>& InCallback)
+{
+	SetVisibility(ESlateVisibility::Visible);
+
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FOptionList::Get().VerticalBox));
+	if (!UIPtr)
+	{
+		return;
+	}
+
+	UIPtr->ClearChildren();
+
+	// 选项
+	int32 Index = 1;
+	for (const auto& Iter : OptionAry)
+	{
+		auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
+		if (ItemUIPtr)
+		{
+			ItemUIPtr->SetData(Iter, Index, InCallback);
+			UIPtr->AddChild(ItemUIPtr);
+		}
+		Index++;
+	}
+
+	// “取消”选项
+	Index = 0;
+	auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
+	if (ItemUIPtr)
+	{
+		ItemUIPtr->SetData(UTextSubSystem::GetInstance()->GetText(TextCollect::Return), Index, InCallback);
+		UIPtr->AddChild(ItemUIPtr);
 	}
 }
 

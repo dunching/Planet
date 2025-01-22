@@ -1,8 +1,11 @@
 #include "STE_TaskNode_GuideThread.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
 #include "GuideThreadActor.h"
+#include "HumanCharacter_Player.h"
 
 void USTE_TaskNode_GuideMainThread::TreeStart(FStateTreeExecutionContext& Context)
 {
@@ -23,4 +26,5 @@ void USTE_TaskNode_GuideMainThread::TreeStop(FStateTreeExecutionContext& Context
 void USTE_TaskNode_GuideMainThread::Tick(FStateTreeExecutionContext& Context, const float DeltaTime)
 {
 	Super::Tick(Context, DeltaTime);
+
 }

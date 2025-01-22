@@ -38,6 +38,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
 	AGuideMainThread* GuideActorPtr = nullptr;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = Output)
+	AHumanCharacter_Player* PlayerCharacter = nullptr;
+
 protected:
 
 };

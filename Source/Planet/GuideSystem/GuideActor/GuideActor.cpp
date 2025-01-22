@@ -5,6 +5,11 @@
 #include "GuideSystemStateTreeComponent.h"
 #include "TaskNode_Guide.h"
 
+bool FTaskNodeDescript::GetIsValid() const
+{
+	return /* bIsFreshPreviouDescription && */ (!Description.IsEmpty());
+}
+
 AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
 {

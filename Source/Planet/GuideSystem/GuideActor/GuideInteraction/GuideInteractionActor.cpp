@@ -3,13 +3,13 @@
 #include "GameplayTasksComponent.h"
 
 #include "GuideSystemStateTreeComponent.h"
-#include "STT_ExcuteGuideInteractionTask.h"
+#include "STT_GuideInteraction.h"
 #include "TaskNode_Guide.h"
 
 bool UStateTreeGuideInteractionComponentSchema::IsStructAllowed(const UScriptStruct* InScriptStruct) const
 {
 	return Super::IsStructAllowed(InScriptStruct) ||
-		InScriptStruct->IsChildOf(FSTT_ExcuteGuideInteractionBaseTask::StaticStruct());
+		InScriptStruct->IsChildOf(FSTT_GuideInteractionBase::StaticStruct());
 }
 
 TSubclassOf<UStateTreeSchema> UGuideInteractionSystemStateTreeComponent::GetSchema() const

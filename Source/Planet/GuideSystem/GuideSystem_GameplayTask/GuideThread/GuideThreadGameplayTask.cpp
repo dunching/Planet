@@ -215,27 +215,6 @@ void UGameplayTask_Guide_ConversationWithTarget::Activate()
 	ConditionalPerformTask();
 }
 
-void UGameplayTask_Guide_ConversationWithTarget::TickTask(float DeltaTime)
-{
-	Super::TickTask(DeltaTime);
-
-	if (GuideActorPtr)
-	{
-		const auto Result = GuideActorPtr->ConsumeEvent(TaskID);
-		if (Result.GetIsValid())
-		{
-			SelectedIndex = Result.Output_1;
-			
-			StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
-			EndTask();
-		}
-		return;
-	}
-	
-	StateTreeRunStatus = EStateTreeRunStatus::Failed;
-	EndTask();
-}
-
 void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(bool bInOwnerFinished)
 {
 	if (TargetPointPtr)
@@ -249,14 +228,18 @@ void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(bool bInOwnerFinished
 
 void UGameplayTask_Guide_ConversationWithTarget::SetUp(UPAD_TaskNode_Guide_ConversationWithTarget* InTaskNodePtr)
 {
-	TaskNodePtr = InTaskNodePtr;
+	TargetCharacterPtr = InTaskNodePtr->TargetCharacterPtr;
+}
+
+void UGameplayTask_Guide_ConversationWithTarget::SetUp(const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr)
+{
+	TargetCharacterPtr = InTargetCharacterPtr;
 }
 
 void UGameplayTask_Guide_ConversationWithTarget::ConditionalPerformTask()
 {
 	if (
-		TaskNodePtr &&
-		TaskNodePtr->TargetCharacterPtr.IsValid()
+		TargetCharacterPtr.IsValid()
 	)
 	{
 		if (PlayerCharacterPtr)
@@ -272,8 +255,30 @@ void UGameplayTask_Guide_ConversationWithTarget::ConditionalPerformTask()
 				SpawnParameters
 			);
 
-			TargetPointPtr->AttachToActor(TaskNodePtr->TargetCharacterPtr.Get(),
+			TargetPointPtr->AttachToActor(TargetCharacterPtr.Get(),
 			                              FAttachmentTransformRules::KeepRelativeTransform);
 		}
 	}
+}
+
+void UGameplayTask_Guide_WaitComplete::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+	
+	if (GuideActorPtr)
+	{
+		const auto Result = GuideActorPtr->ConsumeEvent(TaskID);
+		if (Result.GetIsValid())
+		{
+			TaskNodeResuleHelper = Result;
+			
+			StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+			EndTask();
+		}
+	}
+}
+
+void UGameplayTask_Guide_WaitComplete::SetUp(const FGuid& InTaskID)
+{
+	TaskID = InTaskID;
 }

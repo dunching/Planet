@@ -115,7 +115,7 @@ void UGameplayTask_Interaction_Option::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
 
-	if (TaskNodeRef->DelayTime > 0.f)
+	if (DelayTime > 0.f)
 	{
 		RemainingTime -= DeltaTime;
 
@@ -139,21 +139,31 @@ void UGameplayTask_Interaction_Option::SetUp(
 	const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef
 )
 {
-	TaskNodeRef = InTaskNodeRef;
+	OptionAry = InTaskNodeRef->OptionAry;
+	DelayTime = InTaskNodeRef->DelayTime;
+}
+
+void UGameplayTask_Interaction_Option::SetUp(
+	const TArray<FString>& InOptionAry,
+	float InDelayTime
+	)
+{
+	OptionAry = InOptionAry;
+	DelayTime = InDelayTime;
 }
 
 void UGameplayTask_Interaction_Option::ConditionalPerformTask()
 {
-	if (TaskNodeRef->DelayTime > 0.f)
+	if (DelayTime > 0.f)
 	{
-		RemainingTime = TaskNodeRef->DelayTime;
+		RemainingTime = DelayTime;
 	}
 
 	Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
 		->GetHUD<AMainHUD>()
 		->GetMainHUDLayout()
 		->GetConversationLayout()
-		->GetOptions()->UpdateDisplay(TaskNodeRef, std::bind(&ThisClass::OnSelected, this, std::placeholders::_1));
+		->GetOptions()->UpdateDisplay(OptionAry, std::bind(&ThisClass::OnSelected, this, std::placeholders::_1));
 }
 
 void UGameplayTask_Interaction_Option::OnSelected(int32 Index)
@@ -194,7 +204,7 @@ void UGameplayTask_Interaction_NotifyGuideThread::ConditionalPerformTask()
 {
 	FTaskNodeResuleHelper TaskNodeResuleHelper;
 
-	TaskNodeResuleHelper.TaskId = TaskID;
+	TaskNodeResuleHelper.TaskID = TaskID;
 	TaskNodeResuleHelper.Output_1 = SelectedIndex;
 	
 	UGuideSubSystem::GetInstance()->GetCurrentGuideThread()->AddEvent(TaskNodeResuleHelper);

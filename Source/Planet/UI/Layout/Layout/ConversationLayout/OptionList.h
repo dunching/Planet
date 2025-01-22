@@ -45,14 +45,17 @@ public:
 		const std::function<void(int32)>& InCallback
 		);
 	
+	void UpdateDisplay(
+		const TArray<FString>&OptionAry,
+		const std::function<void(int32)>& InCallback
+		);
+	
 	void CloseUI();
 
 protected:
 	
 	bool ResetPosition(float InDeltaTime);
 
-	TSoftObjectPtr<UPAD_TaskNode_Interaction_Option> TaskNodeRef;
-	
 	AHumanCharacter_AI* TargetCharacterPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item Class")

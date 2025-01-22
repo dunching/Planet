@@ -1,6 +1,7 @@
 #include "CharacterAttributesComponent.h"
 
 #include "Net/UnrealNetwork.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
@@ -18,6 +19,8 @@ UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitia
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickInterval = 1.f;
 
+	CharacterID = FGuid::NewGuid();
+	
 	SetIsReplicatedByDefault(true);
 }
 
@@ -168,4 +171,25 @@ void UCharacterAttributesComponent::BeginPlay()
 		}
 	}
 #endif
+}
+
+ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
+	const UObject* WorldContextObject,
+	TSubclassOf<ACharacterBase> ActorClass,
+	const FGuid& CharacterID)
+{
+	TArray<AActor*> ActorAry;
+	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, ActorClass, ActorAry);
+	for (auto Iter : ActorAry)
+	{
+		if (auto CharacterPtr = Cast<ACharacterBase>(Iter))
+		{
+			if (CharacterPtr->GetCharacterAttributesComponent()->CharacterID == CharacterID)
+			{
+				return CharacterPtr;
+			}
+		}
+	}
+
+	return nullptr;
 }

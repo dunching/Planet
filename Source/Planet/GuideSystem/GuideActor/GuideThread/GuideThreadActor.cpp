@@ -2,20 +2,20 @@
 
 #include "GameplayTasksComponent.h"
 #include "StateTreeConditionBase.h"
-#include "STT_ExcuteGuideThreadTask.h"
+#include "STT_GuideThread.h"
 
 #include "GuideSystemStateTreeComponent.h"
 #include "TaskNode_Guide.h"
 
 bool FTaskNodeResuleHelper::GetIsValid() const
 {
-	return TaskId.IsValid();
+	return TaskID.IsValid();
 }
 
 bool UStateTreeGuideThreadComponentSchema::IsStructAllowed(const UScriptStruct* InScriptStruct) const
 {
 	return Super::IsStructAllowed(InScriptStruct) ||
-		InScriptStruct->IsChildOf(FSTT_ExcuteGuideThreadBaseTask::StaticStruct());
+		InScriptStruct->IsChildOf(FSTT_GuideThreadBase::StaticStruct());
 }
 
 TSubclassOf<UStateTreeSchema> UGuideThreadSystemStateTreeComponent::GetSchema() const
@@ -46,7 +46,7 @@ void AGuideThread::UpdateCurrentTaskNode(const FTaskNodeDescript& TaskNodeDescri
 
 void AGuideThread::AddEvent(const FTaskNodeResuleHelper& TaskNodeResuleHelper)
 {
-	EventsSet.Add(TaskNodeResuleHelper.TaskId, TaskNodeResuleHelper);
+	EventsSet.Add(TaskNodeResuleHelper.TaskID, TaskNodeResuleHelper);
 }
 
 FTaskNodeResuleHelper AGuideThread::ConsumeEvent(const FGuid& InGuid)

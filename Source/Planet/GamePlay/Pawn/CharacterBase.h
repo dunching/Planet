@@ -171,7 +171,7 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
 	float BaseLookUpRate = 45.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;
 	
 	UPROPERTY()

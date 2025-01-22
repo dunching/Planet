@@ -18,8 +18,26 @@ class ACharacterBase;
 class AHumanCharacter;
 class AHumanCharacter_Player;
 
+USTRUCT(BlueprintType, Blueprintable)
+struct FTaskNodeResuleHelper
+{
+	GENERATED_USTRUCT_BODY()
+
+	bool GetIsValid() const;
+
+	// 任务ID
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FGuid TaskID;
+
+	// 执行结果 (-1表示无效)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int32 Output_1 = -1;
+};
+
 struct FTaskNodeDescript
 {
+	bool GetIsValid() const;
+	
 	// 执行此节点时，是否刷新上一条的描述？
 	// 在执行某些H节点时，是不需要刷新的
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

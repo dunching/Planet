@@ -26,17 +26,6 @@ struct FTaskNodeDescript;
 
 using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
 
-struct FTaskNodeResuleHelper
-{
-	bool GetIsValid() const;
-
-	// 任务ID
-	FGuid TaskId;
-
-	// 执行结果 (-1表示无效)
-	int32 Output_1 = -1;
-};
-
 UCLASS()
 class UStateTreeGuideThreadComponentSchema : public UStateTreeComponentSchema
 {

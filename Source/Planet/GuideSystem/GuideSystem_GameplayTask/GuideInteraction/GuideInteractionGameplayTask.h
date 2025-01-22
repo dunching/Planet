@@ -90,6 +90,11 @@ public:
 		const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef
 		);
 
+	void SetUp(
+		const TArray<FString>& InOptionAry,
+		float DelayTime
+		);
+
 	int32 SelectedIndex = 0;
 	
 protected:
@@ -100,7 +105,11 @@ protected:
 	
 	float RemainingTime = 0.f;
 	
-	TSoftObjectPtr<UPAD_TaskNode_Interaction_Option> TaskNodeRef;
+	// 
+	TArray<FString> OptionAry;
+
+	// 时间限制，<0为无限制
+	float DelayTime = -1.f;
 	
 };
 

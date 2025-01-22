@@ -10,8 +10,9 @@
 #include <EnvironmentQuery/EnvQueryTypes.h>
 
 #include "GenerateType.h"
+#include "GuideThreadActor.h"
 
-#include "STT_ExcuteGuideTask.generated.h"
+#include "STT_GuideBase.generated.h"
 
 class AGuideActor;
 class AGuideThread;
@@ -25,17 +26,27 @@ class AHumanCharacter_Player;
 class UGameplayTask_Base;
 
 USTRUCT()
-struct PLANET_API FStateTreeExcuteGuideTaskTaskInstanceData
+struct PLANET_API FSTID_GuideBase
 {
 	GENERATED_BODY()
 
-	FStateTreeExcuteGuideTaskTaskInstanceData();
+	FSTID_GuideBase();
 	
-	UPROPERTY(VisibleAnywhere, Category = Param)
+	UPROPERTY(VisibleAnywhere, Category = Output)
 	FGuid TaskID;
 	
 	// 上条任务的输出参数
 	UPROPERTY(EditAnywhere, Category = Output)
-	int32 LastTaskOut = 0;
+	FTaskNodeResuleHelper TaskNodeResuleHelper;
 
+};
+
+template<>
+struct TStructOpsTypeTraits<FSTID_GuideBase> :
+	public TStructOpsTypeTraitsBase2<FSTID_GuideBase>
+{
+	enum
+	{
+		WithZeroConstructor = true,
+	};
 };

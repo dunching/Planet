@@ -42,6 +42,10 @@ public:
 
 	float GetRate()const;
 	
+	// Character的ID
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FGuid CharacterID;
+	
 protected:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -64,4 +68,18 @@ protected:
    
 private:
 
+};
+
+UCLASS()
+class UGameplayStatics_Character : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+	
+	static PLANET_API ACharacterBase* GetCharacterByID(
+		const UObject* WorldContextObject,
+		TSubclassOf<ACharacterBase> ActorClass,
+		const FGuid&CharacterID
+		);
 };
