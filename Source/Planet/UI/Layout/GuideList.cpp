@@ -11,7 +11,7 @@
 #include "GuideSubSystem.h"
 #include "GuideThreadActor.h"
 #include "ProxyProcessComponent.h"
-#include "STT_GuideThread.h"
+#include "STT_GuideThreadFail.h"
 #include "TaskNode_Guide.h"
 
 struct FGuideList : public TStructVariable<FGuideList>

@@ -45,6 +45,10 @@ public:
 	// Character的ID
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 	FGuid CharacterID;
+
+	// Character的类别
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+	FString CharacterCategory;
 	
 protected:
 	

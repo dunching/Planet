@@ -13,7 +13,7 @@
 #include "GuideActor.h"
 #include "STT_GuideBase.h"
 
-#include "STT_GuideThread.generated.h"
+#include "STT_GuideThreadFail.generated.h"
 
 class AGuideActor;
 class AGuideThread;
@@ -29,7 +29,9 @@ class UGameplayTask_Base;
 class UGameplayTask_Guide_WaitComplete;
 class UGameplayTask_Guide_ConversationWithTarget;
 class UGameplayTask_Guide_AddToTarget;
+class UGameplayTask_Guide_CollectResource;
 
+struct FConsumableProxy;
 struct FTaskNode_Conversation_SentenceInfo;
 
 USTRUCT()
@@ -68,6 +70,7 @@ struct PLANET_API FSTT_GuideThreadBase :
 	
 };
 
+#pragma region Generic
 USTRUCT()
 struct PLANET_API FSTID_GuideThreadGeneric :
 	public FSTID_GuideThreadBase
@@ -124,9 +127,11 @@ protected:
 	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
 	
 };
+#pragma endregion
 
+#pragma region Fail
 USTRUCT()
-struct PLANET_API FSTID_GuideThreadFaileTask :
+struct PLANET_API FSTID_GuideThreadFail :
 	public FSTID_GuideThreadBase
 {
 	GENERATED_BODY()
@@ -135,7 +140,7 @@ struct PLANET_API FSTID_GuideThreadFaileTask :
 
 // 执行引导任务 失败时
 USTRUCT()
-struct PLANET_API FSTT_GuideThread :
+struct PLANET_API FSTT_GuideThreadFail :
 	public FSTT_GuideThreadBase
 {
 	GENERATED_BODY()
@@ -145,7 +150,9 @@ struct PLANET_API FSTT_GuideThread :
 		const FStateTreeTransitionResult& Transition
 	) const override;
 };
+#pragma endregion
 
+#pragma region Monologue
 USTRUCT()
 struct PLANET_API FSTID_GuideThreadMonologue :
 	public FSTID_GuideThreadBase
@@ -194,7 +201,9 @@ protected:
 
 	int32 SentenceIndex = 0;
 };
+#pragma endregion
 
+#pragma region WaitComplete
 USTRUCT()
 struct PLANET_API FSTID_GuideThreadWaitComplete :
 	public FSTID_GuideThreadBase
@@ -236,7 +245,60 @@ protected:
 	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
 	
 };
+#pragma endregion
 
+#pragma region CollectResource
+USTRUCT()
+struct PLANET_API FSTID_GuideThreadCollectResource :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	FGameplayTag ResourceType;
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	int32 Num = 1;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UGameplayTask_Guide_CollectResource> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(Transient)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+
+};
+
+// 要求玩家采集指定类型的资源
+USTRUCT()
+struct PLANET_API FSTT_GuideThreadCollectResource :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThreadCollectResource;
+
+	virtual const UStruct* GetInstanceDataType() const override;
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+	
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+protected:
+	
+	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+
+};
+#pragma endregion
+
+#pragma region ConversationWithTarget
 USTRUCT()
 struct PLANET_API FSTID_GuideThreadConversationWithTarget :
 	public FSTID_GuideThreadBase
@@ -281,7 +343,9 @@ protected:
 	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
 	
 };
+#pragma endregion
 
+#pragma region AddInteractionToTarget
 USTRUCT()
 struct PLANET_API FSTID_GuideThreadAddInteractionToTarget :
 	public FSTID_GuideThreadBase
@@ -322,3 +386,4 @@ protected:
 	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
 
 };
+#pragma endregion

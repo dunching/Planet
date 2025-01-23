@@ -2,7 +2,7 @@
 
 #include "GameplayTasksComponent.h"
 #include "StateTreeConditionBase.h"
-#include "STT_GuideThread.h"
+#include "STT_GuideThreadFail.h"
 
 #include "GuideSystemStateTreeComponent.h"
 #include "TaskNode_Guide.h"

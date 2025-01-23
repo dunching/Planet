@@ -12,6 +12,7 @@
 
 #include "GuideInteractionGameplayTask.h"
 #include "GuideThreadActor.h"
+#include "HoldingItemsComponent.h"
 #include "ProxyProcessComponent.h"
 #include "TaskNode.h"
 
@@ -185,4 +186,35 @@ protected:
 	
 	FGuid TaskID;
 	
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Guide_CollectResource : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+
+public:
+	
+	virtual void Activate() override;
+	
+	virtual void OnDestroy(bool bInOwnerFinished) override;
+	
+	void SetUp(const FGameplayTag &ResourceType, int32 Num);
+	
+	FTaskNodeDescript GetTaskNodeDescripton() const;
+	
+protected:
+	
+	void OnGetConsumableProxy(const TSharedPtr<FConsumableProxy>&, EProxyModifyType ProxyModifyType);
+
+	void UpdateDescription();
+	
+	UHoldingItemsComponent::FOnConsumableProxyChanged::FCallbackHandleSPtr OnConsumableProxyChangedHandle;
+	
+	FGameplayTag ResourceType;
+
+	int32 CurrentNum = 0;
+
+	int32 Num = 0;
+
 };

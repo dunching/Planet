@@ -8,6 +8,7 @@
 #include "GuideInteractionActor.h"
 #include "GuideSubSystem.h"
 #include "GuideThreadActor.h"
+#include "HoldingItemsComponent.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
 #include "MainHUD.h"
@@ -290,4 +291,76 @@ void UGameplayTask_Guide_WaitComplete::TickTask(float DeltaTime)
 void UGameplayTask_Guide_WaitComplete::SetUp(const FGuid& InTaskID)
 {
 	TaskID = InTaskID;
+}
+
+void UGameplayTask_Guide_CollectResource::Activate()
+{
+	Super::Activate();
+	
+	OnConsumableProxyChangedHandle = PlayerCharacterPtr->GetHoldingItemsComponent()->OnConsumableProxyChanged.AddCallback(
+		std::bind(&ThisClass::OnGetConsumableProxy, this, std::placeholders::_1, std::placeholders::_2)
+		);
+}
+
+void UGameplayTask_Guide_CollectResource::OnDestroy(bool bInOwnerFinished)
+{
+	if (OnConsumableProxyChangedHandle)
+	{
+		OnConsumableProxyChangedHandle->UnBindCallback();
+	}
+	
+	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_Guide_CollectResource::SetUp(const FGameplayTag& InResourceType, int32 InNum)
+{
+	ResourceType = InResourceType;
+	Num = InNum;
+}
+
+FTaskNodeDescript UGameplayTask_Guide_CollectResource::GetTaskNodeDescripton() const
+{
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.bIsFreshPreviouDescription = true;
+
+	TaskNodeDescript.Description = FString::Printf(TEXT("采集(%d/%d)个%s"), CurrentNum, Num, *ResourceType.ToString());
+
+	return  TaskNodeDescript;
+}
+
+void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
+	const TSharedPtr<FConsumableProxy>&ConsumableProxySPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	if (ConsumableProxySPtr && ConsumableProxySPtr->GetProxyType().MatchesTag(ResourceType))
+	{
+		switch (ProxyModifyType)
+		{
+		case EProxyModifyType::kAdd:
+			{
+				Num -= ConsumableProxySPtr->Num;
+				if (Num <= 0)
+				{
+					StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+					EndTask();
+				}
+			}
+			break;
+		case EProxyModifyType::kChange:
+			break;
+		case EProxyModifyType::kRemove:
+			break;
+		default: ;
+		}
+	}
+}
+
+void UGameplayTask_Guide_CollectResource::UpdateDescription()
+{
+	if (GuideActorPtr)
+	{
+		GuideActorPtr->UpdateCurrentTaskNode(GetTaskNodeDescripton());
+	}
 }
