@@ -140,20 +140,34 @@ EStateTreeRunStatus FSTT_GuideThreadWaitComplete::Tick(FStateTreeExecutionContex
 	return Super::Tick(Context, DeltaTime);
 }
 
+void FSTT_GuideThreadConversationWithTarget::ExitState(FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition) const
+{
+	Super::ExitState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.GameplayTaskPtr->ExternalCancel();
+	}
+	InstanceData.GameplayTaskPtr = nullptr;
+}
+
 EStateTreeRunStatus FSTT_GuideThreadWaitComplete::PerformMoveTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_WaitComplete>(
+	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_WaitComplete>(
 		*InstanceData.TaskOwner);
 
-	if (GameplayTaskPtr)
+	if (InstanceData.GameplayTaskPtr)
 	{
-		GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
-		GameplayTaskPtr->SetUp(InstanceData.TaskID);
-		GameplayTaskPtr->ReadyForActivation();
+		InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+		InstanceData.GameplayTaskPtr->SetTaskID(InstanceData.TaskID);
+		InstanceData.GameplayTaskPtr->SetGuideActor(InstanceData.GuideActorPtr);
 
-		InstanceData.GameplayTaskPtr = GameplayTaskPtr;
+		InstanceData.GameplayTaskPtr->SetUp(InstanceData.TaskID);
+		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
 
 	return EStateTreeRunStatus::Running;
@@ -177,6 +191,8 @@ EStateTreeRunStatus FSTT_GuideThreadConversationWithTarget::EnterState(FStateTre
                                                                        const FStateTreeTransitionResult& Transition)
 const
 {
+	Super::EnterState(Context, Transition);
+	
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
@@ -192,41 +208,17 @@ const
 	return PerformMoveTask(Context);
 }
 
-EStateTreeRunStatus FSTT_GuideThreadConversationWithTarget::Tick(FStateTreeExecutionContext& Context,
-                                                                 const float DeltaTime) const
-{
-	// Super::Tick(Context, DeltaTime);
-
-	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	if (!InstanceData.GameplayTaskPtr)
-	{
-		checkNoEntry();
-	}
-
-	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
-	{
-		return EStateTreeRunStatus::Succeeded;
-	}
-
-	return Super::Tick(Context, DeltaTime);
-}
-
 EStateTreeRunStatus FSTT_GuideThreadConversationWithTarget::PerformMoveTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_ConversationWithTarget>(
+	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_ConversationWithTarget>(
 		*InstanceData.TaskOwner);
 
-	if (GameplayTaskPtr)
+	if (InstanceData.GameplayTaskPtr)
 	{
-		auto BaseSetUp = [InstanceData](auto GameplayTaskPtr)
-		{
-			GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
-			GameplayTaskPtr->SetTaskID(InstanceData.TaskID);
-			GameplayTaskPtr->SetGuideActor(InstanceData.GuideActorPtr);
-		};
-
-		BaseSetUp(GameplayTaskPtr);
+		InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+		InstanceData.GameplayTaskPtr->SetTaskID(InstanceData.TaskID);
+		InstanceData.GameplayTaskPtr->SetGuideActor(InstanceData.GuideActorPtr);
 
 		auto TargetCharacterPtr = Cast<AHumanCharacter_AI>(
 			UGameplayStatics_Character::GetCharacterByID(
@@ -236,10 +228,8 @@ EStateTreeRunStatus FSTT_GuideThreadConversationWithTarget::PerformMoveTask(FSta
 				)
 			);
 	
-		GameplayTaskPtr->SetUp(TargetCharacterPtr);
-		GameplayTaskPtr->ReadyForActivation();
-
-		InstanceData.GameplayTaskPtr = GameplayTaskPtr;
+		InstanceData.GameplayTaskPtr->SetUp(TargetCharacterPtr);
+		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
 
 	return EStateTreeRunStatus::Running;
@@ -250,7 +240,7 @@ FTaskNodeDescript FSTT_GuideThreadConversationWithTarget::GetTaskNodeDescripton(
 {
 	FTaskNodeDescript TaskNodeDescript;
 
-	TaskNodeDescript.bIsFreshPreviouDescription = false;
+	TaskNodeDescript.bIsFreshPreviouDescription = true;
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	auto TargetCharacterPtr = Cast<AHumanCharacter_AI>(
@@ -264,6 +254,58 @@ FTaskNodeDescript FSTT_GuideThreadConversationWithTarget::GetTaskNodeDescripton(
 	TaskNodeDescript.Description = FString::Printf(TEXT("前往与【%s】对话"), *TargetCharacterPtr->GetName());
 
 	return TaskNodeDescript;
+}
+
+const UStruct* FSTT_GuideThreadAddInteractionToTarget::GetInstanceDataType() const
+{
+	return FInstanceDataType::StaticStruct();
+}
+
+EStateTreeRunStatus FSTT_GuideThreadAddInteractionToTarget::EnterState(FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition) const
+{
+	Super::EnterState(Context, Transition);
+	
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.GuideActorPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass())
+	);
+	if (!InstanceData.TaskOwner)
+	{
+		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+	}
+
+	// TODO -》spawn TaskNodeRef
+
+	return PerformMoveTask(Context);
+}
+
+EStateTreeRunStatus FSTT_GuideThreadAddInteractionToTarget::PerformMoveTask(FStateTreeExecutionContext& Context) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+
+	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_AddToTarget>(
+		*InstanceData.TaskOwner);
+
+	if (GameplayTaskPtr)
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter_AI>(
+			UGameplayStatics_Character::GetCharacterByID(
+				InstanceData.GuideActorPtr,
+				AHumanCharacter_AI::StaticClass(),
+				InstanceData.CharacterID
+				)
+			);
+	
+		GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+		GameplayTaskPtr->SetUp(InstanceData.GuideInteractionActorClass,TargetCharacterPtr);
+		GameplayTaskPtr->ReadyForActivation();
+
+		InstanceData.GameplayTaskPtr = GameplayTaskPtr;
+	}
+
+	return EStateTreeRunStatus::Succeeded;
 }
 
 const UStruct* FSTT_GuideThreadBase::GetInstanceDataType() const
@@ -288,13 +330,15 @@ EStateTreeRunStatus FSTT_GuideThreadBase::EnterState(FStateTreeExecutionContext&
 		return EStateTreeRunStatus::Failed;
 	}
 
-	return FStateTreeTaskBase::EnterState(Context, Transition);
+	return Super::EnterState(Context, Transition);
 }
 
 FTaskNodeDescript FSTT_GuideThreadBase::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
 {
 	FTaskNodeDescript TaskNodeDescript;
 
+	TaskNodeDescript.bIsFreshPreviouDescription = false;
+	
 	return TaskNodeDescript;
 }
 
@@ -439,29 +483,6 @@ EStateTreeRunStatus FSTT_GuideThreadGenraric::PerformMoveTask(FStateTreeExecutio
 					{
 						GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
 						GameplayTaskPtr->SetUp(TaskNodeRef->ConversationsAry);
-						GameplayTaskPtr->ReadyForActivation();
-
-						InstanceData.GameplayTaskPtr = GameplayTaskPtr;
-					}
-
-					return EStateTreeRunStatus::Running;
-				}
-				break;
-			case ETaskNodeType::kGuide_AddToTarget:
-				{
-					auto TaskNodeRef = Cast<UPAD_TaskNode_Guide_AddToTarget>(InstanceData.TaskNodeRef.Get());
-					if (!TaskNodeRef)
-					{
-						return EStateTreeRunStatus::Failed;
-					}
-
-					auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_AddToTarget>(
-						*InstanceData.TaskOwner);
-
-					if (GameplayTaskPtr)
-					{
-						GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
-						GameplayTaskPtr->SetUp(TaskNodeRef);
 						GameplayTaskPtr->ReadyForActivation();
 
 						InstanceData.GameplayTaskPtr = GameplayTaskPtr;

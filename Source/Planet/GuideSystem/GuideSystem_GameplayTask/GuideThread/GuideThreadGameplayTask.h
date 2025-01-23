@@ -126,11 +126,20 @@ public:
 	
 	void SetUp(UPAD_TaskNode_Guide_AddToTarget* InTaskNodePtr);
 
+	void SetUp(
+		const TSubclassOf<AGuideInteractionActor>& InGuideInteractionActorClass,
+		const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
+		);
+
 protected:
 	
 	void ConditionalPerformTask();
 
-	UPAD_TaskNode_Guide_AddToTarget* TaskNodePtr = nullptr;
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSoftObjectPtr<AHumanCharacter_AI>TargetCharacterPtr = nullptr;
 	
 };
 

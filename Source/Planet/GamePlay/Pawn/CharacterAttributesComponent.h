@@ -43,7 +43,7 @@ public:
 	float GetRate()const;
 	
 	// Character的ID
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
 	FGuid CharacterID;
 	
 protected:

@@ -25,6 +25,16 @@ const UStruct* FSTT_GuideInteractionBase::GetInstanceDataType() const
 	return FInstanceDataType::StaticStruct();
 }
 
+EStateTreeRunStatus FSTT_GuideInteractionBase::EnterState(FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
+		UGameplayStatics::GetPlayerCharacter(InstanceData.GuideActorPtr, 0));
+	
+	return Super::EnterState(Context, Transition);
+}
+
 FSTT_GuideInteractionGeneric::FSTT_GuideInteractionGeneric()
 {
 }
@@ -54,6 +64,11 @@ EStateTreeRunStatus FSTT_GuideInteractionGeneric::EnterState(FStateTreeExecution
 	if (!InstanceData.TaskOwner)
 	{
 		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+	}
+
+	if (!InstanceData.TaskNodeRef.IsNull())
+	{
+		InstanceData.TaskNodeRef.LoadSynchronous();
 	}
 
 	InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
@@ -173,14 +188,41 @@ const UStruct* FSTT_GuideInteractionNotify::GetInstanceDataType() const
 	return FInstanceDataType::StaticStruct();
 }
 
+EStateTreeRunStatus FSTT_GuideInteractionNotify::EnterState(FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition) const
+{
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (InstanceData.GuideActorPtr)
+	{
+	}
+	else
+	{
+		return EStateTreeRunStatus::Failed;
+	}
+
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.GuideActorPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass())
+	);
+	if (!InstanceData.TaskOwner)
+	{
+		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+	}
+
+	// TODO -》spawn TaskNodeRef
+
+	return PerformMoveTask(Context);
+}
+
 EStateTreeRunStatus FSTT_GuideInteractionNotify::PerformMoveTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Interaction_NotifyGuideThread>(
+	InstanceData.GameplayTaskPtr= UGameplayTask::NewTask<UGameplayTask_Interaction_NotifyGuideThread>(
 		*InstanceData.TaskOwner);
 
-	if (GameplayTaskPtr)
+	if (InstanceData.GameplayTaskPtr)
 	{
 		auto BaseSetUp = [InstanceData](auto GameplayTaskPtr)
 		{
@@ -188,15 +230,13 @@ EStateTreeRunStatus FSTT_GuideInteractionNotify::PerformMoveTask(FStateTreeExecu
 			GameplayTaskPtr->SetTargetCharacterPtr(InstanceData.TargetCharacterPtr);
 		};
 			
-		BaseSetUp(GameplayTaskPtr);
+		BaseSetUp(InstanceData.GameplayTaskPtr);
 						
-		GameplayTaskPtr->SetUp(InstanceData.GuideInteractionActorClass, InstanceData.NotifyTaskID, InstanceData.Index);
-		GameplayTaskPtr->ReadyForActivation();
-
-		InstanceData.GameplayTaskPtr = GameplayTaskPtr;
+		InstanceData.GameplayTaskPtr->SetUp(InstanceData.GuideInteractionActorClass, InstanceData.NotifyTaskID, InstanceData.Index);
+		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
 
-	return EStateTreeRunStatus::Running;
+	return EStateTreeRunStatus::Succeeded;
 }
 
 const UStruct* FSTT_GuideInteractionConversation::GetInstanceDataType() const
@@ -317,7 +357,22 @@ EStateTreeRunStatus FSTT_GuideInteractionOption::EnterState(FStateTreeExecutionC
 
 EStateTreeRunStatus FSTT_GuideInteractionOption::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
 {
-	return FSTT_GuideInteractionBase::Tick(Context, DeltaTime);
+	// Super::Tick(Context, DeltaTime);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if(!InstanceData.GameplayTaskPtr)
+	{
+		checkNoEntry();
+	}
+	
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
+	{
+		InstanceData.TaskNodeResuleHelper.Output_1 = InstanceData.GameplayTaskPtr->SelectedIndex;
+		
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return Super::Tick(Context, DeltaTime);
 }
 
 EStateTreeRunStatus FSTT_GuideInteractionOption::PerformMoveTask(FStateTreeExecutionContext& Context) const

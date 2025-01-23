@@ -189,19 +189,28 @@ void UGameplayTask_Guide_AddToTarget::Activate()
 
 void UGameplayTask_Guide_AddToTarget::SetUp(UPAD_TaskNode_Guide_AddToTarget* InTaskNodePtr)
 {
-	TaskNodePtr = InTaskNodePtr;
+	GuideInteractionActorClass = InTaskNodePtr->GuideInteractionActorClass;
+	TargetCharacterPtr = InTaskNodePtr->TargetCharacterPtr;
+}
+
+void UGameplayTask_Guide_AddToTarget::SetUp(
+	const TSubclassOf<AGuideInteractionActor>& InGuideInteractionActorClass,
+	const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
+	)
+{
+	GuideInteractionActorClass = InGuideInteractionActorClass;
+	TargetCharacterPtr = InTargetCharacterPtr;
 }
 
 void UGameplayTask_Guide_AddToTarget::ConditionalPerformTask()
 {
 	if (
-		TaskNodePtr &&
-		TaskNodePtr->TargetCharacterPtr.IsValid() &&
-		TaskNodePtr->GuideInteractionActorClass.Get()
+		TargetCharacterPtr.IsValid() &&
+		GuideInteractionActorClass.Get()
 	)
 	{
-		TaskNodePtr->TargetCharacterPtr->GetSceneActorInteractionComponent()->AddGuideActor(
-			TaskNodePtr->GuideInteractionActorClass);
+		TargetCharacterPtr->GetSceneActorInteractionComponent()->AddGuideActor(
+			GuideInteractionActorClass);
 
 		StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 		EndTask();

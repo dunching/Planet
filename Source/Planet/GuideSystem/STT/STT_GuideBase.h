@@ -32,7 +32,7 @@ struct PLANET_API FSTID_GuideBase
 
 	FSTID_GuideBase();
 	
-	UPROPERTY(VisibleAnywhere, Category = Output)
+	UPROPERTY(VisibleAnywhere, Category = Param)
 	FGuid TaskID;
 	
 	// 上条任务的输出参数

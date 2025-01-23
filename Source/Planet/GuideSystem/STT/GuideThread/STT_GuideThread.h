@@ -28,6 +28,7 @@ class AHumanCharacter_Player;
 class UGameplayTask_Base;
 class UGameplayTask_Guide_WaitComplete;
 class UGameplayTask_Guide_ConversationWithTarget;
+class UGameplayTask_Guide_AddToTarget;
 
 struct FTaskNode_Conversation_SentenceInfo;
 
@@ -268,9 +269,9 @@ struct PLANET_API FSTT_GuideThreadConversationWithTarget :
 		const FStateTreeTransitionResult& Transition
 	) const override;
 	
-	virtual EStateTreeRunStatus Tick(
+	virtual void ExitState(
 		FStateTreeExecutionContext& Context,
-		const float DeltaTime
+		const FStateTreeTransitionResult& Transition
 	) const override;
 
 protected:
@@ -279,4 +280,45 @@ protected:
 
 	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
 	
+};
+
+USTRUCT()
+struct PLANET_API FSTID_GuideThreadAddInteractionToTarget :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, Category = Param)
+	FGuid CharacterID;
+	
+	UPROPERTY(EditAnywhere, Category = Param)
+	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UGameplayTask_Guide_AddToTarget> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(Transient)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+};
+
+// 执行引导任务 给目标角色添加互动引导内容
+USTRUCT()
+struct PLANET_API FSTT_GuideThreadAddInteractionToTarget :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThreadAddInteractionToTarget;
+
+	virtual const UStruct* GetInstanceDataType() const override;
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+	
+protected:
+	
+	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+
 };

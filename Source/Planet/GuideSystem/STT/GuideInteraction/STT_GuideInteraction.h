@@ -28,6 +28,7 @@ class AHumanCharacter_Player;
 class UGameplayTask_Base;
 class UGameplayTask_Interaction_Conversation;
 class UGameplayTask_Interaction_Option;
+class UGameplayTask_Interaction_NotifyGuideThread;
 
 // 与 NPC交互的任务 基类
 USTRUCT()
@@ -56,6 +57,12 @@ struct PLANET_API FSTT_GuideInteractionBase :
 	using FInstanceDataType = FSTID_GuideInteractionTaskBase;
 
 	virtual const UStruct* GetInstanceDataType() const override;
+	
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
 };
 
 // 与 NPC交互的任务
@@ -127,7 +134,7 @@ struct PLANET_API FSTID_GuideInteractionNotify :
 
 
 	UPROPERTY(Transient)
-	TObjectPtr<UGameplayTask_Base> GameplayTaskPtr = nullptr;
+	TObjectPtr<UGameplayTask_Interaction_NotifyGuideThread> GameplayTaskPtr = nullptr;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
@@ -156,6 +163,11 @@ struct PLANET_API FSTT_GuideInteractionNotify :
 
 	virtual const UStruct* GetInstanceDataType() const override;
 
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+	
 	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
 };
 
