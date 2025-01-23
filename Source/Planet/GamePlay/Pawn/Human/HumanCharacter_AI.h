@@ -77,6 +77,7 @@ protected:
 
 	void InitialAllocationsByProxy();
 
+	// TODO 移动到UCharacterAttributesComponent下面
 	UPROPERTY(ReplicatedUsing = OnRep_CharacterID)
 	FGuid CharacterID;
 

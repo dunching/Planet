@@ -340,11 +340,13 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 		{
 		case EProxyModifyType::kAdd:
 			{
-				Num -= ConsumableProxySPtr->Num;
-				if (Num <= 0)
+				CurrentNum += ConsumableProxySPtr->Num;
+				UpdateDescription();
+				if (CurrentNum >= Num)
 				{
 					StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 					EndTask();
+					return;
 				}
 			}
 			break;
@@ -357,7 +359,47 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 	}
 }
 
-void UGameplayTask_Guide_CollectResource::UpdateDescription()
+void UGameplayTask_Guide_CollectResource::UpdateDescription()const
+{
+	if (GuideActorPtr)
+	{
+		GuideActorPtr->UpdateCurrentTaskNode(GetTaskNodeDescripton());
+	}
+}
+
+void UGameplayTask_Guide_DefeatEnemy::Activate()
+{
+	Super::Activate();
+}
+
+void UGameplayTask_Guide_DefeatEnemy::OnDestroy(bool bInOwnerFinished)
+{
+	if (OnConsumableProxyChangedHandle)
+	{
+		OnConsumableProxyChangedHandle->UnBindCallback();
+	}
+	
+	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_Guide_DefeatEnemy::SetUp(const FGameplayTag& InEnemyType, int32 InNum)
+{
+	EnemyType = InEnemyType;
+	Num = InNum;
+}
+
+FTaskNodeDescript UGameplayTask_Guide_DefeatEnemy::GetTaskNodeDescripton() const
+{
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.bIsFreshPreviouDescription = true;
+
+	TaskNodeDescript.Description = FString::Printf(TEXT("击杀(%d/%d)个%s"), CurrentNum, Num, *EnemyType.ToString());
+
+	return  TaskNodeDescript;
+}
+
+void UGameplayTask_Guide_DefeatEnemy::UpdateDescription() const
 {
 	if (GuideActorPtr)
 	{

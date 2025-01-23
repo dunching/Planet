@@ -5,6 +5,7 @@
 
 #include "GameplayAbilitySpec.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AssetRefMap.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayEffectExecutionCalculation.h"
 #include "AttributeSet.h"
@@ -29,6 +30,7 @@
 #include "CS_PeriodicPropertyTag.h"
 #include "CharacterTitle.h"
 #include "GameOptions.h"
+#include "GE_Common.h"
 
 UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
@@ -46,7 +48,7 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 	{
 		OnGameplayEffectAppliedDelegateToTarget.AddUObject(
 			this, &ThisClass::OnGEAppliedDelegateToTarget);
-		OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(
+		OnGameplayEffectAppliedDelegateToSelf.AddUObject(
 			this, &ThisClass::OnActiveGEAddedDelegateToSelf);
 	}
 #endif
@@ -1375,15 +1377,15 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 		{
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
+				const auto NewValue = GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
+				
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
 						UAS_Character::GetHPAttribute(),
 						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet))
+						NewValue
 					)
 				);
-
-				
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
@@ -1407,16 +1409,43 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
 			{
+				const auto  NewValue = 
+						GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
 						UAS_Character::GetHPAttribute(),
 						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet))
+						NewValue
 					)
 				);
+				
 				if (SourceASCPtr)
 				{
 					SourceASCPtr->MakedDamageDelegate(GetOwner<ACharacterBase>(), SetByCallerTagMagnitudes);
+				}
+
+				// 回执
+				if (NewValue <= 0.f)
+				{
+					FGameplayEffectSpecHandle SpecHandle =
+						MakeOutgoingSpec(UAssetRefMap::GetInstance()->DamageCallbackClass, 1, MakeEffectContext());
+					SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage_Callback);
+
+					SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath,
+																   1);
+
+					TArray<TWeakObjectPtr<AActor> >Ary;
+					Ary.Add(Instigator);
+					FGameplayAbilityTargetDataHandle TargetData;
+
+					auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_ActorArray;
+					GameplayAbilityTargetData_ActorArrayPtr->SetActors(Ary);
+
+					TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
+					const auto GEHandleAry = ApplyGameplayEffectSpecToTarget(
+					*SpecHandle.Data,
+					Instigator->GetAbilitySystemComponent()
+					);
 				}
 			}
 		}
@@ -1518,5 +1547,17 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 
 	if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Damage))
 	{
+	}
+	else if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Damage_Callback))
+	{
+		const auto Value = GameplayEffectSpec.GetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath);
+		if (Value)
+		{
+			
+		}
+		else
+		{
+			
+		}
 	}
 }

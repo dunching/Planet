@@ -41,6 +41,7 @@ class AHorseCharacter;
 class AGeneratorNPC;
 class UMainMenuLayout;
 class UGE_Damage;
+class UGE_Damage_Callback;
 class ATargetPoint_Runtime;
 
 UCLASS(BlueprintType, Blueprintable)
@@ -96,6 +97,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<UGE_Damage>DamageClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<UGE_Damage_Callback>DamageCallbackClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;

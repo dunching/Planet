@@ -262,6 +262,10 @@ public:
 
 	static FGameplayTag GEData_Damage;
 
+	static FGameplayTag GEData_Damage_Callback;
+
+	static FGameplayTag GEData_Damage_Callback_IsDeath;
+	
 	
 	static FGameplayTag GEData_ModifyType_BaseValue_Addtive;
 	

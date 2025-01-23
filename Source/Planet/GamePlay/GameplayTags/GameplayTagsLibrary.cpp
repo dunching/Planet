@@ -347,17 +347,26 @@ FGameplayTag UGameplayTagsLibrary::GEData_CD =
 FGameplayTag UGameplayTagsLibrary::GEData_Damage =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Damage")));
 
+FGameplayTag UGameplayTagsLibrary::GEData_Damage_Callback =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Damage.Callback")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Damage.Callback.IsDeath")));
+
 
 FGameplayTag UGameplayTagsLibrary::GEData_Duration =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.Duration")));
 
+// 数据被修改的方式
 
+// 直接增加
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Addtive")));
-
+// 覆盖
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Override")));
 
+// 增加一个临时量（比如修改移速时，先添加一个100的增速 再添加一个 20%增速，在移除这些增速是不好计算 所以用这种方式进行记录）
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary")));
 

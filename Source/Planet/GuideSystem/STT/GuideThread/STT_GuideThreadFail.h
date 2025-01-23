@@ -30,6 +30,7 @@ class UGameplayTask_Guide_WaitComplete;
 class UGameplayTask_Guide_ConversationWithTarget;
 class UGameplayTask_Guide_AddToTarget;
 class UGameplayTask_Guide_CollectResource;
+class UGameplayTask_Guide_DefeatEnemy;
 
 struct FConsumableProxy;
 struct FTaskNode_Conversation_SentenceInfo;
@@ -276,6 +277,57 @@ struct PLANET_API FSTT_GuideThreadCollectResource :
 	GENERATED_BODY()
 
 	using FInstanceDataType = FSTID_GuideThreadCollectResource;
+
+	virtual const UStruct* GetInstanceDataType() const override;
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+	
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+protected:
+	
+	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+
+};
+#pragma endregion
+
+#pragma region DefeatEnemy
+USTRUCT()
+struct PLANET_API FSTID_GuideThreadDefeatEnemy :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	FGameplayTag EnemyType;
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	int32 Num = 1;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UGameplayTask_Guide_DefeatEnemy> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(Transient)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+
+};
+
+// 要求玩家采集指定类型的资源
+USTRUCT()
+struct PLANET_API FSTT_GuideThreadDefeatEnemy :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThreadDefeatEnemy;
 
 	virtual const UStruct* GetInstanceDataType() const override;
 

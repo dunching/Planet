@@ -207,7 +207,7 @@ protected:
 	
 	void OnGetConsumableProxy(const TSharedPtr<FConsumableProxy>&, EProxyModifyType ProxyModifyType);
 
-	void UpdateDescription();
+	void UpdateDescription()const;
 	
 	UHoldingItemsComponent::FOnConsumableProxyChanged::FCallbackHandleSPtr OnConsumableProxyChangedHandle;
 	
@@ -216,5 +216,33 @@ protected:
 	int32 CurrentNum = 0;
 
 	int32 Num = 0;
+};
+UCLASS()
+class PLANET_API UGameplayTask_Guide_DefeatEnemy : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
 
+public:
+	
+	virtual void Activate() override;
+	
+	virtual void OnDestroy(bool bInOwnerFinished) override;
+	
+	void SetUp(const FGameplayTag &ResourceType, int32 Num);
+	
+	FTaskNodeDescript GetTaskNodeDescripton() const;
+	
+protected:
+	
+	void OnGetConsumableProxy(const TSharedPtr<FConsumableProxy>&, EProxyModifyType ProxyModifyType);
+
+	void UpdateDescription()const;
+	
+	UHoldingItemsComponent::FOnConsumableProxyChanged::FCallbackHandleSPtr OnConsumableProxyChangedHandle;
+	
+	FGameplayTag EnemyType;
+
+	int32 CurrentNum = 0;
+
+	int32 Num = 0;
 };
