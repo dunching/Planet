@@ -143,7 +143,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 	}
 
 	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-	auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
+	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
 
 	FCharacterSocket FirstWeaponSocketInfoSPtr;
 	FCharacterSocket SecondWeaponSocketInfoSPtr;
@@ -203,7 +203,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 		}
 
 		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-		auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
+		auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
 		for (const auto& Iter : Ary)
 		{
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
@@ -238,7 +238,7 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 	}
 
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
-	auto HoldingItemsComponentPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr->GetHoldingItemsComponent();
+	auto HoldingItemsComponentPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr->GetInventoryComponent();
 
 	for (const auto& Iter : Ary)
 	{
@@ -532,7 +532,7 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 		}
 		UIPtr->ClearChildren();
 
-		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
+		auto HICPtr = CharacterPtr->GetInventoryComponent();
 		auto GroupmateProxyAry = HICPtr->GetCharacterProxyAry();
 
 		for (int32 Index = 0; Index < GroupmateProxyAry.Num(); Index++)

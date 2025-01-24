@@ -59,13 +59,13 @@ void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 {
 	if (CharacterPtr)
 	{
-		if (!(
-			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
-			))
-		{
-			return;
-		}
+		// if (!(
+		// 	GAPtr &&
+		// 	(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
+		// 	))
+		// {
+		// 	return;
+		// }
 
 		auto GA_SendPtr = Cast<UGAEvent_Send>(GAPtr);
 		if (!GA_SendPtr)

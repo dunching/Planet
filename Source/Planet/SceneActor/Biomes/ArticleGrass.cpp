@@ -2,7 +2,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "CollisionDataStruct.h"
 #include "CharacterBase.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 AArticleGrass::AArticleGrass(const FObjectInitializer& ObjectInitializer) :
 	Super(

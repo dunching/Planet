@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 
 #include "Common/GenerateType.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "MenuInterface.h"
 

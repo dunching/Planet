@@ -9,7 +9,7 @@
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "CharactersInfo.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 bool FCharacterSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
@@ -155,7 +155,7 @@ FTableRowProxy_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() 
 
 	auto SceneProxyExtendInfoPtr =
 		DataTable->FindRow<FTableRowProxy_CharacterGrowthAttribute>(
-			*ProxyCharacterPtr->CharacterGrowthAttribute.ToString(), TEXT("GetProxy"));
+			*ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterGrowthAttribute.ToString(), TEXT("GetProxy"));
 	return SceneProxyExtendInfoPtr;
 }
 

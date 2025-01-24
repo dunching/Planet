@@ -8,7 +8,7 @@
 
 class AGroupSharedInfo;
 class UPlanetAbilitySystemComponent;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 class UCharacterAttributesComponent;
 class UTalentAllocationComponent;
 struct FCharacterProxy;
@@ -37,7 +37,7 @@ public:
 
 	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) = 0;
 
-	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const = 0;
+	virtual UInventoryComponent* GetHoldingItemsComponent()const = 0;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const = 0;
 

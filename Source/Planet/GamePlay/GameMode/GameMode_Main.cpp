@@ -19,7 +19,7 @@
 #include "AssetRefMap.h"
 #include "HumanCharacter.h"
 #include "WeatherSystem.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GameplayTagsLibrary.h"

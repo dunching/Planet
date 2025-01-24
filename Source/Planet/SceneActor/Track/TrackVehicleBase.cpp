@@ -11,7 +11,7 @@
 #include "ToolsLibrary.h"
 #include "CollisionDataStruct.h"
 #include "TrackBase.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 ATrackVehicleBase::ATrackVehicleBase(const FObjectInitializer& ObjectInitializer) :
     Super(ObjectInitializer)
@@ -50,7 +50,7 @@ ATrackVehicleBase::ATrackVehicleBase(const FObjectInitializer& ObjectInitializer
 	MeshPtr->SetCollisionProfileName(VehicleItem);
 
 	ItemPropertyComponentPtr = CreateDefaultSubobject<UTrackVehicleItemPropertyComponent>(UTrackVehicleItemPropertyComponent::ComponentName);
-	HoldItemComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
+	HoldItemComponentPtr = CreateDefaultSubobject<UInventoryComponent>(UInventoryComponent::ComponentName);
 }
 
 void ATrackVehicleBase::BeginPlay()

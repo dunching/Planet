@@ -21,7 +21,7 @@
 #include "Raffle_Proxy.h"
 #include "SceneProxyExtendInfo.h"
 #include "ItemProxy_Container.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 struct FRaffleMenu : public TStructVariable<FRaffleMenu>
 {
@@ -121,7 +121,7 @@ void URaffleMenu::SetHoldItemProperty(const TSharedPtr<FSceneProxyContainer>& Ne
 	{
 		auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GWorld, 0));
 
-		UIPtr->ResetUIByData(CharacterPtr->GetHoldingItemsComponent()->GetCoinUintAry());
+		UIPtr->ResetUIByData(CharacterPtr->GetInventoryComponent()->GetCoinUintAry());
 	}
 }
 

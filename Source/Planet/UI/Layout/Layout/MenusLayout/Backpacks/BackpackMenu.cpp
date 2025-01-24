@@ -11,7 +11,7 @@
 #include "Components/Border.h"
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "GenerateType.h"
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
@@ -57,7 +57,7 @@ TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
 	TArray<TSharedPtr<FBasicProxy>> Result;
 	if (CurrentProxyPtr)
 	{
-		 Result = CurrentProxyPtr->GetOwnerCharacter()->GetHoldingItemsComponent()->GetProxys();
+		 Result = CurrentProxyPtr->GetOwnerCharacter()->GetInventoryComponent()->GetProxys();
 	}
 	return Result;
 }

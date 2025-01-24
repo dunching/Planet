@@ -26,11 +26,14 @@
 #include "BasicFutures_Dash.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "BasicFutures_Affected.h"
+#include "ReceivedEventModifyDataCallback.h"
 #include "CS_PeriodicStateModify.h"
 #include "CS_PeriodicPropertyTag.h"
 #include "CharacterTitle.h"
+#include "EventSubjectComponent.h"
 #include "GameOptions.h"
 #include "GE_Common.h"
+#include "PlanetPlayerController.h"
 
 UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
@@ -89,7 +92,8 @@ bool UCharacterAbilitySystemComponent::IsInFighting() const
 	);
 }
 
-void UCharacterAbilitySystemComponent::AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
+void UCharacterAbilitySystemComponent::AddSendEventModify(
+	const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -107,7 +111,8 @@ void UCharacterAbilitySystemComponent::AddSendEventModify(const TSharedPtr<IGAEv
 	SendEventModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UCharacterAbilitySystemComponent::RemoveSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
+void UCharacterAbilitySystemComponent::RemoveSendEventModify(
+	const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
 {
 	for (auto Iter = SendEventModifysMap.begin(); Iter != SendEventModifysMap.end(); Iter++)
 	{
@@ -119,7 +124,8 @@ void UCharacterAbilitySystemComponent::RemoveSendEventModify(const TSharedPtr<IG
 	}
 }
 
-void UCharacterAbilitySystemComponent::AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
+void UCharacterAbilitySystemComponent::AddReceviedEventModify(
+	const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -154,145 +160,145 @@ void UCharacterAbilitySystemComponent::SendEventImp(
 	FGameplayAbilityTargetData_TagModify* GameplayAbilityTargetDataSPtr
 )
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyTag::StaticClass(), 1);
-
-		FGameplayEventData* Payload = new FGameplayEventData;
-		Payload->TargetData.Add(GameplayAbilityTargetDataSPtr);
-
-		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-		ASCPtr->GiveAbilityAndActivateOnce(
-			Spec,
-			Payload
-		);
-	}
-#endif
+	// #if UE_EDITOR || UE_SERVER
+	// 	if (GetNetMode() == NM_DedicatedServer)
+	// 	{
+	// 		FGameplayAbilitySpec Spec(UCS_PeriodicPropertyTag::StaticClass(), 1);
+	//
+	// 		FGameplayEventData* Payload = new FGameplayEventData;
+	// 		Payload->TargetData.Add(GameplayAbilityTargetDataSPtr);
+	//
+	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// 		auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
+	// 		ASCPtr->GiveAbilityAndActivateOnce(
+	// 			Spec,
+	// 			Payload
+	// 		);
+	// 	}
+	// #endif
 }
 
 void UCharacterAbilitySystemComponent::SendEventImp(
 	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
 )
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		if (GAEventDataPtr)
-		{
-			for (auto& Iter : GAEventDataPtr->DataAry)
-			{
-				if (!Iter.DataSource.IsValid())
-				{
-					Iter.DataSource = UGameplayTagsLibrary::DataSource_Character;;
-				}
-			}
-		}
-
-		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		if (OnwerActorPtr)
-		{
-			FGameplayEventData Payload;
-
-			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kNormal));
-			Payload.TargetData.Add(GAEventDataPtr);
-
-			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-			ASCPtr->TriggerAbilityFromGameplayEvent(
-				SendEventHandle,
-				ASCPtr->AbilityActorInfo.Get(),
-				UGameplayTagsLibrary::BaseFeature_Send,
-				&Payload,
-				*ASCPtr
-			);
-		}
-	}
-#endif
+	// #if UE_EDITOR || UE_SERVER
+	// 	if (GetNetMode() == NM_DedicatedServer)
+	// 	{
+	// 		if (GAEventDataPtr)
+	// 		{
+	// 			for (auto& Iter : GAEventDataPtr->DataAry)
+	// 			{
+	// 				if (!Iter.DataSource.IsValid())
+	// 				{
+	// 					Iter.DataSource = UGameplayTagsLibrary::DataSource_Character;;
+	// 				}
+	// 			}
+	// 		}
+	//
+	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// 		if (OnwerActorPtr)
+	// 		{
+	// 			FGameplayEventData Payload;
+	//
+	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kNormal));
+	// 			Payload.TargetData.Add(GAEventDataPtr);
+	//
+	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
+	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
+	// 				SendEventHandle,
+	// 				ASCPtr->AbilityActorInfo.Get(),
+	// 				UGameplayTagsLibrary::BaseFeature_Send,
+	// 				&Payload,
+	// 				*ASCPtr
+	// 			);
+	// 		}
+	// 	}
+	// #endif
 }
 
 void UCharacterAbilitySystemComponent::SendEventImp(
 	FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
 )
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		if (OnwerActorPtr)
-		{
-			FGameplayEventData Payload;
-
-			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kRootMotion));
-			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-			ASCPtr->TriggerAbilityFromGameplayEvent(
-				SendEventHandle,
-				ASCPtr->AbilityActorInfo.Get(),
-				FGameplayTag(),
-				&Payload,
-				*ASCPtr
-			);
-		}
-	}
-#endif
+	// #if UE_EDITOR || UE_SERVER
+	// 	if (GetNetMode() == NM_DedicatedServer)
+	// 	{
+	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// 		if (OnwerActorPtr)
+	// 		{
+	// 			FGameplayEventData Payload;
+	//
+	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kRootMotion));
+	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+	//
+	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
+	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
+	// 				SendEventHandle,
+	// 				ASCPtr->AbilityActorInfo.Get(),
+	// 				FGameplayTag(),
+	// 				&Payload,
+	// 				*ASCPtr
+	// 			);
+	// 		}
+	// 	}
+	// #endif
 }
 
 void UCharacterAbilitySystemComponent::SendEventImp(
 	FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
 )
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		if (OnwerActorPtr)
-		{
-			FGameplayEventData Payload;
-
-			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_PropertyModify));
-			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-			ASCPtr->TriggerAbilityFromGameplayEvent(
-				SendEventHandle,
-				ASCPtr->AbilityActorInfo.Get(),
-				FGameplayTag(),
-				&Payload,
-				*ASCPtr
-			);
-		}
-	}
-#endif
+	// #if UE_EDITOR || UE_SERVER
+	// 	if (GetNetMode() == NM_DedicatedServer)
+	// 	{
+	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// 		if (OnwerActorPtr)
+	// 		{
+	// 			FGameplayEventData Payload;
+	//
+	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_PropertyModify));
+	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+	//
+	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
+	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
+	// 				SendEventHandle,
+	// 				ASCPtr->AbilityActorInfo.Get(),
+	// 				FGameplayTag(),
+	// 				&Payload,
+	// 				*ASCPtr
+	// 			);
+	// 		}
+	// 	}
+	// #endif
 }
 
 void UCharacterAbilitySystemComponent::SendEventImp(
 	FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
 )
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-		if (OnwerActorPtr)
-		{
-			FGameplayEventData Payload;
-
-			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_StateTagModify));
-			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-			ASCPtr->TriggerAbilityFromGameplayEvent(
-				SendEventHandle,
-				ASCPtr->AbilityActorInfo.Get(),
-				FGameplayTag(),
-				&Payload,
-				*ASCPtr
-			);
-		}
-	}
-#endif
+	// #if UE_EDITOR || UE_SERVER
+	// 	if (GetNetMode() == NM_DedicatedServer)
+	// 	{
+	// 		auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// 		if (OnwerActorPtr)
+	// 		{
+	// 			FGameplayEventData Payload;
+	//
+	// 			Payload.TargetData.Add(new FGameplayAbilityTargetData_GAEventType(EEventType::kPeriodic_StateTagModify));
+	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+	//
+	// 			auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
+	// 			ASCPtr->TriggerAbilityFromGameplayEvent(
+	// 				SendEventHandle,
+	// 				ASCPtr->AbilityActorInfo.Get(),
+	// 				FGameplayTag(),
+	// 				&Payload,
+	// 				*ASCPtr
+	// 			);
+	// 		}
+	// 	}
+	// #endif
 }
 
 void UCharacterAbilitySystemComponent::ClearData2Other(
@@ -300,101 +306,101 @@ void UCharacterAbilitySystemComponent::ClearData2Other(
 	const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (!OnwerActorPtr)
-	{
-		return;
-	}
-
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
-
-	for (const auto Iter : ModifyPropertyMap)
-	{
-		FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
-
-		GAEventData.DataSource = DataSource;
-		GAEventData.DataModify = Iter.Value;
-		GAEventData.bIsClearData = true;
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-	SendEventImp(GAEventDataPtr);
+	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// if (!OnwerActorPtr)
+	// {
+	// 	return;
+	// }
+	//
+	// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
+	//
+	// GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
+	//
+	// for (const auto Iter : ModifyPropertyMap)
+	// {
+	// 	FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
+	//
+	// 	GAEventData.DataSource = DataSource;
+	// 	GAEventData.DataModify = Iter.Value;
+	// 	GAEventData.bIsClearData = true;
+	//
+	// 	GAEventDataPtr->DataAry.Add(GAEventData);
+	// }
+	// SendEventImp(GAEventDataPtr);
 }
 
 void UCharacterAbilitySystemComponent::ClearData2Self(
 	const TMap<ECharacterPropertyType, FBaseProperty>& InModifyPropertyMap, const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (!OnwerActorPtr)
-	{
-		return;
-	}
-
-	TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap{
-		OnwerActorPtr, InModifyPropertyMap
-	};
-
-	ClearData2Other({ModifyPropertyMap}, DataSource);
+	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// if (!OnwerActorPtr)
+	// {
+	// 	return;
+	// }
+	//
+	// TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap{
+	// 	OnwerActorPtr, InModifyPropertyMap
+	// };
+	//
+	// ClearData2Other({ModifyPropertyMap}, DataSource);
 }
 
 void UCharacterAbilitySystemComponent::ExcuteAttackedEffect(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
 {
-	const auto IsNotDeathingTag = !IsInDeath();
-	if (IsNotDeathingTag && GAEvent.Data.GetIsHited())
-	{
-		switch (GAEvent.Data.AttackEffectType)
-		{
-		case EAttackEffectType::kNone:
-			break;
-		case EAttackEffectType::kNormalAttackEffect:
-			{
-				FGameplayEventData Payload;
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
-				GameplayAbilityTargetDataPtr->AffectedDirection =
-					GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
-
-				Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-				auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-				if (OnwerActorPtr)
-				{
-					UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-						OnwerActorPtr, UGameplayTagsLibrary::Affected, Payload
-					);
-				}
-			}
-			break;
-		case EAttackEffectType::kAttackEffectAndRepel:
-			{
-				FGameplayEventData Payload;
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
-				GameplayAbilityTargetDataPtr->AffectedDirection =
-					GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
-				GameplayAbilityTargetDataPtr->RepelDistance = GAEvent.Data.RepelDistance > 0
-					                                              ? GAEvent.Data.RepelDistance
-					                                              : 50;
-				if (!GAEvent.Data.RepelDirection.IsNearlyZero())
-				{
-					GameplayAbilityTargetDataPtr->RepelDirection = GAEvent.Data.RepelDirection;
-				}
-				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = GAEvent.Data.TriggerCharacterPtr.Get();
-
-				Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-				auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-				if (OnwerActorPtr)
-				{
-					UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-						OnwerActorPtr, UGameplayTagsLibrary::Affected, Payload
-					);
-				}
-			}
-			break;
-		}
-	}
+	// const auto IsNotDeathingTag = !IsInDeath();
+	// if (IsNotDeathingTag && GAEvent.Data.GetIsHited())
+	// {
+	// 	switch (GAEvent.Data.AttackEffectType)
+	// 	{
+	// 	case EAttackEffectType::kNone:
+	// 		break;
+	// 	case EAttackEffectType::kNormalAttackEffect:
+	// 		{
+	// 			FGameplayEventData Payload;
+	// 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
+	// 			GameplayAbilityTargetDataPtr->AffectedDirection =
+	// 				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
+	//
+	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+	//
+	// 			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// 			if (OnwerActorPtr)
+	// 			{
+	// 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+	// 					OnwerActorPtr, UGameplayTagsLibrary::Affected, Payload
+	// 				);
+	// 			}
+	// 		}
+	// 		break;
+	// 	case EAttackEffectType::kAttackEffectAndRepel:
+	// 		{
+	// 			FGameplayEventData Payload;
+	// 			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Affected;
+	// 			GameplayAbilityTargetDataPtr->AffectedDirection =
+	// 				GetAffectedDirection(GAEvent.Data.TargetCharacterPtr.Get(), GAEvent.TriggerCharacterPtr.Get());
+	// 			GameplayAbilityTargetDataPtr->RepelDistance = GAEvent.Data.RepelDistance > 0
+	// 				                                              ? GAEvent.Data.RepelDistance
+	// 				                                              : 50;
+	// 			if (!GAEvent.Data.RepelDirection.IsNearlyZero())
+	// 			{
+	// 				GameplayAbilityTargetDataPtr->RepelDirection = GAEvent.Data.RepelDirection;
+	// 			}
+	// 			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = GAEvent.Data.TriggerCharacterPtr.Get();
+	//
+	// 			Payload.TargetData.Add(GameplayAbilityTargetDataPtr);
+	//
+	// 			auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// 			if (OnwerActorPtr)
+	// 			{
+	// 				UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+	// 					OnwerActorPtr, UGameplayTagsLibrary::Affected, Payload
+	// 				);
+	// 			}
+	// 		}
+	// 		break;
+	// 	}
+	// }
 }
 
 void UCharacterAbilitySystemComponent::SendEvent2Other(
@@ -402,26 +408,26 @@ void UCharacterAbilitySystemComponent::SendEvent2Other(
 	const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (!OnwerActorPtr)
-	{
-		return;
-	}
-
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
-
-	for (const auto Iter : ModifyPropertyMap)
-	{
-		FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
-
-		GAEventData.DataSource = DataSource;
-		GAEventData.DataModify = Iter.Value;
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-	SendEventImp(GAEventDataPtr);
+	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// if (!OnwerActorPtr)
+	// {
+	// 	return;
+	// }
+	//
+	// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(OnwerActorPtr);
+	//
+	// GAEventDataPtr->TriggerCharacterPtr = OnwerActorPtr;
+	//
+	// for (const auto Iter : ModifyPropertyMap)
+	// {
+	// 	FGAEventData GAEventData(Iter.Key, OnwerActorPtr);
+	//
+	// 	GAEventData.DataSource = DataSource;
+	// 	GAEventData.DataModify = Iter.Value;
+	//
+	// 	GAEventDataPtr->DataAry.Add(GAEventData);
+	// }
+	// SendEventImp(GAEventDataPtr);
 }
 
 void UCharacterAbilitySystemComponent::SendEvent2Self(
@@ -429,17 +435,17 @@ void UCharacterAbilitySystemComponent::SendEvent2Self(
 	const FGameplayTag& DataSource
 )
 {
-	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (!OnwerActorPtr)
-	{
-		return;
-	}
-
-	TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap{
-		OnwerActorPtr, InModifyPropertyMap
-	};
-
-	SendEvent2Other({ModifyPropertyMap}, DataSource);
+	// auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	// if (!OnwerActorPtr)
+	// {
+	// 	return;
+	// }
+	//
+	// TPair<FOwnerPawnType*, TMap<ECharacterPropertyType, FBaseProperty>> ModifyPropertyMap{
+	// 	OnwerActorPtr, InModifyPropertyMap
+	// };
+	//
+	// SendEvent2Other({ModifyPropertyMap}, DataSource);
 }
 
 void UCharacterAbilitySystemComponent::InitialBaseGAs()
@@ -1068,7 +1074,7 @@ void UCharacterAbilitySystemComponent::AddReceivedBaseModify()
 }
 
 EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(ACharacterBase* TargetCharacterPtr,
-                                                               ACharacterBase* TriggerCharacterPtr
+                                                                          ACharacterBase* TriggerCharacterPtr
 )
 {
 	const FVector Vec = (TriggerCharacterPtr->GetActorLocation() - TargetCharacterPtr->GetActorLocation()).
@@ -1232,7 +1238,7 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
 	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
-	
+
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
@@ -1377,8 +1383,9 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 		{
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
-				const auto NewValue = GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
-				
+				const auto NewValue = GetMapValue(
+					Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
+
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
 						UAS_Character::GetHPAttribute(),
@@ -1409,8 +1416,8 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
 			{
-				const auto  NewValue = 
-						GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
+				const auto NewValue =
+					GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
 						UAS_Character::GetHPAttribute(),
@@ -1418,34 +1425,24 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 						NewValue
 					)
 				);
-				
-				if (SourceASCPtr)
-				{
-					SourceASCPtr->MakedDamageDelegate(GetOwner<ACharacterBase>(), SetByCallerTagMagnitudes);
-				}
 
 				// 回执
-				if (NewValue <= 0.f)
-				{
-					FGameplayEffectSpecHandle SpecHandle =
-						MakeOutgoingSpec(UAssetRefMap::GetInstance()->DamageCallbackClass, 1, MakeEffectContext());
-					SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage_Callback);
+				FReceivedEventModifyDataCallback ReceivedEventModifyDataCallback;
 
-					SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath,
-																   1);
+				ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
+				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 
-					TArray<TWeakObjectPtr<AActor> >Ary;
-					Ary.Add(Instigator);
-					FGameplayAbilityTargetDataHandle TargetData;
-
-					auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_ActorArray;
-					GameplayAbilityTargetData_ActorArrayPtr->SetActors(Ary);
-
-					TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
-					const auto GEHandleAry = ApplyGameplayEffectSpecToTarget(
-					*SpecHandle.Data,
-					Instigator->GetAbilitySystemComponent()
+				Instigator->GetCharacterAbilitySystemComponent()->MakedDamageDelegate(
+					ReceivedEventModifyDataCallback
 					);
+
+				if (Instigator->IsPlayerControlled())
+				{
+					auto PCPtr = Instigator->GetController<APlanetPlayerController>();
+					if (PCPtr)
+					{
+						PCPtr->GetEventSubjectComponent()->ReceivedEventModifyDataCallback(ReceivedEventModifyDataCallback);
+					}
 				}
 			}
 		}
@@ -1530,7 +1527,6 @@ void UCharacterAbilitySystemComponent::OnGEAppliedDelegateToTarget(
 
 	if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Damage))
 	{
-		
 	}
 }
 
@@ -1550,14 +1546,13 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	}
 	else if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Damage_Callback))
 	{
-		const auto Value = GameplayEffectSpec.GetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath);
+		const auto Value = GameplayEffectSpec.GetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath);
 		if (Value)
 		{
-			
 		}
 		else
 		{
-			
 		}
 	}
 }

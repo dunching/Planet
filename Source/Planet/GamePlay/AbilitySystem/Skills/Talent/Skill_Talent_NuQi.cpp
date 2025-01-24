@@ -255,12 +255,12 @@ void USkill_Talent_NuQi::OnSendDamage(UGameplayAbility* GAPtr)
 {
 	if (CharacterPtr)
 	{
-		if (
-			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
-			)
-		{
-			AddNuQi();
-		}
+		// if (
+		// 	GAPtr &&
+		// 	(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
+		// 	)
+		// {
+		// 	AddNuQi();
+		// }
 	}
 }

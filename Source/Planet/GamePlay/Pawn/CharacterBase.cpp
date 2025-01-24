@@ -17,7 +17,7 @@
 #include "ToolsLibrary.h"
 #include "Animation/AnimInstanceBase.h"
 #include "Component/SceneActorInteractionComponent.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "GenerateType.h"
 #include "InputProcessor.h"
 #include "InputActions.h"
@@ -224,7 +224,7 @@ AGroupSharedInfo* ACharacterBase::GetGroupSharedInfo() const
 	return GroupSharedInfoPtr;
 }
 
-UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent() const
+UInventoryComponent* ACharacterBase::GetInventoryComponent() const
 {
 	return GroupSharedInfoPtr ? GroupSharedInfoPtr->GetHoldingItemsComponent() : nullptr;
 }
@@ -266,7 +266,7 @@ UCharacterTitleComponent* ACharacterBase::GetCharacterTitleComponent() const
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
-	return GetHoldingItemsComponent()->CharacterProxySPtr;
+	return GetInventoryComponent()->CharacterProxySPtr;
 }
 
 void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)
@@ -361,7 +361,7 @@ void ACharacterBase::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfo
 	
 	auto NewController = GetController();
 
-	GetHoldingItemsComponent()->InitialOwnerCharacterProxy(this);
+	GetInventoryComponent()->InitialOwnerCharacterProxy(this);
 
 	ForEachComponent(false, [this](UActorComponent* ComponentPtr)
 	{

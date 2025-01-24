@@ -1,8 +1,9 @@
 
-#include "CDCaculator.h"
+#include "ReceivedEventModifyDataCallback.h"
 
 #include "ConversationComponent.h"
 #include "TeamMatesHelperComponent.h"
+#include "CharacterBase.h"
 
 void FCDItem_FASI::PreReplicatedRemove(const FCD_FASI_Container& InArraySerializer)
 {
@@ -135,4 +136,12 @@ void FCD_FASI_Container::RemoveItem(const TSharedPtr<FSkillCooldownHelper>& Skil
 		}
 	}
 #endif
+}
+
+bool FReceivedEventModifyDataCallback::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Ar << TargetCharacterPtr;
+	Ar << bIsDeath;
+
+	return true;
 }

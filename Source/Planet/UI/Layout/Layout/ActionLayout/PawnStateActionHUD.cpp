@@ -22,7 +22,7 @@
 #include "State_Talent_NuQi.h"
 #include "State_Talent_YinYang.h"
 #include "GameplayTagsLibrary.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 {
@@ -341,7 +341,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 		return;
 	}
 	const auto& SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-	const auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
+	const auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
 	for (auto Iter : SkillsMap)
 	{
 		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy_BySocket(Iter.Value);

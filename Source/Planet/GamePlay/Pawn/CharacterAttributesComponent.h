@@ -42,14 +42,13 @@ public:
 
 	float GetRate()const;
 	
-	// Character的ID
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	FGuid CharacterID;
+	virtual void SetCharacterID(const FGuid& InCharacterID);
 
-	// Character的类别
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	FString CharacterCategory;
-	
+	FGuid GetCharacterID()const;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
+	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
+
 protected:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -70,7 +69,24 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
 	TSubclassOf<UGameplayEffect>GE_CharacterReplyClass;
    
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
+	float BaseTurnRate = 45.f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
+	float BaseLookUpRate = 45.f;
+
+	// Character的ID
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+	FGuid CharacterID;
+
+	// Character的类别
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+	FString CharacterCategory;
+	
 private:
+
+	UFUNCTION()
+	void OnRep_CharacterID();
 
 };
 

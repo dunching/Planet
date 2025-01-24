@@ -38,7 +38,7 @@ class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter_AI;
 class AHumanCharacter;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 struct FCharacterProxy;
 
 struct FAllocationSkills;
@@ -58,7 +58,7 @@ struct PLANET_API FSkillProxy : public FAllocationbleProxy
 public:
 
 	friend FSceneProxyContainer;
-	friend UHoldingItemsComponent;
+	friend UInventoryComponent;
 
 	FSkillProxy();
 

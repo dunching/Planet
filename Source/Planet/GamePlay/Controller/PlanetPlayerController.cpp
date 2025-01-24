@@ -29,10 +29,11 @@
 #include "HumanCharacter_Player.h"
 #include "KismetGravityLibrary.h"
 #include "CollisionDataStruct.h"
+#include "EventSubjectComponent.h"
 #include "GameMode_Main.h"
 #include "LogWriter.h"
 #include "GroupSharedInfo.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
 #include "GuideActor.h"
@@ -47,6 +48,9 @@ static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation
 APlanetPlayerController::APlanetPlayerController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	EventSubjectComponentPtr = CreateDefaultSubobject<UEventSubjectComponent>(
+		UEventSubjectComponent::ComponentName
+	);
 }
 
 void APlanetPlayerController::SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority)
@@ -370,7 +374,7 @@ void APlanetPlayerController::SetGroupSharedInfo(AGroupSharedInfo* InGroupShared
 {
 }
 
-UHoldingItemsComponent* APlanetPlayerController::GetHoldingItemsComponent() const
+UInventoryComponent* APlanetPlayerController::GetHoldingItemsComponent() const
 {
 	return GroupSharedInfoPtr ? GroupSharedInfoPtr->GetHoldingItemsComponent() : nullptr;
 }
@@ -424,6 +428,11 @@ void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
 			}
 		});
 	}
+}
+
+UEventSubjectComponent* APlanetPlayerController::GetEventSubjectComponent() const
+{
+	return EventSubjectComponentPtr;
 }
 
 void APlanetPlayerController::BindPCWithCharacter()

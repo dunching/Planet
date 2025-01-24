@@ -6,7 +6,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterBase.h"
 #include "GameplayTagsLibrary.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 void USkill_Active_Switch_Test::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -40,7 +40,7 @@ void USkill_Active_Switch_Test::PerformAction(
 
 	TMap<FGameplayTag, FCharacterSocket>CanActiveSocketMap;
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
-	auto HoldingItemsComponentPtr = CharacterPtr->GetHoldingItemsComponent();
+	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
 	for (const auto& Iter : Ary)
 	{
 		auto SocketSPtr = ProxyProcessComponentPtr->FindSocket(Iter.ActiveSocketTag);

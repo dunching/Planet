@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 
 #include "AIComponent.generated.h"
@@ -13,6 +14,7 @@ class ACharacterBase;
 class UPAD_TaskNode;
 class UPAD_TaskNode_Preset;
 class UTaskNode_Temporary;
+class AHumanCharacter_AI;
 
 /**
  *
@@ -23,6 +25,8 @@ class PLANET_API UAIComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
+	using FOwnerType = AHumanCharacter_AI;
+
 	static FName ComponentName;
 
 	UAIComponent(const FObjectInitializer& ObjectInitializer);
@@ -30,6 +34,10 @@ public:
 	virtual void BeginPlay() override;
 
 	void AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr);
+
+	void InitialAllocationsRowName();
+
+	void InitialAllocationsByProxy();
 
 	// 预置的任务，如自动播放的对话
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -42,4 +50,11 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
+	FGameplayTag AI_Allocation_RowName = FGameplayTag::EmptyTag;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
+	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
+
 };

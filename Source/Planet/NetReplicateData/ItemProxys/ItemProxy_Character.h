@@ -91,7 +91,7 @@ struct PLANET_API FCharacterProxy : public FAllocationbleProxy
 
 public:
 
-	friend UHoldingItemsComponent;
+	friend UInventoryComponent;
 	
 	using FPawnType = ACharacterBase;
 

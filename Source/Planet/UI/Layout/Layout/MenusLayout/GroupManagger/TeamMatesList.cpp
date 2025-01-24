@@ -10,7 +10,7 @@
 #include "Components/Border.h"
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "GenerateType.h"
 #include "TeamMatesHelperComponent.h"
 #include "CharacterBase.h"

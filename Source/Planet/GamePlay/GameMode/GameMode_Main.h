@@ -14,7 +14,7 @@
 
 extern PLANET_API class AShiYuGameMode* GGameModePtr;
 
-class UHoldingItemsComponent;
+class UInventoryComponent;
 struct FCharacterProxy;
 
 /**

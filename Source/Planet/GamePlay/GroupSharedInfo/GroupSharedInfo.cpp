@@ -3,7 +3,7 @@
 
 #include "TeamMatesHelperComponent.h"
 
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "UGSAbilitySystemComponent.h"
 
 AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
@@ -16,7 +16,7 @@ AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
 	NetUpdateFrequency = 1;
 
 	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(UTeamMatesHelperComponent::ComponentName);
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
+	InventoryComponentPtr = CreateDefaultSubobject<UInventoryComponent>(UInventoryComponent::ComponentName);
 	
 	AbilitySystemComponentPtr = CreateDefaultSubobject<UGSAbilitySystemComponent>(UGSAbilitySystemComponent::ComponentName);
 	AbilitySystemComponentPtr->SetIsReplicated(true);
@@ -50,7 +50,7 @@ UTeamMatesHelperComponent* AGroupSharedInfo::GetTeamMatesHelperComponent()
 	return TeamMatesHelperComponentPtr;
 }
 
-UHoldingItemsComponent* AGroupSharedInfo::GetHoldingItemsComponent()
+UInventoryComponent* AGroupSharedInfo::GetHoldingItemsComponent()
 {
-	return HoldingItemsComponentPtr;
+	return InventoryComponentPtr;
 }

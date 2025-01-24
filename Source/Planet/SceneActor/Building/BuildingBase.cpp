@@ -14,7 +14,7 @@
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 
 #include "CharacterBase.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "PlacingProcessor.h"
 #include "HumanCharacter.h"
 #include "AssetRefMap.h"

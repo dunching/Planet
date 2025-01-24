@@ -5,7 +5,7 @@
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 
-#include "CDCaculator.h"
+#include "ReceivedEventModifyDataCallback.h"
 
 #include "ConversationComponent.generated.h"
 

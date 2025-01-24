@@ -9,7 +9,7 @@
 #include "GuideSystemGameplayTask.h"
 #include "GuideThreadActor.h"
 #include "GuideThreadGameplayTask.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "HumanCharacter_AI.h"
 #include "TaskNode_Interaction.h"
 

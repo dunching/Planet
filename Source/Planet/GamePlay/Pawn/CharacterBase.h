@@ -33,7 +33,7 @@ class UZYInputComponent;
 class USceneActorPropertyComponent;
 class UPlanetGameplayAbility;
 class UCharacterAttributesComponent;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 class UPlanetAbilitySystemComponent;
 class UTalentAllocationComponent;
 class UStateProcessorComponent;
@@ -90,7 +90,7 @@ public:
 
 	AGroupSharedInfo* GetGroupSharedInfo()const;
 
-	UHoldingItemsComponent* GetHoldingItemsComponent()const;
+	UInventoryComponent* GetInventoryComponent()const;
 
 	UCharacterAttributesComponent* GetCharacterAttributesComponent()const;
 
@@ -125,9 +125,6 @@ public:
 
 	// 确认是否是一个有效的选中目标，比如目标在隐身、或“无法选中”、重伤倒地状态时为不可已被选中
 	bool GetIsValidTarget()const;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
 
 	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfo;
 	
@@ -164,12 +161,6 @@ protected:
 		EGroupMateChangeType GroupMateChangeType,
 		const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
 	);
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
-	float BaseTurnRate = 45.f;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
-	float BaseLookUpRate = 45.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;

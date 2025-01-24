@@ -8,7 +8,7 @@
 
 #include "ResourceBoxBase.generated.h"
 
-class UHoldingItemsComponent;
+class UInventoryComponent;
 class ACharacterBase;
 
 UCLASS()

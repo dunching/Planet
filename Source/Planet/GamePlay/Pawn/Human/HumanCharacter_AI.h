@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 
+#include "CharacterAttributesComponent.h"
 #include "HumanCharacter.h"
 #include "GenerateType.h"
 #include "SceneActorInteractionComponent.h"
@@ -23,6 +24,20 @@ class PLANET_API USceneCharacterAIInteractionComponent : public USceneActorInter
 
 public:
 	// virtual UGameplayTasksComponent* GetGameplayTasksComponent(const UGameplayTask& Task) const override;
+};
+
+/**
+ *
+ */
+UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
+class PLANET_API UCharacterAIAttributesComponent : public UCharacterAttributesComponent
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void SetCharacterID(const FGuid& InCharacterID)override;
+
 };
 
 UCLASS()
@@ -55,12 +70,6 @@ public:
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
 #endif
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag AI_Allocation_RowName = FGameplayTag::EmptyTag;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
-
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -69,17 +78,6 @@ protected:
 	// virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
 
 	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
-
-	UFUNCTION()
-	void OnRep_CharacterID();
-
-	void InitialAllocationsRowName();
-
-	void InitialAllocationsByProxy();
-
-	// TODO 移动到UCharacterAttributesComponent下面
-	UPROPERTY(ReplicatedUsing = OnRep_CharacterID)
-	FGuid CharacterID;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;

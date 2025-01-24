@@ -3,12 +3,14 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "ConversationLayout.h"
+#include "GameplayTagsLibrary.h"
 #include "GuideActor.h"
 #include "GuideInteractionActor.h"
 #include "GuideSubSystem.h"
 #include "GuideThreadActor.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
 #include "MainHUD.h"
@@ -197,7 +199,7 @@ void UGameplayTask_Guide_AddToTarget::SetUp(UPAD_TaskNode_Guide_AddToTarget* InT
 void UGameplayTask_Guide_AddToTarget::SetUp(
 	const TSubclassOf<AGuideInteractionActor>& InGuideInteractionActorClass,
 	const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
-	)
+)
 {
 	GuideInteractionActorClass = InGuideInteractionActorClass;
 	TargetCharacterPtr = InTargetCharacterPtr;
@@ -232,7 +234,7 @@ void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(bool bInOwnerFinished
 		TargetPointPtr->Destroy();
 		TargetPointPtr = nullptr;
 	}
-	
+
 	Super::OnDestroy(bInOwnerFinished);
 }
 
@@ -274,14 +276,14 @@ void UGameplayTask_Guide_ConversationWithTarget::ConditionalPerformTask()
 void UGameplayTask_Guide_WaitComplete::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
-	
+
 	if (GuideActorPtr)
 	{
 		const auto Result = GuideActorPtr->ConsumeEvent(TaskID);
 		if (Result.GetIsValid())
 		{
 			TaskNodeResuleHelper = Result;
-			
+
 			StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 			EndTask();
 		}
@@ -296,10 +298,10 @@ void UGameplayTask_Guide_WaitComplete::SetUp(const FGuid& InTaskID)
 void UGameplayTask_Guide_CollectResource::Activate()
 {
 	Super::Activate();
-	
-	OnConsumableProxyChangedHandle = PlayerCharacterPtr->GetHoldingItemsComponent()->OnConsumableProxyChanged.AddCallback(
+
+	OnConsumableProxyChangedHandle = PlayerCharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
 		std::bind(&ThisClass::OnGetConsumableProxy, this, std::placeholders::_1, std::placeholders::_2)
-		);
+	);
 }
 
 void UGameplayTask_Guide_CollectResource::OnDestroy(bool bInOwnerFinished)
@@ -308,7 +310,7 @@ void UGameplayTask_Guide_CollectResource::OnDestroy(bool bInOwnerFinished)
 	{
 		OnConsumableProxyChangedHandle->UnBindCallback();
 	}
-	
+
 	Super::OnDestroy(bInOwnerFinished);
 }
 
@@ -326,13 +328,13 @@ FTaskNodeDescript UGameplayTask_Guide_CollectResource::GetTaskNodeDescripton() c
 
 	TaskNodeDescript.Description = FString::Printf(TEXT("采集(%d/%d)个%s"), CurrentNum, Num, *ResourceType.ToString());
 
-	return  TaskNodeDescript;
+	return TaskNodeDescript;
 }
 
 void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
-	const TSharedPtr<FConsumableProxy>&ConsumableProxySPtr,
+	const TSharedPtr<FConsumableProxy>& ConsumableProxySPtr,
 	EProxyModifyType ProxyModifyType
-	)
+)
 {
 	if (ConsumableProxySPtr && ConsumableProxySPtr->GetProxyType().MatchesTag(ResourceType))
 	{
@@ -359,7 +361,7 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 	}
 }
 
-void UGameplayTask_Guide_CollectResource::UpdateDescription()const
+void UGameplayTask_Guide_CollectResource::UpdateDescription() const
 {
 	if (GuideActorPtr)
 	{
@@ -370,13 +372,17 @@ void UGameplayTask_Guide_CollectResource::UpdateDescription()const
 void UGameplayTask_Guide_DefeatEnemy::Activate()
 {
 	Super::Activate();
+
+	DelegateHandle = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
+		std::bind(&ThisClass::OnActiveGEAddedDelegateToSelf, this, std::placeholders::_1)
+	);
 }
 
 void UGameplayTask_Guide_DefeatEnemy::OnDestroy(bool bInOwnerFinished)
 {
-	if (OnConsumableProxyChangedHandle)
+	if (DelegateHandle)
 	{
-		OnConsumableProxyChangedHandle->UnBindCallback();
+		DelegateHandle->UnBindCallback();
 	}
 	
 	Super::OnDestroy(bInOwnerFinished);
@@ -396,7 +402,23 @@ FTaskNodeDescript UGameplayTask_Guide_DefeatEnemy::GetTaskNodeDescripton() const
 
 	TaskNodeDescript.Description = FString::Printf(TEXT("击杀(%d/%d)个%s"), CurrentNum, Num, *EnemyType.ToString());
 
-	return  TaskNodeDescript;
+	return TaskNodeDescript;
+}
+
+void UGameplayTask_Guide_DefeatEnemy::OnActiveGEAddedDelegateToSelf(
+	const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback
+)
+{
+	if (ReceivedEventModifyDataCallback.bIsDeath)
+	{
+		CurrentNum++;
+		UpdateDescription();
+		if (CurrentNum >= Num)
+		{
+			StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+			EndTask();
+		}
+	}
 }
 
 void UGameplayTask_Guide_DefeatEnemy::UpdateDescription() const

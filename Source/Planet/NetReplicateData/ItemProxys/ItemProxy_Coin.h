@@ -39,7 +39,7 @@ public:
 
 	friend FSceneProxyContainer;
 	friend FProxy_FASI_Container;
-	friend UHoldingItemsComponent;
+	friend UInventoryComponent;
 
 	FCoinProxy();
 

@@ -77,13 +77,13 @@ void UGAEvent_Send::ActivateAbility(
 					return;
 				}
 				auto ASCPtr = Iter.TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-				ASCPtr->TriggerAbilityFromGameplayEvent(
-					Iter.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
-					ASCPtr->AbilityActorInfo.Get(),
-					FGameplayTag(),
-					&Payload,
-					*ASCPtr
-				);
+				// ASCPtr->TriggerAbilityFromGameplayEvent(
+				// 	Iter.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
+				// 	ASCPtr->AbilityActorInfo.Get(),
+				// 	FGameplayTag(),
+				// 	&Payload,
+				// 	*ASCPtr
+				// );
 			}
 		}
 		break;
@@ -112,13 +112,13 @@ void UGAEvent_Send::ActivateAbility(
 				return;
 			}
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-			ASCPtr->TriggerAbilityFromGameplayEvent(
-				GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
-				ASCPtr->AbilityActorInfo.Get(),
-				FGameplayTag(),
-				&Payload,
-				*ASCPtr
-			);
+			// ASCPtr->TriggerAbilityFromGameplayEvent(
+			// 	GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
+			// 	ASCPtr->AbilityActorInfo.Get(),
+			// 	FGameplayTag(),
+			// 	&Payload,
+			// 	*ASCPtr
+			// );
 		}
 		break;
 		case EEventType::kPeriodic_PropertyModify:
@@ -146,13 +146,13 @@ void UGAEvent_Send::ActivateAbility(
 				return;
 			}
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-			ASCPtr->TriggerAbilityFromGameplayEvent(
-				GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
-				ASCPtr->AbilityActorInfo.Get(),
-				FGameplayTag(),
-				&Payload,
-				*ASCPtr
-			);
+			// ASCPtr->TriggerAbilityFromGameplayEvent(
+			// 	GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
+			// 	ASCPtr->AbilityActorInfo.Get(),
+			// 	FGameplayTag(),
+			// 	&Payload,
+			// 	*ASCPtr
+			// );
 		}
 		break;
 		case EEventType::kPeriodic_StateTagModify:
@@ -180,13 +180,13 @@ void UGAEvent_Send::ActivateAbility(
 				return;
 			}
 			auto ASCPtr = GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-			ASCPtr->TriggerAbilityFromGameplayEvent(
-				GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
-				ASCPtr->AbilityActorInfo.Get(),
-				FGameplayTag(),
-				&Payload,
-				*ASCPtr
-			);
+			// ASCPtr->TriggerAbilityFromGameplayEvent(
+			// 	GAEventDataPtr->TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ReceivedEventHandle,
+			// 	ASCPtr->AbilityActorInfo.Get(),
+			// 	FGameplayTag(),
+			// 	&Payload,
+			// 	*ASCPtr
+			// );
 		}
 		break;
 		}

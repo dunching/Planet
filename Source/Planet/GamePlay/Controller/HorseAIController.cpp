@@ -14,7 +14,7 @@
 #include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
 #include "GameplayTagsLibrary.h"
@@ -174,7 +174,7 @@ void AHorseAIController::InitialCharacter()
 		}
 
 		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
+		auto HICPtr = CharacterPtr->GetInventoryComponent();
 
 	}
 }

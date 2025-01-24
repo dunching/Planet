@@ -5,7 +5,7 @@
 
 #include "CharacterBase.h"
 #include "ItemProxy_Minimal.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "ProxyProcessComponent.h"

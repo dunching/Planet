@@ -99,7 +99,7 @@ protected:
 		UTrackVehicleItemPropertyComponent* ItemPropertyComponentPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CharacterProperty)
-		UHoldingItemsComponent* HoldItemComponentPtr = nullptr;
+		UInventoryComponent* HoldItemComponentPtr = nullptr;
 
 private:
 

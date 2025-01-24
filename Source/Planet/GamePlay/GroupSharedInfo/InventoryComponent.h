@@ -10,7 +10,7 @@
 #include "ItemProxy_Minimal.h"
 #include "ItemProxy_Container.h"
 
-#include "HoldingItemsComponent.generated.h"
+#include "InventoryComponent.generated.h"
 
 struct FSceneProxyContainer;
 struct FProxy_FASI;
@@ -24,7 +24,7 @@ class ACharacterBase;
  *	持有物品相关
  */
 UCLASS(BlueprintType, Blueprintable)
-class UHoldingItemsComponent :
+class UInventoryComponent :
 	public UActorComponent,
 	public IGroupSharedInterface
 {
@@ -53,7 +53,7 @@ public:
 
 	static FName ComponentName;
 
-	UHoldingItemsComponent(const FObjectInitializer& ObjectInitializer);
+	UInventoryComponent(const FObjectInitializer& ObjectInitializer);
 
 #if UE_EDITOR || UE_CLIENT
 	TSharedPtr<FBasicProxy> AddProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);

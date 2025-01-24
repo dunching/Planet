@@ -8,7 +8,7 @@
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
@@ -124,7 +124,7 @@ void AMainHUD::InitMainHUDLayout()
 			auto ItemInfosPtr = MainHUDLayoutPtr->GetItemInfos();
 			{
 				auto Handle =
-					CharacterPtr->GetHoldingItemsComponent()->OnSkillProxyChanged.AddCallback(
+					CharacterPtr->GetInventoryComponent()->OnSkillProxyChanged.AddCallback(
 						std::bind(&UGetItemInfosList::OnSkillProxyChanged, ItemInfosPtr, std::placeholders::_1,
 						          std::placeholders::_2
 						));
@@ -132,7 +132,7 @@ void AMainHUD::InitMainHUDLayout()
 			}
 			{
 				auto Handle =
-					CharacterPtr->GetHoldingItemsComponent()->OnCoinProxyChanged.AddCallback(
+					CharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
 						std::bind(&UGetItemInfosList::OnCoinProxyChanged, ItemInfosPtr, std::placeholders::_1,
 						          std::placeholders::_2, std::placeholders::_3
 						));
@@ -140,7 +140,7 @@ void AMainHUD::InitMainHUDLayout()
 			}
 			{
 				auto Handle =
-					CharacterPtr->GetHoldingItemsComponent()->OnConsumableProxyChanged.AddCallback(
+					CharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
 						std::bind(&UGetItemInfosList::OnConsumableProxyChanged, ItemInfosPtr, std::placeholders::_1,
 						          std::placeholders::_2
 						));
@@ -148,7 +148,7 @@ void AMainHUD::InitMainHUDLayout()
 			}
 			{
 				auto Handle =
-					CharacterPtr->GetHoldingItemsComponent()->OnGroupmateProxyChanged.AddCallback(
+					CharacterPtr->GetInventoryComponent()->OnGroupmateProxyChanged.AddCallback(
 						std::bind(&UGetItemInfosList::OnGourpmateProxyChanged, ItemInfosPtr, std::placeholders::_1,
 						          std::placeholders::_2
 						));

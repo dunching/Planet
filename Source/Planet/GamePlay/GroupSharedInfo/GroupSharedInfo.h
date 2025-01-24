@@ -25,7 +25,7 @@ class UPlanetAbilitySystemComponent;
 class UGSAbilitySystemComponent;
 class UProxySycHelperComponent;
 class UTeamMatesHelperComponent;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 struct FSceneProxyContainer;
 
 /*
@@ -52,7 +52,7 @@ public:
 
 	UTeamMatesHelperComponent* GetTeamMatesHelperComponent();
 
-	UHoldingItemsComponent* GetHoldingItemsComponent();
+	UInventoryComponent* GetHoldingItemsComponent();
 
 	FGuid GroupID;
 	
@@ -62,7 +62,7 @@ protected:
 	TObjectPtr<UTeamMatesHelperComponent> TeamMatesHelperComponentPtr = nullptr;
 	
 	UPROPERTY()
-	TObjectPtr<UHoldingItemsComponent> HoldingItemsComponentPtr = nullptr;
+	TObjectPtr<UInventoryComponent> InventoryComponentPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TObjectPtr<UGSAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;

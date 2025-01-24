@@ -20,9 +20,10 @@ class IPlanetControllerInterface;
 struct FCharacterProxy;
 class UFocusIcon;
 class UCharacterAttributesComponent;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
+class UEventSubjectComponent;
 class AGroupSharedInfo;
 class AGuideActor;
 
@@ -61,12 +62,12 @@ public:
 
 	virtual void SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr) override;
 
-	virtual UHoldingItemsComponent* GetHoldingItemsComponent() const override;
+	virtual UInventoryComponent* GetHoldingItemsComponent() const override;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent() const override;
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent() const override;
-
+	
 	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
 
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() override;
@@ -75,6 +76,8 @@ public:
 
 	void OnHPChanged(int32 CurrentValue);
 
+	UEventSubjectComponent * GetEventSubjectComponent()const;
+	
 	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
 #pragma region CMD
@@ -143,6 +146,9 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
 
+	UPROPERTY()
+	TObjectPtr<UEventSubjectComponent> EventSubjectComponentPtr = nullptr;
+	
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge FocusInformation;

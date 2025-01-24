@@ -44,7 +44,7 @@ struct PLANET_API FWeaponProxy : public FAllocationbleProxy
 public:
 
 	friend FSceneProxyContainer;
-	friend UHoldingItemsComponent;
+	friend UInventoryComponent;
 
 	FWeaponProxy();
 

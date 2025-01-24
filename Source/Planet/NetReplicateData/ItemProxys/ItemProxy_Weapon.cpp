@@ -12,7 +12,7 @@
 #include "ItemProxy_Container.h"
 #include "PropertyEntrys.h"
 #include "Weapon_Base.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "ItemProxy_Minimal.h"
 

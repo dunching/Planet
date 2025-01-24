@@ -13,7 +13,7 @@
 
 #include "HumanCharacter.h"
 #include "GameInstance/PlanetGameInstance.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "AssetRefMap.h"
 #include "Planet.h"
 #include "HumanCharacter.h"
@@ -44,7 +44,7 @@ void TestCommand::AddCahracterTestData()
 void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 {
 	{
-//		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneProxyContainer();
+//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
 // 		HoldItemComponent.AddProxy(EToolProxyType::kPickAxe);
 // 
 // 		HoldItemComponent.AddProxy(EWeaponProxyType::kPickAxe);
@@ -66,7 +66,7 @@ void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
 void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 {
 	{
-//		auto& HoldItemComponent = CharacterPtr->GetHoldingItemsComponent()->GetSceneProxyContainer();
+//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
 // 		HoldItemComponent.AddProxy(EToolProxyType::kPickAxe);
 // 
 // 		HoldItemComponent.AddProxy(EWeaponProxyType::kPickAxe);

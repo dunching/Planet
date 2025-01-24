@@ -5,7 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
 #include "SceneProxyTable.h"

@@ -7,7 +7,7 @@
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 
 void AWeapon_Base::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -32,13 +32,13 @@ void AWeapon_Base::SetWeaponProxyImp_Implementation(ACharacterBase* AllocationCh
 
 void AWeapon_Base::SetWeaponProxy(const FGuid& InWeaponProxy_ID)
 {
-	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
+	UInventoryComponent* HoldingItemsComponentPtr = nullptr;
 
 	// 这里设置了 Owner。第一次掉取到的还是PC？
 	auto OwnerPtr = GetOwner<ACharacterBase>();
 	if (OwnerPtr)
 	{
-		HoldingItemsComponentPtr = OwnerPtr->GetHoldingItemsComponent();
+		HoldingItemsComponentPtr = OwnerPtr->GetInventoryComponent();
 	}
 	else
 	{

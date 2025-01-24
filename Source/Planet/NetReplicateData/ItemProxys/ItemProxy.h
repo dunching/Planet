@@ -38,7 +38,7 @@ class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter_AI;
 class AHumanCharacter;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 struct FCharacterProxy;
 
 struct FAllocationSkills;
@@ -87,7 +87,7 @@ public:
 
 	friend FSceneProxyContainer;
 	friend FProxy_FASI_Container;
-	friend UHoldingItemsComponent;
+	friend UInventoryComponent;
 	friend APlanetGameMode;
 
 	using IDType = FGuid;
@@ -152,7 +152,7 @@ protected:
 	IDType OwnerCharacter_ID;
 
 	// Root组件,不为空
-	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
+	UInventoryComponent* HoldingItemsComponentPtr = nullptr;
 
 private:
 
@@ -227,7 +227,7 @@ struct PLANET_API FToolProxy : public FBasicProxy
 public:
 
 	friend FSceneProxyContainer;
-	friend UHoldingItemsComponent;
+	friend UInventoryComponent;
 
 	FToolProxy();
 

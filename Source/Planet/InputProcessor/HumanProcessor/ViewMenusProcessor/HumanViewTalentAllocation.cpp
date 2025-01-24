@@ -16,7 +16,7 @@
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "BuildingBaseProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "HumanCharacter_Player.h"

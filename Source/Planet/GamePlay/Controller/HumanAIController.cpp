@@ -13,7 +13,7 @@
 #include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 #include "GameplayTagsLibrary.h"
 #include "BuildingArea.h"

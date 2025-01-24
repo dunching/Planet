@@ -277,69 +277,69 @@ void USkill_Talent_YinYang::OnHPValueChanged(int32 OldValue, int32 NewValue)
 
 void USkill_Talent_YinYang::OnSendDamage(UGameplayAbility* GAPtr)
 {
-	if (CharacterPtr)
-	{
-		if (
-			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
-			)
-		{
-			auto SendGaPtr = Cast<UGAEvent_Send>(GAPtr);
-			if (!SendGaPtr)
-			{
-				return;
-			}
-			const auto& EventDataRef = SendGaPtr->GetCurrentEventData();
-			if (!EventDataRef.TargetData.Data.IsValidIndex(0))
-			{
-				return;
-			}
-			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventDataRef.TargetData.Get(0));
-			if (!GAEventDataPtr)
-			{
-				return;
-			}
-
-			for (const auto& DataIter : GAEventDataPtr->DataAry)
-			{
-				switch (TalentSPtr->CurentType)
-				{
-				case ETalent_State_Type::kYin:
-				{
-					for (const auto& Iter : DataIter.ElementSet)
-					{
-						const auto Type = Iter.Get<0>();
-						const auto Damage = Iter.Get<2>();
-						if (
-							((Type == EWuXingType::kWood) && (Damage > 0)) ||
-							((Type == EWuXingType::kWater) && (Damage > 0))
-							)
-						{
-							AddValue(AttackIncrement);
-							break;
-						}
-					}
-				}
-				break;
-				case ETalent_State_Type::kYang:
-				{
-					for (const auto& Iter : DataIter.ElementSet)
-					{
-						const auto Type = Iter.Get<0>();
-						const auto Damage = Iter.Get<2>();
-						if (
-							((Type == EWuXingType::kGold) && (Damage > 0)) ||
-							((Type == EWuXingType::kFire) && (Damage > 0)) 
-							)
-						{
-							AddValue(AttackIncrement);
-							break;
-						}
-					}
-				}
-				break;
-				}
-			}
-		}
-	}
+	// if (CharacterPtr)
+	// {
+	// 	if (
+	// 		GAPtr &&
+	// 		(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
+	// 		)
+	// 	{
+	// 		auto SendGaPtr = Cast<UGAEvent_Send>(GAPtr);
+	// 		if (!SendGaPtr)
+	// 		{
+	// 			return;
+	// 		}
+	// 		const auto& EventDataRef = SendGaPtr->GetCurrentEventData();
+	// 		if (!EventDataRef.TargetData.Data.IsValidIndex(0))
+	// 		{
+	// 			return;
+	// 		}
+	// 		auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventDataRef.TargetData.Get(0));
+	// 		if (!GAEventDataPtr)
+	// 		{
+	// 			return;
+	// 		}
+	//
+	// 		for (const auto& DataIter : GAEventDataPtr->DataAry)
+	// 		{
+	// 			switch (TalentSPtr->CurentType)
+	// 			{
+	// 			case ETalent_State_Type::kYin:
+	// 			{
+	// 				for (const auto& Iter : DataIter.ElementSet)
+	// 				{
+	// 					const auto Type = Iter.Get<0>();
+	// 					const auto Damage = Iter.Get<2>();
+	// 					if (
+	// 						((Type == EWuXingType::kWood) && (Damage > 0)) ||
+	// 						((Type == EWuXingType::kWater) && (Damage > 0))
+	// 						)
+	// 					{
+	// 						AddValue(AttackIncrement);
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 			break;
+	// 			case ETalent_State_Type::kYang:
+	// 			{
+	// 				for (const auto& Iter : DataIter.ElementSet)
+	// 				{
+	// 					const auto Type = Iter.Get<0>();
+	// 					const auto Damage = Iter.Get<2>();
+	// 					if (
+	// 						((Type == EWuXingType::kGold) && (Damage > 0)) ||
+	// 						((Type == EWuXingType::kFire) && (Damage > 0)) 
+	// 						)
+	// 					{
+	// 						AddValue(AttackIncrement);
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 			break;
+	// 			}
+	// 		}
+	// 	}
+	// }
 }

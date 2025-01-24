@@ -5,7 +5,7 @@
 
 #include "KismetGravityLibrary.h"
 
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
 
@@ -65,7 +65,7 @@ void AResourceBoxBase::AddItemsToTarget()
 		{
 			{
 				FGuid Guid = FGuid::NewGuid();
-				auto HICPtr = TargetCharacterPtr->GetHoldingItemsComponent();
+				auto HICPtr = TargetCharacterPtr->GetInventoryComponent();
 				for (const auto Iter : ProxyMap)
 				{
 					HICPtr->AddProxy_Pending(Iter.Key, Iter.Value, Guid);

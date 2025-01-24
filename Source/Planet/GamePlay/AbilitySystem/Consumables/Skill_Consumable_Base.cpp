@@ -6,7 +6,7 @@
 #include "Skill_Consumable_Generic.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "CharacterBase.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 UScriptStruct* FGameplayAbilityTargetData_Consumable::GetScriptStruct() const
 {
@@ -52,7 +52,7 @@ void USkill_Consumable_Base::OnAvatarSet(
 		if (GameplayAbilityTargetDataPtr)
 		{
 			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(
-				CharacterPtr->GetHoldingItemsComponent()->FindProxy(GameplayAbilityTargetDataPtr->ProxyID)
+				CharacterPtr->GetInventoryComponent()->FindProxy(GameplayAbilityTargetDataPtr->ProxyID)
 			);
 		}
 	}

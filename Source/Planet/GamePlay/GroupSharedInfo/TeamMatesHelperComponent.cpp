@@ -11,7 +11,7 @@
 #include "HumanAIController.h"
 #include "PlanetControllerInterface.h"
 #include "PlanetPlayerState.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "ItemProxy_Container.h"
 #include "GameOptions.h"
 #include "SceneProxyTable.h"

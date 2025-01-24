@@ -8,7 +8,7 @@
 
 #include "MyUserWidget.h"
 #include "ItemProxy_Minimal.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "ProxyProcessComponent.h"
 
 #include "ToolsMenu.generated.h"

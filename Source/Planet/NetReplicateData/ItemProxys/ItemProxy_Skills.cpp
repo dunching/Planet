@@ -29,7 +29,7 @@
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "ConversationComponent.h"
 #include "Skill_Consumable_Generic.h"
 #include "CharacterAbilitySystemComponent.h"

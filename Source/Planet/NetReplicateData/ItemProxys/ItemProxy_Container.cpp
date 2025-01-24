@@ -8,7 +8,7 @@
 #include "PlanetControllerInterface.h"
 #include "HumanCharacter.h"
 #include "SceneProxyExtendInfo.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Minimal.h"
 #include "TemplateHelper.h"

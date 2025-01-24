@@ -7,9 +7,10 @@
 #include <GameplayTagContainer.h>
 #include "Net/Serialization/FastArraySerializer.h"
 
-#include "CDCaculator.generated.h"
+#include "ReceivedEventModifyDataCallback.generated.h"
 
 class UConversationComponent;
+class ACharacterBase;
 
 struct FSkillCooldownHelper;
 struct FCDItem_FASI;
@@ -28,19 +29,18 @@ struct PLANET_API FCDItem_FASI : public FFastArraySerializerItem
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	TSharedPtr<FSkillCooldownHelper> SkillCooldownHelper = nullptr;
-
 };
 
- template<>
- struct TStructOpsTypeTraits< FCDItem_FASI > :
- 	public TStructOpsTypeTraitsBase2< FCDItem_FASI >
- {
- 	enum
- 	{
+template <>
+struct TStructOpsTypeTraits<FCDItem_FASI> :
+	public TStructOpsTypeTraitsBase2<FCDItem_FASI>
+{
+	enum
+	{
 		WithNetSerializer = true,
- 	};
- };
- 
+	};
+};
+
 USTRUCT()
 struct PLANET_API FCD_FASI_Container : public FFastArraySerializer
 {
@@ -54,7 +54,7 @@ struct PLANET_API FCD_FASI_Container : public FFastArraySerializer
 
 	bool NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms);
 
-	template< typename Type, typename SerializerType >
+	template <typename Type, typename SerializerType>
 	bool ShouldWriteFastArrayItem(const Type& Item, const bool bIsWritingOnClient)
 	{
 		if (bIsWritingOnClient)
@@ -71,18 +71,41 @@ struct PLANET_API FCD_FASI_Container : public FFastArraySerializer
 
 	void RemoveItem(const TSharedPtr<FSkillCooldownHelper>& SkillCooldownHelper);
 
-	UConversationComponent* CDCaculatorComponentPtr= nullptr;
+	UConversationComponent* CDCaculatorComponentPtr = nullptr;
 
 protected:
-
 };
 
-template<>
-struct TStructOpsTypeTraits< FCD_FASI_Container > :
-	public TStructOpsTypeTraitsBase2< FCD_FASI_Container >
+template <>
+struct TStructOpsTypeTraits<FCD_FASI_Container> :
+	public TStructOpsTypeTraitsBase2<FCD_FASI_Container>
 {
 	enum
 	{
 		WithNetDeltaSerializer = true,
+	};
+};
+
+/////////////////////////////////////////////////////////////
+
+USTRUCT()
+struct PLANET_API FReceivedEventModifyDataCallback
+{
+	GENERATED_USTRUCT_BODY()
+
+	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+
+	ACharacterBase* TargetCharacterPtr = nullptr;
+
+	bool bIsDeath = false;
+};
+
+template <>
+struct TStructOpsTypeTraits<FReceivedEventModifyDataCallback> :
+	public TStructOpsTypeTraitsBase2<FReceivedEventModifyDataCallback>
+{
+	enum
+	{
+		WithNetSerializer = true,
 	};
 };

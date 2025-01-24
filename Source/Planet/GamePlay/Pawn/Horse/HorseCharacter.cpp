@@ -36,7 +36,7 @@
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
 #include "ProxyProcessComponent.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "PlanetPlayerController.h"

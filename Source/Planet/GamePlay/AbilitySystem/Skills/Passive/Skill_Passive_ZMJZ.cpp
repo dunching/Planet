@@ -34,7 +34,7 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 		{
 			AbilityActivatedCallbacksHandle =
 				CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
-					std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_2));
+					std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_1));
 		}
 	}
 #endif
@@ -144,7 +144,7 @@ void USkill_Passive_ZMJZ::PerformAction(
 #endif
 }
 
-void USkill_Passive_ZMJZ::OnSendAttack(const TMap<FGameplayTag, float>&)
+void USkill_Passive_ZMJZ::OnSendAttack(const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback)
 {
 	if (CharacterPtr)
 	{

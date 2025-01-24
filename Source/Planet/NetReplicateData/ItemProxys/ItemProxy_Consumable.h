@@ -30,7 +30,7 @@ struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
-class UHoldingItemsComponent;
+class UInventoryComponent;
 
 USTRUCT()
 struct PLANET_API FConsumableProxy :
@@ -43,7 +43,7 @@ public:
 
 	friend FSceneProxyContainer;
 	friend FProxy_FASI_Container;
-	friend UHoldingItemsComponent;
+	friend UInventoryComponent;
 
 	FConsumableProxy();
 

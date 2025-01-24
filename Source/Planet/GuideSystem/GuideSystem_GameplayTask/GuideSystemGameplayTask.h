@@ -46,5 +46,5 @@ protected:
 	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
 
 	FGuid TaskID;
-	
+
 };

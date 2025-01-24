@@ -23,7 +23,7 @@ class IPlanetControllerInterface;
 class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 
 struct FBasicProxy;
 struct FTableRowProxy;
@@ -93,7 +93,7 @@ struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
 
 	void RemoveItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
-	UHoldingItemsComponent* HoldingItemsComponentPtr = nullptr;
+	UInventoryComponent* HoldingItemsComponentPtr = nullptr;
 
 protected:
 

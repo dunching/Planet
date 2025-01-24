@@ -12,6 +12,8 @@
 #include "GE_CharacterInitail.h"
 #include "CharacterAttibutes.h"
 #include "AS_Character.h"
+#include "GroupSharedInfo.h"
+#include "TeamMatesHelperComponent.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -20,7 +22,7 @@ UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitia
 	PrimaryComponentTick.TickInterval = 1.f;
 
 	CharacterID = FGuid::NewGuid();
-	
+
 	SetIsReplicatedByDefault(true);
 }
 
@@ -123,11 +125,23 @@ float UCharacterAttributesComponent::GetRate() const
 	return Rate;
 }
 
+void UCharacterAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
+{
+	CharacterID = InCharacterID;
+}
+
+FGuid UCharacterAttributesComponent::GetCharacterID() const
+{
+	return CharacterID;
+}
+
 FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesComponent");
 
 void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_None);
 
 	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);
 	// DOREPLIFETIME(ThisClass, CharacterAttributeSetPtr);
@@ -184,7 +198,7 @@ ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 	{
 		if (auto CharacterPtr = Cast<ACharacterBase>(Iter))
 		{
-			if (CharacterPtr->GetCharacterAttributesComponent()->CharacterID == CharacterID)
+			if (CharacterPtr->GetCharacterAttributesComponent()->GetCharacterID() == CharacterID)
 			{
 				return CharacterPtr;
 			}
@@ -192,4 +206,25 @@ ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 	}
 
 	return nullptr;
+}
+
+void UCharacterAttributesComponent::OnRep_CharacterID()
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (PlayerCharacterPtr)
+		{
+			// 确认跟当前玩家的关系
+			const auto bIsMember = PlayerCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(
+				CharacterID);
+
+			auto CharacterPtr = GetOwner<FOwnerType>();
+			CharacterPtr->SetCampType(
+				bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+			);
+		}
+	}
+#endif
 }

@@ -36,6 +36,7 @@ struct FGameplayAbilityTargetData_TagModify;
 struct FGameplayAbilityTargetData;
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
+struct FReceivedEventModifyDataCallback;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
@@ -55,7 +56,7 @@ public:
 
 	using FMakedDamageDelegate_Deprecated = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
 
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(ACharacterBase*, const TMap<FGameplayTag, float>&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>;
 
 	UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer);
 
@@ -176,14 +177,11 @@ public:
 	// “受击”效果
 	void ExcuteAttackedEffect(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
-	FGameplayAbilitySpecHandle SendEventHandle;
-
-	FGameplayAbilitySpecHandle ReceivedEventHandle;
+	// FGameplayAbilitySpecHandle SendEventHandle;
+	//
+	// FGameplayAbilitySpecHandle ReceivedEventHandle;
 
 	FGameplayAbilitySpecHandle MoveToAttaclAreaHandle;
-
-	// 对“其他”角色造成的影响（伤害、控制）
-	FMakedDamageDelegate_Deprecated MakedDamageDelegate_Deprecated;
 
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;

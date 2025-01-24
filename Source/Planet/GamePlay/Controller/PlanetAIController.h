@@ -15,7 +15,7 @@ class UPlanetAbilitySystemComponent;
 struct FCharacterProxy;
 class ACharacterBase;
 class UCharacterAttributesComponent;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class AGroupSharedInfo;
@@ -45,7 +45,7 @@ public:
 
 	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
 
-	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
+	virtual UInventoryComponent* GetHoldingItemsComponent()const override;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;
 

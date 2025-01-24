@@ -7,7 +7,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameOptions.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 
 UScriptStruct* FGameplayAbilityTargetData_SkillBase_RegisterParam::GetScriptStruct() const
@@ -159,7 +159,7 @@ void USkill_Base::UpdateRegisterParam(const FGameplayEventData& GameplayEventDat
 			GameplayEventData.TargetData.Get(0));
 		if (GameplayAbilityTargetPtr)
 		{
-			SkillProxyPtr = CharacterPtr->GetHoldingItemsComponent()->
+			SkillProxyPtr = CharacterPtr->GetInventoryComponent()->
 			                              FindProxy_Skill(GameplayAbilityTargetPtr->ProxyID);
 		}
 	}

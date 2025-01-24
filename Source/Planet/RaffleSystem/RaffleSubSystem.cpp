@@ -7,7 +7,7 @@
 #include "Planet_Tools.h"
 #include "CharacterBase.h"
 #include "PlanetPlayerState.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "SceneProxyExtendInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
@@ -33,7 +33,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	}
 
 	const auto HoldItemPropertyRef =
-		CharacterPtr->GetHoldingItemsComponent();
+		CharacterPtr->GetInventoryComponent();
 
 	switch (RaffleType)
 	{
@@ -72,7 +72,7 @@ void URaffleSubSystem::SyncProxys2Player()const
 	{
 		return;
 	}
-	CharacterPtr->GetHoldingItemsComponent()->SyncPendingProxy(ApendingID);
+	CharacterPtr->GetInventoryComponent()->SyncPendingProxy(ApendingID);
 }
 
 bool URaffleSubSystem::RafflePermanent(int32 Count)const
@@ -125,7 +125,7 @@ void URaffleSubSystem::RafflePermanentComplete(
 	{
 		auto RowPtr = DataTable->FindRow<FTableRowProxy>(*Iter.ToString(), TEXT("GetProxy"));
 
-		CharacterPtr->GetHoldingItemsComponent()->AddProxy_Pending(Iter, 1, ApendingID);
+		CharacterPtr->GetInventoryComponent()->AddProxy_Pending(Iter, 1, ApendingID);
  
  		GetProxyAry.Add(SceneProxyExtendInfoMapPtr->GetTableRowProxy(Iter));
 	}
