@@ -18,7 +18,7 @@
 
 TSharedPtr<FWeaponSkillProxy> FWeaponProxy::GetWeaponSkill()
 {
-	return DynamicCastSharedPtr<FWeaponSkillProxy>(HoldingItemsComponentPtr->FindProxy_Skill(WeaponSkillID));
+	return DynamicCastSharedPtr<FWeaponSkillProxy>(InventoryComponentPtr->FindProxy_Skill(WeaponSkillID));
 }
 
 FWeaponProxy::FWeaponProxy()
@@ -70,8 +70,7 @@ void FWeaponProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProx
 	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 	}
@@ -91,8 +90,7 @@ void FWeaponProxy::Allocation()
 {
 	Super::Allocation();
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		GetWeaponSkill()->Allocation();
 	}
@@ -102,8 +100,7 @@ void FWeaponProxy::Allocation()
 void FWeaponProxy::UnAllocation()
 {
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		GetWeaponSkill()->UnAllocation();
 	}
@@ -136,8 +133,7 @@ void FWeaponProxy::ActiveWeapon()
 	else
 	{
 #if UE_EDITOR || UE_SERVER
-		auto ProxyCharacterPtr = GetOwnerCharacter();
-		if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 		{
 			// 添加武器给的属性词条
 			auto PropertyEntrysPtr = GetMainPropertyEntry();
@@ -167,9 +163,7 @@ void FWeaponProxy::ActiveWeapon()
 
 			FActorSpawnParameters SpawnParameters;
 
-			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
-
-			SpawnParameters.Owner = ProxyCharacterPtr;
+			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
 			ActivedWeaponPtr->SetWeaponProxy(GetID());
@@ -186,8 +180,7 @@ void FWeaponProxy::RetractputWeapon()
 	{
 		// 移除武器给的属性词条
 #if UE_EDITOR || UE_SERVER
-		auto ProxyCharacterPtr = GetOwnerCharacter();
-		if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 		{
 			auto AllocationCharacter = GetAllocationCharacter();
 			if (AllocationCharacter->GetNetMode() == NM_DedicatedServer)
@@ -205,8 +198,7 @@ void FWeaponProxy::RetractputWeapon()
 	}
 
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto AllocationCharacterPtr = GetAllocationCharacter();
 		AllocationCharacterPtr->SwitchAnimLink_Client(EAnimLinkClassType::kUnarmed);

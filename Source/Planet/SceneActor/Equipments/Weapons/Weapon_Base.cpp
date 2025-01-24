@@ -32,26 +32,26 @@ void AWeapon_Base::SetWeaponProxyImp_Implementation(ACharacterBase* AllocationCh
 
 void AWeapon_Base::SetWeaponProxy(const FGuid& InWeaponProxy_ID)
 {
-	UInventoryComponent* HoldingItemsComponentPtr = nullptr;
+	UInventoryComponent* InventoryComponentPtr = nullptr;
 
 	// 这里设置了 Owner。第一次掉取到的还是PC？
 	auto OwnerPtr = GetOwner<ACharacterBase>();
 	if (OwnerPtr)
 	{
-		HoldingItemsComponentPtr = OwnerPtr->GetInventoryComponent();
+		InventoryComponentPtr = OwnerPtr->GetInventoryComponent();
 	}
 	else
 	{
 		auto OwnerPCPtr = GetOwner<APlanetPlayerController>();
 		if (OwnerPCPtr)
 		{
-			HoldingItemsComponentPtr = OwnerPCPtr->GetHoldingItemsComponent();
+			InventoryComponentPtr = OwnerPCPtr->GetHoldingItemsComponent();
 		}
 	}
 
-	if (HoldingItemsComponentPtr)
+	if (InventoryComponentPtr)
 	{
-		WeaponProxyPtr = HoldingItemsComponentPtr->FindProxy_Weapon(InWeaponProxy_ID);
+		WeaponProxyPtr = InventoryComponentPtr->FindProxy_Weapon(InWeaponProxy_ID);
 		if (WeaponProxyPtr)
 		{
 #if UE_EDITOR || UE_SERVER

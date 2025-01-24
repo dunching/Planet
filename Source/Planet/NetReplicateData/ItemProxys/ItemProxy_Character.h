@@ -128,9 +128,9 @@ public:
 	);
 
 	TMap<FGameplayTag, FCharacterSocket>GetSockets()const;;
-	
-	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
+	TWeakObjectPtr<FPawnType>GetCharacterActor()const;
+	
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 
 	FString Title;
@@ -145,6 +145,8 @@ protected:
 	
 	TMap<FGameplayTag, FCharacterSocket>TeammateConfigureMap;
 	
+	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
+
 };
 
 template<>

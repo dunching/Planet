@@ -13,6 +13,7 @@
 #include "CharacterAttibutes.h"
 #include "AS_Character.h"
 #include "GroupSharedInfo.h"
+#include "LogWriter.h"
 #include "TeamMatesHelperComponent.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
@@ -141,7 +142,7 @@ void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_AutonomousOnly);
 
 	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);
 	// DOREPLIFETIME(ThisClass, CharacterAttributeSetPtr);
@@ -206,6 +207,11 @@ ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 	}
 
 	return nullptr;
+}
+
+void UCharacterAttributesComponent::OnRep_GetCharacterProxyID()
+{
+	PRINTINVOKEINFO();
 }
 
 void UCharacterAttributesComponent::OnRep_CharacterID()

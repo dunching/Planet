@@ -65,7 +65,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	);
 	AbilitySystemComponentPtr->AddSpawnedAttribute(CreateDefaultSubobject<UAS_Character>(
 		TEXT("CharacterAttributes1")
-		));
+	));
 
 	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(
 		UTalentAllocationComponent::ComponentName);
@@ -96,11 +96,11 @@ void ACharacterBase::BeginPlay()
 
 	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 		CharacterAttributeSetPtr->GetHPAttribute()
-		).AddUObject(this, &ThisClass::OnHPChanged);
+	).AddUObject(this, &ThisClass::OnHPChanged);
 
 	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 		CharacterAttributeSetPtr->GetMoveSpeedAttribute()
-		).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
+	).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
@@ -116,7 +116,7 @@ void ACharacterBase::BeginPlay()
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
-	
+
 	OnMoveSpeedChangedImp(CharacterAttributeSetPtr->GetMoveSpeed());
 }
 
@@ -266,7 +266,7 @@ UCharacterTitleComponent* ACharacterBase::GetCharacterTitleComponent() const
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
-	return GetInventoryComponent()->CharacterProxySPtr;
+	return GetInventoryComponent()->FindProxy_Character(GetCharacterAttributesComponent()->GetCharacterID());
 }
 
 void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)
@@ -358,10 +358,17 @@ void ACharacterBase::SpawnDefaultController()
 void ACharacterBase::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
 	OnInitaliedGroupSharedInfo();
-	
+
 	auto NewController = GetController();
 
-	GetInventoryComponent()->InitialOwnerCharacterProxy(this);
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		auto ProxyCharacterSPtr = GetInventoryComponent()->InitialOwnerCharacterProxy(this);
+
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->OwnerCharacterProxyPtr = ProxyCharacterSPtr;
+	}
+#endif
 
 	ForEachComponent(false, [this](UActorComponent* ComponentPtr)
 	{
@@ -450,7 +457,6 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 
 void ACharacterBase::OnDeathing(const FGameplayTag Tag, int32 Count)
 {
-
 }
 
 void ACharacterBase::DoDeathing()

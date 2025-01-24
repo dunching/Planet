@@ -11,6 +11,7 @@
 #include "ConversationComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
+#include "InventoryComponent.h"
 #include "Planet_Tools.h"
 
 FConsumableProxy::FConsumableProxy()
@@ -40,8 +41,7 @@ void FConsumableProxy::UpdateByRemote(const TSharedPtr<FConsumableProxy>& Remote
 bool FConsumableProxy::Active()
 {
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto GameplayAbilityTargetPtr =
 			new FGameplayAbilityTargetData_Consumable;
@@ -59,13 +59,13 @@ bool FConsumableProxy::Active()
 		auto GameplayEventData = MakeShared<FGameplayEventData>();
 		GameplayEventData->TargetData.Add(GameplayAbilityTargetPtr);
 
-		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
+		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,
 			*GameplayEventData
 		);
 
-		auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
+		auto ASCPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
 		ASCPtr->GiveAbilityAndActivateOnce(
 			AbilitySpec
 		);
@@ -104,7 +104,7 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 
 	// 独立冷却
 	{
-		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
 		auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
 		GameplayTagContainer.AddTag(GetProxyType());
@@ -128,7 +128,7 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 
 	// 公共冷却
 	{
-		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetGroupSharedInfo()->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = InventoryComponentPtr->GetOwner<AGroupSharedInfo>()->GetAbilitySystemComponent();
 		auto SkillCommonCooldownInfoMap = GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 		for (const auto Iter : SkillCommonCooldownInfoMap)
 		{
@@ -177,7 +177,7 @@ bool FConsumableProxy::CheckCooldown() const
 {
 	// 独立冷却
 	{
-		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
 		auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_CD);
 		GameplayTagContainer.AddTag(GetProxyType());
@@ -192,7 +192,7 @@ bool FConsumableProxy::CheckCooldown() const
 	}
 	// 公共冷却
 	{
-		auto AbilitySystemComponentPtr = GetOwnerCharacter()->GetGroupSharedInfo()->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = InventoryComponentPtr->GetOwner<AGroupSharedInfo>()->GetAbilitySystemComponent();
 		auto SkillCommonCooldownInfoMap = GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 		for (const auto Iter : SkillCommonCooldownInfoMap)
 		{

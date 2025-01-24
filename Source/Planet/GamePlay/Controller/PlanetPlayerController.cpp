@@ -346,6 +346,12 @@ void APlanetPlayerController::OnRep_PlayerState()
 
 void APlanetPlayerController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+	}
+#endif
+
 	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
 	{
 		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);

@@ -74,7 +74,7 @@ void UAIComponent::InitialAllocationsRowName()
 			auto OnwerActorPtr = GetOwner<FOwnerType>();
 			auto TableRowProxy_CharacterInfoPtr =
 				USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_AICharacter_Allocation(AI_Allocation_RowName);
-			auto HoldingItemsComponentPtr = OnwerActorPtr->GetInventoryComponent();
+			auto InventoryComponentPtr = OnwerActorPtr->GetInventoryComponent();
 			if (TableRowProxy_CharacterInfoPtr)
 			{
 				// 武器
@@ -82,17 +82,17 @@ void UAIComponent::InitialAllocationsRowName()
 					{
 						if (TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
 						{
-							auto WeaponProxyPtr = HoldingItemsComponentPtr->AddProxy_Weapon(
+							auto WeaponProxyPtr = InventoryComponentPtr->AddProxy_Weapon(
 								TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo);
 							if (WeaponProxyPtr)
 							{
 								FCharacterSocket SkillsSocketInfo;
 								SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
 								SkillsSocketInfo.UpdateProxy(
-									HoldingItemsComponentPtr->AddProxy_Weapon(
+									InventoryComponentPtr->AddProxy_Weapon(
 										TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo));;
 
-								HoldingItemsComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
+								InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
 							}
 						}
 					}
@@ -103,7 +103,7 @@ void UAIComponent::InitialAllocationsRowName()
 				{
 					if (TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
 					{
-						auto SkillProxyPtr = HoldingItemsComponentPtr->AddProxy_Skill(
+						auto SkillProxyPtr = InventoryComponentPtr->AddProxy_Skill(
 							TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1);
 						if (SkillProxyPtr)
 						{
@@ -111,7 +111,7 @@ void UAIComponent::InitialAllocationsRowName()
 
 							SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
 
-							HoldingItemsComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
+							InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
 						}
 					}
 

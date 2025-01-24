@@ -38,39 +38,39 @@ void FProxy_FASI::PostReplicatedAdd(const struct FProxy_FASI_Container& InArrayS
 
 	if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 	{
-		//		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		//		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->AddProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->AddProxy_SyncHelper(ProxySPtr);
 	}
 }
 
@@ -82,39 +82,39 @@ void FProxy_FASI::PostReplicatedChange(const struct FProxy_FASI_Container& InArr
 
 	if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 	{
-		//		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		//		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
-		ProxySPtr = InArraySerializer.HoldingItemsComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
+		ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr);
 	}
 }
 
@@ -272,7 +272,7 @@ bool FProxy_FASI_Container::NetDeltaSerialize(FNetDeltaSerializeInfo& DeltaParms
 void FProxy_FASI_Container::AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 {
 #if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (ProxySPtr)
 		{
@@ -291,7 +291,7 @@ void FProxy_FASI_Container::AddItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 void FProxy_FASI_Container::UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 {
 #if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (ProxySPtr)
 		{
@@ -314,7 +314,7 @@ void FProxy_FASI_Container::UpdateItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 void FProxy_FASI_Container::UpdateItem(const FGuid& Proxy_ID)
 {
 #if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		for (int32 Index = 0; Index < Items.Num(); Index++)
 		{
@@ -332,7 +332,7 @@ void FProxy_FASI_Container::UpdateItem(const FGuid& Proxy_ID)
 void FProxy_FASI_Container::RemoveItem(const TSharedPtr<FBasicProxy>& ProxySPtr)
 {
 #if UE_EDITOR || UE_SERVER
-	if (HoldingItemsComponentPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		for (int32 Index = 0; Index < Items.Num(); ++Index)
 		{

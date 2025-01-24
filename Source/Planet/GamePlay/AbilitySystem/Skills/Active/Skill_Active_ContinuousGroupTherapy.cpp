@@ -124,10 +124,10 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
-			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterProxyPtr->ProxyCharacterPtr.Get());
+			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterProxyPtr->GetCharacterActor().Get());
 			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				TeammatesSet.Add(Iter->ProxyCharacterPtr.Get());
+				TeammatesSet.Add(Iter->GetCharacterActor().Get());
 			}
 		}
 	}

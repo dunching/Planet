@@ -40,11 +40,11 @@ void USkill_Active_Switch_Test::PerformAction(
 
 	TMap<FGameplayTag, FCharacterSocket>CanActiveSocketMap;
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 	for (const auto& Iter : Ary)
 	{
 		auto SocketSPtr = ProxyProcessComponentPtr->FindSocket(Iter.ActiveSocketTag);
-		auto TempSocketSPtr = HoldingItemsComponentPtr->FindProxy_BySocket(SocketSPtr);
+		auto TempSocketSPtr = InventoryComponentPtr->FindProxy_BySocket(SocketSPtr);
 		if (
 			TempSocketSPtr &&
 			(TempSocketSPtr == SkillProxyPtr)

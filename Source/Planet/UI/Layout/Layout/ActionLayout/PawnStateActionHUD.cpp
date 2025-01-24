@@ -341,10 +341,10 @@ void UPawnStateActionHUD::InitialTalentUI()
 		return;
 	}
 	const auto& SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-	const auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+	const auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 	for (auto Iter : SkillsMap)
 	{
-		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy_BySocket(Iter.Value);
+		auto ProxySPtr = InventoryComponentPtr->FindProxy_BySocket(Iter.Value);
 		bool bIsGiveTalentPassive = false;
 		if (
 			ProxySPtr

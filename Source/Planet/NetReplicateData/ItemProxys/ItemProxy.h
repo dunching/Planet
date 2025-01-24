@@ -132,11 +132,6 @@ public:
 
 	FOnAllocationCharacterProxyChanged OnAllocationCharacterProxyChanged;
 
-	ACharacterBase* GetOwnerCharacter()const;
-
-	// 这个物品所在的对象
-	TWeakPtr<FCharacterProxy> GetOwnerCharacterProxy()const;
-
 	void Update2Client();
 
 protected:
@@ -148,11 +143,8 @@ protected:
 
 	IDType ID;
 
-	// 
-	IDType OwnerCharacter_ID;
-
 	// Root组件,不为空
-	UInventoryComponent* HoldingItemsComponentPtr = nullptr;
+	UInventoryComponent* InventoryComponentPtr = nullptr;
 
 private:
 

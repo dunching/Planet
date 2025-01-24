@@ -73,6 +73,8 @@ protected:
 
 	virtual void OnRep_GroupSharedInfoChanged() override;
 
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+
 	virtual void InitialGroupSharedInfo();
 
 #if WITH_EDITORONLY_DATA

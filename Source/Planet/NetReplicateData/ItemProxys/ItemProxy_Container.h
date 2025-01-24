@@ -93,7 +93,7 @@ struct PLANET_API FProxy_FASI_Container : public FFastArraySerializer
 
 	void RemoveItem(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
-	UInventoryComponent* HoldingItemsComponentPtr = nullptr;
+	UInventoryComponent* InventoryComponentPtr = nullptr;
 
 protected:
 

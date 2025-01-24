@@ -136,14 +136,14 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 	const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 )
 {
-	auto CharacterPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr;
+	auto CharacterPtr = PlayerCharacterProxyPtr->GetCharacterActor();
 	if (!CharacterPtr.IsValid())
 	{
 		return;
 	}
 
 	auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 
 	FCharacterSocket FirstWeaponSocketInfoSPtr;
 	FCharacterSocket SecondWeaponSocketInfoSPtr;
@@ -157,7 +157,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 			{
 				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
-					HoldingItemsComponentPtr->FindProxy_BySocket(FirstWeaponSocketInfoSPtr)
+					InventoryComponentPtr->FindProxy_BySocket(FirstWeaponSocketInfoSPtr)
 				);
 				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
@@ -171,7 +171,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 			{
 				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
-					HoldingItemsComponentPtr->FindProxy_BySocket(SecondWeaponSocketInfoSPtr)
+					InventoryComponentPtr->FindProxy_BySocket(SecondWeaponSocketInfoSPtr)
 				);
 				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
@@ -196,14 +196,14 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 			FAllocationSkillsMenu::Get().TalentPassivSkill,
 		};
 
-		auto CharacterPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr;
+		auto CharacterPtr = PlayerCharacterProxyPtr->GetCharacterActor();
 		if (!CharacterPtr.IsValid())
 		{
 			return;
 		}
 
 		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-		auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+		auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 		for (const auto& Iter : Ary)
 		{
 			auto IconPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter));
@@ -213,7 +213,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 
 				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
-					HoldingItemsComponentPtr->FindProxy_BySocket(Result)
+					InventoryComponentPtr->FindProxy_BySocket(Result)
 				);
 				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
@@ -231,14 +231,14 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 		FAllocationSkillsMenu::Get().Consumable4,
 	};
 
-	auto CharacterPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr;
+	auto CharacterPtr = PlayerCharacterProxyPtr->GetCharacterActor();
 	if (!CharacterPtr.IsValid())
 	{
 		return;
 	}
 
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
-	auto HoldingItemsComponentPtr = PlayerCharacterProxyPtr->ProxyCharacterPtr->GetInventoryComponent();
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 
 	for (const auto& Iter : Ary)
 	{
@@ -249,7 +249,7 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 
 			IconPtr->bPaseInvokeOnResetProxyEvent = true;
 			IconPtr->ResetToolUIByData(
-				HoldingItemsComponentPtr->FindProxy_BySocket(Result)
+				InventoryComponentPtr->FindProxy_BySocket(Result)
 			);
 			IconPtr->bPaseInvokeOnResetProxyEvent = false;
 		}

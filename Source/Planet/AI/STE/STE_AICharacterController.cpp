@@ -87,7 +87,7 @@ void USTE_AICharacterController::OnTeamChanged()
 	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamHelperSPtr)
 	{
-		LeaderCharacterPtr = TeamHelperSPtr->OwnerCharacterProxyPtr->ProxyCharacterPtr.Get();
+		LeaderCharacterPtr = TeamHelperSPtr->OwnerCharacterProxyPtr->GetCharacterActor().Get();
 
 		TeammateOptionChangedDelegate = TeamHelperSPtr->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeamOptionChanged, this, std::placeholders::_1)

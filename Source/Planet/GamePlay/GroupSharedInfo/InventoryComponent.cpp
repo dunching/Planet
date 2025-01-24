@@ -1,6 +1,8 @@
 #include "InventoryComponent.h"
 
 #include <GameFramework/PlayerState.h>
+
+#include "CharacterAttributesComponent.h"
 #include "Net/UnrealNetwork.h"
 
 #include "GameplayTagsLibrary.h"
@@ -26,7 +28,7 @@ void UInventoryComponent::InitializeComponent()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
-		Proxy_Container.HoldingItemsComponentPtr = this;
+		Proxy_Container.InventoryComponentPtr = this;
 	}
 }
 
@@ -46,16 +48,10 @@ void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ThisClass, Proxy_Container, COND_None);
-	DOREPLIFETIME_CONDITION(ThisClass, CharacterProxyID_Container, COND_InitialOnly);
 }
 
 void UInventoryComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
-}
-
-void UInventoryComponent::OnRep_GetCharacterProxyID()
-{
-	CharacterProxySPtr = FindProxy_Character(CharacterProxyID_Container);
 }
 
 void UInventoryComponent::UpdateSocket_Server_Implementation(
@@ -109,7 +105,7 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 	TSharedPtr<FBasicProxy> Result;
 
 	const auto ProxyType = ProxySPtr->GetProxyType();
-	ProxySPtr->HoldingItemsComponentPtr = this;
+	ProxySPtr->InventoryComponentPtr = this;
 
 	if (Result = FindProxy(ProxySPtr->GetID()))
 	{
@@ -237,7 +233,7 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(CharacterProxySPtr->GetID()));
+		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(ProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
@@ -277,8 +273,7 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::AddProxy_Weapon(const FGameplayTag
 #endif
 
 	ResultPtr->ProxyType = ProxyType;
-	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-	ResultPtr->HoldingItemsComponentPtr = this;
+	ResultPtr->InventoryComponentPtr = this;
 	ResultPtr->WeaponSkillID =
 		AddProxy_Skill(ResultPtr->GetTableRowProxy_WeaponExtendInfo()->WeaponSkillProxyType)->GetID();
 
@@ -299,7 +294,6 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::Update_Weapon(const TSharedPtr<FWe
 #if WITH_EDITOR
 #endif
 
-	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
 
 	SceneToolsAry.Add(ResultPtr);
 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -351,8 +345,7 @@ TSharedPtr<FSkillProxy> UInventoryComponent::AddProxy_Skill(const FGameplayTag& 
 
 	ResultPtr->InitialProxy(ProxyType);
 
-	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-	ResultPtr->HoldingItemsComponentPtr = this;
+	ResultPtr->InventoryComponentPtr = this;
 
 	SceneToolsAry.Add(ResultPtr);
 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -411,8 +404,7 @@ TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(const FGam
 
 	ResultPtr->Num = Num;
 	ResultPtr->ProxyType = ProxyType;
-	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-	ResultPtr->HoldingItemsComponentPtr = this;
+	ResultPtr->InventoryComponentPtr = this;
 
 	SceneToolsAry.Add(ResultPtr);
 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -445,8 +437,7 @@ TSharedPtr<FToolProxy> UInventoryComponent::AddProxy_ToolProxy(const FGameplayTa
 	ResultPtr->InitialProxy(ProxyType);
 
 	ResultPtr->ProxyType = ProxyType;
-	ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-	ResultPtr->HoldingItemsComponentPtr = this;
+	ResultPtr->InventoryComponentPtr = this;
 
 	SceneToolsAry.Add(ResultPtr);
 	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -479,8 +470,7 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(const FGameplayTag& Pr
 
 		ResultPtr->InitialProxy(ProxyType);
 
-		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-		ResultPtr->HoldingItemsComponentPtr = this;
+		ResultPtr->InventoryComponentPtr = this;
 		ResultPtr->Num = Num;
 
 		SceneToolsAry.Add(ResultPtr);
@@ -551,11 +541,6 @@ TArray<TSharedPtr<FCharacterProxy>> UInventoryComponent::GetCharacterProxyAry() 
 	return Result;
 }
 
-TSharedPtr<FCharacterProxy> UInventoryComponent::GetOwnerCharacterProxy() const
-{
-	return CharacterProxySPtr;
-}
-
 void UInventoryComponent::UpdateSocket(
 	const TSharedPtr<FCharacterProxy>& InCharacterProxySPtr,
 	const FCharacterSocket& Socket
@@ -588,11 +573,6 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::FindProxy_Character(const IDTyp
 		return DynamicCastSharedPtr<FCharacterProxy>(SceneMetaMap[ID]);
 	}
 
-	if (CharacterProxySPtr && (CharacterProxySPtr->GetID() == ID))
-	{
-		return CharacterProxySPtr;
-	}
-
 	return nullptr;
 }
 
@@ -620,7 +600,7 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy(const FGameplayTag& ProxyT
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		ResultSPtr = AddProxy_Consumable(ProxyType,Num);
+		ResultSPtr = AddProxy_Consumable(ProxyType, Num);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
@@ -668,7 +648,7 @@ void UInventoryComponent::SetAllocationCharacterProxy_Server_Implementation(
 	if (AllocationCharacterSPtr)
 	{
 		const auto PrevSocketTag = ProxySPtr->GetCurrentSocketTag();
-		auto CharacterSocket= AllocationCharacterSPtr->FindSocket(PrevSocketTag);
+		auto CharacterSocket = AllocationCharacterSPtr->FindSocket(PrevSocketTag);
 		auto PrevProxySPtr = FindProxy(CharacterSocket.AllocationedProxyID);
 		if (PrevProxySPtr)
 		{
@@ -701,30 +681,16 @@ void UInventoryComponent::SetAllocationCharacterProxy_Server_Implementation(
 
 TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACharacterBase* OwnerCharacterPtr)
 {
-	Proxy_Container.HoldingItemsComponentPtr = this;
+	Proxy_Container.InventoryComponentPtr = this;
 
-#if UE_EDITOR
-	if (GetNetMode() == NM_Client)
-	{
-		CharacterProxySPtr = MakeShared<FCharacterProxy>(CharacterProxyID_Container);
-	}
-	else
-	{
-		CharacterProxySPtr = MakeShared<FCharacterProxy>();
-	}
-#elif UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		CharacterProxySPtr = MakeShared<FCharacterProxy>(CharacterProxyID_Container);
-	}
-#else
-	CharacterProxySPtr = MakeShared<FCharacterProxy>();
-#endif
+	// 使用指定的ID
+	auto CharacterProxySPtr = MakeShared<FCharacterProxy>(
+		OwnerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterID()
+		);
 
-	CharacterProxySPtr->InitialProxy(UGameplayTagsLibrary::Proxy_Character_Player);
+	CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
 	CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
-	CharacterProxySPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-	CharacterProxySPtr->HoldingItemsComponentPtr = this;
+	CharacterProxySPtr->InventoryComponentPtr = this;
 
 	SceneToolsAry.Add(CharacterProxySPtr);
 	SceneMetaMap.Add(CharacterProxySPtr->ID, CharacterProxySPtr);
@@ -734,7 +700,6 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACha
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		CharacterProxyID_Container = CharacterProxySPtr->ID;
 	}
 #endif
 
@@ -756,8 +721,7 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::AddProxy_Character(const FGamep
 
 		ResultPtr->InitialProxy(ProxyType);
 
-		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-		ResultPtr->HoldingItemsComponentPtr = this;
+		ResultPtr->InventoryComponentPtr = this;
 
 		SceneToolsAry.Add(ResultPtr);
 		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -770,8 +734,7 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::AddProxy_Character(const FGamep
 
 		ResultPtr->InitialProxy(ProxyType);
 
-		ResultPtr->OwnerCharacter_ID = CharacterProxySPtr->GetID();
-		ResultPtr->HoldingItemsComponentPtr = this;
+		ResultPtr->InventoryComponentPtr = this;
 
 		SceneToolsAry.Add(ResultPtr);
 		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);

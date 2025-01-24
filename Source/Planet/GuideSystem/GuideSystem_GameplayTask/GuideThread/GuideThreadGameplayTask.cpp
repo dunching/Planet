@@ -5,6 +5,7 @@
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "ConversationLayout.h"
+#include "EventSubjectComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "GuideActor.h"
 #include "GuideInteractionActor.h"
@@ -373,7 +374,7 @@ void UGameplayTask_Guide_DefeatEnemy::Activate()
 {
 	Super::Activate();
 
-	DelegateHandle = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
+	DelegateHandle = PlayerCharacterPtr->GetController<APlanetPlayerController>()->GetEventSubjectComponent()->MakedDamageDelegate.AddCallback(
 		std::bind(&ThisClass::OnActiveGEAddedDelegateToSelf, this, std::placeholders::_1)
 	);
 }
@@ -409,14 +410,20 @@ void UGameplayTask_Guide_DefeatEnemy::OnActiveGEAddedDelegateToSelf(
 	const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback
 )
 {
-	if (ReceivedEventModifyDataCallback.bIsDeath)
+	if (
+		ReceivedEventModifyDataCallback.TargetCharacterPtr &&
+		ReceivedEventModifyDataCallback.TargetCharacterPtr->GetCharacterProxy()->GetProxyType().MatchesTag(EnemyType)
+		)
 	{
-		CurrentNum++;
-		UpdateDescription();
-		if (CurrentNum >= Num)
+		if (ReceivedEventModifyDataCallback.bIsDeath)
 		{
-			StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
-			EndTask();
+			CurrentNum++;
+			UpdateDescription();
+			if (CurrentNum >= Num)
+			{
+				StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+				EndTask();
+			}
 		}
 	}
 }

@@ -55,9 +55,9 @@ void UBackpackMenu::SyncData()
 TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
 {
 	TArray<TSharedPtr<FBasicProxy>> Result;
-	if (CurrentProxyPtr)
+	if (CurrentProxyPtr && CurrentProxyPtr->GetCharacterActor().IsValid())
 	{
-		 Result = CurrentProxyPtr->GetOwnerCharacter()->GetInventoryComponent()->GetProxys();
+		 Result = CurrentProxyPtr->GetCharacterActor()->GetInventoryComponent()->GetProxys();
 	}
 	return Result;
 }

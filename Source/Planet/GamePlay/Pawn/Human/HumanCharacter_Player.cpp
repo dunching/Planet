@@ -112,9 +112,6 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		// 显示
-		Cast<AMainHUD>(GetController<APlanetPlayerController>()->MyHUD)->InitalHUD();
-
 		// 在SetPawn之后调用
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
 			[this](auto NewProcessor)
@@ -125,6 +122,19 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 		// 
 		UGuideSubSystem::GetInstance()->InitializeMainLine();
 		UGuideSubSystem::GetInstance()->ActiveMainLine();
+	}
+#endif
+}
+
+void AHumanCharacter_Player::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+	Super::OnGroupSharedInfoReady(NewGroupSharedInfoPtr);
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// 显示
+		Cast<AMainHUD>(GetController<APlanetPlayerController>()->MyHUD)->InitalHUD();
 	}
 #endif
 }

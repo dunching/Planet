@@ -108,13 +108,13 @@ bool UProxyProcessComponent::ActiveActionImp(
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	const auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+	const auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
 
 	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
 	if (CanActiveSocketMap.Contains(SocketTag))
 	{
-		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
 		if (ProxySPtr)
 		{
 			return ProxySPtr->Active();
@@ -204,11 +204,9 @@ void UProxyProcessComponent::GetWeaponSocket(
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
-	auto OwnerCharacterProxyPtr = HoldingItemsComponentPtr->GetOwnerCharacterProxy();
-	if (OwnerCharacterProxyPtr)
+	if (CharacterPtr)
 	{
-		OwnerCharacterProxyPtr->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
+		CharacterPtr->GetCharacterProxy()->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 }
 
@@ -219,15 +217,15 @@ void UProxyProcessComponent::GetWeaponProxy(
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 
 	FCharacterSocket FirstWeaponSocketInfoSPtr;
 	FCharacterSocket SecondWeaponSocketInfoSPtr;
 	GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	FirstWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(
-		HoldingItemsComponentPtr->FindProxy_BySocket(FirstWeaponSocketInfoSPtr));
+		InventoryComponentPtr->FindProxy_BySocket(FirstWeaponSocketInfoSPtr));
 	SecondWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(
-		HoldingItemsComponentPtr->FindProxy_BySocket(SecondWeaponSocketInfoSPtr));
+		InventoryComponentPtr->FindProxy_BySocket(SecondWeaponSocketInfoSPtr));
 }
 
 TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::GetWeaponSkillByType(const FGameplayTag& TypeTag)
@@ -263,12 +261,12 @@ TSharedPtr<FWeaponProxy> UProxyProcessComponent::FindWeaponSocket(const FGamepla
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 	auto OwnerCharacterProxyPtr = CharacterPtr->GetCharacterProxy();
 	if (OwnerCharacterProxyPtr)
 	{
 		auto Socket = OwnerCharacterProxyPtr->FindSocket(SocketTag);
-		return DynamicCastSharedPtr<FWeaponProxy>(HoldingItemsComponentPtr->FindProxy_BySocket(Socket));
+		return DynamicCastSharedPtr<FWeaponProxy>(InventoryComponentPtr->FindProxy_BySocket(Socket));
 	}
 
 	return nullptr;
@@ -405,22 +403,14 @@ TMap<FGameplayTag, FCharacterSocket> UProxyProcessComponent::GetAllSocket() cons
 
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
-	auto OwnerCharacterProxyPtr = HoldingItemsComponentPtr->GetOwnerCharacterProxy();
-	if (OwnerCharacterProxyPtr)
-	{
-		Result = OwnerCharacterProxyPtr->GetSockets();
-	}
-	return Result;
+	return  CharacterPtr->GetCharacterProxy()->GetSockets();
 }
 
 FCharacterSocket UProxyProcessComponent::FindSocket(const FGameplayTag& Tag) const
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
-
-	return HoldingItemsComponentPtr->GetOwnerCharacterProxy()->FindSocket(Tag);
+	return CharacterPtr->GetCharacterProxy()->FindSocket(Tag);
 }
 
 void UProxyProcessComponent::UpdateCanbeActiveSkills()
@@ -484,9 +474,7 @@ FCharacterSocket UProxyProcessComponent::FindActiveSkillByType(const FGameplayTa
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
-
-	return HoldingItemsComponentPtr->GetOwnerCharacterProxy()->FindSocketByType(TypeTag);
+	return CharacterPtr->GetCharacterProxy()->FindSocketByType(TypeTag);
 }
 
 void UProxyProcessComponent::Add(const FCharacterSocket& Socket)
@@ -516,13 +504,13 @@ void UProxyProcessComponent::Cancel(const FGameplayTag& SocketTag)
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	const auto HoldingItemsComponentPtr = CharacterPtr->GetInventoryComponent();
+	const auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
 
 	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
 	if (CanActiveSocketMap.Contains(SocketTag))
 	{
-		auto ProxySPtr = HoldingItemsComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
 		if (ProxySPtr)
 		{
 			ProxySPtr->Cancel();

@@ -89,8 +89,7 @@ void FSkillProxy::UnAllocation()
 void FSkillProxy::RegisterSkill()
 {
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;
 
@@ -106,7 +105,7 @@ void FSkillProxy::RegisterSkill()
 		FGameplayEventData GameplayEventData;
 		GameplayEventData.TargetData.Add(GameplayAbilityTargetDataPtr);
 
-		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
+		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,
@@ -120,12 +119,11 @@ void FSkillProxy::RegisterSkill()
 void FSkillProxy::UnRegisterSkill()
 {
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (GetAllocationCharacterProxy().IsValid())
 		{
-			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
+			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 			if (AllocationCharacter.IsValid())
 			{
@@ -144,7 +142,7 @@ void FSkillProxy::UnRegisterSkill()
 TArray<USkill_Base*> FSkillProxy::GetGAInstAry()const
 {
 	TArray<USkill_Base*>ResultAry;
-	auto ProxyCharacterPtr = GetOwnerCharacter();
+	auto ProxyCharacterPtr = GetAllocationCharacter();
 	auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
 	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
 	if (GameplayAbilitySpecPtr)
@@ -157,7 +155,7 @@ TArray<USkill_Base*> FSkillProxy::GetGAInstAry()const
 
 USkill_Base* FSkillProxy::GetGAInst()const
 {
-	auto ProxyCharacterPtr = GetOwnerCharacter();
+	auto ProxyCharacterPtr = GetAllocationCharacter();
 	auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
 	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
 	if (GameplayAbilitySpecPtr)
@@ -225,7 +223,6 @@ bool FActiveSkillProxy::CanActive() const
 bool FActiveSkillProxy::Active()
 {
 	// #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
 	// 	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
@@ -234,7 +231,7 @@ bool FActiveSkillProxy::Active()
 			return false;
 		}
 
-		auto ASCPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
+		auto ASCPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
 
 		// 需要特殊参数的
 		if (
@@ -278,9 +275,6 @@ bool FActiveSkillProxy::Active()
 				auto GameplayAbilityTargetPtr =
 					new FGameplayAbilityTargetData_ActiveSkill_ActiveParam;
 
-				GameplayAbilityTargetPtr->bIsAutoContinue =
-					ProxyCharacterPtr->GetRemoteRole() == ROLE_AutonomousProxy ? false : true;
-
 				FGameplayEventData Payload;
 				Payload.TargetData.Add(GameplayAbilityTargetPtr);
 
@@ -305,13 +299,13 @@ void FActiveSkillProxy::Cancel()
 
 bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
-	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
 	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
 	);
 
 	if (!GameplayEffectHandleAry.IsEmpty())
 	{
-		auto GameplayEffectPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent()->GetActiveGameplayEffect(
+		auto GameplayEffectPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->GetActiveGameplayEffect(
 		GameplayEffectHandleAry[0]
 		);
 
@@ -328,7 +322,7 @@ bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& Re
 
 bool FActiveSkillProxy::CheckCooldown() const
 {
-	const auto GameplayEffectHandleAry = GetOwnerCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
 	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
 	);
 
@@ -386,8 +380,7 @@ void FPassiveSkillProxy::Allocation()
 	Super::Allocation();
 
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto AllocationCharacter = GetAllocationCharacter();
 		// 词条
@@ -414,8 +407,7 @@ void FPassiveSkillProxy::Allocation()
 void FPassiveSkillProxy::UnAllocation()
 {
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto AllocationCharacter = GetAllocationCharacter();
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ClearData2Self(
@@ -466,8 +458,7 @@ void FWeaponSkillProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacte
 bool FWeaponSkillProxy::Active()
 {
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto InGaInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
 		if (!InGaInsPtr)
@@ -492,7 +483,7 @@ bool FWeaponSkillProxy::Active()
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
 		}
 
-		auto ASCPtr = GetOwnerCharacter()->GetCharacterAbilitySystemComponent();
+		auto ASCPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
 
 		return ASCPtr->TriggerAbilityFromGameplayEvent(
 			InGaInsPtr->GetCurrentAbilitySpecHandle(),
@@ -559,8 +550,7 @@ TSubclassOf<USkill_Base> FWeaponSkillProxy::GetSkillClass() const
 void FWeaponSkillProxy::RegisterSkill()
 {
 #if UE_EDITOR || UE_SERVER
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (ProxyCharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		FGameplayAbilityTargetData_SkillBase_RegisterParam* GameplayAbilityTargetDataPtr = nullptr;
 		// 需要特殊参数的
@@ -592,7 +582,7 @@ void FWeaponSkillProxy::RegisterSkill()
 		auto GameplayEventData = MakeShared<FGameplayEventData>();
 		GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
 
-		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr;
+		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,

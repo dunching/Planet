@@ -52,7 +52,6 @@ bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 {
 	Ar << ProxyType;
 	Ar << ID;
-	Ar << OwnerCharacter_ID;
 
 	return true;
 }
@@ -69,7 +68,6 @@ void FBasicProxy::InitialProxy(const FGameplayTag& InProxyType)
 void FBasicProxy::UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr)
 {
 	ID = RemoteSPtr->ID;
-	OwnerCharacter_ID = RemoteSPtr->OwnerCharacter_ID;
 	ProxyType = RemoteSPtr->ProxyType;
 }
 
@@ -122,17 +120,7 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 
 void FBasicProxy::Update2Client()
 {
-	HoldingItemsComponentPtr->Proxy_Container.UpdateItem(GetID());
-}
-
-ACharacterBase* FBasicProxy::GetOwnerCharacter() const
-{
-	return GetOwnerCharacterProxy().Pin()->ProxyCharacterPtr.Get();
-}
-
-TWeakPtr<FCharacterProxy> FBasicProxy::GetOwnerCharacterProxy()const
-{
-	return HoldingItemsComponentPtr->FindProxy_Character(OwnerCharacter_ID);
+	InventoryComponentPtr->Proxy_Container.UpdateItem(GetID());
 }
 
 FString FBasicProxy::GetProxyName() const
@@ -194,12 +182,12 @@ int32 FToolProxy::GetNum() const
 
 TWeakPtr<FCharacterProxy> FAllocationbleProxy::GetAllocationCharacterProxy()
 {
-	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+	return InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
 
 TWeakPtr<FCharacterProxy> FAllocationbleProxy::GetAllocationCharacterProxy() const
 {
-	return HoldingItemsComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+	return InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
 
 void FAllocationbleProxy::SetAllocationCharacterProxy(
@@ -222,10 +210,9 @@ void FAllocationbleProxy::SetAllocationCharacterProxy(
 	}
 
 #if UE_EDITOR || UE_CLIENT
-	auto ProxyCharacterPtr = GetOwnerCharacter();
-	if (GetOwnerCharacter()->GetNetMode() == NM_Client)
+	if (InventoryComponentPtr->GetNetMode() == NM_Client)
 	{
-		HoldingItemsComponentPtr->SetAllocationCharacterProxy(this->GetID(), AllocationCharacter_ID, InSocketTag);
+		InventoryComponentPtr->SetAllocationCharacterProxy(this->GetID(), AllocationCharacter_ID, InSocketTag);
 	}
 #endif
 
@@ -244,5 +231,10 @@ FBasicProxy::IDType FAllocationbleProxy::GetAllocationCharacterID() const
 
 ACharacterBase* FAllocationbleProxy::GetAllocationCharacter() const
 {
-	return GetAllocationCharacterProxy().Pin()->ProxyCharacterPtr.Get();
+	auto AllocationCharacterProxySPtr = GetAllocationCharacterProxy();
+	if (AllocationCharacterProxySPtr.IsValid())
+	{
+		return AllocationCharacterProxySPtr.Pin()->GetCharacterActor().Get();	
+	}
+	return nullptr;
 }

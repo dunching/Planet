@@ -183,10 +183,8 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 	{
 		FActorSpawnParameters SpawnParameters;
 
-		SpawnParameters.Owner = GetOwnerCharacterProxy().Pin()->ProxyCharacterPtr.Get();
-
 		Result =
-			HoldingItemsComponentPtr->GetWorld()->SpawnActor<AHumanCharacter_AI>(
+			InventoryComponentPtr->GetWorld()->SpawnActor<AHumanCharacter_AI>(
 				GetDT_CharacterType()->CharacterClass, Transform, SpawnParameters);
 
 		ProxyCharacterPtr = Result;
@@ -222,7 +220,7 @@ FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& InProxyTy
 	{
 		for (const auto& Iter : TeammateConfigureMap)
 		{
-			auto ProxySPtr = HoldingItemsComponentPtr->FindProxy_BySocket(Iter.Value);
+			auto ProxySPtr = InventoryComponentPtr->FindProxy_BySocket(Iter.Value);
 			if (ProxySPtr && ProxySPtr->GetProxyType() == ProxyType)
 			{
 				return Iter.Value;
@@ -243,6 +241,11 @@ void FCharacterProxy::GetWeaponSocket(FCharacterSocket& FirstWeaponSocketInfoSPt
 TMap<FGameplayTag, FCharacterSocket> FCharacterProxy::GetSockets() const
 {
 	return  TeammateConfigureMap;
+}
+
+TWeakObjectPtr<FCharacterProxy::FPawnType> FCharacterProxy::GetCharacterActor() const
+{
+	return ProxyCharacterPtr;
 }
 
 void FCharacterProxy::UpdateSocket(const FCharacterSocket& Socket)

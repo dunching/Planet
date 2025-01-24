@@ -49,6 +49,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
 
+	// Character的类别
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag CharacterCategory;
+	
 protected:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -75,15 +79,14 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
 	float BaseLookUpRate = 45.f;
 
-	// Character的ID
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
+	// Character的ID，注意：之后不要更改，因为任务引导系统里面需要这个值
+	UPROPERTY(EditInstanceOnly, ReplicatedUsing = OnRep_GetCharacterProxyID)
 	FGuid CharacterID;
 
-	// Character的类别
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly)
-	FString CharacterCategory;
-	
 private:
+
+	UFUNCTION()
+	void OnRep_GetCharacterProxyID();
 
 	UFUNCTION()
 	void OnRep_CharacterID();
