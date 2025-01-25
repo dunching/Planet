@@ -1,10 +1,14 @@
 
 #include "PlanetAbilitySystemComponent.h"
 
+#include "CharacterAbilitySystemComponent.h"
+#include "CharacterBase.h"
 #include "GameOptions.h"
 #include "PlanetGameplayAbility.h"
 #include "Skill_Base.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
+
+FName UPlanetAbilitySystemComponent::ComponentName = TEXT("AbilitySystemComponent");
 
 void UPlanetAbilitySystemComponent::TickComponent(
 	float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
@@ -35,7 +39,7 @@ void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTim
 	UAnimMontage* MontageToStop = LocalAnimMontageInfo.AnimMontage;
 	bool bShouldStopMontage = AnimInstance && MontageToStop && !AnimInstance->Montage_GetIsStopped(MontageToStop);
 
-	if (HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation))
+	if (HasMatchingGameplayTag(UGameplayTagsLibrary::State_Buff_Stagnation))
 	{
 		AnimInstance->Montage_Pause(MontageToStop);
 
@@ -84,6 +88,20 @@ UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(FGam
 	return AbilityInstance;
 }
 
+FActiveGameplayEffectHandle UPlanetAbilitySystemComponent::ApplyGameplayEffectSpecToTarget(const FGameplayEffectSpec &Spec, UAbilitySystemComponent *Target, FPredictionKey PredictionKey)
+{
+	return Super::ApplyGameplayEffectSpecToTarget(Spec,Target , PredictionKey);
+}
+
+void UPlanetAbilitySystemComponent::SetContinuePerform_Server_Implementation(
+	FGameplayAbilitySpecHandle AbilityToTrigger,
+	FGameplayAbilityActivationInfo ActivationInfo,
+	bool bIsContinue
+	)
+{
+	ReplicateContinues(AbilityToTrigger, ActivationInfo, bIsContinue);
+}
+
 void UPlanetAbilitySystemComponent::CurrentMontageStopImp_Implementation(float OverrideBlendOutTime)
 {
 	CurrentMontageStop(OverrideBlendOutTime);
@@ -117,7 +135,7 @@ void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 
 			for (auto Instance : Instances)
 			{
-				Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerformImp(bIsContinue);
+				Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerform(bIsContinue);
 			}
 		}
 	}
@@ -154,6 +172,41 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 	}
 }
 
+ void UPlanetAbilitySystemComponent::ReplicatePerformAction_Server_Implementation(
+	FGameplayAbilitySpecHandle Handle, FGameplayAbilityActivationInfo ActivationInfo
+	)
+{
+	ReplicatePerformAction(Handle, ActivationInfo);
+}
+
+void UPlanetAbilitySystemComponent::ReplicatePerformAction_Implementation(
+	FGameplayAbilitySpecHandle Handle,
+	FGameplayAbilityActivationInfo ActivationInfo
+	)
+{
+	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
+	if (AbilitySpec && AbilitySpec->Ability)
+	{
+		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
+		{
+		}
+		else
+		{
+			TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
+
+			for (auto Instance : Instances)
+			{
+				Cast<USkill_Base>(Instance)->PerformAction(
+					Handle,
+					Instance->GetCurrentActorInfo(),
+					Instance->GetCurrentActivationInfo(),
+					nullptr
+					);
+			}
+		}
+	}
+}
+
 bool UPlanetAbilitySystemComponent::K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const
 {
 	return HasMatchingGameplayTag(TagToCheck);
@@ -162,4 +215,26 @@ bool UPlanetAbilitySystemComponent::K2_HasMatchingGameplayTag(FGameplayTag TagTo
 bool UPlanetAbilitySystemComponent::K2_HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const
 {
 	return HasAnyMatchingGameplayTags(TagContainer);
+}
+
+void UPlanetAbilitySystemComponent::ModifyActiveEffectDuration(FActiveGameplayEffectHandle Handle, float Duration)
+{
+	FActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
+	
+	if (Effect)
+	{
+		//  bDurationLocked 为什么是true？
+		// Effect->Spec.SetDuration(Duration, false);
+	
+		Effect->Spec.Duration = Duration;
+		// Effect->Spec.bDurationLocked = bLockDuration;
+		if (Duration > 0.f)
+		{
+			// We may have potential problems one day if a game is applying duration based gameplay effects from instantaneous effects
+			// (E.g., every time fire damage is applied, a DOT is also applied). We may need to for Duration to always be captured.
+			Effect->Spec.CapturedRelevantAttributes.AddCaptureDefinition(UAbilitySystemComponent::GetOutgoingDurationCapture());
+		}
+		
+		ActiveGameplayEffects.MarkItemDirty(*Effect);
+	}
 }

@@ -11,12 +11,12 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_PlayMontage.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "ProxyProcessComponent.h"
 
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GameOptions.h"
@@ -37,14 +37,23 @@ struct FBasicFutures_MoveToAttaclArea : public TStructVariable<FBasicFutures_Mov
 	FName Donut_OuterRadius = TEXT("Donut.OuterRadius");
 };
 
+UBasicFutures_MoveToAttaclArea::UBasicFutures_MoveToAttaclArea() :
+	Super()
+{
+	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateNo;
+	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
+}
+
 void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
-		ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
+		AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
 	}
 }
 
@@ -59,11 +68,10 @@ void UBasicFutures_MoveToAttaclArea::ActivateAbility(
 
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
-		auto DataPtr = dynamic_cast<const FGameplayAbilityTargetData_MoveToAttaclArea*>(TriggerEventData->TargetData.Get(0));
-		if (DataPtr)
+		GameplayAbilityTargetData_MoveToAttaclAreaSPtr =
+			dynamic_cast<const FGameplayAbilityTargetData_MoveToAttaclArea*>(TriggerEventData->TargetData.Get(0));
+		if (GameplayAbilityTargetData_MoveToAttaclAreaSPtr)
 		{
-			CanbeActivedInfoSPtr = DataPtr->CanbeActivedInfoSPtr;
-
 			AvatorCharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 
 			FEnvQueryRequest QueryRequest(QueryTemplate, AvatorCharacterPtr);
@@ -71,12 +79,17 @@ void UBasicFutures_MoveToAttaclArea::ActivateAbility(
 			QueryRequest.SetFloatParam(FBasicFutures_MoveToAttaclArea::Get().Donut_InnerRadius, MinDistance);
 			QueryRequest.SetFloatParam(
 				FBasicFutures_MoveToAttaclArea::Get().Donut_OuterRadius,
-				DataPtr->AttackDistance - UGameOptions::GetInstance()->MoveToAttaclAreaOffset
+				GameplayAbilityTargetData_MoveToAttaclAreaSPtr->AttackDistance - UGameOptions::GetInstance()->MoveToAttaclAreaOffset
 			);
 
 			auto QueryFinishedDelegate = FQueryFinishedSignature::CreateUObject(this, &ThisClass::OnQueryFinished);
 			RequestID = QueryRequest.Execute(RunMode, QueryFinishedDelegate);
 		}
+	}
+
+	if (RequestID == INDEX_NONE)
+	{
+		OnQueryFinished(nullptr);
 	}
 }
 
@@ -110,12 +123,20 @@ void UBasicFutures_MoveToAttaclArea::CancelAbility(
 		if (AvatorCharacterPtr->IsPlayerControlled())
 		{
 			auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
-			PCPtr->StopMovement();
-			PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::MoveCompletedSignature);
+			if (PCPtr)
+			{
+				PCPtr->StopMovement();
+				PCPtr->ReceiveMoveCompleted.BindUObject(this, &ThisClass::MoveCompletedSignature);
+			}
 		}
 		else
 		{
-
+			auto PCPtr = AvatorCharacterPtr->GetController<AAIController>();
+			if (PCPtr)
+			{
+				PCPtr->StopMovement();
+				PCPtr->ReceiveMoveCompleted.AddDynamic(this, &ThisClass::MoveCompletedSignature);
+			}
 		}
 	}
 
@@ -124,34 +145,45 @@ void UBasicFutures_MoveToAttaclArea::CancelAbility(
 
 void UBasicFutures_MoveToAttaclArea::OnQueryFinished(TSharedPtr<FEnvQueryResult> ResultSPtr)
 {
-	if (ResultSPtr->IsAborted())
+	if (ResultSPtr)
 	{
-		K2_CancelAbility();
-
-		return;
-	}
-
-	const auto DestLocation = ResultSPtr->GetItemAsLocation(0);
+		switch (ResultSPtr->GetRawStatus())
+		{
+		case EEnvQueryStatus::Success:
+		{
+			const auto DestLocation = ResultSPtr->GetItemAsLocation(0);
 #ifdef WITH_EDITOR
-	if (DrawDebugSTT_MoveToAttaclArea.GetValueOnGameThread())
-	{
-		DrawDebugSphere(GetWorld(), DestLocation, 20, 20, FColor::Yellow, false, 5);
-	}
+			if (DrawDebugSTT_MoveToAttaclArea.GetValueOnGameThread())
+			{
+				DrawDebugSphere(GetWorld(), DestLocation, 20, 20, FColor::Yellow, false, 5);
+			}
 #endif
 
-	if (AvatorCharacterPtr)
-	{
-		if (AvatorCharacterPtr->IsPlayerControlled())
-		{
-			auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
+			if (AvatorCharacterPtr)
+			{
+				if (AvatorCharacterPtr->IsPlayerControlled())
+				{
+					auto PCPtr = AvatorCharacterPtr->GetController<APlanetPlayerController>();
 
-			PCPtr->MoveToLocation(DestLocation, nullptr);
+					PCPtr->MoveToLocation(DestLocation, nullptr);
+				}
+				else
+				{
+
+				}
+			}
 		}
-		else
+		break;
+		default:
 		{
-
+		}
+		break;
 		}
 	}
+
+	MoveCompletedSignature(RequestID, EPathFollowingResult::Invalid);
+
+	K2_CancelAbility();
 }
 
 void UBasicFutures_MoveToAttaclArea::MoveCompletedSignature(FAIRequestID InRequestID, EPathFollowingResult::Type Result)
@@ -163,9 +195,15 @@ void UBasicFutures_MoveToAttaclArea::MoveCompletedSignature(FAIRequestID InReque
 
 	if (Result == EPathFollowingResult::Success)
 	{
-	//	AvatorCharacterPtr->GetProxyProcessComponent()->ActiveAction(CanbeActivedInfoSPtr);
+		//	AvatorCharacterPtr->GetProxyProcessComponent()->ActiveAction(CanbeActivedInfoSPtr);
 	}
 	else
 	{
+	}
+
+	if (GameplayAbilityTargetData_MoveToAttaclAreaSPtr)
+	{
+		GameplayAbilityTargetData_MoveToAttaclAreaSPtr->MoveCompletedSignature(Result);
+		GameplayAbilityTargetData_MoveToAttaclAreaSPtr = nullptr;
 	}
 }

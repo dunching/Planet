@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Base.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 
 #include "Skill_Passive_Base.generated.h"
 

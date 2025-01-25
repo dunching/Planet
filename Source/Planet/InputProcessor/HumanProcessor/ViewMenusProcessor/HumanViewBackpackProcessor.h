@@ -4,17 +4,17 @@
 
 #include "CoreMinimal.h"
 
-#include "HumanViewMenuBase.h"
+#include "ViewMenuBaseProcessor.h"
 
 class AHumanCharacter;
 
 namespace HumanProcessor
 {
-	class FViewBackpackProcessor : public FHumanViewMenuBase
+	class FViewBackpackProcessor : public FViewMenuBaseProcessor
 	{
 	private:
 
-		GENERATIONCLASSINFO(FViewBackpackProcessor, FHumanViewMenuBase);
+		GENERATIONCLASSINFO(FViewBackpackProcessor, FViewMenuBaseProcessor);
 
 	public:
 

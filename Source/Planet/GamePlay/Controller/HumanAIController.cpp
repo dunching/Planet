@@ -1,61 +1,66 @@
 
 #include "HumanAIController.h"
 
-#include <GameFramework/CharacterMovementComponent.h>
 #include "Components/StateTreeComponent.h"
 #include "Components/StateTreeAIComponent.h"
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Perception/AISenseConfig_Sight.h>
+#include "Net/UnrealNetwork.h"
 
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
-#include "AssetRefMap.h"
-#include "Planet.h"
-#include "GroupMnaggerComponent.h"
-#include "SceneElement.h"
+#include "TeamMatesHelperComponent.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
-#include "TestCommand.h"
-#include "GameplayTagsSubSystem.h"
-#include "SceneUnitTable.h"
+#include "GameplayTagsLibrary.h"
+#include "BuildingArea.h"
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
 #include "HumanCharacter_AI.h"
+#include "GroupSharedInfo.h"
+#include "AIControllerStateTreeAIComponent.h"
+#include "LogWriter.h"
 
 AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
-	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
+	StateTreeAIComponentPtr = CreateDefaultSubobject<UAIControllerStateTreeAIComponent>(UAIControllerStateTreeAIComponent::ComponentName);
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 
 	// 设置这个之后BP不能保存？
 	InitialSenseConfig();
 }
 
+void AHumanAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+{
+	Super::SetGroupSharedInfo(InGroupSharedInfoPtr);
+}
+
 void AHumanAIController::InitialSenseConfig()
 {
 	auto SightConfig = NewObject<UAISenseConfig_Sight>();
 	check(SightConfig);
-	SightConfig->SightRadius = 50000;
-	SightConfig->LoseSightRadius = 53000;
+	SightConfig->SightRadius = 1000;
+	SightConfig->LoseSightRadius = 1000;
 	SightConfig->PeripheralVisionAngleDegrees = 120.f;
 	SightConfig->AutoSuccessRangeFromLastSeenLocation = FAISystem::InvalidRange;
-	SightConfig->SetMaxAge(1.f);
+	SightConfig->SetMaxAge(5.f);
 	SightConfig->DetectionByAffiliation.bDetectEnemies = 1;
 	SightConfig->DetectionByAffiliation.bDetectNeutrals = 1;
 	SightConfig->DetectionByAffiliation.bDetectFriendlies = 1;
 	AIPerceptionComponentPtr->ConfigureSense(*SightConfig);
 }
 
-void AHumanAIController::SetCampType(ECharacterCampType CharacterCampType)
+void AHumanAIController::InitialAllocations()
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
+	if (!CharacterPtr)
 	{
-		CharacterPtr->SetCampType(CharacterCampType);
+		return;
 	}
 }
 
@@ -66,32 +71,28 @@ UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
 
 bool AHumanAIController::CheckIsFarawayOriginal() const
 {
+	if (BuildingAreaPtr)
+	{
+		return (FVector::Distance(BuildingAreaPtr->GetActorLocation(), GetPawn()->GetActorLocation()) > 1000);
+	}
+	
+	if (GeneratorNPCs_PatrolPtr)
+	{
+		auto CharacterPtr = GetPawn<FPawnType>();
+		if (CharacterPtr)
+		{
+			return GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(CharacterPtr);
+		}
+	}
+
 	return false;
 }
 
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	const TSharedPtr < FCharacterUnitType>& LeaderCharacterUnitPtr
+	const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
 )
 {
-}
-
-void AHumanAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
-{
-
-}
-
-void AHumanAIController::DoDeathing()
-{
-	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
-	{
- 		if (CharacterPtr->CharacterTitlePtr)
- 		{
- 			CharacterPtr->CharacterTitlePtr->RemoveFromParent();
- 			CharacterPtr->CharacterTitlePtr = nullptr;
- 		}
-	}
 }
 
 void AHumanAIController::OnConstruction(const FTransform& Transform)
@@ -105,22 +106,31 @@ void AHumanAIController::BeginPlay()
 
 	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
 	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
+
+	InitialGroupInfo();
+	
+	InitialCharacter();
 }
 
 void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	DoDeathing();
-
 	Super::EndPlay(EndPlayReason);
 }
 
 void AHumanAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+	
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (CharacterPtr)
+	{
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
+#if WITH_EDITORONLY_DATA
+#else
+#endif
+	}
 
-	InitialAILogic();
-
-	InitialCharacter();
+	InitialAllocations();
 }
 
 void AHumanAIController::OnUnPossess()
@@ -143,6 +153,13 @@ void AHumanAIController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
+void AHumanAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
+}
+
 void AHumanAIController::OnGroupChanged()
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
@@ -151,7 +168,7 @@ void AHumanAIController::OnGroupChanged()
 		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 		if (PlayerCharacterPtr)
 		{
-			SetCampType(
+			CharacterPtr->SetCampType(
 				CharacterPtr->IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
 			);
 		}
@@ -160,127 +177,37 @@ void AHumanAIController::OnGroupChanged()
 
 void AHumanAIController::OnTeamChanged()
 {
-	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
+	auto TeamsHelper = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamsHelper)
 	{
 		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterUnitPtr);
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterProxyPtr);
 	}
 }
 
 void AHumanAIController::InitialCharacter()
 {
-	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
-	{
-		auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
-			EGameplayTagEventType::NewOrRemoved
-		);
-		OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
-
-		GroupHelperChangedDelegate =
-			GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
-		OnGroupChanged();
-
-		TeamHelperChangedDelegate =
-			GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+	TeamHelperChangedDelegate =
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
 		
-#if WITH_EDITORONLY_DATA
-		GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
-#else
-		GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
-#endif
-
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
 		// 组件自动调用条件不成功，原因未知
+		// 👆
+		// AI Comtroller下的需要显式调用
 		if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
 		{
 			StateTreeAIComponentPtr->StartLogic();
 		}
-
-#if TESTAICHARACTERHOLDDATA
-		TestCommand::AddAICharacterTestDataImp(CharacterPtr);
-#endif
-		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
-		{
-			auto TableRowUnit_CharacterInfoPtr = CharacterPtr->GetCharacterUnit()->GetTableRowUnit_CharacterInfo();
-			if (TableRowUnit_CharacterInfoPtr)
-			{
-				// 武器
-				{
-					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-
-					auto FirstWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
-					if (TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
-					{
-						auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->FirstWeaponSocketInfo);
-						if (WeaponProxyPtr)
-						{
-							FirstWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1;
-							FirstWeaponSocketInfoSPtr->ProxySPtr = WeaponProxyPtr;
-							FirstWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-						}
-					}
-					EICPtr->UpdateSocket(FirstWeaponSocketInfoSPtr);
-
-					auto SecondWeaponSocketInfoSPtr = MakeShared<FSocket_FASI>();
-					if (TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo.IsValid())
-					{
-						auto WeaponProxyPtr = HICPtr->AddUnit_Weapon(TableRowUnit_CharacterInfoPtr->SecondWeaponSocketInfo);
-						if (WeaponProxyPtr)
-						{
-							SecondWeaponSocketInfoSPtr->Socket = UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2;
-							SecondWeaponSocketInfoSPtr->ProxySPtr = WeaponProxyPtr;
-							SecondWeaponSocketInfoSPtr->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-						}
-					}
-					EICPtr->UpdateSocket(SecondWeaponSocketInfoSPtr);
-
-					EICPtr->ActiveWeapon();
-				}
-
-				// 技能
-				{
-					auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-
-					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
-					{
-						auto SkillUnitPtr = HICPtr->AddUnit_Skill(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_1);
-						if (SkillUnitPtr)
-						{
-							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1;
-							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
-							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-
-							EICPtr->UpdateSocket(SkillsSocketInfo);
-						}
-					}
-					if (TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2.IsValid())
-					{
-						auto SkillUnitPtr = HICPtr->AddUnit_Skill(TableRowUnit_CharacterInfoPtr->ActiveSkillSet_2);
-						if (SkillUnitPtr)
-						{
-							auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-
-							SkillsSocketInfo->Socket = UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2;
-							SkillsSocketInfo->ProxySPtr = SkillUnitPtr;
-							SkillsSocketInfo->ProxySPtr->SetAllocationCharacterUnit(CharacterPtr->GetCharacterUnit());
-
-							EICPtr->UpdateSocket(SkillsSocketInfo);
-						}
-					}
-				}
-			}
-		}
 	}
+#endif
 }
 
-void AHumanAIController::InitialAILogic()
+void AHumanAIController::InitialGroupInfo()
 {
 	if (GetPawn())
 	{
@@ -292,7 +219,7 @@ void AHumanAIController::InitialAILogic()
 
 		if (auto PatrolPtr = Cast<AGeneratorNPCs_Patrol>(ParentPtr))
 		{
-			PatrolSPlinePtr = PatrolPtr->SplineComponentPtr;
+			GeneratorNPCs_PatrolPtr = PatrolPtr;
 		}
 		else if (auto ColonyPtr = Cast<AGeneratorColony>(ParentPtr))
 		{
@@ -302,4 +229,9 @@ void AHumanAIController::InitialAILogic()
 			// 			PathFollowComponentPtr = NPCComponentPtr->PathFollowComponentPtr;
 		}
 	}
+}
+
+void AHumanAIController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+	Super::OnGroupSharedInfoReady(NewGroupSharedInfoPtr);
 }

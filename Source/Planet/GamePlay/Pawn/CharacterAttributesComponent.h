@@ -8,13 +8,15 @@
 #include "Components/ActorComponent.h"
 
 #include "GenerateType.h"
-#include <SceneElement.h>
+#include "ItemProxy_Minimal.h"
 #include "CharacterAttibutes.h"
 
 #include "CharacterAttributesComponent.generated.h"
 
 class IPlanetControllerInterface;
 class UGAEvent_Received;
+class UAS_Character;
+class UGE_CharacterInitail;
 
 struct FCharacterAttributes;
 
@@ -33,18 +35,26 @@ public:
 
 	static FName ComponentName;
 
-	const FCharacterAttributes& GetCharacterAttributes()const;
-
-	FCharacterAttributes& GetCharacterAttributes();
+	const UAS_Character * GetCharacterAttributes()const;
 
 	// 基础状态回复
 	void ProcessCharacterAttributes();
 
+	float GetRate()const;
+	
+	virtual void SetCharacterID(const FGuid& InCharacterID);
+
+	FGuid GetCharacterID()const;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
+	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
+
+	// Character的类别
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag CharacterCategory;
+	
 protected:
 	
-	UPROPERTY(Replicated, EditDefaultsOnly)
-	FCharacterAttributes CharacterAttributes;
-
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void BeginPlay()override;
@@ -55,6 +65,44 @@ protected:
 		FActorComponentTickFunction* ThisTickFunction
 	)override;
 
+	// 初始化GE
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGE_CharacterInitail>GE_InitailCharacterClass;
+
+	// 自动回复GE
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGameplayEffect>GE_CharacterReplyClass;
+   
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
+	float BaseTurnRate = 45.f;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
+	float BaseLookUpRate = 45.f;
+
+	// Character的ID，注意：之后不要更改，因为任务引导系统里面需要这个值
+	UPROPERTY(EditInstanceOnly, ReplicatedUsing = OnRep_GetCharacterProxyID)
+	FGuid CharacterID;
+
 private:
 
+	UFUNCTION()
+	void OnRep_GetCharacterProxyID();
+
+	UFUNCTION()
+	void OnRep_CharacterID();
+
+};
+
+UCLASS()
+class UGameplayStatics_Character : public UBlueprintFunctionLibrary
+{
+	GENERATED_BODY()
+
+public:
+	
+	static PLANET_API ACharacterBase* GetCharacterByID(
+		const UObject* WorldContextObject,
+		TSubclassOf<ACharacterBase> ActorClass,
+		const FGuid&CharacterID
+		);
 };

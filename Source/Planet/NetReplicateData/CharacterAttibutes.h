@@ -149,12 +149,6 @@ struct PLANET_API FCharacterAttributes final
 
 	FProcessedGAEvent ProcessedGAEvent;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FName Name;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	int32 Level = 1;
-
 	// 基础 属性：力道、根骨、身法、洞察、天资
 #pragma region 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

@@ -17,9 +17,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -36,7 +36,7 @@ FGameplayAbilityTargetData_StateModify_CantBeSelected::FGameplayAbilityTargetDat
 FGameplayAbilityTargetData_StateModify_CantBeSelected::FGameplayAbilityTargetData_StateModify_CantBeSelected(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected, Duration)
+	Super(UGameplayTagsLibrary::State_Buff_CantBeSlected, Duration)
 {
 }
 
@@ -89,8 +89,8 @@ void UCS_PeriodicStateModify_CantBeSelected::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
 }
 
 void UCS_PeriodicStateModify_CantBeSelected::OnDuration(

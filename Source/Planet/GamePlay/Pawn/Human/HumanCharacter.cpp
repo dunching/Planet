@@ -18,7 +18,7 @@
 #include "GameMode_Main.h"
 #include "GenerateType.h"
 #include "Command/TestCommand.h"
-#include "HumanActionPigInteractionUI.h"
+#include "HumanInteractionWithNPC.h"
 #include "HumanViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"
 #include "ToolsLibrary.h"
@@ -32,7 +32,7 @@
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
 #include "ProxyProcessComponent.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "HorseProcessor.h"
@@ -41,21 +41,31 @@
 #include "PlanetPlayerState.h"
 #include "HumanAIController.h"
 #include "CharacterTitle.h"
-#include "GroupMnaggerComponent.h"
-#include "SceneElement.h"
+#include "TeamMatesHelperComponent.h"
+#include "ItemProxy_Minimal.h"
 #include "GetItemInfosList.h"
 
-#include "SceneUnitContainer.h"
+#include "ItemProxy_Container.h"
+#include "GroupSharedInfo.h"
+#include "SceneActorInteractionComponent.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(USceneActorInteractionComponent::ComponentName);
+}
+
+USceneActorInteractionComponent* AHumanCharacter::GetSceneActorInteractionComponent() const
+{
+	return SceneActorInteractionComponentPtr;
 }
 
 void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	HasBeenEndedLookAt();
+	
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -88,13 +98,6 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
-		auto GroupsHelperSPtr = GetGroupMnaggerComponent()->GetGroupHelper();
-		if (GroupsHelperSPtr)
-		{
-			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
-				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
-			);
-		}
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
@@ -109,4 +112,20 @@ void AHumanCharacter::UnPossessed()
 	}
 
 	Super::UnPossessed();
+}
+
+void AHumanCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
+{
+}
+
+void AHumanCharacter::HasBeenLookingAt(ACharacterBase* CharacterPtr)
+{
+}
+
+void AHumanCharacter::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
+{
+}
+
+void AHumanCharacter::HasBeenEndedLookAt()
+{
 }

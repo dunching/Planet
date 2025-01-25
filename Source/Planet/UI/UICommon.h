@@ -4,26 +4,22 @@
 
 #include "CoreMinimal.h"
 
-#include "UICommon.generated.h"
-
-enum EUIOrder :uint8
+enum EUIOrder : int8
 {
-	// 
-	kHUD,
-	kPlayer_Character_State_HUD,
-	kCharacter_State_HUD,
+	// WidgetComponent默认为-100
+	kUIOrderDefault = -99,
+
+	kConversationBorder = 1,
+	
+	kInteractionList,
 
 	kFightingTips,
 	kFocus,
+
+	kHUD,
+	kPlayer_Character_State_HUD,
+	kOtherPlayer_Character_State_HUD,
+
 	kMainUI,
 	kTableMenu,
-};
-
-UENUM(BlueprintType)
-enum class EMenuType : uint8
-{
-	kAllocationSkill,
-	kAllocationTalent,
-	kGroupManagger,
-	kRaffle,
 };

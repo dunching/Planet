@@ -31,7 +31,13 @@ struct PLANET_API FGameplayAbilityTargetData_StateModify : public FGameplayAbili
 		float Duration
 	);
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	virtual FGameplayAbilityTargetData_StateModify* Clone()const override;
+
+	TSharedPtr<FGameplayAbilityTargetData_StateModify> Clone_SmartPtr()const;
 
 	// < 0 则意味着由Task/bIsCancelState 取消
 	float Duration = 3.f;
@@ -54,7 +60,14 @@ class PLANET_API UCS_PeriodicStateModify : public UCS_Base
 
 public:
 
+	using FStateParam = FGameplayAbilityTargetData_StateModify;
+
 	UCS_PeriodicStateModify();
+
+	virtual void OnAvatarSet(
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilitySpec& Spec
+	) override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,

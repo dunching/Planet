@@ -18,9 +18,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -32,7 +32,7 @@
 FGameplayAbilityTargetData_StateModify_SuperArmor::FGameplayAbilityTargetData_StateModify_SuperArmor(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor, Duration)
+	Super(UGameplayTagsLibrary::State_Buff_SuperArmor, Duration)
 {
 }
 
@@ -124,15 +124,15 @@ void UCS_PeriodicStateModify_SuperArmor::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
 
 	TArray<FGameplayTag>Ary{
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Silent,
-		UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow,
+		UGameplayTagsLibrary::State_Debuff_Stun,
+		UGameplayTagsLibrary::State_Debuff_Charm,
+		UGameplayTagsLibrary::State_Debuff_Fear,
+		UGameplayTagsLibrary::State_Debuff_Silent,
+		UGameplayTagsLibrary::State_Debuff_Slow,
 	};
 
 	for (const auto& Iter : Ary)

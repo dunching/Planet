@@ -13,8 +13,8 @@
 #include "AbilityTask_TimerHelper.h"
 #include "AllocationSkills.h"
 #include "ProxyProcessComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "SceneElement.h"
+#include "GameplayTagsLibrary.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 
 void USkill_Active_FoldingFan_AddNum::PerformAction(
@@ -27,10 +27,10 @@ void USkill_Active_FoldingFan_AddNum::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
-			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_FoldingFan
+			UGameplayTagsLibrary::Proxy_Skill_Weapon_FoldingFan
 		);
 
 		if (TargetSkillSPtr)

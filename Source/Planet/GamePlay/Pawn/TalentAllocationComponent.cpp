@@ -4,17 +4,17 @@
 #include "Net/UnrealNetwork.h"
 
 #include "CharacterBase.h"
-#include "SceneElement.h"
-#include "HoldingItemsComponent.h"
+#include "ItemProxy_Minimal.h"
+#include "InventoryComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "ProxyProcessComponent.h"
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
-#include "SceneUnitContainer.h"
+#include "GameplayTagsLibrary.h"
+#include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
-#include "BaseFeatureComponent.h"
-#include "SceneUnitExtendInfo.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "SceneProxyExtendInfo.h"
 #include "TalentInfo.h"
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
@@ -39,6 +39,8 @@ struct FPropertySettlementModify_Talent : public FPropertySettlementModify
 UTalentAllocationComponent::UTalentAllocationComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	bWantsInitializeComponent = true;
+	
 	SetIsReplicatedByDefault(true);
 }
 
@@ -141,14 +143,14 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 		auto CharacterPtr = GetOwner<FOwnerType>();
 		if (CharacterPtr)
 		{
-			const auto DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_TalentModify;
+			const auto DataSource = UGameplayTagsLibrary::DataSource_TalentModify;
 
 			const auto PointPropertyType = std::get<EPointPropertyType>(TalentHelper_Iter->Type);
 			switch (PointPropertyType)
 			{
 			case EPointPropertyType::kLiDao:
 			{
-				auto PAD_Talent_PropertyPtr = USceneUnitExtendInfoMap::GetInstance()->GetTalent_Property(PointPropertyType);
+				auto PAD_Talent_PropertyPtr = USceneProxyExtendInfoMap::GetInstance()->GetTalent_Property(PointPropertyType);
 
 				if (TalentHelper_Iter->Level > 0)
 				{
@@ -174,38 +176,38 @@ void UTalentAllocationComponent::UpdateTalent(const FTalentHelper& TalentHelper)
 
 					GAEventDataPtr->DataAry.Add(GAEventData);
 
-					CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+					CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 					// 数据修正
 					for (const auto& Iter : PAD_Talent_PropertyPtr->ModifyValueMap)
 					{
 						const auto MultipleValue = 1 + (TalentHelper_Iter->Level * Iter.Value);
 
-						if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
-						{
-							ModifyMap[PointPropertyType].Pin()->Multiple = MultipleValue;
-							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.UpdateSettlementModify(
-								ModifyMap[PointPropertyType].Pin()
-							);
-						}
-						else
-						{
-							auto SPtr = MakeShared<FPropertySettlementModify_Talent>(MultipleValue);
-							ModifyMap.Add(PointPropertyType, SPtr);
-							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddSettlementModify(SPtr);
-						}
+						// if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
+						// {
+						// 	ModifyMap[PointPropertyType].Pin()->Multiple = MultipleValue;
+						// 	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.UpdateSettlementModify(
+						// 		ModifyMap[PointPropertyType].Pin()
+						// 	);
+						// }
+						// else
+						// {
+						// 	auto SPtr = MakeShared<FPropertySettlementModify_Talent>(MultipleValue);
+						// 	ModifyMap.Add(PointPropertyType, SPtr);
+						// 	CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.AddSettlementModify(SPtr);
+						// }
 					}
 				}
 				else
 				{
-					CharacterPtr->GetBaseFeatureComponent()->ClearData2Self(GetAllData(), DataSource);
+					CharacterPtr->GetCharacterAbilitySystemComponent()->ClearData2Self(GetAllData(), DataSource);
 					for (const auto& Iter : PAD_Talent_PropertyPtr->ModifyValueMap)
 					{
 						if (ModifyMap.Contains(PointPropertyType) && ModifyMap[PointPropertyType].IsValid())
 						{
-							CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.RemoveSettlementModify(
-								ModifyMap[PointPropertyType].Pin()
-							);
+							// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().AD.RemoveSettlementModify(
+							// 	ModifyMap[PointPropertyType].Pin()
+							// );
 						}
 					}
 				}
@@ -268,6 +270,17 @@ void UTalentAllocationComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProp
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, Talent_FASI_Container);
+}
+
+void UTalentAllocationComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	UWorld* World = GetWorld();
+	if ((World->IsGameWorld()))
+	{
+		Talent_FASI_Container.TalentAllocationComponentPtr = this;
+	}
 }
 
 void UTalentAllocationComponent::BeginPlay()

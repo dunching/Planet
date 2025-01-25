@@ -6,7 +6,7 @@
 
 #include "CoreMinimal.h"
 
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 #include "InputProcessor.h"
 
 class ATrackVehicleBase;

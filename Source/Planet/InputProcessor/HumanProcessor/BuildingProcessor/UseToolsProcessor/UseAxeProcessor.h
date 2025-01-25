@@ -7,7 +7,7 @@
 
 #include "CoreMinimal.h"
 
-#include <SceneElement.h>
+#include "ItemProxy_Minimal.h"
 #include "BuildingBaseProcessor.h"
 
 namespace HumanProcessor

@@ -1,16 +1,32 @@
 
 #include "AIComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 #include "GeneratorColony.h"
 #include "CharacterBase.h"
+#include "CharactersInfo.h"
+#include "GameplayTagsLibrary.h"
 #include "HumanAIController.h"
+#include "HumanCharacter_AI.h"
+#include "InventoryComponent.h"
+#include "SceneProxyExtendInfo.h"
+#include "TestCommand.h"
 
-void UNPCComponent::BeginPlay()
+FName UAIComponent::ComponentName = TEXT("AIComponent");
+
+UAIComponent::UAIComponent(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
+{
+	SetIsReplicatedByDefault(true);
+}
+
+void UAIComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	auto OwnerPtr = GetOwner();
-	if (!OwnerPtr)
+	auto OnwerActorPtr = GetOwner<FOwnerType>();
+	if (!OnwerActorPtr)
 	{
 		return;
 	}
@@ -38,5 +54,77 @@ void UNPCComponent::BeginPlay()
 	}
 #endif
 
-	OwnerPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	OnwerActorPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+void UAIComponent::AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr)
+{
+	TemporaryTaskNodesAry.Add(TaskNodePtr);
+}
+
+void UAIComponent::InitialAllocationsRowName()
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+#if TESTAICHARACTERHOLDDATA
+		// TestCommand::AddAICharacterTestDataImp(this);
+#endif
+		{
+			auto OnwerActorPtr = GetOwner<FOwnerType>();
+			auto TableRowProxy_CharacterInfoPtr =
+				USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_AICharacter_Allocation(AI_Allocation_RowName);
+			auto InventoryComponentPtr = OnwerActorPtr->GetInventoryComponent();
+			if (TableRowProxy_CharacterInfoPtr)
+			{
+				// 武器
+				{
+					{
+						if (TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
+						{
+							auto WeaponProxyPtr = InventoryComponentPtr->AddProxy_Weapon(
+								TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo);
+							if (WeaponProxyPtr)
+							{
+								FCharacterSocket SkillsSocketInfo;
+								SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
+								SkillsSocketInfo.UpdateProxy(
+									InventoryComponentPtr->AddProxy_Weapon(
+										TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo));;
+
+								InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
+							}
+						}
+					}
+					OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
+				}
+
+				// 技能
+				{
+					if (TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
+					{
+						auto SkillProxyPtr = InventoryComponentPtr->AddProxy_Skill(
+							TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1);
+						if (SkillProxyPtr)
+						{
+							FCharacterSocket SkillsSocketInfo;
+
+							SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
+
+							InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
+						}
+					}
+
+					OnwerActorPtr->GetProxyProcessComponent()->UpdateCanbeActiveSkills();
+				}
+			}
+		}
+	}
+#endif
+}
+
+void UAIComponent::InitialAllocationsByProxy()
+{
+	auto OnwerActorPtr = GetOwner<FOwnerType>();
+	OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
 }

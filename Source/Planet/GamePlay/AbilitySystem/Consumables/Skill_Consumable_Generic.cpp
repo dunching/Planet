@@ -1,4 +1,3 @@
-
 #include "Skill_Consumable_Generic.h"
 
 #include "AbilitySystemComponent.h"
@@ -9,10 +8,11 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
 #include "CS_PeriodicPropertyModify.h"
-#include "SceneUnitTable.h"
+#include "GroupSharedInfo.h"
+#include "SceneProxyTable.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :
 	Super()
@@ -47,7 +47,12 @@ void USkill_Consumable_Generic::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	CommitAbility(Handle, ActorInfo, ActivationInfo);
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
 }
 
 bool USkill_Consumable_Generic::CanActivateAbility(
@@ -58,7 +63,7 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (UnitPtr->Num <= 0)
+	if (ProxyPtr->Num <= 0)
 	{
 		return false;
 	}
@@ -76,12 +81,61 @@ bool USkill_Consumable_Generic::CommitAbility(
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		UnitPtr->Num--;
-		UnitPtr->Update2Client();
+		ProxyPtr->Num--;
+		ProxyPtr->Update2Client();
 	}
 #endif
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
+}
+
+void USkill_Consumable_Generic::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
+                                              const FGameplayAbilityActorInfo* ActorInfo,
+                                              const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		// 冷却
+		{
+			FGameplayEffectSpecHandle SpecHandle =
+				MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+
+			const auto CD = ProxyPtr->GetTableRowProxy_Consumable()->CD;
+			SpecHandle.Data.Get()->SetDuration(CD, true);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(ProxyPtr->GetProxyType());
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, CD);
+
+			const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+		}
+
+		// 公共冷却
+		{
+			auto AbilitySystemComponentPtr = CharacterPtr->GetGroupSharedInfo()->GetAbilitySystemComponent();
+			auto SkillCommonCooldownInfoMap = ProxyPtr->GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
+			for (const auto Iter : SkillCommonCooldownInfoMap)
+			{
+				auto CommonCooldownInfoPtr = GetTableRowProxy_CommonCooldownInfo(Iter);
+				if (CommonCooldownInfoPtr)
+				{
+					FGameplayEffectSpecHandle SpecHandle =
+						AbilitySystemComponentPtr->MakeOutgoingSpec(CooldownGE->GetClass(), GetAbilityLevel(),
+						                                            AbilitySystemComponentPtr->MakeEffectContext());
+
+					const auto CD = CommonCooldownInfoPtr->CoolDownTime;
+					SpecHandle.Data.Get()->SetDuration(CD, true);
+					SpecHandle.Data.Get()->AddDynamicAssetTag(Iter);
+					SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+					SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, CD);
+					AbilitySystemComponentPtr->ApplyGameplayEffectSpecToSelf(
+						*SpecHandle.Data.Get(),
+						AbilitySystemComponentPtr->GetPredictionKeyForNewAction()
+					);
+				}
+			}
+		}
+	}
 }
 
 void USkill_Consumable_Generic::EndAbility(
@@ -115,17 +169,17 @@ void USkill_Consumable_Generic::PerformAction(
 void USkill_Consumable_Generic::SpawnActor()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
 	{
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = CharacterPtr;
 		ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(
-			UnitPtr->GetTableRowUnit_Consumable()->Consumable_Class, ActorSpawnParameters
+			ProxyPtr->GetTableRowProxy_Consumable()->Consumable_Class, ActorSpawnParameters
 		);
 
 		if (ConsumableActorPtr)
 		{
-			ConsumableActorPtr->Interaction(CharacterPtr);
+			ConsumableActorPtr->HasbeenInteracted(CharacterPtr);
 		}
 	}
 #endif
@@ -138,13 +192,39 @@ void USkill_Consumable_Generic::ExcuteTasks()
 	{
 		if (CharacterPtr)
 		{
-			auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(UnitPtr);
+			FGameplayEffectSpecHandle SpecHandle =
+				MakeOutgoingGameplayEffectSpec(ConsumableGEClass, GetAbilityLevel());
 
-			GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+			const auto Duration = ProxyPtr->GetTableRowProxy_Consumable()->Duration;
+			SpecHandle.Data.Get()->SetDuration(Duration, true);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(ProxyPtr->GetProxyType());
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, Duration);
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
-			ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
+			const auto ModifyPropertyMap = ProxyPtr->GetTableRowProxy_Consumable()->ModifyPropertyMap;
+			for (const auto& Iter : ModifyPropertyMap)
+			{
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+					Iter.Key,
+					Iter.Value
+				);
+			}
+
+			const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(
+				GetCurrentAbilitySpecHandle(),
+				GetCurrentActorInfo(),
+				GetCurrentActivationInfo(),
+				SpecHandle
+			);
+
+			// auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_PropertyModify(ProxyPtr);
+			//
+			// GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
+			// GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
+			//
+			// auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+			// ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 		}
 	}
 #endif
@@ -155,7 +235,7 @@ void USkill_Consumable_Generic::PlayMontage()
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto HumanMontage = UnitPtr->GetTableRowUnit_Consumable()->HumanMontage;
+		auto HumanMontage = ProxyPtr->GetTableRowProxy_Consumable()->HumanMontage;
 		if (HumanMontage)
 		{
 			const float InPlayRate = 1.f;
@@ -168,7 +248,7 @@ void USkill_Consumable_Generic::PlayMontage()
 			);
 
 			TaskPtr->Ability = this;
-			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 
@@ -180,13 +260,18 @@ void USkill_Consumable_Generic::PlayMontage()
 
 void USkill_Consumable_Generic::OnPlayMontageEnd()
 {
-	if (ConsumableActorPtr)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		ConsumableActorPtr->Destroy();
-		ConsumableActorPtr = nullptr;
-	}
+		if (ConsumableActorPtr)
+		{
+			ConsumableActorPtr->Destroy();
+			ConsumableActorPtr = nullptr;
+		}
 
-	K2_CancelAbility();
+		K2_CancelAbility();
+	}
+#endif
 }
 
 void USkill_Consumable_Generic::EmitEffect()

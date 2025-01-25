@@ -7,15 +7,18 @@
 #include "GameFramework/PlayerState.h"
 
 #include "PlanetAbilitySystemComponent.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 
 #include "PlanetPlayerState.generated.h"
 
 class UPlanetAbilitySystemComponent;
-class UHoldingItemsComponent;
+class UProxySycHelperComponent;
 struct FCharacterProxy;
-struct FSceneUnitContainer;
+struct FSceneProxyContainer;
 
+/*
+ *	玩家数据
+ */
 UCLASS()
 class PLANET_API APlanetPlayerState : public APlayerState
 {
@@ -29,8 +32,12 @@ protected:
 
 	virtual void BeginPlay() override;
 
-	void InitialData();
+	virtual void PostInitializeComponents() override;
 
+	void InitialData();
+	
 private:
 
+	FString PlayerName;
+	
 };

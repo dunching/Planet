@@ -54,20 +54,6 @@ UPlanetGameplayAbility::UPlanetGameplayAbility() :
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 }
 
-void UPlanetGameplayAbility::SetContinuePerform(bool bIsContinue)
-{
-	if (CurrentActorInfo && CurrentActorInfo->AbilitySystemComponent.IsValid())
-	{
-		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->ReplicateContinues(
-			CurrentSpecHandle, 
-			CurrentActivationInfo, 
-			bIsContinue
-		);
-	}
-
-	SetContinuePerformImp(bIsContinue);
-}
-
 #if WITH_EDITOR
 void UPlanetGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -154,9 +140,10 @@ void UPlanetGameplayAbility::OnGameplayTaskDeactivated(UGameplayTask& Task)
 {
 	Super::OnGameplayTaskDeactivated(Task);
 }
+
 #endif
 
-void UPlanetGameplayAbility::SetContinuePerformImp(bool bIsContinue)
+void UPlanetGameplayAbility::SetContinuePerform(bool bIsContinue)
 {
 
 }
@@ -201,3 +188,7 @@ void UPlanetGameplayAbility::InitalDefaultTags()
 
 }
 
+void UPlanetGameplayAbility::CancelAbility_Server_Implementation()
+{
+	K2_CancelAbility();
+}

@@ -11,15 +11,16 @@
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
 #include "Planet.h"
-#include "GroupMnaggerComponent.h"
-#include "SceneElement.h"
+#include "TeamMatesHelperComponent.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 #include "TestCommand.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "UICommon.h"
 #include "HorseCharacter.h"
+#include "GroupSharedInfo.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -27,6 +28,11 @@ AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializ
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+}
+
+void AHorseAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+{
+	Super::SetGroupSharedInfo(InGroupSharedInfoPtr);
 }
 
 void AHorseAIController::SetCampType(ECharacterCampType CharacterCampType)
@@ -44,7 +50,7 @@ UAIPerceptionComponent* AHorseAIController::GetAIPerceptionComponent()
 
 void AHorseAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
+	const TSharedPtr<FCharacterProxyType>& LeaderPCPtr
 )
 {
 }
@@ -55,7 +61,7 @@ void AHorseAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 	{
 		GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+			UGameplayTagsLibrary::DeathingTag,
 			EGameplayTagEventType::NewOrRemoved
 		);
 
@@ -96,18 +102,14 @@ void AHorseAIController::OnPossess(APawn* InPawn)
 	InitialCharacter();
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsSubSystem::GetInstance()->DeathingTag,
+		UGameplayTagsLibrary::DeathingTag,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
 
-	GroupHelperChangedDelegate =
-		GetGroupMnaggerComponent()->GroupHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnGroupChanged, this));
-	OnGroupChanged();
-
 	TeamHelperChangedDelegate =
-		GetGroupMnaggerComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
-	GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
+	GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kEnemy);
 
 	if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
 	{
@@ -143,14 +145,14 @@ void AHorseAIController::OnGroupChanged()
 
 void AHorseAIController::OnTeamChanged()
 {
-	auto TeamsHelper = GetGroupMnaggerComponent()->GetTeamHelper();
+	auto TeamsHelper = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamsHelper)
 	{
 		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterUnitPtr);
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterProxyPtr);
 	}
 }
 
@@ -167,12 +169,12 @@ void AHorseAIController::InitialCharacter()
 		AIHumanInfoPtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
 		if (AIHumanInfoPtr)
 		{
-			AIHumanInfoPtr->CharacterPtr = CharacterPtr;
-			AIHumanInfoPtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
+			// AIHumanInfoPtr->CharacterPtr = CharacterPtr;
+			AIHumanInfoPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
 		}
 
 		auto EICPtr = CharacterPtr->GetProxyProcessComponent();
-		auto HICPtr = CharacterPtr->GetHoldingItemsComponent();
+		auto HICPtr = CharacterPtr->GetInventoryComponent();
 
 	}
 }

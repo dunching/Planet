@@ -9,7 +9,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "GAEvent_Helper.h"
 #include "Consumable_Test.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 void USkill_Consumable_Test::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -43,7 +43,7 @@ void USkill_Consumable_Test::SpawnActor()
 	ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(Consumable_Class, ActorSpawnParameters);
 	if (ConsumableActorPtr)
 	{
-		ConsumableActorPtr->Interaction(CharacterPtr);
+		ConsumableActorPtr->HasbeenInteracted(CharacterPtr);
 	}
 }
 
@@ -81,7 +81,7 @@ void USkill_Consumable_Test::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnPlayMontageEnd);
 
@@ -113,7 +113,7 @@ void USkill_Consumable_Test::EmitEffect()
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
@@ -132,7 +132,7 @@ void USkill_Consumable_Test::PreActivate(
 		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_Consumable_Test*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			UnitPtr = GameplayAbilityTargetDataPtr->UnitPtr;
+			ProxyPtr = GameplayAbilityTargetDataPtr->ProxyPtr;
 		}
 	}
 }

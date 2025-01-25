@@ -10,6 +10,7 @@
 
 class UPlanetChildActorComponent;
 class USplineComponent;
+class ACharacterBase;
 
 /**
  *
@@ -24,10 +25,15 @@ public:
 	AGeneratorNPCs_Patrol(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
-	
+
+	bool CheckIsFarawayOriginal(ACharacterBase*TargetCharacterPtr) const;
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Spline")
 	TObjectPtr<USplineComponent> SplineComponentPtr;
 	
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	int32 MaxDistance = 800;
+
 protected:
 
 };

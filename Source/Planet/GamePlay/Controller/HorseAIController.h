@@ -10,12 +10,12 @@
 #include "GenerateType.h"
 #include "PlanetAIController.h"
 
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 #include "HorseAIController.generated.h"
 
 class UCharacterTitle;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
 struct FCharacterProxy;
 class ACharacterBase;
 class AHorseCharacter;
@@ -34,17 +34,19 @@ class PLANET_API AHorseAIController : public APlanetAIController
 
 public:
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
 	using FPawnType = AHorseCharacter;
 
 	using FTeammateOptionChangedDelegate =
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterUnitType>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterProxyType>&)>::FCallbackHandleSPtr;
 
 	using FTeamHelperChangedDelegate =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 	AHorseAIController(const FObjectInitializer& ObjectInitializer);
+
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
@@ -59,7 +61,7 @@ protected:
 
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		const TSharedPtr<FCharacterUnitType>& LeaderPCPtr
+		const TSharedPtr<FCharacterProxyType>& LeaderPCPtr
 	);
 
 	void OnDeathing(const FGameplayTag Tag, int32 Count);

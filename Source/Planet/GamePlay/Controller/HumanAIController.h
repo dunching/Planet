@@ -8,53 +8,58 @@
 
 #include "GravityAIController.h"
 #include "GenerateType.h"
+#include "GroupSharedInterface.h"
 #include "PlanetAIController.h"
 
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 #include "HumanAIController.generated.h"
 
 class USplineComponent;
 class UCharacterTitle;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
 struct FCharacterProxy;
 class ACharacterBase;
-class AHumanCharacter_NPC;
+class AHumanCharacter_AI;
 class UStateTreeComponent;
-class UStateTreeAIComponent;
+class UAIControllerStateTreeAIComponent;
 class UAIPerceptionComponent;
 class ABuildingArea;
+class AGeneratorColony;
+class AGeneratorNPCs_Patrol;
+class AGroupSharedInfo;
 
 /**
  *
  */
 UCLASS()
-class PLANET_API AHumanAIController : public APlanetAIController
+class PLANET_API AHumanAIController :
+	public APlanetAIController
 {
 	GENERATED_BODY()
 
 public:
 
-	using FCharacterUnitType = FCharacterProxy;
+	using FCharacterProxyType = FCharacterProxy;
 
-	using FPawnType = AHumanCharacter_NPC;
+	using FPawnType = AHumanCharacter_AI;
 
 	using FTeamHelperChangedDelegate =
 		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 	using FTeammateOptionChangedDelegate = 
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr < FCharacterUnitType>&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr < FCharacterProxyType>&)>::FCallbackHandleSPtr;
 
 	AHumanAIController(const FObjectInitializer& ObjectInitializer);
 
-	void SetCampType(ECharacterCampType CharacterCampType);
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
 
 	virtual bool CheckIsFarawayOriginal() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<USplineComponent> PatrolSPlinePtr = nullptr;
+	TObjectPtr<AGeneratorNPCs_Patrol> GeneratorNPCs_PatrolPtr = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
@@ -64,14 +69,12 @@ public:
 
 protected:
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	void OnTeammateOptionChangedImp(
 		ETeammateOption TeammateOption,
-		const TSharedPtr < FCharacterUnitType>& LeaderCharacterUnitPtr
+		const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
 	);
-
-	void OnDeathing(const FGameplayTag Tag, int32 Count);
-
-	void DoDeathing();
 
 	virtual void OnConstruction(const FTransform& Transform)override;
 
@@ -83,15 +86,19 @@ protected:
 
 	virtual void OnUnPossess() override;
 
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+
 	void OnGroupChanged();
 
 	void OnTeamChanged();
 
 	void InitialCharacter();
 
-	void InitialAILogic();
+	void InitialGroupInfo();
 
 	void InitialSenseConfig();
+
+	void InitialAllocations();
 
 	FTeammateOptionChangedDelegate TeammateOptionChangedDelegate;
 
@@ -99,10 +106,8 @@ protected:
 
 	FTeamHelperChangedDelegate GroupHelperChangedDelegate;
 
-	FDelegateHandle OnOwnedDeathTagDelegateHandle;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
-	TObjectPtr<UStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;
+	TObjectPtr<UAIControllerStateTreeAIComponent> StateTreeAIComponentPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIPerceptionComponent> AIPerceptionComponentPtr = nullptr;

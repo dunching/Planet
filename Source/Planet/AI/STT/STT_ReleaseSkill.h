@@ -16,29 +16,7 @@
 class AHumanCharacter;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
-
-UENUM(BlueprintType)
-enum class EUpdateReleaseSkillStuteType : uint8
-{
-	kCheck,
-	kMoveTo,
-	kRelease,
-};
-
-UCLASS(Blueprintable)
-class PLANET_API UReleaseSkillGloabVariable : public UObject
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	bool bIsNeedRelease = false;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	EUpdateReleaseSkillStuteType UpdateReleaseSkillStuteType = EUpdateReleaseSkillStuteType::kCheck;
-
-};
+class UGloabVariable;
 
 USTRUCT()
 struct PLANET_API FStateTreeReleaseSkillTaskInstanceData
@@ -50,9 +28,9 @@ struct PLANET_API FStateTreeReleaseSkillTaskInstanceData
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Output)
-	UReleaseSkillGloabVariable* GloabVariable = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = Context)
+	UGloabVariable* GloabVariable = nullptr;
 
 	UPROPERTY(Transient)
 	TObjectPtr<UAITask_ReleaseSkill> AITaskPtr = nullptr;
@@ -88,50 +66,5 @@ struct PLANET_API FSTT_ReleaseSkill : public FStateTreeAIActionTaskBase
 	) const override;
 
 	virtual EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
-
-};
-
-USTRUCT()
-struct PLANET_API FStateTreeUpdateReleaseSkillStuteTaskInstanceData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	UReleaseSkillGloabVariable* GloabVariable = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	FVector TargetLocation = FVector::ZeroVector;
-
-	UPROPERTY(EditAnywhere, Category = Parameter)
-	float AcceptableRadius = GET_AI_CONFIG_VAR(AcceptanceRadius);
-
-	UPROPERTY(EditAnywhere, Category = Parameter)
-	EUpdateReleaseSkillStuteType CurrentState = EUpdateReleaseSkillStuteType::kCheck;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-};
-
-USTRUCT()
-struct PLANET_API FSTT_UpdateReleaseSkillStuta : public FStateTreeAIActionTaskBase
-{
-	GENERATED_BODY()
-
-	using FInstanceDataType = FStateTreeUpdateReleaseSkillStuteTaskInstanceData;
-
-	using FAITaskType = UAITask_ReleaseSkill;
-
-	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
-
-	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
 
 };

@@ -19,7 +19,7 @@ class UAITask_SwitchWalkState;
 class AHumanCharacter;
 class AHumanAIController;
 class UGloabVariable;
-class USTE_Human;
+class USTE_AICharacterController;
 
 USTRUCT()
 struct PLANET_API FStateTreeUpdateQueryDistanceTaskInstanceData
@@ -51,6 +51,11 @@ struct PLANET_API FSTT_UpdateQueryDistance : public FStateTreeAIActionTaskBase
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context, 
 		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
 	) const override;
 
 };

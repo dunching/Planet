@@ -14,11 +14,11 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "SceneUnitTable.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "SceneProxyTable.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify() :
 	Super()
@@ -27,10 +27,10 @@ UCS_PeriodicPropertyModify::UCS_PeriodicPropertyModify() :
 }
 
 FGameplayAbilityTargetData_PropertyModify::FGameplayAbilityTargetData_PropertyModify(const TSharedPtr<FConsumableProxy>& RightVal) :
-	Super(RightVal->GetUnitType())
+	Super(RightVal->GetProxyType())
 {
-	Duration = RightVal->GetTableRowUnit_Consumable()->Duration;
-	PerformActionInterval = RightVal->GetTableRowUnit_Consumable()->PerformActionInterval;
+	Duration = RightVal->GetTableRowProxy_Consumable()->Duration;
+	PerformActionInterval = RightVal->GetTableRowProxy_Consumable()->PerformActionInterval;
 	DefaultIcon = RightVal->GetIcon();
 }
 
@@ -197,7 +197,7 @@ void UCS_PeriodicPropertyModify::OnTaskTick(
 		Iter.Value.CharacterStateInfoSPtr->IncreaseCooldownTime(DeltaTime);
 	}
 
-	const auto DebuffTag = UGameplayTagsSubSystem::GetInstance()->Debuff;
+	const auto DebuffTag = UGameplayTagsLibrary::Debuff;
 	const auto Temp = DurationEffectMap;
 	for (const auto& Iter : Temp)
 	{
@@ -251,17 +251,17 @@ void UCS_PeriodicPropertyModify::PerformPropertyModify(const TSharedPtr<FGamepla
 
 	FGAEventData GAEventData(SPtr->TargetCharacterPtr, SPtr->TriggerCharacterPtr);
 
-	GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+	GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
 	GAEventData.DataModify = SPtr->CharacterPropertyMap;
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 }
 
 void UCS_PeriodicPropertyModify::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->State_Buff_Purify) && (Count > 0))
+	if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Buff_Purify) && (Count > 0))
 	{
 		bIsPurify = true;
 	}

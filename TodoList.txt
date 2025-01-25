@@ -26,6 +26,12 @@
 #endif
 
 #if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_SimulatedProxy)
+	{
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 	}

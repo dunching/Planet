@@ -12,22 +12,22 @@
 
 #include "HumanCharacter.h"
 #include "GameInstance/PlanetGameInstance.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "AssetRefMap.h"
 #include <StateTagExtendInfo.h>
 #include "HumanCharacter.h"
 #include "SPlineActor.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_Base.h"
 #include "Talent_FASI.h"
 #include "TalentAllocationComponent.h"
 #include "CharacterBase.h"
 #include "CollisionDataStruct.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "PlanetControllerInterface.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
 #include "CS_RootMotion.h"
@@ -35,18 +35,18 @@
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
-#include "SceneUnitExtendInfo.h"
-#include "GameplayTagsSubSystem.h"
+#include "SceneProxyExtendInfo.h"
+#include "GameplayTagsLibrary.h"
 #include "PlanetPlayerController.h"
 
 void TestCommand::CopyID2RowName()
 {
 	auto SceneUnitExtendInfoMapPtr = USceneUnitExtendInfoMap::GetInstance();
 
-	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Unit.LoadSynchronous();
+	auto DataTable = SceneUnitExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
 
-	TArray<FTableRowUnit*> OutRowArray;
-	DataTable->GetAllRows<FTableRowUnit>(TEXT("FPCGDataTableRowToParamDataTest"), OutRowArray);
+	TArray<FTableRowProxy*> OutRowArray;
+	DataTable->GetAllRows<FTableRowProxy>(TEXT("FPCGDataTableRowToParamDataTest"), OutRowArray);
 
 	for (const auto Iter : OutRowArray)
 	{
@@ -207,8 +207,8 @@ void TestCommand::TestDisplacementSkill()
 	{
 		// 		auto UnitClass = USceneUnitExtendInfoMap::GetInstance()->SkillToolsMap[ESkillUnitType::kHumanSkill_Active_Displacement];
 		// 
-		// 		Handle1 = CharacterPtr->GetAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
-		// 		CharacterPtr->GetAbilitySystemComponent()->TryActivateAbility(Handle1);
+		// 		Handle1 = CharacterPtr->GetCharacterAbilitySystemComponent()->K2_GiveAbility(UnitClass.GetDefaultObject()->SkillClass);
+		// 		CharacterPtr->GetCharacterAbilitySystemComponent()->TryActivateAbility(Handle1);
 	}
 }
 
@@ -238,7 +238,7 @@ void TestCommand::TestGAEventModify()
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		auto BaseFeatureComponentPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto BaseFeatureComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(123, 523));
 		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(1, 423));
 		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(12, 323));
@@ -275,7 +275,7 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 				auto CharacterPtr = Cast<AHumanCharacter>(ActorPtr);
 				if (Args.IsValidIndex(3))
 				{
-					CharacterPtr->RowName = FGameplayTag::RequestGameplayTag(*Args[3]);
+					// CharacterPtr->CharacterGrowthAttribute = FGameplayTag::RequestGameplayTag(*Args[3]);
 				}
 			};
 
@@ -293,26 +293,26 @@ void TestCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 
 		if (Args.IsValidIndex(1))
 		{
-			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
+			// NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name = *Args[1];
 		}
 
 		if (Args.IsValidIndex(0))
 		{
-			NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP_Replay.AddCurrentValue(
-				UKismetStringLibrary::Conv_StringToInt(Args[0]),
-				UGameplayTagsSubSystem::GetInstance()->DataSource_Regular
-			);
+			// NewCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP_Replay.AddCurrentValue(
+			// 	UKismetStringLibrary::Conv_StringToInt(Args[0]),
+			// 	UGameplayTagsLibrary::DataSource_Regular
+			// );
 		}
 
 		if (Args.IsValidIndex(2))
 		{
 			if (Args[2] == TEXT("1"))
 			{
-				NewCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+//				NewCharacterPtr->GetGroupSharedInfo()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
 			}
 			else if (Args[2] == TEXT("2"))
 			{
-				NewCharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
+	//			NewCharacterPtr->GetGroupSharedInfo()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
 			}
 		}
 	}
@@ -360,7 +360,6 @@ void TestCommand::RecruitCharacter()
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 			if (TargetCharacterPtr)
 			{
-				CharacterPtr->GetGroupMnaggerComponent()->AddCharacterToGroup(TargetCharacterPtr->GetCharacterUnit());
 			}
 		}
 	}
@@ -413,38 +412,38 @@ void TestCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 
 	auto Value = UKismetStringLibrary::Conv_StringToInt(Args[2]);
 	auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	if (Args[1] == TEXT("1"))
-	{
-		CharacterAttributes.GoldElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("2"))
-	{
-		CharacterAttributes.WoodElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("3"))
-	{
-		CharacterAttributes.WaterElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("4"))
-	{
-		CharacterAttributes.FireElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("5"))
-	{
-		CharacterAttributes.SoilElement.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("6"))
-	{
-		CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("7"))
-	{
-		CharacterAttributes.HitRate.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
-	else if (Args[1] == TEXT("8"))
-	{
-		CharacterAttributes.Evade.SetCurrentValue(Value, UGameplayTagsSubSystem::GetInstance()->DataSource_Regular);
-	}
+	// if (Args[1] == TEXT("1"))
+	// {
+	// 	CharacterAttributes.GoldElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("2"))
+	// {
+	// 	CharacterAttributes.WoodElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("3"))
+	// {
+	// 	CharacterAttributes.WaterElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("4"))
+	// {
+	// 	CharacterAttributes.FireElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("5"))
+	// {
+	// 	CharacterAttributes.SoilElement.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("6"))
+	// {
+	// 	CharacterAttributes.CriticalHitRate.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("7"))
+	// {
+	// 	CharacterAttributes.HitRate.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
+	// else if (Args[1] == TEXT("8"))
+	// {
+	// 	CharacterAttributes.Evade.SetCurrentValue(Value, UGameplayTagsLibrary::DataSource_Regular);
+	// }
 }
 
 void TestCommand::TestGAState2Self(const TArray< FString >& Args)
@@ -465,7 +464,7 @@ void TestCommand::TestGAState2Self(const TArray< FString >& Args)
 	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
 	GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 
@@ -509,7 +508,7 @@ void TestCommand::TestGATagState2Target(const TArray< FString >& Args)
 				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = TargetCharacterPtr;
 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
-				auto ICPtr = TargetCharacterPtr->GetBaseFeatureComponent();
+				auto ICPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 		}

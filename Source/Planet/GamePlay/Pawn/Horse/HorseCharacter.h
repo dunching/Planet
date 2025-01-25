@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "CharacterBase.h"
-#include <SceneElement.h>
+#include "ItemProxy_Minimal.h"
 #include "ProxyProcessComponent.h"
 
 #include "HorseCharacter.generated.h"
@@ -17,14 +17,15 @@ class UCameraComponent;
 class UGravitySpringComponent;
 
 class FProcessActionBase;
-class USceneObjPropertyComponent;
+class USceneActorPropertyComponent;
 class FInputProcessor;
 class UAnimInstanceCharacter;
 class AHumanCharacter;
 
 UCLASS()
 class PLANET_API AHorseCharacter : 
-	public ACharacterBase
+	public ACharacterBase,
+	public ISceneActorInteractionInterface
 {
 	GENERATED_BODY()
 
@@ -34,11 +35,15 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
-	virtual void Interaction(ACharacterBase* CharacterPtr)override;
+	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const override;
+	
+	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
+	
+	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
 
-	virtual void StartLookAt(ACharacterBase* CharacterPtr)override;
-
-	virtual void EndLookAt()override;
+	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr)override;
+	
+	virtual void HasBeenEndedLookAt()override;
 
 	virtual TPair<FVector, FVector>GetCharacterViewInfo();
 

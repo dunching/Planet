@@ -10,30 +10,11 @@
 #include "GenerateType.h"
 #include <GameInstance/PlanetGameInstance.h>
 #include "Planet.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
+#include "LayoutCommon.h"
+#include "MainMenuCommon.h"
 
 #include "UIManagerSubSystem.generated.h"
-
-class UWorld;
-
-class ACharacterBase;
-
-class UToolsMenu;
-class UInteractionToAIMenu;
-class UBackpackMenu;
-class UCreateMenu;
-class UPromptBox;
-class AHumanCharacter;
-class UPiginteraction;
-class UDestroyProgress;
-class URegularActionLayout;
-class UEffectsList;
-class UProgressTips;
-class UHUD_TeamInfo;
-class UGetItemInfosList;
-class URaffleMenu;
-class UMenuLayout;
-class UFocusIcon;
 
 struct FPawnDataStruct;
 struct FSceneTool;
@@ -60,43 +41,15 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-#pragma region  ProcessMode
-	// 普通界面(技能状态HUD)、
-	void DisplayActionStateHUD(bool bIsDisplay, ACharacterBase* CharacterPtr = nullptr);
-
-	// 重伤状态
-	void DisplayEndangeredState(bool bIsDisplay);
-
-	// 工具、
-	void DisplayBuildingStateHUD(bool bIsDisplay);
-#pragma endregion  ProcessMode
+#pragma region  Layout
+	void SwitchLayout(ELayoutCommon MainHUDType);
+#pragma endregion  
 
 #pragma region Menu
-	void SwitchMenu(bool bIsShow);
-
-	// 浏览 背包、装配技能
-	void ViewBackpack(bool bIsDisplay);
-
-	// 浏览 天赋界面
-	void ViewTalentAllocation(bool bIsDisplay);
-
-	// 浏览 成员管理界面
-	void ViewGroupMatesManagger(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
-
-	// 抽卡界面
-	void ViewRaffleMenu(bool bIsDisplay);
+	void SwitchMenuLayout(EMenuType MenuType);
 #pragma endregion Menu
 
-	void InitialUI();
-
-	URegularActionLayout* GetRegularActionState();
-
 protected:
-
-	UMenuLayout* GetMainMenu();
-	
-	UPROPERTY()
-	UMenuLayout* MenuLayoutPtr = nullptr;
 
 private:
 

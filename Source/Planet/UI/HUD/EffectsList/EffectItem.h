@@ -14,6 +14,7 @@
 struct FStreamableHandle;
 struct FCharacterStateInfo;
 class UCS_Base;
+class UGameplayEffect;
 
 UCLASS()
 class PLANET_API UEffectItem : 
@@ -28,11 +29,15 @@ public:
 
 	void SetData(const TSharedPtr<FCharacterStateInfo> &InCharacterStateInfoSPtr);
 
+	void SetData(const FActiveGameplayEffect*ActiveGameplayEffect);
+
 protected:
 
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
+
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime)override;
 
 	void OnUpdate();
 
@@ -48,7 +53,11 @@ protected:
 	void SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr);
 
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
+	
+	const FActiveGameplayEffect* ActiveGameplayEffectPtr = nullptr;
 
+	FActiveGameplayEffectHandle Handle;
+	
 	FDataChangedHandle DataChangedHandle;
 
 };

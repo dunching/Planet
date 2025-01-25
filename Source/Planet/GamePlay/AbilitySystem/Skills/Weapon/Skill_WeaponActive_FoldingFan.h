@@ -114,7 +114,7 @@ protected:
 
 	virtual	void UpdateRegisterParam(const FGameplayEventData& GameplayEventData)override;
 
-	virtual void CheckInContinue()override;
+	virtual void CheckInContinue(float InWaitInputTime)override;
 
 	void PlayMontage();
 

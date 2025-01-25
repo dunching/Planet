@@ -17,9 +17,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -31,7 +31,7 @@
 FGameplayAbilityTargetData_StateModify_Charm::FGameplayAbilityTargetData_StateModify_Charm(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm, Duration)
+	Super(UGameplayTagsLibrary::State_Debuff_Charm, Duration)
 {
 }
 
@@ -95,7 +95,7 @@ void UCS_PeriodicStateModify_Charm::EndAbility(
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 	//
 	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
@@ -123,14 +123,14 @@ void UCS_PeriodicStateModify_Charm::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);;
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);;
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
 }
 
 void UCS_PeriodicStateModify_Charm::PerformAction()
@@ -159,7 +159,7 @@ void UCS_PeriodicStateModify_Charm::PerformAction()
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 	//
 	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())

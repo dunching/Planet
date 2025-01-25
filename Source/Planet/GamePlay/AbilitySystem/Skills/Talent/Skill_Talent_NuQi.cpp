@@ -12,7 +12,7 @@
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 int32 FTalent_NuQi::GetCurrentValue() const
 {
@@ -55,16 +55,16 @@ void USkill_Talent_NuQi::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo,
 
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
+		AbilityActivatedCallbacksHandle = CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
-			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
-
-		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
-		);
+		// OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
+		// 	std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
+		// );
+		//
+		// TalentSPtr = TSharedPtr<FCurrentTalentType>(
+		// 	CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
+		// );
 	}
 }
 
@@ -80,7 +80,7 @@ void USkill_Talent_NuQi::OnRemoveAbility(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
+		CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -173,23 +173,23 @@ void USkill_Talent_NuQi::AddNuQi()
 void USkill_Talent_NuQi::SubNuQi(float Inveral)
 {
 	auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
-	if (TalentPtr)
-	{
-		if (bIsInWeak)
-		{
-			const auto Value = TalentPtr->GetMaxValue() / FMath::FloorToFloat(WeakDuration);
-			TalentPtr->AddCurrentValue(-Value);
-		}
-		else
-		{
-			DecrementTime_Accumulate += Inveral;
-			if (DecrementTime_Accumulate > DecrementTime)
-			{
-				TalentPtr->AddCurrentValue(-Decrement);
-			}
-		}
-	}
+	// auto TalentPtr = dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get());
+	// if (TalentPtr)
+	// {
+	// 	if (bIsInWeak)
+	// 	{
+	// 		const auto Value = TalentPtr->GetMaxValue() / FMath::FloorToFloat(WeakDuration);
+	// 		TalentPtr->AddCurrentValue(-Value);
+	// 	}
+	// 	else
+	// 	{
+	// 		DecrementTime_Accumulate += Inveral;
+	// 		if (DecrementTime_Accumulate > DecrementTime)
+	// 		{
+	// 			TalentPtr->AddCurrentValue(-Decrement);
+	// 		}
+	// 	}
+	// }
 }
 
 void USkill_Talent_NuQi::OnHPValueChanged(int32 OldValue, int32 NewValue)
@@ -213,7 +213,7 @@ void USkill_Talent_NuQi::StartFuryState()
 
 		ModifyPropertyMap.Add(ECharacterPropertyType::AD, 50);
 
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(ModifyPropertyMap, SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
 	}
 }
 
@@ -223,7 +223,7 @@ void USkill_Talent_NuQi::StopFuryState()
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetBaseFeatureComponent()->SendEvent2Self(GetAllData(), SkillUnitPtr->GetUnitType());
+		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
 	}
 
 	if (EffectItemPtr)
@@ -255,12 +255,12 @@ void USkill_Talent_NuQi::OnSendDamage(UGameplayAbility* GAPtr)
 {
 	if (CharacterPtr)
 	{
-		if (
-			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
-			)
-		{
-			AddNuQi();
-		}
+		// if (
+		// 	GAPtr &&
+		// 	(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
+		// 	)
+		// {
+		// 	AddNuQi();
+		// }
 	}
 }

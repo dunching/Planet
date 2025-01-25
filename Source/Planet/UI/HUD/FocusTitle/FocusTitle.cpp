@@ -1,4 +1,3 @@
-
 #include "FocusTitle.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -7,6 +6,9 @@
 #include <Components/CanvasPanel.h>
 #include <Components/CanvasPanelSlot.h>
 #include <GameplayTagsManager.h>
+
+#include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Border.h"
 
@@ -16,7 +18,7 @@
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "EffectsList.h"
 
 struct FFocusTitle : public TStructVariable<FFocusTitle>
@@ -67,7 +69,7 @@ void UFocusTitle::NativeDestruct()
 	if (CharacterPtr)
 	{
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
 		}
 	}
@@ -89,43 +91,39 @@ void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
 		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
 
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
-			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
+				this, &ThisClass::OnGameplayEffectTagCountChanged);
+		}
+
+		auto CharacterAttributesPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		{
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributesPtr->GetHPAttribute()
+			).AddUObject(this, &ThisClass::OnHPChanged);
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributesPtr->GetMax_HPAttribute()
+			).AddUObject(this, &ThisClass::OnHPChanged);
+			SetHPChanged(CharacterAttributesPtr->GetHP(), CharacterAttributesPtr->GetMax_HP());
 		}
 		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
-			{
-				OnHPMaxValueChanged(Ref.GetMaxValue());
-				MaxHPValueChanged = Ref.AddOnMaxValueChanged(
-					std::bind(&ThisClass::OnHPMaxValueChanged, this, std::placeholders::_2)
-				);
-			}
-			{
-				OnHPCurrentValueChanged(Ref.GetCurrentValue());
-				CurrentHPValueChanged = Ref.AddOnValueChanged(
-					std::bind(&ThisClass::OnHPCurrentValueChanged, this, std::placeholders::_2)
-				);
-			}
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributesPtr->GetPPAttribute()
+			).AddUObject(this, &ThisClass::OnPPChanged);
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributesPtr->GetMax_PPAttribute()
+			).AddUObject(this, &ThisClass::OnPPChanged);
+			SetPP(CharacterAttributesPtr->GetPP(), CharacterAttributesPtr->GetMax_PP());
 		}
 		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
-			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
-				std::bind(&ThisClass::OnPPChanged, this)
-			));
-			ValueChangedAry.Add(Ref.AddOnValueChanged(
-				std::bind(&ThisClass::OnPPChanged, this)
-			));
-			OnPPChanged();
-		}
-		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
-			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
-				std::bind(&ThisClass::OnShieldChanged, this)
-			));
-			ValueChangedAry.Add(Ref.AddOnValueChanged(
-				std::bind(&ThisClass::OnShieldChanged, this)
-			));
-			OnShieldChanged();
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributesPtr->GetShieldAttribute()
+			).AddUObject(this, &ThisClass::OnShieldChanged);
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributesPtr->GetMax_HPAttribute()
+			).AddUObject(this, &ThisClass::OnShieldChanged);
+			SetShild(CharacterAttributesPtr->GetShield(), CharacterAttributesPtr->GetMax_HP());
 		}
 
 		auto EffectPtr = Cast<UEffectsList>(GetWidgetFromName(FFocusTitle::Get().EffectsList));
@@ -148,24 +146,12 @@ void UFocusTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
 	}
 }
 
-void UFocusTitle::OnHPCurrentValueChanged(int32 NewVal)
-{
-	CurrentHP = NewVal;
-	OnHPChanged();
-}
-
-void UFocusTitle::OnHPMaxValueChanged(int32 NewVal)
-{
-	MaxHP = NewVal;
-	OnHPChanged();
-}
-
 void UFocusTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	if (Tag.MatchesTagExact(UGameplayTagsLibrary::Debuff))
 	{
 	}
-	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	else if (Tag.MatchesTag(UGameplayTagsLibrary::Debuff))
 	{
 		if (Count > 0)
 		{
@@ -187,7 +173,13 @@ void UFocusTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 
 	}
 }
 
-void UFocusTitle::OnHPChanged()
+void UFocusTitle::OnHPChanged(const FOnAttributeChangeData& CurrentValue)
+{
+	auto CharacterAttributesPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+	SetHPChanged(CharacterAttributesPtr->GetHP(), CharacterAttributesPtr->GetMax_HP());
+}
+
+void UFocusTitle::SetHPChanged(float Value, float MaxValue)
 {
 	{
 		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FFocusTitle::Get().HP_ProgressBar));
@@ -205,23 +197,33 @@ void UFocusTitle::OnHPChanged()
 	}
 }
 
-void UFocusTitle::OnPPChanged()
+void UFocusTitle::OnPPChanged(const FOnAttributeChangeData& CurrentValue)
+{
+	auto CharacterAttributesPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+	SetHPChanged(CharacterAttributesPtr->GetPP(), CharacterAttributesPtr->GetMax_PP());
+}
+
+void UFocusTitle::SetPP(float Value, float MaxValue)
 {
 	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FFocusTitle::Get().PP_ProgressBar));
 	if (WidgetPtr)
 	{
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
-		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
+		WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
 	}
 }
 
-void UFocusTitle::OnShieldChanged()
+void UFocusTitle::OnShieldChanged(const FOnAttributeChangeData& CurrentValue)
+{
+	auto CharacterAttributesPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			SetShild(CharacterAttributesPtr->GetShield(), CharacterAttributesPtr->GetMax_HP());
+}
+
+void UFocusTitle::SetShild(float Value, float MaxValue)
 {
 	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FFocusTitle::Get().Shield_ProgressBar));
 	if (WidgetPtr)
 	{
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
-		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
+		WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
 	}
 }
 
@@ -231,7 +233,7 @@ void UFocusTitle::ApplyCharaterNameToTitle()
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FFocusTitle::Get().Title));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
+			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->Name));
 		}
 	}
 }

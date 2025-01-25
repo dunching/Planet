@@ -81,9 +81,14 @@ public:
 
 protected:
 
-	void AddValue(int32 Value);
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	)override;
 
-	void PerformAction();
+	void AddValue(int32 Value);
 
 	void PerformAction_Yang();
 

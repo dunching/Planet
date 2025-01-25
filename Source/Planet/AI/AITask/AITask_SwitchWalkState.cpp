@@ -10,8 +10,8 @@
 #include "AIResources.h"
 #include "GameplayTasksComponent.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "CharacterAbilitySystemComponent.h"
 
 UAITask_SwitchWalkState::UAITask_SwitchWalkState(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -79,7 +79,7 @@ bool UAITask_SwitchWalkState::SwitchWalkState()
 
 	if (OnwerActorPtr)
 	{
-		OnwerActorPtr->GetBaseFeatureComponent()->SwitchWalkState(bIsSwitchToRun);
+		OnwerActorPtr->GetCharacterAbilitySystemComponent()->SwitchWalkState(bIsSwitchToRun);
 		return true;
 	}
 

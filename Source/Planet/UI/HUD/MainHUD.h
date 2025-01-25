@@ -7,6 +7,8 @@
 #include "GameFramework/HUD.h"
 
 #include "MyUserWidget.h"
+#include "TemplateHelper.h"
+#include "LayoutCommon.h"
 
 #include "MainHUD.generated.h"
 
@@ -14,13 +16,8 @@ class UMainHUDLayout;
 class URegularActionLayout;
 class UEndangeredStateLayout;
 class UGetItemInfosList;
-
-enum class EMainHUDType : uint8 
-{
-	kRegularAction,
-	kEndangered,
-	kNone,
-};
+class UUIManagerSubSystem;
+struct FOnAttributeChangeData;
 
 UCLASS()
 class PLANET_API AMainHUD : public AHUD
@@ -29,13 +26,26 @@ class PLANET_API AMainHUD : public AHUD
 
 public:
 
+	friend UUIManagerSubSystem;
+	
+	using FOnInitaliedGroupSharedInfo =
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+
 	virtual void BeginPlay()override;
 
 	virtual void ShowHUD()override;
 
-	void SwitchState(EMainHUDType MainHUDType);
+	void InitalHUD();
+	
+	void SwitchLayout(ELayoutCommon MainHUDType);
 
-	void OnHPChanged(int32 CurrentValue);
+	UMainHUDLayout*GetMainHUDLayout()const;
+	
+protected:
+	
+	void OnHPChanged(const FOnAttributeChangeData&);
+
+	void OnHPChangedImp();
 
 	void InitMainHUDLayout();
 
@@ -43,15 +53,5 @@ public:
 	TSubclassOf<UMainHUDLayout>MainHUDLayoutClass;
 	
 	UMainHUDLayout* MainHUDLayoutPtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<URegularActionLayout>RegularActionStateClass;
-	
-	URegularActionLayout* RegularActionStatePtr = nullptr;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UEndangeredStateLayout>EndangeredStateClass;
-	
-	UEndangeredStateLayout* EndangeredStatePtr = nullptr;
 
 };

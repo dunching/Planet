@@ -27,11 +27,12 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "Weapon_FoldingFan.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "KismetGravityLibrary.h"
 #include "AbilityTask_FlyAway.h"
+#include "AS_Character.h"
 #include "LogWriter.h"
 
 namespace Skill_WeaponActive_FoldingFan
@@ -113,7 +114,7 @@ void USkill_WeaponActive_FoldingFan::ActivateAbility(
 		return;
 	}
 
-	check(0);
+	checkNoEntry();
 	K2_EndAbility();
 }
 
@@ -143,7 +144,7 @@ bool USkill_WeaponActive_FoldingFan::CommitAbility(
 
 	if (CurrentFanNum < 0)
 	{
-		check(0);
+		checkNoEntry();
 		CurrentFanNum = 0;
 	}
 
@@ -171,23 +172,23 @@ void USkill_WeaponActive_FoldingFan::UpdateRegisterParam(const FGameplayEventDat
 
 	if (!GameplayEventData.TargetData.IsValid(0))
 	{
-		check(0);
+		checkNoEntry();
 	}
 	RegisterParamSPtr = MakeSPtr_GameplayAbilityTargetData<FRegisterParamType>(GameplayEventData.TargetData.Get(0));
 	if (!RegisterParamSPtr)
 	{
-		check(0);
+		checkNoEntry();
 	}
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	{
 		CurrentFanNum += RegisterParamSPtr->IncreaseNum;
 	}
 #endif
 }
 
-void USkill_WeaponActive_FoldingFan::CheckInContinue()
+void USkill_WeaponActive_FoldingFan::CheckInContinue(float InWaitInputTime)
 {
 	if (
 		bIsContinue && 
@@ -263,7 +264,7 @@ void USkill_WeaponActive_FoldingFan::OnProjectileBounce(
 					ActivedWeaponPtr->Destroy();
 
 #if UE_EDITOR || UE_SERVER
-					if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+					if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 					{
 						OnCurrentFanNumChanged();
 					}
@@ -304,7 +305,7 @@ void USkill_WeaponActive_FoldingFan::OnMontateComplete()
 	AbilityTask_PlayMontage_HumanPtr = nullptr;
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	{
 		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
 	}
@@ -319,12 +320,12 @@ void USkill_WeaponActive_FoldingFan::OnMotionComplete()
 
 	if (bIsContinue)
 	{
-		CheckInContinue();
+		CheckInContinue(-1.f);
 	}
 	else
 	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+		if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		{
 			K2_CancelAbility();
 		}
@@ -335,7 +336,7 @@ void USkill_WeaponActive_FoldingFan::OnMotionComplete()
 void USkill_WeaponActive_FoldingFan::EmitProjectile()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	{
 		FActorSpawnParameters SpawnParameters;
 
@@ -348,7 +349,7 @@ void USkill_WeaponActive_FoldingFan::EmitProjectile()
 		);
 		if (ActivedWeaponPtr)
 		{
-			ActivedWeaponPtr->SetWeaponUnit(WeaponPtr->WeaponProxyPtr->GetID());
+			ActivedWeaponPtr->SetWeaponProxy(WeaponPtr->GetWeaponProxy()->GetID());
 			ActivedWeaponPtr->GetCollisionComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnProjectileBounce);
 			ActivedWeaponPtr->BeginAttack();
 		}
@@ -379,19 +380,19 @@ void USkill_WeaponActive_FoldingFan::MakeDamage(ACharacterBase* TargetCharacterP
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 
 void USkill_WeaponActive_FoldingFan::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -402,7 +403,7 @@ void USkill_WeaponActive_FoldingFan::PlayMontage()
 		);
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 
@@ -412,7 +413,7 @@ void USkill_WeaponActive_FoldingFan::PlayMontage()
 
 void USkill_WeaponActive_FoldingFan::RootMotion()
 {
-	if (CharacterPtr->GetLocalRole() > ROLE_SimulatedProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
 	{
 		const auto Lenth = HumanMontage->CalculateSequenceLength();
 

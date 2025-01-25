@@ -95,7 +95,7 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
-	virtual void CheckInContinue()override;
+	virtual void CheckInContinue(float InWaitInputTime)override;
 
 	void PlayMontage();
 

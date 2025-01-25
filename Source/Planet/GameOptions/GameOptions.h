@@ -6,17 +6,21 @@
 #include <GenerateType.h>
 
 #include "GameplayTagContainer.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 
 #include "GameOptions.generated.h"
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UGameOptions : public UObject
+class PLANET_API UGameOptions : public UDataAsset
 {
 	GENERATED_BODY()
 public:
 
 	static UGameOptions* GetInstance();
+	
+	virtual void PostCDOContruct() override;
+	
+	virtual void PostInitProperties()override;
 	
 	// 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "ActiveSkill")
@@ -36,5 +40,16 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveToAttaclArea")
 	bool bIsAllowAdjustTime = true;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveSpeed")
+	int32 MaxMoveSpeed = 1000;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "MoveSpeed")
+	int32 MaxPerformSpeed = 300;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TMap<FGameplayTag, FKey>ActionKeyMap;
+
+	static int32 MaxTeammateNum;
 
 };

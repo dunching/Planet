@@ -1,12 +1,18 @@
-
 #include "MainHUD.h"
 
 #include "Components/Border.h"
+#include "Components/WidgetSwitcher.h"
 
 #include "MainHUDLayout.h"
+
+#include "ConversationLayout.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
+#include "InteractionList.h"
+#include "LayoutCommon.h"
+#include "LayoutInterfacetion.h"
+#include "MainMenuLayout.h"
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
@@ -21,7 +27,102 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
 
 	FName LowerHPSocket = TEXT("LowerHPSocket");
+
+	FName InteractionList = TEXT("InteractionList");
+
+	FName Layout_WidgetSwitcher = TEXT("Layout_WidgetSwitcher");
 };
+
+void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
+{
+	auto Lambda = [this](int32 Index)
+	{
+		auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+		if (UIPtr)
+		{
+			const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+			if (CurrentIndex == Index)
+			{
+				return;
+			}
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			if (MenuInterfacePtr)
+			{
+				MenuInterfacePtr->DisEnable();
+			}
+			UIPtr->SetActiveWidgetIndex(Index);
+			MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(Index));
+			if (MenuInterfacePtr)
+			{
+				MenuInterfacePtr->Enable();
+			}
+		}
+	};
+
+	switch (LayoutCommon)
+	{
+	case ELayoutCommon::kActionLayout:
+		{
+			Lambda(0);
+		}
+		break;
+	case ELayoutCommon::kMenuLayout:
+		{
+			Lambda(1);
+		}
+		break;
+	case ELayoutCommon::kConversationLayout:
+		{
+			Lambda(2);
+		}
+		break;
+	case ELayoutCommon::kEndangeredLayout:
+		{
+			Lambda(3);
+		}
+		break;
+	default:
+		{
+		}
+		break;
+	}
+}
+
+UMainMenuLayout* UMainHUDLayout::GetMenuLayout()
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
+	{
+		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kMenuLayout))
+		{
+			auto MenuInterfacePtr = Cast<UMainMenuLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			if (MenuInterfacePtr)
+			{
+				return MenuInterfacePtr;
+			}
+		}
+	}
+	return nullptr;
+}
+
+UConversationLayout* UMainHUDLayout::GetConversationLayout()
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
+	{
+		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kConversationLayout))
+		{
+			auto LayoutUIPtr = Cast<UConversationLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			if (LayoutUIPtr)
+			{
+				return LayoutUIPtr;
+			}
+		}
+	}
+	return nullptr;
+}
 
 UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 {
@@ -53,3 +154,14 @@ void UMainHUDLayout::SwitchIsLowerHP(bool bIsLowerHP)
 
 	BorderPtr->SetVisibility(bIsLowerHP ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
+
+// UInteractionList* UMainHUDLayout::GetInteractionList()
+// {
+// 	auto UIPtr = Cast<UInteractionList>(GetWidgetFromName(FMainHUDLayout::Get().InteractionList));
+// 	if (!UIPtr)
+// 	{
+// 		return nullptr;
+// 	}
+//
+// 	return UIPtr;
+// }

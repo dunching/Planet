@@ -7,6 +7,9 @@
 #include <Components/CanvasPanel.h>
 #include <Components/CanvasPanelSlot.h>
 #include <GameplayTagsManager.h>
+
+#include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Border.h"
 
@@ -16,7 +19,7 @@
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 struct FCharacterTitle : public TStructVariable<FCharacterTitle>
 {
@@ -39,60 +42,8 @@ void UCharacterTitle::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	SetAnchorsInViewport(FAnchors(.5f));
-	SetAlignmentInViewport(FVector2D(.5f, 1.f));
-
-	if (CharacterPtr)
-	{
-		float Radius = 0.f;
-		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
-
-		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent(); 
-			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
-		}
-		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().HP;
-			{
-				OnHPMaxValueChanged(Ref.GetMaxValue());
-				MaxHPValueChanged = Ref.AddOnMaxValueChanged(
-					std::bind(&ThisClass::OnHPMaxValueChanged, this, std::placeholders::_2)
-				);
-			}
-			{
-				OnHPCurrentValueChanged(Ref.GetCurrentValue());
-				CurrentHPValueChanged = Ref.AddOnValueChanged(
-					std::bind(&ThisClass::OnHPCurrentValueChanged, this, std::placeholders::_2)
-				);
-			}
-		}
-		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
-			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
-				std::bind(&ThisClass::OnPPChanged, this)
-			));
-			ValueChangedAry.Add(Ref.AddOnValueChanged(
-				std::bind(&ThisClass::OnPPChanged, this)
-			));
-			OnPPChanged();
-		}
-		{
-			auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
-			ValueChangedAry.Add(Ref.AddOnMaxValueChanged(
-				std::bind(&ThisClass::OnShieldChanged, this)
-			));
-			ValueChangedAry.Add(Ref.AddOnValueChanged(
-				std::bind(&ThisClass::OnShieldChanged, this)
-			));
-			OnShieldChanged();
-		}
-		SwitchCantBeSelect(false);
-
-		ApplyCharaterNameToTitle();
-
-		TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
-		ResetPosition(0.f);
-	}
+	// SetAnchorsInViewport(FAnchors(.5f));
+	// SetAlignmentInViewport(FVector2D(.5f, 1.f));
 }
 
 void UCharacterTitle::NativeDestruct()
@@ -119,7 +70,7 @@ void UCharacterTitle::NativeDestruct()
 	if (CharacterPtr)
 	{
 		{
-			auto GASCompPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 			GASCompPtr->RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
 		}
 	}
@@ -141,24 +92,12 @@ void UCharacterTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
 	}
 }
 
-void UCharacterTitle::OnHPCurrentValueChanged(int32 NewVal)
-{
-	CurrentHP = NewVal;
-	OnHPChanged();
-}
-
-void UCharacterTitle::OnHPMaxValueChanged(int32 NewVal)
-{
-	MaxHP = NewVal;
-	OnHPChanged();
-}
-
 void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
-	if (Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	if (Tag.MatchesTagExact(UGameplayTagsLibrary::Debuff))
 	{
 	}
-	else if (Tag.MatchesTag(UGameplayTagsSubSystem::GetInstance()->Debuff))
+	else if (Tag.MatchesTag(UGameplayTagsLibrary::Debuff))
 	{
 		if (Count > 0)
 		{
@@ -180,41 +119,60 @@ void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, in
 	}
 }
 
-void UCharacterTitle::OnHPChanged()
+void UCharacterTitle::OnHPChanged(const FOnAttributeChangeData& )
+{
+	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetHP();
+	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
+	SetHPChanged(Value, MaxValue);
+}
+
+void UCharacterTitle::SetHPChanged(float Value, float MaxValue)
 {
 	{
 		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().HP_ProgressBar));
 		if (WidgetPtr)
 		{
-			WidgetPtr->SetPercent(static_cast<float>(CurrentHP) / MaxHP);
+			WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
 		}
 	}
 	{
 		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Text));
 		if (WidgetPtr)
 		{
-			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%d/%d"), CurrentHP, MaxHP)));
+			WidgetPtr->SetText(FText::FromString(FString::Printf(TEXT("%.0lf/%.0lf"), Value, MaxValue)));
 		}
 	}
 }
 
-void UCharacterTitle::OnPPChanged()
+void UCharacterTitle::OnPPChanged(const FOnAttributeChangeData&)
+{
+	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP();
+	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_PP();
+	SetPPChanged(Value, MaxValue);
+}
+
+void UCharacterTitle::SetPPChanged(float Value, float MaxValue)
 {
 	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().PP_ProgressBar));
 	if (WidgetPtr)
 	{
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP;
-		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
+		WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
 	}
 }
 
-void UCharacterTitle::OnShieldChanged()
+void UCharacterTitle::OnShieldChanged(const FOnAttributeChangeData&)
+{
+	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetShield();
+	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
+	SetPPChanged(Value, MaxValue);
+}
+
+void UCharacterTitle::SetShieldChanged(float Value, float MaxValue)
 {
 	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().Shield_ProgressBar));
 	if (WidgetPtr)
 	{
-		auto& Ref = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Shield;
-		WidgetPtr->SetPercent(static_cast<float>(Ref.GetCurrentValue()) / Ref.GetMaxValue());
+		WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
 	}
 }
 
@@ -224,7 +182,7 @@ void UCharacterTitle::ApplyCharaterNameToTitle()
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Title));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromName(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().Name));
+			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->Name));
 		}
 	}
 }
@@ -267,4 +225,61 @@ bool UCharacterTitle::ResetPosition(float InDeltaTime)
 	SetPositionInViewport(ScreenPosition);
 
 	return true;
+}
+
+void UCharacterTitle::SetData(ACharacterBase* InCharacterPtr)
+{
+	CharacterPtr = InCharacterPtr;
+	if (CharacterPtr)
+	{
+		float Radius = 0.f;
+		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(Radius, HalfHeight);
+
+		{
+			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent(); 
+			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(this, &ThisClass::OnGameplayEffectTagCountChanged);
+		}
+		
+		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetHPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_HPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
+			SetHPChanged(CharacterAttributeSetPtr->GetHP(), CharacterAttributeSetPtr->GetMax_HP());
+		}
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetPPAttribute()
+				).AddUObject(this, &ThisClass::OnPPChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_PPAttribute()
+				).AddUObject(this, &ThisClass::OnPPChanged);
+
+			SetPPChanged(CharacterAttributeSetPtr->GetPP(), CharacterAttributeSetPtr->GetMax_PP());
+		}
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetShieldAttribute()
+				).AddUObject(this, &ThisClass::OnShieldChanged);
+
+			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+				CharacterAttributeSetPtr->GetMax_HPAttribute()
+				).AddUObject(this, &ThisClass::OnShieldChanged);
+
+			SetShieldChanged(CharacterAttributeSetPtr->GetShield(), CharacterAttributeSetPtr->GetMax_HP());
+		}
+		SwitchCantBeSelect(false);
+
+		ApplyCharaterNameToTitle();
+
+		// TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
+		// ResetPosition(0.f);
+	}
 }

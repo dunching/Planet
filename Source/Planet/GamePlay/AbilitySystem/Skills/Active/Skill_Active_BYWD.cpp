@@ -11,6 +11,8 @@
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AssetRefMap.h"
+#include "GameplayTagsLibrary.h"
 
 void USkill_Active_BYWD::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
@@ -22,22 +24,22 @@ void USkill_Active_BYWD::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
 #endif
 	
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
-
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+		// CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		// CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
+		// CharacterStateInfoSPtr->Duration = Duration;
+		// CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
+		// CharacterStateInfoSPtr->DataChanged();
+		//
+		// CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -48,7 +50,7 @@ void USkill_Active_BYWD::PerformAction(
 	}
 #endif
 
-	if (CharacterPtr->GetLocalRole() > ROLE_SimulatedProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
 	{
 		{
 			auto TaskPtr = UAbilityTask_FlyAway::NewTask(
@@ -62,7 +64,7 @@ void USkill_Active_BYWD::PerformAction(
 			);
 
 #if UE_EDITOR || UE_SERVER
-			if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+			if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 			{
 				TaskPtr->OnFinished.BindLambda([this]
 					{
@@ -78,10 +80,50 @@ void USkill_Active_BYWD::PerformAction(
 	}
 }
 
+bool USkill_Active_BYWD::CommitAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+)
+{
+	UGameplayEffect* DurationGEPtr = UAssetRefMap::GetInstance()->DurationGEClass->GetDefaultObject<UGameplayEffect>();
+	if (DurationGEPtr)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+		   MakeOutgoingGameplayEffectSpec(DurationGEPtr->GetClass(), GetAbilityLevel());
+
+		SpecHandle.Data.Get()->SetDuration(Duration, true);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,1);
+				
+		const auto GEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+	
+	
+	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
+}
+
+void USkill_Active_BYWD::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+		   MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+				
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+	
+	// 公共冷却
+}
+
 void USkill_Active_BYWD::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentInterval, float Interval)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{

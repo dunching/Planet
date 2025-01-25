@@ -5,9 +5,10 @@
 #include "AbilitySystemComponent.h"
 
 #include "AbilityTask_PlayMontage.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
 #include "HumanCharacter_Player.h"
@@ -31,7 +32,7 @@ void UBasicFutures_Respawn::ActivateAbility(
 	PlayMontage(DeathMontage, 1.f);
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 	}
@@ -41,20 +42,20 @@ void UBasicFutures_Respawn::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_Orient2Acce);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_CantBeSlected);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
 }
 
 void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -65,7 +66,7 @@ void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 
@@ -76,14 +77,14 @@ void UBasicFutures_Respawn::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 void UBasicFutures_Respawn::OnMontageComplete()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		)
 	{
 		K2_CancelAbility();
 	}
 
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();

@@ -15,9 +15,9 @@
 #include "AbilityTask_TimerHelper.h"
 #include "CollisionDataStruct.h"
 #include "HumanCharacter.h"
-#include "GroupMnaggerComponent.h"
-#include "SceneObjSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "TeamMatesHelperComponent.h"
+#include "SceneActorSubSystem.h"
+#include "CharacterAbilitySystemComponent.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {
@@ -61,19 +61,19 @@ void USkill_Talent_YinYang::OnAvatarSet(const FGameplayAbilityActorInfo* ActorIn
 	CharacterPtr = Cast<ACharacterBase>(ActorInfo->AvatarActor.Get());
 	if (CharacterPtr)
 	{
-		AbilityActivatedCallbacksHandle = CharacterPtr->GetAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
+		AbilityActivatedCallbacksHandle = CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityEndedCallbacks.AddUObject(this, &ThisClass::OnSendDamage);
 
 		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
-			std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
-
-		TalentSPtr = TSharedPtr<FCurrentTalentType>(
-			CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
-		);
+		// OnValueChanged = CharacterAttributes.HP.AddOnValueChanged(
+		// 	std::bind(&ThisClass::OnHPValueChanged, this, std::placeholders::_1, std::placeholders::_2)
+		// );
+		//
+		// TalentSPtr = TSharedPtr<FCurrentTalentType>(
+		// 	CharacterAttributes.TalentSPtr, dynamic_cast<FCurrentTalentType*>(CharacterAttributes.TalentSPtr.Get())
+		// );
 	}
 
-	TargetPostPtr = USceneObjSubSystem::GetInstance()->GetSkillPost();
+	TargetPostPtr = USceneActorSubSystem::GetInstance()->GetSkillPost();
 	if (TargetPostPtr)
 	{
 		WhiteTemp = TargetPostPtr->Settings.WhiteTemp;
@@ -93,10 +93,17 @@ void USkill_Talent_YinYang::OnRemoveAbility(
 
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
+		CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(AbilityActivatedCallbacksHandle);
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
+void USkill_Talent_YinYang::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData)
+{
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void USkill_Talent_YinYang::EndAbility(
@@ -132,22 +139,12 @@ void USkill_Talent_YinYang::Tick(float DeltaTime)
 		{
 			Tick_Buff_Accumulate = 0.f;
 
-			PerformAction();
+			// PerformAction();
 		}
 	}
 	if (EffectItemPtr)
 	{
 	}
-}
-
-void USkill_Talent_YinYang::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 void USkill_Talent_YinYang::AddValue(int32 Value)
@@ -199,7 +196,12 @@ void USkill_Talent_YinYang::AddValue(int32 Value)
 	}
 }
 
-void USkill_Talent_YinYang::PerformAction()
+void USkill_Talent_YinYang::PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+		)
 {
 	switch (TalentSPtr->CurentType)
 	{
@@ -256,7 +258,7 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
@@ -275,69 +277,69 @@ void USkill_Talent_YinYang::OnHPValueChanged(int32 OldValue, int32 NewValue)
 
 void USkill_Talent_YinYang::OnSendDamage(UGameplayAbility* GAPtr)
 {
-	if (CharacterPtr)
-	{
-		if (
-			GAPtr &&
-			(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetBaseFeatureComponent()->SendEventHandle)
-			)
-		{
-			auto SendGaPtr = Cast<UGAEvent_Send>(GAPtr);
-			if (!SendGaPtr)
-			{
-				return;
-			}
-			const auto& EventDataRef = SendGaPtr->GetCurrentEventData();
-			if (!EventDataRef.TargetData.Data.IsValidIndex(0))
-			{
-				return;
-			}
-			auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventDataRef.TargetData.Get(0));
-			if (!GAEventDataPtr)
-			{
-				return;
-			}
-
-			for (const auto& DataIter : GAEventDataPtr->DataAry)
-			{
-				switch (TalentSPtr->CurentType)
-				{
-				case ETalent_State_Type::kYin:
-				{
-					for (const auto& Iter : DataIter.ElementSet)
-					{
-						const auto Type = Iter.Get<0>();
-						const auto Damage = Iter.Get<2>();
-						if (
-							((Type == EWuXingType::kWood) && (Damage > 0)) ||
-							((Type == EWuXingType::kWater) && (Damage > 0))
-							)
-						{
-							AddValue(AttackIncrement);
-							break;
-						}
-					}
-				}
-				break;
-				case ETalent_State_Type::kYang:
-				{
-					for (const auto& Iter : DataIter.ElementSet)
-					{
-						const auto Type = Iter.Get<0>();
-						const auto Damage = Iter.Get<2>();
-						if (
-							((Type == EWuXingType::kGold) && (Damage > 0)) ||
-							((Type == EWuXingType::kFire) && (Damage > 0)) 
-							)
-						{
-							AddValue(AttackIncrement);
-							break;
-						}
-					}
-				}
-				break;
-				}
-			}
-		}
-	}
+	// if (CharacterPtr)
+	// {
+	// 	if (
+	// 		GAPtr &&
+	// 		(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
+	// 		)
+	// 	{
+	// 		auto SendGaPtr = Cast<UGAEvent_Send>(GAPtr);
+	// 		if (!SendGaPtr)
+	// 		{
+	// 			return;
+	// 		}
+	// 		const auto& EventDataRef = SendGaPtr->GetCurrentEventData();
+	// 		if (!EventDataRef.TargetData.Data.IsValidIndex(0))
+	// 		{
+	// 			return;
+	// 		}
+	// 		auto GAEventDataPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventDataRef.TargetData.Get(0));
+	// 		if (!GAEventDataPtr)
+	// 		{
+	// 			return;
+	// 		}
+	//
+	// 		for (const auto& DataIter : GAEventDataPtr->DataAry)
+	// 		{
+	// 			switch (TalentSPtr->CurentType)
+	// 			{
+	// 			case ETalent_State_Type::kYin:
+	// 			{
+	// 				for (const auto& Iter : DataIter.ElementSet)
+	// 				{
+	// 					const auto Type = Iter.Get<0>();
+	// 					const auto Damage = Iter.Get<2>();
+	// 					if (
+	// 						((Type == EWuXingType::kWood) && (Damage > 0)) ||
+	// 						((Type == EWuXingType::kWater) && (Damage > 0))
+	// 						)
+	// 					{
+	// 						AddValue(AttackIncrement);
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 			break;
+	// 			case ETalent_State_Type::kYang:
+	// 			{
+	// 				for (const auto& Iter : DataIter.ElementSet)
+	// 				{
+	// 					const auto Type = Iter.Get<0>();
+	// 					const auto Damage = Iter.Get<2>();
+	// 					if (
+	// 						((Type == EWuXingType::kGold) && (Damage > 0)) ||
+	// 						((Type == EWuXingType::kFire) && (Damage > 0)) 
+	// 						)
+	// 					{
+	// 						AddValue(AttackIncrement);
+	// 						break;
+	// 					}
+	// 				}
+	// 			}
+	// 			break;
+	// 			}
+	// 		}
+	// 	}
+	// }
 }

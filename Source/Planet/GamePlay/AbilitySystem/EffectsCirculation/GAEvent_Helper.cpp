@@ -153,44 +153,44 @@ void FGAEventData::SetBaseDamage(int32 Value)
 void FGAEventData::AddWuXingDamage(EWuXingType WuXingType, int32 Value)
 {
 	const auto CharacterAttributesComponentPtr = TriggerCharacterPtr->GetCharacterAttributesComponent();
-	auto& CharacterAttributes =
-		CharacterAttributesComponentPtr->GetCharacterAttributes();
-
-	int32 Level = 0;
-	switch (WuXingType)
-	{
-	case EWuXingType::kGold:
-	{
-		Level = CharacterAttributes.GoldElement.GetCurrentValue();
-	}
-	break;
-	case EWuXingType::kWood:
-	{
-		Level = CharacterAttributes.GoldElement.GetCurrentValue();
-	}
-	break;
-	case EWuXingType::kWater:
-	{
-		Level = CharacterAttributes.GoldElement.GetCurrentValue();
-	}
-	break;
-	case EWuXingType::kFire:
-	{
-		Level = CharacterAttributes.GoldElement.GetCurrentValue();
-	}
-	break;
-	case EWuXingType::kSoil:
-	{
-		Level = CharacterAttributes.GoldElement.GetCurrentValue();
-	}
-	break;
-	}
-	const auto Tuple = MakeTuple(
-		WuXingType,
-		Level,
-		Value
-	);
-	ElementSet.Add(Tuple);
+	// auto& CharacterAttributes =
+	// 	CharacterAttributesComponentPtr->GetCharacterAttributes();
+	//
+	// int32 Level = 0;
+	// switch (WuXingType)
+	// {
+	// case EWuXingType::kGold:
+	// {
+	// 	Level = CharacterAttributes.GoldElement.GetCurrentValue();
+	// }
+	// break;
+	// case EWuXingType::kWood:
+	// {
+	// 	Level = CharacterAttributes.GoldElement.GetCurrentValue();
+	// }
+	// break;
+	// case EWuXingType::kWater:
+	// {
+	// 	Level = CharacterAttributes.GoldElement.GetCurrentValue();
+	// }
+	// break;
+	// case EWuXingType::kFire:
+	// {
+	// 	Level = CharacterAttributes.GoldElement.GetCurrentValue();
+	// }
+	// break;
+	// case EWuXingType::kSoil:
+	// {
+	// 	Level = CharacterAttributes.GoldElement.GetCurrentValue();
+	// }
+	// break;
+	// }
+	// const auto Tuple = MakeTuple(
+	// 	WuXingType,
+	// 	Level,
+	// 	Value
+	// );
+	// ElementSet.Add(Tuple);
 }
 
 bool FGAEventData::GetIsHited() const
@@ -252,7 +252,9 @@ IGAEventModifySendInterface::IGAEventModifySendInterface(int32 InPriority /*= 1*
 
 }
 
-bool IGAEventModifySendInterface::Modify(FGameplayAbilityTargetData_GASendEvent& OutGameplayAbilityTargetData_GAEvent)
+bool IGAEventModifySendInterface::Modify(
+		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
+		)
 {
 	return true;
 }
@@ -263,7 +265,9 @@ IGAEventModifyReceivedInterface::IGAEventModifyReceivedInterface(int32 InPriorit
 
 }
 
-bool IGAEventModifyReceivedInterface::Modify(FGameplayAbilityTargetData_GAReceivedEvent& OutGameplayAbilityTargetData_GAEvent)
+bool IGAEventModifyReceivedInterface::Modify(
+		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
+	)
 {
 	return true;
 }

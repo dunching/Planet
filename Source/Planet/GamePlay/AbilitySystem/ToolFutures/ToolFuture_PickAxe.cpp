@@ -17,7 +17,8 @@
 #include "Animation/AnimInstanceBase.h"
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_PlayAnimAndWaitOverride.h"
-#include "ToolUnitBase.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "ToolProxyBase.h"
 #include "Tool_PickAxe.h"
 
 UToolFuture_PickAxe::UToolFuture_PickAxe() :
@@ -45,7 +46,7 @@ void UToolFuture_PickAxe::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		K2_EndAbility();
 	}
 }
@@ -83,7 +84,7 @@ void UToolFuture_PickAxe::PerformAction()
 			);
 
 			TaskPtr->Ability = this;
-			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 
@@ -102,7 +103,7 @@ void UToolFuture_PickAxe::PerformAction()
 			);
 
 			TaskPtr->Ability = this;
-			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+			TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			TaskPtr->OnCompleted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 			TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::DecrementListLockOverride);
 

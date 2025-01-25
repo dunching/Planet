@@ -31,13 +31,11 @@ public:
 
 	void SetUp(ACharacterBase* InChracterPtr);
 
-	bool bIsPauseRelease = true;
-
 protected:
 
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool bOwnerFinished) override;
+	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
 	UFUNCTION()
 	bool PerformTask(float Delta);
@@ -46,7 +44,7 @@ protected:
 
 	void OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr);
 
-	TMap<UGameplayAbility*, TSharedPtr<FSocket_FASI>>ReleasingSkillMap;
+	TMap<UGameplayAbility*, FGameplayTag>ReleasingSkillMap;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

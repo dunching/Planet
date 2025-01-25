@@ -38,16 +38,16 @@ public:
 	template<typename Type = FOwnerPawnType>
 	Type* GetOwnerActor() { return Cast<Type>(OnwerPawnPtr); }
 
-	// 进入当前状态
+	// 
 	virtual void EnterAction();
 
-	// 重新进入
+	// 
 	virtual void ReEnterAction();
 
-	// 通知退出
+	// 
 	virtual void QuitAction();
 
-	// 开始析构
+	// 
 	virtual void BeginDestroy();
 
 	virtual void InputKey(const FInputKeyParams& Params);

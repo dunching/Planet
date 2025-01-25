@@ -46,7 +46,7 @@ void UTextSubSystem::ReadData()
 				FString Value;
 				switch (CurrentLanguageType)
 				{
-				case ELanguageType::kChainese:
+				case ELanguageType::kChinese:
 				{
 					const FString Type = TEXT("Chinese");
 
@@ -79,7 +79,7 @@ FString UTextSubSystem::GetText(const FString& Text) const
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		return Text;
 	}
 }

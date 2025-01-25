@@ -7,16 +7,16 @@
 #include "CoreMinimal.h"
 #include "GameplayAbilitySpecHandle.h"
 
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 #include "InputProcessor.h"
 #include "ProxyProcessComponent.h"
 
 struct FSkillSocketInfo;
 
 class AWeapon_Base;
-class ASceneObj;
+class ASceneActor;
 class AHorseCharacter;
-class ISceneObjInteractionInterface;
+class ISceneActorInteractionInterface;
 
 struct FSocketBase;
 struct FWeaponProxy;

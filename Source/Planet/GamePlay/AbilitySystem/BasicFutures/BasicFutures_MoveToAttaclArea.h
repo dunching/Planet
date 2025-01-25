@@ -17,15 +17,19 @@ class UEnvQuery;
 
 struct FCanbeInteractionInfo;
 
+namespace EPathFollowingResult { enum Type : int; }
+
 struct FGameplayAbilityTargetData_MoveToAttaclArea : public FGameplayAbilityTargetData
 {
-	ACharacterBase*TargetCharacterPtr = nullptr;
+	using FMoveCompletedSignature =
+		TCallbackHandleContainer<void(EPathFollowingResult::Type)>;
 
-	FGameplayAbilityTargetData* DataPtr = nullptr;
+	ACharacterBase*TargetCharacterPtr = nullptr;
 
 	int32 AttackDistance = 100;
 
-	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
+	FMoveCompletedSignature MoveCompletedSignature;
+	
 };
 
 /**
@@ -38,6 +42,8 @@ class PLANET_API UBasicFutures_MoveToAttaclArea : public UBasicFuturesBase
 	GENERATED_BODY()
 
 public:
+
+	UBasicFutures_MoveToAttaclArea();
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -85,5 +91,6 @@ private:
 
 	ACharacterBase* AvatorCharacterPtr = nullptr;
 
-	TSharedPtr<FCanbeInteractionInfo> CanbeActivedInfoSPtr;
+	const FGameplayAbilityTargetData_MoveToAttaclArea * GameplayAbilityTargetData_MoveToAttaclAreaSPtr = nullptr;
+
 };

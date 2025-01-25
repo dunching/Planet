@@ -1,28 +1,20 @@
 
 #include "PlanetAIController.h"
 
-#include <GameFramework/CharacterMovementComponent.h>
 #include "Components/StateTreeComponent.h"
-#include "Components/StateTreeAIComponent.h"
 #include <Perception/AIPerceptionComponent.h>
-#include <Kismet/GameplayStatics.h>
+#include "Kismet/KismetMathLibrary.h"
+#include "Net/UnrealNetwork.h"
 
-#include "CharacterTitle.h"
 #include "CharacterBase.h"
-#include "AssetRefMap.h"
-#include "Planet.h"
-#include "GroupMnaggerComponent.h"
-#include "SceneElement.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "TeamMatesHelperComponent.h"
+#include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
-#include "HoldingItemsComponent.h"
-#include "PlanetPlayerController.h"
-#include "TestCommand.h"
-#include "GameplayTagsSubSystem.h"
-#include "CharacterAttributesComponent.h"
-#include "CharacterAttibutes.h"
-#include "TalentAllocationComponent.h"
-#include "SceneUnitContainer.h"
-#include "GameMode_Main.h"
+#include "GameplayTagsLibrary.h"
+#include "KismetGravityLibrary.h"
+#include "GroupSharedInfo.h"
+#include "LogWriter.h"
 
 APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -50,17 +42,31 @@ void APlanetAIController::OnPossess(APawn* InPawn)
 
 UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() const
 {
-	return GetPawn<FPawnType>()->GetAbilitySystemComponent();
+	return GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
 }
 
-UGroupMnaggerComponent* APlanetAIController::GetGroupMnaggerComponent() const
+void APlanetAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	return GetPawn<FPawnType>()->GetGroupMnaggerComponent();
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
 }
 
-UHoldingItemsComponent* APlanetAIController::GetHoldingItemsComponent() const
+AGroupSharedInfo* APlanetAIController::GetGroupSharedInfo() const
 {
-	return GetPawn<FPawnType>()->GetHoldingItemsComponent();
+	return GroupSharedInfoPtr;
+}
+
+void APlanetAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+{
+	GroupSharedInfoPtr = InGroupSharedInfoPtr;
+
+	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+}
+
+UInventoryComponent* APlanetAIController::GetHoldingItemsComponent() const
+{
+	return GetPawn<FPawnType>()->GetInventoryComponent();
 }
 
 UCharacterAttributesComponent* APlanetAIController::GetCharacterAttributesComponent() const
@@ -73,9 +79,9 @@ UTalentAllocationComponent* APlanetAIController::GetTalentAllocationComponent() 
 	return GetPawn<FPawnType>()->GetTalentAllocationComponent();
 }
 
-TSharedPtr<FCharacterProxy> APlanetAIController::GetCharacterUnit()
+TSharedPtr<FCharacterProxy> APlanetAIController::GetCharacterProxy()
 {
-	return GetPawn<FPawnType>()->GetCharacterUnit();
+	return GetPawn<FPawnType>()->GetCharacterProxy();
 }
 
 ACharacterBase* APlanetAIController::GetRealCharacter()const
@@ -88,16 +94,58 @@ void APlanetAIController::BeginPlay()
 	Super::BeginPlay();
 }
 
+void APlanetAIController::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	//
+	InitialGroupSharedInfo();
+}
+
 void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 }
 
+void APlanetAIController::InitialGroupSharedInfo()
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		if (GetInstigator()->GetParentActor())
+		{
+		}
+		// 如果这个Character是单独的，则直接生成 
+		else
+		{
+			FActorSpawnParameters SpawnParameters;
+
+			SpawnParameters.Owner = this;
+			SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
+			{
+				PRINTINVOKEINFO();
+				auto GroupSharedInfoPtr = Cast<AGroupSharedInfo>(ActorPtr);
+				if (GroupSharedInfoPtr)
+				{
+					GroupSharedInfoPtr->GroupID = FGuid::NewGuid();
+				}
+			};
+
+			GroupSharedInfoPtr = GetWorld()->SpawnActor<AGroupSharedInfo>(
+				AGroupSharedInfo::StaticClass(), SpawnParameters
+			);
+
+			OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		}
+	}
+#endif
+}
+
 TWeakObjectPtr<ACharacterBase> APlanetAIController::GetTeamFocusTarget() const
 {
-	if (GetGroupMnaggerComponent() && GetGroupMnaggerComponent()->GetTeamHelper())
+	if (GetGroupSharedInfo() && GetGroupSharedInfo()->GetTeamMatesHelperComponent())
 	{
-		return GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
+		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
 	}
 
 	return nullptr;
@@ -108,7 +156,7 @@ bool APlanetAIController::CheckIsFarawayOriginal() const
 	return false;
 }
 
-void APlanetAIController::ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)
+void APlanetAIController::ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)
 {
 }
 
@@ -116,9 +164,26 @@ void APlanetAIController::BindPCWithCharacter()
 {
 }
 
-TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterUnit(ACharacterBase* CharaterPtr)
+TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterProxy(ACharacterBase* CharaterPtr)
 {
-	return CharaterPtr->GetCharacterUnit();
+	return CharaterPtr->GetCharacterProxy();
+}
+
+void APlanetAIController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
+	{
+		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		if (GroupSharedInterfacePtr)
+		{
+			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		}
+	});
+}
+
+void APlanetAIController::OnRep_GroupSharedInfoChanged()
+{
+	OnGroupSharedInfoReady(GroupSharedInfoPtr);
 }
 
 void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
@@ -134,11 +199,11 @@ void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus S
 		{
 			if (Stimulus.WasSuccessfullySensed())
 			{
-				GetGroupMnaggerComponent()->GetTeamHelper()->AddKnowCharacter(CharacterPtr);
+				GetGroupSharedInfo()->GetTeamMatesHelperComponent()->AddKnowCharacter(CharacterPtr);
 			}
 			else
 			{
-				GetGroupMnaggerComponent()->GetTeamHelper()->RemoveKnowCharacter(CharacterPtr);
+				GetGroupSharedInfo()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
 			}
 		}
 	}
@@ -162,15 +227,81 @@ void APlanetAIController::OnHPChanged(int32 CurrentValue)
 {
 	if (CurrentValue <= 0)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->DeathingTag });
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsLibrary::DeathingTag });
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			{
-				if (Iter == UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+				if (Iter == UGameplayTagsLibrary::DeathingTag)
 				{
 //					Destroy();
 				}
 			}
 			});
 	}
+}
+
+void APlanetAIController::UpdateControlRotation(float DeltaTime, bool bUpdatePawn)
+{
+	APawn* const MyPawn = GetPawn();
+	if (MyPawn)
+	{
+		FRotator DeltaRot = FRotator::ZeroRotator;
+		FRotator ViewRotation = GetControlRotation();
+
+		// Look toward focus
+		const FVector FocalPoint = GetFocalPoint();
+		if (FAISystem::IsValidLocation(FocalPoint))
+		{
+			const auto Z = -UKismetGravityLibrary::GetGravity();
+			const auto FocusRotation = UKismetMathLibrary::Quat_FindBetweenVectors(
+				UKismetMathLibrary::MakeRotFromZX(Z, ViewRotation.Vector()).Vector(),
+				UKismetMathLibrary::MakeRotFromZX(Z, FocalPoint - MyPawn->GetActorLocation()).Vector()
+			).Rotator();
+
+			const float AngleTolerance = 1e-3f;
+			if (FMath::IsNearlyZero(FocusRotation.Yaw, AngleTolerance))
+			{
+				DeltaRot.Yaw = 0.f;
+			}
+			else
+			{
+				const float RotationRate_Yaw = 120.f * DeltaTime;
+				DeltaRot.Yaw = FMath::FixedTurn(0.f, FocusRotation.Yaw, RotationRate_Yaw);
+
+				ViewRotation += DeltaRot;
+				DeltaRot = FRotator::ZeroRotator;
+			}
+		}
+		else if (bSetControlRotationFromPawnOrientation)
+		{
+			ViewRotation = MyPawn->GetActorRotation();
+		}
+
+		LimitViewYaw(ViewRotation, 0.f, 360.f - 0.1f);
+		ViewRotation.Pitch = 0.f;
+		ViewRotation.Roll = 0.f;
+
+		SetControlRotation(ViewRotation);
+
+		if (bUpdatePawn)
+		{
+			const FRotator CurrentPawnRotation = MyPawn->GetActorRotation();
+
+			if (CurrentPawnRotation.Equals(ViewRotation, 1e-3f) == false)
+			{
+#if WITH_EDITOR
+				RootComponent->SetWorldLocation(MyPawn->GetActorLocation());
+#endif
+
+				// 不要直接使用Controller上的旋转
+				// MyPawn->FaceRotation(ViewRotation, DeltaTime);
+			}
+		}
+	}
+}
+
+void APlanetAIController::LimitViewYaw(FRotator& ViewRotation, float InViewYawMin, float InViewYawMax)
+{
+	ViewRotation.Yaw = FMath::ClampAngle(ViewRotation.Yaw, InViewYawMin, InViewYawMax);
+	ViewRotation.Yaw = FRotator::ClampAxis(ViewRotation.Yaw);
 }

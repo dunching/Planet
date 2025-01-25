@@ -1,13 +1,14 @@
-
 #include "MainHUD.h"
 
+#include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Components/Border.h"
 
 #include "MainHUDLayout.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
@@ -33,9 +34,6 @@ struct FMainHUD : public TStructVariable<FMainHUD>
 void AMainHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
-	InitMainHUDLayout();
-	SwitchState(EMainHUDType::kRegularAction);
 }
 
 void AMainHUD::ShowHUD()
@@ -43,67 +41,23 @@ void AMainHUD::ShowHUD()
 	Super::ShowHUD();
 }
 
-void AMainHUD::SwitchState(EMainHUDType MainHUDType)
+void AMainHUD::InitalHUD()
 {
-	if (bShowHUD && PlayerOwner)
-	{
-		switch (MainHUDType)
-		{
-		default:
-		{
-			if (EndangeredStatePtr)
-			{
-				EndangeredStatePtr->RemoveFromParent();
-				EndangeredStatePtr = nullptr;
-			}
-			if (RegularActionStatePtr)
-			{
-				RegularActionStatePtr->RemoveFromParent();
-				RegularActionStatePtr = nullptr;
-			}
-		}
-		break;
-		case EMainHUDType::kRegularAction:
-		{
-			if (EndangeredStatePtr)
-			{
-				EndangeredStatePtr->RemoveFromParent();
-				EndangeredStatePtr = nullptr;
-			}
-
-			if (!RegularActionStatePtr)
-			{
-				RegularActionStatePtr = CreateWidget<URegularActionLayout>(GetWorld(), RegularActionStateClass);
-				if (RegularActionStatePtr)
-				{
-					RegularActionStatePtr->AddToViewport(EUIOrder::kHUD);
-				}
-			}
-		}
-		break;
-		case EMainHUDType::kEndangered:
-		{
-			if (RegularActionStatePtr)
-			{
-				RegularActionStatePtr->RemoveFromParent();
-				RegularActionStatePtr = nullptr;
-			}
-
-			if (!EndangeredStatePtr)
-			{
-				EndangeredStatePtr = CreateWidget<UEndangeredStateLayout>(GetWorld(), EndangeredStateClass);
-				if (EndangeredStatePtr)
-				{
-					EndangeredStatePtr->AddToViewport(EUIOrder::kHUD);
-				}
-			}
-		}
-		break;
-		}
-	}
+	InitMainHUDLayout();
+	SwitchLayout(ELayoutCommon::kActionLayout);
 }
 
-void AMainHUD::OnHPChanged(int32 InCurrentValue)
+void AMainHUD::SwitchLayout(ELayoutCommon MainHUDType)
+{
+	GetMainHUDLayout()->SwitchToNewLayout(MainHUDType);
+}
+
+UMainHUDLayout* AMainHUD::GetMainHUDLayout() const
+{
+	return MainHUDLayoutPtr;
+}
+
+void AMainHUD::OnHPChanged(const FOnAttributeChangeData&)
 {
 	if (bShowHUD && PlayerOwner)
 	{
@@ -115,19 +69,23 @@ void AMainHUD::OnHPChanged(int32 InCurrentValue)
 				return;
 			}
 
-			auto& CharacterAttributesRef =
+			auto CharacterAttributesRef =
 				PCPtr->GetPawn<ACharacterBase>()->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 			const auto CurrentValue =
-				CharacterAttributesRef.HP.GetCurrentValue();
+				CharacterAttributesRef->GetHP();
 			const auto MaxValue =
-				CharacterAttributesRef.HP.GetMaxValue();
+				CharacterAttributesRef->GetMax_HP();
 			const auto LowerHP_Percent =
 				UGameOptions::GetInstance()->LowerHP_Percent;
 
 			MainHUDLayoutPtr->SwitchIsLowerHP(CurrentValue < (MaxValue * (LowerHP_Percent / 100.f)));
 		}
 	}
+}
+
+void AMainHUD::OnHPChangedImp()
+{
 }
 
 void AMainHUD::InitMainHUDLayout()
@@ -142,53 +100,57 @@ void AMainHUD::InitMainHUDLayout()
 
 		if (PlayerOwner->IsA(APlanetPlayerController::StaticClass()))
 		{
-			auto PCPtr = Cast<APlanetPlayerController>(PlayerOwner);
-			if (!PCPtr)
+			auto CharacterPtr = Cast<APlanetPlayerController>(PlayerOwner)->GetPawn<ACharacterBase>();
+			if (!CharacterPtr)
 			{
 				return;
 			}
 
 			{
-				auto& CharacterAttributesRef =
-					PCPtr->GetPawn<ACharacterBase>()->GetCharacterAttributesComponent()->GetCharacterAttributes();
+				auto CharacterAttributesRef =
+					CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-				auto Handle =
-					CharacterAttributesRef.HP.AddOnValueChanged(
-						std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-					);
-				Handle->bIsAutoUnregister = false;
+				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+					CharacterAttributesRef->GetMax_HPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
 
-				OnHPChanged(
-					CharacterAttributesRef.HP.GetCurrentValue()
-				);
+				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+					CharacterAttributesRef->GetHPAttribute()
+				).AddUObject(this, &ThisClass::OnHPChanged);
+
+				OnHPChangedImp();
 			}
 
 			auto ItemInfosPtr = MainHUDLayoutPtr->GetItemInfos();
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnSkillUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnSkillUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+					CharacterPtr->GetInventoryComponent()->OnSkillProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnSkillProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnCoinUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnCoinUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3
+					CharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnCoinProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2, std::placeholders::_3
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnConsumableUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnConsumableUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+					CharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnConsumableProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
-					PCPtr->GetHoldingItemsComponent()->OnGroupmateUnitChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnGourpmateUnitChanged, ItemInfosPtr, std::placeholders::_1, std::placeholders::_2
+					CharacterPtr->GetInventoryComponent()->OnGroupmateProxyChanged.AddCallback(
+						std::bind(&UGetItemInfosList::OnGourpmateProxyChanged, ItemInfosPtr, std::placeholders::_1,
+						          std::placeholders::_2
 						));
 				Handle->bIsAutoUnregister = false;
 			}

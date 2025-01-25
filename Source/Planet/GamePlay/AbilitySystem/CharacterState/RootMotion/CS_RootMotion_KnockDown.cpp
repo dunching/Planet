@@ -17,9 +17,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -107,7 +107,7 @@ void UCS_RootMotion_KnockDown::ExcuteTasks()
 {
 	if (CharacterPtr->GetCharacterMovement()->IsFlying() || CharacterPtr->GetCharacterMovement()->IsFalling())
 	{
-		TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+		TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			this,
 			TEXT(""),
 			UKismetGravityLibrary::GetGravity(FVector::ZeroVector),
@@ -123,7 +123,7 @@ void UCS_RootMotion_KnockDown::ExcuteTasks()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->ReadyForActivation();
 	}
 	else
@@ -153,7 +153,7 @@ void UCS_RootMotion_KnockDown::PlayMontage(UAnimMontage* CurMontagePtr, float Ra
 	);
 
 	AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-	AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 	AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 	AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
 
@@ -166,7 +166,7 @@ void UCS_RootMotion_KnockDown::OnMontageComplete()
 }
 
 FGameplayAbilityTargetData_RootMotion_KnockDown::FGameplayAbilityTargetData_RootMotion_KnockDown() :
-	Super(UGameplayTagsSubSystem::GetInstance()->KnockDown)
+	Super(UGameplayTagsLibrary::KnockDown)
 {
 
 }

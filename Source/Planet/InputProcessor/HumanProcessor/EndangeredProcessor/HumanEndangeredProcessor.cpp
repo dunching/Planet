@@ -58,14 +58,14 @@
 #include "Weapon_HandProtection.h"
 #include "Weapon_PickAxe.h"
 #include "HumanViewTalentAllocation.h"
-#include "HumanViewGroupManagger.h"
-#include "GroupMnaggerComponent.h"
+#include "ViewGroupsProcessor.h"
+#include "TeamMatesHelperComponent.h"
 
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
 #include "HumanViewRaffleMenu.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter_Player.h"
 
 #include "ResourceBox.h"
@@ -91,12 +91,12 @@ namespace HumanProcessor
 	{
 		Super::EnterAction();
 
-		UUIManagerSubSystem::GetInstance()->DisplayEndangeredState(true);
+		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEndangeredLayout);
 	}
 
 	void FHumanEndangeredProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->DisplayEndangeredState(false);
+		// UUIManagerSubSystem::GetInstance()->DisplayEndangeredLayout(false);
 
 		Super::QuitAction();
 	}

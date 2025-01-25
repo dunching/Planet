@@ -8,7 +8,7 @@
 #include "CoreMinimal.h"
 
 #include "HumanProcessor.h"
-#include <SceneElement.h>
+#include "ItemProxy_Minimal.h"
 #include "ProxyProcessComponent.h"
 
 class AHumanCharacter;
@@ -64,8 +64,6 @@ namespace HumanProcessor
 		void AddOrRemoveUseMenuItemEvent(bool bIsAdd);
 
 		bool bIsPressdLeftAlt = false;
-
-		TMap<FKey, TSharedPtr<FSocket_FASI>>HandleKeysMap;
 
 	};
 

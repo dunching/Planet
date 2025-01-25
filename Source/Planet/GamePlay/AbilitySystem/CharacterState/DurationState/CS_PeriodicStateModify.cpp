@@ -17,9 +17,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -33,6 +33,19 @@ UCS_PeriodicStateModify::UCS_PeriodicStateModify() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
+void UCS_PeriodicStateModify::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (Spec.GameplayEventData && Spec.GameplayEventData->TargetData.IsValid(0))
+	{
+		SetCache(MakeSPtr_GameplayAbilityTargetData<FStateParam>(Spec.GameplayEventData->TargetData.Get(0)));
+	}
+}
+
 void UCS_PeriodicStateModify::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -41,15 +54,6 @@ void UCS_PeriodicStateModify::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
-	{
-		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_StateModify*>(TriggerEventData->TargetData.Get(0));
-		if (GameplayAbilityTargetDataPtr)
-		{
-			SetCache(TSharedPtr<FGameplayAbilityTargetData_StateModify>(GameplayAbilityTargetDataPtr->Clone()));
-		}
-	}
-
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
 
@@ -177,6 +181,23 @@ FGameplayAbilityTargetData_StateModify::FGameplayAbilityTargetData_StateModify()
 
 }
 
+UScriptStruct* FGameplayAbilityTargetData_StateModify::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_StateModify::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_StateModify::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << Duration;
+	Ar << bIsCancelState;
+	Ar << TriggerCharacterPtr;
+	Ar << TargetCharacterPtr;
+
+	return true;
+}
+
 FGameplayAbilityTargetData_StateModify* FGameplayAbilityTargetData_StateModify::Clone() const
 {
 	auto ResultPtr =
@@ -185,4 +206,9 @@ FGameplayAbilityTargetData_StateModify* FGameplayAbilityTargetData_StateModify::
 	*ResultPtr = *this;
 
 	return ResultPtr;
+}
+
+TSharedPtr<FGameplayAbilityTargetData_StateModify> FGameplayAbilityTargetData_StateModify::Clone_SmartPtr() const
+{
+	return TSharedPtr<FGameplayAbilityTargetData_StateModify>(Clone());
 }

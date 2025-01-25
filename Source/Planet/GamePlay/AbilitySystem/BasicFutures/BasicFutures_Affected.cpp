@@ -3,8 +3,9 @@
 
 #include "CharacterBase.h"
 #include "AbilityTask_PlayMontage.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
 
 UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
 {
@@ -72,7 +73,7 @@ void UBasicFutures_Affected::ActivateAbility(
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		K2_CancelAbility();
 	}
 }
@@ -90,13 +91,13 @@ bool UBasicFutures_Affected::CanActivateAbility(
 
 void UBasicFutures_Affected::InitalDefaultTags()
 {
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Affected);
+	AbilityTags.AddTag(UGameplayTagsLibrary::Affected);
 
 	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->RootMotion);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);
 
 	// 在“霸体”时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_SuperArmor);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
 }
 
 void UBasicFutures_Affected::PerformAction()
@@ -142,8 +143,8 @@ void UBasicFutures_Affected::PerformAction()
 void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
@@ -154,7 +155,7 @@ void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
@@ -166,8 +167,8 @@ void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate
 void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		const auto Duration = CurMontagePtr->CalculateSequenceLength();
@@ -176,7 +177,7 @@ void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
 			(ActiveParamPtr->TriggerCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).GetSafeNormal() :
 			ActiveParamPtr->RepelDirection;
 
-		auto TaskPtr = UAbilityTask_MyApplyRootMotionConstantForce::ApplyRootMotionConstantForce(
+		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
 			this,
 			TEXT(""),
 			Direction,
@@ -192,7 +193,7 @@ void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
 	}

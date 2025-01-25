@@ -1,4 +1,3 @@
-
 #include "EffectItem.h"
 
 #include "Engine/AssetManager.h"
@@ -23,13 +22,20 @@ namespace EffectItem
 
 void UEffectItem::SetData(const TSharedPtr<FCharacterStateInfo>& InCharacterStateInfoSPtr)
 {
-	CharacterStateInfoSPtr = InCharacterStateInfoSPtr;
+	// CharacterStateInfoSPtr = InCharacterStateInfoSPtr;
+	//
+	// DataChangedHandle = CharacterStateInfoSPtr->DataChanged.AddCallback(std::bind(&ThisClass::OnUpdate, this));
+	//
+	// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
+	//
+	// OnUpdate();
+}
 
-	DataChangedHandle = CharacterStateInfoSPtr->DataChanged.AddCallback(std::bind(&ThisClass::OnUpdate, this));
+void UEffectItem::SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr)
+{
+	ActiveGameplayEffectPtr = InActiveGameplayEffectPtr;
 
-	SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
-
-	OnUpdate();
+	Handle = ActiveGameplayEffectPtr->Handle;
 }
 
 void UEffectItem::SetNum(int32 NewNum)
@@ -97,7 +103,8 @@ void UEffectItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
 	if (ImagePtr)
 	{
 		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
+		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(
+			TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
 			{
 				ImagePtr->SetBrushFromTexture(TexturePtr.Get());
 			}));
@@ -122,17 +129,60 @@ void UEffectItem::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UEffectItem::OnUpdate()
+void UEffectItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-	SetNum(CharacterStateInfoSPtr->Num);
+	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	if (CharacterStateInfoSPtr->Duration > 0.f)
+	FGameplayTagContainer OutContainer;
+	ActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
+	if (!OutContainer.IsEmpty())
 	{
-		SetPercent(true, CharacterStateInfoSPtr->GetRemainTimePercent());
-	}
-	else
-	{
-		SetPercentIsDisplay(false);
+		// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
+
+		OnUpdate();
 	}
 }
 
+void UEffectItem::OnUpdate()
+{
+	if (ActiveGameplayEffectPtr->Handle != Handle)
+	{
+		RemoveFromParent();
+		return;
+	}
+
+	const auto Count = ActiveGameplayEffectPtr->Spec.GetStackCount();
+	SetNum(Count);
+
+	switch (ActiveGameplayEffectPtr->Spec.Def->DurationPolicy)
+	{
+	case EGameplayEffectDurationType::HasDuration:
+		{
+			const auto Duration = ActiveGameplayEffectPtr->GetDuration();
+			const auto TimeRemaining = ActiveGameplayEffectPtr->GetTimeRemaining(GetWorld()->GetTimeSeconds());
+			if (TimeRemaining > 0.f || Count > 1)
+			{
+				SetPercent(true, TimeRemaining / Duration);
+			}
+			else
+			{
+				RemoveFromParent();
+			}
+		}
+	break;
+	default:
+		{
+			// 没写
+			const auto TimeRemaining = ActiveGameplayEffectPtr->GetTimeRemaining(GetWorld()->GetTimeSeconds());
+			if (TimeRemaining > 0.f)
+			{
+				SetPercent(true, TimeRemaining);
+			}
+			else
+			{
+				SetPercentIsDisplay(false);
+			}
+		}
+	break;
+	}
+}

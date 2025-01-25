@@ -17,9 +17,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -34,7 +34,7 @@ FGameplayAbilityTargetData_StateModify_Stagnation::FGameplayAbilityTargetData_St
 FGameplayAbilityTargetData_StateModify_Stagnation::FGameplayAbilityTargetData_StateModify_Stagnation(
 	float Duration
 ) :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation, Duration)
+	Super(UGameplayTagsLibrary::State_Buff_Stagnation, Duration)
 {
 }
 
@@ -55,7 +55,7 @@ void UCS_PeriodicStateModify_Stagnation::PreActivate(
 )
 {
 	Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->AddLooseGameplayTag_2_Client(
-		UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation
+		UGameplayTagsLibrary::State_Buff_Stagnation
 	);
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
@@ -82,7 +82,7 @@ void UCS_PeriodicStateModify_Stagnation::EndAbility(
 )
 {
 	Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->RemoveLooseGameplayTag_2_Client(
-		UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation
+		UGameplayTagsLibrary::State_Buff_Stagnation
 	);
 
 	const float OverrideBlendOutTime = -1.0f;
@@ -97,16 +97,16 @@ void UCS_PeriodicStateModify_Stagnation::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
 
-	CancelAbilitiesWithTag.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
+	CancelAbilitiesWithTag.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->MovementStateAble_CantRotation);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
 }
 
 void UCS_PeriodicStateModify_Stagnation::PerformAction()

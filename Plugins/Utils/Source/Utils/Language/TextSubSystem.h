@@ -10,7 +10,7 @@
 
 enum class ELanguageType :uint8
 {
-	kChainese,
+	kChinese,
 	kEnglish,
 };
 
@@ -33,6 +33,6 @@ public:
 
 	TMap<FString, FString>TextMap;
 
-	ELanguageType CurrentLanguageType = ELanguageType::kChainese;
+	ELanguageType CurrentLanguageType = ELanguageType::kChinese;
 
 };

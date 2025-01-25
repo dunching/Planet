@@ -12,6 +12,7 @@
 #include "HumanAnimInstance.generated.h"
 
 class UAbilitySystemComponent;
+struct FOnAttributeChangeData;
 
 UENUM(BlueprintType)
 enum class EAnimationType : uint8
@@ -33,6 +34,7 @@ public:
 
 	virtual void BeginDestroy() override;
 
+	// 角度旋转还是不正确？不确定
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetIsMelee(bool bIsMeele);
 
@@ -41,8 +43,10 @@ public:
 
 protected:
 	
+	void OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue);
+	
 	UFUNCTION(BlueprintImplementableEvent)
-	void OnMoveSpeedChanged(int32 CurrentValue);
+	void SetMoveSpeedChanged(int32 CurrentValue);
 	
 	UFUNCTION(BlueprintCallable)
 	FQuat GetGravityToWorldTransform() const;

@@ -18,9 +18,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -46,7 +46,7 @@ ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitia
 }
 
 FGameplayAbilityTargetData_RootMotion_TornadoTraction::FGameplayAbilityTargetData_RootMotion_TornadoTraction() :
-	Super(UGameplayTagsSubSystem::GetInstance()->TornadoTraction)
+	Super(UGameplayTagsLibrary::TornadoTraction)
 {
 
 }
@@ -117,7 +117,7 @@ void UCS_RootMotion_TornadoTraction::EndAbility(
 // 	{
 // 		TaskPtr->UpdateDuration();
 // 	}
-// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsLibrary::FlyAway))
 // 	{
 // 		for (auto Iter : ActiveTasks)
 // 		{
@@ -146,7 +146,7 @@ void UCS_RootMotion_TornadoTraction::PerformAction()
 		);
 
 		RootMotionTaskPtr->Ability = this;
-		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		RootMotionTaskPtr->OnFinish.BindUObject(this, &ThisClass::OnTaskComplete);
 

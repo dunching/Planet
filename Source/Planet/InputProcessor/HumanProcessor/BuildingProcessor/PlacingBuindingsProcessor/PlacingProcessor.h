@@ -8,7 +8,7 @@
 #include "CoreMinimal.h"
 
 #include "HumanProcessor.h"
-#include <SceneElement.h>
+#include "ItemProxy_Minimal.h"
 
 class AHumanCharacter;
 class ABuildingBase;
@@ -22,10 +22,10 @@ namespace HumanProcessor
 {
 	struct FCaptureInfo
 	{
-		// 附著在捕捉點上時
+		// 闄勮憲鍦ㄦ崟鎹夐粸涓婃檪
 		TSharedPtr<FCapturesInfo::FCaptureInfo>CaptureInfoSPtr;
 
-		// 附著在地面時
+		// 闄勮憲鍦ㄥ湴闈㈡檪
 		FHitResult HitResult;
 	};
 

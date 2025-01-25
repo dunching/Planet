@@ -2,11 +2,11 @@
 #include "Skill_Consumable_Base.h"
 
 #include "AbilitySystemComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "Skill_Consumable_Generic.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "CharacterBase.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 
 UScriptStruct* FGameplayAbilityTargetData_Consumable::GetScriptStruct() const
 {
@@ -51,8 +51,8 @@ void USkill_Consumable_Base::OnAvatarSet(
 		auto GameplayAbilityTargetDataPtr = dynamic_cast<const FRegisterParamType*>(Spec.GameplayEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			UnitPtr = DynamicCastSharedPtr<FConsumableProxy>(
-				CharacterPtr->GetHoldingItemsComponent()->FindProxy(GameplayAbilityTargetDataPtr->ProxyID)
+			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(
+				CharacterPtr->GetInventoryComponent()->FindProxy(GameplayAbilityTargetDataPtr->ProxyID)
 			);
 		}
 	}
@@ -71,7 +71,7 @@ void USkill_Consumable_Base::PreActivate(
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->UsingConsumable);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::UsingConsumable);
 
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -100,7 +100,7 @@ bool USkill_Consumable_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (UnitPtr && UnitPtr->CheckCooldown())
+	if (ProxyPtr && ProxyPtr->CheckCooldown())
 	{
 		return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 	}
@@ -115,19 +115,19 @@ bool USkill_Consumable_Base::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	UnitPtr->ApplyCooldown();
+	// ProxyPtr->ApplyCooldown();
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
-void USkill_Consumable_Base::ContinueActive(const TSharedPtr<FConsumableProxy>& InUnitPtr)
+void USkill_Consumable_Base::ContinueActive(const TSharedPtr<FConsumableProxy>& InProxyPtr)
 {
 	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
 	{
 		return;
 	}
 
- 	UnitPtr = InUnitPtr;
+ 	ProxyPtr = InProxyPtr;
  
  	PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
 }

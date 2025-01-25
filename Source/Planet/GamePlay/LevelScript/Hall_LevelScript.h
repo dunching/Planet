@@ -25,3 +25,19 @@ public:
 	virtual void BeginPlay()override;
 
 };
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API AMain_LevelScriptActor : public ALevelScriptActor
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void BeginPlay()override;
+
+	void ClearWorldProcessCache();
+	
+};

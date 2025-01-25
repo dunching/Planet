@@ -26,8 +26,8 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_PeriodicPropertyModify.h"
@@ -63,7 +63,7 @@ void USkill_Active_Fire::PerformAction(
 		PlayMontage();
 	}
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
@@ -73,7 +73,7 @@ void USkill_Active_Fire::PerformAction(
 void USkill_Active_Fire::ExcuteTasks()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterPtr)
 		{
@@ -108,7 +108,7 @@ void USkill_Active_Fire::ExcuteTasks()
 			}
 
 			// 持续点燃效果
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 			for (const auto& Iter : TargetSet)
 			{
@@ -117,7 +117,7 @@ void USkill_Active_Fire::ExcuteTasks()
 					{ECharacterPropertyType::HP, -Damage}
 				};
 				auto GAEventDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-					UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fire,
+					UGameplayTagsLibrary::State_Debuff_Fire,
 					Duration,
 					PerformActionInterval,
 					InModifyPropertyMap
@@ -136,8 +136,8 @@ void USkill_Active_Fire::ExcuteTasks()
 void USkill_Active_Fire::PlayMontage()
 {
 	if (
-		(CharacterPtr->GetLocalRole() == ROLE_Authority) ||
-		(CharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 		)
 	{
 		const float InPlayRate = 1.f;
@@ -150,7 +150,7 @@ void USkill_Active_Fire::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 

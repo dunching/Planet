@@ -21,6 +21,7 @@
 #include "Planet.h"
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "SPlineActor.h"
 
 USkill_Active_Displacement::USkill_Active_Displacement() :
@@ -184,7 +185,7 @@ void USkill_Active_Displacement::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 

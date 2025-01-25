@@ -22,11 +22,14 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 #include "Weapon_PickAxe.h"
 #include "PlanetControllerInterface.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GroupSharedInfo.h"
+#include "ItemProxy_Character.h"
 
 namespace Skill_GroupTherapy
 {
@@ -115,16 +118,16 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 	FCollisionQueryParams CapsuleParams;
 
 	TSet<ACharacterBase*>TeammatesSet;
-	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupMnaggerComponent();
+	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupSharedInfo();
 	if (GroupMnaggerComponent)
 	{
-		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamHelper();
+		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
-			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterUnitPtr->ProxyCharacterPtr.Get());
+			TeammatesSet.Add(TeamsHelperSPtr->OwnerCharacterProxyPtr->GetCharacterActor().Get());
 			for (auto Iter : TeamsHelperSPtr->MembersSet)
 			{
-				TeammatesSet.Add(Iter->ProxyCharacterPtr.Get());
+				TeammatesSet.Add(Iter->GetCharacterActor().Get());
 			}
 		}
 	}
@@ -162,14 +165,14 @@ void USkill_Active_ContinuousGroupTherapy::EmitEffect()
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 
 void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{
@@ -181,7 +184,7 @@ void USkill_Active_ContinuousGroupTherapy::PlayMontage()
 		);
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 

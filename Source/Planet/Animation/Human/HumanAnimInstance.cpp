@@ -2,6 +2,8 @@
 
 #include "HumanAnimInstance.h"
 
+#include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "GravityMovementComponent.h"
 #include "HorseCharacter.h"
@@ -23,10 +25,11 @@ void UHumanAnimInstance::NativeBeginPlay()
 #endif
 
 	// 绑定一些会影响到 Character行动的数据
-	MoveSpeedChangedHandle = PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddOnValueChanged(
-		std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-	);
-	OnMoveSpeedChanged(PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.GetCurrentValue());
+	GetAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMoveSpeedAttribute()
+		).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
+
+	SetMoveSpeedChanged(PawnPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMoveSpeed());
 }
 
 void UHumanAnimInstance::BeginDestroy()
@@ -37,6 +40,11 @@ void UHumanAnimInstance::BeginDestroy()
 	}
 
 	Super::BeginDestroy();
+}
+
+void UHumanAnimInstance::OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue)
+{
+	SetMoveSpeedChanged(CurrentValue.NewValue);
 }
 
 FQuat UHumanAnimInstance::GetGravityToWorldTransform() const
@@ -56,7 +64,7 @@ bool UHumanAnimInstance::HasMatchingGameplayTag() const
 	{
 		return false;
 	}
-	return Character->GetAbilitySystemComponent()->K2_HasMatchingGameplayTag(TagToCheck);
+	return Character->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(TagToCheck);
 }
 
 bool UHumanAnimInstance::HasAnyMatchingGameplayTags() const
@@ -66,7 +74,7 @@ bool UHumanAnimInstance::HasAnyMatchingGameplayTags() const
 	{
 		return false;
 	}
-	return Character->GetAbilitySystemComponent()->K2_HasAnyMatchingGameplayTags(TagContainer);
+	return Character->GetCharacterAbilitySystemComponent()->K2_HasAnyMatchingGameplayTags(TagContainer);
 }
 
 UPlanetAbilitySystemComponent* UHumanAnimInstance::GetAbilitySystemComponent() const
@@ -76,7 +84,7 @@ UPlanetAbilitySystemComponent* UHumanAnimInstance::GetAbilitySystemComponent() c
 	{
 		return nullptr;
 	}
-	return Character->GetAbilitySystemComponent();
+	return Character->GetCharacterAbilitySystemComponent();
 }
 
 void UHumanAnimInstance::NativeUpdateAnimation(float DeltaSeconds)

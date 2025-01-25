@@ -3,27 +3,17 @@
 
 #include "AssetRefMap.h"
 #include "StateTagExtendInfo.h"
-#include "SceneUnitExtendInfo.h"
+#include "SceneProxyExtendInfo.h"
 #include "GameOptions.h"
 
 UAssetRefMap* APlanetWorldSettings::GetAssetRefMapInstance()
 {
-	if (!AssetRefMapPtr)
-	{
-		AssetRefMapPtr = NewObject<UAssetRefMap>(GetWorld(), AssetRefMapClass);
-	}
-
-	return AssetRefMapPtr;
+	return AssetRefMapClass.LoadSynchronous();
 }
 
-USceneUnitExtendInfoMap* APlanetWorldSettings::GetSceneUnitExtendInfoMap()
+USceneProxyExtendInfoMap* APlanetWorldSettings::GetSceneProxyExtendInfoMap()
 {
-	if (!SceneUnitExtendInfoMapPtr)
-	{
-		SceneUnitExtendInfoMapPtr = NewObject<USceneUnitExtendInfoMap>(GetWorld(), SceneUnitExtendInfoMapPtrClass);
-	}
-
-	return SceneUnitExtendInfoMapPtr;
+	return SceneProxyExtendInfoMapPtrClass.LoadSynchronous();
 }
 
 UGameOptions* APlanetWorldSettings::GetGameOptions()

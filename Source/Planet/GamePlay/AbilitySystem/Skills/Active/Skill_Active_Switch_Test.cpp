@@ -5,7 +5,8 @@
 
 #include "ProxyProcessComponent.h"
 #include "CharacterBase.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
+#include "InventoryComponent.h"
 
 void USkill_Active_Switch_Test::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -31,21 +32,22 @@ void USkill_Active_Switch_Test::PerformAction(
 	};
 	TArray<FMyStruct> Ary
 	{
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_1 },
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_2 },
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_3,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_3 },
-		{UGameplayTagsSubSystem::GetInstance()->ActiveSocket_4,UGameplayTagsSubSystem::GetInstance()->PassiveSocket_4 },
+		{UGameplayTagsLibrary::ActiveSocket_1,UGameplayTagsLibrary::PassiveSocket_1 },
+		{UGameplayTagsLibrary::ActiveSocket_2,UGameplayTagsLibrary::PassiveSocket_2 },
+		{UGameplayTagsLibrary::ActiveSocket_3,UGameplayTagsLibrary::PassiveSocket_3 },
+		{UGameplayTagsLibrary::ActiveSocket_4,UGameplayTagsLibrary::PassiveSocket_4 },
 	};
 
-	TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>CanActiveSocketMap;
+	TMap<FGameplayTag, FCharacterSocket>CanActiveSocketMap;
 	auto ProxyProcessComponentPtr = CharacterPtr->GetProxyProcessComponent();
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 	for (const auto& Iter : Ary)
 	{
 		auto SocketSPtr = ProxyProcessComponentPtr->FindSocket(Iter.ActiveSocketTag);
-		TSharedPtr<FSocket_FASI> TempSocketSPtr = SocketSPtr;
+		auto TempSocketSPtr = InventoryComponentPtr->FindProxy_BySocket(SocketSPtr);
 		if (
-			SocketSPtr->ProxySPtr &&
-			(SocketSPtr->ProxySPtr == SkillUnitPtr)
+			TempSocketSPtr &&
+			(TempSocketSPtr == SkillProxyPtr)
 			)
 		{
 		}
@@ -56,25 +58,14 @@ void USkill_Active_Switch_Test::PerformAction(
 			}
 			else
 			{
-				auto PassiveSocketSPtr = ProxyProcessComponentPtr->FindSocket(Iter.PassiveSocketTag);
-				if (
-					PassiveSocketSPtr->ProxySPtr &&
-					PassiveSocketSPtr->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
-					)
-				{
-					TempSocketSPtr = MakeShared<FSocket_FASI>();
-					*TempSocketSPtr = *SocketSPtr;
 
-					TempSocketSPtr->ProxySPtr = PassiveSocketSPtr->ProxySPtr;
-				}
 			}
 		}
-		CanActiveSocketMap.Add(Iter.ActiveSocketTag, TempSocketSPtr);
 	}
 	ProxyProcessComponentPtr->UpdateCanbeActiveSkills_UsePassiveSocket(CanActiveSocketMap);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 		K2_CancelAbility();

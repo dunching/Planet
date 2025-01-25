@@ -26,8 +26,8 @@
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
 #include "CS_PeriodicStateModify_Purify.h"
@@ -113,7 +113,7 @@ void USkill_Active_Purify::ExcuteTasks()
 		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 	}
@@ -122,7 +122,7 @@ void USkill_Active_Purify::ExcuteTasks()
 void USkill_Active_Purify::PlayMontage()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		const float InPlayRate = 1.f;
 
@@ -134,7 +134,7 @@ void USkill_Active_Purify::PlayMontage()
 		);
 
 		TaskPtr->Ability = this;
-		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		TaskPtr->OnCompleted.BindUObject(this, &ThisClass::K2_CancelAbility);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
 

@@ -6,9 +6,9 @@
 
 #include "PlanetControllerInterface.generated.h"
 
-class UGroupMnaggerComponent;
+class AGroupSharedInfo;
 class UPlanetAbilitySystemComponent;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 class UCharacterAttributesComponent;
 class UTalentAllocationComponent;
 struct FCharacterProxy;
@@ -33,19 +33,21 @@ public:
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
 
 	// “成员管理”记录了成员信息，因为
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const = 0;
+	virtual AGroupSharedInfo* GetGroupSharedInfo() const = 0;
 
-	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const = 0;
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) = 0;
+
+	virtual UInventoryComponent* GetHoldingItemsComponent()const = 0;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const = 0;
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const = 0;
 
-	virtual TSharedPtr<FCharacterProxy> GetCharacterUnit() = 0;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() = 0;
 
 	virtual ACharacterBase* GetRealCharacter()const = 0;
 
-	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr) = 0;
+	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr) = 0;
 
 	// 我们设定每个PC只对应一个Character，
 	// 如：Player在骑乘“马”时，PC会控制到“马”Character，
@@ -54,7 +56,7 @@ public:
 
 protected:
 
-	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase * CharaterPtr) = 0;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase * CharaterPtr) = 0;
 
 private:
 

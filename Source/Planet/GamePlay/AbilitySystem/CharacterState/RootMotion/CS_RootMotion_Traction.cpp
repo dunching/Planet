@@ -22,14 +22,14 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "AbilityTask_Tornado.h"
-#include "AbilityTask_MyApplyRootMotionRadialForce.h"
+#include "AbilityTask_ARM_RadialForce.h"
 #include "StateProcessorComponent.h"
 
 ATractionPoint::ATractionPoint(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/)
@@ -112,7 +112,7 @@ void ATractionPoint::Tick(float DeltaSeconds)
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		// 控制效果
 		for (const auto& Iter : TargetSet)
@@ -134,7 +134,7 @@ void ATractionPoint::Tick(float DeltaSeconds)
 }
 
 FGameplayAbilityTargetData_RootMotion_Traction::FGameplayAbilityTargetData_RootMotion_Traction() :
-	Super(UGameplayTagsSubSystem::GetInstance()->State_RootMotion_Traction)
+	Super(UGameplayTagsLibrary::State_RootMotion_Traction)
 {
 
 }
@@ -273,7 +273,7 @@ void UCS_RootMotion_Traction::ExcuteTasks()
 #endif
 	
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetLocalRole() == ENetRole::ROLE_AutonomousProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ENetRole::ROLE_AutonomousProxy)
 	{
 		TArray<AActor*> OutActors;
 		UGameplayStatics::GetAllActorsOfClass(CharacterPtr, ATractionPoint::StaticClass(), OutActors);
@@ -294,7 +294,7 @@ void UCS_RootMotion_Traction::ExcuteTasks()
 #endif
 
 	// 
-	RootMotionTaskPtr = UAbilityTask_MyApplyRootMotionRadialForce::MyApplyRootMotionRadialForce(
+	RootMotionTaskPtr = UAbilityTask_ARM_RadialForce::MyApplyRootMotionRadialForce(
 		this,
 		TEXT(""),
 		GameplayAbilityTargetDataSPtr->TractionPointPtr

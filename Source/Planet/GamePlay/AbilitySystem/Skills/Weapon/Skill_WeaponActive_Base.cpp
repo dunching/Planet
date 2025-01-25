@@ -1,18 +1,18 @@
-
 #include "Skill_WeaponActive_Base.h"
 
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "LogWriter.h"
 #include "Weapon_Base.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UScriptStruct* FGameplayAbilityTargetData_WeaponActive_ActiveParam::GetScriptStruct() const
 {
 	return FGameplayAbilityTargetData_WeaponActive_ActiveParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map,
+                                                                       bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -35,7 +35,7 @@ FGameplayAbilityTargetData_WeaponActive_ActiveParam* FGameplayAbilityTargetData_
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 	Super()
 {
-//	bRetriggerInstancedAbility = true;
+	//	bRetriggerInstancedAbility = true;
 }
 
 void USkill_WeaponActive_Base::OnAvatarSet(
@@ -115,7 +115,7 @@ void USkill_WeaponActive_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_WeaponActive_Base::SetContinuePerformImp(bool bIsContinue_)
+void USkill_WeaponActive_Base::SetContinuePerform(bool bIsContinue_)
 {
 	if (bIsContinue_)
 	{
@@ -131,15 +131,15 @@ void USkill_WeaponActive_Base::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
+	AbilityTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
 
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->Skill_CanBeInterrupted_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Buff_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Stun);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Charm);
-	ActivationBlockedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Fear);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
 
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 }
 
 bool USkill_WeaponActive_Base::GetNum(int32& Num) const
@@ -160,7 +160,8 @@ void USkill_WeaponActive_Base::ContinueActive()
 		WaitInputTaskPtr->ExternalCancel();
 		WaitInputTaskPtr = nullptr;
 
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(),
+		              &CurrentEventData);
 	}
 	else
 	{
@@ -172,22 +173,14 @@ void USkill_WeaponActive_Base::StopContinueActive()
 	bIsContinue = false;
 }
 
-void USkill_WeaponActive_Base::PerformAction(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	ResetPreviousStageActions();
-	bIsContinue = true;
-}
-
-void USkill_WeaponActive_Base::CheckInContinue()
+void USkill_WeaponActive_Base::CheckInContinue(float InWaitInputTime)
 {
 	if (bIsContinue && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
 	{
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+		Cast<UPlanetAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo())->ReplicatePerformAction_Server(
+			GetCurrentAbilitySpecHandle(),
+			GetCurrentActivationInfo()
+		);
 	}
 	else
 	{
@@ -195,19 +188,27 @@ void USkill_WeaponActive_Base::CheckInContinue()
 
 		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 
-		if (CurrentWaitInputTime > 0.f)
+		if (InWaitInputTime > 0.f)
 		{
-			WaitInputTaskPtr->SetDuration(CurrentWaitInputTime, 0.1f);
-			WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
-			WaitInputTaskPtr->OnFinished.BindLambda([this](auto) {
+			WaitInputTaskPtr->SetDuration(InWaitInputTime, 0.1f);
+			
 #if UE_EDITOR || UE_SERVER
-				if (CharacterPtr->GetLocalRole() == ROLE_Authority)
+			if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+			{
+				WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
+			}
+#endif
+			
+#if UE_EDITOR || UE_SERVER
+			if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+			{
+				WaitInputTaskPtr->OnFinished.BindLambda([this](auto)
 				{
 					K2_CancelAbility();
-				}
-#endif
-				return true;
+					return true;
 				});
+			}
+#endif
 		}
 		else
 		{
@@ -218,7 +219,21 @@ void USkill_WeaponActive_Base::CheckInContinue()
 	}
 }
 
-void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInputTaskPtr, float Interval, float Duration)
+void USkill_WeaponActive_Base::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+	ResetPreviousStageActions();
+	bIsContinue = true;
+}
+
+void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInputTaskPtr, float Interval,
+                                             float Duration)
 {
 	if (Duration > 0.f)
 	{
@@ -226,7 +241,7 @@ void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInp
 	}
 	else
 	{
-		check(0);
+		checkNoEntry();
 		WaitInputPercent = 1.f;
 	}
 }

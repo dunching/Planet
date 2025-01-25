@@ -15,7 +15,7 @@ struct FStreamableHandle;
 struct FBasicProxy;
 
 UCLASS()
-class PLANET_API UGetItemInfosItem : public UMyUserWidget, public IUnitIconInterface
+class PLANET_API UGetItemInfosItem : public UMyUserWidget, public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 
@@ -25,17 +25,17 @@ public:
 
 	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicUnitPtr)override;
+	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	void ResetToolUIByData(const TSharedPtr<FSkillProxy>& UnitPtr, bool bIsAdd);
+	void ResetToolUIByData(const TSharedPtr<FSkillProxy>& ProxyPtr, bool bIsAdd);
 
-	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& UnitPtr, bool bIsAdd, int32 Num);
+	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num);
 
-	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& UnitPtr, EProxyModifyType ProxyModifyType);
+	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
-	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& UnitPtr, bool bIsAdd);
+	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& ProxyPtr, bool bIsAdd);
 
 	FOnFinished OnFinished;
 

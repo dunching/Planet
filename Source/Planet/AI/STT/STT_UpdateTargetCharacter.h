@@ -19,7 +19,7 @@ class UAITask_SwitchWalkState;
 class AHumanCharacter;
 class AHumanAIController;
 class UGloabVariable;
-class USTE_Human;
+class USTE_AICharacterController;
 
 USTRUCT()
 struct PLANET_API FStateTreeUpdateTargetCharacterTaskInstanceData
@@ -31,10 +31,10 @@ struct PLANET_API FStateTreeUpdateTargetCharacterTaskInstanceData
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = Context)
 	UGloabVariable* GloabVariable = nullptr;
-	
+
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 };
@@ -49,8 +49,15 @@ struct PLANET_API FSTT_UpdateTargetCharacter : public FStateTreeAIActionTaskBase
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
 	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context, 
+		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
 
 };

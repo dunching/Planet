@@ -31,8 +31,8 @@
 #include "Helper_RootMotionSource.h"
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
-#include "GameplayTagsSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
@@ -51,7 +51,7 @@ void USkill_Active_Slow::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		FCollisionObjectQueryParams ObjectQueryParams;
 		ObjectQueryParams.AddObjectTypesToQuery(ECC_Pawn);
@@ -83,7 +83,7 @@ void USkill_Active_Slow::PerformAction(
 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		// 控制效果
 		for (const auto& Iter : TargetSet)

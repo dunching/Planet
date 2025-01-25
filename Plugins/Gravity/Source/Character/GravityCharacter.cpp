@@ -55,3 +55,43 @@ void AGravityCharacter::AddMovementInput(FVector WorldDirection, float ScaleValu
 
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 }
+
+void AGravityCharacter::FaceRotation(FRotator NewControlRotation, float DeltaTime)
+{
+	if (bUseCustomRotation)
+	{
+		SetActorRotation(NewControlRotation);
+
+		return;
+	}
+
+	// Only if we actually are going to use any component of rotation.
+	if (bUseControllerRotationPitch || bUseControllerRotationYaw || bUseControllerRotationRoll)
+	{
+		const FRotator CurrentRotation = GetActorRotation();
+
+		if (!bUseControllerRotationPitch)
+		{
+			NewControlRotation.Pitch = CurrentRotation.Pitch;
+		}
+
+		if (!bUseControllerRotationYaw)
+		{
+			NewControlRotation.Yaw = CurrentRotation.Yaw;
+		}
+
+		if (!bUseControllerRotationRoll)
+		{
+			NewControlRotation.Roll = CurrentRotation.Roll;
+		}
+
+#if ENABLE_NAN_DIAGNOSTIC
+		if (NewControlRotation.ContainsNaN())
+		{
+			logOrEnsureNanError(TEXT("APawn::FaceRotation about to apply NaN-containing rotation to actor! New:(%s), Current:(%s)"), *NewControlRotation.ToString(), *CurrentRotation.ToString());
+		}
+#endif
+
+		SetActorRotation(NewControlRotation);
+	}
+}

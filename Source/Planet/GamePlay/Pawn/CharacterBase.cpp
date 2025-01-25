@@ -11,15 +11,15 @@
 #include "DrawDebugHelpers.h"
 #include "EnhancedInputSubsystems.h"
 #include "AbilitySystemComponent.h"
+#include "Net/UnrealNetwork.h"
 
 #include "GameMode_Main.h"
 #include "ToolsLibrary.h"
 #include "Animation/AnimInstanceBase.h"
-#include "Component/ItemInteractionComponent.h"
-#include "HoldingItemsComponent.h"
+#include "Component/SceneActorInteractionComponent.h"
+#include "InventoryComponent.h"
 #include "GenerateType.h"
 #include "InputProcessor.h"
-#include <ToolsMenu.h>
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "CharacterAttributesComponent.h"
@@ -28,14 +28,15 @@
 #include "TestCommand.h"
 #include "BasicFuturesBase.h"
 #include "TalentAllocationComponent.h"
-#include "GroupMnaggerComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "AssetRefMap.h"
+#include "AS_Character.h"
 #include "PlanetControllerInterface.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "StateProcessorComponent.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "ProxyProcessComponent.h"
-#include "CDCaculatorComponent.h"
+#include "ConversationComponent.h"
 
 #include "CharacterTitle.h"
 #include "UICommon.h"
@@ -43,8 +44,10 @@
 #include "PlanetPlayerController.h"
 #include "GAEvent_Helper.h"
 #include "CharacterRisingTips.h"
-#include "SceneObj.h"
-#include "SceneUnitContainer.h"
+#include "CharacterTitleComponent.h"
+#include "SceneActor.h"
+#include "GE_CharacterInitail.h"
+#include "GroupSharedInfo.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -52,25 +55,33 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
-	AbilitySystemComponentPtr = CreateDefaultSubobject<UPlanetAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponentPtr->SetIsReplicated(true);
-	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
+		UCharacterAttributesComponent::ComponentName
+	);
+	// CharacterAttributesComponentPtr->CharacterAttributeSetPtr = ;
 
-	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(UCharacterAttributesComponent::ComponentName);
-	HoldingItemsComponentPtr = CreateDefaultSubobject<UHoldingItemsComponent>(UHoldingItemsComponent::ComponentName);
-	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(UTalentAllocationComponent::ComponentName);
-	GroupMnaggerComponentPtr = CreateDefaultSubobject<UGroupMnaggerComponent>(UGroupMnaggerComponent::ComponentName);
+	AbilitySystemComponentPtr = CreateDefaultSubobject<UCharacterAbilitySystemComponent>(
+		UCharacterAbilitySystemComponent::ComponentName
+	);
+	AbilitySystemComponentPtr->AddSpawnedAttribute(CreateDefaultSubobject<UAS_Character>(
+		TEXT("CharacterAttributes1")
+	));
 
-	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(UStateProcessorComponent::ComponentName);
+	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(
+		UTalentAllocationComponent::ComponentName);
 
-	BaseFeatureComponentPtr = CreateDefaultSubobject<UBaseFeatureComponent>(UBaseFeatureComponent::ComponentName);
+	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(
+		UStateProcessorComponent::ComponentName);
+
+	CharacterTitleComponentPtr = CreateDefaultSubobject<UCharacterTitleComponent>(
+		UCharacterTitleComponent::ComponentName);
+
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
-	CDCaculatorComponentPtr = CreateDefaultSubobject<UCDCaculatorComponent>(UCDCaculatorComponent::ComponentName);
+	ConversationComponentPtr = CreateDefaultSubobject<UConversationComponent>(UConversationComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
 {
-
 }
 
 void ACharacterBase::BeginPlay()
@@ -79,59 +90,34 @@ void ACharacterBase::BeginPlay()
 
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
-#if UE_EDITOR || UE_CLIENT
-	if (GetLocalRole() < ROLE_Authority)
-	{
- 		if (!CharacterTitlePtr)
- 		{
- 			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
- 			CharacterTitlePtr = CreateWidget<UCharacterTitle>(GetWorldImp(), AssetRefMapPtr->AIHumanInfoClass);
- 			if (CharacterTitlePtr)
- 			{
- 				CharacterTitlePtr->CharacterPtr = this;
- 				if (GetLocalRole() == ROLE_AutonomousProxy)
- 				{
- 					CharacterTitlePtr->AddToViewport(EUIOrder::kPlayer_Character_State_HUD);
- 				}
- 				else
- 				{
- 					CharacterTitlePtr->AddToViewport(EUIOrder::kCharacter_State_HUD);
- 				}
- 
- 				auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
- 				if (PlayerCharacterPtr)
- 				{
- 					SetCampType(
- 						IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
- 					);
- 				}
- 			}
- 		}
-	}
-#endif
+	auto CharacterAttributeSetPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
+	// 绑定一些会影响到 Character行动的数据
 
+	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		CharacterAttributeSetPtr->GetHPAttribute()
+	).AddUObject(this, &ThisClass::OnHPChanged);
+
+	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		CharacterAttributeSetPtr->GetMoveSpeedAttribute()
+	).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		// 绑定一些会影响到 Character行动的数据
-		HPChangedHandle = CharacterAttributes.HP.AddOnValueChanged(
-			std::bind(&ThisClass::OnHPChanged, this, std::placeholders::_2)
-		);
-
-		MoveSpeedChangedHandle = CharacterAttributes.MoveSpeed.AddOnValueChanged(
-			std::bind(&ThisClass::OnMoveSpeedChanged, this, std::placeholders::_2)
-		);
-
 		// 绑定 Character收到的效果回调(收到的是“最终结算效果”)
-		ProcessedGAEventHandle = CharacterAttributes.ProcessedGAEvent.AddCallback(
-			std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
-		);
+		// ProcessedGAEventHandle = CharacterAttributes.ProcessedGAEvent.AddCallback(
+		// 	std::bind(&ThisClass::OnProcessedGAEVent, this, std::placeholders::_1)
+		// );
 	}
 #endif
 
-	OnMoveSpeedChanged(CharacterAttributes.MoveSpeed.GetCurrentValue());
+	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
+		UGameplayTagsLibrary::DeathingTag,
+		EGameplayTagEventType::NewOrRemoved
+	);
+	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
+
+	OnMoveSpeedChangedImp(CharacterAttributeSetPtr->GetMoveSpeed());
 }
 
 void ACharacterBase::Destroyed()
@@ -151,12 +137,6 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		MoveSpeedChangedHandle->UnBindCallback();
 	}
 
- 	if (CharacterTitlePtr)
- 	{
- 		CharacterTitlePtr->RemoveFromParent();
- 		CharacterTitlePtr = nullptr;
- 	}
-
 	OriginalAIController = nullptr;
 
 	Super::EndPlay(EndPlayReason);
@@ -169,44 +149,29 @@ void ACharacterBase::OnConstruction(const FTransform& Transform)
 
 void ACharacterBase::PostInitializeComponents()
 {
+	Super::PostInitializeComponents();
+
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
-		InitialDefaultCharacterUnit();
-
-#if UE_EDITOR || UE_SERVER
-		if (GetNetMode() == NM_DedicatedServer)
-		{
-			// GA全部通过Server注册
-			auto GASPtr = GetAbilitySystemComponent();
-
-			GASPtr->ClearAllAbilities();
-			GASPtr->InitAbilityActorInfo(this, this);
-			GetBaseFeatureComponent()->InitialBaseGAs();
-		}
-#endif
+		GetCharacterAbilitySystemComponent()->InitAbilityActorInfo(this, this);
 	}
-
-	if ((World->IsGameWorld()))
-	{
-		HoldingItemsComponentPtr->Proxy_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
-
-		ProxyProcessComponentPtr->AllocationSkills_Container.HoldingItemsComponentPtr = HoldingItemsComponentPtr;
-		ProxyProcessComponentPtr->AllocationSkills_Container.UnitProxyProcessComponentPtr = ProxyProcessComponentPtr;
-
-		CDCaculatorComponentPtr->CD_FASI_Container.CDCaculatorComponentPtr = CDCaculatorComponentPtr;
-
-		StateProcessorComponentPtr->CharacterStateInfo_FASI_Container.StateProcessorComponent = StateProcessorComponentPtr;
-
-		TalentAllocationComponentPtr->Talent_FASI_Container.TalentAllocationComponentPtr = TalentAllocationComponentPtr;
-	}
-
-	Super::PostInitializeComponents();
 }
 
 void ACharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+
+	if (NewController->IsA(APlanetPlayerController::StaticClass()))
+	{
+		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GetGroupSharedInfo();
+		OnGroupSharedInfoReady(GroupSharedInfoPtr);
+	}
+	else if (NewController->IsA(AHumanAIController::StaticClass()))
+	{
+		GroupSharedInfoPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
+		OnGroupSharedInfoReady(GroupSharedInfoPtr);
+	}
 }
 
 void ACharacterBase::UnPossessed()
@@ -235,29 +200,18 @@ void ACharacterBase::UnPossessed()
 	}
 }
 
-void ACharacterBase::InteractionSceneObj(ASceneObj* SceneObjPtr)
+void ACharacterBase::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+}
+
+void ACharacterBase::InteractionSceneActor(ASceneActor* SceneObjPtr)
 {
 	InteractionSceneObj_Server(SceneObjPtr);
 }
 
-void ACharacterBase::Interaction(ACharacterBase* CharacterPtr)
+void ACharacterBase::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
 {
-
-}
-
-void ACharacterBase::LookingAt(ACharacterBase* CharacterPtr)
-{
-
-}
-
-void ACharacterBase::StartLookAt(ACharacterBase* CharacterPtr)
-{
-
-}
-
-void ACharacterBase::EndLookAt()
-{
-
 }
 
 class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
@@ -265,24 +219,29 @@ class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent()
 	return AbilitySystemComponentPtr;
 }
 
-UHoldingItemsComponent* ACharacterBase::GetHoldingItemsComponent()const
+AGroupSharedInfo* ACharacterBase::GetGroupSharedInfo() const
 {
-	return HoldingItemsComponentPtr;
+	return GroupSharedInfoPtr;
 }
 
-UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent()const
+UInventoryComponent* ACharacterBase::GetInventoryComponent() const
+{
+	return GroupSharedInfoPtr ? GroupSharedInfoPtr->GetHoldingItemsComponent() : nullptr;
+}
+
+UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent() const
 {
 	return CharacterAttributesComponentPtr;
 }
 
-UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent()const
+UTalentAllocationComponent* ACharacterBase::GetTalentAllocationComponent() const
 {
 	return TalentAllocationComponentPtr;
 }
 
-UBaseFeatureComponent* ACharacterBase::GetBaseFeatureComponent()const
+UCharacterAbilitySystemComponent* ACharacterBase::GetCharacterAbilitySystemComponent() const
 {
-	return BaseFeatureComponentPtr;
+	return AbilitySystemComponentPtr;
 }
 
 UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
@@ -290,77 +249,68 @@ UStateProcessorComponent* ACharacterBase::GetStateProcessorComponent() const
 	return StateProcessorComponentPtr;
 }
 
-UProxyProcessComponent* ACharacterBase::GetProxyProcessComponent()const
+UProxyProcessComponent* ACharacterBase::GetProxyProcessComponent() const
 {
 	return ProxyProcessComponentPtr;
 }
 
-UGroupMnaggerComponent* ACharacterBase::GetGroupMnaggerComponent()const
+UConversationComponent* ACharacterBase::GetConversationComponent() const
 {
-	return GroupMnaggerComponentPtr;
+	return ConversationComponentPtr;
 }
 
-UCDCaculatorComponent* ACharacterBase::GetCDCaculatorComponent() const
+UCharacterTitleComponent* ACharacterBase::GetCharacterTitleComponent() const
 {
-	return CDCaculatorComponentPtr;
+	return CharacterTitleComponentPtr;
 }
 
-TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterUnit()const
+TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
-	return HoldingItemsComponentPtr->CharacterProxySPtr;
+	return GetInventoryComponent()->FindProxy_Character(GetCharacterAttributesComponent()->GetCharacterID());
 }
 
-void ACharacterBase::InitialDefaultCharacterUnit()
-{
-	TSharedPtr<FCharacterProxy>CharacterUnitPtr = nullptr;
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
-	}
-#endif
-
-	auto CharacterAttributes = GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
-	}
-#endif
-	
-	// 
-
-	// 
-	if (CharacterUnitPtr)
-	{
-		auto TableRowUnit_CharacterInfoPtr = CharacterUnitPtr->GetTableRowUnit_CharacterInfo();
-	}
-	else
-	{
-		CharacterUnitPtr = HoldingItemsComponentPtr->InitialDefaultCharacter();
-		check(0);
-	}
-//	GetCharacterAttributesComponent()->CharacterAttributes = TableRowUnit_CharacterInfoPtr->CharacterAttributes;
-}
-
-void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneObj* SceneObjPtr)
+void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)
 {
 	if (SceneObjPtr)
 	{
-		SceneObjPtr->Interaction(this);
+		SceneObjPtr->HasbeenInteracted(this);
 	}
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupMnaggerComponent()->GetGroupHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+	return
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
 bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
 {
-	return GetGroupMnaggerComponent()->GetTeamHelper()->IsMember(TargetCharacterPtr->GetCharacterUnit());
+	return
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
+}
+
+ACharacterBase* ACharacterBase::GetFocusActor() const
+{
+	if (IsPlayerControlled())
+	{
+		auto PCPtr = GetController<APlanetPlayerController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+	else
+	{
+		auto ACPtr = GetController<AAIController>();
+		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
+		if (TargetCharacterPtr)
+		{
+			return TargetCharacterPtr;
+		}
+	}
+
+	return nullptr;
 }
 
 void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType AnimLinkClassType)
@@ -370,17 +320,32 @@ void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType Ani
 
 void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCampType)
 {
- 	if (CharacterTitlePtr)
- 	{
- 		CharacterTitlePtr->SetCampType(CharacterCampType);
- 	}
+	CharacterTitleComponentPtr->SetCampType(CharacterCampType);
+}
+
+bool ACharacterBase::GetIsValidTarget() const
+{
+	TArray<FGameplayTag> Ary{
+		UGameplayTagsLibrary::DeathingTag,
+		UGameplayTagsLibrary::State_Buff_CantBeSlected
+	};
+	const auto TagContainer = FGameplayTagContainer::CreateFromArray(Ary);
+	return !AbilitySystemComponentPtr->HasAnyMatchingGameplayTags(TagContainer);
 }
 
 void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	// 只在 ROLE_AutonomousProxy 运行
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	UInputProcessorSubSystem::GetInstance()->BindAction(InputComponent);
+}
+
+void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
 }
 
 void ACharacterBase::SpawnDefaultController()
@@ -390,31 +355,40 @@ void ACharacterBase::SpawnDefaultController()
 	OriginalAIController = Controller;
 }
 
-void ACharacterBase::OnHPChanged_Implementation(int32 CurrentValue)
+void ACharacterBase::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
 {
+	OnInitaliedGroupSharedInfo();
+
+	auto NewController = GetController();
+
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		if (!GetController())
-		{
-			return;
-		}
-		if (IsPlayerControlled())
-		{
-			GetController<APlanetPlayerController>()->OnHPChanged(CurrentValue);
-		}
-		else
-		{
-			GetController<APlanetAIController>()->OnHPChanged(CurrentValue);
-		}
+		auto ProxyCharacterSPtr = GetInventoryComponent()->InitialOwnerCharacterProxy(this);
+
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->OwnerCharacterProxyPtr = ProxyCharacterSPtr;
 	}
 #endif
+
+	ForEachComponent(false, [this](UActorComponent* ComponentPtr)
+	{
+		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		if (GroupSharedInterfacePtr)
+		{
+			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		}
+	});
 }
 
-void ACharacterBase::OnMoveSpeedChanged_Implementation(int32 CurrentValue)
+void ACharacterBase::OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue)
 {
-	GetCharacterMovement()->MaxWalkSpeed = CurrentValue;
-	GetCharacterMovement()->MaxFlySpeed = CurrentValue;
+	OnMoveSpeedChangedImp(CurrentValue.NewValue);
+}
+
+void ACharacterBase::OnMoveSpeedChangedImp(float Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = Value;
+	GetCharacterMovement()->MaxFlySpeed = Value;
 }
 
 void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
@@ -434,25 +408,61 @@ void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTar
 
 void ACharacterBase::OnCharacterGroupMateChanged(
 	EGroupMateChangeType GroupMateChangeType,
-	const TSharedPtr<FCharacterUnitType>& TargetCharacterUnitPtr
+	const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
 )
 {
 	switch (GroupMateChangeType)
 	{
 	case EGroupMateChangeType::kAdd:
-	{
-		if (TargetCharacterUnitPtr)
 		{
-			if (TargetCharacterUnitPtr->ProxyCharacterPtr->GetGroupMnaggerComponent()->GetGroupHelper()->OwnerCharacterUnitPtr == GetCharacterUnit())
-			{
-				auto AIPCPtr = TargetCharacterUnitPtr->ProxyCharacterPtr->GetController<AHumanAIController>();
-				if (AIPCPtr)
-				{
-					AIPCPtr->SetCampType(ECharacterCampType::kTeamMate);
-				}
-			}
+		}
+		break;
+	default:
+		{
+		};
+	}
+}
+
+void ACharacterBase::OnHPChanged(const FOnAttributeChangeData& CurrentValue)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		if (!GetController())
+		{
+			return;
+		}
+		if (IsPlayerControlled())
+		{
+			GetController<APlanetPlayerController>()->OnHPChanged(CurrentValue.NewValue);
+		}
+		else
+		{
+			GetController<APlanetAIController>()->OnHPChanged(CurrentValue.NewValue);
 		}
 	}
-	break;
+#endif
+}
+
+void ACharacterBase::OnRep_GroupSharedInfoChanged()
+{
+	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() < ROLE_Authority)
+	{
 	}
+#endif
+}
+
+void ACharacterBase::OnDeathing(const FGameplayTag Tag, int32 Count)
+{
+}
+
+void ACharacterBase::DoDeathing()
+{
+	// auto CharacterPtr = GetPawn<FPawnType>();
+	// if (CharacterPtr)
+	// {
+	// }
 }

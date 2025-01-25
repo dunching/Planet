@@ -13,9 +13,9 @@
 #include "AbilityTask_TimerHelper.h"
 #include "AllocationSkills.h"
 #include "ProxyProcessComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "Skill_WeaponActive_Bow.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 
 void USkill_Active_Arrow_HomingToward::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
@@ -27,13 +27,13 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		// 状态信息
 		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
@@ -57,7 +57,7 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 void USkill_Active_Arrow_HomingToward::DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{
@@ -83,7 +83,7 @@ bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 void USkill_Active_Arrow_HomingToward::SwitchIsHomingToward(bool bIsHomingToward)
 {
 	auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
-		UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Weapon_Bow
+		UGameplayTagsLibrary::Proxy_Skill_Weapon_Bow
 	);
 
 	if (TargetSkillSPtr)

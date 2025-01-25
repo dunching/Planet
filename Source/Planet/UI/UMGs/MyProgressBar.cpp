@@ -48,6 +48,27 @@ void UMyProgressBar::SetDataSource(FBasePropertySet& Property)
 	}
 }
 
+void UMyProgressBar::SetDataSource(
+	UAbilitySystemComponent*AbilitySystemComponentPtr,
+	FGameplayAttribute Attribute,
+	float Value,
+	FGameplayAttribute MaxAttribute,
+	float InMaxValue
+		)
+{
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+	Attribute
+		).AddUObject(this, &ThisClass::SetCurrentValue_Re);
+	CurrentValue = Value;
+
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+	MaxAttribute
+		).AddUObject(this, &ThisClass::SetMaxValue_Re);
+	MaxValue = InMaxValue;
+
+	ValueChanged();
+}
+
 void UMyProgressBar::SetCurrentValue(int32 InCurrentValue)
 {
 	CurrentValue = InCurrentValue;
@@ -55,9 +76,23 @@ void UMyProgressBar::SetCurrentValue(int32 InCurrentValue)
 	ValueChanged();
 }
 
+void UMyProgressBar::SetCurrentValue_Re(const FOnAttributeChangeData& InCurrentValue)
+{
+	CurrentValue = InCurrentValue.NewValue;
+
+	ValueChanged();
+}
+
 void UMyProgressBar::SetMaxValue(int32 InMaxValue)
 {
 	MaxValue = InMaxValue;
+
+	ValueChanged();
+}
+
+void UMyProgressBar::SetMaxValue_Re(const FOnAttributeChangeData& InMaxValue)
+{
+	MaxValue = InMaxValue.NewValue;
 
 	ValueChanged();
 }

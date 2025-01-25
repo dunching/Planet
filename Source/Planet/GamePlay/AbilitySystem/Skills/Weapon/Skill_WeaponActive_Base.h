@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Base.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 
 #include "Skill_WeaponActive_Base.generated.h"
 
@@ -94,14 +94,14 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void SetContinuePerformImp(bool bIsContinue)override;
-
 	virtual	void InitalDefaultTags()override;
 
 	virtual bool GetNum(int32 & Num)const;
 
 protected:
 	
+	virtual void SetContinuePerform(bool bIsContinue)override;
+
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -113,7 +113,8 @@ protected:
 
 	void StopContinueActive();
 
-	virtual void CheckInContinue();
+	// < 0 则为不限时间，在显式结束前就可以再次输入
+	virtual void CheckInContinue(float InWaitInputTime);
 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
@@ -122,15 +123,12 @@ protected:
 
 	bool bIsContinue = true;
 
-	// < 0 则为不限时间，在显式结束前就可以再次输入
-	float CurrentWaitInputTime = 1.f;
-
-	float WaitInputPercent = 1.f;
-
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 	TSharedPtr<FActiveParamType> ActiveParamSPtr = nullptr;
 
 private:
+
+	float WaitInputPercent = 1.f;
 
 };

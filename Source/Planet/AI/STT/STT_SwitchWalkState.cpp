@@ -7,7 +7,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 
 EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -26,7 +26,7 @@ EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	InstanceData.CharacterPtr->GetBaseFeatureComponent()->SwitchWalkState(InstanceData.bIsRun);
+	InstanceData.CharacterPtr->GetCharacterAbilitySystemComponent()->SwitchWalkState(InstanceData.bIsRun);
 
 	return EStateTreeRunStatus::Succeeded;
 }

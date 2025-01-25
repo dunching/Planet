@@ -1,0 +1,160 @@
+
+#include "SkillsIcon.h"
+
+#include "Components/TextBlock.h"
+#include "Components/Image.h"
+#include "Containers/UnrealString.h"
+#include <Kismet/GameplayStatics.h>
+#include "Components/CanvasPanel.h"
+#include "Engine/StreamableManager.h"
+#include "Engine/AssetManager.h"
+#include "Components/Border.h"
+#include "Components/Overlay.h"
+#include "Components/ProgressBar.h"
+#include "Kismet/KismetStringLibrary.h"
+#include "Components/SizeBox.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Engine/Texture2D.h"
+
+#include "ToolsLibrary.h"
+#include "BackpackIcon.h"
+#include "StateTagExtendInfo.h"
+#include "AssetRefMap.h"
+#include "ItemProxyDragDropOperation.h"
+#include "ItemProxyDragDropOperationWidget.h"
+#include "CharacterBase.h"
+#include "ProxyProcessComponent.h"
+#include "Skill_Base.h"
+#include "GameplayTagsLibrary.h"
+
+namespace SkillsIcon
+{
+	const FName Content = TEXT("Content");
+
+	const FName Enable = TEXT("Enable");
+
+	const FName Icon = TEXT("Icon");
+}
+
+USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+
+}
+
+void USkillsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+{
+	if (InBasicProxyPtr == BasicProxyPtr)
+	{
+		return;
+	}
+
+	auto PreviousProxyPtr = BasicProxyPtr;
+	TSharedPtr<FAllocationbleProxy> NewProxyPtr = nullptr;
+	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(ProxyType))
+	{
+		NewProxyPtr = InBasicProxyPtr;
+	}
+	else
+	{
+		if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
+		{
+			auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+			if (!CharacterPtr)
+			{
+				return;
+			}
+
+			// 装备了可以在“被动”槽上备注“主动技能”的主动技能
+			if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
+				UGameplayTagsLibrary::Proxy_Skill_Active_Switch
+			).IsValid())
+			{
+				NewProxyPtr = InBasicProxyPtr;
+			}
+		}
+
+	}
+
+	if (!bPaseInvokeOnResetProxyEvent)
+	{
+		OnResetProxy.ExcuteCallback(PreviousProxyPtr, NewProxyPtr, IconSocket);
+	}
+
+	BasicProxyPtr = NewProxyPtr;
+
+	if (!bPaseInvokeOnResetProxyEvent)
+	{
+		OnResetData(this);
+	}
+
+	SetItemType();
+
+	SetLevel();
+}
+
+void USkillsIcon::EnableIcon(bool bIsEnable)
+{
+	auto ImagePtr = Cast<UImage>(GetWidgetFromName(SkillsIcon::Enable));
+	if (ImagePtr)
+	{
+		ImagePtr->SetVisibility(bIsEnable ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+	}
+}
+
+void USkillsIcon::SetLevel()
+{
+}
+
+void USkillsIcon::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	ResetToolUIByData(nullptr);
+}
+
+void USkillsIcon::NativeDestruct()
+{
+	Super::NativeDestruct();
+}
+
+void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
+{
+	if (bIsDragging)
+	{
+		if (ProxyPtr && ProxyPtr->GetProxyType().MatchesTag(ProxyType))
+		{
+			EnableIcon(true);
+		}
+		else
+		{
+			if (
+				ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve) &&
+				ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)
+				)
+			{
+				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+				if (!CharacterPtr)
+				{
+					return;
+				}
+
+				// 装备了可以在“被动”槽上备注“主动技能”的主动技能
+				if (CharacterPtr->GetProxyProcessComponent()->FindActiveSkillByType(
+					UGameplayTagsLibrary::Proxy_Skill_Active_Switch
+				).IsValid())
+				{
+					EnableIcon(true);
+
+					return;
+				}
+			}
+
+			EnableIcon(false);
+		}
+	}
+	else
+	{
+		EnableIcon(true);
+	}
+}

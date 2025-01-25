@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Base.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 
 #include "Skill_Active_Base.generated.h"
 
@@ -66,21 +66,21 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	)override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	);
+	)override;
 
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
+	)override;
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -105,8 +105,6 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void SetContinuePerformImp(bool bIsContinue)override;
-
 	virtual	void InitalDefaultTags()override;
 
 	virtual void Tick(float DeltaTime);
@@ -117,6 +115,8 @@ public:
 protected:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void SetContinuePerform(bool bIsContinue)override;
 
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,

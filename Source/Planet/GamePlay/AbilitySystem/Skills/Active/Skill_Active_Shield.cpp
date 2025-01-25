@@ -31,10 +31,11 @@
 #include "Helper_RootMotionSource.h"
 #include "AbilityTask_tornado.h"
 #include "CS_RootMotion.h"
-#include "GameplayTagsSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
+#include "AS_Character.h"
 #include "CharacterAttibutes.h"
 #include "CharacterAttributesComponent.h"
 #include "KismetGravityLibrary.h"
@@ -51,7 +52,7 @@ void USkill_Active_Shield::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
 
@@ -63,19 +64,19 @@ void USkill_Active_Shield::PerformAction(
 			FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 			GAEventData.DataModify.Add(ECharacterPropertyType::Shield, ShieldValue);
-			GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+			GAEventData.DataSource = SkillProxyPtr->GetProxyType();
 			GAEventData.bIsOverlapData = true;
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 		}
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 
 		// 状态
 		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
@@ -101,7 +102,7 @@ bool USkill_Active_Shield::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().PP.GetCurrentValue())
+	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP())
 	{
 		return false;
 	}
@@ -118,7 +119,7 @@ void USkill_Active_Shield::EndAbility(
 )
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		// 清空 数值修改
 		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
@@ -128,12 +129,12 @@ void USkill_Active_Shield::EndAbility(
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify = GetAllData();
-		GAEventData.DataSource = SkillUnitPtr->GetUnitType();
+		GAEventData.DataSource = SkillProxyPtr->GetProxyType();
 		GAEventData.bIsClearData = true;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 
 		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
@@ -158,11 +159,11 @@ bool USkill_Active_Shield::CommitAbility(
 		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
 		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -PP);
-		GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->DataSource_Character;
+		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
 
 		GAEventDataPtr->DataAry.Add(GAEventData);
 	}
-	auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 	ICPtr->SendEventImp(GAEventDataPtr);
 
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
@@ -171,7 +172,7 @@ bool USkill_Active_Shield::CommitAbility(
 void USkill_Active_Shield::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{

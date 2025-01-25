@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Base.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_Active_Base.h"
 
 #include "Skill_Consumable_Base.generated.h"
@@ -86,7 +86,7 @@ public:
 
 	virtual bool CanUse()const;
 
-	void ContinueActive(const TSharedPtr<FConsumableProxy>& UnitPtr);
+	void ContinueActive(const TSharedPtr<FConsumableProxy>& ProxyPtr);
 
 protected:
 
@@ -99,7 +99,7 @@ protected:
 
 	ACharacterBase* CharacterPtr = nullptr;
 
-	TSharedPtr<FConsumableProxy> UnitPtr = nullptr;
+	TSharedPtr<FConsumableProxy> ProxyPtr = nullptr;
 
 	TMap<FGameplayTag, TWeakPtr<FSkillCooldownHelper>>CooldownMap;
 

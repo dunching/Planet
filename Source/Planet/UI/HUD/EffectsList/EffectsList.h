@@ -16,6 +16,7 @@ struct FCharacterStateInfo;
 class UEffectItem;
 class ACharacterBase;
 class UCS_Base;
+class UAbilitySystemComponent;
 
 UCLASS()
 class PLANET_API UEffectsList : 
@@ -53,13 +54,25 @@ protected:
 	
 	void OnCharacterStateMapChanged(const TSharedPtr<FCharacterStateInfo>& CharacterStatePtr, bool bIsAdd);
 
+	void OnActiveGameplayEffect(
+		UAbilitySystemComponent*,
+		const FGameplayEffectSpec&,
+		FActiveGameplayEffectHandle
+		);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Class")
 	TSubclassOf<UEffectItem>EffectItemClass;
 	
 	FCallbackHandle CallbackHandle;
 
-	FCharacterStateMapHandle CharacterStateMapHandle;
+	FDelegateHandle ActiveGameplayEffectHandle;
+	
+	FDelegateHandle AppliedGameplayEffectHandle;
+	
+	// FCharacterStateMapHandle CharacterStateMapHandle;
 
-	TMap<FGuid, UEffectItem*>EffectItemMap;
+	// TMap<FGuid, UEffectItem*>EffectItemMap;
 
+	ACharacterBase* TargetCharacterPtr = nullptr;
+	
 };

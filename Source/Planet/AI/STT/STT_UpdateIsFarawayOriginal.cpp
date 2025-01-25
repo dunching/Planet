@@ -7,7 +7,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
-#include "STE_Human.h"
+#include "STE_AICharacterController.h"
 
 EStateTreeRunStatus FSTT_UpdateIsFarawayOriginal::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -26,7 +26,16 @@ EStateTreeRunStatus FSTT_UpdateIsFarawayOriginal::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
+	return Super::EnterState(Context, Transition);
+}
+
+EStateTreeRunStatus FSTT_UpdateIsFarawayOriginal::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	InstanceData.GloabVariable->bIsFarawayOriginal = InstanceData.AIControllerPtr->CheckIsFarawayOriginal();
 
-	return EStateTreeRunStatus::Succeeded;
+	return Super::Tick(Context, DeltaTime);
 }

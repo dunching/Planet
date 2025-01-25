@@ -7,6 +7,7 @@
 
 #include "Skill_Base.h"
 #include "CS_Base.h"
+#include "BaseData.h"
 
 #include "CS_PeriodicPropertyModify.generated.h"
 

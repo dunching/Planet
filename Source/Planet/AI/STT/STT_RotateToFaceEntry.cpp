@@ -7,7 +7,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
-#include "STE_Human.h"
+#include "STE_AICharacterController.h"
 #include "Planet.h"
 #include "PlanetPlayerController.h"
 
@@ -72,7 +72,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 		const auto PawnRot = InstanceData.CharacterPtr->GetActorRotation();
 
 		// Gravity?
-		if (FMath::IsNearlyEqual(PCRot.Yaw, PawnRot.Yaw, AngleTolerance))
+		if (PCRot.EqualsOrientation(PawnRot, AngleTolerance))
 		{
 			return EStateTreeRunStatus::Succeeded;
 		}

@@ -389,7 +389,7 @@ TSharedPtr<FInputProcessor> UInputProcessorSubSystem::SwitchActionProcessImp(
 	EInputProcessorType ProcessType
 )
 {
-	check(0);
+	checkNoEntry();
 
 	return nullptr;
 }

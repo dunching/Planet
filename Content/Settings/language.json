@@ -63,5 +63,15 @@
     "Default": "Lose",
     "Chinese": "失去",
     "English": "Lose"
+  },
+  "Return": {
+    "Default": "Return",
+    "Chinese": "返回",
+    "English": "Return"
+  },
+  "CharacterInteraction": {
+    "Default": "Press F to talk",
+    "Chinese": "按F互动",
+    "English": "Press F to talk"
   }
 }

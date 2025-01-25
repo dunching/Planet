@@ -1,9 +1,9 @@
-
 #include "MyBaseProperty.h"
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
 #include "Components/ProgressBar.h"
+#include "AbilitySystemComponent.h"
 
 namespace MyBaseProperty
 {
@@ -19,32 +19,45 @@ void UMyBaseProperty::NativeConstruct()
 
 void UMyBaseProperty::NativeDestruct()
 {
-	if (OnValueChanged)
-	{
-		OnValueChanged->UnBindCallback();
-	}
-
 	Super::NativeDestruct();
 }
 
-void UMyBaseProperty::SetDataSource(FBasePropertySet& Property)
+void UMyBaseProperty::SetDataSource(
+	UAbilitySystemComponent* AbilitySystemComponentPtr,
+	FGameplayAttribute Attribute,
+	float Value
+)
 {
-	SetCurrentValue(Property.GetCurrentValue());
-	OnValueChanged = Property.AddOnValueChanged(
-		std::bind(&ThisClass::SetCurrentValue, this, std::placeholders::_2)
-	);
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+		Attribute
+	).AddUObject(this, &ThisClass::OnValueChanged);
+	SetCurrentValue(Value);
 }
 
-void UMyBaseProperty::SetDataSource(FBasePropertySet& Property1, FBasePropertySet& Property2)
+void UMyBaseProperty::SetDataSource(
+	UAbilitySystemComponent* AbilitySystemComponentPtr,
+	FGameplayAttribute Attribute,
+	float Value,
+	FGameplayAttribute MaxAttribute,
+	float MaxValue
+)
 {
-	SetCurrentValue1(Property1.GetCurrentValue());
-	OnValueChanged = Property1.AddOnValueChanged(
-		std::bind(&ThisClass::SetCurrentValue1, this, std::placeholders::_2)
-	);
-	SetCurrentValue2(Property2.GetCurrentValue());
-	OnValueChanged = Property2.AddOnValueChanged(
-		std::bind(&ThisClass::SetCurrentValue2, this, std::placeholders::_2)
-	);
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+		Attribute
+	).AddUObject(this, &ThisClass::OnValue1Changed);
+	Value1 = Value;
+
+	AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
+		MaxAttribute
+	).AddUObject(this, &ThisClass::OnValue2Changed);
+	Value2 = MaxValue;
+
+	SetCurrentValue(Value1, Value2);
+}
+
+void UMyBaseProperty::OnValueChanged(const FOnAttributeChangeData& CurrentValue)
+{
+	SetCurrentValue(CurrentValue.NewValue);
 }
 
 void UMyBaseProperty::SetCurrentValue(int32 InCurrentValue)
@@ -56,19 +69,21 @@ void UMyBaseProperty::SetCurrentValue(int32 InCurrentValue)
 	}
 }
 
-void UMyBaseProperty::SetCurrentValue1(int32 InCurrentValue)
+void UMyBaseProperty::OnValue1Changed(const FOnAttributeChangeData& CurrentValue)
 {
-	Value1 = InCurrentValue;
-	ValueChanged();
+	Value1 = CurrentValue.NewValue;
+
+	SetCurrentValue(Value1, Value2);
 }
 
-void UMyBaseProperty::SetCurrentValue2(int32 InCurrentValue)
+void UMyBaseProperty::OnValue2Changed(const FOnAttributeChangeData& CurrentValue)
 {
-	Value2 = InCurrentValue;
-	ValueChanged();
+	Value2 = CurrentValue.NewValue;
+
+	SetCurrentValue(Value1, Value2);
 }
 
-void UMyBaseProperty::ValueChanged()
+void UMyBaseProperty::SetCurrentValue(int32 InValue1, int32 InValue2)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(MyBaseProperty::Text));
 	if (UIPtr)

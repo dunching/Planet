@@ -19,4 +19,8 @@ namespace TextCollect
 	TEXTCOLLECT(GetSkill);
 
 	TEXTCOLLECT(LoseSkill);
+
+	TEXTCOLLECT(CharacterInteraction);
+
+	TEXTCOLLECT(Return);
 }

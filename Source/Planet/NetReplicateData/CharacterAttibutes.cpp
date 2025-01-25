@@ -2,10 +2,11 @@
 #include "CharacterAttibutes.h"
 
 #include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterRisingTips.h"
 #include "Planet.h"
 #include "UICommon.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 #include "LogWriter.h"
 #include "CharacterBase.h"
 
@@ -186,9 +187,6 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 {
 	if (Ar.IsSaving())
 	{
-		Ar << Name;
-		Ar << Level;
-
 		Ar << LiDao.CurrentValue.CurrentValue;
 		Ar << GenGu.CurrentValue.CurrentValue;
 		Ar << ShenFa.CurrentValue.CurrentValue;
@@ -216,9 +214,6 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 				}
 			};
 
-		Ar << Name;
-		Ar << Level;
-
 		Lambda(LiDao.CurrentValue);
 		Lambda(GenGu.CurrentValue);
 		Lambda(ShenFa.CurrentValue);
@@ -242,8 +237,6 @@ bool FCharacterAttributes::NetSerialize(FArchive& Ar, class UPackageMap* Map, bo
 
 void FCharacterAttributes::InitialData()
 {
-	Name = TEXT("Player");
-
 	LiDao.GetMaxProperty().SetCurrentValue(6);
 
 	GenGu.GetMaxProperty().SetCurrentValue(6);
@@ -327,13 +320,13 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 	};
 
 	if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->DeathingTag)
+		GAEvent.Data.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag)
 		)
 	{
 		if (GAEvent.Data.bIsRespawn)
 		{
-			GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{ UGameplayTagsSubSystem::GetInstance()->Respawning }
+			GAEvent.Data.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
+				FGameplayTagContainer{ UGameplayTagsLibrary::Respawning }
 			);
 		}
 		else
@@ -342,7 +335,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 		}
 	}
 	else if (
-		GAEvent.Data.TargetCharacterPtr->GetAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsSubSystem::GetInstance()->Respawning)
+		GAEvent.Data.TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 		)
 	{
 		return;
@@ -366,7 +359,7 @@ void FCharacterAttributes::ProcessGAEVent(const FGameplayAbilityTargetData_GARec
 
 		if (Ref.GetIsHited())
 		{
-			check(Ref.DataSource == UGameplayTagsSubSystem::GetInstance()->DataSource_Character);
+			check(Ref.DataSource == UGameplayTagsLibrary::DataSource_Character);
 			if (Ref.ElementSet.IsEmpty())
 			{
 				// 基础伤害

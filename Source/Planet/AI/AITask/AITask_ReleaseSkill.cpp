@@ -15,8 +15,8 @@
 #include "CharacterBase.h"
 #include "Skill_Base.h"
 #include "AssetRefMap.h"
-#include "GameplayTagsSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "CharacterAbilitySystemComponent.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -43,19 +43,13 @@ void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
 
 bool UAITask_ReleaseSkill::PerformTask(float)
 {
-	if (bIsPauseRelease)
-	{
-		StopReleaseSkill();
-		return true;
-	}
-
 	if (CharacterPtr)
 	{
-		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		FGameplayTagContainer GameplayTagContainer;
-		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->State_ReleasingSkill_Continuous);
-		GameplayTagContainer.AddTag(UGameplayTagsSubSystem::GetInstance()->State_MoveToAttaclArea);
+		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_ReleasingSkill_Continuous);
+		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
 
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{
@@ -63,15 +57,15 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 		}
 		else
 		{
+			const auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSocket();
 			{
-				auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveSkills();
 				for (const auto& Iter : CanbeActivedInfo)
 				{
 					if (
-						Iter.Value->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ActiveSocket)
+						Iter.Key.Socket.MatchesTag(UGameplayTagsLibrary::ActiveSocket)
 						)
 					{
-						auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->ProxySPtr);
+						auto SkillProxySPtr = CharacterPtr->GetProxyProcessComponent()->FindActiveSkillBySocket(Iter.Key.Socket);
 						auto GAInsPtr = Cast<USkill_Base>(SkillProxySPtr->GetGAInst());
 						if (!GAInsPtr)
 						{
@@ -84,9 +78,9 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						);
 						if (bIsReady)
 						{
-							if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Value))
+							if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Key.Socket))
 							{
-								ReleasingSkillMap.Add(GAInsPtr, Iter.Value);
+								ReleasingSkillMap.Add(GAInsPtr, Iter.Key.Socket);
 								return true;
 							}
 						}
@@ -95,11 +89,10 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 			}
 
 			// 未释放主动技能
-			auto CanbeActivedInfo = CharacterPtr->GetProxyProcessComponent()->GetCanbeActiveWeapon();
 			for (const auto& Iter : CanbeActivedInfo)
 			{
 				if (
-					Iter->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->WeaponSocket)
+					Iter.Key.Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
 					)
 				{
 					auto WeaponSPtr = CharacterPtr->GetProxyProcessComponent()->GetActivedWeapon();
@@ -119,9 +112,9 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 					);
 					if (bIsReady)
 					{
-						if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter, true))
+						if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Key.Socket, true))
 						{
-							ReleasingSkillMap.Add(GAInsPtr, Iter);
+							ReleasingSkillMap.Add(GAInsPtr, Iter.Key.Socket);
 							return true;
 						}
 					}
@@ -135,7 +128,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 void UAITask_ReleaseSkill::StopReleaseSkill()
 {
 	// 结束移动释放至范围内释放
-	CharacterPtr->GetBaseFeatureComponent()->BreakMoveToAttackDistance();
+	CharacterPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 
 	for (const auto Iter : ReleasingSkillMap)
 	{

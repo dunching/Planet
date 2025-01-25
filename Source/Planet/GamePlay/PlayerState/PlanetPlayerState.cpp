@@ -5,11 +5,11 @@
 
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "HoldingItemsComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "SceneUnitContainer.h"
-#include "SceneUnitTable.h"
-#include "SceneElement.h"
+#include "InventoryComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "ItemProxy_Container.h"
+#include "SceneProxyTable.h"
+#include "ItemProxy_Minimal.h"
 
 APlanetPlayerState::APlanetPlayerState(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -21,6 +21,11 @@ void APlanetPlayerState::BeginPlay()
 	Super::BeginPlay();
 
 	InitialData();
+}
+
+void APlanetPlayerState::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 }
 
 void APlanetPlayerState::InitialData()

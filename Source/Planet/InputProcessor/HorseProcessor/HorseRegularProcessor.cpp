@@ -11,7 +11,7 @@
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 #include "Async/Async.h"
 #include "Components/CapsuleComponent.h"
-#include "GameplayTags/GameplayTagsSubSystem.h"
+#include "GameplayTags/GameplayTagsLibrary.h"
 #include "AbilitySystemBlueprintLibrary.h"
 
 #include "Character/GravityMovementComponent.h"
@@ -182,7 +182,7 @@ namespace HorseProcessor
 
 			Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr->RiderPtr, UGameplayTagsSubSystem::GetInstance()->DisMount, Payload);
+			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OnwerActorPtr->RiderPtr, UGameplayTagsLibrary::DisMount, Payload);
 		}
 	}
 

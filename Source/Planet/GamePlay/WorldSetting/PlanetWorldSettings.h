@@ -8,8 +8,10 @@
 
 class UAssetRefMap;
 class UStateTagExtendInfoMap;
-class USceneUnitExtendInfoMap;
+class USceneProxyExtendInfoMap;
 class UGameOptions;
+class AGuideActor;
+class AGuideMainThread;
 
 /**
  *
@@ -23,23 +25,20 @@ public:
 
 	UAssetRefMap* GetAssetRefMapInstance();
 
-	USceneUnitExtendInfoMap* GetSceneUnitExtendInfoMap();
+	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap();
 	
 	UGameOptions* GetGameOptions();
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<AGuideMainThread>MainLineGuideClass;
+
 protected:
 
-	UPROPERTY(Transient)
-	UAssetRefMap* AssetRefMapPtr = nullptr;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<UAssetRefMap>AssetRefMapClass;
+	TSoftObjectPtr<UAssetRefMap>AssetRefMapClass;
 	
-	UPROPERTY(Transient)
-	USceneUnitExtendInfoMap* SceneUnitExtendInfoMapPtr = nullptr;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<USceneUnitExtendInfoMap>SceneUnitExtendInfoMapPtrClass;
+	TSoftObjectPtr<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtrClass;
 	
 	UPROPERTY(Transient)
 	UGameOptions* GameOptionsPtr = nullptr;

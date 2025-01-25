@@ -1,103 +1,38 @@
-
 #include "ProxyProcessComponent.h"
 
-#include <queue>
-#include <map>
-
-#include "GameplayAbilitySpec.h"
 #include "Net/UnrealNetwork.h"
 
-
-#include "GAEvent_Helper.h"
 #include "CharacterBase.h"
-#include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
-#include "PlanetPlayerState.h"
-#include "BasicFuturesBase.h"
-#include "GAEvent_Send.h"
-#include "GAEvent_Received.h"
-#include "SceneElement.h"
-#include "Weapon_Base.h"
-#include "Skill_Base.h"
-#include "Skill_Active_Base.h"
-#include "Skill_WeaponActive_PickAxe.h"
-#include "Skill_WeaponActive_HandProtection.h"
-#include "Skill_WeaponActive_RangeTest.h"
-#include "Weapon_HandProtection.h"
-#include "Weapon_PickAxe.h"
-#include "Weapon_RangeTest.h"
-#include "AssetRefMap.h"
-#include "Skill_Talent_NuQi.h"
-#include "Skill_Talent_YinYang.h"
-#include "Skill_Element_Gold.h"
-#include "InputProcessorSubSystem.h"
-#include "Tool_PickAxe.h"
-#include "HumanRegularProcessor.h"
-#include "HumanCharacter.h"
-#include "GameplayTagsSubSystem.h"
-#include "SceneUnitTable.h"
-#include "Skill_Active_Control.h"
-#include "BaseFeatureComponent.h"
-#include "Skill_WeaponActive_Base.h"
-#include "HoldingItemsComponent.h"
+#include "GameOptions.h"
+#include "GameplayTagsManager.h"
+#include "ItemProxy_Minimal.h"
+#include "GameplayTagsLibrary.h"
+#include "ItemProxy_Character.h"
+#include "InventoryComponent.h"
 
 FName UProxyProcessComponent::ComponentName = TEXT("ProxyProcessComponent");
 
 UProxyProcessComponent::UProxyProcessComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
+	bWantsInitializeComponent = true;
+
 	SetIsReplicatedByDefault(true);
+}
+
+void UProxyProcessComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+
+	UWorld* World = GetWorld();
+	if (World->IsGameWorld())
+	{
+	}
 }
 
 void UProxyProcessComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		struct FMyStruct
-		{
-			FGameplayTag SocketTag;
-			FKey Key;
-		};
-		TArray<FMyStruct>Ary
-		{
-			{ UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1, EKeys::Q },
-			{ UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2, EKeys::E },
-			{ UGameplayTagsSubSystem::GetInstance()->ActiveSocket_3, EKeys::R },
-			{ UGameplayTagsSubSystem::GetInstance()->ActiveSocket_4, EKeys::F },
-
-			{ UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1, EKeys::LeftMouseButton },
-			{ UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2, EKeys::LeftMouseButton },
-
-			{ UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket_1, EKeys::LeftMouseButton },
-			{ UGameplayTagsSubSystem::GetInstance()->WeaponActiveSocket_2, EKeys::LeftMouseButton },
-
-			{ UGameplayTagsSubSystem::GetInstance()->ConsumableSocket1, EKeys::One },
-			{ UGameplayTagsSubSystem::GetInstance()->ConsumableSocket2, EKeys::Two },
-			{ UGameplayTagsSubSystem::GetInstance()->ConsumableSocket3, EKeys::Three },
-			{ UGameplayTagsSubSystem::GetInstance()->ConsumableSocket4, EKeys::Four },
-
-			{ UGameplayTagsSubSystem::GetInstance()->PassiveSocket_1, EKeys::Invalid },
-			{ UGameplayTagsSubSystem::GetInstance()->PassiveSocket_2, EKeys::Invalid },
-			{ UGameplayTagsSubSystem::GetInstance()->PassiveSocket_3, EKeys::Invalid },
-			{ UGameplayTagsSubSystem::GetInstance()->PassiveSocket_4, EKeys::Invalid },
-			{ UGameplayTagsSubSystem::GetInstance()->PassiveSocket_5, EKeys::Invalid },
-		};
-
-		for (const auto& Iter : Ary)
-		{
-			auto SocketSPtr = MakeShared<FSocket_FASI>();
-
-			SocketSPtr->Key = Iter.Key;
-			SocketSPtr->Socket = Iter.SocketTag;
-
-			SocketMap.Add(SocketSPtr->Socket, SocketSPtr);
-			AllocationSkills_Container.AddItem(SocketSPtr);
-		}
-	}
-#endif
 }
 
 void UProxyProcessComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -105,7 +40,11 @@ void UProxyProcessComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void UProxyProcessComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UProxyProcessComponent::TickComponent(
+	float DeltaTime,
+	enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction
+)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
@@ -117,52 +56,31 @@ void UProxyProcessComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	FDoRepLifetimeParams Params;
 	Params.bIsPushBased = true;
 
-	DOREPLIFETIME_CONDITION(ThisClass, AllocationSkills_Container, COND_OwnerOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, CurrentWeaponSocket, COND_OwnerOnly);
-}
-
-void UProxyProcessComponent::UpdateSocket(
-	const TSharedPtr<FSocket_FASI>& SkillsSocketInfo
-)
-{
-	if (SkillsSocketInfo->ProxySPtr)
-	{
-		SkillsSocketInfo->ProxyID = SkillsSocketInfo->ProxySPtr->GetID();
-	}
-	else
-	{
-		SkillsSocketInfo->ProxyID = FGuid();
-	}
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		UpdateSocket_Server(*SkillsSocketInfo);
-	}
-#endif
-
-	Update(SkillsSocketInfo);
-}
-
-void UProxyProcessComponent::UpdateSocket_Server_Implementation(const FSocket_FASI& Socket)
-{
-	auto SkillsSocketInfo = MakeShared<FSocket_FASI>();
-	*SkillsSocketInfo = Socket;
-
-	SkillsSocketInfo->ProxySPtr = AllocationSkills_Container.HoldingItemsComponentPtr->FindProxy(Socket.ProxyID);
-
-	Update(SkillsSocketInfo);
-	// 	if (SocketMap.Contains(Socket.Socket))
-	// 	{
-	// 		SocketMap[Socket.Socket]->ProxySPtr = AllocationSkills_Container.HoldingItemsComponentPtr->FindProxy(Socket.ProxyID);
-	// 
-	// 		Update(SocketMap[Socket.Socket]);
-	// 	}
+	DOREPLIFETIME_CONDITION(ThisClass, CurrentWeaponSocket, COND_None);
 }
 
 void UProxyProcessComponent::ActiveWeapon_Server_Implementation()
 {
-	ActiveWeapon();
+	ActiveWeaponImp();
+}
+
+void UProxyProcessComponent::ActiveWeaponImp()
+{
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
+	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
+
+	if (WeaponSocket_1.AllocationedProxyID.IsValid())
+	{
+		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
+	}
+	else if (WeaponSocket_2.AllocationedProxyID.IsValid())
+	{
+		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
+	}
 }
 
 void UProxyProcessComponent::SwitchWeapon_Server_Implementation()
@@ -183,6 +101,29 @@ void UProxyProcessComponent::ActiveAction_Server_Implementation(
 	Active(SocketTag);
 }
 
+bool UProxyProcessComponent::ActiveActionImp(
+	const FGameplayTag& SocketTag,
+	bool bIsAutomaticStop
+)
+{
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
+	if (CanActiveSocketMap.Contains(SocketTag))
+	{
+		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		if (ProxySPtr)
+		{
+			return ProxySPtr->Active();
+		}
+	}
+
+	return false;
+}
+
 void UProxyProcessComponent::CancelAction_Server_Implementation(
 	const FGameplayTag& SocketTag
 )
@@ -196,49 +137,36 @@ void UProxyProcessComponent::ActiveWeapon()
 	if (GetNetMode() == NM_Client)
 	{
 		ActiveWeapon_Server();
+		ActiveWeaponImp();
 	}
 #endif
 
-	const auto WeaponsMap = SocketMap;
-
-	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1];
-		if (WeaponSocketSPtr->ProxyID.IsValid())
-		{
-			SwitchWeaponImp(WeaponSocketSPtr->Socket);
-			return;
-		}
+		ActiveWeaponImp();
 	}
-	
-	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
-	{
-		auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
-		if (WeaponSocketSPtr->ProxyID.IsValid())
-		{
-			SwitchWeaponImp(WeaponSocketSPtr->Socket);
-			return;
-		}
-	}
+#endif
 }
 
 void UProxyProcessComponent::SwitchWeapon()
 {
-	const auto WeaponsMap = SocketMap;
-	if (
-		(WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1)) ||
-		(WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
-		)
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
+	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
+
+	if (WeaponSocket_1.Socket == CurrentWeaponSocket)
 	{
-		if (UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1 == CurrentWeaponSocket)
-		{
-			SwitchWeaponImp(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2);
-		}
-		else
-		{
-			SwitchWeaponImp(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1);
-		}
+		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
 	}
+	else
+	{
+		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
+	}
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -249,7 +177,7 @@ void UProxyProcessComponent::SwitchWeapon()
 
 void UProxyProcessComponent::RetractputWeapon()
 {
-	SwitchWeaponImp(FGameplayTag::EmptyTag);
+	SwitchWeaponImpAndCheck(FGameplayTag::EmptyTag);
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -270,18 +198,15 @@ int32 UProxyProcessComponent::GetCurrentWeaponAttackDistance() const
 }
 
 void UProxyProcessComponent::GetWeaponSocket(
-	TSharedPtr<FSocket_FASI>& FirstWeaponSocketInfoSPtr,
-	TSharedPtr<FSocket_FASI>& SecondWeaponSocketInfoSPtr
+	FCharacterSocket& FirstWeaponSocketInfoSPtr,
+	FCharacterSocket& SecondWeaponSocketInfoSPtr
 )
 {
-	const auto WeaponsMap = SocketMap;
-	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	if (CharacterPtr)
 	{
-		FirstWeaponSocketInfoSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1];
-	}
-	if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
-	{
-		SecondWeaponSocketInfoSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
+		CharacterPtr->GetCharacterProxy()->GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 }
 
@@ -290,37 +215,17 @@ void UProxyProcessComponent::GetWeaponProxy(
 	TSharedPtr<FWeaponProxy>& SecondWeaponProxySPtr
 )
 {
-	TSharedPtr<FSocket_FASI> FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FSocket_FASI> SecondWeaponSocketInfoSPtr;
-	GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
-	if (FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr)
-	{
-		FirstWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr);
-	}
-	if (SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr)
-	{
-		SecondWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr);
-	}
-}
+	auto CharacterPtr = GetOwner<FOwnerType>();
 
-void UProxyProcessComponent::GetWeaponSkills(
-	TSharedPtr<FWeaponSkillProxy>& FirstWeaponSkillSPtr,
-	TSharedPtr<FWeaponSkillProxy>& SecondWeaponSkillSPtr
-)
-{
-	TSharedPtr<FSocket_FASI> FirstWeaponSocketInfoSPtr;
-	TSharedPtr<FSocket_FASI> SecondWeaponSocketInfoSPtr;
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
+
+	FCharacterSocket FirstWeaponSocketInfoSPtr;
+	FCharacterSocket SecondWeaponSocketInfoSPtr;
 	GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
-	if (FirstWeaponSocketInfoSPtr && FirstWeaponSocketInfoSPtr->ProxySPtr)
-	{
-		auto WeaponSPtr = DynamicCastSharedPtr<FWeaponProxy>(FirstWeaponSocketInfoSPtr->ProxySPtr);
-		FirstWeaponSkillSPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(WeaponSPtr->GetWeaponSkill());
-	}
-	if (SecondWeaponSocketInfoSPtr && SecondWeaponSocketInfoSPtr->ProxySPtr)
-	{
-		auto WeaponSPtr = DynamicCastSharedPtr<FWeaponProxy>(SecondWeaponSocketInfoSPtr->ProxySPtr);
-		SecondWeaponSkillSPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(WeaponSPtr->GetWeaponSkill());
-	}
+	FirstWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(
+		InventoryComponentPtr->FindProxy_BySocket(FirstWeaponSocketInfoSPtr));
+	SecondWeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(
+		InventoryComponentPtr->FindProxy_BySocket(SecondWeaponSocketInfoSPtr));
 }
 
 TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::GetWeaponSkillByType(const FGameplayTag& TypeTag)
@@ -328,14 +233,19 @@ TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::GetWeaponSkillByType(const
 	// 找到当前装备的 弓箭类武器
 	TSharedPtr<FWeaponSkillProxy> TargetSkillSPtr = nullptr;
 
-	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr;
-	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr;
-	GetWeaponSkills(FirstWeaponSkillSPtr, SecondWeaponSkillSPtr);
-	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetUnitType() == TypeTag)
+	TSharedPtr<FWeaponProxy> FirstWeaponProxySPtr;
+	TSharedPtr<FWeaponProxy> SecondWeaponProxySPtr;
+
+	GetWeaponProxy(FirstWeaponProxySPtr, SecondWeaponProxySPtr);
+
+	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr = FirstWeaponProxySPtr->GetWeaponSkill();
+	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr = SecondWeaponProxySPtr->GetWeaponSkill();
+
+	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetProxyType() == TypeTag)
 	{
 		TargetSkillSPtr = FirstWeaponSkillSPtr;
 	}
-	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetUnitType() == TypeTag)
+	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetProxyType() == TypeTag)
 	{
 		TargetSkillSPtr = SecondWeaponSkillSPtr;
 	}
@@ -347,146 +257,88 @@ TSharedPtr<FWeaponProxy> UProxyProcessComponent::GetActivedWeapon() const
 	return FindWeaponSocket(CurrentWeaponSocket);
 }
 
-TSharedPtr<FWeaponProxy> UProxyProcessComponent::FindWeaponSocket(const FGameplayTag& Tag) const
+TSharedPtr<FWeaponProxy> UProxyProcessComponent::FindWeaponSocket(const FGameplayTag& SocketTag) const
 {
-	if (SocketMap.Contains(Tag))
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
+	auto OwnerCharacterProxyPtr = CharacterPtr->GetCharacterProxy();
+	if (OwnerCharacterProxyPtr)
 	{
-		return DynamicCastSharedPtr<FWeaponProxy>(SocketMap[Tag]->ProxySPtr);
+		auto Socket = OwnerCharacterProxyPtr->FindSocket(SocketTag);
+		return DynamicCastSharedPtr<FWeaponProxy>(InventoryComponentPtr->FindProxy_BySocket(Socket));
 	}
 
 	return nullptr;
 }
 
-TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::FindWeaponSkillSocket(const FGameplayTag& Tag) const
+TSharedPtr<FConsumableProxy> UProxyProcessComponent::FindConsumablesBySocket(const FGameplayTag& SocketTag) const
 {
-	if (SocketMap.Contains(Tag))
-	{
-		return DynamicCastSharedPtr<FWeaponSkillProxy>(SocketMap[Tag]->ProxySPtr);
-	}
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
 
+	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
+
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Consumable(Sockets.AllocationedProxyID);
+	if (SkillProxySPtr)
+	{
+		return DynamicCastSharedPtr<FConsumableProxy>(SkillProxySPtr);
+	}
 	return nullptr;
-}
-
-TArray<TSharedPtr<FSocket_FASI>> UProxyProcessComponent::GetCanbeActiveWeapon() const
-{
-	TArray<TSharedPtr<FSocket_FASI>>Result;
-
-	if (SocketMap.Contains(CurrentWeaponSocket))
-	{
-		Result.Add(SocketMap[CurrentWeaponSocket]);
-	}
-
-	return Result;
 }
 
 bool UProxyProcessComponent::ActiveAction(
-	const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr, bool bIsAutomaticStop /*= false */
+	const FGameplayTag& CanbeActivedInfoSPtr,
+	bool bIsAutomaticStop /*= false */
 )
 {
 	// 使用武器
-	auto WeaponSPtr = FindSocket(CurrentWeaponSocket);
-	if (WeaponSPtr && (WeaponSPtr->Socket == CanbeActivedInfoSPtr->Socket))
+	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
 	{
-		ActiveAction_Server(WeaponSPtr->Socket, bIsAutomaticStop);
+		ActiveAction_Server(CanbeActivedInfoSPtr, bIsAutomaticStop);
 	}
 	// 使用主动技能
-	else if (CanActiveSocketMap.Contains(CanbeActivedInfoSPtr->Socket))
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
 	{
-		if (ActivedCorrespondingWeapon(CanbeActivedInfoSPtr->Socket))
+		if (ActivedCorrespondingWeapon(CanbeActivedInfoSPtr))
 		{
-			ActiveAction_Server(CanbeActivedInfoSPtr->Socket, bIsAutomaticStop);
+			ActiveAction_Server(CanbeActivedInfoSPtr, bIsAutomaticStop);
 		}
 	}
 	// 使用消耗品
-	else
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ConsumableSocket))
 	{
-		ActiveAction_Server(CanbeActivedInfoSPtr->Socket, bIsAutomaticStop);
+		ActiveAction_Server(CanbeActivedInfoSPtr, bIsAutomaticStop);
 	}
 
 	return true;
 }
 
-void UProxyProcessComponent::CancelAction(const TSharedPtr<FSocket_FASI>& CanbeActivedInfoSPtr)
+void UProxyProcessComponent::CancelAction(const FGameplayTag& CanbeActivedInfoSPtr)
 {
-	auto WeaponSPtr = FindSocket(CurrentWeaponSocket);
-	if (WeaponSPtr->Key == CanbeActivedInfoSPtr->Key)
+	// 使用武器
+	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
 	{
-		CancelAction_Server(WeaponSPtr->Socket);
+		CancelAction_Server(CanbeActivedInfoSPtr);
 	}
-	else
+	// 使用主动技能
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
 	{
-		CancelAction_Server(CanbeActivedInfoSPtr->Socket);
-	}
-}
-
-TArray<TSharedPtr<FSocket_FASI>> UProxyProcessComponent::GetCanbeActiveConsumable() const
-{
-	TArray<TSharedPtr<FSocket_FASI>>Result;
-
-	for (auto Iter : SocketMap)
-	{
-		if (Iter.Value->Socket.MatchesTag(UGameplayTagsSubSystem::GetInstance()->ConsumableSocket))
+		if (ActivedCorrespondingWeapon(CanbeActivedInfoSPtr))
 		{
-			Result.Add(Iter.Value);
+			CancelAction_Server(CanbeActivedInfoSPtr);
 		}
 	}
-
-	return Result;
+	// 使用消耗品
+	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ConsumableSocket))
+	{
+		CancelAction_Server(CanbeActivedInfoSPtr);
+	}
 }
 
 bool UProxyProcessComponent::ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag)
 {
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		ActivedCorrespondingWeapon_Server(ActiveSkillSocketTag);
-	}
-#endif
-
-	auto SocketSPtr = SocketMap[ActiveSkillSocketTag];
-	if (SocketSPtr->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
-	{
-		auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(SocketSPtr->ProxySPtr);
-		const auto RequireWeaponUnitType = ActiveSkillUnitPtr->GetTableRowUnit_ActiveSkillExtendInfo()->RequireWeaponUnitType;
-
-		const auto WeaponsMap = SocketMap;
-
-		if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1))
-		{
-			auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_1];
-
-			if (
-				WeaponSocketSPtr->ProxySPtr && 
-				(WeaponSocketSPtr->ProxySPtr->GetUnitType() == RequireWeaponUnitType)
-				)
-			{
-				SwitchWeaponImp(WeaponSocketSPtr->Socket);
-
-				return true;
-			}
-		}
-		
-		if (WeaponsMap.Contains(UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2))
-		{
-			auto WeaponSocketSPtr = WeaponsMap[UGameplayTagsSubSystem::GetInstance()->WeaponSocket_2];
-
-			if (
-				WeaponSocketSPtr->ProxySPtr &&
-				(WeaponSocketSPtr->ProxySPtr->GetUnitType() == RequireWeaponUnitType)
-				)
-			{
-				SwitchWeaponImp(WeaponSocketSPtr->Socket);
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-	else
-	{
-		return true;
-	}
+	return true;
 }
 
 void UProxyProcessComponent::ActivedCorrespondingWeapon_Server_Implementation(const FGameplayTag& ActiveSkillSocketTag)
@@ -498,225 +350,170 @@ void UProxyProcessComponent::OnRep_AllocationChanged()
 {
 }
 
-void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged()
+void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged(const FGameplayTag& OldWeaponSocket)
 {
+	SwitchWeaponImp(CurrentWeaponSocket);
 }
 
-void UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket)
+void UProxyProcessComponent::SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket)
 {
 	if (NewWeaponSocket == CurrentWeaponSocket)
 	{
 	}
 	else
 	{
-		auto PreviousWeaponSocketSPtr = FindWeaponSocket(CurrentWeaponSocket);
-		if (PreviousWeaponSocketSPtr)
-		{
-#if UE_EDITOR || UE_SERVER
-			if (GetNetMode() == NM_DedicatedServer)
-			{
-				PreviousWeaponSocketSPtr->RetractputWeapon();
-				PreviousWeaponSocketSPtr->Update2Client();
-			}
-#endif
-		}
-
-		auto NewWeaponSocketSPtr = FindWeaponSocket(NewWeaponSocket);
-		if (NewWeaponSocketSPtr)
-		{
-#if UE_EDITOR || UE_SERVER
-			if (GetNetMode() == NM_DedicatedServer)
-			{
-				NewWeaponSocketSPtr->ActiveWeapon();
-				NewWeaponSocketSPtr->Update2Client();
-			}
-#endif
-		}
-
-		CurrentWeaponSocket = NewWeaponSocket;
-
-		OnCurrentWeaponChanged();
+		SwitchWeaponImp(NewWeaponSocket);
 	}
 }
 
-TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> UProxyProcessComponent::GetAllSocket() const
+void UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket)
 {
-	return SocketMap;
-}
-
-TSharedPtr<FSocket_FASI> UProxyProcessComponent::FindSocket(const FGameplayTag& Tag) const
-{
-	if (SocketMap.Contains(Tag))
+	auto PreviousWeaponSocketSPtr = FindWeaponSocket(CurrentWeaponSocket);
+	if (PreviousWeaponSocketSPtr)
 	{
-		return SocketMap[Tag];
+#if UE_EDITOR || UE_SERVER
+		if (GetNetMode() == NM_DedicatedServer)
+		{
+			PreviousWeaponSocketSPtr->RetractputWeapon();
+			PreviousWeaponSocketSPtr->Update2Client();
+		}
+#endif
 	}
 
-	return nullptr;
+	auto NewWeaponSocketSPtr = FindWeaponSocket(NewWeaponSocket);
+	if (NewWeaponSocketSPtr)
+	{
+#if UE_EDITOR || UE_SERVER
+		if (GetNetMode() == NM_DedicatedServer)
+		{
+			NewWeaponSocketSPtr->ActiveWeapon();
+			NewWeaponSocketSPtr->Update2Client();
+		}
+#endif
+	}
+
+	CurrentWeaponSocket = NewWeaponSocket;
+
+	OnCurrentWeaponChanged();
+}
+
+TMap<FGameplayTag, FCharacterSocket> UProxyProcessComponent::GetAllSocket() const
+{
+	TMap<FGameplayTag, FCharacterSocket> Result;
+
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	return  CharacterPtr->GetCharacterProxy()->GetSockets();
+}
+
+FCharacterSocket UProxyProcessComponent::FindSocket(const FGameplayTag& Tag) const
+{
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	return CharacterPtr->GetCharacterProxy()->FindSocket(Tag);
 }
 
 void UProxyProcessComponent::UpdateCanbeActiveSkills()
 {
-	CanActiveSocketMap.Empty();
-
 	struct FMyStruct
 	{
 		FGameplayTag ActiveSocketTag;
 	};
 	TArray<FGameplayTag> Ary
-	{ 
-		UGameplayTagsSubSystem::GetInstance()->ActiveSocket_1,
-		UGameplayTagsSubSystem::GetInstance()->ActiveSocket_2,
-		UGameplayTagsSubSystem::GetInstance()->ActiveSocket_3,
-		UGameplayTagsSubSystem::GetInstance()->ActiveSocket_4,
-	};
-
-	for (const auto& Iter : Ary)
 	{
-		auto SocketSPtr = FindSocket(Iter);
-		if (
-			SocketSPtr->ProxySPtr &&
-			SocketSPtr->ProxySPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active)
-			)
-		{
-			CanActiveSocketMap.Add(Iter, SocketSPtr);
-		}
-	}
+		UGameplayTagsLibrary::ActiveSocket_1,
+		UGameplayTagsLibrary::ActiveSocket_2,
+		UGameplayTagsLibrary::ActiveSocket_3,
+		UGameplayTagsLibrary::ActiveSocket_4,
+	};
 }
 
 void UProxyProcessComponent::UpdateCanbeActiveSkills_UsePassiveSocket(
-	const TMap<FGameplayTag, TSharedPtr<FSocket_FASI>>& InCanActiveSocketMap
+	const TMap<FGameplayTag, FCharacterSocket>& InCanActiveSocketMap
 )
 {
-	CanActiveSocketMap = InCanActiveSocketMap;
 	OnCanAciveSkillChanged();
 }
 
-TMap<FGameplayTag, TSharedPtr<FSocket_FASI>> UProxyProcessComponent::GetCanbeActiveSkills() const
+TMap<FCharacterSocket, FKey> UProxyProcessComponent::GetCanbeActiveSocket() const
 {
-	return CanActiveSocketMap;
-}
+	TMap<FCharacterSocket, FKey> Result;
 
-TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(const FGameplayTag& Tag)const
-{
-	if (SocketMap.Contains(Tag))
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
+
+	const auto Sockets = CharacterPtr->GetCharacterProxy()->GetSockets();
+
+	for (const auto& Iter : Sockets)
 	{
-		return DynamicCastSharedPtr<FActiveSkillProxy>(SocketMap[Tag]->ProxySPtr);
+		if (ActionKeyMap.Contains(Iter.Key) && Iter.Value.AllocationedProxyID.IsValid())
+		{
+			Result.Add(Iter.Value,ActionKeyMap[Iter.Key]);
+		}
 	}
 
+	return Result;
+}
+
+TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(const FGameplayTag& SocketTag) const
+{
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
+
+	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
+
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Skill(Sockets.AllocationedProxyID);
+	if (SkillProxySPtr)
+	{
+		return DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxySPtr);
+	}
 	return nullptr;
 }
 
-TSharedPtr<FSocket_FASI> UProxyProcessComponent::FindActiveSkillByType(const FGameplayTag& TypeTag) const
+FCharacterSocket UProxyProcessComponent::FindActiveSkillByType(const FGameplayTag& TypeTag) const
 {
-	for (const auto& Iter : SocketMap)
-	{
-		if (Iter.Value->ProxySPtr && Iter.Value->ProxySPtr->GetUnitType().MatchesTag(
-			UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active_Switch
-		))
-		{
-			return Iter.Value;
-		}
-	}
+	auto CharacterPtr = GetOwner<FOwnerType>();
 
-	return nullptr;
+	return CharacterPtr->GetCharacterProxy()->FindSocketByType(TypeTag);
 }
 
-void UProxyProcessComponent::Add(const TSharedPtr<FSocket_FASI>& Socket)
+void UProxyProcessComponent::Add(const FCharacterSocket& Socket)
 {
-	SocketMap.Add(Socket->Socket, Socket);
-	if (Socket->ProxySPtr)
-	{
-		Socket->ProxySPtr->Allocation();
-
-#if UE_EDITOR || UE_SERVER
-		if (GetNetMode() == NM_DedicatedServer)
-		{
-			Socket->ProxySPtr->Update2Client();
-		}
-#endif
-	}
 }
 
-void UProxyProcessComponent::Update(const TSharedPtr<FSocket_FASI>& Socket)
+void UProxyProcessComponent::Update(const FCharacterSocket& Socket)
 {
-	if (SocketMap.Contains(Socket->Socket))
-	{
-		if (SocketMap[Socket->Socket]->ProxySPtr == Socket->ProxySPtr)
-		{
-		}
-		else
-		{
-			if (SocketMap[Socket->Socket]->ProxySPtr)
-			{
-				SocketMap[Socket->Socket]->ProxySPtr->UnAllocation();
-#if UE_EDITOR || UE_SERVER
-				if (GetNetMode() == NM_DedicatedServer)
-				{
-					SocketMap[Socket->Socket]->ProxySPtr->Update2Client();
-				}
-#endif
-			}
-
-			if (Socket->ProxySPtr)
-			{
-				Socket->ProxySPtr->Allocation();
-#if UE_EDITOR || UE_SERVER
-				if (GetNetMode() == NM_DedicatedServer)
-				{
-					Socket->ProxySPtr->Update2Client();
-				}
-#endif
-			}
-
-			*SocketMap[Socket->Socket] = *Socket;
-
-#if UE_EDITOR || UE_SERVER
-			if (GetNetMode() == NM_DedicatedServer)
-			{
-				AllocationSkills_Container.UpdateItem(Socket);
-			}
-#endif
-		}
-	}
 }
 
-bool UProxyProcessComponent::Active(const TSharedPtr<FSocket_FASI>& Socket)
+bool UProxyProcessComponent::Active(const FCharacterSocket& Socket)
 {
-	return Active(Socket->Socket);
+	return Active(Socket.Socket);
 }
 
 bool UProxyProcessComponent::Active(const FGameplayTag& Socket)
 {
-	if (CanActiveSocketMap.Contains(Socket))
-	{
-		if (CanActiveSocketMap[Socket]->ProxySPtr)
-		{
-			return CanActiveSocketMap[Socket]->ProxySPtr->Active();
-		}
-	}
-	else if (SocketMap.Contains(Socket))
-	{
-		if (SocketMap[Socket]->ProxySPtr)
-		{
-			return SocketMap[Socket]->ProxySPtr->Active();
-		}
-	}
-
-	return false;
+	return ActiveActionImp(Socket, true);
 }
 
-void UProxyProcessComponent::Cancel(const TSharedPtr<FSocket_FASI>& Socket)
+void UProxyProcessComponent::Cancel(const FCharacterSocket& Socket)
 {
-	Cancel(Socket->Socket);
+	Cancel(Socket.Socket);
 }
 
-void UProxyProcessComponent::Cancel(const FGameplayTag& Socket)
+void UProxyProcessComponent::Cancel(const FGameplayTag& SocketTag)
 {
-	if (SocketMap.Contains(Socket))
+	auto CharacterPtr = GetOwner<FOwnerType>();
+
+	const auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
+	const auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+
+	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
+	if (CanActiveSocketMap.Contains(SocketTag))
 	{
-		if (SocketMap[Socket]->ProxySPtr)
+		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		if (ProxySPtr)
 		{
-			SocketMap[Socket]->ProxySPtr->Cancel();
+			ProxySPtr->Cancel();
 		}
 	}
 }

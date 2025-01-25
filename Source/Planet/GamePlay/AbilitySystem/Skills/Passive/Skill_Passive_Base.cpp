@@ -1,9 +1,9 @@
 
 #include "Skill_Passive_Base.h"
 
-#include "SceneUnitTable.h"
+#include "SceneProxyTable.h"
 #include "CharacterBase.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttibutes.h"
 #include "GenerateType.h"
 #include "CharacterAttributesComponent.h"
@@ -24,7 +24,7 @@ void USkill_Passive_Base::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 
 	if (CharacterPtr)
 	{
-		auto PassiveSkillUnitPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(SkillUnitPtr);
+		auto PassiveSkillProxyPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxyPtr);
 	}
 }
 
@@ -35,7 +35,7 @@ void USkill_Passive_Base::OnRemoveAbility(
 {
 	if (CharacterPtr)
 	{
-		auto PassiveSkillUnitPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(SkillUnitPtr);
+		auto PassiveSkillProxyPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxyPtr);
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);

@@ -6,7 +6,7 @@
 #include <GameplayTagContainer.h>
 
 #include "GravityAIController.h"
-
+#include "GroupSharedInterface.h"
 #include "PlanetControllerInterface.h"
 
 #include "PlanetAIController.generated.h"
@@ -15,15 +15,17 @@ class UPlanetAbilitySystemComponent;
 struct FCharacterProxy;
 class ACharacterBase;
 class UCharacterAttributesComponent;
-class UHoldingItemsComponent;
+class UInventoryComponent;
 class UTalentAllocationComponent;
-class UGroupMnaggerComponent;
+class UTeamMatesHelperComponent;
+class AGroupSharedInfo;
 
 
 UCLASS()
 class PLANET_API APlanetAIController : 
 	public AGravityAIController, 
-	public IPlanetControllerInterface
+	public IPlanetControllerInterface,
+	public IGroupSharedInterface
 {
 	GENERATED_BODY()
 
@@ -37,15 +39,19 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	virtual UGroupMnaggerComponent* GetGroupMnaggerComponent() const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual UHoldingItemsComponent* GetHoldingItemsComponent()const override;
+	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
+
+	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
+
+	virtual UInventoryComponent* GetHoldingItemsComponent()const override;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent()const override;
 
-	virtual TSharedPtr<FCharacterProxy> GetCharacterUnit() override;
+	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() override;
 
 	virtual ACharacterBase* GetRealCharacter()const override;
 	
@@ -63,20 +69,36 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	virtual void ResetGroupmateUnit(FCharacterProxy* NewGourpMateUnitPtr)override;
+	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn)override;
+
+	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)override;
 
 	virtual void BindPCWithCharacter()override;
 
-	virtual TSharedPtr<FCharacterProxy> InitialCharacterUnit(ACharacterBase* CharaterPtr)override;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase* CharaterPtr)override;
 	
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+
+	virtual void InitialGroupSharedInfo();
+
+	UFUNCTION()
+	void OnRep_GroupSharedInfoChanged();
+
 	UFUNCTION()
 	void OnPerceptionUpdated(const TArray<AActor*>& UpdatedActors);
 
 	UFUNCTION()
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
+
 private:
+
+	void LimitViewYaw(FRotator& ViewRotation, float InViewYawMin, float InViewYawMax);
 
 };

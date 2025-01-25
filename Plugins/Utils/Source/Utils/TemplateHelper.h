@@ -237,6 +237,8 @@ public:
 
 	const TCallbackHandleContainer<Ret(ParamTypes...)>& operator()(ParamTypes...Args);
 
+	const TCallbackHandleContainer<Ret(ParamTypes...)>& operator()(ParamTypes...Args)const;
+
 	_NODISCARD TSharedPtr<FCallbackHandle> AddCallback(
 		const typename FCallbackHandle::FCallbackType& Callback
 	);
@@ -264,6 +266,24 @@ const TCallbackHandleContainer<Ret(ParamTypes...)>& TCallbackHandleContainer<Ret
 
 template<typename Ret, typename... ParamTypes>
 const TCallbackHandleContainer<Ret(ParamTypes...)>& TCallbackHandleContainer<Ret(ParamTypes...)>::operator()(ParamTypes...Args)
+{
+	if (CallbacksMapSPtr)
+	{
+		const auto Temp = *CallbacksMapSPtr;
+		for (auto Iter : Temp)
+		{
+			if (Iter.second)
+			{
+				Iter.second(Args...);
+			}
+		}
+	}
+
+	return *this;
+}
+
+template<typename Ret, typename... ParamTypes>
+const TCallbackHandleContainer<Ret(ParamTypes...)>& TCallbackHandleContainer<Ret(ParamTypes...)>::operator()(ParamTypes...Args)const
 {
 	if (CallbacksMapSPtr)
 	{

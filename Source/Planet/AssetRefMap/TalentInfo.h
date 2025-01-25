@@ -6,7 +6,7 @@
 #include <GenerateType.h>
 
 #include "GameplayTagContainer.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 
 #include "TalentInfo.generated.h"
 

@@ -17,9 +17,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -31,7 +31,7 @@
 FGameplayAbilityTargetData_StateModify_Slow::FGameplayAbilityTargetData_StateModify_Slow(
 	int32 InSpeedOffset
 ):
-	Super(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow, 5.f),
+	Super(UGameplayTagsLibrary::State_Debuff_Slow, 5.f),
 	SpeedOffset(InSpeedOffset)
 {
 }
@@ -101,13 +101,13 @@ void UCS_PeriodicStateModify_Slow::EndAbility(
 
 	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
 
-	GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow;
+	GAEventData.DataSource = UGameplayTagsLibrary::State_Debuff_Slow;
 	GAEventData.DataModify = GetAllData();
 	GAEventData.bIsClearData = true;
 
 	GAEventDataPtr->DataAry.Add(GAEventData);
 
-	CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -194,7 +194,7 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 
 			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
 		}
@@ -229,13 +229,13 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 
 			FGAEventData GAEventData(Iter.Value.SPtr->TargetCharacterPtr, Iter.Value.SPtr->TriggerCharacterPtr);
 
-			GAEventData.DataSource = UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow;
+			GAEventData.DataSource = UGameplayTagsLibrary::State_Debuff_Slow;
 			GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed, Iter.Key } };
 			GAEventData.bIsOverlapData = true;
 
 			GAEventDataPtr->DataAry.Add(GAEventData);
 
-			CharacterPtr->GetBaseFeatureComponent()->SendEventImp(GAEventDataPtr);
+			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 		}
 		break;
 	}
@@ -245,6 +245,6 @@ void UCS_PeriodicStateModify_Slow::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);
-	ActivationOwnedTags.AddTag(UGameplayTagsSubSystem::GetInstance()->State_Debuff_Slow);
+	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Slow);
+	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Slow);
 }

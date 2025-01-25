@@ -19,12 +19,13 @@
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AS_Character.h"
 #include "Weapon_HandProtection.h"
 #include "UIManagerSubSystem.h"
 #include "ProgressTips.h"
 #include "Skill_Active_Base.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
 
 namespace Skill_WeaponHandProtection
@@ -85,7 +86,7 @@ void USkill_WeaponActive_HandProtection::ActivateAbility(
 		return;
 	}
 
-	check(0);
+	checkNoEntry();
 	K2_EndAbility();
 }
 
@@ -201,13 +202,13 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 	if (NotifyName == Skill_WeaponHandProtection::AttackEnd)
 	{
 #if UE_EDITOR || UE_SERVER
-		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+		if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 		{
 			MakeDamage();
 		}
 #endif
 
-		CheckInContinue();
+		CheckInContinue(-1.f);
 	}
 }
 
@@ -254,32 +255,32 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		}
 
 		auto SkillsAry = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-		auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		for (const auto& Iter : SkillsAry)
 		{
-// 			if (Iter.Value->SkillUnitPtr)
+// 			if (Iter.Value->SkillProxyPtr)
 // 			{
-// 				if (Iter.Value->SkillUnitPtr->GetUnitType().MatchesTag(UGameplayTagsSubSystem::GetInstance()->Unit_Skill_Active))
+// 				if (Iter.Value->SkillProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 // 				{
-// 					auto ActiveSkillUnitPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillUnitPtr);
-// 					if (!ActiveSkillUnitPtr)
+// 					auto ActiveSkillProxyPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillProxyPtr);
+// 					if (!ActiveSkillProxyPtr)
 // 					{
 // 						continue;
 // 					}
 // 
-// 					ActiveSkillUnitPtr->AddCooldownConsumeTime(1.f);
+// 					ActiveSkillProxyPtr->AddCooldownConsumeTime(1.f);
 // 				}
 // 			}
 		}
 
-		auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 
 void USkill_WeaponActive_HandProtection::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().GAPerformSpeed.GetCurrentValue();
+	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
 
 	{
@@ -315,7 +316,7 @@ void USkill_WeaponActive_HandProtection::PlayMontage()
 		);
 
 		AbilityTask_PlayMontage_HumanPtr->Ability = this;
-		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 		AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 		AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 

@@ -7,7 +7,8 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
-#include "STE_Human.h"
+#include "STE_AICharacterController.h"
+#include "GroupSharedInfo.h"
 
 EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -20,6 +21,23 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
+	return Super::EnterState(Context, Transition);
+}
+
+EStateTreeRunStatus FSTT_UpdateTargetCharacter::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	PerformMoveTask(Context);
+
+	return Super::Tick(Context, DeltaTime);
+}
+
+EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformMoveTask(FStateTreeExecutionContext& Context) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
 	if (!InstanceData.TaskOwner)
 	{
@@ -27,7 +45,7 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 	}
 
 	InstanceData.GloabVariable->TargetCharacterPtr =
-		InstanceData.CharacterPtr->GetGroupMnaggerComponent()->GetTeamHelper()->GetKnowCharacter();
+		InstanceData.CharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
 
-	return EStateTreeRunStatus::Succeeded;
+	return EStateTreeRunStatus::Running;
 }

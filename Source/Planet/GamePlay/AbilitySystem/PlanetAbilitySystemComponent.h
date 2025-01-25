@@ -24,14 +24,21 @@ class PLANET_API IPlanetAbilitySystemInterface
 public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
+	
 };
 
+/*
+ *	在GA里面使用RPC的NetMulticast蓝图会有警告，所以我们在这里转发一下
+ * 
+ */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UPlanetAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 
 public:
+
+	static FName ComponentName;
 
 	virtual void TickComponent(
 		float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
@@ -45,6 +52,12 @@ public:
 		FGameplayAbilitySpec& Spec, const UGameplayAbility* Ability
 	)override;
 
+	virtual FActiveGameplayEffectHandle ApplyGameplayEffectSpecToTarget(
+		const FGameplayEffectSpec& GameplayEffect,
+		UAbilitySystemComponent *Target,
+		FPredictionKey PredictionKey=FPredictionKey()
+		)override;
+
 	UFUNCTION(NetMulticast, Reliable)
 	void CurrentMontageStopImp(float OverrideBlendOutTime);
 	
@@ -55,13 +68,35 @@ public:
 	UFUNCTION(Client, Reliable)
 	void RemoveLooseGameplayTag_2_Client(const FGameplayTag& GameplayTag);
 
-	UFUNCTION(Client, Reliable)
+# pragma region 继续执行的RPC 
+	UFUNCTION(Server, Reliable)
+	void SetContinuePerform_Server(
+		FGameplayAbilitySpecHandle AbilityToTrigger,
+		FGameplayAbilityActivationInfo ActivationInfo,
+		bool bIsContinue
+		);
+
+	UFUNCTION(NetMulticast, Reliable)
 	void ReplicateContinues(
 		FGameplayAbilitySpecHandle Handle,
 		FGameplayAbilityActivationInfo ActivationInfo,
 		bool bIsContinue
 	);
 
+	UFUNCTION(Server, Reliable)
+	void ReplicatePerformAction_Server(
+		FGameplayAbilitySpecHandle Handle,
+		FGameplayAbilityActivationInfo ActivationInfo
+	);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReplicatePerformAction(
+		FGameplayAbilitySpecHandle Handle,
+		FGameplayAbilityActivationInfo ActivationInfo
+	);
+# pragma endregion 
+
+# pragma region 复制参数 
 	UFUNCTION(NetMulticast, Reliable)
 	void ReplicateEventData(
 		int32 InputID,
@@ -73,12 +108,15 @@ public:
 		FGameplayAbilitySpecHandle Handle,
 		const FGameplayEventData&TriggerEventData
 	);
+# pragma endregion 
 
 	UFUNCTION(BlueprintCallable, Category = "ASC")
 	bool K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ASC")
 	bool K2_HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const;
+	
+	virtual void ModifyActiveEffectDuration(FActiveGameplayEffectHandle Handle, float Duration);
 
 private:
 

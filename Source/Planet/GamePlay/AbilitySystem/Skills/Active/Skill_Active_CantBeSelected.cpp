@@ -6,8 +6,8 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CS_RootMotion.h"
-#include "GameplayTagsSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
@@ -36,15 +36,15 @@ void USkill_Active_CantBeSelected::ActivateAbility(
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 		ExcuteTasks();
 
 		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
@@ -87,7 +87,7 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
@@ -97,7 +97,7 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
 
-			auto ICPtr = CharacterPtr->GetBaseFeatureComponent();
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
@@ -107,7 +107,7 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 void USkill_Active_CantBeSelected::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentIntervalTime, float IntervalTime)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{

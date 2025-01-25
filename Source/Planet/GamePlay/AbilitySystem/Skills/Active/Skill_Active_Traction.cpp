@@ -6,8 +6,8 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CS_RootMotion.h"
-#include "GameplayTagsSubSystem.h"
-#include "BaseFeatureComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
@@ -48,14 +48,14 @@ void USkill_Active_Traction::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 
 		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillUnitPtr->GetUnitType();
+		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillUnitPtr->GetIcon();
+		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
 		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
@@ -99,7 +99,7 @@ void USkill_Active_Traction::IntervalDelegate(
 void USkill_Active_Traction::DurationDelegate(UAbilityTask_TimerHelper*, float CurrentIntervalTime, float IntervalTime)
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		if (CharacterStateInfoSPtr)
 		{
@@ -124,7 +124,7 @@ void USkill_Active_Traction::PlayMontage()
 	);
 
 	TaskPtr->Ability = this;
-	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+	TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 	TaskPtr->ReadyForActivation();
 }

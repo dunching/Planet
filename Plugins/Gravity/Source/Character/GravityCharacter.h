@@ -28,7 +28,11 @@ public:
 
     FQuat GetGravityToWorldTransform() const;
 
+    virtual void FaceRotation(FRotator NewControlRotation, float DeltaTime = 0.f)override;
+
     virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false)override;
+
+    bool bUseCustomRotation = false;
 
 protected:
 

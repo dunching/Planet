@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 #include "Skill_Consumable_Base.h"
 
 #include "Skill_Consumable_Test.generated.h"
@@ -79,11 +79,11 @@ protected:
 
 	AConsumable_Test* ConsumableActorPtr = nullptr;
 
-	FConsumableProxy* UnitPtr = nullptr;
+	FConsumableProxy* ProxyPtr = nullptr;
 
 };
 
 struct FGameplayAbilityTargetData_Consumable_Test : public FGameplayAbilityTargetData
 {
-	FConsumableProxy* UnitPtr = nullptr;
+	FConsumableProxy* ProxyPtr = nullptr;
 };

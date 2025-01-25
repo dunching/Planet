@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "GenerateType.h"
-#include "SceneElement.h"
+#include "ItemProxy_Minimal.h"
 #include "PlanetGameplayAbility.generated.h"
 
 class UPlanetAbilitySystemComponent;
@@ -74,8 +74,6 @@ public:
 
 	UPlanetGameplayAbility();
 
-	void SetContinuePerform(bool bIsContinue);
-
 #if WITH_EDITOR
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -132,14 +130,18 @@ public:
 	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
+	
 #endif
 
 	// 通过此函数修改GAS上记录的CDO的Tags
 	virtual	void InitalDefaultTags();
 
-protected:
+	UFUNCTION(Server, Reliable)
+	void CancelAbility_Server();
+	
+	virtual void SetContinuePerform(bool bIsContinue);
 
-	virtual void SetContinuePerformImp(bool bIsContinue);
+protected:
 
 	void RunIfListLock()const;
 

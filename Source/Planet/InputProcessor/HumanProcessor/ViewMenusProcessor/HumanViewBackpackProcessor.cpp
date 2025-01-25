@@ -16,7 +16,7 @@
 #include "HumanRegularProcessor.h"
 #include "HorseProcessor.h"
 #include "HumanProcessor.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "BuildingBaseProcessor.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "HumanCharacter_Player.h"
@@ -34,10 +34,14 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(true);
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(
-			true
-		);
+		// UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(true);
+		// UUIManagerSubSystem::GetInstance()->ViewBackpack(
+		// 	true
+		// 	);
+
+		// 没用到
+		// UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kMenuLayout);
+		// UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kAllocationSkill);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
@@ -50,8 +54,8 @@ namespace HumanProcessor
 
 	void FViewBackpackProcessor::QuitAction()
 	{
-		UUIManagerSubSystem::GetInstance()->DisplayBuildingStateHUD(false);
-		UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
+		// UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(false);
+		// UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 

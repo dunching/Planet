@@ -15,6 +15,10 @@
 class AAIController;
 class USplineComponent;
 
+// namespace EPathFollowingResult { enum Type : int; }
+// 
+// using FMyMoveTaskCompletedSignature = TDelegate<void(TEnumAsByte<EPathFollowingResult::Type>)>;
+
 UCLASS()
 class PLANET_API UAITask_MoveBySpline : public UAITask_MoveTo
 {
@@ -23,5 +27,15 @@ class PLANET_API UAITask_MoveBySpline : public UAITask_MoveTo
 public:
 	
 	virtual void PerformMove()override;
+
+	virtual void OnRequestFinished(FAIRequestID RequestID, const FPathFollowingResult& Result)override;
+// 
+// 	FMyMoveTaskCompletedSignature GetMoveTaskCompletedSignature();
+// 
+// 	FMyMoveTaskCompletedSignature MyMoveTaskCompletedSignature;
+
+	TArray<FVector>Pts;
+
+	int32 Index = 0;
 
 };

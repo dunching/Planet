@@ -19,13 +19,14 @@
 #include "AssetRefMap.h"
 #include "HumanCharacter.h"
 #include "WeatherSystem.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "AbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "SceneUnitContainer.h"
-#include "SceneUnitTable.h"
-#include "SceneElement.h"
+#include "GameplayTagsLibrary.h"
+#include "ItemProxy_Container.h"
+#include "SceneProxyTable.h"
+#include "ItemProxy_Minimal.h"
+#include "ItemProxy_Character.h"
 
 AGameMode_Main::AGameMode_Main() :
 	Super()
@@ -53,7 +54,7 @@ void AGameMode_Main::BeginPlay()
 
 void AGameMode_Main::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	for (auto Iter : CharacterUnitMap)
+	for (auto Iter : CharacterProxyMap)
 	{
 		if (Iter.Value)
 		{
@@ -86,16 +87,16 @@ void AGameMode_Main::OnVoxelWorldLoad()
 {
 }
 
-FCharacterProxy* AGameMode_Main::AddCharacterUnit(FGameplayTag UnitType)
+FCharacterProxy* AGameMode_Main::AddCharacterProxy(FGameplayTag ProxyType)
 {
 	return nullptr;
 }
 
-FCharacterProxy* AGameMode_Main::FindCharacterUnit(int32 ID)
+FCharacterProxy* AGameMode_Main::FindCharacterProxy(int32 ID)
 {
-	if (CharacterUnitMap.Contains(ID))
+	if (CharacterProxyMap.Contains(ID))
 	{
-		return CharacterUnitMap[ID];
+		return CharacterProxyMap[ID];
 	}
 
 	return nullptr;

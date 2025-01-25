@@ -17,9 +17,9 @@
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
-#include "BaseFeatureComponent.h"
-#include "GameplayTagsSubSystem.h"
-#include "AbilityTask_MyApplyRootMotionConstantForce.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "AbilityTask_ARM_ConstantForce.h"
 #include "AbilityTask_FlyAway.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
@@ -86,7 +86,7 @@ void UCS_RootMotion_MoveAlongSpline::EndAbility(
 // 	{
 // 		TaskPtr->UpdateDuration();
 // 	}
-// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsSubSystem::GetInstance()->FlyAway))
+// 	if (GameplayAbilityTargetDataPtr->Tag.MatchesTagExact(UGameplayTagsLibrary::FlyAway))
 // 	{
 // 		for (auto Iter : ActiveTasks)
 // 		{
@@ -116,7 +116,7 @@ void UCS_RootMotion_MoveAlongSpline::PerformAction()
 		);
 
 		RootMotionTaskPtr->Ability = this;
-		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetAbilitySystemComponent());
+		RootMotionTaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		RootMotionTaskPtr->OnFinish.BindUObject(this, &ThisClass::DecrementToZeroListLock);
 
@@ -184,7 +184,7 @@ void UCS_RootMotion_MoveAlongSpline::OnDuration(UAbilityTask_TimerHelper* InTask
 }
 
 FGameplayAbilityTargetData_RootMotion_MoveAlongSpline::FGameplayAbilityTargetData_RootMotion_MoveAlongSpline() :
-	Super(UGameplayTagsSubSystem::GetInstance()->MoveAlongSpline)
+	Super(UGameplayTagsLibrary::MoveAlongSpline)
 {
 
 }

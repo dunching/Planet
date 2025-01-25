@@ -15,13 +15,13 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/PlayerController.h"
 #include "AbilitySystemBlueprintLibrary.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 #include "GameMode_Main.h"
 #include "PlanetPlayerState.h"
 #include "GenerateType.h"
 #include "Command/TestCommand.h"
-#include "HumanActionPigInteractionUI.h"
+#include "HumanInteractionWithNPC.h"
 #include "HorseViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"
 #include "HorseRegularProcessor.h"
@@ -36,7 +36,7 @@
 #include "UIManagerSubSystem.h"
 #include <ToolsMenu.h>
 #include "ProxyProcessComponent.h"
-#include "HoldingItemsComponent.h"
+#include "InventoryComponent.h"
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"
 #include "PlanetPlayerController.h"
@@ -101,7 +101,13 @@ void AHorseCharacter::PossessedBy(AController* NewController)
 	}
 }
 
-void AHorseCharacter::Interaction(ACharacterBase* CharacterPtr)
+USceneActorInteractionComponent* AHorseCharacter::GetSceneActorInteractionComponent() const
+{
+	// TODO 添加组件
+	return nullptr;
+}
+
+void AHorseCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
 {
 	if (CharacterPtr)
 	{
@@ -112,16 +118,20 @@ void AHorseCharacter::Interaction(ACharacterBase* CharacterPtr)
 
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(CharacterPtr, UGameplayTagsSubSystem::GetInstance()->Mount, Payload);
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(CharacterPtr, UGameplayTagsLibrary::Mount, Payload);
 	}
 }
 
-void AHorseCharacter::StartLookAt(ACharacterBase* CharacterPtr)
+void AHorseCharacter::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
 {
 	SwitchDisplayMountTips(true);
 }
 
-void AHorseCharacter::EndLookAt()
+void AHorseCharacter::HasBeenLookingAt(ACharacterBase* CharacterPtr)
+{
+}
+
+void AHorseCharacter::HasBeenEndedLookAt()
 {
 	SwitchDisplayMountTips(false);
 }

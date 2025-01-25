@@ -8,12 +8,12 @@
 #include "ProxyProcessComponent.h"
 
 #include "CharacterAttributesComponent.h"
-#include "BaseFeatureComponent.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "StateProcessorComponent.h"
 #include "CS_RootMotion.h"
 #include "CS_PeriodicPropertyModify.h"
 #include "CS_PeriodicStateModify.h"
-#include "GameplayTagsSubSystem.h"
+#include "GameplayTagsLibrary.h"
 
 UGAEvent_Received::UGAEvent_Received() :
 	Super()
@@ -61,24 +61,24 @@ void UGAEvent_Received::ActivateAbility(
 			auto CloneSPtr = GAEventDataPtr->Clone_SmartPtr();
 			if (CloneSPtr->Data.bIsRespawn)
 			{
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
+				// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 			}
 			else
 			{
 				// 受击的角色会对数据做出的修正
-				CharacterPtr->GetBaseFeatureComponent()->OnReceivedEventModifyData(*CloneSPtr);
+				// CharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(*CloneSPtr);
 
 				// 将数据应用到角色
-				CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
+				// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().ProcessGAEVent(*CloneSPtr);
 
 				// 
 				CloneSPtr->TrueDataDelagate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
 				//
-				GAEventDataPtr->TriggerCharacterPtr->GetBaseFeatureComponent()->MakedDamageDelegate.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
+				// GAEventDataPtr->TriggerCharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate_Deprecated.ExcuteCallback(CharacterPtr, CloneSPtr->Data);
 
 				// 角色根据数据作出相应的反馈（如播放通用的动画或位移效果）
-				CharacterPtr->GetBaseFeatureComponent()->ExcuteAttackedEffect(*CloneSPtr);
+				CharacterPtr->GetCharacterAbilitySystemComponent()->ExcuteAttackedEffect(*CloneSPtr);
 			}
 		}
 		break;

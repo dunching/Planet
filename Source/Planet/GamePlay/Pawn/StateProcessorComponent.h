@@ -9,6 +9,7 @@
 #include "Talent_FASI.h"
 #include "GenerateType.h"
 #include "CharacterStateInfo.h"
+#include "GroupSharedInterface.h"
 
 #include "StateProcessorComponent.generated.h"
 
@@ -33,7 +34,9 @@ struct FGameplayAbilityTargetData;
 struct FCharacterStateInfo;
 
 UCLASS(BlueprintType, Blueprintable)
-class UStateProcessorComponent : public UActorComponent
+class UStateProcessorComponent :
+	public UActorComponent,
+	public IGroupSharedInterface
 {
 	GENERATED_BODY()
 
@@ -70,11 +73,15 @@ public:
 
 protected:
 
+	virtual void InitializeComponent()override;
+
 	virtual void BeginPlay()override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
 
 	void BreakOhterState(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
