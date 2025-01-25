@@ -130,12 +130,13 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
 	)
 	{
-		if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
-		{
-			CheckInContinue(-1.f);
-		}
 	}
 #endif
+	
+	if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
+	{
+		CheckInContinue(-1.f);
+	}
 	
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
@@ -155,10 +156,7 @@ void USkill_WeaponActive_PickAxe::OnMontageComplete()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		// 确认是不在输入，而不是再次输入
-		if (!bIsContinue)
-		{
-		}
+		// 
 		K2_CancelAbility();
 	}
 #endif

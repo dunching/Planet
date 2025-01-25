@@ -175,7 +175,7 @@ void USkill_Active_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Active_Base::SetContinuePerformImp(bool bIsContinue)
+void USkill_Active_Base::SetContinuePerform(bool bIsContinue)
 {
 	ContinueActive();
 }
@@ -275,5 +275,5 @@ void USkill_Active_Base::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
-
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }

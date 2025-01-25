@@ -68,8 +68,15 @@ public:
 	UFUNCTION(Client, Reliable)
 	void RemoveLooseGameplayTag_2_Client(const FGameplayTag& GameplayTag);
 
-	// 仅 ROLE_AutonomousProxy
-	UFUNCTION(Client, Reliable)
+# pragma region 继续执行的RPC 
+	UFUNCTION(Server, Reliable)
+	void SetContinuePerform_Server(
+		FGameplayAbilitySpecHandle AbilityToTrigger,
+		FGameplayAbilityActivationInfo ActivationInfo,
+		bool bIsContinue
+		);
+
+	UFUNCTION(NetMulticast, Reliable)
 	void ReplicateContinues(
 		FGameplayAbilitySpecHandle Handle,
 		FGameplayAbilityActivationInfo ActivationInfo,
@@ -87,7 +94,9 @@ public:
 		FGameplayAbilitySpecHandle Handle,
 		FGameplayAbilityActivationInfo ActivationInfo
 	);
+# pragma endregion 
 
+# pragma region 复制参数 
 	UFUNCTION(NetMulticast, Reliable)
 	void ReplicateEventData(
 		int32 InputID,
@@ -99,6 +108,7 @@ public:
 		FGameplayAbilitySpecHandle Handle,
 		const FGameplayEventData&TriggerEventData
 	);
+# pragma endregion 
 
 	UFUNCTION(BlueprintCallable, Category = "ASC")
 	bool K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const;

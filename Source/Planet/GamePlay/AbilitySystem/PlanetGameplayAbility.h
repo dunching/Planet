@@ -74,9 +74,6 @@ public:
 
 	UPlanetGameplayAbility();
 
-	UFUNCTION(Server, Reliable)
-	void SetContinuePerform(bool bIsContinue);
-
 #if WITH_EDITOR
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -142,9 +139,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void CancelAbility_Server();
 	
-protected:
+	virtual void SetContinuePerform(bool bIsContinue);
 
-	virtual void SetContinuePerformImp(bool bIsContinue);
+protected:
 
 	void RunIfListLock()const;
 

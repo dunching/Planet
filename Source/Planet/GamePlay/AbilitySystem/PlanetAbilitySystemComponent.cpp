@@ -93,6 +93,15 @@ FActiveGameplayEffectHandle UPlanetAbilitySystemComponent::ApplyGameplayEffectSp
 	return Super::ApplyGameplayEffectSpecToTarget(Spec,Target , PredictionKey);
 }
 
+void UPlanetAbilitySystemComponent::SetContinuePerform_Server_Implementation(
+	FGameplayAbilitySpecHandle AbilityToTrigger,
+	FGameplayAbilityActivationInfo ActivationInfo,
+	bool bIsContinue
+	)
+{
+	ReplicateContinues(AbilityToTrigger, ActivationInfo, bIsContinue);
+}
+
 void UPlanetAbilitySystemComponent::CurrentMontageStopImp_Implementation(float OverrideBlendOutTime)
 {
 	CurrentMontageStop(OverrideBlendOutTime);
@@ -126,7 +135,7 @@ void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 
 			for (auto Instance : Instances)
 			{
-				Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerformImp(bIsContinue);
+				Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerform(bIsContinue);
 			}
 		}
 	}

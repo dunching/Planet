@@ -54,18 +54,6 @@ UPlanetGameplayAbility::UPlanetGameplayAbility() :
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerInitiated;
 }
 
-void UPlanetGameplayAbility::SetContinuePerform_Implementation(bool bIsContinue)
-{
-	if (CurrentActorInfo && CurrentActorInfo->AbilitySystemComponent.IsValid())
-	{
-		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->ReplicateContinues(
-			CurrentSpecHandle, 
-			CurrentActivationInfo, 
-			bIsContinue
-		);
-	}
-}
-
 #if WITH_EDITOR
 void UPlanetGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -155,7 +143,7 @@ void UPlanetGameplayAbility::OnGameplayTaskDeactivated(UGameplayTask& Task)
 
 #endif
 
-void UPlanetGameplayAbility::SetContinuePerformImp(bool bIsContinue)
+void UPlanetGameplayAbility::SetContinuePerform(bool bIsContinue)
 {
 
 }

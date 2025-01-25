@@ -105,8 +105,6 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void SetContinuePerformImp(bool bIsContinue)override;
-
 	virtual	void InitalDefaultTags()override;
 
 	virtual void Tick(float DeltaTime);
@@ -117,6 +115,8 @@ public:
 protected:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void SetContinuePerform(bool bIsContinue)override;
 
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,

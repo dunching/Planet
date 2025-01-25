@@ -240,7 +240,11 @@ bool FActiveSkillProxy::Active()
 		{
 			if (InGAInsPtr->IsActive())
 			{
-				InGAInsPtr->SetContinuePerform(true);
+				ASCPtr->SetContinuePerform_Server(
+					InGAInsPtr->GetCurrentAbilitySpecHandle(),
+					InGAInsPtr->GetCurrentActivationInfo(),
+					true
+				);
 				return true;
 			}
 			else
@@ -267,7 +271,11 @@ bool FActiveSkillProxy::Active()
 		{
 			if (InGAInsPtr->IsActive())
 			{
-				InGAInsPtr->SetContinuePerform(true);
+				ASCPtr->SetContinuePerform_Server(
+					InGAInsPtr->GetCurrentAbilitySpecHandle(),
+					InGAInsPtr->GetCurrentActivationInfo(),
+					true
+				);
 				return true;
 			}
 			else
@@ -460,15 +468,21 @@ bool FWeaponSkillProxy::Active()
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto InGaInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
-		if (!InGaInsPtr)
+		auto InGAInsPtr = Cast<USkill_WeaponActive_Base>(GetGAInst());
+		if (!InGAInsPtr)
 		{
 			return false;
 		}
 
-		if (InGaInsPtr->IsActive())
+		if (InGAInsPtr->IsActive())
 		{
-			InGaInsPtr->SetContinuePerform(true);
+			auto ASCPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
+
+			ASCPtr->SetContinuePerform_Server(
+				InGAInsPtr->GetCurrentAbilitySpecHandle(),
+				InGAInsPtr->GetCurrentActivationInfo(),
+				true
+			);
 			return true;
 		}
 
@@ -486,7 +500,7 @@ bool FWeaponSkillProxy::Active()
 		auto ASCPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
 
 		return ASCPtr->TriggerAbilityFromGameplayEvent(
-			InGaInsPtr->GetCurrentAbilitySpecHandle(),
+			InGAInsPtr->GetCurrentAbilitySpecHandle(),
 			ASCPtr->AbilityActorInfo.Get(),
 			GetProxyType(),
 			&Payload,
@@ -506,7 +520,13 @@ void FWeaponSkillProxy::Cancel()
 		return;
 	}
 
-	InGAInsPtr->SetContinuePerform(false);
+	auto ASCPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
+
+	ASCPtr->SetContinuePerform_Server(
+		InGAInsPtr->GetCurrentAbilitySpecHandle(),
+		InGAInsPtr->GetCurrentActivationInfo(),
+		false
+	);
 }
 
 void FWeaponSkillProxy::End()

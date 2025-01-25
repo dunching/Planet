@@ -94,14 +94,14 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual void SetContinuePerformImp(bool bIsContinue)override;
-
 	virtual	void InitalDefaultTags()override;
 
 	virtual bool GetNum(int32 & Num)const;
 
 protected:
 	
+	virtual void SetContinuePerform(bool bIsContinue)override;
+
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
