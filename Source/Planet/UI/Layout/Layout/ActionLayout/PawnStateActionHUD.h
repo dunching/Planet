@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "PawnStateActionHUD.generated.h"
 
@@ -23,7 +24,8 @@ class ACharacterBase;
 UCLASS()
 class PLANET_API UPawnStateActionHUD :
 	public UMyUserWidget, 
-	public IHUDInterface
+	public IHUDInterface,
+	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 

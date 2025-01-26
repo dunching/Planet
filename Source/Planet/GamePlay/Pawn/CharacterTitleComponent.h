@@ -4,6 +4,7 @@
 
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
+#include "Components/WidgetComponent.h"
 
 #include "ReceivedEventModifyDataCallback.h"
 #include "MyUserWidget.h"
@@ -15,6 +16,7 @@
 
 class UPAD_TaskNode_Preset_Conversation;
 class UConversationBorder;
+class UCharacterTitle;
 class ACharacterBase;
 class AGroupSharedInfo;
 
@@ -29,7 +31,7 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	ACharacterBase* CharacterPtr = nullptr;
+	void SetData(ACharacterBase* CharacterPtr);
 };
 
 /*
@@ -37,7 +39,7 @@ public:
  */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterTitleComponent :
-	public UActorComponent,
+	public UWidgetComponent,
 	public IGroupSharedInterface
 {
 	GENERATED_BODY()
@@ -56,14 +58,14 @@ public:
 		enum ELevelTick TickType,
 		FActorComponentTickFunction* ThisTickFunction
 	) override;
-	
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)override;
+
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 
 	virtual void DisplaySentence(
-		const FTaskNode_Conversation_SentenceInfo&Sentence
-		);
+		const FTaskNode_Conversation_SentenceInfo& Sentence
+	);
 
 	void CloseConversationborder();
 
@@ -76,15 +78,14 @@ protected:
 	float HalfHeight = 0.f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UCharacterTitleBox> CharacterTitleBoxClass;
+	TSubclassOf<UCharacterTitle> CharacterTitleClass;
 
 	UPROPERTY(Transient)
-	UCharacterTitleBox* CharacterTitleBoxPtr = nullptr;
-	
+	UCharacterTitle* CharacterTitlePtr = nullptr;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UConversationBorder> ConversationBorderClass;
 
 	UPROPERTY(Transient)
 	UConversationBorder* ConversationBorderPtr = nullptr;
-
 };

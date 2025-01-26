@@ -1,0 +1,106 @@
+
+#include "Skill_Active_Arrow_Multiple.h"
+
+#include "Net/UnrealNetwork.h"
+
+#include "AbilityTask_FlyAway.h"
+
+#include "GameFramework/RootMotionSource.h"
+
+#include "CharacterBase.h"
+#include "CharacterStateInfo.h"
+#include "StateProcessorComponent.h"
+#include "AbilityTask_TimerHelper.h"
+#include "AllocationSkills.h"
+#include "ProxyProcessComponent.h"
+#include "GameplayTagsLibrary.h"
+#include "Skill_WeaponActive_Bow.h"
+#include "ItemProxy_Minimal.h"
+
+void USkill_Active_Arrow_Multiple::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
+	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	{
+		// 状态信息
+		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
+		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
+		CharacterStateInfoSPtr->Duration = Duration;
+		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
+		CharacterStateInfoSPtr->DataChanged();
+
+		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
+
+		//
+		{
+			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			TaskPtr->SetDuration(Duration, 0.1f);
+			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationTick);
+			TaskPtr->OnFinished.BindUObject(this, &ThisClass::OnFinished);
+			TaskPtr->ReadyForActivation();
+		}
+
+		SwitchIsMultiple(true);
+
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
+}
+
+void USkill_Active_Arrow_Multiple::DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	{
+		if (CharacterStateInfoSPtr)
+		{
+			CharacterStateInfoSPtr->TotalTime = Interval;
+			CharacterStateInfoSPtr->DataChanged();
+			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
+		}
+	}
+#endif
+}
+
+bool USkill_Active_Arrow_Multiple::OnFinished(UAbilityTask_TimerHelper*)
+{
+	SwitchIsMultiple(false);
+
+	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
+
+	K2_CancelAbility();
+
+	return true;
+}
+
+void USkill_Active_Arrow_Multiple::SwitchIsMultiple(bool bIsMultiple)
+{
+	auto TargetSkillSPtr = CharacterPtr->GetProxyProcessComponent()->GetWeaponSkillByType(
+		UGameplayTagsLibrary::Proxy_Skill_Weapon_Bow
+	);
+
+	if (TargetSkillSPtr)
+	{
+		auto RegisterParamPtr =
+			Cast<USkill_WeaponActive_Bow>(TargetSkillSPtr->GetGAInst())->RegisterParamSPtr;
+		auto GameplayAbilityTargetPtr =
+			DeepClone_GameplayAbilityTargetData<FGameplayAbilityTargetData_Bow_RegisterParam>(RegisterParamPtr.Get());
+
+		GameplayAbilityTargetPtr->bIsMultiple = bIsMultiple;
+
+		FGameplayEventData GameplayEventData;
+		GameplayEventData.TargetData.Add(GameplayAbilityTargetPtr);
+
+		Cast<UPlanetAbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent)->Replicate_UpdateGAParam(
+			TargetSkillSPtr->GetGAHandle(),
+			GameplayEventData
+		);
+	}
+}

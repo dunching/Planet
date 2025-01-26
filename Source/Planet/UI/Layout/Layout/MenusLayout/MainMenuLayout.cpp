@@ -27,9 +27,17 @@ void UMainMenuLayout::NativeDestruct()
 
 void UMainMenuLayout::Enable()
 {
+	ILayoutInterfacetion::Enable();
 }
 
 void UMainMenuLayout::DisEnable()
+{
+	SyncData();
+	
+	ILayoutInterfacetion::DisEnable();
+}
+
+void UMainMenuLayout::SyncData()
 {
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMenuLayout::Get().WidgetSwitcher));
 	if (UIPtr)
@@ -78,29 +86,5 @@ void UMainMenuLayout::SwitchViewer(EMenuType MenuType)
 			}
 		};
 
-	switch (MenuType)
-	{
-	case EMenuType::kAllocationSkill:
-	{
-		Lambda(0);
-	}
-	break;
-	case EMenuType::kAllocationTalent:
-	{
-		Lambda(1);
-	}
-	break;
-	case EMenuType::kGroupManagger:
-	{
-		Lambda(2);
-	}
-	break;
-	case EMenuType::kRaffle:
-	{
-		Lambda(1);
-	}
-	break;
-	default:
-		break;
-	}
+	Lambda(static_cast<int32>(MenuType));
 }

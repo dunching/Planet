@@ -80,7 +80,7 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 
 	if (Ar.IsSaving())
 	{
-		auto Num= TeammateConfigureMap.Num();
+		auto Num = TeammateConfigureMap.Num();
 		Ar << Num;
 		for (auto& Iter : TeammateConfigureMap)
 		{
@@ -90,8 +90,8 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 	else if (Ar.IsLoading())
 	{
 		TeammateConfigureMap.Empty();
-		
-		int32 Num= 0;
+
+		int32 Num = 0;
 		Ar << Num;
 		for (int32 Index = 0; Index < Num; Index++)
 		{
@@ -155,7 +155,8 @@ FTableRowProxy_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() 
 
 	auto SceneProxyExtendInfoPtr =
 		DataTable->FindRow<FTableRowProxy_CharacterGrowthAttribute>(
-			*ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterGrowthAttribute.ToString(), TEXT("GetProxy"));
+			*ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterGrowthAttribute.ToString(),
+			TEXT("GetProxy"));
 	return SceneProxyExtendInfoPtr;
 }
 
@@ -232,7 +233,7 @@ FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& InProxyTy
 }
 
 void FCharacterProxy::GetWeaponSocket(FCharacterSocket& FirstWeaponSocketInfoSPtr,
-	FCharacterSocket& SecondWeaponSocketInfoSPtr)
+                                      FCharacterSocket& SecondWeaponSocketInfoSPtr)
 {
 	FirstWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	SecondWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
@@ -240,7 +241,7 @@ void FCharacterProxy::GetWeaponSocket(FCharacterSocket& FirstWeaponSocketInfoSPt
 
 TMap<FGameplayTag, FCharacterSocket> FCharacterProxy::GetSockets() const
 {
-	return  TeammateConfigureMap;
+	return TeammateConfigureMap;
 }
 
 TWeakObjectPtr<FCharacterProxy::FPawnType> FCharacterProxy::GetCharacterActor() const

@@ -25,7 +25,7 @@ void AWeapon_Base::AttachToCharacter(ACharacterBase* CharacterPtr)
 	Super::AttachToCharacter(CharacterPtr);
 }
 
-void AWeapon_Base::SetWeaponProxyImp_Implementation(ACharacterBase* AllocationCharacterPtr)
+void AWeapon_Base::SetWeaponProxyImp/*_Implementation*/(ACharacterBase* AllocationCharacterPtr)
 {
 	AttachToCharacter(AllocationCharacterPtr);
 }

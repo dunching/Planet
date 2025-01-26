@@ -586,6 +586,12 @@ void FWeaponSkillProxy::RegisterSkill()
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_FoldingFan_RegisterParam;
 		}
+		else if (
+			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon_Axe)
+			)
+		{
+			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Axe_RegisterParam;
+		}
 		else
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;

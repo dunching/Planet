@@ -65,6 +65,11 @@ struct PLANET_API FSTT_GuideThreadBase :
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
 	protected:
 
 	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const;
@@ -145,6 +150,35 @@ struct PLANET_API FSTT_GuideThreadFail :
 	public FSTT_GuideThreadBase
 {
 	GENERATED_BODY()
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+};
+#pragma endregion
+
+#pragma region DistributeRewards
+USTRUCT()
+struct PLANET_API FSTID_GuideThreadDistributeRewards :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	FGuid RewardsItemID;
+};
+
+// 执行任务 获取奖励
+USTRUCT()
+struct PLANET_API FSTT_GuideThreadDistributeRewards :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThreadDistributeRewards;
+
+	virtual const UStruct* GetInstanceDataType() const override;
 
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context,

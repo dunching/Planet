@@ -27,6 +27,7 @@ class PLANET_API IGroupSharedInterface
 
 public:
 
+	// TODO 
 	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) = 0;
 
 protected:

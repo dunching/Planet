@@ -129,6 +129,8 @@ public:
 	TArray<TSharedPtr<FBasicProxy>> GetProxys() const;
 #endif
 
+	UFUNCTION(Server, Reliable)
+	void AddProxys_Server(const FGuid&RewardsItemID);
 
 	void AddProxy_Pending(FGameplayTag ProxyType, int32 Num, FGuid Guid);
 
@@ -153,7 +155,6 @@ public:
 	FOnWeaponProxyChanged OnWeaponProxyChanged;
 
 protected:
-	
 	virtual void InitializeComponent() override;
 
 	virtual void BeginPlay() override;
@@ -161,7 +162,6 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	
 	UFUNCTION(Server, Reliable)
 	void UpdateSocket_Server(const FGuid& CharacterProxyID, const FCharacterSocket& Socket);
 
@@ -182,5 +182,4 @@ private:
 	TMap<IDType, TSharedPtr<FBasicProxy>> SceneMetaMap;
 
 	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinProxyMap;
-
 };

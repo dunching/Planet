@@ -75,6 +75,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 	CharacterTitleComponentPtr = CreateDefaultSubobject<UCharacterTitleComponent>(
 		UCharacterTitleComponent::ComponentName);
+	CharacterTitleComponentPtr->SetupAttachment(RootComponent);
 
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
 	ConversationComponentPtr = CreateDefaultSubobject<UConversationComponent>(UConversationComponent::ComponentName);

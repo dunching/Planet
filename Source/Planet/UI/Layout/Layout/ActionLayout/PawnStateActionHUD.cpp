@@ -408,6 +408,11 @@ void UPawnStateActionHUD::InitialActiveSkillIcon()
 
 void UPawnStateActionHUD::InitialWeaponSkillIcon()
 {
+	if (!bIsActive)
+	{
+		return;
+	}
+	
 	if (!CharacterPtr)
 	{
 		return;
@@ -437,5 +442,50 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	else
 	{
 		return;
+	}
+
+	{
+		auto UIPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
+		if (UIPtr)
+		{
+			if (FirstWeaponSocketInfoSPtr.IsValid())
+			{
+				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(FirstWeaponSocketInfoSPtr.Socket);
+				if (SocketIter && SocketIter->GetWeaponSkill())
+				{
+					UIPtr->ResetToolUIByData(SocketIter->GetWeaponSkill());
+				}
+				else
+				{
+					UIPtr->ResetToolUIByData(nullptr);
+				}
+			}
+			else
+			{
+				UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
+	}
+	{
+		auto UIPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2));
+		if (UIPtr)
+		{
+			if (SecondWeaponSocketInfoSPtr.IsValid())
+			{
+				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(SecondWeaponSocketInfoSPtr.Socket);
+				if (SocketIter && SocketIter->GetWeaponSkill())
+				{
+					UIPtr->ResetToolUIByData(SocketIter->GetWeaponSkill());
+				}
+				else
+				{
+					UIPtr->ResetToolUIByData(nullptr);
+				}
+			}
+			else
+			{
+				UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
 	}
 }

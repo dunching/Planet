@@ -6,7 +6,7 @@
 #include "PlanetWorldSettings.h"
 #include "ProxyProcessComponent.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "GameOptions.h"
+#include "Weapon_Base.h"
 #include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 
@@ -22,12 +22,12 @@ bool FGameplayAbilityTargetData_SkillBase_RegisterParam::NetSerialize(FArchive& 
 
 	if (Ar.IsSaving())
 	{
-		Ar << ProxyID;
 	}
 	else if (Ar.IsLoading())
 	{
-		Ar << ProxyID;
 	}
+
+	Ar << ProxyID;
 
 	return true;
 }
@@ -141,7 +141,7 @@ TArray<FActiveGameplayEffectHandle> USkill_Base::MyApplyGameplayEffectSpecToTarg
 	CharacterPtr->GetCharacterAbilitySystemComponent()->OnSendEventModifyData(
 		GetAbilitySystemComponentFromActorInfo(),
 		SpecHandle
-		);
+	);
 
 	return ApplyGameplayEffectSpecToTarget(AbilityHandle, ActorInfo, ActivationInfo, SpecHandle, TargetData);
 }
@@ -252,6 +252,6 @@ void USkill_Base::PerformAction(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-	)
+)
 {
 }

@@ -13,6 +13,30 @@ class AWeapon_PickAxe;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
 
+USTRUCT()
+struct FGameplayAbilityTargetData_Axe_RegisterParam :
+	public FGameplayAbilityTargetData_SkillBase_RegisterParam
+{
+	GENERATED_USTRUCT_BODY()
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
+	virtual FGameplayAbilityTargetData_Axe_RegisterParam* Clone()const override;
+
+};
+
+template<>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Axe_RegisterParam> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Axe_RegisterParam>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
 UCLASS()
 class PLANET_API USkill_WeaponActive_PickAxe : public USkill_WeaponActive_Base
 {
@@ -20,12 +44,24 @@ class PLANET_API USkill_WeaponActive_PickAxe : public USkill_WeaponActive_Base
 
 public:
 
+	using FRegisterParamType = FGameplayAbilityTargetData_Axe_RegisterParam;
+
+	using FWeaponActorType = AWeapon_PickAxe;
+
 	USkill_WeaponActive_PickAxe();
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
 	) override;
+
+	virtual bool CanActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayTagContainer* SourceTags = nullptr,
+		const FGameplayTagContainer* TargetTags = nullptr,
+		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
+	) const override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -85,7 +121,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float AD_Damage_Magnification = .5f;
 
-	AWeapon_PickAxe* EquipmentAxePtr = nullptr;
+	FWeaponActorType* WeaponActorPtr = nullptr;
 
 	int32 MontageNum = 0;
 

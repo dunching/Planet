@@ -17,6 +17,7 @@
 #include "GuideList.h"
 #include "GuideSubSystem.h"
 #include "HUD_TeamInfo.h"
+#include "PawnStateActionHUD.h"
 #include "ProgressTips.h"
 
 struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
@@ -29,7 +30,7 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 
 	FName PawnStateConsumablesHUD_Socket = TEXT("PawnStateConsumablesHUD_Socket");
 
-	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
+	FName PawnStateActionHUD = TEXT("PawnStateActionHUD");
 
 	FName FocusCharacterSocket = TEXT("FocusCharacterSocket");
 
@@ -56,10 +57,29 @@ void URegularActionLayout::NativeConstruct()
 
 void URegularActionLayout::Enable()
 {
+	ILayoutInterfacetion::Enable();
+	
+	{
+		auto UIPtr = Cast<UPawnStateActionHUD>(GetWidgetFromName(FRegularActionLayout::Get().PawnStateActionHUD));
+		if (UIPtr)
+		{
+			UIPtr->Enable();
+			UIPtr->ResetUIByData();
+		}
+	}
 }
 
 void URegularActionLayout::DisEnable()
 {
+	{
+		auto UIPtr = Cast<UPawnStateActionHUD>(GetWidgetFromName(FRegularActionLayout::Get().PawnStateActionHUD));
+		if (UIPtr)
+		{
+			UIPtr->DisEnable();
+		}
+	}
+	
+	ILayoutInterfacetion::DisEnable();
 }
 
 void URegularActionLayout::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)

@@ -32,7 +32,7 @@ protected:
 
 	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
-	UFUNCTION(NetMulticast, Reliable)
+	// UFUNCTION(NetMulticast, Reliable)
 	void SetWeaponProxyImp(ACharacterBase* AllocationCharacterPtr);
 
 	TSharedPtr<FWeaponProxy> WeaponProxyPtr = nullptr;

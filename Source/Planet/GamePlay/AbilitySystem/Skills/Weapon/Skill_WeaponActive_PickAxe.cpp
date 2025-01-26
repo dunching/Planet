@@ -31,12 +31,35 @@
 #include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
 #include "ItemProxy_Character.h"
+#include "LogWriter.h"
 
 namespace Skill_WeaponActive_PickAxe
 {
 	const FName Hit = TEXT("Hit");
 
 	const FName AttackEnd = TEXT("AttackEnd");
+}
+
+UScriptStruct* FGameplayAbilityTargetData_Axe_RegisterParam::GetScriptStruct() const
+{
+	return FGameplayAbilityTargetData_Axe_RegisterParam::StaticStruct();
+}
+
+bool FGameplayAbilityTargetData_Axe_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	return true;
+}
+
+FGameplayAbilityTargetData_Axe_RegisterParam* FGameplayAbilityTargetData_Axe_RegisterParam::Clone() const
+{
+	auto ResultPtr =
+		new FGameplayAbilityTargetData_Axe_RegisterParam;
+
+	*ResultPtr = *this;
+
+	return ResultPtr;
 }
 
 USkill_WeaponActive_PickAxe::USkill_WeaponActive_PickAxe() :
@@ -54,6 +77,17 @@ void USkill_WeaponActive_PickAxe::OnAvatarSet(
 	if (CharacterPtr)
 	{
 	}
+}
+
+bool USkill_WeaponActive_PickAxe::CanActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
+	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
+	) const
+{
+	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
 void USkill_WeaponActive_PickAxe::OnRemoveAbility(
@@ -78,7 +112,7 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 	{
 		if (ActiveParamSPtr)
 		{
-			EquipmentAxePtr = Cast<AWeapon_PickAxe>(ActiveParamSPtr->WeaponPtr);
+			WeaponActorPtr = Cast<AWeapon_PickAxe>(ActiveParamSPtr->WeaponPtr);
 		}
 	}
 }
@@ -92,12 +126,12 @@ void USkill_WeaponActive_PickAxe::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (EquipmentAxePtr)
+	if (WeaponActorPtr)
 	{
 		return;
 	}
 
-	checkNoEntry();
+	PRINTINVOKEWITHSTR(FString(TEXT("No Weapon")));
 	K2_EndAbility();
 }
 
@@ -117,7 +151,7 @@ void USkill_WeaponActive_PickAxe::PerformAction(
 
 void USkill_WeaponActive_PickAxe::StartTasksLink()
 {
-	if (EquipmentAxePtr && CharacterPtr)
+	if (WeaponActorPtr && CharacterPtr)
 	{
 		PlayMontage();
 	}
@@ -173,6 +207,8 @@ void USkill_WeaponActive_PickAxe::OnMontageOnInterrupted()
 		if (!bIsContinue)
 		{
 		}
+		// 
+		K2_CancelAbility();
 	}
 #endif
 }
@@ -304,7 +340,7 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 				this,
 				TEXT(""),
 				PickAxeMontage,
-				EquipmentAxePtr->GetMesh()->GetAnimInstance(),
+				WeaponActorPtr->GetMesh()->GetAnimInstance(),
 				Rate
 			);
 

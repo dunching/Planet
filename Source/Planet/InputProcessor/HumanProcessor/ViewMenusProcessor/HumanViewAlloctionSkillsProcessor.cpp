@@ -20,6 +20,10 @@
 #include "BuildingBaseProcessor.h"
 #include "CharacterAttributesComponent.h"
 #include "HumanCharacter_Player.h"
+#include "MainHUD.h"
+#include "MainHUDLayout.h"
+#include "MainMenuLayout.h"
+#include "PlanetPlayerController.h"
 
 namespace HumanProcessor
 {
@@ -53,6 +57,9 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
+		//
+		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
+		
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
 		{

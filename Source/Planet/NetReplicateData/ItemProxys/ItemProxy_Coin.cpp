@@ -10,6 +10,15 @@ FCoinProxy::FCoinProxy()
 
 }
 
+bool FCoinProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+{
+	Super::NetSerialize(Ar, Map, bOutSuccess);
+
+	Ar << Num;
+
+	return true;
+}
+
 void FCoinProxy::UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr)
 {
 	Super::UpdateByRemote(RemoteSPtr);

@@ -11,6 +11,7 @@
 struct FBasicProxy;
 struct FSkillProxy;
 class UInteractiveComponent;
+class AWeapon_Base;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_SkillBase_RegisterParam :

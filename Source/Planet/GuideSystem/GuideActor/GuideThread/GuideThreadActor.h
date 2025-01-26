@@ -50,6 +50,7 @@ public:
 
 /**
  *	任务
+ *	仅在 ROLE_AutonomousProxy 执行
  */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API AGuideThread : public AGuideActor

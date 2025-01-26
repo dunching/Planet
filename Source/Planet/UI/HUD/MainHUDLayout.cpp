@@ -13,6 +13,7 @@
 #include "LayoutCommon.h"
 #include "LayoutInterfacetion.h"
 #include "MainMenuLayout.h"
+#include "RegularActionLayout.h"
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
@@ -59,33 +60,7 @@ void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 		}
 	};
 
-	switch (LayoutCommon)
-	{
-	case ELayoutCommon::kActionLayout:
-		{
-			Lambda(0);
-		}
-		break;
-	case ELayoutCommon::kMenuLayout:
-		{
-			Lambda(1);
-		}
-		break;
-	case ELayoutCommon::kConversationLayout:
-		{
-			Lambda(2);
-		}
-		break;
-	case ELayoutCommon::kEndangeredLayout:
-		{
-			Lambda(3);
-		}
-		break;
-	default:
-		{
-		}
-		break;
-	}
+	Lambda(static_cast<int32>(LayoutCommon));
 }
 
 UMainMenuLayout* UMainHUDLayout::GetMenuLayout()
@@ -115,6 +90,24 @@ UConversationLayout* UMainHUDLayout::GetConversationLayout()
 		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kConversationLayout))
 		{
 			auto LayoutUIPtr = Cast<UConversationLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			if (LayoutUIPtr)
+			{
+				return LayoutUIPtr;
+			}
+		}
+	}
+	return nullptr;
+}
+
+URegularActionLayout* UMainHUDLayout::GetRegularActionLayout() const
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
+	{
+		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kMenuLayout))
+		{
+			auto LayoutUIPtr = Cast<URegularActionLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
 			if (LayoutUIPtr)
 			{
 				return LayoutUIPtr;

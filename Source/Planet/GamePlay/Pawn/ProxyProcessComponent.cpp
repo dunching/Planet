@@ -230,26 +230,26 @@ void UProxyProcessComponent::GetWeaponProxy(
 
 TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::GetWeaponSkillByType(const FGameplayTag& TypeTag)
 {
-	// 找到当前装备的 弓箭类武器
-	TSharedPtr<FWeaponSkillProxy> TargetSkillSPtr = nullptr;
-
 	TSharedPtr<FWeaponProxy> FirstWeaponProxySPtr;
 	TSharedPtr<FWeaponProxy> SecondWeaponProxySPtr;
 
 	GetWeaponProxy(FirstWeaponProxySPtr, SecondWeaponProxySPtr);
 
-	TSharedPtr<FWeaponSkillProxy> FirstWeaponSkillSPtr = FirstWeaponProxySPtr->GetWeaponSkill();
-	TSharedPtr<FWeaponSkillProxy> SecondWeaponSkillSPtr = SecondWeaponProxySPtr->GetWeaponSkill();
+	// 找到当前装备的 弓箭类武器
+	auto WeaponSkillSPtr = FirstWeaponProxySPtr->GetWeaponSkill();
 
-	if (FirstWeaponSkillSPtr && FirstWeaponSkillSPtr->GetProxyType() == TypeTag)
+	if (WeaponSkillSPtr && WeaponSkillSPtr->GetProxyType() == TypeTag)
 	{
-		TargetSkillSPtr = FirstWeaponSkillSPtr;
+		return WeaponSkillSPtr;
 	}
-	else if (SecondWeaponSkillSPtr && SecondWeaponSkillSPtr->GetProxyType() == TypeTag)
+	
+	WeaponSkillSPtr = SecondWeaponProxySPtr->GetWeaponSkill();
+
+	if (WeaponSkillSPtr && WeaponSkillSPtr->GetProxyType() == TypeTag)
 	{
-		TargetSkillSPtr = SecondWeaponSkillSPtr;
+		return WeaponSkillSPtr;
 	}
-	return TargetSkillSPtr;
+	return nullptr;
 }
 
 TSharedPtr<FWeaponProxy> UProxyProcessComponent::GetActivedWeapon() const
@@ -295,7 +295,7 @@ bool UProxyProcessComponent::ActiveAction(
 	// 使用武器
 	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
 	{
-		ActiveAction_Server(CanbeActivedInfoSPtr, bIsAutomaticStop);
+		ActiveAction_Server(CurrentWeaponSocket, bIsAutomaticStop);
 	}
 	// 使用主动技能
 	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
@@ -319,7 +319,7 @@ void UProxyProcessComponent::CancelAction(const FGameplayTag& CanbeActivedInfoSP
 	// 使用武器
 	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
 	{
-		CancelAction_Server(CanbeActivedInfoSPtr);
+		CancelAction_Server(CurrentWeaponSocket);
 	}
 	// 使用主动技能
 	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))

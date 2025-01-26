@@ -26,12 +26,14 @@ class PLANET_API ILayoutInterfacetion
 
 public:
 
-	virtual void Enable() = 0;
+	virtual void Enable();
 	
-	virtual void DisEnable() = 0;
+	virtual void DisEnable();
 
 protected:
 
+	bool bIsActive = false;
+	
 private:
 
 };

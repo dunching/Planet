@@ -9,6 +9,7 @@
 UENUM(BlueprintType)
 enum class EMenuType : uint8
 {
+	kEmpty,
 	kAllocationSkill,
 	kAllocationTalent,
 	kGroupManagger,

@@ -54,4 +54,6 @@ public:
 
 protected:
 
+	void SyncData();
+	
 };

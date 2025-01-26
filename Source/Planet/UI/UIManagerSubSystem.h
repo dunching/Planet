@@ -41,7 +41,7 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-#pragma region  Layout
+#pragma region Layout
 	void SwitchLayout(ELayoutCommon MainHUDType);
 #pragma endregion  
 

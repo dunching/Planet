@@ -12,6 +12,7 @@
 #include "ItemProxy_Container.h"
 #include "PlanetControllerInterface.h"
 #include "ItemProxy_Character.h"
+#include "RewardsTD.h"
 
 UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -138,7 +139,10 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
 		SceneToolsAry.Add(ProxySPtr);
 
-		Result = ProxySPtr;
+		auto CoinProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
+		Result = CoinProxySPtr ;
+
+		OnCoinProxyChanged(CoinProxySPtr , true, CoinProxySPtr->Num);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
@@ -499,6 +503,18 @@ TSharedPtr<FCoinProxy> UInventoryComponent::FindProxy_Coin(const FGameplayTag& P
 TArray<TSharedPtr<FBasicProxy>> UInventoryComponent::GetProxys() const
 {
 	return SceneToolsAry;
+}
+
+void UInventoryComponent::AddProxys_Server_Implementation(const FGuid&RewardsItemID)
+{
+	const auto RewardsItem = UPAD_RewardsItems::GetInstance()->GetRewardsItem(RewardsItemID);;
+	if (RewardsItem.IsValid())
+	{
+		for (const auto& Proxy : RewardsItem.RewardsMap)
+		{
+			AddProxy(Proxy.Key, Proxy.Value);
+		}
+	}
 }
 
 void UInventoryComponent::RemoveProxy_Consumable(const TSharedPtr<FConsumableProxy>& ProxyPtr, int32 Num /*= 1*/)

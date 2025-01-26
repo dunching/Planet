@@ -162,7 +162,8 @@ void FWeaponProxy::ActiveWeapon()
 			auto ToolActorClass = TableRowProxy_WeaponExtendInfoPtr->ToolActorClass;
 
 			FActorSpawnParameters SpawnParameters;
-
+			SpawnParameters.Owner = GetAllocationCharacter();
+			
 			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);

@@ -23,6 +23,23 @@ EStateTreeRunStatus FSTT_GuideThreadFail::EnterState(FStateTreeExecutionContext&
 	return Super::EnterState(Context, Transition);
 }
 
+const UStruct* FSTT_GuideThreadDistributeRewards::GetInstanceDataType() const
+{
+	return FInstanceDataType::StaticStruct();
+}
+
+EStateTreeRunStatus FSTT_GuideThreadDistributeRewards::EnterState(FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition) const
+{
+	// 
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	InstanceData.PlayerCharacterPtr->GetInventoryComponent()->AddProxys_Server(InstanceData.RewardsItemID);
+	
+	return EStateTreeRunStatus::Succeeded;
+}
+
 const UStruct* FSTT_GuideThreadMonologue::GetInstanceDataType() const
 {
 	return FInstanceDataType::StaticStruct();
@@ -473,6 +490,12 @@ EStateTreeRunStatus FSTT_GuideThreadBase::EnterState(FStateTreeExecutionContext&
 	}
 
 	return Super::EnterState(Context, Transition);
+}
+
+void FSTT_GuideThreadBase::ExitState(FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition) const
+{
+	Super::ExitState(Context, Transition);
 }
 
 FTaskNodeDescript FSTT_GuideThreadBase::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const

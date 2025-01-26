@@ -15,6 +15,7 @@ class UGetItemInfosList;
 class UInteractionList;
 class UMainMenuLayout;
 class UConversationLayout;
+class URegularActionLayout;
 
 UCLASS()
 class PLANET_API UMainHUDLayout : public UMyUserWidget
@@ -29,6 +30,8 @@ public:
 	UMainMenuLayout *GetMenuLayout();
 	
 	UConversationLayout *GetConversationLayout();
+	
+	URegularActionLayout *GetRegularActionLayout()const;
 	
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();

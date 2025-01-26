@@ -12,6 +12,7 @@ class USceneProxyExtendInfoMap;
 class UGameOptions;
 class AGuideActor;
 class AGuideMainThread;
+class UPAD_RewardsItems;
 
 /**
  *
@@ -23,9 +24,11 @@ class PLANET_API APlanetWorldSettings : public AWorldSettings
 
 public:
 
-	UAssetRefMap* GetAssetRefMapInstance();
+	UPAD_RewardsItems* GetTableRow_RewardsTD()const;
 
-	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap();
+	UAssetRefMap* GetAssetRefMapInstance()const;
+
+	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap()const;
 	
 	UGameOptions* GetGameOptions();
 
@@ -35,10 +38,13 @@ public:
 protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<UAssetRefMap>AssetRefMapClass;
+	TSoftObjectPtr<UPAD_RewardsItems>TableRow_RewardsTDRef;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtrClass;
+	TSoftObjectPtr<UAssetRefMap>AssetRefMapRef;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<USceneProxyExtendInfoMap>SceneProxyExtendInfoMapPtr;
 	
 	UPROPERTY(Transient)
 	UGameOptions* GameOptionsPtr = nullptr;

@@ -105,7 +105,11 @@ protected:
 	UFUNCTION()
 	void OnMontateComplete();
 
-	void EmitProjectile()const;
+	UFUNCTION()
+	void OnMontageOnInterrupted();
+
+	// 默认的旋转角度（绕Z轴）
+	void EmitProjectile(float OffsetAroundZ)const;
 
 	void MakeDamage(ACharacterBase * TargetCharacterPtr);
 
@@ -133,9 +137,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 SweepWidth = 500;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	float AD_Damage_Magnification = .5f;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<ASkill_WeaponActive_Bow_Projectile>Skill_WeaponActive_RangeTest_ProjectileClass;
 
-	FWeaponActorType* WeaponPtr = nullptr;
+	FWeaponActorType* WeaponActorPtr = nullptr;
 
 };

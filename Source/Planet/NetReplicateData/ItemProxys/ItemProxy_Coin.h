@@ -43,6 +43,8 @@ public:
 
 	FCoinProxy();
 
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+
 	void UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr);
 
 	void AddCurrentValue(int32 val);
