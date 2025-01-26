@@ -7,7 +7,7 @@
 #include "UIInterfaces.h"
 #include "MenuInterface.h"
 
-struct FMenuLayout : public TStructVariable<FMenuLayout>
+struct FMainMenuLayout : public TStructVariable<FMainMenuLayout>
 {
 	FName WidgetSwitcher = TEXT("WidgetSwitcher");
 };
@@ -39,7 +39,7 @@ void UMainMenuLayout::DisEnable()
 
 void UMainMenuLayout::SyncData()
 {
-	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMenuLayout::Get().WidgetSwitcher));
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
 	if (UIPtr)
 	{
 		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
@@ -55,7 +55,7 @@ void UMainMenuLayout::SwitchViewer(EMenuType MenuType)
 {
 	auto Lambda = [this](int32 Index)
 		{
-			auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMenuLayout::Get().WidgetSwitcher));
+			auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
 			if (UIPtr)
 			{
 				const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();

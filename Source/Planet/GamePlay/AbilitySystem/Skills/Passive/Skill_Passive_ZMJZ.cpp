@@ -103,6 +103,7 @@ void USkill_Passive_ZMJZ::PerformAction(
 				MakeOutgoingGameplayEffectSpec(GE_ZMJZClass, GetAbilityLevel());
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, DecreamTime);
 
 			const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
@@ -187,6 +188,7 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
+		// 更新每层实际的攻速收益
 		auto UpdateGELmbda = [this,NewStackCount]
 		{
 			FGameplayEffectSpecHandle SpecHandle =
@@ -210,13 +212,14 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 		{
 			if (NewStackCount > 0)
 			{
-				// 当地一层小时候更新后续的消失时间
+				// 当第一层消失时更新后续的消失时间
 				FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([this](auto)
 				{
 					FGameplayEffectSpecHandle SpecHandle =
 						MakeOutgoingGameplayEffectSpec(GE_ZMJZClass, GetAbilityLevel());
 
 					SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+					SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 					SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,
 					                                               SecondaryDecreamTime);
 					SpecHandle.Data.Get()->SetStackCount(0);

@@ -94,9 +94,6 @@ protected:
 		const FGameplayEffectRemovalInfo&
 		);
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Icons")
-	TSoftObjectPtr<UTexture2D> BuffIcon;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float DecreamTime = 5.f;
 

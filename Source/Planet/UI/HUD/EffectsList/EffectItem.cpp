@@ -6,6 +6,8 @@
 #include "CS_Base.h"
 #include "TemplateHelper.h"
 #include "CharacterStateInfo.h"
+#include "SceneProxyExtendInfo.h"
+#include "StateTagExtendInfo.h"
 
 namespace EffectItem
 {
@@ -36,6 +38,26 @@ void UEffectItem::SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr
 	ActiveGameplayEffectPtr = InActiveGameplayEffectPtr;
 
 	Handle = ActiveGameplayEffectPtr->Handle;
+
+	FGameplayTagContainer OutContainer;
+	InActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
+
+	for (const auto& Iter : OutContainer)
+	{
+		auto TableRowPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_TagExtendInfo(Iter);
+		if (TableRowPtr)
+		{
+			auto Icon = TableRowPtr->DefaultIcon;
+			if (Icon.IsNull())
+			{
+			}
+			else
+			{
+				SetTexutre(Icon);
+				break;
+			}
+		}
+	}
 }
 
 void UEffectItem::SetNum(int32 NewNum)
@@ -169,7 +191,7 @@ void UEffectItem::OnUpdate()
 				RemoveFromParent();
 			}
 		}
-	break;
+		break;
 	default:
 		{
 			// 没写
@@ -183,6 +205,6 @@ void UEffectItem::OnUpdate()
 				SetPercentIsDisplay(false);
 			}
 		}
-	break;
+		break;
 	}
 }
