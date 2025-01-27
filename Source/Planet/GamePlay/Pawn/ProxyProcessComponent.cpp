@@ -87,11 +87,11 @@ void UProxyProcessComponent::ActiveWeaponImp()
 	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
 
-	if (WeaponSocket_1.AllocationedProxyID.IsValid())
+	if (WeaponSocket_1.IsValid())
 	{
 		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
 	}
-	else if (WeaponSocket_2.AllocationedProxyID.IsValid())
+	else if (WeaponSocket_2.IsValid())
 	{
 		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
 	}
@@ -128,7 +128,7 @@ bool UProxyProcessComponent::ActiveActionImp(
 	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
 	if (CanActiveSocketMap.Contains(SocketTag))
 	{
-		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].GetAllocationedProxyID());
 		if (ProxySPtr)
 		{
 			return ProxySPtr->Active();
@@ -300,7 +300,7 @@ TSharedPtr<FConsumableProxy> UProxyProcessComponent::FindConsumablesBySocket(con
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
 
-	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Consumable(Sockets.AllocationedProxyID);
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Consumable(Sockets.GetAllocationedProxyID());
 	if (SkillProxySPtr)
 	{
 		return DynamicCastSharedPtr<FConsumableProxy>(SkillProxySPtr);
@@ -471,7 +471,7 @@ TMap<FCharacterSocket, FKey> UProxyProcessComponent::GetCanbeActiveSocket() cons
 
 	for (const auto& Iter : Sockets)
 	{
-		if (ActionKeyMap.Contains(Iter.Key) && Iter.Value.AllocationedProxyID.IsValid())
+		if (ActionKeyMap.Contains(Iter.Key) && Iter.Value.IsValid())
 		{
 			Result.Add(Iter.Value,ActionKeyMap[Iter.Key]);
 		}
@@ -487,7 +487,7 @@ TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(co
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
 
-	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Skill(Sockets.AllocationedProxyID);
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Skill(Sockets.GetAllocationedProxyID());
 	if (SkillProxySPtr)
 	{
 		return DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxySPtr);
@@ -535,7 +535,7 @@ void UProxyProcessComponent::Cancel(const FGameplayTag& SocketTag)
 	const auto CanActiveSocketMap = CharacterProxySPtr->GetSockets();
 	if (CanActiveSocketMap.Contains(SocketTag))
 	{
-		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].AllocationedProxyID);
+		auto ProxySPtr = InventoryComponentPtr->FindProxy(CanActiveSocketMap[SocketTag].GetAllocationedProxyID());
 		if (ProxySPtr)
 		{
 			ProxySPtr->Cancel();

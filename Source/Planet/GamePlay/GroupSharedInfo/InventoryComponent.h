@@ -17,6 +17,7 @@ struct FProxy_FASI;
 struct FCharacterSocket;
 struct FSkillProxy;
 struct FWeaponProxy;
+struct FAllocationbleProxy;
 class IPlanetControllerInterface;
 class ACharacterBase;
 
@@ -33,6 +34,7 @@ class UInventoryComponent :
 public:
 	friend ACharacterBase;
 	friend FProxy_FASI;
+	friend FAllocationbleProxy;
 
 	using FOwnerType = ACharacterBase;
 
@@ -59,12 +61,6 @@ public:
 	TSharedPtr<FBasicProxy> AddProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
 
 	TSharedPtr<FBasicProxy> UpdateProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr);
-
-	void SetAllocationCharacterProxy(
-		const FGuid& Proxy_ID,
-		const FGuid& CharacterProxy_ID,
-		const FGameplayTag& InSocketTag
-	);
 #endif
 
 
@@ -87,9 +83,6 @@ public:
 	TSharedPtr<FCharacterProxy> InitialOwnerCharacterProxy(ACharacterBase* OwnerCharacterPtr);
 
 	TArray<TSharedPtr<FCharacterProxy>> GetCharacterProxyAry() const;
-
-	void UpdateSocket(const TSharedPtr<FCharacterProxy>& CharacterProxySPtr, const FCharacterSocket& Socket);
-
 
 	TSharedPtr<FWeaponProxy> AddProxy_Weapon(const FGameplayTag& ProxyType);
 
@@ -162,8 +155,13 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
-	UFUNCTION(Server, Reliable)
-	void UpdateSocket_Server(const FGuid& CharacterProxyID, const FCharacterSocket& Socket);
+#if UE_EDITOR || UE_CLIENT
+	void SetAllocationCharacterProxy(
+		const FGuid& Proxy_ID,
+		const FGuid& CharacterProxy_ID,
+		const FGameplayTag& InSocketTag
+	);
+#endif
 
 	// 同步到服務器
 	UFUNCTION(Server, Reliable)

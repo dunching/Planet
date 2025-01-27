@@ -110,8 +110,6 @@ void UAIComponent::InitialAllocationsRowName()
 								NewWeaponProxySPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
 								
 								SkillsSocketInfo.UpdateProxy(NewWeaponProxySPtr);
-
-								InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
 							}
 						}
 					}
@@ -132,8 +130,6 @@ void UAIComponent::InitialAllocationsRowName()
 							SkillProxyPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
 								
 							SkillsSocketInfo.UpdateProxy(SkillProxyPtr);
-
-							InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
 						}
 					}
 

@@ -55,14 +55,6 @@ void UInventoryComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupShare
 {
 }
 
-void UInventoryComponent::UpdateSocket_Server_Implementation(
-	const FGuid& CharacterProxyID,
-	const FCharacterSocket& Socket
-)
-{
-	UpdateSocket(FindProxy_Character(CharacterProxyID), Socket);
-}
-
 void UInventoryComponent::AddProxy_Pending(FGameplayTag ProxyType, int32 Num, FGuid Guid)
 {
 	if (PendingMap.Contains(Guid))
@@ -142,7 +134,7 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 		auto CoinProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
 		Result = CoinProxySPtr ;
 
-		OnCoinProxyChanged(CoinProxySPtr , true, CoinProxySPtr->Num);
+		OnCoinProxyChanged(CoinProxySPtr , true, CoinProxySPtr->OffsetNum);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
@@ -185,6 +177,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
+
+		OnWeaponProxyChanged(LeftProxySPtr, true);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 	{
@@ -193,6 +187,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
+
+		OnSkillProxyChanged(LeftProxySPtr, true);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
 	{
@@ -201,6 +197,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
+
+		OnSkillProxyChanged(LeftProxySPtr, true);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent))
 	{
@@ -217,6 +215,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
+
+		OnSkillProxyChanged(LeftProxySPtr, true);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
@@ -225,6 +225,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
+
+		OnCoinProxyChanged(LeftProxySPtr , true, LeftProxySPtr->OffsetNum);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
@@ -458,6 +460,9 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(const FGameplayTag& Pr
 		auto Ref = CoinProxyMap[ProxyType];
 
 		Ref->Num += Num;
+		Ref->OffsetNum = Num;
+
+		Proxy_Container.UpdateItem(Ref);
 
 		OnCoinProxyChanged.ExcuteCallback(Ref, true, Num);
 
@@ -476,6 +481,7 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(const FGameplayTag& Pr
 
 		ResultPtr->InventoryComponentPtr = this;
 		ResultPtr->Num = Num;
+		ResultPtr->OffsetNum = Num;
 
 		SceneToolsAry.Add(ResultPtr);
 		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
@@ -557,31 +563,6 @@ TArray<TSharedPtr<FCharacterProxy>> UInventoryComponent::GetCharacterProxyAry() 
 	return Result;
 }
 
-void UInventoryComponent::UpdateSocket(
-	const TSharedPtr<FCharacterProxy>& InCharacterProxySPtr,
-	const FCharacterSocket& Socket
-)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		InCharacterProxySPtr->UpdateSocket(Socket);
-		InCharacterProxySPtr->Update2Client();
-	}
-#endif
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		// 本地直接更新一次
-		InCharacterProxySPtr->UpdateSocket(Socket);
-
-		// Server
-		UpdateSocket_Server(InCharacterProxySPtr->GetID(), Socket);
-	}
-#endif
-}
-
 TSharedPtr<FCharacterProxy> UInventoryComponent::FindProxy_Character(const IDType& ID) const
 {
 	if (SceneMetaMap.Contains(ID))
@@ -643,7 +624,7 @@ TSharedPtr<FAllocationbleProxy> UInventoryComponent::FindAllocationableProxy(con
 
 TSharedPtr<FAllocationbleProxy> UInventoryComponent::FindProxy_BySocket(const FCharacterSocket& Socket)
 {
-	return FindAllocationableProxy(Socket.AllocationedProxyID);
+	return FindAllocationableProxy(Socket.GetAllocationedProxyID());
 }
 
 void UInventoryComponent::SetAllocationCharacterProxy_Server_Implementation(
@@ -658,41 +639,13 @@ void UInventoryComponent::SetAllocationCharacterProxy_Server_Implementation(
 		return;
 	}
 
-	// 找到这个物品之前被分配的插槽
-	const auto AllocationCharacterID = ProxySPtr->GetAllocationCharacterID();
-	auto AllocationCharacterSPtr = FindProxy_Character(AllocationCharacterID);
-	if (AllocationCharacterSPtr)
+	auto CharacterProxySPtr = FindProxy_Character(CharacterProxy_ID);
+	if (!CharacterProxySPtr)
 	{
-		const auto PrevSocketTag = ProxySPtr->GetCurrentSocketTag();
-		auto CharacterSocket = AllocationCharacterSPtr->FindSocket(PrevSocketTag);
-		auto PrevProxySPtr = FindProxy(CharacterSocket.AllocationedProxyID);
-		if (PrevProxySPtr)
-		{
-			PrevProxySPtr->UnAllocation();
-		}
-		CharacterSocket.AllocationedProxyID = FGuid();
-		UpdateSocket(AllocationCharacterSPtr, CharacterSocket);
+		return;
 	}
 
-	auto TargetCharacterProxySPtr = FindProxy_Character(CharacterProxy_ID);
-	if (TargetCharacterProxySPtr)
-	{
-		ProxySPtr->SetAllocationCharacterProxy(TargetCharacterProxySPtr, InSocketTag);
-		ProxySPtr->Allocation();
-	}
-	else
-	{
-		ProxySPtr->SetAllocationCharacterProxy(nullptr, InSocketTag);
-	}
-
-	if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
-	{
-		// 此项是跟 Weapon 绑定的，所以不必复制
-	}
-	else
-	{
-		Proxy_Container.UpdateItem(ProxySPtr);
-	}
+	ProxySPtr->SetAllocationCharacterProxy(CharacterProxySPtr, InSocketTag);
 }
 
 TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACharacterBase* OwnerCharacterPtr)

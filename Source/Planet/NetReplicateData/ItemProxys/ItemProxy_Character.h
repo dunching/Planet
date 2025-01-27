@@ -43,11 +43,15 @@ struct PLANET_API FCharacterSocket
 
 	void UpdateProxy(const TSharedPtr<FBasicProxy>&ProxySPtr);
 
+	void SetAllocationedProxyID(const FGuid&NewID);
+	
+	FGuid GetAllocationedProxyID()const;
+	
 	bool operator()() const;
 	
 	bool IsValid() const;
 	
-	void ResetSocket();
+	void ResetAllocatedProxy();
 	
 	bool operator==(const FCharacterSocket& Other) const
 	{
@@ -69,6 +73,8 @@ struct PLANET_API FCharacterSocket
 
 	FGameplayTag Socket;
 
+private:
+	
 	// 分配的物品ID
 	FGuid AllocationedProxyID;
 	
@@ -131,6 +137,8 @@ public:
 
 	TWeakObjectPtr<FPawnType>GetCharacterActor()const;
 	
+	void UpdateSocket(const FCharacterSocket&Socket);
+	
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 
 	FString Title;
@@ -141,8 +149,6 @@ public:
 
 protected:
 
-	void UpdateSocket(const FCharacterSocket&Socket);
-	
 	TMap<FGameplayTag, FCharacterSocket>TeammateConfigureMap;
 	
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;

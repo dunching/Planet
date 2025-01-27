@@ -66,7 +66,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyP
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s %dX%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), ProxyPtr->GetCurrentValue(), *ProxyPtr->GetProxyName()));
+	SetText(FString::Printf(TEXT("%s %dX%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()));
 
 	ResetToolUIByData(ProxyPtr);
 }

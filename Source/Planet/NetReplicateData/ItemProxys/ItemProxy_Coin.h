@@ -51,11 +51,17 @@ public:
 
 	int32 GetCurrentValue()const;
 
+	int32 GetOffsetNum()const;
+
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 
 protected:
 
+	// 总数
 	int32 Num = 1;
+
+	// 这次的增量/减量
+	int32 OffsetNum = 1;
 
 };
 

@@ -55,12 +55,11 @@ FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGa
 struct PLANET_API IProxy_Cooldown
 {
 public:
-
 	virtual bool GetRemainingCooldown(
 		float& RemainingCooldown, float& RemainingCooldownPercent
-	)const = 0;
+	) const = 0;
 
-	virtual bool CheckCooldown()const = 0;
+	virtual bool CheckCooldown() const = 0;
 
 	virtual void AddCooldownConsumeTime(float NewTime) = 0;
 
@@ -69,7 +68,6 @@ public:
 	virtual void OffsetCooldownTime() = 0;
 
 	virtual void ApplyCooldown() = 0;
-
 };
 
 // 场景内的对象代理
@@ -81,9 +79,8 @@ struct PLANET_API FBasicProxy
 	GENERATED_USTRUCT_BODY()
 
 public:
-
 	using FOnAllocationCharacterProxyChanged =
-		TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>;
+	TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>;
 
 	friend FSceneProxyContainer;
 	friend FProxy_FASI_Container;
@@ -104,14 +101,14 @@ public:
 	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
 
 	// 是否可以激活
-	virtual bool CanActive()const;
-	
+	virtual bool CanActive() const;
+
 	// 激活
 	virtual bool Active();
 
 	//  取消 激活
 	virtual void Cancel();
-	
+
 	//  取消
 	virtual void End();
 
@@ -121,22 +118,21 @@ public:
 	// 从插槽移除
 	virtual void UnAllocation();
 
-	IDType GetID()const;
+	IDType GetID() const;
 
-	FGameplayTag GetProxyType()const;
+	FGameplayTag GetProxyType() const;
 
-	TSoftObjectPtr<UTexture2D> GetIcon()const;
+	TSoftObjectPtr<UTexture2D> GetIcon() const;
 
 	// 
-	FString GetProxyName()const;
+	FString GetProxyName() const;
 
 	FOnAllocationCharacterProxyChanged OnAllocationCharacterProxyChanged;
 
 	void Update2Client();
 
 protected:
-
-	FTableRowProxy* GetTableRowProxy()const;
+	FTableRowProxy* GetTableRowProxy() const;
 
 	UPROPERTY(Transient)
 	FGameplayTag ProxyType = FGameplayTag::EmptyTag;
@@ -147,10 +143,9 @@ protected:
 	UInventoryComponent* InventoryComponentPtr = nullptr;
 
 private:
-
 };
 
-template<>
+template <>
 struct TStructOpsTypeTraits<FBasicProxy> :
 	public TStructOpsTypeTraitsBase2<FBasicProxy>
 {
@@ -169,31 +164,31 @@ struct PLANET_API FAllocationbleProxy : public FBasicProxy
 	GENERATED_USTRUCT_BODY()
 
 public:
-
 	FAllocationbleProxy();
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
 
 	void UpdateByRemote(const TSharedPtr<FAllocationbleProxy>& RemoteSPtr);
 
 	// 这个物品被分配给的对象
 	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy();
 
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy()const;
+	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy() const;
 
-	ACharacterBase* GetAllocationCharacter()const;
+	ACharacterBase* GetAllocationCharacter() const;
 
 	virtual void SetAllocationCharacterProxy(
-		const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr,
+		const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
 		const FGameplayTag& InSocketTag
-		);
+	);
 
-	FGameplayTag GetCurrentSocketTag()const;
+	virtual void ResetAllocationCharacterProxy();
 
-	IDType GetAllocationCharacterID()const;
-	
+	FGameplayTag GetCurrentSocketTag() const;
+
+	IDType GetAllocationCharacterID() const;
+
 protected:
-
 	// 被分配给的对象ID
 	IDType AllocationCharacter_ID;
 
@@ -201,7 +196,7 @@ protected:
 	FGameplayTag SocketTag;
 };
 
-template<>
+template <>
 struct TStructOpsTypeTraits<FAllocationbleProxy> :
 	public TStructOpsTypeTraitsBase2<FAllocationbleProxy>
 {
@@ -217,18 +212,15 @@ struct PLANET_API FToolProxy : public FBasicProxy
 	GENERATED_USTRUCT_BODY()
 
 public:
-
 	friend FSceneProxyContainer;
 	friend UInventoryComponent;
 
 	FToolProxy();
 
-	int32 GetNum()const;
+	int32 GetNum() const;
 
 	int32 DamageDegree = 0;
 
 protected:
-
 	int32 Num = 1;
-
 };

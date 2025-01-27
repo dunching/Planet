@@ -35,6 +35,16 @@ void FCharacterSocket::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
 	}
 }
 
+void FCharacterSocket::SetAllocationedProxyID(const FGuid& NewID)
+{
+	AllocationedProxyID  = NewID;
+}
+
+FGuid FCharacterSocket::GetAllocationedProxyID() const
+{
+	return AllocationedProxyID;
+}
+
 bool FCharacterSocket::operator()() const
 {
 	return AllocationedProxyID.IsValid();
@@ -45,7 +55,7 @@ bool FCharacterSocket::IsValid() const
 	return AllocationedProxyID.IsValid();
 }
 
-void FCharacterSocket::ResetSocket()
+void FCharacterSocket::ResetAllocatedProxy()
 {
 	AllocationedProxyID = FGuid();
 }

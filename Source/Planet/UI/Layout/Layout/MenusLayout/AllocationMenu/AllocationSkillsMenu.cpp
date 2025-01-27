@@ -286,13 +286,12 @@ void UAllocationSkillsMenu::SyncData()
 			{
 				if (UIPtr->BasicProxyPtr)
 				{
-					Socket.AllocationedProxyID = UIPtr->WeaponProxyPtr->GetID();
+					Socket.UpdateProxy(UIPtr->WeaponProxyPtr);
 				}
 				else
 				{
-					Socket.ResetSocket();
+					Socket.ResetAllocatedProxy();
 				}
-				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
 			}
 		}
 	}
@@ -311,15 +310,6 @@ void UAllocationSkillsMenu::SyncData()
 			auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.UIName));
 			if (UIPtr)
 			{
-				if (UIPtr->BasicProxyPtr)
-				{
-					Socket.AllocationedProxyID = UIPtr->BasicProxyPtr->GetID();
-				}
-				else
-				{
-					Socket.ResetSocket();
-				}
-				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
 			}
 		}
 	}
@@ -338,15 +328,6 @@ void UAllocationSkillsMenu::SyncData()
 			auto UIPtr = Cast<USkillsIcon>(GetWidgetFromName(Iter.UIName));
 			if (UIPtr)
 			{
-				if (UIPtr->BasicProxyPtr)
-				{
-					Socket.AllocationedProxyID = UIPtr->BasicProxyPtr->GetID();
-				}
-				else
-				{
-					Socket.ResetSocket();
-				}
-				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
 			}
 		}
 	}
@@ -365,15 +346,6 @@ void UAllocationSkillsMenu::SyncData()
 			auto UIPtr = Cast<UConsumableIcon>(GetWidgetFromName(Iter.UIName));
 			if (UIPtr)
 			{
-				if (UIPtr->BasicProxyPtr)
-				{
-					Socket.AllocationedProxyID = UIPtr->BasicProxyPtr->GetID();
-				}
-				else
-				{
-					Socket.ResetSocket();
-				}
-				PCPtr->GetHoldingItemsComponent()->UpdateSocket(CurrentProxyPtr, Socket);
 			}
 		}
 	}
@@ -616,7 +588,7 @@ void UAllocationSkillsMenu::OnResetData(UAllocationIconBase* UAllocationIconPtr)
 	auto SocketSPtr = CurrentProxyPtr->FindSocket(UAllocationIconPtr->IconSocket);
 	if (UAllocationIconPtr->BasicProxyPtr)
 	{
-		SocketSPtr.AllocationedProxyID = UAllocationIconPtr->BasicProxyPtr->GetID();
+		UAllocationIconPtr->BasicProxyPtr->ResetAllocationCharacterProxy();
 	}
 }
 
@@ -869,7 +841,7 @@ void UAllocationSkillsMenu::SetAllocation(
 		}
 		else
 		{
-			PreviousProxyPtr->SetAllocationCharacterProxy(nullptr, SocketTag);
+			PreviousProxyPtr->ResetAllocationCharacterProxy();
 		}
 	}
 }

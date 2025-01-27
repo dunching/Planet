@@ -194,29 +194,99 @@ void FAllocationbleProxy::SetAllocationCharacterProxy(
 	const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag
 	)
 {
-	SocketTag = InSocketTag;
-	if (InAllocationCharacterProxyPtr)
+	// 
+	if (InventoryComponentPtr->GetNetMode() == NM_Client)
 	{
-		if (AllocationCharacter_ID == InAllocationCharacterProxyPtr->GetID())
+		if (InAllocationCharacterProxyPtr)
+		{
+			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), InAllocationCharacterProxyPtr->GetID(), InSocketTag);
+		}
+		else
+		{
+			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), FGuid(), InSocketTag);
+		}
+		return;
+	}
+	
+	// 找到这个物品之前被分配的插槽
+	auto UnAllocationPrevious = [this]
+	{
+		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			auto PreviousAllocationCharacterProxySPtr= InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+			if (PreviousAllocationCharacterProxySPtr)
+			{
+				auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
+				CharacterSocket.ResetAllocatedProxy();
+		
+				PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
+			}
+		}
+	};
+	
+	if (InAllocationCharacterProxyPtr && InSocketTag.IsValid())
+	{
+		if (
+			(AllocationCharacter_ID == InAllocationCharacterProxyPtr->GetID() )&&
+			(SocketTag == InSocketTag)
+			)
 		{
 			return;
 		}
 
-		AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
+		UnAllocationPrevious();
+		
+		// 将这个物品注册到新的插槽
+		auto CharacterSocket = InAllocationCharacterProxyPtr->FindSocket(SocketTag);
+		CharacterSocket.SetAllocationedProxyID(GetID());
+		
+		InAllocationCharacterProxyPtr->UpdateSocket(CharacterSocket);
+
+		if (AllocationCharacter_ID.IsValid())
+		{
+			Allocation();
+		}
 	}
 	else
 	{
-		AllocationCharacter_ID = FGuid();
+		UnAllocationPrevious();
 	}
+		
+	AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
+	SocketTag = InSocketTag;
+	
+	OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
 
-#if UE_EDITOR || UE_CLIENT
+	Update2Client();
+}
+
+void FAllocationbleProxy::ResetAllocationCharacterProxy()
+{
+	// 
 	if (InventoryComponentPtr->GetNetMode() == NM_Client)
 	{
-		InventoryComponentPtr->SetAllocationCharacterProxy(this->GetID(), AllocationCharacter_ID, InSocketTag);
+		InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), FGuid(), FGameplayTag::EmptyTag);
+		return;
 	}
-#endif
-
-	OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
+	
+	// 找到这个物品之前被分配的插槽
+	auto UnAllocationPrevious = [this]
+	{
+		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			auto PreviousAllocationCharacterProxySPtr= InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+			if (PreviousAllocationCharacterProxySPtr)
+			{
+				auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
+				CharacterSocket.ResetAllocatedProxy();
+		
+				PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
+			}
+		}
+	};
+	
+	AllocationCharacter_ID = FGuid();
+	SocketTag = FGameplayTag::EmptyTag;
 }
 
 FGameplayTag FAllocationbleProxy::GetCurrentSocketTag() const
