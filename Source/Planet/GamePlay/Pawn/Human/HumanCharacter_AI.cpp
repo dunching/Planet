@@ -10,7 +10,6 @@
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "InventoryComponent.h"
-#include "TestCommand.h"
 #include "GameplayTagsLibrary.h"
 #include "SceneProxyExtendInfo.h"
 #include "CharactersInfo.h"

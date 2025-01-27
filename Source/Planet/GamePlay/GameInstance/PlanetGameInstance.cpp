@@ -20,7 +20,8 @@ void UPlanetGameInstance::OnStart()
 {
 	Super::OnStart();
 
-	GetWorldImp()->SetGameInstance(this);
+	// 之前的代码，为什么加这句记不起来了
+	// GetWorldImp()->SetGameInstance(this);
 
 	bIsExiting = false;
 }
@@ -29,7 +30,8 @@ void UPlanetGameInstance::Shutdown()
 {
 	bIsExiting = true;
 
-	GUObjectArray.ShutdownUObjectArray();
+	// 注意：这里提前释放的会，之后编辑器模式下保存资源会出错
+	// GUObjectArray.ShutdownUObjectArray();
 
 #if WITH_EDITOR
 	auto TestMap1 = TestGCProxyMap;

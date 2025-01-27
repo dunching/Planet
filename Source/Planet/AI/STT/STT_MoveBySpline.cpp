@@ -36,22 +36,33 @@ EStateTreeRunStatus FSTT_CheckTarget_Spline::Tick(
 EStateTreeRunStatus FSTT_CheckTarget_Spline::PerformAction(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	if (InstanceData.GloabVariable->TargetCharacterPtr.IsValid())
+	
+	if (InstanceData.AIControllerPtr->GeneratorNPCs_PatrolPtr)
 	{
-		if (InstanceData.AIControllerPtr->GeneratorNPCs_PatrolPtr)
+		if (InstanceData.GloabVariable->TargetCharacterPtr.IsValid())
 		{
-			return
-				InstanceData.AIControllerPtr->GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(
+			const auto Value  =InstanceData.AIControllerPtr->GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(
 					InstanceData.GloabVariable->TargetCharacterPtr.Get()
-				) ?
-				EStateTreeRunStatus::Running : 
-				EStateTreeRunStatus::Failed;
+				) ;
+			if (Value)
+			{
+				// 里巡逻路线太原，我们就不需要追踪目标敌人了
+				return EStateTreeRunStatus::Running;
+			}
+			else
+			{
+				InstanceData.bIsEntryAttackTarget = true;
+				return EStateTreeRunStatus::Failed;
+			}
 		}
-		return InstanceData.AIControllerPtr->CheckIsFarawayOriginal() ? EStateTreeRunStatus::Running : EStateTreeRunStatus::Failed;
+		else
+		{
+			return EStateTreeRunStatus::Running;
+		}
 	}
 	else
 	{
-		return EStateTreeRunStatus::Running;
+		return EStateTreeRunStatus::Failed;
 	}
 }
 
@@ -72,6 +83,11 @@ EStateTreeRunStatus FSTT_MoveBySpline::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
+	if (!InstanceData.SPlinePtr)
+	{
+		return EStateTreeRunStatus::Failed;
+	}
+	
 	return PerformMoveTask(Context, *InstanceData.AIControllerPtr);
 }
 

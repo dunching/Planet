@@ -41,6 +41,9 @@ struct PLANET_API FStateTreeCheckTarget_SplineTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	UGloabVariable* GloabVariable = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = Output)
+	bool bIsEntryAttackTarget = false;
+
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	USplineComponent* SPlinePtr = nullptr;
 
@@ -78,7 +81,7 @@ struct PLANET_API FStateTreeMoveBySplineTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, Category = Parameter)
+	UPROPERTY(EditAnywhere, Category = Context)
 	USplineComponent* SPlinePtr = nullptr;
 
 	UPROPERTY(Transient)

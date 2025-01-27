@@ -11,7 +11,6 @@
 #include "HumanCharacter_AI.h"
 #include "InventoryComponent.h"
 #include "SceneProxyExtendInfo.h"
-#include "TestCommand.h"
 
 FName UAIComponent::ComponentName = TEXT("AIComponent");
 

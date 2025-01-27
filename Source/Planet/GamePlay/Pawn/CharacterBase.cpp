@@ -25,7 +25,6 @@
 #include "CharacterAttributesComponent.h"
 #include "PlanetPlayerState.h"
 #include "PlanetGameplayAbility.h"
-#include "TestCommand.h"
 #include "BasicFuturesBase.h"
 #include "TalentAllocationComponent.h"
 #include "TeamMatesHelperComponent.h"

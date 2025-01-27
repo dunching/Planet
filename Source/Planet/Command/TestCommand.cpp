@@ -1,44 +1,20 @@
 
 #include "TestCommand.h"
 
-#include "Kismet/GameplayStatics.h"
+// #include "Kismet/GameplayStatics.h"
 
-#include "Engine/StreamableManager.h"
-#include "MyUserWidget.h"
-#include "Engine/AssetManager.h"
-#include <Subsystems/SubsystemBlueprintLibrary.h>
-#include "Components/SplineComponent.h"
-#include "GameplayEffect.h"
-#include "Kismet/KismetStringLibrary.h"
-
-#include "HumanCharacter.h"
-#include "GameInstance/PlanetGameInstance.h"
-#include "InventoryComponent.h"
-#include "AssetRefMap.h"
-#include "Planet.h"
-#include "HumanCharacter.h"
-#include "SPlineActor.h"
-#include "ItemProxy_Minimal.h"
-#include "Skill_Base.h"
-#include "Talent_FASI.h"
-#include "TalentAllocationComponent.h"
-#include "CharacterBase.h"
-#include "CollisionDataStruct.h"
-#include "TeamMatesHelperComponent.h"
-#include "CharacterAttributesComponent.h"
-#include "CharacterAttibutes.h"
-#include "PlanetControllerInterface.h"
-#include "CharacterAbilitySystemComponent.h"
-#include "HorseCharacter.h"
+// #include "HumanCharacter.h"
+// #include "Planet.h"
+// #include "CharacterBase.h"
 
 void TestCommand::AddCahracterTestData()
 {
-	auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
-	if (!CharacterPtr)
-	{
-		return;
-	}
-	AddPlayerCharacterTestDataImp(CharacterPtr);
+	// auto CharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+	// if (!CharacterPtr)
+	// {
+	// 	return;
+	// }
+	// AddPlayerCharacterTestDataImp(CharacterPtr);
 }
 
 void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)

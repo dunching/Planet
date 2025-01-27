@@ -16,7 +16,6 @@
 #include "HumanCharacter.h"
 #include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
-#include "TestCommand.h"
 #include "GameplayTagsLibrary.h"
 #include "UICommon.h"
 #include "HorseCharacter.h"

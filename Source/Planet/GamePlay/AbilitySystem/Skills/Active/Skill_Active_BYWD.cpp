@@ -87,19 +87,14 @@ bool USkill_Active_BYWD::CommitAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
-	UGameplayEffect* DurationGEPtr = UAssetRefMap::GetInstance()->DurationGEClass->GetDefaultObject<UGameplayEffect>();
-	if (DurationGEPtr)
-	{
-		FGameplayEffectSpecHandle SpecHandle =
-		   MakeOutgoingGameplayEffectSpec(DurationGEPtr->GetClass(), GetAbilityLevel());
+	FGameplayEffectSpecHandle SpecHandle =
+	   MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->DurationGEClass, GetAbilityLevel());
 
-		SpecHandle.Data.Get()->SetDuration(Duration, true);
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,1);
+	SpecHandle.Data.Get()->SetDuration(Duration, true);
+	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+	SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,1);
 				
-		const auto GEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-	}
-	
+	const auto GEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 	
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }

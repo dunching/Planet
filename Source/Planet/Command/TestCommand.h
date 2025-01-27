@@ -14,7 +14,7 @@ namespace TestCommand
 
 	void AddCahracterTestData();
 
-	static FAutoConsoleCommand CMDAddCahracterTestData(
+	static FAutoConsoleCommand AddCahracterTestData111CMD(
 		//CMD 名字，在控制台输入这个调用
 		TEXT("AddCahracterTestData"),
 		//控制台帮助信息，选择这个命令的时候会看到

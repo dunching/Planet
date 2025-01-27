@@ -20,7 +20,6 @@
 #include "GameMode_Main.h"
 #include "PlanetPlayerState.h"
 #include "GenerateType.h"
-#include "Command/TestCommand.h"
 #include "HumanInteractionWithNPC.h"
 #include "HorseViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"
