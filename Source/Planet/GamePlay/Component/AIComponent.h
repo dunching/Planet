@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 #include "GameplayTagContainer.h"
+#include "GenerateType.h"
+#include "GroupSharedInterface.h"
 #include "Components/ActorComponent.h"
 
 #include "AIComponent.generated.h"
@@ -20,7 +22,9 @@ class AHumanCharacter_AI;
  *
  */
 UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
-class PLANET_API UAIComponent : public UActorComponent
+class PLANET_API UAIComponent :
+	public UActorComponent,
+	public IGroupSharedInterface
 {
 	GENERATED_BODY()
 
@@ -32,6 +36,8 @@ public:
 	UAIComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
+
+	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)override;
 
 	void AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr);
 
@@ -47,6 +53,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<UTaskNode_Temporary*> TemporaryTaskNodesAry;
 	
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
+	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
+#endif
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;

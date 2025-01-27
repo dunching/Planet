@@ -17,7 +17,8 @@ class USceneComponent;
  *
  */
 UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
-class PLANET_API UPlayerComponent : public UActorComponent
+class PLANET_API UPlayerComponent :
+	public UActorComponent
 {
 	GENERATED_BODY()
 

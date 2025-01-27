@@ -20,6 +20,7 @@
 #include "HumanCharacter.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupSharedInfo.h"
+#include "HumanCharacter_Player.h"
 #include "ItemProxy_Character.h"
 #include "TeamMatesList.h"
 
@@ -72,14 +73,14 @@ void UGroupManaggerMenu::ResetGroupmates()
 	TileViewPtr->ClearListItems();
 	auto EntryClass = TileViewPtr->GetEntryWidgetClass();
 
-	auto PCPtr = Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
-	if (!PCPtr)
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!PlayerCharacterPtr)
 	{
 		return;
 	}
 
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
-	auto HICPtr = PCPtr->GetHoldingItemsComponent();
+	auto GroupSharedInfoPtr = PlayerCharacterPtr->GetGroupSharedInfo();
+	auto HICPtr = GroupSharedInfoPtr->GetHoldingItemsComponent();
 
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)

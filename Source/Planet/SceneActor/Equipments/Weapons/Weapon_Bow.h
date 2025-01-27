@@ -60,7 +60,10 @@ protected:
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FTransform BowTransform = FTransform::Identity;
+	FTransform BowIdleTransform = FTransform::Identity;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FTransform BowShootTransform = FTransform::Identity;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FName Bow_Socket;

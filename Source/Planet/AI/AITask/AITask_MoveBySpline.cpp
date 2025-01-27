@@ -1,4 +1,3 @@
-
 #include "AITask_MoveBySpline.h"
 
 #include "UObject/Package.h"
@@ -43,7 +42,9 @@ void UAITask_MoveBySpline::PerformMove()
 
 	case EPathFollowingRequestResult::AlreadyAtGoal:
 		MoveRequestID = ResultData.MoveId;
-		OnRequestFinished(ResultData.MoveId, FPathFollowingResult(EPathFollowingResult::Success, FPathFollowingResultFlags::AlreadyAtGoal));
+		OnRequestFinished(ResultData.MoveId,
+		                  FPathFollowingResult(EPathFollowingResult::Success,
+		                                       FPathFollowingResultFlags::AlreadyAtGoal));
 		break;
 
 	case EPathFollowingRequestResult::RequestSuccessful:
@@ -53,7 +54,8 @@ void UAITask_MoveBySpline::PerformMove()
 
 		if (IsFinished())
 		{
-			UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Error, TEXT("%s> re-Activating Finished task!"), *GetName());
+			UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Error, TEXT("%s> re-Activating Finished task!"),
+			        *GetName());
 		}
 		break;
 
@@ -67,22 +69,53 @@ void UAITask_MoveBySpline::OnRequestFinished(FAIRequestID RequestID, const FPath
 {
 	if (RequestID == MoveRequestID)
 	{
-// 		if (MyMoveTaskCompletedSignature.IsBound())
-// 		{
-// 			MyMoveTaskCompletedSignature.Execute(Result.Code);
-// 		}
+		// 		if (MyMoveTaskCompletedSignature.IsBound())
+		// 		{
+		// 			MyMoveTaskCompletedSignature.Execute(Result.Code);
+		// 		}
 		Index++;
 		if (Index >= Pts.Num())
 		{
 			Index = 0;
 		}
 		GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAITask_MoveBySpline::PerformMove);
+
+		// if (Pts.IsValidIndex(Index))
+		// {
+		// 	MoveRequest.UpdateGoalLocation(Pts[Index]);
+		// }
+		// // ConditionalUpdatePath();
+		// FNavPathSharedPtr FollowedPath;
+		// const FPathFollowingRequestResult ResultData = OwnerController->MoveTo(MoveRequest, &FollowedPath);
+		// switch (ResultData.Code)
+		// {
+		// case EPathFollowingRequestResult::Failed:
+		// 	break;
+		//
+		// case EPathFollowingRequestResult::AlreadyAtGoal:
+		// 	break;
+		//
+		// case EPathFollowingRequestResult::RequestSuccessful:
+		// 	MoveRequestID = ResultData.MoveId;
+		// 	break;
+		// default:
+		// 	checkNoEntry();
+		// 	break;
+		// }
 	}
 	else if (IsActive())
 	{
-		UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Warning, TEXT("%s> received OnRequestFinished with not matching RequestID!"), *GetName());
+		UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Warning,
+		        TEXT("%s> received OnRequestFinished with not matching RequestID!"), *GetName());
+	}
+	else
+	{
+		checkNoEntry();
+		UE_VLOG(GetGameplayTasksComponent(), LogGameplayTasks, Warning,
+		        TEXT("%s> received OnRequestFinished with not matching RequestID!"), *GetName());
 	}
 }
+
 // 
 // FMyMoveTaskCompletedSignature UAITask_MoveBySpline::GetMoveTaskCompletedSignature()
 // {

@@ -65,11 +65,6 @@ public:
 
 	UAIComponent* GetAIComponent() const;
 
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
-	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
-#endif
-
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

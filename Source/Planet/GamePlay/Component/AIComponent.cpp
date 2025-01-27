@@ -50,11 +50,30 @@ void UAIComponent::BeginPlay()
 // 					OwnerCharacterPtr->GetController<AHumanAIController>()->PathFollowComponentPtr = ChildAry[OutActors.Num() - 1];
 // 				}
 // 			}
-// 		}
+		// 		}
 	}
 #endif
 
 	OnwerActorPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+}
+
+void UAIComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		InitialAllocationsRowName();
+		InitialAllocationsByProxy();
+	}
+#endif
+	
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_Client)
+	{
+		auto OnwerActorPtr = GetOwner<FOwnerType>();
+		OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
+	}
+#endif
 }
 
 void UAIComponent::AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr)
@@ -82,34 +101,38 @@ void UAIComponent::InitialAllocationsRowName()
 					{
 						if (TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo.IsValid())
 						{
-							auto WeaponProxyPtr = InventoryComponentPtr->AddProxy_Weapon(
+							FCharacterSocket SkillsSocketInfo;
+							SkillsSocketInfo.Socket = UGameplayTagsLibrary::WeaponSocket_1;
+							
+							auto NewWeaponProxySPtr = InventoryComponentPtr->AddProxy_Weapon(
 								TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo);
-							if (WeaponProxyPtr)
+							if (NewWeaponProxySPtr)
 							{
-								FCharacterSocket SkillsSocketInfo;
-								SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
-								SkillsSocketInfo.UpdateProxy(
-									InventoryComponentPtr->AddProxy_Weapon(
-										TableRowProxy_CharacterInfoPtr->FirstWeaponSocketInfo));;
+								NewWeaponProxySPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
+								
+								SkillsSocketInfo.UpdateProxy(NewWeaponProxySPtr);
 
 								InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
 							}
 						}
 					}
-					OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
 				}
 
 				// 技能
 				{
 					if (TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1.IsValid())
 					{
+						FCharacterSocket SkillsSocketInfo;
+
+						SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
+
 						auto SkillProxyPtr = InventoryComponentPtr->AddProxy_Skill(
 							TableRowProxy_CharacterInfoPtr->ActiveSkillSet_1);
 						if (SkillProxyPtr)
 						{
-							FCharacterSocket SkillsSocketInfo;
-
-							SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
+							SkillProxyPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
+								
+							SkillsSocketInfo.UpdateProxy(SkillProxyPtr);
 
 							InventoryComponentPtr->UpdateSocket(OnwerActorPtr->GetCharacterProxy(), SkillsSocketInfo);
 						}

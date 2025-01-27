@@ -6,6 +6,8 @@
 #include <Perception/AIPerceptionComponent.h>
 #include <Kismet/GameplayStatics.h>
 #include <Perception/AISenseConfig_Sight.h>
+
+#include "AIComponent.h"
 #include "Net/UnrealNetwork.h"
 
 #include "CharacterTitle.h"
@@ -107,7 +109,7 @@ void AHumanAIController::BeginPlay()
 	GetAIPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &ThisClass::OnTargetPerceptionUpdated);
 	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
 
-	InitialGroupInfo();
+	InitialAIConony();
 	
 	InitialCharacter();
 }
@@ -124,7 +126,7 @@ void AHumanAIController::OnPossess(APawn* InPawn)
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->DefaultTeammateOption);
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->GetAIComponent()->DefaultTeammateOption);
 #if WITH_EDITORONLY_DATA
 #else
 #endif
@@ -207,7 +209,7 @@ void AHumanAIController::InitialCharacter()
 #endif
 }
 
-void AHumanAIController::InitialGroupInfo()
+void AHumanAIController::InitialAIConony()
 {
 	if (GetPawn())
 	{

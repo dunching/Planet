@@ -59,6 +59,20 @@ void UProxyProcessComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_CONDITION(ThisClass, CurrentWeaponSocket, COND_None);
 }
 
+void UProxyProcessComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+{
+// #if UE_EDITOR || UE_SERVER
+// 	if (GetNetMode() == NM_Client)
+// 	{
+// 		auto CharacterPtr = GetOwner<FOwnerType>();
+// 		if (CharacterPtr->IsBotControlled())
+// 		{
+// 			SwitchWeaponImp(CurrentWeaponSocket);
+// 		}
+// 	}
+// #endif
+}
+
 void UProxyProcessComponent::ActiveWeapon_Server_Implementation()
 {
 	ActiveWeaponImp();
@@ -134,7 +148,7 @@ void UProxyProcessComponent::CancelAction_Server_Implementation(
 void UProxyProcessComponent::ActiveWeapon()
 {
 #if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
 	{
 		ActiveWeapon_Server();
 		ActiveWeaponImp();
@@ -143,6 +157,13 @@ void UProxyProcessComponent::ActiveWeapon()
 
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
+	{
+		ActiveWeaponImp();
+	}
+#endif
+	
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_SimulatedProxy)
 	{
 		ActiveWeaponImp();
 	}
@@ -352,7 +373,11 @@ void UProxyProcessComponent::OnRep_AllocationChanged()
 
 void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged(const FGameplayTag& OldWeaponSocket)
 {
-	SwitchWeaponImp(CurrentWeaponSocket);
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	if (CharacterPtr->GetGroupSharedInfo())
+	{
+		SwitchWeaponImp(CurrentWeaponSocket);
+	}
 }
 
 void UProxyProcessComponent::SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket)

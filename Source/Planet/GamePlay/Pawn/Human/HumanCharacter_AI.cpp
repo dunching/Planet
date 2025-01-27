@@ -34,7 +34,6 @@ void UCharacterAIAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		auto OwnerCharacterPtr = GetOwner<AHumanCharacter_AI>();
-		OwnerCharacterPtr->GetAIComponent()->InitialAllocationsByProxy();
 	}
 #endif
 }

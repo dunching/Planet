@@ -94,7 +94,7 @@ protected:
 
 	void InitialCharacter();
 
-	void InitialGroupInfo();
+	void InitialAIConony();
 
 	void InitialSenseConfig();
 

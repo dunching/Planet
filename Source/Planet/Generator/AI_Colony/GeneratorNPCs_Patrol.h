@@ -13,7 +13,7 @@ class USplineComponent;
 class ACharacterBase;
 
 /**
- *
+ * NPC会沿着这条样条线巡逻
  */
 UCLASS()
 class PLANET_API AGeneratorNPCs_Patrol : public AGeneratorBase

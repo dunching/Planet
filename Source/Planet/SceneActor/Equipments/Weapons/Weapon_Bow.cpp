@@ -49,12 +49,22 @@ void AWeapon_Bow::AttachToCharacter(ACharacterBase* CharacterPtr)
 	// 注意：这里使用Lyra动画，添加到这个插槽之后Transform不正确，还不知道怎么改
 	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 
-	BowActorPtr->AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
+	BowActorPtr->AttachToComponent(
+		CharacterPtr->GetMesh(),
+		FAttachmentTransformRules::KeepRelativeTransform,
 	                               Bow_Socket);
-	QuiverActorPtr->AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform,
-	                                  Quiver_Socket);
-	ArrowActorPtr->AttachToComponent(BowActorPtr->GetSkeletalMeshComponent(),
-	                                 FAttachmentTransformRules::KeepRelativeTransform, Arrow_Socket);
+	
+	QuiverActorPtr->AttachToComponent(
+		CharacterPtr->GetMesh(),
+		FAttachmentTransformRules::KeepRelativeTransform,
+	                                  Quiver_Socket
+	                                  );
+	
+	ArrowActorPtr->AttachToComponent(
+		BowActorPtr->GetSkeletalMeshComponent(),
+	                                 FAttachmentTransformRules::KeepRelativeTransform,
+	                                 Arrow_Socket
+	                                 );
 }
 
 USkeletalMeshComponent* AWeapon_Bow::GetMesh() const
@@ -77,7 +87,7 @@ void AWeapon_Bow::BeginPlay()
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.Owner = GetOwner();
 
-		BowActorPtr = GetWorld()->SpawnActor<ASkeletalMeshActor>(Bow_Class, BowTransform, SpawnParameters);
+		BowActorPtr = GetWorld()->SpawnActor<ASkeletalMeshActor>(Bow_Class, BowIdleTransform, SpawnParameters);
 		BowActorPtr->SetReplicates(true);
 		BowActorPtr->SetReplicatingMovement(true);
 
