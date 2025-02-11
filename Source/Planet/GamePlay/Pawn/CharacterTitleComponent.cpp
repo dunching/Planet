@@ -70,7 +70,7 @@ void UCharacterTitleComponent::TickComponent(
 #endif
 }
 
-void UCharacterTitleComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void UCharacterTitleComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)

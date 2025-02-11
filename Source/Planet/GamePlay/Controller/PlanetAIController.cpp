@@ -13,7 +13,7 @@
 #include "HumanCharacter.h"
 #include "GameplayTagsLibrary.h"
 #include "KismetGravityLibrary.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "LogWriter.h"
 
 APlanetAIController::APlanetAIController(const FObjectInitializer& ObjectInitializer) :
@@ -49,19 +49,19 @@ void APlanetAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, GroupManaggerPtr, COND_None);
 }
 
-AGroupSharedInfo* APlanetAIController::GetGroupSharedInfo() const
+AGroupManagger* APlanetAIController::GetGroupSharedInfo() const
 {
-	return GroupSharedInfoPtr;
+	return GroupManaggerPtr;
 }
 
-void APlanetAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+void APlanetAIController::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr)
 {
-	GroupSharedInfoPtr = InGroupSharedInfoPtr;
+	GroupManaggerPtr = InGroupSharedInfoPtr;
 
-	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+	OnGroupManaggerReady(GroupManaggerPtr);
 }
 
 UInventoryComponent* APlanetAIController::GetHoldingItemsComponent() const
@@ -124,18 +124,18 @@ void APlanetAIController::InitialGroupSharedInfo()
 			SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
 			{
 				PRINTINVOKEINFO();
-				auto GroupSharedInfoPtr = Cast<AGroupSharedInfo>(ActorPtr);
-				if (GroupSharedInfoPtr)
+				auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+				if (GroupManaggerPtr)
 				{
-					GroupSharedInfoPtr->GroupID = FGuid::NewGuid();
+					GroupManaggerPtr->GroupID = FGuid::NewGuid();
 				}
 			};
 
-			GroupSharedInfoPtr = GetWorld()->SpawnActor<AGroupSharedInfo>(
-				AGroupSharedInfo::StaticClass(), SpawnParameters
+			GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
+				AGroupManagger::StaticClass(), SpawnParameters
 			);
 
-			OnGroupSharedInfoReady(GroupSharedInfoPtr);
+			OnGroupManaggerReady(GroupManaggerPtr);
 		}
 	}
 #endif
@@ -169,21 +169,21 @@ TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterProxy(ACharacte
 	return CharaterPtr->GetCharacterProxy();
 }
 
-void APlanetAIController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void APlanetAIController::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
 	{
-		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
 		if (GroupSharedInterfacePtr)
 		{
-			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
+			GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
 		}
 	});
 }
 
 void APlanetAIController::OnRep_GroupSharedInfoChanged()
 {
-	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+	OnGroupManaggerReady(GroupManaggerPtr);
 }
 
 void APlanetAIController::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
@@ -229,7 +229,7 @@ void APlanetAIController::OnHPChanged(int32 CurrentValue)
 	{
 		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsLibrary::DeathingTag });
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
-			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
+			for (auto Iter : AbilityEndedData.AbilityThatEnded->GetAssetTags())
 			{
 				if (Iter == UGameplayTagsLibrary::DeathingTag)
 				{

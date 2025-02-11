@@ -14,7 +14,7 @@
 #include "SceneProxyExtendInfo.h"
 #include "CharactersInfo.h"
 #include "HumanAIController.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "AIControllerStateTreeAIComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
@@ -91,9 +91,9 @@ void AHumanCharacter_AI::HasBeenEndedLookAt()
 	Super::HasBeenEndedLookAt();
 }
 
-void AHumanCharacter_AI::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+void AHumanCharacter_AI::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr)
 {
-	GroupSharedInfoPtr = InGroupSharedInfoPtr;
+	GroupManaggerPtr = InGroupSharedInfoPtr;
 
 	if (auto ControllerPtr = GetController<AHumanAIController>())
 	{
@@ -126,9 +126,9 @@ void AHumanCharacter_AI::OnRep_GroupSharedInfoChanged()
 // 	return GetGroupSharedInfo()->GetInventoryComponent()->FindProxy_Character(CharacterID);
 // }
 
-void AHumanCharacter_AI::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void AHumanCharacter_AI::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
-	Super::OnGroupSharedInfoReady(NewGroupSharedInfoPtr);
+	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)

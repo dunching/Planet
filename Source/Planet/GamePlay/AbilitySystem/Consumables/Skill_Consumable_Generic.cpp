@@ -11,7 +11,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "CS_PeriodicPropertyModify.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "SceneProxyTable.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :

@@ -22,7 +22,7 @@
 #include "GeneratorNPCs_Patrol.h"
 #include "GeneratorColony.h"
 #include "HumanCharacter_AI.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "AIControllerStateTreeAIComponent.h"
 #include "LogWriter.h"
 
@@ -37,7 +37,7 @@ AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializ
 	InitialSenseConfig();
 }
 
-void AHumanAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+void AHumanAIController::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr)
 {
 	Super::SetGroupSharedInfo(InGroupSharedInfoPtr);
 }
@@ -159,7 +159,7 @@ void AHumanAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, GroupManaggerPtr, COND_None);
 }
 
 void AHumanAIController::OnGroupChanged()
@@ -233,7 +233,7 @@ void AHumanAIController::InitialAIConony()
 	}
 }
 
-void AHumanAIController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void AHumanAIController::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
-	Super::OnGroupSharedInfoReady(NewGroupSharedInfoPtr);
+	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 }

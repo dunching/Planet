@@ -11,7 +11,7 @@
 UTextSubSystem* UTextSubSystem::GetInstance()
 {
 	return Cast<UTextSubSystem>(
-		USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GWorld, UTextSubSystem::StaticClass())
+		USubsystemBlueprintLibrary::GetEngineSubsystem(UTextSubSystem::StaticClass())
 	);
 }
 

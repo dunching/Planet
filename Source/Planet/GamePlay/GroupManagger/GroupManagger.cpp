@@ -1,19 +1,19 @@
 
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 
 #include "TeamMatesHelperComponent.h"
 
 #include "InventoryComponent.h"
 #include "UGSAbilitySystemComponent.h"
 
-AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
+AGroupManagger::AGroupManagger(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
 {
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	bAlwaysRelevant = true;
 	SetReplicatingMovement(false);
-	NetUpdateFrequency = 1;
+	SetNetUpdateFrequency(1.f);
 
 	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(UTeamMatesHelperComponent::ComponentName);
 	InventoryComponentPtr = CreateDefaultSubobject<UInventoryComponent>(UInventoryComponent::ComponentName);
@@ -23,12 +23,12 @@ AGroupSharedInfo::AGroupSharedInfo(const FObjectInitializer& ObjectInitializer):
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }
 
-void AGroupSharedInfo::BeginPlay()
+void AGroupManagger::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AGroupSharedInfo::PostInitializeComponents()
+void AGroupManagger::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
@@ -40,17 +40,17 @@ void AGroupSharedInfo::PostInitializeComponents()
 	}
 }
 
-UPlanetAbilitySystemComponent* AGroupSharedInfo::GetAbilitySystemComponent() const
+UPlanetAbilitySystemComponent* AGroupManagger::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponentPtr;
 }
 
-UTeamMatesHelperComponent* AGroupSharedInfo::GetTeamMatesHelperComponent()
+UTeamMatesHelperComponent* AGroupManagger::GetTeamMatesHelperComponent()
 {
 	return TeamMatesHelperComponentPtr;
 }
 
-UInventoryComponent* AGroupSharedInfo::GetHoldingItemsComponent()
+UInventoryComponent* AGroupManagger::GetHoldingItemsComponent()
 {
 	return InventoryComponentPtr;
 }

@@ -6,7 +6,7 @@
 #include <GameplayTagContainer.h>
 
 #include "GravityAIController.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "PlanetControllerInterface.h"
 
 #include "PlanetAIController.generated.h"
@@ -18,14 +18,14 @@ class UCharacterAttributesComponent;
 class UInventoryComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
-class AGroupSharedInfo;
+class AGroupManagger;
 
 
 UCLASS()
 class PLANET_API APlanetAIController : 
 	public AGravityAIController, 
 	public IPlanetControllerInterface,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -41,9 +41,9 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
+	virtual AGroupManagger* GetGroupSharedInfo() const override;
 
-	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
+	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) override;
 
 	virtual UInventoryComponent* GetHoldingItemsComponent()const override;
 
@@ -81,7 +81,7 @@ protected:
 
 	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase* CharaterPtr)override;
 	
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	virtual void InitialGroupSharedInfo();
 
@@ -95,7 +95,7 @@ protected:
 	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
+	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 
 private:
 

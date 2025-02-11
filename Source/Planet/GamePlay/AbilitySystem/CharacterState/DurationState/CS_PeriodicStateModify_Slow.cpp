@@ -245,6 +245,6 @@ void UCS_PeriodicStateModify_Slow::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Slow);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Slow);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Slow);
 }

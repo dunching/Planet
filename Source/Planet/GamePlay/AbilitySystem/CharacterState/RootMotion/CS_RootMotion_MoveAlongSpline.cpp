@@ -39,7 +39,7 @@ void UCS_RootMotion_MoveAlongSpline::PreActivate(
 		GameplayAbilityTargetDataPtr = dynamic_cast<const FGameplayAbilityTargetData_RootMotion_MoveAlongSpline*>(TriggerEventData->TargetData.Get(0));
 		if (GameplayAbilityTargetDataPtr)
 		{
-			AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
+			// AbilityTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
 			ActivationOwnedTags.AddTag(GameplayAbilityTargetDataPtr->Tag);
 			CancelAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);
 			BlockAbilitiesWithTag.AddTag(GameplayAbilityTargetDataPtr->Tag);

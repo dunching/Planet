@@ -37,7 +37,7 @@ void FCharacterSocket::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
 
 void FCharacterSocket::SetAllocationedProxyID(const FGuid& NewID)
 {
-	AllocationedProxyID  = NewID;
+	AllocationedProxyID = NewID;
 }
 
 FGuid FCharacterSocket::GetAllocationedProxyID() const
@@ -75,6 +75,7 @@ void FCharacterProxy::UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSP
 {
 	Super::UpdateByRemote(RemoteSPtr);
 
+	TeammateConfigureMap = RemoteSPtr->TeammateConfigureMap;
 	ProxyCharacterPtr = RemoteSPtr->ProxyCharacterPtr;
 }
 
@@ -261,8 +262,60 @@ TWeakObjectPtr<FCharacterProxy::FPawnType> FCharacterProxy::GetCharacterActor() 
 
 void FCharacterProxy::UpdateSocket(const FCharacterSocket& Socket)
 {
+	// 判断插槽是否可以存放这个物品代理
+	if (Socket.Socket.MatchesTag(UGameplayTagsLibrary::ConsumableSocket))
+	{
+		auto ProxySPtr = GetInventoryComponent()->FindProxy(Socket.GetAllocationedProxyID());
+		if (ProxySPtr)
+		{
+			if (!ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
+			{
+				return;
+			}
+		}
+	}
+	else if (Socket.Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
+	{
+		auto ProxySPtr = GetInventoryComponent()->FindProxy(Socket.GetAllocationedProxyID());
+		if (ProxySPtr)
+		{
+			if (!ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
+			{
+				return;
+			}
+		}
+	}
+	else if (Socket.Socket.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
+	{
+		auto ProxySPtr = GetInventoryComponent()->FindProxy(Socket.GetAllocationedProxyID());
+		if (ProxySPtr)
+		{
+			if (!ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
+			{
+				return;
+			}
+		}
+	}
+	else if (Socket.Socket.MatchesTag(UGameplayTagsLibrary::PassiveSocket))
+	{
+		auto ProxySPtr = GetInventoryComponent()->FindProxy(Socket.GetAllocationedProxyID());
+		if (ProxySPtr)
+		{
+			if (!ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
+			{
+				return;
+			}
+		}
+	}
+	else
+	{
+		return;
+	}
+
 	if (TeammateConfigureMap.Contains(Socket.Socket))
 	{
 		TeammateConfigureMap[Socket.Socket] = Socket;
 	}
+
+	Update2Client();
 }

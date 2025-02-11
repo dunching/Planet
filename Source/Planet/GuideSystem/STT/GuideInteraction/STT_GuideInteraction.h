@@ -83,6 +83,7 @@ struct PLANET_API FSTID_GuideInteractionGeneric :
 	
 };
 
+// Deprecated
 USTRUCT()
 struct PLANET_API FSTT_GuideInteractionGeneric :
 	public FSTT_GuideInteractionBase

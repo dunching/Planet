@@ -8,7 +8,7 @@
 
 #include "GeneratorNPCs_Patrol.h"
 #include "PlayerComponent.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "GuideSubSystem.h"
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"
@@ -126,9 +126,9 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 #endif
 }
 
-void AHumanCharacter_Player::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void AHumanCharacter_Player::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
-	Super::OnGroupSharedInfoReady(NewGroupSharedInfoPtr);
+	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 	
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)

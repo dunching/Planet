@@ -19,7 +19,7 @@
 #include "HumanCharacter_AI.h"
 #include "LogWriter.h"
 #include "TeamConfigure.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
 
 #ifdef WITH_EDITOR
@@ -101,16 +101,19 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 	const auto CharactersAry= TeamConfigure.GetCharactersAry();
 	for (int32 Index = 0; Index < CharactersAry.Num(); Index++)
 	{
-		const auto CharacterProxySPtr =
-			GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(CharactersAry[Index]);
-		if (CharacterProxySPtr)
+		for (int32 SecondIndex = 0; SecondIndex < CharactersAry[Index].Num(); SecondIndex++)
 		{
-			Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
-			auto AICharacterPtr = CharacterProxySPtr->SpwanCharacter(Transform);
-			if (AICharacterPtr)
+			const auto CharacterProxySPtr =
+				GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(CharactersAry[Index][SecondIndex]);
+			if (CharacterProxySPtr)
 			{
-				AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
-				AICharacterPtr->SetCharacterID(CharacterProxySPtr->GetID());
+				Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
+				auto AICharacterPtr = CharacterProxySPtr->SpwanCharacter(Transform);
+				if (AICharacterPtr)
+				{
+					AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
+					AICharacterPtr->SetCharacterID(CharacterProxySPtr->GetID());
+				}
 			}
 		}
 	}
@@ -131,12 +134,21 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(const TSharedPtr<FCharac
 {
 	if (CharacterProxyPtr)
 	{
+		FTeammate Teammate;
+
+		Teammate.CharacterProxyID = CharacterProxyPtr->GetID();
+		Teammate.IndexInTheTeam = Index;
+		
 		MembersSet.Add(CharacterProxyPtr);
-		TeamConfigure.UpdateTeammateConfig(CharacterProxyPtr->GetID(),Index);
+		TeamConfigure.UpdateTeammateConfig(Teammate);
 	}
 	else
 	{
-		TeamConfigure.UpdateTeammateConfig(FGuid(),Index);
+		FTeammate Teammate;
+
+		Teammate.IndexInTheTeam = Index;
+		
+		TeamConfigure.UpdateTeammateConfig(Teammate);
 	}
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterProxyPtr);

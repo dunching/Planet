@@ -113,7 +113,7 @@ void UCS_PeriodicStateModify_Stun::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
 
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);

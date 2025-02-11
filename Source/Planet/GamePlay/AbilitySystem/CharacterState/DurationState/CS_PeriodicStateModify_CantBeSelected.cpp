@@ -89,7 +89,7 @@ void UCS_PeriodicStateModify_CantBeSelected::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
 }
 

@@ -28,7 +28,7 @@ void UBasicFutures_Running::InitalDefaultTags()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
+		// AbilityTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
 		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
 	}
 }

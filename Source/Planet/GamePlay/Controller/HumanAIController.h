@@ -8,7 +8,7 @@
 
 #include "GravityAIController.h"
 #include "GenerateType.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "PlanetAIController.h"
 
 #include "TeamMatesHelperComponent.h"
@@ -27,7 +27,7 @@ class UAIPerceptionComponent;
 class ABuildingArea;
 class AGeneratorColony;
 class AGeneratorNPCs_Patrol;
-class AGroupSharedInfo;
+class AGroupManagger;
 
 /**
  *
@@ -52,7 +52,7 @@ public:
 
 	AHumanAIController(const FObjectInitializer& ObjectInitializer);
 
-	virtual void SetGroupSharedInfo(AGroupSharedInfo*GroupSharedInfoPtr) override;
+	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) override;
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
 
@@ -86,7 +86,7 @@ protected:
 
 	virtual void OnUnPossess() override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	void OnGroupChanged();
 

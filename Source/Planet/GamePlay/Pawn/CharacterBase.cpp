@@ -46,7 +46,7 @@
 #include "CharacterTitleComponent.h"
 #include "SceneActor.h"
 #include "GE_CharacterInitail.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 
 ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -164,13 +164,13 @@ void ACharacterBase::PossessedBy(AController* NewController)
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
-		GroupSharedInfoPtr = Cast<APlanetPlayerController>(NewController)->GetGroupSharedInfo();
-		OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		GroupManaggerPtr = Cast<APlanetPlayerController>(NewController)->GetGroupSharedInfo();
+		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
-		GroupSharedInfoPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
-		OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		GroupManaggerPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
+		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 }
 
@@ -219,14 +219,14 @@ class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent()
 	return AbilitySystemComponentPtr;
 }
 
-AGroupSharedInfo* ACharacterBase::GetGroupSharedInfo() const
+AGroupManagger* ACharacterBase::GetGroupSharedInfo() const
 {
-	return GroupSharedInfoPtr;
+	return GroupManaggerPtr;
 }
 
 UInventoryComponent* ACharacterBase::GetInventoryComponent() const
 {
-	return GroupSharedInfoPtr ? GroupSharedInfoPtr->GetHoldingItemsComponent() : nullptr;
+	return GroupManaggerPtr ? GroupManaggerPtr->GetHoldingItemsComponent() : nullptr;
 }
 
 UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent() const
@@ -345,7 +345,7 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, GroupManaggerPtr, COND_None);
 }
 
 void ACharacterBase::SpawnDefaultController()
@@ -355,7 +355,7 @@ void ACharacterBase::SpawnDefaultController()
 	OriginalAIController = Controller;
 }
 
-void ACharacterBase::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void ACharacterBase::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 	OnInitaliedGroupSharedInfo();
 
@@ -372,10 +372,10 @@ void ACharacterBase::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfo
 
 	ForEachComponent(false, [this](UActorComponent* ComponentPtr)
 	{
-		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
 		if (GroupSharedInterfacePtr)
 		{
-			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
+			GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
 		}
 	});
 }
@@ -446,7 +446,7 @@ void ACharacterBase::OnHPChanged(const FOnAttributeChangeData& CurrentValue)
 
 void ACharacterBase::OnRep_GroupSharedInfoChanged()
 {
-	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+	OnGroupManaggerReady(GroupManaggerPtr);
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() < ROLE_Authority)

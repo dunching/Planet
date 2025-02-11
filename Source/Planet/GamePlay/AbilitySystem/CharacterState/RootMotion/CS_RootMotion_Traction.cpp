@@ -48,7 +48,7 @@ ATractionPoint::ATractionPoint(const FObjectInitializer& ObjectInitializer /*= F
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	NetPriority = 3.0f;
-	NetUpdateFrequency = 100.f;
+	SetNetUpdateFrequency(100.f);
 	SetReplicatingMovement(true);
 
 	PrimaryActorTick.bCanEverTick = true;

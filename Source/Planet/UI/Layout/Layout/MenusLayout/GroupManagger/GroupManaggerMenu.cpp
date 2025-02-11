@@ -19,7 +19,7 @@
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "GameplayTagsLibrary.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "HumanCharacter_Player.h"
 #include "ItemProxy_Character.h"
 #include "TeamMatesList.h"
@@ -79,8 +79,8 @@ void UGroupManaggerMenu::ResetGroupmates()
 		return;
 	}
 
-	auto GroupSharedInfoPtr = PlayerCharacterPtr->GetGroupSharedInfo();
-	auto HICPtr = GroupSharedInfoPtr->GetHoldingItemsComponent();
+	auto GroupManaggerPtr = PlayerCharacterPtr->GetGroupSharedInfo();
+	auto HICPtr = GroupManaggerPtr->GetHoldingItemsComponent();
 
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)

@@ -73,7 +73,7 @@ protected:
 
 	virtual void OnRep_GroupSharedInfoChanged() override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	virtual void InitialGroupSharedInfo();
 

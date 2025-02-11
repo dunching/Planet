@@ -132,15 +132,15 @@ void USkill_WeaponActive_Base::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
+	// GetAssetTags(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+	//
+	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
+	//
+	// ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 }
 
 bool USkill_WeaponActive_Base::GetNum(int32& Num) const

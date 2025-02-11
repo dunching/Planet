@@ -59,7 +59,7 @@ void UProxyProcessComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	DOREPLIFETIME_CONDITION(ThisClass, CurrentWeaponSocket, COND_None);
 }
 
-void UProxyProcessComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void UProxyProcessComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 // #if UE_EDITOR || UE_SERVER
 // 	if (GetNetMode() == NM_Client)
@@ -296,7 +296,7 @@ TSharedPtr<FWeaponProxy> UProxyProcessComponent::FindWeaponSocket(const FGamepla
 TSharedPtr<FConsumableProxy> UProxyProcessComponent::FindConsumablesBySocket(const FGameplayTag& SocketTag) const
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
-	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
+	const auto ActionKeyMap = UGameOptions::GetInstance()->GetActionKeyMap();
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
 
@@ -465,7 +465,7 @@ TMap<FCharacterSocket, FKey> UProxyProcessComponent::GetCanbeActiveSocket() cons
 	TMap<FCharacterSocket, FKey> Result;
 
 	auto CharacterPtr = GetOwner<FOwnerType>();
-	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
+	const auto ActionKeyMap = UGameOptions::GetInstance()->GetActionKeyMap();
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->GetSockets();
 
@@ -483,7 +483,7 @@ TMap<FCharacterSocket, FKey> UProxyProcessComponent::GetCanbeActiveSocket() cons
 TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(const FGameplayTag& SocketTag) const
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
-	const auto ActionKeyMap = UGameOptions::GetInstance()->ActionKeyMap;
+	const auto ActionKeyMap = UGameOptions::GetInstance()->GetActionKeyMap();
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
 

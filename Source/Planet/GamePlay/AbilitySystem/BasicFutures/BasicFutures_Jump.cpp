@@ -76,7 +76,7 @@ void UBasicFutures_Jump::OnRemoveAbility(
 
 void UBasicFutures_Jump::InitalDefaultTags()
 {
-	AbilityTags.AddTag(UGameplayTagsLibrary::Jump);
+	// // AbilityTags.AddTag(UGameplayTagsLibrary::Jump);
 
 	// 在运动时不激活
 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);

@@ -12,7 +12,7 @@
 #include "PlanetPlayerController.h"
 #include "LogWriter.h"
 #include "BuildingArea.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "HumanCharacter_AI.h"
 #include "ItemProxy_Character.h"
 

@@ -26,14 +26,14 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicPr
 	PlayThisAnimation();
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& ProxyPtr, bool bIsAdd)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& ProxyPtr, EProxyModifyType ProxyModifyType)
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
 	const auto Text =
 		FString::Printf(
 			TEXT("%s:%s"),
-			bIsAdd ? * UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+			ProxyModifyType == EProxyModifyType::kAdd ? * UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
 			*ProxyPtr->GetProxyName()
 		);
 	SetText(Text);
@@ -62,20 +62,24 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& 
 	ResetToolUIByData(ProxyPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyPtr, EProxyModifyType ProxyModifyType, int32 Num)
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s %dX%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()));
+	SetText(FString::Printf(
+		TEXT("%s %dX%s"), ProxyModifyType == EProxyModifyType::kAdd ? TEXT("Get") : TEXT("Lose"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()
+		));
 
 	ResetToolUIByData(ProxyPtr);
 }
 
-void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCharacterProxy>& ProxyPtr, bool bIsAdd)
+void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCharacterProxy>& ProxyPtr, EProxyModifyType ProxyModifyType)
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
-	SetText(FString::Printf(TEXT("%s X%s"), bIsAdd ? TEXT("Get") : TEXT("Lose"), *ProxyPtr->GetProxyName()));
+	SetText(FString::Printf(
+		TEXT("%s X%s"), ProxyModifyType == EProxyModifyType::kAdd ? TEXT("Get") : TEXT("Lose"), *ProxyPtr->GetProxyName()
+		));
 
 	ResetToolUIByData(ProxyPtr);
 }

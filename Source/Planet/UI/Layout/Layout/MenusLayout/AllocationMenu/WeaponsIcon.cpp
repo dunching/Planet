@@ -37,7 +37,7 @@ UWeaponsIcon::UWeaponsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	Super::ResetToolUIByData(InBasicProxyPtr);
 

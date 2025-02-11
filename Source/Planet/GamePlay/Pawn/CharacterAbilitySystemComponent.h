@@ -9,7 +9,7 @@
 
 #include "ProxyProcessComponent.h"
 #include "GAEvent_Helper.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "PlanetAbilitySystemComponent.h"
 
 #include "CharacterAbilitySystemComponent.generated.h"
@@ -43,7 +43,7 @@ TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 UCLASS()
 class PLANET_API UCharacterAbilitySystemComponent :
 	public UPlanetAbilitySystemComponent,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -188,7 +188,7 @@ public:
 
 protected:
 	
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	void OnGEAppliedDelegateToTarget(
 		UAbilitySystemComponent*,

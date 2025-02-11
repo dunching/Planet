@@ -126,7 +126,7 @@ void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Ability && AbilitySpec->IsActive())
 	{
-		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
+		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor)
 		{
 		}
 		else
@@ -157,7 +157,7 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Ability)
 	{
-		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
+		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor)
 		{
 		}
 		else
@@ -187,7 +187,7 @@ void UPlanetAbilitySystemComponent::ReplicatePerformAction_Implementation(
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Ability)
 	{
-		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::NonInstanced)
+		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor)
 		{
 		}
 		else

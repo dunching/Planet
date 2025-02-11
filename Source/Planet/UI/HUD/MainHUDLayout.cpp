@@ -1,3 +1,5 @@
+#include "MainHUDLayout.h"
+
 #include "MainHUD.h"
 
 #include "Components/Border.h"

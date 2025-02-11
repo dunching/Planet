@@ -29,7 +29,7 @@
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
 
 struct FTeamMateInfo : public TStructVariable<FTeamMateInfo>

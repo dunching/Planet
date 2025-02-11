@@ -10,7 +10,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "ConversationComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "InventoryComponent.h"
 #include "Planet_Tools.h"
 
@@ -128,7 +128,7 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 
 	// 公共冷却
 	{
-		auto AbilitySystemComponentPtr = InventoryComponentPtr->GetOwner<AGroupSharedInfo>()->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = InventoryComponentPtr->GetOwner<AGroupManagger>()->GetAbilitySystemComponent();
 		auto SkillCommonCooldownInfoMap = GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 		for (const auto Iter : SkillCommonCooldownInfoMap)
 		{
@@ -192,7 +192,7 @@ bool FConsumableProxy::CheckCooldown() const
 	}
 	// 公共冷却
 	{
-		auto AbilitySystemComponentPtr = InventoryComponentPtr->GetOwner<AGroupSharedInfo>()->GetAbilitySystemComponent();
+		auto AbilitySystemComponentPtr = InventoryComponentPtr->GetOwner<AGroupManagger>()->GetAbilitySystemComponent();
 		auto SkillCommonCooldownInfoMap = GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 		for (const auto Iter : SkillCommonCooldownInfoMap)
 		{

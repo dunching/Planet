@@ -52,7 +52,8 @@ void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
 
 	if (GetWorldImp())
 	{
-		AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+		// // AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+		
 		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
 	}
 }

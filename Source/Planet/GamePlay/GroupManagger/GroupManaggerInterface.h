@@ -11,24 +11,24 @@
 #include "GenerateType.h"
 #include "ItemProxy_Minimal.h"
 
-#include "GroupSharedInterface.generated.h"
+#include "GroupManaggerInterface.generated.h"
 
-class AGroupSharedInfo;
+class AGroupManagger;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
-class UGroupSharedInterface : public UInterface
+class UGroupManaggerInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class PLANET_API IGroupSharedInterface
+class PLANET_API IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
 public:
 
 	// TODO 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) = 0;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) = 0;
 
 protected:
 

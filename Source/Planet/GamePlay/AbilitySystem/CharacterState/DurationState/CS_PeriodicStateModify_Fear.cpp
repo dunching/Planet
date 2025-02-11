@@ -161,7 +161,7 @@ void UCS_PeriodicStateModify_Fear::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
 
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);

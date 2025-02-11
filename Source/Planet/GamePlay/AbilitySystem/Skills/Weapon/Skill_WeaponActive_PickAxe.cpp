@@ -29,7 +29,7 @@
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
 #include "LogWriter.h"
 

@@ -64,6 +64,16 @@
     "Chinese": "失去",
     "English": "Lose"
   },
+  "EntryActionProcessor": {
+    "Default": "EntryActionProcessor",
+    "Chinese": "切换到动作模式",
+    "English": "EntryActionProcessor"
+  },
+  "ViewAllocationMenu": {
+    "Default": "ViewAllocationMenu",
+    "Chinese": "查看分配技能界面",
+    "English": "ViewAllocationMenu"
+  },
   "Return": {
     "Default": "Return",
     "Chinese": "返回",

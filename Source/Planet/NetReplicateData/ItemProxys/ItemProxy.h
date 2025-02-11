@@ -127,10 +127,10 @@ public:
 	// 
 	FString GetProxyName() const;
 
-	FOnAllocationCharacterProxyChanged OnAllocationCharacterProxyChanged;
-
 	void Update2Client();
 
+	UInventoryComponent*GetInventoryComponent() const;
+	
 protected:
 	FTableRowProxy* GetTableRowProxy() const;
 
@@ -188,6 +188,8 @@ public:
 
 	IDType GetAllocationCharacterID() const;
 
+	FOnAllocationCharacterProxyChanged OnAllocationCharacterProxyChanged;
+
 protected:
 	// 被分配给的对象ID
 	IDType AllocationCharacter_ID;
@@ -207,7 +209,7 @@ struct TStructOpsTypeTraits<FAllocationbleProxy> :
 };
 
 USTRUCT()
-struct PLANET_API FToolProxy : public FBasicProxy
+struct PLANET_API FToolProxy : public FAllocationbleProxy
 {
 	GENERATED_USTRUCT_BODY()
 

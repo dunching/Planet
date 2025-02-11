@@ -48,7 +48,7 @@ void UAllocationIconBase::InvokeReset(UUserWidget* InBasicProxyPtr)
 	}
 }
 
-void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	if (InBasicProxyPtr == BasicProxyPtr)
 	{
@@ -59,7 +59,7 @@ void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy
 	TSharedPtr<FAllocationbleProxy> NewProxyPtr = nullptr;
 	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(ProxyType))
 	{
-		NewProxyPtr = InBasicProxyPtr;
+		NewProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr);
 	}
 
 	if (!bPaseInvokeOnResetProxyEvent)

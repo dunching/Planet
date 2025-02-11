@@ -12,7 +12,7 @@
 #include "GE_CharacterInitail.h"
 #include "CharacterAttibutes.h"
 #include "AS_Character.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "LogWriter.h"
 #include "TeamMatesHelperComponent.h"
 

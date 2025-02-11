@@ -16,7 +16,7 @@
 class AHumanCharacter;
 class ACharacterBase;
 class IPlanetControllerInterface;
-class AGroupSharedInfo;
+class AGroupManagger;
 struct FSkillProxy;
 struct FActiveSkillProxy;
 struct FConsumableProxy;
@@ -34,7 +34,7 @@ class UTeamMatesHelperComponent : public UActorComponent
 	GENERATED_BODY()
 public:
 
-	friend AGroupSharedInfo;
+	friend AGroupManagger;
 
 	using FCharacterProxyType = FCharacterProxy;
 
@@ -44,7 +44,7 @@ public:
 
 	using FCharacterProxyType = FCharacterProxy;
 
-	using FOwnerType = AGroupSharedInfo;
+	using FOwnerType = AGroupManagger;
 
 	using FMemberChangedDelegateContainer =
 		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterProxyType>&)>;

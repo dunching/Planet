@@ -66,13 +66,12 @@ protected:
 	);
 
 	void ResetUIByData_WeaponSkills(
-		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr,
-		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
+		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr
 		);
 
-	void ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr);
+	void ResetUIByData_Skills(const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr);
 
-	void ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr);
+	void ResetUIByData_Consumable(const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr);
 
 	void OnItemProxyDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& ProxyPtr);
 

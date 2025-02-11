@@ -32,7 +32,7 @@
 #include "EventSubjectComponent.h"
 #include "GameMode_Main.h"
 #include "LogWriter.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "InventoryComponent.h"
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
@@ -143,7 +143,7 @@ void APlanetPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimePropert
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, GroupSharedInfoPtr, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, GroupManaggerPtr, COND_None);
 	// DOREPLIFETIME_CONDITION(ThisClass, MainLineGuidePtr, COND_AutonomousOnly);
 }
 
@@ -344,7 +344,7 @@ void APlanetPlayerController::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 }
 
-void APlanetPlayerController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void APlanetPlayerController::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
@@ -354,10 +354,10 @@ void APlanetPlayerController::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupS
 
 	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
 	{
-		auto GroupSharedInterfacePtr = Cast<IGroupSharedInterface>(ComponentPtr);
+		auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
 		if (GroupSharedInterfacePtr)
 		{
-			GroupSharedInterfacePtr->OnGroupSharedInfoReady(GroupSharedInfoPtr);
+			GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
 		}
 	});
 }
@@ -371,18 +371,18 @@ UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponen
 	return GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
 }
 
-AGroupSharedInfo* APlanetPlayerController::GetGroupSharedInfo() const
+AGroupManagger* APlanetPlayerController::GetGroupSharedInfo() const
 {
-	return GroupSharedInfoPtr;
+	return GroupManaggerPtr;
 }
 
-void APlanetPlayerController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+void APlanetPlayerController::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr)
 {
 }
 
 UInventoryComponent* APlanetPlayerController::GetHoldingItemsComponent() const
 {
-	return GroupSharedInfoPtr ? GroupSharedInfoPtr->GetHoldingItemsComponent() : nullptr;
+	return GroupManaggerPtr ? GroupManaggerPtr->GetHoldingItemsComponent() : nullptr;
 }
 
 UCharacterAttributesComponent* APlanetPlayerController::GetCharacterAttributesComponent() const
@@ -424,14 +424,14 @@ void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
 		});
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData)
 		{
-			for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
-			{
-				if (Iter == UGameplayTagsLibrary::DeathingTag)
-				{
-					// TODO 
-					//					Destroy();
-				}
-			}
+			// for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
+			// {
+			// 	if (Iter == UGameplayTagsLibrary::DeathingTag)
+			// 	{
+			// 		// TODO 
+			// 		//					Destroy();
+			// 	}
+			// }
 		});
 	}
 }
@@ -461,17 +461,17 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
 		{
 			PRINTINVOKEINFO();
-			auto GroupSharedInfoPtr = Cast<AGroupSharedInfo>(ActorPtr);
-			if (GroupSharedInfoPtr)
+			auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+			if (GroupManaggerPtr)
 			{
-				GroupSharedInfoPtr->GroupID = FGuid::NewGuid();
+				GroupManaggerPtr->GroupID = FGuid::NewGuid();
 			}
 		};
 
-		GroupSharedInfoPtr = GetWorld()->SpawnActor<AGroupSharedInfo>(
-			AGroupSharedInfo::StaticClass(), SpawnParameters
+		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
+			AGroupManagger::StaticClass(), SpawnParameters
 		);
-		OnGroupSharedInfoReady(GroupSharedInfoPtr);
+		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
 }
@@ -672,7 +672,7 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray<FString>& 
 
 void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 {
-	OnGroupSharedInfoReady(GroupSharedInfoPtr);
+	OnGroupManaggerReady(GroupManaggerPtr);
 
 	// auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	// if (PlayerCharacterPtr)

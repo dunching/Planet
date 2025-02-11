@@ -167,7 +167,7 @@ EStateTreeRunStatus FSTT_GuideInteractionGeneric::PerformMoveTask(FStateTreeExec
 					{
 						BaseSetUp(GameplayTaskPtr);
 						
-						GameplayTaskPtr->SetUp(InstanceData.TaskNodeRef.LoadSynchronous());
+						// GameplayTaskPtr->SetUp(InstanceData.TaskNodeRef);
 						GameplayTaskPtr->ReadyForActivation();
 
 						InstanceData.GameplayTaskPtr = GameplayTaskPtr;

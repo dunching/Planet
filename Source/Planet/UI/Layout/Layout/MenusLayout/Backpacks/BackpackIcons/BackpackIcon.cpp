@@ -62,12 +62,12 @@ void UBackpackIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProx
 	{
 		SetItemType(BasicProxyPtr.Get());
 
-		OnAllocationCharacterProxyChangedHandle = BasicProxyPtr->OnAllocationCharacterProxyChanged.AddCallback(
-			std::bind(&ThisClass::OnAllocationCharacterProxyChanged, this, std::placeholders::_1)
-		);
-
 		if (auto AllocationbleProxySPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr))
 		{
+			OnAllocationCharacterProxyChangedHandle = AllocationbleProxySPtr->OnAllocationCharacterProxyChanged.AddCallback(
+				std::bind(&ThisClass::OnAllocationCharacterProxyChanged, this, std::placeholders::_1)
+			);
+
 			OnAllocationCharacterProxyChanged(AllocationbleProxySPtr->GetAllocationCharacterProxy());
 		}
 	}

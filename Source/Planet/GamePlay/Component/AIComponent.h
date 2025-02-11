@@ -6,7 +6,7 @@
 
 #include "GameplayTagContainer.h"
 #include "GenerateType.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "Components/ActorComponent.h"
 
 #include "AIComponent.generated.h"
@@ -24,7 +24,7 @@ class AHumanCharacter_AI;
 UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
 class PLANET_API UAIComponent :
 	public UActorComponent,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -37,7 +37,7 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)override;
 
 	void AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr);
 

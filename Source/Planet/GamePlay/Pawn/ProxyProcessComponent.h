@@ -9,7 +9,7 @@
 #include "GAEvent_Helper.h"
 
 #include "AllocationSkills.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "ItemProxy_Character.h"
 
 #include "ProxyProcessComponent.generated.h"
@@ -28,7 +28,7 @@ class ACharacterBase;
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UProxyProcessComponent :
 	public UActorComponent,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -62,7 +62,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)override;
 
 	bool ActiveAction(
 		const FGameplayTag& CanbeActivedInfoSPtr,

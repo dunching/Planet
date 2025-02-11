@@ -95,11 +95,11 @@ void UAllocationableProxyDragDropOperationWidget::InvokeReset(UUserWidget* BaseW
 }
 
 void UAllocationableProxyDragDropOperationWidget::ResetToolUIByData(
-	const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+	const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	if (InBasicProxyPtr)
 	{
-		BasicProxyPtr = InBasicProxyPtr;
+		BasicProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr);
 		SetItemType(BasicProxyPtr.Get());
 	}
 }

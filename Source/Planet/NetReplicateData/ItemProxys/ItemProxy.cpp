@@ -1,3 +1,4 @@
+#include "ItemProxy.h"
 
 #include "ItemProxy_Minimal.h"
 
@@ -40,12 +41,10 @@
 
 FBasicProxy::FBasicProxy()
 {
-
 }
 
 FBasicProxy::~FBasicProxy()
 {
-
 }
 
 bool FBasicProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
@@ -83,25 +82,21 @@ bool FBasicProxy::Active()
 
 void FBasicProxy::Cancel()
 {
-
 }
 
 void FBasicProxy::End()
 {
-
 }
 
 void FBasicProxy::Allocation()
 {
-
 }
 
 void FBasicProxy::UnAllocation()
 {
-
 }
 
-FBasicProxy::IDType FBasicProxy::GetID()const
+FBasicProxy::IDType FBasicProxy::GetID() const
 {
 	return ID;
 }
@@ -121,6 +116,11 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 void FBasicProxy::Update2Client()
 {
 	InventoryComponentPtr->Proxy_Container.UpdateItem(GetID());
+}
+
+UInventoryComponent* FBasicProxy::GetInventoryComponent() const
+{
+	return InventoryComponentPtr;
 }
 
 FString FBasicProxy::GetProxyName() const
@@ -149,16 +149,18 @@ bool FAllocationbleProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, boo
 
 	Ar << AllocationCharacter_ID;
 	Ar << SocketTag;
-	
+
 	return true;
 }
 
 void FAllocationbleProxy::UpdateByRemote(const TSharedPtr<FAllocationbleProxy>& RemoteSPtr)
 {
 	Super::UpdateByRemote(RemoteSPtr);
-	
+
 	AllocationCharacter_ID = RemoteSPtr->AllocationCharacter_ID;
 	SocketTag = RemoteSPtr->SocketTag;
+
+	OnAllocationCharacterProxyChanged(GetAllocationCharacterProxy());
 }
 
 FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag)
@@ -166,13 +168,13 @@ FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGa
 	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_CommonCooldownInfo.LoadSynchronous();
 
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_CommonCooldownInfo>(*CommonCooldownTag.ToString(), TEXT("GetProxy"));
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_CommonCooldownInfo>(
+		*CommonCooldownTag.ToString(), TEXT("GetProxy"));
 	return SceneProxyExtendInfoPtr;
 }
 
 FToolProxy::FToolProxy()
 {
-
 }
 
 int32 FToolProxy::GetNum() const
@@ -191,73 +193,73 @@ TWeakPtr<FCharacterProxy> FAllocationbleProxy::GetAllocationCharacterProxy() con
 }
 
 void FAllocationbleProxy::SetAllocationCharacterProxy(
-	const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag
-	)
+	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag
+)
 {
 	// 
 	if (InventoryComponentPtr->GetNetMode() == NM_Client)
 	{
 		if (InAllocationCharacterProxyPtr)
 		{
-			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), InAllocationCharacterProxyPtr->GetID(), InSocketTag);
+			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), InAllocationCharacterProxyPtr->GetID(),
+			                                                   InSocketTag);
 		}
 		else
 		{
 			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), FGuid(), InSocketTag);
 		}
-		return;
+		// return;
 	}
-	
-	// 找到这个物品之前被分配的插槽
-	auto UnAllocationPrevious = [this]
-	{
-		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
-		{
-			auto PreviousAllocationCharacterProxySPtr= InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
-			if (PreviousAllocationCharacterProxySPtr)
-			{
-				auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
-				CharacterSocket.ResetAllocatedProxy();
-		
-				PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
-			}
-		}
-	};
-	
+
 	if (InAllocationCharacterProxyPtr && InSocketTag.IsValid())
 	{
 		if (
-			(AllocationCharacter_ID == InAllocationCharacterProxyPtr->GetID() )&&
+			(AllocationCharacter_ID == InAllocationCharacterProxyPtr->GetID()) &&
 			(SocketTag == InSocketTag)
-			)
+		)
 		{
 			return;
 		}
 
-		UnAllocationPrevious();
-		
+		// 找到这个物品之前被分配的插槽
+		// 如果还是在同一个CharacterActor上，则不需要重新分配
+		if (AllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
+		{
+			UnAllocation();
+		}
+
+		auto PreviousAllocationCharacterProxySPtr = InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+		if (PreviousAllocationCharacterProxySPtr)
+		{
+			auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
+			CharacterSocket.ResetAllocatedProxy();
+
+			PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
+		}
+
+		AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
+		SocketTag = InSocketTag;
+
 		// 将这个物品注册到新的插槽
 		auto CharacterSocket = InAllocationCharacterProxyPtr->FindSocket(SocketTag);
 		CharacterSocket.SetAllocationedProxyID(GetID());
-		
+
 		InAllocationCharacterProxyPtr->UpdateSocket(CharacterSocket);
 
-		if (AllocationCharacter_ID.IsValid())
+		// 如果还是在同一个CharacterActor上，则不需要重新分配
+		if (AllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
 		{
 			Allocation();
 		}
+
+		OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
+
+		Update2Client();
 	}
 	else
 	{
-		UnAllocationPrevious();
+		ResetAllocationCharacterProxy();
 	}
-		
-	AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
-	SocketTag = InSocketTag;
-	
-	OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
-
-	Update2Client();
 }
 
 void FAllocationbleProxy::ResetAllocationCharacterProxy()
@@ -266,37 +268,37 @@ void FAllocationbleProxy::ResetAllocationCharacterProxy()
 	if (InventoryComponentPtr->GetNetMode() == NM_Client)
 	{
 		InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), FGuid(), FGameplayTag::EmptyTag);
-		return;
+		// return;
 	}
-	
+
 	// 找到这个物品之前被分配的插槽
-	auto UnAllocationPrevious = [this]
+	UnAllocation();
+
+	auto PreviousAllocationCharacterProxySPtr = InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+	if (PreviousAllocationCharacterProxySPtr)
 	{
-		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
-		{
-			auto PreviousAllocationCharacterProxySPtr= InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
-			if (PreviousAllocationCharacterProxySPtr)
-			{
-				auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
-				CharacterSocket.ResetAllocatedProxy();
-		
-				PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
-			}
-		}
-	};
-	
+		auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
+		CharacterSocket.ResetAllocatedProxy();
+
+		PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
+	}
+
 	AllocationCharacter_ID = FGuid();
 	SocketTag = FGameplayTag::EmptyTag;
+
+	OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
+
+	Update2Client();
 }
 
 FGameplayTag FAllocationbleProxy::GetCurrentSocketTag() const
 {
-	return  SocketTag;
+	return SocketTag;
 }
 
 FBasicProxy::IDType FAllocationbleProxy::GetAllocationCharacterID() const
 {
-	return  AllocationCharacter_ID;
+	return AllocationCharacter_ID;
 }
 
 ACharacterBase* FAllocationbleProxy::GetAllocationCharacter() const
@@ -304,7 +306,7 @@ ACharacterBase* FAllocationbleProxy::GetAllocationCharacter() const
 	auto AllocationCharacterProxySPtr = GetAllocationCharacterProxy();
 	if (AllocationCharacterProxySPtr.IsValid())
 	{
-		return AllocationCharacterProxySPtr.Pin()->GetCharacterActor().Get();	
+		return AllocationCharacterProxySPtr.Pin()->GetCharacterActor().Get();
 	}
 	return nullptr;
 }

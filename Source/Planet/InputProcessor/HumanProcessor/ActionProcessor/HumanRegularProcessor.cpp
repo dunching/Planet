@@ -67,9 +67,10 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter_Player.h"
 #include "ResourceBox.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "HumanCharacter_AI.h"
 #include "ItemProxy_Character.h"
+#include "TextCollect.h"
 
 static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
@@ -111,6 +112,17 @@ namespace HumanProcessor
 				});
 
 			AddOrRemoveUseMenuItemEvent(true);
+			const auto  GameplayFeatureKeyMapAry=  UGameOptions::GetInstance()->GetGameplayFeatureKeyMapAry();
+			for (const auto& Iter : GameplayFeatureKeyMapAry)
+			{
+				// 忽略一些命令
+				if (Iter.CMD == TextCollect::EntryActionProcessor)
+				{
+					const auto Key = Iter.Key;
+				}
+				
+				GameplayFeatureKeyMapMap.Add(Iter.Key, Iter);
+			}
 		}
 	}
 
@@ -162,6 +174,13 @@ namespace HumanProcessor
 			// 特殊处理一下
 			if (OnwerActorPtr->LookAtSceneActorPtr && (Params.Key == EKeys::E))
 			{
+				return;
+			}
+
+			auto GameplayFeatureKeyMapMapIter = GameplayFeatureKeyMapMap.Find(Params.Key);
+			if (GameplayFeatureKeyMapMapIter)
+			{
+				OnwerActorPtr->GetController<APlayerController>()->ConsoleCommand(GameplayFeatureKeyMapMapIter->CMD);
 				return;
 			}
 
@@ -268,7 +287,6 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::BKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 	}
 
 	void FHumanRegularProcessor::TabKeyPressed()

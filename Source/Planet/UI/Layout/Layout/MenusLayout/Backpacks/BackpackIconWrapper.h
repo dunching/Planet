@@ -14,6 +14,7 @@
 struct FStreamableHandle;
 
 struct FBasicProxy;
+struct FAllocationbleProxy;
 struct FToolProxy;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;

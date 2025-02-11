@@ -23,4 +23,8 @@ namespace TextCollect
 	TEXTCOLLECT(CharacterInteraction);
 
 	TEXTCOLLECT(Return);
+	
+	TEXTCOLLECT(EntryActionProcessor);
+	
+	TEXTCOLLECT(ViewAllocationMenu);
 }

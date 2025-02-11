@@ -125,7 +125,9 @@ public:
 	// 通过插槽
 	FCharacterSocket FindSocket(const FGameplayTag&SocketID)const;
 
-	// 通过指定代理类型，比如我们需要查询我们的插槽里面是否使用了“换技能”的代理
+	// 通过指定代理类型，
+	// 比如我们需要确认是否装备了斧头
+	// 比如我们需要查询我们的插槽里面是否使用了“换技能”的代理
 	FCharacterSocket FindSocketByType(const FGameplayTag&ProxyType)const;
 
 	void GetWeaponSocket(

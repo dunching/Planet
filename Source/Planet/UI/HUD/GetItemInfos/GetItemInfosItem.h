@@ -29,13 +29,13 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	void ResetToolUIByData(const TSharedPtr<FSkillProxy>& ProxyPtr, bool bIsAdd);
+	void ResetToolUIByData(const TSharedPtr<FSkillProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
-	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num);
+	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyPtr, EProxyModifyType ProxyModifyType, int32 Num);
 
 	void ResetToolUIByData(const TSharedPtr < FConsumableProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
-	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& ProxyPtr, bool bIsAdd);
+	void ResetToolUIByData(const TSharedPtr < FCharacterProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
 	FOnFinished OnFinished;
 

@@ -72,9 +72,10 @@ void FWeaponProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProx
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 	}
 #endif
+	
+	GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
 FTableRowProxy_WeaponExtendInfo* FWeaponProxy::GetTableRowProxy_WeaponExtendInfo() const
@@ -92,7 +93,7 @@ void FWeaponProxy::Allocation()
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		GetWeaponSkill()->Allocation();
+		// GetWeaponSkill()->Allocation();
 	}
 #endif
 }

@@ -59,7 +59,7 @@ public:
 
 	virtual void HasBeenEndedLookAt()override;
 
-	void SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr);
+	void SetGroupSharedInfo(AGroupManagger* GroupManaggerPtr);
 
 	void SetCharacterID(const FGuid& InCharacterID);
 
@@ -72,7 +72,7 @@ protected:
 
 	// virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;

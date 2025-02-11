@@ -1,4 +1,6 @@
 
+#include "EmptyLayout.h"
+
 #include "MainMenuLayout.h"
 
 #include "Components/WidgetSwitcher.h"

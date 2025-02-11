@@ -148,6 +148,8 @@ public:
 
 	static FGameplayTag PassiveSocket_1;
 
+	static FGameplayTag PassiveSocket;
+
 	static FGameplayTag PassiveSocket_2;
 
 	static FGameplayTag PassiveSocket_3;

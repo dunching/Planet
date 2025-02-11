@@ -124,7 +124,7 @@ void UCS_PeriodicStateModify_SuperArmor::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
 
 	TArray<FGameplayTag>Ary{

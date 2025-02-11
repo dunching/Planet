@@ -210,7 +210,7 @@ void UBasicFutures_Dash::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::Dash);
+	// // AbilityTags.AddTag(UGameplayTagsLibrary::Dash);
 
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 

@@ -33,7 +33,7 @@ void UGroupmateIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 
 }
 
-void UGroupmateIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UGroupmateIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	ProxyPtr = nullptr;
 	ProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(InBasicProxyPtr);

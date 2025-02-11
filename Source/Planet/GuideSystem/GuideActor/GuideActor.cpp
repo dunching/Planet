@@ -17,7 +17,7 @@ AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
 	bReplicates = true;
 	bAlwaysRelevant = true;
 	SetReplicatingMovement(false);
-	NetUpdateFrequency = 1;
+	SetMinNetUpdateFrequency(1.f);
 
 	GuideStateTreeComponentPtr = CreateDefaultSubobject<UGuideSystemStateTreeComponent>(UGuideSystemStateTreeComponent::ComponentName);
 	

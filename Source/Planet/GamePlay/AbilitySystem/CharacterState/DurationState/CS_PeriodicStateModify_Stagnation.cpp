@@ -97,7 +97,7 @@ void UCS_PeriodicStateModify_Stagnation::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
 
 	CancelAbilitiesWithTag.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);

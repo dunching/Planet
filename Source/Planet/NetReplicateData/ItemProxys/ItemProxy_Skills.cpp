@@ -55,11 +55,6 @@ bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 
 void FSkillProxy::SetAllocationCharacterProxy(const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
 {
-	if (!InAllocationCharacterProxyPtr)
-	{
-		UnAllocation();
-	}
-
 	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
@@ -91,6 +86,13 @@ void FSkillProxy::RegisterSkill()
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
+		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
+		// 确认是否生成了CharacterActor
+		if (!AllocationCharacter.IsValid())
+		{
+			return;
+		}
+		
 		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;
 
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
@@ -104,8 +106,6 @@ void FSkillProxy::RegisterSkill()
 
 		FGameplayEventData GameplayEventData;
 		GameplayEventData.TargetData.Add(GameplayAbilityTargetDataPtr);
-
-		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,
@@ -460,6 +460,8 @@ TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 
 void FWeaponSkillProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
 {
+	// 注意：这里不应该再UpdateSocket
+	// 因为我们直接存的武器
 	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
@@ -572,6 +574,13 @@ void FWeaponSkillProxy::RegisterSkill()
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
+		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
+		// 确认是否生成了CharacterActor
+		if (!AllocationCharacter.IsValid())
+		{
+			return;
+		}
+		
 		FGameplayAbilityTargetData_SkillBase_RegisterParam* GameplayAbilityTargetDataPtr = nullptr;
 		// 需要特殊参数的
 		if (
@@ -607,8 +616,6 @@ void FWeaponSkillProxy::RegisterSkill()
 
 		auto GameplayEventData = MakeShared<FGameplayEventData>();
 		GameplayEventData->TargetData.Add(GameplayAbilityTargetDataPtr);
-
-		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,

@@ -9,7 +9,7 @@
 
 #include "GravityPlayerController.h"
 #include "GenerateType.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "PlanetControllerInterface.h"
 
 #include "PlanetPlayerController.generated.h"
@@ -24,7 +24,7 @@ class UInventoryComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class UEventSubjectComponent;
-class AGroupSharedInfo;
+class AGroupManagger;
 class AGuideActor;
 
 /**
@@ -34,7 +34,7 @@ UCLASS()
 class PLANET_API APlanetPlayerController :
 	public AGravityPlayerController,
 	public IPlanetControllerInterface,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -58,9 +58,9 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	virtual AGroupSharedInfo* GetGroupSharedInfo() const override;
+	virtual AGroupManagger* GetGroupSharedInfo() const override;
 
-	virtual void SetGroupSharedInfo(AGroupSharedInfo* GroupSharedInfoPtr) override;
+	virtual void SetGroupSharedInfo(AGroupManagger* GroupManaggerPtr) override;
 
 	virtual UInventoryComponent* GetHoldingItemsComponent() const override;
 
@@ -117,7 +117,7 @@ protected:
 
 	virtual void OnRep_PlayerState()override;
 	
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr) override;
 
@@ -144,7 +144,7 @@ protected:
 	void BindOnFocusRemove(AActor* Actor);
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
+	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UEventSubjectComponent> EventSubjectComponentPtr = nullptr;

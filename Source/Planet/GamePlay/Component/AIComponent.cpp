@@ -56,7 +56,7 @@ void UAIComponent::BeginPlay()
 	OnwerActorPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
-void UAIComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void UAIComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)

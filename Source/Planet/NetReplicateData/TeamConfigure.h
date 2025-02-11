@@ -10,6 +10,21 @@
 #include "TeamConfigure.generated.h"
 
 USTRUCT(BlueprintType)
+struct PLANET_API FTeammate final
+{
+	GENERATED_USTRUCT_BODY()
+
+	// 小组内索引
+	uint8 TeamIndex = 0;
+	
+	// 小组内索引
+	uint8 IndexInTheTeam = 0;
+	
+	FGuid CharacterProxyID;
+	
+};
+
+USTRUCT(BlueprintType)
 struct PLANET_API FTeamConfigure final
 {
 	GENERATED_USTRUCT_BODY()
@@ -20,13 +35,16 @@ struct PLANET_API FTeamConfigure final
 
 	bool operator==(const FTeamConfigure& RightValue) const;
 
-	void UpdateTeammateConfig(const FGuid&ID, int32 Index);
+	void UpdateTeammateConfig(const FTeammate&Teammate);
 
-	TArray<FGuid> GetCharactersAry()const;
+	TArray<TArray<FGuid>> GetCharactersAry()const;
 	
 private:
+
+	void Check();
 	
-	TArray<FGuid> CharactersAry;
+	// 小组索引、CharacterProxy ID
+	TArray<TArray<FGuid>> TeamConfigureAry;
 	
 };
 

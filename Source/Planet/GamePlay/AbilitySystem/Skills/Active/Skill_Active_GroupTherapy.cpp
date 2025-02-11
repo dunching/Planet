@@ -28,7 +28,7 @@
 #include "TeamMatesHelperComponent.h"
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "ItemProxy_Character.h"
 
 namespace Skill_Active_ContinuousGroupTherapy

@@ -6,7 +6,7 @@
 
 #include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 
 #include "Character/GravityCharacter.h"
 
@@ -45,13 +45,13 @@ class UProxyProcessComponent;
 class UInteractiveToolComponent;
 class UConversationComponent;
 class UWidgetComponent;
-class AGroupSharedInfo;
+class AGroupManagger;
 
 UCLASS()
 class PLANET_API ACharacterBase : 
 	public AGravityCharacter,
 	public IPlanetAbilitySystemInterface,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -88,7 +88,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	AGroupSharedInfo* GetGroupSharedInfo()const;
+	AGroupManagger* GetGroupSharedInfo()const;
 
 	UInventoryComponent* GetInventoryComponent()const;
 
@@ -146,7 +146,7 @@ protected:
 
 	virtual void SpawnDefaultController()override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	UFUNCTION()
 	virtual void OnRep_GroupSharedInfoChanged();
@@ -184,7 +184,7 @@ protected:
 	TObjectPtr<UConversationComponent> ConversationComponentPtr = nullptr;
 	
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	TObjectPtr<AGroupSharedInfo> GroupSharedInfoPtr = nullptr;
+	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 
 	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
 

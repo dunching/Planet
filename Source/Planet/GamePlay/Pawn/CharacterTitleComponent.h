@@ -9,7 +9,7 @@
 #include "ReceivedEventModifyDataCallback.h"
 #include "MyUserWidget.h"
 #include "GenerateType.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "TaskNode.h"
 
 #include "CharacterTitleComponent.generated.h"
@@ -18,7 +18,7 @@ class UPAD_TaskNode_Preset_Conversation;
 class UConversationBorder;
 class UCharacterTitle;
 class ACharacterBase;
-class AGroupSharedInfo;
+class AGroupManagger;
 
 UCLASS()
 class PLANET_API UCharacterTitleBox :
@@ -40,7 +40,7 @@ public:
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterTitleComponent :
 	public UWidgetComponent,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -59,7 +59,7 @@ public:
 		FActorComponentTickFunction* ThisTickFunction
 	) override;
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	void SetCampType(ECharacterCampType CharacterCampType);
 

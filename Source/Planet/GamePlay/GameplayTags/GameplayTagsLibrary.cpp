@@ -149,28 +149,28 @@ FGameplayTag UGameplayTagsLibrary::State_ReleasingSkil_WeaponActive =
 
 #pragma region Socket Tags
 FGameplayTag UGameplayTagsLibrary::ConsumableSocket =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.ConsumableSocket")));
 
 FGameplayTag UGameplayTagsLibrary::ConsumableSocket_1 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.1")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.ConsumableSocket.1")));
 
 FGameplayTag UGameplayTagsLibrary::ConsumableSocket_2 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.2")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.ConsumableSocket.2")));
 
 FGameplayTag UGameplayTagsLibrary::ConsumableSocket_3 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.3")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.ConsumableSocket.3")));
 
 FGameplayTag UGameplayTagsLibrary::ConsumableSocket_4 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ConsumableSocket.4")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.ConsumableSocket.4")));
 
 FGameplayTag UGameplayTagsLibrary::WeaponSocket =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponSocket")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.WeaponSocket")));
 
 FGameplayTag UGameplayTagsLibrary::WeaponSocket_1 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponSocket.1")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.WeaponSocket.1")));
 
 FGameplayTag UGameplayTagsLibrary::WeaponSocket_2 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.WeaponSocket.2")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.WeaponSocket.2")));
 
 FGameplayTag UGameplayTagsLibrary::ActiveSocket =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket")));
@@ -186,6 +186,9 @@ FGameplayTag UGameplayTagsLibrary::ActiveSocket_3 =
 
 FGameplayTag UGameplayTagsLibrary::ActiveSocket_4 =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.ActiveSocket.4")));
+
+FGameplayTag UGameplayTagsLibrary::PassiveSocket =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.PassiveSocket")));
 
 FGameplayTag UGameplayTagsLibrary::PassiveSocket_1 =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Socket.SkillSocket.PassiveSocket.1")));

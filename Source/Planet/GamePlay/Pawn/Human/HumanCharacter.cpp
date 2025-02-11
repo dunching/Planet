@@ -45,7 +45,7 @@
 #include "GetItemInfosList.h"
 
 #include "ItemProxy_Container.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 #include "SceneActorInteractionComponent.h"
 
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :

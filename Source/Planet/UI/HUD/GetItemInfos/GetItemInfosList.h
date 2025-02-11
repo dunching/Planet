@@ -36,13 +36,13 @@ public:
 
 	virtual void ResetUIByData() override;
 
-	void OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& ProxyPtr, bool bIsAdd);
+	void OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
-	void OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPtr, bool bIsAdd, int32 Num);
+	void OnCoinProxyChanged(const TSharedPtr<FCoinProxy>& ProxyPtr, EProxyModifyType ProxyModifyType, int32 Num);
 
 	void OnConsumableProxyChanged(const TSharedPtr<FConsumableProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
-	void OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy>& ProxyPtr, bool bIsAdd);
+	void OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
 protected:
 	void OnRemovedItem();
@@ -55,11 +55,11 @@ protected:
 
 	TArray<TSharedPtr<FBasicProxy>> OrderAry;
 
-	TArray<TPair<TWeakPtr<FSkillProxy>, bool>> SkillPendingAry;
+	TArray<TPair<TWeakPtr<FSkillProxy>, EProxyModifyType>> SkillPendingAry;
 
-	TArray<TTuple<TWeakPtr<FCoinProxy>, bool, int32>> CoinPendingAry;
+	TArray<TTuple<TWeakPtr<FCoinProxy>, EProxyModifyType, int32>> CoinPendingAry;
 
 	TArray<TPair<TWeakPtr<FConsumableProxy>, EProxyModifyType>> ConsumablePendingAry;
 
-	TArray<TPair<TWeakPtr<FCharacterProxy>, bool>> CharacterPendingAry;
+	TArray<TPair<TWeakPtr<FCharacterProxy>, EProxyModifyType>> CharacterPendingAry;
 };

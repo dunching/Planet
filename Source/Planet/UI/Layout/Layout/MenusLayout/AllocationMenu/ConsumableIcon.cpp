@@ -44,7 +44,7 @@ UConsumableIcon::UConsumableIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void UConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	Super::ResetToolUIByData(InBasicProxyPtr);
 

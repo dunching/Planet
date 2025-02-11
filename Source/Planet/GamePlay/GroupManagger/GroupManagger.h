@@ -11,12 +11,12 @@
 #include "PlanetAbilitySystemComponent.h"
 #include "ItemProxy_Minimal.h"
 
-#include "GroupSharedInfo.generated.h"
+#include "GroupManagger.generated.h"
 
 class AHumanCharacter;
 class ACharacterBase;
 class IPlanetControllerInterface;
-class AGroupSharedInfo;
+class AGroupManagger;
 struct FSkillProxy;
 struct FActiveSkillProxy;
 struct FConsumableProxy;
@@ -34,7 +34,7 @@ struct FSceneProxyContainer;
  *	一个组的持有的物品的信息
  */
 UCLASS()
-class PLANET_API AGroupSharedInfo:
+class PLANET_API AGroupManagger:
 	public AInfo,
 	public IPlanetAbilitySystemInterface
 {
@@ -42,7 +42,7 @@ class PLANET_API AGroupSharedInfo:
 
 public:
 
-	AGroupSharedInfo(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AGroupManagger(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	virtual void BeginPlay() override;
 

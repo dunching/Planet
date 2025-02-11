@@ -9,7 +9,7 @@ public class Gravity : ModuleRules
     {
         DefaultBuildSettings = BuildSettingsVersion.V2;
 
-        CppStandard = CppStandardVersion.Cpp17;
+        CppStandard = CppStandardVersion.Cpp20;
 
         bUseRTTI = true;
 

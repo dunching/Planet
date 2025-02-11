@@ -19,7 +19,7 @@
 #include "GameplayTagsLibrary.h"
 #include "UICommon.h"
 #include "HorseCharacter.h"
-#include "GroupSharedInfo.h"
+#include "GroupManagger.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
@@ -29,7 +29,7 @@ AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializ
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 }
 
-void AHorseAIController::SetGroupSharedInfo(AGroupSharedInfo* InGroupSharedInfoPtr)
+void AHorseAIController::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr)
 {
 	Super::SetGroupSharedInfo(InGroupSharedInfoPtr);
 }

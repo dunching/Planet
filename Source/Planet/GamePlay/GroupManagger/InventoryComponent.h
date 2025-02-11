@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 
 #include "GenerateType.h"
-#include "GroupSharedInterface.h"
+#include "GroupManaggerInterface.h"
 #include "ItemProxy_Minimal.h"
 #include "ItemProxy_Container.h"
 
@@ -27,7 +27,7 @@ class ACharacterBase;
 UCLASS(BlueprintType, Blueprintable)
 class UInventoryComponent :
 	public UActorComponent,
-	public IGroupSharedInterface
+	public IGroupManaggerInterface
 {
 	GENERATED_BODY()
 
@@ -40,18 +40,27 @@ public:
 
 	using IDType = FGuid;
 
-	using FOnSkillProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FSkillProxy>&, bool)>;
+	using FOnSkillProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<
+		FSkillProxy>&, EProxyModifyType
+		)>;
 
 	using FOnToolProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FToolProxy>&)>;
 
-	using FOnGroupmateProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterProxy>&, bool)>;
+	using FOnGroupmateProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<
+		FCharacterProxy>&, EProxyModifyType)
+	>;
 
-	using FOnConsumableProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FConsumableProxy>&,
-	                                                                EProxyModifyType)>;
+	using FOnConsumableProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<
+		FConsumableProxy>&, EProxyModifyType)
+	>;
 
-	using FOnCoinProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FCoinProxy>&, bool, int32)>;
+	using FOnCoinProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<
+		FCoinProxy>&, EProxyModifyType, int32
+		)>;
 
-	using FOnWeaponProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<FWeaponProxy>&, bool)>;
+	using FOnWeaponProxyChanged = TCallbackHandleContainer<void(const TSharedPtr<
+		FWeaponProxy>&, EProxyModifyType)
+		>;
 
 	static FName ComponentName;
 
@@ -76,8 +85,6 @@ public:
 
 	TSharedPtr<FCharacterProxy> AddProxy_Character(const FGameplayTag& ProxyType);
 
-	TSharedPtr<FCharacterProxy> Update_Character(const TSharedPtr<FCharacterProxy>& Proxy);
-
 	TSharedPtr<FCharacterProxy> FindProxy_Character(const IDType& ID) const;
 
 	TSharedPtr<FCharacterProxy> InitialOwnerCharacterProxy(ACharacterBase* OwnerCharacterPtr);
@@ -96,8 +103,6 @@ public:
 	TSharedPtr<FSkillProxy> FindProxy_Skill(const IDType& ID) const;
 
 	TSharedPtr<FSkillProxy> AddProxy_Skill(const FGameplayTag& ProxyType);
-
-	TSharedPtr<FSkillProxy> Update_Skill(const TSharedPtr<FSkillProxy>& Proxy);
 
 
 	TSharedPtr<FCoinProxy> FindProxy_Coin(const FGameplayTag& ProxyType) const;
@@ -123,14 +128,14 @@ public:
 #endif
 
 	UFUNCTION(Server, Reliable)
-	void AddProxys_Server(const FGuid&RewardsItemID);
+	void AddProxys_Server(const FGuid& RewardsItemID);
 
 	void AddProxy_Pending(FGameplayTag ProxyType, int32 Num, FGuid Guid);
 
 	void SyncPendingProxy(FGuid Guid);
 
 
-	virtual void OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	UPROPERTY(Replicated)
 	FProxy_FASI_Container Proxy_Container;

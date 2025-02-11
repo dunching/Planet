@@ -243,7 +243,7 @@ void UCS_PeriodicStateModify_Suppress::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
 
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 

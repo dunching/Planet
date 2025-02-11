@@ -5,6 +5,7 @@
 #include <functional>
 
 #include "CoreMinimal.h"
+#include "GameOptions.h"
 #include "GameplayAbilitySpecHandle.h"
 
 #include "ItemProxy_Minimal.h"
@@ -86,6 +87,8 @@ namespace HumanProcessor
 		bool bIsPressdLeftAlt = false;
 
 		TMap<FKey, FCharacterSocket>HandleKeysMap;
+
+		TMap<FKey, FGameplayFeatureKeyMap>GameplayFeatureKeyMapMap;
 
 		FOnAllocationChangedHandle OnAllocationChangedHandle;
 

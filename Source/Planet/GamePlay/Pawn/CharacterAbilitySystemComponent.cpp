@@ -643,7 +643,7 @@ void UCharacterAbilitySystemComponent::BreakMoveToAttackDistance()
 	}
 }
 
-void UCharacterAbilitySystemComponent::OnGroupSharedInfoReady(AGroupSharedInfo* NewGroupSharedInfoPtr)
+void UCharacterAbilitySystemComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)

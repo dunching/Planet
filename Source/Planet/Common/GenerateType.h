@@ -136,6 +136,7 @@ enum class EProxyModifyType
 {
 	kAdd,
 	kChange,
+	kNumChange,
 	kRemove,
 };
 

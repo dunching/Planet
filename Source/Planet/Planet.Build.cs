@@ -6,9 +6,10 @@ public class Planet : ModuleRules
 {
 	public Planet(ReadOnlyTargetRules Target) : base(Target)
     {
-        //PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-        PCHUsage = PCHUsageMode.UseSharedPCHs;
-        //PCHUsage = PCHUsageMode.Default;
+        // 这几个有啥区别？
+        // PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+        // PCHUsage = PCHUsageMode.UseSharedPCHs;
+        // PCHUsage = PCHUsageMode.Default;
 
         bEnableUndefinedIdentifierWarnings = false;
         bWarningsAsErrors = true;
@@ -71,7 +72,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/GameState");
         PublicIncludePaths.Add("Planet/GamePlay/GameplayTags");
         PublicIncludePaths.Add("Planet/GamePlay/PlayerState");
-        PublicIncludePaths.Add("Planet/GamePlay/GroupSharedInfo");
+        PublicIncludePaths.Add("Planet/GamePlay/GroupManagger");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/ToolsInteractiveComponent");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse");

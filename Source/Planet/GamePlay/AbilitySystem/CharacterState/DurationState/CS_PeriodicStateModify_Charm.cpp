@@ -123,7 +123,7 @@ void UCS_PeriodicStateModify_Charm::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
 
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);

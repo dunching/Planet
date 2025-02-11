@@ -441,6 +441,20 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	}
 	else
 	{
+		{
+			auto UIPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
+			if (UIPtr)
+			{
+					UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
+		{
+			auto UIPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2));
+			if (UIPtr)
+			{
+					UIPtr->ResetToolUIByData(nullptr);
+			}
+		}
 		return;
 	}
 

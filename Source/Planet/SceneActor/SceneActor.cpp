@@ -18,7 +18,7 @@ ASceneActor::ASceneActor(const FObjectInitializer& ObjectInitializer) :
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	NetPriority = 3.0f;
-	NetUpdateFrequency = 100.f;
+	SetNetUpdateFrequency(100.f);
 
 	SetReplicatingMovement(true);
 

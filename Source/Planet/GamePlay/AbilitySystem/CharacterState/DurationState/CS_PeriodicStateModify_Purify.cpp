@@ -99,7 +99,7 @@ void UCS_PeriodicStateModify_Purify::InitalDefaultTags()
 {
 	Super::InitalDefaultTags();
 
-	AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Purify);
+	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Purify);
 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Purify);
 
 	TArray<FGameplayTag>Ary{

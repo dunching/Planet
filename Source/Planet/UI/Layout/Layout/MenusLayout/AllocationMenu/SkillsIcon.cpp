@@ -42,7 +42,7 @@ USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
 
 }
 
-void USkillsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBasicProxyPtr)
+void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
 	if (InBasicProxyPtr == BasicProxyPtr)
 	{
@@ -53,7 +53,7 @@ void USkillsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBas
 	TSharedPtr<FAllocationbleProxy> NewProxyPtr = nullptr;
 	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(ProxyType))
 	{
-		NewProxyPtr = InBasicProxyPtr;
+		NewProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr) ;
 	}
 	else
 	{
@@ -70,7 +70,7 @@ void USkillsIcon::ResetToolUIByData(const TSharedPtr<FAllocationbleProxy>& InBas
 				UGameplayTagsLibrary::Proxy_Skill_Active_Switch
 			).IsValid())
 			{
-				NewProxyPtr = InBasicProxyPtr;
+				NewProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr);
 			}
 		}
 

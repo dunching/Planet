@@ -7,6 +7,61 @@
 #include "StateTagExtendInfo.h"
 #include "Planet.h"
 #include "PlanetWorldSettings.h"
+#include "TextCollect.h"
+#include "TextSubSystem.h"
+
+UGameOptions::UGameOptions(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
+{
+	{
+		struct FMyStruct
+		{
+			FGameplayTag SocketTag;
+			FKey Key;
+		};
+		TArray<FMyStruct> Ary
+		{
+					{UGameplayTagsLibrary::ActiveSocket_1, EKeys::Q},
+					{UGameplayTagsLibrary::ActiveSocket_2, EKeys::E},
+					{UGameplayTagsLibrary::ActiveSocket_3, EKeys::R},
+					{UGameplayTagsLibrary::ActiveSocket_4, EKeys::F},
+		
+					{UGameplayTagsLibrary::WeaponSocket_1, EKeys::LeftMouseButton},
+					{UGameplayTagsLibrary::WeaponSocket_2, EKeys::LeftMouseButton},
+		
+					{UGameplayTagsLibrary::ConsumableSocket_1, EKeys::One},
+					{UGameplayTagsLibrary::ConsumableSocket_2, EKeys::Two},
+					{UGameplayTagsLibrary::ConsumableSocket_3, EKeys::Three},
+					{UGameplayTagsLibrary::ConsumableSocket_4, EKeys::Four},
+		
+					{UGameplayTagsLibrary::PassiveSocket_1, EKeys::Invalid},
+					{UGameplayTagsLibrary::PassiveSocket_2, EKeys::Invalid},
+					{UGameplayTagsLibrary::PassiveSocket_3, EKeys::Invalid},
+					{UGameplayTagsLibrary::PassiveSocket_4, EKeys::Invalid},
+					{UGameplayTagsLibrary::PassiveSocket_5, EKeys::Invalid},
+				};
+
+		for (const auto& Iter : Ary)
+		{
+			ActionKeyMap.Add(Iter.SocketTag, Iter.Key);
+		}
+	}
+
+	GameplayFeatureKeyMapAry.Append({
+		FGameplayFeatureKeyMap(
+			EKeys::Escape,
+			TEXT("EntryActionProcessor"),
+			TextCollect::EntryActionProcessor
+			// UTextSubSystem::GetInstance()->GetText(TextCollect::EntryActionProcessor)
+			),
+		FGameplayFeatureKeyMap(
+			EKeys::Q,
+			TEXT("ViewAllocationMenu"),
+			TextCollect::ViewAllocationMenu
+			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
+			),
+	});
+}
 
 UGameOptions* UGameOptions::GetInstance()
 {
@@ -14,7 +69,7 @@ UGameOptions* UGameOptions::GetInstance()
 	return WorldSetting->GetGameOptions();
 }
 
-int32 UGameOptions::MaxTeammateNum = 4;
+int32 UGameOptions::MaxTeammateNum = 5;
 
 void UGameOptions::PostCDOContruct()
 {
@@ -24,36 +79,14 @@ void UGameOptions::PostCDOContruct()
 void UGameOptions::PostInitProperties()
 {
 	Super::PostInitProperties();
+}
 
-	struct FMyStruct
-	{
-		FGameplayTag SocketTag;
-		FKey Key;
-	};
-	TArray<FMyStruct> Ary
-	{
-			{UGameplayTagsLibrary::ActiveSocket_1, EKeys::Q},
-			{UGameplayTagsLibrary::ActiveSocket_2, EKeys::E},
-			{UGameplayTagsLibrary::ActiveSocket_3, EKeys::R},
-			{UGameplayTagsLibrary::ActiveSocket_4, EKeys::F},
-		
-			{UGameplayTagsLibrary::WeaponSocket_1, EKeys::LeftMouseButton},
-			{UGameplayTagsLibrary::WeaponSocket_2, EKeys::LeftMouseButton},
-		
-			{UGameplayTagsLibrary::ConsumableSocket_1, EKeys::One},
-			{UGameplayTagsLibrary::ConsumableSocket_2, EKeys::Two},
-			{UGameplayTagsLibrary::ConsumableSocket_3, EKeys::Three},
-			{UGameplayTagsLibrary::ConsumableSocket_4, EKeys::Four},
-		
-			{UGameplayTagsLibrary::PassiveSocket_1, EKeys::Invalid},
-			{UGameplayTagsLibrary::PassiveSocket_2, EKeys::Invalid},
-			{UGameplayTagsLibrary::PassiveSocket_3, EKeys::Invalid},
-			{UGameplayTagsLibrary::PassiveSocket_4, EKeys::Invalid},
-			{UGameplayTagsLibrary::PassiveSocket_5, EKeys::Invalid},
-		};
+TArray<FGameplayFeatureKeyMap> UGameOptions::GetGameplayFeatureKeyMapAry() const
+{
+	return GameplayFeatureKeyMapAry;
+}
 
-	for (const auto& Iter : Ary)
-	{
-		ActionKeyMap.Add(Iter.SocketTag, Iter.Key);
-	}
+TMap<FGameplayTag, FKey> UGameOptions::GetActionKeyMap() const
+{
+	return ActionKeyMap;
 }
