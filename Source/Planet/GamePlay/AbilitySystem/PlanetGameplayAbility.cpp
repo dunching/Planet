@@ -60,7 +60,7 @@ void UPlanetGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorI
 	Super::OnAvatarSet(ActorInfo, Spec);
 
 	// 确认和我们运行的GA标签一致
-	InitalDefaultTags();
+	// InitalDefaultTags();
 }
 
 void UPlanetGameplayAbility::PreActivate(
@@ -183,10 +183,10 @@ void UPlanetGameplayAbility::DecrementListLockOverride() const
 	RunIfListLock();
 }
 
-void UPlanetGameplayAbility::InitalDefaultTags()
-{
-
-}
+// void UPlanetGameplayAbility::InitalDefaultTags()
+// {
+//
+// }
 
 void UPlanetGameplayAbility::CancelAbility_Server_Implementation()
 {

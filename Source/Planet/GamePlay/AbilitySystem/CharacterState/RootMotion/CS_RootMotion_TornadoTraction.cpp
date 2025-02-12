@@ -154,10 +154,10 @@ void UCS_RootMotion_TornadoTraction::PerformAction()
 	}
 }
 
-void UCS_RootMotion_TornadoTraction::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-}
+// void UCS_RootMotion_TornadoTraction::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+// }
 
 void UCS_RootMotion_TornadoTraction::ExcuteTasks()
 {

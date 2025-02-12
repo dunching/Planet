@@ -109,15 +109,15 @@ void UCS_PeriodicStateModify_Stun::OnTaskTick(UAbilityTask_TimerHelper*, float D
 	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_Stun::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
-}
+// void UCS_PeriodicStateModify_Stun::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+// }

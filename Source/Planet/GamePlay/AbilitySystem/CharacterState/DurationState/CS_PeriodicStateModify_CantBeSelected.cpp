@@ -85,13 +85,13 @@ void UCS_PeriodicStateModify_CantBeSelected::PerformAction()
 	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 }
 
-void UCS_PeriodicStateModify_CantBeSelected::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
-}
+// void UCS_PeriodicStateModify_CantBeSelected::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
+// }
 
 void UCS_PeriodicStateModify_CantBeSelected::OnDuration(
 	UAbilityTask_TimerHelper* TaskPtr,

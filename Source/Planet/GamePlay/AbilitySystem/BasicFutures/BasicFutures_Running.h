@@ -73,7 +73,7 @@ protected:
 
 private:
 
-	virtual void InitalDefaultTags() override;
+	// virtual void InitalDefaultTags() override;
 
 	void IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);
 	

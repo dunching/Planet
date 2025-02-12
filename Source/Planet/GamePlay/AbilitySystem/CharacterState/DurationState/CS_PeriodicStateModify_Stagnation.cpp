@@ -93,21 +93,21 @@ void UCS_PeriodicStateModify_Stagnation::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UCS_PeriodicStateModify_Stagnation::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-
-	CancelAbilitiesWithTag.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
-}
+// void UCS_PeriodicStateModify_Stagnation::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+//
+// 	CancelAbilitiesWithTag.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+// }
 
 void UCS_PeriodicStateModify_Stagnation::PerformAction()
 {

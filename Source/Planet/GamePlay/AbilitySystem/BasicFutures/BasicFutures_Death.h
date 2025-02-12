@@ -29,7 +29,7 @@ public:
 
 protected:
 
-	virtual void InitalDefaultTags()override;
+ 	// virtual void InitalDefaultTags()override;
 
 	void PlayMontage(UAnimMontage* CurMontagePtr, float Rate);
 

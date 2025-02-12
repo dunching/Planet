@@ -94,7 +94,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual	void InitalDefaultTags()override;
+	// virtual	void InitalDefaultTags()override;
 
 	virtual bool GetNum(int32 & Num)const;
 

@@ -206,24 +206,24 @@ void UBasicFutures_Dash::OnGameplayTaskDeactivated(UGameplayTask& Task)
 	}
 }
 
-void UBasicFutures_Dash::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	// // AbilityTags.AddTag(UGameplayTagsLibrary::Dash);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::FlyAway);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
-
-	// 在运动时不激活
-}
+// void UBasicFutures_Dash::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// // AbilityTags.AddTag(UGameplayTagsLibrary::Dash);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::FlyAway);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+//
+// 	// 在运动时不激活
+// }
 
 void UBasicFutures_Dash::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec

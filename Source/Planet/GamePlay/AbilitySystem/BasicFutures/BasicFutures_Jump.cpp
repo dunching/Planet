@@ -74,13 +74,13 @@ void UBasicFutures_Jump::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void UBasicFutures_Jump::InitalDefaultTags()
-{
-	// // AbilityTags.AddTag(UGameplayTagsLibrary::Jump);
-
-	// 在运动时不激活
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);
-}
+// void UBasicFutures_Jump::InitalDefaultTags()
+// {
+// 	// // AbilityTags.AddTag(UGameplayTagsLibrary::Jump);
+//
+// 	// 在运动时不激活
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::RootMotion);
+// }
 
 void UBasicFutures_Jump::OnLanded(const FHitResult& Hit)
 {

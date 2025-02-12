@@ -180,15 +180,15 @@ void USkill_Active_Base::SetContinuePerform(bool bIsContinue)
 	ContinueActive();
 }
 
-void USkill_Active_Base::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
-
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
-	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-}
+// void USkill_Active_Base::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
+//
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+// }
 
 void USkill_Active_Base::GetInputRemainPercent(bool& bIsAcceptInput, float& Percent) const
 {

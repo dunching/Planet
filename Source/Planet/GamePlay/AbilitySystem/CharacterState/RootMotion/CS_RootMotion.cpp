@@ -66,10 +66,10 @@ void UCS_RootMotion::UpdateRootMotion(
 	UpdateRootMotion_Client(GameplayEventData);
 }
 
-void UCS_RootMotion::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-}
+// void UCS_RootMotion::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+// }
 
 void UCS_RootMotion::UpdateRootMotion_Client_Implementation(const FGameplayEventData& GameplayEventData)
 {

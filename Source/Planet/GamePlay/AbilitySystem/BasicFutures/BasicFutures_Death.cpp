@@ -40,18 +40,18 @@ void UBasicFutures_Death::ActivateAbility(
 	}
 }
 
-void UBasicFutures_Death::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
-}
+// void UBasicFutures_Death::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRootMotion);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_Orient2Acce);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
+// }
 
 void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 {

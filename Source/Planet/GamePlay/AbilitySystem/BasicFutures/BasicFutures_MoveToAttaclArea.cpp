@@ -46,17 +46,17 @@ UBasicFutures_MoveToAttaclArea::UBasicFutures_MoveToAttaclArea() :
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 
-void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	if (GetWorldImp())
-	{
-		// // AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
-		
-		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
-	}
-}
+// void UBasicFutures_MoveToAttaclArea::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	if (GetWorldImp())
+// 	{
+// 		// // AbilityTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+// 		
+// 		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+// 	}
+// }
 
 void UBasicFutures_MoveToAttaclArea::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

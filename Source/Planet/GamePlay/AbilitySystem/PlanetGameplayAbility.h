@@ -133,8 +133,8 @@ public:
 	
 #endif
 
-	// 通过此函数修改GAS上记录的CDO的Tags
-	virtual	void InitalDefaultTags();
+	// 通过此函数修改GAS上记录的CDO的Tags Deprecated
+	// virtual	void InitalDefaultTags();
 
 	UFUNCTION(Server, Reliable)
 	void CancelAbility_Server();

@@ -162,12 +162,12 @@ void USkill_Active_DisplacementNoPhy::Move()
 	}
 }
 
-void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_NoPhy);
-}
+// void USkill_Active_DisplacementNoPhy::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_NoPhy);
+// }
 
 void USkill_Active_DisplacementNoPhy::PlayMontage()
 {

@@ -54,7 +54,7 @@ public:
 
 protected:
 
-	virtual void InitalDefaultTags()override;
+	// virtual void InitalDefaultTags()override;
 
 	UFUNCTION()
 	void OnLanded(const FHitResult& Hit);

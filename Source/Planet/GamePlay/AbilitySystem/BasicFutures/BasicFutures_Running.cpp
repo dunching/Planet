@@ -22,16 +22,16 @@ UBasicFutures_Running::UBasicFutures_Running() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Running::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	if (GetWorldImp())
-	{
-		// AbilityTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
-		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
-	}
-}
+// void UBasicFutures_Running::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	if (GetWorldImp())
+// 	{
+// 		// AbilityTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
+// 		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
+// 	}
+// }
 
 void UBasicFutures_Running::IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
 {

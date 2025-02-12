@@ -80,7 +80,7 @@ protected:
 	
 	virtual void PerformAction()override;
 
-	virtual	void InitalDefaultTags()override;
+	// virtual	void InitalDefaultTags()override;
 
 	void OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime);
 

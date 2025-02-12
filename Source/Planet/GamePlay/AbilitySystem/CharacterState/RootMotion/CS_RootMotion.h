@@ -84,7 +84,7 @@ public:
 
 protected:
 
-	virtual void InitalDefaultTags()override;
+	// virtual void InitalDefaultTags()override;
 	
 	UFUNCTION(Client, Reliable)
 	void UpdateRootMotion_Client(

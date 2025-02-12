@@ -105,7 +105,7 @@ protected:
 
 	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
 
-	virtual void InitalDefaultTags()override;
+	// virtual void InitalDefaultTags()override;
 
 	void DoDash(
 		const FGameplayAbilitySpecHandle Handle,

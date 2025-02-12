@@ -88,7 +88,7 @@ protected:
 
 	virtual void PerformAction()override;
 
-	virtual	void InitalDefaultTags()override;
+	// virtual	void InitalDefaultTags()override;
 
 	void ExcuteTasks();
 

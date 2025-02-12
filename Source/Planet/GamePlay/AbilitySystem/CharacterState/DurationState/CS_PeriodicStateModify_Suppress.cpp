@@ -239,19 +239,19 @@ void UCS_PeriodicStateModify_Suppress::PlayMontage()
 	}
 }
 
-void UCS_PeriodicStateModify_Suppress::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
-
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_UseCustomRotation);
-}
+// void UCS_PeriodicStateModify_Suppress::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Suppress);
+//
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantJump);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_CantRotation);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_UseCustomRotation);
+// }

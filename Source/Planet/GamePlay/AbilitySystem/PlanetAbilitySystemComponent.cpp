@@ -69,7 +69,7 @@ UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(FGam
 	AActor* Owner = GetOwner();
 	check(Owner);
 
-	Cast<UPlanetGameplayAbility>(Spec.Ability)->InitalDefaultTags();
+	// Cast<UPlanetGameplayAbility>(Spec.Ability)->InitalDefaultTags();
 
 	auto AbilityInstance = NewObject<UPlanetGameplayAbility>(Owner, Ability->GetClass());
 	check(AbilityInstance);

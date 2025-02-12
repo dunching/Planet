@@ -105,7 +105,7 @@ public:
 		bool bWasCancelled
 	)override;
 
-	virtual	void InitalDefaultTags()override;
+	// virtual	void InitalDefaultTags()override;
 
 	virtual void Tick(float DeltaTime);
 

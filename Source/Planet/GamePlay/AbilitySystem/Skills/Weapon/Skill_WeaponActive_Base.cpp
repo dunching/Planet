@@ -128,20 +128,20 @@ void USkill_WeaponActive_Base::SetContinuePerform(bool bIsContinue_)
 	}
 }
 
-void USkill_WeaponActive_Base::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	// GetAssetTags(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
-	//
-	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
-	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
-	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
-	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
-	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
-	//
-	// ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
-}
+// void USkill_WeaponActive_Base::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// GetAssetTags(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+// 	//
+// 	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::Skill_CanBeInterrupted_Stagnation);
+// 	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_Stagnation);
+// 	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
+// 	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Charm);
+// 	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);
+// 	//
+// 	// ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
+// }
 
 bool USkill_WeaponActive_Base::GetNum(int32& Num) const
 {

@@ -95,28 +95,28 @@ void UCS_PeriodicStateModify_Purify::OnTaskTick(UAbilityTask_TimerHelper*, float
 {
 }
 
-void UCS_PeriodicStateModify_Purify::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-
-	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Purify);
-	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Purify);
-
-	TArray<FGameplayTag>Ary{
-		UGameplayTagsLibrary::State_Debuff_Stun,
-		UGameplayTagsLibrary::State_Debuff_Charm,
-		UGameplayTagsLibrary::State_Debuff_Fear,
-		UGameplayTagsLibrary::State_Debuff_Silent,
-		UGameplayTagsLibrary::State_Debuff_Slow,
-	};
-
-	for (const auto& Iter : Ary)
-	{
-		CancelAbilitiesWithTag.AddTag(Iter);
-	}
-
-	for (const auto& Iter : Ary)
-	{
-		BlockAbilitiesWithTag.AddTag(Iter);
-	}
-}
+// void UCS_PeriodicStateModify_Purify::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+//
+// 	// AbilityTags.AddTag(UGameplayTagsLibrary::State_Buff_Purify);
+// 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_Purify);
+//
+// 	TArray<FGameplayTag>Ary{
+// 		UGameplayTagsLibrary::State_Debuff_Stun,
+// 		UGameplayTagsLibrary::State_Debuff_Charm,
+// 		UGameplayTagsLibrary::State_Debuff_Fear,
+// 		UGameplayTagsLibrary::State_Debuff_Silent,
+// 		UGameplayTagsLibrary::State_Debuff_Slow,
+// 	};
+//
+// 	for (const auto& Iter : Ary)
+// 	{
+// 		CancelAbilitiesWithTag.AddTag(Iter);
+// 	}
+//
+// 	for (const auto& Iter : Ary)
+// 	{
+// 		BlockAbilitiesWithTag.AddTag(Iter);
+// 	}
+// }

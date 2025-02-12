@@ -22,7 +22,7 @@ void UBasicFuturesBase::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, 
 	}
 }
 
-void UBasicFuturesBase::InitalDefaultTags()
-{
-	Super::InitalDefaultTags();
-}
+// void UBasicFuturesBase::InitalDefaultTags()
+// {
+// 	Super::InitalDefaultTags();
+// }
