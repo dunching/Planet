@@ -38,6 +38,8 @@
 #include "PlanetWorldSettings.h"
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
+#include "ChallengeSystem.h"
+#include "OpenWorldSystem.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
 	TEXT("PlanetPlayerController.DrawControllerRotation"),
@@ -441,6 +443,22 @@ UEventSubjectComponent* APlanetPlayerController::GetEventSubjectComponent() cons
 	return EventSubjectComponentPtr;
 }
 
+void APlanetPlayerController::EntryChallengeLevel_Implementation(const TArray<FString>& Args)
+{
+	if (Args[0] == TEXT("ReturnOpenWorld"))
+	{
+		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kReturnOpenWorld, this);
+	}
+	else if (Args[0] == TEXT("Test1"))
+	{
+		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kTest1, this);
+	}
+	else if (Args[0] == TEXT("Test2"))
+	{
+		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kTest2, this);
+	}
+}
+
 void APlanetPlayerController::BindPCWithCharacter()
 {
 }
@@ -672,6 +690,11 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray<FString>& 
 
 void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 {
+	if (!GroupManaggerPtr)
+	{
+		return;
+	}
+	
 	OnGroupManaggerReady(GroupManaggerPtr);
 
 	// auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));

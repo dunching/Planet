@@ -65,8 +65,10 @@ UGameOptions::UGameOptions(const FObjectInitializer& ObjectInitializer):
 
 UGameOptions* UGameOptions::GetInstance()
 {
-	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
-	return WorldSetting->GetGameOptions();
+	// auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
+	// return WorldSetting->GetGameOptions();
+	
+	return GEngine ? CastChecked<UGameOptions>(GEngine->GetGameUserSettings()) : nullptr;
 }
 
 int32 UGameOptions::MaxTeammateNum = 5;

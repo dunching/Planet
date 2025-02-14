@@ -93,6 +93,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Character_GrowthAttribute;
 	
+	// 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataLayer")
+	TSoftObjectPtr<UDataTable> DataTable_Teleport;
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Talent")
 	TMap<EPointPropertyType, UPAD_Talent_Property*> PAD_Talent_PropertyMap;
 	

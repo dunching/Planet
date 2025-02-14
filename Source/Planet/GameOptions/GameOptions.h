@@ -2,6 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/GameUserSettings.h"
 
 #include <GenerateType.h>
 
@@ -27,7 +28,7 @@ public:
 };
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UGameOptions : public UObject
+class PLANET_API UGameOptions : public UGameUserSettings
 {
 	GENERATED_BODY()
 

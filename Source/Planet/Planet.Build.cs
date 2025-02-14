@@ -28,7 +28,9 @@ public class Planet : ModuleRules
         PublicDefinitions.Add("TESTRAFFLE = 1");
 
         PublicIncludePaths.Add("Planet");
+        PublicIncludePaths.Add("Planet/OpenWorld");
         PublicIncludePaths.Add("Planet/GuideSystem");
+        PublicIncludePaths.Add("Planet/ChallengeSystem");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideInteraction");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideThread");
@@ -185,6 +187,7 @@ public class Planet : ModuleRules
             "NetCore",
 
             "Tools",
+            "CommonUser",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {

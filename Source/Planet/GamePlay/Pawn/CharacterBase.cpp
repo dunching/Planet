@@ -118,6 +118,12 @@ void ACharacterBase::BeginPlay()
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
 
 	OnMoveSpeedChangedImp(CharacterAttributeSetPtr->GetMoveSpeed());
+
+	// 这里是用于传送时，重新生成这个Character绑定之前的GroupManager数据
+	if (GroupManaggerPtr)
+	{
+		OnRep_GroupSharedInfoChanged();
+	}
 }
 
 void ACharacterBase::Destroyed()
@@ -446,6 +452,11 @@ void ACharacterBase::OnHPChanged(const FOnAttributeChangeData& CurrentValue)
 
 void ACharacterBase::OnRep_GroupSharedInfoChanged()
 {
+	if (!GroupManaggerPtr)
+	{
+		return;
+	}
+	
 	OnGroupManaggerReady(GroupManaggerPtr);
 
 #if UE_EDITOR || UE_CLIENT

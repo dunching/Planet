@@ -83,6 +83,9 @@ public:
 #pragma region CMD
 
 	UFUNCTION(Server, Reliable)
+	void EntryChallengeLevel(const TArray< FString >& Args);
+
+	UFUNCTION(Server, Reliable)
 	void MakeTrueDamege(const TArray<FString>& Args);
 
 	UFUNCTION(Server, Reliable)

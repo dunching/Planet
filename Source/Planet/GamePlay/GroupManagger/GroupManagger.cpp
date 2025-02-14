@@ -15,6 +15,14 @@ AGroupManagger::AGroupManagger(const FObjectInitializer& ObjectInitializer):
 	SetReplicatingMovement(false);
 	SetNetUpdateFrequency(1.f);
 
+	// Note: this is very important to set to false. Though all replication infos are spawned at run time, during seamless travel
+	// they are held on to and brought over into the new world. In ULevel::InitializeActors, these PlayerStates may be treated as map/startup actors
+	// and given static NetGUIDs. This also causes their deletions to be recorded and sent to new clients, which if unlucky due to name conflicts,
+	// may end up deleting the new PlayerStates they had just spaned.
+	bNetLoadOnClient = false;
+
+	bIsSpatiallyLoaded = false;
+
 	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(UTeamMatesHelperComponent::ComponentName);
 	InventoryComponentPtr = CreateDefaultSubobject<UInventoryComponent>(UInventoryComponent::ComponentName);
 	
