@@ -63,16 +63,21 @@ void UOpenWorldSubSystem::ForeachTeleportRow(
 					Value.DLS,
 					EDataLayerRuntimeState::Activated))
 			{
-				auto TeleportPtr = Value.TeleportRef.LoadSynchronous();
-				const auto Pt = TeleportPtr->GetActorLocation();
-				const auto Rot = TeleportPtr->GetActorRotation();
-				if (PCPtr->GetPawn()->TeleportTo(Pt, Rot)
+				PRINTINVOKEWITHSTR(
+					FString(TEXT("SetDataLayerRuntimeState Success!")
+					));
+			}
+			
+			auto TeleportPtr = Value.TeleportRef.LoadSynchronous();
+			const auto TeleportTransform = TeleportPtr->GetLandTransform();
+			if (PCPtr->GetPawn()->TeleportTo(
+				TeleportTransform.GetLocation(), TeleportTransform.GetRotation().Rotator()
 				)
-				{
-					PRINTINVOKEWITHSTR(
-						FString(TEXT("Teleport Success!")
-						));
-				}
+			)
+			{
+				PRINTINVOKEWITHSTR(
+					FString(TEXT("Teleport Success!")
+					));
 			}
 		}
 		else

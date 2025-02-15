@@ -142,7 +142,8 @@ void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_AutonomousOnly);
+	// DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_AutonomousOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_InitialOnly);
 
 	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);
 	// DOREPLIFETIME(ThisClass, CharacterAttributeSetPtr);
@@ -212,6 +213,16 @@ ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 void UCharacterAttributesComponent::OnRep_GetCharacterProxyID()
 {
 	PRINTINVOKEINFO();
+	
+	bCharacterIDIsReplicated = true;
+
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	CharacterPtr->OnRep_GroupSharedInfoChanged();
 }
 
 void UCharacterAttributesComponent::OnRep_CharacterID()

@@ -112,7 +112,7 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 				if (AICharacterPtr)
 				{
 					AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
-					AICharacterPtr->SetCharacterID(CharacterProxySPtr->GetID());
+					// AICharacterPtr->SetCharacterID(CharacterProxySPtr->GetID());
 				}
 			}
 		}

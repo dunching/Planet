@@ -27,4 +27,6 @@ namespace TextCollect
 	TEXTCOLLECT(EntryActionProcessor);
 	
 	TEXTCOLLECT(ViewAllocationMenu);
+	
+	TEXTCOLLECT(ViewGroupmateMenu);
 }

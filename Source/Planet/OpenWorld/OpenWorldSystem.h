@@ -15,6 +15,7 @@ UENUM(BlueprintType)
 enum class ETeleport : uint8
 {
 	kReturnOpenWorld,
+	kTeleport_1,
 	kTest1,
 	kTest2,
 };
@@ -38,10 +39,7 @@ struct PLANET_API FTableRow_Teleport : public FTableRowBase
 };
 
 /*
- * 挑战/爬塔关卡系统
- * 如传送副本之类
- * 我们会将一些挑战关卡放置在世界分区关卡，使用数据层的方式去加载或隐藏
- * 类似云顶的效果
+ * 传送
  */
 UCLASS()
 class PLANET_API UOpenWorldSubSystem : public UWorldSubsystem

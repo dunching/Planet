@@ -6,8 +6,10 @@
 
 #include "Teleport.generated.h"
 
-class UNiagaraComponent;
+class UStaticMeshComponent;
+class USceneComponent;
 class UWidgetComponent;
+class UBillboardComponent;
 
 /**
  *
@@ -19,6 +21,21 @@ class PLANET_API ATeleport : public AActor
 
 public:
 
+	ATeleport(const FObjectInitializer& ObjectInitializer);
+
+	FTransform GetLandTransform() const;
+	
 protected:
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Display)
+	TObjectPtr<UStaticMeshComponent> StaticComponentPtr = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Display)
+	TObjectPtr<USceneComponent> LandPtComponentPtr = nullptr;
+
+#if WITH_EDITORONLY_DATA
+	UPROPERTY()
+	TObjectPtr<UBillboardComponent> WidgetComponentPtr = nullptr;
+#endif
+	
 };

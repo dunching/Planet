@@ -88,6 +88,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UFUNCTION()
+	virtual void OnRep_GroupSharedInfoChanged();
+
 	AGroupManagger* GetGroupSharedInfo()const;
 
 	UInventoryComponent* GetInventoryComponent()const;
@@ -147,9 +150,6 @@ protected:
 	virtual void SpawnDefaultController()override;
 
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
-
-	UFUNCTION()
-	virtual void OnRep_GroupSharedInfoChanged();
 
 	UFUNCTION(Server, Reliable)
 	virtual void InteractionSceneObj_Server(ASceneActor* SceneObjPtr);

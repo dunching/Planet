@@ -449,6 +449,10 @@ void APlanetPlayerController::EntryChallengeLevel_Implementation(const TArray<FS
 	{
 		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kReturnOpenWorld, this);
 	}
+	else if (Args[0] == TEXT("Teleport"))
+	{
+		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kTeleport_1, this);
+	}
 	else if (Args[0] == TEXT("Test1"))
 	{
 		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kTest1, this);

@@ -60,14 +60,14 @@ void FTeamConfigure::UpdateTeammateConfig(const FTeammate&Teammate)
 			}
 			else
 			{
-				TeamConfigureAry[Teammate.TeamIndex].SetNum(Teammate.IndexInTheTeam);
+				TeamConfigureAry[Teammate.TeamIndex].SetNumZeroed(Teammate.IndexInTheTeam + 1);
 				TeamConfigureAry[Teammate.TeamIndex][Teammate.IndexInTheTeam] = Teammate.CharacterProxyID;
 			}
 		}
 		else
 		{
-			TeamConfigureAry.SetNum(Teammate.TeamIndex);
-			TeamConfigureAry[Teammate.TeamIndex].SetNum(Teammate.IndexInTheTeam);
+			TeamConfigureAry.SetNumZeroed(Teammate.TeamIndex + 1);
+			TeamConfigureAry[Teammate.TeamIndex].SetNumZeroed(Teammate.IndexInTheTeam + 1);
 			TeamConfigureAry[Teammate.TeamIndex][Teammate.IndexInTheTeam] = Teammate.CharacterProxyID;
 		}
 	}

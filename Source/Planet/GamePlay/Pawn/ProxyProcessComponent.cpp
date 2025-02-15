@@ -86,7 +86,7 @@ void UProxyProcessComponent::ActiveWeaponImp()
 
 	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
-
+	
 	if (WeaponSocket_1.IsValid())
 	{
 		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);

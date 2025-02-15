@@ -1,4 +1,3 @@
-
 #include "GameplayCommand.h"
 
 #include "InputProcessorSubSystem.h"
@@ -7,6 +6,7 @@
 #include "HumanRegularProcessor.h"
 #include "PlanetPlayerController.h"
 #include "ChallengeSystem.h"
+#include "HumanViewTalentAllocation.h"
 
 void GameplayCommand::ViewAllocationMenu()
 {
@@ -16,6 +16,11 @@ void GameplayCommand::ViewAllocationMenu()
 void GameplayCommand::EntryActionProcessor()
 {
 	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+}
+
+void GameplayCommand::ViewGroupmateMenu()
+{
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewTalentAllocation>();
 }
 
 void GameplayCommand::EntryChallengeLevel(const TArray<FString>& Args)

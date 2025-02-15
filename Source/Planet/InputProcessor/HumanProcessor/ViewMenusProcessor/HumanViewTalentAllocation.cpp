@@ -35,6 +35,8 @@ namespace HumanProcessor
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
 		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(true);
+		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kMenuLayout);
+		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kGroupManagger);
 
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
@@ -51,6 +53,9 @@ namespace HumanProcessor
 
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
 
+		//
+		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
+		
 		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
 		if (PlayerPCPtr)
 		{

@@ -377,8 +377,6 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::GKeyPressed()
 	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewTalentAllocation>();
-
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (!OnwerActorPtr)
 		{

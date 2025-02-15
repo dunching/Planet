@@ -195,6 +195,15 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 	{
 		FActorSpawnParameters SpawnParameters;
 
+		SpawnParameters.CustomPreSpawnInitalization = [this](auto ActorPtr)
+		{
+			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+			if (AICharacterPtr)
+			{
+				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(GetID());
+			}
+		};
+		
 		Result =
 			InventoryComponentPtr->GetWorld()->SpawnActor<AHumanCharacter_AI>(
 				GetDT_CharacterType()->CharacterClass, Transform, SpawnParameters);

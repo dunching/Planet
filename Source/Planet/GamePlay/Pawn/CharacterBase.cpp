@@ -456,12 +456,21 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 	{
 		return;
 	}
-	
-	OnGroupManaggerReady(GroupManaggerPtr);
 
-#if UE_EDITOR || UE_CLIENT
-	if (GetLocalRole() < ROLE_Authority)
+#if UE_EDITOR || UE_SERVER
+	if (GetLocalRole() > ROLE_SimulatedProxy)
 	{
+		OnGroupManaggerReady(GroupManaggerPtr);
+	}
+#endif
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		if (GetCharacterAttributesComponent()->bCharacterIDIsReplicated)
+		{
+			OnGroupManaggerReady(GroupManaggerPtr);
+		}
 	}
 #endif
 }

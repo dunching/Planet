@@ -55,9 +55,15 @@ UGameOptions::UGameOptions(const FObjectInitializer& ObjectInitializer):
 			// UTextSubSystem::GetInstance()->GetText(TextCollect::EntryActionProcessor)
 			),
 		FGameplayFeatureKeyMap(
-			EKeys::Q,
+			EKeys::B,
 			TEXT("ViewAllocationMenu"),
 			TextCollect::ViewAllocationMenu
+			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
+			),
+		FGameplayFeatureKeyMap(
+			EKeys::G,
+			TEXT("ViewGroupmateMenu"),
+			TextCollect::ViewGroupmateMenu
 			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
 			),
 	});

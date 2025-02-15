@@ -73,7 +73,7 @@ public:
 	static int32 MaxTeammateNum;
 
 protected:
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	// UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<FGameplayFeatureKeyMap> GameplayFeatureKeyMapAry;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
