@@ -47,15 +47,15 @@ void AWeapon_Bow::AttachToCharacter(ACharacterBase* CharacterPtr)
 	Super::AttachToCharacter(CharacterPtr);
 
 	// 注意：这里使用Lyra动画，添加到这个插槽之后Transform不正确，还不知道怎么改
-	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform);
+	AttachToComponent(CharacterPtr->GetCopyPoseMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	BowActorPtr->AttachToComponent(
-		CharacterPtr->GetMesh(),
+		CharacterPtr->GetCopyPoseMesh(),
 		FAttachmentTransformRules::KeepRelativeTransform,
 	                               Bow_Socket);
 	
 	QuiverActorPtr->AttachToComponent(
-		CharacterPtr->GetMesh(),
+		CharacterPtr->GetCopyPoseMesh(),
 		FAttachmentTransformRules::KeepRelativeTransform,
 	                                  Quiver_Socket
 	                                  );

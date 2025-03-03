@@ -75,6 +75,13 @@ public:
 
 	bool IsMember(const FGuid& CharacterID)const;
 
+	bool TeleportTo(
+		const FVector& DestLocation,
+		const FRotator& DestRotation,
+		bool bIsATest=false,
+		bool bNoCheck=false
+		);
+	
 	TWeakObjectPtr<ACharacterBase> GetKnowCharacter()const;
 
 	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;

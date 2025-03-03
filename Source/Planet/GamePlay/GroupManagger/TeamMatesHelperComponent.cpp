@@ -180,6 +180,24 @@ bool UTeamMatesHelperComponent::IsMember(const FGuid& CharacterID) const
 	return false;
 }
 
+bool UTeamMatesHelperComponent::TeleportTo(
+	const FVector& DestLocation,
+	const FRotator& DestRotation,
+	bool bIsATest,
+	bool bNoCheck)
+{
+	for (auto Iter : MembersSet)
+	{
+		auto TargetActorPtr = 	Iter->GetCharacterActor();
+		if (TargetActorPtr.IsValid())
+		{
+			TargetActorPtr->TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
+		}
+	}
+
+	return true;	
+}
+
 void UTeamMatesHelperComponent::SwitchTeammateOption(ETeammateOption InTeammateOption)
 {
 	TeammateOption = InTeammateOption;

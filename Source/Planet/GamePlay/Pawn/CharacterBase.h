@@ -25,6 +25,7 @@ class ASceneActor;
 class UCharacterTitle;
 class UCharacterRisingTips;
 
+class USkeletalMeshComponent;
 class UAnimInstanceBase;
 class UEquipmentInteractionComponent;
 class UHoldItemComponent;
@@ -111,6 +112,8 @@ public:
 
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const;
 	
+	USkeletalMeshComponent* GetCopyPoseMesh() const;
+	
 	template<typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
@@ -161,6 +164,9 @@ protected:
 		EGroupMateChangeType GroupMateChangeType,
 		const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
 	);
+
+	UPROPERTY(Category=Character, VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USkeletalMeshComponent> CopyPoseMeshPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Data)
 	TObjectPtr<UCharacterAttributesComponent> CharacterAttributesComponentPtr = nullptr;

@@ -43,6 +43,9 @@ struct PLANET_API FStateTreeDashToLeaderTaskInstanceData
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 };
 
+/*
+ *	距离玩家过远时，或自动寻路跟随玩家失败时 强制冲刺至玩家身边
+ */
 USTRUCT()
 struct PLANET_API FSTT_DashToLeader : public FStateTreeAIActionTaskBase
 {

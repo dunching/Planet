@@ -12,6 +12,7 @@
 #include "PlayerComponent.generated.h"
 
 class USceneComponent;
+class AHumanCharacter_Player;
 
 /**
  *
@@ -24,10 +25,19 @@ class PLANET_API UPlayerComponent :
 
 public:
 
+	using FOwnerType = AHumanCharacter_Player;
+
 	static FName ComponentName;
 	
 	UPlayerComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay()override;
+
+	virtual bool TeleportTo(
+		const FVector& DestLocation,
+		const FRotator& DestRotation,
+		bool bIsATest=false,
+		bool bNoCheck=false
+		);
 	
 };

@@ -13,6 +13,7 @@
 
 #include "GroupManagger.generated.h"
 
+class APlanetPlayerController;
 class AHumanCharacter;
 class ACharacterBase;
 class IPlanetControllerInterface;
@@ -54,6 +55,8 @@ public:
 
 	UInventoryComponent* GetHoldingItemsComponent();
 
+	void InitialByPlayerController(APlanetPlayerController*PCPtr);
+	
 	FGuid GroupID;
 	
 protected:

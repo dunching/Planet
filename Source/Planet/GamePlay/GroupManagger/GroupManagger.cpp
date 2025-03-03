@@ -1,9 +1,11 @@
 
 #include "GroupManagger.h"
 
+#include "HumanCharacter.h"
 #include "TeamMatesHelperComponent.h"
 
 #include "InventoryComponent.h"
+#include "PlanetPlayerController.h"
 #include "UGSAbilitySystemComponent.h"
 
 AGroupManagger::AGroupManagger(const FObjectInitializer& ObjectInitializer):
@@ -61,4 +63,9 @@ UTeamMatesHelperComponent* AGroupManagger::GetTeamMatesHelperComponent()
 UInventoryComponent* AGroupManagger::GetHoldingItemsComponent()
 {
 	return InventoryComponentPtr;
+}
+
+void AGroupManagger::InitialByPlayerController(APlanetPlayerController* PCPtr)
+{
+	TeamMatesHelperComponentPtr->OwnerCharacterProxyPtr = PCPtr->GetPawn<AHumanCharacter>()->GetCharacterProxy();
 }

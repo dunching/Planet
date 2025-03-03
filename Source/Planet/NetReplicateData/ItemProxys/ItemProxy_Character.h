@@ -137,6 +137,7 @@ public:
 
 	TMap<FGameplayTag, FCharacterSocket>GetSockets()const;;
 
+	// 获取这个代理的CharacterActor，如果有的话
 	TWeakObjectPtr<FPawnType>GetCharacterActor()const;
 	
 	void UpdateSocket(const FCharacterSocket&Socket);

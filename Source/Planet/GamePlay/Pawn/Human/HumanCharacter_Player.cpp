@@ -99,6 +99,18 @@ void AHumanCharacter_Player::UnPossessed()
 	Super::UnPossessed();
 }
 
+bool AHumanCharacter_Player::TeleportTo(
+	const FVector& DestLocation,
+	const FRotator& DestRotation,
+	bool bIsATest,
+	bool bNoCheck
+	)
+{
+	PlayerComponentPtr->TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
+	
+	return Super::TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
+}
+
 void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 {
 	Super::OnRep_GroupSharedInfoChanged();

@@ -30,7 +30,7 @@ void AWeapon_PickAxe::AttachToCharacter(ACharacterBase* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 
-	AttachToComponent(CharacterPtr->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
+	AttachToComponent(CharacterPtr->GetCopyPoseMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
 }
 
 USkeletalMeshComponent* AWeapon_PickAxe::GetMesh()

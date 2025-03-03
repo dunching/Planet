@@ -54,6 +54,27 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
+	if (GetMesh())
+	{
+		GetMesh()->SetHiddenInGame(true);
+
+		GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
+		
+		CopyPoseMeshPtr = CreateOptionalDefaultSubobject<USkeletalMeshComponent>(TEXT("CopyMesh"));
+		if (CopyPoseMeshPtr)
+		{
+			CopyPoseMeshPtr->AlwaysLoadOnClient = true;
+			CopyPoseMeshPtr->AlwaysLoadOnServer = true;
+			CopyPoseMeshPtr->bOwnerNoSee = false;
+			CopyPoseMeshPtr->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPose;
+			CopyPoseMeshPtr->bCastDynamicShadow = true;
+			CopyPoseMeshPtr->bAffectDynamicIndirectLighting = true;
+			CopyPoseMeshPtr->PrimaryComponentTick.TickGroup = TG_PrePhysics;
+			CopyPoseMeshPtr->SetupAttachment(GetMesh());
+			CopyPoseMeshPtr->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		}
+	}
+	
 	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
 		UCharacterAttributesComponent::ComponentName
 	);
@@ -82,6 +103,11 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 
 ACharacterBase::~ACharacterBase()
 {
+}
+
+void ACharacterBase::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
 }
 
 void ACharacterBase::BeginPlay()
@@ -146,11 +172,6 @@ void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	OriginalAIController = nullptr;
 
 	Super::EndPlay(EndPlayReason);
-}
-
-void ACharacterBase::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
 }
 
 void ACharacterBase::PostInitializeComponents()
@@ -273,6 +294,11 @@ UCharacterTitleComponent* ACharacterBase::GetCharacterTitleComponent() const
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
 	return GetInventoryComponent()->FindProxy_Character(GetCharacterAttributesComponent()->GetCharacterID());
+}
+
+USkeletalMeshComponent* ACharacterBase::GetCopyPoseMesh() const
+{
+	return CopyPoseMeshPtr;
 }
 
 void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)

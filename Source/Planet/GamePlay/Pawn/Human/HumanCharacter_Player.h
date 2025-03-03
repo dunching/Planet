@@ -70,7 +70,14 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 
 	virtual void UnPossessed() override;
-
+	
+	virtual bool TeleportTo(
+		const FVector& DestLocation,
+		const FRotator& DestRotation,
+		bool bIsATest=false,
+		bool bNoCheck=false
+		)override;
+	
 	virtual void OnRep_GroupSharedInfoChanged() override;
 
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;

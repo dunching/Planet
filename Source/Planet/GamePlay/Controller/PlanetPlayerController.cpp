@@ -283,6 +283,11 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 		// 注意：PC并非是在此处绑定，这段仅为测试
 		BindPCWithCharacter();
 
+		if (GroupManaggerPtr)
+		{
+			GroupManaggerPtr->InitialByPlayerController(this);
+		}
+		
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
 #if UE_EDITOR || UE_SERVER
@@ -493,6 +498,7 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
 			AGroupManagger::StaticClass(), SpawnParameters
 		);
+		
 		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
