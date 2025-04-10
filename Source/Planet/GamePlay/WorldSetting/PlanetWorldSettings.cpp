@@ -20,13 +20,3 @@ USceneProxyExtendInfoMap* APlanetWorldSettings::GetSceneProxyExtendInfoMap()cons
 {
 	return SceneProxyExtendInfoMapPtr.LoadSynchronous();
 }
-
-UGameOptions* APlanetWorldSettings::GetGameOptions()
-{
-	if (!GameOptionsPtr)
-	{
-		GameOptionsPtr = NewObject<UGameOptions>(GetWorld(), GameOptionsClass);
-	}
-
-	return GameOptionsPtr;
-}

@@ -72,49 +72,6 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	}
 	else
 	{
-		TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-		const auto DataSource = UGameplayTagsLibrary::DataSource_Regular;
-
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-			CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-
-		// 基础回复
-		{
-			// GAEventData.DataModify.Add(ECharacterPropertyType::HP, CharacterAttributes.HP_Replay.GetCurrentValue());
-			//
-			// if (
-			// 	CharacterPtr->GetCharacterMovement()->Velocity.Length() > 0.f
-			// 	)
-			// {
-			// 	GAEventData.DataModify.Add(ECharacterPropertyType::PP, FMath::Max(1, CharacterAttributes.PP_Replay.GetCurrentValue() / 2));
-			// }
-			// else
-			// {
-			// 	GAEventData.DataModify.Add(ECharacterPropertyType::PP, CharacterAttributes.PP_Replay.GetCurrentValue());
-			// }
-			//
-			// if (
-			// 	CharacterPtr->GetCharacterAbilitySystemComponent()->IsInFighting()
-			// 	)
-			// {
-			// }
-			// else
-			// {
-			// 	GAEventData.DataModify.Add(ECharacterPropertyType::Mana, CharacterAttributes.Mana_Replay.GetCurrentValue());
-			// }
-		}
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

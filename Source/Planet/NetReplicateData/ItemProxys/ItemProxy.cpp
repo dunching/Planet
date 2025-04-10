@@ -196,7 +196,8 @@ void FAllocationbleProxy::SetAllocationCharacterProxy(
 	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag
 )
 {
-	// 
+	// 这里做一个转发，
+	// 同步到服务器
 	if (InventoryComponentPtr->GetNetMode() == NM_Client)
 	{
 		if (InAllocationCharacterProxyPtr)

@@ -1,7 +1,7 @@
 #include "ConversationLayout.h"
 
 #include "GuideActor.h"
-#include "GuideInteractionActor.h"
+#include "GuideInteraction.h"
 #include "GuideSystemStateTreeComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -55,6 +55,8 @@ void UConversationLayout::Enable()
 
 		if (CurrentActionSPtr)
 		{
+			CharacterPtr = CurrentActionSPtr->CharacterPtr;
+			
 			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
 			if (UIPtr)
 			{
@@ -72,11 +74,9 @@ void UConversationLayout::DisEnable()
 {
 	GetOptions()->CloseUI();
 
-	if (GuideInteractionActorPtr)
+	if (CharacterPtr)
 	{
-		GuideInteractionActorPtr->OnGuideInteractionEnd.Clear();
-		GuideInteractionActorPtr->GetGuideSystemStateTreeComponent()->Cleanup();
-		GuideInteractionActorPtr = nullptr;
+		CharacterPtr->GetSceneActorInteractionComponent()->StopInteractionItem();
 	}
 }
 
@@ -100,37 +100,12 @@ void UConversationLayout::CloseOption()
 	}
 }
 
-void UConversationLayout::SelectedInteractionItem(const TSubclassOf<AGuideInteractionActor>& GuideInteractionClass)
+void UConversationLayout::SelectedInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& GuideInteractionClass)
 {
-	auto CurrentActionSPtr =
-		DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithNPCProcessor>(
-			UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
-		);
-	if (CurrentActionSPtr)
+	if (CharacterPtr)
 	{
-		FActorSpawnParameters SpawnParameters;
-
-		GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteractionActor>(
-			GuideInteractionClass, SpawnParameters
-		);
-
-		if (GuideInteractionActorPtr)
-		{
-			auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
-
-			GuideInteractionActorPtr->PlayerCharacter = PlayerCharacterPtr;
-		}
-		GuideInteractionActorPtr->TargetCharacter = CurrentActionSPtr->CharacterPtr;
-
-		GuideInteractionActorPtr->OnGuideInteractionEnd.AddLambda([]
-		{
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-		});
-
-		Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
-			->GetHUD<AMainHUD>()
-			->GetMainHUDLayout()
-			->GetConversationLayout()
-			->CloseOption();
+		CharacterPtr->GetSceneActorInteractionComponent()->StartInteractionItem(GuideInteractionClass);
 	}
+
+	CloseOption();
 }

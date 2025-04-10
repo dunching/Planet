@@ -8,7 +8,7 @@
 
 #include "GenerateType.h"
 #include "BaseData.h"
-#include "GAEvent_Helper.h"
+
 #include "GameplayTagContainer.h"
 
 #include "CharacterAttibutes.generated.h"
@@ -127,8 +127,6 @@ struct PLANET_API FCharacterAttributes final
 {
 	GENERATED_USTRUCT_BODY()
 
-	using FProcessedGAEvent = TCallbackHandleContainer<void(const FGameplayAbilityTargetData_GAReceivedEvent&)>;
-
 	FCharacterAttributes();
 
 	virtual ~FCharacterAttributes();
@@ -137,8 +135,6 @@ struct PLANET_API FCharacterAttributes final
 
 	void InitialData();
 
-	void ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
-
 	bool Identical(const FCharacterAttributes* Other, uint32 PortFlags) const;
 
 	bool operator==(const FCharacterAttributes& RightValue) const;
@@ -146,8 +142,6 @@ struct PLANET_API FCharacterAttributes final
 	const FBasePropertySet& GetHPReply()const;
 
 	const FBasePropertySet& GetPPReply()const;
-
-	FProcessedGAEvent ProcessedGAEvent;
 
 	// 基础 属性：力道、根骨、身法、洞察、天资
 #pragma region 

@@ -13,6 +13,7 @@
 #include "EffectsList.generated.h"
 
 struct FCharacterStateInfo;
+struct FGameplayEffectSpec;
 class UEffectItem;
 class ACharacterBase;
 class UCS_Base;

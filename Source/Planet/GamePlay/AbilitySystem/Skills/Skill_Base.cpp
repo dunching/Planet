@@ -138,11 +138,6 @@ TArray<FActiveGameplayEffectHandle> USkill_Base::MyApplyGameplayEffectSpecToTarg
 	const FGameplayAbilityTargetDataHandle& TargetData
 ) const
 {
-	CharacterPtr->GetCharacterAbilitySystemComponent()->OnSendEventModifyData(
-		GetAbilitySystemComponentFromActorInfo(),
-		SpecHandle
-	);
-
 	return ApplyGameplayEffectSpecToTarget(AbilityHandle, ActorInfo, ActivationInfo, SpecHandle, TargetData);
 }
 

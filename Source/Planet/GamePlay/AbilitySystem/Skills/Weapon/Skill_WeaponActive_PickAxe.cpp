@@ -10,7 +10,7 @@
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
@@ -250,11 +250,6 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
 
-		// FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-		// 	CharacterPtr);
-		//
-		// GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
 		TSet<ACharacterBase*> TargetCharacterSet;
 		for (auto Iter : OutHits)
 		{
@@ -292,20 +287,6 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			SpecHandle,
 			TargetData
 		);
-		for (auto Iter : TargetCharacterSet)
-		{
-			// FGAEventData GAEventData(Iter, CharacterPtr);
-			//
-			// GAEventData.bIsWeaponAttack = true;
-			// GAEventData.AttackEffectType = EAttackEffectType::kNormalAttackEffect;
-			// GAEventData.SetBaseDamage(BaseDamage);
-			//
-			// GAEventDataPtr->DataAry.Add(GAEventData);
-
-		}
-
-		// auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		// ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

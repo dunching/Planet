@@ -402,10 +402,6 @@ void FPassiveSkillProxy::Allocation()
 				{
 					ModifyPropertyMap.Add(Iter);
 				}
-
-				AllocationCharacter->GetCharacterAbilitySystemComponent()->SendEvent2Self(
-					ModifyPropertyMap, GetProxyType()
-				);
 			}
 		}
 	}
@@ -418,9 +414,6 @@ void FPassiveSkillProxy::UnAllocation()
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto AllocationCharacter = GetAllocationCharacter();
-		AllocationCharacter->GetCharacterAbilitySystemComponent()->ClearData2Self(
-			GetAllData(), GetProxyType()
-		);
 	}
 #endif
 

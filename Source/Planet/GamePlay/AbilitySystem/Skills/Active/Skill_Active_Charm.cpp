@@ -16,7 +16,7 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -97,42 +97,6 @@ void USkill_Active_Charm::ExcuteTasks()
 				Params
 			);
 
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-			TSet<ACharacterBase*>TargetSet;
-			for (const auto& Iter : Result)
-			{
-				auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-				if (TargetCharacterPtr && !CharacterPtr->IsGroupmate(TargetCharacterPtr))
-				{
-					TargetSet.Add(TargetCharacterPtr);
-				}
-			}
-
-			// 伤害
-			for (const auto& Iter : TargetSet)
-			{
-				FGAEventData GAEventData(Iter, CharacterPtr);
-
-				GAEventData.SetBaseDamage(Damage);
-
-				GAEventDataPtr->DataAry.Add(GAEventData);
-			}
-			ICPtr->SendEventImp(GAEventDataPtr);
-
-			// 控制效果
-			for (const auto& Iter : TargetSet)
-			{
-				auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Charm(Duration);
-
-				GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-				GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = Iter;
-
-				ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-			}
 		}
 	}
 #endif

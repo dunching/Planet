@@ -7,13 +7,8 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
-#include "EffectsList.h"
-#include "UIManagerSubSystem.h"
-#include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "GameplayTagsLibrary.h"
 
 void USkill_Element_Gold::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -57,69 +52,6 @@ void USkill_Element_Gold::OnElementLevelChanged(int32 OldValue, int32 NewValue)
 
 void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
 {
-	if (CharacterPtr)
-	{
-		// if (!(
-		// 	GAPtr &&
-		// 	(GAPtr->GetCurrentAbilitySpecHandle() == CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventHandle)
-		// 	))
-		// {
-		// 	return;
-		// }
-
-		auto GA_SendPtr = Cast<UGAEvent_Send>(GAPtr);
-		if (!GA_SendPtr)
-		{
-			return;
-		}
-
-		const auto& EventData = GA_SendPtr->GetCurrentEventData();
-
-		auto GAEventPtr = dynamic_cast<const FGameplayAbilityTargetData_GASendEvent*>(EventData.TargetData.Get(0));
-		if (GAEventPtr && GAEventPtr->DataAry.IsValidIndex(0) && GAEventPtr->DataAry[0].bIsWeaponAttack)
-		{
-			auto RegisterRemoveBuff = [this]
-				{
-					if (RemoveBuffTask && RemoveBuffTask->IsActive())
-					{
-						RemoveBuffTask->ExternalCancel();
-					}
-
-					RemoveBuffTask = UAbilityTask_TimerHelper::DelayTask(this);
-					RemoveBuffTask->SetDuration(CountDown);
-					RemoveBuffTask->OnFinished.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr) {
-						RemoveBuff();
-						return true;
-						});
-					RemoveBuffTask->TickDelegate.BindLambda([this](UAbilityTask_TimerHelper* TaskPtr, float) {
-
-						});
-					RemoveBuffTask->ReadyForActivation();
-				};
-
-			switch (CurrentElementLevel)
-			{
-			case 3:
-			{
-				RegisterRemoveBuff();
-				if (CurrentBuffLevel < 3)
-				{
-					CurrentBuffLevel++;
-					AddBuff();
-				}
-			}
-			break;
-			case 6:
-			{
-			}
-			break;
-			case 9:
-			{
-			}
-			break;
-			}
-		}
-	}
 }
 
 void USkill_Element_Gold::AddBuff()
@@ -128,15 +60,6 @@ void USkill_Element_Gold::AddBuff()
 	{
 	case 3:
 	{
-		if (CharacterPtr)
-		{
-			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-			ModifyPropertyMap.Add(ECharacterPropertyType::CriticalHitRate, CurrentBuffLevel * CriticalHitRate);
-			ModifyPropertyMap.Add(ECharacterPropertyType::Evade, CurrentBuffLevel * Evade);
-
-			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(ModifyPropertyMap, SkillProxyPtr->GetProxyType());
-		}
 	}
 	break;
 	case 6:
@@ -154,6 +77,5 @@ void USkill_Element_Gold::RemoveBuff()
 {
 	if (CharacterPtr)
 	{
-		CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(GetAllData(), SkillProxyPtr->GetProxyType());
 	}
 }

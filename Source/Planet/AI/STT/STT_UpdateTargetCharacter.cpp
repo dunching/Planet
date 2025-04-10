@@ -29,12 +29,12 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::Tick(
 	const float DeltaTime
 ) const
 {
-	PerformMoveTask(Context);
+	PerformGameplayTask(Context);
 
 	return Super::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformMoveTask(FStateTreeExecutionContext& Context) const
+EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformGameplayTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 

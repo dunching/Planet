@@ -1,5 +1,7 @@
 #include "EventSubjectComponent.h"
 
+#include "ReceivedEventModifyDataCallback.h"
+
 FName UEventSubjectComponent::ComponentName = TEXT("EventSubjectComponent");
 
 UEventSubjectComponent::UEventSubjectComponent(const FObjectInitializer& ObjectInitializer) :

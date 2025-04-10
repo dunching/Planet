@@ -83,8 +83,6 @@ protected:
 	
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
-	virtual void InitialGroupSharedInfo();
-
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
 

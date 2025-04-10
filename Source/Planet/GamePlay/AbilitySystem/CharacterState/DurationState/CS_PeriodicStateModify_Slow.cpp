@@ -13,7 +13,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
+
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -90,25 +90,6 @@ void UCS_PeriodicStateModify_Slow::EndAbility(
 	bool bWasCancelled
 )
 {
-	for (const auto & Iter : MoveSpeedOffsetMap)
-	{
-		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
-	}
-
-	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-	GAEventData.DataSource = UGameplayTagsLibrary::State_Debuff_Slow;
-	GAEventData.DataModify = GetAllData();
-	GAEventData.bIsClearData = true;
-
-	GAEventDataPtr->DataAry.Add(GAEventData);
-
-	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -158,7 +139,6 @@ void UCS_PeriodicStateModify_Slow::PerformAction()
 			MyStruct.CharacterStateInfoSPtr->DataChanged();
 			MyStruct.SPtr = CurrentGameplayAbilityTargetDataSPtr;
 
-			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(MyStruct.CharacterStateInfoSPtr);
 
 			MoveSpeedOffsetMap.Add(
 				CurrentGameplayAbilityTargetDataSPtr->SpeedOffset,
@@ -177,31 +157,6 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 	const auto Temp = MoveSpeedOffsetMap;
 	for (auto Iter : Temp)
 	{
-		// 移除不生效的
-		if (Iter.Value.CharacterStateInfoSPtr->GetRemainTime() < 0.f)
-		{
-			MoveSpeedOffsetMap.Remove(Iter.Key);
-
-			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
-
-			GAEventDataPtr->TriggerCharacterPtr = Iter.Value.SPtr->TriggerCharacterPtr;
-
-			FGAEventData GAEventData(Iter.Value.SPtr->TargetCharacterPtr, Iter.Value.SPtr->TriggerCharacterPtr);
-
-			GAEventData.DataSource = Iter.Value.SPtr->Tag;
-			GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,0 } };
-			GAEventData.bIsClearData = true;
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-
-			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
-
-			CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Iter.Value.CharacterStateInfoSPtr);
-		}
-		else
-		{
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Iter.Value.CharacterStateInfoSPtr);
-		}
 	}
 
 	if (MoveSpeedOffsetMap.IsEmpty())
@@ -222,20 +177,6 @@ void UCS_PeriodicStateModify_Slow::OnTaskTick(UAbilityTask_TimerHelper*, float D
 		else
 		{
 			PreviouSpeed = Iter.Key;
-
-			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
-
-			GAEventDataPtr->TriggerCharacterPtr = Iter.Value.SPtr->TriggerCharacterPtr;
-
-			FGAEventData GAEventData(Iter.Value.SPtr->TargetCharacterPtr, Iter.Value.SPtr->TriggerCharacterPtr);
-
-			GAEventData.DataSource = UGameplayTagsLibrary::State_Debuff_Slow;
-			GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed, Iter.Key } };
-			GAEventData.bIsOverlapData = true;
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-
-			CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
 		}
 		break;
 	}

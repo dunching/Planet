@@ -6,17 +6,35 @@
 
 #include "ConversationComponent.h"
 #include "HumanCharacter.h"
+#include "SceneActorInteractionComponent.h"
 
 #include "HumanCharacter_Player.generated.h"
 
 // 是否开启、语句内容
 using FOnPlayerHaveNewSentence = TMulticastDelegate<void(bool, const FTaskNode_Conversation_SentenceInfo&)>;
 
+using FOnPlayerInteraction = TMulticastDelegate<void(ASceneActor*)>;
+
 class UPlayerComponent;
+class AHumanCharacter_AI;
 class USpringArmComponent;
 class UCameraComponent;
 
 class UInteractionList;
+
+/**
+ *
+ */
+UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
+class PLANET_API USceneCharacterPlayerInteractionComponent : public USceneActorInteractionComponent
+{
+	GENERATED_BODY()
+
+public:
+
+	FOnPlayerInteraction OnPlayerInteraction;
+	
+};
 
 /* 角色的会话组件
  * 比如角色在念某一段台词是需要显示一个气泡和音频播放
@@ -27,13 +45,19 @@ class PLANET_API UPlayerConversationComponent : public UConversationComponent
 	GENERATED_BODY()
 
 public:
-	virtual void DisplaySentence_Implementation(
-		const FTaskNode_Conversation_SentenceInfo& Sentence
+	virtual void DisplaySentence_Player(
+		const FTaskNode_Conversation_SentenceInfo&Sentence,
+		const std::function<void()>&SentenceStop
 	) override;
 
-	void CloseConversationborder_Implementation();
+	virtual void CloseConversationborder_Player()override;
 
 	FOnPlayerHaveNewSentence OnPlayerHaveNewSentence;
+
+	std::function<void()>SentenceStop;
+	
+protected:
+	
 };
 
 UCLASS()
@@ -44,17 +68,25 @@ class PLANET_API AHumanCharacter_Player : public AHumanCharacter
 public:
 	AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer);
 
-	virtual void InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr) override;
-
 	UCameraComponent* GetCameraComp();;
 
 	USpringArmComponent* GetCameraBoom();;
 
 	UPlayerConversationComponent* GetPlayerConversationComponent() const;
 
+	USceneCharacterPlayerInteractionComponent*GetSceneCharacterPlayerInteractionComponent()const;
+	
 	void UpdateSightActor();
 	
 	virtual TPair<FVector, FVector> GetCharacterViewInfo();
+
+	/**
+	 * 与场景中的可交互对象开始交互
+	 * @param SceneObjPtr 
+	 */
+	virtual void InteractionSceneActor(ASceneActor* SceneObjPtr);
+
+	virtual void InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr);
 
 	virtual void StartLookAt(ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr);
 
@@ -82,7 +114,8 @@ protected:
 
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
-	virtual void InitialGroupSharedInfo();
+	UFUNCTION(Server, Reliable)
+	virtual void InteractionSceneObj_Server(ASceneActor* SceneObjPtr);
 
 #if WITH_EDITORONLY_DATA
 

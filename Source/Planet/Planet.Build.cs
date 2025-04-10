@@ -31,6 +31,9 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/OpenWorld");
         PublicIncludePaths.Add("Planet/GuideSystem");
         PublicIncludePaths.Add("Planet/ChallengeSystem");
+        PublicIncludePaths.Add("Planet/ChallengeSystem/GuideActor");
+        PublicIncludePaths.Add("Planet/ChallengeSystem/STE");
+        PublicIncludePaths.Add("Planet/ChallengeSystem/STT");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideInteraction");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideThread");
@@ -105,6 +108,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/BuildingLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/EndangeredLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/ConversationLayout");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/ConversationLayout/PlayerConversationBorder");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/GroupManagger");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Backpacks");

@@ -18,7 +18,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
+
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -126,7 +126,6 @@ void ATractionPoint::Tick(float DeltaSeconds)
 
 				GameplayAbilityTargetData_StateModifyPtr->TractionPointPtr = this;
 
-				ICPtr->SendEventImp(GameplayAbilityTargetData_StateModifyPtr);
 			}
 		}
 	}
@@ -217,7 +216,6 @@ void UCS_RootMotion_Traction::EndAbility(
 )
 {
 	//
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -267,7 +265,6 @@ void UCS_RootMotion_Traction::ExcuteTasks()
 		CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
 		CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 		CharacterStateInfoSPtr->DataChanged();
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 	}
 #endif

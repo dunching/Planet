@@ -8,6 +8,8 @@
 
 #include "EventSubjectComponent.generated.h"
 
+struct FReceivedEventModifyDataCallback;
+
 /*
  * 事务由转发
  * 仅玩家具备

@@ -213,8 +213,12 @@ FGameplayTag UGameplayTagsLibrary::TalentSocket =
 FGameplayTag UGameplayTagsLibrary::Proxy_Weapon =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Weapon")));
 
+FGameplayTag UGameplayTagsLibrary::Proxy_Weapon_Test =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Weapon.Test")));
+
 FGameplayTag UGameplayTagsLibrary::Proxy_Weapon_Axe =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Weapon.Axe")));
+
 FGameplayTag UGameplayTagsLibrary::Proxy_Tool =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Tool")));
 
@@ -365,6 +369,7 @@ FGameplayTag UGameplayTagsLibrary::GEData_Duration =
 // 直接增加
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Addtive")));
+
 // 覆盖
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Override")));

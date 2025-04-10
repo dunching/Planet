@@ -33,8 +33,6 @@ void USkill_Active_Traction::EndAbility(
 		TractionPointPtr = nullptr;
 	}
 
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -51,14 +49,6 @@ void USkill_Active_Traction::PerformAction(
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
-
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
-
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -105,7 +95,6 @@ void USkill_Active_Traction::DurationDelegate(UAbilityTask_TimerHelper*, float C
 		{
 			CharacterStateInfoSPtr->TotalTime = CurrentIntervalTime;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}
 	}
 #endif

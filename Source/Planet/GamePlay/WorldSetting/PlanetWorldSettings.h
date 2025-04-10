@@ -30,9 +30,7 @@ public:
 
 	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap()const;
 	
-	UGameOptions* GetGameOptions();
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
 	TSubclassOf<AGuideMainThread>MainLineGuideClass;
 
 protected:

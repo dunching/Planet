@@ -43,23 +43,6 @@ void UBasicFutures_Running::IntervalTick(UAbilityTask_TimerHelper*, float Interv
 			RunningConsume.GetCurrentValue()
 		)
 		{
-			TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-				CharacterPtr);
-
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-			GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-
-			GAEventData.DataModify.Add(ECharacterPropertyType::PP, -RunningConsume.GetCurrentValue());
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 		else
 		{

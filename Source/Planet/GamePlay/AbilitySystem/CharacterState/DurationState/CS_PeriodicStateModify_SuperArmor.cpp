@@ -14,7 +14,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
+
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -80,7 +80,6 @@ void UCS_PeriodicStateModify_SuperArmor::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -110,14 +109,12 @@ void UCS_PeriodicStateModify_SuperArmor::PerformAction()
 	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
 	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 	CharacterStateInfoSPtr->DataChanged();
-	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 }
 
 void UCS_PeriodicStateModify_SuperArmor::OnTaskTick(UAbilityTask_TimerHelper*, float DeltaTime)
 {
 	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
-	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
 // void UCS_PeriodicStateModify_SuperArmor::InitalDefaultTags()

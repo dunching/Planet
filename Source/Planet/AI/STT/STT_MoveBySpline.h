@@ -163,7 +163,7 @@ struct PLANET_API FSTT_MoveBySpline : public FStateTreeAIActionTaskBase
 		FAIMoveRequest& MoveRequest
 	) const;
 
-	virtual EStateTreeRunStatus PerformMoveTask(
+	virtual EStateTreeRunStatus PerformGameplayTask(
 		FStateTreeExecutionContext& Context, 
 		AAIController& Controller
 	) const;

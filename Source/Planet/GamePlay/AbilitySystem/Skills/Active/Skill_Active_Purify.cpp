@@ -16,7 +16,7 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -108,14 +108,6 @@ void USkill_Active_Purify::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Purify;
-
-		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 	}
 }
 

@@ -13,7 +13,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
+
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -105,7 +105,6 @@ void UCS_RootMotion_FlyAway::EndAbility(
 )
 {
 	//
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 	CharacterStateInfoSPtr = nullptr;
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -146,7 +145,6 @@ void UCS_RootMotion_FlyAway::UpdateRootMotionImp(const TSharedPtr<FGameplayAbili
 			CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 			CharacterStateInfoSPtr->RefreshTime();
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 
 			if (AbilityTask_TimerHelperPtr)
 			{
@@ -162,7 +160,6 @@ void UCS_RootMotion_FlyAway::UpdateRootMotionImp(const TSharedPtr<FGameplayAbili
 			CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
 			CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 			// 
 			AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -204,7 +201,6 @@ void UCS_RootMotion_FlyAway::ExcuteTasks()
 			CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
 			CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 			// 
 			AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -253,6 +249,5 @@ void UCS_RootMotion_FlyAway::OnDuration(UAbilityTask_TimerHelper* InTaskPtr, flo
 	{
 		CharacterStateInfoSPtr->TotalTime = CurrentInterval;
 
-		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 	}
 }

@@ -8,7 +8,7 @@
 #include <AIController.h>
 
 #include "GenerateType.h"
-#include "GAEvent_Helper.h"
+
 
 #include "CharacterRisingTips.generated.h"
 
@@ -33,8 +33,6 @@ public:
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 
-	bool ProcessGAEVent(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
-
 protected:
 
 	enum class EType
@@ -54,8 +52,6 @@ protected:
 		kIcon_Treatment,
 		kIcon_BaseDamage,
 	};
-
-	void ProcessGAEVentImp(EType Type, const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayMyAnimation(

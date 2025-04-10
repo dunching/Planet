@@ -17,7 +17,7 @@
 #include <GameFramework/SpringArmComponent.h>
 #include "Net/UnrealNetwork.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -57,29 +57,6 @@ void USkill_Active_Shield::PerformAction(
 		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
 
 		// 数值修改
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-		{
-			FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-			GAEventData.DataModify.Add(ECharacterPropertyType::Shield, ShieldValue);
-			GAEventData.DataSource = SkillProxyPtr->GetProxyType();
-			GAEventData.bIsOverlapData = true;
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-		}
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
-
-		// 状态
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
-
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		// 持续时间
 		auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -122,22 +99,6 @@ void USkill_Active_Shield::EndAbility(
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		// 清空 数值修改
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-		GAEventData.DataModify = GetAllData();
-		GAEventData.DataSource = SkillProxyPtr->GetProxyType();
-		GAEventData.bIsClearData = true;
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
-
-		CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 	}
 #endif
 
@@ -152,20 +113,6 @@ bool USkill_Active_Shield::CommitAbility(
 )
 {
 	// 数值修改
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-	{
-		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-		GAEventData.DataModify.Add(ECharacterPropertyType::PP, -PP);
-		GAEventData.DataSource = UGameplayTagsLibrary::DataSource_Character;
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
-
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
@@ -178,7 +125,6 @@ void USkill_Active_Shield::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, f
 		{
 			CharacterStateInfoSPtr->TotalTime = CurrentInterval;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}
 	}
 #endif

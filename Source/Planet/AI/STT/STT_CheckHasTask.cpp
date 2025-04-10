@@ -15,7 +15,7 @@ EStateTreeRunStatus FSTT_CheckHasTask::EnterState(FStateTreeExecutionContext& Co
 {
 	FStateTreeTaskBase::EnterState(Context, Transition);
 	
-	return PerformMoveTask(Context);
+	return PerformGameplayTask(Context);
 }
 
 void FSTT_CheckHasTask::ExitState(FStateTreeExecutionContext& Context,
@@ -29,14 +29,10 @@ EStateTreeRunStatus FSTT_CheckHasTask::Tick(FStateTreeExecutionContext& Context,
 	return FStateTreeTaskBase::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_CheckHasTask::PerformMoveTask(FStateTreeExecutionContext& Context) const
+EStateTreeRunStatus FSTT_CheckHasTask::PerformGameplayTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (!InstanceData.CharacterPtr->GetAIComponent()->PresetTaskNodesAry.IsEmpty())
-	{
-		return EStateTreeRunStatus::Succeeded;
-	}
 	return EStateTreeRunStatus::Failed;
 }
 
@@ -50,7 +46,7 @@ EStateTreeRunStatus FSTT_CheckHasTemopraryTask::EnterState(FStateTreeExecutionCo
 {
 	FStateTreeTaskBase::EnterState(Context, Transition);
 	
-	return PerformMoveTask(Context);
+	return PerformGameplayTask(Context);
 }
 
 void FSTT_CheckHasTemopraryTask::ExitState(FStateTreeExecutionContext& Context,
@@ -64,13 +60,9 @@ EStateTreeRunStatus FSTT_CheckHasTemopraryTask::Tick(FStateTreeExecutionContext&
 	return FStateTreeTaskBase::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_CheckHasTemopraryTask::PerformMoveTask(FStateTreeExecutionContext& Context) const
+EStateTreeRunStatus FSTT_CheckHasTemopraryTask::PerformGameplayTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (!InstanceData.CharacterPtr->GetAIComponent()->TemporaryTaskNodesAry.IsEmpty())
-	{
-		return EStateTreeRunStatus::Succeeded;
-	}
 	return EStateTreeRunStatus::Failed;
 }

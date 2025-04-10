@@ -12,7 +12,7 @@
 #include "Components/SplineComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"

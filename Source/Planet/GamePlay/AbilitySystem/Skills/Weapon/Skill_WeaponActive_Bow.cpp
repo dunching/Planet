@@ -13,7 +13,7 @@
 #include "GameFramework/Controller.h"
 #include "Kismet/KismetMathLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"

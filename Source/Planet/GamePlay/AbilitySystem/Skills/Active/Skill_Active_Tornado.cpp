@@ -15,7 +15,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include <Engine/OverlapResult.h>
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -225,13 +225,6 @@ void USkill_Active_Tornado::OnOverlap(AActor* OtherActor)
 
 		// 控制效果
 		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_TornadoTraction;
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = OtherCharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TornadoPtr = TornadoPtr;
-
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
 	}
 }

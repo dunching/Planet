@@ -2,3 +2,8 @@
 
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
+
+void USTE_TaskNode::TreeStop(FStateTreeExecutionContext& Context)
+{
+	Super::TreeStop(Context);
+}

@@ -77,7 +77,6 @@ void UAIComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 
 void UAIComponent::AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr)
 {
-	TemporaryTaskNodesAry.Add(TaskNodePtr);
 }
 
 void UAIComponent::InitialAllocationsRowName()

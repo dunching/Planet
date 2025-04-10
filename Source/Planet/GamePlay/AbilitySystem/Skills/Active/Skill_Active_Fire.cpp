@@ -16,7 +16,7 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -30,7 +30,6 @@
 #include "GameplayTagsLibrary.h"
 #include "CS_RootMotion.h"
 #include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicPropertyModify.h"
 
 bool USkill_Active_Fire::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -108,26 +107,6 @@ void USkill_Active_Fire::ExcuteTasks()
 			}
 
 			// 持续点燃效果
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-			for (const auto& Iter : TargetSet)
-			{
-				TMap<ECharacterPropertyType, FBaseProperty> InModifyPropertyMap
-				{
-					{ECharacterPropertyType::HP, -Damage}
-				};
-				auto GAEventDataPtr = new FGameplayAbilityTargetData_PropertyModify(
-					UGameplayTagsLibrary::State_Debuff_Fire,
-					Duration,
-					PerformActionInterval,
-					InModifyPropertyMap
-				); 
-
-				GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-				GAEventDataPtr->TargetCharacterPtr = Iter;
-
-				ICPtr->SendEventImp(GAEventDataPtr);
-			}
 		}
 	}
 #endif

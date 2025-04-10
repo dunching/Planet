@@ -12,9 +12,11 @@
 #include "MainHUDLayout.h"
 #include "OptionList.h"
 #include "PlanetPlayerController.h"
+#include "ResourceBoxBase.h"
+#include "SceneActor.h"
+#include "STT_GuideThread.h"
 #include "TargetPoint_Runtime.h"
-#include "TaskNode_Guide.h"
-#include "TaskNode_Interaction.h"
+
 
 class AMainHUD;
 
@@ -28,12 +30,100 @@ void UGameplayTask_Base::SetTaskID(const FGuid& InTaskID)
 	TaskID = InTaskID;
 }
 
-void UGameplayTask_Base::SetGuideActor(TObjectPtr<AGuideThread> InGuideActorPtr)
-{
-	GuideActorPtr = InGuideActorPtr;
-}
 
 EStateTreeRunStatus UGameplayTask_Base::GetStateTreeRunStatus() const
 {
 	return StateTreeRunStatus;
+}
+
+UGameplayTask_WaitInteractionSceneActor::UGameplayTask_WaitInteractionSceneActor(
+	const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	bTickingTask = true;
+	bIsPausable = true;
+}
+
+void UGameplayTask_WaitInteractionSceneActor::Activate()
+{
+	Super::Activate();
+
+	DelegateHandle = PlayerCharacterPtr->GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.AddUObject(
+		this, &ThisClass::OnInteractionSceneActor
+	);
+}
+
+void UGameplayTask_WaitInteractionSceneActor::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+
+	if (bIsInteractionSceneActor)
+	{
+		EndTask();
+	}
+}
+
+void UGameplayTask_WaitInteractionSceneActor::OnDestroy(bool bInOwnerFinished)
+{
+	PlayerCharacterPtr->GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Remove(DelegateHandle);
+
+	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_WaitInteractionSceneActor::OnInteractionSceneActor(ASceneActor* TargetActorPtr)
+{
+	auto PADPtr = PAD.LoadSynchronous();
+	if (TargetActorPtr)
+	{
+		if (TargetActorPtr->IsA(PADPtr->ResourceBoxClass))
+		{
+			bIsInteractionSceneActor = true;
+		}
+		else if (auto CharacterPtr = PADPtr->CharacterPtr.LoadSynchronous())
+		{
+		}
+	}
+}
+
+UGameplayTask_WaitPlayerEquipment::UGameplayTask_WaitPlayerEquipment(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
+{
+	bTickingTask = true;
+	bIsPausable = true;
+}
+
+void UGameplayTask_WaitPlayerEquipment::Activate()
+{
+	Super::Activate();
+
+	DelegateHandle = PlayerCharacterPtr->GetCharacterProxy()->OnCharacterSocketUpdated.AddUObject(
+		this, &ThisClass::OnCharacterSocketUpdated
+	);
+}
+
+void UGameplayTask_WaitPlayerEquipment::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+}
+
+void UGameplayTask_WaitPlayerEquipment::OnDestroy(bool bInOwnerFinished)
+{
+	PlayerCharacterPtr->GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Remove(DelegateHandle);
+
+	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_WaitPlayerEquipment::OnCharacterSocketUpdated(const FCharacterSocket& Socket)
+{
+	if (Socket.IsValid())
+	{
+		if (Socket.Socket.MatchesTag(WeaponSocket))
+		{
+			EndTask();
+		}
+		else if (Socket.Socket.MatchesTag(SkillSocket))
+		{
+			EndTask();
+		}
+	}
 }

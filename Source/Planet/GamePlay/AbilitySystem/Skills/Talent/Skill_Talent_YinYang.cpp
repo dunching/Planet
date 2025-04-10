@@ -8,7 +8,6 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -238,28 +237,6 @@ void USkill_Talent_YinYang::PerformAction_Yang()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		for (auto Iter : OutOverlaps)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
-			{
-				if (CharacterPtr->IsTeammate(TargetCharacterPtr))
-				{
-					FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-					auto CharacterAttributes = TargetCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-					GAEventDataPtr->DataAry.Add(GAEventData);
-				}
-			}
-		}
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

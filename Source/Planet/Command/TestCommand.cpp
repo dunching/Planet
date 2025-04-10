@@ -1,6 +1,10 @@
 
 #include "TestCommand.h"
 
+#include "AssetRefMap.h"
+#include "GuideSubSystem.h"
+#include "GuideThreadChallengeActor.h"
+
 // #include "Kismet/GameplayStatics.h"
 
 // #include "HumanCharacter.h"
@@ -55,4 +59,32 @@ void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 // 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_GroupTherapy);
 // 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_ContinuousGroupTherapy);
 	}
+}
+
+void TestCommand::ActiveBrandTest()
+{
+#if WITH_EDITOR
+	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTestClass, true);
+#endif
+}
+
+void TestCommand::ActiveBrandTest1()
+{
+#if WITH_EDITOR
+	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest1Class, true);
+#endif
+}
+
+void TestCommand::ActiveBrandTest2()
+{
+#if WITH_EDITOR
+	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest2Class, true);
+#endif
+}
+
+void TestCommand::ChallengeTest()
+{
+#if WITH_EDITOR
+	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass, true);
+#endif
 }

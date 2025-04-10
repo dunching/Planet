@@ -6,11 +6,10 @@
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
-#include "GAEvent_Helper.h"
+
 #include "Consumable_Test.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_PeriodicPropertyModify.h"
 #include "GroupManagger.h"
 #include "SceneProxyTable.h"
 

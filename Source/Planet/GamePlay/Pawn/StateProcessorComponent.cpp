@@ -10,38 +10,14 @@
 #include "Components/CapsuleComponent.h"
 
 #include "GravityMovementComponent.h"
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
-#include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "PlanetPlayerState.h"
-#include "BasicFuturesBase.h"
-#include "GAEvent_Send.h"
-#include "GAEvent_Received.h"
-#include "ItemProxy_Minimal.h"
 #include "Weapon_Base.h"
 #include "Skill_Base.h"
-#include "Skill_Active_Base.h"
-#include "Skill_WeaponActive_PickAxe.h"
-#include "Skill_WeaponActive_HandProtection.h"
-#include "Skill_WeaponActive_RangeTest.h"
-#include "Skill_Talent_NuQi.h"
-#include "Skill_Talent_YinYang.h"
-#include "Skill_Element_Gold.h"
 #include "CS_RootMotion.h"
-#include "CS_PeriodicPropertyModify.h"
-#include "Weapon_HandProtection.h"
-#include "Weapon_PickAxe.h"
-#include "Weapon_RangeTest.h"
-#include "AssetRefMap.h"
-#include "InputProcessorSubSystem.h"
-#include "Tool_PickAxe.h"
-#include "HumanRegularProcessor.h"
-#include "HumanCharacter.h"
 #include "GameplayTagsLibrary.h"
-#include "BasicFutures_Dash.h"
-#include "BasicFutures_MoveToAttaclArea.h"
-#include "BasicFutures_Affected.h"
 #include "SceneProxyExtendInfo.h"
 #include "StateTagExtendInfo.h"
 #include "CS_PeriodicStateModify.h"
@@ -129,68 +105,6 @@ TSharedPtr<FCharacterStateInfo> UStateProcessorComponent::GetCharacterState(cons
 	}
 
 	return nullptr;
-}
-
-void UStateProcessorComponent::AddStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		CharacterStateInfo_FASI_Container.AddItem(StateDisplayInfo);
-	}
-#endif
-
-	StateDisplayMap.Add(StateDisplayInfo->Guid, StateDisplayInfo);
-	CharacterStateMapChanged(StateDisplayInfo, true);
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-	}
-#endif
-}
-
-void UStateProcessorComponent::ChangeStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		CharacterStateInfo_FASI_Container.UpdateItem(StateDisplayInfo);
-	}
-#endif
-
-	if (StateDisplayMap.Contains(StateDisplayInfo->Guid))
-	{
-		StateDisplayMap[StateDisplayInfo->Guid]->DataChanged();
-	}
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-	}
-#endif
-}
-
-void UStateProcessorComponent::RemoveStateDisplay(const TSharedPtr<FCharacterStateInfo>& StateDisplayInfo)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		CharacterStateInfo_FASI_Container.RemoveItem(StateDisplayInfo);
-	}
-#endif
-
-	if (StateDisplayInfo && StateDisplayMap.Contains(StateDisplayInfo->Guid))
-	{
-		StateDisplayMap.Remove(StateDisplayInfo->Guid);
-		CharacterStateMapChanged(StateDisplayInfo, false);
-	}
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-	}
-#endif
 }
 
 auto UStateProcessorComponent::BindCharacterStateChanged(const std::function<void(ECharacterStateType, UCS_Base*)>& Func)
@@ -372,55 +286,6 @@ void UStateProcessorComponent::OnCharacterStateChanged(ECharacterStateType Chara
 	default:
 		break;
 	}
-}
-
-void UStateProcessorComponent::ExcuteEffects(
-	const TSharedPtr<FGameplayAbilityTargetData_PropertyModify>& GameplayAbilityTargetDataSPtr
-)
-{
-	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
-	if (!OnwerActorPtr)
-	{
-		return;
-	}
-
-	if (
-		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
-		OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
-		)
-	{
-		return;
-	}
-
-	auto ASCPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
-	if (CharacterStateMap.Contains(GameplayAbilityTargetDataSPtr->Tag))
-	{
-		auto GAPtr = Cast<UCS_PeriodicPropertyModify>(CharacterStateMap[GameplayAbilityTargetDataSPtr->Tag]);
-		if (GAPtr)
-		{
-			GAPtr->SetCache(GameplayAbilityTargetDataSPtr);
-			GAPtr->UpdateDuration();
-			return;
-		}
-	}
-
-	FGameplayAbilitySpec Spec(UCS_PeriodicPropertyModify::StaticClass());
-
-	auto GAHandle = ASCPtr->GiveAbilityAndActivateOnce(
-		Spec,
-		MakeTargetData(GameplayAbilityTargetDataSPtr)
-	);
-
-	// 为什么不在此处直接获取 GetPrimaryInstance？因为在GA过程中调用时会pending，导致返回为nullptr
-// 		auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GAHandle);
-// 		if (GameplayAbilitySpecPtr)
-// 		{
-// 			ResultPtr = Cast<UCS_PeriodicPropertyModify>(GameplayAbilitySpecPtr->GetPrimaryInstance());
-// 			if (ResultPtr)
-// 			{
-// 				PeriodicPropertyModifyMap.Add(GameplayAbilityTargetDataSPtr->Tag, ResultPtr);
-// 			}
-// 		}
 }
 
 void UStateProcessorComponent::ExcuteEffects(

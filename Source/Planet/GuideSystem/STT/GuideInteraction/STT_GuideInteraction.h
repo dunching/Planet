@@ -11,7 +11,7 @@
 
 #include "GenerateType.h"
 #include "STT_GuideBase.h"
-#include "TaskNode.h"
+#include "STT_CommonData.h"
 #include "GuideActor.h"
 
 #include "STT_GuideInteraction.generated.h"
@@ -19,17 +19,19 @@
 class AGuideActor;
 class AGuideThread;
 class AGuideMainThread;
-class AGuideInteractionActor;
+class AGuideInteraction_Actor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
 class ACharacterBase;
 class AHumanCharacter;
 class AHumanCharacter_Player;
+class UGloabVariable_Interaction;
 class UGameplayTask_Base;
 class UGameplayTask_Interaction_Conversation;
 class UGameplayTask_Interaction_Option;
 class UGameplayTask_Interaction_NotifyGuideThread;
 
+#pragma region Base
 // 与 NPC交互的任务 基类
 USTRUCT()
 struct PLANET_API FSTID_GuideInteractionTaskBase :
@@ -38,14 +40,13 @@ struct PLANET_API FSTID_GuideInteractionTaskBase :
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AGuideInteractionActor> GuideActorPtr = nullptr;
+	TObjectPtr<AGuideInteraction_Actor> GuideActorPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanCharacter_Player> PlayerCharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
-	
 };
 
 USTRUCT()
@@ -57,66 +58,23 @@ struct PLANET_API FSTT_GuideInteractionBase :
 	using FInstanceDataType = FSTID_GuideInteractionTaskBase;
 
 	virtual const UStruct* GetInstanceDataType() const override;
-	
-	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-};
-
-// 与 NPC交互的任务
-USTRUCT()
-struct PLANET_API FSTID_GuideInteractionGeneric :
-	public FSTID_GuideInteractionTaskBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	TSoftObjectPtr<UPAD_TaskNode_Interaction> TaskNodeRef;
-
-	UPROPERTY(Transient)
-	TObjectPtr<UGameplayTask_Base> GameplayTaskPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-	
-};
-
-// Deprecated
-USTRUCT()
-struct PLANET_API FSTT_GuideInteractionGeneric :
-	public FSTT_GuideInteractionBase
-{
-	GENERATED_BODY()
-
-	using FInstanceDataType = FSTID_GuideInteractionGeneric;
-
-	FSTT_GuideInteractionGeneric();
-
-	virtual const UStruct* GetInstanceDataType() const override;
-
-	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-	virtual void ExitState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
 
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
 	) const override;
 
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
 };
+#pragma endregion
 
-// 与 NPC交互的任务 失败时
+#pragma region Termination
+// 与 NPC交互的任务 提前终止
 USTRUCT()
-struct PLANET_API FSTT_GuideInteractionFaile :
+struct PLANET_API FSTT_GuideInteraction_Termination :
 	public FSTT_GuideInteractionBase
 {
 	GENERATED_BODY()
@@ -126,34 +84,34 @@ struct PLANET_API FSTT_GuideInteractionFaile :
 		const FStateTreeTransitionResult& Transition
 	) const override;
 };
+#pragma endregion
 
+#pragma region BackToRegularProcessor
+// 与 NPC交互的任务 失败时
+USTRUCT()
+struct PLANET_API FSTT_GuideInteraction_BackToRegularProcessor :
+	public FSTT_GuideInteractionBase
+{
+	GENERATED_BODY()
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+};
+#pragma endregion
+
+#pragma region 与 NPC交互的任务 选择的内容通知到引导任务
 USTRUCT()
 struct PLANET_API FSTID_GuideInteractionNotify :
 	public FSTID_GuideInteractionTaskBase
 {
 	GENERATED_BODY()
 
-
-	UPROPERTY(Transient)
-	TObjectPtr<UGameplayTask_Interaction_NotifyGuideThread> GameplayTaskPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-	
-	UPROPERTY(EditAnywhere, Category = Param)
-	int32 Index = -1;
-	
-	// 
-	UPROPERTY(EditAnywhere, Category = Param)
-	FGuid NotifyTaskID;
-
-	//结束时移除这个节点
-	UPROPERTY(EditAnywhere, Category = Param)
-	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
-	
+	UPROPERTY(EditAnywhere, Category = Context)
+	UGloabVariable_Interaction* GloabVariable = nullptr;
 };
 
-// 与 NPC交互的任务 选择的内容通知到引导任务
 USTRUCT()
 struct PLANET_API FSTT_GuideInteractionNotify :
 	public FSTT_GuideInteractionBase
@@ -168,10 +126,10 @@ struct PLANET_API FSTT_GuideInteractionNotify :
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
-	
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
 };
+#pragma endregion
 
+#pragma region Conversation
 USTRUCT()
 struct PLANET_API FSTID_GuideInteractionConversation :
 	public FSTID_GuideInteractionTaskBase
@@ -184,10 +142,9 @@ struct PLANET_API FSTID_GuideInteractionConversation :
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = Param)
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
-	
 };
 
 // 与 NPC交互的任务 对话
@@ -205,15 +162,17 @@ struct PLANET_API FSTT_GuideInteractionConversation :
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
-	
+
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
 	) const override;
 
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 };
+#pragma endregion
 
+#pragma region 与 NPC交互的任务 选项对话
 USTRUCT()
 struct PLANET_API FSTID_GuideInteractionOption :
 	public FSTID_GuideInteractionTaskBase
@@ -225,16 +184,17 @@ struct PLANET_API FSTID_GuideInteractionOption :
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Context)
+	UGloabVariable_Interaction* GloabVariable = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Param)
 	TArray<FString> OptionAry;
-	
+
 	UPROPERTY(EditAnywhere, Category = Param)
 	float DurationTime = -1.f;
-	
 };
 
-// 与 NPC交互的任务 选项对话
 USTRUCT()
 struct PLANET_API FSTT_GuideInteractionOption :
 	public FSTT_GuideInteractionBase
@@ -249,12 +209,12 @@ struct PLANET_API FSTT_GuideInteractionOption :
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
-	
+
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
 	) const override;
 
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 };
-
+#pragma endregion

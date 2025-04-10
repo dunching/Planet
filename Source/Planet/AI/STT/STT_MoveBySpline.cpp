@@ -6,6 +6,7 @@
 #include <Components/SplineComponent.h>
 
 #include "AITask_MoveBySpline.h"
+#include "GeneratorColony.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "STE_AICharacterController.h"
@@ -88,7 +89,7 @@ EStateTreeRunStatus FSTT_MoveBySpline::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 	
-	return PerformMoveTask(Context, *InstanceData.AIControllerPtr);
+	return PerformGameplayTask(Context, *InstanceData.AIControllerPtr);
 }
 
 void FSTT_MoveBySpline::ExitState(
@@ -162,7 +163,7 @@ FSTT_MoveBySpline::FAITaskType* FSTT_MoveBySpline::PrepareMoveToTask(
 	return MoveTask;
 }
 
-EStateTreeRunStatus FSTT_MoveBySpline::PerformMoveTask(
+EStateTreeRunStatus FSTT_MoveBySpline::PerformGameplayTask(
 	FStateTreeExecutionContext& Context,
 	AAIController& Controller
 ) const

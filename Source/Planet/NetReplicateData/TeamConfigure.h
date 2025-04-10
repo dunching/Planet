@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "GAEvent_Helper.h"
+
 #include "GameplayTagContainer.h"
 
 #include "TeamConfigure.generated.h"

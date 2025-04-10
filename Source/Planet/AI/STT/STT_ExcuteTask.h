@@ -27,6 +27,37 @@ class UPAD_TaskNode;
 class UPAD_TaskNode_Preset;
 class UTaskNode_Temporary;
 
+USTRUCT(Blueprintable, BlueprintType)
+struct PLANET_API FSTT_Saying_SentenceInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	FSTT_Saying_SentenceInfo(){}
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FString Sentence;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	float DelayTime = 1.f;
+
+	// 念这句词的角色，为空则是“自己”念，否则把这句推送给 PlayerCharacter 念
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TSoftObjectPtr<AHumanCharacter_AI>AvatorCharacterPtr = nullptr;
+	
+};
+ 
+template<>
+struct TStructOpsTypeTraits<FSTT_Saying_SentenceInfo> :
+	public TStructOpsTypeTraitsBase2<FSTT_Saying_SentenceInfo>
+{
+	enum
+	{
+		WithNetSerializer = false,
+	};
+};
+
 USTRUCT()
 struct PLANET_API FStateTreeExcuteTaskAutomaticInstanceData
 {
@@ -39,20 +70,11 @@ struct PLANET_API FStateTreeExcuteTaskAutomaticInstanceData
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 
 	UPROPERTY(Transient)
-	TObjectPtr<UAITask_ExcuteTask_Base> AITaskPtr = nullptr;
-
-	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(Transient)
-	TArray<TSoftObjectPtr<UPAD_TaskNode_Preset>> TaskNodesAry;
-
-	UPROPERTY(Transient)
-	UPAD_TaskNode_Preset* CurrentTaskNodePtr = nullptr;
 };
 
-/* 让AIController执行一些预置的任务，比如让AI说某一段对话、去到某一处地点
- * 相比于内置的任务逻辑，这个任务更倾向于执行由“任务系统（AWolrdProcess）”分发下来的任务
+/*
+ * 让AI自言自语
  */
 USTRUCT()
 struct PLANET_API FSTT_ExcuteTask_Automatic : public FStateTreeAIActionTaskBase //FStateTreeTaskCommonBase
@@ -82,64 +104,6 @@ struct PLANET_API FSTT_ExcuteTask_Automatic : public FStateTreeAIActionTaskBase 
 		const float DeltaTime
 	) const override;
 
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 };
 
-
-USTRUCT()
-struct PLANET_API FStateTreeExcuteTemporaryTaskInstanceData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TObjectPtr<UAITask_ExcuteTemporaryTask_Base> AITaskPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(Transient)
-	TArray<UTaskNode_Temporary*> TaskNodesAry;
-
-	UPROPERTY(Transient)
-	UPAD_TaskNode_Preset* CurrentTaskNodePtr = nullptr;
-};
-
-/* 让AIController执行一些预置的任务，比如让AI说某一段对话、去到某一处地点
- * 相比于内置的任务逻辑，这个任务更倾向于执行由“任务系统（AWolrdProcess）”分发下来的任务
- */
-USTRUCT()
-struct PLANET_API FSTT_ExcuteTask_Temporary : public FStateTreeAIActionTaskBase //FStateTreeTaskCommonBase
-{
-	GENERATED_BODY()
-
-	using FInstanceDataType = FStateTreeExcuteTemporaryTaskInstanceData;
-
-	using FAITaskType_Conversation = UAITask_Conversation;
-
-	using FAITaskType_MoveToLocation = UAITask_Conversation;
-
-	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
-
-	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-	virtual void ExitState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-	virtual EStateTreeRunStatus Tick(
-		FStateTreeExecutionContext& Context,
-		const float DeltaTime
-	) const override;
-
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
-};

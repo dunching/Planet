@@ -18,12 +18,39 @@
 #include "AIControllerStateTreeAIComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
+#include "GuideInteraction.h"
+#include "HumanCharacter_Player.h"
 
 // UGameplayTasksComponent* USceneCharacterAIInteractionComponent::GetGameplayTasksComponent(
 // 	const UGameplayTask& Task) const
 // {
 // 	return GetOwner<AHumanCharacter_AI>()->GetCharacterAbilitySystemComponent();
 // }
+
+void USceneCharacterAIInteractionComponent::StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item)
+{
+	Super::StartInteractionItem(Item);
+	
+	auto OnwerActorPtr = GetOwner<FOwnerType>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.CustomPreSpawnInitalization = [OnwerActorPtr, this](AActor*ActorPtr)
+	{
+		auto GuideInteractionActorPtr= Cast<AGuideInteraction_HumanCharacter_AI>(ActorPtr);
+		if (GuideInteractionActorPtr)
+		{
+			GuideInteractionActorPtr->Character_NPC = OnwerActorPtr;
+		}
+	};
+
+	GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteraction_HumanCharacter_AI>(
+		Item, SpawnParameters
+	);
+}
 
 void UCharacterAIAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
 {
@@ -38,7 +65,11 @@ void UCharacterAIAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
 }
 
 AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+Super(
+	ObjectInitializer.
+	SetDefaultSubobjectClass<USceneCharacterAIInteractionComponent>(
+		USceneCharacterAIInteractionComponent::ComponentName)
+		)
 {
 	AIComponentPtr = CreateDefaultSubobject<UAIComponent>(UAIComponent::ComponentName);
 	
@@ -54,6 +85,32 @@ void AHumanCharacter_AI::BeginPlay()
 void AHumanCharacter_AI::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+}
+
+void AHumanCharacter_AI::SpawnDefaultController()
+{
+	if (!GroupManaggerPtr)
+	{
+		// 单个的NPC
+		FActorSpawnParameters SpawnParameters;
+
+		SpawnParameters.Owner = this;
+		SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
+		{
+			auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+			if (GroupManaggerPtr)
+			{
+				GroupManaggerPtr->GroupID = FGuid::NewGuid();
+			}
+		};
+
+		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
+			AGroupManagger::StaticClass(), SpawnParameters
+		);
+		SetGroupSharedInfo(GroupManaggerPtr);
+	}
+	
+	Super::SpawnDefaultController();
 }
 
 void AHumanCharacter_AI::HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)
@@ -95,10 +152,12 @@ void AHumanCharacter_AI::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr
 {
 	GroupManaggerPtr = InGroupSharedInfoPtr;
 
-	if (auto ControllerPtr = GetController<AHumanAIController>())
-	{
-		ControllerPtr->SetGroupSharedInfo(InGroupSharedInfoPtr);
-	}
+	// if (auto ControllerPtr = GetController<AHumanAIController>())
+	// {
+	// 	ControllerPtr->SetGroupSharedInfo(InGroupSharedInfoPtr);
+	// }
+	
+	OnGroupManaggerReady(GroupManaggerPtr);
 }
 
 void AHumanCharacter_AI::SetCharacterID(const FGuid& InCharacterID)

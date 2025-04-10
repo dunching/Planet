@@ -5,7 +5,7 @@
 
 #include "PlanetGameplayAbility.h"
 #include "Skill_Passive_Base.h"
-#include "GAEvent_Helper.h"
+
 
 #include "Skill_Passive_XS.generated.h"
 

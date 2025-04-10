@@ -13,6 +13,7 @@
 
 #include "SceneActorInteractionInterface.generated.h"
 
+class ASceneActor;
 class ACharacterBase;
 class USceneActorInteractionComponent;
 
@@ -28,6 +29,10 @@ class PLANET_API ISceneActorInteractionInterface
 
 public:
 
+	/**
+	 * 开始交互
+	 * @param CharacterPtr 
+	 */
 	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) = 0;
 
 	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr) = 0;
@@ -40,6 +45,8 @@ public:
 	
 protected:
 
+	
+	
 private:
 
 };

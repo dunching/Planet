@@ -14,9 +14,9 @@
 class AGuideActor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
-class AGuideInteractionActor;
+class AGuideInteraction_Actor;
 
-using FOnClickedInteractionItem =  TMulticastDelegate<void(const TSubclassOf<AGuideInteractionActor>&)>;
+using FOnClickedInteractionItem =  TMulticastDelegate<void(const TSubclassOf<AGuideInteraction_Actor>&)>;
 
 using FOnClickedIndex =  TMulticastDelegate<void(int32)>;
 
@@ -36,8 +36,8 @@ public:
 	virtual void ResetUIByData() override;
 
 	void SetData(
-		const TSubclassOf<AGuideInteractionActor>&TaskNode,
-		const std::function<void(const TSubclassOf<AGuideInteractionActor>&)>& InCallback
+		const TSubclassOf<AGuideInteraction_Actor>&TaskNode,
+		const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
 		);
 
 	void SetData(
@@ -49,7 +49,7 @@ protected:
 	UFUNCTION()
 	void OnClicked();
 	
-	TSubclassOf<AGuideInteractionActor> TaskNode;
+	TSubclassOf<AGuideInteraction_Actor> TaskNode;
 
 	FOnClickedInteractionItem OnClickedInteractionItem;
 	

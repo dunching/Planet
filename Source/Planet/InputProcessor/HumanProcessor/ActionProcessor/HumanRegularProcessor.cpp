@@ -160,7 +160,10 @@ namespace HumanProcessor
 			OnwerActorPtr->GetProxyProcessComponent()->RetractputWeapon();
 		}
 
-		OnAllocationChangedHandle->UnBindCallback();
+		if (OnAllocationChangedHandle)
+		{
+			OnAllocationChangedHandle->UnBindCallback();
+		}
 
 		Super::QuitAction();
 	}

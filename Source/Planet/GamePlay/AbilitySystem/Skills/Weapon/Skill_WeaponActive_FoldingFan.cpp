@@ -14,7 +14,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
@@ -366,22 +366,6 @@ void USkill_WeaponActive_FoldingFan::MakeDamage(ACharacterBase* TargetCharacterP
 {
 	if (TargetCharacterPtr && WeaponProjectilePtr)
 	{
-		auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventData.AttackEffectType = EAttackEffectType::kAttackEffectAndRepel;
-		GAEventData.RepelDirection = WeaponProjectilePtr->GetVelocity().GetSafeNormal();
-
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

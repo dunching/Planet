@@ -13,7 +13,6 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -68,7 +67,6 @@ void UCS_PeriodicStateModify_CantBeSelected::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -82,7 +80,6 @@ void UCS_PeriodicStateModify_CantBeSelected::PerformAction()
 	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
 	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 	CharacterStateInfoSPtr->DataChanged();
-	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 }
 
 // void UCS_PeriodicStateModify_CantBeSelected::InitalDefaultTags()
@@ -102,5 +99,4 @@ void UCS_PeriodicStateModify_CantBeSelected::OnDuration(
 	CharacterStateInfoSPtr->TotalTime = CurrentTime;
 	CharacterStateInfoSPtr->DataChanged();
 
-	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }

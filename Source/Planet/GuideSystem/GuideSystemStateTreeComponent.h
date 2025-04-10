@@ -27,4 +27,8 @@ public:
 
 	virtual UGameplayTasksComponent* GetGameplayTasksComponent(const UGameplayTask& Task) const override;
 
+	virtual void StartLogic() override;
+
+	virtual void StopLogic(const FString& Reason)  override;
+	
 };

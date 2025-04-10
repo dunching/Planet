@@ -9,7 +9,6 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -17,7 +16,6 @@
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "StateProcessorComponent.h"
-#include "CS_PeriodicPropertyModify.h"
 #include "CS_Base.h"
 #include "CharacterStateInfo.h"
 
@@ -77,40 +75,10 @@ void USkill_Passive_XS::ReigsterEffect()
 
 void USkill_Passive_XS::AddShield(int32 ShieldValue)
 {
-	// 数值修改
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-	{
-		FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-		GAEventData.DataModify.Add(ECharacterPropertyType::Shield, ShieldValue);
-		GAEventData.DataSource = SkillProxyPtr->GetProxyType();
-		GAEventData.bIsOverlapData = true;
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
 void USkill_Passive_XS::RemoveShield()
 {
-	// 清空 数值修改
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-	GAEventData.DataModify = GetAllData();
-	GAEventData.DataSource = SkillProxyPtr->GetProxyType();
-	GAEventData.bIsClearData = true;
-
-	GAEventDataPtr->DataAry.Add(GAEventData);
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
 void USkill_Passive_XS::PerformAction(
@@ -121,34 +89,6 @@ void USkill_Passive_XS::PerformAction(
 		)
 {
 #if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
-	{
-		{
-			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			TaskPtr->SetDuration(CD, 0.1f);
-			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::CD_DurationDelegate);
-			TaskPtr->OnFinished.BindLambda([this](auto) {
-				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CD_CharacterStateInfoSPtr);
-				CD_CharacterStateInfoSPtr = nullptr;
-
-				ReigsterEffect();
-				return true;
-				});
-			TaskPtr->ReadyForActivation();
-		}
-		{
-			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			TaskPtr->SetDuration(ShieldDuration, 0.1f);
-			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::Duration_DurationDelegate);
-			TaskPtr->OnFinished.BindLambda([this](auto) {
-				RemoveShield();
-				CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(Duration_CharacterStateInfoSPtr);
-				Duration_CharacterStateInfoSPtr = nullptr;
-				return true;
-				});
-			TaskPtr->ReadyForActivation();
-		}
-	}
 #endif
 }
 
@@ -158,40 +98,10 @@ void USkill_Passive_XS::OnSendAttack(const FGAEventData& GAEventData)
 
 void USkill_Passive_XS::CD_DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentTime, float Duration)
 {
-	if (CD_CharacterStateInfoSPtr)
-	{
-		CD_CharacterStateInfoSPtr->TotalTime = Duration - CurrentTime;
-		CD_CharacterStateInfoSPtr->DataChanged();
-		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CD_CharacterStateInfoSPtr);
-	}
-	else
-	{
-		CD_CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CD_CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CD_CharacterStateInfoSPtr->Duration = Duration;
-		CD_CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CD_CharacterStateInfoSPtr->DataChanged();
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CD_CharacterStateInfoSPtr);
-	}
 }
 
 void USkill_Passive_XS::Duration_DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentTime, float Duration)
 {
-	if (Duration_CharacterStateInfoSPtr)
-	{
-		Duration_CharacterStateInfoSPtr->TotalTime = CurrentTime;
-		Duration_CharacterStateInfoSPtr->DataChanged();
-		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(Duration_CharacterStateInfoSPtr);
-	}
-	else
-	{
-		Duration_CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		Duration_CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		Duration_CharacterStateInfoSPtr->Duration = Duration;
-		Duration_CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		Duration_CharacterStateInfoSPtr->DataChanged();
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(Duration_CharacterStateInfoSPtr);
-	}
 }
 
 // USkill_Passive_XS::FMyStruct::FMyStruct(int32 InPriority, USkill_Passive_XS* InGAInsPtr) :

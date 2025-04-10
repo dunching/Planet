@@ -15,7 +15,7 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -149,32 +149,6 @@ void USkill_Active_Control::ExcuteTasks()
 
 	const auto Duration = HumanMontage->CalculateSequenceLength();
 
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-	// 伤害
-	{
-		FGAEventData GAEventData(HasFocusActor(), CharacterPtr);
-
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-		ICPtr->SendEventImp(GAEventDataPtr);
-	}
-
-	// 控制效果
-	{
-		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_RootMotion_MoveAlongSpline;
-
-		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = HasFocusActor();
-		GameplayAbilityTargetData_RootMotionPtr->SPlineActorPtr = SPlineActorPtr;
-		GameplayAbilityTargetData_RootMotionPtr->Duration = Duration;
-
-		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
-	}
 }
 
 void USkill_Active_Control::PlayMontage()

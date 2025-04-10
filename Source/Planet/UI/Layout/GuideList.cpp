@@ -9,10 +9,10 @@
 #include "CharacterBase.h"
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
-#include "GuideThreadActor.h"
+#include "GuideThread.h"
 #include "ProxyProcessComponent.h"
-#include "STT_GuideThreadFail.h"
-#include "TaskNode_Guide.h"
+#include "STT_GuideThread.h"
+
 
 struct FGuideList : public TStructVariable<FGuideList>
 {
@@ -36,7 +36,7 @@ void UGuideList::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 void UGuideList::ResetUIByData()
 {
 	UGuideSubSystem::GetInstance()->OnCurrentGuideChagned.AddUObject(this, &ThisClass::OnCurrentGuideChagned);
-	UGuideSubSystem::GetInstance()->OnGuideEnd.AddUObject(this, &ThisClass::OnGuideEnd);
+	UGuideSubSystem::GetInstance()->GetOnGuideEnd().AddUObject(this, &ThisClass::OnGuideEnd);
 }
 
 void UGuideList::OnCurrentGuideChagned(AGuideThread* NewGuidePtr)
@@ -55,6 +55,8 @@ void UGuideList::OnCurrentGuideChagned(AGuideThread* NewGuidePtr)
 		NewGuidePtr->OnCurrentTaskNodeChanged.AddUObject(this, &ThisClass::OnCurrentTaskNodeChanged);
 
 		UIPtr->SetText(FText::FromString(NewGuidePtr->TaskName));
+
+		OnCurrentTaskNodeChanged(FTaskNodeDescript::Refresh);
 	}
 	else
 	{
@@ -77,7 +79,10 @@ void UGuideList::OnGuideEnd(AGuideThread* NewGuidePtr)
 
 void UGuideList::OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNode)
 {
-	if (CurrentTaskNode.GetIsValid() && CurrentTaskNode.bIsFreshPreviouDescription)
+	if (
+		CurrentTaskNode.bIsOnlyFresh ||
+		(CurrentTaskNode.GetIsValid() && CurrentTaskNode.bIsFreshPreviouDescription)
+		)
 	{
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGuideList::Get().Description));
 		if (!UIPtr)

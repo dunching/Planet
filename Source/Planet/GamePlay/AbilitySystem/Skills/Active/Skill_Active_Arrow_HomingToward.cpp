@@ -36,7 +36,6 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		//
 		{
@@ -63,7 +62,6 @@ void USkill_Active_Arrow_HomingToward::DurationTick(UAbilityTask_TimerHelper*, f
 		{
 			CharacterStateInfoSPtr->TotalTime = Interval;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}
 	}
 #endif
@@ -73,7 +71,6 @@ bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 {
 	SwitchIsHomingToward(false);
 
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	K2_CancelAbility();
 

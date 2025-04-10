@@ -17,7 +17,7 @@
 #include <GameFramework/SpringArmComponent.h>
 #include "Net/UnrealNetwork.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -94,8 +94,6 @@ void USkill_Active_Slow::PerformAction(
 
 			GameplayAbilityTargetData_StateModifyPtr->TriggerCharacterPtr = CharacterPtr;
 			GameplayAbilityTargetData_StateModifyPtr->TargetCharacterPtr = Iter;
-
-			ICPtr->SendEventImp(GameplayAbilityTargetData_StateModifyPtr);
 		}
 
 		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());

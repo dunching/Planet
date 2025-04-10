@@ -31,7 +31,6 @@
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
 #include "CS_RootMotion.h"
-#include "CS_PeriodicPropertyModify.h"
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
@@ -225,33 +224,9 @@ void EditorCommand::TestGAEventModify()
 		map.Add(1000 - Index, Index);
 	}
 
-	struct MyStruct : public IGAEventModifySendInterface
-	{
-		MyStruct(int32 P, int32 a1a) :
-			IGAEventModifySendInterface(P)
-		{
-			aa = a1a;
-		}
-		int32 aa = 1;
-	};
-
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
-		auto BaseFeatureComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(123, 523));
-		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(1, 423));
-		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(12, 323));
-		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(13, 223));
-
-		auto d = MakeShared<MyStruct>(14, 1231);
-		BaseFeatureComponentPtr->AddSendEventModify(d);
-		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1232));
-		BaseFeatureComponentPtr->AddSendEventModify(MakeShared<MyStruct>(14, 1233));
-
-		BaseFeatureComponentPtr->RemoveSendEventModify(d);
-
-
 	}
 
 	TSet<int32>set;
@@ -465,7 +440,6 @@ void EditorCommand::TestGAState2Self(const TArray< FString >& Args)
 	GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
 	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 }
 
 void EditorCommand::TestGATagState2Target(const TArray< FString >& Args)
@@ -509,7 +483,6 @@ void EditorCommand::TestGATagState2Target(const TArray< FString >& Args)
 				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
 				auto ICPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-				ICPtr->SendEventImp(GameplayAbilityTargetDataPtr);
 			}
 		}
 	}

@@ -12,6 +12,7 @@
 #include "HumanCharacter_AI.generated.h"
 
 class UAIComponent;
+class AGuideInteraction_HumanCharacter_AI;
 class UResourceBoxStateTreeComponent;
 
 /**
@@ -23,7 +24,10 @@ class PLANET_API USceneCharacterAIInteractionComponent : public USceneActorInter
 	GENERATED_BODY()
 
 public:
-	// virtual UGameplayTasksComponent* GetGameplayTasksComponent(const UGameplayTask& Task) const override;
+	using FOwnerType = AHumanCharacter_AI;
+
+	virtual void StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item)override;
+	
 };
 
 /**
@@ -53,6 +57,8 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void SpawnDefaultController()override;
+
 	virtual void HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)override;
 
 	virtual void HasBeenLookingAt(ACharacterBase* InCharacterPtr)override;
@@ -77,9 +83,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
-	TObjectPtr<UGameplayTasksComponent> GameplayTasksComponentPtr = nullptr;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
 	UWidgetComponent* InteractionWidgetCompoentPtr = nullptr;
 

@@ -14,7 +14,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
+
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -99,7 +99,6 @@ void UCS_PeriodicStateModify_Fear::EndAbility(
 )
 {
 	//
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 	CharacterStateInfoSPtr = nullptr;
 
 	//
@@ -148,7 +147,6 @@ void UCS_PeriodicStateModify_Fear::PerformAction()
 		CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
 		CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 		CharacterStateInfoSPtr->DataChanged();
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		// TalentHelper.Level > 
 
@@ -200,7 +198,6 @@ void UCS_PeriodicStateModify_Fear::OnTaskTick(UAbilityTask_TimerHelper*, float D
 {
 	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
-	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
 void UCS_PeriodicStateModify_Fear::MoveImp()

@@ -24,7 +24,7 @@ EStateTreeRunStatus FSTT_DashToLeader::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	InstanceData.AITaskPtr = PerformMoveTask(Context);
+	InstanceData.AITaskPtr = PerformGameplayTask(Context);
 
 	if (InstanceData.AITaskPtr)
 	{
@@ -81,7 +81,7 @@ EStateTreeRunStatus FSTT_DashToLeader::Tick(
 	return EStateTreeRunStatus::Failed;
 }
 
-FSTT_DashToLeader::FAITaskType* FSTT_DashToLeader::PerformMoveTask(FStateTreeExecutionContext& Context) const
+FSTT_DashToLeader::FAITaskType* FSTT_DashToLeader::PerformGameplayTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	FAITaskType* AITaskPtr =

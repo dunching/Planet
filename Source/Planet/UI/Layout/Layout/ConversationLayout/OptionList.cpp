@@ -6,7 +6,7 @@
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
 #include "OptionItem.h"
-#include "TaskNode_Interaction.h"
+
 #include "TextCollect.h"
 #include "TextSubSystem.h"
 
@@ -39,7 +39,7 @@ void UOptionList::ResetUIByData()
 
 void UOptionList::UpdateDisplay(
 	AHumanCharacter_AI* InTargetCharacterPtr,
-	const std::function<void(const TSubclassOf<AGuideInteractionActor>&)>& InCallback
+	const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
 )
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
@@ -58,54 +58,13 @@ void UOptionList::UpdateDisplay(
 
 	UIPtr->ClearChildren();
 
-	const auto TaskNodes = TargetCharacterPtr->GetSceneActorInteractionComponent()->GetTaskNodes();
+	const auto TaskNodes = TargetCharacterPtr->GetSceneActorInteractionComponent()->GetInteractionLists();
 	for (const auto& Iter : TaskNodes)
 	{
 		auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
 		if (ItemUIPtr)
 		{
 			ItemUIPtr->SetData(Iter, InCallback);
-			UIPtr->AddChild(ItemUIPtr);
-		}
-	}
-}
-
-void UOptionList::UpdateDisplay(
-	const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef,
-	const std::function<void(int32)>& InCallback
-)
-{
-	if (InTaskNodeRef.IsValid())
-	{
-		SetVisibility(ESlateVisibility::Visible);
-
-		auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FOptionList::Get().VerticalBox));
-		if (!UIPtr)
-		{
-			return;
-		}
-
-		UIPtr->ClearChildren();
-
-		// 选项
-		int32 Index = 1;
-		for (const auto& Iter : InTaskNodeRef.LoadSynchronous()->OptionAry)
-		{
-			auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
-			if (ItemUIPtr)
-			{
-				ItemUIPtr->SetData(Iter, Index, InCallback);
-				UIPtr->AddChild(ItemUIPtr);
-			}
-			Index++;
-		}
-
-		// “取消”选项
-		Index = 0;
-		auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
-		if (ItemUIPtr)
-		{
-			ItemUIPtr->SetData(UTextSubSystem::GetInstance()->GetText(TextCollect::Return), Index, InCallback);
 			UIPtr->AddChild(ItemUIPtr);
 		}
 	}

@@ -7,20 +7,32 @@
 #include "Components/ActorComponent.h"
 #include "Components/StateTreeComponent.h"
 
-#include "TaskNode.h"
-
 #include "SceneActorInteractionComponent.generated.h"
 
 class USceneComponent;
 class ACharacterBase;
+class AHumanCharacter_AI;
 class UPAD_TaskNode;
 class UPAD_TaskNode_Preset;
 class UTaskNode_Temporary;
 class UPAD_TaskNode_Interaction;
-class AGuideInteractionActor;
+class AGuideInteraction_Actor;
+
+USTRUCT(BlueprintType, Blueprintable)
+struct PLANET_API FGuideInterationSetting
+{
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AGuideInteraction_Actor> GuideInteraction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsEnable = true;
+
+};
 
 /**
- *
+ * 场景里的Actor拥有互动功能的组件
  */
 UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
 class PLANET_API USceneActorInteractionComponent : public UActorComponent
@@ -32,18 +44,21 @@ public:
 
 	USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer);
 
-	TArray<TSubclassOf<AGuideInteractionActor>> GetTaskNodes() const;
+	TArray<TSubclassOf<AGuideInteraction_Actor>> GetInteractionLists() const;
 
-	void AddGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass);
+	virtual void StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item);
+	
+	void StopInteractionItem();
 
-	void RemoveGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass);
-
+	void ChangedInterationState(const TSubclassOf<AGuideInteraction_Actor>& Item, bool bIsEnable);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Range = 200;
 
 protected:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TSubclassOf<AGuideInteractionActor>> GuideInteractionAry;
+	TArray<FGuideInterationSetting> GuideInteractionAry;
 
-	TArray<TSubclassOf<AGuideInteractionActor>> TemporaryGuideInteractionAry;
+	TObjectPtr<AGuideInteraction_Actor>GuideInteractionActorPtr = nullptr;
 };

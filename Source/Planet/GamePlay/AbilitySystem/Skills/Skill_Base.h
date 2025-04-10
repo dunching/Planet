@@ -97,6 +97,15 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
+	/**
+	 * 
+	 * @param AbilityHandle 
+	 * @param ActorInfo 
+	 * @param ActivationInfo 
+	 * @param SpecHandle 
+	 * @param TargetData 
+	 * @return 
+	 */
 	TArray<FActiveGameplayEffectHandle> MyApplyGameplayEffectSpecToTarget(
 		const FGameplayAbilitySpecHandle AbilityHandle,
 		const FGameplayAbilityActorInfo* ActorInfo,

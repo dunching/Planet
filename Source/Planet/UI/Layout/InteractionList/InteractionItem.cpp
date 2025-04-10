@@ -4,7 +4,7 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "TaskNode_Interaction.h"
+
 #include "GuideActor.h"
 #include "InputProcessorSubSystem.h"
 #include "InteractionList.h"

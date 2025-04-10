@@ -51,20 +51,12 @@
 AHumanCharacter::AHumanCharacter(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
-	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(USceneActorInteractionComponent::ComponentName);
-}
-
-USceneActorInteractionComponent* AHumanCharacter::GetSceneActorInteractionComponent() const
-{
-	return SceneActorInteractionComponentPtr;
 }
 
 void AHumanCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	HasBeenEndedLookAt();
-	
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -111,20 +103,4 @@ void AHumanCharacter::UnPossessed()
 	}
 
 	Super::UnPossessed();
-}
-
-void AHumanCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
-{
-}
-
-void AHumanCharacter::HasBeenLookingAt(ACharacterBase* CharacterPtr)
-{
-}
-
-void AHumanCharacter::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
-{
-}
-
-void AHumanCharacter::HasBeenEndedLookAt()
-{
 }

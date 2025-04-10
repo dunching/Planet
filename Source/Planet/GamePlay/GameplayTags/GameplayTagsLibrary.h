@@ -166,6 +166,8 @@ public:
 
 	static FGameplayTag Proxy_Weapon_Axe;
 	
+	static FGameplayTag Proxy_Weapon_Test;
+	
 	static FGameplayTag Proxy_Tool;
 
 	static FGameplayTag Proxy_Tool_Axe;

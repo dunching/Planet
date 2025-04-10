@@ -13,7 +13,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
+
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -77,26 +77,6 @@ void UCS_PeriodicStateModify_Charm::EndAbility(
 )
 {
 	//
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
-
-	//
-	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
-
-	GAEventDataPtr->TriggerCharacterPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr;
-
-	FGAEventData GAEventData(
-		GameplayAbilityTargetDataSPtr->TargetCharacterPtr,
-		GameplayAbilityTargetDataSPtr->TargetCharacterPtr
-	);
-
-	GAEventData.DataSource = GameplayAbilityTargetDataSPtr->Tag;
-	GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,0 } };
-	GAEventData.bIsClearData = true;
-
-	GAEventDataPtr->DataAry.Add(GAEventData);
-
-	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
-
 	//
 	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
 	{
@@ -136,31 +116,6 @@ void UCS_PeriodicStateModify_Charm::UpdateDuration()
 void UCS_PeriodicStateModify_Charm::PerformAction()
 {
 	// 
-	CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-	CharacterStateInfoSPtr->Tag = GameplayAbilityTargetDataSPtr->Tag;
-	CharacterStateInfoSPtr->Duration = GameplayAbilityTargetDataSPtr->Duration;
-	CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
-	CharacterStateInfoSPtr->DataChanged();
-	CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
-
-	//
-	auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent;
-
-	GAEventDataPtr->TriggerCharacterPtr = GameplayAbilityTargetDataSPtr->TargetCharacterPtr;
-
-	FGAEventData GAEventData(
-		GameplayAbilityTargetDataSPtr->TargetCharacterPtr,
-		GameplayAbilityTargetDataSPtr->TargetCharacterPtr
-	);
-
-	GAEventData.DataSource = GameplayAbilityTargetDataSPtr->Tag;
-	GAEventData.DataModify = { {ECharacterPropertyType::MoveSpeed,0 } };
-	GAEventData.bIsOverlapData = true;
-
-	GAEventDataPtr->DataAry.Add(GAEventData);
-
-	CharacterPtr->GetCharacterAbilitySystemComponent()->SendEventImp(GAEventDataPtr);
-
 	//
 	if (auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>())
 	{
@@ -225,5 +180,4 @@ void UCS_PeriodicStateModify_Charm::OnTaskTick(UAbilityTask_TimerHelper*, float 
 {
 	CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
-	CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 }

@@ -17,6 +17,7 @@ class IPlanetControllerInterface;
 class UGAEvent_Received;
 class UAS_Character;
 class UGE_CharacterInitail;
+class UGameplayEffect;
 
 struct FCharacterAttributes;
 
@@ -83,7 +84,9 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Anim")
 	float BaseLookUpRate = 45.f;
 
-	// Character的ID，注意：之后不要更改，因为任务引导系统里面需要这个值
+	/**
+	 * Character的ID，注意：之后不要更改，因为任务引导系统里面需要这个值
+	 */
 	UPROPERTY(EditInstanceOnly, ReplicatedUsing = OnRep_GetCharacterProxyID)
 	FGuid CharacterID;
 

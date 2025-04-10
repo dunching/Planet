@@ -6,6 +6,9 @@
 
 #include "GeneratorBase.generated.h"
 
+class AGroupManagger;
+class UPlanetChildActorComponent;
+
 /**
  *
  */
@@ -17,5 +20,22 @@ class PLANET_API AGeneratorBase : public AActor
 public:
 
 	AGeneratorBase(const FObjectInitializer& ObjectInitializer);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void PostInitializeComponents() override;
+
+	virtual void BeginPlay() override;
+
+	void SpawnGeneratorActor();
+
+	bool bDirctSpawnChild = false;
+	
+	UPROPERTY(Replicated)
+	FGuid GeneratorGuid;
+	
+	TObjectPtr<AGroupManagger>GroupManaggerPtr = nullptr;
+	
+protected:
 
 };

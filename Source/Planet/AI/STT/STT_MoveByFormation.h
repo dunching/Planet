@@ -104,7 +104,7 @@ struct PLANET_API FSTT_MoveByFormation : public FStateTreeAIActionTaskBase
 		const float DeltaTime
 	) const override;
 
-	virtual EStateTreeRunStatus PerformMoveTask(
+	virtual EStateTreeRunStatus PerformGameplayTask(
 		FStateTreeExecutionContext& Context, 
 		AAIController& Controller
 	) const;

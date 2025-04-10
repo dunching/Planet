@@ -1,0 +1,122 @@
+// Copyright Epic Games, Inc. All Rights Reserved.
+
+#pragma once
+
+#include "CoreMinimal.h"
+
+#include "BrainComponent.h"
+#include "GameplayTagContainer.h"
+#include "GuideThread.h"
+
+#include "GuideInteraction.generated.h"
+
+
+class UGameplayTasksComponent;
+
+class UGuideSystemStateTreeComponent;
+class UPAD_TaskNode_Guide;
+class ACharacterBase;
+class AHumanCharacter;
+class AHumanCharacter_Player;
+class AHumanCharacter_AI;
+
+using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
+
+#pragma region Base
+UCLASS()
+class UStateTreeGuideInteractionComponentSchema : public UStateTreeComponentSchema
+{
+	GENERATED_BODY()
+public:
+	virtual bool IsStructAllowed(const UScriptStruct* InScriptStruct) const override;
+
+};
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API UGuideInteractionSystemStateTreeComponent : public UGuideSystemStateTreeComponent
+{
+	GENERATED_BODY()
+
+public:
+	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
+};
+
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API AGuideInteraction_Actor : public AGuideActor
+{
+	GENERATED_BODY()
+
+public:
+	AGuideInteraction_Actor(const FObjectInitializer& ObjectInitializer);
+
+	// 交互节点名称
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString InteractionNodeName;
+
+	/**
+	 * 提前终止交互
+	 * 
+	 */
+	bool bWantToStop = false;
+	
+};
+#pragma endregion
+
+#pragma region NPC交互
+/**
+ *	与NPC对话时的系列任务
+ *
+ *	例如：主线或者支线的某一段要求角色前往某处与NPC对话时，新增的对话选项
+ */
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API AGuideInteraction_HumanCharacter_AI : public AGuideInteraction_Actor
+{
+	GENERATED_BODY()
+
+public:
+	
+	AGuideInteraction_HumanCharacter_AI(const FObjectInitializer& ObjectInitializer);
+
+	// 这个引导所属的Character
+	AHumanCharacter_AI* Character_NPC = nullptr;
+
+};
+
+UCLASS()
+class UStateTreeGuideInteraction_HumanCharacter_AI_ComponentSchema : public UStateTreeGuideInteractionComponentSchema
+{
+	GENERATED_BODY()
+public:
+	
+	using FOwnerType = AGuideInteraction_HumanCharacter_AI;
+
+	UStateTreeGuideInteraction_HumanCharacter_AI_ComponentSchema();
+	
+	virtual void PostLoad() override;
+	
+	static bool SetContextRequirements(UBrainComponent& BrainComponent, FStateTreeExecutionContext& Context, bool bLogErrors = false);
+
+	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
+	TSubclassOf<AHumanCharacter_Player> HumanCharacter_PlayerClass = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
+	TSubclassOf<AHumanCharacter_AI> HumanCharacter_AIClass = nullptr;
+};
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API UGuideInteraction_HumanCharacter_AI_SystemStateTreeComponent : public UGuideInteractionSystemStateTreeComponent
+{
+	GENERATED_BODY()
+
+public:
+	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
+	
+	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
+};
+#pragma endregion

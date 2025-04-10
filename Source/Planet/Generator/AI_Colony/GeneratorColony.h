@@ -10,6 +10,7 @@
 
 class UPlanetChildActorComponent;
 class USplineComponent;
+class ACharacterBase;
 
 UCLASS()
 class PLANET_API UFormationComponent : public USceneComponent
@@ -23,16 +24,16 @@ public:
 };
 
 /**
- *
+ * 一组按固定阵型行走的NPC群体
  */
 UCLASS()
-class PLANET_API AGeneratorColony : public AGeneratorBase
+class PLANET_API AGeneratorColonyWithPath : public AGeneratorBase
 {
 	GENERATED_BODY()
 
 public:
 
-	AGeneratorColony(const FObjectInitializer& ObjectInitializer);
+	AGeneratorColonyWithPath(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
@@ -51,5 +52,59 @@ public:
 	int32 MaxDistance = 1000;
 
 	int32 CurrentLength = 0;
+
+};
+
+/**
+ * 一组NPC群体
+ */
+UCLASS()
+class PLANET_API AGeneratorColony : public AGeneratorBase
+{
+	GENERATED_BODY()
+
+public:
+
+	AGeneratorColony(const FObjectInitializer& ObjectInitializer);
+
+	virtual void BeginPlay() override;
+
+};
+
+/**
+ * 一组NPC群体
+ */
+UCLASS()
+class PLANET_API AGeneratorColonyDelay : public AGeneratorBase
+{
+	GENERATED_BODY()
+
+public:
+
+};
+
+/**
+ * NPC会沿着这条样条线巡逻
+ */
+UCLASS()
+class PLANET_API AGeneratorNPCs_Patrol : public AGeneratorBase
+{
+	GENERATED_BODY()
+
+public:
+
+	AGeneratorNPCs_Patrol(const FObjectInitializer& ObjectInitializer);
+
+	virtual void BeginPlay() override;
+
+	bool CheckIsFarawayOriginal(ACharacterBase*TargetCharacterPtr) const;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Spline")
+	TObjectPtr<USplineComponent> SplineComponentPtr;
+	
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	int32 MaxDistance = 800;
+
+protected:
 
 };

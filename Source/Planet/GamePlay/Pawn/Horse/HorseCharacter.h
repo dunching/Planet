@@ -24,8 +24,7 @@ class AHumanCharacter;
 
 UCLASS()
 class PLANET_API AHorseCharacter : 
-	public ACharacterBase,
-	public ISceneActorInteractionInterface
+	public ACharacterBase
 {
 	GENERATED_BODY()
 

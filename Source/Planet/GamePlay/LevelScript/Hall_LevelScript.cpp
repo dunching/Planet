@@ -1,4 +1,3 @@
-
 #include "Hall_LevelScript.h"
 
 #include <type_traits>
@@ -20,13 +19,18 @@ void AMain_LevelScriptActor::BeginPlay()
 
 void AMain_LevelScriptActor::ClearWorldProcessCache()
 {
-	TArray<AActor*> OutActors;
-	UGameplayStatics::GetAllActorsOfClass(this, ATargetPoint::StaticClass(),OutActors);
-	for (auto Iter : OutActors)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
-		if (Iter)
+		TArray<AActor*> OutActors;
+		UGameplayStatics::GetAllActorsOfClass(this, ATargetPoint::StaticClass(), OutActors);
+		for (auto Iter : OutActors)
 		{
-			Iter->Destroy();
+			if (Iter)
+			{
+				Iter->Destroy();
+			}
 		}
 	}
+#endif
 }

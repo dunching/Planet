@@ -9,8 +9,7 @@
 #include "AIComponent.h"
 #include "MyUserWidget.h"
 #include "GenerateType.h"
-#include "TaskNode.h"
-#include "TaskNode_Character.h"
+#include "STT_CommonData.h"
 
 #include "ConversationBorder.generated.h"
 

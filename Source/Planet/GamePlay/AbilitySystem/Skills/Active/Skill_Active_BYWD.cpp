@@ -68,7 +68,6 @@ void USkill_Active_BYWD::PerformAction(
 			{
 				TaskPtr->OnFinished.BindLambda([this]
 					{
-						CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 						K2_CancelAbility();
 					});
@@ -124,7 +123,6 @@ void USkill_Active_BYWD::DurationDelegate(UAbilityTask_TimerHelper*, float Curre
 		{
 			CharacterStateInfoSPtr->TotalTime = CurrentInterval;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}
 	}
 #endif

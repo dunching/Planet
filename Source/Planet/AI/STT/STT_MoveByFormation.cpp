@@ -41,7 +41,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	return PerformMoveTask(Context, *InstanceData.AIControllerPtr); 
+	return PerformGameplayTask(Context, *InstanceData.AIControllerPtr); 
 }
 
 void FSTT_MoveByFormation::ExitState(
@@ -70,7 +70,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::Tick(
 	return EStateTreeRunStatus::Failed;
 }
 
-EStateTreeRunStatus FSTT_MoveByFormation::PerformMoveTask(
+EStateTreeRunStatus FSTT_MoveByFormation::PerformGameplayTask(
 	FStateTreeExecutionContext& Context,
 	AAIController& Controller
 ) const

@@ -59,7 +59,7 @@ struct PLANET_API FSTT_CheckHasTask : public FStateTreeAIActionTaskBase//FStateT
 		const float DeltaTime
 	) const override;
 
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context)const;
+	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context)const;
 
 };
 
@@ -87,6 +87,6 @@ struct PLANET_API FSTT_CheckHasTemopraryTask : public FStateTreeAIActionTaskBase
 		const float DeltaTime
 	) const override;
 
-	EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context)const;
+	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context)const;
 
 };

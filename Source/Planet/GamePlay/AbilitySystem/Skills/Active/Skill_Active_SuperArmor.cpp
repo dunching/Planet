@@ -16,7 +16,7 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -115,7 +115,6 @@ void USkill_Active_SuperArmor::ExcuteTasks()
 
 		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
-		ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 	}
 }
 

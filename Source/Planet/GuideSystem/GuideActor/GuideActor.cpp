@@ -3,12 +3,23 @@
 #include "GameplayTasksComponent.h"
 
 #include "GuideSystemStateTreeComponent.h"
-#include "TaskNode_Guide.h"
+
+
+FTaskNodeDescript::FTaskNodeDescript()
+{
+}
+
+FTaskNodeDescript::FTaskNodeDescript(bool bIsOnlyFresh):
+	bIsOnlyFresh(bIsOnlyFresh)
+{
+}
 
 bool FTaskNodeDescript::GetIsValid() const
 {
 	return /* bIsFreshPreviouDescription && */ (!Description.IsEmpty());
 }
+
+FTaskNodeDescript FTaskNodeDescript::Refresh = FTaskNodeDescript(true);
 
 AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
@@ -22,6 +33,13 @@ AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
 	GuideStateTreeComponentPtr = CreateDefaultSubobject<UGuideSystemStateTreeComponent>(UGuideSystemStateTreeComponent::ComponentName);
 	
 	GameplayTasksComponentPtr = CreateDefaultSubobject<UGameplayTasksComponent>(TEXT("GameplayTasksComponent"));
+}
+
+void AGuideActor::Destroyed()
+{
+	GetGuideSystemStateTreeComponent()->StopLogic(TEXT(""));
+	
+	Super::Destroyed();
 }
 
 UGameplayTasksComponent* AGuideActor::GetGameplayTasksComponent() const

@@ -1,9 +1,16 @@
 #include "SceneActorInteractionComponent.h"
 
-#include "GuideActor.h"
+#include "ConversationLayout.h"
+#include "Kismet/GameplayStatics.h"
 
-#include "GuideInteractionActor.h"
+#include "HumanCharacter_AI.h"
+#include "GuideInteraction.h"
+#include "HumanCharacter_Player.h"
+#include "MainHUD.h"
+#include "MainHUDLayout.h"
+#include "PlanetPlayerController.h"
 
+class AMainHUD;
 FName USceneActorInteractionComponent::ComponentName = TEXT("SceneActorInteractionComponent");
 
 USceneActorInteractionComponent::USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer):
@@ -13,28 +20,45 @@ USceneActorInteractionComponent::USceneActorInteractionComponent(const FObjectIn
 	// bStartLogicAutomatically = false;
 }
 
-TArray<TSubclassOf<AGuideInteractionActor>>  USceneActorInteractionComponent::GetTaskNodes() const
+TArray<TSubclassOf<AGuideInteraction_Actor>> USceneActorInteractionComponent::GetInteractionLists() const
 {
-	TArray<TSubclassOf<AGuideInteractionActor>> Results;
-	
-	Results.Append(GuideInteractionAry);
-	Results.Append(TemporaryGuideInteractionAry);
-	
+	TArray<TSubclassOf<AGuideInteraction_Actor>> Results;
+
+	for (const auto& Iter : GuideInteractionAry)
+	{
+		if (Iter.bIsEnable)
+		{
+			Results.Add(Iter.GuideInteraction);
+		}
+	}
+
 	return Results;
 }
 
-void USceneActorInteractionComponent::AddGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass)
+void USceneActorInteractionComponent::StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item)
 {
-	TemporaryGuideInteractionAry.Add(GuideActorClass);
 }
 
- void USceneActorInteractionComponent::RemoveGuideActor(const TSubclassOf<AGuideInteractionActor>& GuideActorClass)
+void USceneActorInteractionComponent::StopInteractionItem()
 {
-	for (int32 Index = 0; Index < TemporaryGuideInteractionAry.Num(); Index++)
+	if (GuideInteractionActorPtr)
 	{
-		if (TemporaryGuideInteractionAry[Index] == GuideActorClass)
+		// GuideInteractionActorPtr->GetGuideSystemStateTreeComponent()->Cleanup();
+		GuideInteractionActorPtr->bWantToStop = true;
+		GuideInteractionActorPtr = nullptr;
+	}
+}
+
+void USceneActorInteractionComponent::ChangedInterationState(
+	const TSubclassOf<AGuideInteraction_Actor>& Item,
+	bool bIsEnable
+)
+{
+	for (auto& Iter : GuideInteractionAry)
+	{
+		if (Iter.GuideInteraction == Item)
 		{
-			TemporaryGuideInteractionAry.RemoveAt(Index);
+			Iter.bIsEnable = bIsEnable;
 			break;
 		}
 	}

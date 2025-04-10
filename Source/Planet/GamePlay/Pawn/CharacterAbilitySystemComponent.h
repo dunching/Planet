@@ -8,7 +8,7 @@
 #include "Components/ActorComponent.h"
 
 #include "ProxyProcessComponent.h"
-#include "GAEvent_Helper.h"
+
 #include "GroupManaggerInterface.h"
 #include "PlanetAbilitySystemComponent.h"
 
@@ -40,6 +40,58 @@ struct FReceivedEventModifyDataCallback;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
+struct FGAEventModify_key_compare;
+
+class PLANET_API IGAEventModifyInterface
+{
+public:
+	friend UCharacterAbilitySystemComponent;
+	friend FGAEventModify_key_compare;
+
+	IGAEventModifyInterface(int32 InPriority = 1);
+
+	bool operator<(const IGAEventModifyInterface& RightValue) const;
+
+protected:
+	bool bIsOnceTime = false;
+
+private:
+	// 越小的越先算, 100~200 用于基础功能
+	int32 Priority = -1;
+
+	int32 ID = -1;
+};
+
+class PLANET_API IGAEventModifySendInterface : public IGAEventModifyInterface
+{
+public:
+	IGAEventModifySendInterface(int32 InPriority = 1);
+
+	// Return：本次修改完是否移除本【修正方式】
+	virtual bool Modify(
+		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
+		);
+};
+
+class PLANET_API IGAEventModifyReceivedInterface : public IGAEventModifyInterface
+{
+public:
+	IGAEventModifyReceivedInterface(int32 InPriority = 1);
+
+	virtual bool Modify(
+		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
+	);
+};
+
+struct FGAEventModify_key_compare
+{
+	bool operator()(const TSharedPtr<IGAEventModifyInterface>& lhs,
+					const TSharedPtr<IGAEventModifyInterface>& rhs) const
+	{
+		return lhs->Priority < rhs->Priority;
+	}
+};
+
 UCLASS()
 class PLANET_API UCharacterAbilitySystemComponent :
 	public UPlanetAbilitySystemComponent,
@@ -53,8 +105,6 @@ public:
 	using FOwnerPawnType = ACharacterBase;
 
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
-
-	using FMakedDamageDelegate_Deprecated = TCallbackHandleContainer<void(ACharacterBase*, const FGAEventData&)>;
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>;
 
@@ -72,13 +122,10 @@ public:
 
 	bool IsInFighting() const;
 
-	void OnSendEventModifyData(FGameplayAbilityTargetData_GASendEvent& OutGAEventData);
+	void InitialBaseGAs();
 
-	void OnSendEventModifyData(
-		UAbilitySystemComponent*AbilitySystemComponentPtr,
-		FGameplayEffectSpecHandle GameplayEffectSpecHandle
-	);
-
+#pragma region 输入和输出得修正
+	
 	void OnReceivedEventModifyData(
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -92,65 +139,10 @@ public:
 	void AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
 
 	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
+#pragma endregion
 
-	void ClearData2Other(
-		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	void ClearData2Self(
-		const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	void SendEvent2Other(
-		const TMap<ACharacterBase*, TMap<ECharacterPropertyType, FBaseProperty>>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	// 增加
-	void SendEvent2Self(
-		const TMap<ECharacterPropertyType, FBaseProperty>& ModifyPropertyMap,
-		const FGameplayTag& DataSource
-	);
-
-	/*
-		一次性的伤害结算
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr
-	);
-
-	/*
-		周期类的标签
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_TagModify* GameplayAbilityTargetDataPtr
-	);
-
-	/*
-		周期类的跟运动修改
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_RootMotion* GameplayAbilityTargetDataPtr
-	);
-
-	/*
-		周期类的状态修改
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_StateModify* GameplayAbilityTargetDataPtr
-	);
-
-	/*
-		周期类的属性修改
-	*/
-	void SendEventImp(
-		FGameplayAbilityTargetData_PropertyModify* GameplayAbilityTargetDataPtr
-	);
-
-	void InitialBaseGAs();
-
+#pragma region 基础GA
+	
 	UFUNCTION(Server, Reliable)
 	void SwitchWalkState(bool bIsRun);
 
@@ -174,9 +166,6 @@ public:
 	// 取消 移动至攻击范围内
 	void BreakMoveToAttackDistance();
 
-	// “受击”效果
-	void ExcuteAttackedEffect(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent);
-
 	// FGameplayAbilitySpecHandle SendEventHandle;
 	//
 	// FGameplayAbilitySpecHandle ReceivedEventHandle;
@@ -186,6 +175,8 @@ public:
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;
 
+#pragma endregion
+	
 protected:
 	
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
@@ -201,8 +192,6 @@ protected:
 		const FGameplayEffectSpec&,
 		FActiveGameplayEffectHandle
 		);
-
-	void AddSendBaseModify();
 
 	void AddReceivedBaseModify();
 

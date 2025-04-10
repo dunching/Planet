@@ -6,10 +6,10 @@
 
 #include "Planet_Tools.h"
 #include "ConversationBorder.h"
-#include "UICommon.h"
+#include "STT_CommonData.h"
 #include "CharacterBase.h"
 #include "CharacterTitle.h"
-#include "TaskNode.h"
+
 #include "Components/VerticalBox.h"
 
 struct FCharacterTitleBox : public TStructVariable<FCharacterTitleBox>

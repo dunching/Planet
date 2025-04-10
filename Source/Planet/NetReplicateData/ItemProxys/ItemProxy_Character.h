@@ -30,6 +30,8 @@ struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 struct FBasicProxy;
 
+using FOnCharacterSocketUpdated = TMulticastDelegate<void(const FCharacterSocket&)>;
+
 /*
  * 角色的配置
  * 比如角色的武器插槽，技能插槽分配
@@ -150,6 +152,8 @@ public:
 
 	int32 Level = 1;
 
+	FOnCharacterSocketUpdated OnCharacterSocketUpdated;
+	
 protected:
 
 	TMap<FGameplayTag, FCharacterSocket>TeammateConfigureMap;

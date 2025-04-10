@@ -98,47 +98,12 @@ void APlanetAIController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	//
-	InitialGroupSharedInfo();
+	// 
 }
 
 void APlanetAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
-}
-
-void APlanetAIController::InitialGroupSharedInfo()
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		if (GetInstigator()->GetParentActor())
-		{
-		}
-		// 如果这个Character是单独的，则直接生成 
-		else
-		{
-			FActorSpawnParameters SpawnParameters;
-
-			SpawnParameters.Owner = this;
-			SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
-			{
-				PRINTINVOKEINFO();
-				auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
-				if (GroupManaggerPtr)
-				{
-					GroupManaggerPtr->GroupID = FGuid::NewGuid();
-				}
-			};
-
-			GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
-				AGroupManagger::StaticClass(), SpawnParameters
-			);
-
-			OnGroupManaggerReady(GroupManaggerPtr);
-		}
-	}
-#endif
 }
 
 TWeakObjectPtr<ACharacterBase> APlanetAIController::GetTeamFocusTarget() const

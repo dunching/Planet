@@ -70,9 +70,11 @@ public:
 	virtual void ApplyCooldown() = 0;
 };
 
-// 场景内的对象代理
-// 通用数据记录在DataTable，变化数据记录在对象内
-// 序列化&反序列化
+/**
+ * 序列化&反序列化
+ * 通用数据记录在DataTable，变化数据记录在对象内
+ * 场景内的对象代理
+ */
 USTRUCT()
 struct PLANET_API FBasicProxy
 {

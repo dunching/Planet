@@ -25,6 +25,8 @@ class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class UEventSubjectComponent;
 class AGroupManagger;
+class AGeneratorColony;
+class AGeneratorBase;
 class AGuideActor;
 
 /**
@@ -83,7 +85,7 @@ public:
 #pragma region CMD
 
 	UFUNCTION(Server, Reliable)
-	void EntryChallengeLevel(const TArray< FString >& Args);
+	void EntryChallengeLevel(ETeleport Teleport);
 
 	UFUNCTION(Server, Reliable)
 	void MakeTrueDamege(const TArray<FString>& Args);
@@ -96,6 +98,20 @@ public:
 
 #pragma endregion
 
+#pragma region RPC
+
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnGeneratorActor(const TSoftObjectPtr<AGeneratorBase>&GeneratorBasePtr);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnCharacter(
+		const TSoftClassPtr<AHumanCharacter_AI>&CharacterClass,
+		const FGuid&ID,
+		const FTransform& Transform
+		);
+
+#pragma region 
+	
 protected:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

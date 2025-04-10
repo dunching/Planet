@@ -15,7 +15,7 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
+
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -129,7 +129,6 @@ void UCS_PeriodicStateModify_Suppress::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -172,7 +171,6 @@ void UCS_PeriodicStateModify_Suppress::PerformAction()
 			}
 			CharacterStateInfoSPtr->DefaultIcon = GameplayAbilityTargetDataSPtr->DefaultIcon;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		}
 #endif
@@ -214,7 +212,6 @@ void UCS_PeriodicStateModify_Suppress::OnTaskTick(UAbilityTask_TimerHelper*, flo
 	{
 		CharacterStateInfoSPtr->TotalTime += DeltaTime;
 
-		CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 	}
 #endif
 }

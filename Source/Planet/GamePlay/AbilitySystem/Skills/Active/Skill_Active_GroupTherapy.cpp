@@ -12,7 +12,7 @@
 #include "GameFramework/Controller.h"
 #include <Engine/OverlapResult.h>
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
@@ -127,29 +127,6 @@ void USkill_Active_GroupTherapy::EmitEffect()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		for (auto Iter : OutOverlaps)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
-			{
-				auto CharacterIter = TeammatesSet.Find(TargetCharacterPtr);
-				if (CharacterIter)
-				{
-					FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-					GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
-
-					GAEventDataPtr->DataAry.Add(GAEventData);
-				}
-			}
-		}
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

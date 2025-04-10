@@ -16,44 +16,42 @@
 #include "InputProcessorSubSystem.h"
 #include "MainHUD.h"
 #include "PlanetPlayerController.h"
-#include "TaskNode.h"
+
 #include "UICommon.h"
 #include "InteractionList.h"
 #include "MainHUDLayout.h"
 #include "SceneActor.h"
 #include "HumanInteractionWithNPC.h"
+#include "STT_CommonData.h"
 
 namespace HumanProcessor
 {
 	class FHumanInteractionWithNPCProcessor;
 }
 
-void UPlayerConversationComponent::DisplaySentence_Implementation(const FTaskNode_Conversation_SentenceInfo& Sentence)
+void UPlayerConversationComponent::DisplaySentence_Player(
+	const FTaskNode_Conversation_SentenceInfo& Sentence,
+	const std::function<void()>& SentenceStop_
+)
 {
-	Super::DisplaySentence_Implementation(Sentence);
-#if UE_EDITOR || UE_CLIENT
-	if (GetOwnerRole() < ROLE_Authority)
-	{
-		OnPlayerHaveNewSentence.Broadcast(true, Sentence);
-	}
-#endif
+	SentenceStop = SentenceStop_;
+
+	OnPlayerHaveNewSentence.Broadcast(true, Sentence);
 }
 
-void UPlayerConversationComponent::CloseConversationborder_Implementation()
+void UPlayerConversationComponent::CloseConversationborder_Player()
 {
-	Super::CloseConversationborder_Implementation();
-#if UE_EDITOR || UE_CLIENT
-	if (GetOwnerRole() < ROLE_Authority)
-	{
-		OnPlayerHaveNewSentence.Broadcast(false, FTaskNode_Conversation_SentenceInfo());
-	}
-#endif
+	OnPlayerHaveNewSentence.Broadcast(false, FTaskNode_Conversation_SentenceInfo());
 }
 
 AHumanCharacter_Player::AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer) :
 	Super(
-		ObjectInitializer.SetDefaultSubobjectClass<UPlayerConversationComponent>(
-			UPlayerConversationComponent::ComponentName)
+		ObjectInitializer.
+		SetDefaultSubobjectClass<UPlayerConversationComponent>(
+			UPlayerConversationComponent::ComponentName).
+		SetDefaultSubobjectClass<USceneCharacterPlayerInteractionComponent>(
+			USceneCharacterPlayerInteractionComponent::ComponentName
+			)
 	)
 {
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -104,10 +102,10 @@ bool AHumanCharacter_Player::TeleportTo(
 	const FRotator& DestRotation,
 	bool bIsATest,
 	bool bNoCheck
-	)
+)
 {
 	PlayerComponentPtr->TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
-	
+
 	return Super::TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
 }
 
@@ -132,8 +130,8 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 			});
 
 		// 
-		UGuideSubSystem::GetInstance()->InitializeMainLine();
-		UGuideSubSystem::GetInstance()->ActiveMainLine();
+		UGuideSubSystem::GetInstance()->InitializeMainThread();
+		UGuideSubSystem::GetInstance()->ActiveMainThread();
 	}
 #endif
 }
@@ -141,7 +139,7 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 void AHumanCharacter_Player::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
 	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
-	
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
@@ -149,28 +147,6 @@ void AHumanCharacter_Player::OnGroupManaggerReady(AGroupManagger* NewGroupShared
 		Cast<AMainHUD>(GetController<APlanetPlayerController>()->MyHUD)->InitalHUD();
 	}
 #endif
-}
-
-void AHumanCharacter_Player::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
-{
-	Super::InteractionSceneCharacter(CharacterPtr);
-
-	// 隐藏交互提示
-	if (CharacterPtr)
-	{
-		CharacterPtr->HasBeenEndedLookAt();
-	}
-	
-	// 
-	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>(
-		[CharacterPtr](auto NewProcessor)
-		{
-			NewProcessor->CharacterPtr = CharacterPtr;
-		});
-}
-
-void AHumanCharacter_Player::InitialGroupSharedInfo()
-{
 }
 
 UCameraComponent* AHumanCharacter_Player::GetCameraComp()
@@ -186,6 +162,11 @@ USpringArmComponent* AHumanCharacter_Player::GetCameraBoom()
 UPlayerConversationComponent* AHumanCharacter_Player::GetPlayerConversationComponent() const
 {
 	return Cast<UPlayerConversationComponent>(ConversationComponentPtr);
+}
+
+USceneCharacterPlayerInteractionComponent* AHumanCharacter_Player::GetSceneCharacterPlayerInteractionComponent() const
+{
+	return Cast<USceneCharacterPlayerInteractionComponent>(SceneActorInteractionComponentPtr);
 }
 
 void AHumanCharacter_Player::UpdateSightActor()
@@ -319,5 +300,37 @@ void AHumanCharacter_Player::EndLookAt()
 	{
 		InteractionListPtr->RemoveFromParent();
 		InteractionListPtr = nullptr;
+	}
+}
+
+void AHumanCharacter_Player::InteractionSceneActor(ASceneActor* SceneObjPtr)
+{
+	//
+	GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
+	
+	InteractionSceneObj_Server(SceneObjPtr);
+}
+
+void AHumanCharacter_Player::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
+{
+	// 隐藏交互提示
+	if (CharacterPtr)
+	{
+		CharacterPtr->HasBeenEndedLookAt();
+	}
+
+	// 
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>(
+		[CharacterPtr](auto NewProcessor)
+		{
+			NewProcessor->CharacterPtr = CharacterPtr;
+		});
+}
+
+void AHumanCharacter_Player::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)
+{
+	if (SceneObjPtr)
+	{
+		SceneObjPtr->HasbeenInteracted(this);
 	}
 }

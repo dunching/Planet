@@ -41,7 +41,6 @@
 #include "UICommon.h"
 #include "HumanAIController.h"
 #include "PlanetPlayerController.h"
-#include "GAEvent_Helper.h"
 #include "CharacterRisingTips.h"
 #include "CharacterTitleComponent.h"
 #include "SceneActor.h"
@@ -98,7 +97,10 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	CharacterTitleComponentPtr->SetupAttachment(RootComponent);
 
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
+	
 	ConversationComponentPtr = CreateDefaultSubobject<UConversationComponent>(UConversationComponent::ComponentName);
+	
+	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(USceneActorInteractionComponent::ComponentName);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -114,6 +116,8 @@ void ACharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	HasBeenEndedLookAt();
+	
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 	auto CharacterAttributeSetPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
@@ -196,8 +200,14 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
-		GroupManaggerPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
-		OnGroupManaggerReady(GroupManaggerPtr);
+		// GroupManaggerPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
+		
+		// if (auto ControllerPtr = GetController<AHumanAIController>())
+		// {
+		// 	ControllerPtr->SetGroupSharedInfo(GetGroupSharedInfo());
+		// }
+		
+		// OnGroupManaggerReady(GetGroupSharedInfo());
 	}
 }
 
@@ -230,15 +240,6 @@ void ACharacterBase::UnPossessed()
 void ACharacterBase::OnRep_Controller()
 {
 	Super::OnRep_Controller();
-}
-
-void ACharacterBase::InteractionSceneActor(ASceneActor* SceneObjPtr)
-{
-	InteractionSceneObj_Server(SceneObjPtr);
-}
-
-void ACharacterBase::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
-{
 }
 
 class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent() const
@@ -299,14 +300,6 @@ TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 USkeletalMeshComponent* ACharacterBase::GetCopyPoseMesh() const
 {
 	return CopyPoseMeshPtr;
-}
-
-void ACharacterBase::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)
-{
-	if (SceneObjPtr)
-	{
-		SceneObjPtr->HasbeenInteracted(this);
-	}
 }
 
 bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
@@ -382,8 +375,37 @@ void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 void ACharacterBase::SpawnDefaultController()
 {
-	Super::SpawnDefaultController();
+	// Super::SpawnDefaultController();
 
+	if ( Controller != nullptr || GetNetMode() == NM_Client)
+	{
+		return;
+	}
+
+	if (AIControllerClass != nullptr)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.Instigator = GetInstigator();
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnInfo.CustomPreSpawnInitalization = [this](AActor* ActorPtr)
+		{
+			auto AIControllerPtr = Cast<APlanetAIController>(ActorPtr);
+			if (AIControllerPtr)
+			{
+				AIControllerPtr->SetGroupSharedInfo(GetGroupSharedInfo());
+			}
+		};
+		SpawnInfo.OverrideLevel = GetLevel();
+		SpawnInfo.ObjectFlags |= RF_Transient;	// We never want to save AI controllers into a map
+		AController* NewController = GetWorld()->SpawnActor<AController>(AIControllerClass, GetActorLocation(), GetActorRotation(), SpawnInfo);
+		if (NewController != nullptr)
+		{
+			// if successful will result in setting this->Controller 
+			// as part of possession mechanics
+			NewController->Possess(this);
+		}
+	}
+	
 	OriginalAIController = Controller;
 }
 
@@ -421,21 +443,6 @@ void ACharacterBase::OnMoveSpeedChangedImp(float Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = Value;
 	GetCharacterMovement()->MaxFlySpeed = Value;
-}
-
-void ACharacterBase::OnProcessedGAEVent_Implementation(const FGameplayAbilityTargetData_GAReceivedEvent& GAEvent)
-{
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		// 显示对应的浮动UI
-		auto UIPtr = CreateWidget<UCharacterRisingTips>(GetWorldImp(), UAssetRefMap::GetInstance()->FightingTipsClass);
-		if (UIPtr->ProcessGAEVent(GAEvent))
-		{
-			UIPtr->AddToViewport(EUIOrder::kFightingTips);
-		}
-	}
-#endif
 }
 
 void ACharacterBase::OnCharacterGroupMateChanged(
@@ -511,4 +518,25 @@ void ACharacterBase::DoDeathing()
 	// if (CharacterPtr)
 	// {
 	// }
+}
+
+void ACharacterBase::HasbeenInteracted(ACharacterBase* CharacterPtr)
+{
+}
+
+void ACharacterBase::HasBeenLookingAt(ACharacterBase* CharacterPtr)
+{
+}
+
+void ACharacterBase::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
+{
+}
+
+void ACharacterBase::HasBeenEndedLookAt()
+{
+}
+
+USceneActorInteractionComponent* ACharacterBase::GetSceneActorInteractionComponent() const
+{
+	return SceneActorInteractionComponentPtr;
 }

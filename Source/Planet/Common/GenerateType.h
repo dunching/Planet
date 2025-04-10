@@ -130,14 +130,17 @@ enum class ETeammateOption : uint8
 	// 初始状态
 	kInitialize,
 
+	// 说话状态
+	kConversation,
+
 };
 
 enum class EProxyModifyType
 {
-	kAdd,
-	kChange,
-	kNumChange,
-	kRemove,
+	kAdd,		// 新增
+	kChange,	// 属性改变
+	kNumChange,	// 数量改变
+	kRemove,	// 移除
 };
 
 enum class EWeaponSocket

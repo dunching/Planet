@@ -22,44 +22,6 @@ namespace EffectItem
 	const FName TextCanvas = TEXT("TextCanvas");
 }
 
-void UEffectItem::SetData(const TSharedPtr<FCharacterStateInfo>& InCharacterStateInfoSPtr)
-{
-	// CharacterStateInfoSPtr = InCharacterStateInfoSPtr;
-	//
-	// DataChangedHandle = CharacterStateInfoSPtr->DataChanged.AddCallback(std::bind(&ThisClass::OnUpdate, this));
-	//
-	// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
-	//
-	// OnUpdate();
-}
-
-void UEffectItem::SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr)
-{
-	ActiveGameplayEffectPtr = InActiveGameplayEffectPtr;
-
-	Handle = ActiveGameplayEffectPtr->Handle;
-
-	FGameplayTagContainer OutContainer;
-	InActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
-
-	for (const auto& Iter : OutContainer)
-	{
-		auto TableRowPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy_TagExtendInfo(Iter);
-		if (TableRowPtr)
-		{
-			auto Icon = TableRowPtr->DefaultIcon;
-			if (Icon.IsNull())
-			{
-			}
-			else
-			{
-				SetTexutre(Icon);
-				break;
-			}
-		}
-	}
-}
-
 void UEffectItem::SetNum(int32 NewNum)
 {
 	SetSetNumIsDisplay(true);

@@ -58,6 +58,6 @@ struct PLANET_API FSTT_UpdateTargetCharacter : public FStateTreeAIActionTaskBase
 		const float DeltaTime
 	) const override;
 
-	virtual EStateTreeRunStatus PerformMoveTask(FStateTreeExecutionContext& Context) const;
+	virtual EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 
 };

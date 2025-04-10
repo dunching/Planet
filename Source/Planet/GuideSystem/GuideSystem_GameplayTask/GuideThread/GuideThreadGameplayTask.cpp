@@ -8,9 +8,9 @@
 #include "EventSubjectComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "GuideActor.h"
-#include "GuideInteractionActor.h"
+#include "GuideInteraction.h"
 #include "GuideSubSystem.h"
-#include "GuideThreadActor.h"
+#include "GuideThread.h"
 #include "InventoryComponent.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
@@ -19,8 +19,8 @@
 #include "OptionList.h"
 #include "PlanetPlayerController.h"
 #include "TargetPoint_Runtime.h"
-#include "TaskNode_Guide.h"
-#include "TaskNode_Interaction.h"
+
+
 
 class AMainHUD;
 
@@ -31,6 +31,10 @@ UGameplayTask_Guide::UGameplayTask_Guide(const FObjectInitializer& ObjectInitial
 	bIsPausable = true;
 }
 
+void UGameplayTask_Guide::SetGuideActor(TObjectPtr<AGuideThread> InGuideActorPtr)
+{
+	GuideActorPtr = InGuideActorPtr;
+}
 UGameplayTask_Guide_MoveToLocation::UGameplayTask_Guide_MoveToLocation(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
@@ -191,14 +195,8 @@ void UGameplayTask_Guide_AddToTarget::Activate()
 	ConditionalPerformTask();
 }
 
-void UGameplayTask_Guide_AddToTarget::SetUp(UPAD_TaskNode_Guide_AddToTarget* InTaskNodePtr)
-{
-	GuideInteractionActorClass = InTaskNodePtr->GuideInteractionActorClass;
-	TargetCharacterPtr = InTaskNodePtr->TargetCharacterPtr;
-}
-
 void UGameplayTask_Guide_AddToTarget::SetUp(
-	const TSubclassOf<AGuideInteractionActor>& InGuideInteractionActorClass,
+	const TSubclassOf<AGuideInteraction_Actor>& InGuideInteractionActorClass,
 	const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
 )
 {
@@ -213,9 +211,6 @@ void UGameplayTask_Guide_AddToTarget::ConditionalPerformTask()
 		GuideInteractionActorClass.Get()
 	)
 	{
-		TargetCharacterPtr->GetSceneActorInteractionComponent()->AddGuideActor(
-			GuideInteractionActorClass);
-
 		StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 		EndTask();
 	}
@@ -237,11 +232,6 @@ void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(bool bInOwnerFinished
 	}
 
 	Super::OnDestroy(bInOwnerFinished);
-}
-
-void UGameplayTask_Guide_ConversationWithTarget::SetUp(UPAD_TaskNode_Guide_ConversationWithTarget* InTaskNodePtr)
-{
-	TargetCharacterPtr = InTaskNodePtr->TargetCharacterPtr;
 }
 
 void UGameplayTask_Guide_ConversationWithTarget::SetUp(const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr)
@@ -303,6 +293,10 @@ void UGameplayTask_Guide_CollectResource::Activate()
 	OnConsumableProxyChangedHandle = PlayerCharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
 		std::bind(&ThisClass::OnGetConsumableProxy, this, std::placeholders::_1, std::placeholders::_2)
 	);
+	
+	OnCoinProxyChangedHandle = PlayerCharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
+		std::bind(&ThisClass::OnCoinProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+	);
 }
 
 void UGameplayTask_Guide_CollectResource::OnDestroy(bool bInOwnerFinished)
@@ -346,6 +340,38 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 				CurrentNum += ConsumableProxySPtr->Num;
 				UpdateDescription();
 				if (CurrentNum >= Num)
+				{
+					StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+					EndTask();
+					return;
+				}
+			}
+			break;
+		case EProxyModifyType::kChange:
+			break;
+		case EProxyModifyType::kRemove:
+			break;
+		default: ;
+		}
+	}
+}
+
+void UGameplayTask_Guide_CollectResource::OnCoinProxyChanged(
+	const TSharedPtr<FCoinProxy>&ProxySPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num_
+	)
+{
+	if (ProxySPtr && ProxySPtr->GetProxyType().MatchesTag(ResourceType))
+	{
+		switch (ProxyModifyType)
+		{
+		case EProxyModifyType::kAdd:
+		case EProxyModifyType::kNumChange:
+			{
+				CurrentNum += Num_;
+				UpdateDescription();
+				if (CurrentNum >= Num_)
 				{
 					StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 					EndTask();
@@ -434,4 +460,34 @@ void UGameplayTask_Guide_DefeatEnemy::UpdateDescription() const
 	{
 		GuideActorPtr->UpdateCurrentTaskNode(GetTaskNodeDescripton());
 	}
+}
+
+void UGameplayTask_Guide_ReturnOpenWorld::TickTask(float DeltaTime)
+{
+	Super::TickTask(DeltaTime);
+
+	TotalTime += DeltaTime;
+
+	if (TotalTime > RemainTime)
+	{
+		StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
+		EndTask();
+	}
+}
+
+void UGameplayTask_Guide_ReturnOpenWorld::SetUp(int32 RemainTime_)
+{
+	RemainTime = RemainTime_;
+}
+
+FTaskNodeDescript UGameplayTask_Guide_ReturnOpenWorld::GetTaskNodeDescripton() const
+{
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.bIsFreshPreviouDescription = true;
+
+	const auto Time = RemainTime - TotalTime;
+	TaskNodeDescript.Description = FString::Printf(TEXT("%.1lf后离开副本"), Time);
+
+	return TaskNodeDescript;
 }

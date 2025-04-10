@@ -52,7 +52,7 @@ EStateTreeRunStatus FSTT_RunEQS::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	return PerformMoveTask(Context);
+	return PerformGameplayTask(Context);
 }
 
 void FSTT_RunEQS::ExitState(
@@ -105,7 +105,7 @@ EStateTreeRunStatus FSTT_RunEQS::Tick(
 	return Super::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_RunEQS::PerformMoveTask(FStateTreeExecutionContext& Context)const
+EStateTreeRunStatus FSTT_RunEQS::PerformGameplayTask(FStateTreeExecutionContext& Context)const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 

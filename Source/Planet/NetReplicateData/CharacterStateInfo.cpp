@@ -115,17 +115,14 @@ void FCharacterStateInfo_FASI_Container::RemoveItem(const TSharedPtr<FCharacterS
 
 void FCharacterStateInfo_FASI::PreReplicatedRemove(const FCharacterStateInfo_FASI_Container& InArraySerializer)
 {
-	InArraySerializer.StateProcessorComponent->RemoveStateDisplay(CharacterStateInfoSPtr);
 }
 
 void FCharacterStateInfo_FASI::PostReplicatedAdd(const FCharacterStateInfo_FASI_Container& InArraySerializer)
 {
-	InArraySerializer.StateProcessorComponent->AddStateDisplay(CharacterStateInfoSPtr);
 }
 
 void FCharacterStateInfo_FASI::PostReplicatedChange(const FCharacterStateInfo_FASI_Container& InArraySerializer)
 {
-	InArraySerializer.StateProcessorComponent->ChangeStateDisplay(CharacterStateInfoSPtr);
 }
 
 bool FCharacterStateInfo_FASI::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)

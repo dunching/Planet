@@ -6,8 +6,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "GAEvent_Helper.h"
-
 #include "AllocationSkills.h"
 #include "GroupManaggerInterface.h"
 #include "ItemProxy_Character.h"

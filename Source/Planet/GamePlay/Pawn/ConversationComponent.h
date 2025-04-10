@@ -30,6 +30,7 @@ public:
 
 	UConversationComponent(const FObjectInitializer& ObjectInitializer);
 
+#pragma region NPC Saying
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void DisplaySentence(
 		const FTaskNode_Conversation_SentenceInfo&Sentence
@@ -37,6 +38,17 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void CloseConversationborder();
+#pragma endregion 
+
+#pragma region Conversation
+	virtual void DisplaySentence_Player(
+		const FTaskNode_Conversation_SentenceInfo&Sentence,
+		const std::function<void()>&SentenceStop
+		);
+
+	virtual void CloseConversationborder_Player();
+#pragma endregion 
 
 protected:
+
 };

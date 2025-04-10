@@ -27,8 +27,7 @@ struct FConsumableProxy;
 
 UCLASS()
 class PLANET_API AHumanCharacter :
-	public ACharacterBase,
-	public ISceneActorInteractionInterface
+	public ACharacterBase
 {
 	GENERATED_BODY()
 
@@ -36,8 +35,6 @@ public:
 
 	AHumanCharacter(const FObjectInitializer& ObjectInitializer);
 
-	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const override;
-	
 protected:
 
 	virtual void BeginPlay() override;
@@ -50,19 +47,8 @@ protected:
 
 	virtual void UnPossessed() override;
 
-	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) override;
-
-	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
-
-	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr) override;
-
-	virtual void HasBeenEndedLookAt() override;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "ToolsIcons")
 	TSoftObjectPtr<UTexture2D> CharacterIcon;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
-	TObjectPtr<USceneActorInteractionComponent> SceneActorInteractionComponentPtr = nullptr;
 	
 private:
 

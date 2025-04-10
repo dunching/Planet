@@ -18,3 +18,13 @@ UGameplayTasksComponent* UGuideSystemStateTreeComponent::GetGameplayTasksCompone
 {
 	return GetOwner<AGuideActor>()->GetGameplayTasksComponent();
 }
+
+void UGuideSystemStateTreeComponent::StartLogic()
+{
+	Super::StartLogic();
+}
+
+void UGuideSystemStateTreeComponent::StopLogic(const FString& Reason)
+{
+	Super::StopLogic(Reason);
+}

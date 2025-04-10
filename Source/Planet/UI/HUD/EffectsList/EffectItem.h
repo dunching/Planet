@@ -13,6 +13,8 @@
 
 struct FStreamableHandle;
 struct FCharacterStateInfo;
+struct FActiveGameplayEffect;
+
 class UCS_Base;
 class UGameplayEffect;
 
@@ -26,10 +28,6 @@ class PLANET_API UEffectItem :
 public:
 
 	using FDataChangedHandle = TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
-
-	void SetData(const TSharedPtr<FCharacterStateInfo> &InCharacterStateInfoSPtr);
-
-	void SetData(const FActiveGameplayEffect*ActiveGameplayEffect);
 
 protected:
 

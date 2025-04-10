@@ -47,7 +47,6 @@ void USkill_Active_CantBeSelected::ActivateAbility(
 		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
 		CharacterStateInfoSPtr->DataChanged();
 
-		CharacterPtr->GetStateProcessorComponent()->AddStateDisplay(CharacterStateInfoSPtr);
 
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
@@ -72,7 +71,6 @@ void USkill_Active_CantBeSelected::EndAbility(
 	bool bWasCancelled
 )
 {
-	CharacterPtr->GetStateProcessorComponent()->RemoveStateDisplay(CharacterStateInfoSPtr);
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
@@ -89,7 +87,6 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 
 			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
 		{
 			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Stagnation(Duration);
@@ -99,7 +96,6 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 
 			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
 	}
 }
@@ -113,7 +109,6 @@ void USkill_Active_CantBeSelected::DurationDelegate(UAbilityTask_TimerHelper*, f
 		{
 			CharacterStateInfoSPtr->TotalTime = CurrentIntervalTime;
 			CharacterStateInfoSPtr->DataChanged();
-			CharacterPtr->GetStateProcessorComponent()->ChangeStateDisplay(CharacterStateInfoSPtr);
 		}
 	}
 #endif

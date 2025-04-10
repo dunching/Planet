@@ -43,6 +43,8 @@ class UMainMenuLayout;
 class UGE_Damage;
 class UGE_Damage_Callback;
 class ATargetPoint_Runtime;
+class AGuideBranchThread;
+class AGuideChallengeThread;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UPrimaryDataAsset
@@ -122,6 +124,19 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName PostProcessVolume_Skill_Tag;
 
+#if WITH_EDITORONLY_DATA
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
+	TSubclassOf<AGuideBranchThread> GuideBranchThreadTestClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
+	TSubclassOf<AGuideBranchThread> GuideBranchThreadTest1Class;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
+	TSubclassOf<AGuideBranchThread> GuideBranchThreadTest2Class;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
+	TSubclassOf<AGuideChallengeThread> GuideThreadChallengeActorClass;
+#endif
 };
 
 FString GetVoxelWorldSlot();

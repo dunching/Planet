@@ -10,7 +10,7 @@
 #include "MyUserWidget.h"
 #include "GenerateType.h"
 #include "GroupManaggerInterface.h"
-#include "TaskNode.h"
+
 
 #include "CharacterTitleComponent.generated.h"
 
@@ -19,6 +19,8 @@ class UConversationBorder;
 class UCharacterTitle;
 class ACharacterBase;
 class AGroupManagger;
+
+struct FTaskNode_Conversation_SentenceInfo;
 
 UCLASS()
 class PLANET_API UCharacterTitleBox :

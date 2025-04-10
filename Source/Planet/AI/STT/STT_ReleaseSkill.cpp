@@ -45,7 +45,7 @@ EStateTreeRunStatus FSTT_ReleaseSkill::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	return PerformMoveTask(Context);
+	return PerformGameplayTask(Context);
 }
 
 void FSTT_ReleaseSkill::ExitState(
@@ -110,7 +110,7 @@ EStateTreeRunStatus FSTT_ReleaseSkill::Tick(
 	return Super::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_ReleaseSkill::PerformMoveTask(FStateTreeExecutionContext& Context) const
+EStateTreeRunStatus FSTT_ReleaseSkill::PerformGameplayTask(FStateTreeExecutionContext& Context) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 

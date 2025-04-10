@@ -12,14 +12,15 @@
 
 #include "GuideSystemGameplayTask.h"
 #include "ProxyProcessComponent.h"
-#include "TaskNode.h"
+#include "STT_CommonData.h"
+
 
 #include "GuideInteractionGameplayTask.generated.h"
 
 class AHumanCharacter_Player;
 class ATargetPoint_Runtime;
 class AGuideThread;
-class AGuideInteractionActor;
+class AGuideInteraction_Actor;
 class UPAD_TaskNode_Guide_AddToTarget;
 class UPAD_TaskNode_Guide_ConversationWithTarget;
 class UPAD_TaskNode_Interaction_Option;
@@ -36,6 +37,10 @@ public:
 
 	void SetTargetCharacterPtr(AHumanCharacter* InTargetCharacterPtr);
 
+	void SetGuideInteractionActor(AGuideInteraction_Actor* InTargetCharacterPtr);
+
+	TObjectPtr<AGuideInteraction_Actor> GuideActorPtr = nullptr;
+	
 	// 激活互动的Character
 	AHumanCharacter* TargetCharacterPtr = nullptr;
 };
@@ -58,11 +63,13 @@ public:
 	void SetUp(
 		const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry
 		);
-
+	
 protected:
 	
 	void ConditionalPerformTask();
 
+	void CurrentSentenceStop();
+	
 	float RemainingTime = 0.f;
 	
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
@@ -110,33 +117,5 @@ protected:
 
 	// 时间限制，<0为无限制
 	float DelayTime = -1.f;
-	
-};
-
-UCLASS()
-class PLANET_API UGameplayTask_Interaction_NotifyGuideThread : public UGameplayTask_Interaction
-{
-	GENERATED_BODY()
-
-public:
-	
-	virtual void Activate() override;
-	
-	void SetUp(
-		const TSubclassOf<AGuideInteractionActor> &GuideInteractionActorClass,
-		FGuid TaskID,
-		int32 SelectedIndex
-		);
-
-protected:
-	
-	void ConditionalPerformTask();
-	
-	FGuid TaskID;
-
-	//结束时移除这个节点
-	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
-	
-	int32 SelectedIndex = -1;
 	
 };

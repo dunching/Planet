@@ -16,7 +16,7 @@
 
 class AGuideActor;
 class AGuideMainThread;
-class AGuideInteractionActor;
+class AGuideInteraction_Actor;
 class ACharacterBase;
 class AHumanCharacter;
 class AHumanCharacter_Player;
@@ -27,6 +27,8 @@ class PLANET_API USTE_TaskNode : public UStateTreeEvaluatorBlueprintBase
 	GENERATED_BODY()
 
 public:
+
+	virtual void TreeStop(FStateTreeExecutionContext& Context)override;
 
 protected:
 

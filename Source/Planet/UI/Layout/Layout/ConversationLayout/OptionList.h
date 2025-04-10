@@ -12,7 +12,7 @@
 #include "OptionList.generated.h"
 
 class AGuideActor;
-class AGuideInteractionActor;
+class AGuideInteraction_Actor;
 class UOptionItem;
 class ACharacterBase;
 class AHumanCharacter_AI;
@@ -36,15 +36,9 @@ public:
 	// 显示AI可以互动的节点
 	void UpdateDisplay(
 		AHumanCharacter_AI* InTargetCharacterPtr,
-		const std::function<void(const TSubclassOf<AGuideInteractionActor>&)>& InCallback
+		const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
 		);
 
-	// 显示选项
-	void UpdateDisplay(
-		const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>&InTaskNodeRef,
-		const std::function<void(int32)>& InCallback
-		);
-	
 	void UpdateDisplay(
 		const TArray<FString>&OptionAry,
 		const std::function<void(int32)>& InCallback

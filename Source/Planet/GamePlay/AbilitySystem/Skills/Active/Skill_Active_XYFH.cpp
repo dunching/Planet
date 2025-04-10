@@ -17,7 +17,7 @@
 #include <GameFramework/SpringArmComponent.h>
 #include "Net/UnrealNetwork.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"

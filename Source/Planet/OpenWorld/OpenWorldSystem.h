@@ -11,35 +11,13 @@ class ATargetPoint;
 class ATeleport;
 class APlanetPlayerController;
 
-UENUM(BlueprintType)
-enum class ETeleport : uint8
-{
-	kReturnOpenWorld,
-	kTeleport_1,
-	kTest1,
-	kTest2,
-};
+struct FTableRow_Teleport;
 
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRow_Teleport : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	ETeleport ChallengeLevelType = ETeleport::kTest1;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FString ExtendText;
-
-	UPROPERTY(EditAnywhere, Category = "DataLayer")
-	TObjectPtr<const UDataLayerAsset> DLS;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<ATeleport> TeleportRef;
-};
+enum class ETeleport : uint8;
 
 /*
  * 传送
+ * Only Server
  */
 UCLASS()
 class PLANET_API UOpenWorldSubSystem : public UWorldSubsystem
@@ -49,17 +27,45 @@ class PLANET_API UOpenWorldSubSystem : public UWorldSubsystem
 public:
 	static UOpenWorldSubSystem* GetInstance();
 
-	void EntryLevel(ETeleport ChallengeLevelType, APlanetPlayerController* PCPtr);
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
+	void SwitchDataLayer(ETeleport ChallengeLevelType, APlanetPlayerController* PCPtr);
+
+	/**
+	 * 确认切换的数据层中，必须的数据是否已存在
+	 * @param ChallengeLevelType 
+	 * @return 
+	 */
+	bool CheckSwitchDataLayerComplete(ETeleport ChallengeLevelType);
+
+	TSoftObjectPtr<ATeleport> GetTeleport(ETeleport ChallengeLevelType)const;
+
+	/**
+	 * 根据指定挑战关卡和生成NPC数量 返回生成位置
+	 * @param ChallengeLevelType 
+	 * @param Num 
+	 * @return 
+	 */
+	TArray<FTransform>GetChallengeSpawnPts(ETeleport ChallengeLevelType, int32 Num)const;
+	
 private:
 
-	void ForeachTeleportRow(
+	void SwitchDataLayerImp(
+		const FName& Key,
+		const FTableRow_Teleport& Value,
+		ETeleport ChallengeLevelType
+		);
+
+	void TeleportPlayer(
 		const FName& Key,
 		const FTableRow_Teleport& Value,
 		ETeleport ChallengeLevelType,
 		APlanetPlayerController* PCPtr
 		);
-	
+
+	/*
+	 *	角色进入副本之前在开放世界的位置信息
+	 */
 	FTransform OpenWorldTransform = FTransform::Identity;
 	
 };

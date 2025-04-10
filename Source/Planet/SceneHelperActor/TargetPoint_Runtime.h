@@ -21,6 +21,8 @@ public:
 
 	ATargetPoint_Runtime(const FObjectInitializer& ObjectInitializer);
 
+	virtual void BeginPlay()override;
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Display)

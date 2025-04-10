@@ -16,7 +16,7 @@
 #include "KismetCollisionHelper.h"
 #include "KismetGravityLibrary.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "Tool_PickAxe.h"
@@ -200,23 +200,6 @@ void USkill_Active_Suppress::ExcuteTasksImp_Implementation(ACharacterBase* Targe
 			// 伤害
 			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
-			auto GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-			GAEventData.SetBaseDamage(Damage);
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-			ICPtr->SendEventImp(GAEventDataPtr);
-
-			// 控制效果,压制
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Suppress(TargetMontage);
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = TargetCharacterPtr;
-
-			ICPtr->SendEventImp(GameplayAbilityTargetData_RootMotionPtr);
 		}
 #endif
 	}

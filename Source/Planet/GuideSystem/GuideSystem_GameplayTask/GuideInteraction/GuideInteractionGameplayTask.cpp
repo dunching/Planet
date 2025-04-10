@@ -5,8 +5,9 @@
 #include "AssetRefMap.h"
 #include "ConversationLayout.h"
 #include "GuideActor.h"
+#include "GuideInteraction.h"
 #include "GuideSubSystem.h"
-#include "GuideThreadActor.h"
+#include "GuideThread.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
 #include "MainHUD.h"
@@ -14,8 +15,8 @@
 #include "OptionList.h"
 #include "PlanetPlayerController.h"
 #include "TargetPoint_Runtime.h"
-#include "TaskNode_Guide.h"
-#include "TaskNode_Interaction.h"
+
+
 
 class AMainHUD;
 
@@ -29,6 +30,11 @@ UGameplayTask_Interaction::UGameplayTask_Interaction(const FObjectInitializer& O
 void UGameplayTask_Interaction::SetTargetCharacterPtr(AHumanCharacter* InTargetCharacterPtr)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
+}
+
+void UGameplayTask_Interaction::SetGuideInteractionActor(AGuideInteraction_Actor* InTargetCharacterPtr)
+{
+	GuideActorPtr = InTargetCharacterPtr;
 }
 
 UGameplayTask_Interaction_Conversation::UGameplayTask_Interaction_Conversation(
@@ -50,6 +56,11 @@ void UGameplayTask_Interaction_Conversation::TickTask(float DeltaTime)
 {
 	Super::TickTask(DeltaTime);
 
+	if (GuideActorPtr->bWantToStop)
+	{
+		EndTask();
+	}
+	
 	RemainingTime -= DeltaTime;
 
 	if (RemainingTime <= 0.f)
@@ -60,7 +71,6 @@ void UGameplayTask_Interaction_Conversation::TickTask(float DeltaTime)
 		}
 		else
 		{
-			StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 			EndTask();
 		}
 	}
@@ -70,7 +80,7 @@ void UGameplayTask_Interaction_Conversation::OnDestroy(bool bInOwnerFinished)
 {
 	if (PlayerCharacterPtr)
 	{
-		PlayerCharacterPtr->GetConversationComponent()->CloseConversationborder();
+		PlayerCharacterPtr->GetConversationComponent()->CloseConversationborder_Player();
 	}
 
 	Super::OnDestroy(bInOwnerFinished);
@@ -91,10 +101,15 @@ void UGameplayTask_Interaction_Conversation::ConditionalPerformTask()
 
 		RemainingTime = Ref.DelayTime;
 
-		PlayerCharacterPtr->GetConversationComponent()->DisplaySentence(Ref);
+		PlayerCharacterPtr->GetConversationComponent()->DisplaySentence_Player(Ref,std::bind(&ThisClass::CurrentSentenceStop, this));
 	}
 
 	SentenceIndex++;
+}
+
+void UGameplayTask_Interaction_Conversation::CurrentSentenceStop()
+{
+	RemainingTime = 0.f;
 }
 
 UGameplayTask_Interaction_Option::UGameplayTask_Interaction_Option(const FObjectInitializer& ObjectInitializer)
@@ -139,8 +154,6 @@ void UGameplayTask_Interaction_Option::SetUp(
 	const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef
 )
 {
-	OptionAry = InTaskNodeRef->OptionAry;
-	DelayTime = InTaskNodeRef->DelayTime;
 }
 
 void UGameplayTask_Interaction_Option::SetUp(
@@ -176,44 +189,6 @@ void UGameplayTask_Interaction_Option::OnSelected(int32 Index)
 
 	SelectedIndex = Index;
 
-	StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
-	EndTask();
-}
-
-void UGameplayTask_Interaction_NotifyGuideThread::Activate()
-{
-	Super::Activate();
-
-	ConditionalPerformTask();
-}
-
-void UGameplayTask_Interaction_NotifyGuideThread::SetUp(
-		const TSubclassOf<AGuideInteractionActor> &InGuideInteractionActorClass,
-		FGuid InTaskID,
-		int32 InSelectedIndex
-	)
-{
-	GuideInteractionActorClass = InGuideInteractionActorClass;
-	
-	TaskID = InTaskID;
-	
-	SelectedIndex = InSelectedIndex;
-}
-
-void UGameplayTask_Interaction_NotifyGuideThread::ConditionalPerformTask()
-{
-	FTaskNodeResuleHelper TaskNodeResuleHelper;
-
-	TaskNodeResuleHelper.TaskID = TaskID;
-	TaskNodeResuleHelper.Output_1 = SelectedIndex;
-	
-	UGuideSubSystem::GetInstance()->GetCurrentGuideThread()->AddEvent(TaskNodeResuleHelper);
-
-	if (TargetCharacterPtr)
-	{
-		TargetCharacterPtr->GetSceneActorInteractionComponent()->RemoveGuideActor(GuideInteractionActorClass);
-	}
-	
 	StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 	EndTask();
 }

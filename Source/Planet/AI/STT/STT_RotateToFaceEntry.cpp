@@ -39,7 +39,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	return PerformMoveTask(Context);
+	return PerformGameplayTask(Context);
 }
 
 void FSTT_RotateToFaceEntry::ExitState(
@@ -66,7 +66,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 
 	if (InstanceData.AIControllerPtr->GetFocusActor())
 	{
-		const float AngleTolerance = 5.f;
+		const float AngleTolerance = FMath::DegreesToRadians(5.0f);
 
 		const auto PCRot = InstanceData.AIControllerPtr->GetControlRotation();
 		const auto PawnRot = InstanceData.CharacterPtr->GetActorRotation();
@@ -85,7 +85,7 @@ EStateTreeRunStatus FSTT_RotateToFaceEntry::Tick(
 	return Super::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_RotateToFaceEntry::PerformMoveTask(FStateTreeExecutionContext& Context)const
+EStateTreeRunStatus FSTT_RotateToFaceEntry::PerformGameplayTask(FStateTreeExecutionContext& Context)const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 

@@ -12,7 +12,7 @@
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
@@ -157,21 +157,6 @@ void USkill_WeaponActive_RangeTest::EmitProjectile()
 
 void USkill_WeaponActive_RangeTest::MakeDamage(ACharacterBase* TargetCharacterPtr)
 {
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	if (TargetCharacterPtr)
-	{
-		FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-		GAEventData.SetBaseDamage(Damage);
-
-		GAEventDataPtr->DataAry.Add(GAEventData);
-	}
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
 void USkill_WeaponActive_RangeTest::PlayMontage()

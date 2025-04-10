@@ -141,7 +141,6 @@ void UEffectsList::OnActiveGameplayEffect(
 	if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Info))
 	{
 		auto ItemPtr = AddEffectItem();
-		ItemPtr->SetData(ActiveGameplayEffectPtr);
 	}
 }
 

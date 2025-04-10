@@ -27,30 +27,47 @@ class PLANET_API UGuideSubSystem : public UWorldSubsystem
 	GENERATED_BODY()
 
 public:
+	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
+
 	static UGuideSubSystem* GetInstance();
 
 	// 初始化主线内容
-	void InitializeMainLine();
+	void InitializeMainThread();
 
-	void ActiveMainLine();
+	void ActiveMainThread();
 	
 	// 添加支线内容
 	void AddBranchLine(const TSubclassOf<AGuideBranchThread>& BranchLineGuideClass);
 
+	// 将任务设置为当前任务
+	void ActiveTargetGuideThread(const TSubclassOf<AGuideThread>& GuideClass, bool bIsTransit);
+	
+	// 停止当前任务，如果类型为指定类型的话
+	void StopActiveTargetGuideThread(const TSubclassOf<AGuideThread>& GuideClass);
+
+	void GuideThreadEnded(AGuideThread * GuideThreadPtr);
+	
 	TObjectPtr<AGuideThread>GetCurrentGuideThread()const;
+
+	FOnGuideEnd & GetOnGuideEnd();
 	
 	FOnCurrentGuideChagned OnCurrentGuideChagned;
+
+private:
 
 	// TODO 选中其他任务
 	FOnGuideEnd OnGuideEnd;
 	
-private:
-
-	// 当前追踪的引导
+	// 上一个激活的引导任务
+	TSubclassOf<AGuideThread> PreviouGuideClass;
+	
+	/**
+	 * 当前追踪的引导
+	 * 同一只时间只能激活一个引导
+	 */
 	TObjectPtr<AGuideThread> CurrentLineGuidePtr = nullptr;
 
-	// UPROPERTY(ReplicatedUsing = OnRep_WolrdProcess)
-	TObjectPtr<AGuideMainThread> MainLineGuidePtr = nullptr;
+	// 引导任务ID, 已执行到的任务ID
+	TMap<FGuid, FGuid> GuidePostionSet;
 
-	TArray<TObjectPtr<AGuideBranchThread>> BranchLineAry;
 };

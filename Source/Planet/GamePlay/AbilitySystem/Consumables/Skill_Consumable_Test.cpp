@@ -7,7 +7,7 @@
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
-#include "GAEvent_Helper.h"
+
 #include "Consumable_Test.h"
 #include "CharacterAbilitySystemComponent.h"
 
@@ -100,21 +100,6 @@ void USkill_Consumable_Test::OnPlayMontageEnd()
 
 void USkill_Consumable_Test::EmitEffect()
 {
-	FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-	FGameplayEventData Payload;
-	Payload.TargetData.Add(GAEventDataPtr);
-
-	GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-	FGAEventData GAEventData(CharacterPtr, CharacterPtr);
-
-	GAEventData.DataModify.Add(ECharacterPropertyType::HP, HP);
-
-	GAEventDataPtr->DataAry.Add(GAEventData);
-
-	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-	ICPtr->SendEventImp(GAEventDataPtr);
 }
 
 void USkill_Consumable_Test::PreActivate(

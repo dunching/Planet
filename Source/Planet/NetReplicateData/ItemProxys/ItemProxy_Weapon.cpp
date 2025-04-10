@@ -148,9 +148,6 @@ void FWeaponProxy::ActiveWeapon()
 				}
 
 				auto AllocationCharacter = GetAllocationCharacter();
-				AllocationCharacter->GetCharacterAbilitySystemComponent()->SendEvent2Self(
-					ModifyPropertyMap, GetProxyType()
-				);
 			}
 
 			// 切换人物姿势
@@ -187,7 +184,6 @@ void FWeaponProxy::RetractputWeapon()
 			auto AllocationCharacter = GetAllocationCharacter();
 			if (AllocationCharacter->GetNetMode() == NM_DedicatedServer)
 			{
-				AllocationCharacter->GetCharacterAbilitySystemComponent()->ClearData2Self(GetAllData(), GetProxyType());
 			}
 		}
 #endif

@@ -36,6 +36,12 @@ struct FTaskNodeResuleHelper
 
 struct FTaskNodeDescript
 {
+	FTaskNodeDescript();
+	
+	FTaskNodeDescript(bool bIsOnlyFresh);
+	
+	static FTaskNodeDescript Refresh; 
+	
 	bool GetIsValid() const;
 	
 	// 执行此节点时，是否刷新上一条的描述？
@@ -43,9 +49,13 @@ struct FTaskNodeDescript
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsFreshPreviouDescription = true;
 	
+	bool bIsOnlyFresh = false;
+	
 	FString Name;
 	
 	FString Description;
+
+	FGuid StepTaskID;
 };
 
 using FOnCurrentTaskNodeChanged = TMulticastDelegate<void(const FTaskNodeDescript&)>;
@@ -64,6 +74,8 @@ class PLANET_API AGuideActor : public AInfo
 public:
 	AGuideActor(const FObjectInitializer& ObjectInitializer);
 
+	virtual void Destroyed() override;
+	
 	UGameplayTasksComponent* GetGameplayTasksComponent() const;
 
 	UGuideSystemStateTreeComponent* GetGuideSystemStateTreeComponent() const;

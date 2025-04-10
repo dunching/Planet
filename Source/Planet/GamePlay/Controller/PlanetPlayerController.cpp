@@ -5,6 +5,8 @@
 #include <Engine/Engine.h>
 #include <IXRTrackingSystem.h>
 #include <IXRCamera.h>
+
+#include "AssetRefMap.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/HUD.h"
@@ -37,8 +39,9 @@
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
 #include "GuideActor.h"
-#include "GuideSubSystem.h"
-#include "ChallengeSystem.h"
+#include "GE_Common.h"
+#include "HumanCharacter_AI.h"
+#include "GeneratorColony.h"
 #include "OpenWorldSystem.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
@@ -139,6 +142,39 @@ FVector APlanetPlayerController::GetFocalPoint() const
 FVector APlanetPlayerController::GetFocalPointOnActor(const AActor* Actor) const
 {
 	return Actor != nullptr ? Actor->GetActorLocation() : FAISystem::InvalidLocation;
+}
+
+void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
+	const TSoftObjectPtr<AGeneratorBase>& GeneratorBasePtr)
+{
+	GeneratorBasePtr->SpawnGeneratorActor();
+}
+
+void APlanetPlayerController::ServerSpawnCharacter_Implementation(
+	const TSoftClassPtr<AHumanCharacter_AI>& CharacterClass,
+	const FGuid& ID,
+	const FTransform& Transform
+)
+{
+	FActorSpawnParameters SpawnParameters;
+
+	SpawnParameters.CustomPreSpawnInitalization = [this, ID](auto ActorPtr)
+	{
+		auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+		if (AICharacterPtr)
+		{
+			AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
+		}
+	};
+		
+	auto Result =
+		GetWorld()->SpawnActor<AHumanCharacter_AI>(
+			CharacterClass.LoadSynchronous(), Transform, SpawnParameters
+			);
+	if (Result)
+	{
+		
+	}
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -287,7 +323,7 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 		{
 			GroupManaggerPtr->InitialByPlayerController(this);
 		}
-		
+
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
 #if UE_EDITOR || UE_SERVER
@@ -359,7 +395,7 @@ void APlanetPlayerController::OnGroupManaggerReady(AGroupManagger* NewGroupShare
 	}
 #endif
 
-	ForEachComponent(false, [this](UActorComponent*ComponentPtr)
+	ForEachComponent(false, [this](UActorComponent* ComponentPtr)
 	{
 		auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
 		if (GroupSharedInterfacePtr)
@@ -448,24 +484,9 @@ UEventSubjectComponent* APlanetPlayerController::GetEventSubjectComponent() cons
 	return EventSubjectComponentPtr;
 }
 
-void APlanetPlayerController::EntryChallengeLevel_Implementation(const TArray<FString>& Args)
+void APlanetPlayerController::EntryChallengeLevel_Implementation(ETeleport Teleport)
 {
-	if (Args[0] == TEXT("ReturnOpenWorld"))
-	{
-		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kReturnOpenWorld, this);
-	}
-	else if (Args[0] == TEXT("Teleport"))
-	{
-		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kTeleport_1, this);
-	}
-	else if (Args[0] == TEXT("Test1"))
-	{
-		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kTest1, this);
-	}
-	else if (Args[0] == TEXT("Test2"))
-	{
-		UOpenWorldSubSystem::GetInstance()->EntryLevel(ETeleport::kTest2, this);
-	}
+	UOpenWorldSubSystem::GetInstance()->SwitchDataLayer(Teleport, this);
 }
 
 void APlanetPlayerController::BindPCWithCharacter()
@@ -498,7 +519,7 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
 			AGroupManagger::StaticClass(), SpawnParameters
 		);
-		
+
 		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
@@ -589,21 +610,26 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(const TArray<FString
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
 		{
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-				CharacterPtr);
-
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-			GAEventData.bIsWeaponAttack = true;
-			GAEventData.bIsCantEvade = true;
-			LexFromString(GAEventData.TrueDamage, *Args[0]);
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-
 			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-			ICPtr->SendEventImp(GAEventDataPtr);
+			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+			FGameplayEffectSpecHandle SpecHandle =
+				ICPtr->MakeOutgoingSpec(UAssetRefMap::GetInstance()->DamageClass, 1,
+				                         ICPtr->MakeEffectContext());
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
+
+			int32 Damege = 0;
+			LexFromString(Damege, *Args[0]);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+			                                               Damege);
+
+			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
+				*SpecHandle.Data.Get(),
+				ASCPtr,
+				ASCPtr->GetPredictionKeyForNewAction()
+			);
 		}
 	}
 }
@@ -632,22 +658,6 @@ void APlanetPlayerController::MakeTherapy_Implementation(const TArray<FString>& 
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
 		{
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-				CharacterPtr);
-
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-			int32 TreatmentVolume = 0;
-			LexFromString(TreatmentVolume, *Args[0]);
-
-			GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 	}
 }
@@ -676,24 +686,6 @@ void APlanetPlayerController::MakeRespawn_Implementation(const TArray<FString>& 
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
 		{
-			FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(
-				CharacterPtr);
-
-			GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-			FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-			int32 TreatmentVolume = 0;
-			LexFromString(TreatmentVolume, *Args[0]);
-
-			GAEventData.DataModify.Add(ECharacterPropertyType::HP, TreatmentVolume);
-
-			GAEventData.bIsRespawn = true;
-
-			GAEventDataPtr->DataAry.Add(GAEventData);
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-			ICPtr->SendEventImp(GAEventDataPtr);
 		}
 	}
 }
@@ -704,7 +696,7 @@ void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 	{
 		return;
 	}
-	
+
 	OnGroupManaggerReady(GroupManaggerPtr);
 
 	// auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));

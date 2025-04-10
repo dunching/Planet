@@ -8,15 +8,13 @@
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
-#include "GAEvent_Send.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "StateProcessorComponent.h"
-#include "CS_PeriodicPropertyModify.h"
-#include "GAEvent_Helper.h"
+
 #include "GameplayTagsLibrary.h"
 #include "GE_Common.h"
 

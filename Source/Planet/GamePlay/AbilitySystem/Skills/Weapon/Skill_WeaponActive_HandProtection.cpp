@@ -10,7 +10,7 @@
 #include "AbilitySystemComponent.h"
 #include "Abilities/Tasks/AbilityTask_Repeat.h"
 
-#include "GAEvent_Helper.h"
+
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "AbilityTask_PlayMontage.h"
@@ -237,44 +237,6 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 		CapsuleParams
 	))
 	{
-		FGameplayAbilityTargetData_GASendEvent* GAEventDataPtr = new FGameplayAbilityTargetData_GASendEvent(CharacterPtr);
-
-		GAEventDataPtr->TriggerCharacterPtr = CharacterPtr;
-
-		for (auto Iter : OutHits)
-		{
-			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-			if (TargetCharacterPtr)
-			{
-				FGAEventData GAEventData(TargetCharacterPtr, CharacterPtr);
-
-				GAEventData.SetBaseDamage(Damage);
-
-				GAEventDataPtr->DataAry.Add(GAEventData);
-			}
-		}
-
-		auto SkillsAry = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		for (const auto& Iter : SkillsAry)
-		{
-// 			if (Iter.Value->SkillProxyPtr)
-// 			{
-// 				if (Iter.Value->SkillProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
-// 				{
-// 					auto ActiveSkillProxyPtr = DynamicCastSharedPtr<FActiveSkillProxy>(Iter.Value->SkillProxyPtr);
-// 					if (!ActiveSkillProxyPtr)
-// 					{
-// 						continue;
-// 					}
-// 
-// 					ActiveSkillProxyPtr->AddCooldownConsumeTime(1.f);
-// 				}
-// 			}
-		}
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-		ICPtr->SendEventImp(GAEventDataPtr);
 	}
 }
 

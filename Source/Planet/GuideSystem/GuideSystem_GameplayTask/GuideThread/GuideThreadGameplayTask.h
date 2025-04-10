@@ -11,10 +11,10 @@
 #include "BehaviorTree/Tasks/BTTask_RunDynamicStateTree.h"
 
 #include "GuideInteractionGameplayTask.h"
-#include "GuideThreadActor.h"
+#include "GuideThread.h"
 #include "InventoryComponent.h"
 #include "ProxyProcessComponent.h"
-#include "TaskNode.h"
+#include "STT_CommonData.h"
 
 #include "GuideThreadGameplayTask.generated.h"
 
@@ -26,6 +26,8 @@ class UPAD_TaskNode_Guide_ConversationWithTarget;
 class UPAD_TaskNode_Interaction_Option;
 class UPAD_TaskNode_Interaction_NotifyGuideThread;
 
+struct FCoinProxy;
+struct FConsumableProxy;
 struct FReceivedEventModifyDataCallback;
 
 UCLASS()
@@ -35,6 +37,13 @@ class PLANET_API UGameplayTask_Guide : public UGameplayTask_Base
 
 public:
 	UGameplayTask_Guide(const FObjectInitializer& ObjectInitializer);
+
+	void SetGuideActor(TObjectPtr<AGuideThread> InGuideActorPtr);
+
+protected:
+	
+	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
+	
 };
 
 UCLASS()
@@ -115,10 +124,8 @@ public:
 
 	virtual void Activate() override;
 
-	void SetUp(UPAD_TaskNode_Guide_AddToTarget* InTaskNodePtr);
-
 	void SetUp(
-		const TSubclassOf<AGuideInteractionActor>& InGuideInteractionActorClass,
+		const TSubclassOf<AGuideInteraction_Actor>& InGuideInteractionActorClass,
 		const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
 	);
 
@@ -126,7 +133,7 @@ protected:
 	void ConditionalPerformTask();
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TSubclassOf<AGuideInteractionActor> GuideInteractionActorClass;
+	TSubclassOf<AGuideInteraction_Actor> GuideInteractionActorClass;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TSoftObjectPtr<AHumanCharacter_AI> TargetCharacterPtr = nullptr;
@@ -141,8 +148,6 @@ public:
 	virtual void Activate() override;
 
 	virtual void OnDestroy(bool bInOwnerFinished) override;
-
-	void SetUp(UPAD_TaskNode_Guide_ConversationWithTarget* InTaskNodePtr);
 
 	void SetUp(const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr);
 
@@ -187,9 +192,13 @@ public:
 protected:
 	void OnGetConsumableProxy(const TSharedPtr<FConsumableProxy>&, EProxyModifyType ProxyModifyType);
 
+	void OnCoinProxyChanged(const TSharedPtr<FCoinProxy>&, EProxyModifyType ProxyModifyType, int32 Num);
+
 	void UpdateDescription() const;
 
 	UInventoryComponent::FOnConsumableProxyChanged::FCallbackHandleSPtr OnConsumableProxyChangedHandle;
+
+	UInventoryComponent::FOnCoinProxyChanged::FCallbackHandleSPtr OnCoinProxyChangedHandle;
 
 	FGameplayTag ResourceType;
 
@@ -228,4 +237,25 @@ protected:
 	int32 CurrentNum = 0;
 
 	int32 Num = 0;
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Guide_ReturnOpenWorld : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+
+	using FMakedDamageHandle = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>::FCallbackHandleSPtr;
+
+public:
+	virtual void TickTask(float DeltaTime) override;
+
+	void SetUp(int32 RemainTime);
+
+	FTaskNodeDescript GetTaskNodeDescripton() const;
+
+protected:
+
+	float TotalTime = 0.0f;
+
+	int32 RemainTime = 1;
 };

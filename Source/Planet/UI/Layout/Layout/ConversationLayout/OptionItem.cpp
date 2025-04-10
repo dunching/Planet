@@ -5,9 +5,9 @@
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
-#include "TaskNode_Interaction.h"
+
 #include "GuideActor.h"
-#include "GuideInteractionActor.h"
+#include "GuideInteraction.h"
 #include "InputProcessorSubSystem.h"
 #include "InteractionList.h"
 #include "MainHUD.h"
@@ -53,8 +53,8 @@ void UOptionItem::ResetUIByData()
 }
 
 void UOptionItem::SetData(
-	const TSubclassOf<AGuideInteractionActor>& InTaskNode,
-	const std::function<void(const TSubclassOf<AGuideInteractionActor>&)>& InCallback
+	const TSubclassOf<AGuideInteraction_Actor>& InTaskNode,
+	const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
 )
 {
 	if (!InTaskNode.Get())

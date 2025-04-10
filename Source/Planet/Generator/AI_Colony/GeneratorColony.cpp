@@ -4,13 +4,19 @@
 #include "Components/SceneComponent.h"
 #include "Components/SplineComponent.h"
 
-#include "Component/PlanetChildActorComponent.h"
+#include "PlanetChildActorComponent.h"
 #include "BuildingArea.h"
 #include "HumanCharacter.h"
 #include "HumanAIController.h"
 #include "AIComponent.h"
 
-AGeneratorColony::AGeneratorColony(const FObjectInitializer& ObjectInitializer) :
+UFormationComponent::UFormationComponent(const FObjectInitializer& ObjectInitializer):
+	Super(ObjectInitializer)
+{
+	// SetIsReplicatedByDefault(true);
+}
+
+AGeneratorColonyWithPath::AGeneratorColonyWithPath(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
@@ -29,7 +35,7 @@ AGeneratorColony::AGeneratorColony(const FObjectInitializer& ObjectInitializer) 
 	PrimaryActorTick.TickInterval = 1.f / 60;
 }
 
-void AGeneratorColony::BeginPlay()
+void AGeneratorColonyWithPath::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -63,7 +69,7 @@ void AGeneratorColony::BeginPlay()
 #endif
 }
 
-void AGeneratorColony::Tick(float DeltaSeconds)
+void AGeneratorColonyWithPath::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
@@ -82,8 +88,56 @@ void AGeneratorColony::Tick(float DeltaSeconds)
 #endif
 }
 
-UFormationComponent::UFormationComponent(const FObjectInitializer& ObjectInitializer):
+AGeneratorColony::AGeneratorColony(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
 {
-	SetIsReplicatedByDefault(true);
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
+
+	bReplicates = true;
+	SetReplicatingMovement(true);
+
+	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.TickInterval = 1.f / 60;
 }
+
+void AGeneratorColony::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	SpawnGeneratorActor();
+}
+
+AGeneratorNPCs_Patrol::AGeneratorNPCs_Patrol(const FObjectInitializer& ObjectInitializer) :
+	Super(ObjectInitializer)
+{
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("USceneComponent"));
+
+	SplineComponentPtr = CreateDefaultSubobject<USplineComponent>(TEXT("SplineComponent"));
+	SplineComponentPtr->SetupAttachment(RootComponent);
+}
+
+void AGeneratorNPCs_Patrol::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	SpawnGeneratorActor();
+}
+
+bool AGeneratorNPCs_Patrol::CheckIsFarawayOriginal(ACharacterBase* TargetCharacterPtr) const
+{
+	if (TargetCharacterPtr)
+	{
+		const auto CharacterPt = TargetCharacterPtr->GetActorLocation();
+		const auto Pt = SplineComponentPtr->FindLocationClosestToWorldLocation(
+			CharacterPt, ESplineCoordinateSpace::World
+		);
+		const auto Distance = FVector::Distance(Pt, CharacterPt);
+
+		return Distance > MaxDistance;
+	}
+	else
+	{
+		return false;
+	}
+}
+
