@@ -1,4 +1,5 @@
-Lyra content Effects
+Lyra content Effects	
+
 	content ArcherAnimsetPro
 	content BossyEnemy
 	content CraftResourcesIcons
