@@ -13,15 +13,15 @@
 #include "GenerateType.h"
 #include "OpenWorldDataLayer.h"
 #include "OpenWorldSystem.h"
-#include "STE_TaskNode.h"
-#include "STE_TaskNode_GuideThread.h"
+#include "STE_Base.h"
+#include "STE_GuideThread.h"
 
 #include "STE_GuideThread_Challenge.generated.h"
 
 class AGuideChallengeThread;
 
 UCLASS(Blueprintable)
-class PLANET_API UGloabVariable_GuideChallengeThread : public UObject
+class PLANET_API UGloabVariable_GuideThread_Challenge : public UObject
 {
 	GENERATED_BODY()
 
@@ -43,7 +43,7 @@ public:
 };
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode_GuideChallengeThread : public USTE_TaskNode_GuideThread
+class PLANET_API USTE_TaskNode_GuideChallengeThread : public USTE_GuideThread
 {
 	GENERATED_BODY()
 
@@ -57,6 +57,6 @@ public:
 	AGuideChallengeThread* GuideActorPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	UGloabVariable_GuideChallengeThread* GloabVariable = nullptr;
+	UGloabVariable_GuideThread_Challenge* GloabVariable_Challenge = nullptr;
 
 };

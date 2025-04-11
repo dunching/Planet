@@ -36,7 +36,7 @@ void UGuideSubSystem::ActiveMainThread()
 	ActiveTargetGuideThread(WorldSetting->MainLineGuideClass, false);
 }
 
-void UGuideSubSystem::AddBranchLine(const TSubclassOf<AGuideBranchThread>& BranchLineGuideClass)
+void UGuideSubSystem::AddBranchLine(const TSubclassOf<AGuideThread_Branch>& BranchLineGuideClass)
 {
 }
 

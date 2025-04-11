@@ -37,7 +37,7 @@ AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
 
 void AGuideActor::Destroyed()
 {
-	GetGuideSystemStateTreeComponent()->StopLogic(TEXT(""));
+	// GetGuideSystemStateTreeComponent()->StopLogic(TEXT(""));
 	
 	Super::Destroyed();
 }

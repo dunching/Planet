@@ -56,7 +56,7 @@ void AAreaVolume::OnActorBeginOverlapCB(AActor* OverlappedActor, AActor* OtherAc
 		}
 		// FActorSpawnParameters SpawnParameters;
 		//
-		// GuidePtr = GetWorld()->SpawnActor<AGuideBranchThread>(
+		// GuidePtr = GetWorld()->SpawnActor<AGuideThread_Branch>(
 		// 	GuideBranchThreadClass, SpawnParameters
 		// );
 	}

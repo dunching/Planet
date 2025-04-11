@@ -16,7 +16,7 @@
 
 class AGuideActor;
 class AGuideThread;
-class AGuideMainThread;
+class AGuideThread_Main;
 class AGuideInteraction_Actor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;

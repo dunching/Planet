@@ -11,21 +11,21 @@ void USTE_TaskNode_GuideChallengeThread::TreeStart(FStateTreeExecutionContext& C
 {
 	Super::TreeStart(Context);
 
-	GloabVariable = NewObject<UGloabVariable_GuideChallengeThread>();
+	GloabVariable_Challenge = NewObject<UGloabVariable_GuideThread_Challenge>();
 }
 
 void USTE_TaskNode_GuideChallengeThread::TreeStop(FStateTreeExecutionContext& Context)
 {
-	if (GloabVariable)
+	if (GloabVariable_Challenge)
 	{
-		for (auto Iter : GloabVariable->TemporaryActorAry)
+		for (auto Iter : GloabVariable_Challenge->TemporaryActorAry)
 		{
 			if (Iter)
 			{
 				Iter->Destroy();
 			}
 		}
-		GloabVariable->TemporaryActorAry.Empty();
+		GloabVariable_Challenge->TemporaryActorAry.Empty();
 	}
 
 	if (GuideActorPtr)

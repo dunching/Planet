@@ -19,7 +19,7 @@
 
 class ATeleport;
 class AHumanCharacter_AI;
-class UGloabVariable_GuideChallengeThread;
+class UGloabVariable_GuideThread_Challenge;
 
 #pragma region ChallengeBase
 USTRUCT()
@@ -29,7 +29,7 @@ struct PLANET_API FSTID_GuideThreadChallengeBase :
 	GENERATED_BODY()
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable_GuideChallengeThread* GloabVariable = nullptr;
+	UGloabVariable_GuideThread_Challenge* GloabVariable_Challenge = nullptr;
 };
 
 USTRUCT()

@@ -10,8 +10,8 @@
 
 class AGuideActor;
 class AGuideThread;
-class AGuideMainThread;
-class AGuideBranchThread;
+class AGuideThread_Main;
+class AGuideThread_Branch;
 
 using FOnCurrentGuideChagned = TMulticastDelegate<void(AGuideThread*)>;
 
@@ -37,7 +37,7 @@ public:
 	void ActiveMainThread();
 	
 	// 添加支线内容
-	void AddBranchLine(const TSubclassOf<AGuideBranchThread>& BranchLineGuideClass);
+	void AddBranchLine(const TSubclassOf<AGuideThread_Branch>& BranchLineGuideClass);
 
 	// 将任务设置为当前任务
 	void ActiveTargetGuideThread(const TSubclassOf<AGuideThread>& GuideClass, bool bIsTransit);

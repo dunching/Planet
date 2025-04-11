@@ -11,7 +11,7 @@ class UStateTagExtendInfoMap;
 class USceneProxyExtendInfoMap;
 class UGameOptions;
 class AGuideActor;
-class AGuideMainThread;
+class AGuideThread_Main;
 class UPAD_RewardsItems;
 
 /**
@@ -31,7 +31,7 @@ public:
 	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap()const;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
-	TSubclassOf<AGuideMainThread>MainLineGuideClass;
+	TSubclassOf<AGuideThread_Main>MainLineGuideClass;
 
 protected:
 

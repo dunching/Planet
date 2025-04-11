@@ -11,7 +11,7 @@
 #include "GuideSystemGameplayTask.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
-#include "STE_TaskNode_Interaction.h"
+#include "STE_Interaction.h"
 
 
 EStateTreeRunStatus FSTT_GuideInteraction_Termination::EnterState(FStateTreeExecutionContext& Context,

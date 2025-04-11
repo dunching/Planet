@@ -83,6 +83,7 @@ public:
 	FOnCurrentTaskNodeChanged OnCurrentTaskNodeChanged;
 
 protected:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GuideST)
 	TObjectPtr<UGuideSystemStateTreeComponent> GuideStateTreeComponentPtr = nullptr;
 

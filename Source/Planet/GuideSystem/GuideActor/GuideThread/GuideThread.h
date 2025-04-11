@@ -145,26 +145,26 @@ public:
  *	主线任务
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideMainThread : public AGuideThread
+class PLANET_API AGuideThread_Main : public AGuideThread
 {
 	GENERATED_BODY()
 
 public:
 	
-	AGuideMainThread(const FObjectInitializer& ObjectInitializer);
+	AGuideThread_Main(const FObjectInitializer& ObjectInitializer);
 
 };
 
 UCLASS()
-class UStateTreeGuideMaiThreadComponentSchema : public UStateTreeGuideThreadComponentSchema
+class UStateTreeGuideMainThreadComponentSchema : public UStateTreeGuideThreadComponentSchema
 {
 	GENERATED_BODY()
 
 public:
 	
-	using FOwnerType = AGuideMainThread;
+	using FOwnerType = AGuideThread_Main;
 
-	UStateTreeGuideMaiThreadComponentSchema();
+	UStateTreeGuideMainThreadComponentSchema();
 	
 };
 
@@ -188,7 +188,7 @@ public:
  *	支线任务
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideBranchThread : public AGuideThread
+class PLANET_API AGuideThread_Branch : public AGuideThread
 {
 	GENERATED_BODY()
 
@@ -215,10 +215,39 @@ public:
  *	区域事件，进入区域后发生的引导,如世界首领、副本
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideAreaThread : public AGuideThread
+class PLANET_API AGuideThread_Area : public AGuideThread
 {
 	GENERATED_BODY()
 
 public:
+	AGuideThread_Area(const FObjectInitializer& ObjectInitializer);
+
+};
+
+UCLASS()
+class UStateTreeGuideAreaThreadComponentSchema : public UStateTreeGuideThreadComponentSchema
+{
+	GENERATED_BODY()
+
+public:
+	
+	using FOwnerType = AGuideThread_Area;
+
+	UStateTreeGuideAreaThreadComponentSchema();
+	
+};
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API UGuideAreaThreadSystemStateTreeComponent : public UGuideThreadSystemStateTreeComponent
+{
+	GENERATED_BODY()
+
+public:
+	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
+	
+	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
 };
 #pragma endregion 

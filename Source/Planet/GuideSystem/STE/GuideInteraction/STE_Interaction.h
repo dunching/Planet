@@ -12,12 +12,12 @@
 
 #include "GenerateType.h"
 #include "GuideActor.h"
-#include "STE_TaskNode.h"
+#include "STE_Base.h"
 
-#include "STE_TaskNode_Interaction.generated.h"
+#include "STE_Interaction.generated.h"
 
 class AGuideActor;
-class AGuideMainThread;
+class AGuideThread_Main;
 class AGuideInteraction_Actor;
 class AGuideInteraction_HumanCharacter_AI;
 class ACharacterBase;
@@ -39,7 +39,7 @@ public:
 };
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode_Interaction : public UStateTreeEvaluatorBlueprintBase
+class PLANET_API USTE_Interaction : public USTE_Base
 {
 	GENERATED_BODY()
 
@@ -64,7 +64,7 @@ protected:
 };
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode_Interaction_HumanCharacter_AI : public USTE_TaskNode_Interaction
+class PLANET_API USTE_Interaction_HumanCharacter_AI : public USTE_Interaction
 {
 	GENERATED_BODY()
 

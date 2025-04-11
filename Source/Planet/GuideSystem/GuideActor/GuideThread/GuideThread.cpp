@@ -125,7 +125,7 @@ bool UGuideThreadSystemStateTreeComponent::SetContextRequirements(
 	);
 }
 
-AGuideMainThread::AGuideMainThread(
+AGuideThread_Main::AGuideThread_Main(
 	const FObjectInitializer& ObjectInitializer
 ):
  Super(
@@ -138,7 +138,7 @@ AGuideMainThread::AGuideMainThread(
 {
 }
 
-UStateTreeGuideMaiThreadComponentSchema::UStateTreeGuideMaiThreadComponentSchema()
+UStateTreeGuideMainThreadComponentSchema::UStateTreeGuideMainThreadComponentSchema()
 {
 	ContextActorClass = FOwnerType::StaticClass();
 
@@ -147,7 +147,7 @@ UStateTreeGuideMaiThreadComponentSchema::UStateTreeGuideMaiThreadComponentSchema
 
 TSubclassOf<UStateTreeSchema> UGuideMainThreadSystemStateTreeComponent::GetSchema() const
 {
-	return UStateTreeGuideMaiThreadComponentSchema::StaticClass();
+	return UStateTreeGuideMainThreadComponentSchema::StaticClass();
 }
 
 bool UGuideMainThreadSystemStateTreeComponent::SetContextRequirements(
@@ -161,7 +161,50 @@ bool UGuideMainThreadSystemStateTreeComponent::SetContextRequirements(
 			&ThisClass::CollectExternalData
 		)
 	);
-	return UStateTreeGuideMaiThreadComponentSchema::SetContextRequirements(
+	return UStateTreeGuideMainThreadComponentSchema::SetContextRequirements(
+		*this,
+		Context,
+		bLogErrors
+	);
+}
+
+AGuideThread_Area::AGuideThread_Area(
+	const FObjectInitializer& ObjectInitializer
+):
+ Super(
+	 ObjectInitializer.
+	 SetDefaultSubobjectClass<
+		 UGuideAreaThreadSystemStateTreeComponent>(
+		 UGuideAreaThreadSystemStateTreeComponent::ComponentName
+	 )
+ )
+{
+}
+
+UStateTreeGuideAreaThreadComponentSchema::UStateTreeGuideAreaThreadComponentSchema()
+{
+	ContextActorClass = FOwnerType::StaticClass();
+
+	ContextDataDescs[0].Struct = ContextActorClass.Get();
+}
+
+TSubclassOf<UStateTreeSchema> UGuideAreaThreadSystemStateTreeComponent::GetSchema() const
+{
+	return UStateTreeGuideAreaThreadComponentSchema::StaticClass();
+}
+
+bool UGuideAreaThreadSystemStateTreeComponent::SetContextRequirements(
+	FStateTreeExecutionContext& Context,
+	bool bLogErrors
+)
+{
+	Context.SetCollectExternalDataCallback(
+		FOnCollectStateTreeExternalData::CreateUObject(
+			this,
+			&ThisClass::CollectExternalData
+		)
+	);
+	return UStateTreeGuideAreaThreadComponentSchema::SetContextRequirements(
 		*this,
 		Context,
 		bLogErrors

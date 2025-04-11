@@ -16,7 +16,7 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::EnterState(FStateTreeExecuti
 	const auto Teleport = InstanceData.ChallengeAry[
 		FMath::RandRange(0, InstanceData.ChallengeAry.Num() - 1)
 	];;
-	InstanceData.GloabVariable->Teleport = Teleport;
+	InstanceData.GloabVariable_Challenge->Teleport = Teleport;
 
 	InstanceData.TeleportRef = UOpenWorldSubSystem::GetInstance()->GetTeleport(Teleport);
 
@@ -26,7 +26,7 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::EnterState(FStateTreeExecuti
 			UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0)
 		);
 
-		PCPtr->EntryChallengeLevel(InstanceData.GloabVariable->Teleport);
+		PCPtr->EntryChallengeLevel(InstanceData.GloabVariable_Challenge->Teleport);
 
 		return Super::EnterState(Context, Transition);
 	}
@@ -44,7 +44,7 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::Tick(FStateTreeExecutionCont
 	const auto Distance = FVector::Distance(InstanceData.TeleportRef->GetActorLocation(),
 	                                        InstanceData.PlayerCharacterPtr->GetActorLocation());
 	if (
-		UOpenWorldSubSystem::GetInstance()->CheckSwitchDataLayerComplete(InstanceData.GloabVariable->Teleport) &&
+		UOpenWorldSubSystem::GetInstance()->CheckSwitchDataLayerComplete(InstanceData.GloabVariable_Challenge->Teleport) &&
 		Distance < InstanceData.Distance
 	)
 	{
@@ -136,7 +136,7 @@ bool FSTT_GuideThreadSpawnNPCs::SpawnNPC(FStateTreeExecutionContext& Context) co
 		{
 			const auto& NPCAry = InstanceData.PerWaveNum[InstanceData.WaveIndex].NPCAry;
 			const auto Pts = UOpenWorldSubSystem::GetInstance()->GetChallengeSpawnPts(
-				InstanceData.GloabVariable->Teleport,
+				InstanceData.GloabVariable_Challenge->Teleport,
 				NPCAry.Num()
 			);
 

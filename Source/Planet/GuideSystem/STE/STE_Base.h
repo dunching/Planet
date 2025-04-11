@@ -12,17 +12,17 @@
 
 #include "GenerateType.h"
 
-#include "STE_TaskNode.generated.h"
+#include "STE_Base.generated.h"
 
 class AGuideActor;
-class AGuideMainThread;
+class AGuideThread_Main;
 class AGuideInteraction_Actor;
 class ACharacterBase;
 class AHumanCharacter;
 class AHumanCharacter_Player;
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode : public UStateTreeEvaluatorBlueprintBase
+class PLANET_API USTE_Base : public UStateTreeEvaluatorBlueprintBase
 {
 	GENERATED_BODY()
 
