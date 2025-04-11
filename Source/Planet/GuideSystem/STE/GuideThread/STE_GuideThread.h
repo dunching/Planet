@@ -19,7 +19,7 @@ class AGuideActor;
 class AGuideThread_Main;
 class AGuideThread_Branch;
 class AGuideThread_Area;
-class AGuideChallengeThread;
+class AGuideThread_Challenge;
 class AGuideInteraction_Actor;
 class ACharacterBase;
 class AHumanCharacter;

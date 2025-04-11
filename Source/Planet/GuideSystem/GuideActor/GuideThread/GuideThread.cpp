@@ -147,7 +147,7 @@ UStateTreeGuideMainThreadComponentSchema::UStateTreeGuideMainThreadComponentSche
 
 TSubclassOf<UStateTreeSchema> UGuideMainThreadSystemStateTreeComponent::GetSchema() const
 {
-	return UStateTreeGuideMainThreadComponentSchema::StaticClass();
+	return FSchemaType::StaticClass();
 }
 
 bool UGuideMainThreadSystemStateTreeComponent::SetContextRequirements(
@@ -161,7 +161,7 @@ bool UGuideMainThreadSystemStateTreeComponent::SetContextRequirements(
 			&ThisClass::CollectExternalData
 		)
 	);
-	return UStateTreeGuideMainThreadComponentSchema::SetContextRequirements(
+	return FSchemaType::SetContextRequirements(
 		*this,
 		Context,
 		bLogErrors
@@ -190,7 +190,7 @@ UStateTreeGuideAreaThreadComponentSchema::UStateTreeGuideAreaThreadComponentSche
 
 TSubclassOf<UStateTreeSchema> UGuideAreaThreadSystemStateTreeComponent::GetSchema() const
 {
-	return UStateTreeGuideAreaThreadComponentSchema::StaticClass();
+	return FSchemaType::StaticClass();
 }
 
 bool UGuideAreaThreadSystemStateTreeComponent::SetContextRequirements(
@@ -204,7 +204,7 @@ bool UGuideAreaThreadSystemStateTreeComponent::SetContextRequirements(
 			&ThisClass::CollectExternalData
 		)
 	);
-	return UStateTreeGuideAreaThreadComponentSchema::SetContextRequirements(
+	return FSchemaType::SetContextRequirements(
 		*this,
 		Context,
 		bLogErrors

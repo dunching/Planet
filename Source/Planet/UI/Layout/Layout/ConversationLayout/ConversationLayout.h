@@ -16,6 +16,7 @@
 class UToolsMenu;
 class UOptionList;
 class AGuideInteraction_Actor;
+class ISceneActorInteractionInterface;
 
 struct FCharacterAttributes;
 
@@ -46,8 +47,9 @@ public:
 protected:
 	void SelectedInteractionItem(const TSubclassOf<AGuideInteraction_Actor>&GuideInteractionClass);
 
-	
 	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
+		
+	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr = nullptr;
 		
 	TObjectPtr<AGuideInteraction_Actor>GuideInteractionActorPtr = nullptr;
 	

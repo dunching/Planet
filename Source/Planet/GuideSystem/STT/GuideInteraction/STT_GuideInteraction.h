@@ -44,9 +44,6 @@ struct PLANET_API FSTID_GuideInteractionTaskBase :
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanCharacter_Player> PlayerCharacterPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
 };
 
 USTRUCT()
@@ -126,95 +123,5 @@ struct PLANET_API FSTT_GuideInteractionNotify :
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
-};
-#pragma endregion
-
-#pragma region Conversation
-USTRUCT()
-struct PLANET_API FSTID_GuideInteractionConversation :
-	public FSTID_GuideInteractionTaskBase
-{
-	GENERATED_BODY()
-
-
-	UPROPERTY(Transient)
-	TObjectPtr<UGameplayTask_Interaction_Conversation> GameplayTaskPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
-};
-
-// 与 NPC交互的任务 对话
-USTRUCT()
-struct PLANET_API FSTT_GuideInteractionConversation :
-	public FSTT_GuideInteractionBase
-{
-	GENERATED_BODY()
-
-	using FInstanceDataType = FSTID_GuideInteractionConversation;
-
-	virtual const UStruct* GetInstanceDataType() const override;
-
-	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-	virtual EStateTreeRunStatus Tick(
-		FStateTreeExecutionContext& Context,
-		const float DeltaTime
-	) const override;
-
-	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
-};
-#pragma endregion
-
-#pragma region 与 NPC交互的任务 选项对话
-USTRUCT()
-struct PLANET_API FSTID_GuideInteractionOption :
-	public FSTID_GuideInteractionTaskBase
-{
-	GENERATED_BODY()
-
-	UPROPERTY(Transient)
-	TObjectPtr<UGameplayTask_Interaction_Option> GameplayTaskPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable_Interaction* GloabVariable = nullptr;
-	
-	UPROPERTY(EditAnywhere, Category = Param)
-	TArray<FString> OptionAry;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	float DurationTime = -1.f;
-};
-
-USTRUCT()
-struct PLANET_API FSTT_GuideInteractionOption :
-	public FSTT_GuideInteractionBase
-{
-	GENERATED_BODY()
-
-	using FInstanceDataType = FSTID_GuideInteractionOption;
-
-	virtual const UStruct* GetInstanceDataType() const override;
-
-	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-	virtual EStateTreeRunStatus Tick(
-		FStateTreeExecutionContext& Context,
-		const float DeltaTime
-	) const override;
-
-	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 };
 #pragma endregion

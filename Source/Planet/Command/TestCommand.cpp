@@ -3,7 +3,7 @@
 
 #include "AssetRefMap.h"
 #include "GuideSubSystem.h"
-#include "GuideThreadChallengeActor.h"
+#include "GuideThreadChallenge.h"
 
 // #include "Kismet/GameplayStatics.h"
 

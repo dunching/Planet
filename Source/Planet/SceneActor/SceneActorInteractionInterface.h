@@ -44,8 +44,6 @@ public:
 	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const = 0;
 	
 protected:
-
-	
 	
 private:
 

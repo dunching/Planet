@@ -18,7 +18,7 @@
 
 #include "STE_GuideThread_Challenge.generated.h"
 
-class AGuideChallengeThread;
+class AGuideThread_Challenge;
 
 UCLASS(Blueprintable)
 class PLANET_API UGloabVariable_GuideThread_Challenge : public UObject
@@ -39,6 +39,8 @@ public:
 	 * 选择的关卡类型
 	 */
 	ETeleport Teleport = ETeleport::kChallenge_LevelType_1;
+
+	int32 CurrentLevel = 1;
 	
 };
 
@@ -54,7 +56,7 @@ public:
 	virtual void TreeStop(FStateTreeExecutionContext& Context)override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
-	AGuideChallengeThread* GuideActorPtr = nullptr;
+	AGuideThread_Challenge* GuideActorPtr = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	UGloabVariable_GuideThread_Challenge* GloabVariable_Challenge = nullptr;

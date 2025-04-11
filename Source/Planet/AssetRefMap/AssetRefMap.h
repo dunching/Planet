@@ -44,7 +44,7 @@ class UGE_Damage;
 class UGE_Damage_Callback;
 class ATargetPoint_Runtime;
 class AGuideThread_Branch;
-class AGuideChallengeThread;
+class AGuideThread_Challenge;
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UAssetRefMap : public UPrimaryDataAsset
@@ -135,7 +135,7 @@ public:
 	TSubclassOf<AGuideThread_Branch> GuideBranchThreadTest2Class;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
-	TSubclassOf<AGuideChallengeThread> GuideThreadChallengeActorClass;
+	TSubclassOf<AGuideThread_Challenge> GuideThreadChallengeActorClass;
 #endif
 };
 

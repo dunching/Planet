@@ -17,6 +17,7 @@ class UOptionItem;
 class ACharacterBase;
 class AHumanCharacter_AI;
 class UPAD_TaskNode_Interaction_Option;
+class ISceneActorInteractionInterface;
 
 UCLASS()
 class PLANET_API UOptionList :
@@ -40,6 +41,11 @@ public:
 		);
 
 	void UpdateDisplay(
+		ISceneActorInteractionInterface*SceneActorInteractionInterfacePtr,
+		const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
+		);
+
+	void UpdateDisplay(
 		const TArray<FString>&OptionAry,
 		const std::function<void(int32)>& InCallback
 		);
@@ -52,6 +58,8 @@ protected:
 
 	AHumanCharacter_AI* TargetCharacterPtr = nullptr;
 
+	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr = nullptr;
+		
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item Class")
 	TSubclassOf<UOptionItem>InteractionItemClass;
 

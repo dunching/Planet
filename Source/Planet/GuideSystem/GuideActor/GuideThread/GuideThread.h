@@ -177,6 +177,8 @@ class PLANET_API UGuideMainThreadSystemStateTreeComponent : public UGuideThreadS
 	GENERATED_BODY()
 
 public:
+	using FSchemaType = UStateTreeGuideMainThreadComponentSchema;
+
 	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
 	
 	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
@@ -246,6 +248,9 @@ class PLANET_API UGuideAreaThreadSystemStateTreeComponent : public UGuideThreadS
 	GENERATED_BODY()
 
 public:
+
+	using FSchemaType = UStateTreeGuideAreaThreadComponentSchema;
+
 	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
 	
 	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;

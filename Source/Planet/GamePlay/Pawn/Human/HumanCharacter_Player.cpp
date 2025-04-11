@@ -1,6 +1,7 @@
 #include "HumanCharacter_Player.h"
 
 #include "AssetRefMap.h"
+#include "ChallengeEntry.h"
 #include "CollisionDataStruct.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerInput.h"
@@ -17,16 +18,19 @@
 #include "MainHUD.h"
 #include "PlanetPlayerController.h"
 
-#include "UICommon.h"
+#include "ChallengeEntry.h"
 #include "InteractionList.h"
 #include "MainHUDLayout.h"
 #include "SceneActor.h"
 #include "HumanInteractionWithNPC.h"
+#include "HumanInteractionWithChallengeEntry.h"
+#include "ResourceBoxBase.h"
 #include "STT_CommonData.h"
 
 namespace HumanProcessor
 {
 	class FHumanInteractionWithNPCProcessor;
+	class FHumanInteractionWithChallengeEntryProcessor;
 }
 
 void UPlayerConversationComponent::DisplaySentence_Player(
@@ -184,20 +188,16 @@ void AHumanCharacter_Player::UpdateSightActor()
 
 	FHitResult Result;
 
-	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
-	ObjectQueryParams.AddObjectTypesToQuery(ResouceBox_Object);
-
 	FCollisionQueryParams Params;
 	Params.bTraceComplex = false;
 	Params.AddIgnoredActor(this);
 
 	ISceneActorInteractionInterface* TempLookAtSceneObjPtr = nullptr;
-	if (GetWorld()->LineTraceSingleByObjectType(
+	if (GetWorld()->LineTraceSingleByChannel(
 			Result,
 			StartPt,
 			StopPt,
-			ObjectQueryParams,
+			SceneActor_Channel,
 			Params
 		)
 	)
@@ -305,10 +305,35 @@ void AHumanCharacter_Player::EndLookAt()
 
 void AHumanCharacter_Player::InteractionSceneActor(ASceneActor* SceneObjPtr)
 {
-	//
-	GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
+	if (SceneObjPtr->IsA(AResourceBoxBase::StaticClass()))
+	{
+		//
+		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
 	
-	InteractionSceneObj_Server(SceneObjPtr);
+		InteractionSceneObj_Server(SceneObjPtr);
+	}
+	else if (SceneObjPtr->IsA(AChallengeEntry::StaticClass()))
+	{
+		// 隐藏交互提示
+		if (SceneObjPtr)
+		{
+			SceneObjPtr->HasBeenEndedLookAt();
+		}
+
+		// 
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithChallengeEntryProcessor>(
+			[SceneObjPtr](auto NewProcessor)
+			{
+				NewProcessor->TargetPtr = Cast<AChallengeEntry>(SceneObjPtr);
+			});
+	}
+	else
+	{
+		//
+		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
+	
+		InteractionSceneObj_Server(SceneObjPtr);
+	}
 }
 
 void AHumanCharacter_Player::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)

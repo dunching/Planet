@@ -4,28 +4,29 @@
 
 #include "CoreMinimal.h"
 
-#include "Engine/TriggerVolume.h"
-
-#include "SceneActorInteractionInterface.h"
+#include "SceneActor.h"
 
 #include "ChallengeEntry.generated.h"
 
-class AGuideChallengeThread;
+class AGuideThread_Challenge;
 class USceneActorInteractionComponent;
+class UWidgetComponent;
+class UBoxComponent;
 
 /**
  * 爬塔挑战进入点
  */
 UCLASS()
 class PLANET_API AChallengeEntry :
-	public AActor,
-	public ISceneActorInteractionInterface
+	public ASceneActor
 {
 	GENERATED_BODY()
 
 public:
 	AChallengeEntry(const FObjectInitializer& ObjectInitializer);
 	
+	virtual void BeginPlay() override;
+
 	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const override;
 	
 	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr)override;
@@ -37,9 +38,30 @@ public:
 	virtual void HasBeenEndedLookAt()override;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
-	TSubclassOf<AGuideChallengeThread> GuideThreadChallengeActorClass;
+	TSubclassOf<AGuideThread_Challenge> GuideThreadChallengeActorClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
 	TObjectPtr<USceneActorInteractionComponent> SceneActorInteractionComponentPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
+	UWidgetComponent* InteractionWidgetCompoentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UBoxComponent> BoxComponentPtr = nullptr;
+
+};
+
+/**
+ *
+ */
+UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
+class PLANET_API USceneChallengeEntryInteractionComponent : public USceneActorInteractionComponent
+{
+	GENERATED_BODY()
+
+public:
+	using FOwnerType = AChallengeEntry;
+
+	virtual void StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item)override;
 	
 };

@@ -135,7 +135,6 @@ void AHumanCharacter_AI::HasBeenLookingAt(ACharacterBase* InCharacterPtr)
 	{
 		HasBeenEndedLookAt();
 	}
-	
 }
 
 void AHumanCharacter_AI::HasBeenEndedLookAt()

@@ -63,6 +63,7 @@
 #include "GameplayTagsLibrary.h"
 #include "BasicFutures_Mount.h"
 #include "BasicFutures_Dash.h"
+#include "ChallengeEntry.h"
 #include "HumanViewRaffleMenu.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter_Player.h"
@@ -249,6 +250,7 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::EKeyPressed()
 	{
+		//TODO. 之后修改为任意输入相应
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
 		if (OnwerActorPtr->LookAtSceneActorPtr)
@@ -263,6 +265,7 @@ namespace HumanProcessor
 
 	void FHumanRegularProcessor::FKeyPressed()
 	{
+		//TODO. 之后修改为任意输入相应
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
 		if (OnwerActorPtr->LookAtSceneActorPtr)
@@ -270,6 +273,10 @@ namespace HumanProcessor
 			if (auto CharacterPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
 			{
 				OnwerActorPtr->InteractionSceneCharacter(CharacterPtr);
+			}
+			else if (auto ChallengeEntryPtr = Cast<AChallengeEntry>(OnwerActorPtr->LookAtSceneActorPtr))
+			{
+				OnwerActorPtr->InteractionSceneActor(ChallengeEntryPtr);
 			}
 		}
 	}

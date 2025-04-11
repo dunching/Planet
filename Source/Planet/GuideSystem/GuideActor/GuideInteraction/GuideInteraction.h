@@ -16,6 +16,7 @@ class UGameplayTasksComponent;
 class UGuideSystemStateTreeComponent;
 class UPAD_TaskNode_Guide;
 class ACharacterBase;
+class AChallengeEntry;
 class AHumanCharacter;
 class AHumanCharacter_Player;
 class AHumanCharacter_AI;
@@ -23,27 +24,6 @@ class AHumanCharacter_AI;
 using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
 
 #pragma region Base
-UCLASS()
-class UStateTreeGuideInteractionComponentSchema : public UStateTreeComponentSchema
-{
-	GENERATED_BODY()
-public:
-	virtual bool IsStructAllowed(const UScriptStruct* InScriptStruct) const override;
-
-};
-
-/**
- *
- */
-UCLASS()
-class PLANET_API UGuideInteractionSystemStateTreeComponent : public UGuideSystemStateTreeComponent
-{
-	GENERATED_BODY()
-
-public:
-	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
-};
-
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API AGuideInteraction_Actor : public AGuideActor
 {
@@ -62,6 +42,41 @@ public:
 	 */
 	bool bWantToStop = false;
 	
+};
+
+UCLASS()
+class UStateTreeGuideInteractionComponentSchema : public UStateTreeComponentSchema
+{
+	GENERATED_BODY()
+public:
+	using FOwnerType = AGuideInteraction_Actor;
+
+	UStateTreeGuideInteractionComponentSchema();
+	
+	virtual void PostLoad() override;
+	
+	virtual bool IsStructAllowed(const UScriptStruct* InScriptStruct) const override;
+
+	static bool SetContextRequirements(UBrainComponent& BrainComponent, FStateTreeExecutionContext& Context, bool bLogErrors = false);
+
+	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
+	TSubclassOf<AHumanCharacter_Player> HumanCharacter_PlayerClass = nullptr;
+};
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API UGuideInteractionSystemStateTreeComponent : public UGuideSystemStateTreeComponent
+{
+	GENERATED_BODY()
+
+public:
+	using FSchemaType = UStateTreeGuideInteractionComponentSchema;
+	
+	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
+	
+	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
 };
 #pragma endregion
 
@@ -100,9 +115,6 @@ public:
 	static bool SetContextRequirements(UBrainComponent& BrainComponent, FStateTreeExecutionContext& Context, bool bLogErrors = false);
 
 	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
-	TSubclassOf<AHumanCharacter_Player> HumanCharacter_PlayerClass = nullptr;
-	
-	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
 	TSubclassOf<AHumanCharacter_AI> HumanCharacter_AIClass = nullptr;
 };
 
@@ -115,6 +127,63 @@ class PLANET_API UGuideInteraction_HumanCharacter_AI_SystemStateTreeComponent : 
 	GENERATED_BODY()
 
 public:
+	
+	using FSchemaType = UStateTreeGuideInteraction_HumanCharacter_AI_ComponentSchema;
+	
+	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
+	
+	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
+};
+#pragma endregion
+
+#pragma region 挑战关卡入口
+/**
+ *	在挑战入口对话时的系列任务
+ */
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API AGuideInteraction_ChallengeEntry : public AGuideInteraction_Actor
+{
+	GENERATED_BODY()
+
+public:
+	
+	AGuideInteraction_ChallengeEntry(const FObjectInitializer& ObjectInitializer);
+
+	// 
+	AChallengeEntry* ChallengeEntryPtr = nullptr;
+
+};
+
+UCLASS()
+class UStateTreeGuideInteraction_ChallengeEntry_ComponentSchema : public UStateTreeGuideInteractionComponentSchema
+{
+	GENERATED_BODY()
+public:
+	
+	using FOwnerType = AGuideInteraction_ChallengeEntry;
+
+	UStateTreeGuideInteraction_ChallengeEntry_ComponentSchema();
+	
+	virtual void PostLoad() override;
+	
+	static bool SetContextRequirements(UBrainComponent& BrainComponent, FStateTreeExecutionContext& Context, bool bLogErrors = false);
+
+	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
+	TSubclassOf<AChallengeEntry> ChallengeEntryClass = nullptr;
+};
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API UGuideInteraction_ChallengeEntry_SystemStateTreeComponent : public UGuideInteractionSystemStateTreeComponent
+{
+	GENERATED_BODY()
+
+public:
+
+	using FSchemaType = UStateTreeGuideInteraction_ChallengeEntry_ComponentSchema;
+	
 	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
 	
 	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;

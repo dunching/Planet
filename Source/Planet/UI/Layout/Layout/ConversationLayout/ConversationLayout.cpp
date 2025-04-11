@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "HumanCharacter_Player.h"
+#include "HumanInteractionWithChallengeEntry.h"
 #include "HumanInteractionWithNPC.h"
 #include "InputProcessorSubSystem.h"
 #include "MainHUD.h"
@@ -41,12 +42,15 @@ void UConversationLayout::Enable()
 {
 	{
 		auto UIPtr = Cast<UPlayerConversationBorder>(
-			GetWidgetFromName(FConversationLayout::Get().PlayerConversationBorder));
+			GetWidgetFromName(FConversationLayout::Get().PlayerConversationBorder)
+		);
 		if (UIPtr)
 		{
 			UIPtr->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+
+	// NPC
 	{
 		auto CurrentActionSPtr =
 			DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithNPCProcessor>(
@@ -56,7 +60,7 @@ void UConversationLayout::Enable()
 		if (CurrentActionSPtr)
 		{
 			CharacterPtr = CurrentActionSPtr->CharacterPtr;
-			
+
 			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
 			if (UIPtr)
 			{
@@ -66,6 +70,31 @@ void UConversationLayout::Enable()
 					std::bind(&ThisClass::SelectedInteractionItem, this, std::placeholders::_1)
 				);
 			}
+			return;
+		}
+	}
+
+	// ChallengeEntry
+	{
+		auto CurrentActionSPtr =
+			DynamicCastSharedPtr<HumanProcessor::FHumanInteractionWithChallengeEntryProcessor>(
+				UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
+			);
+
+		if (CurrentActionSPtr)
+		{
+			SceneActorInteractionInterfacePtr = CurrentActionSPtr->TargetPtr;
+
+			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
+			if (UIPtr)
+			{
+				UIPtr->SetVisibility(ESlateVisibility::Visible);
+				UIPtr->UpdateDisplay(
+					CurrentActionSPtr->TargetPtr,
+					std::bind(&ThisClass::SelectedInteractionItem, this, std::placeholders::_1)
+				);
+			}
+			return;
 		}
 	}
 }
@@ -100,7 +129,9 @@ void UConversationLayout::CloseOption()
 	}
 }
 
-void UConversationLayout::SelectedInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& GuideInteractionClass)
+void UConversationLayout::SelectedInteractionItem(
+	const TSubclassOf<AGuideInteraction_Actor>& GuideInteractionClass
+)
 {
 	if (CharacterPtr)
 	{

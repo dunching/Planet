@@ -34,3 +34,22 @@ void USTE_Interaction_HumanCharacter_AI::TreeStop(FStateTreeExecutionContext& Co
 	
 	Super::TreeStop(Context);
 }
+
+void USTE_Interaction_ChallengeEntry::TreeStart(
+	FStateTreeExecutionContext& Context
+)
+{
+	Super::TreeStart(Context);
+}
+
+void USTE_Interaction_ChallengeEntry::TreeStop(
+	FStateTreeExecutionContext& Context
+)
+{
+	if (GuideActorPtr)
+	{
+		GuideActorPtr->Destroy();
+	}
+	
+	Super::TreeStop(Context);
+}

@@ -5,7 +5,7 @@
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
 #include "GuideThread.h"
-#include "GuideThreadChallengeActor.h"
+#include "GuideThreadChallenge.h"
 
 void USTE_TaskNode_GuideChallengeThread::TreeStart(FStateTreeExecutionContext& Context)
 {

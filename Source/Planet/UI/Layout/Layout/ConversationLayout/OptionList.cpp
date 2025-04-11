@@ -70,6 +70,39 @@ void UOptionList::UpdateDisplay(
 	}
 }
 
+void UOptionList::UpdateDisplay(
+	ISceneActorInteractionInterface* InSceneActorInteractionInterfacePtr,
+	const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
+)
+{
+	SceneActorInteractionInterfacePtr = InSceneActorInteractionInterfacePtr;
+	if (!SceneActorInteractionInterfacePtr)
+	{
+		return;
+	}
+
+	SetVisibility(ESlateVisibility::Visible);
+
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FOptionList::Get().VerticalBox));
+	if (!UIPtr)
+	{
+		return;
+	}
+
+	UIPtr->ClearChildren();
+
+	const auto TaskNodes = SceneActorInteractionInterfacePtr->GetSceneActorInteractionComponent()->GetInteractionLists();
+	for (const auto& Iter : TaskNodes)
+	{
+		auto ItemUIPtr = CreateWidget<UOptionItem>(GetWorld(), InteractionItemClass);
+		if (ItemUIPtr)
+		{
+			ItemUIPtr->SetData(Iter, InCallback);
+			UIPtr->AddChild(ItemUIPtr);
+		}
+	}
+}
+
 void UOptionList::UpdateDisplay(const TArray<FString>& OptionAry, const std::function<void(int32)>& InCallback)
 {
 	SetVisibility(ESlateVisibility::Visible);
