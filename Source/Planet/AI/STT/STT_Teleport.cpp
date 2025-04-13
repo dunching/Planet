@@ -28,7 +28,7 @@ EStateTreeRunStatus FSTT_Teleport::EnterState(
 	auto TeamHelperSPtr = InstanceData.AIControllerPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamHelperSPtr)
 	{
-		auto LeaderCharacterPtr = TeamHelperSPtr->OwnerCharacterProxyPtr->GetCharacterActor().Get();
+		auto LeaderCharacterPtr = TeamHelperSPtr->GetOwnerCharacterProxyPtr()->GetCharacterActor().Get();
 		FVector Destination = FVector::ZeroVector;
 		UNavigationSystemV1::K2_GetRandomReachablePointInRadius(
 			InstanceData.AIControllerPtr, LeaderCharacterPtr->GetActorLocation(), Destination, InstanceData.AcceptableRadius

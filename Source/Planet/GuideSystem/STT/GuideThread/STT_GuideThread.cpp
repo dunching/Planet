@@ -17,7 +17,6 @@
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GeneratorColony.h"
 #include "OpenWorldDataLayer.h"
 #include "PlanetChildActorComponent.h"
 #include "SceneActor.h"

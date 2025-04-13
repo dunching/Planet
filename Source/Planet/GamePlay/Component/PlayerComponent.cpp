@@ -1,7 +1,6 @@
 
 #include "PlayerComponent.h"
 
-#include "GeneratorColony.h"
 #include "CharacterBase.h"
 #include "GroupManagger.h"
 #include "HumanAIController.h"

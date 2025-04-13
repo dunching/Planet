@@ -7,7 +7,6 @@
 #include "GameFramework/PlayerInput.h"
 #include "GravitySpringArmComponent.h"
 
-#include "GeneratorNPCs_Patrol.h"
 #include "PlayerComponent.h"
 #include "GroupManagger.h"
 #include "GuideSubSystem.h"
@@ -305,6 +304,11 @@ void AHumanCharacter_Player::EndLookAt()
 
 void AHumanCharacter_Player::InteractionSceneActor(ASceneActor* SceneObjPtr)
 {
+	if (!SceneObjPtr)
+	{
+		return;
+	}
+	
 	if (SceneObjPtr->IsA(AResourceBoxBase::StaticClass()))
 	{
 		//

@@ -6,6 +6,7 @@
 #include <Components/SphereComponent.h>
 #include <Components/SplineComponent.h>
 
+#include "AIComponent.h"
 #include "HumanCharacter.h"
 #include "TeamMatesHelperComponent.h"
 #include "HumanAIController.h"
@@ -62,6 +63,15 @@ void USTE_AICharacterController::Tick(FStateTreeExecutionContext& Context, const
 
 void USTE_AICharacterController::OnTeamOptionChanged(ETeammateOption NewTeammateOption)
 {
+#if WITH_EDITOR
+	// TODO. 满足测试
+	auto DefaultTeammateOption = HumanCharacterPtr->GetAIComponent()->DefaultTeammateOption;
+	if (DefaultTeammateOption == ETeammateOption::kTest)
+	{
+		NewTeammateOption = DefaultTeammateOption;
+	}
+#endif
+	
 	TeammateOption = NewTeammateOption;
 
 	switch (TeammateOption)
@@ -87,7 +97,10 @@ void USTE_AICharacterController::OnTeamChanged()
 	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
 	if (TeamHelperSPtr)
 	{
-		LeaderCharacterPtr = TeamHelperSPtr->OwnerCharacterProxyPtr->GetCharacterActor().Get();
+		if (auto OwnerCharacterProxySPtr = TeamHelperSPtr->GetOwnerCharacterProxyPtr())
+		{
+			LeaderCharacterPtr = OwnerCharacterProxySPtr->GetCharacterActor().Get();
+		}
 
 		TeammateOptionChangedDelegate = TeamHelperSPtr->TeammateOptionChanged.AddCallback(
 			std::bind(&ThisClass::OnTeamOptionChanged, this, std::placeholders::_1)

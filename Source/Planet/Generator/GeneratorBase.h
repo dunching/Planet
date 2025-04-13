@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenerateType.h"
 
 #include "GeneratorBase.generated.h"
 
@@ -27,10 +28,6 @@ public:
 
 	virtual void BeginPlay() override;
 
-	void SpawnGeneratorActor();
-
-	bool bDirctSpawnChild = false;
-	
 	UPROPERTY(Replicated)
 	FGuid GeneratorGuid;
 	
@@ -38,4 +35,11 @@ public:
 	
 protected:
 
+	/**
+	 * 仅服务器
+	 */
+	virtual void SpawnGeneratorActor();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
 };

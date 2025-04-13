@@ -56,6 +56,8 @@ public:
 
 	virtual UAIPerceptionComponent* GetAIPerceptionComponent();
 
+	virtual TObjectPtr<UAIControllerStateTreeAIComponent> GetStateTreeAIComponent()const;
+
 	virtual bool CheckIsFarawayOriginal() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)

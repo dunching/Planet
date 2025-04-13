@@ -27,6 +27,9 @@ struct FSceneProxyContainer;
 
 /*
  *	“小队”信息
+ *
+ *	共享GroupManagger数据的Character会记录在此
+ *	玩家的队伍配置会记录在此
  */
 UCLASS(BlueprintType, Blueprintable)
 class UTeamMatesHelperComponent : public UActorComponent
@@ -83,14 +86,14 @@ public:
 		);
 	
 	TWeakObjectPtr<ACharacterBase> GetKnowCharacter()const;
-
+	
+	TSharedPtr<FCharacterProxyType>GetOwnerCharacterProxyPtr()const;
+	
 	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
 	FKnowCharaterChanged KnowCharaterChanged;
 
 	FMemberChangedDelegateContainer MembersChanged;
-
-	TSharedPtr<FCharacterProxyType> OwnerCharacterProxyPtr = nullptr;
 
 	// 分配的小队
 	TSet<TSharedPtr<FCharacterProxyType>> MembersSet;
@@ -132,5 +135,7 @@ private:
 	void UpdateTeammateConfigImp(FPawnType* PCPtr, int32 Index);
 
 	void UpdateTeammateConfigImp(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
+
+	TSharedPtr<FCharacterProxyType> OwnerCharacterProxyPtr = nullptr;
 
 };

@@ -1,4 +1,5 @@
 Lyra content Effects	
+Lyra content PhysicsMaterials
 
 	content ArcherAnimsetPro
 	content BossyEnemy

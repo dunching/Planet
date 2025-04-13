@@ -143,7 +143,16 @@ struct PLANET_API FSTT_GuideThreadSpawnNPCs :
 		const float DeltaTime
 	) const override;
 
-	bool SpawnNPC(FStateTreeExecutionContext& Context)const;
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+protected:
 	
+	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	
+	bool SpawnNPC(FStateTreeExecutionContext& Context)const;
+
 };
 #pragma endregion

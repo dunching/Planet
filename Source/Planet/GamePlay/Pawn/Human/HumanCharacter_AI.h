@@ -80,10 +80,10 @@ protected:
 
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "StateTree")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interactuib)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
 	UWidgetComponent* InteractionWidgetCompoentPtr = nullptr;
 
 };

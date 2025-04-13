@@ -17,13 +17,12 @@
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GeneratorColony.h"
+#include "GeneratorBase.h"
 #include "OpenWorldDataLayer.h"
 #include "PlanetChildActorComponent.h"
 #include "SceneActor.h"
 #include "STE_GuideThread.h"
-#include "TargetPoint_Runtime.h"
-#include "Engine/TargetPoint.h"
+#include "GeneratorColony_ByInvoke.h"
 
 EStateTreeRunStatus FSTT_GuideThreadSpwanNPCColony::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -170,4 +169,11 @@ EStateTreeRunStatus FSTT_GuideThreadWaitCharacterDie::Tick(
 	}
 
 	return EStateTreeRunStatus::Succeeded;
+}
+
+FTaskNodeDescript FSTT_GuideThreadWaitCharacterDie::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
+{
+	return FSTT_GuideThreadBase::GetTaskNodeDescripton(Context);
 }

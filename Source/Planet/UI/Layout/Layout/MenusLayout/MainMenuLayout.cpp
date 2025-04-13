@@ -1,11 +1,15 @@
 
 #include "MainMenuLayout.h"
 
+#include "GroupManagger.h"
 #include "Components/WidgetSwitcher.h"
+#include "Kismet/GameplayStatics.h"
 
 #include "UICommon.h"
 #include "UIInterfaces.h"
 #include "MenuInterface.h"
+#include "PlanetControllerInterface.h"
+#include "TeamMatesHelperComponent.h"
 
 struct FMainMenuLayout : public TStructVariable<FMainMenuLayout>
 {
@@ -33,6 +37,16 @@ void UMainMenuLayout::Enable()
 void UMainMenuLayout::DisEnable()
 {
 	SyncData();
+	
+	auto PCPtr =
+		Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	auto GMCPtr = PCPtr->GetGroupSharedInfo();
+	GMCPtr->GetTeamMatesHelperComponent()->SpwanTeammateCharacter();
 	
 	ILayoutInterfacetion::DisEnable();
 }

@@ -80,6 +80,20 @@ Super(
 void AHumanCharacter_AI::BeginPlay()
 {
 	Super::BeginPlay();
+	
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		// 组件自动调用条件不成功，原因未知   应该是AIST设置上下文的数据不正确，导致没开始执行
+		// 👆
+		// AI Comtroller下的需要显式调用
+		// if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
+		if (auto AISTComponentPtr = Cast<AHumanAIController>(GetController())->GetStateTreeAIComponent())
+		{
+			AISTComponentPtr->StartLogic();
+		}
+	}
+#endif
 }
 
 void AHumanCharacter_AI::PossessedBy(AController* NewController)
@@ -197,7 +211,6 @@ void AHumanCharacter_AI::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfo
 		// 如果这个Character是单独的，则直接生成 
 		else
 		{
-			GetGroupSharedInfo()->GetTeamMatesHelperComponent()->OwnerCharacterProxyPtr = GetCharacterProxy();
 		}
 	}
 #endif

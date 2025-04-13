@@ -27,6 +27,7 @@ class UEventSubjectComponent;
 class AGroupManagger;
 class AGeneratorColony;
 class AGeneratorBase;
+class AGeneratorColonyDelay;
 class AGuideActor;
 
 /**
@@ -101,13 +102,18 @@ public:
 #pragma region RPC
 
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnGeneratorActor(const TSoftObjectPtr<AGeneratorBase>&GeneratorBasePtr);
+	void ServerSpawnGeneratorActor(const TSoftObjectPtr<AGeneratorColonyDelay>&GeneratorBasePtr);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnCharacter(
 		const TSoftClassPtr<AHumanCharacter_AI>&CharacterClass,
 		const FGuid&ID,
 		const FTransform& Transform
+		);
+
+	UFUNCTION(Server, Reliable)
+	void ServerDestroyActor(
+		AActor*ActorPtr
 		);
 
 #pragma region 

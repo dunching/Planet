@@ -6,15 +6,14 @@
 #include "GroupManagger.h"
 
 #include "PlanetChildActorComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 AGeneratorBase::AGeneratorBase(const FObjectInitializer& ObjectInitializer) :
-	Super()
+                                                                            Super()
 {
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	bAlwaysRelevant = true;
-
-	bDirctSpawnChild = false;
 }
 
 void AGeneratorBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -27,28 +26,6 @@ void AGeneratorBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void AGeneratorBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		FActorSpawnParameters SpawnParameters;
-
-		SpawnParameters.Owner = this;
-		SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
-		{
-			PRINTINVOKEINFO();
-			auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
-			if (GroupManaggerPtr)
-			{
-				GroupManaggerPtr->GroupID = FGuid::NewGuid();
-			}
-		};
-
-		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
-			AGroupManagger::StaticClass(), SpawnParameters
-		);
-	}
-#endif
 }
 
 void AGeneratorBase::BeginPlay()
@@ -58,14 +35,39 @@ void AGeneratorBase::BeginPlay()
 
 void AGeneratorBase::SpawnGeneratorActor()
 {
-	bDirctSpawnChild = true;
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		if (!GroupManaggerPtr)
+		{
+			FActorSpawnParameters SpawnParameters;
 
+			SpawnParameters.Owner = this;
+			SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
+			{
+				PRINTINVOKEINFO();
+				auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+				if (GroupManaggerPtr)
+				{
+					GroupManaggerPtr->GroupID = FGuid::NewGuid();
+				}
+			};
+
+			GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
+				AGroupManagger::StaticClass(), SpawnParameters
+			);
+
+			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(DefaultTeammateOption);
+		}
+	}
+#endif
+	
 	ForEachComponent(true, [](UActorComponent* Comp)
 	{
 		auto PlanetChildActorComponentPtr = Cast<UPlanetChildActorComponent>(Comp);
 		if (PlanetChildActorComponentPtr)
 		{
-			PlanetChildActorComponentPtr->CreateChildActor();
+			PlanetChildActorComponentPtr->RespawnChildActor();
 		}
 	});
 }

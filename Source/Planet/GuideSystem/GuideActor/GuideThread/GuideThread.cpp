@@ -75,8 +75,6 @@ bool UStateTreeGuideThreadComponentSchema::SetContextRequirements(
 		return false;
 	}
 
-	PRINTFUNC();
-
 	auto OwnerPtr = BrainComponent.GetOwner<FOwnerType>();
 	if (OwnerPtr)
 	{

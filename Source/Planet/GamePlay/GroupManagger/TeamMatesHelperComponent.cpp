@@ -271,6 +271,11 @@ TWeakObjectPtr<ACharacterBase> UTeamMatesHelperComponent::GetKnowCharacter() con
 	return nullptr;
 }
 
+TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperComponent::GetOwnerCharacterProxyPtr() const
+{
+	return OwnerCharacterProxyPtr;
+}
+
 FName UTeamMatesHelperComponent::ComponentName = TEXT("TeamMatesHelperComponent");
 
 void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

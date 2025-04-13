@@ -644,27 +644,53 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACha
 {
 	Proxy_Container.InventoryComponentPtr = this;
 
-	// 使用指定的ID
-	auto CharacterProxySPtr = MakeShared<FCharacterProxy>(
-		OwnerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterID()
-		);
+	if (!OwnerCharacterPtr)
+	{
+		return nullptr;
+	}
+	
+	// 是否已存在？
+	const auto ID = OwnerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterID();
+	if (SceneMetaMap.Contains(ID))
+	{
+		// 使用指定的ID
+		auto CharacterProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(SceneMetaMap[ID]);
 
-	CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
-	CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
-	CharacterProxySPtr->InventoryComponentPtr = this;
-
-	SceneToolsAry.Add(CharacterProxySPtr);
-	SceneMetaMap.Add(CharacterProxySPtr->ID, CharacterProxySPtr);
-
-	Proxy_Container.AddItem(CharacterProxySPtr);
+		CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
+		CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
+		CharacterProxySPtr->InventoryComponentPtr = this;
 
 #if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-	}
+		if (GetNetMode() == NM_DedicatedServer)
+		{
+		}
 #endif
+		
+		return CharacterProxySPtr;
+	}
+	else
+	{
+		// 使用指定的ID
+		auto CharacterProxySPtr = MakeShared<FCharacterProxy>(
+			OwnerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterID()
+			);
 
-	return CharacterProxySPtr;
+		CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
+		CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
+		CharacterProxySPtr->InventoryComponentPtr = this;
+
+		SceneToolsAry.Add(CharacterProxySPtr);
+		SceneMetaMap.Add(CharacterProxySPtr->ID, CharacterProxySPtr);
+		Proxy_Container.AddItem(CharacterProxySPtr);
+
+#if UE_EDITOR || UE_SERVER
+		if (GetNetMode() == NM_DedicatedServer)
+		{
+		}
+#endif
+		
+		return CharacterProxySPtr;
+	}
 }
 
 TSharedPtr<FCharacterProxy> UInventoryComponent::AddProxy_Character(const FGameplayTag& ProxyType)

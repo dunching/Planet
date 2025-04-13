@@ -106,6 +106,12 @@ void UConversationLayout::DisEnable()
 	if (CharacterPtr)
 	{
 		CharacterPtr->GetSceneActorInteractionComponent()->StopInteractionItem();
+		CharacterPtr = nullptr;
+	}
+	if (SceneActorInteractionInterfacePtr)
+	{
+		SceneActorInteractionInterfacePtr->GetSceneActorInteractionComponent()->StopInteractionItem();
+		SceneActorInteractionInterfacePtr = nullptr;
 	}
 }
 
@@ -136,6 +142,10 @@ void UConversationLayout::SelectedInteractionItem(
 	if (CharacterPtr)
 	{
 		CharacterPtr->GetSceneActorInteractionComponent()->StartInteractionItem(GuideInteractionClass);
+	}
+	else if (SceneActorInteractionInterfacePtr)
+	{
+		SceneActorInteractionInterfacePtr->GetSceneActorInteractionComponent()->StartInteractionItem(GuideInteractionClass);
 	}
 
 	CloseOption();

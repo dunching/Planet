@@ -10,6 +10,7 @@
 #include "CharacterAttibutes.h"
 #include "CharactersInfo.h"
 #include "InventoryComponent.h"
+#include "GroupManagger.h"
 
 bool FCharacterSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
@@ -197,10 +198,14 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 
 		SpawnParameters.CustomPreSpawnInitalization = [this](auto ActorPtr)
 		{
+			auto GroupSharedInfoPtr = InventoryComponentPtr->GetOwner<AGroupManagger>();
+			
 			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
-			if (AICharacterPtr)
+			
+			if (AICharacterPtr && GroupSharedInfoPtr)
 			{
 				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(GetID());
+				AICharacterPtr->SetGroupSharedInfo(GroupSharedInfoPtr);
 			}
 		};
 		

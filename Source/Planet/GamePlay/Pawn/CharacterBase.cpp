@@ -419,8 +419,6 @@ void ACharacterBase::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		auto ProxyCharacterSPtr = GetInventoryComponent()->InitialOwnerCharacterProxy(this);
-
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->OwnerCharacterProxyPtr = ProxyCharacterSPtr;
 	}
 #endif
 

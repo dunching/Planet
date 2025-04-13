@@ -99,6 +99,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kInitialize;
 
+	/**
+	 * 若为Player的群体，则为PlayerCharacter
+	 * NPC群体为空
+	 */
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ACharacterBase* LeaderCharacterPtr = nullptr;
 

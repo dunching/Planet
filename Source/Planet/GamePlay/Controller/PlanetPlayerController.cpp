@@ -33,6 +33,8 @@
 #include "CollisionDataStruct.h"
 #include "EventSubjectComponent.h"
 #include "GameMode_Main.h"
+#include "GeneratorBase.h"
+#include "GeneratorColony_ByInvoke.h"
 #include "LogWriter.h"
 #include "GroupManagger.h"
 #include "InventoryComponent.h"
@@ -41,7 +43,6 @@
 #include "GuideActor.h"
 #include "GE_Common.h"
 #include "HumanCharacter_AI.h"
-#include "GeneratorColony.h"
 #include "OpenWorldSystem.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
@@ -145,7 +146,7 @@ FVector APlanetPlayerController::GetFocalPointOnActor(const AActor* Actor) const
 }
 
 void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
-	const TSoftObjectPtr<AGeneratorBase>& GeneratorBasePtr)
+	const TSoftObjectPtr<AGeneratorColonyDelay>& GeneratorBasePtr)
 {
 	GeneratorBasePtr->SpawnGeneratorActor();
 }
@@ -174,6 +175,16 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	if (Result)
 	{
 		
+	}
+}
+
+void APlanetPlayerController::ServerDestroyActor_Implementation(
+	AActor* ActorPtr
+)
+{
+	if (ActorPtr)
+	{
+		ActorPtr->Destroy();
 	}
 }
 
@@ -319,25 +330,16 @@ void APlanetPlayerController::OnPossess(APawn* InPawn)
 		// 注意：PC并非是在此处绑定，这段仅为测试
 		BindPCWithCharacter();
 
-		if (GroupManaggerPtr)
-		{
-			GroupManaggerPtr->InitialByPlayerController(this);
-		}
-
 		if (InPawn->IsA(AHumanCharacter::StaticClass()))
 		{
 #if UE_EDITOR || UE_SERVER
 			if (GetNetMode() == NM_DedicatedServer)
 			{
-				if (InPawn)
+				if (InPawn->IsA(AHumanCharacter::StaticClass()))
 				{
-					if (InPawn->IsA(AHumanCharacter::StaticClass()))
+					if (GroupManaggerPtr)
 					{
-						if (GetNetMode() == NM_DedicatedServer)
-						{
-							GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-								ETeammateOption::kFollow);
-						}
+						GroupManaggerPtr->SetOwnerCharacterProxyPtr(Cast<AHumanCharacter>(InPawn));
 					}
 				}
 			}
@@ -389,9 +391,10 @@ void APlanetPlayerController::OnRep_PlayerState()
 
 void APlanetPlayerController::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 {
-#if UE_EDITOR || UE_CLIENT
-	if (GetLocalRole() == ROLE_AutonomousProxy)
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
 	{
+		NewGroupSharedInfoPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(ETeammateOption::kFollow);
 	}
 #endif
 

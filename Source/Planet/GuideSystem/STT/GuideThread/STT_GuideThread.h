@@ -134,7 +134,9 @@ struct PLANET_API FSTT_GuideThreadBase :
 	) const override;
 
 protected:
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const;
 };
 #pragma endregion
 
@@ -197,7 +199,9 @@ struct PLANET_API FSTT_GuideThread_PressKey :
 		const float DeltaTime
 	) const override;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 };
 #pragma endregion
 
@@ -281,7 +285,9 @@ struct PLANET_API FSTT_GuideThread_GoToTheTargetPoint :
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 };
 #pragma endregion
 
@@ -363,9 +369,13 @@ struct PLANET_API FSTT_GuideThreadMonologue :
 	) const override;
 
 protected:
-	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
+	EStateTreeRunStatus PerformGameplayTask(
+		FStateTreeExecutionContext& Context
+	) const;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 
 	float RemainingTime = 0.f;
 
@@ -416,7 +426,9 @@ struct PLANET_API FSTT_GuideThread_WaitTaskComplete :
 	) const override;
 
 protected:
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 };
 #pragma endregion
 
@@ -493,7 +505,9 @@ struct PLANET_API FSTT_GuideThread_WaitInteractionSceneActor :
 	) const override;
 
 protected:
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 };
 
 #pragma endregion
@@ -550,9 +564,13 @@ struct PLANET_API FSTT_GuideThreadCollectResource :
 	) const override;
 
 protected:
-	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
+	EStateTreeRunStatus PerformGameplayTask(
+		FStateTreeExecutionContext& Context
+	) const;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 };
 #pragma endregion
 
@@ -608,9 +626,13 @@ struct PLANET_API FSTT_GuideThreadDefeatEnemy :
 	) const override;
 
 protected:
-	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
+	EStateTreeRunStatus PerformGameplayTask(
+		FStateTreeExecutionContext& Context
+	) const;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 };
 #pragma endregion
 
@@ -754,7 +776,9 @@ struct PLANET_API FSTT_GuideThreadLeaveHere :
 		const float DeltaTime
 	) const override;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 
 protected:
 	float TatolTime = 0.f;
@@ -816,7 +840,9 @@ struct PLANET_API FSTGT_GuideThreadCheckIsInValidArea :
 		const float DeltaTime
 	) const override;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 
 protected:
 };
@@ -878,7 +904,9 @@ struct PLANET_API FSTT_GuideThreadReturnOpenWorld :
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 
 protected:
 };
@@ -940,7 +968,9 @@ struct PLANET_API FSTT_GuideThread_WaitPlayerEquipment :
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
-	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
 
 protected:
 };

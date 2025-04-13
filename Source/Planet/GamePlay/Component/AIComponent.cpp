@@ -3,7 +3,6 @@
 
 #include "Net/UnrealNetwork.h"
 
-#include "GeneratorColony.h"
 #include "CharacterBase.h"
 #include "CharactersInfo.h"
 #include "GameplayTagsLibrary.h"

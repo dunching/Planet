@@ -21,9 +21,10 @@
 class ASceneActor;
 class AResourceBoxBase;
 class ATargetPoint_Runtime;
-class AGeneratorColony;
 class ATargetPoint;
 class AGeneratorBase;
+class AGeneratorColonyDelay;
+class AGeneratorColony;
 class AAreaVolume;
 class AGuideActor;
 class AGuideThread;
@@ -66,7 +67,7 @@ public:
 		BlueprintReadOnly,
 		EditAnywhere
 	)
-	TSoftObjectPtr<AGeneratorBase> ActorPtr;
+	TSoftObjectPtr<AGeneratorColonyDelay> ActorPtr;
 };
 
 USTRUCT()
@@ -149,5 +150,8 @@ struct PLANET_API FSTT_GuideThreadWaitCharacterDie :
 	) const override;
 
 protected:
+	
+	virtual FTaskNodeDescript GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const override;
+	
 };
 #pragma endregion

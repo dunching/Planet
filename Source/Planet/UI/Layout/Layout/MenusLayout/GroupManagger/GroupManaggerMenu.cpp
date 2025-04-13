@@ -45,21 +45,11 @@ void UGroupManaggerMenu::ResetUIByData()
 
 void UGroupManaggerMenu::SyncData()
 {
-	auto PCPtr =
-		Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
-	if (!PCPtr)
-	{
-		return;
-	}
-
 	auto TeamMatesListPtr = Cast<UTeamMatesList>(GetWidgetFromName(GroupManaggerMenu::TeamMatesList));
 	if (TeamMatesListPtr)
 	{
 		TeamMatesListPtr->SyncData();
 	}
-
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
-	GMCPtr->GetTeamMatesHelperComponent()->SpwanTeammateCharacter();
 }
 
 void UGroupManaggerMenu::ResetGroupmates()

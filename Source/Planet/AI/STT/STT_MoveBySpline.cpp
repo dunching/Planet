@@ -6,11 +6,10 @@
 #include <Components/SplineComponent.h>
 
 #include "AITask_MoveBySpline.h"
-#include "GeneratorColony.h"
+#include "GeneratorColony_ByInvoke.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "STE_AICharacterController.h"
-#include "GeneratorNPCs_Patrol.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_MoveBySpline(

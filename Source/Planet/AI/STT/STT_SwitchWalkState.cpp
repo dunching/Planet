@@ -28,5 +28,27 @@ EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 
 	InstanceData.CharacterPtr->GetCharacterAbilitySystemComponent()->SwitchWalkState(InstanceData.bIsRun);
 
-	return EStateTreeRunStatus::Succeeded;
+	if (InstanceData.bIsInfinish)
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+void FSTT_SwitchWalkState::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	InstanceData.CharacterPtr->GetCharacterAbilitySystemComponent()->SwitchWalkState(!InstanceData.bIsRun);
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
 }

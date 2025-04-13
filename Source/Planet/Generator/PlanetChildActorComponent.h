@@ -26,5 +26,7 @@ public:
 	UPlanetChildActorComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void CreateChildActor(TFunction<void(AActor*)> CustomizerFunc = nullptr)override;
+
+	virtual void RespawnChildActor(TFunction<void(AActor*)> CustomizerFunc = nullptr);
 	
 };

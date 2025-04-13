@@ -76,6 +76,11 @@ EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::Tick(FStateTreeExecutionContext& 
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
+	InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
+		GetTaskNodeDescripton(
+			Context
+		)
+	);
 	if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
 	{
 		// 获取对应的Characers
@@ -95,6 +100,13 @@ EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::Tick(FStateTreeExecutionContext& 
 		if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
 		{
 			InstanceData.CharacterAry.Empty();
+		}
+		else
+		{
+			for (auto Iter : InstanceData.CharacterAry)
+			{
+				InstanceData.GloabVariable_Challenge->TemporaryActorAry.Add(Iter.Get());
+			}
 		}
 	}
 	else
@@ -123,6 +135,32 @@ EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::Tick(FStateTreeExecutionContext& 
 	}
 
 	return Super::Tick(Context, DeltaTime);
+}
+
+void FSTT_GuideThreadSpawnNPCs::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (InstanceData.GloabVariable_Challenge)
+	{
+		auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0));
+		if (PCPtr)
+		{
+			for (auto Iter : InstanceData.GloabVariable_Challenge->TemporaryActorAry)
+			{
+				if (Iter)
+				{
+					PCPtr->ServerDestroyActor(Iter);
+				}
+			}
+			InstanceData.GloabVariable_Challenge->TemporaryActorAry.Empty();
+		}
+	}
+
+	Super::ExitState(Context, Transition);
 }
 
 bool FSTT_GuideThreadSpawnNPCs::SpawnNPC(FStateTreeExecutionContext& Context) const
@@ -164,4 +202,45 @@ bool FSTT_GuideThreadSpawnNPCs::SpawnNPC(FStateTreeExecutionContext& Context) co
 	}
 
 	return false;
+}
+
+FTaskNodeDescript FSTT_GuideThreadSpawnNPCs::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	FTaskNodeDescript TaskNodeDescript;
+
+	if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
+	{
+		TaskNodeDescript.Description = FString::Printf(
+			TEXT(
+				"击败敌人（0/%d）,第%d/%d波敌人"
+			),
+			InstanceData.CharacterIDAry.Num(), InstanceData.WaveIndex,InstanceData.PerWaveNum.Num()
+		);
+	}
+	else
+	{
+		int32 Num  = 0;
+		for (auto Iter : InstanceData.CharacterAry)
+		{
+			if (Iter.IsValid() && Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
+			{
+				Num++;
+			}
+		}
+
+		TaskNodeDescript.Description = FString::Printf(
+			TEXT(
+				"击败敌人（%d/%d）,第%d/%d波敌人"
+			),
+			Num, InstanceData.CharacterIDAry.Num(), InstanceData.WaveIndex,InstanceData.PerWaveNum.Num()
+		);
+	}
+
+	return TaskNodeDescript;
 }

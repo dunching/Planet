@@ -1,4 +1,3 @@
-
 #include "GroupManagger.h"
 
 #include "HumanCharacter.h"
@@ -8,8 +7,10 @@
 #include "PlanetPlayerController.h"
 #include "UGSAbilitySystemComponent.h"
 
-AGroupManagger::AGroupManagger(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+AGroupManagger::AGroupManagger(
+	const FObjectInitializer& ObjectInitializer
+):
+ Super(ObjectInitializer)
 {
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
@@ -25,10 +26,14 @@ AGroupManagger::AGroupManagger(const FObjectInitializer& ObjectInitializer):
 
 	bIsSpatiallyLoaded = false;
 
-	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(UTeamMatesHelperComponent::ComponentName);
+	TeamMatesHelperComponentPtr = CreateDefaultSubobject<UTeamMatesHelperComponent>(
+		UTeamMatesHelperComponent::ComponentName
+	);
 	InventoryComponentPtr = CreateDefaultSubobject<UInventoryComponent>(UInventoryComponent::ComponentName);
-	
-	AbilitySystemComponentPtr = CreateDefaultSubobject<UGSAbilitySystemComponent>(UGSAbilitySystemComponent::ComponentName);
+
+	AbilitySystemComponentPtr = CreateDefaultSubobject<UGSAbilitySystemComponent>(
+		UGSAbilitySystemComponent::ComponentName
+	);
 	AbilitySystemComponentPtr->SetIsReplicated(true);
 	AbilitySystemComponentPtr->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 }
@@ -65,7 +70,12 @@ UInventoryComponent* AGroupManagger::GetHoldingItemsComponent()
 	return InventoryComponentPtr;
 }
 
-void AGroupManagger::InitialByPlayerController(APlanetPlayerController* PCPtr)
+void AGroupManagger::SetOwnerCharacterProxyPtr(
+	ACharacterBase* CharacterPtr
+)
 {
-	TeamMatesHelperComponentPtr->OwnerCharacterProxyPtr = PCPtr->GetPawn<AHumanCharacter>()->GetCharacterProxy();
+	if (CharacterPtr != nullptr)
+	{
+		TeamMatesHelperComponentPtr->OwnerCharacterProxyPtr = CharacterPtr->GetCharacterProxy();
+	}
 }

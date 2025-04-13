@@ -151,7 +151,6 @@ void AHorseAIController::OnTeamChanged()
 			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
 			));
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterProxyPtr);
 	}
 }
 

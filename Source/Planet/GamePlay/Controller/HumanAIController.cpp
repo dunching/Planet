@@ -1,4 +1,3 @@
-
 #include "HumanAIController.h"
 
 #include "Components/StateTreeComponent.h"
@@ -19,25 +18,31 @@
 #include "PlanetPlayerController.h"
 #include "GameplayTagsLibrary.h"
 #include "BuildingArea.h"
-#include "GeneratorNPCs_Patrol.h"
-#include "GeneratorColony.h"
 #include "HumanCharacter_AI.h"
 #include "GroupManagger.h"
 #include "AIControllerStateTreeAIComponent.h"
+#include "GeneratorColony_ByInvoke.h"
+#include "GeneratorColony_ByTime.h"
 #include "LogWriter.h"
 
-AHumanAIController::AHumanAIController(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+AHumanAIController::AHumanAIController(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
-	StateTreeAIComponentPtr = CreateDefaultSubobject<UAIControllerStateTreeAIComponent>(UAIControllerStateTreeAIComponent::ComponentName);
+	StateTreeAIComponentPtr = CreateDefaultSubobject<UAIControllerStateTreeAIComponent>(
+		UAIControllerStateTreeAIComponent::ComponentName
+	);
 	AIPerceptionComponentPtr = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 
 	// 设置这个之后BP不能保存？
 	InitialSenseConfig();
 }
 
-void AHumanAIController::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr)
+void AHumanAIController::SetGroupSharedInfo(
+	AGroupManagger* InGroupSharedInfoPtr
+)
 {
 	Super::SetGroupSharedInfo(InGroupSharedInfoPtr);
 }
@@ -71,13 +76,18 @@ UAIPerceptionComponent* AHumanAIController::GetAIPerceptionComponent()
 	return AIPerceptionComponentPtr;
 }
 
+TObjectPtr<UAIControllerStateTreeAIComponent> AHumanAIController::GetStateTreeAIComponent() const
+{
+	return StateTreeAIComponentPtr;
+}
+
 bool AHumanAIController::CheckIsFarawayOriginal() const
 {
 	if (BuildingAreaPtr)
 	{
 		return (FVector::Distance(BuildingAreaPtr->GetActorLocation(), GetPawn()->GetActorLocation()) > 1000);
 	}
-	
+
 	if (GeneratorNPCs_PatrolPtr)
 	{
 		auto CharacterPtr = GetPawn<FPawnType>();
@@ -92,12 +102,14 @@ bool AHumanAIController::CheckIsFarawayOriginal() const
 
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
-	const TSharedPtr < FCharacterProxyType>& LeaderCharacterProxyPtr
+	const TSharedPtr<FCharacterProxyType>& LeaderCharacterProxyPtr
 )
 {
 }
 
-void AHumanAIController::OnConstruction(const FTransform& Transform)
+void AHumanAIController::OnConstruction(
+	const FTransform& Transform
+)
 {
 	Super::OnConstruction(Transform);
 }
@@ -110,26 +122,26 @@ void AHumanAIController::BeginPlay()
 	GetAIPerceptionComponent()->OnPerceptionUpdated.AddDynamic(this, &ThisClass::OnPerceptionUpdated);
 
 	InitialAIConony();
-	
+
 	InitialCharacter();
 }
 
-void AHumanAIController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AHumanAIController::EndPlay(
+	const EEndPlayReason::Type EndPlayReason
+)
 {
 	Super::EndPlay(EndPlayReason);
 }
 
-void AHumanAIController::OnPossess(APawn* InPawn)
+void AHumanAIController::OnPossess(
+	APawn* InPawn
+)
 {
 	Super::OnPossess(InPawn);
-	
+
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (CharacterPtr)
 	{
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(CharacterPtr->GetAIComponent()->DefaultTeammateOption);
-#if WITH_EDITORONLY_DATA
-#else
-#endif
 	}
 
 	InitialAllocations();
@@ -155,7 +167,9 @@ void AHumanAIController::OnUnPossess()
 	Super::OnUnPossess();
 }
 
-void AHumanAIController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AHumanAIController::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -171,7 +185,9 @@ void AHumanAIController::OnGroupChanged()
 		if (PlayerCharacterPtr)
 		{
 			CharacterPtr->SetCampType(
-				CharacterPtr->IsTeammate(PlayerCharacterPtr) ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+				CharacterPtr->IsTeammate(PlayerCharacterPtr) ?
+					ECharacterCampType::kTeamMate :
+					ECharacterCampType::kEnemy
 			);
 		}
 	}
@@ -183,30 +199,24 @@ void AHumanAIController::OnTeamChanged()
 	if (TeamsHelper)
 	{
 		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(
-			std::bind(&ThisClass::OnTeammateOptionChangedImp, this, std::placeholders::_1, std::placeholders::_2
-			));
+			std::bind(
+				&ThisClass::OnTeammateOptionChangedImp,
+				this,
+				std::placeholders::_1,
+				std::placeholders::_2
+			)
+		);
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->OwnerCharacterProxyPtr);
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->GetOwnerCharacterProxyPtr());
 	}
 }
 
 void AHumanAIController::InitialCharacter()
 {
 	TeamHelperChangedDelegate =
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(std::bind(&ThisClass::OnTeamChanged, this));
-		
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		// 组件自动调用条件不成功，原因未知
-		// 👆
-		// AI Comtroller下的需要显式调用
-		if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
-		{
-			StateTreeAIComponentPtr->StartLogic();
-		}
-	}
-#endif
+		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(
+			std::bind(&ThisClass::OnTeamChanged, this)
+		);
 }
 
 void AHumanAIController::InitialAIConony()
@@ -233,7 +243,9 @@ void AHumanAIController::InitialAIConony()
 	}
 }
 
-void AHumanAIController::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void AHumanAIController::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+)
 {
 	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 }

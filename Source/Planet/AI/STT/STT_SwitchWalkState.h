@@ -32,9 +32,16 @@ struct PLANET_API FStateTreeSwitchWalkStateTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
-
+	/**
+	 * true,任务立即完成
+	 * false,在子任务持续期间内保持状态
+	 */
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	bool bIsInfinish = false;
+	
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	bool bIsRun = true;
 
@@ -55,6 +62,11 @@ struct PLANET_API FSTT_SwitchWalkState : public FStateTreeAIActionTaskBase
 
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context, 
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
 

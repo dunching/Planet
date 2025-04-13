@@ -39,20 +39,6 @@ struct PLANET_API FSTID_GuideInteraction_EntryChallenge :
 {
 	GENERATED_BODY()
 
-	UPROPERTY(Transient)
-	TObjectPtr<UGameplayTask_Interaction_Option> GameplayTaskPtr = nullptr;
-
-	UPROPERTY(Transient)
-	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable_Interaction* GloabVariable = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	TArray<FString> OptionAry;
-
-	UPROPERTY(EditAnywhere, Category = Param)
-	float DurationTime = -1.f;
 };
 
 USTRUCT()
@@ -72,14 +58,5 @@ struct PLANET_API FSTT_GuideInteraction_EntryChallenge :
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
 	) const override;
-
-	virtual EStateTreeRunStatus Tick(
-		FStateTreeExecutionContext& Context,
-		const float DeltaTime
-	) const override;
-
-	EStateTreeRunStatus PerformGameplayTask(
-		FStateTreeExecutionContext& Context
-	) const;
 };
 #pragma endregion
