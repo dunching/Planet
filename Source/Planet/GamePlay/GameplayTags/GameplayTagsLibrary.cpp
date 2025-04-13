@@ -1,18 +1,35 @@
-
 #include "GameplayTagsLibrary.h"
 
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 
 #include "Planet.h"
 
-FGameplayTag UGameplayTagsLibrary::BaseFeature_Send =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Send")));
+FGameplayTag UGameplayTagsLibrary::BaseFeature_Reply =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Reply")));
 
-FGameplayTag UGameplayTagsLibrary::BaseFeature_Received =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Received")));
+FGameplayTag UGameplayTagsLibrary::BaseFeature_Dash =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Dash")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_Run =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Run")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_Jump =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Jump")));
 
 FGameplayTag UGameplayTagsLibrary::BaseFeature_Respawn =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Respawn")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenRepel =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenRepel")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenFlyAway =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenFlyAway")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenDisplacement =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenDisplacement")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenPull =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenPull")));
 
 #pragma region Locomotio
 FGameplayTag UGameplayTagsLibrary::Jump =
@@ -39,27 +56,27 @@ FGameplayTag UGameplayTagsLibrary::State_MoveToAttaclArea =
 
 #pragma region MovementStateAbl
 FGameplayTag UGameplayTagsLibrary::MovementStateAble =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble")));
 
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantJump =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantJump")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantJump")));
 
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantPathFollowMove")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantPathFollowMove")));
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantPlayerInputMove")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantPlayerInputMove")));
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRootMotion =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantRootMotion")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRootMotion")));
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRotation =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.CantRotation")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRotation")));
 
 // 浮空状态（被动
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_IntoFly =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.IntoFly")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.IntoFly")));
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_Orient2Acce =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.Orient2Acce")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.Orient2Acce")));
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_UseCustomRotation =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("MovementStateAble.UseCustomRotation")));
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.UseCustomRotation")));
 #pragma endregion
 
 #pragma region State Tag

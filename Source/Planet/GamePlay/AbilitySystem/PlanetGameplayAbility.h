@@ -10,6 +10,9 @@
 
 class UPlanetAbilitySystemComponent;
 
+/**
+ * 注册这个GA时附带的参数
+ */
 USTRUCT()
 struct FGameplayAbilityTargetData_RegisterParam :
 	public FGameplayAbilityTargetData
@@ -36,6 +39,9 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam> :
 	};
 };
 
+/**
+ * 激活这个GA时附带的参数
+ */
 USTRUCT()
 struct FGameplayAbilityTargetData_ActiveParam :
 	public FGameplayAbilityTargetData

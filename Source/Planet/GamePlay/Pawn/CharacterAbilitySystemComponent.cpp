@@ -136,7 +136,7 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 			}
 
 			OnwerActorPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{UGameplayTagsLibrary::State_Locomotion_Run}
+				FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run}
 			);
 		}
 	}
@@ -148,12 +148,9 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
 				UGameplayTagsLibrary::State_Locomotion_Run))
 			{
-				FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::State_Locomotion_Run};
+				FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run};
 				OnwerActorPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
 			}
-
-			OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Locomotion_Run);
 		}
 	}
 }
@@ -181,7 +178,7 @@ void UCharacterAbilitySystemComponent::Dash_Implementation(EDashDirection DashDi
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
-			UGameplayTagsLibrary::Dash,
+			UGameplayTagsLibrary::BaseFeature_Dash,
 			Payload
 		);
 	}
@@ -193,7 +190,7 @@ void UCharacterAbilitySystemComponent::Jump_Implementation()
 	if (OnwerActorPtr)
 	{
 		OnwerActorPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
-			FGameplayTagContainer{UGameplayTagsLibrary::Jump}
+			FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Jump}
 		);
 	}
 }

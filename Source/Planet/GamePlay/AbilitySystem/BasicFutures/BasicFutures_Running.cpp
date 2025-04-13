@@ -22,17 +22,6 @@ UBasicFutures_Running::UBasicFutures_Running() :
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-// void UBasicFutures_Running::InitalDefaultTags()
-// {
-// 	Super::InitalDefaultTags();
-//
-// 	if (GetWorldImp())
-// 	{
-// 		// AbilityTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
-// 		ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Locomotion_Run);
-// 	}
-// }
-
 void UBasicFutures_Running::IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
 {
 	if (Interval > InDuration)
@@ -76,26 +65,6 @@ void UBasicFutures_Running::ActivateAbility(
 #if UE_EDITOR || UE_SERVER
 		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
-			// //
-			// {
-			// 	auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			// 	TaskPtr->SetInfinite(1.f);
-			// 	TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalTick);
-			// 	TaskPtr->ReadyForActivation();
-			// }
-			//
-			// TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-			//
-			// ModifyPropertyMap.Add(
-			// 	ECharacterPropertyType::MoveSpeed,
-			// 	RunningSpeedOffset.GetCurrentValue()
-			// );
-			//
-			// CharacterPtr->GetCharacterAbilitySystemComponent()->SendEvent2Self(
-			// 	ModifyPropertyMap,
-			// 	UGameplayTagsLibrary::State_Locomotion_Run
-			// );
-
 			FGameplayEffectSpecHandle SpecHandle =
 				MakeOutgoingGameplayEffectSpec(GE_RunningClass, GetAbilityLevel());
 
@@ -123,15 +92,6 @@ void UBasicFutures_Running::EndAbility(
 #if UE_EDITOR || UE_SERVER
 		if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 		{
-			// TMap<ECharacterPropertyType, FBaseProperty> ModifyPropertyMap;
-			//
-			// ModifyPropertyMap.Add(ECharacterPropertyType::MoveSpeed, 0);
-			//
-			// CharacterPtr->GetCharacterAbilitySystemComponent()->ClearData2Self(
-			// 	ModifyPropertyMap, 
-			// 	UGameplayTagsLibrary::State_Locomotion_Run
-			// );
-
 			FGameplayEffectSpecHandle SpecHandle =
 				MakeOutgoingGameplayEffectSpec(GE_CancelRunningClass, GetAbilityLevel());
 

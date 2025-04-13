@@ -15,11 +15,26 @@ class PLANET_API UGameplayTagsLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	static FGameplayTag BaseFeature_Send;
+	
+	static FGameplayTag BaseFeature_Reply;
 
-	static FGameplayTag BaseFeature_Received;
+	static FGameplayTag BaseFeature_Dash;
+
+	static FGameplayTag BaseFeature_Run;
+
+	static FGameplayTag BaseFeature_Jump;
 
 	static FGameplayTag BaseFeature_Respawn;
+
+	static FGameplayTag BaseFeature_Affected;
+
+	static FGameplayTag BaseFeature_HasBeenRepel;
+
+	static FGameplayTag BaseFeature_HasBeenFlyAway;
+
+	static FGameplayTag BaseFeature_HasBeenDisplacement;
+
+	static FGameplayTag BaseFeature_HasBeenPull;
 
 #pragma region Locomotio
 	static FGameplayTag Jump;

@@ -214,7 +214,10 @@ protected:
 		const FGameplayAttributeData* GameplayAttributeDataPtr
 	) const;
 
-#pragma region GAs
+#pragma region 基础GA
+	/**
+	 * 基础GA
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilitiesAry;
 

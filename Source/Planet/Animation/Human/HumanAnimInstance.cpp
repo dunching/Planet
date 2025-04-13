@@ -2,13 +2,24 @@
 
 #include "HumanAnimInstance.h"
 
+#include "AbilitySystemGlobals.h"
+#include "CharacterAttributesComponent.h"
+#include "CharacterAttibutes.h"
+
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "GravityMovementComponent.h"
 #include "HorseCharacter.h"
-#include "CharacterAttributesComponent.h"
-#include "CharacterAttibutes.h"
+
+void UHumanAnimInstance::InitializeWithAbilitySystem(
+	UAbilitySystemComponent* ASC
+)
+{
+	check(ASC);
+
+	GameplayTagPropertyMap.Initialize(this, ASC);
+}
 
 void UHumanAnimInstance::NativeBeginPlay()
 {
@@ -40,6 +51,19 @@ void UHumanAnimInstance::BeginDestroy()
 	}
 
 	Super::BeginDestroy();
+}
+
+inline void UHumanAnimInstance::NativeInitializeAnimation()
+{
+	Super::NativeInitializeAnimation();
+
+	if (AActor* OwningActor = GetOwningActor())
+	{
+		if (UAbilitySystemComponent* ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(OwningActor))
+		{
+			InitializeWithAbilitySystem(ASC);
+		}
+	}
 }
 
 void UHumanAnimInstance::OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue)

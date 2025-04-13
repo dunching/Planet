@@ -61,7 +61,7 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty RunningSpeedOffset;
-	
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty RunningConsume;
 

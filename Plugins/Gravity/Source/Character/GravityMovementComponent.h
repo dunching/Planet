@@ -57,23 +57,33 @@ public:
 
     const FLyraCharacterGroundInfo& GetGroundInfo();
 
-    // 
+    /**
+     * 停止角色自动旋转
+     */
     UPROPERTY(Replicated)
     bool bSkip_Rotation = false;
-    
-    // 
+
+    /**
+     * 停止RootMotion
+     */
     UPROPERTY(Replicated)
     bool bSkip_RootMotion = false;
-    
-    // 
+
+    /**
+     * 停止接受输入
+     */
     UPROPERTY(Replicated)
     bool bSkip_PlayerInput = false;
-    
-    // 
+
+    /**
+     * 停止由导航进行的输入
+     */
     UPROPERTY(Replicated)
     bool bSkip_PathFollow = false;
-    
-    // 
+
+    /**
+     * 强制转向前进方向
+     */
     UPROPERTY(Replicated)
     bool bForceRotation = false;
     
