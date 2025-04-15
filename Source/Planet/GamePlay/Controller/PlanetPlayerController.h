@@ -25,9 +25,9 @@ class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class UEventSubjectComponent;
 class AGroupManagger;
-class AGeneratorColony;
+class AGeneratorColony_ByTime;
 class AGeneratorBase;
-class AGeneratorColonyDelay;
+class AGeneratorColony_ByInvoke;
 class AGuideActor;
 
 /**
@@ -102,7 +102,7 @@ public:
 #pragma region RPC
 
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnGeneratorActor(const TSoftObjectPtr<AGeneratorColonyDelay>&GeneratorBasePtr);
+	void ServerSpawnGeneratorActor(const TSoftObjectPtr<AGeneratorColony_ByInvoke>&GeneratorBasePtr);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnCharacter(

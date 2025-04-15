@@ -24,8 +24,10 @@ struct FBasicProxy;
 
 struct FTableRowProxy_TagExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
-struct FTableRowProxy_AICharacter_Allocation;
 
+/**
+ * DataTables
+ */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API USceneProxyExtendInfoMap : public UPrimaryDataAsset
 {
@@ -42,8 +44,6 @@ public:
 	
 	FTableRowProxy_TagExtendInfo* GetTableRowProxy_TagExtendInfo(FGameplayTag UnitType)const;
 	
-	FTableRowProxy_AICharacter_Allocation* GetTableRowProxy_AICharacter_Allocation(FGameplayTag UnitType)const;
-
 	const UPAD_Talent_Property* GetTalent_Property(EPointPropertyType PointPropertyType)const;
 
 	void InitialData();
@@ -85,10 +85,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_PropertyEntrys;
 
-	// AICharacter的技能配分
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Character_Allocation;
-	
 	// Character的成长属性
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Character_GrowthAttribute;

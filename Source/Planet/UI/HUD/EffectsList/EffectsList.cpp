@@ -4,7 +4,6 @@
 
 #include "MyWrapBox.h"
 #include "EffectItem.h"
-#include "CS_Base.h"
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"

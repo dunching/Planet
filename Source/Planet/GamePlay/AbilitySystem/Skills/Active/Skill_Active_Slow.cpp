@@ -30,7 +30,6 @@
 #include "AbilityTask_TimerHelper.h"
 #include "Helper_RootMotionSource.h"
 #include "AbilityTask_tornado.h"
-#include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
@@ -39,7 +38,6 @@
 #include "CharacterAttributesComponent.h"
 #include "KismetGravityLibrary.h"
 #include "KismetCollisionHelper.h"
-#include "CS_PeriodicStateModify_Slow.h"
 
 void USkill_Active_Slow::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
@@ -88,12 +86,6 @@ void USkill_Active_Slow::PerformAction(
 		// 控制效果
 		for (const auto& Iter : TargetSet)
 		{
-			auto GameplayAbilityTargetData_StateModifyPtr = new FGameplayAbilityTargetData_StateModify_Slow(
-				-MoveSpeedOffset
-			);
-
-			GameplayAbilityTargetData_StateModifyPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_StateModifyPtr->TargetCharacterPtr = Iter;
 		}
 
 		CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());

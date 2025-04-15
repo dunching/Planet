@@ -72,13 +72,6 @@ public:
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
 
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	);
-
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -100,8 +93,6 @@ public:
 
 protected:
 	
-	virtual void SetContinuePerform(bool bIsContinue)override;
-
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -109,19 +100,13 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	void ContinueActive();
-
-	void StopContinueActive();
-
-	// < 0 则为不限时间，在显式结束前就可以再次输入
-	virtual void CheckInContinue(float InWaitInputTime);
+	/**
+	 *	进入等待输入，如果按下了攻击键，则继续执行
+	 */
+	bool PerformIfContinue();
 
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
-
-	UAbilityTask_TimerHelper* WaitInputTaskPtr = nullptr;
-
-	bool bIsContinue = true;
 
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
@@ -129,6 +114,9 @@ protected:
 
 private:
 
-	float WaitInputPercent = 1.f;
+	/**
+	 * 攻击前摇结束，等待输入？
+	 */
+	bool WaitInput = true;
 
 };

@@ -72,24 +72,6 @@ void USkill_WeaponActive_HandProtection::PreActivate(
 	}
 }
 
-void USkill_WeaponActive_HandProtection::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (WeaponPtr)
-	{
-		return;
-	}
-
-	checkNoEntry();
-	K2_EndAbility();
-}
-
 bool USkill_WeaponActive_HandProtection::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -208,12 +190,21 @@ void USkill_WeaponActive_HandProtection::OnNotifyBeginReceived(FName NotifyName)
 		}
 #endif
 
-		CheckInContinue(-1.f);
+		PerformIfContinue();
 	}
 }
 
 void USkill_WeaponActive_HandProtection::OnMontateComplete()
 {
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		// 
+		K2_CancelAbility();
+	}
+#endif
 }
 
 void USkill_WeaponActive_HandProtection::MakeDamage()
@@ -242,12 +233,10 @@ void USkill_WeaponActive_HandProtection::MakeDamage()
 
 void USkill_WeaponActive_HandProtection::PlayMontage()
 {
-	const auto GAPerformSpeed = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
-	const float Rate = static_cast<float>(GAPerformSpeed) / 100;
-
-	{
-		// 
-	}
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
 		UAnimMontage* HumanMontage = nullptr;
 
@@ -269,6 +258,8 @@ void USkill_WeaponActive_HandProtection::PlayMontage()
 		}
 		break;
 		}
+
+		const float Rate = CharacterPtr->GetCharacterAttributesComponent()->GetRate();
 
 		auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,

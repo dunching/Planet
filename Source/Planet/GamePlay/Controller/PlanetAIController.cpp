@@ -192,11 +192,11 @@ void APlanetAIController::OnHPChanged(int32 CurrentValue)
 {
 	if (CurrentValue <= 0)
 	{
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsLibrary::DeathingTag });
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{ UGameplayTagsLibrary::BaseFeature_Dying });
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData) {
 			for (auto Iter : AbilityEndedData.AbilityThatEnded->GetAssetTags())
 			{
-				if (Iter == UGameplayTagsLibrary::DeathingTag)
+				if (Iter == UGameplayTagsLibrary::State_Dying)
 				{
 //					Destroy();
 				}

@@ -20,10 +20,11 @@ enum ERootMotionSource_Priority : uint16
 
 	kAIMove,
 
-	kMove,			// 位移
-	kFlyAway,		// 击飞
-	kTraction,		// 牵引
-	kForceMove,		// 强制位移
+	kMove,				// 位移
+	kFlyAway,			// 飞行
+	kHasBeenFlyAway,	// 被击飞
+	kTraction,			// 牵引
+	kForceMove,			// 强制位移
 };
 
 class ASPlineActor;
@@ -31,7 +32,9 @@ class ATornado;
 class ACharacterBase;
 class ATractionPoint;
 
-void SetRootMotionFinished(FRootMotionSource& RootMotionSource);
+void SetRootMotionFinished(
+	FRootMotionSource& RootMotionSource
+);
 
 USTRUCT()
 struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForce
@@ -48,9 +51,9 @@ struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForc
 	) override;
 };
 
-template<>
-struct TStructOpsTypeTraits< FRootMotionSource_MyConstantForce > :
-	public TStructOpsTypeTraitsBase2< FRootMotionSource_MyConstantForce >
+template <>
+struct TStructOpsTypeTraits<FRootMotionSource_MyConstantForce> :
+	public TStructOpsTypeTraitsBase2<FRootMotionSource_MyConstantForce>
 {
 	enum
 	{
@@ -66,15 +69,26 @@ struct FRootMotionSource_MyRadialForce : public FRootMotionSource_RadialForce
 
 	virtual FRootMotionSource* Clone() const override;
 
-	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool Matches(const FRootMotionSource* Other) const override;
+	virtual bool Matches(
+		const FRootMotionSource* Other
+	) const override;
 
-	virtual bool MatchesAndHasSameState(const FRootMotionSource* Other) const override;
+	virtual bool MatchesAndHasSameState(
+		const FRootMotionSource* Other
+	) const override;
 
-	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+	virtual bool UpdateStateFrom(
+		const FRootMotionSource* SourceToTakeStateFrom,
+		bool bMarkForSimulatedCatchup = false
+	) override;
 
 	virtual void PrepareRootMotion(
 		float SimulationTime,
@@ -83,17 +97,70 @@ struct FRootMotionSource_MyRadialForce : public FRootMotionSource_RadialForce
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
-	virtual void CheckTimeOut()override;
+	virtual void CheckTimeOut() override;
 
 	TWeakObjectPtr<ATractionPoint> TractionPointPtr = nullptr;
 
 	int32 AcceptableRadius = 10;
-
 };
 
-template<>
-struct TStructOpsTypeTraits< FRootMotionSource_MyRadialForce > :
-	public TStructOpsTypeTraitsBase2< FRootMotionSource_MyRadialForce >
+template <>
+struct TStructOpsTypeTraits<FRootMotionSource_MyRadialForce> :
+	public TStructOpsTypeTraitsBase2<FRootMotionSource_MyRadialForce>
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
+};
+
+USTRUCT()
+struct FRootMotionSource_HasBeenFlyAway : public FRootMotionSource
+{
+	GENERATED_USTRUCT_BODY()
+
+	FRootMotionSource_HasBeenFlyAway();
+
+	virtual ~FRootMotionSource_HasBeenFlyAway();
+
+	virtual FRootMotionSource* Clone() const override;
+
+	virtual bool Matches(
+		const FRootMotionSource* Other
+	) const override;
+
+	virtual bool MatchesAndHasSameState(
+		const FRootMotionSource* Other
+	) const override;
+
+	virtual bool UpdateStateFrom(
+		const FRootMotionSource* SourceToTakeStateFrom,
+		bool bMarkForSimulatedCatchup = false
+	) override;
+
+	virtual void PrepareRootMotion(
+		float SimulationTime,
+		float MovementTickTime,
+		const ACharacter& Character,
+		const UCharacterMovementComponent& MoveComponent
+	) override;
+
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
+
+	virtual UScriptStruct* GetScriptStruct() const override;
+
+	// 高度
+	int32 Height = 100;
+};
+
+template <>
+struct TStructOpsTypeTraits<FRootMotionSource_HasBeenFlyAway> :
+	public TStructOpsTypeTraitsBase2<FRootMotionSource_HasBeenFlyAway>
 {
 	enum
 	{
@@ -113,11 +180,18 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 
 	virtual FRootMotionSource* Clone() const override;
 
-	virtual bool Matches(const FRootMotionSource* Other) const override;
+	virtual bool Matches(
+		const FRootMotionSource* Other
+	) const override;
 
-	virtual bool MatchesAndHasSameState(const FRootMotionSource* Other) const override;
+	virtual bool MatchesAndHasSameState(
+		const FRootMotionSource* Other
+	) const override;
 
-	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+	virtual bool UpdateStateFrom(
+		const FRootMotionSource* SourceToTakeStateFrom,
+		bool bMarkForSimulatedCatchup = false
+	) override;
 
 	virtual void PrepareRootMotion(
 		float SimulationTime,
@@ -126,11 +200,15 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
-	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual void CheckTimeOut()override;
+	virtual void CheckTimeOut() override;
 
 	void Initial(
 		float Height,
@@ -138,7 +216,7 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 		int32 RisingSpeed,
 		int32 FallingSpeed,
 		const FVector& OriginalPt,
-		ACharacter*CharacterPtr
+		ACharacter* CharacterPtr
 	);
 
 	void UpdateDuration(
@@ -151,25 +229,26 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 
 	// 上升速度 
 	int32 RisingSpeed = 100;
-	
+
 	// 下降速度 < 0则使用默认的速度
 	int32 FallingSpeed = -1;
 
 	// 高度
 	int32 Height = 100;
 
+	bool bIsLanded = false;
+
+	
 	float Radius = 0.f;
 
 	float HalfHeight = 0.f;
 
-	bool bIsFalling = false;
-
 	int32 Line = 10000;
 };
 
-template<>
-struct TStructOpsTypeTraits< FRootMotionSource_FlyAway > :
-	public TStructOpsTypeTraitsBase2< FRootMotionSource_FlyAway >
+template <>
+struct TStructOpsTypeTraits<FRootMotionSource_FlyAway> :
+	public TStructOpsTypeTraitsBase2<FRootMotionSource_FlyAway>
 {
 	enum
 	{
@@ -189,13 +268,22 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 
 	virtual FRootMotionSource* Clone() const override;
 
-	virtual bool Matches(const FRootMotionSource* Other) const override;
+	virtual bool Matches(
+		const FRootMotionSource* Other
+	) const override;
 
-	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+	virtual bool UpdateStateFrom(
+		const FRootMotionSource* SourceToTakeStateFrom,
+		bool bMarkForSimulatedCatchup = false
+	) override;
 
 	virtual void PrepareRootMotion(
 		float SimulationTime,
@@ -217,12 +305,11 @@ struct FRootMotionSource_BySpline : public FRootMotionSource
 	ACharacterBase* TargetCharacterPtr = nullptr;
 
 private:
-
 };
 
-template<>
-struct TStructOpsTypeTraits< FRootMotionSource_BySpline > :
-	public TStructOpsTypeTraitsBase2< FRootMotionSource_BySpline >
+template <>
+struct TStructOpsTypeTraits<FRootMotionSource_BySpline> :
+	public TStructOpsTypeTraitsBase2<FRootMotionSource_BySpline>
 {
 	enum
 	{
@@ -238,13 +325,22 @@ struct FRootMotionSource_Formation : public FRootMotionSource
 
 	virtual FRootMotionSource* Clone() const override;
 
-	virtual bool Matches(const FRootMotionSource* Other) const override;
+	virtual bool Matches(
+		const FRootMotionSource* Other
+	) const override;
 
-	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup = false) override;
+	virtual bool UpdateStateFrom(
+		const FRootMotionSource* SourceToTakeStateFrom,
+		bool bMarkForSimulatedCatchup = false
+	) override;
 
 	virtual void PrepareRootMotion(
 		float SimulationTime,
@@ -256,12 +352,11 @@ struct FRootMotionSource_Formation : public FRootMotionSource
 	USceneComponent* FormationPtr = nullptr;
 
 private:
-
 };
 
-template<>
-struct TStructOpsTypeTraits< FRootMotionSource_Formation > :
-	public TStructOpsTypeTraitsBase2< FRootMotionSource_Formation >
+template <>
+struct TStructOpsTypeTraits<FRootMotionSource_Formation> :
+	public TStructOpsTypeTraitsBase2<FRootMotionSource_Formation>
 {
 	enum
 	{
@@ -281,7 +376,9 @@ struct FRootMotionSource_ByTornado : public FRootMotionSource
 
 	virtual FRootMotionSource* Clone() const override;
 
-	virtual bool Matches(const FRootMotionSource* Other) const override;
+	virtual bool Matches(
+		const FRootMotionSource* Other
+	) const override;
 
 	virtual void PrepareRootMotion(
 		float SimulationTime,

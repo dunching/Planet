@@ -38,7 +38,4 @@ class PLANET_API UAbilityTask_ARM_RadialForce :
 
 	FOnTaskFinished OnFinish;
 	
-	UPROPERTY(Replicated)
-	TWeakObjectPtr<ATractionPoint>TractionPointPtr = nullptr;
-
 };

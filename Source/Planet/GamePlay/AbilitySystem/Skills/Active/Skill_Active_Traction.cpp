@@ -5,7 +5,6 @@
 
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
-#include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
@@ -14,7 +13,6 @@
 #include "CharacterAttributesComponent.h"
 #include "KismetGravityLibrary.h"
 #include "KismetCollisionHelper.h"
-#include "CS_RootMotion_Traction.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "AbilityTask_PlayMontage.h"
@@ -27,12 +25,6 @@ void USkill_Active_Traction::EndAbility(
 	bool bWasCancelled
 )
 {
-	if (TractionPointPtr.IsValid())
-	{
-		TractionPointPtr->Destroy();
-		TractionPointPtr = nullptr;
-	}
-
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -64,13 +56,6 @@ void USkill_Active_Traction::PerformAction(
 
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.Owner = CharacterPtr;
-
-		TractionPointPtr = CharacterPtr->GetWorld()->SpawnActor<ATractionPoint>(
-			CharacterPtr->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters
-		);
-
-		TractionPointPtr->Strength = MoveSpeed;
-		TractionPointPtr->Radius = Radius;
 	}
 #endif
 

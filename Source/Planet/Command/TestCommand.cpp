@@ -2,8 +2,12 @@
 #include "TestCommand.h"
 
 #include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "GuideSubSystem.h"
 #include "GuideThreadChallenge.h"
+#include "HumanCharacter_Player.h"
+#include "Planet_Tools.h"
+#include "Kismet/GameplayStatics.h"
 
 // #include "Kismet/GameplayStatics.h"
 
@@ -86,5 +90,23 @@ void TestCommand::ChallengeTest()
 {
 #if WITH_EDITOR
 	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass, true);
+#endif
+}
+
+void TestCommand::TestHasBeenFlyAway(const TArray< FString >& Args)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto Player = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+	if (Player )
+	{
+		int32 Height = 10.f;
+		LexFromString(Height, *Args[0]);
+		Player ->GetCharacterAbilitySystemComponent()->HasBeenFlayAway(Height);
+	}
 #endif
 }

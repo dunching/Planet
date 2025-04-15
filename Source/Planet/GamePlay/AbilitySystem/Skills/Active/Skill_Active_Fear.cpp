@@ -28,9 +28,6 @@
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
-#include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicStateModify_Fear.h"
 
 bool USkill_Active_Fear::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

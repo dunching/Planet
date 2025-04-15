@@ -59,7 +59,7 @@ void UBasicFutures_Mount::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	PerformAction();
+	Perform();
 }
 
 void UBasicFutures_Mount::EndAbility(
@@ -73,7 +73,7 @@ void UBasicFutures_Mount::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UBasicFutures_Mount::PerformAction()
+void UBasicFutures_Mount::Perform()
 {
 	if (CharacterPtr)
 	{

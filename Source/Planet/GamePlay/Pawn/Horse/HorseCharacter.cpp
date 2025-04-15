@@ -117,7 +117,6 @@ void AHorseCharacter::HasbeenInteracted(ACharacterBase* CharacterPtr)
 
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
-		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(CharacterPtr, UGameplayTagsLibrary::Mount, Payload);
 	}
 }
 

@@ -233,7 +233,7 @@ void AHumanAIController::InitialAIConony()
 		{
 			GeneratorNPCs_PatrolPtr = PatrolPtr;
 		}
-		else if (auto ColonyPtr = Cast<AGeneratorColony>(ParentPtr))
+		else if (auto ColonyPtr = Cast<AGeneratorColony_ByTime>(ParentPtr))
 		{
 			// 			// 这里按次序获取要追踪的位置
 			// 			auto NPCComponentPtr = GetPawn()->GetComponentByClass<UNPCComponent>();

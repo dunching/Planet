@@ -65,7 +65,7 @@ void UCharacterAttributesComponent::ProcessCharacterAttributes()
 	}
 
 	if (
-		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::State_Dying) ||
 		CharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{

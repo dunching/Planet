@@ -56,12 +56,6 @@ public:
 
 	virtual void Cancel()override;
 
-	// 装备至插槽
-	virtual void Allocation()override;
-
-	// 从插槽移除
-	virtual void UnAllocation()override;
-
 	virtual void SetAllocationCharacterProxy(const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)override;
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
@@ -83,6 +77,12 @@ public:
 	TSharedPtr<FWeaponSkillProxy>GetWeaponSkill();
 
 protected:
+
+	// 装备至插槽
+	virtual void Allocation()override;
+
+	// 从插槽移除
+	virtual void UnAllocation()override;
 
 	UPROPERTY(Transient)
 	int32 MaxAttackDistance = 100;

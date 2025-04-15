@@ -20,7 +20,7 @@
 class ASceneActor;
 class AResourceBoxBase;
 class ATargetPoint_Runtime;
-class AGeneratorColony;
+class AGeneratorColony_ByTime;
 class ATargetPoint;
 class AGeneratorBase;
 class AAreaVolume;

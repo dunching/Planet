@@ -10,7 +10,7 @@
 #include "HumanAIController.h"
 #include "AIComponent.h"
 
-AGeneratorColony::AGeneratorColony(const FObjectInitializer& ObjectInitializer):
+AGeneratorColony_ByTime::AGeneratorColony_ByTime(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
@@ -22,7 +22,7 @@ AGeneratorColony::AGeneratorColony(const FObjectInitializer& ObjectInitializer):
 	PrimaryActorTick.TickInterval = 1.f / 60;
 }
 
-void AGeneratorColony::BeginPlay()
+void AGeneratorColony_ByTime::BeginPlay()
 {
 	Super::BeginPlay();
 	

@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -24,13 +23,29 @@ struct FGameplayAbilityTargetData_Tornado : public FGameplayAbilityTargetData
 	ACharacterBase* TargetCharacterPtr = nullptr;
 };
 
+/*
+*	
+*/
+UCLASS()
+class PLANET_API ATornado :
+	public AActor
+{
+	GENERATED_BODY()
+
+public:
+	ATornado(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+ 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UCapsuleComponent> CapsuleComponentPtr = nullptr;
+
+};
+
 UCLASS()
 class PLANET_API USkill_Active_Tornado : public USkill_Active_Base
 {
 	GENERATED_BODY()
 
 public:
-
 	USkill_Active_Tornado();
 
 	virtual void PreActivate(
@@ -65,7 +80,6 @@ public:
 	);
 
 protected:
-
 	virtual void PerformAction(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -79,43 +93,49 @@ protected:
 
 	void OnPlayMontageEnd();
 
-	void OnTimerHelperTick(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Interval);
-	
+	void OnTimerHelperTick(
+		UAbilityTask_TimerHelper* TaskPtr,
+		float CurrentInterval,
+		float Interval
+	);
+
 	UFUNCTION()
 	void OnBeginOverlap(
-		UPrimitiveComponent* OverlappedComponent, 
-		AActor* OtherActor, 
-		UPrimitiveComponent* OtherComp, 
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex,
-		bool bFromSweep, 
+		bool bFromSweep,
 		const FHitResult& SweepResult
 	);
 
-	void OnOverlap(AActor* OtherActor);
-	
+	void OnOverlap(
+		AActor* OtherActor
+	);
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontage = nullptr;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Duration = 3.f;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Offset = 100.f;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Distance = 800.f;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float InnerRadius = 100.f;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float OuterRadius = 150.f;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float MaxHeight = 200.f;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	TSubclassOf<ATornado>TornadoClass;
+	TSubclassOf<ATornado> TornadoClass;
 
 	ATornado* TornadoPtr = nullptr;
 
@@ -125,6 +145,5 @@ protected:
 
 	FVector EndPt = FVector::ZeroVector;
 
-	TSet<ACharacterBase*>TargetsSet;
-
+	TSet<ACharacterBase*> TargetsSet;
 };

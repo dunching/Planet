@@ -3,7 +3,8 @@
 #include "Engine/AssetManager.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
-#include "CS_Base.h"
+#include "GameplayEffect.h"
+
 #include "TemplateHelper.h"
 #include "CharacterStateInfo.h"
 #include "SceneProxyExtendInfo.h"

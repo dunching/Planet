@@ -5,16 +5,11 @@
 
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
-#include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CameraTrailHelper.h"
 #include "AbilityTask_ControlCameraBySpline.h"
 #include "CharacterAttibutes.h"
-#include "CharacterAttributesComponent.h"
-#include "KismetGravityLibrary.h"
-#include "CS_PeriodicStateModify_Stagnation.h"
-#include "CS_PeriodicStateModify_CantBeSelected.h"
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 
@@ -79,24 +74,6 @@ void USkill_Active_CantBeSelected::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_CantBeSelected(Duration);
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-		}
-		{
-			auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_Stagnation(Duration);
-
-			GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-			GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
-
-			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
-		}
 	}
 }
 

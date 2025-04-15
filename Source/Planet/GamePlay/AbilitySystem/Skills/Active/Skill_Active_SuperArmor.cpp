@@ -28,9 +28,6 @@
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
-#include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicStateModify_SuperArmor.h"
 
 USkill_Active_SuperArmor::USkill_Active_SuperArmor() :
 	Super()
@@ -108,13 +105,6 @@ void USkill_Active_SuperArmor::ExcuteTasks()
 {
 	if (CharacterPtr)
 	{
-		auto GameplayAbilityTargetData_RootMotionPtr = new FGameplayAbilityTargetData_StateModify_SuperArmor(Duration);
-
-		GameplayAbilityTargetData_RootMotionPtr->TriggerCharacterPtr = CharacterPtr;
-		GameplayAbilityTargetData_RootMotionPtr->TargetCharacterPtr = CharacterPtr;
-
-		auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-
 	}
 }
 

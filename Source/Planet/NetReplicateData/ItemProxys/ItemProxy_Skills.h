@@ -47,6 +47,7 @@ struct FTalentHelper;
 struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
+struct FWeaponProxy;
 
 enum struct ECharacterPropertyType : uint8;
 
@@ -57,6 +58,7 @@ struct PLANET_API FSkillProxy : public FAllocationbleProxy
 
 public:
 
+	friend FWeaponProxy;
 	friend FSceneProxyContainer;
 	friend UInventoryComponent;
 
@@ -70,12 +72,6 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const;
 
-	// 装备至插槽
-	virtual void Allocation()override;
-
-	// 从插槽移除
-	virtual void UnAllocation()override;
-
 	TArray<USkill_Base*> GetGAInstAry()const;
 
 	USkill_Base* GetGAInst()const;
@@ -85,6 +81,12 @@ public:
 	int32 Level = 1;
 
 protected:
+
+	// 装备至插槽
+	virtual void Allocation()override;
+
+	// 从插槽移除
+	virtual void UnAllocation()override;
 
 	virtual void RegisterSkill();
 
@@ -115,12 +117,6 @@ public:
 
 	virtual void InitialProxy(const FGameplayTag& ProxyType)override;
 
-	// 装备至插槽
-	virtual void Allocation()override;
-
-	// 从插槽移除
-	virtual void UnAllocation()override;
-
 	FTableRowProxy_PassiveSkillExtendInfo* GetTableRowProxy_PassiveSkillExtendInfo()const;
 
 	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry()const;
@@ -137,6 +133,12 @@ public:
 	FGameplayTag SecondPropertyEntry;
 
 protected:
+
+	// 装备至插槽
+	virtual void Allocation()override;
+
+	// 从插槽移除
+	virtual void UnAllocation()override;
 
 };
 

@@ -38,23 +38,3 @@ struct PLANET_API FTableRowProxy_CharacterType : public FTableRowBase
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FString Title;
 };
-
-// NPC分配的技能
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_AICharacter_Allocation : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag FirstWeaponSocketInfo;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag SecondWeaponSocketInfo;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag ActiveSkillSet_1;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FGameplayTag ActiveSkillSet_2;
-
-};

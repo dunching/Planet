@@ -16,7 +16,6 @@
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "StateProcessorComponent.h"
-#include "CS_Base.h"
 #include "CharacterStateInfo.h"
 
 void USkill_Passive_XS::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)

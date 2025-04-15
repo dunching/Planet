@@ -28,8 +28,6 @@
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
-#include "CS_RootMotion_FlyAway.h"
 
 bool USkill_Active_Fire::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,

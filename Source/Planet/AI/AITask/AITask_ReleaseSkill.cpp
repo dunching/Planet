@@ -22,6 +22,7 @@ UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectIniti
 	: Super(ObjectInitializer)
 {
 	bIsPausable = true;
+	bTickingTask = true;
 }
 
 void UAITask_ReleaseSkill::Activate()
@@ -31,25 +32,18 @@ void UAITask_ReleaseSkill::Activate()
 	ConditionalPerformTask();
 }
 
-void UAITask_ReleaseSkill::ConditionalPerformTask()
+void UAITask_ReleaseSkill::TickTask(
+	float DeltaTime
+)
 {
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::PerformTask), Frequency);
-}
-
-void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
-{
-	CharacterPtr = InChracterPtr;
-}
-
-bool UAITask_ReleaseSkill::PerformTask(float)
-{
+	Super::TickTask(DeltaTime);
 	if (CharacterPtr)
 	{
 		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 
 		FGameplayTagContainer GameplayTagContainer;
 		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_ReleasingSkill_Continuous);
-		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_MoveToAttaclArea);
+		GameplayTagContainer.AddTag(UGameplayTagsLibrary::State_MoveToLocation);
 
 		if (GASPtr->MatchesGameplayTagQuery(FGameplayTagQuery::MakeQuery_MatchAnyTags(GameplayTagContainer)))
 		{
@@ -81,7 +75,7 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 							if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Key.Socket))
 							{
 								ReleasingSkillMap.Add(GAInsPtr, Iter.Key.Socket);
-								return true;
+								return;
 							}
 						}
 					}
@@ -115,14 +109,23 @@ bool UAITask_ReleaseSkill::PerformTask(float)
 						if (CharacterPtr->GetProxyProcessComponent()->ActiveAction(Iter.Key.Socket, true))
 						{
 							ReleasingSkillMap.Add(GAInsPtr, Iter.Key.Socket);
-							return true;
+							return;
 						}
 					}
 				}
 			}
 		}
 	}
-	return true;
+	return;
+}
+
+void UAITask_ReleaseSkill::ConditionalPerformTask()
+{
+}
+
+void UAITask_ReleaseSkill::SetUp(ACharacterBase* InChracterPtr)
+{
+	CharacterPtr = InChracterPtr;
 }
 
 void UAITask_ReleaseSkill::StopReleaseSkill()
@@ -160,8 +163,6 @@ void UAITask_ReleaseSkill::OnOnGameplayAbilityEnded(UGameplayAbility* GAPtr)
 
 void UAITask_ReleaseSkill::OnDestroy(bool bInOwnerFinished)
 {
-	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
-
 	StopReleaseSkill();
 
 	Super::OnDestroy(bInOwnerFinished);

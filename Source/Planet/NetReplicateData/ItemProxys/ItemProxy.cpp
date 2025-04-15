@@ -223,7 +223,7 @@ void FAllocationbleProxy::SetAllocationCharacterProxy(
 		}
 
 		// 找到这个物品之前被分配的插槽
-		// 如果还是在同一个CharacterActor上，则不需要重新分配
+		// 如果不是在同一个CharacterActor上，则需要取消分配
 		if (AllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
 		{
 			UnAllocation();
@@ -238,20 +238,22 @@ void FAllocationbleProxy::SetAllocationCharacterProxy(
 			PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
 		}
 
+		const auto PreviousAllocationCharacter_ID = AllocationCharacter_ID;
 		AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
 		SocketTag = InSocketTag;
+
+		// 如果不是在同一个CharacterActor上，则需要重新分配
+		// 否则重新分配
+		if (PreviousAllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
+		{
+			Allocation();
+		}
 
 		// 将这个物品注册到新的插槽
 		auto CharacterSocket = InAllocationCharacterProxyPtr->FindSocket(SocketTag);
 		CharacterSocket.SetAllocationedProxyID(GetID());
 
 		InAllocationCharacterProxyPtr->UpdateSocket(CharacterSocket);
-
-		// 如果还是在同一个CharacterActor上，则不需要重新分配
-		if (AllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
-		{
-			Allocation();
-		}
 
 		OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
 

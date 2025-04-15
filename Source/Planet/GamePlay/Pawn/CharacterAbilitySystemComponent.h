@@ -154,6 +154,13 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Jump();
 
+	/**
+	 * 被击飞
+	 * @param Height 
+	 */
+	UFUNCTION(Server, Reliable)
+	void HasBeenFlayAway(int32 Height);
+
 	void SwitchCantBeSelect(bool bIsCanBeSelect);
 
 	void Respawn();

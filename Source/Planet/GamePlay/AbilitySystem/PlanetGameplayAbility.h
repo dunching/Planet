@@ -21,15 +21,18 @@ struct FGameplayAbilityTargetData_RegisterParam :
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+	);
 
-	virtual FGameplayAbilityTargetData_RegisterParam* Clone()const;
+	virtual FGameplayAbilityTargetData_RegisterParam* Clone() const;
 
 private:
-
 };
 
-template<>
+template <>
 struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam> :
 	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RegisterParam>
 {
@@ -48,15 +51,18 @@ struct FGameplayAbilityTargetData_ActiveParam :
 {
 	GENERATED_USTRUCT_BODY()
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+	);
 
-	virtual FGameplayAbilityTargetData_ActiveParam* Clone()const;
+	virtual FGameplayAbilityTargetData_ActiveParam* Clone() const;
 
 	int32 ID = 0;
-
 };
 
-template<>
+template <>
 struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam> :
 	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam>
 {
@@ -75,7 +81,6 @@ class PLANET_API UPlanetGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 public:
-
 	friend UPlanetAbilitySystemComponent;
 
 	UPlanetGameplayAbility();
@@ -121,7 +126,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateCancelAbility
-	)override;
+	) override;
 
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -129,32 +134,62 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	)override;
+	) override;
 
-	virtual void OnGameplayTaskInitialized(UGameplayTask& Task) override;
+	virtual void OnGameplayTaskInitialized(
+		UGameplayTask& Task
+	) override;
 
-	virtual void OnGameplayTaskActivated(UGameplayTask& Task) override;
+	virtual void OnGameplayTaskActivated(
+		UGameplayTask& Task
+	) override;
 
-	virtual void OnGameplayTaskDeactivated(UGameplayTask& Task) override;
-	
+	virtual void OnGameplayTaskDeactivated(
+		UGameplayTask& Task
+	) override;
+
 #endif
 
 	// 通过此函数修改GAS上记录的CDO的Tags Deprecated
 	// virtual	void InitalDefaultTags();
 
+protected:
 	UFUNCTION(Server, Reliable)
 	void CancelAbility_Server();
+
+	void RunIfListLock() const;
+
+	void ResetListLock() const;
+
+	void DecrementToZeroListLock() const;
+
+	void DecrementListLockOverride() const;
+
+	bool GetIsContinue() const;
+
+	virtual void PerformAction(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
 	
-	virtual void SetContinuePerform(bool bIsContinue);
+private:
+	virtual void PerformActionWrap(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	);
+	
+	void SetContinuePerform(
+		bool bIsContinue
+	);
 
-protected:
-
-	void RunIfListLock()const;
-
-	void ResetListLock()const;
-
-	void DecrementToZeroListLock()const;
-
-	void DecrementListLockOverride()const;
-
+	/**
+	 * GA是否持续执行
+	 * 通用的属性
+	 * 如 我们的武器，按住攻击键时，会不停的执行攻击（前摇+攻击），当松开后，会把攻击执行完（前摇+攻击+后摇）
+	 */
+	bool bIsContinueAction = false;
 };

@@ -21,7 +21,7 @@ void UGEEC_Base::Execute_Implementation(const FGameplayEffectCustomExecutionPara
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::State_Dying) ||
 		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
@@ -57,7 +57,7 @@ void UGEEC_Reply::Execute_Implementation(
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::State_Dying) ||
 		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
@@ -99,7 +99,7 @@ void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionP
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::State_Dying) ||
 		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{
@@ -137,7 +137,7 @@ void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExec
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::DeathingTag) ||
+		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::State_Dying) ||
 		Instigator->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
 	)
 	{

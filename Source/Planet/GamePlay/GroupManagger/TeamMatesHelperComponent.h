@@ -37,8 +37,6 @@ class UTeamMatesHelperComponent : public UActorComponent
 	GENERATED_BODY()
 public:
 
-	friend AGroupManagger;
-
 	using FCharacterProxyType = FCharacterProxy;
 
 	static FName ComponentName;
@@ -88,6 +86,8 @@ public:
 	TWeakObjectPtr<ACharacterBase> GetKnowCharacter()const;
 	
 	TSharedPtr<FCharacterProxyType>GetOwnerCharacterProxyPtr()const;
+	
+	void SetOwnerCharacterProxy(const TSharedPtr<FCharacterProxyType>&CharacterProxySPtr);
 	
 	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 

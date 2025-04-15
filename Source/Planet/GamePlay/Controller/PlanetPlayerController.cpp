@@ -146,7 +146,7 @@ FVector APlanetPlayerController::GetFocalPointOnActor(const AActor* Actor) const
 }
 
 void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
-	const TSoftObjectPtr<AGeneratorColonyDelay>& GeneratorBasePtr)
+	const TSoftObjectPtr<AGeneratorColony_ByInvoke>& GeneratorBasePtr)
 {
 	GeneratorBasePtr->SpawnGeneratorActor();
 }
@@ -466,13 +466,13 @@ void APlanetPlayerController::OnHPChanged(int32 CurrentValue)
 	if (CurrentValue <= 0)
 	{
 		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FGameplayTagContainer{
-			UGameplayTagsLibrary::DeathingTag
+			UGameplayTagsLibrary::BaseFeature_Dying
 		});
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda([this](const FAbilityEndedData& AbilityEndedData)
 		{
 			// for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
 			// {
-			// 	if (Iter == UGameplayTagsLibrary::DeathingTag)
+			// 	if (Iter == UGameplayTagsLibrary::State_Dying)
 			// 	{
 			// 		// TODO 
 			// 		//					Destroy();
@@ -553,7 +553,7 @@ void APlanetPlayerController::OnFocusDeathing(const FGameplayTag Tag, int32 Coun
 
 		AIPCPtr->GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UGameplayTagsLibrary::DeathingTag,
+			UGameplayTagsLibrary::State_Dying,
 			EGameplayTagEventType::NewOrRemoved
 		);
 	}
@@ -583,7 +583,7 @@ void APlanetPlayerController::BindOnFocusRemove(AActor* Actor)
 
 	// 目标进入“死亡”标签
 	auto& DelegateRef = AIPCPtr->GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsLibrary::DeathingTag,
+		UGameplayTagsLibrary::State_Dying,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnFocusDeathing);

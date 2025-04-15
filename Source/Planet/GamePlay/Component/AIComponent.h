@@ -15,6 +15,7 @@ class USceneComponent;
 class ACharacterBase;
 class UPAD_TaskNode;
 class UPAD_TaskNode_Preset;
+class UDA_NPCAllocation;
 class UTaskNode_Temporary;
 class AHumanCharacter_AI;
 
@@ -51,13 +52,24 @@ public:
 #endif
 
 protected:
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag AI_Allocation_RowName = FGameplayTag::EmptyTag;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
 
+#pragma region Allocation
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag FirstWeaponSocketInfo;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag SecondWeaponSocketInfo;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag ActiveSkillSet_1;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
+	FGameplayTag ActiveSkillSet_2;
+#pragma endregion
 };

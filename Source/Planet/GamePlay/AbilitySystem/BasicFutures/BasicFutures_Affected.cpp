@@ -69,7 +69,7 @@ void UBasicFutures_Affected::ActivateAbility(
 	ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_Affected*>(TriggerEventData->TargetData.Get(0));
 	if (ActiveParamPtr)
 	{
-		PerformAction();
+		Perform();
 	}
 	else
 	{
@@ -100,7 +100,7 @@ bool UBasicFutures_Affected::CanActivateAbility(
 // 	// ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Buff_SuperArmor);
 // }
 
-void UBasicFutures_Affected::PerformAction()
+void UBasicFutures_Affected::Perform()
 {
 	UAnimMontage* CurMontagePtr = nullptr;
 

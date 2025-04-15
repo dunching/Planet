@@ -17,13 +17,13 @@ class ACharacterBase;
  * 根据时间刷新
  */
 UCLASS()
-class PLANET_API AGeneratorColony : public AGeneratorBase
+class PLANET_API AGeneratorColony_ByTime : public AGeneratorBase
 {
 	GENERATED_BODY()
 
 public:
 
-	AGeneratorColony(const FObjectInitializer& ObjectInitializer);
+	AGeneratorColony_ByTime(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 	

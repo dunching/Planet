@@ -216,7 +216,7 @@ void UBasicFutures_Dash::OnGameplayTaskDeactivated(UGameplayTask& Task)
 //
 // 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::MovementStateAble_IntoFly);
 //
-// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::FlyAway);
+// 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_RootMotion_FlyAway);
 //
 // 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Stun);
 // 	ActivationBlockedTags.AddTag(UGameplayTagsLibrary::State_Debuff_Fear);

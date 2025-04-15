@@ -31,28 +31,11 @@ FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenDisplacement =
 FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenPull =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenPull")));
 
-#pragma region Locomotio
-FGameplayTag UGameplayTagsLibrary::Jump =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Jump")));
+FGameplayTag UGameplayTagsLibrary::BaseFeature_MoveToLocation =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.MoveToLocation")));
 
-FGameplayTag UGameplayTagsLibrary::State_Locomotion_Run =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Run")));
-
-FGameplayTag UGameplayTagsLibrary::Dash =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Dash")));
-
-FGameplayTag UGameplayTagsLibrary::Mount =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Mount")));
-
-FGameplayTag UGameplayTagsLibrary::DisMount =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.DisMount")));
-
-FGameplayTag UGameplayTagsLibrary::Affected =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Locomotion.Affected")));
-
-FGameplayTag UGameplayTagsLibrary::State_MoveToAttaclArea =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MoveToAttaclArea")));
-#pragma endregion
+FGameplayTag UGameplayTagsLibrary::BaseFeature_Dying =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Dying")));
 
 #pragma region MovementStateAbl
 FGameplayTag UGameplayTagsLibrary::MovementStateAble =
@@ -70,9 +53,6 @@ FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRootMotion =
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRotation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRotation")));
 
-// 浮空状态（被动
-FGameplayTag UGameplayTagsLibrary::MovementStateAble_IntoFly =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.IntoFly")));
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_Orient2Acce =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.Orient2Acce")));
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_UseCustomRotation =
@@ -82,10 +62,22 @@ FGameplayTag UGameplayTagsLibrary::MovementStateAble_UseCustomRotation =
 #pragma region State Tag
 FGameplayTag UGameplayTagsLibrary::UsingConsumable =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.IsUsingConsumable")));
+
 FGameplayTag UGameplayTagsLibrary::Ridering =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Ridering")));
+
+FGameplayTag UGameplayTagsLibrary::State_Dying =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Dying")));
+
+FGameplayTag UGameplayTagsLibrary::State_MoveToLocation =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MoveToLocation")));
+
+FGameplayTag UGameplayTagsLibrary::State_Running =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Running")));
+
 FGameplayTag UGameplayTagsLibrary::State_NoPhy =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.NoPhy")));
+
 FGameplayTag UGameplayTagsLibrary::State_Buff_Purify =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Buff.Purify")));
 
@@ -120,11 +112,15 @@ FGameplayTag UGameplayTagsLibrary::State_Debuff_Slow =
 
 FGameplayTag UGameplayTagsLibrary::State_Debuff_Suppress =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Suppress")));
+
 FGameplayTag UGameplayTagsLibrary::RootMotion =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion")));
 
 // 浮空状态（主动
-FGameplayTag UGameplayTagsLibrary::FlyAway =
+FGameplayTag UGameplayTagsLibrary::RootMotion_HasBeenFlyAway =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.HasBeenFlyAway")));
+
+FGameplayTag UGameplayTagsLibrary::State_RootMotion_FlyAway =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.FlyAway")));
 
 FGameplayTag UGameplayTagsLibrary::KnockDown =
@@ -141,9 +137,6 @@ FGameplayTag UGameplayTagsLibrary::MoveAlongSpline =
 
 FGameplayTag UGameplayTagsLibrary::State_RootMotion_MoveTo =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveTo")));
-
-FGameplayTag UGameplayTagsLibrary::DeathingTag =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Deathing")));
 
 FGameplayTag UGameplayTagsLibrary::Respawning =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Respawning")));

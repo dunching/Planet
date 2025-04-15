@@ -53,7 +53,7 @@ public:
 
 protected:
 
-	void PerformAction();
+	void Perform();
 
 	void PlayMontage();
 

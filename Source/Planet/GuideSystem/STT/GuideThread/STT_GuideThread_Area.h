@@ -23,8 +23,8 @@ class AResourceBoxBase;
 class ATargetPoint_Runtime;
 class ATargetPoint;
 class AGeneratorBase;
-class AGeneratorColonyDelay;
-class AGeneratorColony;
+class AGeneratorColony_ByInvoke;
+class AGeneratorColony_ByTime;
 class AAreaVolume;
 class AGuideActor;
 class AGuideThread;
@@ -67,7 +67,7 @@ public:
 		BlueprintReadOnly,
 		EditAnywhere
 	)
-	TSoftObjectPtr<AGeneratorColonyDelay> ActorPtr;
+	TSoftObjectPtr<AGeneratorColony_ByInvoke> ActorPtr;
 };
 
 USTRUCT()

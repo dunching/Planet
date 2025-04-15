@@ -36,21 +36,9 @@ public:
 
 	static FGameplayTag BaseFeature_HasBeenPull;
 
-#pragma region Locomotio
-	static FGameplayTag Jump;
-	
-	static FGameplayTag State_Locomotion_Run;
+	static FGameplayTag BaseFeature_MoveToLocation;
 
-	static FGameplayTag Dash;
-
-	static FGameplayTag Mount;
-
-	static FGameplayTag DisMount;
-	
-	static FGameplayTag Affected;
-	
-	static FGameplayTag State_MoveToAttaclArea;
-#pragma endregion
+	static FGameplayTag BaseFeature_Dying;
 
 #pragma region MovementStateAbl
 	static FGameplayTag MovementStateAble;
@@ -65,9 +53,6 @@ public:
 	
 	static FGameplayTag MovementStateAble_CantRotation;
 
-	// 浮空状态（被动
-	static FGameplayTag MovementStateAble_IntoFly;
-	
 	static FGameplayTag MovementStateAble_Orient2Acce;
 	
 	static FGameplayTag MovementStateAble_UseCustomRotation;
@@ -77,6 +62,16 @@ public:
 	static FGameplayTag UsingConsumable;
 	
 	static FGameplayTag Ridering;
+	
+	static FGameplayTag Respawning;
+	
+	static FGameplayTag InFightingTag;
+	
+	static FGameplayTag State_Dying;
+	
+	static FGameplayTag State_MoveToLocation;
+	
+	static FGameplayTag State_Running;
 	
 	static FGameplayTag State_NoPhy;
 	
@@ -104,10 +99,20 @@ public:
 
 	static FGameplayTag State_Debuff_Suppress;
 	
+	static FGameplayTag State_ReleasingSkill;
+
+	static FGameplayTag State_ReleasingSkill_Continuous;
+
+	static FGameplayTag State_ReleasingSkill_Active;
+
+	static FGameplayTag State_ReleasingSkil_WeaponActive;
+	
 	static FGameplayTag RootMotion;
 
 	// 浮空状态（主动
-	static FGameplayTag FlyAway;
+	static FGameplayTag RootMotion_HasBeenFlyAway;
+	
+	static FGameplayTag State_RootMotion_FlyAway;
 	
 	static FGameplayTag KnockDown;
 	
@@ -118,20 +123,6 @@ public:
 	static FGameplayTag MoveAlongSpline;
 
 	static FGameplayTag State_RootMotion_MoveTo;
-
-	static FGameplayTag DeathingTag;
-	
-	static FGameplayTag Respawning;
-	
-	static FGameplayTag InFightingTag;
-
-	static FGameplayTag State_ReleasingSkill;
-
-	static FGameplayTag State_ReleasingSkill_Continuous;
-
-	static FGameplayTag State_ReleasingSkill_Active;
-
-	static FGameplayTag State_ReleasingSkil_WeaponActive;
 #pragma endregion
 
 #pragma region Socket Tags

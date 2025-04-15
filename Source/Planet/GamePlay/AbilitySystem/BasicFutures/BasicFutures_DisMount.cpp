@@ -59,7 +59,7 @@ void UBasicFutures_DisMount::ActivateAbility(
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	PerformAction();
+	Perform();
 }
 
 void UBasicFutures_DisMount::EndAbility(
@@ -77,7 +77,7 @@ void UBasicFutures_DisMount::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UBasicFutures_DisMount::PerformAction()
+void UBasicFutures_DisMount::Perform()
 {
 	auto AnimInstPtr = CharacterPtr->GetAnimationIns<UHumanAnimInstance>();
 	if (AnimInstPtr)

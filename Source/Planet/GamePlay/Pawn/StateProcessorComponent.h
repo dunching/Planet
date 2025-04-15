@@ -118,8 +118,6 @@ protected:
 	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
 
 #pragma region GAs
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TSubclassOf<UCS_RootMotion_KnockDown> CS_RootMotion_KnockDownClass;
 #pragma endregion GAs
 
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;

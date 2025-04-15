@@ -28,10 +28,26 @@
 #include "AbilityTask_TimerHelper.h"
 #include "Helper_RootMotionSource.h"
 #include "AbilityTask_tornado.h"
-#include "CS_RootMotion.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "CS_RootMotion_TornadoTraction.h"
+
+ATornado::ATornado(const FObjectInitializer& ObjectInitializer /*= FObjectInitializer::Get()*/) :
+	Super(ObjectInitializer)
+{
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+
+	CapsuleComponentPtr = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
+	CapsuleComponentPtr->InitCapsuleSize(34.0f, 88.0f);
+	CapsuleComponentPtr->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
+	CapsuleComponentPtr->CanCharacterStepUpOn = ECB_No;
+	CapsuleComponentPtr->SetShouldUpdatePhysicsVolume(true);
+	CapsuleComponentPtr->SetCanEverAffectNavigation(false);
+	CapsuleComponentPtr->bDynamicObstacle = true;
+	CapsuleComponentPtr->SetupAttachment(RootComponent);
+
+	bReplicates = true;
+	SetReplicatingMovement(true);
+}
 
 USkill_Active_Tornado::USkill_Active_Tornado() :
 	Super()

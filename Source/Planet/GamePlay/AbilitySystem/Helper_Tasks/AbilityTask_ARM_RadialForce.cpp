@@ -13,7 +13,6 @@
 
 #include "Helper_RootMotionSource.h"
 #include "CharacterBase.h"
-#include "CS_RootMotion_Traction.h"
 
 UAbilityTask_ARM_RadialForce::UAbilityTask_ARM_RadialForce(
 	const FObjectInitializer& ObjectInitializer
@@ -26,7 +25,6 @@ void UAbilityTask_ARM_RadialForce::GetLifetimeReplicatedProps(TArray< FLifetimeP
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, TractionPointPtr);
 }
 
 UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRadialForce(
@@ -38,23 +36,6 @@ UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRad
 	auto MyTask = NewAbilityTask<UAbilityTask_ARM_RadialForce>(OwningAbility, TaskInstanceName);
 
 	MyTask->ForceName = TaskInstanceName;
-
-	MyTask->Location = InTractionPointPtr->GetActorLocation();
-	MyTask->Strength = InTractionPointPtr->Strength;
-	MyTask->Radius = FMath::Max(InTractionPointPtr->Radius, SMALL_NUMBER); // No zero radius
-	MyTask->Duration = InTractionPointPtr->PrimaryActorTick.TickInterval;
-	MyTask->bIsPush = InTractionPointPtr->bIsPush;
-	MyTask->bIsAdditive = InTractionPointPtr->bIsAdditive;
-	MyTask->bNoZForce = InTractionPointPtr->bNoZForce;
-	MyTask->StrengthDistanceFalloff = InTractionPointPtr->StrengthDistanceFalloff;
-	MyTask->StrengthOverTime = InTractionPointPtr->StrengthOverTime;
-	MyTask->bUseFixedWorldDirection = InTractionPointPtr->bUseFixedWorldDirection;
-	MyTask->FixedWorldDirection = InTractionPointPtr->FixedWorldDirection;
-	MyTask->FinishVelocityMode = InTractionPointPtr->VelocityOnFinishMode;
-	MyTask->FinishSetVelocity = InTractionPointPtr->SetVelocityOnFinish;
-	MyTask->FinishClampVelocity = InTractionPointPtr->ClampVelocityOnFinished;
-
-	MyTask->TractionPointPtr = InTractionPointPtr;
 
 	MyTask->SharedInitAndApply();
 
@@ -91,7 +72,6 @@ void UAbilityTask_ARM_RadialForce::SharedInitAndApply()
 			RadialForce->FinishVelocityParams.SetVelocity = FinishSetVelocity;
 			RadialForce->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
 
-			RadialForce->TractionPointPtr = TractionPointPtr;
 
 			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RadialForce);
 		}
@@ -146,7 +126,6 @@ void UAbilityTask_ARM_RadialForce::UpdateLocation(TWeakObjectPtr<ATractionPoint>
 				auto RootMotionSourceSPtr = static_cast<FRootMotionSource_MyRadialForce*>(RMS.Get());
 				if (RootMotionSourceSPtr)
 				{
-					RootMotionSourceSPtr->LocationActor = InTractionPointPtr.Get();
 				}
 			}
 		}

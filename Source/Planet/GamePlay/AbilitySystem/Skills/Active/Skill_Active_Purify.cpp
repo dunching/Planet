@@ -28,9 +28,6 @@
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
-#include "CS_RootMotion_FlyAway.h"
-#include "CS_PeriodicStateModify_Purify.h"
 
 USkill_Active_Purify::USkill_Active_Purify() :
 	Super()

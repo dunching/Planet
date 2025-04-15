@@ -25,7 +25,7 @@ class UStateTreeComponent;
 class UAIControllerStateTreeAIComponent;
 class UAIPerceptionComponent;
 class ABuildingArea;
-class AGeneratorColony;
+class AGeneratorColony_ByTime;
 class AGeneratorNPCs_Patrol;
 class AGroupManagger;
 

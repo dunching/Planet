@@ -88,7 +88,7 @@ void AGeneratorColonyWithPath::Tick(float DeltaSeconds)
 #endif
 }
 
-AGeneratorColonyDelay::AGeneratorColonyDelay(
+AGeneratorColony_ByInvoke::AGeneratorColony_ByInvoke(
 	const FObjectInitializer& ObjectInitializer
 	):
 		Super(ObjectInitializer)
@@ -102,12 +102,12 @@ AGeneratorColonyDelay::AGeneratorColonyDelay(
 	PrimaryActorTick.TickInterval = 1.f / 60;
 }
 
-void AGeneratorColonyDelay::BeginPlay()
+void AGeneratorColony_ByInvoke::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AGeneratorColonyDelay::SpawnGeneratorActor()
+void AGeneratorColony_ByInvoke::SpawnGeneratorActor()
 {
 	Super::SpawnGeneratorActor();
 }

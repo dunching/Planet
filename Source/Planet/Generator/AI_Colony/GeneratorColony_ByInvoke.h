@@ -88,13 +88,13 @@ protected:
  * 延迟/按时间生成，
  */
 UCLASS()
-class PLANET_API AGeneratorColonyDelay : public AGeneratorBase
+class PLANET_API AGeneratorColony_ByInvoke : public AGeneratorBase
 {
 	GENERATED_BODY()
 
 public:
 
-	AGeneratorColonyDelay(const FObjectInitializer& ObjectInitializer);
+	AGeneratorColony_ByInvoke(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 	

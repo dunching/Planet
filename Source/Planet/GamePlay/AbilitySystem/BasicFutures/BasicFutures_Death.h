@@ -13,6 +13,9 @@ class UAnimMontage;
 
 class ACharacterBase;
 
+/**
+ * 进入濒死状态
+ */
 UCLASS()
 class PLANET_API UBasicFutures_Death : public UBasicFuturesBase
 {

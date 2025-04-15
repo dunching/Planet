@@ -52,15 +52,6 @@ FTableRowProxy_TagExtendInfo* USceneProxyExtendInfoMap::GetTableRowProxy_TagExte
 	return SceneUnitExtendInfoPtr;
 }
 
-FTableRowProxy_AICharacter_Allocation* USceneProxyExtendInfoMap::GetTableRowProxy_AICharacter_Allocation(FGameplayTag UnitType) const
-{
-	auto DataTablePtr = DataTable_Character_Allocation.LoadSynchronous();
-
-	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowProxy_AICharacter_Allocation>(*UnitType.ToString(), TEXT("GetUnit"));
-
-	return SceneUnitExtendInfoPtr;
-}
-
 const UPAD_Talent_Property* USceneProxyExtendInfoMap::GetTalent_Property(EPointPropertyType PointPropertyType) const
 {
 	if (PAD_Talent_PropertyMap.Contains(PointPropertyType))

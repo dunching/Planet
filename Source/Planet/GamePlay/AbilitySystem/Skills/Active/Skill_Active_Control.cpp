@@ -27,10 +27,8 @@
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "PlanetPlayerController.h"
-#include "CS_RootMotion_MoveAlongSpline.h"
 
 USkill_Active_Control::USkill_Active_Control() :
 	Super()

@@ -60,7 +60,7 @@ void AHorseAIController::OnDeathing(const FGameplayTag Tag, int32 Count)
 	{
 		GetAbilitySystemComponent()->UnregisterGameplayTagEvent(
 			OnOwnedDeathTagDelegateHandle,
-			UGameplayTagsLibrary::DeathingTag,
+			UGameplayTagsLibrary::State_Dying,
 			EGameplayTagEventType::NewOrRemoved
 		);
 
@@ -101,7 +101,7 @@ void AHorseAIController::OnPossess(APawn* InPawn)
 	InitialCharacter();
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsLibrary::DeathingTag,
+		UGameplayTagsLibrary::State_Dying,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);

@@ -21,7 +21,11 @@ struct FGameplayAbilityTargetData_SkillBase_RegisterParam :
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
 	virtual FGameplayAbilityTargetData_SkillBase_RegisterParam* Clone() const override;
 
@@ -116,13 +120,8 @@ public:
 
 	const TArray<FAbilityTriggerData>& GetTriggers() const;
 
-	virtual void UpdateRegisterParam(const FGameplayEventData& GameplayEventData);
-
-	virtual void PerformAction(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
+	virtual void UpdateRegisterParam(
+		const FGameplayEventData& GameplayEventData
 	);
 
 protected:
@@ -132,15 +131,23 @@ protected:
 	ACharacterBase* HasFocusActor() const;
 
 	// 确认锁定的目标是否在范围内
-	bool CheckTargetInDistance(int32 Distance) const;
+	bool CheckTargetInDistance(
+		int32 Distance
+	) const;
 
 	// 确认锁定的目标是否在范围山（需要跟目标保持一定距离）
-	bool CheckTargetIsEqualDistance(int32 Distance) const;
+	bool CheckTargetIsEqualDistance(
+		int32 Distance
+	) const;
 
 	// 获取范围内任意可攻击的目标
-	ACharacterBase* GetTargetInDistance(int32 Distance) const;
+	ACharacterBase* GetTargetInDistance(
+		int32 Distance
+	) const;
 
 	ACharacterBase* CharacterPtr = nullptr;
 
 	TSharedPtr<FSkillProxy> SkillProxyPtr = nullptr;
+
+private:
 };

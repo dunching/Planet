@@ -13,7 +13,11 @@ UScriptStruct* FGameplayAbilityTargetData_RegisterParam::GetScriptStruct() const
 	return FGameplayAbilityTargetData_RegisterParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_RegisterParam::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	return true;
 }
@@ -28,7 +32,11 @@ FGameplayAbilityTargetData_RegisterParam* FGameplayAbilityTargetData_RegisterPar
 	return ResultPtr;
 }
 
-bool FGameplayAbilityTargetData_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_ActiveParam::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	Ar << ID;
 
@@ -46,7 +54,7 @@ FGameplayAbilityTargetData_ActiveParam* FGameplayAbilityTargetData_ActiveParam::
 }
 
 UPlanetGameplayAbility::UPlanetGameplayAbility() :
-	Super()
+                                                 Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
@@ -55,7 +63,10 @@ UPlanetGameplayAbility::UPlanetGameplayAbility() :
 }
 
 #if WITH_EDITOR
-void UPlanetGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void UPlanetGameplayAbility::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -65,9 +76,9 @@ void UPlanetGameplayAbility::OnAvatarSet(const FGameplayAbilityActorInfo* ActorI
 
 void UPlanetGameplayAbility::PreActivate(
 	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayAbilityActivationInfo ActivationInfo, 
-	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
 )
 {
@@ -75,19 +86,21 @@ void UPlanetGameplayAbility::PreActivate(
 }
 
 void UPlanetGameplayAbility::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
+	PerformActionWrap(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool UPlanetGameplayAbility::CommitAbility(
 	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayAbilityActivationInfo ActivationInfo, 
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 )
 {
@@ -97,8 +110,8 @@ bool UPlanetGameplayAbility::CommitAbility(
 bool UPlanetGameplayAbility::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayTagContainer* SourceTags /*= nullptr*/, 
-	const FGameplayTagContainer* TargetTags /*= nullptr*/, 
+	const FGameplayTagContainer* SourceTags /*= nullptr*/,
+	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
@@ -107,7 +120,7 @@ bool UPlanetGameplayAbility::CanActivateAbility(
 
 void UPlanetGameplayAbility::CancelAbility(
 	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, 
+	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateCancelAbility
 )
@@ -116,36 +129,56 @@ void UPlanetGameplayAbility::CancelAbility(
 }
 
 void UPlanetGameplayAbility::EndAbility(
-	const FGameplayAbilitySpecHandle Handle, 
-	const FGameplayAbilityActorInfo* ActorInfo, 
-	const FGameplayAbilityActivationInfo ActivationInfo, 
-	bool bReplicateEndAbility, 
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
 	bool bWasCancelled
 )
 {
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UPlanetGameplayAbility::OnGameplayTaskInitialized(UGameplayTask& Task)
+void UPlanetGameplayAbility::OnGameplayTaskInitialized(
+	UGameplayTask& Task
+)
 {
 	Super::OnGameplayTaskInitialized(Task);
 }
 
-void UPlanetGameplayAbility::OnGameplayTaskActivated(UGameplayTask& Task)
+void UPlanetGameplayAbility::OnGameplayTaskActivated(
+	UGameplayTask& Task
+)
 {
 	Super::OnGameplayTaskActivated(Task);
 }
 
-void UPlanetGameplayAbility::OnGameplayTaskDeactivated(UGameplayTask& Task)
+void UPlanetGameplayAbility::OnGameplayTaskDeactivated(
+	UGameplayTask& Task
+)
 {
 	Super::OnGameplayTaskDeactivated(Task);
 }
 
 #endif
 
-void UPlanetGameplayAbility::SetContinuePerform(bool bIsContinue)
+void UPlanetGameplayAbility::PerformActionWrap(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
+	bIsContinueAction = true;
 
+	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
+
+void UPlanetGameplayAbility::SetContinuePerform(
+	bool bIsContinue_
+)
+{
+	bIsContinueAction = bIsContinue_;
 }
 
 void UPlanetGameplayAbility::RunIfListLock() const
@@ -165,7 +198,7 @@ void UPlanetGameplayAbility::RunIfListLock() const
 	}
 }
 
-void UPlanetGameplayAbility::ResetListLock()const
+void UPlanetGameplayAbility::ResetListLock() const
 {
 	ScopeLockCount = 0;
 	WaitingToExecute.Empty();
@@ -181,6 +214,20 @@ void UPlanetGameplayAbility::DecrementListLockOverride() const
 {
 	ScopeLockCount--;
 	RunIfListLock();
+}
+
+bool UPlanetGameplayAbility::GetIsContinue() const
+{
+	return bIsContinueAction;
+}
+
+void UPlanetGameplayAbility::PerformAction(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
+{
 }
 
 // void UPlanetGameplayAbility::InitalDefaultTags()

@@ -142,7 +142,7 @@ void ACharacterBase::BeginPlay()
 #endif
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsLibrary::DeathingTag,
+		UGameplayTagsLibrary::State_Dying,
 		EGameplayTagEventType::NewOrRemoved
 	);
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
@@ -351,7 +351,7 @@ void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCamp
 bool ACharacterBase::GetIsValidTarget() const
 {
 	TArray<FGameplayTag> Ary{
-		UGameplayTagsLibrary::DeathingTag,
+		UGameplayTagsLibrary::State_Dying,
 		UGameplayTagsLibrary::State_Buff_CantBeSlected
 	};
 	const auto TagContainer = FGameplayTagContainer::CreateFromArray(Ary);

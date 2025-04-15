@@ -45,7 +45,11 @@ UScriptStruct* FGameplayAbilityTargetData_Axe_RegisterParam::GetScriptStruct() c
 	return FGameplayAbilityTargetData_Axe_RegisterParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_Axe_RegisterParam::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_Axe_RegisterParam::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -63,13 +67,14 @@ FGameplayAbilityTargetData_Axe_RegisterParam* FGameplayAbilityTargetData_Axe_Reg
 }
 
 USkill_WeaponActive_PickAxe::USkill_WeaponActive_PickAxe() :
-	Super()
+                                                           Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
 void USkill_WeaponActive_PickAxe::OnAvatarSet(
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
@@ -85,13 +90,14 @@ bool USkill_WeaponActive_PickAxe::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
 	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-	) const
+) const
 {
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
 void USkill_WeaponActive_PickAxe::OnRemoveAbility(
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
 )
 {
 	// Ins Or Spec
@@ -104,7 +110,8 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-	const FGameplayEventData* TriggerEventData /*= nullptr */)
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -117,24 +124,6 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 	}
 }
 
-void USkill_WeaponActive_PickAxe::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (WeaponActorPtr)
-	{
-		return;
-	}
-
-	PRINTINVOKEWITHSTR(FString(TEXT("No Weapon")));
-	K2_EndAbility();
-}
-
 void USkill_WeaponActive_PickAxe::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -145,8 +134,15 @@ void USkill_WeaponActive_PickAxe::PerformAction(
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	MontageNum = 0;
-
-	StartTasksLink();
+	if (WeaponActorPtr)
+	{
+		StartTasksLink();
+	}
+	else
+	{
+		PRINTINVOKEWITHSTR(FString(TEXT("No Weapon")));
+		K2_EndAbility();
+	}
 }
 
 void USkill_WeaponActive_PickAxe::StartTasksLink()
@@ -157,23 +153,24 @@ void USkill_WeaponActive_PickAxe::StartTasksLink()
 	}
 }
 
-void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(FName NotifyName)
+void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(
+	FName NotifyName
+)
 {
-#if UE_EDITOR || UE_CLIENT
+#if UE_EDITOR || UE_SERVER
 	if (
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
+		if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
+		{
+			PerformIfContinue();
+		}
 	}
 #endif
-	
-	if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
-	{
-		CheckInContinue(-1.f);
-	}
-	
+
 #if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
 		if (NotifyName == Skill_WeaponActive_PickAxe::Hit)
 		{
@@ -203,11 +200,6 @@ void USkill_WeaponActive_PickAxe::OnMontageOnInterrupted()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		// 确认是不在输入，而不是再次输入
-		if (!bIsContinue)
-		{
-		}
-		// 
 		K2_CancelAbility();
 	}
 #endif
@@ -266,11 +258,13 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
-													   BaseDamage);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+			BaseDamage
+		);
 
-		TArray<TWeakObjectPtr<AActor> >Ary;
-		for (auto Iter:TargetCharacterSet)
+		TArray<TWeakObjectPtr<AActor>> Ary;
+		for (auto Iter : TargetCharacterSet)
 		{
 			Ary.Add(Iter);
 		}
@@ -308,7 +302,9 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 			);
 
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
-			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
+			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(
+				CharacterPtr->GetCharacterAbilitySystemComponent()
+			);
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageOnInterrupted);
 
@@ -326,7 +322,9 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 			);
 
 			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
-			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
+			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(
+				CharacterPtr->GetCharacterAbilitySystemComponent()
+			);
 			// AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			// AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 

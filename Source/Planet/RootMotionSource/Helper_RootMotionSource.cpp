@@ -1,4 +1,3 @@
-
 #include "Helper_RootMotionSource.h"
 
 #include "DrawDebugHelpers.h"
@@ -21,28 +20,27 @@
 #include "Skill_Active_tornado.h"
 #include "CharacterBase.h"
 #include "LogWriter.h"
-#include "CS_RootMotion_TornadoTraction.h"
-#include "CS_RootMotion_Traction.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
 	TEXT("Skill.DrawDebug.Tornado"),
 	0,
 	TEXT("")
-	TEXT(" default: 0"));
+	TEXT(" default: 0")
+);
 
 static TAutoConsoleVariable<int32> SkillDrawDebugSpline(
 	TEXT("Skill.DrawDebug.Spline"),
 	0,
 	TEXT("")
-	TEXT(" default: 0"));
+	TEXT(" default: 0")
+);
 
 UScriptStruct* FRootMotionSource_MyConstantForce::GetScriptStruct() const
 {
 	return FRootMotionSource_MyConstantForce::StaticStruct();
 }
 
-void FRootMotionSource_MyConstantForce::PrepareRootMotion
-(
+void FRootMotionSource_MyConstantForce::PrepareRootMotion(
 	float SimulationTime,
 	float MovementTickTime,
 	const ACharacter& Character,
@@ -69,7 +67,6 @@ FRootMotionSource_BySpline::FRootMotionSource_BySpline()
 
 FRootMotionSource_BySpline::~FRootMotionSource_BySpline()
 {
-
 }
 
 FRootMotionSource* FRootMotionSource_BySpline::Clone() const
@@ -78,7 +75,9 @@ FRootMotionSource* FRootMotionSource_BySpline::Clone() const
 	return CopyPtr;
 }
 
-bool FRootMotionSource_BySpline::Matches(const FRootMotionSource* Other) const
+bool FRootMotionSource_BySpline::Matches(
+	const FRootMotionSource* Other
+) const
 {
 	if (!FRootMotionSource::Matches(Other))
 	{
@@ -96,7 +95,11 @@ bool FRootMotionSource_BySpline::Matches(const FRootMotionSource* Other) const
 		FMath::IsNearlyEqual(EndDistance, OtherCast->EndDistance);
 }
 
-bool FRootMotionSource_BySpline::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+bool FRootMotionSource_BySpline::NetSerialize(
+	FArchive& Ar,
+	UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
 	{
@@ -141,8 +144,7 @@ bool FRootMotionSource_BySpline::UpdateStateFrom(
 	return true;
 }
 
-void FRootMotionSource_BySpline::PrepareRootMotion
-(
+void FRootMotionSource_BySpline::PrepareRootMotion(
 	float SimulationTime,
 	float MovementTickTime,
 	const ACharacter& Character,
@@ -199,7 +201,9 @@ FRootMotionSource* FRootMotionSource_Formation::Clone() const
 	return CopyPtr;
 }
 
-bool FRootMotionSource_Formation::Matches(const FRootMotionSource* Other) const
+bool FRootMotionSource_Formation::Matches(
+	const FRootMotionSource* Other
+) const
 {
 	if (!FRootMotionSource::Matches(Other))
 	{
@@ -211,7 +215,11 @@ bool FRootMotionSource_Formation::Matches(const FRootMotionSource* Other) const
 	return FormationPtr == OtherCast->FormationPtr;
 }
 
-bool FRootMotionSource_Formation::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+bool FRootMotionSource_Formation::NetSerialize(
+	FArchive& Ar,
+	UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
 	{
@@ -239,15 +247,15 @@ bool FRootMotionSource_Formation::UpdateStateFrom(
 		return false;
 	}
 
-	const FRootMotionSource_Formation* OtherCast = static_cast<const FRootMotionSource_Formation*>(SourceToTakeStateFrom);
+	const FRootMotionSource_Formation* OtherCast = static_cast<const FRootMotionSource_Formation*>(
+		SourceToTakeStateFrom);
 
 	FormationPtr = OtherCast->FormationPtr;
 
 	return true;
 }
 
-void FRootMotionSource_Formation::PrepareRootMotion
-(
+void FRootMotionSource_Formation::PrepareRootMotion(
 	float SimulationTime,
 	float MovementTickTime,
 	const ACharacter& Character,
@@ -287,7 +295,6 @@ FRootMotionSource_ByTornado::FRootMotionSource_ByTornado()
 
 FRootMotionSource_ByTornado::~FRootMotionSource_ByTornado()
 {
-
 }
 
 FRootMotionSource* FRootMotionSource_ByTornado::Clone() const
@@ -296,7 +303,9 @@ FRootMotionSource* FRootMotionSource_ByTornado::Clone() const
 	return CopyPtr;
 }
 
-bool FRootMotionSource_ByTornado::Matches(const FRootMotionSource* Other) const
+bool FRootMotionSource_ByTornado::Matches(
+	const FRootMotionSource* Other
+) const
 {
 	if (!FRootMotionSource::Matches(Other))
 	{
@@ -308,8 +317,7 @@ bool FRootMotionSource_ByTornado::Matches(const FRootMotionSource* Other) const
 	return TornadoPtr == OtherCast->TornadoPtr;
 }
 
-void FRootMotionSource_ByTornado::PrepareRootMotion
-(
+void FRootMotionSource_ByTornado::PrepareRootMotion(
 	float SimulationTime,
 	float MovementTickTime,
 	const ACharacter& Character,
@@ -364,39 +372,39 @@ void FRootMotionSource_ByTornado::PrepareRootMotion
 	}
 }
 
-FRootMotionSource_FlyAway::FRootMotionSource_FlyAway()
+FRootMotionSource_HasBeenFlyAway::FRootMotionSource_HasBeenFlyAway()
 {
 	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
 }
 
-FRootMotionSource_FlyAway::~FRootMotionSource_FlyAway()
+FRootMotionSource_HasBeenFlyAway::~FRootMotionSource_HasBeenFlyAway()
 {
-
 }
 
-FRootMotionSource* FRootMotionSource_FlyAway::Clone() const
+FRootMotionSource* FRootMotionSource_HasBeenFlyAway::Clone() const
 {
-	FRootMotionSource_FlyAway* CopyPtr = new FRootMotionSource_FlyAway(*this);
+	FRootMotionSource_HasBeenFlyAway* CopyPtr = new FRootMotionSource_HasBeenFlyAway(*this);
 	return CopyPtr;
 }
 
-bool FRootMotionSource_FlyAway::Matches(const FRootMotionSource* Other) const
+bool FRootMotionSource_HasBeenFlyAway::Matches(
+	const FRootMotionSource* Other
+) const
 {
 	if (!FRootMotionSource::Matches(Other))
 	{
 		return false;
 	}
 
-	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
+	const auto OtherCast = static_cast<const FRootMotionSource_HasBeenFlyAway*>(Other);
 
 	return
-		bIsFalling == OtherCast->bIsFalling &&
-		RisingSpeed == OtherCast->RisingSpeed &&
-		FallingSpeed == OtherCast->FallingSpeed &&
 		Height == OtherCast->Height;
 }
 
-bool FRootMotionSource_FlyAway::MatchesAndHasSameState(const FRootMotionSource* Other) const
+bool FRootMotionSource_HasBeenFlyAway::MatchesAndHasSameState(
+	const FRootMotionSource* Other
+) const
 {
 	if (!FRootMotionSource::MatchesAndHasSameState(Other))
 	{
@@ -406,16 +414,117 @@ bool FRootMotionSource_FlyAway::MatchesAndHasSameState(const FRootMotionSource* 
 	return true;
 }
 
-bool FRootMotionSource_FlyAway::UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup /*= false*/)
+bool FRootMotionSource_HasBeenFlyAway::UpdateStateFrom(
+	const FRootMotionSource* SourceToTakeStateFrom,
+	bool bMarkForSimulatedCatchup /*= false*/
+)
 {
 	if (!FRootMotionSource::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
 	{
 		return false;
 	}
 
+	auto OtherCast = static_cast<const FRootMotionSource_HasBeenFlyAway*>(SourceToTakeStateFrom);
+
+	Height = OtherCast->Height;
+
+	return true;
+}
+
+void FRootMotionSource_HasBeenFlyAway::PrepareRootMotion(
+	float SimulationTime,
+	float MovementTickTime,
+	const ACharacter& Character,
+	const UCharacterMovementComponent& MoveComponent
+)
+{
+	RootMotionParams.Clear();
+
+	FTransform NewTransform = FTransform::Identity;
+
+	SetTime(GetTime() + SimulationTime);
+}
+
+bool FRootMotionSource_HasBeenFlyAway::NetSerialize(
+	FArchive& Ar,
+	UPackageMap* Map,
+	bool& bOutSuccess
+)
+{
+	if (!FRootMotionSource::NetSerialize(Ar, Map, bOutSuccess))
+	{
+		return false;
+	}
+
+	Ar << Height;
+
+	bOutSuccess = true;
+	return true;
+}
+
+UScriptStruct* FRootMotionSource_HasBeenFlyAway::GetScriptStruct() const
+{
+	return FRootMotionSource_HasBeenFlyAway::StaticStruct();
+}
+
+FRootMotionSource_FlyAway::FRootMotionSource_FlyAway()
+{
+	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
+}
+
+FRootMotionSource_FlyAway::~FRootMotionSource_FlyAway()
+{
+}
+
+FRootMotionSource* FRootMotionSource_FlyAway::Clone() const
+{
+	FRootMotionSource_FlyAway* CopyPtr = new FRootMotionSource_FlyAway(*this);
+	return CopyPtr;
+}
+
+bool FRootMotionSource_FlyAway::Matches(
+	const FRootMotionSource* Other
+) const
+{
+	if (!Super::Matches(Other))
+	{
+		return false;
+	}
+
+	const auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(Other);
+
+	return
+		bIsLanded == OtherCast->bIsLanded &&
+		RisingSpeed == OtherCast->RisingSpeed &&
+		FallingSpeed == OtherCast->FallingSpeed &&
+		Height == OtherCast->Height;
+}
+
+bool FRootMotionSource_FlyAway::MatchesAndHasSameState(
+	const FRootMotionSource* Other
+) const
+{
+	if (!Super::MatchesAndHasSameState(Other))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool FRootMotionSource_FlyAway::UpdateStateFrom(
+	const FRootMotionSource* SourceToTakeStateFrom,
+	bool bMarkForSimulatedCatchup /*= false*/
+)
+{
+	if (!Super::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
+	{
+		return false;
+	}
+
 	auto OtherCast = static_cast<const FRootMotionSource_FlyAway*>(SourceToTakeStateFrom);
 
-	bIsFalling = OtherCast->bIsFalling;
+	bIsLanded = OtherCast->bIsLanded;
 	RisingSpeed = OtherCast->RisingSpeed;
 	FallingSpeed = OtherCast->FallingSpeed;
 	Height = OtherCast->Height;
@@ -446,7 +555,8 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	if (Character.GetWorld()->LineTraceSingleByChannel(
 		Result,
 		CurrentLocation,
-		CurrentLocation + (GravityDir * Line), // 避免找不到
+		CurrentLocation + (GravityDir * Line),
+		// 避免找不到
 		CollisionChannel,
 		Params
 	))
@@ -458,14 +568,7 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 		// 下降
 		if (GetTime() >= GetDuration())
 		{
-			if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
-			{
-				if (Character.GetLocalRole() > ROLE_SimulatedProxy)
-				{
-					bIsFalling = false;
-				}
-			}
-			else if (FallingSpeed > 0)
+			if (FallingSpeed > 0)
 			{
 				Force.Z = -FallingSpeed;
 			}
@@ -494,27 +597,25 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 
 	const auto NewTime = GetTime() + SimulationTime;
 
-	if (Character.GetLocalRole() > ROLE_SimulatedProxy)
+	if (NewTime >= GetDuration())
 	{
-		if (NewTime >= GetDuration())
+		if (MoveComponent.CurrentFloor.bWalkableFloor || (MoveComponent.CurrentFloor.FloorDist < MoveComponent.
+			MIN_FLOOR_DIST))
 		{
-			if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.MIN_FLOOR_DIST))
-			{
-				PRINTINVOKEINFO();
-			}
-			else
-			{
-				bIsFalling = true;
-			}
+			bIsLanded = true;
 		}
 	}
 
 	SetTime(NewTime);
 }
 
-bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+bool FRootMotionSource_FlyAway::NetSerialize(
+	FArchive& Ar,
+	UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
-	if (!FRootMotionSource::NetSerialize(Ar, Map, bOutSuccess))
+	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
 	{
 		return false;
 	}
@@ -522,7 +623,7 @@ bool FRootMotionSource_FlyAway::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 	Ar << RisingSpeed;
 	Ar << FallingSpeed;
 	Ar << Height;
-	Ar << bIsFalling;
+	Ar << bIsLanded;
 
 	bOutSuccess = true;
 	return true;
@@ -535,13 +636,13 @@ UScriptStruct* FRootMotionSource_FlyAway::GetScriptStruct() const
 
 void FRootMotionSource_FlyAway::CheckTimeOut()
 {
-	if (bIsFalling)
+	if (bIsLanded)
 	{
-		PRINTINVOKEINFO();
+		Super::CheckTimeOut();
 	}
 	else
 	{
-		Super::CheckTimeOut();
+		PRINTINVOKEINFO();
 	}
 }
 
@@ -582,13 +683,14 @@ void FRootMotionSource_FlyAway::UpdateDuration(
 	FallingSpeed = InFallingSpeed;
 }
 
-void SetRootMotionFinished(FRootMotionSource& RootMotionSource)
+void SetRootMotionFinished(
+	FRootMotionSource& RootMotionSource
+)
 {
 	RootMotionSource.Status.SetFlag(ERootMotionSourceStatusFlags::Finished);
 }
 
-void FRootMotionSource_MyRadialForce::PrepareRootMotion
-(
+void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 	float SimulationTime,
 	float MovementTickTime,
 	const ACharacter& Character,
@@ -597,7 +699,6 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion
 {
 	if (TractionPointPtr.IsValid())
 	{
-		Location = TractionPointPtr->GetActorLocation();
 	}
 
 	RootMotionParams.Clear();
@@ -607,9 +708,9 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion
 	const FVector ForceLocation = LocationActor ? LocationActor->GetActorLocation() : Location;
 	float Distance = FVector::Dist(ForceLocation, CharacterLocation);
 	if (
-		(Distance < Radius) && 
+		(Distance < Radius) &&
 		(Distance > AcceptableRadius)
-		)
+	)
 	{
 		// Calculate strength
 		float CurrentStrength = Strength;
@@ -617,7 +718,9 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion
 			float AdditiveStrengthFactor = 1.f;
 			if (StrengthDistanceFalloff)
 			{
-				const float DistanceFactor = StrengthDistanceFalloff->GetFloatValue(FMath::Clamp(Distance / Radius, 0.f, 1.f));
+				const float DistanceFactor = StrengthDistanceFalloff->GetFloatValue(
+					FMath::Clamp(Distance / Radius, 0.f, 1.f)
+				);
 				AdditiveStrengthFactor -= (1.f - DistanceFactor);
 			}
 
@@ -681,7 +784,11 @@ void FRootMotionSource_MyRadialForce::CheckTimeOut()
 	}
 }
 
-bool FRootMotionSource_MyRadialForce::NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+bool FRootMotionSource_MyRadialForce::NetSerialize(
+	FArchive& Ar,
+	UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
 	{
@@ -705,7 +812,9 @@ FRootMotionSource* FRootMotionSource_MyRadialForce::Clone() const
 	return CopyPtr;
 }
 
-bool FRootMotionSource_MyRadialForce::Matches(const FRootMotionSource* Other) const
+bool FRootMotionSource_MyRadialForce::Matches(
+	const FRootMotionSource* Other
+) const
 {
 	if (!Super::Matches(Other))
 	{
@@ -718,7 +827,9 @@ bool FRootMotionSource_MyRadialForce::Matches(const FRootMotionSource* Other) co
 		TractionPointPtr == OtherCast->TractionPointPtr;
 }
 
-bool FRootMotionSource_MyRadialForce::MatchesAndHasSameState(const FRootMotionSource* Other) const
+bool FRootMotionSource_MyRadialForce::MatchesAndHasSameState(
+	const FRootMotionSource* Other
+) const
 {
 	if (!Super::MatchesAndHasSameState(Other))
 	{
@@ -728,7 +839,10 @@ bool FRootMotionSource_MyRadialForce::MatchesAndHasSameState(const FRootMotionSo
 	return true;
 }
 
-bool FRootMotionSource_MyRadialForce::UpdateStateFrom(const FRootMotionSource* SourceToTakeStateFrom, bool bMarkForSimulatedCatchup /*= false*/)
+bool FRootMotionSource_MyRadialForce::UpdateStateFrom(
+	const FRootMotionSource* SourceToTakeStateFrom,
+	bool bMarkForSimulatedCatchup /*= false*/
+)
 {
 	if (!Super::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
 	{

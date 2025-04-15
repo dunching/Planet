@@ -27,28 +27,34 @@ static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
 	TEXT("GroupMnaggerComponent.KnowCharaterChanged"),
 	1,
 	TEXT("")
-	TEXT(" default: 0"));
+	TEXT(" default: 0")
+);
 #endif
 
-UTeamMatesHelperComponent::UTeamMatesHelperComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+UTeamMatesHelperComponent::UTeamMatesHelperComponent(
+	const FObjectInitializer& ObjectInitializer
+):
+ Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 }
 
-void UTeamMatesHelperComponent::UpdateTeammateConfig(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index)
+void UTeamMatesHelperComponent::UpdateTeammateConfig(
+	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
+	int32 Index
+)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		UpdateTeammateConfigImp(CharacterProxyPtr,Index);
+		UpdateTeammateConfigImp(CharacterProxyPtr, Index);
 	}
 #endif
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
-		UpdateTeammateConfigImp(CharacterProxyPtr,Index);
+		UpdateTeammateConfigImp(CharacterProxyPtr, Index);
 		if (CharacterProxyPtr)
 		{
 			UpdateTeammateConfig_Server(CharacterProxyPtr->GetID(), Index);
@@ -61,7 +67,9 @@ void UTeamMatesHelperComponent::UpdateTeammateConfig(const TSharedPtr<FCharacter
 #endif
 }
 
-void UTeamMatesHelperComponent::OnAddToNewTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr)
+void UTeamMatesHelperComponent::OnAddToNewTeam(
+	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
+)
 {
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
@@ -76,7 +84,10 @@ void UTeamMatesHelperComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UTeamMatesHelperComponent::UpdateTeammateConfig_Server_Implementation(const FGuid& ProxtID, int32 Index)
+void UTeamMatesHelperComponent::UpdateTeammateConfig_Server_Implementation(
+	const FGuid& ProxtID,
+	int32 Index
+)
 {
 	const auto CharacterProxySPtr =
 		GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(ProxtID);
@@ -98,13 +109,15 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 	FTransform Transform;
 
 	const auto OwnerPtr = GetOwner<FOwnerType>();
-	const auto CharactersAry= TeamConfigure.GetCharactersAry();
+	const auto CharactersAry = TeamConfigure.GetCharactersAry();
 	for (int32 Index = 0; Index < CharactersAry.Num(); Index++)
 	{
 		for (int32 SecondIndex = 0; SecondIndex < CharactersAry[Index].Num(); SecondIndex++)
 		{
 			const auto CharacterProxySPtr =
-				GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(CharactersAry[Index][SecondIndex]);
+				GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(
+					CharactersAry[Index][SecondIndex]
+				);
 			if (CharacterProxySPtr)
 			{
 				Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
@@ -124,13 +137,19 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter()
 	SpwanTeammateCharacter_Server();
 }
 
-void UTeamMatesHelperComponent::UpdateTeammateConfigImp(FPawnType* PCPtr, int32 Index)
+void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
+	FPawnType* PCPtr,
+	int32 Index
+)
 {
 	auto CharacterProxyPtr = PCPtr->GetCharacterProxy();
-	UpdateTeammateConfigImp(CharacterProxyPtr,Index);
+	UpdateTeammateConfigImp(CharacterProxyPtr, Index);
 }
 
-void UTeamMatesHelperComponent::UpdateTeammateConfigImp(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index)
+void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
+	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
+	int32 Index
+)
 {
 	if (CharacterProxyPtr)
 	{
@@ -138,7 +157,7 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(const TSharedPtr<FCharac
 
 		Teammate.CharacterProxyID = CharacterProxyPtr->GetID();
 		Teammate.IndexInTheTeam = Index;
-		
+
 		MembersSet.Add(CharacterProxyPtr);
 		TeamConfigure.UpdateTeammateConfig(Teammate);
 	}
@@ -147,14 +166,16 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(const TSharedPtr<FCharac
 		FTeammate Teammate;
 
 		Teammate.IndexInTheTeam = Index;
-		
+
 		TeamConfigure.UpdateTeammateConfig(Teammate);
 	}
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterProxyPtr);
 }
 
-bool UTeamMatesHelperComponent::IsMember(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr) const
+bool UTeamMatesHelperComponent::IsMember(
+	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
+) const
 {
 	for (auto Iter : MembersSet)
 	{
@@ -167,7 +188,9 @@ bool UTeamMatesHelperComponent::IsMember(const TSharedPtr<FCharacterProxyType>& 
 	return false;
 }
 
-bool UTeamMatesHelperComponent::IsMember(const FGuid& CharacterID) const
+bool UTeamMatesHelperComponent::IsMember(
+	const FGuid& CharacterID
+) const
 {
 	for (auto Iter : MembersSet)
 	{
@@ -184,21 +207,24 @@ bool UTeamMatesHelperComponent::TeleportTo(
 	const FVector& DestLocation,
 	const FRotator& DestRotation,
 	bool bIsATest,
-	bool bNoCheck)
+	bool bNoCheck
+)
 {
 	for (auto Iter : MembersSet)
 	{
-		auto TargetActorPtr = 	Iter->GetCharacterActor();
+		auto TargetActorPtr = Iter->GetCharacterActor();
 		if (TargetActorPtr.IsValid())
 		{
 			TargetActorPtr->TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
 		}
 	}
 
-	return true;	
+	return true;
 }
 
-void UTeamMatesHelperComponent::SwitchTeammateOption(ETeammateOption InTeammateOption)
+void UTeamMatesHelperComponent::SwitchTeammateOption(
+	ETeammateOption InTeammateOption
+)
 {
 	TeammateOption = InTeammateOption;
 
@@ -210,7 +236,9 @@ ETeammateOption UTeamMatesHelperComponent::GetTeammateOption() const
 	return TeammateOption;
 }
 
-void UTeamMatesHelperComponent::AddKnowCharacter(ACharacterBase* CharacterPtr)
+void UTeamMatesHelperComponent::AddKnowCharacter(
+	ACharacterBase* CharacterPtr
+)
 {
 	for (auto& Iter : KnowCharatersSet)
 	{
@@ -232,7 +260,9 @@ void UTeamMatesHelperComponent::AddKnowCharacter(ACharacterBase* CharacterPtr)
 #endif
 }
 
-void UTeamMatesHelperComponent::RemoveKnowCharacter(ACharacterBase* CharacterPtr)
+void UTeamMatesHelperComponent::RemoveKnowCharacter(
+	ACharacterBase* CharacterPtr
+)
 {
 	for (int32 Index = 0; Index < KnowCharatersSet.Num(); Index++)
 	{
@@ -276,9 +306,19 @@ TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperCompo
 	return OwnerCharacterProxyPtr;
 }
 
+void UTeamMatesHelperComponent::SetOwnerCharacterProxy(
+	const TSharedPtr<FCharacterProxyType>& CharacterProxySPtr
+)
+{
+	OwnerCharacterProxyPtr = CharacterProxySPtr;
+	MembersSet.Add(OwnerCharacterProxyPtr);
+}
+
 FName UTeamMatesHelperComponent::ComponentName = TEXT("TeamMatesHelperComponent");
 
-void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 

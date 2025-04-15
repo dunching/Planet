@@ -1,4 +1,3 @@
-
 #include "PlanetAbilitySystemComponent.h"
 
 #include "CharacterAbilitySystemComponent.h"
@@ -11,13 +10,17 @@
 FName UPlanetAbilitySystemComponent::ComponentName = TEXT("AbilitySystemComponent");
 
 void UPlanetAbilitySystemComponent::TickComponent(
-	float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction
+	float DeltaTime,
+	enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction
 )
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UPlanetAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilitySpec)
+void UPlanetAbilitySystemComponent::OnGiveAbility(
+	FGameplayAbilitySpec& AbilitySpec
+)
 {
 	if (GameplayEventDataMap.Find(AbilitySpec.InputID))
 	{
@@ -33,7 +36,9 @@ void UPlanetAbilitySystemComponent::OnGiveAbility(FGameplayAbilitySpec& AbilityS
 	Super::OnGiveAbility(AbilitySpec);
 }
 
-void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTime /*= -1.0f*/)
+void UPlanetAbilitySystemComponent::CurrentMontageStop(
+	float OverrideBlendOutTime /*= -1.0f*/
+)
 {
 	UAnimInstance* AnimInstance = AbilityActorInfo.IsValid() ? AbilityActorInfo->GetAnimInstance() : nullptr;
 	UAnimMontage* MontageToStop = LocalAnimMontageInfo.AnimMontage;
@@ -50,7 +55,9 @@ void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTim
 	}
 	else if (bShouldStopMontage)
 	{
-		const float BlendOutTime = (OverrideBlendOutTime >= 0.0f ? OverrideBlendOutTime : MontageToStop->BlendOut.GetBlendTime());
+		const float BlendOutTime = (OverrideBlendOutTime >= 0.0f ?
+			                            OverrideBlendOutTime :
+			                            MontageToStop->BlendOut.GetBlendTime());
 
 		AnimInstance->Montage_Stop(BlendOutTime, MontageToStop);
 
@@ -61,7 +68,10 @@ void UPlanetAbilitySystemComponent::CurrentMontageStop(float OverrideBlendOutTim
 	}
 }
 
-UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(FGameplayAbilitySpec& Spec, const UGameplayAbility* Ability)
+UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(
+	FGameplayAbilitySpec& Spec,
+	const UGameplayAbility* Ability
+)
 {
 	check(Ability);
 	check(Ability->HasAllFlags(RF_ClassDefaultObject));
@@ -88,55 +98,85 @@ UGameplayAbility* UPlanetAbilitySystemComponent::CreateNewInstanceOfAbility(FGam
 	return AbilityInstance;
 }
 
-FActiveGameplayEffectHandle UPlanetAbilitySystemComponent::ApplyGameplayEffectSpecToTarget(const FGameplayEffectSpec &Spec, UAbilitySystemComponent *Target, FPredictionKey PredictionKey)
+FActiveGameplayEffectHandle UPlanetAbilitySystemComponent::ApplyGameplayEffectSpecToTarget(
+	const FGameplayEffectSpec& Spec,
+	UAbilitySystemComponent* Target,
+	FPredictionKey PredictionKey
+)
 {
-	return Super::ApplyGameplayEffectSpecToTarget(Spec,Target , PredictionKey);
+	return Super::ApplyGameplayEffectSpecToTarget(Spec, Target, PredictionKey);
 }
 
 void UPlanetAbilitySystemComponent::SetContinuePerform_Server_Implementation(
-	FGameplayAbilitySpecHandle AbilityToTrigger,
+	FGameplayAbilitySpecHandle Handle,
 	FGameplayAbilityActivationInfo ActivationInfo,
 	bool bIsContinue
-	)
+)
 {
-	ReplicateContinues(AbilityToTrigger, ActivationInfo, bIsContinue);
+	if (bIsContinue)
+	{
+		FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
+		if (AbilitySpec && AbilitySpec->Ability && AbilitySpec->IsActive())
+		{
+			TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
+
+			for (auto Instance : Instances)
+			{
+				if (Cast<UPlanetGameplayAbility>(Instance)->CanActivateAbility(
+					Handle,
+					Instance->GetCurrentActorInfo()
+				))
+				{
+					ReplicatePerformAction(Handle, ActivationInfo);
+				}
+				else
+				{
+					ReplicateContinues(Handle, ActivationInfo, bIsContinue);
+				}
+			}
+		}
+	}
+	else
+	{
+		ReplicateContinues(Handle, ActivationInfo, bIsContinue);
+	}
 }
 
-void UPlanetAbilitySystemComponent::CurrentMontageStopImp_Implementation(float OverrideBlendOutTime)
+void UPlanetAbilitySystemComponent::CurrentMontageStopImp_Implementation(
+	float OverrideBlendOutTime
+)
 {
 	CurrentMontageStop(OverrideBlendOutTime);
 }
 
-void UPlanetAbilitySystemComponent::AddLooseGameplayTag_2_Client_Implementation(const FGameplayTag& GameplayTag)
+void UPlanetAbilitySystemComponent::AddLooseGameplayTag_2_Client_Implementation(
+	const FGameplayTag& GameplayTag
+)
 {
 	AddLooseGameplayTag(GameplayTag);
 }
 
-void UPlanetAbilitySystemComponent::RemoveLooseGameplayTag_2_Client_Implementation(const FGameplayTag& GameplayTag)
+void UPlanetAbilitySystemComponent::RemoveLooseGameplayTag_2_Client_Implementation(
+	const FGameplayTag& GameplayTag
+)
 {
 	RemoveLooseGameplayTag(GameplayTag);
 }
 
 void UPlanetAbilitySystemComponent::ReplicateContinues_Implementation(
 	FGameplayAbilitySpecHandle Handle,
-	FGameplayAbilityActivationInfo ActivationInfo, 
+	FGameplayAbilityActivationInfo ActivationInfo,
 	bool bIsContinue
 )
 {
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Ability && AbilitySpec->IsActive())
 	{
-		if (AbilitySpec->Ability->GetInstancingPolicy() == EGameplayAbilityInstancingPolicy::InstancedPerActor)
-		{
-		}
-		else
-		{
-			TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
+		TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
 
-			for (auto Instance : Instances)
-			{
-				Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerform(bIsContinue);
-			}
+		for (auto Instance : Instances)
+		{
+			Cast<UPlanetGameplayAbility>(Instance)->SetContinuePerform(bIsContinue);
 		}
 	}
 }
@@ -172,9 +212,10 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 	}
 }
 
- void UPlanetAbilitySystemComponent::ReplicatePerformAction_Server_Implementation(
-	FGameplayAbilitySpecHandle Handle, FGameplayAbilityActivationInfo ActivationInfo
-	)
+void UPlanetAbilitySystemComponent::ReplicatePerformAction_Server_Implementation(
+	FGameplayAbilitySpecHandle Handle,
+	FGameplayAbilityActivationInfo ActivationInfo
+)
 {
 	ReplicatePerformAction(Handle, ActivationInfo);
 }
@@ -182,7 +223,7 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 void UPlanetAbilitySystemComponent::ReplicatePerformAction_Implementation(
 	FGameplayAbilitySpecHandle Handle,
 	FGameplayAbilityActivationInfo ActivationInfo
-	)
+)
 {
 	FGameplayAbilitySpec* AbilitySpec = FindAbilitySpecFromHandle(Handle);
 	if (AbilitySpec && AbilitySpec->Ability)
@@ -192,49 +233,58 @@ void UPlanetAbilitySystemComponent::ReplicatePerformAction_Implementation(
 		}
 		else
 		{
-			TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
+		}
+		TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
 
-			for (auto Instance : Instances)
-			{
-				Cast<USkill_Base>(Instance)->PerformAction(
-					Handle,
-					Instance->GetCurrentActorInfo(),
-					Instance->GetCurrentActivationInfo(),
-					nullptr
-					);
-			}
+		for (auto Instance : Instances)
+		{
+			Cast<USkill_Base>(Instance)->PerformAction(
+				Handle,
+				Instance->GetCurrentActorInfo(),
+				Instance->GetCurrentActivationInfo(),
+				nullptr
+			);
 		}
 	}
 }
 
-bool UPlanetAbilitySystemComponent::K2_HasMatchingGameplayTag(FGameplayTag TagToCheck) const
+bool UPlanetAbilitySystemComponent::K2_HasMatchingGameplayTag(
+	FGameplayTag TagToCheck
+) const
 {
 	return HasMatchingGameplayTag(TagToCheck);
 }
 
-bool UPlanetAbilitySystemComponent::K2_HasAnyMatchingGameplayTags(const FGameplayTagContainer& TagContainer) const
+bool UPlanetAbilitySystemComponent::K2_HasAnyMatchingGameplayTags(
+	const FGameplayTagContainer& TagContainer
+) const
 {
 	return HasAnyMatchingGameplayTags(TagContainer);
 }
 
-void UPlanetAbilitySystemComponent::ModifyActiveEffectDuration(FActiveGameplayEffectHandle Handle, float Duration)
+void UPlanetAbilitySystemComponent::ModifyActiveEffectDuration(
+	FActiveGameplayEffectHandle Handle,
+	float Duration
+)
 {
 	FActiveGameplayEffect* Effect = ActiveGameplayEffects.GetActiveGameplayEffect(Handle);
-	
+
 	if (Effect)
 	{
 		//  bDurationLocked 为什么是true？
 		// Effect->Spec.SetDuration(Duration, false);
-	
+
 		Effect->Spec.Duration = Duration;
 		// Effect->Spec.bDurationLocked = bLockDuration;
 		if (Duration > 0.f)
 		{
 			// We may have potential problems one day if a game is applying duration based gameplay effects from instantaneous effects
 			// (E.g., every time fire damage is applied, a DOT is also applied). We may need to for Duration to always be captured.
-			Effect->Spec.CapturedRelevantAttributes.AddCaptureDefinition(UAbilitySystemComponent::GetOutgoingDurationCapture());
+			Effect->Spec.CapturedRelevantAttributes.AddCaptureDefinition(
+				UAbilitySystemComponent::GetOutgoingDurationCapture()
+			);
 		}
-		
+
 		ActiveGameplayEffects.MarkItemDirty(*Effect);
 	}
 }

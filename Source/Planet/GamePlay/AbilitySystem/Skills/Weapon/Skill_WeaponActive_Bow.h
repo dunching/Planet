@@ -71,13 +71,6 @@ public:
 		const FGameplayEventData* TriggerEventData = nullptr
 	);
 
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	);
-
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec
 	) override;
@@ -94,8 +87,6 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	)override;
-
-	virtual void CheckInContinue(float InWaitInputTime)override;
 
 	void PlayMontage();
 

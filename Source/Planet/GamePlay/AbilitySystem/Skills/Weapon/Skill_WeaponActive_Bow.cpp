@@ -100,24 +100,6 @@ void USkill_WeaponActive_Bow::PreActivate(
 	}
 }
 
-void USkill_WeaponActive_Bow::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	if (WeaponActorPtr)
-	{
-		return;
-	}
-
-	PRINTINVOKEWITHSTR(FString(TEXT("No Weapon")));
-	K2_EndAbility();
-}
-
 void USkill_WeaponActive_Bow::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo, 
 	const FGameplayAbilitySpec& Spec
@@ -145,24 +127,14 @@ void USkill_WeaponActive_Bow::PerformAction(
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	StartTasksLink();
-}
-
-void USkill_WeaponActive_Bow::CheckInContinue(float InWaitInputTime)
-{
-	if (bIsContinue)
+	if (WeaponActorPtr)
 	{
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+		StartTasksLink();
 	}
 	else
 	{
-		if (
-			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
-			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
-			)
-		{
-			K2_CancelAbility();
-		}
+		PRINTINVOKEWITHSTR(FString(TEXT("No Weapon")));
+		K2_EndAbility();
 	}
 }
 
@@ -201,7 +173,6 @@ void USkill_WeaponActive_Bow::OnNotifyBeginReceived(FName NotifyName)
 {
 	if (NotifyName == Skill_WeaponActive_Bow::AttackEnd)
 	{
-		CheckInContinue(-1.f);
 	}
 }
 
@@ -221,13 +192,20 @@ void USkill_WeaponActive_Bow::OnMontateComplete()
 		}
 	}
 
+#if UE_EDITOR || UE_SERVER
 	if (
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		)
 	{
-		CheckInContinue(-1.f);
+		if (PerformIfContinue())
+		{
+		}
+		else
+		{
+			K2_CancelAbility();
+		}
 	}
+#endif
 }
 
 void USkill_WeaponActive_Bow::OnMontageOnInterrupted()
@@ -237,11 +215,6 @@ void USkill_WeaponActive_Bow::OnMontageOnInterrupted()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		// 确认是不在输入，而不是再次输入
-		if (!bIsContinue)
-		{
-		}
-		// 
 		K2_CancelAbility();
 	}
 #endif
@@ -394,6 +367,8 @@ void USkill_WeaponActive_Bow::PlayMontage()
 			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontateComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::K2_CancelAbility);
+
+			AbilityTask_PlayMontage_HumanPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 
 			AbilityTask_PlayMontage_HumanPtr->ReadyForActivation();
 		}

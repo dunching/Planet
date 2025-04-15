@@ -76,6 +76,6 @@ void AGroupManagger::SetOwnerCharacterProxyPtr(
 {
 	if (CharacterPtr != nullptr)
 	{
-		TeamMatesHelperComponentPtr->OwnerCharacterProxyPtr = CharacterPtr->GetCharacterProxy();
+		TeamMatesHelperComponentPtr->SetOwnerCharacterProxy(CharacterPtr->GetCharacterProxy());
 	}
 }

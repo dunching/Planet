@@ -69,28 +69,27 @@ public:
 	void RemoveLooseGameplayTag_2_Client(const FGameplayTag& GameplayTag);
 
 # pragma region 继续执行的RPC 
+	/**
+	 * 设置GA为是否持续开启
+	 * @param AbilityToTrigger 
+	 * @param ActivationInfo 
+	 * @param bIsContinue 
+	 */
 	UFUNCTION(Server, Reliable)
 	void SetContinuePerform_Server(
-		FGameplayAbilitySpecHandle AbilityToTrigger,
+		FGameplayAbilitySpecHandle Handle,
 		FGameplayAbilityActivationInfo ActivationInfo,
 		bool bIsContinue
 		);
 
-	UFUNCTION(NetMulticast, Reliable)
-	void ReplicateContinues(
-		FGameplayAbilitySpecHandle Handle,
-		FGameplayAbilityActivationInfo ActivationInfo,
-		bool bIsContinue
-	);
-
+	/**
+	 * 设置 武器 为再次激活
+	 * 由ROLE_AutonomousProxy调用
+	 * @param Handle 
+	 * @param ActivationInfo 
+	 */
 	UFUNCTION(Server, Reliable)
 	void ReplicatePerformAction_Server(
-		FGameplayAbilitySpecHandle Handle,
-		FGameplayAbilityActivationInfo ActivationInfo
-	);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void ReplicatePerformAction(
 		FGameplayAbilitySpecHandle Handle,
 		FGameplayAbilityActivationInfo ActivationInfo
 	);
@@ -119,6 +118,21 @@ public:
 	virtual void ModifyActiveEffectDuration(FActiveGameplayEffectHandle Handle, float Duration);
 
 private:
+
+# pragma region 继续执行的RPC 
+	UFUNCTION(NetMulticast, Reliable)
+	void ReplicateContinues(
+		FGameplayAbilitySpecHandle Handle,
+		FGameplayAbilityActivationInfo ActivationInfo,
+		bool bIsContinue
+	);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void ReplicatePerformAction(
+		FGameplayAbilitySpecHandle Handle,
+		FGameplayAbilityActivationInfo ActivationInfo
+	);
+# pragma endregion 
 
 	TMap<int32, FGameplayEventData>GameplayEventDataMap;
 

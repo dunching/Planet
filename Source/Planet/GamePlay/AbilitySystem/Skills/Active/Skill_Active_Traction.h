@@ -67,6 +67,4 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Radius = 600;
 	
-	TWeakObjectPtr<ATractionPoint>TractionPointPtr = nullptr;
-
 };

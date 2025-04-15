@@ -18,6 +18,7 @@
 #include "HumanRegularProcessor.h"
 #include "GameplayTagsLibrary.h"
 #include "BasicFutures_Dash.h"
+#include "BasicFutures_HasBeenFlyAway.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "EventSubjectComponent.h"
 #include "PlanetPlayerController.h"
@@ -49,7 +50,7 @@ bool UCharacterAbilitySystemComponent::IsInDeath() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsLibrary::DeathingTag
+		UGameplayTagsLibrary::State_Dying
 	);
 }
 
@@ -62,7 +63,7 @@ bool UCharacterAbilitySystemComponent::IsRunning() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-		UGameplayTagsLibrary::State_Locomotion_Run
+		UGameplayTagsLibrary::BaseFeature_Run
 	);
 }
 
@@ -130,7 +131,7 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Locomotion_Run))
+				UGameplayTagsLibrary::State_Running))
 			{
 				return;
 			}
@@ -146,7 +147,7 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Locomotion_Run))
+				UGameplayTagsLibrary::State_Running))
 			{
 				FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run};
 				OnwerActorPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
@@ -191,6 +192,27 @@ void UCharacterAbilitySystemComponent::Jump_Implementation()
 	{
 		OnwerActorPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
 			FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Jump}
+		);
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasBeenFlayAway_Implementation(
+	int32 Height
+)
+{
+	FGameplayEventData Payload;
+	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasBeenFlyAway;
+	GameplayAbilityTargetData_DashPtr->Height = Height;
+
+	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+			OnwerActorPtr,
+			UGameplayTagsLibrary::BaseFeature_HasBeenFlyAway,
+			Payload
 		);
 	}
 }
@@ -244,7 +266,7 @@ void UCharacterAbilitySystemComponent::MoveToAttackDistance(
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
-			UGameplayTagsLibrary::State_MoveToAttaclArea,
+			UGameplayTagsLibrary::BaseFeature_MoveToLocation,
 			Payload
 		);
 	}
@@ -257,7 +279,7 @@ void UCharacterAbilitySystemComponent::BreakMoveToAttackDistance()
 	{
 		auto GASPtr = OnwerActorPtr->GetCharacterAbilitySystemComponent();
 
-		FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::State_MoveToAttaclArea};
+		FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::BaseFeature_MoveToLocation};
 		GASPtr->CancelAbilities(&GameplayTagContainer);
 	}
 }

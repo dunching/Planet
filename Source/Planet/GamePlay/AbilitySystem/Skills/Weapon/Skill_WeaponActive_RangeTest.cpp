@@ -133,7 +133,7 @@ void USkill_WeaponActive_RangeTest::OnNotifyBeginReceived(FName NotifyName)
 	{
 		EmitProjectile();
 
-		CheckInContinue(-1.f);
+		PerformIfContinue();
 	}
 }
 

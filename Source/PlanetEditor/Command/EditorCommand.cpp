@@ -30,7 +30,6 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "HorseCharacter.h"
 #include "PlanetEditor_Tools.h"
-#include "CS_RootMotion.h"
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
@@ -432,12 +431,6 @@ void EditorCommand::TestGAState2Self(const TArray< FString >& Args)
 
 	float Duration = 10.f;
 	LexFromString(Duration, *Args[1]);
-	auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RootMotion(
-		FGameplayTag::RequestGameplayTag(*Args[0])
-	);
-
-	GameplayAbilityTargetDataPtr->TriggerCharacterPtr = CharacterPtr;
-	GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
 
 	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 }
@@ -475,13 +468,6 @@ void EditorCommand::TestGATagState2Target(const TArray< FString >& Args)
 			{
 				float Duration = 10.f;
 				LexFromString(Duration, *Args[1]);
-				auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RootMotion(
-					FGameplayTag::RequestGameplayTag(*Args[0])
-				);
-
-				GameplayAbilityTargetDataPtr->TriggerCharacterPtr = TargetCharacterPtr;
-				GameplayAbilityTargetDataPtr->TargetCharacterPtr = CharacterPtr;
-
 				auto ICPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 			}
 		}

@@ -28,8 +28,6 @@
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
-#include "CS_RootMotion.h"
-#include "CS_RootMotion_FlyAway.h"
 
 static TAutoConsoleVariable<int32> Skill_Active_FlyAway_DrawDebug(
 	TEXT("Skill_Active_FlyAway.DrawDebug"),

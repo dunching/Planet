@@ -11,8 +11,11 @@ UScriptStruct* FGameplayAbilityTargetData_WeaponActive_ActiveParam::GetScriptStr
 	return FGameplayAbilityTargetData_WeaponActive_ActiveParam::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(FArchive& Ar, class UPackageMap* Map,
-                                                                       bool& bOutSuccess)
+bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -33,7 +36,7 @@ FGameplayAbilityTargetData_WeaponActive_ActiveParam* FGameplayAbilityTargetData_
 }
 
 USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
-	Super()
+                                                     Super()
 {
 	//	bRetriggerInstancedAbility = true;
 }
@@ -56,8 +59,6 @@ void USkill_WeaponActive_Base::PreActivate(
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
-	WaitInputTaskPtr = nullptr;
-
 	if (TriggerEventData && TriggerEventData->TargetData.IsValid(0))
 	{
 		ActiveParamSPtr = MakeSPtr_GameplayAbilityTargetData<FActiveParamType>(TriggerEventData->TargetData.Get(0));
@@ -71,18 +72,6 @@ void USkill_WeaponActive_Base::PreActivate(
 	}
 }
 
-void USkill_WeaponActive_Base::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	const FGameplayEventData* TriggerEventData
-)
-{
-	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-}
-
 bool USkill_WeaponActive_Base::CanActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -91,7 +80,13 @@ bool USkill_WeaponActive_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	
+	if (WaitInput)
+	{
+	}
+	else
+	{
+		return false;	
+	}
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -116,18 +111,6 @@ void USkill_WeaponActive_Base::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_WeaponActive_Base::SetContinuePerform(bool bIsContinue_)
-{
-	if (bIsContinue_)
-	{
-		ContinueActive();
-	}
-	else
-	{
-		StopContinueActive();
-	}
-}
-
 // void USkill_WeaponActive_Base::InitalDefaultTags()
 // {
 // 	Super::InitalDefaultTags();
@@ -143,81 +126,39 @@ void USkill_WeaponActive_Base::SetContinuePerform(bool bIsContinue_)
 // 	// ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_ReleasingSkill);
 // }
 
-bool USkill_WeaponActive_Base::GetNum(int32& Num) const
+bool USkill_WeaponActive_Base::GetNum(
+	int32& Num
+) const
 {
 	return false;
 }
 
-void USkill_WeaponActive_Base::ContinueActive()
+bool USkill_WeaponActive_Base::PerformIfContinue()
 {
-	if (!CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
-	{
-		return;
-	}
+	WaitInput = true;
 
-	bIsContinue = true;
-	if (WaitInputTaskPtr)
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
 	{
-		WaitInputTaskPtr->ExternalCancel();
-		WaitInputTaskPtr = nullptr;
+		if (GetIsContinue() && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
+		{
+			Cast<UPlanetAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo())->
+				ReplicatePerformAction_Server(
+					GetCurrentAbilitySpecHandle(),
+					GetCurrentActivationInfo()
+				);
 
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(),
-		              &CurrentEventData);
+			return true;
+		}
 	}
 	else
 	{
 	}
-}
-
-void USkill_WeaponActive_Base::StopContinueActive()
-{
-	bIsContinue = false;
-}
-
-void USkill_WeaponActive_Base::CheckInContinue(float InWaitInputTime)
-{
-	if (bIsContinue && CanActivateAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo()))
-	{
-		Cast<UPlanetAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo())->ReplicatePerformAction_Server(
-			GetCurrentAbilitySpecHandle(),
-			GetCurrentActivationInfo()
-		);
-	}
-	else
-	{
-		WaitInputPercent = 1.f;
-
-		WaitInputTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-
-		if (InWaitInputTime > 0.f)
-		{
-			WaitInputTaskPtr->SetDuration(InWaitInputTime, 0.1f);
-			
-#if UE_EDITOR || UE_SERVER
-			if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
-			{
-				WaitInputTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::WaitInputTick);
-			}
 #endif
-			
-#if UE_EDITOR || UE_SERVER
-			if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
-			{
-				WaitInputTaskPtr->OnFinished.BindLambda([this](auto)
-				{
-					K2_CancelAbility();
-					return true;
-				});
-			}
-#endif
-		}
-		else
-		{
-			WaitInputTaskPtr->SetInfinite();
-		}
-
-		WaitInputTaskPtr->ReadyForActivation();
-	}
+	
+	return false;
 }
 
 void USkill_WeaponActive_Base::PerformAction(
@@ -229,20 +170,15 @@ void USkill_WeaponActive_Base::PerformAction(
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	WaitInput = false;
+
 	ResetPreviousStageActions();
-	bIsContinue = true;
 }
 
-void USkill_WeaponActive_Base::WaitInputTick(UAbilityTask_TimerHelper* InWaitInputTaskPtr, float Interval,
-                                             float Duration)
+void USkill_WeaponActive_Base::WaitInputTick(
+	UAbilityTask_TimerHelper* InWaitInputTaskPtr,
+	float Interval,
+	float Duration
+)
 {
-	if (Duration > 0.f)
-	{
-		WaitInputPercent = FMath::Clamp(1.f - (Interval / Duration), 0.f, 1.f);
-	}
-	else
-	{
-		checkNoEntry();
-		WaitInputPercent = 1.f;
-	}
 }

@@ -114,12 +114,6 @@ public:
 	//  取消
 	virtual void End();
 
-	// 装备至插槽
-	virtual void Allocation();
-
-	// 从插槽移除
-	virtual void UnAllocation();
-
 	IDType GetID() const;
 
 	FGameplayTag GetProxyType() const;
@@ -134,6 +128,13 @@ public:
 	UInventoryComponent*GetInventoryComponent() const;
 	
 protected:
+	
+	// 装备至插槽
+	virtual void Allocation();
+
+	// 从插槽移除
+	virtual void UnAllocation();
+
 	FTableRowProxy* GetTableRowProxy() const;
 
 	UPROPERTY(Transient)

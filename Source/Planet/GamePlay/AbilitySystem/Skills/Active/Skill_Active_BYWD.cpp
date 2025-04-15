@@ -3,7 +3,7 @@
 
 #include "Net/UnrealNetwork.h"
 
-#include "AbilityTask_FlyAway.h"
+#include "AbilityTask_ApplyRootMotion_FlyAway.h"
 
 #include "GameFramework/RootMotionSource.h"
 
@@ -53,7 +53,7 @@ void USkill_Active_BYWD::PerformAction(
 	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
 	{
 		{
-			auto TaskPtr = UAbilityTask_FlyAway::NewTask(
+			auto TaskPtr = UAbilityTask_ApplyRootMotion_FlyAway::NewTask(
 				this,
 				TEXT(""),
 				ERootMotionAccumulateMode::Additive,
@@ -119,11 +119,6 @@ void USkill_Active_BYWD::DurationDelegate(UAbilityTask_TimerHelper*, float Curre
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
-		if (CharacterStateInfoSPtr)
-		{
-			CharacterStateInfoSPtr->TotalTime = CurrentInterval;
-			CharacterStateInfoSPtr->DataChanged();
-		}
 	}
 #endif
 }
