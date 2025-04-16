@@ -29,7 +29,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 		UInputAction* MoveRightActionPtr = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
-		TMap<FKey, UInputAction*>KeyEventMap;
-
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		UInputAction* AddPitchActionPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+		UInputAction* AddYawActionPtr = nullptr;
+	
 };

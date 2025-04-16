@@ -1,4 +1,3 @@
-
 #include "RegularActionLayout.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -11,12 +10,16 @@
 #include "CharacterBase.h"
 #include "FocusIcon.h"
 #include "AssetRefMap.h"
+#include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "UICommon.h"
 #include "FocusTitle.h"
+#include "GameOptions.h"
 #include "GuideActor.h"
 #include "GuideList.h"
 #include "GuideSubSystem.h"
 #include "HUD_TeamInfo.h"
+#include "HumanCharacter_Player.h"
 #include "PawnStateActionHUD.h"
 #include "ProgressTips.h"
 
@@ -35,6 +38,8 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 	FName FocusCharacterSocket = TEXT("FocusCharacterSocket");
 
 	FName GuideList = TEXT("GuideList");
+
+	FName LowerHPSocket = TEXT("LowerHPSocket");
 };
 
 void URegularActionLayout::NativeConstruct()
@@ -50,15 +55,34 @@ void URegularActionLayout::NativeConstruct()
 
 		OnFocusCharacter(nullptr);
 		auto DelegateHandle =
-			PCPtr->OnFocusCharacterDelegate.AddCallback(std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1));
+			PCPtr->OnFocusCharacterDelegate.AddCallback(
+				std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1)
+			);
 		DelegateHandle->bIsAutoUnregister = false;
+
+		auto CharacterPtr = PCPtr->GetPawn<ACharacterBase>();
+		if (!CharacterPtr)
+		{
+			return;
+		}
+
+		auto CharacterAttributesRef =
+			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+		CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+			CharacterAttributesRef->GetMax_HPAttribute()
+		).AddUObject(this, &ThisClass::OnHPChanged);
+
+		CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+			CharacterAttributesRef->GetHPAttribute()
+		).AddUObject(this, &ThisClass::OnHPChanged);
 	}
 }
 
 void URegularActionLayout::Enable()
 {
 	ILayoutInterfacetion::Enable();
-	
+
 	{
 		auto UIPtr = Cast<UPawnStateActionHUD>(GetWidgetFromName(FRegularActionLayout::Get().PawnStateActionHUD));
 		if (UIPtr)
@@ -78,11 +102,13 @@ void URegularActionLayout::DisEnable()
 			UIPtr->DisEnable();
 		}
 	}
-	
+
 	ILayoutInterfacetion::DisEnable();
 }
 
-void URegularActionLayout::OnFocusCharacter(ACharacterBase* TargetCharacterPtr)
+void URegularActionLayout::OnFocusCharacter(
+	ACharacterBase* TargetCharacterPtr
+)
 {
 	// 
 	if (TargetCharacterPtr)
@@ -164,7 +190,10 @@ UEffectsList* URegularActionLayout::InitialEffectsList()
 	return nullptr;
 }
 
-void URegularActionLayout::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr)
+void URegularActionLayout::DisplayTeamInfo(
+	bool bIsDisplay,
+	AHumanCharacter* HumanCharacterPtr
+)
 {
 	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(HUD_TeamSocket));
 	if (!BorderPtr)
@@ -197,7 +226,9 @@ void URegularActionLayout::DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* Hum
 	}
 }
 
-UProgressTips* URegularActionLayout::ViewProgressTips(bool bIsViewMenus)
+UProgressTips* URegularActionLayout::ViewProgressTips(
+	bool bIsViewMenus
+)
 {
 	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(ProgressTipsSocket));
 	if (!BorderPtr)
@@ -224,4 +255,35 @@ UProgressTips* URegularActionLayout::ViewProgressTips(bool bIsViewMenus)
 	BorderPtr->ClearChildren();
 
 	return nullptr;
+}
+
+void URegularActionLayout::OnHPChanged(
+	const FOnAttributeChangeData&
+
+)
+{
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!PlayerCharacterPtr)
+	{
+		return;
+	}
+
+	auto CharacterAttributesRef = PlayerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+	const auto CurrentValue =
+		CharacterAttributesRef->GetHP();
+	const auto MaxValue =
+		CharacterAttributesRef->GetMax_HP();
+	const auto LowerHP_Percent =
+		UGameOptions::GetInstance()->LowerHP_Percent;
+
+	const auto bIsLowerHP = CurrentValue < (MaxValue * (LowerHP_Percent / 100.f));
+
+	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FRegularActionLayout::Get().LowerHPSocket));
+	if (!BorderPtr)
+	{
+		return;
+	}
+
+	BorderPtr->SetVisibility(bIsLowerHP ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }

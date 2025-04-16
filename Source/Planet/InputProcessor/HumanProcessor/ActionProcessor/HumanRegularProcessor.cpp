@@ -77,12 +77,15 @@ static TAutoConsoleVariable<int32> HumanRegularProcessor(
 	TEXT("Skill.DrawDebug.HumanRegularProcessor"),
 	0,
 	TEXT("")
-	TEXT(" default: 0"));
+	TEXT(" default: 0")
+);
 
 namespace HumanProcessor
 {
-	FHumanRegularProcessor::FHumanRegularProcessor(FOwnerPawnType* CharacterPtr) :
-		Super(CharacterPtr)
+	FHumanRegularProcessor::FHumanRegularProcessor(
+		FOwnerPawnType* CharacterPtr
+	) :
+	  Super(CharacterPtr)
 	{
 	}
 
@@ -104,16 +107,19 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
+			SwitchShowCursor(false);
+
 			UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kActionLayout);
 
 			OnAllocationChangedHandle = OnwerActorPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
 				[this]()
 				{
 					AddOrRemoveUseMenuItemEvent(true);
-				});
+				}
+			);
 
 			AddOrRemoveUseMenuItemEvent(true);
-			const auto  GameplayFeatureKeyMapAry=  UGameOptions::GetInstance()->GetGameplayFeatureKeyMapAry();
+			const auto GameplayFeatureKeyMapAry = UGameOptions::GetInstance()->GetGameplayFeatureKeyMapAry();
 			for (const auto& Iter : GameplayFeatureKeyMapAry)
 			{
 				// 忽略一些命令
@@ -121,13 +127,15 @@ namespace HumanProcessor
 				{
 					const auto Key = Iter.Key;
 				}
-				
+
 				GameplayFeatureKeyMapMap.Add(Iter.Key, Iter);
 			}
 		}
 	}
 
-	void FHumanRegularProcessor::TickImp(float Delta)
+	void FHumanRegularProcessor::TickImp(
+		float Delta
+	)
 	{
 		Super::TickImp(Delta);
 
@@ -169,276 +177,91 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FHumanRegularProcessor::InputKey(const FInputKeyParams& Params)
+	bool FHumanRegularProcessor::InputKey(
+		const FInputKeyEventArgs& EventArgs
+	)
 	{
-		if (Params.Event == EInputEvent::IE_Pressed)
+		switch (EventArgs.Event)
 		{
-			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-			// 特殊处理一下
-			if (OnwerActorPtr->LookAtSceneActorPtr && (Params.Key == EKeys::E))
-			{
-				return;
-			}
-
-			auto GameplayFeatureKeyMapMapIter = GameplayFeatureKeyMapMap.Find(Params.Key);
-			if (GameplayFeatureKeyMapMapIter)
-			{
-				OnwerActorPtr->GetController<APlayerController>()->ConsoleCommand(GameplayFeatureKeyMapMapIter->CMD);
-				return;
-			}
-
-			auto SkillIter = HandleKeysMap.Find(Params.Key);
-			if (SkillIter)
-			{
-				OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
-
-				OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(SkillIter->Socket);
-			}
-
-			// 这里应该是特定的输入会打断 还是任意输入都会打断？
-			else if (
-				(Params.Key == EKeys::W) ||
-				(Params.Key == EKeys::A) ||
-				(Params.Key == EKeys::S) ||
-				(Params.Key == EKeys::D)
-			)
-			{
-				OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
-			}
-		}
-		else
-		{
-			auto SkillIter = HandleKeysMap.Find(Params.Key);
-			if (SkillIter)
+		case IE_Pressed:
 			{
 				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-				if (
-					SkillIter->Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
+				if (!OnwerActorPtr)
+				{
+					return false;
+				}
+
+				// 特殊处理一下
+				if (OnwerActorPtr->LookAtSceneActorPtr && (EventArgs.Key == EKeys::E))
+				{
+					return true;
+				}
+
+				auto GameplayFeatureKeyMapMapIter = GameplayFeatureKeyMapMap.Find(EventArgs.Key);
+				if (GameplayFeatureKeyMapMapIter)
+				{
+					OnwerActorPtr->GetController<APlayerController>()->ConsoleCommand(
+						GameplayFeatureKeyMapMapIter->CMD
+					);
+					return true;
+				}
+
+				auto SkillIter = HandleKeysMap.Find(EventArgs.Key);
+				if (SkillIter)
+				{
+					OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
+
+					OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(SkillIter->Socket);
+				}
+
+				// 这里应该是特定的输入会打断 还是任意输入都会打断？
+				else if (
+					(EventArgs.Key == EKeys::W) ||
+					(EventArgs.Key == EKeys::A) ||
+					(EventArgs.Key == EKeys::S) ||
+					(EventArgs.Key == EKeys::D)
 				)
 				{
-					OnwerActorPtr->GetProxyProcessComponent()->CancelAction(SkillIter->Socket);
+					OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 				}
 			}
-		}
-	}
-
-	void FHumanRegularProcessor::F1KeyPressed()
-	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		if (OnwerActorPtr)
-		{
-			OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-				ETeammateOption::kFollow);
-		}
-	}
-
-	void FHumanRegularProcessor::F2KeyPressed()
-	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		if (OnwerActorPtr)
-		{
-			OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-				ETeammateOption::kAssistance);
-		}
-	}
-
-	void FHumanRegularProcessor::F10KeyPressed()
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewRaffleMenuProcessor>();
-	}
-
-	void FHumanRegularProcessor::EKeyPressed()
-	{
-		//TODO. 之后修改为任意输入相应
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr->LookAtSceneActorPtr)
-		{
-			OnwerActorPtr->InteractionSceneActor(Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr));
-		}
-	}
-
-	void FHumanRegularProcessor::EKeyReleased()
-	{
-	}
-
-	void FHumanRegularProcessor::FKeyPressed()
-	{
-		//TODO. 之后修改为任意输入相应
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr->LookAtSceneActorPtr)
-		{
-			if (auto CharacterPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
+			break;
+		case IE_Released:
 			{
-				OnwerActorPtr->InteractionSceneCharacter(CharacterPtr);
-			}
-			else if (auto ChallengeEntryPtr = Cast<AChallengeEntry>(OnwerActorPtr->LookAtSceneActorPtr))
-			{
-				OnwerActorPtr->InteractionSceneActor(ChallengeEntryPtr);
-			}
-		}
-	}
-
-	void FHumanRegularProcessor::QKeyPressed()
-	{
-		auto PCPtr = Cast<APlanetPlayerController>(GetOwnerActor()->GetController());
-
-		if (PCPtr->PlayerInput->IsPressed(EKeys::LeftAlt))
-		{
-			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FBuildingBaseProcessor>();
-		}
-	}
-
-	void FHumanRegularProcessor::VKeyPressed()
-	{
-	}
-
-	void FHumanRegularProcessor::BKeyPressed()
-	{
-	}
-
-	void FHumanRegularProcessor::TabKeyPressed()
-	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		if (!OnwerActorPtr)
-		{
-			return;
-		}
-
-		auto PCPtr = OnwerActorPtr->GetController<APlanetPlayerController>();
-		if (!PCPtr)
-		{
-			return;
-		}
-
-		auto PlayerCameraManagerPtr = UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0);
-		if (PlayerCameraManagerPtr)
-		{
-			FVector OutCamLoc;
-			FRotator OutCamRot;
-			PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
-
-			FCollisionObjectQueryParams ObjectQueryParams;
-			ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
-
-			FCollisionQueryParams Params;
-			Params.AddIgnoredActor(OnwerActorPtr);
-
-			FHitResult OutHit;
-			if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
-			                                               ObjectQueryParams, Params))
-			{
-				if (PCPtr->GetFocusActor() == OutHit.GetActor())
+				auto SkillIter = HandleKeysMap.Find(EventArgs.Key);
+				if (SkillIter)
 				{
-				}
-				else
-				{
-					auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
-					if (TargetCharacterPtr)
+					auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+					if (
+						SkillIter->Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
+					)
 					{
-						PCPtr->SetFocus(TargetCharacterPtr);
-						return;
+						OnwerActorPtr->GetProxyProcessComponent()->CancelAction(SkillIter->Socket);
 					}
 				}
 			}
+			break;
 		}
 
-		if (PCPtr->GetFocusActor())
-		{
-			PCPtr->ClearFocus();
-		}
+		return Super::InputKey(EventArgs);
 	}
 
-	void FHumanRegularProcessor::LAltKeyPressed()
+	bool FHumanRegularProcessor::InputAxis(
+		FViewport* Viewport,
+		FInputDeviceId InputDevice,
+		FKey Key,
+		float Delta,
+		float DeltaTime,
+		int32 NumSamples,
+		bool bGamepad
+	)
 	{
-		bIsPressdLeftAlt = true;
+		return Super::InputAxis(Viewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad);
 	}
 
-	void FHumanRegularProcessor::LAltKeyReleased()
-	{
-		if (bIsPressdLeftAlt)
-		{
-			auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-			if (!OnwerActorPtr)
-			{
-				return;
-			}
-
-			auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
-			if (PlayerPCPtr)
-			{
-				if (PlayerPCPtr->bShowMouseCursor > 0)
-				{
-					PlayerPCPtr->bShowMouseCursor = 0;
-					UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
-				}
-				else
-				{
-					PlayerPCPtr->bShowMouseCursor = 1;
-					UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
-				}
-			}
-		}
-
-		bIsPressdLeftAlt = false;
-	}
-
-	void FHumanRegularProcessor::GKeyPressed()
-	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		if (!OnwerActorPtr)
-		{
-			return;
-		}
-
-		FMinimalViewInfo DesiredView;
-		OnwerActorPtr->GetCameraComp()->GetCameraView(0, DesiredView);
-
-		auto StartPt = DesiredView.Location;
-		auto StopPt = DesiredView.Location + (DesiredView.Rotation.Vector() * 1000);
-
-		FHitResult Result;
-
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld_Object);
-
-		FCollisionQueryParams Params;
-		Params.bTraceComplex = false;
-
-		if (OnwerActorPtr->GetWorld()->LineTraceSingleByObjectType(
-				Result,
-				StartPt,
-				StopPt,
-				ObjectQueryParams,
-				Params)
-		)
-		{
-#ifdef WITH_EDITOR
-			if (HumanRegularProcessor.GetValueOnGameThread())
-			{
-				DrawDebugSphere(OnwerActorPtr->GetWorld(), Result.ImpactPoint, 20, 10, FColor::Red, true);
-			}
-#endif
-		}
-	}
-
-	void FHumanRegularProcessor::HKeyPressed()
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewGroupsProcessor>();
-	}
-
-	void FHumanRegularProcessor::XKeyPressed()
-	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		if (OnwerActorPtr)
-		{
-			OnwerActorPtr->GetProxyProcessComponent()->SwitchWeapon();
-		}
-	}
-
-	void FHumanRegularProcessor::AddOrRemoveUseMenuItemEvent(bool bIsAdd)
+	void FHumanRegularProcessor::AddOrRemoveUseMenuItemEvent(
+		bool bIsAdd
+	)
 	{
 		HandleKeysMap.Empty();
 		if (bIsAdd)

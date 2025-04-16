@@ -170,7 +170,7 @@ void AHumanCharacter_AI::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr
 	// 	ControllerPtr->SetGroupSharedInfo(InGroupSharedInfoPtr);
 	// }
 	
-	OnGroupManaggerReady(GroupManaggerPtr);
+	// OnGroupManaggerReady(GroupManaggerPtr);
 }
 
 void AHumanCharacter_AI::SetCharacterID(const FGuid& InCharacterID)

@@ -30,8 +30,6 @@ namespace HumanProcessor
 
 		virtual void QuitAction() override;
 
-		virtual void ESCKeyPressed()override;
-
 		TObjectPtr<AChallengeEntry>TargetPtr = nullptr;
 		
 	protected:

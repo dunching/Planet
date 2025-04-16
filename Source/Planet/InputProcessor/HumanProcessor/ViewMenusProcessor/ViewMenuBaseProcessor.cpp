@@ -29,9 +29,11 @@ namespace HumanProcessor
 
 	}
 
-	void FViewMenuBaseProcessor::ESCKeyPressed()
+	void FViewMenuBaseProcessor::EnterAction()
 	{
-		Switch2RegularProcessor();
+		FInputProcessor::EnterAction();
+		
+		SwitchShowCursor(true);
 	}
 
 	void FViewMenuBaseProcessor::Switch2RegularProcessor()

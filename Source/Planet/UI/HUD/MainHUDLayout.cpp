@@ -29,8 +29,6 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 
 	FName PawnActionStateHUDSocket = TEXT("PawnActionStateHUDSocket");
 
-	FName LowerHPSocket = TEXT("LowerHPSocket");
-
 	FName InteractionList = TEXT("InteractionList");
 
 	FName Layout_WidgetSwitcher = TEXT("Layout_WidgetSwitcher");
@@ -141,13 +139,6 @@ UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 
 void UMainHUDLayout::SwitchIsLowerHP(bool bIsLowerHP)
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FMainHUDLayout::Get().LowerHPSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	BorderPtr->SetVisibility(bIsLowerHP ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 }
 
 // UInteractionList* UMainHUDLayout::GetInteractionList()

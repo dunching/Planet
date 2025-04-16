@@ -27,40 +27,6 @@ namespace HumanProcessor
 	{
 	}
 
-	void FPlacingWallProcessor::TKeyPressed()
-	{
-		switch (WallRot)
-		{
-		case FPlacingWallProcessor::EWallRot::kRot1:
-		{
-			WallRot = EWallRot::kRot2;
-		}
-		break;
-		case FPlacingWallProcessor::EWallRot::kRot2:
-		{
-			WallRot = EWallRot::kRot1;
-		}
-		break;
-		}
-	}
-
-	void FPlacingWallProcessor::MouseLeftPressed()
-	{
-		if (bCanPlace)
-		{
-			if (CaptureInfoSPtr)
-			{
-				auto BuildingCaptureDataPtr = Cast<ABuildingCaptureData>(CaptureInfoSPtr->CapturePtPtr->GetParentActor());
-				if (BuildingCaptureDataPtr)
-				{
-// 					auto BulidingPtr = Cast<ABuildingBase>(BuildingCaptureDataPtr);
-// 					BuildTargetPtr->SetAttchedBuilding(BulidingPtr);
-				}
-			}
-		}
-		Super::MouseLeftPressed();
-	}
-
 	void FPlacingWallProcessor::AttachActor(const FCaptureInfo& CaptureInfo)
 	{
 		if (!BuildTargetPtr)

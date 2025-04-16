@@ -40,25 +40,6 @@ namespace HumanProcessor
 		virtual void QuitAction()override;
 
 	public:
-
-		virtual void InputKey(const FInputKeyParams& Params)override;
-
-		virtual void QKeyPressed()override;
-
-		virtual void VKeyPressed()override;
-
-		virtual void BKeyPressed()override;
-
-		virtual void MouseLeftPressed()override;
-
-		virtual void MouseLeftReleased()override;
-
-		virtual void MouseRightPressed()override;
-
-		virtual void LAltKeyPressed()override;
-
-		virtual void LAltKeyReleased()override;
-
 	private:
 
 		void AddOrRemoveUseMenuItemEvent(bool bIsAdd);

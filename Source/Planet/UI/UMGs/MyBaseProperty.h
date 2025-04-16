@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AttributeSet.h"
 
 #include "MyUserWidget.h"
 
@@ -10,6 +11,8 @@
 #include "GenerateType.h"
 
 #include "MyBaseProperty.generated.h"
+
+struct FOnAttributeChangeData;
 
 class UAbilitySystemComponent;
 

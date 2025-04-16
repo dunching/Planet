@@ -29,10 +29,6 @@ namespace HumanProcessor
 
 		FPlacingWallProcessor(FOwnerPawnType* CharacterPtr);
 
-		virtual void TKeyPressed()override;
-
-		virtual void MouseLeftPressed()override;
-
 	protected:
 
 		virtual void AttachActor(const FCaptureInfo& CaptureInfo)override;

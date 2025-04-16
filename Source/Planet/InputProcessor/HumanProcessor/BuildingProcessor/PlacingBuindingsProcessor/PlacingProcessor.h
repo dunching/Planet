@@ -47,24 +47,6 @@ namespace HumanProcessor
 
 	public:
 
-		virtual void AddPitchInput(const FInputActionValue& InputActionValue)override;
-
-		virtual void AddYawInput(const FInputActionValue& InputActionValue)override;
-
-		virtual void MoveForward(const FInputActionValue& InputActionValue)override;
-
-		virtual void MoveRight(const FInputActionValue& InputActionValue)override;
-
-		virtual void ESCKeyPressed()override;
-
-		virtual void QKeyPressed()override;
-
-		virtual void GKeyPressed()override;
-
-		virtual void PressedNumKey(int32 NumKey)override;
-
-		virtual void MouseLeftPressed()override;
-
 		virtual void SetHoldItemsData(const TSharedPtr<FSceneTool>& HoldItemsSPtr);
 
 		virtual void SetPlaceBuildItem(const FSceneTool& Item);

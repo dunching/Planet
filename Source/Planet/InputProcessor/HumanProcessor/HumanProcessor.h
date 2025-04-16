@@ -45,29 +45,15 @@ namespace HumanProcessor
 
 		virtual void EnterAction()override;
 
-		virtual void MoveForward(const FInputActionValue& InputActionValue)override;
-
-		virtual void MoveRight(const FInputActionValue& InputActionValue)override;
-
-		virtual void AddPitchInput(const FInputActionValue& InputActionValue)override;
-
-		virtual void AddYawInput(const FInputActionValue& InputActionValue)override;
-
-		virtual void LCtrlKeyPressed()override;
-
-		virtual void LShiftKeyPressed()override;
-
-		virtual void LShiftKeyReleased()override;
-
-		virtual void SpaceKeyPressed()override;
-
-		virtual void SpaceKeyReleased()override;
-
 	protected:
+
+		virtual bool InputKey(
+			const FInputKeyEventArgs& EventArgs
+		) ;
 
 		void SwitchWalkingOrRunning();
 
-		void Switch2RegularProcessor();
+		void Dash();
 
 	};
 }

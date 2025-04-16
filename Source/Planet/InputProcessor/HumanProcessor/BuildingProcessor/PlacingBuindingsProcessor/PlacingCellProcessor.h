@@ -22,8 +22,6 @@ namespace HumanProcessor
 
 		FPlacingCellProcessor(FOwnerPawnType* CharacterPtr);
 
-		virtual void MouseLeftPressed()override;
-
 	protected:
 
 		virtual void AttachActor(const FCaptureInfo& CaptureInfo)override;

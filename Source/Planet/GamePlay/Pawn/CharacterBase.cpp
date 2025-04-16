@@ -149,7 +149,7 @@ void ACharacterBase::BeginPlay()
 
 	OnMoveSpeedChangedImp(CharacterAttributeSetPtr->GetMoveSpeed());
 
-	// 这里是用于传送时，重新生成这个Character绑定之前的GroupManager数据
+	// 这里是用于传送时或流送时重新生成这个Character，绑定之前的GroupManager数据
 	if (GroupManaggerPtr)
 	{
 		OnRep_GroupSharedInfoChanged();
@@ -356,14 +356,6 @@ bool ACharacterBase::GetIsValidTarget() const
 	};
 	const auto TagContainer = FGameplayTagContainer::CreateFromArray(Ary);
 	return !AbilitySystemComponentPtr->HasAnyMatchingGameplayTags(TagContainer);
-}
-
-void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	// 只在 ROLE_AutonomousProxy 运行
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	UInputProcessorSubSystem::GetInstance()->BindAction(InputComponent);
 }
 
 void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

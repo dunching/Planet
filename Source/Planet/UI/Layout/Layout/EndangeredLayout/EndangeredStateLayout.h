@@ -21,7 +21,7 @@ struct FToolsSocketInfo;
 struct FConsumableSocketInfo;
 
 /**
- *
+ * 濒死状态
  */
 UCLASS()
 class PLANET_API UEndangeredStateLayout :

@@ -75,10 +75,6 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FPlacingProcessor::PressedNumKey(int32 NumKey)
-	{
-	}
-
 	void FPlacingProcessor::SetHoldItemsData(const TSharedPtr<FSceneTool>& HoldItemsSPtr_)
 	{
 		HoldItemsSPtr = HoldItemsSPtr_;
@@ -87,11 +83,6 @@ namespace HumanProcessor
 	void FPlacingProcessor::SetPlaceBuildItem(const FSceneTool& Item_)
 	{
 		//Item = Item_;
-	}
-
-	void FPlacingProcessor::GKeyPressed()
-	{
-		ExplicitCaptureIndex++;
 	}
 
 	void FPlacingProcessor::BeginDestroy()
@@ -103,59 +94,6 @@ namespace HumanProcessor
 		}
 
 		Super::BeginDestroy();
-	}
-
-	void FPlacingProcessor::AddPitchInput(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-		if (FMath::IsNearlyZero(Value))
-		{
-			return;
-		}
-
-		auto OnwerActorPtr = GetOwnerActor<AHumanCharacter>();
-	}
-
-	void FPlacingProcessor::AddYawInput(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-		auto OnwerActorPtr = GetOwnerActor<AHumanCharacter>();
-		OnwerActorPtr->AddActorLocalRotation(FRotator(0, Value, 0));
-	}
-
-	void FPlacingProcessor::MoveForward(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-		auto OnwerActorPtr = GetOwnerActor<AHumanCharacter>();
-		OnwerActorPtr->AddMovementInput(OnwerActorPtr->GetActorForwardVector(), Value);
-	}
-
-	void FPlacingProcessor::MoveRight(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-		auto OnwerActorPtr = GetOwnerActor<AHumanCharacter>();
-		OnwerActorPtr->AddMovementInput(OnwerActorPtr->GetActorRightVector(), Value);
-	}
-
-	void FPlacingProcessor::ESCKeyPressed()
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
-	}
-
-	void FPlacingProcessor::QKeyPressed()
-	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr)
-		{
-			auto EnhancedInputLocalPlayerSubsystemPtr = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
-				Cast<APlayerController>(GetOwnerActor()->GetController())->GetLocalPlayer()
-			);
-			if (EnhancedInputLocalPlayerSubsystemPtr->GetPlayerInput()->IsPressed(EKeys::LeftAlt))
-			{
-				UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-			}
-		}
 	}
 
 	void FPlacingProcessor::OnPlaceItemPrev()
@@ -373,18 +311,4 @@ namespace HumanProcessor
 		}
 	}
 
-	void FPlacingProcessor::MouseLeftPressed()
-	{
-		if (bCanPlace)
-		{
-			BuildTargetPtr->GetStateController()->SwitchToNewState(EBuildingState::kPlaced);
-		}
-		else
-		{
-			BuildTargetPtr->Destroy();
-		}
-		BuildTargetPtr = nullptr;
-
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
-	}
 }

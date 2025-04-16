@@ -24,14 +24,6 @@ namespace HumanProcessor
 
 		virtual void QuitAction()override;
 
-		virtual void VKeyPressed()override;
-
-		virtual void BKeyPressed()override;
-
-		virtual void ESCKeyPressed()override;
-
-		virtual void PressedNumKey(int32 NumKey)override;
-
 	protected:
 
 	private:

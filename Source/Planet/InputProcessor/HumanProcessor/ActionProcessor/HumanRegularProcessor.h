@@ -27,70 +27,56 @@ namespace HumanProcessor
 	class FHumanRegularProcessor : public FHumanProcessor
 	{
 	private:
-
 		GENERATIONCLASSINFO(FHumanRegularProcessor, FHumanProcessor);
 
 	public:
 		using FOnAllocationChangedHandle =
-			TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-		FHumanRegularProcessor(FOwnerPawnType* CharacterPtr);
+		FHumanRegularProcessor(
+			FOwnerPawnType* CharacterPtr
+		);
 
 		virtual ~FHumanRegularProcessor();
 
-		virtual void EnterAction()override;
+		virtual void EnterAction() override;
 
-		virtual void QuitAction()override;
+		virtual void QuitAction() override;
 
-		virtual void InputKey(const FInputKeyParams& Params)override;
+	protected:
+		virtual bool InputKey(
+			const FInputKeyEventArgs& EventArgs
+		);
 
-		virtual void F1KeyPressed()override;
-
-		virtual void F2KeyPressed()override;
-		
-		virtual void F10KeyPressed()override;
-
-		virtual void EKeyPressed()override;
-
-		virtual void EKeyReleased()override;
-
-		virtual void FKeyPressed()override;
-
-		virtual void QKeyPressed()override;
-
-		virtual void GKeyPressed()override;
-
-		virtual void HKeyPressed()override;
-
-		virtual void XKeyPressed()override;
-
-		virtual void VKeyPressed()override;
-
-		virtual void BKeyPressed()override;
-
-		virtual void TabKeyPressed()override;
-
-		virtual void LAltKeyPressed()override;
-
-		virtual void LAltKeyReleased()override;
+		virtual bool InputAxis(
+			FViewport* Viewport,
+			FInputDeviceId InputDevice,
+			FKey Key,
+			float Delta,
+			float DeltaTime,
+			int32 NumSamples = 1,
+			bool bGamepad = false
+		);
 
 	private:
-
-		virtual void TickImp(float Delta)override;
+		virtual void TickImp(
+			float Delta
+		) override;
 
 		void SwitchCurrentWeapon();
 
-		void AddOrRemoveUseMenuItemEvent(bool bIsAdd);
+		void AddOrRemoveUseMenuItemEvent(
+			bool bIsAdd
+		);
 
 		void UpdateLookAtObject();
 
 		bool bIsPressdLeftAlt = false;
 
-		TMap<FKey, FCharacterSocket>HandleKeysMap;
+		TMap<FKey, FCharacterSocket> HandleKeysMap;
 
-		TMap<FKey, FGameplayFeatureKeyMap>GameplayFeatureKeyMapMap;
+		TMap<FKey, FGameplayFeatureKeyMap> GameplayFeatureKeyMapMap;
 
 		FOnAllocationChangedHandle OnAllocationChangedHandle;
-
 	};
 }

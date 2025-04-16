@@ -4,7 +4,9 @@
 #include "PlanetPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
-void UPlanetLocalPlayer::ReceivedPlayerController(APlayerController* NewController)
+void UPlanetLocalPlayer::ReceivedPlayerController(
+	APlayerController* NewController
+)
 {
 	Super::ReceivedPlayerController(NewController);
 
@@ -14,7 +16,19 @@ void UPlanetLocalPlayer::ReceivedPlayerController(APlayerController* NewControll
 	}
 }
 
-bool UPlanetLocalPlayer::SpawnPlayActor(const FString& URL, FString& OutError, UWorld* InWorld)
+bool UPlanetLocalPlayer::SpawnPlayActor(
+	const FString& URL,
+	FString& OutError,
+	UWorld* InWorld
+)
 {
 	return Super::SpawnPlayActor(URL, OutError, InWorld);
+}
+
+void UPlanetLocalPlayer::PlayerAdded(
+	class UGameViewportClient* InViewportClient,
+	FPlatformUserId InUserId
+)
+{
+	Super::PlayerAdded(InViewportClient, InUserId);
 }

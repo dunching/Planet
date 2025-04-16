@@ -91,6 +91,8 @@ namespace HumanProcessor
 	{
 		Super::EnterAction();
 
+		SwitchShowCursor(true);
+			
 		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEndangeredLayout);
 	}
 

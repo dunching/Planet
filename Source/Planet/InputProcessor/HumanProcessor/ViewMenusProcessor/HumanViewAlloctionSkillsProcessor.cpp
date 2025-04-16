@@ -71,19 +71,6 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FHumanViewAlloctionSkillsProcessor::VKeyPressed()
-	{
-	}
-
-	void FHumanViewAlloctionSkillsProcessor::BKeyPressed()
-	{
-	}
-
-	void FHumanViewAlloctionSkillsProcessor::PressedNumKey(int32 NumKey)
-	{
-
-	}
-
 	void FHumanViewAlloctionSkillsProcessor::CheckInteraction()
 	{
 	}

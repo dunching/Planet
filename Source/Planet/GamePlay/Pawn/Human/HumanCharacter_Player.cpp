@@ -5,8 +5,8 @@
 #include "CollisionDataStruct.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerInput.h"
-#include "GravitySpringArmComponent.h"
 
+#include "GravitySpringArmComponent.h"
 #include "PlayerComponent.h"
 #include "GroupManagger.h"
 #include "GuideSubSystem.h"
@@ -18,11 +18,13 @@
 #include "PlanetPlayerController.h"
 
 #include "ChallengeEntry.h"
+#include "EnhancedInputComponent.h"
 #include "InteractionList.h"
 #include "MainHUDLayout.h"
 #include "SceneActor.h"
 #include "HumanInteractionWithNPC.h"
 #include "HumanInteractionWithChallengeEntry.h"
+#include "InputActions.h"
 #include "ResourceBoxBase.h"
 #include "STT_CommonData.h"
 
@@ -81,18 +83,22 @@ void AHumanCharacter_Player::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
+	PlayerComponentPtr->PossessedBy(Cast<APlayerController>(NewController));
+		
+	auto GroupsHelperSPtr = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
+	if (GroupsHelperSPtr)
 	{
-		auto GroupsHelperSPtr = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
-		if (GroupsHelperSPtr)
-		{
-			TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
-				std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
-			);
-		}
+		TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
+			std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
+		);
 	}
-#endif
+}
+
+void AHumanCharacter_Player::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+	
+	PlayerComponentPtr->PossessedBy(Cast<APlayerController>(Controller));
 }
 
 void AHumanCharacter_Player::UnPossessed()
@@ -110,6 +116,14 @@ bool AHumanCharacter_Player::TeleportTo(
 	PlayerComponentPtr->TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
 
 	return Super::TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
+}
+
+void AHumanCharacter_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	// 只在 ROLE_AutonomousProxy 运行
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerComponentPtr->SetupPlayerInputComponent(PlayerInputComponent);
 }
 
 void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()

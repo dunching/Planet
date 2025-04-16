@@ -26,13 +26,6 @@ void USkill_Active_BYWD::PerformAction(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
-		CommitAbility(Handle, ActorInfo, ActivationInfo);
-	}
-#endif
-	
-#if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
-	{
 		// CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
 		// CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
 		// CharacterStateInfoSPtr->Duration = Duration;
@@ -98,8 +91,26 @@ bool USkill_Active_BYWD::CommitAbility(
 	return Super::CommitAbility(Handle, ActorInfo, ActivationInfo, OptionalRelevantTags);
 }
 
+void USkill_Active_BYWD::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	{
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
 void USkill_Active_BYWD::ApplyCooldown(const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
+                                       const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo) const
 {
 	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
 	if (CooldownGE)

@@ -38,12 +38,6 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FPlacingGroundProcessor::MouseWheel(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-		RotAngle += Value * 5;
-	}
-
 	void FPlacingGroundProcessor::AttachActor(const FCaptureInfo& CaptureInfo)
 	{
 		if (!BuildTargetPtr)

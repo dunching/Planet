@@ -28,21 +28,6 @@ namespace HumanProcessor
 	{
 	}
 
-	void FPlacingCellProcessor::MouseLeftPressed()
-	{
-		if (bCanPlace)
-		{
-			if (CaptureInfoSPtr)
-			{
-				auto BuildingCaptureDataPtr = Cast<ABuildingCaptureData>(CaptureInfoSPtr->CapturePtPtr->GetParentActor());
-				if (BuildingCaptureDataPtr)
-				{
-				}
-			}
-		}
-		Super::MouseLeftPressed(); 
-	}
-
 	void FPlacingCellProcessor::AttachActor(const FCaptureInfo& CaptureInfo)
 	{
 		if (!BuildTargetPtr)

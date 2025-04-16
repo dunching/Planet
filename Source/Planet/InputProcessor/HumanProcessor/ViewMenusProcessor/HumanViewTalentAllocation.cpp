@@ -66,24 +66,7 @@ namespace HumanProcessor
 
 		Super::QuitAction();
 	}
-
-	void FHumanViewTalentAllocation::GKeyPressed()
-	{
-	}
-
-	void FHumanViewTalentAllocation::VKeyPressed()
-	{
-	}
-
-	void FHumanViewTalentAllocation::BKeyPressed()
-	{
-	}
-
-	void FHumanViewTalentAllocation::PressedNumKey(int32 NumKey)
-	{
-
-	}
-
+	
 	void FHumanViewTalentAllocation::CheckInteraction()
 	{
 	}

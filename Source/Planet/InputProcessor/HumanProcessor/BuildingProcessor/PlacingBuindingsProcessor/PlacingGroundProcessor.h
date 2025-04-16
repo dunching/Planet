@@ -26,8 +26,6 @@ namespace HumanProcessor
 
 		virtual void QuitAction()override;
 
-		virtual void MouseWheel(const FInputActionValue& InputActionValue)override;
-
 	protected:
 
 		virtual void AttachActor(const FCaptureInfo& CaptureInfo)override;

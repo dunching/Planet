@@ -11,6 +11,8 @@
 
 #include "RegularActionLayout.generated.h"
 
+struct FOnAttributeChangeData;
+
 class UMainUILayout;
 class URaffleMenu;
 class UPawnStateActionHUD;
@@ -110,6 +112,8 @@ protected:
 
 	// 进度条/工具
 	UProgressTips* ViewProgressTips(bool bIsViewMenus);
+
+	void OnHPChanged(const FOnAttributeChangeData&);
 
 	UFocusIcon* FocusIconPtr = nullptr;
 

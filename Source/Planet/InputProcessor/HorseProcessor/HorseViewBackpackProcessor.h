@@ -30,12 +30,6 @@ namespace HorseProcessor
 
 		virtual void QuitAction()override;
 
-		virtual void BKeyPressed()override;
-
-		virtual void EKeyPressed()override;
-
-		virtual void ESCKeyPressed()override;
-
 	protected:
 
 	private:

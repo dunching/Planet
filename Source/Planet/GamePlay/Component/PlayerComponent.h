@@ -11,7 +11,10 @@
 
 #include "PlayerComponent.generated.h"
 
+struct FInputActionValue;
+
 class USceneComponent;
+class UInputActions;
 class AHumanCharacter_Player;
 
 /**
@@ -40,4 +43,21 @@ public:
 		bool bNoCheck=false
 		);
 	
+	virtual void PossessedBy(APlayerController* NewController);
+
+	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
+
+protected:
+	
+	virtual void MoveForward(const FInputActionValue& InputActionValue);
+
+	virtual void MoveRight(const FInputActionValue& InputActionValue);
+
+	virtual void AddPitchInput(const FInputActionValue& InputActionValue);
+
+	virtual void AddYawInput(const FInputActionValue& InputActionValue);
+
+	UPROPERTY()
+	UInputActions* InputActionsPtr = nullptr;
+
 };

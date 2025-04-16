@@ -70,12 +70,24 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
 	int32 MaxPerformSpeed = 300;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey DashKey = EKeys::LeftShift;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey RunKey = EKeys::LeftControl;
+
 	static int32 MaxTeammateNum;
 
 protected:
+	/**
+	 * 
+	 */
 	// UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<FGameplayFeatureKeyMap> GameplayFeatureKeyMapAry;
 
+	/**
+	 * 技能槽对应的按键
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<FGameplayTag, FKey> ActionKeyMap;
 

@@ -108,6 +108,8 @@ void USkill_WeaponActive_Base::EndAbility(
 	bool bWasCancelled
 )
 {
+	WaitInput = true;
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

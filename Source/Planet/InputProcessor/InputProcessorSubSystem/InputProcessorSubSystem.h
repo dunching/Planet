@@ -23,6 +23,11 @@ class APlanetPlayerController;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FSYKeyEvent, EInputEvent);
 
+/**
+ * 对于输入处理方式
+ * 如正常模式下WASD和鼠标会控制玩家角色
+ * 在浏览菜单时WASD则是其他的行为
+ */
 UCLASS(BlueprintType, Blueprintable)
 class UInputProcessorSubSystem : public UGameInstanceSubsystem
 {
@@ -43,8 +48,6 @@ public:
 
 	TSharedPtr<FInputProcessor>& GetCurrentAction();
 
-	void BindAction(UInputComponent* PlayerInputComponent);
-
 	template<typename ProcessorType>
 	void SwitchToProcessor();
 
@@ -59,102 +62,21 @@ public:
 
 	void RemoveKeyEvent(FDelegateHandle DelegateHandle);
 
-	UPROPERTY()
-	UInputActions* InputActionsPtr = nullptr;
+	virtual bool InputKey(
+		const FInputKeyEventArgs& EventArgs
+	) ;
 
+	virtual bool InputAxis(
+		FViewport* Viewport,
+		FInputDeviceId InputDevice,
+		FKey Key,
+		float Delta,
+		float DeltaTime,
+		int32 NumSamples = 1,
+		bool bGamepad = false
+	) ;
+	
 protected:
-
-	void InputKey(const FInputKeyParams& Params);
-
-	void MoveForward(const FInputActionValue& InputActionValue);
-
-	void MoveRight(const FInputActionValue& InputActionValue);
-
-	void MoveUp(const FInputActionValue& InputActionValue);
-
-	void MouseWheel(const FInputActionValue& InputActionValue);
-
-	void AddPitchInput(const FInputActionValue& InputActionValue);
-
-	void AddYawInput(const FInputActionValue& InputActionValue);
-
-	void F1KeyPressed();
-
-	void F2KeyPressed();
-
-	void F10KeyPressed();
-
-	void QKeyPressed();
-
-	void WKeyPressed();
-
-	void WKeyReleased();
-
-	void EKeyPressed();
-
-	void EKeyReleased();
-
-	void RKeyPressed();
-
-	void TKeyPressed();
-
-	void YKeyPressed();
-
-	void AKeyPressed();
-
-	void AKeyReleased();
-
-	void SKeyPressed();
-
-	void SKeyReleased();
-
-	void DKeyPressed();
-
-	void DKeyReleased();
-
-	void FKeyPressed();
-
-	void CKeyPressed();
-
-	void XKeyPressed();
-
-	void VKeyPressed();
-
-	void BKeyPressed();
-
-	void GKeyPressed();
-
-	void HKeyPressed();
-
-	void ESCKeyPressed();
-
-	void TabKeyPressed();
-
-	void LCtrlKeyPressed();
-
-	void LCtrlKeyReleased();
-
-	void LAltKeyPressed();
-
-	void LAltKeyReleased();
-
-	void LShiftKeyPressed();
-
-	void LShiftKeyReleased();
-
-	void SpaceKeyPressed();
-
-	void SpaceKeyReleased();
-
-	void MouseLeftPressed();
-
-	void MouseLeftReleased();
-
-	void MouseRightPressed();
-
-	void MouseRightReleased();
-
-	void PressedNumKeyIndex(int32 KeyVal);
 
 	UFUNCTION()
 	bool Tick(float DeltaTime);

@@ -90,6 +90,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Animation");
         PublicIncludePaths.Add("Planet/Animation/Horse");
         PublicIncludePaths.Add("Planet/Animation/Human");
+        PublicIncludePaths.Add("Planet/Transition");
         PublicIncludePaths.Add("Planet/UI");
         PublicIncludePaths.Add("Planet/UI/Hover");
         PublicIncludePaths.Add("Planet/UI/Hover/DestroyProgress");
@@ -147,7 +148,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/AssetRefMap");
         PublicIncludePaths.Add("Planet/GameOptions");
         PublicIncludePaths.Add("Planet/CameraTrailHelper");
-        PublicIncludePaths.Add("Planet/InputProcessor/InputComponent");
+        PublicIncludePaths.Add("Planet/InputProcessor/InputProcessorSubSystem");
         PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HorseProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor");

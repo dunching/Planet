@@ -65,23 +65,6 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FHumanViewRaffleMenuProcessor::F10KeyPressed()
-	{
-	}
-
-	void FHumanViewRaffleMenuProcessor::VKeyPressed()
-	{
-	}
-
-	void FHumanViewRaffleMenuProcessor::BKeyPressed()
-	{
-	}
-
-	void FHumanViewRaffleMenuProcessor::PressedNumKey(int32 NumKey)
-	{
-
-	}
-
 	void FHumanViewRaffleMenuProcessor::CheckInteraction()
 	{
 	}

@@ -76,22 +76,7 @@ namespace HorseProcessor
 
 		Super::QuitAction();
 	}
-
-	void FHorseViewBackpackProcessor::BKeyPressed()
-	{
-		ESCKeyPressed();
-	}
-
-	void FHorseViewBackpackProcessor::EKeyPressed()
-	{
-
-	}
-
-	void FHorseViewBackpackProcessor::ESCKeyPressed()
-	{
-	//	UInputProcessorSubSystem::GetInstance()->SwitchActionProcess<FRegularProcessor>();
-	}
-
+	
 	void FHorseViewBackpackProcessor::CheckInteraction()
 	{
 	}

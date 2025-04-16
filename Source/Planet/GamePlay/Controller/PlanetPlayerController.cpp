@@ -207,15 +207,6 @@ void APlanetPlayerController::BeginPlay()
 		auto CurrentPawn = GetPawn();
 		if (CurrentPawn->IsA(AHumanCharacter::StaticClass()))
 		{
-			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<
-				UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
-			{
-				Subsystem->AddMappingContext(
-					UInputProcessorSubSystem::GetInstance()->InputActionsPtr->InputMappingContext,
-					0
-				);
-			}
-
 			FInputModeGameOnly InputMode;
 			SetInputMode(InputMode);
 		}
@@ -378,8 +369,6 @@ void APlanetPlayerController::SetPawn(APawn* InPawn)
 bool APlanetPlayerController::InputKey(const FInputKeyParams& Params)
 {
 	auto Result = Super::InputKey(Params);
-
-	UInputProcessorSubSystem::GetInstance()->InputKey(Params);
 
 	return Result;
 }

@@ -2,58 +2,21 @@
 #include "HumanProcessor.h"
 
 #include "DrawDebugHelpers.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
-#include "Camera/CameraComponent.h"
-#include "AIController.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Kismet/KismetMathLibrary.h"
-#include <Kismet/GameplayStatics.h>
-#include <Subsystems/SubsystemBlueprintLibrary.h>
 #include "Async/Async.h"
-#include "Components/CapsuleComponent.h"
-#include "AbilitySystemComponent.h"
-#include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "Engine/LocalPlayer.h"
-#include "AbilitySystemBlueprintLibrary.h"
+#include "EnhancedInputSubsystems.h"
 
-#include "LogHelper/LogWriter.h"
-#include "ThreadPoolHelper/ThreadLibrary.h"
 #include "ToolsLibrary.h"
-#include "Animation/AnimInstanceBase.h"
-#include "GenerateType.h"
 #include "PlanetPlayerState.h"
 #include "CharacterBase.h"
-#include "ArticleBase.h"
 #include "HumanCharacter_Player.h"
 #include "PlacingBuildingAreaProcessor.h"
 #include "ActionTrackVehiclePlace.h"
-#include "PlacingWallProcessor.h"
-#include "PlacingGroundProcessor.h"
-#include "ProxyProcessComponent.h"
-#include "ToolsMenu.h"
-#include <BackpackMenu.h>
-#include "UIManagerSubSystem.h"
-#include <Character/GravityMovementComponent.h>
 #include <DestroyProgress.h>
-#include "InputProcessorSubSystem.h"
-#include "HumanViewBackpackProcessor.h"
 #include "HorseProcessor.h"
-#include "HumanProcessor.h"
-#include "Planet.h"
-#include "PlanetGameInstance.h"
-#include "HorseCharacter.h"
-#include "PlanetGameplayAbility.h"
-#include "BasicFutures_Dash.h"
-#include "AssetRefMap.h"
-#include "BuildingBaseProcessor.h"
-#include "CharacterAttributesComponent.h"
-#include "BuildSharedData.h"
-#include "BuildingBase.h"
-#include "CollisionDataStruct.h"
-#include "CharacterAttibutes.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "HumanRegularProcessor.h"
+#include "GameOptions.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugHumanProcessor(
@@ -75,58 +38,42 @@ namespace HumanProcessor
 		Super::EnterAction();
 	}
 
-	void FHumanProcessor::MoveForward(const FInputActionValue& InputActionValue)
+	bool FHumanProcessor::InputKey(
+		const FInputKeyEventArgs& EventArgs
+	)
 	{
-		const auto Value = InputActionValue.Get<float>();
-
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr->Controller != nullptr)
+		switch (EventArgs.Event)
 		{
-			const FRotator Rotation = OnwerActorPtr->Controller->GetControlRotation();
-
-			const FVector ForwardDirection = 
-				UKismetMathLibrary::MakeRotFromZX(-OnwerActorPtr->GetGravityDirection(), Rotation.Quaternion().GetForwardVector()).Vector();
-
-#ifdef WITH_EDITOR
-			if (DrawDebugHumanProcessor.GetValueOnGameThread())
+		case IE_Pressed:
 			{
-				DrawDebugLine(GetWorldImp(), OnwerActorPtr->GetActorLocation(), OnwerActorPtr->GetActorLocation() + (100 * ForwardDirection), FColor::Red, false, 3);
+				if (EventArgs.Key == EKeys::LeftAlt)
+				{
+					SwitchShowCursor(true);
+				}
+				
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+				
+				if (EventArgs.Key == GameOptionsPtr->DashKey)
+				{
+					Dash();
+				}
+				else if (EventArgs.Key == GameOptionsPtr->RunKey)
+				{
+					SwitchWalkingOrRunning();
+				}
 			}
-#endif
-			OnwerActorPtr->AddMovementInput(ForwardDirection, Value);
+			break;
+		case IE_Released:
+			{
+				if (EventArgs.Key == EKeys::LeftAlt)
+				{
+					SwitchShowCursor(false);
+				}
+			}
+			break;
 		}
-	}
 
-	void FHumanProcessor::MoveRight(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr->Controller != nullptr)
-		{
-			const FRotator Rotation = OnwerActorPtr->Controller->GetControlRotation();
-
-			const FVector RightDirection = Rotation.Quaternion().GetRightVector();
-
-			OnwerActorPtr->AddMovementInput(RightDirection, Value);
-		}
-	}
-
-	void FHumanProcessor::AddPitchInput(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		OnwerActorPtr->AddControllerPitchInput(Value);
-	}
-
-	void FHumanProcessor::AddYawInput(const FInputActionValue& InputActionValue)
-	{
-		const auto Value = InputActionValue.Get<float>();
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-		OnwerActorPtr->AddControllerYawInput(Value);
+		return FInputProcessor::InputKey(EventArgs);
 	}
 
 	void FHumanProcessor::SwitchWalkingOrRunning()
@@ -146,12 +93,7 @@ namespace HumanProcessor
 		}
 	}
 
-	void FHumanProcessor::LCtrlKeyPressed()
-	{
-		SwitchWalkingOrRunning();
-	}
-
-	void FHumanProcessor::LShiftKeyPressed()
+	void FHumanProcessor::Dash()
 	{
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 
@@ -186,23 +128,5 @@ namespace HumanProcessor
 
 			OnwerActorPtr->GetCharacterAbilitySystemComponent()->Dash(DashDirection);
 		}
-	}
-
-	void FHumanProcessor::LShiftKeyReleased()
-	{
-	}
-
-	void FHumanProcessor::SpaceKeyPressed()
-	{
-		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
-
-		if (OnwerActorPtr)
-		{
-			OnwerActorPtr->GetCharacterAbilitySystemComponent()->Jump();
-		}
-	}
-
-	void FHumanProcessor::SpaceKeyReleased()
-	{
 	}
 }

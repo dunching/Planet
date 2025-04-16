@@ -52,78 +52,7 @@ namespace HorseProcessor
 
 		virtual void BeginDestroy();
 
-		virtual void MoveForward(const FInputActionValue& InputActionValue)override;
-
-		virtual void MoveRight(const FInputActionValue& InputActionValue)override;
-
-		virtual void MoveUp(const FInputActionValue& InputActionValue)override;
-
-		virtual void MouseWheel(const FInputActionValue& InputActionValue)override;
-
-		virtual void AddPitchInput(const FInputActionValue& InputActionValue)override;
-
-		virtual void AddYawInput(const FInputActionValue& InputActionValue)override;
-
-		virtual void WKeyPressed()override;
-
-		virtual void WKeyReleased()override;
-
-		virtual void AKeyPressed()override;
-
-		virtual void AKeyReleased()override;
-
-		virtual void SKeyPressed()override;
-
-		virtual void SKeyReleased()override;
-
-		virtual void DKeyPressed()override;
-
-		virtual void DKeyReleased()override;
-
-		virtual void EKeyPressed()override;
-
-		virtual void EKeyReleased()override;
-
-		virtual void RKeyPressed()override;
-
-		virtual void TKeyPressed()override;
-
-		virtual void YKeyPressed()override;
-
-		virtual void FKeyPressed()override;
-
-		virtual void BKeyPressed()override;
-
-		virtual void GKeyPressed()override;
-
-		virtual void ESCKeyPressed()override;
-
-		virtual void LCtrlKeyPressed()override;
-
-		virtual void LCtrlKeyReleased()override;
-
-		virtual void LShiftKeyPressed()override;
-
-		virtual void LShiftKeyReleased()override;
-
-		virtual void SpaceKeyPressed()override;
-
-		virtual void SpaceKeyReleased()override;
-
-		virtual void MouseLeftReleased()override;
-
-		virtual void MouseLeftPressed()override;
-
-		virtual void MouseRightReleased()override;
-
-		virtual void MouseRightPressed()override;
-
-		virtual void PressedNumKey(int32 NumKey)override;
-
 	protected:
-
-		virtual void TickImp(float Delta)override;
-
 	private:
 
 		FTimerHandle TimerHandle;

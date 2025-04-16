@@ -70,25 +70,6 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FViewBackpackProcessor::VKeyPressed()
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
-	}
-
-	void FViewBackpackProcessor::BKeyPressed()
-	{
-	}
-
-	void FViewBackpackProcessor::ESCKeyPressed()
-	{
-		Super::ESCKeyPressed();
-	}
-
-	void FViewBackpackProcessor::PressedNumKey(int32 NumKey)
-	{
-
-	}
-
 	void FViewBackpackProcessor::CheckInteraction()
 	{
 	}

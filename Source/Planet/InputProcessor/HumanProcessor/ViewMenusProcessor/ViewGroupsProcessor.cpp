@@ -62,28 +62,6 @@ namespace HumanProcessor
 		Super::QuitAction();
 	}
 
-	void FViewGroupsProcessor::GKeyPressed()
-	{
-	}
-
-	void FViewGroupsProcessor::VKeyPressed()
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
-	}
-
-	void FViewGroupsProcessor::BKeyPressed()
-	{
-	}
-
-	void FViewGroupsProcessor::HKeyPressed()
-	{
-	}
-
-	void FViewGroupsProcessor::PressedNumKey(int32 NumKey)
-	{
-
-	}
-
 	void FViewGroupsProcessor::CheckInteraction()
 	{
 	}

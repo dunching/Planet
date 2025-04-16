@@ -86,6 +86,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	/**
+	 * ROLE_AutonomousProxy的数据准备好时
+	 */
 	UFUNCTION()
 	virtual void OnRep_GroupSharedInfoChanged();
 
@@ -143,8 +146,6 @@ protected:
 	virtual void Destroyed() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 

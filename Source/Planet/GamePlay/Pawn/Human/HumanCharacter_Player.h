@@ -101,6 +101,8 @@ protected:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void OnRep_Controller() override;
+
 	virtual void UnPossessed() override;
 	
 	virtual bool TeleportTo(
@@ -110,6 +112,8 @@ protected:
 		bool bNoCheck=false
 		)override;
 	
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
 	virtual void OnRep_GroupSharedInfoChanged() override;
 
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;

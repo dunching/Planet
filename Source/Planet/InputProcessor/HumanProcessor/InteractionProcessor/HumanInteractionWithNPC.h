@@ -28,8 +28,6 @@ namespace HumanProcessor
 
 		virtual void QuitAction() override;
 
-		virtual void ESCKeyPressed()override;
-
 		AHumanCharacter_AI* CharacterPtr = nullptr;
 		
 	protected:
