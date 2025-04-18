@@ -9,9 +9,10 @@
 #include "HumanCharacter.h"
 #include "HumanAIController.h"
 #include "AIComponent.h"
+#include "HumanCharacter_AI.h"
 
 UFormationComponent::UFormationComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+                                                                                     Super(ObjectInitializer)
 {
 	// SetIsReplicatedByDefault(true);
 }
@@ -62,7 +63,6 @@ void AGeneratorColonyWithPath::BeginPlay()
 					continue;
 				}
 
-				ControllerPtr->PathFollowComponentPtr = ChildAry[Index];
 			}
 		}
 	}
@@ -86,6 +86,20 @@ void AGeneratorColonyWithPath::Tick(float DeltaSeconds)
 		FormationComponentPtr->SetRelativeTransform(Transform);
 	}
 #endif
+}
+
+void AGeneratorNPCs_Patrol::CustomizerFunc(
+	AActor* TargetActorPtr
+)
+{
+	Super::CustomizerFunc(TargetActorPtr);
+
+	auto HumanCharacterPtr = Cast<AHumanCharacter_AI>(TargetActorPtr);
+	if (HumanCharacterPtr)
+	{
+		HumanCharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr = this;
+	}
+
 }
 
 AGeneratorColony_ByInvoke::AGeneratorColony_ByInvoke(

@@ -27,6 +27,5 @@ public:
 
 	virtual void CreateChildActor(TFunction<void(AActor*)> CustomizerFunc = nullptr)override;
 
-	virtual void RespawnChildActor(TFunction<void(AActor*)> CustomizerFunc = nullptr);
-	
+	virtual void RespawnChildActor();
 };

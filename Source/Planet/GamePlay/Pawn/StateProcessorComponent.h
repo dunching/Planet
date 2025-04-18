@@ -33,8 +33,13 @@ struct FGameplayAbilityTargetData_MoveToAttaclArea;
 struct FGameplayAbilityTargetData;
 struct FCharacterStateInfo;
 
+/*
+ *	状态相关
+ * 获得某些状态标签是Character要进行的变化
+ * 
+ */
 UCLASS(BlueprintType, Blueprintable)
-class UStateProcessorComponent :
+class PLANET_API UStateProcessorComponent :
 	public UActorComponent,
 	public IGroupManaggerInterface
 {
@@ -47,6 +52,9 @@ public:
 
 	using FOwnerPawnType = ACharacterBase;
 
+	using FOnFocusCharacterDelegate =
+	TCallbackHandleContainer<void(ACharacterBase*)>;
+
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
 	using FCharacterStateMapChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterStateInfo>&, bool)>;
@@ -57,13 +65,26 @@ public:
 
 	UStateProcessorComponent(const FObjectInitializer& ObjectInitializer);
 
+	/**
+	 * 锁定敌人
+	 */
+	virtual void FocusTarget();
+	
+	void SetFocusCharactersAry(ACharacterBase*TargetCharacterPtr);
+	
+	void ClearFocusCharactersAry();
+	
+	TArray<ACharacterBase*> GetFocusCharactersAry()const;
+	
 	TSharedPtr<FCharacterStateInfo> GetCharacterState(const FGameplayTag& CSTag)const;
-
+	
 	auto BindCharacterStateChanged(const std::function<void(ECharacterStateType, UCS_Base*)>& Func)
 		-> FCharacterStateChanged::FCallbackHandleSPtr;
 
 	auto BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func)
 		-> FCharacterStateMapChanged::FCallbackHandleSPtr;
+
+	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
 protected:
 
@@ -124,6 +145,21 @@ protected:
 
 	UPROPERTY(Replicated)
 	FCharacterStateInfo_FASI_Container CharacterStateInfo_FASI_Container;
+
+	UFUNCTION(Server, Reliable)
+	void SetFocusCharactersAry_Server(ACharacterBase*TargetCharacterPtr);
+	
+	UFUNCTION(Server, Reliable)
+	void ClearFocusCharactersAry_Server();
+
+private:
+	
+	/**
+	 * 这个角色锁定的目标，第0个为主要锁定
+	 * 为什么不用Controller UpdateRotation去做？因为我们要在移动组件里统一设置旋转
+	 */
+	UPROPERTY(Replicated)
+	TArray<ACharacterBase*> FocusCharactersAry;
 
 	// 每个连接都会有的 “状态信息”
 	TMap<FGuid, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;

@@ -191,6 +191,14 @@ namespace HumanProcessor
 					return false;
 				}
 
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+				
+				if (EventArgs.Key == GameOptionsPtr->FocusTarget)
+				{
+					OnwerActorPtr->GetStateProcessorComponent()->FocusTarget();
+					return true;
+				}
+				
 				// 特殊处理一下
 				if (OnwerActorPtr->LookAtSceneActorPtr && (EventArgs.Key == EKeys::E))
 				{
@@ -212,6 +220,7 @@ namespace HumanProcessor
 					OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
 
 					OnwerActorPtr->GetProxyProcessComponent()->ActiveAction(SkillIter->Socket);
+					return true;
 				}
 
 				// 这里应该是特定的输入会打断 还是任意输入都会打断？
@@ -223,6 +232,7 @@ namespace HumanProcessor
 				)
 				{
 					OnwerActorPtr->GetCharacterAbilitySystemComponent()->BreakMoveToAttackDistance();
+					return true;
 				}
 			}
 			break;
@@ -237,6 +247,7 @@ namespace HumanProcessor
 					)
 					{
 						OnwerActorPtr->GetProxyProcessComponent()->CancelAction(SkillIter->Socket);
+						return true;
 					}
 				}
 			}

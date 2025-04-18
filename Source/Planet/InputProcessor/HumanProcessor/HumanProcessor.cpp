@@ -56,10 +56,12 @@ namespace HumanProcessor
 				if (EventArgs.Key == GameOptionsPtr->DashKey)
 				{
 					Dash();
+					return true;
 				}
 				else if (EventArgs.Key == GameOptionsPtr->RunKey)
 				{
 					SwitchWalkingOrRunning();
+					return true;
 				}
 			}
 			break;

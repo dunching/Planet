@@ -9,6 +9,7 @@
 #include "Weapon_Base.h"
 #include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
+#include "StateProcessorComponent.h"
 
 UScriptStruct* FGameplayAbilityTargetData_SkillBase_RegisterParam::GetScriptStruct() const
 {
@@ -185,7 +186,7 @@ bool USkill_Base::CheckTargetInDistance(int32 InDistance) const
 	if (CharacterPtr->IsPlayerControlled())
 	{
 		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		ACharacterBase* TargetCharacterPtr = nullptr;
 		if (TargetCharacterPtr)
 		{
 			const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(),
@@ -213,13 +214,16 @@ bool USkill_Base::CheckTargetIsEqualDistance(int32 InDistance) const
 	const float Tolerance = 5.f;
 	if (CharacterPtr->IsPlayerControlled())
 	{
-		auto PCPtr = CharacterPtr->GetController<APlanetPlayerController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
-		if (TargetCharacterPtr)
+		auto FocusCharactersAry =CharacterPtr->GetStateProcessorComponent()->GetFocusCharactersAry();
+		if (FocusCharactersAry.IsValidIndex(0))
 		{
-			const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(),
-			                                        CharacterPtr->GetActorLocation());
-			return FMath::IsNearlyEqual(Distance, InDistance, Tolerance);
+			auto TargetCharacterPtr =FocusCharactersAry[0];
+			if (TargetCharacterPtr)
+			{
+				const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(),
+														CharacterPtr->GetActorLocation());
+				return FMath::IsNearlyEqual(Distance, InDistance, Tolerance);
+			}
 		}
 	}
 	else

@@ -7,6 +7,7 @@
 #include "ConversationComponent.h"
 #include "HumanCharacter.h"
 #include "SceneActorInteractionComponent.h"
+#include "StateProcessorComponent.h"
 
 #include "HumanCharacter_Player.generated.h"
 
@@ -21,6 +22,7 @@ class USpringArmComponent;
 class UCameraComponent;
 
 class UInteractionList;
+class AHumanCharacter_Player;
 
 /**
  *
@@ -33,6 +35,22 @@ class PLANET_API USceneCharacterPlayerInteractionComponent : public USceneActorI
 public:
 
 	FOnPlayerInteraction OnPlayerInteraction;
+	
+};
+
+/**
+ *
+ */
+UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
+class PLANET_API UCharacterPlayerStateProcessorComponent : public UStateProcessorComponent
+{
+	GENERATED_BODY()
+
+public:
+
+	using FOwnerType = AHumanCharacter_Player;
+
+	virtual void FocusTarget() override;
 	
 };
 

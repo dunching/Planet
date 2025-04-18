@@ -46,9 +46,17 @@
 #include "SceneActor.h"
 #include "GE_CharacterInitail.h"
 #include "GroupManagger.h"
+#include "PlanetCharacterMovementComponent.h"
 
-ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+ACharacterBase::ACharacterBase(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(
+	  ObjectInitializer.
+	  SetDefaultSubobjectClass<UPlanetCharacterMovementComponent>(
+		  CharacterMovementComponentName
+	  )
+  )
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -58,7 +66,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 		GetMesh()->SetHiddenInGame(true);
 
 		GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
-		
+
 		CopyPoseMeshPtr = CreateOptionalDefaultSubobject<USkeletalMeshComponent>(TEXT("CopyMesh"));
 		if (CopyPoseMeshPtr)
 		{
@@ -73,7 +81,7 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 			CopyPoseMeshPtr->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		}
 	}
-	
+
 	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
 		UCharacterAttributesComponent::ComponentName
 	);
@@ -82,32 +90,41 @@ ACharacterBase::ACharacterBase(const FObjectInitializer& ObjectInitializer) :
 	AbilitySystemComponentPtr = CreateDefaultSubobject<UCharacterAbilitySystemComponent>(
 		UCharacterAbilitySystemComponent::ComponentName
 	);
-	AbilitySystemComponentPtr->AddSpawnedAttribute(CreateDefaultSubobject<UAS_Character>(
-		TEXT("CharacterAttributes1")
-	));
+	AbilitySystemComponentPtr->AddSpawnedAttribute(
+		CreateDefaultSubobject<UAS_Character>(
+			TEXT("CharacterAttributes1")
+		)
+	);
 
 	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(
-		UTalentAllocationComponent::ComponentName);
+		UTalentAllocationComponent::ComponentName
+	);
 
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(
-		UStateProcessorComponent::ComponentName);
+		UStateProcessorComponent::ComponentName
+	);
 
 	CharacterTitleComponentPtr = CreateDefaultSubobject<UCharacterTitleComponent>(
-		UCharacterTitleComponent::ComponentName);
+		UCharacterTitleComponent::ComponentName
+	);
 	CharacterTitleComponentPtr->SetupAttachment(RootComponent);
 
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
-	
+
 	ConversationComponentPtr = CreateDefaultSubobject<UConversationComponent>(UConversationComponent::ComponentName);
-	
-	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(USceneActorInteractionComponent::ComponentName);
+
+	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(
+		USceneActorInteractionComponent::ComponentName
+	);
 }
 
 ACharacterBase::~ACharacterBase()
 {
 }
 
-void ACharacterBase::OnConstruction(const FTransform& Transform)
+void ACharacterBase::OnConstruction(
+	const FTransform& Transform
+)
 {
 	Super::OnConstruction(Transform);
 }
@@ -117,7 +134,7 @@ void ACharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	HasBeenEndedLookAt();
-	
+
 	SwitchAnimLink(EAnimLinkClassType::kUnarmed);
 
 	auto CharacterAttributeSetPtr = GetCharacterAttributesComponent()->GetCharacterAttributes();
@@ -161,7 +178,9 @@ void ACharacterBase::Destroyed()
 	Super::Destroyed();
 }
 
-void ACharacterBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void ACharacterBase::EndPlay(
+	const EEndPlayReason::Type EndPlayReason
+)
 {
 	if (HPChangedHandle)
 	{
@@ -189,7 +208,9 @@ void ACharacterBase::PostInitializeComponents()
 	}
 }
 
-void ACharacterBase::PossessedBy(AController* NewController)
+void ACharacterBase::PossessedBy(
+	AController* NewController
+)
 {
 	Super::PossessedBy(NewController);
 
@@ -201,12 +222,12 @@ void ACharacterBase::PossessedBy(AController* NewController)
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
 		// GroupManaggerPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
-		
+
 		// if (auto ControllerPtr = GetController<AHumanAIController>())
 		// {
 		// 	ControllerPtr->SetGroupSharedInfo(GetGroupSharedInfo());
 		// }
-		
+
 		// OnGroupManaggerReady(GetGroupSharedInfo());
 	}
 }
@@ -302,13 +323,17 @@ USkeletalMeshComponent* ACharacterBase::GetCopyPoseMesh() const
 	return CopyPoseMeshPtr;
 }
 
-bool ACharacterBase::IsGroupmate(ACharacterBase* TargetCharacterPtr) const
+bool ACharacterBase::IsGroupmate(
+	ACharacterBase* TargetCharacterPtr
+) const
 {
 	return
 		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
-bool ACharacterBase::IsTeammate(ACharacterBase* TargetCharacterPtr) const
+bool ACharacterBase::IsTeammate(
+	ACharacterBase* TargetCharacterPtr
+) const
 {
 	return
 		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
@@ -319,7 +344,7 @@ ACharacterBase* ACharacterBase::GetFocusActor() const
 	if (IsPlayerControlled())
 	{
 		auto PCPtr = GetController<APlanetPlayerController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(PCPtr->GetFocusActor());
+		auto TargetCharacterPtr = nullptr;
 		if (TargetCharacterPtr)
 		{
 			return TargetCharacterPtr;
@@ -338,12 +363,16 @@ ACharacterBase* ACharacterBase::GetFocusActor() const
 	return nullptr;
 }
 
-void ACharacterBase::SwitchAnimLink_Client_Implementation(EAnimLinkClassType AnimLinkClassType)
+void ACharacterBase::SwitchAnimLink_Client_Implementation(
+	EAnimLinkClassType AnimLinkClassType
+)
 {
 	SwitchAnimLink(AnimLinkClassType);
 }
 
-void ACharacterBase::SetCampType_Implementation(ECharacterCampType CharacterCampType)
+void ACharacterBase::SetCampType_Implementation(
+	ECharacterCampType CharacterCampType
+)
 {
 	CharacterTitleComponentPtr->SetCampType(CharacterCampType);
 }
@@ -358,7 +387,9 @@ bool ACharacterBase::GetIsValidTarget() const
 	return !AbilitySystemComponentPtr->HasAnyMatchingGameplayTags(TagContainer);
 }
 
-void ACharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void ACharacterBase::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -369,7 +400,7 @@ void ACharacterBase::SpawnDefaultController()
 {
 	// Super::SpawnDefaultController();
 
-	if ( Controller != nullptr || GetNetMode() == NM_Client)
+	if (Controller != nullptr || GetNetMode() == NM_Client)
 	{
 		return;
 	}
@@ -379,17 +410,24 @@ void ACharacterBase::SpawnDefaultController()
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.Instigator = GetInstigator();
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnInfo.CustomPreSpawnInitalization = [this](AActor* ActorPtr)
-		{
-			auto AIControllerPtr = Cast<APlanetAIController>(ActorPtr);
-			if (AIControllerPtr)
+		SpawnInfo.CustomPreSpawnInitalization = [this](
+			AActor* ActorPtr
+		)
 			{
-				AIControllerPtr->SetGroupSharedInfo(GetGroupSharedInfo());
-			}
-		};
+				auto AIControllerPtr = Cast<APlanetAIController>(ActorPtr);
+				if (AIControllerPtr)
+				{
+					AIControllerPtr->SetGroupSharedInfo(GetGroupSharedInfo());
+				}
+			};
 		SpawnInfo.OverrideLevel = GetLevel();
-		SpawnInfo.ObjectFlags |= RF_Transient;	// We never want to save AI controllers into a map
-		AController* NewController = GetWorld()->SpawnActor<AController>(AIControllerClass, GetActorLocation(), GetActorRotation(), SpawnInfo);
+		SpawnInfo.ObjectFlags |= RF_Transient; // We never want to save AI controllers into a map
+		AController* NewController = GetWorld()->SpawnActor<AController>(
+			AIControllerClass,
+			GetActorLocation(),
+			GetActorRotation(),
+			SpawnInfo
+		);
 		if (NewController != nullptr)
 		{
 			// if successful will result in setting this->Controller 
@@ -397,11 +435,13 @@ void ACharacterBase::SpawnDefaultController()
 			NewController->Possess(this);
 		}
 	}
-	
+
 	OriginalAIController = Controller;
 }
 
-void ACharacterBase::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void ACharacterBase::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+)
 {
 	OnInitaliedGroupSharedInfo();
 
@@ -414,22 +454,31 @@ void ACharacterBase::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 	}
 #endif
 
-	ForEachComponent(false, [this](UActorComponent* ComponentPtr)
-	{
-		auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
-		if (GroupSharedInterfacePtr)
+	ForEachComponent(
+		false,
+		[this](
+		UActorComponent* ComponentPtr
+	)
 		{
-			GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+			auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
+			if (GroupSharedInterfacePtr)
+			{
+				GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+			}
 		}
-	});
+	);
 }
 
-void ACharacterBase::OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue)
+void ACharacterBase::OnMoveSpeedChanged(
+	const FOnAttributeChangeData& CurrentValue
+)
 {
 	OnMoveSpeedChangedImp(CurrentValue.NewValue);
 }
 
-void ACharacterBase::OnMoveSpeedChangedImp(float Value)
+void ACharacterBase::OnMoveSpeedChangedImp(
+	float Value
+)
 {
 	GetCharacterMovement()->MaxWalkSpeed = Value;
 	GetCharacterMovement()->MaxFlySpeed = Value;
@@ -452,7 +501,9 @@ void ACharacterBase::OnCharacterGroupMateChanged(
 	}
 }
 
-void ACharacterBase::OnHPChanged(const FOnAttributeChangeData& CurrentValue)
+void ACharacterBase::OnHPChanged(
+	const FOnAttributeChangeData& CurrentValue
+)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -486,7 +537,7 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
-	
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_SimulatedProxy)
 	{
@@ -498,7 +549,10 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 #endif
 }
 
-void ACharacterBase::OnDeathing(const FGameplayTag Tag, int32 Count)
+void ACharacterBase::OnDeathing(
+	const FGameplayTag Tag,
+	int32 Count
+)
 {
 }
 
@@ -510,15 +564,21 @@ void ACharacterBase::DoDeathing()
 	// }
 }
 
-void ACharacterBase::HasbeenInteracted(ACharacterBase* CharacterPtr)
+void ACharacterBase::HasbeenInteracted(
+	ACharacterBase* CharacterPtr
+)
 {
 }
 
-void ACharacterBase::HasBeenLookingAt(ACharacterBase* CharacterPtr)
+void ACharacterBase::HasBeenLookingAt(
+	ACharacterBase* CharacterPtr
+)
 {
 }
 
-void ACharacterBase::HasBeenStartedLookAt(ACharacterBase* CharacterPtr)
+void ACharacterBase::HasBeenStartedLookAt(
+	ACharacterBase* CharacterPtr
+)
 {
 }
 

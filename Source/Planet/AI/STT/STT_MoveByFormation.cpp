@@ -6,6 +6,7 @@
 #include <Components/SplineComponent.h>
 #include <GameFramework/CharacterMovementComponent.h>
 
+#include "AIComponent.h"
 #include "AITask_MoveBySpline.h"
 #include "AS_Character.h"
 #include "HumanAIController.h"
@@ -13,6 +14,7 @@
 #include "Helper_RootMotionSource.h"
 #include "CharacterAttributesComponent.h"
 #include "GravityMovementComponent.h"
+#include "HumanCharacter_AI.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_MoveByFormation(
@@ -86,7 +88,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::PerformGameplayTask(
 		InstanceData.CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPerformSpeed();
 	RootMotionSourcePtr->Settings.SetFlag(ERootMotionSourceSettingsFlags::IgnoreZAccumulate);
 
-	RootMotionSourcePtr->FormationPtr = InstanceData.AIControllerPtr->PathFollowComponentPtr;
+	RootMotionSourcePtr->FormationPtr = InstanceData.CharacterPtr->GetAIComponent()->PathFollowComponentPtr;
 	RootMotionSourcePtr->Duration = -1.f;
 
 	InstanceData.RootMotionSourceID =

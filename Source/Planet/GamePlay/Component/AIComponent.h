@@ -18,6 +18,8 @@ class UPAD_TaskNode_Preset;
 class UDA_NPCAllocation;
 class UTaskNode_Temporary;
 class AHumanCharacter_AI;
+class AGeneratorNPCs_Patrol;
+class ABuildingArea;
 
 /**
  *
@@ -51,10 +53,25 @@ public:
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
 #endif
 
-protected:
-	
+	/**
+	 * 既定的巡逻路线
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<AGeneratorNPCs_Patrol> GeneratorNPCs_PatrolPtr = nullptr;
+
+	/**
+	 * 营寨
+	 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
+
+	/**
+	 * 跟随前进的点
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
+	
+protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
 	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;

@@ -60,15 +60,6 @@ public:
 
 	virtual bool CheckIsFarawayOriginal() const;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<AGeneratorNPCs_Patrol> GeneratorNPCs_PatrolPtr = nullptr;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
-
 protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

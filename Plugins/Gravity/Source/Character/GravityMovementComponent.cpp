@@ -503,6 +503,13 @@ void UGravityMovementComponent::ClientHandleMoveResponse(const FCharacterMoveRes
 	Super::ClientHandleMoveResponse(MoveResponse);
 }
 
+bool UGravityMovementComponent::ShouldSkipUpdate(
+	float DeltaTime
+) const
+{
+	return Super::ShouldSkipUpdate(DeltaTime);
+}
+
 void UGravityMovementComponent::ClientAdjustPosition_Implementation
 (
 	float TimeStamp,

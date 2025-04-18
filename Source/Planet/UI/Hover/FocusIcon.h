@@ -16,7 +16,7 @@ class ACharacterBase;
 class UToolIcon;
 
 /**
- *
+ * 锁定目标时，目标身上的标记
  */
 UCLASS()
 class PLANET_API UFocusIcon : public UMyUserWidget

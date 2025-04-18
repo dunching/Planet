@@ -34,6 +34,58 @@ namespace HumanProcessor
 	class FHumanInteractionWithChallengeEntryProcessor;
 }
 
+void UCharacterPlayerStateProcessorComponent::FocusTarget()
+{
+	Super::FocusTarget();
+
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+
+	auto PCPtr = OnwerActorPtr->GetController<APlanetPlayerController>();
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	auto PlayerCameraManagerPtr = UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0);
+	if (PlayerCameraManagerPtr)
+	{
+		FVector OutCamLoc;
+		FRotator OutCamRot;
+		PlayerCameraManagerPtr->GetCameraViewPoint(OutCamLoc, OutCamRot);
+
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+		FCollisionQueryParams Params;
+		Params.AddIgnoredActor(OnwerActorPtr);
+
+		FHitResult OutHit;
+		if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
+													   ObjectQueryParams, Params))
+		{
+			auto FocusCharactersAry_ = GetFocusCharactersAry();
+			if (FocusCharactersAry_.IsValidIndex(0) && (FocusCharactersAry_[0] == OutHit.GetActor()))
+			{
+			}
+			else
+			{
+				auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+				if (TargetCharacterPtr)
+				{
+					SetFocusCharactersAry(TargetCharacterPtr);
+					return;
+				}
+			}
+		}
+	}
+
+	ClearFocusCharactersAry();
+}
+
 void UPlayerConversationComponent::DisplaySentence_Player(
 	const FTaskNode_Conversation_SentenceInfo& Sentence,
 	const std::function<void()>& SentenceStop_
@@ -56,6 +108,9 @@ AHumanCharacter_Player::AHumanCharacter_Player(const FObjectInitializer& ObjectI
 			UPlayerConversationComponent::ComponentName).
 		SetDefaultSubobjectClass<USceneCharacterPlayerInteractionComponent>(
 			USceneCharacterPlayerInteractionComponent::ComponentName
+			).
+		SetDefaultSubobjectClass<UCharacterPlayerStateProcessorComponent>(
+			UCharacterPlayerStateProcessorComponent::ComponentName
 			)
 	)
 {

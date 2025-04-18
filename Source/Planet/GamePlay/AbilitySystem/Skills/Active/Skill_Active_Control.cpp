@@ -131,7 +131,6 @@ void USkill_Active_Control::PerformAction(
 		{
 			auto MoveToAttaclAreaPtr = new FGameplayAbilityTargetData_MoveToAttaclArea;
 
-			MoveToAttaclAreaPtr->TargetCharacterPtr = Cast<ACharacterBase>(CharacterPtr->GetController<APlanetPlayerController>()->GetFocusActor());
 			MoveToAttaclAreaPtr->AttackDistance = AttackDistance;
 
 			CharacterPtr->GetCharacterAbilitySystemComponent()->MoveToAttackDistance(

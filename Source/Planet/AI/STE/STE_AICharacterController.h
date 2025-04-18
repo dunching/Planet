@@ -73,9 +73,6 @@ protected:
 
 	void OnTeamChanged();
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	UGloabVariable* GloabVariable = nullptr;
-
 public:
 
 	void KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd);
@@ -98,6 +95,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kInitialize;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	UGloabVariable* GloabVariable = nullptr;
 
 	/**
 	 * 若为Player的群体，则为PlayerCharacter

@@ -44,20 +44,7 @@ class PLANET_API APlanetPlayerController :
 public:
 	using FPawnType = AHumanCharacter_Player;
 
-	using FOnFocusCharacterDelegate =
-	TCallbackHandleContainer<void(ACharacterBase*)>;
-
 	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
-
-	virtual void SetFocus(AActor* NewFocus, EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
-
-	AActor* GetFocusActor() const;
-
-	virtual void ClearFocus(EAIFocusPriority::Type InPriority = EAIFocusPriority::Gameplay);
-
-	FVector GetFocalPoint() const;
-
-	FVector GetFocalPointOnActor(const AActor* Actor) const;
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -81,8 +68,6 @@ public:
 
 	UEventSubjectComponent * GetEventSubjectComponent()const;
 	
-	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
-
 #pragma region CMD
 
 	UFUNCTION(Server, Reliable)
@@ -130,8 +115,6 @@ protected:
 
 	virtual void PlayerTick(float DeltaTime) override;
 
-	virtual void UpdateRotation(float DeltaTime) override;
-
 	virtual void OnPossess(APawn* InPawn) override;
 
 	virtual void OnUnPossess() override;
@@ -158,12 +141,6 @@ protected:
 
 	UFUNCTION()
 	void OnRep_WolrdProcess();
-
-	UFUNCTION()
-	void OnFocusEndplay(AActor* Actor, EEndPlayReason::Type EndPlayReason);
-
-	// 目标进入死亡状态
-	void OnFocusDeathing(const FGameplayTag Tag, int32 Count);
 
 	// 给被锁定的目标绑定一些回调，比如目标进入“死亡”、“隐身”、“不可选中”时
 	void BindOnFocusRemove(AActor* Actor);

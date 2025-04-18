@@ -19,6 +19,7 @@ class UInventoryComponent;
 class UTalentAllocationComponent;
 class UTeamMatesHelperComponent;
 class AGroupManagger;
+class USplineComponent;
 
 
 UCLASS()
@@ -65,6 +66,11 @@ public:
 
 	void OnHPChanged(int32 CurrentValue);
 
+	virtual FPathFollowingRequestResult MoveAlongSPline(
+		USplineComponent* SplineComponentPtr,
+		const FAIMoveRequest& MoveRequest,
+		FNavPathSharedPtr* OutPath = nullptr);
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -72,8 +78,6 @@ protected:
 	virtual void PostInitializeComponents() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	virtual void UpdateControlRotation(float DeltaTime, bool bUpdatePawn)override;
 
 	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr)override;
 

@@ -71,3 +71,9 @@ void AGeneratorBase::SpawnGeneratorActor()
 		}
 	});
 }
+
+void AGeneratorBase::CustomizerFunc(
+	AActor* TargetActorPtr
+)
+{
+}

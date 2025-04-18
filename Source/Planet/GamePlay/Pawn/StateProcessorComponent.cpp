@@ -31,6 +31,43 @@ UStateProcessorComponent::UStateProcessorComponent(const FObjectInitializer& Obj
 	SetIsReplicatedByDefault(true);
 }
 
+void UStateProcessorComponent::FocusTarget()
+{
+}
+
+void UStateProcessorComponent::SetFocusCharactersAry(
+	ACharacterBase* TargetCharacterPtr
+)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		SetFocusCharactersAry_Server(TargetCharacterPtr);
+	}
+#endif
+	
+	FocusCharactersAry = {TargetCharacterPtr};
+	OnFocusCharacterDelegate(TargetCharacterPtr);
+}
+
+void UStateProcessorComponent::ClearFocusCharactersAry()
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		ClearFocusCharactersAry_Server();
+	}
+#endif
+	
+	FocusCharactersAry.Empty();
+	OnFocusCharacterDelegate(nullptr);
+}
+
+TArray<ACharacterBase*> UStateProcessorComponent::GetFocusCharactersAry() const
+{
+	return FocusCharactersAry;
+}
+
 void UStateProcessorComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -57,6 +94,7 @@ void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	Params.Condition = COND_None;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterStateInfo_FASI_Container, Params);
+	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FocusCharactersAry, Params);
 }
 
 void UStateProcessorComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
@@ -244,6 +282,18 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			);
 		}
 	}
+}
+
+void UStateProcessorComponent::ClearFocusCharactersAry_Server_Implementation()
+{
+	ClearFocusCharactersAry();
+}
+
+void UStateProcessorComponent::SetFocusCharactersAry_Server_Implementation(
+	ACharacterBase* TargetCharacterPtr
+)
+{
+	SetFocusCharactersAry(TargetCharacterPtr);
 }
 
 void UStateProcessorComponent::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)

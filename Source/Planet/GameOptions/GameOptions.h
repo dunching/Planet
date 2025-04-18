@@ -76,6 +76,9 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey RunKey = EKeys::LeftControl;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey FocusTarget = EKeys::Tab;
+
 	static int32 MaxTeammateNum;
 
 protected:

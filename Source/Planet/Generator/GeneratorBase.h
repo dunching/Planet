@@ -20,6 +20,8 @@ class PLANET_API AGeneratorBase : public AActor
 
 public:
 
+	friend UPlanetChildActorComponent;
+	
 	AGeneratorBase(const FObjectInitializer& ObjectInitializer);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -40,6 +42,8 @@ protected:
 	 */
 	virtual void SpawnGeneratorActor();
 
+	virtual void CustomizerFunc(AActor*TargetActorPtr);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
 };

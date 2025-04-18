@@ -137,7 +137,9 @@ protected:
     virtual void ServerAutonomousProxyTick(float DeltaSeconds)override;
 
     virtual void ClientHandleMoveResponse(const FCharacterMoveResponseDataContainer& MoveResponse)override;
-
+    
+    virtual bool ShouldSkipUpdate(float DeltaTime) const override;
+    
     virtual void ClientAdjustPosition_Implementation(
         float TimeStamp, 
         FVector NewLoc,

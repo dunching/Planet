@@ -46,8 +46,8 @@ void URegularActionLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-	if (PCPtr)
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (PlayerCharacterPtr)
 	{
 		DisplayTeamInfo(true);
 		InitialEffectsList();
@@ -55,25 +55,19 @@ void URegularActionLayout::NativeConstruct()
 
 		OnFocusCharacter(nullptr);
 		auto DelegateHandle =
-			PCPtr->OnFocusCharacterDelegate.AddCallback(
+			PlayerCharacterPtr->GetStateProcessorComponent()->OnFocusCharacterDelegate.AddCallback(
 				std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1)
 			);
 		DelegateHandle->bIsAutoUnregister = false;
 
-		auto CharacterPtr = PCPtr->GetPawn<ACharacterBase>();
-		if (!CharacterPtr)
-		{
-			return;
-		}
-
 		auto CharacterAttributesRef =
-			CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			PlayerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
-		CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 			CharacterAttributesRef->GetMax_HPAttribute()
 		).AddUObject(this, &ThisClass::OnHPChanged);
 
-		CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 			CharacterAttributesRef->GetHPAttribute()
 		).AddUObject(this, &ThisClass::OnHPChanged);
 	}

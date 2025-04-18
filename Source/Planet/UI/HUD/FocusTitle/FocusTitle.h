@@ -17,7 +17,7 @@ class UToolIcon;
 struct FOnAttributeChangeData;
 
 /**
- *
+ * 锁定目标时，上方显示的敌人的信息
  */
 UCLASS()
 class PLANET_API UFocusTitle : public UMyUserWidget

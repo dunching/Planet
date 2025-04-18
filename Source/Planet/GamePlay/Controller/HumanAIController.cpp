@@ -83,17 +83,17 @@ TObjectPtr<UAIControllerStateTreeAIComponent> AHumanAIController::GetStateTreeAI
 
 bool AHumanAIController::CheckIsFarawayOriginal() const
 {
-	if (BuildingAreaPtr)
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (CharacterPtr)
 	{
-		return (FVector::Distance(BuildingAreaPtr->GetActorLocation(), GetPawn()->GetActorLocation()) > 1000);
-	}
-
-	if (GeneratorNPCs_PatrolPtr)
-	{
-		auto CharacterPtr = GetPawn<FPawnType>();
-		if (CharacterPtr)
+		if (CharacterPtr->GetAIComponent()->BuildingAreaPtr)
 		{
-			return GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(CharacterPtr);
+			return (FVector::Distance(CharacterPtr->GetAIComponent()->BuildingAreaPtr->GetActorLocation(), GetPawn()->GetActorLocation()) > 1000);
+		}
+
+		if (CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
+		{
+			return CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(CharacterPtr);
 		}
 	}
 
@@ -231,7 +231,7 @@ void AHumanAIController::InitialAIConony()
 
 		if (auto PatrolPtr = Cast<AGeneratorNPCs_Patrol>(ParentPtr))
 		{
-			GeneratorNPCs_PatrolPtr = PatrolPtr;
+			// GeneratorNPCs_PatrolPtr = PatrolPtr;
 		}
 		else if (auto ColonyPtr = Cast<AGeneratorColony_ByTime>(ParentPtr))
 		{

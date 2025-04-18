@@ -115,6 +115,7 @@ protected:
 
 	void OnHPChanged(const FOnAttributeChangeData&);
 
+	UPROPERTY(Transient)
 	UFocusIcon* FocusIconPtr = nullptr;
 
 };

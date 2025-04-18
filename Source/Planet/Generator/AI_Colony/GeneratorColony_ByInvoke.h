@@ -79,6 +79,8 @@ public:
 
 protected:
 
+	virtual void CustomizerFunc(AActor*TargetActorPtr) override;
+	
 };
 
 /////////////////////////////////////////////////////////////////

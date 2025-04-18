@@ -22,6 +22,7 @@ struct FAIMoveRequest;
 
 class UAITask_MoveBySpline;
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
 
 USTRUCT()
@@ -30,7 +31,7 @@ struct PLANET_API FStateTreeMoveByFormationTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;

@@ -20,6 +20,7 @@ UPlanetChildActorComponent::UPlanetChildActorComponent(
 void UPlanetChildActorComponent::CreateChildActor(
 	TFunction<void(
 		AActor*
+	
 	)> CustomizerFunc /*= nullptr*/
 )
 {
@@ -47,9 +48,6 @@ void UPlanetChildActorComponent::CreateChildActor(
 }
 
 void UPlanetChildActorComponent::RespawnChildActor(
-	TFunction<void(
-		AActor*
-	)> CustomizerFunc
 )
 {
 	UWorld* World = GetWorld();
@@ -80,6 +78,8 @@ void UPlanetChildActorComponent::RespawnChildActor(
 					{
 						HumanCharacterPtr->SetGroupSharedInfo(OnwerActorPtr->GroupManaggerPtr);
 					}
+
+					OnwerActorPtr->CustomizerFunc(ActorPtr);
 				};
 
 			FVector Location = GetComponentLocation();
