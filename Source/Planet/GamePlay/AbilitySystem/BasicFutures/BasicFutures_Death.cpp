@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "AbilityTask_PlayMontage.h"
+#include "AbilityTask_TimerHelper.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
@@ -81,5 +82,19 @@ void UBasicFutures_Death::OnMontageComplete()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) 
 		)
 	{
+		if (DestroyInSecond > 0)
+		{
+			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+			TaskPtr->SetInfinite(DestroyInSecond);
+			TaskPtr->OnFinished.BindUObject(this, &ThisClass::DestroyAvatar);
+			TaskPtr->ReadyForActivation();
+		}
 	}
+}
+
+bool UBasicFutures_Death::DestroyAvatar(UAbilityTask_TimerHelper*TaskPtr) const
+{
+	GetAvatarActorFromActorInfo()->Destroy();
+
+	return true;
 }

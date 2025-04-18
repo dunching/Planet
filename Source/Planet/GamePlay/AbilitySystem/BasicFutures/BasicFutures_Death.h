@@ -12,6 +12,7 @@
 class UAnimMontage;
 
 class ACharacterBase;
+class UAbilityTask_TimerHelper;
 
 /**
  * 进入濒死状态
@@ -38,8 +39,17 @@ protected:
 
 	void OnMontageComplete();
 
+	UFUNCTION()
+	bool DestroyAvatar(UAbilityTask_TimerHelper*TaskPtr) const;
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* DeathMontage = nullptr;
+	
+	/**
+	 * 在蒙太奇播放完成之后第几秒后销魂Actor -1不销毁
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	int32 DestroyInSecond = -1;
 
 	ACharacterBase* CharacterPtr = nullptr;
 

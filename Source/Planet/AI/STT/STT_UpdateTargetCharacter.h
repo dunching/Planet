@@ -17,6 +17,7 @@ class IGameplayTaskOwnerInterface;
 class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
 class UGloabVariable;
 class USTE_AICharacterController;
@@ -27,13 +28,19 @@ struct PLANET_API FStateTreeUpdateTargetCharacterTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	UGloabVariable* GloabVariable = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bIsCcontinuous = false;
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bCheckHave = true;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;

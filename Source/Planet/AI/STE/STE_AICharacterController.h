@@ -17,7 +17,10 @@
 class AActor;
 
 struct FCharacterProxy;
+class AGeneratorNPCs_Patrol;
 class ACharacterBase;
+class ABuildingArea;
+class USceneComponent;
 class AHumanCharacter;
 class AHumanCharacter_AI;
 class AHumanAIController;
@@ -32,9 +35,6 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	FVector Location = FVector::ZeroVector;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	bool bIsFarawayOriginal = false;
-	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	int32 QueryDistance = 100;
 	
@@ -99,6 +99,24 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	UGloabVariable* GloabVariable = nullptr;
 
+	/**
+	 * 既定的巡逻路线
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	TObjectPtr<AGeneratorNPCs_Patrol> GeneratorNPCs_PatrolPtr = nullptr;
+
+	/**
+	 * 营寨
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
+
+	/**
+	 * 跟随前进的点
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
+	
 	/**
 	 * 若为Player的群体，则为PlayerCharacter
 	 * NPC群体为空

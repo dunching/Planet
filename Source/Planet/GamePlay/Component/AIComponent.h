@@ -24,7 +24,7 @@ class ABuildingArea;
 /**
  *
  */
-UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
+UCLASS(BlueprintType, Blueprintable, meta = (BlueprintSpawnableComponent))
 class PLANET_API UAIComponent :
 	public UActorComponent,
 	public IGroupManaggerInterface
@@ -70,6 +70,8 @@ public:
 	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
+
+	bool bIsSingle = true;
 	
 protected:
 	

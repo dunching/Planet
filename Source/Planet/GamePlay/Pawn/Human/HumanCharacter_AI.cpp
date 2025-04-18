@@ -103,8 +103,13 @@ void AHumanCharacter_AI::PossessedBy(AController* NewController)
 
 void AHumanCharacter_AI::SpawnDefaultController()
 {
-	if (!GroupManaggerPtr)
+	if (GroupManaggerPtr)
 	{
+	}
+	else
+	{
+		GetAIComponent()->bIsSingle = true;
+		
 		// 单个的NPC
 		FActorSpawnParameters SpawnParameters;
 
@@ -121,6 +126,7 @@ void AHumanCharacter_AI::SpawnDefaultController()
 		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
 			AGroupManagger::StaticClass(), SpawnParameters
 		);
+		
 		SetGroupSharedInfo(GroupManaggerPtr);
 	}
 	
@@ -211,6 +217,11 @@ void AHumanCharacter_AI::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfo
 		// 如果这个Character是单独的，则直接生成 
 		else
 		{
+		}
+		if (GetAIComponent()->bIsSingle)
+		{
+			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(AIComponentPtr->DefaultTeammateOption);
+			GroupManaggerPtr->SetOwnerCharacterProxyPtr(this);
 		}
 	}
 #endif

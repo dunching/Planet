@@ -3,6 +3,8 @@
 #include "Net/UnrealNetwork.h"
 
 #include "TeamMatesHelperComponent.h"
+
+#include "AIComponent.h"
 #include "AIController.h"
 #include "Kismet/GameplayStatics.h"
 #include "CharacterBase.h"
@@ -14,6 +16,7 @@
 #include "InventoryComponent.h"
 #include "ItemProxy_Container.h"
 #include "GameOptions.h"
+#include "GeneratorColony_ByInvoke.h"
 #include "SceneProxyTable.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter_AI.h"
@@ -82,6 +85,19 @@ void UTeamMatesHelperComponent::InitializeComponent()
 void UTeamMatesHelperComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		GetWorld()->GetTimerManager().SetTimer(
+			CheckKnowCharacterTimerHandle,
+			this,
+			&ThisClass::CheckKnowCharacterImp,
+			1.f,
+			true
+		);
+	}
+#endif
 }
 
 void UTeamMatesHelperComponent::UpdateTeammateConfig_Server_Implementation(
@@ -173,6 +189,50 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterProxyPtr);
 }
 
+void UTeamMatesHelperComponent::CheckKnowCharacterImp()
+{
+	auto CharacterActorPtr = GetOwnerCharacterProxyPtr()->GetCharacterActor();
+	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
+	{
+		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
+
+		if (AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
+		{
+			const auto Location = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->GetActorLocation();
+			const auto MaxDistance = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->MaxDistance;
+
+			TSet<ACharacterBase*> NeedRemoveAry;
+			for (const auto& Iter : KnowCharatersSet)
+			{
+				if (Iter.Key.IsValid())
+				{
+					if (FVector::Distance(Iter.Key->GetActorLocation(), Location) > MaxDistance)
+					{
+						NeedRemoveAry.Add(Iter.Key.Get());
+					}
+				}
+				else
+				{
+				}
+			}
+			for (int32 Index = KnowCharatersSet.Num() - 1; Index >= 0; Index--)
+			{
+				if (KnowCharatersSet[Index].Key.IsValid())
+				{
+					auto TargetPtr = KnowCharatersSet[Index].Key.Get();
+					if (NeedRemoveAry.Contains(TargetPtr))
+					{
+						NeedRemoveAry.Remove(TargetPtr);
+						KnowCharatersSet.RemoveAt(Index);
+
+						KnowCharaterChanged(TargetPtr, false);
+					}
+				}
+			}
+		}
+	}
+}
+
 bool UTeamMatesHelperComponent::IsMember(
 	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
 ) const
@@ -240,24 +300,55 @@ void UTeamMatesHelperComponent::AddKnowCharacter(
 	ACharacterBase* CharacterPtr
 )
 {
-	for (auto& Iter : KnowCharatersSet)
+	if (!CharacterPtr)
 	{
-		if (Iter.Key == CharacterPtr)
+		return;
+	}
+	auto CharacterActorPtr = GetOwnerCharacterProxyPtr()->GetCharacterActor();
+	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
+	{
+		// NPC
+		if (CharacterPtr->IsA(AHumanCharacter_AI::StaticClass()))
 		{
-			Iter.Value++;
-
 			return;
 		}
-	}
+		
+		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
 
-	KnowCharatersSet.Add({CharacterPtr, 1});
-	KnowCharaterChanged(CharacterPtr, true);
+		if (AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
+		{
+			const auto Location = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->GetActorLocation();
+			const auto MaxDistance = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->MaxDistance;
+
+			if (FVector::Distance(CharacterPtr->GetActorLocation(), Location) > MaxDistance)
+			{
+				return;
+			}
+		}
+		else
+		{
+			
+		}
+		
+		for (auto& Iter : KnowCharatersSet)
+		{
+			if (Iter.Key == CharacterPtr)
+			{
+				Iter.Value++;
+
+				return;
+			}
+		}
+
+		KnowCharatersSet.Add({CharacterPtr, 1});
+		KnowCharaterChanged(CharacterPtr, true);
 #ifdef WITH_EDITOR
-	if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
-	{
-		PRINTINVOKEWITHSTR(FString(TEXT("")));
-	}
+		if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
+		{
+			PRINTINVOKEWITHSTR(FString(TEXT("")));
+		}
 #endif
+	}
 }
 
 void UTeamMatesHelperComponent::RemoveKnowCharacter(

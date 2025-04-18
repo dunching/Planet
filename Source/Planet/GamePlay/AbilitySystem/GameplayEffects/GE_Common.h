@@ -25,6 +25,14 @@ public:
 	
 };
 
+UCLASS()
+class PLANET_API UGE_Duration : public UGameplayEffect
+{
+	GENERATED_BODY()
+public:
+	
+};
+
 /*
  * 造成输出后的回执
  * 比这次伤害是否使目标死亡

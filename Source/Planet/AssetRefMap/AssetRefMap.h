@@ -41,6 +41,7 @@ class AHorseCharacter;
 class AGeneratorNPC;
 class UMainMenuLayout;
 class UGE_Damage;
+class UGE_Duration;
 class UGE_Damage_Callback;
 class ATargetPoint_Runtime;
 class AGuideThread_Branch;
@@ -94,6 +95,7 @@ public:
 	TSubclassOf<UInteractionList>InteractionList;
 #pragma endregion MenusUI
 
+#pragma region GEs
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<UGameplayEffect>DurationGEClass;
 
@@ -101,8 +103,12 @@ public:
 	TSubclassOf<UGE_Damage>DamageClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGE_Damage_Callback>DamageCallbackClass;
+	TSubclassOf<UGE_Duration>DurationClass;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<UGE_Damage_Callback>DamageCallbackClass;
+#pragma endregion 
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;
 

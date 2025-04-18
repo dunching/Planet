@@ -76,35 +76,9 @@ EStateTreeRunStatus FSTT_ReleaseSkill::Tick(
 ) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	if (InstanceData.AITaskPtr && InstanceData.AITaskPtr->GetState() != EGameplayTaskState::Finished)
+	if (InstanceData.AITaskPtr && InstanceData.AITaskPtr->GetState() == EGameplayTaskState::Finished)
 	{
-		if (InstanceData.GloabVariable->bIsFarawayOriginal)
-		{
-			return EStateTreeRunStatus::Failed;
-		}
-		else if
-			(
-				InstanceData.GloabVariable->TargetCharacterPtr.IsValid() &&
-				InstanceData.GloabVariable->TargetCharacterPtr->GetIsValidTarget()
-				)
-		{
-			const auto Pt1 = InstanceData.GloabVariable->TargetCharacterPtr->GetActorLocation();
-			const auto Pt2 = InstanceData.CharacterPtr->GetActorLocation();
-
-			float OutRadius1 = InstanceData.GloabVariable->TargetCharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
-			float OutRadius2 = InstanceData.CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
-
-			const auto Distance = FVector::Distance(Pt1, Pt2);
-
-			if (Distance > (InstanceData.GloabVariable->QueryDistance + OutRadius1 + OutRadius2))
-			{
-				return EStateTreeRunStatus::Failed;
-			}
-		}
-		else
-		{
-			return EStateTreeRunStatus::Failed;
-		}
+		return EStateTreeRunStatus::Succeeded;
 	}
 
 	return Super::Tick(Context, DeltaTime);

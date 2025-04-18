@@ -1,22 +1,29 @@
 #include "GeneratorBase.h"
 
+#include "AIComponent.h"
+#include "CharacterBase.h"
 #include "Net/UnrealNetwork.h"
 
 #include "LogWriter.h"
 #include "GroupManagger.h"
+#include "HumanCharacter_AI.h"
 
 #include "PlanetChildActorComponent.h"
 #include "TeamMatesHelperComponent.h"
 
-AGeneratorBase::AGeneratorBase(const FObjectInitializer& ObjectInitializer) :
-                                                                            Super()
+AGeneratorBase::AGeneratorBase(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super()
 {
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
 	bAlwaysRelevant = true;
 }
 
-void AGeneratorBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AGeneratorBase::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -43,33 +50,56 @@ void AGeneratorBase::SpawnGeneratorActor()
 			FActorSpawnParameters SpawnParameters;
 
 			SpawnParameters.Owner = this;
-			SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
-			{
-				PRINTINVOKEINFO();
-				auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
-				if (GroupManaggerPtr)
+			SpawnParameters.CustomPreSpawnInitalization = [](
+				AActor* ActorPtr
+			)
 				{
-					GroupManaggerPtr->GroupID = FGuid::NewGuid();
-				}
-			};
+					PRINTINVOKEINFO();
+					auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+					if (GroupManaggerPtr)
+					{
+						GroupManaggerPtr->GroupID = FGuid::NewGuid();
+					}
+				};
 
 			GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
-				AGroupManagger::StaticClass(), SpawnParameters
+				AGroupManagger::StaticClass(),
+				SpawnParameters
 			);
 
 			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(DefaultTeammateOption);
 		}
 	}
 #endif
-	
-	ForEachComponent(true, [](UActorComponent* Comp)
-	{
-		auto PlanetChildActorComponentPtr = Cast<UPlanetChildActorComponent>(Comp);
-		if (PlanetChildActorComponentPtr)
+
+	bool bIsFirst = true;
+	ForEachComponent(
+		true,
+		[&bIsFirst, this](
+		UActorComponent* Comp
+	)
 		{
-			PlanetChildActorComponentPtr->RespawnChildActor();
+			auto PlanetChildActorComponentPtr = Cast<UPlanetChildActorComponent>(Comp);
+			if (PlanetChildActorComponentPtr)
+			{
+				PlanetChildActorComponentPtr->RespawnChildActor();
+				auto AICharacterPtr = Cast<AHumanCharacter_AI>(PlanetChildActorComponentPtr->GetChildActor());
+				if (!AICharacterPtr)
+				{
+					return;
+				}
+				AICharacterPtr->GetAIComponent()->bIsSingle = false;
+
+				if (bIsFirst)
+				{
+					GroupManaggerPtr->SetOwnerCharacterProxyPtr(
+						AICharacterPtr
+					);
+					bIsFirst = false;
+				}
+			}
 		}
-	});
+	);
 }
 
 void AGeneratorBase::CustomizerFunc(

@@ -22,20 +22,6 @@ class AGroupManagger;
 
 struct FTaskNode_Conversation_SentenceInfo;
 
-UCLASS()
-class PLANET_API UCharacterTitleBox :
-	public UMyUserWidget
-{
-	GENERATED_BODY()
-
-public:
-	virtual void NativePreConstruct() override;
-
-	virtual void NativeConstruct() override;
-
-	void SetData(ACharacterBase* CharacterPtr);
-};
-
 /*
  * 角色的抬头UI，如血条
  */
@@ -84,10 +70,4 @@ protected:
 
 	UPROPERTY(Transient)
 	UCharacterTitle* CharacterTitlePtr = nullptr;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
-	TSubclassOf<UConversationBorder> ConversationBorderClass;
-
-	UPROPERTY(Transient)
-	UConversationBorder* ConversationBorderPtr = nullptr;
 };

@@ -31,11 +31,15 @@ struct FSceneProxyContainer;
 
 /*
  *	对局内每个组群共享的资源
+ *	
  *	例如每个Player控制的Pawn和AI队友、群落AI
  *	一个组的持有的物品的信息
  *
  *	每个PlayerController会拥有一个，并于AI队友共享数据
+ *	
  *	每组NPC会共用一个，由AGeneratorBase生成
+ *
+ *	单独的NPC会自己生成（SpawnDefaultController）一个，如功能性的NPC
  */
 UCLASS()
 class PLANET_API AGroupManagger:

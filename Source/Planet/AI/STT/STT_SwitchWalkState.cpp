@@ -1,4 +1,3 @@
-
 #include "STT_SwitchWalkState.h"
 
 #include <NavigationSystem.h>
@@ -8,11 +7,12 @@
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "HumanCharacter_AI.h"
 
 EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-)const
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (!InstanceData.CharacterPtr)
@@ -20,7 +20,9 @@ EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass())
+	);
 	if (!InstanceData.TaskOwner)
 	{
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
@@ -28,12 +30,11 @@ EStateTreeRunStatus FSTT_SwitchWalkState::EnterState(
 
 	InstanceData.CharacterPtr->GetCharacterAbilitySystemComponent()->SwitchWalkState(InstanceData.bIsRun);
 
-	if (InstanceData.bIsInfinish)
+	if (InstanceData.bRunForever)
 	{
-		return EStateTreeRunStatus::Succeeded;
+		return EStateTreeRunStatus::Running;
 	}
-
-	return EStateTreeRunStatus::Running;
+	return EStateTreeRunStatus::Succeeded;
 }
 
 void FSTT_SwitchWalkState::ExitState(

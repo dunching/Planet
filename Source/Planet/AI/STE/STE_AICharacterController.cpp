@@ -23,6 +23,8 @@ void USTE_AICharacterController::TreeStart(FStateTreeExecutionContext& Context)
 
 	GloabVariable = NewObject<UGloabVariable>();
 
+	GeneratorNPCs_PatrolPtr = HumanCharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr;
+	
 	if (HumanAIControllerPtr)
 	{
 		KownCharacterChangedHandle =

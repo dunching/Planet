@@ -54,10 +54,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag CharacterCategory;
 	
-#if UE_EDITOR || UE_CLIENT
-	bool bCharacterIDIsReplicated = false;
-#endif
-
 protected:
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

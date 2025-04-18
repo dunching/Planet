@@ -12,36 +12,7 @@
 
 #include "Components/VerticalBox.h"
 
-struct FCharacterTitleBox : public TStructVariable<FCharacterTitleBox>
-{
-	const FName VerticalBox = TEXT("VerticalBox");
-
-	const FName CharacterTitle = TEXT("CharacterTitle");
-};
-
 FName UCharacterTitleComponent::ComponentName = TEXT("CharacterTitleComponent");
-
-void UCharacterTitleBox::NativePreConstruct()
-{
-	Super::NativePreConstruct();
-}
-
-void UCharacterTitleBox::NativeConstruct()
-{
-	Super::NativeConstruct();
-
-	// SetAnchorsInViewport(FAnchors(.5f));
-	// SetAlignmentInViewport(FVector2D(.5f, 1.f));
-}
-
-void UCharacterTitleBox::SetData(ACharacterBase* CharacterPtr)
-{
-	auto UIPtr = Cast<UCharacterTitle>(GetWidgetFromName(FCharacterTitleBox::Get().CharacterTitle));
-	if (UIPtr)
-	{
-		UIPtr->SetData(CharacterPtr);
-	}
-}
 
 UCharacterTitleComponent::UCharacterTitleComponent(const FObjectInitializer& ObjectInitializer):
 	Super(ObjectInitializer)
@@ -92,12 +63,6 @@ void UCharacterTitleComponent::OnGroupManaggerReady(AGroupManagger* NewGroupShar
 			// {
 			// 	CharacterTitleBoxPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
 			// }
-			auto UIPtr = Cast<UVerticalBox>(
-				CharacterTitleBoxPtr->GetWidgetFromName(FCharacterTitleBox::Get().VerticalBox));
-			if (UIPtr)
-			{
-				UIPtr->ClearChildren();
-			}
 		}
 	}
 #endif
@@ -108,13 +73,7 @@ void UCharacterTitleComponent::SetCampType(ECharacterCampType CharacterCampType)
 	auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
 	if (CharacterTitleBoxPtr)
 	{
-		auto UIPtr = Cast<UCharacterTitle>(
-			CharacterTitleBoxPtr->GetWidgetFromName(FCharacterTitleBox::Get().CharacterTitle)
-		);
-		if (UIPtr)
-		{
-			UIPtr->SetCampType(CharacterCampType);
-		}
+		CharacterTitleBoxPtr->SetCampType(CharacterCampType);
 	}
 }
 
@@ -145,33 +104,15 @@ void UCharacterTitleComponent::DisplaySentence(const FTaskNode_Conversation_Sent
 	{
 		return;
 	}
-
-	if (ConversationBorderPtr)
-	{
-		ConversationBorderPtr->SetSentence(Sentence);
-	}
-	else
-	{
-		ConversationBorderPtr = CreateWidget<UConversationBorder>(GetWorld(), ConversationBorderClass);
-		if (ConversationBorderPtr)
-		{
-			ConversationBorderPtr->CharacterPtr = GetOwner<ACharacterBase>();
-			ConversationBorderPtr->SetSentence(Sentence);
-			auto UIPtr = Cast<UVerticalBox>(
-				CharacterTitleBoxPtr->GetWidgetFromName(FCharacterTitleBox::Get().VerticalBox));
-			if (UIPtr)
-			{
-				UIPtr->AddChild(ConversationBorderPtr);
-			}
-		}
-	}
+	CharacterTitleBoxPtr->DisplaySentence(Sentence);
 }
 
 void UCharacterTitleComponent::CloseConversationborder()
 {
-	if (ConversationBorderPtr)
+	auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
+	if (!CharacterTitleBoxPtr)
 	{
-		ConversationBorderPtr->RemoveFromParent();
-		ConversationBorderPtr = nullptr;
+		return;
 	}
+	CharacterTitleBoxPtr->CloseConversationborder();
 }

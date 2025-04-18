@@ -35,6 +35,9 @@ struct PLANET_API FStateTreeUpdateQueryDistanceTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	UGloabVariable* GloabVariable = nullptr;
 	
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bRunForever = true;
+	
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 };
@@ -57,5 +60,7 @@ struct PLANET_API FSTT_UpdateQueryDistance : public FStateTreeAIActionTaskBase
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
 	) const override;
-
+	
+	void PerformAction(FStateTreeExecutionContext& Context)const;
+	
 };

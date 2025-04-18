@@ -194,7 +194,7 @@ void APlanetAIController::OnTargetPerceptionUpdated(
 			}
 			else
 			{
-				GetGroupSharedInfo()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
+				// GetGroupSharedInfo()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
 			}
 		}
 	}

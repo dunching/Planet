@@ -9,6 +9,7 @@
 #include "AITask_SwitchWalkState.h"
 #include "STE_AICharacterController.h"
 #include "GroupManagger.h"
+#include "HumanCharacter_AI.h"
 
 EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 	FStateTreeExecutionContext& Context,
@@ -21,6 +22,15 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
+	if (InstanceData.bIsCcontinuous)
+	{
+	}
+	else
+	{
+		PerformGameplayTask(Context);
+		return EStateTreeRunStatus::Succeeded;
+	}
+	
 	return Super::EnterState(Context, Transition);
 }
 
@@ -29,9 +39,9 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::Tick(
 	const float DeltaTime
 ) const
 {
-	PerformGameplayTask(Context);
-
-	return Super::Tick(Context, DeltaTime);
+	Super::Tick(Context, DeltaTime);
+	
+	return PerformGameplayTask(Context);
 }
 
 EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformGameplayTask(FStateTreeExecutionContext& Context) const
@@ -47,5 +57,20 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformGameplayTask(FStateTreeEx
 	InstanceData.GloabVariable->TargetCharacterPtr =
 		InstanceData.CharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
 
+	if (InstanceData.bIsCcontinuous)
+	{
+		if (InstanceData.bCheckHave)
+		{
+			return InstanceData.GloabVariable->TargetCharacterPtr.IsValid() ? EStateTreeRunStatus::Running : EStateTreeRunStatus::Succeeded;
+		}
+		else
+		{
+			return !InstanceData.GloabVariable->TargetCharacterPtr.IsValid() ? EStateTreeRunStatus::Running : EStateTreeRunStatus::Succeeded;
+		}
+	}
+	else
+	{
+	}
+	
 	return EStateTreeRunStatus::Running;
 }

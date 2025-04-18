@@ -7,18 +7,20 @@
 #include <Components/CanvasPanel.h>
 #include <Components/CanvasPanelSlot.h>
 #include <GameplayTagsManager.h>
+#include "Components/VerticalBox.h"
 
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/Border.h"
-
-#include "HumanCharacter.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/SizeBox.h"
+
+#include "HumanCharacter.h"
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "CharacterBase.h"
+#include "ConversationBorder.h"
 #include "GameplayTagsLibrary.h"
 
 struct FCharacterTitle : public TStructVariable<FCharacterTitle>
@@ -281,5 +283,92 @@ void UCharacterTitle::SetData(ACharacterBase* InCharacterPtr)
 
 		// TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition));
 		// ResetPosition(0.f);
+	}
+}
+
+struct FCharacterTitleBox : public TStructVariable<FCharacterTitleBox>
+{
+	const FName VerticalBox = TEXT("VerticalBox");
+
+	const FName CharacterTitle = TEXT("CharacterTitle");
+};
+
+void UCharacterTitleBox::NativePreConstruct()
+{
+	Super::NativePreConstruct();
+}
+
+void UCharacterTitleBox::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	// SetAnchorsInViewport(FAnchors(.5f));
+	// SetAlignmentInViewport(FVector2D(.5f, 1.f));
+}
+
+void UCharacterTitleBox::SetCampType(
+	ECharacterCampType CharacterCampType
+)
+{
+	auto UIPtr = Cast<UCharacterTitle>(
+		GetWidgetFromName(FCharacterTitleBox::Get().CharacterTitle)
+	);
+	if (UIPtr)
+	{
+		UIPtr->SetCampType(CharacterCampType);
+	}
+}
+
+void UCharacterTitleBox::SetData(ACharacterBase* CharacterPtr_)
+{
+	CharacterPtr = CharacterPtr_;
+	{
+		auto UIPtr = Cast<UCharacterTitle>(GetWidgetFromName(FCharacterTitleBox::Get().CharacterTitle));
+		if (UIPtr)
+		{
+			UIPtr->SetData(CharacterPtr);
+		}
+	}
+	{
+		auto UIPtr = Cast<UVerticalBox>(
+			GetWidgetFromName(FCharacterTitleBox::Get().VerticalBox));
+		if (UIPtr)
+		{
+			UIPtr->ClearChildren();
+		}
+	}
+}
+
+void UCharacterTitleBox::DisplaySentence(
+	const FTaskNode_Conversation_SentenceInfo& Sentence
+)
+{
+	if (ConversationBorderPtr)
+	{
+		ConversationBorderPtr->SetSentence(Sentence);
+	}
+	else
+	{
+		ConversationBorderPtr = CreateWidget<UConversationBorder>(GetWorld(), ConversationBorderClass);
+		if (ConversationBorderPtr)
+		{
+			ConversationBorderPtr->CharacterPtr = CharacterPtr;
+			ConversationBorderPtr->SetSentence(Sentence);
+			auto UIPtr = Cast<UVerticalBox>(
+				GetWidgetFromName(FCharacterTitleBox::Get().VerticalBox));
+			if (UIPtr)
+			{
+				UIPtr->AddChild(ConversationBorderPtr);
+			}
+		}
+	}
+}
+
+void UCharacterTitleBox::CloseConversationborder()
+{
+	if (ConversationBorderPtr)
+	{
+		ConversationBorderPtr->RemoveFromParent();
+		ConversationBorderPtr = nullptr;
 	}
 }

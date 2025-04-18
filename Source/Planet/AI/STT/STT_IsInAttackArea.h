@@ -10,23 +10,24 @@
 
 #include "GenerateType.h"
 
-#include "STT_UpdateIsFarawayOriginal.generated.h"
+#include "STT_IsInAttackArea.generated.h"
 
 class IGameplayTaskOwnerInterface;
 
 class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
 class UGloabVariable;
 
 USTRUCT()
-struct PLANET_API FStateTreeUpdateIsFarawayOriginalTaskInstanceData
+struct PLANET_API FSTID_IsInAttackArea
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
@@ -34,16 +35,22 @@ struct PLANET_API FStateTreeUpdateIsFarawayOriginalTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	UGloabVariable* GloabVariable = nullptr;
 
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bRunForever = true;
+	
+	UPROPERTY(EditAnywhere, Category = Output)
+	bool bIsFarawayOriginal = false;
+	
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 };
 
 USTRUCT()
-struct PLANET_API FSTT_UpdateIsFarawayOriginal : public FStateTreeAIActionTaskBase
+struct PLANET_API FSTT_IsInAttackArea : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeUpdateIsFarawayOriginalTaskInstanceData;
+	using FInstanceDataType = FSTID_IsInAttackArea;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
@@ -57,4 +64,6 @@ struct PLANET_API FSTT_UpdateIsFarawayOriginal : public FStateTreeAIActionTaskBa
 		const float DeltaTime
 	) const override;
 
+	void PerformAction(FStateTreeExecutionContext& Context)const;
+	
 };

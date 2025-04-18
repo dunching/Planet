@@ -17,27 +17,37 @@
 #include "AS_Character.h"
 
 UBasicFutures_Running::UBasicFutures_Running() :
-	Super()
+                                               Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
 
-void UBasicFutures_Running::IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
+void UBasicFutures_Running::IntervalTick(
+	UAbilityTask_TimerHelper*,
+	float Interval,
+	float InDuration
+)
 {
-	if (Interval > InDuration)
+#if UE_EDITOR || UE_SERVER
+	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		if (
-			CharacterAttributes->GetPP() >=
-			RunningConsume.GetCurrentValue()
-		)
+		if (Interval > InDuration)
 		{
-		}
-		else
-		{
-			K2_CancelAbility();
+			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+			if (
+				CharacterAttributes->GetPP() >=
+				RunningConsume.GetCurrentValue()
+			)
+			{
+				CommitAbility(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo());
+			}
+			else
+			{
+				K2_CancelAbility();
+			}
 		}
 	}
+#endif
 }
 
 void UBasicFutures_Running::PreActivate(
@@ -71,9 +81,19 @@ void UBasicFutures_Running::ActivateAbility(
 			// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				UGameplayTagsLibrary::DataSource_Character,
+				RunningSpeedOffset.CurrentValue
+			);
 
 			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+
+			{
+				auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+				TaskPtr->SetInfinite(1.f);
+				TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalTick);
+				TaskPtr->ReadyForActivation();
+			}
 		}
 #endif
 	}
@@ -97,7 +117,10 @@ void UBasicFutures_Running::EndAbility(
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::DataSource_Character, RunningSpeedOffset.CurrentValue);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				UGameplayTagsLibrary::DataSource_Character,
+				RunningSpeedOffset.CurrentValue
+			);
 
 			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 		}
@@ -131,4 +154,28 @@ bool UBasicFutures_Running::CanActivateAbility(
 	}
 
 	return false;
+}
+
+void UBasicFutures_Running::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+) const
+{
+	Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
+
+	auto CostGE = GetCostGameplayEffect();
+	if (CostGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
+
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_ModifyItem_PP,
+			-RunningConsume.CurrentValue
+		);
+
+		ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
 }

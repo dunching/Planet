@@ -14,7 +14,9 @@
 class ACharacterBase;
 
 class UToolIcon;
+class UConversationBorder;
 struct FOnAttributeChangeData;
+struct FTaskNode_Conversation_SentenceInfo;
 
 /**
  *
@@ -31,39 +33,70 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeTick(
+		const FGeometry& MyGeometry,
+		float InDeltaTime
+	);
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void SetCampType(ECharacterCampType CharacterCampType);
+	void SetCampType(
+		ECharacterCampType CharacterCampType
+	);
 
-	void SwitchCantBeSelect(bool bIsCanBeSelect);
+	void SwitchCantBeSelect(
+		bool bIsCanBeSelect
+	);
 
-	void SetData(ACharacterBase* CharacterPtr);
-	
+	void SetData(
+		ACharacterBase* CharacterPtr
+	);
+
 protected:
-
 	ACharacterBase* CharacterPtr = nullptr;
 
 protected:
-	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
+	void OnGameplayEffectTagCountChanged(
+		const FGameplayTag Tag,
+		int32 Count
+	);
 
-	void OnHPChanged(const FOnAttributeChangeData&);
+	void OnHPChanged(
+		const FOnAttributeChangeData&
+	
+	);
 
-	void SetHPChanged(float Value, float MaxValue);
+	void SetHPChanged(
+		float Value,
+		float MaxValue
+	);
 
-	void OnPPChanged(const FOnAttributeChangeData&);
+	void OnPPChanged(
+		const FOnAttributeChangeData&
+	
+	);
 
-	void SetPPChanged(float Value, float MaxValue);
+	void SetPPChanged(
+		float Value,
+		float MaxValue
+	);
 
-	void OnShieldChanged(const FOnAttributeChangeData&);
+	void OnShieldChanged(
+		const FOnAttributeChangeData&
+	
+	);
 
-	void SetShieldChanged(float Value, float MaxValue);
+	void SetShieldChanged(
+		float Value,
+		float MaxValue
+	);
 
 	void ApplyCharaterNameToTitle();
 
 	void ApplyStatesToTitle();
 
-	bool ResetPosition(float InDeltaTime);
+	bool ResetPosition(
+		float InDeltaTime
+	);
 
 	FVector2D PreviousPt = FVector2D::ZeroVector;
 
@@ -93,4 +126,40 @@ protected:
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
 
 	TSet<FGameplayTag> TagSet;
+};
+
+UCLASS()
+class PLANET_API UCharacterTitleBox :
+	public UMyUserWidget
+{
+	GENERATED_BODY()
+
+public:
+	virtual void NativePreConstruct() override;
+
+	virtual void NativeConstruct() override;
+
+	void SetCampType(
+		ECharacterCampType CharacterCampType
+	);
+
+	void SetData(
+		ACharacterBase* CharacterPtr
+	);
+
+	void DisplaySentence(
+		const FTaskNode_Conversation_SentenceInfo& Sentence
+	);
+
+	void CloseConversationborder();
+
+	UPROPERTY(Transient)
+	UConversationBorder* ConversationBorderPtr = nullptr;
+
+protected:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UConversationBorder> ConversationBorderClass;
+
+private:
+	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 };

@@ -77,6 +77,7 @@ void UPlanetChildActorComponent::RespawnChildActor(
 					if (HumanCharacterPtr)
 					{
 						HumanCharacterPtr->SetGroupSharedInfo(OnwerActorPtr->GroupManaggerPtr);
+						HumanCharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(FGuid::NewGuid());
 					}
 
 					OnwerActorPtr->CustomizerFunc(ActorPtr);

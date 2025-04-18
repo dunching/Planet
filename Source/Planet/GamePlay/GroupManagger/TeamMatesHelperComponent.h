@@ -136,6 +136,10 @@ private:
 
 	void UpdateTeammateConfigImp(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
 
+	void CheckKnowCharacterImp();
+	
 	TSharedPtr<FCharacterProxyType> OwnerCharacterProxyPtr = nullptr;
 
+	FTimerHandle CheckKnowCharacterTimerHandle;
+	
 };

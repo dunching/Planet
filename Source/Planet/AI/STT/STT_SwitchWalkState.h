@@ -17,6 +17,7 @@ class IGameplayTaskOwnerInterface;
 class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanAIController;
 
 
@@ -27,7 +28,7 @@ struct PLANET_API FStateTreeSwitchWalkStateTaskInstanceData
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
@@ -40,7 +41,7 @@ struct PLANET_API FStateTreeSwitchWalkStateTaskInstanceData
 		EditAnywhere,
 		Category = Param
 	)
-	bool bIsInfinish = false;
+	bool bRunForever = true;
 	
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	bool bIsRun = true;

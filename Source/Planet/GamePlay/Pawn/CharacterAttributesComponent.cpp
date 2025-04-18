@@ -169,10 +169,6 @@ ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 
 void UCharacterAttributesComponent::OnRep_GetCharacterProxyID()
 {
-	PRINTINVOKEINFO();
-	
-	bCharacterIDIsReplicated = true;
-
 	auto CharacterPtr = GetOwner<FOwnerType>();
 	if (!CharacterPtr)
 	{

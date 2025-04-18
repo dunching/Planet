@@ -541,10 +541,10 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_SimulatedProxy)
 	{
-		if (GetCharacterAttributesComponent()->bCharacterIDIsReplicated)
-		{
-			OnGroupManaggerReady(GroupManaggerPtr);
-		}
+		// if (GetCharacterAttributesComponent()->bCharacterIDIsReplicated)
+		// {
+		// }
+		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 #endif
 }

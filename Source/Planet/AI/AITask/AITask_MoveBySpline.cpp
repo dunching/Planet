@@ -12,6 +12,15 @@
 #include "PlanetAIController.h"
 #include "PlanetPlayerController.h"
 
+#ifdef WITH_EDITOR
+static TAutoConsoleVariable<int32> ITask_MoveBySpline(
+	TEXT("ITask_MoveBySpline"),
+	0,
+	TEXT("")
+	TEXT(" default: 0")
+);
+#endif
+
 void UAITask_MoveBySpline::Activate()
 {
 	Super::Activate();
@@ -31,6 +40,13 @@ void UAITask_MoveBySpline::PerformMove()
 
 	auto Location = SPlinePtr->FindLocationClosestToWorldLocation(GetAvatarActor()->GetActorLocation(),ESplineCoordinateSpace::World);
 	MoveRequest.UpdateGoalLocation(Location);
+
+#ifdef WITH_EDITOR
+	if (ITask_MoveBySpline.GetValueOnGameThread())
+	{
+		DrawDebugSphere(OwnerController->GetWorld(), Location, 20,20,FColor::Red, false, 10);
+	}
+#endif
 
 	// start new move request
 	FNavPathSharedPtr FollowedPath;
