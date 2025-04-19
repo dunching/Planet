@@ -16,4 +16,5 @@ enum class ELayoutCommon : uint8
 	kEndangeredLayout,		// 重伤状态
 	kBuildingLayout,
 	kViewTasksLayout,		// 任务模式
+	kTransitionLayout,		// 切换、过度界面
 };

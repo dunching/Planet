@@ -6,10 +6,12 @@
 #include "HumanRegularProcessor.h"
 #include "PlanetPlayerController.h"
 #include "ChallengeSystem.h"
+#include "GroupManagger.h"
 #include "GuideSubSystem.h"
 #include "HumanViewTalentAllocation.h"
 #include "OpenWorldDataLayer.h"
 #include "OpenWorldSystem.h"
+#include "TeamMatesHelperComponent.h"
 
 void GameplayCommand::ActiveGuideMainThread()
 {
@@ -56,4 +58,29 @@ void GameplayCommand::EntryChallengeLevel(const TArray<FString>& Args)
 			}
 		}
 	}
+}
+
+void GameplayCommand::SwitchTeammateOptionToFollow()
+{
+	auto OnwerActorPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+	if (OnwerActorPtr)
+	{
+		OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+			ETeammateOption::kFollow);
+	}
+}
+
+void GameplayCommand::SwitchTeammateOptionTokAssistance()
+{
+	auto OnwerActorPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
+	if (OnwerActorPtr)
+	{
+		OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+			ETeammateOption::kAssistance);
+	}
+}
+
+void GameplayCommand::RespawnPlayerCharacter()
+{
+	
 }

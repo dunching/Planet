@@ -163,6 +163,7 @@ public:
 
 	void SwitchCantBeSelect(bool bIsCanBeSelect);
 
+	UFUNCTION(Server, Reliable)
 	void Respawn();
 
 	// 移动至攻击范围内

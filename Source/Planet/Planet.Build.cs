@@ -71,6 +71,8 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState/DurationState");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState/RootMotion");
         PublicIncludePaths.Add("Planet/GamePlay/Controller");
+        PublicIncludePaths.Add("Planet/GamePlay/Controller/Player");
+        PublicIncludePaths.Add("Planet/GamePlay/Controller/NPC");
         PublicIncludePaths.Add("Planet/GamePlay/Component");
         PublicIncludePaths.Add("Planet/GamePlay/GameInstance");
         PublicIncludePaths.Add("Planet/GamePlay/GameMode");
@@ -120,6 +122,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/TalentAllocation");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/CoinList");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/RaffleMenu");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/TransitionLayout");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");
         PublicIncludePaths.Add("Planet/AI/EQS");

@@ -35,6 +35,8 @@ enum class ETeleport : uint8
 	 */
 	kChallenge_LevelType_1,
 	kChallenge_LevelType_2,
+	
+	kNone,
 };
 
 USTRUCT(BlueprintType)
@@ -56,6 +58,9 @@ struct PLANET_API FTableRow_Teleport : public FTableRowBase
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<ATeleport> TeleportRef;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	bool bIsOpenWorldTeleport = false;
 	
 	/**
 	 * 这个是否BegunePlay

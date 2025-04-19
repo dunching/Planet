@@ -73,4 +73,43 @@ namespace GameplayCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
+	void SwitchTeammateOptionToFollow();
+
+	static FAutoConsoleCommand SwitchTeammateOptionToFollowCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("SwitchTeammateOptionToFollow"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandDelegate::CreateStatic(SwitchTeammateOptionToFollow),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
+	void SwitchTeammateOptionTokAssistance();
+
+	static FAutoConsoleCommand SwitchTeammateOptionTokAssistanceCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("SwitchTeammateOptionTokAssistance"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandDelegate::CreateStatic(SwitchTeammateOptionTokAssistance),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
+	void RespawnPlayerCharacter();
+
+	static FAutoConsoleCommand RespawnPlayerCharacterCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("RespawnPlayerCharacter"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandDelegate::CreateStatic(RespawnPlayerCharacter),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
 };

@@ -231,7 +231,7 @@ void UCharacterAbilitySystemComponent::SwitchCantBeSelect(bool bIsCanBeSelect)
 	}
 }
 
-void UCharacterAbilitySystemComponent::Respawn()
+void UCharacterAbilitySystemComponent::Respawn_Implementation()
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)

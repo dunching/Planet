@@ -100,10 +100,6 @@ public:
 
 	TWeakObjectPtr<ACharacterBase>ForceKnowCharater;
 
-	TArray<TPair<TWeakObjectPtr<ACharacterBase>, int32>>KnowCharatersSet;
-
-	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
-
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
 	TSet<AHumanCharacter*>TargetSet;
@@ -122,13 +118,13 @@ protected:
 	UFUNCTION(Server, Reliable)
 	virtual void SpwanTeammateCharacter_Server();
 
-	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
-	FTeamConfigure TeamConfigure;
-
 private:
 	
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
+
+	UFUNCTION()
+	void OnRep_TeammateOptionChanged();
 
 	void OnAddToNewTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr);
 
@@ -142,4 +138,12 @@ private:
 
 	FTimerHandle CheckKnowCharacterTimerHandle;
 	
+	UPROPERTY(ReplicatedUsing = OnRep_TeammateOptionChanged)
+	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
+
+	TArray<TPair<TWeakObjectPtr<ACharacterBase>, int32>>KnowCharatersSet;
+
+	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
+	FTeamConfigure TeamConfigure;
+
 };

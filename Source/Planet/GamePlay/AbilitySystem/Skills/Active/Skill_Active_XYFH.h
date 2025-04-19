@@ -87,10 +87,8 @@ protected:
 
 	float SubStepPercent = 0.8f;
 
-	UPROPERTY(Replicated)
 	int32 StepIndex = 0;
 
-	UPROPERTY(Replicated)
 	int32 SubStepIndex = 0;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
@@ -108,7 +106,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	TSubclassOf<ASPlineActor>SPlineActorClass;
 
-	UPROPERTY(Replicated)
 	ASPlineActor* SPlineActorPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")

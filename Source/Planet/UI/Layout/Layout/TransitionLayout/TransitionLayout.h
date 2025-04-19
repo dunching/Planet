@@ -11,7 +11,7 @@
 #include "LayoutInterfacetion.h"
 
 
-#include "EndangeredStateLayout.generated.h"
+#include "TransitionLayout.generated.h"
 
 class UToolsMenu;
 
@@ -24,7 +24,7 @@ struct FConsumableSocketInfo;
  * 濒死状态
  */
 UCLASS()
-class PLANET_API UEndangeredStateLayout :
+class PLANET_API UTransitionLayout :
 	public UMyUserWidget,
 	public ILayoutInterfacetion
 {
@@ -39,7 +39,4 @@ public:
 	virtual void DisEnable()override;
 
 private:
-
-	UFUNCTION()
-	void OnClicked();
 };

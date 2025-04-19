@@ -110,3 +110,9 @@ void TestCommand::TestHasBeenFlyAway(const TArray< FString >& Args)
 	}
 #endif
 }
+
+void TestCommand::ReplyHP(
+	const TArray<FString>& Args
+)
+{
+}

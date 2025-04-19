@@ -12,6 +12,7 @@
 class UAnimMontage;
 
 class ACharacterBase;
+class ATeleport;
 
 UCLASS()
 class PLANET_API UBasicFutures_Respawn : public UBasicFuturesBase
@@ -44,5 +45,4 @@ protected:
 	UAnimMontage* DeathMontage = nullptr;
 
 	ACharacterBase* CharacterPtr = nullptr;
-
 };

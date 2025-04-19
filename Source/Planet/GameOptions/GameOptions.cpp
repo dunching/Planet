@@ -66,6 +66,18 @@ UGameOptions::UGameOptions(const FObjectInitializer& ObjectInitializer):
 			TextCollect::ViewGroupmateMenu
 			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
 			),
+		FGameplayFeatureKeyMap(
+			EKeys::F1,
+			TEXT("SwitchTeammateOptionToFollow"),
+			TextCollect::ViewGroupmateMenu
+			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
+			),
+		FGameplayFeatureKeyMap(
+			EKeys::F2,
+			TEXT("SwitchTeammateOptionTokAssistance"),
+			TextCollect::ViewGroupmateMenu
+			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
+			),
 	});
 }
 

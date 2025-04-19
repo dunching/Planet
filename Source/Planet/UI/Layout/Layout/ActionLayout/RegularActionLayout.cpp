@@ -40,6 +40,8 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 	FName GuideList = TEXT("GuideList");
 
 	FName LowerHPSocket = TEXT("LowerHPSocket");
+
+	FName HUD_TeamInfoSocket = TEXT("HUD_TeamInfoSocket");
 };
 
 void URegularActionLayout::NativeConstruct()

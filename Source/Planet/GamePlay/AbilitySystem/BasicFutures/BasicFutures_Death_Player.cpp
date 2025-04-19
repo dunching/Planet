@@ -1,5 +1,4 @@
-
-#include "BasicFutures_Death.h"
+#include "BasicFutures_Death_Player.h"
 
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
@@ -15,7 +14,12 @@
 #include "InputProcessorSubSystem.h"
 #include "HumanCharacter_Player.h"
 
-void UBasicFutures_Death::ActivateAbility(
+struct FBasicFutures_Death : public TStructVariable<FBasicFutures_Death>
+{
+	const FName MontageEnd = TEXT("MontageEnd");
+};
+
+void UBasicFutures_Death_Player::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -28,20 +32,26 @@ void UBasicFutures_Death::ActivateAbility(
 
 	PlayMontage(DeathMontage, 1.f);
 
-	if (auto AIPCPtr = CharacterPtr->GetController<AHumanAIController>())
-	{
-
-	}
-
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
-		)
+	)
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanEndangeredProcessor>();
 	}
 }
 
-// void UBasicFutures_Death::InitalDefaultTags()
+void UBasicFutures_Death_Player::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled
+)
+{
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+}
+
+// void UBasicFutures_Death_Player::InitalDefaultTags()
 // {
 // 	Super::InitalDefaultTags();
 //
@@ -54,12 +64,15 @@ void UBasicFutures_Death::ActivateAbility(
 // 	ActivationOwnedTags.AddTag(UGameplayTagsLibrary::State_Buff_CantBeSlected);
 // }
 
-void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
+void UBasicFutures_Death_Player::PlayMontage(
+	UAnimMontage* CurMontagePtr,
+	float Rate
+)
 {
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
-		)
+	)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
 			this,
@@ -70,30 +83,39 @@ void UBasicFutures_Death::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
+		TaskPtr->OnNotifyBegin.BindUObject(this, &ThisClass::OnNotifyBeginReceived);
 		TaskPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageComplete);
 
 		TaskPtr->ReadyForActivation();
 	}
 }
 
-void UBasicFutures_Death::OnMontageComplete()
+void UBasicFutures_Death_Player::OnMontageComplete()
 {
-	if (
-		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) 
-		)
-	{
-		if (DestroyInSecond > 0)
-		{
-			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			TaskPtr->SetInfinite(DestroyInSecond);
-			TaskPtr->OnFinished.BindUObject(this, &ThisClass::DestroyAvatar);
-			TaskPtr->ReadyForActivation();
-		}
-	}
 }
 
-bool UBasicFutures_Death::DestroyAvatar(UAbilityTask_TimerHelper*TaskPtr) const
+void UBasicFutures_Death_Player::OnNotifyBeginReceived(
+	FName NotifyName
+)
 {
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		if (NotifyName == FBasicFutures_Death::Get().MontageEnd)
+		{
+		}
+	}
+#endif
+}
+
+bool UBasicFutures_Death_Player::DestroyAvatar(
+	UAbilityTask_TimerHelper* TaskPtr
+)
+{
+	K2_CancelAbility();
+
 	GetAvatarActorFromActorInfo()->Destroy();
 
 	return true;

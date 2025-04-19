@@ -6,6 +6,7 @@
 
 #include "AIComponent.h"
 #include "AIController.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "CharacterBase.h"
 #include "HumanCharacter.h"
@@ -191,6 +192,40 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 
 void UTeamMatesHelperComponent::CheckKnowCharacterImp()
 {
+	// 是否有效
+	{
+		TSet<ACharacterBase*> NeedRemoveAry;
+		for (const auto& Iter : KnowCharatersSet)
+		{
+			if (Iter.Key.IsValid())
+			{
+				if (Iter.Key->GetCharacterAbilitySystemComponent()->IsInDeath())
+				{
+					NeedRemoveAry.Add(Iter.Key.Get());
+				}
+			}
+			else
+			{
+				NeedRemoveAry.Add(Iter.Key.Get());
+			}
+		}
+		for (int32 Index = KnowCharatersSet.Num() - 1; Index >= 0; Index--)
+		{
+			if (KnowCharatersSet[Index].Key.IsValid())
+			{
+				auto TargetPtr = KnowCharatersSet[Index].Key.Get();
+				if (NeedRemoveAry.Contains(TargetPtr))
+				{
+					NeedRemoveAry.Remove(TargetPtr);
+					KnowCharatersSet.RemoveAt(Index);
+
+					KnowCharaterChanged(TargetPtr, false);
+				}
+			}
+		}
+	}
+
+	// 是否远离了设定位置
 	auto CharacterActorPtr = GetOwnerCharacterProxyPtr()->GetCharacterActor();
 	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
 	{
@@ -272,6 +307,10 @@ bool UTeamMatesHelperComponent::TeleportTo(
 {
 	for (auto Iter : MembersSet)
 	{
+		if (Iter == OwnerCharacterProxyPtr)
+		{
+			continue;
+		}
 		auto TargetActorPtr = Iter->GetCharacterActor();
 		if (TargetActorPtr.IsValid())
 		{
@@ -304,15 +343,22 @@ void UTeamMatesHelperComponent::AddKnowCharacter(
 	{
 		return;
 	}
+	
 	auto CharacterActorPtr = GetOwnerCharacterProxyPtr()->GetCharacterActor();
 	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
 	{
+		// 
+		if (CharacterPtr->GetCharacterAbilitySystemComponent()->IsInDeath())
+		{
+			return;
+		}
+
 		// NPC
 		if (CharacterPtr->IsA(AHumanCharacter_AI::StaticClass()))
 		{
 			return;
 		}
-		
+
 		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
 
 		if (AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
@@ -327,9 +373,8 @@ void UTeamMatesHelperComponent::AddKnowCharacter(
 		}
 		else
 		{
-			
 		}
-		
+
 		for (auto& Iter : KnowCharatersSet)
 		{
 			if (Iter.Key == CharacterPtr)
@@ -414,10 +459,16 @@ void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ThisClass, TeamConfigure, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, TeammateOption, COND_None);
 }
 
 void UTeamMatesHelperComponent::OnRep_GroupSharedInfoChanged()
 {
 	TeamHelperChangedDelegateContainer();
 	PRINTINVOKEWITHSTR(FString(TEXT("")));
+}
+
+void UTeamMatesHelperComponent::OnRep_TeammateOptionChanged()
+{
+	TeammateOptionChanged.ExcuteCallback(TeammateOption, OwnerCharacterProxyPtr);
 }

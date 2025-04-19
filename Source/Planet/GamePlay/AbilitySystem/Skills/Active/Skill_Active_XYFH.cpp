@@ -141,10 +141,6 @@ void USkill_Active_XYFH::EndAbility(
 void USkill_Active_XYFH::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(ThisClass, SPlineActorPtr, COND_None);
-	DOREPLIFETIME_CONDITION(ThisClass, StepIndex, COND_SkipOwner);
-	DOREPLIFETIME_CONDITION(ThisClass, SubStepIndex, COND_SkipOwner);
 }
 
 void USkill_Active_XYFH::PerformAction(

@@ -29,6 +29,7 @@ class AGeneratorColony_ByTime;
 class AGeneratorBase;
 class AGeneratorColony_ByInvoke;
 class AGuideActor;
+class ATeleport;
 
 /**
  *
@@ -81,6 +82,12 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void MakeRespawn(const TArray<FString>& Args);
+
+	UFUNCTION(Server, Reliable)
+	void TeleportPlayerToNearest();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void TeleportPlayerToNearestEnd(bool bIsSuccess);
 
 #pragma endregion
 
@@ -150,6 +157,9 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UEventSubjectComponent> EventSubjectComponentPtr = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<UGameplayTasksComponent> GameplayTasksComponentPtr = nullptr;
 	
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 

@@ -63,12 +63,19 @@ void FSTT_IsInAttackArea::PerformAction(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	
-	float OutRadius1 = InstanceData.GloabVariable->TargetCharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
-	float OutRadius2 = InstanceData.CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
+	if(InstanceData.GloabVariable->TargetCharacterPtr.IsValid())
+	{
+		float OutRadius1 = InstanceData.GloabVariable->TargetCharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
+		float OutRadius2 = InstanceData.CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleRadius();
 
-	const auto Distance =InstanceData.GloabVariable->QueryDistance + OutRadius1 + OutRadius2;
-	InstanceData.bIsFarawayOriginal = FVector::Distance(
-		InstanceData.GloabVariable->TargetCharacterPtr->GetActorLocation(),
-		InstanceData.CharacterPtr->GetActorLocation()
-	) <= Distance;
+		const auto Distance =InstanceData.GloabVariable->QueryDistance + OutRadius1 + OutRadius2;
+		InstanceData.bIsFarawayOriginal = FVector::Distance(
+			InstanceData.GloabVariable->TargetCharacterPtr->GetActorLocation(),
+			InstanceData.CharacterPtr->GetActorLocation()
+		) <= Distance;
+	}
+	else
+	{
+		InstanceData.bIsFarawayOriginal = false;
+	}
 }

@@ -29,7 +29,14 @@ public:
 
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
+	/**
+	 * 将Player传送至该点
+	 * @param ChallengeLevelType 
+	 * @param PCPtr 
+	 */
 	void SwitchDataLayer(ETeleport ChallengeLevelType, APlanetPlayerController* PCPtr);
+
+	ETeleport GetTeleportPlayerToNearest(APlanetPlayerController* PCPtr);
 
 	/**
 	 * 确认切换的数据层中，必须的数据是否已存在
