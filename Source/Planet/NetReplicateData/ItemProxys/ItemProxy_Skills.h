@@ -210,6 +210,8 @@ struct PLANET_API FWeaponSkillProxy : public FSkillProxy
 
 public:
 
+	friend FCharacterProxy;
+	
 	FWeaponSkillProxy();
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;

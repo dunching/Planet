@@ -42,7 +42,7 @@ UBasicFutures_MoveToAttaclArea::UBasicFutures_MoveToAttaclArea() :
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
-	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateNo;
+	ReplicationPolicy = EGameplayAbilityReplicationPolicy::ReplicateYes;
 	NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
 }
 

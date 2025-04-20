@@ -67,14 +67,20 @@ UGameOptions::UGameOptions(const FObjectInitializer& ObjectInitializer):
 			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
 			),
 		FGameplayFeatureKeyMap(
-			EKeys::F1,
+			SwitchTeammateOptionToFollow,
 			TEXT("SwitchTeammateOptionToFollow"),
 			TextCollect::ViewGroupmateMenu
 			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
 			),
 		FGameplayFeatureKeyMap(
-			EKeys::F2,
-			TEXT("SwitchTeammateOptionTokAssistance"),
+			SwitchTeammateOptionToAssistance,
+			TEXT("SwitchTeammateOptionToAssistance"),
+			TextCollect::ViewGroupmateMenu
+			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
+			),
+		FGameplayFeatureKeyMap(
+			SwitchTeammateOptionToFireTarget,
+			TEXT("SwitchTeammateOptionToFireTarget"),
 			TextCollect::ViewGroupmateMenu
 			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
 			),

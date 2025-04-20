@@ -20,6 +20,8 @@
 #include "HumanAnimInstance.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CollisionDataStruct.h"
+#include "GroupManagger.h"
+#include "TeamMatesHelperComponent.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
@@ -46,8 +48,11 @@ void UStateProcessorComponent::SetFocusCharactersAry(
 	}
 #endif
 	
-	FocusCharactersAry = {TargetCharacterPtr};
-	OnFocusCharacterDelegate(TargetCharacterPtr);
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SetFocusCharactersAry(TargetCharacterPtr);
+	}
 }
 
 void UStateProcessorComponent::ClearFocusCharactersAry()
@@ -59,13 +64,29 @@ void UStateProcessorComponent::ClearFocusCharactersAry()
 	}
 #endif
 	
-	FocusCharactersAry.Empty();
-	OnFocusCharacterDelegate(nullptr);
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->ClearFocusCharactersAry();
+	}
 }
 
 TArray<ACharacterBase*> UStateProcessorComponent::GetFocusCharactersAry() const
 {
-	return FocusCharactersAry;
+	TArray<ACharacterBase*> Result;
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		if (auto GroupManaggerPtr = CharacterPtr->GetGroupManagger())
+		{
+			auto ForceKnowCharater =GroupManaggerPtr->GetTeamMatesHelperComponent()->GetForceKnowCharater();
+			if (ForceKnowCharater.IsValid())
+			{
+				Result.Add( ForceKnowCharater.Get());
+			}
+		}
+	}
+	return Result;
 }
 
 void UStateProcessorComponent::BeginPlay()
@@ -94,7 +115,6 @@ void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 
 	Params.Condition = COND_None;
 	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterStateInfo_FASI_Container, Params);
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, FocusCharactersAry, Params);
 }
 
 void UStateProcessorComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)

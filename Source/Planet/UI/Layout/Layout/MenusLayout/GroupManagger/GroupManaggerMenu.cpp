@@ -69,7 +69,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 		return;
 	}
 
-	auto GroupManaggerPtr = PlayerCharacterPtr->GetGroupSharedInfo();
+	auto GroupManaggerPtr = PlayerCharacterPtr->GetGroupManagger();
 	auto HICPtr = GroupManaggerPtr->GetHoldingItemsComponent();
 
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();

@@ -120,6 +120,11 @@ public:
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();
 
+	/**
+	 * 生成一个NPC Actor
+	 * @param Transform 
+	 * @return 
+	 */
 	AHumanCharacter_AI * SpwanCharacter(const FTransform&Transform);
 
 	void DestroyCharacter();

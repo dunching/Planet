@@ -50,9 +50,6 @@ protected:
 	UFUNCTION()
 	void OnNotifyBeginReceived(FName NotifyName);
 
-	UFUNCTION()
-	bool DestroyAvatar(UAbilityTask_TimerHelper*TaskPtr) ;
-	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	UAnimMontage* DeathMontage = nullptr;
 

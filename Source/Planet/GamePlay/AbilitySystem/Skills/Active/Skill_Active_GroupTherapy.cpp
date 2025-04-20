@@ -103,7 +103,7 @@ void USkill_Active_GroupTherapy::EmitEffect()
 
 	TSet<ACharacterBase*>TeammatesSet;
 	TeammatesSet.Add(CharacterPtr);
-	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupSharedInfo();
+	auto GroupMnaggerComponent = Cast<AHumanCharacter>(CharacterPtr)->GetGroupManagger();
 	if (GroupMnaggerComponent)
 	{
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();

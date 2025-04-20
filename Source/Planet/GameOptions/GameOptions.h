@@ -79,6 +79,25 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey FocusTarget = EKeys::Tab;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey Interaction = EKeys::E;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey SwitchTeammateOptionToFollow = EKeys::F1;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey SwitchTeammateOptionToAssistance = EKeys::F2;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey SwitchTeammateOptionToFireTarget = EKeys::F3;
+
+	/**
+	 * 返回上一级
+	 * 这里的操作是固定的?
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey Return = EKeys::Escape;
+
 	static int32 MaxTeammateNum;
 
 protected:

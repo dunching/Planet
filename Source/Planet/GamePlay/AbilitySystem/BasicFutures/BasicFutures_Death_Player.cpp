@@ -14,7 +14,7 @@
 #include "InputProcessorSubSystem.h"
 #include "HumanCharacter_Player.h"
 
-struct FBasicFutures_Death : public TStructVariable<FBasicFutures_Death>
+struct FBasicFutures_Death_Player : public TStructVariable<FBasicFutures_Death_Player>
 {
 	const FName MontageEnd = TEXT("MontageEnd");
 };
@@ -103,20 +103,9 @@ void UBasicFutures_Death_Player::OnNotifyBeginReceived(
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		if (NotifyName == FBasicFutures_Death::Get().MontageEnd)
+		if (NotifyName == FBasicFutures_Death_Player::Get().MontageEnd)
 		{
 		}
 	}
 #endif
-}
-
-bool UBasicFutures_Death_Player::DestroyAvatar(
-	UAbilityTask_TimerHelper* TaskPtr
-)
-{
-	K2_CancelAbility();
-
-	GetAvatarActorFromActorInfo()->Destroy();
-
-	return true;
 }

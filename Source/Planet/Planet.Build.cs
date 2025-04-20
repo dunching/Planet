@@ -152,6 +152,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GameOptions");
         PublicIncludePaths.Add("Planet/CameraTrailHelper");
         PublicIncludePaths.Add("Planet/InputProcessor/InputProcessorSubSystem");
+        PublicIncludePaths.Add("Planet/InputProcessor/TransitionProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HorseProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor");

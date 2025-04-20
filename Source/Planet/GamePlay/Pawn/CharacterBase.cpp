@@ -221,14 +221,14 @@ void ACharacterBase::PossessedBy(
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
 	{
-		// GroupManaggerPtr = Cast<AHumanAIController>(NewController)->GetGroupSharedInfo();
+		// GroupManaggerPtr = Cast<AHumanAIController>(NewController)->GetGroupManagger();
 
 		// if (auto ControllerPtr = GetController<AHumanAIController>())
 		// {
-		// 	ControllerPtr->SetGroupSharedInfo(GetGroupSharedInfo());
+		// 	ControllerPtr->SetGroupSharedInfo(GetGroupManagger());
 		// }
 
-		// OnGroupManaggerReady(GetGroupSharedInfo());
+		// OnGroupManaggerReady(GetGroupManagger());
 	}
 }
 
@@ -268,7 +268,7 @@ class UPlanetAbilitySystemComponent* ACharacterBase::GetAbilitySystemComponent()
 	return AbilitySystemComponentPtr;
 }
 
-AGroupManagger* ACharacterBase::GetGroupSharedInfo() const
+AGroupManagger* ACharacterBase::GetGroupManagger() const
 {
 	return GroupManaggerPtr;
 }
@@ -328,7 +328,7 @@ bool ACharacterBase::IsGroupmate(
 ) const
 {
 	return
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
+		GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
 bool ACharacterBase::IsTeammate(
@@ -336,7 +336,7 @@ bool ACharacterBase::IsTeammate(
 ) const
 {
 	return
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
+		GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
 ACharacterBase* ACharacterBase::GetFocusActor() const
@@ -417,7 +417,7 @@ void ACharacterBase::SpawnDefaultController()
 				auto AIControllerPtr = Cast<APlanetAIController>(ActorPtr);
 				if (AIControllerPtr)
 				{
-					AIControllerPtr->SetGroupSharedInfo(GetGroupSharedInfo());
+					AIControllerPtr->SetGroupSharedInfo(GetGroupManagger());
 				}
 			};
 		SpawnInfo.OverrideLevel = GetLevel();

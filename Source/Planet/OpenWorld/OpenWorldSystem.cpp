@@ -34,7 +34,7 @@ bool UOpenWorldSubSystem::ShouldCreateSubsystem(UObject* Outer) const
 void UOpenWorldSubSystem::SwitchDataLayer(ETeleport ChallengeLevelType, APlanetPlayerController* PCPtr)
 {
 	//在客户端/服务器中，只有服务器可以激活数据层
-	if (PCPtr->HasAuthority())
+	// if (PCPtr->HasAuthority())
 	{
 		if (auto DataLayerManagerPtr = UDataLayerManager::GetDataLayerManager(this))
 		{
@@ -61,7 +61,7 @@ ETeleport UOpenWorldSubSystem::GetTeleportPlayerToNearest(
 	ETeleport TargetTeleport = ETeleport::kNone;
 	
 	//在客户端/服务器中，只有服务器可以激活数据层
-	if (PCPtr->HasAuthority())
+	// if (PCPtr->HasAuthority())
 	{
 		if (auto DataLayerManagerPtr = UDataLayerManager::GetDataLayerManager(this))
 		{

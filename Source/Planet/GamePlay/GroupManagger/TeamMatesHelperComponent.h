@@ -35,8 +35,8 @@ UCLASS(BlueprintType, Blueprintable)
 class UTeamMatesHelperComponent : public UActorComponent
 {
 	GENERATED_BODY()
-public:
 
+public:
 	using FCharacterProxyType = FCharacterProxy;
 
 	static FName ComponentName;
@@ -48,77 +48,142 @@ public:
 	using FOwnerType = AGroupManagger;
 
 	using FMemberChangedDelegateContainer =
-		TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterProxyType>&)>;
+	TCallbackHandleContainer<void(
+		EGroupMateChangeType,
+		const TSharedPtr<FCharacterProxyType>&
+	
+	)>;
 
-	using FTeammateOptionChangedDelegateContainer = 
-		TCallbackHandleContainer<void(ETeammateOption, const TSharedPtr<FCharacterProxyType>&)>;
+	using FTeammateOptionChangedDelegateContainer =
+	TCallbackHandleContainer<void(
+		ETeammateOption,
+		const TSharedPtr<FCharacterProxyType>&
+	
+	)>;
 
-	using FKnowCharaterChanged = 
-		TCallbackHandleContainer<void(TWeakObjectPtr<ACharacterBase>, bool)>;
+	using FKnowCharaterChanged =
+	TCallbackHandleContainer<void(
+		TWeakObjectPtr<ACharacterBase>,
+		bool
+	)>;
+
+	using FOnFocusCharacterDelegate =
+	TCallbackHandleContainer<void(
+		ACharacterBase*
+	
+	)>;
 
 	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
 
-	UTeamMatesHelperComponent(const FObjectInitializer& ObjectInitializer);
+	UTeamMatesHelperComponent(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	void SwitchTeammateOption(ETeammateOption InTeammateOption);
+	void SwitchTeammateOption(
+		ETeammateOption InTeammateOption
+	);
 
-	ETeammateOption GetTeammateOption()const;
+	ETeammateOption GetTeammateOption() const;
 
-	void AddKnowCharacter(ACharacterBase*CharacterPtr);
+#pragma region 锁定,感知到的目标
+	void AddKnowCharacter(
+		ACharacterBase* CharacterPtr
+	);
 
-	void RemoveKnowCharacter(ACharacterBase* CharacterPtr);
+	void RemoveKnowCharacter(
+		ACharacterBase* CharacterPtr
+	);
+
+	void SetFocusCharactersAry(ACharacterBase*TargetCharacterPtr);
+	
+	void ClearFocusCharactersAry();
+	
+	TWeakObjectPtr<ACharacterBase> GetForceKnowCharater() const;
+
+	TArray<TWeakObjectPtr<ACharacterBase>> GetKnowCharater() const;
+#pragma endregion
 
 	void SpwanTeammateCharacter();
 
-	void UpdateTeammateConfig(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
+	void UpdateTeammateConfig(
+		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
+		int32 Index
+	);
 
-	bool IsMember(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr)const;
+	bool IsMember(
+		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
+	) const;
 
-	bool IsMember(const FGuid& CharacterID)const;
+	bool IsMember(
+		const FGuid& CharacterID
+	) const;
 
 	bool TeleportTo(
 		const FVector& DestLocation,
 		const FRotator& DestRotation,
-		bool bIsATest=false,
-		bool bNoCheck=false
-		);
-	
-	TWeakObjectPtr<ACharacterBase> GetKnowCharacter()const;
-	
-	TSharedPtr<FCharacterProxyType>GetOwnerCharacterProxyPtr()const;
-	
-	void SetOwnerCharacterProxy(const TSharedPtr<FCharacterProxyType>&CharacterProxySPtr);
-	
-	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
+		bool bIsATest = false,
+		bool bNoCheck = false
+	);
 
-	FKnowCharaterChanged KnowCharaterChanged;
+	TSharedPtr<FCharacterProxyType> GetOwnerCharacterProxyPtr() const;
+
+	void SetOwnerCharacterProxy(
+		const TSharedPtr<FCharacterProxyType>& CharacterProxySPtr
+	);
+
+	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
 	FMemberChangedDelegateContainer MembersChanged;
 
 	// 分配的小队
 	TSet<TSharedPtr<FCharacterProxyType>> MembersSet;
 
-	TWeakObjectPtr<ACharacterBase>ForceKnowCharater;
-
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
-	TSet<AHumanCharacter*>TargetSet;
+	TSet<AHumanCharacter*> TargetSet;
+
+	FKnowCharaterChanged KnowCharaterChanged;
+
+	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
 protected:
+	virtual void InitializeComponent() override;
 
-	virtual void InitializeComponent()override;
+	virtual void BeginPlay() override;
 
-	virtual void BeginPlay()override;
-	
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
+
+#pragma region RPC
+
+public:
+	/**
+	 * 
+	 */
+	UFUNCTION(Server, Reliable)
+	virtual void TeammateCharacter_ActiveWeapon_Server();
+
+private:
 
 	UFUNCTION(Server, Reliable)
-	virtual void UpdateTeammateConfig_Server(const FGuid&ProxtID, int32 Index);
+	void SwitchTeammateOption_Server(
+		ETeammateOption InTeammateOption
+	);
 
+	UFUNCTION(Server, Reliable)
+	virtual void UpdateTeammateConfig_Server(
+		const FGuid& ProxtID,
+		int32 Index
+	);
+
+	/**
+	 * 
+	 */
 	UFUNCTION(Server, Reliable)
 	virtual void SpwanTeammateCharacter_Server();
 
-private:
+#pragma endregion
 	
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
@@ -126,24 +191,43 @@ private:
 	UFUNCTION()
 	void OnRep_TeammateOptionChanged();
 
-	void OnAddToNewTeam(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr);
+	void OnAddToNewTeam(
+		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
+	);
 
-	void UpdateTeammateConfigImp(FPawnType* PCPtr, int32 Index);
+	void UpdateTeammateConfigImp(
+		FPawnType* PCPtr,
+		int32 Index
+	);
 
-	void UpdateTeammateConfigImp(const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr, int32 Index);
+	void UpdateTeammateConfigImp(
+		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
+		int32 Index
+	);
 
 	void CheckKnowCharacterImp();
-	
+
 	TSharedPtr<FCharacterProxyType> OwnerCharacterProxyPtr = nullptr;
 
 	FTimerHandle CheckKnowCharacterTimerHandle;
-	
+
 	UPROPERTY(ReplicatedUsing = OnRep_TeammateOptionChanged)
 	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
 
-	TArray<TPair<TWeakObjectPtr<ACharacterBase>, int32>>KnowCharatersSet;
+	/**
+	 * 目标、敌人列表
+	 */
+	UPROPERTY(Replicated)
+	TArray<TWeakObjectPtr<ACharacterBase>> KnowCharatersSet;
+
+	/**
+	* 玩家锁定的目标
+	 * 这个角色锁定的目标，第0个为主要锁定
+	 * 为什么不用Controller UpdateRotation去做？因为我们要在移动组件里统一设置旋转
+	 */
+	UPROPERTY(Replicated)
+	TWeakObjectPtr<ACharacterBase> ForceKnowCharater;
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	FTeamConfigure TeamConfigure;
-
 };

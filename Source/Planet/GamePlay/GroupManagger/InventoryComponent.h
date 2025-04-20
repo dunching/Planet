@@ -160,6 +160,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+	
 #if UE_EDITOR || UE_CLIENT
 	void SetAllocationCharacterProxy(
 		const FGuid& Proxy_ID,

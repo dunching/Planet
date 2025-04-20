@@ -10,6 +10,8 @@ class UStaticMeshComponent;
 class USceneComponent;
 class UWidgetComponent;
 class UBillboardComponent;
+class UGameplayEffect;
+class USphereComponent;
 
 /**
  *
@@ -20,22 +22,40 @@ class PLANET_API ATeleport : public AActor
 	GENERATED_BODY()
 
 public:
+	ATeleport(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	ATeleport(const FObjectInitializer& ObjectInitializer);
+	virtual void BeginPlay() override;
 
 	FTransform GetLandTransform() const;
-	
-protected:
 
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Display)
 	TObjectPtr<UStaticMeshComponent> StaticComponentPtr = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = Display)
 	TObjectPtr<USceneComponent> LandPtComponentPtr = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<USphereComponent> GEAreaComponentPtr = nullptr;
+
 #if WITH_EDITORONLY_DATA
 	UPROPERTY()
 	TObjectPtr<UBillboardComponent> WidgetComponentPtr = nullptr;
 #endif
-	
+
+	// 靠近传送点时治疗角色的GE
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGameplayEffect> ReplyGEClass;
+
+	UFUNCTION()
+	void OnComponentBeginOverlap(
+		UPrimitiveComponent* OverlappedComponent,
+		AActor* OtherActor,
+		UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex,
+		bool bFromSweep,
+		const FHitResult& SweepResult
+	);
 };

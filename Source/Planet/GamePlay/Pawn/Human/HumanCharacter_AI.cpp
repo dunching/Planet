@@ -201,7 +201,7 @@ void AHumanCharacter_AI::OnRep_GroupSharedInfoChanged()
 
 // TSharedPtr<FCharacterProxy> AHumanCharacter_AI::GetCharacterProxy() const
 // {
-// 	return GetGroupSharedInfo()->GetInventoryComponent()->FindProxy_Character(CharacterID);
+// 	return GetGroupManagger()->GetInventoryComponent()->FindProxy_Character(CharacterID);
 // }
 
 void AHumanCharacter_AI::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
@@ -218,7 +218,7 @@ void AHumanCharacter_AI::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfo
 		else
 		{
 		}
-		if (GetAIComponent()->bIsSingle)
+		if (GetAIComponent()->bIsSingle && !GetAIComponent()->bIsTeammate)
 		{
 			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(AIComponentPtr->DefaultTeammateOption);
 			GroupManaggerPtr->SetOwnerCharacterProxyPtr(this);

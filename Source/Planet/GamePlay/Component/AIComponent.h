@@ -71,7 +71,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<USceneComponent> PathFollowComponentPtr = nullptr;
 
+	/**
+	 * 是否是单个的NPC，如地图上的商家
+	 */
 	bool bIsSingle = true;
+	
+	/**
+	 * 是否是玩家的队友
+	 */
+	bool bIsTeammate = false;
 	
 protected:
 	

@@ -141,8 +141,10 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 				auto AICharacterPtr = CharacterProxySPtr->SpwanCharacter(Transform);
 				if (AICharacterPtr)
 				{
-					AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
+					// AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
 					// AICharacterPtr->SetCharacterID(CharacterProxySPtr->GetID());
+					
+					AICharacterPtr->GetProxyProcessComponent()->ActiveWeapon();
 				}
 			}
 		}
@@ -197,23 +199,23 @@ void UTeamMatesHelperComponent::CheckKnowCharacterImp()
 		TSet<ACharacterBase*> NeedRemoveAry;
 		for (const auto& Iter : KnowCharatersSet)
 		{
-			if (Iter.Key.IsValid())
+			if (Iter.IsValid())
 			{
-				if (Iter.Key->GetCharacterAbilitySystemComponent()->IsInDeath())
+				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
 				{
-					NeedRemoveAry.Add(Iter.Key.Get());
+					NeedRemoveAry.Add(Iter.Get());
 				}
 			}
 			else
 			{
-				NeedRemoveAry.Add(Iter.Key.Get());
+				NeedRemoveAry.Add(Iter.Get());
 			}
 		}
 		for (int32 Index = KnowCharatersSet.Num() - 1; Index >= 0; Index--)
 		{
-			if (KnowCharatersSet[Index].Key.IsValid())
+			if (KnowCharatersSet[Index].IsValid())
 			{
-				auto TargetPtr = KnowCharatersSet[Index].Key.Get();
+				auto TargetPtr = KnowCharatersSet[Index].Get();
 				if (NeedRemoveAry.Contains(TargetPtr))
 				{
 					NeedRemoveAry.Remove(TargetPtr);
@@ -239,11 +241,11 @@ void UTeamMatesHelperComponent::CheckKnowCharacterImp()
 			TSet<ACharacterBase*> NeedRemoveAry;
 			for (const auto& Iter : KnowCharatersSet)
 			{
-				if (Iter.Key.IsValid())
+				if (Iter.IsValid())
 				{
-					if (FVector::Distance(Iter.Key->GetActorLocation(), Location) > MaxDistance)
+					if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
 					{
-						NeedRemoveAry.Add(Iter.Key.Get());
+						NeedRemoveAry.Add(Iter.Get());
 					}
 				}
 				else
@@ -252,9 +254,9 @@ void UTeamMatesHelperComponent::CheckKnowCharacterImp()
 			}
 			for (int32 Index = KnowCharatersSet.Num() - 1; Index >= 0; Index--)
 			{
-				if (KnowCharatersSet[Index].Key.IsValid())
+				if (KnowCharatersSet[Index].IsValid())
 				{
-					auto TargetPtr = KnowCharatersSet[Index].Key.Get();
+					auto TargetPtr = KnowCharatersSet[Index].Get();
 					if (NeedRemoveAry.Contains(TargetPtr))
 					{
 						NeedRemoveAry.Remove(TargetPtr);
@@ -328,6 +330,13 @@ void UTeamMatesHelperComponent::SwitchTeammateOption(
 	TeammateOption = InTeammateOption;
 
 	TeammateOptionChanged.ExcuteCallback(InTeammateOption, OwnerCharacterProxyPtr);
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		SwitchTeammateOption_Server(InTeammateOption);
+	}
+#endif
 }
 
 ETeammateOption UTeamMatesHelperComponent::GetTeammateOption() const
@@ -377,15 +386,13 @@ void UTeamMatesHelperComponent::AddKnowCharacter(
 
 		for (auto& Iter : KnowCharatersSet)
 		{
-			if (Iter.Key == CharacterPtr)
+			if (Iter == CharacterPtr)
 			{
-				Iter.Value++;
-
 				return;
 			}
 		}
 
-		KnowCharatersSet.Add({CharacterPtr, 1});
+		KnowCharatersSet.Add(CharacterPtr);
 		KnowCharaterChanged(CharacterPtr, true);
 #ifdef WITH_EDITOR
 		if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
@@ -402,14 +409,9 @@ void UTeamMatesHelperComponent::RemoveKnowCharacter(
 {
 	for (int32 Index = 0; Index < KnowCharatersSet.Num(); Index++)
 	{
-		if (KnowCharatersSet[Index].Key == CharacterPtr)
+		if (KnowCharatersSet[Index] == CharacterPtr)
 		{
-			KnowCharatersSet[Index].Value--;
-
-			if (KnowCharatersSet[Index].Value <= 0)
-			{
-				KnowCharatersSet.RemoveAt(Index);
-			}
+			KnowCharatersSet.RemoveAt(Index);
 			KnowCharaterChanged(CharacterPtr, false);
 #ifdef WITH_EDITOR
 			if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
@@ -422,19 +424,42 @@ void UTeamMatesHelperComponent::RemoveKnowCharacter(
 	}
 }
 
-TWeakObjectPtr<ACharacterBase> UTeamMatesHelperComponent::GetKnowCharacter() const
+void UTeamMatesHelperComponent::SetFocusCharactersAry(
+	ACharacterBase* TargetCharacterPtr
+)
+{
+	ForceKnowCharater = TargetCharacterPtr;
+	OnFocusCharacterDelegate(TargetCharacterPtr);
+
+	KnowCharatersSet.Add(TargetCharacterPtr);
+	KnowCharaterChanged(TargetCharacterPtr, true);
+}
+
+void UTeamMatesHelperComponent::ClearFocusCharactersAry()
+{
+	ForceKnowCharater = nullptr;
+	OnFocusCharacterDelegate(nullptr);
+}
+
+TWeakObjectPtr<ACharacterBase> UTeamMatesHelperComponent::GetForceKnowCharater() const
 {
 	if (ForceKnowCharater.IsValid())
 	{
 		return ForceKnowCharater;
 	}
 
-	for (auto Iter : KnowCharatersSet)
-	{
-		return Iter.Key;
-	}
-
 	return nullptr;
+}
+
+TArray<TWeakObjectPtr<ACharacterBase>> UTeamMatesHelperComponent::GetKnowCharater() const
+{
+	TArray<TWeakObjectPtr<ACharacterBase>> Result;
+
+	for (const auto& Iter : KnowCharatersSet)
+	{
+		Result.Add(Iter);
+	}
+	return Result;
 }
 
 TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperComponent::GetOwnerCharacterProxyPtr() const
@@ -460,6 +485,39 @@ void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
 
 	DOREPLIFETIME_CONDITION(ThisClass, TeamConfigure, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, TeammateOption, COND_None);
+	
+	DOREPLIFETIME_CONDITION(ThisClass, KnowCharatersSet, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, ForceKnowCharater, COND_None);
+}
+
+void UTeamMatesHelperComponent::TeammateCharacter_ActiveWeapon_Server_Implementation()
+{
+	const auto CharactersAry = TeamConfigure.GetCharactersAry();
+	for (int32 Index = 0; Index < CharactersAry.Num(); Index++)
+	{
+		for (int32 SecondIndex = 0; SecondIndex < CharactersAry[Index].Num(); SecondIndex++)
+		{
+			const auto CharacterProxySPtr =
+				GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(
+					CharactersAry[Index][SecondIndex]
+				);
+			if (CharacterProxySPtr)
+			{
+				auto CharacterActorPtr = CharacterProxySPtr->GetCharacterActor();
+				if (CharacterActorPtr.IsValid())
+				{
+					CharacterActorPtr->GetProxyProcessComponent()->ActiveWeapon();
+				}
+			}
+		}
+	}
+}
+
+void UTeamMatesHelperComponent::SwitchTeammateOption_Server_Implementation(
+	ETeammateOption InTeammateOption
+)
+{
+	SwitchTeammateOption(InTeammateOption);
 }
 
 void UTeamMatesHelperComponent::OnRep_GroupSharedInfoChanged()

@@ -154,6 +154,7 @@ namespace HumanProcessor
 		if (OnwerActorPtr)
 		{
 			OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
+			OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->TeammateCharacter_ActiveWeapon_Server();
 		}
 	}
 
@@ -200,8 +201,9 @@ namespace HumanProcessor
 				}
 				
 				// 特殊处理一下
-				if (OnwerActorPtr->LookAtSceneActorPtr && (EventArgs.Key == EKeys::E))
+				if (OnwerActorPtr->LookAtSceneActorPtr && (EventArgs.Key == GameOptionsPtr->Interaction))
 				{
+					OnwerActorPtr->InteractionSceneActor(Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr));
 					return true;
 				}
 

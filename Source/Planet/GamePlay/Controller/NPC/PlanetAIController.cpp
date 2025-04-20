@@ -122,7 +122,7 @@ TWeakObjectPtr<ACharacterBase> APlanetAIController::GetTeamFocusTarget() const
 {
 	if (GetGroupSharedInfo() && GetGroupSharedInfo()->GetTeamMatesHelperComponent())
 	{
-		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
+		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetForceKnowCharater();
 	}
 
 	return nullptr;
@@ -194,7 +194,7 @@ void APlanetAIController::OnTargetPerceptionUpdated(
 			}
 			else
 			{
-				// GetGroupSharedInfo()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
+				// GetGroupManagger()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
 			}
 		}
 	}

@@ -85,6 +85,7 @@ public:
 	TCallbackHandleContainer<void(const TWeakPtr<FCharacterProxy>&)>;
 
 	friend FSceneProxyContainer;
+	friend FCharacterProxy;
 	friend FProxy_FASI_Container;
 	friend UInventoryComponent;
 	friend APlanetGameMode;
@@ -95,6 +96,8 @@ public:
 
 	virtual ~FBasicProxy();
 
+	// FBasicProxy operator=(const FBasicProxy&) = delete;
+	
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
 	virtual void InitialProxy(const FGameplayTag& ProxyType);

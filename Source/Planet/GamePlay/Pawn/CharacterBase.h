@@ -92,7 +92,7 @@ public:
 	UFUNCTION()
 	virtual void OnRep_GroupSharedInfoChanged();
 
-	AGroupManagger* GetGroupSharedInfo() const;
+	AGroupManagger* GetGroupManagger() const;
 
 	UInventoryComponent* GetInventoryComponent() const;
 

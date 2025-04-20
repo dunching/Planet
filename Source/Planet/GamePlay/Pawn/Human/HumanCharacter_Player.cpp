@@ -140,7 +140,7 @@ void AHumanCharacter_Player::PossessedBy(AController* NewController)
 
 	PlayerComponentPtr->PossessedBy(Cast<APlayerController>(NewController));
 		
-	auto GroupsHelperSPtr = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
+	auto GroupsHelperSPtr = GetGroupManagger()->GetTeamMatesHelperComponent();
 	if (GroupsHelperSPtr)
 	{
 		TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(

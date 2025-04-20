@@ -282,11 +282,11 @@ void EditorCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 		{
 			if (Args[2] == TEXT("1"))
 			{
-//				NewCharacterPtr->GetGroupSharedInfo()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+//				NewCharacterPtr->GetGroupManagger()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
 			}
 			else if (Args[2] == TEXT("2"))
 			{
-	//			NewCharacterPtr->GetGroupSharedInfo()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
+	//			NewCharacterPtr->GetGroupManagger()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
 			}
 		}
 	}

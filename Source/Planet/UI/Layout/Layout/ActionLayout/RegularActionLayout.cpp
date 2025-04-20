@@ -15,6 +15,7 @@
 #include "UICommon.h"
 #include "FocusTitle.h"
 #include "GameOptions.h"
+#include "GroupManagger.h"
 #include "GuideActor.h"
 #include "GuideList.h"
 #include "GuideSubSystem.h"
@@ -22,6 +23,7 @@
 #include "HumanCharacter_Player.h"
 #include "PawnStateActionHUD.h"
 #include "ProgressTips.h"
+#include "TeamMatesHelperComponent.h"
 
 struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 {
@@ -57,9 +59,10 @@ void URegularActionLayout::NativeConstruct()
 
 		OnFocusCharacter(nullptr);
 		auto DelegateHandle =
-			PlayerCharacterPtr->GetStateProcessorComponent()->OnFocusCharacterDelegate.AddCallback(
-				std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1)
-			);
+			PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->OnFocusCharacterDelegate.
+			                    AddCallback(
+				                    std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1)
+			                    );
 		DelegateHandle->bIsAutoUnregister = false;
 
 		auto CharacterAttributesRef =
@@ -255,6 +258,7 @@ UProgressTips* URegularActionLayout::ViewProgressTips(
 
 void URegularActionLayout::OnHPChanged(
 	const FOnAttributeChangeData&
+
 
 )
 {

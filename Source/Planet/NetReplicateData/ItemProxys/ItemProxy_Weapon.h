@@ -42,25 +42,36 @@ struct PLANET_API FWeaponProxy : public FAllocationbleProxy
 	GENERATED_USTRUCT_BODY()
 
 public:
-
 	friend FSceneProxyContainer;
+	friend FCharacterProxy;
 	friend UInventoryComponent;
 
 	FWeaponProxy();
 
-	void UpdateByRemote(const TSharedPtr<FWeaponProxy>& RemoteSPtr);
+	void UpdateByRemote(
+		const TSharedPtr<FWeaponProxy>& RemoteSPtr
+	);
 
-	virtual void InitialProxy(const FGameplayTag& ProxyType)override;
+	virtual void InitialProxy(
+		const FGameplayTag& ProxyType
+	) override;
 
-	virtual bool Active()override;
+	virtual bool Active() override;
 
-	virtual void Cancel()override;
+	virtual void Cancel() override;
 
-	virtual void SetAllocationCharacterProxy(const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)override;
+	virtual void SetAllocationCharacterProxy(
+		const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
+		const FGameplayTag& InSocketTag
+	) override;
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
-	FTableRowProxy_WeaponExtendInfo* GetTableRowProxy_WeaponExtendInfo()const;
+	FTableRowProxy_WeaponExtendInfo* GetTableRowProxy_WeaponExtendInfo() const;
 
 	// 切换至当前武器
 	void ActiveWeapon();
@@ -69,20 +80,19 @@ public:
 	void RetractputWeapon();
 
 	// 主词条
-	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry()const;
+	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry() const;
 
-	int32 GetMaxAttackDistance()const;
+	int32 GetMaxAttackDistance() const;
 
 	// 注意：因为不能确定 “复制顺序”，所以这里不能用 WeakPtr
-	TSharedPtr<FWeaponSkillProxy>GetWeaponSkill();
+	TSharedPtr<FWeaponSkillProxy> GetWeaponSkill();
 
 protected:
-
 	// 装备至插槽
-	virtual void Allocation()override;
+	virtual void Allocation() override;
 
 	// 从插槽移除
-	virtual void UnAllocation()override;
+	virtual void UnAllocation() override;
 
 	UPROPERTY(Transient)
 	int32 MaxAttackDistance = 100;
@@ -90,10 +100,9 @@ protected:
 	AWeapon_Base* ActivedWeaponPtr = nullptr;
 
 	FGuid WeaponSkillID;
-
 };
 
-template<>
+template <>
 struct TStructOpsTypeTraits<FWeaponProxy> :
 	public TStructOpsTypeTraitsBase2<FWeaponProxy>
 {

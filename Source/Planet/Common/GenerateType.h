@@ -114,9 +114,9 @@ enum class ETeammateOption : uint8
 	kFree,
 
 	// 作为队友时的状态
-	kFollow,	// 跟随 
-	kAssistance,// 协助
-	kFireTarget,// 集火目标
+	kFollow,			// 跟随 
+	kAssistance,		// 协助
+	kFireTarget,		// 集火目标
 
 	// 具有攻击性的敌人
 	kEnemy,

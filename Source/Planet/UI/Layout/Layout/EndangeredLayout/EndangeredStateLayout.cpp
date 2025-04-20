@@ -8,6 +8,7 @@
 #include "HumanCharacter_Player.h"
 #include "OpenWorldSystem.h"
 #include "PlanetPlayerController.h"
+#include "PlayerGameplayTasks.h"
 
 struct FEndangeredStateLayout : public TStructVariable<FEndangeredStateLayout>
 {
@@ -41,5 +42,5 @@ void UEndangeredStateLayout::OnClicked()
 		return;
 	}
 	
-	PCPtr->TeleportPlayerToNearest();
+	PCPtr->GetGameplayTasksComponent()->TeleportPlayerToNearest();
 }

@@ -30,6 +30,7 @@ class AGeneratorBase;
 class AGeneratorColony_ByInvoke;
 class AGuideActor;
 class ATeleport;
+class UPlayerControllerGameplayTasksComponent;
 
 /**
  *
@@ -45,100 +46,129 @@ class PLANET_API APlanetPlayerController :
 public:
 	using FPawnType = AHumanCharacter_Player;
 
-	APlanetPlayerController(const FObjectInitializer& ObjectInitializer);
+	APlanetPlayerController(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	virtual AGroupManagger* GetGroupSharedInfo() const override;
 
-	virtual void SetGroupSharedInfo(AGroupManagger* GroupManaggerPtr) override;
+	virtual void SetGroupSharedInfo(
+		AGroupManagger* GroupManaggerPtr
+	) override;
 
 	virtual UInventoryComponent* GetHoldingItemsComponent() const override;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent() const override;
 
 	virtual UTalentAllocationComponent* GetTalentAllocationComponent() const override;
-	
+
 	virtual TWeakObjectPtr<ACharacterBase> GetTeamFocusTarget() const;
 
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() override;
 
 	virtual ACharacterBase* GetRealCharacter() const override;
 
-	void OnHPChanged(int32 CurrentValue);
+	void OnHPChanged(
+		int32 CurrentValue
+	);
 
-	UEventSubjectComponent * GetEventSubjectComponent()const;
-	
+	UEventSubjectComponent* GetEventSubjectComponent() const;
+
+	TObjectPtr<UPlayerControllerGameplayTasksComponent> GetGameplayTasksComponent() const;
+
 #pragma region CMD
 
 	UFUNCTION(Server, Reliable)
-	void EntryChallengeLevel(ETeleport Teleport);
+	void EntryChallengeLevel(
+		ETeleport Teleport
+	);
 
 	UFUNCTION(Server, Reliable)
-	void MakeTrueDamege(const TArray<FString>& Args);
+	void MakeTrueDamege(
+		const TArray<FString>& Args
+	);
 
 	UFUNCTION(Server, Reliable)
-	void MakeTherapy(const TArray<FString>& Args);
+	void MakeTherapy(
+		const TArray<FString>& Args
+	);
 
 	UFUNCTION(Server, Reliable)
-	void MakeRespawn(const TArray<FString>& Args);
-
-	UFUNCTION(Server, Reliable)
-	void TeleportPlayerToNearest();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void TeleportPlayerToNearestEnd(bool bIsSuccess);
+	void MakeRespawn(
+		const TArray<FString>& Args
+	);
 
 #pragma endregion
 
 #pragma region RPC
 
 	UFUNCTION(Server, Reliable)
-	void ServerSpawnGeneratorActor(const TSoftObjectPtr<AGeneratorColony_ByInvoke>&GeneratorBasePtr);
+	void ServerSpawnGeneratorActor(
+		const TSoftObjectPtr<AGeneratorColony_ByInvoke>& GeneratorBasePtr
+	);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnCharacter(
-		const TSoftClassPtr<AHumanCharacter_AI>&CharacterClass,
-		const FGuid&ID,
+		const TSoftClassPtr<AHumanCharacter_AI>& CharacterClass,
+		const FGuid& ID,
 		const FTransform& Transform
-		);
+	);
 
 	UFUNCTION(Server, Reliable)
 	void ServerDestroyActor(
-		AActor*ActorPtr
-		);
+		AActor* ActorPtr
+	);
 
-#pragma region 
-	
+#pragma region
+
 protected:
-	
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
 
 	virtual void BeginPlay() override;
 
 	virtual void PostInitializeComponents() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+	) override;
 
-	virtual void PlayerTick(float DeltaTime) override;
+	virtual void PlayerTick(
+		float DeltaTime
+	) override;
 
-	virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnPossess(
+		APawn* InPawn
+	) override;
 
 	virtual void OnUnPossess() override;
 
-	virtual void SetPawn(APawn* InPawn) override;
+	virtual void SetPawn(
+		APawn* InPawn
+	) override;
 
-	virtual bool InputKey(const FInputKeyParams& Params) override;
+	virtual bool InputKey(
+		const FInputKeyParams& Params
+	) override;
 
-	virtual void OnRep_PlayerState()override;
-	
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual void OnRep_PlayerState() override;
 
-	virtual void ResetGroupmateProxy(FCharacterProxy* NewGourpMateProxyPtr) override;
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+	) override;
+
+	virtual void ResetGroupmateProxy(
+		FCharacterProxy* NewGourpMateProxyPtr
+	) override;
 
 	virtual void BindPCWithCharacter() override;
 
-	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(ACharacterBase* CharaterPtr) override;
+	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(
+		ACharacterBase* CharaterPtr
+	) override;
 
 	// 初始化共享信息相关的内容
 	virtual void InitialGroupSharedInfo();
@@ -150,7 +180,9 @@ protected:
 	void OnRep_WolrdProcess();
 
 	// 给被锁定的目标绑定一些回调，比如目标进入“死亡”、“隐身”、“不可选中”时
-	void BindOnFocusRemove(AActor* Actor);
+	void BindOnFocusRemove(
+		AActor* Actor
+	);
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
@@ -159,10 +191,9 @@ protected:
 	TObjectPtr<UEventSubjectComponent> EventSubjectComponentPtr = nullptr;
 
 	UPROPERTY()
-	TObjectPtr<UGameplayTasksComponent> GameplayTasksComponentPtr = nullptr;
-	
+	TObjectPtr<UPlayerControllerGameplayTasksComponent> GameplayTasksComponentPtr = nullptr;
+
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge FocusInformation;
-	
 };

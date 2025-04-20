@@ -3,11 +3,50 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTasksComponent.h"
+#include "OpenWorldDataLayer.h"
 
 #include "PlayerGameplayTasks.generated.h"
 
 class ATeleport;
 class APlanetPlayerController;
+
+/*
+ *
+ */
+UCLASS(BlueprintType, Blueprintable)
+class PLANET_API UPlayerControllerGameplayTasksComponent : public UGameplayTasksComponent
+{
+	GENERATED_BODY()
+
+public:
+	
+	using FOwnerType = APlanetPlayerController;
+
+	static FName ComponentName;
+
+	UPlayerControllerGameplayTasksComponent(const FObjectInitializer& ObjectInitializer);
+
+#pragma region Teleport
+
+	/**
+	 * Client
+	 */
+	void TeleportPlayerToNearest();
+
+private:
+	
+	UFUNCTION(Server, Reliable)
+	void TeleportPlayerToNearest_Server();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void TeleportPlayerToNearest_Task(ETeleport Teleport);
+
+	void TeleportPlayerToNearestEnd(bool bIsSuccess);
+
+#pragma endregion
+
+};
 
 UCLASS()
 class PLANET_API UGameplayTask_TeleportPlayer : public UGameplayTask
@@ -31,12 +70,15 @@ public:
 	
 	TObjectPtr<APlanetPlayerController> TargetPCPtr = nullptr;
 
-	const int32 DistanceThreshold = 100;
-
+	ETeleport Teleport = ETeleport::kNone;
+	
 	FOnEnd OnEnd;
 
 private:
 	TSoftObjectPtr<ATeleport> Target = nullptr;
 
 	bool bIsSuccessful = false;
+	
+	const int32 DistanceThreshold = 100;
+
 };

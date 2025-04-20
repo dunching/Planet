@@ -187,7 +187,7 @@ void UCharacterAttributesComponent::OnRep_CharacterID()
 		if (PlayerCharacterPtr)
 		{
 			// 确认跟当前玩家的关系
-			const auto bIsMember = PlayerCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->IsMember(
+			const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
 				CharacterID);
 
 			auto CharacterPtr = GetOwner<FOwnerType>();

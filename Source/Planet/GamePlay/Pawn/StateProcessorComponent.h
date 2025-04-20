@@ -52,9 +52,6 @@ public:
 
 	using FOwnerPawnType = ACharacterBase;
 
-	using FOnFocusCharacterDelegate =
-	TCallbackHandleContainer<void(ACharacterBase*)>;
-
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
 	using FCharacterStateMapChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterStateInfo>&, bool)>;
@@ -83,8 +80,6 @@ public:
 
 	auto BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func)
 		-> FCharacterStateMapChanged::FCallbackHandleSPtr;
-
-	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
 protected:
 
@@ -154,13 +149,6 @@ protected:
 
 private:
 	
-	/**
-	 * 这个角色锁定的目标，第0个为主要锁定
-	 * 为什么不用Controller UpdateRotation去做？因为我们要在移动组件里统一设置旋转
-	 */
-	UPROPERTY(Replicated)
-	TArray<ACharacterBase*> FocusCharactersAry;
-
 	// 每个连接都会有的 “状态信息”
 	TMap<FGuid, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
 

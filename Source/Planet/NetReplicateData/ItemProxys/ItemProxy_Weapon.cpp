@@ -1,4 +1,3 @@
-
 #include "ItemProxy_Weapon.h"
 
 #include "AbilitySystemComponent.h"
@@ -23,17 +22,22 @@ TSharedPtr<FWeaponSkillProxy> FWeaponProxy::GetWeaponSkill()
 
 FWeaponProxy::FWeaponProxy()
 {
-
 }
 
-void FWeaponProxy::UpdateByRemote(const TSharedPtr<FWeaponProxy>& RemoteSPtr)
+void FWeaponProxy::UpdateByRemote(
+	const TSharedPtr<FWeaponProxy>& RemoteSPtr
+)
 {
 	Super::UpdateByRemote(RemoteSPtr);
 
 	MaxAttackDistance = RemoteSPtr->MaxAttackDistance;
 }
 
-bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FWeaponProxy::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -43,7 +47,9 @@ bool FWeaponProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOut
 	return true;
 }
 
-void FWeaponProxy::InitialProxy(const FGameplayTag& InProxyType)
+void FWeaponProxy::InitialProxy(
+	const FGameplayTag& InProxyType
+)
 {
 	Super::InitialProxy(InProxyType);
 	{
@@ -65,7 +71,10 @@ void FWeaponProxy::Cancel()
 	GetWeaponSkill()->Cancel();
 }
 
-void FWeaponProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
+void FWeaponProxy::SetAllocationCharacterProxy(
+	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
+	const FGameplayTag& InSocketTag
+)
 {
 	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 
@@ -83,13 +92,17 @@ FTableRowProxy_WeaponExtendInfo* FWeaponProxy::GetTableRowProxy_WeaponExtendInfo
 	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_WeaponExtendInfo.LoadSynchronous();
 
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_WeaponExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_WeaponExtendInfo>(
+		*ProxyType.ToString(),
+		TEXT("GetProxy")
+	);
 	return SceneProxyExtendInfoPtr;
 }
 
 void FWeaponProxy::Allocation()
 {
 	Super::Allocation();
+	
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
@@ -115,7 +128,8 @@ FTableRowProxy_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
 	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(
-		*GetTableRowProxy_WeaponExtendInfo()->PropertyEntry.ToString(), TEXT("GetProxy")
+		*GetTableRowProxy_WeaponExtendInfo()->PropertyEntry.ToString(),
+		TEXT("GetProxy")
 	);
 	return SceneProxyExtendInfoPtr;
 }
@@ -161,7 +175,7 @@ void FWeaponProxy::ActiveWeapon()
 
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.Owner = GetAllocationCharacter();
-			
+
 			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
 
 			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);

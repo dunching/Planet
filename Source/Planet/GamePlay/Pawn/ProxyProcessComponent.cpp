@@ -374,7 +374,7 @@ void UProxyProcessComponent::OnRep_AllocationChanged()
 void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged(const FGameplayTag& OldWeaponSocket)
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
-	if (CharacterPtr->GetGroupSharedInfo())
+	if (CharacterPtr->GetGroupManagger())
 	{
 		SwitchWeaponImp(CurrentWeaponSocket);
 	}

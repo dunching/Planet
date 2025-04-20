@@ -39,7 +39,7 @@ bool UPlayerComponent::TeleportTo(
 	}
 
 	// TODO 使用EQS查询位置
-	OnwerActorPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeleportTo(
+	OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->TeleportTo(
 		DestLocation,
 		DestRotation,
 		bIsATest,

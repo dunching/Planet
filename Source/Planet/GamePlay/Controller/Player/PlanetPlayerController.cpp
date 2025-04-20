@@ -62,7 +62,9 @@ APlanetPlayerController::APlanetPlayerController(
 		UEventSubjectComponent::ComponentName
 	);
 
-	GameplayTasksComponentPtr = CreateDefaultSubobject<UGameplayTasksComponent>(TEXT("GameplayTasksComponent"));
+	GameplayTasksComponentPtr = CreateDefaultSubobject<UPlayerControllerGameplayTasksComponent>(
+		UPlayerControllerGameplayTasksComponent::ComponentName
+	);
 }
 
 void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
@@ -110,31 +112,6 @@ void APlanetPlayerController::ServerDestroyActor_Implementation(
 	{
 		ActorPtr->Destroy();
 	}
-}
-
-void APlanetPlayerController::TeleportPlayerToNearest_Implementation()
-{
-	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_TeleportPlayer>(
-		TScriptInterface<IGameplayTaskOwnerInterface>(
-			GameplayTasksComponentPtr
-		)
-	);
-	GameplayTaskPtr->TargetPCPtr = this;
-	GameplayTaskPtr->OnEnd.AddUObject(this, &ThisClass::TeleportPlayerToNearestEnd);
-
-	GameplayTaskPtr->ReadyForActivation();
-}
-
-void APlanetPlayerController::TeleportPlayerToNearestEnd_Implementation(
-	bool bIsSuccess
-)
-{
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-	}
-#endif
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(
@@ -338,7 +315,7 @@ TWeakObjectPtr<ACharacterBase> APlanetPlayerController::GetTeamFocusTarget() con
 {
 	if (GetGroupSharedInfo() && GetGroupSharedInfo()->GetTeamMatesHelperComponent())
 	{
-		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetKnowCharacter();
+		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetForceKnowCharater();
 	}
 
 	return nullptr;
@@ -386,6 +363,11 @@ void APlanetPlayerController::OnHPChanged(
 UEventSubjectComponent* APlanetPlayerController::GetEventSubjectComponent() const
 {
 	return EventSubjectComponentPtr;
+}
+
+TObjectPtr<UPlayerControllerGameplayTasksComponent> APlanetPlayerController::GetGameplayTasksComponent() const
+{
+	return GameplayTasksComponentPtr;
 }
 
 void APlanetPlayerController::EntryChallengeLevel_Implementation(

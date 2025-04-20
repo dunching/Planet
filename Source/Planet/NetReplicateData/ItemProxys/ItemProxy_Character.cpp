@@ -2,7 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 
-#include "AssetRefMap.h"
+#include "AIComponent.h"
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
 #include "SceneProxyExtendInfo.h"
@@ -204,6 +204,7 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 			
 			if (AICharacterPtr && GroupSharedInfoPtr)
 			{
+				AICharacterPtr->GetAIComponent()->bIsTeammate = true;
 				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(GetID());
 				AICharacterPtr->SetGroupSharedInfo(GroupSharedInfoPtr);
 			}
@@ -215,6 +216,30 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 
 		ProxyCharacterPtr = Result;
 
+		// 注册
+		const auto CanActiveSocketMap = GetSockets();
+		for (const auto & Iter : CanActiveSocketMap)
+		{
+			auto ProxySPtr = InventoryComponentPtr->FindProxy(Iter.Value.GetAllocationedProxyID());
+			if (ProxySPtr)
+			{
+				// 
+				if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
+				{
+					auto WeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
+					if (WeaponProxySPtr )
+					{
+						WeaponProxySPtr->Allocation();
+						WeaponProxySPtr->GetWeaponSkill()->Allocation();
+					}
+				}
+				else
+				{
+					ProxySPtr->Allocation();
+				}
+			}
+		}
+		
 		Update2Client();
 	}
 	return Result;

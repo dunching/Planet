@@ -26,6 +26,10 @@ namespace HumanProcessor
 
 		virtual void EnterAction()override;
 
+		virtual bool InputKey(
+			const FInputKeyEventArgs& EventArgs
+		);
+
 		void Switch2RegularProcessor();
 
 	};

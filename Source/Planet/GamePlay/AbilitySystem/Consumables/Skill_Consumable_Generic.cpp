@@ -111,7 +111,7 @@ void USkill_Consumable_Generic::ApplyCooldown(const FGameplayAbilitySpecHandle H
 
 		// 公共冷却
 		{
-			auto AbilitySystemComponentPtr = CharacterPtr->GetGroupSharedInfo()->GetAbilitySystemComponent();
+			auto AbilitySystemComponentPtr = CharacterPtr->GetGroupManagger()->GetAbilitySystemComponent();
 			auto SkillCommonCooldownInfoMap = ProxyPtr->GetTableRowProxy_Consumable()->CommonCooldownInfoMap;
 			for (const auto Iter : SkillCommonCooldownInfoMap)
 			{

@@ -36,6 +36,39 @@ namespace HumanProcessor
 		SwitchShowCursor(true);
 	}
 
+	bool FViewMenuBaseProcessor::InputKey(
+		const FInputKeyEventArgs& EventArgs
+	)
+	{
+		switch (EventArgs.Event)
+		{
+		case IE_Pressed:
+			{
+				auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+				if (!OnwerActorPtr)
+				{
+					return false;
+				}
+
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+				
+				if (EventArgs.Key == GameOptionsPtr->Return)
+				{
+					Switch2RegularProcessor();
+					return true;
+				}
+				
+			}
+			break;
+		case IE_Released:
+			{
+			}
+			break;
+		}
+
+		return Super::InputKey(EventArgs);
+	}
+
 	void FViewMenuBaseProcessor::Switch2RegularProcessor()
 	{
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();

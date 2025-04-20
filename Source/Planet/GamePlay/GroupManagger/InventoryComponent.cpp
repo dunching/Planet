@@ -656,7 +656,7 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACha
 		// 使用指定的ID
 		auto CharacterProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(SceneMetaMap[ID]);
 
-		CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
+		// CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
 		CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
 		CharacterProxySPtr->InventoryComponentPtr = this;
 

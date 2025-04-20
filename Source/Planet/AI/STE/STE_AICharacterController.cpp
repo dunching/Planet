@@ -28,14 +28,14 @@ void USTE_AICharacterController::TreeStart(FStateTreeExecutionContext& Context)
 	if (HumanAIControllerPtr)
 	{
 		KownCharacterChangedHandle =
-			HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->KnowCharaterChanged.AddCallback(
+			HumanCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->KnowCharaterChanged.AddCallback(
 				std::bind(&ThisClass::KnowCharaterChanged, this, std::placeholders::_1, std::placeholders::_2)
 			);
 
 		HumanCharacterPtr = HumanAIControllerPtr->GetPawn<AHumanCharacter_AI>();
 		if (HumanCharacterPtr)
 		{
-			TeammateChangedDelegate = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(
+			TeammateChangedDelegate = HumanCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(
 				std::bind(&ThisClass::OnTeamChanged, this)
 			);
 			OnTeamChanged();
@@ -96,7 +96,7 @@ void USTE_AICharacterController::OnTeamOptionChanged(ETeammateOption NewTeammate
 
 void USTE_AICharacterController::OnTeamChanged()
 {
-	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
+	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent();
 	if (TeamHelperSPtr)
 	{
 		if (auto OwnerCharacterProxySPtr = TeamHelperSPtr->GetOwnerCharacterProxyPtr())

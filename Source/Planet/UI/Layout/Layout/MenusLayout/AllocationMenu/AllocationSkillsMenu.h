@@ -77,6 +77,10 @@ protected:
 
 	void OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
 
+	/**
+	 * 选择了要分配的人物
+	 * @param ProxyPtr 
+	 */
 	void OnSelectedCharacterProxy(const TSharedPtr<FCharacterProxy>& ProxyPtr);
 
 	void OnMainWeaponChanged(const TSharedPtr<FWeaponProxy>& ToolSPtr);
