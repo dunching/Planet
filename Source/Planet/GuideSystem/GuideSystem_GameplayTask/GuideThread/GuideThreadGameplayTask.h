@@ -20,6 +20,8 @@
 
 class AHumanCharacter_Player;
 class ATargetPoint_Runtime;
+class UGameplayAbility;
+class UPlanetGameplayAbility;
 class AGuideThread;
 class UPAD_TaskNode_Guide_AddToTarget;
 class UPAD_TaskNode_Guide_ConversationWithTarget;
@@ -41,8 +43,10 @@ public:
 	void SetGuideActor(TObjectPtr<AGuideThread> InGuideActorPtr);
 
 protected:
-	
+
 	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
+	
+private:
 	
 };
 
@@ -258,4 +262,36 @@ protected:
 	float TotalTime = 0.0f;
 
 	int32 RemainTime = 1;
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Guide_ActiveDash : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+public:
+
+	virtual void Activate() override;
+
+	TSubclassOf<UPlanetGameplayAbility>GAClass;
+
+private:
+
+	UFUNCTION()
+	void FGenericAbilityDelegate( UGameplayAbility*GAPtr);
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Guide_ActiveRun : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+public:
+
+	virtual void Activate() override;
+
+	TSubclassOf<UPlanetGameplayAbility>GAClass;
+
+private:
+
+	UFUNCTION()
+	void FGenericAbilityDelegate( UGameplayAbility*GAPtr);
 };

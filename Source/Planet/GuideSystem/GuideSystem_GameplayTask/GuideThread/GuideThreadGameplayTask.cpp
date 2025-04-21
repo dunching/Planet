@@ -16,27 +16,33 @@
 #include "HumanCharacter_Player.h"
 #include "MainHUD.h"
 #include "MainHUDLayout.h"
-#include "OptionList.h"
+#include "PlanetGameplayAbility.h"
 #include "PlanetPlayerController.h"
 #include "TargetPoint_Runtime.h"
 
 
-
 class AMainHUD;
 
-UGameplayTask_Guide::UGameplayTask_Guide(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGameplayTask_Guide::UGameplayTask_Guide(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
 }
 
-void UGameplayTask_Guide::SetGuideActor(TObjectPtr<AGuideThread> InGuideActorPtr)
+void UGameplayTask_Guide::SetGuideActor(
+	TObjectPtr<AGuideThread> InGuideActorPtr
+)
 {
 	GuideActorPtr = InGuideActorPtr;
 }
-UGameplayTask_Guide_MoveToLocation::UGameplayTask_Guide_MoveToLocation(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+
+UGameplayTask_Guide_MoveToLocation::UGameplayTask_Guide_MoveToLocation(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -62,7 +68,9 @@ void UGameplayTask_Guide_MoveToLocation::Activate()
 	}
 }
 
-void UGameplayTask_Guide_MoveToLocation::TickTask(float DeltaTime)
+void UGameplayTask_Guide_MoveToLocation::TickTask(
+	float DeltaTime
+)
 {
 	Super::TickTask(DeltaTime);
 
@@ -73,7 +81,9 @@ void UGameplayTask_Guide_MoveToLocation::TickTask(float DeltaTime)
 	}
 }
 
-void UGameplayTask_Guide_MoveToLocation::OnDestroy(bool bInOwnerFinished)
+void UGameplayTask_Guide_MoveToLocation::OnDestroy(
+	bool bInOwnerFinished
+)
 {
 	if (TargetPointPtr)
 	{
@@ -84,14 +94,19 @@ void UGameplayTask_Guide_MoveToLocation::OnDestroy(bool bInOwnerFinished)
 	Super::OnDestroy(bInOwnerFinished);
 }
 
-void UGameplayTask_Guide_MoveToLocation::SetUp(const FVector& InTargetLocation, int32 InReachedRadius)
+void UGameplayTask_Guide_MoveToLocation::SetUp(
+	const FVector& InTargetLocation,
+	int32 InReachedRadius
+)
 {
 	TargetLocation = InTargetLocation;
 	ReachedRadius = InReachedRadius;
 }
 
-UGameplayTask_Guide_WaitInputKey::UGameplayTask_Guide_WaitInputKey(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGameplayTask_Guide_WaitInputKey::UGameplayTask_Guide_WaitInputKey(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -107,7 +122,9 @@ void UGameplayTask_Guide_WaitInputKey::Activate()
 	}
 }
 
-void UGameplayTask_Guide_WaitInputKey::TickTask(float DeltaTime)
+void UGameplayTask_Guide_WaitInputKey::TickTask(
+	float DeltaTime
+)
 {
 	Super::TickTask(DeltaTime);
 
@@ -118,8 +135,10 @@ void UGameplayTask_Guide_WaitInputKey::TickTask(float DeltaTime)
 	}
 }
 
-UGameplayTask_Guide_Monologue::UGameplayTask_Guide_Monologue(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGameplayTask_Guide_Monologue::UGameplayTask_Guide_Monologue(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -132,7 +151,9 @@ void UGameplayTask_Guide_Monologue::Activate()
 	ConditionalPerformTask();
 }
 
-void UGameplayTask_Guide_Monologue::TickTask(float DeltaTime)
+void UGameplayTask_Guide_Monologue::TickTask(
+	float DeltaTime
+)
 {
 	Super::TickTask(DeltaTime);
 
@@ -152,7 +173,9 @@ void UGameplayTask_Guide_Monologue::TickTask(float DeltaTime)
 	}
 }
 
-void UGameplayTask_Guide_Monologue::OnDestroy(bool bInOwnerFinished)
+void UGameplayTask_Guide_Monologue::OnDestroy(
+	bool bInOwnerFinished
+)
 {
 	if (PlayerCharacterPtr)
 	{
@@ -162,7 +185,9 @@ void UGameplayTask_Guide_Monologue::OnDestroy(bool bInOwnerFinished)
 	Super::OnDestroy(bInOwnerFinished);
 }
 
-void UGameplayTask_Guide_Monologue::SetUp(const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry)
+void UGameplayTask_Guide_Monologue::SetUp(
+	const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry
+)
 {
 	ConversationsAry = InConversationsAry;
 }
@@ -181,8 +206,10 @@ void UGameplayTask_Guide_Monologue::ConditionalPerformTask()
 	SentenceIndex++;
 }
 
-UGameplayTask_Guide_AddToTarget::UGameplayTask_Guide_AddToTarget(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGameplayTask_Guide_AddToTarget::UGameplayTask_Guide_AddToTarget(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -223,7 +250,9 @@ void UGameplayTask_Guide_ConversationWithTarget::Activate()
 	ConditionalPerformTask();
 }
 
-void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(bool bInOwnerFinished)
+void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(
+	bool bInOwnerFinished
+)
 {
 	if (TargetPointPtr)
 	{
@@ -234,7 +263,9 @@ void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(bool bInOwnerFinished
 	Super::OnDestroy(bInOwnerFinished);
 }
 
-void UGameplayTask_Guide_ConversationWithTarget::SetUp(const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr)
+void UGameplayTask_Guide_ConversationWithTarget::SetUp(
+	const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
+)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
 }
@@ -258,13 +289,17 @@ void UGameplayTask_Guide_ConversationWithTarget::ConditionalPerformTask()
 				SpawnParameters
 			);
 
-			TargetPointPtr->AttachToActor(TargetCharacterPtr.Get(),
-			                              FAttachmentTransformRules::KeepRelativeTransform);
+			TargetPointPtr->AttachToActor(
+				TargetCharacterPtr.Get(),
+				FAttachmentTransformRules::KeepRelativeTransform
+			);
 		}
 	}
 }
 
-void UGameplayTask_Guide_WaitComplete::TickTask(float DeltaTime)
+void UGameplayTask_Guide_WaitComplete::TickTask(
+	float DeltaTime
+)
 {
 	Super::TickTask(DeltaTime);
 
@@ -281,7 +316,9 @@ void UGameplayTask_Guide_WaitComplete::TickTask(float DeltaTime)
 	}
 }
 
-void UGameplayTask_Guide_WaitComplete::SetUp(const FGuid& InTaskID)
+void UGameplayTask_Guide_WaitComplete::SetUp(
+	const FGuid& InTaskID
+)
 {
 	TaskID = InTaskID;
 }
@@ -293,13 +330,21 @@ void UGameplayTask_Guide_CollectResource::Activate()
 	OnConsumableProxyChangedHandle = PlayerCharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
 		std::bind(&ThisClass::OnGetConsumableProxy, this, std::placeholders::_1, std::placeholders::_2)
 	);
-	
+
 	OnCoinProxyChangedHandle = PlayerCharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
-		std::bind(&ThisClass::OnCoinProxyChanged, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)
+		std::bind(
+			&ThisClass::OnCoinProxyChanged,
+			this,
+			std::placeholders::_1,
+			std::placeholders::_2,
+			std::placeholders::_3
+		)
 	);
 }
 
-void UGameplayTask_Guide_CollectResource::OnDestroy(bool bInOwnerFinished)
+void UGameplayTask_Guide_CollectResource::OnDestroy(
+	bool bInOwnerFinished
+)
 {
 	if (OnConsumableProxyChangedHandle)
 	{
@@ -309,7 +354,10 @@ void UGameplayTask_Guide_CollectResource::OnDestroy(bool bInOwnerFinished)
 	Super::OnDestroy(bInOwnerFinished);
 }
 
-void UGameplayTask_Guide_CollectResource::SetUp(const FGameplayTag& InResourceType, int32 InNum)
+void UGameplayTask_Guide_CollectResource::SetUp(
+	const FGameplayTag& InResourceType,
+	int32 InNum
+)
 {
 	ResourceType = InResourceType;
 	Num = InNum;
@@ -357,10 +405,10 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 }
 
 void UGameplayTask_Guide_CollectResource::OnCoinProxyChanged(
-	const TSharedPtr<FCoinProxy>&ProxySPtr,
+	const TSharedPtr<FCoinProxy>& ProxySPtr,
 	EProxyModifyType ProxyModifyType,
 	int32 Num_
-	)
+)
 {
 	if (ProxySPtr && ProxySPtr->GetProxyType().MatchesTag(ResourceType))
 	{
@@ -400,22 +448,32 @@ void UGameplayTask_Guide_DefeatEnemy::Activate()
 {
 	Super::Activate();
 
-	DelegateHandle = PlayerCharacterPtr->GetController<APlanetPlayerController>()->GetEventSubjectComponent()->MakedDamageDelegate.AddCallback(
-		std::bind(&ThisClass::OnActiveGEAddedDelegateToSelf, this, std::placeholders::_1)
-	);
+	DelegateHandle = PlayerCharacterPtr->GetController<APlanetPlayerController>()->GetEventSubjectComponent()->
+	                                     MakedDamageDelegate.AddCallback(
+		                                     std::bind(
+			                                     &ThisClass::OnActiveGEAddedDelegateToSelf,
+			                                     this,
+			                                     std::placeholders::_1
+		                                     )
+	                                     );
 }
 
-void UGameplayTask_Guide_DefeatEnemy::OnDestroy(bool bInOwnerFinished)
+void UGameplayTask_Guide_DefeatEnemy::OnDestroy(
+	bool bInOwnerFinished
+)
 {
 	if (DelegateHandle)
 	{
 		DelegateHandle->UnBindCallback();
 	}
-	
+
 	Super::OnDestroy(bInOwnerFinished);
 }
 
-void UGameplayTask_Guide_DefeatEnemy::SetUp(const FGameplayTag& InEnemyType, int32 InNum)
+void UGameplayTask_Guide_DefeatEnemy::SetUp(
+	const FGameplayTag& InEnemyType,
+	int32 InNum
+)
 {
 	EnemyType = InEnemyType;
 	Num = InNum;
@@ -439,7 +497,7 @@ void UGameplayTask_Guide_DefeatEnemy::OnActiveGEAddedDelegateToSelf(
 	if (
 		ReceivedEventModifyDataCallback.TargetCharacterPtr &&
 		ReceivedEventModifyDataCallback.TargetCharacterPtr->GetCharacterProxy()->GetProxyType().MatchesTag(EnemyType)
-		)
+	)
 	{
 		if (ReceivedEventModifyDataCallback.bIsDeath)
 		{
@@ -462,7 +520,9 @@ void UGameplayTask_Guide_DefeatEnemy::UpdateDescription() const
 	}
 }
 
-void UGameplayTask_Guide_ReturnOpenWorld::TickTask(float DeltaTime)
+void UGameplayTask_Guide_ReturnOpenWorld::TickTask(
+	float DeltaTime
+)
 {
 	Super::TickTask(DeltaTime);
 
@@ -475,7 +535,9 @@ void UGameplayTask_Guide_ReturnOpenWorld::TickTask(float DeltaTime)
 	}
 }
 
-void UGameplayTask_Guide_ReturnOpenWorld::SetUp(int32 RemainTime_)
+void UGameplayTask_Guide_ReturnOpenWorld::SetUp(
+	int32 RemainTime_
+)
 {
 	RemainTime = RemainTime_;
 }
@@ -490,4 +552,54 @@ FTaskNodeDescript UGameplayTask_Guide_ReturnOpenWorld::GetTaskNodeDescripton() c
 	TaskNodeDescript.Description = FString::Printf(TEXT("%.1lf后离开副本"), Time);
 
 	return TaskNodeDescript;
+}
+
+void UGameplayTask_Guide_ActiveDash::Activate()
+{
+	Super::Activate();
+	
+	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(
+		this,
+		&ThisClass::FGenericAbilityDelegate
+	);
+
+}
+
+void UGameplayTask_Guide_ActiveDash::FGenericAbilityDelegate(
+	UGameplayAbility* GAPtr
+
+)
+{
+	if (GAPtr)
+	{
+		if (GAPtr->IsA(GAClass))
+		{
+			EndTask();
+		}
+	}
+}
+
+void UGameplayTask_Guide_ActiveRun::Activate()
+{
+	Super::Activate();
+	
+	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(
+		this,
+		&ThisClass::FGenericAbilityDelegate
+	);
+
+}
+
+void UGameplayTask_Guide_ActiveRun::FGenericAbilityDelegate(
+	UGameplayAbility* GAPtr
+
+)
+{
+	if (GAPtr)
+	{
+		if (GAPtr->IsA(GAClass))
+		{
+			EndTask();
+		}
+	}
 }

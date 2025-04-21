@@ -17,6 +17,8 @@
 
 #include "STT_GuideThread.generated.h"
 
+class UGameplayAbility;
+class UPlanetGameplayAbility;
 class ASceneActor;
 class AResourceBoxBase;
 class ATargetPoint_Runtime;
@@ -45,6 +47,8 @@ class UGameplayTask_Guide_AddToTarget;
 class UGameplayTask_Guide_CollectResource;
 class UGameplayTask_Guide_DefeatEnemy;
 class UGameplayTask_Guide_ReturnOpenWorld;
+class UGameplayTask_Guide_ActiveDash;
+class UGameplayTask_Guide_ActiveRun;
 class UGameplayTask_WaitInteractionSceneActor;
 class UGameplayTask_WaitPlayerEquipment;
 
@@ -202,6 +206,122 @@ struct PLANET_API FSTT_GuideThread_PressKey :
 	virtual FTaskNodeDescript GetTaskNodeDescripton(
 		FStateTreeExecutionContext& Context
 	) const override;
+};
+#pragma endregion
+
+#pragma region 要求玩家激活一次冲刺
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_ActiveDash :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	TSubclassOf<UPlanetGameplayAbility> GAClass;
+
+	UPROPERTY(
+		Transient
+	)
+	TObjectPtr<UGameplayTask_Guide_ActiveDash> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(
+		Transient
+	)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+};
+
+// 
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_ActiveDash :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_ActiveDash;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
+
+private:
+};
+#pragma endregion
+
+#pragma region 要求玩家激活奔跑
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_Run :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	TSubclassOf<UPlanetGameplayAbility> GAClass;
+
+	UPROPERTY(
+		Transient
+	)
+	TObjectPtr<UGameplayTask_Guide_ActiveRun> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(
+		Transient
+	)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+};
+
+// 
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_Run :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_Run;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
+
+private:
 };
 #pragma endregion
 
@@ -366,6 +486,11 @@ struct PLANET_API FSTT_GuideThreadMonologue :
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
 	) const override;
 
 protected:
@@ -563,6 +688,11 @@ struct PLANET_API FSTT_GuideThreadCollectResource :
 		const float DeltaTime
 	) const override;
 
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
 protected:
 	EStateTreeRunStatus PerformGameplayTask(
 		FStateTreeExecutionContext& Context
@@ -623,6 +753,11 @@ struct PLANET_API FSTT_GuideThreadDefeatEnemy :
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
 	) const override;
 
 protected:

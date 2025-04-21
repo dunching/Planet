@@ -103,6 +103,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/HUD/FocusTitle");
         PublicIncludePaths.Add("Planet/UI/HUD/PlayerConversationBorder");
         PublicIncludePaths.Add("Planet/UI/UMGs");
+        PublicIncludePaths.Add("Planet/UI/UMGs/RichTextBlock");
         PublicIncludePaths.Add("Planet/UI/Layout");
         PublicIncludePaths.Add("Planet/UI/Layout/InteractionList");
         PublicIncludePaths.Add("Planet/UI/Layout/Team");

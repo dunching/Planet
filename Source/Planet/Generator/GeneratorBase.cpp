@@ -69,37 +69,37 @@ void AGeneratorBase::SpawnGeneratorActor()
 
 			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(DefaultTeammateOption);
 		}
-	}
-#endif
 
-	bool bIsFirst = true;
-	ForEachComponent(
-		true,
-		[&bIsFirst, this](
-		UActorComponent* Comp
-	)
-		{
-			auto PlanetChildActorComponentPtr = Cast<UPlanetChildActorComponent>(Comp);
-			if (PlanetChildActorComponentPtr)
+		bool bIsFirst = true;
+		ForEachComponent(
+			true,
+			[&bIsFirst, this](
+			UActorComponent* Comp
+		)
 			{
-				PlanetChildActorComponentPtr->RespawnChildActor();
-				auto AICharacterPtr = Cast<AHumanCharacter_AI>(PlanetChildActorComponentPtr->GetChildActor());
-				if (!AICharacterPtr)
+				auto PlanetChildActorComponentPtr = Cast<UPlanetChildActorComponent>(Comp);
+				if (PlanetChildActorComponentPtr)
 				{
-					return;
-				}
-				AICharacterPtr->GetAIComponent()->bIsSingle = false;
+					PlanetChildActorComponentPtr->RespawnChildActor();
+					auto AICharacterPtr = Cast<AHumanCharacter_AI>(PlanetChildActorComponentPtr->GetChildActor());
+					if (!AICharacterPtr)
+					{
+						return;
+					}
+					AICharacterPtr->GetAIComponent()->bIsSingle = false;
 
-				if (bIsFirst)
-				{
-					GroupManaggerPtr->SetOwnerCharacterProxyPtr(
-						AICharacterPtr
-					);
-					bIsFirst = false;
+					if (bIsFirst)
+					{
+						GroupManaggerPtr->SetOwnerCharacterProxyPtr(
+							AICharacterPtr
+						);
+						bIsFirst = false;
+					}
 				}
 			}
-		}
-	);
+		);
+	}
+#endif
 }
 
 void AGeneratorBase::CustomizerFunc(

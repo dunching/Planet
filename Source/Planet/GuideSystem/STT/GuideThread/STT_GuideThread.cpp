@@ -1,9 +1,9 @@
 #include "STT_GuideThread.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Engine/TargetPoint.h"
 
 #include "HumanCharacter_Player.h"
-
 #include "GuideActor.h"
 #include "GuideSystemGameplayTask.h"
 #include "GuideThread.h"
@@ -17,12 +17,13 @@
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
+#include "GameOptions.h"
 #include "OpenWorldDataLayer.h"
 #include "PlanetChildActorComponent.h"
+#include "PlanetRichTextBlock.h"
 #include "SceneActor.h"
 #include "STE_GuideThread.h"
 #include "TargetPoint_Runtime.h"
-#include "Engine/TargetPoint.h"
 
 const UStruct* FSTT_GuideThreadRecord::GetInstanceDataType() const
 {
@@ -122,7 +123,9 @@ void FSTT_GuideThreadBase::ExitState(
 	);
 }
 
-FTaskNodeDescript FSTT_GuideThreadBase::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThreadBase::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -234,7 +237,29 @@ EStateTreeRunStatus FSTT_GuideThreadMonologue::Tick(
 	);
 }
 
-EStateTreeRunStatus FSTT_GuideThreadMonologue::PerformGameplayTask(FStateTreeExecutionContext& Context) const
+void FSTT_GuideThreadMonologue::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.GameplayTaskPtr->ExternalCancel();
+	}
+	InstanceData.GameplayTaskPtr = nullptr;
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
+}
+
+EStateTreeRunStatus FSTT_GuideThreadMonologue::PerformGameplayTask(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -260,7 +285,9 @@ EStateTreeRunStatus FSTT_GuideThreadMonologue::PerformGameplayTask(FStateTreeExe
 	return EStateTreeRunStatus::Running;
 }
 
-FTaskNodeDescript FSTT_GuideThreadMonologue::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThreadMonologue::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -325,7 +352,9 @@ EStateTreeRunStatus FSTT_GuideThread_WaitTaskComplete::Tick(
 	);
 }
 
-FTaskNodeDescript FSTT_GuideThread_WaitTaskComplete::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThread_WaitTaskComplete::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -410,7 +439,29 @@ EStateTreeRunStatus FSTT_GuideThreadCollectResource::Tick(
 	);
 }
 
-EStateTreeRunStatus FSTT_GuideThreadCollectResource::PerformGameplayTask(FStateTreeExecutionContext& Context) const
+void FSTT_GuideThreadCollectResource::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.GameplayTaskPtr->ExternalCancel();
+	}
+	InstanceData.GameplayTaskPtr = nullptr;
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
+}
+
+EStateTreeRunStatus FSTT_GuideThreadCollectResource::PerformGameplayTask(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -433,7 +484,9 @@ EStateTreeRunStatus FSTT_GuideThreadCollectResource::PerformGameplayTask(FStateT
 	return EStateTreeRunStatus::Running;
 }
 
-FTaskNodeDescript FSTT_GuideThreadCollectResource::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThreadCollectResource::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -487,7 +540,10 @@ EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::EnterState(
 	);
 }
 
-EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
+EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	// Super::Tick(Context, DeltaTime);
 
@@ -510,7 +566,29 @@ EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::Tick(FStateTreeExecutionContext
 	);
 }
 
-EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::PerformGameplayTask(FStateTreeExecutionContext& Context) const
+void FSTT_GuideThreadDefeatEnemy::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.GameplayTaskPtr->ExternalCancel();
+	}
+	InstanceData.GameplayTaskPtr = nullptr;
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
+}
+
+EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::PerformGameplayTask(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -533,7 +611,9 @@ EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::PerformGameplayTask(FStateTreeE
 	return EStateTreeRunStatus::Running;
 }
 
-FTaskNodeDescript FSTT_GuideThreadDefeatEnemy::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThreadDefeatEnemy::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -616,7 +696,9 @@ const UStruct* FSTT_GuideThreadLeaveHere::GetInstanceDataType() const
 	return FInstanceDataType::StaticStruct();
 }
 
-FTaskNodeDescript FSTT_GuideThreadLeaveHere::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThreadLeaveHere::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -657,7 +739,10 @@ EStateTreeRunStatus FSTT_GuideThreadLeaveHere::EnterState(
 	return EStateTreeRunStatus::Failed;
 }
 
-EStateTreeRunStatus FSTT_GuideThreadLeaveHere::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
+EStateTreeRunStatus FSTT_GuideThreadLeaveHere::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -727,7 +812,9 @@ EStateTreeRunStatus FSTGT_GuideThreadCheckIsInValidArea::Tick(
 	);
 }
 
-FTaskNodeDescript FSTGT_GuideThreadCheckIsInValidArea::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTGT_GuideThreadCheckIsInValidArea::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	return FSTT_GuideThreadBase::GetTaskNodeDescripton(
 		Context
@@ -813,7 +900,9 @@ EStateTreeRunStatus FSTT_GuideThreadReturnOpenWorld::Tick(
 	);
 }
 
-FTaskNodeDescript FSTT_GuideThreadReturnOpenWorld::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThreadReturnOpenWorld::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -920,7 +1009,9 @@ void FSTT_GuideThread_WaitPlayerEquipment::ExitState(
 	);
 }
 
-FTaskNodeDescript FSTT_GuideThread_WaitPlayerEquipment::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThread_WaitPlayerEquipment::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -940,11 +1031,6 @@ void FSTT_GuideThreadReturnOpenWorld::ExitState(
 	const FStateTreeTransitionResult& Transition
 ) const
 {
-	Super::ExitState(
-		Context,
-		Transition
-	);
-
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
 	);
@@ -953,6 +1039,11 @@ void FSTT_GuideThreadReturnOpenWorld::ExitState(
 		InstanceData.GameplayTaskPtr->ExternalCancel();
 	}
 	InstanceData.GameplayTaskPtr = nullptr;
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
 }
 
 EStateTreeRunStatus FSTT_GuideThread_PressKey::EnterState(
@@ -1013,7 +1104,9 @@ EStateTreeRunStatus FSTT_GuideThread_PressKey::Tick(
 	);
 }
 
-FTaskNodeDescript FSTT_GuideThread_PressKey::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThread_PressKey::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -1023,9 +1116,208 @@ FTaskNodeDescript FSTT_GuideThread_PressKey::GetTaskNodeDescripton(FStateTreeExe
 
 	TaskNodeDescript.Description = FString::Printf(
 		TEXT(
-			"Press %s key"
+			"Press <%s>%s</> key To Move"
 		),
+		*Rich_Key,
 		*InstanceData.Key.ToString()
+	);
+
+	return TaskNodeDescript;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_ActiveDash::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.GuideActorPtr->FindComponentByInterface(
+			UGameplayTaskOwnerInterface::StaticClass()
+		)
+	);
+	if (!InstanceData.TaskOwner)
+	{
+		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+	}
+
+	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_ActiveDash>(
+		*InstanceData.TaskOwner
+	);
+	InstanceData.GameplayTaskPtr->GAClass = InstanceData.GAClass;
+	InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+
+	InstanceData.GameplayTaskPtr->ReadyForActivation();
+
+	return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_ActiveDash::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	Super::Tick(Context, DeltaTime);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	if (!InstanceData.GameplayTaskPtr)
+	{
+		checkNoEntry();
+	}
+
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+void FSTT_GuideThread_ActiveDash::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.GameplayTaskPtr->ExternalCancel();
+	}
+	InstanceData.GameplayTaskPtr = nullptr;
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
+}
+
+FTaskNodeDescript FSTT_GuideThread_ActiveDash::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	auto GameOptionsPtr = UGameOptions::GetInstance();
+
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.Description = FString::Printf(
+		TEXT(
+			"Press <%s>%s</> key To <Button Display=\"Dash\" Param=\"Dash\"/>"
+		),
+		*Rich_Key,
+		*GameOptionsPtr->DashKey.ToString()
+	);
+
+	return TaskNodeDescript;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_Run::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.GuideActorPtr->FindComponentByInterface(
+			UGameplayTaskOwnerInterface::StaticClass()
+		)
+	);
+	if (!InstanceData.TaskOwner)
+	{
+		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+	}
+
+	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_ActiveRun>(
+		*InstanceData.TaskOwner
+	);
+	InstanceData.GameplayTaskPtr->GAClass = InstanceData.GAClass;
+	InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+
+	InstanceData.GameplayTaskPtr->ReadyForActivation();
+
+	return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_Run::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	Super::Tick(Context, DeltaTime);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	if (!InstanceData.GameplayTaskPtr)
+	{
+		checkNoEntry();
+	}
+
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+void FSTT_GuideThread_Run::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.GameplayTaskPtr->ExternalCancel();
+	}
+	InstanceData.GameplayTaskPtr = nullptr;
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
+}
+
+FTaskNodeDescript FSTT_GuideThread_Run::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	auto GameOptionsPtr = UGameOptions::GetInstance();
+
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.Description = FString::Printf(
+		TEXT(
+			"Press <%s>%s</> key To <Button Display=\"Run\" Param=\"Run\"/>"
+		),
+		*Rich_Key,
+		*GameOptionsPtr->RunKey.ToString()
 	);
 
 	return TaskNodeDescript;
@@ -1143,7 +1435,9 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::Tick(
 	);
 }
 
-FTaskNodeDescript FSTT_GuideThread_GoToTheTargetPoint::GetTaskNodeDescripton(FStateTreeExecutionContext& Context) const
+FTaskNodeDescript FSTT_GuideThread_GoToTheTargetPoint::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
@@ -1170,11 +1464,6 @@ void FSTT_GuideThread_GoToTheTargetPoint::ExitState(
 	const FStateTreeTransitionResult& Transition
 ) const
 {
-	Super::ExitState(
-		Context,
-		Transition
-	);
-
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
 		*this
 	);
@@ -1183,6 +1472,11 @@ void FSTT_GuideThread_GoToTheTargetPoint::ExitState(
 		InstanceData.TargetPointPtr->Destroy();
 	}
 	InstanceData.TargetPointPtr = nullptr;
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
 }
 
 EStateTreeRunStatus FSTT_GuideThread_WaitInteractionSceneActor::EnterState(

@@ -18,6 +18,7 @@ struct FCharacterSocket;
 struct FSkillProxy;
 struct FWeaponProxy;
 struct FAllocationbleProxy;
+struct FWeaponSkillProxy;
 class IPlanetControllerInterface;
 class ACharacterBase;
 
@@ -35,6 +36,7 @@ public:
 	friend ACharacterBase;
 	friend FProxy_FASI;
 	friend FAllocationbleProxy;
+	friend FWeaponSkillProxy;
 
 	using FOwnerType = ACharacterBase;
 

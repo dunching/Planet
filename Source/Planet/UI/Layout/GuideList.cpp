@@ -10,9 +10,9 @@
 #include "GuideActor.h"
 #include "GuideSubSystem.h"
 #include "GuideThread.h"
+#include "PlanetRichTextBlock.h"
 #include "ProxyProcessComponent.h"
 #include "STT_GuideThread.h"
-
 
 struct FGuideList : public TStructVariable<FGuideList>
 {
@@ -84,7 +84,7 @@ void UGuideList::OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNo
 		(CurrentTaskNode.GetIsValid() && CurrentTaskNode.bIsFreshPreviouDescription)
 		)
 	{
-		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGuideList::Get().Description));
+		auto UIPtr = Cast<URichTextBlock_Button>(GetWidgetFromName(FGuideList::Get().Description));
 		if (!UIPtr)
 		{
 			return;

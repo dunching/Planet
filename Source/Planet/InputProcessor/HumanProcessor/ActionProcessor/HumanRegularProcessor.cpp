@@ -193,18 +193,26 @@ namespace HumanProcessor
 				}
 
 				auto GameOptionsPtr = UGameOptions::GetInstance();
-				
+
 				if (EventArgs.Key == GameOptionsPtr->FocusTarget)
 				{
 					OnwerActorPtr->GetStateProcessorComponent()->FocusTarget();
 					return true;
 				}
-				
-				// 特殊处理一下
-				if (OnwerActorPtr->LookAtSceneActorPtr && (EventArgs.Key == GameOptionsPtr->Interaction))
+
+				// 与场景里的对象交互，特殊处理一下
+				if (OnwerActorPtr->LookAtSceneActorPtr)
 				{
-					OnwerActorPtr->InteractionSceneActor(Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr));
-					return true;
+					if (EventArgs.Key == GameOptionsPtr->InteractionWithSceneActor)
+					{
+						OnwerActorPtr->InteractionSceneActor(Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr));
+						return true;
+					}
+					else if (EventArgs.Key == GameOptionsPtr->InteractionWithSceneCharacter)
+					{
+						OnwerActorPtr->InteractionSceneCharacter(Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr));
+						return true;
+					}
 				}
 
 				auto GameplayFeatureKeyMapMapIter = GameplayFeatureKeyMapMap.Find(EventArgs.Key);

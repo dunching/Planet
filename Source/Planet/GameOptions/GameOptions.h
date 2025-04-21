@@ -70,6 +70,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
 	int32 MaxPerformSpeed = 300;
 
+#pragma region 按键映射
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey DashKey = EKeys::LeftShift;
 
@@ -80,9 +81,6 @@ public:
 	FKey FocusTarget = EKeys::Tab;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
-	FKey Interaction = EKeys::E;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey SwitchTeammateOptionToFollow = EKeys::F1;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
@@ -90,13 +88,20 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey SwitchTeammateOptionToFireTarget = EKeys::F3;
-
+	
 	/**
 	 * 返回上一级
 	 * 这里的操作是固定的?
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey Return = EKeys::Escape;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey InteractionWithSceneActor = EKeys::E;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey InteractionWithSceneCharacter = EKeys::F;
+#pragma endregion
 
 	static int32 MaxTeammateNum;
 

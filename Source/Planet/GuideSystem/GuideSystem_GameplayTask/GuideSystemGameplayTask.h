@@ -31,11 +31,13 @@ class PLANET_API UGameplayTask_Base : public UGameplayTask
 
 public:
 	
+	EStateTreeRunStatus GetStateTreeRunStatus()const;
+
 	void SetPlayerCharacter(AHumanCharacter_Player* PlayerCharacterPtr);
 
 	void SetTaskID(const FGuid& InTaskID);
 
-	EStateTreeRunStatus GetStateTreeRunStatus()const;
+private:
 	
 protected:
 

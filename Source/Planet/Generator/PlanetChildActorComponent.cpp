@@ -20,8 +20,9 @@ UPlanetChildActorComponent::UPlanetChildActorComponent(
 void UPlanetChildActorComponent::CreateChildActor(
 	TFunction<void(
 		AActor*
+
 	
-	)> CustomizerFunc /*= nullptr*/
+	)> CustomizerFunc
 )
 {
 	UWorld* World = GetWorld();
@@ -53,6 +54,9 @@ void UPlanetChildActorComponent::RespawnChildActor(
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
+		// Kill spawned actor if we have one
+		DestroyChildActor();
+
 #if UE_EDITOR || UE_SERVER
 		if (GetNetMode() == NM_DedicatedServer)
 		{
@@ -61,9 +65,6 @@ void UPlanetChildActorComponent::RespawnChildActor(
 			{
 				return;
 			}
-
-			// Kill spawned actor if we have one
-			DestroyChildActor();
 
 			FActorSpawnParameters Params;
 			Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;

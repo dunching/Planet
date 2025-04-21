@@ -455,7 +455,76 @@ void FWeaponSkillProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacte
 {
 	// 注意：这里不应该再UpdateSocket
 	// 因为我们直接存的武器
-	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
+	
+	// Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
+
+	// 这里做一个转发，
+	// 同步到服务器
+	if (InventoryComponentPtr->GetNetMode() == NM_Client)
+	{
+		if (InAllocationCharacterProxyPtr)
+		{
+			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), InAllocationCharacterProxyPtr->GetID(),
+															   InSocketTag);
+		}
+		else
+		{
+			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), FGuid(), InSocketTag);
+		}
+		// return;
+	}
+
+	if (InAllocationCharacterProxyPtr && InSocketTag.IsValid())
+	{
+		if (
+			(AllocationCharacter_ID == InAllocationCharacterProxyPtr->GetID()) &&
+			(SocketTag == InSocketTag)
+		)
+		{
+			return;
+		}
+
+		// 找到这个物品之前被分配的插槽
+		// 如果不是在同一个CharacterActor上，则需要取消分配
+		if (AllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
+		{
+			UnAllocation();
+		}
+
+		auto PreviousAllocationCharacterProxySPtr = InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+		if (PreviousAllocationCharacterProxySPtr)
+		{
+			auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
+			CharacterSocket.ResetAllocatedProxy();
+
+			PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
+		}
+
+		const auto PreviousAllocationCharacter_ID = AllocationCharacter_ID;
+		AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
+		SocketTag = InSocketTag;
+
+		// 如果不是在同一个CharacterActor上，则需要重新分配
+		// 否则重新分配
+		if (PreviousAllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
+		{
+			Allocation();
+		}
+
+		// 将这个物品注册到新的插槽
+		auto CharacterSocket = InAllocationCharacterProxyPtr->FindSocket(SocketTag);
+		CharacterSocket.SetAllocationedProxyID(GetID());
+
+		InAllocationCharacterProxyPtr->UpdateSocket(CharacterSocket);
+
+		OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
+
+		Update2Client();
+	}
+	else
+	{
+		ResetAllocationCharacterProxy();
+	}
 }
 
 bool FWeaponSkillProxy::Active()

@@ -20,12 +20,17 @@ class PLANET_API UPlanetChildActorComponent : public UChildActorComponent
 	GENERATED_BODY()
 
 public:
-	
 	using FOwnerType = AGeneratorBase;
 
-	UPlanetChildActorComponent(const FObjectInitializer& ObjectInitializer);
+	UPlanetChildActorComponent(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	virtual void CreateChildActor(TFunction<void(AActor*)> CustomizerFunc = nullptr)override;
+	virtual void CreateChildActor(
+		TFunction<void(
+			AActor*
+		)> CustomizerFunc = nullptr
+	) override;
 
 	virtual void RespawnChildActor();
 };
