@@ -19,8 +19,10 @@
 
 class UGameplayAbility;
 class UPlanetGameplayAbility;
+class UMarkPoints;
 class ASceneActor;
 class AResourceBoxBase;
+class AChallengeEntry;
 class ATargetPoint_Runtime;
 class AGeneratorColony_ByTime;
 class ATargetPoint;
@@ -40,6 +42,7 @@ class UPAD_TaskNode_Guide_LeaveHere;
 class UPAD_TaskNode_Guide_SpwanNPCColony;
 class UGloabVariable_GuideBrandThread;
 class UGloabVariable_GuideThread_Area;
+class UGloabVariable_GuideThread_Main;
 class UGameplayTask_Base;
 class UGameplayTask_Guide_WaitComplete;
 class UGameplayTask_Guide_ConversationWithTarget;
@@ -49,6 +52,7 @@ class UGameplayTask_Guide_DefeatEnemy;
 class UGameplayTask_Guide_ReturnOpenWorld;
 class UGameplayTask_Guide_ActiveDash;
 class UGameplayTask_Guide_ActiveRun;
+class UGameplayTask_Guide_AttckCharacter;
 class UGameplayTask_WaitInteractionSceneActor;
 class UGameplayTask_WaitPlayerEquipment;
 
@@ -57,11 +61,13 @@ struct FTaskNode_Conversation_SentenceInfo;
 
 #pragma region Record
 USTRUCT()
-struct PLANET_API FSTID_GuideThreadRecord :
-	public FSTID_GuideBase
+struct PLANET_API FSTID_GuideThreadRecord
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, Category = Param)
+	FGuid TaskID;
+	
 	UPROPERTY(
 		EditAnywhere,
 		Category = Context
@@ -377,6 +383,8 @@ struct PLANET_API FSTID_GuideThread_GoToTheTargetPoint :
 	TObjectPtr<AHumanCharacter_AI> TargetCharacterPtr = nullptr;
 
 	ATargetPoint_Runtime* TargetPointPtr = nullptr;
+
+	UMarkPoints* MarkPointsPtr = nullptr;
 };
 
 // 
@@ -572,6 +580,18 @@ public:
 		EditAnywhere
 	)
 	TSoftObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
+
+	UPROPERTY(
+		BlueprintReadOnly,
+		EditAnywhere
+	)
+	TSoftObjectPtr<AResourceBoxBase> ResourceBoxPtr = nullptr;
+
+	UPROPERTY(
+		BlueprintReadOnly,
+		EditAnywhere
+	)
+	TSoftObjectPtr<AChallengeEntry> ChallengeEntryPtr = nullptr;
 
 	UPROPERTY(
 		BlueprintReadOnly,
@@ -1085,6 +1105,113 @@ struct PLANET_API FSTT_GuideThread_WaitPlayerEquipment :
 	GENERATED_BODY()
 
 	using FInstanceDataType = FSTID_GuideThread_WaitPlayerEquipment;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
+
+protected:
+};
+#pragma endregion
+
+#pragma region 生成一个目标NPC
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_SpawnNPC :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, Category = Context)
+	UGloabVariable_GuideThread_Main* GloabVariable_Main = nullptr;
+	
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	TSubclassOf<AHumanCharacter_AI> NPCClass;
+
+	FGuid NPC_ID;
+};
+
+// 执行引导任务 给目标角色添加互动引导内容
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_SpawnNPC :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_SpawnNPC;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
+
+protected:
+};
+#pragma endregion
+
+#pragma region 要求玩家攻击这个目标
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_AttckCharacter :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(
+		Transient
+	)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+
+	UPROPERTY(
+		Transient
+	)
+	TObjectPtr<UGameplayTask_Guide_AttckCharacter> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Context)
+	UGloabVariable_GuideThread_Main* GloabVariable_Main = nullptr;
+
+	TObjectPtr<ACharacterBase> HumanCharacterAI = nullptr;
+
+	bool bIsNotFreshed = true;
+};
+
+// 执行引导任务 给目标角色添加互动引导内容
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_AttckCharacter :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_AttckCharacter;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

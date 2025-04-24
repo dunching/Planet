@@ -30,20 +30,39 @@ public:
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
 	/**
-	 * 将Player传送至该点
+	 * 获取最近的传送点
+	 * @param ChallengeLevelType 
+	 * @param PCPtr 
+	 */
+	ETeleport GetTeleportPlayerToNearest(APlanetPlayerController* PCPtr);
+
+	/**
+	 * 根据传送点切换数据层
 	 * @param ChallengeLevelType 
 	 * @param PCPtr 
 	 */
 	void SwitchDataLayer(ETeleport ChallengeLevelType, APlanetPlayerController* PCPtr);
-
-	ETeleport GetTeleportPlayerToNearest(APlanetPlayerController* PCPtr);
 
 	/**
 	 * 确认切换的数据层中，必须的数据是否已存在
 	 * @param ChallengeLevelType 
 	 * @return 
 	 */
-	bool CheckSwitchDataLayerComplete(ETeleport ChallengeLevelType);
+	bool CheckSwitchDataLayerComplete(ETeleport ChallengeLevelType)const;
+
+	/**
+	 * 根据传送点切换数据层
+	 * @param ChallengeLevelType 
+	 * @param PCPtr 
+	 */
+	void TeleportPlayer(ETeleport ChallengeLevelType, APlanetPlayerController* PCPtr);
+
+	/**
+	 * 根据传送点切换数据层
+	 * @param ChallengeLevelType 
+	 * @param PCPtr 
+	 */
+	bool CheckTeleportPlayerComplete(ETeleport ChallengeLevelType)const;
 
 	TSoftObjectPtr<ATeleport> GetTeleport(ETeleport ChallengeLevelType)const;
 
@@ -56,19 +75,6 @@ public:
 	TArray<FTransform>GetChallengeSpawnPts(ETeleport ChallengeLevelType, int32 Num)const;
 	
 private:
-
-	void SwitchDataLayerImp(
-		const FName& Key,
-		const FTableRow_Teleport& Value,
-		ETeleport ChallengeLevelType
-		);
-
-	void TeleportPlayer(
-		const FName& Key,
-		const FTableRow_Teleport& Value,
-		ETeleport ChallengeLevelType,
-		APlanetPlayerController* PCPtr
-		);
 
 	/*
 	 *	角色进入副本之前在开放世界的位置信息

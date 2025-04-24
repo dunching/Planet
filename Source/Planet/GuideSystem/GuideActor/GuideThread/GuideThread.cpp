@@ -136,6 +136,11 @@ AGuideThread_Main::AGuideThread_Main(
 {
 }
 
+EGuideThreadType AGuideThread_Main::GetGuideThreadType() const
+{
+	return EGuideThreadType::kMain;
+}
+
 UStateTreeGuideMainThreadComponentSchema::UStateTreeGuideMainThreadComponentSchema()
 {
 	ContextActorClass = FOwnerType::StaticClass();
@@ -166,6 +171,11 @@ bool UGuideMainThreadSystemStateTreeComponent::SetContextRequirements(
 	);
 }
 
+EGuideThreadType AGuideThread_Branch::GetGuideThreadType() const
+{
+	return EGuideThreadType::kBrand;
+}
+
 AGuideThread_Area::AGuideThread_Area(
 	const FObjectInitializer& ObjectInitializer
 ):
@@ -177,6 +187,11 @@ AGuideThread_Area::AGuideThread_Area(
 	 )
  )
 {
+}
+
+inline EGuideThreadType AGuideThread_Area::GetGuideThreadType() const
+{
+	return EGuideThreadType::kArea;
 }
 
 UStateTreeGuideAreaThreadComponentSchema::UStateTreeGuideAreaThreadComponentSchema()

@@ -21,28 +21,55 @@ void USTE_GuideThread::Tick(FStateTreeExecutionContext& Context, const float Del
 
 void USTE_GuideThread::TreeStop(FStateTreeExecutionContext& Context)
 {
-	Super::TreeStop(Context);
-}
-
-void USTE_TaskNode_GuideMainThread::TreeStop(FStateTreeExecutionContext& Context)
-{
-	if (GuideActorPtr)
+	if (GuideThreadActorPtr)
 	{
 		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideActorPtr);
+		GuideSubSystemPtr->GuideThreadEnded(GuideThreadActorPtr);
 	}
 
 	Super::TreeStop(Context);
 }
 
-void USTE_TaskNode_GuideBrandThread::TreeStart(FStateTreeExecutionContext& Context)
+void USTE_GuideThread_Main::TreeStart(
+	FStateTreeExecutionContext& Context
+)
+{
+	Super::TreeStart(Context);
+
+	GloabVariable_MainPtr = NewObject<UGloabVariable_GuideThread_Main>();
+}
+
+void USTE_GuideThread_Main::TreeStop(FStateTreeExecutionContext& Context)
+{
+	if (GloabVariable_MainPtr)
+	{
+		for (auto Iter : GloabVariable_MainPtr->TemporaryActorAry)
+		{
+			if (Iter)
+			{
+				Iter->Destroy();
+			}
+		}
+		GloabVariable_MainPtr->TemporaryActorAry.Empty();
+	}
+
+	if (GuideThreadMainActorPtr)
+	{
+		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
+		GuideSubSystemPtr->GuideThreadEnded(GuideThreadMainActorPtr);
+	}
+
+	Super::TreeStop(Context);
+}
+
+void USTE_GuideThread_Brand::TreeStart(FStateTreeExecutionContext& Context)
 {
 	Super::TreeStart(Context);
 
 	GloabVariable_Brand = NewObject<UGloabVariable_GuideThread_Brand>();
 }
 
-void USTE_TaskNode_GuideBrandThread::TreeStop(FStateTreeExecutionContext& Context)
+void USTE_GuideThread_Brand::TreeStop(FStateTreeExecutionContext& Context)
 {
 	if (GloabVariable_Brand)
 	{
@@ -56,16 +83,16 @@ void USTE_TaskNode_GuideBrandThread::TreeStop(FStateTreeExecutionContext& Contex
 		GloabVariable_Brand->TemporaryActorAry.Empty();
 	}
 
-	if (GuideActorPtr)
+	if (GuideThreadBranchActorPtr)
 	{
 		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideActorPtr);
+		GuideSubSystemPtr->GuideThreadEnded(GuideThreadBranchActorPtr);
 	}
 
 	Super::TreeStop(Context);
 }
 
-void USTE_TaskNode_GuideThread_Area::TreeStart(
+void USTE_GuideThread_Area::TreeStart(
 	FStateTreeExecutionContext& Context
 )
 {
@@ -74,12 +101,12 @@ void USTE_TaskNode_GuideThread_Area::TreeStart(
 	GloabVariable_Area = NewObject<UGloabVariable_GuideThread_Area>();
 }
 
-void USTE_TaskNode_GuideThread_Area::TreeStop(FStateTreeExecutionContext& Context)
+void USTE_GuideThread_Area::TreeStop(FStateTreeExecutionContext& Context)
 {
-	if (GuideActorPtr)
+	if (GuideThreadAreaActorPtr)
 	{
 		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideActorPtr);
+		GuideSubSystemPtr->GuideThreadEnded(GuideThreadAreaActorPtr);
 	}
 
 	Super::TreeStop(Context);

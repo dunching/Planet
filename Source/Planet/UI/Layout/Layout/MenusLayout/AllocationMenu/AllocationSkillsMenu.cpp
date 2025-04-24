@@ -349,6 +349,11 @@ void UAllocationSkillsMenu::SyncData()
 	}
 }
 
+EMenuType UAllocationSkillsMenu::GetMenuType() const
+{
+	return EMenuType::kAllocationSkill;
+}
+
 void UAllocationSkillsMenu::BindEvent()
 {
 	{

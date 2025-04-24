@@ -52,6 +52,11 @@ void UGroupManaggerMenu::SyncData()
 	}
 }
 
+EMenuType UGroupManaggerMenu::GetMenuType() const
+{
+	return EMenuType::kGroupManagger;
+}
+
 void UGroupManaggerMenu::ResetGroupmates()
 {
 	auto TileViewPtr = Cast<UTileView>(GetWidgetFromName(GroupManaggerMenu::GroupMatesTileView));

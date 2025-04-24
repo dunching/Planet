@@ -32,7 +32,7 @@ using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
  *	不断重复并且强化
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideThread_Challenge : public AGuideThread
+class PLANET_API AGuideThread_Challenge : public AGuideThread_Immediate
 {
 	GENERATED_BODY()
 

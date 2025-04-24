@@ -48,37 +48,38 @@ class PLANET_API URegularActionLayout :
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual void Enable() override;
 
-	virtual void Enable()override;
-	
-	virtual void DisEnable()override;
+	virtual void DisEnable() override;
+
+	virtual ELayoutCommon GetLayoutType() const override final;
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UBackpackMenu>BackpackMenuClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateActionHUD>PawnStateActionHUDClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateConsumablesHUD>PawnStateConsumablesHUDClass;
+	TSubclassOf<UBackpackMenu> BackpackMenuClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateBuildingHUD>PawnStateBuildingHUDClass;
+	TSubclassOf<UPawnStateActionHUD> PawnStateActionHUDClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UEffectsList>EffectsListClass;
-	
+	TSubclassOf<UPawnStateConsumablesHUD> PawnStateConsumablesHUDClass;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UProgressTips>ProgressTipsClass;
-	
+	TSubclassOf<UPawnStateBuildingHUD> PawnStateBuildingHUDClass;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UFocusTitle>FocusTitleClass;
-	
+	TSubclassOf<UEffectsList> EffectsListClass;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UHUD_TeamInfo>HUD_TeamInfoClass;
+	TSubclassOf<UProgressTips> ProgressTipsClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UFocusTitle> FocusTitleClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UHUD_TeamInfo> HUD_TeamInfoClass;
 #pragma endregion MenusUI
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
@@ -100,22 +101,33 @@ public:
 	FName HUD_TeamSocket;
 
 protected:
-
 	// 锁定目标时,上方显示的状态栏
-	void OnFocusCharacter(ACharacterBase* TargetCharacterPtr);
+	void OnFocusCharacter(
+		ACharacterBase* TargetCharacterPtr
+	);
 
 	// 出战队员列表
-	void DisplayTeamInfo(bool bIsDisplay, AHumanCharacter* HumanCharacterPtr = nullptr);
+	void DisplayTeamInfo(
+		bool bIsDisplay,
+		AHumanCharacter* HumanCharacterPtr = nullptr
+	);
 
 	// 效果栏（buff、debuff）
 	UEffectsList* InitialEffectsList();
 
 	// 进度条/工具
-	UProgressTips* ViewProgressTips(bool bIsViewMenus);
+	UProgressTips* ViewProgressTips(
+		bool bIsViewMenus
+	);
 
-	void OnHPChanged(const FOnAttributeChangeData&);
+	void OnHPChanged(
+		const FOnAttributeChangeData&
+	);
+
+	void OnFocusDestruct(
+		UUserWidget* UIPtr
+	);
 
 	UPROPERTY(Transient)
 	UFocusIcon* FocusIconPtr = nullptr;
-
 };

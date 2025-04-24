@@ -10,6 +10,7 @@
 
 #include "GuideActor.h"
 #include "GuideSystemStateTreeComponent.h"
+#include "GuideThreadType.h"
 
 #include "GuideThread.generated.h"
 
@@ -27,6 +28,22 @@ struct FTaskNodeDescript;
 
 using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
 
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class UGuideThreadInterfacetion : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class PLANET_API IGuideThreadInterfacetion
+{
+	GENERATED_BODY()
+
+public:
+	virtual EGuideThreadType GetGuideThreadType() const = 0;
+
+private:
+};
+
 #pragma region Base
 /**
  *	任务
@@ -38,16 +55,26 @@ class PLANET_API AGuideThread : public AGuideActor
 	GENERATED_BODY()
 
 public:
-	AGuideThread(const FObjectInitializer& ObjectInitializer);
+	AGuideThread(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	void UpdateCurrentTaskNode(const TSoftObjectPtr<UPAD_TaskNode_Guide>& InTaskNode);
+	void UpdateCurrentTaskNode(
+		const TSoftObjectPtr<UPAD_TaskNode_Guide>& InTaskNode
+	);
 
-	void UpdateCurrentTaskNode(const FTaskNodeDescript& TaskNodeDescript);
+	void UpdateCurrentTaskNode(
+		const FTaskNodeDescript& TaskNodeDescript
+	);
 
 	// 添加任务执行结果
-	void AddEvent(const FTaskNodeResuleHelper& TaskNodeResuleHelper);
+	void AddEvent(
+		const FTaskNodeResuleHelper& TaskNodeResuleHelper
+	);
 
-	FTaskNodeResuleHelper ConsumeEvent(const FGuid& InGuid);
+	FTaskNodeResuleHelper ConsumeEvent(
+		const FGuid& InGuid
+	);
 
 	FGuid GetPreviousTaskID() const;
 
@@ -55,7 +82,9 @@ public:
 	 * 设置上一次执行到的任务的ID
 	 * @param PreviousGuideID 
 	 */
-	void SetPreviousTaskID(const FGuid& PreviousGuideID);
+	void SetPreviousTaskID(
+		const FGuid& PreviousGuideID
+	);
 
 	FGuid GetCurrentTaskID() const;
 
@@ -63,10 +92,12 @@ public:
 	 * 记录当前执行到的任务的ID
 	 * @param PreviousGuideID 
 	 */
-	void SetCurrentTaskID(const FGuid& TaskID);
+	void SetCurrentTaskID(
+		const FGuid& TaskID
+	);
 
-	FGuid GetGuideID()const;
-	
+	FGuid GetGuideID() const;
+
 	// 任务节点类型：支线/支线
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag TaskNodeCategory;
@@ -80,7 +111,6 @@ public:
 	FString Description;
 
 protected:
-	
 	// 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGuid GuideID;
@@ -109,20 +139,24 @@ class UStateTreeGuideThreadComponentSchema : public UStateTreeComponentSchema
 	GENERATED_BODY()
 
 public:
-	
 	using FOwnerType = AGuideThread;
 
 	UStateTreeGuideThreadComponentSchema();
-	
-	virtual bool IsStructAllowed(const UScriptStruct* InScriptStruct) const override;
-	
+
+	virtual bool IsStructAllowed(
+		const UScriptStruct* InScriptStruct
+	) const override;
+
 	virtual void PostLoad() override;
-	
-	static bool SetContextRequirements(UBrainComponent& BrainComponent, FStateTreeExecutionContext& Context, bool bLogErrors = false);
+
+	static bool SetContextRequirements(
+		UBrainComponent& BrainComponent,
+		FStateTreeExecutionContext& Context,
+		bool bLogErrors = false
+	);
 
 	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
 	TSubclassOf<APlanetPlayerController> PlayerControllerClass = nullptr;
-	
 };
 
 /**
@@ -135,24 +169,30 @@ class PLANET_API UGuideThreadSystemStateTreeComponent : public UGuideSystemState
 
 public:
 	virtual TSubclassOf<UStateTreeSchema> GetSchema() const override;
-	
-	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
+
+	virtual bool SetContextRequirements(
+		FStateTreeExecutionContext& Context,
+		bool bLogErrors = false
+	) override;
 };
-#pragma endregion 
+#pragma endregion
 
 #pragma region 主线
 /**
  *	主线任务
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideThread_Main : public AGuideThread
+class PLANET_API AGuideThread_Main : public AGuideThread,
+                                     public IGuideThreadInterfacetion
 {
 	GENERATED_BODY()
 
 public:
-	
-	AGuideThread_Main(const FObjectInitializer& ObjectInitializer);
+	AGuideThread_Main(
+		const FObjectInitializer& ObjectInitializer
+	);
 
+	virtual EGuideThreadType GetGuideThreadType() const override final;
 };
 
 UCLASS()
@@ -161,11 +201,9 @@ class UStateTreeGuideMainThreadComponentSchema : public UStateTreeGuideThreadCom
 	GENERATED_BODY()
 
 public:
-	
 	using FOwnerType = AGuideThread_Main;
 
 	UStateTreeGuideMainThreadComponentSchema();
-	
 };
 
 /**
@@ -179,22 +217,27 @@ class PLANET_API UGuideMainThreadSystemStateTreeComponent : public UGuideThreadS
 public:
 	using FSchemaType = UStateTreeGuideMainThreadComponentSchema;
 
-	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
-	
-	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
+	virtual TSubclassOf<UStateTreeSchema> GetSchema() const override;
+
+	virtual bool SetContextRequirements(
+		FStateTreeExecutionContext& Context,
+		bool bLogErrors = false
+	) override;
 };
-#pragma endregion 
+#pragma endregion
 
 #pragma region 支线
 /**
  *	支线任务
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideThread_Branch : public AGuideThread
+class PLANET_API AGuideThread_Branch : public AGuideThread,
+                                       public IGuideThreadInterfacetion
 {
 	GENERATED_BODY()
 
 public:
+	virtual EGuideThreadType GetGuideThreadType() const override final;
 };
 #pragma endregion
 
@@ -203,7 +246,7 @@ public:
  *	即时事件，如即时挑战
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideImmediateEventsThread : public AGuideThread
+class PLANET_API AGuideThread_Immediate : public AGuideThread
 {
 	GENERATED_BODY()
 
@@ -217,13 +260,17 @@ public:
  *	区域事件，进入区域后发生的引导,如世界首领、副本
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API AGuideThread_Area : public AGuideThread
+class PLANET_API AGuideThread_Area : public AGuideThread_Immediate,
+                                     public IGuideThreadInterfacetion
 {
 	GENERATED_BODY()
 
 public:
-	AGuideThread_Area(const FObjectInitializer& ObjectInitializer);
+	AGuideThread_Area(
+		const FObjectInitializer& ObjectInitializer
+	);
 
+	virtual EGuideThreadType GetGuideThreadType() const override final;
 };
 
 UCLASS()
@@ -232,11 +279,9 @@ class UStateTreeGuideAreaThreadComponentSchema : public UStateTreeGuideThreadCom
 	GENERATED_BODY()
 
 public:
-	
 	using FOwnerType = AGuideThread_Area;
 
 	UStateTreeGuideAreaThreadComponentSchema();
-	
 };
 
 /**
@@ -248,11 +293,13 @@ class PLANET_API UGuideAreaThreadSystemStateTreeComponent : public UGuideThreadS
 	GENERATED_BODY()
 
 public:
-
 	using FSchemaType = UStateTreeGuideAreaThreadComponentSchema;
 
-	virtual TSubclassOf<UStateTreeSchema>GetSchema() const override;
-	
-	virtual bool SetContextRequirements(FStateTreeExecutionContext& Context, bool bLogErrors = false) override;
+	virtual TSubclassOf<UStateTreeSchema> GetSchema() const override;
+
+	virtual bool SetContextRequirements(
+		FStateTreeExecutionContext& Context,
+		bool bLogErrors = false
+	) override;
 };
-#pragma endregion 
+#pragma endregion

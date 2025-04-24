@@ -40,6 +40,8 @@ protected:
 
 	virtual void SyncData()override;
 
+	virtual EMenuType GetMenuType()const override final;
+	
 	void OnUsedTalentNumChanged(int32 OldNum, int32 NewNum);
 	
 	void OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);

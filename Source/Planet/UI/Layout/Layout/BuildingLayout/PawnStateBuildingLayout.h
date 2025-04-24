@@ -8,6 +8,7 @@
 
 #include "GenerateType.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 
 #include "PawnStateBuildingLayout.generated.h"
@@ -24,10 +25,13 @@ struct FConsumableSocketInfo;
  */
 UCLASS()
 class PLANET_API UPawnStateBuildingLayout :
-	public UMyUserWidget
+	public UMyUserWidget,
+	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
 
+	virtual ELayoutCommon GetLayoutType() const override final;
+	
 };

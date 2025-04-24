@@ -30,9 +30,8 @@ EStateTreeRunStatus FSTT_GuideInteraction_EntryChallenge::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(
-		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass,
-		true
+	UGuideSubSystem::GetInstance()->StartParallelGuideThread(
+		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
 	);
 	
 	return EStateTreeRunStatus::Succeeded;

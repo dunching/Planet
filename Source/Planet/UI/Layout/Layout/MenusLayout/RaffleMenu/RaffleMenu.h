@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "MenuInterface.h"
 #include "RaffleCommon.h"
 
 #include "RaffleMenu.generated.h"
@@ -22,36 +23,54 @@ struct FTableRowProxy;
  *
  */
 UCLASS()
-class PLANET_API URaffleMenu : public UMyUserWidget
+class PLANET_API URaffleMenu :
+	public UMyUserWidget,
+	public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
-
 	using FOnGetProxyDelegateHandle =
-		TCallbackHandleContainer<void(const TArray<FTableRowProxy*>&)>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void(
+		const TArray<FTableRowProxy*>&
+	)>::FCallbackHandleSPtr;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeConstruct() override;
 
-	virtual void NativeDestruct()override;
+	virtual void NativeDestruct() override;
 
+	virtual void ResetUIByData()override;
+	
+	virtual void SyncData()override;
+
+	virtual EMenuType GetMenuType()const override final;
+	
 	void InitialRaffleType();
 
 	void InitialRaffleBtn();
 
-	void SetHoldItemProperty(const TSharedPtr<FSceneProxyContainer>& NewSPHoldItemPerperty);
+	void SetHoldItemProperty(
+		const TSharedPtr<FSceneProxyContainer>& NewSPHoldItemPerperty
+	);
 
-	void SwitchDisplay(bool bIsDisplayRaffleUI);
+	void SwitchDisplay(
+		bool bIsDisplayRaffleUI
+	);
 
-	void ResetGetProxyAry(const TArray<FTableRowProxy*>&Ary);
+	void ResetGetProxyAry(
+		const TArray<FTableRowProxy*>& Ary
+	);
 
 protected:
-
 	FOnGetProxyDelegateHandle OnGetProxyDelegateHandle;
 
-	void OnRaffleTypeSelected(URaffleType* RaffleTypePtr);
-	
-	void OnRaffleBtnSelected(URaffleBtn* RaffleTypePtr);
+	void OnRaffleTypeSelected(
+		URaffleType* RaffleTypePtr
+	);
+
+	void OnRaffleBtnSelected(
+		URaffleBtn* RaffleTypePtr
+	);
 
 	UFUNCTION()
 	void OnClickedConfirmGetProxyBtn();
@@ -59,8 +78,7 @@ protected:
 	URaffleType* PreviouRaffleTypePtr = nullptr;
 
 	ERaffleType LastRaffleType = ERaffleType::kRafflePermanent;
-	
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
-	TSubclassOf<URaffle_Proxy>Raffle_ProxyClass;
-	
+	TSubclassOf<URaffle_Proxy> Raffle_ProxyClass;
 };

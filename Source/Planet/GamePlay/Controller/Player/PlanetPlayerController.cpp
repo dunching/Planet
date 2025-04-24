@@ -74,36 +74,6 @@ void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
 	GeneratorBasePtr->SpawnGeneratorActor();
 }
 
-void APlanetPlayerController::ServerSpawnCharacter_Implementation(
-	const TSoftClassPtr<AHumanCharacter_AI>& CharacterClass,
-	const FGuid& ID,
-	const FTransform& Transform
-)
-{
-	FActorSpawnParameters SpawnParameters;
-
-	SpawnParameters.CustomPreSpawnInitalization = [this, ID](
-		auto ActorPtr
-	)
-		{
-			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
-			if (AICharacterPtr)
-			{
-				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
-			}
-		};
-
-	auto Result =
-		GetWorld()->SpawnActor<AHumanCharacter_AI>(
-			CharacterClass.LoadSynchronous(),
-			Transform,
-			SpawnParameters
-		);
-	if (Result)
-	{
-	}
-}
-
 void APlanetPlayerController::ServerDestroyActor_Implementation(
 	AActor* ActorPtr
 )
@@ -112,6 +82,36 @@ void APlanetPlayerController::ServerDestroyActor_Implementation(
 	{
 		ActorPtr->Destroy();
 	}
+}
+
+void APlanetPlayerController::ServerSpawnCharacter_Implementation(
+	TSubclassOf<AHumanCharacter_AI> CharacterClass,
+	const FGuid& ID,
+	const FTransform& Transform
+)
+{
+		FActorSpawnParameters SpawnParameters;
+	
+		SpawnParameters.CustomPreSpawnInitalization = [this, ID](
+			auto ActorPtr
+		)
+			{
+				auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+				if (AICharacterPtr)
+				{
+					AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
+				}
+			};
+	
+		auto Result =
+			GetWorld()->SpawnActor<AHumanCharacter_AI>(
+				CharacterClass,
+				Transform,
+				SpawnParameters
+			);
+		if (Result)
+		{
+		}
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(

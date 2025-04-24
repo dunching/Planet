@@ -32,6 +32,8 @@ struct PLANET_API FTableRowProxy_CharacterType : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 	
+public:
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AHumanCharacter_AI>CharacterClass;
 	

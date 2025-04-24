@@ -49,7 +49,10 @@ EStateTreeRunStatus FSTT_GetPatrolPt::EnterState(
 		}
 #endif
 
-		return Super::EnterState(Context, Transition);
+		if (InstanceData.bRunForever)
+		{
+			return EStateTreeRunStatus::Running;
+		}
 		return EStateTreeRunStatus::Succeeded;
 	}
 

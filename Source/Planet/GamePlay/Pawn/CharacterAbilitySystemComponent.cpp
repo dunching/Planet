@@ -22,7 +22,7 @@
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "EventSubjectComponent.h"
 #include "PlanetPlayerController.h"
-#include "ReceivedEventModifyDataCallback.h"
+#include "OnEffectedTawrgetCallback.h"
 
 UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer):
                                                                                                                Super(ObjectInitializer)
@@ -999,12 +999,17 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 				);
 
 				// 回执
-				FReceivedEventModifyDataCallback ReceivedEventModifyDataCallback;
+				FOnEffectedTawrgetCallback ReceivedEventModifyDataCallback;
 
+				ReceivedEventModifyDataCallback.InstigatorCharacterPtr = Instigator;
 				ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
 				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 
 				Instigator->GetCharacterAbilitySystemComponent()->MakedDamageDelegate(
+					ReceivedEventModifyDataCallback
+					);
+
+				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate(
 					ReceivedEventModifyDataCallback
 					);
 
@@ -1013,7 +1018,7 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 					auto PCPtr = Instigator->GetController<APlanetPlayerController>();
 					if (PCPtr)
 					{
-						PCPtr->GetEventSubjectComponent()->ReceivedEventModifyDataCallback(ReceivedEventModifyDataCallback);
+						PCPtr->GetEventSubjectComponent()->OnEffectOhterCharacter(ReceivedEventModifyDataCallback);
 					}
 				}
 			}

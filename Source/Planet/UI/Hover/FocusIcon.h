@@ -8,6 +8,7 @@
 #include <AIController.h>
 
 #include "GenerateType.h"
+#include "HoverWidgetBase.h"
 
 #include "FocusIcon.generated.h"
 
@@ -19,30 +20,25 @@ class UToolIcon;
  * 锁定目标时，目标身上的标记
  */
 UCLASS()
-class PLANET_API UFocusIcon : public UMyUserWidget
+class PLANET_API UFocusIcon : public UHoverWidgetBase
 {
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeDestruct() override;
 
-	virtual void NativeDestruct()override;
+	virtual void NativeTick(
+		const FGeometry& MyGeometry,
+		float InDeltaTime
+	);
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual FVector GetHoverPosition() override;
 
-	ACharacterBase* TargetCharacterPtr = nullptr;
+	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
 protected:
 
 private:
-
-	bool ResetPosition(float InDeltaTime);
-
-	FTSTicker::FDelegateHandle TickDelegateHandle;
-
-	FVector2D MoveSpeed = FVector2D(100.f, 100.f);
-
-	FVector2D PreviousPosition = FVector2D::ZeroVector;
-
 };

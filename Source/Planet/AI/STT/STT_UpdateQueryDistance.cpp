@@ -1,4 +1,3 @@
-
 #include "STT_UpdateQueryDistance.h"
 
 #include <NavigationSystem.h>
@@ -13,7 +12,7 @@
 EStateTreeRunStatus FSTT_UpdateQueryDistance::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-)const
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (!InstanceData.CharacterPtr)
@@ -21,7 +20,9 @@ EStateTreeRunStatus FSTT_UpdateQueryDistance::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass())
+	);
 	if (!InstanceData.TaskOwner)
 	{
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
@@ -44,7 +45,7 @@ EStateTreeRunStatus FSTT_UpdateQueryDistance::Tick(
 ) const
 {
 	PerformAction(Context);
-	
+
 	return Super::Tick(Context, DeltaTime);
 }
 

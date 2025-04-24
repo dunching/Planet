@@ -31,12 +31,13 @@ class PLANET_API UTransitionLayout :
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual void Enable() override;
 
-	virtual void Enable()override;
-	
-	virtual void DisEnable()override;
+	virtual void DisEnable() override;
+
+	virtual ELayoutCommon GetLayoutType() const override final;
 
 private:
 };

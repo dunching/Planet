@@ -20,12 +20,13 @@ class PLANET_API UPlayerControllerGameplayTasksComponent : public UGameplayTasks
 	GENERATED_BODY()
 
 public:
-	
 	using FOwnerType = APlanetPlayerController;
 
 	static FName ComponentName;
 
-	UPlayerControllerGameplayTasksComponent(const FObjectInitializer& ObjectInitializer);
+	UPlayerControllerGameplayTasksComponent(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 #pragma region Teleport
 
@@ -34,18 +35,41 @@ public:
 	 */
 	void TeleportPlayerToNearest();
 
+	/**
+	 * Client
+	 */
+	void EntryChallengeLevel(
+		ETeleport Teleport
+	);
+
 private:
-	
 	UFUNCTION(Server, Reliable)
 	void TeleportPlayerToNearest_Server();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void TeleportPlayerToNearest_Task(ETeleport Teleport);
+	void TeleportPlayerToNearest_ActiveTask(
+		ETeleport Teleport
+	);
 
-	void TeleportPlayerToNearestEnd(bool bIsSuccess);
+	void TeleportPlayerToNearestEnd(
+		bool bIsSuccess
+	);
+
+	UFUNCTION(Server, Reliable)
+	void EntryChallengeLevel_Server(
+		ETeleport Teleport
+	);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void EntryChallengeLevel_ActiveTask(
+		ETeleport Teleport
+	);
+
+	void EntryChallengeLevelEnd(
+		bool bIsSuccess
+	);
 
 #pragma endregion
-
 };
 
 UCLASS()
@@ -54,7 +78,9 @@ class PLANET_API UGameplayTask_TeleportPlayer : public UGameplayTask
 	GENERATED_BODY()
 
 public:
-	using FOnEnd = TMulticastDelegate<void(bool)>;
+	using FOnEnd = TMulticastDelegate<void(
+		bool
+	)>;
 
 	UGameplayTask_TeleportPlayer(
 		const FObjectInitializer& ObjectInitializer
@@ -65,20 +91,23 @@ public:
 	virtual void TickTask(
 		float DeltaTime
 	) override;
-	
-	virtual void OnDestroy(bool bInOwnerFinished)override;
-	
+
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
+
 	TObjectPtr<APlanetPlayerController> TargetPCPtr = nullptr;
 
 	ETeleport Teleport = ETeleport::kNone;
-	
+
 	FOnEnd OnEnd;
 
 private:
 	TSoftObjectPtr<ATeleport> Target = nullptr;
 
-	bool bIsSuccessful = false;
-	
-	const int32 DistanceThreshold = 100;
+	bool bIsSwitchDataLayerComplete = false;
 
+	bool bIsSuccessful = false;
+
+	const int32 DistanceThreshold = 100;
 };

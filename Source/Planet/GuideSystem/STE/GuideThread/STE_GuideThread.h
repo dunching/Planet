@@ -15,7 +15,7 @@
 
 #include "STE_GuideThread.generated.h"
 
-class AGuideActor;
+class AGuideThread;
 class AGuideThread_Main;
 class AGuideThread_Branch;
 class AGuideThread_Area;
@@ -55,6 +55,9 @@ public:
 
 protected:
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
+	AGuideThread* GuideThreadActorPtr = nullptr;
+
 private:
 	
 	/**
@@ -68,16 +71,43 @@ private:
 
 #pragma region 主线
 UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode_GuideMainThread : public USTE_GuideThread
+class PLANET_API UGloabVariable_GuideThread_Main : public UObject
 {
 	GENERATED_BODY()
 
 public:
 
+	TArray<TWeakObjectPtr<ACharacterBase>> SpwanedCharacterAry;
+
+	/**
+	 * 引导生成的即时Actor
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
+	TArray<TObjectPtr<AActor>> TemporaryActorAry;
+
+};
+
+UCLASS(Blueprintable)
+class PLANET_API USTE_GuideThread_Main : public USTE_GuideThread
+{
+	GENERATED_BODY()
+
+public:
+
+	virtual void TreeStart(FStateTreeExecutionContext& Context)override;
+
 	virtual auto TreeStop(FStateTreeExecutionContext& Context) -> void override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
-	AGuideThread_Main* GuideActorPtr = nullptr;
+	AGuideThread_Main* GuideThreadMainActorPtr = nullptr;
+
+private:
+	
+	/**
+	 * 任务之间共享数据
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output, meta=(AllowPrivateAccess="true"))
+	UGloabVariable_GuideThread_Main* GloabVariable_MainPtr = nullptr;
 
 };
 #pragma endregion 
@@ -101,7 +131,7 @@ public:
 };
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode_GuideBrandThread : public USTE_GuideThread
+class PLANET_API USTE_GuideThread_Brand : public USTE_GuideThread
 {
 	GENERATED_BODY()
 
@@ -112,7 +142,7 @@ public:
 	virtual void TreeStop(FStateTreeExecutionContext& Context)override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
-	AGuideThread_Branch* GuideActorPtr = nullptr;
+	AGuideThread_Branch* GuideThreadBranchActorPtr = nullptr;
 
 	/**
 	 * 任务之间共享数据
@@ -142,7 +172,7 @@ public:
 };
 
 UCLASS(Blueprintable)
-class PLANET_API USTE_TaskNode_GuideThread_Area : public USTE_GuideThread
+class PLANET_API USTE_GuideThread_Area : public USTE_GuideThread
 {
 	GENERATED_BODY()
 
@@ -153,7 +183,7 @@ public:
 	virtual auto TreeStop(FStateTreeExecutionContext& Context) -> void override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Content)
-	AGuideThread_Area* GuideActorPtr = nullptr;
+	AGuideThread_Area* GuideThreadAreaActorPtr = nullptr;
 
 	/**
 	 * 任务之间共享数据

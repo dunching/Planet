@@ -57,8 +57,10 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformGameplayTask(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	const auto GetKnowCharater = InstanceData.CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
-	                                          GetKnowCharater();
+	auto CharacterStateComponentPtr = InstanceData.CharacterPtr->GetCharacterNPCStateProcessorComponent();
+	CharacterStateComponentPtr->UpdateTargetCharacter();
+	
+	const auto GetKnowCharater = CharacterStateComponentPtr->GetTargetCharactersAry();
 	if (GetKnowCharater.IsValidIndex(0))
 	{
 		InstanceData.GloabVariable->TargetCharacterPtr = GetKnowCharater[0];

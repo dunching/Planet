@@ -34,6 +34,7 @@ class UTalentAllocation;
 class UGroupManaggerMenu;
 class UHUD_TeamInfo;
 class UFocusIcon;
+class UMarkPoints;
 class UCharacterRisingTips;
 class UInteractionList;
 class AHumanCharacter;

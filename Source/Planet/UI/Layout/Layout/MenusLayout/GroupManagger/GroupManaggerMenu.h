@@ -34,6 +34,8 @@ protected:
 
 	virtual void SyncData()override;
 
+	virtual EMenuType GetMenuType()const override final;
+	
 private:
 
 	void ResetGroupmates();

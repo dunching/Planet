@@ -52,7 +52,7 @@ void AAreaVolume::OnActorBeginOverlapCB(AActor* OverlappedActor, AActor* OtherAc
 		const auto bIsLocallyControlled = CharacterPtr->IsLocallyControlled();
 		if (bIsLocallyControlled)
 		{
-			UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(GuideBranchThreadClass, true);
+			UGuideSubSystem::GetInstance()->StartParallelGuideThread(GuideBranchThreadClass);
 		}
 		// FActorSpawnParameters SpawnParameters;
 		//

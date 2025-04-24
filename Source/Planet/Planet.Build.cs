@@ -37,10 +37,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideInteraction");
         PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideThread");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode/TaskNode_Character");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode/TaskNode_GuideSystem");
-        PublicIncludePaths.Add("Planet/GuideSystem/TaskNode/TaskNode_Interaction");
         PublicIncludePaths.Add("Planet/GuideSystem/STT");
         PublicIncludePaths.Add("Planet/GuideSystem/STT/GuideInteraction");
         PublicIncludePaths.Add("Planet/GuideSystem/STT/GuideThread");
@@ -66,10 +62,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Talent");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/ToolFutures");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Consumables");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState/DurationProperty");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState/DurationState");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/CharacterState/RootMotion");
         PublicIncludePaths.Add("Planet/GamePlay/Controller");
         PublicIncludePaths.Add("Planet/GamePlay/Controller/Player");
         PublicIncludePaths.Add("Planet/GamePlay/Controller/NPC");
@@ -86,6 +78,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human");
         PublicIncludePaths.Add("Planet/GamePlay/WorldSetting");
         PublicIncludePaths.Add("Planet/GamePlay/PlayerCameraManager");
+        PublicIncludePaths.Add("Planet/GamePlay/GameViewportClient");
         PublicIncludePaths.Add("Planet/RootMotionSource");
         PublicIncludePaths.Add("Planet/Generator");
         PublicIncludePaths.Add("Planet/Generator/AI_Colony");
@@ -107,6 +100,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Layout");
         PublicIncludePaths.Add("Planet/UI/Layout/InteractionList");
         PublicIncludePaths.Add("Planet/UI/Layout/Team");
+        PublicIncludePaths.Add("Planet/UI/Layout/GuideList");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/ActionLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/BuildingLayout");
@@ -114,15 +108,18 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/ConversationLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/ConversationLayout/PlayerConversationBorder");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common/CoinList");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common/DragDropOperations");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/GroupManagger");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Backpacks");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Backpacks/BackpackIcons");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/CreateMenuS");
-        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/DragDropOperations");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/TalentAllocation");
-        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/CoinList");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/RaffleMenu");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/ViewMap");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/ViewTasks");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/TransitionLayout");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");

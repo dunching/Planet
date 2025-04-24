@@ -1,6 +1,6 @@
 #include "EventSubjectComponent.h"
 
-#include "ReceivedEventModifyDataCallback.h"
+#include "OnEffectedTawrgetCallback.h"
 
 FName UEventSubjectComponent::ComponentName = TEXT("EventSubjectComponent");
 
@@ -13,8 +13,8 @@ UEventSubjectComponent::UEventSubjectComponent(const FObjectInitializer& ObjectI
 	SetIsReplicatedByDefault(true);
 }
 
-void UEventSubjectComponent::ReceivedEventModifyDataCallback_Implementation(
-	const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback)
+void UEventSubjectComponent::OnEffectOhterCharacter_Implementation(
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback)
 {
 	MakedDamageDelegate(ReceivedEventModifyDataCallback);
 }

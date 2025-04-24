@@ -38,6 +38,8 @@ public:
 	
 	virtual void DisEnable()override;
 
+	virtual ELayoutCommon GetLayoutType() const  override final;
+	
 private:
 
 	UFUNCTION()

@@ -13,7 +13,7 @@ EStateTreeRunStatus FSTT_ClearFocus::EnterState(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	InstanceData.CharacterPtr->GetStateProcessorComponent()->ClearFocusCharactersAry();
+	// InstanceData.CharacterPtr->GetStateProcessorComponent()->ClearFocusCharactersAry();
 	
 	return EStateTreeRunStatus::Succeeded;
 }

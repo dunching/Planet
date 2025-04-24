@@ -30,7 +30,7 @@ class UPAD_TaskNode_Interaction_NotifyGuideThread;
 
 struct FCoinProxy;
 struct FConsumableProxy;
-struct FReceivedEventModifyDataCallback;
+struct FOnEffectedTawrgetCallback;
 
 UCLASS()
 class PLANET_API UGameplayTask_Guide : public UGameplayTask_Base
@@ -38,16 +38,18 @@ class PLANET_API UGameplayTask_Guide : public UGameplayTask_Base
 	GENERATED_BODY()
 
 public:
-	UGameplayTask_Guide(const FObjectInitializer& ObjectInitializer);
+	UGameplayTask_Guide(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	void SetGuideActor(TObjectPtr<AGuideThread> InGuideActorPtr);
+	void SetGuideActor(
+		TObjectPtr<AGuideThread> InGuideActorPtr
+	);
 
 protected:
-
 	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
-	
+
 private:
-	
 };
 
 UCLASS()
@@ -56,15 +58,24 @@ class PLANET_API UGameplayTask_Guide_MoveToLocation : public UGameplayTask_Guide
 	GENERATED_BODY()
 
 public:
-	UGameplayTask_Guide_MoveToLocation(const FObjectInitializer& ObjectInitializer);
+	UGameplayTask_Guide_MoveToLocation(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	virtual void Activate() override;
 
-	virtual void TickTask(float DeltaTime) override;
+	virtual void TickTask(
+		float DeltaTime
+	) override;
 
-	virtual void OnDestroy(bool bInOwnerFinished) override;
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
 
-	void SetUp(const FVector& TargetLocation, int32 ReachedRadius);
+	void SetUp(
+		const FVector& TargetLocation,
+		int32 ReachedRadius
+	);
 
 protected:
 	FVector TargetLocation = FVector::ZeroVector;
@@ -80,11 +91,15 @@ class PLANET_API UGameplayTask_Guide_WaitInputKey : public UGameplayTask_Guide
 	GENERATED_BODY()
 
 public:
-	UGameplayTask_Guide_WaitInputKey(const FObjectInitializer& ObjectInitializer);
+	UGameplayTask_Guide_WaitInputKey(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	virtual void Activate() override;
 
-	virtual void TickTask(float DeltaTime) override;
+	virtual void TickTask(
+		float DeltaTime
+	) override;
 
 	FKey Key = EKeys::AnyKey;
 
@@ -98,15 +113,23 @@ class PLANET_API UGameplayTask_Guide_Monologue : public UGameplayTask_Guide
 	GENERATED_BODY()
 
 public:
-	UGameplayTask_Guide_Monologue(const FObjectInitializer& ObjectInitializer);
+	UGameplayTask_Guide_Monologue(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	virtual void Activate() override;
 
-	virtual void TickTask(float DeltaTime) override;
+	virtual void TickTask(
+		float DeltaTime
+	) override;
 
-	virtual void OnDestroy(bool bInOwnerFinished) override;
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
 
-	void SetUp(const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry);
+	void SetUp(
+		const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry
+	);
 
 protected:
 	void ConditionalPerformTask();
@@ -124,7 +147,9 @@ class PLANET_API UGameplayTask_Guide_AddToTarget : public UGameplayTask_Guide
 	GENERATED_BODY()
 
 public:
-	UGameplayTask_Guide_AddToTarget(const FObjectInitializer& ObjectInitializer);
+	UGameplayTask_Guide_AddToTarget(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	virtual void Activate() override;
 
@@ -151,9 +176,13 @@ class PLANET_API UGameplayTask_Guide_ConversationWithTarget : public UGameplayTa
 public:
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool bInOwnerFinished) override;
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
 
-	void SetUp(const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr);
+	void SetUp(
+		const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
+	);
 
 protected:
 	void ConditionalPerformTask();
@@ -169,9 +198,13 @@ class PLANET_API UGameplayTask_Guide_WaitComplete : public UGameplayTask_Guide
 	GENERATED_BODY()
 
 public:
-	virtual void TickTask(float DeltaTime) override;
+	virtual void TickTask(
+		float DeltaTime
+	) override;
 
-	void SetUp(const FGuid& InTaskID);
+	void SetUp(
+		const FGuid& InTaskID
+	);
 
 	FTaskNodeResuleHelper TaskNodeResuleHelper;
 
@@ -187,16 +220,28 @@ class PLANET_API UGameplayTask_Guide_CollectResource : public UGameplayTask_Guid
 public:
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool bInOwnerFinished) override;
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
 
-	void SetUp(const FGameplayTag& ResourceType, int32 Num);
+	void SetUp(
+		const FGameplayTag& ResourceType,
+		int32 Num
+	);
 
 	FTaskNodeDescript GetTaskNodeDescripton() const;
 
 protected:
-	void OnGetConsumableProxy(const TSharedPtr<FConsumableProxy>&, EProxyModifyType ProxyModifyType);
+	void OnGetConsumableProxy(
+		const TSharedPtr<FConsumableProxy>&,
+		EProxyModifyType ProxyModifyType
+	);
 
-	void OnCoinProxyChanged(const TSharedPtr<FCoinProxy>&, EProxyModifyType ProxyModifyType, int32 Num);
+	void OnCoinProxyChanged(
+		const TSharedPtr<FCoinProxy>&,
+		EProxyModifyType ProxyModifyType,
+		int32 Num
+	);
 
 	void UpdateDescription() const;
 
@@ -216,20 +261,27 @@ class PLANET_API UGameplayTask_Guide_DefeatEnemy : public UGameplayTask_Guide
 {
 	GENERATED_BODY()
 
-	using FMakedDamageHandle = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>::FCallbackHandleSPtr;
+	using FMakedDamageHandle = TCallbackHandleContainer<void(
+		const FOnEffectedTawrgetCallback&
+	)>::FCallbackHandleSPtr;
 
 public:
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool bInOwnerFinished) override;
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
 
-	void SetUp(const FGameplayTag& ResourceType, int32 Num);
+	void SetUp(
+		const FGameplayTag& ResourceType,
+		int32 Num
+	);
 
 	FTaskNodeDescript GetTaskNodeDescripton() const;
 
 protected:
 	void OnActiveGEAddedDelegateToSelf(
-		const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback
+		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 	);
 
 	void UpdateDescription() const;
@@ -248,17 +300,22 @@ class PLANET_API UGameplayTask_Guide_ReturnOpenWorld : public UGameplayTask_Guid
 {
 	GENERATED_BODY()
 
-	using FMakedDamageHandle = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>::FCallbackHandleSPtr;
+	using FMakedDamageHandle = TCallbackHandleContainer<void(
+		const FOnEffectedTawrgetCallback&
+	)>::FCallbackHandleSPtr;
 
 public:
-	virtual void TickTask(float DeltaTime) override;
+	virtual void TickTask(
+		float DeltaTime
+	) override;
 
-	void SetUp(int32 RemainTime);
+	void SetUp(
+		int32 RemainTime
+	);
 
 	FTaskNodeDescript GetTaskNodeDescripton() const;
 
 protected:
-
 	float TotalTime = 0.0f;
 
 	int32 RemainTime = 1;
@@ -268,30 +325,68 @@ UCLASS()
 class PLANET_API UGameplayTask_Guide_ActiveDash : public UGameplayTask_Guide
 {
 	GENERATED_BODY()
-public:
 
+public:
 	virtual void Activate() override;
 
-	TSubclassOf<UPlanetGameplayAbility>GAClass;
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
+
+	TSubclassOf<UPlanetGameplayAbility> GAClass;
 
 private:
-
 	UFUNCTION()
-	void FGenericAbilityDelegate( UGameplayAbility*GAPtr);
+	void FGenericAbilityDelegate(
+		UGameplayAbility* GAPtr
+	);
+
+	FDelegateHandle DelegateHandle;
 };
 
 UCLASS()
 class PLANET_API UGameplayTask_Guide_ActiveRun : public UGameplayTask_Guide
 {
 	GENERATED_BODY()
-public:
 
+public:
 	virtual void Activate() override;
 
-	TSubclassOf<UPlanetGameplayAbility>GAClass;
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
+
+	TSubclassOf<UPlanetGameplayAbility> GAClass;
 
 private:
-
 	UFUNCTION()
-	void FGenericAbilityDelegate( UGameplayAbility*GAPtr);
+	void FGenericAbilityDelegate(
+		UGameplayAbility* GAPtr
+	);
+
+	FDelegateHandle DelegateHandle;
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Guide_AttckCharacter : public UGameplayTask_Guide
+{
+	GENERATED_BODY()
+
+public:
+	virtual void Activate() override;
+
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
+
+	TObjectPtr<ACharacterBase> HumanCharacterAI = nullptr;
+
+private:
+	void OnEffectOhterCharacter(
+		const FOnEffectedTawrgetCallback&
+	);
+
+	TCallbackHandleContainer<void(
+		const FOnEffectedTawrgetCallback&
+	)>::FCallbackHandleSPtr DelegateHandle;
 };

@@ -14,4 +14,6 @@ enum class EMenuType : uint8
 	kAllocationTalent,
 	kGroupManagger,
 	kRaffle,
+	kViewTask,
+	kViewMap,
 };

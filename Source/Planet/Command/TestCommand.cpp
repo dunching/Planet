@@ -68,28 +68,28 @@ void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
 void TestCommand::ActiveBrandTest()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTestClass, true);
+	UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTestClass);
 #endif
 }
 
 void TestCommand::ActiveBrandTest1()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest1Class, true);
+	UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest1Class);
 #endif
 }
 
 void TestCommand::ActiveBrandTest2()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest2Class, true);
+	UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(UAssetRefMap::GetInstance()->GuideBranchThreadTest2Class);
 #endif
 }
 
 void TestCommand::ChallengeTest()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->ActiveTargetGuideThread(UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass, true);
+	UGuideSubSystem::GetInstance()->StartParallelGuideThread(UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass);
 #endif
 }
 

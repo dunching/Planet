@@ -37,7 +37,7 @@ struct PLANET_API FSTID_GuideBase
 	 * 如要求玩家按下W为一个阶段
 	 * 要求玩家按下S为一个阶段，ID需要不同
 	 *
-	 * EditAnywhere 确保我们能够
+	 * EditAnywhere 确保我们能够修改
 	 */
 	UPROPERTY(EditAnywhere, Category = Param)
 	FGuid TaskID;

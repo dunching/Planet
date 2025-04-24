@@ -39,7 +39,7 @@ void UPlanetCharacterMovementComponent::PhysicsRotation(
 	FRotator DeltaRot = GetDeltaRotation(DeltaTime);
 	DeltaRot.DiagnosticCheckNaN(TEXT("CharacterMovementComponent::PhysicsRotation(): GetDeltaRotation"));
 
-	auto FocusCharactersAry = Cast<ACharacterBase>(CharacterOwner)->GetStateProcessorComponent()->GetFocusCharactersAry();
+	auto FocusCharactersAry = Cast<ACharacterBase>(CharacterOwner)->GetStateProcessorComponent()->GetTargetCharactersAry();
 
 	FRotator DesiredRotation = CurrentRotation;
 	if (bForceRotation)

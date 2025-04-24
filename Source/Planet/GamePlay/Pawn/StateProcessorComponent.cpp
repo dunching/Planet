@@ -33,45 +33,7 @@ UStateProcessorComponent::UStateProcessorComponent(const FObjectInitializer& Obj
 	SetIsReplicatedByDefault(true);
 }
 
-void UStateProcessorComponent::FocusTarget()
-{
-}
-
-void UStateProcessorComponent::SetFocusCharactersAry(
-	ACharacterBase* TargetCharacterPtr
-)
-{
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		SetFocusCharactersAry_Server(TargetCharacterPtr);
-	}
-#endif
-	
-	auto CharacterPtr = GetOwner<FOwnerPawnType>();
-	if (CharacterPtr)
-	{
-		CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SetFocusCharactersAry(TargetCharacterPtr);
-	}
-}
-
-void UStateProcessorComponent::ClearFocusCharactersAry()
-{
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		ClearFocusCharactersAry_Server();
-	}
-#endif
-	
-	auto CharacterPtr = GetOwner<FOwnerPawnType>();
-	if (CharacterPtr)
-	{
-		CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->ClearFocusCharactersAry();
-	}
-}
-
-TArray<ACharacterBase*> UStateProcessorComponent::GetFocusCharactersAry() const
+TArray<ACharacterBase*> UStateProcessorComponent::GetTargetCharactersAry() const
 {
 	TArray<ACharacterBase*> Result;
 	auto CharacterPtr = GetOwner<FOwnerPawnType>();
@@ -302,18 +264,6 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			);
 		}
 	}
-}
-
-void UStateProcessorComponent::ClearFocusCharactersAry_Server_Implementation()
-{
-	ClearFocusCharactersAry();
-}
-
-void UStateProcessorComponent::SetFocusCharactersAry_Server_Implementation(
-	ACharacterBase* TargetCharacterPtr
-)
-{
-	SetFocusCharactersAry(TargetCharacterPtr);
 }
 
 void UStateProcessorComponent::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)

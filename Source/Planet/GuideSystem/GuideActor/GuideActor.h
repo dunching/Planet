@@ -14,6 +14,7 @@ class UGameplayTasksComponent;
 
 class UGuideSystemStateTreeComponent;
 class UPAD_TaskNode_Guide;
+class AGuideThread;
 class ACharacterBase;
 class AHumanCharacter;
 class AHumanCharacter_Player;
@@ -49,6 +50,9 @@ struct FTaskNodeDescript
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsFreshPreviouDescription = true;
 	
+	/**
+	 * 是否强制刷新
+	 */
 	bool bIsOnlyFresh = false;
 	
 	FString Name;
@@ -56,9 +60,9 @@ struct FTaskNodeDescript
 	FString Description;
 
 	FGuid StepTaskID;
-};
 
-using FOnCurrentTaskNodeChanged = TMulticastDelegate<void(const FTaskNodeDescript&)>;
+	TObjectPtr<AGuideThread>GuideThreadPtr = nullptr;
+};
 
 using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
 
@@ -72,6 +76,9 @@ class PLANET_API AGuideActor : public AInfo
 	GENERATED_BODY()
 
 public:
+	
+	using FOnCurrentTaskNodeChanged = TMulticastDelegate<void(const FTaskNodeDescript&)>;
+
 	AGuideActor(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Destroyed() override;

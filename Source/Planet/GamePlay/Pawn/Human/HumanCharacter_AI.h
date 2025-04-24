@@ -8,6 +8,7 @@
 #include "HumanCharacter.h"
 #include "GenerateType.h"
 #include "SceneActorInteractionComponent.h"
+#include "StateProcessorComponent.h"
 
 #include "HumanCharacter_AI.generated.h"
 
@@ -26,8 +27,9 @@ class PLANET_API USceneCharacterAIInteractionComponent : public USceneActorInter
 public:
 	using FOwnerType = AHumanCharacter_AI;
 
-	virtual void StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item)override;
-	
+	virtual void StartInteractionItem(
+		const TSubclassOf<AGuideInteraction_Actor>& Item
+	) override;
 };
 
 /**
@@ -39,9 +41,33 @@ class PLANET_API UCharacterAIAttributesComponent : public UCharacterAttributesCo
 	GENERATED_BODY()
 
 public:
+	virtual void SetCharacterID(
+		const FGuid& InCharacterID
+	) override;
+};
 
-	virtual void SetCharacterID(const FGuid& InCharacterID)override;
+/**
+ *
+ */
+UCLASS(BlueprintType, meta = (BlueprintSpawnableComponent))
+class PLANET_API UCharacterNPCStateProcessorComponent : public UStateProcessorComponent
+{
+	GENERATED_BODY()
 
+public:
+	using FOwnerType = AHumanCharacter_AI;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	/**
+	 * OnlyServer
+	 */
+	void UpdateTargetCharacter();
+	
+	TArray<ACharacterBase*> GetTargetCharactersAry() const;
+
+	UPROPERTY(Replicated)
+	TObjectPtr<ACharacterBase> TargetCharacter = nullptr;
 };
 
 UCLASS()
@@ -51,39 +77,56 @@ class PLANET_API AHumanCharacter_AI :
 	GENERATED_BODY()
 
 public:
-	AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer);
+	AHumanCharacter_AI(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	virtual void BeginPlay() override;
 
-	virtual void PossessedBy(AController* NewController) override;
+	virtual void PossessedBy(
+		AController* NewController
+	) override;
 
-	virtual void SpawnDefaultController()override;
+	virtual void SpawnDefaultController() override;
 
-	virtual void HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)override;
+	UCharacterNPCStateProcessorComponent* GetCharacterNPCStateProcessorComponent() const;
 
-	virtual void HasBeenLookingAt(ACharacterBase* InCharacterPtr)override;
+	virtual void HasBeenStartedLookAt(
+		ACharacterBase* InCharacterPtr
+	) override;
 
-	virtual void HasBeenEndedLookAt()override;
+	virtual void HasBeenLookingAt(
+		ACharacterBase* InCharacterPtr
+	) override;
 
-	void SetGroupSharedInfo(AGroupManagger* GroupManaggerPtr);
+	virtual void HasBeenEndedLookAt() override;
 
-	void SetCharacterID(const FGuid& InCharacterID);
+	void SetGroupSharedInfo(
+		AGroupManagger* GroupManaggerPtr
+	);
+
+	void SetCharacterID(
+		const FGuid& InCharacterID
+	);
 
 	UAIComponent* GetAIComponent() const;
 
 protected:
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
 
 	virtual void OnRep_GroupSharedInfoChanged() override;
 
 	// virtual TSharedPtr<FCharacterProxy> GetCharacterProxy()const override;
 
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+	) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
 	UWidgetComponent* InteractionWidgetCompoentPtr = nullptr;
-
 };

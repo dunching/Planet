@@ -18,7 +18,7 @@ class UGE_ZMJZImp;
 
 struct FGAEventData;
 struct FCharacterStateInfo;
-struct FReceivedEventModifyDataCallback;
+struct FOnEffectedTawrgetCallback;
 
 UCLASS()
 class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
@@ -28,7 +28,7 @@ class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 public:
 
 	using FMakedDamageHandle = 
-		TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>::FCallbackHandleSPtr;
+		TCallbackHandleContainer<void(const FOnEffectedTawrgetCallback&)>::FCallbackHandleSPtr;
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -72,7 +72,7 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	)override;
 
-	void OnSendAttack(const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback);
+	void OnSendAttack(const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback);
 
 	void DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
 

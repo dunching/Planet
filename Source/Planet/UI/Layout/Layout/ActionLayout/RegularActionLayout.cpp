@@ -2,6 +2,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/Border.h"
+#include "Slate/SGameLayerManager.h"
 
 #include "TemplateHelper.h"
 #include "PlanetPlayerController.h"
@@ -22,6 +23,7 @@
 #include "HUD_TeamInfo.h"
 #include "HumanCharacter_Player.h"
 #include "PawnStateActionHUD.h"
+#include "PlanetGameViewportClient.h"
 #include "ProgressTips.h"
 #include "TeamMatesHelperComponent.h"
 
@@ -105,6 +107,11 @@ void URegularActionLayout::DisEnable()
 	ILayoutInterfacetion::DisEnable();
 }
 
+ELayoutCommon URegularActionLayout::GetLayoutType() const
+{
+	return ELayoutCommon::kActionLayout;
+}
+
 void URegularActionLayout::OnFocusCharacter(
 	ACharacterBase* TargetCharacterPtr
 )
@@ -112,19 +119,39 @@ void URegularActionLayout::OnFocusCharacter(
 	// 
 	if (TargetCharacterPtr)
 	{
-		auto AssetRefMapPtr = UAssetRefMap::GetInstance();
-		FocusIconPtr = CreateWidget<UFocusIcon>(GetWorldImp(), AssetRefMapPtr->FocusIconClass);
-		if (FocusIconPtr)
+		auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+			GetWorld(),
+			TargetPointSharedLayerName
+		);
+		if (ScreenLayer)
 		{
-			FocusIconPtr->TargetCharacterPtr = TargetCharacterPtr;
-			FocusIconPtr->AddToViewport(EUIOrder::kFocus);
+			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
+			auto TempFocusIconPtr = CreateWidget<UFocusIcon>(GetWorldImp(), AssetRefMapPtr->FocusIconClass);
+			if (TempFocusIconPtr)
+			{
+				TempFocusIconPtr->TargetCharacterPtr = TargetCharacterPtr;
+				TempFocusIconPtr->OnNativeDestruct.AddUObject(this, &ThisClass::OnFocusDestruct);
+				// FocusIconPtr->AddToViewport(EUIOrder::kFocus);
+
+				FocusIconPtr = TempFocusIconPtr;
+
+				ScreenLayer->AddHoverWidget(TempFocusIconPtr);
+			}
 		}
 	}
 	else
 	{
 		if (FocusIconPtr)
 		{
-			FocusIconPtr->RemoveFromParent();
+			auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+				GetWorld(),
+				TargetPointSharedLayerName
+			);
+			if (ScreenLayer)
+			{
+				ScreenLayer->RemoveHoverWidget(FocusIconPtr);
+			}
+
 			FocusIconPtr = nullptr;
 		}
 	}
@@ -260,6 +287,7 @@ void URegularActionLayout::OnHPChanged(
 	const FOnAttributeChangeData&
 
 
+
 )
 {
 	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
@@ -286,4 +314,20 @@ void URegularActionLayout::OnHPChanged(
 	}
 
 	BorderPtr->SetVisibility(bIsLowerHP ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+}
+
+void URegularActionLayout::OnFocusDestruct(
+	UUserWidget* UIPtr
+)
+{
+	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+		GetWorld(),
+		TargetPointSharedLayerName
+	);
+	if (ScreenLayer)
+	{
+		ScreenLayer->RemoveHoverWidget(FocusIconPtr);
+	}
+
+	FocusIconPtr = nullptr;
 }

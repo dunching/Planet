@@ -14,7 +14,7 @@
 // 是否开启、语句内容
 using FOnPlayerHaveNewSentence = TMulticastDelegate<void(bool, const FTaskNode_Conversation_SentenceInfo&)>;
 
-using FOnPlayerInteraction = TMulticastDelegate<void(ASceneActor*)>;
+using FOnPlayerInteraction = TMulticastDelegate<void(ISceneActorInteractionInterface*)>;
 
 class UPlayerComponent;
 class AHumanCharacter_AI;
@@ -50,8 +50,23 @@ public:
 
 	using FOwnerType = AHumanCharacter_Player;
 
-	virtual void FocusTarget() override;
+	/**
+	 * 锁定敌人
+	 */
+	virtual void FocusTarget();
 	
+	void SetFocusCharactersAry(ACharacterBase*TargetCharacterPtr);
+	
+	void ClearFocusCharactersAry();
+
+private:
+	
+	UFUNCTION(Server, Reliable)
+	void SetFocusCharactersAry_Server(ACharacterBase*TargetCharacterPtr);
+	
+	UFUNCTION(Server, Reliable)
+	void ClearFocusCharactersAry_Server();
+
 };
 
 /* 角色的会话组件
@@ -94,6 +109,8 @@ public:
 
 	USceneCharacterPlayerInteractionComponent*GetSceneCharacterPlayerInteractionComponent()const;
 	
+	UCharacterPlayerStateProcessorComponent* GetCharacterPlayerStateProcessorComponent() const;
+
 	void UpdateSightActor();
 	
 	virtual TPair<FVector, FVector> GetCharacterViewInfo();

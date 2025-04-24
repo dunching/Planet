@@ -1,15 +1,19 @@
 #include "STT_GuideThread_Challenge.h"
 
+#include "Kismet/GameplayStatics.h"
+
 #include "CharacterAbilitySystemComponent.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
 #include "PlanetPlayerController.h"
+#include "PlayerGameplayTasks.h"
 #include "STE_GuideThread_Challenge.h"
 #include "Teleport.h"
-#include "Kismet/GameplayStatics.h"
 
-EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::EnterState(FStateTreeExecutionContext& Context,
-                                                               const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -18,34 +22,25 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::EnterState(FStateTreeExecuti
 	];;
 	InstanceData.GloabVariable_Challenge->Teleport = Teleport;
 
-	InstanceData.TeleportRef = UOpenWorldSubSystem::GetInstance()->GetTeleport(Teleport);
+	auto PCPtr = Cast<APlanetPlayerController>(
+		UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0)
+	);
 
-	if (InstanceData.TeleportRef.IsValid())
-	{
-		auto PCPtr = Cast<APlanetPlayerController>(
-			UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0)
-		);
+	PCPtr->GetGameplayTasksComponent()->EntryChallengeLevel(InstanceData.GloabVariable_Challenge->Teleport);
 
-		PCPtr->EntryChallengeLevel(InstanceData.GloabVariable_Challenge->Teleport);
-
-		return Super::EnterState(Context, Transition);
-	}
-	else
-	{
-		return EStateTreeRunStatus::Failed;
-	}
+	return Super::EnterState(Context, Transition);
 }
 
-EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::Tick(FStateTreeExecutionContext& Context,
-                                                         const float DeltaTime) const
+EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	const auto Distance = FVector::Distance(InstanceData.TeleportRef->GetActorLocation(),
-	                                        InstanceData.PlayerCharacterPtr->GetActorLocation());
 	if (
 		UOpenWorldSubSystem::GetInstance()->CheckSwitchDataLayerComplete(InstanceData.GloabVariable_Challenge->Teleport) &&
-		Distance < InstanceData.Distance
+		UOpenWorldSubSystem::GetInstance()->CheckTeleportPlayerComplete(InstanceData.GloabVariable_Challenge->Teleport)
 	)
 	{
 		return EStateTreeRunStatus::Succeeded;
@@ -54,8 +49,10 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::Tick(FStateTreeExecutionCont
 	return Super::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::EnterState(FStateTreeExecutionContext& Context,
-                                                          const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FSTT_GuideThread_Challenge_SpawnNPCs::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -71,8 +68,10 @@ EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::EnterState(FStateTreeExecutionCon
 	}
 }
 
-EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::Tick(FStateTreeExecutionContext& Context,
-                                                    const float DeltaTime) const
+EStateTreeRunStatus FSTT_GuideThread_Challenge_SpawnNPCs::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -91,8 +90,8 @@ EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::Tick(FStateTreeExecutionContext& 
 			auto CharacterPtr = Cast<AHumanCharacter_AI>(Iter);
 			if (
 				CharacterPtr &&
-				InstanceData.CharacterIDAry.Contains( CharacterPtr->GetCharacterAttributesComponent()->GetCharacterID())
-				)
+				InstanceData.CharacterIDAry.Contains(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterID())
+			)
 			{
 				InstanceData.CharacterAry.Add(CharacterPtr);
 			}
@@ -114,12 +113,18 @@ EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::Tick(FStateTreeExecutionContext& 
 		// 等待消亡
 		for (auto Iter : InstanceData.CharacterAry)
 		{
-			if (Iter.IsValid() && Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
+			if (Iter.IsValid())
 			{
+				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
+				{
+				}
+				else
+				{
+					return Super::Tick(Context, DeltaTime);
+				}
 			}
 			else
 			{
-				return Super::Tick(Context, DeltaTime);
 			}
 		}
 
@@ -137,16 +142,17 @@ EStateTreeRunStatus FSTT_GuideThreadSpawnNPCs::Tick(FStateTreeExecutionContext& 
 	return Super::Tick(Context, DeltaTime);
 }
 
-void FSTT_GuideThreadSpawnNPCs::ExitState(
+void FSTT_GuideThread_Challenge_SpawnNPCs::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
 ) const
 {
-	
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (InstanceData.GloabVariable_Challenge)
 	{
-		auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0));
+		auto PCPtr = Cast<APlanetPlayerController>(
+			UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0)
+		);
 		if (PCPtr)
 		{
 			for (auto Iter : InstanceData.GloabVariable_Challenge->TemporaryActorAry)
@@ -163,7 +169,9 @@ void FSTT_GuideThreadSpawnNPCs::ExitState(
 	Super::ExitState(Context, Transition);
 }
 
-bool FSTT_GuideThreadSpawnNPCs::SpawnNPC(FStateTreeExecutionContext& Context) const
+bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (InstanceData.WaveIndex < InstanceData.PerWaveNum.Num())
@@ -204,7 +212,7 @@ bool FSTT_GuideThreadSpawnNPCs::SpawnNPC(FStateTreeExecutionContext& Context) co
 	return false;
 }
 
-FTaskNodeDescript FSTT_GuideThreadSpawnNPCs::GetTaskNodeDescripton(
+FTaskNodeDescript FSTT_GuideThread_Challenge_SpawnNPCs::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
 ) const
 {
@@ -220,12 +228,14 @@ FTaskNodeDescript FSTT_GuideThreadSpawnNPCs::GetTaskNodeDescripton(
 			TEXT(
 				"击败敌人（0/%d）,第%d/%d波敌人"
 			),
-			InstanceData.CharacterIDAry.Num(), InstanceData.WaveIndex,InstanceData.PerWaveNum.Num()
+			InstanceData.CharacterIDAry.Num(),
+			InstanceData.WaveIndex,
+			InstanceData.PerWaveNum.Num()
 		);
 	}
 	else
 	{
-		int32 Num  = 0;
+		int32 Num = 0;
 		for (auto Iter : InstanceData.CharacterAry)
 		{
 			if (Iter.IsValid() && Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
@@ -238,7 +248,10 @@ FTaskNodeDescript FSTT_GuideThreadSpawnNPCs::GetTaskNodeDescripton(
 			TEXT(
 				"击败敌人（%d/%d）,第%d/%d波敌人"
 			),
-			Num, InstanceData.CharacterIDAry.Num(), InstanceData.WaveIndex,InstanceData.PerWaveNum.Num()
+			Num,
+			InstanceData.CharacterIDAry.Num(),
+			InstanceData.WaveIndex,
+			InstanceData.PerWaveNum.Num()
 		);
 	}
 

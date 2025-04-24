@@ -41,6 +41,8 @@ public:
 
 	virtual void SyncData() override;
 
+	virtual EMenuType GetMenuType()const override final;
+	
 	AHumanCharacter* HumanCharacterPtr = nullptr;
 
 protected:

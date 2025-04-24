@@ -10,7 +10,7 @@
 #include "UObject/Interface.h"
 
 #include "GenerateType.h"
-#include "ItemProxy_Minimal.h"
+#include "LayoutCommon.h"
 
 #include "LayoutInterfacetion.generated.h"
 
@@ -30,6 +30,8 @@ public:
 	
 	virtual void DisEnable();
 
+	virtual ELayoutCommon GetLayoutType() const = 0;
+	
 protected:
 
 	bool bIsActive = false;

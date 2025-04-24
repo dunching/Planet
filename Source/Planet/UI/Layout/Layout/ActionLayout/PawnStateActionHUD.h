@@ -48,6 +48,8 @@ public:
 
 	virtual void ResetUIByData()override;
 
+	virtual ELayoutCommon GetLayoutType() const  override final;
+	
 	ACharacterBase* CharacterPtr = nullptr;
 
 protected:

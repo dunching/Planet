@@ -330,9 +330,6 @@ FGameplayTag UGameplayTagsLibrary::Proxy_Character =
 FGameplayTag UGameplayTagsLibrary::Proxy_Character_Player =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.Player")));
 
-FGameplayTag UGameplayTagsLibrary::Proxy_Character_TestNPC_1 =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.TestNPC.1")));
-
 #pragma endregion
 
 FGameplayTag UGameplayTagsLibrary::DataSource_Regular =

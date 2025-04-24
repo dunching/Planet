@@ -101,6 +101,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey InteractionWithSceneCharacter = EKeys::F;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey InteractionWithChallengeEntry = EKeys::F;
 #pragma endregion
 
 	static int32 MaxTeammateNum;

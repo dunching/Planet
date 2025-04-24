@@ -115,6 +115,11 @@ void UConversationLayout::DisEnable()
 	}
 }
 
+ELayoutCommon UConversationLayout::GetLayoutType() const
+{
+	return ELayoutCommon::kConversationLayout;
+}
+
 UOptionList* UConversationLayout::GetOptions() const
 {
 	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));

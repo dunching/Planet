@@ -39,6 +39,8 @@ public:
 
 	virtual void SyncData()override;
 
+	virtual EMenuType GetMenuType()const override final;
+	
 	bool bIsPlayerMenu = true;
 
 	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;

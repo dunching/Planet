@@ -1,7 +1,7 @@
-
 #include "MainMenuLayout.h"
 
 #include "GroupManagger.h"
+#include "LayoutCommon.h"
 #include "Components/WidgetSwitcher.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -37,7 +37,7 @@ void UMainMenuLayout::Enable()
 void UMainMenuLayout::DisEnable()
 {
 	SyncData();
-	
+
 	auto PCPtr =
 		Cast<IPlanetControllerInterface>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
@@ -47,8 +47,13 @@ void UMainMenuLayout::DisEnable()
 
 	auto GMCPtr = PCPtr->GetGroupSharedInfo();
 	GMCPtr->GetTeamMatesHelperComponent()->SpwanTeammateCharacter();
-	
+
 	ILayoutInterfacetion::DisEnable();
+}
+
+ELayoutCommon UMainMenuLayout::GetLayoutType() const
+{
+	return ELayoutCommon::kMenuLayout;
 }
 
 void UMainMenuLayout::SyncData()
@@ -65,40 +70,43 @@ void UMainMenuLayout::SyncData()
 	}
 }
 
-void UMainMenuLayout::SwitchViewer(EMenuType MenuType)
+void UMainMenuLayout::SwitchViewer(
+	EMenuType MenuType
+)
 {
-	auto Lambda = [this](int32 Index)
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
+	if (UIPtr)
+	{
 		{
-			auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainMenuLayout::Get().WidgetSwitcher));
-			if (UIPtr)
+			auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetActiveWidget());
+			if (MenuInterfacePtr)
 			{
-				const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
-				if (CurrentIndex == Index)
+				if (MenuInterfacePtr->GetMenuType() == MenuType)
 				{
 					// 这里不太对啊？
-					auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(Index));
-					if (MenuInterfacePtr)
-					{
-						MenuInterfacePtr->ResetUIByData();
-					}
-
+					MenuInterfacePtr->ResetUIByData();
 					return;
 				}
-				{
-					auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(CurrentIndex));
-					if (MenuInterfacePtr)
-					{
-						MenuInterfacePtr->SyncData();
-					}
-				}
-				UIPtr->SetActiveWidgetIndex(Index);
-				auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(Index));
-				if (MenuInterfacePtr)
-				{
-					MenuInterfacePtr->ResetUIByData();
-				}
-			}
-		};
 
-	Lambda(static_cast<int32>(MenuType));
+				MenuInterfacePtr->SyncData();
+			}
+		}
+
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (auto Iter : ChildrensAry)
+		{
+			auto MenuInterfacePtr = Cast<IMenuInterface>(Iter);
+			if (!MenuInterfacePtr)
+			{
+				continue;
+			}
+			if (MenuInterfacePtr->GetMenuType() != MenuType)
+			{
+				continue;
+			}
+			MenuInterfacePtr->ResetUIByData();
+			UIPtr->SetActiveWidget(Iter);
+			break;
+		}
+	}
 }

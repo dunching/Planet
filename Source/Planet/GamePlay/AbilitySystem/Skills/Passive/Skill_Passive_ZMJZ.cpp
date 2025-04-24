@@ -143,7 +143,7 @@ void USkill_Passive_ZMJZ::PerformAction(
 #endif
 }
 
-void USkill_Passive_ZMJZ::OnSendAttack(const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback)
+void USkill_Passive_ZMJZ::OnSendAttack(const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback)
 {
 	if (CharacterPtr)
 	{

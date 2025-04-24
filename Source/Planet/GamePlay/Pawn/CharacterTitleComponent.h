@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/WidgetComponent.h"
 
-#include "ReceivedEventModifyDataCallback.h"
+#include "OnEffectedTawrgetCallback.h"
 #include "MyUserWidget.h"
 #include "GenerateType.h"
 #include "GroupManaggerInterface.h"

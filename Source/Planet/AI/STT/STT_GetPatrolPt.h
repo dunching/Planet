@@ -34,6 +34,12 @@ struct PLANET_API FStateTreeGetPatrolPtTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
 	
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	bool bRunForever = true;
+	
 	UPROPERTY(VisibleAnywhere, Category = Out)
 	FVector Location = FVector::ZeroVector;
 

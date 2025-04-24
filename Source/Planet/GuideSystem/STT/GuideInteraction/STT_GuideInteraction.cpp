@@ -14,10 +14,12 @@
 #include "STE_Interaction.h"
 
 
-EStateTreeRunStatus FSTT_GuideInteraction_Termination::EnterState(FStateTreeExecutionContext& Context,
-                                                                  const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FSTT_GuideInteraction_Termination::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
 {
-	return EStateTreeRunStatus::Succeeded;	
+	return EStateTreeRunStatus::Succeeded;
 }
 
 const UStruct* FSTT_GuideInteractionBase::GetInstanceDataType() const
@@ -25,7 +27,10 @@ const UStruct* FSTT_GuideInteractionBase::GetInstanceDataType() const
 	return FInstanceDataType::StaticStruct();
 }
 
-EStateTreeRunStatus FSTT_GuideInteractionBase::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
+EStateTreeRunStatus FSTT_GuideInteractionBase::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (InstanceData.GuideActorPtr)
@@ -43,12 +48,15 @@ EStateTreeRunStatus FSTT_GuideInteractionBase::Tick(FStateTreeExecutionContext& 
 	return FStateTreeTaskBase::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_GuideInteractionBase::EnterState(FStateTreeExecutionContext& Context,
-                                                          const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FSTT_GuideInteractionBase::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
-		UGameplayStatics::GetPlayerCharacter(InstanceData.GuideActorPtr, 0));
+		UGameplayStatics::GetPlayerCharacter(InstanceData.GuideActorPtr, 0)
+	);
 
 	return Super::EnterState(Context, Transition);
 }
@@ -58,8 +66,10 @@ const UStruct* FSTT_GuideInteractionNotify::GetInstanceDataType() const
 	return FInstanceDataType::StaticStruct();
 }
 
-EStateTreeRunStatus FSTT_GuideInteractionNotify::EnterState(FStateTreeExecutionContext& Context,
-                                                            const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FSTT_GuideInteractionNotify::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
 {
 	Super::EnterState(Context, Transition);
 
@@ -73,15 +83,50 @@ EStateTreeRunStatus FSTT_GuideInteractionNotify::EnterState(FStateTreeExecutionC
 	}
 
 	InstanceData.GloabVariable->TaskNodeResuleHelper.TaskID = InstanceData.TaskID;
-	
+
 	UGuideSubSystem::GetInstance()->GetCurrentGuideThread()->AddEvent(InstanceData.GloabVariable->TaskNodeResuleHelper);
 
 	return EStateTreeRunStatus::Succeeded;
 }
 
-EStateTreeRunStatus FSTT_GuideInteraction_BackToRegularProcessor::EnterState(FStateTreeExecutionContext& Context,
-                                                                             const FStateTreeTransitionResult&
-                                                                             Transition) const
+EStateTreeRunStatus FSTT_GuideInteraction_GiveGuideThread::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+	if (InstanceData.GuideActorPtr)
+	{
+		if (InstanceData.BrandGuideThreadClass)
+		{
+			UGuideSubSystem::GetInstance()->AddGuideThread_Brand(InstanceData.BrandGuideThreadClass);
+			if (InstanceData.bIsAutomaticActive)
+			{
+				UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(InstanceData.BrandGuideThreadClass);
+			}
+
+			return EStateTreeRunStatus::Succeeded;
+		}
+		else if (InstanceData.ImmediateGuideThreadClass)
+		{
+			UGuideSubSystem::GetInstance()->StartParallelGuideThread(InstanceData.ImmediateGuideThreadClass);
+
+			return EStateTreeRunStatus::Succeeded;
+		}
+	}
+	else
+	{
+	}
+	return EStateTreeRunStatus::Failed;
+}
+
+EStateTreeRunStatus FSTT_GuideInteraction_BackToRegularProcessor::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult&
+	Transition
+) const
 {
 	Super::EnterState(Context, Transition);
 

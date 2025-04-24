@@ -196,7 +196,7 @@ namespace HumanProcessor
 
 				if (EventArgs.Key == GameOptionsPtr->FocusTarget)
 				{
-					OnwerActorPtr->GetStateProcessorComponent()->FocusTarget();
+					OnwerActorPtr->GetCharacterPlayerStateProcessorComponent()->FocusTarget();
 					return true;
 				}
 
@@ -208,10 +208,23 @@ namespace HumanProcessor
 						OnwerActorPtr->InteractionSceneActor(Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr));
 						return true;
 					}
-					else if (EventArgs.Key == GameOptionsPtr->InteractionWithSceneCharacter)
+					
+					 if (EventArgs.Key == GameOptionsPtr->InteractionWithSceneCharacter)
 					{
-						OnwerActorPtr->InteractionSceneCharacter(Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr));
-						return true;
+					 	if (auto CharacterPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
+					 	{
+					 		OnwerActorPtr->InteractionSceneCharacter(CharacterPtr);
+					 		return true;
+					 	}
+					}
+					
+					 if (EventArgs.Key == GameOptionsPtr->InteractionWithChallengeEntry)
+					 {
+					 	if (auto ChallengeEntryPtr = Cast<AChallengeEntry>(OnwerActorPtr->LookAtSceneActorPtr))
+					 	{
+					 		OnwerActorPtr->InteractionSceneActor(ChallengeEntryPtr);
+					 		return true;
+					 	}
 					}
 				}
 

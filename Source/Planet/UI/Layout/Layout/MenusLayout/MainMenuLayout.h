@@ -38,6 +38,8 @@ public:
 	
 	virtual void DisEnable()override;
 
+	virtual ELayoutCommon GetLayoutType() const  override ;
+	
 	void SwitchViewer(EMenuType MenuType);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")

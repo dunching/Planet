@@ -47,9 +47,6 @@ public:
 
 	FGuid GetCharacterID()const;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag CharacterGrowthAttribute = FGameplayTag::EmptyTag;
-
 	// Character的类别
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag CharacterCategory;

@@ -8,7 +8,6 @@
 #include <AIController.h>
 
 #include "GravityPlayerController.h"
-#include "GenerateType.h"
 #include "GroupManaggerInterface.h"
 #include "PlanetControllerInterface.h"
 
@@ -16,6 +15,7 @@
 
 class ACharacterBase;
 class AHumanCharacter_Player;
+class AHumanCharacter_AI;
 class IPlanetControllerInterface;
 struct FCharacterProxy;
 class UFocusIcon;
@@ -111,7 +111,7 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnCharacter(
-		const TSoftClassPtr<AHumanCharacter_AI>& CharacterClass,
+		TSubclassOf<AHumanCharacter_AI> CharacterClass,
 		const FGuid& ID,
 		const FTransform& Transform
 	);

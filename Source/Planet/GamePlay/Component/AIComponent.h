@@ -83,9 +83,6 @@ public:
 	
 protected:
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Pawn")
-	FGameplayTag AI_CharacterType = FGameplayTag::EmptyTag;
-
 #pragma region Allocation
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
 	FGameplayTag FirstWeaponSocketInfo;

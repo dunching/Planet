@@ -44,6 +44,16 @@ void URaffleMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	ResetUIByData();
+}
+
+void URaffleMenu::NativeDestruct()
+{
+	Super::NativeDestruct();
+}
+
+void URaffleMenu::ResetUIByData()
+{
 	InitialRaffleType();
 	InitialRaffleBtn();
 
@@ -60,11 +70,14 @@ void URaffleMenu::NativeConstruct()
 	);
 }
 
-void URaffleMenu::NativeDestruct()
+void URaffleMenu::SyncData()
 {
-	Super::NativeDestruct();
-
 	OnGetProxyDelegateHandle->UnBindCallback();
+}
+
+EMenuType URaffleMenu::GetMenuType() const
+{
+	return  EMenuType::kRaffle;
 }
 
 void URaffleMenu::InitialRaffleType()

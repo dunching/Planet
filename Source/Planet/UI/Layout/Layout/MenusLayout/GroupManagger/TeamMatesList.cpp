@@ -84,6 +84,11 @@ void UTeamMatesList::SyncData()
 	}
 }
 
+EMenuType UTeamMatesList::GetMenuType() const
+{
+	return EMenuType::kGroupManagger;
+}
+
 void UTeamMatesList::OnWeaponProxyChanged(
 	UTeamMateInfo*UIPtr,
 	const TSharedPtr<FCharacterProxy>& PrevProxycharacterSPtr,

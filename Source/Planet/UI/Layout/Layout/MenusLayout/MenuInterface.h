@@ -10,6 +10,7 @@
 
 #include "GenerateType.h"
 #include "ItemProxy_Minimal.h"
+#include "MainMenuCommon.h"
 
 #include "MenuInterface.generated.h"
 
@@ -29,6 +30,8 @@ public:
 	
 	virtual void SyncData() = 0;
 
+	virtual EMenuType GetMenuType()const = 0;
+	
 protected:
 
 private:

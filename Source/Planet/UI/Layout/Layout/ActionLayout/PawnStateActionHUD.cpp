@@ -300,6 +300,11 @@ void UPawnStateActionHUD::ResetUIByData()
 	InitialWeaponSkillIcon();
 }
 
+ELayoutCommon UPawnStateActionHUD::GetLayoutType() const
+{
+	return ELayoutCommon::kEmptyLayout;
+}
+
 void UPawnStateActionHUD::BindEvent()
 {
 	if (!CharacterPtr)

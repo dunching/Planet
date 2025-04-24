@@ -167,7 +167,7 @@ FTableRowProxy_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() 
 
 	auto SceneProxyExtendInfoPtr =
 		DataTable->FindRow<FTableRowProxy_CharacterGrowthAttribute>(
-			*ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterGrowthAttribute.ToString(),
+			*ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory.ToString(),
 			TEXT("GetProxy"));
 	return SceneProxyExtendInfoPtr;
 }

@@ -40,6 +40,8 @@ public:
 
 	virtual void DisEnable() override;
 
+	virtual ELayoutCommon GetLayoutType() const  override final;
+	
 	UOptionList* GetOptions() const;
 
 	void CloseOption();

@@ -16,6 +16,7 @@
 
 class AHumanCharacter_Player;
 class ATargetPoint_Runtime;
+class ISceneActorInteractionInterface;
 class ASceneActor;
 class AGuideThread;
 class UPAD_TaskNode_Guide_AddToTarget;
@@ -35,10 +36,10 @@ public:
 
 	void SetPlayerCharacter(AHumanCharacter_Player* PlayerCharacterPtr);
 
-	void SetTaskID(const FGuid& InTaskID);
-
 private:
 	
+	void SetTaskID(const FGuid& InTaskID);
+
 protected:
 
 	EStateTreeRunStatus StateTreeRunStatus = EStateTreeRunStatus::Running;
@@ -60,18 +61,13 @@ public:
 
 	virtual void Activate() override;
 	
-	virtual void TickTask(float DeltaTime)override;
-
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
 	TSoftObjectPtr<UPAD_GuideThread_WaitInteractionSceneActor> PAD = nullptr;
 
 protected:
 
-	UFUNCTION()
-	void OnInteractionSceneActor(ASceneActor* TargetActorPtr);
-
-	bool bIsInteractionSceneActor = false;
+	void OnInteractionSceneActor(ISceneActorInteractionInterface* TargetActorPtr);
 
 	FDelegateHandle DelegateHandle;
 	

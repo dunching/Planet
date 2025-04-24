@@ -9,3 +9,4 @@ void ILayoutInterfacetion::DisEnable()
 {
 	bIsActive = false;
 }
+

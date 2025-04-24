@@ -17,4 +17,5 @@ enum class ELayoutCommon : uint8
 	kBuildingLayout,
 	kViewTasksLayout,		// 任务模式
 	kTransitionLayout,		// 切换、过度界面
+	kObserverLayout,		// 观战
 };

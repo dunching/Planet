@@ -36,31 +36,39 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 
 void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 {
-	auto Lambda = [this](int32 Index)
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
 	{
-		auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
-		if (UIPtr)
 		{
-			const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
-			if (CurrentIndex == Index)
-			{
-				return;
-			}
-			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetActiveWidget());
 			if (MenuInterfacePtr)
 			{
+				if (MenuInterfacePtr->GetLayoutType() == LayoutCommon)
+				{
+					return;
+				}
+
 				MenuInterfacePtr->DisEnable();
 			}
-			UIPtr->SetActiveWidgetIndex(Index);
-			MenuInterfacePtr = Cast<ILayoutInterfacetion>(UIPtr->GetWidgetAtIndex(Index));
-			if (MenuInterfacePtr)
-			{
-				MenuInterfacePtr->Enable();
-			}
 		}
-	};
 
-	Lambda(static_cast<int32>(LayoutCommon));
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (auto Iter : ChildrensAry)
+		{
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(Iter);
+			if (!MenuInterfacePtr)
+			{
+				continue;
+			}
+			if (MenuInterfacePtr->GetLayoutType() != LayoutCommon)
+			{
+				continue;
+			}
+			MenuInterfacePtr->Enable();
+			UIPtr->SetActiveWidget(Iter);
+			break;
+		}
+	}
 }
 
 UMainMenuLayout* UMainHUDLayout::GetMenuLayout()

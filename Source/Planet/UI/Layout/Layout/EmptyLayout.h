@@ -30,6 +30,8 @@ class PLANET_API UEmptyLayout :
 
 public:
 
-protected:
+private:
 
+	virtual ELayoutCommon GetLayoutType() const  override final;
+	
 };

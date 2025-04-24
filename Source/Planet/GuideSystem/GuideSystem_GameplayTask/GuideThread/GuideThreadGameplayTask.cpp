@@ -491,7 +491,7 @@ FTaskNodeDescript UGameplayTask_Guide_DefeatEnemy::GetTaskNodeDescripton() const
 }
 
 void UGameplayTask_Guide_DefeatEnemy::OnActiveGEAddedDelegateToSelf(
-	const FReceivedEventModifyDataCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 )
 {
 	if (
@@ -557,12 +557,20 @@ FTaskNodeDescript UGameplayTask_Guide_ReturnOpenWorld::GetTaskNodeDescripton() c
 void UGameplayTask_Guide_ActiveDash::Activate()
 {
 	Super::Activate();
-	
+
 	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(
 		this,
 		&ThisClass::FGenericAbilityDelegate
 	);
+}
 
+void UGameplayTask_Guide_ActiveDash::OnDestroy(
+	bool bInOwnerFinished
+)
+{
+	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(DelegateHandle);
+	
+	Super::OnDestroy(bInOwnerFinished);
 }
 
 void UGameplayTask_Guide_ActiveDash::FGenericAbilityDelegate(
@@ -582,12 +590,20 @@ void UGameplayTask_Guide_ActiveDash::FGenericAbilityDelegate(
 void UGameplayTask_Guide_ActiveRun::Activate()
 {
 	Super::Activate();
-	
+
 	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(
 		this,
 		&ThisClass::FGenericAbilityDelegate
 	);
+}
 
+void UGameplayTask_Guide_ActiveRun::OnDestroy(
+	bool bInOwnerFinished
+)
+{
+	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(DelegateHandle);
+	
+	Super::OnDestroy(bInOwnerFinished);
 }
 
 void UGameplayTask_Guide_ActiveRun::FGenericAbilityDelegate(
@@ -601,5 +617,42 @@ void UGameplayTask_Guide_ActiveRun::FGenericAbilityDelegate(
 		{
 			EndTask();
 		}
+	}
+}
+
+void UGameplayTask_Guide_AttckCharacter::Activate()
+{
+	Super::Activate();
+
+	if (HumanCharacterAI && PlayerCharacterPtr)
+	{
+		auto PCPtr = PlayerCharacterPtr->GetController<APlanetPlayerController>();
+
+		DelegateHandle = PCPtr->GetEventSubjectComponent()->MakedDamageDelegate.AddCallback(
+			std::bind(&ThisClass::OnEffectOhterCharacter, this, std::placeholders::_1)
+		);
+	}
+}
+
+void UGameplayTask_Guide_AttckCharacter::OnDestroy(
+	bool bInOwnerFinished
+)
+{
+	if (DelegateHandle)
+	{
+		DelegateHandle->UnBindCallback();
+	}
+
+	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_Guide_AttckCharacter::OnEffectOhterCharacter(
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+
+)
+{
+	if (ReceivedEventModifyDataCallback.TargetCharacterPtr && ReceivedEventModifyDataCallback.TargetCharacterPtr == HumanCharacterAI)
+	{
+		EndTask();
 	}
 }

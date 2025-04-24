@@ -85,6 +85,11 @@ void UTalentAllocation::SyncData()
 {
 }
 
+EMenuType UTalentAllocation::GetMenuType() const
+{
+	return EMenuType::kAllocationTalent;
+}
+
 void UTalentAllocation::OnUsedTalentNumChanged(int32 OldNum, int32 NewNum)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(UsedNum));

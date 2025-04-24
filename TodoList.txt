@@ -1,5 +1,11 @@
         // b*[^:b#/]+.*$
 		// E:\Projects\Planet_Dev\Source;E:\Projects\Planet_Dev\Plugins
+		
+在命令行中输入以下控制台命令，然后按 Enter ： n.bNavmeshAllowPartitionedBuildingFromEditor 1
+
+输入命令n.bNavmeshAllowPartitionedBuildingFromEditor 1
+点击 构建（Build）> 构建路径（Build Paths） ，在你的关卡中构建寻路网格体。
+
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)

@@ -471,9 +471,6 @@ EStateTreeRunStatus FSTT_GuideThreadCollectResource::PerformGameplayTask(
 		InstanceData.GameplayTaskPtr->SetPlayerCharacter(
 			InstanceData.PlayerCharacterPtr
 		);
-		InstanceData.GameplayTaskPtr->SetTaskID(
-			InstanceData.TaskID
-		);
 		InstanceData.GameplayTaskPtr->SetGuideActor(
 			InstanceData.GuideActorPtr
 		);
@@ -597,9 +594,6 @@ EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::PerformGameplayTask(
 	{
 		InstanceData.GameplayTaskPtr->SetPlayerCharacter(
 			InstanceData.PlayerCharacterPtr
-		);
-		InstanceData.GameplayTaskPtr->SetTaskID(
-			InstanceData.TaskID
 		);
 		InstanceData.GameplayTaskPtr->SetGuideActor(
 			InstanceData.GuideActorPtr
@@ -1024,6 +1018,226 @@ FTaskNodeDescript FSTT_GuideThread_WaitPlayerEquipment::GetTaskNodeDescripton(
 	);
 
 	return TaskNodeDescript;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	auto PCPtr = Cast<
+		APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0));
+	if (PCPtr)
+	{
+		InstanceData.NPC_ID = FGuid::NewGuid();
+
+		FTransform Transform = FTransform::Identity;
+		Transform.SetLocation(
+			InstanceData.PlayerCharacterPtr->GetActorLocation() + (InstanceData.PlayerCharacterPtr->
+				GetActorForwardVector() * 100)
+		);
+
+		PCPtr->ServerSpawnCharacter(
+			InstanceData.NPCClass,
+			InstanceData.NPC_ID,
+			Transform
+		);
+
+		InstanceData.GloabVariable_Main->SpwanedCharacterAry.Empty();
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
+
+	// 获取对应的Characers
+	TArray<AActor*> OutActors;
+	UGameplayStatics::GetAllActorsOfClass(InstanceData.GuideActorPtr, AHumanCharacter_AI::StaticClass(), OutActors);
+	for (auto Iter : OutActors)
+	{
+		auto CharacterPtr = Cast<AHumanCharacter_AI>(Iter);
+		if (
+			CharacterPtr &&
+			InstanceData.NPC_ID == CharacterPtr->GetCharacterAttributesComponent()->GetCharacterID()
+		)
+		{
+			InstanceData.GloabVariable_Main->SpwanedCharacterAry.Add(CharacterPtr);
+			InstanceData.GloabVariable_Main->TemporaryActorAry.Add(CharacterPtr);
+			return EStateTreeRunStatus::Succeeded;
+		}
+	}
+
+	return Super::Tick(Context, DeltaTime);
+}
+
+FTaskNodeDescript FSTT_GuideThread_SpawnNPC::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
+{
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.bIsFreshPreviouDescription = false;
+
+	return TaskNodeDescript;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	Super::EnterState(Context, Transition);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	if (InstanceData.GloabVariable_Main->SpwanedCharacterAry.IsEmpty())
+	{
+		return EStateTreeRunStatus::Failed;
+	}
+	else
+	{
+		InstanceData.HumanCharacterAI = InstanceData.GloabVariable_Main->SpwanedCharacterAry[0].Get();
+	}
+
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+		InstanceData.GuideActorPtr->FindComponentByInterface(
+			UGameplayTaskOwnerInterface::StaticClass()
+		)
+	);
+	if (!InstanceData.TaskOwner)
+	{
+		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+	}
+
+	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_AttckCharacter>(
+		*InstanceData.TaskOwner
+	);
+	InstanceData.GameplayTaskPtr->HumanCharacterAI = InstanceData.HumanCharacterAI;
+	InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+
+	InstanceData.GameplayTaskPtr->ReadyForActivation();
+
+	return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
+{
+	Super::Tick(Context, DeltaTime);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	if (InstanceData.bIsNotFreshed && InstanceData.HumanCharacterAI && InstanceData.HumanCharacterAI->
+		GetGroupManagger())
+	{
+		InstanceData.bIsNotFreshed = false;
+		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
+			GetTaskNodeDescripton(
+				Context
+			)
+		);
+	}
+
+	if (!InstanceData.GameplayTaskPtr)
+	{
+		checkNoEntry();
+	}
+
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+void FSTT_GuideThread_AttckCharacter::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
+	{
+		InstanceData.GameplayTaskPtr->ExternalCancel();
+	}
+	InstanceData.GameplayTaskPtr = nullptr;
+
+	InstanceData.GloabVariable_Main->SpwanedCharacterAry.Empty();
+	if (InstanceData.HumanCharacterAI)
+	{
+		for (int32 Index = 0; Index < InstanceData.GloabVariable_Main->TemporaryActorAry.Num(); Index--)
+		{
+			if (InstanceData.GloabVariable_Main->TemporaryActorAry[Index] == InstanceData.HumanCharacterAI)
+			{
+				InstanceData.GloabVariable_Main->TemporaryActorAry.RemoveAt(Index);
+				break;
+			}
+		}
+
+		auto PCPtr = Cast<
+			APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0));
+		if (PCPtr)
+		{
+			PCPtr->ServerDestroyActor(InstanceData.HumanCharacterAI);
+		}
+	}
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
+}
+
+FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	if (InstanceData.HumanCharacterAI)
+	{
+		FTaskNodeDescript TaskNodeDescript;
+
+		TaskNodeDescript.Description = FString::Printf(
+			TEXT(
+				"Attack <%s>%s</>"
+			),
+			*Rich_Emphasis,
+			*InstanceData.HumanCharacterAI->GetCharacterProxy()->Title
+		);
+
+		return TaskNodeDescript;
+	}
+	else
+	{
+		FTaskNodeDescript TaskNodeDescript;
+
+		TaskNodeDescript.bIsFreshPreviouDescription = false;
+
+		return TaskNodeDescript;
+	}
 }
 
 void FSTT_GuideThreadReturnOpenWorld::ExitState(

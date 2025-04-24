@@ -36,7 +36,7 @@ struct FGameplayAbilityTargetData_TagModify;
 struct FGameplayAbilityTargetData;
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
-struct FReceivedEventModifyDataCallback;
+struct FOnEffectedTawrgetCallback;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
@@ -106,7 +106,7 @@ public:
 
 	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
 
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FReceivedEventModifyDataCallback&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FOnEffectedTawrgetCallback&)>;
 
 	UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer);
 

@@ -6,6 +6,7 @@
 
 #include "GameplayCommand.h"
 #include "HumanCharacter_Player.h"
+#include "LayoutCommon.h"
 #include "OpenWorldSystem.h"
 #include "PlanetPlayerController.h"
 
@@ -25,4 +26,9 @@ void UTransitionLayout::Enable()
 
 void UTransitionLayout::DisEnable()
 {
+}
+
+ELayoutCommon UTransitionLayout::GetLayoutType() const
+{
+	return ELayoutCommon::kTransitionLayout;
 }

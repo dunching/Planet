@@ -214,7 +214,7 @@ bool USkill_Base::CheckTargetIsEqualDistance(int32 InDistance) const
 	const float Tolerance = 5.f;
 	if (CharacterPtr->IsPlayerControlled())
 	{
-		auto FocusCharactersAry =CharacterPtr->GetStateProcessorComponent()->GetFocusCharactersAry();
+		auto FocusCharactersAry =CharacterPtr->GetStateProcessorComponent()->GetTargetCharactersAry();
 		if (FocusCharactersAry.IsValidIndex(0))
 		{
 			auto TargetCharacterPtr =FocusCharactersAry[0];

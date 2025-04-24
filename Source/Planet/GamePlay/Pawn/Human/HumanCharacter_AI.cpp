@@ -27,10 +27,12 @@
 // 	return GetOwner<AHumanCharacter_AI>()->GetCharacterAbilitySystemComponent();
 // }
 
-void USceneCharacterAIInteractionComponent::StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item)
+void USceneCharacterAIInteractionComponent::StartInteractionItem(
+	const TSubclassOf<AGuideInteraction_Actor>& Item
+)
 {
 	Super::StartInteractionItem(Item);
-	
+
 	auto OnwerActorPtr = GetOwner<FOwnerType>();
 	if (!OnwerActorPtr)
 	{
@@ -38,24 +40,29 @@ void USceneCharacterAIInteractionComponent::StartInteractionItem(const TSubclass
 	}
 
 	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.CustomPreSpawnInitalization = [OnwerActorPtr, this](AActor*ActorPtr)
-	{
-		auto GuideInteractionActorPtr= Cast<AGuideInteraction_HumanCharacter_AI>(ActorPtr);
-		if (GuideInteractionActorPtr)
+	SpawnParameters.CustomPreSpawnInitalization = [OnwerActorPtr, this](
+		AActor* ActorPtr
+	)
 		{
-			GuideInteractionActorPtr->Character_NPC = OnwerActorPtr;
-		}
-	};
+			auto GuideInteractionActorPtr = Cast<AGuideInteraction_HumanCharacter_AI>(ActorPtr);
+			if (GuideInteractionActorPtr)
+			{
+				GuideInteractionActorPtr->Character_NPC = OnwerActorPtr;
+			}
+		};
 
 	GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteraction_HumanCharacter_AI>(
-		Item, SpawnParameters
+		Item,
+		SpawnParameters
 	);
 }
 
-void UCharacterAIAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
+void UCharacterAIAttributesComponent::SetCharacterID(
+	const FGuid& InCharacterID
+)
 {
 	Super::SetCharacterID(InCharacterID);
-	
+
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
@@ -64,15 +71,86 @@ void UCharacterAIAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
 #endif
 }
 
-AHumanCharacter_AI::AHumanCharacter_AI(const FObjectInitializer& ObjectInitializer) :
-Super(
-	ObjectInitializer.
-	SetDefaultSubobjectClass<USceneCharacterAIInteractionComponent>(
-		USceneCharacterAIInteractionComponent::ComponentName)
-		)
+void UCharacterNPCStateProcessorComponent::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME_CONDITION(ThisClass, TargetCharacter, COND_InitialOnly);
+}
+
+void UCharacterNPCStateProcessorComponent::UpdateTargetCharacter()
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+			auto KnowCharaterAry = CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
+												 GetKnowCharater();
+
+			const auto Location = CharacterPtr->GetActorLocation();
+			TWeakObjectPtr<ACharacterBase> TargetPtr = nullptr;
+			int32 Distance = 0;
+			for (const auto Iter : KnowCharaterAry)
+			{
+				if (Iter.IsValid())
+				{
+					auto NewDistance = FVector::Dist2D(Location, Iter->GetActorLocation());
+					if (TargetPtr.IsValid())
+					{
+						if (NewDistance < Distance)
+						{
+							TargetPtr = Iter;
+							Distance = NewDistance;
+						}
+					}
+					else
+					{
+						TargetPtr = Iter;
+						Distance = NewDistance;
+					}
+				}
+			}
+
+			if (TargetPtr.IsValid())
+			{
+				TargetCharacter = TargetPtr.Get();
+			}
+		}
+	}
+#endif
+}
+
+TArray<ACharacterBase*> UCharacterNPCStateProcessorComponent::GetTargetCharactersAry() const
+{
+	TArray<ACharacterBase*> Result;
+
+	if (TargetCharacter)
+	{
+		Result.Add(TargetCharacter);
+	}
+
+	return Result;
+}
+
+AHumanCharacter_AI::AHumanCharacter_AI(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(
+	  ObjectInitializer.
+	  SetDefaultSubobjectClass<USceneCharacterAIInteractionComponent>(
+		  USceneCharacterAIInteractionComponent::ComponentName
+	  ).
+	  SetDefaultSubobjectClass<UCharacterNPCStateProcessorComponent>(
+		  UCharacterNPCStateProcessorComponent::ComponentName
+	  )
+  )
 {
 	AIComponentPtr = CreateDefaultSubobject<UAIComponent>(UAIComponent::ComponentName);
-	
+
 	InteractionWidgetCompoentPtr = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 	InteractionWidgetCompoentPtr->SetupAttachment(RootComponent);
 }
@@ -80,7 +158,7 @@ Super(
 void AHumanCharacter_AI::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
@@ -96,7 +174,9 @@ void AHumanCharacter_AI::BeginPlay()
 #endif
 }
 
-void AHumanCharacter_AI::PossessedBy(AController* NewController)
+void AHumanCharacter_AI::PossessedBy(
+	AController* NewController
+)
 {
 	Super::PossessedBy(NewController);
 }
@@ -109,45 +189,58 @@ void AHumanCharacter_AI::SpawnDefaultController()
 	else
 	{
 		GetAIComponent()->bIsSingle = true;
-		
+
 		// 单个的NPC
 		FActorSpawnParameters SpawnParameters;
 
 		SpawnParameters.Owner = this;
-		SpawnParameters.CustomPreSpawnInitalization = [](AActor* ActorPtr)
-		{
-			auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
-			if (GroupManaggerPtr)
+		SpawnParameters.CustomPreSpawnInitalization = [](
+			AActor* ActorPtr
+		)
 			{
-				GroupManaggerPtr->GroupID = FGuid::NewGuid();
-			}
-		};
+				auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+				if (GroupManaggerPtr)
+				{
+					GroupManaggerPtr->GroupID = FGuid::NewGuid();
+				}
+			};
 
 		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
-			AGroupManagger::StaticClass(), SpawnParameters
+			AGroupManagger::StaticClass(),
+			SpawnParameters
 		);
-		
+
 		SetGroupSharedInfo(GroupManaggerPtr);
 	}
-	
+
 	Super::SpawnDefaultController();
 }
 
-void AHumanCharacter_AI::HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)
+UCharacterNPCStateProcessorComponent* AHumanCharacter_AI::GetCharacterNPCStateProcessorComponent() const
+{
+	return Cast<UCharacterNPCStateProcessorComponent>(StateProcessorComponentPtr);
+}
+
+void AHumanCharacter_AI::HasBeenStartedLookAt(
+	ACharacterBase* InCharacterPtr
+)
 {
 	Super::HasBeenStartedLookAt(InCharacterPtr);
-	
+
 	HasBeenLookingAt(InCharacterPtr);
 }
 
-void AHumanCharacter_AI::HasBeenLookingAt(ACharacterBase* InCharacterPtr)
+void AHumanCharacter_AI::HasBeenLookingAt(
+	ACharacterBase* InCharacterPtr
+)
 {
 	Super::HasBeenLookingAt(InCharacterPtr);
-	
+
 	if (
 		InteractionWidgetCompoentPtr &&
-		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < SceneActorInteractionComponentPtr->Range)
-		)
+		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < SceneActorInteractionComponentPtr->
+			Range)
+	)
 	{
 		InteractionWidgetCompoentPtr->SetVisibility(true);
 	}
@@ -158,16 +251,18 @@ void AHumanCharacter_AI::HasBeenLookingAt(ACharacterBase* InCharacterPtr)
 }
 
 void AHumanCharacter_AI::HasBeenEndedLookAt()
-{	
+{
 	if (InteractionWidgetCompoentPtr)
 	{
 		InteractionWidgetCompoentPtr->SetVisibility(false);
 	}
-	
+
 	Super::HasBeenEndedLookAt();
 }
 
-void AHumanCharacter_AI::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr)
+void AHumanCharacter_AI::SetGroupSharedInfo(
+	AGroupManagger* InGroupSharedInfoPtr
+)
 {
 	GroupManaggerPtr = InGroupSharedInfoPtr;
 
@@ -175,21 +270,25 @@ void AHumanCharacter_AI::SetGroupSharedInfo(AGroupManagger* InGroupSharedInfoPtr
 	// {
 	// 	ControllerPtr->SetGroupSharedInfo(InGroupSharedInfoPtr);
 	// }
-	
+
 	// OnGroupManaggerReady(GroupManaggerPtr);
 }
 
-void AHumanCharacter_AI::SetCharacterID(const FGuid& InCharacterID)
+void AHumanCharacter_AI::SetCharacterID(
+	const FGuid& InCharacterID
+)
 {
 	GetCharacterAttributesComponent()->SetCharacterID(InCharacterID);
 }
 
 UAIComponent* AHumanCharacter_AI::GetAIComponent() const
 {
-	return  AIComponentPtr;
+	return AIComponentPtr;
 }
 
-void AHumanCharacter_AI::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void AHumanCharacter_AI::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 }
@@ -204,7 +303,9 @@ void AHumanCharacter_AI::OnRep_GroupSharedInfoChanged()
 // 	return GetGroupManagger()->GetInventoryComponent()->FindProxy_Character(CharacterID);
 // }
 
-void AHumanCharacter_AI::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void AHumanCharacter_AI::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+)
 {
 	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 
@@ -220,7 +321,9 @@ void AHumanCharacter_AI::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfo
 		}
 		if (GetAIComponent()->bIsSingle && !GetAIComponent()->bIsTeammate)
 		{
-			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(AIComponentPtr->DefaultTeammateOption);
+			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+				AIComponentPtr->DefaultTeammateOption
+			);
 			GroupManaggerPtr->SetOwnerCharacterProxyPtr(this);
 		}
 	}

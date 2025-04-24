@@ -19,6 +19,8 @@
 class AGuideActor;
 class AGuideThread;
 class AGuideThread_Main;
+class AGuideThread_Branch;
+class AGuideThread_Immediate;
 class AGuideInteraction_Actor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
@@ -68,8 +70,7 @@ struct PLANET_API FSTT_GuideInteractionBase :
 };
 #pragma endregion
 
-#pragma region Termination
-// 与 NPC交互的任务 提前终止
+#pragma region 与 NPC交互的任务 提前终止
 USTRUCT()
 struct PLANET_API FSTT_GuideInteraction_Termination :
 	public FSTT_GuideInteractionBase
@@ -83,8 +84,7 @@ struct PLANET_API FSTT_GuideInteraction_Termination :
 };
 #pragma endregion
 
-#pragma region BackToRegularProcessor
-// 与 NPC交互的任务 失败时
+#pragma region 让玩家回到动作模式
 USTRUCT()
 struct PLANET_API FSTT_GuideInteraction_BackToRegularProcessor :
 	public FSTT_GuideInteractionBase
@@ -118,6 +118,40 @@ struct PLANET_API FSTT_GuideInteractionNotify :
 	using FInstanceDataType = FSTID_GuideInteractionNotify;
 
 	virtual const UStruct* GetInstanceDataType() const override;
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+};
+#pragma endregion
+
+#pragma region 给玩家一条任务
+USTRUCT()
+struct PLANET_API FSTID_GuideInteraction_GiveGuideThread :
+	public FSTID_GuideInteractionTaskBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	TSubclassOf<AGuideThread_Immediate> ImmediateGuideThreadClass = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	TSubclassOf<AGuideThread_Branch> BrandGuideThreadClass = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bIsAutomaticActive = true;
+};
+
+USTRUCT()
+struct PLANET_API FSTT_GuideInteraction_GiveGuideThread :
+	public FSTT_GuideInteractionBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideInteraction_GiveGuideThread;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context,

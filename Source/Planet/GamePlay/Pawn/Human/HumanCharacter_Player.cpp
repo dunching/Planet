@@ -36,8 +36,6 @@ namespace HumanProcessor
 
 void UCharacterPlayerStateProcessorComponent::FocusTarget()
 {
-	Super::FocusTarget();
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (!OnwerActorPtr)
 	{
@@ -67,7 +65,7 @@ void UCharacterPlayerStateProcessorComponent::FocusTarget()
 		if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
 													   ObjectQueryParams, Params))
 		{
-			auto FocusCharactersAry_ = GetFocusCharactersAry();
+			auto FocusCharactersAry_ = GetTargetCharactersAry();
 			if (FocusCharactersAry_.IsValidIndex(0) && (FocusCharactersAry_[0] == OutHit.GetActor()))
 			{
 			}
@@ -84,6 +82,52 @@ void UCharacterPlayerStateProcessorComponent::FocusTarget()
 	}
 
 	ClearFocusCharactersAry();
+}
+
+void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
+	ACharacterBase* TargetCharacterPtr
+)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		SetFocusCharactersAry_Server(TargetCharacterPtr);
+	}
+#endif
+	
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SetFocusCharactersAry(TargetCharacterPtr);
+	}
+}
+
+void UCharacterPlayerStateProcessorComponent::ClearFocusCharactersAry()
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		ClearFocusCharactersAry_Server();
+	}
+#endif
+	
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->ClearFocusCharactersAry();
+	}
+}
+
+void UCharacterPlayerStateProcessorComponent::ClearFocusCharactersAry_Server_Implementation()
+{
+	ClearFocusCharactersAry();
+}
+
+void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry_Server_Implementation(
+	ACharacterBase* TargetCharacterPtr
+)
+{
+	SetFocusCharactersAry(TargetCharacterPtr);
 }
 
 void UPlayerConversationComponent::DisplaySentence_Player(
@@ -241,6 +285,11 @@ USceneCharacterPlayerInteractionComponent* AHumanCharacter_Player::GetSceneChara
 	return Cast<USceneCharacterPlayerInteractionComponent>(SceneActorInteractionComponentPtr);
 }
 
+UCharacterPlayerStateProcessorComponent* AHumanCharacter_Player::GetCharacterPlayerStateProcessorComponent() const
+{
+	return Cast<UCharacterPlayerStateProcessorComponent>(StateProcessorComponentPtr);
+}
+
 void AHumanCharacter_Player::UpdateSightActor()
 {
 	FVector OutCamLoc = FVector::ZeroVector;
@@ -387,6 +436,9 @@ void AHumanCharacter_Player::InteractionSceneActor(ASceneActor* SceneObjPtr)
 	}
 	else if (SceneObjPtr->IsA(AChallengeEntry::StaticClass()))
 	{
+		//
+		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
+	
 		// 隐藏交互提示
 		if (SceneObjPtr)
 		{
@@ -411,6 +463,9 @@ void AHumanCharacter_Player::InteractionSceneActor(ASceneActor* SceneObjPtr)
 
 void AHumanCharacter_Player::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
 {
+	//
+	GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(CharacterPtr);
+	
 	// 隐藏交互提示
 	if (CharacterPtr)
 	{

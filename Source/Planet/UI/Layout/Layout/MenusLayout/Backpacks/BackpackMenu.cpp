@@ -52,6 +52,11 @@ void UBackpackMenu::SyncData()
 
 }
 
+EMenuType UBackpackMenu::GetMenuType() const
+{
+	return EMenuType::kRaffle;
+}
+
 TArray<TSharedPtr<FBasicProxy>> UBackpackMenu::GetProxys() const
 {
 	TArray<TSharedPtr<FBasicProxy>> Result;

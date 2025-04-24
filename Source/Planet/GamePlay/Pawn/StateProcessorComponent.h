@@ -62,16 +62,7 @@ public:
 
 	UStateProcessorComponent(const FObjectInitializer& ObjectInitializer);
 
-	/**
-	 * 锁定敌人
-	 */
-	virtual void FocusTarget();
-	
-	void SetFocusCharactersAry(ACharacterBase*TargetCharacterPtr);
-	
-	void ClearFocusCharactersAry();
-	
-	TArray<ACharacterBase*> GetFocusCharactersAry()const;
+	virtual TArray<ACharacterBase*> GetTargetCharactersAry()const;
 	
 	TSharedPtr<FCharacterStateInfo> GetCharacterState(const FGameplayTag& CSTag)const;
 	
@@ -140,12 +131,6 @@ protected:
 
 	UPROPERTY(Replicated)
 	FCharacterStateInfo_FASI_Container CharacterStateInfo_FASI_Container;
-
-	UFUNCTION(Server, Reliable)
-	void SetFocusCharactersAry_Server(ACharacterBase*TargetCharacterPtr);
-	
-	UFUNCTION(Server, Reliable)
-	void ClearFocusCharactersAry_Server();
 
 private:
 	
