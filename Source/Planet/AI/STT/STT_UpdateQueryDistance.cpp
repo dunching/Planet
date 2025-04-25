@@ -6,8 +6,10 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
-#include "STE_AICharacterController.h"
+#include "HumanCharacter_AI.h"
+#include "STE_Assistance.h"
 #include "ProxyProcessComponent.h"
+#include "STE_CharacterBase.h"
 
 EStateTreeRunStatus FSTT_UpdateQueryDistance::EnterState(
 	FStateTreeExecutionContext& Context,

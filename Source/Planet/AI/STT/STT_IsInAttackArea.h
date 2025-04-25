@@ -19,7 +19,7 @@ class UAITask_SwitchWalkState;
 class AHumanCharacter;
 class AHumanCharacter_AI;
 class AHumanAIController;
-class UGloabVariable;
+class UGloabVariable_Character;
 
 USTRUCT()
 struct PLANET_API FSTID_IsInAttackArea
@@ -33,7 +33,7 @@ struct PLANET_API FSTID_IsInAttackArea
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	bool bRunForever = true;

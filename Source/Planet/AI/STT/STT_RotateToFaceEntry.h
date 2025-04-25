@@ -20,8 +20,8 @@ class AHumanCharacter;
 class AHumanCharacter_AI;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
-class USTE_AICharacterController;
-class UGloabVariable;
+class USTE_Assistance;
+class UGloabVariable_Character;
 
 #pragma region 面向目标
 USTRUCT()
@@ -36,7 +36,7 @@ struct PLANET_API FSTID_RotateToFaceTarget
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
 };
 
@@ -72,7 +72,7 @@ struct PLANET_API FSTID_IsFaceToTarget
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
 	UPROPERTY(
 		EditAnywhere,

@@ -11,8 +11,9 @@
 #include "StateTreeExecutionContext.h"
 
 #include "GenerateType.h"
+#include "STE_CharacterBase.h"
 
-#include "STE_AICharacterController.generated.h"
+#include "STE_Assistance.generated.h"
 
 class AActor;
 
@@ -24,27 +25,10 @@ class USceneComponent;
 class AHumanCharacter;
 class AHumanCharacter_AI;
 class AHumanAIController;
+class UGloabVariable_Character;
 
 UCLASS(Blueprintable)
-class PLANET_API UGloabVariable : public UObject
-{
-	GENERATED_BODY()
-
-public:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	FVector Location = FVector::ZeroVector;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	int32 QueryDistance = 100;
-	
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
-
-};
-
-UCLASS(Blueprintable)
-class PLANET_API USTE_AICharacterController : public UStateTreeEvaluatorBlueprintBase
+class PLANET_API USTE_Assistance : public USTE_CharacterBase
 {
 	GENERATED_BODY()
 
@@ -75,17 +59,7 @@ protected:
 
 public:
 
-	void KnowCharaterChanged(TWeakObjectPtr<ACharacterBase> KnowCharacter, bool bIsAdd);
-
-	FTSTicker::FDelegateHandle CaculationPatrolHandle;
-
-	FTSTicker::FDelegateHandle CaculationDistance2AreaHandle;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
-	AHumanCharacter_AI* HumanCharacterPtr = nullptr;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
-	AHumanAIController* HumanAIControllerPtr = nullptr;
+	void CheckKnowCharacterImp();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
 	int32 MaxDistanceToPatrolSpline = 1000;
@@ -95,9 +69,6 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeammateOption TeammateOption = ETeammateOption::kInitialize;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
-	UGloabVariable* GloabVariable = nullptr;
 
 	/**
 	 * 既定的巡逻路线
@@ -128,6 +99,6 @@ public:
 
 	FTeammateChangedHandle TeammateChangedDelegate;
 
-	FKownCharacterChangedHandle	KownCharacterChangedHandle;
+	FTimerHandle CheckKnowCharacterTimerHandle;
 
 };

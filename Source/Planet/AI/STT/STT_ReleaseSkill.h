@@ -16,7 +16,7 @@
 class AHumanCharacter;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
-class UGloabVariable;
+class UGloabVariable_Character;
 
 USTRUCT()
 struct PLANET_API FStateTreeReleaseSkillTaskInstanceData
@@ -30,7 +30,7 @@ struct PLANET_API FStateTreeReleaseSkillTaskInstanceData
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
 	UPROPERTY(Transient)
 	TObjectPtr<UAITask_ReleaseSkill> AITaskPtr = nullptr;

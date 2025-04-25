@@ -51,6 +51,8 @@ public:
 	TCallbackHandleContainer<void(
 		EGroupMateChangeType,
 		const TSharedPtr<FCharacterProxyType>&
+
+
 	
 	)>;
 
@@ -58,6 +60,8 @@ public:
 	TCallbackHandleContainer<void(
 		ETeammateOption,
 		const TSharedPtr<FCharacterProxyType>&
+
+
 	
 	)>;
 
@@ -70,6 +74,8 @@ public:
 	using FOnFocusCharacterDelegate =
 	TCallbackHandleContainer<void(
 		ACharacterBase*
+
+
 	
 	)>;
 
@@ -94,13 +100,26 @@ public:
 		ACharacterBase* CharacterPtr
 	);
 
-	void SetFocusCharactersAry(ACharacterBase*TargetCharacterPtr);
-	
+	void SetFocusCharactersAry(
+		ACharacterBase* TargetCharacterPtr
+	);
+
 	void ClearFocusCharactersAry();
-	
+
 	TWeakObjectPtr<ACharacterBase> GetForceKnowCharater() const;
 
-	TArray<TWeakObjectPtr<ACharacterBase>> GetKnowCharater() const;
+	TSet<TWeakObjectPtr<ACharacterBase>> GetValidCharater() const;
+
+	void SetValidCharater(
+		const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
+	);
+	
+	TSet<TWeakObjectPtr<ACharacterBase>> GetSensingChractersSet() const;
+
+	void SetSensingChractersSet(
+		const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
+	);
+	
 #pragma endregion
 
 	void SpwanTeammateCharacter();
@@ -142,8 +161,6 @@ public:
 
 	TSet<AHumanCharacter*> TargetSet;
 
-	FKnowCharaterChanged KnowCharaterChanged;
-
 	FOnFocusCharacterDelegate OnFocusCharacterDelegate;
 
 protected:
@@ -165,7 +182,6 @@ public:
 	virtual void TeammateCharacter_ActiveWeapon_Server();
 
 private:
-
 	UFUNCTION(Server, Reliable)
 	void SwitchTeammateOption_Server(
 		ETeammateOption InTeammateOption
@@ -184,7 +200,7 @@ private:
 	virtual void SpwanTeammateCharacter_Server();
 
 #pragma endregion
-	
+
 	UFUNCTION()
 	void OnRep_GroupSharedInfoChanged();
 
@@ -205,26 +221,27 @@ private:
 		int32 Index
 	);
 
-	void CheckKnowCharacterImp();
-
 	TSharedPtr<FCharacterProxyType> OwnerCharacterProxyPtr = nullptr;
-
-	FTimerHandle CheckKnowCharacterTimerHandle;
 
 	UPROPERTY(ReplicatedUsing = OnRep_TeammateOptionChanged)
 	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
 
 	/**
+	 * 感知到的目标
+	 */
+	TSet<TWeakObjectPtr<ACharacterBase>> SensingChractersSet;
+
+	/**
 	 * 目标、敌人列表
 	 */
 	UPROPERTY(Replicated)
-	TArray<TWeakObjectPtr<ACharacterBase>> KnowCharatersSet;
+	TArray<TWeakObjectPtr<ACharacterBase>> ValidCharatersSet;
 
 	/**
 	* 玩家锁定的目标
-	 * 这个角色锁定的目标，第0个为主要锁定
-	 * 为什么不用Controller UpdateRotation去做？因为我们要在移动组件里统一设置旋转
-	 */
+	* 这个角色锁定的目标，第0个为主要锁定
+	* 为什么不用Controller UpdateRotation去做？因为我们要在移动组件里统一设置旋转
+	*/
 	UPROPERTY(Replicated)
 	TWeakObjectPtr<ACharacterBase> ForceKnowCharater;
 

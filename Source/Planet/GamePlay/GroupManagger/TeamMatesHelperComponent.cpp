@@ -90,13 +90,6 @@ void UTeamMatesHelperComponent::BeginPlay()
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		GetWorld()->GetTimerManager().SetTimer(
-			CheckKnowCharacterTimerHandle,
-			this,
-			&ThisClass::CheckKnowCharacterImp,
-			1.f,
-			true
-		);
 	}
 #endif
 }
@@ -143,7 +136,7 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 				{
 					// AICharacterPtr->SetGroupSharedInfo(OwnerPtr);
 					// AICharacterPtr->SetCharacterID(CharacterProxySPtr->GetID());
-					
+
 					AICharacterPtr->GetProxyProcessComponent()->ActiveWeapon();
 				}
 			}
@@ -190,84 +183,6 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 	}
 
 	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterProxyPtr);
-}
-
-void UTeamMatesHelperComponent::CheckKnowCharacterImp()
-{
-	// 是否有效
-	{
-		TSet<ACharacterBase*> NeedRemoveAry;
-		for (const auto& Iter : KnowCharatersSet)
-		{
-			if (Iter.IsValid())
-			{
-				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
-				{
-					NeedRemoveAry.Add(Iter.Get());
-				}
-			}
-			else
-			{
-				NeedRemoveAry.Add(Iter.Get());
-			}
-		}
-		for (int32 Index = KnowCharatersSet.Num() - 1; Index >= 0; Index--)
-		{
-			if (KnowCharatersSet[Index].IsValid())
-			{
-				auto TargetPtr = KnowCharatersSet[Index].Get();
-				if (NeedRemoveAry.Contains(TargetPtr))
-				{
-					NeedRemoveAry.Remove(TargetPtr);
-					KnowCharatersSet.RemoveAt(Index);
-
-					KnowCharaterChanged(TargetPtr, false);
-				}
-			}
-		}
-	}
-
-	// 是否远离了设定位置
-	auto CharacterActorPtr = GetOwnerCharacterProxyPtr()->GetCharacterActor();
-	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
-	{
-		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
-
-		if (AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
-		{
-			const auto Location = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->GetActorLocation();
-			const auto MaxDistance = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->MaxDistance;
-
-			TSet<ACharacterBase*> NeedRemoveAry;
-			for (const auto& Iter : KnowCharatersSet)
-			{
-				if (Iter.IsValid())
-				{
-					if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
-					{
-						NeedRemoveAry.Add(Iter.Get());
-					}
-				}
-				else
-				{
-				}
-			}
-			for (int32 Index = KnowCharatersSet.Num() - 1; Index >= 0; Index--)
-			{
-				if (KnowCharatersSet[Index].IsValid())
-				{
-					auto TargetPtr = KnowCharatersSet[Index].Get();
-					if (NeedRemoveAry.Contains(TargetPtr))
-					{
-						NeedRemoveAry.Remove(TargetPtr);
-						KnowCharatersSet.RemoveAt(Index);
-
-						KnowCharaterChanged(TargetPtr, false);
-					}
-				}
-			}
-		}
-	}
 }
 
 bool UTeamMatesHelperComponent::IsMember(
@@ -348,80 +263,14 @@ void UTeamMatesHelperComponent::AddKnowCharacter(
 	ACharacterBase* CharacterPtr
 )
 {
-	if (!CharacterPtr)
-	{
-		return;
-	}
-	
-	auto CharacterActorPtr = GetOwnerCharacterProxyPtr()->GetCharacterActor();
-	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
-	{
-		// 
-		if (CharacterPtr->GetCharacterAbilitySystemComponent()->IsInDeath())
-		{
-			return;
-		}
-
-		// NPC
-		if (CharacterPtr->IsA(AHumanCharacter_AI::StaticClass()))
-		{
-			return;
-		}
-
-		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
-
-		if (AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
-		{
-			const auto Location = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->GetActorLocation();
-			const auto MaxDistance = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->MaxDistance;
-
-			if (FVector::Distance(CharacterPtr->GetActorLocation(), Location) > MaxDistance)
-			{
-				return;
-			}
-		}
-		else
-		{
-		}
-
-		for (auto& Iter : KnowCharatersSet)
-		{
-			if (Iter == CharacterPtr)
-			{
-				return;
-			}
-		}
-
-		KnowCharatersSet.Add(CharacterPtr);
-		KnowCharaterChanged(CharacterPtr, true);
-#ifdef WITH_EDITOR
-		if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
-		{
-			PRINTINVOKEWITHSTR(FString(TEXT("")));
-		}
-#endif
-	}
+	SensingChractersSet.Add(CharacterPtr);
 }
 
 void UTeamMatesHelperComponent::RemoveKnowCharacter(
 	ACharacterBase* CharacterPtr
 )
 {
-	for (int32 Index = 0; Index < KnowCharatersSet.Num(); Index++)
-	{
-		if (KnowCharatersSet[Index] == CharacterPtr)
-		{
-			KnowCharatersSet.RemoveAt(Index);
-			KnowCharaterChanged(CharacterPtr, false);
-#ifdef WITH_EDITOR
-			if (GroupMnaggerComponent_KnowCharaterChanged.GetValueOnGameThread())
-			{
-				PRINTINVOKEWITHSTR(FString(TEXT("")));
-			}
-#endif
-			return;
-		}
-	}
+	SensingChractersSet.Add(CharacterPtr);
 }
 
 void UTeamMatesHelperComponent::SetFocusCharactersAry(
@@ -431,8 +280,7 @@ void UTeamMatesHelperComponent::SetFocusCharactersAry(
 	ForceKnowCharater = TargetCharacterPtr;
 	OnFocusCharacterDelegate(TargetCharacterPtr);
 
-	KnowCharatersSet.Add(TargetCharacterPtr);
-	KnowCharaterChanged(TargetCharacterPtr, true);
+	SensingChractersSet.Add(TargetCharacterPtr);
 }
 
 void UTeamMatesHelperComponent::ClearFocusCharactersAry()
@@ -451,15 +299,37 @@ TWeakObjectPtr<ACharacterBase> UTeamMatesHelperComponent::GetForceKnowCharater()
 	return nullptr;
 }
 
-TArray<TWeakObjectPtr<ACharacterBase>> UTeamMatesHelperComponent::GetKnowCharater() const
+TSet<TWeakObjectPtr<ACharacterBase>> UTeamMatesHelperComponent::GetValidCharater() const
 {
-	TArray<TWeakObjectPtr<ACharacterBase>> Result;
-
-	for (const auto& Iter : KnowCharatersSet)
+	TSet<TWeakObjectPtr<ACharacterBase>> Result;
+	for (auto Iter : ValidCharatersSet)
 	{
 		Result.Add(Iter);
 	}
 	return Result;
+}
+
+TSet<TWeakObjectPtr<ACharacterBase>> UTeamMatesHelperComponent::GetSensingChractersSet() const
+{
+	return SensingChractersSet;
+}
+
+void UTeamMatesHelperComponent::SetSensingChractersSet(
+	const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
+)
+{
+	SensingChractersSet = KnowCharater;
+}
+
+void UTeamMatesHelperComponent::SetValidCharater(
+	const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
+)
+{
+	ValidCharatersSet.Empty();
+	for (auto Iter : KnowCharater)
+	{
+		ValidCharatersSet.Add(Iter);
+	}
 }
 
 TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperComponent::GetOwnerCharacterProxyPtr() const
@@ -485,8 +355,8 @@ void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
 
 	DOREPLIFETIME_CONDITION(ThisClass, TeamConfigure, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, TeammateOption, COND_None);
-	
-	DOREPLIFETIME_CONDITION(ThisClass, KnowCharatersSet, COND_None);
+
+	DOREPLIFETIME_CONDITION(ThisClass, ValidCharatersSet, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, ForceKnowCharater, COND_None);
 }
 

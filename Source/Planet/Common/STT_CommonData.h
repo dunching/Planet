@@ -18,6 +18,7 @@ class AHumanCharacter_AI;
 
 // 
 
+#pragma region STT
 USTRUCT(Blueprintable, BlueprintType)
 struct PLANET_API FTaskNode_Conversation_SentenceInfo
 {
@@ -38,3 +39,4 @@ public:
 	TSoftObjectPtr<AHumanCharacter_AI>AvatorCharacterPtr = nullptr;
 	
 };
+#pragma endregion

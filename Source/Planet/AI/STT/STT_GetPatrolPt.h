@@ -18,7 +18,7 @@ class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
 class AHumanAIController;
-class UGloabVariable;
+class UGloabVariable_Character;
 
 USTRUCT()
 struct PLANET_API FStateTreeGetPatrolPtTaskInstanceData

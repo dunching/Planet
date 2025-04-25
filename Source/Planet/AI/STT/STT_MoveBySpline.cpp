@@ -10,7 +10,8 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "HumanCharacter_AI.h"
-#include "STE_AICharacterController.h"
+#include "STE_Assistance.h"
+#include "STE_CharacterBase.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_MoveBySpline(

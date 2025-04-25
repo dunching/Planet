@@ -59,11 +59,6 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	/**
-	 * OnlyServer
-	 */
-	void UpdateTargetCharacter();
-	
 	TArray<ACharacterBase*> GetTargetCharactersAry() const;
 
 	UPROPERTY(Replicated)

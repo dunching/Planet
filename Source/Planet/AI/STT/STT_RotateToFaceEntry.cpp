@@ -6,9 +6,10 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
-#include "STE_AICharacterController.h"
+#include "STE_Assistance.h"
 #include "Planet.h"
 #include "PlanetPlayerController.h"
+#include "STE_CharacterBase.h"
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 

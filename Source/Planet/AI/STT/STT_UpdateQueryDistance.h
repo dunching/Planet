@@ -9,6 +9,7 @@
 #include "Tasks/StateTreeAITask.h"
 
 #include "GenerateType.h"
+#include "STT_Base.h"
 
 #include "STT_UpdateQueryDistance.generated.h"
 
@@ -18,22 +19,16 @@ class UAITask_SwitchWalkState;
 
 class AHumanCharacter;
 class AHumanAIController;
-class UGloabVariable;
-class USTE_AICharacterController;
+class UGloabVariable_Character;
+class USTE_Assistance;
 
 USTRUCT()
-struct PLANET_API FStateTreeUpdateQueryDistanceTaskInstanceData
+struct PLANET_API FSTID_UpdateQueryDistance : public FSTID_CharacterBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> CharacterPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-	
-	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Param)
 	bool bRunForever = true;
@@ -47,7 +42,7 @@ struct PLANET_API FSTT_UpdateQueryDistance : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeUpdateQueryDistanceTaskInstanceData;
+	using FInstanceDataType = FSTID_UpdateQueryDistance;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 

@@ -194,7 +194,7 @@ public class Planet : ModuleRules
             "NetCore",
 
             "Tools",
-            "CommonUser",
+            "CommonUser", "ShaderConductor",
         });
 
         PublicDependencyModuleNames.AddRange(new string[] {

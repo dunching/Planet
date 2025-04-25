@@ -19,8 +19,8 @@ class AHumanCharacter;
 class AHumanCharacter_AI;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
-class USTE_AICharacterController;
-class UGloabVariable;
+class USTE_Assistance;
+class UGloabVariable_Character;
 
 USTRUCT()
 struct PLANET_API FSTID_ClearFocus

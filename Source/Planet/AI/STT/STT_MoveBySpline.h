@@ -24,7 +24,7 @@ class UAITask_MoveBySpline;
 class AHumanCharacter;
 class AHumanCharacter_AI;
 class AHumanAIController;
-class UGloabVariable;
+class UGloabVariable_Character;
 class AGeneratorNPCs_Patrol;
 
 namespace EPathFollowingResult { enum Type : int; }
@@ -41,7 +41,7 @@ struct PLANET_API FStateTreeCheckTarget_SplineTaskInstanceData
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Output)
 	bool bIsEntryAttackTarget = false;

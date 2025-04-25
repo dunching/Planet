@@ -12,6 +12,8 @@
 
 #include "GenerateType.generated.h"
 
+class AHumanCharacter_AI;
+
 UENUM(BlueprintType)
 enum class ECharacterPropertyType : uint8
 {

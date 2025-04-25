@@ -18,8 +18,8 @@ class UEnvQuery;
 class AHumanCharacter;
 class AHumanAIController;
 class UAITask_ReleaseSkill;
-class USTE_AICharacterController;
-class UGloabVariable;
+class USTE_Assistance;
+class UGloabVariable_Character;
 
 USTRUCT()
 struct PLANET_API FStateTreeRunEQSTaskInstanceData
@@ -33,7 +33,7 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Output)
 	FVector Location = FVector::ZeroVector;

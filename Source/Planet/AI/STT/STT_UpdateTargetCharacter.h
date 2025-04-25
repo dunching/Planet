@@ -9,6 +9,7 @@
 #include "Tasks/StateTreeAITask.h"
 
 #include "GenerateType.h"
+#include "STT_Base.h"
 
 #include "STT_UpdateTargetCharacter.generated.h"
 
@@ -19,22 +20,16 @@ class UAITask_SwitchWalkState;
 class AHumanCharacter;
 class AHumanCharacter_AI;
 class AHumanAIController;
-class UGloabVariable;
-class USTE_AICharacterController;
+class UGloabVariable_Character;
+class USTE_Assistance;
 
 USTRUCT()
-struct PLANET_API FStateTreeUpdateTargetCharacterTaskInstanceData
+struct PLANET_API FSTID_UpdateTargetCharacter : public FSTID_CharacterBase
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
-
-	UPROPERTY(EditAnywhere, Category = Context)
-	UGloabVariable* GloabVariable = nullptr;
+	UGloabVariable_Character* GloabVariable_Character = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	bool bIsCcontinuous = false;
@@ -51,7 +46,7 @@ struct PLANET_API FSTT_UpdateTargetCharacter : public FStateTreeAIActionTaskBase
 {
 	GENERATED_BODY()
 
-	using FInstanceDataType = FStateTreeUpdateTargetCharacterTaskInstanceData;
+	using FInstanceDataType = FSTID_UpdateTargetCharacter;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
@@ -67,4 +62,9 @@ struct PLANET_API FSTT_UpdateTargetCharacter : public FStateTreeAIActionTaskBase
 
 	virtual EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 
+	/**
+	 * OnlyServer
+	 */
+	void UpdateTargetCharacter(FStateTreeExecutionContext& Context)const;
+	
 };

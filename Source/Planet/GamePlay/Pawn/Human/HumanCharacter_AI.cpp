@@ -80,50 +80,6 @@ void UCharacterNPCStateProcessorComponent::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, TargetCharacter, COND_InitialOnly);
 }
 
-void UCharacterNPCStateProcessorComponent::UpdateTargetCharacter()
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto CharacterPtr = GetOwner<FOwnerPawnType>();
-		if (CharacterPtr)
-		{
-			auto KnowCharaterAry = CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
-												 GetKnowCharater();
-
-			const auto Location = CharacterPtr->GetActorLocation();
-			TWeakObjectPtr<ACharacterBase> TargetPtr = nullptr;
-			int32 Distance = 0;
-			for (const auto Iter : KnowCharaterAry)
-			{
-				if (Iter.IsValid())
-				{
-					auto NewDistance = FVector::Dist2D(Location, Iter->GetActorLocation());
-					if (TargetPtr.IsValid())
-					{
-						if (NewDistance < Distance)
-						{
-							TargetPtr = Iter;
-							Distance = NewDistance;
-						}
-					}
-					else
-					{
-						TargetPtr = Iter;
-						Distance = NewDistance;
-					}
-				}
-			}
-
-			if (TargetPtr.IsValid())
-			{
-				TargetCharacter = TargetPtr.Get();
-			}
-		}
-	}
-#endif
-}
-
 TArray<ACharacterBase*> UCharacterNPCStateProcessorComponent::GetTargetCharactersAry() const
 {
 	TArray<ACharacterBase*> Result;
@@ -166,9 +122,13 @@ void AHumanCharacter_AI::BeginPlay()
 		// 👆
 		// AI Comtroller下的需要显式调用
 		// if (StateTreeAIComponentPtr && !StateTreeAIComponentPtr->IsRunning())
-		if (auto AISTComponentPtr = Cast<AHumanAIController>(GetController())->GetStateTreeAIComponent())
+		auto AIControllerPtr = Cast<AHumanAIController>(GetController());
+		if (AIControllerPtr)
 		{
-			AISTComponentPtr->StartLogic();
+			if (auto AISTComponentPtr = AIControllerPtr->GetStateTreeAIComponent())
+			{
+				AISTComponentPtr->StartLogic();
+			}
 		}
 	}
 #endif

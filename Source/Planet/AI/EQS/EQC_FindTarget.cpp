@@ -60,7 +60,7 @@ void UEQC_GetTarget::ProvideContext(
 	if (CharacterPtr)
 	{
 		auto KnowCharaterAry = CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
-		                                     GetKnowCharater();
+		                                     GetValidCharater();
 
 		const auto Location = CharacterPtr->GetActorLocation();
 		TWeakObjectPtr<ACharacterBase> TargetPtr = nullptr;

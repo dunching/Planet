@@ -10,7 +10,7 @@
 
 #include "STT_MoveTo.generated.h"
 
-USTRUCT(meta = (DisplayName = "MyMoveTo", Category = "AI|Action"))
+USTRUCT()
 struct PLANET_API FSTT_MoveToTask : public FStateTreeMoveToTask
 {
 	GENERATED_BODY()

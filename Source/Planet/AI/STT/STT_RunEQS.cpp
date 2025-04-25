@@ -7,8 +7,9 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
-#include "STE_AICharacterController.h"
+#include "STE_Assistance.h"
 #include "Planet.h"
+#include "STE_CharacterBase.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_RunEQS(

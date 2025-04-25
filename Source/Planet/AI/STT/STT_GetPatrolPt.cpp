@@ -7,7 +7,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
-#include "STE_AICharacterController.h"
+#include "STE_Assistance.h"
 #include "Planet.h"
 
 #ifdef WITH_EDITOR

@@ -9,7 +9,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
-#include "STE_AICharacterController.h"
+#include "STE_Assistance.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> Skill_DrawDebug_FSTT_ReleaseSkill(
