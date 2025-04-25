@@ -37,9 +37,22 @@ protected:
 
 	virtual EMenuType GetMenuType()const override final;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+private:
+
+	// 显示选择的任务
+	void ActiveCurrentCorrespondingItem();
+	
+	UFUNCTION()
+	void OnSelected(UTaskItem* ItemPtr);
+	
+	UFUNCTION()
+	void OnActiveGuideThread();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UTaskItem>TaskItemClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UTaskItemCategory>TaskItemCategoryClass;
+	
+	UTaskItem* TaskItemPtr = nullptr;
 };

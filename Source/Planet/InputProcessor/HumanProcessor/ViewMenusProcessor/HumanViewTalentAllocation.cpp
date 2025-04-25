@@ -37,32 +37,14 @@ namespace HumanProcessor
 		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(true);
 		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kMenuLayout);
 		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kGroupManagger);
-
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			PlayerPCPtr->bShowMouseCursor = true;
-
-			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
-		}
 	}
 
 	void FHumanViewTalentAllocation::QuitAction()
 	{
 		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(false);
 
-		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-
 		//
 		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
-		
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			PlayerPCPtr->bShowMouseCursor = false;
-
-			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
-		}
 
 		Super::QuitAction();
 	}

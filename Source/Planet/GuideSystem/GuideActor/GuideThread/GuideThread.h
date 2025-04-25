@@ -17,6 +17,7 @@
 
 class UGameplayTasksComponent;
 
+class UGuideSubSystem;
 class UGuideSystemStateTreeComponent;
 class UPAD_TaskNode_Guide;
 class APlanetPlayerController;
@@ -25,6 +26,7 @@ class AHumanCharacter;
 class AHumanCharacter_Player;
 
 struct FTaskNodeDescript;
+struct FSTT_GuideThread_Completet;
 
 using FOnGuideInteractionEnd = TMulticastDelegate<void()>;
 
@@ -55,6 +57,9 @@ class PLANET_API AGuideThread : public AGuideActor
 	GENERATED_BODY()
 
 public:
+	friend FSTT_GuideThread_Completet;
+	friend UGuideSubSystem;
+
 	AGuideThread(
 		const FObjectInitializer& ObjectInitializer
 	);
@@ -131,6 +136,9 @@ protected:
 	TMap<FGuid, FTaskNodeResuleHelper> EventsSet;
 
 	FTaskNodeDescript CurrentTaskNodeDescript;
+
+private:
+	bool bIsComleted = false;
 };
 
 UCLASS()

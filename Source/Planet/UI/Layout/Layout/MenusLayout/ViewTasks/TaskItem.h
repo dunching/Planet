@@ -11,6 +11,9 @@
 #include "TaskItem.generated.h"
 
 class UTalentIcon;
+class AGuideThread;
+class AGuideThread_Main;
+class AGuideThread_Branch;
 
 /**
  *
@@ -23,4 +26,26 @@ class PLANET_API UTaskItem :
 
 public:
 
+	using FOnSeleted = TDelegate<void(UTaskItem*)>;
+	
+	virtual void NativeConstruct()override;
+
+	void SetGuideThreadType(const TSubclassOf<AGuideThread_Main>& GuideThreadClass);
+
+	void SetGuideThreadType(const TSubclassOf<AGuideThread_Branch>& GuideThreadClass);
+
+	UFUNCTION()
+	void OnClicked();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SwitchSeleted(bool bIsSeleted);
+
+	FOnSeleted OnSeleted; 
+	
+	TSubclassOf<AGuideThread_Main> MainGuideThreadClass;
+	
+	TSubclassOf<AGuideThread_Branch> BrandGuideThreadClass;
+	
+private:
+	
 };

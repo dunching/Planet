@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "GuideThreadType.h"
 #include "MenuInterface.h"
 
 #include "TaskItemCategory.generated.h"
@@ -23,4 +24,6 @@ class PLANET_API UTaskItemCategory :
 
 public:
 
+	void SetTaskType(EGuideThreadType GuideThreadType);
+	
 };

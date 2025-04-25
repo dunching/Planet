@@ -65,6 +65,9 @@ struct PLANET_API FSTID_GuideThreadRecord
 {
 	GENERATED_BODY()
 
+	/**
+	 * EditAnywhere 确保我们能够修改
+	 */
 	UPROPERTY(EditAnywhere, Category = Param)
 	FGuid TaskID;
 	
@@ -1232,6 +1235,62 @@ struct PLANET_API FSTT_GuideThread_AttckCharacter :
 
 	virtual FTaskNodeDescript GetTaskNodeDescripton(
 		FStateTreeExecutionContext& Context
+	) const override;
+
+protected:
+};
+#pragma endregion
+
+#pragma region 未完待续
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_ToBeContinued :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+	
+};
+
+// 执行引导任务 给目标角色添加互动引导内容
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_ToBeContinued :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_ToBeContinued;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
+
+protected:
+};
+#pragma endregion
+
+#pragma region 引导完成
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_Completet :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+	
+};
+
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_Completet :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_Completet;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
 	) const override;
 
 protected:

@@ -107,6 +107,9 @@ protected:
 	APlayerController* PCPtr = nullptr;
 };
 
+/**
+ * NPC或Player的独白，不会阻挡输入或进入其他状态
+ */
 UCLASS()
 class PLANET_API UGameplayTask_Guide_Monologue : public UGameplayTask_Guide
 {
@@ -168,6 +171,9 @@ protected:
 	TSoftObjectPtr<AHumanCharacter_AI> TargetCharacterPtr = nullptr;
 };
 
+/**
+ * 要求Player的前往对NPC对话
+ */
 UCLASS()
 class PLANET_API UGameplayTask_Guide_ConversationWithTarget : public UGameplayTask_Guide
 {

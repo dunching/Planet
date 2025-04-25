@@ -74,6 +74,16 @@
     "Chinese": "查看分配技能界面",
     "English": "ViewAllocationMenu"
   },
+  "MainThread": {
+    "Default": "MainThread",
+    "Chinese": "主线",
+    "English": "MainThread"
+  },
+  "BrandThread": {
+    "Default": "BrandThread",
+    "Chinese": "支线",
+    "English": "BrandThread"
+  },
   "Return": {
     "Default": "Return",
     "Chinese": "返回",

@@ -33,9 +33,7 @@ void UGuideSubSystem::InitializeMainThread()
 
 void UGuideSubSystem::ActiveMainThread()
 {
-	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
-
-	ActiveTargetGuideThread(WorldSetting->MainLineGuideClass);
+	ActiveTargetGuideThread(GetCurrentMainGuideThread());	
 }
 
 void UGuideSubSystem::AddGuideThread_Brand(
@@ -117,7 +115,7 @@ void UGuideSubSystem::StopParallelGuideThread(
 	}
 }
 
-void UGuideSubSystem::GuideThreadEnded(
+void UGuideSubSystem::OnGuideThreadStoped(
 	AGuideThread* GuideThreadPtr
 )
 {
@@ -125,15 +123,25 @@ void UGuideSubSystem::GuideThreadEnded(
 
 	if (GuideThreadPtr)
 	{
-		const auto CurrentGuideID = GuideThreadPtr->GetGuideID();
-		const auto CurrentTaskID = GuideThreadPtr->GetCurrentTaskID();
-
-		if (GuidePostionSet.Contains(CurrentGuideID))
+		if (GuideThreadPtr->bIsComleted)
 		{
-			//
-			GuidePostionSet.Remove(CurrentGuideID);
-		}
+			
+			const auto CurrentGuideID = GuideThreadPtr->GetGuideID();
+			const auto CurrentTaskID = GuideThreadPtr->GetCurrentTaskID();
 
+			if (GuidePostionSet.Contains(CurrentGuideID))
+			{
+				//
+				GuidePostionSet.Remove(CurrentGuideID);
+			}
+
+			if (GuideThreadPtr->IsA(AGuideThread_Main::StaticClass()))
+			{
+				CurrentMainGuideThreadIndex++;
+				ActiveMainThread();
+			}
+		}
+		
 		GuideThreadPtr->Destroy();
 		GuideThreadPtr = nullptr;
 	}
@@ -142,6 +150,25 @@ void UGuideSubSystem::GuideThreadEnded(
 TObjectPtr<AGuideThread> UGuideSubSystem::GetCurrentGuideThread() const
 {
 	return CurrentLineGuidePtr;
+}
+
+TSubclassOf<AGuideThread_Main> UGuideSubSystem::GetCurrentMainGuideThread() const
+{
+	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
+
+	if (WorldSetting->MainGuideThreadChaptersAry.IsValidIndex(CurrentMainGuideThreadIndex))
+	{
+		return WorldSetting->MainGuideThreadChaptersAry[CurrentMainGuideThreadIndex];	
+	}
+	else
+	{
+		return WorldSetting->ToBeContinueGuideThread;	
+	}
+}
+
+TArray<TSubclassOf<AGuideThread_Branch>> UGuideSubSystem::GetGuideThreadAry() const
+{
+	return GuideThreadBranchAry;
 }
 
 FOnStartGuide& UGuideSubSystem::GetOnStartGuide()

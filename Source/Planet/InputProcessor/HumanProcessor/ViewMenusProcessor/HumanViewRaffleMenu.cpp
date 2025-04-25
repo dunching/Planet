@@ -32,36 +32,10 @@ namespace HumanProcessor
 	void FHumanViewRaffleMenuProcessor::EnterAction()
 	{
 		Super::EnterAction();
-
-		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-
-		// UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(true);
-
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			PlayerPCPtr->bShowMouseCursor = true;
-
-			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
-		}
 	}
 
 	void FHumanViewRaffleMenuProcessor::QuitAction()
 	{
-		// UUIManagerSubSystem::GetInstance()->ViewRaffleMenu(false);
-		
-		URaffleSubSystem::GetInstance()->SyncProxys2Player();
-
-		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			PlayerPCPtr->bShowMouseCursor = false;
-
-			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
-		}
-
 		Super::QuitAction();
 	}
 

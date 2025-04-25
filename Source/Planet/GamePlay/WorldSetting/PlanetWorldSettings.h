@@ -30,8 +30,14 @@ public:
 
 	USceneProxyExtendInfoMap* GetSceneProxyExtendInfoMap()const;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideLine")
-	TSubclassOf<AGuideThread_Main>MainLineGuideClass;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideThread")
+	TArray<TSubclassOf<AGuideThread_Main>> MainGuideThreadChaptersAry;
+
+	/**
+	 * 提示[未完待续]的任务引导
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GuideThread")
+	TSubclassOf<AGuideThread_Main> ToBeContinueGuideThread;
 
 protected:
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraStatelessBuiltDistribution.h"
 #include "Engine/World.h"
 
 #include "GuideSubSystem.generated.h"
@@ -79,12 +80,25 @@ public:
 		const TSubclassOf<AGuideThread_Immediate>& GuideClass
 	);
 
-	void GuideThreadEnded(
+	void OnGuideThreadStoped(
 		AGuideThread* GuideThreadPtr
 	);
 
+	/**
+	 * @return 当前激活的任务 
+	 */
 	TObjectPtr<AGuideThread> GetCurrentGuideThread() const;
-
+	
+	/**
+	 * @return 当前的主线任务
+	 */
+	TSubclassOf<AGuideThread_Main> GetCurrentMainGuideThread()const;
+	
+	/**
+	 * @return 所有拥有的支线任务
+	 */
+	TArray<TSubclassOf<AGuideThread_Branch>> GetGuideThreadAry()const;
+	
 	FOnStartGuide& GetOnStartGuide();
 
 	FOnStopGuide& GetOnStopGuide();
@@ -123,4 +137,9 @@ private:
 	 * Value	已执行到的任务ID
 	 */
 	TMap<FGuid, FGuid> GuidePostionSet;
+
+	/**
+	 * 当前的主线引导章节
+	 */
+	uint8 CurrentMainGuideThreadIndex = 0;
 };

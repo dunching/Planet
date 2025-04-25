@@ -62,8 +62,13 @@ void UCharacterPlayerStateProcessorComponent::FocusTarget()
 		Params.AddIgnoredActor(OnwerActorPtr);
 
 		FHitResult OutHit;
-		if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000),
-													   ObjectQueryParams, Params))
+		if (GetWorldImp()->LineTraceSingleByObjectType(
+			OutHit,
+			OutCamLoc,
+			OutCamLoc + (OutCamRot.Vector() * 1000),
+			ObjectQueryParams,
+			Params
+		))
 		{
 			auto FocusCharactersAry_ = GetTargetCharactersAry();
 			if (FocusCharactersAry_.IsValidIndex(0) && (FocusCharactersAry_[0] == OutHit.GetActor()))
@@ -94,7 +99,7 @@ void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
 		SetFocusCharactersAry_Server(TargetCharacterPtr);
 	}
 #endif
-	
+
 	auto CharacterPtr = GetOwner<FOwnerPawnType>();
 	if (CharacterPtr)
 	{
@@ -110,7 +115,7 @@ void UCharacterPlayerStateProcessorComponent::ClearFocusCharactersAry()
 		ClearFocusCharactersAry_Server();
 	}
 #endif
-	
+
 	auto CharacterPtr = GetOwner<FOwnerPawnType>();
 	if (CharacterPtr)
 	{
@@ -145,18 +150,21 @@ void UPlayerConversationComponent::CloseConversationborder_Player()
 	OnPlayerHaveNewSentence.Broadcast(false, FTaskNode_Conversation_SentenceInfo());
 }
 
-AHumanCharacter_Player::AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer) :
-	Super(
-		ObjectInitializer.
-		SetDefaultSubobjectClass<UPlayerConversationComponent>(
-			UPlayerConversationComponent::ComponentName).
-		SetDefaultSubobjectClass<USceneCharacterPlayerInteractionComponent>(
-			USceneCharacterPlayerInteractionComponent::ComponentName
-			).
-		SetDefaultSubobjectClass<UCharacterPlayerStateProcessorComponent>(
-			UCharacterPlayerStateProcessorComponent::ComponentName
-			)
-	)
+AHumanCharacter_Player::AHumanCharacter_Player(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(
+	  ObjectInitializer.
+	  SetDefaultSubobjectClass<UPlayerConversationComponent>(
+		  UPlayerConversationComponent::ComponentName
+	  ).
+	  SetDefaultSubobjectClass<USceneCharacterPlayerInteractionComponent>(
+		  USceneCharacterPlayerInteractionComponent::ComponentName
+	  ).
+	  SetDefaultSubobjectClass<UCharacterPlayerStateProcessorComponent>(
+		  UCharacterPlayerStateProcessorComponent::ComponentName
+	  )
+  )
 {
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<UGravitySpringArmComponent>(TEXT("CameraBoom"));
@@ -178,12 +186,14 @@ void AHumanCharacter_Player::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AHumanCharacter_Player::PossessedBy(AController* NewController)
+void AHumanCharacter_Player::PossessedBy(
+	AController* NewController
+)
 {
 	Super::PossessedBy(NewController);
 
 	PlayerComponentPtr->PossessedBy(Cast<APlayerController>(NewController));
-		
+
 	auto GroupsHelperSPtr = GetGroupManagger()->GetTeamMatesHelperComponent();
 	if (GroupsHelperSPtr)
 	{
@@ -196,7 +206,7 @@ void AHumanCharacter_Player::PossessedBy(AController* NewController)
 void AHumanCharacter_Player::OnRep_Controller()
 {
 	Super::OnRep_Controller();
-	
+
 	PlayerComponentPtr->PossessedBy(Cast<APlayerController>(Controller));
 }
 
@@ -217,7 +227,9 @@ bool AHumanCharacter_Player::TeleportTo(
 	return Super::TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
 }
 
-void AHumanCharacter_Player::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AHumanCharacter_Player::SetupPlayerInputComponent(
+	UInputComponent* PlayerInputComponent
+)
 {
 	// 只在 ROLE_AutonomousProxy 运行
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -240,10 +252,13 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 	{
 		// 在SetPawn之后调用
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
-			[this](auto NewProcessor)
+			[this](
+			auto NewProcessor
+		)
 			{
 				NewProcessor->SetPawn(Cast<ThisClass>(this));
-			});
+			}
+		);
 
 		// 
 		UGuideSubSystem::GetInstance()->InitializeMainThread();
@@ -252,7 +267,9 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 #endif
 }
 
-void AHumanCharacter_Player::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void AHumanCharacter_Player::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+)
 {
 	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 
@@ -359,13 +376,16 @@ TPair<FVector, FVector> AHumanCharacter_Player::GetCharacterViewInfo()
 	GetCameraComp()->GetCameraView(0, DesiredView);
 
 	TPair<FVector, FVector> Result(
-		DesiredView.Location, DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
+		DesiredView.Location,
+		DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
 	);
 
 	return Result;
 }
 
-void AHumanCharacter_Player::StartLookAt(ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr)
+void AHumanCharacter_Player::StartLookAt(
+	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
+)
 {
 	if (SceneActorInteractionInterfacePtr)
 	{
@@ -398,7 +418,9 @@ void AHumanCharacter_Player::StartLookAt(ISceneActorInteractionInterface* SceneA
 	}
 }
 
-void AHumanCharacter_Player::LookingAt(ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr)
+void AHumanCharacter_Player::LookingAt(
+	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
+)
 {
 	if (SceneActorInteractionInterfacePtr)
 	{
@@ -420,25 +442,27 @@ void AHumanCharacter_Player::EndLookAt()
 	}
 }
 
-void AHumanCharacter_Player::InteractionSceneActor(ASceneActor* SceneObjPtr)
+void AHumanCharacter_Player::InteractionSceneActor(
+	ASceneActor* SceneObjPtr
+)
 {
 	if (!SceneObjPtr)
 	{
 		return;
 	}
-	
+
 	if (SceneObjPtr->IsA(AResourceBoxBase::StaticClass()))
 	{
 		//
 		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
-	
+
 		InteractionSceneObj_Server(SceneObjPtr);
 	}
 	else if (SceneObjPtr->IsA(AChallengeEntry::StaticClass()))
 	{
 		//
 		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
-	
+
 		// 隐藏交互提示
 		if (SceneObjPtr)
 		{
@@ -446,26 +470,32 @@ void AHumanCharacter_Player::InteractionSceneActor(ASceneActor* SceneObjPtr)
 		}
 
 		// 
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithChallengeEntryProcessor>(
-			[SceneObjPtr](auto NewProcessor)
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<
+			HumanProcessor::FHumanInteractionWithChallengeEntryProcessor>(
+			[SceneObjPtr](
+			auto NewProcessor
+		)
 			{
 				NewProcessor->TargetPtr = Cast<AChallengeEntry>(SceneObjPtr);
-			});
+			}
+		);
 	}
 	else
 	{
 		//
 		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
-	
+
 		InteractionSceneObj_Server(SceneObjPtr);
 	}
 }
 
-void AHumanCharacter_Player::InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr)
+void AHumanCharacter_Player::InteractionSceneCharacter(
+	AHumanCharacter_AI* CharacterPtr
+)
 {
 	//
 	GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(CharacterPtr);
-	
+
 	// 隐藏交互提示
 	if (CharacterPtr)
 	{
@@ -474,13 +504,18 @@ void AHumanCharacter_Player::InteractionSceneCharacter(AHumanCharacter_AI* Chara
 
 	// 
 	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>(
-		[CharacterPtr](auto NewProcessor)
+		[CharacterPtr](
+		auto NewProcessor
+	)
 		{
 			NewProcessor->CharacterPtr = CharacterPtr;
-		});
+		}
+	);
 }
 
-void AHumanCharacter_Player::InteractionSceneObj_Server_Implementation(ASceneActor* SceneObjPtr)
+void AHumanCharacter_Player::InteractionSceneObj_Server_Implementation(
+	ASceneActor* SceneObjPtr
+)
 {
 	if (SceneObjPtr)
 	{

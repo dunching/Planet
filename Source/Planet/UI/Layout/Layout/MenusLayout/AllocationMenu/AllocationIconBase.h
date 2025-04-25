@@ -30,38 +30,66 @@ class PLANET_API UAllocationIconBase :
 	GENERATED_BODY()
 
 public:
-
 	// 旧的Proxy，新的Proxy
 	using FOnResetProxy =
-		TCallbackHandleContainer<void(
-			const TSharedPtr<FAllocationbleProxy>&,
-			const TSharedPtr<FAllocationbleProxy>&,
-			const FGameplayTag&
-			)>;
+	TCallbackHandleContainer<void(
+		const TSharedPtr<FAllocationbleProxy>&,
+		const TSharedPtr<FAllocationbleProxy>&,
+		const FGameplayTag&
+			
+	)>;
 
 	using FOnResetData =
-		TCallbackHandleContainer<void(UAllocationIconBase*)>;
+	TCallbackHandleContainer<void(
+		UAllocationIconBase*
+	)>;
 
-	UAllocationIconBase(const FObjectInitializer& ObjectInitializer);
+	UAllocationIconBase(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	virtual void NativeOnListItemObjectSet(UObject* ListItemObject)override;
+	virtual void NativeOnListItemObjectSet(
+		UObject* ListItemObject
+	) override;
 
-	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
+	virtual void InvokeReset(
+		UUserWidget* BaseWidgetPtr
+	) override;
 
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
+	virtual void ResetToolUIByData(
+		const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	) override;
 
-	virtual void EnableIcon(bool bIsEnable)override;
+	virtual void EnableIcon(
+		bool bIsEnable
+	) override;
 
-	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
+	virtual void OnDragIcon(
+		bool bIsDragging,
+		const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+	);
 
-	virtual void SublingIconProxyChanged(const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
+	virtual void SublingIconProxyChanged(
+		const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+	);
 
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
+	virtual FReply NativeOnMouseButtonDown(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent
+	) override;
 
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+	virtual bool NativeOnDrop(
+		const FGeometry& InGeometry,
+		const FDragDropEvent& InDragDropEvent,
+		UDragDropOperation* InOperation
+	) override;
 
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
-	
+	virtual void NativeOnDragDetected(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent,
+		UDragDropOperation*& OutOperation
+	) override;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Socket")
 	FGameplayTag IconSocket;
 
@@ -74,10 +102,8 @@ public:
 	TSharedPtr<FAllocationbleProxy> BasicProxyPtr = nullptr;
 
 protected:
-
 	virtual void SetItemType();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Adaptation ProxyType")
 	FGameplayTag ProxyType = FGameplayTag::EmptyTag;
-
 };

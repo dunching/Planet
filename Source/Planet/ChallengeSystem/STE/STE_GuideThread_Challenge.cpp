@@ -31,7 +31,7 @@ void USTE_TaskNode_GuideChallengeThread::TreeStop(FStateTreeExecutionContext& Co
 	if (GuideActorPtr)
 	{
 		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideActorPtr);
+		GuideSubSystemPtr->OnGuideThreadStoped(GuideActorPtr);
 	}
 
 	Super::TreeStop(Context);

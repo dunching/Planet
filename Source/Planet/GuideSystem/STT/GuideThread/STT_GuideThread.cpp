@@ -1240,6 +1240,30 @@ FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 	}
 }
 
+FTaskNodeDescript FSTT_GuideThread_ToBeContinued::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+) const
+{
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.Description = TEXT("未完待续...");
+
+	return TaskNodeDescript;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_Completet::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+	InstanceData.GuideActorPtr->bIsComleted = true;
+	
+	return EStateTreeRunStatus::Succeeded;
+}
+
 void FSTT_GuideThreadReturnOpenWorld::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition

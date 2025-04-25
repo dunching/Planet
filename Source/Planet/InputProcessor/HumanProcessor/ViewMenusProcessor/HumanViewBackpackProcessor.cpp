@@ -31,42 +31,10 @@ namespace HumanProcessor
 	void FViewBackpackProcessor::EnterAction()
 	{
 		Super::EnterAction();
-
-		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-
-		// UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(true);
-		// UUIManagerSubSystem::GetInstance()->ViewBackpack(
-		// 	true
-		// 	);
-
-		// 没用到
-		// UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kMenuLayout);
-		// UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kAllocationSkill);
-
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			PlayerPCPtr->bShowMouseCursor = true;
-
-			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
-		}
 	}
 
 	void FViewBackpackProcessor::QuitAction()
 	{
-		// UUIManagerSubSystem::GetInstance()->DisplayBuildingLayout(false);
-		// UUIManagerSubSystem::GetInstance()->ViewBackpack(false);
-
-		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			PlayerPCPtr->bShowMouseCursor = false;
-
-			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
-		}
-
 		Super::QuitAction();
 	}
 

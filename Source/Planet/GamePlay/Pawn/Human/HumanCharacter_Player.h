@@ -12,9 +12,14 @@
 #include "HumanCharacter_Player.generated.h"
 
 // 是否开启、语句内容
-using FOnPlayerHaveNewSentence = TMulticastDelegate<void(bool, const FTaskNode_Conversation_SentenceInfo&)>;
+using FOnPlayerHaveNewSentence = TMulticastDelegate<void(
+	bool,
+	const FTaskNode_Conversation_SentenceInfo&
+)>;
 
-using FOnPlayerInteraction = TMulticastDelegate<void(ISceneActorInteractionInterface*)>;
+using FOnPlayerInteraction = TMulticastDelegate<void(
+	ISceneActorInteractionInterface*
+)>;
 
 class UPlayerComponent;
 class AHumanCharacter_AI;
@@ -33,9 +38,7 @@ class PLANET_API USceneCharacterPlayerInteractionComponent : public USceneActorI
 	GENERATED_BODY()
 
 public:
-
 	FOnPlayerInteraction OnPlayerInteraction;
-	
 };
 
 /**
@@ -47,26 +50,27 @@ class PLANET_API UCharacterPlayerStateProcessorComponent : public UStateProcesso
 	GENERATED_BODY()
 
 public:
-
 	using FOwnerType = AHumanCharacter_Player;
 
 	/**
 	 * 锁定敌人
 	 */
 	virtual void FocusTarget();
-	
-	void SetFocusCharactersAry(ACharacterBase*TargetCharacterPtr);
-	
+
+	void SetFocusCharactersAry(
+		ACharacterBase* TargetCharacterPtr
+	);
+
 	void ClearFocusCharactersAry();
 
 private:
-	
 	UFUNCTION(Server, Reliable)
-	void SetFocusCharactersAry_Server(ACharacterBase*TargetCharacterPtr);
-	
+	void SetFocusCharactersAry_Server(
+		ACharacterBase* TargetCharacterPtr
+	);
+
 	UFUNCTION(Server, Reliable)
 	void ClearFocusCharactersAry_Server();
-
 };
 
 /* 角色的会话组件
@@ -79,18 +83,20 @@ class PLANET_API UPlayerConversationComponent : public UConversationComponent
 
 public:
 	virtual void DisplaySentence_Player(
-		const FTaskNode_Conversation_SentenceInfo&Sentence,
-		const std::function<void()>&SentenceStop
+		const FTaskNode_Conversation_SentenceInfo& Sentence,
+		const std::function<void()>& SentenceStop
 	) override;
 
-	virtual void CloseConversationborder_Player()override;
+	virtual void CloseConversationborder_Player() override;
 
 	FOnPlayerHaveNewSentence OnPlayerHaveNewSentence;
 
-	std::function<void()>SentenceStop;
-	
+	/**
+	 * 但规矩播放完成
+	 */
+	std::function<void()> SentenceStop;
+
 protected:
-	
 };
 
 UCLASS()
@@ -99,7 +105,9 @@ class PLANET_API AHumanCharacter_Player : public AHumanCharacter
 	GENERATED_BODY()
 
 public:
-	AHumanCharacter_Player(const FObjectInitializer& ObjectInitializer);
+	AHumanCharacter_Player(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	UCameraComponent* GetCameraComp();;
 
@@ -107,25 +115,33 @@ public:
 
 	UPlayerConversationComponent* GetPlayerConversationComponent() const;
 
-	USceneCharacterPlayerInteractionComponent*GetSceneCharacterPlayerInteractionComponent()const;
-	
+	USceneCharacterPlayerInteractionComponent* GetSceneCharacterPlayerInteractionComponent() const;
+
 	UCharacterPlayerStateProcessorComponent* GetCharacterPlayerStateProcessorComponent() const;
 
 	void UpdateSightActor();
-	
+
 	virtual TPair<FVector, FVector> GetCharacterViewInfo();
 
 	/**
 	 * 与场景中的可交互对象开始交互
 	 * @param SceneObjPtr 
 	 */
-	virtual void InteractionSceneActor(ASceneActor* SceneObjPtr);
+	virtual void InteractionSceneActor(
+		ASceneActor* SceneObjPtr
+	);
 
-	virtual void InteractionSceneCharacter(AHumanCharacter_AI* CharacterPtr);
+	virtual void InteractionSceneCharacter(
+		AHumanCharacter_AI* CharacterPtr
+	);
 
-	virtual void StartLookAt(ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr);
+	virtual void StartLookAt(
+		ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
+	);
 
-	virtual void LookingAt(ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr);
+	virtual void LookingAt(
+		ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
+	);
 
 	virtual void EndLookAt();
 
@@ -134,27 +150,35 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void PossessedBy(AController* NewController) override;
+	virtual void PossessedBy(
+		AController* NewController
+	) override;
 
 	virtual void OnRep_Controller() override;
 
 	virtual void UnPossessed() override;
-	
+
 	virtual bool TeleportTo(
 		const FVector& DestLocation,
 		const FRotator& DestRotation,
-		bool bIsATest=false,
-		bool bNoCheck=false
-		)override;
-	
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+		bool bIsATest = false,
+		bool bNoCheck = false
+	) override;
+
+	virtual void SetupPlayerInputComponent(
+		UInputComponent* PlayerInputComponent
+	) override;
 
 	virtual void OnRep_GroupSharedInfoChanged() override;
 
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+	) override;
 
 	UFUNCTION(Server, Reliable)
-	virtual void InteractionSceneObj_Server(ASceneActor* SceneObjPtr);
+	virtual void InteractionSceneObj_Server(
+		ASceneActor* SceneObjPtr
+	);
 
 #if WITH_EDITORONLY_DATA
 
@@ -170,8 +194,7 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UPlayerComponent> PlayerComponentPtr = nullptr;
-	
+
 	UPROPERTY(Transient)
 	UInteractionList* InteractionListPtr = nullptr;
- 	
 };

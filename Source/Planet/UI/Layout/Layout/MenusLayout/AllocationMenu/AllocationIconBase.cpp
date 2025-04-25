@@ -1,4 +1,3 @@
-
 #include "AllocationIconBase.h"
 
 #include "Components/Image.h"
@@ -22,20 +21,25 @@ struct FAllocationIconBase : public TStructVariable<FAllocationIconBase>
 	const FName Icon = TEXT("Icon");
 };
 
-UAllocationIconBase::UAllocationIconBase(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UAllocationIconBase::UAllocationIconBase(
+	const FObjectInitializer& ObjectInitializer
+) :
+  Super(ObjectInitializer)
 {
-
 }
 
-void UAllocationIconBase::NativeOnListItemObjectSet(UObject* ListItemObject)
+void UAllocationIconBase::NativeOnListItemObjectSet(
+	UObject* ListItemObject
+)
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 
 	InvokeReset(Cast<ThisClass>(ListItemObject));
 }
 
-void UAllocationIconBase::InvokeReset(UUserWidget* InBasicProxyPtr)
+void UAllocationIconBase::InvokeReset(
+	UUserWidget* InBasicProxyPtr
+)
 {
 	if (InBasicProxyPtr)
 	{
@@ -48,7 +52,9 @@ void UAllocationIconBase::InvokeReset(UUserWidget* InBasicProxyPtr)
 	}
 }
 
-void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
+void UAllocationIconBase::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
+)
 {
 	if (InBasicProxyPtr == BasicProxyPtr)
 	{
@@ -77,12 +83,16 @@ void UAllocationIconBase::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBas
 	SetItemType();
 }
 
-void UAllocationIconBase::EnableIcon(bool bIsEnable)
+void UAllocationIconBase::EnableIcon(
+	bool bIsEnable
+)
 {
-
 }
 
-void UAllocationIconBase::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
+void UAllocationIconBase::OnDragIcon(
+	bool bIsDragging,
+	const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+)
 {
 	if (bIsDragging)
 	{
@@ -101,7 +111,9 @@ void UAllocationIconBase::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocat
 	}
 }
 
-void UAllocationIconBase::SublingIconProxyChanged(const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
+void UAllocationIconBase::SublingIconProxyChanged(
+	const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+)
 {
 	if (BasicProxyPtr && (BasicProxyPtr == ProxyPtr))
 	{
@@ -119,10 +131,15 @@ void UAllocationIconBase::SetItemType()
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(BasicProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-				{
-					ImagePtr->SetBrushFromTexture(BasicProxyPtr->GetIcon().Get());
-				}));
+			AsyncLoadTextureHandleAry.Add(
+				StreamableManager.RequestAsyncLoad(
+					BasicProxyPtr->GetIcon().ToSoftObjectPath(),
+					[this, ImagePtr]()
+					{
+						ImagePtr->SetBrushFromTexture(BasicProxyPtr->GetIcon().Get());
+					}
+				)
+			);
 		}
 		else
 		{
@@ -131,7 +148,10 @@ void UAllocationIconBase::SetItemType()
 	}
 }
 
-FReply UAllocationIconBase::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply UAllocationIconBase::NativeOnMouseButtonDown(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent
+)
 {
 	if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
 	{
@@ -145,7 +165,11 @@ FReply UAllocationIconBase::NativeOnMouseButtonDown(const FGeometry& InGeometry,
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
-bool UAllocationIconBase::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+bool UAllocationIconBase::NativeOnDrop(
+	const FGeometry& InGeometry,
+	const FDragDropEvent& InDragDropEvent,
+	UDragDropOperation* InOperation
+)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
@@ -163,7 +187,11 @@ bool UAllocationIconBase::NativeOnDrop(const FGeometry& InGeometry, const FDragD
 	return true;
 }
 
-void UAllocationIconBase::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+void UAllocationIconBase::NativeOnDragDetected(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent,
+	UDragDropOperation*& OutOperation
+)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 

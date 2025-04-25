@@ -44,6 +44,16 @@ void URaffleMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
+	auto UIPtr = Cast<UButton>(GetWidgetFromName(FRaffleMenu::Get().ConfirmBtn));
+	if (UIPtr)
+	{
+		UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnClickedConfirmGetProxyBtn);
+	}
+
+	OnGetProxyDelegateHandle = URaffleSubSystem::GetInstance()->OnGetProxyAry.AddCallback(
+		std::bind(&ThisClass::ResetGetProxyAry, this, std::placeholders::_1)
+	);
+	
 	ResetUIByData();
 }
 
@@ -58,16 +68,6 @@ void URaffleMenu::ResetUIByData()
 	InitialRaffleBtn();
 
 	SwitchDisplay(true);
-
-	auto UIPtr = Cast<UButton>(GetWidgetFromName(FRaffleMenu::Get().ConfirmBtn));
-	if (UIPtr)
-	{
-		UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnClickedConfirmGetProxyBtn);
-	}
-
-	OnGetProxyDelegateHandle = URaffleSubSystem::GetInstance()->OnGetProxyAry.AddCallback(
-		std::bind(&ThisClass::ResetGetProxyAry, this, std::placeholders::_1)
-	);
 }
 
 void URaffleMenu::SyncData()

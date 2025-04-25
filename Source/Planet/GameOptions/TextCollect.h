@@ -29,4 +29,8 @@ namespace TextCollect
 	TEXTCOLLECT(ViewAllocationMenu);
 	
 	TEXTCOLLECT(ViewGroupmateMenu);
+	
+	TEXTCOLLECT(MainThread);
+	
+	TEXTCOLLECT(BrandThread);
 }

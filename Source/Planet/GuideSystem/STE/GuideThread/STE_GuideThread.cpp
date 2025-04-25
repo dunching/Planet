@@ -24,7 +24,7 @@ void USTE_GuideThread::TreeStop(FStateTreeExecutionContext& Context)
 	if (GuideThreadActorPtr)
 	{
 		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideThreadActorPtr);
+		GuideSubSystemPtr->OnGuideThreadStoped(GuideThreadActorPtr);
 	}
 
 	Super::TreeStop(Context);
@@ -55,8 +55,6 @@ void USTE_GuideThread_Main::TreeStop(FStateTreeExecutionContext& Context)
 
 	if (GuideThreadMainActorPtr)
 	{
-		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideThreadMainActorPtr);
 	}
 
 	Super::TreeStop(Context);
@@ -85,8 +83,6 @@ void USTE_GuideThread_Brand::TreeStop(FStateTreeExecutionContext& Context)
 
 	if (GuideThreadBranchActorPtr)
 	{
-		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideThreadBranchActorPtr);
 	}
 
 	Super::TreeStop(Context);
@@ -105,8 +101,6 @@ void USTE_GuideThread_Area::TreeStop(FStateTreeExecutionContext& Context)
 {
 	if (GuideThreadAreaActorPtr)
 	{
-		auto GuideSubSystemPtr = UGuideSubSystem::GetInstance();
-		GuideSubSystemPtr->GuideThreadEnded(GuideThreadAreaActorPtr);
 	}
 
 	Super::TreeStop(Context);

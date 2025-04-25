@@ -30,7 +30,7 @@ public:
 
 	UConversationComponent(const FObjectInitializer& ObjectInitializer);
 
-#pragma region NPC Saying
+#pragma region NPC弹出的对话
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void DisplaySentence(
 		const FTaskNode_Conversation_SentenceInfo&Sentence
@@ -40,7 +40,7 @@ public:
 	void CloseConversationborder();
 #pragma endregion 
 
-#pragma region Conversation
+#pragma region 玩家弹出的对话
 	virtual void DisplaySentence_Player(
 		const FTaskNode_Conversation_SentenceInfo&Sentence,
 		const std::function<void()>&SentenceStop
