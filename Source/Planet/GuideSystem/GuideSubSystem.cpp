@@ -171,6 +171,21 @@ TArray<TSubclassOf<AGuideThread_Branch>> UGuideSubSystem::GetGuideThreadAry() co
 	return GuideThreadBranchAry;
 }
 
+TObjectPtr<AGuideThread> UGuideSubSystem::IsActivedGuideThread(
+	const TSubclassOf<AGuideThread_Immediate>& GuideClass
+) const
+{
+	for (auto Iter : ActivedGuideThreadsAry)
+	{
+		if (Iter->IsA(GuideClass))
+		{
+			return Iter;
+		}
+	}
+	
+	return nullptr;
+}
+
 FOnStartGuide& UGuideSubSystem::GetOnStartGuide()
 {
 	return OnStartGuide;

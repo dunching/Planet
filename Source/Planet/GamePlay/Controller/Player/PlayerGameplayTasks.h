@@ -32,6 +32,12 @@ public:
 
 	/**
 	 * Client
+	 * 回到进入离开世界前的位置最近的传送点
+	 */
+	void TeleportPlayerToOpenWorld();
+
+	/**
+	 * Client
 	 */
 	void TeleportPlayerToNearest();
 
@@ -43,6 +49,18 @@ public:
 	);
 
 private:
+	UFUNCTION(Server, Reliable)
+	void TeleportPlayerToOpenWorld_Server();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void TeleportPlayerToOpenWorld_ActiveTask(
+		ETeleport Teleport
+	);
+
+	void TeleportPlayerToOpenWorldEnd(
+		bool bIsSuccess
+	);
+
 	UFUNCTION(Server, Reliable)
 	void TeleportPlayerToNearest_Server();
 

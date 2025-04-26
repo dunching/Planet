@@ -13,8 +13,10 @@
 class AMainHUD;
 FName USceneActorInteractionComponent::ComponentName = TEXT("SceneActorInteractionComponent");
 
-USceneActorInteractionComponent::USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+USceneActorInteractionComponent::USceneActorInteractionComponent(
+	const FObjectInitializer& ObjectInitializer
+):
+ Super(ObjectInitializer)
 {
 	// 因为有切换任务 所以这里我们不要他自动调用，
 	// bStartLogicAutomatically = false;
@@ -35,7 +37,14 @@ TArray<TSubclassOf<AGuideInteraction_Actor>> USceneActorInteractionComponent::Ge
 	return Results;
 }
 
-void USceneActorInteractionComponent::StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item)
+TArray<FGuideInterationSetting> USceneActorInteractionComponent::GetGuideInteractionAry() const
+{
+	return GuideInteractionAry;
+}
+
+void USceneActorInteractionComponent::StartInteractionItem(
+	const TSubclassOf<AGuideInteraction_Actor>& Item
+)
 {
 }
 
@@ -59,6 +68,21 @@ void USceneActorInteractionComponent::ChangedInterationState(
 		if (Iter.GuideInteraction == Item)
 		{
 			Iter.bIsEnable = bIsEnable;
+			break;
+		}
+	}
+}
+
+void USceneActorInteractionComponent::ChangedInterationTaskState(
+	TSubclassOf<AGuideInteraction_Actor> Item,
+	bool bIsEnable
+)
+{
+	for (auto& Iter : GuideInteractionAry)
+	{
+		if ((Iter.GuideInteraction == Item) && Iter.bIsTask)
+		{
+			Iter.bTaskHasCompleted = bIsEnable;
 			break;
 		}
 	}

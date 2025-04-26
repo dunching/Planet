@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 
 #include "Components/ActorComponent.h"
-#include "Components/StateTreeComponent.h"
 
 #include "SceneActorInteractionComponent.generated.h"
 
@@ -29,6 +28,19 @@ struct PLANET_API FGuideInterationSetting
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsEnable = true;
 
+	/**
+	 * 是否是可接取的任务
+	 * 通常表现为NPC头上的【！】
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bIsTask = false;
+
+	/**
+	 * 可接取的任务是否已完成
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bTaskHasCompleted = false;
+
 };
 
 /**
@@ -46,11 +58,15 @@ public:
 
 	TArray<TSubclassOf<AGuideInteraction_Actor>> GetInteractionLists() const;
 
+	TArray<FGuideInterationSetting> GetGuideInteractionAry() const;
+
 	virtual void StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item);
 	
 	void StopInteractionItem();
 
 	void ChangedInterationState(const TSubclassOf<AGuideInteraction_Actor>& Item, bool bIsEnable);
+
+	void ChangedInterationTaskState(TSubclassOf<AGuideInteraction_Actor> Item, bool bIsEnable);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Range = 200;

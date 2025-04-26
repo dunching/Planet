@@ -79,7 +79,9 @@ public:
 
 protected:
 
-	virtual void CustomizerFunc(AActor*TargetActorPtr) override;
+	virtual void SpawnGeneratorActor() override;
+
+	virtual void CustomizerGroupManagger(AGroupManagger_NPC*TargetActorPtr)override;
 	
 };
 

@@ -164,11 +164,6 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
 
-	void OnCharacterGroupMateChanged(
-		EGroupMateChangeType GroupMateChangeType,
-		const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
-	);
-
 	UPROPERTY(Category=Character, EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> CopyPoseMeshPtr = nullptr;
 
@@ -199,8 +194,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
 	TObjectPtr<USceneActorInteractionComponent> SceneActorInteractionComponentPtr = nullptr;
 	
-	FTeamMembersChangedDelegateHandle TeamMembersChangedDelegateHandle;
-
 private:
 	void OnHPChanged(const FOnAttributeChangeData& CurrentValue);
 

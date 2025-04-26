@@ -216,7 +216,7 @@ void ACharacterBase::PossessedBy(
 
 	if (NewController->IsA(APlanetPlayerController::StaticClass()))
 	{
-		GroupManaggerPtr = Cast<APlanetPlayerController>(NewController)->GetGroupSharedInfo();
+		GroupManaggerPtr = Cast<APlanetPlayerController>(NewController)->GetGroupManagger();
 		OnGroupManaggerReady(GroupManaggerPtr);
 	}
 	else if (NewController->IsA(AHumanAIController::StaticClass()))
@@ -482,23 +482,6 @@ void ACharacterBase::OnMoveSpeedChangedImp(
 {
 	GetCharacterMovement()->MaxWalkSpeed = Value;
 	GetCharacterMovement()->MaxFlySpeed = Value;
-}
-
-void ACharacterBase::OnCharacterGroupMateChanged(
-	EGroupMateChangeType GroupMateChangeType,
-	const TSharedPtr<FCharacterProxyType>& TargetCharacterProxyPtr
-)
-{
-	switch (GroupMateChangeType)
-	{
-	case EGroupMateChangeType::kAdd:
-		{
-		}
-		break;
-	default:
-		{
-		};
-	}
 }
 
 void ACharacterBase::OnHPChanged(

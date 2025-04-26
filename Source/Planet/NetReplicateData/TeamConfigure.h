@@ -14,10 +14,10 @@ struct PLANET_API FTeammate final
 {
 	GENERATED_USTRUCT_BODY()
 
-	// 小组内索引
+	// 小组索引
 	uint8 TeamIndex = 0;
 	
-	// 小组内索引
+	// 角色在小组内的索引
 	uint8 IndexInTheTeam = 0;
 	
 	FGuid CharacterProxyID;

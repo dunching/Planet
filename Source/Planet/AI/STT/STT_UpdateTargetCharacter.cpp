@@ -22,7 +22,7 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	if (InstanceData.bIsCcontinuous)
+	if (InstanceData.bRunForever)
 	{
 	}
 	else
@@ -70,7 +70,7 @@ EStateTreeRunStatus FSTT_UpdateTargetCharacter::PerformGameplayTask(
 		InstanceData.GloabVariable_Character->TargetCharacterPtr = nullptr;
 	}
 
-	if (InstanceData.bIsCcontinuous)
+	if (InstanceData.bRunForever)
 	{
 		if (InstanceData.bCheckHave)
 		{
@@ -94,43 +94,12 @@ void FSTT_UpdateTargetCharacter::UpdateTargetCharacter(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	auto CharacterPtr = InstanceData.CharacterPtr;
-	if (CharacterPtr)
+	if (InstanceData.GloabVariable_Character->UpdateTargetCharacterFunc)
 	{
-		auto KnowCharaterAry = CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
-		                                     GetValidCharater();
-
-		const auto Location = CharacterPtr->GetActorLocation();
-		TWeakObjectPtr<ACharacterBase> TargetPtr = nullptr;
-		int32 Distance = 0;
-		for (const auto Iter : KnowCharaterAry)
-		{
-			if (Iter.IsValid())
-			{
-				auto NewDistance = FVector::Dist2D(Location, Iter->GetActorLocation());
-				if (TargetPtr.IsValid())
-				{
-					if (NewDistance < Distance)
-					{
-						TargetPtr = Iter;
-						Distance = NewDistance;
-					}
-				}
-				else
-				{
-					TargetPtr = Iter;
-					Distance = NewDistance;
-				}
-			}
-		}
-
-		if (TargetPtr.IsValid())
-		{
-			CharacterPtr->GetCharacterNPCStateProcessorComponent()->TargetCharacter = TargetPtr.Get();
-		}
-		else
-		{
-			CharacterPtr->GetCharacterNPCStateProcessorComponent()->TargetCharacter = nullptr;
-		}
+		auto CharacterPtr = InstanceData.CharacterPtr;
+		CharacterPtr->GetCharacterNPCStateProcessorComponent()->SetTargetCharactersAry(
+			InstanceData.GloabVariable_Character->
+			             UpdateTargetCharacterFunc()
+		);
 	}
 }

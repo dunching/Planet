@@ -98,6 +98,8 @@ public:
 	 * @return 所有拥有的支线任务
 	 */
 	TArray<TSubclassOf<AGuideThread_Branch>> GetGuideThreadAry()const;
+
+	TObjectPtr<AGuideThread> IsActivedGuideThread(const TSubclassOf<AGuideThread_Immediate>& GuideClass)const;
 	
 	FOnStartGuide& GetOnStartGuide();
 

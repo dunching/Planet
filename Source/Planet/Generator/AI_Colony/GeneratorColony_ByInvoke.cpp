@@ -9,6 +9,7 @@
 #include "HumanCharacter.h"
 #include "HumanAIController.h"
 #include "AIComponent.h"
+#include "GroupManagger_NPC.h"
 #include "HumanCharacter_AI.h"
 
 UFormationComponent::UFormationComponent(const FObjectInitializer& ObjectInitializer):
@@ -88,18 +89,18 @@ void AGeneratorColonyWithPath::Tick(float DeltaSeconds)
 #endif
 }
 
-void AGeneratorNPCs_Patrol::CustomizerFunc(
-	AActor* TargetActorPtr
+void AGeneratorNPCs_Patrol::SpawnGeneratorActor()
+{
+	Super::SpawnGeneratorActor();
+}
+
+void AGeneratorNPCs_Patrol::CustomizerGroupManagger(
+	AGroupManagger_NPC* TargetActorPtr
 )
 {
-	Super::CustomizerFunc(TargetActorPtr);
-
-	auto HumanCharacterPtr = Cast<AHumanCharacter_AI>(TargetActorPtr);
-	if (HumanCharacterPtr)
-	{
-		HumanCharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr = this;
-	}
-
+	Super::CustomizerGroupManagger(TargetActorPtr);
+	
+	TargetActorPtr->GeneratorNPCs_PatrolPtr = this;
 }
 
 AGeneratorColony_ByInvoke::AGeneratorColony_ByInvoke(
@@ -139,7 +140,12 @@ void AGeneratorNPCs_Patrol::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnGeneratorActor();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		SpawnGeneratorActor();
+	}
+#endif
 }
 
 bool AGeneratorNPCs_Patrol::CheckIsFarawayOriginal(ACharacterBase* TargetCharacterPtr) const

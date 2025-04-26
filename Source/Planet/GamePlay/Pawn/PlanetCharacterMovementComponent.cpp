@@ -46,7 +46,7 @@ void UPlanetCharacterMovementComponent::PhysicsRotation(
 	{
 		DesiredRotation = ComputeRootMotionToMovementRotation(CurrentRotation, DeltaTime, DeltaRot);
 	}
-	else if (FocusCharactersAry.IsValidIndex(0) && FocusCharactersAry[0])
+	else if (FocusCharactersAry.IsValidIndex(0) && FocusCharactersAry[0].IsValid())
 	{
 		const auto CurrentLocation = UpdatedComponent->GetComponentLocation(); // Normalized
 		const auto Z = -UKismetGravityLibrary::GetGravity();

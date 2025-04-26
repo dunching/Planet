@@ -4,6 +4,7 @@
 #include "BuildingBase.h"
 #include "BuildingArea.h"
 #include "GeneratorBase.h"
+#include "GroupManagger_NPC.h"
 #include "HumanCharacter.h"
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"

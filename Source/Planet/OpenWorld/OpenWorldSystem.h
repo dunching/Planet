@@ -30,6 +30,13 @@ public:
 	virtual bool ShouldCreateSubsystem(UObject* Outer) const override;
 
 	/**
+	 * 获取距离离开开放世界时最近的传送点
+	 * @param ChallengeLevelType 
+	 * @param PCPtr 
+	 */
+	ETeleport GetTeleportLastPtInOpenWorld(APlanetPlayerController* PCPtr);
+
+	/**
 	 * 获取最近的传送点
 	 * @param ChallengeLevelType 
 	 * @param PCPtr 

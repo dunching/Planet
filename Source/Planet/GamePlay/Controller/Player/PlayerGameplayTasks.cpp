@@ -28,6 +28,66 @@ void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel(
 	EntryChallengeLevel_Server(Teleport);
 }
 
+void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorldEnd(
+	bool bIsSuccess
+)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		auto OwnerPtr = GetOwner<FOwnerType>();
+		auto CharacterPtr = OwnerPtr->GetPawn<AHumanCharacter_Player>();
+		if (CharacterPtr)
+		{
+			FGameplayTagContainer FGameplayTagContainer(UGameplayTagsLibrary::BaseFeature_Dying);
+			CharacterPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&FGameplayTagContainer);
+		}
+	}
+#endif
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+	}
+#endif
+}
+
+void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld_ActiveTask_Implementation(
+	ETeleport Teleport
+)
+{
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (!OwnerPtr)
+	{
+		return;
+	}
+
+	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_TeleportPlayer>(
+		TScriptInterface<IGameplayTaskOwnerInterface>(
+			this
+		)
+	);
+	GameplayTaskPtr->Teleport = Teleport;
+	GameplayTaskPtr->TargetPCPtr = OwnerPtr;
+	GameplayTaskPtr->OnEnd.AddUObject(this, &ThisClass::TeleportPlayerToOpenWorldEnd);
+
+	GameplayTaskPtr->ReadyForActivation();
+}
+
+void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld_Server_Implementation()
+{
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (!OwnerPtr)
+	{
+		return;
+	}
+
+	auto Teleport = UOpenWorldSubSystem::GetInstance()->GetTeleportLastPtInOpenWorld(OwnerPtr);
+
+	TeleportPlayerToOpenWorld_ActiveTask(Teleport);
+}
+
 void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest_Server_Implementation()
 {
 	auto OwnerPtr = GetOwner<FOwnerType>();
@@ -148,6 +208,13 @@ UPlayerControllerGameplayTasksComponent::UPlayerControllerGameplayTasksComponent
   Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
+}
+
+void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld()
+{
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
+
+	TeleportPlayerToOpenWorld_Server();
 }
 
 UGameplayTask_TeleportPlayer::UGameplayTask_TeleportPlayer(

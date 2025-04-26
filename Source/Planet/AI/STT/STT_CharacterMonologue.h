@@ -10,7 +10,7 @@
 #include <EnvironmentQuery/EnvQueryTypes.h>
 
 #include "AITask_CharacterMonologue.h"
-#include "STT_Base.h"
+#include "STT_CharacterBase.h"
 
 #include "STT_CharacterMonologue.generated.h"
 

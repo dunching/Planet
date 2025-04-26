@@ -9,12 +9,16 @@
 #include "GuideInteractionGameplayTask.h"
 #include "GuideSubSystem.h"
 #include "GuideSystemGameplayTask.h"
+#include "HumanCharacter_AI.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
+#include "PlanetPlayerController.h"
 #include "STE_Interaction.h"
 
-EStateTreeRunStatus FSTT_GuideInteractionOption::EnterState(FStateTreeExecutionContext& Context,
-                                                            const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FSTT_GuideInteractionOption::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
 {
 	Super::EnterState(Context, Transition);
 
@@ -36,14 +40,18 @@ EStateTreeRunStatus FSTT_GuideInteractionOption::EnterState(FStateTreeExecutionC
 	}
 
 	InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
-		UGameplayStatics::GetPlayerCharacter(InstanceData.GuideActorPtr, 0));
+		UGameplayStatics::GetPlayerCharacter(InstanceData.GuideActorPtr, 0)
+	);
 
 	// TODO -》spawn TaskNodeRef
 
 	return PerformGameplayTask(Context);
 }
 
-EStateTreeRunStatus FSTT_GuideInteractionOption::Tick(FStateTreeExecutionContext& Context, const float DeltaTime) const
+EStateTreeRunStatus FSTT_GuideInteractionOption::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	// Super::Tick(Context, DeltaTime);
 
@@ -64,16 +72,21 @@ EStateTreeRunStatus FSTT_GuideInteractionOption::Tick(FStateTreeExecutionContext
 	return Super::Tick(Context, DeltaTime);
 }
 
-EStateTreeRunStatus FSTT_GuideInteractionOption::PerformGameplayTask(FStateTreeExecutionContext& Context) const
+EStateTreeRunStatus FSTT_GuideInteractionOption::PerformGameplayTask(
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
 	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Interaction_Option>(
-		*InstanceData.TaskOwner);
+		*InstanceData.TaskOwner
+	);
 
 	if (GameplayTaskPtr)
 	{
-		auto BaseSetUp = [InstanceData](auto GameplayTaskPtr)
+		auto BaseSetUp = [InstanceData](
+			auto GameplayTaskPtr
+		)
 		{
 			GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
 		};
@@ -89,8 +102,10 @@ EStateTreeRunStatus FSTT_GuideInteractionOption::PerformGameplayTask(FStateTreeE
 	return EStateTreeRunStatus::Running;
 }
 
-EStateTreeRunStatus FSTT_GuideInteractionConversation::EnterState(FStateTreeExecutionContext& Context,
-                                                                  const FStateTreeTransitionResult& Transition) const
+EStateTreeRunStatus FSTT_GuideInteractionConversation::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
 {
 	Super::EnterState(Context, Transition);
 
@@ -112,15 +127,18 @@ EStateTreeRunStatus FSTT_GuideInteractionConversation::EnterState(FStateTreeExec
 	}
 
 	InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
-		UGameplayStatics::GetPlayerCharacter(InstanceData.GuideActorPtr, 0));
+		UGameplayStatics::GetPlayerCharacter(InstanceData.GuideActorPtr, 0)
+	);
 
 	// TODO -》spawn TaskNodeRef
 
 	return PerformGameplayTask(Context);
 }
 
-EStateTreeRunStatus FSTT_GuideInteractionConversation::Tick(FStateTreeExecutionContext& Context,
-                                                            const float DeltaTime) const
+EStateTreeRunStatus FSTT_GuideInteractionConversation::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+) const
 {
 	// Super::Tick(Context, DeltaTime);
 
@@ -144,16 +162,20 @@ EStateTreeRunStatus FSTT_GuideInteractionConversation::Tick(FStateTreeExecutionC
 }
 
 EStateTreeRunStatus FSTT_GuideInteractionConversation::PerformGameplayTask(
-	FStateTreeExecutionContext& Context) const
+	FStateTreeExecutionContext& Context
+) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
 	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Interaction_Conversation>(
-		*InstanceData.TaskOwner);
+		*InstanceData.TaskOwner
+	);
 
 	if (GameplayTaskPtr)
 	{
-		auto BaseSetUp = [InstanceData](auto GameplayTaskPtr)
+		auto BaseSetUp = [InstanceData](
+			auto GameplayTaskPtr
+		)
 		{
 			GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
 			GameplayTaskPtr->SetTargetCharacterPtr(InstanceData.TargetCharacterPtr);
@@ -169,4 +191,89 @@ EStateTreeRunStatus FSTT_GuideInteractionConversation::PerformGameplayTask(
 	}
 
 	return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTT_GuideInteraction_ChangeNPCsTaskState::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	Super::EnterState(
+		Context,
+		Transition
+	);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	if (auto PAD = InstanceData.PAD.LoadSynchronous())
+	{
+		auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
+		if (TargetCharacterPtr)
+		{
+			auto PCPtr = Cast<APlanetPlayerController>(
+				UGameplayStatics::GetPlayerController(
+					GetWorldImp(),
+					0
+				)
+			);
+			if (PCPtr)
+			{
+				PCPtr->ChangedInterationTaskState(
+					TargetCharacterPtr,
+					InstanceData.GuideInteractionActorClass,
+					InstanceData.bEnable
+				);
+			}
+
+			if (InstanceData.bRunForever)
+			{
+				return EStateTreeRunStatus::Running;
+			}
+			return EStateTreeRunStatus::Succeeded;
+		}
+	}
+
+	return EStateTreeRunStatus::Failed;
+}
+
+void FSTT_GuideInteraction_ChangeNPCsTaskState::ExitState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+		*this
+	);
+
+	if (InstanceData.bRunForever)
+	{
+		if (auto PAD = InstanceData.PAD.LoadSynchronous())
+		{
+			auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
+			if (TargetCharacterPtr)
+			{
+				auto PCPtr = Cast<APlanetPlayerController>(
+					UGameplayStatics::GetPlayerController(
+						GetWorldImp(),
+						0
+					)
+				);
+				if (PCPtr)
+				{
+					PCPtr->ChangedInterationTaskState(
+						TargetCharacterPtr,
+						InstanceData.GuideInteractionActorClass,
+						!InstanceData.bEnable
+					);
+				}
+			}
+		}
+	}
+
+	Super::ExitState(
+		Context,
+		Transition
+	);
 }

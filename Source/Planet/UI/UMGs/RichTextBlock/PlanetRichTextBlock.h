@@ -87,6 +87,6 @@ public:
 protected:
 };
 
-const FString Rich_Emphasis = TEXT("RichText.Emphasis");
+const FString RichText_Emphasis = TEXT("RichText.Emphasis");
 
-const FString Rich_Key = TEXT("RichText.Key");
+const FString RichText_Key = TEXT("RichText.Key");

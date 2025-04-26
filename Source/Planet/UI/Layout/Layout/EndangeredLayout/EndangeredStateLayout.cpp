@@ -44,15 +44,29 @@ ELayoutCommon UEndangeredStateLayout::GetLayoutType() const
 
 void UEndangeredStateLayout::OnClicked()
 {
-	UGuideSubSystem::GetInstance()->StopParallelGuideThread(
-		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
-		);
-	
-	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
-	if (!PCPtr)
+	// 确认是否在挑战模式
+	if (auto GuideThreadPtr = UGuideSubSystem::GetInstance()->IsActivedGuideThread(AGuideThread_Challenge::StaticClass()))
 	{
-		return;
-	}
+		auto GuideThread_ChallengePtr = Cast<AGuideThread_Challenge>(GuideThreadPtr );
+		if (GuideThread_ChallengePtr )
+		{
+			auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+			if (!PCPtr)
+			{
+				return;
+			}
 	
-	PCPtr->GetGameplayTasksComponent()->TeleportPlayerToNearest();
+			PCPtr->GetGameplayTasksComponent()->EntryChallengeLevel(GuideThread_ChallengePtr->Teleport);
+		}
+	}
+	else
+	{
+		auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+		if (!PCPtr)
+		{
+			return;
+		}
+	
+		PCPtr->GetGameplayTasksComponent()->TeleportPlayerToNearest();
+	}
 }

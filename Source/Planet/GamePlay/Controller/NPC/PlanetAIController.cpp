@@ -60,7 +60,7 @@ void APlanetAIController::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, GroupManaggerPtr, COND_None);
 }
 
-AGroupManagger* APlanetAIController::GetGroupSharedInfo() const
+AGroupManagger* APlanetAIController::GetGroupManagger() const
 {
 	return GroupManaggerPtr;
 }
@@ -120,9 +120,9 @@ void APlanetAIController::EndPlay(
 
 TWeakObjectPtr<ACharacterBase> APlanetAIController::GetTeamFocusTarget() const
 {
-	if (GetGroupSharedInfo() && GetGroupSharedInfo()->GetTeamMatesHelperComponent())
+	if (GetGroupManagger() && GetGroupManagger()->GetTeamMatesHelperComponent())
 	{
-		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetForceKnowCharater();
+		return GetGroupManagger()->GetTeamMatesHelperComponent()->GetForceKnowCharater();
 	}
 
 	return nullptr;
@@ -190,11 +190,11 @@ void APlanetAIController::OnTargetPerceptionUpdated(
 		{
 			if (Stimulus.WasSuccessfullySensed())
 			{
-				GetGroupSharedInfo()->GetTeamMatesHelperComponent()->AddKnowCharacter(CharacterPtr);
+				GetGroupManagger()->GetTeamMatesHelperComponent()->AddKnowCharacter(CharacterPtr);
 			}
 			else
 			{
-				GetGroupSharedInfo()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
+				GetGroupManagger()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
 			}
 		}
 	}

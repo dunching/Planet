@@ -8,6 +8,7 @@
 #include "GeneratorBase.generated.h"
 
 class AGroupManagger;
+class AGroupManagger_NPC;
 class UPlanetChildActorComponent;
 
 /**
@@ -33,8 +34,6 @@ public:
 	UPROPERTY(Replicated)
 	FGuid GeneratorGuid;
 	
-	TObjectPtr<AGroupManagger>GroupManaggerPtr = nullptr;
-	
 protected:
 
 	/**
@@ -44,6 +43,13 @@ protected:
 
 	virtual void CustomizerFunc(AActor*TargetActorPtr);
 	
+	virtual void CustomizerGroupManagger(AGroupManagger_NPC*TargetActorPtr);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
+
+private:
+	
+	TObjectPtr<AGroupManagger_NPC>GroupManaggerPtr = nullptr;
+	
 };

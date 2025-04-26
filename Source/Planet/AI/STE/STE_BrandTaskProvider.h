@@ -38,13 +38,15 @@ protected:
 
 	virtual void TreeStart(FStateTreeExecutionContext& Context)override;
 
+	virtual void Tick(FStateTreeExecutionContext& Context, const float DeltaTime)override;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
 	int32 MaxDistance = 200;
 
 private:
 
-	void CheckKnowCharacterImp();
+	virtual UGloabVariable_Character* CreateGloabVarianble() override;;
 
-	FTimerHandle CheckKnowCharacterTimerHandle;
+	TWeakObjectPtr<ACharacterBase> UpdateTargetCharacter();
 
 };

@@ -13,6 +13,7 @@
 
 struct FOnAttributeChangeData;
 
+class AGuideThread;
 class UMainUILayout;
 class URaffleMenu;
 class UPawnStateActionHUD;
@@ -55,6 +56,44 @@ public:
 	virtual void DisEnable() override;
 
 	virtual ELayoutCommon GetLayoutType() const override final;
+
+private:
+	
+	void OnStartGuide(AGuideThread*GuideThread);
+	
+	void OnStopGuide(AGuideThread*GuideThread);
+	
+	UFUNCTION()
+	void OnQuitChallengeBtnClicked();
+	
+	// 锁定目标时,上方显示的状态栏
+	void OnFocusCharacter(
+		ACharacterBase* TargetCharacterPtr
+	);
+
+	// 出战队员列表
+	void DisplayTeamInfo(
+		bool bIsDisplay,
+		AHumanCharacter* HumanCharacterPtr = nullptr
+	);
+
+	// 效果栏（buff、debuff）
+	UEffectsList* InitialEffectsList();
+
+	// 进度条/工具
+	UProgressTips* ViewProgressTips(
+		bool bIsViewMenus
+	);
+
+	void OnHPChanged(
+		const FOnAttributeChangeData&
+	);
+
+	void OnFocusDestruct(
+		UUserWidget* UIPtr
+	);
+
+protected:
 
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
@@ -99,34 +138,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName HUD_TeamSocket;
-
-protected:
-	// 锁定目标时,上方显示的状态栏
-	void OnFocusCharacter(
-		ACharacterBase* TargetCharacterPtr
-	);
-
-	// 出战队员列表
-	void DisplayTeamInfo(
-		bool bIsDisplay,
-		AHumanCharacter* HumanCharacterPtr = nullptr
-	);
-
-	// 效果栏（buff、debuff）
-	UEffectsList* InitialEffectsList();
-
-	// 进度条/工具
-	UProgressTips* ViewProgressTips(
-		bool bIsViewMenus
-	);
-
-	void OnHPChanged(
-		const FOnAttributeChangeData&
-	);
-
-	void OnFocusDestruct(
-		UUserWidget* UIPtr
-	);
 
 	UPROPERTY(Transient)
 	UFocusIcon* FocusIconPtr = nullptr;

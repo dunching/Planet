@@ -42,7 +42,7 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	virtual AGroupManagger* GetGroupSharedInfo() const override;
+	virtual AGroupManagger* GetGroupManagger() const override;
 
 	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) override;
 

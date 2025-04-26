@@ -97,10 +97,5 @@ void AHumanCharacter::PossessedBy(AController* NewController)
 
 void AHumanCharacter::UnPossessed()
 {
-	if (TeamMembersChangedDelegateHandle)
-	{
-		TeamMembersChangedDelegateHandle->UnBindCallback();
-	}
-
 	Super::UnPossessed();
 }

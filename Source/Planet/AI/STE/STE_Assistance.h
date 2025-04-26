@@ -49,17 +49,20 @@ protected:
 
 	virtual void TreeStart(FStateTreeExecutionContext& Context)override;
 
-	virtual void TreeStop(FStateTreeExecutionContext& Context)override;
-
 	virtual void Tick(FStateTreeExecutionContext& Context, const float DeltaTime)override;
+
+	virtual void TreeStop(FStateTreeExecutionContext& Context)override;
 
 	void OnTeamOptionChanged(ETeammateOption TeammateOption);
 
 	void OnTeamChanged();
 
-public:
+private:
+	virtual UGloabVariable_Character* CreateGloabVarianble() override;;
 
-	void CheckKnowCharacterImp();
+	TWeakObjectPtr<ACharacterBase> UpdateTargetCharacter();
+
+public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
 	int32 MaxDistanceToPatrolSpline = 1000;
@@ -98,7 +101,5 @@ public:
 	FTeamOptionChangedHandle TeammateOptionChangedDelegate;
 
 	FTeammateChangedHandle TeammateChangedDelegate;
-
-	FTimerHandle CheckKnowCharacterTimerHandle;
 
 };

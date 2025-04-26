@@ -59,35 +59,16 @@ void UEQC_GetTarget::ProvideContext(
 
 	if (CharacterPtr)
 	{
-		auto KnowCharaterAry = CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
-		                                     GetValidCharater();
-
-		const auto Location = CharacterPtr->GetActorLocation();
-		TWeakObjectPtr<ACharacterBase> TargetPtr = nullptr;
-		int32 Distance = 0;
-		for (const auto Iter : KnowCharaterAry)
+		auto TargetCharactersAry = CharacterPtr->GetStateProcessorComponent()->GetTargetCharactersAry();
+		if (TargetCharactersAry.IsEmpty())
+		{}
+		else
 		{
-			if (Iter.IsValid())
+			TWeakObjectPtr<ACharacterBase> TargetPtr = TargetCharactersAry[0];
+			if (TargetPtr.IsValid())
 			{
-				auto NewDistance = FVector::Dist2D(Location, Iter->GetActorLocation());
-				if (TargetPtr.IsValid())
-				{
-					if (NewDistance < Distance)
-					{
-						TargetPtr = Iter;
-						Distance = NewDistance;
-					}
-				}
-				else
-				{
-					TargetPtr = Iter;
-					Distance = NewDistance;
-				}
+				UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetPtr.Get());
 			}
-		}
-		if (TargetPtr.IsValid())
-		{
-			UEnvQueryItemType_Actor::SetContextHelper(ContextData, TargetPtr.Get());
 		}
 	}
 }

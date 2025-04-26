@@ -3,6 +3,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "CharacterAbilitySystemComponent.h"
+#include "GuideThreadChallenge.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
 #include "PlanetPlayerController.h"
@@ -43,6 +44,11 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::Tick(
 		UOpenWorldSubSystem::GetInstance()->CheckTeleportPlayerComplete(InstanceData.GloabVariable_Challenge->Teleport)
 	)
 	{
+		auto GuideThread_ChallengePtr = Cast<AGuideThread_Challenge>(InstanceData.GuideActorPtr);
+		if (GuideThread_ChallengePtr)
+		{
+			GuideThread_ChallengePtr->Teleport = InstanceData.GloabVariable_Challenge->Teleport;
+		}
 		return EStateTreeRunStatus::Succeeded;
 	}
 

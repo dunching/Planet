@@ -9,7 +9,7 @@
 #include "Tasks/StateTreeAITask.h"
 
 #include "GenerateType.h"
-#include "STT_Base.h"
+#include "STT_CharacterBase.h"
 
 #include "STT_UpdateTargetCharacter.generated.h"
 
@@ -32,7 +32,7 @@ struct PLANET_API FSTID_UpdateTargetCharacter : public FSTID_CharacterBase
 	UGloabVariable_Character* GloabVariable_Character = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Param)
-	bool bIsCcontinuous = false;
+	bool bRunForever = false;
 
 	UPROPERTY(EditAnywhere, Category = Param)
 	bool bCheckHave = true;

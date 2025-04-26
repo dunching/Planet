@@ -242,6 +242,8 @@ public:
 
 	static FGameplayTag Proxy_Character_Player;
 
+	static FGameplayTag Proxy_Character_NPC_Assistional;
+
 #pragma endregion
 
 	

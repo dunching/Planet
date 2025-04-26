@@ -6,6 +6,9 @@
 #include "SceneActor.h"
 #include "STT_GuideThread.h"
 #include "ChallengeEntry.h"
+#include "GameplayTagsLibrary.h"
+#include "GroupManagger.h"
+#include "TeamMatesHelperComponent.h"
 
 
 class AMainHUD;
@@ -110,10 +113,25 @@ void UGameplayTask_WaitPlayerEquipment::Activate()
 {
 	Super::Activate();
 
-	DelegateHandle = PlayerCharacterPtr->GetCharacterProxy()->OnCharacterSocketUpdated.AddUObject(
-		this,
-		&ThisClass::OnCharacterSocketUpdated
-	);
+	if (bIsEquipentCharacter)
+	{
+		MemberChangedDelegate = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->MembersChanged.
+		                                            AddCallback(
+			                                            std::bind(
+				                                            &ThisClass::OnMembersChanged,
+				                                            this,
+				                                            std::placeholders::_1,
+				                                            std::placeholders::_2
+			                                            )
+		                                            );
+	}
+	else
+	{
+		DelegateHandle = PlayerCharacterPtr->GetCharacterProxy()->OnCharacterSocketUpdated.AddUObject(
+			this,
+			&ThisClass::OnCharacterSocketUpdated
+		);
+	}
 }
 
 void UGameplayTask_WaitPlayerEquipment::TickTask(
@@ -129,13 +147,33 @@ void UGameplayTask_WaitPlayerEquipment::OnDestroy(
 {
 	PlayerCharacterPtr->GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Remove(DelegateHandle);
 
+	if (MemberChangedDelegate)
+	{
+		MemberChangedDelegate->UnBindCallback();
+	}
+
 	Super::OnDestroy(bInOwnerFinished);
 }
 
 void UGameplayTask_WaitPlayerEquipment::OnCharacterSocketUpdated(
-	const FCharacterSocket& Socket
+	const FCharacterSocket& Socket,const FGameplayTag&ProxyType
 )
 {
+	if (bPlayerAssign)
+	{
+		if (!UGameplayTagsLibrary::Proxy_Character_Player.MatchesTag(ProxyType))
+		{
+			return;
+		}
+	}
+	else
+	{
+		if (!UGameplayTagsLibrary::Proxy_Character_NPC_Assistional.MatchesTag(ProxyType))
+		{
+			return;
+		}
+	}
+	
 	if (Socket.IsValid())
 	{
 		if (Socket.Socket.MatchesTag(WeaponSocket))
@@ -146,5 +184,16 @@ void UGameplayTask_WaitPlayerEquipment::OnCharacterSocketUpdated(
 		{
 			EndTask();
 		}
+	}
+}
+
+void UGameplayTask_WaitPlayerEquipment::OnMembersChanged(
+	const FTeammate& Teammate,
+	const TSharedPtr<FCharacterProxy>& CharacterProxySPtr
+)
+{
+	if (CharacterProxySPtr)
+	{
+		EndTask();
 	}
 }

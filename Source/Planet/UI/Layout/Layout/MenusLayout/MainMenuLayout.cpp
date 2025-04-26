@@ -45,7 +45,7 @@ void UMainMenuLayout::DisEnable()
 		return;
 	}
 
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
+	auto GMCPtr = PCPtr->GetGroupManagger();
 	GMCPtr->GetTeamMatesHelperComponent()->SpwanTeammateCharacter();
 
 	ILayoutInterfacetion::DisEnable();

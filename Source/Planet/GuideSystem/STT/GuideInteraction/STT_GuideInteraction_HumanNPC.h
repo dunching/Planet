@@ -130,3 +130,85 @@ struct PLANET_API FSTT_GuideInteractionConversation :
 	EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context) const;
 };
 #pragma endregion
+
+#pragma region 改变指定NPC的可交互选项的是否可用状态
+UCLASS(
+	Blueprintable,
+	BlueprintType
+)
+class PLANET_API UPAD_GuideInteraction_ChangeNPCsInteractionList : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(
+		BlueprintReadOnly,
+		EditAnywhere
+	)
+	TSoftObjectPtr<AHumanCharacter_AI> TargetCharacterPtr = nullptr;
+};
+
+USTRUCT()
+struct PLANET_API FSTID_GuideInteraction_ChangeNPCsTaskState :
+	public FSTID_GuideInteractionTaskBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	TSoftObjectPtr<UPAD_GuideInteraction_ChangeNPCsInteractionList> PAD = nullptr;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	FGuid CharacterID;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	TSubclassOf<AGuideInteraction_Actor> GuideInteractionActorClass;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	bool bEnable = false;
+
+	/**
+	 * true,任务立即完成
+	 * false,在子任务持续期间内保持状态
+	 */
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	bool bRunForever = false;
+};
+
+USTRUCT()
+struct PLANET_API FSTT_GuideInteraction_ChangeNPCsTaskState :
+	public FSTT_GuideInteractionBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideInteraction_ChangeNPCsTaskState;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+protected:
+};
+#pragma endregion

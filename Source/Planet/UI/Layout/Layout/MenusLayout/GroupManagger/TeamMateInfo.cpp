@@ -163,6 +163,6 @@ void UTeamMateInfo::SynMember2Config(int32 Index )
 	{
 		return;
 	}
-	auto GMCPtr = PCPtr->GetGroupSharedInfo();
+	auto GMCPtr = PCPtr->GetGroupManagger();
 	GMCPtr->GetTeamMatesHelperComponent()->UpdateTeammateConfig(GroupMateProxyPtr, Index);
 }

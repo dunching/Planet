@@ -10,11 +10,16 @@
 #include "Components/VerticalBox.h"
 
 #include "GuideThread.h"
+#include "HumanRegularProcessor.h"
+#include "InputProcessorSubSystem.h"
 #include "TaskItemCategory.h"
+#include "HumanCharacter_Player.h"
 
 struct FUViewTaskMenu : public TStructVariable<FUViewTaskMenu>
 {
 	FName ActiveGuideThreadBtn = TEXT("ActiveGuideThreadBtn");
+
+	FName ActiveGuideThreadText = TEXT("ActiveGuideThreadText");
 
 	FName TaskDetails = TEXT("TaskDetails");
 
@@ -169,21 +174,6 @@ void UViewTaskMenu::OnSelected(
 	{
 		TaskItemPtr = ItemPtr;
 
-		AGuideThread* GuideThreadPtr = nullptr;
-		if (TaskItemPtr->MainGuideThreadClass)
-		{
-			GuideThreadPtr = TaskItemPtr->MainGuideThreadClass.GetDefaultObject();
-		}
-		else if (TaskItemPtr->BrandGuideThreadClass)
-		{
-			GuideThreadPtr = TaskItemPtr->BrandGuideThreadClass.GetDefaultObject();
-		}
-
-		if (!GuideThreadPtr)
-		{
-			return;
-		}
-
 		{
 			auto UIPtr = GetWidgetFromName(FUViewTaskMenu::Get().TaskDetails);
 			if (UIPtr)
@@ -191,38 +181,10 @@ void UViewTaskMenu::OnSelected(
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
-
-		{
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUViewTaskMenu::Get().TaskName));
-			if (UIPtr)
-			{
-				UIPtr->SetText(FText::FromString(GuideThreadPtr->TaskName));
-			}
-		}
-		{
-			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUViewTaskMenu::Get().TaskDescription));
-			if (UIPtr)
-			{
-				UIPtr->SetText(FText::FromString(GuideThreadPtr->Description));
-			}
-		}
-		auto UIPtr = Cast<UScrollBox>(GetWidgetFromName(FUViewTaskMenu::Get().TaskList));
-		if (UIPtr)
-		{
-			auto ChildrensAry = UIPtr->GetAllChildren();
-			for (const auto& Iter : ChildrensAry)
-			{
-				if (Iter == TaskItemPtr)
-				{
-					continue;
-				}
-				auto TempUIPtr = Cast<UTaskItem>(Iter);
-				if (TempUIPtr)
-				{
-					TempUIPtr->SwitchSeleted(false);
-				}
-			}
-		}
+		
+		ModifyTaskText();
+		ModifyActiveGuideThreadText();
+		ModifyTaskList();
 	}
 }
 
@@ -240,5 +202,109 @@ void UViewTaskMenu::OnActiveGuideThread()
 	else if (TaskItemPtr->BrandGuideThreadClass)
 	{
 		UGuideSubSystem::GetInstance()->ActiveBrandGuideThread(TaskItemPtr->BrandGuideThreadClass);
+	}
+
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+}
+
+void UViewTaskMenu::ModifyTaskText()
+{
+	AGuideThread* GuideThreadPtr = nullptr;
+	if (TaskItemPtr->MainGuideThreadClass)
+	{
+		GuideThreadPtr = TaskItemPtr->MainGuideThreadClass.GetDefaultObject();
+	}
+	else if (TaskItemPtr->BrandGuideThreadClass)
+	{
+		GuideThreadPtr = TaskItemPtr->BrandGuideThreadClass.GetDefaultObject();
+	}
+
+	if (!GuideThreadPtr)
+	{
+		return;
+	}
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUViewTaskMenu::Get().TaskName));
+		if (UIPtr)
+		{
+			UIPtr->SetText(FText::FromString(GuideThreadPtr->TaskName));
+		}
+	}
+
+	{
+		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUViewTaskMenu::Get().TaskDescription));
+		if (UIPtr)
+		{
+			UIPtr->SetText(FText::FromString(GuideThreadPtr->Description));
+		}
+	}
+}
+
+void UViewTaskMenu::ModifyActiveGuideThreadText()
+{
+	const auto CurrentGuideThread = UGuideSubSystem::GetInstance()->GetCurrentGuideThread();
+	if (!CurrentGuideThread)
+	{
+		return;
+	}
+
+	if (TaskItemPtr->MainGuideThreadClass)
+	{
+		if (TaskItemPtr->MainGuideThreadClass == CurrentGuideThread->GetClass())
+		{
+			auto TextUIPtr = Cast<UTextBlock>(
+				GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
+			);
+			if (TextUIPtr)
+			{
+				TextUIPtr->SetText(FText::FromString(TEXT("正在追踪")));
+			}
+
+			return;
+		}
+	}
+	else if (TaskItemPtr->BrandGuideThreadClass)
+	{
+		if (TaskItemPtr->BrandGuideThreadClass == CurrentGuideThread->GetClass())
+		{
+			auto TextUIPtr = Cast<UTextBlock>(
+				GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
+			);
+			if (TextUIPtr)
+			{
+				TextUIPtr->SetText(FText::FromString(TEXT("正在追踪")));
+			}
+
+			return;
+		}
+	}
+		
+	auto TextUIPtr = Cast<UTextBlock>(
+		GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
+	);
+	if (TextUIPtr)
+	{
+		TextUIPtr->SetText(FText::FromString(TEXT("追踪任务")));
+	}
+}
+
+void UViewTaskMenu::ModifyTaskList()
+{
+	auto UIPtr = Cast<UScrollBox>(GetWidgetFromName(FUViewTaskMenu::Get().TaskList));
+	if (UIPtr)
+	{
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (const auto& Iter : ChildrensAry)
+		{
+			if (Iter == TaskItemPtr)
+			{
+				continue;
+			}
+			auto TempUIPtr = Cast<UTaskItem>(Iter);
+			if (TempUIPtr)
+			{
+				TempUIPtr->SwitchSelected(false);
+			}
+		}
 	}
 }

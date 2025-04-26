@@ -18,6 +18,7 @@
 #include "AIControllerStateTreeAIComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
+#include "GroupManagger_NPC.h"
 #include "GuideInteraction.h"
 #include "HumanCharacter_Player.h"
 
@@ -80,16 +81,23 @@ void UCharacterNPCStateProcessorComponent::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, TargetCharacter, COND_InitialOnly);
 }
 
-TArray<ACharacterBase*> UCharacterNPCStateProcessorComponent::GetTargetCharactersAry() const
+TArray<TWeakObjectPtr<ACharacterBase>> UCharacterNPCStateProcessorComponent::GetTargetCharactersAry() const
 {
-	TArray<ACharacterBase*> Result;
+	TArray<TWeakObjectPtr<ACharacterBase>> Result;
 
-	if (TargetCharacter)
+	if (TargetCharacter.IsValid())
 	{
 		Result.Add(TargetCharacter);
 	}
 
 	return Result;
+}
+
+void UCharacterNPCStateProcessorComponent::SetTargetCharactersAry(
+	const TWeakObjectPtr<ACharacterBase>& InTargetCharacter
+)
+{
+	TargetCharacter = InTargetCharacter;
 }
 
 AHumanCharacter_AI::AHumanCharacter_AI(
@@ -165,8 +173,8 @@ void AHumanCharacter_AI::SpawnDefaultController()
 				}
 			};
 
-		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
-			AGroupManagger::StaticClass(),
+		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger_NPC>(
+			AGroupManagger_NPC::StaticClass(),
 			SpawnParameters
 		);
 
@@ -179,6 +187,11 @@ void AHumanCharacter_AI::SpawnDefaultController()
 UCharacterNPCStateProcessorComponent* AHumanCharacter_AI::GetCharacterNPCStateProcessorComponent() const
 {
 	return Cast<UCharacterNPCStateProcessorComponent>(StateProcessorComponentPtr);
+}
+
+AGroupManagger_NPC* AHumanCharacter_AI::GetGroupManagger_NPC() const
+{
+	return Cast<AGroupManagger_NPC>(GetGroupManagger());
 }
 
 void AHumanCharacter_AI::HasBeenStartedLookAt(

@@ -58,8 +58,6 @@ public:
 
 	virtual TObjectPtr<UAIControllerStateTreeAIComponent> GetStateTreeAIComponent()const;
 
-	virtual bool CheckIsFarawayOriginal() const;
-
 protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

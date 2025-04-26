@@ -90,6 +90,13 @@ void UTeamMatesHelperComponent::BeginPlay()
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
+		GetWorld()->GetTimerManager().SetTimer(
+			CheckKnowCharacterTimerHandle,
+			this,
+			&ThisClass::UpdateSensingCharacters,
+			1.f,
+			true
+		);
 	}
 #endif
 }
@@ -163,26 +170,21 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 	int32 Index
 )
 {
+	FTeammate Teammate;
+
 	if (CharacterProxyPtr)
 	{
-		FTeammate Teammate;
-
 		Teammate.CharacterProxyID = CharacterProxyPtr->GetID();
-		Teammate.IndexInTheTeam = Index;
 
 		MembersSet.Add(CharacterProxyPtr);
-		TeamConfigure.UpdateTeammateConfig(Teammate);
 	}
 	else
 	{
-		FTeammate Teammate;
-
-		Teammate.IndexInTheTeam = Index;
-
-		TeamConfigure.UpdateTeammateConfig(Teammate);
 	}
 
-	MembersChanged.ExcuteCallback(EGroupMateChangeType::kAdd, CharacterProxyPtr);
+	Teammate.IndexInTheTeam = Index;
+	TeamConfigure.UpdateTeammateConfig(Teammate);
+	MembersChanged.ExcuteCallback(Teammate, CharacterProxyPtr);
 }
 
 bool UTeamMatesHelperComponent::IsMember(
@@ -299,16 +301,6 @@ TWeakObjectPtr<ACharacterBase> UTeamMatesHelperComponent::GetForceKnowCharater()
 	return nullptr;
 }
 
-TSet<TWeakObjectPtr<ACharacterBase>> UTeamMatesHelperComponent::GetValidCharater() const
-{
-	TSet<TWeakObjectPtr<ACharacterBase>> Result;
-	for (auto Iter : ValidCharatersSet)
-	{
-		Result.Add(Iter);
-	}
-	return Result;
-}
-
 TSet<TWeakObjectPtr<ACharacterBase>> UTeamMatesHelperComponent::GetSensingChractersSet() const
 {
 	return SensingChractersSet;
@@ -319,17 +311,6 @@ void UTeamMatesHelperComponent::SetSensingChractersSet(
 )
 {
 	SensingChractersSet = KnowCharater;
-}
-
-void UTeamMatesHelperComponent::SetValidCharater(
-	const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
-)
-{
-	ValidCharatersSet.Empty();
-	for (auto Iter : KnowCharater)
-	{
-		ValidCharatersSet.Add(Iter);
-	}
 }
 
 TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperComponent::GetOwnerCharacterProxyPtr() const
@@ -356,7 +337,6 @@ void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, TeamConfigure, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, TeammateOption, COND_None);
 
-	DOREPLIFETIME_CONDITION(ThisClass, ValidCharatersSet, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, ForceKnowCharater, COND_None);
 }
 
@@ -399,4 +379,41 @@ void UTeamMatesHelperComponent::OnRep_GroupSharedInfoChanged()
 void UTeamMatesHelperComponent::OnRep_TeammateOptionChanged()
 {
 	TeammateOptionChanged.ExcuteCallback(TeammateOption, OwnerCharacterProxyPtr);
+}
+
+void UTeamMatesHelperComponent::UpdateSensingCharacters()
+{
+	auto KnowCharatersSet = GetSensingChractersSet();
+
+	decltype(KnowCharatersSet) NewSensingChractersSet;
+	decltype(KnowCharatersSet) NewValidCharater;
+
+	// 是否有效
+	{
+		TSet<ACharacterBase*> NeedRemoveAry;
+		for (const auto& Iter : KnowCharatersSet)
+		{
+			if (Iter.IsValid())
+			{
+				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
+				{
+					NeedRemoveAry.Add(Iter.Get());
+				}
+			}
+			else
+			{
+				NeedRemoveAry.Add(Iter.Get());
+			}
+		}
+		for (const auto& Iter : NeedRemoveAry)
+		{
+			if (KnowCharatersSet.Contains(Iter))
+			{
+				KnowCharatersSet.Remove(Iter);
+			}
+		}
+	}
+
+	NewSensingChractersSet = KnowCharatersSet;
+	SetSensingChractersSet(NewSensingChractersSet);
 }

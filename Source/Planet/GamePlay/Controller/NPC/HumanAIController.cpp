@@ -81,25 +81,6 @@ TObjectPtr<UAIControllerStateTreeAIComponent> AHumanAIController::GetStateTreeAI
 	return StateTreeAIComponentPtr;
 }
 
-bool AHumanAIController::CheckIsFarawayOriginal() const
-{
-	auto CharacterPtr = GetPawn<FPawnType>();
-	if (CharacterPtr)
-	{
-		if (CharacterPtr->GetAIComponent()->BuildingAreaPtr)
-		{
-			return (FVector::Distance(CharacterPtr->GetAIComponent()->BuildingAreaPtr->GetActorLocation(), GetPawn()->GetActorLocation()) > 1000);
-		}
-
-		if (CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
-		{
-			return CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->CheckIsFarawayOriginal(CharacterPtr);
-		}
-	}
-
-	return false;
-}
-
 void AHumanAIController::OnTeammateOptionChangedImp(
 	ETeammateOption TeammateOption,
 	const TSharedPtr<FCharacterProxyType>& LeaderCharacterProxyPtr
@@ -195,7 +176,7 @@ void AHumanAIController::OnGroupChanged()
 
 void AHumanAIController::OnTeamChanged()
 {
-	auto TeamsHelper = GetGroupSharedInfo()->GetTeamMatesHelperComponent();
+	auto TeamsHelper = GetGroupManagger()->GetTeamMatesHelperComponent();
 	if (TeamsHelper)
 	{
 		TeammateOptionChangedDelegate = TeamsHelper->TeammateOptionChanged.AddCallback(
@@ -214,7 +195,7 @@ void AHumanAIController::OnTeamChanged()
 void AHumanAIController::InitialCharacter()
 {
 	TeamHelperChangedDelegate =
-		GetGroupSharedInfo()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(
+		GetGroupManagger()->GetTeamMatesHelperComponent()->TeamHelperChangedDelegateContainer.AddCallback(
 			std::bind(&ThisClass::OnTeamChanged, this)
 		);
 }

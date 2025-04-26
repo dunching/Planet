@@ -20,12 +20,16 @@
 #include "GuideActor.h"
 #include "GuideList.h"
 #include "GuideSubSystem.h"
+#include "GuideThread.h"
+#include "GuideThreadChallenge.h"
 #include "HUD_TeamInfo.h"
 #include "HumanCharacter_Player.h"
 #include "PawnStateActionHUD.h"
 #include "PlanetGameViewportClient.h"
+#include "PlayerGameplayTasks.h"
 #include "ProgressTips.h"
 #include "TeamMatesHelperComponent.h"
+#include "Components/Button.h"
 
 struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 {
@@ -46,6 +50,8 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 	FName LowerHPSocket = TEXT("LowerHPSocket");
 
 	FName HUD_TeamInfoSocket = TEXT("HUD_TeamInfoSocket");
+
+	FName QuitChallengeBtn = TEXT("QuitChallengeBtn");
 };
 
 void URegularActionLayout::NativeConstruct()
@@ -77,6 +83,18 @@ void URegularActionLayout::NativeConstruct()
 		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 			CharacterAttributesRef->GetHPAttribute()
 		).AddUObject(this, &ThisClass::OnHPChanged);
+	}
+	
+	{
+		UGuideSubSystem::GetInstance()->GetOnStartGuide().AddUObject(this, &ThisClass::OnStartGuide);
+		UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(this, &ThisClass::OnStopGuide);
+		
+		auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
+		if (UIPtr)
+		{
+			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitChallengeBtnClicked);
+			UIPtr->SetVisibility(ESlateVisibility::Hidden);
+		}
 	}
 }
 
@@ -110,6 +128,56 @@ void URegularActionLayout::DisEnable()
 ELayoutCommon URegularActionLayout::GetLayoutType() const
 {
 	return ELayoutCommon::kActionLayout;
+}
+
+void URegularActionLayout::OnStartGuide(
+	AGuideThread* GuideThread
+)
+{
+	if (GuideThread)
+	{
+		if (GuideThread->IsA(AGuideThread_Challenge::StaticClass()))
+		{
+			auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
+			if (UIPtr)
+			{
+				UIPtr->SetVisibility(ESlateVisibility::Visible);
+			}
+		}
+	}
+}
+
+void URegularActionLayout::OnStopGuide(
+	AGuideThread* GuideThread
+)
+{
+	if (GuideThread)
+	{
+		if (GuideThread->IsA(AGuideThread_Challenge::StaticClass()))
+		{
+			auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
+			if (UIPtr)
+			{
+				UIPtr->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+	}
+}
+
+void URegularActionLayout::OnQuitChallengeBtnClicked()
+{
+	// 停止挑战任务
+	UGuideSubSystem::GetInstance()->StopParallelGuideThread(
+		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
+		);
+	
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+	
+	PCPtr->GetGameplayTasksComponent()->TeleportPlayerToOpenWorld();
 }
 
 void URegularActionLayout::OnFocusCharacter(

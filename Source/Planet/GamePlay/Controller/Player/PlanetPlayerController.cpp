@@ -42,6 +42,7 @@
 #include "PlanetWorldSettings.h"
 #include "GuideActor.h"
 #include "GE_Common.h"
+#include "GroupManagger_Player.h"
 #include "HumanCharacter_AI.h"
 #include "OpenWorldSystem.h"
 #include "PlayerGameplayTasks.h"
@@ -112,6 +113,18 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 		if (Result)
 		{
 		}
+}
+
+void APlanetPlayerController::ChangedInterationTaskState_Implementation(
+	AHumanCharacter_AI* HumanCharacterPtr,
+	TSubclassOf<AGuideInteraction_Actor> Item,
+	bool bIsEnable
+)
+{
+	if (HumanCharacterPtr)
+	{
+		HumanCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationTaskState(Item, bIsEnable);
+	}
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(
@@ -285,7 +298,7 @@ UPlanetAbilitySystemComponent* APlanetPlayerController::GetAbilitySystemComponen
 	return GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
 }
 
-AGroupManagger* APlanetPlayerController::GetGroupSharedInfo() const
+AGroupManagger* APlanetPlayerController::GetGroupManagger() const
 {
 	return GroupManaggerPtr;
 }
@@ -313,9 +326,9 @@ UTalentAllocationComponent* APlanetPlayerController::GetTalentAllocationComponen
 
 TWeakObjectPtr<ACharacterBase> APlanetPlayerController::GetTeamFocusTarget() const
 {
-	if (GetGroupSharedInfo() && GetGroupSharedInfo()->GetTeamMatesHelperComponent())
+	if (GetGroupManagger() && GetGroupManagger()->GetTeamMatesHelperComponent())
 	{
-		return GetGroupSharedInfo()->GetTeamMatesHelperComponent()->GetForceKnowCharater();
+		return GetGroupManagger()->GetTeamMatesHelperComponent()->GetForceKnowCharater();
 	}
 
 	return nullptr;
@@ -408,8 +421,8 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 				}
 			};
 
-		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
-			AGroupManagger::StaticClass(),
+		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger_Player>(
+			AGroupManagger_Player::StaticClass(),
 			SpawnParameters
 		);
 

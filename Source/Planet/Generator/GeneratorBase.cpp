@@ -6,6 +6,7 @@
 
 #include "LogWriter.h"
 #include "GroupManagger.h"
+#include "GroupManagger_NPC.h"
 #include "HumanCharacter_AI.h"
 
 #include "PlanetChildActorComponent.h"
@@ -42,68 +43,71 @@ void AGeneratorBase::BeginPlay()
 
 void AGeneratorBase::SpawnGeneratorActor()
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
+	if (!GroupManaggerPtr)
 	{
-		if (!GroupManaggerPtr)
-		{
-			FActorSpawnParameters SpawnParameters;
+		FActorSpawnParameters SpawnParameters;
 
-			SpawnParameters.Owner = this;
-			SpawnParameters.CustomPreSpawnInitalization = [](
-				AActor* ActorPtr
-			)
-				{
-					PRINTINVOKEINFO();
-					auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
-					if (GroupManaggerPtr)
-					{
-						GroupManaggerPtr->GroupID = FGuid::NewGuid();
-					}
-				};
-
-			GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger>(
-				AGroupManagger::StaticClass(),
-				SpawnParameters
-			);
-
-			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(DefaultTeammateOption);
-		}
-
-		bool bIsFirst = true;
-		ForEachComponent(
-			true,
-			[&bIsFirst, this](
-			UActorComponent* Comp
+		SpawnParameters.Owner = this;
+		SpawnParameters.CustomPreSpawnInitalization = [](
+			AActor* ActorPtr
 		)
+		{
+			PRINTINVOKEINFO();
+			auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+			if (GroupManaggerPtr)
 			{
-				auto PlanetChildActorComponentPtr = Cast<UPlanetChildActorComponent>(Comp);
-				if (PlanetChildActorComponentPtr)
-				{
-					PlanetChildActorComponentPtr->RespawnChildActor();
-					auto AICharacterPtr = Cast<AHumanCharacter_AI>(PlanetChildActorComponentPtr->GetChildActor());
-					if (!AICharacterPtr)
-					{
-						return;
-					}
-					AICharacterPtr->GetAIComponent()->bIsSingle = false;
+				GroupManaggerPtr->GroupID = FGuid::NewGuid();
+			}
+		};
 
-					if (bIsFirst)
-					{
-						GroupManaggerPtr->SetOwnerCharacterProxyPtr(
-							AICharacterPtr
-						);
-						bIsFirst = false;
-					}
+		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger_NPC>(
+			AGroupManagger_NPC::StaticClass(),
+			SpawnParameters
+		);
+		
+		CustomizerGroupManagger(GroupManaggerPtr);
+		
+		GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(DefaultTeammateOption);
+	}
+
+	bool bIsFirst = true;
+	ForEachComponent(
+		true,
+		[&bIsFirst, this](
+		UActorComponent* Comp
+	)
+		{
+			auto PlanetChildActorComponentPtr = Cast<UPlanetChildActorComponent>(Comp);
+			if (PlanetChildActorComponentPtr)
+			{
+				PlanetChildActorComponentPtr->RespawnChildActor();
+				auto AICharacterPtr = Cast<AHumanCharacter_AI>(PlanetChildActorComponentPtr->GetChildActor());
+				if (!AICharacterPtr)
+				{
+					return;
+				}
+				AICharacterPtr->GetAIComponent()->bIsSingle = false;
+
+				if (bIsFirst)
+				{
+					GroupManaggerPtr->SetOwnerCharacterProxyPtr(
+						AICharacterPtr
+					);
+					bIsFirst = false;
 				}
 			}
-		);
-	}
-#endif
+		}
+	);
 }
 
 void AGeneratorBase::CustomizerFunc(
 	AActor* TargetActorPtr
+)
+{
+}
+
+void AGeneratorBase::CustomizerGroupManagger(
+	AGroupManagger_NPC* TargetActorPtr
 )
 {
 }

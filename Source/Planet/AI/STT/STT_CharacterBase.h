@@ -4,7 +4,9 @@
 
 #include "Templates/SubclassOf.h"
 
-#include "STT_Base.generated.h"
+#include "Tasks/StateTreeAITask.h"
+
+#include "STT_CharacterBase.generated.h"
 
 class AHumanAIController;
 class AHumanCharacter;
@@ -20,4 +22,14 @@ struct PLANET_API FSTID_CharacterBase
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	TObjectPtr<AHumanAIController> AIControllerPtr = nullptr;
+};
+
+/*
+ */
+USTRUCT()
+struct PLANET_API FSTT_CharacterBase : public FStateTreeAIActionTaskBase //FStateTreeTaskCommonBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_CharacterBase;
 };

@@ -9,6 +9,7 @@
 
 #include "GravityPlayerController.h"
 #include "GroupManaggerInterface.h"
+#include "HumanCharacter_AI.h"
 #include "PlanetControllerInterface.h"
 
 #include "PlanetPlayerController.generated.h"
@@ -52,7 +53,7 @@ public:
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	virtual AGroupManagger* GetGroupSharedInfo() const override;
+	virtual AGroupManagger* GetGroupManagger() const override;
 
 	virtual void SetGroupSharedInfo(
 		AGroupManagger* GroupManaggerPtr
@@ -119,6 +120,13 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerDestroyActor(
 		AActor* ActorPtr
+	);
+
+	UFUNCTION(Server, Reliable)
+	void ChangedInterationTaskState(
+		AHumanCharacter_AI* HumanCharacterPtr,
+		TSubclassOf<AGuideInteraction_Actor> Item,
+		bool bIsEnable
 	);
 
 #pragma region

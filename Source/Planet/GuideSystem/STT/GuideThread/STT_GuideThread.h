@@ -188,6 +188,12 @@ struct PLANET_API FSTID_GuideThread_PressKey :
 	)
 	FKey Key = EKeys::AnyKey;
 
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	FString Description = TEXT("Decription {Key} To Replace Str");
+
 	APlayerController* PCPtr = nullptr;
 };
 
@@ -849,7 +855,7 @@ struct PLANET_API FSTID_GuideThread_ChangeNPCsInteractionList :
 		EditAnywhere,
 		Category = Param
 	)
-	bool bIsInfinish = false;
+	bool bRunForever = false;
 };
 
 // 执行引导任务 给目标角色添加互动引导内容
@@ -861,7 +867,7 @@ struct PLANET_API FSTT_GuideThread_ChangeNPCsInteractionList :
 
 	using FInstanceDataType = FSTID_GuideThread_ChangeNPCsInteractionList;
 
-	virtual const UStruct* GetInstanceDataType() const override;
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context,
@@ -1091,6 +1097,12 @@ struct PLANET_API FSTID_GuideThread_WaitPlayerEquipment :
 		EditAnywhere,
 		Category = Param
 	)
+	bool bPlayerAssign = true;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
 	FGameplayTag WeaponSocket;
 
 	UPROPERTY(
@@ -1098,6 +1110,13 @@ struct PLANET_API FSTID_GuideThread_WaitPlayerEquipment :
 		Category = Param
 	)
 	FGameplayTag SkillSocket;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	bool bIsEquipentCharacter = false;
+	
 };
 
 // 执行引导任务 给目标角色添加互动引导内容

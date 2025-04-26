@@ -7,6 +7,7 @@
 #include "AIComponent.h"
 #include "AITask_MoveBySpline.h"
 #include "GeneratorColony_ByInvoke.h"
+#include "GroupManagger_NPC.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"
 #include "HumanCharacter_AI.h"
@@ -30,7 +31,7 @@ EStateTreeRunStatus FSTT_CheckTarget_Spline::EnterState(
 	Super::EnterState(Context, Transition);
 	
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
-	InstanceData.SPlinePtr = InstanceData.CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->SplineComponentPtr;
+	InstanceData.SPlinePtr = InstanceData.CharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr->SplineComponentPtr;
 	if (!InstanceData.SPlinePtr)
 	{
 		return EStateTreeRunStatus::Failed;
@@ -59,11 +60,11 @@ EStateTreeRunStatus FSTT_CheckTarget_Spline::PerformAction(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (InstanceData.CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
+	if (InstanceData.CharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr)
 	{
 		if (InstanceData.GloabVariable->TargetCharacterPtr.IsValid())
 		{
-			const auto Value = InstanceData.CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->
+			const auto Value = InstanceData.CharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr->
 			                                CheckIsFarawayOriginal(
 				                                InstanceData.GloabVariable->TargetCharacterPtr.Get()
 			                                );
@@ -108,7 +109,7 @@ EStateTreeRunStatus FSTT_MoveBySpline::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	InstanceData.SPlinePtr = InstanceData.CharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->SplineComponentPtr;
+	InstanceData.SPlinePtr = InstanceData.CharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr->SplineComponentPtr;
 	if (!InstanceData.SPlinePtr)
 	{
 		return EStateTreeRunStatus::Failed;

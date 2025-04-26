@@ -218,7 +218,7 @@ bool USkill_Base::CheckTargetIsEqualDistance(int32 InDistance) const
 		if (FocusCharactersAry.IsValidIndex(0))
 		{
 			auto TargetCharacterPtr =FocusCharactersAry[0];
-			if (TargetCharacterPtr)
+			if (TargetCharacterPtr.IsValid())
 			{
 				const auto Distance = FVector::Distance(TargetCharacterPtr->GetActorLocation(),
 														CharacterPtr->GetActorLocation());

@@ -37,15 +37,21 @@ public:
 	UFUNCTION()
 	void OnClicked();
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void SwitchSeleted(bool bIsSeleted);
+	void SwitchSelected(bool bIsSelected);
 
 	FOnSeleted OnSeleted; 
 	
 	TSubclassOf<AGuideThread_Main> MainGuideThreadClass;
 	
 	TSubclassOf<AGuideThread_Branch> BrandGuideThreadClass;
+
+protected:
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SwitchSelected_Blueprint(bool bIsSelected_);
+
 private:
+
+	bool bIsSelected = false;
 	
 };

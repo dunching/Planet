@@ -49,7 +49,7 @@ public:
 
 	using FMemberChangedDelegateContainer =
 	TCallbackHandleContainer<void(
-		EGroupMateChangeType,
+		const FTeammate&,
 		const TSharedPtr<FCharacterProxyType>&
 
 
@@ -108,12 +108,6 @@ public:
 
 	TWeakObjectPtr<ACharacterBase> GetForceKnowCharater() const;
 
-	TSet<TWeakObjectPtr<ACharacterBase>> GetValidCharater() const;
-
-	void SetValidCharater(
-		const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
-	);
-	
 	TSet<TWeakObjectPtr<ACharacterBase>> GetSensingChractersSet() const;
 
 	void SetSensingChractersSet(
@@ -152,9 +146,14 @@ public:
 
 	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
+	/**
+	 * 
+	 */
 	FMemberChangedDelegateContainer MembersChanged;
 
-	// 分配的小队
+	/**
+	 * 分配的小队
+	 */
 	TSet<TSharedPtr<FCharacterProxyType>> MembersSet;
 
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
@@ -171,6 +170,10 @@ protected:
 	virtual void GetLifetimeReplicatedProps(
 		TArray<FLifetimeProperty>& OutLifetimeProps
 	) const override;
+
+private:
+	
+	void UpdateSensingCharacters();
 
 #pragma region RPC
 
@@ -232,12 +235,6 @@ private:
 	TSet<TWeakObjectPtr<ACharacterBase>> SensingChractersSet;
 
 	/**
-	 * 目标、敌人列表
-	 */
-	UPROPERTY(Replicated)
-	TArray<TWeakObjectPtr<ACharacterBase>> ValidCharatersSet;
-
-	/**
 	* 玩家锁定的目标
 	* 这个角色锁定的目标，第0个为主要锁定
 	* 为什么不用Controller UpdateRotation去做？因为我们要在移动组件里统一设置旋转
@@ -247,4 +244,7 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	FTeamConfigure TeamConfigure;
+	
+	FTimerHandle CheckKnowCharacterTimerHandle;
+
 };

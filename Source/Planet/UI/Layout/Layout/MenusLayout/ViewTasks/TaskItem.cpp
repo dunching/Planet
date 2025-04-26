@@ -62,6 +62,19 @@ void UTaskItem::SetGuideThreadType(
 
 inline void UTaskItem::OnClicked()
 {
-	SwitchSeleted(true);
+	if (bIsSelected)
+	{
+		return;
+	}
+	
+	SwitchSelected(true);
 	OnSeleted.ExecuteIfBound(this);
+}
+
+void UTaskItem::SwitchSelected(
+	bool bIsSelected_
+)
+{
+	bIsSelected = bIsSelected_;
+	SwitchSelected_Blueprint(bIsSelected);
 }

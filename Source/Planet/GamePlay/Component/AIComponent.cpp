@@ -9,7 +9,8 @@
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"
 #include "InventoryComponent.h"
-#include "SceneProxyExtendInfo.h"
+#include "PlanetGameViewportClient.h"
+#include "TaskPromt.h"
 
 FName UAIComponent::ComponentName = TEXT("AIComponent");
 
@@ -138,4 +139,52 @@ void UAIComponent::InitialAllocationsByProxy()
 {
 	auto OnwerActorPtr = GetOwner<FOwnerType>();
 	OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
+}
+
+void UAIComponent::StopDisplayTaskPromy_Implementation()
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+			GetWorld(),
+			TargetPointSharedLayerName
+		);
+		if (ScreenLayer)
+		{
+			ScreenLayer->RemoveHoverWidget(TaskPromtPtr);
+			TaskPromtPtr = nullptr;
+		}
+	}
+#endif
+}
+
+void UAIComponent::DisplayTaskPromy_Implementation(
+	 TSubclassOf<UTaskPromt> TaskPromtClass
+)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+			GetWorld(),
+			TargetPointSharedLayerName
+		);
+		if (ScreenLayer)
+		{
+			if (TaskPromtPtr)
+			{
+				return;
+			}
+			
+			TaskPromtPtr = CreateWidget<UTaskPromt>(GetWorld(), TaskPromtClass);
+			if (TaskPromtPtr)
+			{
+				auto OnwerActorPtr = GetOwner<FOwnerType>();
+				TaskPromtPtr->TargetCharacterPtr = OnwerActorPtr;
+				ScreenLayer->AddHoverWidget(TaskPromtPtr);
+			}
+		}
+	}
+#endif
 }

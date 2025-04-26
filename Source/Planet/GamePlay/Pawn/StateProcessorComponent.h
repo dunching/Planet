@@ -62,7 +62,7 @@ public:
 
 	UStateProcessorComponent(const FObjectInitializer& ObjectInitializer);
 
-	virtual TArray<ACharacterBase*> GetTargetCharactersAry()const;
+	virtual TArray<TWeakObjectPtr<ACharacterBase>> GetTargetCharactersAry()const;
 	
 	TSharedPtr<FCharacterStateInfo> GetCharacterState(const FGameplayTag& CSTag)const;
 	

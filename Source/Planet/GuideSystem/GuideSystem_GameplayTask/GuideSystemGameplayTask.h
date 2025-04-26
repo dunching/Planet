@@ -25,6 +25,9 @@ class UPAD_TaskNode_Interaction_Option;
 class UPAD_TaskNode_Interaction_NotifyGuideThread;
 class UPAD_GuideThread_WaitInteractionSceneActor;
 
+struct FTeammate;
+struct FCharacterProxy;
+
 UCLASS()
 class PLANET_API UGameplayTask_Base : public UGameplayTask
 {
@@ -80,6 +83,12 @@ class PLANET_API UGameplayTask_WaitPlayerEquipment : public UGameplayTask_Base
 
 public:
 	
+	using FMemberChangedDelegate =
+	TCallbackHandleContainer<void(
+		const FTeammate&,
+		const TSharedPtr<FCharacterProxy>&
+	)>::FCallbackHandleSPtr;
+
 	UGameplayTask_WaitPlayerEquipment(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Activate() override;
@@ -88,17 +97,27 @@ public:
 
 	virtual void OnDestroy(bool bInOwnerFinished) override;
 	
+	bool bPlayerAssign = true;
+	
 	FGameplayTag WeaponSocket;
 
 	FGameplayTag SkillSocket;
 
+	bool bIsEquipentCharacter = false;
+	
 protected:
 
 	UFUNCTION()
-	void OnCharacterSocketUpdated(const FCharacterSocket&Socket);
+	void OnCharacterSocketUpdated(const FCharacterSocket&Socket,const FGameplayTag&ProxyType);
+
+	void OnMembersChanged(
+		const FTeammate&Teammate,
+		const TSharedPtr<FCharacterProxy>&CharacterProxySPtr
+		);
 
 	bool bIsComplete = false;
 
 	FDelegateHandle DelegateHandle;
-	
+
+	FMemberChangedDelegate MemberChangedDelegate;
 };

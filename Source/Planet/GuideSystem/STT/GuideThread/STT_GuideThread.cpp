@@ -616,11 +616,6 @@ FTaskNodeDescript FSTT_GuideThreadDefeatEnemy::GetTaskNodeDescripton(
 	return InstanceData.GameplayTaskPtr->GetTaskNodeDescripton();
 }
 
-const UStruct* FSTT_GuideThread_ChangeNPCsInteractionList::GetInstanceDataType() const
-{
-	return FInstanceDataType::StaticStruct();
-}
-
 EStateTreeRunStatus FSTT_GuideThread_ChangeNPCsInteractionList::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
@@ -646,12 +641,11 @@ const
 				InstanceData.bEnable
 			);
 
-			if (InstanceData.bIsInfinish)
+			if (InstanceData.bRunForever)
 			{
-				return EStateTreeRunStatus::Succeeded;
+				return EStateTreeRunStatus::Running;
 			}
-
-			return EStateTreeRunStatus::Running;
+			return EStateTreeRunStatus::Succeeded;
 		}
 	}
 
@@ -667,15 +661,18 @@ void FSTT_GuideThread_ChangeNPCsInteractionList::ExitState(
 		*this
 	);
 
-	if (auto PAD = InstanceData.PAD.LoadSynchronous())
+	if (InstanceData.bRunForever)
 	{
-		auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
-		if (TargetCharacterPtr)
+		if (auto PAD = InstanceData.PAD.LoadSynchronous())
 		{
-			TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationState(
-				InstanceData.GuideInteractionActorClass,
-				!InstanceData.bEnable
-			);
+			auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
+			if (TargetCharacterPtr)
+			{
+				TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationState(
+					InstanceData.GuideInteractionActorClass,
+					!InstanceData.bEnable
+				);
+			}
 		}
 	}
 
@@ -941,6 +938,7 @@ EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::EnterState(
 
 		InstanceData.GameplayTaskPtr->WeaponSocket = InstanceData.WeaponSocket;
 		InstanceData.GameplayTaskPtr->SkillSocket = InstanceData.SkillSocket;
+		InstanceData.GameplayTaskPtr->bIsEquipentCharacter = InstanceData.bIsEquipentCharacter;
 
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
@@ -1224,7 +1222,7 @@ FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 			TEXT(
 				"Attack <%s>%s</>"
 			),
-			*Rich_Emphasis,
+			*RichText_Emphasis,
 			*InstanceData.HumanCharacterAI->GetCharacterProxy()->Title
 		);
 
@@ -1260,7 +1258,7 @@ EStateTreeRunStatus FSTT_GuideThread_Completet::EnterState(
 		*this
 	);
 	InstanceData.GuideActorPtr->bIsComleted = true;
-	
+
 	return EStateTreeRunStatus::Succeeded;
 }
 
@@ -1352,13 +1350,7 @@ FTaskNodeDescript FSTT_GuideThread_PressKey::GetTaskNodeDescripton(
 
 	FTaskNodeDescript TaskNodeDescript;
 
-	TaskNodeDescript.Description = FString::Printf(
-		TEXT(
-			"Press <%s>%s</> key To Move"
-		),
-		*Rich_Key,
-		*InstanceData.Key.ToString()
-	);
+	TaskNodeDescript.Description = InstanceData.Description.Replace(TEXT("{Key}"), *InstanceData.Key.ToString());
 
 	return TaskNodeDescript;
 }
@@ -1455,7 +1447,7 @@ FTaskNodeDescript FSTT_GuideThread_ActiveDash::GetTaskNodeDescripton(
 		TEXT(
 			"Press <%s>%s</> key To <Button Display=\"Dash\" Param=\"Dash\"/>"
 		),
-		*Rich_Key,
+		*RichText_Key,
 		*GameOptionsPtr->DashKey.ToString()
 	);
 
@@ -1554,7 +1546,7 @@ FTaskNodeDescript FSTT_GuideThread_Run::GetTaskNodeDescripton(
 		TEXT(
 			"Press <%s>%s</> key To <Button Display=\"Run\" Param=\"Run\"/>"
 		),
-		*Rich_Key,
+		*RichText_Key,
 		*GameOptionsPtr->RunKey.ToString()
 	);
 

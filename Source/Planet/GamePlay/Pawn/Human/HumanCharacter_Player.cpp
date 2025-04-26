@@ -197,9 +197,6 @@ void AHumanCharacter_Player::PossessedBy(
 	auto GroupsHelperSPtr = GetGroupManagger()->GetTeamMatesHelperComponent();
 	if (GroupsHelperSPtr)
 	{
-		TeamMembersChangedDelegateHandle = GroupsHelperSPtr->MembersChanged.AddCallback(
-			std::bind(&ThisClass::OnCharacterGroupMateChanged, this, std::placeholders::_1, std::placeholders::_2)
-		);
 	}
 }
 

@@ -33,9 +33,9 @@ UStateProcessorComponent::UStateProcessorComponent(const FObjectInitializer& Obj
 	SetIsReplicatedByDefault(true);
 }
 
-TArray<ACharacterBase*> UStateProcessorComponent::GetTargetCharactersAry() const
+TArray<TWeakObjectPtr<ACharacterBase>> UStateProcessorComponent::GetTargetCharactersAry() const
 {
-	TArray<ACharacterBase*> Result;
+	TArray<TWeakObjectPtr<ACharacterBase>> Result;
 	auto CharacterPtr = GetOwner<FOwnerPawnType>();
 	if (CharacterPtr)
 	{

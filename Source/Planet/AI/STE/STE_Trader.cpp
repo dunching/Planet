@@ -1,4 +1,3 @@
-
 #include "STE_Trader.h"
 
 #include <NavigationSystem.h>
@@ -20,97 +19,56 @@
 #include "ItemProxy_Character.h"
 #include "STE_CharacterBase.h"
 
-void USTE_Trader::TreeStart(FStateTreeExecutionContext& Context)
-{
-	Super::TreeStart(Context);
-
-	GetWorld()->GetTimerManager().SetTimer(
-		CheckKnowCharacterTimerHandle,
-		this,
-		&ThisClass::UpdateSensingCharacters,
-		1.f,
-		true
-	);
-}
-
-void USTE_Trader::UpdateTargetCharacter(
+void USTE_Trader::TreeStart(
 	FStateTreeExecutionContext& Context
 )
 {
-	Super::UpdateTargetCharacter(Context);
+	Super::TreeStart(Context);
 }
 
-void USTE_Trader::UpdateSensingCharacters()
+UGloabVariable_Character* USTE_Trader::CreateGloabVarianble()
 {
-	auto TeamMatesHelperComponent= HumanAIControllerPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
-	auto KnowCharatersSet = TeamMatesHelperComponent->GetSensingChractersSet();
-	auto OwnerCharacterProxyPtr = TeamMatesHelperComponent->GetOwnerCharacterProxyPtr();
+	auto GloabVariablePtr = NewObject<FGloabVariable>();
 
-	decltype(KnowCharatersSet) NewSensingChractersSet;
-	decltype(KnowCharatersSet) NewValidCharater;
+	GloabVariablePtr->UpdateTargetCharacterFunc = std::bind(&ThisClass::UpdateTargetCharacter, this);
+
+	return GloabVariablePtr;
+}
+
+TWeakObjectPtr<ACharacterBase> USTE_Trader::UpdateTargetCharacter()
+{
+	auto TeamMatesHelperComponentPtr = HumanAIControllerPtr->GetGroupManagger()->GetTeamMatesHelperComponent();
+	auto KnowCharatersSet = TeamMatesHelperComponentPtr->GetSensingChractersSet();
 	
-	// 是否有效
+	const auto Location = HumanCharacterPtr->GetActorLocation();
+
+	// 是否过远
+	TSet<ACharacterBase*> NeedRemoveAry;
+	for (const auto& Iter : KnowCharatersSet)
 	{
-		TSet<ACharacterBase*> NeedRemoveAry;
-		for (const auto& Iter : KnowCharatersSet)
+		if (Iter.IsValid())
 		{
-			if (Iter.IsValid())
+			if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
 			{
-				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
-				{
-					NeedRemoveAry.Add(Iter.Get());
-				}
-				else if (Iter->IsA(AHumanCharacter_AI::StaticClass()))
-				{
-					NeedRemoveAry.Add(Iter.Get());
-				}
+				NeedRemoveAry.Add(Iter.Get());
 			}
-			else
+			else if (Iter->IsA(AHumanCharacter_AI::StaticClass()))
 			{
 				NeedRemoveAry.Add(Iter.Get());
 			}
 		}
-		for (const auto& Iter : NeedRemoveAry)
+		else
 		{
-			if (KnowCharatersSet.Contains(Iter))
-			{
-				KnowCharatersSet.Remove(Iter);
-			}
 		}
 	}
-	NewSensingChractersSet = KnowCharatersSet;
-	TeamMatesHelperComponent->SetSensingChractersSet(NewSensingChractersSet);
-
-	// 是否过远
-	auto CharacterActorPtr = OwnerCharacterProxyPtr->GetCharacterActor();
-	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
+		
+	for (const auto& Iter : NeedRemoveAry)
 	{
-		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
-
-		const auto Location = AI_CharacterActorPtr->GetActorLocation();
-
-		TSet<ACharacterBase*> NeedRemoveAry;
-		for (const auto& Iter : KnowCharatersSet)
+		if (KnowCharatersSet.Contains(Iter))
 		{
-			if (Iter.IsValid())
-			{
-				if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
-				{
-					NeedRemoveAry.Add(Iter.Get());
-				}
-			}
-			else
-			{
-			}
-		}
-		for (const auto& Iter : NeedRemoveAry)
-		{
-			if (KnowCharatersSet.Contains(Iter))
-			{
-				KnowCharatersSet.Remove(Iter);
-			}
+			KnowCharatersSet.Remove(Iter);
 		}
 	}
-	NewValidCharater = KnowCharatersSet;
-	TeamMatesHelperComponent->SetValidCharater(NewValidCharater);
+
+	return GetNewTargetCharacter(KnowCharatersSet);
 }

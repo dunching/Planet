@@ -23,19 +23,59 @@
 void USTE_BrandTaskProvider::TreeStart(FStateTreeExecutionContext& Context)
 {
 	Super::TreeStart(Context);
-
-	GetWorld()->GetTimerManager().SetTimer(
-		CheckKnowCharacterTimerHandle,
-		this,
-		&ThisClass::CheckKnowCharacterImp,
-		1.f,
-		true
-	);
 }
 
-void USTE_BrandTaskProvider::CheckKnowCharacterImp()
+void USTE_BrandTaskProvider::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+)
 {
-	auto TeamMatesHelperComponent= HumanAIControllerPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
-	auto KnowCharatersSet = TeamMatesHelperComponent->GetSensingChractersSet();
-	auto OwnerCharacterProxyPtr = TeamMatesHelperComponent->GetOwnerCharacterProxyPtr();
+	Super::Tick(Context, DeltaTime);
+}
+
+UGloabVariable_Character* USTE_BrandTaskProvider::CreateGloabVarianble()
+{
+	auto GloabVariablePtr = NewObject<FGloabVariable>();
+
+	GloabVariablePtr->UpdateTargetCharacterFunc = std::bind(&ThisClass::UpdateTargetCharacter, this);
+
+	return GloabVariablePtr;
+}
+
+TWeakObjectPtr<ACharacterBase> USTE_BrandTaskProvider::UpdateTargetCharacter()
+{
+	auto TeamMatesHelperComponentPtr = HumanAIControllerPtr->GetGroupManagger()->GetTeamMatesHelperComponent();
+	auto KnowCharatersSet = TeamMatesHelperComponentPtr->GetSensingChractersSet();
+	
+	const auto Location = HumanCharacterPtr->GetActorLocation();
+
+	// 是否过远
+	TSet<ACharacterBase*> NeedRemoveAry;
+	for (const auto& Iter : KnowCharatersSet)
+	{
+		if (Iter.IsValid())
+		{
+			if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
+			{
+				NeedRemoveAry.Add(Iter.Get());
+			}
+			else if (Iter->IsA(AHumanCharacter_AI::StaticClass()))
+			{
+				NeedRemoveAry.Add(Iter.Get());
+			}
+		}
+		else
+		{
+		}
+	}
+		
+	for (const auto& Iter : NeedRemoveAry)
+	{
+		if (KnowCharatersSet.Contains(Iter))
+		{
+			KnowCharatersSet.Remove(Iter);
+		}
+	}
+
+	return GetNewTargetCharacter(KnowCharatersSet);
 }

@@ -33,7 +33,7 @@ public:
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const = 0;
 
 	// “成员管理”记录了成员信息，因为
-	virtual AGroupManagger* GetGroupSharedInfo() const = 0;
+	virtual AGroupManagger* GetGroupManagger() const = 0;
 
 	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) = 0;
 

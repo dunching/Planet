@@ -45,9 +45,15 @@ private:
 	UFUNCTION()
 	void OnSelected(UTaskItem* ItemPtr);
 	
+	void ModifyTaskText();
+	
+	void ModifyActiveGuideThreadText();
+	
+	void ModifyTaskList();
+	
 	UFUNCTION()
 	void OnActiveGuideThread();
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UTaskItem>TaskItemClass;
 

@@ -28,25 +28,32 @@ class AHumanAIController;
 class UGloabVariable_Character;
 
 UCLASS(Blueprintable)
+class PLANET_API UGloabVariable_TraderCharacter : public UGloabVariable_Character
+{
+	GENERATED_BODY()
+
+public:
+};
+
+UCLASS(Blueprintable)
 class PLANET_API USTE_Trader : public USTE_CharacterBase
 {
 	GENERATED_BODY()
 
 public:
+	using FGloabVariable = UGloabVariable_TraderCharacter;
 
 protected:
-
-	virtual void TreeStart(FStateTreeExecutionContext& Context)override;
-
-	virtual void UpdateTargetCharacter(FStateTreeExecutionContext& Context)override;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
-	int32 MaxDistance = 200;
+	virtual void TreeStart(
+		FStateTreeExecutionContext& Context
+	) override;
 
 private:
+	virtual UGloabVariable_Character* CreateGloabVarianble() override;;
 
-	void UpdateSensingCharacters();
+	TWeakObjectPtr<ACharacterBase> UpdateTargetCharacter();
 
-	FTimerHandle CheckKnowCharacterTimerHandle;
-
+protected:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Param)
+	int32 MaxDistance = 200;
 };

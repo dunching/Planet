@@ -15,6 +15,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GeneratorColony_ByInvoke.h"
 #include "GroupManagger.h"
+#include "GroupManagger_NPC.h"
 #include "HumanCharacter_AI.h"
 #include "ItemProxy_Character.h"
 #include "STE_CharacterBase.h"
@@ -25,7 +26,7 @@ void USTE_Assistance::TreeStart(
 {
 	Super::TreeStart(Context);
 
-	GeneratorNPCs_PatrolPtr = HumanCharacterPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr;
+	GeneratorNPCs_PatrolPtr = HumanCharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr;
 
 	if (HumanAIControllerPtr)
 	{
@@ -39,14 +40,6 @@ void USTE_Assistance::TreeStart(
 			OnTeamChanged();
 		}
 	}
-
-	GetWorld()->GetTimerManager().SetTimer(
-		CheckKnowCharacterTimerHandle,
-		this,
-		&ThisClass::CheckKnowCharacterImp,
-		1.f,
-		true
-	);
 }
 
 void USTE_Assistance::TreeStop(
@@ -124,37 +117,20 @@ void USTE_Assistance::OnTeamChanged()
 	}
 }
 
-void USTE_Assistance::CheckKnowCharacterImp()
+UGloabVariable_Character* USTE_Assistance::CreateGloabVarianble()
 {
-	auto TeamMatesHelperComponent = HumanAIControllerPtr->GetGroupSharedInfo()->GetTeamMatesHelperComponent();
+	auto GloabVariablePtr = NewObject<FGloabVariable>();
+
+	GloabVariablePtr->UpdateTargetCharacterFunc = std::bind(&ThisClass::UpdateTargetCharacter, this);
+
+	return GloabVariablePtr;
+}
+
+TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
+{
+	auto TeamMatesHelperComponent = HumanAIControllerPtr->GetGroupManagger()->GetTeamMatesHelperComponent();
 	auto KnowCharatersSet = TeamMatesHelperComponent->GetSensingChractersSet();
 	auto OwnerCharacterProxyPtr = TeamMatesHelperComponent->GetOwnerCharacterProxyPtr();
-
-	// 是否有效
-	{
-		TSet<ACharacterBase*> NeedRemoveAry;
-		for (const auto& Iter : KnowCharatersSet)
-		{
-			if (Iter.IsValid())
-			{
-				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
-				{
-					NeedRemoveAry.Add(Iter.Get());
-				}
-			}
-			else
-			{
-				NeedRemoveAry.Add(Iter.Get());
-			}
-		}
-		for (const auto& Iter : NeedRemoveAry)
-		{
-			if (KnowCharatersSet.Contains(Iter))
-			{
-				KnowCharatersSet.Remove(Iter);
-			}
-		}
-	}
 
 	// 是否远离了设定位置
 	auto CharacterActorPtr = OwnerCharacterProxyPtr->GetCharacterActor();
@@ -162,10 +138,10 @@ void USTE_Assistance::CheckKnowCharacterImp()
 	{
 		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
 
-		if (AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr)
+		if (GeneratorNPCs_PatrolPtr)
 		{
-			const auto Location = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->GetActorLocation();
-			const auto MaxDistance = AI_CharacterActorPtr->GetAIComponent()->GeneratorNPCs_PatrolPtr->MaxDistance;
+			const auto Location = GeneratorNPCs_PatrolPtr->GetActorLocation();
+			const auto MaxDistance = GeneratorNPCs_PatrolPtr->MaxDistance;
 
 			TSet<ACharacterBase*> NeedRemoveAry;
 			for (const auto& Iter : KnowCharatersSet)
@@ -173,6 +149,10 @@ void USTE_Assistance::CheckKnowCharacterImp()
 				if (Iter.IsValid())
 				{
 					if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
+					{
+						NeedRemoveAry.Add(Iter.Get());
+					}
+					else if (Iter->IsA(AHumanCharacter_AI::StaticClass()))
 					{
 						NeedRemoveAry.Add(Iter.Get());
 					}
@@ -190,5 +170,9 @@ void USTE_Assistance::CheckKnowCharacterImp()
 				}
 			}
 		}
+
+		return GetNewTargetCharacter(KnowCharatersSet);
 	}
+
+	return nullptr;
 }

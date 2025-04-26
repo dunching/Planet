@@ -9,6 +9,7 @@
 #include "Components/StateTreeComponentSchema.h"
 
 #include "GuideThread.h"
+#include "OpenWorldDataLayer.h"
 
 #include "GuideThreadChallenge.generated.h"
 
@@ -37,6 +38,12 @@ class PLANET_API AGuideThread_Challenge : public AGuideThread_Immediate
 	GENERATED_BODY()
 
 public:
+	
+	/**
+	 * 当前在哪个挑战关卡入口
+	 */
+	ETeleport Teleport = ETeleport::kChallenge_LevelType_1;
+	
 	AGuideThread_Challenge(const FObjectInitializer& ObjectInitializer);
 
 };

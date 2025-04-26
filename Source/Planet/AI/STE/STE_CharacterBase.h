@@ -35,6 +35,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	TWeakObjectPtr<ACharacterBase> TargetCharacterPtr = nullptr;
 
+	std::function<TWeakObjectPtr<ACharacterBase>()> UpdateTargetCharacterFunc;
+	
 };
 
 UCLASS(Blueprintable)
@@ -44,11 +46,17 @@ class PLANET_API USTE_CharacterBase : public UStateTreeEvaluatorBlueprintBase
 
 protected:
 
+	using FGloabVariable = UGloabVariable_Character;
+
 	virtual void TreeStart(FStateTreeExecutionContext& Context)override;
 
-public:
+	TWeakObjectPtr<ACharacterBase> GetNewTargetCharacter(const TSet<TWeakObjectPtr<ACharacterBase>>&ChractersSet);
+	
+private:
+	
+	virtual UGloabVariable_Character* CreateGloabVarianble();;
 
-	virtual void UpdateTargetCharacter(FStateTreeExecutionContext& Context);
+public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Context)
 	AHumanCharacter_AI* HumanCharacterPtr = nullptr;

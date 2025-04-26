@@ -15,6 +15,7 @@
 class UAIComponent;
 class AGuideInteraction_HumanCharacter_AI;
 class UResourceBoxStateTreeComponent;
+class AGroupManagger_NPC;
 
 /**
  *
@@ -57,12 +58,19 @@ class PLANET_API UCharacterNPCStateProcessorComponent : public UStateProcessorCo
 public:
 	using FOwnerType = AHumanCharacter_AI;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
 
-	TArray<ACharacterBase*> GetTargetCharactersAry() const;
+	virtual TArray<TWeakObjectPtr<ACharacterBase>> GetTargetCharactersAry() const override;
 
+	void SetTargetCharactersAry(
+		const TWeakObjectPtr<ACharacterBase>& TargetCharacter
+	);
+
+private:
 	UPROPERTY(Replicated)
-	TObjectPtr<ACharacterBase> TargetCharacter = nullptr;
+	TWeakObjectPtr<ACharacterBase> TargetCharacter = nullptr;
 };
 
 UCLASS()
@@ -85,6 +93,8 @@ public:
 	virtual void SpawnDefaultController() override;
 
 	UCharacterNPCStateProcessorComponent* GetCharacterNPCStateProcessorComponent() const;
+
+	AGroupManagger_NPC* GetGroupManagger_NPC() const;
 
 	virtual void HasBeenStartedLookAt(
 		ACharacterBase* InCharacterPtr

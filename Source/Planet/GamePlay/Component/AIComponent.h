@@ -20,6 +20,7 @@ class UTaskNode_Temporary;
 class AHumanCharacter_AI;
 class AGeneratorNPCs_Patrol;
 class ABuildingArea;
+class UTaskPromt;
 
 /**
  *
@@ -48,22 +49,18 @@ public:
 
 	void InitialAllocationsByProxy();
 
+#pragma region RPC
+	UFUNCTION(NetMulticast, Reliable)
+	void DisplayTaskPromy(TSubclassOf<UTaskPromt> TaskPromtClass);
+	
+	UFUNCTION(NetMulticast, Reliable)
+	void StopDisplayTaskPromy();
+#pragma endregion
+	
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pawn")
 	ETeammateOption DefaultTeammateOption = ETeammateOption::kEnemy;
 #endif
-
-	/**
-	 * 既定的巡逻路线
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<AGeneratorNPCs_Patrol> GeneratorNPCs_PatrolPtr = nullptr;
-
-	/**
-	 * 营寨
-	 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
 
 	/**
 	 * 跟随前进的点
@@ -96,4 +93,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Allocation")
 	FGameplayTag ActiveSkillSet_2;
 #pragma endregion
+
+	UPROPERTY(Transient)
+	UTaskPromt* TaskPromtPtr = nullptr;
 };

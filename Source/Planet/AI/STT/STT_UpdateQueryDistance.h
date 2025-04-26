@@ -9,7 +9,7 @@
 #include "Tasks/StateTreeAITask.h"
 
 #include "GenerateType.h"
-#include "STT_Base.h"
+#include "STT_CharacterBase.h"
 
 #include "STT_UpdateQueryDistance.generated.h"
 

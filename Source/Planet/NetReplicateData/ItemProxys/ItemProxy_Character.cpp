@@ -355,7 +355,7 @@ void FCharacterProxy::UpdateSocket(const FCharacterSocket& Socket)
 	{
 		TeammateConfigureMap[Socket.Socket] = Socket;
 		
-		OnCharacterSocketUpdated.Broadcast(Socket);
+		OnCharacterSocketUpdated.Broadcast(Socket, GetProxyType());
 	}
 
 	Update2Client();
