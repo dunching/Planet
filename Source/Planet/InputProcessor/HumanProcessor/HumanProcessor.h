@@ -55,5 +55,7 @@ namespace HumanProcessor
 
 		void Dash();
 
+		void Jump();
+
 	};
 }

@@ -30,11 +30,6 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
 		// 状态信息
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
 
 
 		//
@@ -60,8 +55,6 @@ void USkill_Active_Arrow_HomingToward::DurationTick(UAbilityTask_TimerHelper*, f
 	{
 		if (CharacterStateInfoSPtr)
 		{
-			CharacterStateInfoSPtr->TotalTime = Interval;
-			CharacterStateInfoSPtr->DataChanged();
 		}
 	}
 #endif

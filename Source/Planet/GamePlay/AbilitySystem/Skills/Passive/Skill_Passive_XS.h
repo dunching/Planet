@@ -18,6 +18,9 @@ class ACharacterBase;
 
 struct FGAEventData;
 
+/**
+ * 血手 低血量时触发护盾
+ */
 UCLASS()
 class PLANET_API USkill_Passive_XS : public USkill_Passive_Base
 {

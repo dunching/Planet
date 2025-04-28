@@ -32,22 +32,6 @@ void UMyProgressBar::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UMyProgressBar::SetDataSource(FBasePropertySet& Property)
-{
-	{
-		SetMaxValue(Property.GetMaxValue());
-		OnMaxPPValueChanged = Property.AddOnMaxValueChanged(
-			std::bind(&ThisClass::SetMaxValue, this, std::placeholders::_2)
-		);
-	}
-	{
-		SetCurrentValue(Property.GetCurrentValue());
-		OnPPValueChanged = Property.AddOnValueChanged(
-			std::bind(&ThisClass::SetCurrentValue, this, std::placeholders::_2)
-		);
-	}
-}
-
 void UMyProgressBar::SetDataSource(
 	UAbilitySystemComponent*AbilitySystemComponentPtr,
 	FGameplayAttribute Attribute,

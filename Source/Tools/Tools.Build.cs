@@ -8,7 +8,7 @@ public class Tools : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        bEnableUndefinedIdentifierWarnings = false;
+        UndefinedIdentifierWarningLevel = WarningLevel.Error;
         bWarningsAsErrors = true;
         bEnableExceptions = true;
 
@@ -21,8 +21,6 @@ public class Tools : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[] { });
         PublicIncludePaths.Add("Tools");
-        PublicIncludePaths.Add("Tools/ThreadPoolHelper");
-        PublicIncludePaths.Add("Tools/LogHelper");
 
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Core",

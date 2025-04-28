@@ -14,6 +14,8 @@
 
 struct FCharacterStateInfo;
 struct FGameplayEffectSpec;
+struct FActiveGameplayEffect;
+
 class UEffectItem;
 class ACharacterBase;
 class UCS_Base;
@@ -40,7 +42,7 @@ public:
 
 	virtual void SynchronizeProperties()override;
 
-	UEffectItem* AddEffectItem();
+	UEffectItem* AddEffectItem(const FActiveGameplayEffect* InActiveGameplayEffectPtr);
 
 	void BindCharacterState(ACharacterBase*TargetCharacterPtr);
 	

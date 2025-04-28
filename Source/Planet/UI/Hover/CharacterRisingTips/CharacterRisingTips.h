@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -8,9 +8,12 @@
 #include <AIController.h>
 
 #include "GenerateType.h"
+#include "HoverWidgetBase.h"
 
 
 #include "CharacterRisingTips.generated.h"
+
+struct FOnEffectedTawrgetCallback;
 
 class ACharacterBase;
 class UFightingTipsItem;
@@ -21,7 +24,7 @@ class UToolIcon;
  * 浮动跳字
  */
 UCLASS()
-class PLANET_API UCharacterRisingTips : public UMyUserWidget
+class PLANET_API UCharacterRisingTips : public UHoverWidgetBase
 {
 	GENERATED_BODY()
 
@@ -29,11 +32,11 @@ public:
 
 	virtual void NativeConstruct()override;
 
-	virtual void NativeDestruct()override;
-
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
-
+	void SetData(const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback);
+	
 protected:
+
+	virtual FVector GetHoverPosition() override;
 
 	enum class EType
 	{
@@ -69,20 +72,7 @@ protected:
 
 private:
 
-	bool ResetPosition(float InDeltaTime);
-
 	ACharacterBase* TargetCharacterPtr = nullptr;
 
-	FTSTicker::FDelegateHandle TickDelegateHandle;
-
 	bool bIsCritical = false;
-};
-
-UCLASS()
-class PLANET_API UCharacterRisingTips1 : public UCharacterRisingTips
-{
-	GENERATED_BODY()
-
-public:
-
 };

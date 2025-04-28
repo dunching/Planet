@@ -72,11 +72,6 @@ void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProper
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	FDoRepLifetimeParams Params;
-	Params.bIsPushBased = true;
-
-	Params.Condition = COND_None;
-	DOREPLIFETIME_WITH_PARAMS_FAST(ThisClass, CharacterStateInfo_FASI_Container, Params);
 }
 
 void UStateProcessorComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
@@ -98,14 +93,6 @@ void UStateProcessorComponent::OnGroupManaggerReady(AGroupManagger* NewGroupShar
 
 TSharedPtr<FCharacterStateInfo> UStateProcessorComponent::GetCharacterState(const FGameplayTag& CSTag) const
 {
-	for (const auto& Iter : StateDisplayMap)
-	{
-		if (Iter.Value && Iter.Value->Tag == CSTag)
-		{
-			return Iter.Value;
-		}
-	}
-
 	return nullptr;
 }
 
@@ -142,7 +129,6 @@ void UStateProcessorComponent::InitializeComponent()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
-		CharacterStateInfo_FASI_Container.StateProcessorComponent = this;
 	}
 }
 

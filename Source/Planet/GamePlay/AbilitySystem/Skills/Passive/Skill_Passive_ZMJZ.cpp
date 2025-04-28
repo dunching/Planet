@@ -18,7 +18,10 @@
 #include "GameplayTagsLibrary.h"
 #include "GE_Common.h"
 
-void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void USkill_Passive_ZMJZ::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -32,17 +35,20 @@ void USkill_Passive_ZMJZ::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo
 		{
 			AbilityActivatedCallbacksHandle =
 				CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
-					std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_1));
+					std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_1)
+				);
 		}
 	}
 #endif
 }
 
-void USkill_Passive_ZMJZ::PreActivate(const FGameplayAbilitySpecHandle Handle,
-                                      const FGameplayAbilityActorInfo* ActorInfo,
-                                      const FGameplayAbilityActivationInfo ActivationInfo,
-                                      FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
-                                      const FGameplayEventData* TriggerEventData /*= nullptr */)
+void USkill_Passive_ZMJZ::PreActivate(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
+	const FGameplayEventData* TriggerEventData /*= nullptr */
+)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
@@ -84,14 +90,13 @@ void USkill_Passive_ZMJZ::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Passive_ZMJZ::PerformAction(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-		)
+void USkill_Passive_ZMJZ::ModifyGASpeed(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
-	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
@@ -104,8 +109,12 @@ void USkill_Passive_ZMJZ::PerformAction(
 			SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, DecreamTime);
 
-			const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
-			                                                     GetCurrentActivationInfo(), SpecHandle);
+			const auto GEHandle = ApplyGameplayEffectSpecToOwner(
+				GetCurrentAbilitySpecHandle(),
+				GetCurrentActorInfo(),
+				GetCurrentActivationInfo(),
+				SpecHandle
+			);
 
 			{
 				auto OnActiveGameplayEffectStackChangePtr = GetAbilitySystemComponentFromActorInfo()->
@@ -119,7 +128,9 @@ void USkill_Passive_ZMJZ::PerformAction(
 					{
 						OnActiveGameplayEffectStackChange(GEHandle, 1, 0);
 						OnActiveGameplayEffectStackChangePtr->AddUObject(
-							this, &ThisClass::OnActiveGameplayEffectStackChange);
+							this,
+							&ThisClass::OnActiveGameplayEffectStackChange
+						);
 					}
 				}
 			}
@@ -134,7 +145,9 @@ void USkill_Passive_ZMJZ::PerformAction(
 					else
 					{
 						OnGameplayEffectRemoved_InfoDelegatePtr->AddUObject(
-							this, &ThisClass::OnGameplayEffectRemoved_InfoDelegate);
+							this,
+							&ThisClass::OnGameplayEffectRemoved_InfoDelegate
+						);
 					}
 				}
 			}
@@ -143,15 +156,26 @@ void USkill_Passive_ZMJZ::PerformAction(
 #endif
 }
 
-void USkill_Passive_ZMJZ::OnSendAttack(const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback)
+void USkill_Passive_ZMJZ::OnSendAttack(
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+)
 {
 	if (CharacterPtr)
 	{
-		PerformAction(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), &CurrentEventData);
+		ModifyGASpeed(
+			GetCurrentAbilitySpecHandle(),
+			GetCurrentActorInfo(),
+			GetCurrentActivationInfo(),
+			&CurrentEventData
+		);
 	}
 }
 
-void USkill_Passive_ZMJZ::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration)
+void USkill_Passive_ZMJZ::DurationDelegate(
+	UAbilityTask_TimerHelper* TaskPtr,
+	float CurrentInterval,
+	float Duration
+)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
@@ -160,7 +184,9 @@ void USkill_Passive_ZMJZ::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, fl
 #endif
 }
 
-bool USkill_Passive_ZMJZ::OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr)
+bool USkill_Passive_ZMJZ::OnTimerTaskFinished(
+	UAbilityTask_TimerHelper* TaskPtr
+)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
@@ -181,7 +207,8 @@ void USkill_Passive_ZMJZ::ModifyCharacterData(
 void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 	FActiveGameplayEffectHandle Handle,
 	int32 NewStackCount,
-	int32 PreviousStackCount)
+	int32 PreviousStackCount
+)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
@@ -196,8 +223,12 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(SkillProxyPtr->GetProxyType(), NewStackCount * 10);
 
-			const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
-			                                                     GetCurrentActivationInfo(), SpecHandle);
+			const auto GEHandle = ApplyGameplayEffectSpecToOwner(
+				GetCurrentAbilitySpecHandle(),
+				GetCurrentActorInfo(),
+				GetCurrentActivationInfo(),
+				SpecHandle
+			);
 		};
 		if (NewStackCount > PreviousStackCount)
 		{
@@ -211,22 +242,35 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 			if (NewStackCount > 0)
 			{
 				// 当第一层消失时更新后续的消失时间
-				FTSTicker::GetCoreTicker().AddTicker(FTickerDelegate::CreateLambda([this](auto)
-				{
-					FGameplayEffectSpecHandle SpecHandle =
-						MakeOutgoingGameplayEffectSpec(GE_ZMJZClass, GetAbilityLevel());
+				FTSTicker::GetCoreTicker().AddTicker(
+					FTickerDelegate::CreateLambda(
+						[this](
+						auto
+					)
+						{
+							FGameplayEffectSpecHandle SpecHandle =
+								MakeOutgoingGameplayEffectSpec(GE_ZMJZClass, GetAbilityLevel());
 
-					SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
-					SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-					SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,
-					                                               SecondaryDecreamTime);
-					SpecHandle.Data.Get()->SetStackCount(0);
+							SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+							SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+							SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+								UGameplayTagsLibrary::GEData_Duration,
+								SecondaryDecreamTime
+							);
+							SpecHandle.Data.Get()->SetStackCount(0);
 
-					const auto GEHandle = ApplyGameplayEffectSpecToOwner(
-						GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(), GetCurrentActivationInfo(), SpecHandle);
+							const auto GEHandle = ApplyGameplayEffectSpecToOwner(
+								GetCurrentAbilitySpecHandle(),
+								GetCurrentActorInfo(),
+								GetCurrentActivationInfo(),
+								SpecHandle
+							);
 
-					return false;
-				}), 0);
+							return false;
+						}
+					),
+					0
+				);
 
 				// 
 				UpdateGELmbda();
@@ -239,7 +283,10 @@ void USkill_Passive_ZMJZ::OnActiveGameplayEffectStackChange(
 #endif
 }
 
-void USkill_Passive_ZMJZ::OnGameplayEffectRemoved_InfoDelegate(const FGameplayEffectRemovalInfo&)
+void USkill_Passive_ZMJZ::OnGameplayEffectRemoved_InfoDelegate(
+	const FGameplayEffectRemovalInfo&
+
+)
 {
 #if UE_EDITOR || UE_SERVER
 
@@ -252,8 +299,12 @@ void USkill_Passive_ZMJZ::OnGameplayEffectRemoved_InfoDelegate(const FGameplayEf
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(SkillProxyPtr->GetProxyType(), 0);
 
-		const auto GEHandle = ApplyGameplayEffectSpecToOwner(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo(),
-		                                                     GetCurrentActivationInfo(), SpecHandle);
+		const auto GEHandle = ApplyGameplayEffectSpecToOwner(
+			GetCurrentAbilitySpecHandle(),
+			GetCurrentActorInfo(),
+			GetCurrentActivationInfo(),
+			SpecHandle
+		);
 	}
 #endif
 }

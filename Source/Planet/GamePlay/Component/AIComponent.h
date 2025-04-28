@@ -40,7 +40,7 @@ public:
 	UAIComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
-
+	
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)override;
 
 	void AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr);
@@ -49,12 +49,11 @@ public:
 
 	void InitialAllocationsByProxy();
 
-#pragma region RPC
-	UFUNCTION(NetMulticast, Reliable)
 	void DisplayTaskPromy(TSubclassOf<UTaskPromt> TaskPromtClass);
 	
-	UFUNCTION(NetMulticast, Reliable)
 	void StopDisplayTaskPromy();
+	
+#pragma region RPC
 #pragma endregion
 	
 #if WITH_EDITORONLY_DATA

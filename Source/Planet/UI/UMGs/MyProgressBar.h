@@ -25,8 +25,6 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	void SetDataSource(FBasePropertySet & Property);
-
 	void SetDataSource(
 		UAbilitySystemComponent*AbilitySystemComponentPtr,
 		FGameplayAttribute Attribute,

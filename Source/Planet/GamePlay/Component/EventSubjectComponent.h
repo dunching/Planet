@@ -29,13 +29,4 @@ public:
 
 	UEventSubjectComponent(const FObjectInitializer& ObjectInitializer);
 
-	// 对“其他”角色造成的影响（伤害、控制）
-	UFUNCTION(NetMulticast, Reliable)
-	void OnEffectOhterCharacter(
-		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-		);
-	
-	// 对“其他”角色造成的影响（伤害、控制）
-	FMakedDamageDelegate MakedDamageDelegate;
-
 };

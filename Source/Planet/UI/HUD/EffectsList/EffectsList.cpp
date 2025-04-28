@@ -64,12 +64,14 @@ void UEffectsList::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-UEffectItem* UEffectsList::AddEffectItem()
+UEffectItem* UEffectsList::AddEffectItem(const FActiveGameplayEffect* InActiveGameplayEffectPtr)
 {
 	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
 	if (UIPtr)
 	{
 		auto ChildPtr = CreateWidget<UEffectItem>(this, EffectItemClass);
+		ChildPtr->SetData(InActiveGameplayEffectPtr);
+		
 		auto SlotPtr = UIPtr->AddChildToWrapBox(ChildPtr);
 
 		return ChildPtr;
@@ -139,7 +141,7 @@ void UEffectsList::OnActiveGameplayEffect(
 
 	if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Info))
 	{
-		auto ItemPtr = AddEffectItem();
+		auto ItemPtr = AddEffectItem(ActiveGameplayEffectPtr);
 	}
 }
 

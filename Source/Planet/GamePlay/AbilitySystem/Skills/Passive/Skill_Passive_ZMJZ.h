@@ -1,4 +1,3 @@
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -20,15 +19,19 @@ struct FGAEventData;
 struct FCharacterStateInfo;
 struct FOnEffectedTawrgetCallback;
 
+/**
+ * 致命节奏 增加平通攻击得速度
+ */
 UCLASS()
 class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 {
 	GENERATED_BODY()
 
 public:
-
-	using FMakedDamageHandle = 
-		TCallbackHandleContainer<void(const FOnEffectedTawrgetCallback&)>::FCallbackHandleSPtr;
+	using FMakedDamageHandle =
+	TCallbackHandleContainer<void(
+		const FOnEffectedTawrgetCallback&
+	)>::FCallbackHandleSPtr;
 
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
@@ -41,19 +44,19 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	)override;
+	) override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	)override;
+	) override;
 
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
-	)override;
+	) override;
 
 	virtual void EndAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -61,25 +64,32 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	)override;
+	) override;
 
 protected:
-
-	virtual void PerformAction(
+	void ModifyGASpeed(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	)override;
+	);
 
-	void OnSendAttack(const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback);
+	void OnSendAttack(
+		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	);
 
-	void DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, float CurrentInterval, float Duration);
+	void DurationDelegate(
+		UAbilityTask_TimerHelper* TaskPtr,
+		float CurrentInterval,
+		float Duration
+	);
 
-	bool OnTimerTaskFinished(UAbilityTask_TimerHelper* TaskPtr);
+	bool OnTimerTaskFinished(
+		UAbilityTask_TimerHelper* TaskPtr
+	);
 
 	void ModifyCharacterData(
-		const FGameplayTag&DataSource,
+		const FGameplayTag& DataSource,
 		int32 Value,
 		bool bIsClear = false
 	);
@@ -88,11 +98,12 @@ protected:
 		FActiveGameplayEffectHandle,
 		int32 NewStackCount,
 		int32 PreviousStackCount
-		);
+	);
 
 	void OnGameplayEffectRemoved_InfoDelegate(
 		const FGameplayEffectRemovalInfo&
-		);
+		
+	);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float DecreamTime = 5.f;
@@ -102,9 +113,8 @@ protected:
 	FMakedDamageHandle AbilityActivatedCallbacksHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
-	TSubclassOf<UGE_ZMJZ>GE_ZMJZClass;
+	TSubclassOf<UGameplayEffect> GE_ZMJZClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
-	TSubclassOf<UGE_ZMJZImp>GE_ZMJZImpClass;
-
+	TSubclassOf<UGameplayEffect> GE_ZMJZImpClass;
 };

@@ -16,12 +16,13 @@ class UPAD_TaskNode_Preset;
 class UTaskNode_Temporary;
 class UPAD_TaskNode_Interaction;
 class AGuideInteraction_Actor;
+class UTaskPromt;
 
 USTRUCT(BlueprintType, Blueprintable)
 struct PLANET_API FGuideInterationSetting
 {
 	GENERATED_USTRUCT_BODY()
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AGuideInteraction_Actor> GuideInteraction;
 
@@ -40,6 +41,9 @@ struct PLANET_API FGuideInterationSetting
 	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bTaskHasCompleted = false;
+	
+	UPROPERTY(EditAnywhere, Category = Parameter)
+	TSubclassOf<UTaskPromt> TaskPromtClass;
 
 };
 
@@ -54,27 +58,36 @@ class PLANET_API USceneActorInteractionComponent : public UActorComponent
 public:
 	static FName ComponentName;
 
-	USceneActorInteractionComponent(const FObjectInitializer& ObjectInitializer);
+	USceneActorInteractionComponent(
+		const FObjectInitializer& ObjectInitializer
+	);
 
 	TArray<TSubclassOf<AGuideInteraction_Actor>> GetInteractionLists() const;
 
 	TArray<FGuideInterationSetting> GetGuideInteractionAry() const;
 
-	virtual void StartInteractionItem(const TSubclassOf<AGuideInteraction_Actor>& Item);
-	
+	virtual void StartInteractionItem(
+		const TSubclassOf<AGuideInteraction_Actor>& Item
+	);
+
 	void StopInteractionItem();
 
-	void ChangedInterationState(const TSubclassOf<AGuideInteraction_Actor>& Item, bool bIsEnable);
+	void ChangedInterationState(
+		const TSubclassOf<AGuideInteraction_Actor>& Item,
+		bool bIsEnable
+	);
 
-	void ChangedInterationTaskState(TSubclassOf<AGuideInteraction_Actor> Item, bool bIsEnable);
-	
+	virtual void ChangedInterationTaskState(
+		TSubclassOf<AGuideInteraction_Actor> Item,
+		bool bIsEnable
+	);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Range = 200;
 
 protected:
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FGuideInterationSetting> GuideInteractionAry;
 
-	TObjectPtr<AGuideInteraction_Actor>GuideInteractionActorPtr = nullptr;
+	TObjectPtr<AGuideInteraction_Actor> GuideInteractionActorPtr = nullptr;
 };

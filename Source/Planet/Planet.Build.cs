@@ -53,7 +53,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Tasks");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Async");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/BasicFutures");
-        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/EffectsCirculation");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Active");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Skills/Passive");
@@ -73,7 +72,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GamePlay/PlayerState");
         PublicIncludePaths.Add("Planet/GamePlay/GroupManagger");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn");
-        PublicIncludePaths.Add("Planet/GamePlay/Pawn/ToolsInteractiveComponent");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse");
         PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human");
         PublicIncludePaths.Add("Planet/GamePlay/WorldSetting");
@@ -94,7 +92,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/HUD/EffectsList");
         PublicIncludePaths.Add("Planet/UI/HUD/GetItemInfos");
         PublicIncludePaths.Add("Planet/UI/HUD/FocusTitle");
-        PublicIncludePaths.Add("Planet/UI/HUD/PlayerConversationBorder");
         PublicIncludePaths.Add("Planet/UI/UMGs");
         PublicIncludePaths.Add("Planet/UI/UMGs/RichTextBlock");
         PublicIncludePaths.Add("Planet/UI/Layout");
@@ -128,7 +125,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/AI/STT");
         PublicIncludePaths.Add("Planet/AI/StateTreeComponent");
         PublicIncludePaths.Add("Planet/Navgation");
-        PublicIncludePaths.Add("Planet/GroupsManagger");
         PublicIncludePaths.Add("Planet/SceneHelperActor");
         PublicIncludePaths.Add("Planet/SceneActor");
         PublicIncludePaths.Add("Planet/SceneActor/Biomes");
@@ -143,7 +139,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/RaffleSystem");
         PublicIncludePaths.Add("Planet/Command");
         PublicIncludePaths.Add("Planet/Common");
-        PublicIncludePaths.Add("Planet/DelayTask");
         PublicIncludePaths.Add("Planet/NetReplicateData");
         PublicIncludePaths.Add("Planet/NetReplicateData/ItemProxys");
         PublicIncludePaths.Add("Planet/AssetRefMap");

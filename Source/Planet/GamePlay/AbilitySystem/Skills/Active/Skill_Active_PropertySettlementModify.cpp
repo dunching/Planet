@@ -49,20 +49,20 @@ void USkill_Active_PropertySettlementModify::ActivateAbility(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
-		struct FMyPropertySettlementModify : public FPropertySettlementModify
-		{
-			FMyPropertySettlementModify():
-				FPropertySettlementModify(10)
-			{
-			
-			}
-
-			virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const override
-			{
-				const auto Result = FPropertySettlementModify::SettlementModify(ValueMap);
-				return 100 < Result ? 100 : Result;
-			}
-		};
+		// struct FMyPropertySettlementModify : public FPropertySettlementModify
+		// {
+		// 	FMyPropertySettlementModify():
+		// 		FPropertySettlementModify(10)
+		// 	{
+		// 	
+		// 	}
+		//
+		// 	virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const override
+		// 	{
+		// 		const auto Result = FPropertySettlementModify::SettlementModify(ValueMap);
+		// 		return 100 < Result ? 100 : Result;
+		// 	}
+		// };
 
 		// const auto MyPropertySettlementModify = MakeShared<FMyPropertySettlementModify>();
 		// CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes().MoveSpeed.AddSettlementModify(MyPropertySettlementModify);

@@ -58,6 +58,35 @@ void USceneCharacterAIInteractionComponent::StartInteractionItem(
 	);
 }
 
+void USceneCharacterAIInteractionComponent::ChangedInterationTaskState(
+	TSubclassOf<AGuideInteraction_Actor> Item,
+	bool bIsEnable
+)
+{
+	Super::ChangedInterationTaskState(Item, bIsEnable);
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		auto OnwerActorPtr = GetOwner<FOwnerType>();
+		if (!OnwerActorPtr)
+		{
+			return;
+		}
+
+		for (const auto& Iter : GuideInteractionAry)
+		{
+			if ((Iter.GuideInteraction == Item) && Iter.bIsTask && !Iter.bTaskHasCompleted)
+			{
+				OnwerActorPtr->GetAIComponent()->DisplayTaskPromy(Iter.TaskPromtClass);
+				return;
+			}
+		}
+		OnwerActorPtr->GetAIComponent()->StopDisplayTaskPromy();
+	}
+#endif
+}
+
 void UCharacterAIAttributesComponent::SetCharacterID(
 	const FGuid& InCharacterID
 )

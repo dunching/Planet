@@ -15,6 +15,11 @@ class ASPlineActor;
 
 struct FCharacterStateInfo;
 
+/**
+ *	牵引效果
+ * 以角色为中心，在半径内得敌人会被拖向中心
+ * 类似LOL龙王E、天刀丐帮得奴扫乾坤
+ */
 UCLASS()
 class PLANET_API USkill_Active_Traction : public USkill_Active_Base
 {
@@ -39,19 +44,8 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
-	void IntervalDelegate(
-		UAbilityTask_TimerHelper*, 
-		float CurrentIntervalTime,
-		float IntervalTime,
-		bool bIsEnd
-	);
-
-	void DurationDelegate(UAbilityTask_TimerHelper*, float CurrentIntervalTime, float IntervalTime);
-
 	void PlayMontage();
 
-	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
-	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	UAnimMontage* HumanMontagePtr = nullptr;
 
@@ -66,5 +60,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 Radius = 600;
-	
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	int32 Strength = 400;
+
+	TObjectPtr<ATractionPoint>TractionPoint = nullptr;
 };

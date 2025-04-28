@@ -26,3 +26,19 @@ public:
 protected:
 
 };
+
+/**
+ *
+ */
+UCLASS()
+class PLANET_API ATractionPoint : public AActor
+{
+	GENERATED_BODY()
+
+public:
+
+	ATractionPoint(const FObjectInitializer& ObjectInitializer);
+
+protected:
+
+};

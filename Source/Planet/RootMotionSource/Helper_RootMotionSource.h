@@ -20,11 +20,11 @@ enum ERootMotionSource_Priority : uint16
 
 	kAIMove,
 
-	kMove,				// 位移
-	kFlyAway,			// 飞行
-	kHasBeenFlyAway,	// 被击飞
-	kTraction,			// 牵引
-	kForceMove,			// 强制位移
+	kMove, // 位移
+	kFlyAway, // 飞行
+	kHasBeenFlyAway, // 被击飞
+	kTraction, // 牵引
+	kForceMove, // 强制位移
 };
 
 class ASPlineActor;
@@ -42,6 +42,12 @@ struct FRootMotionSource_MyConstantForce : public FRootMotionSource_ConstantForc
 	GENERATED_USTRUCT_BODY()
 
 	virtual UScriptStruct* GetScriptStruct() const override;
+
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
 	virtual void PrepareRootMotion(
 		float SimulationTime,
@@ -69,13 +75,13 @@ struct FRootMotionSource_MyRadialForce : public FRootMotionSource_RadialForce
 
 	virtual FRootMotionSource* Clone() const override;
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
 	virtual bool NetSerialize(
 		FArchive& Ar,
 		UPackageMap* Map,
 		bool& bOutSuccess
 	) override;
-
-	virtual UScriptStruct* GetScriptStruct() const override;
 
 	virtual bool Matches(
 		const FRootMotionSource* Other
@@ -99,9 +105,8 @@ struct FRootMotionSource_MyRadialForce : public FRootMotionSource_RadialForce
 
 	virtual void CheckTimeOut() override;
 
-	TWeakObjectPtr<ATractionPoint> TractionPointPtr = nullptr;
-
-	int32 AcceptableRadius = 10;
+	UPROPERTY()
+	float InnerRadius = 100.f;
 };
 
 template <>
@@ -122,7 +127,7 @@ struct FRootMotionSource_HasBeenFlyAway : public FRootMotionSource
 
 	FRootMotionSource_HasBeenFlyAway();
 
-	virtual ~FRootMotionSource_HasBeenFlyAway();
+	virtual ~FRootMotionSource_HasBeenFlyAway() override;
 
 	virtual FRootMotionSource* Clone() const override;
 
@@ -176,7 +181,7 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 
 	FRootMotionSource_FlyAway();
 
-	virtual ~FRootMotionSource_FlyAway();
+	virtual ~FRootMotionSource_FlyAway() override;
 
 	virtual FRootMotionSource* Clone() const override;
 
@@ -238,7 +243,6 @@ struct FRootMotionSource_FlyAway : public FRootMotionSource
 
 	bool bIsLanded = false;
 
-	
 	float Radius = 0.f;
 
 	float HalfHeight = 0.f;

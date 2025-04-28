@@ -36,11 +36,6 @@ void USkill_Active_CantBeSelected::ActivateAbility(
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 		ExcuteTasks();
 
-		CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
-		CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
-		CharacterStateInfoSPtr->Duration = Duration;
-		CharacterStateInfoSPtr->DefaultIcon = SkillProxyPtr->GetIcon();
-		CharacterStateInfoSPtr->DataChanged();
 
 
 		{
@@ -84,8 +79,6 @@ void USkill_Active_CantBeSelected::DurationDelegate(UAbilityTask_TimerHelper*, f
 	{
 		if (CharacterStateInfoSPtr)
 		{
-			CharacterStateInfoSPtr->TotalTime = CurrentIntervalTime;
-			CharacterStateInfoSPtr->DataChanged();
 		}
 	}
 #endif

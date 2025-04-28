@@ -642,7 +642,7 @@ void UCharacterAbilitySystemComponent::UpdateMap(
 			GameplayAttributeDataPtr,
 			{
 				{
-					UGameplayTagsLibrary::DataSource_Regular,
+					UGameplayTagsLibrary::DataSource_Character,
 					FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
 				}
 			}
@@ -653,33 +653,33 @@ void UCharacterAbilitySystemComponent::UpdateMap(
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Regular))
+		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
 		{
-			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] += Value;
+			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] += Value;
 		}
 		else
 		{
-			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Regular, Value);
+			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
 		}
 
-		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] =
-			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular], MinValue, MaxValue);
+		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] =
+			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character], MinValue, MaxValue);
 	}
 	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override))
 	{
 		auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
 
-		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Regular))
+		if (GameplayAttributeDataMap.Contains(UGameplayTagsLibrary::DataSource_Character))
 		{
-			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] = Value;
+			GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] = Value;
 		}
 		else
 		{
-			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Regular, Value);
+			GameplayAttributeDataMap.Add(UGameplayTagsLibrary::DataSource_Character, Value);
 		}
 
-		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular] =
-			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Regular], MinValue, MaxValue);
+		GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character] =
+			FMath::Clamp(GameplayAttributeDataMap[UGameplayTagsLibrary::DataSource_Character], MinValue, MaxValue);
 	}
 	else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary))
 	{
@@ -853,7 +853,7 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 					Iter.Key,
 					Iter.Value,
 					0.f,
-					SourceSet->GetMax_HP(),
+					TargetSet->GetMax_HP(),
 					Spec,
 					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
 				);
@@ -864,7 +864,7 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 					Iter.Key,
 					Iter.Value,
 					0.f,
-					SourceSet->GetMax_PP(),
+					TargetSet->GetMax_PP(),
 					Spec,
 					UAS_Character::GetPPAttribute().GetGameplayAttributeData(TargetSet)
 				);
@@ -875,7 +875,7 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 					Iter.Key,
 					Iter.Value,
 					0.f,
-					SourceSet->GetMax_Mana(),
+					TargetSet->GetMax_Mana(),
 					Spec,
 					UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet)
 				);
@@ -886,7 +886,7 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 					Iter.Key,
 					-Iter.Value,
 					0.f,
-					SourceSet->GetMax_HP(),
+					TargetSet->GetMax_HP(),
 					Spec,
 					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
 				);
@@ -1005,22 +1005,13 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 				ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
 				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 
-				Instigator->GetCharacterAbilitySystemComponent()->MakedDamageDelegate(
+				Instigator->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
 					ReceivedEventModifyDataCallback
 					);
 
-				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate(
+				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
 					ReceivedEventModifyDataCallback
 					);
-
-				if (Instigator->IsPlayerControlled())
-				{
-					auto PCPtr = Instigator->GetController<APlanetPlayerController>();
-					if (PCPtr)
-					{
-						PCPtr->GetEventSubjectComponent()->OnEffectOhterCharacter(ReceivedEventModifyDataCallback);
-					}
-				}
 			}
 		}
 	}
@@ -1152,4 +1143,10 @@ void UCharacterAbilitySystemComponent::RemoveReceviedEventModify(
 			break;
 		}
 	}
+}
+
+void UCharacterAbilitySystemComponent::OnEffectOhterCharacter_Implementation(
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback)
+{
+	MakedDamageDelegate(ReceivedEventModifyDataCallback);
 }

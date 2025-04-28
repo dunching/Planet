@@ -118,6 +118,10 @@ void UActionSkillsIcon::UpdateSkillState()
 	{
 		UpdateSkillState_ActiveSkill();
 	}
+	else if (IconSocket.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
+	{
+		UpdateSkillState_ActiveWeapon();
+	}
 }
 
 void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
@@ -167,19 +171,6 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 		if (!GAInsPtr)
 		{
 			return;
-		}
-
-		auto CSSPtr = CharacterPtr->GetStateProcessorComponent()->GetCharacterState(SKillProxyType);
-		if (CSSPtr)
-		{
-			//
-			SetDurationPercent(true, CSSPtr->GetRemainTimePercent());
-		}
-		else
-		{
-			// 
-			GAInsPtr->GetInputRemainPercent(bIsAcceptInput, Percent);
-			SetInputRemainPercent(bIsAcceptInput, Percent);
 		}
 	}
 }

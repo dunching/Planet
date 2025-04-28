@@ -90,9 +90,6 @@ public:
 	TSubclassOf<UFocusIcon>FocusIconClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UInteractionList>InteractionList;
 #pragma endregion MenusUI
 

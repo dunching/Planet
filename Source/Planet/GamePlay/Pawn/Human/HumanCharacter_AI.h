@@ -30,7 +30,13 @@ public:
 
 	virtual void StartInteractionItem(
 		const TSubclassOf<AGuideInteraction_Actor>& Item
+		) override;
+	
+	virtual void ChangedInterationTaskState(
+		TSubclassOf<AGuideInteraction_Actor> Item,
+		bool bIsEnable
 	) override;
+
 };
 
 /**

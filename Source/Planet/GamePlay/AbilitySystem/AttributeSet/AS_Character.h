@@ -99,7 +99,21 @@ public:
 	FMyGameplayAttributeData Mana_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana_Replay);
 	
-	// 攻击力
+	/**
+	 * 内攻值
+	 * 不可被闪避
+	 * 可被对方内功减少伤害
+	 */
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData AP;
+	ATTRIBUTE_ACCESSORS(UAS_Character, AP);
+	
+	/**
+	 * 外功值
+	 * 可被闪避
+	 * 可被抗性减少伤害
+	 * 武器攻击时默认的加成
+	 */
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData AD;
 	ATTRIBUTE_ACCESSORS(UAS_Character, AD);

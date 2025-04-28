@@ -14,6 +14,10 @@ class ACameraTrailHelper;
 class ASPlineActor;
 class UAbilityTask_TimerHelper;
 
+/**
+ * 类似 逆水寒手游 碧云问笛或天刀 暴雨梨花
+ * 会将角色升到空中，并且切换为不可选中状态，期间移速增加，持续时间结束时缓慢下降，着陆之后取消不可选中状态
+ */
 UCLASS()
 class PLANET_API USkill_Active_BYWD : public USkill_Active_Base
 {

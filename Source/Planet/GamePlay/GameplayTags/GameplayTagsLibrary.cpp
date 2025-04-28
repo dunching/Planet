@@ -335,9 +335,6 @@ FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Assistional =
 
 #pragma endregion
 
-FGameplayTag UGameplayTagsLibrary::DataSource_Regular =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Regular")));
-
 // 人物身上自带的属性
 FGameplayTag UGameplayTagsLibrary::DataSource_Character =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Character")));

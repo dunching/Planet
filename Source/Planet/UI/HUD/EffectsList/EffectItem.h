@@ -29,7 +29,9 @@ public:
 
 	using FDataChangedHandle = TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-protected:
+	void SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr);
+
+private:
 
 	virtual void NativeConstruct()override;
 
@@ -48,12 +50,12 @@ protected:
 
 	void SetPercentIsDisplay(bool bIsDisplay);
 
-	void SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr);
+	void SetTexutre();
+
+	const FActiveGameplayEffect* ActiveGameplayEffectPtr = nullptr;
 
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
 	
-	const FActiveGameplayEffect* ActiveGameplayEffectPtr = nullptr;
-
 	FActiveGameplayEffectHandle Handle;
 	
 	FDataChangedHandle DataChangedHandle;

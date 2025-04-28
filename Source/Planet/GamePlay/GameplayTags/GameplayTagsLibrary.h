@@ -253,9 +253,6 @@ public:
 
 	
 	// 人物身上自带的属性
-	static FGameplayTag DataSource_Regular;
-
-	// 人物身上自带的属性
 	static FGameplayTag DataSource_Character;
 
 	static FGameplayTag DataSource_EquipmentModify;

@@ -84,8 +84,6 @@ void USkill_Active_Base::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Active_Base::CommitAbility(
@@ -142,11 +140,6 @@ bool USkill_Active_Base::CanActivateAbility(
 	else
 	{
 		return false;
-	}
-
-	if (IsActive())
-	{
-		return true;
 	}
 
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);

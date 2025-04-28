@@ -23,8 +23,8 @@ struct PLANET_API FTableRowProxy_CharacterGrowthAttribute : public FTableRowBase
 // 	FCharacterAttributes CharacterAttributes;
 
 	// 每级增加的属性
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TArray<FCharacterAttributes> CharacterAttributesPerLevel;
+	// UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	// TArray<FCharacterAttributes> CharacterAttributesPerLevel;
 };
 
 USTRUCT(BlueprintType)

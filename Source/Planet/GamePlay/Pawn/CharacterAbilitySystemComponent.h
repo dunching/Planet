@@ -182,10 +182,15 @@ public:
 
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;
-
 #pragma endregion
 	
 protected:
+	
+	// 对“其他”角色造成的影响（伤害、控制）
+	UFUNCTION(NetMulticast, Reliable)
+	void OnEffectOhterCharacter(
+		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		);
 	
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
@@ -208,6 +213,15 @@ protected:
 		ACharacterBase* TriggerCharacterPtr
 	);
 
+	/**
+	 * 
+	 * @param Tag 仅为 DataSource
+	 * @param Value 
+	 * @param MinValue 
+	 * @param MaxValue 
+	 * @param Spec 
+	 * @param GameplayAttributeDataPtr 
+	 */
 	void UpdateMap(
 		const FGameplayTag& Tag,
 		float Value,
@@ -238,7 +252,11 @@ protected:
 
 	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare> ReceivedEventModifysMap;
 
-	// GameplayAttributeData的组成
+	/**
+	 * GameplayAttributeData的组成
+	 * 如HP仅有 DataSource_Character 基础组成
+	 * 而移速则会由 DataSource_Character 和减速时的减速buff 叠加负数
+	 */
 	TMap<const FGameplayAttributeData*, TMap<FGameplayTag, float>> ValueMap;
 	
 };

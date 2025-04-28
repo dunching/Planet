@@ -72,6 +72,9 @@ public:
 
 #pragma region 按键映射
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey JumpKey = EKeys::SpaceBar;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey DashKey = EKeys::LeftShift;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")

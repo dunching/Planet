@@ -19,22 +19,22 @@
 
 FName UTalentAllocationComponent::ComponentName = TEXT("TalentAllocationComponent");
 
-struct FPropertySettlementModify_Talent : public FPropertySettlementModify
-{
-	float Multiple = 1.f;
-	FPropertySettlementModify_Talent(float InMultiple) :
-		FPropertySettlementModify(10),
-		Multiple(InMultiple)
-	{
-
-	}
-
-	virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const override
-	{
-		const auto Result = FPropertySettlementModify::SettlementModify(ValueMap);
-		return Result * Multiple;
-	}
-};
+// struct FPropertySettlementModify_Talent : public FPropertySettlementModify
+// {
+// 	float Multiple = 1.f;
+// 	FPropertySettlementModify_Talent(float InMultiple) :
+// 		FPropertySettlementModify(10),
+// 		Multiple(InMultiple)
+// 	{
+//
+// 	}
+//
+// 	virtual int32 SettlementModify(const TMap<FGameplayTag, int32>& ValueMap)const override
+// 	{
+// 		const auto Result = FPropertySettlementModify::SettlementModify(ValueMap);
+// 		return Result * Multiple;
+// 	}
+// };
 
 UTalentAllocationComponent::UTalentAllocationComponent(const FObjectInitializer& ObjectInitializer) :
 	Super(ObjectInitializer)

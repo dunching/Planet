@@ -234,6 +234,11 @@ UAbilityTask_HasBeenFlyAway* UAbilityTask_HasBeenFlyAway::NewTask(
 	return MyTask;
 }
 
+void UAbilityTask_HasBeenFlyAway::Activate()
+{
+	Super::Activate();
+}
+
 void UAbilityTask_HasBeenFlyAway::TickTask(
 	float DeltaTime
 )

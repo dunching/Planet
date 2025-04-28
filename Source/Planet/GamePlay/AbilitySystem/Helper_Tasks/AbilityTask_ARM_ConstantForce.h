@@ -48,6 +48,7 @@ public:
 	virtual void TickTask(float DeltaTime) override;
 
 	virtual void PreDestroyFromReplication() override;
+	
 	virtual void OnDestroy(bool AbilityIsEnding) override;
 
 protected:

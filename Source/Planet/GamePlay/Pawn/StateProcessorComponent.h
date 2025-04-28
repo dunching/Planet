@@ -34,9 +34,8 @@ struct FGameplayAbilityTargetData;
 struct FCharacterStateInfo;
 
 /*
- *	状态相关
+ * 状态相关
  * 获得某些状态标签是Character要进行的变化
- * 
  */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UStateProcessorComponent :
@@ -128,9 +127,6 @@ protected:
 #pragma endregion GAs
 
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
-
-	UPROPERTY(Replicated)
-	FCharacterStateInfo_FASI_Container CharacterStateInfo_FASI_Container;
 
 private:
 	

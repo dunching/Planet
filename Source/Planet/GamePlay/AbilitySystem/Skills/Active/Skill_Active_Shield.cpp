@@ -122,8 +122,6 @@ void USkill_Active_Shield::DurationDelegate(UAbilityTask_TimerHelper* TaskPtr, f
 	{
 		if (CharacterStateInfoSPtr)
 		{
-			CharacterStateInfoSPtr->TotalTime = CurrentInterval;
-			CharacterStateInfoSPtr->DataChanged();
 		}
 	}
 #endif

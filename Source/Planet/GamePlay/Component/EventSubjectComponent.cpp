@@ -12,9 +12,3 @@ UEventSubjectComponent::UEventSubjectComponent(const FObjectInitializer& ObjectI
 
 	SetIsReplicatedByDefault(true);
 }
-
-void UEventSubjectComponent::OnEffectOhterCharacter_Implementation(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback)
-{
-	MakedDamageDelegate(ReceivedEventModifyDataCallback);
-}

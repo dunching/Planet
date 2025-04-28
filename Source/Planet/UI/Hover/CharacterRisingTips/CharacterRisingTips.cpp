@@ -1,4 +1,3 @@
-
 #include "CharacterRisingTips.h"
 
 #include <Kismet/GameplayStatics.h>
@@ -12,6 +11,7 @@
 #include "CharacterBase.h"
 #include "Planet.h"
 #include "GameOptions.h"
+#include "OnEffectedTawrgetCallback.h"
 #include "TemplateHelper.h"
 #include "TextSubSystem.h"
 #include "TextCollect.h"
@@ -39,43 +39,28 @@ void UCharacterRisingTips::NativeConstruct()
 
 	SetAnchorsInViewport(FAnchors(.5f));
 	SetAlignmentInViewport(FVector2D(.5f, .5f));
+}
 
-	TickDelegateHandle = FTSTicker::GetCoreTicker().AddTicker(
-		FTickerDelegate::CreateUObject(this, &ThisClass::ResetPosition)
-	);
+void UCharacterRisingTips::SetData(
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+)
+{
+	if (!ReceivedEventModifyDataCallback.TargetCharacterPtr)
+	{
+		return;
+	}
+
+	TargetCharacterPtr = ReceivedEventModifyDataCallback.TargetCharacterPtr;
 
 	PlayMyAnimation(bIsCritical);
-
-	ResetPosition(0.f);
 }
 
-void UCharacterRisingTips::NativeDestruct()
+FVector UCharacterRisingTips::GetHoverPosition()
 {
-	FTSTicker::GetCoreTicker().RemoveTicker(TickDelegateHandle);
-
-	Super::NativeDestruct();
-}
-
-void UCharacterRisingTips::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-	Super::NativeTick(MyGeometry, InDeltaTime);
+	return TargetCharacterPtr->GetActorLocation();
 }
 
 void UCharacterRisingTips::PlayAnimationFinished()
 {
 	RemoveFromParent();
-}
-
-bool UCharacterRisingTips::ResetPosition(float InDeltaTime)
-{
-	FVector2D ScreenPosition = FVector2D::ZeroVector;
-	UGameplayStatics::ProjectWorldToScreen(
-		UGameplayStatics::GetPlayerController(this, 0),
-		TargetCharacterPtr->GetActorLocation(),
-		ScreenPosition
-	);
-
-	SetPositionInViewport(ScreenPosition);
-
-	return true;
 }

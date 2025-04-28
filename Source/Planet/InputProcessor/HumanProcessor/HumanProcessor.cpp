@@ -63,6 +63,11 @@ namespace HumanProcessor
 					SwitchWalkingOrRunning();
 					return true;
 				}
+				else if (EventArgs.Key == GameOptionsPtr->JumpKey)
+				{
+					Jump();
+					return true;
+				}
 			}
 			break;
 		case IE_Released:
@@ -129,6 +134,16 @@ namespace HumanProcessor
 			}
 
 			OnwerActorPtr->GetCharacterAbilitySystemComponent()->Dash(DashDirection);
+		}
+	}
+
+	void FHumanProcessor::Jump()
+	{
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+
+		if (OnwerActorPtr)
+		{
+			OnwerActorPtr->GetCharacterAbilitySystemComponent()->Jump();
 		}
 	}
 }

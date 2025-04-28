@@ -13,6 +13,8 @@
 #include "AssetRefMap.h"
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "CharacterRisingTips.h"
+#include "EventSubjectComponent.h"
 #include "UICommon.h"
 #include "FocusTitle.h"
 #include "GameOptions.h"
@@ -30,6 +32,7 @@
 #include "ProgressTips.h"
 #include "TeamMatesHelperComponent.h"
 #include "Components/Button.h"
+#include "Components/CanvasPanel.h"
 
 struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 {
@@ -52,6 +55,8 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 	FName HUD_TeamInfoSocket = TEXT("HUD_TeamInfoSocket");
 
 	FName QuitChallengeBtn = TEXT("QuitChallengeBtn");
+
+	FName CharacterRisingTipsCavans = TEXT("CharacterRisingTipsCavans");
 };
 
 void URegularActionLayout::NativeConstruct()
@@ -62,10 +67,13 @@ void URegularActionLayout::NativeConstruct()
 	if (PlayerCharacterPtr)
 	{
 		DisplayTeamInfo(true);
+
 		InitialEffectsList();
+
 		ViewProgressTips(false);
 
 		OnFocusCharacter(nullptr);
+
 		auto DelegateHandle =
 			PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->OnFocusCharacterDelegate.
 			                    AddCallback(
@@ -83,12 +91,22 @@ void URegularActionLayout::NativeConstruct()
 		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
 			CharacterAttributesRef->GetHPAttribute()
 		).AddUObject(this, &ThisClass::OnHPChanged);
+
+		EffectOhterCharacterCallbackDelegate = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
+		                                       MakedDamageDelegate.
+		                                       AddCallback(
+			                                       std::bind(
+				                                       &ThisClass::OnEffectOhterCharacter,
+				                                       this,
+				                                       std::placeholders::_1
+			                                       )
+		                                       );
 	}
-	
+
 	{
 		UGuideSubSystem::GetInstance()->GetOnStartGuide().AddUObject(this, &ThisClass::OnStartGuide);
 		UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(this, &ThisClass::OnStopGuide);
-		
+
 		auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
 		if (UIPtr)
 		{
@@ -96,6 +114,16 @@ void URegularActionLayout::NativeConstruct()
 			UIPtr->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void URegularActionLayout::NativeDestruct()
+{
+	if (EffectOhterCharacterCallbackDelegate)
+	{
+		EffectOhterCharacterCallbackDelegate->UnBindCallback();
+	}
+
+	Super::NativeDestruct();
 }
 
 void URegularActionLayout::Enable()
@@ -169,14 +197,14 @@ void URegularActionLayout::OnQuitChallengeBtnClicked()
 	// 停止挑战任务
 	UGuideSubSystem::GetInstance()->StopParallelGuideThread(
 		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
-		);
-	
+	);
+
 	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
 	{
 		return;
 	}
-	
+
 	PCPtr->GetGameplayTasksComponent()->TeleportPlayerToOpenWorld();
 }
 
@@ -398,4 +426,23 @@ void URegularActionLayout::OnFocusDestruct(
 	}
 
 	FocusIconPtr = nullptr;
+}
+
+void URegularActionLayout::OnEffectOhterCharacter(
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+)
+{
+	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+		GetWorld(),
+		TargetPointSharedLayerName
+	);
+	if (ScreenLayer)
+	{
+		auto WidgetPtr = CreateWidget<UCharacterRisingTips>(this, FightingTipsClass);
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetData(ReceivedEventModifyDataCallback);
+			ScreenLayer->AddHoverWidget(WidgetPtr);
+		}
+	}
 }

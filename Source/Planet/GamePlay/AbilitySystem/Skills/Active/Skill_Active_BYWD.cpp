@@ -82,7 +82,7 @@ bool USkill_Active_BYWD::CommitAbility(
 	FGameplayEffectSpecHandle SpecHandle =
 	   MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->DurationGEClass, GetAbilityLevel());
 
-	SpecHandle.Data.Get()->SetDuration(Duration, true);
+	// SpecHandle.Data.Get()->SetDuration(Duration, true);
 	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
 	SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration,1);
 				

@@ -40,6 +40,19 @@ UScriptStruct* FRootMotionSource_MyConstantForce::GetScriptStruct() const
 	return FRootMotionSource_MyConstantForce::StaticStruct();
 }
 
+bool FRootMotionSource_MyConstantForce::NetSerialize(
+	FArchive& Ar,
+	UPackageMap* Map,
+	bool& bOutSuccess
+)
+{
+	return Super::NetSerialize(Ar, Map, bOutSuccess);
+}
+
+FRootMotionSource_HasBeenFlyAway::~FRootMotionSource_HasBeenFlyAway()
+{
+}
+
 void FRootMotionSource_MyConstantForce::PrepareRootMotion(
 	float SimulationTime,
 	float MovementTickTime,
@@ -377,10 +390,6 @@ FRootMotionSource_HasBeenFlyAway::FRootMotionSource_HasBeenFlyAway()
 	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
 }
 
-FRootMotionSource_HasBeenFlyAway::~FRootMotionSource_HasBeenFlyAway()
-{
-}
-
 FRootMotionSource* FRootMotionSource_HasBeenFlyAway::Clone() const
 {
 	FRootMotionSource_HasBeenFlyAway* CopyPtr = new FRootMotionSource_HasBeenFlyAway(*this);
@@ -697,8 +706,10 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 	const UCharacterMovementComponent& MoveComponent
 )
 {
-	if (TractionPointPtr.IsValid())
+	if (!LocationActor)
 	{
+		Status.SetFlag(ERootMotionSourceStatusFlags::Finished);
+		return;
 	}
 
 	RootMotionParams.Clear();
@@ -707,46 +718,52 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 	FVector Force = FVector::ZeroVector;
 	const FVector ForceLocation = LocationActor ? LocationActor->GetActorLocation() : Location;
 	float Distance = FVector::Dist(ForceLocation, CharacterLocation);
-	if (
-		(Distance < Radius) &&
-		(Distance > AcceptableRadius)
-	)
+	if (Distance > Radius)
 	{
-		// Calculate strength
-		float CurrentStrength = Strength;
+		Status.SetFlag(ERootMotionSourceStatusFlags::Finished);
+		return;
+	}
+
+	// Calculate strength
+	float CurrentStrength = Strength;
+	{
+		float AdditiveStrengthFactor = 1.f;
+		if (StrengthDistanceFalloff)
 		{
-			float AdditiveStrengthFactor = 1.f;
-			if (StrengthDistanceFalloff)
-			{
-				const float DistanceFactor = StrengthDistanceFalloff->GetFloatValue(
-					FMath::Clamp(Distance / Radius, 0.f, 1.f)
-				);
-				AdditiveStrengthFactor -= (1.f - DistanceFactor);
-			}
-
-			if (StrengthOverTime)
-			{
-				const float TimeValue = Duration > 0.f ? FMath::Clamp(GetTime() / Duration, 0.f, 1.f) : GetTime();
-				const float TimeFactor = StrengthOverTime->GetFloatValue(TimeValue);
-				AdditiveStrengthFactor -= (1.f - TimeFactor);
-			}
-
-			CurrentStrength = Strength * FMath::Clamp(AdditiveStrengthFactor, 0.f, 1.f);
+			const float DistanceFactor = StrengthDistanceFalloff->GetFloatValue(
+				FMath::Clamp(Distance / Radius, 0.f, 1.f)
+			);
+			AdditiveStrengthFactor -= (1.f - DistanceFactor);
 		}
 
-		if (bUseFixedWorldDirection)
+		if (StrengthOverTime)
 		{
-			Force = FixedWorldDirection.Vector() * CurrentStrength;
+			const float TimeValue = Duration > 0.f ? FMath::Clamp(GetTime() / Duration, 0.f, 1.f) : GetTime();
+			const float TimeFactor = StrengthOverTime->GetFloatValue(TimeValue);
+			AdditiveStrengthFactor -= (1.f - TimeFactor);
+		}
+
+		CurrentStrength = Strength * FMath::Clamp(AdditiveStrengthFactor, 0.f, 1.f);
+	}
+
+	if (bUseFixedWorldDirection)
+	{
+		Force = FixedWorldDirection.Vector() * CurrentStrength;
+	}
+	else
+	{
+		Force = (ForceLocation - CharacterLocation).GetSafeNormal() * CurrentStrength;
+
+		if (bIsPush)
+		{
+			Force *= -1.f;
 		}
 		else
 		{
-			Force = (ForceLocation - CharacterLocation).GetSafeNormal() * CurrentStrength;
-
-			if (bIsPush)
-			{
-				Force *= -1.f;
-			}
 		}
+
+		// 
+		Force = Force * (Distance / Radius);
 	}
 
 	if (bNoZForce)
@@ -774,7 +791,7 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 
 void FRootMotionSource_MyRadialForce::CheckTimeOut()
 {
-	if (TractionPointPtr.IsValid())
+	if (LocationActor)
 	{
 		Super::CheckTimeOut();
 	}
@@ -784,32 +801,20 @@ void FRootMotionSource_MyRadialForce::CheckTimeOut()
 	}
 }
 
+UScriptStruct* FRootMotionSource_MyRadialForce::GetScriptStruct() const
+{
+	return FRootMotionSource_MyRadialForce::StaticStruct();
+}
+
 bool FRootMotionSource_MyRadialForce::NetSerialize(
 	FArchive& Ar,
 	UPackageMap* Map,
 	bool& bOutSuccess
 )
 {
-	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
-	{
-		return false;
-	}
+	Ar << InnerRadius;
 
-	Ar << TractionPointPtr;
-
-	bOutSuccess = true;
-	return true;
-}
-
-UScriptStruct* FRootMotionSource_MyRadialForce::GetScriptStruct() const
-{
-	return FRootMotionSource_MyRadialForce::StaticStruct();
-}
-
-FRootMotionSource* FRootMotionSource_MyRadialForce::Clone() const
-{
-	FRootMotionSource_MyRadialForce* CopyPtr = new FRootMotionSource_MyRadialForce(*this);
-	return CopyPtr;
+	return Super::NetSerialize(Ar, Map, bOutSuccess);
 }
 
 bool FRootMotionSource_MyRadialForce::Matches(
@@ -821,27 +826,22 @@ bool FRootMotionSource_MyRadialForce::Matches(
 		return false;
 	}
 
-	const auto OtherCast = static_cast<const FRootMotionSource_MyRadialForce*>(Other);
+	// We can cast safely here since in FRootMotionSource::Matches() we ensured ScriptStruct equality
+	const FRootMotionSource_MyRadialForce* OtherCast = static_cast<const FRootMotionSource_MyRadialForce*>(Other);
 
-	return
-		TractionPointPtr == OtherCast->TractionPointPtr;
+	return FMath::IsNearlyEqual(InnerRadius, OtherCast->InnerRadius);
 }
 
 bool FRootMotionSource_MyRadialForce::MatchesAndHasSameState(
 	const FRootMotionSource* Other
 ) const
 {
-	if (!Super::MatchesAndHasSameState(Other))
-	{
-		return false;
-	}
-
-	return true;
+	return Super::MatchesAndHasSameState(Other);
 }
 
 bool FRootMotionSource_MyRadialForce::UpdateStateFrom(
 	const FRootMotionSource* SourceToTakeStateFrom,
-	bool bMarkForSimulatedCatchup /*= false*/
+	bool bMarkForSimulatedCatchup
 )
 {
 	if (!Super::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
@@ -851,7 +851,13 @@ bool FRootMotionSource_MyRadialForce::UpdateStateFrom(
 
 	auto OtherCast = static_cast<const FRootMotionSource_MyRadialForce*>(SourceToTakeStateFrom);
 
-	TractionPointPtr = OtherCast->TractionPointPtr;
+	InnerRadius = OtherCast->InnerRadius;
 
 	return true;
+}
+
+FRootMotionSource* FRootMotionSource_MyRadialForce::Clone() const
+{
+	FRootMotionSource_MyRadialForce* CopyPtr = new FRootMotionSource_MyRadialForce(*this);
+	return CopyPtr;
 }

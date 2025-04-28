@@ -141,7 +141,7 @@ void UAIComponent::InitialAllocationsByProxy()
 	OnwerActorPtr->GetProxyProcessComponent()->ActiveWeapon();
 }
 
-void UAIComponent::StopDisplayTaskPromy_Implementation()
+void UAIComponent::StopDisplayTaskPromy()
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
@@ -159,7 +159,7 @@ void UAIComponent::StopDisplayTaskPromy_Implementation()
 #endif
 }
 
-void UAIComponent::DisplayTaskPromy_Implementation(
+void UAIComponent::DisplayTaskPromy(
 	 TSubclassOf<UTaskPromt> TaskPromtClass
 )
 {
@@ -177,13 +177,13 @@ void UAIComponent::DisplayTaskPromy_Implementation(
 				return;
 			}
 			
-			TaskPromtPtr = CreateWidget<UTaskPromt>(GetWorld(), TaskPromtClass);
-			if (TaskPromtPtr)
-			{
-				auto OnwerActorPtr = GetOwner<FOwnerType>();
-				TaskPromtPtr->TargetCharacterPtr = OnwerActorPtr;
-				ScreenLayer->AddHoverWidget(TaskPromtPtr);
-			}
+			// TaskPromtPtr = CreateWidget<UTaskPromt>(GetWorld(), TaskPromtClass);
+			// if (TaskPromtPtr)
+			// {
+			// 	auto OnwerActorPtr = GetOwner<FOwnerType>();
+			// 	TaskPromtPtr->TargetCharacterPtr = OnwerActorPtr;
+			// 	ScreenLayer->AddHoverWidget(TaskPromtPtr);
+			// }
 		}
 	}
 #endif

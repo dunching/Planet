@@ -7,6 +7,7 @@
 
 #include "TemplateHelper.h"
 #include "CharacterStateInfo.h"
+#include "GameplayTagsLibrary.h"
 #include "SceneProxyExtendInfo.h"
 #include "StateTagExtendInfo.h"
 
@@ -23,7 +24,9 @@ namespace EffectItem
 	const FName TextCanvas = TEXT("TextCanvas");
 }
 
-void UEffectItem::SetNum(int32 NewNum)
+void UEffectItem::SetNum(
+	int32 NewNum
+)
 {
 	SetSetNumIsDisplay(true);
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(EffectItem::Text));
@@ -43,7 +46,9 @@ void UEffectItem::SetNum(int32 NewNum)
 	}
 }
 
-void UEffectItem::SetSetNumIsDisplay(bool bIsDisplay)
+void UEffectItem::SetSetNumIsDisplay(
+	bool bIsDisplay
+)
 {
 	{
 		auto UIPtr = GetWidgetFromName(EffectItem::TextCanvas);
@@ -55,7 +60,10 @@ void UEffectItem::SetSetNumIsDisplay(bool bIsDisplay)
 	}
 }
 
-void UEffectItem::SetPercent(bool bIsInversion, float Percent)
+void UEffectItem::SetPercent(
+	bool bIsInversion,
+	float Percent
+)
 {
 	SetPercentIsDisplay(true);
 	auto UIPtr = Cast<UImage>(GetWidgetFromName(EffectItem::ProgressBar));
@@ -70,7 +78,9 @@ void UEffectItem::SetPercent(bool bIsInversion, float Percent)
 	}
 }
 
-void UEffectItem::SetPercentIsDisplay(bool bIsDisplay)
+void UEffectItem::SetPercentIsDisplay(
+	bool bIsDisplay
+)
 {
 	{
 		auto UIPtr = GetWidgetFromName(EffectItem::ProgressBar);
@@ -82,17 +92,57 @@ void UEffectItem::SetPercentIsDisplay(bool bIsDisplay)
 	}
 }
 
-void UEffectItem::SetTexutre(const TSoftObjectPtr<UTexture2D>& TexturePtr)
+void UEffectItem::SetTexutre(
+)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(EffectItem::Icon));
-	if (ImagePtr)
+	if (!ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(
-			TexturePtr.ToSoftObjectPath(), [this, ImagePtr, TexturePtr]()
+		return;
+	}
+	
+	FGameplayTagContainer OutContainer;
+	ActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
+
+	for (const auto &Iter : OutContainer)
+	{
+		if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
+		{
+			auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+			auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
+
+			auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy>(*Iter.ToString(), TEXT("GetProxy"));
+			if (!SceneProxyExtendInfoPtr)
 			{
-				ImagePtr->SetBrushFromTexture(TexturePtr.Get());
-			}));
+				return;
+			}
+		
+			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
+			AsyncLoadTextureHandleAry.Add(
+				StreamableManager.RequestAsyncLoad(
+					SceneProxyExtendInfoPtr->DefaultIcon.ToSoftObjectPath(),
+					[this, ImagePtr, SceneProxyExtendInfoPtr]()
+					{
+						ImagePtr->SetBrushFromTexture(SceneProxyExtendInfoPtr->DefaultIcon.Get());
+					}
+				)
+			);
+			
+			return;
+		}
+	}
+}
+
+void UEffectItem::SetData(
+	const FActiveGameplayEffect* InActiveGameplayEffectPtr
+)
+{
+	ActiveGameplayEffectPtr = InActiveGameplayEffectPtr;
+	if (ActiveGameplayEffectPtr)
+	{
+		Handle = ActiveGameplayEffectPtr->Handle;
+		
+		SetTexutre();
 	}
 }
 
@@ -114,16 +164,21 @@ void UEffectItem::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UEffectItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UEffectItem::NativeTick(
+	const FGeometry& MyGeometry,
+	float InDeltaTime
+)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	if (!ActiveGameplayEffectPtr)
+	{
+		return;
+	}
 	FGameplayTagContainer OutContainer;
 	ActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
 	if (!OutContainer.IsEmpty())
 	{
-		// SetTexutre(CharacterStateInfoSPtr->DefaultIcon);
-
 		OnUpdate();
 	}
 }

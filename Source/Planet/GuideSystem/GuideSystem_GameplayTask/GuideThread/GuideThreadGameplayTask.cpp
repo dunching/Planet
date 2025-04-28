@@ -448,7 +448,7 @@ void UGameplayTask_Guide_DefeatEnemy::Activate()
 {
 	Super::Activate();
 
-	DelegateHandle = PlayerCharacterPtr->GetController<APlanetPlayerController>()->GetEventSubjectComponent()->
+	DelegateHandle = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
 	                                     MakedDamageDelegate.AddCallback(
 		                                     std::bind(
 			                                     &ThisClass::OnActiveGEAddedDelegateToSelf,
@@ -626,9 +626,7 @@ void UGameplayTask_Guide_AttckCharacter::Activate()
 
 	if (HumanCharacterAI && PlayerCharacterPtr)
 	{
-		auto PCPtr = PlayerCharacterPtr->GetController<APlanetPlayerController>();
-
-		DelegateHandle = PCPtr->GetEventSubjectComponent()->MakedDamageDelegate.AddCallback(
+		DelegateHandle = HumanCharacterAI->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
 			std::bind(&ThisClass::OnEffectOhterCharacter, this, std::placeholders::_1)
 		);
 	}

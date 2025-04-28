@@ -12,6 +12,7 @@
 #include "RegularActionLayout.generated.h"
 
 struct FOnAttributeChangeData;
+struct FOnEffectedTawrgetCallback;
 
 class AGuideThread;
 class UMainUILayout;
@@ -50,7 +51,9 @@ class PLANET_API URegularActionLayout :
 
 public:
 	virtual void NativeConstruct() override;
-
+	
+	virtual void NativeDestruct() override;
+	
 	virtual void Enable() override;
 
 	virtual void DisEnable() override;
@@ -95,7 +98,16 @@ private:
 
 protected:
 
+	void OnEffectOhterCharacter(
+		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		);
+
+	TCallbackHandleContainer<void(const FOnEffectedTawrgetCallback&)>::FCallbackHandleSPtr EffectOhterCharacterCallbackDelegate;
+	
 #pragma region MenusUI
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UBackpackMenu> BackpackMenuClass;
 

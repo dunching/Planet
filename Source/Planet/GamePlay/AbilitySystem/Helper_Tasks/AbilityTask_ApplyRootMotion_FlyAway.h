@@ -26,10 +26,13 @@ class PLANET_API UAbilityTask_ApplyRootMotion_FlyAway : public UAbilityTask_Appl
 	GENERATED_BODY()
 
 public:
+	UAbilityTask_ApplyRootMotion_FlyAway(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	UAbilityTask_ApplyRootMotion_FlyAway(const FObjectInitializer& ObjectInitializer);
-
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
 
 	static UAbilityTask_ApplyRootMotion_FlyAway* NewTask(
 		UGameplayAbility* OwningAbility,
@@ -37,7 +40,7 @@ public:
 		float Duration,
 		float Height
 	);
-	
+
 	static UAbilityTask_ApplyRootMotion_FlyAway* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
@@ -56,39 +59,43 @@ public:
 		int32 FallingSpeed
 	);
 
-	virtual void TickTask(float DeltaTime) override;
+	virtual void TickTask(
+		float DeltaTime
+	) override;
 
 	virtual void Activate() override;
 
-	virtual void OnDestroy(bool AbilityIsEnding) override;
+	virtual void OnDestroy(
+		bool AbilityIsEnding
+	) override;
 
-	void UpdateDuration(int32 InHeight, float InDuration);
-	
+	void UpdateDuration(
+		int32 InHeight,
+		float InDuration
+	);
+
 	void UpdateDuration();
 
 	FOnTaskFinished OnFinished;
 
 protected:
-
 	virtual void SharedInitAndApply() override;
 
 protected:
-	
 	UPROPERTY(Replicated)
 	int32 Height = 100;
-	
+
 	UPROPERTY(Replicated)
 	float Duration = 1.f;
-	
+
 	UPROPERTY(Replicated)
 	int32 ResingSpeed = 100;
-	
+
 	UPROPERTY(Replicated)
 	int32 FallingSpeed = 100;
-	
+
 	UPROPERTY(Replicated)
 	ERootMotionAccumulateMode RootMotionAccumulateMode = ERootMotionAccumulateMode::Additive;
-
 };
 
 /**
@@ -101,31 +108,37 @@ class PLANET_API UAbilityTask_HasBeenFlyAway : public UAbilityTask
 	GENERATED_BODY()
 
 public:
+	UAbilityTask_HasBeenFlyAway(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	UAbilityTask_HasBeenFlyAway(const FObjectInitializer& ObjectInitializer);
-
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+	) const override;
 
 	static UAbilityTask_HasBeenFlyAway* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
 		int32 Height
 	);
-	
-	virtual void TickTask(float DeltaTime) override;
+
+	virtual void Activate() override;
+
+	virtual void TickTask(
+		float DeltaTime
+	) override;
 
 	FOnTaskFinished OnFinished;
 
 protected:
-	
 	UPROPERTY(Replicated)
 	int32 Height = 300;
-	
+
 	UPROPERTY(Replicated)
 	int32 CurrentDistance = 0;
 
 	UPROPERTY(Replicated)
 	bool bHasBeenApex = false;
-	
+
 	int32 Line = 10000;
 };
