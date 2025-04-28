@@ -24,6 +24,8 @@ class PLANET_API UMainHUDLayout : public UMyUserWidget
 
 public:
 
+	virtual void NativeConstruct() override;
+	
 	// 
 	void SwitchToNewLayout(ELayoutCommon LayoutCommon);
 

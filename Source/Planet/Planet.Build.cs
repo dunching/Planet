@@ -109,10 +109,10 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common/CoinList");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common/DragDropOperations");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/GroupManagger");
-        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Backpacks");
-        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Backpacks/BackpackIcons");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/CreateMenuS");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu/Backpacks");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/AllocationMenu/Backpacks/BackpackIcons");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/TalentAllocation");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/RaffleMenu");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/ViewMap");

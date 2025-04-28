@@ -7,8 +7,6 @@ struct FProxyIcon : public TStructVariable<FProxyIcon>
 {
 	const FName Content = TEXT("Content");
 
-	const FName Enable = TEXT("Enable");
-
 	const FName Icon = TEXT("Icon");
 };
 

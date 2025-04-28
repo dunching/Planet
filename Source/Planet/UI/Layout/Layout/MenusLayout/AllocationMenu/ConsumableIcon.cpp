@@ -31,7 +31,7 @@
 
 struct FConsumableIcon : public TStructVariable<FConsumableIcon>
 {
-	const FName Content = TEXT("Content");
+	const FName Proxy = TEXT("Proxy");
 
 	const FName Enable = TEXT("Enable");
 

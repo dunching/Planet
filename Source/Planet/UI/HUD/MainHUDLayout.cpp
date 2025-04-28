@@ -16,6 +16,7 @@
 #include "LayoutInterfacetion.h"
 #include "MainMenuLayout.h"
 #include "RegularActionLayout.h"
+#include "Components/CanvasPanel.h"
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
@@ -32,7 +33,20 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 	FName InteractionList = TEXT("InteractionList");
 
 	FName Layout_WidgetSwitcher = TEXT("Layout_WidgetSwitcher");
+
+	FName ItemDecriptionCanvas = TEXT("ItemDecriptionCanvas");
 };
+
+void UMainHUDLayout::NativeConstruct()
+{
+	Super::NativeConstruct();
+	
+	auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FMainHUDLayout::Get().ItemDecriptionCanvas));
+	if (UIPtr)
+	{
+		UIPtr->ClearChildren();
+	}
+}
 
 void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 {

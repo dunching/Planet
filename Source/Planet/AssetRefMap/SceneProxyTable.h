@@ -22,6 +22,8 @@ struct FBasicProxy;
 struct FCharacterProxy;
 class AWeapon_Base; 
 class AConsumable_Base;
+class UItemProxy_Description;
+class UItemDecription;
 
 USTRUCT(BlueprintType)
 struct PLANET_API FTableRowProxy_CommonCooldownInfo : public FTableRowBase
@@ -50,8 +52,17 @@ struct PLANET_API FTableRowProxy : public FTableRowBase
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<UTexture2D> RaffleIcon;
 
+	/**
+	 * 这个Item使用哪个数据
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName DescriptionText = TEXT("描述文字");
+	TSoftObjectPtr<UItemProxy_Description> ItemProxy_Description;
+
+	/**
+	 * 这个Item使用哪个Widget进行展示
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSubclassOf<UItemDecription> ItemDecriptionClass;
 
 };
 

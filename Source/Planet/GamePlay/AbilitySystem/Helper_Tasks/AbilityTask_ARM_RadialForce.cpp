@@ -58,7 +58,7 @@ UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRad
 	MyTask->InnerRadius = InnerRadius;
 	MyTask->bIsPush = bIsPush;
 	MyTask->LocationActor = InTractionPointPtr;
-
+	int32 asd = 1;
 	return MyTask;
 }
 
