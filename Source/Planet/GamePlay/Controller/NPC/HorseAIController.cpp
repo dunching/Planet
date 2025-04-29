@@ -168,7 +168,7 @@ void AHorseAIController::InitialCharacter()
 		if (AIHumanInfoPtr)
 		{
 			// AIHumanInfoPtr->CharacterPtr = CharacterPtr;
-			AIHumanInfoPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_HUD);
+			AIHumanInfoPtr->AddToViewport(EUIOrder::kOtherPlayer_Character_State_Title);
 		}
 
 		auto EICPtr = CharacterPtr->GetProxyProcessComponent();

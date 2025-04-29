@@ -44,6 +44,9 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void SpawnTractionPointActor(ATractionPoint*NewTractionPointPtr);
+
 	void PlayMontage();
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")

@@ -3,6 +3,7 @@
 #include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
+#include "AssetRefMap.h"
 #include "PlanetWorldSettings.h"
 #include "ProxyProcessComponent.h"
 #include "CharacterAbilitySystemComponent.h"
@@ -129,6 +130,16 @@ void USkill_Base::OnRemoveAbility(
 )
 {
 	Super::OnRemoveAbility(ActorInfo, Spec);
+}
+
+UGameplayEffect* USkill_Base::GetCooldownGameplayEffect() const
+{
+	return UAssetRefMap::GetInstance()->DurationClass.GetDefaultObject();
+}
+
+UGameplayEffect* USkill_Base::GetCostGameplayEffect() const
+{
+	return UAssetRefMap::GetInstance()->DamageClass.GetDefaultObject();
 }
 
 TArray<FActiveGameplayEffectHandle> USkill_Base::MyApplyGameplayEffectSpecToTarget(

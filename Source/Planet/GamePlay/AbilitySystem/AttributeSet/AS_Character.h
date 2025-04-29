@@ -82,19 +82,19 @@ public:
 	FMyGameplayAttributeData PP_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, PP_Replay);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData Max_Mana;
-	ATTRIBUTE_ACCESSORS(UAS_Character, Max_Mana);
-	
-	// 法力值，用于释放技能
+	// 战斗资源，用于释放技能
 	UPROPERTY(ReplicatedUsing = OnRep_Mana, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana);
 	
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData Max_Mana;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Max_Mana);
+	
 	UFUNCTION()
 	virtual void OnRep_Mana(const FMyGameplayAttributeData& OldHealth);
 
-	// 法力回复速率
+	// 战斗资源回复速率
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData Mana_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana_Replay);

@@ -10,30 +10,6 @@
 #include "GE_Common.generated.h"
 
 UCLASS()
-class PLANET_API UGE_Reply : public UGameplayEffect
-{
-	GENERATED_BODY()
-public:
-	
-};
-
-UCLASS()
-class PLANET_API UGE_Damage : public UGameplayEffect
-{
-	GENERATED_BODY()
-public:
-	
-};
-
-UCLASS()
-class PLANET_API UGE_Duration : public UGameplayEffect
-{
-	GENERATED_BODY()
-public:
-	
-};
-
-UCLASS()
 class PLANET_API UGE_Running : public UGameplayEffect
 {
 	GENERATED_BODY()

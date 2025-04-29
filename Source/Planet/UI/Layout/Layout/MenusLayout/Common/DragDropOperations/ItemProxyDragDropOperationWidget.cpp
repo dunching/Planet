@@ -60,17 +60,12 @@ void UItemProxyDragDropOperationWidget::SetNum(int32 NewNum)
 	}
 }
 
-void UItemProxyDragDropOperationWidget::SetItemType(FBasicProxy* ToolSPtr)
+void UItemProxyDragDropOperationWidget::SetItemType(FBasicProxy* ProxyPtr)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
 	if (ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(
-			ToolSPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr, ToolSPtr]()
-			{
-				ImagePtr->SetBrushFromTexture(ToolSPtr->GetIcon().Get());
-			}));
+			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
 	}
 }
 
@@ -127,17 +122,12 @@ void UAllocationableProxyDragDropOperationWidget::SetNum(int32 NewNum)
 	}
 }
 
-void UAllocationableProxyDragDropOperationWidget::SetItemType(FBasicProxy* ToolSPtr)
+void UAllocationableProxyDragDropOperationWidget::SetItemType(FBasicProxy* ProxyPtr)
 {
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
 	if (ImagePtr)
 	{
-		FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-		AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(
-			ToolSPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr, ToolSPtr]()
-			{
-				ImagePtr->SetBrushFromTexture(ToolSPtr->GetIcon().Get());
-			}));
+			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
 	}
 }
 

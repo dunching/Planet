@@ -16,5 +16,6 @@ class PLANET_API UPlanetCharacterMovementComponent : public UGravityMovementComp
 public:
 
     virtual void PhysicsRotation(float DeltaTime)override;
-
+    
+    virtual void OnRootMotionSourceBeingApplied(const FRootMotionSource* Source)override;
 };

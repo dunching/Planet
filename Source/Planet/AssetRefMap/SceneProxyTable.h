@@ -40,18 +40,6 @@ struct PLANET_API FTableRowProxy : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName RowDescriptionText = TEXT("Row描述文字");
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<UTexture2D> DefaultIcon;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FString ProxyName = TEXT("ProxyName");
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSoftObjectPtr<UTexture2D> RaffleIcon;
-
 	/**
 	 * 这个Item使用哪个数据
 	 */
@@ -66,10 +54,12 @@ struct PLANET_API FTableRowProxy : public FTableRowBase
 
 };
 
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_WeaponExtendInfo : public FTableRowBase
+UCLASS()
+class PLANET_API UItemProxy_Description_Weapon : public UItemProxy_Description
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
+
+public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AWeapon_Base> ToolActorClass;
@@ -90,20 +80,24 @@ struct PLANET_API FTableRowProxy_WeaponExtendInfo : public FTableRowBase
 	
 };
 
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_SkillExtendInfo : public FTableRowBase
+UCLASS()
+class PLANET_API UItemProxy_Description_Skill : public UItemProxy_Description
 {
-	GENERATED_USTRUCT_BODY()
-	
+	GENERATED_BODY()
+
+public:
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<USkill_Base>SkillClass;
 
 };
 
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_ActiveSkillExtendInfo : public FTableRowProxy_SkillExtendInfo
+UCLASS()
+class PLANET_API UItemProxy_Description_ActiveSkill : public UItemProxy_Description_Skill
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
+
+public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FGameplayTag RequireWeaponProxyType = FGameplayTag::EmptyTag;
@@ -118,18 +112,59 @@ struct PLANET_API FTableRowProxy_ActiveSkillExtendInfo : public FTableRowProxy_S
 
 };
 
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_PassiveSkillExtendInfo : public FTableRowProxy_SkillExtendInfo
+UCLASS()
+class PLANET_API UItemProxy_Description_PassiveSkill : public UItemProxy_Description_Skill
 {
-	GENERATED_USTRUCT_BODY()
-	
+	GENERATED_BODY()
+
+public:
+
 };
 
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_WeaponSkillExtendInfo : public FTableRowProxy_SkillExtendInfo
+UCLASS()
+class PLANET_API UItemProxy_Description_WeaponSkill : public UItemProxy_Description_Skill
 {
-	GENERATED_USTRUCT_BODY()
+	GENERATED_BODY()
+
+public:
+
+};
+
+UCLASS()
+class PLANET_API UItemProxy_Description_Consumable : public UItemProxy_Description
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<AConsumable_Base> Consumable_Class;
 	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	TSubclassOf<USkill_Consumable_Base> Skill_Consumable_Class;
+	
+	// UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	// TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	TMap<FGameplayTag, int32>ModifyPropertyMap;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UAnimMontage* HumanMontage = nullptr;
+
+	// 消耗品公共CD
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag>CommonCooldownInfoMap;
+
+	// 消耗品独立CD
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	int32 CD = 1;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float Duration = 3.f;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	float PerformActionInterval = 1.f;
 };
 
 USTRUCT(BlueprintType)

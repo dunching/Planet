@@ -15,8 +15,12 @@ struct PLANET_API FPerLevelValue : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
+	FPerLevelValue();
+	
+	FPerLevelValue(std::initializer_list<float> InitList);
+	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TArray<int32> PerLevelValue;
+	TArray<float> PerLevelValue;
 };
 
 /**
@@ -30,14 +34,36 @@ class PLANET_API UItemProxy_Description : public UDataAsset
 
 public:
 	/**
-	 * 
+	 * 简要说明
+	 */
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	FString Summary;
+
+	/**
+	 * 详细说明
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<FString> DecriptionText;
 
 	/**
-	 * 
+	 * 数值
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TMap<FString, FPerLevelValue> Values;
+	
+	/**
+	 * 作为物品时的显示图片
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<UTexture2D> DefaultIcon;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FString ProxyName = TEXT("ProxyName");
+
+	/**
+	 * 立绘，
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<UTexture2D> RaffleIcon;
+
 };

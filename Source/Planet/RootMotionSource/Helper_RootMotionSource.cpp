@@ -17,8 +17,8 @@
 #include "KismetGravityLibrary.h"
 
 #include "SPlineActor.h"
-#include "Skill_Active_tornado.h"
 #include "CharacterBase.h"
+#include "Tornado.h"
 #include "LogWriter.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
@@ -301,13 +301,19 @@ void FRootMotionSource_Formation::PrepareRootMotion(
 	}
 }
 
+FName FRootMotionSource_ByTornado::RootMotionName = TEXT("RootMotionSource_ByTornado");
+
 FRootMotionSource_ByTornado::FRootMotionSource_ByTornado()
 {
+	// Settings.SetFlag(ERootMotionSourceSettingsFlags::UseSensitiveLiftoffCheck);
 	Settings.SetFlag(ERootMotionSourceSettingsFlags::DisablePartialEndTick);
+
+	InstanceName = FRootMotionSource_ByTornado::RootMotionName;
 }
 
-FRootMotionSource_ByTornado::~FRootMotionSource_ByTornado()
+UScriptStruct* FRootMotionSource_ByTornado::GetScriptStruct() const
 {
+	return FRootMotionSource_ByTornado::StaticStruct();
 }
 
 FRootMotionSource* FRootMotionSource_ByTornado::Clone() const
@@ -316,18 +322,66 @@ FRootMotionSource* FRootMotionSource_ByTornado::Clone() const
 	return CopyPtr;
 }
 
-bool FRootMotionSource_ByTornado::Matches(
-	const FRootMotionSource* Other
-) const
+bool FRootMotionSource_ByTornado::NetSerialize(
+	FArchive& Ar,
+	UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
-	if (!FRootMotionSource::Matches(Other))
+	if (!Super::NetSerialize(Ar, Map, bOutSuccess))
 	{
 		return false;
 	}
 
+	Ar << CurrentRotatorDir;
+	Ar << CurrentHeight;
+
+	bOutSuccess = true;
+	return true;
+}
+
+bool FRootMotionSource_ByTornado::Matches(
+	const FRootMotionSource* Other
+) const
+{
+	return Super::Matches(Other);
+}
+
+bool FRootMotionSource_ByTornado::MatchesAndHasSameState(
+	const FRootMotionSource* Other
+) const
+{
+	// Check that it matches
+	if (!Super::MatchesAndHasSameState(Other))
+	{
+		return false;
+	}
+
+	// We can cast safely here since in FRootMotionSource::Matches() we ensured ScriptStruct equality
 	const FRootMotionSource_ByTornado* OtherCast = static_cast<const FRootMotionSource_ByTornado*>(Other);
 
-	return TornadoPtr == OtherCast->TornadoPtr;
+	return CurrentRotatorDir.Equals(OtherCast->CurrentRotatorDir) &&
+		FMath::IsNearlyEqual(CurrentHeight, OtherCast->CurrentHeight);
+}
+
+bool FRootMotionSource_ByTornado::UpdateStateFrom(
+	const FRootMotionSource* SourceToTakeStateFrom,
+	bool bMarkForSimulatedCatchup
+)
+{
+	if (!Super::UpdateStateFrom(SourceToTakeStateFrom, bMarkForSimulatedCatchup))
+	{
+		return false;
+	}
+
+	// We can cast safely here since in FRootMotionSource::UpdateStateFrom() we ensured ScriptStruct equality
+	const FRootMotionSource_ByTornado* OtherCast = static_cast<const FRootMotionSource_ByTornado*>(
+		SourceToTakeStateFrom);
+
+	CurrentRotatorDir = OtherCast->CurrentRotatorDir;
+	CurrentHeight = OtherCast->CurrentHeight;
+
+	return true;
 }
 
 void FRootMotionSource_ByTornado::PrepareRootMotion(
@@ -341,39 +395,50 @@ void FRootMotionSource_ByTornado::PrepareRootMotion(
 
 	if (TornadoPtr.IsValid())
 	{
-		const FVector CurrentLocation = Character.GetActorLocation();
-		const FVector TornadoLocation = TornadoPtr->GetActorLocation();
+		const auto CurrentLocation = Character.GetActorLocation();
+		const auto TornadoLocation = TornadoPtr->GetActorLocation();
 
-		const auto Rotator =
-			UKismetMathLibrary::MakeRotFromZX(-Character.GetGravityDirection(), CurrentLocation - TornadoLocation);
+		if (CurrentRotatorDir.IsNearlyZero())
+		{
+			CurrentRotatorDir = UKismetMathLibrary::MakeRotFromZX(
+				FVector::UpVector,
+				TornadoLocation - CurrentLocation
+			).Vector() * InnerRadius;
+		}
+		CurrentRotatorDir = CurrentRotatorDir.RotateAngleAxis(MovementTickTime * RotationSpeed, FVector::UpVector);
 
-		const auto NewRotator =
-			Rotator.Vector().RotateAngleAxis(SimulationTime * RotationSpeed, -Character.GetGravityDirection());
-
-		const auto NewPt =
+		auto TargetLocation =
 			TornadoLocation +
 			(-Character.GetGravityDirection() * MaxHeight) +
-			(NewRotator * OuterRadius);
-
-		FVector Distance = (NewPt - CurrentLocation) / MovementTickTime;
+			CurrentRotatorDir;
 
 #ifdef WITH_EDITOR
 		if (SkillDrawDebugTornado.GetValueOnGameThread())
 		{
-			DrawDebugSphere(MoveComponent.GetWorld(), NewPt, 20, 20, FColor::Red, false, 3);
+			if (Character.GetLocalRole() == ROLE_Authority)
+			{
+				DrawDebugSphere(MoveComponent.GetWorld(), TargetLocation, 20, 20, FColor::Red, false, 10);
+				DrawDebugSphere(MoveComponent.GetWorld(), CurrentLocation, 20, 20, FColor::Blue, false, 10);
+			}
+			if (Character.GetLocalRole() == ROLE_SimulatedProxy)
+			{
+				DrawDebugSphere(MoveComponent.GetWorld(), TargetLocation, 20, 20, FColor::Yellow, false, 10);
+				DrawDebugSphere(MoveComponent.GetWorld(), CurrentLocation, 20, 20, FColor::White, false, 10);
+			}
 		}
 #endif
 
 		FTransform NewTransform;
 
-		NewTransform.SetTranslation(Distance);
+		NewTransform.SetTranslation((TargetLocation - CurrentLocation) / MovementTickTime);
 
-		FQuat Rot = FQuat::FindBetween(Character.GetActorForwardVector(), NewRotator) / MovementTickTime;
+		NewTransform.SetRotation(FRotator(0.f, RotationSpeed * MovementTickTime, 0.f).Quaternion());
 
-		NewTransform.SetRotation(Rot);
-
-		const float Multiplier = (MovementTickTime > UE_SMALL_NUMBER) ? (SimulationTime / MovementTickTime) : 1.f;
-		NewTransform.ScaleTranslation(Multiplier);
+		if (SimulationTime != MovementTickTime && MovementTickTime > UE_SMALL_NUMBER)
+		{
+			const float Multiplier = SimulationTime / MovementTickTime;
+			NewTransform.ScaleTranslation(Multiplier);
+		}
 
 		RootMotionParams.Set(NewTransform);
 
@@ -381,7 +446,32 @@ void FRootMotionSource_ByTornado::PrepareRootMotion(
 	}
 	else
 	{
-		SetRootMotionFinished(*this);
+#ifdef WITH_EDITOR
+		if (SkillDrawDebugTornado.GetValueOnGameThread())
+		{
+		const auto CurrentLocation = Character.GetActorLocation();
+			if (Character.GetLocalRole() == ROLE_Authority)
+			{
+				DrawDebugSphere(MoveComponent.GetWorld(), CurrentLocation, 20, 20, FColor::Blue, false, 10);
+			}
+			if (Character.GetLocalRole() == ROLE_SimulatedProxy)
+			{
+				DrawDebugSphere(MoveComponent.GetWorld(), CurrentLocation, 20, 20, FColor::White, false, 10);
+			}
+		}
+#endif
+
+		if (StopTime > 0.f)
+		{
+			StopTime -= MovementTickTime;
+			FTransform NewTransform;
+
+			RootMotionParams.Set(NewTransform);
+		}
+		else
+		{
+			SetRootMotionFinished(*this);
+		}
 	}
 }
 
@@ -812,6 +902,7 @@ bool FRootMotionSource_MyRadialForce::NetSerialize(
 	bool& bOutSuccess
 )
 {
+	Ar << TractionPoinAcotrPtr;
 	Ar << InnerRadius;
 
 	return Super::NetSerialize(Ar, Map, bOutSuccess);

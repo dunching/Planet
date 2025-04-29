@@ -101,6 +101,10 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
+	virtual UGameplayEffect* GetCooldownGameplayEffect() const;
+
+	virtual UGameplayEffect* GetCostGameplayEffect() const;
+
 	/**
 	 * 
 	 * @param AbilityHandle 

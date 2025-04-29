@@ -106,6 +106,9 @@ struct FRootMotionSource_MyRadialForce : public FRootMotionSource_RadialForce
 	virtual void CheckTimeOut() override;
 
 	UPROPERTY()
+	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr;
+
+	UPROPERTY()
 	float InnerRadius = 100.f;
 };
 
@@ -327,6 +330,8 @@ struct FRootMotionSource_Formation : public FRootMotionSource
 {
 	GENERATED_USTRUCT_BODY()
 
+	virtual UScriptStruct* GetScriptStruct() const override;
+
 	virtual FRootMotionSource* Clone() const override;
 
 	virtual bool Matches(
@@ -338,8 +343,6 @@ struct FRootMotionSource_Formation : public FRootMotionSource
 		UPackageMap* Map,
 		bool& bOutSuccess
 	) override;
-
-	virtual UScriptStruct* GetScriptStruct() const override;
 
 	virtual bool UpdateStateFrom(
 		const FRootMotionSource* SourceToTakeStateFrom,
@@ -369,20 +372,40 @@ struct TStructOpsTypeTraits<FRootMotionSource_Formation> :
 	};
 };
 
+/**
+ * TODO 这个移动方式对NPC释放结束时的表现效果不正常，会被拉扯一下，原因未知
+ */
 USTRUCT()
 struct FRootMotionSource_ByTornado : public FRootMotionSource
 {
 	GENERATED_USTRUCT_BODY()
 
+	static FName RootMotionName;
+	
 	FRootMotionSource_ByTornado();
 
-	virtual ~FRootMotionSource_ByTornado();
+	virtual UScriptStruct* GetScriptStruct() const override;
 
 	virtual FRootMotionSource* Clone() const override;
+
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		UPackageMap* Map,
+		bool& bOutSuccess
+	) override;
 
 	virtual bool Matches(
 		const FRootMotionSource* Other
 	) const override;
+
+	virtual bool MatchesAndHasSameState(
+		const FRootMotionSource* Other
+	) const override;
+
+	virtual bool UpdateStateFrom(
+		const FRootMotionSource* SourceToTakeStateFrom,
+		bool bMarkForSimulatedCatchup = false
+	) override;
 
 	virtual void PrepareRootMotion(
 		float SimulationTime,
@@ -391,14 +414,30 @@ struct FRootMotionSource_ByTornado : public FRootMotionSource
 		const UCharacterMovementComponent& MoveComponent
 	) override;
 
-	// 如果这个值过小，会导致移动时距离过近从而忽略本次移动 ?
-	float OuterRadius = 150.f;
-
-	float MaxHeight = 200.f;
-
-	float RotationSpeed = 360.f;
-
 	TWeakObjectPtr<ATornado> TornadoPtr = nullptr;
 
-	ACharacterBase* TargetCharacterPtr = nullptr;
+	float InnerRadius = 150.f;
+
+	float MaxHeight = 300.f;
+
+	float RotationSpeed = 360.f;
+	
+private:
+
+	FVector CurrentRotatorDir = FVector::ZeroVector;
+	
+	float CurrentHeight = 0.f;
+
+	float StopTime = .1f;
+};
+
+template <>
+struct TStructOpsTypeTraits<FRootMotionSource_ByTornado> :
+	public TStructOpsTypeTraitsBase2<FRootMotionSource_ByTornado>
+{
+	enum
+	{
+		WithNetSerializer = true,
+		WithCopy = true
+	};
 };

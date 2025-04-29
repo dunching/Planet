@@ -6,8 +6,35 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GE_Common.h"
 
-void UGEEC_Base::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UGEEC_Base::ApplyModifyData(
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput,
+		const TMap<FGameplayTag, float>& SetByCallerTagMagnitudes,
+		TObjectPtr<ACharacterBase>InstigatorPtr,
+		TObjectPtr<ACharacterBase>TargetCharacterPtr
+) const
+{
+	auto CustomMagnitudes = InstigatorPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
+		SetByCallerTagMagnitudes,
+		ExecutionParams,
+		OutExecutionOutput
+	);
+
+	CustomMagnitudes = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyInputData(
+		CustomMagnitudes,
+		ExecutionParams,
+		OutExecutionOutput
+	);
+
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ApplyInputData(
+		CustomMagnitudes,
+		ExecutionParams,
+		OutExecutionOutput
+	);
+}
+
+void UGEEC_DataModify::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+                                              FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
@@ -32,11 +59,14 @@ void UGEEC_Base::Execute_Implementation(const FGameplayEffectCustomExecutionPara
 	}
 
 	TMap<FGameplayTag, float> CustomMagnitudes;
-
-	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(
-		CustomMagnitudes,
+	CustomMagnitudes.Append(Spec.SetByCallerTagMagnitudes);
+	
+	ApplyModifyData(
 		ExecutionParams,
-		OutExecutionOutput
+		OutExecutionOutput,
+		CustomMagnitudes,
+		Instigator,
+		TargetCharacterPtr
 	);
 }
 
@@ -77,10 +107,14 @@ void UGEEC_Reply::Execute_Implementation(
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_PP, SourceSet->GetPP_Replay());
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_Mana, SourceSet->GetMana_Replay());
 
-	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(
-		CustomMagnitudes,
+	CustomMagnitudes.Append(Spec.SetByCallerTagMagnitudes);
+	
+	ApplyModifyData(
 		ExecutionParams,
-		OutExecutionOutput
+		OutExecutionOutput,
+		CustomMagnitudes,
+		Instigator,
+		TargetCharacterPtr
 	);
 }
 
@@ -118,7 +152,7 @@ void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionP
 	const auto MoveSpeedOffset = Cast<UGE_Running>(Spec.Def)->MoveSpeedOffset.GetValue();
 	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, MoveSpeedOffset);
 
-	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(CustomMagnitudes, ExecutionParams,
 	                                                                 OutExecutionOutput);
 }
 
@@ -155,6 +189,6 @@ void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExec
 
 	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, 0);
 
-	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnReceivedEventModifyData(CustomMagnitudes, ExecutionParams,
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(CustomMagnitudes, ExecutionParams,
 	                                                                 OutExecutionOutput);
 }

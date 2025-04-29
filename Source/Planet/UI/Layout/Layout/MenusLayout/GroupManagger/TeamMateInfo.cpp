@@ -107,14 +107,10 @@ void UTeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyP
 
 			GroupMateProxyPtr = DynamicCastSharedPtr<FCharacterProxy>(BasicProxyPtr);
 			{
-				auto UIPtr = Cast<UImage>(GetWidgetFromName(FTeamMateInfo::Get().Icon));
-				if (UIPtr)
+				auto ImagePtr = Cast<UImage>(GetWidgetFromName(FTeamMateInfo::Get().Icon));
+				if (ImagePtr)
 				{
-					FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-					AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateProxyPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
-						{
-							UIPtr->SetBrushFromTexture(GroupMateProxyPtr->GetIcon().Get());
-						}));
+					AsyncLoadText(GroupMateProxyPtr->GetIcon(),ImagePtr );
 				}
 			}
 			{

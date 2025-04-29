@@ -10,6 +10,7 @@
 #include "GameplayAbilitySpecHandle.h"
 
 #include "ItemProxy.h"
+#include "ItemProxy_Description.h"
 
 #include "ItemProxy_Skills.generated.h"
 
@@ -17,9 +18,6 @@ struct FGameplayAbilityTargetData_RegisterParam;
 struct FTableRowProxy_CommonCooldownInfo;
 struct FTableRowProxy;
 struct FTableRowProxy_WeaponExtendInfo;
-struct FTableRowProxy_ActiveSkillExtendInfo;
-struct FTableRowProxy_PassiveSkillExtendInfo;
-struct FTableRowProxy_WeaponSkillExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRowProxy_Consumable;
 struct FTableRowProxy_PropertyEntrys;
@@ -34,6 +32,9 @@ class IPlanetControllerInterface;
 class APlanetPlayerState;
 class APlanetGameMode;
 
+class UItemProxy_Description_PassiveSkill;
+class UItemProxy_Description_ActiveSkill;
+class UItemProxy_Description_WeaponSkill;
 class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter_AI;
@@ -117,7 +118,7 @@ public:
 
 	virtual void InitialProxy(const FGameplayTag& ProxyType)override;
 
-	FTableRowProxy_PassiveSkillExtendInfo* GetTableRowProxy_PassiveSkillExtendInfo()const;
+	UItemProxy_Description_PassiveSkill* GetTableRowProxy_PassiveSkillExtendInfo()const;
 
 	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry()const;
 
@@ -162,7 +163,7 @@ public:
 
 	virtual void Cancel()override;
 
-	FTableRowProxy_ActiveSkillExtendInfo* GetTableRowProxy_ActiveSkillExtendInfo()const;
+	UItemProxy_Description_ActiveSkill* GetTableRowProxy_ActiveSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 
@@ -224,7 +225,7 @@ public:
 
 	virtual void End()override;
 
-	FTableRowProxy_WeaponSkillExtendInfo* GetTableRowProxy_WeaponSkillExtendInfo()const;
+	UItemProxy_Description_WeaponSkill* GetTableRowProxy_WeaponSkillExtendInfo()const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass()const override;
 

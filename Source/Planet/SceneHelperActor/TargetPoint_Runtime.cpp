@@ -40,15 +40,20 @@ void ATargetPoint_Runtime::BeginPlay()
 
 	// 调整位置 紧贴地面
 	// TODO. 重新生成导航
-	FCollisionQueryParams Param;
+	
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(LandScape_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
 
 	FHitResult OutHit;
-	if (GetWorld()->LineTraceSingleByChannel(
+	if (GetWorld()->LineTraceSingleByObjectType(
 		OutHit,
 		GetActorLocation() + (FVector::UpVector * CheckDistance),
 		GetActorLocation() - (FVector::UpVector * CheckDistance),
-		SceneActor_Channel,
-		Param
+		ObjectQueryParams,
+		Params
 	))
 	{
 		SetActorLocation(OutHit.ImpactPoint);

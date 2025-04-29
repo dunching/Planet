@@ -16,6 +16,7 @@
 
 struct FGameplayAttributeData;
 
+class ATornado;
 class UGAEvent_Received;
 struct FConsumableProxy;
 class UCS_PeriodicPropertyModify;
@@ -40,17 +41,21 @@ struct FOnEffectedTawrgetCallback;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
-struct FGAEventModify_key_compare;
+struct FDataModify_key_compare;
 
-class PLANET_API IGAEventModifyInterface
+class PLANET_API IDataModifyInterface
 {
 public:
 	friend UCharacterAbilitySystemComponent;
-	friend FGAEventModify_key_compare;
+	friend FDataModify_key_compare;
 
-	IGAEventModifyInterface(int32 InPriority = 1);
+	IDataModifyInterface(
+		int32 InPriority = 1
+	);
 
-	bool operator<(const IGAEventModifyInterface& RightValue) const;
+	bool operator<(
+		const IDataModifyInterface& RightValue
+	) const;
 
 protected:
 	bool bIsOnceTime = false;
@@ -62,31 +67,37 @@ private:
 	int32 ID = -1;
 };
 
-class PLANET_API IGAEventModifySendInterface : public IGAEventModifyInterface
+class PLANET_API IOutputDataModifyInterface : public IDataModifyInterface
 {
 public:
-	IGAEventModifySendInterface(int32 InPriority = 1);
+	IOutputDataModifyInterface(
+		int32 InPriority = 1
+	);
 
 	// Return：本次修改完是否移除本【修正方式】
 	virtual bool Modify(
-		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
-		);
-};
-
-class PLANET_API IGAEventModifyReceivedInterface : public IGAEventModifyInterface
-{
-public:
-	IGAEventModifyReceivedInterface(int32 InPriority = 1);
-
-	virtual bool Modify(
-		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
+		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
 	);
 };
 
-struct FGAEventModify_key_compare
+class PLANET_API IInputDataModifyInterface : public IDataModifyInterface
 {
-	bool operator()(const TSharedPtr<IGAEventModifyInterface>& lhs,
-					const TSharedPtr<IGAEventModifyInterface>& rhs) const
+public:
+	IInputDataModifyInterface(
+		int32 InPriority = 1
+	);
+
+	virtual bool Modify(
+		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+	);
+};
+
+struct FDataModify_key_compare
+{
+	bool operator()(
+		const TSharedPtr<IDataModifyInterface>& lhs,
+		const TSharedPtr<IDataModifyInterface>& rhs
+	) const
 	{
 		return lhs->Priority < rhs->Priority;
 	}
@@ -104,13 +115,22 @@ public:
 
 	using FOwnerPawnType = ACharacterBase;
 
-	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
+	using FCharacterStateChanged = TCallbackHandleContainer<void(
+		ECharacterStateType,
+		UCS_Base*
+	)>;
 
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FOnEffectedTawrgetCallback&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(
+		const FOnEffectedTawrgetCallback&
+	)>;
 
-	UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer);
+	UCharacterAbilitySystemComponent(
+		const FObjectInitializer& ObjectInitializer
+	);
 
-	virtual void BeginPlay()override;
+	virtual void BeginPlay() override;
+
+	bool IsCanBeDamage() const;
 
 	bool IsInDeath() const;
 
@@ -125,30 +145,53 @@ public:
 	void InitialBaseGAs();
 
 #pragma region 输入和输出得修正
-	
-	void OnReceivedEventModifyData(
+
+	TMap<FGameplayTag, float> ModifyOutputData(
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	);
 
-	void AddSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
+	TMap<FGameplayTag, float> ModifyInputData(
+		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+	);
 
-	void RemoveSendEventModify(const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr);
+	void ApplyInputData(
+		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput);
+	
+	void AddOutputModify(
+		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
+	);
 
-	void AddReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
+	void RemoveOutputModify(
+		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
+	);
 
-	void RemoveReceviedEventModify(const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr);
+	void AddInputModify(
+		const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
+	);
+
+	void RemoveInputModify(
+		const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
+	);
 #pragma endregion
 
 #pragma region 基础GA
-	
+
 	UFUNCTION(Server, Reliable)
-	void SwitchWalkState(bool bIsRun);
+	void SwitchWalkState(
+		bool bIsRun
+	);
 
 	// 冲刺/闪避
 	UFUNCTION(Server, Reliable)
-	void Dash(EDashDirection DashDirection);
+	void Dash(
+		EDashDirection DashDirection
+	);
 
 	// 
 	UFUNCTION(Server, Reliable)
@@ -159,9 +202,22 @@ public:
 	 * @param Height 
 	 */
 	UFUNCTION(Server, Reliable)
-	void HasBeenFlayAway(int32 Height);
+	void HasBeenFlayAway(
+		int32 Height
+	);
 
-	void SwitchCantBeSelect(bool bIsCanBeSelect);
+	/**
+	 * 被击飞
+	 * @param Height 
+	 */
+	UFUNCTION(NetMulticast, Reliable)
+	void HasbeenTornodo(
+		ATornado* TornadoPtr
+	);
+
+	void SwitchCantBeSelect(
+		bool bIsCanBeSelect
+	);
 
 	UFUNCTION(Server, Reliable)
 	void Respawn();
@@ -183,28 +239,29 @@ public:
 	// 对“其他”角色造成的影响（伤害、控制）
 	FMakedDamageDelegate MakedDamageDelegate;
 #pragma endregion
-	
+
 protected:
-	
 	// 对“其他”角色造成的影响（伤害、控制）
 	UFUNCTION(NetMulticast, Reliable)
 	void OnEffectOhterCharacter(
 		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-		);
-	
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	);
+
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+	) override;
 
 	void OnGEAppliedDelegateToTarget(
 		UAbilitySystemComponent*,
 		const FGameplayEffectSpec&,
 		FActiveGameplayEffectHandle
-		);
+	);
 
 	void OnActiveGEAddedDelegateToSelf(
 		UAbilitySystemComponent*,
 		const FGameplayEffectSpec&,
 		FActiveGameplayEffectHandle
-		);
+	);
 
 	void AddReceivedBaseModify();
 
@@ -229,7 +286,7 @@ protected:
 		int32 MaxValue,
 		const FGameplayEffectSpec& Spec,
 		const FGameplayAttributeData* GameplayAttributeDataPtr
-		);
+	);
 
 	float GetMapValue(
 		const FGameplayEffectSpec& Spec,
@@ -248,9 +305,9 @@ protected:
 #pragma endregion GAs
 
 	// 从小到大
-	std::multiset<TSharedPtr<IGAEventModifySendInterface>, FGAEventModify_key_compare> SendEventModifysMap;
+	std::multiset<TSharedPtr<IOutputDataModifyInterface>, FDataModify_key_compare> OutputDataModifysMap;
 
-	std::multiset<TSharedPtr<IGAEventModifyReceivedInterface>, FGAEventModify_key_compare> ReceivedEventModifysMap;
+	std::multiset<TSharedPtr<IInputDataModifyInterface>, FDataModify_key_compare> InputDataModifysMap;
 
 	/**
 	 * GameplayAttributeData的组成
@@ -258,5 +315,4 @@ protected:
 	 * 而移速则会由 DataSource_Character 和减速时的减速buff 叠加负数
 	 */
 	TMap<const FGameplayAttributeData*, TMap<FGameplayTag, float>> ValueMap;
-	
 };

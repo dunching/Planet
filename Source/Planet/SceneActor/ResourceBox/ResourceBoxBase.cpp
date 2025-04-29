@@ -7,6 +7,7 @@
 
 #include "InventoryComponent.h"
 #include "CharacterBase.h"
+#include "CollisionDataStruct.h"
 #include "PlanetPlayerState.h"
 
 AResourceBoxBase::AResourceBoxBase(const FObjectInitializer& ObjectInitializer) :
@@ -23,7 +24,7 @@ void AResourceBoxBase::BeginPlay()
 	FVector End = Start + (UKismetGravityLibrary::GetGravity(RootComponent->GetComponentLocation()) * 1000.f);
 
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+	ObjectQueryParams.AddObjectTypesToQuery(LandScape_Object);
 
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);

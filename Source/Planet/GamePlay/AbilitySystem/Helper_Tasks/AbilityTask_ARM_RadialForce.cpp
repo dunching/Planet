@@ -31,18 +31,18 @@ void UAbilityTask_ARM_RadialForce::GetLifetimeReplicatedProps(
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ThisClass, LocationActor);
-	DOREPLIFETIME(ThisClass, Radius);
-	DOREPLIFETIME(ThisClass, InnerRadius);
-	DOREPLIFETIME(ThisClass, Strength);
-	DOREPLIFETIME(ThisClass, Duration);
-	DOREPLIFETIME(ThisClass, bIsPush);
+	DOREPLIFETIME_CONDITION(ThisClass, TractionPoinAcotrPtr, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, Radius, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, InnerRadius, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, Strength, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, Duration, COND_InitialOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, bIsPush, COND_InitialOnly);
 }
 
 UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRadialForce(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,
-	TObjectPtr<ATractionPoint> InTractionPointPtr,
+	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr,
 	float Strength,
 	float Duration,
 	float Radius,
@@ -57,8 +57,8 @@ UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRad
 	MyTask->Radius = Radius;
 	MyTask->InnerRadius = InnerRadius;
 	MyTask->bIsPush = bIsPush;
-	MyTask->LocationActor = InTractionPointPtr;
-	int32 asd = 1;
+	MyTask->TractionPoinAcotrPtr = TractionPoinAcotrPtr;
+
 	return MyTask;
 }
 
@@ -146,7 +146,7 @@ void UAbilityTask_ARM_RadialForce::UpdateTarget()
 	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 	GetWorld()->OverlapMultiByObjectType(
 		OutOverlaps,
-		LocationActor->GetActorLocation(),
+		TractionPoinAcotrPtr->GetActorLocation(),
 		FQuat::Identity,
 		ObjectQueryParams,
 		FCollisionShape::MakeSphere(Radius),
@@ -169,23 +169,26 @@ void UAbilityTask_ARM_RadialForce::UpdateTarget()
 					float OutRadius = 0.f;
 					float OutHalfHeight = 0.f;
 					TargetCharacter->GetCapsuleComponent()->GetScaledCapsuleSize(OutRadius, OutHalfHeight);
-					
+
 					ForceName = ForceName.IsNone() ? FName("AbilityTaskApplyRootMotionRadialForce") : ForceName;
 					TSharedPtr<FRootMotionSource_MyRadialForce> RadialForce = MakeShared<
 						FRootMotionSource_MyRadialForce>();
+					
 					RadialForce->InstanceName = ForceName;
+					
 					RadialForce->AccumulateMode = ERootMotionAccumulateMode::Additive;
 					RadialForce->Priority = ERootMotionSource_Priority::kTraction;
-					RadialForce->LocationActor = LocationActor;
+					RadialForce->FinishVelocityParams.Mode = FinishVelocityMode;
+					RadialForce->FinishVelocityParams.SetVelocity = FinishSetVelocity;
+					RadialForce->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
+					
+					RadialForce->TractionPoinAcotrPtr = TractionPoinAcotrPtr;
 					RadialForce->Duration = EndTime - CurrentTime;
 					RadialForce->Radius = Radius;
 					RadialForce->InnerRadius = InnerRadius + OutRadius;
 					RadialForce->Strength = Strength;
 					RadialForce->bIsPush = bIsPush;
 					RadialForce->bNoZForce = true;
-					RadialForce->FinishVelocityParams.Mode = FinishVelocityMode;
-					RadialForce->FinishVelocityParams.SetVelocity = FinishSetVelocity;
-					RadialForce->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
 
 					TargetCharacterMovementComponent->ApplyRootMotionSource(RadialForce);
 				}

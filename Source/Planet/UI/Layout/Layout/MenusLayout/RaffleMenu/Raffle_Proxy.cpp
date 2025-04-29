@@ -11,6 +11,7 @@
 #include "Engine/AssetManager.h"
 
 #include "CharacterBase.h"
+#include "ItemProxy_Description.h"
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
 #include "UICommon.h"
@@ -48,19 +49,14 @@ void URaffle_Proxy::ResetToolUIByData(FTableRowProxy * TableRowProxyPtr)
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FRaffle_Proxy::Get().Text));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(TableRowProxyPtr->ProxyName));
+			UIPtr->SetText(FText::FromString(TableRowProxyPtr->ItemProxy_Description.LoadSynchronous()->ProxyName));
 		}
 	}
 	{
 		auto UIPtr = Cast<UImage>(GetWidgetFromName(FRaffle_Proxy::Get().Texture));
 		if (UIPtr)
 		{
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(TableRowProxyPtr->RaffleIcon.ToSoftObjectPath(),
-				[TableRowProxyPtr, UIPtr]()
-				{
-					UIPtr->SetBrushFromTexture(TableRowProxyPtr->RaffleIcon.Get());
-				}));
+			AsyncLoadText(TableRowProxyPtr->ItemProxy_Description.LoadSynchronous()->RaffleIcon,UIPtr );
 		}
 	}
 }

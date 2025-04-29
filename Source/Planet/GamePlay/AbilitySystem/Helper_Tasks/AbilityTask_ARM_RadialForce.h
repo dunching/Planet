@@ -21,15 +21,14 @@ class PLANET_API UAbilityTask_ARM_RadialForce :
 	GENERATED_BODY()
 
 public:
-
 	UAbilityTask_ARM_RadialForce(
 		const FObjectInitializer& ObjectInitializer
-	) ;
-	
+	);
+
 	static UAbilityTask_ARM_RadialForce* MyApplyRootMotionRadialForce(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
-		TObjectPtr<ATractionPoint> TractionPointPtr,
+		TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr,
 		float Strength,
 		float Duration,
 		float Radius,
@@ -67,7 +66,7 @@ protected:
 	float IntervalTime = 0.f;
 
 	UPROPERTY(Replicated)
-	TObjectPtr<ATractionPoint> LocationActor = nullptr;
+	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr = nullptr;
 
 	UPROPERTY(Replicated)
 	float Strength = 100.f;

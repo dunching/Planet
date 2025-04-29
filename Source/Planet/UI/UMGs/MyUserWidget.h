@@ -9,6 +9,9 @@
 
 struct FStreamableHandle;
 
+class UTexture2D;
+class UImage;
+
 /**
  *
  */
@@ -23,6 +26,10 @@ public:
 
 protected:
 
+	void AsyncLoadText(const TSoftObjectPtr<UTexture2D>& Texture, UImage*ImagePtr);
+
+private:
+	
 	TArray<TSharedPtr<FStreamableHandle>> AsyncLoadTextureHandleAry;
 
 };

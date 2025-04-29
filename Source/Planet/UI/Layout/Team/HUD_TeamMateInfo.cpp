@@ -1,4 +1,3 @@
-
 #include "HUD_TeamMateInfo.h"
 
 #include <Kismet/GameplayStatics.h>
@@ -47,12 +46,15 @@ void UHUD_TeamMateInfo::NativeConstruct()
 	ResetToolUIByData(nullptr);
 }
 
-void UHUD_TeamMateInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UHUD_TeamMateInfo::InvokeReset(
+	UUserWidget* BaseWidgetPtr
+)
 {
-
 }
 
-void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
+void UHUD_TeamMateInfo::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+)
 {
 	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
@@ -61,11 +63,7 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicPr
 			auto UIPtr = Cast<UImage>(GetWidgetFromName(FHUD_TeamMateInfo::Get().Texture));
 			if (UIPtr)
 			{
-				FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-				AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(GroupMateProxyPtr->GetIcon().ToSoftObjectPath(), [this, UIPtr]()
-					{
-						UIPtr->SetBrushFromTexture(GroupMateProxyPtr->GetIcon().Get());
-					}));
+				AsyncLoadText(GroupMateProxyPtr->GetIcon(), UIPtr);
 			}
 		}
 		{
@@ -77,18 +75,26 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicPr
 				if (GroupMateProxyPtr->Name.IsEmpty())
 				{
 					UIPtr->SetText(
-						FText::FromString(FString::Printf(TEXT("%s(%d)"),
-							*GroupMateProxyPtr->Title,
-							GroupMateProxyPtr->Level))
+						FText::FromString(
+							FString::Printf(
+								TEXT("%s(%d)"),
+								*GroupMateProxyPtr->Title,
+								GroupMateProxyPtr->Level
+							)
+						)
 					);
 				}
 				else
 				{
 					UIPtr->SetText(
-						FText::FromString(FString::Printf(TEXT("%s %s(%d)"),
-							*GroupMateProxyPtr->Title,
-							*GroupMateProxyPtr->Name,
-							GroupMateProxyPtr->Level))
+						FText::FromString(
+							FString::Printf(
+								TEXT("%s %s(%d)"),
+								*GroupMateProxyPtr->Title,
+								*GroupMateProxyPtr->Name,
+								GroupMateProxyPtr->Level
+							)
+						)
 					);
 				}
 			}
@@ -102,8 +108,8 @@ void UHUD_TeamMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicPr
 	}
 }
 
-void UHUD_TeamMateInfo::EnableIcon(bool bIsEnable)
+void UHUD_TeamMateInfo::EnableIcon(
+	bool bIsEnable
+)
 {
-
 }
-

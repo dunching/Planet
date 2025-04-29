@@ -34,6 +34,8 @@ struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
+class UItemProxy_Description_Weapon;
+
 enum struct ECharacterPropertyType : uint8;
 
 USTRUCT()
@@ -71,7 +73,7 @@ public:
 		bool& bOutSuccess
 	) override;
 
-	FTableRowProxy_WeaponExtendInfo* GetTableRowProxy_WeaponExtendInfo() const;
+	UItemProxy_Description_Weapon*  GetTableRowProxy_WeaponExtendInfo() const;
 
 	// 切换至当前武器
 	void ActiveWeapon();

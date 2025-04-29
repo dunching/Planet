@@ -26,6 +26,7 @@
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "ItemProxy_Character.h"
+#include "Common/ProxyIcon.h"
 
 struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 {
@@ -33,7 +34,7 @@ struct FBackpackIcon : public TStructVariable<FBackpackIcon>
 
 	const FName Enable = TEXT("Enable");
 
-	const FName Icon = TEXT("Icon");
+	const FName ProxyIcon = TEXT("ProxyIcon");
 
 	const FName AllocationCharacterProxy = TEXT("AllocationCharacterProxy");
 };
@@ -168,24 +169,10 @@ void UBackpackIcon::OnDroped(UDragDropOperation* Operation)
 
 void UBackpackIcon::SetItemType(FBasicProxy* InBasicProxyPtr)
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FBackpackIcon::Get().Icon));
-	if (ImagePtr)
+	auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FBackpackIcon::Get().ProxyIcon));
+	if (ProxyIconPtr)
 	{
-		if (InBasicProxyPtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
-
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(
-				InBasicProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr, InBasicProxyPtr]()
-				{
-					ImagePtr->SetBrushFromTexture(InBasicProxyPtr->GetIcon().Get());
-				}));
-		}
-		else
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-		}
+		ProxyIconPtr->ResetToolUIByData(BasicProxyPtr);
 	}
 }
 

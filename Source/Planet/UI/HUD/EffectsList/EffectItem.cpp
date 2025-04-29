@@ -8,6 +8,7 @@
 #include "TemplateHelper.h"
 #include "CharacterStateInfo.h"
 #include "GameplayTagsLibrary.h"
+#include "ItemProxy_Description.h"
 #include "SceneProxyExtendInfo.h"
 #include "StateTagExtendInfo.h"
 
@@ -100,11 +101,11 @@ void UEffectItem::SetTexutre(
 	{
 		return;
 	}
-	
+
 	FGameplayTagContainer OutContainer;
 	ActiveGameplayEffectPtr->Spec.GetAllAssetTags(OutContainer);
 
-	for (const auto &Iter : OutContainer)
+	for (const auto& Iter : OutContainer)
 	{
 		if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
 		{
@@ -116,18 +117,9 @@ void UEffectItem::SetTexutre(
 			{
 				return;
 			}
-		
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(
-				StreamableManager.RequestAsyncLoad(
-					SceneProxyExtendInfoPtr->DefaultIcon.ToSoftObjectPath(),
-					[this, ImagePtr, SceneProxyExtendInfoPtr]()
-					{
-						ImagePtr->SetBrushFromTexture(SceneProxyExtendInfoPtr->DefaultIcon.Get());
-					}
-				)
-			);
-			
+
+			AsyncLoadText(SceneProxyExtendInfoPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon, ImagePtr);
+
 			return;
 		}
 	}
@@ -141,7 +133,7 @@ void UEffectItem::SetData(
 	if (ActiveGameplayEffectPtr)
 	{
 		Handle = ActiveGameplayEffectPtr->Handle;
-		
+
 		SetTexutre();
 	}
 }

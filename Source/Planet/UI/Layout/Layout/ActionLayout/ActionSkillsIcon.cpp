@@ -313,11 +313,7 @@ void UActionSkillsIcon::SetItemType()
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(ProxyPtr->GetIcon().ToSoftObjectPath(), [this, ImagePtr]()
-				{
-					ImagePtr->SetBrushFromTexture(ProxyPtr->GetIcon().Get());
-				}));
+			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
 		}
 		else
 		{

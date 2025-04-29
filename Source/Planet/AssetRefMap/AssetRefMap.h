@@ -95,16 +95,13 @@ public:
 
 #pragma region GEs
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>DurationGEClass;
+	TSubclassOf<UGameplayEffect>DamageClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGE_Damage>DamageClass;
+	TSubclassOf<UGameplayEffect>DurationClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGE_Duration>DurationClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGE_Damage_Callback>DamageCallbackClass;
+	TSubclassOf<UGameplayEffect>DamageCallbackClass;
 #pragma endregion 
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")

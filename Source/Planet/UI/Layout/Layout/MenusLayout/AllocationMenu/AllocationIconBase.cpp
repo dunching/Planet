@@ -11,6 +11,7 @@
 #include "AssetRefMap.h"
 #include "ItemProxyDragDropOperation.h"
 #include "ItemProxyDragDropOperationWidget.h"
+#include "Common/ProxyIcon.h"
 
 struct FAllocationIconBase : public TStructVariable<FAllocationIconBase>
 {
@@ -18,7 +19,7 @@ struct FAllocationIconBase : public TStructVariable<FAllocationIconBase>
 
 	const FName Enable = TEXT("Enable");
 
-	const FName Icon = TEXT("Icon");
+	const FName ProxyIcon = TEXT("ProxyIcon");
 };
 
 UAllocationIconBase::UAllocationIconBase(
@@ -123,28 +124,10 @@ void UAllocationIconBase::SublingIconProxyChanged(
 
 void UAllocationIconBase::SetItemType()
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FAllocationIconBase::Get().Icon));
-	if (ImagePtr)
+	auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FAllocationIconBase::Get().ProxyIcon));
+	if (ProxyIconPtr)
 	{
-		if (BasicProxyPtr)
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
-
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(
-				StreamableManager.RequestAsyncLoad(
-					BasicProxyPtr->GetIcon().ToSoftObjectPath(),
-					[this, ImagePtr]()
-					{
-						ImagePtr->SetBrushFromTexture(BasicProxyPtr->GetIcon().Get());
-					}
-				)
-			);
-		}
-		else
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
-		}
+		ProxyIconPtr->ResetToolUIByData(BasicProxyPtr);
 	}
 }
 

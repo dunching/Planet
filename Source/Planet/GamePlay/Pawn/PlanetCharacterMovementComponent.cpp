@@ -179,3 +179,10 @@ void UPlanetCharacterMovementComponent::PhysicsRotation(
 		MoveUpdatedComponent(FVector::ZeroVector, DesiredRotation, /*bSweep*/ false);
 	}
 }
+
+void UPlanetCharacterMovementComponent::OnRootMotionSourceBeingApplied(
+	const FRootMotionSource* Source
+)
+{
+	Super::OnRootMotionSourceBeingApplied(Source);
+}

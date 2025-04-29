@@ -87,16 +87,11 @@ void FWeaponProxy::SetAllocationCharacterProxy(
 	GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
-FTableRowProxy_WeaponExtendInfo* FWeaponProxy::GetTableRowProxy_WeaponExtendInfo() const
+UItemProxy_Description_Weapon* FWeaponProxy::GetTableRowProxy_WeaponExtendInfo() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_WeaponExtendInfo.LoadSynchronous();
-
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_WeaponExtendInfo>(
-		*ProxyType.ToString(),
-		TEXT("GetProxy")
-	);
-	return SceneProxyExtendInfoPtr;
+	auto TableRowPtr = GetTableRowProxy();
+	auto ItemProxy_Description_WeaponPtr = Cast<UItemProxy_Description_Weapon>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	return ItemProxy_Description_WeaponPtr;
 }
 
 void FWeaponProxy::Allocation()

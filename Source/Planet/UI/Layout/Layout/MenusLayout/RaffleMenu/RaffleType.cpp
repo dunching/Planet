@@ -43,14 +43,10 @@ void URaffleType::NativeConstruct()
 		}
 	}
 	{
-		auto UIPtr = Cast<UImage>(GetWidgetFromName(RaffleType::Texture));
-		if (UIPtr)
+		auto ImagePtr = Cast<UImage>(GetWidgetFromName(RaffleType::Texture));
+		if (ImagePtr)
 		{
-			FStreamableManager& StreamableManager = UAssetManager::GetStreamableManager();
-			AsyncLoadTextureHandleAry.Add(StreamableManager.RequestAsyncLoad(DefaultIcon.ToSoftObjectPath(), [this, UIPtr]()
-				{
-					UIPtr->SetBrushFromTexture(DefaultIcon.Get());
-				}));
+			AsyncLoadText(DefaultIcon,ImagePtr );
 		}
 	}
 }

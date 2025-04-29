@@ -29,14 +29,14 @@ void USkill_Active_Traction::EndAbility(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		if (TractionPoint)
-		{
-			TractionPoint->Destroy();
-		}
-
 		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
 #endif
+
+	if (TractionPoint)
+	{
+		TractionPoint->Destroy();
+	}
 
 	TractionPoint = nullptr;
 
@@ -52,10 +52,32 @@ void USkill_Active_Traction::PerformAction(
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+#if UE_EDITOR || UE_SERVER
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
+	{
+		SpawnTractionPointActor(GetWorld()->SpawnActor<ATractionPoint>(CharacterPtr->GetActorLocation(), FRotator::ZeroRotator));
+
+		auto DelayTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		DelayTaskPtr->SetDuration(Duration);
+		DelayTaskPtr->OnFinished.BindLambda([this](auto)
+		{
+			K2_CancelAbility();
+			
+			return true;
+		});
+		DelayTaskPtr->ReadyForActivation();
+	}
+#endif
+
+	PlayMontage();
+}
+
+void USkill_Active_Traction::SpawnTractionPointActor_Implementation(
+	ATractionPoint* NewTractionPointPtr
+)
+{
 	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
 	{
-		TractionPoint = GetWorld()->SpawnActor<ATractionPoint>(CharacterPtr->GetActorLocation(), FRotator::ZeroRotator);
-
 		float OutRadius = 0.f;
 		float OutHalfHeight = 0.f;
 		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(OutRadius, OutHalfHeight);
@@ -73,23 +95,6 @@ void USkill_Active_Traction::PerformAction(
 
 		RoomtMotionTaskptr->ReadyForActivation();
 	}
-
-#if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
-	{
-		auto DelayTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		DelayTaskPtr->SetDuration(Duration);
-		DelayTaskPtr->OnFinished.BindLambda([this](auto)
-		{
-			K2_CancelAbility();
-			
-			return true;
-		});
-		DelayTaskPtr->ReadyForActivation();
-	}
-#endif
-
-	PlayMontage();
 }
 
 void USkill_Active_Traction::PlayMontage()

@@ -5,6 +5,7 @@
 
 #include "GameplayAbilitySpec.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayTask_Tornado.h"
 #include "AssetRefMap.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameplayEffectExecutionCalculation.h"
@@ -21,11 +22,13 @@
 #include "BasicFutures_HasBeenFlyAway.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "EventSubjectComponent.h"
-#include "PlanetPlayerController.h"
+#include "Tornado.h"
 #include "OnEffectedTawrgetCallback.h"
 
-UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(const FObjectInitializer& ObjectInitializer):
-                                                                                                               Super(ObjectInitializer)
+UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(
+	const FObjectInitializer& ObjectInitializer
+):
+ Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 	SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -39,11 +42,20 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 	if (GetOwnerRole() == ROLE_Authority)
 	{
 		OnGameplayEffectAppliedDelegateToTarget.AddUObject(
-			this, &ThisClass::OnGEAppliedDelegateToTarget);
+			this,
+			&ThisClass::OnGEAppliedDelegateToTarget
+		);
 		OnGameplayEffectAppliedDelegateToSelf.AddUObject(
-			this, &ThisClass::OnActiveGEAddedDelegateToSelf);
+			this,
+			&ThisClass::OnActiveGEAddedDelegateToSelf
+		);
 	}
 #endif
+}
+
+bool UCharacterAbilitySystemComponent::IsCanBeDamage() const
+{
+	return IsInDeath() || IsUnSelected();
 }
 
 bool UCharacterAbilitySystemComponent::IsInDeath() const
@@ -118,12 +130,15 @@ void UCharacterAbilitySystemComponent::InitialBaseGAs()
 			);
 		}
 #pragma region 结算效果修正
+		
 #pragma endregion 结算效果修正
 	}
 #endif
 }
 
-void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRun)
+void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(
+	bool bIsRun
+)
 {
 	if (bIsRun)
 	{
@@ -131,7 +146,8 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Running))
+				UGameplayTagsLibrary::State_Running
+			))
 			{
 				return;
 			}
@@ -147,7 +163,8 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Running))
+				UGameplayTagsLibrary::State_Running
+			))
 			{
 				FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run};
 				OnwerActorPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
@@ -156,7 +173,9 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(bool bIsRu
 	}
 }
 
-void UCharacterAbilitySystemComponent::Dash_Implementation(EDashDirection DashDirection)
+void UCharacterAbilitySystemComponent::Dash_Implementation(
+	EDashDirection DashDirection
+)
 {
 	FGameplayEventData Payload;
 	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
@@ -217,7 +236,23 @@ void UCharacterAbilitySystemComponent::HasBeenFlayAway_Implementation(
 	}
 }
 
-void UCharacterAbilitySystemComponent::SwitchCantBeSelect(bool bIsCanBeSelect)
+void UCharacterAbilitySystemComponent::HasbeenTornodo_Implementation(
+	ATornado* TornadoPtr
+)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() > ROLE_SimulatedProxy)
+	{
+		auto NewTaskPtr = UGameplayTask_Tornado::NewTask<UGameplayTask_Tornado>(this);
+		NewTaskPtr->TornadoPtr = TornadoPtr;
+		NewTaskPtr->ReadyForActivation();
+	}
+#endif
+}
+
+void UCharacterAbilitySystemComponent::SwitchCantBeSelect(
+	bool bIsCanBeSelect
+)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -284,7 +319,9 @@ void UCharacterAbilitySystemComponent::BreakMoveToAttackDistance()
 	}
 }
 
-void UCharacterAbilitySystemComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void UCharacterAbilitySystemComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -594,8 +631,9 @@ void UCharacterAbilitySystemComponent::AddReceivedBaseModify()
 	// }
 }
 
-EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(ACharacterBase* TargetCharacterPtr,
-                                                                          ACharacterBase* TriggerCharacterPtr
+EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(
+	ACharacterBase* TargetCharacterPtr,
+	ACharacterBase* TriggerCharacterPtr
 )
 {
 	const FVector Vec = (TriggerCharacterPtr->GetActorLocation() - TargetCharacterPtr->GetActorLocation()).
@@ -789,7 +827,8 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	else if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Damage_Callback))
 	{
 		const auto Value = GameplayEffectSpec.GetSetByCallerMagnitude(
-			UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath);
+			UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath
+		);
 		if (Value)
 		{
 		}
@@ -799,12 +838,68 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	}
 }
 
-void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
+TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
+	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+) 
+{
+	TMap<FGameplayTag, float>Result = CustomMagnitudes;
+	
+	// 根据自身的效果对【输入】进行一些修正
+	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
+
+	for (auto Iter = InputDataModifysMap.begin(); Iter != InputDataModifysMap.end(); Iter++)
+	{
+		if ((*Iter)->Modify(Result) && (*Iter)->bIsOnceTime)
+		{
+			NeedRemoveIterAry.Add(Iter);
+		}
+	}
+
+	for (auto Iter : NeedRemoveIterAry)
+	{
+		InputDataModifysMap.erase(Iter);
+	}
+
+	return Result;
+}
+
+TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 )
 {
+	TMap<FGameplayTag, float>Result = CustomMagnitudes;
+	
+	// 根据自身的效果对【输出】进行一些修正
+	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
+
+	for (auto Iter = InputDataModifysMap.begin(); Iter != InputDataModifysMap.end(); Iter++)
+	{
+		if ((*Iter)->Modify(Result) && (*Iter)->bIsOnceTime)
+		{
+			NeedRemoveIterAry.Add(Iter);
+		}
+	}
+
+	for (auto Iter : NeedRemoveIterAry)
+	{
+		InputDataModifysMap.erase(Iter);
+	}
+
+	return Result;
+}
+
+void UCharacterAbilitySystemComponent::ApplyInputData(
+	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+) 
+{
+	TMap<FGameplayTag, float>Result = CustomMagnitudes;
+	
 	// 获得对应GE对象
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
@@ -823,15 +918,18 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 
 	// 获得来源AttributeSet
 	const auto SourceASCPtr = Cast<ThisClass>(
-		ExecutionParams.GetSourceAbilitySystemComponent());
+		ExecutionParams.GetSourceAbilitySystemComponent()
+	);
 
 	// 获得来源AttributeSet
 	const auto SourceSet = Cast<UAS_Character>(
-		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
+		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass())
+	);
 
 	// 获得目标AttributeSet
 	const auto TargetSet = Cast<UAS_Character>(
-		ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
+		ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass())
+	);
 
 	TMap<FGameplayTag, float> SetByCallerTagMagnitudes = CustomMagnitudes;
 	SetByCallerTagMagnitudes.Append(Spec.SetByCallerTagMagnitudes);
@@ -929,22 +1027,7 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 		}
 	}
 
-	// 根据自身的效果对【输入】进行一些修正
-	TArray<decltype(ReceivedEventModifysMap)::iterator> NeedRemoveIterAry;;
-
-	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
-	{
-		if ((*Iter)->Modify(SetByCallerTagMagnitudes) && (*Iter)->bIsOnceTime)
-		{
-			NeedRemoveIterAry.Add(Iter);
-		}
-	}
-
-	for (auto Iter : NeedRemoveIterAry)
-	{
-		ReceivedEventModifysMap.erase(Iter);
-	}
-
+	// 把值写进GE里面
 	// 如果是此类，数据在 SetByCallerTagMagnitudes
 	if (
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
@@ -956,7 +1039,9 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
 				const auto NewValue = GetMapValue(
-					Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
+					Spec,
+					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
+				);
 
 				OutExecutionOutput.AddOutputModifier(
 					FGameplayModifierEvaluatedData(
@@ -1007,11 +1092,11 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 
 				Instigator->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
 					ReceivedEventModifyDataCallback
-					);
+				);
 
 				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
 					ReceivedEventModifyDataCallback
-					);
+				);
 			}
 		}
 	}
@@ -1044,51 +1129,58 @@ void UCharacterAbilitySystemComponent::OnReceivedEventModifyData(
 	}
 }
 
-IGAEventModifyInterface::IGAEventModifyInterface(int32 InPriority) :
-	Priority(InPriority)
+IDataModifyInterface::IDataModifyInterface(
+	int32 InPriority
+) :
+  Priority(InPriority)
 {
 	ID = FMath::Rand32();
 }
 
-bool IGAEventModifyInterface::operator<(const IGAEventModifyInterface& RightValue)const
+bool IDataModifyInterface::operator<(
+	const IDataModifyInterface& RightValue
+) const
 {
 	return (Priority > RightValue.Priority) && (ID == RightValue.ID);
 }
 
-IGAEventModifySendInterface::IGAEventModifySendInterface(int32 InPriority /*= 1*/) :
-	IGAEventModifyInterface(InPriority)
+IOutputDataModifyInterface::IOutputDataModifyInterface(
+	int32 InPriority /*= 1*/
+) :
+  IDataModifyInterface(InPriority)
 {
-
 }
 
-bool IGAEventModifySendInterface::Modify(
-		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
-		)
-{
-	return true;
-}
-
-IGAEventModifyReceivedInterface::IGAEventModifyReceivedInterface(int32 InPriority /*= 1*/) :
-	IGAEventModifyInterface(InPriority)
-{
-
-}
-
-bool IGAEventModifyReceivedInterface::Modify(
-		TMap<FGameplayTag, float>&	SetByCallerTagMagnitudes
-	)
+bool IOutputDataModifyInterface::Modify(
+	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+)
 {
 	return true;
 }
 
-void UCharacterAbilitySystemComponent::AddSendEventModify(
-	const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
+IInputDataModifyInterface::IInputDataModifyInterface(
+	int32 InPriority /*= 1*/
+) :
+  IDataModifyInterface(InPriority)
+{
+}
+
+bool IInputDataModifyInterface::Modify(
+	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+)
+{
+	return true;
+}
+
+void UCharacterAbilitySystemComponent::AddOutputModify(
+	const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
+)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
 		bIsContinue = false;
 		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-		for (const auto& Iter : SendEventModifysMap)
+		for (const auto& Iter : OutputDataModifysMap)
 		{
 			if (Iter->ID == GAEventModifySPtr->ID)
 			{
@@ -1097,30 +1189,32 @@ void UCharacterAbilitySystemComponent::AddSendEventModify(
 			}
 		}
 	}
-	SendEventModifysMap.emplace(GAEventModifySPtr);
+	OutputDataModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UCharacterAbilitySystemComponent::RemoveSendEventModify(
-	const TSharedPtr<IGAEventModifySendInterface>& GAEventModifySPtr)
+void UCharacterAbilitySystemComponent::RemoveOutputModify(
+	const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
+)
 {
-	for (auto Iter = SendEventModifysMap.begin(); Iter != SendEventModifysMap.end(); Iter++)
+	for (auto Iter = OutputDataModifysMap.begin(); Iter != OutputDataModifysMap.end(); Iter++)
 	{
 		if ((*Iter)->ID == GAEventModifySPtr->ID)
 		{
-			SendEventModifysMap.erase(Iter);
+			OutputDataModifysMap.erase(Iter);
 			break;
 		}
 	}
 }
 
-void UCharacterAbilitySystemComponent::AddReceviedEventModify(
-	const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
+void UCharacterAbilitySystemComponent::AddInputModify(
+	const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
+)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
 		bIsContinue = false;
 		GAEventModifySPtr->ID = FMath::RandRange(1, std::numeric_limits<int32>::max());
-		for (const auto& Iter : ReceivedEventModifysMap)
+		for (const auto& Iter : InputDataModifysMap)
 		{
 			if (Iter->ID == GAEventModifySPtr->ID)
 			{
@@ -1129,24 +1223,26 @@ void UCharacterAbilitySystemComponent::AddReceviedEventModify(
 			}
 		}
 	}
-	ReceivedEventModifysMap.emplace(GAEventModifySPtr);
+	InputDataModifysMap.emplace(GAEventModifySPtr);
 }
 
-void UCharacterAbilitySystemComponent::RemoveReceviedEventModify(
-	const TSharedPtr<IGAEventModifyReceivedInterface>& GAEventModifySPtr)
+void UCharacterAbilitySystemComponent::RemoveInputModify(
+	const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
+)
 {
-	for (auto Iter = ReceivedEventModifysMap.begin(); Iter != ReceivedEventModifysMap.end(); Iter++)
+	for (auto Iter = InputDataModifysMap.begin(); Iter != InputDataModifysMap.end(); Iter++)
 	{
 		if ((*Iter)->ID == GAEventModifySPtr->ID)
 		{
-			ReceivedEventModifysMap.erase(Iter);
+			InputDataModifysMap.erase(Iter);
 			break;
 		}
 	}
 }
 
 void UCharacterAbilitySystemComponent::OnEffectOhterCharacter_Implementation(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback)
+	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+)
 {
 	MakedDamageDelegate(ReceivedEventModifyDataCallback);
 }

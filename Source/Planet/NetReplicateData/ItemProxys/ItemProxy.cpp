@@ -38,6 +38,7 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
+#include "ItemProxy_Description.h"
 
 FBasicProxy::FBasicProxy()
 {
@@ -110,7 +111,11 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 {
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy();
 
-	return SceneProxyExtendInfoPtr->DefaultIcon;
+	if (SceneProxyExtendInfoPtr->ItemProxy_Description.ToSoftObjectPath().IsAsset())
+	{
+		return SceneProxyExtendInfoPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon;
+	}
+	return nullptr;
 }
 
 void FBasicProxy::Update2Client()
@@ -127,7 +132,12 @@ FString FBasicProxy::GetProxyName() const
 {
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy();
 
-	return SceneProxyExtendInfoPtr->ProxyName;
+	if (SceneProxyExtendInfoPtr->ItemProxy_Description)
+	{
+		return SceneProxyExtendInfoPtr->ItemProxy_Description.LoadSynchronous()->ProxyName;
+	}
+
+	return TEXT("");
 }
 
 FTableRowProxy* FBasicProxy::GetTableRowProxy() const

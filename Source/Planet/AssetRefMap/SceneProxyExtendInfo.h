@@ -52,22 +52,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Proxy;
 
-	// 可被持有的“武器”
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Proxy_WeaponExtendInfo;
-
-	// 可被持有的“主动技能”
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Proxy_ActiveSkillExtendInfo;
-
-	// 可被持有的“被动技能”
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Proxy_PassiveSkillExtendInfo;
-
-	// 可被持有的“武器技能”
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Proxy_WeaponSkillExtendInfo;
-
 	// 可被持有的“消耗品”
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Proxy_Consumable;

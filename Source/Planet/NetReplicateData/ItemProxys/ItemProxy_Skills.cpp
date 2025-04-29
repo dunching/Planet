@@ -360,13 +360,11 @@ void FActiveSkillProxy::OffsetCooldownTime()
 // 	Update2Client();
 // }
 
-FTableRowProxy_ActiveSkillExtendInfo* FActiveSkillProxy::GetTableRowProxy_ActiveSkillExtendInfo() const
+UItemProxy_Description_ActiveSkill* FActiveSkillProxy::GetTableRowProxy_ActiveSkillExtendInfo() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_ActiveSkillExtendInfo.LoadSynchronous();
-
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_ActiveSkillExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
-	return SceneProxyExtendInfoPtr;
+	auto TableRowPtr = GetTableRowProxy();
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_ActiveSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	return ItemProxy_Description_SkillPtr;
 }
 
 TSubclassOf<USkill_Base> FActiveSkillProxy::GetSkillClass() const
@@ -420,13 +418,11 @@ void FPassiveSkillProxy::UnAllocation()
 	Super::UnAllocation();
 }
 
-FTableRowProxy_PassiveSkillExtendInfo* FPassiveSkillProxy::GetTableRowProxy_PassiveSkillExtendInfo() const
+UItemProxy_Description_PassiveSkill* FPassiveSkillProxy::GetTableRowProxy_PassiveSkillExtendInfo() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_PassiveSkillExtendInfo.LoadSynchronous();
-
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PassiveSkillExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
-	return SceneProxyExtendInfoPtr;
+	auto TableRowPtr = GetTableRowProxy();
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_PassiveSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	return ItemProxy_Description_SkillPtr;
 }
 
 FTableRowProxy_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
@@ -617,17 +613,17 @@ bool FWeaponSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool&
 	return true;
 }
 
-FTableRowProxy_WeaponSkillExtendInfo* FWeaponSkillProxy::GetTableRowProxy_WeaponSkillExtendInfo() const
+UItemProxy_Description_WeaponSkill* FWeaponSkillProxy::GetTableRowProxy_WeaponSkillExtendInfo() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_WeaponSkillExtendInfo.LoadSynchronous();
-
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_WeaponSkillExtendInfo>(*ProxyType.ToString(), TEXT("GetProxy"));
-	return SceneProxyExtendInfoPtr;
+	auto TableRowPtr = GetTableRowProxy();
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_WeaponSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	return ItemProxy_Description_SkillPtr;
 }
 
 TSubclassOf<USkill_Base> FWeaponSkillProxy::GetSkillClass() const
 {
+	auto TableRowPtr = GetTableRowProxy();
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_WeaponSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
 	return GetTableRowProxy_WeaponSkillExtendInfo()->SkillClass;
 }
 
