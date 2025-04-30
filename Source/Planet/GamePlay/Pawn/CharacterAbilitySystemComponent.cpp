@@ -942,7 +942,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
-	
+
 	// 回执
 	FOnEffectedTawrgetCallback ReceivedEventModifyDataCallback;
 
@@ -1135,14 +1135,17 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		}
 	}
 #pragma endregion
-	
+
 	Instigator->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
 		ReceivedEventModifyDataCallback
 	);
 
-	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
-		ReceivedEventModifyDataCallback
-	);
+	if (Instigator != TargetCharacterPtr)
+	{
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
+			ReceivedEventModifyDataCallback
+		);
+	}
 }
 
 IDataModifyInterface::IDataModifyInterface(

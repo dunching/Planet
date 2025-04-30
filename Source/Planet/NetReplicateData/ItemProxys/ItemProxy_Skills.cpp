@@ -354,7 +354,7 @@ bool FActiveSkillProxy::GetRemainingCooldown(
 	return true;
 }
 
-bool FActiveSkillProxy::CheckCooldown() const
+bool FActiveSkillProxy::CheckNotInCooldown() const
 {
 	auto InTags = FGameplayTagContainer::EmptyContainer;
 

@@ -59,7 +59,7 @@ public:
 		float& RemainingCooldown, float& RemainingCooldownPercent
 	)const override;
 
-	virtual bool CheckCooldown()const override;
+	virtual bool CheckNotInCooldown()const override;
 
 	virtual void AddCooldownConsumeTime(float NewTime)override;
 

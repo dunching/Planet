@@ -17,6 +17,7 @@
 
 #include "GameplayTagsLibrary.h"
 #include "GE_Common.h"
+#include "OnEffectedTawrgetCallback.h"
 
 void UItemDecription_Skill_PassiveSkill_ZMJZ::SetUIStyle()
 {
@@ -166,12 +167,15 @@ void USkill_Passive_ZMJZ::OnSendAttack(
 {
 	if (CharacterPtr)
 	{
-		ModifyGASpeed(
-			GetCurrentAbilitySpecHandle(),
-			GetCurrentActorInfo(),
-			GetCurrentActivationInfo(),
-			&CurrentEventData
-		);
+		if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
+		{
+			ModifyGASpeed(
+				GetCurrentAbilitySpecHandle(),
+				GetCurrentActorInfo(),
+				GetCurrentActivationInfo(),
+				&CurrentEventData
+			);
+		}
 	}
 }
 

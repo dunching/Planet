@@ -173,7 +173,7 @@ public:
 	)const override;
 
 	// return 是否在冷却
-	virtual bool CheckCooldown()const override;
+	virtual bool CheckNotInCooldown()const override;
 
 	virtual void AddCooldownConsumeTime(float CDOffset)override;
 

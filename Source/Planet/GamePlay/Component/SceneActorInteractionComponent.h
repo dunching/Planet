@@ -82,6 +82,8 @@ public:
 		bool bIsEnable
 	);
 
+	bool GetIsEnableInteraction()const;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Range = 200;
 
@@ -90,4 +92,8 @@ protected:
 	TArray<FGuideInterationSetting> GuideInteractionAry;
 
 	TObjectPtr<AGuideInteraction_Actor> GuideInteractionActorPtr = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bEnableInteraction = true;
+
 };

@@ -47,6 +47,13 @@ void USkill_Passive_XR::OnAvatarSet(
 		}
 	}
 #endif
+
+	if (SkillProxyPtr)
+	{
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_PassiveSkillExtendInfo()
+		);
+	}
 }
 
 void USkill_Passive_XR::OnRemoveAbility(
@@ -68,15 +75,46 @@ void USkill_Passive_XR::OnSendAttack(
 {
 	if (CharacterPtr)
 	{
-		if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Weapon))
+		if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 		{
 			auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
 			auto HoldingItemsComponentPtr = CharacterPtr->GetGroupManagger()->GetHoldingItemsComponent();
-			
+
+			TArray<TSharedPtr<FActiveSkillProxy>> ActiveSkillProxyAry;
 			const auto ActiveSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::ActiveSocket_1);
-			auto SkillSPtr = HoldingItemsComponentPtr->FindProxy_Skill(ActiveSocket_1.GetAllocationedProxyID());
-			
+			auto ActiveSkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(
+					HoldingItemsComponentPtr->FindProxy_Skill(ActiveSocket_1.GetAllocationedProxyID())
+				);
+			if (ActiveSkillProxySPtr && !ActiveSkillProxySPtr->CheckNotInCooldown())
+			{
+				ActiveSkillProxyAry.Add(
+				ActiveSkillProxySPtr
+				);
+			}
+
 			const auto ActiveSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::ActiveSocket_2);
+			ActiveSkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(
+					HoldingItemsComponentPtr->FindProxy_Skill(ActiveSocket_2.GetAllocationedProxyID())
+				);
+			if (ActiveSkillProxySPtr && !ActiveSkillProxySPtr->CheckNotInCooldown())
+			{
+				ActiveSkillProxyAry.Add(
+				ActiveSkillProxySPtr
+				);
+			}
+
+			if (!ActiveSkillProxyAry.IsEmpty())
+			{
+				for (;;)
+				{
+					const auto Index = FMath::RandRange(0, ActiveSkillProxyAry.Num() - 1);
+					if (ActiveSkillProxyAry[Index])
+					{
+						ActiveSkillProxyAry[Index]->AddCooldownConsumeTime(-ItemProxy_DescriptionPtr->CD.PerLevelValue[0]);
+						break;
+					}
+				}
+			}
 		}
 	}
 }

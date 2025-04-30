@@ -205,26 +205,34 @@ namespace HumanProcessor
 				{
 					if (EventArgs.Key == GameOptionsPtr->InteractionWithSceneActor)
 					{
-						OnwerActorPtr->InteractionSceneActor(Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr));
-						return true;
+						if (OnwerActorPtr->InteractionSceneActor(
+							Cast<ASceneActor>(OnwerActorPtr->LookAtSceneActorPtr)
+						))
+						{
+							return true;
+						}
 					}
-					
-					 if (EventArgs.Key == GameOptionsPtr->InteractionWithSceneCharacter)
+
+					if (EventArgs.Key == GameOptionsPtr->InteractionWithSceneCharacter)
 					{
-					 	if (auto CharacterPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
-					 	{
-					 		OnwerActorPtr->InteractionSceneCharacter(CharacterPtr);
-					 		return true;
-					 	}
+						if (auto CharacterPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
+						{
+							if (OnwerActorPtr->InteractionSceneCharacter(CharacterPtr))
+							{
+								return true;
+							}
+						}
 					}
-					
-					 if (EventArgs.Key == GameOptionsPtr->InteractionWithChallengeEntry)
-					 {
-					 	if (auto ChallengeEntryPtr = Cast<AChallengeEntry>(OnwerActorPtr->LookAtSceneActorPtr))
-					 	{
-					 		OnwerActorPtr->InteractionSceneActor(ChallengeEntryPtr);
-					 		return true;
-					 	}
+
+					if (EventArgs.Key == GameOptionsPtr->InteractionWithChallengeEntry)
+					{
+						if (auto ChallengeEntryPtr = Cast<AChallengeEntry>(OnwerActorPtr->LookAtSceneActorPtr))
+						{
+							if (OnwerActorPtr->InteractionSceneActor(ChallengeEntryPtr))
+							{
+								return true;
+							}
+						}
 					}
 				}
 

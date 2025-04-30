@@ -66,7 +66,7 @@ public:
 		float& RemainingCooldown, float& RemainingCooldownPercent
 	) const = 0;
 
-	virtual bool CheckCooldown() const = 0;
+	virtual bool CheckNotInCooldown() const = 0;
 
 	/**
 	 * 增加或减少GA冷却

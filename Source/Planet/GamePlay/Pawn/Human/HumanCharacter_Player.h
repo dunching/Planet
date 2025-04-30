@@ -127,11 +127,11 @@ public:
 	 * 与场景中的可交互对象开始交互
 	 * @param SceneObjPtr 
 	 */
-	virtual void InteractionSceneActor(
+	virtual bool InteractionSceneActor(
 		ASceneActor* SceneObjPtr
 	);
 
-	virtual void InteractionSceneCharacter(
+	virtual bool InteractionSceneCharacter(
 		AHumanCharacter_AI* CharacterPtr
 	);
 

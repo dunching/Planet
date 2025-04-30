@@ -439,13 +439,13 @@ void AHumanCharacter_Player::EndLookAt()
 	}
 }
 
-void AHumanCharacter_Player::InteractionSceneActor(
+bool AHumanCharacter_Player::InteractionSceneActor(
 	ASceneActor* SceneObjPtr
 )
 {
 	if (!SceneObjPtr)
 	{
-		return;
+		return false;
 	}
 
 	if (SceneObjPtr->IsA(AResourceBoxBase::StaticClass()))
@@ -484,12 +484,24 @@ void AHumanCharacter_Player::InteractionSceneActor(
 
 		InteractionSceneObj_Server(SceneObjPtr);
 	}
+
+	return true;
 }
 
-void AHumanCharacter_Player::InteractionSceneCharacter(
+bool AHumanCharacter_Player::InteractionSceneCharacter(
 	AHumanCharacter_AI* CharacterPtr
 )
 {
+	if (!CharacterPtr)
+	{
+		return false;
+	}
+
+	if (!CharacterPtr->GetSceneActorInteractionComponent()->GetIsEnableInteraction())
+	{
+		return false;
+	}
+	
 	//
 	GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(CharacterPtr);
 
@@ -508,6 +520,8 @@ void AHumanCharacter_Player::InteractionSceneCharacter(
 			NewProcessor->CharacterPtr = CharacterPtr;
 		}
 	);
+
+	return true;
 }
 
 void AHumanCharacter_Player::InteractionSceneObj_Server_Implementation(

@@ -111,7 +111,7 @@ bool USkill_Active_Base::CanActivateAbility(
 	{
 		return false;
 	}
-	if (!ActiveSkillProxyPtr->CheckCooldown())
+	if (!ActiveSkillProxyPtr->CheckNotInCooldown())
 	{
 		return false;
 	}

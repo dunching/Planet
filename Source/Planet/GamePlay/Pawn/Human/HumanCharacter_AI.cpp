@@ -240,6 +240,7 @@ void AHumanCharacter_AI::HasBeenLookingAt(
 
 	if (
 		InteractionWidgetCompoentPtr &&
+		SceneActorInteractionComponentPtr->GetIsEnableInteraction() &&
 		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < SceneActorInteractionComponentPtr->
 			Range)
 	)

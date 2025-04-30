@@ -71,6 +71,7 @@ void UAbilityTask_ARM_RadialForce::SharedInitAndApply()
 			RadialForce->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
 			
 			RadialForce->Radius = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->OuterRadius;
+			RadialForce->bNoZForce = true;
 			RadialForce->Strength = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->Strength;
 			RadialForce->bIsPush = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->bIsPush;
 			RadialForce->StrengthDistanceFalloff = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->StrengthDistanceFalloff.LoadSynchronous();

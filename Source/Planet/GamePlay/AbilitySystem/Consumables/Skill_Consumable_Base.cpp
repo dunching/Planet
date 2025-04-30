@@ -100,7 +100,7 @@ bool USkill_Consumable_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (ProxyPtr && ProxyPtr->CheckCooldown())
+	if (ProxyPtr && ProxyPtr->CheckNotInCooldown())
 	{
 		return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 	}

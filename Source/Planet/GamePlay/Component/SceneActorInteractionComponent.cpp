@@ -87,3 +87,8 @@ void USceneActorInteractionComponent::ChangedInterationTaskState(
 		}
 	}
 }
+
+bool USceneActorInteractionComponent::GetIsEnableInteraction() const
+{
+	return bEnableInteraction && !GetInteractionLists().IsEmpty();
+}

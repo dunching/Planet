@@ -173,7 +173,7 @@ bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& Rem
 	return true;
 }
 
-bool FConsumableProxy::CheckCooldown() const
+bool FConsumableProxy::CheckNotInCooldown() const
 {
 	// 独立冷却
 	{

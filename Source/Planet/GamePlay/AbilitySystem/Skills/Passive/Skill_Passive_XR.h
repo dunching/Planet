@@ -27,7 +27,10 @@ class PLANET_API UItemProxy_Description_PassiveSkill_XR : public UItemProxy_Desc
 	GENERATED_BODY()
 
 public:
-	
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FPerLevelValue CD = {1, 2, 3, 4, 5};
+
 };
 
 UCLASS()
@@ -49,6 +52,8 @@ class PLANET_API USkill_Passive_XR : public USkill_Passive_Base
 {
 	GENERATED_BODY()
 
+	using FItemProxy_DescriptionType = UItemProxy_Description_PassiveSkill_XR;
+	
 public:
 	using FMakedDamageHandle =
 	TCallbackHandleContainer<void(
@@ -72,5 +77,7 @@ protected:
 	);
 	
 	FMakedDamageHandle AbilityActivatedCallbacksHandle;
+
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
 };
