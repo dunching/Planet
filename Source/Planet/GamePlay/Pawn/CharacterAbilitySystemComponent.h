@@ -17,6 +17,7 @@
 struct FGameplayAttributeData;
 
 class ATornado;
+class ATractionPoint;
 class UGAEvent_Received;
 struct FConsumableProxy;
 class UCS_PeriodicPropertyModify;
@@ -200,6 +201,7 @@ public:
 	/**
 	 * 被击飞
 	 * @param Height 
+	 * Only Server
 	 */
 	UFUNCTION(Server, Reliable)
 	void HasBeenFlayAway(
@@ -208,11 +210,18 @@ public:
 
 	/**
 	 * 被击飞
-	 * @param Height 
+	 * Only Server
 	 */
-	UFUNCTION(NetMulticast, Reliable)
 	void HasbeenTornodo(
-		ATornado* TornadoPtr
+			const TWeakObjectPtr<ATornado>&  TornadoPtr
+	);
+
+	/**
+	 * 被牵引
+	 * Only Server
+	 */
+	void HasbeenTraction(
+		const TWeakObjectPtr<ATractionPoint>& TractionPointPtr
 	);
 
 	void SwitchCantBeSelect(

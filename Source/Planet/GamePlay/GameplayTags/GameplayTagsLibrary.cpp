@@ -25,6 +25,12 @@ FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenRepel =
 FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenFlyAway =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenFlyAway")));
 
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasbeenTornodo =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasbeenTornodo")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasbeenTraction =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasbeenTraction")));
+
 FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenDisplacement =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenDisplacement")));
 

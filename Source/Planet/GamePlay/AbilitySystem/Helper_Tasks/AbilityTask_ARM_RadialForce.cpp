@@ -16,7 +16,9 @@
 #include "CharacterBase.h"
 #include "CollisionDataStruct.h"
 #include "HumanCharacter.h"
+#include "Skill_Active_Traction.h"
 #include "SPlineActor.h"
+#include "TractionActor.h"
 
 UAbilityTask_ARM_RadialForce::UAbilityTask_ARM_RadialForce(
 	const FObjectInitializer& ObjectInitializer
@@ -32,31 +34,16 @@ void UAbilityTask_ARM_RadialForce::GetLifetimeReplicatedProps(
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ThisClass, TractionPoinAcotrPtr, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, Radius, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, InnerRadius, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, Strength, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, Duration, COND_InitialOnly);
-	DOREPLIFETIME_CONDITION(ThisClass, bIsPush, COND_InitialOnly);
 }
 
-UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRadialForce(
+UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::ApplyRootMotionRadialForce(
 	UGameplayAbility* OwningAbility,
 	FName TaskInstanceName,
-	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr,
-	float Strength,
-	float Duration,
-	float Radius,
-	float InnerRadius,
-	bool bIsPush
+	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr
 )
 {
 	auto MyTask = NewAbilityTask<UAbilityTask_ARM_RadialForce>(OwningAbility, TaskInstanceName);
 
-	MyTask->Strength = Strength;
-	MyTask->Duration = Duration;
-	MyTask->Radius = Radius;
-	MyTask->InnerRadius = InnerRadius;
-	MyTask->bIsPush = bIsPush;
 	MyTask->TractionPoinAcotrPtr = TractionPoinAcotrPtr;
 
 	return MyTask;
@@ -64,12 +51,41 @@ UAbilityTask_ARM_RadialForce* UAbilityTask_ARM_RadialForce::MyApplyRootMotionRad
 
 void UAbilityTask_ARM_RadialForce::SharedInitAndApply()
 {
-	StartTime = GetWorld()->GetTimeSeconds();
-	CurrentTime = GetWorld()->GetTimeSeconds();
+	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
+	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
+	{
+		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
 
-	EndTime = StartTime + Duration;
+		if (MovementComponent && TractionPoinAcotrPtr.IsValid())
+		{
+			ForceName = ForceName.IsNone() ? FName("AbilityTaskApplyRootMotionRadialForce") : ForceName;
+			auto RadialForce = MakeShared<
+				FRootMotionSource_MyRadialForce>();
+					
+			RadialForce->InstanceName = ForceName;
+					
+			RadialForce->AccumulateMode = ERootMotionAccumulateMode::Additive;
+			RadialForce->Priority = ERootMotionSource_Priority::kTraction;
+			RadialForce->FinishVelocityParams.Mode = FinishVelocityMode;
+			RadialForce->FinishVelocityParams.SetVelocity = FinishSetVelocity;
+			RadialForce->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
+			
+			RadialForce->Radius = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->OuterRadius;
+			RadialForce->Strength = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->Strength;
+			RadialForce->bIsPush = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->bIsPush;
+			RadialForce->StrengthDistanceFalloff = TractionPoinAcotrPtr->ItemProxy_DescriptionPtr->StrengthDistanceFalloff.LoadSynchronous();
 
-	UpdateTarget();
+			RadialForce->TractionPoinAcotrPtr = TractionPoinAcotrPtr;
+			
+			RootMotionSourceID = MovementComponent->ApplyRootMotionSource(RadialForce);
+		}
+	}
+	else
+	{
+		ABILITY_LOG(Warning, TEXT("UAbilityTask_ARM_MoveToForce called in Ability %s with null MovementComponent; Task Instance Name %s."),
+			Ability ? *Ability->GetName() : TEXT("NULL"),
+			*InstanceName.ToString());
+	}
 }
 
 void UAbilityTask_ARM_RadialForce::Activate()
@@ -83,25 +99,46 @@ void UAbilityTask_ARM_RadialForce::TickTask(
 	float DeltaTime
 )
 {
+	if (bIsFinished)
+	{
+		return;
+	}
+
 	Super::TickTask(DeltaTime);
 
-	const bool bTimedOut = HasTimedOut();
-	if (GetWorld()->GetTimeSeconds() > EndTime)
+	AActor* MyActor = GetAvatarActor();
+	if (MyActor)
 	{
-		bIsFinished = true;
-		OnFinish.ExecuteIfBound();
-		EndTask();
+		const bool bTimedOut = HasTimedOut();
+
+		if (bTimedOut)
+		{
+			// Task has finished
+			bIsFinished = true;
+			if (!bIsSimulating)
+			{
+				MyActor->ForceNetUpdate();
+				if (ShouldBroadcastAbilityTaskDelegates())
+				{
+					OnFinished.ExecuteIfBound();
+				}
+				EndTask();
+			}
+		}
 	}
 	else
 	{
-		CurrentTime += DeltaTime;
-		IntervalTime += DeltaTime;
-		if (IntervalTime >= Interval)
-		{
-			IntervalTime = 0.f;
-			UpdateTarget();
-		}
+		bIsFinished = true;
+		EndTask();
 	}
+}
+
+void UAbilityTask_ARM_RadialForce::PreDestroyFromReplication()
+{
+	bIsFinished = true;
+	EndTask();
+	
+	Super::PreDestroyFromReplication();
 }
 
 void UAbilityTask_ARM_RadialForce::OnDestroy(
@@ -130,67 +167,6 @@ void UAbilityTask_ARM_RadialForce::UpdateLocation(
 				auto RootMotionSourceSPtr = static_cast<FRootMotionSource_MyRadialForce*>(RMS.Get());
 				if (RootMotionSourceSPtr)
 				{
-				}
-			}
-		}
-	}
-}
-
-void UAbilityTask_ARM_RadialForce::UpdateTarget()
-{
-	TArray<FOverlapResult> OutOverlaps;
-	FCollisionObjectQueryParams ObjectQueryParams;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(GetAvatarActor());
-
-	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
-	GetWorld()->OverlapMultiByObjectType(
-		OutOverlaps,
-		TractionPoinAcotrPtr->GetActorLocation(),
-		FQuat::Identity,
-		ObjectQueryParams,
-		FCollisionShape::MakeSphere(Radius),
-		Params
-	);
-
-	for (const auto& Iter : OutOverlaps)
-	{
-		auto TargetCharacter = Cast<AHumanCharacter>(Iter.GetActor());
-		if (TargetCharacter)
-		{
-			auto TargetCharacterMovementComponent = TargetCharacter->GetCharacterMovement();
-			if (TargetCharacterMovementComponent->HasRootMotionSources())
-			{
-			}
-			else
-			{
-				if (TargetCharacterMovementComponent)
-				{
-					float OutRadius = 0.f;
-					float OutHalfHeight = 0.f;
-					TargetCharacter->GetCapsuleComponent()->GetScaledCapsuleSize(OutRadius, OutHalfHeight);
-
-					ForceName = ForceName.IsNone() ? FName("AbilityTaskApplyRootMotionRadialForce") : ForceName;
-					TSharedPtr<FRootMotionSource_MyRadialForce> RadialForce = MakeShared<
-						FRootMotionSource_MyRadialForce>();
-					
-					RadialForce->InstanceName = ForceName;
-					
-					RadialForce->AccumulateMode = ERootMotionAccumulateMode::Additive;
-					RadialForce->Priority = ERootMotionSource_Priority::kTraction;
-					RadialForce->FinishVelocityParams.Mode = FinishVelocityMode;
-					RadialForce->FinishVelocityParams.SetVelocity = FinishSetVelocity;
-					RadialForce->FinishVelocityParams.ClampVelocity = FinishClampVelocity;
-					
-					RadialForce->TractionPoinAcotrPtr = TractionPoinAcotrPtr;
-					RadialForce->Duration = EndTime - CurrentTime;
-					RadialForce->Radius = Radius;
-					RadialForce->InnerRadius = InnerRadius + OutRadius;
-					RadialForce->Strength = Strength;
-					RadialForce->bIsPush = bIsPush;
-					RadialForce->bNoZForce = true;
-
-					TargetCharacterMovementComponent->ApplyRootMotionSource(RadialForce);
 				}
 			}
 		}

@@ -128,6 +128,12 @@ public:
 		const FGameplayEventData& GameplayEventData
 	);
 
+	/**
+	 * 获取持续性或具备下一段输入的，不立即进入CD的GA的剩余持续时间
+	 * @return > 0 有时间, < 0 无限制时间
+	 */
+	virtual float GetRemainTime()const;
+
 protected:
 	virtual void ResetPreviousStageActions();
 

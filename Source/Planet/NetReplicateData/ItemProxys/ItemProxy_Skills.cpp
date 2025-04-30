@@ -1,4 +1,3 @@
-
 #include "ItemProxy_Skills.h"
 
 #include "AbilitySystemComponent.h"
@@ -37,13 +36,17 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
-FSkillProxy::FSkillProxy() :
-	Super()
-{
 
+FSkillProxy::FSkillProxy() :
+                           Super()
+{
 }
 
-bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FSkillProxy::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -53,12 +56,17 @@ bool FSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutS
 	return true;
 }
 
-void FSkillProxy::SetAllocationCharacterProxy(const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
+void FSkillProxy::SetAllocationCharacterProxy(
+	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
+	const FGameplayTag& InSocketTag
+)
 {
 	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
-void FSkillProxy::UpdateByRemote(const TSharedPtr<FSkillProxy>& RemoteSPtr)
+void FSkillProxy::UpdateByRemote(
+	const TSharedPtr<FSkillProxy>& RemoteSPtr
+)
 {
 	Super::UpdateByRemote(RemoteSPtr);
 
@@ -92,7 +100,7 @@ void FSkillProxy::RegisterSkill()
 		{
 			return;
 		}
-		
+
 		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;
 
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
@@ -111,7 +119,9 @@ void FSkillProxy::RegisterSkill()
 			InputID,
 			GameplayEventData
 		);
-		GameplayAbilitySpecHandle = AllocationCharacter->GetCharacterAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+		GameplayAbilitySpecHandle = AllocationCharacter->GetCharacterAbilitySystemComponent()->GiveAbility(
+			GameplayAbilitySpec
+		);
 	}
 #endif
 }
@@ -139,9 +149,9 @@ void FSkillProxy::UnRegisterSkill()
 	GameplayAbilitySpecHandle = FGameplayAbilitySpecHandle();
 }
 
-TArray<USkill_Base*> FSkillProxy::GetGAInstAry()const
+TArray<USkill_Base*> FSkillProxy::GetGAInstAry() const
 {
-	TArray<USkill_Base*>ResultAry;
+	TArray<USkill_Base*> ResultAry;
 	auto ProxyCharacterPtr = GetAllocationCharacter();
 	auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
 	auto GameplayAbilitySpecPtr = ASCPtr->FindAbilitySpecFromHandle(GameplayAbilitySpecHandle);
@@ -153,7 +163,7 @@ TArray<USkill_Base*> FSkillProxy::GetGAInstAry()const
 	return ResultAry;
 }
 
-USkill_Base* FSkillProxy::GetGAInst()const
+USkill_Base* FSkillProxy::GetGAInst() const
 {
 	auto ProxyCharacterPtr = GetAllocationCharacter();
 	auto ASCPtr = ProxyCharacterPtr->GetCharacterAbilitySystemComponent();
@@ -179,7 +189,11 @@ FActiveSkillProxy::FActiveSkillProxy()
 {
 }
 
-bool FActiveSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FActiveSkillProxy::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -208,9 +222,11 @@ bool FActiveSkillProxy::CanActive() const
 
 	// 本地判断是否能释放（有些条件仅本地存在，比如是否锁定了目标）
 	if (
-		InGAInsPtr->CanActivateAbility(InGAInsPtr->GetCurrentAbilitySpecHandle(),
-			InGAInsPtr->GetCurrentActorInfo())
+		InGAInsPtr->CanActivateAbility(
+			InGAInsPtr->GetCurrentAbilitySpecHandle(),
+			InGAInsPtr->GetCurrentActorInfo()
 		)
+	)
 	{
 		return true;
 	}
@@ -236,7 +252,7 @@ bool FActiveSkillProxy::Active()
 		// 需要特殊参数的
 		if (
 			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active_Control)
-			)
+		)
 		{
 			if (InGAInsPtr->IsActive())
 			{
@@ -305,22 +321,32 @@ void FActiveSkillProxy::Cancel()
 {
 }
 
-bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
+bool FActiveSkillProxy::GetRemainingCooldown(
+	float& RemainingCooldown,
+	float& RemainingCooldownPercent
+) const
 {
-	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
-	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
-	);
+	auto InTags = FGameplayTagContainer::EmptyContainer;
+
+	InTags.AddTag(GetProxyType());
+	InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+	                                                               GetActiveEffectsWithAllTags(
+		                                                               InTags
+	                                                               );
 
 	if (!GameplayEffectHandleAry.IsEmpty())
 	{
-		auto GameplayEffectPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->GetActiveGameplayEffect(
-		GameplayEffectHandleAry[0]
-		);
+		auto GameplayEffectPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+		                                                   GetActiveGameplayEffect(
+			                                                   GameplayEffectHandleAry[0]
+		                                                   );
 
 		if (GameplayEffectPtr)
 		{
 			RemainingCooldown = GameplayEffectPtr->GetTimeRemaining(GetWorldImp()->GetTimeSeconds());
-			RemainingCooldownPercent = RemainingCooldown / GameplayEffectPtr->GetDuration(); 
+			RemainingCooldownPercent = RemainingCooldown / GameplayEffectPtr->GetDuration();
 
 			return false;
 		}
@@ -330,15 +356,41 @@ bool FActiveSkillProxy::GetRemainingCooldown(float& RemainingCooldown, float& Re
 
 bool FActiveSkillProxy::CheckCooldown() const
 {
-	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->GetActiveEffects(
-	FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(FGameplayTagContainer(GetProxyType()))
-	);
+	auto InTags = FGameplayTagContainer::EmptyContainer;
+
+	InTags.AddTag(GetProxyType());
+	InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+	                                                               GetActiveEffectsWithAllTags(
+		                                                               InTags
+	                                                               );
 
 	return GameplayEffectHandleAry.IsEmpty();
 }
 
-void FActiveSkillProxy::AddCooldownConsumeTime(float NewTime)
+void FActiveSkillProxy::AddCooldownConsumeTime(
+	float CDOffset
+)
 {
+	auto InTags = FGameplayTagContainer::EmptyContainer;
+
+	InTags.AddTag(GetProxyType());
+	InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+	                                                               GetActiveEffectsWithAllTags(
+		                                                               InTags
+	                                                               );
+
+	if (!GameplayEffectHandleAry.IsEmpty())
+	{
+		GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+		                          ModifyActiveEffectStartTime(
+			                          GameplayEffectHandleAry[0],
+			                          CDOffset
+		                          );
+	}
 }
 
 void FActiveSkillProxy::FreshUniqueCooldownTime()
@@ -363,7 +415,9 @@ void FActiveSkillProxy::OffsetCooldownTime()
 UItemProxy_Description_ActiveSkill* FActiveSkillProxy::GetTableRowProxy_ActiveSkillExtendInfo() const
 {
 	auto TableRowPtr = GetTableRowProxy();
-	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_ActiveSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_ActiveSkill>(
+		TableRowPtr->ItemProxy_Description.LoadSynchronous()
+	);
 	return ItemProxy_Description_SkillPtr;
 }
 
@@ -376,7 +430,9 @@ FPassiveSkillProxy::FPassiveSkillProxy()
 {
 }
 
-void FPassiveSkillProxy::InitialProxy(const FGameplayTag& InProxyType)
+void FPassiveSkillProxy::InitialProxy(
+	const FGameplayTag& InProxyType
+)
 {
 	Super::InitialProxy(InProxyType);
 }
@@ -421,7 +477,9 @@ void FPassiveSkillProxy::UnAllocation()
 UItemProxy_Description_PassiveSkill* FPassiveSkillProxy::GetTableRowProxy_PassiveSkillExtendInfo() const
 {
 	auto TableRowPtr = GetTableRowProxy();
-	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_PassiveSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_PassiveSkill>(
+		TableRowPtr->ItemProxy_Description.LoadSynchronous()
+	);
 	return ItemProxy_Description_SkillPtr;
 }
 
@@ -431,14 +489,17 @@ FTableRowProxy_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
 	// 
-	TArray<FTableRowProxy_PropertyEntrys*>ResultAry;
+	TArray<FTableRowProxy_PropertyEntrys*> ResultAry;
 	DataTable->GetAllRows(TEXT("GetProxy"), ResultAry);
 	if (!ResultAry.IsEmpty())
 	{
 		return ResultAry[FMath::RandRange(0, ResultAry.Num() - 1)];
 	}
 
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(*ProxyType.ToString(), TEXT("GetProxy"));
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(
+		*ProxyType.ToString(),
+		TEXT("GetProxy")
+	);
 	return SceneProxyExtendInfoPtr;
 }
 
@@ -447,11 +508,14 @@ TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 	return GetTableRowProxy_PassiveSkillExtendInfo()->SkillClass;
 }
 
-void FWeaponSkillProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacterProxy>& InAllocationCharacterProxyPtr, const FGameplayTag& InSocketTag)
+void FWeaponSkillProxy::SetAllocationCharacterProxy(
+	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
+	const FGameplayTag& InSocketTag
+)
 {
 	// 注意：这里不应该再UpdateSocket
 	// 因为我们直接存的武器
-	
+
 	// Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 
 	// 这里做一个转发，
@@ -460,8 +524,11 @@ void FWeaponSkillProxy::SetAllocationCharacterProxy(const TSharedPtr < FCharacte
 	{
 		if (InAllocationCharacterProxyPtr)
 		{
-			InventoryComponentPtr->SetAllocationCharacterProxy(GetID(), InAllocationCharacterProxyPtr->GetID(),
-															   InSocketTag);
+			InventoryComponentPtr->SetAllocationCharacterProxy(
+				GetID(),
+				InAllocationCharacterProxyPtr->GetID(),
+				InSocketTag
+			);
 		}
 		else
 		{
@@ -548,8 +615,8 @@ bool FWeaponSkillProxy::Active()
 
 		FGameplayEventData Payload;
 		if (
-			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon) 
-			)
+			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon)
+		)
 		{
 			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
 			GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
@@ -604,7 +671,11 @@ FWeaponSkillProxy::FWeaponSkillProxy()
 {
 }
 
-bool FWeaponSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FWeaponSkillProxy::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -616,14 +687,18 @@ bool FWeaponSkillProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool&
 UItemProxy_Description_WeaponSkill* FWeaponSkillProxy::GetTableRowProxy_WeaponSkillExtendInfo() const
 {
 	auto TableRowPtr = GetTableRowProxy();
-	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_WeaponSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_WeaponSkill>(
+		TableRowPtr->ItemProxy_Description.LoadSynchronous()
+	);
 	return ItemProxy_Description_SkillPtr;
 }
 
 TSubclassOf<USkill_Base> FWeaponSkillProxy::GetSkillClass() const
 {
 	auto TableRowPtr = GetTableRowProxy();
-	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_WeaponSkill>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_WeaponSkill>(
+		TableRowPtr->ItemProxy_Description.LoadSynchronous()
+	);
 	return GetTableRowProxy_WeaponSkillExtendInfo()->SkillClass;
 }
 
@@ -638,24 +713,24 @@ void FWeaponSkillProxy::RegisterSkill()
 		{
 			return;
 		}
-		
+
 		FGameplayAbilityTargetData_SkillBase_RegisterParam* GameplayAbilityTargetDataPtr = nullptr;
 		// 需要特殊参数的
 		if (
 			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon_Bow)
-			)
+		)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Bow_RegisterParam;
 		}
 		else if (
 			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon_FoldingFan)
-			)
+		)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_FoldingFan_RegisterParam;
 		}
 		else if (
 			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon_Axe)
-			)
+		)
 		{
 			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_Axe_RegisterParam;
 		}
@@ -679,7 +754,9 @@ void FWeaponSkillProxy::RegisterSkill()
 			InputID,
 			*GameplayEventData
 		);
-		GameplayAbilitySpecHandle = AllocationCharacter->GetCharacterAbilitySystemComponent()->GiveAbility(GameplayAbilitySpec);
+		GameplayAbilitySpecHandle = AllocationCharacter->GetCharacterAbilitySystemComponent()->GiveAbility(
+			GameplayAbilitySpec
+		);
 	}
 #endif
 }

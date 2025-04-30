@@ -1,13 +1,15 @@
-
 #include "TestCommand.h"
 
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "GameplayTagsLibrary.h"
 #include "GuideSubSystem.h"
 #include "GuideThreadChallenge.h"
 #include "HumanCharacter_Player.h"
+#include "PlanetPlayerController.h"
 #include "Planet_Tools.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetStringLibrary.h"
 
 // #include "Kismet/GameplayStatics.h"
 
@@ -25,43 +27,47 @@ void TestCommand::AddCahracterTestData()
 	// AddPlayerCharacterTestDataImp(CharacterPtr);
 }
 
-void TestCommand::AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr)
+void TestCommand::AddPlayerCharacterTestDataImp(
+	AHumanCharacter* CharacterPtr
+)
 {
 	{
-//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
-// 		HoldItemComponent.AddProxy(EToolProxyType::kPickAxe);
-// 
-// 		HoldItemComponent.AddProxy(EWeaponProxyType::kPickAxe);
-// 		HoldItemComponent.AddProxy(EWeaponProxyType::kWeaponHandProtection);
-// 		HoldItemComponent.AddProxy(EWeaponProxyType::kRangeTest);
-// 
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Passive_ZMJZ);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_Displacement);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Talent_NuQi);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_GroupTherapy);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_ContinuousGroupTherapy);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_Tornado);
-// 
-// 		HoldItemComponent.AddProxy(EConsumableProxyType::kGeneric_HP, 1);
-// 		HoldItemComponent.AddProxy(EConsumableProxyType::kGeneric_PP, 1);
+		//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
+		// 		HoldItemComponent.AddProxy(EToolProxyType::kPickAxe);
+		// 
+		// 		HoldItemComponent.AddProxy(EWeaponProxyType::kPickAxe);
+		// 		HoldItemComponent.AddProxy(EWeaponProxyType::kWeaponHandProtection);
+		// 		HoldItemComponent.AddProxy(EWeaponProxyType::kRangeTest);
+		// 
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Passive_ZMJZ);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_Displacement);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Talent_NuQi);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_GroupTherapy);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_ContinuousGroupTherapy);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_Tornado);
+		// 
+		// 		HoldItemComponent.AddProxy(EConsumableProxyType::kGeneric_HP, 1);
+		// 		HoldItemComponent.AddProxy(EConsumableProxyType::kGeneric_PP, 1);
 	}
 }
 
-void TestCommand::AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr)
+void TestCommand::AddAICharacterTestDataImp(
+	AHumanCharacter* CharacterPtr
+)
 {
 	{
-//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
-// 		HoldItemComponent.AddProxy(EToolProxyType::kPickAxe);
-// 
-// 		HoldItemComponent.AddProxy(EWeaponProxyType::kPickAxe);
-// 		HoldItemComponent.AddProxy(EWeaponProxyType::kWeaponHandProtection);
-// 		HoldItemComponent.AddProxy(EWeaponProxyType::kRangeTest);
-// 
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Passive_ZMJZ);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_Displacement);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Talent_NuQi);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_GroupTherapy);
-// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_ContinuousGroupTherapy);
+		//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
+		// 		HoldItemComponent.AddProxy(EToolProxyType::kPickAxe);
+		// 
+		// 		HoldItemComponent.AddProxy(EWeaponProxyType::kPickAxe);
+		// 		HoldItemComponent.AddProxy(EWeaponProxyType::kWeaponHandProtection);
+		// 		HoldItemComponent.AddProxy(EWeaponProxyType::kRangeTest);
+		// 
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Passive_ZMJZ);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_Displacement);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Talent_NuQi);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_GroupTherapy);
+		// 		HoldItemComponent.AddProxy(ESkillProxyType::kHumanSkill_Active_ContinuousGroupTherapy);
 	}
 }
 
@@ -89,11 +95,15 @@ void TestCommand::ActiveBrandTest2()
 void TestCommand::ChallengeTest()
 {
 #if WITH_EDITOR
-	UGuideSubSystem::GetInstance()->StartParallelGuideThread(UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass);
+	UGuideSubSystem::GetInstance()->StartParallelGuideThread(
+		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
+	);
 #endif
 }
 
-void TestCommand::TestHasBeenFlyAway(const TArray< FString >& Args)
+void TestCommand::TestHasBeenFlyAway(
+	const TArray<FString>& Args
+)
 {
 #if WITH_EDITOR
 	if (!Args.IsValidIndex(0))
@@ -102,11 +112,11 @@ void TestCommand::TestHasBeenFlyAway(const TArray< FString >& Args)
 	}
 
 	auto Player = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
-	if (Player )
+	if (Player)
 	{
 		int32 Height = 10.f;
 		LexFromString(Height, *Args[0]);
-		Player ->GetCharacterAbilitySystemComponent()->HasBeenFlayAway(Height);
+		Player->GetCharacterAbilitySystemComponent()->HasBeenFlayAway(Height);
 	}
 #endif
 }
@@ -115,4 +125,23 @@ void TestCommand::ReplyHP(
 	const TArray<FString>& Args
 )
 {
+}
+
+void TestCommand::IncreaseCD(
+	const TArray<FString>& Args
+)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto Player = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (Player)
+	{
+		int32 CD = UKismetStringLibrary::Conv_StringToInt(Args[0]);
+		Player->IncreaseCD(CD);
+	}
+#endif
 }

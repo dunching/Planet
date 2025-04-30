@@ -132,7 +132,6 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 		return;
 	}
 
-
 	const auto SKillProxyType = ProxyPtr->GetProxyType();
 	{
 		auto GAInsPtr = ProxyPtr->GetGAInst();
@@ -141,11 +140,20 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 			return;
 		}
 
+		if (GAInsPtr->IsActive())
+		{
+			const auto RemainTime = GAInsPtr->GetRemainTime();
+
+			SetDurationPercent(true, RemainTime < 0.f ? 1.f : RemainTime);
+			return;
+		}
+		
 		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
 		SetCanRelease(bIsReady);
 	}
 	if (SKillProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 	{
+		SetDurationPercent(false, 0.f);
 		const auto SkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(ProxyPtr);
 		if (!SkillProxySPtr)
 		{

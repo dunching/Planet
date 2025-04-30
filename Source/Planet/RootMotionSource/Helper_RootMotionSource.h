@@ -107,9 +107,6 @@ struct FRootMotionSource_MyRadialForce : public FRootMotionSource_RadialForce
 
 	UPROPERTY()
 	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr;
-
-	UPROPERTY()
-	float InnerRadius = 100.f;
 };
 
 template <>

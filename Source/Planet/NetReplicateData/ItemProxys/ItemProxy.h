@@ -55,14 +55,27 @@ FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGa
 struct PLANET_API IProxy_Cooldown
 {
 public:
+	
+	/**
+	 * 获取GA冷却
+	 * @param RemainingCooldown 
+	 * @param RemainingCooldownPercent 
+	 * @return 
+	 */
 	virtual bool GetRemainingCooldown(
 		float& RemainingCooldown, float& RemainingCooldownPercent
 	) const = 0;
 
 	virtual bool CheckCooldown() const = 0;
 
+	/**
+	 * 增加或减少GA冷却
+	 */
 	virtual void AddCooldownConsumeTime(float NewTime) = 0;
 
+	/**
+	 * 刷新冷却
+	 */
 	virtual void FreshUniqueCooldownTime() = 0;
 
 	virtual void OffsetCooldownTime() = 0;

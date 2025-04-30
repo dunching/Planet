@@ -32,6 +32,10 @@ public:
 
 	static FGameplayTag BaseFeature_HasBeenFlyAway;
 
+	static FGameplayTag BaseFeature_HasbeenTornodo;
+
+	static FGameplayTag BaseFeature_HasbeenTraction;
+
 	static FGameplayTag BaseFeature_HasBeenDisplacement;
 
 	static FGameplayTag BaseFeature_HasBeenPull;

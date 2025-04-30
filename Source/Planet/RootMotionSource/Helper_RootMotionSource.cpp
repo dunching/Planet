@@ -20,6 +20,7 @@
 #include "CharacterBase.h"
 #include "Tornado.h"
 #include "LogWriter.h"
+#include "TractionActor.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugTornado(
 	TEXT("Skill.DrawDebug.Tornado"),
@@ -796,7 +797,7 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 	const UCharacterMovementComponent& MoveComponent
 )
 {
-	if (!LocationActor)
+	if (!TractionPoinAcotrPtr.IsValid())
 	{
 		Status.SetFlag(ERootMotionSourceStatusFlags::Finished);
 		return;
@@ -806,7 +807,7 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 
 	const FVector CharacterLocation = Character.GetActorLocation();
 	FVector Force = FVector::ZeroVector;
-	const FVector ForceLocation = LocationActor ? LocationActor->GetActorLocation() : Location;
+	const FVector ForceLocation = TractionPoinAcotrPtr.IsValid() ? TractionPoinAcotrPtr->GetActorLocation() : Location;
 	float Distance = FVector::Dist(ForceLocation, CharacterLocation);
 	if (Distance > Radius)
 	{
@@ -814,27 +815,11 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 		return;
 	}
 
-	// Calculate strength
-	float CurrentStrength = Strength;
-	{
-		float AdditiveStrengthFactor = 1.f;
-		if (StrengthDistanceFalloff)
-		{
-			const float DistanceFactor = StrengthDistanceFalloff->GetFloatValue(
-				FMath::Clamp(Distance / Radius, 0.f, 1.f)
-			);
-			AdditiveStrengthFactor -= (1.f - DistanceFactor);
-		}
-
-		if (StrengthOverTime)
-		{
-			const float TimeValue = Duration > 0.f ? FMath::Clamp(GetTime() / Duration, 0.f, 1.f) : GetTime();
-			const float TimeFactor = StrengthOverTime->GetFloatValue(TimeValue);
-			AdditiveStrengthFactor -= (1.f - TimeFactor);
-		}
-
-		CurrentStrength = Strength * FMath::Clamp(AdditiveStrengthFactor, 0.f, 1.f);
-	}
+	
+	// 我们让牵引强度在过距离到一半时进行衰减
+	const float CurrentStrength = Strength * StrengthDistanceFalloff->GetFloatValue(
+		FMath::Clamp(Distance / Radius, 0.f, 1.f)
+	);
 
 	if (bUseFixedWorldDirection)
 	{
@@ -881,7 +866,7 @@ void FRootMotionSource_MyRadialForce::PrepareRootMotion(
 
 void FRootMotionSource_MyRadialForce::CheckTimeOut()
 {
-	if (LocationActor)
+	if (TractionPoinAcotrPtr.IsValid())
 	{
 		Super::CheckTimeOut();
 	}
@@ -903,7 +888,6 @@ bool FRootMotionSource_MyRadialForce::NetSerialize(
 )
 {
 	Ar << TractionPoinAcotrPtr;
-	Ar << InnerRadius;
 
 	return Super::NetSerialize(Ar, Map, bOutSuccess);
 }
@@ -920,7 +904,7 @@ bool FRootMotionSource_MyRadialForce::Matches(
 	// We can cast safely here since in FRootMotionSource::Matches() we ensured ScriptStruct equality
 	const FRootMotionSource_MyRadialForce* OtherCast = static_cast<const FRootMotionSource_MyRadialForce*>(Other);
 
-	return FMath::IsNearlyEqual(InnerRadius, OtherCast->InnerRadius);
+	return TractionPoinAcotrPtr == OtherCast->TractionPoinAcotrPtr;
 }
 
 bool FRootMotionSource_MyRadialForce::MatchesAndHasSameState(
@@ -942,7 +926,7 @@ bool FRootMotionSource_MyRadialForce::UpdateStateFrom(
 
 	auto OtherCast = static_cast<const FRootMotionSource_MyRadialForce*>(SourceToTakeStateFrom);
 
-	InnerRadius = OtherCast->InnerRadius;
+	TractionPoinAcotrPtr = OtherCast->TractionPoinAcotrPtr;
 
 	return true;
 }

@@ -91,28 +91,28 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	const FTransform& Transform
 )
 {
-		FActorSpawnParameters SpawnParameters;
-	
-		SpawnParameters.CustomPreSpawnInitalization = [this, ID](
-			auto ActorPtr
-		)
-			{
-				auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
-				if (AICharacterPtr)
-				{
-					AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
-				}
-			};
-	
-		auto Result =
-			GetWorld()->SpawnActor<AHumanCharacter_AI>(
-				CharacterClass,
-				Transform,
-				SpawnParameters
-			);
-		if (Result)
+	FActorSpawnParameters SpawnParameters;
+
+	SpawnParameters.CustomPreSpawnInitalization = [this, ID](
+		auto ActorPtr
+	)
 		{
-		}
+			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+			if (AICharacterPtr)
+			{
+				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
+			}
+		};
+
+	auto Result =
+		GetWorld()->SpawnActor<AHumanCharacter_AI>(
+			CharacterClass,
+			Transform,
+			SpawnParameters
+		);
+	if (Result)
+	{
+	}
 }
 
 void APlanetPlayerController::ChangedInterationTaskState_Implementation(
@@ -124,6 +124,32 @@ void APlanetPlayerController::ChangedInterationTaskState_Implementation(
 	if (HumanCharacterPtr)
 	{
 		HumanCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationTaskState(Item, bIsEnable);
+	}
+}
+
+void APlanetPlayerController::IncreaseCD_Implementation(
+	int32 CD
+)
+{
+	auto CharacterPtr = Cast<ACharacterBase>(GetPawn());
+	if (CharacterPtr)
+	{
+		auto InTags = FGameplayTagContainer::EmptyContainer;
+
+		InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+		const auto GameplayEffectHandleAry = CharacterPtr->GetCharacterAbilitySystemComponent()->
+		                                             GetActiveEffectsWithAllTags(
+			                                             InTags
+		                                             );
+		if (!GameplayEffectHandleAry.IsEmpty())
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->
+			        ModifyActiveEffectStartTime(
+				        GameplayEffectHandleAry[0],
+				        CD
+			        );
+		}
 	}
 }
 

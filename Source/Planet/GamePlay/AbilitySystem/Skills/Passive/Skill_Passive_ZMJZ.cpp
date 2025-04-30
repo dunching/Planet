@@ -18,6 +18,10 @@
 #include "GameplayTagsLibrary.h"
 #include "GE_Common.h"
 
+void UItemDecription_Skill_PassiveSkill_ZMJZ::SetUIStyle()
+{
+}
+
 void USkill_Passive_ZMJZ::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec

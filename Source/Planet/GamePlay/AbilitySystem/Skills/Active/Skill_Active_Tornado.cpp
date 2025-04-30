@@ -33,6 +33,80 @@
 #include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"
 
+struct FItemDecription_Skill_Active_Tornado : public TStructVariable<FItemDecription_Skill_Active_Tornado>
+{
+#pragma region UISocket
+	const FName Title = TEXT("Title");
+
+	const FName Text = TEXT("Text");
+
+	const FName CD = TEXT("CD");
+
+	const FName Cost = TEXT("Cost");
+#pragma endregion
+
+#pragma region UIDescription
+	const FString Duration = TEXT("[Duration]");
+
+	const FString Damage = TEXT("[Damage]");
+#pragma endregion
+};
+
+void UItemDecription_Skill_Active_Tornado::SetUIStyle()
+{
+	if (!ProxySPtr)
+	{
+		return;
+	}
+	{
+		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().Title));
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetText(FText::FromString(ProxySPtr->GetProxyName()));
+		}
+	}
+	auto ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(ItemProxy_Description.LoadSynchronous());
+	if (!ItemProxy_DescriptionPtr)
+	{
+		return;
+	}
+	{
+		auto WidgetPtr = Cast<URichTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().CD));
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetText(
+				FText::FromString(UKismetStringLibrary::Conv_IntToString(ItemProxy_DescriptionPtr->CD.PerLevelValue[0]))
+			);
+		}
+	}
+	{
+		auto WidgetPtr = Cast<URichTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().Cost));
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetText(
+				FText::FromString(
+					UKismetStringLibrary::Conv_IntToString(ItemProxy_DescriptionPtr->Cost.PerLevelValue[0])
+				)
+			);
+		}
+	}
+	if (!ItemProxy_DescriptionPtr->DecriptionText.IsEmpty())
+	{
+		FString Text = ItemProxy_DescriptionPtr->DecriptionText[0];
+
+		Text = Text.Replace(
+			*FItemDecription_Skill_Active_Tornado::Get().Duration,
+			*UKismetStringLibrary::Conv_IntToString(ItemProxy_DescriptionPtr->Duration.PerLevelValue[0])
+		);
+
+		auto WidgetPtr = Cast<URichTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().Text));
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetText(FText::FromString(Text));
+		}
+	}
+}
+
 USkill_Active_Tornado::USkill_Active_Tornado() :
                                                Super()
 {
@@ -48,7 +122,7 @@ void USkill_Active_Tornado::OnAvatarSet(
 
 	if (SkillProxyPtr)
 	{
-		ItemProxy_Description_TornadoPtr = Cast<UItemProxy_Description_ActiveSkill_Tornado>(
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
 			DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_ActiveSkillExtendInfo()
 		);
 	}
@@ -123,9 +197,10 @@ void USkill_Active_Tornado::ApplyCooldown(
 		FGameplayEffectSpecHandle SpecHandle =
 			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			UGameplayTagsLibrary::GEData_Duration,
-			ItemProxy_Description_TornadoPtr->CD.PerLevelValue[0]
+			ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
 		);
 
 		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
@@ -146,7 +221,7 @@ void USkill_Active_Tornado::ApplyCost(
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			UGameplayTagsLibrary::GEData_ModifyItem_Mana,
-			ItemProxy_Description_TornadoPtr->Cost.PerLevelValue[0]
+			ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
 		);
 
 		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
@@ -186,7 +261,7 @@ void USkill_Active_Tornado::PerformAction(
 				)
 					{
 						Cast<ATornado>(ActorPtr)->SetData(
-							ItemProxy_Description_TornadoPtr,
+							ItemProxy_DescriptionPtr,
 							SkillProxyPtr,
 							Dir.Vector()
 						);
@@ -267,78 +342,4 @@ void USkill_Active_Tornado::OnTimerHelperTick(
 	float Interval
 )
 {
-}
-
-struct FItemDecription_Skill_Active_Tornado : public TStructVariable<FItemDecription_Skill_Active_Tornado>
-{
-#pragma region UISocket
-	const FName Title = TEXT("Title");
-
-	const FName Text = TEXT("Text");
-
-	const FName CD = TEXT("CD");
-
-	const FName Cost = TEXT("Cost");
-#pragma endregion
-
-#pragma region UIDescription
-	const FString Duration = TEXT("[Duration]");
-
-	const FString Damage = TEXT("[Damage]");
-#pragma endregion
-};
-
-void UItemDecription_Skill_Active_Tornado::SetUIStyle()
-{
-	if (!ProxySPtr)
-	{
-		return;
-	}
-	{
-		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().Title));
-		if (WidgetPtr)
-		{
-			WidgetPtr->SetText(FText::FromString(ProxySPtr->GetProxyName()));
-		}
-	}
-	auto ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(ItemProxy_Description.LoadSynchronous());
-	if (!ItemProxy_DescriptionPtr)
-	{
-		return;
-	}
-	{
-		auto WidgetPtr = Cast<URichTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().CD));
-		if (WidgetPtr)
-		{
-			WidgetPtr->SetText(
-				FText::FromString(UKismetStringLibrary::Conv_IntToString(ItemProxy_DescriptionPtr->CD.PerLevelValue[0]))
-			);
-		}
-	}
-	{
-		auto WidgetPtr = Cast<URichTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().Cost));
-		if (WidgetPtr)
-		{
-			WidgetPtr->SetText(
-				FText::FromString(
-					UKismetStringLibrary::Conv_IntToString(ItemProxy_DescriptionPtr->Cost.PerLevelValue[0])
-				)
-			);
-		}
-	}
-	if (!ItemProxy_DescriptionPtr->DecriptionText.IsEmpty())
-	{
-		FString Text = ItemProxy_DescriptionPtr->DecriptionText[0];
-
-		Text = Text.Replace(
-			*FItemDecription_Skill_Active_Tornado::Get().Duration,
-			*UKismetStringLibrary::Conv_IntToString(ItemProxy_DescriptionPtr->Duration.PerLevelValue[0])
-		);
-
-		auto WidgetPtr = Cast<URichTextBlock>(GetWidgetFromName(FItemDecription_Skill_Active_Tornado::Get().Text));
-		if (WidgetPtr)
-		{
-			WidgetPtr->SetText(FText::FromString(Text));
-		}
-	}
 }

@@ -7,6 +7,7 @@
 #include "SPlineActor.generated.h"
 
 class USplineComponent;
+class UItemProxy_Description_ActiveSkill_Traction;
 
 /**
  *
@@ -22,22 +23,6 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
 	TObjectPtr<USplineComponent> SplineComponentPtr;
-
-protected:
-
-};
-
-/**
- *
- */
-UCLASS()
-class PLANET_API ATractionPoint : public AActor
-{
-	GENERATED_BODY()
-
-public:
-
-	ATractionPoint(const FObjectInitializer& ObjectInitializer);
 
 protected:
 

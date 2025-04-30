@@ -172,6 +172,11 @@ void USkill_Base::UpdateRegisterParam(const FGameplayEventData& GameplayEventDat
 	}
 }
 
+float USkill_Base::GetRemainTime() const
+{
+	return 0.f;
+}
+
 void USkill_Base::ResetPreviousStageActions()
 {
 	// 清除上一阶段遗留的内容

@@ -20,6 +20,8 @@
 #include "GameplayTagsLibrary.h"
 #include "BasicFutures_Dash.h"
 #include "BasicFutures_HasBeenFlyAway.h"
+#include "BasicFutures_HasbeenTornodo.h"
+#include "BasicFutures_HasbeenTraction.h"
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "EventSubjectComponent.h"
 #include "Tornado.h"
@@ -130,7 +132,7 @@ void UCharacterAbilitySystemComponent::InitialBaseGAs()
 			);
 		}
 #pragma region 结算效果修正
-		
+
 #pragma endregion 结算效果修正
 	}
 #endif
@@ -236,18 +238,46 @@ void UCharacterAbilitySystemComponent::HasBeenFlayAway_Implementation(
 	}
 }
 
-void UCharacterAbilitySystemComponent::HasbeenTornodo_Implementation(
-	ATornado* TornadoPtr
+void UCharacterAbilitySystemComponent::HasbeenTornodo(
+	const TWeakObjectPtr<ATornado>& TornadoPtr
 )
 {
-#if UE_EDITOR || UE_CLIENT
-	if (GetOwnerRole() > ROLE_SimulatedProxy)
+	FGameplayEventData Payload;
+	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasbeenTornodo;
+	GameplayAbilityTargetData_DashPtr->TornadoPtr = TornadoPtr;
+
+	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
 	{
-		auto NewTaskPtr = UGameplayTask_Tornado::NewTask<UGameplayTask_Tornado>(this);
-		NewTaskPtr->TornadoPtr = TornadoPtr;
-		NewTaskPtr->ReadyForActivation();
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+			OnwerActorPtr,
+			UGameplayTagsLibrary::BaseFeature_HasbeenTornodo,
+			Payload
+		);
 	}
-#endif
+}
+
+void UCharacterAbilitySystemComponent::HasbeenTraction(
+	const TWeakObjectPtr<ATractionPoint>& TractionPointPtr
+)
+{
+	FGameplayEventData Payload;
+	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasbeenTraction;
+	GameplayAbilityTargetData_DashPtr->TractionPoint = TractionPointPtr;
+
+	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+			OnwerActorPtr,
+			UGameplayTagsLibrary::BaseFeature_HasbeenTraction,
+			Payload
+		);
+	}
 }
 
 void UCharacterAbilitySystemComponent::SwitchCantBeSelect(
@@ -842,10 +872,10 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-) 
+)
 {
-	TMap<FGameplayTag, float>Result = CustomMagnitudes;
-	
+	TMap<FGameplayTag, float> Result = CustomMagnitudes;
+
 	// 根据自身的效果对【输入】进行一些修正
 	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
 
@@ -871,8 +901,8 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 )
 {
-	TMap<FGameplayTag, float>Result = CustomMagnitudes;
-	
+	TMap<FGameplayTag, float> Result = CustomMagnitudes;
+
 	// 根据自身的效果对【输出】进行一些修正
 	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
 
@@ -896,10 +926,8 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-) 
+)
 {
-	TMap<FGameplayTag, float>Result = CustomMagnitudes;
-	
 	// 获得对应GE对象
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
@@ -907,43 +935,30 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
 
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
-	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
-
-	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
-	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
-
-	FAggregatorEvaluateParameters EvaluateParameters;
-	EvaluateParameters.SourceTags = SourceTags;
-	EvaluateParameters.TargetTags = TargetTags;
-
-	// 获得来源AttributeSet
-	const auto SourceASCPtr = Cast<ThisClass>(
-		ExecutionParams.GetSourceAbilitySystemComponent()
-	);
-
-	// 获得来源AttributeSet
-	const auto SourceSet = Cast<UAS_Character>(
-		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass())
-	);
-
 	// 获得目标AttributeSet
 	const auto TargetSet = Cast<UAS_Character>(
 		ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass())
 	);
 
-	TMap<FGameplayTag, float> SetByCallerTagMagnitudes = CustomMagnitudes;
-	SetByCallerTagMagnitudes.Append(Spec.SetByCallerTagMagnitudes);
-
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
+	
+	// 回执
+	FOnEffectedTawrgetCallback ReceivedEventModifyDataCallback;
 
+	ReceivedEventModifyDataCallback.InstigatorCharacterPtr = Instigator;
+	ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
+	ReceivedEventModifyDataCallback.AllAssetTags = AllAssetTags;
+	ReceivedEventModifyDataCallback.SetByCallerTagMagnitudes = CustomMagnitudes;
+
+#pragma region 确认最终的值
 	// 如果是此类，数据在 SetByCallerTagMagnitudes
 	if (
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override)
 	)
 	{
-		for (const auto& Iter : SetByCallerTagMagnitudes)
+		for (const auto& Iter : CustomMagnitudes)
 		{
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
@@ -988,6 +1003,8 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 					Spec,
 					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
 				);
+
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
 			}
 		}
 	}
@@ -999,7 +1016,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	{
 		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
 		{
-			for (const auto& Iter : SetByCallerTagMagnitudes)
+			for (const auto& Iter : CustomMagnitudes)
 			{
 				UpdateMap(
 					Iter.Key,
@@ -1013,7 +1030,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		}
 		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
 		{
-			for (const auto& Iter : SetByCallerTagMagnitudes)
+			for (const auto& Iter : CustomMagnitudes)
 			{
 				UpdateMap(
 					Iter.Key,
@@ -1026,15 +1043,16 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			}
 		}
 	}
+#pragma endregion
 
-	// 把值写进GE里面
+#pragma region  把值写进GE里面
 	// 如果是此类，数据在 SetByCallerTagMagnitudes
 	if (
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override)
 	)
 	{
-		for (const auto& Iter : SetByCallerTagMagnitudes)
+		for (const auto& Iter : CustomMagnitudes)
 		{
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
@@ -1050,6 +1068,8 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 						NewValue
 					)
 				);
+
+				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
@@ -1083,20 +1103,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 					)
 				);
 
-				// 回执
-				FOnEffectedTawrgetCallback ReceivedEventModifyDataCallback;
-
-				ReceivedEventModifyDataCallback.InstigatorCharacterPtr = Instigator;
-				ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
 				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
-
-				Instigator->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
-					ReceivedEventModifyDataCallback
-				);
-
-				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
-					ReceivedEventModifyDataCallback
-				);
 			}
 		}
 	}
@@ -1127,6 +1134,15 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			);
 		}
 	}
+#pragma endregion
+	
+	Instigator->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
+		ReceivedEventModifyDataCallback
+	);
+
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
+		ReceivedEventModifyDataCallback
+	);
 }
 
 IDataModifyInterface::IDataModifyInterface(

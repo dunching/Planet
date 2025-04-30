@@ -106,10 +106,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSet<FGameplayTag>SkillCommonCooldownInfoMap;
 
-	// 技能CD
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TMap<int32, int32>SkillCooldownInfoMap;
-
 };
 
 UCLASS()

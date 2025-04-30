@@ -129,6 +129,11 @@ public:
 		bool bIsEnable
 	);
 
+	UFUNCTION(Server, Reliable)
+	void IncreaseCD(
+		int32 CD
+	);
+
 #pragma region
 
 protected:

@@ -10,6 +10,12 @@ bool FOnEffectedTawrgetCallback::NetSerialize(FArchive& Ar, class UPackageMap* M
 	Ar << InstigatorCharacterPtr;
 	Ar << TargetCharacterPtr;
 	Ar << bIsDeath;
+	if (!AllAssetTags.NetSerialize(Ar, Map, bOutSuccess))
+	{
+		return false;
+	}
+	Ar << SetByCallerTagMagnitudes;
+	Ar << Damage;
 
 	return true;
 }

@@ -12,7 +12,7 @@ DECLARE_DELEGATE(FOnTaskFinished);
 class ATractionPoint;
 
 /**
- *	Applies force to character's movement
+ *	是否应在做成脱手的形式？
  */
 UCLASS()
 class PLANET_API UAbilityTask_ARM_RadialForce :
@@ -25,20 +25,17 @@ public:
 		const FObjectInitializer& ObjectInitializer
 	);
 
-	static UAbilityTask_ARM_RadialForce* MyApplyRootMotionRadialForce(
+	static UAbilityTask_ARM_RadialForce* ApplyRootMotionRadialForce(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
-		TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr,
-		float Strength,
-		float Duration,
-		float Radius,
-		float InnerRadius,
-		bool bIsPush
+		TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr
 	);
 
 	void UpdateLocation(
 		TWeakObjectPtr<ATractionPoint> TractionPointPtr
 	);
+
+	FOnTaskFinished OnFinished;
 
 protected:
 	virtual void GetLifetimeReplicatedProps(
@@ -49,39 +46,14 @@ protected:
 
 	virtual void Activate() override;
 
-	virtual void TickTask(
-		float DeltaTime
-	) override;
+	virtual void TickTask(float DeltaTime) override;
 
-	virtual void OnDestroy(
-		bool AbilityIsEnding
-	) override;
-
-	void UpdateTarget();
-
-	FOnTaskFinished OnFinish;
-
-	const float Interval = .1f;
-
-	float IntervalTime = 0.f;
-
+	virtual void PreDestroyFromReplication() override;
+	
+	virtual void OnDestroy(bool AbilityIsEnding) override;
+	
 	UPROPERTY(Replicated)
 	TWeakObjectPtr<ATractionPoint> TractionPoinAcotrPtr = nullptr;
 
-	UPROPERTY(Replicated)
-	float Strength = 100.f;
-
-	UPROPERTY(Replicated)
-	float Duration = 1.f;
-
-	UPROPERTY(Replicated)
-	float Radius = 200.f;
-
-	UPROPERTY(Replicated)
-	float InnerRadius = 100.f;
-
-	UPROPERTY(Replicated)
-	bool bIsPush = false;
-
-	float CurrentTime = 0.f;
+private:
 };

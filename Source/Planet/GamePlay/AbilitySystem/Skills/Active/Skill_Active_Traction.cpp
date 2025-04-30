@@ -1,6 +1,7 @@
 #include "Skill_Active_Traction.h"
 
 #include <Engine/OverlapResult.h>
+#include "Components/CapsuleComponent.h"
 
 #include "AbilityTask_ARM_RadialForce.h"
 #include "CharacterBase.h"
@@ -16,7 +17,26 @@
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "AbilityTask_PlayMontage.h"
-#include "Components/CapsuleComponent.h"
+#include "TractionActor.h"
+
+void UItemDecription_Skill_Active_Traction::SetUIStyle()
+{
+}
+
+void USkill_Active_Traction::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (SkillProxyPtr)
+	{
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_ActiveSkillExtendInfo()
+		);
+	}
+}
 
 void USkill_Active_Traction::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -43,6 +63,49 @@ void USkill_Active_Traction::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
+void USkill_Active_Traction::ApplyCooldown(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_Duration,
+			ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
+
+void USkill_Active_Traction::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_ModifyItem_Mana,
+			ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
+
 void USkill_Active_Traction::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
@@ -55,46 +118,56 @@ void USkill_Active_Traction::PerformAction(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		SpawnTractionPointActor(GetWorld()->SpawnActor<ATractionPoint>(CharacterPtr->GetActorLocation(), FRotator::ZeroRotator));
+		FActorSpawnParameters SpawnParameters;
 
-		auto DelayTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
-		DelayTaskPtr->SetDuration(Duration);
-		DelayTaskPtr->OnFinished.BindLambda([this](auto)
-		{
-			K2_CancelAbility();
-			
-			return true;
-		});
-		DelayTaskPtr->ReadyForActivation();
+		SpawnParameters.CustomPreSpawnInitalization = [this](
+			auto ActorPtr
+		)
+			{
+				Cast<ATractionPoint>(ActorPtr)->ItemProxy_DescriptionPtr = ItemProxy_DescriptionPtr;
+			};
+
+		SpawnParameters.Owner = CharacterPtr;
+
+		auto TractionPointPtr = GetWorld()->SpawnActor<ATractionPoint>(
+			CharacterPtr->GetActorLocation(),
+			FRotator::ZeroRotator,
+			SpawnParameters
+		);
 	}
 #endif
+
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
+	{
+		auto DelayTaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
+		DelayTaskPtr->SetDuration(ItemProxy_DescriptionPtr->Duration.PerLevelValue[0]);
+		DelayTaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+
+		if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+		{
+			DelayTaskPtr->OnFinished.BindLambda(
+				[this](
+				auto
+			)
+				{
+					K2_CancelAbility();
+
+					return true;
+				}
+			);
+		}
+		DelayTaskPtr->ReadyForActivation();
+	}
 
 	PlayMontage();
 }
 
-void USkill_Active_Traction::SpawnTractionPointActor_Implementation(
-	ATractionPoint* NewTractionPointPtr
-)
+float USkill_Active_Traction::GetRemainTime() const
 {
-	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
-	{
-		float OutRadius = 0.f;
-		float OutHalfHeight = 0.f;
-		CharacterPtr->GetCapsuleComponent()->GetScaledCapsuleSize(OutRadius, OutHalfHeight);
-		// 
-		auto RoomtMotionTaskptr = UAbilityTask_ARM_RadialForce::MyApplyRootMotionRadialForce(
-			this,
-			TEXT(""),
-			TractionPoint,
-			Strength,
-			Duration,
-			Radius,
-			OutRadius,
-			false
-		);
-
-		RoomtMotionTaskptr->ReadyForActivation();
-	}
+	return RemainTime;
 }
 
 void USkill_Active_Traction::PlayMontage()
@@ -118,5 +191,23 @@ void USkill_Active_Traction::PlayMontage()
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
 
 		TaskPtr->ReadyForActivation();
+	}
+}
+
+void USkill_Active_Traction::OnDuration(
+	UAbilityTask_TimerHelper*,
+	float CurrentTiem,
+	float TotalTime
+)
+{
+	if (FMath::IsNearlyZero(TotalTime))
+	{
+		return;
+	}
+	
+	RemainTime = (TotalTime - CurrentTiem) / TotalTime;
+	if (RemainTime < 0.f)
+	{
+		RemainTime = 0.f;
 	}
 }

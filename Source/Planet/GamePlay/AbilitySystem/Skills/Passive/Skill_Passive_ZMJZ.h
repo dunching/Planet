@@ -1,8 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemDecription.h"
 
 #include "PlanetGameplayAbility.h"
+#include "SceneProxyTable.h"
 #include "Skill_Passive_Base.h"
 
 #include "Skill_Passive_ZMJZ.generated.h"
@@ -19,6 +21,26 @@ struct FGAEventData;
 struct FCharacterStateInfo;
 struct FOnEffectedTawrgetCallback;
 
+UCLASS()
+class PLANET_API UItemProxy_Description_PassiveSkill_ZMJZ : public UItemProxy_Description_PassiveSkill
+{
+	GENERATED_BODY()
+
+public:
+	
+};
+
+UCLASS()
+class PLANET_API UItemDecription_Skill_PassiveSkill_ZMJZ : public UItemDecription
+{
+	GENERATED_BODY()
+
+public:
+	using FItemProxy_DescriptionType = UItemProxy_Description_PassiveSkill_ZMJZ;
+private:
+	virtual void SetUIStyle() override;
+};
+
 /**
  * 致命节奏 增加平通攻击得速度
  */
@@ -27,6 +49,8 @@ class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 {
 	GENERATED_BODY()
 
+	using FItemProxy_DescriptionType = UItemProxy_Description_PassiveSkill_ZMJZ;
+	
 public:
 	using FMakedDamageHandle =
 	TCallbackHandleContainer<void(

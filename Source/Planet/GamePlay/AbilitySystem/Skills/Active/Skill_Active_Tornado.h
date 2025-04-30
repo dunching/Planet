@@ -88,6 +88,8 @@ class PLANET_API USkill_Active_Tornado : public USkill_Active_Base
 	GENERATED_BODY()
 
 public:
+	using FItemProxy_DescriptionType = UItemProxy_Description_ActiveSkill_Tornado;
+	
 	USkill_Active_Tornado();
 
 	virtual void OnAvatarSet(
@@ -177,5 +179,5 @@ protected:
 
 	ATool_PickAxe* EquipmentAxePtr = nullptr;
 
-	TObjectPtr<UItemProxy_Description_ActiveSkill_Tornado> ItemProxy_Description_TornadoPtr = nullptr;
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 };
