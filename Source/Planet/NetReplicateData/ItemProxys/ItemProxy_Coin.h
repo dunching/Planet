@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "ItemProxy.h"
+#include "ItemProxy_Interface.h"
 
 #include "TemplateHelper.h"
 
@@ -31,45 +32,37 @@ struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
 USTRUCT()
-struct PLANET_API FCoinProxy : public FAllocationbleProxy
+struct PLANET_API FCoinProxy :
+	public FBasicProxy,
+	public IProxy_Allocationble,
+	public IProxy_Unique
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
-
 	friend FSceneProxyContainer;
 	friend FProxy_FASI_Container;
 	friend UInventoryComponent;
 
 	FCoinProxy();
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
+	virtual bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+		) override;
 
-	void UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr);
-
-	void AddCurrentValue(int32 val);
-
-	virtual int32 GetNum()const override;
-
-	int32 GetOffsetNum()const;
-
-	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
+	virtual void InitialProxy(const FGameplayTag& InProxyType) override;
 
 private:
-	
-	virtual bool IsUnique()const override;
+	void UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr);
+
+	virtual bool IsUnique() const override;
 
 protected:
-
-	// 总数
-	int32 Num = 0;
-
-	// 这次的增量/减量
-	int32 OffsetNum = 0;
-
 };
 
-template<>
+template <>
 struct TStructOpsTypeTraits<FCoinProxy> :
 	public TStructOpsTypeTraitsBase2<FCoinProxy>
 {

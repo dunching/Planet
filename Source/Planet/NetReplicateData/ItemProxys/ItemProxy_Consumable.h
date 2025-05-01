@@ -6,6 +6,7 @@
 #include <GameplayTagContainer.h>
 
 #include "ItemProxy.h"
+#include "ItemProxy_Interface.h"
 #include "TemplateHelper.h"
 
 #include "ItemProxy_Consumable.generated.h"
@@ -34,8 +35,10 @@ class UInventoryComponent;
 
 USTRUCT()
 struct PLANET_API FConsumableProxy :
-	public FAllocationbleProxy,
-	public IProxy_Cooldown
+	public FBasicProxy,
+	public IProxy_Allocationble,
+	public IProxy_Cooldown,
+	public IProxy_Unique
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -69,13 +72,7 @@ public:
 
 	virtual void OffsetCooldownTime()override;
 
-	void AddCurrentValue(int32 val);
-
-	virtual int32 GetNum()const override;
-
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
-
-	int32 Num = 1;
 
 protected:
 

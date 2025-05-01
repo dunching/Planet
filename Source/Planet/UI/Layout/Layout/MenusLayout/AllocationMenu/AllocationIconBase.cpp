@@ -57,16 +57,16 @@ void UAllocationIconBase::ResetToolUIByData(
 	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
 )
 {
-	if (InBasicProxyPtr == BasicProxyPtr)
+	if (InBasicProxyPtr == DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr))
 	{
 		return;
 	}
 
 	auto PreviousProxyPtr = BasicProxyPtr;
-	TSharedPtr<FAllocationbleProxy> NewProxyPtr = nullptr;
+	TSharedPtr<IProxy_Allocationble> NewProxyPtr = nullptr;
 	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(ProxyType))
 	{
-		NewProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr);
+		NewProxyPtr = DynamicCastSharedPtr<IProxy_Allocationble>(InBasicProxyPtr);
 	}
 
 	if (!bPaseInvokeOnResetProxyEvent)
@@ -92,12 +92,12 @@ void UAllocationIconBase::EnableIcon(
 
 void UAllocationIconBase::OnDragIcon(
 	bool bIsDragging,
-	const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+	const TSharedPtr<IProxy_Allocationble>& ProxyPtr
 )
 {
 	if (bIsDragging)
 	{
-		if (ProxyPtr && ProxyPtr->GetProxyType().MatchesTag(ProxyType))
+		if (ProxyPtr && DynamicCastSharedPtr<FBasicProxy>( ProxyPtr)->GetProxyType().MatchesTag(ProxyType))
 		{
 			EnableIcon(true);
 		}
@@ -113,7 +113,7 @@ void UAllocationIconBase::OnDragIcon(
 }
 
 void UAllocationIconBase::SublingIconProxyChanged(
-	const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+	const TSharedPtr<IProxy_Allocationble>& ProxyPtr
 )
 {
 	if (BasicProxyPtr && (BasicProxyPtr == ProxyPtr))
@@ -127,7 +127,7 @@ void UAllocationIconBase::SetItemType()
 	auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FAllocationIconBase::Get().ProxyIcon));
 	if (ProxyIconPtr)
 	{
-		ProxyIconPtr->ResetToolUIByData(BasicProxyPtr);
+		ProxyIconPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr));
 	}
 }
 
@@ -161,7 +161,7 @@ bool UAllocationIconBase::NativeOnDrop(
 		auto WidgetDragPtr = Cast<UAllocationableProxyDragDropOperation>(InOperation);
 		if (WidgetDragPtr)
 		{
-			ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
+			ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(WidgetDragPtr->SceneToolSPtr));
 
 			WidgetDragPtr->OnDrop.Broadcast(WidgetDragPtr);
 		}

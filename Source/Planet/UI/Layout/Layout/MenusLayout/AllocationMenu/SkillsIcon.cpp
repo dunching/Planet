@@ -44,16 +44,16 @@ USkillsIcon::USkillsIcon(const FObjectInitializer& ObjectInitializer) :
 
 void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyPtr)
 {
-	if (InBasicProxyPtr == BasicProxyPtr)
+	if (InBasicProxyPtr == DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr))
 	{
 		return;
 	}
 
 	auto PreviousProxyPtr = BasicProxyPtr;
-	TSharedPtr<FAllocationbleProxy> NewProxyPtr = nullptr;
+	TSharedPtr<IProxy_Allocationble> NewProxyPtr = nullptr;
 	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(ProxyType))
 	{
-		NewProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr) ;
+		NewProxyPtr = DynamicCastSharedPtr<IProxy_Allocationble>(InBasicProxyPtr) ;
 	}
 	else
 	{
@@ -70,7 +70,7 @@ void USkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxyP
 				UGameplayTagsLibrary::Proxy_Skill_Active_Switch
 			).IsValid())
 			{
-				NewProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr);
+				NewProxyPtr = DynamicCastSharedPtr<IProxy_Allocationble>(InBasicProxyPtr);
 			}
 		}
 
@@ -118,11 +118,11 @@ void USkillsIcon::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
+void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<IProxy_Allocationble>& ProxyPtr)
 {
 	if (bIsDragging)
 	{
-		if (ProxyPtr && ProxyPtr->GetProxyType().MatchesTag(ProxyType))
+		if (ProxyPtr && DynamicCastSharedPtr<FBasicProxy>(ProxyPtr)->GetProxyType().MatchesTag(ProxyType))
 		{
 			EnableIcon(true);
 		}
@@ -130,7 +130,7 @@ void USkillsIcon::OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationblePr
 		{
 			if (
 				ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve) &&
-				ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)
+				DynamicCastSharedPtr<FBasicProxy>(ProxyPtr)->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)
 				)
 			{
 				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));

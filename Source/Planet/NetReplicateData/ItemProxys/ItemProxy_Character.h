@@ -6,6 +6,7 @@
 #include <GameplayTagContainer.h>
 
 #include "ItemProxy.h"
+#include "ItemProxy_Interface.h"
 
 #include "ItemProxy_Character.generated.h"
 
@@ -34,7 +35,8 @@ using FOnCharacterSocketUpdated = TMulticastDelegate<void(
 	const FCharacterSocket&,
 	const FGameplayTag&
 
-)>;
+
+	)>;
 
 /*
  * 角色的配置
@@ -49,15 +51,15 @@ struct PLANET_API FCharacterSocket
 		FArchive& Ar,
 		class UPackageMap* Map,
 		bool& bOutSuccess
-	);
+		);
 
 	void UpdateProxy(
 		const TSharedPtr<FBasicProxy>& ProxySPtr
-	);
+		);
 
 	void SetAllocationedProxyID(
 		const FGuid& NewID
-	);
+		);
 
 	FGuid GetAllocationedProxyID() const;
 
@@ -69,21 +71,21 @@ struct PLANET_API FCharacterSocket
 
 	bool operator==(
 		const FCharacterSocket& Other
-	) const
+		) const
 	{
 		return Socket == Other.Socket && AllocationedProxyID == Other.AllocationedProxyID;
 	}
 
 	bool operator!=(
 		const FCharacterSocket& Other
-	) const
+		) const
 	{
 		return !(*this == Other);
 	}
 
 	friend inline uint32 GetTypeHash(
 		const FCharacterSocket& Key
-	)
+		)
 	{
 		uint32 Hash = 0;
 		Hash = HashCombine(Hash, GetTypeHash(Key.Socket));
@@ -109,7 +111,9 @@ struct TStructOpsTypeTraits<FCharacterSocket> :
 };
 
 USTRUCT()
-struct PLANET_API FCharacterProxy : public FAllocationbleProxy
+struct PLANET_API FCharacterProxy :
+	public FBasicProxy,
+	public IProxy_Allocationble
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -122,21 +126,21 @@ public:
 
 	FCharacterProxy(
 		const IDType& ID
-	);
+		);
 
 	void UpdateByRemote(
 		const TSharedPtr<FCharacterProxy>& RemoteSPtr
-	);
+		);
 
 	virtual void InitialProxy(
 		const FGameplayTag& ProxyType
-	) override;
+		) override;
 
 	virtual bool NetSerialize(
 		FArchive& Ar,
 		class UPackageMap* Map,
 		bool& bOutSuccess
-	) override;
+		) override;
 
 	FTableRowProxy_CharacterGrowthAttribute* GetDT_CharacterInfo() const;
 
@@ -152,26 +156,26 @@ public:
 	 */
 	AHumanCharacter_AI* SpwanCharacter(
 		const FTransform& Transform
-	);
+		);
 
 	void DestroyCharacter();
 
 	// 通过插槽
 	FCharacterSocket FindSocket(
 		const FGameplayTag& SocketID
-	) const;
+		) const;
 
 	// 通过指定代理类型，
 	// 比如我们需要确认是否装备了斧头
 	// 比如我们需要查询我们的插槽里面是否使用了“换技能”的代理
 	FCharacterSocket FindSocketByType(
 		const FGameplayTag& ProxyType
-	) const;
+		) const;
 
 	void GetWeaponSocket(
 		FCharacterSocket& FirstWeaponSocketInfoSPtr,
 		FCharacterSocket& SecondWeaponSocketInfoSPtr
-	);
+		);
 
 	TMap<FGameplayTag, FCharacterSocket> GetSockets() const;;
 
@@ -180,7 +184,7 @@ public:
 
 	void UpdateSocket(
 		const FCharacterSocket& Socket
-	);
+		);
 
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
 

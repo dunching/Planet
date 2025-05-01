@@ -49,11 +49,21 @@ bool FSkillProxy::NetSerialize(
 )
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
-
+	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
+	
 	Ar << Level;
 	Ar << GameplayAbilitySpecHandle;
 
 	return true;
+}
+
+void FSkillProxy::InitialProxy(
+	const FGameplayTag& InProxyType
+	)
+{
+	Super::InitialProxy(InProxyType);
+
+	ProxyPtr = this;
 }
 
 void FSkillProxy::SetAllocationCharacterProxy(
@@ -61,7 +71,7 @@ void FSkillProxy::SetAllocationCharacterProxy(
 	const FGameplayTag& InSocketTag
 )
 {
-	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
+	IProxy_Allocationble::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
 void FSkillProxy::UpdateByRemote(
@@ -69,7 +79,8 @@ void FSkillProxy::UpdateByRemote(
 )
 {
 	Super::UpdateByRemote(RemoteSPtr);
-
+	UpdateByRemote_Allocationble(RemoteSPtr);
+	
 	Level = RemoteSPtr->Level;
 	GameplayAbilitySpecHandle = RemoteSPtr->GameplayAbilitySpecHandle;
 }
@@ -540,8 +551,8 @@ void FWeaponSkillProxy::SetAllocationCharacterProxy(
 	if (InAllocationCharacterProxyPtr && InSocketTag.IsValid())
 	{
 		if (
-			(AllocationCharacter_ID == InAllocationCharacterProxyPtr->GetID()) &&
-			(SocketTag == InSocketTag)
+			(GetAllocationCharacterID() == InAllocationCharacterProxyPtr->GetID()) &&
+			(GetCurrentSocketTag() == InSocketTag)
 		)
 		{
 			return;
@@ -549,23 +560,23 @@ void FWeaponSkillProxy::SetAllocationCharacterProxy(
 
 		// 找到这个物品之前被分配的插槽
 		// 如果不是在同一个CharacterActor上，则需要取消分配
-		if (AllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
+		if (GetAllocationCharacterID() != InAllocationCharacterProxyPtr->GetID())
 		{
 			UnAllocation();
 		}
 
-		auto PreviousAllocationCharacterProxySPtr = InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
+		auto PreviousAllocationCharacterProxySPtr = InventoryComponentPtr->FindProxy_Character(GetAllocationCharacterID());
 		if (PreviousAllocationCharacterProxySPtr)
 		{
-			auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
+			auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(GetCurrentSocketTag());
 			CharacterSocket.ResetAllocatedProxy();
 
 			PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
 		}
 
-		const auto PreviousAllocationCharacter_ID = AllocationCharacter_ID;
-		AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
-		SocketTag = InSocketTag;
+		const auto PreviousAllocationCharacter_ID = GetAllocationCharacterID();
+		SetAllocationCharacterID( InAllocationCharacterProxyPtr->GetID());
+		SetCurrentSocketTag( InSocketTag);
 
 		// 如果不是在同一个CharacterActor上，则需要重新分配
 		// 否则重新分配
@@ -575,7 +586,7 @@ void FWeaponSkillProxy::SetAllocationCharacterProxy(
 		}
 
 		// 将这个物品注册到新的插槽
-		auto CharacterSocket = InAllocationCharacterProxyPtr->FindSocket(SocketTag);
+		auto CharacterSocket = InAllocationCharacterProxyPtr->FindSocket(GetCurrentSocketTag());
 		CharacterSocket.SetAllocationedProxyID(GetID());
 
 		InAllocationCharacterProxyPtr->UpdateSocket(CharacterSocket);

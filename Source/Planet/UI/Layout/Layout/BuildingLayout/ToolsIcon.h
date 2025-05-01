@@ -35,8 +35,6 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	TSharedPtr<FToolProxy> GetToolProxy()const;
-
 	TSharedPtr<FConsumableProxy> GetConsumablesProxy()const;
 
 	void OnSublingIconReset(const TSharedPtr<FBasicProxy>& InToolProxyPtr);

@@ -384,7 +384,7 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 		{
 		case EProxyModifyType::kAdd:
 			{
-				CurrentNum += ConsumableProxySPtr->Num;
+				CurrentNum += ConsumableProxySPtr->GetNum();
 				UpdateDescription();
 				if (CurrentNum >= Num)
 				{

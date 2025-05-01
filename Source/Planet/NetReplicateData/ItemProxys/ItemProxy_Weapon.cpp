@@ -29,6 +29,7 @@ void FWeaponProxy::UpdateByRemote(
 )
 {
 	Super::UpdateByRemote(RemoteSPtr);
+	UpdateByRemote_Allocationble(RemoteSPtr);
 
 	MaxAttackDistance = RemoteSPtr->MaxAttackDistance;
 }
@@ -40,6 +41,7 @@ bool FWeaponProxy::NetSerialize(
 )
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
+	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
 
 	Ar << ActivedWeaponPtr;
 	Ar << WeaponSkillID;
@@ -52,6 +54,8 @@ void FWeaponProxy::InitialProxy(
 )
 {
 	Super::InitialProxy(InProxyType);
+
+	ProxyPtr = this;
 	{
 		MaxAttackDistance = GetTableRowProxy_WeaponExtendInfo()->MaxAttackDistance;
 	}
@@ -76,7 +80,7 @@ void FWeaponProxy::SetAllocationCharacterProxy(
 	const FGameplayTag& InSocketTag
 )
 {
-	Super::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
+	IProxy_Allocationble::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)

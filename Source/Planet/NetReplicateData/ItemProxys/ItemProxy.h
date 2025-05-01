@@ -48,41 +48,11 @@ struct FTalentHelper;
 struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
+struct IProxy_Allocationble;
 
 enum struct ECharacterPropertyType : uint8;
 
 FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGameplayTag& CommonCooldownTag);
-
-struct PLANET_API IProxy_Cooldown
-{
-public:
-	
-	/**
-	 * 获取GA冷却
-	 * @param RemainingCooldown 
-	 * @param RemainingCooldownPercent 
-	 * @return 
-	 */
-	virtual bool GetRemainingCooldown(
-		float& RemainingCooldown, float& RemainingCooldownPercent
-	) const = 0;
-
-	virtual bool CheckNotInCooldown() const = 0;
-
-	/**
-	 * 增加或减少GA冷却
-	 */
-	virtual void AddCooldownConsumeTime(float NewTime) = 0;
-
-	/**
-	 * 刷新冷却
-	 */
-	virtual void FreshUniqueCooldownTime() = 0;
-
-	virtual void OffsetCooldownTime() = 0;
-
-	virtual void ApplyCooldown() = 0;
-};
 
 /**
  * 序列化&反序列化
@@ -103,6 +73,7 @@ public:
 	friend FProxy_FASI_Container;
 	friend UInventoryComponent;
 	friend APlanetGameMode;
+	friend IProxy_Allocationble;
 
 	using IDType = FGuid;
 
@@ -114,7 +85,7 @@ public:
 	
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	virtual void InitialProxy(const FGameplayTag& ProxyType);
+	virtual void InitialProxy(const FGameplayTag& InProxyType);
 
 	// 通过远程的更新客户端的数据
 	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
@@ -186,76 +157,4 @@ struct TStructOpsTypeTraits<FBasicProxy> :
 	{
 		WithNetSerializer = true,
 	};
-};
-
-/*
- *	可被分配至插槽的物品 
- */
-USTRUCT()
-struct PLANET_API FAllocationbleProxy : public FBasicProxy
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	FAllocationbleProxy();
-
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
-
-	void UpdateByRemote(const TSharedPtr<FAllocationbleProxy>& RemoteSPtr);
-
-	// 这个物品被分配给的对象
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy();
-
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy() const;
-
-	ACharacterBase* GetAllocationCharacter() const;
-
-	virtual void SetAllocationCharacterProxy(
-		const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
-		const FGameplayTag& InSocketTag
-	);
-
-	virtual void ResetAllocationCharacterProxy();
-
-	FGameplayTag GetCurrentSocketTag() const;
-
-	IDType GetAllocationCharacterID() const;
-
-	FOnAllocationCharacterProxyChanged OnAllocationCharacterProxyChanged;
-
-protected:
-	// 被分配给的对象ID
-	IDType AllocationCharacter_ID;
-
-	// 所在插槽
-	FGameplayTag SocketTag;
-};
-
-template <>
-struct TStructOpsTypeTraits<FAllocationbleProxy> :
-	public TStructOpsTypeTraitsBase2<FAllocationbleProxy>
-{
-	enum
-	{
-		WithNetSerializer = true,
-	};
-};
-
-USTRUCT()
-struct PLANET_API FToolProxy : public FAllocationbleProxy
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	friend FSceneProxyContainer;
-	friend UInventoryComponent;
-
-	FToolProxy();
-
-	virtual int32 GetNum() const override;
-
-	int32 DamageDegree = 0;
-
-protected:
-	int32 Num = 1;
 };

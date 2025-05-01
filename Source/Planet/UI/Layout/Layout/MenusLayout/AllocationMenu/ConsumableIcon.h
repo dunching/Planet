@@ -18,7 +18,7 @@ class UDragDropOperation;
 
 struct FSkillProxy;
 struct FConsumableProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 UCLASS()
 class PLANET_API UConsumableIcon : public UAllocationIconBase

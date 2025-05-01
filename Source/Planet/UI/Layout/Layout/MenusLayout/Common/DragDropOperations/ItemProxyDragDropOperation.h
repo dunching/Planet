@@ -13,7 +13,7 @@
 
 class UToolIcon;
 struct FBasicProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 /**
  *
@@ -38,7 +38,7 @@ class PLANET_API UAllocationableProxyDragDropOperation : public UDragDropOperati
 
 public:
 
-	TSharedPtr<FAllocationbleProxy> SceneToolSPtr;
+	TSharedPtr<IProxy_Allocationble> SceneToolSPtr;
 
 	bool bIsInBackpakc = false;
 

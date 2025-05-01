@@ -24,7 +24,7 @@ namespace HumanProcessor
 	class FHumanInteractionWithNPCProcessor;
 }
 
-struct FConversationLayout : public TStructVariable<FConversationLayout>
+struct FInteractionOptionsLayout : public TStructVariable<FInteractionOptionsLayout>
 {
 	FName InteractionList = TEXT("InteractionList");
 
@@ -42,7 +42,7 @@ void UInteractionOptionsLayout::Enable()
 {
 	{
 		auto UIPtr = Cast<UPlayerConversationBorder>(
-			GetWidgetFromName(FConversationLayout::Get().PlayerConversationBorder)
+			GetWidgetFromName(FInteractionOptionsLayout::Get().PlayerConversationBorder)
 		);
 		if (UIPtr)
 		{
@@ -61,7 +61,7 @@ void UInteractionOptionsLayout::Enable()
 		{
 			CharacterPtr = CurrentActionSPtr->CharacterPtr;
 
-			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
+			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FInteractionOptionsLayout::Get().InteractionList));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
@@ -85,7 +85,7 @@ void UInteractionOptionsLayout::Enable()
 		{
 			SceneActorInteractionInterfacePtr = CurrentActionSPtr->TargetPtr;
 
-			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
+			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FInteractionOptionsLayout::Get().InteractionList));
 			if (UIPtr)
 			{
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
@@ -122,7 +122,7 @@ ELayoutCommon UInteractionOptionsLayout::GetLayoutType() const
 
 UOptionList* UInteractionOptionsLayout::GetOptions() const
 {
-	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
+	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FInteractionOptionsLayout::Get().InteractionList));
 	if (UIPtr)
 	{
 		return UIPtr;
@@ -133,7 +133,7 @@ UOptionList* UInteractionOptionsLayout::GetOptions() const
 
 void UInteractionOptionsLayout::CloseOption()
 {
-	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
+	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FInteractionOptionsLayout::Get().InteractionList));
 	if (UIPtr)
 	{
 		UIPtr->SetVisibility(ESlateVisibility::Hidden);

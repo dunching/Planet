@@ -18,8 +18,9 @@ struct FProxy_FASI;
 struct FCharacterSocket;
 struct FSkillProxy;
 struct FWeaponProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 struct FWeaponSkillProxy;
+struct IProxy_Allocationble;
 class IPlanetControllerInterface;
 class ACharacterBase;
 
@@ -38,8 +39,9 @@ class UInventoryComponent :
 public:
 	friend ACharacterBase;
 	friend FProxy_FASI;
-	friend FAllocationbleProxy;
+	friend IProxy_Allocationble;
 	friend FWeaponSkillProxy;
+	friend IProxy_Allocationble;
 
 	using FOwnerType = ACharacterBase;
 
@@ -49,10 +51,6 @@ public:
 		const TSharedPtr<
 			FSkillProxy>&,
 		EProxyModifyType
-		)>;
-
-	using FOnToolProxyChanged = TCallbackHandleContainer<void(
-		const TSharedPtr<FToolProxy>&
 		)>;
 
 	using FOnGroupmateProxyChanged = TCallbackHandleContainer<void(
@@ -65,7 +63,7 @@ public:
 	using FOnConsumableProxyChanged = TCallbackHandleContainer<void(
 		const TSharedPtr<
 			FConsumableProxy>&,
-		EProxyModifyType
+			EProxyModifyType
 		)
 	>;
 
@@ -115,11 +113,11 @@ public:
 		const FGameplayTag& ProxyType
 		)const;
 
-	TSharedPtr<FAllocationbleProxy> FindAllocationableProxy(
+	TSharedPtr<IProxy_Allocationble> FindAllocationableProxy(
 		const IDType& ID
 		)const;
 
-	TSharedPtr<FAllocationbleProxy> FindProxy_BySocket(
+	TSharedPtr<IProxy_Allocationble> FindProxy_BySocket(
 		const FCharacterSocket& Socket
 		)const;
 
@@ -189,14 +187,7 @@ public:
 		);
 
 
-	TSharedPtr<FToolProxy> AddProxy_ToolProxy(
-		const FGameplayTag& ProxyType
-		);
-
-
 	const TArray<TSharedPtr<FBasicProxy>>& GetSceneUintAry() const;
-
-	const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& GetCoinUintAry() const;
 
 	TArray<TSharedPtr<FBasicProxy>> GetProxys() const;
 #endif
@@ -225,8 +216,6 @@ public:
 	FProxy_FASI_Container Proxy_Container;
 
 	FOnSkillProxyChanged OnSkillProxyChanged;
-
-	FOnToolProxyChanged OnToolProxyChanged;
 
 	FOnConsumableProxyChanged OnConsumableProxyChanged;
 
@@ -274,5 +263,5 @@ private:
 
 	TMap<IDType, TSharedPtr<FBasicProxy>> ProxysMap;
 
-	TMap<FGameplayTag, TSharedPtr<FCoinProxy>> CoinProxyMap;
+	TMap<FGameplayTag, TSharedPtr<FBasicProxy>> ProxyTypeMap;
 };

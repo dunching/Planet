@@ -94,8 +94,8 @@ void UAllocationableProxyDragDropOperationWidget::ResetToolUIByData(
 {
 	if (InBasicProxyPtr)
 	{
-		BasicProxyPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr);
-		SetItemType(BasicProxyPtr.Get());
+		BasicProxyPtr = DynamicCastSharedPtr<IProxy_Allocationble>(InBasicProxyPtr);
+		SetItemType(DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr).Get());
 	}
 }
 
@@ -127,7 +127,7 @@ void UAllocationableProxyDragDropOperationWidget::SetItemType(FBasicProxy* Proxy
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(TEXT("Texture")));
 	if (ImagePtr)
 	{
-			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
+		AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
 	}
 }
 

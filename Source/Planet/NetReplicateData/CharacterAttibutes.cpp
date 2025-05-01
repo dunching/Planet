@@ -23,7 +23,7 @@ FBasePropertySet::FBasePropertySet()
 	PropertySettlementModifySet.emplace(MakeShared<FPropertySettlementModify>());
 }
 
-void FBasePropertySet::AddCurrentValue(int32 NewValue, const FGameplayTag& DataSource)
+void FBasePropertySet::AddNum(int32 NewValue, const FGameplayTag& DataSource)
 {
 	if (ValueMap.Contains(DataSource))
 	{

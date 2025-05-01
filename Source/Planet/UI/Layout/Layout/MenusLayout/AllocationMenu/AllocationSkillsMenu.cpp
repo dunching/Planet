@@ -155,7 +155,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 
 				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
-				ProxySPtr
+				DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)
 				);
 				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
@@ -172,7 +172,7 @@ void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
 
 				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
-				ProxySPtr
+				DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)
 				);
 				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
@@ -214,7 +214,7 @@ void UAllocationSkillsMenu::ResetUIByData_Skills(const TSharedPtr<FCharacterProx
 
 				IconPtr->bPaseInvokeOnResetProxyEvent = true;
 				IconPtr->ResetToolUIByData(
-				ProxySPtr
+				DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)
 				);
 				IconPtr->bPaseInvokeOnResetProxyEvent = false;
 			}
@@ -247,7 +247,7 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(const TSharedPtr<FCharacter
 
 			IconPtr->bPaseInvokeOnResetProxyEvent = true;
 			IconPtr->ResetToolUIByData(
-			ProxySPtr
+			DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)
 			);
 			IconPtr->bPaseInvokeOnResetProxyEvent = false;
 		}
@@ -570,10 +570,10 @@ void UAllocationSkillsMenu::OnResetData(UAllocationIconBase* UAllocationIconPtr)
 
 void UAllocationSkillsMenu::OnItemProxyDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& ProxyPtr)
 {
-	OnAllocationbableDragIcon(bIsDragging, DynamicCastSharedPtr<FAllocationbleProxy>(ProxyPtr));
+	OnAllocationbableDragIcon(bIsDragging, DynamicCastSharedPtr<IProxy_Allocationble>(ProxyPtr));
 }
 
-void UAllocationSkillsMenu::OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)
+void UAllocationSkillsMenu::OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<IProxy_Allocationble>& ProxyPtr)
 {
 	{
 		TArray<FName> Ary
@@ -677,8 +677,8 @@ void UAllocationSkillsMenu::OnSelectedCharacterProxy(const TSharedPtr<FCharacter
 }
 
 void UAllocationSkillsMenu::OnSkillProxyChanged(
-	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
 	const FGameplayTag& SocketTag
 )
 {
@@ -705,7 +705,7 @@ void UAllocationSkillsMenu::OnSkillProxyChanged(
 			if (NewProxyPtr && (NewProxyPtr == UIPtr->BasicProxyPtr))
 			{
 				UIPtr->bPaseInvokeOnResetProxyEvent = true;
-				UIPtr->ResetToolUIByData(PreviousProxyPtr);
+				UIPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(PreviousProxyPtr));
 				UIPtr->bPaseInvokeOnResetProxyEvent = false;
 
 				bIsReplaced = true;
@@ -722,8 +722,8 @@ void UAllocationSkillsMenu::OnSkillProxyChanged(
 }
 
 void UAllocationSkillsMenu::OnWeaponProxyChanged(
-	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
 	const FGameplayTag& SocketTag
 )
 {
@@ -742,7 +742,7 @@ void UAllocationSkillsMenu::OnWeaponProxyChanged(
 			if (NewProxyPtr && (NewProxyPtr == UIPtr->BasicProxyPtr))
 			{
 				UIPtr->bPaseInvokeOnResetProxyEvent = true;
-				UIPtr->ResetToolUIByData(PreviousProxyPtr);
+				UIPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(PreviousProxyPtr));
 				UIPtr->bPaseInvokeOnResetProxyEvent = false;
 
 				bIsReplaced = true;
@@ -759,8 +759,8 @@ void UAllocationSkillsMenu::OnWeaponProxyChanged(
 }
 
 void UAllocationSkillsMenu::OnConsumableProxyChanged(
-	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
 	const FGameplayTag& SocketTag
 )
 {
@@ -781,7 +781,7 @@ void UAllocationSkillsMenu::OnConsumableProxyChanged(
 			if (NewProxyPtr && (NewProxyPtr == UIPtr->BasicProxyPtr))
 			{
 				UIPtr->bPaseInvokeOnResetProxyEvent = true;
-				UIPtr->ResetToolUIByData(PreviousProxyPtr);
+				UIPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(PreviousProxyPtr));
 				UIPtr->bPaseInvokeOnResetProxyEvent = false;
 
 				bIsReplaced = true;
@@ -798,8 +798,8 @@ void UAllocationSkillsMenu::OnConsumableProxyChanged(
 }
 
 void UAllocationSkillsMenu::SetAllocation(
-	const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-	const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+	const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
 	const FGameplayTag& SocketTag,
 	bool bIsReplaced
 )

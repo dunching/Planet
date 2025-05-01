@@ -15,7 +15,7 @@ struct FBasicProxy;
 struct FToolProxy;
 struct FSkillProxy;
 struct FConsumableProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 struct FStreamableHandle;
 
@@ -80,6 +80,6 @@ protected:
 
 private:
 
-	TSharedPtr<FAllocationbleProxy> BasicProxyPtr = nullptr;
+	TSharedPtr<IProxy_Allocationble> BasicProxyPtr = nullptr;
 
 };

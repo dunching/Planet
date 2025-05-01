@@ -18,7 +18,7 @@ class UDragDropOperation;
 
 struct FSkillProxy;
 struct FWeaponProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 UCLASS()
 class PLANET_API UWeaponsIcon : public UAllocationIconBase

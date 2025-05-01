@@ -10,6 +10,7 @@
 #include "GameplayAbilitySpecHandle.h"
 
 #include "ItemProxy.h"
+#include "ItemProxy_Interface.h"
 
 #include "ItemProxy_Weapon.generated.h"
 
@@ -39,7 +40,9 @@ class UItemProxy_Description_Weapon;
 enum struct ECharacterPropertyType : uint8;
 
 USTRUCT()
-struct PLANET_API FWeaponProxy : public FAllocationbleProxy
+struct PLANET_API FWeaponProxy :
+	public FBasicProxy,
+	public IProxy_Allocationble
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -52,11 +55,11 @@ public:
 
 	void UpdateByRemote(
 		const TSharedPtr<FWeaponProxy>& RemoteSPtr
-	);
+		);
 
 	virtual void InitialProxy(
 		const FGameplayTag& ProxyType
-	) override;
+		) override;
 
 	virtual bool Active() override;
 
@@ -65,15 +68,15 @@ public:
 	virtual void SetAllocationCharacterProxy(
 		const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
 		const FGameplayTag& InSocketTag
-	) override;
+		) override;
 
 	virtual bool NetSerialize(
 		FArchive& Ar,
 		class UPackageMap* Map,
 		bool& bOutSuccess
-	) override;
+		) override;
 
-	UItemProxy_Description_Weapon*  GetTableRowProxy_WeaponExtendInfo() const;
+	UItemProxy_Description_Weapon* GetTableRowProxy_WeaponExtendInfo() const;
 
 	// 切换至当前武器
 	void ActiveWeapon();

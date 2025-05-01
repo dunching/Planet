@@ -14,7 +14,7 @@
 #include "UIInterfaces.generated.h"
 
 struct FBasicProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class UItemProxyIconInterface : public UInterface

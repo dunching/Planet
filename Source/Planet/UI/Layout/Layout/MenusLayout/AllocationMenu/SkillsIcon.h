@@ -35,7 +35,7 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
-	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr)override;
+	virtual void OnDragIcon(bool bIsDragging, const TSharedPtr<IProxy_Allocationble>& ProxyPtr)override;
 
 protected:
 

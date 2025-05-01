@@ -44,7 +44,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 		{
 			if (CoinProxyPtr->GetNum() > Count)
 			{
-				CoinProxyPtr->AddCurrentValue(-Count);
+				CoinProxyPtr->AddNum(-Count);
 				return RafflePermanent(Count);
 			}
 		}

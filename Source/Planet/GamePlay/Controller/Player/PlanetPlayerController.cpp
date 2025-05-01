@@ -41,7 +41,6 @@
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
 #include "GuideActor.h"
-#include "GE_Common.h"
 #include "GroupManagger_Player.h"
 #include "HumanCharacter_AI.h"
 #include "OpenWorldSystem.h"
@@ -154,6 +153,7 @@ void APlanetPlayerController::IncreaseCD_Implementation(
 }
 
 void APlanetPlayerController::BuyProxys_Implementation(
+ACharacterBase* InTraderCharacterPtr,
 	const FGameplayTag& ProxyTag,
 	int32 Num,
 	int32 Cost
@@ -162,11 +162,18 @@ void APlanetPlayerController::BuyProxys_Implementation(
 	auto InventoryComponentPtr = GetGroupManagger()->GetInventoryComponent();
 	if (InventoryComponentPtr)
 	{
-		auto CoinProxySPtr = GetGroupManagger()->GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
-		if (Cost <= CoinProxySPtr ->GetNum())
+		auto CoinProxySPtr = InventoryComponentPtr->FindProxy_Coin(
+			 UGameplayTagsLibrary::Proxy_Coin_Regular
+			);
+		if (Cost <= CoinProxySPtr->GetNum())
 		{
 			InventoryComponentPtr->AddProxy(ProxyTag, Num);
 			InventoryComponentPtr->AddProxy(UGameplayTagsLibrary::Proxy_Coin_Regular, -Cost);
+
+			// if (InTraderCharacterPtr.IsValid())
+			// {
+			// 	InTraderCharacterPtr->GetInventoryComponent()->AddProxy(ProxyTag, Num);
+			// }
 		}
 	}
 }

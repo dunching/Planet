@@ -84,14 +84,14 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 		{
 			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicProxyPtr);
 
-			if (ProxyPtr && ProxyPtr->Num > 0)
+			if (ProxyPtr && ProxyPtr->GetNum() > 0)
 			{
 				OnValueChangedDelegateHandle =
 					ProxyPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
 
 				SetLevel();
 				SetItemType();
-				SetNum(ProxyPtr->Num);
+				SetNum(ProxyPtr->GetNum());
 				SetCanRelease(true);
 				SetRemainingCooldown(true, 0.f, 0.f);
 				SetInputRemainPercent(false, 0.f);
@@ -126,7 +126,7 @@ void UActionConsumablesIcon::UpdateState()
 		auto bCooldownIsReady = ProxyPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
 		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 
-		SetCanRelease(bCooldownIsReady && (ProxyPtr->Num > 0));
+		SetCanRelease(bCooldownIsReady && (ProxyPtr->GetNum() > 0));
 	}
 }
 

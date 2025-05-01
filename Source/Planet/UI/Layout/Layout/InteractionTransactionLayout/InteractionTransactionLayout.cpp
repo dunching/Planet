@@ -98,10 +98,12 @@ void UInteractionTransactionLayout::NativeConstruct()
 		}
 	}
 	auto CoinSPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->
-					GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
+	                GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
 	if (CoinSPtr)
 	{
-		OnCoinChangedDelegateHandle = CoinSPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::OnCoinChanged, this, std::placeholders::_1, std::placeholders::_2));
+		OnCoinChangedDelegateHandle = CoinSPtr->CallbackContainerHelper.AddOnValueChanged(
+			 std::bind(&ThisClass::OnCoinChanged, this, std::placeholders::_1, std::placeholders::_2)
+			);
 	}
 }
 
@@ -173,6 +175,7 @@ void UInteractionTransactionLayout::OnQuitClicked()
 void UInteractionTransactionLayout::OnBuyClicked()
 {
 	Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->BuyProxys(
+		 CharacterPtr,
 		 CurrentProxyPtr->GetProxyType(),
 		 CurrentNum,
 		 CalculateCost()

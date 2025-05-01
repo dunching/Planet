@@ -75,6 +75,7 @@ FCharacterProxy::FCharacterProxy(const IDType& InID):
 void FCharacterProxy::UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSPtr)
 {
 	Super::UpdateByRemote(RemoteSPtr);
+	UpdateByRemote_Allocationble(RemoteSPtr);
 
 	TeammateConfigureMap = RemoteSPtr->TeammateConfigureMap;
 	ProxyCharacterPtr = RemoteSPtr->ProxyCharacterPtr;
@@ -83,6 +84,7 @@ void FCharacterProxy::UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSP
 bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
+	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
 
 	Ar << Title;
 	Ar << Name;
@@ -92,8 +94,8 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 
 	if (Ar.IsSaving())
 	{
-		auto Num = TeammateConfigureMap.Num();
-		Ar << Num;
+		auto TeammateConfigureMapNum = TeammateConfigureMap.Num();
+		Ar << TeammateConfigureMapNum;
 		for (auto& Iter : TeammateConfigureMap)
 		{
 			Iter.Value.NetSerialize(Ar, Map, bOutSuccess);
@@ -103,9 +105,9 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 	{
 		TeammateConfigureMap.Empty();
 
-		int32 Num = 0;
-		Ar << Num;
-		for (int32 Index = 0; Index < Num; Index++)
+		int32 TeammateConfigureMapNum = 0;
+		Ar << TeammateConfigureMapNum;
+		for (int32 Index = 0; Index < TeammateConfigureMapNum; Index++)
 		{
 			FCharacterSocket MySocket_FASI;
 			MySocket_FASI.NetSerialize(Ar, Map, bOutSuccess);
@@ -121,6 +123,8 @@ void FCharacterProxy::InitialProxy(const FGameplayTag& InProxyType)
 {
 	Super::InitialProxy(InProxyType);
 
+	ProxyPtr = this;
+	
 	Title = GetDT_CharacterType()->Title;
 
 	struct FMyStruct
@@ -271,7 +275,7 @@ FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& InProxyTy
 	{
 		for (const auto& Iter : TeammateConfigureMap)
 		{
-			auto ProxySPtr = InventoryComponentPtr->FindProxy_BySocket(Iter.Value);
+			auto ProxySPtr = DynamicCastSharedPtr<FBasicProxy>( InventoryComponentPtr->FindProxy_BySocket(Iter.Value));
 			if (ProxySPtr && ProxySPtr->GetProxyType() == ProxyType)
 			{
 				return Iter.Value;

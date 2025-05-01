@@ -56,7 +56,7 @@ public:
 
 	FBasePropertySet();
 
-	void AddCurrentValue(int32 NewValue, const FGameplayTag& DataSource);
+	void AddNum(int32 NewValue, const FGameplayTag& DataSource);
 
 	void RemoveCurrentValue(const FGameplayTag& DataSource);
 

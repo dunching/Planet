@@ -18,7 +18,7 @@ class UDragDropOperation;
 
 struct FSkillProxy;
 struct FCharacterProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 
 UCLASS()
 class PLANET_API UGroupmateIcon :

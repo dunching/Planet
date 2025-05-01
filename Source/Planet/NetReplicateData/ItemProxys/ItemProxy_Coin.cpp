@@ -13,41 +13,28 @@ FCoinProxy::FCoinProxy()
 bool FCoinProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
-
-	Ar << Num;
-	Ar << OffsetNum;
+	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
+	NetSerialize_Unique(Ar, Map, bOutSuccess);
 
 	return true;
 }
 
-void FCoinProxy::UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr)
+void FCoinProxy::InitialProxy(
+	const FGameplayTag& InProxyType
+	)
+{
+	Super::InitialProxy(InProxyType);
+	
+	ProxyPtr = this;
+}
+
+void FCoinProxy::UpdateByRemote(
+	const TSharedPtr<FCoinProxy>& RemoteSPtr
+	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
-
-	Num = RemoteSPtr->Num;
-
-	CallbackContainerHelper.ValueChanged(Num, RemoteSPtr->Num);
-	OffsetNum = RemoteSPtr->OffsetNum;
-}
-
-void FCoinProxy::AddCurrentValue(int32 val)
-{
-	const auto Old = Num;
-	Num += val;
-	
-	OffsetNum = val;
-
-	CallbackContainerHelper.ValueChanged(Old, Num);
-}
-
-int32 FCoinProxy::GetNum() const
-{
-	return Num;
-}
-
-int32 FCoinProxy::GetOffsetNum() const
-{
-	return OffsetNum;
+	UpdateByRemote_Allocationble(RemoteSPtr);
+	UpdateByRemote_Unique(RemoteSPtr);
 }
 
 bool FCoinProxy::IsUnique() const

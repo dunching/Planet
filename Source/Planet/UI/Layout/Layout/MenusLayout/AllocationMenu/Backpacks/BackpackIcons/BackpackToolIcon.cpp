@@ -35,7 +35,6 @@ void UBackpackToolIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 		auto NewPtr = Cast<ThisClass>(BaseWidgetPtr);
 		if (NewPtr)
 		{
-			ResetToolUIByData(NewPtr->ProxyPtr);
 		}
 	}
 }
@@ -46,8 +45,6 @@ void UBackpackToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasic
 
 	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 	{
-		ProxyPtr = DynamicCastSharedPtr<FToolProxy>(InBasicProxyPtr);
-		SetNum(ProxyPtr->GetNum());
 	}
 }
 

@@ -63,8 +63,6 @@ bool FProxy_FASI::NetSerialize(
 
 		if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
-			auto TempProxySPtr = DynamicCastSharedPtr<FToolProxy>(ProxySPtr);
-			TempProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 		}
 		else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 		{
@@ -120,8 +118,6 @@ bool FProxy_FASI::NetSerialize(
 		{
 			if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 			{
-				CacheProxySPtr = MakeShared<FToolProxy>();
-				CacheProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
 			}
 			else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 			{
@@ -284,7 +280,6 @@ TSharedPtr<FBasicProxy> FProxy_FASI_Container::GetProxyType(
 {
 	if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 	{
-		return MakeShared<FToolProxy>();
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{

@@ -63,7 +63,7 @@ void UBackpackIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProx
 	{
 		SetItemType(BasicProxyPtr.Get());
 
-		if (auto AllocationbleProxySPtr = DynamicCastSharedPtr<FAllocationbleProxy>(InBasicProxyPtr))
+		if (auto AllocationbleProxySPtr = DynamicCastSharedPtr<IProxy_Allocationble>(InBasicProxyPtr))
 		{
 			OnAllocationCharacterProxyChangedHandle = AllocationbleProxySPtr->OnAllocationCharacterProxyChanged.AddCallback(
 				std::bind(&ThisClass::OnAllocationCharacterProxyChanged, this, std::placeholders::_1)
@@ -102,7 +102,7 @@ void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoi
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
-	if (auto AllocationbleProxySPtr = DynamicCastSharedPtr<FAllocationbleProxy>(BasicProxyPtr))
+	if (auto AllocationbleProxySPtr = DynamicCastSharedPtr<IProxy_Allocationble>(BasicProxyPtr))
 	{
 		auto BaseItemClassPtr = UAssetRefMap::GetInstance()->AllocationableProxyDragDropOperationWidgetClass;
 		if (!BaseItemClassPtr)
@@ -114,7 +114,7 @@ void UBackpackIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPoi
 		if (DragWidgetPtr)
 		{
 			DragWidgetPtr->ResetSize(InGeometry.Size);
-			DragWidgetPtr->ResetToolUIByData(AllocationbleProxySPtr);
+			DragWidgetPtr->ResetToolUIByData(DynamicCastSharedPtr<FBasicProxy>(AllocationbleProxySPtr));
 
 			auto WidgetDragPtr = Cast<UAllocationableProxyDragDropOperation>(
 				UWidgetBlueprintLibrary::CreateDragDropOperation(UAllocationableProxyDragDropOperation::StaticClass()));

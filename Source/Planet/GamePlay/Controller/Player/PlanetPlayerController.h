@@ -49,7 +49,7 @@ public:
 
 	APlanetPlayerController(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -57,7 +57,7 @@ public:
 
 	virtual void SetGroupSharedInfo(
 		AGroupManagger* GroupManaggerPtr
-	) override;
+		) override;
 
 	virtual UInventoryComponent* GetInventoryComponent() const override;
 
@@ -73,7 +73,7 @@ public:
 
 	void OnHPChanged(
 		int32 CurrentValue
-	);
+		);
 
 	UEventSubjectComponent* GetEventSubjectComponent() const;
 
@@ -84,22 +84,22 @@ public:
 	UFUNCTION(Server, Reliable)
 	void EntryChallengeLevel(
 		ETeleport Teleport
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void MakeTrueDamege(
 		const TArray<FString>& Args
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void MakeTherapy(
 		const TArray<FString>& Args
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void MakeRespawn(
 		const TArray<FString>& Args
-	);
+		);
 
 #pragma endregion
 
@@ -108,43 +108,46 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnGeneratorActor(
 		const TSoftObjectPtr<AGeneratorColony_ByInvoke>& GeneratorBasePtr
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnCharacter(
 		TSubclassOf<AHumanCharacter_AI> CharacterClass,
 		const FGuid& ID,
 		const FTransform& Transform
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void ServerDestroyActor(
 		AActor* ActorPtr
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void ChangedInterationTaskState(
 		AHumanCharacter_AI* HumanCharacterPtr,
 		TSubclassOf<AGuideInteraction_Actor> Item,
 		bool bIsEnable
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void BuyProxys(
-		const FGameplayTag& ProxyTag, int32 Num, int32 Cost
-	);
+		ACharacterBase* InTraderCharacterPtr,
+		const FGameplayTag& ProxyTag,
+		int32 Num,
+		int32 Cost
+		);
 
 	UFUNCTION(Server, Reliable)
 	void IncreaseCD(
 		int32 CD
-	);
+		);
 
 #pragma region
 
 protected:
 	virtual void GetLifetimeReplicatedProps(
 		TArray<FLifetimeProperty>& OutLifetimeProps
-	) const override;
+		) const override;
 
 	virtual void BeginPlay() override;
 
@@ -152,41 +155,41 @@ protected:
 
 	virtual void EndPlay(
 		const EEndPlayReason::Type EndPlayReason
-	) override;
+		) override;
 
 	virtual void PlayerTick(
 		float DeltaTime
-	) override;
+		) override;
 
 	virtual void OnPossess(
 		APawn* InPawn
-	) override;
+		) override;
 
 	virtual void OnUnPossess() override;
 
 	virtual void SetPawn(
 		APawn* InPawn
-	) override;
+		) override;
 
 	virtual bool InputKey(
 		const FInputKeyParams& Params
-	) override;
+		) override;
 
 	virtual void OnRep_PlayerState() override;
 
 	virtual void OnGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
-	) override;
+		) override;
 
 	virtual void ResetGroupmateProxy(
 		FCharacterProxy* NewGourpMateProxyPtr
-	) override;
+		) override;
 
 	virtual void BindPCWithCharacter() override;
 
 	virtual TSharedPtr<FCharacterProxy> InitialCharacterProxy(
 		ACharacterBase* CharaterPtr
-	) override;
+		) override;
 
 	// 初始化共享信息相关的内容
 	virtual void InitialGroupSharedInfo();
@@ -200,7 +203,7 @@ protected:
 	// 给被锁定的目标绑定一些回调，比如目标进入“死亡”、“隐身”、“不可选中”时
 	void BindOnFocusRemove(
 		AActor* Actor
-	);
+		);
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;

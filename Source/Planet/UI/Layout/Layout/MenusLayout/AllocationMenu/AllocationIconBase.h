@@ -18,7 +18,7 @@ struct FStreamableHandle;
 class UDragDropOperation;
 
 struct FBasicProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 struct FCharacterProxy;
 
 UCLASS()
@@ -33,8 +33,8 @@ public:
 	// 旧的Proxy，新的Proxy
 	using FOnResetProxy =
 	TCallbackHandleContainer<void(
-		const TSharedPtr<FAllocationbleProxy>&,
-		const TSharedPtr<FAllocationbleProxy>&,
+		const TSharedPtr<IProxy_Allocationble>&,
+		const TSharedPtr<IProxy_Allocationble>&,
 		const FGameplayTag&
 			
 	)>;
@@ -66,11 +66,11 @@ public:
 
 	virtual void OnDragIcon(
 		bool bIsDragging,
-		const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+		const TSharedPtr<IProxy_Allocationble>& ProxyPtr
 	);
 
 	virtual void SublingIconProxyChanged(
-		const TSharedPtr<FAllocationbleProxy>& ProxyPtr
+		const TSharedPtr<IProxy_Allocationble>& ProxyPtr
 	);
 
 	virtual FReply NativeOnMouseButtonDown(
@@ -99,7 +99,7 @@ public:
 
 	bool bPaseInvokeOnResetProxyEvent = false;
 
-	TSharedPtr<FAllocationbleProxy> BasicProxyPtr = nullptr;
+	TSharedPtr<IProxy_Allocationble> BasicProxyPtr = nullptr;
 
 protected:
 	virtual void SetItemType();

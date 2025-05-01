@@ -355,7 +355,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 			ProxySPtr
 		)
 		{
-			if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi))
+			if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 				if (UIPtr)
@@ -364,7 +364,7 @@ void UPawnStateActionHUD::InitialTalentUI()
 					bIsGiveTalentPassive = true;
 				}
 			}
-			else if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang))
+			else if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
 				if (UIPtr)

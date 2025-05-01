@@ -64,7 +64,6 @@ void UToolIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
 	{
 		if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
-			ProxyPtr = DynamicCastSharedPtr<FToolProxy>(BasicProxyPtr);
 		}
 		else if (BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
@@ -100,11 +99,6 @@ void UToolIcon::EnableIcon(bool bIsEnable)
 
 }
 
-TSharedPtr<FToolProxy> UToolIcon::GetToolProxy() const
-{
-	return DynamicCastSharedPtr<FToolProxy>(ProxyPtr);
-}
-
 TSharedPtr<FConsumableProxy> UToolIcon::GetConsumablesProxy() const
 {
 	return DynamicCastSharedPtr<FConsumableProxy>(ProxyPtr);
@@ -126,11 +120,6 @@ void UToolIcon::SetNum()
 	{
 		if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 		{
-			auto TempProxyPtr = DynamicCastSharedPtr<FToolProxy>(ProxyPtr);
-			if (TempProxyPtr)
-			{
-				NewNum = TempProxyPtr->GetNum();
-			}
 		}
 		else if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{

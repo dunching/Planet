@@ -42,7 +42,7 @@ void UWeaponsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& InBasicProxy
 	Super::ResetToolUIByData(InBasicProxyPtr);
 
 	WeaponProxyPtr = nullptr;
-	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
+	if (BasicProxyPtr && DynamicCastSharedPtr<FBasicProxy>(BasicProxyPtr)->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
 		WeaponProxyPtr = DynamicCastSharedPtr<FWeaponProxy>(BasicProxyPtr);
 	}

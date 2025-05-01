@@ -21,8 +21,8 @@ FConsumableProxy::FConsumableProxy()
 bool FConsumableProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
-
-	Ar << Num;
+	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
+	NetSerialize_Unique(Ar, Map, bOutSuccess);
 
 	return true;
 }
@@ -30,12 +30,8 @@ bool FConsumableProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& 
 void FConsumableProxy::UpdateByRemote(const TSharedPtr<FConsumableProxy>& RemoteSPtr)
 {
 	Super::UpdateByRemote(RemoteSPtr);
-
-	const auto OldValue = Num;
-
-	Num = RemoteSPtr->Num;
-
-	CallbackContainerHelper.ValueChanged(OldValue, Num);
+	UpdateByRemote_Allocationble(RemoteSPtr);
+	UpdateByRemote_Unique(RemoteSPtr);
 }
 
 bool FConsumableProxy::Active()
@@ -73,19 +69,6 @@ bool FConsumableProxy::Active()
 #endif
 
 	return true;
-}
-
-void FConsumableProxy::AddCurrentValue(int32 val)
-{
-	const auto Old = Num;
-	Num += val;
-
-	CallbackContainerHelper.ValueChanged(Old, Num);
-}
-
-int32 FConsumableProxy::GetNum() const
-{
-	return Num;
 }
 
 FTableRowProxy_Consumable* FConsumableProxy::GetTableRowProxy_Consumable() const

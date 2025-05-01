@@ -62,7 +62,7 @@ bool USkill_Consumable_Generic::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (ProxyPtr->Num <= 0)
+	if (ProxyPtr->GetNum() <= 0)
 	{
 		return false;
 	}
@@ -80,7 +80,7 @@ bool USkill_Consumable_Generic::CommitAbility(
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		ProxyPtr->Num--;
+		ProxyPtr->AddNum(-1);
 		ProxyPtr->Update2Client();
 	}
 #endif

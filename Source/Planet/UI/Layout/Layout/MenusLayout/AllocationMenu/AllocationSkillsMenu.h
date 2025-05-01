@@ -16,7 +16,7 @@
 class UGroupmateIcon;
 class UAllocationIconBase;
 struct FWeaponProxy;
-struct FAllocationbleProxy;
+struct IProxy_Allocationble;
 struct FCharacterProxy;
 
 /**
@@ -75,7 +75,7 @@ protected:
 
 	void OnItemProxyDragIcon(bool bIsDragging, const TSharedPtr<FBasicProxy>& ProxyPtr);
 
-	void OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<FAllocationbleProxy>& ProxyPtr);
+	void OnAllocationbableDragIcon(bool bIsDragging, const TSharedPtr<IProxy_Allocationble>& ProxyPtr);
 
 	/**
 	 * 选择了要分配的人物
@@ -92,26 +92,26 @@ protected:
 	);
 
 	void OnWeaponProxyChanged(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
 		const FGameplayTag&SocketTag
 	);
 
 	void OnSkillProxyChanged(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr,
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
 		const FGameplayTag&SocketTag
 	);
 
 	void OnConsumableProxyChanged(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr, 
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr,
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr, 
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr,
 		const FGameplayTag&SocketTag
 	);
 
 	void SetAllocation(
-		const TSharedPtr<FAllocationbleProxy>& PreviousProxyPtr, 
-		const TSharedPtr<FAllocationbleProxy>& NewProxyPtr, 
+		const TSharedPtr<IProxy_Allocationble>& PreviousProxyPtr, 
+		const TSharedPtr<IProxy_Allocationble>& NewProxyPtr, 
 		const FGameplayTag&SocketTag,
 		bool bIsReplaced
 	);
