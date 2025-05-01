@@ -25,6 +25,8 @@ void FCoinProxy::UpdateByRemote(const TSharedPtr<FCoinProxy>& RemoteSPtr)
 	Super::UpdateByRemote(RemoteSPtr);
 
 	Num = RemoteSPtr->Num;
+
+	CallbackContainerHelper.ValueChanged(Num, RemoteSPtr->Num);
 	OffsetNum = RemoteSPtr->OffsetNum;
 }
 
@@ -38,7 +40,7 @@ void FCoinProxy::AddCurrentValue(int32 val)
 	CallbackContainerHelper.ValueChanged(Old, Num);
 }
 
-int32 FCoinProxy::GetCurrentValue() const
+int32 FCoinProxy::GetNum() const
 {
 	return Num;
 }
@@ -46,4 +48,9 @@ int32 FCoinProxy::GetCurrentValue() const
 int32 FCoinProxy::GetOffsetNum() const
 {
 	return OffsetNum;
+}
+
+bool FCoinProxy::IsUnique() const
+{
+	return true;
 }

@@ -49,7 +49,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& 
 	{
 	case EProxyModifyType::kAdd:
 	{
-		SetText(FString::Printf(TEXT("Get:%dX%s"), ProxyPtr->GetCurrentValue(), *ProxyPtr->GetProxyName()));
+		SetText(FString::Printf(TEXT("Get:%dX%s"), ProxyPtr->GetNum(), *ProxyPtr->GetProxyName()));
 	}
 	break;
 	case EProxyModifyType::kChange:

@@ -78,7 +78,7 @@ void USkill_Passive_XR::OnSendAttack(
 		if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 		{
 			auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
-			auto HoldingItemsComponentPtr = CharacterPtr->GetGroupManagger()->GetHoldingItemsComponent();
+			auto HoldingItemsComponentPtr = CharacterPtr->GetGroupManagger()->GetInventoryComponent();
 
 			TArray<TSharedPtr<FActiveSkillProxy>> ActiveSkillProxyAry;
 			const auto ActiveSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::ActiveSocket_1);

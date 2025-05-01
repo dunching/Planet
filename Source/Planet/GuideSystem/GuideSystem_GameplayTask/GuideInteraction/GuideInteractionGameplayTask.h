@@ -17,6 +17,7 @@
 
 #include "GuideInteractionGameplayTask.generated.h"
 
+class AHumanCharacter_AI;
 class AHumanCharacter_Player;
 class ATargetPoint_Runtime;
 class AGuideThread;
@@ -35,14 +36,14 @@ public:
 
 	UGameplayTask_Interaction(const FObjectInitializer& ObjectInitializer);
 
-	void SetTargetCharacterPtr(AHumanCharacter* InTargetCharacterPtr);
+	void SetTargetCharacterPtr(AHumanCharacter_AI* InTargetCharacterPtr);
 
 	void SetGuideInteractionActor(AGuideInteraction_Actor* InTargetCharacterPtr);
 
 	TObjectPtr<AGuideInteraction_Actor> GuideActorPtr = nullptr;
 	
 	// 激活互动的Character
-	AHumanCharacter* TargetCharacterPtr = nullptr;
+	AHumanCharacter_AI* TargetCharacterPtr = nullptr;
 };
 
 UCLASS()
@@ -117,5 +118,16 @@ protected:
 
 	// 时间限制，<0为无限制
 	float DelayTime = -1.f;
+	
+};
+
+UCLASS()
+class PLANET_API UGameplayTask_Interaction_Transaction : public UGameplayTask_Interaction
+{
+	GENERATED_BODY()
+
+public:
+	
+	virtual void Activate() override;
 	
 };

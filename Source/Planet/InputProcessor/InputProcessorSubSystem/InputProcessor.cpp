@@ -75,6 +75,11 @@ void FInputProcessor::ReEnterAction()
 
 void FInputProcessor::QuitAction()
 {
+	if (OnQuitFunc)
+	{
+		OnQuitFunc();
+	}
+	
 	UnRegisterTicker();
 }
 

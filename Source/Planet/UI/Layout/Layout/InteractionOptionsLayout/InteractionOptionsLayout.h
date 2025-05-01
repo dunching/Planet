@@ -11,7 +11,7 @@
 #include "LayoutInterfacetion.h"
 
 
-#include "ConversationLayout.generated.h"
+#include "InteractionOptionsLayout.generated.h"
 
 class UToolsMenu;
 class UOptionList;
@@ -27,7 +27,7 @@ struct FConsumableSocketInfo;
  *
  */
 UCLASS()
-class PLANET_API UConversationLayout :
+class PLANET_API UInteractionOptionsLayout :
 	public UMyUserWidget,
 	public ILayoutInterfacetion
 {

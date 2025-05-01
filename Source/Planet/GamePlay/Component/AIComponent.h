@@ -52,6 +52,8 @@ public:
 	void DisplayTaskPromy(TSubclassOf<UTaskPromt> TaskPromtClass);
 	
 	void StopDisplayTaskPromy();
+
+	TMap<FGameplayTag, FProductsForSale> GetSaleItemsInfo()const;
 	
 #pragma region RPC
 #pragma endregion
@@ -93,6 +95,9 @@ protected:
 	FGameplayTag ActiveSkillSet_2;
 #pragma endregion
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<FGameplayTag, FProductsForSale> ProxyMap;
+	
 	UPROPERTY(Transient)
 	UTaskPromt* TaskPromtPtr = nullptr;
 };

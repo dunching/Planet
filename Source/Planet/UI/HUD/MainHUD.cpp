@@ -44,12 +44,15 @@ void AMainHUD::ShowHUD()
 void AMainHUD::InitalHUD()
 {
 	InitMainHUDLayout();
-	SwitchLayout(ELayoutCommon::kActionLayout);
+	SwitchLayout(ELayoutCommon::kActionLayout, nullptr);
 }
 
-void AMainHUD::SwitchLayout(ELayoutCommon MainHUDType)
+void AMainHUD::SwitchLayout(
+	ELayoutCommon MainHUDType,
+	const ILayoutInterfacetion::FOnQuit& OnQuit
+	)
 {
-	GetMainHUDLayout()->SwitchToNewLayout(MainHUDType);
+	GetMainHUDLayout()->SwitchToNewLayout(MainHUDType, OnQuit);
 }
 
 UMainHUDLayout* AMainHUD::GetMainHUDLayout() const
@@ -57,7 +60,10 @@ UMainHUDLayout* AMainHUD::GetMainHUDLayout() const
 	return MainHUDLayoutPtr;
 }
 
-void AMainHUD::OnHPChanged(const FOnAttributeChangeData&)
+void AMainHUD::OnHPChanged(
+	const FOnAttributeChangeData&
+	
+	)
 {
 	if (bShowHUD && PlayerOwner)
 	{
@@ -111,12 +117,12 @@ void AMainHUD::InitMainHUDLayout()
 					CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
 				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-					CharacterAttributesRef->GetMax_HPAttribute()
-				).AddUObject(this, &ThisClass::OnHPChanged);
+					 CharacterAttributesRef->GetMax_HPAttribute()
+					).AddUObject(this, &ThisClass::OnHPChanged);
 
 				CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-					CharacterAttributesRef->GetHPAttribute()
-				).AddUObject(this, &ThisClass::OnHPChanged);
+					 CharacterAttributesRef->GetHPAttribute()
+					).AddUObject(this, &ThisClass::OnHPChanged);
 
 				OnHPChangedImp();
 			}
@@ -125,33 +131,50 @@ void AMainHUD::InitMainHUDLayout()
 			{
 				auto Handle =
 					CharacterPtr->GetInventoryComponent()->OnSkillProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnSkillProxyChanged, ItemInfosPtr, std::placeholders::_1,
-						          std::placeholders::_2
-						));
+						 std::bind(
+						           &UGetItemInfosList::OnSkillProxyChanged,
+						           ItemInfosPtr,
+						           std::placeholders::_1,
+						           std::placeholders::_2
+						          )
+						);
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
 					CharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnCoinProxyChanged, ItemInfosPtr, std::placeholders::_1,
-						          std::placeholders::_2, std::placeholders::_3
-						));
+						 std::bind(
+						           &UGetItemInfosList::OnCoinProxyChanged,
+						           ItemInfosPtr,
+						           std::placeholders::_1,
+						           std::placeholders::_2,
+						           std::placeholders::_3
+						          )
+						);
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
 					CharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnConsumableProxyChanged, ItemInfosPtr, std::placeholders::_1,
-						          std::placeholders::_2
-						));
+						 std::bind(
+						           &UGetItemInfosList::OnConsumableProxyChanged,
+						           ItemInfosPtr,
+						           std::placeholders::_1,
+						           std::placeholders::_2
+						          )
+						);
 				Handle->bIsAutoUnregister = false;
 			}
 			{
 				auto Handle =
 					CharacterPtr->GetInventoryComponent()->OnGroupmateProxyChanged.AddCallback(
-						std::bind(&UGetItemInfosList::OnGourpmateProxyChanged, ItemInfosPtr, std::placeholders::_1,
-						          std::placeholders::_2
-						));
+						 std::bind(
+						           &UGetItemInfosList::OnGourpmateProxyChanged,
+						           ItemInfosPtr,
+						           std::placeholders::_1,
+						           std::placeholders::_2
+						          )
+						);
 				Handle->bIsAutoUnregister = false;
 			}
 #if TESTPLAYERCHARACTERHOLDDATA

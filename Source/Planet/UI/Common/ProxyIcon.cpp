@@ -38,7 +38,7 @@ void UProxyIcon::NativeOnMouseEnter(
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
-	if (BasicProxyPtr)
+	if (BasicProxyPtr && bIsDisplayInfo)
 	{
 		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(BasicProxyPtr->GetProxyType());
 		if (ProxyDTSPtr)

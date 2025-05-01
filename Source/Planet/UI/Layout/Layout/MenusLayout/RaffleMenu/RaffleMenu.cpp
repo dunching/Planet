@@ -133,8 +133,6 @@ void URaffleMenu::SetHoldItemProperty(const TSharedPtr<FSceneProxyContainer>& Ne
 	if (UIPtr)
 	{
 		auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GWorld, 0));
-
-		UIPtr->ResetUIByData(CharacterPtr->GetInventoryComponent()->GetCoinUintAry());
 	}
 }
 

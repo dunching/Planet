@@ -65,7 +65,7 @@ UTeamMatesHelperComponent* AGroupManagger::GetTeamMatesHelperComponent()
 	return TeamMatesHelperComponentPtr;
 }
 
-UInventoryComponent* AGroupManagger::GetHoldingItemsComponent()
+UInventoryComponent* AGroupManagger::GetInventoryComponent()
 {
 	return InventoryComponentPtr;
 }

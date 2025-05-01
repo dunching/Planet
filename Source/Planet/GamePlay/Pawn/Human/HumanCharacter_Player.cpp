@@ -63,12 +63,12 @@ void UCharacterPlayerStateProcessorComponent::FocusTarget()
 
 		FHitResult OutHit;
 		if (GetWorldImp()->LineTraceSingleByObjectType(
-			OutHit,
-			OutCamLoc,
-			OutCamLoc + (OutCamRot.Vector() * 1000),
-			ObjectQueryParams,
-			Params
-		))
+		                                               OutHit,
+		                                               OutCamLoc,
+		                                               OutCamLoc + (OutCamRot.Vector() * 1000),
+		                                               ObjectQueryParams,
+		                                               Params
+		                                              ))
 		{
 			auto FocusCharactersAry_ = GetTargetCharactersAry();
 			if (FocusCharactersAry_.IsValidIndex(0) && (FocusCharactersAry_[0] == OutHit.GetActor()))
@@ -91,7 +91,7 @@ void UCharacterPlayerStateProcessorComponent::FocusTarget()
 
 void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
 	ACharacterBase* TargetCharacterPtr
-)
+	)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
@@ -130,7 +130,7 @@ void UCharacterPlayerStateProcessorComponent::ClearFocusCharactersAry_Server_Imp
 
 void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry_Server_Implementation(
 	ACharacterBase* TargetCharacterPtr
-)
+	)
 {
 	SetFocusCharactersAry(TargetCharacterPtr);
 }
@@ -138,7 +138,7 @@ void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry_Server_Imple
 void UPlayerConversationComponent::DisplaySentence_Player(
 	const FTaskNode_Conversation_SentenceInfo& Sentence,
 	const std::function<void()>& SentenceStop_
-)
+	)
 {
 	SentenceStop = SentenceStop_;
 
@@ -152,19 +152,19 @@ void UPlayerConversationComponent::CloseConversationborder_Player()
 
 AHumanCharacter_Player::AHumanCharacter_Player(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(
-	  ObjectInitializer.
-	  SetDefaultSubobjectClass<UPlayerConversationComponent>(
-		  UPlayerConversationComponent::ComponentName
-	  ).
-	  SetDefaultSubobjectClass<USceneCharacterPlayerInteractionComponent>(
-		  USceneCharacterPlayerInteractionComponent::ComponentName
-	  ).
-	  SetDefaultSubobjectClass<UCharacterPlayerStateProcessorComponent>(
-		  UCharacterPlayerStateProcessorComponent::ComponentName
-	  )
-  )
+	) :
+	  Super(
+	        ObjectInitializer.
+	        SetDefaultSubobjectClass<UPlayerConversationComponent>(
+	                                                               UPlayerConversationComponent::ComponentName
+	                                                              ).
+	        SetDefaultSubobjectClass<USceneCharacterPlayerInteractionComponent>(
+	                                                                            USceneCharacterPlayerInteractionComponent::ComponentName
+	                                                                           ).
+	        SetDefaultSubobjectClass<UCharacterPlayerStateProcessorComponent>(
+	                                                                          UCharacterPlayerStateProcessorComponent::ComponentName
+	                                                                         )
+	       )
 {
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<UGravitySpringArmComponent>(TEXT("CameraBoom"));
@@ -188,7 +188,7 @@ void AHumanCharacter_Player::BeginPlay()
 
 void AHumanCharacter_Player::PossessedBy(
 	AController* NewController
-)
+	)
 {
 	Super::PossessedBy(NewController);
 
@@ -217,7 +217,7 @@ bool AHumanCharacter_Player::TeleportTo(
 	const FRotator& DestRotation,
 	bool bIsATest,
 	bool bNoCheck
-)
+	)
 {
 	PlayerComponentPtr->TeleportTo(DestLocation, DestRotation, bIsATest, bNoCheck);
 
@@ -226,7 +226,7 @@ bool AHumanCharacter_Player::TeleportTo(
 
 void AHumanCharacter_Player::SetupPlayerInputComponent(
 	UInputComponent* PlayerInputComponent
-)
+	)
 {
 	// 只在 ROLE_AutonomousProxy 运行
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -249,13 +249,13 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 	{
 		// 在SetPawn之后调用
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>(
-			[this](
-			auto NewProcessor
-		)
-			{
-				NewProcessor->SetPawn(Cast<ThisClass>(this));
-			}
-		);
+			 [this](
+			 auto NewProcessor
+			 )
+			 {
+				 NewProcessor->SetPawn(Cast<ThisClass>(this));
+			 }
+			);
 
 		// 
 		UGuideSubSystem::GetInstance()->InitializeMainThread();
@@ -266,7 +266,7 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 
 void AHumanCharacter_Player::OnGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
-)
+	)
 {
 	Super::OnGroupManaggerReady(NewGroupSharedInfoPtr);
 
@@ -325,12 +325,12 @@ void AHumanCharacter_Player::UpdateSightActor()
 
 	ISceneActorInteractionInterface* TempLookAtSceneObjPtr = nullptr;
 	if (GetWorld()->LineTraceSingleByChannel(
-			Result,
-			StartPt,
-			StopPt,
-			SceneActor_Channel,
-			Params
-		)
+	                                         Result,
+	                                         StartPt,
+	                                         StopPt,
+	                                         SceneActor_Channel,
+	                                         Params
+	                                        )
 	)
 	{
 		if (Cast<ISceneActorInteractionInterface>(Result.GetActor()))
@@ -373,16 +373,16 @@ TPair<FVector, FVector> AHumanCharacter_Player::GetCharacterViewInfo()
 	GetCameraComp()->GetCameraView(0, DesiredView);
 
 	TPair<FVector, FVector> Result(
-		DesiredView.Location,
-		DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
-	);
+	                               DesiredView.Location,
+	                               DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
+	                              );
 
 	return Result;
 }
 
 void AHumanCharacter_Player::StartLookAt(
 	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
-)
+	)
 {
 	if (SceneActorInteractionInterfacePtr)
 	{
@@ -417,7 +417,7 @@ void AHumanCharacter_Player::StartLookAt(
 
 void AHumanCharacter_Player::LookingAt(
 	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
-)
+	)
 {
 	if (SceneActorInteractionInterfacePtr)
 	{
@@ -441,7 +441,7 @@ void AHumanCharacter_Player::EndLookAt()
 
 bool AHumanCharacter_Player::InteractionSceneActor(
 	ASceneActor* SceneObjPtr
-)
+	)
 {
 	if (!SceneObjPtr)
 	{
@@ -469,13 +469,14 @@ bool AHumanCharacter_Player::InteractionSceneActor(
 		// 
 		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<
 			HumanProcessor::FHumanInteractionWithChallengeEntryProcessor>(
-			[SceneObjPtr](
-			auto NewProcessor
-		)
-			{
-				NewProcessor->TargetPtr = Cast<AChallengeEntry>(SceneObjPtr);
-			}
-		);
+			                                                              [SceneObjPtr](
+			                                                              auto NewProcessor
+			                                                              )
+			                                                              {
+				                                                              NewProcessor->TargetPtr = Cast<
+					                                                              AChallengeEntry>(SceneObjPtr);
+			                                                              }
+			                                                             );
 	}
 	else
 	{
@@ -490,7 +491,7 @@ bool AHumanCharacter_Player::InteractionSceneActor(
 
 bool AHumanCharacter_Player::InteractionSceneCharacter(
 	AHumanCharacter_AI* CharacterPtr
-)
+	)
 {
 	if (!CharacterPtr)
 	{
@@ -501,7 +502,7 @@ bool AHumanCharacter_Player::InteractionSceneCharacter(
 	{
 		return false;
 	}
-	
+
 	//
 	GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(CharacterPtr);
 
@@ -513,20 +514,20 @@ bool AHumanCharacter_Player::InteractionSceneCharacter(
 
 	// 
 	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanInteractionWithNPCProcessor>(
-		[CharacterPtr](
-		auto NewProcessor
-	)
-		{
-			NewProcessor->CharacterPtr = CharacterPtr;
-		}
-	);
+		 [CharacterPtr](
+		 auto NewProcessor
+		 )
+		 {
+			 NewProcessor->CharacterPtr = CharacterPtr;
+		 }
+		);
 
 	return true;
 }
 
 void AHumanCharacter_Player::InteractionSceneObj_Server_Implementation(
 	ASceneActor* SceneObjPtr
-)
+	)
 {
 	if (SceneObjPtr)
 	{

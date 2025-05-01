@@ -12,6 +12,7 @@
 #include "Planet.h"
 #include "ItemProxy_Minimal.h"
 #include "LayoutCommon.h"
+#include "LayoutInterfacetion.h"
 #include "MainMenuCommon.h"
 
 #include "UIManagerSubSystem.generated.h"
@@ -29,9 +30,10 @@ class PLANET_API UUIManagerSubSystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-
-	template<typename FWidgetType>
-	using FBeforeDisplayFunc = std::function<void(FWidgetType*)>;
+	template <typename FWidgetType>
+	using FBeforeDisplayFunc = std::function<void(
+		FWidgetType*
+		)>;
 
 	static UUIManagerSubSystem* GetInstance();
 
@@ -39,18 +41,24 @@ public:
 
 	virtual ~UUIManagerSubSystem();
 
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Initialize(
+		FSubsystemCollectionBase& Collection
+		) override;
 
 #pragma region Layout
-	void SwitchLayout(ELayoutCommon MainHUDType);
-#pragma endregion  
+	void SwitchLayout(
+		ELayoutCommon MainHUDType,
+		const ILayoutInterfacetion::FOnQuit& OnQuit = nullptr
+		);
+#pragma endregion
 
 #pragma region Menu
-	void SwitchMenuLayout(EMenuType MenuType);
+	void SwitchMenuLayout(
+		EMenuType MenuType
+		);
 #pragma endregion Menu
 
 protected:
 
 private:
-
 };

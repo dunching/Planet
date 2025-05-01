@@ -3,43 +3,52 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "AssetRefMap.h"
-#include "ConversationLayout.h"
 #include "GuideActor.h"
 #include "GuideInteraction.h"
 #include "GuideSubSystem.h"
 #include "GuideThread.h"
 #include "HumanCharacter_AI.h"
 #include "HumanCharacter_Player.h"
+#include "HumanTransactionProcessor.h"
+#include "InputProcessorSubSystem.h"
+#include "InteractionConversationLayout.h"
+#include "InteractionOptionsLayout.h"
 #include "MainHUD.h"
 #include "MainHUDLayout.h"
 #include "OptionList.h"
 #include "PlanetPlayerController.h"
 #include "TargetPoint_Runtime.h"
-
-
+#include "UIManagerSubSystem.h"
 
 class AMainHUD;
 
-UGameplayTask_Interaction::UGameplayTask_Interaction(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGameplayTask_Interaction::UGameplayTask_Interaction(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
 }
 
-void UGameplayTask_Interaction::SetTargetCharacterPtr(AHumanCharacter* InTargetCharacterPtr)
+void UGameplayTask_Interaction::SetTargetCharacterPtr(
+	AHumanCharacter_AI* InTargetCharacterPtr
+	)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
 }
 
-void UGameplayTask_Interaction::SetGuideInteractionActor(AGuideInteraction_Actor* InTargetCharacterPtr)
+void UGameplayTask_Interaction::SetGuideInteractionActor(
+	AGuideInteraction_Actor* InTargetCharacterPtr
+	)
 {
 	GuideActorPtr = InTargetCharacterPtr;
 }
 
 UGameplayTask_Interaction_Conversation::UGameplayTask_Interaction_Conversation(
-	const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -49,10 +58,16 @@ void UGameplayTask_Interaction_Conversation::Activate()
 {
 	Super::Activate();
 
+	UUIManagerSubSystem::GetInstance()->SwitchLayout(
+													 ELayoutCommon::kConversationLayout
+													);
+	
 	ConditionalPerformTask();
 }
 
-void UGameplayTask_Interaction_Conversation::TickTask(float DeltaTime)
+void UGameplayTask_Interaction_Conversation::TickTask(
+	float DeltaTime
+	)
 {
 	Super::TickTask(DeltaTime);
 
@@ -60,7 +75,7 @@ void UGameplayTask_Interaction_Conversation::TickTask(float DeltaTime)
 	{
 		EndTask();
 	}
-	
+
 	RemainingTime -= DeltaTime;
 
 	if (RemainingTime <= 0.f)
@@ -76,7 +91,9 @@ void UGameplayTask_Interaction_Conversation::TickTask(float DeltaTime)
 	}
 }
 
-void UGameplayTask_Interaction_Conversation::OnDestroy(bool bInOwnerFinished)
+void UGameplayTask_Interaction_Conversation::OnDestroy(
+	bool bInOwnerFinished
+	)
 {
 	if (PlayerCharacterPtr)
 	{
@@ -88,7 +105,7 @@ void UGameplayTask_Interaction_Conversation::OnDestroy(bool bInOwnerFinished)
 
 void UGameplayTask_Interaction_Conversation::SetUp(
 	const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry
-)
+	)
 {
 	ConversationsAry = InConversationsAry;
 }
@@ -101,7 +118,13 @@ void UGameplayTask_Interaction_Conversation::ConditionalPerformTask()
 
 		RemainingTime = Ref.DelayTime;
 
-		PlayerCharacterPtr->GetConversationComponent()->DisplaySentence_Player(Ref,std::bind(&ThisClass::CurrentSentenceStop, this));
+		PlayerCharacterPtr->GetConversationComponent()->DisplaySentence_Player(
+		                                                                       Ref,
+		                                                                       std::bind(
+			                                                                        &ThisClass::CurrentSentenceStop,
+			                                                                        this
+			                                                                       )
+		                                                                      );
 	}
 
 	SentenceIndex++;
@@ -112,8 +135,10 @@ void UGameplayTask_Interaction_Conversation::CurrentSentenceStop()
 	RemainingTime = 0.f;
 }
 
-UGameplayTask_Interaction_Option::UGameplayTask_Interaction_Option(const FObjectInitializer& ObjectInitializer)
-	: Super(ObjectInitializer)
+UGameplayTask_Interaction_Option::UGameplayTask_Interaction_Option(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -126,7 +151,9 @@ void UGameplayTask_Interaction_Option::Activate()
 	ConditionalPerformTask();
 }
 
-void UGameplayTask_Interaction_Option::TickTask(float DeltaTime)
+void UGameplayTask_Interaction_Option::TickTask(
+	float DeltaTime
+	)
 {
 	Super::TickTask(DeltaTime);
 
@@ -145,14 +172,16 @@ void UGameplayTask_Interaction_Option::TickTask(float DeltaTime)
 	}
 }
 
-void UGameplayTask_Interaction_Option::OnDestroy(bool bInOwnerFinished)
+void UGameplayTask_Interaction_Option::OnDestroy(
+	bool bInOwnerFinished
+	)
 {
 	Super::OnDestroy(bInOwnerFinished);
 }
 
 void UGameplayTask_Interaction_Option::SetUp(
 	const TSoftObjectPtr<UPAD_TaskNode_Interaction_Option>& InTaskNodeRef
-)
+	)
 {
 }
 
@@ -175,20 +204,35 @@ void UGameplayTask_Interaction_Option::ConditionalPerformTask()
 	Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
 		->GetHUD<AMainHUD>()
 		->GetMainHUDLayout()
-		->GetConversationLayout()
+		->GetInteractionOptionsLayout()
 		->GetOptions()->UpdateDisplay(OptionAry, std::bind(&ThisClass::OnSelected, this, std::placeholders::_1));
 }
 
-void UGameplayTask_Interaction_Option::OnSelected(int32 Index)
+void UGameplayTask_Interaction_Option::OnSelected(
+	int32 Index
+	)
 {
 	Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
 		->GetHUD<AMainHUD>()
 		->GetMainHUDLayout()
-		->GetConversationLayout()
+		->GetInteractionOptionsLayout()
 		->CloseOption();
 
 	SelectedIndex = Index;
 
 	StateTreeRunStatus = EStateTreeRunStatus::Succeeded;
 	EndTask();
+}
+
+void UGameplayTask_Interaction_Transaction::Activate()
+{
+	Super::Activate();
+
+	UUIManagerSubSystem::GetInstance()->SwitchLayout(
+	                                                 ELayoutCommon::kTransactionLayout,
+	                                                 [this]()
+	                                                 {
+		                                                 EndTask();
+	                                                 }
+	                                                );
 }

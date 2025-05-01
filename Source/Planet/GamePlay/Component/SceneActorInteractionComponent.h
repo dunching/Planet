@@ -64,6 +64,8 @@ public:
 
 	TArray<TSubclassOf<AGuideInteraction_Actor>> GetInteractionLists() const;
 
+	TObjectPtr<AGuideInteraction_Actor> GetCurrentInteraction() const;
+	
 	TArray<FGuideInterationSetting> GetGuideInteractionAry() const;
 
 	virtual void StartInteractionItem(

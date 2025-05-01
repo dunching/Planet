@@ -128,7 +128,7 @@ void UAllocationSkillsMenu::ResetUIByData()
 
 	InitialGroupmateList();
 
-	ResetUI(CharacterPtr->GetCharacterProxy(), CharacterPtr->GetCharacterProxy());
+	ResetUI(CharacterPtr->GetCharacterProxy());
 }
 
 void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
@@ -478,21 +478,12 @@ void UAllocationSkillsMenu::BindEvent()
 }
 
 void UAllocationSkillsMenu::ResetUI(
-	const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr,
 	const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 )
 {
-	CurrentProxyPtr = TargetCharacterProxyPtr;
-	if (TargetCharacterProxyPtr == PlayerCharacterProxyPtr)
-	{
-		ResetBackpack(nullptr, PlayerCharacterProxyPtr);
-	}
-	else
-	{
-		ResetBackpack(nullptr, PlayerCharacterProxyPtr);
-	}
-	
-	ResetUIByData_WeaponSkills(TargetCharacterProxyPtr);
+	CurrentProxyPtr = PlayerCharacterProxyPtr;
+	ResetBackpack(PlayerCharacterProxyPtr);
+	ResetUIByData_WeaponSkills(CurrentProxyPtr);
 	ResetUIByData_Skills(CurrentProxyPtr);
 	ResetUIByData_Consumable(CurrentProxyPtr);
 }
@@ -534,30 +525,10 @@ void UAllocationSkillsMenu::InitialGroupmateList()
 }
 
 void UAllocationSkillsMenu::ResetBackpack(
-	const TSharedPtr<FCharacterProxy>& AICharacterProxyPtr,
 	const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 )
 {
-	if (AICharacterProxyPtr)
-	{
-	}
-	{
-		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().TargetBackpack));
-
-		UIPtr->CurrentProxyPtr = AICharacterProxyPtr;
-
-		{
-			auto Delegate =
-				UIPtr->OnDragIconDelegate.AddCallback(
-					std::bind(&ThisClass::OnItemProxyDragIcon, this, std::placeholders::_1, std::placeholders::_2));
-			Delegate->bIsAutoUnregister = false;
-		}
-
-		UIPtr->ResetUIByData();
-	}
 	if (PlayerCharacterProxyPtr)
-	{
-	}
 	{
 		auto UIPtr = Cast<UBackpackMenu>(GetWidgetFromName(FAllocationSkillsMenu::Get().PlayerBackpack));
 
@@ -693,7 +664,7 @@ void UAllocationSkillsMenu::OnSelectedCharacterProxy(const TSharedPtr<FCharacter
 
 				SyncData();
 
-				ResetUI(ProxyPtr, CharacterPtr->GetCharacterProxy());
+				ResetUI(CharacterPtr->GetCharacterProxy());
 
 				continue;
 			}

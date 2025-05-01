@@ -275,7 +275,7 @@ AGroupManagger* ACharacterBase::GetGroupManagger() const
 
 UInventoryComponent* ACharacterBase::GetInventoryComponent() const
 {
-	return GroupManaggerPtr ? GroupManaggerPtr->GetHoldingItemsComponent() : nullptr;
+	return GroupManaggerPtr ? GroupManaggerPtr->GetInventoryComponent() : nullptr;
 }
 
 UCharacterAttributesComponent* ACharacterBase::GetCharacterAttributesComponent() const

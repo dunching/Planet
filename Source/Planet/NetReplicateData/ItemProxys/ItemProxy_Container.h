@@ -47,6 +47,10 @@ struct PLANET_API FProxy_FASI : public FFastArraySerializerItem
 
 	TSharedPtr<FBasicProxy> ProxySPtr = nullptr;
 
+private:
+	
+	TSharedPtr<FBasicProxy> CacheProxySPtr = nullptr;
+
 };
 
  template<>

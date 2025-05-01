@@ -15,9 +15,12 @@ struct FInputKeyEventArgs;
 
 class FViewport;
 class APawn;
+class UInputProcessorSubSystem;
 
 class FInputProcessor
 {
+	friend UInputProcessorSubSystem;
+	
 public:
 
 	GENERATIONCLASSINFOONLYTHIS(FInputProcessor);
@@ -25,6 +28,8 @@ public:
 	using FOwnerPawnType = APawn;
 
 	using FOnQuitComplete = std::function<void()>;
+
+	using FOnQuitFunc = std::function<void()>;
 
 	FInputProcessor(FOwnerPawnType* CharacterPtr);
 
@@ -98,4 +103,6 @@ private:
 	const float Frequency = 1.f / 60;
 
 	FTSTicker::FDelegateHandle TickDelegateHandle;
+
+	FOnQuitFunc OnQuitFunc;
 };

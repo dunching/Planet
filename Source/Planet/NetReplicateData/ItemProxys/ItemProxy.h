@@ -34,6 +34,7 @@ class IPlanetControllerInterface;
 class APlanetPlayerState;
 class APlanetGameMode;
 
+class UItemProxy_Description;
 class USkill_Base;
 class ACharacterBase;
 class AHumanCharacter_AI;
@@ -130,6 +131,8 @@ public:
 	//  取消
 	virtual void End();
 
+	virtual int32 GetNum()const;
+
 	IDType GetID() const;
 
 	FGameplayTag GetProxyType() const;
@@ -141,8 +144,18 @@ public:
 
 	void Update2Client();
 
-	UInventoryComponent*GetInventoryComponent() const;
+	TObjectPtr<UItemProxy_Description>GetItemProxy_Description()const;
 	
+	UInventoryComponent*GetInventoryComponent() const;
+
+private:
+
+	/**
+	 * 是否是唯一的，比如货币
+	 * @return 
+	 */
+	virtual bool IsUnique()const;
+
 protected:
 	
 	// 装备至插槽
@@ -153,15 +166,16 @@ protected:
 
 	FTableRowProxy* GetTableRowProxy() const;
 
+	// Root组件,不为空
+	UInventoryComponent* InventoryComponentPtr = nullptr;
+	
+private:
+	
 	UPROPERTY(Transient)
 	FGameplayTag ProxyType = FGameplayTag::EmptyTag;
 
 	IDType ID;
 
-	// Root组件,不为空
-	UInventoryComponent* InventoryComponentPtr = nullptr;
-
-private:
 };
 
 template <>
@@ -238,7 +252,7 @@ public:
 
 	FToolProxy();
 
-	int32 GetNum() const;
+	virtual int32 GetNum() const override;
 
 	int32 DamageDegree = 0;
 

@@ -60,7 +60,7 @@ public:
 
 	UTeamMatesHelperComponent* GetTeamMatesHelperComponent();
 
-	UInventoryComponent* GetHoldingItemsComponent();
+	UInventoryComponent* GetInventoryComponent();
 
 	void SetOwnerCharacterProxyPtr(ACharacterBase*CharacterPtr);
 	

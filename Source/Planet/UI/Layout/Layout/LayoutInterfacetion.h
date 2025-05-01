@@ -14,6 +14,8 @@
 
 #include "LayoutInterfacetion.generated.h"
 
+class UMainHUDLayout;
+
 UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
 class ULayoutInterfacetion : public UInterface
 {
@@ -24,8 +26,12 @@ class PLANET_API ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
+	friend UMainHUDLayout;
+	
 public:
 
+	using FOnQuit = std::function<void()>;
+	
 	virtual void Enable();
 	
 	virtual void DisEnable();
@@ -38,4 +44,6 @@ protected:
 	
 private:
 
+	FOnQuit OnQuit;
+	
 };

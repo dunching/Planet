@@ -75,7 +75,7 @@ void UGroupManaggerMenu::ResetGroupmates()
 	}
 
 	auto GroupManaggerPtr = PlayerCharacterPtr->GetGroupManagger();
-	auto HICPtr = GroupManaggerPtr->GetHoldingItemsComponent();
+	auto HICPtr = GroupManaggerPtr->GetInventoryComponent();
 
 	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)

@@ -37,7 +37,7 @@ public:
 
 	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) = 0;
 
-	virtual UInventoryComponent* GetHoldingItemsComponent()const = 0;
+	virtual UInventoryComponent* GetInventoryComponent()const = 0;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const = 0;
 

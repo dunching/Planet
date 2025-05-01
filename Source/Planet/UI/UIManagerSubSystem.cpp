@@ -37,12 +37,15 @@ struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>
 UUIManagerSubSystem* UUIManagerSubSystem::GetInstance()
 {
 	return Cast<UUIManagerSubSystem>(
-		USubsystemBlueprintLibrary::GetGameInstanceSubsystem(GetWorldImp(), UUIManagerSubSystem::StaticClass())
-	);
+	                                 USubsystemBlueprintLibrary::GetGameInstanceSubsystem(
+		                                  GetWorldImp(),
+		                                  UUIManagerSubSystem::StaticClass()
+		                                 )
+	                                );
 }
 
 UUIManagerSubSystem::UUIManagerSubSystem() :
-	Super()
+                                           Super()
 {
 }
 
@@ -50,17 +53,24 @@ UUIManagerSubSystem::~UUIManagerSubSystem()
 {
 }
 
-void UUIManagerSubSystem::Initialize(FSubsystemCollectionBase& Collection)
+void UUIManagerSubSystem::Initialize(
+	FSubsystemCollectionBase& Collection
+	)
 {
 	Super::Initialize(Collection);
 }
 
-void UUIManagerSubSystem::SwitchLayout(ELayoutCommon MainHUDType)
+void UUIManagerSubSystem::SwitchLayout(
+	ELayoutCommon MainHUDType,
+	const ILayoutInterfacetion::FOnQuit& OnQuit
+	)
 {
-	UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AMainHUD>()->SwitchLayout(MainHUDType);
+	UGameplayStatics::GetPlayerController(this, 0)->GetHUD<AMainHUD>()->SwitchLayout(MainHUDType, OnQuit);
 }
 
-void UUIManagerSubSystem::SwitchMenuLayout(EMenuType MenuType)
+void UUIManagerSubSystem::SwitchMenuLayout(
+	EMenuType MenuType
+	)
 {
 	auto MenuLayoutPtr = UGameplayStatics::GetPlayerController(this, 0)
 	                     ->GetHUD<AMainHUD>()

@@ -85,6 +85,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/Animation/Human");
         PublicIncludePaths.Add("Planet/Transition");
         PublicIncludePaths.Add("Planet/UI");
+        PublicIncludePaths.Add("Planet/UI/Common");
         PublicIncludePaths.Add("Planet/UI/Hover");
         PublicIncludePaths.Add("Planet/UI/Hover/DestroyProgress");
         PublicIncludePaths.Add("Planet/UI/Hover/CharacterRisingTips");
@@ -99,11 +100,13 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Layout/Team");
         PublicIncludePaths.Add("Planet/UI/Layout/GuideList");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/TransactionLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/ActionLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/BuildingLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/EndangeredLayout");
-        PublicIncludePaths.Add("Planet/UI/Layout/Layout/ConversationLayout");
-        PublicIncludePaths.Add("Planet/UI/Layout/Layout/ConversationLayout/PlayerConversationBorder");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/InteractionOptionsLayout");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/InteractionConversationLayout");
+        PublicIncludePaths.Add("Planet/UI/Layout/Layout/InteractionTransitionLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common/CoinList");
@@ -117,7 +120,6 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/RaffleMenu");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/ViewMap");
         PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/ViewTasks");
-        PublicIncludePaths.Add("Planet/UI/Layout/Layout/TransitionLayout");
         PublicIncludePaths.Add("Planet/AI");
         PublicIncludePaths.Add("Planet/AI/AITask");
         PublicIncludePaths.Add("Planet/AI/EQS");
@@ -149,6 +151,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HorseProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor");
+        PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/TransactionProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/ActionProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/EndangeredProcessor");
         PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/InteractionProcessor");

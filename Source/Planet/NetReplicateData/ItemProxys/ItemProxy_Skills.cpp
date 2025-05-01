@@ -497,7 +497,7 @@ FTableRowProxy_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 	}
 
 	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(
-		*ProxyType.ToString(),
+		*GetProxyType().ToString(),
 		TEXT("GetProxy")
 	);
 	return SceneProxyExtendInfoPtr;

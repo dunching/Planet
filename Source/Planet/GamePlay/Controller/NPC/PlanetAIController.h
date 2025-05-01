@@ -46,7 +46,7 @@ public:
 
 	virtual void SetGroupSharedInfo(AGroupManagger*GroupManaggerPtr) override;
 
-	virtual UInventoryComponent* GetHoldingItemsComponent()const override;
+	virtual UInventoryComponent* GetInventoryComponent()const override;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent()const override;
 

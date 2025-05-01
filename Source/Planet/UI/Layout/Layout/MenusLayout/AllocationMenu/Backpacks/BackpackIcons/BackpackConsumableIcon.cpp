@@ -53,7 +53,7 @@ void UBackpackConsumableIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& I
 	if (InBasicProxyPtr && InBasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
 		ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(InBasicProxyPtr);
-		SetNum(ProxyPtr->GetCurrentValue());
+		SetNum(ProxyPtr->GetNum());
 	}
 }
 

@@ -42,7 +42,7 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 		auto CoinProxyPtr = HoldItemPropertyRef->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_RaffleLimit);
 		if (CoinProxyPtr)
 		{
-			if (CoinProxyPtr->GetCurrentValue() > Count)
+			if (CoinProxyPtr->GetNum() > Count)
 			{
 				CoinProxyPtr->AddCurrentValue(-Count);
 				return RafflePermanent(Count);

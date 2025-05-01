@@ -1,6 +1,5 @@
 #include "SceneActorInteractionComponent.h"
 
-#include "ConversationLayout.h"
 #include "Kismet/GameplayStatics.h"
 
 #include "HumanCharacter_AI.h"
@@ -35,6 +34,11 @@ TArray<TSubclassOf<AGuideInteraction_Actor>> USceneActorInteractionComponent::Ge
 	}
 
 	return Results;
+}
+
+TObjectPtr<AGuideInteraction_Actor> USceneActorInteractionComponent::GetCurrentInteraction() const
+{
+	return GuideInteractionActorPtr;
 }
 
 TArray<FGuideInterationSetting> USceneActorInteractionComponent::GetGuideInteractionAry() const

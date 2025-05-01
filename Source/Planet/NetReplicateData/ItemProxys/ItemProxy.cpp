@@ -67,7 +67,9 @@ void FBasicProxy::InitialProxy(const FGameplayTag& InProxyType)
 
 void FBasicProxy::UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr)
 {
+	GetInventoryComponent()->UpdateID(RemoteSPtr->ID, ID);
 	ID = RemoteSPtr->ID;
+	
 	ProxyType = RemoteSPtr->ProxyType;
 }
 
@@ -87,6 +89,16 @@ void FBasicProxy::Cancel()
 
 void FBasicProxy::End()
 {
+}
+
+int32 FBasicProxy::GetNum() const
+{
+	return 1;
+}
+
+int32 FToolProxy::GetNum() const
+{
+	return FAllocationbleProxy::GetNum();
 }
 
 void FBasicProxy::Allocation()
@@ -123,9 +135,21 @@ void FBasicProxy::Update2Client()
 	InventoryComponentPtr->Proxy_Container.UpdateItem(GetID());
 }
 
+TObjectPtr<UItemProxy_Description> FBasicProxy::GetItemProxy_Description() const
+{
+	auto TableRowPtr = GetTableRowProxy();
+
+	return TableRowPtr->ItemProxy_Description.LoadSynchronous();
+}
+
 UInventoryComponent* FBasicProxy::GetInventoryComponent() const
 {
 	return InventoryComponentPtr;
+}
+
+bool FBasicProxy::IsUnique() const
+{
+	return false;
 }
 
 FString FBasicProxy::GetProxyName() const
@@ -185,11 +209,6 @@ FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(const FGa
 
 FToolProxy::FToolProxy()
 {
-}
-
-int32 FToolProxy::GetNum() const
-{
-	return Num;
 }
 
 TWeakPtr<FCharacterProxy> FAllocationbleProxy::GetAllocationCharacterProxy()

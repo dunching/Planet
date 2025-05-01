@@ -25,12 +25,14 @@ class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
 class ACharacterBase;
 class AHumanCharacter;
+class AHumanCharacter_AI;
 class AHumanCharacter_Player;
 class UGloabVariable_Interaction;
 class UGameplayTask_Base;
 class UGameplayTask_Interaction_Conversation;
 class UGameplayTask_Interaction_Option;
 class UGameplayTask_Interaction_NotifyGuideThread;
+class UGameplayTask_Interaction_Transaction;
 
 #pragma region 与 NPC交互的任务 选项对话
 USTRUCT()
@@ -89,7 +91,6 @@ struct PLANET_API FSTID_GuideInteractionConversation :
 {
 	GENERATED_BODY()
 
-
 	UPROPERTY(Transient)
 	TObjectPtr<UGameplayTask_Interaction_Conversation> GameplayTaskPtr = nullptr;
 
@@ -97,7 +98,7 @@ struct PLANET_API FSTID_GuideInteractionConversation :
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = Context)
-	TObjectPtr<AHumanCharacter> TargetCharacterPtr = nullptr;
+	TObjectPtr<AHumanCharacter_AI> TargetCharacterPtr = nullptr;
 	
 	UPROPERTY(EditAnywhere, Category = Param)
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
@@ -207,6 +208,48 @@ struct PLANET_API FSTT_GuideInteraction_ChangeNPCsTaskState :
 	virtual void ExitState(
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
+	) const override;
+
+protected:
+};
+#pragma endregion
+
+#pragma region 与商人进行交易，打开交易界面
+USTRUCT()
+struct PLANET_API FSTID_GuideInteraction_Transaction :
+	public FSTID_GuideInteractionTaskBase
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(Transient)
+	TObjectPtr<UGameplayTask_Interaction_Transaction> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(Transient)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = Context)
+	TObjectPtr<AHumanCharacter_AI> TargetCharacterPtr = nullptr;
+	
+};
+
+USTRUCT()
+struct PLANET_API FSTT_GuideInteraction_Transaction :
+	public FSTT_GuideInteractionBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideInteraction_Transaction;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
 	) const override;
 
 protected:

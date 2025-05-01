@@ -49,16 +49,20 @@ public:
 
 	void AddCurrentValue(int32 val);
 
-	int32 GetCurrentValue()const;
+	virtual int32 GetNum()const override;
 
 	int32 GetOffsetNum()const;
 
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 
+private:
+	
+	virtual bool IsUnique()const override;
+
 protected:
 
 	// 总数
-	int32 Num = 1;
+	int32 Num = 0;
 
 	// 这次的增量/减量
 	int32 OffsetNum = 0;

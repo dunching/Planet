@@ -4,19 +4,20 @@
 
 #include "Components/Border.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/CanvasPanel.h"
 
 #include "MainHUDLayout.h"
 
-#include "ConversationLayout.h"
+#include "InteractionConversationLayout.h"
 #include "UICommon.h"
 #include "PlanetPlayerController.h"
 #include "GetItemInfosList.h"
 #include "InteractionList.h"
+#include "InteractionOptionsLayout.h"
 #include "LayoutCommon.h"
 #include "LayoutInterfacetion.h"
 #include "MainMenuLayout.h"
 #include "RegularActionLayout.h"
-#include "Components/CanvasPanel.h"
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
@@ -40,7 +41,7 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 void UMainHUDLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FMainHUDLayout::Get().ItemDecriptionCanvas));
 	if (UIPtr)
 	{
@@ -48,7 +49,10 @@ void UMainHUDLayout::NativeConstruct()
 	}
 }
 
-void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
+void UMainHUDLayout::SwitchToNewLayout(
+	ELayoutCommon LayoutCommon,
+	const ILayoutInterfacetion::FOnQuit& OnQuit
+	)
 {
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
 	if (UIPtr)
@@ -78,6 +82,7 @@ void UMainHUDLayout::SwitchToNewLayout(ELayoutCommon LayoutCommon)
 			{
 				continue;
 			}
+			MenuInterfacePtr->OnQuit = OnQuit;
 			MenuInterfacePtr->Enable();
 			UIPtr->SetActiveWidget(Iter);
 			break;
@@ -103,7 +108,7 @@ UMainMenuLayout* UMainHUDLayout::GetMenuLayout()
 	return nullptr;
 }
 
-UConversationLayout* UMainHUDLayout::GetConversationLayout()
+UInteractionConversationLayout* UMainHUDLayout::GetConversationLayout()
 {
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
 	if (UIPtr)
@@ -111,7 +116,25 @@ UConversationLayout* UMainHUDLayout::GetConversationLayout()
 		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
 		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kConversationLayout))
 		{
-			auto LayoutUIPtr = Cast<UConversationLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			auto LayoutUIPtr = Cast<UInteractionConversationLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
+			if (LayoutUIPtr)
+			{
+				return LayoutUIPtr;
+			}
+		}
+	}
+	return nullptr;
+}
+
+UInteractionOptionsLayout* UMainHUDLayout::GetInteractionOptionsLayout()
+{
+	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
+	if (UIPtr)
+	{
+		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
+		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kOptionLayout))
+		{
+			auto LayoutUIPtr = Cast<UInteractionOptionsLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
 			if (LayoutUIPtr)
 			{
 				return LayoutUIPtr;
@@ -159,7 +182,9 @@ UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 	return nullptr;
 }
 
-void UMainHUDLayout::SwitchIsLowerHP(bool bIsLowerHP)
+void UMainHUDLayout::SwitchIsLowerHP(
+	bool bIsLowerHP
+	)
 {
 }
 

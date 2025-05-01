@@ -28,8 +28,6 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	virtual void ResetUIByData(const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& CoinMap);
-
 protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")

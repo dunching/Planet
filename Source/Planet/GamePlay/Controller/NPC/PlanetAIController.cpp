@@ -74,7 +74,7 @@ void APlanetAIController::SetGroupSharedInfo(
 	OnGroupManaggerReady(GroupManaggerPtr);
 }
 
-UInventoryComponent* APlanetAIController::GetHoldingItemsComponent() const
+UInventoryComponent* APlanetAIController::GetInventoryComponent() const
 {
 	return GetPawn<FPawnType>()->GetInventoryComponent();
 }

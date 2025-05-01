@@ -107,7 +107,7 @@ void UTeamMatesHelperComponent::UpdateTeammateConfig_Server_Implementation(
 )
 {
 	const auto CharacterProxySPtr =
-		GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(ProxtID);
+		GetOwner<FOwnerType>()->GetInventoryComponent()->FindProxy_Character(ProxtID);
 
 	UpdateTeammateConfig(CharacterProxySPtr, Index);
 }
@@ -132,7 +132,7 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 		for (int32 SecondIndex = 0; SecondIndex < CharactersAry[Index].Num(); SecondIndex++)
 		{
 			const auto CharacterProxySPtr =
-				GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(
+				GetOwner<FOwnerType>()->GetInventoryComponent()->FindProxy_Character(
 					CharactersAry[Index][SecondIndex]
 				);
 			if (CharacterProxySPtr)
@@ -348,7 +348,7 @@ void UTeamMatesHelperComponent::TeammateCharacter_ActiveWeapon_Server_Implementa
 		for (int32 SecondIndex = 0; SecondIndex < CharactersAry[Index].Num(); SecondIndex++)
 		{
 			const auto CharacterProxySPtr =
-				GetOwner<FOwnerType>()->GetHoldingItemsComponent()->FindProxy_Character(
+				GetOwner<FOwnerType>()->GetInventoryComponent()->FindProxy_Character(
 					CharactersAry[Index][SecondIndex]
 				);
 			if (CharacterProxySPtr)

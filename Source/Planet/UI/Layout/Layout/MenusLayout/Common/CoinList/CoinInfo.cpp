@@ -1,4 +1,3 @@
-
 #include "CoinInfo.h"
 
 #include "Kismet/GameplayStatics.h"
@@ -13,56 +12,66 @@
 #include "TalentAllocationComponent.h"
 #include "TalentIcon.h"
 #include "GameplayTagsLibrary.h"
+#include "HumanCharacter_AI.h"
+#include "HumanCharacter_Player.h"
+#include "InventoryComponent.h"
 #include "TemplateHelper.h"
+#include "ProxyIcon.h"
 
-namespace CoinInfo
+struct FCoinInfo : public TStructVariable<FCoinInfo>
 {
 	const FName Number = TEXT("Number");
 
+	const FName ProxyIcon = TEXT("ProxyIcon");
+
 	const FName Texture = TEXT("Texture");
-}
+};
 
 void UCoinInfo::NativeConstruct()
 {
 	Super::NativeConstruct();
-}
 
-void UCoinInfo::NativeDestruct()
-{
-	if (OnNumChanged)
+	auto CharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
 	{
-		OnNumChanged->UnBindCallback();
+		return;
 	}
 
-	Super::NativeDestruct();
-}
-
-void UCoinInfo::InvokeReset(UUserWidget* BaseWidgetPtr)
-{
-
-}
-
-void UCoinInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
-{
-	if (BasicProxyPtr && BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
-		ProxyPtr = DynamicCastSharedPtr<FCoinProxy>(BasicProxyPtr);
+		auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FCoinInfo::Get().ProxyIcon));
+		if (ProxyIconPtr)
+		{
+			auto CoinProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Coin(CoinType);
+			if (CoinProxySPtr)
+			{
+				SetNum(CoinProxySPtr->GetNum());
+				ProxyIconPtr->ResetToolUIByData(CoinProxySPtr);
+			}
+			else
+			{
+				GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ThisClass::RemoveFromParent));
+			}
+		}
 
-		OnNumChanged = ProxyPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
-
-		SetNum(ProxyPtr->GetCurrentValue());
-		SetItemType();
+		auto Handle =
+			CharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
+				 std::bind(
+				           &ThisClass::OnCoinProxyChanged,
+				           this,
+				           std::placeholders::_1,
+				           std::placeholders::_2,
+				           std::placeholders::_3
+				          )
+				);
+		Handle->bIsAutoUnregister = false;
 	}
 }
 
-void UCoinInfo::EnableIcon(bool bIsEnable)
+void UCoinInfo::SetNum(
+	int32 NewNum
+	)
 {
-
-}
-
-void UCoinInfo::SetNum(int32 NewNum)
-{
-	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(CoinInfo::Number));
+	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FCoinInfo::Get().Number));
 	if (!NumTextPtr)
 	{
 		return;
@@ -75,16 +84,22 @@ void UCoinInfo::SetNum(int32 NewNum)
 	}
 	else
 	{
-		checkNoEntry();
-		NumTextPtr->SetText(FText::FromString(TEXT("无效")));
+		// checkNoEntry();
+		const auto NumStr = FString::Printf(TEXT("%d"), NewNum);
+
+		NumTextPtr->SetText(FText::FromString(NumStr));
 	}
 }
 
-void UCoinInfo::SetItemType()
+void UCoinInfo::OnCoinProxyChanged(
+	const TSharedPtr<
+		FCoinProxy>& CoinProxySPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num
+	)
 {
-	auto ImagePtr = Cast<UImage>(GetWidgetFromName(CoinInfo::Texture));
-	if (ImagePtr)
+	if (CoinProxySPtr)
 	{
-			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
+		SetNum(CoinProxySPtr->GetNum());
 	}
 }

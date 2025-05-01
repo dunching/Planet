@@ -48,36 +48,36 @@
 #include "PlayerGameplayTasks.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
-	TEXT("PlanetPlayerController.DrawControllerRotation"),
-	0,
-	TEXT("")
-	TEXT(" default: 0")
-);
+	 TEXT("PlanetPlayerController.DrawControllerRotation"),
+	 0,
+	 TEXT("")
+	 TEXT(" default: 0")
+	);
 
 APlanetPlayerController::APlanetPlayerController(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 	EventSubjectComponentPtr = CreateDefaultSubobject<UEventSubjectComponent>(
-		UEventSubjectComponent::ComponentName
-	);
+	                                                                          UEventSubjectComponent::ComponentName
+	                                                                         );
 
 	GameplayTasksComponentPtr = CreateDefaultSubobject<UPlayerControllerGameplayTasksComponent>(
-		UPlayerControllerGameplayTasksComponent::ComponentName
-	);
+		 UPlayerControllerGameplayTasksComponent::ComponentName
+		);
 }
 
 void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
 	const TSoftObjectPtr<AGeneratorColony_ByInvoke>& GeneratorBasePtr
-)
+	)
 {
 	GeneratorBasePtr->SpawnGeneratorActor();
 }
 
 void APlanetPlayerController::ServerDestroyActor_Implementation(
 	AActor* ActorPtr
-)
+	)
 {
 	if (ActorPtr)
 	{
@@ -89,13 +89,13 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	TSubclassOf<AHumanCharacter_AI> CharacterClass,
 	const FGuid& ID,
 	const FTransform& Transform
-)
+	)
 {
 	FActorSpawnParameters SpawnParameters;
 
 	SpawnParameters.CustomPreSpawnInitalization = [this, ID](
 		auto ActorPtr
-	)
+		)
 		{
 			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
 			if (AICharacterPtr)
@@ -106,10 +106,10 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 
 	auto Result =
 		GetWorld()->SpawnActor<AHumanCharacter_AI>(
-			CharacterClass,
-			Transform,
-			SpawnParameters
-		);
+		                                           CharacterClass,
+		                                           Transform,
+		                                           SpawnParameters
+		                                          );
 	if (Result)
 	{
 	}
@@ -119,7 +119,7 @@ void APlanetPlayerController::ChangedInterationTaskState_Implementation(
 	AHumanCharacter_AI* HumanCharacterPtr,
 	TSubclassOf<AGuideInteraction_Actor> Item,
 	bool bIsEnable
-)
+	)
 {
 	if (HumanCharacterPtr)
 	{
@@ -129,7 +129,7 @@ void APlanetPlayerController::ChangedInterationTaskState_Implementation(
 
 void APlanetPlayerController::IncreaseCD_Implementation(
 	int32 CD
-)
+	)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(GetPawn());
 	if (CharacterPtr)
@@ -139,23 +139,41 @@ void APlanetPlayerController::IncreaseCD_Implementation(
 		InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
 
 		const auto GameplayEffectHandleAry = CharacterPtr->GetCharacterAbilitySystemComponent()->
-		                                             GetActiveEffectsWithAllTags(
-			                                             InTags
-		                                             );
+		                                                   GetActiveEffectsWithAllTags(
+			                                                    InTags
+			                                                   );
 		if (!GameplayEffectHandleAry.IsEmpty())
 		{
 			CharacterPtr->GetCharacterAbilitySystemComponent()->
-			        ModifyActiveEffectStartTime(
-				        GameplayEffectHandleAry[0],
-				        CD
-			        );
+			              ModifyActiveEffectStartTime(
+			                                          GameplayEffectHandleAry[0],
+			                                          CD
+			                                         );
+		}
+	}
+}
+
+void APlanetPlayerController::BuyProxys_Implementation(
+	const FGameplayTag& ProxyTag,
+	int32 Num,
+	int32 Cost
+	)
+{
+	auto InventoryComponentPtr = GetGroupManagger()->GetInventoryComponent();
+	if (InventoryComponentPtr)
+	{
+		auto CoinProxySPtr = GetGroupManagger()->GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
+		if (Cost <= CoinProxySPtr ->GetNum())
+		{
+			InventoryComponentPtr->AddProxy(ProxyTag, Num);
+			InventoryComponentPtr->AddProxy(UGameplayTagsLibrary::Proxy_Coin_Regular, -Cost);
 		}
 	}
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps
-) const
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -190,21 +208,21 @@ void APlanetPlayerController::PostInitializeComponents()
 
 void APlanetPlayerController::EndPlay(
 	const EEndPlayReason::Type EndPlayReason
-)
+	)
 {
 	Super::EndPlay(EndPlayReason);
 }
 
 void APlanetPlayerController::PlayerTick(
 	float DeltaTime
-)
+	)
 {
 	Super::PlayerTick(DeltaTime);
 }
 
 void APlanetPlayerController::OnPossess(
 	APawn* InPawn
-)
+	)
 {
 	bool bIsNewPawn = (InPawn != GetPawn());
 
@@ -243,13 +261,13 @@ void APlanetPlayerController::OnPossess(
 			auto PreviousPawnPtr = UInputProcessorSubSystem::GetInstance()->GetCurrentAction()->GetOwnerActor();
 
 			UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HorseProcessor::FHorseRegularProcessor>(
-				[this, InPawn](
-				auto NewProcessor
-			)
-				{
-					NewProcessor->SetPawn(Cast<AHorseCharacter>(InPawn));
-				}
-			);
+				 [this, InPawn](
+				 auto NewProcessor
+				 )
+				 {
+					 NewProcessor->SetPawn(Cast<AHorseCharacter>(InPawn));
+				 }
+				);
 		}
 	}
 }
@@ -268,14 +286,14 @@ void APlanetPlayerController::OnUnPossess()
 
 void APlanetPlayerController::SetPawn(
 	APawn* InPawn
-)
+	)
 {
 	Super::SetPawn(InPawn);
 }
 
 bool APlanetPlayerController::InputKey(
 	const FInputKeyParams& Params
-)
+	)
 {
 	auto Result = Super::InputKey(Params);
 
@@ -289,7 +307,7 @@ void APlanetPlayerController::OnRep_PlayerState()
 
 void APlanetPlayerController::OnGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
-)
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -299,23 +317,23 @@ void APlanetPlayerController::OnGroupManaggerReady(
 #endif
 
 	ForEachComponent(
-		false,
-		[this](
-		UActorComponent* ComponentPtr
-	)
-		{
-			auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
-			if (GroupSharedInterfacePtr)
-			{
-				GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
-			}
-		}
-	);
+	                 false,
+	                 [this](
+	                 UActorComponent* ComponentPtr
+	                 )
+	                 {
+		                 auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
+		                 if (GroupSharedInterfacePtr)
+		                 {
+			                 GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+		                 }
+	                 }
+	                );
 }
 
 void APlanetPlayerController::ResetGroupmateProxy(
 	FCharacterProxy* NewGourpMateProxyPtr
-)
+	)
 {
 }
 
@@ -331,13 +349,13 @@ AGroupManagger* APlanetPlayerController::GetGroupManagger() const
 
 void APlanetPlayerController::SetGroupSharedInfo(
 	AGroupManagger* InGroupSharedInfoPtr
-)
+	)
 {
 }
 
-UInventoryComponent* APlanetPlayerController::GetHoldingItemsComponent() const
+UInventoryComponent* APlanetPlayerController::GetInventoryComponent() const
 {
-	return GroupManaggerPtr ? GroupManaggerPtr->GetHoldingItemsComponent() : nullptr;
+	return GroupManaggerPtr ? GroupManaggerPtr->GetInventoryComponent() : nullptr;
 }
 
 UCharacterAttributesComponent* APlanetPlayerController::GetCharacterAttributesComponent() const
@@ -372,30 +390,30 @@ ACharacterBase* APlanetPlayerController::GetRealCharacter() const
 
 void APlanetPlayerController::OnHPChanged(
 	int32 CurrentValue
-)
+	)
 {
 	if (CurrentValue <= 0)
 	{
 		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-			FGameplayTagContainer{
-				UGameplayTagsLibrary::BaseFeature_Dying
-			}
-		);
+		                                                       FGameplayTagContainer{
+			                                                       UGameplayTagsLibrary::BaseFeature_Dying
+		                                                       }
+		                                                      );
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda(
-			[this](
-			const FAbilityEndedData& AbilityEndedData
-		)
-			{
-				// for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
-				// {
-				// 	if (Iter == UGameplayTagsLibrary::State_Dying)
-				// 	{
-				// 		// TODO 
-				// 		//					Destroy();
-				// 	}
-				// }
-			}
-		);
+		                                                      [this](
+		                                                      const FAbilityEndedData& AbilityEndedData
+		                                                      )
+		                                                      {
+			                                                      // for (auto Iter : AbilityEndedData.AbilityThatEnded->AbilityTags)
+			                                                      // {
+			                                                      // 	if (Iter == UGameplayTagsLibrary::State_Dying)
+			                                                      // 	{
+			                                                      // 		// TODO 
+			                                                      // 		//					Destroy();
+			                                                      // 	}
+			                                                      // }
+		                                                      }
+		                                                     );
 	}
 }
 
@@ -411,7 +429,7 @@ TObjectPtr<UPlayerControllerGameplayTasksComponent> APlanetPlayerController::Get
 
 void APlanetPlayerController::EntryChallengeLevel_Implementation(
 	ETeleport Teleport
-)
+	)
 {
 	UOpenWorldSubSystem::GetInstance()->SwitchDataLayer(Teleport, this);
 }
@@ -422,7 +440,7 @@ void APlanetPlayerController::BindPCWithCharacter()
 
 TSharedPtr<FCharacterProxy> APlanetPlayerController::InitialCharacterProxy(
 	ACharacterBase* CharaterPtr
-)
+	)
 {
 	return CharaterPtr->GetCharacterProxy();
 }
@@ -437,7 +455,7 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 		SpawnParameters.Owner = this;
 		SpawnParameters.CustomPreSpawnInitalization = [](
 			AActor* ActorPtr
-		)
+			)
 			{
 				PRINTINVOKEINFO();
 				auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
@@ -448,9 +466,9 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 			};
 
 		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger_Player>(
-			AGroupManagger_Player::StaticClass(),
-			SpawnParameters
-		);
+		                                                                 AGroupManagger_Player::StaticClass(),
+		                                                                 SpawnParameters
+		                                                                );
 
 		OnGroupManaggerReady(GroupManaggerPtr);
 	}
@@ -459,7 +477,7 @@ void APlanetPlayerController::InitialGroupSharedInfo()
 
 void APlanetPlayerController::MakeTrueDamege_Implementation(
 	const TArray<FString>& Args
-)
+	)
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (!CharacterPtr && !Args.IsValidIndex(0))
@@ -478,12 +496,12 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(
 
 	FHitResult OutHit;
 	if (GetWorld()->LineTraceSingleByObjectType(
-		OutHit,
-		OutCamLoc,
-		OutCamLoc + (OutCamRot.Vector() * 1000),
-		ObjectQueryParams,
-		Params
-	))
+	                                            OutHit,
+	                                            OutCamLoc,
+	                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams,
+	                                            Params
+	                                           ))
 	{
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
@@ -492,10 +510,10 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(
 			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 			FGameplayEffectSpecHandle SpecHandle =
 				ICPtr->MakeOutgoingSpec(
-					UAssetRefMap::GetInstance()->DamageClass,
-					1,
-					ICPtr->MakeEffectContext()
-				);
+				                        UAssetRefMap::GetInstance()->DamageClass,
+				                        1,
+				                        ICPtr->MakeEffectContext()
+				                       );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
@@ -504,22 +522,22 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(
 			int32 Damege = 0;
 			LexFromString(Damege, *Args[0]);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-				UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
-				Damege
-			);
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+			                                               Damege
+			                                              );
 
 			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
-				*SpecHandle.Data.Get(),
-				ASCPtr,
-				ASCPtr->GetPredictionKeyForNewAction()
-			);
+				 *SpecHandle.Data.Get(),
+				 ASCPtr,
+				 ASCPtr->GetPredictionKeyForNewAction()
+				);
 		}
 	}
 }
 
 void APlanetPlayerController::MakeTherapy_Implementation(
 	const TArray<FString>& Args
-)
+	)
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (!CharacterPtr && !Args.IsValidIndex(0))
@@ -538,12 +556,12 @@ void APlanetPlayerController::MakeTherapy_Implementation(
 
 	FHitResult OutHit;
 	if (GetWorld()->LineTraceSingleByObjectType(
-		OutHit,
-		OutCamLoc,
-		OutCamLoc + (OutCamRot.Vector() * 1000),
-		ObjectQueryParams,
-		Params
-	))
+	                                            OutHit,
+	                                            OutCamLoc,
+	                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams,
+	                                            Params
+	                                           ))
 	{
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
@@ -554,7 +572,7 @@ void APlanetPlayerController::MakeTherapy_Implementation(
 
 void APlanetPlayerController::MakeRespawn_Implementation(
 	const TArray<FString>& Args
-)
+	)
 {
 	auto CharacterPtr = GetPawn<FPawnType>();
 	if (!CharacterPtr && !Args.IsValidIndex(0))
@@ -573,12 +591,12 @@ void APlanetPlayerController::MakeRespawn_Implementation(
 
 	FHitResult OutHit;
 	if (GetWorld()->LineTraceSingleByObjectType(
-		OutHit,
-		OutCamLoc,
-		OutCamLoc + (OutCamRot.Vector() * 1000),
-		ObjectQueryParams,
-		Params
-	))
+	                                            OutHit,
+	                                            OutCamLoc,
+	                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams,
+	                                            Params
+	                                           ))
 	{
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)

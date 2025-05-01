@@ -226,6 +226,9 @@ FGameplayTag UGameplayTagsLibrary::TalentSocket =
 #pragma endregion
 
 #pragma region ProxyTyp
+FGameplayTag UGameplayTagsLibrary::Proxy =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy")));
+
 FGameplayTag UGameplayTagsLibrary::Proxy_Weapon =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Weapon")));
 

@@ -59,7 +59,7 @@ public:
 		AGroupManagger* GroupManaggerPtr
 	) override;
 
-	virtual UInventoryComponent* GetHoldingItemsComponent() const override;
+	virtual UInventoryComponent* GetInventoryComponent() const override;
 
 	virtual UCharacterAttributesComponent* GetCharacterAttributesComponent() const override;
 
@@ -127,6 +127,11 @@ public:
 		AHumanCharacter_AI* HumanCharacterPtr,
 		TSubclassOf<AGuideInteraction_Actor> Item,
 		bool bIsEnable
+	);
+
+	UFUNCTION(Server, Reliable)
+	void BuyProxys(
+		const FGameplayTag& ProxyTag, int32 Num, int32 Cost
 	);
 
 	UFUNCTION(Server, Reliable)

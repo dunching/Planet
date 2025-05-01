@@ -137,7 +137,7 @@ void UToolIcon::SetNum()
 			auto TempProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxyPtr);
 			if (TempProxyPtr)
 			{
-				NewNum = TempProxyPtr->GetCurrentValue();
+				NewNum = TempProxyPtr->GetNum();
 			}
 		}
 	}

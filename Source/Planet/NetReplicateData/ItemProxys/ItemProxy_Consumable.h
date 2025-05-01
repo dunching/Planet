@@ -71,7 +71,7 @@ public:
 
 	void AddCurrentValue(int32 val);
 
-	int32 GetCurrentValue()const;
+	virtual int32 GetNum()const override;
 
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 

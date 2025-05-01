@@ -1,4 +1,4 @@
-#include "ConversationLayout.h"
+#include "InteractionOptionsLayout.h"
 
 #include "GuideActor.h"
 #include "GuideInteraction.h"
@@ -31,14 +31,14 @@ struct FConversationLayout : public TStructVariable<FConversationLayout>
 	FName PlayerConversationBorder = TEXT("PlayerConversationBorder");
 };
 
-void UConversationLayout::NativeConstruct()
+void UInteractionOptionsLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
 
 	Enable();
 }
 
-void UConversationLayout::Enable()
+void UInteractionOptionsLayout::Enable()
 {
 	{
 		auto UIPtr = Cast<UPlayerConversationBorder>(
@@ -99,28 +99,28 @@ void UConversationLayout::Enable()
 	}
 }
 
-void UConversationLayout::DisEnable()
+void UInteractionOptionsLayout::DisEnable()
 {
 	GetOptions()->CloseUI();
 
-	if (CharacterPtr)
-	{
-		CharacterPtr->GetSceneActorInteractionComponent()->StopInteractionItem();
-		CharacterPtr = nullptr;
-	}
-	if (SceneActorInteractionInterfacePtr)
-	{
-		SceneActorInteractionInterfacePtr->GetSceneActorInteractionComponent()->StopInteractionItem();
-		SceneActorInteractionInterfacePtr = nullptr;
-	}
+	// if (CharacterPtr)
+	// {
+	// 	CharacterPtr->GetSceneActorInteractionComponent()->StopInteractionItem();
+	// 	CharacterPtr = nullptr;
+	// }
+	// if (SceneActorInteractionInterfacePtr)
+	// {
+	// 	SceneActorInteractionInterfacePtr->GetSceneActorInteractionComponent()->StopInteractionItem();
+	// 	SceneActorInteractionInterfacePtr = nullptr;
+	// }
 }
 
-ELayoutCommon UConversationLayout::GetLayoutType() const
+ELayoutCommon UInteractionOptionsLayout::GetLayoutType() const
 {
-	return ELayoutCommon::kConversationLayout;
+	return ELayoutCommon::kOptionLayout;
 }
 
-UOptionList* UConversationLayout::GetOptions() const
+UOptionList* UInteractionOptionsLayout::GetOptions() const
 {
 	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
 	if (UIPtr)
@@ -131,7 +131,7 @@ UOptionList* UConversationLayout::GetOptions() const
 	return nullptr;
 }
 
-void UConversationLayout::CloseOption()
+void UInteractionOptionsLayout::CloseOption()
 {
 	auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FConversationLayout::Get().InteractionList));
 	if (UIPtr)
@@ -140,7 +140,7 @@ void UConversationLayout::CloseOption()
 	}
 }
 
-void UConversationLayout::SelectedInteractionItem(
+void UInteractionOptionsLayout::SelectedInteractionItem(
 	const TSubclassOf<AGuideInteraction_Actor>& GuideInteractionClass
 )
 {

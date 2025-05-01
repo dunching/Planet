@@ -8,13 +8,15 @@
 
 #include "MyUserWidget.h"
 #include "LayoutCommon.h"
+#include "LayoutInterfacetion.h"
 
 #include "MainHUDLayout.generated.h"
 
 class UGetItemInfosList;
 class UInteractionList;
 class UMainMenuLayout;
-class UConversationLayout;
+class UInteractionConversationLayout;
+class UInteractionOptionsLayout;
 class URegularActionLayout;
 
 UCLASS()
@@ -23,23 +25,28 @@ class PLANET_API UMainHUDLayout : public UMyUserWidget
 	GENERATED_BODY()
 
 public:
-
 	virtual void NativeConstruct() override;
-	
-	// 
-	void SwitchToNewLayout(ELayoutCommon LayoutCommon);
 
-	UMainMenuLayout *GetMenuLayout();
-	
-	UConversationLayout *GetConversationLayout();
-	
-	URegularActionLayout *GetRegularActionLayout()const;
-	
+	// 
+	void SwitchToNewLayout(
+		ELayoutCommon LayoutCommon,
+		const ILayoutInterfacetion::FOnQuit& OnQuit
+		);
+
+	UMainMenuLayout* GetMenuLayout();
+
+	UInteractionConversationLayout* GetConversationLayout();
+
+	UInteractionOptionsLayout* GetInteractionOptionsLayout();
+
+	URegularActionLayout* GetRegularActionLayout() const;
+
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
 
-	void SwitchIsLowerHP(bool bIsLowerHP);
+	void SwitchIsLowerHP(
+		bool bIsLowerHP
+		);
 
 	// UInteractionList* GetInteractionList();
-
 };

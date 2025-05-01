@@ -83,7 +83,7 @@ void FConsumableProxy::AddCurrentValue(int32 val)
 	CallbackContainerHelper.ValueChanged(Old, Num);
 }
 
-int32 FConsumableProxy::GetCurrentValue() const
+int32 FConsumableProxy::GetNum() const
 {
 	return Num;
 }
@@ -94,7 +94,7 @@ FTableRowProxy_Consumable* FConsumableProxy::GetTableRowProxy_Consumable() const
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_Consumable.LoadSynchronous();
 
 	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_Consumable>(
-		*ProxyType.ToString(), TEXT("GetProxy"));
+		*GetProxyType().ToString(), TEXT("GetProxy"));
 	return SceneProxyExtendInfoPtr;
 }
 

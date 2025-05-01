@@ -172,6 +172,8 @@ public:
 #pragma endregion
 
 #pragma region ProxyTyp
+	static FGameplayTag Proxy;
+
 	static FGameplayTag Proxy_Weapon;
 
 	static FGameplayTag Proxy_Weapon_Axe;

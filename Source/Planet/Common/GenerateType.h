@@ -216,6 +216,21 @@ enum class EPointType :uint8
 	kProperty,
 };
 
+USTRUCT(BlueprintType ,Blueprintable)
+struct PLANET_API FProductsForSale
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Num = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Value = 0;
+	
+};
+
 // 以前的？
 #pragma region DEPRECATED
 UENUM(BlueprintType)

@@ -45,7 +45,7 @@ void AWeapon_Base::SetWeaponProxy(const FGuid& InWeaponProxy_ID)
 		auto OwnerPCPtr = GetOwner<APlanetPlayerController>();
 		if (OwnerPCPtr)
 		{
-			InventoryComponentPtr = OwnerPCPtr->GetHoldingItemsComponent();
+			InventoryComponentPtr = OwnerPCPtr->GetInventoryComponent();
 		}
 	}
 

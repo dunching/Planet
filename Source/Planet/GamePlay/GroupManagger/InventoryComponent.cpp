@@ -14,12 +14,26 @@
 #include "ItemProxy_Character.h"
 #include "RewardsTD.h"
 
-UInventoryComponent::UInventoryComponent(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UInventoryComponent::UInventoryComponent(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
 
 	SetIsReplicatedByDefault(true);
+}
+
+void UInventoryComponent::UpdateID(
+	const FBasicProxy::IDType& NewID,
+	const FBasicProxy::IDType& OldID
+	)
+{
+	if (auto Iter = ProxysMap.Find(OldID))
+	{
+		ProxysMap.Remove(OldID);
+		ProxysMap.Add(NewID, *Iter);
+	}
 }
 
 void UInventoryComponent::InitializeComponent()
@@ -31,6 +45,15 @@ void UInventoryComponent::InitializeComponent()
 	{
 		Proxy_Container.InventoryComponentPtr = this;
 	}
+
+	// 初始化一些需要的Proxy
+	AddProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular, 0);
+
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+	}
+#endif
 }
 
 void UInventoryComponent::BeginPlay()
@@ -44,18 +67,26 @@ void UInventoryComponent::BeginPlay()
 #endif
 }
 
-void UInventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UInventoryComponent::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ThisClass, Proxy_Container, COND_None);
 }
 
-void UInventoryComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void UInventoryComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
 {
 }
 
-void UInventoryComponent::AddProxy_Pending(FGameplayTag ProxyType, int32 Num, FGuid Guid)
+void UInventoryComponent::AddProxy_Pending(
+	FGameplayTag ProxyType,
+	int32 Num,
+	FGuid Guid
+	)
 {
 	if (PendingMap.Contains(Guid))
 	{
@@ -75,7 +106,9 @@ void UInventoryComponent::AddProxy_Pending(FGameplayTag ProxyType, int32 Num, FG
 	}
 }
 
-void UInventoryComponent::SyncPendingProxy(FGuid Guid)
+void UInventoryComponent::SyncPendingProxy(
+	FGuid Guid
+	)
 {
 	if (PendingMap.Contains(Guid))
 	{
@@ -93,7 +126,9 @@ void UInventoryComponent::SyncPendingProxy(FGuid Guid)
 FName UInventoryComponent::ComponentName = TEXT("InventoryComponent");
 
 #if UE_EDITOR || UE_CLIENT
-TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr)
+TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
+	)
 {
 	TSharedPtr<FBasicProxy> Result;
 
@@ -110,8 +145,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
+		ProxysMap.Add(ProxySPtr->GetID(), ProxySPtr);
+		ProxysAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
 
@@ -119,8 +154,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
 	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
+		ProxysMap.Add(ProxySPtr->GetID(), ProxySPtr);
+		ProxysAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
 
@@ -128,18 +163,13 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
-
 		auto CoinProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
-		Result = CoinProxySPtr ;
-
-		OnCoinProxyChanged(CoinProxySPtr , EProxyModifyType::kAdd, CoinProxySPtr->OffsetNum);
+		Result = AddProxy_Coin(ProxyType, CoinProxySPtr->OffsetNum);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
+		ProxysMap.Add(ProxySPtr->GetID(), ProxySPtr);
+		ProxysAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
 
@@ -147,8 +177,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
-		SceneMetaMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		SceneToolsAry.Add(ProxySPtr);
+		ProxysMap.Add(ProxySPtr->GetID(), ProxySPtr);
+		ProxysAry.Add(ProxySPtr);
 
 		Result = ProxySPtr;
 	}
@@ -156,24 +186,37 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(const TSharedPt
 	return Result;
 }
 
-TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TSharedPtr<FBasicProxy>& ProxySPtr)
+TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
+	const TSharedPtr<FBasicProxy>& LocalProxySPtr,
+	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
+	)
 {
-	TSharedPtr<FBasicProxy> Result;
+	TSharedPtr<FBasicProxy> Result = nullptr;
 
-	const auto ProxyType = ProxySPtr->GetProxyType();
+	if (!(LocalProxySPtr && RemoteProxySPtr))
+	{
+		return Result;
+	}
+
+	if (LocalProxySPtr->GetProxyType() != RemoteProxySPtr->GetProxyType())
+	{
+		return Result;
+	}
+
+	const auto ProxyType = RemoteProxySPtr->GetProxyType();
 
 	if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FToolProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FToolProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FToolProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FToolProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
@@ -182,8 +225,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
@@ -192,8 +235,8 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
@@ -202,16 +245,16 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
@@ -220,41 +263,41 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(const TShare
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FCoinProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FCoinProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FCoinProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 
 		if (LeftProxySPtr->OffsetNum == 0)
 		{
-			OnCoinProxyChanged(LeftProxySPtr , EProxyModifyType::kChange, LeftProxySPtr->OffsetNum);
+			OnCoinProxyChanged(LeftProxySPtr, EProxyModifyType::kChange, LeftProxySPtr->OffsetNum);
 		}
 		else
 		{
-			OnCoinProxyChanged(LeftProxySPtr , EProxyModifyType::kNumChange, LeftProxySPtr->OffsetNum);
+			OnCoinProxyChanged(LeftProxySPtr, EProxyModifyType::kNumChange, LeftProxySPtr->OffsetNum);
 		}
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
-		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
-		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(ProxySPtr->GetID()));
+		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(RemoteProxySPtr);
+		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
 		Result = LeftProxySPtr;
@@ -267,14 +310,16 @@ void UInventoryComponent::SetAllocationCharacterProxy(
 	const FGuid& Proxy_ID,
 	const FGuid& CharacterProxy_ID,
 	const FGameplayTag& InSocketTag
-)
+	)
 {
 	SetAllocationCharacterProxy_Server(Proxy_ID, CharacterProxy_ID, InSocketTag);
 }
 #endif
 
 #if UE_EDITOR || UE_SERVER
-TSharedPtr<FWeaponProxy> UInventoryComponent::AddProxy_Weapon(const FGameplayTag& ProxyType)
+TSharedPtr<FWeaponProxy> UInventoryComponent::AddProxy_Weapon(
+	const FGameplayTag& ProxyType
+	)
 {
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
 
@@ -290,8 +335,8 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::AddProxy_Weapon(const FGameplayTag
 	ResultPtr->WeaponSkillID =
 		AddProxy_Skill(ResultPtr->GetTableRowProxy_WeaponExtendInfo()->WeaponSkillProxyType)->GetID();
 
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+	ProxysAry.Add(ResultPtr);
+	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
 	Proxy_Container.AddItem(ResultPtr);
 
@@ -300,7 +345,9 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::AddProxy_Weapon(const FGameplayTag
 	return ResultPtr;
 }
 
-TSharedPtr<FWeaponProxy> UInventoryComponent::Update_Weapon(const TSharedPtr<FWeaponProxy>& Proxy)
+TSharedPtr<FWeaponProxy> UInventoryComponent::Update_Weapon(
+	const TSharedPtr<FWeaponProxy>& Proxy
+	)
 {
 	auto ResultPtr = Proxy;
 
@@ -308,17 +355,19 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::Update_Weapon(const TSharedPtr<FWe
 #endif
 
 
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+	ProxysAry.Add(ResultPtr);
+	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
 	OnWeaponProxyChanged(ResultPtr, EProxyModifyType::kChange);
 
 	return ResultPtr;
 }
 
-TSharedPtr<FWeaponProxy> UInventoryComponent::FindProxy_Weapon(const IDType& ID)
+TSharedPtr<FWeaponProxy> UInventoryComponent::FindProxy_Weapon(
+	const IDType& ID
+	) const
 {
-	auto Iter = SceneMetaMap.Find(ID);
+	auto Iter = ProxysMap.Find(ID);
 	if (Iter)
 	{
 		return DynamicCastSharedPtr<FWeaponProxy>(*Iter);
@@ -327,7 +376,9 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::FindProxy_Weapon(const IDType& ID)
 	return nullptr;
 }
 
-TSharedPtr<FSkillProxy> UInventoryComponent::AddProxy_Skill(const FGameplayTag& ProxyType)
+TSharedPtr<FSkillProxy> UInventoryComponent::AddProxy_Skill(
+	const FGameplayTag& ProxyType
+	)
 {
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
 
@@ -360,8 +411,8 @@ TSharedPtr<FSkillProxy> UInventoryComponent::AddProxy_Skill(const FGameplayTag& 
 
 	ResultPtr->InventoryComponentPtr = this;
 
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+	ProxysAry.Add(ResultPtr);
+	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
 	Proxy_Container.AddItem(ResultPtr);
 
@@ -370,21 +421,28 @@ TSharedPtr<FSkillProxy> UInventoryComponent::AddProxy_Skill(const FGameplayTag& 
 	return ResultPtr;
 }
 
-TSharedPtr<FSkillProxy> UInventoryComponent::FindProxy_Skill(const FGameplayTag& ProxyType)
+TSharedPtr<FSkillProxy> UInventoryComponent::FindProxy_Skill(
+	const FGameplayTag& ProxyType
+	) const
 {
 	return nullptr;
 }
 
-TSharedPtr<FSkillProxy> UInventoryComponent::FindProxy_Skill(const IDType& ID) const
+TSharedPtr<FSkillProxy> UInventoryComponent::FindProxy_Skill(
+	const IDType& ID
+	) const
 {
-	if (SceneMetaMap.Contains(ID))
+	if (ProxysMap.Contains(ID))
 	{
-		return DynamicCastSharedPtr<FSkillProxy>(SceneMetaMap[ID]);
+		return DynamicCastSharedPtr<FSkillProxy>(ProxysMap[ID]);
 	}
 	return nullptr;
 }
 
-TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(const FGameplayTag& ProxyType, int32 Num)
+TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(
+	const FGameplayTag& ProxyType,
+	int32 Num
+	)
 {
 	check(Num > 0);
 
@@ -401,8 +459,8 @@ TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(const FGam
 	ResultPtr->ProxyType = ProxyType;
 	ResultPtr->InventoryComponentPtr = this;
 
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+	ProxysAry.Add(ResultPtr);
+	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
 	Proxy_Container.AddItem(ResultPtr);
 
@@ -411,16 +469,20 @@ TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(const FGam
 	return ResultPtr;
 }
 
-TSharedPtr<FConsumableProxy> UInventoryComponent::FindProxy_Consumable(const IDType& ID) const
+TSharedPtr<FConsumableProxy> UInventoryComponent::FindProxy_Consumable(
+	const IDType& ID
+	) const
 {
-	if (SceneMetaMap.Contains(ID))
+	if (ProxysMap.Contains(ID))
 	{
-		return DynamicCastSharedPtr<FConsumableProxy>(SceneMetaMap[ID]);
+		return DynamicCastSharedPtr<FConsumableProxy>(ProxysMap[ID]);
 	}
 	return nullptr;
 }
 
-TSharedPtr<FToolProxy> UInventoryComponent::AddProxy_ToolProxy(const FGameplayTag& ProxyType)
+TSharedPtr<FToolProxy> UInventoryComponent::AddProxy_ToolProxy(
+	const FGameplayTag& ProxyType
+	)
 {
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
 
@@ -434,24 +496,31 @@ TSharedPtr<FToolProxy> UInventoryComponent::AddProxy_ToolProxy(const FGameplayTa
 	ResultPtr->ProxyType = ProxyType;
 	ResultPtr->InventoryComponentPtr = this;
 
-	SceneToolsAry.Add(ResultPtr);
-	SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+	ProxysAry.Add(ResultPtr);
+	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
 	Proxy_Container.AddItem(ResultPtr);
 
 	return ResultPtr;
 }
 
-TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(const FGameplayTag& ProxyType, int32 Num /*= 1*/)
+TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(
+	const FGameplayTag& ProxyType,
+	int32 Num /*= 1*/
+	)
 {
 	if (CoinProxyMap.Contains(ProxyType))
 	{
 		auto Ref = CoinProxyMap[ProxyType];
 
-		Ref->Num += Num;
-		Ref->OffsetNum = Num;
+		Ref->AddCurrentValue(Num);
 
-		Proxy_Container.UpdateItem(Ref);
+#if UE_EDITOR || UE_SERVER
+		if (GetOwnerRole() == ROLE_Authority)
+		{
+			Proxy_Container.UpdateItem(Ref);
+		}
+#endif
 
 		OnCoinProxyChanged.ExcuteCallback(Ref, EProxyModifyType::kAdd, Num);
 
@@ -469,14 +538,18 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(const FGameplayTag& Pr
 		ResultPtr->InitialProxy(ProxyType);
 
 		ResultPtr->InventoryComponentPtr = this;
-		ResultPtr->Num = Num;
-		ResultPtr->OffsetNum = Num;
+		ResultPtr->AddCurrentValue(Num);
 
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+		ProxysAry.Add(ResultPtr);
+		ProxysMap.Add(ResultPtr->ID, ResultPtr);
 		CoinProxyMap.Add(ProxyType, ResultPtr);
 
-		Proxy_Container.AddItem(ResultPtr);
+#if UE_EDITOR || UE_SERVER
+		if (GetOwnerRole() == ROLE_Authority)
+		{
+			Proxy_Container.AddItem(ResultPtr);
+		}
+#endif
 
 		OnCoinProxyChanged.ExcuteCallback(ResultPtr, EProxyModifyType::kNumChange, Num);
 
@@ -484,7 +557,9 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(const FGameplayTag& Pr
 	}
 }
 
-TSharedPtr<FCoinProxy> UInventoryComponent::FindProxy_Coin(const FGameplayTag& ProxyType) const
+TSharedPtr<FCoinProxy> UInventoryComponent::FindProxy_Coin(
+	const FGameplayTag& ProxyType
+	) const
 {
 	auto Iter = CoinProxyMap.Find(ProxyType);
 	if (Iter)
@@ -497,11 +572,13 @@ TSharedPtr<FCoinProxy> UInventoryComponent::FindProxy_Coin(const FGameplayTag& P
 
 TArray<TSharedPtr<FBasicProxy>> UInventoryComponent::GetProxys() const
 {
-	return SceneToolsAry;
+	return ProxysAry;
 }
 #endif
 
-void UInventoryComponent::AddProxys_Server_Implementation(const FGuid&RewardsItemID)
+void UInventoryComponent::AddProxys_Server_Implementation(
+	const FGuid& RewardsItemID
+	)
 {
 	const auto RewardsItem = UPAD_RewardsItems::GetInstance()->GetRewardsItem(RewardsItemID);;
 	if (RewardsItem.IsValid())
@@ -513,7 +590,10 @@ void UInventoryComponent::AddProxys_Server_Implementation(const FGuid&RewardsIte
 	}
 }
 
-void UInventoryComponent::RemoveProxy_Consumable(const TSharedPtr<FConsumableProxy>& ProxyPtr, int32 Num /*= 1*/)
+void UInventoryComponent::RemoveProxy_Consumable(
+	const TSharedPtr<FConsumableProxy>& ProxyPtr,
+	int32 Num /*= 1*/
+	)
 {
 	if (ProxyPtr)
 	{
@@ -525,7 +605,7 @@ void UInventoryComponent::RemoveProxy_Consumable(const TSharedPtr<FConsumablePro
 
 const TArray<TSharedPtr<FBasicProxy>>& UInventoryComponent::GetSceneUintAry() const
 {
-	return SceneToolsAry;
+	return ProxysAry;
 }
 
 const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& UInventoryComponent::GetCoinUintAry() const
@@ -537,7 +617,7 @@ TArray<TSharedPtr<FCharacterProxy>> UInventoryComponent::GetCharacterProxyAry() 
 {
 	TArray<TSharedPtr<FCharacterProxy>> Result;
 
-	for (auto Iter : SceneToolsAry)
+	for (auto Iter : ProxysAry)
 	{
 		if (Iter->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 		{
@@ -553,17 +633,22 @@ TArray<TSharedPtr<FCharacterProxy>> UInventoryComponent::GetCharacterProxyAry() 
 	return Result;
 }
 
-TSharedPtr<FCharacterProxy> UInventoryComponent::FindProxy_Character(const IDType& ID) const
+TSharedPtr<FCharacterProxy> UInventoryComponent::FindProxy_Character(
+	const IDType& ID
+	) const
 {
-	if (SceneMetaMap.Contains(ID))
+	if (ProxysMap.Contains(ID))
 	{
-		return DynamicCastSharedPtr<FCharacterProxy>(SceneMetaMap[ID]);
+		return DynamicCastSharedPtr<FCharacterProxy>(ProxysMap[ID]);
 	}
 
 	return nullptr;
 }
 
-TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy(const FGameplayTag& ProxyType, int32 Num)
+TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy(
+	const FGameplayTag& ProxyType,
+	int32 Num
+	)
 {
 	TSharedPtr<FBasicProxy> ResultSPtr = nullptr;
 
@@ -597,22 +682,45 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy(const FGameplayTag& ProxyT
 	return ResultSPtr;
 }
 
-TSharedPtr<FBasicProxy> UInventoryComponent::FindProxy(const IDType& ID)
+TSharedPtr<FBasicProxy> UInventoryComponent::FindProxy(
+	const IDType& ID
+	) const
 {
-	if (SceneMetaMap.Contains(ID))
+	if (ProxysMap.Contains(ID))
 	{
-		return SceneMetaMap[ID];
+		return ProxysMap[ID];
 	}
 
 	return nullptr;
 }
 
-TSharedPtr<FAllocationbleProxy> UInventoryComponent::FindAllocationableProxy(const IDType& ID)
+TArray<TSharedPtr<FBasicProxy>> UInventoryComponent::GetProxys(
+	const FGameplayTag& ProxyType
+	) const
+{
+	TArray<TSharedPtr<FBasicProxy>> Result;
+
+	for (const auto& Iter : ProxysAry)
+	{
+		if (Iter && Iter->GetProxyType().MatchesTag(ProxyType))
+		{
+			Result.Add(Iter);
+		}
+	}
+
+	return Result;
+}
+
+TSharedPtr<FAllocationbleProxy> UInventoryComponent::FindAllocationableProxy(
+	const IDType& ID
+	) const
 {
 	return DynamicCastSharedPtr<FAllocationbleProxy>(FindProxy(ID));
 }
 
-TSharedPtr<FAllocationbleProxy> UInventoryComponent::FindProxy_BySocket(const FCharacterSocket& Socket)
+TSharedPtr<FAllocationbleProxy> UInventoryComponent::FindProxy_BySocket(
+	const FCharacterSocket& Socket
+	) const
 {
 	return FindAllocationableProxy(Socket.GetAllocationedProxyID());
 }
@@ -621,7 +729,7 @@ void UInventoryComponent::SetAllocationCharacterProxy_Server_Implementation(
 	const FGuid& Proxy_ID,
 	const FGuid& CharacterProxy_ID,
 	const FGameplayTag& InSocketTag
-)
+	)
 {
 	auto ProxySPtr = FindAllocationableProxy(Proxy_ID);
 	if (!ProxySPtr)
@@ -640,7 +748,9 @@ void UInventoryComponent::SetAllocationCharacterProxy_Server_Implementation(
 	}
 }
 
-TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACharacterBase* OwnerCharacterPtr)
+TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(
+	ACharacterBase* OwnerCharacterPtr
+	)
 {
 	Proxy_Container.InventoryComponentPtr = this;
 
@@ -648,13 +758,13 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACha
 	{
 		return nullptr;
 	}
-	
+
 	// 是否已存在？
 	const auto ID = OwnerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterID();
-	if (SceneMetaMap.Contains(ID))
+	if (ProxysMap.Contains(ID))
 	{
 		// 使用指定的ID
-		auto CharacterProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(SceneMetaMap[ID]);
+		auto CharacterProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxysMap[ID]);
 
 		// CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
 		CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
@@ -665,22 +775,23 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACha
 		{
 		}
 #endif
-		
+
 		return CharacterProxySPtr;
 	}
 	else
 	{
 		// 使用指定的ID
 		auto CharacterProxySPtr = MakeShared<FCharacterProxy>(
-			OwnerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterID()
-			);
+		                                                      OwnerCharacterPtr->GetCharacterAttributesComponent()->
+		                                                      GetCharacterID()
+		                                                     );
 
 		CharacterProxySPtr->InitialProxy(OwnerCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory);
 		CharacterProxySPtr->ProxyCharacterPtr = OwnerCharacterPtr;
 		CharacterProxySPtr->InventoryComponentPtr = this;
 
-		SceneToolsAry.Add(CharacterProxySPtr);
-		SceneMetaMap.Add(CharacterProxySPtr->ID, CharacterProxySPtr);
+		ProxysAry.Add(CharacterProxySPtr);
+		ProxysMap.Add(CharacterProxySPtr->ID, CharacterProxySPtr);
 		Proxy_Container.AddItem(CharacterProxySPtr);
 
 #if UE_EDITOR || UE_SERVER
@@ -688,12 +799,14 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(ACha
 		{
 		}
 #endif
-		
+
 		return CharacterProxySPtr;
 	}
 }
 
-TSharedPtr<FCharacterProxy> UInventoryComponent::AddProxy_Character(const FGameplayTag& ProxyType)
+TSharedPtr<FCharacterProxy> UInventoryComponent::AddProxy_Character(
+	const FGameplayTag& ProxyType
+	)
 {
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
 
@@ -710,8 +823,8 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::AddProxy_Character(const FGamep
 
 		ResultPtr->InventoryComponentPtr = this;
 
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+		ProxysAry.Add(ResultPtr);
+		ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
 		Proxy_Container.AddItem(ResultPtr);
 	}
@@ -723,8 +836,8 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::AddProxy_Character(const FGamep
 
 		ResultPtr->InventoryComponentPtr = this;
 
-		SceneToolsAry.Add(ResultPtr);
-		SceneMetaMap.Add(ResultPtr->ID, ResultPtr);
+		ProxysAry.Add(ResultPtr);
+		ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
 		Proxy_Container.AddItem(ResultPtr);
 	}

@@ -11,10 +11,12 @@
 #include "TalentIcon.h"
 #include "CoinInfo.h"
 
-namespace CoinList
+struct FCoinList : public TStructVariable<FCoinList>
 {
-	const FName HorizontalBox = TEXT("HorizontalBox");
-}
+	FName HorizontalBox = TEXT("HorizontalBox");
+	
+	FName Regular = TEXT("Regular");
+};
 
 void UCoinList::NativeConstruct()
 {
@@ -24,25 +26,4 @@ void UCoinList::NativeConstruct()
 void UCoinList::NativeDestruct()
 {
 	Super::NativeDestruct(); 
-}
-
-void UCoinList::ResetUIByData(const TMap<FGameplayTag, TSharedPtr<FCoinProxy>>& CoinMap)
-{
-	auto UIPtr = Cast<UHorizontalBox>(GetWidgetFromName(CoinList::HorizontalBox));
-	if (!UIPtr)
-	{
-		return;
-	}
-
-	UIPtr->ClearChildren();
-
-	for (const auto& Iter : CoinMap)
-	{
-		auto WidgetPtr = CreateWidget<UCoinInfo>(this, CoinInfoClass);
-		if (WidgetPtr)
-		{
-			WidgetPtr->ResetToolUIByData(Iter.Value);
-			UIPtr->AddChild(WidgetPtr);
-		}
-	}
 }

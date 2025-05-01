@@ -12,8 +12,10 @@ enum class ELayoutCommon : uint8
 	kEmptyLayout,			// 空白的模式，
 	kActionLayout,			// 默认的模式，
 	kMenuLayout,			// 查看菜单
-	kConversationLayout,	// 对话状态
 	kEndangeredLayout,		// 重伤状态
+	kOptionLayout,			// 选择条目状态
+	kConversationLayout,	// 对话状态
+	kTransactionLayout,		// 商店交易状态
 	kBuildingLayout,
 	kViewTasksLayout,		// 任务模式
 	kTransitionLayout,		// 切换、过度界面

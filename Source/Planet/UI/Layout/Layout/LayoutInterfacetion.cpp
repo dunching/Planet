@@ -7,6 +7,11 @@ void ILayoutInterfacetion::Enable()
 
 void ILayoutInterfacetion::DisEnable()
 {
+	if (OnQuit)
+	{
+		OnQuit();
+	}
+	
 	bIsActive = false;
 }
 

@@ -34,37 +34,50 @@ class UInputProcessorSubSystem : public UGameInstanceSubsystem
 	GENERATED_BODY()
 
 public:
-
 	friend APlanetPlayerController;
 
-	template<typename ProcessorType>
-	using FInitSwitchFunc = std::function<void(ProcessorType*)>;
+	template <typename ProcessorType>
+	using FInitSwitchFunc = std::function<void(
+		ProcessorType*
+		)>;
+
+	using FOnQuitFunc = std::function<void()>;
 
 	static UInputProcessorSubSystem* GetInstance();
 
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Initialize(
+		FSubsystemCollectionBase& Collection
+		) override;
 
 	virtual void Deinitialize() override;
 
 	TSharedPtr<FInputProcessor>& GetCurrentAction();
 
-	template<typename ProcessorType>
+	template <typename ProcessorType>
 	void SwitchToProcessor();
 
-	template<typename ProcessorType>
+	template <typename ProcessorType>
 	void SwitchToProcessor(
-		const FInitSwitchFunc<ProcessorType>& InitSwitchFunc
-	);
+		const FInitSwitchFunc<ProcessorType>& InitSwitchFunc,
+		const FOnQuitFunc& OnQuitFunc = nullptr
+		);
 
 	void ResetProcessor();
 
-	FDelegateHandle AddKeyEvent(FKey Key, const std::function<void(EInputEvent)>& KeyEvent);
+	FDelegateHandle AddKeyEvent(
+		FKey Key,
+		const std::function<void(
+			EInputEvent
+			)>& KeyEvent
+		);
 
-	void RemoveKeyEvent(FDelegateHandle DelegateHandle);
+	void RemoveKeyEvent(
+		FDelegateHandle DelegateHandle
+		);
 
 	virtual bool InputKey(
 		const FInputKeyEventArgs& EventArgs
-	) ;
+		);
 
 	virtual bool InputAxis(
 		FViewport* Viewport,
@@ -74,22 +87,22 @@ public:
 		float DeltaTime,
 		int32 NumSamples = 1,
 		bool bGamepad = false
-	) ;
-	
-protected:
+		);
 
+protected:
 	UFUNCTION()
-	bool Tick(float DeltaTime);
+	bool Tick(
+		float DeltaTime
+		);
 
 private:
-
 	virtual TSharedPtr<FInputProcessor> SwitchActionProcessImp(
 		EInputProcessorType ProcessType
-	);
+		);
 
 	TSet<TSharedPtr<FInputProcessor>> ActionCacheSet;
 
-	TSharedPtr<FInputProcessor>CurrentProcessorSPtr;
+	TSharedPtr<FInputProcessor> CurrentProcessorSPtr;
 
 	TMap<FKey, FSYKeyEvent> OnKeyPressedMap;
 
@@ -100,20 +113,23 @@ private:
 	FTSTicker::FDelegateHandle TickDelegateHandle;
 };
 
-template<typename ProcessorType>
+template <typename ProcessorType>
 void UInputProcessorSubSystem::SwitchToProcessor()
 {
 	SwitchToProcessor<ProcessorType>(nullptr);
 }
 
-template<typename ProcessorType>
-void UInputProcessorSubSystem::SwitchToProcessor(const FInitSwitchFunc<ProcessorType>& InitSwitchFunc)
+template <typename ProcessorType>
+void UInputProcessorSubSystem::SwitchToProcessor(
+	const FInitSwitchFunc<ProcessorType>& InitSwitchFunc,
+		const FOnQuitFunc& OnQuitFunc
+	)
 {
 	if constexpr (
 		(std::is_same_v<ProcessorType, FInputProcessor>) ||
 		(std::is_same_v<ProcessorType, HorseProcessor::FHorseProcessor>) ||
 		(std::is_same_v<ProcessorType, HumanProcessor::FHumanProcessor>)
-		)
+	)
 	{
 		return;
 	}
@@ -132,12 +148,14 @@ void UInputProcessorSubSystem::SwitchToProcessor(const FInitSwitchFunc<Processor
 		auto PawnPtr = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 		auto CharacterPtr = Cast<typename ProcessorType::FOwnerPawnType>(PawnPtr);
 		ActionProcessSPtr = MakeShared<ProcessorType>(CharacterPtr);
+		ActionProcessSPtr->OnQuitFunc = OnQuitFunc;
 	}
 	else
 	{
 		auto PawnPtr = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 		auto CharacterPtr = Cast<typename ProcessorType::FOwnerPawnType>(PawnPtr);
 		ActionProcessSPtr = MakeShared<ProcessorType>(CharacterPtr);
+		ActionProcessSPtr->OnQuitFunc = OnQuitFunc;
 	}
 
 	if (InitSwitchFunc)

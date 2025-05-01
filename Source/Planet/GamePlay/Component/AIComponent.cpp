@@ -63,6 +63,16 @@ void UAIComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 	{
 		InitialAllocationsRowName();
 		InitialAllocationsByProxy();
+
+		FGuid Guid = FGuid::NewGuid();
+		auto OnwerActorPtr = GetOwner<FOwnerType>();
+		auto InventoryComponentPtr = OnwerActorPtr->GetInventoryComponent();
+		for (const auto Iter : ProxyMap)
+		{
+			InventoryComponentPtr->AddProxy_Pending(Iter.Key, Iter.Value.Num, Guid);
+		}
+
+		InventoryComponentPtr->SyncPendingProxy(Guid);
 	}
 #endif
 	
@@ -157,6 +167,11 @@ void UAIComponent::StopDisplayTaskPromy()
 		}
 	}
 #endif
+}
+
+TMap<FGameplayTag, FProductsForSale> UAIComponent::GetSaleItemsInfo() const
+{
+	return ProxyMap;
 }
 
 void UAIComponent::DisplayTaskPromy(

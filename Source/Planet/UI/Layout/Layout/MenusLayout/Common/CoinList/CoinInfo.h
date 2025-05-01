@@ -16,34 +16,31 @@ struct FCoinProxy;
  *
  */
 UCLASS()
-class PLANET_API UCoinInfo : 
-	public UMyUserWidget,
-	public IItemProxyIconInterface
+class PLANET_API UCoinInfo :
+	public UMyUserWidget
 {
 	GENERATED_BODY()
 
 public:
-
 	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeConstruct() override;
 
-	virtual void NativeDestruct()override;
+	void SetNum(
+		int32 NewNum
+	);
 
-	virtual void InvokeReset(UUserWidget* BaseWidgetPtr)override;
-
-	virtual void ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)override;
-
-	virtual void EnableIcon(bool bIsEnable)override;
-
-protected:
-
-	void SetNum(int32 NewNum);
-
-	void SetItemType();
+	void OnCoinProxyChanged(
+		const TSharedPtr<
+			FCoinProxy>& CoinProxySPtr,
+		EProxyModifyType ProxyModifyType,
+		int32 Num
+	);
 
 	TSharedPtr<FCoinProxy> ProxyPtr = nullptr;
 
 	FValueChangedDelegateHandle OnNumChanged;
 
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Coin")
+	FGameplayTag CoinType;
 };

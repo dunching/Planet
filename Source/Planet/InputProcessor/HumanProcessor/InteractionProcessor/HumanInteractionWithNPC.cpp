@@ -30,15 +30,9 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
-			UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kConversationLayout);
-
-			auto PlayerPCPtr = OnwerActorPtr->GetController<APlayerController>();
-			if (PlayerPCPtr)
-			{
-				PlayerPCPtr->bShowMouseCursor = true;
-
-				UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(PlayerPCPtr);
-			}
+			UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kOptionLayout);
+			
+			SwitchShowCursor(true);
 
 			// Player对应的操作
 			if (auto Character_NPCPtr = Cast<AHumanCharacter_AI>(OnwerActorPtr->LookAtSceneActorPtr))
@@ -57,14 +51,6 @@ namespace HumanProcessor
 	void FHumanInteractionWithNPCProcessor::QuitAction()
 	{
 		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
-
-		auto PlayerPCPtr = HumanCharaterPtr->GetController<APlayerController>();
-		if (PlayerPCPtr)
-		{
-			PlayerPCPtr->bShowMouseCursor = false;
-
-			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
-		}
 	
 		// Player对应的操作
 		if (auto Character_NPCPtr = Cast<AHumanCharacter_AI>(HumanCharaterPtr->LookAtSceneActorPtr))

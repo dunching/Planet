@@ -56,14 +56,12 @@ protected:
 	void BindEvent();
 
 	void ResetUI(
-		const TSharedPtr<FCharacterProxy>& TargetCharacterProxyPtr, 
 		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 	);
 
 	void InitialGroupmateList();
 
 	void ResetBackpack(
-		const TSharedPtr<FCharacterProxy>& AICharacterProxyPtr,
 		const TSharedPtr<FCharacterProxy>& PlayerCharacterProxyPtr
 	);
 
