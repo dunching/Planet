@@ -21,6 +21,24 @@ AGuideThread_Challenge::AGuideThread_Challenge(
 {
 }
 
+FString AGuideThread_Challenge::GetGuideThreadTitle() const
+{
+	return FString::Printf(TEXT("%s·第%d层"),*TaskName, CurrentLevel);
+}
+
+void AGuideThread_Challenge::SetCurrentLevel(
+	int32 NewCurrentLevel
+	)
+{
+	CurrentLevel = NewCurrentLevel;
+	OnGuideThreadNameChagned.Broadcast(GetGuideThreadTitle());
+}
+
+int32 AGuideThread_Challenge::GetCurrentLevel() const
+{
+	return CurrentLevel;
+}
+
 UStateTreeGuideChallengeThreadComponentSchema::UStateTreeGuideChallengeThreadComponentSchema()
 {
 	ContextActorClass = FOwnerType::StaticClass();

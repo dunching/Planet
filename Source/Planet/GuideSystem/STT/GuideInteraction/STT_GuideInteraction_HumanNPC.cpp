@@ -225,20 +225,10 @@ EStateTreeRunStatus FSTT_GuideInteraction_ChangeNPCsTaskState::EnterState(
 		auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
 		if (TargetCharacterPtr)
 		{
-			auto PCPtr = Cast<APlanetPlayerController>(
-			                                           UGameplayStatics::GetPlayerController(
-				                                            GetWorldImp(),
-				                                            0
-				                                           )
-			                                          );
-			if (PCPtr)
-			{
-				PCPtr->ChangedInterationTaskState(
-				                                  TargetCharacterPtr,
-				                                  InstanceData.GuideInteractionActorClass,
-				                                  InstanceData.bEnable
-				                                 );
-			}
+			TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationTaskState(
+				 InstanceData.GuideInteractionActorClass,
+				 InstanceData.bEnable
+				);
 
 			if (InstanceData.bRunForever)
 			{
@@ -267,20 +257,10 @@ void FSTT_GuideInteraction_ChangeNPCsTaskState::ExitState(
 			auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
 			if (TargetCharacterPtr)
 			{
-				auto PCPtr = Cast<APlanetPlayerController>(
-				                                           UGameplayStatics::GetPlayerController(
-					                                            GetWorldImp(),
-					                                            0
-					                                           )
-				                                          );
-				if (PCPtr)
-				{
-					PCPtr->ChangedInterationTaskState(
-					                                  TargetCharacterPtr,
-					                                  InstanceData.GuideInteractionActorClass,
-					                                  !InstanceData.bEnable
-					                                 );
-				}
+				TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationTaskState(
+					 InstanceData.GuideInteractionActorClass,
+					 !InstanceData.bEnable
+					);
 			}
 		}
 	}
@@ -303,22 +283,22 @@ EStateTreeRunStatus FSTT_GuideInteraction_Transaction::EnterState(
 	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-																		   InstanceData.GuideActorPtr->
-																		   FindComponentByInterface(
-																				UGameplayTaskOwnerInterface::StaticClass()
-																			   )
-																		  );
+	                                                                       InstanceData.GuideActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
 		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
 	}
 
 	InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
-																   UGameplayStatics::GetPlayerCharacter(
-																		InstanceData.GuideActorPtr,
-																		0
-																	   )
-																  );
+	                                                               UGameplayStatics::GetPlayerCharacter(
+		                                                                InstanceData.GuideActorPtr,
+		                                                                0
+		                                                               )
+	                                                              );
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Interaction_Transaction>(
 		 *InstanceData.TaskOwner

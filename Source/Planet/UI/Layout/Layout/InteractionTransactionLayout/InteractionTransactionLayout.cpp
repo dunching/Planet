@@ -97,14 +97,6 @@ void UInteractionTransactionLayout::NativeConstruct()
 			UIPtr->OnTextChanged.AddDynamic(this, &ThisClass::OnEditableTextBoxChangedEvent);
 		}
 	}
-	auto CoinSPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->
-	                GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
-	if (CoinSPtr)
-	{
-		OnCoinChangedDelegateHandle = CoinSPtr->CallbackContainerHelper.AddOnValueChanged(
-			 std::bind(&ThisClass::OnCoinChanged, this, std::placeholders::_1, std::placeholders::_2)
-			);
-	}
 }
 
 void UInteractionTransactionLayout::Enable()
@@ -126,9 +118,29 @@ void UInteractionTransactionLayout::Enable()
 		                                                                        ->GetCurrentAction()
 		                                                                       );
 
+	auto CoinSPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->
+	                GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
+	if (CoinSPtr)
+	{
+		OnCoinChangedDelegateHandle = CoinSPtr->CallbackContainerHelper.AddOnValueChanged(
+			 std::bind(&ThisClass::OnCoinChanged, this, std::placeholders::_1, std::placeholders::_2)
+			);
+	}
+
 	if (CurrentActionSPtr)
 	{
 		CharacterPtr = CurrentActionSPtr->CharacterPtr;
+		auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
+
+		OnConsumableProxyChangedDelegateHandle = InventoryComponentPtr->OnConsumableProxyChanged.AddCallback(
+			 std::bind(
+			           &ThisClass::OnTraderConsumableProxyChanged,
+			           this,
+			           std::placeholders::_1,
+			           std::placeholders::_2,
+			           std::placeholders::_3
+			          )
+			);
 
 		auto UIPtr = Cast<UTileView>(GetWidgetFromName(FTransactionLayout::Get().TileView));
 		if (UIPtr)
@@ -137,8 +149,8 @@ void UInteractionTransactionLayout::Enable()
 			auto EnteryClass = UIPtr->GetEntryWidgetClass();
 
 			const auto SaleItemsInfo = CharacterPtr->GetAIComponent()->GetSaleItemsInfo();
-			auto Proxys = CharacterPtr->GetInventoryComponent()->GetProxys(UGameplayTagsLibrary::Proxy_Weapon);
-			Proxys.Append(CharacterPtr->GetInventoryComponent()->GetProxys(UGameplayTagsLibrary::Proxy_Consumables));
+			auto Proxys = InventoryComponentPtr->GetProxys(UGameplayTagsLibrary::Proxy_Weapon);
+			Proxys.Append(InventoryComponentPtr->GetProxys(UGameplayTagsLibrary::Proxy_Consumables));
 			for (const auto& Iter : Proxys)
 			{
 				auto ChildPtr = CreateWidget<UGoodsItem>(this, EnteryClass);
@@ -157,6 +169,16 @@ void UInteractionTransactionLayout::Enable()
 
 void UInteractionTransactionLayout::DisEnable()
 {
+	if (OnConsumableProxyChangedDelegateHandle)
+	{
+		OnConsumableProxyChangedDelegateHandle->UnBindCallback();
+	}
+
+	if (OnCoinChangedDelegateHandle)
+	{
+		OnCoinChangedDelegateHandle->UnBindCallback();
+	}
+
 	ILayoutInterfacetion::DisEnable();
 }
 
@@ -177,9 +199,19 @@ void UInteractionTransactionLayout::OnBuyClicked()
 	Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->BuyProxys(
 		 CharacterPtr,
 		 CurrentProxyPtr->GetProxyType(),
+		 CurrentProxyPtr->GetID(),
 		 CurrentNum,
+		 UGameplayTagsLibrary::Proxy_Coin_Regular,
 		 CalculateCost()
 		);
+
+	auto UIPtr = Cast<UEditableTextBox>(GetWidgetFromName(FTransactionLayout::Get().EditableTextBox));
+	if (UIPtr)
+	{
+		CurrentNum = 1;
+		UIPtr->SetText(FText::FromString(UKismetStringLibrary::Conv_IntToString(CurrentNum)));
+		NewNum(CurrentNum);
+	}
 }
 
 void UInteractionTransactionLayout::OnAddClicked()
@@ -187,7 +219,7 @@ void UInteractionTransactionLayout::OnAddClicked()
 	auto UIPtr = Cast<UEditableTextBox>(GetWidgetFromName(FTransactionLayout::Get().EditableTextBox));
 	if (UIPtr)
 	{
-		const auto Num = CurrentProxyPtr->GetNum();
+		const auto Num = GetProxyNum(CurrentProxyPtr);
 		if (CurrentNum + 1 > Num)
 		{
 		}
@@ -205,7 +237,7 @@ void UInteractionTransactionLayout::OnSubClicked()
 	auto UIPtr = Cast<UEditableTextBox>(GetWidgetFromName(FTransactionLayout::Get().EditableTextBox));
 	if (UIPtr)
 	{
-		const auto Num = CurrentProxyPtr->GetNum();
+		const auto Num = GetProxyNum(CurrentProxyPtr);
 		if ((CurrentNum - 1) > 0)
 		{
 			CurrentNum--;
@@ -220,9 +252,13 @@ void UInteractionTransactionLayout::OnMaxClicked()
 	auto UIPtr = Cast<UEditableTextBox>(GetWidgetFromName(FTransactionLayout::Get().EditableTextBox));
 	if (UIPtr)
 	{
-		CurrentNum = CurrentProxyPtr->GetNum();
-		UIPtr->SetText(FText::FromString(UKismetStringLibrary::Conv_IntToString(CurrentNum)));
-		NewNum(CurrentNum);
+		const auto Num = GetProxyNum(CurrentProxyPtr);
+		if (Num > 0)
+		{
+			CurrentNum = Num;
+			UIPtr->SetText(FText::FromString(UKismetStringLibrary::Conv_IntToString(CurrentNum)));
+			NewNum(CurrentNum);
+		}
 	}
 }
 
@@ -235,7 +271,7 @@ void UInteractionTransactionLayout::OnEditableTextBoxChangedEvent(
 	{
 		if (UKismetStringLibrary::IsNumeric(Text.ToString()))
 		{
-			const auto Num = CurrentProxyPtr->GetNum();
+			const auto Num = GetProxyNum(CurrentProxyPtr);
 			const auto TargetNum = UKismetStringLibrary::Conv_StringToInt(Text.ToString());
 			if (TargetNum > Num)
 			{
@@ -296,7 +332,7 @@ void UInteractionTransactionLayout::OnItemClicked(
 			auto UIPtr = Cast<UEditableTextBox>(GetWidgetFromName(FTransactionLayout::Get().EditableTextBox));
 			if (UIPtr)
 			{
-				const auto Num = CurrentProxyPtr->GetNum();
+				const auto Num = GetProxyNum(CurrentProxyPtr);
 				CurrentNum = Num > 0 ? 1 : 0;
 				UIPtr->SetText(FText::FromString(UKismetStringLibrary::Conv_IntToString(CurrentNum)));
 				NewNum(CurrentNum);
@@ -315,6 +351,49 @@ void UInteractionTransactionLayout::OnCoinChanged(
 		return;
 	}
 	NewNum(CurrentNum);
+}
+
+void UInteractionTransactionLayout::OnTraderConsumableProxyChanged(
+	const TSharedPtr<FConsumableProxy>& ProxySPtr,
+	EProxyModifyType ProxyModifyType,
+	int32 Num
+	)
+{
+	if (ProxySPtr)
+	{
+		auto UIPtr = Cast<UTileView>(GetWidgetFromName(FTransactionLayout::Get().TileView));
+		if (UIPtr)
+		{
+			auto Items = UIPtr->GetDisplayedEntryWidgets();
+			for (auto Iter : Items)
+			{
+				auto GoodsItemPtr = Cast<UGoodsItem>(Iter);
+				if (GoodsItemPtr && GoodsItemPtr->BasicProxyPtr == ProxySPtr)
+				{
+					switch (ProxyModifyType) {
+					case EProxyModifyType::kNumChanged:
+						{
+							// 刷新一下
+							const auto ProxyPtrNum = GetProxyNum(GoodsItemPtr->BasicProxyPtr);
+							GoodsItemPtr->SetNum(ProxyPtrNum);
+						}
+						break;
+					case EProxyModifyType::kRemove:
+						{
+							// 刷新一下
+							GoodsItemPtr->EnableIcon(false);
+							GoodsItemPtr->SetNum(0);
+						}
+						break;
+					case EProxyModifyType::kPropertyChange:
+						break;
+					}
+					UIPtr->RequestRefresh();
+					return;
+				}
+			}
+		}
+	}
 }
 
 inline void UInteractionTransactionLayout::NewNum(
@@ -343,10 +422,13 @@ inline void UInteractionTransactionLayout::NewNum(
 
 int32 UInteractionTransactionLayout::CalculateCost() const
 {
-	const auto ProductsForSaleMap = CharacterPtr->GetAIComponent()->GetSaleItemsInfo();
-	if (ProductsForSaleMap.Contains(CurrentProxyPtr->GetProxyType()))
+	if (CurrentProxyPtr)
 	{
-		return CurrentNum * ProductsForSaleMap[CurrentProxyPtr->GetProxyType()].Value;
+		const auto ProductsForSaleMap = CharacterPtr->GetAIComponent()->GetSaleItemsInfo();
+		if (ProductsForSaleMap.Contains(CurrentProxyPtr->GetProxyType()))
+		{
+			return CurrentNum * ProductsForSaleMap[CurrentProxyPtr->GetProxyType()].Value;
+		}
 	}
 
 	return -1;

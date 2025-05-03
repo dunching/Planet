@@ -14,18 +14,36 @@
 EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	const auto Teleport = InstanceData.ChallengeAry[
-		FMath::RandRange(0, InstanceData.ChallengeAry.Num() - 1)
-	];;
-	InstanceData.GloabVariable_Challenge->Teleport = Teleport;
+	const auto CurrentLevel = InstanceData.ChallengeGuideTrheadActorPtr->GetCurrentLevel() + 1;
+	InstanceData.ChallengeGuideTrheadActorPtr->SetCurrentLevel(CurrentLevel);
+
+	InstanceData.GloabVariable_Challenge->Teleport = ETeleport::kNone;
+	for (const auto& Iter : InstanceData.ChallengeGuideTrheadActorPtr->SpecifySpecialLevels)
+	{
+		if ((CurrentLevel % Iter.Key) == 0)
+		{
+			InstanceData.GloabVariable_Challenge->Teleport = Iter.Value;
+			break;
+		}
+	}
+
+	if (InstanceData.GloabVariable_Challenge->Teleport == ETeleport::kNone)
+	{
+		InstanceData.GloabVariable_Challenge->Teleport = InstanceData.ChallengeAry[
+			FMath::RandRange(0, InstanceData.ChallengeAry.Num() - 1)
+		];
+	}
 
 	auto PCPtr = Cast<APlanetPlayerController>(
-		UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0)
-	);
+	                                           UGameplayStatics::GetPlayerController(
+		                                            InstanceData.GuideThreadActorPtr,
+		                                            0
+		                                           )
+	                                          );
 
 	PCPtr->GetGameplayTasksComponent()->EntryChallengeLevel(InstanceData.GloabVariable_Challenge->Teleport);
 
@@ -35,19 +53,20 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::EnterState(
 EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
 	if (
-		UOpenWorldSubSystem::GetInstance()->CheckSwitchDataLayerComplete(InstanceData.GloabVariable_Challenge->Teleport) &&
+		UOpenWorldSubSystem::GetInstance()->CheckSwitchDataLayerComplete(InstanceData.GloabVariable_Challenge->Teleport)
+		&&
 		UOpenWorldSubSystem::GetInstance()->CheckTeleportPlayerComplete(InstanceData.GloabVariable_Challenge->Teleport)
 	)
 	{
-		auto GuideThread_ChallengePtr = Cast<AGuideThread_Challenge>(InstanceData.GuideActorPtr);
+		auto GuideThread_ChallengePtr = Cast<AGuideThread_Challenge>(InstanceData.GuideThreadActorPtr);
 		if (GuideThread_ChallengePtr)
 		{
-			GuideThread_ChallengePtr->Teleport = InstanceData.GloabVariable_Challenge->Teleport;
+			GuideThread_ChallengePtr->CurrentTeleport = InstanceData.GloabVariable_Challenge->Teleport;
 		}
 		return EStateTreeRunStatus::Succeeded;
 	}
@@ -58,7 +77,7 @@ EStateTreeRunStatus FSTT_GuideThreadEntryNextLevel::Tick(
 EStateTreeRunStatus FSTT_GuideThread_Challenge_SpawnNPCs::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
@@ -68,7 +87,7 @@ EStateTreeRunStatus FSTT_GuideThread_Challenge_SpawnNPCs::EnterState(
 	}
 	else
 	{
-		SpawnNPC(Context);
+		InstanceData.RemainTime = InstanceData.DelayTime;
 
 		return Super::EnterState(Context, Transition);
 	}
@@ -77,71 +96,110 @@ EStateTreeRunStatus FSTT_GuideThread_Challenge_SpawnNPCs::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_Challenge_SpawnNPCs::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-		GetTaskNodeDescripton(
-			Context
-		)
-	);
-	if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
+	if (InstanceData.RemainTime > 0)
 	{
-		// 获取对应的Characers
-		TArray<AActor*> OutActors;
-		UGameplayStatics::GetAllActorsOfClass(InstanceData.GuideActorPtr, AHumanCharacter_AI::StaticClass(), OutActors);
-		for (auto Iter : OutActors)
+		InstanceData.RemainTime -= DeltaTime;
+	}
+	
+	if (InstanceData.RemainTime > 0)
+	{
+		if (InstanceData.GuideThreadActorPtr)
 		{
-			auto CharacterPtr = Cast<AHumanCharacter_AI>(Iter);
-			if (
-				CharacterPtr &&
-				InstanceData.CharacterIDAry.Contains(CharacterPtr->GetCharacterAttributesComponent()->GetCharacterID())
-			)
-			{
-				InstanceData.CharacterAry.Add(CharacterPtr);
-			}
-		}
-		if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
-		{
-			InstanceData.CharacterAry.Empty();
-		}
-		else
-		{
-			for (auto Iter : InstanceData.CharacterAry)
-			{
-				InstanceData.GloabVariable_Challenge->TemporaryActorAry.Add(Iter.Get());
-			}
+			InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+			                                                        GetTaskNodeDescripton(
+				                                                         Context
+				                                                        )
+			                                                       );
 		}
 	}
 	else
 	{
-		// 等待消亡
-		for (auto Iter : InstanceData.CharacterAry)
+		if (InstanceData.GuideThreadActorPtr)
 		{
-			if (Iter.IsValid())
-			{
-				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
-				{
-				}
-				else
-				{
-					return Super::Tick(Context, DeltaTime);
-				}
-			}
-			else
-			{
-			}
+			InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+																	GetTaskNodeDescripton(
+																		 Context
+																		)
+																   );
 		}
 
-		if (InstanceData.WaveIndex < InstanceData.PerWaveNum.Num())
+		if (InstanceData.CharacterIDAry.IsEmpty())
 		{
-			InstanceData.CharacterAry.Empty();
 			SpawnNPC(Context);
 		}
 		else
 		{
-			return EStateTreeRunStatus::Succeeded;
+			// 获取对应的Characers
+			if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
+			{
+				TArray<AActor*> OutActors;
+				UGameplayStatics::GetAllActorsOfClass(
+													  InstanceData.GuideThreadActorPtr,
+													  AHumanCharacter_AI::StaticClass(),
+													  OutActors
+													 );
+				for (auto Iter : OutActors)
+				{
+					auto CharacterPtr = Cast<AHumanCharacter_AI>(Iter);
+					if (
+						CharacterPtr &&
+						InstanceData.CharacterIDAry.Contains(
+															 CharacterPtr->GetCharacterAttributesComponent()->
+																		   GetCharacterID()
+															)
+					)
+					{
+						InstanceData.CharacterAry.Add(CharacterPtr);
+					}
+				}
+				if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
+				{
+					InstanceData.CharacterAry.Empty();
+				}
+				else
+				{
+					for (auto Iter : InstanceData.CharacterAry)
+					{
+						InstanceData.GloabVariable_Challenge->TemporaryActorAry.Add(Iter.Get());
+					}
+				}
+			}
+			// 等待消亡
+			else
+			{
+				for (auto Iter : InstanceData.CharacterAry)
+				{
+					if (Iter.IsValid())
+					{
+						if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
+						{
+						}
+						else
+						{
+							return Super::Tick(Context, DeltaTime);
+						}
+					}
+					else
+					{
+					}
+				}
+
+				if (InstanceData.WaveIndex < InstanceData.PerWaveNum.Num())
+				{
+					InstanceData.CharacterAry.Empty();
+					InstanceData.CharacterIDAry.Empty();
+				
+					InstanceData.RemainTime = InstanceData.DelayTime;
+				}
+				else
+				{
+					return EStateTreeRunStatus::Succeeded;
+				}
+			}
 		}
 	}
 
@@ -151,14 +209,17 @@ EStateTreeRunStatus FSTT_GuideThread_Challenge_SpawnNPCs::Tick(
 void FSTT_GuideThread_Challenge_SpawnNPCs::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (InstanceData.GloabVariable_Challenge)
 	{
 		auto PCPtr = Cast<APlanetPlayerController>(
-			UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0)
-		);
+		                                           UGameplayStatics::GetPlayerController(
+			                                            InstanceData.GuideThreadActorPtr,
+			                                            0
+			                                           )
+		                                          );
 		if (PCPtr)
 		{
 			for (auto Iter : InstanceData.GloabVariable_Challenge->TemporaryActorAry)
@@ -177,20 +238,20 @@ void FSTT_GuideThread_Challenge_SpawnNPCs::ExitState(
 
 bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	if (InstanceData.WaveIndex < InstanceData.PerWaveNum.Num())
 	{
 		auto PCPtr = Cast<
-			APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0));
+			APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideThreadActorPtr, 0));
 		if (PCPtr)
 		{
 			const auto& NPCAry = InstanceData.PerWaveNum[InstanceData.WaveIndex].NPCAry;
 			const auto Pts = UOpenWorldSubSystem::GetInstance()->GetChallengeSpawnPts(
-				InstanceData.GloabVariable_Challenge->Teleport,
-				NPCAry.Num()
-			);
+				 InstanceData.GloabVariable_Challenge->Teleport,
+				 NPCAry.Num()
+				);
 
 			if (Pts.Num() == NPCAry.Num())
 			{
@@ -199,10 +260,10 @@ bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
 				{
 					InstanceData.CharacterIDAry[Index] = FGuid::NewGuid();
 					PCPtr->ServerSpawnCharacter(
-						NPCAry[Index],
-						InstanceData.CharacterIDAry[Index],
-						Pts[Index]
-					);
+					                            NPCAry[Index],
+					                            InstanceData.CharacterIDAry[Index],
+					                            Pts[Index]
+					                           );
 				}
 
 				InstanceData.WaveIndex++;
@@ -220,45 +281,59 @@ bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
 
 FTaskNodeDescript FSTT_GuideThread_Challenge_SpawnNPCs::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
-	if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
+	if (InstanceData.RemainTime > 0)
 	{
-		TaskNodeDescript.Description = FString::Printf(
-			TEXT(
-				"击败敌人（0/%d）,第%d/%d波敌人"
-			),
-			InstanceData.CharacterIDAry.Num(),
-			InstanceData.WaveIndex,
-			InstanceData.PerWaveNum.Num()
-		);
+		TaskNodeDescript.Description =  FString::Printf(TEXT("%.0lf秒后生成下一波敌人"), InstanceData.RemainTime);
 	}
 	else
 	{
-		int32 Num = 0;
-		for (auto Iter : InstanceData.CharacterAry)
+		if (InstanceData.CharacterAry.Num() < InstanceData.CharacterIDAry.Num())
 		{
-			if (Iter.IsValid() && Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
-			{
-				Num++;
-			}
+			TaskNodeDescript.Description = FString::Printf(
+														   TEXT(
+																"击败敌人（0/%d）,第%d/%d波敌人"
+															   ),
+														   InstanceData.CharacterIDAry.Num(),
+														   InstanceData.WaveIndex,
+														   InstanceData.PerWaveNum.Num()
+														  );
 		}
+		else
+		{
+			int32 Num = 0;
+			for (auto Iter : InstanceData.CharacterAry)
+			{
+				if (Iter.IsValid())
+				{
+					if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
+					{
+						Num++;
+					}
+				}
+				else
+				{
+					Num++;
+				}
+			}
 
-		TaskNodeDescript.Description = FString::Printf(
-			TEXT(
-				"击败敌人（%d/%d）,第%d/%d波敌人"
-			),
-			Num,
-			InstanceData.CharacterIDAry.Num(),
-			InstanceData.WaveIndex,
-			InstanceData.PerWaveNum.Num()
-		);
+			TaskNodeDescript.Description = FString::Printf(
+														   TEXT(
+																"击败敌人（%d/%d）,第%d/%d波敌人"
+															   ),
+														   Num,
+														   InstanceData.CharacterIDAry.Num(),
+														   InstanceData.WaveIndex,
+														   InstanceData.PerWaveNum.Num()
+														  );
+		}
 	}
 
 	return TaskNodeDescript;

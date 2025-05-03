@@ -21,12 +21,21 @@ inline void UProxyIcon::ResetToolUIByData(
 	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
 )
 {
-	if (InBasicProxyPtr == BasicProxyPtr)
+	if (!InBasicProxyPtr)
 	{
 		return;
 	}
 
-	BasicProxyPtr = InBasicProxyPtr;
+	ProxyType = InBasicProxyPtr->GetProxyType();
+
+	SetItemType();
+}
+
+void UProxyIcon::ResetToolUIByData(
+	const FGameplayTag& InProxyType
+	)
+{
+	ProxyType = InProxyType;
 
 	SetItemType();
 }
@@ -38,9 +47,9 @@ void UProxyIcon::NativeOnMouseEnter(
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
-	if (BasicProxyPtr && bIsDisplayInfo)
+	if (ProxyType.IsValid() && bIsDisplayInfo)
 	{
-		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(BasicProxyPtr->GetProxyType());
+		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(ProxyType);
 		if (ProxyDTSPtr)
 		{
 			if (ItemDecriptionPtr)
@@ -57,7 +66,7 @@ void UProxyIcon::NativeOnMouseEnter(
 			}
 			if (ItemDecriptionPtr)
 			{
-				ItemDecriptionPtr->BindData(BasicProxyPtr, ProxyDTSPtr->ItemProxy_Description);
+				ItemDecriptionPtr->BindData(ProxyType, ProxyDTSPtr->ItemProxy_Description);
 
 				ItemDecriptionPtr->AddToViewport(EUIOrder::kHoverDecription);
 			}
@@ -83,15 +92,12 @@ void UProxyIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FProxyIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		if (BasicProxyPtr)
+		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(ProxyType);
+		if (ProxyDTSPtr)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			AsyncLoadText(BasicProxyPtr->GetIcon(), ImagePtr);
-		}
-		else
-		{
-			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
+			AsyncLoadText(ProxyDTSPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon, ImagePtr);
 		}
 	}
 }

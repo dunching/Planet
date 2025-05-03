@@ -35,6 +35,7 @@ enum class ETeleport : uint8
 	 */
 	kChallenge_LevelType_1,
 	kChallenge_LevelType_2,
+	kChallenge_LevelType_Special_1,	// 选择强化、休息,
 	
 	kNone,
 };

@@ -38,10 +38,9 @@ public:
 	/**
 	 * 选择的关卡类型
 	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	ETeleport Teleport = ETeleport::kChallenge_LevelType_1;
 
-	int32 CurrentLevel = 1;
-	
 };
 
 UCLASS(Blueprintable)

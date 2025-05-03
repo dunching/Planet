@@ -7,10 +7,12 @@
 #include "GuideActor.h"
 #include "GuideSystemStateTreeComponent.h"
 #include "GuideThread.h"
+#include "PlanetPlayerController.h"
+#include "Kismet/GameplayStatics.h"
 
 bool UGuideSubSystem::ShouldCreateSubsystem(
 	UObject* Outer
-) const
+	) const
 {
 	if (IsRunningDedicatedServer())
 	{
@@ -23,8 +25,11 @@ bool UGuideSubSystem::ShouldCreateSubsystem(
 UGuideSubSystem* UGuideSubSystem::GetInstance()
 {
 	return Cast<UGuideSubSystem>(
-		USubsystemBlueprintLibrary::GetWorldSubsystem(GetWorldImp(), UGuideSubSystem::StaticClass())
-	);
+	                             USubsystemBlueprintLibrary::GetWorldSubsystem(
+	                                                                           GetWorldImp(),
+	                                                                           UGuideSubSystem::StaticClass()
+	                                                                          )
+	                            );
 }
 
 void UGuideSubSystem::InitializeMainThread()
@@ -33,12 +38,12 @@ void UGuideSubSystem::InitializeMainThread()
 
 void UGuideSubSystem::ActiveMainThread()
 {
-	ActiveTargetGuideThread(GetCurrentMainGuideThread());	
+	ActiveTargetGuideThread(GetCurrentMainGuideThread());
 }
 
 void UGuideSubSystem::AddGuideThread_Brand(
 	const TSubclassOf<AGuideThread_Branch>& BranchLineGuideClass
-)
+	)
 {
 	for (int32 Index = 0; Index < GuideThreadBranchAry.Num(); Index++)
 	{
@@ -53,14 +58,14 @@ void UGuideSubSystem::AddGuideThread_Brand(
 
 void UGuideSubSystem::ActiveBrandGuideThread(
 	const TSubclassOf<AGuideThread_Branch>& GuideClass
-)
+	)
 {
 	ActiveTargetGuideThread(GuideClass);
 }
 
 void UGuideSubSystem::StopActiveBrandGuideThread(
 	const TSubclassOf<AGuideThread_Branch>& GuideClass
-)
+	)
 {
 	if (CurrentLineGuidePtr)
 	{
@@ -77,7 +82,7 @@ void UGuideSubSystem::StopActiveBrandGuideThread(
 
 void UGuideSubSystem::StartParallelGuideThread(
 	const TSubclassOf<AGuideThread_Immediate>& GuideClass
-)
+	)
 {
 	for (auto Iter : ActivedGuideThreadsAry)
 	{
@@ -90,9 +95,9 @@ void UGuideSubSystem::StartParallelGuideThread(
 	FActorSpawnParameters SpawnParameters;
 
 	auto GuideThreadPtr = GetWorld()->SpawnActor<AGuideThread>(
-		GuideClass,
-		SpawnParameters
-	);
+	                                                           GuideClass,
+	                                                           SpawnParameters
+	                                                          );
 
 	GuideThreadPtr->GetGuideSystemStateTreeComponent()->StartLogic();
 
@@ -102,7 +107,7 @@ void UGuideSubSystem::StartParallelGuideThread(
 
 void UGuideSubSystem::StopParallelGuideThread(
 	const TSubclassOf<AGuideThread_Immediate>& GuideClass
-)
+	)
 {
 	for (int32 Index = 0; Index < ActivedGuideThreadsAry.Num(); Index++)
 	{
@@ -117,15 +122,24 @@ void UGuideSubSystem::StopParallelGuideThread(
 
 void UGuideSubSystem::OnGuideThreadStoped(
 	AGuideThread* GuideThreadPtr
-)
+	)
 {
 	OnStopGuide.Broadcast(GuideThreadPtr);
 
 	if (GuideThreadPtr)
 	{
+		// 任务已完成
 		if (GuideThreadPtr->bIsComleted)
 		{
-			
+			auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
+			if (PCPtr)
+			{
+				for (const auto& Iter : GuideThreadPtr->RewardProxysMap)
+				{
+					PCPtr->AddProxy(Iter.Key, Iter.Value);
+				}
+			}
+
 			const auto CurrentGuideID = GuideThreadPtr->GetGuideID();
 			const auto CurrentTaskID = GuideThreadPtr->GetCurrentTaskID();
 
@@ -141,7 +155,7 @@ void UGuideSubSystem::OnGuideThreadStoped(
 				ActiveMainThread();
 			}
 		}
-		
+
 		GuideThreadPtr->Destroy();
 		GuideThreadPtr = nullptr;
 	}
@@ -158,11 +172,11 @@ TSubclassOf<AGuideThread_Main> UGuideSubSystem::GetCurrentMainGuideThread() cons
 
 	if (WorldSetting->MainGuideThreadChaptersAry.IsValidIndex(CurrentMainGuideThreadIndex))
 	{
-		return WorldSetting->MainGuideThreadChaptersAry[CurrentMainGuideThreadIndex];	
+		return WorldSetting->MainGuideThreadChaptersAry[CurrentMainGuideThreadIndex];
 	}
 	else
 	{
-		return WorldSetting->ToBeContinueGuideThread;	
+		return WorldSetting->ToBeContinueGuideThread;
 	}
 }
 
@@ -173,7 +187,7 @@ TArray<TSubclassOf<AGuideThread_Branch>> UGuideSubSystem::GetGuideThreadAry() co
 
 TObjectPtr<AGuideThread> UGuideSubSystem::IsActivedGuideThread(
 	const TSubclassOf<AGuideThread_Immediate>& GuideClass
-) const
+	) const
 {
 	for (auto Iter : ActivedGuideThreadsAry)
 	{
@@ -182,7 +196,7 @@ TObjectPtr<AGuideThread> UGuideSubSystem::IsActivedGuideThread(
 			return Iter;
 		}
 	}
-	
+
 	return nullptr;
 }
 
@@ -198,7 +212,7 @@ FOnStopGuide& UGuideSubSystem::GetOnStopGuide()
 
 void UGuideSubSystem::ActiveTargetGuideThread(
 	const TSubclassOf<AGuideThread>& GuideClass
-)
+	)
 {
 	PreviouGuideClass = nullptr;
 	if (CurrentLineGuidePtr)
@@ -211,7 +225,7 @@ void UGuideSubSystem::ActiveTargetGuideThread(
 		{
 			GuidePostionSet.Add(CurrentGuideID, CurrentTaskID);
 		}
-		
+
 		OnStopGuide.Broadcast(CurrentLineGuidePtr);
 		CurrentLineGuidePtr->Destroy();
 	}
@@ -219,9 +233,9 @@ void UGuideSubSystem::ActiveTargetGuideThread(
 	FActorSpawnParameters SpawnParameters;
 
 	auto GuideThreadPtr = GetWorld()->SpawnActor<AGuideThread>(
-		GuideClass,
-		SpawnParameters
-	);
+	                                                           GuideClass,
+	                                                           SpawnParameters
+	                                                          );
 
 	CurrentLineGuidePtr = GuideThreadPtr;
 

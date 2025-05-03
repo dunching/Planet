@@ -8,6 +8,7 @@
 
 #include "GenerateType.h"
 #include "HUDInterface.h"
+#include "InventoryComponent.h"
 #include "LayoutInterfacetion.h"
 
 
@@ -32,49 +33,65 @@ class PLANET_API UInteractionTransactionLayout :
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
+	virtual void Enable() override;
 
-	virtual void Enable()override;
-	
-	virtual void DisEnable()override;
+	virtual void DisEnable() override;
 
-	virtual ELayoutCommon GetLayoutType() const  override final;
-	
+	virtual ELayoutCommon GetLayoutType() const override final;
+
 private:
-
 	UFUNCTION()
 	void OnQuitClicked();
-	
+
 	UFUNCTION()
 	void OnBuyClicked();
-	
+
 	UFUNCTION()
 	void OnAddClicked();
-	
+
 	UFUNCTION()
 	void OnSubClicked();
-	
+
 	UFUNCTION()
 	void OnMaxClicked();
-	
-	UFUNCTION()
-	void OnEditableTextBoxChangedEvent( const FText& Text);
-	
-	UFUNCTION()
-	void OnItemClicked(UGoodsItem*ItemPtr);
 
-	void OnCoinChanged(int32, int32 NewValue);
-	
-	void NewNum(int32 Num);
+	UFUNCTION()
+	void OnEditableTextBoxChangedEvent(
+		const FText& Text
+		);
 
-	int32 CalculateCost()const;
-	
+	UFUNCTION()
+	void OnItemClicked(
+		UGoodsItem* ItemPtr
+		);
+
+	void OnCoinChanged(
+		int32,
+		int32 NewValue
+		);
+
+	void OnTraderConsumableProxyChanged(
+		const TSharedPtr<
+			FConsumableProxy>& ProxySPtr,
+		EProxyModifyType ProxyModifyType,
+		int32 Num
+		);
+
+	void NewNum(
+		int32 Num
+		);
+
+	int32 CalculateCost() const;
+
 	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 
 	TSharedPtr<FBasicProxy> CurrentProxyPtr = nullptr;
 
 	int32 CurrentNum = 0;
+
+	UInventoryComponent::FOnConsumableProxyChanged::FCallbackHandleSPtr OnConsumableProxyChangedDelegateHandle;
 
 	TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr OnCoinChangedDelegateHandle;
 };

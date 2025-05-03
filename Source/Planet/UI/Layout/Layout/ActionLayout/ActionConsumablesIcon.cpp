@@ -1,4 +1,3 @@
-
 #include "ActionConsumablesIcon.h"
 
 #include "Components/TextBlock.h"
@@ -52,13 +51,16 @@ struct FActionConsumablesIcon : public TStructVariable<FActionConsumablesIcon>
 	const FName WaitInputPercent = TEXT("WaitInputPercent");
 };
 
-UActionConsumablesIcon::UActionConsumablesIcon(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UActionConsumablesIcon::UActionConsumablesIcon(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
-
 }
 
-void UActionConsumablesIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UActionConsumablesIcon::InvokeReset(
+	UUserWidget* BaseWidgetPtr
+	)
 {
 	if (BaseWidgetPtr)
 	{
@@ -70,7 +72,9 @@ void UActionConsumablesIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
+void UActionConsumablesIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	)
 {
 	bIsReady_Previous = false;
 
@@ -80,14 +84,20 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 	{
 		if (
 			BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Consumables)
-			)
+		)
 		{
 			ProxyPtr = DynamicCastSharedPtr<FConsumableProxy>(BasicProxyPtr);
 
 			if (ProxyPtr && ProxyPtr->GetNum() > 0)
 			{
 				OnValueChangedDelegateHandle =
-					ProxyPtr->CallbackContainerHelper.AddOnValueChanged(std::bind(&ThisClass::SetNum, this, std::placeholders::_2));
+					ProxyPtr->CallbackContainerHelper.AddOnValueChanged(
+					                                                    std::bind(
+						                                                     &ThisClass::SetNum,
+						                                                     this,
+						                                                     std::placeholders::_1
+						                                                    )
+					                                                   );
 
 				SetLevel();
 				SetItemType();
@@ -111,9 +121,10 @@ void UActionConsumablesIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& Ba
 	SetInputRemainPercent(false, 0.f);
 }
 
-void UActionConsumablesIcon::EnableIcon(bool bIsEnable)
+void UActionConsumablesIcon::EnableIcon(
+	bool bIsEnable
+	)
 {
-
 }
 
 void UActionConsumablesIcon::UpdateState()
@@ -138,7 +149,7 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 	bool bCooldownIsReady,
 	float RemainingTime,
 	float Percent
-)
+	)
 {
 	if (bCooldownIsReady)
 	{
@@ -181,7 +192,9 @@ void UActionConsumablesIcon::SetRemainingCooldown(
 	}
 }
 
-void UActionConsumablesIcon::SetCanRelease(bool bIsReady_In)
+void UActionConsumablesIcon::SetCanRelease(
+	bool bIsReady_In
+	)
 {
 	if (bIsReady_In)
 	{
@@ -228,7 +241,7 @@ void UActionConsumablesIcon::SetItemType()
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
+			AsyncLoadText(ProxyPtr->GetIcon(), ImagePtr);
 		}
 		else
 		{
@@ -237,7 +250,9 @@ void UActionConsumablesIcon::SetItemType()
 	}
 }
 
-void UActionConsumablesIcon::SetNum(int32 NewNum)
+void UActionConsumablesIcon::SetNum(
+	int32 NewNum
+	)
 {
 	auto NumTextPtr = Cast<UTextBlock>(GetWidgetFromName(FActionConsumablesIcon::Get().Number));
 	if (!NumTextPtr)
@@ -256,17 +271,23 @@ void UActionConsumablesIcon::SetNum(int32 NewNum)
 	}
 }
 
-void UActionConsumablesIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)
+void UActionConsumablesIcon::SetInputRemainPercent(
+	bool bIsAcceptInput,
+	float Percent
+	)
 {
 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionConsumablesIcon::Get().WaitInputPercent));
 	if (UIPtr)
 	{
-		UIPtr->SetVisibility(bIsAcceptInput ?  ESlateVisibility::Visible : ESlateVisibility::Hidden);
+		UIPtr->SetVisibility(bIsAcceptInput ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
 		UIPtr->SetPercent(Percent);
 	}
 }
 
-void UActionConsumablesIcon::SetDurationPercent(bool bIsHaveDuration, float Percent)
+void UActionConsumablesIcon::SetDurationPercent(
+	bool bIsHaveDuration,
+	float Percent
+	)
 {
 }
 

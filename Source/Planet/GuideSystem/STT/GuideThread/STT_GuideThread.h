@@ -114,7 +114,7 @@ struct PLANET_API FSTID_GuideThreadBase :
 		EditAnywhere,
 		Category = Context
 	)
-	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
+	TObjectPtr<AGuideThread> GuideThreadActorPtr = nullptr;
 
 	/**
 	 * 该引导的的PlayerCharacter
@@ -1310,6 +1310,65 @@ struct PLANET_API FSTT_GuideThread_Completet :
 	virtual EStateTreeRunStatus EnterState(
 		FStateTreeExecutionContext& Context,
 		const FStateTreeTransitionResult& Transition
+	) const override;
+
+protected:
+};
+#pragma endregion
+
+#pragma region 延迟任务
+USTRUCT()
+struct PLANET_API FSTID_DelayTask :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	/**
+	 * 延迟时间
+	 */
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	int32 DelayTime = 5;
+
+	/**
+	 * 描述文字
+	 */
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	FString Descrption = TEXT("剩余[Time]秒");
+
+	float RemainTime = 0.f;
+};
+
+/**
+ * 与FStateTreeDelayTask的区别为输出一段描述文字
+ */
+USTRUCT()
+struct PLANET_API FSTT_DelayTask :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_DelayTask;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
 	) const override;
 
 protected:

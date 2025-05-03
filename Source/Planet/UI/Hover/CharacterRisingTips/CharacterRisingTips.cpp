@@ -12,6 +12,7 @@
 #include "Planet.h"
 #include "GameOptions.h"
 #include "OnEffectedTawrgetCallback.h"
+#include "PlanetGameViewportClient.h"
 #include "TemplateHelper.h"
 #include "TextSubSystem.h"
 #include "TextCollect.h"
@@ -62,5 +63,12 @@ FVector UCharacterRisingTips::GetHoverPosition()
 
 void UCharacterRisingTips::PlayAnimationFinished()
 {
-	RemoveFromParent();
+	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+		GetWorld(),
+		TargetPointSharedLayerName
+	);
+	if (ScreenLayer)
+	{
+		ScreenLayer->RemoveHoverWidget(this);
+	}
 }

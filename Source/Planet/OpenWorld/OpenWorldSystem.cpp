@@ -18,13 +18,16 @@
 UOpenWorldSubSystem* UOpenWorldSubSystem::GetInstance()
 {
 	return Cast<UOpenWorldSubSystem>(
-		USubsystemBlueprintLibrary::GetWorldSubsystem(GetWorldImp(), UOpenWorldSubSystem::StaticClass())
-	);
+	                                 USubsystemBlueprintLibrary::GetWorldSubsystem(
+		                                  GetWorldImp(),
+		                                  UOpenWorldSubSystem::StaticClass()
+		                                 )
+	                                );
 }
 
 bool UOpenWorldSubSystem::ShouldCreateSubsystem(
 	UObject* Outer
-) const
+	) const
 {
 	// if (!IsRunningDedicatedServer())
 	// {
@@ -36,7 +39,7 @@ bool UOpenWorldSubSystem::ShouldCreateSubsystem(
 
 ETeleport UOpenWorldSubSystem::GetTeleportLastPtInOpenWorld(
 	APlanetPlayerController* PCPtr
-)
+	)
 {
 	ETeleport TargetTeleport = ETeleport::kNone;
 
@@ -90,7 +93,7 @@ ETeleport UOpenWorldSubSystem::GetTeleportLastPtInOpenWorld(
 void UOpenWorldSubSystem::SwitchDataLayer(
 	ETeleport ChallengeLevelType,
 	APlanetPlayerController* PCPtr
-)
+	)
 {
 	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
@@ -108,14 +111,14 @@ void UOpenWorldSubSystem::SwitchDataLayer(
 					if (
 						DataLayerManagerPtr->
 						SetDataLayerRuntimeState(
-							DataLayerIter.Key,
-							DataLayerIter.Value
-						))
+						                         DataLayerIter.Key,
+						                         DataLayerIter.Value
+						                        ))
 					{
 						PRINTINVOKEWITHSTR(
-							FString(TEXT("SetDataLayerRuntimeState Success!")
-							)
-						);
+						                   FString(TEXT("SetDataLayerRuntimeState Success!")
+						                   )
+						                  );
 					}
 				}
 			}
@@ -126,14 +129,14 @@ void UOpenWorldSubSystem::SwitchDataLayer(
 void UOpenWorldSubSystem::TeleportPlayer(
 	ETeleport ChallengeLevelType,
 	APlanetPlayerController* PCPtr
-)
+	)
 {
 	if (ChallengeLevelType == ETeleport::kReturnOpenWorld)
 	{
 		if (PCPtr->GetPawn()->TeleportTo(
-			OpenWorldTransform.GetLocation(),
-			OpenWorldTransform.GetRotation().Rotator()
-		))
+		                                 OpenWorldTransform.GetLocation(),
+		                                 OpenWorldTransform.GetRotation().Rotator()
+		                                ))
 		{
 		}
 	}
@@ -156,15 +159,15 @@ void UOpenWorldSubSystem::TeleportPlayer(
 					auto TeleportPtr = RowIter->TeleportRef.LoadSynchronous();
 					const auto TeleportTransform = TeleportPtr->GetLandTransform();
 					if (PCPtr->GetPawn()->TeleportTo(
-							TeleportTransform.GetLocation(),
-							TeleportTransform.GetRotation().Rotator()
-						)
+					                                 TeleportTransform.GetLocation(),
+					                                 TeleportTransform.GetRotation().Rotator()
+					                                )
 					)
 					{
 						PRINTINVOKEWITHSTR(
-							FString(TEXT("Teleport Success!")
-							)
-						);
+						                   FString(TEXT("Teleport Success!")
+						                   )
+						                  );
 					}
 				}
 			}
@@ -174,7 +177,7 @@ void UOpenWorldSubSystem::TeleportPlayer(
 
 bool UOpenWorldSubSystem::CheckTeleportPlayerComplete(
 	ETeleport ChallengeLevelType
-) const
+	) const
 {
 	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
@@ -187,9 +190,9 @@ bool UOpenWorldSubSystem::CheckTeleportPlayerComplete(
 		{
 			auto PlayerCharacterPtr = UGameplayStatics::GetPlayerCharacter(this, 0);
 			const auto Distance = FVector::Dist2D(
-				RowIter->TeleportRef->GetLandTransform().GetLocation(),
-				PlayerCharacterPtr->GetActorLocation()
-			);
+			                                      RowIter->TeleportRef->GetLandTransform().GetLocation(),
+			                                      PlayerCharacterPtr->GetActorLocation()
+			                                     );
 
 			const auto Threshold = 100;
 			if (
@@ -205,7 +208,7 @@ bool UOpenWorldSubSystem::CheckTeleportPlayerComplete(
 
 ETeleport UOpenWorldSubSystem::GetTeleportPlayerToNearest(
 	APlanetPlayerController* PCPtr
-)
+	)
 {
 	ETeleport TargetTeleport = ETeleport::kNone;
 
@@ -258,7 +261,7 @@ ETeleport UOpenWorldSubSystem::GetTeleportPlayerToNearest(
 
 bool UOpenWorldSubSystem::CheckSwitchDataLayerComplete(
 	ETeleport ChallengeLevelType
-) const
+	) const
 {
 	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
@@ -269,6 +272,24 @@ bool UOpenWorldSubSystem::CheckSwitchDataLayerComplete(
 	{
 		if (RowIter->ChallengeLevelType == ChallengeLevelType)
 		{
+			switch (RowIter->ChallengeLevelType)
+			{
+			case ETeleport::kReturnOpenWorld:
+
+			default:
+				{
+					auto LoadTargetPtr = RowIter->TeleportRef.LoadSynchronous();
+					if (LoadTargetPtr && LoadTargetPtr->HasActorBegunPlay())
+					{
+					}
+					else
+					{
+						return false;
+					}
+					break;
+				};
+			}
+
 			for (const auto& Iter : RowIter->MustReadActors)
 			{
 				if (auto ActorPtr = Iter.LoadSynchronous())
@@ -304,6 +325,11 @@ bool UOpenWorldSubSystem::CheckSwitchDataLayerComplete(
 					}
 				}
 				break;
+			case ETeleport::kChallenge_LevelType_Special_1:
+				{
+					return true;
+				}
+				break;
 			}
 		}
 	}
@@ -313,7 +339,7 @@ bool UOpenWorldSubSystem::CheckSwitchDataLayerComplete(
 
 TSoftObjectPtr<ATeleport> UOpenWorldSubSystem::GetTeleport(
 	ETeleport ChallengeLevelType
-) const
+	) const
 {
 	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
 
@@ -334,7 +360,7 @@ TSoftObjectPtr<ATeleport> UOpenWorldSubSystem::GetTeleport(
 TArray<FTransform> UOpenWorldSubSystem::GetChallengeSpawnPts(
 	ETeleport ChallengeLevelType,
 	int32 Num
-) const
+	) const
 {
 	TArray<FTransform> Result;
 

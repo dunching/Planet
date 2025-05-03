@@ -29,6 +29,10 @@ public:
 		const TSharedPtr<FBasicProxy>& BasicProxyPtr
 	);
 
+	virtual void ResetToolUIByData(
+		const FGameplayTag &InProxyType
+	);
+
 	protected:
 	
 	 virtual void NativeOnMouseEnter( const FGeometry& InGeometry, const FPointerEvent& InMouseEvent ) override;
@@ -38,7 +42,7 @@ public:
 private:
 	virtual void SetItemType();
 
-	TSharedPtr<FBasicProxy> BasicProxyPtr = nullptr;
+	FGameplayTag ProxyType;
 
 	UPROPERTY(transient)
 	UItemDecription * ItemDecriptionPtr = nullptr;

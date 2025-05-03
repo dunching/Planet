@@ -30,13 +30,13 @@ ATeleport::ATeleport(const FObjectInitializer& ObjectInitializer)
 	
 	GEAreaComponentPtr = CreateEditorOnlyDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	GEAreaComponentPtr->SetupAttachment(RootComponent);
+
+	GEAreaComponentPtr->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnComponentBeginOverlap);
 }
 
 void ATeleport::BeginPlay()
 {
 	Super::BeginPlay();
-
-	GEAreaComponentPtr->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnComponentBeginOverlap);
 }
 
 FTransform ATeleport::GetLandTransform() const

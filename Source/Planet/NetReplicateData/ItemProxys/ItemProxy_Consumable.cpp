@@ -27,6 +27,15 @@ bool FConsumableProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& 
 	return true;
 }
 
+void FConsumableProxy::InitialProxy(
+	const FGameplayTag& InProxyType
+	)
+{
+	Super::InitialProxy(InProxyType);
+	
+	ProxyPtr = this;
+}
+
 void FConsumableProxy::UpdateByRemote(const TSharedPtr<FConsumableProxy>& RemoteSPtr)
 {
 	Super::UpdateByRemote(RemoteSPtr);

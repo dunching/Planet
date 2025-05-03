@@ -490,6 +490,24 @@ void EditorCommand::MakeTrueDamege(const TArray< FString >& Args)
 	PCPtr->MakeTrueDamege(Args);
 }
 
+void EditorCommand::MakeTrueDamegeInArea(
+	const TArray<FString>& Args
+	)
+{
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->MakeTrueDamegeInArea(Args);
+}
+
 void EditorCommand::MakeTherapy(const TArray< FString >& Args)
 {
 	if (!Args.IsValidIndex(0))

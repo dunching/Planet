@@ -3,9 +3,11 @@
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
+#include "GroupManagger.h"
 #include "GuideSubSystem.h"
 #include "GuideThreadChallenge.h"
 #include "HumanCharacter_Player.h"
+#include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 #include "Planet_Tools.h"
 #include "Kismet/GameplayStatics.h"
@@ -29,7 +31,7 @@ void TestCommand::AddCahracterTestData()
 
 void TestCommand::AddPlayerCharacterTestDataImp(
 	AHumanCharacter* CharacterPtr
-)
+	)
 {
 	{
 		//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
@@ -53,7 +55,7 @@ void TestCommand::AddPlayerCharacterTestDataImp(
 
 void TestCommand::AddAICharacterTestDataImp(
 	AHumanCharacter* CharacterPtr
-)
+	)
 {
 	{
 		//		auto& HoldItemComponent = CharacterPtr->GetInventoryComponent()->GetSceneProxyContainer();
@@ -96,14 +98,14 @@ void TestCommand::ChallengeTest()
 {
 #if WITH_EDITOR
 	UGuideSubSystem::GetInstance()->StartParallelGuideThread(
-		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
-	);
+	                                                         UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
+	                                                        );
 #endif
 }
 
 void TestCommand::TestHasBeenFlyAway(
 	const TArray<FString>& Args
-)
+	)
 {
 #if WITH_EDITOR
 	if (!Args.IsValidIndex(0))
@@ -123,13 +125,13 @@ void TestCommand::TestHasBeenFlyAway(
 
 void TestCommand::ReplyHP(
 	const TArray<FString>& Args
-)
+	)
 {
 }
 
 void TestCommand::IncreaseCD(
 	const TArray<FString>& Args
-)
+	)
 {
 #if WITH_EDITOR
 	if (!Args.IsValidIndex(0))
@@ -142,6 +144,48 @@ void TestCommand::IncreaseCD(
 	{
 		int32 CD = UKismetStringLibrary::Conv_StringToInt(Args[0]);
 		Player->IncreaseCD(CD);
+	}
+#endif
+}
+
+void TestCommand::AddProxy(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		PCPtr->AddProxy(
+		                FGameplayTag::RequestGameplayTag(*Args[0]),
+		                UKismetStringLibrary::Conv_StringToInt(Args[1])
+		               );
+	}
+#endif
+}
+
+void TestCommand::RemoveProxy(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		auto InventoryComponentPtr = PCPtr->GetGroupManagger()->GetInventoryComponent();
+		if (InventoryComponentPtr)
+		{
+		}
 	}
 #endif
 }

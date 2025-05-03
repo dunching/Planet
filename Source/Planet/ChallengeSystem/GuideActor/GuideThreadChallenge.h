@@ -42,9 +42,29 @@ public:
 	/**
 	 * 当前在哪个挑战关卡入口
 	 */
-	ETeleport Teleport = ETeleport::kChallenge_LevelType_1;
+	ETeleport CurrentTeleport = ETeleport::kChallenge_LevelType_1;
+	
+	/**
+	 * 每多少层进入一个指定关卡
+	 * 如同LOL斗魂，指定关卡层数进入选秀或选择强化关卡
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<int32, ETeleport> SpecifySpecialLevels;
 	
 	AGuideThread_Challenge(const FObjectInitializer& ObjectInitializer);
+
+	virtual FString GetGuideThreadTitle() const;
+
+	void SetCurrentLevel(int32 NewCurrentLevel );
+	
+	int32 GetCurrentLevel()const;
+	
+protected:
+	
+	/**
+	 * 当前层数
+	 */
+	int32 CurrentLevel = 0;
 
 };
 

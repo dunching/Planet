@@ -56,7 +56,7 @@ void UEndangeredStateLayout::OnClicked()
 				return;
 			}
 	
-			PCPtr->GetGameplayTasksComponent()->EntryChallengeLevel(GuideThread_ChallengePtr->Teleport);
+			PCPtr->GetGameplayTasksComponent()->EntryChallengeLevel(GuideThread_ChallengePtr->CurrentTeleport);
 		}
 	}
 	else

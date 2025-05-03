@@ -116,7 +116,7 @@ void UInventoryComponent::SyncPendingProxy(
 		{
 			for (const auto& SecondIter : Iter.Value)
 			{
-				AddProxy(SecondIter.Key, SecondIter.Value);
+				AddProxyNum(SecondIter.Key, SecondIter.Value);
 			}
 		}
 		PendingMap.Remove(Guid);
@@ -145,64 +145,84 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy_SyncHelper(
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 	{
-		ProxysMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		ProxysAry.Add(ProxySPtr);
-
-		Result = ProxySPtr;
-
-		OnWeaponProxyChanged(DynamicCastSharedPtr<FWeaponProxy>(Result), EProxyModifyType::kAdd);
+		auto RemoteProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
+		auto TempResult = AddProxy_Weapon(ProxyType);
+		TempResult->UpdateByRemote(RemoteProxySPtr);
+		Result = TempResult;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
 	{
-		ProxysMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		ProxysAry.Add(ProxySPtr);
-
-		Result = ProxySPtr;
-
-		OnSkillProxyChanged(DynamicCastSharedPtr<FSkillProxy>(Result), EProxyModifyType::kAdd);
+		auto RemoteProxySPtr = DynamicCastSharedPtr<FSkillProxy>(ProxySPtr);
+		auto TempResult = AddProxy_Skill(ProxyType);
+		TempResult->UpdateByRemote(RemoteProxySPtr);
+		Result = TempResult;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
-		auto CoinProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
-		auto TempResult = AddProxy_Coin(ProxyType, CoinProxySPtr->GetOffsetNum());
+		auto RemoteProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
+		auto TempResult = AddProxy_Coin(ProxyType, RemoteProxySPtr->GetOffsetNum());
+		TempResult->UpdateByRemote(RemoteProxySPtr);
 		Result = TempResult;
-
-		OnCoinProxyChanged(TempResult, EProxyModifyType::kAdd, CoinProxySPtr->GetOffsetNum());
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 	{
-		auto CoinProxySPtr = DynamicCastSharedPtr<FCoinProxy>(ProxySPtr);
+		auto CoinProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
 		auto TempResult = AddProxy_Consumable(ProxyType, CoinProxySPtr->GetOffsetNum());
+		TempResult->UpdateByRemote(CoinProxySPtr);
 		Result = TempResult;
-
-		OnConsumableProxyChanged(TempResult, EProxyModifyType::kAdd);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
-		ProxysMap.Add(ProxySPtr->GetID(), ProxySPtr);
-		ProxysAry.Add(ProxySPtr);
-
-		Result = ProxySPtr;
+		auto CoinProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(ProxySPtr);
+		auto TempResult = AddProxy_Character(ProxyType);
+		TempResult->UpdateByRemote(CoinProxySPtr);
+		Result = TempResult;
 	}
 
 	return Result;
 }
 
-TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
+void UInventoryComponent::RemoveProxy_SyncHelper(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
+	)
+{
+	const auto ProxyType = ProxySPtr->GetProxyType();
+	
+	if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
+	{
+	}
+	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
+	{
+	}
+	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
+	{
+	}
+	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
+	{
+	}
+	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
+	{
+		auto CoinProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(ProxySPtr);
+		RemoveProxy_Consumable(CoinProxySPtr, CoinProxySPtr->GetNum());
+	}
+	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
+	{
+	}
+}
+
+ void UInventoryComponent::UpdateProxy_SyncHelper(
 	const TSharedPtr<FBasicProxy>& LocalProxySPtr,
 	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
 	)
 {
-	TSharedPtr<FBasicProxy> Result = nullptr;
-
 	if (!(LocalProxySPtr && RemoteProxySPtr))
 	{
-		return Result;
+		return;
 	}
 
 	if (LocalProxySPtr->GetProxyType() != RemoteProxySPtr->GetProxyType())
 	{
-		return Result;
+		return;
 	}
 
 	const auto ProxyType = RemoteProxySPtr->GetProxyType();
@@ -216,9 +236,7 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
 		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
-		Result = LeftProxySPtr;
-
-		OnWeaponProxyChanged(LeftProxySPtr, EProxyModifyType::kChange);
+		OnWeaponProxyChanged(LeftProxySPtr, EProxyModifyType::kPropertyChange);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
 	{
@@ -226,9 +244,7 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
 		auto LeftProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
-		Result = LeftProxySPtr;
-
-		OnSkillProxyChanged(LeftProxySPtr, EProxyModifyType::kChange);
+		OnSkillProxyChanged(LeftProxySPtr, EProxyModifyType::kPropertyChange);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
 	{
@@ -236,17 +252,13 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
 		auto LeftProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
-		Result = LeftProxySPtr;
-
-		OnSkillProxyChanged(LeftProxySPtr, EProxyModifyType::kChange);
+		OnSkillProxyChanged(LeftProxySPtr, EProxyModifyType::kPropertyChange);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(RemoteProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FTalentSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
-
-		Result = LeftProxySPtr;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 	{
@@ -254,9 +266,7 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
 		auto LeftProxySPtr = DynamicCastSharedPtr<FWeaponSkillProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
-		Result = LeftProxySPtr;
-
-		OnSkillProxyChanged(LeftProxySPtr, EProxyModifyType::kChange);
+		OnSkillProxyChanged(LeftProxySPtr, EProxyModifyType::kPropertyChange);
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
 	{
@@ -264,15 +274,13 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCoinProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
-		Result = LeftProxySPtr;
-
 		if (LeftProxySPtr->GetOffsetNum() == 0)
 		{
-			OnCoinProxyChanged(LeftProxySPtr, EProxyModifyType::kChange, LeftProxySPtr->GetOffsetNum());
+			OnCoinProxyChanged(LeftProxySPtr, EProxyModifyType::kPropertyChange, LeftProxySPtr->GetOffsetNum());
 		}
 		else
 		{
-			OnCoinProxyChanged(LeftProxySPtr, EProxyModifyType::kNumChange, LeftProxySPtr->GetOffsetNum());
+			OnCoinProxyChanged(LeftProxySPtr, EProxyModifyType::kNumChanged, LeftProxySPtr->GetOffsetNum());
 		}
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
@@ -281,26 +289,27 @@ TSharedPtr<FBasicProxy> UInventoryComponent::UpdateProxy_SyncHelper(
 		auto LeftProxySPtr = DynamicCastSharedPtr<FConsumableProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
 
-		Result = LeftProxySPtr;
+		if (LeftProxySPtr->GetOffsetNum() == 0)
+		{
+			OnConsumableProxyChanged(LeftProxySPtr, EProxyModifyType::kPropertyChange, LeftProxySPtr->GetOffsetNum());
+		}
+		else
+		{
+			OnConsumableProxyChanged(LeftProxySPtr, EProxyModifyType::kNumChanged, LeftProxySPtr->GetOffsetNum());
+		}
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(RemoteProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
-
-		Result = LeftProxySPtr;
 	}
 	else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
 	{
 		auto RightProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(RemoteProxySPtr);
 		auto LeftProxySPtr = DynamicCastSharedPtr<FCharacterProxy>(FindProxy(LocalProxySPtr->GetID()));
 		LeftProxySPtr->UpdateByRemote(RightProxySPtr);
-
-		Result = LeftProxySPtr;
 	}
-
-	return Result;
 }
 
 void UInventoryComponent::SetAllocationCharacterProxy(
@@ -337,7 +346,7 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::AddProxy_Weapon(
 
 	Proxy_Container.AddItem(ResultPtr);
 
-	OnWeaponProxyChanged(ResultPtr, EProxyModifyType::kAdd);
+	OnWeaponProxyChanged(ResultPtr, EProxyModifyType::kNumChanged);
 
 	return ResultPtr;
 }
@@ -355,7 +364,7 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::Update_Weapon(
 	ProxysAry.Add(ResultPtr);
 	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
-	OnWeaponProxyChanged(ResultPtr, EProxyModifyType::kChange);
+	OnWeaponProxyChanged(ResultPtr, EProxyModifyType::kPropertyChange);
 
 	return ResultPtr;
 }
@@ -413,7 +422,7 @@ TSharedPtr<FSkillProxy> UInventoryComponent::AddProxy_Skill(
 
 	Proxy_Container.AddItem(ResultPtr);
 
-	OnSkillProxyChanged(ResultPtr, EProxyModifyType::kAdd);
+	OnSkillProxyChanged(ResultPtr, EProxyModifyType::kNumChanged);
 
 	return ResultPtr;
 }
@@ -438,14 +447,15 @@ TSharedPtr<FSkillProxy> UInventoryComponent::FindProxy_Skill(
 
 TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(
 	const FGameplayTag& ProxyType,
-	int32 Num
+	int32 Num,
+	const IDType& ID
 	)
 {
 	if (ProxyTypeMap.Contains(ProxyType))
 	{
 		auto Ref = DynamicCastSharedPtr<FConsumableProxy>(ProxyTypeMap[ProxyType]);
 
-		Ref->AddNum(Num);
+		Ref->ModifyNum(Num);
 
 #if UE_EDITOR || UE_SERVER
 		if (GetOwnerRole() == ROLE_Authority)
@@ -454,7 +464,7 @@ TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(
 		}
 #endif
 
-		OnConsumableProxyChanged.ExcuteCallback(Ref, EProxyModifyType::kNumChange);
+		OnConsumableProxyChanged.ExcuteCallback(Ref, EProxyModifyType::kNumChanged, Num);
 
 		return Ref;
 	}
@@ -465,24 +475,79 @@ TSharedPtr<FConsumableProxy> UInventoryComponent::AddProxy_Consumable(
 		auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
 
 		auto ResultPtr = MakeShared<FConsumableProxy>();
-
-#if WITH_EDITOR
-#endif
+		if (ID.IsValid())
+		{
+			ResultPtr->ID = ID;
+		}
 
 		ResultPtr->InitialProxy(ProxyType);
 
 		ResultPtr->InventoryComponentPtr = this;
 
-		ResultPtr->AddNum(Num);
+		ResultPtr->ModifyNum(Num);
 
 		ProxysAry.Add(ResultPtr);
 		ProxysMap.Add(ResultPtr->ID, ResultPtr);
+		ProxyTypeMap.Add(ProxyType, ResultPtr);
 
-		Proxy_Container.AddItem(ResultPtr);
+#if UE_EDITOR || UE_SERVER
+		if (GetOwnerRole() == ROLE_Authority)
+		{
+			Proxy_Container.AddItem(ResultPtr);
+		}
+#endif
 
-		OnConsumableProxyChanged.ExcuteCallback(ResultPtr, EProxyModifyType::kRemove);
+		OnConsumableProxyChanged.ExcuteCallback(ResultPtr, EProxyModifyType::kNumChanged, Num);
 
 		return ResultPtr;
+	}
+}
+
+void UInventoryComponent::RemoveProxy_Consumable(
+	const TSharedPtr<FConsumableProxy>& ProxyPtr,
+	int32 Num /*= 1*/
+	)
+{
+	if (ProxyPtr)
+	{
+		const auto CurrentNum = ProxyPtr->GetNum();
+		if (Num < CurrentNum)
+		{
+			ProxyPtr->ModifyNum(-Num);
+
+#if UE_EDITOR || UE_SERVER
+			if (GetOwnerRole() == ROLE_Authority)
+			{
+				Proxy_Container.UpdateItem(ProxyPtr);
+			}
+#endif
+
+			OnConsumableProxyChanged.ExcuteCallback(ProxyPtr, EProxyModifyType::kNumChanged, Num);
+		}
+		else
+		{
+			ProxyPtr->ModifyNum(-Num);
+
+			for (int32 Index = 0; Index < ProxysAry.Num(); Index++)
+			{
+				if (ProxysAry[Index] == ProxyPtr)
+				{
+					ProxysAry.RemoveAt(Index);
+					break;
+				}
+			}
+			ProxysMap.Remove(ProxyPtr->GetID());
+			ProxyTypeMap.Remove(ProxyPtr->GetProxyType());
+
+#if UE_EDITOR || UE_SERVER
+			if (GetOwnerRole() == ROLE_Authority)
+			{
+				Proxy_Container.RemoveItem(ProxyPtr);
+			}
+#endif
+
+			OnConsumableProxyChanged.ExcuteCallback(ProxyPtr, EProxyModifyType::kRemove, Num);
+		}
 	}
 }
 
@@ -506,7 +571,7 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(
 	{
 		auto Ref = DynamicCastSharedPtr<FCoinProxy>(ProxyTypeMap[ProxyType]);
 
-		Ref->AddNum(Num);
+		Ref->ModifyNum(Num);
 
 #if UE_EDITOR || UE_SERVER
 		if (GetOwnerRole() == ROLE_Authority)
@@ -515,7 +580,7 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(
 		}
 #endif
 
-		OnCoinProxyChanged.ExcuteCallback(Ref, EProxyModifyType::kAdd, Num);
+		OnCoinProxyChanged.ExcuteCallback(Ref, EProxyModifyType::kNumChanged, Num);
 
 		return Ref;
 	}
@@ -531,7 +596,7 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(
 		ResultPtr->InitialProxy(ProxyType);
 
 		ResultPtr->InventoryComponentPtr = this;
-		ResultPtr->AddNum(Num);
+		ResultPtr->ModifyNum(Num);
 
 		ProxysAry.Add(ResultPtr);
 		ProxysMap.Add(ResultPtr->ID, ResultPtr);
@@ -544,9 +609,47 @@ TSharedPtr<FCoinProxy> UInventoryComponent::AddProxy_Coin(
 		}
 #endif
 
-		OnCoinProxyChanged.ExcuteCallback(ResultPtr, EProxyModifyType::kNumChange, Num);
+		OnCoinProxyChanged.ExcuteCallback(ResultPtr, EProxyModifyType::kNumChanged, Num);
 
 		return ResultPtr;
+	}
+}
+
+void UInventoryComponent::RemoveProxy_Coin(
+	const TSharedPtr<FCoinProxy>& ProxyPtr,
+	int32 Num
+	)
+{
+	if (ProxyPtr)
+	{
+		const auto CurrentNum = ProxyPtr->GetNum();
+		if (Num < CurrentNum)
+		{
+			ProxyPtr->ModifyNum(-Num);
+
+#if UE_EDITOR || UE_SERVER
+			if (GetOwnerRole() == ROLE_Authority)
+			{
+				Proxy_Container.UpdateItem(ProxyPtr);
+			}
+#endif
+
+			OnCoinProxyChanged.ExcuteCallback(ProxyPtr, EProxyModifyType::kNumChanged, Num);
+		}
+		else
+		{
+			// 不要移除这个类型，因为我们可以让金币成为负数或称为0
+			ProxyPtr->ModifyNum(-Num);
+
+#if UE_EDITOR || UE_SERVER
+			if (GetOwnerRole() == ROLE_Authority)
+			{
+				Proxy_Container.UpdateItem(ProxyPtr);
+			}
+#endif
+
+			OnCoinProxyChanged.ExcuteCallback(ProxyPtr, EProxyModifyType::kNumChanged, Num);
+		}
 	}
 }
 
@@ -578,21 +681,8 @@ void UInventoryComponent::AddProxys_Server_Implementation(
 	{
 		for (const auto& Proxy : RewardsItem.RewardsMap)
 		{
-			AddProxy(Proxy.Key, Proxy.Value);
+			AddProxyNum(Proxy.Key, Proxy.Value);
 		}
-	}
-}
-
-void UInventoryComponent::RemoveProxy_Consumable(
-	const TSharedPtr<FConsumableProxy>& ProxyPtr,
-	int32 Num /*= 1*/
-	)
-{
-	if (ProxyPtr)
-	{
-		ProxyPtr->AddNum(-Num);
-
-		OnConsumableProxyChanged.ExcuteCallback(ProxyPtr, EProxyModifyType::kRemove);
 	}
 }
 
@@ -633,11 +723,16 @@ TSharedPtr<FCharacterProxy> UInventoryComponent::FindProxy_Character(
 	return nullptr;
 }
 
-TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy(
+TSharedPtr<FBasicProxy> UInventoryComponent::AddProxyNum(
 	const FGameplayTag& ProxyType,
 	int32 Num
 	)
 {
+	if (Num <= 0)
+	{
+		return nullptr;
+	}
+
 	TSharedPtr<FBasicProxy> ResultSPtr = nullptr;
 
 	auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
@@ -667,6 +762,44 @@ TSharedPtr<FBasicProxy> UInventoryComponent::AddProxy(
 	}
 
 	return ResultSPtr;
+}
+
+void UInventoryComponent::RemoveProxyNum(
+	const IDType& ID,
+	int32 Num
+	)
+{
+	if (Num <= 0)
+	{
+		return;
+	}
+
+	TSharedPtr<FBasicProxy> ResultSPtr = FindProxy(ID);
+	if (ResultSPtr)
+	{
+		const auto ProxyType = ResultSPtr->GetProxyType();
+
+		if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Tool))
+		{
+		}
+		else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
+		{
+		}
+		else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
+		{
+		}
+		else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Coin))
+		{
+			RemoveProxy_Coin(DynamicCastSharedPtr<FCoinProxy>(ResultSPtr), Num);
+		}
+		else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
+		{
+			RemoveProxy_Consumable(DynamicCastSharedPtr<FConsumableProxy>(ResultSPtr), Num);
+		}
+		else if (ProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Character))
+		{
+		}
+	}
 }
 
 TSharedPtr<FBasicProxy> UInventoryComponent::FindProxy(

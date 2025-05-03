@@ -139,10 +139,9 @@ enum class ETeammateOption : uint8
 
 enum class EProxyModifyType
 {
-	kAdd,		// 新增
-	kChange,	// 属性改变
-	kNumChange,	// 数量改变
-	kRemove,	// 移除
+	kNumChanged,		// 新增
+	kRemove,			// 移除
+	kPropertyChange,	// 属性改变
 };
 
 enum class EWeaponSocket

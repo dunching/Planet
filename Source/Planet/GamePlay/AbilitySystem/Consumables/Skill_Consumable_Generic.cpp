@@ -80,7 +80,7 @@ bool USkill_Consumable_Generic::CommitAbility(
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		ProxyPtr->AddNum(-1);
+		ProxyPtr->ModifyNum(-1);
 		ProxyPtr->Update2Client();
 	}
 #endif

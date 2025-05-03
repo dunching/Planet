@@ -40,6 +40,8 @@ protected:
 	void OnStopGuide(AGuideThread* NewGuidePtr);
 
 	void OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNode);
+
+	void OnGuideThreadPropertyChagned(const FString& NewTaskName);
 	
 	// 当前追踪的引导
 	TObjectPtr<AGuideThread> CurrentLineGuidePtr = nullptr;

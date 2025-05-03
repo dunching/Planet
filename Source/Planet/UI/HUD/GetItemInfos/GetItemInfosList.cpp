@@ -35,15 +35,18 @@ void UGetItemInfosList::ResetUIByData()
 {
 }
 
-void UGetItemInfosList::OnSkillProxyChanged(const TSharedPtr<FSkillProxy>& ProxyPtr, EProxyModifyType ProxyModifyType)
+void UGetItemInfosList::OnSkillProxyChanged(
+	const TSharedPtr<FSkillProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kAdd:
+	case EProxyModifyType::kNumChanged:
 		{
 		}
 		break;
-	default: 
+	default:
 		{
 			return;
 		};
@@ -76,12 +79,11 @@ void UGetItemInfosList::OnCoinProxyChanged(
 	const TSharedPtr<FCoinProxy>& ProxyPtr,
 	EProxyModifyType ProxyModifyType,
 	int32 Num
-)
+	)
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kAdd:
-	case EProxyModifyType::kNumChange:
+	case EProxyModifyType::kNumChanged:
 		{
 			if (Num == 0)
 			{
@@ -89,7 +91,7 @@ void UGetItemInfosList::OnCoinProxyChanged(
 			}
 		}
 		break;
-	default: 
+	default:
 		{
 			return;
 		};
@@ -118,17 +120,18 @@ void UGetItemInfosList::OnCoinProxyChanged(
 	}
 }
 
-void UGetItemInfosList::OnConsumableProxyChanged(const TSharedPtr<FConsumableProxy>& ProxyPtr,
-                                                 EProxyModifyType ProxyModifyType)
+void UGetItemInfosList::OnConsumableProxyChanged(
+	const TSharedPtr<FConsumableProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kAdd:
-	case EProxyModifyType::kNumChange:
+	case EProxyModifyType::kNumChanged:
 		{
 		}
 		break;
-	default: 
+	default:
 		{
 			return;
 		};
@@ -157,16 +160,18 @@ void UGetItemInfosList::OnConsumableProxyChanged(const TSharedPtr<FConsumablePro
 	}
 }
 
-void UGetItemInfosList::OnGourpmateProxyChanged(const TSharedPtr<FCharacterProxy>& ProxyPtr,
-                                                EProxyModifyType ProxyModifyType)
+void UGetItemInfosList::OnGourpmateProxyChanged(
+	const TSharedPtr<FCharacterProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
 {
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kAdd:
+	case EProxyModifyType::kNumChanged:
 		{
 		}
 		break;
-	default: 
+	default:
 		{
 			return;
 		};
@@ -215,10 +220,12 @@ void UGetItemInfosList::OnRemovedItem()
 		{
 			if (OrderAry[Index] == CoinPendingAry[SecondIndex].Get<0>())
 			{
-				OnCoinProxyChanged(CoinPendingAry[
-					                   SecondIndex].Get<0>().Pin(), CoinPendingAry[SecondIndex].Get<1>(),
+				OnCoinProxyChanged(
+				                   CoinPendingAry[
+					                   SecondIndex].Get<0>().Pin(),
+				                   CoinPendingAry[SecondIndex].Get<1>(),
 				                   CoinPendingAry[SecondIndex].Get<2>()
-				);
+				                  );
 
 				OrderAry.RemoveAt(Index);
 				SkillPendingAry.RemoveAt(SecondIndex);
@@ -230,8 +237,10 @@ void UGetItemInfosList::OnRemovedItem()
 		{
 			if (OrderAry[Index] == ConsumablePendingAry[SecondIndex].Get<0>())
 			{
-				OnConsumableProxyChanged(ConsumablePendingAry[SecondIndex].Get<0>().Pin(),
-				                         ConsumablePendingAry[SecondIndex].Get<1>());
+				OnConsumableProxyChanged(
+				                         ConsumablePendingAry[SecondIndex].Get<0>().Pin(),
+				                         ConsumablePendingAry[SecondIndex].Get<1>()
+				                        );
 
 				OrderAry.RemoveAt(Index);
 				ConsumablePendingAry.RemoveAt(SecondIndex);
@@ -243,8 +252,10 @@ void UGetItemInfosList::OnRemovedItem()
 		{
 			if (OrderAry[Index] == CharacterPendingAry[SecondIndex].Get<0>())
 			{
-				OnGourpmateProxyChanged(CharacterPendingAry[SecondIndex].Get<0>().Pin(),
-				                        CharacterPendingAry[SecondIndex].Get<1>());
+				OnGourpmateProxyChanged(
+				                        CharacterPendingAry[SecondIndex].Get<0>().Pin(),
+				                        CharacterPendingAry[SecondIndex].Get<1>()
+				                       );
 
 				OrderAry.RemoveAt(Index);
 				CharacterPendingAry.RemoveAt(SecondIndex);

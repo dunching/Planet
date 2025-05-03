@@ -382,7 +382,7 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 	{
 		switch (ProxyModifyType)
 		{
-		case EProxyModifyType::kAdd:
+		case EProxyModifyType::kNumChanged:
 			{
 				CurrentNum += ConsumableProxySPtr->GetNum();
 				UpdateDescription();
@@ -394,7 +394,7 @@ void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 				}
 			}
 			break;
-		case EProxyModifyType::kChange:
+		case EProxyModifyType::kPropertyChange:
 			break;
 		case EProxyModifyType::kRemove:
 			break;
@@ -413,8 +413,7 @@ void UGameplayTask_Guide_CollectResource::OnCoinProxyChanged(
 	{
 		switch (ProxyModifyType)
 		{
-		case EProxyModifyType::kAdd:
-		case EProxyModifyType::kNumChange:
+		case EProxyModifyType::kNumChanged:
 			{
 				CurrentNum += Num_;
 				UpdateDescription();
@@ -426,7 +425,7 @@ void UGameplayTask_Guide_CollectResource::OnCoinProxyChanged(
 				}
 			}
 			break;
-		case EProxyModifyType::kChange:
+		case EProxyModifyType::kPropertyChange:
 			break;
 		case EProxyModifyType::kRemove:
 			break;

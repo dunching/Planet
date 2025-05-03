@@ -9,6 +9,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"
 #include "InventoryComponent.h"
+#include "NiagaraComponent.h"
 #include "PlanetGameViewportClient.h"
 #include "TaskPromt.h"
 
@@ -153,20 +154,8 @@ void UAIComponent::InitialAllocationsByProxy()
 
 void UAIComponent::StopDisplayTaskPromy()
 {
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-			GetWorld(),
-			TargetPointSharedLayerName
-		);
-		if (ScreenLayer)
-		{
-			ScreenLayer->RemoveHoverWidget(TaskPromtPtr);
-			TaskPromtPtr = nullptr;
-		}
-	}
-#endif
+	auto OnwerActorPtr = GetOwner<FOwnerType>();
+	OnwerActorPtr->GetNiagaraComponent()->SetActive(false);
 }
 
 TMap<FGameplayTag, FProductsForSale> UAIComponent::GetSaleItemsInfo() const
@@ -178,28 +167,6 @@ void UAIComponent::DisplayTaskPromy(
 	 TSubclassOf<UTaskPromt> TaskPromtClass
 )
 {
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-			GetWorld(),
-			TargetPointSharedLayerName
-		);
-		if (ScreenLayer)
-		{
-			if (TaskPromtPtr)
-			{
-				return;
-			}
-			
-			// TaskPromtPtr = CreateWidget<UTaskPromt>(GetWorld(), TaskPromtClass);
-			// if (TaskPromtPtr)
-			// {
-			// 	auto OnwerActorPtr = GetOwner<FOwnerType>();
-			// 	TaskPromtPtr->TargetCharacterPtr = OnwerActorPtr;
-			// 	ScreenLayer->AddHoverWidget(TaskPromtPtr);
-			// }
-		}
-	}
-#endif
+	auto OnwerActorPtr = GetOwner<FOwnerType>();
+	OnwerActorPtr->GetNiagaraComponent()->SetActive(true);
 }

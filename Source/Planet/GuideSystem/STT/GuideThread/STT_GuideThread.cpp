@@ -33,11 +33,11 @@ const UStruct* FSTT_GuideThreadRecord::GetInstanceDataType() const
 EStateTreeRunStatus FSTT_GuideThreadRecord::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.GuideActorPtr)
 	{
@@ -48,13 +48,13 @@ EStateTreeRunStatus FSTT_GuideThreadRecord::EnterState(
 			if (PreviousTaskID == InstanceData.TaskID)
 			{
 				InstanceData.GuideActorPtr->SetPreviousTaskID(
-					FGuid()
-				);
+				                                              FGuid()
+				                                             );
 
 				return Super::EnterState(
-					Context,
-					Transition
-				);
+				                         Context,
+				                         Transition
+				                        );
 			}
 
 			return EStateTreeRunStatus::Succeeded;
@@ -67,39 +67,39 @@ EStateTreeRunStatus FSTT_GuideThreadRecord::EnterState(
 
 	// 记录当前的任务ID，
 	InstanceData.GuideActorPtr->SetCurrentTaskID(
-		InstanceData.TaskID
-	);
+	                                             InstanceData.TaskID
+	                                            );
 
 	return Super::EnterState(
-		Context,
-		Transition
-	);
+	                         Context,
+	                         Transition
+	                        );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadBase::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
-	if (InstanceData.GuideActorPtr)
+	if (InstanceData.GuideThreadActorPtr)
 	{
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 
 		// 因为这个PlayerCharacter可能会被销毁，所以我们在每次任务时重新获取而不是在STE里面获取
 		InstanceData.PlayerCharacterPtr = Cast<AHumanCharacter_Player>(
-			UGameplayStatics::GetPlayerCharacter(
-				InstanceData.GuideActorPtr,
-				0
-			)
-		);
+		                                                               UGameplayStatics::GetPlayerCharacter(
+			                                                                InstanceData.GuideThreadActorPtr,
+			                                                                0
+			                                                               )
+		                                                              );
 	}
 	else
 	{
@@ -107,25 +107,25 @@ EStateTreeRunStatus FSTT_GuideThreadBase::EnterState(
 	}
 
 	return Super::EnterState(
-		Context,
-		Transition
-	);
+	                         Context,
+	                         Transition
+	                        );
 }
 
 void FSTT_GuideThreadBase::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 FTaskNodeDescript FSTT_GuideThreadBase::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -137,16 +137,16 @@ FTaskNodeDescript FSTT_GuideThreadBase::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThreadFail::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	// TODO 任务失败时 
 
 	checkNoEntry();
 
 	return Super::EnterState(
-		Context,
-		Transition
-	);
+	                         Context,
+	                         Transition
+	                        );
 }
 
 const UStruct* FSTT_GuideThreadDistributeRewards::GetInstanceDataType() const
@@ -157,20 +157,20 @@ const UStruct* FSTT_GuideThreadDistributeRewards::GetInstanceDataType() const
 EStateTreeRunStatus FSTT_GuideThreadDistributeRewards::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	// 
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	InstanceData.PlayerCharacterPtr->GetInventoryComponent()->AddProxys_Server(
-		InstanceData.RewardsItemID
-	);
+	                                                                           InstanceData.RewardsItemID
+	                                                                          );
 
 	return EStateTreeRunStatus::Succeeded;
 }
@@ -183,44 +183,45 @@ const UStruct* FSTT_GuideThreadMonologue::GetInstanceDataType() const
 EStateTreeRunStatus FSTT_GuideThreadMonologue::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	// TODO -》spawn TaskNodeRef
 
 	return PerformGameplayTask(
-		Context
-	);
+	                           Context
+	                          );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadMonologue::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	// Super::Tick(Context, DeltaTime);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (!InstanceData.GameplayTaskPtr)
 	{
 		checkNoEntry();
@@ -232,19 +233,19 @@ EStateTreeRunStatus FSTT_GuideThreadMonologue::Tick(
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 void FSTT_GuideThreadMonologue::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -252,31 +253,31 @@ void FSTT_GuideThreadMonologue::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadMonologue::PerformGameplayTask(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_Monologue>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 
 	if (GameplayTaskPtr)
 	{
 		GameplayTaskPtr->SetPlayerCharacter(
-			InstanceData.PlayerCharacterPtr
-		);
+		                                    InstanceData.PlayerCharacterPtr
+		                                   );
 		GameplayTaskPtr->SetUp(
-			InstanceData.ConversationsAry
-		);
+		                       InstanceData.ConversationsAry
+		                      );
 		GameplayTaskPtr->ReadyForActivation();
 
 		InstanceData.GameplayTaskPtr = GameplayTaskPtr;
@@ -287,7 +288,7 @@ EStateTreeRunStatus FSTT_GuideThreadMonologue::PerformGameplayTask(
 
 FTaskNodeDescript FSTT_GuideThreadMonologue::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -299,24 +300,24 @@ FTaskNodeDescript FSTT_GuideThreadMonologue::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_WaitTaskComplete::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
-	if (InstanceData.GuideActorPtr)
+	if (InstanceData.GuideThreadActorPtr)
 	{
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	return EStateTreeRunStatus::Running;
@@ -325,21 +326,21 @@ EStateTreeRunStatus FSTT_GuideThread_WaitTaskComplete::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_WaitTaskComplete::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	// Super::Tick(Context, DeltaTime);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
-	if (!InstanceData.GuideActorPtr)
+	                                                          *this
+	                                                         );
+	if (!InstanceData.GuideThreadActorPtr)
 	{
 		checkNoEntry();
 	}
 
-	const auto TaskNodeResuleHelper = InstanceData.GuideActorPtr->ConsumeEvent(
-		InstanceData.NotifyTaskID
-	);
+	const auto TaskNodeResuleHelper = InstanceData.GuideThreadActorPtr->ConsumeEvent(
+		 InstanceData.NotifyTaskID
+		);
 	if (TaskNodeResuleHelper.GetIsValid())
 	{
 		InstanceData.TaskNodeResuleHelper = TaskNodeResuleHelper;
@@ -347,18 +348,18 @@ EStateTreeRunStatus FSTT_GuideThread_WaitTaskComplete::Tick(
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 FTaskNodeDescript FSTT_GuideThread_WaitTaskComplete::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -376,53 +377,54 @@ const UStruct* FSTT_GuideThreadCollectResource::GetInstanceDataType() const
 EStateTreeRunStatus FSTT_GuideThreadCollectResource::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	// 因为获取任务描述需要用到GameplayTaskPtr，所以我们这里提前初始化这个Task
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_CollectResource>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 	InstanceData.GameplayTaskPtr->SetUp(
-		InstanceData.ResourceType,
-		InstanceData.Num
-	);
+	                                    InstanceData.ResourceType,
+	                                    InstanceData.Num
+	                                   );
 
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	// TODO -》spawn TaskNodeRef
 
 	return PerformGameplayTask(
-		Context
-	);
+	                           Context
+	                          );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadCollectResource::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	// Super::Tick(Context, DeltaTime);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (!InstanceData.GameplayTaskPtr)
 	{
 		checkNoEntry();
@@ -434,19 +436,19 @@ EStateTreeRunStatus FSTT_GuideThreadCollectResource::Tick(
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 void FSTT_GuideThreadCollectResource::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -454,26 +456,26 @@ void FSTT_GuideThreadCollectResource::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadCollectResource::PerformGameplayTask(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr)
 	{
 		InstanceData.GameplayTaskPtr->SetPlayerCharacter(
-			InstanceData.PlayerCharacterPtr
-		);
+		                                                 InstanceData.PlayerCharacterPtr
+		                                                );
 		InstanceData.GameplayTaskPtr->SetGuideActor(
-			InstanceData.GuideActorPtr
-		);
+		                                            InstanceData.GuideThreadActorPtr
+		                                           );
 
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
@@ -483,11 +485,11 @@ EStateTreeRunStatus FSTT_GuideThreadCollectResource::PerformGameplayTask(
 
 FTaskNodeDescript FSTT_GuideThreadCollectResource::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	return InstanceData.GameplayTaskPtr->GetTaskNodeDescripton();
 }
@@ -500,53 +502,54 @@ const UStruct* FSTT_GuideThreadDefeatEnemy::GetInstanceDataType() const
 EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	// 因为获取任务描述需要用到GameplayTaskPtr，所以我们这里提前初始化这个Task
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_DefeatEnemy>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 	InstanceData.GameplayTaskPtr->SetUp(
-		InstanceData.EnemyType,
-		InstanceData.Num
-	);
+	                                    InstanceData.EnemyType,
+	                                    InstanceData.Num
+	                                   );
 
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	// TODO -》spawn TaskNodeRef
 
 	return PerformGameplayTask(
-		Context
-	);
+	                           Context
+	                          );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	// Super::Tick(Context, DeltaTime);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (!InstanceData.GameplayTaskPtr)
 	{
 		checkNoEntry();
@@ -558,19 +561,19 @@ EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::Tick(
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 void FSTT_GuideThreadDefeatEnemy::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -578,26 +581,26 @@ void FSTT_GuideThreadDefeatEnemy::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::PerformGameplayTask(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr)
 	{
 		InstanceData.GameplayTaskPtr->SetPlayerCharacter(
-			InstanceData.PlayerCharacterPtr
-		);
+		                                                 InstanceData.PlayerCharacterPtr
+		                                                );
 		InstanceData.GameplayTaskPtr->SetGuideActor(
-			InstanceData.GuideActorPtr
-		);
+		                                            InstanceData.GuideThreadActorPtr
+		                                           );
 
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
@@ -607,11 +610,11 @@ EStateTreeRunStatus FSTT_GuideThreadDefeatEnemy::PerformGameplayTask(
 
 FTaskNodeDescript FSTT_GuideThreadDefeatEnemy::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	return InstanceData.GameplayTaskPtr->GetTaskNodeDescripton();
 }
@@ -619,17 +622,17 @@ FTaskNodeDescript FSTT_GuideThreadDefeatEnemy::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_ChangeNPCsInteractionList::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-)
+	)
 const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (auto PAD = InstanceData.PAD.LoadSynchronous())
 	{
@@ -637,9 +640,9 @@ const
 		if (TargetCharacterPtr)
 		{
 			TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationState(
-				InstanceData.GuideInteractionActorClass,
-				InstanceData.bEnable
-			);
+				 InstanceData.GuideInteractionActorClass,
+				 InstanceData.bEnable
+				);
 
 			if (InstanceData.bRunForever)
 			{
@@ -655,11 +658,11 @@ const
 void FSTT_GuideThread_ChangeNPCsInteractionList::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.bRunForever)
 	{
@@ -669,17 +672,17 @@ void FSTT_GuideThread_ChangeNPCsInteractionList::ExitState(
 			if (TargetCharacterPtr)
 			{
 				TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationState(
-					InstanceData.GuideInteractionActorClass,
-					!InstanceData.bEnable
-				);
+					 InstanceData.GuideInteractionActorClass,
+					 !InstanceData.bEnable
+					);
 			}
 		}
 	}
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 const UStruct* FSTT_GuideThreadLeaveHere::GetInstanceDataType() const
@@ -689,11 +692,11 @@ const UStruct* FSTT_GuideThreadLeaveHere::GetInstanceDataType() const
 
 FTaskNodeDescript FSTT_GuideThreadLeaveHere::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -710,16 +713,16 @@ const UStruct* FSTT_GuideThreadBase::GetInstanceDataType() const
 EStateTreeRunStatus FSTT_GuideThreadLeaveHere::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.PAD.LoadSynchronous();
 	if (InstanceData.PAD->AreaVolumePtr)
@@ -733,39 +736,39 @@ EStateTreeRunStatus FSTT_GuideThreadLeaveHere::EnterState(
 EStateTreeRunStatus FSTT_GuideThreadLeaveHere::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	// TODO Task里面用代理去做
 	if (!InstanceData.PAD->AreaVolumePtr->IsOverlappingActor(
-		InstanceData.PlayerCharacterPtr
-	))
+	                                                         InstanceData.PlayerCharacterPtr
+	                                                        ))
 	{
 		return EStateTreeRunStatus::Succeeded;
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 EStateTreeRunStatus FSTGT_GuideThreadCheckIsInValidArea::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.PAD.LoadSynchronous();
 	if (InstanceData.PAD->AreaVolumePtr)
@@ -779,125 +782,126 @@ EStateTreeRunStatus FSTGT_GuideThreadCheckIsInValidArea::EnterState(
 EStateTreeRunStatus FSTGT_GuideThreadCheckIsInValidArea::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.Total += DeltaTime;
 	if (InstanceData.Total > 1.f)
 	{
 		// TODO Task里面用代理去做
 		if (!InstanceData.PAD->AreaVolumePtr->IsOverlappingActor(
-			InstanceData.PlayerCharacterPtr
-		))
+		                                                         InstanceData.PlayerCharacterPtr
+		                                                        ))
 		{
 			return EStateTreeRunStatus::Stopped;
 		}
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 FTaskNodeDescript FSTGT_GuideThreadCheckIsInValidArea::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	return FSTT_GuideThreadBase::GetTaskNodeDescripton(
-		Context
-	);
+	                                                   Context
+	                                                  );
 }
 
 
 EStateTreeRunStatus FSTT_GuideThreadReturnOpenWorld::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.RemainTime > 0)
 	{
 		InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-			InstanceData.GuideActorPtr->FindComponentByInterface(
-				UGameplayTaskOwnerInterface::StaticClass()
-			)
-		);
+		                                                                       InstanceData.GuideThreadActorPtr->
+		                                                                       FindComponentByInterface(
+			                                                                        UGameplayTaskOwnerInterface::StaticClass()
+			                                                                       )
+		                                                                      );
 		if (!InstanceData.TaskOwner)
 		{
-			InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+			InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 		}
 
 		InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_ReturnOpenWorld>(
-			*InstanceData.TaskOwner
-		);
+			 *InstanceData.TaskOwner
+			);
 		InstanceData.GameplayTaskPtr->SetUp(
-			InstanceData.RemainTime
-		);
+		                                    InstanceData.RemainTime
+		                                   );
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
 
 	return Super::EnterState(
-		Context,
-		Transition
-	);
+	                         Context,
+	                         Transition
+	                        );
 }
 
 EStateTreeRunStatus FSTT_GuideThreadReturnOpenWorld::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
-	if (InstanceData.GuideActorPtr)
+	if (InstanceData.GuideThreadActorPtr)
 	{
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
 	{
 		auto PCPtr = Cast<APlanetPlayerController>(
-			UGameplayStatics::GetPlayerController(
-				GetWorldImp(),
-				0
-			)
-		);
+		                                           UGameplayStatics::GetPlayerController(
+			                                            GetWorldImp(),
+			                                            0
+			                                           )
+		                                          );
 		if (PCPtr)
 		{
 			PCPtr->EntryChallengeLevel(
-				ETeleport::kReturnOpenWorld
-			);
+			                           ETeleport::kReturnOpenWorld
+			                          );
 		}
 
 		return EStateTreeRunStatus::Succeeded;
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 FTaskNodeDescript FSTT_GuideThreadReturnOpenWorld::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	return InstanceData.GameplayTaskPtr->GetTaskNodeDescripton();
 }
@@ -905,36 +909,37 @@ FTaskNodeDescript FSTT_GuideThreadReturnOpenWorld::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_WaitPlayerEquipment>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 
 	if (InstanceData.GameplayTaskPtr)
 	{
 		InstanceData.GameplayTaskPtr->SetPlayerCharacter(
-			InstanceData.PlayerCharacterPtr
-		);
+		                                                 InstanceData.PlayerCharacterPtr
+		                                                );
 
 		InstanceData.GameplayTaskPtr->WeaponSocket = InstanceData.WeaponSocket;
 		InstanceData.GameplayTaskPtr->SkillSocket = InstanceData.SkillSocket;
@@ -943,13 +948,13 @@ EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::EnterState(
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
 
-	if (InstanceData.GuideActorPtr)
+	if (InstanceData.GuideThreadActorPtr)
 	{
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	return EStateTreeRunStatus::Running;
@@ -958,16 +963,16 @@ EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FSTT_GuideThreadBase::Tick(
-		Context,
-		DeltaTime
-	);
+	                           Context,
+	                           DeltaTime
+	                          );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (!InstanceData.GameplayTaskPtr)
 	{
 		checkNoEntry();
@@ -984,11 +989,11 @@ EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::Tick(
 void FSTT_GuideThread_WaitPlayerEquipment::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -996,24 +1001,24 @@ void FSTT_GuideThread_WaitPlayerEquipment::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	FSTT_GuideThreadBase::ExitState(
-		Context,
-		Transition
-	);
+	                                Context,
+	                                Transition
+	                               );
 }
 
 FTaskNodeDescript FSTT_GuideThread_WaitPlayerEquipment::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
 	TaskNodeDescript.Description = TEXT(
-		"装备武器和技能"
-	);
+	                                    "装备武器和技能"
+	                                   );
 
 	return TaskNodeDescript;
 }
@@ -1021,30 +1026,30 @@ FTaskNodeDescript FSTT_GuideThread_WaitPlayerEquipment::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(Context, Transition);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	auto PCPtr = Cast<
-		APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0));
+		APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideThreadActorPtr, 0));
 	if (PCPtr)
 	{
 		InstanceData.NPC_ID = FGuid::NewGuid();
 
 		FTransform Transform = FTransform::Identity;
 		Transform.SetLocation(
-			InstanceData.PlayerCharacterPtr->GetActorLocation() + (InstanceData.PlayerCharacterPtr->
-				GetActorForwardVector() * 100)
-		);
+		                      InstanceData.PlayerCharacterPtr->GetActorLocation() + (InstanceData.PlayerCharacterPtr->
+			                      GetActorForwardVector() * 100)
+		                     );
 
 		PCPtr->ServerSpawnCharacter(
-			InstanceData.NPCClass,
-			InstanceData.NPC_ID,
-			Transform
-		);
+		                            InstanceData.NPCClass,
+		                            InstanceData.NPC_ID,
+		                            Transform
+		                           );
 
 		InstanceData.GloabVariable_Main->SpwanedCharacterAry.Empty();
 	}
@@ -1055,13 +1060,17 @@ EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
 	// 获取对应的Characers
 	TArray<AActor*> OutActors;
-	UGameplayStatics::GetAllActorsOfClass(InstanceData.GuideActorPtr, AHumanCharacter_AI::StaticClass(), OutActors);
+	UGameplayStatics::GetAllActorsOfClass(
+	                                      InstanceData.GuideThreadActorPtr,
+	                                      AHumanCharacter_AI::StaticClass(),
+	                                      OutActors
+	                                     );
 	for (auto Iter : OutActors)
 	{
 		auto CharacterPtr = Cast<AHumanCharacter_AI>(Iter);
@@ -1081,7 +1090,7 @@ EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::Tick(
 
 FTaskNodeDescript FSTT_GuideThread_SpawnNPC::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -1093,13 +1102,13 @@ FTaskNodeDescript FSTT_GuideThread_SpawnNPC::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(Context, Transition);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.GloabVariable_Main->SpwanedCharacterAry.IsEmpty())
 	{
@@ -1111,18 +1120,19 @@ EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::EnterState(
 	}
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_AttckCharacter>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 	InstanceData.GameplayTaskPtr->HumanCharacterAI = InstanceData.HumanCharacterAI;
 	InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
 
@@ -1134,23 +1144,23 @@ EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	Super::Tick(Context, DeltaTime);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.bIsNotFreshed && InstanceData.HumanCharacterAI && InstanceData.HumanCharacterAI->
-		GetGroupManagger())
+	    GetGroupManagger())
 	{
 		InstanceData.bIsNotFreshed = false;
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	if (!InstanceData.GameplayTaskPtr)
@@ -1169,11 +1179,11 @@ EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::Tick(
 void FSTT_GuideThread_AttckCharacter::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -1193,7 +1203,7 @@ void FSTT_GuideThread_AttckCharacter::ExitState(
 		}
 
 		auto PCPtr = Cast<
-			APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideActorPtr, 0));
+			APlanetPlayerController>(UGameplayStatics::GetPlayerController(InstanceData.GuideThreadActorPtr, 0));
 		if (PCPtr)
 		{
 			PCPtr->ServerDestroyActor(InstanceData.HumanCharacterAI);
@@ -1201,30 +1211,30 @@ void FSTT_GuideThread_AttckCharacter::ExitState(
 	}
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.HumanCharacterAI)
 	{
 		FTaskNodeDescript TaskNodeDescript;
 
 		TaskNodeDescript.Description = FString::Printf(
-			TEXT(
-				"Attack <%s>%s</>"
-			),
-			*RichText_Emphasis,
-			*InstanceData.HumanCharacterAI->GetCharacterProxy()->Title
-		);
+		                                               TEXT(
+		                                                    "Attack <%s>%s</>"
+		                                                   ),
+		                                               *RichText_Emphasis,
+		                                               *InstanceData.HumanCharacterAI->GetCharacterProxy()->Title
+		                                              );
 
 		return TaskNodeDescript;
 	}
@@ -1240,7 +1250,7 @@ FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 
 FTaskNodeDescript FSTT_GuideThread_ToBeContinued::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -1252,24 +1262,82 @@ FTaskNodeDescript FSTT_GuideThread_ToBeContinued::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_Completet::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
-	InstanceData.GuideActorPtr->bIsComleted = true;
+	                                                          *this
+	                                                         );
+	InstanceData.GuideThreadActorPtr->bIsComleted = true;
 
 	return EStateTreeRunStatus::Succeeded;
+}
+
+EStateTreeRunStatus FSTT_DelayTask::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+	) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+	                                                          *this
+	                                                         );
+
+	InstanceData.RemainTime = InstanceData.DelayTime;
+
+	return Super::EnterState(Context, Transition);
+}
+
+EStateTreeRunStatus FSTT_DelayTask::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+	) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+	                                                          *this
+	                                                         );
+
+	InstanceData.RemainTime -= DeltaTime;
+	if (InstanceData.RemainTime <= 0)
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	if (InstanceData.GuideThreadActorPtr)
+	{
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+																GetTaskNodeDescripton(
+																	 Context
+																	)
+															   );
+	}
+	return Super::Tick(Context, DeltaTime);
+}
+
+FTaskNodeDescript FSTT_DelayTask::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+	) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+	                                                          *this
+	                                                         );
+
+	auto GameOptionsPtr = UGameOptions::GetInstance();
+
+	FTaskNodeDescript TaskNodeDescript;
+
+	const auto RemainTimeStr = FString::Printf(TEXT("%.0lf"), InstanceData.RemainTime);
+	TaskNodeDescript.Description = InstanceData.Descrption.Replace(TEXT("[Time]"), *RemainTimeStr);
+
+	return TaskNodeDescript;
 }
 
 void FSTT_GuideThreadReturnOpenWorld::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -1277,39 +1345,39 @@ void FSTT_GuideThreadReturnOpenWorld::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 EStateTreeRunStatus FSTT_GuideThread_PressKey::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
-	if (InstanceData.GuideActorPtr)
+	if (InstanceData.GuideThreadActorPtr)
 	{
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	// 因为这个PlayerCharacter可能会被销毁，所以我们在每次任务时重新获取而不是在STE里面获取
 	InstanceData.PCPtr = UGameplayStatics::GetPlayerController(
-		InstanceData.PlayerCharacterPtr,
-		0
-	);
+	                                                           InstanceData.PlayerCharacterPtr,
+	                                                           0
+	                                                          );
 	if (InstanceData.PCPtr)
 	{
 		return EStateTreeRunStatus::Running;
@@ -1321,32 +1389,32 @@ EStateTreeRunStatus FSTT_GuideThread_PressKey::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_PressKey::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.PCPtr->IsInputKeyDown(
-		InstanceData.Key
-	))
+	                                       InstanceData.Key
+	                                      ))
 	{
 		return EStateTreeRunStatus::Succeeded;
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 FTaskNodeDescript FSTT_GuideThread_PressKey::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
@@ -1358,27 +1426,28 @@ FTaskNodeDescript FSTT_GuideThread_PressKey::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_ActiveDash::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(Context, Transition);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_ActiveDash>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 	InstanceData.GameplayTaskPtr->GAClass = InstanceData.GAClass;
 	InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
 
@@ -1390,13 +1459,13 @@ EStateTreeRunStatus FSTT_GuideThread_ActiveDash::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_ActiveDash::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	Super::Tick(Context, DeltaTime);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (!InstanceData.GameplayTaskPtr)
 	{
@@ -1414,11 +1483,11 @@ EStateTreeRunStatus FSTT_GuideThread_ActiveDash::Tick(
 void FSTT_GuideThread_ActiveDash::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -1426,30 +1495,30 @@ void FSTT_GuideThread_ActiveDash::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 FTaskNodeDescript FSTT_GuideThread_ActiveDash::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	auto GameOptionsPtr = UGameOptions::GetInstance();
 
 	FTaskNodeDescript TaskNodeDescript;
 
 	TaskNodeDescript.Description = FString::Printf(
-		TEXT(
-			"Press <%s>%s</> key To <Button Display=\"Dash\" Param=\"Dash\"/>"
-		),
-		*RichText_Key,
-		*GameOptionsPtr->DashKey.ToString()
-	);
+	                                               TEXT(
+	                                                    "Press <%s>%s</> key To <Button Display=\"Dash\" Param=\"Dash\"/>"
+	                                                   ),
+	                                               *RichText_Key,
+	                                               *GameOptionsPtr->DashKey.ToString()
+	                                              );
 
 	return TaskNodeDescript;
 }
@@ -1457,27 +1526,28 @@ FTaskNodeDescript FSTT_GuideThread_ActiveDash::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_Run::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(Context, Transition);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_ActiveRun>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 	InstanceData.GameplayTaskPtr->GAClass = InstanceData.GAClass;
 	InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
 
@@ -1489,13 +1559,13 @@ EStateTreeRunStatus FSTT_GuideThread_Run::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_Run::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	Super::Tick(Context, DeltaTime);
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (!InstanceData.GameplayTaskPtr)
 	{
@@ -1513,11 +1583,11 @@ EStateTreeRunStatus FSTT_GuideThread_Run::Tick(
 void FSTT_GuideThread_Run::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -1525,30 +1595,30 @@ void FSTT_GuideThread_Run::ExitState(
 	InstanceData.GameplayTaskPtr = nullptr;
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 FTaskNodeDescript FSTT_GuideThread_Run::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	auto GameOptionsPtr = UGameOptions::GetInstance();
 
 	FTaskNodeDescript TaskNodeDescript;
 
 	TaskNodeDescript.Description = FString::Printf(
-		TEXT(
-			"Press <%s>%s</> key To <Button Display=\"Run\" Param=\"Run\"/>"
-		),
-		*RichText_Key,
-		*GameOptionsPtr->RunKey.ToString()
-	);
+	                                               TEXT(
+	                                                    "Press <%s>%s</> key To <Button Display=\"Run\" Param=\"Run\"/>"
+	                                                   ),
+	                                               *RichText_Key,
+	                                               *GameOptionsPtr->RunKey.ToString()
+	                                              );
 
 	return TaskNodeDescript;
 }
@@ -1556,24 +1626,24 @@ FTaskNodeDescript FSTT_GuideThread_Run::GetTaskNodeDescripton(
 EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
-	if (InstanceData.GuideActorPtr)
+	if (InstanceData.GuideThreadActorPtr)
 	{
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	if (InstanceData.PlayerCharacterPtr)
@@ -1589,14 +1659,14 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::EnterState(
 
 				InstanceData.TargetPointPtr = InstanceData.PlayerCharacterPtr->GetWorld()->SpawnActor<
 					ATargetPoint_Runtime>(
-					UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
-					SpawnParameters
-				);
+					                      UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
+					                      SpawnParameters
+					                     );
 
 				InstanceData.TargetPointPtr->AttachToActor(
-					InstanceData.TargetCharacterPtr,
-					FAttachmentTransformRules::KeepRelativeTransform
-				);
+				                                           InstanceData.TargetCharacterPtr,
+				                                           FAttachmentTransformRules::KeepRelativeTransform
+				                                          );
 
 				return EStateTreeRunStatus::Running;
 			}
@@ -1606,18 +1676,18 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::EnterState(
 
 				FTransform AbsoluteTransform = FTransform::Identity;
 				AbsoluteTransform.SetLocation(
-					InstanceData.TargetLocation
-				);
+				                              InstanceData.TargetLocation
+				                             );
 
 				FActorSpawnParameters SpawnParameters;
 				SpawnParameters.Owner = InstanceData.PlayerCharacterPtr;
 
 				InstanceData.TargetPointPtr = InstanceData.PlayerCharacterPtr->GetWorld()->SpawnActor<
 					ATargetPoint_Runtime>(
-					UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
-					AbsoluteTransform,
-					SpawnParameters
-				);
+					                      UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
+					                      AbsoluteTransform,
+					                      SpawnParameters
+					                     );
 
 				return EStateTreeRunStatus::Running;
 			}
@@ -1630,18 +1700,18 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	if (InstanceData.TargetCharacterPtr)
 	{
 		const auto Distance = FVector::Distance(
-			InstanceData.TargetCharacterPtr->GetActorLocation(),
-			InstanceData.PlayerCharacterPtr->GetActorLocation()
-		);
+		                                        InstanceData.TargetCharacterPtr->GetActorLocation(),
+		                                        InstanceData.PlayerCharacterPtr->GetActorLocation()
+		                                       );
 		if (Distance < InstanceData.ReachedRadius)
 		{
 			return EStateTreeRunStatus::Succeeded;
@@ -1650,9 +1720,9 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::Tick(
 	else
 	{
 		const auto Distance = FVector::Distance(
-			InstanceData.TargetLocation,
-			InstanceData.PlayerCharacterPtr->GetActorLocation()
-		);
+		                                        InstanceData.TargetLocation,
+		                                        InstanceData.PlayerCharacterPtr->GetActorLocation()
+		                                       );
 		if (Distance < InstanceData.ReachedRadius)
 		{
 			return EStateTreeRunStatus::Succeeded;
@@ -1660,26 +1730,26 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::Tick(
 	}
 
 	return Super::Tick(
-		Context,
-		DeltaTime
-	);
+	                   Context,
+	                   DeltaTime
+	                  );
 }
 
 FTaskNodeDescript FSTT_GuideThread_GoToTheTargetPoint::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
 	if (InstanceData.PromtStr.IsEmpty())
 	{
 		TaskNodeDescript.Description = TEXT(
-			"移动至目标点"
-		);
+		                                    "移动至目标点"
+		                                   );
 	}
 	else
 	{
@@ -1692,11 +1762,11 @@ FTaskNodeDescript FSTT_GuideThread_GoToTheTargetPoint::GetTaskNodeDescripton(
 void FSTT_GuideThread_GoToTheTargetPoint::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.TargetPointPtr)
 	{
 		InstanceData.TargetPointPtr->Destroy();
@@ -1704,57 +1774,58 @@ void FSTT_GuideThread_GoToTheTargetPoint::ExitState(
 	InstanceData.TargetPointPtr = nullptr;
 
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 }
 
 EStateTreeRunStatus FSTT_GuideThread_WaitInteractionSceneActor::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::EnterState(
-		Context,
-		Transition
-	);
+	                  Context,
+	                  Transition
+	                 );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
-		InstanceData.GuideActorPtr->FindComponentByInterface(
-			UGameplayTaskOwnerInterface::StaticClass()
-		)
-	);
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
 	if (!InstanceData.TaskOwner)
 	{
-		InstanceData.TaskOwner = InstanceData.GuideActorPtr;
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
 	}
 
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_WaitInteractionSceneActor>(
-		*InstanceData.TaskOwner
-	);
+		 *InstanceData.TaskOwner
+		);
 
 	if (InstanceData.GameplayTaskPtr)
 	{
 		InstanceData.GameplayTaskPtr->SetPlayerCharacter(
-			InstanceData.PlayerCharacterPtr
-		);
+		                                                 InstanceData.PlayerCharacterPtr
+		                                                );
 
 		InstanceData.GameplayTaskPtr->PAD = InstanceData.PAD;
 
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
 
-	if (InstanceData.GuideActorPtr)
+	if (InstanceData.GuideThreadActorPtr)
 	{
-		InstanceData.GuideActorPtr->UpdateCurrentTaskNode(
-			GetTaskNodeDescripton(
-				Context
-			)
-		);
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 
 	return EStateTreeRunStatus::Running;
@@ -1763,16 +1834,16 @@ EStateTreeRunStatus FSTT_GuideThread_WaitInteractionSceneActor::EnterState(
 EStateTreeRunStatus FSTT_GuideThread_WaitInteractionSceneActor::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-) const
+	) const
 {
 	FSTT_GuideThreadBase::Tick(
-		Context,
-		DeltaTime
-	);
+	                           Context,
+	                           DeltaTime
+	                          );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (!InstanceData.GameplayTaskPtr)
 	{
 		checkNoEntry();
@@ -1789,16 +1860,16 @@ EStateTreeRunStatus FSTT_GuideThread_WaitInteractionSceneActor::Tick(
 void FSTT_GuideThread_WaitInteractionSceneActor::ExitState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition
-) const
+	) const
 {
 	Super::ExitState(
-		Context,
-		Transition
-	);
+	                 Context,
+	                 Transition
+	                );
 
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() != EGameplayTaskState::Finished)
 	{
 		InstanceData.GameplayTaskPtr->ExternalCancel();
@@ -1808,17 +1879,17 @@ void FSTT_GuideThread_WaitInteractionSceneActor::ExitState(
 
 FTaskNodeDescript FSTT_GuideThread_WaitInteractionSceneActor::GetTaskNodeDescripton(
 	FStateTreeExecutionContext& Context
-) const
+	) const
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(
-		*this
-	);
+	                                                          *this
+	                                                         );
 
 	FTaskNodeDescript TaskNodeDescript;
 
 	TaskNodeDescript.Description = TEXT(
-		"前往与目标交互!"
-	);
+	                                    "前往与目标交互!"
+	                                   );
 
 	return TaskNodeDescript;
 }

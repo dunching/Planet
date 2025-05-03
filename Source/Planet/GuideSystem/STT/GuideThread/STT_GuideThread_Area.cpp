@@ -38,7 +38,7 @@ EStateTreeRunStatus FSTT_GuideThreadSpwanNPCColony::EnterState(
 		auto PCPtr = Cast<
 			APlanetPlayerController>(
 			UGameplayStatics::GetPlayerController(
-				InstanceData.GuideActorPtr,
+				InstanceData.GuideThreadActorPtr,
 				0
 			)
 		);

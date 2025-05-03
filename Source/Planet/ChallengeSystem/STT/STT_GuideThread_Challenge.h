@@ -20,6 +20,7 @@
 class ATeleport;
 class AHumanCharacter_AI;
 class UGloabVariable_GuideThread_Challenge;
+class AGuideThread_Challenge;
 
 #pragma region ChallengeBase
 USTRUCT()
@@ -53,6 +54,12 @@ struct PLANET_API FSTID_GuideThreadEntryNextLevel :
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere, Category = Context)
+	AGuideThread_Challenge* ChallengeGuideTrheadActorPtr = nullptr;
+	
+	/**
+	 * 会在这里地图里随机选择
+	 */
 	UPROPERTY(EditAnywhere, Category = Param)
 	TArray<ETeleport> ChallengeAry;
 };
@@ -108,6 +115,17 @@ struct PLANET_API FSTID_GuideThread_Challenge_SpawnNPCs :
 	TArray<FGuid> CharacterIDAry;
 
 	TArray<TWeakObjectPtr<AHumanCharacter_AI>> CharacterAry;
+	
+	/**
+	 * 间隔时间
+	 */
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	int32 DelayTime = 1;
+
+	float RemainTime = 0.f;
 };
 
 /**

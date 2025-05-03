@@ -309,3 +309,8 @@ FGuid AGuideThread::GetGuideID() const
 {
 	return GuideID;
 }
+
+FString AGuideThread::GetGuideThreadTitle() const
+{
+	return TaskName;
+}

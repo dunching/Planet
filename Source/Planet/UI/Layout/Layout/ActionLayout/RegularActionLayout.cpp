@@ -27,6 +27,7 @@
 #include "HUD_TeamInfo.h"
 #include "HumanCharacter_Player.h"
 #include "PawnStateActionHUD.h"
+#include "PawnStateConsumablesHUD.h"
 #include "PlanetGameViewportClient.h"
 #include "PlayerGameplayTasks.h"
 #include "ProgressTips.h"
@@ -52,7 +53,7 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 
 	FName LowerHPSocket = TEXT("LowerHPSocket");
 
-	FName HUD_TeamInfoSocket = TEXT("HUD_TeamInfoSocket");
+	FName PawnStateConsumablesHUD = TEXT("PawnStateConsumablesHUD");
 
 	FName QuitChallengeBtn = TEXT("QuitChallengeBtn");
 
@@ -135,6 +136,13 @@ void URegularActionLayout::Enable()
 		if (UIPtr)
 		{
 			UIPtr->Enable();
+			UIPtr->ResetUIByData();
+		}
+	}
+	{
+		auto UIPtr = Cast<UPawnStateConsumablesHUD>(GetWidgetFromName(FRegularActionLayout::Get().PawnStateConsumablesHUD));
+		if (UIPtr)
+		{
 			UIPtr->ResetUIByData();
 		}
 	}

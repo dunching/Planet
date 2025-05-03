@@ -38,7 +38,7 @@ void UTaskItem::SetGuideThreadType(
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUTaskItem::Get().Text));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(DefaultObjPtr->TaskName));
+			UIPtr->SetText(FText::FromString(DefaultObjPtr->GetGuideThreadTitle()));
 		}
 	}
 }
@@ -55,7 +55,7 @@ void UTaskItem::SetGuideThreadType(
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUTaskItem::Get().Text));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(DefaultObjPtr->TaskName));
+			UIPtr->SetText(FText::FromString(DefaultObjPtr->GetGuideThreadTitle()));
 		}
 	}
 }

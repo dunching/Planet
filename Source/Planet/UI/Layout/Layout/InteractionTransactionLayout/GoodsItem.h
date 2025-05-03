@@ -46,6 +46,8 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
+	virtual	void SetNum(int32 Num);
+
 	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
 	
 	TSharedPtr<FBasicProxy> BasicProxyPtr = nullptr;
@@ -55,8 +57,6 @@ public:
 private:
 	
 	virtual	void SetItemType(const TSharedPtr<FBasicProxy>& BasicProxyPtr);
-
-	virtual	void SetNum(const TSharedPtr<FBasicProxy>& BasicProxyPtr);
 
 	virtual	void SetValue(const TSharedPtr<FBasicProxy>& BasicProxyPtr);
 

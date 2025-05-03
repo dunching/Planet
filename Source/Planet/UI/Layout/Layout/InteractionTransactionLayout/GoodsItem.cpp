@@ -61,7 +61,10 @@ void UGoodsItem::ResetToolUIByData(
 	if (BasicProxyPtr)
 	{
 		SetItemType(BasicProxyPtr);
-		SetNum(BasicProxyPtr);
+		
+		const auto Num = GetProxyNum(BasicProxyPtr);
+		SetNum(Num);
+		
 		SetValue(BasicProxyPtr);
 	}
 }
@@ -115,7 +118,7 @@ void UGoodsItem::OnClicked()
 }
 
 inline void UGoodsItem::SetNum(
-	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
+int32 Num
 	)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGoodsItem::Get().Num));
@@ -123,7 +126,7 @@ inline void UGoodsItem::SetNum(
 	{
 		const auto Text = FString::Printf(
 										  TEXT("剩余数量：%d"),
-										  InBasicProxyPtr->GetNum()
+										  Num
 										 );
 		UIPtr->SetText(FText::FromString(Text));
 	}

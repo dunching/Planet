@@ -52,12 +52,15 @@ public:
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)override;
 
+	virtual void InitialProxy(const FGameplayTag& InProxyType) override;
+
 	void UpdateByRemote(const TSharedPtr<FConsumableProxy>& RemoteSPtr);
 
 	virtual bool Active()override;
 
 	FTableRowProxy_Consumable* GetTableRowProxy_Consumable()const;
 
+#pragma region Cooldown interface
 	virtual bool GetRemainingCooldown(
 		float& RemainingCooldown, float& RemainingCooldownPercent
 	)const override;
@@ -71,8 +74,7 @@ public:
 	virtual void ApplyCooldown()override;
 
 	virtual void OffsetCooldownTime()override;
-
-	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
+#pragma endregion 
 
 protected:
 

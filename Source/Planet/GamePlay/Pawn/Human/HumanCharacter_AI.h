@@ -12,6 +12,7 @@
 
 #include "HumanCharacter_AI.generated.h"
 
+class UNiagaraComponent;
 class UAIComponent;
 class AGuideInteraction_HumanCharacter_AI;
 class UResourceBoxStateTreeComponent;
@@ -28,6 +29,8 @@ class PLANET_API USceneCharacterAIInteractionComponent : public USceneActorInter
 public:
 	using FOwnerType = AHumanCharacter_AI;
 
+	virtual void BeginPlay() override;
+	
 	virtual void StartInteractionItem(
 		const TSubclassOf<AGuideInteraction_Actor>& Item
 		) override;
@@ -37,6 +40,9 @@ public:
 		bool bIsEnable
 	) override;
 
+private:
+	
+	void UpdatePromt()const;
 };
 
 /**
@@ -102,6 +108,8 @@ public:
 
 	AGroupManagger_NPC* GetGroupManagger_NPC() const;
 
+	TObjectPtr<UNiagaraComponent>  GetNiagaraComponent() const;
+
 	virtual void HasBeenStartedLookAt(
 		ACharacterBase* InCharacterPtr
 	) override;
@@ -137,6 +145,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
 	TObjectPtr<UAIComponent> AIComponentPtr = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI)
+	TObjectPtr<UNiagaraComponent> NiagaraComponentPtr = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Interaction)
 	UWidgetComponent* InteractionWidgetCompoentPtr = nullptr;

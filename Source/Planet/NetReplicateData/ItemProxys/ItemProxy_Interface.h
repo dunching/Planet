@@ -56,7 +56,7 @@ public:
 };
 
 /**
- * 叠加接口
+ * 可堆叠物品接口
  */
 struct PLANET_API IProxy_Unique
 {
@@ -72,13 +72,16 @@ public:
 
 	void UpdateByRemote_Unique(const TSharedPtr<IProxy_Unique>& RemoteSPtr);
 
-	virtual void AddNum(int32 Value);
+	virtual void ModifyNum(int32 Value);
+
+	int32 GetNum()const;
 
 	int32 GetOffsetNum()const;
 
 	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
 
 protected:
+	
 private:
 	// 总数
 	int32 Num = 0;
@@ -86,6 +89,8 @@ private:
 	// 这次的增量/减量
 	int32 OffsetNum = 0;
 };
+
+int32 GetProxyNum(const TSharedPtr<FBasicProxy>& ProxySPtr); 
 
 /**
  * 可被分配的接口

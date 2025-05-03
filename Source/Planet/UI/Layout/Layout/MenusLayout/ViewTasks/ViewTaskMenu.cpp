@@ -13,6 +13,7 @@
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
 #include "TaskItemCategory.h"
+#include "ProxyIcon.h"
 #include "HumanCharacter_Player.h"
 
 struct FUViewTaskMenu : public TStructVariable<FUViewTaskMenu>
@@ -168,7 +169,7 @@ void UViewTaskMenu::ActiveCurrentCorrespondingItem()
 
 void UViewTaskMenu::OnSelected(
 	UTaskItem* ItemPtr
-)
+	)
 {
 	if (ItemPtr && ItemPtr != TaskItemPtr)
 	{
@@ -181,10 +182,11 @@ void UViewTaskMenu::OnSelected(
 				UIPtr->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
-		
+
 		ModifyTaskText();
 		ModifyActiveGuideThreadText();
 		ModifyTaskList();
+		ModifyRewardProxysList();
 	}
 }
 
@@ -227,7 +229,7 @@ void UViewTaskMenu::ModifyTaskText()
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUViewTaskMenu::Get().TaskName));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(GuideThreadPtr->TaskName));
+			UIPtr->SetText(FText::FromString(GuideThreadPtr->GetGuideThreadTitle()));
 		}
 	}
 
@@ -253,8 +255,8 @@ void UViewTaskMenu::ModifyActiveGuideThreadText()
 		if (TaskItemPtr->MainGuideThreadClass == CurrentGuideThread->GetClass())
 		{
 			auto TextUIPtr = Cast<UTextBlock>(
-				GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
-			);
+			                                  GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
+			                                 );
 			if (TextUIPtr)
 			{
 				TextUIPtr->SetText(FText::FromString(TEXT("正在追踪")));
@@ -268,8 +270,8 @@ void UViewTaskMenu::ModifyActiveGuideThreadText()
 		if (TaskItemPtr->BrandGuideThreadClass == CurrentGuideThread->GetClass())
 		{
 			auto TextUIPtr = Cast<UTextBlock>(
-				GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
-			);
+			                                  GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
+			                                 );
 			if (TextUIPtr)
 			{
 				TextUIPtr->SetText(FText::FromString(TEXT("正在追踪")));
@@ -278,10 +280,10 @@ void UViewTaskMenu::ModifyActiveGuideThreadText()
 			return;
 		}
 	}
-		
+
 	auto TextUIPtr = Cast<UTextBlock>(
-		GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
-	);
+	                                  GetWidgetFromName(FUViewTaskMenu::Get().ActiveGuideThreadText)
+	                                 );
 	if (TextUIPtr)
 	{
 		TextUIPtr->SetText(FText::FromString(TEXT("追踪任务")));
@@ -304,6 +306,40 @@ void UViewTaskMenu::ModifyTaskList()
 			if (TempUIPtr)
 			{
 				TempUIPtr->SwitchSelected(false);
+			}
+		}
+	}
+}
+
+void UViewTaskMenu::ModifyRewardProxysList()
+{
+	auto UIPtr = Cast<UScrollBox>(GetWidgetFromName(FUViewTaskMenu::Get().RewardList));
+	if (UIPtr)
+	{
+		UIPtr->ClearChildren();
+		if (TaskItemPtr->MainGuideThreadClass)
+		{
+			auto GuideThreadPtr = TaskItemPtr->MainGuideThreadClass.GetDefaultObject();
+			if (GuideThreadPtr)
+			{
+				for (const auto& Iter : GuideThreadPtr->RewardProxysMap)
+				{
+					auto RewardProxyPtr = CreateWidget<UProxyIcon>(this, RewardProxysClass);
+					UIPtr->AddChild(RewardProxyPtr);
+				}
+			}
+		}
+		else if (TaskItemPtr->BrandGuideThreadClass)
+		{
+			auto GuideThreadPtr = TaskItemPtr->BrandGuideThreadClass.GetDefaultObject();
+			if (GuideThreadPtr)
+			{
+				for (const auto& Iter : GuideThreadPtr->RewardProxysMap)
+				{
+					auto RewardProxyPtr = CreateWidget<UProxyIcon>(this, RewardProxysClass);
+					RewardProxyPtr->ResetToolUIByData(Iter.Key);
+					UIPtr->AddChild(RewardProxyPtr);
+				}
 			}
 		}
 	}

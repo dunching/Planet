@@ -29,6 +29,17 @@ inline void UItemDecription::BindData(
 	SetVisibility(ESlateVisibility::Hidden);
 }
 
+inline void UItemDecription::BindData(
+	const FGameplayTag &InProxyType,
+	const TSoftObjectPtr<UItemProxy_Description>& InItemProxy_Description
+)
+{
+	ProxyType = InProxyType;
+	ItemProxy_Description = InItemProxy_Description;
+
+	SetVisibility(ESlateVisibility::Hidden);
+}
+
 void UItemDecription::NativeConstruct()
 {
 	Super::NativeConstruct();
@@ -59,10 +70,7 @@ void UItemDecription::UpdatePosstion()
 
 void UItemDecription::SetUIStyle()
 {
-	if (!ProxySPtr)
-	{
-		return;
-	}
+	if (ProxySPtr)
 	{
 		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FUItemDecription::Get().Title));
 		if (WidgetPtr)
@@ -70,6 +78,15 @@ void UItemDecription::SetUIStyle()
 			WidgetPtr->SetText(FText::FromString(ProxySPtr->GetProxyName()));
 		}
 	}
+	else if (ProxyType.IsValid())
+	{
+		auto WidgetPtr = Cast<UTextBlock>(GetWidgetFromName(FUItemDecription::Get().Title));
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetText(FText::FromString(ItemProxy_Description.LoadSynchronous()->ProxyName));
+		}
+	}
+	
 	auto ItemProxy_DescriptionPtr = ItemProxy_Description.LoadSynchronous();
 	if (ItemProxy_DescriptionPtr && !ItemProxy_DescriptionPtr->DecriptionText.IsEmpty())
 	{

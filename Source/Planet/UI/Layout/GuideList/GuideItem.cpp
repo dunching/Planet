@@ -48,20 +48,17 @@ void UGuideItem::ResetUIByData()
 
 void UGuideItem::BindGuide(AGuideThread* NewGuidePtr)
 {
-	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUGuideItem::Get().Name));
-	if (!UIPtr)
-	{
-		return;
-	}
 
 	CurrentLineGuidePtr = NewGuidePtr;
 	if (NewGuidePtr)
 	{
 		SetVisibility(ESlateVisibility::Visible);
 		
+		NewGuidePtr->OnGuideThreadNameChagned.AddUObject(this, &ThisClass::OnGuideThreadPropertyChagned);
+		
+		OnGuideThreadPropertyChagned(NewGuidePtr->GetGuideThreadTitle());
+		
 		NewGuidePtr->OnCurrentTaskNodeChanged.AddUObject(this, &ThisClass::OnCurrentTaskNodeChanged);
-
-		UIPtr->SetText(FText::FromString(NewGuidePtr->TaskName));
 
 		OnCurrentTaskNodeChanged(FTaskNodeDescript::Refresh);
 	}
@@ -94,4 +91,15 @@ void UGuideItem::OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNo
 		const auto Description = CurrentTaskNode.Description;
 		UIPtr->SetText(FText::FromString(Description));
 	}
+}
+
+void UGuideItem::OnGuideThreadPropertyChagned(const FString& NewTaskName)
+{
+	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FUGuideItem::Get().Name));
+	if (!UIPtr)
+	{
+		return;
+	}
+	
+	UIPtr->SetText(FText::FromString(NewTaskName));
 }

@@ -56,30 +56,34 @@ class PLANET_API AGuideThread : public AGuideActor
 {
 	GENERATED_BODY()
 
+	using FOnGuideThreadNameChagned = TMulticastDelegate<void(
+		const FString&
+		)>;
+
 public:
 	friend FSTT_GuideThread_Completet;
 	friend UGuideSubSystem;
 
 	AGuideThread(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	void UpdateCurrentTaskNode(
 		const TSoftObjectPtr<UPAD_TaskNode_Guide>& InTaskNode
-	);
+		);
 
 	void UpdateCurrentTaskNode(
 		const FTaskNodeDescript& TaskNodeDescript
-	);
+		);
 
 	// 添加任务执行结果
 	void AddEvent(
 		const FTaskNodeResuleHelper& TaskNodeResuleHelper
-	);
+		);
 
 	FTaskNodeResuleHelper ConsumeEvent(
 		const FGuid& InGuid
-	);
+		);
 
 	FGuid GetPreviousTaskID() const;
 
@@ -89,7 +93,7 @@ public:
 	 */
 	void SetPreviousTaskID(
 		const FGuid& PreviousGuideID
-	);
+		);
 
 	FGuid GetCurrentTaskID() const;
 
@@ -99,23 +103,33 @@ public:
 	 */
 	void SetCurrentTaskID(
 		const FGuid& TaskID
-	);
+		);
 
 	FGuid GetGuideID() const;
+
+	virtual FString GetGuideThreadTitle() const;
 
 	// 任务节点类型：支线/支线
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FGameplayTag TaskNodeCategory;
 
-	// 任务名称
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FString TaskName;
-
 	// 任务描述
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
 
+	/**
+	 * 任务完成后的奖励
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<FGameplayTag, int32> RewardProxysMap;
+
+	FOnGuideThreadNameChagned OnGuideThreadNameChagned;
+
 protected:
+	// 任务名称
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString TaskName;
+
 	// 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGuid GuideID;
@@ -153,7 +167,7 @@ public:
 
 	virtual bool IsStructAllowed(
 		const UScriptStruct* InScriptStruct
-	) const override;
+		) const override;
 
 	virtual void PostLoad() override;
 
@@ -161,7 +175,7 @@ public:
 		UBrainComponent& BrainComponent,
 		FStateTreeExecutionContext& Context,
 		bool bLogErrors = false
-	);
+		);
 
 	UPROPERTY(EditAnywhere, Category = "Defaults", NoClear)
 	TSubclassOf<APlanetPlayerController> PlayerControllerClass = nullptr;
@@ -181,7 +195,7 @@ public:
 	virtual bool SetContextRequirements(
 		FStateTreeExecutionContext& Context,
 		bool bLogErrors = false
-	) override;
+		) override;
 };
 #pragma endregion
 
@@ -198,7 +212,7 @@ class PLANET_API AGuideThread_Main : public AGuideThread,
 public:
 	AGuideThread_Main(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	virtual EGuideThreadType GetGuideThreadType() const override final;
 };
@@ -230,7 +244,7 @@ public:
 	virtual bool SetContextRequirements(
 		FStateTreeExecutionContext& Context,
 		bool bLogErrors = false
-	) override;
+		) override;
 };
 #pragma endregion
 
@@ -276,7 +290,7 @@ class PLANET_API AGuideThread_Area : public AGuideThread_Immediate,
 public:
 	AGuideThread_Area(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	virtual EGuideThreadType GetGuideThreadType() const override final;
 };
@@ -308,6 +322,6 @@ public:
 	virtual bool SetContextRequirements(
 		FStateTreeExecutionContext& Context,
 		bool bLogErrors = false
-	) override;
+		) override;
 };
 #pragma endregion

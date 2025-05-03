@@ -3,6 +3,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Net/UnrealNetwork.h"
 #include "Components/WidgetComponent.h"
+#include "NiagaraComponent.h"
 
 #include "AIComponent.h"
 #include "CharacterTitle.h"
@@ -27,6 +28,13 @@
 // {
 // 	return GetOwner<AHumanCharacter_AI>()->GetCharacterAbilitySystemComponent();
 // }
+
+void USceneCharacterAIInteractionComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UpdatePromt();
+}
 
 void USceneCharacterAIInteractionComponent::StartInteractionItem(
 	const TSubclassOf<AGuideInteraction_Actor>& Item
@@ -64,27 +72,35 @@ void USceneCharacterAIInteractionComponent::ChangedInterationTaskState(
 )
 {
 	Super::ChangedInterationTaskState(Item, bIsEnable);
-	
+
+	if (bIsEnable)
+	{
+		UpdatePromt();
+	}
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() == ROLE_AutonomousProxy)
 	{
-		auto OnwerActorPtr = GetOwner<FOwnerType>();
-		if (!OnwerActorPtr)
-		{
-			return;
-		}
-
-		for (const auto& Iter : GuideInteractionAry)
-		{
-			if ((Iter.GuideInteraction == Item) && Iter.bIsTask && !Iter.bTaskHasCompleted)
-			{
-				OnwerActorPtr->GetAIComponent()->DisplayTaskPromy(Iter.TaskPromtClass);
-				return;
-			}
-		}
-		OnwerActorPtr->GetAIComponent()->StopDisplayTaskPromy();
 	}
 #endif
+}
+
+void USceneCharacterAIInteractionComponent::UpdatePromt() const
+{
+	auto OnwerActorPtr = GetOwner<FOwnerType>();
+	if (!OnwerActorPtr)
+	{
+		return;
+	}
+
+	for (const auto& Iter : GuideInteractionAry)
+	{
+		if (Iter.bIsTask && !Iter.bTaskHasCompleted)
+		{
+			OnwerActorPtr->GetAIComponent()->DisplayTaskPromy(Iter.TaskPromtClass);
+			return;
+		}
+	}
+	OnwerActorPtr->GetAIComponent()->StopDisplayTaskPromy();
 }
 
 void UCharacterAIAttributesComponent::SetCharacterID(
@@ -146,6 +162,9 @@ AHumanCharacter_AI::AHumanCharacter_AI(
 
 	InteractionWidgetCompoentPtr = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 	InteractionWidgetCompoentPtr->SetupAttachment(RootComponent);
+
+	NiagaraComponentPtr = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraComponent"));
+	NiagaraComponentPtr->SetupAttachment(RootComponent);
 }
 
 void AHumanCharacter_AI::BeginPlay()
@@ -221,6 +240,11 @@ UCharacterNPCStateProcessorComponent* AHumanCharacter_AI::GetCharacterNPCStatePr
 AGroupManagger_NPC* AHumanCharacter_AI::GetGroupManagger_NPC() const
 {
 	return Cast<AGroupManagger_NPC>(GetGroupManagger());
+}
+
+TObjectPtr<UNiagaraComponent> AHumanCharacter_AI::GetNiagaraComponent() const
+{
+	return NiagaraComponentPtr;
 }
 
 void AHumanCharacter_AI::HasBeenStartedLookAt(

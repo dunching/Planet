@@ -33,7 +33,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& Proxy
 	const auto Text =
 		FString::Printf(
 			TEXT("%s:%s"),
-			ProxyModifyType == EProxyModifyType::kAdd ? * UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+			ProxyModifyType == EProxyModifyType::kNumChanged ? * UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
 			*ProxyPtr->GetProxyName()
 		);
 	SetText(Text);
@@ -47,18 +47,33 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FConsumableProxy>& 
 
 	switch (ProxyModifyType)
 	{
-	case EProxyModifyType::kAdd:
-	{
-		SetText(FString::Printf(TEXT("Get:%dX%s"), ProxyPtr->GetNum(), *ProxyPtr->GetProxyName()));
+	case EProxyModifyType::kNumChanged:
+		{
+			if (ProxyPtr->GetOffsetNum() > 0)
+			{
+				SetText(FString::Printf(
+					TEXT("%s %dX%s"), TEXT("Get"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()
+					));
+			}
+			else
+			{
+				SetText(FString::Printf(
+					TEXT("%s %dX%s"), TEXT("Lose"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()
+					));
+			}
 	}
 	break;
-	case EProxyModifyType::kChange:
+	case EProxyModifyType::kPropertyChange:
 		break;
 	case EProxyModifyType::kRemove:
+		{
+			SetText(FString::Printf(TEXT("Lose:%dX%s"), ProxyPtr->GetNum(), *ProxyPtr->GetProxyName()));
+		}
 		break;
 	default:
 		break;
 	}
+	
 	ResetToolUIByData(ProxyPtr);
 }
 
@@ -66,10 +81,34 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyP
 {
 	SetTexutre(ProxyPtr->GetIcon());
 
-	SetText(FString::Printf(
-		TEXT("%s %dX%s"), ProxyModifyType == EProxyModifyType::kAdd ? TEXT("Get") : TEXT("Lose"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()
-		));
-
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+			if (ProxyPtr->GetOffsetNum() > 0)
+			{
+				SetText(FString::Printf(
+					TEXT("%s %dX%s"), TEXT("Get"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()
+					));
+			}
+			else
+			{
+				SetText(FString::Printf(
+					TEXT("%s %dX%s"), TEXT("Lose"), ProxyPtr->GetOffsetNum(), *ProxyPtr->GetProxyName()
+					));
+			}
+		}
+		break;
+	case EProxyModifyType::kPropertyChange:
+		break;
+	case EProxyModifyType::kRemove:
+		{
+		}
+		break;
+	default:
+		break;
+	}
+	
 	ResetToolUIByData(ProxyPtr);
 }
 
@@ -78,7 +117,7 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FCharacterProxy>& P
 	SetTexutre(ProxyPtr->GetIcon());
 
 	SetText(FString::Printf(
-		TEXT("%s X%s"), ProxyModifyType == EProxyModifyType::kAdd ? TEXT("Get") : TEXT("Lose"), *ProxyPtr->GetProxyName()
+		TEXT("%s X%s"), ProxyModifyType == EProxyModifyType::kNumChanged ? TEXT("Get") : TEXT("Lose"), *ProxyPtr->GetProxyName()
 		));
 
 	ResetToolUIByData(ProxyPtr);

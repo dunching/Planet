@@ -30,6 +30,9 @@ void FProxy_FASI::PreReplicatedRemove(
 	const struct FProxy_FASI_Container& InArraySerializer
 	)
 {
+	// 在这里 我们对本地的数据进行绑定
+
+	InArraySerializer.InventoryComponentPtr->RemoveProxy_SyncHelper(ProxySPtr);
 }
 
 void FProxy_FASI::PostReplicatedAdd(
@@ -47,7 +50,7 @@ void FProxy_FASI::PostReplicatedChange(
 {
 	// 在这里 我们对本地的数据进行绑定
 
-	ProxySPtr = InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr, CacheProxySPtr);
+	InArraySerializer.InventoryComponentPtr->UpdateProxy_SyncHelper(ProxySPtr, CacheProxySPtr);
 }
 
 bool FProxy_FASI::NetSerialize(

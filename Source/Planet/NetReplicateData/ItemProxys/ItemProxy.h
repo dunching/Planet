@@ -102,8 +102,6 @@ public:
 	//  取消
 	virtual void End();
 
-	virtual int32 GetNum()const;
-
 	IDType GetID() const;
 
 	FGameplayTag GetProxyType() const;

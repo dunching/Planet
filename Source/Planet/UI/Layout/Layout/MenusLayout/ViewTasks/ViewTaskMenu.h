@@ -12,6 +12,7 @@
 
 class UTaskItem;
 class UTaskItemCategory;
+class UProxyIcon;
 
 /**
  *
@@ -51,6 +52,8 @@ private:
 	
 	void ModifyTaskList();
 	
+	void ModifyRewardProxysList();
+	
 	UFUNCTION()
 	void OnActiveGuideThread();
 
@@ -59,6 +62,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UTaskItemCategory>TaskItemCategoryClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UProxyIcon>RewardProxysClass;
 	
 	UTaskItem* TaskItemPtr = nullptr;
 };

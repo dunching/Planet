@@ -10,6 +10,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/HUD.h"
+#include "Engine/OverlapResult.h"
+#include "Kismet/KismetStringLibrary.h"
 
 #include "InputProcessorSubSystem.h"
 #include "HorseCharacter.h"
@@ -114,18 +116,6 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	}
 }
 
-void APlanetPlayerController::ChangedInterationTaskState_Implementation(
-	AHumanCharacter_AI* HumanCharacterPtr,
-	TSubclassOf<AGuideInteraction_Actor> Item,
-	bool bIsEnable
-	)
-{
-	if (HumanCharacterPtr)
-	{
-		HumanCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationTaskState(Item, bIsEnable);
-	}
-}
-
 void APlanetPlayerController::IncreaseCD_Implementation(
 	int32 CD
 	)
@@ -153,29 +143,49 @@ void APlanetPlayerController::IncreaseCD_Implementation(
 }
 
 void APlanetPlayerController::BuyProxys_Implementation(
-ACharacterBase* InTraderCharacterPtr,
-	const FGameplayTag& ProxyTag,
+	ACharacterBase* InTraderCharacterPtr,
+	const FGameplayTag& BuyProxyTag,
+	const FGuid& BuyProxyID,
 	int32 Num,
+	const FGameplayTag& CostProxyType,
 	int32 Cost
 	)
 {
 	auto InventoryComponentPtr = GetGroupManagger()->GetInventoryComponent();
-	if (InventoryComponentPtr)
+	if (!InventoryComponentPtr)
 	{
-		auto CoinProxySPtr = InventoryComponentPtr->FindProxy_Coin(
-			 UGameplayTagsLibrary::Proxy_Coin_Regular
-			);
-		if (Cost <= CoinProxySPtr->GetNum())
-		{
-			InventoryComponentPtr->AddProxy(ProxyTag, Num);
-			InventoryComponentPtr->AddProxy(UGameplayTagsLibrary::Proxy_Coin_Regular, -Cost);
-
-			// if (InTraderCharacterPtr.IsValid())
-			// {
-			// 	InTraderCharacterPtr->GetInventoryComponent()->AddProxy(ProxyTag, Num);
-			// }
-		}
+		return;
 	}
+
+	auto CoinProxySPtr = InventoryComponentPtr->FindProxy_Coin(CostProxyType);
+	if (!(CoinProxySPtr && Cost <= CoinProxySPtr->GetNum()))
+	{
+		return;
+	}
+
+	if (!InTraderCharacterPtr)
+	{
+		return;
+	}
+
+	auto TraderInventoryComponentPtr = InTraderCharacterPtr->GetGroupManagger()->GetInventoryComponent();
+	auto TargetProxySPtr = TraderInventoryComponentPtr->FindProxy(BuyProxyID);
+	if (!TargetProxySPtr)
+	{
+		return;
+	}
+
+	const auto RemainNum = GetProxyNum(TargetProxySPtr);
+	if (Num > RemainNum)
+	{
+		return;
+	}
+
+	InventoryComponentPtr->AddProxyNum(BuyProxyTag, Num);
+
+	InventoryComponentPtr->RemoveProxyNum(CoinProxySPtr->GetID(), Cost);
+
+	TraderInventoryComponentPtr->RemoveProxyNum(BuyProxyID, Num);
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(
@@ -542,6 +552,72 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(
 	}
 }
 
+void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	TArray<FOverlapResult> OutHit;
+	if (GetWorld()->OverlapMultiByObjectType(
+	                                         OutHit,
+	                                         OutCamLoc,
+	                                         FQuat::Identity,
+	                                         ObjectQueryParams,
+	                                         FCollisionShape::MakeSphere(
+	                                                                     UKismetStringLibrary::Conv_StringToInt(Args[1])
+	                                                                    ),
+	                                         Params
+	                                        ))
+	{
+		for (const auto& Iter : OutHit)
+		{
+			auto TargetCharacterPtr = Cast<AHumanCharacter>(Iter.GetActor());
+			if (TargetCharacterPtr)
+			{
+				auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+				auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+				FGameplayEffectSpecHandle SpecHandle =
+					ICPtr->MakeOutgoingSpec(
+					                        UAssetRefMap::GetInstance()->DamageClass,
+					                        1,
+					                        ICPtr->MakeEffectContext()
+					                       );
+
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
+
+				int32 Damege = 0;
+				LexFromString(Damege, *Args[0]);
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+				                                               Damege
+				                                              );
+
+				CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
+					 *SpecHandle.Data.Get(),
+					 ASCPtr,
+					 ASCPtr->GetPredictionKeyForNewAction()
+					);
+			}
+		}
+	}
+}
+
 void APlanetPlayerController::MakeTherapy_Implementation(
 	const TArray<FString>& Args
 	)
@@ -632,4 +708,19 @@ void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 
 void APlanetPlayerController::OnRep_WolrdProcess()
 {
+}
+
+inline void APlanetPlayerController::AddProxy_Implementation(
+	const FGameplayTag& ProxyType,
+	int32 Num
+	)
+{
+	auto InventoryComponentPtr = GetGroupManagger()->GetInventoryComponent();
+	if (InventoryComponentPtr)
+	{
+		InventoryComponentPtr->AddProxyNum(
+		                                   ProxyType,
+		                                   Num
+		                                  );
+	}
 }

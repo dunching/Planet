@@ -92,6 +92,11 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
+	void MakeTrueDamegeInArea(
+		const TArray<FString>& Args
+		);
+
+	UFUNCTION(Server, Reliable)
 	void MakeTherapy(
 		const TArray<FString>& Args
 		);
@@ -123,23 +128,24 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
-	void ChangedInterationTaskState(
-		AHumanCharacter_AI* HumanCharacterPtr,
-		TSubclassOf<AGuideInteraction_Actor> Item,
-		bool bIsEnable
-		);
-
-	UFUNCTION(Server, Reliable)
 	void BuyProxys(
 		ACharacterBase* InTraderCharacterPtr,
-		const FGameplayTag& ProxyTag,
+		const FGameplayTag& BuyProxyTag,
+		const FGuid& BuyProxyID,
 		int32 Num,
+		const FGameplayTag& CostProxyType,
 		int32 Cost
 		);
 
 	UFUNCTION(Server, Reliable)
 	void IncreaseCD(
 		int32 CD
+		);
+
+	UFUNCTION(Server, Reliable)
+	void AddProxy(
+		const FGameplayTag& ProxyType,
+		int32 Num
 		);
 
 #pragma region

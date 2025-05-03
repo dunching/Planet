@@ -91,11 +91,6 @@ void FBasicProxy::End()
 {
 }
 
-int32 FBasicProxy::GetNum() const
-{
-	return 1;
-}
-
 void FBasicProxy::Allocation()
 {
 }

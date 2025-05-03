@@ -28,12 +28,12 @@ void IProxy_Unique::UpdateByRemote_Unique(
 	)
 {
 	Num = RemoteSPtr->Num;
-
-	CallbackContainerHelper.ValueChanged(Num, RemoteSPtr->Num);
 	OffsetNum = RemoteSPtr->OffsetNum;
+
+	CallbackContainerHelper.ValueChanged(Num, RemoteSPtr->OffsetNum);
 }
 
-void IProxy_Unique::AddNum(
+void IProxy_Unique::ModifyNum(
 	int32 Value
 	)
 {
@@ -42,12 +42,33 @@ void IProxy_Unique::AddNum(
 
 	OffsetNum = Value;
 
-	CallbackContainerHelper.ValueChanged(Old, Num);
+	CallbackContainerHelper.ValueChanged(Old, OffsetNum);
 }
 
 int32 IProxy_Unique::GetOffsetNum() const
 {
 	return OffsetNum;
+}
+
+int32 IProxy_Unique::GetNum() const
+{
+	return Num;
+}
+
+int32 GetProxyNum(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
+	)
+{
+	auto Num = 1;
+	if (ProxySPtr)
+	{
+		auto IProxy_UniquePtr = DynamicCastSharedPtr<IProxy_Unique>(ProxySPtr);
+		if (IProxy_UniquePtr)
+		{
+			Num = IProxy_UniquePtr->GetNum();
+		}
+	}
+	return Num;
 }
 
 IProxy_Allocationble::~IProxy_Allocationble()
