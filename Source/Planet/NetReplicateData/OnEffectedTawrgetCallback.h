@@ -33,7 +33,15 @@ struct PLANET_API FOnEffectedTawrgetCallback
 
 	TMap<FGameplayTag, float> SetByCallerTagMagnitudes;
 
+	/**
+	 * 伤害值
+	 */
 	int32 Damage = 0;
+	
+	/**
+	 * 治疗量
+	 */
+	int32 TherapeuticalDose = 0;
 };
 
 template <>

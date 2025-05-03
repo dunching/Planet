@@ -72,6 +72,18 @@ private:
 		int32 NewValue
 		);
 
+	void OnTraderSkillProxyChanged(
+		const TSharedPtr<
+			FSkillProxy>& ProxySPtr,
+		EProxyModifyType ProxyModifyType
+		);
+
+	void OnTraderWeaponProxyChanged(
+		const TSharedPtr<
+			FWeaponProxy>& ProxySPtr,
+		EProxyModifyType ProxyModifyType
+		);
+
 	void OnTraderConsumableProxyChanged(
 		const TSharedPtr<
 			FConsumableProxy>& ProxySPtr,
@@ -90,6 +102,10 @@ private:
 	TSharedPtr<FBasicProxy> CurrentProxyPtr = nullptr;
 
 	int32 CurrentNum = 0;
+
+	UInventoryComponent::FOnSkillProxyChanged::FCallbackHandleSPtr OnSkillProxyChangedDelegateHandle;
+
+	UInventoryComponent::FOnWeaponProxyChanged::FCallbackHandleSPtr OnWeaponProxyChangedDelegateHandle;
 
 	UInventoryComponent::FOnConsumableProxyChanged::FCallbackHandleSPtr OnConsumableProxyChangedDelegateHandle;
 

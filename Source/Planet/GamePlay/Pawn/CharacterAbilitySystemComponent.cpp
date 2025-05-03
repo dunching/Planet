@@ -951,7 +951,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	ReceivedEventModifyDataCallback.AllAssetTags = AllAssetTags;
 	ReceivedEventModifyDataCallback.SetByCallerTagMagnitudes = CustomMagnitudes;
 
-#pragma region 确认最终的值
+#pragma region 确认最终要应用的值
 	// 如果是此类，数据在 SetByCallerTagMagnitudes
 	if (
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
@@ -970,6 +970,8 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 					Spec,
 					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
 				);
+
+				ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
@@ -1045,7 +1047,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	}
 #pragma endregion
 
-#pragma region  把值写进GE里面
+#pragma region 把值写进GE里面
 	// 如果是此类，数据在 SetByCallerTagMagnitudes
 	if (
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||

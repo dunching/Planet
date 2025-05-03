@@ -93,13 +93,13 @@ public:
 		const TSharedPtr<FBasicProxy>& ProxySPtr
 		);
 
-	void RemoveProxy_SyncHelper(
-		const TSharedPtr<FBasicProxy>& ProxySPtr
-		);
-
 	void UpdateProxy_SyncHelper(
 		const TSharedPtr<FBasicProxy>& LocalProxySPtr,
 		const TSharedPtr<FBasicProxy>& RemoteProxySPtr
+		);
+	
+	void RemoveProxy_SyncHelper(
+		const TSharedPtr<FBasicProxy>& ProxySPtr
 		);
 #endif
 
@@ -130,12 +130,12 @@ public:
 	/**
 	 * 修改物品的数量
 	 * 如果是可堆叠的，则增加一个物品并修改数量
-	 * 如果是不可堆叠的，则仅增加一个物品？
+	 * 如果是不可堆叠的，则仅增加对应数量个物品？
 	 * @param ProxyType 
 	 * @param Num 
 	 * @return 
 	 */
-	TSharedPtr<FBasicProxy> AddProxyNum(
+	TArray<TSharedPtr<FBasicProxy>> AddProxyNum(
 		const FGameplayTag& ProxyType,
 		int32 Num
 		);
@@ -188,6 +188,10 @@ public:
 #pragma endregion
 
 #pragma region Weapon
+	TSharedPtr<FWeaponProxy> FindProxy_Weapon(
+		const IDType& ID
+		)const;
+
 	TSharedPtr<FWeaponProxy> AddProxy_Weapon(
 		const FGameplayTag& ProxyType
 		);
@@ -196,9 +200,9 @@ public:
 		const TSharedPtr<FWeaponProxy>& Proxy
 		);
 
-	TSharedPtr<FWeaponProxy> FindProxy_Weapon(
-		const IDType& ID
-		)const;
+	void RemoveProxy_Weapon(
+		const TSharedPtr<FWeaponProxy>& ProxyPtr
+		);
 #pragma endregion
 
 #pragma region Skill
@@ -212,6 +216,10 @@ public:
 
 	TSharedPtr<FSkillProxy> AddProxy_Skill(
 		const FGameplayTag& ProxyType
+		);
+
+	void RemoveProxy_Skill(
+		const TSharedPtr<FSkillProxy>& ProxyPtr
 		);
 #pragma endregion
 

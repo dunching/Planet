@@ -207,7 +207,7 @@ void SHoverWidgetScreenLayer::Tick(
 								FVector2D ComponentPivot = Iter->Value.HoverWidgetPtr->Pivot;
 
 								CanvasSlot->SetAutoSize(
-									false
+									Iter->Value.HoverWidgetPtr->bDrawAtDesiredSize
 								);
 								CanvasSlot->SetOffset(
 									FMargin(LocalPosition.X, LocalPosition.Y, ComponentDrawSize.X, ComponentDrawSize.Y)

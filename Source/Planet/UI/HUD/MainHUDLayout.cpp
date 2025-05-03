@@ -21,7 +21,7 @@
 
 struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 {
-	FName GetItemInfos_Socket = TEXT("GetItemInfos_Socket");
+	FName GetItemInfosList = TEXT("GetItemInfosList");
 
 	FName RaffleMenu_Socket = TEXT("RaffleMenu_Socket");
 
@@ -164,22 +164,12 @@ URegularActionLayout* UMainHUDLayout::GetRegularActionLayout() const
 
 UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FMainHUDLayout::Get().GetItemInfos_Socket));
-	if (!BorderPtr)
+	auto UIPtr = Cast<UGetItemInfosList>(GetWidgetFromName(FMainHUDLayout::Get().GetItemInfosList));
+	if (!UIPtr)
 	{
-		return nullptr;
 	}
 
-	for (auto Iter : BorderPtr->GetAllChildren())
-	{
-		auto UIPtr = Cast<UGetItemInfosList>(Iter);
-		if (UIPtr)
-		{
-			return UIPtr;
-		}
-	}
-
-	return nullptr;
+	return UIPtr;
 }
 
 void UMainHUDLayout::SwitchIsLowerHP(

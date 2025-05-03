@@ -16,6 +16,7 @@ bool FOnEffectedTawrgetCallback::NetSerialize(FArchive& Ar, class UPackageMap* M
 	}
 	Ar << SetByCallerTagMagnitudes;
 	Ar << Damage;
+	Ar << TherapeuticalDose;
 
 	bOutSuccess = true;
 	return true;

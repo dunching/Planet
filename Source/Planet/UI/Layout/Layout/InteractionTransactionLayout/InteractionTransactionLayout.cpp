@@ -132,6 +132,24 @@ void UInteractionTransactionLayout::Enable()
 		CharacterPtr = CurrentActionSPtr->CharacterPtr;
 		auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
 
+		OnSkillProxyChangedDelegateHandle = InventoryComponentPtr->OnSkillProxyChanged.AddCallback(
+			 std::bind(
+			           &ThisClass::OnTraderSkillProxyChanged,
+			           this,
+			           std::placeholders::_1,
+			           std::placeholders::_2
+			          )
+			);
+
+		OnWeaponProxyChangedDelegateHandle = InventoryComponentPtr->OnWeaponProxyChanged.AddCallback(
+			 std::bind(
+			           &ThisClass::OnTraderWeaponProxyChanged,
+			           this,
+			           std::placeholders::_1,
+			           std::placeholders::_2
+			          )
+			);
+
 		OnConsumableProxyChangedDelegateHandle = InventoryComponentPtr->OnConsumableProxyChanged.AddCallback(
 			 std::bind(
 			           &ThisClass::OnTraderConsumableProxyChanged,
@@ -151,6 +169,8 @@ void UInteractionTransactionLayout::Enable()
 			const auto SaleItemsInfo = CharacterPtr->GetAIComponent()->GetSaleItemsInfo();
 			auto Proxys = InventoryComponentPtr->GetProxys(UGameplayTagsLibrary::Proxy_Weapon);
 			Proxys.Append(InventoryComponentPtr->GetProxys(UGameplayTagsLibrary::Proxy_Consumables));
+			Proxys.Append(InventoryComponentPtr->GetProxys(UGameplayTagsLibrary::Proxy_Skill_Active));
+			Proxys.Append(InventoryComponentPtr->GetProxys(UGameplayTagsLibrary::Proxy_Skill_Passve));
 			for (const auto& Iter : Proxys)
 			{
 				auto ChildPtr = CreateWidget<UGoodsItem>(this, EnteryClass);
@@ -169,6 +189,16 @@ void UInteractionTransactionLayout::Enable()
 
 void UInteractionTransactionLayout::DisEnable()
 {
+	if (OnSkillProxyChangedDelegateHandle)
+	{
+		OnSkillProxyChangedDelegateHandle->UnBindCallback();
+	}
+
+	if (OnWeaponProxyChangedDelegateHandle)
+	{
+		OnWeaponProxyChangedDelegateHandle->UnBindCallback();
+	}
+
 	if (OnConsumableProxyChangedDelegateHandle)
 	{
 		OnConsumableProxyChangedDelegateHandle->UnBindCallback();
@@ -353,6 +383,82 @@ void UInteractionTransactionLayout::OnCoinChanged(
 	NewNum(CurrentNum);
 }
 
+void UInteractionTransactionLayout::OnTraderSkillProxyChanged(
+	const TSharedPtr<FSkillProxy>& ProxySPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	if (ProxySPtr)
+	{
+		auto UIPtr = Cast<UTileView>(GetWidgetFromName(FTransactionLayout::Get().TileView));
+		if (UIPtr)
+		{
+			auto Items = UIPtr->GetDisplayedEntryWidgets();
+			for (auto Iter : Items)
+			{
+				auto GoodsItemPtr = Cast<UGoodsItem>(Iter);
+				if (GoodsItemPtr && GoodsItemPtr->BasicProxyPtr == ProxySPtr)
+				{
+					switch (ProxyModifyType)
+					{
+					case EProxyModifyType::kNumChanged:
+						break;
+					case EProxyModifyType::kRemove:
+						{
+							// 刷新一下
+							GoodsItemPtr->EnableIcon(false);
+							GoodsItemPtr->SetNum(0);
+						}
+						break;
+					case EProxyModifyType::kPropertyChange:
+						break;
+					}
+					UIPtr->RequestRefresh();
+					return;
+				}
+			}
+		}
+	}
+}
+
+void UInteractionTransactionLayout::OnTraderWeaponProxyChanged(
+	const TSharedPtr<FWeaponProxy>& ProxySPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	if (ProxySPtr)
+	{
+		auto UIPtr = Cast<UTileView>(GetWidgetFromName(FTransactionLayout::Get().TileView));
+		if (UIPtr)
+		{
+			auto Items = UIPtr->GetDisplayedEntryWidgets();
+			for (auto Iter : Items)
+			{
+				auto GoodsItemPtr = Cast<UGoodsItem>(Iter);
+				if (GoodsItemPtr && GoodsItemPtr->BasicProxyPtr == ProxySPtr)
+				{
+					switch (ProxyModifyType)
+					{
+					case EProxyModifyType::kNumChanged:
+						break;
+					case EProxyModifyType::kRemove:
+						{
+							// 刷新一下
+							GoodsItemPtr->EnableIcon(false);
+							GoodsItemPtr->SetNum(0);
+						}
+						break;
+					case EProxyModifyType::kPropertyChange:
+						break;
+					}
+					UIPtr->RequestRefresh();
+					return;
+				}
+			}
+		}
+	}
+}
+
 void UInteractionTransactionLayout::OnTraderConsumableProxyChanged(
 	const TSharedPtr<FConsumableProxy>& ProxySPtr,
 	EProxyModifyType ProxyModifyType,
@@ -370,7 +476,8 @@ void UInteractionTransactionLayout::OnTraderConsumableProxyChanged(
 				auto GoodsItemPtr = Cast<UGoodsItem>(Iter);
 				if (GoodsItemPtr && GoodsItemPtr->BasicProxyPtr == ProxySPtr)
 				{
-					switch (ProxyModifyType) {
+					switch (ProxyModifyType)
+					{
 					case EProxyModifyType::kNumChanged:
 						{
 							// 刷新一下
@@ -401,22 +508,33 @@ inline void UInteractionTransactionLayout::NewNum(
 	)
 {
 	CurrentNum = Num;
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 	const auto Cost = CalculateCost();
-	auto CoinSPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->
-	                GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
-	if (CoinSPtr)
-	{
-		auto UIPtr = Cast<UButton>(GetWidgetFromName(FTransactionLayout::Get().BuyBtn));
-		if (UIPtr)
-		{
-			UIPtr->SetIsEnabled(Cost <= CoinSPtr->GetNum());
-		}
-	}
 
 	auto TextPtr = Cast<UTextBlock>(GetWidgetFromName(FTransactionLayout::Get().Value));
 	if (TextPtr)
 	{
 		TextPtr->SetText(FText::FromString(UKismetStringLibrary::Conv_IntToString(Cost)));
+	}
+
+	auto CoinSPtr = PCPtr->
+	                GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
+
+	if (CoinSPtr && CurrentProxyPtr)
+	{
+		// 确认目标商人身上的存量是否足够
+		auto TargetProxyPtr = CharacterPtr->
+		                      GetInventoryComponent()->FindProxy(CurrentProxyPtr->GetID());
+
+		auto UIPtr = Cast<UButton>(GetWidgetFromName(FTransactionLayout::Get().BuyBtn));
+		if (UIPtr)
+		{
+			UIPtr->SetIsEnabled(
+			                    (Cost <= CoinSPtr->GetNum()) && TargetProxyPtr && (
+				                    GetProxyNum(TargetProxyPtr) >= CurrentNum)
+			                   );
+		}
 	}
 }
 

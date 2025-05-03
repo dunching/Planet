@@ -93,11 +93,15 @@ void UProxyIcon::SetItemType()
 	if (ImagePtr)
 	{
 		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(ProxyType);
-		if (ProxyDTSPtr)
+		if (ProxyDTSPtr && ProxyDTSPtr->ItemProxy_Description)
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
 			AsyncLoadText(ProxyDTSPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon, ImagePtr);
+		}
+		else
+		{
+			checkNoEntry();
 		}
 	}
 }

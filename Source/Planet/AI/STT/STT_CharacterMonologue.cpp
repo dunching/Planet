@@ -107,6 +107,11 @@ EStateTreeRunStatus FSTT_CharacterMonologue::PerformGameplayTask(
 		);
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}
+	else
+	{
+		checkNoEntry();
+		return EStateTreeRunStatus::Running;
+	}
 
 	return EStateTreeRunStatus::Running;
 }

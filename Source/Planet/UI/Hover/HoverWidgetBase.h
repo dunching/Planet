@@ -40,5 +40,8 @@ public:
 	UPROPERTY(EditAnywhere, Category=UserInterface)
 	FVector2D Pivot = FVector2D(.5f, .5f);
 
+	UPROPERTY(EditAnywhere, Category=UserInterface)
+	bool bDrawAtDesiredSize = true;
+
 	bool bShouldCalcOutsideViewPosition = false;
 };

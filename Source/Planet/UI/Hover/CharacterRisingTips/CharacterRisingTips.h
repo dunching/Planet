@@ -56,9 +56,15 @@ protected:
 		kIcon_BaseDamage,
 	};
 
+	/**
+	 * 
+	 * @param bIsCritical_In	是否暴击
+	 * @param bIsTreatment		是否是治疗
+	 */
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayMyAnimation(
-		bool bIsCritical_In
+		bool bIsCritical_In,
+		bool bIsTreatment
 	);
 
 	UFUNCTION(BlueprintCallable)

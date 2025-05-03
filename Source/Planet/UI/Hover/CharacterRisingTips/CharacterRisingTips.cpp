@@ -16,22 +16,16 @@
 #include "TemplateHelper.h"
 #include "TextSubSystem.h"
 #include "TextCollect.h"
+#include "Components/Button.h"
+#include "Kismet/KismetStringLibrary.h"
 
 struct FCharacterRisingTips : public TStructVariable<FCharacterRisingTips>
 {
 	const FName VerticalBox = TEXT("VerticalBox");
 
-	const FName Icon = TEXT("Icon");
-
-	const FName Icon_Disable = TEXT("Icon_Disable");
-
 	const FName Icon_Treatment = TEXT("Icon_Treatment");
 
 	const FName Text = TEXT("Text");
-
-	const FName SizeBox = TEXT("SizeBox");
-
-	const FName WidgetSwitcher = TEXT("WidgetSwitcher");
 };
 
 void UCharacterRisingTips::NativeConstruct()
@@ -44,7 +38,7 @@ void UCharacterRisingTips::NativeConstruct()
 
 void UCharacterRisingTips::SetData(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-)
+	)
 {
 	if (!ReceivedEventModifyDataCallback.TargetCharacterPtr)
 	{
@@ -53,7 +47,24 @@ void UCharacterRisingTips::SetData(
 
 	TargetCharacterPtr = ReceivedEventModifyDataCallback.TargetCharacterPtr;
 
-	PlayMyAnimation(bIsCritical);
+	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
+	if (UIPtr)
+	{
+		UIPtr->SetText(
+		               FText::FromString(
+		                                 UKismetStringLibrary::Conv_IntToString(
+		                                                                        ReceivedEventModifyDataCallback.
+		                                                                        TherapeuticalDose > 0 ?
+			                                                                        ReceivedEventModifyDataCallback.
+			                                                                        TherapeuticalDose :
+			                                                                        ReceivedEventModifyDataCallback.
+			                                                                        Damage
+		                                                                       )
+		                                )
+		              );
+	}
+
+	PlayMyAnimation(bIsCritical, ReceivedEventModifyDataCallback.TherapeuticalDose > 0);
 }
 
 FVector UCharacterRisingTips::GetHoverPosition()
@@ -64,9 +75,9 @@ FVector UCharacterRisingTips::GetHoverPosition()
 void UCharacterRisingTips::PlayAnimationFinished()
 {
 	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-		GetWorld(),
-		TargetPointSharedLayerName
-	);
+		 GetWorld(),
+		 TargetPointSharedLayerName
+		);
 	if (ScreenLayer)
 	{
 		ScreenLayer->RemoveHoverWidget(this);
