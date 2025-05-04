@@ -164,6 +164,7 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(
 	{
 		if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
 		{
+			EnableMovement(true);
 			PerformIfContinue();
 		}
 	}

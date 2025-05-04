@@ -106,6 +106,7 @@ void UMainMenuLayout::SwitchViewer(
 			}
 			MenuInterfacePtr->ResetUIByData();
 			UIPtr->SetActiveWidget(Iter);
+			OnMenuLayoutChanged(MenuType);
 			break;
 		}
 	}

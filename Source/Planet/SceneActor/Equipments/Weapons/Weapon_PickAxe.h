@@ -27,7 +27,7 @@ public:
 
 	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
 
-	USkeletalMeshComponent* GetMesh();
+	USkeletalMeshComponent* GetMesh() const;
 
 protected:
 

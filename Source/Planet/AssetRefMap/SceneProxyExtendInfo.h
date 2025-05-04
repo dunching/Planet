@@ -41,6 +41,9 @@ public:
 	static USceneProxyExtendInfoMap* GetInstance();
 
 	FTableRowProxy* GetTableRowProxy(FGameplayTag UnitType)const;
+
+	template<typename ItemProxy_DescriptionType>
+	TObjectPtr<ItemProxy_DescriptionType> GetTableRowProxyDescription(FGameplayTag UnitType)const;
 	
 	FTableRowProxy_TagExtendInfo* GetTableRowProxy_TagExtendInfo(FGameplayTag UnitType)const;
 	
@@ -52,14 +55,6 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_Proxy;
 
-	// 可被持有的“消耗品”
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Proxy_Consumable;
-	
-	// 可被持有的“队友/角色”
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
-	TSoftObjectPtr<UDataTable> DataTable_Proxy_CharacterInfo;
-	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UnitExtendInfoMap")
 	TSoftObjectPtr<UDataTable> DataTable_TagExtendInfo;
 	
@@ -81,6 +76,18 @@ public:
 	TMap<EPointPropertyType, UPAD_Talent_Property*> PAD_Talent_PropertyMap;
 	
 };
+
+template <typename ItemProxy_DescriptionType>
+TObjectPtr<ItemProxy_DescriptionType> USceneProxyExtendInfoMap::GetTableRowProxyDescription(
+	FGameplayTag UnitType
+	) const
+{
+	auto TableRowPtr = GetTableRowProxy(UnitType);
+	auto ItemProxy_Description_SkillPtr = Cast<ItemProxy_DescriptionType>(
+		TableRowPtr->ItemProxy_Description.LoadSynchronous()
+	);
+	return ItemProxy_Description_SkillPtr;
+}
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API USceneUnitExtendInfoMap : public USceneProxyExtendInfoMap

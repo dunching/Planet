@@ -9,6 +9,7 @@
 
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "CharacterAttributesComponent.h"
 #include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
@@ -20,14 +21,14 @@
 
 APlanetAIController::APlanetAIController(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 }
 
 void APlanetAIController::OnPossess(
 	APawn* InPawn
-)
+	)
 {
 	bool bIsNewPawn = (InPawn && InPawn != GetPawn());
 
@@ -53,7 +54,7 @@ UPlanetAbilitySystemComponent* APlanetAIController::GetAbilitySystemComponent() 
 
 void APlanetAIController::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps
-) const
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -67,7 +68,7 @@ AGroupManagger* APlanetAIController::GetGroupManagger() const
 
 void APlanetAIController::SetGroupSharedInfo(
 	AGroupManagger* InGroupSharedInfoPtr
-)
+	)
 {
 	GroupManaggerPtr = InGroupSharedInfoPtr;
 
@@ -113,7 +114,7 @@ void APlanetAIController::PostInitializeComponents()
 
 void APlanetAIController::EndPlay(
 	const EEndPlayReason::Type EndPlayReason
-)
+	)
 {
 	Super::EndPlay(EndPlayReason);
 }
@@ -135,7 +136,7 @@ bool APlanetAIController::CheckIsFarawayOriginal() const
 
 void APlanetAIController::ResetGroupmateProxy(
 	FCharacterProxy* NewGourpMateProxyPtr
-)
+	)
 {
 }
 
@@ -145,28 +146,28 @@ void APlanetAIController::BindPCWithCharacter()
 
 TSharedPtr<FCharacterProxy> APlanetAIController::InitialCharacterProxy(
 	ACharacterBase* CharaterPtr
-)
+	)
 {
 	return CharaterPtr->GetCharacterProxy();
 }
 
 void APlanetAIController::OnGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
-)
+	)
 {
 	ForEachComponent(
-		false,
-		[this](
-		UActorComponent* ComponentPtr
-	)
-		{
-			auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
-			if (GroupSharedInterfacePtr)
-			{
-				GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
-			}
-		}
-	);
+	                 false,
+	                 [this](
+	                 UActorComponent* ComponentPtr
+	                 )
+	                 {
+		                 auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
+		                 if (GroupSharedInterfacePtr)
+		                 {
+			                 GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+		                 }
+	                 }
+	                );
 }
 
 void APlanetAIController::OnRep_GroupSharedInfoChanged()
@@ -177,12 +178,14 @@ void APlanetAIController::OnRep_GroupSharedInfoChanged()
 void APlanetAIController::OnTargetPerceptionUpdated(
 	AActor* Actor,
 	FAIStimulus Stimulus
-)
+	)
 {
 	auto CharacterPtr = Cast<AHumanCharacter>(Actor);
 	if (CharacterPtr)
 	{
-		if (IsGroupmate(CharacterPtr))
+		if (IsGroupmate(CharacterPtr) || CharacterPtr->GetCharacterAttributesComponent()->CharacterCategory.MatchesTag(
+			     UGameplayTagsLibrary::Proxy_Character_NPC_Functional
+			    ))
 		{
 			return;
 		}
@@ -202,47 +205,50 @@ void APlanetAIController::OnTargetPerceptionUpdated(
 
 void APlanetAIController::OnPerceptionUpdated(
 	const TArray<AActor*>& UpdatedActors
-)
+	)
 {
 }
 
 bool APlanetAIController::IsGroupmate(
 	ACharacterBase* TargetCharacterPtr
-) const
+	) const
 {
 	return GetPawn<FPawnType>()->IsGroupmate(TargetCharacterPtr);
 }
 
 bool APlanetAIController::IsTeammate(
 	ACharacterBase* TargetCharacterPtr
-) const
+	) const
 {
 	return GetPawn<FPawnType>()->IsTeammate(TargetCharacterPtr);
 }
 
 void APlanetAIController::OnHPChanged(
 	int32 CurrentValue
-)
+	)
 {
 	if (CurrentValue <= 0)
 	{
 		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(
-			FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Dying}
-		);
+		                                                       FGameplayTagContainer{
+			                                                       UGameplayTagsLibrary::BaseFeature_Dying
+		                                                       }
+		                                                      );
 		GetAbilitySystemComponent()->OnAbilityEnded.AddLambda(
-			[this](
-			const FAbilityEndedData& AbilityEndedData
-		)
-			{
-				for (auto Iter : AbilityEndedData.AbilityThatEnded->GetAssetTags())
-				{
-					if (Iter == UGameplayTagsLibrary::State_Dying)
-					{
-						//					Destroy();
-					}
-				}
-			}
-		);
+		                                                      [this](
+		                                                      const FAbilityEndedData& AbilityEndedData
+		                                                      )
+		                                                      {
+			                                                      for (auto Iter : AbilityEndedData.AbilityThatEnded->
+			                                                           GetAssetTags())
+			                                                      {
+				                                                      if (Iter == UGameplayTagsLibrary::State_Dying)
+				                                                      {
+					                                                      //					Destroy();
+				                                                      }
+			                                                      }
+		                                                      }
+		                                                     );
 	}
 }
 
@@ -250,7 +256,7 @@ FPathFollowingRequestResult APlanetAIController::MoveAlongSPline(
 	USplineComponent* SplineComponentPtr,
 	const FAIMoveRequest& MoveRequest,
 	FNavPathSharedPtr* OutPath
-)
+	)
 {
 	FPathFollowingRequestResult ResultData;
 	ResultData.Code = EPathFollowingRequestResult::Failed;
@@ -270,19 +276,18 @@ FPathFollowingRequestResult APlanetAIController::MoveAlongSPline(
 		}
 		else
 		{
-			
 		}
 	}
-	
+
 	FNavPathSharedPtr Path = MakeShared<FNavigationPath>(Points);
-	
+
 	const FAIRequestID RequestID = Path.IsValid() ? RequestMove(MoveRequest, Path) : FAIRequestID::InvalidRequest;
 	if (RequestID.IsValid())
 	{
 		bAllowStrafe = MoveRequest.CanStrafe();
 		ResultData.MoveId = RequestID;
 		ResultData.Code = EPathFollowingRequestResult::RequestSuccessful;
-		
+
 		if (OutPath)
 		{
 			*OutPath = Path;
@@ -296,7 +301,7 @@ void APlanetAIController::LimitViewYaw(
 	FRotator& ViewRotation,
 	float InViewYawMin,
 	float InViewYawMax
-)
+	)
 {
 	ViewRotation.Yaw = FMath::ClampAngle(ViewRotation.Yaw, InViewYawMin, InViewYawMax);
 	ViewRotation.Yaw = FRotator::ClampAxis(ViewRotation.Yaw);

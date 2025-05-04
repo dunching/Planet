@@ -30,6 +30,8 @@ class PLANET_API UMainMenuLayout :
 
 public:
 
+	using FOnMenuLayoutChanged = TCallbackHandleContainer<void(EMenuType)>;
+	
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
@@ -54,6 +56,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UAllocationSkillsMenu>AllocationSkillsMenuClass;
 
+	FOnMenuLayoutChanged OnMenuLayoutChanged;
+	
 protected:
 
 	void SyncData();

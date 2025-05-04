@@ -33,7 +33,7 @@ void AWeapon_PickAxe::AttachToCharacter(ACharacterBase* CharacterPtr)
 	AttachToComponent(CharacterPtr->GetCopyPoseMesh(), FAttachmentTransformRules::KeepRelativeTransform, Socket);
 }
 
-USkeletalMeshComponent* AWeapon_PickAxe::GetMesh()
+USkeletalMeshComponent* AWeapon_PickAxe::GetMesh() const
 {
 	return SkeletalComponentPtr;
 }

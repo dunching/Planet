@@ -163,38 +163,18 @@ public:
 	float PerformActionInterval = 1.f;
 };
 
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_Consumable : public FTableRowBase
+
+UCLASS()
+class PLANET_API UItemProxy_Description_Character : public UItemProxy_Description
 {
-	GENERATED_USTRUCT_BODY()
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	TSubclassOf<AConsumable_Base> Consumable_Class;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	TSubclassOf<USkill_Consumable_Base> Skill_Consumable_Class;
-	
-	// UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	// TMap<ECharacterPropertyType, FBaseProperty>ModifyPropertyMap;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	TMap<FGameplayTag, int32>ModifyPropertyMap;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	UAnimMontage* HumanMontage = nullptr;
+	GENERATED_BODY()
 
-	// 消耗品公共CD
+public:
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSet<FGameplayTag>CommonCooldownInfoMap;
-
-	// 消耗品独立CD
+	TSubclassOf<AHumanCharacter_AI>CharacterClass;
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	int32 CD = 1;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float Duration = 3.f;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
-	float PerformActionInterval = 1.f;
-
+	FString Title;
+	
 };

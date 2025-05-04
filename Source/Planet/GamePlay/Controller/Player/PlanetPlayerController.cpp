@@ -39,6 +39,7 @@
 #include "GeneratorColony_ByInvoke.h"
 #include "LogWriter.h"
 #include "GroupManagger.h"
+#include "GroupManagger_NPC.h"
 #include "InventoryComponent.h"
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
@@ -47,6 +48,7 @@
 #include "HumanCharacter_AI.h"
 #include "OpenWorldSystem.h"
 #include "PlayerGameplayTasks.h"
+#include "SceneProxyExtendInfo.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
 	 TEXT("PlanetPlayerController.DrawControllerRotation"),
@@ -86,6 +88,71 @@ void APlanetPlayerController::ServerDestroyActor_Implementation(
 	}
 }
 
+void APlanetPlayerController::ServerSpawnCharacterAry_Implementation(
+		const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
+		const TArray<FGuid>& IDAry,
+		const TArray<FTransform>& TransformAry
+	)
+{
+	FActorSpawnParameters GroupManaggerSpawnParameters;
+
+	GroupManaggerSpawnParameters.Owner = this;
+	GroupManaggerSpawnParameters.CustomPreSpawnInitalization = [](
+		AActor* ActorPtr
+		)
+	{
+		PRINTINVOKEINFO();
+		auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+		if (GroupManaggerPtr)
+		{
+			GroupManaggerPtr->GroupID = FGuid::NewGuid();
+		}
+	};
+
+	auto GroupManagger_NPCPtr = GetWorld()->SpawnActor<AGroupManagger_NPC>(
+																	  AGroupManagger_NPC::StaticClass(),
+																	  GroupManaggerSpawnParameters
+																	  );
+	GroupManagger_NPCPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+		ETeammateOption::kEnemy
+	);
+	
+	if ((CharacterClassAry.Num() == IDAry.Num()) && (IDAry.Num()== TransformAry.Num()))
+	{
+		for (int32 Index = 0; Index < CharacterClassAry.Num(); Index++)
+		{
+			FActorSpawnParameters SpawnParameters;
+
+			SpawnParameters.CustomPreSpawnInitalization = [this, &IDAry, Index, GroupManagger_NPCPtr](
+				auto ActorPtr
+				)
+			{
+				auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+				if (AICharacterPtr)
+				{
+					AICharacterPtr->SetGroupSharedInfo(GroupManagger_NPCPtr);
+					AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(IDAry[Index]);
+				}
+			};
+
+			auto AICharacterPtr =
+				GetWorld()->SpawnActor<AHumanCharacter_AI>(
+														   CharacterClassAry[Index],
+														   TransformAry[Index],
+														   SpawnParameters
+														  );
+			if (AICharacterPtr)
+			{
+				GroupManagger_NPCPtr->GetTeamMatesHelperComponent()->UpdateTeammateConfig(
+					 AICharacterPtr->GetCharacterProxy(),
+					 Index
+					);
+				GroupManagger_NPCPtr->AddSpwanedCharacter(AICharacterPtr);
+			}
+		}
+	}
+}
+
 void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	TSubclassOf<AHumanCharacter_AI> CharacterClass,
 	const FGuid& ID,
@@ -97,22 +164,56 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	SpawnParameters.CustomPreSpawnInitalization = [this, ID](
 		auto ActorPtr
 		)
+	{
+		auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+		if (AICharacterPtr)
+		{
+			AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
+		}
+	};
+
+	auto Result =
+		GetWorld()->SpawnActor<AHumanCharacter_AI>(
+												   CharacterClass,
+												   Transform,
+												   SpawnParameters
+												  );
+	if (Result)
+	{
+	}
+}
+
+inline void APlanetPlayerController::ServerSpawnCharacterByProxyType_Implementation(
+	const FGameplayTag& CharacterProxyType,
+	const FTransform& Transform
+	)
+{
+	auto ItemProxy_Description_CharacterPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxyDescription<
+		UItemProxy_Description_Character>(CharacterProxyType);
+
+	if (ItemProxy_Description_CharacterPtr)
+	{
+		FActorSpawnParameters SpawnParameters;
+
+		SpawnParameters.CustomPreSpawnInitalization = [this](
+			auto ActorPtr
+			)
 		{
 			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
 			if (AICharacterPtr)
 			{
-				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
 			}
 		};
 
-	auto Result =
-		GetWorld()->SpawnActor<AHumanCharacter_AI>(
-		                                           CharacterClass,
-		                                           Transform,
-		                                           SpawnParameters
-		                                          );
-	if (Result)
-	{
+		auto Result =
+			GetWorld()->SpawnActor<AHumanCharacter_AI>(
+													   ItemProxy_Description_CharacterPtr->CharacterClass,
+													   Transform,
+													   SpawnParameters
+													  );
+		if (Result)
+		{
+		}
 	}
 }
 
@@ -186,6 +287,31 @@ void APlanetPlayerController::BuyProxys_Implementation(
 	InventoryComponentPtr->RemoveProxyNum(CoinProxySPtr->GetID(), Cost);
 
 	TraderInventoryComponentPtr->RemoveProxyNum(BuyProxyID, Num);
+}
+
+void APlanetPlayerController::SwitchPlayerInput_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	if (Args.IsValidIndex(0))
+	{
+		auto CharacterOwnerPtr = GetPawn<FPawnType>();
+		if (CharacterOwnerPtr)
+		{
+			if (UKismetStringLibrary::Conv_StringToInt(Args[0]))
+			{
+				CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->AddLooseGameplayTag(
+					 UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove
+					);
+			}
+			else
+			{
+				CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->RemoveLooseGameplayTag(
+					 UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove
+					);
+			}
+		}
+	}
 }
 
 void APlanetPlayerController::GetLifetimeReplicatedProps(

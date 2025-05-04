@@ -31,6 +31,8 @@ struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 struct FBasicProxy;
 
+class UItemProxy_Description_Character;
+
 using FOnCharacterSocketUpdated = TMulticastDelegate<void(
 	const FCharacterSocket&,
 	const FGameplayTag&
@@ -142,9 +144,7 @@ public:
 		bool& bOutSuccess
 		) override;
 
-	FTableRowProxy_CharacterGrowthAttribute* GetDT_CharacterInfo() const;
-
-	FTableRowProxy_CharacterType* GetDT_CharacterType() const;
+	UItemProxy_Description_Character* GetTableRowProxy_Character() const;
 
 	// 解除这个类下AddToRoot的对象
 	void RelieveRootBind();

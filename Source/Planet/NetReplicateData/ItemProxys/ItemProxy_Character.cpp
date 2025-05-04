@@ -125,7 +125,7 @@ void FCharacterProxy::InitialProxy(const FGameplayTag& InProxyType)
 
 	ProxyPtr = this;
 	
-	Title = GetDT_CharacterType()->Title;
+	Title = GetTableRowProxy_Character()->Title;
 
 	struct FMyStruct
 	{
@@ -164,26 +164,13 @@ void FCharacterProxy::InitialProxy(const FGameplayTag& InProxyType)
 	}
 }
 
-FTableRowProxy_CharacterGrowthAttribute* FCharacterProxy::GetDT_CharacterInfo() const
+UItemProxy_Description_Character* FCharacterProxy::GetTableRowProxy_Character() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Character_GrowthAttribute.LoadSynchronous();
-
-	auto SceneProxyExtendInfoPtr =
-		DataTable->FindRow<FTableRowProxy_CharacterGrowthAttribute>(
-			*ProxyCharacterPtr->GetCharacterAttributesComponent()->CharacterCategory.ToString(),
-			TEXT("GetProxy"));
-	return SceneProxyExtendInfoPtr;
-}
-
-FTableRowProxy_CharacterType* FCharacterProxy::GetDT_CharacterType() const
-{
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_CharacterInfo.LoadSynchronous();
-
-	auto SceneProxyExtendInfoPtr =
-		DataTable->FindRow<FTableRowProxy_CharacterType>(*ProxyType.ToString(), TEXT("GetProxy"));
-	return SceneProxyExtendInfoPtr;
+	auto TableRowPtr = GetTableRowProxy();
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_Character>(
+		TableRowPtr->ItemProxy_Description.LoadSynchronous()
+	);
+	return ItemProxy_Description_SkillPtr;
 }
 
 void FCharacterProxy::RelieveRootBind()
@@ -216,7 +203,7 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 		
 		Result =
 			InventoryComponentPtr->GetWorld()->SpawnActor<AHumanCharacter_AI>(
-				GetDT_CharacterType()->CharacterClass, Transform, SpawnParameters);
+				GetTableRowProxy_Character()->CharacterClass, Transform, SpawnParameters);
 
 		ProxyCharacterPtr = Result;
 

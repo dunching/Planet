@@ -116,9 +116,22 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
+	void ServerSpawnCharacterAry(
+		const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
+		const TArray<FGuid>& IDAry,
+		const TArray<FTransform>& TransformAry
+		);
+
+	UFUNCTION(Server, Reliable)
 	void ServerSpawnCharacter(
 		TSubclassOf<AHumanCharacter_AI> CharacterClass,
 		const FGuid& ID,
+		const FTransform& Transform
+		);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSpawnCharacterByProxyType(
+		const FGameplayTag& CharacterProxyType,
 		const FTransform& Transform
 		);
 
@@ -147,6 +160,9 @@ public:
 		const FGameplayTag& ProxyType,
 		int32 Num
 		);
+
+	UFUNCTION(Server, Reliable)
+	void SwitchPlayerInput(const TArray< FString >& Args);
 
 #pragma region
 

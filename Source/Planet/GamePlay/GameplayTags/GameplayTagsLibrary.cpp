@@ -339,6 +339,9 @@ FGameplayTag UGameplayTagsLibrary::Proxy_Character =
 FGameplayTag UGameplayTagsLibrary::Proxy_Character_Player =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.Player")));
 
+FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Functional =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.NPC.Functional")));
+
 FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Assistional =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.NPC.Assistional")));
 

@@ -189,3 +189,16 @@ void TestCommand::RemoveProxy(
 	}
 #endif
 }
+
+void TestCommand::SwitchPlayerInput(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		PCPtr->SwitchPlayerInput(Args);
+	}
+#endif
+}

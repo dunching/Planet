@@ -1,4 +1,3 @@
-
 #include "GravityMovementComponent.h"
 
 #include <Engine/Engine.h>
@@ -17,20 +16,26 @@
 namespace LyraCharacter
 {
 	static float GroundTraceDistance = 100000.0f;
-	FAutoConsoleVariableRef CVar_GroundTraceDistance(TEXT("LyraCharacter.GroundTraceDistance"), GroundTraceDistance, TEXT("Distance to trace down when generating ground information."), ECVF_Cheat);
+	FAutoConsoleVariableRef CVar_GroundTraceDistance(
+	                                                 TEXT("LyraCharacter.GroundTraceDistance"),
+	                                                 GroundTraceDistance,
+	                                                 TEXT("Distance to trace down when generating ground information."),
+	                                                 ECVF_Cheat
+	                                                );
 };
 
 static TAutoConsoleVariable<int32> GravityMovementComponent_Debug(
-	TEXT("GravityMovementComponent.Debug"),
-	0,
-	TEXT("")
-	TEXT(" default: 0"));
+                                                                  TEXT("GravityMovementComponent.Debug"),
+                                                                  0,
+                                                                  TEXT("")
+                                                                  TEXT(" default: 0")
+                                                                 );
 
 bool FMyCharacterMoveResponseDataContainer::Serialize(
 	UCharacterMovementComponent& CharacterMovement,
 	FArchive& Ar,
 	UPackageMap* PackageMap
-)
+	)
 {
 	Ar << bPathFollow;
 	Ar << CharacterMovement.RequestedVelocity;
@@ -38,8 +43,10 @@ bool FMyCharacterMoveResponseDataContainer::Serialize(
 	return FCharacterMoveResponseDataContainer::Serialize(CharacterMovement, Ar, PackageMap);
 }
 
-UGravityMovementComponent::UGravityMovementComponent(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UGravityMovementComponent::UGravityMovementComponent(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	SetMoveResponseDataContainer(MyDefaultMoveResponseDataContainer);
 
@@ -64,16 +71,33 @@ const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
 		check(CapsuleComp);
 
 		const float CapsuleHalfHeight = CapsuleComp->GetUnscaledCapsuleHalfHeight();
-		const ECollisionChannel CollisionChannel = (UpdatedComponent ? UpdatedComponent->GetCollisionObjectType() : ECC_Pawn);
+		const ECollisionChannel CollisionChannel = (UpdatedComponent ?
+			                                            UpdatedComponent->GetCollisionObjectType() :
+			                                            ECC_Pawn);
 		const FVector TraceStart(GetActorLocation());
-		const FVector TraceEnd(TraceStart.X, TraceStart.Y, (TraceStart.Z - LyraCharacter::GroundTraceDistance - CapsuleHalfHeight));
+		const FVector TraceEnd(
+		                       TraceStart.X,
+		                       TraceStart.Y,
+		                       (TraceStart.Z - LyraCharacter::GroundTraceDistance - CapsuleHalfHeight)
+		                      );
 
-		FCollisionQueryParams QueryParams(SCENE_QUERY_STAT(LyraCharacterMovementComponent_GetGroundInfo), false, CharacterOwner);
+		FCollisionQueryParams QueryParams(
+		                                  SCENE_QUERY_STAT(LyraCharacterMovementComponent_GetGroundInfo),
+		                                  false,
+		                                  CharacterOwner
+		                                 );
 		FCollisionResponseParams ResponseParam;
 		InitCollisionParams(QueryParams, ResponseParam);
 
 		FHitResult HitResult;
-		GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, CollisionChannel, QueryParams, ResponseParam);
+		GetWorld()->LineTraceSingleByChannel(
+		                                     HitResult,
+		                                     TraceStart,
+		                                     TraceEnd,
+		                                     CollisionChannel,
+		                                     QueryParams,
+		                                     ResponseParam
+		                                    );
 
 		CachedGroundInfo.GroundHitResult = HitResult;
 		CachedGroundInfo.GroundDistance = LyraCharacter::GroundTraceDistance;
@@ -93,17 +117,33 @@ const FLyraCharacterGroundInfo& UGravityMovementComponent::GetGroundInfo()
 	return CachedGroundInfo;
 }
 
-void UGravityMovementComponent::SetIsOrientRotationToMovement_RPC_Implementation(bool bIsOrientRotationToMovement)
+void UGravityMovementComponent::SetIsOrientRotationToMovement_RPC_Implementation(
+	bool bIsOrientRotationToMovement
+	)
 {
 	bOrientRotationToMovement = bIsOrientRotationToMovement;
 }
 
-void UGravityMovementComponent::CalcVelocity(float DeltaTime, float Friction, bool bFluid, float BrakingDeceleration)
+void UGravityMovementComponent::CalcVelocity(
+	float DeltaTime,
+	float Friction,
+	bool bFluid,
+	float BrakingDeceleration
+	)
 {
+	if (bSkip_PlayerInput || bSkip_PathFollow)
+	{
+		Acceleration = FVector::ZeroVector;
+		Velocity = FVector::ZeroVector;
+		return;
+	}
+
 	Super::CalcVelocity(DeltaTime, Friction, bFluid, BrakingDeceleration);
 }
 
-void UGravityMovementComponent::ApplyRootMotionToVelocity(float DeltaTime)
+void UGravityMovementComponent::ApplyRootMotionToVelocity(
+	float DeltaTime
+	)
 {
 	Super::ApplyRootMotionToVelocity(DeltaTime);
 }
@@ -116,7 +156,7 @@ bool UGravityMovementComponent::ApplyRequestedMove(
 	float BrakingDeceleration,
 	FVector& OutAcceleration,
 	float& OutRequestedSpeed
-)
+	)
 {
 	if (bSkip_PathFollow)
 	{
@@ -132,25 +172,27 @@ bool UGravityMovementComponent::ApplyRequestedMove(
 	}
 
 	return Super::ApplyRequestedMove(
-		DeltaTime,
-		MaxAccel,
-		MaxSpeed,
-		Friction,
-		BrakingDeceleration,
-		OutAcceleration,
-		OutRequestedSpeed
-	);
+	                                 DeltaTime,
+	                                 MaxAccel,
+	                                 MaxSpeed,
+	                                 Friction,
+	                                 BrakingDeceleration,
+	                                 OutAcceleration,
+	                                 OutRequestedSpeed
+	                                );
 }
 
-void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
+void UGravityMovementComponent::PhysicsRotation(
+	float DeltaTime
+	)
 {
 	if (bForceRotation)
 	{
 	}
 	else if (
-//		HasRootMotionSources() ||
+		//		HasRootMotionSources() ||
 		HasAnimRootMotion()
-		)
+	)
 	{
 		return;
 	}
@@ -185,7 +227,7 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 	{
 		if (
 			bSkip_Rotation
-			)
+		)
 		{
 			return;
 		}
@@ -195,7 +237,7 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 	{
 		if (
 			bSkip_Rotation
-			)
+		)
 		{
 			return;
 		}
@@ -215,7 +257,8 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 	{
 		if (HasCustomGravity())
 		{
-			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).Rotator();
+			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).
+				Rotator();
 			GravityRelativeDesiredRotation.Pitch = 0.f;
 			GravityRelativeDesiredRotation.Yaw = FRotator::NormalizeAxis(GravityRelativeDesiredRotation.Yaw);
 			GravityRelativeDesiredRotation.Roll = 0.f;
@@ -253,25 +296,51 @@ void UGravityMovementComponent::PhysicsRotation(float DeltaTime)
 
 		if (HasCustomGravity())
 		{
-			FRotator GravityRelativeCurrentRotation = (GetGravityToWorldTransform() * CurrentRotation.Quaternion()).Rotator();
-			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).Rotator();
+			FRotator GravityRelativeCurrentRotation = (GetGravityToWorldTransform() * CurrentRotation.Quaternion()).
+				Rotator();
+			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).
+				Rotator();
 
 			// PITCH
-			if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Pitch, GravityRelativeDesiredRotation.Pitch, AngleTolerance))
+			if (!FMath::IsNearlyEqual(
+			                          GravityRelativeCurrentRotation.Pitch,
+			                          GravityRelativeDesiredRotation.Pitch,
+			                          AngleTolerance
+			                         ))
 			{
-				GravityRelativeDesiredRotation.Pitch = FMath::FixedTurn(GravityRelativeCurrentRotation.Pitch, GravityRelativeDesiredRotation.Pitch, DeltaRot.Pitch);
+				GravityRelativeDesiredRotation.Pitch = FMath::FixedTurn(
+				                                                        GravityRelativeCurrentRotation.Pitch,
+				                                                        GravityRelativeDesiredRotation.Pitch,
+				                                                        DeltaRot.Pitch
+				                                                       );
 			}
 
 			// YAW
-			if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Yaw, GravityRelativeDesiredRotation.Yaw, AngleTolerance))
+			if (!FMath::IsNearlyEqual(
+			                          GravityRelativeCurrentRotation.Yaw,
+			                          GravityRelativeDesiredRotation.Yaw,
+			                          AngleTolerance
+			                         ))
 			{
-				GravityRelativeDesiredRotation.Yaw = FMath::FixedTurn(GravityRelativeCurrentRotation.Yaw, GravityRelativeDesiredRotation.Yaw, DeltaRot.Yaw);
+				GravityRelativeDesiredRotation.Yaw = FMath::FixedTurn(
+				                                                      GravityRelativeCurrentRotation.Yaw,
+				                                                      GravityRelativeDesiredRotation.Yaw,
+				                                                      DeltaRot.Yaw
+				                                                     );
 			}
 
 			// ROLL
-			if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Roll, GravityRelativeDesiredRotation.Roll, AngleTolerance))
+			if (!FMath::IsNearlyEqual(
+			                          GravityRelativeCurrentRotation.Roll,
+			                          GravityRelativeDesiredRotation.Roll,
+			                          AngleTolerance
+			                         ))
 			{
-				GravityRelativeDesiredRotation.Roll = FMath::FixedTurn(GravityRelativeCurrentRotation.Roll, GravityRelativeDesiredRotation.Roll, DeltaRot.Roll);
+				GravityRelativeDesiredRotation.Roll = FMath::FixedTurn(
+				                                                       GravityRelativeCurrentRotation.Roll,
+				                                                       GravityRelativeDesiredRotation.Roll,
+				                                                       DeltaRot.Roll
+				                                                      );
 			}
 
 			DesiredRotation = (GetWorldToGravityTransform() * GravityRelativeDesiredRotation.Quaternion()).Rotator();
@@ -313,7 +382,10 @@ FVector UGravityMovementComponent::ConsumeInputVector()
 	return Super::ConsumeInputVector();
 }
 
-void UGravityMovementComponent::ControlledCharacterMove(const FVector& InputVector, float DeltaSeconds)
+void UGravityMovementComponent::ControlledCharacterMove(
+	const FVector& InputVector,
+	float DeltaSeconds
+	)
 {
 	{
 		// We need to check the jump state before adjusting input acceleration, to minimize latency
@@ -341,12 +413,17 @@ void UGravityMovementComponent::ControlledCharacterMove(const FVector& InputVect
 	}
 }
 
-void UGravityMovementComponent::PerformMovement(float DeltaSeconds)
+void UGravityMovementComponent::PerformMovement(
+	float DeltaSeconds
+	)
 {
 	Super::PerformMovement(DeltaSeconds);
 }
 
-void UGravityMovementComponent::StartNewPhysics(float DeltaTime, int32 Iterations)
+void UGravityMovementComponent::StartNewPhysics(
+	float DeltaTime,
+	int32 Iterations
+	)
 {
 	PerformBlockResult.Reset();
 
@@ -361,8 +438,10 @@ void UGravityMovementComponent::StartNewPhysics(float DeltaTime, int32 Iteration
 }
 
 void UGravityMovementComponent::HandleImpact(
-	const FHitResult& Hit, float TimeSlice /*= 0.f*/, const FVector& MoveDelta /*= FVector::ZeroVector */
-)
+	const FHitResult& Hit,
+	float TimeSlice /*= 0.f*/,
+	const FVector& MoveDelta /*= FVector::ZeroVector */
+	)
 {
 	PerformBlockResult = Hit;
 
@@ -376,7 +455,11 @@ void UGravityMovementComponent::HandleImpact(
 	return Super::HandleImpact(Hit, TimeSlice, MoveDelta);
 }
 
-void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UGravityMovementComponent::TickComponent(
+	float DeltaTime,
+	enum ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction
+	)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -386,25 +469,25 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 		switch (MovementMode)
 		{
 		case MOVE_Walking:
-		{
-			PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Walking")));
-		}
-		break;
+			{
+				PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Walking")));
+			}
+			break;
 		case MOVE_NavWalking:
-		{
-			PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_NavWalking")));
-		}
-		break;
+			{
+				PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_NavWalking")));
+			}
+			break;
 		case MOVE_Falling:
-		{
-			PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Falling")));
-		}
-		break;
+			{
+				PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Falling")));
+			}
+			break;
 		case MOVE_Flying:
-		{
-			PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Flying")));
-		}
-		break;
+			{
+				PRINTINVOKEWITHSTR(FString(TEXT("CurrentMoveState:MOVE_Flying")));
+			}
+			break;
 		default:
 			break;
 		}
@@ -412,12 +495,19 @@ void UGravityMovementComponent::TickComponent(float DeltaTime, enum ELevelTick T
 #endif
 }
 
-FRotator UGravityMovementComponent::ComputeRootMotionToMovementRotation(const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation) const
+FRotator UGravityMovementComponent::ComputeRootMotionToMovementRotation(
+	const FRotator& CurrentRotation,
+	float DeltaTime,
+	FRotator& DeltaRotation
+	) const
 {
 	return Velocity.GetSafeNormal().Rotation();
 }
 
-void UGravityMovementComponent::PhysFlying(float deltaTime, int32 Iterations)
+void UGravityMovementComponent::PhysFlying(
+	float deltaTime,
+	int32 Iterations
+	)
 {
 	if (deltaTime < MIN_TICK_TIME)
 	{
@@ -475,8 +565,8 @@ void UGravityMovementComponent::PhysFlying(float deltaTime, int32 Iterations)
 			else
 			{
 				//adjust and try again
-// 				 HandleImpact(Hit, deltaTime, Adjusted);
-// 				 SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
+				// 				 HandleImpact(Hit, deltaTime, Adjusted);
+				// 				 SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
 			}
 		}
 	}
@@ -487,12 +577,16 @@ void UGravityMovementComponent::PhysFlying(float deltaTime, int32 Iterations)
 	}
 }
 
-void UGravityMovementComponent::ServerAutonomousProxyTick(float DeltaSeconds)
+void UGravityMovementComponent::ServerAutonomousProxyTick(
+	float DeltaSeconds
+	)
 {
 	//    SimulatedTick(DeltaSeconds);
 }
 
-void UGravityMovementComponent::ClientHandleMoveResponse(const FCharacterMoveResponseDataContainer& MoveResponse)
+void UGravityMovementComponent::ClientHandleMoveResponse(
+	const FCharacterMoveResponseDataContainer& MoveResponse
+	)
 {
 	auto MyMoveResponsePtr = dynamic_cast<const FMyCharacterMoveResponseDataContainer*>(&MoveResponse);
 	if (MyMoveResponsePtr)
@@ -505,13 +599,12 @@ void UGravityMovementComponent::ClientHandleMoveResponse(const FCharacterMoveRes
 
 bool UGravityMovementComponent::ShouldSkipUpdate(
 	float DeltaTime
-) const
+	) const
 {
 	return Super::ShouldSkipUpdate(DeltaTime);
 }
 
-void UGravityMovementComponent::ClientAdjustPosition_Implementation
-(
+void UGravityMovementComponent::ClientAdjustPosition_Implementation(
 	float TimeStamp,
 	FVector NewLocation,
 	FVector NewVelocity,
@@ -521,19 +614,19 @@ void UGravityMovementComponent::ClientAdjustPosition_Implementation
 	bool bBaseRelativePosition,
 	uint8 ServerMovementMode,
 	TOptional<FRotator> OptionalRotation /* = TOptional<FRotator>()*/
-)
+	)
 {
 	Super::ClientAdjustPosition_Implementation(
-		TimeStamp,
-		NewLocation,
-		NewVelocity,
-		NewBase,
-		NewBaseBoneName,
-		bHasBase,
-		bBaseRelativePosition,
-		ServerMovementMode,
-		OptionalRotation /* = TOptional<FRotator>()*/
-	);
+	                                           TimeStamp,
+	                                           NewLocation,
+	                                           NewVelocity,
+	                                           NewBase,
+	                                           NewBaseBoneName,
+	                                           bHasBase,
+	                                           bBaseRelativePosition,
+	                                           ServerMovementMode,
+	                                           OptionalRotation /* = TOptional<FRotator>()*/
+	                                          );
 
 	UpdateProxyAcceleration();
 }
@@ -543,15 +636,16 @@ FMyCharacterMoveResponseDataContainer* UGravityMovementComponent::GetMyMoveRespo
 	return dynamic_cast<FMyCharacterMoveResponseDataContainer*>(&GetMoveResponseDataContainer());
 }
 
-void UGravityMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UGravityMovementComponent::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	//     DOREPLIFETIME_CONDITION(ThisClass, bSkipRotation, COND_None);
-	//     DOREPLIFETIME_CONDITION(ThisClass, bSkipRootMotion, COND_None);
-	//     DOREPLIFETIME_CONDITION(ThisClass, bSkip_PlayerInput, COND_None);
-	//     DOREPLIFETIME_CONDITION(ThisClass, bSkip_PathFollow, COND_None);
-	// 
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_Rotation, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_RootMotion, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_PlayerInput, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_PathFollow, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bForceRotation, COND_None);
 }
 

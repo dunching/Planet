@@ -33,7 +33,9 @@ void GameplayCommand::ViewGroupmateMenu()
 	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewTalentAllocation>();
 }
 
-void GameplayCommand::EntryChallengeLevel(const TArray<FString>& Args)
+void GameplayCommand::EntryChallengeLevel(
+	const TArray<FString>& Args
+	)
 {
 	if (Args.IsValidIndex(0))
 	{
@@ -66,7 +68,8 @@ void GameplayCommand::SwitchTeammateOptionToFollow()
 	if (OnwerActorPtr)
 	{
 		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-			ETeammateOption::kFollow);
+			 ETeammateOption::kFollow
+			);
 	}
 }
 
@@ -76,7 +79,8 @@ void GameplayCommand::SwitchTeammateOptionToAssistance()
 	if (OnwerActorPtr)
 	{
 		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-			ETeammateOption::kAssistance);
+			 ETeammateOption::kAssistance
+			);
 	}
 }
 
@@ -86,11 +90,31 @@ void GameplayCommand::SwitchTeammateOptionToFireTarget()
 	if (OnwerActorPtr)
 	{
 		OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-			ETeammateOption::kFireTarget);
+			 ETeammateOption::kFireTarget
+			);
 	}
 }
 
 void GameplayCommand::RespawnPlayerCharacter()
 {
-	
+}
+
+void GameplayCommand::ServerSpawnCharacterByProxyType(
+	const TArray<FString>& Args
+	)
+{
+	if (Args.IsValidIndex(0))
+	{
+		auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+		if (PCPtr)
+		{
+			FTransform Transform = FTransform::Identity;
+			Transform.SetLocation(
+			                      PCPtr->GetPawn()->GetActorLocation() + (PCPtr->GetPawn()->
+			                                                              GetActorForwardVector() * 100)
+			                     );
+
+			PCPtr->ServerSpawnCharacterByProxyType(FGameplayTag::RequestGameplayTag(*Args[0]), Transform);
+		}
+	}
 }

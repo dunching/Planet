@@ -15,7 +15,7 @@ bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
-)
+	)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -44,7 +44,7 @@ USkill_WeaponActive_Base::USkill_WeaponActive_Base() :
 void USkill_WeaponActive_Base::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
-)
+	)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 }
@@ -55,7 +55,7 @@ void USkill_WeaponActive_Base::PreActivate(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
+	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -78,14 +78,16 @@ bool USkill_WeaponActive_Base::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
 	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+	) const
 {
 	if (WaitInput)
 	{
+		PRINTFUNCSTR(TEXT(""));
 	}
 	else
 	{
-		return false;	
+		PRINTFUNCSTR(TEXT(""));
+		return false;
 	}
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
@@ -95,7 +97,7 @@ void USkill_WeaponActive_Base::CancelAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateCancelAbility
-)
+	)
 {
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
@@ -106,10 +108,11 @@ void USkill_WeaponActive_Base::EndAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateEndAbility,
 	bool bWasCancelled
-)
+	)
 {
+	PRINTFUNCSTR(TEXT(""));
 	WaitInput = true;
-	
+
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
@@ -130,13 +133,14 @@ void USkill_WeaponActive_Base::EndAbility(
 
 bool USkill_WeaponActive_Base::GetNum(
 	int32& Num
-) const
+	) const
 {
 	return false;
 }
 
 bool USkill_WeaponActive_Base::PerformIfContinue()
 {
+	PRINTFUNCSTR(TEXT(""));
 	WaitInput = true;
 
 #if UE_EDITOR || UE_SERVER
@@ -148,9 +152,9 @@ bool USkill_WeaponActive_Base::PerformIfContinue()
 		{
 			Cast<UPlanetAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo())->
 				ReplicatePerformAction_Server(
-					GetCurrentAbilitySpecHandle(),
-					GetCurrentActivationInfo()
-				);
+				                              GetCurrentAbilitySpecHandle(),
+				                              GetCurrentActivationInfo()
+				                             );
 
 			return true;
 		}
@@ -159,7 +163,7 @@ bool USkill_WeaponActive_Base::PerformIfContinue()
 	{
 	}
 #endif
-	
+
 	return false;
 }
 
@@ -168,11 +172,14 @@ void USkill_WeaponActive_Base::PerformAction(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	PRINTFUNCSTR(TEXT(""));
 	WaitInput = false;
+
+	EnableMovement(false);
 
 	ResetPreviousStageActions();
 }
@@ -181,6 +188,15 @@ void USkill_WeaponActive_Base::WaitInputTick(
 	UAbilityTask_TimerHelper* InWaitInputTaskPtr,
 	float Interval,
 	float Duration
-)
+	)
 {
+}
+
+void USkill_WeaponActive_Base::EnableMovement(
+	bool bEnableMovement
+	)
+{
+	// GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(
+	//                                                               UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove
+	//                                                              );
 }

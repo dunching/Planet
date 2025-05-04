@@ -5,8 +5,10 @@
 
 #include "AbilitySystemComponent.h"
 #include "GameplayTagContainer.h"
+#include "LogWriter.h"
 
 #include "PlanetAbilitySystemComponent.h"
+#include "Kismet/KismetStringLibrary.h"
 
 UScriptStruct* FGameplayAbilityTargetData_RegisterParam::GetScriptStruct() const
 {
@@ -169,8 +171,7 @@ void UPlanetGameplayAbility::PerformActionWrap(
 	const FGameplayEventData* TriggerEventData
 )
 {
-	bIsContinueAction = true;
-
+	PRINTFUNCSTR(TEXT(""));
 	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
@@ -178,6 +179,7 @@ void UPlanetGameplayAbility::SetContinuePerform(
 	bool bIsContinue_
 )
 {
+	PRINTFUNCSTR(UKismetStringLibrary::Conv_BoolToString(bIsContinue_));
 	bIsContinueAction = bIsContinue_;
 }
 
@@ -218,6 +220,7 @@ void UPlanetGameplayAbility::DecrementListLockOverride() const
 
 bool UPlanetGameplayAbility::GetIsContinue() const
 {
+	PRINTFUNCSTR(UKismetStringLibrary::Conv_BoolToString(bIsContinue_));
 	return bIsContinueAction;
 }
 
@@ -228,6 +231,7 @@ void UPlanetGameplayAbility::PerformAction(
 	const FGameplayEventData* TriggerEventData
 )
 {
+	bIsContinueAction = true;
 }
 
 // void UPlanetGameplayAbility::InitalDefaultTags()

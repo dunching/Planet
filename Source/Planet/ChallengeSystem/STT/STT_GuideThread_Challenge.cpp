@@ -259,12 +259,12 @@ bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
 				for (int32 Index = 0; Index < NPCAry.Num(); Index++)
 				{
 					InstanceData.CharacterIDAry[Index] = FGuid::NewGuid();
-					PCPtr->ServerSpawnCharacter(
-					                            NPCAry[Index],
-					                            InstanceData.CharacterIDAry[Index],
-					                            Pts[Index]
-					                           );
 				}
+				PCPtr->ServerSpawnCharacterAry(
+											NPCAry,
+											InstanceData.CharacterIDAry,
+											Pts
+										   );
 
 				InstanceData.WaveIndex++;
 				return true;

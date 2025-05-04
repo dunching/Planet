@@ -1,4 +1,3 @@
-
 #include "StateProcessorComponent.h"
 
 #include <queue>
@@ -25,11 +24,13 @@
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
-UStateProcessorComponent::UStateProcessorComponent(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UStateProcessorComponent::UStateProcessorComponent(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	bWantsInitializeComponent = true;
-	
+
 	SetIsReplicatedByDefault(true);
 }
 
@@ -41,10 +42,10 @@ TArray<TWeakObjectPtr<ACharacterBase>> UStateProcessorComponent::GetTargetCharac
 	{
 		if (auto GroupManaggerPtr = CharacterPtr->GetGroupManagger())
 		{
-			auto ForceKnowCharater =GroupManaggerPtr->GetTeamMatesHelperComponent()->GetForceKnowCharater();
+			auto ForceKnowCharater = GroupManaggerPtr->GetTeamMatesHelperComponent()->GetForceKnowCharater();
 			if (ForceKnowCharater.IsValid())
 			{
-				Result.Add( ForceKnowCharater.Get());
+				Result.Add(ForceKnowCharater.Get());
 			}
 		}
 	}
@@ -56,7 +57,9 @@ void UStateProcessorComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UStateProcessorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UStateProcessorComponent::EndPlay(
+	const EEndPlayReason::Type EndPlayReason
+	)
 {
 	auto CharacterPtr = GetOwner<FOwnerPawnType>();
 	if (CharacterPtr)
@@ -68,36 +71,47 @@ void UStateProcessorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-void UStateProcessorComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UStateProcessorComponent::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
 }
 
-void UStateProcessorComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void UStateProcessorComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
-		auto CharacterPtr = GetOwner<FOwnerPawnType>();
-		if (CharacterPtr)
-		{
-			auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
-			OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
-				this, &ThisClass::OnGameplayEffectTagCountChanged
-			);
-		}
 	}
 #endif
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		auto GASCompPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		OnGameplayEffectTagCountChangedHandle = GASCompPtr->RegisterGenericGameplayTagEvent().AddUObject(
+			 this,
+			 &ThisClass::OnGameplayEffectTagCountChanged
+			);
+	}
 }
 
-TSharedPtr<FCharacterStateInfo> UStateProcessorComponent::GetCharacterState(const FGameplayTag& CSTag) const
+TSharedPtr<FCharacterStateInfo> UStateProcessorComponent::GetCharacterState(
+	const FGameplayTag& CSTag
+	) const
 {
 	return nullptr;
 }
 
-auto UStateProcessorComponent::BindCharacterStateChanged(const std::function<void(ECharacterStateType, UCS_Base*)>& Func)
-->UStateProcessorComponent::FCharacterStateChanged::FCallbackHandleSPtr
+auto UStateProcessorComponent::BindCharacterStateChanged(
+	const std::function<void(
+		ECharacterStateType,
+		UCS_Base*
+		)>& Func
+	)
+	-> UStateProcessorComponent::FCharacterStateChanged::FCallbackHandleSPtr
 {
 	auto CallbackHandle = CharacterStateChangedContainer.AddCallback(Func);
 
@@ -109,8 +123,13 @@ auto UStateProcessorComponent::BindCharacterStateChanged(const std::function<voi
 	return CallbackHandle;
 }
 
-auto UStateProcessorComponent::BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func)
--> UStateProcessorComponent::FCharacterStateMapChanged::FCallbackHandleSPtr
+auto UStateProcessorComponent::BindCharacterStateMapChanged(
+	const std::function<void(
+		const TSharedPtr<FCharacterStateInfo>&,
+		bool
+		)>& Func
+	)
+	-> UStateProcessorComponent::FCharacterStateMapChanged::FCallbackHandleSPtr
 {
 	auto CallbackHandle = CharacterStateMapChanged.AddCallback(Func);
 
@@ -132,13 +151,16 @@ void UStateProcessorComponent::InitializeComponent()
 	}
 }
 
-void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
+void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
+	const FGameplayTag Tag,
+	int32 Count
+	)
 {
 	auto Lambda = [&]
-		{
-			const auto Value = Count > 0;
-			return Value;
-		};
+	{
+		const auto Value = Count > 0;
+		return Value;
+	};
 
 	if (Tag.MatchesTag(UGameplayTagsLibrary::RootMotion))
 	{
@@ -148,7 +170,11 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->SetMovementMode(Lambda() ? EMovementMode::MOVE_Flying : EMovementMode::MOVE_Falling);
+				CharacterMovementPtr->SetMovementMode(
+				                                      Lambda() ?
+					                                      EMovementMode::MOVE_Flying :
+					                                      EMovementMode::MOVE_Falling
+				                                     );
 				if (Lambda())
 				{
 					CharacterMovementPtr->MaxFlySpeed = CharacterMovementPtr->MaxWalkSpeed;
@@ -246,31 +272,37 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(const FGameplayTa
 		if (CharacterPtr)
 		{
 			CharacterPtr->GetCapsuleComponent()->SetCollisionResponseToChannel(
-				Pawn_Object, Lambda() ? ECollisionResponse::ECR_Overlap : ECollisionResponse::ECR_Block
-			);
+			                                                                   Pawn_Object,
+			                                                                   Lambda() ?
+				                                                                   ECollisionResponse::ECR_Overlap :
+				                                                                   ECollisionResponse::ECR_Block
+			                                                                  );
 		}
 	}
 }
 
-void UStateProcessorComponent::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)
+void UStateProcessorComponent::OnCharacterStateChanged(
+	ECharacterStateType CharacterStateType,
+	UCS_Base* CharacterStatePtr
+	)
 {
 }
 
 void UStateProcessorComponent::ExcuteEffects(
 	const TSharedPtr<FGameplayAbilityTargetData_StateModify>& GameplayAbilityTargetDataSPtr
-)
+	)
 {
 }
 
 void UStateProcessorComponent::ExcuteEffects(
 	const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& GameplayAbilityTargetDataSPtr
-)
+	)
 {
 }
 
 FGameplayEventData* UStateProcessorComponent::MakeTargetData(
 	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
-)
+	)
 {
 	FGameplayEventData* Payload = new FGameplayEventData;
 	return Payload;
@@ -280,7 +312,7 @@ FGameplayAbilitySpec UStateProcessorComponent::MakeSpec(
 	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
 	TSubclassOf<UPlanetGameplayAbility> InAbilityClass,
 	int32 InputID
-)
+	)
 {
 	// 	auto GACDOPtr = InAbilityClass.GetDefaultObject();
 	// 
@@ -296,7 +328,7 @@ void UStateProcessorComponent::BreakOhterState(
 	const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
 	const FGameplayTag& ThisTag,
 	const TArray<FGameplayTag>& CancelTags
-)
+	)
 {
 	// 会中断其他跟运动的状态
 	FGameplayTagContainer GameplayTagContainer;

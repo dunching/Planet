@@ -32,6 +32,7 @@ struct FProxy_FASI_Container;
 struct FSkillCooldownHelper;
 
 class UInventoryComponent;
+class UItemProxy_Description_Consumable;
 
 USTRUCT()
 struct PLANET_API FConsumableProxy :
@@ -58,7 +59,7 @@ public:
 
 	virtual bool Active()override;
 
-	FTableRowProxy_Consumable* GetTableRowProxy_Consumable()const;
+	UItemProxy_Description_Consumable* GetTableRowProxy_Consumable()const;
 
 #pragma region Cooldown interface
 	virtual bool GetRemainingCooldown(

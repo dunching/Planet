@@ -201,6 +201,7 @@ void AHumanCharacter_AI::SpawnDefaultController()
 {
 	if (GroupManaggerPtr)
 	{
+		auto ProxyCharacterSPtr = GetInventoryComponent()->InitialOwnerCharacterProxy(this);
 	}
 	else
 	{
@@ -221,12 +222,21 @@ void AHumanCharacter_AI::SpawnDefaultController()
 				}
 			};
 
-		GroupManaggerPtr = GetWorld()->SpawnActor<AGroupManagger_NPC>(
+		auto GroupManagger_NPCPtr = GetWorld()->SpawnActor<AGroupManagger_NPC>(
 			AGroupManagger_NPC::StaticClass(),
 			SpawnParameters
 		);
 
-		SetGroupSharedInfo(GroupManaggerPtr);
+		SetGroupSharedInfo(GroupManagger_NPCPtr);
+		
+		auto ProxyCharacterSPtr = GetInventoryComponent()->InitialOwnerCharacterProxy(this);
+		GroupManagger_NPCPtr->GetTeamMatesHelperComponent()->UpdateTeammateConfig(ProxyCharacterSPtr, 0);
+		GroupManagger_NPCPtr->AddSpwanedCharacter(this);
+		GroupManagger_NPCPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(
+			ETeammateOption::kEnemy
+		);
+
+		GroupManaggerPtr = GroupManagger_NPCPtr;
 	}
 
 	Super::SpawnDefaultController();
@@ -348,9 +358,6 @@ void AHumanCharacter_AI::OnGroupManaggerReady(
 		}
 		if (GetAIComponent()->bIsSingle && !GetAIComponent()->bIsTeammate)
 		{
-			GroupManaggerPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-				AIComponentPtr->DefaultTeammateOption
-			);
 			GroupManaggerPtr->SetOwnerCharacterProxyPtr(this);
 		}
 	}

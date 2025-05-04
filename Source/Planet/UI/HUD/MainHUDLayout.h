@@ -25,6 +25,9 @@ class PLANET_API UMainHUDLayout : public UMyUserWidget
 	GENERATED_BODY()
 
 public:
+
+	using FOnLayoutChanged = TCallbackHandleContainer<void(ELayoutCommon)>;
+	
 	virtual void NativeConstruct() override;
 
 	// 
@@ -49,4 +52,6 @@ public:
 		);
 
 	// UInteractionList* GetInteractionList();
+
+	FOnLayoutChanged OnLayoutChanged;
 };

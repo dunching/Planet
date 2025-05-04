@@ -28,17 +28,19 @@ class PLANET_API AToolProxyBase : public ASceneActor
 	GENERATED_BODY()
 
 public:
-
 	using FOwnerPawnType = ACharacterBase;
 
-	AToolProxyBase(const FObjectInitializer& ObjectInitializer);
+	AToolProxyBase(
+		const FObjectInitializer& ObjectInitializer
+		);
 
 protected:
+	virtual void AttachToCharacter(
+		ACharacterBase* CharacterPtr
+		);
 
-	virtual void AttachToCharacter(ACharacterBase* CharacterPtr);
+	virtual void BeginPlay() override;
 
-	virtual void BeginPlay()override;
-	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Equiment")
 	USceneComponent* SceneCompPtr = nullptr;
 
@@ -46,4 +48,8 @@ protected:
 
 private:
 
+	UFUNCTION()
+	void OnOwnerDestroyde(
+		AActor* DestroyedActor
+		);
 };

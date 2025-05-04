@@ -8,7 +8,7 @@
 #include "Weapon_Base.h"
 #include "Skill_Consumable_Generic.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "ConversationComponent.h"
+#include "SceneProxyTable.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"
 #include "InventoryComponent.h"
@@ -80,14 +80,13 @@ bool FConsumableProxy::Active()
 	return true;
 }
 
-FTableRowProxy_Consumable* FConsumableProxy::GetTableRowProxy_Consumable() const
+UItemProxy_Description_Consumable* FConsumableProxy::GetTableRowProxy_Consumable() const
 {
-	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy_Consumable.LoadSynchronous();
-
-	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_Consumable>(
-		*GetProxyType().ToString(), TEXT("GetProxy"));
-	return SceneProxyExtendInfoPtr;
+	auto TableRowPtr = GetTableRowProxy();
+	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_Consumable>(
+		TableRowPtr->ItemProxy_Description.LoadSynchronous()
+	);
+	return ItemProxy_Description_SkillPtr;
 }
 
 bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const

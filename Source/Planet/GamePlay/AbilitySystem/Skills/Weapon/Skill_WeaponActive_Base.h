@@ -21,13 +21,13 @@ struct FGameplayAbilityTargetData_WeaponActive_ActiveParam :
 
 	virtual UScriptStruct* GetScriptStruct() const override;
 
-	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
+	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
 
 	virtual FGameplayAbilityTargetData_WeaponActive_ActiveParam* Clone()const override;
 
 	bool bIsAutoContinue = false;
 
-	AWeapon_Base* WeaponPtr = nullptr;
+	TObjectPtr<AWeapon_Base> WeaponPtr = nullptr;
 };
 
 template<>
@@ -70,7 +70,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	) override;
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -98,7 +98,7 @@ protected:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	);
+	) override;
 
 	/**
 	 *	进入等待输入，如果按下了攻击键，则继续执行
@@ -108,6 +108,8 @@ protected:
 	UFUNCTION()
 	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
 
+	void EnableMovement(bool bEnableMovement);
+	
 	FGuid PropertuModify_GUID = FGuid::NewGuid();
 
 	TSharedPtr<FActiveParamType> ActiveParamSPtr = nullptr;

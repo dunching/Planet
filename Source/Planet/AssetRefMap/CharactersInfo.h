@@ -6,7 +6,7 @@
 #include <GenerateType.h>
 
 #include "GameplayTagContainer.h"
-#include "CharacterAttibutes.h"
+#include "ItemProxy_Description.h"
 
 #include "CharactersInfo.generated.h"
 
@@ -25,18 +25,4 @@ struct PLANET_API FTableRowProxy_CharacterGrowthAttribute : public FTableRowBase
 	// 每级增加的属性
 	// UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	// TArray<FCharacterAttributes> CharacterAttributesPerLevel;
-};
-
-USTRUCT(BlueprintType)
-struct PLANET_API FTableRowProxy_CharacterType : public FTableRowBase
-{
-	GENERATED_USTRUCT_BODY()
-	
-public:
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TSubclassOf<AHumanCharacter_AI>CharacterClass;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FString Title;
 };

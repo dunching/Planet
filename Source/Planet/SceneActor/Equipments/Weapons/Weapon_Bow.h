@@ -57,8 +57,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FTransform BowIdleTransform = FTransform::Identity;
 

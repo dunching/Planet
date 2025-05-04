@@ -85,6 +85,7 @@ void UMainHUDLayout::SwitchToNewLayout(
 			MenuInterfacePtr->OnQuit = OnQuit;
 			MenuInterfacePtr->Enable();
 			UIPtr->SetActiveWidget(Iter);
+			OnLayoutChanged(LayoutCommon);
 			break;
 		}
 	}

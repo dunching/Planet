@@ -26,6 +26,8 @@ class PLANET_API AGroupManagger_NPC :
 	GENERATED_BODY()
 
 public:
+
+	void AddSpwanedCharacter(const TObjectPtr<AHumanCharacter_AI>&SpwanedCharacter);
 	
 	/**
 	 * 既定的巡逻路线
@@ -39,4 +41,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TObjectPtr<ABuildingArea> BuildingAreaPtr = nullptr;
 
+private:
+
+	UFUNCTION()
+	void OnSpwanedCharacterDestroyed(AActor* DestroyedActor);
+	
+	TSet<TObjectPtr<AHumanCharacter_AI>>SpwanedCharactersSet;
+	
 };
