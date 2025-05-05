@@ -77,6 +77,8 @@ public:
 		int32 ReachedRadius
 	);
 
+	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;
+
 protected:
 	FVector TargetLocation = FVector::ZeroVector;
 
@@ -190,6 +192,7 @@ public:
 		const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
 	);
 
+	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;
 protected:
 	void ConditionalPerformTask();
 

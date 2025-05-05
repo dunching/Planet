@@ -37,6 +37,7 @@ public:
 
 	void InitalHUD();
 
+protected:
 	void SwitchLayout(
 		ELayoutCommon MainHUDType,
 		const ILayoutInterfacetion::FOnQuit& OnQuit
@@ -44,7 +45,6 @@ public:
 
 	UMainHUDLayout* GetMainHUDLayout() const;
 
-protected:
 	void OnHPChanged(
 		const FOnAttributeChangeData&
 		);

@@ -104,9 +104,6 @@ public:
 	TSubclassOf<UGameplayEffect>DamageCallbackClass;
 #pragma endregion 
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;
-
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<EMaterialParamNameType, FName>MatParamNameMap;
 

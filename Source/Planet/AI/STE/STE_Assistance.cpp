@@ -13,38 +13,53 @@
 #include "LogWriter.h"
 #include "BuildingArea.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "GameOptions.h"
 #include "GeneratorColony_ByInvoke.h"
 #include "GroupManagger.h"
 #include "GroupManagger_NPC.h"
+#include "GroupManagger_Player.h"
 #include "HumanCharacter_AI.h"
+#include "HumanCharacter_Player.h"
 #include "ItemProxy_Character.h"
 #include "STE_CharacterBase.h"
 
 void USTE_Assistance::TreeStart(
 	FStateTreeExecutionContext& Context
-)
+	)
 {
 	Super::TreeStart(Context);
 
-	GeneratorNPCs_PatrolPtr = HumanCharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr;
-
-	if (HumanAIControllerPtr)
+	auto GroupManagger = HumanCharacterPtr->GetGroupManagger();
+	if (GroupManagger)
 	{
-		HumanCharacterPtr = HumanAIControllerPtr->GetPawn<AHumanCharacter_AI>();
-		if (HumanCharacterPtr)
+		// 如果是由Playher生成的NPC群体 则是这个类型
+		if (GroupManagger->IsA(AGroupManagger_Player::StaticClass()))
 		{
-			TeammateChangedDelegate = HumanCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
-			                                             TeamHelperChangedDelegateContainer.AddCallback(
-				                                             std::bind(&ThisClass::OnTeamChanged, this)
-			                                             );
-			OnTeamChanged();
+		}
+		// 如果是NPC群体 则是这个类型
+		else if (GroupManagger->IsA(AGroupManagger_NPC::StaticClass()))
+		{
+			GeneratorNPCs_PatrolPtr = HumanCharacterPtr->GetGroupManagger_NPC()->GeneratorNPCs_PatrolPtr;
+		}
+
+		if (HumanAIControllerPtr)
+		{
+			HumanCharacterPtr = HumanAIControllerPtr->GetPawn<AHumanCharacter_AI>();
+			if (HumanCharacterPtr)
+			{
+				TeammateChangedDelegate = HumanCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
+				                                             TeamHelperChangedDelegateContainer.AddCallback(
+					                                              std::bind(&ThisClass::OnTeamChanged, this)
+					                                             );
+				OnTeamChanged();
+			}
 		}
 	}
 }
 
 void USTE_Assistance::TreeStop(
 	FStateTreeExecutionContext& Context
-)
+	)
 {
 	if (TeammateOptionChangedDelegate)
 	{
@@ -62,14 +77,14 @@ void USTE_Assistance::TreeStop(
 void USTE_Assistance::Tick(
 	FStateTreeExecutionContext& Context,
 	const float DeltaTime
-)
+	)
 {
 	Super::Tick(Context, DeltaTime);
 }
 
 void USTE_Assistance::OnTeamOptionChanged(
 	ETeammateOption NewTeammateOption
-)
+	)
 {
 #if WITH_EDITOR
 	// TODO. 满足测试
@@ -111,8 +126,8 @@ void USTE_Assistance::OnTeamChanged()
 		}
 
 		TeammateOptionChangedDelegate = TeamHelperSPtr->TeammateOptionChanged.AddCallback(
-			std::bind(&ThisClass::OnTeamOptionChanged, this, std::placeholders::_1)
-		);
+			 std::bind(&ThisClass::OnTeamOptionChanged, this, std::placeholders::_1)
+			);
 		OnTeamOptionChanged(TeamHelperSPtr->GetTeammateOption());
 	}
 }
@@ -129,19 +144,75 @@ UGloabVariable_Character* USTE_Assistance::CreateGloabVarianble()
 TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
 {
 	auto TeamMatesHelperComponent = HumanAIControllerPtr->GetGroupManagger()->GetTeamMatesHelperComponent();
-	auto KnowCharatersSet = TeamMatesHelperComponent->GetSensingChractersSet();
 	auto OwnerCharacterProxyPtr = TeamMatesHelperComponent->GetOwnerCharacterProxyPtr();
 
 	// 是否远离了设定位置
 	auto CharacterActorPtr = OwnerCharacterProxyPtr->GetCharacterActor();
-	if (CharacterActorPtr.IsValid() && CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
+	if (CharacterActorPtr.IsValid())
 	{
-		auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
-
-		if (GeneratorNPCs_PatrolPtr)
+		if (CharacterActorPtr->IsA(AHumanCharacter_AI::StaticClass()))
 		{
-			const auto Location = GeneratorNPCs_PatrolPtr->GetActorLocation();
-			const auto MaxDistance = GeneratorNPCs_PatrolPtr->MaxDistance;
+			auto KnowCharatersSet = TeamMatesHelperComponent->GetSensingChractersSet();
+
+			auto AI_CharacterActorPtr = Cast<AHumanCharacter_AI>(CharacterActorPtr.Get());
+
+			if (GeneratorNPCs_PatrolPtr)
+			{
+				const auto Location = GeneratorNPCs_PatrolPtr->GetActorLocation();
+				const auto MaxDistance = GeneratorNPCs_PatrolPtr->MaxDistance;
+
+				TSet<ACharacterBase*> NeedRemoveAry;
+				for (const auto& Iter : KnowCharatersSet)
+				{
+					if (Iter.IsValid())
+					{
+						if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
+						{
+							NeedRemoveAry.Add(Iter.Get());
+						}
+						else if (Iter->IsA(AHumanCharacter_AI::StaticClass()))
+						{
+							NeedRemoveAry.Add(Iter.Get());
+						}
+					}
+					else
+					{
+						NeedRemoveAry.Add(Iter.Get());
+					}
+				}
+				for (const auto& Iter : NeedRemoveAry)
+				{
+					if (KnowCharatersSet.Contains(Iter))
+					{
+						KnowCharatersSet.Remove(Iter);
+					}
+				}
+			}
+
+			return GetNewTargetCharacter(KnowCharatersSet);
+		}
+		else if (CharacterActorPtr->IsA(AHumanCharacter_Player::StaticClass()))
+		{
+			TSet<TWeakObjectPtr<ACharacterBase>> KnowCharatersSet;
+
+			switch (TeammateOption)
+			{
+			case ETeammateOption::kFollow:
+				break;
+			case ETeammateOption::kAssistance:
+				{
+					KnowCharatersSet = TeamMatesHelperComponent->GetSensingChractersSet();
+				}
+				break;
+			case ETeammateOption::kFireTarget:
+				{
+					KnowCharatersSet.Add(TeamMatesHelperComponent->GetForceKnowCharater());
+				}
+				break;
+			}
+
+			const auto Location = HumanCharacterPtr->GetActorLocation();
+			const auto MaxDistance = UGameOptions::GetInstance()->NPCTeammateMaxActtackDistance;
 
 			TSet<ACharacterBase*> NeedRemoveAry;
 			for (const auto& Iter : KnowCharatersSet)
@@ -149,10 +220,6 @@ TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
 				if (Iter.IsValid())
 				{
 					if (FVector::Distance(Iter->GetActorLocation(), Location) > MaxDistance)
-					{
-						NeedRemoveAry.Add(Iter.Get());
-					}
-					else if (Iter->IsA(AHumanCharacter_AI::StaticClass()))
 					{
 						NeedRemoveAry.Add(Iter.Get());
 					}
@@ -169,9 +236,8 @@ TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
 					KnowCharatersSet.Remove(Iter);
 				}
 			}
+			return GetNewTargetCharacter(KnowCharatersSet);
 		}
-
-		return GetNewTargetCharacter(KnowCharatersSet);
 	}
 
 	return nullptr;

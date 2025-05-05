@@ -38,6 +38,7 @@ using FOnCharacterSocketUpdated = TMulticastDelegate<void(
 	const FGameplayTag&
 
 
+	
 	)>;
 
 /*
@@ -186,11 +187,9 @@ public:
 		const FCharacterSocket& Socket
 		);
 
+	FString GetDisplayTitle() const;
+
 	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
-
-	FString Title;
-
-	FString Name;
 
 	int32 Level = 1;
 
@@ -200,6 +199,11 @@ protected:
 	TMap<FGameplayTag, FCharacterSocket> TeammateConfigureMap;
 
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
+
+private:
+	FString Title;
+
+	FString Name;
 };
 
 template <>

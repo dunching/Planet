@@ -11,6 +11,8 @@
 
 #include "GenerateType.h"
 #include "GuideActor.h"
+#include "LayoutCommon.h"
+#include "MainMenuCommon.h"
 #include "STT_GuideBase.h"
 #include "STT_CommonData.h"
 
@@ -55,6 +57,7 @@ class UGameplayTask_Guide_ActiveRun;
 class UGameplayTask_Guide_AttckCharacter;
 class UGameplayTask_WaitInteractionSceneActor;
 class UGameplayTask_WaitPlayerEquipment;
+class UGameplayTask_WaitOpenLayout;
 
 struct FConsumableProxy;
 struct FTaskNode_Conversation_SentenceInfo;
@@ -205,6 +208,69 @@ struct PLANET_API FSTT_GuideThread_PressKey :
 	GENERATED_BODY()
 
 	using FInstanceDataType = FSTID_GuideThread_PressKey;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
+};
+#pragma endregion
+
+#pragma region 要求玩家切换到某个UI布局
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_OpenLayout :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(
+		Transient
+	)
+	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
+
+	UPROPERTY(
+		Transient
+	)
+	TObjectPtr<UGameplayTask_WaitOpenLayout> GameplayTaskPtr = nullptr;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	ELayoutCommon LayoutCommon = ELayoutCommon::kMenuLayout;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	EMenuType MenuType = EMenuType::kAllocationSkill;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	FString Description = TEXT("Decription {Layout} &{MenuLayout} To Replace Str");
+};
+
+// 
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_OpenLayout :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_OpenLayout;
 
 	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
 
@@ -386,6 +452,12 @@ struct PLANET_API FSTID_GuideThread_GoToTheTargetPoint :
 		Category = Param
 	)
 	FString PromtStr;
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;
 
 	FVector TargetLocation = FVector::ZeroVector;
 
@@ -630,6 +702,13 @@ struct PLANET_API FSTID_GuideThread_WaitInteractionSceneActor :
 		Category = Param
 	)
 	TSoftObjectPtr<UPAD_GuideThread_WaitInteractionSceneActor> PAD = nullptr;
+	
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	TSubclassOf<ATargetPoint_Runtime>TargetPoint_RuntimeClass;
+
 };
 
 // 等待完成
@@ -1093,6 +1172,10 @@ struct PLANET_API FSTID_GuideThread_WaitPlayerEquipment :
 	)
 	TObjectPtr<UGameplayTask_WaitPlayerEquipment> GameplayTaskPtr = nullptr;
 
+	/**
+	 * true 给玩家装备
+	 * false 给NPC队友装备
+	 */
 	UPROPERTY(
 		EditAnywhere,
 		Category = Param
@@ -1111,12 +1194,14 @@ struct PLANET_API FSTID_GuideThread_WaitPlayerEquipment :
 	)
 	FGameplayTag SkillSocket;
 
+	/**
+	 * 是否是装备一个NPC队友
+	 */
 	UPROPERTY(
 		EditAnywhere,
 		Category = Param
 	)
 	bool bIsEquipentCharacter = false;
-	
 };
 
 // 执行引导任务 给目标角色添加互动引导内容

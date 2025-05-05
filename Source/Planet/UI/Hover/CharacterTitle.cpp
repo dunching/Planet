@@ -184,7 +184,7 @@ void UCharacterTitle::ApplyCharaterNameToTitle()
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterTitle::Get().Title));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->Name));
+			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->GetDisplayTitle()));
 		}
 	}
 }

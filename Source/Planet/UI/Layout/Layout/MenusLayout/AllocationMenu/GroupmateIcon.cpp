@@ -92,7 +92,7 @@ void UGroupmateIcon::SetName()
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGroupmateIcon::Get().Text));
 	if (UIPtr)
 	{
-		UIPtr->SetText(FText::FromString(ProxyPtr->Name));
+		UIPtr->SetText(FText::FromString(ProxyPtr->GetDisplayTitle()));
 	}
 }
 

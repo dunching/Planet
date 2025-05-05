@@ -233,7 +233,7 @@ void UFocusTitle::ApplyCharaterNameToTitle()
 		auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FFocusTitle::Get().Title));
 		if (UIPtr)
 		{
-			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->Name));
+			UIPtr->SetText(FText::FromString(CharacterPtr->GetCharacterProxy()->GetDisplayTitle()));
 		}
 	}
 }

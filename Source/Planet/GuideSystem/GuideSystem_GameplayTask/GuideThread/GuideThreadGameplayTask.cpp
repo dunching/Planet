@@ -60,7 +60,7 @@ void UGameplayTask_Guide_MoveToLocation::Activate()
 		SpawnParameters.Owner = GetOwnerActor();
 
 		TargetPointPtr = PlayerCharacterPtr->GetWorld()->SpawnActor<ATargetPoint_Runtime>(
-			UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
+			TargetPoint_RuntimeClass,
 			AbsoluteTransform,
 			SpawnParameters
 		);
@@ -283,7 +283,7 @@ void UGameplayTask_Guide_ConversationWithTarget::ConditionalPerformTask()
 			SpawnParameters.Owner = GetOwnerActor();
 
 			TargetPointPtr = PlayerCharacterPtr->GetWorld()->SpawnActor<ATargetPoint_Runtime>(
-				UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
+				TargetPoint_RuntimeClass,
 				AbsoluteTransform,
 				SpawnParameters
 			);

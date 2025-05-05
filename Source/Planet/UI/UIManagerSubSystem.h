@@ -21,6 +21,9 @@ struct FPawnDataStruct;
 struct FSceneTool;
 struct FCharacterAttributes;
 
+class UMainHUDLayout;
+class UMainMenuLayout;
+
 /*
 	HUD、UI
 */
@@ -46,17 +49,29 @@ public:
 		) override;
 
 #pragma region Layout
+	UMainHUDLayout* GetMainHUDLayout() const;
+	
 	void SwitchLayout(
 		ELayoutCommon MainHUDType,
 		const ILayoutInterfacetion::FOnQuit& OnQuit = nullptr
 		);
+	
+	FString GetLayoutName(
+		ELayoutCommon MainHUDType
+		)const;
 #pragma endregion
 
-#pragma region Menu
+#pragma region MenuLayout
+	UMainMenuLayout* GetMainMenuLayout() const;
+	
 	void SwitchMenuLayout(
 		EMenuType MenuType
 		);
-#pragma endregion Menu
+	
+	FString GetMenuLayoutName(
+		EMenuType MenuType
+		)const;
+#pragma endregion 
 
 protected:
 

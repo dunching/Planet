@@ -187,14 +187,7 @@ void UBackpackIcon::OnAllocationCharacterProxyChanged(const TWeakPtr<FCharacterP
 		}
 
 		UIPtr->SetVisibility(ESlateVisibility::Visible);
-		if (AllocationCharacterProxyPtr.Pin()->Name.IsEmpty())
-		{
-			UIPtr->SetText(FText::FromString(AllocationCharacterProxyPtr.Pin()->Title));
-		}
-		else
-		{
-			UIPtr->SetText(FText::FromString(AllocationCharacterProxyPtr.Pin()->Name));
-		}
+		UIPtr->SetText(FText::FromString(AllocationCharacterProxyPtr.Pin()->GetDisplayTitle()));
 	}
 	else
 	{

@@ -70,6 +70,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
 	int32 MaxPerformSpeed = 300;
 
+	// NPC队友会攻击的最远的敌人的距离
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 NPCTeammateMaxActtackDistance = 1200;
+
 #pragma region 按键映射
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey JumpKey = EKeys::SpaceBar;

@@ -72,31 +72,15 @@ void UHUD_TeamMateInfo::ResetToolUIByData(
 			{
 				auto CharacterAttributesSPtr =
 					GroupMateProxyPtr->CharacterAttributesSPtr;
-				if (GroupMateProxyPtr->Name.IsEmpty())
-				{
-					UIPtr->SetText(
-						FText::FromString(
-							FString::Printf(
-								TEXT("%s(%d)"),
-								*GroupMateProxyPtr->Title,
-								GroupMateProxyPtr->Level
-							)
+				UIPtr->SetText(
+					FText::FromString(
+						FString::Printf(
+							TEXT("%s(%d)"),
+							*GroupMateProxyPtr->GetDisplayTitle(),
+							GroupMateProxyPtr->Level
 						)
-					);
-				}
-				else
-				{
-					UIPtr->SetText(
-						FText::FromString(
-							FString::Printf(
-								TEXT("%s %s(%d)"),
-								*GroupMateProxyPtr->Title,
-								*GroupMateProxyPtr->Name,
-								GroupMateProxyPtr->Level
-							)
-						)
-					);
-				}
+					)
+				);
 			}
 		}
 

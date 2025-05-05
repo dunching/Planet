@@ -24,6 +24,7 @@
 #include "SceneActor.h"
 #include "STE_GuideThread.h"
 #include "TargetPoint_Runtime.h"
+#include "UIManagerSubSystem.h"
 
 const UStruct* FSTT_GuideThreadRecord::GetInstanceDataType() const
 {
@@ -941,6 +942,7 @@ EStateTreeRunStatus FSTT_GuideThread_WaitPlayerEquipment::EnterState(
 		                                                 InstanceData.PlayerCharacterPtr
 		                                                );
 
+		InstanceData.GameplayTaskPtr->bPlayerAssign = InstanceData.bPlayerAssign;
 		InstanceData.GameplayTaskPtr->WeaponSocket = InstanceData.WeaponSocket;
 		InstanceData.GameplayTaskPtr->SkillSocket = InstanceData.SkillSocket;
 		InstanceData.GameplayTaskPtr->bIsEquipentCharacter = InstanceData.bIsEquipentCharacter;
@@ -1233,7 +1235,7 @@ FTaskNodeDescript FSTT_GuideThread_AttckCharacter::GetTaskNodeDescripton(
 		                                                    "Attack <%s>%s</>"
 		                                                   ),
 		                                               *RichText_Emphasis,
-		                                               *InstanceData.HumanCharacterAI->GetCharacterProxy()->Title
+		                                               *InstanceData.HumanCharacterAI->GetCharacterProxy()->GetDisplayTitle()
 		                                              );
 
 		return TaskNodeDescript;
@@ -1304,10 +1306,10 @@ EStateTreeRunStatus FSTT_DelayTask::Tick(
 	if (InstanceData.GuideThreadActorPtr)
 	{
 		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
-																GetTaskNodeDescripton(
-																	 Context
-																	)
-															   );
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
 	}
 	return Super::Tick(Context, DeltaTime);
 }
@@ -1419,6 +1421,125 @@ FTaskNodeDescript FSTT_GuideThread_PressKey::GetTaskNodeDescripton(
 	FTaskNodeDescript TaskNodeDescript;
 
 	TaskNodeDescript.Description = InstanceData.Description.Replace(TEXT("{Key}"), *InstanceData.Key.ToString());
+
+	return TaskNodeDescript;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_OpenLayout::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+	) const
+{
+	Super::EnterState(
+	                  Context,
+	                  Transition
+	                 );
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+	                                                          *this
+	                                                         );
+
+	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(
+	                                                                       InstanceData.GuideThreadActorPtr->
+	                                                                       FindComponentByInterface(
+		                                                                        UGameplayTaskOwnerInterface::StaticClass()
+		                                                                       )
+	                                                                      );
+	if (!InstanceData.TaskOwner)
+	{
+		InstanceData.TaskOwner = InstanceData.GuideThreadActorPtr;
+	}
+
+	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_WaitOpenLayout>(
+		 *InstanceData.TaskOwner
+		);
+
+	if (InstanceData.GameplayTaskPtr)
+	{
+		InstanceData.GameplayTaskPtr->SetPlayerCharacter(
+		                                                 InstanceData.PlayerCharacterPtr
+		                                                );
+
+		InstanceData.GameplayTaskPtr->TargetLayoutCommon = InstanceData.LayoutCommon;
+		InstanceData.GameplayTaskPtr->TargetMenuType = InstanceData.MenuType;
+		InstanceData.GameplayTaskPtr->PCPtr = Cast<APlanetPlayerController>(
+		                                                                    UGameplayStatics::GetPlayerController(
+			                                                                     InstanceData.PlayerCharacterPtr,
+			                                                                     0
+			                                                                    )
+		                                                                   );
+
+		InstanceData.GameplayTaskPtr->ReadyForActivation();
+	}
+
+	if (InstanceData.GuideThreadActorPtr)
+	{
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+		                                                        GetTaskNodeDescripton(
+			                                                         Context
+			                                                        )
+		                                                       );
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_OpenLayout::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+	) const
+{
+	Super::Tick(Context, DeltaTime);
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+	                                                          *this
+	                                                         );
+
+	if (!InstanceData.GameplayTaskPtr)
+	{
+		checkNoEntry();
+	}
+
+	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return EStateTreeRunStatus::Running;
+}
+
+FTaskNodeDescript FSTT_GuideThread_OpenLayout::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+	) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+	                                                          *this
+	                                                         );
+
+	auto GameOptionsPtr = UGameOptions::GetInstance();
+
+	FTaskNodeDescript TaskNodeDescript;
+
+	switch (InstanceData.LayoutCommon)
+	{
+	case ELayoutCommon::kMenuLayout:
+		{
+			TaskNodeDescript.Description = InstanceData.Description.Replace(
+			                                                                TEXT("{MenuLayout}"),
+			                                                                *UUIManagerSubSystem::GetInstance()->
+			                                                                GetMenuLayoutName(InstanceData.MenuType)
+			                                                               );
+		}
+		break;
+	default:
+		{
+			TaskNodeDescript.Description = InstanceData.Description.Replace(
+			                                                                TEXT("{Layout}"),
+			                                                                *UUIManagerSubSystem::GetInstance()->
+			                                                                GetLayoutName(InstanceData.LayoutCommon)
+			                                                               );
+		};
+	}
 
 	return TaskNodeDescript;
 }
@@ -1659,7 +1780,7 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::EnterState(
 
 				InstanceData.TargetPointPtr = InstanceData.PlayerCharacterPtr->GetWorld()->SpawnActor<
 					ATargetPoint_Runtime>(
-					                      UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
+					                      InstanceData.TargetPoint_RuntimeClass,
 					                      SpawnParameters
 					                     );
 
@@ -1684,7 +1805,7 @@ EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::EnterState(
 
 				InstanceData.TargetPointPtr = InstanceData.PlayerCharacterPtr->GetWorld()->SpawnActor<
 					ATargetPoint_Runtime>(
-					                      UAssetRefMap::GetInstance()->TargetPoint_RuntimeClass,
+					                      InstanceData.TargetPoint_RuntimeClass,
 					                      AbsoluteTransform,
 					                      SpawnParameters
 					                     );
@@ -1815,6 +1936,7 @@ EStateTreeRunStatus FSTT_GuideThread_WaitInteractionSceneActor::EnterState(
 		                                                );
 
 		InstanceData.GameplayTaskPtr->PAD = InstanceData.PAD;
+		InstanceData.GameplayTaskPtr->TargetPoint_RuntimeClass = InstanceData.TargetPoint_RuntimeClass;
 
 		InstanceData.GameplayTaskPtr->ReadyForActivation();
 	}

@@ -201,10 +201,7 @@ void UGameplayTask_Interaction_Option::ConditionalPerformTask()
 		RemainingTime = DelayTime;
 	}
 
-	Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
-		->GetHUD<AMainHUD>()
-		->GetMainHUDLayout()
-		->GetInteractionOptionsLayout()
+	UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->GetInteractionOptionsLayout()
 		->GetOptions()->UpdateDisplay(OptionAry, std::bind(&ThisClass::OnSelected, this, std::placeholders::_1));
 }
 
@@ -212,10 +209,7 @@ void UGameplayTask_Interaction_Option::OnSelected(
 	int32 Index
 	)
 {
-	Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))
-		->GetHUD<AMainHUD>()
-		->GetMainHUDLayout()
-		->GetInteractionOptionsLayout()
+	UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->GetInteractionOptionsLayout()
 		->CloseOption();
 
 	SelectedIndex = Index;

@@ -12,7 +12,11 @@
 #include "InventoryComponent.h"
 #include "GroupManagger.h"
 
-bool FCharacterSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FCharacterSocket::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
 {
 	if (Ar.IsSaving())
 	{
@@ -28,7 +32,9 @@ bool FCharacterSocket::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& 
 	return true;
 }
 
-void FCharacterSocket::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
+void FCharacterSocket::UpdateProxy(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
+	)
 {
 	if (ProxySPtr)
 	{
@@ -36,7 +42,9 @@ void FCharacterSocket::UpdateProxy(const TSharedPtr<FBasicProxy>& ProxySPtr)
 	}
 }
 
-void FCharacterSocket::SetAllocationedProxyID(const FGuid& NewID)
+void FCharacterSocket::SetAllocationedProxyID(
+	const FGuid& NewID
+	)
 {
 	AllocationedProxyID = NewID;
 }
@@ -66,13 +74,17 @@ FCharacterProxy::FCharacterProxy()
 	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
 }
 
-FCharacterProxy::FCharacterProxy(const IDType& InID):
-	FCharacterProxy()
+FCharacterProxy::FCharacterProxy(
+	const IDType& InID
+	):
+	 FCharacterProxy()
 {
 	ID = InID;
 }
 
-void FCharacterProxy::UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSPtr)
+void FCharacterProxy::UpdateByRemote(
+	const TSharedPtr<FCharacterProxy>& RemoteSPtr
+	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
 	UpdateByRemote_Allocationble(RemoteSPtr);
@@ -81,7 +93,11 @@ void FCharacterProxy::UpdateByRemote(const TSharedPtr<FCharacterProxy>& RemoteSP
 	ProxyCharacterPtr = RemoteSPtr->ProxyCharacterPtr;
 }
 
-bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FCharacterProxy::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
@@ -119,12 +135,14 @@ bool FCharacterProxy::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& b
 	return true;
 }
 
-void FCharacterProxy::InitialProxy(const FGameplayTag& InProxyType)
+void FCharacterProxy::InitialProxy(
+	const FGameplayTag& InProxyType
+	)
 {
 	Super::InitialProxy(InProxyType);
 
 	ProxyPtr = this;
-	
+
 	Title = GetTableRowProxy_Character()->Title;
 
 	struct FMyStruct
@@ -168,8 +186,8 @@ UItemProxy_Description_Character* FCharacterProxy::GetTableRowProxy_Character() 
 {
 	auto TableRowPtr = GetTableRowProxy();
 	auto ItemProxy_Description_SkillPtr = Cast<UItemProxy_Description_Character>(
-		TableRowPtr->ItemProxy_Description.LoadSynchronous()
-	);
+		 TableRowPtr->ItemProxy_Description.LoadSynchronous()
+		);
 	return ItemProxy_Description_SkillPtr;
 }
 
@@ -177,7 +195,9 @@ void FCharacterProxy::RelieveRootBind()
 {
 }
 
-AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
+AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(
+	const FTransform& Transform
+	)
 {
 	AHumanCharacter_AI* Result = nullptr;
 	if (ProxyCharacterPtr.IsValid())
@@ -187,29 +207,35 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 	{
 		FActorSpawnParameters SpawnParameters;
 
-		SpawnParameters.CustomPreSpawnInitalization = [this](auto ActorPtr)
-		{
-			auto GroupSharedInfoPtr = InventoryComponentPtr->GetOwner<AGroupManagger>();
-			
-			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
-			
-			if (AICharacterPtr && GroupSharedInfoPtr)
+		SpawnParameters.CustomPreSpawnInitalization = [this](
+			auto ActorPtr
+			)
 			{
-				AICharacterPtr->GetAIComponent()->bIsTeammate = true;
-				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(GetID());
-				AICharacterPtr->SetGroupSharedInfo(GroupSharedInfoPtr);
-			}
-		};
-		
+				auto GroupSharedInfoPtr = InventoryComponentPtr->GetOwner<AGroupManagger>();
+
+				auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+
+				if (AICharacterPtr && GroupSharedInfoPtr)
+				{
+					AICharacterPtr->GetAIComponent()->bIsTeammate = true;
+					AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(GetID());
+					AICharacterPtr->SetGroupSharedInfo(GroupSharedInfoPtr);
+				}
+			};
+
 		Result =
 			InventoryComponentPtr->GetWorld()->SpawnActor<AHumanCharacter_AI>(
-				GetTableRowProxy_Character()->CharacterClass, Transform, SpawnParameters);
+			                                                                  GetTableRowProxy_Character()->
+			                                                                  CharacterClass,
+			                                                                  Transform,
+			                                                                  SpawnParameters
+			                                                                 );
 
 		ProxyCharacterPtr = Result;
 
 		// 注册
 		const auto CanActiveSocketMap = GetSockets();
-		for (const auto & Iter : CanActiveSocketMap)
+		for (const auto& Iter : CanActiveSocketMap)
 		{
 			auto ProxySPtr = InventoryComponentPtr->FindProxy(Iter.Value.GetAllocationedProxyID());
 			if (ProxySPtr)
@@ -218,7 +244,7 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 				if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 				{
 					auto WeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
-					if (WeaponProxySPtr )
+					if (WeaponProxySPtr)
 					{
 						WeaponProxySPtr->Allocation();
 						WeaponProxySPtr->GetWeaponSkill()->Allocation();
@@ -230,7 +256,7 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(const FTransform& Transform)
 				}
 			}
 		}
-		
+
 		Update2Client();
 	}
 	return Result;
@@ -246,7 +272,9 @@ void FCharacterProxy::DestroyCharacter()
 	ProxyCharacterPtr = nullptr;
 }
 
-FCharacterSocket FCharacterProxy::FindSocket(const FGameplayTag& SocketID) const
+FCharacterSocket FCharacterProxy::FindSocket(
+	const FGameplayTag& SocketID
+	) const
 {
 	if (TeammateConfigureMap.Contains(SocketID))
 	{
@@ -256,13 +284,15 @@ FCharacterSocket FCharacterProxy::FindSocket(const FGameplayTag& SocketID) const
 	return FCharacterSocket();
 }
 
-FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& InProxyType) const
+FCharacterSocket FCharacterProxy::FindSocketByType(
+	const FGameplayTag& InProxyType
+	) const
 {
 	if (ProxyCharacterPtr.IsValid())
 	{
 		for (const auto& Iter : TeammateConfigureMap)
 		{
-			auto ProxySPtr = DynamicCastSharedPtr<FBasicProxy>( InventoryComponentPtr->FindProxy_BySocket(Iter.Value));
+			auto ProxySPtr = DynamicCastSharedPtr<FBasicProxy>(InventoryComponentPtr->FindProxy_BySocket(Iter.Value));
 			if (ProxySPtr && ProxySPtr->GetProxyType() == ProxyType)
 			{
 				return Iter.Value;
@@ -273,8 +303,10 @@ FCharacterSocket FCharacterProxy::FindSocketByType(const FGameplayTag& InProxyTy
 	return FCharacterSocket();
 }
 
-void FCharacterProxy::GetWeaponSocket(FCharacterSocket& FirstWeaponSocketInfoSPtr,
-                                      FCharacterSocket& SecondWeaponSocketInfoSPtr)
+void FCharacterProxy::GetWeaponSocket(
+	FCharacterSocket& FirstWeaponSocketInfoSPtr,
+	FCharacterSocket& SecondWeaponSocketInfoSPtr
+	)
 {
 	FirstWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	SecondWeaponSocketInfoSPtr = FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
@@ -290,7 +322,9 @@ TWeakObjectPtr<FCharacterProxy::FPawnType> FCharacterProxy::GetCharacterActor() 
 	return ProxyCharacterPtr;
 }
 
-void FCharacterProxy::UpdateSocket(const FCharacterSocket& Socket)
+void FCharacterProxy::UpdateSocket(
+	const FCharacterSocket& Socket
+	)
 {
 	// 判断插槽是否可以存放这个物品代理
 	if (Socket.Socket.MatchesTag(UGameplayTagsLibrary::ConsumableSocket))
@@ -345,9 +379,21 @@ void FCharacterProxy::UpdateSocket(const FCharacterSocket& Socket)
 	if (TeammateConfigureMap.Contains(Socket.Socket))
 	{
 		TeammateConfigureMap[Socket.Socket] = Socket;
-		
+
 		OnCharacterSocketUpdated.Broadcast(Socket, GetProxyType());
 	}
 
 	Update2Client();
+}
+
+FString FCharacterProxy::GetDisplayTitle() const
+{
+	if (Name.IsEmpty())
+	{
+		return Title;
+	}
+	else
+	{
+		return FString::Printf(TEXT("%s-%s"), *Title, *Name);
+	}
 }

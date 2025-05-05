@@ -19,7 +19,7 @@ struct FProxyIcon : public TStructVariable<FProxyIcon>
 
 inline void UProxyIcon::ResetToolUIByData(
 	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
-)
+	)
 {
 	if (!InBasicProxyPtr)
 	{
@@ -43,7 +43,7 @@ void UProxyIcon::ResetToolUIByData(
 void UProxyIcon::NativeOnMouseEnter(
 	const FGeometry& InGeometry,
 	const FPointerEvent& InMouseEvent
-)
+	)
 {
 	Super::NativeOnMouseEnter(InGeometry, InMouseEvent);
 
@@ -76,7 +76,7 @@ void UProxyIcon::NativeOnMouseEnter(
 
 void UProxyIcon::NativeOnMouseLeave(
 	const FPointerEvent& InMouseEvent
-)
+	)
 {
 	if (ItemDecriptionPtr)
 	{
@@ -93,15 +93,20 @@ void UProxyIcon::SetItemType()
 	if (ImagePtr)
 	{
 		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(ProxyType);
-		if (ProxyDTSPtr && ProxyDTSPtr->ItemProxy_Description)
+		if (ProxyDTSPtr)
 		{
-			ImagePtr->SetVisibility(ESlateVisibility::Visible);
+			if (auto ItemProxy_Description = ProxyDTSPtr->ItemProxy_Description.LoadSynchronous())
+			{
+				ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			AsyncLoadText(ProxyDTSPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon, ImagePtr);
+				AsyncLoadText(ItemProxy_Description->DefaultIcon, ImagePtr);
+
+				return;
+			}
 		}
 		else
 		{
-			checkNoEntry();
 		}
+		checkNoEntry();
 	}
 }

@@ -153,4 +153,6 @@ protected:
 
 	UPROPERTY(Transient)
 	UFocusIcon* FocusIconPtr = nullptr;
+
+	TObjectPtr<ACharacterBase>PreviousTargetCharacterPtr = nullptr;
 };

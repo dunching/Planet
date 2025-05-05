@@ -220,9 +220,46 @@ void URegularActionLayout::OnFocusCharacter(
 	ACharacterBase* TargetCharacterPtr
 )
 {
-	// 
+	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FRegularActionLayout::Get().FocusCharacterSocket));
+	if (!BorderPtr)
+	{
+		return;
+	}
+
+	auto ClearPrevious = [this, TargetCharacterPtr, BorderPtr]
+	{
+		if (FocusIconPtr)
+		{
+			auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
+				GetWorld(),
+				TargetPointSharedLayerName
+			);
+			if (ScreenLayer)
+			{
+				ScreenLayer->RemoveHoverWidget(FocusIconPtr);
+			}
+
+			FocusIconPtr = nullptr;
+		}
+
+		if (TargetCharacterPtr)
+		{
+		}
+		else
+		{
+			BorderPtr->ClearChildren();
+		}
+	};
+	
 	if (TargetCharacterPtr)
 	{
+		if (TargetCharacterPtr != PreviousTargetCharacterPtr)
+		{
+			ClearPrevious();
+			PreviousTargetCharacterPtr = TargetCharacterPtr;
+		}
+		
+		// 悬浮的锁定UI
 		auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
 			GetWorld(),
 			TargetPointSharedLayerName
@@ -242,33 +279,8 @@ void URegularActionLayout::OnFocusCharacter(
 				ScreenLayer->AddHoverWidget(TempFocusIconPtr);
 			}
 		}
-	}
-	else
-	{
-		if (FocusIconPtr)
-		{
-			auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-				GetWorld(),
-				TargetPointSharedLayerName
-			);
-			if (ScreenLayer)
-			{
-				ScreenLayer->RemoveHoverWidget(FocusIconPtr);
-			}
 
-			FocusIconPtr = nullptr;
-		}
-	}
-
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FRegularActionLayout::Get().FocusCharacterSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-
-	if (TargetCharacterPtr)
-	{
-		// 
+		// 上方的状态条
 		UFocusTitle* UIPtr = nullptr;
 		for (auto Iter : BorderPtr->GetAllChildren())
 		{
@@ -287,10 +299,11 @@ void URegularActionLayout::OnFocusCharacter(
 		{
 			UIPtr->SetTargetCharacter(TargetCharacterPtr);
 		}
+			
 	}
 	else
 	{
-		BorderPtr->ClearChildren();
+		ClearPrevious();
 	}
 }
 

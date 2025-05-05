@@ -342,6 +342,9 @@ FGameplayTag UGameplayTagsLibrary::Proxy_Character_Player =
 FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Functional =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.NPC.Functional")));
 
+FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Functional_Dummy =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.NPC.Functional.Dummy")));
+
 FGameplayTag UGameplayTagsLibrary::Proxy_Character_NPC_Assistional =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Proxy.Character.NPC.Assistional")));
 

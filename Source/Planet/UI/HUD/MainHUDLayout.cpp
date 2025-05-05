@@ -96,16 +96,23 @@ UMainMenuLayout* UMainHUDLayout::GetMenuLayout()
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
 	if (UIPtr)
 	{
-		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
-		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kMenuLayout))
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (auto Iter : ChildrensAry)
 		{
-			auto MenuInterfacePtr = Cast<UMainMenuLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
-			if (MenuInterfacePtr)
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(Iter);
+			if (!MenuInterfacePtr)
 			{
-				return MenuInterfacePtr;
+				continue;
 			}
+			if (MenuInterfacePtr->GetLayoutType() != ELayoutCommon::kMenuLayout)
+			{
+				continue;
+			}
+
+			return Cast<UMainMenuLayout>(MenuInterfacePtr);
 		}
 	}
+
 	return nullptr;
 }
 

@@ -50,6 +50,11 @@ protected:
 
 	virtual void TreeStart(FStateTreeExecutionContext& Context)override;
 
+	/**
+	 * 选择最近的目标
+	 * @param ChractersSet 
+	 * @return 
+	 */
 	TWeakObjectPtr<ACharacterBase> GetNewTargetCharacter(const TSet<TWeakObjectPtr<ACharacterBase>>&ChractersSet);
 	
 private:

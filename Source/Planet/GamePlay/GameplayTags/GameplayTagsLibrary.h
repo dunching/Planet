@@ -250,6 +250,8 @@ public:
 
 	static FGameplayTag Proxy_Character_NPC_Functional;
 
+	static FGameplayTag Proxy_Character_NPC_Functional_Dummy;
+
 	static FGameplayTag Proxy_Character_NPC_Assistional;
 
 #pragma endregion
