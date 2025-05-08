@@ -664,7 +664,7 @@ void UAllocationSkillsMenu::OnSelectedCharacterProxy(const TSharedPtr<FCharacter
 
 				SyncData();
 
-				ResetUI(CharacterPtr->GetCharacterProxy());
+				ResetUI(CurrentProxyPtr);
 
 				continue;
 			}
