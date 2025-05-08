@@ -55,7 +55,7 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 #endif
 }
 
-bool UCharacterAbilitySystemComponent::IsCanBeDamage() const
+bool UCharacterAbilitySystemComponent::IsCantBeDamage() const
 {
 	return IsInDeath() || IsUnSelected();
 }
@@ -70,7 +70,10 @@ bool UCharacterAbilitySystemComponent::IsInDeath() const
 
 bool UCharacterAbilitySystemComponent::IsUnSelected() const
 {
-	return false;
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
+		UGameplayTagsLibrary::State_Buff_CantBeSlected
+	);
 }
 
 bool UCharacterAbilitySystemComponent::IsRunning() const

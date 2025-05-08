@@ -202,12 +202,12 @@ void UPlanetAbilitySystemComponent::Replicate_UpdateGAParam_Implementation(
 		}
 		else
 		{
-			TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
+		}
+		TArray<UGameplayAbility*> Instances = AbilitySpec->GetAbilityInstances();
 
-			for (auto Instance : Instances)
-			{
-				Cast<USkill_Base>(Instance)->UpdateRegisterParam(TriggerEventData);
-			}
+		for (auto Instance : Instances)
+		{
+			Cast<USkill_Base>(Instance)->UpdateRegisterParam(TriggerEventData);
 		}
 	}
 }

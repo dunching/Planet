@@ -26,13 +26,20 @@ void UBasicFutures_Running::IntervalTick(
 	UAbilityTask_TimerHelper*,
 	float Interval,
 	float InDuration
-)
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		if (Interval > InDuration)
 		{
+			// 停止输入时
+			if (CharacterPtr->GetCharacterMovement()->GetCurrentAcceleration().Length() < 10.f)
+			{
+				K2_CancelAbility();
+				return;
+			}
+
 			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 			if (
 				CharacterAttributes->GetPP() >=
@@ -55,7 +62,7 @@ void UBasicFutures_Running::PreActivate(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
+	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
@@ -65,7 +72,7 @@ void UBasicFutures_Running::ActivateAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -84,9 +91,9 @@ void UBasicFutures_Running::ActivateAbility(
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-					UGameplayTagsLibrary::BaseFeature_Run,
-					RunningSpeedOffset.CurrentValue
-				);
+				                                               UGameplayTagsLibrary::BaseFeature_Run,
+				                                               RunningSpeedOffset.CurrentValue
+				                                              );
 
 				ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 			}
@@ -99,9 +106,9 @@ void UBasicFutures_Running::ActivateAbility(
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PP);
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-					UGameplayTagsLibrary::GEData_ModifyItem_PP,
-					-RunningConsume.CurrentValue
-				);
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_PP,
+				                                               -RunningConsume.CurrentValue
+				                                              );
 
 				RunningCostGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 			}
@@ -122,7 +129,7 @@ void UBasicFutures_Running::EndAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateEndAbility,
 	bool bWasCancelled
-)
+	)
 {
 	if (CharacterPtr)
 	{
@@ -136,12 +143,12 @@ void UBasicFutures_Running::EndAbility(
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-				UGameplayTagsLibrary::BaseFeature_Run,
-				RunningSpeedOffset.CurrentValue
-			);
+			                                               UGameplayTagsLibrary::BaseFeature_Run,
+			                                               RunningSpeedOffset.CurrentValue
+			                                              );
 
 			ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-			
+
 			BP_RemoveGameplayEffectFromOwnerWithHandle(RunningCostGEHandle);
 		}
 #endif
@@ -156,7 +163,7 @@ bool UBasicFutures_Running::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
 	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+	) const
 {
 	if (CharacterPtr)
 	{
@@ -180,7 +187,7 @@ void UBasicFutures_Running::ApplyCost(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo
-) const
+	) const
 {
 	Super::ApplyCost(Handle, ActorInfo, ActivationInfo);
 }

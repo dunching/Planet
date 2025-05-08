@@ -14,6 +14,8 @@ ADynamic_Weather::ADynamic_Weather(
 	//
 	// SetReplicatingMovement(true);
 
+	bIsSpatiallyLoaded = true;
+	
 	WeatherMap.Add(WeatherSettings::Clear_Skies, nullptr);
 	WeatherMap.Add(WeatherSettings::Cloudy, nullptr);
 	WeatherMap.Add(WeatherSettings::Foggy, nullptr);

@@ -88,6 +88,17 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
 	{
+		SwitchIsHomingToward(true);
+
+		CommitAbility(Handle, ActorInfo, ActivationInfo);
+	}
+#endif
+	
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
+	{
 		// 状态信息
 
 
@@ -95,28 +106,33 @@ void USkill_Active_Arrow_HomingToward::PerformAction(
 		{
 			auto TaskPtr = UAbilityTask_TimerHelper::DelayTask(this);
 			TaskPtr->SetDuration(Duration, 0.1f);
-			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationTick);
-			TaskPtr->OnFinished.BindUObject(this, &ThisClass::OnFinished);
+			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
+			if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+			{
+				TaskPtr->OnFinished.BindUObject(this, &ThisClass::OnFinished);
+			}
 			TaskPtr->ReadyForActivation();
 		}
-
-		SwitchIsHomingToward(true);
-
-		CommitAbility(Handle, ActorInfo, ActivationInfo);
 	}
-#endif
 }
 
-void USkill_Active_Arrow_HomingToward::DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration)
+float USkill_Active_Arrow_HomingToward::GetRemainTime() const
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode()  == NM_DedicatedServer)
+	return RemainTime;
+}
+
+void USkill_Active_Arrow_HomingToward::OnDuration(UAbilityTask_TimerHelper*, float CurrentTiem, float TotalTime)
+{
+	if (FMath::IsNearlyZero(TotalTime))
 	{
-		if (CharacterStateInfoSPtr)
-		{
-		}
+		return;
 	}
-#endif
+	
+	RemainTime = (TotalTime - CurrentTiem) / TotalTime;
+	if (RemainTime < 0.f)
+	{
+		RemainTime = 0.f;
+	}
 }
 
 bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)

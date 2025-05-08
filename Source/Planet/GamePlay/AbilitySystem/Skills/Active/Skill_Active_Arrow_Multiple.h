@@ -49,11 +49,13 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
-	void DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);
-
+	void OnDuration(UAbilityTask_TimerHelper*, float CurrentTiem, float TotalTime);
+	
 	bool OnFinished(UAbilityTask_TimerHelper*);
 
 	void SwitchIsMultiple(bool bIsMultiple);
+
+	virtual float GetRemainTime()const override;
 
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr;
 	
@@ -62,4 +64,5 @@ protected:
 	
 	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
+	float RemainTime = 0.f;
 };

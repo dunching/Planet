@@ -99,6 +99,8 @@ protected:
 		const FGameplayAbilityActivationInfo ActivationInfo
 		) const override;
 
+	virtual float GetRemainTime()const override;
+
 	void PlayMontage();
 
 	void MakeDamage();
@@ -109,5 +111,9 @@ protected:
 		float IntervalTime
 		);
 
+	void OnDuration(UAbilityTask_TimerHelper*, float CurrentTiem, float TotalTime);
+	
 	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
+	
+	float RemainTime = 0.f;
 };

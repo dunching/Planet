@@ -50,13 +50,13 @@
 
 ACharacterBase::ACharacterBase(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(
-	  ObjectInitializer.
-	  SetDefaultSubobjectClass<UPlanetCharacterMovementComponent>(
-		  CharacterMovementComponentName
-	  )
-  )
+	) :
+	  Super(
+	        ObjectInitializer.
+	        SetDefaultSubobjectClass<UPlanetCharacterMovementComponent>(
+	                                                                    CharacterMovementComponentName
+	                                                                   )
+	       )
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -83,30 +83,30 @@ ACharacterBase::ACharacterBase(
 	}
 
 	CharacterAttributesComponentPtr = CreateDefaultSubobject<UCharacterAttributesComponent>(
-		UCharacterAttributesComponent::ComponentName
-	);
+		 UCharacterAttributesComponent::ComponentName
+		);
 	// CharacterAttributesComponentPtr->CharacterAttributeSetPtr = ;
 
 	AbilitySystemComponentPtr = CreateDefaultSubobject<UCharacterAbilitySystemComponent>(
-		UCharacterAbilitySystemComponent::ComponentName
-	);
+		 UCharacterAbilitySystemComponent::ComponentName
+		);
 	AbilitySystemComponentPtr->AddSpawnedAttribute(
-		CreateDefaultSubobject<UAS_Character>(
-			TEXT("CharacterAttributes1")
-		)
-	);
+	                                               CreateDefaultSubobject<UAS_Character>(
+		                                                TEXT("CharacterAttributes1")
+		                                               )
+	                                              );
 
 	TalentAllocationComponentPtr = CreateDefaultSubobject<UTalentAllocationComponent>(
-		UTalentAllocationComponent::ComponentName
-	);
+		 UTalentAllocationComponent::ComponentName
+		);
 
 	StateProcessorComponentPtr = CreateDefaultSubobject<UStateProcessorComponent>(
-		UStateProcessorComponent::ComponentName
-	);
+		 UStateProcessorComponent::ComponentName
+		);
 
 	CharacterTitleComponentPtr = CreateDefaultSubobject<UCharacterTitleComponent>(
-		UCharacterTitleComponent::ComponentName
-	);
+		 UCharacterTitleComponent::ComponentName
+		);
 	CharacterTitleComponentPtr->SetupAttachment(RootComponent);
 
 	ProxyProcessComponentPtr = CreateDefaultSubobject<UProxyProcessComponent>(UProxyProcessComponent::ComponentName);
@@ -114,8 +114,8 @@ ACharacterBase::ACharacterBase(
 	ConversationComponentPtr = CreateDefaultSubobject<UConversationComponent>(UConversationComponent::ComponentName);
 
 	SceneActorInteractionComponentPtr = CreateDefaultSubobject<USceneActorInteractionComponent>(
-		USceneActorInteractionComponent::ComponentName
-	);
+		 USceneActorInteractionComponent::ComponentName
+		);
 }
 
 ACharacterBase::~ACharacterBase()
@@ -124,7 +124,7 @@ ACharacterBase::~ACharacterBase()
 
 void ACharacterBase::OnConstruction(
 	const FTransform& Transform
-)
+	)
 {
 	Super::OnConstruction(Transform);
 }
@@ -142,12 +142,12 @@ void ACharacterBase::BeginPlay()
 	// 绑定一些会影响到 Character行动的数据
 
 	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-		CharacterAttributeSetPtr->GetHPAttribute()
-	).AddUObject(this, &ThisClass::OnHPChanged);
+		 CharacterAttributeSetPtr->GetHPAttribute()
+		).AddUObject(this, &ThisClass::OnHPChanged);
 
 	GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-		CharacterAttributeSetPtr->GetMoveSpeedAttribute()
-	).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
+		 CharacterAttributeSetPtr->GetMoveSpeedAttribute()
+		).AddUObject(this, &ThisClass::OnMoveSpeedChanged);
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
 	{
@@ -159,9 +159,9 @@ void ACharacterBase::BeginPlay()
 #endif
 
 	auto& DelegateRef = GetAbilitySystemComponent()->RegisterGameplayTagEvent(
-		UGameplayTagsLibrary::State_Dying,
-		EGameplayTagEventType::NewOrRemoved
-	);
+	                                                                          UGameplayTagsLibrary::State_Dying,
+	                                                                          EGameplayTagEventType::NewOrRemoved
+	                                                                         );
 	OnOwnedDeathTagDelegateHandle = DelegateRef.AddUObject(this, &ThisClass::OnDeathing);
 
 	OnMoveSpeedChangedImp(CharacterAttributeSetPtr->GetMoveSpeed());
@@ -180,7 +180,7 @@ void ACharacterBase::Destroyed()
 
 void ACharacterBase::EndPlay(
 	const EEndPlayReason::Type EndPlayReason
-)
+	)
 {
 	if (HPChangedHandle)
 	{
@@ -210,7 +210,7 @@ void ACharacterBase::PostInitializeComponents()
 
 void ACharacterBase::PossessedBy(
 	AController* NewController
-)
+	)
 {
 	Super::PossessedBy(NewController);
 
@@ -325,7 +325,7 @@ USkeletalMeshComponent* ACharacterBase::GetCopyPoseMesh() const
 
 bool ACharacterBase::IsGroupmate(
 	ACharacterBase* TargetCharacterPtr
-) const
+	) const
 {
 	return
 		GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
@@ -333,30 +333,23 @@ bool ACharacterBase::IsGroupmate(
 
 bool ACharacterBase::IsTeammate(
 	ACharacterBase* TargetCharacterPtr
-) const
+	) const
 {
 	return
 		GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(TargetCharacterPtr->GetCharacterProxy());
 }
 
-ACharacterBase* ACharacterBase::GetFocusActor() const
+TObjectPtr<ACharacterBase> ACharacterBase::GetFocusActor() const
 {
-	if (IsPlayerControlled())
+	const auto TargetCharactersAry = GetStateProcessorComponent()->GetTargetCharactersAry();
+	if (TargetCharactersAry.IsEmpty())
 	{
-		auto PCPtr = GetController<APlanetPlayerController>();
-		auto TargetCharacterPtr = nullptr;
-		if (TargetCharacterPtr)
-		{
-			return TargetCharacterPtr;
-		}
 	}
 	else
 	{
-		auto ACPtr = GetController<AAIController>();
-		auto TargetCharacterPtr = Cast<ACharacterBase>(ACPtr->GetFocusActor());
-		if (TargetCharacterPtr)
+		if (TargetCharactersAry[0].IsValid())
 		{
-			return TargetCharacterPtr;
+			return TargetCharactersAry[0].Get();
 		}
 	}
 
@@ -365,14 +358,14 @@ ACharacterBase* ACharacterBase::GetFocusActor() const
 
 void ACharacterBase::SwitchAnimLink_Client_Implementation(
 	EAnimLinkClassType AnimLinkClassType
-)
+	)
 {
 	SwitchAnimLink(AnimLinkClassType);
 }
 
 void ACharacterBase::SetCampType_Implementation(
 	ECharacterCampType CharacterCampType
-)
+	)
 {
 	CharacterTitleComponentPtr->SetCampType(CharacterCampType);
 }
@@ -389,7 +382,7 @@ bool ACharacterBase::GetIsValidTarget() const
 
 void ACharacterBase::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps
-) const
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -412,7 +405,7 @@ void ACharacterBase::SpawnDefaultController()
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 		SpawnInfo.CustomPreSpawnInitalization = [this](
 			AActor* ActorPtr
-		)
+			)
 			{
 				auto AIControllerPtr = Cast<APlanetAIController>(ActorPtr);
 				if (AIControllerPtr)
@@ -423,11 +416,11 @@ void ACharacterBase::SpawnDefaultController()
 		SpawnInfo.OverrideLevel = GetLevel();
 		SpawnInfo.ObjectFlags |= RF_Transient; // We never want to save AI controllers into a map
 		AController* NewController = GetWorld()->SpawnActor<AController>(
-			AIControllerClass,
-			GetActorLocation(),
-			GetActorRotation(),
-			SpawnInfo
-		);
+		                                                                 AIControllerClass,
+		                                                                 GetActorLocation(),
+		                                                                 GetActorRotation(),
+		                                                                 SpawnInfo
+		                                                                );
 		if (NewController != nullptr)
 		{
 			// if successful will result in setting this->Controller 
@@ -441,7 +434,7 @@ void ACharacterBase::SpawnDefaultController()
 
 void ACharacterBase::OnGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
-)
+	)
 {
 	OnInitaliedGroupSharedInfo();
 
@@ -455,30 +448,30 @@ void ACharacterBase::OnGroupManaggerReady(
 #endif
 
 	ForEachComponent(
-		false,
-		[this](
-		UActorComponent* ComponentPtr
-	)
-		{
-			auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
-			if (GroupSharedInterfacePtr)
-			{
-				GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
-			}
-		}
-	);
+	                 false,
+	                 [this](
+	                 UActorComponent* ComponentPtr
+	                 )
+	                 {
+		                 auto GroupSharedInterfacePtr = Cast<IGroupManaggerInterface>(ComponentPtr);
+		                 if (GroupSharedInterfacePtr)
+		                 {
+			                 GroupSharedInterfacePtr->OnGroupManaggerReady(GroupManaggerPtr);
+		                 }
+	                 }
+	                );
 }
 
 void ACharacterBase::OnMoveSpeedChanged(
 	const FOnAttributeChangeData& CurrentValue
-)
+	)
 {
 	OnMoveSpeedChangedImp(CurrentValue.NewValue);
 }
 
 void ACharacterBase::OnMoveSpeedChangedImp(
 	float Value
-)
+	)
 {
 	GetCharacterMovement()->MaxWalkSpeed = Value;
 	GetCharacterMovement()->MaxFlySpeed = Value;
@@ -486,7 +479,7 @@ void ACharacterBase::OnMoveSpeedChangedImp(
 
 void ACharacterBase::OnHPChanged(
 	const FOnAttributeChangeData& CurrentValue
-)
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -535,7 +528,7 @@ void ACharacterBase::OnRep_GroupSharedInfoChanged()
 void ACharacterBase::OnDeathing(
 	const FGameplayTag Tag,
 	int32 Count
-)
+	)
 {
 }
 
@@ -549,19 +542,19 @@ void ACharacterBase::DoDeathing()
 
 void ACharacterBase::HasbeenInteracted(
 	ACharacterBase* CharacterPtr
-)
+	)
 {
 }
 
 void ACharacterBase::HasBeenLookingAt(
 	ACharacterBase* CharacterPtr
-)
+	)
 {
 }
 
 void ACharacterBase::HasBeenStartedLookAt(
 	ACharacterBase* CharacterPtr
-)
+	)
 {
 }
 

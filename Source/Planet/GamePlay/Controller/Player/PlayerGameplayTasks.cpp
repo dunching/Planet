@@ -167,14 +167,12 @@ void UGameplayTask_TeleportPlayer::Activate()
 #if UE_EDITOR || UE_SERVER
 	if (TargetPCPtr->GetLocalRole() == ROLE_AutonomousProxy)
 	{
-		TargetPCPtr->GetGameplayTasksComponent()->OpenWorldWeather = UWeatherSystem::GetInstance()->GetDynamicWeather()
-			->GetCurrentWeather();
-
-		// 改变天气
-		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(Weather);
 	}
 #endif
 
+	TargetPCPtr->GetGameplayTasksComponent()->OpenWorldWeather = UWeatherSystem::GetInstance()->GetDynamicWeather()
+		->GetCurrentWeather();
+	
 #if UE_EDITOR || UE_SERVER
 	if (TargetPCPtr->GetNetMode() == NM_DedicatedServer)
 	{
@@ -208,6 +206,15 @@ void UGameplayTask_TeleportPlayer::TickTask(
 		{
 			if ((CurrentWaitTime >= MinWaitTime) && bIsOnLanded)
 			{
+#if UE_EDITOR || UE_SERVER
+				if (TargetPCPtr->GetLocalRole() == ROLE_AutonomousProxy)
+				{
+				}
+#endif
+
+				// 改变天气
+				// UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(Weather);
+				
 				EndTask();
 			}
 		}

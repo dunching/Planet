@@ -66,6 +66,7 @@ void USkill_Active_BYWD::PerformAction(
 			                     ItemProxy_DescriptionPtr->DamageFrequency.PerLevelValue[0]
 			                    );
 			TaskPtr->IntervalDelegate.BindUObject(this, &ThisClass::IntervalDelegate);
+			TaskPtr->DurationDelegate.BindUObject(this, &ThisClass::OnDuration);
 			TaskPtr->ReadyForActivation();
 		}
 	}
@@ -169,6 +170,11 @@ void USkill_Active_BYWD::ApplyCost(
 	}
 }
 
+float USkill_Active_BYWD::GetRemainTime() const
+{
+	return RemainTime;
+}
+
 void USkill_Active_BYWD::PlayMontage()
 {
 	if (
@@ -209,6 +215,24 @@ void USkill_Active_BYWD::IntervalDelegate(
 		MakeDamage();
 	}
 #endif
+}
+
+void USkill_Active_BYWD::OnDuration(
+	UAbilityTask_TimerHelper*,
+	float CurrentTiem,
+	float TotalTime
+	)
+{
+	if (FMath::IsNearlyZero(TotalTime))
+	{
+		return;
+	}
+	
+	RemainTime = (TotalTime - CurrentTiem) / TotalTime;
+	if (RemainTime < 0.f)
+	{
+		RemainTime = 0.f;
+	}
 }
 
 void USkill_Active_BYWD::MakeDamage()
@@ -265,7 +289,7 @@ void USkill_Active_BYWD::MakeDamage()
 				{
 					continue;
 				}
-				if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCanBeDamage())
+				if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
 				{
 					continue;
 				}

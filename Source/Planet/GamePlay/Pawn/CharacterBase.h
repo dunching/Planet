@@ -123,7 +123,7 @@ public:
 
 	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr) const;
 
-	ACharacterBase* GetFocusActor() const;
+	TObjectPtr<ACharacterBase> GetFocusActor() const;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);

@@ -185,7 +185,7 @@ void ATornado::OnBeginOverlap(
 			{
 				return;
 			}
-			if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCanBeDamage())
+			if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
 			{
 				return;
 			}

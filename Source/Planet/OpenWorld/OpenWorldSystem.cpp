@@ -394,11 +394,12 @@ FGameplayTag UOpenWorldSubSystem::GetTeleportWeather(
 		int32 CurrentIndex = 0;
 		for (const auto& Iter : TeleportDTPtr->WeatherTagMap)
 		{
-			CurrentIndex++;
 			if (CurrentIndex >= Index)
 			{
 				NewWeather = Iter;
+				break;
 			}
+			CurrentIndex++;
 		}
 	}
 	return NewWeather; 

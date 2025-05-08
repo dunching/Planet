@@ -254,7 +254,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 				{
 					continue;
 				}
-				if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCanBeDamage())
+				if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
 				{
 					continue;
 				}

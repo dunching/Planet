@@ -148,7 +148,7 @@ void USkill_WeaponActive_Bow::StartTasksLink()
 
 void USkill_WeaponActive_Bow::OnProjectileBounce(
 	UPrimitiveComponent* OverlappedComponent,
-	AActor* OtherActor,
+	AActor* OtherActor, 
 	UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex,
 	bool bFromSweep,
@@ -162,7 +162,7 @@ void USkill_WeaponActive_Bow::OnProjectileBounce(
 		{
 			return;
 		}
-		if (OtherCharacterPtr->GetCharacterAbilitySystemComponent()->IsCanBeDamage())
+		if (OtherCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
 		{
 			return;
 		}
@@ -234,66 +234,72 @@ void USkill_WeaponActive_Bow::EmitProjectile(float OffsetAroundZ)const
 	ACharacterBase* HomingTarget = nullptr;
 	if (RegisterParamSPtr && RegisterParamSPtr->bIsHomingTowards)
 	{
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
-
-		FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SweepWidth);
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(CharacterPtr);
-
-		TArray<struct FHitResult> OutHits;
-		if (CharacterPtr->GetWorld()->SweepMultiByObjectType(
-			OutHits,
-			EmitTransform.GetLocation(),
-			EmitTransform.GetLocation() + (CharacterPtr->GetActorForwardVector() * AttackDistance),
-			FQuat::Identity,
-			ObjectQueryParams,
-			CollisionShape,
-			Params
-		))
-		{
-			for (const auto& Iter : OutHits)
-			{
-				auto OtherCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
-				if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
-				{
-					continue;
-				}
-				else if (FVector::Distance(OtherCharacterPtr->GetActorLocation(), CharacterPtr->GetActorLocation()) < SweepWidth)
-				{
-					continue;
-				}
-
-				// 初始角度
-				const auto OriginRot = UKismetMathLibrary::MakeRotFromZX(
-					-UKismetGravityLibrary::GetGravity(),
-					CharacterPtr->GetActorForwardVector()
-				);
-				EmitTransform.SetRotation((OriginRot + OffsetRot).Quaternion());
-
-				HomingTarget = OtherCharacterPtr;
-
-				break;
-			}
-		}
-	}
-	else
-	{
 		auto FocusActorPtr = HasFocusActor();
 		if (FocusActorPtr)
 		{
+			HomingTarget = FocusActorPtr;
 			auto OrgineRot = (FocusActorPtr->GetActorLocation() - EmitTransform.GetLocation()).Rotation();
 			EmitTransform.SetRotation((OrgineRot + OffsetRot).Quaternion());
 		}
 		else
 		{
-			auto OrgineRot = UKismetMathLibrary::MakeRotFromZX(
-				-UKismetGravityLibrary::GetGravity(),
-				CharacterPtr->GetActorForwardVector()
-			);
-			EmitTransform.SetRotation((OrgineRot +OffsetRot).Quaternion());
+			FCollisionObjectQueryParams ObjectQueryParams;
+			ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+			FCollisionShape CollisionShape = FCollisionShape::MakeSphere(SweepWidth);
+
+			FCollisionQueryParams Params;
+			Params.AddIgnoredActor(CharacterPtr);
+
+			TArray<struct FHitResult> OutHits;
+			if (CharacterPtr->GetWorld()->SweepMultiByObjectType(
+				OutHits,
+				EmitTransform.GetLocation(),
+				EmitTransform.GetLocation() + (CharacterPtr->GetActorForwardVector() * AttackDistance),
+				FQuat::Identity,
+				ObjectQueryParams,
+				CollisionShape,
+				Params
+			))
+			{
+				// 初始角度
+				const auto OriginRot = UKismetMathLibrary::MakeRotFromZX(
+					-UKismetGravityLibrary::GetGravity(),
+					CharacterPtr->GetActorForwardVector()
+				);
+				const auto Dir = (OriginRot + OffsetRot).Vector();
+				const auto CharacterLocation = CharacterPtr->GetActorLocation();
+				
+				float Dot = 0.f;
+
+				for (const auto& Iter : OutHits)
+				{
+					auto OtherCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+					if (CharacterPtr->IsGroupmate(OtherCharacterPtr))
+					{
+						continue;
+					}
+
+					const auto TargetDir = (OtherCharacterPtr->GetActorLocation() - CharacterLocation).GetSafeNormal();
+					const auto NewDot = FVector::DotProduct(TargetDir, Dir);
+					if (NewDot  > Dot)
+					{
+						Dot = NewDot;
+						HomingTarget = OtherCharacterPtr;
+					}
+				}
+				
+				EmitTransform.SetRotation((OriginRot + OffsetRot).Quaternion());
+			}
 		}
+	}
+	else
+	{
+		auto OrgineRot = UKismetMathLibrary::MakeRotFromZX(
+			-UKismetGravityLibrary::GetGravity(),
+			CharacterPtr->GetActorForwardVector()
+		);
+		EmitTransform.SetRotation((OrgineRot +OffsetRot).Quaternion());
 	}
 
 	FActorSpawnParameters SpawnParameters;

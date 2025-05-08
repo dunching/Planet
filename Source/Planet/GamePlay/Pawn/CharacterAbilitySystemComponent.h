@@ -131,7 +131,7 @@ public:
 
 	virtual void BeginPlay() override;
 
-	bool IsCanBeDamage() const;
+	bool IsCantBeDamage() const;
 
 	bool IsInDeath() const;
 

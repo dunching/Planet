@@ -110,7 +110,7 @@ void ATractionPoint::CheckTarget()
 			{
 				return;
 			}
-			if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCanBeDamage())
+			if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
 			{
 				return;
 			}

@@ -49,8 +49,10 @@ protected:
 
 protected:
 
-	void DurationTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);
+	virtual float GetRemainTime()const override;
 
+	void OnDuration(UAbilityTask_TimerHelper*, float CurrentTiem, float TotalTime);
+	
 	bool OnFinished(UAbilityTask_TimerHelper*);
 
 	void SwitchIsHomingToward(bool bIsHomingToward);
@@ -62,4 +64,5 @@ protected:
 	
 	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
+	float RemainTime = 0.f;
 };
