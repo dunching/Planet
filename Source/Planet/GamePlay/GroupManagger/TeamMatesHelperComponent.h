@@ -179,6 +179,8 @@ private:
 	 */
 	void UpdateSensingCharacters();
 
+	bool CheckCharacterIsValid(const TWeakObjectPtr<ACharacterBase>& CharacterPtr);
+	
 #pragma region RPC
 
 public:

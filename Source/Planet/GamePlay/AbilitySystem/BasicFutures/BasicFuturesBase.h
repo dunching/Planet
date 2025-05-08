@@ -25,8 +25,12 @@ public:
 
 protected:
 
+	virtual UGameplayEffect* GetCooldownGameplayEffect() const override;
+
+	virtual UGameplayEffect* GetCostGameplayEffect() const override;
+
 	// virtual void InitalDefaultTags()override;
 
-	ACharacterBase* CharacterPtr = nullptr;
+	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 };

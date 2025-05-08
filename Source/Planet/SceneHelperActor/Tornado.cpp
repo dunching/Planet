@@ -59,7 +59,7 @@ void ATornado::Tick(
 			                                                 GetCharacterAttributes();
 			auto CharacterAbilitySystemComponentPtr = OwnerCharacterPtr->GetCharacterAbilitySystemComponent();
 			auto SpecHandle = CharacterAbilitySystemComponentPtr->MakeOutgoingSpec(
-				UAssetRefMap::GetInstance()->DamageClass,
+				UAssetRefMap::GetInstance()->OnceGEClass,
 				1,
 				CharacterAbilitySystemComponentPtr->MakeEffectContext()
 			);

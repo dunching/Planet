@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "GameplayTagContainer.h"
 #include "Engine/World.h"
 
 #include "OpenWorldSystem.generated.h"
@@ -73,6 +75,10 @@ public:
 
 	TSoftObjectPtr<ATeleport> GetTeleport(ETeleport ChallengeLevelType)const;
 
+	FTableRow_Teleport* GetTeleportDT(ETeleport ChallengeLevelType)const;
+
+	FGameplayTag GetTeleportWeather(ETeleport ChallengeLevelType)const;
+
 	/**
 	 * 根据指定挑战关卡和生成NPC数量 返回生成位置
 	 * @param ChallengeLevelType 
@@ -83,9 +89,4 @@ public:
 	
 private:
 
-	/*
-	 *	角色进入副本之前在开放世界的位置信息
-	 */
-	FTransform OpenWorldTransform = FTransform::Identity;
-	
 };

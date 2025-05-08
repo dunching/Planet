@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "HumanCharacter_AI.h"
+#include "HumanInteractionBase.h"
 
 #include "InputProcessor.h"
 
@@ -12,11 +13,11 @@ class AHumanCharacter_AI;
 
 namespace HumanProcessor
 {
-	class FHumanInteractionWithNPCProcessor : public FInputProcessor
+	class FHumanInteractionWithNPCProcessor : public FHumanInteractionBaseProcessor
 	{
 	private:
 
-		GENERATIONCLASSINFO(FHumanInteractionWithNPCProcessor, FInputProcessor);
+		GENERATIONCLASSINFO(FHumanInteractionWithNPCProcessor, FHumanInteractionBaseProcessor);
 
 	public:
 

@@ -101,9 +101,9 @@ public:
 		const FGameplayAbilitySpec& Spec
 	) override;
 
-	virtual UGameplayEffect* GetCooldownGameplayEffect() const;
+	virtual UGameplayEffect* GetCooldownGameplayEffect() const override;
 
-	virtual UGameplayEffect* GetCostGameplayEffect() const;
+	virtual UGameplayEffect* GetCostGameplayEffect() const override;
 
 	/**
 	 * 

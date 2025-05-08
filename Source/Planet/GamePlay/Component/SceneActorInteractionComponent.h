@@ -36,12 +36,6 @@ struct PLANET_API FGuideInterationSetting
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bIsTask = false;
 
-	/**
-	 * 可接取的任务是否已完成
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool bTaskHasCompleted = false;
-	
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	TSubclassOf<UTaskPromt> TaskPromtClass;
 
@@ -74,13 +68,8 @@ public:
 
 	void StopInteractionItem();
 
-	void ChangedInterationState(
+	virtual void ChangedInterationState(
 		const TSubclassOf<AGuideInteraction_Actor>& Item,
-		bool bIsEnable
-	);
-
-	virtual void ChangedInterationTaskState(
-		TSubclassOf<AGuideInteraction_Actor> Item,
 		bool bIsEnable
 	);
 

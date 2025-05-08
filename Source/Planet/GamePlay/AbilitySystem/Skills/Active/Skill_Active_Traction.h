@@ -24,13 +24,7 @@ class PLANET_API UItemProxy_Description_ActiveSkill_Traction : public UItemProxy
 
 public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FPerLevelValue Duration = {3, 4, 5, 6, 7};
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FPerLevelValue CD = {60, 50, 40, 30, 20};
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FPerLevelValue Cost = {60, 50, 40, 30, 20};
+	FPerLevelValue_Float Duration = {3, 4, 5, 6, 7};
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float BaseDamage = 100.f;

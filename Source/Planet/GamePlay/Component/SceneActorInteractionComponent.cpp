@@ -77,21 +77,6 @@ void USceneActorInteractionComponent::ChangedInterationState(
 	}
 }
 
-void USceneActorInteractionComponent::ChangedInterationTaskState(
-	TSubclassOf<AGuideInteraction_Actor> Item,
-	bool bIsEnable
-)
-{
-	for (auto& Iter : GuideInteractionAry)
-	{
-		if ((Iter.GuideInteraction == Item) && Iter.bIsTask)
-		{
-			Iter.bTaskHasCompleted = bIsEnable;
-			break;
-		}
-	}
-}
-
 bool USceneActorInteractionComponent::GetIsEnableInteraction() const
 {
 	return bEnableInteraction && !GetInteractionLists().IsEmpty();

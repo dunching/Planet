@@ -44,7 +44,7 @@ public:
 	);
 
 	void SwitchCantBeSelect(
-		bool bIsCanBeSelect
+		bool bIsCantBeSelect
 	);
 
 	void SetData(

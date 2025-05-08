@@ -21,6 +21,8 @@ class WEATHER_API ADynamic_Sky : public AActor
 
 public:
 
+	ADynamic_Sky(const FObjectInitializer& ObjectInitializer);
+
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintImplementableEvent)

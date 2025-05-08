@@ -202,3 +202,24 @@ void TestCommand::SwitchPlayerInput(
 	}
 #endif
 }
+
+void TestCommand::AddOrRemoveState(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		PCPtr->AddOrRemoveState(
+		                        FGameplayTag::RequestGameplayTag(*Args[0]),
+		                        static_cast<bool>(UKismetStringLibrary::Conv_StringToInt(Args[1]))
+		                       );
+	}
+#endif
+}

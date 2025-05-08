@@ -23,37 +23,38 @@ class ACharacterBase;
 
 UCLASS()
 class PLANET_API UPawnStateActionHUD :
-	public UMyUserWidget, 
+	public UMyUserWidget,
 	public IHUDInterface,
 	public ILayoutInterfacetion
 {
 	GENERATED_BODY()
 
 public:
-
 	using FOnInitaliedGroupSharedInfo =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 	using FOnAllocationSkillChangedHandle =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
 	using FOnCanAciveSkillChangedHandle =
-		TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-	virtual void NativeConstruct()override;
+	virtual void NativeConstruct() override;
 
-	virtual void NativeDestruct()override;
+	virtual void NativeDestruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeTick(
+		const FGeometry& MyGeometry,
+		float InDeltaTime
+		) override;
 
-	virtual void ResetUIByData()override;
+	virtual void ResetUIByData() override;
 
-	virtual ELayoutCommon GetLayoutType() const  override final;
-	
-	ACharacterBase* CharacterPtr = nullptr;
+	virtual ELayoutCommon GetLayoutType() const override final;
+
+	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 protected:
-
 	void BindEvent();
 
 	void InitialTalentUI();
@@ -63,17 +64,16 @@ protected:
 	void InitialWeaponSkillIcon();
 
 	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfoHandle;
-	
+
 	TArray<FOnAllocationSkillChangedHandle> OnAllocationSkillChangedDelegateAry;
 
 	FOnCanAciveSkillChangedHandle OnCanAciveSkillChangedHandle;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UState_Talent_NuQi>State_Talent_NuQi_Class;
-	
+	TSubclassOf<UState_Talent_NuQi> State_Talent_NuQi_Class;
+
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UState_Talent_YinYang>Talent_YinYang_Class;
+	TSubclassOf<UState_Talent_YinYang> Talent_YinYang_Class;
 
 private:
-
 };

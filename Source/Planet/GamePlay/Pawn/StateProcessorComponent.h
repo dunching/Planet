@@ -121,7 +121,7 @@ protected:
 
 	void OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr);
 
-	void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
+	virtual void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
 
 #pragma region GAs
 #pragma endregion GAs

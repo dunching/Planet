@@ -344,13 +344,24 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::AddProxy_Weapon(
 
 	ResultPtr->ProxyType = ProxyType;
 	ResultPtr->InventoryComponentPtr = this;
-	ResultPtr->WeaponSkillID =
-		AddProxy_Skill(ResultPtr->GetTableRowProxy_WeaponExtendInfo()->WeaponSkillProxyType)->GetID();
+	
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		ResultPtr->WeaponSkillID =
+			AddProxy_Skill(ResultPtr->GetTableRowProxy_WeaponExtendInfo()->WeaponSkillProxyType)->GetID();
+	}
+#endif
 
 	ProxysAry.Add(ResultPtr);
 	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
-	Proxy_Container.AddItem(ResultPtr);
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		Proxy_Container.AddItem(ResultPtr);
+	}
+#endif
 
 	OnWeaponProxyChanged(ResultPtr, EProxyModifyType::kNumChanged);
 
@@ -369,6 +380,13 @@ TSharedPtr<FWeaponProxy> UInventoryComponent::Update_Weapon(
 
 	ProxysAry.Add(ResultPtr);
 	ProxysMap.Add(ResultPtr->ID, ResultPtr);
+
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		Proxy_Container.UpdateItem(ResultPtr);
+	}
+#endif
 
 	OnWeaponProxyChanged(ResultPtr, EProxyModifyType::kPropertyChange);
 
@@ -450,7 +468,12 @@ TSharedPtr<FSkillProxy> UInventoryComponent::AddProxy_Skill(
 	ProxysAry.Add(ResultPtr);
 	ProxysMap.Add(ResultPtr->ID, ResultPtr);
 
-	Proxy_Container.AddItem(ResultPtr);
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		Proxy_Container.AddItem(ResultPtr);
+	}
+#endif
 
 	OnSkillProxyChanged(ResultPtr, EProxyModifyType::kNumChanged);
 

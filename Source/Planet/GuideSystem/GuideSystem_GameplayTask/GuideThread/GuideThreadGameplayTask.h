@@ -390,6 +390,8 @@ public:
 
 	TObjectPtr<ACharacterBase> HumanCharacterAI = nullptr;
 
+	bool bIsKill = true;
+	
 private:
 	void OnEffectOhterCharacter(
 		const FOnEffectedTawrgetCallback&

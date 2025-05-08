@@ -263,7 +263,8 @@ bool FSTT_GuideThread_Challenge_SpawnNPCs::SpawnNPC(
 				PCPtr->ServerSpawnCharacterAry(
 											NPCAry,
 											InstanceData.CharacterIDAry,
-											Pts
+											Pts,
+											ETeammateOption::kEnemy
 										   );
 
 				InstanceData.WaveIndex++;

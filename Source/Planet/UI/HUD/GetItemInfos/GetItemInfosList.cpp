@@ -2,8 +2,11 @@
 
 #include <Components/VerticalBox.h>
 
+#include "CharacterBase.h"
+#include "GameplayTagsLibrary.h"
 #include "ItemProxy_Minimal.h"
 #include "GetItemInfosItem.h"
+#include "InventoryComponent.h"
 #include "TemplateHelper.h"
 #include "ItemProxy_Character.h"
 
@@ -35,6 +38,118 @@ void UGetItemInfosList::ResetUIByData()
 {
 }
 
+void UGetItemInfosList::SetPlayerCharacter(
+	ACharacterBase* PlayeyCharacterPtr
+	)
+{
+	if (!PlayeyCharacterPtr)
+	{
+		return;
+	}
+	
+	{
+		auto Handle =
+			PlayeyCharacterPtr->GetInventoryComponent()->OnWeaponProxyChanged.AddCallback(
+				 std::bind(
+						   &UGetItemInfosList::OnWeaponProxyChanged,
+						   this,
+						   std::placeholders::_1,
+						   std::placeholders::_2
+						  )
+				);
+		Handle->bIsAutoUnregister = false;
+	}
+	{
+		auto Handle =
+			PlayeyCharacterPtr->GetInventoryComponent()->OnSkillProxyChanged.AddCallback(
+				 std::bind(
+						   &UGetItemInfosList::OnSkillProxyChanged,
+						   this,
+						   std::placeholders::_1,
+						   std::placeholders::_2
+						  )
+				);
+		Handle->bIsAutoUnregister = false;
+	}
+	{
+		auto Handle =
+			PlayeyCharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
+				 std::bind(
+						   &UGetItemInfosList::OnCoinProxyChanged,
+						   this,
+						   std::placeholders::_1,
+						   std::placeholders::_2,
+						   std::placeholders::_3
+						  )
+				);
+		Handle->bIsAutoUnregister = false;
+	}
+	{
+		auto Handle =
+			PlayeyCharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
+				 std::bind(
+						   &UGetItemInfosList::OnConsumableProxyChanged,
+						   this,
+						   std::placeholders::_1,
+						   std::placeholders::_2
+						  )
+				);
+		Handle->bIsAutoUnregister = false;
+	}
+	{
+		auto Handle =
+			PlayeyCharacterPtr->GetInventoryComponent()->OnGroupmateProxyChanged.AddCallback(
+				 std::bind(
+						   &UGetItemInfosList::OnGourpmateProxyChanged,
+						   this,
+						   std::placeholders::_1,
+						   std::placeholders::_2
+						  )
+				);
+		Handle->bIsAutoUnregister = false;
+	}
+}
+
+void UGetItemInfosList::OnWeaponProxyChanged(
+	const TSharedPtr<FWeaponProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	switch (ProxyModifyType)
+	{
+	case EProxyModifyType::kNumChanged:
+		{
+		}
+		break;
+	default:
+		{
+			return;
+		};
+	}
+
+	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGetItemInfosList::Get().VerticalBox));
+	if (UIPtr)
+	{
+		const auto ChildNum = UIPtr->GetChildrenCount();
+		if (ChildNum >= MaxDisplayNum)
+		{
+			OrderAry.Add(ProxyPtr);
+			WeaponPendingAry.Add({ProxyPtr, ProxyModifyType});
+		}
+		else
+		{
+			auto WidgetPtr = CreateWidget<UGetItemInfosItem>(this, GetItemInfosClass);
+			if (WidgetPtr)
+			{
+				WidgetPtr->OnFinished.BindUObject(this, &ThisClass::OnRemovedItem);
+				WidgetPtr->ResetToolUIByData(ProxyPtr, ProxyModifyType);
+
+				UIPtr->AddChild(WidgetPtr);
+			}
+		}
+	}
+}
+
 void UGetItemInfosList::OnSkillProxyChanged(
 	const TSharedPtr<FSkillProxy>& ProxyPtr,
 	EProxyModifyType ProxyModifyType
@@ -44,6 +159,17 @@ void UGetItemInfosList::OnSkillProxyChanged(
 	{
 	case EProxyModifyType::kNumChanged:
 		{
+			if (ProxyPtr)
+			{
+				if (ProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
+				{
+					return;
+				}
+			}
+			else
+			{
+				return;
+			}
 		}
 		break;
 	default:
@@ -228,7 +354,7 @@ void UGetItemInfosList::OnRemovedItem()
 				                  );
 
 				OrderAry.RemoveAt(Index);
-				SkillPendingAry.RemoveAt(SecondIndex);
+				CoinPendingAry.RemoveAt(SecondIndex);
 				return;
 			}
 		}

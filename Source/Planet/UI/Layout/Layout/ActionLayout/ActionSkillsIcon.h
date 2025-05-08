@@ -18,7 +18,7 @@ struct FStreamableHandle;
 struct FSkillProxy;
 
 /**
- *
+ * 主动技能和武器的使用状态
  */
 UCLASS()
 class PLANET_API UActionSkillsIcon : 

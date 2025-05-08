@@ -4,6 +4,19 @@
 #include <Kismet/GameplayStatics.h>
 #include <Components/ArrowComponent.h>
 
+ADynamic_Sky::ADynamic_Sky(
+	const FObjectInitializer& ObjectInitializer
+	)
+{
+	// SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	// bReplicates = true;
+	// NetPriority = 3.0f;
+	// SetNetUpdateFrequency(100.f);
+	//
+	// SetReplicatingMovement(true);
+
+}
+
 void ADynamic_Sky::BeginPlay()
 {
 	Super::BeginPlay();

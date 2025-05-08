@@ -49,7 +49,7 @@ bool FGameplayAbilityTargetData_Axe_RegisterParam::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
-)
+	)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 
@@ -75,7 +75,7 @@ USkill_WeaponActive_PickAxe::USkill_WeaponActive_PickAxe() :
 void USkill_WeaponActive_PickAxe::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
-)
+	)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -90,7 +90,7 @@ bool USkill_WeaponActive_PickAxe::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
 	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+	) const
 {
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
@@ -98,7 +98,7 @@ bool USkill_WeaponActive_PickAxe::CanActivateAbility(
 void USkill_WeaponActive_PickAxe::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
-)
+	)
 {
 	// Ins Or Spec
 
@@ -111,7 +111,7 @@ void USkill_WeaponActive_PickAxe::PreActivate(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
+	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
@@ -129,7 +129,7 @@ void USkill_WeaponActive_PickAxe::PerformAction(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -155,7 +155,7 @@ void USkill_WeaponActive_PickAxe::StartTasksLink()
 
 void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(
 	FName NotifyName
-)
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (
@@ -231,14 +231,15 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 	TArray<struct FHitResult> OutHits;
 	if (GetWorldImp()->SweepMultiByObjectType(
-		OutHits,
-		CharacterPtr->GetActorLocation(),
-		CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
-		FQuat::Identity,
-		ObjectQueryParams,
-		CollisionShape,
-		CapsuleParams
-	))
+	                                          OutHits,
+	                                          CharacterPtr->GetActorLocation(),
+	                                          CharacterPtr->GetActorLocation() + (
+		                                          CharacterPtr->GetActorForwardVector() * Distance),
+	                                          FQuat::Identity,
+	                                          ObjectQueryParams,
+	                                          CollisionShape,
+	                                          CapsuleParams
+	                                         ))
 	{
 		const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
@@ -249,20 +250,28 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
 			if (TargetCharacterPtr)
 			{
+				if (CharacterPtr->IsGroupmate(TargetCharacterPtr))
+				{
+					continue;
+				}
+				if (TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCanBeDamage())
+				{
+					continue;
+				}
 				TargetCharacterSet.Add(TargetCharacterPtr);
 			}
 		}
 
 		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->DamageClass, GetAbilityLevel());
+			MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-			UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
-			BaseDamage
-		);
+		                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+		                                               BaseDamage
+		                                              );
 
 		TArray<TWeakObjectPtr<AActor>> Ary;
 		for (auto Iter : TargetCharacterSet)
@@ -276,12 +285,12 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 
 		TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
 		const auto GEHandleAry = MyApplyGameplayEffectSpecToTarget(
-			GetCurrentAbilitySpecHandle(),
-			GetCurrentActorInfo(),
-			GetCurrentActivationInfo(),
-			SpecHandle,
-			TargetData
-		);
+		                                                           GetCurrentAbilitySpecHandle(),
+		                                                           GetCurrentActorInfo(),
+		                                                           GetCurrentActivationInfo(),
+		                                                           SpecHandle,
+		                                                           TargetData
+		                                                          );
 	}
 }
 
@@ -296,16 +305,17 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 
 		{
 			auto AbilityTask_PlayMontage_HumanPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-				this,
-				TEXT(""),
-				HumanMontage,
-				Rate
-			);
+				 this,
+				 TEXT(""),
+				 HumanMontage,
+				 Rate
+				);
 
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
 			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(
-				CharacterPtr->GetCharacterAbilitySystemComponent()
-			);
+			                                                            CharacterPtr->
+			                                                            GetCharacterAbilitySystemComponent()
+			                                                           );
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageOnInterrupted);
 
@@ -315,17 +325,18 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 		}
 		{
 			auto AbilityTask_PlayMontage_PickAxePtr = UAbilityTask_PlayMontage::CreatePlayMontageAndWaitProxy(
-				this,
-				TEXT(""),
-				PickAxeMontage,
-				WeaponActorPtr->GetMesh()->GetAnimInstance(),
-				Rate
-			);
+				 this,
+				 TEXT(""),
+				 PickAxeMontage,
+				 WeaponActorPtr->GetMesh()->GetAnimInstance(),
+				 Rate
+				);
 
 			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
 			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(
-				CharacterPtr->GetCharacterAbilitySystemComponent()
-			);
+			                                                              CharacterPtr->
+			                                                              GetCharacterAbilitySystemComponent()
+			                                                             );
 			// AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			// AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 

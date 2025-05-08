@@ -43,6 +43,9 @@ FGameplayTag UGameplayTagsLibrary::BaseFeature_MoveToLocation =
 FGameplayTag UGameplayTagsLibrary::BaseFeature_Dying =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Dying")));
 
+FGameplayTag UGameplayTagsLibrary::BaseFeature_SwitchWeapon =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.SwitchWeapon")));
+
 #pragma region MovementStateAbl
 FGameplayTag UGameplayTagsLibrary::MovementStateAble =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble")));
@@ -52,15 +55,25 @@ FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantJump =
 
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantPathFollowMove =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantPathFollowMove")));
+
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantPlayerInputMove")));
+
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRootMotion =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRootMotion")));
+
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRotation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRotation")));
 
+FGameplayTag UGameplayTagsLibrary::MovementStateAble_SkipSlideAlongSurface =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.SkipSlideAlongSurface")));
+
+FGameplayTag UGameplayTagsLibrary::MovementStateAble_SkipFlyingCheck =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.SkipFlyingCheck")));
+
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_Orient2Acce =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.Orient2Acce")));
+
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_UseCustomRotation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.UseCustomRotation")));
 #pragma endregion
@@ -77,6 +90,9 @@ FGameplayTag UGameplayTagsLibrary::State_Dying =
 
 FGameplayTag UGameplayTagsLibrary::State_MoveToLocation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MoveToLocation")));
+
+FGameplayTag UGameplayTagsLibrary::State_UsingCurrentWeapon =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.UsingCurrentWeapon")));
 
 FGameplayTag UGameplayTagsLibrary::State_Running =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Running")));

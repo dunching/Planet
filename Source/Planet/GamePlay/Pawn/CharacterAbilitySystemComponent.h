@@ -199,6 +199,12 @@ public:
 	void Jump();
 
 	/**
+	 * 切换武器
+	 */
+	UFUNCTION(Server, Reliable)
+	void SwitchWeapon();
+
+	/**
 	 * 被击飞
 	 * @param Height 
 	 * Only Server

@@ -94,11 +94,23 @@ public:
 #pragma endregion MenusUI
 
 #pragma region GEs
+	/**
+	 * 一次性
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>DamageClass;
+	TSubclassOf<UGameplayEffect>OnceGEClass;
 
+	/**
+	 * 周期性
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>DurationClass;
+	TSubclassOf<UGameplayEffect>DurationGEClass;
+
+	/**
+	 * 永久
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<UGameplayEffect>ForeverGEClass;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<UGameplayEffect>DamageCallbackClass;

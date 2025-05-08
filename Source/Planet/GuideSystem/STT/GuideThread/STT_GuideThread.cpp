@@ -2,6 +2,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Engine/TargetPoint.h"
+#include "Kismet/KismetMathLibrary.h"
 
 #include "HumanCharacter_Player.h"
 #include "GuideActor.h"
@@ -1045,12 +1046,16 @@ EStateTreeRunStatus FSTT_GuideThread_SpawnNPC::EnterState(
 		Transform.SetLocation(
 		                      InstanceData.PlayerCharacterPtr->GetActorLocation() + (InstanceData.PlayerCharacterPtr->
 			                      GetActorForwardVector() * 100)
-		                     );
+			                      );
+		Transform.SetRotation(
+		UKismetMathLibrary::MakeRotFromZX(FVector::UpVector, -PCPtr->GetPawn()->GetActorForwardVector()).Quaternion()
+							 );
 
 		PCPtr->ServerSpawnCharacter(
 		                            InstanceData.NPCClass,
 		                            InstanceData.NPC_ID,
-		                            Transform
+		                            Transform,
+		                            InstanceData.TeammateOption
 		                           );
 
 		InstanceData.GloabVariable_Main->SpwanedCharacterAry.Empty();
@@ -1135,8 +1140,9 @@ EStateTreeRunStatus FSTT_GuideThread_AttckCharacter::EnterState(
 	InstanceData.GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_Guide_AttckCharacter>(
 		 *InstanceData.TaskOwner
 		);
-	InstanceData.GameplayTaskPtr->HumanCharacterAI = InstanceData.HumanCharacterAI;
 	InstanceData.GameplayTaskPtr->SetPlayerCharacter(InstanceData.PlayerCharacterPtr);
+	InstanceData.GameplayTaskPtr->HumanCharacterAI = InstanceData.HumanCharacterAI;
+	InstanceData.GameplayTaskPtr->bIsKill = InstanceData.bIsKill;
 
 	InstanceData.GameplayTaskPtr->ReadyForActivation();
 

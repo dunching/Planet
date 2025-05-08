@@ -2,6 +2,8 @@
 
 #include <type_traits>
 
+#include "Dynamic_Weather.h"
+#include "WeatherSystem.h"
 #include "Engine/TargetPoint.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -31,6 +33,12 @@ void AMain_LevelScriptActor::ClearWorldProcessCache()
 				Iter->Destroy();
 			}
 		}
+	}
+#endif
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(WeatherSettings::Clear_Skies);
 	}
 #endif
 }

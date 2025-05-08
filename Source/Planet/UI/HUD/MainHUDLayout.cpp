@@ -121,16 +121,23 @@ UInteractionConversationLayout* UMainHUDLayout::GetConversationLayout()
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
 	if (UIPtr)
 	{
-		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
-		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kConversationLayout))
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (auto Iter : ChildrensAry)
 		{
-			auto LayoutUIPtr = Cast<UInteractionConversationLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
-			if (LayoutUIPtr)
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(Iter);
+			if (!MenuInterfacePtr)
 			{
-				return LayoutUIPtr;
+				continue;
 			}
+			if (MenuInterfacePtr->GetLayoutType() != ELayoutCommon::kConversationLayout)
+			{
+				continue;
+			}
+
+			return Cast<UInteractionConversationLayout>(MenuInterfacePtr);
 		}
 	}
+
 	return nullptr;
 }
 
@@ -139,16 +146,23 @@ UInteractionOptionsLayout* UMainHUDLayout::GetInteractionOptionsLayout()
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
 	if (UIPtr)
 	{
-		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
-		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kOptionLayout))
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (auto Iter : ChildrensAry)
 		{
-			auto LayoutUIPtr = Cast<UInteractionOptionsLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
-			if (LayoutUIPtr)
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(Iter);
+			if (!MenuInterfacePtr)
 			{
-				return LayoutUIPtr;
+				continue;
 			}
+			if (MenuInterfacePtr->GetLayoutType() != ELayoutCommon::kOptionLayout)
+			{
+				continue;
+			}
+
+			return Cast<UInteractionOptionsLayout>(MenuInterfacePtr);
 		}
 	}
+
 	return nullptr;
 }
 
@@ -157,16 +171,23 @@ URegularActionLayout* UMainHUDLayout::GetRegularActionLayout() const
 	auto UIPtr = Cast<UWidgetSwitcher>(GetWidgetFromName(FMainHUDLayout::Get().Layout_WidgetSwitcher));
 	if (UIPtr)
 	{
-		const auto CurrentIndex = UIPtr->GetActiveWidgetIndex();
-		if (CurrentIndex == static_cast<int32>(ELayoutCommon::kMenuLayout))
+		auto ChildrensAry = UIPtr->GetAllChildren();
+		for (auto Iter : ChildrensAry)
 		{
-			auto LayoutUIPtr = Cast<URegularActionLayout>(UIPtr->GetWidgetAtIndex(CurrentIndex));
-			if (LayoutUIPtr)
+			auto MenuInterfacePtr = Cast<ILayoutInterfacetion>(Iter);
+			if (!MenuInterfacePtr)
 			{
-				return LayoutUIPtr;
+				continue;
 			}
+			if (MenuInterfacePtr->GetLayoutType() != ELayoutCommon::kActionLayout)
+			{
+				continue;
+			}
+
+			return Cast<URegularActionLayout>(MenuInterfacePtr);
 		}
 	}
+
 	return nullptr;
 }
 

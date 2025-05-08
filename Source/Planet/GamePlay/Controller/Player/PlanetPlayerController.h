@@ -119,14 +119,16 @@ public:
 	void ServerSpawnCharacterAry(
 		const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
 		const TArray<FGuid>& IDAry,
-		const TArray<FTransform>& TransformAry
+		const TArray<FTransform>& TransformAry,
+		ETeammateOption TeammateOption
 		);
 
 	UFUNCTION(Server, Reliable)
 	void ServerSpawnCharacter(
 		TSubclassOf<AHumanCharacter_AI> CharacterClass,
 		const FGuid& ID,
-		const FTransform& Transform
+		const FTransform& Transform,
+		ETeammateOption TeammateOption
 		);
 
 	UFUNCTION(Server, Reliable)
@@ -163,6 +165,18 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void SwitchPlayerInput(const TArray< FString >& Args);
+
+	UFUNCTION(Server, Reliable)
+	void AdjustTime(const FDateTime& Time);
+
+	UFUNCTION(Server, Reliable)
+	void UpdateWeather(const FGameplayTag& WeatherType);
+
+	UFUNCTION(Server, Reliable)
+	void AddOrRemoveState(const FGameplayTag& StateTag, bool bIsAdd);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void AddOrRemoveStateImp(const FGameplayTag& StateTag, bool bIsAdd);
 
 #pragma region
 

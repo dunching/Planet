@@ -1,6 +1,7 @@
 #include "PlayerGameplayTasks.h"
 
 #include "CharacterAbilitySystemComponent.h"
+#include "Dynamic_Weather.h"
 #include "GameplayTagsLibrary.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
@@ -9,6 +10,7 @@
 #include "Teleport.h"
 #include "HumanCharacter_Player.h"
 #include "TransitionProcessor.h"
+#include "WeatherSystem.h"
 
 FName UPlayerControllerGameplayTasksComponent::ComponentName = TEXT("PlayerControllerGameplayTasksComponent");
 
@@ -21,58 +23,11 @@ void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest()
 
 void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel(
 	ETeleport Teleport
-)
+	)
 {
 	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
 
 	EntryChallengeLevel_Server(Teleport);
-}
-
-void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorldEnd(
-	bool bIsSuccess
-)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto OwnerPtr = GetOwner<FOwnerType>();
-		auto CharacterPtr = OwnerPtr->GetPawn<AHumanCharacter_Player>();
-		if (CharacterPtr)
-		{
-			FGameplayTagContainer FGameplayTagContainer(UGameplayTagsLibrary::BaseFeature_Dying);
-			CharacterPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&FGameplayTagContainer);
-		}
-	}
-#endif
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-	}
-#endif
-}
-
-void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld_ActiveTask_Implementation(
-	ETeleport Teleport
-)
-{
-	auto OwnerPtr = GetOwner<FOwnerType>();
-	if (!OwnerPtr)
-	{
-		return;
-	}
-
-	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_TeleportPlayer>(
-		TScriptInterface<IGameplayTaskOwnerInterface>(
-			this
-		)
-	);
-	GameplayTaskPtr->Teleport = Teleport;
-	GameplayTaskPtr->TargetPCPtr = OwnerPtr;
-	GameplayTaskPtr->OnEnd.AddUObject(this, &ThisClass::TeleportPlayerToOpenWorldEnd);
-
-	GameplayTaskPtr->ReadyForActivation();
 }
 
 void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld_Server_Implementation()
@@ -85,7 +40,7 @@ void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld_Server_I
 
 	auto Teleport = UOpenWorldSubSystem::GetInstance()->GetTeleportLastPtInOpenWorld(OwnerPtr);
 
-	TeleportPlayerToOpenWorld_ActiveTask(Teleport);
+	EntryLevel_ActiveTask(Teleport, OpenWorldWeather);
 }
 
 void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest_Server_Implementation()
@@ -98,66 +53,24 @@ void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest_Server_Imp
 
 	auto Teleport = UOpenWorldSubSystem::GetInstance()->GetTeleportPlayerToNearest(OwnerPtr);
 
-	TeleportPlayerToNearest_ActiveTask(Teleport);
-}
+	FGameplayTag NewWeather = UOpenWorldSubSystem::GetInstance()->GetTeleportWeather(Teleport);
 
-void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearest_ActiveTask_Implementation(
-	ETeleport Teleport
-)
-{
-	auto OwnerPtr = GetOwner<FOwnerType>();
-	if (!OwnerPtr)
-	{
-		return;
-	}
-
-	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_TeleportPlayer>(
-		TScriptInterface<IGameplayTaskOwnerInterface>(
-			this
-		)
-	);
-	GameplayTaskPtr->Teleport = Teleport;
-	GameplayTaskPtr->TargetPCPtr = OwnerPtr;
-	GameplayTaskPtr->OnEnd.AddUObject(this, &ThisClass::TeleportPlayerToNearestEnd);
-
-	GameplayTaskPtr->ReadyForActivation();
-}
-
-void UPlayerControllerGameplayTasksComponent::TeleportPlayerToNearestEnd(
-	bool bIsSuccess
-)
-{
-#if UE_EDITOR || UE_SERVER
-	if (GetNetMode() == NM_DedicatedServer)
-	{
-		auto OwnerPtr = GetOwner<FOwnerType>();
-		auto CharacterPtr = OwnerPtr->GetPawn<AHumanCharacter_Player>();
-		if (CharacterPtr)
-		{
-			FGameplayTagContainer FGameplayTagContainer(UGameplayTagsLibrary::BaseFeature_Dying);
-			CharacterPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&FGameplayTagContainer);
-		}
-	}
-#endif
-
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
-	}
-#endif
+	EntryLevel_ActiveTask(Teleport, NewWeather);
 }
 
 void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel_Server_Implementation(
 	ETeleport Teleport
-)
+	)
 {
-	EntryChallengeLevel_ActiveTask(Teleport);
+	FGameplayTag NewWeather = UOpenWorldSubSystem::GetInstance()->GetTeleportWeather(Teleport);
+
+	EntryLevel_ActiveTask(Teleport, NewWeather);
 }
 
-void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel_ActiveTask_Implementation(
-	ETeleport Teleport
-)
+void UPlayerControllerGameplayTasksComponent::EntryLevel_ActiveTask_Implementation(
+	ETeleport Teleport,
+	const FGameplayTag& NewWeather
+	)
 {
 	auto OwnerPtr = GetOwner<FOwnerType>();
 	if (!OwnerPtr)
@@ -166,20 +79,22 @@ void UPlayerControllerGameplayTasksComponent::EntryChallengeLevel_ActiveTask_Imp
 	}
 
 	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_TeleportPlayer>(
-		TScriptInterface<IGameplayTaskOwnerInterface>(
-			this
-		)
-	);
+	                                                                            TScriptInterface<
+		                                                                            IGameplayTaskOwnerInterface>(
+		                                                                             this
+		                                                                            )
+	                                                                           );
 	GameplayTaskPtr->Teleport = Teleport;
 	GameplayTaskPtr->TargetPCPtr = OwnerPtr;
-	GameplayTaskPtr->OnEnd.AddUObject(this, &ThisClass::EntryChallengeLevelEnd);
+	GameplayTaskPtr->Weather = NewWeather;
+	GameplayTaskPtr->OnEnd.AddUObject(this, &ThisClass::EntryLevelEnd);
 
 	GameplayTaskPtr->ReadyForActivation();
 }
 
-void UPlayerControllerGameplayTasksComponent::EntryChallengeLevelEnd(
+void UPlayerControllerGameplayTasksComponent::EntryLevelEnd(
 	bool bIsSuccess
-)
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -204,10 +119,29 @@ void UPlayerControllerGameplayTasksComponent::EntryChallengeLevelEnd(
 
 UPlayerControllerGameplayTasksComponent::UPlayerControllerGameplayTasksComponent(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
+}
+
+void UPlayerControllerGameplayTasksComponent::WaitPlayerLoad()
+{
+	auto OwnerPtr = GetOwner<FOwnerType>();
+	if (!OwnerPtr)
+	{
+		return;
+	}
+
+	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_WaitLoadComplete>(
+																				TScriptInterface<
+																					IGameplayTaskOwnerInterface>(
+																					 this
+																					)
+																			   );
+	GameplayTaskPtr->TargetPCPtr = OwnerPtr;
+
+	GameplayTaskPtr->ReadyForActivation();
 }
 
 void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld()
@@ -219,8 +153,8 @@ void UPlayerControllerGameplayTasksComponent::TeleportPlayerToOpenWorld()
 
 UGameplayTask_TeleportPlayer::UGameplayTask_TeleportPlayer(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(ObjectInitializer)
+	):
+	 Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -231,27 +165,55 @@ void UGameplayTask_TeleportPlayer::Activate()
 	Super::Activate();
 
 #if UE_EDITOR || UE_SERVER
+	if (TargetPCPtr->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		TargetPCPtr->GetGameplayTasksComponent()->OpenWorldWeather = UWeatherSystem::GetInstance()->GetDynamicWeather()
+			->GetCurrentWeather();
+
+		// 改变天气
+		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(Weather);
+	}
+#endif
+
+#if UE_EDITOR || UE_SERVER
 	if (TargetPCPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		UOpenWorldSubSystem::GetInstance()->SwitchDataLayer(Teleport, TargetPCPtr);
 	}
 #endif
 
+	auto CharacterPtr = Cast<ACharacterBase>(TargetPCPtr->GetPawn<ACharacterBase>());
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
+	}
+	
 	Target.LoadSynchronous();
 }
 
 void UGameplayTask_TeleportPlayer::TickTask(
 	float DeltaTime
-)
+	)
 {
 	Super::TickTask(DeltaTime);
 
+	if (CurrentWaitTime < MinWaitTime)
+	{
+		CurrentWaitTime+=DeltaTime;
+	}
+	
 	if (bIsSwitchDataLayerComplete)
 	{
-		if (UOpenWorldSubSystem::GetInstance()->CheckTeleportPlayerComplete(Teleport))
+		if (bIsSuccessful)
 		{
+			if ((CurrentWaitTime >= MinWaitTime) && bIsOnLanded)
+			{
+				EndTask();
+			}
+		}
+		else if (UOpenWorldSubSystem::GetInstance()->CheckTeleportPlayerComplete(Teleport))
+		{ 
 			bIsSuccessful = true;
-			EndTask();
 		}
 	}
 	else
@@ -272,9 +234,81 @@ void UGameplayTask_TeleportPlayer::TickTask(
 
 void UGameplayTask_TeleportPlayer::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
+	auto CharacterPtr = Cast<ACharacterBase>(TargetPCPtr->GetPawn<ACharacterBase>());
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
+	}
+	
 	OnEnd.Broadcast(bIsSuccessful);
 
 	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_TeleportPlayer::OnLanded(
+	const FHitResult& Hit
+	)
+{
+	bIsOnLanded = true;
+}
+
+inline UGameplayTask_WaitLoadComplete::UGameplayTask_WaitLoadComplete(
+	const FObjectInitializer& ObjectInitializer
+	):Super(ObjectInitializer)
+{
+	bTickingTask = true;
+	bIsPausable = true;
+}
+
+void UGameplayTask_WaitLoadComplete::Activate()
+{
+	Super::Activate();
+
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FTransitionProcessor>();
+
+	auto CharacterPtr = Cast<ACharacterBase>(TargetPCPtr->GetPawn<ACharacterBase>());
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
+	}
+}
+
+void UGameplayTask_WaitLoadComplete::TickTask(
+	float DeltaTime
+	)
+{
+	Super::TickTask(DeltaTime);
+	if (CurrentWaitTime < MinWaitTime)
+	{
+		CurrentWaitTime+=DeltaTime;
+	}
+	
+	if ((CurrentWaitTime >= MinWaitTime) && bIsOnLanded)
+	{
+		EndTask();
+	}
+}
+
+void UGameplayTask_WaitLoadComplete::OnDestroy(
+	bool bInOwnerFinished
+	)
+{
+	auto CharacterPtr = Cast<ACharacterBase>(TargetPCPtr->GetPawn<ACharacterBase>());
+	if (CharacterPtr)
+	{
+		CharacterPtr->LandedDelegate.RemoveDynamic(this, &ThisClass::OnLanded);
+	}
+	
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
+
+	Super::OnDestroy(bInOwnerFinished);
+}
+
+void UGameplayTask_WaitLoadComplete::OnLanded(
+	const FHitResult& Hit
+	)
+{
+	bIsOnLanded = true;
 }

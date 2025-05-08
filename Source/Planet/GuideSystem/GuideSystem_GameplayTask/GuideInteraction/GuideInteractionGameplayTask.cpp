@@ -201,6 +201,7 @@ void UGameplayTask_Interaction_Option::ConditionalPerformTask()
 		RemainingTime = DelayTime;
 	}
 
+	UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kOptionLayout);
 	UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->GetInteractionOptionsLayout()
 		->GetOptions()->UpdateDisplay(OptionAry, std::bind(&ThisClass::OnSelected, this, std::placeholders::_1));
 }

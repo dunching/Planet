@@ -18,6 +18,7 @@
 
 #include "SPlineActor.h"
 #include "CharacterBase.h"
+#include "CollisionDataStruct.h"
 #include "Tornado.h"
 #include "LogWriter.h"
 #include "TractionActor.h"
@@ -650,14 +651,13 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 	Params.bTraceComplex = false;
 	Params.AddIgnoredActor(&Character);
 
-	const ECollisionChannel CollisionChannel = MoveComponent.UpdatedComponent->GetCollisionObjectType();
 	FHitResult Result;
-	if (Character.GetWorld()->LineTraceSingleByChannel(
+	if (Character.GetWorld()->LineTraceSingleByObjectType(
 		Result,
 		CurrentLocation,
 		CurrentLocation + (GravityDir * Line),
-		// 避免找不到
-		CollisionChannel,
+		// 避免找不到。仅跟地面保持高度
+		LandScape_Object,
 		Params
 	))
 	{
@@ -675,7 +675,7 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 			else
 			{
 				const FVector Gravity = -MoveComponent.GetGravityDirection() * MoveComponent.GetGravityZ();
-				Force = MoveComponent.NewFallVelocity(Force, Gravity, SimulationTime) / MovementTickTime;
+				Force = MoveComponent.NewFallVelocity(Force, Gravity, SimulationTime);
 			}
 		}
 		// 上升
@@ -699,7 +699,7 @@ void FRootMotionSource_FlyAway::PrepareRootMotion(
 
 	if (NewTime >= GetDuration())
 	{
-		if (MoveComponent.CurrentFloor.bWalkableFloor || (MoveComponent.CurrentFloor.FloorDist < MoveComponent.
+		if (MoveComponent.CurrentFloor.bWalkableFloor && (MoveComponent.CurrentFloor.FloorDist < MoveComponent.
 			MIN_FLOOR_DIST))
 		{
 			bIsLanded = true;

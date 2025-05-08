@@ -162,6 +162,10 @@ void USkill_WeaponActive_Bow::OnProjectileBounce(
 		{
 			return;
 		}
+		if (OtherCharacterPtr->GetCharacterAbilitySystemComponent()->IsCanBeDamage())
+		{
+			return;
+		}
 
 		MakeDamage(OtherCharacterPtr);
 	}
@@ -320,7 +324,7 @@ void USkill_WeaponActive_Bow::MakeDamage(ACharacterBase* TargetCharacterPtr)
 	const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
 
 	FGameplayEffectSpecHandle SpecHandle =
-		MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->DamageClass, GetAbilityLevel());
+		MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
 	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 	SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());

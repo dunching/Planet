@@ -128,55 +128,7 @@ void AMainHUD::InitMainHUDLayout()
 			}
 
 			auto ItemInfosPtr = MainHUDLayoutPtr->GetItemInfos();
-			{
-				auto Handle =
-					CharacterPtr->GetInventoryComponent()->OnSkillProxyChanged.AddCallback(
-						 std::bind(
-						           &UGetItemInfosList::OnSkillProxyChanged,
-						           ItemInfosPtr,
-						           std::placeholders::_1,
-						           std::placeholders::_2
-						          )
-						);
-				Handle->bIsAutoUnregister = false;
-			}
-			{
-				auto Handle =
-					CharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
-						 std::bind(
-						           &UGetItemInfosList::OnCoinProxyChanged,
-						           ItemInfosPtr,
-						           std::placeholders::_1,
-						           std::placeholders::_2,
-						           std::placeholders::_3
-						          )
-						);
-				Handle->bIsAutoUnregister = false;
-			}
-			{
-				auto Handle =
-					CharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
-						 std::bind(
-						           &UGetItemInfosList::OnConsumableProxyChanged,
-						           ItemInfosPtr,
-						           std::placeholders::_1,
-						           std::placeholders::_2
-						          )
-						);
-				Handle->bIsAutoUnregister = false;
-			}
-			{
-				auto Handle =
-					CharacterPtr->GetInventoryComponent()->OnGroupmateProxyChanged.AddCallback(
-						 std::bind(
-						           &UGetItemInfosList::OnGourpmateProxyChanged,
-						           ItemInfosPtr,
-						           std::placeholders::_1,
-						           std::placeholders::_2
-						          )
-						);
-				Handle->bIsAutoUnregister = false;
-			}
+			ItemInfosPtr->SetPlayerCharacter(CharacterPtr);
 #if TESTPLAYERCHARACTERHOLDDATA
 			TestCommand::AddPlayerCharacterTestDataImp(this);
 #endif

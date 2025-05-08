@@ -89,9 +89,10 @@ void APlanetPlayerController::ServerDestroyActor_Implementation(
 }
 
 void APlanetPlayerController::ServerSpawnCharacterAry_Implementation(
-		const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
-		const TArray<FGuid>& IDAry,
-		const TArray<FTransform>& TransformAry
+	const TArray<TSubclassOf<AHumanCharacter_AI>>& CharacterClassAry,
+	const TArray<FGuid>& IDAry,
+	const TArray<FTransform>& TransformAry,
+	ETeammateOption TeammateOption
 	)
 {
 	FActorSpawnParameters GroupManaggerSpawnParameters;
@@ -100,24 +101,24 @@ void APlanetPlayerController::ServerSpawnCharacterAry_Implementation(
 	GroupManaggerSpawnParameters.CustomPreSpawnInitalization = [](
 		AActor* ActorPtr
 		)
-	{
-		PRINTINVOKEINFO();
-		auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
-		if (GroupManaggerPtr)
 		{
-			GroupManaggerPtr->GroupID = FGuid::NewGuid();
-		}
-	};
+			PRINTINVOKEINFO();
+			auto GroupManaggerPtr = Cast<AGroupManagger>(ActorPtr);
+			if (GroupManaggerPtr)
+			{
+				GroupManaggerPtr->GroupID = FGuid::NewGuid();
+			}
+		};
 
 	auto GroupManagger_NPCPtr = GetWorld()->SpawnActor<AGroupManagger_NPC>(
-																	  AGroupManagger_NPC::StaticClass(),
-																	  GroupManaggerSpawnParameters
-																	  );
+	                                                                       AGroupManagger_NPC::StaticClass(),
+	                                                                       GroupManaggerSpawnParameters
+	                                                                      );
 	GroupManagger_NPCPtr->GetTeamMatesHelperComponent()->SwitchTeammateOption(
-		ETeammateOption::kEnemy
-	);
-	
-	if ((CharacterClassAry.Num() == IDAry.Num()) && (IDAry.Num()== TransformAry.Num()))
+	                                                                          TeammateOption
+	                                                                         );
+
+	if ((CharacterClassAry.Num() == IDAry.Num()) && (IDAry.Num() == TransformAry.Num()))
 	{
 		for (int32 Index = 0; Index < CharacterClassAry.Num(); Index++)
 		{
@@ -126,21 +127,21 @@ void APlanetPlayerController::ServerSpawnCharacterAry_Implementation(
 			SpawnParameters.CustomPreSpawnInitalization = [this, &IDAry, Index, GroupManagger_NPCPtr](
 				auto ActorPtr
 				)
-			{
-				auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
-				if (AICharacterPtr)
 				{
-					AICharacterPtr->SetGroupSharedInfo(GroupManagger_NPCPtr);
-					AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(IDAry[Index]);
-				}
-			};
+					auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+					if (AICharacterPtr)
+					{
+						AICharacterPtr->SetGroupSharedInfo(GroupManagger_NPCPtr);
+						AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(IDAry[Index]);
+					}
+				};
 
 			auto AICharacterPtr =
 				GetWorld()->SpawnActor<AHumanCharacter_AI>(
-														   CharacterClassAry[Index],
-														   TransformAry[Index],
-														   SpawnParameters
-														  );
+				                                           CharacterClassAry[Index],
+				                                           TransformAry[Index],
+				                                           SpawnParameters
+				                                          );
 			if (AICharacterPtr)
 			{
 				GroupManagger_NPCPtr->GetTeamMatesHelperComponent()->UpdateTeammateConfig(
@@ -156,7 +157,8 @@ void APlanetPlayerController::ServerSpawnCharacterAry_Implementation(
 void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	TSubclassOf<AHumanCharacter_AI> CharacterClass,
 	const FGuid& ID,
-	const FTransform& Transform
+	const FTransform& Transform,
+	ETeammateOption TeammateOption
 	)
 {
 	FActorSpawnParameters SpawnParameters;
@@ -164,22 +166,23 @@ void APlanetPlayerController::ServerSpawnCharacter_Implementation(
 	SpawnParameters.CustomPreSpawnInitalization = [this, ID](
 		auto ActorPtr
 		)
-	{
-		auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
-		if (AICharacterPtr)
 		{
-			AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
-		}
-	};
+			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+			if (AICharacterPtr)
+			{
+				AICharacterPtr->GetCharacterAttributesComponent()->SetCharacterID(ID);
+			}
+		};
 
 	auto Result =
 		GetWorld()->SpawnActor<AHumanCharacter_AI>(
-												   CharacterClass,
-												   Transform,
-												   SpawnParameters
-												  );
+		                                           CharacterClass,
+		                                           Transform,
+		                                           SpawnParameters
+		                                          );
 	if (Result)
 	{
+		Result->GetGroupManagger_NPC()->GetTeamMatesHelperComponent()->SwitchTeammateOption(TeammateOption);
 	}
 }
 
@@ -198,21 +201,23 @@ inline void APlanetPlayerController::ServerSpawnCharacterByProxyType_Implementat
 		SpawnParameters.CustomPreSpawnInitalization = [this](
 			auto ActorPtr
 			)
-		{
-			auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
-			if (AICharacterPtr)
 			{
-			}
-		};
+				auto AICharacterPtr = Cast<AHumanCharacter_AI>(ActorPtr);
+				if (AICharacterPtr)
+				{
+				}
+			};
 
 		auto Result =
 			GetWorld()->SpawnActor<AHumanCharacter_AI>(
-													   ItemProxy_Description_CharacterPtr->CharacterClass,
-													   Transform,
-													   SpawnParameters
-													  );
+			                                           ItemProxy_Description_CharacterPtr->CharacterClass,
+			                                           Transform,
+			                                           SpawnParameters
+			                                          );
 		if (Result)
 		{
+			// 似乎感知不到玩家？
+			Result->GetGroupManagger_NPC()->GetTeamMatesHelperComponent()->AddKnowCharacter(GetPawn<ACharacterBase>());
 		}
 	}
 }
@@ -314,6 +319,49 @@ void APlanetPlayerController::SwitchPlayerInput_Implementation(
 	}
 }
 
+void APlanetPlayerController::AdjustTime_Implementation(
+	const FDateTime& Time
+	)
+{
+}
+
+void APlanetPlayerController::UpdateWeather_Implementation(
+	const FGameplayTag& WeatherType
+	)
+{
+}
+
+void APlanetPlayerController::AddOrRemoveState_Implementation(
+	const FGameplayTag& StateTag,
+	bool bIsAdd
+	)
+{
+	AddOrRemoveStateImp(StateTag, bIsAdd);
+}
+
+void APlanetPlayerController::AddOrRemoveStateImp_Implementation(
+	const FGameplayTag& StateTag,
+	bool bIsAdd
+	)
+{
+	auto CharacterOwnerPtr = GetPawn<FPawnType>();
+	if (CharacterOwnerPtr)
+	{
+		if (bIsAdd)
+		{
+			CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->AddLooseGameplayTag(
+				 StateTag
+				);
+		}
+		else
+		{
+			CharacterOwnerPtr->GetCharacterAbilitySystemComponent()->RemoveLooseGameplayTag(
+				 StateTag
+				);
+		}
+	}
+}
+
 void APlanetPlayerController::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps
 	) const
@@ -338,6 +386,8 @@ void APlanetPlayerController::BeginPlay()
 			FInputModeGameOnly InputMode;
 			SetInputMode(InputMode);
 		}
+
+		// GetGameplayTasksComponent()->WaitPlayerLoad();
 	}
 #endif
 }
@@ -653,7 +703,7 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(
 			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 			FGameplayEffectSpecHandle SpecHandle =
 				ICPtr->MakeOutgoingSpec(
-				                        UAssetRefMap::GetInstance()->DamageClass,
+				                        UAssetRefMap::GetInstance()->OnceGEClass,
 				                        1,
 				                        ICPtr->MakeEffectContext()
 				                       );
@@ -718,7 +768,7 @@ void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
 				auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 				FGameplayEffectSpecHandle SpecHandle =
 					ICPtr->MakeOutgoingSpec(
-					                        UAssetRefMap::GetInstance()->DamageClass,
+					                        UAssetRefMap::GetInstance()->OnceGEClass,
 					                        1,
 					                        ICPtr->MakeEffectContext()
 					                       );

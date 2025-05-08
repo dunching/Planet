@@ -66,20 +66,20 @@ void USceneCharacterAIInteractionComponent::StartInteractionItem(
 	);
 }
 
-void USceneCharacterAIInteractionComponent::ChangedInterationTaskState(
-	TSubclassOf<AGuideInteraction_Actor> Item,
+void USceneCharacterAIInteractionComponent::ChangedInterationState(
+	const TSubclassOf<AGuideInteraction_Actor>& Item,
 	bool bIsEnable
-)
+	)
 {
-	Super::ChangedInterationTaskState(Item, bIsEnable);
+	Super::ChangedInterationState(Item, bIsEnable);
 
-	if (bIsEnable)
-	{
-		UpdatePromt();
-	}
 #if UE_EDITOR || UE_CLIENT
-	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	if (GetOwnerRole() == ROLE_SimulatedProxy)
 	{
+		if (bIsEnable)
+		{
+			UpdatePromt();
+		}
 	}
 #endif
 }
@@ -94,7 +94,7 @@ void USceneCharacterAIInteractionComponent::UpdatePromt() const
 
 	for (const auto& Iter : GuideInteractionAry)
 	{
-		if (Iter.bIsTask && !Iter.bTaskHasCompleted)
+		if (Iter.bIsEnable && Iter.bIsTask)
 		{
 			OnwerActorPtr->GetAIComponent()->DisplayTaskPromy(Iter.TaskPromtClass);
 			return;

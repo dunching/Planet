@@ -11,16 +11,33 @@
 #include "ItemProxy_Description.generated.h"
 
 USTRUCT(BlueprintType)
-struct PLANET_API FPerLevelValue : public FTableRowBase
+struct PLANET_API FPerLevelValue_Float : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
 
-	FPerLevelValue();
-	
-	FPerLevelValue(std::initializer_list<float> InitList);
-	
+	FPerLevelValue_Float();
+
+	FPerLevelValue_Float(
+		std::initializer_list<float> InitList
+		);
+
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	TArray<float> PerLevelValue;
+};
+
+USTRUCT(BlueprintType)
+struct PLANET_API FPerLevelValue_Int : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	FPerLevelValue_Int();
+
+	FPerLevelValue_Int(
+		std::initializer_list<int32> InitList
+		);
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	TArray<int32> PerLevelValue;
 };
 
 /**
@@ -49,8 +66,8 @@ public:
 	 * 数值
 	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
-	TMap<FString, FPerLevelValue> Values;
-	
+	TMap<FString, FPerLevelValue_Float> Values;
+
 	/**
 	 * 作为物品时的显示图片
 	 */
@@ -65,5 +82,4 @@ public:
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSoftObjectPtr<UTexture2D> RaffleIcon;
-
 };

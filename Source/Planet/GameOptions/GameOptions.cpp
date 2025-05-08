@@ -21,18 +21,18 @@ UGameOptions::UGameOptions(const FObjectInitializer& ObjectInitializer):
 		};
 		TArray<FMyStruct> Ary
 		{
-					{UGameplayTagsLibrary::ActiveSocket_1, EKeys::Q},
-					{UGameplayTagsLibrary::ActiveSocket_2, EKeys::E},
-					{UGameplayTagsLibrary::ActiveSocket_3, EKeys::R},
-					{UGameplayTagsLibrary::ActiveSocket_4, EKeys::F},
+					{UGameplayTagsLibrary::ActiveSocket_1, ActiveSkill_1_Key},
+					{UGameplayTagsLibrary::ActiveSocket_2, ActiveSkill_2_Key},
+					{UGameplayTagsLibrary::ActiveSocket_3, ActiveSkill_3_Key},
+					{UGameplayTagsLibrary::ActiveSocket_4, ActiveSkill_4_Key},
 		
 					{UGameplayTagsLibrary::WeaponSocket_1, EKeys::LeftMouseButton},
 					{UGameplayTagsLibrary::WeaponSocket_2, EKeys::LeftMouseButton},
 		
-					{UGameplayTagsLibrary::ConsumableSocket_1, EKeys::One},
-					{UGameplayTagsLibrary::ConsumableSocket_2, EKeys::Two},
-					{UGameplayTagsLibrary::ConsumableSocket_3, EKeys::Three},
-					{UGameplayTagsLibrary::ConsumableSocket_4, EKeys::Four},
+					{UGameplayTagsLibrary::ConsumableSocket_1, Consumable_1_Key},
+					{UGameplayTagsLibrary::ConsumableSocket_2, Consumable_2_Key},
+					{UGameplayTagsLibrary::ConsumableSocket_3, Consumable_3_Key},
+					{UGameplayTagsLibrary::ConsumableSocket_4, Consumable_4_Key},
 		
 					{UGameplayTagsLibrary::PassiveSocket_1, EKeys::Invalid},
 					{UGameplayTagsLibrary::PassiveSocket_2, EKeys::Invalid},

@@ -35,8 +35,8 @@ public:
 		const TSubclassOf<AGuideInteraction_Actor>& Item
 		) override;
 	
-	virtual void ChangedInterationTaskState(
-		TSubclassOf<AGuideInteraction_Actor> Item,
+	virtual void ChangedInterationState(
+		const TSubclassOf<AGuideInteraction_Actor>& Item,
 		bool bIsEnable
 	) override;
 

@@ -47,7 +47,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	) override;
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -71,14 +71,10 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FBaseProperty RunningConsume;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
-	TSubclassOf<UGE_Running>GE_RunningClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
-	TSubclassOf<UGE_CancelRunning>GE_CancelRunningClass;
-
 private:
 
+	FActiveGameplayEffectHandle RunningCostGEHandle;
+	
 	// virtual void InitalDefaultTags() override;
 
 	void IntervalTick(UAbilityTask_TimerHelper*, float Interval, float InDuration);

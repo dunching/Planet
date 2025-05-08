@@ -102,7 +102,7 @@ protected:
 	UPROPERTY(Transient)
 	int32 MaxAttackDistance = 100;
 
-	AWeapon_Base* ActivedWeaponPtr = nullptr;
+	TObjectPtr<AWeapon_Base> ActivedWeaponPtr = nullptr;
 
 	FGuid WeaponSkillID;
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ChallengeEntry.h"
 #include "HumanCharacter_AI.h"
+#include "HumanInteractionBase.h"
 
 #include "InputProcessor.h"
 
@@ -14,11 +15,11 @@ class AChallengeEntry;
 
 namespace HumanProcessor
 {
-	class FHumanInteractionWithChallengeEntryProcessor : public FInputProcessor
+	class FHumanInteractionWithChallengeEntryProcessor : public FHumanInteractionBaseProcessor
 	{
 	private:
 
-		GENERATIONCLASSINFO(FHumanInteractionWithChallengeEntryProcessor, FInputProcessor);
+		GENERATIONCLASSINFO(FHumanInteractionWithChallengeEntryProcessor, FHumanInteractionBaseProcessor);
 
 	public:
 

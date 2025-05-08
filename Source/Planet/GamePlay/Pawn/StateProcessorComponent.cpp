@@ -230,6 +230,24 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 				CharacterMovementPtr->bSkip_Rotation = Lambda();
 			}
 		}
+		if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_SkipSlideAlongSurface))
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkip_SkipSlideAlongSurface = Lambda();
+			}
+		}
+		if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_SkipFlyingCheck))
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkip_SkipFlyingCheck = Lambda();
+			}
+		}
 		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_Orient2Acce))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();

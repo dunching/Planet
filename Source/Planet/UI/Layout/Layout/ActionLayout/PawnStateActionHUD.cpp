@@ -78,7 +78,7 @@ void UPawnStateActionHUD::NativeConstruct()
 	{
 		return;
 	}
-	
+
 	BindEvent();
 	ResetUIByData();
 }
@@ -98,7 +98,10 @@ void UPawnStateActionHUD::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UPawnStateActionHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+void UPawnStateActionHUD::NativeTick(
+	const FGeometry& MyGeometry,
+	float InDeltaTime
+	)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
@@ -140,12 +143,12 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetHPAttribute(),
-				CharacterAttributeSetPtr->GetHP(),
-				CharacterAttributeSetPtr->GetMax_HPAttribute(),
-				CharacterAttributeSetPtr->GetMax_HP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetHPAttribute(),
+			                     CharacterAttributeSetPtr->GetHP(),
+			                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
+			                     CharacterAttributeSetPtr->GetMax_HP()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
@@ -154,12 +157,12 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetPPAttribute(),
-				CharacterAttributeSetPtr->GetPP(),
-				CharacterAttributeSetPtr->GetMax_PPAttribute(),
-				CharacterAttributeSetPtr->GetMax_PP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetPPAttribute(),
+			                     CharacterAttributeSetPtr->GetPP(),
+			                     CharacterAttributeSetPtr->GetMax_PPAttribute(),
+			                     CharacterAttributeSetPtr->GetMax_PP()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Mana));
@@ -168,12 +171,12 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetManaAttribute(),
-				CharacterAttributeSetPtr->GetMana(),
-				CharacterAttributeSetPtr->GetMax_ManaAttribute(),
-				CharacterAttributeSetPtr->GetMax_Mana()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetManaAttribute(),
+			                     CharacterAttributeSetPtr->GetMana(),
+			                     CharacterAttributeSetPtr->GetMax_ManaAttribute(),
+			                     CharacterAttributeSetPtr->GetMax_Mana()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Shield));
@@ -182,12 +185,12 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetShieldAttribute(),
-				CharacterAttributeSetPtr->GetShield(),
-				CharacterAttributeSetPtr->GetMax_HPAttribute(),
-				CharacterAttributeSetPtr->GetMax_HP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetShieldAttribute(),
+			                     CharacterAttributeSetPtr->GetShield(),
+			                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
+			                     CharacterAttributeSetPtr->GetMax_HP()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD));
@@ -196,12 +199,12 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetShieldAttribute(),
-				CharacterAttributeSetPtr->GetShield(),
-				CharacterAttributeSetPtr->GetMax_HPAttribute(),
-				CharacterAttributeSetPtr->GetMax_HP()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetShieldAttribute(),
+			                     CharacterAttributeSetPtr->GetShield(),
+			                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
+			                     CharacterAttributeSetPtr->GetMax_HP()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Penetration));
@@ -210,12 +213,12 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetADAttribute(),
-				CharacterAttributeSetPtr->GetAD(),
-				CharacterAttributeSetPtr->GetAD_PenetrationAttribute(),
-				CharacterAttributeSetPtr->GetAD_Penetration()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetADAttribute(),
+			                     CharacterAttributeSetPtr->GetAD(),
+			                     CharacterAttributeSetPtr->GetAD_PenetrationAttribute(),
+			                     CharacterAttributeSetPtr->GetAD_Penetration()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Resistance));
@@ -224,10 +227,10 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetAD_ResistanceAttribute(),
-				CharacterAttributeSetPtr->GetAD_Resistance()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetAD_ResistanceAttribute(),
+			                     CharacterAttributeSetPtr->GetAD_Resistance()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
@@ -236,10 +239,10 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetMoveSpeedAttribute(),
-				CharacterAttributeSetPtr->GetMoveSpeed()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetMoveSpeedAttribute(),
+			                     CharacterAttributeSetPtr->GetMoveSpeed()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
@@ -248,10 +251,10 @@ void UPawnStateActionHUD::ResetUIByData()
 				return;
 			}
 			UIPtr->SetDataSource(
-				AbilitySystemComponentPtr,
-				CharacterAttributeSetPtr->GetPerformSpeedAttribute(),
-				CharacterAttributeSetPtr->GetPerformSpeed()
-				);
+			                     AbilitySystemComponentPtr,
+			                     CharacterAttributeSetPtr->GetPerformSpeedAttribute(),
+			                     CharacterAttributeSetPtr->GetPerformSpeed()
+			                    );
 		}
 		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Gold));
@@ -318,18 +321,28 @@ void UPawnStateActionHUD::BindEvent()
 	// 	);
 
 	OnAllocationSkillChangedDelegateAry.Add(
-		CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
-			std::bind(&ThisClass::InitialActiveSkillIcon, this)
-		));
+	                                        CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.
+	                                                      AddCallback(
+	                                                                  std::bind(
+	                                                                            &ThisClass::InitialActiveSkillIcon,
+	                                                                            this
+	                                                                           )
+	                                                                 )
+	                                       );
 
 	OnAllocationSkillChangedDelegateAry.Add(
-		CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.AddCallback(
-			std::bind(&ThisClass::InitialWeaponSkillIcon, this)
-		));
+	                                        CharacterPtr->GetProxyProcessComponent()->OnCurrentWeaponChanged.
+	                                                      AddCallback(
+	                                                                  std::bind(
+	                                                                            &ThisClass::InitialWeaponSkillIcon,
+	                                                                            this
+	                                                                           )
+	                                                                 )
+	                                       );
 
 	OnCanAciveSkillChangedHandle = CharacterPtr->GetProxyProcessComponent()->OnCanAciveSkillChanged.AddCallback(
-		std::bind(&ThisClass::InitialActiveSkillIcon, this)
-	);
+		 std::bind(&ThisClass::InitialActiveSkillIcon, this)
+		);
 }
 
 void UPawnStateActionHUD::InitialTalentUI()
@@ -355,7 +368,9 @@ void UPawnStateActionHUD::InitialTalentUI()
 			ProxySPtr
 		)
 		{
-			if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi))
+			if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(
+				 UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi
+				))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
 				if (UIPtr)
@@ -364,7 +379,9 @@ void UPawnStateActionHUD::InitialTalentUI()
 					bIsGiveTalentPassive = true;
 				}
 			}
-			else if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang))
+			else if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(
+				 UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang
+				))
 			{
 				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
 				if (UIPtr)
@@ -417,7 +434,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	{
 		return;
 	}
-	
+
 	if (!CharacterPtr)
 	{
 		return;
@@ -450,14 +467,14 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 			auto UIPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
 			if (UIPtr)
 			{
-					UIPtr->ResetToolUIByData(nullptr);
+				UIPtr->ResetToolUIByData(nullptr);
 			}
 		}
 		{
 			auto UIPtr = Cast<UActionSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2));
 			if (UIPtr)
 			{
-					UIPtr->ResetToolUIByData(nullptr);
+				UIPtr->ResetToolUIByData(nullptr);
 			}
 		}
 		return;
@@ -469,7 +486,9 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		{
 			if (FirstWeaponSocketInfoSPtr.IsValid())
 			{
-				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(FirstWeaponSocketInfoSPtr.Socket);
+				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(
+					 FirstWeaponSocketInfoSPtr.Socket
+					);
 				if (SocketIter && SocketIter->GetWeaponSkill())
 				{
 					UIPtr->ResetToolUIByData(SocketIter->GetWeaponSkill());
@@ -491,7 +510,9 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		{
 			if (SecondWeaponSocketInfoSPtr.IsValid())
 			{
-				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(SecondWeaponSocketInfoSPtr.Socket);
+				auto SocketIter = CharacterPtr->GetProxyProcessComponent()->FindWeaponSocket(
+					 SecondWeaponSocketInfoSPtr.Socket
+					);
 				if (SocketIter && SocketIter->GetWeaponSkill())
 				{
 					UIPtr->ResetToolUIByData(SocketIter->GetWeaponSkill());

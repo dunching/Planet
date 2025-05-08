@@ -122,6 +122,7 @@ void UAbilityTask_ApplyRootMotion_FlyAway::SharedInitAndApply()
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
+		ASC->AddLooseGameplayTag(UGameplayTagsLibrary::MovementStateAble_SkipFlyingCheck);
 		ASC->AddLooseGameplayTag(UGameplayTagsLibrary::State_RootMotion_FlyAway);
 
 		MovementComponent = Cast<UCharacterMovementComponent>(ASC->AbilityActorInfo->MovementComponent.Get());
@@ -158,6 +159,7 @@ void UAbilityTask_ApplyRootMotion_FlyAway::OnDestroy(
 	UAbilitySystemComponent* ASC = AbilitySystemComponent.Get();
 	if (ASC && ASC->AbilityActorInfo->MovementComponent.IsValid())
 	{
+		ASC->RemoveLooseGameplayTag(UGameplayTagsLibrary::MovementStateAble_SkipFlyingCheck);
 		ASC->RemoveLooseGameplayTag(UGameplayTagsLibrary::State_RootMotion_FlyAway);
 	}
 

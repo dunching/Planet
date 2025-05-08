@@ -134,12 +134,12 @@ void USkill_Base::OnRemoveAbility(
 
 UGameplayEffect* USkill_Base::GetCooldownGameplayEffect() const
 {
-	return UAssetRefMap::GetInstance()->DurationClass.GetDefaultObject();
+	return UAssetRefMap::GetInstance()->DurationGEClass.GetDefaultObject();
 }
 
 UGameplayEffect* USkill_Base::GetCostGameplayEffect() const
 {
-	return UAssetRefMap::GetInstance()->DamageClass.GetDefaultObject();
+	return UAssetRefMap::GetInstance()->OnceGEClass.GetDefaultObject();
 }
 
 TArray<FActiveGameplayEffectHandle> USkill_Base::MyApplyGameplayEffectSpecToTarget(

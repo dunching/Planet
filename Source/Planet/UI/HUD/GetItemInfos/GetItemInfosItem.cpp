@@ -26,6 +26,24 @@ void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicPr
 	PlayThisAnimation();
 }
 
+void UGetItemInfosItem::ResetToolUIByData(
+	const TSharedPtr<FWeaponProxy>& ProxyPtr,
+	EProxyModifyType ProxyModifyType
+	)
+{
+	SetTexutre(ProxyPtr->GetIcon());
+
+	const auto Text =
+		FString::Printf(
+			TEXT("%s:%s"),
+			ProxyModifyType == EProxyModifyType::kNumChanged ? * UTextSubSystem::GetInstance()->GetText(TextCollect::GetSkill) : *UTextSubSystem::GetInstance()->GetText(TextCollect::LoseSkill),
+			*ProxyPtr->GetProxyName()
+		);
+	SetText(Text);
+
+	ResetToolUIByData(ProxyPtr);
+}
+
 void UGetItemInfosItem::ResetToolUIByData(const TSharedPtr < FSkillProxy>& ProxyPtr, EProxyModifyType ProxyModifyType)
 {
 	SetTexutre(ProxyPtr->GetIcon());

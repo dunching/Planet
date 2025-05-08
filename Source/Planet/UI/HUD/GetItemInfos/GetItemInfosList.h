@@ -36,6 +36,13 @@ public:
 
 	virtual void ResetUIByData() override;
 
+	void SetPlayerCharacter(ACharacterBase*PlayeyCharacterPtr);
+	
+	void OnWeaponProxyChanged(
+		const TSharedPtr<FWeaponProxy>& ProxyPtr,
+		EProxyModifyType ProxyModifyType
+		);
+
 	void OnSkillProxyChanged(
 		const TSharedPtr<FSkillProxy>& ProxyPtr,
 		EProxyModifyType ProxyModifyType
@@ -67,6 +74,8 @@ protected:
 	int32 MaxDisplayNum = 8;
 
 	TArray<TSharedPtr<FBasicProxy>> OrderAry;
+
+	TArray<TPair<TWeakPtr<FWeaponProxy>, EProxyModifyType>> WeaponPendingAry;
 
 	TArray<TPair<TWeakPtr<FSkillProxy>, EProxyModifyType>> SkillPendingAry;
 

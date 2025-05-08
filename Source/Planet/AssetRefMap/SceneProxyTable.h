@@ -106,6 +106,12 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSet<FGameplayTag>SkillCommonCooldownInfoMap;
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FPerLevelValue_Float CD = {60, 50, 40, 30, 20};
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FPerLevelValue_Float Cost = {60, 50, 40, 30, 20};
+
 };
 
 UCLASS()

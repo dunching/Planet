@@ -29,6 +29,8 @@ public:
 
 	virtual void EnableIcon(bool bIsEnable)override;
 
+	void ResetToolUIByData(const TSharedPtr<FWeaponProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
+
 	void ResetToolUIByData(const TSharedPtr<FSkillProxy>& ProxyPtr, EProxyModifyType ProxyModifyType);
 
 	void ResetToolUIByData(const TSharedPtr < FCoinProxy>& ProxyPtr, EProxyModifyType ProxyModifyType, int32 Num);

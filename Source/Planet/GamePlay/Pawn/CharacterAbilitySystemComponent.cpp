@@ -179,12 +179,6 @@ void UCharacterAbilitySystemComponent::Dash_Implementation(
 	EDashDirection DashDirection
 )
 {
-	FGameplayEventData Payload;
-	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
-	GameplayAbilityTargetData_DashPtr->DashDirection = DashDirection;
-
-	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
@@ -197,6 +191,12 @@ void UCharacterAbilitySystemComponent::Dash_Implementation(
 		// 			&Payload,
 		// 			*ASCPtr
 		// 		);	
+
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_Dash;
+		GameplayAbilityTargetData_DashPtr->DashDirection = DashDirection;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
@@ -221,18 +221,32 @@ void UCharacterAbilitySystemComponent::HasBeenFlayAway_Implementation(
 	int32 Height
 )
 {
-	FGameplayEventData Payload;
-	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasBeenFlyAway;
-	GameplayAbilityTargetData_DashPtr->Height = Height;
-
-	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasBeenFlyAway;
+		GameplayAbilityTargetData_DashPtr->Height = Height;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
 			UGameplayTagsLibrary::BaseFeature_HasBeenFlyAway,
+			Payload
+		);
+	}
+}
+
+void UCharacterAbilitySystemComponent::SwitchWeapon_Implementation()
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+			OnwerActorPtr,
+			UGameplayTagsLibrary::BaseFeature_SwitchWeapon,
 			Payload
 		);
 	}
@@ -242,15 +256,15 @@ void UCharacterAbilitySystemComponent::HasbeenTornodo(
 	const TWeakObjectPtr<ATornado>& TornadoPtr
 )
 {
-	FGameplayEventData Payload;
-	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasbeenTornodo;
-	GameplayAbilityTargetData_DashPtr->TornadoPtr = TornadoPtr;
-
-	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasbeenTornodo;
+		GameplayAbilityTargetData_DashPtr->TornadoPtr = TornadoPtr;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
 			UGameplayTagsLibrary::BaseFeature_HasbeenTornodo,
@@ -263,15 +277,15 @@ void UCharacterAbilitySystemComponent::HasbeenTraction(
 	const TWeakObjectPtr<ATractionPoint>& TractionPointPtr
 )
 {
-	FGameplayEventData Payload;
-	auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasbeenTraction;
-	GameplayAbilityTargetData_DashPtr->TractionPoint = TractionPointPtr;
-
-	Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasbeenTraction;
+		GameplayAbilityTargetData_DashPtr->TractionPoint = TractionPointPtr;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
 			UGameplayTagsLibrary::BaseFeature_HasbeenTraction,
@@ -314,9 +328,6 @@ void UCharacterAbilitySystemComponent::MoveToAttackDistance(
 	FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
 )
 {
-	FGameplayEventData Payload;
-	Payload.TargetData.Add(MoveToAttaclAreaPtr);
-
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
 	{
@@ -328,6 +339,9 @@ void UCharacterAbilitySystemComponent::MoveToAttackDistance(
 		// 			&Payload,
 		// 			*ASCPtr
 		// 		);
+
+		FGameplayEventData Payload;
+		Payload.TargetData.Add(MoveToAttaclAreaPtr);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
 			OnwerActorPtr,
@@ -963,7 +977,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
 				UpdateMap(
-					Iter.Key,
+					UGameplayTagsLibrary::DataSource_Character,
 					Iter.Value,
 					0.f,
 					TargetSet->GetMax_HP(),
@@ -976,7 +990,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
 				UpdateMap(
-					Iter.Key,
+					UGameplayTagsLibrary::DataSource_Character,
 					Iter.Value,
 					0.f,
 					TargetSet->GetMax_PP(),
@@ -987,7 +1001,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 			{
 				UpdateMap(
-					Iter.Key,
+					UGameplayTagsLibrary::DataSource_Character,
 					Iter.Value,
 					0.f,
 					TargetSet->GetMax_Mana(),
@@ -998,7 +1012,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
 			{
 				UpdateMap(
-					Iter.Key,
+					UGameplayTagsLibrary::DataSource_Character,
 					-Iter.Value,
 					0.f,
 					TargetSet->GetMax_HP(),

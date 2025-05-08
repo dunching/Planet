@@ -26,6 +26,7 @@ struct PLANET_API FMyGameplayAttributeData : public FGameplayAttributeData
 	
 	virtual void SetBaseValue(float NewValue)override;
 
+	TMap<FGameplayTag, float> ValueMap;
 };
 
 /**

@@ -29,7 +29,7 @@ class PLANET_API UItemProxy_Description_PassiveSkill_XR : public UItemProxy_Desc
 public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FPerLevelValue CD = {1, 2, 3, 4, 5};
+	FPerLevelValue_Float CD = {1, 2, 3, 4, 5};
 
 };
 

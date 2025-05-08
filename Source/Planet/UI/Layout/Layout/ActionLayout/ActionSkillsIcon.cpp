@@ -1,4 +1,3 @@
-
 #include "ActionSkillsIcon.h"
 
 #include "Components/TextBlock.h"
@@ -23,6 +22,7 @@
 
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "ItemProxyDragDropOperation.h"
 #include "ItemProxyDragDropOperationWidget.h"
 #include "CharacterBase.h"
@@ -32,6 +32,7 @@
 #include "Skill_Active_Base.h"
 #include "Skill_WeaponActive_Base.h"
 #include "ItemProxy_Minimal.h"
+#include "Planet_Tools.h"
 #include "StateProcessorComponent.h"
 
 struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
@@ -55,20 +56,25 @@ struct FActionSkillsIcon : public TStructVariable<FActionSkillsIcon>
 	const FName WaitInputPercent = TEXT("WaitInputPercent");
 };
 
-UActionSkillsIcon::UActionSkillsIcon(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UActionSkillsIcon::UActionSkillsIcon(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
-
 }
 
-void UActionSkillsIcon::NativeOnListItemObjectSet(UObject* ListItemObject)
+void UActionSkillsIcon::NativeOnListItemObjectSet(
+	UObject* ListItemObject
+	)
 {
 	IUserObjectListEntry::NativeOnListItemObjectSet(ListItemObject);
 
 	InvokeReset(Cast<ThisClass>(ListItemObject));
 }
 
-void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
+void UActionSkillsIcon::InvokeReset(
+	UUserWidget* BaseWidgetPtr
+	)
 {
 	if (BaseWidgetPtr)
 	{
@@ -80,7 +86,9 @@ void UActionSkillsIcon::InvokeReset(UUserWidget* BaseWidgetPtr)
 	}
 }
 
-void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxyPtr)
+void UActionSkillsIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	)
 {
 	bIsReady_Previous = false;
 
@@ -91,7 +99,7 @@ void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicPr
 		if (
 			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)) ||
 			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
-			)
+		)
 		{
 			ProxyPtr = DynamicCastSharedPtr<FSkillProxy>(BasicProxyPtr);
 		}
@@ -107,9 +115,10 @@ void UActionSkillsIcon::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicPr
 	SetNum(false, 0);
 }
 
-void UActionSkillsIcon::EnableIcon(bool bIsEnable)
+void UActionSkillsIcon::EnableIcon(
+	bool bIsEnable
+	)
 {
-
 }
 
 void UActionSkillsIcon::UpdateSkillState()
@@ -147,8 +156,11 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 			SetDurationPercent(true, RemainTime < 0.f ? 1.f : RemainTime);
 			return;
 		}
-		
-		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
+
+		auto bIsReady = GAInsPtr->CanActivateAbility(
+		                                             GAInsPtr->GetCurrentAbilitySpecHandle(),
+		                                             GAInsPtr->GetCurrentActorInfo()
+		                                            );
 		SetCanRelease(bIsReady);
 	}
 	if (SKillProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
@@ -197,17 +209,8 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		return;
 	}
 
+	auto bIsReady = false;
 	const auto SKillProxyType = SkillProxySPtr->GetProxyType();
-	{
-		auto GAInsPtr = SkillProxySPtr->GetGAInst();
-		if (!GAInsPtr)
-		{
-			return;
-		}
-		auto bIsReady = GAInsPtr->CanActivateAbility(GAInsPtr->GetCurrentAbilitySpecHandle(), GAInsPtr->GetCurrentActorInfo());
-		SetCanRelease(bIsReady);
-	}
-
 	if (SKillProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 	{
 		auto GAInsPtr = Cast<USkill_WeaponActive_Base>(SkillProxySPtr->GetGAInst());
@@ -219,6 +222,74 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		int32 Num = 0;
 		const auto bIsDisplay = GAInsPtr->GetNum(Num);
 		SetNum(bIsDisplay, Num);
+
+		bIsReady = GAInsPtr->CanActivateAbility(
+		                                             GAInsPtr->GetCurrentAbilitySpecHandle(),
+		                                             GAInsPtr->GetCurrentActorInfo()
+		                                            );
+		SetCanRelease(bIsReady);
+	}
+
+	// 如果现实的是副武器插槽，则还需要合并显示切换武器的CD
+	if (IconSocket.MatchesTag(UGameplayTagsLibrary::WeaponSocket_2))
+	{
+		auto InTags = FGameplayTagContainer::EmptyContainer;
+
+		InTags.AddTag(UGameplayTagsLibrary::BaseFeature_SwitchWeapon);
+		InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+		auto GASPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		const auto GameplayEffectHandleAry = GASPtr->
+			GetActiveEffectsWithAllTags(
+			                            InTags
+			                           );
+		if (!GameplayEffectHandleAry.IsEmpty())
+		{
+			auto GameplayEffectPtr = GASPtr->
+				GetActiveGameplayEffect(
+				                        GameplayEffectHandleAry[0]
+				                       );
+
+			if (GameplayEffectPtr)
+			{
+				const auto RemainingCooldown = GameplayEffectPtr->GetTimeRemaining(GetWorldImp()->GetTimeSeconds());
+				const auto RemainingCooldownPercent = RemainingCooldown / GameplayEffectPtr->GetDuration();
+
+				SetRemainingCooldown(false, RemainingCooldown, RemainingCooldownPercent);
+				return;
+			}
+		}
+		SetRemainingCooldown(true, 0.f, 0.f	);
+		
+		TArray<FGameplayAbilitySpecHandle> OutAbilityHandles;
+		GASPtr->FindAllAbilitiesWithTags(OutAbilityHandles,
+		                                                                FGameplayTagContainer(
+			                                                                 UGameplayTagsLibrary::BaseFeature_SwitchWeapon
+			                                                                )
+		                                                               );
+		for (const auto &Iter : OutAbilityHandles)
+		{
+			auto GASpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter);
+			if (GASpecPtr)
+			{
+				const auto GAInstAry = GASpecPtr->GetAbilityInstances();
+				for (auto GAInstIter : GAInstAry)
+				{
+					if (GAInstIter && GAInstIter->CanActivateAbility(
+													 GAInstIter->GetCurrentAbilitySpecHandle(),
+													 GAInstIter->GetCurrentActorInfo()))
+					{
+						SetCanRelease(true && bIsReady);
+						return;
+					}
+					else
+					{
+						SetCanRelease(false && bIsReady);
+						return;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -230,7 +301,7 @@ void UActionSkillsIcon::SetRemainingCooldown(
 	bool bCooldownIsReady,
 	float RemainingTime,
 	float Percent
-)
+	)
 {
 	if (bCooldownIsReady)
 	{
@@ -274,7 +345,9 @@ void UActionSkillsIcon::SetRemainingCooldown(
 	}
 }
 
-void UActionSkillsIcon::SetCanRelease(bool bIsReady_In)
+void UActionSkillsIcon::SetCanRelease(
+	bool bIsReady_In
+	)
 {
 	if (bIsReady_In)
 	{
@@ -321,7 +394,7 @@ void UActionSkillsIcon::SetItemType()
 		{
 			ImagePtr->SetVisibility(ESlateVisibility::Visible);
 
-			AsyncLoadText(ProxyPtr->GetIcon(),ImagePtr );
+			AsyncLoadText(ProxyPtr->GetIcon(), ImagePtr);
 		}
 		else
 		{
@@ -330,7 +403,10 @@ void UActionSkillsIcon::SetItemType()
 	}
 }
 
-void UActionSkillsIcon::SetNum(bool bIsDisplay, int32 Num)
+void UActionSkillsIcon::SetNum(
+	bool bIsDisplay,
+	int32 Num
+	)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FActionSkillsIcon::Get().Number));
 	if (UIPtr)
@@ -343,7 +419,10 @@ void UActionSkillsIcon::SetNum(bool bIsDisplay, int32 Num)
 	}
 }
 
-void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent)
+void UActionSkillsIcon::SetInputRemainPercent(
+	bool bIsAcceptInput,
+	float Percent
+	)
 {
 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
 	if (UIPtr)
@@ -353,7 +432,10 @@ void UActionSkillsIcon::SetInputRemainPercent(bool bIsAcceptInput, float Percent
 	}
 }
 
-void UActionSkillsIcon::SetDurationPercent(bool bIsHaveDuration, float Percent)
+void UActionSkillsIcon::SetDurationPercent(
+	bool bIsHaveDuration,
+	float Percent
+	)
 {
 	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FActionSkillsIcon::Get().WaitInputPercent));
 	if (UIPtr)
@@ -370,39 +452,50 @@ void UActionSkillsIcon::NativeConstruct()
 	ResetToolUIByData(nullptr);
 }
 
-FReply UActionSkillsIcon::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+FReply UActionSkillsIcon::NativeOnMouseButtonDown(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent
+	)
 {
 	Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 
 	return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 }
 
-bool UActionSkillsIcon::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+bool UActionSkillsIcon::NativeOnDrop(
+	const FGeometry& InGeometry,
+	const FDragDropEvent& InDragDropEvent,
+	UDragDropOperation* InOperation
+	)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
 
 	if (InOperation->IsA(UItemProxyDragDropOperation::StaticClass()))
 	{
- 		auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(InOperation);
- 		if (WidgetDragPtr)
+		auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(InOperation);
+		if (WidgetDragPtr)
 		{
 			auto OtherProxyPtr = DynamicCastSharedPtr<FSkillProxy>(WidgetDragPtr->SceneToolSPtr);
-// 			if (ProxyPtr && ProxySPtr->GetProxyType().MatchesTag(SkillProxyType))
-// 			{
-// 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
-// 			}
- 		}
+			// 			if (ProxyPtr && ProxySPtr->GetProxyType().MatchesTag(SkillProxyType))
+			// 			{
+			// 				ResetToolUIByData(WidgetDragPtr->SceneToolSPtr);
+			// 			}
+		}
 	}
 
 	return true;
 }
 
-void UActionSkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
+void UActionSkillsIcon::NativeOnDragDetected(
+	const FGeometry& InGeometry,
+	const FPointerEvent& InMouseEvent,
+	UDragDropOperation*& OutOperation
+	)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
 
 	auto BaseItemClassPtr = UAssetRefMap::GetInstance()->DragDropOperationWidgetClass;
-	
+
 	if (BaseItemClassPtr)
 	{
 		auto DragWidgetPtr = CreateWidget<UItemProxyDragDropOperationWidget>(this, BaseItemClassPtr);
@@ -411,7 +504,11 @@ void UActionSkillsIcon::NativeOnDragDetected(const FGeometry& InGeometry, const 
 			DragWidgetPtr->ResetSize(InGeometry.Size);
 			DragWidgetPtr->ResetToolUIByData(ProxyPtr);
 
-			auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UItemProxyDragDropOperation::StaticClass()));
+			auto WidgetDragPtr = Cast<UItemProxyDragDropOperation>(
+			                                                       UWidgetBlueprintLibrary::CreateDragDropOperation(
+				                                                        UItemProxyDragDropOperation::StaticClass()
+				                                                       )
+			                                                      );
 			if (WidgetDragPtr)
 			{
 				WidgetDragPtr->DefaultDragVisual = DragWidgetPtr;

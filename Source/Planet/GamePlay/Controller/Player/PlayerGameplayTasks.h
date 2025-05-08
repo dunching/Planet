@@ -12,7 +12,8 @@ class ATeleport;
 class APlanetPlayerController;
 
 /*
- *
+ * PlayerController处理异步得组件，如
+ * 传送
  */
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UPlayerControllerGameplayTasksComponent : public UGameplayTasksComponent
@@ -28,6 +29,15 @@ public:
 		const FObjectInitializer& ObjectInitializer
 	);
 
+#pragma region WaitLoad
+	
+	/**
+	 * Client
+	 */
+	void WaitPlayerLoad();
+
+#pragma endregion
+	
 #pragma region Teleport
 
 	/**
@@ -48,48 +58,45 @@ public:
 		ETeleport Teleport
 	);
 
+	/*
+	 *	角色进入副本之前在开放世界的位置信息
+	 */
+	FTransform OpenWorldTransform = FTransform::Identity;
+	
+	/*
+	 *	角色进入副本之前，开放世界的天气
+	 */
+	FGameplayTag OpenWorldWeather;
+	
 private:
 	UFUNCTION(Server, Reliable)
 	void TeleportPlayerToOpenWorld_Server();
 
-	UFUNCTION(NetMulticast, Reliable)
-	void TeleportPlayerToOpenWorld_ActiveTask(
-		ETeleport Teleport
-	);
-
-	void TeleportPlayerToOpenWorldEnd(
-		bool bIsSuccess
-	);
-
 	UFUNCTION(Server, Reliable)
 	void TeleportPlayerToNearest_Server();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void TeleportPlayerToNearest_ActiveTask(
-		ETeleport Teleport
-	);
-
-	void TeleportPlayerToNearestEnd(
-		bool bIsSuccess
-	);
 
 	UFUNCTION(Server, Reliable)
 	void EntryChallengeLevel_Server(
 		ETeleport Teleport
 	);
 
+	
 	UFUNCTION(NetMulticast, Reliable)
-	void EntryChallengeLevel_ActiveTask(
-		ETeleport Teleport
+	void EntryLevel_ActiveTask(
+		ETeleport Teleport,
+		const FGameplayTag &NewWeather
 	);
 
-	void EntryChallengeLevelEnd(
+	void EntryLevelEnd(
 		bool bIsSuccess
 	);
-
+	
 #pragma endregion
 };
 
+/**
+ * 传送PlayeyController
+ */
 UCLASS()
 class PLANET_API UGameplayTask_TeleportPlayer : public UGameplayTask
 {
@@ -118,14 +125,80 @@ public:
 
 	ETeleport Teleport = ETeleport::kNone;
 
+	FGameplayTag Weather;
+	
 	FOnEnd OnEnd;
 
 private:
+	UFUNCTION()
+	void OnLanded(const FHitResult& Hit);
+
 	TSoftObjectPtr<ATeleport> Target = nullptr;
 
 	bool bIsSwitchDataLayerComplete = false;
 
 	bool bIsSuccessful = false;
 
+	bool bIsOnLanded = false;
+
 	const int32 DistanceThreshold = 100;
+
+	/**
+	 * 最小运行时长
+	 */
+	int32 MinWaitTime = 1;
+	
+	/**
+	 * 
+	 */
+	float CurrentWaitTime = 0.f;
+};
+
+/**
+ * 等待游戏初始时加载任务完成
+ * Only Client
+ */
+UCLASS()
+class PLANET_API UGameplayTask_WaitLoadComplete : public UGameplayTask
+{
+	GENERATED_BODY()
+
+public:
+	using FOnEnd = TMulticastDelegate<void(
+		bool
+	)>;
+
+	UGameplayTask_WaitLoadComplete(
+		const FObjectInitializer& ObjectInitializer
+	);
+
+	virtual void Activate() override;
+
+	virtual void TickTask(
+		float DeltaTime
+	) override;
+
+	virtual void OnDestroy(
+		bool bInOwnerFinished
+	) override;
+
+	TObjectPtr<APlanetPlayerController> TargetPCPtr = nullptr;
+
+	FOnEnd OnEnd;
+
+private:
+	UFUNCTION()
+	void OnLanded(const FHitResult& Hit);
+	
+	bool bIsOnLanded = false;
+
+	/**
+	 * 最小运行时长
+	 */
+	int32 MinWaitTime = 1;
+	
+	/**
+	 * 
+	 */
+	float CurrentWaitTime = 0.f;
 };

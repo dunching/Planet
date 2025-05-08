@@ -1,6 +1,7 @@
 
 #include "BasicFuturesBase.h"
 
+#include "AssetRefMap.h"
 #include "CharacterBase.h"
 
 UBasicFuturesBase::UBasicFuturesBase() :
@@ -26,3 +27,13 @@ void UBasicFuturesBase::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, 
 // {
 // 	Super::InitalDefaultTags();
 // }
+
+UGameplayEffect* UBasicFuturesBase::GetCooldownGameplayEffect() const
+{
+	return UAssetRefMap::GetInstance()->DurationGEClass.GetDefaultObject();
+}
+
+UGameplayEffect* UBasicFuturesBase::GetCostGameplayEffect() const
+{
+	return UAssetRefMap::GetInstance()->OnceGEClass.GetDefaultObject();
+}

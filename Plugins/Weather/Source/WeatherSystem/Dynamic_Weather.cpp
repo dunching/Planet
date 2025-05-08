@@ -1,11 +1,19 @@
-
 #include "Dynamic_Weather.h"
 
 #include <Kismet/GameplayStatics.h>
 
-ADynamic_Weather::ADynamic_Weather(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+ADynamic_Weather::ADynamic_Weather(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
+	// SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
+	// bReplicates = true;
+	// NetPriority = 3.0f;
+	// SetNetUpdateFrequency(100.f);
+	//
+	// SetReplicatingMovement(true);
+
 	WeatherMap.Add(WeatherSettings::Clear_Skies, nullptr);
 	WeatherMap.Add(WeatherSettings::Cloudy, nullptr);
 	WeatherMap.Add(WeatherSettings::Foggy, nullptr);
@@ -26,11 +34,19 @@ void ADynamic_Weather::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ADynamic_Weather::UpdateWeather(const FGameplayTag& WeatherType)
+void ADynamic_Weather::UpdateWeather(
+	const FGameplayTag& WeatherType
+	)
 {
 	const auto Iter = WeatherMap.Find(WeatherType);
 	if (Iter)
 	{
+		CurrentWeather = WeatherType;
 		UpdateWeatherCPP(Iter->LoadSynchronous());
 	}
+}
+
+FGameplayTag ADynamic_Weather::GetCurrentWeather() const
+{
+	return CurrentWeather;
 }

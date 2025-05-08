@@ -71,6 +71,15 @@ private:
 
 	UFUNCTION(Server, Reliable)
 	void ClearFocusCharactersAry_Server();
+	
+	UFUNCTION()
+	void OnFocusCharacterDestroyed(AActor* DestroyedActor);
+
+	virtual void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count) override;
+
+	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
+
+	TObjectPtr<ACharacterBase>PreviousFocusCharactersPtr = nullptr;
 };
 
 /* 角色的会话组件

@@ -28,17 +28,19 @@
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> GroupMnaggerComponent_KnowCharaterChanged(
-	TEXT("GroupMnaggerComponent.KnowCharaterChanged"),
-	1,
-	TEXT("")
-	TEXT(" default: 0")
-);
+                                                                             TEXT(
+	                                                                              "GroupMnaggerComponent.KnowCharaterChanged"
+	                                                                             ),
+                                                                             1,
+                                                                             TEXT("")
+                                                                             TEXT(" default: 0")
+                                                                            );
 #endif
 
 UTeamMatesHelperComponent::UTeamMatesHelperComponent(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(ObjectInitializer)
+	):
+	 Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 }
@@ -46,7 +48,7 @@ UTeamMatesHelperComponent::UTeamMatesHelperComponent(
 void UTeamMatesHelperComponent::UpdateTeammateConfig(
 	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
 	int32 Index
-)
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -73,7 +75,7 @@ void UTeamMatesHelperComponent::UpdateTeammateConfig(
 
 void UTeamMatesHelperComponent::OnAddToNewTeam(
 	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
-)
+	)
 {
 	TeamHelperChangedDelegateContainer.ExcuteCallback();
 }
@@ -91,12 +93,12 @@ void UTeamMatesHelperComponent::BeginPlay()
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		GetWorld()->GetTimerManager().SetTimer(
-			CheckKnowCharacterTimerHandle,
-			this,
-			&ThisClass::UpdateSensingCharacters,
-			1.f,
-			true
-		);
+		                                       CheckKnowCharacterTimerHandle,
+		                                       this,
+		                                       &ThisClass::UpdateSensingCharacters,
+		                                       1.f,
+		                                       true
+		                                      );
 	}
 #endif
 }
@@ -104,7 +106,7 @@ void UTeamMatesHelperComponent::BeginPlay()
 void UTeamMatesHelperComponent::UpdateTeammateConfig_Server_Implementation(
 	const FGuid& ProxtID,
 	int32 Index
-)
+	)
 {
 	const auto CharacterProxySPtr =
 		GetOwner<FOwnerType>()->GetInventoryComponent()->FindProxy_Character(ProxtID);
@@ -133,8 +135,8 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter_Server_Implementation()
 		{
 			const auto CharacterProxySPtr =
 				GetOwner<FOwnerType>()->GetInventoryComponent()->FindProxy_Character(
-					CharactersAry[Index][SecondIndex]
-				);
+					 CharactersAry[Index][SecondIndex]
+					);
 			if (CharacterProxySPtr)
 			{
 				Transform.SetLocation(PlayerCharacterLocation + (PlayerCharacterRotation.Vector() * 100));
@@ -159,7 +161,7 @@ void UTeamMatesHelperComponent::SpwanTeammateCharacter()
 void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 	FPawnType* PCPtr,
 	int32 Index
-)
+	)
 {
 	auto CharacterProxyPtr = PCPtr->GetCharacterProxy();
 	UpdateTeammateConfigImp(CharacterProxyPtr, Index);
@@ -168,7 +170,7 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
 	int32 Index
-)
+	)
 {
 	FTeammate Teammate;
 
@@ -189,7 +191,7 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 
 bool UTeamMatesHelperComponent::IsMember(
 	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
-) const
+	) const
 {
 	for (auto Iter : MembersSet)
 	{
@@ -204,7 +206,7 @@ bool UTeamMatesHelperComponent::IsMember(
 
 bool UTeamMatesHelperComponent::IsMember(
 	const FGuid& CharacterID
-) const
+	) const
 {
 	for (auto Iter : MembersSet)
 	{
@@ -222,7 +224,7 @@ bool UTeamMatesHelperComponent::TeleportTo(
 	const FRotator& DestRotation,
 	bool bIsATest,
 	bool bNoCheck
-)
+	)
 {
 	for (auto Iter : MembersSet)
 	{
@@ -242,7 +244,7 @@ bool UTeamMatesHelperComponent::TeleportTo(
 
 void UTeamMatesHelperComponent::SwitchTeammateOption(
 	ETeammateOption InTeammateOption
-)
+	)
 {
 	TeammateOption = InTeammateOption;
 
@@ -263,21 +265,25 @@ ETeammateOption UTeamMatesHelperComponent::GetTeammateOption() const
 
 void UTeamMatesHelperComponent::AddKnowCharacter(
 	ACharacterBase* CharacterPtr
-)
+	)
 {
-	SensingChractersSet.Add(CharacterPtr);
+	if (CheckCharacterIsValid(CharacterPtr))
+	{
+		SensingChractersSet.Add(CharacterPtr);
+	}
 }
 
 void UTeamMatesHelperComponent::RemoveKnowCharacter(
 	ACharacterBase* CharacterPtr
-)
+	)
 {
-	SensingChractersSet.Add(CharacterPtr);
+	// 不要通过离开视野移除目标，因为我们要通过其他判断
+	// SensingChractersSet.Remove(CharacterPtr);
 }
 
 void UTeamMatesHelperComponent::SetFocusCharactersAry(
 	ACharacterBase* TargetCharacterPtr
-)
+	)
 {
 	ForceKnowCharater = TargetCharacterPtr;
 	OnFocusCharacterDelegate(TargetCharacterPtr);
@@ -308,7 +314,7 @@ TSet<TWeakObjectPtr<ACharacterBase>> UTeamMatesHelperComponent::GetSensingChract
 
 void UTeamMatesHelperComponent::SetSensingChractersSet(
 	const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
-)
+	)
 {
 	SensingChractersSet = KnowCharater;
 }
@@ -320,7 +326,7 @@ TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperCompo
 
 void UTeamMatesHelperComponent::SetOwnerCharacterProxy(
 	const TSharedPtr<FCharacterProxyType>& CharacterProxySPtr
-)
+	)
 {
 	OwnerCharacterProxyPtr = CharacterProxySPtr;
 	MembersSet.Add(OwnerCharacterProxyPtr);
@@ -330,7 +336,7 @@ FName UTeamMatesHelperComponent::ComponentName = TEXT("TeamMatesHelperComponent"
 
 void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps
-) const
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -349,8 +355,8 @@ void UTeamMatesHelperComponent::TeammateCharacter_ActiveWeapon_Server_Implementa
 		{
 			const auto CharacterProxySPtr =
 				GetOwner<FOwnerType>()->GetInventoryComponent()->FindProxy_Character(
-					CharactersAry[Index][SecondIndex]
-				);
+					 CharactersAry[Index][SecondIndex]
+					);
 			if (CharacterProxySPtr)
 			{
 				auto CharacterActorPtr = CharacterProxySPtr->GetCharacterActor();
@@ -365,7 +371,7 @@ void UTeamMatesHelperComponent::TeammateCharacter_ActiveWeapon_Server_Implementa
 
 void UTeamMatesHelperComponent::SwitchTeammateOption_Server_Implementation(
 	ETeammateOption InTeammateOption
-)
+	)
 {
 	SwitchTeammateOption(InTeammateOption);
 }
@@ -393,12 +399,8 @@ void UTeamMatesHelperComponent::UpdateSensingCharacters()
 		TSet<ACharacterBase*> NeedRemoveAry;
 		for (const auto& Iter : KnowCharatersSet)
 		{
-			if (Iter.IsValid())
+			if (CheckCharacterIsValid(Iter))
 			{
-				if (Iter->GetCharacterAbilitySystemComponent()->IsInDeath())
-				{
-					NeedRemoveAry.Add(Iter.Get());
-				}
 			}
 			else
 			{
@@ -416,4 +418,23 @@ void UTeamMatesHelperComponent::UpdateSensingCharacters()
 
 	NewSensingChractersSet = KnowCharatersSet;
 	SetSensingChractersSet(NewSensingChractersSet);
+}
+
+bool UTeamMatesHelperComponent::CheckCharacterIsValid(
+	const TWeakObjectPtr<ACharacterBase>& CharacterPtr
+	)
+{
+	if (CharacterPtr.IsValid())
+	{
+		if (CharacterPtr->GetCharacterAbilitySystemComponent()->IsInDeath())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	return false;
 }

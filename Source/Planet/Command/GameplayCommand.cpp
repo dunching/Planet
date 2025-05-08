@@ -1,5 +1,7 @@
 #include "GameplayCommand.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 #include "InputProcessorSubSystem.h"
 #include "HumanViewAlloctionSkillsProcessor.h"
 #include "HumanCharacter_Player.h"
@@ -112,6 +114,9 @@ void GameplayCommand::ServerSpawnCharacterByProxyType(
 			Transform.SetLocation(
 			                      PCPtr->GetPawn()->GetActorLocation() + (PCPtr->GetPawn()->
 			                                                              GetActorForwardVector() * 100)
+			                     );
+			Transform.SetRotation(
+			UKismetMathLibrary::MakeRotFromZX(FVector::UpVector, -PCPtr->GetPawn()->GetActorForwardVector()).Quaternion()
 			                     );
 
 			PCPtr->ServerSpawnCharacterByProxyType(FGameplayTag::RequestGameplayTag(*Args[0]), Transform);

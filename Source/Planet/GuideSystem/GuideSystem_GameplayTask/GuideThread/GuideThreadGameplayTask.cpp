@@ -24,8 +24,8 @@ class AMainHUD;
 
 UGameplayTask_Guide::UGameplayTask_Guide(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -33,15 +33,15 @@ UGameplayTask_Guide::UGameplayTask_Guide(
 
 void UGameplayTask_Guide::SetGuideActor(
 	TObjectPtr<AGuideThread> InGuideActorPtr
-)
+	)
 {
 	GuideActorPtr = InGuideActorPtr;
 }
 
 UGameplayTask_Guide_MoveToLocation::UGameplayTask_Guide_MoveToLocation(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -60,16 +60,16 @@ void UGameplayTask_Guide_MoveToLocation::Activate()
 		SpawnParameters.Owner = GetOwnerActor();
 
 		TargetPointPtr = PlayerCharacterPtr->GetWorld()->SpawnActor<ATargetPoint_Runtime>(
-			TargetPoint_RuntimeClass,
-			AbsoluteTransform,
-			SpawnParameters
-		);
+			 TargetPoint_RuntimeClass,
+			 AbsoluteTransform,
+			 SpawnParameters
+			);
 	}
 }
 
 void UGameplayTask_Guide_MoveToLocation::TickTask(
 	float DeltaTime
-)
+	)
 {
 	Super::TickTask(DeltaTime);
 
@@ -82,7 +82,7 @@ void UGameplayTask_Guide_MoveToLocation::TickTask(
 
 void UGameplayTask_Guide_MoveToLocation::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	if (TargetPointPtr)
 	{
@@ -96,7 +96,7 @@ void UGameplayTask_Guide_MoveToLocation::OnDestroy(
 void UGameplayTask_Guide_MoveToLocation::SetUp(
 	const FVector& InTargetLocation,
 	int32 InReachedRadius
-)
+	)
 {
 	TargetLocation = InTargetLocation;
 	ReachedRadius = InReachedRadius;
@@ -104,8 +104,8 @@ void UGameplayTask_Guide_MoveToLocation::SetUp(
 
 UGameplayTask_Guide_WaitInputKey::UGameplayTask_Guide_WaitInputKey(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -123,7 +123,7 @@ void UGameplayTask_Guide_WaitInputKey::Activate()
 
 void UGameplayTask_Guide_WaitInputKey::TickTask(
 	float DeltaTime
-)
+	)
 {
 	Super::TickTask(DeltaTime);
 
@@ -136,8 +136,8 @@ void UGameplayTask_Guide_WaitInputKey::TickTask(
 
 UGameplayTask_Guide_Monologue::UGameplayTask_Guide_Monologue(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -152,7 +152,7 @@ void UGameplayTask_Guide_Monologue::Activate()
 
 void UGameplayTask_Guide_Monologue::TickTask(
 	float DeltaTime
-)
+	)
 {
 	Super::TickTask(DeltaTime);
 
@@ -174,7 +174,7 @@ void UGameplayTask_Guide_Monologue::TickTask(
 
 void UGameplayTask_Guide_Monologue::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	if (PlayerCharacterPtr)
 	{
@@ -186,7 +186,7 @@ void UGameplayTask_Guide_Monologue::OnDestroy(
 
 void UGameplayTask_Guide_Monologue::SetUp(
 	const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry
-)
+	)
 {
 	ConversationsAry = InConversationsAry;
 }
@@ -207,8 +207,8 @@ void UGameplayTask_Guide_Monologue::ConditionalPerformTask()
 
 UGameplayTask_Guide_AddToTarget::UGameplayTask_Guide_AddToTarget(
 	const FObjectInitializer& ObjectInitializer
-) :
-  Super(ObjectInitializer)
+	) :
+	  Super(ObjectInitializer)
 {
 	bTickingTask = true;
 	bIsPausable = true;
@@ -224,7 +224,7 @@ void UGameplayTask_Guide_AddToTarget::Activate()
 void UGameplayTask_Guide_AddToTarget::SetUp(
 	const TSubclassOf<AGuideInteraction_Actor>& InGuideInteractionActorClass,
 	const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
-)
+	)
 {
 	GuideInteractionActorClass = InGuideInteractionActorClass;
 	TargetCharacterPtr = InTargetCharacterPtr;
@@ -251,7 +251,7 @@ void UGameplayTask_Guide_ConversationWithTarget::Activate()
 
 void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	if (TargetPointPtr)
 	{
@@ -264,7 +264,7 @@ void UGameplayTask_Guide_ConversationWithTarget::OnDestroy(
 
 void UGameplayTask_Guide_ConversationWithTarget::SetUp(
 	const TSoftObjectPtr<AHumanCharacter_AI>& InTargetCharacterPtr
-)
+	)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
 }
@@ -283,22 +283,22 @@ void UGameplayTask_Guide_ConversationWithTarget::ConditionalPerformTask()
 			SpawnParameters.Owner = GetOwnerActor();
 
 			TargetPointPtr = PlayerCharacterPtr->GetWorld()->SpawnActor<ATargetPoint_Runtime>(
-				TargetPoint_RuntimeClass,
-				AbsoluteTransform,
-				SpawnParameters
-			);
+				 TargetPoint_RuntimeClass,
+				 AbsoluteTransform,
+				 SpawnParameters
+				);
 
 			TargetPointPtr->AttachToActor(
-				TargetCharacterPtr.Get(),
-				FAttachmentTransformRules::KeepRelativeTransform
-			);
+			                              TargetCharacterPtr.Get(),
+			                              FAttachmentTransformRules::KeepRelativeTransform
+			                             );
 		}
 	}
 }
 
 void UGameplayTask_Guide_WaitComplete::TickTask(
 	float DeltaTime
-)
+	)
 {
 	Super::TickTask(DeltaTime);
 
@@ -317,7 +317,7 @@ void UGameplayTask_Guide_WaitComplete::TickTask(
 
 void UGameplayTask_Guide_WaitComplete::SetUp(
 	const FGuid& InTaskID
-)
+	)
 {
 	TaskID = InTaskID;
 }
@@ -327,23 +327,23 @@ void UGameplayTask_Guide_CollectResource::Activate()
 	Super::Activate();
 
 	OnConsumableProxyChangedHandle = PlayerCharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
-		std::bind(&ThisClass::OnGetConsumableProxy, this, std::placeholders::_1, std::placeholders::_2)
-	);
+		 std::bind(&ThisClass::OnGetConsumableProxy, this, std::placeholders::_1, std::placeholders::_2)
+		);
 
 	OnCoinProxyChangedHandle = PlayerCharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
-		std::bind(
-			&ThisClass::OnCoinProxyChanged,
-			this,
-			std::placeholders::_1,
-			std::placeholders::_2,
-			std::placeholders::_3
-		)
-	);
+		 std::bind(
+		           &ThisClass::OnCoinProxyChanged,
+		           this,
+		           std::placeholders::_1,
+		           std::placeholders::_2,
+		           std::placeholders::_3
+		          )
+		);
 }
 
 void UGameplayTask_Guide_CollectResource::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	if (OnConsumableProxyChangedHandle)
 	{
@@ -356,7 +356,7 @@ void UGameplayTask_Guide_CollectResource::OnDestroy(
 void UGameplayTask_Guide_CollectResource::SetUp(
 	const FGameplayTag& InResourceType,
 	int32 InNum
-)
+	)
 {
 	ResourceType = InResourceType;
 	Num = InNum;
@@ -376,7 +376,7 @@ FTaskNodeDescript UGameplayTask_Guide_CollectResource::GetTaskNodeDescripton() c
 void UGameplayTask_Guide_CollectResource::OnGetConsumableProxy(
 	const TSharedPtr<FConsumableProxy>& ConsumableProxySPtr,
 	EProxyModifyType ProxyModifyType
-)
+	)
 {
 	if (ConsumableProxySPtr && ConsumableProxySPtr->GetProxyType().MatchesTag(ResourceType))
 	{
@@ -407,7 +407,7 @@ void UGameplayTask_Guide_CollectResource::OnCoinProxyChanged(
 	const TSharedPtr<FCoinProxy>& ProxySPtr,
 	EProxyModifyType ProxyModifyType,
 	int32 Num_
-)
+	)
 {
 	if (ProxySPtr && ProxySPtr->GetProxyType().MatchesTag(ResourceType))
 	{
@@ -448,17 +448,17 @@ void UGameplayTask_Guide_DefeatEnemy::Activate()
 
 	DelegateHandle = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
 	                                     MakedDamageDelegate.AddCallback(
-		                                     std::bind(
-			                                     &ThisClass::OnActiveGEAddedDelegateToSelf,
-			                                     this,
-			                                     std::placeholders::_1
-		                                     )
-	                                     );
+	                                                                     std::bind(
+		                                                                      &ThisClass::OnActiveGEAddedDelegateToSelf,
+		                                                                      this,
+		                                                                      std::placeholders::_1
+		                                                                     )
+	                                                                    );
 }
 
 void UGameplayTask_Guide_DefeatEnemy::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	if (DelegateHandle)
 	{
@@ -471,7 +471,7 @@ void UGameplayTask_Guide_DefeatEnemy::OnDestroy(
 void UGameplayTask_Guide_DefeatEnemy::SetUp(
 	const FGameplayTag& InEnemyType,
 	int32 InNum
-)
+	)
 {
 	EnemyType = InEnemyType;
 	Num = InNum;
@@ -490,7 +490,7 @@ FTaskNodeDescript UGameplayTask_Guide_DefeatEnemy::GetTaskNodeDescripton() const
 
 void UGameplayTask_Guide_DefeatEnemy::OnActiveGEAddedDelegateToSelf(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-)
+	)
 {
 	if (
 		ReceivedEventModifyDataCallback.TargetCharacterPtr &&
@@ -520,7 +520,7 @@ void UGameplayTask_Guide_DefeatEnemy::UpdateDescription() const
 
 void UGameplayTask_Guide_ReturnOpenWorld::TickTask(
 	float DeltaTime
-)
+	)
 {
 	Super::TickTask(DeltaTime);
 
@@ -535,7 +535,7 @@ void UGameplayTask_Guide_ReturnOpenWorld::TickTask(
 
 void UGameplayTask_Guide_ReturnOpenWorld::SetUp(
 	int32 RemainTime_
-)
+	)
 {
 	RemainTime = RemainTime_;
 }
@@ -557,24 +557,24 @@ void UGameplayTask_Guide_ActiveDash::Activate()
 	Super::Activate();
 
 	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(
-		this,
-		&ThisClass::FGenericAbilityDelegate
-	);
+		 this,
+		 &ThisClass::FGenericAbilityDelegate
+		);
 }
 
 void UGameplayTask_Guide_ActiveDash::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(DelegateHandle);
-	
+
 	Super::OnDestroy(bInOwnerFinished);
 }
 
 void UGameplayTask_Guide_ActiveDash::FGenericAbilityDelegate(
 	UGameplayAbility* GAPtr
 
-)
+	)
 {
 	if (GAPtr)
 	{
@@ -590,24 +590,24 @@ void UGameplayTask_Guide_ActiveRun::Activate()
 	Super::Activate();
 
 	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(
-		this,
-		&ThisClass::FGenericAbilityDelegate
-	);
+		 this,
+		 &ThisClass::FGenericAbilityDelegate
+		);
 }
 
 void UGameplayTask_Guide_ActiveRun::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.Remove(DelegateHandle);
-	
+
 	Super::OnDestroy(bInOwnerFinished);
 }
 
 void UGameplayTask_Guide_ActiveRun::FGenericAbilityDelegate(
 	UGameplayAbility* GAPtr
 
-)
+	)
 {
 	if (GAPtr)
 	{
@@ -625,14 +625,14 @@ void UGameplayTask_Guide_AttckCharacter::Activate()
 	if (HumanCharacterAI && PlayerCharacterPtr)
 	{
 		DelegateHandle = HumanCharacterAI->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
-			std::bind(&ThisClass::OnEffectOhterCharacter, this, std::placeholders::_1)
-		);
+			 std::bind(&ThisClass::OnEffectOhterCharacter, this, std::placeholders::_1)
+			);
 	}
 }
 
 void UGameplayTask_Guide_AttckCharacter::OnDestroy(
 	bool bInOwnerFinished
-)
+	)
 {
 	if (DelegateHandle)
 	{
@@ -645,10 +645,23 @@ void UGameplayTask_Guide_AttckCharacter::OnDestroy(
 void UGameplayTask_Guide_AttckCharacter::OnEffectOhterCharacter(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 
-)
+	)
 {
-	if (ReceivedEventModifyDataCallback.TargetCharacterPtr && ReceivedEventModifyDataCallback.TargetCharacterPtr == HumanCharacterAI)
+	if (ReceivedEventModifyDataCallback.TargetCharacterPtr &&
+	    ReceivedEventModifyDataCallback.TargetCharacterPtr == HumanCharacterAI &&
+	    ReceivedEventModifyDataCallback.Damage > 0
+	)
 	{
-		EndTask();
+		if (bIsKill)
+		{
+			if (ReceivedEventModifyDataCallback.bIsDeath)
+			{
+				EndTask();
+			}
+		}
+		else
+		{
+			EndTask();
+		}
 	}
 }

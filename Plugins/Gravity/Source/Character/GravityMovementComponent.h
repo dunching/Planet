@@ -83,6 +83,20 @@ public:
 	bool bSkip_PathFollow = false;
 
 	/**
+	 * 跳过贴墙的检查
+	 * 比如飞行时
+	 */
+	UPROPERTY(Replicated)
+	bool bSkip_SkipSlideAlongSurface = false;
+
+	/**
+	 * 跳过飞行的检查
+	 * 比如飞行时
+	 */
+	UPROPERTY(Replicated)
+	bool bSkip_SkipFlyingCheck = false;
+
+	/**
 	 * 强制转向前进方向
 	 */
 	UPROPERTY(Replicated)
@@ -162,6 +176,10 @@ protected:
 		float deltaTime,
 		int32 Iterations
 		) override;
+
+	virtual float SlideAlongSurface(
+		const FVector& Delta, float Time, const FVector& Normal, FHitResult& Hit, bool bHandleImpact
+	) override;
 
 	virtual void ServerAutonomousProxyTick(
 		float DeltaSeconds

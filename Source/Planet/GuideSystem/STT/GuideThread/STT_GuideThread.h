@@ -1254,6 +1254,12 @@ struct PLANET_API FSTID_GuideThread_SpawnNPC :
 	)
 	TSubclassOf<AHumanCharacter_AI> NPCClass;
 
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	ETeammateOption TeammateOption = ETeammateOption::kEnemy;
+	
 	FGuid NPC_ID;
 };
 
@@ -1305,6 +1311,15 @@ struct PLANET_API FSTID_GuideThread_AttckCharacter :
 
 	UPROPERTY(EditAnywhere, Category = Context)
 	UGloabVariable_GuideThread_Main* GloabVariable_Main = nullptr;
+
+	/**
+	 * 击杀目标或仅攻击一次
+	 */
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	bool bIsKill = true;
 
 	TObjectPtr<ACharacterBase> HumanCharacterAI = nullptr;
 

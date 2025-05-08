@@ -12,6 +12,7 @@
 #include "SceneProxyExtendInfo.h"
 #include "PlanetPlayerController.h"
 #include "OpenWorldDataLayer.h"
+#include "PlayerGameplayTasks.h"
 #include "SpawnPoints.h"
 #include "Teleport.h"
 
@@ -53,7 +54,7 @@ ETeleport UOpenWorldSubSystem::GetTeleportLastPtInOpenWorld(
 			TArray<FTableRow_Teleport*> Result;
 			DT_TeleportPtr->GetAllRows<FTableRow_Teleport>(TEXT("GetChallenge"), Result);
 
-			const auto PlayerCharacterPt = OpenWorldTransform.GetLocation();
+			const auto PlayerCharacterPt = PCPtr->GetGameplayTasksComponent()->OpenWorldTransform.GetLocation();
 
 			ATeleport* TargetTeleportActorPtr = nullptr;
 			int32 Distance = -1;
@@ -134,8 +135,8 @@ void UOpenWorldSubSystem::TeleportPlayer(
 	if (ChallengeLevelType == ETeleport::kReturnOpenWorld)
 	{
 		if (PCPtr->GetPawn()->TeleportTo(
-		                                 OpenWorldTransform.GetLocation(),
-		                                 OpenWorldTransform.GetRotation().Rotator()
+		                                 PCPtr->GetGameplayTasksComponent()->OpenWorldTransform.GetLocation(),
+		                                 PCPtr->GetGameplayTasksComponent()->OpenWorldTransform.GetRotation().Rotator()
 		                                ))
 		{
 		}
@@ -153,8 +154,8 @@ void UOpenWorldSubSystem::TeleportPlayer(
 			{
 				if (RowIter->ChallengeLevelType == ChallengeLevelType)
 				{
-					OpenWorldTransform = PCPtr->GetPawn()->
-					                            GetActorTransform();
+					PCPtr->GetGameplayTasksComponent()->OpenWorldTransform = PCPtr->GetPawn()->
+						GetActorTransform();
 
 					auto TeleportPtr = RowIter->TeleportRef.LoadSynchronous();
 					const auto TeleportTransform = TeleportPtr->GetLandTransform();
@@ -355,6 +356,52 @@ TSoftObjectPtr<ATeleport> UOpenWorldSubSystem::GetTeleport(
 	}
 
 	return nullptr;
+}
+
+FTableRow_Teleport* UOpenWorldSubSystem::GetTeleportDT(
+	ETeleport ChallengeLevelType
+	) const
+{
+	auto DT_TeleportPtr = USceneProxyExtendInfoMap::GetInstance()->DataTable_Teleport.LoadSynchronous();
+
+	TArray<FTableRow_Teleport*> TeleportResult;
+	DT_TeleportPtr->GetAllRows<>(TEXT("GetChallenge"), TeleportResult);
+
+	for (const auto& RowIter : TeleportResult)
+	{
+		if (RowIter->ChallengeLevelType == ChallengeLevelType)
+		{
+			return RowIter;
+		}
+	}
+
+	return nullptr;
+}
+
+FGameplayTag UOpenWorldSubSystem::GetTeleportWeather(
+	ETeleport ChallengeLevelType
+	) const
+{
+	FGameplayTag NewWeather;
+	auto TeleportDTPtr = UOpenWorldSubSystem::GetInstance()->GetTeleportDT(ChallengeLevelType);
+	if (TeleportDTPtr->WeatherTagMap.IsEmpty())
+	{
+		
+	}
+	else
+	{
+		int32 Index = FMath::RandRange(0, TeleportDTPtr->WeatherTagMap.Num() - 1);
+		int32 CurrentIndex = 0;
+		for (const auto& Iter : TeleportDTPtr->WeatherTagMap)
+		{
+			CurrentIndex++;
+			if (CurrentIndex >= Index)
+			{
+				NewWeather = Iter;
+			}
+		}
+	}
+	return NewWeather; 
 }
 
 TArray<FTransform> UOpenWorldSubSystem::GetChallengeSpawnPts(

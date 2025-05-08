@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
 #include "Engine/World.h"
+#include "GameplayTagContainer.h"
 
 #include "OpenWorldDataLayer.generated.h"
 
@@ -68,4 +70,10 @@ struct PLANET_API FTableRow_Teleport : public FTableRowBase
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<TSoftObjectPtr<AActor>> MustReadActors;
+	
+	/**
+	 * 切换这个关卡时使用的天气
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSet<FGameplayTag> WeatherTagMap;
 };

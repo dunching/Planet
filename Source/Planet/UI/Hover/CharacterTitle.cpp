@@ -85,23 +85,29 @@ void UCharacterTitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
-void UCharacterTitle::SwitchCantBeSelect(bool bIsCanBeSelect)
+void UCharacterTitle::SwitchCantBeSelect(bool bIsCantBeSelect)
 {
 	auto WidgetPtr = Cast<UBorder>(GetWidgetFromName(FCharacterTitle::Get().Border));
 	if (WidgetPtr)
 	{
-		WidgetPtr->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, bIsCanBeSelect ? .3f: 1.f));
+		WidgetPtr->SetContentColorAndOpacity(FLinearColor(1.f, 1.f, 1.f, bIsCantBeSelect ? .3f: 1.f));
 	}
 }
 
 void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count)
 {
+	auto Lambda = [&]
+	{
+		const auto Value = Count > 0;
+		return Value;
+	};
+
 	if (Tag.MatchesTagExact(UGameplayTagsLibrary::Debuff))
 	{
 	}
 	else if (Tag.MatchesTag(UGameplayTagsLibrary::Debuff))
 	{
-		if (Count > 0)
+		if (Lambda())
 		{
 			TagSet.Add(Tag);
 		}
@@ -118,6 +124,10 @@ void UCharacterTitle::OnGameplayEffectTagCountChanged(const FGameplayTag Tag, in
 		{
 			ApplyStatesToTitle();
 		}
+	}
+	else if (Tag.MatchesTag(UGameplayTagsLibrary::State_Buff_CantBeSlected))
+	{
+		SwitchCantBeSelect(Lambda());
 	}
 }
 

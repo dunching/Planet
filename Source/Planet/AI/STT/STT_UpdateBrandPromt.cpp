@@ -26,7 +26,7 @@ EStateTreeRunStatus FSTT_UpdateBrandPromt::EnterState(
 
 	for (const auto& Iter : InteractionLists)
 	{
-		if (Iter.bIsTask && !Iter.bTaskHasCompleted)
+		if (Iter.bIsTask && Iter.bIsEnable)
 		{
 			InstanceData.bHaveTask = true;
 			InstanceData.CharacterPtr->GetAIComponent()->DisplayTaskPromy(InstanceData.TaskPromtClass);

@@ -63,6 +63,8 @@ namespace HumanProcessor
 			float Delta
 		) override;
 
+		void SwitchWeapon();
+
 		void SwitchCurrentWeapon();
 
 		void AddOrRemoveUseMenuItemEvent(

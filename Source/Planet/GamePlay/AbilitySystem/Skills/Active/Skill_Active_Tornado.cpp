@@ -219,9 +219,10 @@ void USkill_Active_Tornado::ApplyCost(
 		FGameplayEffectSpecHandle SpecHandle =
 			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 			UGameplayTagsLibrary::GEData_ModifyItem_Mana,
-			ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
+			-ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
 		);
 
 		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);

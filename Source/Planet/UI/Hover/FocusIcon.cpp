@@ -24,12 +24,17 @@ void UFocusIcon::NativeDestruct()
 void UFocusIcon::NativeTick(
 	const FGeometry& MyGeometry,
 	float InDeltaTime
-)
+	)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
 FVector UFocusIcon::GetHoverPosition()
 {
-	return TargetCharacterPtr->GetActorLocation();
+	if (TargetCharacterPtr.IsValid())
+	{
+		return TargetCharacterPtr->GetActorLocation();
+	}
+
+	return Super::GetHoverPosition();
 }

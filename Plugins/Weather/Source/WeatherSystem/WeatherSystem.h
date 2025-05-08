@@ -11,7 +11,9 @@
 class ADynamic_Sky;
 class ADynamic_Weather;
 
-using FOnHourly = std::function<void(int32)>;
+using FOnHourly = std::function<void(
+	int32
+	)>;
 
 /**
  *
@@ -19,43 +21,50 @@ using FOnHourly = std::function<void(int32)>;
 UCLASS()
 class WEATHER_API UWeatherSystem : public UWorldSubsystem
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+
 public:
+	static UWeatherSystem* GetInstance();
 
-    static UWeatherSystem* GetInstance();
+	virtual void Initialize(
+		FSubsystemCollectionBase& Collection
+		) override;
 
-    virtual void Initialize(FSubsystemCollectionBase& Collection) override;
+	virtual void Deinitialize() override;
 
-    virtual void Deinitialize() override;
+	void RegisterCallback();
 
-    void RegisterCallback();
+	void ResetTime();
 
-    void ResetTime();
+	// UFUNCTION(NetMulticast, Unreliable)
+	void AdjustTime(
+		const FDateTime& Time
+		);
 
-    void AdjustTime(const FDateTime& Time);
+	int32 AddOnHourly(
+		const FOnHourly& OnHourly
+		);
 
-    int32 AddOnHourly(const FOnHourly& OnHourly);
+	ADynamic_Sky* GetDynamicSky();
 
-    ADynamic_Sky* GetDynamicSky();
-
-    ADynamic_Weather* GetDynamicWeather();
+	ADynamic_Weather* GetDynamicWeather();
 
 protected:
-    
+
 private:
+	void OnHoury(
+		int32 Hour
+		);
 
-    void OnHoury(int32 Hour);
+	FDateTime CustomTime;
 
-    FDateTime CustomTime;
+	FDateTime CurrentTime;
 
-    FDateTime CurrentTime;
-
-    float AdjustTimeSpeed = 200.f;
+	float AdjustTimeSpeed = 200.f;
 
 	float OriginalSpeed = 1.f;
 
-    ADynamic_Sky* Dynamic_SkyPtr = nullptr;
+	ADynamic_Sky* Dynamic_SkyPtr = nullptr;
 
-    ADynamic_Weather* Dynamic_WeatherPtr = nullptr;
-
+	ADynamic_Weather* Dynamic_WeatherPtr = nullptr;
 };

@@ -170,7 +170,7 @@ void UProxyProcessComponent::ActiveWeapon()
 #endif
 }
 
-void UProxyProcessComponent::SwitchWeapon()
+bool UProxyProcessComponent::SwitchWeapon()
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 
@@ -181,19 +181,29 @@ void UProxyProcessComponent::SwitchWeapon()
 
 	if (WeaponSocket_1.Socket == CurrentWeaponSocket)
 	{
-		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
+		auto NewWeaponSocketSPtr = FindWeaponSocket(UGameplayTagsLibrary::WeaponSocket_2);
+		if (NewWeaponSocketSPtr)
+		{
+			return SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
+		}
 	}
 	else
 	{
-		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
+		auto NewWeaponSocketSPtr = FindWeaponSocket(UGameplayTagsLibrary::WeaponSocket_1);
+		if (NewWeaponSocketSPtr)
+		{
+			return SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
+		}
 	}
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
-		SwitchWeapon_Server();
+		// SwitchWeapon_Server();
 	}
 #endif
+
+	return false;
 }
 
 void UProxyProcessComponent::RetractputWeapon()
@@ -380,18 +390,20 @@ void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged(const FGameplayTa
 	}
 }
 
-void UProxyProcessComponent::SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket)
+bool UProxyProcessComponent::SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket)
 {
 	if (NewWeaponSocket == CurrentWeaponSocket)
 	{
 	}
 	else
 	{
-		SwitchWeaponImp(NewWeaponSocket);
+		return SwitchWeaponImp(NewWeaponSocket);
 	}
+
+	return false;
 }
 
-void UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket)
+bool UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket)
 {
 	auto PreviousWeaponSocketSPtr = FindWeaponSocket(CurrentWeaponSocket);
 	if (PreviousWeaponSocketSPtr)
@@ -420,6 +432,8 @@ void UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket
 	CurrentWeaponSocket = NewWeaponSocket;
 
 	OnCurrentWeaponChanged();
+
+	return true;
 }
 
 TMap<FGameplayTag, FCharacterSocket> UProxyProcessComponent::GetAllSocket() const

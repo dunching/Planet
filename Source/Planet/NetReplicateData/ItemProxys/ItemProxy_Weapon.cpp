@@ -32,6 +32,8 @@ void FWeaponProxy::UpdateByRemote(
 	UpdateByRemote_Allocationble(RemoteSPtr);
 
 	MaxAttackDistance = RemoteSPtr->MaxAttackDistance;
+	ActivedWeaponPtr = RemoteSPtr->ActivedWeaponPtr;
+	WeaponSkillID = RemoteSPtr->WeaponSkillID;
 }
 
 bool FWeaponProxy::NetSerialize(
@@ -43,6 +45,7 @@ bool FWeaponProxy::NetSerialize(
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
 
+	Ar << MaxAttackDistance;
 	Ar << ActivedWeaponPtr;
 	Ar << WeaponSkillID;
 

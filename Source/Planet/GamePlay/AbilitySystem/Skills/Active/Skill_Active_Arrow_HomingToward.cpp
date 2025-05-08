@@ -16,6 +16,65 @@
 #include "GameplayTagsLibrary.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "ItemProxy_Minimal.h"
+#include "SceneProxyTable.h"
+
+void USkill_Active_Arrow_HomingToward::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
+{
+	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (SkillProxyPtr)
+	{
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_ActiveSkillExtendInfo()
+		);
+	}
+}
+
+void USkill_Active_Arrow_HomingToward::ApplyCooldown(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+	) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_Duration,
+			ItemProxy_DescriptionPtr->CD.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
+
+void USkill_Active_Arrow_HomingToward::ApplyCost(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo
+	) const
+{
+	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+	if (CooldownGE)
+	{
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			UGameplayTagsLibrary::GEData_ModifyItem_Mana,
+			ItemProxy_DescriptionPtr->Cost.PerLevelValue[0]
+		);
+
+		const auto CDGEHandle = ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
+	}
+}
 
 void USkill_Active_Arrow_HomingToward::PerformAction(
 	const FGameplayAbilitySpecHandle Handle,
@@ -63,7 +122,6 @@ void USkill_Active_Arrow_HomingToward::DurationTick(UAbilityTask_TimerHelper*, f
 bool USkill_Active_Arrow_HomingToward::OnFinished(UAbilityTask_TimerHelper*)
 {
 	SwitchIsHomingToward(false);
-
 
 	K2_CancelAbility();
 

@@ -18,7 +18,9 @@
 #include "PlanetPlayerController.h"
 
 #include "ChallengeEntry.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
+#include "GameplayTagsLibrary.h"
 #include "InteractionList.h"
 #include "MainHUDLayout.h"
 #include "SceneActor.h"
@@ -89,10 +91,55 @@ void UCharacterPlayerStateProcessorComponent::FocusTarget()
 	ClearFocusCharactersAry();
 }
 
+inline void UCharacterPlayerStateProcessorComponent::OnFocusCharacterDestroyed(
+	AActor* DestroyedActor
+	)
+{
+	ClearFocusCharactersAry();
+}
+
+void UCharacterPlayerStateProcessorComponent::OnGameplayEffectTagCountChanged(
+	const FGameplayTag Tag,
+	int32 Count
+	)
+{
+	Super::OnGameplayEffectTagCountChanged(Tag, Count);
+	
+	auto Lambda = [&]
+	{
+		const auto Value = Count > 0;
+		return Value;
+	};
+	if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Dying))
+	{
+		ClearFocusCharactersAry();
+	}
+	else if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Buff_CantBeSlected))
+	{
+		ClearFocusCharactersAry();
+	}
+}
+
 void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
 	ACharacterBase* TargetCharacterPtr
 	)
 {
+	if (TargetCharacterPtr && TargetCharacterPtr != PreviousFocusCharactersPtr)
+	{
+		PreviousFocusCharactersPtr = TargetCharacterPtr;
+		
+		TargetCharacterPtr->OnDestroyed.AddDynamic(this, &ThisClass::OnFocusCharacterDestroyed);
+		OnGameplayEffectTagCountChangedHandle = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->
+		                                                            RegisterGenericGameplayTagEvent().AddUObject(
+			                                                             this,
+			                                                             &ThisClass::OnGameplayEffectTagCountChanged
+			                                                            );
+	}
+	else
+	{
+		return;
+	}
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -109,6 +156,14 @@ void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
 
 void UCharacterPlayerStateProcessorComponent::ClearFocusCharactersAry()
 {
+	if (PreviousFocusCharactersPtr)
+	{
+		PreviousFocusCharactersPtr->OnDestroyed.RemoveDynamic(this, &ThisClass::OnFocusCharacterDestroyed);
+		PreviousFocusCharactersPtr->GetCharacterAbilitySystemComponent()->
+		                            RegisterGenericGameplayTagEvent().Remove(OnGameplayEffectTagCountChangedHandle);
+		PreviousFocusCharactersPtr = nullptr;
+	}
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{

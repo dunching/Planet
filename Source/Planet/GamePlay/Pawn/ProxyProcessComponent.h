@@ -94,8 +94,11 @@ public:
 	// 激活可用的武器
 	void ActiveWeapon();
 
-	// 切換主副武器
-	void SwitchWeapon();
+	/**
+	 * 切換主副武器
+	 * @return 是否切换成功
+	 */
+	bool SwitchWeapon();
 
 	void RetractputWeapon();
 
@@ -145,9 +148,9 @@ protected:
 
 	void Cancel(const FGameplayTag& Socket);
 
-	void SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket);
+	bool SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket);
 
-	void SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
+	bool SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
 
 	bool ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag);
 

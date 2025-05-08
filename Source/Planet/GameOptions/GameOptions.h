@@ -76,6 +76,33 @@ public:
 
 #pragma region 按键映射
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ActiveSkill_1_Key = EKeys::Q;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ActiveSkill_2_Key = EKeys::E;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ActiveSkill_3_Key = EKeys::R;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ActiveSkill_4_Key = EKeys::F;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey Consumable_1_Key = EKeys::One;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey Consumable_2_Key = EKeys::Two;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey Consumable_3_Key = EKeys::Three;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey Consumable_4_Key = EKeys::Four;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey SwitchWeapon = EKeys::X;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey JumpKey = EKeys::SpaceBar;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")

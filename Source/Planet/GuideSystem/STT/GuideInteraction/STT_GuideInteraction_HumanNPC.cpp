@@ -225,7 +225,7 @@ EStateTreeRunStatus FSTT_GuideInteraction_ChangeNPCsTaskState::EnterState(
 		auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
 		if (TargetCharacterPtr)
 		{
-			TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationTaskState(
+			TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationState(
 				 InstanceData.GuideInteractionActorClass,
 				 InstanceData.bEnable
 				);
@@ -257,7 +257,7 @@ void FSTT_GuideInteraction_ChangeNPCsTaskState::ExitState(
 			auto TargetCharacterPtr = PAD->TargetCharacterPtr.LoadSynchronous();
 			if (TargetCharacterPtr)
 			{
-				TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationTaskState(
+				TargetCharacterPtr->GetSceneActorInteractionComponent()->ChangedInterationState(
 					 InstanceData.GuideInteractionActorClass,
 					 !InstanceData.bEnable
 					);

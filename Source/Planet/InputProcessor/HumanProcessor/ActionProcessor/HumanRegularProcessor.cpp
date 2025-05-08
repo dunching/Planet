@@ -148,6 +148,16 @@ namespace HumanProcessor
 		OnwerActorPtr->UpdateSightActor();
 	}
 
+	void FHumanRegularProcessor::SwitchWeapon()
+	{
+		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
+
+		if (OnwerActorPtr)
+		{
+			OnwerActorPtr->GetCharacterAbilitySystemComponent()->SwitchWeapon();
+		}
+	}
+
 	void FHumanRegularProcessor::SwitchCurrentWeapon()
 	{
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
@@ -245,6 +255,7 @@ namespace HumanProcessor
 					return true;
 				}
 
+				// 可激活的技能或消耗品插槽
 				auto SkillIter = HandleKeysMap.Find(EventArgs.Key);
 				if (SkillIter)
 				{
@@ -254,6 +265,12 @@ namespace HumanProcessor
 					return true;
 				}
 
+				if (EventArgs.Key == GameOptionsPtr->SwitchWeapon)
+				{
+					SwitchWeapon();
+					return true;
+				}
+				
 				// 这里应该是特定的输入会打断 还是任意输入都会打断？
 				else if (
 					(EventArgs.Key == EKeys::W) ||

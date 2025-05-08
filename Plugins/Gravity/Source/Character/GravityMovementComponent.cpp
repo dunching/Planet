@@ -555,6 +555,7 @@ void UGravityMovementComponent::PhysFlying(
 
 		if (Velocity.Z > 0.f)
 		{
+			SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
 		}
 		else
 		{
@@ -571,10 +572,30 @@ void UGravityMovementComponent::PhysFlying(
 		}
 	}
 
-	if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
+	if (bSkip_SkipFlyingCheck)
+	{
+		
+	}
+	else if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 	{
 		Velocity = (UpdatedComponent->GetComponentLocation() - OldLocation) / deltaTime;
 	}
+}
+
+float UGravityMovementComponent::SlideAlongSurface(
+	const FVector& Delta,
+	float Time,
+	const FVector& Normal,
+	FHitResult& Hit,
+	bool bHandleImpact
+	)
+{
+	// if (bSkip_SkipSlideAlongSurface)
+	// {
+	// 	return 0.f;
+	// }
+
+	return Super::SlideAlongSurface(Delta, Time, Normal, Hit, bHandleImpact);
 }
 
 void UGravityMovementComponent::ServerAutonomousProxyTick(
@@ -646,6 +667,8 @@ void UGravityMovementComponent::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_RootMotion, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_PlayerInput, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_PathFollow, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_SkipSlideAlongSurface, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_SkipFlyingCheck, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bForceRotation, COND_None);
 }
 

@@ -44,6 +44,8 @@ public:
 
 	static FGameplayTag BaseFeature_Dying;
 
+	static FGameplayTag BaseFeature_SwitchWeapon;
+
 #pragma region MovementStateAbl
 	static FGameplayTag MovementStateAble;
 
@@ -56,6 +58,10 @@ public:
 	static FGameplayTag MovementStateAble_CantRootMotion;
 	
 	static FGameplayTag MovementStateAble_CantRotation;
+
+	static FGameplayTag MovementStateAble_SkipSlideAlongSurface;
+
+	static FGameplayTag MovementStateAble_SkipFlyingCheck;
 
 	static FGameplayTag MovementStateAble_Orient2Acce;
 	
@@ -74,6 +80,8 @@ public:
 	static FGameplayTag State_Dying;
 	
 	static FGameplayTag State_MoveToLocation;
+	
+	static FGameplayTag State_UsingCurrentWeapon;
 	
 	static FGameplayTag State_Running;
 	
