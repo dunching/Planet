@@ -129,6 +129,7 @@ void UAllocationSkillsMenu::ResetUIByData()
 	InitialGroupmateList();
 
 	ResetUI(CharacterPtr->GetCharacterProxy());
+	ResetBackpack(CharacterPtr->GetCharacterProxy());
 }
 
 void UAllocationSkillsMenu::ResetUIByData_WeaponSkills(
@@ -482,7 +483,6 @@ void UAllocationSkillsMenu::ResetUI(
 )
 {
 	CurrentProxyPtr = PlayerCharacterProxyPtr;
-	ResetBackpack(PlayerCharacterProxyPtr);
 	ResetUIByData_WeaponSkills(CurrentProxyPtr);
 	ResetUIByData_Skills(CurrentProxyPtr);
 	ResetUIByData_Consumable(CurrentProxyPtr);
@@ -656,15 +656,9 @@ void UAllocationSkillsMenu::OnSelectedCharacterProxy(const TSharedPtr<FCharacter
 		{
 			if (CharacterIconPtr->ProxyPtr == ProxyPtr)
 			{
-				auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-				if (!CharacterPtr)
-				{
-					return;
-				}
-
 				SyncData();
 
-				ResetUI(CurrentProxyPtr);
+				ResetUI(ProxyPtr);
 
 				continue;
 			}

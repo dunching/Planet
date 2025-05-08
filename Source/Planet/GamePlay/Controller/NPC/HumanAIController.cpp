@@ -188,7 +188,7 @@ void AHumanAIController::OnTeamChanged()
 			)
 		);
 
-		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->GetOwnerCharacterProxyPtr());
+		OnTeammateOptionChangedImp(TeamsHelper->GetTeammateOption(), TeamsHelper->GetOwnerCharacterProxy());
 	}
 }
 

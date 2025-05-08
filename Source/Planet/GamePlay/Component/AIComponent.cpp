@@ -6,6 +6,7 @@
 #include "CharacterBase.h"
 #include "CharactersInfo.h"
 #include "GameplayTagsLibrary.h"
+#include "GroupManagger.h"
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"
 #include "InventoryComponent.h"
@@ -100,46 +101,59 @@ void UAIComponent::InitialAllocationsRowName()
 #endif
 		{
 			auto OnwerActorPtr = GetOwner<FOwnerType>();
-			auto InventoryComponentPtr = OnwerActorPtr->GetInventoryComponent();
-			// 武器
+			auto OwnerCharacterProxy = OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->GetOwnerCharacterProxy();
+			if (!OwnerCharacterProxy)
 			{
+				return;
+			}
+
+			if (OwnerCharacterProxy->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
+			{
+				
+			}
+			else if (OwnerCharacterProxy->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Assistional))
+			{
+				auto InventoryComponentPtr = OnwerActorPtr->GetInventoryComponent();
+				// 武器
 				{
-					if (FirstWeaponSocketInfo.IsValid())
 					{
-						FCharacterSocket SkillsSocketInfo;
-						SkillsSocketInfo.Socket = UGameplayTagsLibrary::WeaponSocket_1;
-							
-						auto NewWeaponProxySPtr = InventoryComponentPtr->AddProxy_Weapon(
-							FirstWeaponSocketInfo);
-						if (NewWeaponProxySPtr)
+						if (FirstWeaponSocketInfo.IsValid())
 						{
-							NewWeaponProxySPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
+							FCharacterSocket SkillsSocketInfo;
+							SkillsSocketInfo.Socket = UGameplayTagsLibrary::WeaponSocket_1;
+							
+							auto NewWeaponProxySPtr = InventoryComponentPtr->AddProxy_Weapon(
+								FirstWeaponSocketInfo);
+							if (NewWeaponProxySPtr)
+							{
+								NewWeaponProxySPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
 								
-							SkillsSocketInfo.UpdateProxy(NewWeaponProxySPtr);
+								SkillsSocketInfo.UpdateProxy(NewWeaponProxySPtr);
+							}
 						}
 					}
 				}
-			}
 
-			// 技能
-			{
-				if (ActiveSkillSet_1.IsValid())
+				// 技能
 				{
-					FCharacterSocket SkillsSocketInfo;
-
-					SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
-
-					auto SkillProxyPtr = InventoryComponentPtr->AddProxy_Skill(
-						ActiveSkillSet_1);
-					if (SkillProxyPtr)
+					if (ActiveSkillSet_1.IsValid())
 					{
-						SkillProxyPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
-								
-						SkillsSocketInfo.UpdateProxy(SkillProxyPtr);
-					}
-				}
+						FCharacterSocket SkillsSocketInfo;
 
-				OnwerActorPtr->GetProxyProcessComponent()->UpdateCanbeActiveSkills();
+						SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
+
+						auto SkillProxyPtr = InventoryComponentPtr->AddProxy_Skill(
+							ActiveSkillSet_1);
+						if (SkillProxyPtr)
+						{
+							SkillProxyPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
+								
+							SkillsSocketInfo.UpdateProxy(SkillProxyPtr);
+						}
+					}
+
+					OnwerActorPtr->GetProxyProcessComponent()->UpdateCanbeActiveSkills();
+				}
 			}
 		}
 	}

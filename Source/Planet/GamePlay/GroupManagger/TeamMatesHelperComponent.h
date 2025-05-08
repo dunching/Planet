@@ -138,7 +138,7 @@ public:
 		bool bNoCheck = false
 	);
 
-	TSharedPtr<FCharacterProxyType> GetOwnerCharacterProxyPtr() const;
+	TSharedPtr<FCharacterProxyType> GetOwnerCharacterProxy() const;
 
 	void SetOwnerCharacterProxy(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxySPtr
@@ -203,7 +203,7 @@ private:
 	);
 
 	/**
-	 * 
+	 * 生成AI队友
 	 */
 	UFUNCTION(Server, Reliable)
 	virtual void SpwanTeammateCharacter_Server();

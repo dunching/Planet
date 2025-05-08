@@ -108,7 +108,7 @@ void UHUD_TeamInfo::ResetUIByData()
 
 	OnTeammateOptionChanged(
 		GMCPtr->GetTeamMatesHelperComponent()->GetTeammateOption(),
-		GMCPtr->GetTeamMatesHelperComponent()->GetOwnerCharacterProxyPtr()
+		GMCPtr->GetTeamMatesHelperComponent()->GetOwnerCharacterProxy()
 	);
 }
 

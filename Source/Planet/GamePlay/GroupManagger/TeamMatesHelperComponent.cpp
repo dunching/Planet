@@ -319,7 +319,7 @@ void UTeamMatesHelperComponent::SetSensingChractersSet(
 	SensingChractersSet = KnowCharater;
 }
 
-TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperComponent::GetOwnerCharacterProxyPtr() const
+TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType> UTeamMatesHelperComponent::GetOwnerCharacterProxy() const
 {
 	return OwnerCharacterProxyPtr;
 }

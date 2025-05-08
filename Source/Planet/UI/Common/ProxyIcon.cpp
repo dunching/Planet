@@ -21,12 +21,14 @@ inline void UProxyIcon::ResetToolUIByData(
 	const TSharedPtr<FBasicProxy>& InBasicProxyPtr
 	)
 {
-	if (!InBasicProxyPtr)
+	if (InBasicProxyPtr)
 	{
-		return;
+		ProxyType = InBasicProxyPtr->GetProxyType();
 	}
-
-	ProxyType = InBasicProxyPtr->GetProxyType();
+	else
+	{
+		ProxyType = FGameplayTag::EmptyTag;
+	}
 
 	SetItemType();
 }
@@ -106,7 +108,7 @@ void UProxyIcon::SetItemType()
 		}
 		else
 		{
+			ImagePtr->SetVisibility(ESlateVisibility::Hidden);
 		}
-		checkNoEntry();
 	}
 }

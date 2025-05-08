@@ -117,7 +117,7 @@ void UEQC_GetLeader::ProvideContext(
 	if (CharacterPtr)
 	{
 		auto OwnerCharacterProxyPtr = CharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
-		                                            GetOwnerCharacterProxyPtr();
+		                                            GetOwnerCharacterProxy();
 		if (OwnerCharacterProxyPtr && OwnerCharacterProxyPtr.IsValid())
 		{
 			auto TargetCharacterPtr = OwnerCharacterProxyPtr->GetCharacterActor();

@@ -120,7 +120,7 @@ void USTE_Assistance::OnTeamChanged()
 	auto TeamHelperSPtr = HumanCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent();
 	if (TeamHelperSPtr)
 	{
-		if (auto OwnerCharacterProxySPtr = TeamHelperSPtr->GetOwnerCharacterProxyPtr())
+		if (auto OwnerCharacterProxySPtr = TeamHelperSPtr->GetOwnerCharacterProxy())
 		{
 			LeaderCharacterPtr = OwnerCharacterProxySPtr->GetCharacterActor().Get();
 		}
@@ -144,7 +144,7 @@ UGloabVariable_Character* USTE_Assistance::CreateGloabVarianble()
 TWeakObjectPtr<ACharacterBase> USTE_Assistance::UpdateTargetCharacter()
 {
 	auto TeamMatesHelperComponent = HumanAIControllerPtr->GetGroupManagger()->GetTeamMatesHelperComponent();
-	auto OwnerCharacterProxyPtr = TeamMatesHelperComponent->GetOwnerCharacterProxyPtr();
+	auto OwnerCharacterProxyPtr = TeamMatesHelperComponent->GetOwnerCharacterProxy();
 
 	// 是否远离了设定位置
 	auto CharacterActorPtr = OwnerCharacterProxyPtr->GetCharacterActor();
