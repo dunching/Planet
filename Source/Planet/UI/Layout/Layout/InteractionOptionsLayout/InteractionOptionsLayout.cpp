@@ -59,7 +59,7 @@ void UInteractionOptionsLayout::Enable()
 
 		if (CurrentActionSPtr)
 		{
-			CharacterPtr = CurrentActionSPtr->CharacterPtr;
+			SceneActorInteractionInterfacePtr = CurrentActionSPtr->CharacterPtr;
 
 			auto UIPtr = Cast<UOptionList>(GetWidgetFromName(FInteractionOptionsLayout::Get().InteractionList));
 			if (UIPtr)
@@ -144,11 +144,7 @@ void UInteractionOptionsLayout::SelectedInteractionItem(
 	const TSubclassOf<AGuideInteraction_Actor>& GuideInteractionClass
 )
 {
-	if (CharacterPtr)
-	{
-		CharacterPtr->GetSceneActorInteractionComponent()->StartInteractionItem(GuideInteractionClass);
-	}
-	else if (SceneActorInteractionInterfacePtr)
+	if (SceneActorInteractionInterfacePtr)
 	{
 		SceneActorInteractionInterfacePtr->GetSceneActorInteractionComponent()->StartInteractionItem(GuideInteractionClass);
 	}

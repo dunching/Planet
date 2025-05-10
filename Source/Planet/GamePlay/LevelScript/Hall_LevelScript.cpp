@@ -17,6 +17,13 @@ void AMain_LevelScriptActor::BeginPlay()
 	Super::BeginPlay();
 
 	ClearWorldProcessCache();
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(WeatherSettings::Clear_Skies);
+	}
+#endif
 }
 
 void AMain_LevelScriptActor::ClearWorldProcessCache()
@@ -33,12 +40,6 @@ void AMain_LevelScriptActor::ClearWorldProcessCache()
 				Iter->Destroy();
 			}
 		}
-	}
-#endif
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(WeatherSettings::Clear_Skies);
 	}
 #endif
 }

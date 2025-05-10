@@ -13,7 +13,7 @@
 #include "Hall_LevelScript.generated.h"
 
 /**
- *
+ * 大厅
  */
 UCLASS()
 class PLANET_API AHall_LevelScriptActor : public ALevelScriptActor
@@ -27,8 +27,8 @@ public:
 };
 
 /**
- *
- */
+ * 开放世界
+ */ 
 UCLASS()
 class PLANET_API AMain_LevelScriptActor : public ALevelScriptActor
 {

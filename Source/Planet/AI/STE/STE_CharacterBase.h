@@ -29,6 +29,8 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	FVector Location = FVector::ZeroVector;
 
+	bool bEQSSucessed = false;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Output)
 	int32 QueryDistance = 100;
 	

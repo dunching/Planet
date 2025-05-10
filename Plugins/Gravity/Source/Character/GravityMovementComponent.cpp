@@ -566,15 +566,14 @@ void UGravityMovementComponent::PhysFlying(
 			else
 			{
 				//adjust and try again
-				// 				 HandleImpact(Hit, deltaTime, Adjusted);
-				// 				 SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
+				HandleImpact(Hit, deltaTime, Adjusted);
+				SlideAlongSurface(Adjusted, (1.f - Hit.Time), Hit.Normal, Hit, true);
 			}
 		}
 	}
 
 	if (bSkip_SkipFlyingCheck)
 	{
-		
 	}
 	else if (!bJustTeleported && !HasAnimRootMotion() && !CurrentRootMotion.HasOverrideVelocity())
 	{

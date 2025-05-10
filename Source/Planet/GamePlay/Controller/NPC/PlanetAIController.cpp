@@ -183,13 +183,7 @@ void APlanetAIController::OnTargetPerceptionUpdated(
 	auto CharacterPtr = Cast<AHumanCharacter>(Actor);
 	if (CharacterPtr)
 	{
-		if (IsGroupmate(CharacterPtr) || CharacterPtr->GetCharacterAttributesComponent()->CharacterCategory.MatchesTag(
-			     UGameplayTagsLibrary::Proxy_Character_NPC_Functional
-			    ))
-		{
-			return;
-		}
-		else
+		auto AddLambda = [&Stimulus, this, CharacterPtr]
 		{
 			if (Stimulus.WasSuccessfullySensed())
 			{
@@ -199,6 +193,25 @@ void APlanetAIController::OnTargetPerceptionUpdated(
 			{
 				GetGroupManagger()->GetTeamMatesHelperComponent()->RemoveKnowCharacter(CharacterPtr);
 			}
+		};
+
+		if (IsGroupmate(CharacterPtr))
+		{
+		}
+		else if (CharacterPtr->GetCharacterAttributesComponent()->CharacterCategory.MatchesTag(
+			 UGameplayTagsLibrary::Proxy_Character_NPC_Functional_Dummy
+			))
+		{
+			AddLambda();
+		}
+		else if (CharacterPtr->GetCharacterAttributesComponent()->CharacterCategory.MatchesTag(
+			 UGameplayTagsLibrary::Proxy_Character_NPC_Functional
+			))
+		{
+		}
+		else
+		{
+			AddLambda();
 		}
 	}
 }

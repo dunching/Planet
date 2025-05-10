@@ -53,7 +53,7 @@ EStateTreeRunStatus FSTT_RunEQS::EnterState(
 		InstanceData.TaskOwner = InstanceData.AIControllerPtr;
 	}
 
-	return PerformGameplayTask(Context);
+	return Super::EnterState(Context, Transition);
 }
 
 void FSTT_RunEQS::ExitState(
@@ -80,7 +80,7 @@ EStateTreeRunStatus FSTT_RunEQS::Tick(
 {
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 
-	if (InstanceData.bIsFinished)
+	if (InstanceData.GloabVariable->bEQSSucessed)
 	{
 		if (InstanceData.ResultSPtr)
 		{
@@ -88,21 +88,27 @@ EStateTreeRunStatus FSTT_RunEQS::Tick(
 			if (bSuccess)
 			{
 				InstanceData.GloabVariable->Location = InstanceData.ResultSPtr->GetItemAsLocation(0);
-				InstanceData.Location = InstanceData.GloabVariable->Location;
 
 #ifdef WITH_EDITOR
 				if (DrawDebugSTT_RunEQS.GetValueOnGameThread())
 				{
-					DrawDebugSphere(GetWorldImp(), InstanceData.Location, 20, 20, FColor::Yellow, false, 5);
+					DrawDebugSphere(GetWorldImp(), InstanceData.GloabVariable->Location, 20, 20, FColor::Yellow, false, 5);
 				}
 #endif
 
-				return EStateTreeRunStatus::Succeeded;
+				return Super::Tick(Context, DeltaTime);
 			}
 		}
 		return EStateTreeRunStatus::Failed;
 	}
-
+	else
+	{
+		if (InstanceData.RequestID <= INDEX_NONE)
+		{
+			return PerformGameplayTask(Context); 
+		}
+	}
+	
 	return Super::Tick(Context, DeltaTime);
 }
 
@@ -129,7 +135,8 @@ EStateTreeRunStatus FSTT_RunEQS::PerformGameplayTask(FStateTreeExecutionContext&
 
 void FStateTreeRunEQSTaskInstanceData::OnQueryFinished(TSharedPtr<FEnvQueryResult> Result)
 {
-	bIsFinished = true;
+	GloabVariable->bEQSSucessed = true;
+	RequestID = INDEX_NONE;
 
 	if (Result->IsAborted())
 	{
@@ -141,7 +148,7 @@ void FStateTreeRunEQSTaskInstanceData::OnQueryFinished(TSharedPtr<FEnvQueryResul
 
 void FStateTreeRunEQSTaskInstanceData::Reset()
 {
-	RequestID = 0;
-	bIsFinished = false;
+	RequestID = INDEX_NONE;
+	GloabVariable->bEQSSucessed = false;
 	ResultSPtr.Reset();
 }

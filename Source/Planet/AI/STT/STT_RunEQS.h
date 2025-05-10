@@ -35,9 +35,6 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Context)
 	UGloabVariable_Character* GloabVariable = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = Output)
-	FVector Location = FVector::ZeroVector;
-
 	UPROPERTY(EditAnywhere, Category = Param)
 	TObjectPtr<UEnvQuery> QueryTemplate;
 
@@ -50,13 +47,10 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Param)
 	int32 Donut_OuterRadius = 850;
 	
-	int32 RequestID = 0;
+	int32 RequestID = INDEX_NONE;
 
 	UPROPERTY(Transient)
 	TScriptInterface<IGameplayTaskOwnerInterface> TaskOwner = nullptr;
-
-	UPROPERTY(Transient)
-	bool bIsFinished = false;
 
 	TSharedPtr<FEnvQueryResult> ResultSPtr;
 
@@ -84,14 +78,14 @@ struct PLANET_API FSTT_RunEQS : public FStateTreeAIActionTaskBase
 		const FStateTreeTransitionResult& Transition
 	) const override;
 
-	virtual void ExitState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
 	virtual EStateTreeRunStatus Tick(
 		FStateTreeExecutionContext& Context,
 		const float DeltaTime
+	) const override;
+
+	virtual void ExitState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
 	) const override;
 
 	virtual EStateTreeRunStatus PerformGameplayTask(FStateTreeExecutionContext& Context)const;

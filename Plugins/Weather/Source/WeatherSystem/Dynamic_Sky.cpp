@@ -15,7 +15,7 @@ ADynamic_Sky::ADynamic_Sky(
 	//
 	// SetReplicatingMovement(true);
 
-	bIsSpatiallyLoaded = true;
+	bIsSpatiallyLoaded = false;
 	
 }
 

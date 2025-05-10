@@ -169,13 +169,19 @@ void UGameplayTask_TeleportPlayer::Activate()
 	{
 	}
 #endif
-
-	TargetPCPtr->GetGameplayTasksComponent()->OpenWorldWeather = UWeatherSystem::GetInstance()->GetDynamicWeather()
-		->GetCurrentWeather();
-	
+		
 #if UE_EDITOR || UE_SERVER
 	if (TargetPCPtr->GetNetMode() == NM_DedicatedServer)
 	{
+		if (Weather.IsValid())
+		{
+			TargetPCPtr->GetGameplayTasksComponent()->OpenWorldWeather = UWeatherSystem::GetInstance()->GetDynamicWeather()
+				->GetCurrentWeather();
+	
+			// 改变天气
+			UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(Weather);
+		}
+		
 		UOpenWorldSubSystem::GetInstance()->SwitchDataLayer(Teleport, TargetPCPtr);
 	}
 #endif
@@ -212,9 +218,6 @@ void UGameplayTask_TeleportPlayer::TickTask(
 				}
 #endif
 
-				// 改变天气
-				// UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(Weather);
-				
 				EndTask();
 			}
 		}

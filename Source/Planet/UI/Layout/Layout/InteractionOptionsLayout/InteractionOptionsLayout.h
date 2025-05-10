@@ -49,10 +49,14 @@ public:
 protected:
 	void SelectedInteractionItem(const TSubclassOf<AGuideInteraction_Actor>&GuideInteractionClass);
 
-	TObjectPtr<AHumanCharacter_AI> CharacterPtr = nullptr;
-		
+	/**
+	 * 交互的对象
+	 */
 	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr = nullptr;
 		
+	/**
+	 * 交互的节点
+	 */
 	TObjectPtr<AGuideInteraction_Actor>GuideInteractionActorPtr = nullptr;
 	
 };

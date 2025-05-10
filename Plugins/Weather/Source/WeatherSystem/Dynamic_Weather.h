@@ -28,13 +28,17 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
+
 	// UFUNCTION(NetMulticast, Unreliable)
 	void UpdateWeather(
 		const FGameplayTag& WeatherType
 		);
 
-	FGameplayTag GetCurrentWeather()const;
-	
+	FGameplayTag GetCurrentWeather() const;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateSeasonCPP();
 
