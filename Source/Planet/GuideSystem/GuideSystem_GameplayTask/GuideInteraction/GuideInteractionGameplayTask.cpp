@@ -58,9 +58,16 @@ void UGameplayTask_Interaction_Conversation::Activate()
 {
 	Super::Activate();
 
-	UUIManagerSubSystem::GetInstance()->SwitchLayout(
-													 ELayoutCommon::kConversationLayout
-													);
+	if (bOnlyDisplyOnTitle)
+	{
+		
+	}
+	else
+	{
+		UUIManagerSubSystem::GetInstance()->SwitchLayout(
+														 ELayoutCommon::kConversationLayout
+														);
+	}
 	
 	ConditionalPerformTask();
 }
@@ -71,11 +78,17 @@ void UGameplayTask_Interaction_Conversation::TickTask(
 {
 	Super::TickTask(DeltaTime);
 
-	if (GuideActorPtr->bWantToStop)
+	if (bOnlyDisplyOnTitle)
 	{
-		EndTask();
 	}
-
+	else
+	{
+		if (GuideActorPtr->bWantToStop)
+		{
+			EndTask();
+		}
+	}
+	 
 	RemainingTime -= DeltaTime;
 
 	if (RemainingTime <= 0.f)
@@ -97,6 +110,8 @@ void UGameplayTask_Interaction_Conversation::OnDestroy(
 {
 	if (PlayerCharacterPtr)
 	{
+		TargetCharacterPtr->GetConversationComponent()->CloseConversationborder();
+		
 		PlayerCharacterPtr->GetConversationComponent()->CloseConversationborder_Player();
 	}
 
@@ -118,13 +133,20 @@ void UGameplayTask_Interaction_Conversation::ConditionalPerformTask()
 
 		RemainingTime = Ref.DelayTime;
 
-		PlayerCharacterPtr->GetConversationComponent()->DisplaySentence_Player(
-		                                                                       Ref,
-		                                                                       std::bind(
-			                                                                        &ThisClass::CurrentSentenceStop,
-			                                                                        this
-			                                                                       )
-		                                                                      );
+		if (bOnlyDisplyOnTitle)
+		{
+			TargetCharacterPtr->GetConversationComponent()->DisplaySentence(Ref);
+		}
+		else
+		{
+			PlayerCharacterPtr->GetConversationComponent()->DisplaySentence_Player(
+																				   Ref,
+																				   std::bind(
+																						&ThisClass::CurrentSentenceStop,
+																						this
+																					   )
+																				  );
+		}
 	}
 
 	SentenceIndex++;

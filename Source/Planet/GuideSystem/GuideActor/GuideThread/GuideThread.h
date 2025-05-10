@@ -85,28 +85,6 @@ public:
 		const FGuid& InGuid
 		);
 
-	FGuid GetPreviousTaskID() const;
-
-	/**
-	 * 设置上一次执行到的任务的ID
-	 * @param PreviousGuideID 
-	 */
-	void SetPreviousTaskID(
-		const FGuid& PreviousGuideID
-		);
-
-	FGuid GetCurrentTaskID() const;
-
-	/**
-	 * 记录当前执行到的任务的ID
-	 * @param PreviousGuideID 
-	 */
-	void SetCurrentTaskID(
-		const FGuid& TaskID
-		);
-
-	FGuid GetGuideID() const;
-
 	virtual FString GetGuideThreadTitle() const;
 
 	// 任务节点类型：支线/支线
@@ -129,20 +107,6 @@ protected:
 	// 任务名称
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString TaskName;
-
-	// 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FGuid GuideID;
-
-	/**
-	 * 这个引导任务上次执行到的任务的ID
-	 */
-	FGuid PreviousTaskID;
-
-	/**
-	 * 这个引导任务当前执行到的任务的ID
-	 */
-	FGuid CurrentTaskID;
 
 	/**
 	 * 引导任务内，某些选项的结果保存在这里

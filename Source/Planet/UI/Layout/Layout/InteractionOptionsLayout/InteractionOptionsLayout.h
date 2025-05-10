@@ -49,6 +49,9 @@ public:
 protected:
 	void SelectedInteractionItem(const TSubclassOf<AGuideInteraction_Actor>&GuideInteractionClass);
 
+	UFUNCTION()
+	void OnQuitBtnClicked();
+	
 	/**
 	 * 交互的对象
 	 */

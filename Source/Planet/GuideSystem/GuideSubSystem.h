@@ -105,6 +105,22 @@ public:
 
 	FOnStopGuide& GetOnStopGuide();
 
+	/**
+	 * 添加引导已执行到的子节点的记录
+	 * @param GuideID 
+	 * @param TaskId 
+	 */
+	void AddGuidePostion(const FGuid &CurrentGuideID, const FGuid& CurrentTaskID);
+	
+	/**
+	 * 消耗引导已执行到的子节点的记录
+	 * @param GuideID 
+	 * @return 
+	 */
+	bool ConsumeGuidePostion(const FGuid &CurrentGuideID, FGuid& CurrentTaskID);
+	
+	void RemoveGuidePostion(const FGuid &CurrentGuideID);
+	
 private:
 	void ActiveTargetGuideThread(
 		const TSubclassOf<AGuideThread>& GuideClass

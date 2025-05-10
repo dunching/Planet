@@ -46,14 +46,14 @@ namespace HumanProcessor
 		{
 		case IE_Pressed:
 			{
-				if (EventArgs.Key == EKeys::LeftAlt)
-				{
-					SwitchShowCursor(true);
-				}
-				
 				auto GameOptionsPtr = UGameOptions::GetInstance();
 				
-				if (EventArgs.Key == GameOptionsPtr->DashKey)
+				if (EventArgs.Key == GameOptionsPtr->ShowMouse)
+				{
+					SwitchShowCursor(true);
+					return true;
+				}
+				else if (EventArgs.Key == GameOptionsPtr->DashKey)
 				{
 					Dash();
 					return true;
@@ -72,7 +72,9 @@ namespace HumanProcessor
 			break;
 		case IE_Released:
 			{
-				if (EventArgs.Key == EKeys::LeftAlt)
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+				
+				if (EventArgs.Key == GameOptionsPtr->ShowMouse)
 				{
 					SwitchShowCursor(false);
 				}

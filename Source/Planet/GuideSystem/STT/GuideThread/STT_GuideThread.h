@@ -62,47 +62,6 @@ class UGameplayTask_WaitOpenLayout;
 struct FConsumableProxy;
 struct FTaskNode_Conversation_SentenceInfo;
 
-#pragma region Record
-USTRUCT()
-struct PLANET_API FSTID_GuideThreadRecord
-{
-	GENERATED_BODY()
-
-	/**
-	 * EditAnywhere 确保我们能够修改
-	 */
-	UPROPERTY(EditAnywhere, Category = Param)
-	FGuid TaskID;
-	
-	UPROPERTY(
-		EditAnywhere,
-		Category = Context
-	)
-	TObjectPtr<AGuideThread> GuideActorPtr = nullptr;
-};
-
-/**
- * 引导任务的记录点
- */
-USTRUCT()
-struct PLANET_API FSTT_GuideThreadRecord :
-	public FStateTreeTaskBase
-{
-	GENERATED_BODY()
-
-	using FInstanceDataType = FSTID_GuideThreadRecord;
-
-	virtual const UStruct* GetInstanceDataType() const override;
-
-	virtual EStateTreeRunStatus EnterState(
-		FStateTreeExecutionContext& Context,
-		const FStateTreeTransitionResult& Transition
-	) const override;
-
-protected:
-};
-#pragma endregion
-
 #pragma region Base
 USTRUCT()
 struct PLANET_API FSTID_GuideThreadBase :

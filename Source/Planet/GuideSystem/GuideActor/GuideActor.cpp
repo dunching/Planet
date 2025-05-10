@@ -31,8 +31,11 @@ AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
 	SetMinNetUpdateFrequency(1.f);
 
 	GuideStateTreeComponentPtr = CreateDefaultSubobject<UGuideSystemStateTreeComponent>(UGuideSystemStateTreeComponent::ComponentName);
+	GuideStateTreeComponentPtr->SetStartLogicAutomatically(false);
 	
 	GameplayTasksComponentPtr = CreateDefaultSubobject<UGameplayTasksComponent>(TEXT("GameplayTasksComponent"));
+	
+	GuideID = FGuid::NewGuid();
 }
 
 void AGuideActor::Destroyed()
@@ -50,4 +53,33 @@ UGameplayTasksComponent* AGuideActor::GetGameplayTasksComponent() const
 UGuideSystemStateTreeComponent* AGuideActor::GetGuideSystemStateTreeComponent() const
 {
 	return GuideStateTreeComponentPtr;
+}
+
+FGuid AGuideActor::GetGuideID() const
+{
+	return GuideID;
+}
+
+void AGuideActor::SetCurrentTaskID(
+	const FGuid& TaskID
+)
+{
+	CurrentTaskID = TaskID;
+}
+
+FGuid AGuideActor::GetPreviousTaskID() const
+{
+	return PreviousTaskID;
+}
+
+void AGuideActor::SetPreviousTaskID(
+	const FGuid& PreviousGuideID_
+)
+{
+	PreviousTaskID = PreviousGuideID_;
+}
+
+FGuid AGuideActor::GetCurrentTaskID() const
+{
+	return CurrentTaskID;
 }

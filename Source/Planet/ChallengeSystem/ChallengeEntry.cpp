@@ -15,6 +15,7 @@
 #include "TestCommand.h"
 #include "CollisionDataStruct.h"
 #include "GuideInteraction.h"
+#include "GuideSubSystem.h"
 #include "GuideThreadChallenge.h"
 
 AChallengeEntry::AChallengeEntry(const FObjectInitializer& ObjectInitializer):
@@ -102,7 +103,9 @@ void USceneChallengeEntryInteractionComponent::StartInteractionItem(
 		}
 	};
 
-	GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteraction_ChallengeEntry>(
+	auto GuideInteraction_ActorPtr = GetWorld()->SpawnActor<AGuideInteraction_ChallengeEntry>(
 		Item, SpawnParameters
-	);
+		);
+
+	StartInteractionImp(Item, GuideInteraction_ActorPtr);
 }

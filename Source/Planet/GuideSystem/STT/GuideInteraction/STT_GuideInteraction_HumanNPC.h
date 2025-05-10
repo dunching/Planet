@@ -102,6 +102,12 @@ struct PLANET_API FSTID_GuideInteractionConversation :
 	
 	UPROPERTY(EditAnywhere, Category = Param)
 	TArray<FTaskNode_Conversation_SentenceInfo> ConversationsAry;
+	
+	/**
+	 * 是否仅在人物上方的气泡上显示，而非弹出对话框
+	 */
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bOnlyDisplyOnTitle = false;
 };
 
 // 与 NPC交互的任务 对话

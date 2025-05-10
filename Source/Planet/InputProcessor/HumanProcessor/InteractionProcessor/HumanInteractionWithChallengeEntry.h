@@ -35,7 +35,5 @@ namespace HumanProcessor
 		
 	protected:
 
-		void Switch2RegularProcessor();
-
 	};
 }

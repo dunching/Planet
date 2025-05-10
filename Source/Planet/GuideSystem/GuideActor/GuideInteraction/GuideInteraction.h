@@ -38,8 +38,8 @@ public:
 
 	/**
 	 * 提前终止交互
-	 * 
 	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bWantToStop = false;
 	
 };

@@ -55,3 +55,46 @@ struct TStructOpsTypeTraits<FSTID_GuideBase> :
 		WithZeroConstructor = true,
 	};
 };
+
+#pragma region Record
+USTRUCT()
+struct PLANET_API FSTID_Guide_Record
+{
+	GENERATED_BODY()
+
+	FSTID_Guide_Record();
+
+	/**
+	 * EditAnywhere 确保我们能够修改
+	 */
+	UPROPERTY(EditAnywhere, Category = Param)
+	FGuid TaskID;
+	
+	UPROPERTY(
+		EditAnywhere,
+		Category = Context
+	)
+	TObjectPtr<AGuideActor> GuideActorPtr = nullptr;
+};
+
+/**
+ * 引导任务的记录点
+ */
+USTRUCT()
+struct PLANET_API FSTT_Guide_Record :
+	public FStateTreeTaskBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_Guide_Record;
+
+	virtual const UStruct* GetInstanceDataType() const override;
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+protected:
+};
+#pragma endregion

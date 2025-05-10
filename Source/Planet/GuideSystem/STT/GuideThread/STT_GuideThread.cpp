@@ -27,57 +27,6 @@
 #include "TargetPoint_Runtime.h"
 #include "UIManagerSubSystem.h"
 
-const UStruct* FSTT_GuideThreadRecord::GetInstanceDataType() const
-{
-	return FInstanceDataType::StaticStruct();
-}
-
-EStateTreeRunStatus FSTT_GuideThreadRecord::EnterState(
-	FStateTreeExecutionContext& Context,
-	const FStateTreeTransitionResult& Transition
-	) const
-{
-	FInstanceDataType& InstanceData = Context.GetInstanceData(
-	                                                          *this
-	                                                         );
-
-	if (InstanceData.GuideActorPtr)
-	{
-		// 读取任务进度
-		const auto PreviousTaskID = InstanceData.GuideActorPtr->GetPreviousTaskID();
-		if (PreviousTaskID.IsValid())
-		{
-			if (PreviousTaskID == InstanceData.TaskID)
-			{
-				InstanceData.GuideActorPtr->SetPreviousTaskID(
-				                                              FGuid()
-				                                             );
-
-				return Super::EnterState(
-				                         Context,
-				                         Transition
-				                        );
-			}
-
-			return EStateTreeRunStatus::Succeeded;
-		}
-	}
-	else
-	{
-		return EStateTreeRunStatus::Failed;
-	}
-
-	// 记录当前的任务ID，
-	InstanceData.GuideActorPtr->SetCurrentTaskID(
-	                                             InstanceData.TaskID
-	                                            );
-
-	return Super::EnterState(
-	                         Context,
-	                         Transition
-	                        );
-}
-
 EStateTreeRunStatus FSTT_GuideThreadBase::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition

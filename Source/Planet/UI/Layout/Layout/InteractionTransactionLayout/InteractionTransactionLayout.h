@@ -42,6 +42,7 @@ public:
 	virtual ELayoutCommon GetLayoutType() const override final;
 
 private:
+
 	UFUNCTION()
 	void OnQuitClicked();
 

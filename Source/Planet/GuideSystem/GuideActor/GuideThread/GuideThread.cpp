@@ -17,46 +17,41 @@ bool FTaskNodeResuleHelper::GetIsValid() const
 }
 
 const FName PlayerController(
-	TEXT(
-		"PlayerController"
-	)
-);
+                             TEXT(
+                                  "PlayerController"
+                                 )
+                            );
 
 UStateTreeGuideThreadComponentSchema::UStateTreeGuideThreadComponentSchema()
 {
 	check(
-		ContextDataDescs.Num() == 1 && ContextDataDescs[0].Struct == AActor::StaticClass()
-	);
+	      ContextDataDescs.Num() == 1 && ContextDataDescs[0].Struct == AActor::StaticClass()
+	     );
 
 	ContextActorClass = FOwnerType::StaticClass();
 	PlayerControllerClass = APlanetPlayerController::StaticClass();
 
 	ContextDataDescs[0].Struct = ContextActorClass.Get();
 	ContextDataDescs.Emplace(
-		PlayerController,
-		PlayerControllerClass.Get(),
-		FGuid(
-			0xEDB3CD90,
-			0x95F94E0A,
-			0xBD15207B,
-			0x98645CDC
-		)
-	);
+	                         PlayerController,
+	                         PlayerControllerClass.Get(),
+	                         FGuid::NewGuid()
+	                        );
 }
 
 bool UStateTreeGuideThreadComponentSchema::IsStructAllowed(
 	const UScriptStruct* InScriptStruct
-) const
+	) const
 {
 	return Super::IsStructAllowed(
-			InScriptStruct
-		) ||
-		InScriptStruct->IsChildOf(
-			FSTT_GuideThreadBase::StaticStruct()
-		) ||
-		InScriptStruct->IsChildOf(
-			FSTT_GuideThreadRecord::StaticStruct()
-		);
+	                              InScriptStruct
+	                             ) ||
+	       InScriptStruct->IsChildOf(
+	                                 FSTT_GuideThreadBase::StaticStruct()
+	                                ) ||
+	       InScriptStruct->IsChildOf(
+	                                 FSTT_Guide_Record::StaticStruct()
+	                                );
 }
 
 void UStateTreeGuideThreadComponentSchema::PostLoad()
@@ -68,7 +63,7 @@ bool UStateTreeGuideThreadComponentSchema::SetContextRequirements(
 	UBrainComponent& BrainComponent,
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	if (!Context.IsValid())
 	{
@@ -79,25 +74,25 @@ bool UStateTreeGuideThreadComponentSchema::SetContextRequirements(
 	if (OwnerPtr)
 	{
 		auto PlayerControllerPtr = Cast<APlanetPlayerController>(
-			UGameplayStatics::GetPlayerController(
-				OwnerPtr,
-				0
-			)
-		);
+		                                                         UGameplayStatics::GetPlayerController(
+			                                                          OwnerPtr,
+			                                                          0
+			                                                         )
+		                                                        );
 
 		Context.SetContextDataByName(
-			PlayerController,
-			FStateTreeDataView(
-				PlayerControllerPtr
-			)
-		);
+		                             PlayerController,
+		                             FStateTreeDataView(
+		                                                PlayerControllerPtr
+		                                               )
+		                            );
 	}
 
 	return Super::SetContextRequirements(
-		BrainComponent,
-		Context,
-		bLogErrors
-	);
+	                                     BrainComponent,
+	                                     Context,
+	                                     bLogErrors
+	                                    );
 }
 
 TSubclassOf<UStateTreeSchema> UGuideThreadSystemStateTreeComponent::GetSchema() const
@@ -108,31 +103,31 @@ TSubclassOf<UStateTreeSchema> UGuideThreadSystemStateTreeComponent::GetSchema() 
 bool UGuideThreadSystemStateTreeComponent::SetContextRequirements(
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	Context.SetCollectExternalDataCallback(
-		FOnCollectStateTreeExternalData::CreateUObject(
-			this,
-			&ThisClass::CollectExternalData
-		)
-	);
+	                                       FOnCollectStateTreeExternalData::CreateUObject(
+		                                        this,
+		                                        &ThisClass::CollectExternalData
+		                                       )
+	                                      );
 	return UStateTreeGuideThreadComponentSchema::SetContextRequirements(
-		*this,
-		Context,
-		bLogErrors
-	);
+	                                                                    *this,
+	                                                                    Context,
+	                                                                    bLogErrors
+	                                                                   );
 }
 
 AGuideThread_Main::AGuideThread_Main(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(
-	 ObjectInitializer.
-	 SetDefaultSubobjectClass<
-		 UGuideMainThreadSystemStateTreeComponent>(
-		 UGuideMainThreadSystemStateTreeComponent::ComponentName
-	 )
- )
+	):
+	 Super(
+	       ObjectInitializer.
+	       SetDefaultSubobjectClass<
+		       UGuideMainThreadSystemStateTreeComponent>(
+		                                                 UGuideMainThreadSystemStateTreeComponent::ComponentName
+		                                                )
+	      )
 {
 }
 
@@ -156,19 +151,19 @@ TSubclassOf<UStateTreeSchema> UGuideMainThreadSystemStateTreeComponent::GetSchem
 bool UGuideMainThreadSystemStateTreeComponent::SetContextRequirements(
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	Context.SetCollectExternalDataCallback(
-		FOnCollectStateTreeExternalData::CreateUObject(
-			this,
-			&ThisClass::CollectExternalData
-		)
-	);
+	                                       FOnCollectStateTreeExternalData::CreateUObject(
+		                                        this,
+		                                        &ThisClass::CollectExternalData
+		                                       )
+	                                      );
 	return FSchemaType::SetContextRequirements(
-		*this,
-		Context,
-		bLogErrors
-	);
+	                                           *this,
+	                                           Context,
+	                                           bLogErrors
+	                                          );
 }
 
 EGuideThreadType AGuideThread_Branch::GetGuideThreadType() const
@@ -178,14 +173,14 @@ EGuideThreadType AGuideThread_Branch::GetGuideThreadType() const
 
 AGuideThread_Area::AGuideThread_Area(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(
-	 ObjectInitializer.
-	 SetDefaultSubobjectClass<
-		 UGuideAreaThreadSystemStateTreeComponent>(
-		 UGuideAreaThreadSystemStateTreeComponent::ComponentName
-	 )
- )
+	):
+	 Super(
+	       ObjectInitializer.
+	       SetDefaultSubobjectClass<
+		       UGuideAreaThreadSystemStateTreeComponent>(
+		                                                 UGuideAreaThreadSystemStateTreeComponent::ComponentName
+		                                                )
+	      )
 {
 }
 
@@ -209,36 +204,36 @@ TSubclassOf<UStateTreeSchema> UGuideAreaThreadSystemStateTreeComponent::GetSchem
 bool UGuideAreaThreadSystemStateTreeComponent::SetContextRequirements(
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	Context.SetCollectExternalDataCallback(
-		FOnCollectStateTreeExternalData::CreateUObject(
-			this,
-			&ThisClass::CollectExternalData
-		)
-	);
+	                                       FOnCollectStateTreeExternalData::CreateUObject(
+		                                        this,
+		                                        &ThisClass::CollectExternalData
+		                                       )
+	                                      );
 	return FSchemaType::SetContextRequirements(
-		*this,
-		Context,
-		bLogErrors
-	);
+	                                           *this,
+	                                           Context,
+	                                           bLogErrors
+	                                          );
 }
 
 AGuideThread::AGuideThread(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(
-	 ObjectInitializer.SetDefaultSubobjectClass<
-		 UGuideThreadSystemStateTreeComponent>(
-		 UGuideThreadSystemStateTreeComponent::ComponentName
-	 )
- )
+	):
+	 Super(
+	       ObjectInitializer.SetDefaultSubobjectClass<
+		       UGuideThreadSystemStateTreeComponent>(
+		                                             UGuideThreadSystemStateTreeComponent::ComponentName
+		                                            )
+	      )
 {
 }
 
 void AGuideThread::UpdateCurrentTaskNode(
 	const TSoftObjectPtr<UPAD_TaskNode_Guide>& InTaskNode
-)
+	)
 {
 	// TaskNodeRef = InTaskNode;
 	// OnCurrentTaskNodeChanged.Broadcast(TaskNodeRef);
@@ -246,68 +241,39 @@ void AGuideThread::UpdateCurrentTaskNode(
 
 void AGuideThread::UpdateCurrentTaskNode(
 	const FTaskNodeDescript& TaskNodeDescript
-)
+	)
 {
 	CurrentTaskNodeDescript = TaskNodeDescript;
 	OnCurrentTaskNodeChanged.Broadcast(
-		CurrentTaskNodeDescript
-	);
+	                                   CurrentTaskNodeDescript
+	                                  );
 }
 
 void AGuideThread::AddEvent(
 	const FTaskNodeResuleHelper& TaskNodeResuleHelper
-)
+	)
 {
 	EventsSet.Add(
-		TaskNodeResuleHelper.TaskID,
-		TaskNodeResuleHelper
-	);
+	              TaskNodeResuleHelper.TaskID,
+	              TaskNodeResuleHelper
+	             );
 }
 
 FTaskNodeResuleHelper AGuideThread::ConsumeEvent(
 	const FGuid& InGuid
-)
+	)
 {
 	FTaskNodeResuleHelper Result;
 	if (EventsSet.Contains(
-		InGuid
-	))
+	                       InGuid
+	                      ))
 	{
 		Result = EventsSet[InGuid];
 		EventsSet.Remove(
-			InGuid
-		);
+		                 InGuid
+		                );
 	}
 	return Result;
-}
-
-FGuid AGuideThread::GetPreviousTaskID() const
-{
-	return PreviousTaskID;
-}
-
-void AGuideThread::SetPreviousTaskID(
-	const FGuid& PreviousGuideID_
-)
-{
-	PreviousTaskID = PreviousGuideID_;
-}
-
-FGuid AGuideThread::GetCurrentTaskID() const
-{
-	return CurrentTaskID;
-}
-
-void AGuideThread::SetCurrentTaskID(
-	const FGuid& TaskID
-)
-{
-	CurrentTaskID = TaskID;
-}
-
-FGuid AGuideThread::GetGuideID() const
-{
-	return GuideID;
 }
 
 FString AGuideThread::GetGuideThreadTitle() const

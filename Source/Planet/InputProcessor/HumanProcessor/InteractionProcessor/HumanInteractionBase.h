@@ -9,20 +9,32 @@
 
 class AHumanCharacter_Player;
 class AHumanCharacter_AI;
+class ISceneActorInteractionInterface;
 
 namespace HumanProcessor
 {
 	class FHumanInteractionBaseProcessor : public FInputProcessor
 	{
 	private:
-
 		GENERATIONCLASSINFO(FHumanInteractionBaseProcessor, FInputProcessor);
 
 	public:
-		
 		using FOwnerPawnType = APawn;
 
-		FHumanInteractionBaseProcessor(FOwnerPawnType* CharacterPtr);
+		FHumanInteractionBaseProcessor(
+			FOwnerPawnType* CharacterPtr
+			);
 
+		virtual bool InputKey(
+			const FInputKeyEventArgs& EventArgs
+			) override;
+
+		void StopInteraciton();
+		
+	protected:
+		
+		void Switch2RegularProcessor();
+		
+		ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr = nullptr;
 	};
 }

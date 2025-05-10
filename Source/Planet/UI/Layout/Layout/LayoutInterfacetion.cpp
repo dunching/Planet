@@ -10,6 +10,7 @@ void ILayoutInterfacetion::DisEnable()
 	if (OnQuit)
 	{
 		OnQuit();
+		OnQuit = FOnQuit();
 	}
 	
 	bIsActive = false;

@@ -161,11 +161,6 @@ EStateTreeRunStatus FSTT_GuideInteractionConversation::Tick(
 		checkNoEntry();
 	}
 
-	if (InstanceData.GuideActorPtr && InstanceData.GuideActorPtr->bWantToStop)
-	{
-		return EStateTreeRunStatus::Failed;
-	}
-
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)
 	{
 		return EStateTreeRunStatus::Succeeded;
@@ -198,6 +193,7 @@ EStateTreeRunStatus FSTT_GuideInteractionConversation::PerformGameplayTask(
 		BaseSetUp(GameplayTaskPtr);
 
 		GameplayTaskPtr->SetUp(InstanceData.ConversationsAry);
+		GameplayTaskPtr->bOnlyDisplyOnTitle = InstanceData.bOnlyDisplyOnTitle;
 		GameplayTaskPtr->ReadyForActivation();
 
 		InstanceData.GameplayTaskPtr = GameplayTaskPtr;
@@ -331,7 +327,7 @@ EStateTreeRunStatus FSTT_GuideInteraction_Transaction::Tick(
 
 	if (InstanceData.GuideActorPtr && InstanceData.GuideActorPtr->bWantToStop)
 	{
-		return EStateTreeRunStatus::Failed;
+		return EStateTreeRunStatus::Succeeded;
 	}
 
 	if (InstanceData.GameplayTaskPtr && InstanceData.GameplayTaskPtr->GetState() == EGameplayTaskState::Finished)

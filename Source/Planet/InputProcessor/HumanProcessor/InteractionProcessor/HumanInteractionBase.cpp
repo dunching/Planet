@@ -23,4 +23,44 @@ namespace HumanProcessor
 		 Super(CharacterPtr)
 	{
 	}
+
+	bool FHumanInteractionBaseProcessor::InputKey(
+		const FInputKeyEventArgs& EventArgs
+		)
+	{
+		switch (EventArgs.Event)
+		{
+		case IE_Pressed:
+			{
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+
+				if (EventArgs.Key == GameOptionsPtr->StopInteraction)
+				{
+					StopInteraciton();
+					Switch2RegularProcessor();
+					return true;
+				}
+			}
+			break;
+		case IE_Released:
+			{
+			}
+			break;
+		}
+
+		return FInputProcessor::InputKey(EventArgs);
+	}
+
+	void FHumanInteractionBaseProcessor::StopInteraciton()
+	{
+		if (SceneActorInteractionInterfacePtr)
+		{
+			SceneActorInteractionInterfacePtr->GetSceneActorInteractionComponent()->StopInteractionItem();
+		}
+	}
+
+	void FHumanInteractionBaseProcessor::Switch2RegularProcessor()
+	{
+		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
+	}
 }

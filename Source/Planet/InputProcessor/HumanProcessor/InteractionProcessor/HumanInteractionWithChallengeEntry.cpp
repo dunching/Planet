@@ -67,8 +67,4 @@ namespace HumanProcessor
 		FInputProcessor::QuitAction();
 	}
 
-	void FHumanInteractionWithChallengeEntryProcessor::Switch2RegularProcessor()
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
-	}
 }

@@ -21,6 +21,7 @@
 #include "CharacterAttributesComponent.h"
 #include "GroupManagger_NPC.h"
 #include "GuideInteraction.h"
+#include "GuideSubSystem.h"
 #include "HumanCharacter_Player.h"
 
 // UGameplayTasksComponent* USceneCharacterAIInteractionComponent::GetGameplayTasksComponent(
@@ -60,10 +61,11 @@ void USceneCharacterAIInteractionComponent::StartInteractionItem(
 			}
 		};
 
-	GuideInteractionActorPtr = GetWorld()->SpawnActor<AGuideInteraction_HumanCharacter_AI>(
+	auto GuideInteraction_ActorPtr = GetWorld()->SpawnActor<AGuideInteraction_HumanCharacter_AI>(
 		Item,
 		SpawnParameters
-	);
+		);
+	StartInteractionImp(Item, GuideInteraction_ActorPtr);
 }
 
 void USceneCharacterAIInteractionComponent::ChangedInterationState(

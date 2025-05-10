@@ -71,7 +71,7 @@ void UGuideSubSystem::StopActiveBrandGuideThread(
 	{
 		if (CurrentLineGuidePtr->IsA(GuideClass))
 		{
-			GuidePostionSet.Add(CurrentLineGuidePtr->GetPreviousTaskID());
+			AddGuidePostion(CurrentLineGuidePtr->GetGuideID(), CurrentLineGuidePtr->GetPreviousTaskID());
 			CurrentLineGuidePtr->Destroy();
 
 			CurrentLineGuidePtr = nullptr;
@@ -143,11 +143,7 @@ void UGuideSubSystem::OnGuideThreadStoped(
 			const auto CurrentGuideID = GuideThreadPtr->GetGuideID();
 			const auto CurrentTaskID = GuideThreadPtr->GetCurrentTaskID();
 
-			if (GuidePostionSet.Contains(CurrentGuideID))
-			{
-				//
-				GuidePostionSet.Remove(CurrentGuideID);
-			}
+			RemoveGuidePostion(CurrentGuideID);
 
 			if (GuideThreadPtr->IsA(AGuideThread_Main::StaticClass()))
 			{
@@ -210,6 +206,44 @@ FOnStopGuide& UGuideSubSystem::GetOnStopGuide()
 	return OnStopGuide;
 }
 
+void UGuideSubSystem::AddGuidePostion(
+	const FGuid& CurrentGuideID,
+	const FGuid& CurrentTaskID
+	)
+{
+	if (CurrentGuideID.IsValid() && CurrentTaskID.IsValid())
+	{
+		GuidePostionSet.Add(CurrentGuideID, CurrentTaskID);
+	}
+}
+
+bool UGuideSubSystem::ConsumeGuidePostion(
+	const FGuid& CurrentGuideID,
+	FGuid& CurrentTaskID
+	)
+{
+	if (GuidePostionSet.Contains(CurrentGuideID))
+	{
+		//
+		CurrentTaskID = GuidePostionSet[CurrentGuideID];
+		GuidePostionSet.Remove(CurrentGuideID);
+		return true;
+	}
+
+	return false;
+}
+
+void UGuideSubSystem::RemoveGuidePostion(
+	const FGuid& CurrentGuideID
+	)
+{
+	if (GuidePostionSet.Contains(CurrentGuideID))
+	{
+		//
+		GuidePostionSet.Remove(CurrentGuideID);
+	}
+}
+
 void UGuideSubSystem::ActiveTargetGuideThread(
 	const TSubclassOf<AGuideThread>& GuideClass
 	)
@@ -221,10 +255,7 @@ void UGuideSubSystem::ActiveTargetGuideThread(
 
 		const auto CurrentGuideID = CurrentLineGuidePtr->GetGuideID();
 		const auto CurrentTaskID = CurrentLineGuidePtr->GetCurrentTaskID();
-		if (CurrentGuideID.IsValid() && CurrentTaskID.IsValid())
-		{
-			GuidePostionSet.Add(CurrentGuideID, CurrentTaskID);
-		}
+		AddGuidePostion(CurrentGuideID, CurrentTaskID);
 
 		OnStopGuide.Broadcast(CurrentLineGuidePtr);
 		CurrentLineGuidePtr->Destroy();
@@ -245,10 +276,11 @@ void UGuideSubSystem::ActiveTargetGuideThread(
 		checkNoEntry();
 	}
 
-	if (GuidePostionSet.Contains(NewGuideID))
+	FGuid CurrentTaskID;
+	if (ConsumeGuidePostion(NewGuideID, CurrentTaskID))
 	{
 		//
-		CurrentLineGuidePtr->SetPreviousTaskID(GuidePostionSet[NewGuideID]);
+		CurrentLineGuidePtr->SetPreviousTaskID(CurrentTaskID);
 	}
 
 	CurrentLineGuidePtr->GetGuideSystemStateTreeComponent()->StartLogic();

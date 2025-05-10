@@ -15,6 +15,7 @@
 #include "PlanetPlayerController.h"
 #include "PlayerConversationBorder.h"
 #include "HumanRegularProcessor.h"
+#include "Components/Button.h"
 
 class AMainHUD;
 
@@ -29,11 +30,23 @@ struct FInteractionOptionsLayout : public TStructVariable<FInteractionOptionsLay
 	FName InteractionList = TEXT("InteractionList");
 
 	FName PlayerConversationBorder = TEXT("PlayerConversationBorder");
+
+	FName QuitBtn = TEXT("QuitBtn");
 };
 
 void UInteractionOptionsLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	{
+		auto UIPtr = Cast<UButton>(
+			GetWidgetFromName(FInteractionOptionsLayout::Get().QuitBtn)
+		);
+		if (UIPtr)
+		{
+			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitBtnClicked);
+		}
+	}
 
 	Enable();
 }
@@ -150,4 +163,9 @@ void UInteractionOptionsLayout::SelectedInteractionItem(
 	}
 
 	CloseOption();
+}
+
+void UInteractionOptionsLayout::OnQuitBtnClicked()
+{
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }

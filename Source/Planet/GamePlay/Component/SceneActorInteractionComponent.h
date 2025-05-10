@@ -38,7 +38,6 @@ struct PLANET_API FGuideInterationSetting
 
 	UPROPERTY(EditAnywhere, Category = Parameter)
 	TSubclassOf<UTaskPromt> TaskPromtClass;
-
 };
 
 /**
@@ -54,37 +53,44 @@ public:
 
 	USceneActorInteractionComponent(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	TArray<TSubclassOf<AGuideInteraction_Actor>> GetInteractionLists() const;
 
 	TObjectPtr<AGuideInteraction_Actor> GetCurrentInteraction() const;
-	
+
 	TArray<FGuideInterationSetting> GetGuideInteractionAry() const;
 
 	virtual void StartInteractionItem(
 		const TSubclassOf<AGuideInteraction_Actor>& Item
-	);
+		);
 
 	void StopInteractionItem();
 
 	virtual void ChangedInterationState(
 		const TSubclassOf<AGuideInteraction_Actor>& Item,
 		bool bIsEnable
-	);
+		);
 
-	bool GetIsEnableInteraction()const;
-	
+	bool GetIsEnableInteraction() const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Range = 200;
 
 protected:
+	void StartInteractionImp(
+		const TSubclassOf<AGuideInteraction_Actor>& Item,
+		const TObjectPtr<AGuideInteraction_Actor>& GuideInteraction_ActorPtr
+		);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FGuideInterationSetting> GuideInteractionAry;
 
+	/**
+	 * 当前正在执行的交互引导
+	 */
 	TObjectPtr<AGuideInteraction_Actor> GuideInteractionActorPtr = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bEnableInteraction = true;
-
 };

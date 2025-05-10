@@ -87,6 +87,28 @@ public:
 
 	UGuideSystemStateTreeComponent* GetGuideSystemStateTreeComponent() const;
 
+	FGuid GetCurrentTaskID() const;
+
+	/**
+	 * 记录当前执行到的任务的ID
+	 * @param PreviousGuideID 
+	 */
+	void SetCurrentTaskID(
+		const FGuid& TaskID
+		);
+
+	FGuid GetPreviousTaskID() const;
+
+	/**
+	 * 设置上一次执行到的任务的ID
+	 * @param PreviousGuideID 
+	 */
+	void SetPreviousTaskID(
+		const FGuid& PreviousGuideID
+		);
+
+	FGuid GetGuideID() const;
+
 	FOnCurrentTaskNodeChanged OnCurrentTaskNodeChanged;
 
 protected:
@@ -96,4 +118,22 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UGameplayTasksComponent> GameplayTasksComponentPtr = nullptr;
+
+private:
+	/**
+	 * 这条引导的ID
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly,  meta=(AllowPrivateAccess="true"))
+	FGuid GuideID;
+
+	/**
+	 * 这个引导任务当前执行到的任务的ID
+	 */
+	FGuid CurrentTaskID;
+
+	/**
+	 * 这个引导任务上次执行到的任务的ID
+	 */
+	FGuid PreviousTaskID;
+
 };

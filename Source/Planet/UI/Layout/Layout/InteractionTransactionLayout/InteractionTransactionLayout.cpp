@@ -219,9 +219,16 @@ ELayoutCommon UInteractionTransactionLayout::GetLayoutType() const
 
 void UInteractionTransactionLayout::OnQuitClicked()
 {
-	UUIManagerSubSystem::GetInstance()->SwitchLayout(
-	                                                 ELayoutCommon::kConversationLayout
-	                                                );
+	auto CurrentActionSPtr =
+		DynamicCastSharedPtr<HumanProcessor::FHumanInteractionBaseProcessor>(
+			UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
+		);
+
+	if (CurrentActionSPtr)
+	{
+		CurrentActionSPtr->StopInteraciton();
+	}
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }
 
 void UInteractionTransactionLayout::OnBuyClicked()

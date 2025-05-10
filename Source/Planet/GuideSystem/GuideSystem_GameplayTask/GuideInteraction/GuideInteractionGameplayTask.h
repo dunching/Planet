@@ -65,6 +65,8 @@ public:
 		const TArray<FTaskNode_Conversation_SentenceInfo>& InConversationsAry
 		);
 	
+	bool bOnlyDisplyOnTitle = false;
+	
 protected:
 	
 	void ConditionalPerformTask();

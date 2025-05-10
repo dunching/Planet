@@ -103,6 +103,9 @@ public:
 	FKey SwitchWeapon = EKeys::X;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey StopInteraction = EKeys::Escape;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey JumpKey = EKeys::SpaceBar;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
@@ -122,6 +125,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey SwitchTeammateOptionToFireTarget = EKeys::F3;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ShowMouse = EKeys::LeftAlt;
 	
 	/**
 	 * 返回上一级

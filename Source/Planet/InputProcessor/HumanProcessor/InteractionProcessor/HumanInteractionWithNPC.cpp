@@ -30,6 +30,8 @@ namespace HumanProcessor
 		auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 		if (OnwerActorPtr)
 		{
+			SceneActorInteractionInterfacePtr = CharacterPtr;
+			
 			UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kOptionLayout);
 			
 			SwitchShowCursor(true);
@@ -67,8 +69,4 @@ namespace HumanProcessor
 		FInputProcessor::QuitAction();
 	}
 
-	void FHumanInteractionWithNPCProcessor::Switch2RegularProcessor()
-	{
-		UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanRegularProcessor>();
-	}
 }

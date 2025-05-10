@@ -4,6 +4,7 @@
 #include "GuideInteraction.h"
 #include "GuideSystemStateTreeComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/Button.h"
 
 #include "HumanCharacter_Player.h"
 #include "HumanInteractionWithChallengeEntry.h"
@@ -29,11 +30,23 @@ struct FConversationLayout : public TStructVariable<FConversationLayout>
 	FName InteractionList = TEXT("InteractionList");
 
 	FName PlayerConversationBorder = TEXT("PlayerConversationBorder");
+
+	FName QuitBtn = TEXT("QuitBtn");
 };
 
 void UInteractionConversationLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+	{
+		auto UIPtr = Cast<UButton>(
+			GetWidgetFromName(FConversationLayout::Get().QuitBtn)
+		);
+		if (UIPtr)
+		{
+			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitBtnClicked);
+		}
+	}
 
 	Enable();
 }
@@ -54,4 +67,9 @@ void UInteractionConversationLayout::Enable()
 ELayoutCommon UInteractionConversationLayout::GetLayoutType() const
 {
 	return ELayoutCommon::kConversationLayout;
+}
+
+void UInteractionConversationLayout::OnQuitBtnClicked()
+{
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanRegularProcessor>();
 }

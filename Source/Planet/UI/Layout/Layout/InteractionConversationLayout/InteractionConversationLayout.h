@@ -39,5 +39,10 @@ public:
 	virtual void Enable() override;
 
 	virtual ELayoutCommon GetLayoutType() const  override final;
+
+private:
+	
+	UFUNCTION()
+	void OnQuitBtnClicked();
 	
 };

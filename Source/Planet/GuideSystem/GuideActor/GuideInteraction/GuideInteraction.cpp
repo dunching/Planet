@@ -21,10 +21,10 @@ UStateTreeGuideInteractionComponentSchema::UStateTreeGuideInteractionComponentSc
 
 	ContextDataDescs[0].Struct = ContextActorClass.Get();
 	ContextDataDescs.Emplace(
-		PlayerCharacter,
-		HumanCharacter_PlayerClass.Get(),
-		FGuid::NewGuid()
-	);
+	                         PlayerCharacter,
+	                         HumanCharacter_PlayerClass.Get(),
+	                         FGuid::NewGuid()
+	                        );
 }
 
 void UStateTreeGuideInteractionComponentSchema::PostLoad()
@@ -36,17 +36,20 @@ void UStateTreeGuideInteractionComponentSchema::PostLoad()
 
 bool UStateTreeGuideInteractionComponentSchema::IsStructAllowed(
 	const UScriptStruct* InScriptStruct
-) const
+	) const
 {
 	return Super::IsStructAllowed(InScriptStruct) ||
-		InScriptStruct->IsChildOf(FSTT_GuideInteractionBase::StaticStruct());
+	       InScriptStruct->IsChildOf(FSTT_GuideInteractionBase::StaticStruct()) ||
+	       InScriptStruct->IsChildOf(
+	                                 FSTT_Guide_Record::StaticStruct()
+	                                );
 }
 
 bool UStateTreeGuideInteractionComponentSchema::SetContextRequirements(
 	UBrainComponent& BrainComponent,
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	if (!Context.IsValid())
 	{
@@ -74,28 +77,30 @@ TSubclassOf<UStateTreeSchema> UGuideInteractionSystemStateTreeComponent::GetSche
 bool UGuideInteractionSystemStateTreeComponent::SetContextRequirements(
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	Context.SetCollectExternalDataCallback(
-		FOnCollectStateTreeExternalData::CreateUObject(this, &ThisClass::CollectExternalData)
-	);
+	                                       FOnCollectStateTreeExternalData::CreateUObject(
+		                                        this,
+		                                        &ThisClass::CollectExternalData
+		                                       )
+	                                      );
 	return FSchemaType::SetContextRequirements(
-		*this,
-		Context,
-		bLogErrors
-	);
+	                                           *this,
+	                                           Context,
+	                                           bLogErrors
+	                                          );
 }
 
 AGuideInteraction_Actor::AGuideInteraction_Actor(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(
-	 ObjectInitializer.SetDefaultSubobjectClass<UGuideInteractionSystemStateTreeComponent>(
-		 UGuideInteractionSystemStateTreeComponent::ComponentName
-	 )
- )
+	):
+	 Super(
+	       ObjectInitializer.SetDefaultSubobjectClass<UGuideInteractionSystemStateTreeComponent>(
+		        UGuideInteractionSystemStateTreeComponent::ComponentName
+		       )
+	      )
 {
-	GuideStateTreeComponentPtr->SetStartLogicAutomatically(true);
 }
 
 const FName HumanCharacter_NPC_Target(TEXT("HumanCharacter_NPC_Target"));
@@ -109,10 +114,10 @@ UStateTreeGuideInteraction_HumanCharacter_AI_ComponentSchema::UStateTreeGuideInt
 
 	ContextDataDescs[0].Struct = ContextActorClass.Get();
 	ContextDataDescs.Emplace(
-		HumanCharacter_NPC_Target,
-		HumanCharacter_AIClass.Get(),
-		FGuid::NewGuid()
-	);
+	                         HumanCharacter_NPC_Target,
+	                         HumanCharacter_AIClass.Get(),
+	                         FGuid::NewGuid()
+	                        );
 	ContextDataDescs[2].Struct = HumanCharacter_AIClass.Get();
 }
 
@@ -127,7 +132,7 @@ bool UStateTreeGuideInteraction_HumanCharacter_AI_ComponentSchema::SetContextReq
 	UBrainComponent& BrainComponent,
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	if (!Context.IsValid())
 	{
@@ -153,26 +158,29 @@ TSubclassOf<UStateTreeSchema> UGuideInteraction_HumanCharacter_AI_SystemStateTre
 bool UGuideInteraction_HumanCharacter_AI_SystemStateTreeComponent::SetContextRequirements(
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	Context.SetCollectExternalDataCallback(
-		FOnCollectStateTreeExternalData::CreateUObject(this, &ThisClass::CollectExternalData)
-	);
+	                                       FOnCollectStateTreeExternalData::CreateUObject(
+		                                        this,
+		                                        &ThisClass::CollectExternalData
+		                                       )
+	                                      );
 	return FSchemaType::SetContextRequirements(
-		*this,
-		Context,
-		bLogErrors
-	);
+	                                           *this,
+	                                           Context,
+	                                           bLogErrors
+	                                          );
 }
 
 AGuideInteraction_HumanCharacter_AI::AGuideInteraction_HumanCharacter_AI(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(
-	 ObjectInitializer.SetDefaultSubobjectClass<UGuideInteraction_HumanCharacter_AI_SystemStateTreeComponent>(
-		 UGuideInteraction_HumanCharacter_AI_SystemStateTreeComponent::ComponentName
-	 )
- )
+	):
+	 Super(
+	       ObjectInitializer.SetDefaultSubobjectClass<UGuideInteraction_HumanCharacter_AI_SystemStateTreeComponent>(
+		        UGuideInteraction_HumanCharacter_AI_SystemStateTreeComponent::ComponentName
+		       )
+	      )
 {
 }
 
@@ -187,10 +195,10 @@ UStateTreeGuideInteraction_ChallengeEntry_ComponentSchema::UStateTreeGuideIntera
 
 	ContextDataDescs[0].Struct = ContextActorClass.Get();
 	ContextDataDescs.Emplace(
-		ChallengeEntryTarget,
-		ChallengeEntryClass.Get(),
-		FGuid::NewGuid()
-	);
+	                         ChallengeEntryTarget,
+	                         ChallengeEntryClass.Get(),
+	                         FGuid::NewGuid()
+	                        );
 
 	ContextDataDescs[2].Struct = ChallengeEntryClass.Get();
 }
@@ -206,7 +214,7 @@ bool UStateTreeGuideInteraction_ChallengeEntry_ComponentSchema::SetContextRequir
 	UBrainComponent& BrainComponent,
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	if (!Context.IsValid())
 	{
@@ -232,25 +240,28 @@ TSubclassOf<UStateTreeSchema> UGuideInteraction_ChallengeEntry_SystemStateTreeCo
 bool UGuideInteraction_ChallengeEntry_SystemStateTreeComponent::SetContextRequirements(
 	FStateTreeExecutionContext& Context,
 	bool bLogErrors
-)
+	)
 {
 	Context.SetCollectExternalDataCallback(
-		FOnCollectStateTreeExternalData::CreateUObject(this, &ThisClass::CollectExternalData)
-	);
+	                                       FOnCollectStateTreeExternalData::CreateUObject(
+		                                        this,
+		                                        &ThisClass::CollectExternalData
+		                                       )
+	                                      );
 	return FSchemaType::SetContextRequirements(
-		*this,
-		Context,
-		bLogErrors
-	);
+	                                           *this,
+	                                           Context,
+	                                           bLogErrors
+	                                          );
 }
 
 AGuideInteraction_ChallengeEntry::AGuideInteraction_ChallengeEntry(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(
-	 ObjectInitializer.SetDefaultSubobjectClass<UGuideInteraction_ChallengeEntry_SystemStateTreeComponent>(
-		 UGuideInteraction_ChallengeEntry_SystemStateTreeComponent::ComponentName
-	 )
- )
+	):
+	 Super(
+	       ObjectInitializer.SetDefaultSubobjectClass<UGuideInteraction_ChallengeEntry_SystemStateTreeComponent>(
+		        UGuideInteraction_ChallengeEntry_SystemStateTreeComponent::ComponentName
+		       )
+	      )
 {
 }
