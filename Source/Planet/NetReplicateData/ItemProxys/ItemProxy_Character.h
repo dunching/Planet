@@ -96,10 +96,15 @@ struct PLANET_API FCharacterSocket
 		return Hash;
 	}
 
+	/**
+	 * 插槽
+	 */
 	FGameplayTag Socket;
 
 private:
-	// 分配的物品ID
+	/**
+	 * 插槽里分配的物品ID
+	 */
 	FGuid AllocationedProxyID;
 };
 

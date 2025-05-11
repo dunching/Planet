@@ -132,7 +132,7 @@ public:
 	FOnCanAciveSkillChanged OnCanAciveSkillChanged;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CurrentActivedSocketChanged)
-	FGameplayTag CurrentWeaponSocket;
+	FCharacterSocket CurrentWeaponSocket;
 
 protected:
 	
@@ -148,9 +148,9 @@ protected:
 
 	void Cancel(const FGameplayTag& Socket);
 
-	bool SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket);
+	bool SwitchWeaponImpAndCheck(const FCharacterSocket& NewWeaponSocket);
 
-	bool SwitchWeaponImp(const FGameplayTag& NewWeaponSocket);
+	bool SwitchWeaponImp(const FCharacterSocket& NewWeaponSocket);
 
 	bool ActivedCorrespondingWeapon(const FGameplayTag& ActiveSkillSocketTag);
 
@@ -189,6 +189,6 @@ protected:
 	void OnRep_AllocationChanged();
 
 	UFUNCTION()
-	void OnRep_CurrentActivedSocketChanged(const FGameplayTag& OldWeaponSocket);
+	void OnRep_CurrentActivedSocketChanged();
 #pragma endregion
 };

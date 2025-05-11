@@ -1,4 +1,3 @@
-
 #include "AIComponent.h"
 
 #include "Net/UnrealNetwork.h"
@@ -16,8 +15,10 @@
 
 FName UAIComponent::ComponentName = TEXT("AIComponent");
 
-UAIComponent::UAIComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+UAIComponent::UAIComponent(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 }
@@ -36,21 +37,21 @@ void UAIComponent::BeginPlay()
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		// 这里按次序获取要追踪的位置
-// 		TArray<AActor*> OutActors;
-// 		OwnerPtr->GetAttachedActors(OutActors);
-// 
-// 		auto ParentPtr = OwnerPtr->GetAttachParentActor();
-// 		if (auto ColonyPtr = Cast<AGeneratorColony_ByTime>(ParentPtr))
-// 		{
-// 			const auto ChildAry = ColonyPtr->FormationComponentPtr->GetAttachChildren();
-// 			if (ChildAry.Num() >= OutActors.Num())
-// 			{
-// 				auto OwnerCharacterPtr = Cast<ACharacterBase>(OwnerPtr);
-// 				if (OwnerCharacterPtr)
-// 				{
-// 					OwnerCharacterPtr->GetController<AHumanAIController>()->PathFollowComponentPtr = ChildAry[OutActors.Num() - 1];
-// 				}
-// 			}
+		// 		TArray<AActor*> OutActors;
+		// 		OwnerPtr->GetAttachedActors(OutActors);
+		// 
+		// 		auto ParentPtr = OwnerPtr->GetAttachParentActor();
+		// 		if (auto ColonyPtr = Cast<AGeneratorColony_ByTime>(ParentPtr))
+		// 		{
+		// 			const auto ChildAry = ColonyPtr->FormationComponentPtr->GetAttachChildren();
+		// 			if (ChildAry.Num() >= OutActors.Num())
+		// 			{
+		// 				auto OwnerCharacterPtr = Cast<ACharacterBase>(OwnerPtr);
+		// 				if (OwnerCharacterPtr)
+		// 				{
+		// 					OwnerCharacterPtr->GetController<AHumanAIController>()->PathFollowComponentPtr = ChildAry[OutActors.Num() - 1];
+		// 				}
+		// 			}
 		// 		}
 	}
 #endif
@@ -58,7 +59,9 @@ void UAIComponent::BeginPlay()
 	OnwerActorPtr->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }
 
-void UAIComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void UAIComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -77,7 +80,7 @@ void UAIComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 		InventoryComponentPtr->SyncPendingProxy(Guid);
 	}
 #endif
-	
+
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_Client)
 	{
@@ -87,7 +90,9 @@ void UAIComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
 #endif
 }
 
-void UAIComponent::AddTemporaryTaskNode(UTaskNode_Temporary*TaskNodePtr)
+void UAIComponent::AddTemporaryTaskNode(
+	UTaskNode_Temporary* TaskNodePtr
+	)
 {
 }
 
@@ -101,14 +106,18 @@ void UAIComponent::InitialAllocationsRowName()
 #endif
 		{
 			auto OnwerActorPtr = GetOwner<FOwnerType>();
-			auto OwnerCharacterProxy = OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->GetOwnerCharacterProxy();
+			auto CharacterProxy = OnwerActorPtr->GetCharacterProxy();
+			auto OwnerCharacterProxy = OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->
+			                                          GetOwnerCharacterProxy();
 			if (OwnerCharacterProxy)
 			{
 				if (OwnerCharacterProxy->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
 				{
 					return;
 				}
-				else if (OwnerCharacterProxy->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Assistional))
+				else if (OwnerCharacterProxy->GetProxyType().MatchesTag(
+				                                                        UGameplayTagsLibrary::Proxy_Character_NPC_Assistional
+				                                                       ))
 				{
 				}
 			}
@@ -119,16 +128,22 @@ void UAIComponent::InitialAllocationsRowName()
 				{
 					if (FirstWeaponSocketInfo.IsValid())
 					{
-						FCharacterSocket SkillsSocketInfo;
-						SkillsSocketInfo.Socket = UGameplayTagsLibrary::WeaponSocket_1;
-							
 						auto NewWeaponProxySPtr = InventoryComponentPtr->AddProxy_Weapon(
-							FirstWeaponSocketInfo);
+							 FirstWeaponSocketInfo
+							);
 						if (NewWeaponProxySPtr)
 						{
-							NewWeaponProxySPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
-								
+							FCharacterSocket SkillsSocketInfo;
+							SkillsSocketInfo.Socket = UGameplayTagsLibrary::WeaponSocket_1;
+
+							NewWeaponProxySPtr->SetAllocationCharacterProxy(
+							                                                CharacterProxy,
+							                                                SkillsSocketInfo.Socket
+							                                               );
+
 							SkillsSocketInfo.UpdateProxy(NewWeaponProxySPtr);
+
+							CharacterProxy->UpdateSocket(SkillsSocketInfo);
 						}
 					}
 				}
@@ -138,17 +153,23 @@ void UAIComponent::InitialAllocationsRowName()
 			{
 				if (ActiveSkillSet_1.IsValid())
 				{
-					FCharacterSocket SkillsSocketInfo;
-
-					SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
-
 					auto SkillProxyPtr = InventoryComponentPtr->AddProxy_Skill(
-						ActiveSkillSet_1);
+					                                                           ActiveSkillSet_1
+					                                                          );
 					if (SkillProxyPtr)
 					{
-						SkillProxyPtr->SetAllocationCharacterProxy(OnwerActorPtr->GetCharacterProxy(),SkillsSocketInfo.Socket);
-								
+						FCharacterSocket SkillsSocketInfo;
+
+						SkillsSocketInfo.Socket = UGameplayTagsLibrary::ActiveSocket_1;
+
+						SkillProxyPtr->SetAllocationCharacterProxy(
+						                                           CharacterProxy,
+						                                           SkillsSocketInfo.Socket
+						                                          );
+
 						SkillsSocketInfo.UpdateProxy(SkillProxyPtr);
+
+						CharacterProxy->UpdateSocket(SkillsSocketInfo);
 					}
 				}
 
@@ -177,8 +198,8 @@ TMap<FGameplayTag, FProductsForSale> UAIComponent::GetSaleItemsInfo() const
 }
 
 void UAIComponent::DisplayTaskPromy(
-	 TSubclassOf<UTaskPromt> TaskPromtClass
-)
+	TSubclassOf<UTaskPromt> TaskPromtClass
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerType>();
 	OnwerActorPtr->GetNiagaraComponent()->SetActive(true);

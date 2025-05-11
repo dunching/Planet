@@ -326,6 +326,15 @@ void UInventoryComponent::SetAllocationCharacterProxy(
 {
 	SetAllocationCharacterProxy_Server(Proxy_ID, CharacterProxy_ID, InSocketTag);
 }
+
+void UInventoryComponent::UpdateSocket(
+		const FGuid& CharacterProxy_ID,
+	const FCharacterSocket& Socket
+	)
+{
+	UpdateSocket_Server(CharacterProxy_ID, Socket);
+}
+
 #endif
 
 #if UE_EDITOR || UE_SERVER
@@ -954,6 +963,20 @@ void UInventoryComponent::SetAllocationCharacterProxy_Server_Implementation(
 	{
 		ProxySPtr->ResetAllocationCharacterProxy();
 	}
+}
+
+void UInventoryComponent::UpdateSocket_Server_Implementation(
+	const FGuid& CharacterProxy_ID,
+	const FCharacterSocket& Socket
+	)
+{
+	auto CharacterProxySPtr = FindProxy_Character(CharacterProxy_ID);
+	if (!CharacterProxySPtr)
+	{
+		return;
+	}
+
+	CharacterProxySPtr->UpdateSocket(Socket);
 }
 
 TSharedPtr<FCharacterProxy> UInventoryComponent::InitialOwnerCharacterProxy(

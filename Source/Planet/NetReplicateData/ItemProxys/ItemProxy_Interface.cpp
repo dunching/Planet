@@ -158,17 +158,17 @@ ACharacterBase* IProxy_Allocationble::GetAllocationCharacter() const
 	auto AllocationCharacterProxySPtr = GetAllocationCharacterProxy();
 	if (AllocationCharacterProxySPtr.IsValid())
 	{
-		return AllocationCharacterProxySPtr.Pin()->GetCharacterActor().Get();
+		return AllocationCharacterProxySPtr->GetCharacterActor().Get();
 	}
 	return nullptr;
 }
 
-TWeakPtr<FCharacterProxy> IProxy_Allocationble::GetAllocationCharacterProxy()
+TSharedPtr<FCharacterProxy> IProxy_Allocationble::GetAllocationCharacterProxy()
 {
 	return ProxyPtr->InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
 
-TWeakPtr<FCharacterProxy> IProxy_Allocationble::GetAllocationCharacterProxy() const
+TSharedPtr<FCharacterProxy> IProxy_Allocationble::GetAllocationCharacterProxy() const
 {
 	return ProxyPtr->InventoryComponentPtr->FindProxy_Character(AllocationCharacter_ID);
 }
@@ -190,11 +190,6 @@ void IProxy_Allocationble::SetAllocationCharacterProxy(
 			                                                             InSocketTag
 			                                                            );
 		}
-		else
-		{
-			ProxyPtr->InventoryComponentPtr->SetAllocationCharacterProxy(ProxyPtr->GetID(), FGuid(), InSocketTag);
-		}
-		// return;
 	}
 
 	if (InAllocationCharacterProxyPtr && InSocketTag.IsValid())
@@ -207,40 +202,13 @@ void IProxy_Allocationble::SetAllocationCharacterProxy(
 			return;
 		}
 
-		// 找到这个物品之前被分配的插槽
-		// 如果不是在同一个CharacterActor上，则需要取消分配
-		if (AllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
-		{
-			ProxyPtr->UnAllocation();
-		}
-
-		auto PreviousAllocationCharacterProxySPtr = ProxyPtr->InventoryComponentPtr->FindProxy_Character(
-			 AllocationCharacter_ID
-			);
-		if (PreviousAllocationCharacterProxySPtr)
-		{
-			auto CharacterSocket = PreviousAllocationCharacterProxySPtr->FindSocket(SocketTag);
-			CharacterSocket.ResetAllocatedProxy();
-
-			PreviousAllocationCharacterProxySPtr->UpdateSocket(CharacterSocket);
-		}
+		ProxyPtr->UnAllocation();
 
 		const auto PreviousAllocationCharacter_ID = AllocationCharacter_ID;
 		AllocationCharacter_ID = InAllocationCharacterProxyPtr->GetID();
 		SocketTag = InSocketTag;
 
-		// 如果不是在同一个CharacterActor上，则需要重新分配
-		// 否则重新分配
-		if (PreviousAllocationCharacter_ID != InAllocationCharacterProxyPtr->GetID())
-		{
-			ProxyPtr->Allocation();
-		}
-
-		// 将这个物品注册到新的插槽
-		auto CharacterSocket = InAllocationCharacterProxyPtr->FindSocket(SocketTag);
-		CharacterSocket.SetAllocationedProxyID(ProxyPtr->GetID());
-
-		InAllocationCharacterProxyPtr->UpdateSocket(CharacterSocket);
+		ProxyPtr->Allocation();
 
 		OnAllocationCharacterProxyChanged.ExcuteCallback(GetAllocationCharacterProxy());
 

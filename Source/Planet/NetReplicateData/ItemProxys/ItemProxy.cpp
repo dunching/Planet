@@ -122,7 +122,12 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 
 void FBasicProxy::Update2Client()
 {
-	InventoryComponentPtr->Proxy_Container.UpdateItem(GetID());
+#if UE_EDITOR || UE_SERVER
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		InventoryComponentPtr->Proxy_Container.UpdateItem(GetID());
+	}
+#endif
 }
 
 TObjectPtr<UItemProxy_Description> FBasicProxy::GetItemProxy_Description() const

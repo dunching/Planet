@@ -89,11 +89,15 @@ void UProxyProcessComponent::ActiveWeaponImp()
 	
 	if (WeaponSocket_1.IsValid())
 	{
-		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
+		SwitchWeaponImpAndCheck(WeaponSocket_1);
 	}
 	else if (WeaponSocket_2.IsValid())
 	{
-		SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
+		SwitchWeaponImpAndCheck(WeaponSocket_2);
+	}
+	else
+	{
+		RetractputWeapon();
 	}
 }
 
@@ -179,12 +183,12 @@ bool UProxyProcessComponent::SwitchWeapon()
 	const auto WeaponSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_1);
 	const auto WeaponSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::WeaponSocket_2);
 
-	if (WeaponSocket_1.Socket == CurrentWeaponSocket)
+	if (WeaponSocket_1 == CurrentWeaponSocket)
 	{
 		auto NewWeaponSocketSPtr = FindWeaponSocket(UGameplayTagsLibrary::WeaponSocket_2);
 		if (NewWeaponSocketSPtr)
 		{
-			return SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_2);
+			return SwitchWeaponImpAndCheck(WeaponSocket_2);
 		}
 	}
 	else
@@ -192,7 +196,7 @@ bool UProxyProcessComponent::SwitchWeapon()
 		auto NewWeaponSocketSPtr = FindWeaponSocket(UGameplayTagsLibrary::WeaponSocket_1);
 		if (NewWeaponSocketSPtr)
 		{
-			return SwitchWeaponImpAndCheck(UGameplayTagsLibrary::WeaponSocket_1);
+			return SwitchWeaponImpAndCheck(WeaponSocket_1);
 		}
 	}
 
@@ -208,7 +212,7 @@ bool UProxyProcessComponent::SwitchWeapon()
 
 void UProxyProcessComponent::RetractputWeapon()
 {
-	SwitchWeaponImpAndCheck(FGameplayTag::EmptyTag);
+	SwitchWeaponImpAndCheck(FCharacterSocket());
 #if UE_EDITOR || UE_CLIENT
 	if (GetNetMode() == NM_Client)
 	{
@@ -285,7 +289,7 @@ TSharedPtr<FWeaponSkillProxy> UProxyProcessComponent::GetWeaponSkillByType(const
 
 TSharedPtr<FWeaponProxy> UProxyProcessComponent::GetActivedWeapon() const
 {
-	return FindWeaponSocket(CurrentWeaponSocket);
+	return FindWeaponSocket(CurrentWeaponSocket.Socket);
 }
 
 TSharedPtr<FWeaponProxy> UProxyProcessComponent::FindWeaponSocket(const FGameplayTag& SocketTag) const
@@ -326,7 +330,7 @@ bool UProxyProcessComponent::ActiveAction(
 	// 使用武器
 	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
 	{
-		ActiveAction_Server(CurrentWeaponSocket, bIsAutomaticStop);
+		ActiveAction_Server(CurrentWeaponSocket.Socket, bIsAutomaticStop);
 	}
 	// 使用主动技能
 	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
@@ -350,7 +354,7 @@ void UProxyProcessComponent::CancelAction(const FGameplayTag& CanbeActivedInfoSP
 	// 使用武器
 	if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
 	{
-		CancelAction_Server(CurrentWeaponSocket);
+		CancelAction_Server(CurrentWeaponSocket.Socket);
 	}
 	// 使用主动技能
 	else if (CanbeActivedInfoSPtr.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
@@ -381,7 +385,7 @@ void UProxyProcessComponent::OnRep_AllocationChanged()
 {
 }
 
-void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged(const FGameplayTag& OldWeaponSocket)
+void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged()
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();
 	if (CharacterPtr->GetGroupManagger())
@@ -390,22 +394,19 @@ void UProxyProcessComponent::OnRep_CurrentActivedSocketChanged(const FGameplayTa
 	}
 }
 
-bool UProxyProcessComponent::SwitchWeaponImpAndCheck(const FGameplayTag& NewWeaponSocket)
+bool UProxyProcessComponent::SwitchWeaponImpAndCheck(const FCharacterSocket& NewWeaponSocket)
 {
 	if (NewWeaponSocket == CurrentWeaponSocket)
 	{
-	}
-	else
-	{
-		return SwitchWeaponImp(NewWeaponSocket);
+		return false;
 	}
 
-	return false;
+	return SwitchWeaponImp(NewWeaponSocket);
 }
 
-bool UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket)
+bool UProxyProcessComponent::SwitchWeaponImp(const FCharacterSocket& NewWeaponSocket)
 {
-	auto PreviousWeaponSocketSPtr = FindWeaponSocket(CurrentWeaponSocket);
+	auto PreviousWeaponSocketSPtr = FindWeaponSocket(CurrentWeaponSocket.Socket);
 	if (PreviousWeaponSocketSPtr)
 	{
 #if UE_EDITOR || UE_SERVER
@@ -417,7 +418,7 @@ bool UProxyProcessComponent::SwitchWeaponImp(const FGameplayTag& NewWeaponSocket
 #endif
 	}
 
-	auto NewWeaponSocketSPtr = FindWeaponSocket(NewWeaponSocket);
+	auto NewWeaponSocketSPtr = FindWeaponSocket(NewWeaponSocket.Socket);
 	if (NewWeaponSocketSPtr)
 	{
 #if UE_EDITOR || UE_SERVER

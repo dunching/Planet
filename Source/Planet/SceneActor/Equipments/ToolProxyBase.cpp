@@ -28,6 +28,13 @@ void AToolProxyBase::AttachToCharacter(
 	ACharacterBase* CharacterPtr
 	)
 {
+	auto OldOwnerPtr=  GetOwner();
+	if (OldOwnerPtr)
+	{
+		CharacterPtr->OnDestroyed.RemoveDynamic(this, &ThisClass::OnOwnerDestroyde);
+	}
+	
+	SetOwner(CharacterPtr);
 	if (CharacterPtr)
 	{
 		CharacterPtr->OnDestroyed.AddDynamic(this, &ThisClass::OnOwnerDestroyde);

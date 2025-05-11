@@ -246,13 +246,16 @@ AHumanCharacter_AI* FCharacterProxy::SpwanCharacter(
 					auto WeaponProxySPtr = DynamicCastSharedPtr<FWeaponProxy>(ProxySPtr);
 					if (WeaponProxySPtr)
 					{
-						WeaponProxySPtr->Allocation();
-						WeaponProxySPtr->GetWeaponSkill()->Allocation();
+						WeaponProxySPtr->GetWeaponSkill()->RegisterSkill();
 					}
 				}
-				else
+				else if (ProxySPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Weapon))
 				{
-					ProxySPtr->Allocation();
+					auto SkillProxySPtr = DynamicCastSharedPtr<FSkillProxy>(ProxySPtr);
+					if (SkillProxySPtr)
+					{
+						SkillProxySPtr->RegisterSkill();
+					}
 				}
 			}
 		}
@@ -326,6 +329,13 @@ void FCharacterProxy::UpdateSocket(
 	const FCharacterSocket& Socket
 	)
 {
+	// 这里做一个转发，
+	// 同步到服务器
+	if (ProxyPtr->InventoryComponentPtr->GetNetMode() == NM_Client)
+	{
+		ProxyPtr->InventoryComponentPtr->UpdateSocket(GetID(), Socket);
+	}
+
 	// 判断插槽是否可以存放这个物品代理
 	if (Socket.Socket.MatchesTag(UGameplayTagsLibrary::ConsumableSocket))
 	{

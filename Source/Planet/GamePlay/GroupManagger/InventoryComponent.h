@@ -14,6 +14,7 @@
 
 struct FSceneProxyContainer;
 struct FBasicProxy;
+struct FCharacterProxy;
 struct FProxy_FASI;
 struct FCharacterSocket;
 struct FSkillProxy;
@@ -34,14 +35,15 @@ class UInventoryComponent :
 {
 	GENERATED_BODY()
 
-	friend FBasicProxy;
-	
-public:
 	friend ACharacterBase;
 	friend FProxy_FASI;
 	friend IProxy_Allocationble;
 	friend FWeaponSkillProxy;
 	friend IProxy_Allocationble;
+	friend FBasicProxy;
+	friend FCharacterProxy;
+	
+public:
 
 	using FOwnerType = ACharacterBase;
 
@@ -296,6 +298,11 @@ private:
 		const FGuid& CharacterProxy_ID,
 		const FGameplayTag& InSocketTag
 		);
+	
+	void UpdateSocket(
+		const FGuid& CharacterProxy_ID,
+		const FCharacterSocket& Socket
+		);
 #endif
 
 	// 同步到服務器
@@ -304,6 +311,13 @@ private:
 		const FGuid& Proxy_ID,
 		const FGuid& CharacterProxy_ID,
 		const FGameplayTag& InSocketTag
+		);
+	
+	// 同步到服務器
+	UFUNCTION(Server, Reliable)
+	void UpdateSocket_Server(
+		const FGuid& CharacterProxy_ID,
+		const FCharacterSocket& Socket
 		);
 
 	// 等待加入“库存”的物品

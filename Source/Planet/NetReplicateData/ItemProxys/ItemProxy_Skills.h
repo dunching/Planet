@@ -89,6 +89,12 @@ public:
 
 	USkill_Base* GetGAInst() const;
 
+	// 注册GA
+	virtual void RegisterSkill();
+
+	// 取消注册GA
+	void UnRegisterSkill();
+
 	FGameplayAbilitySpecHandle GetGAHandle() const;
 
 	int32 Level = 1;
@@ -100,11 +106,9 @@ protected:
 	// 从插槽移除
 	virtual void UnAllocation() override;
 
-	virtual void RegisterSkill();
-
-	void UnRegisterSkill();
-
 	FGameplayAbilitySpecHandle GameplayAbilitySpecHandle;
+private:
+	
 };
 
 template <>

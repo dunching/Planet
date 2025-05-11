@@ -64,7 +64,7 @@ bool FConsumableProxy::Active()
 		auto GameplayEventData = MakeShared<FGameplayEventData>();
 		GameplayEventData->TargetData.Add(GameplayAbilityTargetPtr);
 
-		auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
+		auto AllocationCharacter = GetAllocationCharacterProxy()->GetCharacterActor();
 		AllocationCharacter->GetCharacterAbilitySystemComponent()->ReplicateEventData(
 			InputID,
 			*GameplayEventData

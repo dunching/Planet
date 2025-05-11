@@ -446,7 +446,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	const auto CurrentWeaponSocket = CharacterPtr->GetProxyProcessComponent()->CurrentWeaponSocket;
 
 	if (
-		CurrentWeaponSocket ==
+		CurrentWeaponSocket.Socket ==
 		UGameplayTagsLibrary::WeaponSocket_1
 	)
 	{
@@ -454,7 +454,7 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 		              GetWeaponSocket(FirstWeaponSocketInfoSPtr, SecondWeaponSocketInfoSPtr);
 	}
 	else if (
-		CurrentWeaponSocket ==
+		CurrentWeaponSocket.Socket ==
 		UGameplayTagsLibrary::WeaponSocket_2
 	)
 	{

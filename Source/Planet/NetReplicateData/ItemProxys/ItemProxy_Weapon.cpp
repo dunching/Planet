@@ -26,7 +26,7 @@ FWeaponProxy::FWeaponProxy()
 
 void FWeaponProxy::UpdateByRemote(
 	const TSharedPtr<FWeaponProxy>& RemoteSPtr
-)
+	)
 {
 	Super::UpdateByRemote(RemoteSPtr);
 	UpdateByRemote_Allocationble(RemoteSPtr);
@@ -40,7 +40,7 @@ bool FWeaponProxy::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
-)
+	)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 	NetSerialize_Allocationble(Ar, Map, bOutSuccess);
@@ -54,7 +54,7 @@ bool FWeaponProxy::NetSerialize(
 
 void FWeaponProxy::InitialProxy(
 	const FGameplayTag& InProxyType
-)
+	)
 {
 	Super::InitialProxy(InProxyType);
 
@@ -81,7 +81,7 @@ void FWeaponProxy::Cancel()
 void FWeaponProxy::SetAllocationCharacterProxy(
 	const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
 	const FGameplayTag& InSocketTag
-)
+	)
 {
 	IProxy_Allocationble::SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 
@@ -90,25 +90,28 @@ void FWeaponProxy::SetAllocationCharacterProxy(
 	{
 	}
 #endif
-	
+
 	GetWeaponSkill()->SetAllocationCharacterProxy(InAllocationCharacterProxyPtr, InSocketTag);
 }
 
 UItemProxy_Description_Weapon* FWeaponProxy::GetTableRowProxy_WeaponExtendInfo() const
 {
 	auto TableRowPtr = GetTableRowProxy();
-	auto ItemProxy_Description_WeaponPtr = Cast<UItemProxy_Description_Weapon>(TableRowPtr->ItemProxy_Description.LoadSynchronous());
+	auto ItemProxy_Description_WeaponPtr = Cast<UItemProxy_Description_Weapon>(
+	                                                                           TableRowPtr->ItemProxy_Description.
+	                                                                           LoadSynchronous()
+	                                                                          );
 	return ItemProxy_Description_WeaponPtr;
 }
 
 void FWeaponProxy::Allocation()
 {
 	Super::Allocation();
-	
+
 #if UE_EDITOR || UE_SERVER
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
-		// GetWeaponSkill()->Allocation();
+		GetWeaponSkill()->Allocation();
 	}
 #endif
 }
@@ -122,6 +125,8 @@ void FWeaponProxy::UnAllocation()
 	}
 #endif
 	Super::UnAllocation();
+
+	RetractputWeapon();
 }
 
 FTableRowProxy_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
@@ -130,9 +135,9 @@ FTableRowProxy_PropertyEntrys* FWeaponProxy::GetMainPropertyEntry() const
 	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_PropertyEntrys.LoadSynchronous();
 
 	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_PropertyEntrys>(
-		*GetTableRowProxy_WeaponExtendInfo()->PropertyEntry.ToString(),
-		TEXT("GetProxy")
-	);
+		 *GetTableRowProxy_WeaponExtendInfo()->PropertyEntry.ToString(),
+		 TEXT("GetProxy")
+		);
 	return SceneProxyExtendInfoPtr;
 }
 
@@ -145,7 +150,6 @@ void FWeaponProxy::ActiveWeapon()
 {
 	if (ActivedWeaponPtr)
 	{
-		checkNoEntry();
 	}
 	else
 	{
@@ -169,24 +173,36 @@ void FWeaponProxy::ActiveWeapon()
 			// 切换人物姿势
 			auto TableRowProxy_WeaponExtendInfoPtr = GetTableRowProxy_WeaponExtendInfo();
 
-			auto AllocationCharacterPtr = GetAllocationCharacter();
-			AllocationCharacterPtr->SwitchAnimLink_Client(TableRowProxy_WeaponExtendInfoPtr->AnimLinkClassType);
-
 			// 生成对应的武器Actor
 			auto ToolActorClass = TableRowProxy_WeaponExtendInfoPtr->ToolActorClass;
 
 			FActorSpawnParameters SpawnParameters;
 			SpawnParameters.Owner = GetAllocationCharacter();
 
-			auto AllocationCharacter = GetAllocationCharacterProxy().Pin()->GetCharacterActor();
+			auto AllocationCharacter = GetAllocationCharacterProxy()->GetCharacterActor();
 
 			ActivedWeaponPtr = GWorld->SpawnActor<AWeapon_Base>(ToolActorClass, SpawnParameters);
-			ActivedWeaponPtr->SetWeaponProxy(GetID());
 
 			GetWeaponSkill()->ActivedWeaponPtr = ActivedWeaponPtr;
 		}
 #endif
 	}
+
+#if UE_EDITOR || UE_SERVER
+	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
+	{
+		if (ActivedWeaponPtr)
+		{
+			ActivedWeaponPtr->SetWeaponProxy(GetID());
+		}
+
+		// 切换人物姿势
+		auto TableRowProxy_WeaponExtendInfoPtr = GetTableRowProxy_WeaponExtendInfo();
+
+		auto AllocationCharacterPtr = GetAllocationCharacter();
+		AllocationCharacterPtr->SwitchAnimLink_Client(TableRowProxy_WeaponExtendInfoPtr->AnimLinkClassType);
+	}
+#endif
 }
 
 void FWeaponProxy::RetractputWeapon()
@@ -201,10 +217,10 @@ void FWeaponProxy::RetractputWeapon()
 			if (AllocationCharacter->GetNetMode() == NM_DedicatedServer)
 			{
 			}
+
+			ActivedWeaponPtr->Destroy();
 		}
 #endif
-
-		ActivedWeaponPtr->Destroy();
 		ActivedWeaponPtr = nullptr;
 
 		GetWeaponSkill()->End();
@@ -215,7 +231,10 @@ void FWeaponProxy::RetractputWeapon()
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto AllocationCharacterPtr = GetAllocationCharacter();
-		AllocationCharacterPtr->SwitchAnimLink_Client(EAnimLinkClassType::kUnarmed);
+		if (AllocationCharacterPtr)
+		{
+			AllocationCharacterPtr->SwitchAnimLink_Client(EAnimLinkClassType::kUnarmed);
+		}
 	}
 #endif
 }

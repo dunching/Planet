@@ -111,9 +111,9 @@ public:
 	void UpdateByRemote_Allocationble(const TSharedPtr<IProxy_Allocationble>& RemoteSPtr);
 
 	// 这个物品被分配给的对象
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy();
+	TSharedPtr<FCharacterProxy> GetAllocationCharacterProxy();
 
-	TWeakPtr<FCharacterProxy> GetAllocationCharacterProxy() const;
+	TSharedPtr<FCharacterProxy> GetAllocationCharacterProxy() const;
 
 	ACharacterBase* GetAllocationCharacter() const;
 
