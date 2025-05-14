@@ -1,10 +1,10 @@
 #include "ViewMapMenu.h"
 
-inline void UViewMapMenu::ResetUIByData()
+inline void UViewMapMenu::EnableMenu()
 {
 }
 
-void UViewMapMenu::SyncData()
+void UViewMapMenu::DisEnableMenu()
 {
 }
 

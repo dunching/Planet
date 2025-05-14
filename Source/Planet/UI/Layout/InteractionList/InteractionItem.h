@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "InteractionItem.generated.h"
 
@@ -21,7 +22,7 @@ using FOnInteractionItemClicked = TMulticastDelegate<void()>;
 UCLASS()
 class PLANET_API UInteractionItem :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -29,11 +30,13 @@ public:
 	
 	virtual void NativeConstruct() override;
 
-	virtual void ResetUIByData() override;
-
 	void SetData(const FOnInteractionItemClicked &InOnInteractionItemClicked);
 
 protected:
+
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 	UFUNCTION()
 	void OnClicked();

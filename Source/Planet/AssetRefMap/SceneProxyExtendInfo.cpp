@@ -3,12 +3,13 @@
 
 #include <Kismet/GameplayStatics.h>
 
+#include "GameplayTagsManager.h"
 #include "GameInstance/PlanetGameInstance.h"
 #include "Planet.h"
 #include "PlanetWorldSettings.h"
 #include "StateTagExtendInfo.h"
 #include "TalentInfo.h"
-#include "CharactersInfo.h"
+#include "Regions.h"
 
 USceneProxyExtendInfoMap::USceneProxyExtendInfoMap() :
 	Super()
@@ -60,6 +61,39 @@ const UPAD_Talent_Property* USceneProxyExtendInfoMap::GetTalent_Property(EPointP
 	}
 
 	return nullptr;
+}
+
+FTableRow_Regions* USceneProxyExtendInfoMap::GetTableRow_Region(
+	FGameplayTag UnitType
+	) const
+{
+	auto DataTablePtr = DataTable_Regions.LoadSynchronous();
+
+	auto RegionsPtr = DataTablePtr->FindRow<FTableRow_Regions>(*UnitType.ToString(), TEXT("GetUnit"));
+	if (RegionsPtr)
+	{
+		return RegionsPtr;
+	}
+
+	// 默认的
+	TArray<FTableRow_Regions*> OutRowArray;
+	DataTablePtr->GetAllRows<FTableRow_Regions>(TEXT("GetUnit"),OutRowArray);
+	if (OutRowArray.IsValidIndex(0))
+	{
+		return OutRowArray[0];
+	}
+
+	return nullptr;
+}
+
+TArray<FTableRow_Regions*> USceneProxyExtendInfoMap::GetTableRow_AllRegions() const
+{
+	auto DataTablePtr = DataTable_Regions.LoadSynchronous();
+
+	TArray<FTableRow_Regions*> Result;
+	DataTablePtr->GetAllRows<FTableRow_Regions>(TEXT("GetUnit"),Result);
+
+	return Result;
 }
 
 void USceneProxyExtendInfoMap::InitialData()

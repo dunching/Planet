@@ -73,7 +73,9 @@ public:
 	// NPC队友会攻击的最远的敌人的距离
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
 	int32 NPCTeammateMaxActtackDistance = 1200;
-
+	
+	float VolumeMultiplier = 1.f;
+	
 #pragma region 按键映射
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey ActiveSkill_1_Key = EKeys::Q;

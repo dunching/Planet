@@ -11,7 +11,7 @@ class UNiagaraComponent;
 class UMarkPoints;
 
 /**
- *
+ * 指引玩家的目标点
  */
 UCLASS()
 class PLANET_API ATargetPoint_Runtime : public AActor

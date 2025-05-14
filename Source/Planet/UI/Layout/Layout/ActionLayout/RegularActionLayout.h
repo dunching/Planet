@@ -51,9 +51,9 @@ class PLANET_API URegularActionLayout :
 
 public:
 	virtual void NativeConstruct() override;
-	
+
 	virtual void NativeDestruct() override;
-	
+
 	virtual void Enable() override;
 
 	virtual void DisEnable() override;
@@ -61,98 +61,74 @@ public:
 	virtual ELayoutCommon GetLayoutType() const override final;
 
 private:
-	
-	void OnStartGuide(AGuideThread*GuideThread);
-	
-	void OnStopGuide(AGuideThread*GuideThread);
-	
+	void OnStartGuide(
+		AGuideThread* GuideThread
+		);
+
+	void OnStopGuide(
+		AGuideThread* GuideThread
+		);
+
 	UFUNCTION()
 	void OnQuitChallengeBtnClicked();
-	
+
 	// 锁定目标时,上方显示的状态栏
 	void OnFocusCharacter(
 		ACharacterBase* TargetCharacterPtr
-	);
+		);
 
 	// 出战队员列表
 	void DisplayTeamInfo(
 		bool bIsDisplay,
 		AHumanCharacter* HumanCharacterPtr = nullptr
-	);
+		);
 
 	// 效果栏（buff、debuff）
-	UEffectsList* InitialEffectsList();
+	UEffectsList* InitialEffectsList(bool bIsDisplay);
 
 	// 进度条/工具
 	UProgressTips* ViewProgressTips(
 		bool bIsViewMenus
-	);
+		);
 
 	void OnHPChanged(
 		const FOnAttributeChangeData&
-	);
+	
+		);
 
 	void OnFocusDestruct(
 		UUserWidget* UIPtr
-	);
+		);
 
 protected:
-
 	void OnEffectOhterCharacter(
 		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 		);
 
-	TCallbackHandleContainer<void(const FOnEffectedTawrgetCallback&)>::FCallbackHandleSPtr EffectOhterCharacterCallbackDelegate;
-	
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UBackpackMenu> BackpackMenuClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateActionHUD> PawnStateActionHUDClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateConsumablesHUD> PawnStateConsumablesHUDClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UPawnStateBuildingHUD> PawnStateBuildingHUDClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UEffectsList> EffectsListClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UProgressTips> ProgressTipsClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UFocusTitle> FocusTitleClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
-	TSubclassOf<UHUD_TeamInfo> HUD_TeamInfoClass;
 #pragma endregion MenusUI
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName PawnBuildingStateHUDSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName GroupMatesManaggerSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName TalentAllocationSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName EffectsListSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName ProgressTipsSocket;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	FName HUD_TeamSocket;
-
+	
 	UPROPERTY(Transient)
 	UFocusIcon* FocusIconPtr = nullptr;
 
-	TObjectPtr<ACharacterBase>PreviousTargetCharacterPtr = nullptr;
+	TObjectPtr<ACharacterBase> PreviousTargetCharacterPtr = nullptr;
+
+	FDelegateHandle StartGuideDelegateHandle;
+
+	FDelegateHandle StopGuideDelegateHandle;
+
+	FDelegateHandle Max_HPChangedDelegateHandle;
+
+	FDelegateHandle HPChangedDelegateHandle;
+
+	TCallbackHandleContainer<void(
+		ACharacterBase*
+	
+		)>::FCallbackHandleSPtr FocusCharacterDelegateSPtr;
+
+	TCallbackHandleContainer<void(
+		const FOnEffectedTawrgetCallback&
+		)>::FCallbackHandleSPtr EffectOhterCharacterCallbackDelegate;
 };

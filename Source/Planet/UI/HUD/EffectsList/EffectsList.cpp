@@ -36,11 +36,75 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 void UEffectsList::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UEffectsList::NativeDestruct()
+{
+	Super::NativeDestruct();
+}
+
+UEffectItem* UEffectsList::AddEffectItem(
+		const TObjectPtr<UAbilitySystemComponent>& AbilitySystemComponentPtr,
+		FActiveGameplayEffectHandle NewActiveGameplayEffectHandle
+		)
+{
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(NewActiveGameplayEffectHandle);
+	if (!ActiveGameplayEffectPtr)
+	{
+		return nullptr;
+	}
+
+	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
+	if (UIPtr)
+	{
+		auto ChildPtr = CreateWidget<UEffectItem>(this, EffectItemClass);
+		ChildPtr->SetData(AbilitySystemComponentPtr, NewActiveGameplayEffectHandle);
+		
+		auto SlotPtr = UIPtr->AddChildToWrapBox(ChildPtr);
+
+		return ChildPtr;
+	}
+
+	return nullptr;
+}
+
+void UEffectsList::BindCharacterState(ACharacterBase* InTargetCharacterPtr)
+{
+	TargetCharacterPtr = InTargetCharacterPtr;
+}
+
+void UEffectsList::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
+	
+	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
+	if (UIPtr)
+	{
+		UIPtr->ClearChildren();
+	}
+
+	if (!TargetCharacterPtr)
+	{
+		return;
+	}
+	
+	CallbackHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateChanged(
+		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
+	);
+
+	// CharacterStateMapHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateMapChanged(
+	// 	std::bind(&ThisClass::OnCharacterStateMapChanged, this, std::placeholders::_1, std::placeholders::_2)
+	// );
+
+	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+		ActiveGameplayEffectHandle = GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
+		// AppliedGameplayEffectHandle = GASCompPtr->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
+	}
+}
+
+void UEffectsList::DisEnable()
 {
 	if (CallbackHandle)
 	{
@@ -61,44 +125,7 @@ void UEffectsList::NativeDestruct()
 	}
 #endif
 	
-	Super::NativeDestruct();
-}
-
-UEffectItem* UEffectsList::AddEffectItem(const FActiveGameplayEffect* InActiveGameplayEffectPtr)
-{
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
-	if (UIPtr)
-	{
-		auto ChildPtr = CreateWidget<UEffectItem>(this, EffectItemClass);
-		ChildPtr->SetData(InActiveGameplayEffectPtr);
-		
-		auto SlotPtr = UIPtr->AddChildToWrapBox(ChildPtr);
-
-		return ChildPtr;
-	}
-
-	return nullptr;
-}
-
-void UEffectsList::BindCharacterState(ACharacterBase* InTargetCharacterPtr)
-{
-	TargetCharacterPtr = InTargetCharacterPtr;
-	CallbackHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateChanged(
-		std::bind(&ThisClass::OnCharacterStateChanged, this, std::placeholders::_1, std::placeholders::_2)
-	);
-
-	// CharacterStateMapHandle = TargetCharacterPtr->GetStateProcessorComponent()->BindCharacterStateMapChanged(
-	// 	std::bind(&ThisClass::OnCharacterStateMapChanged, this, std::placeholders::_1, std::placeholders::_2)
-	// );
-
-#if UE_EDITOR || UE_SERVER
-	if (TargetCharacterPtr && TargetCharacterPtr->GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		auto GASCompPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
-		ActiveGameplayEffectHandle = GASCompPtr->OnActiveGameplayEffectAddedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
-		AppliedGameplayEffectHandle = GASCompPtr->OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnActiveGameplayEffect);
-	}
-#endif
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UEffectsList::OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr)
@@ -141,15 +168,6 @@ void UEffectsList::OnActiveGameplayEffect(
 
 	if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Info))
 	{
-		auto ItemPtr = AddEffectItem(ActiveGameplayEffectPtr);
-	}
-}
-
-void UEffectsList::ResetUIByData()
-{
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
-	if (UIPtr)
-	{
-		UIPtr->ClearChildren();
+		auto ItemPtr = AddEffectItem(AbilitySystemComponentPtr, InActiveGameplayEffectHandle);
 	}
 }

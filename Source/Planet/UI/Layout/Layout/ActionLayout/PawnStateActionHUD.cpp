@@ -80,21 +80,10 @@ void UPawnStateActionHUD::NativeConstruct()
 	}
 
 	BindEvent();
-	ResetUIByData();
 }
 
 void UPawnStateActionHUD::NativeDestruct()
 {
-	for (auto Iter : OnAllocationSkillChangedDelegateAry)
-	{
-		Iter->UnBindCallback();
-	}
-
-	if (OnCanAciveSkillChangedHandle)
-	{
-		OnCanAciveSkillChangedHandle->UnBindCallback();
-	}
-
 	Super::NativeDestruct();
 }
 
@@ -127,8 +116,10 @@ void UPawnStateActionHUD::NativeTick(
 	}
 }
 
-void UPawnStateActionHUD::ResetUIByData()
+void UPawnStateActionHUD::Enable()
 {
+	ILayoutInterfacetion::Enable();
+	
 	if (!CharacterPtr)
 	{
 		return;
@@ -303,9 +294,19 @@ void UPawnStateActionHUD::ResetUIByData()
 	InitialWeaponSkillIcon();
 }
 
-ELayoutCommon UPawnStateActionHUD::GetLayoutType() const
+void UPawnStateActionHUD::DisEnable()
 {
-	return ELayoutCommon::kEmptyLayout;
+	for (auto Iter : OnAllocationSkillChangedDelegateAry)
+	{
+		Iter->UnBindCallback();
+	}
+
+	if (OnCanAciveSkillChangedHandle)
+	{
+		OnCanAciveSkillChangedHandle->UnBindCallback();
+	}
+
+	ILayoutInterfacetion::DisEnable();
 }
 
 void UPawnStateActionHUD::BindEvent()

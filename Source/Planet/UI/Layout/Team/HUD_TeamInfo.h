@@ -8,6 +8,7 @@
 
 #include "UIInterfaces.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 
 #include "HUD_TeamInfo.generated.h"
@@ -17,7 +18,7 @@ class UHUD_TeamMateInfo;
 UCLASS()
 class PLANET_API UHUD_TeamInfo :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -39,9 +40,11 @@ public:
 		const FKeyEvent& InKeyEvent
 	) override;
 
-protected:
-	virtual void ResetUIByData() override;
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
+protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UHUD_TeamMateInfo> TeamMateInfoClass;
 

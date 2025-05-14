@@ -26,9 +26,9 @@ class PLANET_API IMenuInterface
 
 public:
 
-	virtual void ResetUIByData() = 0;
+	virtual void EnableMenu() = 0;
 	
-	virtual void SyncData() = 0;
+	virtual void DisEnableMenu() = 0;
 
 	virtual EMenuType GetMenuType()const = 0;
 	

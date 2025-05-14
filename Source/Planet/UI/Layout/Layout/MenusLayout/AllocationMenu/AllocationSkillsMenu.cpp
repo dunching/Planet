@@ -96,8 +96,6 @@ void UAllocationSkillsMenu::NativeConstruct()
 		return;
 	}
 
-	ResetUIByData();
-
 	BindEvent();
 }
 
@@ -117,10 +115,10 @@ void UAllocationSkillsMenu::NativeDestruct()
 		SecondaryDelegateHandleSPtr->UnBindCallback();
 	}
 
-	SyncData();
+	DisEnableMenu();
 }
 
-void UAllocationSkillsMenu::ResetUIByData()
+void UAllocationSkillsMenu::EnableMenu()
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
@@ -261,7 +259,7 @@ void UAllocationSkillsMenu::ResetUIByData_Consumable(
 	}
 }
 
-void UAllocationSkillsMenu::SyncData()
+void UAllocationSkillsMenu::DisEnableMenu()
 {
 	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 
@@ -576,7 +574,7 @@ void UAllocationSkillsMenu::ResetBackpack(
 			Delegate->bIsAutoUnregister = false;
 		}
 
-		UIPtr->ResetUIByData();
+		UIPtr->EnableMenu();
 	}
 }
 
@@ -705,7 +703,7 @@ void UAllocationSkillsMenu::OnSelectedCharacterProxy(
 		{
 			if (CharacterIconPtr->ProxyPtr == ProxyPtr)
 			{
-				SyncData();
+				DisEnableMenu();
 
 				ResetUI(ProxyPtr);
 

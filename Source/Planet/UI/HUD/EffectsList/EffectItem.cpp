@@ -1,5 +1,6 @@
 #include "EffectItem.h"
 
+#include "AbilitySystemComponent.h"
 #include "Engine/AssetManager.h"
 #include "Components/TextBlock.h"
 #include "Components/Image.h"
@@ -96,6 +97,12 @@ void UEffectItem::SetPercentIsDisplay(
 void UEffectItem::SetTexutre(
 )
 {
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(Handle);
+	if (!ActiveGameplayEffectPtr)
+	{
+		return;
+	}
+
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(EffectItem::Icon));
 	if (!ImagePtr)
 	{
@@ -122,20 +129,33 @@ void UEffectItem::SetTexutre(
 
 			return;
 		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
+		{
+			auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+			auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
+
+			auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy>(*Iter.ToString(), TEXT("GetProxy"));
+			if (!SceneProxyExtendInfoPtr)
+			{
+				return;
+			}
+
+			AsyncLoadText(SceneProxyExtendInfoPtr->ItemProxy_Description.LoadSynchronous()->DefaultIcon, ImagePtr);
+
+			return;
+		}
 	}
 }
 
 void UEffectItem::SetData(
-	const FActiveGameplayEffect* InActiveGameplayEffectPtr
+	const TObjectPtr<UAbilitySystemComponent>& InAbilitySystemComponentPtr,
+	FActiveGameplayEffectHandle NewActiveGameplayEffectHandle
 )
 {
-	ActiveGameplayEffectPtr = InActiveGameplayEffectPtr;
-	if (ActiveGameplayEffectPtr)
-	{
-		Handle = ActiveGameplayEffectPtr->Handle;
+	AbilitySystemComponentPtr = InAbilitySystemComponentPtr;
+	Handle = NewActiveGameplayEffectHandle;
 
-		SetTexutre();
-	}
+	SetTexutre();
 }
 
 void UEffectItem::NativeConstruct()
@@ -163,6 +183,13 @@ void UEffectItem::NativeTick(
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(Handle);
+	if (!ActiveGameplayEffectPtr)
+	{
+		RemoveFromParent();
+		return;
+	}
+
 	if (!ActiveGameplayEffectPtr)
 	{
 		return;
@@ -177,6 +204,12 @@ void UEffectItem::NativeTick(
 
 void UEffectItem::OnUpdate()
 {
+	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(Handle);
+	if (!ActiveGameplayEffectPtr)
+	{
+		return;
+	}
+
 	if (ActiveGameplayEffectPtr->Handle != Handle)
 	{
 		RemoveFromParent();

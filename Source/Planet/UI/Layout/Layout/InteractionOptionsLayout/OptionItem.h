@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "OptionItem.generated.h"
 
@@ -23,7 +24,7 @@ using FOnClickedIndex =  TMulticastDelegate<void(int32)>;
 UCLASS()
 class PLANET_API UOptionItem :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -32,8 +33,6 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
-
-	virtual void ResetUIByData() override;
 
 	void SetData(
 		const TSubclassOf<AGuideInteraction_Actor>&TaskNode,
@@ -45,6 +44,10 @@ public:
 		);
 
 protected:
+
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 	UFUNCTION()
 	void OnClicked();

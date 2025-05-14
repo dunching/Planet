@@ -24,6 +24,7 @@ struct FBasicProxy;
 
 struct FTableRowProxy_TagExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
+struct FTableRow_Regions;
 
 /**
  * DataTables
@@ -49,6 +50,10 @@ public:
 	
 	const UPAD_Talent_Property* GetTalent_Property(EPointPropertyType PointPropertyType)const;
 
+	FTableRow_Regions* GetTableRow_Region(FGameplayTag UnitType)const;
+	
+	TArray<FTableRow_Regions*> GetTableRow_AllRegions()const;
+	
 	void InitialData();
 
 	// 可被持有的“物品”基础信息
@@ -71,6 +76,10 @@ public:
 	// 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DataLayer")
 	TSoftObjectPtr<UDataTable> DataTable_Teleport;
+	
+	// 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Regions")
+	TSoftObjectPtr<UDataTable> DataTable_Regions;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Talent")
 	TMap<EPointPropertyType, UPAD_Talent_Property*> PAD_Talent_PropertyMap;

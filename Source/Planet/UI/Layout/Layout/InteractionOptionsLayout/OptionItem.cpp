@@ -47,10 +47,6 @@ void UOptionItem::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UOptionItem::ResetUIByData()
-{
-}
-
 void UOptionItem::SetData(
 	const TSubclassOf<AGuideInteraction_Actor>& InTaskNode,
 	const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
@@ -86,6 +82,15 @@ void UOptionItem::SetData(const FString& InOption, int32 InIndex, const std::fun
 	}
 
 	UIPtr->SetText(FText::FromString(Option));
+}
+
+void UOptionItem::Enable()
+{
+}
+
+void UOptionItem::DisEnable()
+{
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UOptionItem::OnClicked()

@@ -13,6 +13,7 @@
 
 class UPlanetAbilitySystemComponent;
 class UProxySycHelperComponent;
+class UAudioComponent;
 struct FCharacterProxy;
 struct FSceneProxyContainer;
 
@@ -32,12 +33,23 @@ protected:
 
 	virtual void BeginPlay() override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	virtual void PostInitializeComponents() override;
 
 	void InitialData();
 	
 private:
 
-	FString PlayerName;
+	void UpdatePosition();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void UpdateCurrentPosition(const FGameplayTag&NewCurrentRegionTag);
 	
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent>AudioComponentPtr = nullptr;
+	
+	FString PlayerName;
+
+	FGameplayTag CurrentRegionTag;
 };

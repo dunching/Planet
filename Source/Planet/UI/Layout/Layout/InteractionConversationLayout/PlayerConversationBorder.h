@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "PlayerConversationBorder.generated.h"
 
@@ -20,16 +21,18 @@ struct FTaskNode_Conversation_SentenceInfo;
 UCLASS()
 class PLANET_API UPlayerConversationBorder :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
 public:
 	virtual void NativeConstruct() override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	virtual void ResetUIByData() override;
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 	void SetSentence(const FTaskNode_Conversation_SentenceInfo& InSentence);
 
@@ -44,5 +47,6 @@ protected:
 	// 点击了显示文本的框，通常要跳过这一句
 	UFUNCTION()
 	void On_Skip_Clicked();
-	
+
+	FDelegateHandle OnPlayerHaveNewSentenceDelegateHandle;
 };

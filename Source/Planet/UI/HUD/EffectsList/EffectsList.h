@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
 
 #include "MyUserWidget.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "EffectsList.generated.h"
 
@@ -24,7 +26,7 @@ class UAbilitySystemComponent;
 UCLASS()
 class PLANET_API UEffectsList : 
 	public UMyUserWidget, 
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -42,7 +44,14 @@ public:
 
 	virtual void SynchronizeProperties()override;
 
-	UEffectItem* AddEffectItem(const FActiveGameplayEffect* InActiveGameplayEffectPtr);
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
+
+	UEffectItem* AddEffectItem(
+		const TObjectPtr<UAbilitySystemComponent>& AbilitySystemComponentPtr,
+		FActiveGameplayEffectHandle NewActiveGameplayEffectHandle
+		);
 
 	void BindCharacterState(ACharacterBase*TargetCharacterPtr);
 	
@@ -50,8 +59,6 @@ public:
 	bool bIsPositiveSequence = true;
 
 protected:
-
-	virtual void ResetUIByData()override;
 
 	void OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr);
 	

@@ -34,8 +34,6 @@ namespace PawnStateBuildingHUD
 void UPawnStateBuildingHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UPawnStateBuildingHUD::NativeDestruct()
@@ -62,8 +60,10 @@ void UPawnStateBuildingHUD::NativeDestruct()
 	}
 }
 
-void UPawnStateBuildingHUD::ResetUIByData()
+void UPawnStateBuildingHUD::Enable()
 {
+	ILayoutItemInterfacetion::Enable();
+	
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
 	{
@@ -91,34 +91,34 @@ void UPawnStateBuildingHUD::ResetUIByData()
 			}
 		}
 		{
-// 			auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
-// 			for (const auto& Iter : Ary)
-// 			{
-// 				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
-// 				if (IconPtr)
-// 				{
-// 					auto Result = EICPtr->FindTool(IconPtr->IconSocket);
-// 					if (Result && Result->ProxyPtr)
-// 					{
-// //						IconPtr->ResetToolUIByData(Result->ProxyPtr);
-// 					}
-// 				}
-// 			}
+			// 			auto EICPtr = CharacterPtr->GetInteractiveToolComponent();
+			// 			for (const auto& Iter : Ary)
+			// 			{
+			// 				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
+			// 				if (IconPtr)
+			// 				{
+			// 					auto Result = EICPtr->FindTool(IconPtr->IconSocket);
+			// 					if (Result && Result->ProxyPtr)
+			// 					{
+			// //						IconPtr->ResetToolUIByData(Result->ProxyPtr);
+			// 					}
+			// 				}
+			// 			}
 		}
 		{
-// 			auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
-// 			for (const auto& Iter : Ary)
-// 			{
-// 				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
-// 				if (IconPtr)
-// 				{
-// 					auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
-// 					if (Result && Result->ProxyPtr)
-// 					{
-// 		//				IconPtr->ResetToolUIByData(Result->ProxyPtr);
-// 					}
-// 				}
-// 			}
+			// 			auto EICPtr = CharacterPtr->GetInteractiveConsumablesComponent();
+			// 			for (const auto& Iter : Ary)
+			// 			{
+			// 				auto IconPtr = Cast<UToolIcon>(GetWidgetFromName(Iter));
+			// 				if (IconPtr)
+			// 				{
+			// 					auto Result = EICPtr->FindConsumable(IconPtr->IconSocket);
+			// 					if (Result && Result->ProxyPtr)
+			// 					{
+			// 		//				IconPtr->ResetToolUIByData(Result->ProxyPtr);
+			// 					}
+			// 				}
+			// 			}
 		}
 		for (const auto& FirstIter : Ary)
 		{
@@ -139,6 +139,11 @@ void UPawnStateBuildingHUD::ResetUIByData()
 			}
 		}
 	}
+}
+
+void UPawnStateBuildingHUD::DisEnable()
+{
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 UToolsMenu* UPawnStateBuildingHUD::GetEquipMenu()

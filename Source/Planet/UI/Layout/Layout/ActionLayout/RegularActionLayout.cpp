@@ -47,10 +47,6 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 
 	FName PawnStateActionHUD = TEXT("PawnStateActionHUD");
 
-	FName FocusCharacterSocket = TEXT("FocusCharacterSocket");
-
-	FName GuideList = TEXT("GuideList");
-
 	FName LowerHPSocket = TEXT("LowerHPSocket");
 
 	FName PawnStateConsumablesHUD = TEXT("PawnStateConsumablesHUD");
@@ -58,72 +54,23 @@ struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 	FName QuitChallengeBtn = TEXT("QuitChallengeBtn");
 
 	FName CharacterRisingTipsCavans = TEXT("CharacterRisingTipsCavans");
+
+	FName TeamInfo = TEXT("TeamInfo");
+
+	FName EffectsList = TEXT("EffectsList");
+
+	FName GuideList = TEXT("GuideList");
+
+	FName FocusTitle = TEXT("FocusTitle");
 };
 
 void URegularActionLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (PlayerCharacterPtr)
-	{
-		DisplayTeamInfo(true);
-
-		InitialEffectsList();
-
-		ViewProgressTips(false);
-
-		OnFocusCharacter(nullptr);
-
-		auto DelegateHandle =
-			PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->OnFocusCharacterDelegate.
-			                    AddCallback(
-				                    std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1)
-			                    );
-		DelegateHandle->bIsAutoUnregister = false;
-
-		auto CharacterAttributesRef =
-			PlayerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-
-		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-			CharacterAttributesRef->GetMax_HPAttribute()
-		).AddUObject(this, &ThisClass::OnHPChanged);
-
-		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-			CharacterAttributesRef->GetHPAttribute()
-		).AddUObject(this, &ThisClass::OnHPChanged);
-
-		EffectOhterCharacterCallbackDelegate = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
-		                                       MakedDamageDelegate.
-		                                       AddCallback(
-			                                       std::bind(
-				                                       &ThisClass::OnEffectOhterCharacter,
-				                                       this,
-				                                       std::placeholders::_1
-			                                       )
-		                                       );
-	}
-
-	{
-		UGuideSubSystem::GetInstance()->GetOnStartGuide().AddUObject(this, &ThisClass::OnStartGuide);
-		UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(this, &ThisClass::OnStopGuide);
-
-		auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
-		if (UIPtr)
-		{
-			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitChallengeBtnClicked);
-			UIPtr->SetVisibility(ESlateVisibility::Hidden);
-		}
-	}
 }
 
 void URegularActionLayout::NativeDestruct()
 {
-	if (EffectOhterCharacterCallbackDelegate)
-	{
-		EffectOhterCharacterCallbackDelegate->UnBindCallback();
-	}
-
 	Super::NativeDestruct();
 }
 
@@ -136,14 +83,84 @@ void URegularActionLayout::Enable()
 		if (UIPtr)
 		{
 			UIPtr->Enable();
-			UIPtr->ResetUIByData();
 		}
 	}
 	{
-		auto UIPtr = Cast<UPawnStateConsumablesHUD>(GetWidgetFromName(FRegularActionLayout::Get().PawnStateConsumablesHUD));
+		auto UIPtr = Cast<UPawnStateConsumablesHUD>(
+		                                            GetWidgetFromName(
+		                                                              FRegularActionLayout::Get().
+		                                                              PawnStateConsumablesHUD
+		                                                             )
+		                                           );
 		if (UIPtr)
 		{
-			UIPtr->ResetUIByData();
+			UIPtr->Enable();
+		}
+	}
+	{
+		auto UIPtr = Cast<UGuideList>(GetWidgetFromName(FRegularActionLayout::Get().GuideList));
+		if (UIPtr)
+		{
+			UIPtr->Enable();
+		}
+	}
+
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (PlayerCharacterPtr)
+	{
+		DisplayTeamInfo(true);
+
+		InitialEffectsList(true);
+
+		ViewProgressTips(false);
+
+		OnFocusCharacter(nullptr);
+
+		FocusCharacterDelegateSPtr =
+			PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->OnFocusCharacterDelegate.
+			                    AddCallback(
+			                                std::bind(&ThisClass::OnFocusCharacter, this, std::placeholders::_1)
+			                               );
+
+		auto CharacterAttributesRef =
+			PlayerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+		Max_HPChangedDelegateHandle = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
+		                                                  GetGameplayAttributeValueChangeDelegate(
+			                                                   CharacterAttributesRef->GetMax_HPAttribute()
+			                                                  ).AddUObject(this, &ThisClass::OnHPChanged);
+
+		HPChangedDelegateHandle = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
+		                                              GetGameplayAttributeValueChangeDelegate(
+			                                               CharacterAttributesRef->GetHPAttribute()
+			                                              ).AddUObject(this, &ThisClass::OnHPChanged);
+
+		EffectOhterCharacterCallbackDelegate = PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->
+		                                                           MakedDamageDelegate.
+		                                                           AddCallback(
+		                                                                       std::bind(
+			                                                                        &ThisClass::OnEffectOhterCharacter,
+			                                                                        this,
+			                                                                        std::placeholders::_1
+			                                                                       )
+		                                                                      );
+	}
+
+	{
+		StartGuideDelegateHandle = UGuideSubSystem::GetInstance()->GetOnStartGuide().AddUObject(
+			 this,
+			 &ThisClass::OnStartGuide
+			);
+		StopGuideDelegateHandle = UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(
+			 this,
+			 &ThisClass::OnStopGuide
+			);
+
+		auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
+		if (UIPtr)
+		{
+			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitChallengeBtnClicked);
+			UIPtr->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
 }
@@ -158,6 +175,51 @@ void URegularActionLayout::DisEnable()
 		}
 	}
 
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (PlayerCharacterPtr)
+	{
+		DisplayTeamInfo(false);
+
+		InitialEffectsList(false);
+
+		if (FocusCharacterDelegateSPtr)
+		{
+			FocusCharacterDelegateSPtr->UnBindCallback();
+		}
+
+		auto CharacterAttributesRef =
+			PlayerCharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+			 CharacterAttributesRef->GetMax_HPAttribute()
+			).Remove(Max_HPChangedDelegateHandle);
+
+		PlayerCharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
+			 CharacterAttributesRef->GetHPAttribute()
+			).Remove(HPChangedDelegateHandle);
+	}
+
+	if (EffectOhterCharacterCallbackDelegate)
+	{
+		EffectOhterCharacterCallbackDelegate->UnBindCallback();
+	}
+
+	if (FocusCharacterDelegateSPtr)
+	{
+		FocusCharacterDelegateSPtr->UnBindCallback();
+	}
+
+	{
+		UGuideSubSystem::GetInstance()->GetOnStartGuide().Remove(StartGuideDelegateHandle);
+		UGuideSubSystem::GetInstance()->GetOnStopGuide().Remove(StopGuideDelegateHandle);
+
+		auto UIPtr = Cast<UButton>(GetWidgetFromName(FRegularActionLayout::Get().QuitChallengeBtn));
+		if (UIPtr)
+		{
+			UIPtr->OnClicked.RemoveDynamic(this, &ThisClass::OnQuitChallengeBtnClicked);
+		}
+	}
+
 	ILayoutInterfacetion::DisEnable();
 }
 
@@ -168,7 +230,7 @@ ELayoutCommon URegularActionLayout::GetLayoutType() const
 
 void URegularActionLayout::OnStartGuide(
 	AGuideThread* GuideThread
-)
+	)
 {
 	if (GuideThread)
 	{
@@ -185,7 +247,7 @@ void URegularActionLayout::OnStartGuide(
 
 void URegularActionLayout::OnStopGuide(
 	AGuideThread* GuideThread
-)
+	)
 {
 	if (GuideThread)
 	{
@@ -204,8 +266,8 @@ void URegularActionLayout::OnQuitChallengeBtnClicked()
 {
 	// 停止挑战任务
 	UGuideSubSystem::GetInstance()->StopParallelGuideThread(
-		UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
-	);
+	                                                        UAssetRefMap::GetInstance()->GuideThreadChallengeActorClass
+	                                                       );
 
 	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 	if (!PCPtr)
@@ -218,22 +280,22 @@ void URegularActionLayout::OnQuitChallengeBtnClicked()
 
 void URegularActionLayout::OnFocusCharacter(
 	ACharacterBase* TargetCharacterPtr
-)
+	)
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FRegularActionLayout::Get().FocusCharacterSocket));
-	if (!BorderPtr)
+	auto UIPtr = Cast<UFocusTitle>(GetWidgetFromName(FRegularActionLayout::Get().FocusTitle));
+	if (!UIPtr)
 	{
 		return;
 	}
 
-	auto ClearPrevious = [this, TargetCharacterPtr, BorderPtr]
+	auto ClearPrevious = [this, TargetCharacterPtr, UIPtr]
 	{
 		if (FocusIconPtr)
 		{
 			auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-				GetWorld(),
-				TargetPointSharedLayerName
-			);
+				 GetWorld(),
+				 TargetPointSharedLayerName
+				);
 			if (ScreenLayer)
 			{
 				ScreenLayer->RemoveHoverWidget(FocusIconPtr);
@@ -247,10 +309,10 @@ void URegularActionLayout::OnFocusCharacter(
 		}
 		else
 		{
-			BorderPtr->ClearChildren();
+			UIPtr->SetVisibility(ESlateVisibility::Hidden);
 		}
 	};
-	
+
 	if (TargetCharacterPtr)
 	{
 		if (TargetCharacterPtr != PreviousTargetCharacterPtr)
@@ -258,12 +320,12 @@ void URegularActionLayout::OnFocusCharacter(
 			ClearPrevious();
 			PreviousTargetCharacterPtr = TargetCharacterPtr;
 		}
-		
+
 		// 悬浮的锁定UI
 		auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-			GetWorld(),
-			TargetPointSharedLayerName
-		);
+			 GetWorld(),
+			 TargetPointSharedLayerName
+			);
 		if (ScreenLayer)
 		{
 			auto AssetRefMapPtr = UAssetRefMap::GetInstance();
@@ -281,25 +343,14 @@ void URegularActionLayout::OnFocusCharacter(
 		}
 
 		// 上方的状态条
-		UFocusTitle* UIPtr = nullptr;
-		for (auto Iter : BorderPtr->GetAllChildren())
-		{
-			UIPtr = Cast<UFocusTitle>(Iter);
-			if (UIPtr)
-			{
-				break;
-			}
-		}
 		if (!UIPtr)
 		{
-			UIPtr = CreateWidget<UFocusTitle>(GetWorldImp(), FocusTitleClass);
-			BorderPtr->AddChild(UIPtr);
+			UIPtr->SetVisibility(ESlateVisibility::Visible);
 		}
 		if (UIPtr)
 		{
 			UIPtr->SetTargetCharacter(TargetCharacterPtr);
 		}
-			
 	}
 	else
 	{
@@ -307,96 +358,59 @@ void URegularActionLayout::OnFocusCharacter(
 	}
 }
 
-UEffectsList* URegularActionLayout::InitialEffectsList()
+UEffectsList* URegularActionLayout::InitialEffectsList(
+	bool bIsDisplay
+	)
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(EffectsListSocket));
-	if (!BorderPtr)
+	auto UIPtr = Cast<UEffectsList>(GetWidgetFromName(FRegularActionLayout::Get().EffectsList));
+	if (!UIPtr)
 	{
 		return nullptr;
 	}
 
-	for (auto Iter : BorderPtr->GetAllChildren())
+	// 绑定效果状态栏
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (CharacterPtr)
 	{
-		auto UIPtr = Cast<UEffectsList>(Iter);
-		if (UIPtr)
+		if (bIsDisplay)
 		{
-			// 绑定效果状态栏
-			auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-			if (CharacterPtr)
-			{
-				UIPtr->BindCharacterState(CharacterPtr);
-			}
-
-			return UIPtr;
+			UIPtr->BindCharacterState(CharacterPtr);
+			UIPtr->Enable();
+		}
+		else
+		{
+			UIPtr->DisEnable();
 		}
 	}
-	return nullptr;
+
+	return UIPtr;
 }
 
 void URegularActionLayout::DisplayTeamInfo(
 	bool bIsDisplay,
 	AHumanCharacter* HumanCharacterPtr
-)
+	)
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(HUD_TeamSocket));
-	if (!BorderPtr)
+	auto UIPtr = Cast<UHUD_TeamInfo>(GetWidgetFromName(FRegularActionLayout::Get().TeamInfo));
+	if (!UIPtr)
 	{
 		return;
 	}
 
-	auto UIPtr = Cast<UHUD_TeamInfo>(BorderPtr->GetContent());
-	if (UIPtr)
+	if (bIsDisplay)
 	{
-		if (bIsDisplay)
-		{
-			UIPtr->SetVisibility(ESlateVisibility::Visible);
-		}
-		else
-		{
-			UIPtr->RemoveFromParent();
-		}
+		UIPtr->Enable();
 	}
 	else
 	{
-		if (bIsDisplay)
-		{
-			UIPtr = CreateWidget<UHUD_TeamInfo>(GetWorldImp(), HUD_TeamInfoClass);
-			if (UIPtr)
-			{
-				BorderPtr->AddChild(UIPtr);
-			}
-		}
+		UIPtr->DisEnable();
 	}
 }
 
 UProgressTips* URegularActionLayout::ViewProgressTips(
 	bool bIsViewMenus
-)
+	)
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(ProgressTipsSocket));
-	if (!BorderPtr)
-	{
-		return nullptr;
-	}
-
-	if (bIsViewMenus)
-	{
-		if (BorderPtr->HasAnyChildren())
-		{
-			return nullptr;
-		}
-
-		auto UIPtr = CreateWidget<UProgressTips>(GetWorldImp(), ProgressTipsClass);
-		if (UIPtr)
-		{
-			BorderPtr->AddChild(UIPtr);
-
-			return UIPtr;
-		}
-	}
-
-	BorderPtr->ClearChildren();
-
 	return nullptr;
 }
 
@@ -405,7 +419,7 @@ void URegularActionLayout::OnHPChanged(
 
 
 
-)
+	)
 {
 	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!PlayerCharacterPtr)
@@ -435,12 +449,12 @@ void URegularActionLayout::OnHPChanged(
 
 void URegularActionLayout::OnFocusDestruct(
 	UUserWidget* UIPtr
-)
+	)
 {
 	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-		GetWorld(),
-		TargetPointSharedLayerName
-	);
+		 GetWorld(),
+		 TargetPointSharedLayerName
+		);
 	if (ScreenLayer)
 	{
 		ScreenLayer->RemoveHoverWidget(FocusIconPtr);
@@ -451,12 +465,12 @@ void URegularActionLayout::OnFocusDestruct(
 
 void URegularActionLayout::OnEffectOhterCharacter(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-)
+	)
 {
 	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
-		GetWorld(),
-		TargetPointSharedLayerName
-	);
+		 GetWorld(),
+		 TargetPointSharedLayerName
+		);
 	if (ScreenLayer)
 	{
 		auto WidgetPtr = CreateWidget<UCharacterRisingTips>(this, FightingTipsClass);

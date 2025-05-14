@@ -39,7 +39,7 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	virtual void SyncData() override;
+	virtual void DisEnableMenu() override;
 
 	virtual EMenuType GetMenuType()const override final;
 	
@@ -47,7 +47,7 @@ public:
 
 protected:
 	
-	virtual void ResetUIByData() override;
+	virtual void EnableMenu() override;
 
 	void OnWeaponProxyChanged(
 		UTeamMateInfo*UIPtr,

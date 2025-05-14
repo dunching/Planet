@@ -76,6 +76,8 @@ public:
 		const FTaskNodeDescript& TaskNodeDescript
 		);
 
+	FTaskNodeDescript GetCurrentTaskNodeDescript() const;
+	
 	// 添加任务执行结果
 	void AddEvent(
 		const FTaskNodeResuleHelper& TaskNodeResuleHelper

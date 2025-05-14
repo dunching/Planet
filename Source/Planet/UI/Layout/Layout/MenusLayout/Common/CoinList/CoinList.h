@@ -8,6 +8,7 @@
 #include "MyUserWidget.h"
 #include "GenerateType.h"
 #include "ItemProxy_Minimal.h"
+#include "LayoutInterfacetion.h"
 
 #include "CoinList.generated.h"
 
@@ -18,7 +19,9 @@ struct FCoinProxy;
  *
  */
 UCLASS()
-class PLANET_API UCoinList : public UMyUserWidget
+class PLANET_API UCoinList :
+	public UMyUserWidget,
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -27,6 +30,8 @@ public:
 	virtual void NativeConstruct()override;
 
 	virtual void NativeDestruct()override;
+
+	virtual void Enable() override;
 
 protected:
 	

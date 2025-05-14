@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "GuideItem.generated.h"
 
@@ -20,7 +21,7 @@ struct FTaskNodeDescript;
 UCLASS()
 class PLANET_API UGuideItem :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -32,11 +33,13 @@ public:
 
 	virtual void NativeDestruct() override;
 	
-	virtual void ResetUIByData() override;
-
 	void BindGuide(AGuideThread* NewGuidePtr);
 
 protected:
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
+
 	void OnStopGuide(AGuideThread* NewGuidePtr);
 
 	void OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNode);

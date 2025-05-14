@@ -44,8 +44,6 @@ void UViewTaskMenu::NativeConstruct()
 			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnActiveGuideThread);
 		}
 	}
-
-	ResetUIByData();
 }
 
 void UViewTaskMenu::NativeDestruct()
@@ -53,7 +51,7 @@ void UViewTaskMenu::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-inline void UViewTaskMenu::ResetUIByData()
+inline void UViewTaskMenu::EnableMenu()
 {
 	{
 		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FUViewTaskMenu::Get().TaskDetails));
@@ -127,7 +125,7 @@ inline void UViewTaskMenu::ResetUIByData()
 	ActiveCurrentCorrespondingItem();
 }
 
-inline void UViewTaskMenu::SyncData()
+inline void UViewTaskMenu::DisEnableMenu()
 {
 }
 

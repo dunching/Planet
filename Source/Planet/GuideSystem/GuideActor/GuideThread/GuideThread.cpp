@@ -249,6 +249,11 @@ void AGuideThread::UpdateCurrentTaskNode(
 	                                  );
 }
 
+FTaskNodeDescript AGuideThread::GetCurrentTaskNodeDescript() const
+{
+	return CurrentTaskNodeDescript;
+}
+
 void AGuideThread::AddEvent(
 	const FTaskNodeResuleHelper& TaskNodeResuleHelper
 	)

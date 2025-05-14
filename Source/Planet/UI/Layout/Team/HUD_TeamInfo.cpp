@@ -27,17 +27,10 @@ struct FHUD_TeamInfo : public TStructVariable<FHUD_TeamInfo>
 void UHUD_TeamInfo::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UHUD_TeamInfo::NativeDestruct()
 {
-	if (TeammateOptionChangedDelegateContainer)
-	{
-		TeammateOptionChangedDelegateContainer->UnBindCallback();
-	}
-
 	Super::NativeDestruct();
 }
 
@@ -56,8 +49,10 @@ FReply UHUD_TeamInfo::NativeOnKeyDown(
 	return Super::NativeOnKeyDown(InGeometry, InKeyEvent);
 }
 
-void UHUD_TeamInfo::ResetUIByData()
+void UHUD_TeamInfo::Enable()
 {
+	ILayoutItemInterfacetion::Enable();
+	
 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(FHUD_TeamInfo::Get().VerticalBox));
 	if (!PanelPtr)
 	{
@@ -110,6 +105,16 @@ void UHUD_TeamInfo::ResetUIByData()
 		GMCPtr->GetTeamMatesHelperComponent()->GetTeammateOption(),
 		GMCPtr->GetTeamMatesHelperComponent()->GetOwnerCharacterProxy()
 	);
+}
+
+void UHUD_TeamInfo::DisEnable()
+{
+	if (TeammateOptionChangedDelegateContainer)
+	{
+		TeammateOptionChangedDelegateContainer->UnBindCallback();
+	}
+
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UHUD_TeamInfo::OnTeammateOptionChanged(

@@ -8,6 +8,7 @@
 
 #include "UIInterfaces.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "GetItemInfosList.generated.h"
 
@@ -23,7 +24,7 @@ struct FConsumableProxy;
 UCLASS()
 class PLANET_API UGetItemInfosList :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -33,8 +34,6 @@ public:
 #else
 	virtual void NativePreConstruct()override;
 #endif
-
-	virtual void ResetUIByData() override;
 
 	void SetPlayerCharacter(ACharacterBase*PlayeyCharacterPtr);
 	

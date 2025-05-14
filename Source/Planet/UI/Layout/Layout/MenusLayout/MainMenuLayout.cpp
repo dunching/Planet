@@ -65,7 +65,7 @@ void UMainMenuLayout::SyncData()
 		auto MenuInterfacePtr = Cast<IMenuInterface>(UIPtr->GetWidgetAtIndex(CurrentIndex));
 		if (MenuInterfacePtr)
 		{
-			MenuInterfacePtr->SyncData();
+			MenuInterfacePtr->DisEnableMenu();
 		}
 	}
 }
@@ -84,11 +84,11 @@ void UMainMenuLayout::SwitchViewer(
 				if (MenuInterfacePtr->GetMenuType() == MenuType)
 				{
 					// 这里不太对啊？
-					MenuInterfacePtr->ResetUIByData();
+					MenuInterfacePtr->EnableMenu();
 					return;
 				}
 
-				MenuInterfacePtr->SyncData();
+				MenuInterfacePtr->DisEnableMenu();
 			}
 		}
 
@@ -104,7 +104,7 @@ void UMainMenuLayout::SwitchViewer(
 			{
 				continue;
 			}
-			MenuInterfacePtr->ResetUIByData();
+			MenuInterfacePtr->EnableMenu();
 			UIPtr->SetActiveWidget(Iter);
 			OnMenuLayoutChanged(MenuType);
 			break;

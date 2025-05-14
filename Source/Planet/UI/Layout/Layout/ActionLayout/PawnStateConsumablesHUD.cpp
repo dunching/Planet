@@ -16,8 +16,6 @@ struct FPawnStateConsumablesHUD : public TStructVariable<FPawnStateConsumablesHU
 void UPawnStateConsumablesHUD::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UPawnStateConsumablesHUD::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -39,8 +37,10 @@ void UPawnStateConsumablesHUD::NativeTick(const FGeometry& MyGeometry, float InD
 	}
 }
 
-void UPawnStateConsumablesHUD::ResetUIByData()
+void UPawnStateConsumablesHUD::Enable()
 {
+	ILayoutInterfacetion::Enable();
+	
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
 	{
@@ -65,4 +65,9 @@ void UPawnStateConsumablesHUD::ResetUIByData()
 			IconPtr->ResetToolUIByData(ConsumableSocketInfoSPtr);
 		}
 	}
+}
+
+void UPawnStateConsumablesHUD::DisEnable()
+{
+	ILayoutInterfacetion::DisEnable();
 }

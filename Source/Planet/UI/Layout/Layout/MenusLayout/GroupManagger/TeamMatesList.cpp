@@ -52,7 +52,7 @@ void UTeamMatesList::NativeConstruct()
 
 	HumanCharacterPtr = Cast<AHumanCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
 
-	ResetUIByData();
+	EnableMenu();
 }
 
 void UTeamMatesList::NativeDestruct()
@@ -62,11 +62,11 @@ void UTeamMatesList::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UTeamMatesList::ResetUIByData()
+void UTeamMatesList::EnableMenu()
 {
 }
 
-void UTeamMatesList::SyncData()
+void UTeamMatesList::DisEnableMenu()
 {
 	auto PanelPtr = Cast<UVerticalBox>(GetWidgetFromName(TeanMatesList::Get().VerticalBox));
 	if (!PanelPtr)

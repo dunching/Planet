@@ -59,7 +59,7 @@ void UInteractionConversationLayout::Enable()
 		);
 		if (UIPtr)
 		{
-			UIPtr->SetVisibility(ESlateVisibility::Hidden);
+			UIPtr->Enable();
 		}
 	}
 }

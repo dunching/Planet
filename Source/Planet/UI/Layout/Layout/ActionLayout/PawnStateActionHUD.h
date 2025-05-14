@@ -24,8 +24,7 @@ class ACharacterBase;
 UCLASS()
 class PLANET_API UPawnStateActionHUD :
 	public UMyUserWidget,
-	public IHUDInterface,
-	public ILayoutInterfacetion
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -48,9 +47,9 @@ public:
 		float InDeltaTime
 		) override;
 
-	virtual void ResetUIByData() override;
-
-	virtual ELayoutCommon GetLayoutType() const override final;
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 

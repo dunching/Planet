@@ -53,8 +53,6 @@ void URaffleMenu::NativeConstruct()
 	OnGetProxyDelegateHandle = URaffleSubSystem::GetInstance()->OnGetProxyAry.AddCallback(
 		std::bind(&ThisClass::ResetGetProxyAry, this, std::placeholders::_1)
 	);
-	
-	ResetUIByData();
 }
 
 void URaffleMenu::NativeDestruct()
@@ -62,7 +60,7 @@ void URaffleMenu::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void URaffleMenu::ResetUIByData()
+void URaffleMenu::EnableMenu()
 {
 	InitialRaffleType();
 	InitialRaffleBtn();
@@ -70,7 +68,7 @@ void URaffleMenu::ResetUIByData()
 	SwitchDisplay(true);
 }
 
-void URaffleMenu::SyncData()
+void URaffleMenu::DisEnableMenu()
 {
 	OnGetProxyDelegateHandle->UnBindCallback();
 }

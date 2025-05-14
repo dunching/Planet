@@ -51,9 +51,9 @@ public:
 	virtual void NativeDestruct() override;
 
 protected:
-	virtual void ResetUIByData() override;
+	virtual void EnableMenu() override;
 
-	virtual void SyncData() override;
+	virtual void DisEnableMenu() override;
 
 	virtual EMenuType GetMenuType() const override final;
 

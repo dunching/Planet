@@ -12,6 +12,7 @@
 
 #include "MainHUDLayout.generated.h"
 
+class UOverlaySlot;
 class UGetItemInfosList;
 class UInteractionList;
 class UMainMenuLayout;
@@ -25,9 +26,10 @@ class PLANET_API UMainHUDLayout : public UMyUserWidget
 	GENERATED_BODY()
 
 public:
+	using FOnLayoutChanged = TCallbackHandleContainer<void(
+		ELayoutCommon
+		)>;
 
-	using FOnLayoutChanged = TCallbackHandleContainer<void(ELayoutCommon)>;
-	
 	virtual void NativeConstruct() override;
 
 	// 
@@ -46,6 +48,12 @@ public:
 
 	// 获取物品的提示
 	UGetItemInfosList* GetItemInfos();
+
+	UOverlaySlot* DisplayWidget(
+		const TSubclassOf<UUserWidget>& WidgetClass,
+		const std::function<void(UUserWidget*)>& Initializer
+ 
+		);
 
 	void SwitchIsLowerHP(
 		bool bIsLowerHP

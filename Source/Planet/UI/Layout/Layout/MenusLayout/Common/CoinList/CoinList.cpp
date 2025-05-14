@@ -27,3 +27,14 @@ void UCoinList::NativeDestruct()
 {
 	Super::NativeDestruct(); 
 }
+
+void UCoinList::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
+
+	auto UIPtr = Cast<UCoinInfo>(GetWidgetFromName(FCoinList::Get().Regular));
+	if (UIPtr )
+	{
+		UIPtr->Enable();
+	}
+}

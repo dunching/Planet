@@ -27,8 +27,6 @@ struct FGuideList : public TStructVariable<FGuideList>
 void UGuideList::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UGuideList::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -36,8 +34,10 @@ void UGuideList::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	Super::NativeTick(MyGeometry, InDeltaTime);
 }
 
-void UGuideList::ResetUIByData()
+void UGuideList::Enable()
 {
+	ILayoutItemInterfacetion::Enable();
+	
 	auto UIPtr = Cast<UVerticalBox>(GetWidgetFromName(FGuideList::Get().VerticalBox));
 	if (UIPtr)
 	{
@@ -45,6 +45,12 @@ void UGuideList::ResetUIByData()
 	}
 	
 	UGuideSubSystem::GetInstance()->GetOnStartGuide().AddUObject(this, &ThisClass::OnStartGuide);
+	OnStartGuide(UGuideSubSystem::GetInstance()->GetCurrentGuideThread());
+}
+
+void UGuideList::DisEnable()
+{
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UGuideList::OnStartGuide(AGuideThread* NewGuidePtr)

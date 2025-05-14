@@ -5,6 +5,8 @@
 #include "Components/Border.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/CanvasPanel.h"
+#include "Components/Overlay.h"
+#include "Components/OverlaySlot.h"
 
 #include "MainHUDLayout.h"
 
@@ -36,16 +38,28 @@ struct FMainHUDLayout : public TStructVariable<FMainHUDLayout>
 	FName Layout_WidgetSwitcher = TEXT("Layout_WidgetSwitcher");
 
 	FName ItemDecriptionCanvas = TEXT("ItemDecriptionCanvas");
+
+	FName OtherWidgets = TEXT("OtherWidgets");
 };
 
 void UMainHUDLayout::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FMainHUDLayout::Get().ItemDecriptionCanvas));
-	if (UIPtr)
+	// 常驻的UI
 	{
-		UIPtr->ClearChildren();
+		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FMainHUDLayout::Get().ItemDecriptionCanvas));
+		if (UIPtr)
+		{
+			UIPtr->ClearChildren();
+		}
+	}
+	{
+		auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FMainHUDLayout::Get().OtherWidgets));
+		if (UIPtr)
+		{
+			UIPtr->ClearChildren();
+		}
 	}
 }
 
@@ -196,9 +210,39 @@ UGetItemInfosList* UMainHUDLayout::GetItemInfos()
 	auto UIPtr = Cast<UGetItemInfosList>(GetWidgetFromName(FMainHUDLayout::Get().GetItemInfosList));
 	if (!UIPtr)
 	{
+		return nullptr;
 	}
 
 	return UIPtr;
+}
+
+UOverlaySlot* UMainHUDLayout::DisplayWidget(
+	const TSubclassOf<UUserWidget>& WidgetClass,
+	const std::function<void(
+		UUserWidget*
+		)>& Initializer
+	)
+{
+	auto UIPtr = Cast<UOverlay>(GetWidgetFromName(FMainHUDLayout::Get().OtherWidgets));
+	if (!UIPtr)
+	{
+		return nullptr;
+	}
+
+	auto WidgetPtr = CreateWidget(UIPtr, WidgetClass);
+	if (Initializer && WidgetPtr)
+	{
+		Initializer(WidgetPtr);
+	}
+
+	auto SlotPtr = UIPtr->AddChildToOverlay(WidgetPtr);
+	if (SlotPtr)
+	{
+		SlotPtr->SetHorizontalAlignment(EHorizontalAlignment::HAlign_Center);
+		SlotPtr->SetVerticalAlignment(EVerticalAlignment::VAlign_Fill);
+	}
+
+	return SlotPtr; 
 }
 
 void UMainHUDLayout::SwitchIsLowerHP(

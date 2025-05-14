@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "GuideList.generated.h"
 
@@ -21,7 +22,7 @@ struct FTaskNodeDescript;
 UCLASS()
 class PLANET_API UGuideList :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -30,7 +31,9 @@ public:
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	
-	virtual void ResetUIByData() override;
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 protected:
 	void OnStartGuide(AGuideThread* NewGuidePtr);

@@ -30,6 +30,11 @@ struct FCoinInfo : public TStructVariable<FCoinInfo>
 void UCoinInfo::NativeConstruct()
 {
 	Super::NativeConstruct();
+}
+
+void UCoinInfo::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
 
 	auto CharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
@@ -56,12 +61,12 @@ void UCoinInfo::NativeConstruct()
 		auto Handle =
 			CharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
 				 std::bind(
-				           &ThisClass::OnCoinProxyChanged,
-				           this,
-				           std::placeholders::_1,
-				           std::placeholders::_2,
-				           std::placeholders::_3
-				          )
+						   &ThisClass::OnCoinProxyChanged,
+						   this,
+						   std::placeholders::_1,
+						   std::placeholders::_2,
+						   std::placeholders::_3
+						  )
 				);
 		Handle->bIsAutoUnregister = false;
 	}

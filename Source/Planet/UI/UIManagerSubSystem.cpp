@@ -104,7 +104,7 @@ FString UUIManagerSubSystem::GetLayoutName(
 		break;
 	default: ;
 	}
-	return  Result;
+	return Result;
 }
 
 void UUIManagerSubSystem::SwitchMenuLayout(
@@ -124,7 +124,8 @@ FString UUIManagerSubSystem::GetMenuLayoutName(
 	) const
 {
 	FString Result = TEXT("");
-	switch (MenuType) {
+	switch (MenuType)
+	{
 	case EMenuType::kEmpty:
 		break;
 	case EMenuType::kAllocationSkill:
@@ -146,7 +147,7 @@ FString UUIManagerSubSystem::GetMenuLayoutName(
 	case EMenuType::kViewMap:
 		break;
 	}
-	return  Result;
+	return Result;
 }
 
 UMainMenuLayout* UUIManagerSubSystem::GetMainMenuLayout() const

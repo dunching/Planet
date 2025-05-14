@@ -15,6 +15,7 @@ class UInputProcessorSubSystem;
 class UWidgetComponent;
 class UHoverWidgetBase;
 class UFocusIcon;
+class UMainHUDLayout;
 
 class FComponentEntry_Hover
 {
@@ -125,7 +126,7 @@ const FName TargetPointSharedLayerName = TEXT("TargetPointSharedLayer");
 /**
  *
  */
-UCLASS()
+UCLASS(BlueprintType,Blueprintable)
 class PLANET_API UPlanetGameViewportClient : public UGameViewportClient
 {
 	GENERATED_BODY()
@@ -135,9 +136,11 @@ public:
 		struct FWorldContext& WorldContext,
 		UGameInstance* OwningGameInstance,
 		bool bCreateNewAudioDevice = true
-	);
+	) override;
 	
 	virtual void NotifyPlayerAdded( int32 PlayerIndex, class ULocalPlayer* AddedPlayer ) override;
+	
+	virtual ULocalPlayer* SetupInitialLocalPlayer(FString& OutError) override;
 	
 	virtual bool InputKey(
 		const FInputKeyEventArgs& EventArgs
@@ -153,6 +156,8 @@ public:
 		bool bGamepad = false
 	) override;
 
+private:
+	
 	UPROPERTY(Transient)
 	UInputProcessorSubSystem* InputProcessorSubSystemPtr = nullptr;
 };

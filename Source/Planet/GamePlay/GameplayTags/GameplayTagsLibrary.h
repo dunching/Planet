@@ -312,5 +312,10 @@ public:
 	static FGameplayTag GEData_ModifyItem_MoveSpeed;
 	
 	static FGameplayTag GEData_ModifyItem_PerformSpeed;
+
+	
+	static FGameplayTag Region_Default;
+	
+	static FGameplayTag Region_NoviceVillage;
 	
 };

@@ -30,10 +30,6 @@ void UInteractionList::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UInteractionList::ResetUIByData()
-{
-}
-
 void UInteractionList::UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr)
 {
 	TargetCharacterPtr = InTargetCharacterPtr;

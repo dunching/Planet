@@ -34,10 +34,6 @@ void UGetItemInfosList::NativePreConstruct()
 	}
 }
 
-void UGetItemInfosList::ResetUIByData()
-{
-}
-
 void UGetItemInfosList::SetPlayerCharacter(
 	ACharacterBase* PlayeyCharacterPtr
 	)

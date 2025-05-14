@@ -88,8 +88,6 @@ void USkill_Consumable_Base::ActivateAbility(
 )
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-	PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
 bool USkill_Consumable_Base::CanActivateAbility(

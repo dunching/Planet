@@ -1,4 +1,3 @@
-
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
@@ -27,23 +26,33 @@ class PLANET_API ILayoutInterfacetion
 	GENERATED_BODY()
 
 	friend UMainHUDLayout;
-	
-public:
 
+public:
 	using FOnQuit = std::function<void()>;
-	
+
 	virtual void Enable();
-	
+
 	virtual void DisEnable();
 
 	virtual ELayoutCommon GetLayoutType() const = 0;
-	
+
 protected:
-
 	bool bIsActive = false;
-	
-private:
 
+private:
 	FOnQuit OnQuit;
-	
+};
+
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class ULayoutItemInterfacetion : public ULayoutInterfacetion
+{
+	GENERATED_BODY()
+};
+
+class PLANET_API ILayoutItemInterfacetion : public ILayoutInterfacetion
+{
+	GENERATED_BODY()
+
+private:
+	virtual ELayoutCommon GetLayoutType() const override final;
 };

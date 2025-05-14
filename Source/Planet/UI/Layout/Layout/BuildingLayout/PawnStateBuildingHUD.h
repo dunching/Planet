@@ -8,6 +8,7 @@
 
 #include "GenerateType.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 
 #include "PawnStateBuildingHUD.generated.h"
@@ -25,7 +26,7 @@ struct FConsumableSocketInfo;
 UCLASS()
 class PLANET_API UPawnStateBuildingHUD :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -39,13 +40,17 @@ public:
 
 	virtual void NativeDestruct()override;
 
-	virtual void ResetUIByData()override;
+	// virtual void ResetUIByData()override;
 // 
 // 	TMap<FGameplayTag, TSharedPtr<FToolsSocketInfo>>GetTools();
 // 
 // 	TMap<FGameplayTag, TSharedPtr<FConsumableSocketInfo>>GetConsumables();
 
 protected:
+
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ToolSocket1;

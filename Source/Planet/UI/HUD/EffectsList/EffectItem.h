@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
 
 #include "MyUserWidget.h"
 
@@ -17,6 +18,7 @@ struct FActiveGameplayEffect;
 
 class UCS_Base;
 class UGameplayEffect;
+class UAbilitySystemComponent;
 
 UCLASS()
 class PLANET_API UEffectItem : 
@@ -29,7 +31,10 @@ public:
 
 	using FDataChangedHandle = TCallbackHandleContainer<void()>::FCallbackHandleSPtr;
 
-	void SetData(const FActiveGameplayEffect* InActiveGameplayEffectPtr);
+	void SetData(
+		const TObjectPtr<UAbilitySystemComponent>& AbilitySystemComponentPtr,
+		FActiveGameplayEffectHandle NewActiveGameplayEffectHandle
+		);
 
 private:
 
@@ -52,9 +57,9 @@ private:
 
 	void SetTexutre();
 
-	const FActiveGameplayEffect* ActiveGameplayEffectPtr = nullptr;
-
 	TSharedPtr<FCharacterStateInfo> CharacterStateInfoSPtr = nullptr;
+	
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponentPtr = nullptr;
 	
 	FActiveGameplayEffectHandle Handle;
 	

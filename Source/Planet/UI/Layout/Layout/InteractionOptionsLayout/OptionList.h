@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "OptionList.generated.h"
 
@@ -22,7 +23,7 @@ class ISceneActorInteractionInterface;
 UCLASS()
 class PLANET_API UOptionList :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -32,7 +33,9 @@ public:
 
 	virtual void NativeDestruct() override;
 
-	virtual void ResetUIByData() override;
+	virtual void Enable() override;
+	
+	virtual void DisEnable() override;
 
 	// 显示AI可以互动的节点
 	void UpdateDisplay(

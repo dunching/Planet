@@ -16,3 +16,8 @@ void ILayoutInterfacetion::DisEnable()
 	bIsActive = false;
 }
 
+ELayoutCommon ILayoutItemInterfacetion::GetLayoutType() const
+{
+	return ELayoutCommon::kEmptyLayout;
+}
+

@@ -6,6 +6,7 @@
 #include "MyUserWidget.h"
 
 #include "GenerateType.h"
+#include "LayoutInterfacetion.h"
 #include "UIInterfaces.h"
 
 #include "CoinInfo.generated.h"
@@ -17,7 +18,8 @@ struct FCoinProxy;
  */
 UCLASS()
 class PLANET_API UCoinInfo :
-	public UMyUserWidget
+	public UMyUserWidget,
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -25,6 +27,8 @@ public:
 	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct() override;
+
+	virtual void Enable() override;
 
 	void SetNum(
 		int32 NewNum

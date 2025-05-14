@@ -437,3 +437,9 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed =
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.PerformSpeed")));
+
+FGameplayTag UGameplayTagsLibrary::Region_Default =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Region.Default")));
+
+FGameplayTag UGameplayTagsLibrary::Region_NoviceVillage =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("Region.NoviceVillage")));

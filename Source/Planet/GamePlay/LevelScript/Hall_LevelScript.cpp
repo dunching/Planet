@@ -24,6 +24,12 @@ void AMain_LevelScriptActor::BeginPlay()
 		UWeatherSystem::GetInstance()->GetDynamicWeather()->UpdateWeather(WeatherSettings::Clear_Skies);
 	}
 #endif
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+	}
+#endif
 }
 
 void AMain_LevelScriptActor::ClearWorldProcessCache()

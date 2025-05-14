@@ -33,8 +33,14 @@ void UOptionList::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UOptionList::ResetUIByData()
+void UOptionList::Enable()
 {
+	ILayoutItemInterfacetion::Enable();
+}
+
+void UOptionList::DisEnable()
+{
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UOptionList::UpdateDisplay(

@@ -34,21 +34,19 @@ namespace GroupManaggerMenu
 void UGroupManaggerMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
-void UGroupManaggerMenu::ResetUIByData()
+void UGroupManaggerMenu::EnableMenu()
 {
 	ResetGroupmates();
 }
 
-void UGroupManaggerMenu::SyncData()
+void UGroupManaggerMenu::DisEnableMenu()
 {
 	auto TeamMatesListPtr = Cast<UTeamMatesList>(GetWidgetFromName(GroupManaggerMenu::TeamMatesList));
 	if (TeamMatesListPtr)
 	{
-		TeamMatesListPtr->SyncData();
+		TeamMatesListPtr->DisEnableMenu();
 	}
 }
 

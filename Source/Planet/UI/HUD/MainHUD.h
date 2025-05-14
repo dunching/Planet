@@ -56,5 +56,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UMainHUDLayout> MainHUDLayoutClass;
 
-	UMainHUDLayout* MainHUDLayoutPtr = nullptr;
+	UPROPERTY(Transient)
+	TObjectPtr<UMainHUDLayout> MainHUDLayoutPtr = nullptr;
 };

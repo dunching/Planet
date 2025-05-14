@@ -8,13 +8,14 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "PawnStateConsumablesHUD.generated.h"
 
 UCLASS()
 class PLANET_API UPawnStateConsumablesHUD :
 	public UMyUserWidget, 
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -22,8 +23,10 @@ public:
 
 	virtual void NativeConstruct()override;
 
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	virtual void ResetUIByData()override;
-	
+	virtual void Enable() override;
+
+	virtual void DisEnable() override;
+
 };

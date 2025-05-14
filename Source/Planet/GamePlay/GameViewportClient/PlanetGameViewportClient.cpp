@@ -1,9 +1,16 @@
 #include "PlanetGameViewportClient.h"
 
+#include "AS_Character.h"
+#include "CharacterAbilitySystemComponent.h"
 #include "FocusIcon.h"
+#include "GetItemInfosList.h"
 #include "Components/WidgetComponent.h"
 
 #include "InputProcessorSubSystem.h"
+#include "MainHUDLayout.h"
+#include "PlanetPlayerController.h"
+#include "UICommon.h"
+#include "UIManagerSubSystem.h"
 #include "Blueprint/SlateBlueprintLibrary.h"
 
 static int32 GSlateTargetPointWidgetZOrder = 2;
@@ -21,7 +28,7 @@ FComponentEntry_Hover::~FComponentEntry_Hover()
 
 void SHoverWidgetScreenLayer::RemoveEntryFromCanvas(
 	FComponentEntry_Hover& Entry
-)
+	)
 {
 	// Mark the component was being removed, so we ignore any other remove requests for this component.
 	Entry.bRemoving = true;
@@ -35,7 +42,7 @@ void SHoverWidgetScreenLayer::RemoveEntryFromCanvas(
 void SHoverWidgetScreenLayer::Construct(
 	const FArguments& InArgs,
 	const FLocalPlayerContext& InPlayerContext
-)
+	)
 {
 	PlayerContext = InPlayerContext;
 
@@ -51,14 +58,14 @@ void SHoverWidgetScreenLayer::Construct(
 
 void SHoverWidgetScreenLayer::SetWidgetDrawSize(
 	FVector2D InDrawSize
-)
+	)
 {
 	DrawSize = InDrawSize;
 }
 
 void SHoverWidgetScreenLayer::SetWidgetPivot(
 	FVector2D InPivot
-)
+	)
 {
 	Pivot = InPivot;
 }
@@ -66,7 +73,7 @@ void SHoverWidgetScreenLayer::SetWidgetPivot(
 void SHoverWidgetScreenLayer::AddComponent(
 	UHoverWidgetBase* HoverWidgetPtr,
 	TSharedRef<SWidget> Widget
-)
+	)
 {
 	if (HoverWidgetPtr)
 	{
@@ -87,7 +94,7 @@ void SHoverWidgetScreenLayer::AddComponent(
 
 void SHoverWidgetScreenLayer::RemoveComponent(
 	UHoverWidgetBase* HoverWidgetPtr
-)
+	)
 {
 	if (ensure(HoverWidgetPtr))
 	{
@@ -106,7 +113,7 @@ void SHoverWidgetScreenLayer::Tick(
 	const FGeometry& AllottedGeometry,
 	const double InCurrentTime,
 	const float InDeltaTime
-)
+	)
 {
 	QUICK_SCOPE_CYCLE_COUNTER(SWorldWidgetScreenLayer_Tick);
 
@@ -145,45 +152,46 @@ void SHoverWidgetScreenLayer::Tick(
 					FVector2D ScreenPosition2D = FVector2D::ZeroVector;
 
 					if (GSlateTargetPointWidgetZOrder &&
-						Iter->Value.HoverWidgetPtr &&
-						(
-							(Iter->Value.HoverWidgetPtr->GetVisibility() == ESlateVisibility::Collapsed) ||
-							(Iter->Value.HoverWidgetPtr->GetVisibility() == ESlateVisibility::Hidden)
-						))
+					    Iter->Value.HoverWidgetPtr &&
+					    (
+						    (Iter->Value.HoverWidgetPtr->GetVisibility() == ESlateVisibility::Collapsed) ||
+						    (Iter->Value.HoverWidgetPtr->GetVisibility() == ESlateVisibility::Hidden)
+					    ))
 					{
 						return;
 					}
 
 					const auto bIsInsideView = FSceneView::ProjectWorldToScreen(
-						WorldLocation,
-						ProjectionData.GetConstrainedViewRect(),
-						ViewProjectionMatrix,
-						ScreenPosition2D,
-						Iter->Value.HoverWidgetPtr->bShouldCalcOutsideViewPosition
-					);
+					                                                            WorldLocation,
+					                                                            ProjectionData.GetConstrainedViewRect(),
+					                                                            ViewProjectionMatrix,
+					                                                            ScreenPosition2D,
+					                                                            Iter->Value.HoverWidgetPtr->
+					                                                            bShouldCalcOutsideViewPosition
+					                                                           );
 					if (bIsInsideView || Iter->Value.HoverWidgetPtr->bShouldCalcOutsideViewPosition)
 					{
 						const double ViewportDist = FVector::Dist(ProjectionData.ViewOrigin, WorldLocation);
 						const FVector2D RoundedPosition2D(
-							FMath::RoundToDouble(ScreenPosition2D.X),
-							FMath::RoundToDouble(ScreenPosition2D.Y)
-						);
+						                                  FMath::RoundToDouble(ScreenPosition2D.X),
+						                                  FMath::RoundToDouble(ScreenPosition2D.Y)
+						                                 );
 
 						// If the root widget has pixel snapping disabled, then don't pixel snap the screen coordinates either otherwise
 						// it'll always jump between pixels. This saves needing an explicit flag on the widget component, and is probably 
 						// a better delegation of responsibility anyway, since changing the widget type can change the snapping as it wants
 						bool bDisablePixelSnapping = Iter->Value.Widget->GetPixelSnapping() ==
-							EWidgetPixelSnapping::Disabled;
+						                             EWidgetPixelSnapping::Disabled;
 						const FVector2D ScreenPositionToUse = bDisablePixelSnapping ?
 							                                      ScreenPosition2D :
 							                                      RoundedPosition2D;
 
 						FVector2D ViewportPosition2D;
 						USlateBlueprintLibrary::ScreenToViewport(
-							PlayerController,
-							ScreenPositionToUse,
-							OUT ViewportPosition2D
-						);
+						                                         PlayerController,
+						                                         ScreenPositionToUse,
+						                                         OUT ViewportPosition2D
+						                                        );
 
 						const FVector ViewportPosition(ViewportPosition2D.X, ViewportPosition2D.Y, ViewportDist);
 
@@ -192,26 +200,31 @@ void SHoverWidgetScreenLayer::Tick(
 						if (SConstraintCanvas::FSlot* CanvasSlot = Iter->Value.Slot)
 						{
 							FVector2D AbsoluteProjectedLocation = ViewportGeometry.LocalToAbsolute(
-								FVector2D(ViewportPosition.X, ViewportPosition.Y)
-							);
+								 FVector2D(ViewportPosition.X, ViewportPosition.Y)
+								);
 							FVector2D LocalPosition = AllottedGeometry.AbsoluteToLocal(AbsoluteProjectedLocation);
 
 							if (Iter->Value.HoverWidgetPtr)
 							{
 								LocalPosition = Iter->Value.HoverWidgetPtr->ModifyProjectedLocalPosition(
-									ViewportGeometry,
-									LocalPosition
-								);
+									 ViewportGeometry,
+									 LocalPosition
+									);
 
 								FVector2D ComponentDrawSize = Iter->Value.HoverWidgetPtr->DrawSize;
 								FVector2D ComponentPivot = Iter->Value.HoverWidgetPtr->Pivot;
 
 								CanvasSlot->SetAutoSize(
-									Iter->Value.HoverWidgetPtr->bDrawAtDesiredSize
-								);
+								                        Iter->Value.HoverWidgetPtr->bDrawAtDesiredSize
+								                       );
 								CanvasSlot->SetOffset(
-									FMargin(LocalPosition.X, LocalPosition.Y, ComponentDrawSize.X, ComponentDrawSize.Y)
-								);
+								                      FMargin(
+								                              LocalPosition.X,
+								                              LocalPosition.Y,
+								                              ComponentDrawSize.X,
+								                              ComponentDrawSize.Y
+								                             )
+								                     );
 								CanvasSlot->SetAnchors(FAnchors(0, 0, 0, 0));
 								CanvasSlot->SetAlignment(ComponentPivot);
 
@@ -224,8 +237,8 @@ void SHoverWidgetScreenLayer::Tick(
 							{
 								CanvasSlot->SetAutoSize(DrawSize.IsZero());
 								CanvasSlot->SetOffset(
-									FMargin(LocalPosition.X, LocalPosition.Y, DrawSize.X, DrawSize.Y)
-								);
+								                      FMargin(LocalPosition.X, LocalPosition.Y, DrawSize.X, DrawSize.Y)
+								                     );
 								CanvasSlot->SetAnchors(FAnchors(0, 0, 0, 0));
 								CanvasSlot->SetAlignment(Pivot);
 
@@ -266,14 +279,14 @@ void SHoverWidgetScreenLayer::Tick(
 
 FVector2D SHoverWidgetScreenLayer::ComputeDesiredSize(
 	float X
-) const
+	) const
 {
 	return FVector2D(0, 0);
 }
 
 FHoverWidgetScreenLayer::FHoverWidgetScreenLayer(
 	const FLocalPlayerContext& PlayerContext
-)
+	)
 {
 	OwningPlayer = PlayerContext;
 }
@@ -285,7 +298,7 @@ FHoverWidgetScreenLayer::~FHoverWidgetScreenLayer()
 
 void FHoverWidgetScreenLayer::AddHoverWidget(
 	UHoverWidgetBase* HoverWidgetPtr
-)
+	)
 {
 	if (!HoverWidgetMapSPtr)
 	{
@@ -304,7 +317,7 @@ void FHoverWidgetScreenLayer::AddHoverWidget(
 
 void FHoverWidgetScreenLayer::RemoveHoverWidget(
 	UHoverWidgetBase* HoverWidgetPtr
-)
+	)
 {
 	if (HoverWidgetPtr)
 	{
@@ -333,47 +346,67 @@ void UPlanetGameViewportClient::Init(
 	struct FWorldContext& WorldContext,
 	UGameInstance* OwningGameInstance,
 	bool bCreateNewAudioDevice
-)
+	)
 {
 	Super::Init(WorldContext, OwningGameInstance, bCreateNewAudioDevice);
 
 	FTSTicker::GetCoreTicker().AddTicker(
-		FTickerDelegate::CreateLambda(
-			[this, OwningGameInstance](
-			float
-		)
-			{
-				TSharedPtr<IGameLayerManager> LayerManager = GetGameLayerManager();
-				if (LayerManager.IsValid())
-				{
-					auto PlayerAry = OwningGameInstance->GetLocalPlayers();
-					if (PlayerAry.IsValidIndex(0))
-					{
-						auto NewScreenLayer = MakeShareable(new FHoverWidgetScreenLayer(PlayerAry[0]));
-						LayerManager->AddLayerForPlayer(PlayerAry[0], TargetPointSharedLayerName, NewScreenLayer, -100);
-						return false;
-					}
-				}
-				return true;
-			}
-		),
-		1.f
-	);
+	                                     FTickerDelegate::CreateLambda(
+	                                                                   [this, OwningGameInstance](
+	                                                                   float
+	                                                                   )
+	                                                                   {
+		                                                                   TSharedPtr<IGameLayerManager> LayerManager =
+			                                                                   GetGameLayerManager();
+		                                                                   if (LayerManager.IsValid())
+		                                                                   {
+			                                                                   auto PlayerAry = OwningGameInstance->
+				                                                                   GetLocalPlayers();
+			                                                                   if (PlayerAry.IsValidIndex(0))
+			                                                                   {
+				                                                                   auto NewScreenLayer = MakeShareable(
+					                                                                    new FHoverWidgetScreenLayer(
+						                                                                     PlayerAry[0]
+						                                                                    )
+					                                                                   );
+				                                                                   LayerManager->AddLayerForPlayer(
+					                                                                    PlayerAry[0],
+					                                                                    TargetPointSharedLayerName,
+					                                                                    NewScreenLayer,
+					                                                                    -100
+					                                                                   );
+				                                                                   return false;
+			                                                                   }
+		                                                                   }
+		                                                                   return true;
+	                                                                   }
+	                                                                  ),
+	                                     1.f
+	                                    );
 }
 
 void UPlanetGameViewportClient::NotifyPlayerAdded(
 	int32 PlayerIndex,
 	class ULocalPlayer* AddedPlayer
-)
+	)
 {
 	Super::NotifyPlayerAdded(PlayerIndex, AddedPlayer);
 
 	InputProcessorSubSystemPtr = UInputProcessorSubSystem::GetInstance();
 }
 
+ULocalPlayer* UPlanetGameViewportClient::SetupInitialLocalPlayer(
+	FString& OutError
+	)
+{
+	auto Result = Super::SetupInitialLocalPlayer(OutError);
+
+	return Result;
+}
+
 inline bool UPlanetGameViewportClient::InputKey(
 	const FInputKeyEventArgs& EventArgs
-)
+	)
 {
 	if (InputProcessorSubSystemPtr->InputKey(EventArgs))
 	{
@@ -390,7 +423,7 @@ inline bool UPlanetGameViewportClient::InputAxis(
 	float DeltaTime,
 	int32 NumSamples,
 	bool bGamepad
-)
+	)
 {
 	if (InputProcessorSubSystemPtr->InputAxis(InViewport, InputDevice, Key, Delta, DeltaTime, NumSamples, bGamepad))
 	{

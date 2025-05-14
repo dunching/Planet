@@ -1,10 +1,12 @@
 #include "InteractionTransactionLayout.h"
 
-#include "AIComponent.h"
-#include "AssetRefMap.h"
-#include "CharacterAbilitySystemComponent.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CanvasPanel.h"
+#include "Components/EditableTextBox.h"
+#include "Components/TextBlock.h"
+#include "Components/TileView.h"
+#include "Kismet/KismetStringLibrary.h"
 
 #include "GameplayCommand.h"
 #include "GameplayTagsLibrary.h"
@@ -20,11 +22,10 @@
 #include "PlanetPlayerController.h"
 #include "PlayerGameplayTasks.h"
 #include "UIManagerSubSystem.h"
-#include "Components/CanvasPanel.h"
-#include "Components/EditableTextBox.h"
-#include "Components/TextBlock.h"
-#include "Components/TileView.h"
-#include "Kismet/KismetStringLibrary.h"
+#include "AIComponent.h"
+#include "AssetRefMap.h"
+#include "CharacterAbilitySystemComponent.h"
+#include "CoinList.h"
 
 struct FTransactionLayout : public TStructVariable<FTransactionLayout>
 {
@@ -49,6 +50,8 @@ struct FTransactionLayout : public TStructVariable<FTransactionLayout>
 	FName TileView = TEXT("TileView");
 
 	FName ItemDetails = TEXT("ItemDetails");
+
+	FName CoinList = TEXT("CoinList");
 };
 
 void UInteractionTransactionLayout::NativeConstruct()
@@ -104,6 +107,14 @@ void UInteractionTransactionLayout::Enable()
 	ILayoutInterfacetion::Enable();
 
 	CurrentProxyPtr = nullptr;
+
+	{
+		auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FTransactionLayout::Get().CoinList));
+		if (UIPtr)
+		{
+			UIPtr->Enable();
+		}
+	}
 
 	{
 		auto UIPtr = Cast<UCanvasPanel>(GetWidgetFromName(FTransactionLayout::Get().ItemDetails));

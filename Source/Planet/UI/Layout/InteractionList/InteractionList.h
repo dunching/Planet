@@ -8,6 +8,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
+#include "LayoutInterfacetion.h"
 
 #include "InteractionList.generated.h"
 
@@ -19,7 +20,7 @@ class AHumanCharacter_AI;
 UCLASS()
 class PLANET_API UInteractionList :
 	public UMyUserWidget,
-	public IHUDInterface
+	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()
 
@@ -28,8 +29,6 @@ public:
 	virtual void NativeConstruct() override;
 
 	virtual void NativeDestruct() override;
-
-	virtual void ResetUIByData() override;
 
 	void UpdateDisplay(AHumanCharacter_AI* InTargetCharacterPtr);
 	

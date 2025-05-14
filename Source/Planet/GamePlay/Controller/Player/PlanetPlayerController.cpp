@@ -47,6 +47,7 @@
 #include "GroupManagger_Player.h"
 #include "HumanCharacter_AI.h"
 #include "OpenWorldSystem.h"
+#include "PlanetGameViewportClient.h"
 #include "PlayerGameplayTasks.h"
 #include "SceneProxyExtendInfo.h"
 
@@ -509,6 +510,12 @@ void APlanetPlayerController::OnGroupManaggerReady(
 	}
 #endif
 
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+	}
+#endif
+	
 	ForEachComponent(
 	                 false,
 	                 [this](

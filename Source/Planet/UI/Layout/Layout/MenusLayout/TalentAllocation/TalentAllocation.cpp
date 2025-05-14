@@ -14,6 +14,41 @@ const FName UsedNum = TEXT("UsedNum");
 void UTalentAllocation::NativeConstruct()
 {
 	Super::NativeConstruct();
+}
+
+void UTalentAllocation::NativeDestruct()
+{
+	Super::NativeDestruct(); 
+
+	if (OnValueChanged)
+	{
+		OnValueChanged->UnBindCallback();
+	}
+	for (auto& Iter : OnPointChangedHandleAry)
+	{
+		if (Iter)
+		{
+			Iter->UnBindCallback();
+		}
+	}
+
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (CharacterPtr)
+	{
+		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
+		if (TalentAllocationComponentPtr)
+		{
+			TalentAllocationComponentPtr->SyncToHolding();
+		}
+	}
+
+}
+
+void UTalentAllocation::EnableMenu()
+{
+	if (WidgetTree)
+	{
+	}
 
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (CharacterPtr)
@@ -46,42 +81,7 @@ void UTalentAllocation::NativeConstruct()
 	}
 }
 
-void UTalentAllocation::NativeDestruct()
-{
-	Super::NativeDestruct(); 
-
-	if (OnValueChanged)
-	{
-		OnValueChanged->UnBindCallback();
-	}
-	for (auto& Iter : OnPointChangedHandleAry)
-	{
-		if (Iter)
-		{
-			Iter->UnBindCallback();
-		}
-	}
-
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (CharacterPtr)
-	{
-		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
-		if (TalentAllocationComponentPtr)
-		{
-			TalentAllocationComponentPtr->SyncToHolding();
-		}
-	}
-
-}
-
-void UTalentAllocation::ResetUIByData()
-{
-	if (WidgetTree)
-	{
-	}
-}
-
-void UTalentAllocation::SyncData()
+void UTalentAllocation::DisEnableMenu()
 {
 }
 

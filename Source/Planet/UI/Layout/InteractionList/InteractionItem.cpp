@@ -43,10 +43,6 @@ void UInteractionItem::NativeConstruct()
 	UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnClicked);
 }
 
-void UInteractionItem::ResetUIByData()
-{
-}
-
 void UInteractionItem::SetData(const FOnInteractionItemClicked & InOnInteractionItemClicked)
 {
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FInteractionItem::Get().Text));
@@ -56,6 +52,16 @@ void UInteractionItem::SetData(const FOnInteractionItemClicked & InOnInteraction
 	}
 
 	UIPtr->SetText(FText::FromString(UTextSubSystem::GetInstance()->GetText(TextCollect::CharacterInteraction)));
+}
+
+void UInteractionItem::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
+}
+
+void UInteractionItem::DisEnable()
+{
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UInteractionItem::OnClicked()

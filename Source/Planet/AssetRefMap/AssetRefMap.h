@@ -19,6 +19,7 @@ class UGameplayEffect;
 class UMainUILayout;
 class AGroupManagger;
 class URaffleMenu;
+class UMainHUDLayout;
 class UPawnStateActionHUD;
 class UPawnStateBuildingHUD;
 class UItemProxyDragDropOperation;
@@ -33,6 +34,7 @@ class UProgressTips;
 class UTalentAllocation;
 class UGroupManaggerMenu;
 class UHUD_TeamInfo;
+class URegionPromt;
 class UFocusIcon;
 class UMarkPoints;
 class UCharacterRisingTips;
@@ -71,26 +73,29 @@ public:
 	TSubclassOf<AGroupManagger>GroupSharedInfoClass;
 
 #pragma region MenusUI
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UItemProxyDragDropOperationWidget>DragDropOperationWidgetClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UAllocationableProxyDragDropOperationWidget>AllocationableProxyDragDropOperationWidgetClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UItemProxyDragDropOperation>ItemsDragDropOperationClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UMainMenuLayout>MenuLayoutClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UCharacterTitle>AIHumanInfoClass;
 	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UFocusIcon>FocusIconClass;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UInteractionList>InteractionList;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
+	TSubclassOf<URegionPromt>RegionPromtClass;
 #pragma endregion MenusUI
 
 #pragma region GEs

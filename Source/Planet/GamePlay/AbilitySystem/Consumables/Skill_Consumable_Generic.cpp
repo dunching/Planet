@@ -168,7 +168,7 @@ void USkill_Consumable_Generic::PerformAction(
 void USkill_Consumable_Generic::SpawnActor()
 {
 #if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_SimulatedProxy)
+	if (GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() > ROLE_Authority)
 	{
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = CharacterPtr;
@@ -187,7 +187,7 @@ void USkill_Consumable_Generic::SpawnActor()
 void USkill_Consumable_Generic::ExcuteTasks()
 {
 #if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
 		if (CharacterPtr)
 		{
@@ -231,8 +231,10 @@ void USkill_Consumable_Generic::ExcuteTasks()
 
 void USkill_Consumable_Generic::PlayMontage()
 {
-#if UE_EDITOR || UE_SERVER
-	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
 		auto HumanMontage = ProxyPtr->GetTableRowProxy_Consumable()->HumanMontage;
 		if (HumanMontage)
@@ -254,7 +256,6 @@ void USkill_Consumable_Generic::PlayMontage()
 			TaskPtr->ReadyForActivation();
 		}
 	}
-#endif
 }
 
 void USkill_Consumable_Generic::OnPlayMontageEnd()

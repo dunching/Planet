@@ -25,8 +25,6 @@ struct FUGuideItem : public TStructVariable<FUGuideItem>
 void UGuideItem::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	ResetUIByData();
 }
 
 void UGuideItem::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -39,11 +37,6 @@ void UGuideItem::NativeDestruct()
 	UGuideSubSystem::GetInstance()->GetOnStopGuide().Remove(OnStartGuideHandle);
 	
 	Super::NativeDestruct();
-}
-
-void UGuideItem::ResetUIByData()
-{
-	UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(this, &ThisClass::OnStopGuide);
 }
 
 void UGuideItem::BindGuide(AGuideThread* NewGuidePtr)
@@ -60,11 +53,23 @@ void UGuideItem::BindGuide(AGuideThread* NewGuidePtr)
 		
 		NewGuidePtr->OnCurrentTaskNodeChanged.AddUObject(this, &ThisClass::OnCurrentTaskNodeChanged);
 
-		OnCurrentTaskNodeChanged(FTaskNodeDescript::Refresh);
+		OnCurrentTaskNodeChanged(NewGuidePtr->GetCurrentTaskNodeDescript());
 	}
 	else
 	{
 	}
+}
+
+void UGuideItem::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
+	
+	UGuideSubSystem::GetInstance()->GetOnStopGuide().AddUObject(this, &ThisClass::OnStopGuide);
+}
+
+void UGuideItem::DisEnable()
+{
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UGuideItem::OnStopGuide(AGuideThread* NewGuidePtr)

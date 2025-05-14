@@ -20,6 +20,7 @@
 #include "UICommon.h"
 #include "ItemProxy_Container.h"
 #include "CharacterBase.h"
+#include "CoinList.h"
 #include "ItemProxy_Character.h"
 
 struct FBackpackMenu : public TStructVariable<FBackpackMenu>
@@ -33,6 +34,8 @@ struct FBackpackMenu : public TStructVariable<FBackpackMenu>
 	const FName ConsumableBtn = TEXT("ConsumableBtn");
 
 	const FName ShowAllBtn = TEXT("ShowAllBtn");
+
+	const FName CoinList = TEXT("CoinList");
 };
 
 void UBackpackMenu::NativeConstruct()
@@ -42,14 +45,26 @@ void UBackpackMenu::NativeConstruct()
 	BindEvent();
 }
 
-void UBackpackMenu::ResetUIByData()
+void UBackpackMenu::EnableMenu()
 {
 	ResetUIByData_All();
+	
+	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FBackpackMenu::Get().CoinList));
+	if (!UIPtr)
+	{
+		return;
+	}
+	UIPtr->Enable();
 }
 
-void UBackpackMenu::SyncData()
+void UBackpackMenu::DisEnableMenu()
 {
-
+	auto UIPtr = Cast<UCoinList>(GetWidgetFromName(FBackpackMenu::Get().CoinList));
+	if (!UIPtr)
+	{
+		return;
+	}
+	UIPtr->DisEnable();
 }
 
 EMenuType UBackpackMenu::GetMenuType() const

@@ -27,8 +27,10 @@
 #include "HumanInteractionWithNPC.h"
 #include "HumanInteractionWithChallengeEntry.h"
 #include "InputActions.h"
+#include "PlanetGameViewportClient.h"
 #include "ResourceBoxBase.h"
 #include "STT_CommonData.h"
+#include "UIManagerSubSystem.h"
 
 namespace HumanProcessor
 {
@@ -294,11 +296,11 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 	Super::OnRep_GroupSharedInfoChanged();
 
 #if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
+	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 	}
 #endif
-
+	
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{

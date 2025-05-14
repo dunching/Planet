@@ -36,21 +36,11 @@ void UPlayerConversationBorder::NativeConstruct()
 	UIPtr->OnClicked.AddDynamic(this, &ThisClass::On_Skip_Clicked);
 
 	EndBorder();
-
-	ResetUIByData();
 }
 
 void UPlayerConversationBorder::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
-}
-
-void UPlayerConversationBorder::ResetUIByData()
-{
-	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
-
-	PlayerCharacterPtr->GetPlayerConversationComponent()->OnPlayerHaveNewSentence.AddUObject(
-		this, &ThisClass::OnPlayerHaveNewSentence);
 }
 
 void UPlayerConversationBorder::SetSentence(const FTaskNode_Conversation_SentenceInfo& InSentence)
@@ -69,6 +59,25 @@ void UPlayerConversationBorder::SetSentence(const FTaskNode_Conversation_Sentenc
 void UPlayerConversationBorder::EndBorder()
 {
 	SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UPlayerConversationBorder::Enable()
+{
+	ILayoutItemInterfacetion::Enable();
+	
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+	OnPlayerHaveNewSentenceDelegateHandle = PlayerCharacterPtr->GetPlayerConversationComponent()->OnPlayerHaveNewSentence.AddUObject(
+		this, &ThisClass::OnPlayerHaveNewSentence);
+}
+
+void UPlayerConversationBorder::DisEnable()
+{
+	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
+
+	PlayerCharacterPtr->GetPlayerConversationComponent()->OnPlayerHaveNewSentence.Remove(OnPlayerHaveNewSentenceDelegateHandle);
+	
+	ILayoutItemInterfacetion::DisEnable();
 }
 
 void UPlayerConversationBorder::OnPlayerHaveNewSentence(bool bIsDisplay,
