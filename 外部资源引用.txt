@@ -9,4 +9,6 @@ Lyra content PhysicsMaterials
 	content Finisher_Animations
 	content CloseCombatAnimSet
 	content UltimateHorsePack
+	content HumanVocalizations
+	content Interface_And_Item_Sounds
 	content StarterContent

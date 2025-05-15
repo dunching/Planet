@@ -66,6 +66,7 @@ enum class EDashDirection : uint8
 
 enum class EAffectedDirection : uint8
 {
+	kNone,
 	kForward,
 	kBackward,
 	kLeft,

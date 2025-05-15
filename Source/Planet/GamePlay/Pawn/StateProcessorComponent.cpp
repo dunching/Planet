@@ -20,7 +20,9 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "CollisionDataStruct.h"
 #include "GroupManagger.h"
+#include "KismetGravityLibrary.h"
 #include "TeamMatesHelperComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");
 
@@ -37,24 +39,46 @@ UStateProcessorComponent::UStateProcessorComponent(
 TArray<TWeakObjectPtr<ACharacterBase>> UStateProcessorComponent::GetTargetCharactersAry() const
 {
 	TArray<TWeakObjectPtr<ACharacterBase>> Result;
-	auto CharacterPtr = GetOwner<FOwnerPawnType>();
-	if (CharacterPtr)
+	return Result;
+}
+
+TArray<TPair<FRotator, bool>> UStateProcessorComponent::GetOrient() const
+{
+	TArray<TPair<FRotator, bool>> Result;
+
+	for (const auto& Iter : GetOrientFuncMap)
 	{
-		if (auto GroupManaggerPtr = CharacterPtr->GetGroupManagger())
+		if (Iter.Value)
 		{
-			auto ForceKnowCharater = GroupManaggerPtr->GetTeamMatesHelperComponent()->GetForceKnowCharater();
-			if (ForceKnowCharater.IsValid())
+			FRotator Rot;
+			bool bIsImmediatelyRot = false;
+			if (Iter.Value(Rot, bIsImmediatelyRot))
 			{
-				Result.Add(ForceKnowCharater.Get());
+				Result.Add({Rot, bIsImmediatelyRot});
+				break;
 			}
 		}
 	}
+
 	return Result;
+}
+
+void UStateProcessorComponent::AddGetOrientFunc(
+	int32 Prority,
+	const FGetOrientFunc& Func
+	)
+{
+	GetOrientFuncMap.Add(Prority, Func);
 }
 
 void UStateProcessorComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	GetOrientFuncMap.Add(
+	                     GetOrientPrority,
+	                     std::bind(&ThisClass::GetOrientDefautl, this, std::placeholders::_1, std::placeholders::_2)
+	                    );
 }
 
 void UStateProcessorComponent::EndPlay(
@@ -98,6 +122,16 @@ void UStateProcessorComponent::OnGroupManaggerReady(
 	}
 }
 
+void UStateProcessorComponent::RemoveGetOrientFunc(
+	int32 Prority
+	)
+{
+	if (GetOrientFuncMap.Contains(Prority))
+	{
+		GetOrientFuncMap.Remove(Prority);
+	}
+}
+
 TSharedPtr<FCharacterStateInfo> UStateProcessorComponent::GetCharacterState(
 	const FGameplayTag& CSTag
 	) const
@@ -109,6 +143,9 @@ auto UStateProcessorComponent::BindCharacterStateChanged(
 	const std::function<void(
 		ECharacterStateType,
 		UCS_Base*
+
+
+		
 		)>& Func
 	)
 	-> UStateProcessorComponent::FCharacterStateChanged::FCallbackHandleSPtr
@@ -221,16 +258,34 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 				CharacterMovementPtr->bSkip_RootMotion = Lambda();
 			}
 		}
-		if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_CantRotation))
+		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_CantRotation_All))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
 			{
 				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
-				CharacterMovementPtr->bSkip_Rotation = Lambda();
+				CharacterMovementPtr->bSkip_Rotation_All = Lambda();
 			}
 		}
-		if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_SkipSlideAlongSurface))
+		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_CantRotation_OrientToMovement))
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkip_Rotation_OrientToMovement = Lambda();
+			}
+		}
+		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_CantRotation_Controller))
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				auto CharacterMovementPtr = CharacterPtr->GetGravityMovementComponent();
+				CharacterMovementPtr->bSkip_Rotation_Controller = Lambda();
+			}
+		}
+		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_SkipSlideAlongSurface))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -239,7 +294,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 				CharacterMovementPtr->bSkip_SkipSlideAlongSurface = Lambda();
 			}
 		}
-		if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_SkipFlyingCheck))
+		else if (Tag.MatchesTagExact(UGameplayTagsLibrary::MovementStateAble_SkipFlyingCheck))
 		{
 			auto CharacterPtr = GetOwner<FOwnerPawnType>();
 			if (CharacterPtr)
@@ -297,6 +352,41 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 			                                                                  );
 		}
 	}
+	else if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Debuff_Suppress))
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+			auto AnimInsPtr = CharacterPtr->GetAnimationIns<UHumanAnimInstance>();
+			AnimInsPtr->SetIsMelee(Lambda());
+		}
+	}
+}
+
+bool UStateProcessorComponent::GetOrientDefautl(
+	FRotator& DesiredRotation,
+	bool& bIsImmediatelyRot
+	)
+{
+	auto FocusCharactersAry = GetTargetCharactersAry();
+	if (FocusCharactersAry.IsValidIndex(0) && FocusCharactersAry[0].IsValid())
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+			const auto CurrentLocation = CharacterPtr->GetActorLocation();
+			// Normalized
+			const auto Z = -UKismetGravityLibrary::GetGravity();
+			DesiredRotation = UKismetMathLibrary::MakeRotFromZX(
+			                                                    Z,
+			                                                    FocusCharactersAry[0]->GetActorLocation() -
+			                                                    CurrentLocation
+			                                                   );
+			return true;
+		}
+	}
+
+	return false;
 }
 
 void UStateProcessorComponent::OnCharacterStateChanged(

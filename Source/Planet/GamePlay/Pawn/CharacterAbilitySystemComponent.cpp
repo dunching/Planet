@@ -16,10 +16,12 @@
 #include "CharacterAttributesComponent.h"
 #include "GenerateType.h"
 #include "AS_Character.h"
+#include "BasicFutures_Affected.h"
 #include "HumanRegularProcessor.h"
 #include "GameplayTagsLibrary.h"
 #include "BasicFutures_Dash.h"
 #include "BasicFutures_HasBeenFlyAway.h"
+#include "BasicFutures_HasbeenSuppress.h"
 #include "BasicFutures_HasbeenTornodo.h"
 #include "BasicFutures_HasbeenTraction.h"
 #include "BasicFutures_MoveToAttaclArea.h"
@@ -29,8 +31,8 @@
 
 UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(ObjectInitializer)
+	):
+	 Super(ObjectInitializer)
 {
 	SetIsReplicatedByDefault(true);
 	SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
@@ -44,13 +46,13 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 	if (GetOwnerRole() == ROLE_Authority)
 	{
 		OnGameplayEffectAppliedDelegateToTarget.AddUObject(
-			this,
-			&ThisClass::OnGEAppliedDelegateToTarget
-		);
+		                                                   this,
+		                                                   &ThisClass::OnGEAppliedDelegateToTarget
+		                                                  );
 		OnGameplayEffectAppliedDelegateToSelf.AddUObject(
-			this,
-			&ThisClass::OnActiveGEAddedDelegateToSelf
-		);
+		                                                 this,
+		                                                 &ThisClass::OnActiveGEAddedDelegateToSelf
+		                                                );
 	}
 #endif
 }
@@ -64,24 +66,24 @@ bool UCharacterAbilitySystemComponent::IsInDeath() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsLibrary::State_Dying
-	);
+		 UGameplayTagsLibrary::State_Dying
+		);
 }
 
 bool UCharacterAbilitySystemComponent::IsUnSelected() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsLibrary::State_Buff_CantBeSlected
-	);
+		 UGameplayTagsLibrary::State_Buff_CantBeSlected
+		);
 }
 
 bool UCharacterAbilitySystemComponent::IsRunning() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-		UGameplayTagsLibrary::BaseFeature_Run
-	);
+		 UGameplayTagsLibrary::BaseFeature_Run
+		);
 }
 
 bool UCharacterAbilitySystemComponent::IsRootMotion() const
@@ -94,8 +96,8 @@ bool UCharacterAbilitySystemComponent::IsInFighting() const
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	return OnwerActorPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
-		UGameplayTagsLibrary::InFightingTag
-	);
+		 UGameplayTagsLibrary::InFightingTag
+		);
 }
 
 void UCharacterAbilitySystemComponent::InitialBaseGAs()
@@ -131,8 +133,8 @@ void UCharacterAbilitySystemComponent::InitialBaseGAs()
 		for (auto Iter : CharacterAbilitiesAry)
 		{
 			GiveAbility(
-				FGameplayAbilitySpec(Iter, 1)
-			);
+			            FGameplayAbilitySpec(Iter, 1)
+			           );
 		}
 #pragma region 结算效果修正
 
@@ -143,7 +145,7 @@ void UCharacterAbilitySystemComponent::InitialBaseGAs()
 
 void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(
 	bool bIsRun
-)
+	)
 {
 	if (bIsRun)
 	{
@@ -151,15 +153,15 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Running
-			))
+				 UGameplayTagsLibrary::State_Running
+				))
 			{
 				return;
 			}
 
 			OnwerActorPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
-				FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run}
-			);
+				 FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run}
+				);
 		}
 	}
 	else
@@ -168,8 +170,8 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(
 		if (OnwerActorPtr)
 		{
 			if (OnwerActorPtr->GetCharacterAbilitySystemComponent()->K2_HasMatchingGameplayTag(
-				UGameplayTagsLibrary::State_Running
-			))
+				 UGameplayTagsLibrary::State_Running
+				))
 			{
 				FGameplayTagContainer GameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Run};
 				OnwerActorPtr->GetCharacterAbilitySystemComponent()->CancelAbilities(&GameplayTagContainer);
@@ -180,7 +182,7 @@ void UCharacterAbilitySystemComponent::SwitchWalkState_Implementation(
 
 void UCharacterAbilitySystemComponent::Dash_Implementation(
 	EDashDirection DashDirection
-)
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -202,10 +204,10 @@ void UCharacterAbilitySystemComponent::Dash_Implementation(
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_Dash,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_Dash,
+		                                                         Payload
+		                                                        );
 	}
 }
 
@@ -215,14 +217,14 @@ void UCharacterAbilitySystemComponent::Jump_Implementation()
 	if (OnwerActorPtr)
 	{
 		OnwerActorPtr->GetCharacterAbilitySystemComponent()->TryActivateAbilitiesByTag(
-			FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Jump}
-		);
+			 FGameplayTagContainer{UGameplayTagsLibrary::BaseFeature_Jump}
+			);
 	}
 }
 
 void UCharacterAbilitySystemComponent::HasBeenFlayAway_Implementation(
 	int32 Height
-)
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -234,10 +236,10 @@ void UCharacterAbilitySystemComponent::HasBeenFlayAway_Implementation(
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_HasBeenFlyAway,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenFlyAway,
+		                                                         Payload
+		                                                        );
 	}
 }
 
@@ -248,16 +250,16 @@ void UCharacterAbilitySystemComponent::SwitchWeapon_Implementation()
 	{
 		FGameplayEventData Payload;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_SwitchWeapon,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_SwitchWeapon,
+		                                                         Payload
+		                                                        );
 	}
 }
 
 void UCharacterAbilitySystemComponent::HasbeenTornodo(
 	const TWeakObjectPtr<ATornado>& TornadoPtr
-)
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -269,16 +271,16 @@ void UCharacterAbilitySystemComponent::HasbeenTornodo(
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_HasbeenTornodo,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasbeenTornodo,
+		                                                         Payload
+		                                                        );
 	}
 }
 
 void UCharacterAbilitySystemComponent::HasbeenTraction(
 	const TWeakObjectPtr<ATractionPoint>& TractionPointPtr
-)
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -290,16 +292,87 @@ void UCharacterAbilitySystemComponent::HasbeenTraction(
 		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_HasbeenTraction,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasbeenTraction,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasbeenSuppress(
+	const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+	const TSoftObjectPtr<UAnimMontage>& Montage,
+	float Duration
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData_DashPtr = new FGameplayAbilityTargetData_HasbeenSuppress;
+		GameplayAbilityTargetData_DashPtr->InstigatorPtr = InstigatorPtr;
+		GameplayAbilityTargetData_DashPtr->MontageRef = Montage;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData_DashPtr);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasbeenSuppress,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasbeenAttacked(
+	const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+	FVector RepelDirection
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData = new FGameplayAbilityTargetData_Affected;
+		GameplayAbilityTargetData->TriggerCharacterPtr = InstigatorPtr;
+		GameplayAbilityTargetData->RepelDirection = RepelDirection;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenAffected,
+		                                                         Payload
+		                                                        );
+	}
+}
+
+void UCharacterAbilitySystemComponent::HasBeenRepel(
+	const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+	FVector RepelDirection,
+	int32 RepelDistance
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		FGameplayEventData Payload;
+		auto GameplayAbilityTargetData = new FGameplayAbilityTargetData_Affected;
+		GameplayAbilityTargetData->TriggerCharacterPtr = InstigatorPtr;
+		GameplayAbilityTargetData->RepelDirection = RepelDirection;
+
+		Payload.TargetData.Add(GameplayAbilityTargetData);
+
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_HasBeenAffected,
+		                                                         Payload
+		                                                        );
 	}
 }
 
 void UCharacterAbilitySystemComponent::SwitchCantBeSelect(
 	bool bIsCanBeSelect
-)
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -320,16 +393,16 @@ void UCharacterAbilitySystemComponent::Respawn_Implementation()
 	{
 		FGameplayEventData Payload;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_Respawn,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_Respawn,
+		                                                         Payload
+		                                                        );
 	}
 }
 
 void UCharacterAbilitySystemComponent::MoveToAttackDistance(
 	FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
-)
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
 	if (OnwerActorPtr)
@@ -347,10 +420,10 @@ void UCharacterAbilitySystemComponent::MoveToAttackDistance(
 		Payload.TargetData.Add(MoveToAttaclAreaPtr);
 
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(
-			OnwerActorPtr,
-			UGameplayTagsLibrary::BaseFeature_MoveToLocation,
-			Payload
-		);
+		                                                         OnwerActorPtr,
+		                                                         UGameplayTagsLibrary::BaseFeature_MoveToLocation,
+		                                                         Payload
+		                                                        );
 	}
 }
 
@@ -368,7 +441,7 @@ void UCharacterAbilitySystemComponent::BreakMoveToAttackDistance()
 
 void UCharacterAbilitySystemComponent::OnGroupManaggerReady(
 	AGroupManagger* NewGroupSharedInfoPtr
-)
+	)
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetNetMode() == NM_DedicatedServer)
@@ -681,7 +754,7 @@ void UCharacterAbilitySystemComponent::AddReceivedBaseModify()
 EAffectedDirection UCharacterAbilitySystemComponent::GetAffectedDirection(
 	ACharacterBase* TargetCharacterPtr,
 	ACharacterBase* TriggerCharacterPtr
-)
+	)
 {
 	const FVector Vec = (TriggerCharacterPtr->GetActorLocation() - TargetCharacterPtr->GetActorLocation()).
 		GetSafeNormal();
@@ -716,7 +789,7 @@ void UCharacterAbilitySystemComponent::UpdateMap(
 	int32 MaxValue,
 	const FGameplayEffectSpec& Spec,
 	const FGameplayAttributeData* GameplayAttributeDataPtr
-)
+	)
 {
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
@@ -724,14 +797,14 @@ void UCharacterAbilitySystemComponent::UpdateMap(
 	if (!ValueMap.Contains(GameplayAttributeDataPtr))
 	{
 		ValueMap.Add(
-			GameplayAttributeDataPtr,
-			{
-				{
-					UGameplayTagsLibrary::DataSource_Character,
-					FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
-				}
-			}
-		);
+		             GameplayAttributeDataPtr,
+		             {
+			             {
+				             UGameplayTagsLibrary::DataSource_Character,
+				             FMath::Clamp(GameplayAttributeDataPtr->GetCurrentValue(), MinValue, MaxValue)
+			             }
+		             }
+		            );
 	}
 
 	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
@@ -784,7 +857,7 @@ void UCharacterAbilitySystemComponent::UpdateMap(
 float UCharacterAbilitySystemComponent::GetMapValue(
 	const FGameplayEffectSpec& Spec,
 	const FGameplayAttributeData* GameplayAttributeDataPtr
-) const
+	) const
 {
 	float Result = 0.f;
 
@@ -845,7 +918,7 @@ void UCharacterAbilitySystemComponent::OnGEAppliedDelegateToTarget(
 	UAbilitySystemComponent* AbilitySystemComponentPtr,
 	const FGameplayEffectSpec& GameplayEffectSpec,
 	FActiveGameplayEffectHandle InActiveGameplayEffectHandle
-)
+	)
 {
 	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(InActiveGameplayEffectHandle);
 
@@ -861,7 +934,7 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	UAbilitySystemComponent* AbilitySystemComponentPtr,
 	const FGameplayEffectSpec& GameplayEffectSpec,
 	FActiveGameplayEffectHandle InActiveGameplayEffectHandle
-)
+	)
 {
 	auto ActiveGameplayEffectPtr = AbilitySystemComponentPtr->GetActiveGameplayEffect(InActiveGameplayEffectHandle);
 
@@ -874,8 +947,8 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	else if (OutContainer.HasTag(UGameplayTagsLibrary::GEData_Damage_Callback))
 	{
 		const auto Value = GameplayEffectSpec.GetSetByCallerMagnitude(
-			UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath
-		);
+		                                                              UGameplayTagsLibrary::GEData_Damage_Callback_IsDeath
+		                                                             );
 		if (Value)
 		{
 		}
@@ -889,7 +962,7 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-)
+	)
 {
 	TMap<FGameplayTag, float> Result = CustomMagnitudes;
 
@@ -916,7 +989,7 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-)
+	)
 {
 	TMap<FGameplayTag, float> Result = CustomMagnitudes;
 
@@ -943,7 +1016,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-)
+	)
 {
 	// 获得对应GE对象
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
@@ -952,10 +1025,13 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
 
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
+
 	// 获得目标AttributeSet
 	const auto TargetSet = Cast<UAS_Character>(
-		ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass())
-	);
+	                                           ExecutionParams.GetTargetAbilitySystemComponent()->GetAttributeSet(
+		                                            UAS_Character::StaticClass()
+		                                           )
+	                                          );
 
 	FGameplayTagContainer AllAssetTags;
 	Spec.GetAllAssetTags(AllAssetTags);
@@ -980,48 +1056,48 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
 				UpdateMap(
-					UGameplayTagsLibrary::DataSource_Character,
-					Iter.Value,
-					0.f,
-					TargetSet->GetMax_HP(),
-					Spec,
-					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
-				);
+				          UGameplayTagsLibrary::DataSource_Character,
+				          Iter.Value,
+				          0.f,
+				          TargetSet->GetMax_HP(),
+				          Spec,
+				          UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
+				         );
 
 				ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
 				UpdateMap(
-					UGameplayTagsLibrary::DataSource_Character,
-					Iter.Value,
-					0.f,
-					TargetSet->GetMax_PP(),
-					Spec,
-					UAS_Character::GetPPAttribute().GetGameplayAttributeData(TargetSet)
-				);
+				          UGameplayTagsLibrary::DataSource_Character,
+				          Iter.Value,
+				          0.f,
+				          TargetSet->GetMax_PP(),
+				          Spec,
+				          UAS_Character::GetPPAttribute().GetGameplayAttributeData(TargetSet)
+				         );
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 			{
 				UpdateMap(
-					UGameplayTagsLibrary::DataSource_Character,
-					Iter.Value,
-					0.f,
-					TargetSet->GetMax_Mana(),
-					Spec,
-					UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet)
-				);
+				          UGameplayTagsLibrary::DataSource_Character,
+				          Iter.Value,
+				          0.f,
+				          TargetSet->GetMax_Mana(),
+				          Spec,
+				          UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet)
+				         );
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
 			{
 				UpdateMap(
-					UGameplayTagsLibrary::DataSource_Character,
-					-Iter.Value,
-					0.f,
-					TargetSet->GetMax_HP(),
-					Spec,
-					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
-				);
+				          UGameplayTagsLibrary::DataSource_Character,
+				          -Iter.Value,
+				          0.f,
+				          TargetSet->GetMax_HP(),
+				          Spec,
+				          UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
+				         );
 
 				ReceivedEventModifyDataCallback.Damage = Iter.Value;
 			}
@@ -1038,13 +1114,13 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			for (const auto& Iter : CustomMagnitudes)
 			{
 				UpdateMap(
-					Iter.Key,
-					Iter.Value,
-					0.f,
-					UGameOptions::GetInstance()->MaxMoveSpeed,
-					Spec,
-					UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet)
-				);
+				          Iter.Key,
+				          Iter.Value,
+				          0.f,
+				          UGameOptions::GetInstance()->MaxMoveSpeed,
+				          Spec,
+				          UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet)
+				         );
 			}
 		}
 		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
@@ -1052,13 +1128,13 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			for (const auto& Iter : CustomMagnitudes)
 			{
 				UpdateMap(
-					Iter.Key,
-					Iter.Value,
-					0.f,
-					UGameOptions::GetInstance()->MaxPerformSpeed,
-					Spec,
-					UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet)
-				);
+				          Iter.Key,
+				          Iter.Value,
+				          0.f,
+				          UGameOptions::GetInstance()->MaxPerformSpeed,
+				          Spec,
+				          UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet)
+				         );
 			}
 		}
 	}
@@ -1076,51 +1152,59 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
 				const auto NewValue = GetMapValue(
-					Spec,
-					UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
-				);
+				                                  Spec,
+				                                  UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
+				                                 );
 
 				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetHPAttribute(),
-						EGameplayModOp::Override,
-						NewValue
-					)
-				);
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetHPAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      NewValue
+					                                     )
+				                                    );
 
 				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PP))
 			{
 				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetPPAttribute(),
-						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetPPAttribute().GetGameplayAttributeData(TargetSet))
-					)
-				);
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetPPAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      GetMapValue(
+					                                                  Spec,
+					                                                  UAS_Character::GetPPAttribute().
+					                                                  GetGameplayAttributeData(TargetSet)
+					                                                 )
+					                                     )
+				                                    );
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 			{
 				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetManaAttribute(),
-						EGameplayModOp::Override,
-						GetMapValue(Spec, UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet))
-					)
-				);
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetManaAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      GetMapValue(
+					                                                  Spec,
+					                                                  UAS_Character::GetManaAttribute().
+					                                                  GetGameplayAttributeData(TargetSet)
+					                                                 )
+					                                     )
+				                                    );
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
 			{
 				const auto NewValue =
 					GetMapValue(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
 				OutExecutionOutput.AddOutputModifier(
-					FGameplayModifierEvaluatedData(
-						UAS_Character::GetHPAttribute(),
-						EGameplayModOp::Override,
-						NewValue
-					)
-				);
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetHPAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      NewValue
+					                                     )
+				                                    );
 
 				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 			}
@@ -1135,84 +1219,114 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
 		{
 			OutExecutionOutput.AddOutputModifier(
-				FGameplayModifierEvaluatedData(
-					UAS_Character::GetMoveSpeedAttribute(),
-					EGameplayModOp::Override,
-					GetMapValue(Spec, UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet))
-				)
-			);
+			                                     FGameplayModifierEvaluatedData(
+			                                                                    UAS_Character::GetMoveSpeedAttribute(),
+			                                                                    EGameplayModOp::Override,
+			                                                                    GetMapValue(
+				                                                                     Spec,
+				                                                                     UAS_Character::GetMoveSpeedAttribute()
+				                                                                     .GetGameplayAttributeData(
+					                                                                      TargetSet
+					                                                                     )
+				                                                                    )
+			                                                                   )
+			                                    );
 		}
 		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
 		{
 			OutExecutionOutput.AddOutputModifier(
-				FGameplayModifierEvaluatedData(
-					UAS_Character::GetPerformSpeedAttribute(),
-					EGameplayModOp::Override,
-					GetMapValue(Spec, UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet))
-				)
-			);
+			                                     FGameplayModifierEvaluatedData(
+			                                                                    UAS_Character::GetPerformSpeedAttribute(),
+			                                                                    EGameplayModOp::Override,
+			                                                                    GetMapValue(
+				                                                                     Spec,
+				                                                                     UAS_Character::GetPerformSpeedAttribute()
+				                                                                     .GetGameplayAttributeData(
+					                                                                      TargetSet
+					                                                                     )
+				                                                                    )
+			                                                                   )
+			                                    );
 		}
 	}
 #pragma endregion
 
 	Instigator->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
-		ReceivedEventModifyDataCallback
-	);
+	                                                                         ReceivedEventModifyDataCallback
+	                                                                        );
 
 	if (Instigator != TargetCharacterPtr)
 	{
 		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->OnEffectOhterCharacter(
-			ReceivedEventModifyDataCallback
-		);
+			 ReceivedEventModifyDataCallback
+			);
+
+		if (ReceivedEventModifyDataCallback.bIsDeath)
+		{
+		}
+		else
+		{
+			if (ReceivedEventModifyDataCallback.Damage > 0)
+			{
+				const auto HitResultPtr = Context.GetHitResult();
+				if (HitResultPtr)
+				{
+					TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasbeenAttacked(
+						 Instigator,
+						 HitResultPtr->ImpactNormal
+						);
+				}
+			}
+		}
 	}
 }
 
 IDataModifyInterface::IDataModifyInterface(
 	int32 InPriority
-) :
-  Priority(InPriority)
+	) :
+	  Priority(InPriority)
 {
 	ID = FMath::Rand32();
 }
 
 bool IDataModifyInterface::operator<(
 	const IDataModifyInterface& RightValue
-) const
+	) const
 {
 	return (Priority > RightValue.Priority) && (ID == RightValue.ID);
 }
 
 IOutputDataModifyInterface::IOutputDataModifyInterface(
 	int32 InPriority /*= 1*/
-) :
-  IDataModifyInterface(InPriority)
+	) :
+	  IDataModifyInterface(InPriority)
 {
 }
 
 bool IOutputDataModifyInterface::Modify(
 	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-)
+	)
 {
 	return true;
 }
 
 IInputDataModifyInterface::IInputDataModifyInterface(
 	int32 InPriority /*= 1*/
-) :
-  IDataModifyInterface(InPriority)
+	) :
+	  IDataModifyInterface(InPriority)
 {
 }
 
 bool IInputDataModifyInterface::Modify(
 	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-)
+	)
 {
 	return true;
 }
 
 void UCharacterAbilitySystemComponent::AddOutputModify(
 	const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
-)
+	)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -1232,7 +1346,7 @@ void UCharacterAbilitySystemComponent::AddOutputModify(
 
 void UCharacterAbilitySystemComponent::RemoveOutputModify(
 	const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
-)
+	)
 {
 	for (auto Iter = OutputDataModifysMap.begin(); Iter != OutputDataModifysMap.end(); Iter++)
 	{
@@ -1246,7 +1360,7 @@ void UCharacterAbilitySystemComponent::RemoveOutputModify(
 
 void UCharacterAbilitySystemComponent::AddInputModify(
 	const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
-)
+	)
 {
 	for (bool bIsContinue = true; bIsContinue;)
 	{
@@ -1266,7 +1380,7 @@ void UCharacterAbilitySystemComponent::AddInputModify(
 
 void UCharacterAbilitySystemComponent::RemoveInputModify(
 	const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
-)
+	)
 {
 	for (auto Iter = InputDataModifysMap.begin(); Iter != InputDataModifysMap.end(); Iter++)
 	{
@@ -1280,7 +1394,7 @@ void UCharacterAbilitySystemComponent::RemoveInputModify(
 
 void UCharacterAbilitySystemComponent::OnEffectOhterCharacter_Implementation(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-)
+	)
 {
 	MakedDamageDelegate(ReceivedEventModifyDataCallback);
 }

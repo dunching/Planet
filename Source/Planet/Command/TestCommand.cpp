@@ -223,3 +223,22 @@ void TestCommand::AddOrRemoveState(
 	}
 #endif
 }
+
+void TestCommand::SetBGMVolume(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	UGameplayStatics::SetSoundMixClassOverride(
+	                                           GetWorldImp(),
+	                                           UAssetRefMap::GetInstance()->SoundMixRef.LoadSynchronous(),
+	                                           UAssetRefMap::GetInstance()->BGMSoundClassRef.LoadSynchronous(),
+	                                           UKismetStringLibrary::Conv_StringToInt(Args[0])
+	                                          );
+#endif
+}

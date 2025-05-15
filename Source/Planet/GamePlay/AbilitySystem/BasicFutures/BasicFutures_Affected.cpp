@@ -1,4 +1,3 @@
-
 #include "BasicFutures_Affected.h"
 
 #include "CharacterBase.h"
@@ -12,7 +11,11 @@ UScriptStruct* FGameplayAbilityTargetData_Affected::GetScriptStruct() const
 	return FGameplayAbilityTargetData_Affected::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_Affected::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_Affected::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
 {
 	Ar << AffectedDirection;
 	Ar << RepelDistance;
@@ -22,14 +25,17 @@ bool FGameplayAbilityTargetData_Affected::NetSerialize(FArchive& Ar, class UPack
 }
 
 UBasicFutures_Affected::UBasicFutures_Affected() :
-	Super()
+                                                 Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 
 	bRetriggerInstancedAbility = true;
 }
 
-void UBasicFutures_Affected::OnAvatarSet(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
+void UBasicFutures_Affected::OnAvatarSet(
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilitySpec& Spec
+	)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -45,12 +51,25 @@ void UBasicFutures_Affected::PreActivate(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
+	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 
 	if (CharacterPtr)
 	{
+#ifdef WITH_EDITOR
+#endif
+
+		ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_Affected*>(TriggerEventData->TargetData.Get(0));
+		if (ActiveParamPtr)
+		{
+			Perform();
+		}
+		else
+		{
+			checkNoEntry();
+			K2_CancelAbility();
+		}
 	}
 }
 
@@ -59,23 +78,9 @@ void UBasicFutures_Affected::ActivateAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
-
-#ifdef WITH_EDITOR
-#endif
-
-	ActiveParamPtr = dynamic_cast<const FGameplayAbilityTargetData_Affected*>(TriggerEventData->TargetData.Get(0));
-	if (ActiveParamPtr)
-	{
-		Perform();
-	}
-	else
-	{
-		checkNoEntry();
-		K2_CancelAbility();
-	}
 }
 
 bool UBasicFutures_Affected::CanActivateAbility(
@@ -84,7 +89,7 @@ bool UBasicFutures_Affected::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags,
 	const FGameplayTagContainer* TargetTags,
 	OUT FGameplayTagContainer* OptionalRelevantTags
-) const
+	) const
 {
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
@@ -105,30 +110,63 @@ void UBasicFutures_Affected::Perform()
 	UAnimMontage* CurMontagePtr = nullptr;
 
 	const FRotator Rotation = CharacterPtr->GetActorRotation();
+	const auto RepelDirection = ActiveParamPtr->RepelDirection.GetSafeNormal();
 	FVector Direction = FVector::ZeroVector;
 
-	switch (ActiveParamPtr->AffectedDirection)
+	EAffectedDirection AffectedDirection = ActiveParamPtr->AffectedDirection;
+	if (ActiveParamPtr->AffectedDirection == EAffectedDirection::kNone)
+	{
+		const auto ForwardVector = CharacterPtr->GetActorForwardVector();
+		const auto Dot = FVector::DotProduct(ForwardVector, RepelDirection);
+		if (Dot > .5f)
+		{
+			AffectedDirection = EAffectedDirection::kForward;
+		}
+		else if (Dot < -.5f)
+		{
+			AffectedDirection = EAffectedDirection::kBackward;
+		}
+		else
+		{
+			const auto RightVector = CharacterPtr->GetActorRightVector();
+			const auto RightDot = FVector::DotProduct(RightVector, RepelDirection);
+			if (RightDot > .5f)
+			{
+				AffectedDirection = EAffectedDirection::kRight;
+			}
+			else if (RightDot < -.5f)
+			{
+				AffectedDirection = EAffectedDirection::kLeft;
+			}
+		}
+	}
+
+	switch (AffectedDirection)
 	{
 	case EAffectedDirection::kForward:
-	{
-		CurMontagePtr = ForwardMontage;
-	}
-	break;
+		{
+			CurMontagePtr = ForwardMontage;
+		}
+		break;
 	case EAffectedDirection::kBackward:
-	{
-		CurMontagePtr = BackwardMontage;
-	}
-	break;
+		{
+			CurMontagePtr = BackwardMontage;
+		}
+		break;
 	case EAffectedDirection::kLeft:
-	{
-		CurMontagePtr = LeftMontage;
-	}
-	break;
+		{
+			CurMontagePtr = LeftMontage;
+		}
+		break;
 	case EAffectedDirection::kRight:
-	{
-		CurMontagePtr = RightMontage;
-	}
-	break;
+		{
+			CurMontagePtr = RightMontage;
+		}
+		break;
+	default:
+		{
+			CurMontagePtr = ForwardMontage;
+		};
 	}
 
 	const auto Rate = 1.f;
@@ -140,19 +178,22 @@ void UBasicFutures_Affected::Perform()
 	}
 }
 
-void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate)
+void UBasicFutures_Affected::PlayMontage(
+	UAnimMontage* CurMontagePtr,
+	float Rate
+	)
 {
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
-		)
+	)
 	{
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-			this,
-			TEXT(""),
-			CurMontagePtr,
-			Rate
-		);
+			 this,
+			 TEXT(""),
+			 CurMontagePtr,
+			 Rate
+			);
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());
@@ -164,33 +205,38 @@ void UBasicFutures_Affected::PlayMontage(UAnimMontage* CurMontagePtr, float Rate
 	}
 }
 
-void UBasicFutures_Affected::Move(UAnimMontage* CurMontagePtr, float Rate)
+void UBasicFutures_Affected::Move(
+	UAnimMontage* CurMontagePtr,
+	float Rate
+	)
 {
 	if (
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
-		)
+	)
 	{
 		const auto Duration = CurMontagePtr->CalculateSequenceLength();
 		const auto Direction =
 			ActiveParamPtr->RepelDirection.IsNearlyZero() ?
-			(ActiveParamPtr->TriggerCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).GetSafeNormal() :
-			ActiveParamPtr->RepelDirection;
+				(ActiveParamPtr->TriggerCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).
+				GetSafeNormal() :
+				ActiveParamPtr->RepelDirection;
 
 		auto TaskPtr = UAbilityTask_ARM_ConstantForce::ApplyRootMotionConstantForce(
-			this,
-			TEXT(""),
-			Direction,
-			ActiveParamPtr->RepelDistance / Duration,
-			Duration,
-			false,
-			false,
-			nullptr,
-			ERootMotionFinishVelocityMode::ClampVelocity,
-			FVector::ZeroVector,
-			0.f,// 受击后 速度降为0
-			false
-		);
+			 this,
+			 TEXT(""),
+			 Direction,
+			 ActiveParamPtr->RepelDistance / Duration,
+			 Duration,
+			 false,
+			 false,
+			 nullptr,
+			 ERootMotionFinishVelocityMode::ClampVelocity,
+			 FVector::ZeroVector,
+			 0.f,
+			 // 受击后 速度降为0
+			 false
+			);
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());

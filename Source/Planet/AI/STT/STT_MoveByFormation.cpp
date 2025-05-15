@@ -35,7 +35,7 @@ EStateTreeRunStatus FSTT_MoveByFormation::EnterState(
 		return EStateTreeRunStatus::Failed;
 	}
 
-	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation = true;
+	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation_OrientToMovement = true;
 
 	InstanceData.TaskOwner = TScriptInterface<IGameplayTaskOwnerInterface>(InstanceData.AIControllerPtr->FindComponentByInterface(UGameplayTaskOwnerInterface::StaticClass()));
 	if (!InstanceData.TaskOwner)
@@ -54,7 +54,7 @@ void FSTT_MoveByFormation::ExitState(
 	FInstanceDataType& InstanceData = Context.GetInstanceData(*this);
 	InstanceData.CharacterPtr->GetCharacterMovement()->RemoveRootMotionSourceByID(InstanceData.RootMotionSourceID);
 
-	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation = false;
+	InstanceData.CharacterPtr->GetGravityMovementComponent()->bForceRotation_OrientToMovement = false;
 
 	Super::ExitState(Context, Transition);
 }

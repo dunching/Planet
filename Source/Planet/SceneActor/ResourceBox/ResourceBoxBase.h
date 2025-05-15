@@ -44,6 +44,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<FGameplayTag, int32> ProxyMap;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<USoundWave>OpenBoxSoundRef = nullptr;
+	
 	bool bIsOpend = false;
 
 };

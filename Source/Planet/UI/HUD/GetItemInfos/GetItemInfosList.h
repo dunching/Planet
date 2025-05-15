@@ -66,6 +66,9 @@ public:
 protected:
 	void OnRemovedItem();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSoftObjectPtr<USoundWave>GetCoinsSoundRef = nullptr;
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UGetItemInfosItem> GetItemInfosClass;
 

@@ -145,14 +145,14 @@ protected:
 		int32 Distance
 	) const;
 
-	// 确认锁定的目标是否在范围山（需要跟目标保持一定距离）
+	// 确认锁定的目标是否在范围上（需要跟目标保持一定距离）
 	bool CheckTargetIsEqualDistance(
 		int32 Distance
 	) const;
 
 	// 获取范围内任意可攻击的目标
 	ACharacterBase* GetTargetInDistance(
-		int32 Distance
+		int32 MaxDistance
 	) const;
 
 	ACharacterBase* CharacterPtr = nullptr;

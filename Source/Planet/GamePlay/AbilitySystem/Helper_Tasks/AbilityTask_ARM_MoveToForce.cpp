@@ -45,6 +45,8 @@ UAbilityTask_ARM_MoveToForce* UAbilityTask_ARM_MoveToForce::ApplyRootMotionMoveT
 void UAbilityTask_ARM_MoveToForce::Activate()
 {
 	Super::Activate();
+
+	SharedInitAndApply();
 }
 
 void UAbilityTask_ARM_MoveToForce::SharedInitAndApply()

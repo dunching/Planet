@@ -48,6 +48,7 @@ public class Planet : ModuleRules
         PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask/GuideInteraction");
         PublicIncludePaths.Add("Planet/GamePlay");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
+        PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/GameplayAbilityTargetTypes");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/AttributeSet");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/GameplayEffects");
         PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/Helper_Tasks");

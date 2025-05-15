@@ -52,6 +52,8 @@ class PLANET_API UCharacterPlayerStateProcessorComponent : public UStateProcesso
 public:
 	using FOwnerType = AHumanCharacter_Player;
 
+	virtual TArray<TWeakObjectPtr<ACharacterBase>> GetTargetCharactersAry() const override;
+
 	/**
 	 * 锁定敌人
 	 */

@@ -32,6 +32,7 @@
 #include "GroupManagger.h"
 #include "ItemProxy_Character.h"
 #include "LogWriter.h"
+#include "PlanetGameplayAbilityTargetTypes.h"
 
 namespace Skill_WeaponActive_PickAxe
 {
@@ -280,8 +281,9 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		}
 		FGameplayAbilityTargetDataHandle TargetData;
 
-		auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_ActorArray;
+		auto GameplayAbilityTargetData_ActorArrayPtr = new FGameplayAbilityTargetData_MyActorArray;
 		GameplayAbilityTargetData_ActorArrayPtr->SetActors(Ary);
+		GameplayAbilityTargetData_ActorArrayPtr->HitResult.ImpactNormal = CharacterPtr->GetActorForwardVector();
 
 		TargetData.Add(GameplayAbilityTargetData_ActorArrayPtr);
 		const auto GEHandleAry = MyApplyGameplayEffectSpecToTarget(

@@ -52,11 +52,11 @@ public:
 
 	IDataModifyInterface(
 		int32 InPriority = 1
-	);
+		);
 
 	bool operator<(
 		const IDataModifyInterface& RightValue
-	) const;
+		) const;
 
 protected:
 	bool bIsOnceTime = false;
@@ -73,12 +73,12 @@ class PLANET_API IOutputDataModifyInterface : public IDataModifyInterface
 public:
 	IOutputDataModifyInterface(
 		int32 InPriority = 1
-	);
+		);
 
 	// Return：本次修改完是否移除本【修正方式】
 	virtual bool Modify(
 		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-	);
+		);
 };
 
 class PLANET_API IInputDataModifyInterface : public IDataModifyInterface
@@ -86,11 +86,11 @@ class PLANET_API IInputDataModifyInterface : public IDataModifyInterface
 public:
 	IInputDataModifyInterface(
 		int32 InPriority = 1
-	);
+		);
 
 	virtual bool Modify(
 		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-	);
+		);
 };
 
 struct FDataModify_key_compare
@@ -98,7 +98,7 @@ struct FDataModify_key_compare
 	bool operator()(
 		const TSharedPtr<IDataModifyInterface>& lhs,
 		const TSharedPtr<IDataModifyInterface>& rhs
-	) const
+		) const
 	{
 		return lhs->Priority < rhs->Priority;
 	}
@@ -119,15 +119,17 @@ public:
 	using FCharacterStateChanged = TCallbackHandleContainer<void(
 		ECharacterStateType,
 		UCS_Base*
-	)>;
+	
+		)>;
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(
 		const FOnEffectedTawrgetCallback&
-	)>;
+	
+		)>;
 
 	UCharacterAbilitySystemComponent(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	virtual void BeginPlay() override;
 
@@ -151,34 +153,35 @@ public:
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-	);
+		);
 
 	TMap<FGameplayTag, float> ModifyInputData(
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-	);
+		);
 
 	void ApplyInputData(
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-		FGameplayEffectCustomExecutionOutput& OutExecutionOutput);
-	
+		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+		);
+
 	void AddOutputModify(
 		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
-	);
+		);
 
 	void RemoveOutputModify(
 		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
-	);
+		);
 
 	void AddInputModify(
 		const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
-	);
+		);
 
 	void RemoveInputModify(
 		const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
-	);
+		);
 #pragma endregion
 
 #pragma region 基础GA
@@ -186,13 +189,13 @@ public:
 	UFUNCTION(Server, Reliable)
 	void SwitchWalkState(
 		bool bIsRun
-	);
+		);
 
 	// 冲刺/闪避
 	UFUNCTION(Server, Reliable)
 	void Dash(
 		EDashDirection DashDirection
-	);
+		);
 
 	// 
 	UFUNCTION(Server, Reliable)
@@ -212,27 +215,56 @@ public:
 	UFUNCTION(Server, Reliable)
 	void HasBeenFlayAway(
 		int32 Height
-	);
+		);
 
 	/**
 	 * 被击飞
-	 * Only Server
+	 * Only Server Invoke
 	 */
 	void HasbeenTornodo(
-			const TWeakObjectPtr<ATornado>&  TornadoPtr
-	);
+		const TWeakObjectPtr<ATornado>& TornadoPtr
+		);
 
 	/**
 	 * 被牵引
-	 * Only Server
+	 * Only Server Invoke
 	 */
 	void HasbeenTraction(
 		const TWeakObjectPtr<ATractionPoint>& TractionPointPtr
-	);
+		);
+
+	/**
+	 * 被压制
+	 * Only Server Invoke
+	 */
+	void HasbeenSuppress(
+		const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+		const TSoftObjectPtr<UAnimMontage>& Montage,
+		float Duration
+		);
+
+	/**
+	 * 受击
+	 * Only Server Invoke
+	 */
+	void HasbeenAttacked(
+		const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+		FVector RepelDirection
+		);
+
+	/**
+	 * 被击退
+	 * Only Server Invoke
+	 */
+	void HasBeenRepel(
+		const TWeakObjectPtr<ACharacterBase>& InstigatorPtr,
+		FVector RepelDirection,
+		int32 RepelDistance
+		);
 
 	void SwitchCantBeSelect(
 		bool bIsCanBeSelect
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	void Respawn();
@@ -240,7 +272,7 @@ public:
 	// 移动至攻击范围内
 	void MoveToAttackDistance(
 		FGameplayAbilityTargetData_MoveToAttaclArea* MoveToAttaclAreaPtr
-	);
+		);
 
 	// 取消 移动至攻击范围内
 	void BreakMoveToAttackDistance();
@@ -260,30 +292,30 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void OnEffectOhterCharacter(
 		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-	);
+		);
 
 	virtual void OnGroupManaggerReady(
 		AGroupManagger* NewGroupSharedInfoPtr
-	) override;
+		) override;
 
 	void OnGEAppliedDelegateToTarget(
 		UAbilitySystemComponent*,
 		const FGameplayEffectSpec&,
 		FActiveGameplayEffectHandle
-	);
+		);
 
 	void OnActiveGEAddedDelegateToSelf(
 		UAbilitySystemComponent*,
 		const FGameplayEffectSpec&,
 		FActiveGameplayEffectHandle
-	);
+		);
 
 	void AddReceivedBaseModify();
 
 	EAffectedDirection GetAffectedDirection(
 		ACharacterBase* TargetCharacterPtr,
 		ACharacterBase* TriggerCharacterPtr
-	);
+		);
 
 	/**
 	 * 
@@ -301,12 +333,12 @@ protected:
 		int32 MaxValue,
 		const FGameplayEffectSpec& Spec,
 		const FGameplayAttributeData* GameplayAttributeDataPtr
-	);
+		);
 
 	float GetMapValue(
 		const FGameplayEffectSpec& Spec,
 		const FGameplayAttributeData* GameplayAttributeDataPtr
-	) const;
+		) const;
 
 #pragma region 基础GA
 	/**

@@ -186,7 +186,7 @@ void UGravityMovementComponent::PhysicsRotation(
 	float DeltaTime
 	)
 {
-	if (bForceRotation)
+	if (bForceRotation_OrientToMovement)
 	{
 	}
 	else if (
@@ -215,7 +215,7 @@ void UGravityMovementComponent::PhysicsRotation(
 	DeltaRot.DiagnosticCheckNaN(TEXT("CharacterMovementComponent::PhysicsRotation(): GetDeltaRotation"));
 
 	FRotator DesiredRotation = CurrentRotation;
-	if (bForceRotation)
+	if (bForceRotation_OrientToMovement)
 	{
 		DesiredRotation = ComputeRootMotionToMovementRotation(CurrentRotation, DeltaTime, DeltaRot);
 	}
@@ -226,7 +226,7 @@ void UGravityMovementComponent::PhysicsRotation(
 	else if (CharacterOwner->Controller && bUseControllerDesiredRotation)
 	{
 		if (
-			bSkip_Rotation
+			bSkip_Rotation_All
 		)
 		{
 			return;
@@ -236,7 +236,7 @@ void UGravityMovementComponent::PhysicsRotation(
 	else if (!CharacterOwner->Controller && bRunPhysicsWithNoController && bUseControllerDesiredRotation)
 	{
 		if (
-			bSkip_Rotation
+			bSkip_Rotation_All
 		)
 		{
 			return;
@@ -662,13 +662,15 @@ void UGravityMovementComponent::GetLifetimeReplicatedProps(
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(ThisClass, bSkip_Rotation, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_Rotation_All, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_Rotation_OrientToMovement, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bSkip_Rotation_Controller, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_RootMotion, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_PlayerInput, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_PathFollow, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_SkipSlideAlongSurface, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, bSkip_SkipFlyingCheck, COND_None);
-	DOREPLIFETIME_CONDITION(ThisClass, bForceRotation, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, bForceRotation_OrientToMovement, COND_None);
 }
 
 #if USECUSTOMEGRAVITY

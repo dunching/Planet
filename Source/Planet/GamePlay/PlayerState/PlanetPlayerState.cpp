@@ -140,19 +140,22 @@ void APlanetPlayerState::UpdateCurrentPosition_Implementation(
 			AudioComponentPtr->SetVolumeMultiplier(UGameOptions::GetInstance()->VolumeMultiplier);
 			AudioComponentPtr->Play();
 
-			UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->DisplayWidget(
-				 UAssetRefMap::GetInstance()->RegionPromtClass,
-				 [TableRow_RegionsPtr](
-				 UUserWidget* WidgetPtr
-				 )
-				 {
-					 auto RegionPromtPtr = Cast<URegionPromt>(WidgetPtr);
-					 if (RegionPromtPtr)
+			if (UUIManagerSubSystem::GetInstance()->GetMainHUDLayout())
+			{
+				UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->DisplayWidget(
+					 UAssetRefMap::GetInstance()->RegionPromtClass,
+					 [TableRow_RegionsPtr](
+					 UUserWidget* WidgetPtr
+					 )
 					 {
-						 RegionPromtPtr->SetRegionPromt(TableRow_RegionsPtr);
+						 auto RegionPromtPtr = Cast<URegionPromt>(WidgetPtr);
+						 if (RegionPromtPtr)
+						 {
+							 RegionPromtPtr->SetRegionPromt(TableRow_RegionsPtr);
+						 }
 					 }
-				 }
-				);
+					);
+			}
 		}
 #endif
 	}

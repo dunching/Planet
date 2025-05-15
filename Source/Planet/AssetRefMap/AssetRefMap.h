@@ -11,6 +11,8 @@
 #include "AssetRefMap.generated.h"
 
 class UTexture2D;
+class USoundMix;
+class USoundClass;
 class UStaticMesh;
 class UMaterialInstance;
 class USkeletalMesh;
@@ -119,6 +121,17 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
 	TSubclassOf<UGameplayEffect>DamageCallbackClass;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
+	TSubclassOf<UGameplayEffect>SuppressClass;
+#pragma endregion 
+	
+#pragma region Audios
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Audios")
+	TSoftObjectPtr<USoundMix>SoundMixRef;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Audios")
+	TSoftObjectPtr<USoundClass>BGMSoundClassRef;
 #pragma endregion 
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)

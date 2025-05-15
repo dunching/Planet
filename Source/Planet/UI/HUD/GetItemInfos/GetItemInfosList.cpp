@@ -3,12 +3,14 @@
 #include <Components/VerticalBox.h>
 
 #include "CharacterBase.h"
+#include "GameOptions.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Minimal.h"
 #include "GetItemInfosItem.h"
 #include "InventoryComponent.h"
 #include "TemplateHelper.h"
 #include "ItemProxy_Character.h"
+#include "Kismet/GameplayStatics.h"
 
 struct FGetItemInfosList : public TStructVariable<FGetItemInfosList>
 {
@@ -237,6 +239,13 @@ void UGetItemInfosList::OnCoinProxyChanged(
 				WidgetPtr->ResetToolUIByData(ProxyPtr, ProxyModifyType, Num);
 
 				UIPtr->AddChild(WidgetPtr);
+
+				//
+				UGameplayStatics::SpawnSound2D(
+													  this,
+													  GetCoinsSoundRef.LoadSynchronous(),
+													  UGameOptions::GetInstance()->VolumeMultiplier
+													 );
 			}
 		}
 	}

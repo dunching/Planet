@@ -1,4 +1,3 @@
-
 #include "ResourceBox.h"
 
 #include "ActorSequenceComponent.h"
@@ -10,9 +9,13 @@
 #include "LogWriter.h"
 
 #include "CharacterBase.h"
+#include "GameOptions.h"
+#include "Kismet/GameplayStatics.h"
 
-AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+AResourceBox::AResourceBox(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	BoxComponentPtr = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComponent"));
 	BoxComponentPtr->SetupAttachment(RootComponent);
@@ -23,7 +26,9 @@ AResourceBox::AResourceBox(const FObjectInitializer& ObjectInitializer) :
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void AResourceBox::OnConstruction(const FTransform& Transform)
+void AResourceBox::OnConstruction(
+	const FTransform& Transform
+	)
 {
 	Super::OnConstruction(Transform);
 }
@@ -34,17 +39,19 @@ void AResourceBox::HasBeenEndedLookAt()
 	{
 		InteractionWidgetCompoentPtr->SetVisibility(false);
 	}
-	
+
 	Super::HasBeenEndedLookAt();
 }
 
-void AResourceBox::HasBeenLookingAt(ACharacterBase* InCharacterPtr)
+void AResourceBox::HasBeenLookingAt(
+	ACharacterBase* InCharacterPtr
+	)
 {
 	if (
 		InteractionWidgetCompoentPtr &&
 		!bIsOpend &&
 		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < Range)
-		)
+	)
 	{
 		InteractionWidgetCompoentPtr->SetVisibility(true);
 	}
@@ -52,7 +59,7 @@ void AResourceBox::HasBeenLookingAt(ACharacterBase* InCharacterPtr)
 	{
 		HasBeenEndedLookAt();
 	}
-	
+
 	Super::HasBeenEndedLookAt();
 }
 
@@ -71,20 +78,24 @@ void AResourceBox::BeginPlay()
 #endif
 }
 
-void AResourceBox::Tick(float DeltaSeconds)
+void AResourceBox::Tick(
+	float DeltaSeconds
+	)
 {
 	Super::Tick(DeltaSeconds);
 }
 
-void AResourceBox::HasbeenInteracted(ACharacterBase* InCharacterPtr)
+void AResourceBox::HasbeenInteracted(
+	ACharacterBase* InCharacterPtr
+	)
 {
 	if (
 		!bIsOpend &&
 		(FVector::Distance(InCharacterPtr->GetActorLocation(), GetActorLocation()) < Range)
-		)
+	)
 	{
 		InteractionImp();
-		
+
 		Super::HasbeenInteracted(InCharacterPtr);
 	}
 	else
@@ -93,15 +104,29 @@ void AResourceBox::HasbeenInteracted(ACharacterBase* InCharacterPtr)
 	}
 }
 
-void AResourceBox::HasBeenStartedLookAt(ACharacterBase* InCharacterPtr)
+void AResourceBox::HasBeenStartedLookAt(
+	ACharacterBase* InCharacterPtr
+	)
 {
 	Super::HasBeenStartedLookAt(InCharacterPtr);
-	
+
 	HasBeenLookingAt(InCharacterPtr);
 }
 
 void AResourceBox::InteractionImp_Implementation()
 {
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		UGameplayStatics::PlaySoundAtLocation(
+		                                      this,
+		                                      OpenBoxSoundRef.LoadSynchronous(),
+		                                      GetActorLocation(),
+		                                      UGameOptions::GetInstance()->VolumeMultiplier
+		                                     );
+	}
+#endif
+
 	if (ActorSequenceComponent)
 	{
 		ActorSequenceComponent->PlaySequence();

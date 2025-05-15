@@ -59,10 +59,28 @@ public:
 
 #pragma region 限制移动的内容，由GAS上的变迁控制
 	/**
+	 * 强制转向前进方向
+	 */
+	UPROPERTY(Replicated)
+	bool bForceRotation_OrientToMovement = false;
+	
+	/**
 	 * 停止角色自动旋转
 	 */
 	UPROPERTY(Replicated)
-	bool bSkip_Rotation = false;
+	bool bSkip_Rotation_All = false;
+
+	/**
+	 * 停止角色自动旋转
+	 */
+	UPROPERTY(Replicated)
+	bool bSkip_Rotation_OrientToMovement = false;
+
+	/**
+	 * 停止角色自动旋转
+	 */
+	UPROPERTY(Replicated)
+	bool bSkip_Rotation_Controller = false;
 
 	/**
 	 * 停止RootMotion
@@ -95,12 +113,6 @@ public:
 	 */
 	UPROPERTY(Replicated)
 	bool bSkip_SkipFlyingCheck = false;
-
-	/**
-	 * 强制转向前进方向
-	 */
-	UPROPERTY(Replicated)
-	bool bForceRotation = false;
 #pragma endregion
 
 	UFUNCTION(NetMulticast, Reliable)

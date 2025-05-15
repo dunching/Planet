@@ -19,6 +19,9 @@ FGameplayTag UGameplayTagsLibrary::BaseFeature_Jump =
 FGameplayTag UGameplayTagsLibrary::BaseFeature_Respawn =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.Respawn")));
 
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenAffected =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenAffected")));
+
 FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenRepel =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenRepel")));
 
@@ -36,6 +39,9 @@ FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenDisplacement =
 
 FGameplayTag UGameplayTagsLibrary::BaseFeature_HasBeenPull =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasBeenPull")));
+
+FGameplayTag UGameplayTagsLibrary::BaseFeature_HasbeenSuppress =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.HasbeenSuppress")));
 
 FGameplayTag UGameplayTagsLibrary::BaseFeature_MoveToLocation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("BaseFeature.MoveToLocation")));
@@ -62,8 +68,14 @@ FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantPlayerInputMove =
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRootMotion =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRootMotion")));
 
-FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRotation =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRotation")));
+FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRotation_All =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRotation.All")));
+
+FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRotation_OrientToMovement =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRotation.OrientToMovement")));
+
+FGameplayTag UGameplayTagsLibrary::MovementStateAble_CantRotation_Controller =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.CantRotation.Controller")));
 
 FGameplayTag UGameplayTagsLibrary::MovementStateAble_SkipSlideAlongSurface =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MovementStateAble.SkipSlideAlongSurface")));

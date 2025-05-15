@@ -130,7 +130,7 @@ void USkill_Active_Traction::PerformAction(
 
 		SpawnParameters.Owner = CharacterPtr;
 
-		auto TractionPointPtr = GetWorld()->SpawnActor<ATractionPoint>(
+		TractionPoint = GetWorld()->SpawnActor<ATractionPoint>(
 			CharacterPtr->GetActorLocation(),
 			FRotator::ZeroRotator,
 			SpawnParameters

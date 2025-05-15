@@ -152,6 +152,8 @@ protected:
 
 	float WaitInputPercent = 1.f;
 
+private:
+	
 	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
 };

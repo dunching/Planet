@@ -38,6 +38,24 @@ namespace HumanProcessor
 	class FHumanInteractionWithChallengeEntryProcessor;
 }
 
+TArray<TWeakObjectPtr<ACharacterBase>> UCharacterPlayerStateProcessorComponent::GetTargetCharactersAry() const
+{
+	TArray<TWeakObjectPtr<ACharacterBase>> Result;
+	auto CharacterPtr = GetOwner<FOwnerPawnType>();
+	if (CharacterPtr)
+	{
+		if (auto GroupManaggerPtr = CharacterPtr->GetGroupManagger())
+		{
+			auto ForceKnowCharater = GroupManaggerPtr->GetTeamMatesHelperComponent()->GetForceKnowCharater();
+			if (ForceKnowCharater.IsValid())
+			{
+				Result.Add(ForceKnowCharater.Get());
+			}
+		}
+	}
+	return Result;
+}
+
 void UCharacterPlayerStateProcessorComponent::FocusTarget()
 {
 	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();

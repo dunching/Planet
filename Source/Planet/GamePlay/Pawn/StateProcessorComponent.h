@@ -45,58 +45,114 @@ class PLANET_API UStateProcessorComponent :
 	GENERATED_BODY()
 
 public:
-
 	friend UGAEvent_Received;
 	friend ACharacterBase;
 
 	using FOwnerPawnType = ACharacterBase;
 
-	using FCharacterStateChanged = TCallbackHandleContainer<void(ECharacterStateType, UCS_Base*)>;
+	using FCharacterStateChanged = TCallbackHandleContainer<void(
+		ECharacterStateType,
+		UCS_Base*
+		
+		)>;
 
-	using FCharacterStateMapChanged = TCallbackHandleContainer<void(const TSharedPtr<FCharacterStateInfo>&, bool)>;
+	using FCharacterStateMapChanged = TCallbackHandleContainer<void(
+		const TSharedPtr<FCharacterStateInfo>&,
+		bool
+		)>;
 
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(FOwnerPawnType*, const FGAEventData&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(
+		FOwnerPawnType*,
+		const FGAEventData&
+		
+		)>;
+
+	using FGetOrientFunc = std::function<bool(
+		FRotator&,
+		bool&
+		
+		)>;
 
 	static FName ComponentName;
 
-	UStateProcessorComponent(const FObjectInitializer& ObjectInitializer);
+	UStateProcessorComponent(
+		const FObjectInitializer& ObjectInitializer
+		);
 
-	virtual TArray<TWeakObjectPtr<ACharacterBase>> GetTargetCharactersAry()const;
-	
-	TSharedPtr<FCharacterStateInfo> GetCharacterState(const FGameplayTag& CSTag)const;
-	
-	auto BindCharacterStateChanged(const std::function<void(ECharacterStateType, UCS_Base*)>& Func)
+	/**
+	 * 获取角色目标
+	 * @return 
+	 */
+	virtual TArray<TWeakObjectPtr<ACharacterBase>> GetTargetCharactersAry() const;
+
+	/**
+	 * 获取角色优先转向的方向
+	 * @return 
+	 */
+	TArray<TPair<FRotator, bool>> GetOrient() const;
+
+	void AddGetOrientFunc(
+		int32 Prority,
+		const FGetOrientFunc& Func
+		);
+
+	void RemoveGetOrientFunc(
+		int32 Prority
+		);
+
+	TSharedPtr<FCharacterStateInfo> GetCharacterState(
+		const FGameplayTag& CSTag
+		) const;
+
+	auto BindCharacterStateChanged(
+		const std::function<void(
+			ECharacterStateType,
+			UCS_Base*
+			
+			)>& Func
+		)
 		-> FCharacterStateChanged::FCallbackHandleSPtr;
 
-	auto BindCharacterStateMapChanged(const std::function<void(const TSharedPtr<FCharacterStateInfo>&, bool)>& Func)
+	auto BindCharacterStateMapChanged(
+		const std::function<void(
+			const TSharedPtr<FCharacterStateInfo>&,
+			bool
+			)>& Func
+		)
 		-> FCharacterStateMapChanged::FCallbackHandleSPtr;
 
 protected:
+	virtual void InitializeComponent() override;
 
-	virtual void InitializeComponent()override;
+	virtual void BeginPlay() override;
 
-	virtual void BeginPlay()override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason)override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
 	void BreakOhterState(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
 		const FGameplayTag& ThisTag,
-		const TArray<FGameplayTag>& CancelTags);
+		const TArray<FGameplayTag>& CancelTags
+		);
 
 	FGameplayEventData* MakeTargetData(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr
-	);
+		);
 
 	FGameplayAbilitySpec MakeSpec(
 		const TSharedPtr<FGameplayAbilityTargetData_CS_Base>& GameplayAbilityTargetDataSPtr,
 		TSubclassOf<UPlanetGameplayAbility> InAbilityClass,
 		int32 InputID
-	);
+		);
 
 	/**
 	 * 注意：如果是RootMotion类型的状态修改，则此类型的子状态只会为一种，比如：人物先被击飞2s，1s之后又被击飞2s，则刷新击飞时间为2s
@@ -107,7 +163,7 @@ protected:
 	 */
 	void ExcuteEffects(
 		const TSharedPtr<FGameplayAbilityTargetData_RootMotion>& GameplayAbilityTargetDataSPtr
-	);
+		);
 
 	/**
 	 * 普通的状态修改（禁止移动的眩晕、禁锢，沉默，虚弱，禁疗）下，通过动画蓝图选择对应的动画（因为这些状态可以共存，比如人物
@@ -117,11 +173,17 @@ protected:
 	 */
 	void ExcuteEffects(
 		const TSharedPtr<FGameplayAbilityTargetData_StateModify>& GameplayAbilityTargetDataSPtr
-	);
+		);
 
-	void OnCharacterStateChanged(ECharacterStateType CharacterStateType, UCS_Base* CharacterStatePtr);
+	void OnCharacterStateChanged(
+		ECharacterStateType CharacterStateType,
+		UCS_Base* CharacterStatePtr
+		);
 
-	virtual void OnGameplayEffectTagCountChanged(const FGameplayTag Tag, int32 Count);
+	virtual void OnGameplayEffectTagCountChanged(
+		const FGameplayTag Tag,
+		int32 Count
+		);
 
 #pragma region GAs
 #pragma endregion GAs
@@ -129,15 +191,22 @@ protected:
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
 
 private:
-	
+	bool GetOrientDefautl(
+		FRotator& DesiredRotation,
+		bool& bIsImmediatelyRot
+		);
+
 	// 每个连接都会有的 “状态信息”
-	TMap<FGuid, TSharedPtr<FCharacterStateInfo>>StateDisplayMap;
+	TMap<FGuid, TSharedPtr<FCharacterStateInfo>> StateDisplayMap;
 
 	// Server 上存在的 GA状态信息
-	TMap<FGameplayTag, UCS_Base*>CharacterStateMap;
+	TMap<FGameplayTag, UCS_Base*> CharacterStateMap;
 
 	FCharacterStateChanged CharacterStateChangedContainer;
 
 	FCharacterStateMapChanged CharacterStateMapChanged;
 
+	TMap<int32, FGetOrientFunc> GetOrientFuncMap;
+
+	const int32 GetOrientPrority = 100;
 };

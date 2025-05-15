@@ -26,7 +26,7 @@ public:
 
 	static FGameplayTag BaseFeature_Respawn;
 
-	static FGameplayTag BaseFeature_Affected;
+	static FGameplayTag BaseFeature_HasBeenAffected;
 
 	static FGameplayTag BaseFeature_HasBeenRepel;
 
@@ -39,6 +39,8 @@ public:
 	static FGameplayTag BaseFeature_HasBeenDisplacement;
 
 	static FGameplayTag BaseFeature_HasBeenPull;
+
+	static FGameplayTag BaseFeature_HasbeenSuppress;
 
 	static FGameplayTag BaseFeature_MoveToLocation;
 
@@ -57,7 +59,11 @@ public:
 	
 	static FGameplayTag MovementStateAble_CantRootMotion;
 	
-	static FGameplayTag MovementStateAble_CantRotation;
+	static FGameplayTag MovementStateAble_CantRotation_All;
+
+	static FGameplayTag MovementStateAble_CantRotation_OrientToMovement;
+
+	static FGameplayTag MovementStateAble_CantRotation_Controller;
 
 	static FGameplayTag MovementStateAble_SkipSlideAlongSurface;
 

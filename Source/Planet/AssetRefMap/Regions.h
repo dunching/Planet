@@ -32,5 +32,5 @@ struct PLANET_API FTableRow_Regions : public FTableRowBase
 		Category=Collision,
 		meta = (AllowPrivateAccess = true)
 	)
-	TSoftObjectPtr<USoundWave> RegionBGM;
+	TSoftObjectPtr<USoundWave> RegionBGM = nullptr;
 };

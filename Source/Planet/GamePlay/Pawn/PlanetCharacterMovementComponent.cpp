@@ -1,4 +1,3 @@
-
 #include "PlanetCharacterMovementComponent.h"
 
 #include "GameFramework/Character.h"
@@ -10,14 +9,15 @@
 
 void UPlanetCharacterMovementComponent::PhysicsRotation(
 	float DeltaTime
-)
-{	if (bForceRotation)
+	)
+{
+	if (bForceRotation_OrientToMovement)
 	{
 	}
 	else if (
-//		HasRootMotionSources() ||
+		//		HasRootMotionSources() ||
 		HasAnimRootMotion()
-		)
+	)
 	{
 		return;
 	}
@@ -39,51 +39,74 @@ void UPlanetCharacterMovementComponent::PhysicsRotation(
 	FRotator DeltaRot = GetDeltaRotation(DeltaTime);
 	DeltaRot.DiagnosticCheckNaN(TEXT("CharacterMovementComponent::PhysicsRotation(): GetDeltaRotation"));
 
-	auto FocusCharactersAry = Cast<ACharacterBase>(CharacterOwner)->GetStateProcessorComponent()->GetTargetCharactersAry();
+	bool bIsImmediatelyRot = false;
+
+	auto OrientAry = Cast<ACharacterBase>(CharacterOwner)->GetStateProcessorComponent()->GetOrient();
 
 	FRotator DesiredRotation = CurrentRotation;
-	if (bForceRotation)
+	if (bForceRotation_OrientToMovement)
 	{
 		DesiredRotation = ComputeRootMotionToMovementRotation(CurrentRotation, DeltaTime, DeltaRot);
 	}
-	else if (FocusCharactersAry.IsValidIndex(0) && FocusCharactersAry[0].IsValid())
-	{
-		const auto CurrentLocation = UpdatedComponent->GetComponentLocation(); // Normalized
-		const auto Z = -UKismetGravityLibrary::GetGravity();
-		DesiredRotation = UKismetMathLibrary::MakeRotFromZX(
-		Z, FocusCharactersAry[0]->GetActorLocation() - CurrentLocation
-		);
-	}
-	else if (bOrientRotationToMovement)
-	{
-		DesiredRotation = ComputeOrientToMovementRotation(CurrentRotation, DeltaTime, DeltaRot);
-	}
-	else if (CharacterOwner->Controller && bUseControllerDesiredRotation)
-	{
-		if (
-			bSkip_Rotation
-			)
-		{
-			return;
-		}
-		DesiredRotation = CharacterOwner->Controller->GetDesiredRotation();
-	}
-	else if (!CharacterOwner->Controller && bRunPhysicsWithNoController && bUseControllerDesiredRotation)
-	{
-		if (
-			bSkip_Rotation
-			)
-		{
-			return;
-		}
-		if (AController* ControllerOwner = Cast<AController>(CharacterOwner->GetOwner()))
-		{
-			DesiredRotation = ControllerOwner->GetDesiredRotation();
-		}
-	}
 	else
 	{
-		return;
+		if (
+			bSkip_Rotation_All
+		)
+		{
+			return;
+		}
+
+		if (OrientAry.IsValidIndex(0))
+		{
+			DesiredRotation = OrientAry[0].Key;
+
+			// 让这个转速变快
+			if (OrientAry[0].Value)
+			{
+				DeltaRot = DeltaRot * 10;
+			}
+		}
+		else if (bOrientRotationToMovement)
+		{
+			if (
+				bSkip_Rotation_OrientToMovement
+			)
+			{
+				return;
+			}
+
+			DesiredRotation = ComputeOrientToMovementRotation(CurrentRotation, DeltaTime, DeltaRot);
+		}
+		else if (CharacterOwner->Controller && bUseControllerDesiredRotation)
+		{
+			if (
+				bSkip_Rotation_Controller
+			)
+			{
+				return;
+			}
+
+			DesiredRotation = CharacterOwner->Controller->GetDesiredRotation();
+		}
+		else if (!CharacterOwner->Controller && bRunPhysicsWithNoController && bUseControllerDesiredRotation)
+		{
+			if (
+				bSkip_Rotation_Controller
+			)
+			{
+				return;
+			}
+
+			if (AController* ControllerOwner = Cast<AController>(CharacterOwner->GetOwner()))
+			{
+				DesiredRotation = ControllerOwner->GetDesiredRotation();
+			}
+		}
+		else
+		{
+			return;
+		}
 	}
 
 	const bool bWantsToBeVertical = ShouldRemainVertical();
@@ -92,7 +115,8 @@ void UPlanetCharacterMovementComponent::PhysicsRotation(
 	{
 		if (HasCustomGravity())
 		{
-			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).Rotator();
+			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).
+				Rotator();
 			GravityRelativeDesiredRotation.Pitch = 0.f;
 			GravityRelativeDesiredRotation.Yaw = FRotator::NormalizeAxis(GravityRelativeDesiredRotation.Yaw);
 			GravityRelativeDesiredRotation.Roll = 0.f;
@@ -130,25 +154,51 @@ void UPlanetCharacterMovementComponent::PhysicsRotation(
 
 		if (HasCustomGravity())
 		{
-			FRotator GravityRelativeCurrentRotation = (GetGravityToWorldTransform() * CurrentRotation.Quaternion()).Rotator();
-			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).Rotator();
+			FRotator GravityRelativeCurrentRotation = (GetGravityToWorldTransform() * CurrentRotation.Quaternion()).
+				Rotator();
+			FRotator GravityRelativeDesiredRotation = (GetGravityToWorldTransform() * DesiredRotation.Quaternion()).
+				Rotator();
 
 			// PITCH
-			if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Pitch, GravityRelativeDesiredRotation.Pitch, AngleTolerance))
+			if (!FMath::IsNearlyEqual(
+			                          GravityRelativeCurrentRotation.Pitch,
+			                          GravityRelativeDesiredRotation.Pitch,
+			                          AngleTolerance
+			                         ))
 			{
-				GravityRelativeDesiredRotation.Pitch = FMath::FixedTurn(GravityRelativeCurrentRotation.Pitch, GravityRelativeDesiredRotation.Pitch, DeltaRot.Pitch);
+				GravityRelativeDesiredRotation.Pitch = FMath::FixedTurn(
+				                                                        GravityRelativeCurrentRotation.Pitch,
+				                                                        GravityRelativeDesiredRotation.Pitch,
+				                                                        DeltaRot.Pitch
+				                                                       );
 			}
 
 			// YAW
-			if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Yaw, GravityRelativeDesiredRotation.Yaw, AngleTolerance))
+			if (!FMath::IsNearlyEqual(
+			                          GravityRelativeCurrentRotation.Yaw,
+			                          GravityRelativeDesiredRotation.Yaw,
+			                          AngleTolerance
+			                         ))
 			{
-				GravityRelativeDesiredRotation.Yaw = FMath::FixedTurn(GravityRelativeCurrentRotation.Yaw, GravityRelativeDesiredRotation.Yaw, DeltaRot.Yaw);
+				GravityRelativeDesiredRotation.Yaw = FMath::FixedTurn(
+				                                                      GravityRelativeCurrentRotation.Yaw,
+				                                                      GravityRelativeDesiredRotation.Yaw,
+				                                                      DeltaRot.Yaw
+				                                                     );
 			}
 
 			// ROLL
-			if (!FMath::IsNearlyEqual(GravityRelativeCurrentRotation.Roll, GravityRelativeDesiredRotation.Roll, AngleTolerance))
+			if (!FMath::IsNearlyEqual(
+			                          GravityRelativeCurrentRotation.Roll,
+			                          GravityRelativeDesiredRotation.Roll,
+			                          AngleTolerance
+			                         ))
 			{
-				GravityRelativeDesiredRotation.Roll = FMath::FixedTurn(GravityRelativeCurrentRotation.Roll, GravityRelativeDesiredRotation.Roll, DeltaRot.Roll);
+				GravityRelativeDesiredRotation.Roll = FMath::FixedTurn(
+				                                                       GravityRelativeCurrentRotation.Roll,
+				                                                       GravityRelativeDesiredRotation.Roll,
+				                                                       DeltaRot.Roll
+				                                                      );
 			}
 
 			DesiredRotation = (GetWorldToGravityTransform() * GravityRelativeDesiredRotation.Quaternion()).Rotator();
@@ -182,7 +232,7 @@ void UPlanetCharacterMovementComponent::PhysicsRotation(
 
 void UPlanetCharacterMovementComponent::OnRootMotionSourceBeingApplied(
 	const FRootMotionSource* Source
-)
+	)
 {
 	Super::OnRootMotionSourceBeingApplied(Source);
 }
