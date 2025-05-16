@@ -101,6 +101,17 @@ public:
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana_Replay);
 	
 #pragma region 基础 属性：五行元素
+
+	const int32 MaxElementalValue = 10000;
+	
+	const int32 MaxElementalLevel = 9;
+	
+	const int32 MaxElementalPenetration = 1000;
+	
+	const int32 MaxElementalPercentPenetration = 100;
+	
+	const int32 MaxElementalResistance = 10000;
+	
 	/**
 	 * Value					元素强度
 	 * Level					元素等级 0 3 6 9
@@ -109,25 +120,40 @@ public:
 	 * PercentPenetration		元素穿透百分比
 	 */
 	 
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UPROPERTY(ReplicatedUsing = OnRep_MetalValue, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData MetalValue;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalValue);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_MetalValue(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_MetalLevel, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData MetalLevel;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalLevel);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_MetalLevel(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_MetalPenetration, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData MetalPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalPenetration);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_MetalPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_MetalPercentPenetration, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData MetalPercentPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalPercentPenetration);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_MetalPercentPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_MetalResistance, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData MetalResistance;
 	ATTRIBUTE_ACCESSORS(UAS_Character, MetalResistance);
+
+	UFUNCTION()
+	virtual void OnRep_MetalResistance(const FMyGameplayAttributeData& OldHealth);
 
 	
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);

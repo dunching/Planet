@@ -441,9 +441,6 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Stamina =
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Mana =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Mana")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Base")));
-
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.MoveSpeed")));
 
@@ -452,6 +449,37 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed =
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Shield =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Shield")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.Value")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.Level")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.Penetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.PercentPenetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.Resistance")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Metal")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Wood")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Water")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Fire")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Earth")));
+
 
 FGameplayTag UGameplayTagsLibrary::Region_Default =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Region.Default")));

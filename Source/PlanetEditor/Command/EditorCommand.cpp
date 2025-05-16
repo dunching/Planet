@@ -570,3 +570,29 @@ void EditorCommand::AddShield(
 
 	PCPtr->AddShield(Args);
 }
+
+void EditorCommand::AddShieldToTarget(
+	const TArray<FString>& Args
+	)
+{
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->AddShieldToTarget(Args);
+}
+
+void EditorCommand::ModifyElementalData(
+	const TArray<FString>& Args
+	)
+{
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->ModifyElementalData(Args);
+}

@@ -70,7 +70,7 @@ void ATornado::Tick(
 
 			const auto Value = ItemProxy_DescriptionPtr->Elemental_Damage;
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-				UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+				UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
 				Value
 			);
 

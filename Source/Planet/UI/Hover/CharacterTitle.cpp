@@ -176,7 +176,7 @@ void UCharacterTitle::OnShieldChanged(const FOnAttributeChangeData&)
 {
 	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetShield();
 	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_HP();
-	SetPPChanged(Value, MaxValue);
+	SetShieldChanged(Value, MaxValue);
 }
 
 void UCharacterTitle::SetShieldChanged(float Value, float MaxValue)

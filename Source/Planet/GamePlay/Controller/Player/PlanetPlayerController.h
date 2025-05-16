@@ -116,6 +116,16 @@ public:
 		const TArray<FString>& Args
 		);
 
+	UFUNCTION(Server, Reliable)
+	void AddShieldToTarget(
+		const TArray<FString>& Args
+		);
+
+	UFUNCTION(Server, Reliable)
+	void ModifyElementalData(
+		const TArray<FString>& Args
+		);
+
 #pragma endregion
 
 #pragma region RPC

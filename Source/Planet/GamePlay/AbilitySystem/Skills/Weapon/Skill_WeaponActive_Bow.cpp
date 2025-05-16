@@ -335,7 +335,7 @@ void USkill_WeaponActive_Bow::MakeDamage(ACharacterBase* TargetCharacterPtr)
 	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 	SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 
-	SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+	SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
 												   BaseDamage);
 
 	TArray<TWeakObjectPtr<AActor> >Ary;

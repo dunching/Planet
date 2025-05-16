@@ -1113,7 +1113,62 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 				                   UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet)
 				                  );
 			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
+			{
+				UpdateMapBaseValue(
+				                   UGameplayTagsLibrary::DataSource_Character,
+				                   Iter.Value,
+				                   0.f,
+				                   TargetSet->MaxElementalValue,
+				                   Spec,
+				                   UAS_Character::GetMetalValueAttribute().GetGameplayAttributeData(TargetSet)
+				                  );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+			{
+				UpdateMapBaseValue(
+				                   UGameplayTagsLibrary::DataSource_Character,
+				                   Iter.Value,
+				                   0.f,
+				                   TargetSet->MaxElementalLevel,
+				                   Spec,
+				                   UAS_Character::GetMetalLevelAttribute().GetGameplayAttributeData(TargetSet)
+				                  );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+			{
+				UpdateMapBaseValue(
+				                   UGameplayTagsLibrary::DataSource_Character,
+				                   Iter.Value,
+				                   0.f,
+				                   TargetSet->MaxElementalPenetration,
+				                   Spec,
+				                   UAS_Character::GetMetalPenetrationAttribute().GetGameplayAttributeData(TargetSet)
+				                  );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+			{
+				UpdateMapBaseValue(
+				                   UGameplayTagsLibrary::DataSource_Character,
+				                   Iter.Value,
+				                   0.f,
+				                   TargetSet->MaxElementalPercentPenetration,
+				                   Spec,
+				                   UAS_Character::GetMetalPercentPenetrationAttribute().GetGameplayAttributeData(TargetSet)
+				                  );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+			{
+				UpdateMapBaseValue(
+				                   UGameplayTagsLibrary::DataSource_Character,
+				                   Iter.Value,
+				                   0.f,
+				                   TargetSet->MaxElementalResistance,
+				                   Spec,
+				                   UAS_Character::GetMetalResistanceAttribute().GetGameplayAttributeData(TargetSet)
+				                  );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 			{
 				UpdateMapBaseValue(
 				                   UGameplayTagsLibrary::DataSource_Character,
@@ -1235,7 +1290,92 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 					                                     )
 				                                    );
 			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base))
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
+			{
+				const auto NewValue = GetBaseValueMaps(
+				                                       Spec,
+				                                       UAS_Character::GetMetalValueAttribute().GetGameplayAttributeData(
+					                                        TargetSet
+					                                       )
+				                                      );
+
+				OutExecutionOutput.AddOutputModifier(
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetMetalValueAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      NewValue
+					                                     )
+				                                    );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+			{
+				const auto NewValue = GetBaseValueMaps(
+				                                       Spec,
+				                                       UAS_Character::GetMetalLevelAttribute().GetGameplayAttributeData(
+					                                        TargetSet
+					                                       )
+				                                      );
+
+				OutExecutionOutput.AddOutputModifier(
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetMetalLevelAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      NewValue
+					                                     )
+				                                    );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+			{
+				const auto NewValue = GetBaseValueMaps(
+				                                       Spec,
+				                                       UAS_Character::GetMetalPenetrationAttribute().GetGameplayAttributeData(
+					                                        TargetSet
+					                                       )
+				                                      );
+
+				OutExecutionOutput.AddOutputModifier(
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetMetalPenetrationAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      NewValue
+					                                     )
+				                                    );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+			{
+				const auto NewValue = GetBaseValueMaps(
+				                                       Spec,
+				                                       UAS_Character::GetMetalPercentPenetrationAttribute().GetGameplayAttributeData(
+					                                        TargetSet
+					                                       )
+				                                      );
+
+				OutExecutionOutput.AddOutputModifier(
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetMetalPercentPenetrationAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      NewValue
+					                                     )
+				                                    );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+			{
+				const auto NewValue = GetBaseValueMaps(
+				                                       Spec,
+				                                       UAS_Character::GetMetalResistanceAttribute().GetGameplayAttributeData(
+					                                        TargetSet
+					                                       )
+				                                      );
+
+				OutExecutionOutput.AddOutputModifier(
+				                                     FGameplayModifierEvaluatedData(
+					                                      UAS_Character::GetMetalResistanceAttribute(),
+					                                      EGameplayModOp::Override,
+					                                      NewValue
+					                                     )
+				                                    );
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 			{
 				const auto NewValue =
 					GetBaseValueMaps(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));

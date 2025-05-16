@@ -304,7 +304,7 @@ void USkill_Active_BYWD::MakeDamage()
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-		                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+		                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
 		                                               BaseDamage
 		                                              );
 

@@ -313,14 +313,32 @@ public:
 	
 	static FGameplayTag GEData_ModifyItem_Mana;
 	
-	static FGameplayTag GEData_ModifyItem_Damage_Base;
-	
 	static FGameplayTag GEData_ModifyItem_MoveSpeed;
 	
 	static FGameplayTag GEData_ModifyItem_PerformSpeed;
 
 	static FGameplayTag GEData_ModifyItem_Shield;
 
+	static FGameplayTag GEData_ModifyItem_Metal_Value;
+
+	static FGameplayTag GEData_ModifyItem_Metal_Level;
+
+	static FGameplayTag GEData_ModifyItem_Metal_Penetration;
+
+	static FGameplayTag GEData_ModifyItem_Metal_PercentPenetration;
+
+	static FGameplayTag GEData_ModifyItem_Metal_Resistance;
+
+	static FGameplayTag GEData_ModifyItem_Damage_Metal;
+	
+	static FGameplayTag GEData_ModifyItem_Damage_Wood;
+	
+	static FGameplayTag GEData_ModifyItem_Damage_Water;
+	
+	static FGameplayTag GEData_ModifyItem_Damage_Fire;
+	
+	static FGameplayTag GEData_ModifyItem_Damage_Earth;
+	
 	
 	static FGameplayTag Region_Default;
 	

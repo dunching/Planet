@@ -627,6 +627,196 @@ TObjectPtr<UPlayerControllerGameplayTasksComponent> APlanetPlayerController::Get
 	return GameplayTasksComponentPtr;
 }
 
+void APlanetPlayerController::ModifyElementalData_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	if (Args.Num() < 6)
+	{
+		return;
+	}
+
+	{
+		auto GASPtr = GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
+
+		auto SpecHandle = GASPtr->MakeOutgoingSpec(
+												   UAssetRefMap::GetInstance()->OnceGEClass,
+												   1,
+												   GASPtr->MakeEffectContext()
+												  );
+
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override);
+
+		if (TEXT("Metal") == Args[0])
+		{
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value,
+														   UKismetStringLibrary::Conv_StringToInt(Args[1])
+														  );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level,
+														   UKismetStringLibrary::Conv_StringToInt(Args[2])
+														  );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration,
+														   UKismetStringLibrary::Conv_StringToInt(Args[3])
+														  );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration,
+														   UKismetStringLibrary::Conv_StringToInt(Args[4])
+														  );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance,
+														   UKismetStringLibrary::Conv_StringToInt(Args[5])
+														  );
+		}
+		else if (TEXT("Wood") == Args[0])
+		{		
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+														   UKismetStringLibrary::Conv_StringToInt(Args[1])
+														  );
+		}
+		else if (TEXT("Water") == Args[0])
+		{
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+														   UKismetStringLibrary::Conv_StringToInt(Args[1])
+														  );
+		}
+		else if (TEXT("Fire") == Args[0])
+		{
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+														   UKismetStringLibrary::Conv_StringToInt(Args[1])
+														  );
+		}
+		else if (TEXT("Earth") == Args[0])
+		{
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+														   UKismetStringLibrary::Conv_StringToInt(Args[1])
+														  );
+		}
+
+		const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		if (!GEHandle.IsValid())
+		{
+			// checkNoEntry();
+		}
+	}
+}
+
+void APlanetPlayerController::AddShieldToTarget_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	if (!Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(
+	                                            OutHit,
+	                                            OutCamLoc,
+	                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams,
+	                                            Params
+	                                           ))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			// 自动回复
+			{
+				auto GASPtr = GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
+
+				auto SpecHandle = GASPtr->MakeOutgoingSpec(
+				                                           UAssetRefMap::GetInstance()->OnceGEClass,
+				                                           1,
+				                                           GASPtr->MakeEffectContext()
+				                                          );
+
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::DataSource_Character,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[0])
+				                                              );
+
+				const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToTarget(
+				                                                              *SpecHandle.Data.Get(),
+				                                                              TargetCharacterPtr->
+				                                                              GetCharacterAbilitySystemComponent()
+				                                                             );
+				if (!GEHandle.IsValid())
+				{
+					// checkNoEntry();
+				}
+				const auto TimerDelegate = FTimerDelegate::CreateLambda(
+				                                                        [this, TargetCharacterPtr, GASPtr](
+				                                                        )
+				                                                        {
+					                                                        auto SpecHandle = GASPtr->MakeOutgoingSpec(
+						                                                         UAssetRefMap::GetInstance()->
+						                                                         OnceGEClass,
+						                                                         1,
+						                                                         GASPtr->MakeEffectContext()
+						                                                        );
+
+					                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
+						                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary
+						                                                        );
+					                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
+						                                                         UGameplayTagsLibrary::GEData_ModifyItem_Shield
+						                                                        );
+					                                                        SpecHandle.Data.Get()->
+						                                                        SetSetByCallerMagnitude(
+							                                                         UGameplayTagsLibrary::DataSource_Character,
+							                                                         0
+							                                                        );
+
+					                                                        const auto GEHandle = GASPtr->
+						                                                        ApplyGameplayEffectSpecToTarget(
+							                                                         *SpecHandle.Data.Get(),
+							                                                         TargetCharacterPtr->
+							                                                         GetCharacterAbilitySystemComponent()
+							                                                        );
+					                                                        if (!GEHandle.IsValid())
+					                                                        {
+						                                                        // checkNoEntry();
+					                                                        }
+				                                                        }
+				                                                       );
+
+				FTimerHandle TimerHandle;
+				GetWorld()->GetTimerManager().SetTimer(
+				                                       TimerHandle,
+				                                       TimerDelegate,
+				                                       UKismetStringLibrary::Conv_StringToInt(Args[1]),
+				                                       false
+				                                      );
+			}
+		}
+	}
+}
+
 void APlanetPlayerController::ReplyStamina_Implementation(
 	const TArray<FString>& Args
 	)
@@ -648,12 +838,12 @@ void APlanetPlayerController::ReplyStamina_Implementation(
 
 	FHitResult OutHit;
 	if (GetWorld()->LineTraceSingleByObjectType(
-												OutHit,
-												OutCamLoc,
-												OutCamLoc + (OutCamRot.Vector() * 1000),
-												ObjectQueryParams,
-												Params
-											   ))
+	                                            OutHit,
+	                                            OutCamLoc,
+	                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams,
+	                                            Params
+	                                           ))
 	{
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
@@ -662,19 +852,19 @@ void APlanetPlayerController::ReplyStamina_Implementation(
 			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 			FGameplayEffectSpecHandle SpecHandle =
 				ICPtr->MakeOutgoingSpec(
-										UAssetRefMap::GetInstance()->OnceGEClass,
-										1,
-										ICPtr->MakeEffectContext()
-									   );
+				                        UAssetRefMap::GetInstance()->OnceGEClass,
+				                        1,
+				                        ICPtr->MakeEffectContext()
+				                       );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 
 			int32 Damege = 0;
 			LexFromString(Damege, *Args[0]);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
-														   Damege
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+			                                               Damege
+			                                              );
 
 			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
 				 *SpecHandle.Data.Get(),
@@ -857,7 +1047,7 @@ void APlanetPlayerController::MakeTrueDamege_Implementation(
 			int32 Damege = 0;
 			LexFromString(Damege, *Args[0]);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
 			                                               Damege
 			                                              );
 
@@ -922,7 +1112,7 @@ void APlanetPlayerController::MakeTrueDamegeInArea_Implementation(
 				int32 Damege = 0;
 				LexFromString(Damege, *Args[0]);
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-				                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
 				                                               Damege
 				                                              );
 
@@ -971,10 +1161,10 @@ void APlanetPlayerController::MakeTherapy_Implementation(
 			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
 			FGameplayEffectSpecHandle SpecHandle =
 				ICPtr->MakeOutgoingSpec(
-										UAssetRefMap::GetInstance()->OnceGEClass,
-										1,
-										ICPtr->MakeEffectContext()
-									   );
+				                        UAssetRefMap::GetInstance()->OnceGEClass,
+				                        1,
+				                        ICPtr->MakeEffectContext()
+				                       );
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
@@ -983,9 +1173,9 @@ void APlanetPlayerController::MakeTherapy_Implementation(
 			int32 Damege = 0;
 			LexFromString(Damege, *Args[0]);
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
-														   Damege
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
+			                                               Damege
+			                                              );
 
 			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
 				 *SpecHandle.Data.Get(),

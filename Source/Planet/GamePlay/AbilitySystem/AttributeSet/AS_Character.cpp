@@ -94,6 +94,46 @@ void UAS_Character::OnRep_Mana(const FMyGameplayAttributeData& OldHealth)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Mana, OldHealth);
 }
 
+void UAS_Character::OnRep_MetalValue(
+	const FMyGameplayAttributeData& OldHealth
+	)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalValue, OldHealth);
+}
+
+void UAS_Character::OnRep_MetalLevel(
+	const FMyGameplayAttributeData& OldHealth
+	)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalLevel, OldHealth);
+}
+
+void UAS_Character::OnRep_MetalPenetration(
+	const FMyGameplayAttributeData& OldHealth
+	)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalPenetration, OldHealth);
+}
+
+void UAS_Character::OnRep_MetalPercentPenetration(
+	const FMyGameplayAttributeData& OldHealth
+	)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalPercentPenetration, OldHealth);
+}
+
+void UAS_Character::OnRep_MetalResistance(
+	const FMyGameplayAttributeData& OldHealth
+	)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, MetalResistance, OldHealth);
+}
+
 void UAS_Character::OnRep_MoveSpeed(const FMyGameplayAttributeData& OldHealth)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
