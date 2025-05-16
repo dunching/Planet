@@ -327,7 +327,7 @@ void USkill_WeaponActive_Bow::EmitProjectile(float OffsetAroundZ)const
 void USkill_WeaponActive_Bow::MakeDamage(ACharacterBase* TargetCharacterPtr)
 {
 	const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
+	const int32 BaseDamage = Elemental_Damage;
 
 	FGameplayEffectSpecHandle SpecHandle =
 		MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());

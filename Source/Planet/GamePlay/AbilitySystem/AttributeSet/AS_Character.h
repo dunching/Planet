@@ -192,7 +192,7 @@ public:
 	FMyGameplayAttributeData Shield;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Shield);
 	
-#pragma region 基础 属性：力道、根骨、身法、洞察、天资
+#pragma region 基础 属性：力道,根骨,身法,洞察,天资
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData LiDao;
 	ATTRIBUTE_ACCESSORS(UAS_Character, LiDao);

@@ -171,6 +171,16 @@ enum class EBuildingsType : uint8
 	kNone,
 };
 
+UENUM()
+enum class EElementalType : uint8
+{
+	kMetal,
+	kWood,
+	kWater,
+	kFire,
+	kEarth,
+};
+
 UENUM(BlueprintType)
 enum class EWuXingType : uint8
 {

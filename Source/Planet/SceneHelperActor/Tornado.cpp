@@ -68,9 +68,7 @@ void ATornado::Tick(
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 
-			const auto Value = ItemProxy_DescriptionPtr->BaseDamage + (ItemProxy_DescriptionPtr->AD *
-					CharacterAttributesPtr->GetAD())
-				+ (ItemProxy_DescriptionPtr->AP * CharacterAttributesPtr->GetAP());
+			const auto Value = ItemProxy_DescriptionPtr->Elemental_Damage;
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 				UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
 				Value

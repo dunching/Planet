@@ -30,13 +30,7 @@ public:
 	FPerLevelValue_Float Duration = {3, 4, 5, 6, 7};
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	float BaseDamage = 100.f;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	float AD = 1.f;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	float AP = 1.f;
+	float Elemental_Damage = 100.f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	int32 MoveSpeed = 300;

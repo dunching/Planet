@@ -21,16 +21,6 @@ class UGameplayEffect;
 
 struct FCharacterAttributes;
 
-UENUM()
-enum class EElementalType : uint8
-{
-	kMetal,
-	kWood,
-	kWater,
-	kFire,
-	kEarth,
-};
-
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterAttributesComponent : public UActorComponent
 {
@@ -57,20 +47,6 @@ public:
 
 	FGuid GetCharacterID()const;
 
-#pragma region 其他属性
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	EElementalType ElementalType = EElementalType::kMetal;
-	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	uint8 WoodLevel = 0;
-	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	uint8 WoodResistance = 0;
-	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	uint8 WoodValue = 0;
-#pragma endregion
-	
 	// Character的类别
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FGameplayTag CharacterCategory;

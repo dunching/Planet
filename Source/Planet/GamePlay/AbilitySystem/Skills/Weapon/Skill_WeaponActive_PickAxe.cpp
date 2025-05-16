@@ -243,7 +243,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	                                         ))
 	{
 		const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		const int32 BaseDamage = Damage + (CharacterAttributes->GetAD() * AD_Damage_Magnification);
+		const int32 BaseDamage = Elemental_Damage ;
 
 		TSet<ACharacterBase*> TargetCharacterSet;
 		for (auto Iter : OutHits)

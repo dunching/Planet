@@ -109,10 +109,13 @@ protected:
 	float Distance = 100.f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Damage = 10;
+	EElementalType ElementalType = EElementalType::kMetal;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	int32 Elemental_Damage = 10;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float AD_Damage_Magnification = .5f;
+	float Elemental_Damage_Magnification = .5f;
 
 	FWeaponActorType* WeaponActorPtr = nullptr;
 

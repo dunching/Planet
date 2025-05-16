@@ -17,7 +17,7 @@
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "MyProgressBar.h"
-#include "MyBaseProperty.h"
+#include "BasePropertyWidget.h"
 #include "LogWriter.h"
 #include "State_Talent_NuQi.h"
 #include "State_Talent_YinYang.h"
@@ -111,7 +111,7 @@ void UPawnStateActionHUD::NativeTick(
 void UPawnStateActionHUD::Enable()
 {
 	ILayoutInterfacetion::Enable();
-	
+
 	if (!CharacterPtr)
 	{
 		return;
@@ -119,50 +119,13 @@ void UPawnStateActionHUD::Enable()
 	{
 		auto CharacterAttributeSetPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 		auto AbilitySystemComponentPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+		BindProgressData(
+		                 CharacterAttributeSetPtr,
+		                 AbilitySystemComponentPtr
+		                );
+
 		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetHPAttribute(),
-			                     CharacterAttributeSetPtr->GetHP(),
-			                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
-			                     CharacterAttributeSetPtr->GetMax_HP()
-			                    );
-		}
-		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetStaminaAttribute(),
-			                     CharacterAttributeSetPtr->GetStamina(),
-			                     CharacterAttributeSetPtr->GetMax_StaminaAttribute(),
-			                     CharacterAttributeSetPtr->GetMax_Stamina()
-			                    );
-		}
-		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Mana));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetManaAttribute(),
-			                     CharacterAttributeSetPtr->GetMana(),
-			                     CharacterAttributeSetPtr->GetMax_ManaAttribute(),
-			                     CharacterAttributeSetPtr->GetMax_Mana()
-			                    );
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().MoveSpeed));
 			if (!UIPtr)
 			{
 				return;
@@ -174,7 +137,7 @@ void UPawnStateActionHUD::Enable()
 			                    );
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
+			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().GAPerformSpeed));
 			if (!UIPtr)
 			{
 				return;
@@ -185,38 +148,10 @@ void UPawnStateActionHUD::Enable()
 			                     CharacterAttributeSetPtr->GetPerformSpeed()
 			                    );
 		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.WoodElement);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Water));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.WaterElement);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Fire));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.FireElement);
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Earth));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.SoilElement);
-		}
+		BindElementalData(
+		                  CharacterAttributeSetPtr,
+		                  AbilitySystemComponentPtr
+		                 );
 	}
 
 	InitialTalentUI();
@@ -415,23 +350,98 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	}
 }
 
-void UPawnStateActionHUD::BindElementalData(
-		const UAS_Character* CharacterAttributeSetPtr,
-		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
-		)
+void UPawnStateActionHUD::BindProgressData(
+	const UAS_Character* CharacterAttributeSetPtr,
+	UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+	)
 {
 	{
-		auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Metal));
+		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().HP));
 		if (!UIPtr)
 		{
 			return;
 		}
 		UIPtr->SetDataSource(
-							 AbilitySystemComponentPtr,
-							 CharacterAttributeSetPtr->GetShieldAttribute(),
-							 CharacterAttributeSetPtr->GetShield(),
-							 CharacterAttributeSetPtr->GetMax_HPAttribute(),
-							 CharacterAttributeSetPtr->GetMax_HP()
-							);
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetHPAttribute(),
+		                     CharacterAttributeSetPtr->GetHP(),
+		                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
+		                     CharacterAttributeSetPtr->GetMax_HP()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetStaminaAttribute(),
+		                     CharacterAttributeSetPtr->GetStamina(),
+		                     CharacterAttributeSetPtr->GetMax_StaminaAttribute(),
+		                     CharacterAttributeSetPtr->GetMax_Stamina()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Mana));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetManaAttribute(),
+		                     CharacterAttributeSetPtr->GetMana(),
+		                     CharacterAttributeSetPtr->GetMax_ManaAttribute(),
+		                     CharacterAttributeSetPtr->GetMax_Mana()
+		                    );
+	}
+}
+
+void UPawnStateActionHUD::BindElementalData(
+	const UAS_Character* CharacterAttributeSetPtr,
+	UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+	)
+{
+	{
+		auto UIPtr = Cast<UBaseProperty_Elemental>(GetWidgetFromName(FPawnStateActionHUD::Get().Metal));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetMetalValueAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalValue(),
+		                     CharacterAttributeSetPtr->GetMetalLevelAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalLevel(),
+		                     CharacterAttributeSetPtr->GetMetalPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalPenetration(),
+		                     CharacterAttributeSetPtr->GetMetalPercentPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalPercentPenetration(),
+		                     CharacterAttributeSetPtr->GetMetalResistanceAttribute(),
+		                     CharacterAttributeSetPtr->GetMetalResistance()
+		                    );
+	}
+	{
+		auto UIPtr = Cast<UBaseProperty_Elemental>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetWoodValueAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodValue(),
+		                     CharacterAttributeSetPtr->GetWoodLevelAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodLevel(),
+		                     CharacterAttributeSetPtr->GetWoodPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodPenetration(),
+		                     CharacterAttributeSetPtr->GetWoodPercentPenetrationAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodPercentPenetration(),
+		                     CharacterAttributeSetPtr->GetWoodResistanceAttribute(),
+		                     CharacterAttributeSetPtr->GetWoodResistance()
+		                    );
 	}
 }

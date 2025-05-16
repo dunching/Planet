@@ -20,6 +20,8 @@ struct FWeaponProxy;
 class UState_Talent_NuQi;
 class UState_Talent_YinYang;
 class ACharacterBase;
+class UAS_Character;
+class UCharacterAbilitySystemComponent;
 
 UCLASS()
 class PLANET_API UPawnStateActionHUD :
@@ -75,6 +77,10 @@ protected:
 	TSubclassOf<UState_Talent_YinYang> Talent_YinYang_Class;
 
 private:
+	void BindProgressData(
+		const UAS_Character* CharacterAttributeSetPtr,
+		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+		);
 	void BindElementalData(
 		const UAS_Character* CharacterAttributeSetPtr,
 		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
