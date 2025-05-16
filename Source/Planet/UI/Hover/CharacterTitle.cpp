@@ -29,7 +29,7 @@ struct FCharacterTitle : public TStructVariable<FCharacterTitle>
 
 	const FName PP_ProgressBar = TEXT("PP_ProgressBar");
 
-	const FName Shield_ProgressBar = TEXT("Shield_ProgressBar");
+	const FName ProgressBar_Shield = TEXT("ProgressBar_Shield");
 
 	const FName Border = TEXT("Border");
 
@@ -181,10 +181,21 @@ void UCharacterTitle::OnShieldChanged(const FOnAttributeChangeData&)
 
 void UCharacterTitle::SetShieldChanged(float Value, float MaxValue)
 {
-	auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().Shield_ProgressBar));
-	if (WidgetPtr)
+	if (MaxValue > 0)
 	{
-		WidgetPtr->SetPercent(static_cast<float>(Value) / MaxValue);
+		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().ProgressBar_Shield));
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetPercent(FMath::Clamp( static_cast<float>(Value) / MaxValue, 0, 1));
+		}
+	}
+	else
+	{
+		auto WidgetPtr = Cast<UProgressBar>(GetWidgetFromName(FCharacterTitle::Get().ProgressBar_Shield));
+		if (WidgetPtr)
+		{
+			WidgetPtr->SetPercent(0);
+		}
 	}
 }
 

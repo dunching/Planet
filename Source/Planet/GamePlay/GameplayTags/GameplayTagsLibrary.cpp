@@ -421,7 +421,7 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Addtive")));
 
 // 覆盖
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Immediate_Override =
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Override")));
 
 // 增加一个临时量（比如修改移速时，先添加一个100的增速 再添加一个 20%增速，在移除这些增速是不好计算 所以用这种方式进行记录）
@@ -435,8 +435,8 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary =
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_HP =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.HP")));
 
-FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_PP =
-	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.PP")));
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Stamina =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Stamina")));
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Mana =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Mana")));
@@ -449,6 +449,9 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed =
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.PerformSpeed")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Shield =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Shield")));
 
 FGameplayTag UGameplayTagsLibrary::Region_Default =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Region.Default")));

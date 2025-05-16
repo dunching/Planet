@@ -72,7 +72,7 @@ void UHUD_TeamInfo::Enable()
 	auto MembersHelperSPtr = GMCPtr->GetTeamMatesHelperComponent();
 	if (MembersHelperSPtr)
 	{
-		for (auto Iter : MembersHelperSPtr->MembersSet)
+		for (auto Iter : MembersHelperSPtr->GetMembersSet())
 		{
 			if (Index < ChidrensAry.Num())
 			{

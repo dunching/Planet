@@ -108,7 +108,7 @@ void UBasicFutures_Dash::ApplyCost(
 			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
 
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_PP, -Consume);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Stamina, -Consume);
 
 		ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
 	}

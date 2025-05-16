@@ -105,3 +105,11 @@ void UAS_Character::OnRep_PerformSpeed(const FMyGameplayAttributeData& OldHealth
 	// 使用默认的游戏玩法属性系统更新通知行为。
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PerformSpeed, OldHealth);
 }
+
+inline void UAS_Character::OnRep_Shield(
+	const FMyGameplayAttributeData& OldHealth
+	)
+{
+	// 使用默认的游戏玩法属性系统更新通知行为。
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Shield, OldHealth);
+}

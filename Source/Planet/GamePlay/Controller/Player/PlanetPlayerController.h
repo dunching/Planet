@@ -102,7 +102,17 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
+	void ReplyStamina(
+		const TArray<FString>& Args
+		);
+
+	UFUNCTION(Server, Reliable)
 	void MakeRespawn(
+		const TArray<FString>& Args
+		);
+
+	UFUNCTION(Server, Reliable)
+	void AddShield(
 		const TArray<FString>& Args
 		);
 

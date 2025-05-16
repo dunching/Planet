@@ -321,12 +321,12 @@ protected:
 	 * 
 	 * @param Tag 仅为 DataSource
 	 * @param Value 
-	 * @param MinValue 
-	 * @param MaxValue 
+	 * @param MinValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
+	 * @param MaxValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
 	 * @param Spec 
 	 * @param GameplayAttributeDataPtr 
 	 */
-	void UpdateMap(
+	void UpdateMapBaseValue(
 		const FGameplayTag& Tag,
 		float Value,
 		int32 MinValue,
@@ -335,7 +335,20 @@ protected:
 		const FGameplayAttributeData* GameplayAttributeDataPtr
 		);
 
-	float GetMapValue(
+	void UpdateMapTemporary(
+		const FGameplayTag& Tag,
+		float Value,
+		const FGameplayEffectSpec& Spec,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
+
+	/**
+	 * 获取基础数据
+	 * @param Spec 
+	 * @param GameplayAttributeDataPtr 
+	 * @return 
+	 */
+	float GetBaseValueMaps(
 		const FGameplayEffectSpec& Spec,
 		const FGameplayAttributeData* GameplayAttributeDataPtr
 		) const;

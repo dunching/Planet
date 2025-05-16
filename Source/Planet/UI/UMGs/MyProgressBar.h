@@ -33,21 +33,33 @@ public:
 		float MaxValue
 		);
 
+	void SetOverlayDataSource(
+		UAbilitySystemComponent*AbilitySystemComponentPtr,
+		FGameplayAttribute Attribute,
+		float Value
+		);
+
 	void SetCurrentValue(int32 InCurrentValue);
 
-	void SetCurrentValue_Re(const FOnAttributeChangeData& CurrentValue);
+	void SetCurrentValue_Re(const FOnAttributeChangeData& AttributeChangeData);
 
 	void SetMaxValue(int32 InMaxValue);
 
-	void SetMaxValue_Re(const FOnAttributeChangeData& CurrentValue);
+	void SetMaxValue_Re(const FOnAttributeChangeData& AttributeChangeData);
+
+	void SetOverlayValue(const FOnAttributeChangeData& AttributeChangeData);
 
 private:
 
 	void ValueChanged();
 
+	void OverlayValueChanged();
+
 	int32 CurrentValue = 0;
 
 	int32 MaxValue = 0;
+
+	int32 OverlayValue = 0;
 
 	FValueChangedDelegateHandle OnPPValueChanged;
 

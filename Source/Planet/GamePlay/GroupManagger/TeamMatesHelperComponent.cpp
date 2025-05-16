@@ -179,6 +179,7 @@ void UTeamMatesHelperComponent::UpdateTeammateConfigImp(
 		Teammate.CharacterProxyID = CharacterProxyPtr->GetID();
 
 		MembersSet.Add(CharacterProxyPtr);
+		MembersIDSet.Add(CharacterProxyPtr->GetID());
 	}
 	else
 	{
@@ -193,14 +194,10 @@ bool UTeamMatesHelperComponent::IsMember(
 	const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
 	) const
 {
-	for (auto Iter : MembersSet)
+	if (CharacterProxyPtr)
 	{
-		if (Iter == CharacterProxyPtr)
-		{
-			return true;
-		}
+		return IsMember(CharacterProxyPtr->GetID());
 	}
-
 	return false;
 }
 
@@ -211,6 +208,14 @@ bool UTeamMatesHelperComponent::IsMember(
 	for (auto Iter : MembersSet)
 	{
 		if (Iter->GetID() == CharacterID)
+		{
+			return true;
+		}
+	}
+
+	for (auto Iter : MembersIDSet)
+	{
+		if (Iter == CharacterID)
 		{
 			return true;
 		}
@@ -330,6 +335,12 @@ void UTeamMatesHelperComponent::SetOwnerCharacterProxy(
 {
 	OwnerCharacterProxyPtr = CharacterProxySPtr;
 	MembersSet.Add(OwnerCharacterProxyPtr);
+	MembersIDSet.Add(OwnerCharacterProxyPtr->GetID());
+}
+
+TSet<TSharedPtr<UTeamMatesHelperComponent::FCharacterProxyType>> UTeamMatesHelperComponent::GetMembersSet() const
+{
+	return MembersSet;
 }
 
 FName UTeamMatesHelperComponent::ComponentName = TEXT("TeamMatesHelperComponent");
@@ -344,6 +355,7 @@ void UTeamMatesHelperComponent::GetLifetimeReplicatedProps(
 	DOREPLIFETIME_CONDITION(ThisClass, TeammateOption, COND_None);
 
 	DOREPLIFETIME_CONDITION(ThisClass, ForceKnowCharater, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, MembersIDSet, COND_None);
 }
 
 void UTeamMatesHelperComponent::TeammateCharacter_ActiveWeapon_Server_Implementation()

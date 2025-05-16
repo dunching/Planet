@@ -524,6 +524,24 @@ void EditorCommand::MakeTherapy(const TArray< FString >& Args)
 	PCPtr->MakeTherapy(Args);
 }
 
+void EditorCommand::ReplyStamina(
+	const TArray<FString>& Args
+	)
+{
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->ReplyStamina(Args);
+}
+
 void EditorCommand::MakeRespawn(const TArray< FString >& Args)
 {
 	if (!Args.IsValidIndex(0))
@@ -538,4 +556,17 @@ void EditorCommand::MakeRespawn(const TArray< FString >& Args)
 	}
 
 	PCPtr->MakeRespawn(Args);
+}
+
+void EditorCommand::AddShield(
+	const TArray<FString>& Args
+	)
+{
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->AddShield(Args);
 }

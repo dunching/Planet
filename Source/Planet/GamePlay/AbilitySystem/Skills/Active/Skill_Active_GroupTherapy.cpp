@@ -109,7 +109,7 @@ void USkill_Active_GroupTherapy::EmitEffect()
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
-			for (auto Iter : TeamsHelperSPtr->MembersSet)
+			for (auto Iter : TeamsHelperSPtr->GetMembersSet())
 			{
 				TeammatesSet.Add(Iter->GetCharacterActor().Get());
 			}

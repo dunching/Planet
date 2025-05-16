@@ -36,20 +36,20 @@ public:
 	virtual void NativeTick(
 		const FGeometry& MyGeometry,
 		float InDeltaTime
-	);
+		);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetCampType(
 		ECharacterCampType CharacterCampType
-	);
+		);
 
 	void SwitchCantBeSelect(
 		bool bIsCantBeSelect
-	);
+		);
 
 	void SetData(
 		ACharacterBase* CharacterPtr
-	);
+		);
 
 protected:
 	ACharacterBase* CharacterPtr = nullptr;
@@ -58,37 +58,40 @@ protected:
 	void OnGameplayEffectTagCountChanged(
 		const FGameplayTag Tag,
 		int32 Count
-	);
+		);
 
 	void OnHPChanged(
 		const FOnAttributeChangeData&
+
 	
-	);
+		);
 
 	void SetHPChanged(
 		float Value,
 		float MaxValue
-	);
+		);
 
 	void OnPPChanged(
 		const FOnAttributeChangeData&
+
 	
-	);
+		);
 
 	void SetPPChanged(
 		float Value,
 		float MaxValue
-	);
+		);
 
 	void OnShieldChanged(
 		const FOnAttributeChangeData&
+
 	
-	);
+		);
 
 	void SetShieldChanged(
 		float Value,
 		float MaxValue
-	);
+		);
 
 	void ApplyCharaterNameToTitle();
 
@@ -96,7 +99,7 @@ protected:
 
 	bool ResetPosition(
 		float InDeltaTime
-	);
+		);
 
 	FVector2D PreviousPt = FVector2D::ZeroVector;
 
@@ -141,15 +144,15 @@ public:
 
 	void SetCampType(
 		ECharacterCampType CharacterCampType
-	);
+		);
 
 	void SetData(
 		ACharacterBase* CharacterPtr
-	);
+		);
 
 	void DisplaySentence(
 		const FTaskNode_Conversation_SentenceInfo& Sentence
-	);
+		);
 
 	void CloseConversationborder();
 

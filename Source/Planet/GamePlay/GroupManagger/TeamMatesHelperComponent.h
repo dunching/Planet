@@ -54,7 +54,7 @@ public:
 
 
 	
-	)>;
+		)>;
 
 	using FTeammateOptionChangedDelegateContainer =
 	TCallbackHandleContainer<void(
@@ -63,13 +63,13 @@ public:
 
 
 	
-	)>;
+		)>;
 
 	using FKnowCharaterChanged =
 	TCallbackHandleContainer<void(
 		TWeakObjectPtr<ACharacterBase>,
 		bool
-	)>;
+		)>;
 
 	using FOnFocusCharacterDelegate =
 	TCallbackHandleContainer<void(
@@ -77,32 +77,32 @@ public:
 
 
 	
-	)>;
+		)>;
 
 	using FTeamHelperChangedDelegateContainer = TCallbackHandleContainer<void()>;
 
 	UTeamMatesHelperComponent(
 		const FObjectInitializer& ObjectInitializer
-	);
+		);
 
 	void SwitchTeammateOption(
 		ETeammateOption InTeammateOption
-	);
+		);
 
 	ETeammateOption GetTeammateOption() const;
 
 #pragma region 锁定,感知到的目标
 	void AddKnowCharacter(
 		ACharacterBase* CharacterPtr
-	);
+		);
 
 	void RemoveKnowCharacter(
 		ACharacterBase* CharacterPtr
-	);
+		);
 
 	void SetFocusCharactersAry(
 		ACharacterBase* TargetCharacterPtr
-	);
+		);
 
 	void ClearFocusCharactersAry();
 
@@ -112,8 +112,8 @@ public:
 
 	void SetSensingChractersSet(
 		const TSet<TWeakObjectPtr<ACharacterBase>>& KnowCharater
-	);
-	
+		);
+
 #pragma endregion
 
 	void SpwanTeammateCharacter();
@@ -121,40 +121,37 @@ public:
 	void UpdateTeammateConfig(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
 		int32 Index
-	);
+		);
 
 	bool IsMember(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
-	) const;
+		) const;
 
 	bool IsMember(
 		const FGuid& CharacterID
-	) const;
+		) const;
 
 	bool TeleportTo(
 		const FVector& DestLocation,
 		const FRotator& DestRotation,
 		bool bIsATest = false,
 		bool bNoCheck = false
-	);
+		);
 
 	TSharedPtr<FCharacterProxyType> GetOwnerCharacterProxy() const;
 
 	void SetOwnerCharacterProxy(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxySPtr
-	);
-
+		);
+	
+	TSet<TSharedPtr<FCharacterProxyType>>GetMembersSet() const;
+	
 	FTeammateOptionChangedDelegateContainer TeammateOptionChanged;
 
 	/**
 	 * 
 	 */
 	FMemberChangedDelegateContainer MembersChanged;
-
-	/**
-	 * 分配的小队
-	 */
-	TSet<TSharedPtr<FCharacterProxyType>> MembersSet;
 
 	FTeamHelperChangedDelegateContainer TeamHelperChangedDelegateContainer;
 
@@ -169,18 +166,19 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(
 		TArray<FLifetimeProperty>& OutLifetimeProps
-	) const override;
+		) const override;
 
 private:
-	
 	/**
 	 * 更新感知到的目标
 	 * 移除无效的感知到的目标
 	 */
 	void UpdateSensingCharacters();
 
-	bool CheckCharacterIsValid(const TWeakObjectPtr<ACharacterBase>& CharacterPtr);
-	
+	bool CheckCharacterIsValid(
+		const TWeakObjectPtr<ACharacterBase>& CharacterPtr
+		);
+
 #pragma region RPC
 
 public:
@@ -194,13 +192,13 @@ private:
 	UFUNCTION(Server, Reliable)
 	void SwitchTeammateOption_Server(
 		ETeammateOption InTeammateOption
-	);
+		);
 
 	UFUNCTION(Server, Reliable)
 	virtual void UpdateTeammateConfig_Server(
 		const FGuid& ProxtID,
 		int32 Index
-	);
+		);
 
 	/**
 	 * 生成AI队友
@@ -218,17 +216,17 @@ private:
 
 	void OnAddToNewTeam(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr
-	);
+		);
 
 	void UpdateTeammateConfigImp(
 		FPawnType* PCPtr,
 		int32 Index
-	);
+		);
 
 	void UpdateTeammateConfigImp(
 		const TSharedPtr<FCharacterProxyType>& CharacterProxyPtr,
 		int32 Index
-	);
+		);
 
 	TSharedPtr<FCharacterProxyType> OwnerCharacterProxyPtr = nullptr;
 
@@ -250,7 +248,15 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	FTeamConfigure TeamConfigure;
-	
+
 	FTimerHandle CheckKnowCharacterTimerHandle;
 
+	/**
+	 * 组内Character信息
+	 * 包括玩家生成的AI队友和召唤物
+	 */
+	TSet<TSharedPtr<FCharacterProxyType>> MembersSet;
+
+	UPROPERTY(Replicated)
+	TArray<FGuid> MembersIDSet;
 };

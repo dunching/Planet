@@ -255,6 +255,19 @@ namespace EditorCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
+	void ReplyStamina(const TArray< FString >& Args);
+
+	static FAutoConsoleCommand ReplyStaminaCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("ReplyStamina"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandWithArgsDelegate::CreateStatic(ReplyStamina),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+	
 	void MakeRespawn(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand MakeRespawnCMD(
@@ -264,6 +277,19 @@ namespace EditorCommand
 		TEXT("this is a CMD test."),
 		//创建静态委托，输入上面的命令后会调用到后面的函数
 		FConsoleCommandWithArgsDelegate::CreateStatic(MakeRespawn),
+		//可选标志位掩码
+		EConsoleVariableFlags::ECVF_Default
+	);
+
+	void AddShield(const TArray< FString >& Args);
+
+	static FAutoConsoleCommand AddShieldCMD(
+		//CMD 名字，在控制台输入这个调用
+		TEXT("AddShield"),
+		//控制台帮助信息，选择这个命令的时候会看到
+		TEXT("this is a CMD test."),
+		//创建静态委托，输入上面的命令后会调用到后面的函数
+		FConsoleCommandWithArgsDelegate::CreateStatic(AddShield),
 		//可选标志位掩码
 		EConsoleVariableFlags::ECVF_Default
 	);

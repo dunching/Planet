@@ -182,16 +182,17 @@ void UBaseProperty_Elemental::UpdateText()
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(MyBaseProperty::Text));
 	if (UIPtr)
 	{
+		const auto Text = FString::Printf(
+		                                  TEXT("%d/%d/%d/%d%%/%d"),
+		                                  Level,
+		                                  Value,
+		                                  Penetration,
+		                                  PercentPenetration,
+		                                  Resistance
+		                                 );
 		UIPtr->SetText(
 		               FText::FromString(
-		                                 *FString::Printf(
-		                                                  TEXT("%d/%d/%d/%d/%/%d"),
-		                                                  Level,
-		                                                  Value,
-		                                                  Penetration,
-		                                                  PercentPenetration,
-		                                                  Resistance
-		                                                 )
+		                                 *Text
 		                                )
 		              );
 	}

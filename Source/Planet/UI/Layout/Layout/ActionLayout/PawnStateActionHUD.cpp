@@ -368,6 +368,11 @@ void UPawnStateActionHUD::BindProgressData(
 		                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
 		                     CharacterAttributeSetPtr->GetMax_HP()
 		                    );
+		UIPtr->SetOverlayDataSource(
+		                     AbilitySystemComponentPtr,
+		                     CharacterAttributeSetPtr->GetShieldAttribute(),
+		                     CharacterAttributeSetPtr->GetShield()
+		                    );
 	}
 	{
 		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));

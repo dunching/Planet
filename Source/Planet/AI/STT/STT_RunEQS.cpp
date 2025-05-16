@@ -96,7 +96,14 @@ EStateTreeRunStatus FSTT_RunEQS::Tick(
 				}
 #endif
 
-				return Super::Tick(Context, DeltaTime);
+				if (InstanceData.bRunForever)
+				{
+					return Super::Tick(Context, DeltaTime);
+				}
+				else
+				{
+					return EStateTreeRunStatus::Succeeded;
+				}
 			}
 		}
 		return EStateTreeRunStatus::Failed;

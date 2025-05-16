@@ -515,7 +515,7 @@ void APlanetPlayerController::OnGroupManaggerReady(
 	{
 	}
 #endif
-	
+
 	ForEachComponent(
 	                 false,
 	                 [this](
@@ -625,6 +625,141 @@ UEventSubjectComponent* APlanetPlayerController::GetEventSubjectComponent() cons
 TObjectPtr<UPlayerControllerGameplayTasksComponent> APlanetPlayerController::GetGameplayTasksComponent() const
 {
 	return GameplayTasksComponentPtr;
+}
+
+void APlanetPlayerController::ReplyStamina_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr && !Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(
+												OutHit,
+												OutCamLoc,
+												OutCamLoc + (OutCamRot.Vector() * 1000),
+												ObjectQueryParams,
+												Params
+											   ))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+			FGameplayEffectSpecHandle SpecHandle =
+				ICPtr->MakeOutgoingSpec(
+										UAssetRefMap::GetInstance()->OnceGEClass,
+										1,
+										ICPtr->MakeEffectContext()
+									   );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+
+			int32 Damege = 0;
+			LexFromString(Damege, *Args[0]);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+														   Damege
+														  );
+
+			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
+				 *SpecHandle.Data.Get(),
+				 ASCPtr,
+				 ASCPtr->GetPredictionKeyForNewAction()
+				);
+		}
+	}
+}
+
+void APlanetPlayerController::AddShield_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	if (!Args.IsValidIndex(1))
+	{
+		return;
+	}
+
+	// 自动回复
+	{
+		auto GASPtr = GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
+
+		auto SpecHandle = GASPtr->MakeOutgoingSpec(
+		                                           UAssetRefMap::GetInstance()->OnceGEClass,
+		                                           1,
+		                                           GASPtr->MakeEffectContext()
+		                                          );
+
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
+		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
+		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+		                                               UGameplayTagsLibrary::DataSource_Character,
+		                                               UKismetStringLibrary::Conv_StringToInt(Args[0])
+		                                              );
+
+		const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		if (!GEHandle.IsValid())
+		{
+			// checkNoEntry();
+		}
+
+		const auto TimerDelegate = FTimerDelegate::CreateLambda(
+		                                                        [this](
+		                                                        )
+		                                                        {
+			                                                        auto GASPtr = GetPawn<FPawnType>()->
+				                                                        GetCharacterAbilitySystemComponent();
+
+			                                                        auto SpecHandle = GASPtr->MakeOutgoingSpec(
+				                                                         UAssetRefMap::GetInstance()->OnceGEClass,
+				                                                         1,
+				                                                         GASPtr->MakeEffectContext()
+				                                                        );
+
+			                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
+				                                                         UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary
+				                                                        );
+			                                                        SpecHandle.Data.Get()->AddDynamicAssetTag(
+				                                                         UGameplayTagsLibrary::GEData_ModifyItem_Shield
+				                                                        );
+			                                                        SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                                         UGameplayTagsLibrary::DataSource_Character,
+				                                                         0
+				                                                        );
+
+			                                                        const auto GEHandle = GASPtr->
+				                                                        ApplyGameplayEffectSpecToSelf(
+					                                                         *SpecHandle.Data.Get()
+					                                                        );
+			                                                        if (!GEHandle.IsValid())
+			                                                        {
+				                                                        // checkNoEntry();
+			                                                        }
+		                                                        }
+		                                                       );
+
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+		                                       TimerHandle,
+		                                       TimerDelegate,
+		                                       UKismetStringLibrary::Conv_StringToInt(Args[1]),
+		                                       false
+		                                      );
+	}
 }
 
 void APlanetPlayerController::EntryChallengeLevel_Implementation(
@@ -832,6 +967,31 @@ void APlanetPlayerController::MakeTherapy_Implementation(
 		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 		if (TargetCharacterPtr)
 		{
+			auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
+			auto ASCPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+			FGameplayEffectSpecHandle SpecHandle =
+				ICPtr->MakeOutgoingSpec(
+										UAssetRefMap::GetInstance()->OnceGEClass,
+										1,
+										ICPtr->MakeEffectContext()
+									   );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::Proxy_Weapon_Test);
+
+			int32 Damege = 0;
+			LexFromString(Damege, *Args[0]);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														   UGameplayTagsLibrary::GEData_ModifyItem_Damage_Base,
+														   Damege
+														  );
+
+			CharacterPtr->GetCharacterAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(
+				 *SpecHandle.Data.Get(),
+				 ASCPtr,
+				 ASCPtr->GetPredictionKeyForNewAction()
+				);
 		}
 	}
 }

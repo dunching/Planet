@@ -24,6 +24,9 @@ struct PLANET_API FTeammate final
 	
 };
 
+/**
+ * 队伍配置
+ */
 USTRUCT(BlueprintType)
 struct PLANET_API FTeamConfigure final
 {
@@ -43,7 +46,13 @@ private:
 
 	void Check();
 	
-	// 小组索引、CharacterProxy ID
+	/**
+	 * 小组索引、CharacterProxy ID，如
+	 * 1. Character_A、Character_B、Character_C、Character_D
+	 * 2. Character_A、Character_B、Character_C、Character_D
+	 * 3. Character_A、Character_B、Character_C、Character_D
+	 * 4. Character_A、Character_B、Character_C、Character_D
+	 */
 	TArray<TArray<FGuid>> TeamConfigureAry;
 	
 };

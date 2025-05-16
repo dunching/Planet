@@ -16,8 +16,10 @@
 #include "LogWriter.h"
 #include "TeamMatesHelperComponent.h"
 
-UCharacterAttributesComponent::UCharacterAttributesComponent(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+UCharacterAttributesComponent::UCharacterAttributesComponent(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickInterval = 1.f;
@@ -31,7 +33,7 @@ void UCharacterAttributesComponent::TickComponent(
 	float DeltaTime,
 	enum ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction
-)
+	)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -39,6 +41,50 @@ void UCharacterAttributesComponent::TickComponent(
 	if (GetNetMode() == NM_DedicatedServer)
 	{
 		// ProcessCharacterAttributes();
+	}
+#endif
+}
+
+void UCharacterAttributesComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
+{
+#if UE_EDITOR || UE_CLIENT
+	if (GetNetMode() == NM_Client)
+	{
+		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+		if (PlayerCharacterPtr)
+		{
+			if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
+			{
+				// 确认跟当前玩家的关系
+				const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
+					 CharacterID
+					);
+
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(
+				                          bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+				                         );
+			}
+			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Functional))
+			{
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(ECharacterCampType::kNeutral);
+			}
+			else if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_NPC_Assistional))
+			{
+				// 确认跟当前玩家的关系
+				const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
+					 CharacterID
+					);
+
+				auto CharacterPtr = GetOwner<FOwnerType>();
+				CharacterPtr->SetCampType(
+				                          bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
+				                         );
+			}
+		}
 	}
 #endif
 }
@@ -83,7 +129,9 @@ float UCharacterAttributesComponent::GetRate() const
 	return Rate;
 }
 
-void UCharacterAttributesComponent::SetCharacterID(const FGuid& InCharacterID)
+void UCharacterAttributesComponent::SetCharacterID(
+	const FGuid& InCharacterID
+	)
 {
 	CharacterID = InCharacterID;
 }
@@ -95,7 +143,9 @@ FGuid UCharacterAttributesComponent::GetCharacterID() const
 
 FName UCharacterAttributesComponent::ComponentName = TEXT("CharacterAttributesComponent");
 
-void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UCharacterAttributesComponent::GetLifetimeReplicatedProps(
+	TArray<FLifetimeProperty>& OutLifetimeProps
+	) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
@@ -149,7 +199,8 @@ void UCharacterAttributesComponent::BeginPlay()
 ACharacterBase* UGameplayStatics_Character::GetCharacterByID(
 	const UObject* WorldContextObject,
 	TSubclassOf<ACharacterBase> ActorClass,
-	const FGuid& CharacterID)
+	const FGuid& CharacterID
+	)
 {
 	TArray<AActor*> ActorAry;
 	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, ActorClass, ActorAry);
@@ -180,21 +231,4 @@ void UCharacterAttributesComponent::OnRep_GetCharacterProxyID()
 
 void UCharacterAttributesComponent::OnRep_CharacterID()
 {
-#if UE_EDITOR || UE_CLIENT
-	if (GetNetMode() == NM_Client)
-	{
-		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-		if (PlayerCharacterPtr)
-		{
-			// 确认跟当前玩家的关系
-			const auto bIsMember = PlayerCharacterPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->IsMember(
-				CharacterID);
-
-			auto CharacterPtr = GetOwner<FOwnerType>();
-			CharacterPtr->SetCampType(
-				bIsMember ? ECharacterCampType::kTeamMate : ECharacterCampType::kEnemy
-			);
-		}
-	}
-#endif
 }

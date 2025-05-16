@@ -221,7 +221,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 		auto TeamsHelperSPtr = GroupMnaggerComponent->GetTeamMatesHelperComponent();
 		if (TeamsHelperSPtr)
 		{
-			for (auto Iter : TeamsHelperSPtr->MembersSet)
+			for (auto Iter : TeamsHelperSPtr->GetMembersSet())
 			{
 				CapsuleParams.AddIgnoredActor(Iter->GetCharacterActor().Get());
 			}

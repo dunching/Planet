@@ -34,7 +34,11 @@ void UBasicFutures_Running::IntervalTick(
 		if (Interval > InDuration)
 		{
 			// 停止输入时
-			if (CharacterPtr->GetCharacterMovement()->GetCurrentAcceleration().Length() < 10.f)
+			const auto Velocity = 10.f;
+			if (
+				(CharacterPtr->GetCharacterMovement()->GetCurrentAcceleration().Length() < Velocity) &&
+				(CharacterPtr->GetCharacterMovement()->RequestedVelocity.Length() < Velocity)
+			)
 			{
 				K2_CancelAbility();
 				return;
@@ -104,9 +108,9 @@ void UBasicFutures_Running::ActivateAbility(
 
 				// SpecHandle.Data.Get()->DynamicGrantedTags.AddTag(UGameplayTagsLibrary::GEData_Info);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_PP);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina);
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-				                                               UGameplayTagsLibrary::GEData_ModifyItem_PP,
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
 				                                               -RunningConsume.CurrentValue
 				                                              );
 

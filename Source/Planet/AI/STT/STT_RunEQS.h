@@ -47,6 +47,9 @@ struct PLANET_API FStateTreeRunEQSTaskInstanceData
 	UPROPERTY(EditAnywhere, Category = Param)
 	int32 Donut_OuterRadius = 850;
 	
+	UPROPERTY(EditAnywhere, Category = Param)
+	bool bRunForever = true;
+	
 	int32 RequestID = INDEX_NONE;
 
 	UPROPERTY(Transient)

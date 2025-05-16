@@ -300,7 +300,7 @@ public:
 	
 	static FGameplayTag GEData_ModifyType_BaseValue_Addtive;
 	
-	static FGameplayTag GEData_ModifyType_Immediate_Override;
+	static FGameplayTag GEData_ModifyType_BaseValue_Override;
 	
 	static FGameplayTag GEData_ModifyType_Temporary;
 	
@@ -309,7 +309,7 @@ public:
 	
 	static FGameplayTag GEData_ModifyItem_HP;
 	
-	static FGameplayTag GEData_ModifyItem_PP;
+	static FGameplayTag GEData_ModifyItem_Stamina;
 	
 	static FGameplayTag GEData_ModifyItem_Mana;
 	
@@ -318,6 +318,8 @@ public:
 	static FGameplayTag GEData_ModifyItem_MoveSpeed;
 	
 	static FGameplayTag GEData_ModifyItem_PerformSpeed;
+
+	static FGameplayTag GEData_ModifyItem_Shield;
 
 	
 	static FGameplayTag Region_Default;

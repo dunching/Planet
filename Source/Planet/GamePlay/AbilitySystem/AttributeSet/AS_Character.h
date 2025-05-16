@@ -188,10 +188,13 @@ public:
 	virtual void OnRep_PerformSpeed(const FMyGameplayAttributeData& OldHealth);
 
 	// 当前护盾值
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData Shield;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Shield);
 	
+	UFUNCTION()
+	virtual void OnRep_Shield(const FMyGameplayAttributeData& OldHealth);
+
 #pragma region 基础 属性：力道,根骨,身法,洞察,天资
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData LiDao;
