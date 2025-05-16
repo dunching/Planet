@@ -48,7 +48,7 @@ public:
 		) override;
 
 	virtual void Enable() override;
-	
+
 	virtual void DisEnable() override;
 
 	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
@@ -75,4 +75,8 @@ protected:
 	TSubclassOf<UState_Talent_YinYang> Talent_YinYang_Class;
 
 private:
+	void BindElementalData(
+		const UAS_Character* CharacterAttributeSetPtr,
+		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+		);
 };

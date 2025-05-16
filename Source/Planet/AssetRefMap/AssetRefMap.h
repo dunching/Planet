@@ -10,9 +10,9 @@
 
 #include "AssetRefMap.generated.h"
 
-class UTexture2D;
 class USoundMix;
 class USoundClass;
+class UTexture2D;
 class UStaticMesh;
 class UMaterialInstance;
 class USkeletalMesh;

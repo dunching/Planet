@@ -42,17 +42,26 @@ void UAS_Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, HP, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, HP_Replay, COND_None, REPNOTIFY_Always);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Max_PP, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, PP, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, PP_Replay, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Max_Stamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Stamina, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Stamina_Replay, COND_None, REPNOTIFY_Always);
 
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Max_Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, Mana_Replay, COND_None, REPNOTIFY_Always);
 
-	DOREPLIFETIME_CONDITION(ThisClass, AD, COND_None);
-	DOREPLIFETIME_CONDITION(ThisClass, AD_Penetration, COND_None);
-	DOREPLIFETIME_CONDITION(ThisClass, AD_Resistance, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, MetalValue, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, MetalLevel, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, MetalPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, MetalPercentPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, MetalResistance, COND_None);
+	
+	DOREPLIFETIME_CONDITION(ThisClass, WoodValue, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WoodLevel, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WoodPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WoodPercentPenetration, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WoodResistance, COND_None);
+	
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION(ThisClass, CriticalDamage, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, HitRate, COND_None);
@@ -73,10 +82,10 @@ void UAS_Character::OnRep_HP(const FMyGameplayAttributeData& OldHealth)
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, HP, OldHealth);
 }
 
-void UAS_Character::OnRep_PP(const FMyGameplayAttributeData& OldHealth)
+void UAS_Character::OnRep_Stamina(const FMyGameplayAttributeData& OldHealth)
 {
 	// 使用默认的游戏玩法属性系统更新通知行为。
-	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, PP, OldHealth);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(ThisClass, Stamina, OldHealth);
 }
 
 void UAS_Character::OnRep_Mana(const FMyGameplayAttributeData& OldHealth)

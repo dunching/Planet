@@ -67,21 +67,21 @@ public:
 	ATTRIBUTE_ACCESSORS(UAS_Character, HP_Replay);
 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData Max_PP;
-	ATTRIBUTE_ACCESSORS(UAS_Character, Max_PP);
+	FMyGameplayAttributeData Max_Stamina;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Max_Stamina);
 	
 	// 体力,用于冲刺、奔跑
-	UPROPERTY(ReplicatedUsing = OnRep_PP, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData PP;
-	ATTRIBUTE_ACCESSORS(UAS_Character, PP);
+	UPROPERTY(ReplicatedUsing = OnRep_Stamina, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData Stamina;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Stamina);
 	
 	UFUNCTION()
-	virtual void OnRep_PP(const FMyGameplayAttributeData& OldHealth);
+	virtual void OnRep_Stamina(const FMyGameplayAttributeData& OldHealth);
 
 	// 体力回复速率
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData PP_Replay;
-	ATTRIBUTE_ACCESSORS(UAS_Character, PP_Replay);
+	FMyGameplayAttributeData Stamina_Replay;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Stamina_Replay);
 	
 	// 战斗资源，用于释放技能
 	UPROPERTY(ReplicatedUsing = OnRep_Mana, VisibleAnywhere, BlueprintReadWrite);
@@ -100,39 +100,56 @@ public:
 	FMyGameplayAttributeData Mana_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana_Replay);
 	
+#pragma region 基础 属性：五行元素
 	/**
-	 * 内攻值
-	 * 不可被闪避
-	 * 可被对方内功减少伤害
+	 * Value					元素强度
+	 * Level					元素等级 0 3 6 9
+	 * Penetration				元素抗性
+	 * Resistance				元素固定穿透
+	 * PercentPenetration		元素穿透百分比
 	 */
+	 
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData AP;
-	ATTRIBUTE_ACCESSORS(UAS_Character, AP);
+	FMyGameplayAttributeData MetalValue;
+	ATTRIBUTE_ACCESSORS(UAS_Character, MetalValue);
 	
-	/**
-	 * 外功值
-	 * 可被闪避
-	 * 可被抗性减少伤害
-	 * 武器攻击时默认的加成
-	 */
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData AD;
-	ATTRIBUTE_ACCESSORS(UAS_Character, AD);
+	FMyGameplayAttributeData MetalLevel;
+	ATTRIBUTE_ACCESSORS(UAS_Character, MetalLevel);
 	
-	// 攻击力穿透
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData AD_Penetration;
-	ATTRIBUTE_ACCESSORS(UAS_Character, AD_Penetration);
+	FMyGameplayAttributeData MetalPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, MetalPenetration);
 	
-	// 攻击力百分比穿透
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData AD_PercentPenetration;
-	ATTRIBUTE_ACCESSORS(UAS_Character, AD_PercentPenetration);
+	FMyGameplayAttributeData MetalPercentPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, MetalPercentPenetration);
 	
-	// AD 抗性
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData AD_Resistance;
-	ATTRIBUTE_ACCESSORS(UAS_Character, AD_Resistance);
+	FMyGameplayAttributeData MetalResistance;
+	ATTRIBUTE_ACCESSORS(UAS_Character, MetalResistance);
+
+	
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WoodValue;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WoodValue);
+	
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WoodLevel;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WoodLevel);
+	
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WoodPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WoodPenetration);
+	
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WoodPercentPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WoodPercentPenetration);
+	
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WoodResistance;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WoodResistance);
+#pragma endregion
 	
 	UPROPERTY(ReplicatedUsing = OnRep_MoveSpeed, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData MoveSpeed;
@@ -175,7 +192,7 @@ public:
 	FMyGameplayAttributeData Shield;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Shield);
 	
-	// 基础 属性：力道、根骨、身法、洞察、天资
+#pragma region 基础 属性：力道、根骨、身法、洞察、天资
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData LiDao;
 	ATTRIBUTE_ACCESSORS(UAS_Character, LiDao);
@@ -195,5 +212,6 @@ public:
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData TianZi;
 	ATTRIBUTE_ACCESSORS(UAS_Character, TianZi);
+#pragma endregion
 	
 };

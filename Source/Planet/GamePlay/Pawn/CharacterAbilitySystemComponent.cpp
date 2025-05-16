@@ -1072,9 +1072,9 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 				          UGameplayTagsLibrary::DataSource_Character,
 				          Iter.Value,
 				          0.f,
-				          TargetSet->GetMax_PP(),
+				          TargetSet->GetMax_Stamina(),
 				          Spec,
-				          UAS_Character::GetPPAttribute().GetGameplayAttributeData(TargetSet)
+				          UAS_Character::GetStaminaAttribute().GetGameplayAttributeData(TargetSet)
 				         );
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
@@ -1170,11 +1170,11 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			{
 				OutExecutionOutput.AddOutputModifier(
 				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetPPAttribute(),
+					                                      UAS_Character::GetStaminaAttribute(),
 					                                      EGameplayModOp::Override,
 					                                      GetMapValue(
 					                                                  Spec,
-					                                                  UAS_Character::GetPPAttribute().
+					                                                  UAS_Character::GetStaminaAttribute().
 					                                                  GetGameplayAttributeData(TargetSet)
 					                                                 )
 					                                     )

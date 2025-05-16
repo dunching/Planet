@@ -42,7 +42,7 @@ void UBasicFutures_Running::IntervalTick(
 
 			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 			if (
-				CharacterAttributes->GetPP() >=
+				CharacterAttributes->GetStamina() >=
 				RunningConsume.GetCurrentValue()
 			)
 			{
@@ -171,7 +171,7 @@ bool UBasicFutures_Running::CanActivateAbility(
 		{
 			auto CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 			if (
-				CharacterAttributes->GetPP() >=
+				CharacterAttributes->GetStamina() >=
 				RunningConsume.GetCurrentValue()
 			)
 			{

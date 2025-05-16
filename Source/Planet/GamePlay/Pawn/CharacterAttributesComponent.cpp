@@ -100,6 +100,12 @@ void UCharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	// DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_AutonomousOnly);
+	DOREPLIFETIME_CONDITION(ThisClass, ElementalType, COND_None);
+	
+	DOREPLIFETIME_CONDITION(ThisClass, WoodLevel, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WoodResistance, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, WoodValue, COND_None);
+	
 	DOREPLIFETIME_CONDITION(ThisClass, CharacterID, COND_InitialOnly);
 
 	//DOREPLIFETIME_CONDITION(ThisClass, CharacterAttributes, COND_SimulatedOnly);

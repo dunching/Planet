@@ -78,7 +78,7 @@ bool USkill_Active_Shield::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP())
+	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetStamina())
 	{
 		return false;
 	}

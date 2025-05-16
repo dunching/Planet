@@ -104,7 +104,7 @@ void UGEEC_Reply::Execute_Implementation(
 		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
 
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_HP, SourceSet->GetHP_Replay());
-	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_PP, SourceSet->GetPP_Replay());
+	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_PP, SourceSet->GetStamina_Replay());
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_Mana, SourceSet->GetMana_Replay());
 
 	CustomMagnitudes.Append(Spec.SetByCallerTagMagnitudes);

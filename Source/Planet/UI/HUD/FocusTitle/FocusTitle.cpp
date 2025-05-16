@@ -109,12 +109,12 @@ void UFocusTitle::SetTargetCharacter(ACharacterBase* TargetCharacterPtr)
 		}
 		{
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributesPtr->GetPPAttribute()
+				CharacterAttributesPtr->GetStaminaAttribute()
 			).AddUObject(this, &ThisClass::OnPPChanged);
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributesPtr->GetMax_PPAttribute()
+				CharacterAttributesPtr->GetMax_StaminaAttribute()
 			).AddUObject(this, &ThisClass::OnPPChanged);
-			SetPP(CharacterAttributesPtr->GetPP(), CharacterAttributesPtr->GetMax_PP());
+			SetPP(CharacterAttributesPtr->GetStamina(), CharacterAttributesPtr->GetMax_Stamina());
 		}
 		{
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
@@ -200,7 +200,7 @@ void UFocusTitle::SetHPChanged(float Value, float MaxValue)
 void UFocusTitle::OnPPChanged(const FOnAttributeChangeData& CurrentValue)
 {
 	auto CharacterAttributesPtr = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	SetHPChanged(CharacterAttributesPtr->GetPP(), CharacterAttributesPtr->GetMax_PP());
+	SetHPChanged(CharacterAttributesPtr->GetStamina(), CharacterAttributesPtr->GetMax_Stamina());
 }
 
 void UFocusTitle::SetPP(float Value, float MaxValue)

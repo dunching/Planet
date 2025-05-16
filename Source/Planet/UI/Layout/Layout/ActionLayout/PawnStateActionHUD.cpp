@@ -38,13 +38,7 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 
 	const FName WeaponActiveSkill2 = TEXT("WeaponActiveSkill2");
 
-	const FName TalentStateSocket = TEXT("TalentStateSocket");
-
-	const FName AD = TEXT("AD");
-
-	const FName AD_Penetration = TEXT("AD_Penetration");
-
-	const FName AD_Resistance = TEXT("AD_Resistance");
+	const FName PassiveSkill1 = TEXT("PassiveSkill1");
 
 	const FName MoveSpeed = TEXT("MoveSpeed");
 
@@ -56,9 +50,7 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 
 	const FName Mana = TEXT("Mana");
 
-	const FName Shield = TEXT("Shield");
-
-	const FName Gold = TEXT("Gold");
+	const FName Metal = TEXT("Metal");
 
 	const FName Wood = TEXT("Wood");
 
@@ -66,7 +58,7 @@ struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 
 	const FName Fire = TEXT("Fire");
 
-	const FName Soil = TEXT("Soil");
+	const FName Earth = TEXT("Earth");
 };
 
 void UPawnStateActionHUD::NativeConstruct()
@@ -149,10 +141,10 @@ void UPawnStateActionHUD::Enable()
 			}
 			UIPtr->SetDataSource(
 			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetPPAttribute(),
-			                     CharacterAttributeSetPtr->GetPP(),
-			                     CharacterAttributeSetPtr->GetMax_PPAttribute(),
-			                     CharacterAttributeSetPtr->GetMax_PP()
+			                     CharacterAttributeSetPtr->GetStaminaAttribute(),
+			                     CharacterAttributeSetPtr->GetStamina(),
+			                     CharacterAttributeSetPtr->GetMax_StaminaAttribute(),
+			                     CharacterAttributeSetPtr->GetMax_Stamina()
 			                    );
 		}
 		{
@@ -167,60 +159,6 @@ void UPawnStateActionHUD::Enable()
 			                     CharacterAttributeSetPtr->GetMana(),
 			                     CharacterAttributeSetPtr->GetMax_ManaAttribute(),
 			                     CharacterAttributeSetPtr->GetMax_Mana()
-			                    );
-		}
-		{
-			auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().Shield));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetShieldAttribute(),
-			                     CharacterAttributeSetPtr->GetShield(),
-			                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
-			                     CharacterAttributeSetPtr->GetMax_HP()
-			                    );
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetShieldAttribute(),
-			                     CharacterAttributeSetPtr->GetShield(),
-			                     CharacterAttributeSetPtr->GetMax_HPAttribute(),
-			                     CharacterAttributeSetPtr->GetMax_HP()
-			                    );
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Penetration));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetADAttribute(),
-			                     CharacterAttributeSetPtr->GetAD(),
-			                     CharacterAttributeSetPtr->GetAD_PenetrationAttribute(),
-			                     CharacterAttributeSetPtr->GetAD_Penetration()
-			                    );
-		}
-		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().AD_Resistance));
-			if (!UIPtr)
-			{
-				return;
-			}
-			UIPtr->SetDataSource(
-			                     AbilitySystemComponentPtr,
-			                     CharacterAttributeSetPtr->GetAD_ResistanceAttribute(),
-			                     CharacterAttributeSetPtr->GetAD_Resistance()
 			                    );
 		}
 		{
@@ -248,14 +186,6 @@ void UPawnStateActionHUD::Enable()
 			                    );
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Gold));
-			if (!UIPtr)
-			{
-				return;
-			}
-			// UIPtr->SetDataSource(CharacterAttributes.GoldElement);
-		}
-		{
 			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Wood));
 			if (!UIPtr)
 			{
@@ -280,7 +210,7 @@ void UPawnStateActionHUD::Enable()
 			// UIPtr->SetDataSource(CharacterAttributes.FireElement);
 		}
 		{
-			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Soil));
+			auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Earth));
 			if (!UIPtr)
 			{
 				return;
@@ -348,52 +278,6 @@ void UPawnStateActionHUD::BindEvent()
 
 void UPawnStateActionHUD::InitialTalentUI()
 {
-	auto BorderPtr = Cast<UBorder>(GetWidgetFromName(FPawnStateActionHUD::Get().TalentStateSocket));
-	if (!BorderPtr)
-	{
-		return;
-	}
-	BorderPtr->ClearChildren();
-
-	if (!CharacterPtr)
-	{
-		return;
-	}
-	const auto& SkillsMap = CharacterPtr->GetProxyProcessComponent()->GetAllSocket();
-	const auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
-	for (auto Iter : SkillsMap)
-	{
-		auto ProxySPtr = InventoryComponentPtr->FindProxy_BySocket(Iter.Value);
-		bool bIsGiveTalentPassive = false;
-		if (
-			ProxySPtr
-		)
-		{
-			if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(
-				 UGameplayTagsLibrary::Proxy_Skill_Talent_NuQi
-				))
-			{
-				auto UIPtr = CreateWidget<UState_Talent_NuQi>(this, State_Talent_NuQi_Class);
-				if (UIPtr)
-				{
-					BorderPtr->AddChild(UIPtr);
-					bIsGiveTalentPassive = true;
-				}
-			}
-			else if (DynamicCastSharedPtr<FBasicProxy>(ProxySPtr)->GetProxyType().MatchesTag(
-				 UGameplayTagsLibrary::Proxy_Skill_Talent_YinYang
-				))
-			{
-				auto UIPtr = CreateWidget<UState_Talent_YinYang>(this, Talent_YinYang_Class);
-				if (UIPtr)
-				{
-					UIPtr->TargetCharacterPtr = CharacterPtr;
-					BorderPtr->AddChild(UIPtr);
-					bIsGiveTalentPassive = true;
-				}
-			}
-		}
-	}
 }
 
 void UPawnStateActionHUD::InitialActiveSkillIcon()
@@ -528,5 +412,26 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 				UIPtr->ResetToolUIByData(nullptr);
 			}
 		}
+	}
+}
+
+void UPawnStateActionHUD::BindElementalData(
+		const UAS_Character* CharacterAttributeSetPtr,
+		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
+		)
+{
+	{
+		auto UIPtr = Cast<UMyBaseProperty>(GetWidgetFromName(FPawnStateActionHUD::Get().Metal));
+		if (!UIPtr)
+		{
+			return;
+		}
+		UIPtr->SetDataSource(
+							 AbilitySystemComponentPtr,
+							 CharacterAttributeSetPtr->GetShieldAttribute(),
+							 CharacterAttributeSetPtr->GetShield(),
+							 CharacterAttributeSetPtr->GetMax_HPAttribute(),
+							 CharacterAttributeSetPtr->GetMax_HP()
+							);
 	}
 }

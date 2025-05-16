@@ -67,7 +67,7 @@ bool USkill_Active_DisplacementNoPhy::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 ) const
 {
-	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP())
+	if (PP > CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetStamina())
 	{
 		return false;
 	}

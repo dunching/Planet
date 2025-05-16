@@ -121,8 +121,7 @@ void AResourceBox::InteractionImp_Implementation()
 		UGameplayStatics::PlaySoundAtLocation(
 		                                      this,
 		                                      OpenBoxSoundRef.LoadSynchronous(),
-		                                      GetActorLocation(),
-		                                      UGameOptions::GetInstance()->VolumeMultiplier
+		                                      GetActorLocation()
 		                                     );
 	}
 #endif

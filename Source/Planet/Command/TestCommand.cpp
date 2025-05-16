@@ -1,5 +1,10 @@
 #include "TestCommand.h"
 
+#include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetStringLibrary.h"
+#include "Sound/SoundMix.h"
+#include "Sound/SoundClass.h"
+
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
@@ -10,8 +15,6 @@
 #include "InventoryComponent.h"
 #include "PlanetPlayerController.h"
 #include "Planet_Tools.h"
-#include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetStringLibrary.h"
 
 // #include "Kismet/GameplayStatics.h"
 
@@ -233,12 +236,16 @@ void TestCommand::SetBGMVolume(
 	{
 		return;
 	}
+	USoundMix;
+	USoundClass;
+	float Volume = 0.0f;
+	LexFromString(Volume, Args[0]);
 
 	UGameplayStatics::SetSoundMixClassOverride(
 	                                           GetWorldImp(),
 	                                           UAssetRefMap::GetInstance()->SoundMixRef.LoadSynchronous(),
 	                                           UAssetRefMap::GetInstance()->BGMSoundClassRef.LoadSynchronous(),
-	                                           UKismetStringLibrary::Conv_StringToInt(Args[0])
+	                                           Volume
 	                                          );
 #endif
 }

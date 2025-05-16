@@ -137,7 +137,6 @@ void APlanetPlayerState::UpdateCurrentPosition_Implementation(
 		if (GetNetMode() == NM_Client)
 		{
 			AudioComponentPtr->SetSound(TableRow_RegionsPtr->RegionBGM.LoadSynchronous());
-			AudioComponentPtr->SetVolumeMultiplier(UGameOptions::GetInstance()->VolumeMultiplier);
 			AudioComponentPtr->Play();
 
 			if (UUIManagerSubSystem::GetInstance()->GetMainHUDLayout())

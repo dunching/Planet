@@ -158,8 +158,8 @@ void UCharacterTitle::SetHPChanged(float Value, float MaxValue)
 
 void UCharacterTitle::OnPPChanged(const FOnAttributeChangeData&)
 {
-	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetPP();
-	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_PP();
+	const auto Value = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetStamina();
+	const auto MaxValue = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes()->GetMax_Stamina();
 	SetPPChanged(Value, MaxValue);
 }
 
@@ -267,14 +267,14 @@ void UCharacterTitle::SetData(ACharacterBase* InCharacterPtr)
 		}
 		{
 			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetPPAttribute()
+				CharacterAttributeSetPtr->GetStaminaAttribute()
 				).AddUObject(this, &ThisClass::OnPPChanged);
 
 			AbilitySystemComponentPtr->GetGameplayAttributeValueChangeDelegate(
-				CharacterAttributeSetPtr->GetMax_PPAttribute()
+				CharacterAttributeSetPtr->GetMax_StaminaAttribute()
 				).AddUObject(this, &ThisClass::OnPPChanged);
 
-			SetPPChanged(CharacterAttributeSetPtr->GetPP(), CharacterAttributeSetPtr->GetMax_PP());
+			SetPPChanged(CharacterAttributeSetPtr->GetStamina(), CharacterAttributeSetPtr->GetMax_Stamina());
 		}
 		{
 			CharacterPtr->GetCharacterAbilitySystemComponent()->GetGameplayAttributeValueChangeDelegate(

@@ -243,8 +243,7 @@ void UGetItemInfosList::OnCoinProxyChanged(
 				//
 				UGameplayStatics::SpawnSound2D(
 													  this,
-													  GetCoinsSoundRef.LoadSynchronous(),
-													  UGameOptions::GetInstance()->VolumeMultiplier
+													  GetCoinsSoundRef.LoadSynchronous()
 													 );
 			}
 		}
