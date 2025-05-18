@@ -48,6 +48,8 @@ public:
 
 	using FWeaponActorType = AWeapon_PickAxe;
 
+	using FItemProxy_DescriptionType = UItemProxy_Description_WeaponSkill;
+	
 	USkill_WeaponActive_PickAxe();
 
 	virtual void OnAvatarSet(
@@ -108,17 +110,12 @@ protected:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	float Distance = 100.f;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	EElementalType ElementalType = EElementalType::kMetal;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Elemental_Damage = 10;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float Elemental_Damage_Magnification = .5f;
-
 	FWeaponActorType* WeaponActorPtr = nullptr;
 
 	int32 MontageNum = 0;
+
+private:
+	
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
 };

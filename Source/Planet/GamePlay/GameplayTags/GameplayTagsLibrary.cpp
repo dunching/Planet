@@ -465,6 +465,9 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration =
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.Resistance")));
 
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_True =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.True")));
+
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.Metal")));
 

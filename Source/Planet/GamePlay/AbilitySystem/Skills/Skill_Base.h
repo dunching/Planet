@@ -25,7 +25,7 @@ struct FGameplayAbilityTargetData_SkillBase_RegisterParam :
 		FArchive& Ar,
 		class UPackageMap* Map,
 		bool& bOutSuccess
-	) override;
+		) override;
 
 	virtual FGameplayAbilityTargetData_SkillBase_RegisterParam* Clone() const override;
 
@@ -57,7 +57,7 @@ public:
 	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
-	) override;
+		) override;
 
 	virtual void PreActivate(
 		const FGameplayAbilitySpecHandle Handle,
@@ -65,14 +65,14 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+		);
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-	);
+		);
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -80,26 +80,26 @@ public:
 		const FGameplayTagContainer* SourceTags = nullptr,
 		const FGameplayTagContainer* TargetTags = nullptr,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	) const override;
+		) const override;
 
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	) override;
+		) override;
 
 	virtual void CancelAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateCancelAbility
-	) override;
+		) override;
 
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilitySpec& Spec
-	) override;
+		) override;
 
 	virtual UGameplayEffect* GetCooldownGameplayEffect() const override;
 
@@ -120,19 +120,19 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FGameplayEffectSpecHandle SpecHandle,
 		const FGameplayAbilityTargetDataHandle& TargetData
-	) const;
+		) const;
 
 	const TArray<FAbilityTriggerData>& GetTriggers() const;
 
 	virtual void UpdateRegisterParam(
 		const FGameplayEventData& GameplayEventData
-	);
+		);
 
 	/**
 	 * 获取持续性或具备下一段输入的，不立即进入CD的GA的剩余持续时间
 	 * @return > 0 有时间, < 0 无限制时间
 	 */
-	virtual float GetRemainTime()const;
+	virtual float GetRemainTime() const;
 
 protected:
 	virtual void ResetPreviousStageActions();
@@ -143,17 +143,23 @@ protected:
 	// 确认锁定的目标是否在范围内
 	bool CheckTargetInDistance(
 		int32 Distance
-	) const;
+		) const;
 
 	// 确认锁定的目标是否在范围上（需要跟目标保持一定距离）
 	bool CheckTargetIsEqualDistance(
 		int32 Distance
-	) const;
+		) const;
 
 	// 获取范围内任意可攻击的目标
 	ACharacterBase* GetTargetInDistance(
 		int32 MaxDistance
-	) const;
+		) const;
+
+	FGameplayEffectSpecHandle MakeDamageToTarget(
+		EElementalType ElementalType,
+		int32 Elemental_Damage,
+		float Elemental_Damage_Magnification
+		);
 
 	ACharacterBase* CharacterPtr = nullptr;
 

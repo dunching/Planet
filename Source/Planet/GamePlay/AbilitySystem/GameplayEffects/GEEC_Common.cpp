@@ -7,34 +7,51 @@
 #include "GE_Common.h"
 
 void UGEEC_Base::ApplyModifyData(
-		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-		FGameplayEffectCustomExecutionOutput& OutExecutionOutput,
-		const TMap<FGameplayTag, float>& SetByCallerTagMagnitudes,
-		TObjectPtr<ACharacterBase>InstigatorPtr,
-		TObjectPtr<ACharacterBase>TargetCharacterPtr
-) const
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput,
+	const TMap<FGameplayTag, float>& SetByCallerTagMagnitudes,
+	TObjectPtr<ACharacterBase> InstigatorPtr,
+	TObjectPtr<ACharacterBase> TargetCharacterPtr
+	) const
 {
+	// 获得对应GE对象
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
+
+	FGameplayTagContainer AllAssetTags;
+	Spec.GetAllAssetTags(AllAssetTags);
+
+	TSet<FGameplayTag> NeedModifySet;
+
 	auto CustomMagnitudes = InstigatorPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
-		SetByCallerTagMagnitudes,
-		ExecutionParams,
-		OutExecutionOutput
-	);
+		 AllAssetTags,
+		 NeedModifySet,
+		 SetByCallerTagMagnitudes,
+		 ExecutionParams,
+		 OutExecutionOutput
+		);
 
 	CustomMagnitudes = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyInputData(
-		CustomMagnitudes,
-		ExecutionParams,
-		OutExecutionOutput
-	);
+		 AllAssetTags,
+		 NeedModifySet,
+		 CustomMagnitudes,
+		 ExecutionParams,
+		 OutExecutionOutput
+		);
 
 	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ApplyInputData(
-		CustomMagnitudes,
-		ExecutionParams,
-		OutExecutionOutput
-	);
+	                                                                         AllAssetTags,
+	                                                                         NeedModifySet,
+	                                                                         CustomMagnitudes,
+	                                                                         ExecutionParams,
+	                                                                         OutExecutionOutput
+	                                                                        );
 }
 
-void UGEEC_DataModify::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-                                              FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UGEEC_DataModify::Execute_Implementation(
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+	) const
 {
 	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
@@ -43,13 +60,17 @@ void UGEEC_DataModify::Execute_Implementation(const FGameplayEffectCustomExecuti
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
 	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
-	
+
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
 	if (
-		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::State_Dying) ||
-		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(UGameplayTagsLibrary::Respawning)
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
+			 UGameplayTagsLibrary::State_Dying
+			) ||
+		TargetCharacterPtr->GetCharacterAbilitySystemComponent()->HasMatchingGameplayTag(
+			 UGameplayTagsLibrary::Respawning
+			)
 	)
 	{
 		return;
@@ -60,20 +81,20 @@ void UGEEC_DataModify::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	TMap<FGameplayTag, float> CustomMagnitudes;
 	CustomMagnitudes.Append(Spec.SetByCallerTagMagnitudes);
-	
+
 	ApplyModifyData(
-		ExecutionParams,
-		OutExecutionOutput,
-		CustomMagnitudes,
-		Instigator,
-		TargetCharacterPtr
-	);
+	                ExecutionParams,
+	                OutExecutionOutput,
+	                CustomMagnitudes,
+	                Instigator,
+	                TargetCharacterPtr
+	               );
 }
 
 void UGEEC_Reply::Execute_Implementation(
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-) const
+	) const
 {
 	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
@@ -82,7 +103,7 @@ void UGEEC_Reply::Execute_Implementation(
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
 	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
-	
+
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
@@ -101,25 +122,30 @@ void UGEEC_Reply::Execute_Implementation(
 
 	// 获得来源AttributeSet
 	const auto SourceSet = Cast<UAS_Character>(
-		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
+	                                           ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(
+		                                            UAS_Character::StaticClass()
+		                                           )
+	                                          );
 
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_HP, SourceSet->GetHP_Replay());
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_Stamina, SourceSet->GetStamina_Replay());
 	CustomMagnitudes.Add(UGameplayTagsLibrary::GEData_ModifyItem_Mana, SourceSet->GetMana_Replay());
 
 	CustomMagnitudes.Append(Spec.SetByCallerTagMagnitudes);
-	
+
 	ApplyModifyData(
-		ExecutionParams,
-		OutExecutionOutput,
-		CustomMagnitudes,
-		Instigator,
-		TargetCharacterPtr
-	);
+	                ExecutionParams,
+	                OutExecutionOutput,
+	                CustomMagnitudes,
+	                Instigator,
+	                TargetCharacterPtr
+	               );
 }
 
-void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-                                           FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UGEEC_Running::Execute_Implementation(
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+	) const
 {
 	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
@@ -128,7 +154,7 @@ void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionP
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
 	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
-	
+
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
@@ -147,17 +173,32 @@ void UGEEC_Running::Execute_Implementation(const FGameplayEffectCustomExecutionP
 
 	// 获得来源AttributeSet
 	const auto SourceSet = Cast<UAS_Character>(
-		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
+	                                           ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(
+		                                            UAS_Character::StaticClass()
+		                                           )
+	                                          );
 
 	const auto MoveSpeedOffset = Cast<UGE_Running>(Spec.Def)->MoveSpeedOffset.GetValue();
 	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, MoveSpeedOffset);
 
-	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(CustomMagnitudes, ExecutionParams,
-	                                                                 OutExecutionOutput);
+	FGameplayTagContainer AllAssetTags;
+	Spec.GetAllAssetTags(AllAssetTags);
+
+	TSet<FGameplayTag> NeedModifySet;
+
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
+	                                                                           AllAssetTags,
+	                                                                           NeedModifySet,
+	                                                                           CustomMagnitudes,
+	                                                                           ExecutionParams,
+	                                                                           OutExecutionOutput
+	                                                                          );
 }
 
-void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-                                                 FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
+void UGEEC_CancelRunning::Execute_Implementation(
+	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
+	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
+	) const
 {
 	// Super::Execute_Implementation(ExecutionParams, OutExecutionOutput);
 
@@ -166,7 +207,7 @@ void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExec
 	FGameplayEffectContextHandle Context = Spec.GetContext();
 
 	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
-	
+
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 	auto EffectCauser = Cast<ACharacterBase>(Context.GetEffectCauser());
 
@@ -185,10 +226,23 @@ void UGEEC_CancelRunning::Execute_Implementation(const FGameplayEffectCustomExec
 
 	// 获得来源AttributeSet
 	const auto SourceSet = Cast<UAS_Character>(
-		ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(UAS_Character::StaticClass()));
+	                                           ExecutionParams.GetSourceAbilitySystemComponent()->GetAttributeSet(
+		                                            UAS_Character::StaticClass()
+		                                           )
+	                                          );
 
 	CustomMagnitudes.Add(UGameplayTagsLibrary::DataSource_Character, 0);
 
-	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(CustomMagnitudes, ExecutionParams,
-	                                                                 OutExecutionOutput);
+	FGameplayTagContainer AllAssetTags;
+	Spec.GetAllAssetTags(AllAssetTags);
+
+	TSet<FGameplayTag> NeedModifySet;
+
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
+	                                                                           AllAssetTags,
+	                                                                           NeedModifySet,
+	                                                                           CustomMagnitudes,
+	                                                                           ExecutionParams,
+	                                                                           OutExecutionOutput
+	                                                                          );
 }

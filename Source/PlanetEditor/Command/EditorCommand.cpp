@@ -596,3 +596,16 @@ void EditorCommand::ModifyElementalData(
 
 	PCPtr->ModifyElementalData(Args);
 }
+
+void EditorCommand::ModifyElementalDataToTarget(
+	const TArray<FString>& Args
+	)
+{
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (!PCPtr)
+	{
+		return;
+	}
+
+	PCPtr->ModifyElementalDataToTarget(Args);
+}

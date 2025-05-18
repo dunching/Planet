@@ -33,6 +33,7 @@
 #include "ItemProxy_Character.h"
 #include "LogWriter.h"
 #include "PlanetGameplayAbilityTargetTypes.h"
+#include "SceneProxyTable.h"
 
 namespace Skill_WeaponActive_PickAxe
 {
@@ -82,6 +83,14 @@ void USkill_WeaponActive_PickAxe::OnAvatarSet(
 
 	if (CharacterPtr)
 	{
+		if (SkillProxyPtr)
+		{
+			ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			                                                            DynamicCastSharedPtr<FWeaponSkillProxy>(
+				                                                             SkillProxyPtr
+				                                                            )->GetTableRowProxy_WeaponSkillExtendInfo()
+			                                                           );
+		}
 	}
 }
 
@@ -242,9 +251,6 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 	                                          CapsuleParams
 	                                         ))
 	{
-		const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-		const int32 BaseDamage = Elemental_Damage ;
-
 		TSet<ACharacterBase*> TargetCharacterSet;
 		for (auto Iter : OutHits)
 		{
@@ -263,16 +269,11 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			}
 		}
 
-		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
-		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-
-		SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-		                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
-		                                               BaseDamage
-		                                              );
+		FGameplayEffectSpecHandle SpecHandle = MakeDamageToTarget(
+		                                                          ItemProxy_DescriptionPtr->ElementalType,
+		                                                          ItemProxy_DescriptionPtr->Elemental_Damage,
+		                                                          ItemProxy_DescriptionPtr->Elemental_Damage_Magnification
+		                                                         );
 
 		TArray<TWeakObjectPtr<AActor>> Ary;
 		for (auto Iter : TargetCharacterSet)

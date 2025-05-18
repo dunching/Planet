@@ -53,6 +53,10 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 		                                                 this,
 		                                                 &ThisClass::OnActiveGEAddedDelegateToSelf
 		                                                );
+
+
+		AddInputModify(MakeShared<IInputData_BasicData_ModifyInterface>(100));
+		AddInputModify(MakeShared<IInputData_Shield_ModifyInterface>(101));
 	}
 #endif
 }
@@ -854,14 +858,14 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 	if (!ValueMap.Contains(GameplayAttributeDataPtr))
 	{
 		ValueMap.Add(
-					 GameplayAttributeDataPtr,
-					 {
-						 {
-							 UGameplayTagsLibrary::DataSource_Character,
-						 	GameplayAttributeDataPtr->GetCurrentValue()
-						 }
-					 }
-					);
+		             GameplayAttributeDataPtr,
+		             {
+			             {
+				             UGameplayTagsLibrary::DataSource_Character,
+				             GameplayAttributeDataPtr->GetCurrentValue()
+			             }
+		             }
+		            );
 	}
 
 	if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary))
@@ -877,6 +881,45 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 			GameplayAttributeDataMap.Remove(Tag);
 		}
 	}
+}
+
+void UCharacterAbilitySystemComponent::UpdateMapTemporary(
+	const FGameplayTag& ModifyTypeTag,
+	float Value,
+	const FGameplayAttributeData* GameplayAttributeDataPtr
+	)
+{
+	if (ValueMap.Contains(GameplayAttributeDataPtr))
+	{
+		if (ModifyTypeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			for (auto& Iter : GameplayAttributeDataMap)
+			{
+				if (Value > Iter.Value)
+				{
+					Value -= Iter.Value;
+					if (Value <= 0)
+					{
+						break;
+					}
+				}
+				else
+				{
+					Iter.Value = Iter.Value
+					             + Value;
+					break;
+				}
+			}
+		}
+		else if (ModifyTypeTag.MatchesTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override))
+		{
+			auto& GameplayAttributeDataMap = ValueMap[GameplayAttributeDataPtr];
+			GameplayAttributeDataMap.Empty();
+		}
+	}
+
+	UpdateValueMap();
 }
 
 float UCharacterAbilitySystemComponent::GetBaseValueMaps(
@@ -899,6 +942,24 @@ float UCharacterAbilitySystemComponent::GetBaseValueMaps(
 	}
 
 	return Result;
+}
+
+void UCharacterAbilitySystemComponent::UpdateValueMap()
+{
+	for (auto Iter = ValueMap.CreateIterator(); Iter; ++Iter)
+	{
+		for (auto SecondIter = Iter->Value.CreateIterator(); SecondIter; ++SecondIter)
+		{
+			if (SecondIter->Value <= 0)
+			{
+				SecondIter.RemoveCurrent();
+			}
+		}
+		if (Iter->Value.IsEmpty())
+		{
+			Iter.RemoveCurrent();
+		}
+	}
 }
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData()
@@ -984,6 +1045,8 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 }
 
 TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
+	const FGameplayTagContainer& AllAssetTags,
+	TSet<FGameplayTag>& NeedModifySet,
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
@@ -994,9 +1057,15 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
 	// 根据自身的效果对【输入】进行一些修正
 	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
 
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
+	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
+
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+
 	for (auto Iter = InputDataModifysMap.begin(); Iter != InputDataModifysMap.end(); Iter++)
 	{
-		if ((*Iter)->Modify(Result) && (*Iter)->bIsOnceTime)
+		if ((*Iter)->Modify(Instigator, TargetCharacterPtr, NeedModifySet, Result) && (*Iter)->bIsOnceTime)
 		{
 			NeedRemoveIterAry.Add(Iter);
 		}
@@ -1011,6 +1080,8 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
 }
 
 TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
+	const FGameplayTagContainer& AllAssetTags,
+	TSet<FGameplayTag>& NeedModifySet,
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
@@ -1019,11 +1090,17 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
 	TMap<FGameplayTag, float> Result = CustomMagnitudes;
 
 	// 根据自身的效果对【输出】进行一些修正
-	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
+	TArray<decltype(OutputDataModifysMap)::iterator> NeedRemoveIterAry;;
 
-	for (auto Iter = InputDataModifysMap.begin(); Iter != InputDataModifysMap.end(); Iter++)
+	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle Context = Spec.GetContext();
+	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
+
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+
+	for (auto Iter = OutputDataModifysMap.begin(); Iter != OutputDataModifysMap.end(); Iter++)
 	{
-		if ((*Iter)->Modify(Result) && (*Iter)->bIsOnceTime)
+		if ((*Iter)->Modify(Instigator, TargetCharacterPtr, NeedModifySet, Result) && (*Iter)->bIsOnceTime)
 		{
 			NeedRemoveIterAry.Add(Iter);
 		}
@@ -1031,23 +1108,25 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
 
 	for (auto Iter : NeedRemoveIterAry)
 	{
-		InputDataModifysMap.erase(Iter);
+		OutputDataModifysMap.erase(Iter);
 	}
 
 	return Result;
 }
 
 void UCharacterAbilitySystemComponent::ApplyInputData(
+	const FGameplayTagContainer& AllAssetTags,
+	TSet<FGameplayTag>& NeedModifySet,
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
 {
+	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
+
 	// 获得对应GE对象
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle Context = Spec.GetContext();
-
-	auto TargetCharacterPtr = Cast<ACharacterBase>(ExecutionParams.GetTargetAbilitySystemComponent()->GetOwnerActor());
 
 	auto Instigator = Cast<ACharacterBase>(Context.GetInstigator());
 
@@ -1057,9 +1136,6 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		                                            UAS_Character::StaticClass()
 		                                           )
 	                                          );
-
-	FGameplayTagContainer AllAssetTags;
-	Spec.GetAllAssetTags(AllAssetTags);
 
 	// 回执
 	FOnEffectedTawrgetCallback ReceivedEventModifyDataCallback;
@@ -1076,109 +1152,67 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override)
 	)
 	{
+		auto Lambda = [&ReceivedEventModifyDataCallback, &NeedModifySet, this, TargetSet, &Spec](
+			const TPair<FGameplayTag, float>& Iter,
+			const float MaxValue,
+			const FGameplayAttribute& Attribute
+			)
+		{
+			NeedModifySet.Add(Iter.Key);
+			UpdateMapBaseValue(
+			                   UGameplayTagsLibrary::DataSource_Character,
+			                   Iter.Value,
+			                   0.f,
+			                   MaxValue,
+			                   Spec,
+			                   Attribute.GetGameplayAttributeData(TargetSet)
+			                  );
+
+			ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
+		};
 		for (const auto& Iter : CustomMagnitudes)
 		{
 			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->GetMax_HP(),
-				                   Spec,
-				                   UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
-
-				ReceivedEventModifyDataCallback.TherapeuticalDose = Iter.Value;
+				Lambda(Iter, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->GetMax_Stamina(),
-				                   Spec,
-				                   UAS_Character::GetStaminaAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
+				Lambda(Iter, TargetSet->GetMax_Stamina(), UAS_Character::GetStaminaAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->GetMax_Mana(),
-				                   Spec,
-				                   UAS_Character::GetManaAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
+				Lambda(Iter, TargetSet->GetMax_Mana(), UAS_Character::GetManaAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->MaxElementalValue,
-				                   Spec,
-				                   UAS_Character::GetMetalValueAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
+				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetMetalValueAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->MaxElementalLevel,
-				                   Spec,
-				                   UAS_Character::GetMetalLevelAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
+				Lambda(Iter, TargetSet->MaxElementalLevel, UAS_Character::GetMetalLevelAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->MaxElementalPenetration,
-				                   Spec,
-				                   UAS_Character::GetMetalPenetrationAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
+				Lambda(Iter, TargetSet->MaxElementalPenetration, UAS_Character::GetMetalPenetrationAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->MaxElementalPercentPenetration,
-				                   Spec,
-				                   UAS_Character::GetMetalPercentPenetrationAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
+				Lambda(
+				       Iter,
+				       TargetSet->MaxElementalPercentPenetration,
+				       UAS_Character::GetMetalPercentPenetrationAttribute()
+				      );
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   Iter.Value,
-				                   0.f,
-				                   TargetSet->MaxElementalResistance,
-				                   Spec,
-				                   UAS_Character::GetMetalResistanceAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
+				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetMetalResistanceAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 			{
-				UpdateMapBaseValue(
-				                   UGameplayTagsLibrary::DataSource_Character,
-				                   -Iter.Value,
-				                   0.f,
-				                   TargetSet->GetMax_HP(),
-				                   Spec,
-				                   UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
-
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
 				ReceivedEventModifyDataCallback.Damage = Iter.Value;
 			}
 		}
@@ -1189,249 +1223,102 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary)
 	)
 	{
-		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		auto Lambda = [&NeedModifySet, this, TargetSet, &Spec, &CustomMagnitudes](
+			const FGameplayTag& ModifyItemTag,
+			const FGameplayAttribute& Attribute
+			)
 		{
+			NeedModifySet.Add(ModifyItemTag);
 			for (const auto& Iter : CustomMagnitudes)
 			{
 				UpdateMapTemporary(
 				                   Iter.Key,
 				                   Iter.Value,
 				                   Spec,
-				                   UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet)
+				                   Attribute.GetGameplayAttributeData(TargetSet)
 				                  );
 			}
+		};
+		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		{
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed, UAS_Character::GetMoveSpeedAttribute());
 		}
 		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
 		{
-			for (const auto& Iter : CustomMagnitudes)
-			{
-				UpdateMapTemporary(
-				                   Iter.Key,
-				                   Iter.Value,
-				                   Spec,
-				                   UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
-			}
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed, UAS_Character::GetPerformSpeedAttribute());
 		}
 		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
 		{
-			for (const auto& Iter : CustomMagnitudes)
-			{
-				UpdateMapTemporary(
-				                   Iter.Key,
-				                   Iter.Value,
-				                   Spec,
-				                   UAS_Character::GetShieldAttribute().GetGameplayAttributeData(TargetSet)
-				                  );
-			}
+			Lambda(UGameplayTagsLibrary::GEData_ModifyItem_Shield, UAS_Character::GetShieldAttribute());
 		}
 	}
 #pragma endregion
 
 #pragma region 把值写进GE里面
-	// 如果是此类，数据在 SetByCallerTagMagnitudes
-	if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override)
-	)
+	for (const auto& Iter : NeedModifySet)
 	{
-		for (const auto& Iter : CustomMagnitudes)
+		auto Lambda = [this, TargetSet, &Spec, &CustomMagnitudes, &OutExecutionOutput](
+			const FGameplayAttribute& Attribute
+			)
 		{
-			if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetHPAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
+			const auto NewValue = GetBaseValueMaps(
+			                                       Spec,
+			                                       Attribute.GetGameplayAttributeData(
+				                                        TargetSet
+				                                       )
+			                                      );
 
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetHPAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-
-				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetStaminaAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
-
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetStaminaAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetManaAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
-
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetManaAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetMetalValueAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
-
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetMetalValueAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetMetalLevelAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
-
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetMetalLevelAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetMetalPenetrationAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
-
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetMetalPenetrationAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetMetalPercentPenetrationAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
-
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetMetalPercentPenetrationAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
-			{
-				const auto NewValue = GetBaseValueMaps(
-				                                       Spec,
-				                                       UAS_Character::GetMetalResistanceAttribute().GetGameplayAttributeData(
-					                                        TargetSet
-					                                       )
-				                                      );
-
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetMetalResistanceAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-			}
-			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
-			{
-				const auto NewValue =
-					GetBaseValueMaps(Spec, UAS_Character::GetHPAttribute().GetGameplayAttributeData(TargetSet));
-				OutExecutionOutput.AddOutputModifier(
-				                                     FGameplayModifierEvaluatedData(
-					                                      UAS_Character::GetHPAttribute(),
-					                                      EGameplayModOp::Override,
-					                                      NewValue
-					                                     )
-				                                    );
-
-				ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
-			}
-		}
-	}
-	// 如果是此类 SetByCallerTagMagnitudes 仅为一条，且Key为数据的组成
-	else if (
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary) ||
-		AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary)
-	)
-	{
-		if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
-		{
-			const auto NewValue =
-				GetBaseValueMaps(Spec, UAS_Character::GetMoveSpeedAttribute().GetGameplayAttributeData(TargetSet));
 			OutExecutionOutput.AddOutputModifier(
 			                                     FGameplayModifierEvaluatedData(
-			                                                                    UAS_Character::GetMoveSpeedAttribute(),
+			                                                                    Attribute,
 			                                                                    EGameplayModOp::Override,
 			                                                                    NewValue
 			                                                                   )
 			                                    );
-		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
+			return NewValue;
+		};
+		if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_HP))
 		{
-			const auto NewValue =
-				GetBaseValueMaps(Spec, UAS_Character::GetPerformSpeedAttribute().GetGameplayAttributeData(TargetSet));
-			OutExecutionOutput.AddOutputModifier(
-			                                     FGameplayModifierEvaluatedData(
-			                                                                    UAS_Character::GetPerformSpeedAttribute(),
-			                                                                    EGameplayModOp::Override,
-			                                                                    NewValue
-			                                                                   )
-			                                    );
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 		}
-		else if (AllAssetTags.HasTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
 		{
-			const auto NewValue =
-				GetBaseValueMaps(Spec, UAS_Character::GetShieldAttribute().GetGameplayAttributeData(TargetSet));
-			OutExecutionOutput.AddOutputModifier(
-			                                     FGameplayModifierEvaluatedData(
-			                                                                    UAS_Character::GetShieldAttribute(),
-			                                                                    EGameplayModOp::Override,
-			                                                                    NewValue
-			                                                                   )
-			                                    );
+			const auto NewValue = Lambda(UAS_Character::GetShieldAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetManaAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetShieldAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalValueAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalLevelAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalPercentPenetrationAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMetalResistanceAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
 		}
 	}
 #pragma endregion
@@ -1464,49 +1351,6 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			}
 		}
 	}
-}
-
-IDataModifyInterface::IDataModifyInterface(
-	int32 InPriority
-	) :
-	  Priority(InPriority)
-{
-	ID = FMath::Rand32();
-}
-
-bool IDataModifyInterface::operator<(
-	const IDataModifyInterface& RightValue
-	) const
-{
-	return (Priority > RightValue.Priority) && (ID == RightValue.ID);
-}
-
-IOutputDataModifyInterface::IOutputDataModifyInterface(
-	int32 InPriority /*= 1*/
-	) :
-	  IDataModifyInterface(InPriority)
-{
-}
-
-bool IOutputDataModifyInterface::Modify(
-	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-	)
-{
-	return true;
-}
-
-IInputDataModifyInterface::IInputDataModifyInterface(
-	int32 InPriority /*= 1*/
-	) :
-	  IDataModifyInterface(InPriority)
-{
-}
-
-bool IInputDataModifyInterface::Modify(
-	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-	)
-{
-	return true;
 }
 
 void UCharacterAbilitySystemComponent::AddOutputModify(

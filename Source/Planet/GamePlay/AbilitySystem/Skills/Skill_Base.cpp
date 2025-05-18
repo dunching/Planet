@@ -7,10 +7,12 @@
 #include "CharacterBase.h"
 #include "AbilityTask_TimerHelper.h"
 #include "AssetRefMap.h"
+#include "AS_Character.h"
 #include "PlanetWorldSettings.h"
 #include "ProxyProcessComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CollisionDataStruct.h"
+#include "GameplayTagsLibrary.h"
 #include "Weapon_Base.h"
 #include "InventoryComponent.h"
 #include "KismetGravityLibrary.h"
@@ -218,9 +220,9 @@ bool USkill_Base::CheckTargetInDistance(
 		if (FocusCharactersAry.IsValidIndex(0) && FocusCharactersAry[0].IsValid())
 		{
 			const auto Distance = FVector::Distance(
-													FocusCharactersAry[0]->GetActorLocation(),
-													CharacterPtr->GetActorLocation()
-												   );
+			                                        FocusCharactersAry[0]->GetActorLocation(),
+			                                        CharacterPtr->GetActorLocation()
+			                                       );
 			return Distance < InDistance;
 		}
 	}
@@ -319,11 +321,11 @@ ACharacterBase* USkill_Base::GetTargetInDistance(
 	TArray<struct FOverlapResult> OutOverlaps;
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
-	
+
 	FCollisionQueryParams Params;
 
 	Params.AddIgnoredActor(CharacterPtr);
-	
+
 	if (GetWorld()->OverlapMultiByObjectType(
 	                                         OutOverlaps,
 	                                         CharacterPtr->GetActorLocation(),
@@ -335,38 +337,40 @@ ACharacterBase* USkill_Base::GetTargetInDistance(
 	{
 		// 初始角度
 		const auto OriginRot = UKismetMathLibrary::MakeRotFromZX(
-			-UKismetGravityLibrary::GetGravity(),
-			CharacterPtr->GetActorForwardVector()
-		);
+		                                                         -UKismetGravityLibrary::GetGravity(),
+		                                                         CharacterPtr->GetActorForwardVector()
+		                                                        );
 		const auto Dir = OriginRot.Vector();
 
 		// 身后的敌人
 		float Dot = -1.f;
 
-		for (const auto & Iter : OutOverlaps)
+		for (const auto& Iter : OutOverlaps)
 		{
-			auto TargetCharacterPtr=  Cast<ACharacterBase>(Iter.GetActor());
+			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
 			if (!TargetCharacterPtr)
 			{
 				continue;
 			}
-			if (TargetCharacterPtr->IsGroupmate(CharacterPtr) || TargetCharacterPtr->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
+			if (TargetCharacterPtr->IsGroupmate(CharacterPtr) || TargetCharacterPtr->
+			                                                     GetCharacterAbilitySystemComponent()->IsCantBeDamage())
 			{
 				continue;
 			}
 
 			const auto CurrentDistance = FVector::Distance(
-														   TargetCharacterPtr->GetActorLocation(),
-														   CharacterPtr->GetActorLocation()
-														  );
+			                                               TargetCharacterPtr->GetActorLocation(),
+			                                               CharacterPtr->GetActorLocation()
+			                                              );
 			if (CurrentDistance > MaxDistance)
 			{
 				continue;
 			}
-			
-			const auto TargetDir = (TargetCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).GetSafeNormal();
+
+			const auto TargetDir = (TargetCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()).
+				GetSafeNormal();
 			const auto NewDot = FVector::DotProduct(TargetDir, Dir);
-			if (NewDot  > Dot)
+			if (NewDot > Dot)
 			{
 				Dot = NewDot;
 				FocusCharacterPtr = TargetCharacterPtr;
@@ -374,4 +378,43 @@ ACharacterBase* USkill_Base::GetTargetInDistance(
 		}
 	}
 	return FocusCharacterPtr;
+}
+
+FGameplayEffectSpecHandle USkill_Base::MakeDamageToTarget(
+	EElementalType ElementalType,
+	int32 Elemental_Damage,
+	float Elemental_Damage_Magnification
+	)
+{
+	const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
+
+	FGameplayEffectSpecHandle SpecHandle =
+		MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
+	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
+	SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+
+	switch (ElementalType)
+	{
+	case EElementalType::kMetal:
+		{
+			const int32 BaseDamage = Elemental_Damage + (
+				                         CharacterAttributes->GetMetalValue() * Elemental_Damage_Magnification);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
+			                                               BaseDamage
+			                                              );
+		}
+		break;
+	case EElementalType::kWood:
+		break;
+	case EElementalType::kWater:
+		break;
+	case EElementalType::kFire:
+		break;
+	case EElementalType::kEarth:
+		break;
+	}
+
+	return SpecHandle;
 }

@@ -100,6 +100,50 @@ public:
 	FMyGameplayAttributeData Mana_Replay;
 	ATTRIBUTE_ACCESSORS(UAS_Character, Mana_Replay);
 	
+	UPROPERTY(ReplicatedUsing = OnRep_MoveSpeed, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData MoveSpeed;
+	ATTRIBUTE_ACCESSORS(UAS_Character, MoveSpeed);
+	
+	UFUNCTION()
+	virtual void OnRep_MoveSpeed(const FMyGameplayAttributeData& OldHealth);
+
+	// 会心伤害
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData CriticalDamage;
+	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalDamage);
+	
+	// 会心率
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData CriticalHitRate;
+	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalHitRate);
+	
+	// 命中率
+	// 目标 闪避值 为0时命中的概率
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData HitRate;
+	ATTRIBUTE_ACCESSORS(UAS_Character, HitRate);
+	
+	// 闪避几率
+	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData Evade;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Evade);
+	
+	// 攻击速度、技能释放速度
+	UPROPERTY(ReplicatedUsing = OnRep_PerformSpeed, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData PerformSpeed;
+	ATTRIBUTE_ACCESSORS(UAS_Character, PerformSpeed);
+	
+	UFUNCTION()
+	virtual void OnRep_PerformSpeed(const FMyGameplayAttributeData& OldHealth);
+
+	// 当前护盾值
+	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData Shield;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Shield);
+	
+	UFUNCTION()
+	virtual void OnRep_Shield(const FMyGameplayAttributeData& OldHealth);
+
 #pragma region 基础 属性：五行元素
 
 	const int32 MaxElementalValue = 10000;
@@ -114,9 +158,9 @@ public:
 	
 	/**
 	 * Value					元素强度
-	 * Level					元素等级 0 3 6 9
-	 * Penetration				元素抗性
-	 * Resistance				元素固定穿透
+	 * Level					元素等级			0 3 6 9
+	 * Penetration				元素抗性			0 ~ 1000
+	 * Resistance				元素固定穿透		0 ~ 100
 	 * PercentPenetration		元素穿透百分比
 	 */
 	 
@@ -177,50 +221,6 @@ public:
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodResistance);
 #pragma endregion
 	
-	UPROPERTY(ReplicatedUsing = OnRep_MoveSpeed, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData MoveSpeed;
-	ATTRIBUTE_ACCESSORS(UAS_Character, MoveSpeed);
-	
-	UFUNCTION()
-	virtual void OnRep_MoveSpeed(const FMyGameplayAttributeData& OldHealth);
-
-	// 会心伤害
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData CriticalDamage;
-	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalDamage);
-	
-	// 会心率
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData CriticalHitRate;
-	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalHitRate);
-	
-	// 命中率
-	// 目标 闪避值 为0时命中的概率
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData HitRate;
-	ATTRIBUTE_ACCESSORS(UAS_Character, HitRate);
-	
-	// 闪避几率
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData Evade;
-	ATTRIBUTE_ACCESSORS(UAS_Character, Evade);
-	
-	// 攻击速度、技能释放速度
-	UPROPERTY(ReplicatedUsing = OnRep_PerformSpeed, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData PerformSpeed;
-	ATTRIBUTE_ACCESSORS(UAS_Character, PerformSpeed);
-	
-	UFUNCTION()
-	virtual void OnRep_PerformSpeed(const FMyGameplayAttributeData& OldHealth);
-
-	// 当前护盾值
-	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData Shield;
-	ATTRIBUTE_ACCESSORS(UAS_Character, Shield);
-	
-	UFUNCTION()
-	virtual void OnRep_Shield(const FMyGameplayAttributeData& OldHealth);
-
 #pragma region 基础 属性：力道,根骨,身法,洞察,天资
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData LiDao;

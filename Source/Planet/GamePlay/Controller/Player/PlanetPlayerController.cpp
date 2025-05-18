@@ -627,6 +627,112 @@ TObjectPtr<UPlayerControllerGameplayTasksComponent> APlanetPlayerController::Get
 	return GameplayTasksComponentPtr;
 }
 
+void APlanetPlayerController::ModifyElementalDataToTarget_Implementation(
+	const TArray<FString>& Args
+	)
+{
+	if (Args.Num() < 6)
+	{
+		return;
+	}
+
+	auto CharacterPtr = GetPawn<FPawnType>();
+	if (!CharacterPtr)
+	{
+		return;
+	}
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(CharacterPtr);
+
+	FVector OutCamLoc = CharacterPtr->GetActorLocation();
+	FRotator OutCamRot = CharacterPtr->GetActorRotation();
+
+	FHitResult OutHit;
+	if (GetWorld()->LineTraceSingleByObjectType(
+	                                            OutHit,
+	                                            OutCamLoc,
+	                                            OutCamLoc + (OutCamRot.Vector() * 1000),
+	                                            ObjectQueryParams,
+	                                            Params
+	                                           ))
+	{
+		auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
+		if (TargetCharacterPtr)
+		{
+			auto GASPtr = TargetCharacterPtr->GetCharacterAbilitySystemComponent();
+
+			auto SpecHandle = GASPtr->MakeOutgoingSpec(
+			                                           UAssetRefMap::GetInstance()->OnceGEClass,
+			                                           1,
+			                                           GASPtr->MakeEffectContext()
+			                                          );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override);
+
+			if (TEXT("Metal") == Args[0])
+			{
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+				                                              );
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[2])
+				                                              );
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[3])
+				                                              );
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[4])
+				                                              );
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[5])
+				                                              );
+			}
+			else if (TEXT("Wood") == Args[0])
+			{
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+				                                              );
+			}
+			else if (TEXT("Water") == Args[0])
+			{
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+				                                              );
+			}
+			else if (TEXT("Fire") == Args[0])
+			{
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+				                                              );
+			}
+			else if (TEXT("Earth") == Args[0])
+			{
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+				                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+				                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+				                                              );
+			}
+
+			const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			if (!GEHandle.IsValid())
+			{
+				// checkNoEntry();
+			}
+		}
+	}
+}
+
 void APlanetPlayerController::ModifyElementalData_Implementation(
 	const TArray<FString>& Args
 	)
@@ -640,63 +746,63 @@ void APlanetPlayerController::ModifyElementalData_Implementation(
 		auto GASPtr = GetPawn<FPawnType>()->GetCharacterAbilitySystemComponent();
 
 		auto SpecHandle = GASPtr->MakeOutgoingSpec(
-												   UAssetRefMap::GetInstance()->OnceGEClass,
-												   1,
-												   GASPtr->MakeEffectContext()
-												  );
+		                                           UAssetRefMap::GetInstance()->OnceGEClass,
+		                                           1,
+		                                           GASPtr->MakeEffectContext()
+		                                          );
 
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override);
 
 		if (TEXT("Metal") == Args[0])
 		{
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value,
-														   UKismetStringLibrary::Conv_StringToInt(Args[1])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+			                                              );
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level,
-														   UKismetStringLibrary::Conv_StringToInt(Args[2])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Level,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[2])
+			                                              );
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration,
-														   UKismetStringLibrary::Conv_StringToInt(Args[3])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Penetration,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[3])
+			                                              );
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration,
-														   UKismetStringLibrary::Conv_StringToInt(Args[4])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[4])
+			                                              );
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance,
-														   UKismetStringLibrary::Conv_StringToInt(Args[5])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[5])
+			                                              );
 		}
 		else if (TEXT("Wood") == Args[0])
-		{		
+		{
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
-														   UKismetStringLibrary::Conv_StringToInt(Args[1])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+			                                              );
 		}
 		else if (TEXT("Water") == Args[0])
 		{
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
-														   UKismetStringLibrary::Conv_StringToInt(Args[1])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+			                                              );
 		}
 		else if (TEXT("Fire") == Args[0])
 		{
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
-														   UKismetStringLibrary::Conv_StringToInt(Args[1])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+			                                              );
 		}
 		else if (TEXT("Earth") == Args[0])
 		{
 			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
-														   UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
-														   UKismetStringLibrary::Conv_StringToInt(Args[1])
-														  );
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+			                                               UKismetStringLibrary::Conv_StringToInt(Args[1])
+			                                              );
 		}
 
 		const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());

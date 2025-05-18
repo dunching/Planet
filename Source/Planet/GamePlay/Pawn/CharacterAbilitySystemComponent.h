@@ -7,10 +7,9 @@
 #include "AbilitySystemComponent.h"
 #include "Components/ActorComponent.h"
 
-#include "ProxyProcessComponent.h"
-
 #include "GroupManaggerInterface.h"
 #include "PlanetAbilitySystemComponent.h"
+#include "DataModifyInterface.h"
 
 #include "CharacterAbilitySystemComponent.generated.h"
 
@@ -27,6 +26,9 @@ class UCS_RootMotion_KnockDown;
 class USkill_Element_Gold;
 class UBasicFuturesBase;
 class UAbilitySystemComponent;
+class IOutputDataModifyInterface;
+class IInputDataModifyInterface;
+class IOutputDataModifyInterface;
 
 struct FGameplayEventData;
 struct FGameplayAbilityTargetData_CS_Base;
@@ -41,68 +43,6 @@ struct FGameplayEffectCustomExecutionOutput;
 struct FOnEffectedTawrgetCallback;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
-
-struct FDataModify_key_compare;
-
-class PLANET_API IDataModifyInterface
-{
-public:
-	friend UCharacterAbilitySystemComponent;
-	friend FDataModify_key_compare;
-
-	IDataModifyInterface(
-		int32 InPriority = 1
-		);
-
-	bool operator<(
-		const IDataModifyInterface& RightValue
-		) const;
-
-protected:
-	bool bIsOnceTime = false;
-
-private:
-	// 越小的越先算, 100~200 用于基础功能
-	int32 Priority = -1;
-
-	int32 ID = -1;
-};
-
-class PLANET_API IOutputDataModifyInterface : public IDataModifyInterface
-{
-public:
-	IOutputDataModifyInterface(
-		int32 InPriority = 1
-		);
-
-	// Return：本次修改完是否移除本【修正方式】
-	virtual bool Modify(
-		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-		);
-};
-
-class PLANET_API IInputDataModifyInterface : public IDataModifyInterface
-{
-public:
-	IInputDataModifyInterface(
-		int32 InPriority = 1
-		);
-
-	virtual bool Modify(
-		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
-		);
-};
-
-struct FDataModify_key_compare
-{
-	bool operator()(
-		const TSharedPtr<IDataModifyInterface>& lhs,
-		const TSharedPtr<IDataModifyInterface>& rhs
-		) const
-	{
-		return lhs->Priority < rhs->Priority;
-	}
-};
 
 UCLASS()
 class PLANET_API UCharacterAbilitySystemComponent :
@@ -150,18 +90,24 @@ public:
 #pragma region 输入和输出得修正
 
 	TMap<FGameplayTag, float> ModifyOutputData(
+		const FGameplayTagContainer & AllAssetTags,
+		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
 
 	TMap<FGameplayTag, float> ModifyInputData(
+		const FGameplayTagContainer & AllAssetTags,
+		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
 
 	void ApplyInputData(
+		const FGameplayTagContainer & AllAssetTags,
+		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
@@ -287,7 +233,7 @@ public:
 	FMakedDamageDelegate MakedDamageDelegate;
 #pragma endregion
 
-protected:
+public:
 	// 对“其他”角色造成的影响（伤害、控制）
 	UFUNCTION(NetMulticast, Reliable)
 	void OnEffectOhterCharacter(
@@ -318,8 +264,8 @@ protected:
 		);
 
 	/**
-	 * 
-	 * @param Tag 仅为 DataSource
+	 * 更新数据组成
+	 * @param Tag 仅为 DataSource_Character
 	 * @param Value 
 	 * @param MinValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
 	 * @param MaxValue 仅GEData_ModifyType_BaseValue_Addtive、GEData_ModifyType_Immediate_Override 生效
@@ -343,6 +289,18 @@ protected:
 		);
 
 	/**
+	 * 更新数据组成
+	 * @param Value 该属性之后的值
+	 * @param AllAssetTags 
+	 * @param GameplayAttributeDataPtr 
+	 */
+	void UpdateMapTemporary(
+		const FGameplayTag& ModifyTypeTag,
+		float Value,
+		const FGameplayAttributeData* GameplayAttributeDataPtr
+		);
+
+	/**
 	 * 获取基础数据
 	 * @param Spec 
 	 * @param GameplayAttributeDataPtr 
@@ -353,14 +311,18 @@ protected:
 		const FGameplayAttributeData* GameplayAttributeDataPtr
 		) const;
 
+private:
+
+	void UpdateValueMap();
+	
 #pragma region 基础GA
 	/**
 	 * 基础GA
 	 */
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Abilities", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilitiesAry;
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<USkill_Element_Gold> Skill_Element_GoldClass;
 #pragma endregion GAs
 

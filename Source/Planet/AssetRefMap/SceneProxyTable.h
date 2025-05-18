@@ -130,6 +130,15 @@ class PLANET_API UItemProxy_Description_WeaponSkill : public UItemProxy_Descript
 
 public:
 
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	EElementalType ElementalType = EElementalType::kMetal;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	int32 Elemental_Damage = 10;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	float Elemental_Damage_Magnification = .5f;
+
 };
 
 UCLASS()

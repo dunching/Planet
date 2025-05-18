@@ -329,6 +329,8 @@ public:
 
 	static FGameplayTag GEData_ModifyItem_Metal_Resistance;
 
+	static FGameplayTag GEData_ModifyItem_Damage_True;
+	
 	static FGameplayTag GEData_ModifyItem_Damage_Metal;
 	
 	static FGameplayTag GEData_ModifyItem_Damage_Wood;
