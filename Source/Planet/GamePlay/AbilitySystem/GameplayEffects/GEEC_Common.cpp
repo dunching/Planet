@@ -23,12 +23,12 @@ void UGEEC_Base::ApplyModifyData(
 
 	TSet<FGameplayTag> NeedModifySet;
 	TSet<EAdditionalModify> AdditionalModifyAry;
-	TMap<FGameplayTag, float> NewDatas;
+
+	TMap<FGameplayTag, float> NewDatas = SetByCallerTagMagnitudes;
 
 	InstigatorPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
 	                                                                      AllAssetTags,
 	                                                                      NeedModifySet,
-	                                                                      SetByCallerTagMagnitudes,
 	                                                                      NewDatas,
 	                                                                      AdditionalModifyAry,
 	                                                                      ExecutionParams,
@@ -38,7 +38,6 @@ void UGEEC_Base::ApplyModifyData(
 	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyInputData(
 	                                                                          AllAssetTags,
 	                                                                          NeedModifySet,
-	                                                                          SetByCallerTagMagnitudes,
 	                                                                          NewDatas,
 	                                                                          AdditionalModifyAry,
 	                                                                          ExecutionParams,
@@ -193,12 +192,12 @@ void UGEEC_Running::Execute_Implementation(
 
 	TSet<FGameplayTag> NeedModifySet;
 	TSet<EAdditionalModify> AdditionalModifyAry;
-	TMap<FGameplayTag, float> NewDatas;
+
+	TMap<FGameplayTag, float> NewDatas = CustomMagnitudes;
 
 	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
 	                                                                           AllAssetTags,
 	                                                                           NeedModifySet,
-	                                                                           CustomMagnitudes,
 	                                                                           NewDatas,
 	                                                                           AdditionalModifyAry,
 	                                                                           ExecutionParams,
@@ -249,12 +248,11 @@ void UGEEC_CancelRunning::Execute_Implementation(
 
 	TSet<FGameplayTag> NeedModifySet;
 	TSet<EAdditionalModify> AdditionalModifyAry;
-	TMap<FGameplayTag, float> NewDatas;
+	TMap<FGameplayTag, float> NewDatas = CustomMagnitudes;
 
 	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
 	                                                                           AllAssetTags,
 	                                                                           NeedModifySet,
-	                                                                           CustomMagnitudes,
 	                                                                           NewDatas,
 	                                                                           AdditionalModifyAry,
 	                                                                           ExecutionParams,

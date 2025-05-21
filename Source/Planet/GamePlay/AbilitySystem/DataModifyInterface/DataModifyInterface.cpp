@@ -36,8 +36,7 @@ bool IOutputDataModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
@@ -55,8 +54,7 @@ bool IInputDataModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
@@ -74,8 +72,7 @@ bool IOutputData_ProbabilityConfirmation_ModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
@@ -85,7 +82,7 @@ bool IOutputData_ProbabilityConfirmation_ModifyInterface::Modify(
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
 	                                                              GetCharacterAttributes();
 
-	for (auto& Iter : RawDatas)
+	for (auto& Iter : NewDatas)
 	{
 		if (
 			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
@@ -102,7 +99,7 @@ bool IOutputData_ProbabilityConfirmation_ModifyInterface::Modify(
 				AdditionalModifyAry.Add(EAdditionalModify::kIsCritical);
 
 				const auto CriticalMagnification = InstigatorCharacterAttributesPtr->GetCriticalDamage() / 100;
-				NewwDatas.Add(Iter.Key, Iter.Value * CriticalMagnification);
+				Iter.Value = Iter.Value * CriticalMagnification;
 			}
 		}
 	}
@@ -121,8 +118,7 @@ bool IInputData_ProbabilityConfirmation_ModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
@@ -132,7 +128,7 @@ bool IInputData_ProbabilityConfirmation_ModifyInterface::Modify(
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
 	                                                              GetCharacterAttributes();
 
-	for (auto& Iter : RawDatas)
+	for (auto& Iter : NewDatas)
 	{
 		if (
 			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
@@ -152,7 +148,7 @@ bool IInputData_ProbabilityConfirmation_ModifyInterface::Modify(
 			else
 			{
 				AdditionalModifyAry.Add(EAdditionalModify::kIsEvade);
-				NewwDatas.Add(Iter.Key, 0);
+				Iter.Value = 0;
 			}
 		}
 	}
@@ -171,8 +167,7 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
@@ -182,7 +177,7 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 	                                                          GetCharacterAttributes();
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
 	                                                              GetCharacterAttributes();
-	for (auto& Iter : RawDatas)
+	for (auto& Iter : NewDatas)
 	{
 		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 		{
@@ -199,7 +194,7 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 
 			const auto Percent = FMath::Clamp(ActulyResistance / (ActulyResistance + BaseResistance), 0, 1);
 
-			NewwDatas.Add(Iter.Key, Iter.Value - (Iter.Value * Percent));
+			Iter.Value = Iter.Value - (Iter.Value * Percent);
 		}
 		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
 		{
@@ -220,8 +215,7 @@ bool IInputData_Shield_ModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
@@ -229,7 +223,7 @@ bool IInputData_Shield_ModifyInterface::Modify(
 	                                                          GetCharacterAttributes();
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
 	                                                              GetCharacterAttributes();
-	for (auto& Iter : RawDatas)
+	for (auto& Iter : NewDatas)
 	{
 		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 		{
@@ -251,7 +245,7 @@ bool IInputData_Shield_ModifyInterface::Modify(
 						  TargetCharacterAttributesPtr
 						 )
 					);
-				NewwDatas.Add(Iter.Key, Offset);
+				Iter.Value = Offset;
 			}
 			else
 			{
@@ -262,7 +256,7 @@ bool IInputData_Shield_ModifyInterface::Modify(
 						  TargetCharacterAttributesPtr
 						 )
 					);
-				NewwDatas.Add(Iter.Key, 0);
+				Iter.Value = 0;
 			}
 		}
 		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
@@ -288,12 +282,11 @@ bool IOutputData_MultipleDamega_ModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
-	for (auto& Iter : RawDatas)
+	for (auto& Iter : NewDatas)
 	{
 		if (
 			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
@@ -303,10 +296,12 @@ bool IOutputData_MultipleDamega_ModifyInterface::Modify(
 			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth)
 		)
 		{
+			const auto OldValue = CurrentCount;
 			CurrentCount++;
+			CallbackContainerHelper.ValueChanged(OldValue, CurrentCount);
 
-			NewwDatas.Add(Iter.Key, Iter.Value * Multiple);
-			
+
+			Iter.Value = Iter.Value * Multiple;
 			if (CurrentCount >= Count)
 			{
 				return true;

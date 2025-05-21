@@ -1074,15 +1074,12 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 void UCharacterAbilitySystemComponent::ModifyInputData(
 	const FGameplayTagContainer& AllAssetTags,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
 {
-	NewwDatas = RawDatas;
-
 	// 根据自身的效果对【输入】进行一些修正
 	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
 
@@ -1098,8 +1095,7 @@ void UCharacterAbilitySystemComponent::ModifyInputData(
 		                    Instigator,
 		                    TargetCharacterPtr,
 		                    NeedModifySet,
-		                    RawDatas,
-		                    NewwDatas,
+		                    NewDatas,
 		                    AdditionalModifyAry
 		                   ))
 		{
@@ -1116,15 +1112,12 @@ void UCharacterAbilitySystemComponent::ModifyInputData(
 void UCharacterAbilitySystemComponent::ModifyOutputData(
 	const FGameplayTagContainer& AllAssetTags,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& RawDatas,
-	TMap<FGameplayTag, float>& NewwDatas,
+	TMap<FGameplayTag, float>& NewDatas,
 	TSet<EAdditionalModify>& AdditionalModifyAry,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
 {
-	NewwDatas = RawDatas;
-
 	// 根据自身的效果对【输出】进行一些修正
 	TArray<decltype(OutputDataModifysMap)::iterator> NeedRemoveIterAry;;
 
@@ -1140,8 +1133,7 @@ void UCharacterAbilitySystemComponent::ModifyOutputData(
 		                    Instigator,
 		                    TargetCharacterPtr,
 		                    NeedModifySet,
-		                    RawDatas,
-		                    NewwDatas,
+		                    NewDatas,
 		                    AdditionalModifyAry
 		                   ))
 		{

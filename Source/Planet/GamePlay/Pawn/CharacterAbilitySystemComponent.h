@@ -92,7 +92,6 @@ public:
 	void ModifyOutputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
 		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
@@ -102,7 +101,6 @@ public:
 	void ModifyInputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
 		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,

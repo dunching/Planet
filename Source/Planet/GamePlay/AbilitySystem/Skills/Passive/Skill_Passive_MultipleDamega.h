@@ -16,7 +16,7 @@ class UEffectItem;
 class ACharacterBase;
 class UGE_ZMJZ;
 class UGE_ZMJZImp;
-class IOutputDataModifyInterface;
+class IOutputData_MultipleDamega_ModifyInterface;
 
 struct FGAEventData;
 struct FCharacterStateInfo;
@@ -37,6 +37,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FPerLevelValue_Float Duration = {3, 4, 5, 6, 7};
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FPerLevelValue_Float CD = {10};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
+	TSubclassOf<UGameplayEffect> GEClass;
 
 };
 
@@ -83,22 +89,22 @@ protected:
 		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 	);
 
-	void DurationDelegate(
-		UAbilityTask_TimerHelper* TaskPtr,
-		float CurrentInterval,
-		float Duration
-	);
-	
-	bool OnTimerFinished(
-		UAbilityTask_TimerHelper* TaskPtr
-	);
-	
-	TSharedPtr<IOutputDataModifyInterface>OutputDataModifySPtr = nullptr;
+	TSharedPtr<IOutputData_MultipleDamega_ModifyInterface>OutputDataModifySPtr = nullptr;
 	
 	FMakedDamageHandle AbilityActivatedCallbacksHandle;
 private:
+	void OnGameplayEffectRemoved(
+		const FGameplayEffectRemovalInfo&GameplayEffectRemovalInfo
+		
+	);
+	
+	void OnReaminCountChanged(int32 Count);
+	
+	FActiveGameplayEffectHandle EffectDurationHandle;
+	
+	FActiveGameplayEffectHandle CDHandle;
 	
 	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
-	bool bIsRead =true;
+	TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr HandleSPtr;
 };

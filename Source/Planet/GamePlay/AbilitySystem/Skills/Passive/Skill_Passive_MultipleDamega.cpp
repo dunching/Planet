@@ -68,49 +68,79 @@ void USkill_Passive_MultipleDamega::MakedDamageDelegate(
 {
 	if (CharacterPtr)
 	{
-		if (!bIsRead)
-		{
-			return;
-		}
-		
 		if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 		{
-			auto AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
-			AbilityTask_TimerHelperPtr->SetDuration(ItemProxy_DescriptionPtr->Duration.PerLevelValue[0]);
-			AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationDelegate);
-			AbilityTask_TimerHelperPtr->OnFinished.BindUObject(this, &ThisClass::OnTimerFinished);
-			AbilityTask_TimerHelperPtr->ReadyForActivation();
-
 #if UE_EDITOR || UE_SERVER
 			if (
 				(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 			)
 			{
+				auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
+				GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_Info);
+				GameplayTagContainer.AddTag(SkillProxyPtr->GetProxyType());
+
+				const auto GameplayEffectHandleAry = GetAbilitySystemComponentFromActorInfo()->GetActiveEffects(
+					 FGameplayEffectQuery::MakeQuery_MatchAllOwningTags(GameplayTagContainer)
+					);
+				if (!GameplayEffectHandleAry.IsEmpty())
+				{
+					return;
+				}
+
+				{
+					FGameplayEffectSpecHandle SpecHandle =
+						MakeOutgoingGameplayEffectSpec(ItemProxy_DescriptionPtr->GEClass, GetAbilityLevel());
+
+					SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+					SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+					SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+					                                               UGameplayTagsLibrary::GEData_Duration,
+					                                               ItemProxy_DescriptionPtr->Duration.PerLevelValue[
+						                                               0]
+					                                              );
+					SpecHandle.Data.Get()->SetStackCount(ItemProxy_DescriptionPtr->Count);
+
+					EffectDurationHandle = ApplyGameplayEffectSpecToOwner(
+					                                                      GetCurrentAbilitySpecHandle(),
+					                                                      GetCurrentActorInfo(),
+					                                                      GetCurrentActivationInfo(),
+					                                                      SpecHandle
+					                                                     );
+
+					auto OnActiveGameplayEffectStackChangePtr = GetAbilitySystemComponentFromActorInfo()->
+						OnGameplayEffectRemoved_InfoDelegate(EffectDurationHandle);
+					if (OnActiveGameplayEffectStackChangePtr)
+					{
+						if (OnActiveGameplayEffectStackChangePtr->IsBound())
+						{
+						}
+						else
+						{
+							OnActiveGameplayEffectStackChangePtr->AddUObject(
+							                                                 this,
+							                                                 &ThisClass::OnGameplayEffectRemoved
+							                                                );
+						}
+					}
+				}
 				OutputDataModifySPtr = MakeShared<
 					IOutputData_MultipleDamega_ModifyInterface>(
 					                                            101,
 					                                            ItemProxy_DescriptionPtr->Count,
 					                                            ItemProxy_DescriptionPtr->Multiple
 					                                           );
+				HandleSPtr = OutputDataModifySPtr->CallbackContainerHelper.AddOnValueChanged(
+					 std::bind(&ThisClass::OnReaminCountChanged, this, std::placeholders::_2)
+					);
 				CharacterPtr->GetCharacterAbilitySystemComponent()->AddOutputModify(OutputDataModifySPtr);
 			}
 #endif
-
-			bIsRead = false;
 		}
 	}
 }
 
-void USkill_Passive_MultipleDamega::DurationDelegate(
-	UAbilityTask_TimerHelper* TaskPtr,
-	float CurrentInterval,
-	float Duration
-	)
-{
-}
-
-bool USkill_Passive_MultipleDamega::OnTimerFinished(
-	UAbilityTask_TimerHelper* TaskPtr
+void USkill_Passive_MultipleDamega::OnGameplayEffectRemoved(
+	const FGameplayEffectRemovalInfo& GameplayEffectRemovalInfo
 	)
 {
 #if UE_EDITOR || UE_SERVER
@@ -118,11 +148,64 @@ bool USkill_Passive_MultipleDamega::OnTimerFinished(
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		CharacterPtr->GetCharacterAbilitySystemComponent()->RemoveOutputModify(OutputDataModifySPtr);
+		{
+			UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
+			if (CooldownGE)
+			{
+				FGameplayEffectSpecHandle SpecHandle =
+					MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
+				SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
+				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+															   UGameplayTagsLibrary::GEData_Duration,
+															   ItemProxy_DescriptionPtr->CD.
+															   PerLevelValue[0]
+															  );
+
+				CDHandle = ApplyGameplayEffectSpecToOwner(
+														  GetCurrentAbilitySpecHandle(),
+														  GetCurrentActorInfo(),
+														  GetCurrentActivationInfo(),
+														  SpecHandle
+														 );
+			}
+		}
 	}
 #endif
+}
 
-	bIsRead = true;
+void USkill_Passive_MultipleDamega::OnReaminCountChanged(
+	int32 Count
+	)
+{
+#if UE_EDITOR || UE_SERVER
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
+	)
+	{
+		auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
+		GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_Info);
+		GameplayTagContainer.AddTag(SkillProxyPtr->GetProxyType());
 
-	return true;
+		const auto GameplayEffectHandleAry = GetAbilitySystemComponentFromActorInfo()->GetActiveEffects(
+			 FGameplayEffectQuery::MakeQuery_MatchAllOwningTags(GameplayTagContainer)
+			);
+		if (GameplayEffectHandleAry.IsEmpty())
+		{
+		}
+		else
+		{
+			for (const auto GEIter : GameplayEffectHandleAry)
+			{
+				auto GameplayEffectPtr =
+					GetAbilitySystemComponentFromActorInfo()->RemoveActiveGameplayEffect(
+						 GEIter,
+						 1
+						);
+			}
+		}
+	}
+#endif
 }

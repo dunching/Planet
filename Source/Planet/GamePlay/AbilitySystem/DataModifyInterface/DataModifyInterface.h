@@ -60,7 +60,7 @@ public:
 	 * @param TargetCharacterPtr 
 	 * @param NeedModifySet 
 	 * @param RawDatas 
-	 * @param NewwDatas 
+	 * @param NewDatas 
 	 * @param AdditionalModifyAry 
 	 * @return 本次修改完是否移除本【修正方式】
 	 */
@@ -68,8 +68,7 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
-		TMap<FGameplayTag, float>& NewwDatas,
+		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry
 		);
 };
@@ -85,8 +84,7 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
-		TMap<FGameplayTag, float>& NewwDatas,
+		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry
 		);
 };
@@ -118,8 +116,7 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
-		TMap<FGameplayTag, float>& NewwDatas,
+		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry
 		) override;
 };
@@ -138,8 +135,7 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
-		TMap<FGameplayTag, float>& NewwDatas,
+		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry
 		) override;
 };
@@ -159,8 +155,7 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
-		TMap<FGameplayTag, float>& NewwDatas,
+		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry
 		) override;
 };
@@ -179,8 +174,7 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
-		TMap<FGameplayTag, float>& NewwDatas,
+		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry
 		) override;
 };
@@ -195,6 +189,8 @@ public:
 class PLANET_API IOutputData_MultipleDamega_ModifyInterface : public IOutputDataModifyInterface
 {
 public:
+	TOnValueChangedCallbackContainer<int32> CallbackContainerHelper;
+
 	IOutputData_MultipleDamega_ModifyInterface(
 		int32 InPriority,
 		int32 InCount,
@@ -205,8 +201,7 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& RawDatas,
-		TMap<FGameplayTag, float>& NewwDatas,
+		TMap<FGameplayTag, float>& NewDatas,
 		TSet<EAdditionalModify>& AdditionalModifyAry
 		) override;
 
