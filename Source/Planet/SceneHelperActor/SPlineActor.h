@@ -26,4 +26,6 @@ public:
 
 protected:
 
+	virtual void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
+	
 };

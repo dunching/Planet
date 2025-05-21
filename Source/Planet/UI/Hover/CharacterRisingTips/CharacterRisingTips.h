@@ -64,7 +64,8 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayMyAnimation(
 		bool bIsCritical_In,
-		bool bIsTreatment
+		bool bIsTreatment,
+		EElementalType ElementalType
 	);
 
 	UFUNCTION(BlueprintCallable)
@@ -79,6 +80,4 @@ protected:
 private:
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
-
-	bool bIsCritical = false;
 };

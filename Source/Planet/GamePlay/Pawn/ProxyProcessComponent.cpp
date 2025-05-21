@@ -510,6 +510,23 @@ TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(co
 	return nullptr;
 }
 
+TSharedPtr<FPassiveSkillProxy> UProxyProcessComponent::FindPassiveSkillBySocket(
+	const FGameplayTag& SocketTag
+	) const
+{
+	auto CharacterPtr = GetOwner<FOwnerType>();
+	const auto ActionKeyMap = UGameOptions::GetInstance()->GetActionKeyMap();
+
+	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
+
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Skill(Sockets.GetAllocationedProxyID());
+	if (SkillProxySPtr)
+	{
+		return DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxySPtr);
+	}
+	return nullptr;
+}
+
 FCharacterSocket UProxyProcessComponent::FindActiveSkillByType(const FGameplayTag& TypeTag) const
 {
 	auto CharacterPtr = GetOwner<FOwnerType>();

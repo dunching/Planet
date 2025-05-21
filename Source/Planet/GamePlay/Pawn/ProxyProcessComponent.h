@@ -87,6 +87,8 @@ public:
 
 	TSharedPtr<FActiveSkillProxy> FindActiveSkillBySocket(const FGameplayTag& SocketTag) const;
 
+	TSharedPtr<FPassiveSkillProxy> FindPassiveSkillBySocket(const FGameplayTag& SocketTag) const;
+
 	FCharacterSocket FindActiveSkillByType(const FGameplayTag& TypeTag) const;
 #pragma endregion
 

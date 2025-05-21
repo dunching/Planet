@@ -1,4 +1,3 @@
-
 #include "Skill_Active_Displacement.h"
 
 #include "Abilities/GameplayAbilityTypes.h"
@@ -25,7 +24,7 @@
 #include "SPlineActor.h"
 
 USkill_Active_Displacement::USkill_Active_Displacement() :
-	Super()
+                                                         Super()
 {
 	InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
 }
@@ -36,7 +35,7 @@ void USkill_Active_Displacement::PreActivate(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 	const FGameplayEventData* TriggerEventData /*= nullptr */
-)
+	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
 }
@@ -46,7 +45,7 @@ void USkill_Active_Displacement::ActivateAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
@@ -59,7 +58,7 @@ bool USkill_Active_Displacement::CanActivateAbility(
 	const FGameplayTagContainer* SourceTags /*= nullptr*/,
 	const FGameplayTagContainer* TargetTags /*= nullptr*/,
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
-) const
+	) const
 {
 	if (Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags))
 	{
@@ -74,7 +73,7 @@ void USkill_Active_Displacement::EndAbility(
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	bool bReplicateEndAbility,
 	bool bWasCancelled
-)
+	)
 {
 	if (SPlineActorPtr)
 	{
@@ -89,7 +88,7 @@ void USkill_Active_Displacement::PerformAction(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData
-)
+	)
 {
 	if (CharacterPtr)
 	{
@@ -103,7 +102,7 @@ void USkill_Active_Displacement::FindTarget()
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
 
-	FCollisionShape  CollisionShape = FCollisionShape::MakeSphere(200);
+	FCollisionShape CollisionShape = FCollisionShape::MakeSphere(200);
 
 	FCollisionQueryParams CapsuleParams;
 	CapsuleParams.AddIgnoredActor(CharacterPtr);
@@ -112,14 +111,15 @@ void USkill_Active_Displacement::FindTarget()
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 	if (GetWorldImp()->SweepMultiByObjectType(
-		OutHits,
-		CharacterPtr->GetActorLocation(),
-		CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * Distance),
-		FQuat::Identity,
-		ObjectQueryParams,
-		CollisionShape,
-		CapsuleParams
-	))
+	                                          OutHits,
+	                                          CharacterPtr->GetActorLocation(),
+	                                          CharacterPtr->GetActorLocation() + (
+		                                          CharacterPtr->GetActorForwardVector() * Distance),
+	                                          FQuat::Identity,
+	                                          ObjectQueryParams,
+	                                          CollisionShape,
+	                                          CapsuleParams
+	                                         ))
 	{
 		for (auto Iter : OutHits)
 		{
@@ -136,7 +136,8 @@ void USkill_Active_Displacement::FindTarget()
 	const auto Pt1 = CharacterPtr->GetActorLocation();
 	if (TargetCharacterPtr)
 	{
-		const FVector Offset = (CharacterPtr->GetActorLocation() - TargetCharacterPtr->GetActorLocation()).GetSafeNormal() * ToCharacterOffset;
+		const FVector Offset = (CharacterPtr->GetActorLocation() - TargetCharacterPtr->GetActorLocation()).
+		                       GetSafeNormal() * ToCharacterOffset;
 		TargetPt = TargetCharacterPtr->GetActorLocation() + Offset;
 	}
 	else
@@ -157,17 +158,26 @@ void USkill_Active_Displacement::FindTarget()
 	SPlineActorPtr->SplineComponentPtr->AddSplinePoint(MidPt, ESplineCoordinateSpace::World);
 	SPlineActorPtr->SplineComponentPtr->AddSplinePoint(Pt2, ESplineCoordinateSpace::World);
 
-	SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(0, FVector::ZeroVector, FVector::ZeroVector, ESplineCoordinateSpace::World);
+	SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(
+	                                                             0,
+	                                                             FVector::ZeroVector,
+	                                                             FVector::ZeroVector,
+	                                                             ESplineCoordinateSpace::World
+	                                                            );
 
-	SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(2, FVector::ZeroVector, FVector::ZeroVector, ESplineCoordinateSpace::World);
+	SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(
+	                                                             2,
+	                                                             FVector::ZeroVector,
+	                                                             FVector::ZeroVector,
+	                                                             ESplineCoordinateSpace::World
+	                                                            );
 
 	auto TaskPtr = UAbilityTask_ApplyRootMotionBySPline::NewTask(
-		this,
-		TEXT(""),
-		Duration,
-		SPlineActorPtr,
-		CharacterPtr
-	);
+	                                                             this,
+	                                                             TEXT(""),
+	                                                             Duration,
+	                                                             SPlineActorPtr
+	                                                            );
 	TaskPtr->OnFinish.BindUObject(this, &ThisClass::K2_CancelAbility);
 	TaskPtr->ReadyForActivation();
 }
@@ -178,11 +188,11 @@ void USkill_Active_Displacement::PlayMontage()
 		const float InPlayRate = HumanMontage->CalculateSequenceLength() / Duration;
 
 		auto TaskPtr = UAbilityTask_ASCPlayMontage::CreatePlayMontageAndWaitProxy(
-			this,
-			TEXT(""),
-			HumanMontage,
-			InPlayRate
-		);
+			 this,
+			 TEXT(""),
+			 HumanMontage,
+			 InPlayRate
+			);
 
 		TaskPtr->Ability = this;
 		TaskPtr->SetAbilitySystemComponent(CharacterPtr->GetCharacterAbilitySystemComponent());

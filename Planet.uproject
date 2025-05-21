@@ -58,6 +58,10 @@
 		{
 			"Name": "GameplayStateTree",
 			"Enabled": true
+		},
+		{
+			"Name": "GameplayCameras",
+			"Enabled": true
 		}
 	]
 }

@@ -16,13 +16,15 @@
 #include "ProxyProcessComponent.h"
 
 #include "CharacterAbilitySystemComponent.h"
+#include "HumanCharacter_Player.h"
 #include "Planet_Tools.h"
+#include "PlayerComponent.h"
 
 static TAutoConsoleVariable<int32> SkillDrawDebugDash(
-	TEXT("Skill.DrawDebug.Dash"),
-	0,
-	TEXT("")
-	TEXT(" default: 0"));
+                                                      TEXT("Skill.DrawDebug.Dash"),
+                                                      0,
+                                                      TEXT("")
+                                                      TEXT(" default: 0"));
 
 UBasicFutures_Dash::UBasicFutures_Dash() :
 	Super()
@@ -62,6 +64,18 @@ void UBasicFutures_Dash::PreActivate(
 
 	if (CharacterPtr)
 	{
+#if UE_EDITOR || UE_CLIENT
+		if (
+			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		)
+		{
+			if (CharacterPtr->IsA(AHumanCharacter_Player::StaticClass()))
+			{
+				auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(CharacterPtr);
+				PlayerCharacterPtr->GetPlayerComponent()->SetCameraType(ECameraType::kDashing);
+			}
+		}
+#endif
 	}
 }
 
@@ -158,6 +172,18 @@ void UBasicFutures_Dash::EndAbility(
 {
 	if (CharacterPtr)
 	{
+#if UE_EDITOR || UE_CLIENT
+		if (
+			(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+		)
+		{
+			if (CharacterPtr->IsA(AHumanCharacter_Player::StaticClass()))
+			{
+				auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(CharacterPtr);
+				PlayerCharacterPtr->GetPlayerComponent()->SetCameraType(ECameraType::kAction);
+			}
+		}
+#endif
 	}
 
 #ifdef WITH_EDITOR

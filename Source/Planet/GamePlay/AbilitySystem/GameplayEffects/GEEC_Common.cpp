@@ -22,27 +22,34 @@ void UGEEC_Base::ApplyModifyData(
 	Spec.GetAllAssetTags(AllAssetTags);
 
 	TSet<FGameplayTag> NeedModifySet;
+	TSet<EAdditionalModify> AdditionalModifyAry;
+	TMap<FGameplayTag, float> NewDatas;
 
-	auto CustomMagnitudes = InstigatorPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
-		 AllAssetTags,
-		 NeedModifySet,
-		 SetByCallerTagMagnitudes,
-		 ExecutionParams,
-		 OutExecutionOutput
-		);
+	InstigatorPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
+	                                                                      AllAssetTags,
+	                                                                      NeedModifySet,
+	                                                                      SetByCallerTagMagnitudes,
+	                                                                      NewDatas,
+	                                                                      AdditionalModifyAry,
+	                                                                      ExecutionParams,
+	                                                                      OutExecutionOutput
+	                                                                     );
 
-	CustomMagnitudes = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyInputData(
-		 AllAssetTags,
-		 NeedModifySet,
-		 CustomMagnitudes,
-		 ExecutionParams,
-		 OutExecutionOutput
-		);
+	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyInputData(
+	                                                                          AllAssetTags,
+	                                                                          NeedModifySet,
+	                                                                          SetByCallerTagMagnitudes,
+	                                                                          NewDatas,
+	                                                                          AdditionalModifyAry,
+	                                                                          ExecutionParams,
+	                                                                          OutExecutionOutput
+	                                                                         );
 
 	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ApplyInputData(
 	                                                                         AllAssetTags,
 	                                                                         NeedModifySet,
-	                                                                         CustomMagnitudes,
+	                                                                         NewDatas,
+	                                                                         AdditionalModifyAry,
 	                                                                         ExecutionParams,
 	                                                                         OutExecutionOutput
 	                                                                        );
@@ -185,11 +192,15 @@ void UGEEC_Running::Execute_Implementation(
 	Spec.GetAllAssetTags(AllAssetTags);
 
 	TSet<FGameplayTag> NeedModifySet;
+	TSet<EAdditionalModify> AdditionalModifyAry;
+	TMap<FGameplayTag, float> NewDatas;
 
 	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
 	                                                                           AllAssetTags,
 	                                                                           NeedModifySet,
 	                                                                           CustomMagnitudes,
+	                                                                           NewDatas,
+	                                                                           AdditionalModifyAry,
 	                                                                           ExecutionParams,
 	                                                                           OutExecutionOutput
 	                                                                          );
@@ -237,11 +248,15 @@ void UGEEC_CancelRunning::Execute_Implementation(
 	Spec.GetAllAssetTags(AllAssetTags);
 
 	TSet<FGameplayTag> NeedModifySet;
+	TSet<EAdditionalModify> AdditionalModifyAry;
+	TMap<FGameplayTag, float> NewDatas;
 
 	TargetCharacterPtr->GetCharacterAbilitySystemComponent()->ModifyOutputData(
 	                                                                           AllAssetTags,
 	                                                                           NeedModifySet,
 	                                                                           CustomMagnitudes,
+	                                                                           NewDatas,
+	                                                                           AdditionalModifyAry,
 	                                                                           ExecutionParams,
 	                                                                           OutExecutionOutput
 	                                                                          );

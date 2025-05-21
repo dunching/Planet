@@ -102,12 +102,9 @@ bool FRootMotionSource_BySpline::Matches(
 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(Other);
 
 	return
-		(StartPtIndex == OtherCast->StartPtIndex) &&
-		(EndPtIndex == OtherCast->EndPtIndex) &&
-		(SPlineActorPtr == OtherCast->SPlineActorPtr) &&
-		(TargetCharacterPtr == OtherCast->TargetCharacterPtr) &&
-		FMath::IsNearlyEqual(StartDistance, OtherCast->StartDistance) &&
-		FMath::IsNearlyEqual(EndDistance, OtherCast->EndDistance);
+		(StartDistance == OtherCast->StartDistance) &&
+		(EndDistance == OtherCast->EndDistance) &&
+		(SPlineActorPtr == OtherCast->SPlineActorPtr) ;
 }
 
 bool FRootMotionSource_BySpline::NetSerialize(
@@ -121,12 +118,9 @@ bool FRootMotionSource_BySpline::NetSerialize(
 		return false;
 	}
 
-	Ar << StartPtIndex;
-	Ar << EndPtIndex;
 	Ar << StartDistance;
 	Ar << EndDistance;
 	Ar << SPlineActorPtr;
-	Ar << TargetCharacterPtr;
 
 	bOutSuccess = true;
 	return true;
@@ -149,12 +143,9 @@ bool FRootMotionSource_BySpline::UpdateStateFrom(
 
 	const FRootMotionSource_BySpline* OtherCast = static_cast<const FRootMotionSource_BySpline*>(SourceToTakeStateFrom);
 
-	StartPtIndex = OtherCast->StartPtIndex;
-	EndPtIndex = OtherCast->EndPtIndex;
 	StartDistance = OtherCast->StartDistance;
-	StartPtIndex = OtherCast->StartPtIndex;
+	EndDistance = OtherCast->EndDistance;
 	SPlineActorPtr = OtherCast->SPlineActorPtr;
-	TargetCharacterPtr = OtherCast->TargetCharacterPtr;
 
 	return true;
 }

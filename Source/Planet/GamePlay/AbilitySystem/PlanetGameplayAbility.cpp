@@ -218,6 +218,11 @@ void UPlanetGameplayAbility::DecrementListLockOverride() const
 	RunIfListLock();
 }
 
+bool UPlanetGameplayAbility::CanOncemorePerformAction() const
+{
+	return false;
+}
+
 bool UPlanetGameplayAbility::GetIsContinue() const
 {
 	PRINTFUNCSTR(UKismetStringLibrary::Conv_BoolToString(bIsContinue_));

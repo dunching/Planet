@@ -10,19 +10,31 @@
 #include "HumanAIController.h"
 #include "HumanCharacter_Player.h"
 #include "InputActions.h"
+#include "GameFramework/GameplayCameraComponent.h"
 
 FName UPlayerComponent::ComponentName = TEXT("PlayerComponent");
 
 UPlayerComponent::UPlayerComponent(
 	const FObjectInitializer& ObjectInitializer
-):
- Super(ObjectInitializer)
+	):
+	 Super(ObjectInitializer)
 {
 }
 
 void UPlayerComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+#if UE_EDITOR || UE_CLIENT
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
+	{
+		auto OnwerActorPtr = GetOwner<FOwnerType>();
+		if (!OnwerActorPtr)
+		{
+			return;
+		}
+	}
+#endif
 }
 
 bool UPlayerComponent::TeleportTo(
@@ -30,7 +42,7 @@ bool UPlayerComponent::TeleportTo(
 	const FRotator& DestRotation,
 	bool bIsATest,
 	bool bNoCheck
-)
+	)
 {
 	auto OnwerActorPtr = GetOwner<FOwnerType>();
 	if (!OnwerActorPtr)
@@ -40,18 +52,18 @@ bool UPlayerComponent::TeleportTo(
 
 	// TODO 使用EQS查询位置
 	OnwerActorPtr->GetGroupManagger()->GetTeamMatesHelperComponent()->TeleportTo(
-		DestLocation,
-		DestRotation,
-		bIsATest,
-		bNoCheck
-	);
+		 DestLocation,
+		 DestRotation,
+		 bIsATest,
+		 bNoCheck
+		);
 
 	return true;
 }
 
 void UPlayerComponent::PossessedBy(
 	APlayerController* NewController
-)
+	)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() == ROLE_AutonomousProxy)
@@ -63,9 +75,9 @@ void UPlayerComponent::PossessedBy(
 			InputActionsPtr->InitialInputMapping();
 
 			Subsystem->AddMappingContext(
-				InputActionsPtr->InputMappingContext,
-				0
-			);
+			                             InputActionsPtr->InputMappingContext,
+			                             0
+			                            );
 		}
 	}
 #endif
@@ -73,7 +85,7 @@ void UPlayerComponent::PossessedBy(
 
 void UPlayerComponent::SetupPlayerInputComponent(
 	UInputComponent* PlayerInputComponent
-)
+	)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() == ROLE_AutonomousProxy)
@@ -89,38 +101,45 @@ void UPlayerComponent::SetupPlayerInputComponent(
 			UEnhancedInputComponent>(PlayerInputComponent))
 		{
 			EnhancedInputComponent->BindAction(
-				InputActionsPtr->MoveForwardActionPtr,
-				ETriggerEvent::Triggered,
-				this,
-				&ThisClass::MoveForward
-			);
+			                                   InputActionsPtr->MoveForwardActionPtr,
+			                                   ETriggerEvent::Triggered,
+			                                   this,
+			                                   &ThisClass::MoveForward
+			                                  );
 			EnhancedInputComponent->BindAction(
-				InputActionsPtr->MoveRightActionPtr,
-				ETriggerEvent::Triggered,
-				this,
-				&ThisClass::MoveRight
-			);
+			                                   InputActionsPtr->MoveRightActionPtr,
+			                                   ETriggerEvent::Triggered,
+			                                   this,
+			                                   &ThisClass::MoveRight
+			                                  );
 
 			EnhancedInputComponent->BindAction(
-				InputActionsPtr->AddPitchActionPtr,
-				ETriggerEvent::Triggered,
-				this,
-				&ThisClass::AddPitchInput
-			);
+			                                   InputActionsPtr->AddPitchActionPtr,
+			                                   ETriggerEvent::Triggered,
+			                                   this,
+			                                   &ThisClass::AddPitchInput
+			                                  );
 			EnhancedInputComponent->BindAction(
-				InputActionsPtr->AddYawActionPtr,
-				ETriggerEvent::Triggered,
-				this,
-				&ThisClass::AddYawInput
-			);
+			                                   InputActionsPtr->AddYawActionPtr,
+			                                   ETriggerEvent::Triggered,
+			                                   this,
+			                                   &ThisClass::AddYawInput
+			                                  );
 		}
 	}
 #endif
 }
 
+void UPlayerComponent::SetCameraType(
+	ECameraType NewCameraType
+	)
+{
+	CameraType = NewCameraType;
+}
+
 void UPlayerComponent::AddYawInput(
 	const FInputActionValue& InputActionValue
-)
+	)
 {
 	const auto Value = InputActionValue.Get<float>();
 
@@ -131,7 +150,7 @@ void UPlayerComponent::AddYawInput(
 
 void UPlayerComponent::AddPitchInput(
 	const FInputActionValue& InputActionValue
-)
+	)
 {
 	const auto Value = InputActionValue.Get<float>();
 
@@ -142,7 +161,7 @@ void UPlayerComponent::AddPitchInput(
 
 void UPlayerComponent::MoveRight(
 	const FInputActionValue& InputActionValue
-)
+	)
 {
 	const auto Value = InputActionValue.Get<float>();
 
@@ -160,7 +179,7 @@ void UPlayerComponent::MoveRight(
 
 void UPlayerComponent::MoveForward(
 	const FInputActionValue& InputActionValue
-)
+	)
 {
 	const auto Value = InputActionValue.Get<float>();
 
@@ -172,9 +191,9 @@ void UPlayerComponent::MoveForward(
 
 		const FVector ForwardDirection =
 			UKismetMathLibrary::MakeRotFromZX(
-				-OnwerActorPtr->GetGravityDirection(),
-				Rotation.Quaternion().GetForwardVector()
-			).Vector();
+			                                  -OnwerActorPtr->GetGravityDirection(),
+			                                  Rotation.Quaternion().GetForwardVector()
+			                                 ).Vector();
 
 		OnwerActorPtr->AddMovementInput(ForwardDirection, Value);
 	}

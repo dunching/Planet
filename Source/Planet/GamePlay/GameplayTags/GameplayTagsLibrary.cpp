@@ -100,6 +100,9 @@ FGameplayTag UGameplayTagsLibrary::Ridering =
 FGameplayTag UGameplayTagsLibrary::State_Dying =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Dying")));
 
+FGameplayTag UGameplayTagsLibrary::State_Invisible =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Invisible")));
+
 FGameplayTag UGameplayTagsLibrary::State_MoveToLocation =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.MoveToLocation")));
 
@@ -147,26 +150,29 @@ FGameplayTag UGameplayTagsLibrary::State_Debuff_Slow =
 FGameplayTag UGameplayTagsLibrary::State_Debuff_Suppress =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.Debuff.Suppress")));
 
-FGameplayTag UGameplayTagsLibrary::RootMotion =
+FGameplayTag UGameplayTagsLibrary::State_IgnoreLookInput =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.IgnoreLookInput")));
+
+FGameplayTag UGameplayTagsLibrary::State_RootMotion =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion")));
 
 // 浮空状态（主动
-FGameplayTag UGameplayTagsLibrary::RootMotion_HasBeenFlyAway =
+FGameplayTag UGameplayTagsLibrary::State_RootMotion_HasBeenFlyAway =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.HasBeenFlyAway")));
 
 FGameplayTag UGameplayTagsLibrary::State_RootMotion_FlyAway =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.FlyAway")));
 
-FGameplayTag UGameplayTagsLibrary::KnockDown =
+FGameplayTag UGameplayTagsLibrary::State_RootMotion_KnockDown =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.KnockDown")));
 
 FGameplayTag UGameplayTagsLibrary::State_RootMotion_Traction =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.Traction")));
 
-FGameplayTag UGameplayTagsLibrary::TornadoTraction =
+FGameplayTag UGameplayTagsLibrary::State_RootMotion_TornadoTraction =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.TornadoTraction")));
 
-FGameplayTag UGameplayTagsLibrary::MoveAlongSpline =
+FGameplayTag UGameplayTagsLibrary::State_RootMotion_MoveAlongSpline =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.RootMotion.MoveAlongSpline")));
 
 FGameplayTag UGameplayTagsLibrary::State_RootMotion_MoveTo =

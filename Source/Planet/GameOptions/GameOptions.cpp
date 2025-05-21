@@ -46,45 +46,6 @@ UGameOptions::UGameOptions(const FObjectInitializer& ObjectInitializer):
 			ActionKeyMap.Add(Iter.SocketTag, Iter.Key);
 		}
 	}
-
-	GameplayFeatureKeyMapAry.Append({
-		FGameplayFeatureKeyMap(
-			EKeys::Escape,
-			TEXT("EntryActionProcessor"),
-			TextCollect::EntryActionProcessor
-			// UTextSubSystem::GetInstance()->GetText(TextCollect::EntryActionProcessor)
-			),
-		FGameplayFeatureKeyMap(
-			EKeys::B,
-			TEXT("ViewAllocationMenu"),
-			TextCollect::ViewAllocationMenu
-			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
-			),
-		FGameplayFeatureKeyMap(
-			EKeys::G,
-			TEXT("ViewGroupmateMenu"),
-			TextCollect::ViewGroupmateMenu
-			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
-			),
-		FGameplayFeatureKeyMap(
-			SwitchTeammateOptionToFollow,
-			TEXT("SwitchTeammateOptionToFollow"),
-			TextCollect::ViewGroupmateMenu
-			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
-			),
-		FGameplayFeatureKeyMap(
-			SwitchTeammateOptionToAssistance,
-			TEXT("SwitchTeammateOptionToAssistance"),
-			TextCollect::ViewGroupmateMenu
-			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
-			),
-		FGameplayFeatureKeyMap(
-			SwitchTeammateOptionToFireTarget,
-			TEXT("SwitchTeammateOptionToFireTarget"),
-			TextCollect::ViewGroupmateMenu
-			// UTextSubSystem::GetInstance()->GetText(TextCollect::ViewAllocationMenu)
-			),
-	});
 }
 
 UGameOptions* UGameOptions::GetInstance()
@@ -105,11 +66,6 @@ void UGameOptions::PostCDOContruct()
 void UGameOptions::PostInitProperties()
 {
 	Super::PostInitProperties();
-}
-
-TArray<FGameplayFeatureKeyMap> UGameOptions::GetGameplayFeatureKeyMapAry() const
-{
-	return GameplayFeatureKeyMapAry;
 }
 
 TMap<FGameplayTag, FKey> UGameOptions::GetActionKeyMap() const

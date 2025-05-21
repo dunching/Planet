@@ -36,7 +36,9 @@ bool IOutputDataModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
 	return true;
@@ -53,10 +55,109 @@ bool IInputDataModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
 	return true;
+}
+
+IOutputData_ProbabilityConfirmation_ModifyInterface::IOutputData_ProbabilityConfirmation_ModifyInterface(
+	int32 InPriority
+	):
+	 IOutputDataModifyInterface(InPriority)
+{
+}
+
+bool IOutputData_ProbabilityConfirmation_ModifyInterface::Modify(
+	const TObjectPtr<ACharacterBase>& Instigator,
+	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
+	TSet<FGameplayTag>& NeedModifySet,
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry
+	)
+{
+	const auto InstigatorCharacterAttributesPtr = Instigator->GetCharacterAttributesComponent()->
+	                                                          GetCharacterAttributes();
+
+	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
+	                                                              GetCharacterAttributes();
+
+	for (auto& Iter : RawDatas)
+	{
+		if (
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth)
+		)
+		{
+			const auto CriticalHitRate = InstigatorCharacterAttributesPtr->GetCriticalHitRate();
+			const auto RandNum = FMath::RandRange(0, 100);
+			if (RandNum <= CriticalHitRate)
+			{
+				AdditionalModifyAry.Add(EAdditionalModify::kIsCritical);
+
+				const auto CriticalMagnification = InstigatorCharacterAttributesPtr->GetCriticalDamage() / 100;
+				NewwDatas.Add(Iter.Key, Iter.Value * CriticalMagnification);
+			}
+		}
+	}
+
+	return false;
+}
+
+IInputData_ProbabilityConfirmation_ModifyInterface::IInputData_ProbabilityConfirmation_ModifyInterface(
+	int32 InPriority
+	):
+	 IInputDataModifyInterface(InPriority)
+{
+}
+
+bool IInputData_ProbabilityConfirmation_ModifyInterface::Modify(
+	const TObjectPtr<ACharacterBase>& Instigator,
+	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
+	TSet<FGameplayTag>& NeedModifySet,
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry
+	)
+{
+	const auto InstigatorCharacterAttributesPtr = Instigator->GetCharacterAttributesComponent()->
+	                                                          GetCharacterAttributes();
+
+	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
+	                                                              GetCharacterAttributes();
+
+	for (auto& Iter : RawDatas)
+	{
+		if (
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth)
+		)
+		{
+			const auto HitRate = InstigatorCharacterAttributesPtr->GetHitRate();
+			const auto Evade = InstigatorCharacterAttributesPtr->GetEvadeRate();
+
+			const auto RandNum = FMath::RandRange(0, 100);
+			if (RandNum <= (HitRate - Evade))
+			{
+			}
+			else
+			{
+				AdditionalModifyAry.Add(EAdditionalModify::kIsEvade);
+				NewwDatas.Add(Iter.Key, 0);
+			}
+		}
+	}
+
+	return false;
 }
 
 IInputData_BasicData_ModifyInterface::IInputData_BasicData_ModifyInterface(
@@ -70,7 +171,9 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
 	const int32 BaseResistance = 100;
@@ -79,7 +182,7 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 	                                                          GetCharacterAttributes();
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
 	                                                              GetCharacterAttributes();
-	for (auto& Iter : SetByCallerTagMagnitudes)
+	for (auto& Iter : RawDatas)
 	{
 		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 		{
@@ -96,7 +199,7 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 
 			const auto Percent = FMath::Clamp(ActulyResistance / (ActulyResistance + BaseResistance), 0, 1);
 
-			Iter.Value = Iter.Value - (Iter.Value * Percent);
+			NewwDatas.Add(Iter.Key, Iter.Value - (Iter.Value * Percent));
 		}
 		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
 		{
@@ -117,14 +220,16 @@ bool IInputData_Shield_ModifyInterface::Modify(
 	const TObjectPtr<ACharacterBase>& Instigator,
 	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 	TSet<FGameplayTag>& NeedModifySet,
-	TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry
 	)
 {
 	const auto InstigatorCharacterAttributesPtr = Instigator->GetCharacterAttributesComponent()->
 	                                                          GetCharacterAttributes();
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
 	                                                              GetCharacterAttributes();
-	for (auto& Iter : SetByCallerTagMagnitudes)
+	for (auto& Iter : RawDatas)
 	{
 		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 		{
@@ -135,11 +240,10 @@ bool IInputData_Shield_ModifyInterface::Modify(
 			}
 
 			NeedModifySet.Add(UGameplayTagsLibrary::GEData_ModifyItem_Shield);
-			
+
 			const auto Offset = Iter.Value - ShieldValue;
 			if (Offset > 0)
 			{
-				Iter.Value = Offset;
 				TargetCharacterPtr->GetCharacterAbilitySystemComponent()->UpdateMapTemporary(
 					 UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override,
 					 0,
@@ -147,6 +251,7 @@ bool IInputData_Shield_ModifyInterface::Modify(
 						  TargetCharacterAttributesPtr
 						 )
 					);
+				NewwDatas.Add(Iter.Key, Offset);
 			}
 			else
 			{
@@ -157,11 +262,55 @@ bool IInputData_Shield_ModifyInterface::Modify(
 						  TargetCharacterAttributesPtr
 						 )
 					);
-				Iter.Value = 0;
+				NewwDatas.Add(Iter.Key, 0);
 			}
 		}
 		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
 		{
+		}
+	}
+
+	return false;
+}
+
+IOutputData_MultipleDamega_ModifyInterface::IOutputData_MultipleDamega_ModifyInterface(
+	int32 InPriority,
+	int32 InCount,
+	float InMultiple
+	):
+	 IOutputDataModifyInterface(InPriority)
+	 , Multiple(InMultiple)
+	 , Count(InCount)
+{
+}
+
+bool IOutputData_MultipleDamega_ModifyInterface::Modify(
+	const TObjectPtr<ACharacterBase>& Instigator,
+	const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
+	TSet<FGameplayTag>& NeedModifySet,
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry
+	)
+{
+	for (auto& Iter : RawDatas)
+	{
+		if (
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth)
+		)
+		{
+			CurrentCount++;
+
+			NewwDatas.Add(Iter.Key, Iter.Value * Multiple);
+			
+			if (CurrentCount >= Count)
+			{
+				return true;
+			}
 		}
 	}
 

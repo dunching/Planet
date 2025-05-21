@@ -72,12 +72,14 @@ public:
 
 protected:
 
-	void OnSendAttack(
+	void MakedDamageDelegate(
 		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 	);
 	
 	FMakedDamageHandle AbilityActivatedCallbacksHandle;
 
+private:
+	
 	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
 };

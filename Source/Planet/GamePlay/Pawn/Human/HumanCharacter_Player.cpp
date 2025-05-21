@@ -5,6 +5,7 @@
 #include "CollisionDataStruct.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/PlayerInput.h"
+#include "GameFramework/GameplayCameraComponent.h"
 
 #include "GravitySpringArmComponent.h"
 #include "PlayerComponent.h"
@@ -31,6 +32,7 @@
 #include "ResourceBoxBase.h"
 #include "STT_CommonData.h"
 #include "UIManagerSubSystem.h"
+#include "PlanetGameplayCameraComponent.h"
 
 namespace HumanProcessor
 {
@@ -242,16 +244,8 @@ AHumanCharacter_Player::AHumanCharacter_Player(
 	       )
 {
 	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<UGravitySpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-
-	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	// Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	GameplayCameraComponentPtr = CreateDefaultSubobject<UGameplayCameraComponent>(TEXT("GameplayCameraComponent"));
+	GameplayCameraComponentPtr->SetupAttachment(RootComponent);
 
 	PlayerComponentPtr = CreateDefaultSubobject<UPlayerComponent>(UPlayerComponent::ComponentName);
 }
@@ -259,6 +253,18 @@ AHumanCharacter_Player::AHumanCharacter_Player(
 void AHumanCharacter_Player::BeginPlay()
 {
 	Super::BeginPlay();
+	
+#if UE_EDITOR || UE_CLIENT
+	if (GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		// BUG,先暂时这样处理
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(TimerHandle, [this]
+		{
+			AdjustCamera(UGameOptions::GetInstance()->DefaultBoomLength);
+		}, 1, true);
+	}
+#endif
 }
 
 void AHumanCharacter_Player::PossessedBy(
@@ -354,16 +360,6 @@ void AHumanCharacter_Player::OnGroupManaggerReady(
 #endif
 }
 
-UCameraComponent* AHumanCharacter_Player::GetCameraComp()
-{
-	return FollowCamera;
-}
-
-USpringArmComponent* AHumanCharacter_Player::GetCameraBoom()
-{
-	return CameraBoom;
-}
-
 UPlayerConversationComponent* AHumanCharacter_Player::GetPlayerConversationComponent() const
 {
 	return Cast<UPlayerConversationComponent>(ConversationComponentPtr);
@@ -377,6 +373,16 @@ USceneCharacterPlayerInteractionComponent* AHumanCharacter_Player::GetSceneChara
 UCharacterPlayerStateProcessorComponent* AHumanCharacter_Player::GetCharacterPlayerStateProcessorComponent() const
 {
 	return Cast<UCharacterPlayerStateProcessorComponent>(StateProcessorComponentPtr);
+}
+
+TObjectPtr<UGameplayCameraComponent> AHumanCharacter_Player::GetGameplayCameraComponent() const
+{
+	return GameplayCameraComponentPtr;
+}
+
+TObjectPtr<UPlayerComponent> AHumanCharacter_Player::GetPlayerComponent() const
+{
+	return PlayerComponentPtr;
 }
 
 void AHumanCharacter_Player::UpdateSightActor()
@@ -439,20 +445,6 @@ void AHumanCharacter_Player::UpdateSightActor()
 		EndLookAt();
 		LookAtSceneActorPtr = nullptr;
 	}
-}
-
-TPair<FVector, FVector> AHumanCharacter_Player::GetCharacterViewInfo()
-{
-	FMinimalViewInfo DesiredView;
-
-	GetCameraComp()->GetCameraView(0, DesiredView);
-
-	TPair<FVector, FVector> Result(
-	                               DesiredView.Location,
-	                               DesiredView.Location + (DesiredView.Rotation.Vector() * 1000)
-	                              );
-
-	return Result;
 }
 
 void AHumanCharacter_Player::StartLookAt(

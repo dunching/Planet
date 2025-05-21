@@ -28,7 +28,7 @@ namespace HumanProcessor
 
 		virtual bool InputKey(
 			const FInputKeyEventArgs& EventArgs
-		);
+		) override;
 
 		void Switch2RegularProcessor();
 

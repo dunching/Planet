@@ -15,6 +15,8 @@
 #include "Planet_Tools.h"
 #include "AbilityTask_TimerHelper.h"
 #include "AS_Character.h"
+#include "GameplayCameraHelper.h"
+#include "HumanCharacter_Player.h"
 
 UBasicFutures_Running::UBasicFutures_Running() :
                                                Super()
@@ -69,6 +71,11 @@ void UBasicFutures_Running::PreActivate(
 	)
 {
 	Super::PreActivate(Handle, ActorInfo, ActivationInfo, OnGameplayAbilityEndedDelegate, TriggerEventData);
+
+	UGameplayCameraHelper::SwitchGaplayCameraType(
+												  Cast<AHumanCharacter_Player>(CharacterPtr),
+												  ECameraType::kRunning
+												 );
 }
 
 void UBasicFutures_Running::ActivateAbility(
@@ -158,6 +165,11 @@ void UBasicFutures_Running::EndAbility(
 #endif
 	}
 
+	UGameplayCameraHelper::SwitchGaplayCameraType(
+												  Cast<AHumanCharacter_Player>(CharacterPtr),
+												  ECameraType::kAction
+												 );
+	
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 

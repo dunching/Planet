@@ -48,8 +48,10 @@ void USkill_Active_BYWD::PerformAction(
 {
 	Super::PerformAction(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-#if UE_EDITOR || UE_SERVER
-	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
+	if (
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority) ||
+		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_AutonomousProxy)
+	)
 	{
 		// CharacterStateInfoSPtr = MakeShared<FCharacterStateInfo>();
 		// CharacterStateInfoSPtr->Tag = SkillProxyPtr->GetProxyType();
@@ -70,7 +72,6 @@ void USkill_Active_BYWD::PerformAction(
 			TaskPtr->ReadyForActivation();
 		}
 	}
-#endif
 
 	PlayMontage();
 
@@ -154,11 +155,11 @@ void USkill_Active_BYWD::ApplyCost(
 	const FGameplayAbilityActivationInfo ActivationInfo
 	) const
 {
-	UGameplayEffect* CooldownGE = GetCooldownGameplayEffect();
-	if (CooldownGE)
+	UGameplayEffect* CostGE = GetCostGameplayEffect();
+	if (CostGE)
 	{
 		FGameplayEffectSpecHandle SpecHandle =
-			MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
+			MakeOutgoingGameplayEffectSpec(CostGE->GetClass(), GetAbilityLevel());
 		SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 		SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
 		SpecHandle.Data.Get()->SetSetByCallerMagnitude(

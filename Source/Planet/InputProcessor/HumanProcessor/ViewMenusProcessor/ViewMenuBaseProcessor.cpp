@@ -52,7 +52,7 @@ namespace HumanProcessor
 
 				auto GameOptionsPtr = UGameOptions::GetInstance();
 				
-				if (EventArgs.Key == GameOptionsPtr->Return)
+				if (EventArgs.Key == GameOptionsPtr->EntryActionProcessor)
 				{
 					Switch2RegularProcessor();
 					return true;
@@ -62,6 +62,15 @@ namespace HumanProcessor
 			break;
 		case IE_Released:
 			{
+				auto GameOptionsPtr = UGameOptions::GetInstance();
+
+				// 这个事件只有Rlease？
+				if (EventArgs.Key == GameOptionsPtr->Return)
+				{
+					Switch2RegularProcessor();
+					return true;
+				}
+				
 			}
 			break;
 		}

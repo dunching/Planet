@@ -79,6 +79,10 @@ public:
 
 	TObjectPtr<UPlayerControllerGameplayTasksComponent> GetGameplayTasksComponent() const;
 
+	void AddProvideEyesViewActor(const TObjectPtr<AActor>&ProvideEyesViewActor);
+	
+	void RemoveProvideEyesViewActor(const TObjectPtr<AActor>&ProvideEyesViewActor);
+	
 #pragma region CMD
 
 	UFUNCTION(Server, Reliable)
@@ -236,6 +240,8 @@ protected:
 		const FInputKeyParams& Params
 		) override;
 
+	 virtual void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
+	
 	virtual void OnRep_PlayerState() override;
 
 	virtual void OnGroupManaggerReady(
@@ -278,4 +284,6 @@ protected:
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge FocusInformation;
+	
+	TSet<TWeakObjectPtr<AActor>> ProvideEyesViewActorSet;
 };

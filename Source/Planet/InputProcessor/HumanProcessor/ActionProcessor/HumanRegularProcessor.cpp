@@ -70,6 +70,7 @@
 #include "ResourceBox.h"
 #include "GroupManagger.h"
 #include "HumanCharacter_AI.h"
+#include "HumanViewSetting.h"
 #include "ItemProxy_Character.h"
 #include "TextCollect.h"
 
@@ -119,17 +120,6 @@ namespace HumanProcessor
 			);
 
 			AddOrRemoveUseMenuItemEvent(true);
-			const auto GameplayFeatureKeyMapAry = UGameOptions::GetInstance()->GetGameplayFeatureKeyMapAry();
-			for (const auto& Iter : GameplayFeatureKeyMapAry)
-			{
-				// 忽略一些命令
-				if (Iter.CMD == TextCollect::EntryActionProcessor)
-				{
-					const auto Key = Iter.Key;
-				}
-
-				GameplayFeatureKeyMapMap.Add(Iter.Key, Iter);
-			}
 		}
 	}
 
@@ -246,15 +236,6 @@ namespace HumanProcessor
 					}
 				}
 
-				auto GameplayFeatureKeyMapMapIter = GameplayFeatureKeyMapMap.Find(EventArgs.Key);
-				if (GameplayFeatureKeyMapMapIter)
-				{
-					OnwerActorPtr->GetController<APlayerController>()->ConsoleCommand(
-						GameplayFeatureKeyMapMapIter->CMD
-					);
-					return true;
-				}
-
 				// 可激活的技能或消耗品插槽
 				auto SkillIter = HandleKeysMap.Find(EventArgs.Key);
 				if (SkillIter)
@@ -268,6 +249,24 @@ namespace HumanProcessor
 				if (EventArgs.Key == GameOptionsPtr->SwitchWeapon)
 				{
 					SwitchWeapon();
+					return true;
+				}
+				
+				if (EventArgs.Key == GameOptionsPtr->ViewSetting)
+				{
+					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewSetting>();
+					return true;
+				}
+				
+				if (EventArgs.Key == GameOptionsPtr->ViewGroupmateMenu)
+				{
+					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FViewGroupsProcessor>();
+					return true;
+				}
+				
+				if (EventArgs.Key == GameOptionsPtr->ViewAllocationMenu)
+				{
+					UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<FHumanViewAlloctionSkillsProcessor>();
 					return true;
 				}
 				
@@ -291,7 +290,8 @@ namespace HumanProcessor
 				{
 					auto OnwerActorPtr = GetOwnerActor<FOwnerPawnType>();
 					if (
-						SkillIter->Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket)
+						SkillIter->Socket.MatchesTag(UGameplayTagsLibrary::WeaponSocket) ||
+						SkillIter->Socket.MatchesTag(UGameplayTagsLibrary::ActiveSocket) 
 					)
 					{
 						OnwerActorPtr->GetProxyProcessComponent()->CancelAction(SkillIter->Socket);

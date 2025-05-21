@@ -336,6 +336,19 @@ bool FActiveSkillProxy::Active()
 
 void FActiveSkillProxy::Cancel()
 {
+	auto InGAInsPtr = Cast<USkill_Active_Base>(GetGAInst());
+	if (!InGAInsPtr)
+	{
+		return;
+	}
+
+	auto ASCPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent();
+
+	ASCPtr->SetContinuePerform_Server(
+		InGAInsPtr->GetCurrentAbilitySpecHandle(),
+		InGAInsPtr->GetCurrentActivationInfo(),
+		false
+	);
 }
 
 bool FActiveSkillProxy::GetRemainingCooldown(

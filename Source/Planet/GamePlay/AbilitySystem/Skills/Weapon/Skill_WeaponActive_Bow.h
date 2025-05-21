@@ -57,6 +57,8 @@ public:
 
 	using FWeaponActorType = AWeapon_Bow;
 
+	using FItemProxy_DescriptionType = UItemProxy_Description_WeaponSkill;
+	
 	USkill_WeaponActive_Bow();
 
 	virtual void OnAvatarSet(
@@ -124,20 +126,15 @@ protected:
 	UAnimMontage* BowMontage = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	EElementalType ElementalType = EElementalType::kMetal;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	int32 Elemental_Damage = 10;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
 	int32 SweepWidth = 500;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float Elemental_Damage_Magnification = .5f;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<ASkill_WeaponActive_Bow_Projectile>Skill_WeaponActive_RangeTest_ProjectileClass;
 
 	FWeaponActorType* WeaponActorPtr = nullptr;
+
+private:
+	
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 
 };

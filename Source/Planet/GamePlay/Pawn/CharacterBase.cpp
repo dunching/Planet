@@ -47,6 +47,7 @@
 #include "GE_CharacterInitail.h"
 #include "GroupManagger.h"
 #include "PlanetCharacterMovementComponent.h"
+#include "Weapon_Base.h"
 
 ACharacterBase::ACharacterBase(
 	const FObjectInitializer& ObjectInitializer
@@ -430,6 +431,13 @@ void ACharacterBase::SpawnDefaultController()
 	}
 
 	OriginalAIController = Controller;
+}
+
+void ACharacterBase::SetActorHiddenInGame(
+	bool bNewHidden
+	)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
 }
 
 void ACharacterBase::OnGroupManaggerReady(

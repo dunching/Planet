@@ -79,7 +79,7 @@ protected:
 	
 	void RemoveShield();
 
-	void OnSendAttack(const FGAEventData& GAEventData);
+	void MakedDamageDelegate(const FGAEventData& GAEventData);
 
 	void CD_DurationDelegate(UAbilityTask_TimerHelper*, float CurrentTime, float Duration);
 	

@@ -64,6 +64,8 @@ protected:
 
 	void InitialWeaponSkillIcon();
 
+	void InitialPassiveSkillIcon();
+
 	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfoHandle;
 
 	TArray<FOnAllocationSkillChangedHandle> OnAllocationSkillChangedDelegateAry;

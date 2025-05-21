@@ -83,6 +83,8 @@ public:
 
 	virtual void OnRep_Controller() override;
 
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+	
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -150,7 +152,7 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void SpawnDefaultController() override;
-
+	
 	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
 	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) override;

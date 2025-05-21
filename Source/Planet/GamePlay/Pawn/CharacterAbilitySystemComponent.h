@@ -89,18 +89,22 @@ public:
 
 #pragma region 输入和输出得修正
 
-	TMap<FGameplayTag, float> ModifyOutputData(
+	void ModifyOutputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
 
-	TMap<FGameplayTag, float> ModifyInputData(
+	void ModifyInputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
-		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
@@ -109,6 +113,7 @@ public:
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
+		const TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 		);
@@ -210,6 +215,14 @@ public:
 
 	void SwitchCantBeSelect(
 		bool bIsCanBeSelect
+		);
+
+	/**
+	 * 是否进入隐身状态
+	 * @param bIsInvisible 
+	 */
+	void SwitchInvisible(
+		bool bIsInvisible
 		);
 
 	UFUNCTION(Server, Reliable)

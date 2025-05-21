@@ -122,10 +122,7 @@ void UPlanetAbilitySystemComponent::SetContinuePerform_Server_Implementation(
 
 			for (auto Instance : Instances)
 			{
-				if (Cast<UPlanetGameplayAbility>(Instance)->CanActivateAbility(
-					Handle,
-					Instance->GetCurrentActorInfo()
-				))
+				if (Cast<UPlanetGameplayAbility>(Instance)->CanOncemorePerformAction())
 				{
 					ReplicatePerformAction(Handle, ActivationInfo);
 				}

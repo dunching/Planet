@@ -100,35 +100,6 @@ namespace HumanProcessor
 	{
 		FMinimalViewInfo DesiredView;
 
-		GetOwnerActor<FOwnerPawnType>()->GetCameraComp()->GetCameraView(0, DesiredView);
-
-		auto StartPt = DesiredView.Location;
-		auto StopPt = DesiredView.Location + (DesiredView.Rotation.Vector() * 1000);
-
-		auto OnwerActorPtr = GetOwnerActor<AHumanCharacter>();
-
-		FCollisionQueryParams Params;
-		Params.AddIgnoredActor(BuildTargetPtr);
-		Params.AddIgnoredActor(BuildTargetPtr->BuildingCaptureDataPtr);
-		Params.AddIgnoredActor(OnwerActorPtr);
-
-		FCollisionObjectQueryParams ObjectQueryParams;
-		ObjectQueryParams.AddObjectTypesToQuery(VoxelWorld_Object);
-		ObjectQueryParams.AddObjectTypesToQuery(Building_Object);
-		ObjectQueryParams.AddObjectTypesToQuery(CapturePoint_Object);
-
-		TArray<FHitResult> OutHitsAry;
-		if (GetWorldImp()->LineTraceMultiByObjectType(
-			OutHitsAry,
-			StartPt,
-			StopPt,
-			ObjectQueryParams,
-			Params
-		))
-		{
-		}
-		OutHitsAry.Add(FHitResult(StartPt, StopPt));
-		AsyncFindCaptureComponent(OutHitsAry);
 	}
 
 	void FPlacingProcessor::AsyncFindCaptureComponent(const TArray<FHitResult>& OutHitsAry)

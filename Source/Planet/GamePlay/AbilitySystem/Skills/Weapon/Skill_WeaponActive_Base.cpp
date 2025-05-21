@@ -80,15 +80,6 @@ bool USkill_WeaponActive_Base::CanActivateAbility(
 	OUT FGameplayTagContainer* OptionalRelevantTags /*= nullptr */
 	) const
 {
-	if (WaitInput)
-	{
-		PRINTFUNCSTR(TEXT(""));
-	}
-	else
-	{
-		PRINTFUNCSTR(TEXT(""));
-		return false;
-	}
 	return Super::CanActivateAbility(Handle, ActorInfo, SourceTags, TargetTags, OptionalRelevantTags);
 }
 
@@ -184,12 +175,19 @@ void USkill_WeaponActive_Base::PerformAction(
 	ResetPreviousStageActions();
 }
 
-void USkill_WeaponActive_Base::WaitInputTick(
-	UAbilityTask_TimerHelper* InWaitInputTaskPtr,
-	float Interval,
-	float Duration
-	)
+bool USkill_WeaponActive_Base::CanOncemorePerformAction() const
 {
+	if (WaitInput)
+	{
+		PRINTFUNCSTR(TEXT(""));
+		
+		return true;
+	}
+	else
+	{
+		PRINTFUNCSTR(TEXT(""));
+		return false;
+	}
 }
 
 void USkill_WeaponActive_Base::EnableMovement(

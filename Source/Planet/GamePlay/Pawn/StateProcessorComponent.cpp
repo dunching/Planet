@@ -199,7 +199,7 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 		return Value;
 	};
 
-	if (Tag.MatchesTag(UGameplayTagsLibrary::RootMotion))
+	if (Tag.MatchesTag(UGameplayTagsLibrary::State_RootMotion))
 	{
 		if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_RootMotion_FlyAway))
 		{
@@ -321,6 +321,19 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 			}
 		}
 	}
+	else if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_IgnoreLookInput))
+	{
+#if UE_EDITOR || UE_CLIENT
+		if (GetOwnerRole() == ROLE_AutonomousProxy)
+		{
+			auto CharacterPtr = GetOwner<FOwnerPawnType>();
+			if (CharacterPtr)
+			{
+				CharacterPtr->GetController()->SetIgnoreLookInput(Lambda());
+			}
+		}
+#endif
+	}
 	else if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_ReleasingSkill))
 	{
 		auto CharacterPtr = GetOwner<FOwnerPawnType>();
@@ -350,6 +363,14 @@ void UStateProcessorComponent::OnGameplayEffectTagCountChanged(
 				                                                                   ECollisionResponse::ECR_Overlap :
 				                                                                   ECollisionResponse::ECR_Block
 			                                                                  );
+		}
+	}
+	else if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Invisible))
+	{
+		auto CharacterPtr = GetOwner<FOwnerPawnType>();
+		if (CharacterPtr)
+		{
+			CharacterPtr->GetCharacterAbilitySystemComponent()->SwitchInvisible(Lambda());
 		}
 	}
 	else if (Tag.MatchesTagExact(UGameplayTagsLibrary::State_Debuff_Suppress))

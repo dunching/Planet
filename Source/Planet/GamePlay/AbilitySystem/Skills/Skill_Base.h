@@ -65,14 +65,14 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-		);
+		) override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
-		);
+		) override;
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -155,15 +155,42 @@ protected:
 		int32 MaxDistance
 		) const;
 
-	FGameplayEffectSpecHandle MakeDamageToTarget(
+	/**
+	 * 获取范围内所有目标，按距离角色远近排序
+	 * @param MaxDistance 
+	 * @return 
+	 */
+	TArray<TObjectPtr<ACharacterBase>> GetTargetsInDistanceByNearestCharacter(
+		int32 MaxDistance,
+		int32 UpForwardDistance,
+		int32 DownDistance
+		) const;
+
+	/**
+	 * 获取范围内所有目标，按距离角色视线排序
+	 * @param MaxDistance 
+	 * @return 
+	 */
+	TArray<TObjectPtr<ACharacterBase>> GetTargetsInDistanceByNearestCharacterViewDirection(
+		int32 MaxDistance,
+		int32 UpForwardDistance,
+		int32 DownDistance
+		) const;
+
+	FGameplayEffectSpecHandle MakeDamageToTargetSpecHandle(
 		EElementalType ElementalType,
 		int32 Elemental_Damage,
 		float Elemental_Damage_Magnification
-		);
+		)const;
 
-	ACharacterBase* CharacterPtr = nullptr;
+	TObjectPtr<ACharacterBase> CharacterPtr = nullptr;
 
 	TSharedPtr<FSkillProxy> SkillProxyPtr = nullptr;
 
 private:
+	TSet<TObjectPtr<ACharacterBase>> GetTargetsInDistance(
+		int32 MaxDistance,
+		int32 UpForwardDistance,
+		int32 DownDistance
+		) const;
 };

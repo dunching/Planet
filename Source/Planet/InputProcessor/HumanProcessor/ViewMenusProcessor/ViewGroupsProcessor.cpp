@@ -31,10 +31,18 @@ namespace HumanProcessor
 	void FViewGroupsProcessor::EnterAction()
 	{
 		Super::EnterAction();
+
+		auto HumanCharaterPtr = GetOwnerActor<FOwnerPawnType>();
+
+		// UUIManagerSubSystem::GetInstance()->ViewTalentAllocation(true);
+		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kMenuLayout);
+		UUIManagerSubSystem::GetInstance()->SwitchMenuLayout(EMenuType::kGroupManagger);
 	}
 
 	void FViewGroupsProcessor::QuitAction()
 	{
+		UUIManagerSubSystem::GetInstance()->SwitchLayout(ELayoutCommon::kEmptyLayout);
+
 		Super::QuitAction();
 	}
 

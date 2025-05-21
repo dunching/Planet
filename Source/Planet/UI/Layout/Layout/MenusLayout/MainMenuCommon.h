@@ -16,4 +16,5 @@ enum class EMenuType : uint8
 	kRaffle,
 	kViewTask,
 	kViewMap,
+	kViewSetting,
 };

@@ -91,7 +91,7 @@ void USkill_Passive_XS::PerformAction(
 #endif
 }
 
-void USkill_Passive_XS::OnSendAttack(const FGAEventData& GAEventData)
+void USkill_Passive_XS::MakedDamageDelegate(const FGAEventData& GAEventData)
 {
 }
 

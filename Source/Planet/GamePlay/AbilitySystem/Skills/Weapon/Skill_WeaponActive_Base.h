@@ -100,13 +100,12 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
+	virtual bool CanOncemorePerformAction() const override;
+
 	/**
 	 *	进入等待输入，如果按下了攻击键，则继续执行
 	 */
 	bool PerformIfContinue();
-
-	UFUNCTION()
-	void WaitInputTick(UAbilityTask_TimerHelper* WaitInputTaskPtr, float Interval, float Duration);
 
 	void EnableMovement(bool bEnableMovement);
 	

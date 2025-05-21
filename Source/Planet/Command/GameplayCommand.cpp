@@ -10,6 +10,7 @@
 #include "ChallengeSystem.h"
 #include "GroupManagger.h"
 #include "GuideSubSystem.h"
+#include "HumanViewSetting.h"
 #include "HumanViewTalentAllocation.h"
 #include "OpenWorldDataLayer.h"
 #include "OpenWorldSystem.h"
@@ -33,6 +34,11 @@ void GameplayCommand::EntryActionProcessor()
 void GameplayCommand::ViewGroupmateMenu()
 {
 	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewTalentAllocation>();
+}
+
+void GameplayCommand::ViewSetting()
+{
+	UInputProcessorSubSystem::GetInstance()->SwitchToProcessor<HumanProcessor::FHumanViewSetting>();
 }
 
 void GameplayCommand::EntryChallengeLevel(

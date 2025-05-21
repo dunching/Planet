@@ -43,6 +43,12 @@ private:
 	int32 ID = -1;
 };
 
+enum class EAdditionalModify:uint8
+{
+	kIsCritical,
+	kIsEvade,
+};
+
 class PLANET_API IOutputDataModifyInterface : public IDataModifyInterface
 {
 public:
@@ -50,12 +56,23 @@ public:
 		int32 InPriority = 1
 		);
 
-	// Return：本次修改完是否移除本【修正方式】
+	/**
+	 * 
+	 * @param Instigator 
+	 * @param TargetCharacterPtr 
+	 * @param NeedModifySet 
+	 * @param RawDatas 
+	 * @param NewwDatas 
+	 * @param AdditionalModifyAry 
+	 * @return 本次修改完是否移除本【修正方式】
+	 */
 	virtual bool Modify(
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewwDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry
 		);
 };
 
@@ -70,7 +87,9 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewwDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry
 		);
 };
 
@@ -88,6 +107,46 @@ struct FDataModify_key_compare
 #pragma region 基础的折算
 
 /**
+ * 会心率、会心伤害确认
+ */
+class PLANET_API IOutputData_ProbabilityConfirmation_ModifyInterface : public IOutputDataModifyInterface
+{
+public:
+	IOutputData_ProbabilityConfirmation_ModifyInterface(
+		int32 InPriority
+		);
+
+	virtual bool Modify(
+		const TObjectPtr<ACharacterBase>& Instigator,
+		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
+		TSet<FGameplayTag>& NeedModifySet,
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewwDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry
+		) override;
+};
+
+/**
+ * 命中率确认
+ */
+class PLANET_API IInputData_ProbabilityConfirmation_ModifyInterface : public IInputDataModifyInterface
+{
+public:
+	IInputData_ProbabilityConfirmation_ModifyInterface(
+		int32 InPriority
+		);
+
+	virtual bool Modify(
+		const TObjectPtr<ACharacterBase>& Instigator,
+		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
+		TSet<FGameplayTag>& NeedModifySet,
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewwDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry
+		) override;
+};
+
+/**
  * 元素伤害的基础输入折算
  * 基于对方的穿透和自身的抗性，折算伤害数据
  */
@@ -102,7 +161,9 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewwDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry
 		) override;
 };
 
@@ -120,8 +181,43 @@ public:
 		const TObjectPtr<ACharacterBase>& Instigator,
 		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
 		TSet<FGameplayTag>& NeedModifySet,
-		TMap<FGameplayTag, float>& SetByCallerTagMagnitudes
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewwDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry
 		) override;
 };
+
+#pragma endregion
+
+#pragma region 通用的修正
+
+/**
+ * 接下来的伤害修正输出的次数
+ */
+class PLANET_API IOutputData_MultipleDamega_ModifyInterface : public IOutputDataModifyInterface
+{
+public:
+	IOutputData_MultipleDamega_ModifyInterface(
+		int32 InPriority,
+		int32 InCount,
+		float InMultiple
+		);
+
+	virtual bool Modify(
+		const TObjectPtr<ACharacterBase>& Instigator,
+		const TObjectPtr<ACharacterBase>& TargetCharacterPtr,
+		TSet<FGameplayTag>& NeedModifySet,
+		const TMap<FGameplayTag, float>& RawDatas,
+		TMap<FGameplayTag, float>& NewwDatas,
+		TSet<EAdditionalModify>& AdditionalModifyAry
+		) override;
+
+	float Multiple = 1.f;
+	
+	int32 Count = 1;
+	
+	int32 CurrentCount = 0;
+};
+
 
 #pragma endregion

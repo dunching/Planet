@@ -42,7 +42,7 @@ void USkill_Passive_XR::OnAvatarSet(
 		{
 			AbilityActivatedCallbacksHandle =
 				CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
-					std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_1)
+					std::bind(&ThisClass::MakedDamageDelegate, this, std::placeholders::_1)
 				);
 		}
 	}
@@ -69,7 +69,7 @@ void USkill_Passive_XR::OnRemoveAbility(
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
-void USkill_Passive_XR::OnSendAttack(
+void USkill_Passive_XR::MakedDamageDelegate(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 )
 {

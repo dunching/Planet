@@ -70,6 +70,8 @@ APlanetPlayerController::APlanetPlayerController(
 	GameplayTasksComponentPtr = CreateDefaultSubobject<UPlayerControllerGameplayTasksComponent>(
 		 UPlayerControllerGameplayTasksComponent::ComponentName
 		);
+
+	bAutoManageActiveCameraTarget = false;
 }
 
 void APlanetPlayerController::ServerSpawnGeneratorActor_Implementation(
@@ -382,7 +384,7 @@ void APlanetPlayerController::BeginPlay()
 	{
 		// 因为Pawn是通过网络同步过来的，所以不在OnPoss里面去做
 		auto CurrentPawn = GetPawn();
-		if (CurrentPawn->IsA(AHumanCharacter::StaticClass()))
+		if (CurrentPawn && CurrentPawn->IsA(AHumanCharacter::StaticClass()))
 		{
 			FInputModeGameOnly InputMode;
 			SetInputMode(InputMode);
@@ -492,6 +494,26 @@ bool APlanetPlayerController::InputKey(
 	auto Result = Super::InputKey(Params);
 
 	return Result;
+}
+
+void APlanetPlayerController::GetActorEyesViewPoint(
+	FVector& Location,
+	FRotator& Rotation
+	) const
+{
+	if (!ProvideEyesViewActorSet.IsEmpty())
+	{
+		for (const auto& Iter : ProvideEyesViewActorSet)
+		{
+			if (Iter.IsValid())
+			{
+				Iter->GetActorEyesViewPoint(Location, Rotation);
+				return;
+			}
+		}
+	}
+
+	Super::GetActorEyesViewPoint(Location, Rotation);
 }
 
 void APlanetPlayerController::OnRep_PlayerState()
@@ -625,6 +647,23 @@ UEventSubjectComponent* APlanetPlayerController::GetEventSubjectComponent() cons
 TObjectPtr<UPlayerControllerGameplayTasksComponent> APlanetPlayerController::GetGameplayTasksComponent() const
 {
 	return GameplayTasksComponentPtr;
+}
+
+void APlanetPlayerController::AddProvideEyesViewActor(
+	const TObjectPtr<AActor>& ProvideEyesViewActor
+	)
+{
+	ProvideEyesViewActorSet.Add(ProvideEyesViewActor);
+}
+
+void APlanetPlayerController::RemoveProvideEyesViewActor(
+	const TObjectPtr<AActor>& ProvideEyesViewActor
+	)
+{
+	if (ProvideEyesViewActorSet.Contains(ProvideEyesViewActor))
+	{
+		ProvideEyesViewActorSet.Remove(ProvideEyesViewActor);
+	}
 }
 
 void APlanetPlayerController::ModifyElementalDataToTarget_Implementation(

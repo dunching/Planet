@@ -27,7 +27,7 @@ void USkill_Element_Gold::ActivateAbility(
 		// );
 
 		AbilityActivatedCallbacksHandle =
-			CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::OnSendAttack);
+			CharacterPtr->GetCharacterAbilitySystemComponent()->AbilityActivatedCallbacks.AddUObject(this, &ThisClass::MakedDamageDelegate);
 	}
 }
 
@@ -50,7 +50,7 @@ void USkill_Element_Gold::OnElementLevelChanged(int32 OldValue, int32 NewValue)
 	CurrentElementLevel = NewValue;
 }
 
-void USkill_Element_Gold::OnSendAttack(UGameplayAbility* GAPtr)
+void USkill_Element_Gold::MakedDamageDelegate(UGameplayAbility* GAPtr)
 {
 }
 

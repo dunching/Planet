@@ -71,7 +71,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	) override;
 
 	virtual void OnRemoveAbility(
 		const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec

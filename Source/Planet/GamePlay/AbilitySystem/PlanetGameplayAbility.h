@@ -97,7 +97,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		FOnGameplayAbilityEnded::FDelegate* OnGameplayAbilityEndedDelegate,
 		const FGameplayEventData* TriggerEventData = nullptr
-	);
+	) override;
 
 	virtual void ActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -111,7 +111,7 @@ public:
 		const FGameplayAbilityActorInfo* ActorInfo,
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		OUT FGameplayTagContainer* OptionalRelevantTags = nullptr
-	);
+	) override;
 
 	virtual bool CanActivateAbility(
 		const FGameplayAbilitySpecHandle Handle,
@@ -165,6 +165,10 @@ protected:
 
 	void DecrementListLockOverride() const;
 
+	/**
+	 * GA是否可以要继续执行，比如激活平A时，鼠标左键不妨，此值就是true，松开后则为false
+	 * @return 
+	 */
 	bool GetIsContinue() const;
 
 	virtual void PerformAction(
@@ -175,6 +179,12 @@ protected:
 	);
 	
 private:
+	/**
+	 * GA是否可以再次/继续执行，比如当平A的前摇完成时，此函数应该返回true
+	 * @return 
+	 */
+	virtual bool CanOncemorePerformAction() const;
+
 	virtual void PerformActionWrap(
 		const FGameplayAbilitySpecHandle Handle,
 		const FGameplayAbilityActorInfo* ActorInfo,

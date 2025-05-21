@@ -46,7 +46,7 @@ namespace HumanProcessor
 	protected:
 		virtual bool InputKey(
 			const FInputKeyEventArgs& EventArgs
-		);
+		) override;
 
 		virtual bool InputAxis(
 			FViewport* Viewport,
@@ -56,7 +56,7 @@ namespace HumanProcessor
 			float DeltaTime,
 			int32 NumSamples = 1,
 			bool bGamepad = false
-		);
+		) override;
 
 	private:
 		virtual void TickImp(
@@ -76,8 +76,6 @@ namespace HumanProcessor
 		bool bIsPressdLeftAlt = false;
 
 		TMap<FKey, FCharacterSocket> HandleKeysMap;
-
-		TMap<FKey, FGameplayFeatureKeyMap> GameplayFeatureKeyMapMap;
 
 		FOnAllocationChangedHandle OnAllocationChangedHandle;
 	};

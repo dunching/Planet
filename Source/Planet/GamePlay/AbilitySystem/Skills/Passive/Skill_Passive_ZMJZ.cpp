@@ -40,11 +40,18 @@ void USkill_Passive_ZMJZ::OnAvatarSet(
 		{
 			AbilityActivatedCallbacksHandle =
 				CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
-					std::bind(&ThisClass::OnSendAttack, this, std::placeholders::_1)
+					std::bind(&ThisClass::MakedDamageDelegate, this, std::placeholders::_1)
 				);
 		}
 	}
 #endif
+
+	if (SkillProxyPtr)
+	{
+		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+			DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_PassiveSkillExtendInfo()
+		);
+	}
 }
 
 void USkill_Passive_ZMJZ::PreActivate(
@@ -112,7 +119,7 @@ void USkill_Passive_ZMJZ::ModifyGASpeed(
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
 			SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, DecreamTime);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_Duration, ItemProxy_DescriptionPtr->DecreamTime);
 
 			const auto GEHandle = ApplyGameplayEffectSpecToOwner(
 				GetCurrentAbilitySpecHandle(),
@@ -161,7 +168,7 @@ void USkill_Passive_ZMJZ::ModifyGASpeed(
 #endif
 }
 
-void USkill_Passive_ZMJZ::OnSendAttack(
+void USkill_Passive_ZMJZ::MakedDamageDelegate(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 )
 {

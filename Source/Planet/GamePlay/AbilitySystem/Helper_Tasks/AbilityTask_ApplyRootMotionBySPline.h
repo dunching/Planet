@@ -22,59 +22,53 @@ UCLASS()
 class PLANET_API UAbilityTask_ApplyRootMotionBySPline : public UAbilityTask_ApplyRootMotion_Base
 {
 	GENERATED_BODY()
-public:
 
-	static UAbilityTask_ApplyRootMotionBySPline* NewTask
-	(
+public:
+	static UAbilityTask_ApplyRootMotionBySPline* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
 		float Duration,
 		ASPlineActor* InSPlineActorPtr,
-		ACharacterBase* InTargetCharacterPtr,
 		int32 StartPtIndex,
-		float StartOffset,
-		int32 EndPtIndex,
-		float EndOffset
-	);
+		int32 EndPtIndex
+		);
 
-	static UAbilityTask_ApplyRootMotionBySPline* NewTask
-	(
+	static UAbilityTask_ApplyRootMotionBySPline* NewTask(
 		UGameplayAbility* OwningAbility,
 		FName TaskInstanceName,
 		float Duration,
-		ASPlineActor * InSPlineActorPtr,
-		ACharacterBase* InTargetCharacterPtr
-	);
+		ASPlineActor* InSPlineActorPtr
+		);
 
 	virtual void Activate() override;
 
-	virtual void TickTask(float DeltaTime) override;
+	virtual void TickTask(
+		float DeltaTime
+		) override;
 
-	virtual void OnDestroy(bool AbilityIsEnding) override;
+	virtual void OnDestroy(
+		bool AbilityIsEnding
+		) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
 
 	FOnTaskFinished OnFinish;
 
 protected:
-
 	virtual void SharedInitAndApply() override;
 
 protected:
+	UPROPERTY(Replicated)
+	int32 StartPtIndex = 0;
 
 	UPROPERTY(Replicated)
-	float StartDistance = 0.f;
-
-	UPROPERTY(Replicated)
-	float EndDistance = 0.f;
+	int32 EndPtIndex = 0;
 
 	UPROPERTY(Replicated)
 	float Duration = 1.f;
 
 	UPROPERTY(Replicated)
 	ASPlineActor* SPlineActorPtr = nullptr;
-
-	UPROPERTY(Replicated)
-	ACharacterBase* TargetCharacterPtr = nullptr;
-
 };

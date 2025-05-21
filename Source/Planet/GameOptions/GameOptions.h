@@ -41,8 +41,6 @@ public:
 
 	virtual void PostInitProperties() override;
 	
-	TArray<FGameplayFeatureKeyMap> GetGameplayFeatureKeyMapAry()const;
-
 	TMap<FGameplayTag, FKey>GetActionKeyMap()const;
 	
 	// 
@@ -73,6 +71,12 @@ public:
 	// NPC队友会攻击的最远的敌人的距离
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
 	int32 NPCTeammateMaxActtackDistance = 1200;
+	
+	/**
+	 * 默认臂长
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 DefaultBoomLength = 800;
 	
 	float VolumeMultiplier = 1.f;
 	
@@ -108,6 +112,18 @@ public:
 	FKey StopInteraction = EKeys::Escape;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ViewSetting = EKeys::Escape;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey EntryActionProcessor = EKeys::Escape;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ViewAllocationMenu = EKeys::B;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ViewGroupmateMenu = EKeys::G;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey JumpKey = EKeys::SpaceBar;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
@@ -136,7 +152,7 @@ public:
 	 * 这里的操作是固定的?
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
-	FKey Return = EKeys::Escape;
+	FKey Return = EKeys::RightMouseButton;
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey InteractionWithSceneActor = EKeys::E;
@@ -151,12 +167,6 @@ public:
 	static int32 MaxTeammateNum;
 
 protected:
-	/**
-	 * 
-	 */
-	// UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	TArray<FGameplayFeatureKeyMap> GameplayFeatureKeyMapAry;
-
 	/**
 	 * 技能槽对应的按键
 	 */

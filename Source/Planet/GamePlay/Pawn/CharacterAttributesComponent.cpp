@@ -53,8 +53,14 @@ void UCharacterAttributesComponent::OnGroupManaggerReady(
 	if (GetNetMode() == NM_Client)
 	{
 		auto PlayerCharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-		if (PlayerCharacterPtr)
+		if (PlayerCharacterPtr )
 		{
+			// TODO. 这里失败时，等待这个值有了再进行一次刷新
+			if (!PlayerCharacterPtr->GetGroupManagger())
+			{
+				return;
+			}
+			
 			if (CharacterCategory.MatchesTag(UGameplayTagsLibrary::Proxy_Character_Player))
 			{
 				// 确认跟当前玩家的关系

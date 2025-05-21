@@ -35,6 +35,7 @@
 #include "GameplayTagsLibrary.h"
 #include "KismetGravityLibrary.h"
 #include "LogWriter.h"
+#include "SceneProxyTable.h"
 
 namespace Skill_WeaponActive_Bow
 {
@@ -80,6 +81,18 @@ void USkill_WeaponActive_Bow::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
+
+	if (CharacterPtr)
+	{
+		if (SkillProxyPtr)
+		{
+			ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
+																		DynamicCastSharedPtr<FWeaponSkillProxy>(
+																			 SkillProxyPtr
+																			)->GetTableRowProxy_WeaponSkillExtendInfo()
+																	   );
+		}
+	}
 }
 
 void USkill_WeaponActive_Bow::PreActivate(
@@ -326,17 +339,11 @@ void USkill_WeaponActive_Bow::EmitProjectile(float OffsetAroundZ)const
 
 void USkill_WeaponActive_Bow::MakeDamage(ACharacterBase* TargetCharacterPtr)
 {
-	const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
-	const int32 BaseDamage = Elemental_Damage;
-
-	FGameplayEffectSpecHandle SpecHandle =
-		MakeOutgoingGameplayEffectSpec(UAssetRefMap::GetInstance()->OnceGEClass, GetAbilityLevel());
-	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
-	SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Damage);
-	SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
-
-	SpecHandle.Data.Get()->SetSetByCallerMagnitude(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal,
-												   BaseDamage);
+	FGameplayEffectSpecHandle SpecHandle = MakeDamageToTargetSpecHandle(
+																  ItemProxy_DescriptionPtr->ElementalType,
+																  ItemProxy_DescriptionPtr->Elemental_Damage,
+																  ItemProxy_DescriptionPtr->Elemental_Damage_Magnification
+																 );
 
 	TArray<TWeakObjectPtr<AActor> >Ary;
 	Ary.Add(TargetCharacterPtr);

@@ -85,6 +85,8 @@ public:
 	
 	static FGameplayTag State_Dying;
 	
+	static FGameplayTag State_Invisible;
+	
 	static FGameplayTag State_MoveToLocation;
 	
 	static FGameplayTag State_UsingCurrentWeapon;
@@ -125,20 +127,22 @@ public:
 
 	static FGameplayTag State_ReleasingSkil_WeaponActive;
 	
-	static FGameplayTag RootMotion;
+	static FGameplayTag State_IgnoreLookInput;
 
 	// 浮空状态（主动
-	static FGameplayTag RootMotion_HasBeenFlyAway;
+	static FGameplayTag State_RootMotion;
+
+	static FGameplayTag State_RootMotion_HasBeenFlyAway;
 	
 	static FGameplayTag State_RootMotion_FlyAway;
 	
-	static FGameplayTag KnockDown;
+	static FGameplayTag State_RootMotion_KnockDown;
 	
 	static FGameplayTag State_RootMotion_Traction;
 	
-	static FGameplayTag TornadoTraction;
+	static FGameplayTag State_RootMotion_TornadoTraction;
 	
-	static FGameplayTag MoveAlongSpline;
+	static FGameplayTag State_RootMotion_MoveAlongSpline;
 
 	static FGameplayTag State_RootMotion_MoveTo;
 #pragma endregion

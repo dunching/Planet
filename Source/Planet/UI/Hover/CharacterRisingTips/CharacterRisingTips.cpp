@@ -50,21 +50,32 @@ void UCharacterRisingTips::SetData(
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
 	if (UIPtr)
 	{
-		UIPtr->SetText(
-		               FText::FromString(
-		                                 UKismetStringLibrary::Conv_IntToString(
-		                                                                        ReceivedEventModifyDataCallback.
-		                                                                        TherapeuticalDose > 0 ?
-			                                                                        ReceivedEventModifyDataCallback.
-			                                                                        TherapeuticalDose :
-			                                                                        ReceivedEventModifyDataCallback.
-			                                                                        Damage
-		                                                                       )
-		                                )
-		              );
+		FText Text;
+
+		if (ReceivedEventModifyDataCallback.
+			bIsEvade)
+		{
+			Text = FText::FromString(TEXT("闪避"));
+		}
+		else if (ReceivedEventModifyDataCallback.
+		    Damage > 0)
+		{
+			Text = FText::FromString(FString::Printf(TEXT("%d"), ReceivedEventModifyDataCallback.Damage));
+		}
+		else if (ReceivedEventModifyDataCallback.
+			TherapeuticalDose)
+		{
+			Text = FText::FromString(FString::Printf(TEXT("+%d"), ReceivedEventModifyDataCallback.Damage));
+		}
+
+		UIPtr->SetText(Text);
 	}
 
-	PlayMyAnimation(bIsCritical, ReceivedEventModifyDataCallback.TherapeuticalDose > 0);
+	PlayMyAnimation(
+	                ReceivedEventModifyDataCallback.bIsCritical,
+	                ReceivedEventModifyDataCallback.TherapeuticalDose > 0,
+	                ReceivedEventModifyDataCallback.ElementalType
+	               );
 }
 
 FVector UCharacterRisingTips::GetHoverPosition()

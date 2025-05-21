@@ -35,12 +35,12 @@
 #include "PlanetGameplayAbilityTargetTypes.h"
 #include "SceneProxyTable.h"
 
-namespace Skill_WeaponActive_PickAxe
+struct FSkill_WeaponActive_PickAxe : public TStructVariable<FSkill_WeaponActive_PickAxe>
 {
 	const FName Hit = TEXT("Hit");
 
 	const FName AttackEnd = TEXT("AttackEnd");
-}
+};
 
 UScriptStruct* FGameplayAbilityTargetData_Axe_RegisterParam::GetScriptStruct() const
 {
@@ -172,7 +172,7 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 	)
 	{
-		if (NotifyName == Skill_WeaponActive_PickAxe::AttackEnd)
+		if (NotifyName == FSkill_WeaponActive_PickAxe::Get().AttackEnd)
 		{
 			EnableMovement(true);
 			PerformIfContinue();
@@ -183,7 +183,7 @@ void USkill_WeaponActive_PickAxe::OnNotifyBeginReceived(
 #if UE_EDITOR || UE_SERVER
 	if (GetAbilitySystemComponentFromActorInfo()->GetNetMode() == NM_DedicatedServer)
 	{
-		if (NotifyName == Skill_WeaponActive_PickAxe::Hit)
+		if (NotifyName == FSkill_WeaponActive_PickAxe::Get().Hit)
 		{
 			MakeDamage();
 		}
@@ -269,7 +269,7 @@ void USkill_WeaponActive_PickAxe::MakeDamage()
 			}
 		}
 
-		FGameplayEffectSpecHandle SpecHandle = MakeDamageToTarget(
+		FGameplayEffectSpecHandle SpecHandle = MakeDamageToTargetSpecHandle(
 		                                                          ItemProxy_DescriptionPtr->ElementalType,
 		                                                          ItemProxy_DescriptionPtr->Elemental_Damage,
 		                                                          ItemProxy_DescriptionPtr->Elemental_Damage_Magnification

@@ -28,6 +28,9 @@ class PLANET_API UItemProxy_Description_PassiveSkill_ZMJZ : public UItemProxy_De
 
 public:
 	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
+	float DecreamTime = 5.f;
+
 };
 
 UCLASS()
@@ -98,7 +101,7 @@ protected:
 		const FGameplayEventData* TriggerEventData
 	);
 
-	void OnSendAttack(
+	void MakedDamageDelegate(
 		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 	);
 
@@ -129,9 +132,6 @@ protected:
 		
 	);
 
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Abilities")
-	float DecreamTime = 5.f;
-
 	float SecondaryDecreamTime = 1.f;
 
 	FMakedDamageHandle AbilityActivatedCallbacksHandle;
@@ -141,4 +141,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GE")
 	TSubclassOf<UGameplayEffect> GE_ZMJZImpClass;
+
+private:
+	
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
+	
 };

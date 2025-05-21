@@ -90,29 +90,6 @@ void UActionSkillsIcon::ResetToolUIByData(
 	const TSharedPtr<FBasicProxy>& BasicProxyPtr
 	)
 {
-	bIsReady_Previous = false;
-
-	ProxyPtr = nullptr;
-
-	if (BasicProxyPtr)
-	{
-		if (
-			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active)) ||
-			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
-		)
-		{
-			ProxyPtr = DynamicCastSharedPtr<FSkillProxy>(BasicProxyPtr);
-		}
-	}
-
-	SetLevel();
-	SetItemType();
-	SetCanRelease(true);
-	SetRemainingCooldown(true, 0.f, 0.f);
-
-	// 
-	SetInputRemainPercent(false, 0.f);
-	SetNum(false, 0);
 }
 
 void UActionSkillsIcon::EnableIcon(
@@ -123,17 +100,9 @@ void UActionSkillsIcon::EnableIcon(
 
 void UActionSkillsIcon::UpdateSkillState()
 {
-	if (IconSocket.MatchesTag(UGameplayTagsLibrary::ActiveSocket))
-	{
-		UpdateSkillState_ActiveSkill();
-	}
-	else if (IconSocket.MatchesTag(UGameplayTagsLibrary::WeaponSocket))
-	{
-		UpdateSkillState_ActiveWeapon();
-	}
 }
 
-void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
+void UActionActiveSkillsIcon::UpdateSkillState_ActiveSkill()
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
@@ -195,7 +164,7 @@ void UActionSkillsIcon::UpdateSkillState_ActiveSkill()
 	}
 }
 
-void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
+void UActionWeaponSkillsIcon::UpdateSkillState_ActiveWeapon()
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
 	if (!CharacterPtr)
@@ -224,9 +193,9 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 		SetNum(bIsDisplay, Num);
 
 		bIsReady = GAInsPtr->CanActivateAbility(
-		                                             GAInsPtr->GetCurrentAbilitySpecHandle(),
-		                                             GAInsPtr->GetCurrentActorInfo()
-		                                            );
+		                                        GAInsPtr->GetCurrentAbilitySpecHandle(),
+		                                        GAInsPtr->GetCurrentActorInfo()
+		                                       );
 		SetCanRelease(bIsReady);
 	}
 
@@ -259,15 +228,16 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 				return;
 			}
 		}
-		SetRemainingCooldown(true, 0.f, 0.f	);
-		
+		SetRemainingCooldown(true, 0.f, 0.f);
+
 		TArray<FGameplayAbilitySpecHandle> OutAbilityHandles;
-		GASPtr->FindAllAbilitiesWithTags(OutAbilityHandles,
-		                                                                FGameplayTagContainer(
-			                                                                 UGameplayTagsLibrary::BaseFeature_SwitchWeapon
-			                                                                )
-		                                                               );
-		for (const auto &Iter : OutAbilityHandles)
+		GASPtr->FindAllAbilitiesWithTags(
+		                                 OutAbilityHandles,
+		                                 FGameplayTagContainer(
+		                                                       UGameplayTagsLibrary::BaseFeature_SwitchWeapon
+		                                                      )
+		                                );
+		for (const auto& Iter : OutAbilityHandles)
 		{
 			auto GASpecPtr = GASPtr->FindAbilitySpecFromHandle(Iter);
 			if (GASpecPtr)
@@ -276,8 +246,9 @@ void UActionSkillsIcon::UpdateSkillState_ActiveWeapon()
 				for (auto GAInstIter : GAInstAry)
 				{
 					if (GAInstIter && GAInstIter->CanActivateAbility(
-													 GAInstIter->GetCurrentAbilitySpecHandle(),
-													 GAInstIter->GetCurrentActorInfo()))
+					                                                 GAInstIter->GetCurrentAbilitySpecHandle(),
+					                                                 GAInstIter->GetCurrentActorInfo()
+					                                                ))
 					{
 						SetCanRelease(true && bIsReady);
 						return;
@@ -516,6 +487,167 @@ void UActionSkillsIcon::NativeOnDragDetected(
 
 				OutOperation = WidgetDragPtr;
 			}
+		}
+	}
+}
+
+void UActionActiveSkillsIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	)
+{
+	bIsReady_Previous = false;
+
+	ProxyPtr = nullptr;
+
+	if (BasicProxyPtr)
+	{
+		if (
+			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Active))
+		)
+		{
+			ProxyPtr = DynamicCastSharedPtr<FSkillProxy>(BasicProxyPtr);
+		}
+	}
+
+	SetLevel();
+	SetItemType();
+	SetCanRelease(true);
+	SetRemainingCooldown(true, 0.f, 0.f);
+
+	// 
+	SetInputRemainPercent(false, 0.f);
+	SetNum(false, 0);
+}
+
+void UActionActiveSkillsIcon::UpdateSkillState()
+{
+	UpdateSkillState_ActiveSkill();
+}
+
+void UActionWeaponSkillsIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	)
+{
+	bIsReady_Previous = false;
+
+	ProxyPtr = nullptr;
+
+	if (BasicProxyPtr)
+	{
+		if (
+			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
+		)
+		{
+			ProxyPtr = DynamicCastSharedPtr<FSkillProxy>(BasicProxyPtr);
+		}
+	}
+
+	SetLevel();
+	SetItemType();
+	SetCanRelease(true);
+	SetRemainingCooldown(true, 0.f, 0.f);
+
+	// 
+	SetInputRemainPercent(false, 0.f);
+	SetNum(false, 0);
+}
+
+void UActionWeaponSkillsIcon::UpdateSkillState()
+{
+	UpdateSkillState_ActiveWeapon();
+}
+
+void UActionPassiveSkillsIcon::ResetToolUIByData(
+	const TSharedPtr<FBasicProxy>& BasicProxyPtr
+	)
+{
+	bIsReady_Previous = false;
+
+	ProxyPtr = nullptr;
+
+	if (BasicProxyPtr)
+	{
+		if (
+			(BasicProxyPtr->GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
+		)
+		{
+			ProxyPtr = DynamicCastSharedPtr<FSkillProxy>(BasicProxyPtr);
+		}
+	}
+
+	SetLevel();
+	SetItemType();
+	SetCanRelease(true);
+	SetRemainingCooldown(true, 0.f, 0.f);
+
+	// 
+	SetInputRemainPercent(false, 0.f);
+	SetNum(false, 0);
+}
+
+void UActionPassiveSkillsIcon::UpdateSkillState()
+{
+	UpdateSkillState_PassiveSkill();
+}
+
+void UActionPassiveSkillsIcon::UpdateSkillState_PassiveSkill()
+{
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (!CharacterPtr)
+	{
+		return;
+	}
+
+	const auto SKillProxyType = ProxyPtr->GetProxyType();
+	{
+		auto GAInsPtr = ProxyPtr->GetGAInst();
+		if (!GAInsPtr)
+		{
+			return;
+		}
+
+		if (GAInsPtr->IsActive())
+		{
+			const auto RemainTime = GAInsPtr->GetRemainTime();
+
+			SetDurationPercent(true, RemainTime < 0.f ? 1.f : RemainTime);
+			return;
+		}
+
+		auto bIsReady = GAInsPtr->CanActivateAbility(
+		                                             GAInsPtr->GetCurrentAbilitySpecHandle(),
+		                                             GAInsPtr->GetCurrentActorInfo()
+		                                            );
+		SetCanRelease(bIsReady);
+	}
+	if (SKillProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
+	{
+		SetDurationPercent(false, 0.f);
+		const auto SkillProxySPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(ProxyPtr);
+		if (!SkillProxySPtr)
+		{
+			return;
+		}
+
+		float RemainingCooldown = 0.f;
+		float RemainingCooldownPercent = 0.f;
+
+		auto ActiveSkillProxyPtr = SkillProxySPtr;
+		if (!ActiveSkillProxyPtr)
+		{
+			return;
+		}
+
+		// auto bCooldownIsReady = ActiveSkillProxyPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		// SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
+
+		bool bIsAcceptInput = false;
+		float Percent = 0.f;
+
+		auto GAInsPtr = Cast<USkill_Active_Base>(SkillProxySPtr->GetGAInst());
+		if (!GAInsPtr)
+		{
+			return;
 		}
 	}
 }

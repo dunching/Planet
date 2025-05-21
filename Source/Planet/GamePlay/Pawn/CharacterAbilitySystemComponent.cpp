@@ -28,6 +28,7 @@
 #include "EventSubjectComponent.h"
 #include "Tornado.h"
 #include "OnEffectedTawrgetCallback.h"
+#include "Weapon_Base.h"
 
 UCharacterAbilitySystemComponent::UCharacterAbilitySystemComponent(
 	const FObjectInitializer& ObjectInitializer
@@ -55,8 +56,11 @@ void UCharacterAbilitySystemComponent::BeginPlay()
 		                                                );
 
 
-		AddInputModify(MakeShared<IInputData_BasicData_ModifyInterface>(100));
-		AddInputModify(MakeShared<IInputData_Shield_ModifyInterface>(101));
+		AddOutputModify(MakeShared<IOutputData_ProbabilityConfirmation_ModifyInterface>(100));
+
+		AddInputModify(MakeShared<IInputData_ProbabilityConfirmation_ModifyInterface>(100));
+		AddInputModify(MakeShared<IInputData_BasicData_ModifyInterface>(101));
+		AddInputModify(MakeShared<IInputData_Shield_ModifyInterface>(102));
 	}
 #endif
 }
@@ -387,6 +391,29 @@ void UCharacterAbilitySystemComponent::SwitchCantBeSelect(
 			// TODO
 		}
 #endif
+	}
+}
+
+void UCharacterAbilitySystemComponent::SwitchInvisible(
+	bool bIsInvisible
+	)
+{
+	auto OnwerActorPtr = GetOwner<FOwnerPawnType>();
+	if (OnwerActorPtr)
+	{
+		TArray<AActor*> OutActors;
+		OnwerActorPtr->GetAttachedActors(OutActors);
+
+		for (auto ActorIter : OutActors)
+		{
+			auto WeaponPtr = Cast<AWeapon_Base>(ActorIter);
+			if (WeaponPtr)
+			{
+				WeaponPtr->SetActorHiddenInGame(bIsInvisible);
+			}
+		}
+
+		OnwerActorPtr->GetCopyPoseMesh()->SetHiddenInGame(bIsInvisible);
 	}
 }
 
@@ -1044,15 +1071,17 @@ void UCharacterAbilitySystemComponent::OnActiveGEAddedDelegateToSelf(
 	}
 }
 
-TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
+void UCharacterAbilitySystemComponent::ModifyInputData(
 	const FGameplayTagContainer& AllAssetTags,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
 {
-	TMap<FGameplayTag, float> Result = CustomMagnitudes;
+	NewwDatas = RawDatas;
 
 	// 根据自身的效果对【输入】进行一些修正
 	TArray<decltype(InputDataModifysMap)::iterator> NeedRemoveIterAry;;
@@ -1065,7 +1094,14 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
 
 	for (auto Iter = InputDataModifysMap.begin(); Iter != InputDataModifysMap.end(); Iter++)
 	{
-		if ((*Iter)->Modify(Instigator, TargetCharacterPtr, NeedModifySet, Result) && (*Iter)->bIsOnceTime)
+		if ((*Iter)->Modify(
+		                    Instigator,
+		                    TargetCharacterPtr,
+		                    NeedModifySet,
+		                    RawDatas,
+		                    NewwDatas,
+		                    AdditionalModifyAry
+		                   ) && (*Iter)->bIsOnceTime)
 		{
 			NeedRemoveIterAry.Add(Iter);
 		}
@@ -1075,19 +1111,19 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyInputData(
 	{
 		InputDataModifysMap.erase(Iter);
 	}
-
-	return Result;
 }
 
-TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
+void UCharacterAbilitySystemComponent::ModifyOutputData(
 	const FGameplayTagContainer& AllAssetTags,
 	TSet<FGameplayTag>& NeedModifySet,
-	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const TMap<FGameplayTag, float>& RawDatas,
+	TMap<FGameplayTag, float>& NewwDatas,
+	TSet<EAdditionalModify>& AdditionalModifyAry,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
 {
-	TMap<FGameplayTag, float> Result = CustomMagnitudes;
+	NewwDatas = RawDatas;
 
 	// 根据自身的效果对【输出】进行一些修正
 	TArray<decltype(OutputDataModifysMap)::iterator> NeedRemoveIterAry;;
@@ -1100,7 +1136,14 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
 
 	for (auto Iter = OutputDataModifysMap.begin(); Iter != OutputDataModifysMap.end(); Iter++)
 	{
-		if ((*Iter)->Modify(Instigator, TargetCharacterPtr, NeedModifySet, Result) && (*Iter)->bIsOnceTime)
+		if ((*Iter)->Modify(
+		                    Instigator,
+		                    TargetCharacterPtr,
+		                    NeedModifySet,
+		                    RawDatas,
+		                    NewwDatas,
+		                    AdditionalModifyAry
+		                   ) && (*Iter)->bIsOnceTime)
 		{
 			NeedRemoveIterAry.Add(Iter);
 		}
@@ -1110,14 +1153,13 @@ TMap<FGameplayTag, float> UCharacterAbilitySystemComponent::ModifyOutputData(
 	{
 		OutputDataModifysMap.erase(Iter);
 	}
-
-	return Result;
 }
 
 void UCharacterAbilitySystemComponent::ApplyInputData(
 	const FGameplayTagContainer& AllAssetTags,
 	TSet<FGameplayTag>& NeedModifySet,
 	const TMap<FGameplayTag, float>& CustomMagnitudes,
+	const TSet<EAdditionalModify>& AdditionalModifyAry,
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput
 	)
@@ -1144,6 +1186,23 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
 	ReceivedEventModifyDataCallback.AllAssetTags = AllAssetTags;
 	ReceivedEventModifyDataCallback.SetByCallerTagMagnitudes = CustomMagnitudes;
+
+	for (const auto Iter : AdditionalModifyAry)
+	{
+		switch (Iter)
+		{
+		case EAdditionalModify::kIsCritical:
+			{
+				ReceivedEventModifyDataCallback.bIsCritical = true;
+			}
+			break;
+		case EAdditionalModify::kIsEvade:
+			{
+				ReceivedEventModifyDataCallback.bIsEvade = true;
+			}
+			break;
+		}
+	}
 
 #pragma region 确认最终要应用的值
 	// 如果是此类，数据在 SetByCallerTagMagnitudes
@@ -1209,6 +1268,34 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 				Lambda(Iter, TargetSet->MaxElementalResistance, UAS_Character::GetMetalResistanceAttribute());
 			}
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire))
+			{
+				auto Temp = Iter;
+				Temp.Value = 0 - Iter.Value;
+				Lambda(Temp, TargetSet->GetMax_HP(), UAS_Character::GetHPAttribute());
+				ReceivedEventModifyDataCallback.Damage = Iter.Value;
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth))
 			{
 				auto Temp = Iter;
 				Temp.Value = 0 - Iter.Value;
@@ -1284,7 +1371,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		}
 		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
 		{
-			const auto NewValue = Lambda(UAS_Character::GetShieldAttribute());
+			const auto NewValue = Lambda(UAS_Character::GetStaminaAttribute());
 		}
 		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 		{
@@ -1294,6 +1381,14 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		{
 			const auto NewValue = Lambda(UAS_Character::GetShieldAttribute());
 			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MoveSpeed))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMoveSpeedAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_PerformSpeed))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetPerformSpeedAttribute());
 		}
 		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
 		{
@@ -1319,6 +1414,31 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		{
 			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
 			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kMetal;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kWood;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kWater;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kFire;
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetHPAttribute());
+			ReceivedEventModifyDataCallback.bIsDeath = NewValue <= 0.f;
+			ReceivedEventModifyDataCallback.ElementalType = EElementalType::kEarth;
 		}
 	}
 #pragma endregion
@@ -1334,6 +1454,9 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			);
 
 		if (ReceivedEventModifyDataCallback.bIsDeath)
+		{
+		}
+		else if (ReceivedEventModifyDataCallback.bIsEvade)
 		{
 		}
 		else

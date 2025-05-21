@@ -41,7 +41,7 @@ protected:
 
 	void OnElementLevelChanged(int32 OldValue, int32 NewValue);
 
-	void OnSendAttack(UGameplayAbility* GAPtr);
+	void MakedDamageDelegate(UGameplayAbility* GAPtr);
 
 	void AddBuff();
 	

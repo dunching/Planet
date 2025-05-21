@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 #include <GameplayTagContainer.h>
+
+#include "GenerateType.h"
 #include "Net/Serialization/FastArraySerializer.h"
 
 #include "OnEffectedTawrgetCallback.generated.h"
@@ -27,7 +29,13 @@ struct PLANET_API FOnEffectedTawrgetCallback
 
 	ACharacterBase* TargetCharacterPtr = nullptr;
 
+	EElementalType ElementalType = EElementalType::kMetal;
+	
 	bool bIsDeath = false;
+
+	bool bIsEvade = false;
+
+	bool bIsCritical = false;
 
 	FGameplayTagContainer AllAssetTags;
 

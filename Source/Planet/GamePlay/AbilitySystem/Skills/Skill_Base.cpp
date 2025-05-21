@@ -380,11 +380,73 @@ ACharacterBase* USkill_Base::GetTargetInDistance(
 	return FocusCharacterPtr;
 }
 
-FGameplayEffectSpecHandle USkill_Base::MakeDamageToTarget(
+TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCharacter(
+		int32 MaxDistance,int32 UpForwardDistance,int32 DownDistance
+	)const
+{
+	TArray<TObjectPtr<ACharacterBase>>  Result;
+
+	const auto TargetsAry= GetTargetsInDistance(MaxDistance, UpForwardDistance, DownDistance);
+
+	const auto CharacterLocation = CharacterPtr->GetActorLocation();
+
+	std::map<float, TObjectPtr<ACharacterBase>>  Map;
+	
+	for (const auto& Iter : TargetsAry)
+	{
+		const auto Distance = FVector::Distance(Iter->GetActorLocation() , CharacterLocation);
+		Map.emplace(Distance, Iter);
+	}
+
+	for (const auto& Iter : Map)
+	{
+		Result.Add(Iter.second);
+	}
+
+	return Result;
+}
+
+TArray<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistanceByNearestCharacterViewDirection(
+		int32 MaxDistance,int32 UpForwardDistance,int32 DownDistance
+	)const
+{
+	TArray<TObjectPtr<ACharacterBase>>  Result;
+
+	const auto TargetsAry= GetTargetsInDistance(MaxDistance, UpForwardDistance, DownDistance);
+
+	const auto CharacterLocation = CharacterPtr->GetActorLocation();
+
+	// 初始角度
+	const auto OriginRot = UKismetMathLibrary::MakeRotFromZX(
+															 -UKismetGravityLibrary::GetGravity(),
+															 CharacterPtr->GetActorForwardVector()
+															);
+
+	const auto Dir = OriginRot.Vector();
+
+	std::map<float, TObjectPtr<ACharacterBase>, std::greater<>>  Map;
+	
+	for (const auto& Iter : TargetsAry)
+	{
+		const auto TargetDir = (Iter->GetActorLocation() - CharacterLocation).
+			GetSafeNormal();
+		const auto DotProduct = FVector::DotProduct(TargetDir, Dir);
+		Map.emplace(DotProduct, Iter);
+	}
+
+	for (const auto& Iter : Map)
+	{
+		Result.Add(Iter.second);
+	}
+	
+	return Result;
+}
+
+FGameplayEffectSpecHandle USkill_Base::MakeDamageToTargetSpecHandle(
 	EElementalType ElementalType,
 	int32 Elemental_Damage,
 	float Elemental_Damage_Magnification
-	)
+	)const
 {
 	const auto& CharacterAttributes = CharacterPtr->GetCharacterAttributesComponent()->GetCharacterAttributes();
 
@@ -407,14 +469,133 @@ FGameplayEffectSpecHandle USkill_Base::MakeDamageToTarget(
 		}
 		break;
 	case EElementalType::kWood:
+		{
+			const int32 BaseDamage = Elemental_Damage + (
+				                         CharacterAttributes->GetWoodValue() * Elemental_Damage_Magnification);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood,
+			                                               BaseDamage
+			                                              );
+		}
 		break;
 	case EElementalType::kWater:
+		{
+			const int32 BaseDamage = Elemental_Damage + (
+				                         CharacterAttributes->GetWaterValue() * Elemental_Damage_Magnification);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water,
+			                                               BaseDamage
+			                                              );
+		}
 		break;
 	case EElementalType::kFire:
+		{
+			const int32 BaseDamage = Elemental_Damage + (
+				                         CharacterAttributes->GetFireValue() * Elemental_Damage_Magnification);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire,
+			                                               BaseDamage
+			                                              );
+		}
 		break;
 	case EElementalType::kEarth:
+		{
+			const int32 BaseDamage = Elemental_Damage + (
+				                         CharacterAttributes->GetEarthValue() * Elemental_Damage_Magnification);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth,
+			                                               BaseDamage
+			                                              );
+		}
 		break;
 	}
 
 	return SpecHandle;
+}
+
+TSet<TObjectPtr<ACharacterBase>> USkill_Base::GetTargetsInDistance(
+	int32 MaxDistance,
+	int32 UpForwardDistance,
+	int32 DownDistance
+	) const
+{
+	TSet<TObjectPtr<ACharacterBase>>  Result;
+
+	if (auto FocusCharacterPtr = HasFocusActor())
+	{
+		const auto CurrentDistance = FVector::Distance(
+		                                               FocusCharacterPtr->GetActorLocation(),
+		                                               CharacterPtr->GetActorLocation()
+		                                              );
+		if (CurrentDistance < MaxDistance)
+		{
+			Result.Add(FocusCharacterPtr);
+		}
+	}
+
+	auto FocusCharactersAry = CharacterPtr->GetStateProcessorComponent()->GetTargetCharactersAry();
+	for (auto Iter : FocusCharactersAry)
+	{
+		if (Iter.IsValid())
+		{
+			if (Iter->GetCharacterAbilitySystemComponent()->IsCantBeDamage())
+			{
+				continue;
+			}
+			const auto CurrentDistance = FVector::Distance(
+			                                               Iter->GetActorLocation(),
+			                                               CharacterPtr->GetActorLocation()
+			                                              );
+			if (CurrentDistance < MaxDistance)
+			{
+				Result.Add(Iter.Get());
+			}
+		}
+	}
+
+	TArray<struct FHitResult> OutOverlaps;
+	FCollisionObjectQueryParams ObjectQueryParams;
+	ObjectQueryParams.AddObjectTypesToQuery(Pawn_Object);
+
+	FCollisionQueryParams Params;
+
+	Params.AddIgnoredActor(CharacterPtr);
+
+	if (GetWorld()->SweepMultiByObjectType(
+	                                         OutOverlaps,
+	                                         CharacterPtr->GetActorLocation() + (FVector::UpVector *UpForwardDistance ),
+	                                         CharacterPtr->GetActorLocation() + (FVector::DownVector *DownDistance ),
+	                                         FQuat::Identity,
+	                                         ObjectQueryParams,
+	                                         FCollisionShape::MakeSphere(MaxDistance),
+	                                         Params
+	                                        ))
+	{
+		for (const auto& Iter : OutOverlaps)
+		{
+			auto TargetCharacterPtr = Cast<ACharacterBase>(Iter.GetActor());
+			if (!TargetCharacterPtr)
+			{
+				continue;
+			}
+			if (TargetCharacterPtr->IsGroupmate(CharacterPtr) || TargetCharacterPtr->
+			                                                     GetCharacterAbilitySystemComponent()->IsCantBeDamage())
+			{
+				continue;
+			}
+
+			const auto CurrentDistance = FVector::Distance(
+			                                               TargetCharacterPtr->GetActorLocation(),
+			                                               CharacterPtr->GetActorLocation()
+			                                              );
+			if (CurrentDistance > MaxDistance)
+			{
+				continue;
+			}
+
+			Result.Add(TargetCharacterPtr);
+		}
+	}
+	
+	return Result;
 }

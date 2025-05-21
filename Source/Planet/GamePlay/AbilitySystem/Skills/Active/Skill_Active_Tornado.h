@@ -114,7 +114,7 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		bool bReplicateEndAbility,
 		bool bWasCancelled
-	);
+	) override;
 
 	virtual bool CommitAbility(
 		const FGameplayAbilitySpecHandle Handle,

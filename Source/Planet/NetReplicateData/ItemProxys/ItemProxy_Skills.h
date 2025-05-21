@@ -173,7 +173,7 @@ public:
 		) override;
 
 	// 是否可以激活
-	virtual bool CanActive() const;
+	virtual bool CanActive() const override;
 
 	virtual bool Active() override;
 
@@ -250,7 +250,7 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass() const override;
 
-	AWeapon_Base* ActivedWeaponPtr = nullptr;
+	TObjectPtr<AWeapon_Base> ActivedWeaponPtr = nullptr;
 
 protected:
 	virtual void RegisterSkill() override;

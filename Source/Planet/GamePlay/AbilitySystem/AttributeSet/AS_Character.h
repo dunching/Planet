@@ -125,8 +125,8 @@ public:
 	
 	// 闪避几率
 	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
-	FMyGameplayAttributeData Evade;
-	ATTRIBUTE_ACCESSORS(UAS_Character, Evade);
+	FMyGameplayAttributeData EvadeRate;
+	ATTRIBUTE_ACCESSORS(UAS_Character, EvadeRate);
 	
 	// 攻击速度、技能释放速度
 	UPROPERTY(ReplicatedUsing = OnRep_PerformSpeed, VisibleAnywhere, BlueprintReadWrite);
@@ -144,6 +144,30 @@ public:
 	UFUNCTION()
 	virtual void OnRep_Shield(const FMyGameplayAttributeData& OldHealth);
 
+	// 当前等级
+	UPROPERTY(ReplicatedUsing = OnRep_Level, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData Level;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Level);
+	
+	UFUNCTION()
+	virtual void OnRep_Level(const FMyGameplayAttributeData& OldHealth);
+
+	// 当前经验
+	UPROPERTY(ReplicatedUsing = OnRep_Experience, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData Experience;
+	ATTRIBUTE_ACCESSORS(UAS_Character, Experience);
+	
+	UFUNCTION()
+	virtual void OnRep_Experience(const FMyGameplayAttributeData& OldHealth);
+
+	// 当前等级升级所需经验
+	UPROPERTY(ReplicatedUsing = OnRep_LevelExperience, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData LevelExperience;
+	ATTRIBUTE_ACCESSORS(UAS_Character, LevelExperience);
+	
+	UFUNCTION()
+	virtual void OnRep_LevelExperience(const FMyGameplayAttributeData& OldHealth);
+
 #pragma region 基础 属性：五行元素
 
 	const int32 MaxElementalValue = 10000;
@@ -158,7 +182,7 @@ public:
 	
 	/**
 	 * Value					元素强度
-	 * Level					元素等级			0 3 6 9
+	 * Level					元素等级（废弃）	0 3 6 9
 	 * Penetration				元素抗性			0 ~ 1000
 	 * Resistance				元素固定穿透		0 ~ 100
 	 * PercentPenetration		元素穿透百分比
@@ -198,27 +222,146 @@ public:
 
 	UFUNCTION()
 	virtual void OnRep_MetalResistance(const FMyGameplayAttributeData& OldHealth);
-
-	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	 
+	UPROPERTY(ReplicatedUsing = OnRep_WoodValue, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData WoodValue;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodValue);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_WoodValue(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WoodLevel, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData WoodLevel;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodLevel);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_WoodLevel(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WoodPenetration, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData WoodPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodPenetration);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_WoodPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WoodPercentPenetration, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData WoodPercentPenetration;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodPercentPenetration);
 	
-	UPROPERTY(Replicated, VisibleAnywhere, BlueprintReadWrite);
+	UFUNCTION()
+	virtual void OnRep_WoodPercentPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WoodResistance, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData WoodResistance;
 	ATTRIBUTE_ACCESSORS(UAS_Character, WoodResistance);
+
+	UFUNCTION()
+	virtual void OnRep_WoodResistance(const FMyGameplayAttributeData& OldHealth);
+	
+	UPROPERTY(ReplicatedUsing = OnRep_WaterValue, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WaterValue;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WaterValue);
+	
+	UFUNCTION()
+	virtual void OnRep_WaterValue(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WaterLevel, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WaterLevel;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WaterLevel);
+	
+	UFUNCTION()
+	virtual void OnRep_WaterLevel(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WaterPenetration, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WaterPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WaterPenetration);
+	
+	UFUNCTION()
+	virtual void OnRep_WaterPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WaterPercentPenetration, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WaterPercentPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WaterPercentPenetration);
+	
+	UFUNCTION()
+	virtual void OnRep_WaterPercentPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_WaterResistance, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData WaterResistance;
+	ATTRIBUTE_ACCESSORS(UAS_Character, WaterResistance);
+
+	UFUNCTION()
+	virtual void OnRep_WaterResistance(const FMyGameplayAttributeData& OldHealth);
+	
+	UPROPERTY(ReplicatedUsing = OnRep_FireValue, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData FireValue;
+	ATTRIBUTE_ACCESSORS(UAS_Character, FireValue);
+	
+	UFUNCTION()
+	virtual void OnRep_FireValue(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_FireLevel, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData FireLevel;
+	ATTRIBUTE_ACCESSORS(UAS_Character, FireLevel);
+	
+	UFUNCTION()
+	virtual void OnRep_FireLevel(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_FirePenetration, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData FirePenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, FirePenetration);
+	
+	UFUNCTION()
+	virtual void OnRep_FirePenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_FirePercentPenetration, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData FirePercentPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, FirePercentPenetration);
+	
+	UFUNCTION()
+	virtual void OnRep_FirePercentPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_FireResistance, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData FireResistance;
+	ATTRIBUTE_ACCESSORS(UAS_Character, FireResistance);
+
+	UFUNCTION()
+	virtual void OnRep_FireResistance(const FMyGameplayAttributeData& OldHealth);
+	
+	UPROPERTY(ReplicatedUsing = OnRep_EarthValue, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData EarthValue;
+	ATTRIBUTE_ACCESSORS(UAS_Character, EarthValue);
+	
+	UFUNCTION()
+	virtual void OnRep_EarthValue(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_EarthLevel, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData EarthLevel;
+	ATTRIBUTE_ACCESSORS(UAS_Character, EarthLevel);
+	
+	UFUNCTION()
+	virtual void OnRep_EarthLevel(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_EarthPenetration, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData EarthPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, EarthPenetration);
+	
+	UFUNCTION()
+	virtual void OnRep_EarthPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_EarthPercentPenetration, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData EarthPercentPenetration;
+	ATTRIBUTE_ACCESSORS(UAS_Character, EarthPercentPenetration);
+	
+	UFUNCTION()
+	virtual void OnRep_EarthPercentPenetration(const FMyGameplayAttributeData& OldHealth);
+
+	UPROPERTY(ReplicatedUsing = OnRep_EarthResistance, VisibleAnywhere, BlueprintReadWrite);
+	FMyGameplayAttributeData EarthResistance;
+	ATTRIBUTE_ACCESSORS(UAS_Character, EarthResistance);
+
+	UFUNCTION()
+	virtual void OnRep_EarthResistance(const FMyGameplayAttributeData& OldHealth);
 #pragma endregion
 	
 #pragma region 基础 属性：力道,根骨,身法,洞察,天资

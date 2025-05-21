@@ -25,6 +25,8 @@ class UPlayerComponent;
 class AHumanCharacter_AI;
 class USpringArmComponent;
 class UCameraComponent;
+class UPlanetGameplayCameraComponent;
+class UGameplayCameraComponent;
 
 class UInteractionList;
 class AHumanCharacter_Player;
@@ -120,19 +122,17 @@ public:
 		const FObjectInitializer& ObjectInitializer
 	);
 
-	UCameraComponent* GetCameraComp();;
-
-	USpringArmComponent* GetCameraBoom();;
-
 	UPlayerConversationComponent* GetPlayerConversationComponent() const;
 
 	USceneCharacterPlayerInteractionComponent* GetSceneCharacterPlayerInteractionComponent() const;
 
 	UCharacterPlayerStateProcessorComponent* GetCharacterPlayerStateProcessorComponent() const;
 
-	void UpdateSightActor();
+	TObjectPtr<UGameplayCameraComponent> GetGameplayCameraComponent()const;
 
-	virtual TPair<FVector, FVector> GetCharacterViewInfo();
+	TObjectPtr<UPlayerComponent> GetPlayerComponent()const;
+
+	void UpdateSightActor();
 
 	/**
 	 * 与场景中的可交互对象开始交互
@@ -195,15 +195,16 @@ protected:
 
 #endif
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void AdjustCamera(int32 BoomLength)const;
+	
+private:
+
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USpringArmComponent> CameraBoom = nullptr;
+	TObjectPtr<UGameplayCameraComponent> GameplayCameraComponentPtr = nullptr;
 
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
-
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPlayerComponent> PlayerComponentPtr = nullptr;
 
 	UPROPERTY(Transient)
