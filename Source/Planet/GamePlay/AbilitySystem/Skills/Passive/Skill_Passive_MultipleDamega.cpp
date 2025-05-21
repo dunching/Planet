@@ -73,7 +73,7 @@ void USkill_Passive_MultipleDamega::MakedDamageDelegate(
 			auto AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);
 			AbilityTask_TimerHelperPtr->SetDuration(ItemProxy_DescriptionPtr->Duration.PerLevelValue[0]);
 			AbilityTask_TimerHelperPtr->DurationDelegate.BindUObject(this, &ThisClass::DurationDelegate);
-			AbilityTask_TimerHelperPtr->OnFinished.BindLambda(this, &ThisClass::OnTimerFinished);
+			AbilityTask_TimerHelperPtr->OnFinished.BindUObject(this, &ThisClass::OnTimerFinished);
 			AbilityTask_TimerHelperPtr->ReadyForActivation();
 
 #if UE_EDITOR || UE_SERVER
