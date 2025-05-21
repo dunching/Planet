@@ -68,6 +68,11 @@ void USkill_Passive_MultipleDamega::MakedDamageDelegate(
 {
 	if (CharacterPtr)
 	{
+		if (!bIsRead)
+		{
+			return;
+		}
+		
 		if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::Proxy_Skill_Weapon))
 		{
 			auto AbilityTask_TimerHelperPtr = UAbilityTask_TimerHelper::DelayTask(this);

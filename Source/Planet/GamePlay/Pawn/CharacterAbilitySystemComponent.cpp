@@ -1101,7 +1101,7 @@ void UCharacterAbilitySystemComponent::ModifyInputData(
 		                    RawDatas,
 		                    NewwDatas,
 		                    AdditionalModifyAry
-		                   ) && (*Iter)->bIsOnceTime)
+		                   ))
 		{
 			NeedRemoveIterAry.Add(Iter);
 		}
@@ -1143,7 +1143,7 @@ void UCharacterAbilitySystemComponent::ModifyOutputData(
 		                    RawDatas,
 		                    NewwDatas,
 		                    AdditionalModifyAry
-		                   ) && (*Iter)->bIsOnceTime)
+		                   ))
 		{
 			NeedRemoveIterAry.Add(Iter);
 		}

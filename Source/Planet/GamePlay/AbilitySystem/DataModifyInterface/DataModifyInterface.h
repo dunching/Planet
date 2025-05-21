@@ -34,8 +34,6 @@ public:
 		) const;
 
 protected:
-	bool bIsOnceTime = false;
-
 private:
 	// 越小的越先算, 100~200 用于基础功能
 	int32 Priority = -1;
