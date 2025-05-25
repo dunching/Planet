@@ -99,7 +99,7 @@ void UGuideSubSystem::StartParallelGuideThread(
 	                                                           SpawnParameters
 	                                                          );
 
-	GuideThreadPtr->GetGuideSystemStateTreeComponent()->StartLogic();
+	GuideThreadPtr->ActiveGuide();
 
 	OnStartGuide.Broadcast(GuideThreadPtr);
 	ActivedGuideThreadsAry.Add(GuideThreadPtr);
@@ -283,7 +283,7 @@ void UGuideSubSystem::ActiveTargetGuideThread(
 		CurrentLineGuidePtr->SetPreviousTaskID(CurrentTaskID);
 	}
 
-	CurrentLineGuidePtr->GetGuideSystemStateTreeComponent()->StartLogic();
+	CurrentLineGuidePtr->ActiveGuide();
 
 	OnStartGuide.Broadcast(CurrentLineGuidePtr);
 }

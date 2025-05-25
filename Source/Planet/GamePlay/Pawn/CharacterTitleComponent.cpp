@@ -9,15 +9,19 @@
 #include "STT_CommonData.h"
 #include "CharacterBase.h"
 #include "CharacterTitle.h"
+#include "GameOptions.h"
 
 #include "Components/VerticalBox.h"
 
 FName UCharacterTitleComponent::ComponentName = TEXT("CharacterTitleComponent");
 
-UCharacterTitleComponent::UCharacterTitleComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+UCharacterTitleComponent::UCharacterTitleComponent(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.TickInterval = 1.f;
 }
 
 void UCharacterTitleComponent::BeginPlay()
@@ -29,19 +33,27 @@ void UCharacterTitleComponent::TickComponent(
 	float DeltaTime,
 	enum ELevelTick TickType,
 	FActorComponentTickFunction* ThisTickFunction
-)
+	)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
 	{
+		auto PCPtr = GEngine->GetFirstLocalPlayerController(GetWorld());
+		if (PCPtr)
+		{
+			const auto Distance = FVector::Dist(GetOwner()->GetActorLocation(), PCPtr->GetPawn()->GetActorLocation());
+			SetVisibility(Distance < UGameOptions::GetInstance()->CharacterTitleDisplayRange);
+		}
 		// ResetPosition(DeltaTime);
 	}
 #endif
 }
 
-void UCharacterTitleComponent::OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr)
+void UCharacterTitleComponent::OnGroupManaggerReady(
+	AGroupManagger* NewGroupSharedInfoPtr
+	)
 {
 #if UE_EDITOR || UE_CLIENT
 	if (GetOwnerRole() < ROLE_Authority)
@@ -68,7 +80,9 @@ void UCharacterTitleComponent::OnGroupManaggerReady(AGroupManagger* NewGroupShar
 #endif
 }
 
-void UCharacterTitleComponent::SetCampType(ECharacterCampType CharacterCampType)
+void UCharacterTitleComponent::SetCampType(
+	ECharacterCampType CharacterCampType
+	)
 {
 	auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
 	if (CharacterTitleBoxPtr)
@@ -77,7 +91,9 @@ void UCharacterTitleComponent::SetCampType(ECharacterCampType CharacterCampType)
 	}
 }
 
-bool UCharacterTitleComponent::ResetPosition(float InDeltaTime)
+bool UCharacterTitleComponent::ResetPosition(
+	float InDeltaTime
+	)
 {
 	// if (CharacterTitleBoxPtr)
 	// {
@@ -97,7 +113,9 @@ bool UCharacterTitleComponent::ResetPosition(float InDeltaTime)
 	return true;
 }
 
-void UCharacterTitleComponent::DisplaySentence(const FTaskNode_Conversation_SentenceInfo& Sentence)
+void UCharacterTitleComponent::DisplaySentence(
+	const FTaskNode_Conversation_SentenceInfo& Sentence
+	)
 {
 	auto CharacterTitleBoxPtr = Cast<UCharacterTitleBox>(GetUserWidgetObject());
 	if (!CharacterTitleBoxPtr)

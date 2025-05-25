@@ -186,11 +186,13 @@ void UCharacterAttributesComponent::BeginPlay()
 				// checkNoEntry();
 			}
 		}
+		
 		// 自动回复
 		{
 			auto SpecHandle = GASPtr->MakeOutgoingSpec(GE_CharacterReplyClass, 1, GASPtr->MakeEffectContext());
 
 			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::DataSource_Reply);
 
 			const auto GEHandle = GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			if (!GEHandle.IsValid())

@@ -38,6 +38,7 @@ class AHorseCharacter;
 class AGeneratorNPC;
 class UFocusTitle;
 class ACharacterBase;
+class UUpgradePromt;
 
 /**
  *
@@ -108,6 +109,10 @@ protected:
 #pragma region MenusUI
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI ")
 	TSubclassOf<UCharacterRisingTips>FightingTipsClass;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUpgradePromt>UpgradePromtClass;
+	
 #pragma endregion MenusUI
 	
 	UPROPERTY(Transient)
@@ -131,4 +136,12 @@ protected:
 	TCallbackHandleContainer<void(
 		const FOnEffectedTawrgetCallback&
 		)>::FCallbackHandleSPtr EffectOhterCharacterCallbackDelegate;
+
+private:
+	
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr LevelChangedDelegateHandle;
+	
+	void OnLevelChanged(
+		int32 Level
+		);
 };

@@ -365,6 +365,53 @@ private:
 };
 #pragma endregion
 
+#pragma region 要求玩家弹出光标
+USTRUCT()
+struct PLANET_API FSTID_GuideThread_ShowCursor :
+	public FSTID_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(
+		EditAnywhere,
+		Category = Param
+	)
+	FString Description = TEXT("Hold down the <RichText.Key>{Key} key</> to display the cursor");
+
+	FKey Key = EKeys::AnyKey;
+
+	APlayerController* PCPtr = nullptr;
+};
+
+// 
+USTRUCT()
+struct PLANET_API FSTT_GuideThread_ShowCursor :
+	public FSTT_GuideThreadBase
+{
+	GENERATED_BODY()
+
+	using FInstanceDataType = FSTID_GuideThread_ShowCursor;
+
+	virtual const UStruct* GetInstanceDataType() const override { return FInstanceDataType::StaticStruct(); }
+
+	virtual EStateTreeRunStatus EnterState(
+		FStateTreeExecutionContext& Context,
+		const FStateTreeTransitionResult& Transition
+	) const override;
+
+	virtual EStateTreeRunStatus Tick(
+		FStateTreeExecutionContext& Context,
+		const float DeltaTime
+	) const override;
+
+	virtual FTaskNodeDescript GetTaskNodeDescripton(
+		FStateTreeExecutionContext& Context
+	) const override;
+
+private:
+};
+#pragma endregion
+
 #pragma region 引导玩家去往指定地点
 UCLASS(
 	Blueprintable,

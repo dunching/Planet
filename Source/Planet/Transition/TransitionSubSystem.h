@@ -11,7 +11,7 @@
 
 struct FPawnDataStruct;
 struct FSceneTool;
-struct FCharacterAttributes;
+
 
 /**
  * 过渡，如传送时

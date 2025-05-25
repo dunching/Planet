@@ -1235,6 +1235,20 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 			{
 				Lambda(Iter, TargetSet->GetMax_Mana(), UAS_Character::GetManaAttribute());
 			}
+			
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxHP))
+			{
+				Lambda(Iter, TargetSet->Max_Max_HP, UAS_Character::GetMax_HPAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina))
+			{
+				Lambda(Iter, TargetSet->Max_Max_Stamina, UAS_Character::GetMax_StaminaAttribute());
+			}
+			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxMana))
+			{
+				Lambda(Iter, TargetSet->Max_Max_Mana, UAS_Character::GetMax_ManaAttribute());
+			}
+			
 			else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Metal_Value))
 			{
 				Lambda(Iter, TargetSet->MaxElementalValue, UAS_Character::GetMetalValueAttribute());
@@ -1369,6 +1383,20 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 		{
 			const auto NewValue = Lambda(UAS_Character::GetManaAttribute());
 		}
+		
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxHP))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMax_HPAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMax_StaminaAttribute());
+		}
+		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_MaxMana))
+		{
+			const auto NewValue = Lambda(UAS_Character::GetMax_ManaAttribute());
+		}
+		
 		else if (Iter.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Shield))
 		{
 			const auto NewValue = Lambda(UAS_Character::GetShieldAttribute());

@@ -25,7 +25,6 @@ struct FTableRowProxy_CharacterType;
 struct FCharacterProxy;
 
 struct FAllocationSkills;
-struct FCharacterAttributes;
 struct FTalentHelper;
 struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
@@ -38,7 +37,7 @@ USTRUCT()
 struct PLANET_API FConsumableProxy :
 	public FBasicProxy,
 	public IProxy_Allocationble,
-	public IProxy_Cooldown,
+	public IProxy_SkillState,
 	public IProxy_Unique
 {
 	GENERATED_USTRUCT_BODY()
@@ -62,6 +61,8 @@ public:
 	UItemProxy_Description_Consumable* GetTableRowProxy_Consumable()const;
 
 #pragma region Cooldown interface
+	virtual int32 GetCount() const override;
+
 	virtual bool GetRemainingCooldown(
 		float& RemainingCooldown, float& RemainingCooldownPercent
 	)const override;

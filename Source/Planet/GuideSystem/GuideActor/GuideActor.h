@@ -82,6 +82,8 @@ public:
 	AGuideActor(const FObjectInitializer& ObjectInitializer);
 
 	virtual void Destroyed() override;
+
+	void ActiveGuide();
 	
 	UGameplayTasksComponent* GetGameplayTasksComponent() const;
 
@@ -113,6 +115,9 @@ public:
 
 protected:
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Tags)
+	FGameplayTagContainer ActivedTags;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GuideST)
 	TObjectPtr<UGuideSystemStateTreeComponent> GuideStateTreeComponentPtr = nullptr;
 

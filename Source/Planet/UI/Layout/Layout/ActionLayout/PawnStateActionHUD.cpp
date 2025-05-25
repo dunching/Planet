@@ -23,9 +23,12 @@
 #include "State_Talent_YinYang.h"
 #include "GameplayTagsLibrary.h"
 #include "InventoryComponent.h"
+#include "Components/ProgressBar.h"
 
 struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 {
+	const FName ExperienceProgressBar = TEXT("ExperienceProgressBar");
+
 	const FName ActiveSkill1 = TEXT("ActiveSkill1");
 
 	const FName ActiveSkill2 = TEXT("ActiveSkill2");
@@ -111,6 +114,11 @@ void UPawnStateActionHUD::NativeTick(
 			FPawnStateActionHUD::Get().ActiveSkill4,
 			FPawnStateActionHUD::Get().WeaponActiveSkill1,
 			FPawnStateActionHUD::Get().WeaponActiveSkill2,
+			FPawnStateActionHUD::Get().PassiveSkill1,
+			FPawnStateActionHUD::Get().PassiveSkill2,
+			FPawnStateActionHUD::Get().PassiveSkill3,
+			FPawnStateActionHUD::Get().PassiveSkill4,
+			FPawnStateActionHUD::Get().PassiveSkill5,
 		};
 
 		for (const auto& Iter : Ary)
@@ -139,7 +147,7 @@ void UPawnStateActionHUD::Enable()
 		                 CharacterAttributeSetPtr,
 		                 AbilitySystemComponentPtr
 		                );
-
+		BindExperienceProgressBar();
 		{
 			auto UIPtr = Cast<UBasePropertyWidget>(GetWidgetFromName(FPawnStateActionHUD::Get().CriticalDamage));
 			if (!UIPtr)
@@ -234,6 +242,16 @@ void UPawnStateActionHUD::DisEnable()
 	if (OnCanAciveSkillChangedHandle)
 	{
 		OnCanAciveSkillChangedHandle->UnBindCallback();
+	}
+
+	if (ExperienceChangedDelegateHandle)
+	{
+		ExperienceChangedDelegateHandle->UnBindCallback();
+	}
+
+	if (LevelExperienceChangedDelegateHandle)
+	{
+		LevelExperienceChangedDelegateHandle->UnBindCallback();
 	}
 
 	ILayoutInterfacetion::DisEnable();
@@ -349,14 +367,18 @@ void UPawnStateActionHUD::InitialWeaponSkillIcon()
 	else
 	{
 		{
-			auto UIPtr = Cast<UActionWeaponSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1));
+			auto UIPtr = Cast<UActionWeaponSkillsIcon>(
+			                                           GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill1)
+			                                          );
 			if (UIPtr)
 			{
 				UIPtr->ResetToolUIByData(nullptr);
 			}
 		}
 		{
-			auto UIPtr = Cast<UActionWeaponSkillsIcon>(GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2));
+			auto UIPtr = Cast<UActionWeaponSkillsIcon>(
+			                                           GetWidgetFromName(FPawnStateActionHUD::Get().WeaponActiveSkill2)
+			                                          );
 			if (UIPtr)
 			{
 				UIPtr->ResetToolUIByData(nullptr);
@@ -449,6 +471,22 @@ void UPawnStateActionHUD::InitialPassiveSkillIcon()
 	}
 }
 
+void UPawnStateActionHUD::BindExperienceProgressBar()
+{
+	auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+	if (CharacterProxySPtr)
+	{
+		ExperienceChangedDelegateHandle = CharacterProxySPtr->ExperienceChangedDelegate.AddOnValueChanged(
+			 std::bind(&ThisClass::OnExperienceChanged, this)
+			);
+		LevelExperienceChangedDelegateHandle = CharacterProxySPtr->LevelExperienceChangedDelegate.AddOnValueChanged(
+			 std::bind(&ThisClass::OnExperienceChanged, this)
+			);
+
+		OnExperienceChanged();
+	}
+}
+
 void UPawnStateActionHUD::BindProgressData(
 	const UAS_Character* CharacterAttributeSetPtr,
 	UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
@@ -468,10 +506,10 @@ void UPawnStateActionHUD::BindProgressData(
 		                     CharacterAttributeSetPtr->GetMax_HP()
 		                    );
 		UIPtr->SetOverlayDataSource(
-		                     AbilitySystemComponentPtr,
-		                     CharacterAttributeSetPtr->GetShieldAttribute(),
-		                     CharacterAttributeSetPtr->GetShield()
-		                    );
+		                            AbilitySystemComponentPtr,
+		                            CharacterAttributeSetPtr->GetShieldAttribute(),
+		                            CharacterAttributeSetPtr->GetShield()
+		                           );
 	}
 	{
 		auto UIPtr = Cast<UMyProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().PP));
@@ -607,5 +645,31 @@ void UPawnStateActionHUD::BindElementalData(
 		                     CharacterAttributeSetPtr->GetEarthResistanceAttribute(),
 		                     CharacterAttributeSetPtr->GetEarthResistance()
 		                    );
+	}
+}
+
+void UPawnStateActionHUD::OnExperienceChanged()
+{
+	auto UIPtr = Cast<UProgressBar>(GetWidgetFromName(FPawnStateActionHUD::Get().ExperienceProgressBar));
+	if (!UIPtr)
+	{
+		return;
+	}
+	auto CharacterProxySPtr = CharacterPtr->GetCharacterProxy();
+	if (CharacterProxySPtr)
+	{
+		const auto Experience = CharacterProxySPtr->GetExperience();
+		const auto LevelExperience = CharacterProxySPtr->GetLevelExperience();
+
+		if (LevelExperience > 0)
+		{
+			const auto Percent = Experience / static_cast<float>(LevelExperience);
+			
+			UIPtr->SetPercent(Percent);
+		}
+		else
+		{
+			UIPtr->SetPercent(1.f);
+		}
 	}
 }

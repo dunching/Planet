@@ -79,11 +79,11 @@ void UPlayerControllerGameplayTasksComponent::EntryLevel_ActiveTask_Implementati
 	}
 
 	auto GameplayTaskPtr = UGameplayTask::NewTask<UGameplayTask_TeleportPlayer>(
-	                                                                            TScriptInterface<
-		                                                                            IGameplayTaskOwnerInterface>(
-		                                                                             this
-		                                                                            )
-	                                                                           );
+																				TScriptInterface<
+																					IGameplayTaskOwnerInterface>(
+																					 this
+																					)
+																			   );
 	GameplayTaskPtr->Teleport = Teleport;
 	GameplayTaskPtr->TargetPCPtr = OwnerPtr;
 	GameplayTaskPtr->Weather = NewWeather;
@@ -163,13 +163,9 @@ UGameplayTask_TeleportPlayer::UGameplayTask_TeleportPlayer(
 void UGameplayTask_TeleportPlayer::Activate()
 {
 	Super::Activate();
-
-#if UE_EDITOR || UE_SERVER
-	if (TargetPCPtr->GetLocalRole() == ROLE_AutonomousProxy)
-	{
-	}
-#endif
-		
+	
+	Target.LoadSynchronous();
+	
 #if UE_EDITOR || UE_SERVER
 	if (TargetPCPtr->GetNetMode() == NM_DedicatedServer)
 	{
@@ -184,15 +180,18 @@ void UGameplayTask_TeleportPlayer::Activate()
 		
 		UOpenWorldSubSystem::GetInstance()->SwitchDataLayer(Teleport, TargetPCPtr);
 	}
-#endif
 
+	// 
 	auto CharacterPtr = Cast<ACharacterBase>(TargetPCPtr->GetPawn<ACharacterBase>());
 	if (CharacterPtr)
 	{
 		CharacterPtr->LandedDelegate.AddDynamic(this, &ThisClass::OnLanded);
 	}
-	
-	Target.LoadSynchronous();
+#endif
+
+	if (TargetPCPtr->GetLocalRole() > ROLE_SimulatedProxy)
+	{
+	}
 }
 
 void UGameplayTask_TeleportPlayer::TickTask(
@@ -212,8 +211,14 @@ void UGameplayTask_TeleportPlayer::TickTask(
 		{
 			if ((CurrentWaitTime >= MinWaitTime) && bIsOnLanded)
 			{
-#if UE_EDITOR || UE_SERVER
+#if UE_EDITOR || UE_CLIENT
 				if (TargetPCPtr->GetLocalRole() == ROLE_AutonomousProxy)
+				{
+				}
+#endif
+
+#if UE_EDITOR || UE_SERVER
+				if (TargetPCPtr->GetLocalRole() == ROLE_Authority)
 				{
 				}
 #endif
@@ -297,6 +302,8 @@ void UGameplayTask_WaitLoadComplete::TickTask(
 	
 	if ((CurrentWaitTime >= MinWaitTime) && bIsOnLanded)
 	{
+		OnEnd.Broadcast(true);
+		
 		EndTask();
 	}
 }

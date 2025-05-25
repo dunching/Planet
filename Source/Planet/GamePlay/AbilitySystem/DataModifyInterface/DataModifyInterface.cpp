@@ -177,27 +177,70 @@ bool IInputData_BasicData_ModifyInterface::Modify(
 	                                                          GetCharacterAttributes();
 	const auto TargetCharacterAttributesPtr = TargetCharacterPtr->GetCharacterAttributesComponent()->
 	                                                              GetCharacterAttributes();
+
+	auto Lambda = [this, InstigatorCharacterAttributesPtr, TargetCharacterAttributesPtr](
+		TTuple<FGameplayTag, float>& Iter,
+		const auto Penetration,
+		const auto PercentPenetration,
+		const auto Resistance
+		)
+	{
+		auto ActulyResistance = FMath::Clamp(
+		                                     Resistance - (Resistance * (PercentPenetration / 100.f)) - Penetration,
+		                                     0,
+		                                     TargetCharacterAttributesPtr->MaxElementalResistance
+		                                    );
+
+		const auto Percent = FMath::Clamp(ActulyResistance / (ActulyResistance + BaseResistance), 0, 1);
+
+		Iter.Value = Iter.Value - (Iter.Value * Percent);
+	};
 	for (auto& Iter : NewDatas)
 	{
 		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
 		{
-			const auto Penetration = InstigatorCharacterAttributesPtr->GetMetalPenetration();
-			const auto PercentPenetration = InstigatorCharacterAttributesPtr->GetMetalPercentPenetration();
-
-			const auto Resistance = TargetCharacterAttributesPtr->GetMetalResistance();
-
-			auto ActulyResistance = FMath::Clamp(
-			                                     Resistance - (Resistance * (PercentPenetration / 100.f)) - Penetration,
-			                                     0,
-			                                     TargetCharacterAttributesPtr->MaxElementalResistance
-			                                    );
-
-			const auto Percent = FMath::Clamp(ActulyResistance / (ActulyResistance + BaseResistance), 0, 1);
-
-			Iter.Value = Iter.Value - (Iter.Value * Percent);
+			Lambda(
+			       Iter,
+			       InstigatorCharacterAttributesPtr->GetMetalPenetration(),
+			       InstigatorCharacterAttributesPtr->GetMetalPercentPenetration(),
+			       TargetCharacterAttributesPtr->GetMetalResistance()
+			      );
 		}
 		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
 		{
+			Lambda(
+			       Iter,
+			       InstigatorCharacterAttributesPtr->GetWoodPenetration(),
+			       InstigatorCharacterAttributesPtr->GetWoodPercentPenetration(),
+			       TargetCharacterAttributesPtr->GetWoodResistance()
+			      );
+		}
+		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water))
+		{
+			Lambda(
+			       Iter,
+			       InstigatorCharacterAttributesPtr->GetWaterPenetration(),
+			       InstigatorCharacterAttributesPtr->GetWaterPercentPenetration(),
+			       TargetCharacterAttributesPtr->GetWaterResistance()
+			      );
+		}
+		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire))
+		{
+			Lambda(
+			       Iter,
+			       InstigatorCharacterAttributesPtr->GetFirePenetration(),
+			       InstigatorCharacterAttributesPtr->GetFirePercentPenetration(),
+			       TargetCharacterAttributesPtr->GetFireResistance()
+			      );
+		}
+		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth))
+		{
+			Lambda(
+			       Iter,
+			       InstigatorCharacterAttributesPtr->GetEarthPenetration(),
+			       InstigatorCharacterAttributesPtr->GetEarthPercentPenetration(),
+			       TargetCharacterAttributesPtr->GetEarthResistance()
+			      );
 		}
 	}
 
@@ -225,8 +268,19 @@ bool IInputData_Shield_ModifyInterface::Modify(
 	                                                              GetCharacterAttributes();
 	for (auto& Iter : NewDatas)
 	{
-		if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal))
+		if (
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Metal) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Water) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Fire) ||
+			Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Earth)
+		)
 		{
+			if (Iter.Value <= 0)
+			{
+				continue;
+			}
+
 			const auto ShieldValue = TargetCharacterAttributesPtr->GetShield();
 			if (ShieldValue <= 0)
 			{
@@ -258,9 +312,6 @@ bool IInputData_Shield_ModifyInterface::Modify(
 					);
 				Iter.Value = 0;
 			}
-		}
-		else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Damage_Wood))
-		{
 		}
 	}
 
@@ -299,7 +350,6 @@ bool IOutputData_MultipleDamega_ModifyInterface::Modify(
 			const auto OldValue = CurrentCount;
 			CurrentCount++;
 			CallbackContainerHelper.ValueChanged(OldValue, CurrentCount);
-
 
 			Iter.Value = Iter.Value * Multiple;
 			if (CurrentCount >= Count)

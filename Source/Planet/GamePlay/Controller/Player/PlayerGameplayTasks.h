@@ -79,7 +79,6 @@ private:
 	void EntryChallengeLevel_Server(
 		ETeleport Teleport
 	);
-
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void EntryLevel_ActiveTask(

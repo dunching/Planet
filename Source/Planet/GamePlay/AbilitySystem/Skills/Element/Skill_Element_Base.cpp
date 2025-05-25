@@ -9,6 +9,4 @@ void USkill_Element_Base::OnAvatarSet(
 )
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
-
-	ActorInfo->AbilitySystemComponent->TryActivateAbility(Spec.Handle, false);
 }

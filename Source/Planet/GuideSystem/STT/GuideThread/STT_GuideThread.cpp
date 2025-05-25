@@ -1699,6 +1699,82 @@ FTaskNodeDescript FSTT_GuideThread_Run::GetTaskNodeDescripton(
 	return TaskNodeDescript;
 }
 
+EStateTreeRunStatus FSTT_GuideThread_ShowCursor::EnterState(
+	FStateTreeExecutionContext& Context,
+	const FStateTreeTransitionResult& Transition
+	) const
+{
+	Super::EnterState(
+					  Context,
+					  Transition
+					 );
+
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+															  *this
+															 );
+
+	// 因为这个PlayerCharacter可能会被销毁，所以我们在每次任务时重新获取而不是在STE里面获取
+	InstanceData.PCPtr = UGameplayStatics::GetPlayerController(
+															   InstanceData.PlayerCharacterPtr,
+															   0
+															  );
+	
+	auto GameOptionsPtr = UGameOptions::GetInstance();
+
+	InstanceData.Key = GameOptionsPtr->ShowCursor;
+	
+	if (InstanceData.GuideThreadActorPtr)
+	{
+		InstanceData.GuideThreadActorPtr->UpdateCurrentTaskNode(
+																GetTaskNodeDescripton(
+																	 Context
+																	)
+															   );
+	}
+
+	if (InstanceData.PCPtr)
+	{
+		return EStateTreeRunStatus::Running;
+	}
+
+	return EStateTreeRunStatus::Failed;
+}
+
+EStateTreeRunStatus FSTT_GuideThread_ShowCursor::Tick(
+	FStateTreeExecutionContext& Context,
+	const float DeltaTime
+	) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+															  *this
+															 );
+
+	if (InstanceData.PCPtr->GetMouseCursor())
+	{
+		return EStateTreeRunStatus::Succeeded;
+	}
+
+	return Super::Tick(
+					   Context,
+					   DeltaTime
+					  );
+}
+
+FTaskNodeDescript FSTT_GuideThread_ShowCursor::GetTaskNodeDescripton(
+	FStateTreeExecutionContext& Context
+	) const
+{
+	FInstanceDataType& InstanceData = Context.GetInstanceData(
+															  *this
+															 );
+
+	FTaskNodeDescript TaskNodeDescript;
+
+	TaskNodeDescript.Description = InstanceData.Description.Replace(TEXT("{Key}"), *InstanceData.Key .ToString());
+
+	return TaskNodeDescript;
+}
+
 EStateTreeRunStatus FSTT_GuideThread_GoToTheTargetPoint::EnterState(
 	FStateTreeExecutionContext& Context,
 	const FStateTreeTransitionResult& Transition

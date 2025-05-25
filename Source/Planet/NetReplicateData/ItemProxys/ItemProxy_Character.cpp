@@ -3,6 +3,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "AIComponent.h"
+#include "AssetRefMap.h"
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
 #include "SceneProxyExtendInfo.h"
@@ -69,9 +70,17 @@ void FCharacterSocket::ResetAllocatedProxy()
 	AllocationedProxyID = FGuid();
 }
 
+bool FCharacterTalent::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
+	)
+{
+	return true;
+}
+
 FCharacterProxy::FCharacterProxy()
 {
-	CharacterAttributesSPtr = MakeShared<FCharacterAttributes>();
 }
 
 FCharacterProxy::FCharacterProxy(
@@ -91,6 +100,26 @@ void FCharacterProxy::UpdateByRemote(
 
 	TeammateConfigureMap = RemoteSPtr->TeammateConfigureMap;
 	ProxyCharacterPtr = RemoteSPtr->ProxyCharacterPtr;
+
+	const auto OldLevel = Level;
+	if (RemoteSPtr->Level == Level)
+	{
+	}
+	else
+	{
+		Level = RemoteSPtr->Level;
+		LevelChangedDelegate.ValueChanged(OldLevel, Level);
+	}
+
+	const auto OldExperience = Experience;
+	if (RemoteSPtr->Experience == Experience)
+	{
+	}
+	else
+	{
+		Experience = RemoteSPtr->Experience;
+		ExperienceChangedDelegate.ValueChanged(OldExperience, Experience);
+	}
 }
 
 bool FCharacterProxy::NetSerialize(
@@ -106,7 +135,6 @@ bool FCharacterProxy::NetSerialize(
 	Ar << Name;
 	Ar << Level;
 	Ar << ProxyCharacterPtr;
-	CharacterAttributesSPtr->NetSerialize(Ar, Map, bOutSuccess);
 
 	if (Ar.IsSaving())
 	{
@@ -131,6 +159,10 @@ bool FCharacterProxy::NetSerialize(
 			TeammateConfigureMap.Add(MySocket_FASI.Socket, MySocket_FASI);
 		}
 	}
+
+	CharacterTalent.NetSerialize(Ar, Map, bOutSuccess);
+	Ar << Level;
+	Ar << Experience;
 
 	return true;
 }
@@ -406,4 +438,147 @@ FString FCharacterProxy::GetDisplayTitle() const
 	{
 		return FString::Printf(TEXT("%s-%s"), *Title, *Name);
 	}
+}
+
+void FCharacterProxy::AddExperience(
+	uint32 Value
+	)
+{
+	const auto CharacterGrowthAttributeAry = GetTableRowProxy_Character()->CharacterGrowthAttributeAry;
+
+	if (CharacterGrowthAttributeAry.Num() <= Level)
+	{
+		//满级了
+		return;
+	}
+
+	const auto OldExperience = Experience;
+
+	Experience += Value;
+
+	int32 LevelExperience = 0;
+
+	int32 NewLevelExperience = 0;
+
+	ON_SCOPE_EXIT
+	{
+#if UE_EDITOR || UE_SERVER
+		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			InventoryComponentPtr->Proxy_Container.UpdateItem(GetID());
+		}
+#endif
+
+		ExperienceChangedDelegate.ValueChanged(OldExperience, Experience);
+
+		if (LevelExperience > 0 && NewLevelExperience > 0)
+		{
+			LevelExperienceChangedDelegate.ValueChanged(LevelExperience, NewLevelExperience);
+		}
+	};
+
+	auto CharacterPtr = GetCharacterActor();
+	UPlanetAbilitySystemComponent* GASPtr = nullptr;
+	if (CharacterPtr.IsValid())
+	{
+		GASPtr = CharacterPtr->GetAbilitySystemComponent();
+	}
+
+	for (; Level > 0 && Level < CharacterGrowthAttributeAry.Num();)
+	{
+		const auto& CurrentLevelAttribute = CharacterGrowthAttributeAry[Level - 1];
+
+		// 当前等级升级所需经验
+		LevelExperience = CurrentLevelAttribute.LevelExperience;
+
+		if (Experience < LevelExperience)
+		{
+			return;
+		}
+
+		// 增加属性
+		if (GASPtr)
+		{
+			auto SpecHandle = GASPtr->MakeOutgoingSpec(
+			                                           UAssetRefMap::GetInstance()->OnceGEClass,
+			                                           1,
+			                                           GASPtr->MakeEffectContext()
+			                                          );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina);
+
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_HP,
+			                                               CharacterGrowthAttributeAry[Level].Max_HP
+			                                              );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_MaxHP,
+			                                               CharacterGrowthAttributeAry[Level].Max_HP
+			                                              );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Stamina,
+			                                               CharacterGrowthAttributeAry[Level].Max_Stamina
+			                                              );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina,
+			                                               CharacterGrowthAttributeAry[Level].Max_Stamina
+			                                              );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_Mana,
+			                                               CharacterGrowthAttributeAry[Level].Max_Mana
+			                                              );
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+			                                               UGameplayTagsLibrary::GEData_ModifyItem_MaxMana,
+			                                               CharacterGrowthAttributeAry[Level].Max_Mana
+			                                              );
+
+			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+
+		// 调整数据
+		const auto OldLevel = Level;
+		Level++;
+
+		LevelChangedDelegate.ValueChanged(OldLevel, Level);
+
+		if (Level < CharacterGrowthAttributeAry.Num())
+		{
+			Experience -= LevelExperience;
+
+			LevelExperience = CurrentLevelAttribute.LevelExperience;
+
+			NewLevelExperience = CharacterGrowthAttributeAry[Level].LevelExperience;
+		}
+		else
+		{
+			Experience = CurrentLevelAttribute.LevelExperience;
+
+			LevelExperience = CurrentLevelAttribute.LevelExperience;
+
+			NewLevelExperience = CurrentLevelAttribute.LevelExperience;
+		}
+	}
+}
+
+uint8 FCharacterProxy::GetLevel() const
+{
+	return Level;
+}
+
+uint8 FCharacterProxy::GetExperience() const
+{
+	return Experience;
+}
+
+uint8 FCharacterProxy::GetLevelExperience() const
+{
+	const auto CharacterGrowthAttributeAry = GetTableRowProxy_Character()->CharacterGrowthAttributeAry;
+
+	if (CharacterGrowthAttributeAry.Num() < 0)
+	{
+		return -1;
+	}
+
+	return CharacterGrowthAttributeAry[Level - 1].LevelExperience;
 }

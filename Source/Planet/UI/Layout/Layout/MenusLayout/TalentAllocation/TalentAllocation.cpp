@@ -19,29 +19,6 @@ void UTalentAllocation::NativeConstruct()
 void UTalentAllocation::NativeDestruct()
 {
 	Super::NativeDestruct(); 
-
-	if (OnValueChanged)
-	{
-		OnValueChanged->UnBindCallback();
-	}
-	for (auto& Iter : OnPointChangedHandleAry)
-	{
-		if (Iter)
-		{
-			Iter->UnBindCallback();
-		}
-	}
-
-	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
-	if (CharacterPtr)
-	{
-		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
-		if (TalentAllocationComponentPtr)
-		{
-			TalentAllocationComponentPtr->SyncToHolding();
-		}
-	}
-
 }
 
 void UTalentAllocation::EnableMenu()
@@ -83,6 +60,28 @@ void UTalentAllocation::EnableMenu()
 
 void UTalentAllocation::DisEnableMenu()
 {
+	if (OnValueChanged)
+	{
+		OnValueChanged->UnBindCallback();
+	}
+	
+	for (auto& Iter : OnPointChangedHandleAry)
+	{
+		if (Iter)
+		{
+			Iter->UnBindCallback();
+		}
+	}
+
+	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (CharacterPtr)
+	{
+		auto TalentAllocationComponentPtr = CharacterPtr->GetTalentAllocationComponent();
+		if (TalentAllocationComponentPtr)
+		{
+			TalentAllocationComponentPtr->SyncToHolding();
+		}
+	}
 }
 
 EMenuType UTalentAllocation::GetMenuType() const

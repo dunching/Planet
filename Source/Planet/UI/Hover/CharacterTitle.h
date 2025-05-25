@@ -61,9 +61,7 @@ protected:
 		);
 
 	void OnHPChanged(
-		const FOnAttributeChangeData&
-
-	
+		const FOnAttributeChangeData& OnAttributeChangeData
 		);
 
 	void SetHPChanged(
@@ -71,21 +69,26 @@ protected:
 		float MaxValue
 		);
 
-	void OnPPChanged(
-		const FOnAttributeChangeData&
-
-	
+	void OnStaminaChanged(
+		const FOnAttributeChangeData& OnAttributeChangeData
 		);
 
-	void SetPPChanged(
+	void SetStaminaChanged(
+		float Value,
+		float MaxValue
+		);
+
+	void OnManaChanged(
+		const FOnAttributeChangeData& OnAttributeChangeData
+		);
+
+	void SetManaChanged(
 		float Value,
 		float MaxValue
 		);
 
 	void OnShieldChanged(
-		const FOnAttributeChangeData&
-
-	
+		const FOnAttributeChangeData& OnAttributeChangeData
 		);
 
 	void SetShieldChanged(
@@ -97,8 +100,15 @@ protected:
 
 	void ApplyStatesToTitle();
 
+	void ApplyLevelToTitle();
+
 	bool ResetPosition(
 		float InDeltaTime
+		);
+
+private:
+	void OnLevelChanged(
+		int32 Level
 		);
 
 	FVector2D PreviousPt = FVector2D::ZeroVector;
@@ -111,7 +121,7 @@ protected:
 
 	float CurrentInterval = 0.f;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, meta = (AllowPrivateAccess = true))
 	float Offset = 0.f;
 
 	float HalfHeight = 0.f;
@@ -129,6 +139,8 @@ protected:
 	FDelegateHandle OnGameplayEffectTagCountChangedHandle;
 
 	TSet<FGameplayTag> TagSet;
+
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr LevelChangedDelegateHandle;
 };
 
 UCLASS()

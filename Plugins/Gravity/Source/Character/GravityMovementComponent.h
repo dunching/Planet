@@ -215,7 +215,7 @@ protected:
 		bool bBaseRelativePosition,
 		uint8 ServerMovementMode,
 		TOptional<FRotator> OptionalRotation = TOptional<FRotator>()
-		);
+		) override;
 
 	FMyCharacterMoveResponseDataContainer* GetMyMoveResponseDataContainer() const;
 

@@ -20,14 +20,20 @@ struct FCharacterProxy;
 enum struct ECharacterPropertyType : uint8;
 
 /**
- * 冷却
+ * 技能状态
+ * 如冷却、层数
  */
-struct PLANET_API IProxy_Cooldown
+struct PLANET_API IProxy_SkillState
 {
 public:
 	
-	virtual ~IProxy_Cooldown();
+	virtual ~IProxy_SkillState();
 	
+	/**
+	 * 获取层数
+	 */
+	virtual int32 GetCount() const = 0;
+
 	/**
 	 * 获取GA冷却
 	 * @param RemainingCooldown 

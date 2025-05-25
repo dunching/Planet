@@ -19,7 +19,7 @@
 
 struct FPawnDataStruct;
 struct FSceneTool;
-struct FCharacterAttributes;
+
 
 class UMainHUDLayout;
 class UMainMenuLayout;

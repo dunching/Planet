@@ -11,6 +11,7 @@
 #include "CharacterBase.h"
 #include "Planet.h"
 #include "GameOptions.h"
+#include "GameplayTagsLibrary.h"
 #include "OnEffectedTawrgetCallback.h"
 #include "PlanetGameViewportClient.h"
 #include "TemplateHelper.h"
@@ -36,13 +37,18 @@ void UCharacterRisingTips::NativeConstruct()
 	SetAlignmentInViewport(FVector2D(.5f, .5f));
 }
 
-void UCharacterRisingTips::SetData(
+bool UCharacterRisingTips::SetData(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
 	)
 {
 	if (!ReceivedEventModifyDataCallback.TargetCharacterPtr)
 	{
-		return;
+		return false;
+	}
+
+	if (ReceivedEventModifyDataCallback.AllAssetTags.HasTag(UGameplayTagsLibrary::DataSource_Reply))
+	{
+		return false;
 	}
 
 	TargetCharacterPtr = ReceivedEventModifyDataCallback.TargetCharacterPtr;
@@ -50,32 +56,90 @@ void UCharacterRisingTips::SetData(
 	auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FCharacterRisingTips::Get().Text));
 	if (UIPtr)
 	{
-		FText Text;
-
 		if (ReceivedEventModifyDataCallback.
 			bIsEvade)
 		{
-			Text = FText::FromString(TEXT("闪避"));
-		}
-		else if (ReceivedEventModifyDataCallback.
-		    Damage > 0)
-		{
-			Text = FText::FromString(FString::Printf(TEXT("%d"), ReceivedEventModifyDataCallback.Damage));
-		}
-		else if (ReceivedEventModifyDataCallback.
-			TherapeuticalDose)
-		{
-			Text = FText::FromString(FString::Printf(TEXT("+%d"), ReceivedEventModifyDataCallback.Damage));
-		}
+			const auto Text = FText::FromString(TEXT("闪避"));
 
-		UIPtr->SetText(Text);
+			UIPtr->SetText(Text);
+
+			PlayDamageAnimation(
+			                    ReceivedEventModifyDataCallback.
+			                    bIsCritical,
+			                    ReceivedEventModifyDataCallback.
+			                    bIsEvade,
+			                    ReceivedEventModifyDataCallback.
+			                    ElementalType
+			                   );
+		}
+		else if (ReceivedEventModifyDataCallback.
+		         Damage > 0)
+		{
+			const auto Text = FText::FromString(FString::Printf(TEXT("%d"), ReceivedEventModifyDataCallback.Damage));
+
+			UIPtr->SetText(Text);
+
+			PlayDamageAnimation(
+			                    ReceivedEventModifyDataCallback.
+			                    bIsCritical,
+			                    ReceivedEventModifyDataCallback.
+			                    bIsEvade,
+			                    ReceivedEventModifyDataCallback.
+			                    ElementalType
+			                   );
+		}
+		else if (ReceivedEventModifyDataCallback.
+		         TherapeuticalDose > 0)
+		{
+			const auto Text = FText::FromString(FString::Printf(TEXT("+%d"), ReceivedEventModifyDataCallback.Damage));
+
+			UIPtr->SetText(Text);
+
+			PlayTreatmentAnimation();
+		}
+		else
+		{
+			for (const auto& Iter : ReceivedEventModifyDataCallback.SetByCallerTagMagnitudes)
+			{
+				if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Stamina))
+				{
+					if (Iter.Value > 0)
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("+%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+					else
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+
+					PlayStaminaAnimation();
+				}
+				else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
+				{
+					if (Iter.Value > 0)
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("+%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+					else
+					{
+						const auto Text = FText::FromString(FString::Printf(TEXT("%.0lf"), Iter.Value));
+
+						UIPtr->SetText(Text);
+					}
+
+					PlayManaAnimation();
+				}
+			}
+		}
 	}
 
-	PlayMyAnimation(
-	                ReceivedEventModifyDataCallback.bIsCritical,
-	                ReceivedEventModifyDataCallback.TherapeuticalDose > 0,
-	                ReceivedEventModifyDataCallback.ElementalType
-	               );
+	return true;
 }
 
 FVector UCharacterRisingTips::GetHoverPosition()
@@ -84,6 +148,11 @@ FVector UCharacterRisingTips::GetHoverPosition()
 }
 
 void UCharacterRisingTips::PlayAnimationFinished()
+{
+	EndRising();
+}
+
+void UCharacterRisingTips::EndRising()
 {
 	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(
 		 GetWorld(),

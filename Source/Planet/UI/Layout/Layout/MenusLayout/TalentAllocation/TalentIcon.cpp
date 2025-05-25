@@ -117,23 +117,5 @@ FTalentHelper UTalentIcon::GetTalentHelper() const
 {
 	FTalentHelper TalentHelper;
 
-	TalentHelper.PointType = PointType;
-	TalentHelper.IconSocket = IconSocket;
-	switch (PointType)
-	{
-	case EPointType::kSkill:
-	{
-		TalentHelper.Type = PointSkillType;
-	}
-	break;
-	case EPointType::kProperty:
-	{
-		TalentHelper.Type = PointPropertyType;
-	}
-	break;
-	default:
-		break;
-	}
-
 	return TalentHelper;
 }

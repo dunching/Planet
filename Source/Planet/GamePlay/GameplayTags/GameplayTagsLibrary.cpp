@@ -184,6 +184,9 @@ FGameplayTag UGameplayTagsLibrary::Respawning =
 FGameplayTag UGameplayTagsLibrary::InFightingTag =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.InFighting")));
 
+FGameplayTag UGameplayTagsLibrary::State_ActiveGuide_Challenge =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("State.ActiveGuide.Challenge")));
+
 FGameplayTag UGameplayTagsLibrary::State_ReleasingSkill =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("State.ReleasingSkill")));
 
@@ -394,6 +397,9 @@ FGameplayTag UGameplayTagsLibrary::DataSource_EquipmentModify =
 FGameplayTag UGameplayTagsLibrary::DataSource_TalentModify =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.TalentModify")));
 
+FGameplayTag UGameplayTagsLibrary::DataSource_Reply =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Reply")));
+
 FGameplayTag UGameplayTagsLibrary::Skill_CanBeInterrupted =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("Skill.CanBeInterrupted")));
 
@@ -437,6 +443,15 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary =
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary")));
 
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MaxHP =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.MaxHP")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MaxStamina =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.MaxStamina")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MaxMana =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.MaxMana")));
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_HP =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.HP")));

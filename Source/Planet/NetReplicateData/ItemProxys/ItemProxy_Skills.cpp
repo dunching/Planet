@@ -456,6 +456,11 @@ TSubclassOf<USkill_Base> FActiveSkillProxy::GetSkillClass() const
 	return GetTableRowProxy_ActiveSkillExtendInfo()->SkillClass;
 }
 
+int32 FActiveSkillProxy::GetCount() const
+{
+	return -1;
+}
+
 FPassiveSkillProxy::FPassiveSkillProxy()
 {
 }
@@ -536,6 +541,95 @@ FTableRowProxy_PropertyEntrys* FPassiveSkillProxy::GetMainPropertyEntry() const
 TSubclassOf<USkill_Base> FPassiveSkillProxy::GetSkillClass() const
 {
 	return GetTableRowProxy_PassiveSkillExtendInfo()->SkillClass;
+}
+
+int32 FPassiveSkillProxy::GetCount() const
+{
+	return -1;
+}
+
+bool FPassiveSkillProxy::GetRemainingCooldown(
+	float& RemainingCooldown,
+	float& RemainingCooldownPercent
+	) const
+{
+	auto InTags = FGameplayTagContainer::EmptyContainer;
+
+	InTags.AddTag(GetProxyType());
+	InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+																   GetActiveEffectsWithAllTags(
+																	   InTags
+																   );
+
+	if (!GameplayEffectHandleAry.IsEmpty())
+	{
+		auto GameplayEffectPtr = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+														   GetActiveGameplayEffect(
+															   GameplayEffectHandleAry[0]
+														   );
+
+		if (GameplayEffectPtr)
+		{
+			RemainingCooldown = GameplayEffectPtr->GetTimeRemaining(GetWorldImp()->GetTimeSeconds());
+			RemainingCooldownPercent = RemainingCooldown / GameplayEffectPtr->GetDuration();
+
+			return false;
+		}
+	}
+	return true;
+}
+
+bool FPassiveSkillProxy::CheckNotInCooldown() const
+{
+	auto InTags = FGameplayTagContainer::EmptyContainer;
+
+	InTags.AddTag(GetProxyType());
+	InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+																   GetActiveEffectsWithAllTags(
+																	   InTags
+																   );
+
+	return GameplayEffectHandleAry.IsEmpty();
+}
+
+void FPassiveSkillProxy::AddCooldownConsumeTime(
+	float CDOffset
+	)
+{
+	auto InTags = FGameplayTagContainer::EmptyContainer;
+
+	InTags.AddTag(GetProxyType());
+	InTags.AddTag(UGameplayTagsLibrary::GEData_CD);
+
+	const auto GameplayEffectHandleAry = GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+																   GetActiveEffectsWithAllTags(
+																	   InTags
+																   );
+
+	if (!GameplayEffectHandleAry.IsEmpty())
+	{
+		GetAllocationCharacter()->GetCharacterAbilitySystemComponent()->
+								  ModifyActiveEffectStartTime(
+									  GameplayEffectHandleAry[0],
+									  CDOffset
+								  );
+	}
+}
+
+void FPassiveSkillProxy::FreshUniqueCooldownTime()
+{
+}
+
+void FPassiveSkillProxy::ApplyCooldown()
+{
+}
+
+void FPassiveSkillProxy::OffsetCooldownTime()
+{
 }
 
 void FWeaponSkillProxy::SetAllocationCharacterProxy(

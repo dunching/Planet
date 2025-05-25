@@ -189,7 +189,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AHumanCharacter_AI>CharacterClass;
 	
+	/**
+	 * 
+	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FString Title;
+	
+	/**
+	 * 
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TArray<FCharacterGrowthAttribute> CharacterGrowthAttributeAry;
 	
 };

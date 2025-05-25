@@ -249,3 +249,21 @@ void TestCommand::SetBGMVolume(
 	                                          );
 #endif
 }
+
+void TestCommand::AddExperience(
+	const TArray<FString>& Args
+	)
+{
+#if WITH_EDITOR
+	if (!Args.IsValidIndex(0))
+	{
+		return;
+	}
+
+	auto PCPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
+	if (PCPtr)
+	{
+		PCPtr->AddExperience(UKismetStringLibrary::Conv_StringToInt(Args[0]));
+	}
+#endif
+}

@@ -106,13 +106,10 @@ void UGroupMateInfo::ResetToolUIByData(const TSharedPtr<FBasicProxy>& BasicProxy
 			auto UIPtr = Cast<UTextBlock>(GetWidgetFromName(FGroupMateInfo::Get().Text));
 			if (UIPtr)
 			{
-				auto CharacterAttributesSPtr =
-					GroupMateProxyPtr->CharacterAttributesSPtr;
-
 				UIPtr->SetText(
 					FText::FromString(FString::Printf(TEXT("%s(%d)"),
 						*GroupMateProxyPtr->GetDisplayTitle(),
-						GroupMateProxyPtr->Level))
+						GroupMateProxyPtr->GetLevel()))
 				);
 			}
 		}

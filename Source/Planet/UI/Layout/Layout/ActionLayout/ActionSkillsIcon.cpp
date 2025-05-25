@@ -605,20 +605,6 @@ void UActionPassiveSkillsIcon::UpdateSkillState_PassiveSkill()
 		{
 			return;
 		}
-
-		if (GAInsPtr->IsActive())
-		{
-			const auto RemainTime = GAInsPtr->GetRemainTime();
-
-			SetDurationPercent(true, RemainTime < 0.f ? 1.f : RemainTime);
-			return;
-		}
-
-		auto bIsReady = GAInsPtr->CanActivateAbility(
-		                                             GAInsPtr->GetCurrentAbilitySpecHandle(),
-		                                             GAInsPtr->GetCurrentActorInfo()
-		                                            );
-		SetCanRelease(bIsReady);
 	}
 	if (SKillProxyType.MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Passve))
 	{
@@ -638,8 +624,8 @@ void UActionPassiveSkillsIcon::UpdateSkillState_PassiveSkill()
 			return;
 		}
 
-		// auto bCooldownIsReady = ActiveSkillProxyPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
-		// SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
+		auto bCooldownIsReady = ActiveSkillProxyPtr->GetRemainingCooldown(RemainingCooldown, RemainingCooldownPercent);
+		SetRemainingCooldown(bCooldownIsReady, RemainingCooldown, RemainingCooldownPercent);
 
 		bool bIsAcceptInput = false;
 		float Percent = 0.f;

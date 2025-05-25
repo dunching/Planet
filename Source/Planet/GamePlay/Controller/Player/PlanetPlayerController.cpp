@@ -365,6 +365,17 @@ void APlanetPlayerController::AddOrRemoveStateImp_Implementation(
 	}
 }
 
+void APlanetPlayerController::AddExperience_Implementation(
+	int32 ExperienceValue
+	)
+{
+	auto CharacterProxySPtr = GetCharacterProxy();
+	if (CharacterProxySPtr)
+	{
+		CharacterProxySPtr->AddExperience(ExperienceValue);
+	}
+}
+
 void APlanetPlayerController::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps
 	) const

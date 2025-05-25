@@ -23,7 +23,7 @@ class UCS_PeriodicPropertyModify;
 class UCS_RootMotion;
 class UCS_Base;
 class UCS_RootMotion_KnockDown;
-class USkill_Element_Gold;
+class USkill_Element_Metal;
 class UBasicFuturesBase;
 class UAbilitySystemComponent;
 class IOutputDataModifyInterface;
@@ -334,7 +334,7 @@ private:
 	TArray<TSubclassOf<UBasicFuturesBase>> CharacterAbilitiesAry;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Element Skills", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<USkill_Element_Gold> Skill_Element_GoldClass;
+	TSubclassOf<USkill_Element_Metal> Skill_Element_GoldClass;
 #pragma endregion GAs
 
 	// 从小到大

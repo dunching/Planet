@@ -29,7 +29,7 @@ struct FCharacterProxy;
 struct FWeaponSkillProxy;
 
 struct FAllocationSkills;
-struct FCharacterAttributes;
+
 struct FTalentHelper;
 struct FSceneProxyContainer;
 struct FProxy_FASI_Container;

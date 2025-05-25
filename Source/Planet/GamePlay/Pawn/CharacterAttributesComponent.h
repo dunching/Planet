@@ -20,7 +20,7 @@ class UAS_Character;
 class UGE_CharacterInitail;
 class UGameplayEffect;
 
-struct FCharacterAttributes;
+
 
 UCLASS(BlueprintType, Blueprintable)
 class PLANET_API UCharacterAttributesComponent : public UActorComponent,

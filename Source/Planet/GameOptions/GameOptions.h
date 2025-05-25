@@ -80,6 +80,9 @@ public:
 	
 	float VolumeMultiplier = 1.f;
 	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "MoveSpeed")
+	int32 CharacterTitleDisplayRange = 3000;
+	
 #pragma region 按键映射
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey ActiveSkill_1_Key = EKeys::Q;
@@ -162,6 +165,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
 	FKey InteractionWithChallengeEntry = EKeys::F;
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Keys")
+	FKey ShowCursor = EKeys::LeftAlt;
 #pragma endregion
 
 	static int32 MaxTeammateNum;

@@ -5,13 +5,16 @@
 
 #include <GenerateType.h>
 
-#include "GameplayTagContainer.h"
+#include "CharacterAttibutes.h"
 #include "ItemProxy_Description.h"
 
 #include "CharactersInfo.generated.h"
 
 class AHumanCharacter_AI;
 
+/**
+ * 角色成长属性变化
+ */
 USTRUCT(BlueprintType)
 struct PLANET_API FTableRowProxy_CharacterGrowthAttribute : public FTableRowBase
 {
@@ -19,10 +22,15 @@ struct PLANET_API FTableRowProxy_CharacterGrowthAttribute : public FTableRowBase
 	
 	FTableRowProxy_CharacterGrowthAttribute();
 
-// 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-// 	FCharacterAttributes CharacterAttributes;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 LevelExperience = 100;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Max_HP = 50;
 
-	// 每级增加的属性
-	// UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
-	// TArray<FCharacterAttributes> CharacterAttributesPerLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Max_Stamina = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Max_Mana = 100;
 };

@@ -18,7 +18,7 @@ class UOptionList;
 class AGuideInteraction_Actor;
 class ISceneActorInteractionInterface;
 
-struct FCharacterAttributes;
+
 
 struct FToolsSocketInfo;
 struct FConsumableSocketInfo;

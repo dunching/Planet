@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include <GameplayTagContainer.h>
 
+#include "AttributeSet.h"
 #include "ItemProxy.h"
 #include "ItemProxy_Interface.h"
 
@@ -24,7 +25,6 @@ struct FTableRowProxy_CharacterType;
 struct FCharacterProxy;
 
 struct FAllocationSkills;
-struct FCharacterAttributes;
 struct FTalentHelper;
 struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
@@ -42,8 +42,7 @@ using FOnCharacterSocketUpdated = TMulticastDelegate<void(
 	)>;
 
 /*
- * 角色的配置
- * 比如角色的武器插槽，技能插槽分配
+ * 角色的角色的武器、技能插槽分配配置
  */
 USTRUCT()
 struct PLANET_API FCharacterSocket
@@ -111,6 +110,36 @@ private:
 template <>
 struct TStructOpsTypeTraits<FCharacterSocket> :
 	public TStructOpsTypeTraitsBase2<FCharacterSocket>
+{
+	enum
+	{
+		WithNetSerializer = true,
+	};
+};
+
+/*
+ * 角色的天赋配置
+ */
+USTRUCT()
+struct PLANET_API FCharacterTalent
+{
+	GENERATED_USTRUCT_BODY()
+	
+	bool NetSerialize(
+		FArchive& Ar,
+		class UPackageMap* Map,
+		bool& bOutSuccess
+		);
+
+	/**
+	 * 插槽、点数
+	 */
+	TMap<FGameplayTag, uint8> AllocationMap;
+};
+
+template <>
+struct TStructOpsTypeTraits<FCharacterTalent> :
+	public TStructOpsTypeTraitsBase2<FCharacterTalent>
 {
 	enum
 	{
@@ -194,18 +223,36 @@ public:
 
 	FString GetDisplayTitle() const;
 
-	TSharedPtr<FCharacterAttributes> CharacterAttributesSPtr = nullptr;
+	void AddExperience(uint32 Value);
 
-	int32 Level = 1;
-
+	uint8 GetLevel()const;
+	
+	uint8 GetExperience()const;
+	
+	uint8 GetLevelExperience()const;
+	
 	FOnCharacterSocketUpdated OnCharacterSocketUpdated;
+
+	TOnValueChangedCallbackContainer<uint8> LevelChangedDelegate;
+
+	TOnValueChangedCallbackContainer<uint8> ExperienceChangedDelegate;
+
+	TOnValueChangedCallbackContainer<uint8> LevelExperienceChangedDelegate;
 
 protected:
 	TMap<FGameplayTag, FCharacterSocket> TeammateConfigureMap;
 
+	FCharacterTalent CharacterTalent;
+
 	TWeakObjectPtr<FPawnType> ProxyCharacterPtr = nullptr;
 
 private:
+	// 当前等级
+	uint8 Level = 1;
+
+	// 当前经验
+	int32 Experience = 0;
+
 	FString Title;
 
 	FString Name;

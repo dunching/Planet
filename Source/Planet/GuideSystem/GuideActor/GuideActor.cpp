@@ -1,16 +1,20 @@
 #include "GuideActor.h"
 
 #include "GameplayTasksComponent.h"
+#include "GroupManagger.h"
 
 #include "GuideSystemStateTreeComponent.h"
+#include "PlanetPlayerController.h"
 
 
 FTaskNodeDescript::FTaskNodeDescript()
 {
 }
 
-FTaskNodeDescript::FTaskNodeDescript(bool bIsOnlyFresh):
-	bIsOnlyFresh(bIsOnlyFresh)
+FTaskNodeDescript::FTaskNodeDescript(
+	bool bIsOnlyFresh
+	):
+	 bIsOnlyFresh(bIsOnlyFresh)
 {
 }
 
@@ -21,8 +25,10 @@ bool FTaskNodeDescript::GetIsValid() const
 
 FTaskNodeDescript FTaskNodeDescript::Refresh = FTaskNodeDescript(true);
 
-AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+AGuideActor::AGuideActor(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
 	SetRemoteRoleForBackwardsCompat(ROLE_SimulatedProxy);
 	bReplicates = true;
@@ -30,19 +36,50 @@ AGuideActor::AGuideActor(const FObjectInitializer& ObjectInitializer):
 	SetReplicatingMovement(false);
 	SetMinNetUpdateFrequency(1.f);
 
-	GuideStateTreeComponentPtr = CreateDefaultSubobject<UGuideSystemStateTreeComponent>(UGuideSystemStateTreeComponent::ComponentName);
+	GuideStateTreeComponentPtr = CreateDefaultSubobject<UGuideSystemStateTreeComponent>(
+		 UGuideSystemStateTreeComponent::ComponentName
+		);
 	GuideStateTreeComponentPtr->SetStartLogicAutomatically(false);
-	
+
 	GameplayTasksComponentPtr = CreateDefaultSubobject<UGameplayTasksComponent>(TEXT("GameplayTasksComponent"));
-	
+
 	GuideID = FGuid::NewGuid();
 }
 
 void AGuideActor::Destroyed()
 {
-	// GetGuideSystemStateTreeComponent()->StopLogic(TEXT(""));
+	auto PCPtr =  Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	if (PCPtr)
+	{
+		auto GroupManaggerGASPtr =PCPtr->
+								   GetGroupManagger()->GetAbilitySystemComponent();
+		if (GroupManaggerGASPtr)
+		{
+			GroupManaggerGASPtr->RemoveLooseGameplayTags(
+					 ActivedTags
+					);
+		}
+	}
 	
 	Super::Destroyed();
+}
+
+void AGuideActor::ActiveGuide()
+{
+	GetGuideSystemStateTreeComponent()->StartLogic();
+
+	auto PCPtr =  Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()));
+	if (PCPtr)
+	{
+		auto GroupManaggerGASPtr =PCPtr->
+								   GetGroupManagger()->GetAbilitySystemComponent();
+		if (GroupManaggerGASPtr)
+		{
+			GroupManaggerGASPtr->AddLooseGameplayTags(
+					 ActivedTags
+					);
+		}
+	}
 }
 
 UGameplayTasksComponent* AGuideActor::GetGameplayTasksComponent() const
@@ -62,7 +99,7 @@ FGuid AGuideActor::GetGuideID() const
 
 void AGuideActor::SetCurrentTaskID(
 	const FGuid& TaskID
-)
+	)
 {
 	CurrentTaskID = TaskID;
 }
@@ -74,7 +111,7 @@ FGuid AGuideActor::GetPreviousTaskID() const
 
 void AGuideActor::SetPreviousTaskID(
 	const FGuid& PreviousGuideID_
-)
+	)
 {
 	PreviousTaskID = PreviousGuideID_;
 }

@@ -18,7 +18,7 @@
 
 class UToolsMenu;
 
-struct FCharacterAttributes;
+
 
 struct FToolsSocketInfo;
 struct FConsumableSocketInfo;

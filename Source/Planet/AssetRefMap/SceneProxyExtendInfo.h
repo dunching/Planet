@@ -10,6 +10,7 @@
 #include "ItemProxy_Minimal.h"
 #include "SceneProxyTable.h"
 #include "TalentInfo.h"
+#include "CharactersInfo.h"
 
 #include "SceneProxyExtendInfo.generated.h"
 
@@ -53,6 +54,8 @@ public:
 	FTableRow_Regions* GetTableRow_Region(FGameplayTag UnitType)const;
 	
 	TArray<FTableRow_Regions*> GetTableRow_AllRegions()const;
+	
+	TArray<FTableRowProxy_CharacterGrowthAttribute*> GetTableRow_CharacterGrowthAttribute()const;
 	
 	void InitialData();
 

@@ -3,7 +3,7 @@
 #include "InventoryComponent.h"
 #include "ItemProxy_Character.h"
 
-IProxy_Cooldown::~IProxy_Cooldown()
+IProxy_SkillState::~IProxy_SkillState()
 {
 }
 

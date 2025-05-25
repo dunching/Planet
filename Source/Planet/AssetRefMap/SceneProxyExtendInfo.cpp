@@ -96,6 +96,16 @@ TArray<FTableRow_Regions*> USceneProxyExtendInfoMap::GetTableRow_AllRegions() co
 	return Result;
 }
 
+TArray<FTableRowProxy_CharacterGrowthAttribute*> USceneProxyExtendInfoMap::GetTableRow_CharacterGrowthAttribute() const
+{
+	auto DataTablePtr = DataTable_Character_GrowthAttribute.LoadSynchronous();
+
+	TArray<FTableRowProxy_CharacterGrowthAttribute*> Result;
+	DataTablePtr->GetAllRows<FTableRowProxy_CharacterGrowthAttribute>(TEXT("GetUnit"),Result);
+
+	return Result;
+}
+
 void USceneProxyExtendInfoMap::InitialData()
 {
 }

@@ -15,7 +15,7 @@
 
 class UToolsMenu;
 
-struct FCharacterAttributes;
+
 
 struct FToolsSocketInfo;
 struct FConsumableSocketInfo;
@@ -75,8 +75,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = Keys)
 	FKey ToolSocket8;
-
-	FCharacterAttributes* PawnDataStructPtr = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	FName ItemMenu;

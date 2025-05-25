@@ -83,6 +83,8 @@ public:
 	
 	static FGameplayTag InFightingTag;
 	
+	static FGameplayTag State_ActiveGuide_Challenge;
+	
 	static FGameplayTag State_Dying;
 	
 	static FGameplayTag State_Invisible;
@@ -287,6 +289,8 @@ public:
 
 	static FGameplayTag DataSource_TalentModify;
 
+	static FGameplayTag DataSource_Reply;
+
 	
 	static FGameplayTag GEData_Duration;
 
@@ -310,6 +314,12 @@ public:
 	
 	static FGameplayTag GEData_ModifyType_RemoveTemporary;
 
+	
+	static FGameplayTag GEData_ModifyItem_MaxHP;
+	
+	static FGameplayTag GEData_ModifyItem_MaxStamina;
+	
+	static FGameplayTag GEData_ModifyItem_MaxMana;
 	
 	static FGameplayTag GEData_ModifyItem_HP;
 	

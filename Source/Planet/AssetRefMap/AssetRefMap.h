@@ -37,6 +37,7 @@ class UTalentAllocation;
 class UGroupManaggerMenu;
 class UHUD_TeamInfo;
 class URegionPromt;
+class UUpgradePromt;
 class UFocusIcon;
 class UMarkPoints;
 class UCharacterRisingTips;

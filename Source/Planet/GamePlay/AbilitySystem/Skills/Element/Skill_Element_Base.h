@@ -11,6 +11,9 @@
 
 struct FBasicProxy;
 
+/**
+ * 元素技能
+ */
 UCLASS()
 class USkill_Element_Base : public USkill_Base
 {
@@ -24,7 +27,5 @@ public:
 	) override;
 
 protected:
-
-	float CountDown = 5.f;
 
 };

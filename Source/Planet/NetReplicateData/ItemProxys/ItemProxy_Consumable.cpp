@@ -89,6 +89,11 @@ UItemProxy_Description_Consumable* FConsumableProxy::GetTableRowProxy_Consumable
 	return ItemProxy_Description_SkillPtr;
 }
 
+int32 FConsumableProxy::GetCount() const
+{
+	return -1;
+}
+
 bool FConsumableProxy::GetRemainingCooldown(float& RemainingCooldown, float& RemainingCooldownPercent) const
 {
 	RemainingCooldown = -1.f;

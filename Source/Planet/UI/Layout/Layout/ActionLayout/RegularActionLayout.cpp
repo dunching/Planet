@@ -18,6 +18,7 @@
 #include "UICommon.h"
 #include "FocusTitle.h"
 #include "GameOptions.h"
+#include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"
 #include "GuideActor.h"
 #include "GuideList.h"
@@ -26,12 +27,14 @@
 #include "GuideThreadChallenge.h"
 #include "HUD_TeamInfo.h"
 #include "HumanCharacter_Player.h"
+#include "MainHUDLayout.h"
 #include "PawnStateActionHUD.h"
 #include "PawnStateConsumablesHUD.h"
 #include "PlanetGameViewportClient.h"
 #include "PlayerGameplayTasks.h"
 #include "ProgressTips.h"
 #include "TeamMatesHelperComponent.h"
+#include "UpgradePromt.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 
@@ -144,6 +147,16 @@ void URegularActionLayout::Enable()
 			                                                                        std::placeholders::_1
 			                                                                       )
 		                                                                      );
+
+		auto CharacterProxySPtr = PlayerCharacterPtr->GetCharacterProxy();
+		if (!CharacterProxySPtr)
+		{
+			return;
+		}
+
+		LevelChangedDelegateHandle = CharacterProxySPtr->LevelChangedDelegate.AddOnValueChanged(
+			 std::bind(&ThisClass::OnLevelChanged, this, std::placeholders::_2)
+			);
 	}
 
 	{
@@ -160,7 +173,18 @@ void URegularActionLayout::Enable()
 		if (UIPtr)
 		{
 			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitChallengeBtnClicked);
-			UIPtr->SetVisibility(ESlateVisibility::Hidden);
+
+			auto GroupManaggerGASPtr = Cast<APlanetPlayerController>(GEngine->GetFirstLocalPlayerController(GetWorld()))
+			                           ->
+			                           GetGroupManagger()->GetAbilitySystemComponent();
+			if (GroupManaggerGASPtr->HasMatchingGameplayTag(UGameplayTagsLibrary::State_ActiveGuide_Challenge))
+			{
+				UIPtr->SetVisibility(ESlateVisibility::Visible);
+			}
+			else
+			{
+				UIPtr->SetVisibility(ESlateVisibility::Hidden);
+			}
 		}
 	}
 }
@@ -207,6 +231,11 @@ void URegularActionLayout::DisEnable()
 	if (FocusCharacterDelegateSPtr)
 	{
 		FocusCharacterDelegateSPtr->UnBindCallback();
+	}
+
+	if (LevelChangedDelegateHandle)
+	{
+		LevelChangedDelegateHandle->UnBindCallback();
 	}
 
 	{
@@ -418,7 +447,7 @@ void URegularActionLayout::OnHPChanged(
 	const FOnAttributeChangeData&
 
 
-
+	
 	)
 {
 	auto PlayerCharacterPtr = Cast<AHumanCharacter_Player>(UGameplayStatics::GetPlayerCharacter(this, 0));
@@ -476,8 +505,34 @@ void URegularActionLayout::OnEffectOhterCharacter(
 		auto WidgetPtr = CreateWidget<UCharacterRisingTips>(this, FightingTipsClass);
 		if (WidgetPtr)
 		{
-			WidgetPtr->SetData(ReceivedEventModifyDataCallback);
-			ScreenLayer->AddHoverWidget(WidgetPtr);
+			if (WidgetPtr->SetData(ReceivedEventModifyDataCallback))
+			{
+				ScreenLayer->AddHoverWidget(WidgetPtr);
+			}
 		}
+	}
+}
+
+void URegularActionLayout::OnLevelChanged(
+	int32 Level
+	)
+{
+	if (UUIManagerSubSystem::GetInstance()->GetMainHUDLayout())
+	{
+		UUIManagerSubSystem::GetInstance()->GetMainHUDLayout()->DisplayWidget(
+		                                                                      UpgradePromtClass,
+		                                                                      [Level](
+		                                                                      UUserWidget* WidgetPtr
+		                                                                      )
+		                                                                      {
+			                                                                      auto UIPtr = Cast<UUpgradePromt>(
+				                                                                       WidgetPtr
+				                                                                      );
+			                                                                      if (UIPtr)
+			                                                                      {
+				                                                                      UIPtr->SetLevel(Level);
+			                                                                      }
+		                                                                      }
+		                                                                     );
 	}
 }

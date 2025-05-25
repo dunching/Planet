@@ -43,7 +43,7 @@ class UInventoryComponent;
 struct FCharacterProxy;
 
 struct FAllocationSkills;
-struct FCharacterAttributes;
+
 struct FTalentHelper;
 struct FSceneProxyContainer;
 struct FProxy_FASI_Container;
@@ -72,7 +72,9 @@ public:
 		bool& bOutSuccess
 		) override;
 
-	virtual void InitialProxy(const FGameplayTag& InProxyType) override;
+	virtual void InitialProxy(
+		const FGameplayTag& InProxyType
+		) override;
 
 	virtual void SetAllocationCharacterProxy(
 		const TSharedPtr<FCharacterProxy>& InAllocationCharacterProxyPtr,
@@ -107,8 +109,8 @@ protected:
 	virtual void UnAllocation() override;
 
 	FGameplayAbilitySpecHandle GameplayAbilitySpecHandle;
+
 private:
-	
 };
 
 template <>
@@ -122,7 +124,9 @@ struct TStructOpsTypeTraits<FSkillProxy> :
 };
 
 USTRUCT()
-struct PLANET_API FPassiveSkillProxy : public FSkillProxy
+struct PLANET_API FPassiveSkillProxy :
+	public FSkillProxy,
+	public IProxy_SkillState
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -138,6 +142,29 @@ public:
 	FTableRowProxy_PropertyEntrys* GetMainPropertyEntry() const;
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass() const override;
+
+#pragma region IProxy_Cooldown
+	virtual int32 GetCount() const override;
+
+	// return 是否在冷却
+	virtual bool GetRemainingCooldown(
+		float& RemainingCooldown,
+		float& RemainingCooldownPercent
+		) const override;
+
+	// return 是否在冷却
+	virtual bool CheckNotInCooldown() const override;
+
+	virtual void AddCooldownConsumeTime(
+		float CDOffset
+		) override;
+
+	virtual void FreshUniqueCooldownTime() override;
+
+	virtual void ApplyCooldown() override;
+
+	virtual void OffsetCooldownTime() override;
+#pragma endregion
 
 	// 元素词条
 	FGameplayTag ElementPropertyEntry;
@@ -159,7 +186,7 @@ protected:
 USTRUCT()
 struct PLANET_API FActiveSkillProxy :
 	public FSkillProxy,
-	public IProxy_Cooldown
+	public IProxy_SkillState
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -183,6 +210,9 @@ public:
 
 	virtual TSubclassOf<USkill_Base> GetSkillClass() const override;
 
+#pragma region IProxy_Cooldown
+	virtual int32 GetCount() const override;
+
 	// return 是否在冷却
 	virtual bool GetRemainingCooldown(
 		float& RemainingCooldown,
@@ -201,6 +231,7 @@ public:
 	virtual void ApplyCooldown() override;
 
 	virtual void OffsetCooldownTime() override;
+#pragma endregion
 
 	// void SetCDGEChandle(FActiveGameplayEffectHandle InCD_GE_Handle);
 

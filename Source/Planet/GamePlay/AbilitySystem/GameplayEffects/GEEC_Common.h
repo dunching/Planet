@@ -46,7 +46,7 @@ public:
 	virtual void Execute_Implementation(
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-	) const;
+	) const override;
 
 protected:
 	
@@ -61,7 +61,7 @@ public:
 	virtual void Execute_Implementation(
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-	) const;
+	) const override;
 
 protected:
 	
@@ -76,7 +76,7 @@ public:
 	virtual void Execute_Implementation(
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-	) const;
+	) const override;
 
 protected:
 	
@@ -91,7 +91,7 @@ public:
 	virtual void Execute_Implementation(
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-	) const;
+	) const override;
 
 protected:
 	

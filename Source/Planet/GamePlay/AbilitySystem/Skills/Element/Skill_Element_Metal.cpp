@@ -1,5 +1,5 @@
 
-#include "Skill_Element_Gold.h"
+#include "Skill_Element_Metal.h"
 
 #include "AbilitySystemComponent.h"
 
@@ -10,7 +10,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "CharacterAbilitySystemComponent.h"
 
-void USkill_Element_Gold::ActivateAbility(
+void USkill_Element_Metal::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -32,7 +32,7 @@ void USkill_Element_Gold::ActivateAbility(
 }
 
 
-void USkill_Element_Gold::EndAbility(
+void USkill_Element_Metal::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
@@ -45,16 +45,16 @@ void USkill_Element_Gold::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void USkill_Element_Gold::OnElementLevelChanged(int32 OldValue, int32 NewValue)
+void USkill_Element_Metal::OnElementLevelChanged(int32 OldValue, int32 NewValue)
 {
 	CurrentElementLevel = NewValue;
 }
 
-void USkill_Element_Gold::MakedDamageDelegate(UGameplayAbility* GAPtr)
+void USkill_Element_Metal::MakedDamageDelegate(UGameplayAbility* GAPtr)
 {
 }
 
-void USkill_Element_Gold::AddBuff()
+void USkill_Element_Metal::AddBuff()
 {
 	switch (CurrentElementLevel)
 	{
@@ -73,7 +73,7 @@ void USkill_Element_Gold::AddBuff()
 	}
 }
 
-void USkill_Element_Gold::RemoveBuff()
+void USkill_Element_Metal::RemoveBuff()
 {
 	if (CharacterPtr)
 	{

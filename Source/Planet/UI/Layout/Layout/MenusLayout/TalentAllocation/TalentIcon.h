@@ -36,16 +36,10 @@ protected:
 
 	void ResetUI(const FTalentHelper& TalentHelper);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTalentIcon*NextSocletIcon = nullptr;
+	
 public:
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPointType PointType = EPointType::kSkill;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPointSkillType PointSkillType = EPointSkillType::kNuQi;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	EPointPropertyType PointPropertyType = EPointPropertyType::kLiDao;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FGameplayTag IconSocket;

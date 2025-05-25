@@ -33,13 +33,13 @@ void FInputProcessor::SwitchShowCursor(
 		{
 			if (bIsShowCursor)
 			{
-				PlayerPCPtr->bShowMouseCursor = true;
+				PlayerPCPtr->SetShowMouseCursor(true);
 
 				UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerPCPtr, nullptr, EMouseLockMode::DoNotLock, true);
 			}
 			else
 			{
-				PlayerPCPtr->bShowMouseCursor = false;
+				PlayerPCPtr->SetShowMouseCursor(false);
 
 				UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerPCPtr);
 			}

@@ -7,14 +7,14 @@
 #include "Skill_Element_Base.h"
 #include "GenerateType.h"
 
-#include "Skill_Element_Gold.generated.h"
+#include "Skill_Element_Metal.generated.h"
 
 class UAbilityTask_TimerHelper;
 
 struct FBasicProxy;
 
 UCLASS()
-class USkill_Element_Gold : public USkill_Element_Base
+class USkill_Element_Metal : public USkill_Element_Base
 {
 	GENERATED_BODY()
 

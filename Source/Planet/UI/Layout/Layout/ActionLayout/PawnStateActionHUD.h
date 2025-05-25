@@ -13,7 +13,7 @@
 #include "PawnStateActionHUD.generated.h"
 
 struct FSceneTool;
-struct FCharacterAttributes;
+
 struct FSocket_FASI;
 struct FWeaponProxy;
 
@@ -79,12 +79,21 @@ protected:
 	TSubclassOf<UState_Talent_YinYang> Talent_YinYang_Class;
 
 private:
+	void BindExperienceProgressBar();
+	
 	void BindProgressData(
 		const UAS_Character* CharacterAttributeSetPtr,
 		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
 		);
+	
 	void BindElementalData(
 		const UAS_Character* CharacterAttributeSetPtr,
 		UCharacterAbilitySystemComponent* AbilitySystemComponentPtr
 		);
+
+	void OnExperienceChanged();
+
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr ExperienceChangedDelegateHandle;
+	
+	TOnValueChangedCallbackContainer<uint8>::FCallbackHandleSPtr LevelExperienceChangedDelegateHandle;
 };

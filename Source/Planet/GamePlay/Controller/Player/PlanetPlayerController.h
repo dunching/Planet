@@ -207,6 +207,9 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void AddOrRemoveStateImp(const FGameplayTag& StateTag, bool bIsAdd);
 
+	UFUNCTION(Server, Reliable)
+	void AddExperience(int32 ExperienceValue);
+
 #pragma region
 
 protected:

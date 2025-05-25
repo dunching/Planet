@@ -75,6 +75,16 @@ void USkill_Passive_MultipleDamega::MakedDamageDelegate(
 				(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 			)
 			{
+				auto PassiveSkillProxyPtr = DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxyPtr);
+				if (!PassiveSkillProxyPtr)
+				{
+					return;
+				}
+				if (!PassiveSkillProxyPtr->CheckNotInCooldown())
+				{
+					return;
+				}
+				
 				auto GameplayTagContainer = FGameplayTagContainer::EmptyContainer;
 				GameplayTagContainer.AddTag(UGameplayTagsLibrary::GEData_Info);
 				GameplayTagContainer.AddTag(SkillProxyPtr->GetProxyType());
@@ -156,7 +166,6 @@ void USkill_Passive_MultipleDamega::OnGameplayEffectRemoved(
 					MakeOutgoingGameplayEffectSpec(CooldownGE->GetClass(), GetAbilityLevel());
 
 				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_CD);
-				SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_Info);
 				SpecHandle.Data.Get()->AddDynamicAssetTag(SkillProxyPtr->GetProxyType());
 				SpecHandle.Data.Get()->SetSetByCallerMagnitude(
 															   UGameplayTagsLibrary::GEData_Duration,

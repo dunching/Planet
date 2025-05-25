@@ -3,12 +3,14 @@
 
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
+#include "Perception/AIPerceptionComponent.h"
 
 #include "AbilityTask_PlayMontage.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "HumanAIController.h"
 #include "GameplayTagsLibrary.h"
+#include "HumanCharacter_AI.h"
 #include "HumanRegularProcessor.h"
 #include "InputProcessorSubSystem.h"
 #include "HumanCharacter_Player.h"
@@ -96,6 +98,18 @@ void UBasicFutures_Respawn::OnMontageComplete()
 		(GetAbilitySystemComponentFromActorInfo()->GetOwnerRole() == ROLE_Authority)
 		)
 	{
+		// 清除周围AI对这个Character得感知，以达到重新感知此Character
+		TArray<AActor*> OutActors;
+		UGameplayStatics::GetAllActorsOfClass(this, AHumanCharacter_AI::StaticClass(),OutActors );
+		for (auto Iter : OutActors)
+		{
+			auto HumanCharacter_AIPtr =  Cast<AHumanCharacter_AI>(Iter);
+			if (HumanCharacter_AIPtr)
+			{
+				HumanCharacter_AIPtr->GetController<AHumanAIController>()->GetAIPerceptionComponent()->ForgetActor(CharacterPtr);
+			}
+		}
+		
 		K2_CancelAbility();
 	}
 
