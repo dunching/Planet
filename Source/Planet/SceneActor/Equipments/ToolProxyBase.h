@@ -8,7 +8,7 @@
 #include "GameplayAbilitySpecHandle.h"
 
 #include "SceneActor.h"
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "ToolProxyBase.generated.h"
 

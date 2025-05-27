@@ -16,7 +16,7 @@
 
 
 #include "GameMode_Main.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HumanInteractionWithNPC.h"
 #include "HumanViewBackpackProcessor.h"
 #include "HumanRegularProcessor.h"

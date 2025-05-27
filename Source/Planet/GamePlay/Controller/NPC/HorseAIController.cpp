@@ -10,7 +10,7 @@
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "TeamMatesHelperComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
@@ -20,9 +20,10 @@
 #include "UICommon.h"
 #include "HorseCharacter.h"
 #include "GroupManagger.h"
+#include "Tools.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+                                                                                    Super(ObjectInitializer)
 {
 	//StateTreeComponentPtr = CreateDefaultSubobject<UStateTreeComponent>(TEXT("StateTreeComponent"));
 	StateTreeAIComponentPtr = CreateDefaultSubobject<UStateTreeAIComponent>(TEXT("StateTreeAIComponent"));

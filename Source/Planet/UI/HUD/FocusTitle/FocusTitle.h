@@ -6,8 +6,9 @@
 
 #include <GameplayTagContainer.h>
 
-#include "MyUserWidget.h"
-#include "GenerateType.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
+#include "TemplateHelper.h"
 
 #include "FocusTitle.generated.h"
 
@@ -20,7 +21,7 @@ struct FOnAttributeChangeData;
  * 锁定目标时，上方显示的敌人的信息
  */
 UCLASS()
-class PLANET_API UFocusTitle : public UMyUserWidget
+class PLANET_API UFocusTitle : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

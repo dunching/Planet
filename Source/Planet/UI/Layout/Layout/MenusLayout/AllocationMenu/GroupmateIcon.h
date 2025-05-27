@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 
 #include "UIInterfaces.h"
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include "AllocationIconBase.h"
 
@@ -22,7 +22,7 @@ struct IProxy_Allocationble;
 
 UCLASS()
 class PLANET_API UGroupmateIcon :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IAllocationableProxyIconInterface
 {
 	GENERATED_BODY()

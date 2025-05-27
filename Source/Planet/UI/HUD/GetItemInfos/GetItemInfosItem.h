@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "UIInterfaces.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "GetItemInfosItem.generated.h"
 
@@ -15,7 +15,7 @@ struct FStreamableHandle;
 struct FBasicProxy;
 
 UCLASS()
-class PLANET_API UGetItemInfosItem : public UMyUserWidget, public IItemProxyIconInterface
+class PLANET_API UGetItemInfosItem : public UUserWidget_Override, public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 

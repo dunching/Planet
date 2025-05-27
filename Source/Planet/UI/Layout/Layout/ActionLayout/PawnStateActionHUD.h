@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
@@ -25,7 +25,7 @@ class UCharacterAbilitySystemComponent;
 
 UCLASS()
 class PLANET_API UPawnStateActionHUD :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

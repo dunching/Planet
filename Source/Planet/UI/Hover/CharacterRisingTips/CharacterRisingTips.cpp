@@ -9,7 +9,7 @@
 #include "Components/WidgetSwitcher.h"
 
 #include "CharacterBase.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "GameOptions.h"
 #include "GameplayTagsLibrary.h"
 #include "OnEffectedTawrgetCallback.h"

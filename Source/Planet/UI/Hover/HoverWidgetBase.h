@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include <AIController.h>
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "HoverWidgetBase.generated.h"
 
@@ -19,7 +19,7 @@ class UToolIcon;
  * 悬浮的Widget
  */
 UCLASS()
-class PLANET_API UHoverWidgetBase : public UMyUserWidget
+class PLANET_API UHoverWidgetBase : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

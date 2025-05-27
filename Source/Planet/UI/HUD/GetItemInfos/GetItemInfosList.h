@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "UIInterfaces.h"
 #include "HUDInterface.h"
@@ -23,7 +23,7 @@ struct FConsumableProxy;
 
 UCLASS()
 class PLANET_API UGetItemInfosList :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

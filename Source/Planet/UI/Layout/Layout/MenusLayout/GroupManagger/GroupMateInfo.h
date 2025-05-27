@@ -6,9 +6,9 @@
 
 #include "Blueprint/IUserObjectListEntry.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "UIInterfaces.h"
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 
 #include "GroupMateInfo.generated.h"
@@ -23,7 +23,7 @@ struct FCharacterProxy;
  */
 UCLASS()
 class PLANET_API UGroupMateInfo :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {

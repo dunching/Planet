@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 
-#include <GenerateType.h>
+#include <GenerateTypes.h>
 
 #include "CharacterAttibutes.h"
 #include "ItemProxy_Description.h"

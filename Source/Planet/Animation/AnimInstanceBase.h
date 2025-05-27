@@ -7,7 +7,7 @@
 #include "Animation/AnimInstance.h"
 #include "AnimInstanceDataStruct.h"
 #include <functional>
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "AnimInstanceBase.generated.h"
 

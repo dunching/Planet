@@ -9,7 +9,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "PlanetWorldSettings.h"
 #include "PlanetPlayerController.h"
-#include "GameOptions.h"
+#include "Tools.h"
 #include "SceneProxyTable.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"

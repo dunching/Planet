@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "MenuInterface.h"
 
 #include "ViewTaskMenu.generated.h"
@@ -19,7 +19,7 @@ class UProxyIcon;
  */
 UCLASS()
 class PLANET_API UViewTaskMenu :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IMenuInterface
 {
 	GENERATED_BODY()

@@ -6,7 +6,7 @@
 
 #include "UIInterfaces.h"
 
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include <MenuInterface.h>
 
@@ -24,7 +24,7 @@ struct FWeaponProxy;
  */
 UCLASS()
 class PLANET_API UBackpackMenu : 
-	public UMyUserWidget, 
+	public UUserWidget_Override, 
 	public IMenuInterface
 {
 	GENERATED_BODY()

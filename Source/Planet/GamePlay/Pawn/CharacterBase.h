@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 
-#include "AbilitySystemInterface.h"
 #include "GameplayTagContainer.h"
-#include "GroupManaggerInterface.h"
 
 #include "Character/GravityCharacter.h"
 
+#include "GroupManaggerInterface.h"
 #include "ItemProxy_Minimal.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "SceneActorInteractionInterface.h"
+#include "TemplateHelper.h"
 
 #include "CharacterBase.generated.h"
 
@@ -61,30 +61,35 @@ class PLANET_API ACharacterBase :
 public:
 	using FCharacterProxyType = FCharacterProxy;
 
-	using FTeamMembersChangedDelegateHandle =
-	TCallbackHandleContainer<void(EGroupMateChangeType, const TSharedPtr<FCharacterProxyType>&)>::FCallbackHandleSPtr;
-
 	using FValueChangedDelegateHandle =
 	TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
 	using FProcessedGAEventHandle =
-	TCallbackHandleContainer<void(const FGameplayAbilityTargetData_GAReceivedEvent&)>::FCallbackHandleSPtr;
+	TCallbackHandleContainer<void(
+		const FGameplayAbilityTargetData_GAReceivedEvent&
+		)>::FCallbackHandleSPtr;
 
 	using FOnInitaliedGroupSharedInfo =
 	TCallbackHandleContainer<void()>;
 
-	ACharacterBase(const FObjectInitializer& ObjectInitializer);
+	ACharacterBase(
+		const FObjectInitializer& ObjectInitializer
+		);
 
 	virtual ~ACharacterBase();
 
-	virtual void PossessedBy(AController* NewController) override;
+	virtual void PossessedBy(
+		AController* NewController
+		) override;
 
 	virtual void UnPossessed() override;
 
 	virtual void OnRep_Controller() override;
 
-	virtual void SetActorHiddenInGame(bool bNewHidden) override;
-	
+	virtual void SetActorHiddenInGame(
+		bool bNewHidden
+		) override;
+
 	UFUNCTION(BlueprintPure, Category = "Character")
 	virtual UPlanetAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
@@ -112,8 +117,8 @@ public:
 
 	UCharacterTitleComponent* GetCharacterTitleComponent() const;
 
-	virtual USceneActorInteractionComponent*GetSceneActorInteractionComponent()const override;
-	
+	virtual USceneActorInteractionComponent* GetSceneActorInteractionComponent() const override;
+
 	virtual TSharedPtr<FCharacterProxy> GetCharacterProxy() const;
 
 	USkeletalMeshComponent* GetCopyPoseMesh() const;
@@ -121,17 +126,25 @@ public:
 	template <typename Type = UAnimInstanceBase>
 	Type* GetAnimationIns();
 
-	virtual bool IsGroupmate(ACharacterBase* TargetCharacterPtr) const;
+	virtual bool IsGroupmate(
+		ACharacterBase* TargetCharacterPtr
+		) const;
 
-	virtual bool IsTeammate(ACharacterBase* TargetCharacterPtr) const;
+	virtual bool IsTeammate(
+		ACharacterBase* TargetCharacterPtr
+		) const;
 
 	TObjectPtr<ACharacterBase> GetFocusActor() const;
 
 	UFUNCTION(NetMulticast, Reliable)
-	void SwitchAnimLink_Client(EAnimLinkClassType AnimLinkClassType);
+	void SwitchAnimLink_Client(
+		EAnimLinkClassType AnimLinkClassType
+		);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void SetCampType(ECharacterCampType CharacterCampType);
+	void SetCampType(
+		ECharacterCampType CharacterCampType
+		);
 
 	// 确认是否是一个有效的选中目标，比如目标在隐身、或“无法选中”、重伤倒地状态时为不可已被选中
 	bool GetIsValidTarget() const;
@@ -139,7 +152,9 @@ public:
 	FOnInitaliedGroupSharedInfo OnInitaliedGroupSharedInfo;
 
 protected:
-	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void OnConstruction(
+		const FTransform& Transform
+		) override;
 
 	virtual void PostInitializeComponents() override;
 
@@ -147,24 +162,38 @@ protected:
 
 	virtual void Destroyed() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void EndPlay(
+		const EEndPlayReason::Type EndPlayReason
+		) override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps
+		) const override;
 
 	virtual void SpawnDefaultController() override;
-	
-	virtual void OnGroupManaggerReady(AGroupManagger* NewGroupSharedInfoPtr) override;
 
-	virtual void HasbeenInteracted(ACharacterBase* CharacterPtr) override;
+	virtual void OnGroupManaggerReady(
+		AGroupManagger* NewGroupSharedInfoPtr
+		) override;
 
-	virtual void HasBeenLookingAt(ACharacterBase* CharacterPtr)override;
+	virtual void HasbeenInteracted(
+		ACharacterBase* CharacterPtr
+		) override;
 
-	virtual void HasBeenStartedLookAt(ACharacterBase* CharacterPtr) override;
+	virtual void HasBeenLookingAt(
+		ACharacterBase* CharacterPtr
+		) override;
+
+	virtual void HasBeenStartedLookAt(
+		ACharacterBase* CharacterPtr
+		) override;
 
 	virtual void HasBeenEndedLookAt() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void SwitchAnimLink(EAnimLinkClassType AnimLinkClassType);
+	void SwitchAnimLink(
+		EAnimLinkClassType AnimLinkClassType
+		);
 
 	UPROPERTY(Category=Character, EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> CopyPoseMeshPtr = nullptr;
@@ -195,15 +224,24 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WolrdProcess)
 	TObjectPtr<USceneActorInteractionComponent> SceneActorInteractionComponentPtr = nullptr;
-	
+
 private:
-	void OnHPChanged(const FOnAttributeChangeData& CurrentValue);
+	void OnHPChanged(
+		const FOnAttributeChangeData& CurrentValue
+		);
 
-	void OnMoveSpeedChanged(const FOnAttributeChangeData& CurrentValue);
+	void OnMoveSpeedChanged(
+		const FOnAttributeChangeData& CurrentValue
+		);
 
-	void OnMoveSpeedChangedImp(float Value);
+	void OnMoveSpeedChangedImp(
+		float Value
+		);
 
-	void OnDeathing(const FGameplayTag Tag, int32 Count);
+	void OnDeathing(
+		const FGameplayTag Tag,
+		int32 Count
+		);
 
 	void DoDeathing();
 

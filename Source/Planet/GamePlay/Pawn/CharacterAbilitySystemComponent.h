@@ -10,6 +10,8 @@
 #include "GroupManaggerInterface.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "DataModifyInterface.h"
+#include "BaseData.h"
+#include "GenerateTypes.h"
 
 #include "CharacterAbilitySystemComponent.generated.h"
 

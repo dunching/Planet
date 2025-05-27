@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "MenuInterface.h"
 
 #include "TaskItem.generated.h"
@@ -20,7 +20,7 @@ class AGuideThread_Branch;
  */
 UCLASS()
 class PLANET_API UTaskItem :
-	public UMyUserWidget
+	public UUserWidget_Override
 {
 	GENERATED_BODY()
 

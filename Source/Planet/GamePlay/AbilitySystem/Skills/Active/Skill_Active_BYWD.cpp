@@ -20,6 +20,7 @@
 #include "HumanCharacter.h"
 #include "Planet_Tools.h"
 #include "TeamMatesHelperComponent.h"
+#include "Tools.h"
 #include "VectorTypes.h"
 
 void USkill_Active_BYWD::OnAvatarSet(

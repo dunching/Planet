@@ -11,7 +11,7 @@
 #include "GravityMovementComponent.h"
 
 #include "CharacterBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "PlanetPlayerState.h"
 #include "Weapon_Base.h"
 #include "Skill_Base.h"

@@ -21,14 +21,14 @@
 #include "Tool_PickAxe.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "AbilityTask_ApplyRootMotionBySPline.h"
 #include "SPlineActor.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "BasicFutures_MoveToAttaclArea.h"
-#include "PlanetPlayerController.h"
+#include "Tools.h"
 
 USkill_Active_Control::USkill_Active_Control() :
 	Super()

@@ -4,52 +4,64 @@ using UnrealBuildTool;
 
 public class PlanetEditor : ModuleRules
 {
-    public PlanetEditor(ReadOnlyTargetRules Target) : base(Target)
-    {
-        PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+	public PlanetEditor(ReadOnlyTargetRules Target) : base(Target)
+	{
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        bEnableUndefinedIdentifierWarnings = false;
-        bWarningsAsErrors = true;
-        bEnableExceptions = true;
+		UndefinedIdentifierWarningLevel = WarningLevel.Error;
+		bWarningsAsErrors = true;
+		bEnableExceptions = true;
 
-        if (Target.Platform == UnrealTargetPlatform.Win64)
-        {
-        }
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+		{
+		}
 
-        CppStandard = CppStandardVersion.Cpp20;
-        bUseRTTI = true;
+		CppStandard = CppStandardVersion.Cpp20;
+		bUseRTTI = true;
 
-        PrivateDependencyModuleNames.AddRange(new string[] { });
+		PrivateDependencyModuleNames.AddRange(new string[] { });
 
-        PublicIncludePaths.Add("PlanetEditor");
-        PublicIncludePaths.Add("PlanetEditor/Command");
+		PublicIncludePaths.Add("PlanetEditor");
+		PublicIncludePaths.Add("PlanetEditor/Command");
 
-        PrivateIncludePaths.Add("PlanetEditor/Private");
+		PrivateIncludePaths.Add("PlanetEditor/Private");
 
-        if (Target.bBuildEditor == true)
-        {
-            PrivateDependencyModuleNames.Add("UnrealEd");
-        }
+		if (Target.bBuildEditor == true)
+		{
+			PrivateDependencyModuleNames.Add("UnrealEd");
+		}
 
-        PrivateDependencyModuleNames.AddRange(new string[] {
-            "Core",
-            "CoreUObject",
-            "Engine",
-            "GameplayTags",
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			// 引擎内容
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"GameplayTags",
 
-            "NavigationSystem",
-            "AIModule",
+			// 引擎插件
+			"NavigationSystem",
+			"AIModule",
+			"GameplayAbilities",
 
-            "Tools",
-            "Gravity",
-        });
+			// 插件
+			"Tools",
+			"Gravity",
+			"Utils",
+			"Planet",
 
-        PublicDependencyModuleNames.AddRange(new string[] {
-            "GameplayAbilities",
+			// 其他模块
+			"Tools",
+			"GameplayTagsLibrary",
+			"CommonType",
+			"AssetRef",
+			"GameOptions",
+		});
 
-            "Planet",
-        });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+		});
 
-        // b*[^:b#/]+.*$
-    }
+		// b*[^:b#/]+.*$
+	}
 }

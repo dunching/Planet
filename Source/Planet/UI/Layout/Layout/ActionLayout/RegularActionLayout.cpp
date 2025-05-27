@@ -3,6 +3,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/Border.h"
 #include "Slate/SGameLayerManager.h"
+#include "Components/Button.h"
+#include "Components/CanvasPanel.h"
 
 #include "TemplateHelper.h"
 #include "PlanetPlayerController.h"
@@ -20,7 +22,7 @@
 #include "GameOptions.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"
-#include "GuideActor.h"
+#include "Tools.h"
 #include "GuideList.h"
 #include "GuideSubSystem.h"
 #include "GuideThread.h"
@@ -35,8 +37,6 @@
 #include "ProgressTips.h"
 #include "TeamMatesHelperComponent.h"
 #include "UpgradePromt.h"
-#include "Components/Button.h"
-#include "Components/CanvasPanel.h"
 
 struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 {

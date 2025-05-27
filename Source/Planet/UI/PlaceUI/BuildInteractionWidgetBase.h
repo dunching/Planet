@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "BuildInteractionWidgetBase.generated.h"
 
@@ -12,7 +12,7 @@
  *
  */
 UCLASS()
-class PLANET_API UBuildInteractionWidgetBase : public UMyUserWidget
+class PLANET_API UBuildInteractionWidgetBase : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

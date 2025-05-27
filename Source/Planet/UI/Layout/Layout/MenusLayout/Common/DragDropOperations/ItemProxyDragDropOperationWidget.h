@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "UIInterfaces.h"
 
 #include "ItemProxyDragDropOperationWidget.generated.h"
@@ -24,7 +24,7 @@ struct FStreamableHandle;
  */
 UCLASS()
 class PLANET_API UItemProxyDragDropOperationWidget :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface
 {
 	GENERATED_BODY()
@@ -55,7 +55,7 @@ private:
 
 UCLASS()
 class PLANET_API UAllocationableProxyDragDropOperationWidget :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IAllocationableProxyIconInterface
 {
 	GENERATED_BODY()

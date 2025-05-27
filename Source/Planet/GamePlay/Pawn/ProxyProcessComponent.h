@@ -13,9 +13,15 @@
 #include "ProxyProcessComponent.generated.h"
 
 struct FActiveSkillProxy;
+struct FPassiveSkillProxy;
+struct FWeaponProxy;
+struct FWeaponSkillProxy;
+struct FConsumableProxy;
+
 struct FWeaponSocket;
 struct FCharacterSocket;
 struct FCharacterSocket;
+
 class ACharacterBase;
 
 /*

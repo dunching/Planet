@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 
 #include "GravityAIController.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "GroupManaggerInterface.h"
 #include "PlanetAIController.h"
 

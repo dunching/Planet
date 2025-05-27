@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttibutes.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "BasePropertyWidget.generated.h"
 
@@ -20,7 +20,7 @@ class UAbilitySystemComponent;
  * 单一数据
  */
 UCLASS()
-class PLANET_API UBasePropertyWidget : public UMyUserWidget
+class PLANET_API UBasePropertyWidget : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

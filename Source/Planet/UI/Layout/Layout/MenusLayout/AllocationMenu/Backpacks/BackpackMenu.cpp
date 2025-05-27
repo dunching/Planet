@@ -12,7 +12,7 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "InventoryComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "BackpackToolIcon.h"
 #include "BackpackConsumableIcon.h"
 #include "BackpackIconWrapper.h"

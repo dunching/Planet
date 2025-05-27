@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "MenuInterface.h"
 
 #include "ProxyIcon.generated.h"
@@ -19,7 +19,7 @@ class UItemDecription;
  */
 UCLASS()
 class PLANET_API UProxyIcon :
-	public UMyUserWidget
+	public UUserWidget_Override
 {
 	GENERATED_BODY()
 

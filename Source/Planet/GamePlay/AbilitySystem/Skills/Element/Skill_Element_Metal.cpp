@@ -5,7 +5,7 @@
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "AbilityTask_TimerHelper.h"
 #include "AssetRefMap.h"
 #include "AS_Character.h"

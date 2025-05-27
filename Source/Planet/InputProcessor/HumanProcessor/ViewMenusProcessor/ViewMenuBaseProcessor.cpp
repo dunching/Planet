@@ -6,7 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "PlanetPlayerState.h"
 #include "HumanCharacter.h"
 #include "UIManagerSubSystem.h"

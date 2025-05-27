@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include "PlanetGameplayAbility.generated.h"
 

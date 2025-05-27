@@ -1,9 +1,8 @@
-
 #include "HorseViewBackpackProcessor.h"
 
 #include <Kismet/GameplayStatics.h>
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "PlanetPlayerState.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
@@ -17,13 +16,20 @@
 
 namespace HorseProcessor
 {
-	FHorseViewBackpackProcessor::FHorseViewBackpackProcessor(AHorseCharacter* CharacterPtr) :
-		Super(CharacterPtr)
+	FHorseViewBackpackProcessor::FHorseViewBackpackProcessor(
+		AHorseCharacter* CharacterPtr
+		) :
+		  Super(CharacterPtr)
 	{
 	}
 
 	FHorseViewBackpackProcessor::~FHorseViewBackpackProcessor()
 	{
+	}
+
+	AHorseCharacter* FHorseViewBackpackProcessor::GetOwnerActor()
+	{
+		return Cast<AHorseCharacter>(OnwerPawnPtr);
 	}
 
 	void FHorseViewBackpackProcessor::EnterAction()
@@ -76,7 +82,7 @@ namespace HorseProcessor
 
 		Super::QuitAction();
 	}
-	
+
 	void FHorseViewBackpackProcessor::CheckInteraction()
 	{
 	}

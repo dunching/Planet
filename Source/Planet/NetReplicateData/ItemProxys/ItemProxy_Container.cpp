@@ -1,7 +1,7 @@
 #include "ItemProxy_Container.h"
 
 #include "AssetRefMap.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "PlanetControllerInterface.h"

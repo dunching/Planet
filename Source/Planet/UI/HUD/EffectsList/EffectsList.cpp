@@ -2,7 +2,7 @@
 
 #include "Blueprint\WidgetTree.h"
 
-#include "MyWrapBox.h"
+#include "WrapBox_Override.h"
 #include "EffectItem.h"
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
@@ -23,7 +23,7 @@ void UEffectsList::SynchronizeProperties()
 
 	WidgetTree->ForEachWidget([&](UWidget* Widget)
 	{
-		if (auto UserWidget = Cast<UMyWrapBox>(Widget))
+		if (auto UserWidget = Cast<UWrapBox_Override>(Widget))
 		{
 			UserWidget->bIsPositiveSequence = bIsPositiveSequence;
 			UserWidget->SynchronizeProperties();
@@ -54,7 +54,7 @@ UEffectItem* UEffectsList::AddEffectItem(
 		return nullptr;
 	}
 
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
+	auto UIPtr = Cast<UWrapBox_Override>(GetWidgetFromName(FEffectsList::Get().WrapBox));
 	if (UIPtr)
 	{
 		auto ChildPtr = CreateWidget<UEffectItem>(this, EffectItemClass);
@@ -77,7 +77,7 @@ void UEffectsList::Enable()
 {
 	ILayoutItemInterfacetion::Enable();
 	
-	auto UIPtr = Cast<UMyWrapBox>(GetWidgetFromName(FEffectsList::Get().WrapBox));
+	auto UIPtr = Cast<UWrapBox_Override>(GetWidgetFromName(FEffectsList::Get().WrapBox));
 	if (UIPtr)
 	{
 		UIPtr->ClearChildren();

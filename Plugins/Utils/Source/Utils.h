@@ -4,7 +4,3 @@
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
-
-class FUtilsModule : public IModuleInterface
-{
-};

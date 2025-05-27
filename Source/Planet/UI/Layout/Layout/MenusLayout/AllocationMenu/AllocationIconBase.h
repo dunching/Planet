@@ -8,7 +8,7 @@
 #include "GameplayTagContainer.h"
 
 #include "UIInterfaces.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "ItemProxy_Minimal.h"
 
@@ -23,7 +23,7 @@ struct FCharacterProxy;
 
 UCLASS()
 class PLANET_API UAllocationIconBase :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IUserObjectListEntry,
 	public IAllocationableProxyIconInterface
 {

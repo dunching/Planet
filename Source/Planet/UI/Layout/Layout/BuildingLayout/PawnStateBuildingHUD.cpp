@@ -4,7 +4,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "PlanetPlayerState.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CharacterAttributesComponent.h"
 
 #include "CharacterBase.h"

@@ -18,13 +18,11 @@ namespace HorseProcessor
 
 	public:
 
-		const static EInputProcessorType InputProcessprType = EInputProcessorType::kHorseViewBackpackProcessor;
-
 		FHorseViewBackpackProcessor(AHorseCharacter* CharacterPtr);
 
 		virtual ~FHorseViewBackpackProcessor();
 
-		AHorseCharacter* GetOwnerActor() { return Cast<AHorseCharacter>(OnwerPawnPtr); }
+		AHorseCharacter* GetOwnerActor();
 
 		virtual void EnterAction()override;
 

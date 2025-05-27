@@ -3,7 +3,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "AssetRefMap.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
 #include "CharacterAttributesComponent.h"
@@ -36,6 +36,7 @@
 #include "Skill_WeaponActive_Bow.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 #include "ItemProxy_Character.h"
+#include "Tools.h"
 
 FSkillProxy::FSkillProxy() :
                            Super()

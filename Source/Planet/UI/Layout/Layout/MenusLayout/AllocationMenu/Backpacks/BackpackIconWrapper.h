@@ -6,7 +6,7 @@
 #include <Blueprint/IUserObjectListEntry.h>
 
 #include "UIInterfaces.h"
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 
 #include "BackpackIconWrapper.generated.h"
@@ -26,7 +26,7 @@ class UBackpackWeaponIcon;
  */
 UCLASS()
 class PLANET_API UBackpackIconWrapper :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {

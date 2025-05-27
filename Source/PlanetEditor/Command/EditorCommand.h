@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 
-class AHumanCharacter;
-
 namespace EditorCommand
 {
 	void CopyID2RowName();

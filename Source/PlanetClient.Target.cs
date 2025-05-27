@@ -16,6 +16,10 @@ public class PlanetClientTarget : TargetRules
             "Planet",
             "PlanetEditor",
             "Tools",
+            "GameplayTagsLibrary",
+            "CommonType",
+            "AssetRef",
+            "GameOptions",
         } );
 	}
 }

@@ -18,7 +18,7 @@
 #include "Animation/AnimInstanceBase.h"
 #include "Component/SceneActorInteractionComponent.h"
 #include "InventoryComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "InputProcessor.h"
 #include "InputActions.h"
 #include "InputProcessorSubSystem.h"

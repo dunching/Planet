@@ -8,6 +8,7 @@
 #include "GuideSystemStateTreeComponent.h"
 #include "GuideThread.h"
 #include "PlanetPlayerController.h"
+#include "Tools.h"
 #include "Kismet/GameplayStatics.h"
 
 bool UGuideSubSystem::ShouldCreateSubsystem(

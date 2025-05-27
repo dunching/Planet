@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "BasicFuturesBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "BaseData.h"
 
 #include "BasicFutures_HasBeenFlyAway.generated.h"

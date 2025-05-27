@@ -17,7 +17,7 @@
 
 #include "HumanCharacter.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterBase.h"
 #include "ConversationBorder.h"
 #include "GameplayTagsLibrary.h"

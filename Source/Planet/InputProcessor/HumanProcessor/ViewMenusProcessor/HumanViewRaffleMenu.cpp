@@ -3,7 +3,7 @@
 
 #include <Kismet/GameplayStatics.h>
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "PlanetPlayerState.h"
 #include "CharacterBase.h"
 #include "GameFramework/PlayerController.h"

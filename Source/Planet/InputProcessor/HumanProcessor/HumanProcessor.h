@@ -7,7 +7,7 @@
 
 #include "InputProcessor.h"
 #include "ItemProxy_Minimal.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterBase.h"
 
 class ATrackVehicleBase;

@@ -1,41 +1,25 @@
-
 #include "EditorCommand.h"
 
 #include "Kismet/GameplayStatics.h"
-
-#include "Engine/StreamableManager.h"
-#include "Blueprint/UserWidget.h"
-#include "Engine/AssetManager.h"
-#include <Subsystems/SubsystemBlueprintLibrary.h>
 #include "Components/SplineComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 
 #include "HumanCharacter.h"
-#include "GameInstance/PlanetGameInstance.h"
-#include "InventoryComponent.h"
 #include "AssetRefMap.h"
-#include <StateTagExtendInfo.h>
-#include "HumanCharacter.h"
 #include "SPlineActor.h"
 #include "ItemProxy_Minimal.h"
-#include "Skill_Base.h"
 #include "Talent_FASI.h"
-#include "TalentAllocationComponent.h"
 #include "CharacterBase.h"
 #include "CollisionDataStruct.h"
-#include "TeamMatesHelperComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "CharacterAttibutes.h"
-#include "PlanetControllerInterface.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "HorseCharacter.h"
-#include "PlanetEditor_Tools.h"
 #include "KismetCollisionHelper.h"
 #include "PlanetPlayerCameraManager.h"
 #include "GravityPlayerController.h"
 #include "SceneProxyExtendInfo.h"
-#include "GameplayTagsLibrary.h"
 #include "PlanetPlayerController.h"
+#include "Tools.h"
 
 void EditorCommand::CopyID2RowName()
 {
@@ -51,7 +35,9 @@ void EditorCommand::CopyID2RowName()
 	}
 }
 
-void EditorCommand::TestPlayerCharacterMoveTo(const TArray< FString >& Args)
+void EditorCommand::TestPlayerCharacterMoveTo(
+	const TArray<FString>& Args
+	)
 {
 	if (Args.IsValidIndex(0))
 	{
@@ -63,18 +49,22 @@ void EditorCommand::TestPlayerCharacterMoveTo(const TArray< FString >& Args)
 			auto PCPtr = Cast<AGravityPlayerController>(UGameplayStatics::GetPlayerController(GetWorldImp(), 0));
 			if (PCPtr)
 			{
-//				PCPtr->MoveToLocation(OutActors[0]->GetActorLocation(), 50);
+				//				PCPtr->MoveToLocation(OutActors[0]->GetActorLocation(), 50);
 			}
 		}
 	}
 }
 
-void EditorCommand::TestCameraManager(const TArray< FString >& Args)
+void EditorCommand::TestCameraManager(
+	const TArray<FString>& Args
+	)
 {
 	TArray<AActor*> OutActors;
 	UGameplayStatics::GetAllActorsOfClassWithTag(GetWorldImp(), AActor::StaticClass(), TEXT("CameraTest"), OutActors);
 
-	auto CameraManagerPtr = Cast<APlanetPlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0));
+	auto CameraManagerPtr = Cast<APlanetPlayerCameraManager>(
+	                                                         UGameplayStatics::GetPlayerCameraManager(GetWorldImp(), 0)
+	                                                        );
 	if (CameraManagerPtr && OutActors.IsValidIndex(0) && Args.IsValidIndex(0))
 	{
 		FViewTargetTransitionParams TransitionParams;
@@ -97,7 +87,15 @@ void EditorCommand::TestSectorCollision()
 	FCollisionObjectQueryParams ObjectQueryParams;
 	FCollisionQueryParams Params;
 
-	UKismetCollisionHelper::OverlapMultiSectorByObjectType(GetWorldImp(), FVector(100, 100, 100), FVector(200, 100, 100), 90, 9, ObjectQueryParams, Params);
+	UKismetCollisionHelper::OverlapMultiSectorByObjectType(
+	                                                       GetWorldImp(),
+	                                                       FVector(100, 100, 100),
+	                                                       FVector(200, 100, 100),
+	                                                       90,
+	                                                       9,
+	                                                       ObjectQueryParams,
+	                                                       Params
+	                                                      );
 }
 
 void EditorCommand::TestAsyncAssetLoad()
@@ -109,15 +107,21 @@ void EditorCommand::TestContainer()
 	// 	auto Class = LoadClass<UAssetRefMap>(nullptr, *AssetRefMapClass.ToString());
 	// 	auto CacheAssetManagerPtr = USubsystemBlueprintLibrary::GetEngineSubsystem(Class);
 	{
-		std::map<int32, TFunction<void(bool)>>Map;
+		std::map<int32, TFunction<void(
+			         bool
+			         )>> Map;
 
 		for (int32 Index = 0; Index < 10000; Index++)
 		{
-			Map.emplace(Index, [](bool) {
-
-				UE_LOG(LogTemp, Warning, TEXT("123"));
-
-				});
+			Map.emplace(
+			            Index,
+			            [](
+			            bool
+			            )
+			            {
+				            UE_LOG(LogTemp, Warning, TEXT("123"));
+			            }
+			           );
 		}
 
 		for (const auto& Iter : Map)
@@ -128,15 +132,22 @@ void EditorCommand::TestContainer()
 		UE_LOG(LogTemp, Warning, TEXT("123"));
 	}
 	{
-		TArray<TTuple<int32, TFunction<void(bool)>>>Map;
+		TArray<TTuple<int32, TFunction<void(
+			              bool
+			              )>>> Map;
 
 		for (int32 Index = 0; Index < 10000; Index++)
 		{
-			Map.Add({ Index, [](bool) {
-
-				UE_LOG(LogTemp, Warning, TEXT("123"));
-
-				} });
+			Map.Add(
+			        {
+				        Index, [](
+				        bool
+				        )
+				        {
+					        UE_LOG(LogTemp, Warning, TEXT("123"));
+				        }
+			        }
+			       );
 		}
 
 		for (const auto& Iter : Map)
@@ -147,15 +158,21 @@ void EditorCommand::TestContainer()
 		UE_LOG(LogTemp, Warning, TEXT("123"));
 	}
 	{
-		TMap<int32, TFunction<void(bool)>>Map;
+		TMap<int32, TFunction<void(
+			     bool
+			     )>> Map;
 
 		for (int32 Index = 0; Index < 10000; Index++)
 		{
-			Map.Add(Index, [](bool) {
-
-				UE_LOG(LogTemp, Warning, TEXT("123"));
-
-				});
+			Map.Add(
+			        Index,
+			        [](
+			        bool
+			        )
+			        {
+				        UE_LOG(LogTemp, Warning, TEXT("123"));
+			        }
+			       );
 		}
 
 		for (const auto& Iter : Map)
@@ -169,7 +186,7 @@ void EditorCommand::TestContainer()
 
 void EditorCommand::TestSpline()
 {
-	TArray<AActor*>Ary;
+	TArray<AActor*> Ary;
 	UGameplayStatics::GetAllActorsOfClass(GetWorldImp(), ACharacterBase::StaticClass(), Ary);
 
 	if (Ary.IsValidIndex(1))
@@ -179,7 +196,8 @@ void EditorCommand::TestSpline()
 
 		const auto Pt1 = CharacterPtr->GetActorLocation();
 		const auto Pt2 = TargetCharacterPtr->GetActorLocation();
-		const auto Pt3 = CharacterPtr->GetActorLocation() + ((TargetCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()) / 2);
+		const auto Pt3 = CharacterPtr->GetActorLocation() + (
+			                 (TargetCharacterPtr->GetActorLocation() - CharacterPtr->GetActorLocation()) / 2);
 
 		const auto MidPt = Pt3 - (CharacterPtr->GetGravityDirection() * 100.f);
 
@@ -190,9 +208,19 @@ void EditorCommand::TestSpline()
 		SPlineActorPtr->SplineComponentPtr->AddSplinePoint(MidPt, ESplineCoordinateSpace::World);
 		SPlineActorPtr->SplineComponentPtr->AddSplinePoint(Pt2, ESplineCoordinateSpace::World);
 
-		SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(0, FVector::ZeroVector, FVector::ZeroVector, ESplineCoordinateSpace::World);
+		SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(
+		                                                             0,
+		                                                             FVector::ZeroVector,
+		                                                             FVector::ZeroVector,
+		                                                             ESplineCoordinateSpace::World
+		                                                            );
 
-		SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(2, FVector::ZeroVector, FVector::ZeroVector, ESplineCoordinateSpace::World);
+		SPlineActorPtr->SplineComponentPtr->SetTangentsAtSplinePoint(
+		                                                             2,
+		                                                             FVector::ZeroVector,
+		                                                             FVector::ZeroVector,
+		                                                             ESplineCoordinateSpace::World
+		                                                            );
 	}
 }
 
@@ -216,7 +244,7 @@ void EditorCommand::TestCooldown()
 
 void EditorCommand::TestGAEventModify()
 {
-	TMap<int32, int32>map;
+	TMap<int32, int32> map;
 	for (int Index = 0; Index < 10000; Index++)
 	{
 		map.Add(Index, Index);
@@ -228,23 +256,26 @@ void EditorCommand::TestGAEventModify()
 	{
 	}
 
-	TSet<int32>set;
+	TSet<int32> set;
 	for (int Index = 0; Index < 10000; Index++)
 	{
 		set.Add(Index);
 		set.Add(1000 - Index);
 	}
-
 }
 
-void EditorCommand::SpawnHumanCharacter(const TArray< FString >& Args)
+void EditorCommand::SpawnHumanCharacter(
+	const TArray<FString>& Args
+	)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
 	{
 		FActorSpawnParameters SpawnParameters;
 
-		SpawnParameters.CustomPreSpawnInitalization = [&](AActor* ActorPtr)
+		SpawnParameters.CustomPreSpawnInitalization = [&](
+			AActor* ActorPtr
+			)
 			{
 				auto CharacterPtr = Cast<AHumanCharacter>(ActorPtr);
 				if (Args.IsValidIndex(3))
@@ -254,11 +285,14 @@ void EditorCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 			};
 
 		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHumanCharacter>(
-			UAssetRefMap::GetInstance()->TestNPC_HumanClass,
-			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * 600),
-			FRotator::ZeroRotator,
-			SpawnParameters
-		);
+		                                                                  UAssetRefMap::GetInstance()->
+		                                                                  TestNPC_HumanClass,
+		                                                                  CharacterPtr->GetActorLocation() + (
+			                                                                  CharacterPtr->GetActorForwardVector() *
+			                                                                  600),
+		                                                                  FRotator::ZeroRotator,
+		                                                                  SpawnParameters
+		                                                                 );
 
 		if (!NewCharacterPtr)
 		{
@@ -282,17 +316,19 @@ void EditorCommand::SpawnHumanCharacter(const TArray< FString >& Args)
 		{
 			if (Args[2] == TEXT("1"))
 			{
-//				NewCharacterPtr->GetGroupManagger()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
+				//				NewCharacterPtr->GetGroupManagger()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kEnemy);
 			}
 			else if (Args[2] == TEXT("2"))
 			{
-	//			NewCharacterPtr->GetGroupManagger()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
+				//			NewCharacterPtr->GetGroupManagger()->GetTeamHelper()->SwitchTeammateOption(ETeammateOption::kTest);
 			}
 		}
 	}
 }
 
-void EditorCommand::SpawnHorseCharacter(const TArray< FString >& Args)
+void EditorCommand::SpawnHorseCharacter(
+	const TArray<FString>& Args
+	)
 {
 	auto CharacterPtr = Cast<ACharacterBase>(UGameplayStatics::GetPlayerCharacter(GetWorldImp(), 0));
 	if (CharacterPtr)
@@ -300,11 +336,13 @@ void EditorCommand::SpawnHorseCharacter(const TArray< FString >& Args)
 		FActorSpawnParameters SpawnParameters;
 
 		auto NewCharacterPtr = GetWorldImp()->SpawnActor<AHorseCharacter>(
-			UAssetRefMap::GetInstance()->HorseClass,
-			CharacterPtr->GetActorLocation() + (CharacterPtr->GetActorForwardVector() * 600),
-			FRotator::ZeroRotator,
-			SpawnParameters
-		);
+		                                                                  UAssetRefMap::GetInstance()->HorseClass,
+		                                                                  CharacterPtr->GetActorLocation() + (
+			                                                                  CharacterPtr->GetActorForwardVector() *
+			                                                                  600),
+		                                                                  FRotator::ZeroRotator,
+		                                                                  SpawnParameters
+		                                                                 );
 	}
 }
 
@@ -329,7 +367,13 @@ void EditorCommand::RecruitCharacter()
 		Params.AddIgnoredActor(CharacterPtr);
 
 		FHitResult OutHit;
-		if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+		if (GetWorldImp()->LineTraceSingleByObjectType(
+		                                               OutHit,
+		                                               OutCamLoc,
+		                                               OutCamLoc + (OutCamRot.Vector() * 1000),
+		                                               ObjectQueryParams,
+		                                               Params
+		                                              ))
 		{
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 			if (TargetCharacterPtr)
@@ -339,7 +383,9 @@ void EditorCommand::RecruitCharacter()
 	}
 }
 
-void EditorCommand::ModifyWuXingProperty(const TArray< FString >& Args)
+void EditorCommand::ModifyWuXingProperty(
+	const TArray<FString>& Args
+	)
 {
 	if (!Args.IsValidIndex(2))
 	{
@@ -373,7 +419,13 @@ void EditorCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 			Params.AddIgnoredActor(CharacterPtr);
 
 			FHitResult OutHit;
-			if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+			if (GetWorldImp()->LineTraceSingleByObjectType(
+			                                               OutHit,
+			                                               OutCamLoc,
+			                                               OutCamLoc + (OutCamRot.Vector() * 1000),
+			                                               ObjectQueryParams,
+			                                               Params
+			                                              ))
 			{
 				TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 				if (!TargetCharacterPtr)
@@ -420,7 +472,9 @@ void EditorCommand::ModifyWuXingProperty(const TArray< FString >& Args)
 	// }
 }
 
-void EditorCommand::TestGAState2Self(const TArray< FString >& Args)
+void EditorCommand::TestGAState2Self(
+	const TArray<FString>& Args
+	)
 {
 	if (!Args.IsValidIndex(1))
 	{
@@ -435,7 +489,9 @@ void EditorCommand::TestGAState2Self(const TArray< FString >& Args)
 	auto ICPtr = CharacterPtr->GetCharacterAbilitySystemComponent();
 }
 
-void EditorCommand::TestGATagState2Target(const TArray< FString >& Args)
+void EditorCommand::TestGATagState2Target(
+	const TArray<FString>& Args
+	)
 {
 	if (!Args.IsValidIndex(1))
 	{
@@ -461,7 +517,13 @@ void EditorCommand::TestGATagState2Target(const TArray< FString >& Args)
 		Params.AddIgnoredActor(CharacterPtr);
 
 		FHitResult OutHit;
-		if (GetWorldImp()->LineTraceSingleByObjectType(OutHit, OutCamLoc, OutCamLoc + (OutCamRot.Vector() * 1000), ObjectQueryParams, Params))
+		if (GetWorldImp()->LineTraceSingleByObjectType(
+		                                               OutHit,
+		                                               OutCamLoc,
+		                                               OutCamLoc + (OutCamRot.Vector() * 1000),
+		                                               ObjectQueryParams,
+		                                               Params
+		                                              ))
 		{
 			auto TargetCharacterPtr = Cast<AHumanCharacter>(OutHit.GetActor());
 			if (TargetCharacterPtr)
@@ -474,7 +536,9 @@ void EditorCommand::TestGATagState2Target(const TArray< FString >& Args)
 	}
 }
 
-void EditorCommand::MakeTrueDamege(const TArray< FString >& Args)
+void EditorCommand::MakeTrueDamege(
+	const TArray<FString>& Args
+	)
 {
 	if (!Args.IsValidIndex(0))
 	{
@@ -508,7 +572,9 @@ void EditorCommand::MakeTrueDamegeInArea(
 	PCPtr->MakeTrueDamegeInArea(Args);
 }
 
-void EditorCommand::MakeTherapy(const TArray< FString >& Args)
+void EditorCommand::MakeTherapy(
+	const TArray<FString>& Args
+	)
 {
 	if (!Args.IsValidIndex(0))
 	{
@@ -542,7 +608,9 @@ void EditorCommand::ReplyStamina(
 	PCPtr->ReplyStamina(Args);
 }
 
-void EditorCommand::MakeRespawn(const TArray< FString >& Args)
+void EditorCommand::MakeRespawn(
+	const TArray<FString>& Args
+	)
 {
 	if (!Args.IsValidIndex(0))
 	{

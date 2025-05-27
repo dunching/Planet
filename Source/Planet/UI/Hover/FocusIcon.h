@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include <AIController.h>
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HoverWidgetBase.h"
 
 #include "FocusIcon.generated.h"

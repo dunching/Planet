@@ -17,7 +17,7 @@
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_PlayAnimAndWaitOverride.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
@@ -34,6 +34,7 @@
 #include "LogWriter.h"
 #include "PlanetGameplayAbilityTargetTypes.h"
 #include "SceneProxyTable.h"
+#include "Tools.h"
 
 struct FSkill_WeaponActive_PickAxe : public TStructVariable<FSkill_WeaponActive_PickAxe>
 {

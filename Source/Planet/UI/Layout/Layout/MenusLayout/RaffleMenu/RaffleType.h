@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "RaffleCommon.h"
+#include "TemplateHelper.h"
 
 #include "RaffleType.generated.h"
 
@@ -16,7 +17,7 @@ class UTalentIcon;
  *
  */
 UCLASS()
-class PLANET_API URaffleType : public UMyUserWidget
+class PLANET_API URaffleType : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

@@ -5,7 +5,7 @@
 
 #include "GameplayTagsManager.h"
 #include "GameInstance/PlanetGameInstance.h"
-#include "Planet.h"
+#include "Tools.h"
 #include "PlanetWorldSettings.h"
 #include "StateTagExtendInfo.h"
 #include "TalentInfo.h"

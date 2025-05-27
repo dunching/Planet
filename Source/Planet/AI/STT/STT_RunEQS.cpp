@@ -8,7 +8,7 @@
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
 #include "STE_Assistance.h"
-#include "Planet.h"
+#include "Tools.h"
 #include "STE_CharacterBase.h"
 
 #ifdef WITH_EDITOR

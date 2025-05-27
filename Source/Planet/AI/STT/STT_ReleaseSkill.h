@@ -9,7 +9,7 @@
 #include "Tasks/StateTreeAITask.h"
 #include "AISystem.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_ReleaseSkill.generated.h"
 

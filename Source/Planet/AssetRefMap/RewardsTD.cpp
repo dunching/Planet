@@ -1,7 +1,7 @@
 #include "RewardsTD.h"
 
 #include "PlanetWorldSettings.h"
-#include "Planet_Tools.h"
+#include "Tools.h"
 
 bool FRewardsItem::IsValid() const
 {

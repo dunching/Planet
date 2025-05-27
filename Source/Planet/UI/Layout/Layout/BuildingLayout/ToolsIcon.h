@@ -7,7 +7,7 @@
 #include <GameplayTagContainer.h>
 
 #include "UIInterfaces.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "ItemProxy_Minimal.h"
 
@@ -19,7 +19,7 @@ struct FToolProxy;
 struct FStreamableHandle;
 
 UCLASS()
-class PLANET_API UToolIcon : public UMyUserWidget, public IItemProxyIconInterface
+class PLANET_API UToolIcon : public UUserWidget_Override, public IItemProxyIconInterface
 {
 	GENERATED_BODY()
 

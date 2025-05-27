@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "GameplayTagContainer.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "GroupManaggerInterface.h"
 #include "Components/ActorComponent.h"
 

@@ -47,8 +47,6 @@ void UInteractionOptionsLayout::NativeConstruct()
 			UIPtr->OnClicked.AddDynamic(this, &ThisClass::OnQuitBtnClicked);
 		}
 	}
-
-	Enable();
 }
 
 void UInteractionOptionsLayout::Enable()

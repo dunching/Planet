@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 
 #include "Skill_Element_Base.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "SceneProxyTable.h"
 
 #include "Skill_Element_Metal.generated.h"

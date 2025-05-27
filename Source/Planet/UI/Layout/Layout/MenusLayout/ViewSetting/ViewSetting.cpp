@@ -8,6 +8,7 @@
 #include "AssetRefMap.h"
 #include "GameOptions.h"
 #include "Planet_Tools.h"
+#include "Tools.h"
 
 struct FViewSetting : public TStructVariable<FViewSetting>
 {

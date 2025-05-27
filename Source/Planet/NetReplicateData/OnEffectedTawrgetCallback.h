@@ -6,7 +6,7 @@
 
 #include <GameplayTagContainer.h>
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "Net/Serialization/FastArraySerializer.h"
 
 #include "OnEffectedTawrgetCallback.generated.h"

@@ -6,9 +6,9 @@
 
 #include "Blueprint/IUserObjectListEntry.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HUDInterface.h"
 #include "LayoutInterfacetion.h"
 #include "UIInterfaces.h"
@@ -28,7 +28,7 @@ struct FConsumableSocketInfo;
  */
 UCLASS()
 class PLANET_API UGoodsItem :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {

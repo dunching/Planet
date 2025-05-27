@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "GameFramework/PlayerState.h"
 

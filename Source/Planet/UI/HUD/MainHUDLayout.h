@@ -6,9 +6,10 @@
 
 #include "GameFramework/HUD.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "LayoutCommon.h"
 #include "LayoutInterfacetion.h"
+#include "TemplateHelper.h"
 
 #include "MainHUDLayout.generated.h"
 
@@ -21,7 +22,7 @@ class UInteractionOptionsLayout;
 class URegularActionLayout;
 
 UCLASS()
-class PLANET_API UMainHUDLayout : public UMyUserWidget
+class PLANET_API UMainHUDLayout : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

@@ -7,7 +7,7 @@
 #include "GameplayTagContainer.h"
 
 #include "UIInterfaces.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include "AllocationIconBase.h"
 

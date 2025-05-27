@@ -5,15 +5,15 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttibutes.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "MyProgressBar.generated.h"
 
 UCLASS()
-class PLANET_API UMyProgressBar : public UMyUserWidget
+class PLANET_API UMyProgressBar : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

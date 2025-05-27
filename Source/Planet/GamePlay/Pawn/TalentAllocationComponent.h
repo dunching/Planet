@@ -4,7 +4,6 @@
 #include "Components/ActorComponent.h"
 
 #include "Talent_FASI.h"
-#include "GenerateType.h"
 
 #include "TalentAllocationComponent.generated.h"
 

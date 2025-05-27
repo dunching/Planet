@@ -8,7 +8,7 @@
 #include "StateTreeExecutionContext.h"
 #include "Tasks/StateTreeAITask.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "STT_CharacterBase.h"
 
 #include "STT_UpdateBrandPromt.generated.h"

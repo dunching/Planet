@@ -8,7 +8,7 @@
 #include "StateTreeExecutionContext.h"
 #include "Tasks/StateTreeAITask.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_DashToLeader.generated.h"
 

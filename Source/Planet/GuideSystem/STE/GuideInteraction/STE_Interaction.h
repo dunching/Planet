@@ -10,7 +10,7 @@
 #include "StateTreeEvaluatorBase.h"
 #include "StateTreeExecutionContext.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "GuideActor.h"
 #include "STE_Base.h"
 

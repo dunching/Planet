@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "LayoutInterfacetion.h"
 #include "UIInterfaces.h"
 
@@ -18,7 +18,7 @@ struct FCoinProxy;
  */
 UCLASS()
 class PLANET_API UCoinInfo :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

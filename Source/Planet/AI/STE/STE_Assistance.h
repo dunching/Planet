@@ -10,8 +10,9 @@
 #include "StateTreeEvaluatorBase.h"
 #include "StateTreeExecutionContext.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "STE_CharacterBase.h"
+#include "TemplateHelper.h"
 
 #include "STE_Assistance.generated.h"
 

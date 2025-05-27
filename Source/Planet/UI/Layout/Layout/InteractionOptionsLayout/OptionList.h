@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
@@ -22,7 +22,7 @@ class ISceneActorInteractionInterface;
 
 UCLASS()
 class PLANET_API UOptionList :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

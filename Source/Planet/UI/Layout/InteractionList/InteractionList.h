@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttributesComponent.h"
 #include "HUDInterface.h"
@@ -19,7 +19,7 @@ class AHumanCharacter_AI;
 
 UCLASS()
 class PLANET_API UInteractionList :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

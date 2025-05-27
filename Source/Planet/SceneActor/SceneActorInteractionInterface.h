@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
 #include "UObject/ObjectMacros.h"
 #include "UObject/Interface.h"
 
-#include "GenerateType.h"
 #include "ItemProxy_Minimal.h"
 
 #include "SceneActorInteractionInterface.generated.h"

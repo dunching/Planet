@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "LayoutInterfacetion.h"
 #include "UICommon.h"
 #include "MenuInterface.h"
@@ -23,7 +23,7 @@ class UAllocationSkillsMenu;
  */
 UCLASS()
 class PLANET_API UEmptyLayout :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutInterfacetion
 {
 	GENERATED_BODY()

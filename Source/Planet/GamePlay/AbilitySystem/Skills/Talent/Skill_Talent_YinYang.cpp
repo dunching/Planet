@@ -7,7 +7,7 @@
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "EffectsList.h"
 #include "UIManagerSubSystem.h"
 #include "EffectItem.h"
@@ -17,6 +17,7 @@
 #include "TeamMatesHelperComponent.h"
 #include "SceneActorSubSystem.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "Tools.h"
 
 int32 FTalent_YinYang::GetCurrentValue() const
 {

@@ -2,7 +2,7 @@
 
 #include "BasicFutures_Jump.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterBase.h"
 #include "Planet_Tools.h"
 #include "GameplayTagsLibrary.h"

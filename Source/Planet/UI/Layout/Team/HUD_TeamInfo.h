@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "UIInterfaces.h"
 #include "HUDInterface.h"
@@ -17,7 +17,7 @@ class UHUD_TeamMateInfo;
 
 UCLASS()
 class PLANET_API UHUD_TeamInfo :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

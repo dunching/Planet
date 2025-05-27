@@ -6,7 +6,7 @@
 
 #include "CharacterAttributesComponent.h"
 #include "HumanCharacter.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "SceneActorInteractionComponent.h"
 #include "StateProcessorComponent.h"
 

@@ -9,9 +9,6 @@
 #include <GameplayTagContainer.h>
 #include "Net/Serialization/FastArraySerializer.h"
 
-#include "GenerateType.h"
-#include "BaseData.h"
-
 #include "ItemProxy_Container.generated.h"
 
 class AToolProxyBase;

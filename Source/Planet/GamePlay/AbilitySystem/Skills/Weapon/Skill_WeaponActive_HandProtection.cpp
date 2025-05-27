@@ -15,7 +15,7 @@
 #include "ProxyProcessComponent.h"
 #include "AbilityTask_PlayMontage.h"
 #include "ToolFuture_PickAxe.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
 #include "AbilityTask_TimerHelper.h"
@@ -27,6 +27,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "TemplateHelper.h"
+#include "Tools.h"
 
 namespace Skill_WeaponHandProtection
 {

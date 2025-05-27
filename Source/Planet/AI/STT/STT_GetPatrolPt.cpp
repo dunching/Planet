@@ -8,7 +8,7 @@
 #include "HumanCharacter.h"
 #include "AITask_SwitchWalkState.h"
 #include "STE_Assistance.h"
-#include "Planet.h"
+#include "Tools.h"
 
 #ifdef WITH_EDITOR
 static TAutoConsoleVariable<int32> DrawDebugSTT_GetPatrolPt(

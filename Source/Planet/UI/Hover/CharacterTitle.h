@@ -6,8 +6,9 @@
 
 #include <GameplayTagContainer.h>
 
-#include "MyUserWidget.h"
-#include "GenerateType.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
+#include "TemplateHelper.h"
 
 #include "CharacterTitle.generated.h"
 
@@ -22,7 +23,7 @@ struct FTaskNode_Conversation_SentenceInfo;
  *
  */
 UCLASS()
-class PLANET_API UCharacterTitle : public UMyUserWidget
+class PLANET_API UCharacterTitle : public UUserWidget_Override
 {
 	GENERATED_BODY()
 
@@ -145,7 +146,7 @@ private:
 
 UCLASS()
 class PLANET_API UCharacterTitleBox :
-	public UMyUserWidget
+	public UUserWidget_Override
 {
 	GENERATED_BODY()
 

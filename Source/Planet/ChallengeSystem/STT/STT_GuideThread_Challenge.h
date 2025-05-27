@@ -9,7 +9,7 @@
 #include "Tasks/StateTreeAITask.h"
 #include <EnvironmentQuery/EnvQueryTypes.h>
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "GuideActor.h"
 #include "STT_GuideBase.h"
 #include "STT_GuideThread.h"

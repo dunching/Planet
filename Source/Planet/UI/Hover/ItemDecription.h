@@ -4,11 +4,11 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include <AIController.h>
 #include "GameplayTagContainer.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HoverWidgetBase.h"
 
 #include "ItemDecription.generated.h"
@@ -21,7 +21,7 @@ class UItemProxy_Description;
  * 当鼠标悬浮在ItemProxy上时，显示的说明
  */
 UCLASS()
-class PLANET_API UItemDecription : public UMyUserWidget
+class PLANET_API UItemDecription : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

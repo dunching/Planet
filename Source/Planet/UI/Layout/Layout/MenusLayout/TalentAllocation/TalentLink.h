@@ -17,7 +17,7 @@ class UTalentIcon;
  *
  */
 UCLASS()
-class PLANET_API UTalentLink : public UMyUserWidget
+class PLANET_API UTalentLink : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

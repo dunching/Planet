@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HUDInterface.h"
 #include "LayoutInterfacetion.h"
 
@@ -25,7 +25,7 @@ struct FConsumableSocketInfo;
  */
 UCLASS()
 class PLANET_API UPawnStateBuildingHUD :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

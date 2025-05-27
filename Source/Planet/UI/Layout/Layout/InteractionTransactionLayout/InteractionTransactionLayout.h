@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HUDInterface.h"
 #include "InventoryComponent.h"
 #include "LayoutInterfacetion.h"
@@ -27,7 +27,7 @@ struct FConsumableSocketInfo;
  */
 UCLASS()
 class PLANET_API UInteractionTransactionLayout :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutInterfacetion
 {
 	GENERATED_BODY()

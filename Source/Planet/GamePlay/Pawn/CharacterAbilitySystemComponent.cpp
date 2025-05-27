@@ -14,7 +14,7 @@
 
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "AS_Character.h"
 #include "BasicFutures_Affected.h"
 #include "Skill_Element_Metal.h"

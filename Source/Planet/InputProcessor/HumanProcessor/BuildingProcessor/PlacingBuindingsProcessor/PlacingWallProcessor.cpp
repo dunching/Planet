@@ -12,7 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "CharacterBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "HumanCharacter.h"
 #include "ThreadPoolHelper/ThreadLibrary.h"
 

@@ -7,9 +7,10 @@
 #include "GameplayAbilitySpec.h"
 
 #include "Talent_FASI.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterStateInfo.h"
 #include "GroupManaggerInterface.h"
+#include "TemplateHelper.h"
 
 #include "StateProcessorComponent.generated.h"
 

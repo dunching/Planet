@@ -8,7 +8,7 @@
 #include "ArticleBase.h"
 #include "ArticleSharedData.h"
 #include "AssetRefMap.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "InputProcessorSubSystem.h"
 
 void UPlanetGameInstance::Init()
@@ -23,12 +23,12 @@ void UPlanetGameInstance::OnStart()
 	// 之前的代码，为什么加这句记不起来了
 	// GetWorldImp()->SetGameInstance(this);
 
-	bIsExiting = false;
+	GIsExiting = false;
 }
 
 void UPlanetGameInstance::Shutdown()
 {
-	bIsExiting = true;
+	GIsExiting = true;
 
 	// 注意：这里提前释放的会，之后编辑器模式下保存资源会出错
 	// GUObjectArray.ShutdownUObjectArray();

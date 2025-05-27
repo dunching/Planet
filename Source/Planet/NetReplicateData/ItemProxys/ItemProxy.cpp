@@ -5,7 +5,7 @@
 #include "AbilitySystemComponent.h"
 
 #include "AssetRefMap.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CharacterBase.h"
 #include "HumanCharacter_AI.h"
 #include "CharacterAttributesComponent.h"

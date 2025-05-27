@@ -2,10 +2,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AssetRefBase.h"
 
-#include <GenerateType.h>
-
-#include "GameplayTagContainer.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 
 #include "AssetRefMap.generated.h"
@@ -54,7 +53,7 @@ class AGuideThread_Branch;
 class AGuideThread_Challenge;
 
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API UAssetRefMap : public UPrimaryDataAsset
+class PLANET_API UAssetRefMap : public UAssetRefBase
 {
 	GENERATED_BODY()
 public:
@@ -101,40 +100,6 @@ public:
 	TSubclassOf<URegionPromt>RegionPromtClass;
 #pragma endregion MenusUI
 
-#pragma region GEs
-	/**
-	 * 一次性
-	 */
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>OnceGEClass;
-
-	/**
-	 * 周期性
-	 */
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>DurationGEClass;
-
-	/**
-	 * 永久
-	 */
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>ForeverGEClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>DamageCallbackClass;
-
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "GE")
-	TSubclassOf<UGameplayEffect>SuppressClass;
-#pragma endregion 
-	
-#pragma region Audios
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Audios")
-	TSoftObjectPtr<USoundMix>SoundMixRef;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Audios")
-	TSoftObjectPtr<USoundClass>BGMSoundClassRef;
-#pragma endregion 
-	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<EMaterialParamNameType, FName>MatParamNameMap;
 

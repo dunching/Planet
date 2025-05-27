@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "GroupManaggerInterface.h"
 #include "ItemProxy_Minimal.h"
 #include "ItemProxy_Container.h"

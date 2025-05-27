@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "MenuNavgation.generated.h"
 
@@ -15,7 +15,7 @@ class UTalentIcon;
  *
  */
 UCLASS()
-class PLANET_API UMenuNavgation : public UMyUserWidget
+class PLANET_API UMenuNavgation : public UUserWidget_Override
 {
 	GENERATED_BODY()
 

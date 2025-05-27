@@ -7,8 +7,8 @@
 #include "Components/WidgetComponent.h"
 
 #include "OnEffectedTawrgetCallback.h"
-#include "MyUserWidget.h"
-#include "GenerateType.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
 #include "GroupManaggerInterface.h"
 
 

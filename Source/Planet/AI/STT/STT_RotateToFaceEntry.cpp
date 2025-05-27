@@ -7,7 +7,7 @@
 #include "HumanCharacter.h"
 #include "AITask_ReleaseSkill.h"
 #include "STE_Assistance.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "PlanetPlayerController.h"
 #include "STE_CharacterBase.h"
 #include "Kismet/KismetMaterialLibrary.h"

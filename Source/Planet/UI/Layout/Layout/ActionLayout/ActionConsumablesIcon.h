@@ -7,7 +7,7 @@
 #include <Blueprint/IUserObjectListEntry.h>
 
 #include "UIInterfaces.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "ItemProxy_Minimal.h"
 
@@ -22,7 +22,7 @@ struct FSkillProxy;
  */
 UCLASS()
 class PLANET_API UActionConsumablesIcon :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface
 {
 	GENERATED_BODY()

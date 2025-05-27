@@ -16,7 +16,7 @@
 #include "PawnStateConsumablesHUD.h"
 #include "FocusTitle.h"
 #include "PlanetPlayerController.h"
-#include "FocusIcon.h"
+#include "Tools.h"
 #include "MainHUDLayout.h"
 
 struct FUIManagerSubSystem : public TStructVariable<FUIManagerSubSystem>

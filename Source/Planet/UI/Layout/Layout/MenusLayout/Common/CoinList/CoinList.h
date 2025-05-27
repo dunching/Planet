@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include <GameplayTagContainer.h>
 
-#include "MyUserWidget.h"
-#include "GenerateType.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 #include "LayoutInterfacetion.h"
 
@@ -20,7 +20,7 @@ struct FCoinProxy;
  */
 UCLASS()
 class PLANET_API UCoinList :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutItemInterfacetion
 {
 	GENERATED_BODY()

@@ -11,7 +11,6 @@
 #include <Subsystems/SubsystemBlueprintLibrary.h>
 #include "Async/Async.h"
 #include "Components/CapsuleComponent.h"
-#include "GameplayTags/GameplayTagsLibrary.h"
 #include "AbilitySystemBlueprintLibrary.h"
 
 #include "Character/GravityMovementComponent.h"
@@ -20,7 +19,7 @@
 #include "ThreadPoolHelper/ThreadLibrary.h"
 #include "ToolsLibrary.h"
 #include "Animation/AnimInstanceBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "PlanetPlayerState.h"
 #include "HorseCharacter.h"
 #include "ArticleBase.h"

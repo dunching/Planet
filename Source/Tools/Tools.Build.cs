@@ -12,16 +12,18 @@ public class Tools : ModuleRules
         bWarningsAsErrors = true;
         bEnableExceptions = true;
 
+        CppStandard = CppStandardVersion.Cpp20;
+        
+        bUseRTTI = true;
+
         if (Target.Platform == UnrealTargetPlatform.Win64)
         {
         }
 
-        CppStandard = CppStandardVersion.Cpp20;
-        bUseRTTI = true;
-
-        PrivateDependencyModuleNames.AddRange(new string[] { });
         PublicIncludePaths.Add("Tools");
 
+        PrivateDependencyModuleNames.AddRange(new string[] { });
+        
         PrivateDependencyModuleNames.AddRange(new string[] {
             "Core",
             "CoreUObject",

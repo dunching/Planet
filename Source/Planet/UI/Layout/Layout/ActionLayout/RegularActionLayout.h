@@ -6,8 +6,9 @@
 
 #include "GameFramework/HUD.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 #include "LayoutInterfacetion.h"
+#include "TemplateHelper.h"
 
 #include "RegularActionLayout.generated.h"
 
@@ -45,7 +46,7 @@ class UUpgradePromt;
  */
 UCLASS()
 class PLANET_API URegularActionLayout :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public ILayoutInterfacetion
 {
 	GENERATED_BODY()

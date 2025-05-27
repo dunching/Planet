@@ -11,7 +11,9 @@ public class Planet : ModuleRules
 		// PCHUsage = PCHUsageMode.UseSharedPCHs;
 		// PCHUsage = PCHUsageMode.Default;
 
-		bEnableUndefinedIdentifierWarnings = false;
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		UndefinedIdentifierWarningLevel = WarningLevel.Error;
 		bWarningsAsErrors = true;
 		bEnableExceptions = true;
 
@@ -71,7 +73,6 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/GamePlay/GameInstance");
 		PublicIncludePaths.Add("Planet/GamePlay/GameMode");
 		PublicIncludePaths.Add("Planet/GamePlay/GameState");
-		PublicIncludePaths.Add("Planet/GamePlay/GameplayTags");
 		PublicIncludePaths.Add("Planet/GamePlay/PlayerState");
 		PublicIncludePaths.Add("Planet/GamePlay/GroupManagger");
 		PublicIncludePaths.Add("Planet/GamePlay/Pawn");
@@ -97,19 +98,16 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/UI/HUD/GetItemInfos");
 		PublicIncludePaths.Add("Planet/UI/HUD/FocusTitle");
 		PublicIncludePaths.Add("Planet/UI/UMGs");
-		PublicIncludePaths.Add("Planet/UI/UMGs/RichTextBlock");
 		PublicIncludePaths.Add("Planet/UI/Layout");
 		PublicIncludePaths.Add("Planet/UI/Layout/InteractionList");
 		PublicIncludePaths.Add("Planet/UI/Layout/Team");
 		PublicIncludePaths.Add("Planet/UI/Layout/GuideList");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout");
-		PublicIncludePaths.Add("Planet/UI/Layout/Layout/TransactionLayout");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/ActionLayout");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/BuildingLayout");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/EndangeredLayout");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/InteractionOptionsLayout");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/InteractionConversationLayout");
-		PublicIncludePaths.Add("Planet/UI/Layout/Layout/InteractionTransitionLayout");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common");
 		PublicIncludePaths.Add("Planet/UI/Layout/Layout/MenusLayout/Common/CoinList");
@@ -174,6 +172,7 @@ public class Planet : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
+			// 引擎内容
 			"Core",
 			"CoreUObject",
 			"Engine",
@@ -183,6 +182,7 @@ public class Planet : ModuleRules
 			"Niagara",
 			"UMG",
 
+			// 引擎插件
 			"EnhancedInput",
 			"GameplayTags",
 			"GameplayTasks",
@@ -197,15 +197,24 @@ public class Planet : ModuleRules
 			"ShaderConductor", 
 			"GameplayCameras",
 			
-			"Tools",
+			// 插件
 			"CommonUser", 
+			"Utils",
+			"Gravity",
+			"Weather",
+			"Common_UMG",
+			"StateProcessor",
+			
+			// 其他模块
+			"Tools",
+			"GameplayTagsLibrary",
+			"CommonType",
+			"AssetRef",
+			"GameOptions",
 		});
 
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Gravity",
-			"Weather",
-			"Utils",
 		});
 	}
 }

@@ -8,7 +8,7 @@
 #include <Navigation/PathFollowingComponent.h>
 
 #include "BasicFuturesBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "BasicFutures_MoveToAttaclArea.generated.h"
 

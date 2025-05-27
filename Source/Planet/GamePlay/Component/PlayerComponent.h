@@ -8,7 +8,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/StateTreeComponent.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "PlayerComponent.generated.h"
 

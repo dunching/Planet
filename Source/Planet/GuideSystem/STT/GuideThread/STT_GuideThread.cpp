@@ -25,6 +25,7 @@
 #include "SceneActor.h"
 #include "STE_GuideThread.h"
 #include "TargetPoint_Runtime.h"
+#include "Tools.h"
 #include "UIManagerSubSystem.h"
 
 EStateTreeRunStatus FSTT_GuideThreadBase::EnterState(

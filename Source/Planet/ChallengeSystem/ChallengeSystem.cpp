@@ -10,7 +10,7 @@
 #include "Planet_Tools.h"
 #include "SceneProxyExtendInfo.h"
 #include "PlanetPlayerController.h"
-#include "Teleport.h"
+#include "Tools.h"
 
 UChallengeSubSystem* UChallengeSubSystem::GetInstance()
 {

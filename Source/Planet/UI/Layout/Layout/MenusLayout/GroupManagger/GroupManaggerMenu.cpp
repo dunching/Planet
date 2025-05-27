@@ -11,7 +11,7 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "InventoryComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "TeamMatesHelperComponent.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"

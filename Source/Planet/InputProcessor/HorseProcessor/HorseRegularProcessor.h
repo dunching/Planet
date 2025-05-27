@@ -38,8 +38,6 @@ namespace HorseProcessor
 
 	public:
 
-		const static EInputProcessorType InputProcessprType = EInputProcessorType::kHorseRegularProcessor;
-
 		using FHoverUICB = std::function<bool()>;
 
 		FHorseRegularProcessor(AHorseCharacter* CharacterPtr);

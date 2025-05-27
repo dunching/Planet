@@ -16,7 +16,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/SizeBox.h"
 #include "CharacterAttributesComponent.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "CharacterBase.h"
 #include "GameplayTagsLibrary.h"
 #include "EffectsList.h"

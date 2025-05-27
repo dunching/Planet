@@ -17,7 +17,7 @@
 #include "ThreadPoolHelper/ThreadLibrary.h"
 #include "ToolsLibrary.h"
 #include "Animation/AnimInstanceBase.h"
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "PlanetPlayerState.h"
 #include "CharacterBase.h"
 #include "ArticleBase.h"

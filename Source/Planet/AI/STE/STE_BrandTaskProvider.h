@@ -10,7 +10,7 @@
 #include "StateTreeEvaluatorBase.h"
 #include "StateTreeExecutionContext.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 #include "STE_CharacterBase.h"
 
 #include "STE_BrandTaskProvider.generated.h"

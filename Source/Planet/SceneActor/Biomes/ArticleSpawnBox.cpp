@@ -20,8 +20,10 @@
 #include <HumanCharacter.h>
 #include <Character/GravityMovementComponent.h>
 
+#include "Tools.h"
+
 AArticleSpawnBox::AArticleSpawnBox() :
-	Super()
+                                     Super()
 {
 	BoxCompPtr = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
 	BoxCompPtr->SetBoxExtent(FVector(500, 500, 10));

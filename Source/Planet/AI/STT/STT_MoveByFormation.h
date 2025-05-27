@@ -9,7 +9,7 @@
 #include "StateTreeTaskBase.h"
 #include "StateTreeExecutionContext.h"
 
-#include "GenerateType.h"
+#include "GenerateTypes.h"
 
 #include "STT_MoveByFormation.generated.h"
 

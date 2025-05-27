@@ -23,8 +23,6 @@ namespace HorseProcessor
 
 		using FOwnerPawnType = AHorseCharacter;
 
-		const static EInputProcessorType InputProcessprType = EInputProcessorType::kHorseProcessor;
-
 		FHorseProcessor(AHorseCharacter* CharacterPtr);
 
 	};

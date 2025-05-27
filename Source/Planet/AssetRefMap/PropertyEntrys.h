@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 
-#include <GenerateType.h>
+#include <GenerateTypes.h>
 
 #include "GameplayTagContainer.h"
 #include "ItemProxy_Minimal.h"

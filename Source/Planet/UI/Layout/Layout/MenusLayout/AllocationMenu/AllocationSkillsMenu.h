@@ -6,7 +6,7 @@
 
 #include "UIInterfaces.h"
 
-#include "Common/GenerateType.h"
+#include "GenerateTypes.h"
 #include "InventoryComponent.h"
 #include "ItemProxy_Minimal.h"
 #include "MenuInterface.h"
@@ -24,7 +24,7 @@ struct FCharacterProxy;
  */
 UCLASS()
 class PLANET_API UAllocationSkillsMenu :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IMenuInterface
 {
 	GENERATED_BODY()

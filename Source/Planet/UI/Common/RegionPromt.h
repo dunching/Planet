@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 
-#include "MyUserWidget.h"
+#include "UserWidget_Override.h"
 
 #include "CharacterAttributesComponent.h"
 #include "UIInterfaces.h"
@@ -22,7 +22,7 @@ struct FTableRow_Regions;
  */
 UCLASS()
 class PLANET_API URegionPromt :
-	public UMyUserWidget
+	public UUserWidget_Override
 {
 	GENERATED_BODY()
 

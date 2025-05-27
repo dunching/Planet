@@ -7,8 +7,8 @@
 #include "Blueprint/IUserObjectListEntry.h"
 
 #include "UIInterfaces.h"
-#include "MyUserWidget.h"
-#include "Common/GenerateType.h"
+#include "UserWidget_Override.h"
+#include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 
 #include "BackpackIcon.generated.h"
@@ -24,7 +24,7 @@ struct FCharacterProxy;
  */
 UCLASS()
 class PLANET_API UBackpackIcon :
-	public UMyUserWidget,
+	public UUserWidget_Override,
 	public IItemProxyIconInterface,
 	public IUserObjectListEntry
 {

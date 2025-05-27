@@ -8,7 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "PlanetPlayerState.h"
-#include "Planet.h"
+#include "PlanetModule.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
 #include "ActionSkillsIcon.h"

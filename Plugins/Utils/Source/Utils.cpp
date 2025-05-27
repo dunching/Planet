@@ -2,4 +2,4 @@
 
 #include "Utils.h"
 
-IMPLEMENT_MODULE(FUtilsModule, Utils)
+IMPLEMENT_MODULE(FDefaultGameModuleImpl, Utils)

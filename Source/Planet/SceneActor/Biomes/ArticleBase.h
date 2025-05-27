@@ -3,7 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#include "GenerateTypes.h"
 #include "SceneActor.h"
+
 #include "ArticleBase.generated.h"
 
 class UStaticMesh;
