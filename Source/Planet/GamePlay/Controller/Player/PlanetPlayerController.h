@@ -79,10 +79,14 @@ public:
 
 	TObjectPtr<UPlayerControllerGameplayTasksComponent> GetGameplayTasksComponent() const;
 
-	void AddProvideEyesViewActor(const TObjectPtr<AActor>&ProvideEyesViewActor);
-	
-	void RemoveProvideEyesViewActor(const TObjectPtr<AActor>&ProvideEyesViewActor);
-	
+	void AddProvideEyesViewActor(
+		const TObjectPtr<AActor>& ProvideEyesViewActor
+		);
+
+	void RemoveProvideEyesViewActor(
+		const TObjectPtr<AActor>& ProvideEyesViewActor
+		);
+
 #pragma region CMD
 
 	UFUNCTION(Server, Reliable)
@@ -193,22 +197,49 @@ public:
 		);
 
 	UFUNCTION(Server, Reliable)
-	void SwitchPlayerInput(const TArray< FString >& Args);
+	void SwitchPlayerInput(
+		const TArray<FString>& Args
+		);
 
 	UFUNCTION(Server, Reliable)
-	void AdjustTime(const FDateTime& Time);
+	void AdjustTime(
+		const FDateTime& Time
+		);
 
 	UFUNCTION(Server, Reliable)
-	void UpdateWeather(const FGameplayTag& WeatherType);
+	void UpdateWeather(
+		const FGameplayTag& WeatherType
+		);
 
 	UFUNCTION(Server, Reliable)
-	void AddOrRemoveState(const FGameplayTag& StateTag, bool bIsAdd);
+	void AddOrRemoveState(
+		const FGameplayTag& StateTag,
+		bool bIsAdd
+		);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void AddOrRemoveStateImp(const FGameplayTag& StateTag, bool bIsAdd);
+	void AddOrRemoveStateImp(
+		const FGameplayTag& StateTag,
+		bool bIsAdd
+		);
 
 	UFUNCTION(Server, Reliable)
-	void AddExperience(int32 ExperienceValue);
+	void AddExperience(
+		int32 ExperienceValue
+		);
+
+	/**
+	 * 更新角色的天赋分配
+	 * @param CharacterID 
+	 * @param TalentSocket 
+	 * @param NewLevel 
+	 */
+	UFUNCTION(Server, Reliable)
+	void UpdateCharacterTalent(
+		const FGuid& CharacterID,
+		const FGameplayTag& TalentSocket,
+		int32 NewLevel
+		);
 
 #pragma region
 
@@ -243,8 +274,11 @@ protected:
 		const FInputKeyParams& Params
 		) override;
 
-	 virtual void GetActorEyesViewPoint(FVector& Location, FRotator& Rotation) const override;
-	
+	virtual void GetActorEyesViewPoint(
+		FVector& Location,
+		FRotator& Rotation
+		) const override;
+
 	virtual void OnRep_PlayerState() override;
 
 	virtual void OnGroupManaggerReady(
@@ -287,6 +321,6 @@ protected:
 	FDelegateHandle OnOwnedDeathTagDelegateHandle;
 
 	FFocusKnowledge FocusInformation;
-	
+
 	TSet<TWeakObjectPtr<AActor>> ProvideEyesViewActorSet;
 };

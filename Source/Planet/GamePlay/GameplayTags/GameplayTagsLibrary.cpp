@@ -397,6 +397,21 @@ FGameplayTag UGameplayTagsLibrary::DataSource_EquipmentModify =
 FGameplayTag UGameplayTagsLibrary::DataSource_TalentModify =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.TalentModify")));
 
+FGameplayTag UGameplayTagsLibrary::DataSource_Elemental_Metal =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Elemental.Metal")));
+
+FGameplayTag UGameplayTagsLibrary::DataSource_Elemental_Wood =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Elemental.Wood")));
+
+FGameplayTag UGameplayTagsLibrary::DataSource_Elemental_Water =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Elemental.Water")));
+
+FGameplayTag UGameplayTagsLibrary::DataSource_Elemental_Fire =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Elemental.Fire")));
+
+FGameplayTag UGameplayTagsLibrary::DataSource_Elemental_Earth =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Elemental.Earth")));
+
 FGameplayTag UGameplayTagsLibrary::DataSource_Reply =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("DataSource.Reply")));
 
@@ -428,21 +443,30 @@ FGameplayTag UGameplayTagsLibrary::GEData_Duration =
 
 // 数据被修改的方式
 
-// 直接增加
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Addtive =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Addtive")));
 
-// 覆盖
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_BaseValue_Override =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.BaseValue.Override")));
 
-// 增加一个临时量（比如修改移速时，先添加一个100的增速 再添加一个 20%增速，在移除这些增速是不好计算 所以用这种方式进行记录）
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_Temporary =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.Temporary")));
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary")));
 
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.CriticalDamage")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_CriticalHitRate =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.CriticalHitRate")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_HitRate =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.HitRate")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_EvadeRate =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.EvadeRate")));
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_MaxHP =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.MaxHP")));
@@ -485,6 +509,66 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_PercentPenetration =
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Metal_Resistance =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Metal.Resistance")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Wood_Value =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Wood.Value")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Wood_Level =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Wood.Level")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Wood_Penetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Wood.Penetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Wood_PercentPenetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Wood.PercentPenetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Wood_Resistance =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Wood.Resistance")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Water_Value =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Water.Value")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Water_Level =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Water.Level")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Water_Penetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Water.Penetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Water_PercentPenetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Water.PercentPenetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Water_Resistance =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Water.Resistance")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Fire_Value =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Fire.Value")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Fire_Level =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Fire.Level")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Fire_Penetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Fire.Penetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Fire_PercentPenetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Fire.PercentPenetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Fire_Resistance =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Fire.Resistance")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Earth_Value =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Earth.Value")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Earth_Level =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Earth.Level")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Earth_Penetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Earth.Penetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Earth_PercentPenetration =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Earth.PercentPenetration")));
+
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Earth_Resistance =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Earth.Resistance")));
 
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Damage_True =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Damage.True")));

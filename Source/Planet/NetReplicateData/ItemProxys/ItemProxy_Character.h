@@ -130,7 +130,7 @@ struct PLANET_API FCharacterTalent
 		class UPackageMap* Map,
 		bool& bOutSuccess
 		);
-
+	
 	/**
 	 * 插槽、点数
 	 */
@@ -225,11 +225,17 @@ public:
 
 	void AddExperience(uint32 Value);
 
+	uint8 GetTalentNum()const;
+	
 	uint8 GetLevel()const;
 	
 	uint8 GetExperience()const;
 	
 	uint8 GetLevelExperience()const;
+
+	const FCharacterTalent&GetCharacterTalent()const;
+
+	void UpdateTalentSocket(const FGameplayTag& TalentSocketTag, int32 Num);
 	
 	FOnCharacterSocketUpdated OnCharacterSocketUpdated;
 

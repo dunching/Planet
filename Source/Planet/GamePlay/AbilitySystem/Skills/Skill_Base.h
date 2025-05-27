@@ -14,7 +14,7 @@ class UInteractiveComponent;
 class AWeapon_Base;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_SkillBase_RegisterParam :
+struct FGameplayAbilityTargetData_RegisterParam_SkillBase :
 	public FGameplayAbilityTargetData_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -27,14 +27,14 @@ struct FGameplayAbilityTargetData_SkillBase_RegisterParam :
 		bool& bOutSuccess
 		) override;
 
-	virtual FGameplayAbilityTargetData_SkillBase_RegisterParam* Clone() const override;
+	virtual FGameplayAbilityTargetData_RegisterParam_SkillBase* Clone() const override;
 
 	FGuid ProxyID;
 };
 
 template <>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_SkillBase_RegisterParam> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_SkillBase_RegisterParam>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam_SkillBase> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RegisterParam_SkillBase>
 {
 	enum
 	{
@@ -48,7 +48,7 @@ class PLANET_API USkill_Base : public UPlanetGameplayAbility
 	GENERATED_BODY()
 
 public:
-	using FRegisterParamType = FGameplayAbilityTargetData_SkillBase_RegisterParam;
+	using FRegisterParamType = FGameplayAbilityTargetData_RegisterParam_SkillBase;
 
 	friend UInteractiveComponent;
 

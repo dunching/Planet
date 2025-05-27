@@ -6,6 +6,7 @@
 
 #include "Skill_Element_Base.h"
 #include "GenerateType.h"
+#include "SceneProxyTable.h"
 
 #include "Skill_Element_Metal.generated.h"
 
@@ -14,56 +15,55 @@ class UAbilityTask_TimerHelper;
 struct FBasicProxy;
 
 UCLASS()
+class PLANET_API UItemProxy_Description_ElementtalSkill_Metal : public UItemProxy_Description_ElementtalSkill
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FPerLevelValue_Float PerLevel_CriticalHitRate = {
+		0.5f, 0.5f, 0.5f,
+		1.0f, 1.0f, 1.0f,
+		1.5f, 1.5f, 1.5f,
+	};
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FPerLevelValue_Float PerLevel_CriticalDamage = {
+		1.5f, 1.5f, 1.5f, 1.5f,
+		2.0f, 2.0f, 2.0f, 2.0f,
+		2.5f, 2.5f, 2.5f, 2.5f,
+	};
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	FPerLevelValue_Float PerLevel_PercentPenetration = {
+		0.f, 0.f, 0.f,
+		1.0f, 1.0f, 1.0f,
+		1.5f, 1.5f, 1.5f,
+	};
+};
+
+UCLASS()
 class USkill_Element_Metal : public USkill_Element_Base
 {
 	GENERATED_BODY()
 
 public:
+	using FItemProxy_DescriptionType = UItemProxy_Description_ElementtalSkill_Metal;
 
 	using FValueChangedDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
 
-	virtual void ActivateAbility(
-		const FGameplayAbilitySpecHandle Handle,
+	virtual void OnAvatarSet(
 		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		const FGameplayEventData* TriggerEventData
-	) override;
+		const FGameplayAbilitySpec& Spec
+		) override;
 
-	virtual void EndAbility(
-		const FGameplayAbilitySpecHandle Handle,
-		const FGameplayAbilityActorInfo* ActorInfo,
-		const FGameplayAbilityActivationInfo ActivationInfo,
-		bool bReplicateEndAbility,
-		bool bWasCancelled
-	)override;
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TSoftObjectPtr<UItemProxy_Description_ElementtalSkill_Metal> ItemProxy_Description_Ref;
 
-protected:
+private:
+	void OnValueChanged(
+		const FOnAttributeChangeData& CurrentValue
+		);
 
-	void OnElementLevelChanged(int32 OldValue, int32 NewValue);
-
-	void MakedDamageDelegate(UGameplayAbility* GAPtr);
-
-	void AddBuff();
-	
-	void RemoveBuff();
-
-	FValueChangedDelegateHandle OnValueChanged;
-
-	FDelegateHandle AbilityActivatedCallbacksHandle;
-
-	int32 CurrentElementLevel = 0;
-
-	int32 CurrentBuffLevel = 0;
-
-	UPROPERTY()
-	TObjectPtr<UAbilityTask_TimerHelper> RemoveBuffTask;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Property")
-	int32 CriticalHitRate = 3;
-	
-	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Property")
-	int32 Evade = 3;
-
-	FGuid PropertuModify_GUID = FGuid::NewGuid();
-
+	TObjectPtr<FItemProxy_DescriptionType> ItemProxy_DescriptionPtr = nullptr;
 };

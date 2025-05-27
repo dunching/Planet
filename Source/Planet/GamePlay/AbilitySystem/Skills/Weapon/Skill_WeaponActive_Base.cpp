@@ -6,12 +6,12 @@
 #include "Weapon_Base.h"
 #include "GameplayTagsLibrary.h"
 
-UScriptStruct* FGameplayAbilityTargetData_WeaponActive_ActiveParam::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_ActiveParam_WeaponActive::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_WeaponActive_ActiveParam::StaticStruct();
+	return FGameplayAbilityTargetData_ActiveParam_WeaponActive::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(
+bool FGameplayAbilityTargetData_ActiveParam_WeaponActive::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
@@ -25,10 +25,10 @@ bool FGameplayAbilityTargetData_WeaponActive_ActiveParam::NetSerialize(
 	return true;
 }
 
-FGameplayAbilityTargetData_WeaponActive_ActiveParam* FGameplayAbilityTargetData_WeaponActive_ActiveParam::Clone() const
+FGameplayAbilityTargetData_ActiveParam_WeaponActive* FGameplayAbilityTargetData_ActiveParam_WeaponActive::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
+		new FGameplayAbilityTargetData_ActiveParam_WeaponActive;
 
 	*ResultPtr = *this;
 

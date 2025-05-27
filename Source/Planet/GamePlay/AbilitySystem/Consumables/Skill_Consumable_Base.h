@@ -14,7 +14,7 @@ class AConsumable_Base;
 class ACharacterBase;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Consumable : 
+struct FGameplayAbilityTargetData_RegisterParam_Consumable : 
 	public FGameplayAbilityTargetData_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -28,8 +28,8 @@ struct FGameplayAbilityTargetData_Consumable :
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_Consumable> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_Consumable>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_RegisterParam_Consumable> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_RegisterParam_Consumable>
 {
 	enum
 	{
@@ -45,7 +45,7 @@ class USkill_Consumable_Base :
 
 public:
 
-	using FRegisterParamType = FGameplayAbilityTargetData_Consumable;
+	using FRegisterParamType = FGameplayAbilityTargetData_RegisterParam_Consumable;
 
 	USkill_Consumable_Base();
 

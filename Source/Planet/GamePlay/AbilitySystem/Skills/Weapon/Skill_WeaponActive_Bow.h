@@ -20,7 +20,7 @@ class ASkill_WeaponActive_Bow_Projectile;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_Bow_RegisterParam :
-	public FGameplayAbilityTargetData_SkillBase_RegisterParam
+	public FGameplayAbilityTargetData_RegisterParam_SkillBase
 {
 	GENERATED_USTRUCT_BODY()
 

@@ -41,6 +41,8 @@ public:
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	
+	virtual void PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const override;
+
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 	
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -128,7 +130,9 @@ public:
 	UFUNCTION()
 	virtual void OnRep_MoveSpeed(const FMyGameplayAttributeData& OldHealth);
 
-	// 会心伤害
+	/**
+	 * 会心伤害 0 ~ 10000
+	 */
 	UPROPERTY(ReplicatedUsing = OnRep_CriticalDamage, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData CriticalDamage;
 	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalDamage);
@@ -136,7 +140,9 @@ public:
 	UFUNCTION()
 	virtual void OnRep_CriticalDamage(const FMyGameplayAttributeData& OldHealth);
 
-	// 会心率
+	/**
+	 * 会心率 0 ~ 100
+	 */
 	UPROPERTY(ReplicatedUsing = OnRep_CriticalHitRate, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData CriticalHitRate;
 	ATTRIBUTE_ACCESSORS(UAS_Character, CriticalHitRate);
@@ -144,8 +150,9 @@ public:
 	UFUNCTION()
 	virtual void OnRep_CriticalHitRate(const FMyGameplayAttributeData& OldHealth);
 
-	// 命中率
-	// 目标 闪避值 为0时命中的概率
+	/**
+	 * 命中率 0 ~ 1000
+	 */
 	UPROPERTY(ReplicatedUsing = OnRep_HitRate, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData HitRate;
 	ATTRIBUTE_ACCESSORS(UAS_Character, HitRate);
@@ -153,7 +160,9 @@ public:
 	UFUNCTION()
 	virtual void OnRep_HitRate(const FMyGameplayAttributeData& OldHealth);
 
-	// 闪避几率
+	/**
+	 * 闪避几率 0 ~ 1000
+	 */
 	UPROPERTY(ReplicatedUsing = OnRep_EvadeRate, VisibleAnywhere, BlueprintReadWrite);
 	FMyGameplayAttributeData EvadeRate;
 	ATTRIBUTE_ACCESSORS(UAS_Character, EvadeRate);

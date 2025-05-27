@@ -7,6 +7,7 @@
 
 #include "GenerateType.h"
 #include "MenuInterface.h"
+#include "ScaleableWidget.h"
 
 #include "TalentAllocation.generated.h"
 
@@ -17,18 +18,12 @@ class UTalentIcon;
  */
 UCLASS()
 class PLANET_API UTalentAllocation :
-	public UMyUserWidget,
+	public UScaleableWidget,
 	public IMenuInterface
 {
 	GENERATED_BODY()
 
 public:
-
-	// 可用的总点数变更
-	using FPointsDelegateHandle = TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr;
-
-	// 分配的点数变更
-	using FPointDelegateHandle = TCallbackHandleContainer<void(UTalentIcon*, bool)>::FCallbackHandleSPtr;
 
 	virtual void NativeConstruct()override;
 
@@ -42,12 +37,15 @@ protected:
 
 	virtual EMenuType GetMenuType()const override final;
 	
-	void OnUsedTalentNumChanged(int32 OldNum, int32 NewNum);
-	
-	void OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);
+	void OnUsedTalentNumChanged(int32 UsedNum, int32 TatolNum);
 
-	FPointsDelegateHandle OnValueChanged;
-	
-	TArray<FPointDelegateHandle> OnPointChangedHandleAry;
+	UFUNCTION()
+	bool OnAddPoint(UTalentIcon* TalentIconPtr, bool bIsAdd);
 
+private:
+	void OnSelectedCharacterProxy(
+		const TSharedPtr<FCharacterProxy>& ProxyPtr
+		);
+
+	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
 };

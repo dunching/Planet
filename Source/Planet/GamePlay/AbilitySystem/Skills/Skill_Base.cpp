@@ -19,12 +19,12 @@
 #include "PlanetPlayerController.h"
 #include "StateProcessorComponent.h"
 
-UScriptStruct* FGameplayAbilityTargetData_SkillBase_RegisterParam::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_RegisterParam_SkillBase::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_SkillBase_RegisterParam::StaticStruct();
+	return FGameplayAbilityTargetData_RegisterParam_SkillBase::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_SkillBase_RegisterParam::NetSerialize(
+bool FGameplayAbilityTargetData_RegisterParam_SkillBase::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
@@ -44,10 +44,10 @@ bool FGameplayAbilityTargetData_SkillBase_RegisterParam::NetSerialize(
 	return true;
 }
 
-FGameplayAbilityTargetData_SkillBase_RegisterParam* FGameplayAbilityTargetData_SkillBase_RegisterParam::Clone() const
+FGameplayAbilityTargetData_RegisterParam_SkillBase* FGameplayAbilityTargetData_RegisterParam_SkillBase::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_SkillBase_RegisterParam;
+		new FGameplayAbilityTargetData_RegisterParam_SkillBase;
 
 	*ResultPtr = *this;
 

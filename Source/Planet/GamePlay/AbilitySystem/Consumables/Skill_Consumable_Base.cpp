@@ -8,12 +8,12 @@
 #include "CharacterBase.h"
 #include "InventoryComponent.h"
 
-UScriptStruct* FGameplayAbilityTargetData_Consumable::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_RegisterParam_Consumable::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_Consumable::StaticStruct();
+	return FGameplayAbilityTargetData_RegisterParam_Consumable::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_Consumable::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FGameplayAbilityTargetData_RegisterParam_Consumable::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Super::NetSerialize(Ar, Map, bOutSuccess);
 

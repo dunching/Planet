@@ -17,7 +17,7 @@ class UGE_Running;
 class UGE_CancelRunning;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_HasbeenTornodo : public FGameplayAbilityTargetData_ActiveParam
+struct PLANET_API FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo : public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -29,14 +29,14 @@ struct PLANET_API FGameplayAbilityTargetData_HasbeenTornodo : public FGameplayAb
 		bool& bOutSuccess
 	);
 
-	virtual FGameplayAbilityTargetData_HasbeenTornodo* Clone() const override;
+	virtual FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo* Clone() const override;
 	
 	TWeakObjectPtr<ATornado>TornadoPtr = nullptr;
 };
 
 template <>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_HasbeenTornodo> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_HasbeenTornodo>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo>
 {
 	enum
 	{
@@ -52,7 +52,7 @@ class PLANET_API UBasicFutures_HasbeenTornodo : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
-	using FActiveParamType = FGameplayAbilityTargetData_HasbeenTornodo;
+	using FActiveParamType = FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo;
 
 public:
 	virtual void OnAvatarSet(

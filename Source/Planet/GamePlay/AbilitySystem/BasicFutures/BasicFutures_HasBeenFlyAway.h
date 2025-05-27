@@ -16,7 +16,7 @@ class UGE_Running;
 class UGE_CancelRunning;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_HasBeenFlyAway : public FGameplayAbilityTargetData_ActiveParam
+struct PLANET_API FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway : public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -28,14 +28,14 @@ struct PLANET_API FGameplayAbilityTargetData_HasBeenFlyAway : public FGameplayAb
 		bool& bOutSuccess
 	);
 
-	virtual FGameplayAbilityTargetData_HasBeenFlyAway* Clone() const override;
+	virtual FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway* Clone() const override;
 
 	int32 Height = 100;
 };
 
 template <>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_HasBeenFlyAway> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_HasBeenFlyAway>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway>
 {
 	enum
 	{
@@ -51,7 +51,7 @@ class PLANET_API UBasicFutures_HasBeenFlyAway : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
-	using FActiveParamType = FGameplayAbilityTargetData_HasBeenFlyAway;
+	using FActiveParamType = FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway;
 
 public:
 	UBasicFutures_HasBeenFlyAway();

@@ -178,6 +178,24 @@ public:
 	float PerformActionInterval = 1.f;
 };
 
+USTRUCT(BlueprintType,Blueprintable)
+struct FTalentHelper final
+{
+	GENERATED_USTRUCT_BODY()
+	
+	/**
+	 * 属性Tag
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
+	FGameplayTag ModifyDataTypeTag;
+
+	/**
+	 * 
+	 */
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "SkillSocket")
+	int32 Value = 1;
+
+};
 
 UCLASS()
 class PLANET_API UItemProxy_Description_Character : public UItemProxy_Description
@@ -186,6 +204,8 @@ class PLANET_API UItemProxy_Description_Character : public UItemProxy_Descriptio
 
 public:
 
+	UItemProxy_Description_Character(const FObjectInitializer& ObjectInitializer);
+	
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TSubclassOf<AHumanCharacter_AI>CharacterClass;
 	
@@ -200,5 +220,11 @@ public:
 	 */
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TArray<FCharacterGrowthAttribute> CharacterGrowthAttributeAry;
+	
+	/**
+	 * 天赋属性槽对应修改的属性
+	 */
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<FGameplayTag, FTalentHelper> TalentSocketModifyMap;
 	
 };

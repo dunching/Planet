@@ -376,6 +376,19 @@ void APlanetPlayerController::AddExperience_Implementation(
 	}
 }
 
+void APlanetPlayerController::UpdateCharacterTalent_Implementation(
+	const FGuid& CharacterID,
+	const FGameplayTag& TalentSocket,
+	int32 NewLevel
+	)
+{
+	auto TargetCharacterProxySPtr = GetGroupManagger()->GetInventoryComponent()->FindProxy_Character(CharacterID);
+	if (TargetCharacterProxySPtr)
+	{
+		TargetCharacterProxySPtr->UpdateTalentSocket(TalentSocket, NewLevel);
+	}
+}
+
 void APlanetPlayerController::GetLifetimeReplicatedProps(
 	TArray<FLifetimeProperty>& OutLifetimeProps
 	) const

@@ -561,6 +561,11 @@ void FCharacterProxy::AddExperience(
 	}
 }
 
+uint8 FCharacterProxy::GetTalentNum() const
+{
+	return GetLevel();
+}
+
 uint8 FCharacterProxy::GetLevel() const
 {
 	return Level;
@@ -581,4 +586,94 @@ uint8 FCharacterProxy::GetLevelExperience() const
 	}
 
 	return CharacterGrowthAttributeAry[Level - 1].LevelExperience;
+}
+
+const FCharacterTalent& FCharacterProxy::GetCharacterTalent() const
+{
+	return CharacterTalent;
+}
+
+void FCharacterProxy::UpdateTalentSocket(
+	const FGameplayTag& TalentSocketTag,
+	int32 Num
+	)
+{
+	auto TableRowProxy_CharacterPtr = GetTableRowProxy_Character();
+	if (!TableRowProxy_CharacterPtr)
+	{
+		return;
+	}
+	
+	if (!TableRowProxy_CharacterPtr->TalentSocketModifyMap.Contains(TalentSocketTag))
+	{
+		return;
+	}
+	
+	const auto TargetTalent = TableRowProxy_CharacterPtr->TalentSocketModifyMap[TalentSocketTag];
+	
+	ON_SCOPE_EXIT
+	{
+#if UE_EDITOR || UE_SERVER
+		if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
+		{
+			InventoryComponentPtr->Proxy_Container.UpdateItem(GetID());
+		}
+#endif
+	};
+
+	if (Num>0)
+	{
+		if (CharacterTalent.AllocationMap.Contains(TalentSocketTag))
+		{
+			CharacterTalent.AllocationMap[TalentSocketTag] = Num;
+		}
+		else
+		{
+			CharacterTalent.AllocationMap.Add(TalentSocketTag, Num);
+		}
+
+		auto CharacterPtr = GetCharacterActor();
+		if (CharacterPtr.IsValid())
+		{
+			auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto SpecHandle = GASPtr->MakeOutgoingSpec(
+			                                           UAssetRefMap::GetInstance()->OnceGEClass,
+			                                           1,
+			                                           GASPtr->MakeEffectContext()
+			                                          );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_Temporary);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(TargetTalent.ModifyDataTypeTag);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														  TalentSocketTag,
+														  Num * TargetTalent.Value
+														  );
+
+			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+	else
+	{
+		auto CharacterPtr = GetCharacterActor();
+		if (CharacterPtr.IsValid())
+		{
+			auto GASPtr = CharacterPtr->GetAbilitySystemComponent();
+			auto SpecHandle = GASPtr->MakeOutgoingSpec(
+													   UAssetRefMap::GetInstance()->OnceGEClass,
+													   1,
+													   GASPtr->MakeEffectContext()
+													  );
+
+			SpecHandle.Data.Get()->AddDynamicAssetTag(UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary);
+			SpecHandle.Data.Get()->AddDynamicAssetTag(TargetTalent.ModifyDataTypeTag);
+			SpecHandle.Data.Get()->SetSetByCallerMagnitude(
+														  TalentSocketTag,
+														  0
+														  );
+
+			GASPtr->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+		
+		CharacterTalent.AllocationMap.Remove(TalentSocketTag);
+	}
 }

@@ -118,7 +118,7 @@ void FSkillProxy::RegisterSkill()
 			return;
 		}
 
-		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;
+		auto GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RegisterParam_SkillBase;
 
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 
@@ -671,7 +671,7 @@ bool FWeaponSkillProxy::Active()
 			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon)
 		)
 		{
-			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_WeaponActive_ActiveParam;
+			auto GameplayAbilityTargetDashPtr = new FGameplayAbilityTargetData_ActiveParam_WeaponActive;
 			GameplayAbilityTargetDashPtr->WeaponPtr = ActivedWeaponPtr;
 			GameplayAbilityTargetDashPtr->bIsAutoContinue = true;
 			Payload.TargetData.Add(GameplayAbilityTargetDashPtr);
@@ -773,7 +773,7 @@ void FWeaponSkillProxy::RegisterSkill()
 			return;
 		}
 
-		FGameplayAbilityTargetData_SkillBase_RegisterParam* GameplayAbilityTargetDataPtr = nullptr;
+		FGameplayAbilityTargetData_RegisterParam_SkillBase* GameplayAbilityTargetDataPtr = nullptr;
 		// 需要特殊参数的
 		if (
 			GetProxyType().MatchesTag(UGameplayTagsLibrary::Proxy_Skill_Weapon_Bow)
@@ -795,7 +795,7 @@ void FWeaponSkillProxy::RegisterSkill()
 		}
 		else
 		{
-			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_SkillBase_RegisterParam;
+			GameplayAbilityTargetDataPtr = new FGameplayAbilityTargetData_RegisterParam_SkillBase;
 		}
 		GameplayAbilityTargetDataPtr->ProxyID = GetID();
 

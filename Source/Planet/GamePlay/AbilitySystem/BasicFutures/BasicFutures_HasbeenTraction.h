@@ -17,7 +17,7 @@ class UGE_Running;
 class UGE_CancelRunning;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_HasbeenTraction : public FGameplayAbilityTargetData_ActiveParam
+struct PLANET_API FGameplayAbilityTargetData_ActiveParam_HasbeenTraction : public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -29,14 +29,14 @@ struct PLANET_API FGameplayAbilityTargetData_HasbeenTraction : public FGameplayA
 		bool& bOutSuccess
 	);
 
-	virtual FGameplayAbilityTargetData_HasbeenTraction* Clone() const override;
+	virtual FGameplayAbilityTargetData_ActiveParam_HasbeenTraction* Clone() const override;
 	
 	TWeakObjectPtr<ATractionPoint>TractionPoint = nullptr;
 };
 
 template <>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_HasbeenTraction> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_HasbeenTraction>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam_HasbeenTraction> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam_HasbeenTraction>
 {
 	enum
 	{
@@ -52,7 +52,7 @@ class PLANET_API UBasicFutures_HasbeenTraction : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
-	using FActiveParamType = FGameplayAbilityTargetData_HasbeenTraction;
+	using FActiveParamType = FGameplayAbilityTargetData_ActiveParam_HasbeenTraction;
 
 public:
 	virtual void OnAvatarSet(

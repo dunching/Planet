@@ -6,12 +6,12 @@
 #include "CharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-UScriptStruct* FGameplayAbilityTargetData_HasbeenTornodo::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_HasbeenTornodo::StaticStruct();
+	return FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_HasbeenTornodo::NetSerialize(
+bool FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
@@ -24,10 +24,10 @@ bool FGameplayAbilityTargetData_HasbeenTornodo::NetSerialize(
 	return true;
 }
 
-FGameplayAbilityTargetData_HasbeenTornodo* FGameplayAbilityTargetData_HasbeenTornodo::Clone() const
+FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo* FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_HasbeenTornodo;
+		new FGameplayAbilityTargetData_ActiveParam_HasbeenTornodo;
 
 	*ResultPtr = *this;
 

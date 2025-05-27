@@ -21,7 +21,7 @@ class ASkill_WeaponActive_FoldingFan_Projectile;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_FoldingFan_RegisterParam :
-	public FGameplayAbilityTargetData_SkillBase_RegisterParam
+	public FGameplayAbilityTargetData_RegisterParam_SkillBase
 {
 	GENERATED_USTRUCT_BODY()
 

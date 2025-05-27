@@ -11,7 +11,7 @@ void FMyGameplayAttributeData::SetBaseValue(
 	float NewValue
 	)
 {
-	FGameplayAttributeData::SetBaseValue(NewValue);
+	Super::SetBaseValue(NewValue);
 }
 
 void UAS_Character::PreAttributeChange(
@@ -20,6 +20,14 @@ void UAS_Character::PreAttributeChange(
 	)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
+}
+
+void UAS_Character::PreAttributeBaseChange(
+	const FGameplayAttribute& Attribute,
+	float& NewValue
+	) const
+{
+	Super::PreAttributeBaseChange(Attribute, NewValue);
 }
 
 void UAS_Character::PostGameplayEffectExecute(
@@ -73,6 +81,7 @@ void UAS_Character::GetLifetimeReplicatedProps(
 
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, MoveSpeed, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION(ThisClass, CriticalDamage, COND_None);
+	DOREPLIFETIME_CONDITION(ThisClass, CriticalHitRate, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, HitRate, COND_None);
 	DOREPLIFETIME_CONDITION(ThisClass, EvadeRate, COND_None);
 	DOREPLIFETIME_CONDITION_NOTIFY(ThisClass, PerformSpeed, COND_None, REPNOTIFY_Always);

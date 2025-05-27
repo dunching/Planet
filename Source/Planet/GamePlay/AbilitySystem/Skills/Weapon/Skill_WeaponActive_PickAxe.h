@@ -15,7 +15,7 @@ class UAbilityTask_PlayMontage;
 
 USTRUCT()
 struct FGameplayAbilityTargetData_Axe_RegisterParam :
-	public FGameplayAbilityTargetData_SkillBase_RegisterParam
+	public FGameplayAbilityTargetData_RegisterParam_SkillBase
 {
 	GENERATED_USTRUCT_BODY()
 

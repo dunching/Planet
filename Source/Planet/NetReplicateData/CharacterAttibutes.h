@@ -16,7 +16,7 @@ USTRUCT(BlueprintType)
 struct PLANET_API FCharacterGrowthAttribute : public FTableRowBase
 {
 	GENERATED_USTRUCT_BODY()
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 LevelExperience = 100;
 	

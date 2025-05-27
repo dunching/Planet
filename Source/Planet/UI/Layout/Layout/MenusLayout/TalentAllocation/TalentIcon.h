@@ -20,30 +20,39 @@ class PLANET_API UTalentIcon : public UMyUserWidget
 	GENERATED_BODY()
 
 public:
+	/**
+	 * 插槽，增加/删除
+	 * return 是否可以更改
+	 */
+	using FDelegateHandle = TDelegate<bool(
+		UTalentIcon*,
+		bool
+		)>;
 
-	// 
-	using FDelegateHandle = TCallbackHandleContainer<void(UTalentIcon*, bool)>;
-
-	void ResetPoint();
-
-	FTalentHelper GetTalentHelper()const;
+	void Reset();
+	
+	TSharedPtr<FCharacterProxy> CurrentProxyPtr = nullptr;
 
 protected:
+	virtual void NativeConstruct() override;
 
-	virtual void NativeConstruct()override;
-
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)override;
-
-	void ResetUI(const FTalentHelper& TalentHelper);
+	virtual FReply NativeOnMouseButtonDown(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent
+		) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UTalentIcon*NextSocletIcon = nullptr;
-	
-public:
+	UTalentIcon* NextSocletIcon = nullptr;
 
+public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FGameplayTag IconSocket;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int32 MaxNum = 3;
+
 	FDelegateHandle OnValueChanged;
 
+private:
+	void UpdateNum();
 };

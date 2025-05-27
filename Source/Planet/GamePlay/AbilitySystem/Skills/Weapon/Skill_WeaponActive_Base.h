@@ -14,7 +14,7 @@ class UAbilityTask_TimerHelper;
 class AWeapon_Base;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_WeaponActive_ActiveParam :
+struct FGameplayAbilityTargetData_ActiveParam_WeaponActive :
 	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -23,7 +23,7 @@ struct FGameplayAbilityTargetData_WeaponActive_ActiveParam :
 
 	virtual bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess) override;
 
-	virtual FGameplayAbilityTargetData_WeaponActive_ActiveParam* Clone()const override;
+	virtual FGameplayAbilityTargetData_ActiveParam_WeaponActive* Clone()const override;
 
 	bool bIsAutoContinue = false;
 
@@ -31,8 +31,8 @@ struct FGameplayAbilityTargetData_WeaponActive_ActiveParam :
 };
 
 template<>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_WeaponActive_ActiveParam> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_WeaponActive_ActiveParam>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam_WeaponActive> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam_WeaponActive>
 {
 	enum
 	{
@@ -47,7 +47,7 @@ class USkill_WeaponActive_Base : public USkill_Base
 
 public:
 
-	using FActiveParamType = FGameplayAbilityTargetData_WeaponActive_ActiveParam;
+	using FActiveParamType = FGameplayAbilityTargetData_ActiveParam_WeaponActive;
 
 	USkill_WeaponActive_Base();
 

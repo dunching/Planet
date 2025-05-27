@@ -49,7 +49,7 @@ bool FConsumableProxy::Active()
 	if (InventoryComponentPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		auto GameplayAbilityTargetPtr =
-			new FGameplayAbilityTargetData_Consumable;
+			new FGameplayAbilityTargetData_RegisterParam_Consumable;
 
 		// Test
 		GameplayAbilityTargetPtr->ProxyID = GetID();

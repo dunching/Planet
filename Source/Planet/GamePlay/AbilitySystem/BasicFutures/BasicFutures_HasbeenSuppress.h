@@ -18,7 +18,7 @@ class ACharacterBase;
 class UGE_CancelRunning;
 
 USTRUCT()
-struct PLANET_API FGameplayAbilityTargetData_HasbeenSuppress : public FGameplayAbilityTargetData_ActiveParam
+struct PLANET_API FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress : public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
 
@@ -30,7 +30,7 @@ struct PLANET_API FGameplayAbilityTargetData_HasbeenSuppress : public FGameplayA
 		bool& bOutSuccess
 		) override;
 
-	virtual FGameplayAbilityTargetData_HasbeenSuppress* Clone() const override;
+	virtual FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress* Clone() const override;
 
 	TWeakObjectPtr<ACharacterBase> InstigatorPtr = nullptr;
 
@@ -38,8 +38,8 @@ struct PLANET_API FGameplayAbilityTargetData_HasbeenSuppress : public FGameplayA
 };
 
 template <>
-struct TStructOpsTypeTraits<FGameplayAbilityTargetData_HasbeenSuppress> :
-	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_HasbeenSuppress>
+struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress> :
+	public TStructOpsTypeTraitsBase2<FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress>
 {
 	enum
 	{
@@ -55,7 +55,7 @@ class PLANET_API UBasicFutures_HasbeenSuppress : public UBasicFuturesBase
 {
 	GENERATED_BODY()
 
-	using FActiveParamType = FGameplayAbilityTargetData_HasbeenSuppress;
+	using FActiveParamType = FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress;
 
 public:
 	virtual void OnAvatarSet(

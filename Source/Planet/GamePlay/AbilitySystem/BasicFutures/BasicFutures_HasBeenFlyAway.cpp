@@ -4,12 +4,12 @@
 #include "CharacterBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-UScriptStruct* FGameplayAbilityTargetData_HasBeenFlyAway::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_HasBeenFlyAway::StaticStruct();
+	return FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_HasBeenFlyAway::NetSerialize(
+bool FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
@@ -22,10 +22,10 @@ bool FGameplayAbilityTargetData_HasBeenFlyAway::NetSerialize(
 	return true;
 }
 
-FGameplayAbilityTargetData_HasBeenFlyAway* FGameplayAbilityTargetData_HasBeenFlyAway::Clone() const
+FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway* FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_HasBeenFlyAway;
+		new FGameplayAbilityTargetData_ActiveParam_HasBeenFlyAway;
 
 	*ResultPtr = *this;
 

@@ -14,12 +14,12 @@
 #include "StateProcessorComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-UScriptStruct* FGameplayAbilityTargetData_HasbeenSuppress::GetScriptStruct() const
+UScriptStruct* FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress::GetScriptStruct() const
 {
-	return FGameplayAbilityTargetData_HasbeenSuppress::StaticStruct();
+	return FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress::StaticStruct();
 }
 
-bool FGameplayAbilityTargetData_HasbeenSuppress::NetSerialize(
+bool FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress::NetSerialize(
 	FArchive& Ar,
 	class UPackageMap* Map,
 	bool& bOutSuccess
@@ -33,10 +33,10 @@ bool FGameplayAbilityTargetData_HasbeenSuppress::NetSerialize(
 	return true;
 }
 
-FGameplayAbilityTargetData_HasbeenSuppress* FGameplayAbilityTargetData_HasbeenSuppress::Clone() const
+FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress* FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress::Clone() const
 {
 	auto ResultPtr =
-		new FGameplayAbilityTargetData_HasbeenSuppress;
+		new FGameplayAbilityTargetData_ActiveParam_HasbeenSuppress;
 
 	*ResultPtr = *this;
 
