@@ -7,10 +7,12 @@ public class Common_UMG : ModuleRules
 {
 	public Common_UMG(ReadOnlyTargetRules Target) : base(Target)
 	{
-		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
+		UndefinedIdentifierWarningLevel = WarningLevel.Error;
+		bWarningsAsErrors = true;
 		CppStandard = CppStandardVersion.Cpp20;
 
 		bUseRTTI = true;
@@ -18,11 +20,12 @@ public class Common_UMG : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
+				Path.Combine(PluginDirectory, "Source/WidgetScreenLayer"),
+				Path.Combine(PluginDirectory, "Source/ScaleableWidget"),
 				Path.Combine(PluginDirectory, "Source/Common_UMG"),
 				Path.Combine(PluginDirectory, "Source/Common_UMG/RichTextBlock"),
 			}
 			);
-				
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {

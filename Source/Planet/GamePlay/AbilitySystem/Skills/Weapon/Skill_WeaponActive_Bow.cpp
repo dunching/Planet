@@ -33,6 +33,8 @@
 #include "Weapon_Bow.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
 #include "KismetGravityLibrary.h"
 #include "LogWriter.h"
 #include "SceneProxyTable.h"

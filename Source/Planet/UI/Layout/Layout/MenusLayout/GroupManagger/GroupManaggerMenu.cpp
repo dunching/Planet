@@ -12,7 +12,7 @@
 #include "AssetRefMap.h"
 #include "InventoryComponent.h"
 #include "GenerateTypes.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"
@@ -73,9 +73,9 @@ void UGroupManaggerMenu::ResetGroupmates()
 	}
 
 	auto GroupManaggerPtr = PlayerCharacterPtr->GetGroupManagger();
-	auto HICPtr = GroupManaggerPtr->GetInventoryComponent();
+	auto InventoryComponentPtr = GroupManaggerPtr->GetInventoryComponent();
 
-	auto CharacterProxyAry = HICPtr->GetCharacterProxyAry();
+	auto CharacterProxyAry = InventoryComponentPtr->GetCharacterProxyAry();
 	for (auto Iter : CharacterProxyAry)
 	{
 		if (UGameplayTagsLibrary::Proxy_Character_Player == Iter->GetProxyType())

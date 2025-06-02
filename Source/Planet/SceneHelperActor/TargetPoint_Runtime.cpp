@@ -15,6 +15,7 @@
 #include "CollisionDataStruct.h"
 #include "PlanetGameViewportClient.h"
 #include "MarkPoints.h"
+#include "WidgetScreenLayer.h"
 
 const int32 CheckDistance = 500;
 

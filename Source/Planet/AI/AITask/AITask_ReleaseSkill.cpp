@@ -17,6 +17,8 @@
 #include "AssetRefMap.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAbilitySystemComponent.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
 
 UAITask_ReleaseSkill::UAITask_ReleaseSkill(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

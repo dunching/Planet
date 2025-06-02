@@ -12,7 +12,7 @@
 #include "AssetRefMap.h"
 #include "InventoryComponent.h"
 #include "GenerateTypes.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "CharacterBase.h"
 #include "GroupMateInfo.h"
 #include "PlanetControllerInterface.h"

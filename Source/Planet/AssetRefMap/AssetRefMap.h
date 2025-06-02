@@ -1,9 +1,9 @@
-// Zowee. All Rights Reserved.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AssetRefBase.h"
 
+#include "AssetRefBase.h"
 #include "GenerateTypes.h"
 #include "ItemProxy_Minimal.h"
 

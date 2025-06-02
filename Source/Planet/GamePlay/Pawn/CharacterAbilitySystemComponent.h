@@ -11,6 +11,7 @@
 #include "PlanetAbilitySystemComponent.h"
 #include "DataModifyInterface.h"
 #include "BaseData.h"
+#include "GameplayEffectDataModifyInterface.h"
 #include "GenerateTypes.h"
 
 #include "CharacterAbilitySystemComponent.generated.h"
@@ -27,6 +28,7 @@ class UCS_Base;
 class UCS_RootMotion_KnockDown;
 class USkill_Element_Metal;
 class UBasicFuturesBase;
+class ACharacterBase;
 class UAbilitySystemComponent;
 class IOutputDataModifyInterface;
 class IInputDataModifyInterface;
@@ -49,7 +51,8 @@ TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 UCLASS()
 class PLANET_API UCharacterAbilitySystemComponent :
 	public UPlanetAbilitySystemComponent,
-	public IGroupManaggerInterface
+	public IGroupManaggerInterface,
+	public IGameplayEffectDataModifyInterface
 {
 	GENERATED_BODY()
 
@@ -91,48 +94,15 @@ public:
 
 #pragma region 输入和输出得修正
 
-	void ModifyOutputData(
-		const FGameplayTagContainer & AllAssetTags,
-		TSet<FGameplayTag>& NeedModifySet,
-		TMap<FGameplayTag, float>& NewDatas,
-		TSet<EAdditionalModify>& AdditionalModifyAry,
-		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-		);
-
-	void ModifyInputData(
-		const FGameplayTagContainer & AllAssetTags,
-		TSet<FGameplayTag>& NeedModifySet,
-		TMap<FGameplayTag, float>& NewDatas,
-		TSet<EAdditionalModify>& AdditionalModifyAry,
-		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
-		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-		);
-
-	void ApplyInputData(
+	virtual void ApplyInputData(
 		const FGameplayTagContainer & AllAssetTags,
 		TSet<FGameplayTag>& NeedModifySet,
 		const TMap<FGameplayTag, float>& CustomMagnitudes,
 		const TSet<EAdditionalModify>& AdditionalModifyAry,
 		const FGameplayEffectCustomExecutionParameters& ExecutionParams,
 		FGameplayEffectCustomExecutionOutput& OutExecutionOutput
-		);
+		) override;
 
-	void AddOutputModify(
-		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
-		);
-
-	void RemoveOutputModify(
-		const TSharedPtr<IOutputDataModifyInterface>& GAEventModifySPtr
-		);
-
-	void AddInputModify(
-		const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
-		);
-
-	void RemoveInputModify(
-		const TSharedPtr<IInputDataModifyInterface>& GAEventModifySPtr
-		);
 #pragma endregion
 
 #pragma region 基础GA
@@ -313,21 +283,6 @@ public:
 		const FGameplayAttributeData* GameplayAttributeDataPtr
 		);
 
-	/**
-	 * 获取基础数据
-	 * @param Spec 
-	 * @param GameplayAttributeDataPtr 
-	 * @return 
-	 */
-	float GetBaseValueMaps(
-		const FGameplayEffectSpec& Spec,
-		const FGameplayAttributeData* GameplayAttributeDataPtr
-		) const;
-
-private:
-
-	void UpdateValueMap();
-	
 #pragma region 基础GA
 	/**
 	 * 基础GA
@@ -339,15 +294,4 @@ private:
 	TSubclassOf<USkill_Element_Metal> Skill_Element_GoldClass;
 #pragma endregion GAs
 
-	// 从小到大
-	std::multiset<TSharedPtr<IOutputDataModifyInterface>, FDataModify_key_compare> OutputDataModifysMap;
-
-	std::multiset<TSharedPtr<IInputDataModifyInterface>, FDataModify_key_compare> InputDataModifysMap;
-
-	/**
-	 * GameplayAttributeData的组成
-	 * 如HP仅有 DataSource_Character 基础组成
-	 * 而移速则会由 DataSource_Character 和减速时的减速buff 叠加负数
-	 */
-	TMap<const FGameplayAttributeData*, TMap<FGameplayTag, float>> ValueMap;
 };

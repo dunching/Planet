@@ -9,6 +9,9 @@
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Character.h"
 #include "InventoryComponent.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
+#include "ModifyItemProxyStrategy.h"
 
 FName UProxyProcessComponent::ComponentName = TEXT("ProxyProcessComponent");
 
@@ -314,10 +317,10 @@ TSharedPtr<FConsumableProxy> UProxyProcessComponent::FindConsumablesBySocket(con
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
 
-	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Consumable(Sockets.GetAllocationedProxyID());
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_Consumable>(Sockets.GetAllocationedProxyID());
 	if (SkillProxySPtr)
 	{
-		return DynamicCastSharedPtr<FConsumableProxy>(SkillProxySPtr);
+		return SkillProxySPtr;
 	}
 	return nullptr;
 }
@@ -502,7 +505,7 @@ TSharedPtr<FActiveSkillProxy> UProxyProcessComponent::FindActiveSkillBySocket(co
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
 
-	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Skill(Sockets.GetAllocationedProxyID());
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_ActiveSkill>(Sockets.GetAllocationedProxyID());
 	if (SkillProxySPtr)
 	{
 		return DynamicCastSharedPtr<FActiveSkillProxy>(SkillProxySPtr);
@@ -519,7 +522,7 @@ TSharedPtr<FPassiveSkillProxy> UProxyProcessComponent::FindPassiveSkillBySocket(
 
 	const auto Sockets = CharacterPtr->GetCharacterProxy()->FindSocket(SocketTag);
 
-	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Skill(Sockets.GetAllocationedProxyID());
+	auto SkillProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_PassveSkill>(Sockets.GetAllocationedProxyID());
 	if (SkillProxySPtr)
 	{
 		return DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxySPtr);

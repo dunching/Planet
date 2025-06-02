@@ -5,13 +5,14 @@
 #include <Components/Border.h>
 
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "TeamMateInfo.h"
 #include "HUD_TeamMateInfo.h"
 #include "CharacterBase.h"
 #include "TemplateHelper.h"
 #include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "TeamMatesHelperComponent.h"
 
 struct FHUD_TeamInfo : public TStructVariable<FHUD_TeamInfo>
 {

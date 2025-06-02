@@ -16,6 +16,7 @@
 #include "GameplayTagsLibrary.h"
 #include "Skill_WeaponActive_Bow.h"
 #include "ItemProxy_Minimal.h"
+#include "ItemProxy_Skills.h"
 #include "SceneProxyTable.h"
 
 void USkill_Active_Arrow_HomingToward::OnAvatarSet(

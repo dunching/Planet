@@ -20,13 +20,20 @@ public class PlanetEditorTarget : TargetRules
         // bOverrideBuildEnvironment = false;
 
         ExtraModuleNames.AddRange( new string[] {
+	        "EditTool",
+	        
+	        "AssetRef",
+	        "ChallengeSystem",
+	        "CommonType",
+	        "GameOptions",
+	        "GameplayTagsLibrary",
             "Planet",
-            "PlanetEditor",
+            "Planet_GroupManagger",
+            "Planet_GuideSystem",
+            "Planet_InputProcessor",
+            "Planet_ItemProxy",
+            "Planet_NPCGenerator",
             "Tools",
-            "GameplayTagsLibrary",
-            "CommonType",
-            "AssetRef",
-            "GameOptions",
         } );
 	}
 }

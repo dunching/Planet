@@ -27,7 +27,7 @@ void UTaskItem::NativeConstruct()
 }
 
 void UTaskItem::SetGuideThreadType(
-	const TSubclassOf<AGuideThread_Main>& GuideThreadClass
+	const TSubclassOf<AGuideThread_MainBase>& GuideThreadClass
 )
 {
 	MainGuideThreadClass = GuideThreadClass;
@@ -44,7 +44,7 @@ void UTaskItem::SetGuideThreadType(
 }
 
 void UTaskItem::SetGuideThreadType(
-	const TSubclassOf<AGuideThread_Branch>& GuideThreadClass
+	const TSubclassOf<AGuideThread_BranchBase>& GuideThreadClass
 )
 {
 	BrandGuideThreadClass = GuideThreadClass;

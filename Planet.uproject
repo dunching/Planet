@@ -2,6 +2,7 @@
 	"FileVersion": 3,
 	"EngineAssociation": "{0CD8EBCA-4C21-F1A1-4443-95B2FA556040}",
 	"Category": "",
+	"CreatedBy": "武侯笑笑生",
 	"Description": "",
 	"Modules": [
 		{
@@ -14,7 +15,7 @@
 			]
 		},
 		{
-			"Name": "PlanetEditor",
+			"Name": "EditTool",
 			"Type": "Editor",
 			"LoadingPhase": "Default"
 		}
@@ -61,6 +62,64 @@
 		},
 		{
 			"Name": "GameplayCameras",
+			"Enabled": true
+		},
+		
+		{
+			"Name": "ChaosVehiclesPlugin",
+			"Enabled": true
+		},
+
+		{
+			"Name": "Common_UMG",
+			"Enabled": true
+		},
+		{
+			"Name": "CommonUser",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayEffectDataModify",
+			"Enabled": true
+		},
+		{
+			"Name": "Gravity",
+			"Enabled": true
+		},
+		{
+			"Name": "GroupManagger",
+			"Enabled": true
+		},
+		{
+			"Name": "GuideSystem",
+			"Enabled": true
+		},
+		{
+			"Name": "ItemProxy",
+			"Enabled": true
+		},
+		{
+			"Name": "NetAbilitySystem",
+			"Enabled": true
+		},
+		{
+			"Name": "NPCGenerator",
+			"Enabled": true
+		},
+		{
+			"Name": "SceneActor",
+			"Enabled": true
+		},
+		{
+			"Name": "StateProcessor",
+			"Enabled": true
+		},
+		{
+			"Name": "Utils",
+			"Enabled": true
+		},
+		{
+			"Name": "Weather",
 			"Enabled": true
 		}
 	]

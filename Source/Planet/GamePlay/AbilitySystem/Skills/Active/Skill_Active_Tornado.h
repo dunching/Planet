@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "ItemDecription.h"
+#include "ItemProxy_Skills.h"
 #include "SceneProxyTable.h"
 
 #include "Skill_Active_Base.h"

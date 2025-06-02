@@ -4,4 +4,4 @@
 
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_MODULE( FDefaultGameModuleImpl, GameOptions );
+IMPLEMENT_MODULE( FDefaultModuleImpl, GameOptions );

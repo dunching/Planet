@@ -8,7 +8,7 @@
 
 #include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
-#include "GuideActor.h"
+#include "GuideActorBase.h"
 #include "GuideSubSystem.h"
 #include "GuideThread.h"
 #include "PlanetRichTextBlock.h"
@@ -39,7 +39,7 @@ void UGuideItem::NativeDestruct()
 	Super::NativeDestruct();
 }
 
-void UGuideItem::BindGuide(AGuideThread* NewGuidePtr)
+void UGuideItem::BindGuide(AGuideThreadBase* NewGuidePtr)
 {
 
 	CurrentLineGuidePtr = NewGuidePtr;
@@ -72,7 +72,7 @@ void UGuideItem::DisEnable()
 	ILayoutItemInterfacetion::DisEnable();
 }
 
-void UGuideItem::OnStopGuide(AGuideThread* NewGuidePtr)
+void UGuideItem::OnStopGuide(AGuideThreadBase* NewGuidePtr)
 {
 	if (CurrentLineGuidePtr == NewGuidePtr)
 	{

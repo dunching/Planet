@@ -42,29 +42,29 @@ AWeapon_Bow::AWeapon_Bow(const FObjectInitializer& ObjectInitializer) :
 	SetReplicatingMovement(true);
 }
 
-void AWeapon_Bow::AttachToCharacter(ACharacterBase* CharacterPtr)
+void AWeapon_Bow::AttachToCharacterBase(ACharacterBase* CharacterPtr)
 {
-	Super::AttachToCharacter(CharacterPtr);
-
+	Super::AttachToCharacterBase(CharacterPtr);
+	
 	// 注意：这里使用Lyra动画，添加到这个插槽之后Transform不正确，还不知道怎么改
 	AttachToComponent(CharacterPtr->GetCopyPoseMesh(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	BowActorPtr->AttachToComponent(
 		CharacterPtr->GetCopyPoseMesh(),
 		FAttachmentTransformRules::KeepRelativeTransform,
-	                               Bow_Socket);
+								   Bow_Socket);
 	
 	QuiverActorPtr->AttachToComponent(
 		CharacterPtr->GetCopyPoseMesh(),
 		FAttachmentTransformRules::KeepRelativeTransform,
-	                                  Quiver_Socket
-	                                  );
+									  Quiver_Socket
+									  );
 	
 	ArrowActorPtr->AttachToComponent(
 		BowActorPtr->GetSkeletalMeshComponent(),
-	                                 FAttachmentTransformRules::KeepRelativeTransform,
-	                                 Arrow_Socket
-	                                 );
+									 FAttachmentTransformRules::KeepRelativeTransform,
+									 Arrow_Socket
+									 );
 }
 
 USkeletalMeshComponent* AWeapon_Bow::GetMesh() const

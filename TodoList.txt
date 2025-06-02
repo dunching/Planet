@@ -1,5 +1,15 @@
-        // b*[^:b#/]+.*$
-		// E:\Projects\Planet_Dev\Source;E:\Projects\Planet_Dev\Plugins
+// b*[^:b#/]+.*$
+// E:\Projects\Planet_Dev\Source;E:\Projects\Planet_Dev\Plugins
+		
+		
+^(\S*\s+\S*\s+)(\S)(\S+)(.*)$
+
+\n+ClassRedirects=(OldName="/Script/Planet.$3",NewName="/Script/Planet_GuideSystem.$3")
+
+\n+StructRedirects=(OldName="/Script/Planet.$3",NewName="/Script/Planet_GuideSystem.$3")
+
+		
+		
 		
 在命令行中输入以下控制台命令，然后按 Enter ： n.bNavmeshAllowPartitionedBuildingFromEditor 1
 

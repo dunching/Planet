@@ -209,7 +209,7 @@ void UViewTaskMenu::OnActiveGuideThread()
 
 void UViewTaskMenu::ModifyTaskText()
 {
-	AGuideThread* GuideThreadPtr = nullptr;
+	AGuideThreadBase* GuideThreadPtr = nullptr;
 	if (TaskItemPtr->MainGuideThreadClass)
 	{
 		GuideThreadPtr = TaskItemPtr->MainGuideThreadClass.GetDefaultObject();

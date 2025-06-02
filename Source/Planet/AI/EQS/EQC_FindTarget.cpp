@@ -14,6 +14,7 @@
 #include "PlanetPlayerController.h"
 #include "HumanAIController.h"
 #include "StateProcessorComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 void UEQC_Test::ProvideContext(
 	FEnvQueryInstance& QueryInstance,

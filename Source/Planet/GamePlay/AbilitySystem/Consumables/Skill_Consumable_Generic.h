@@ -97,7 +97,7 @@ protected:
 
 	void OnGAEnd(UGameplayAbility* GAPtr);
 
-	AConsumable_Base* ConsumableActorPtr = nullptr;
+	APlanet_Consumable_Base* ConsumableActorPtr = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category = GE)
 	TSubclassOf<class UGameplayEffect> ConsumableGEClass;

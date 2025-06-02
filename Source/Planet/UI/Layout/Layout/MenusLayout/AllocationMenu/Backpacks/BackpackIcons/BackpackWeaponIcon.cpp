@@ -18,7 +18,7 @@
 #include "StateTagExtendInfo.h"
 #include "AssetRefMap.h"
 #include "ItemProxyDragDropOperation.h"
-#include "ItemProxyDragDropOperationWidget.h"
+#include "ItemProxy_Weapon.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
 

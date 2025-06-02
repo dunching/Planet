@@ -17,6 +17,7 @@
 #include "TemplateHelper.h"
 #include "TextSubSystem.h"
 #include "TextCollect.h"
+#include "WidgetScreenLayer.h"
 #include "Components/Button.h"
 #include "Kismet/KismetStringLibrary.h"
 

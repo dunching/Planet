@@ -25,11 +25,12 @@
 #include "AS_Character.h"
 #include "Weapon_PickAxe.h"
 #include "Tools.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "TeamMatesHelperComponent.h"
 
 namespace Skill_Active_ContinuousGroupTherapy
 {

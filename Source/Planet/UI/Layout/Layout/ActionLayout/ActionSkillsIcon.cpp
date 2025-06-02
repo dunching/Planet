@@ -32,6 +32,7 @@
 #include "Skill_Active_Base.h"
 #include "Skill_WeaponActive_Base.h"
 #include "ItemProxy_Minimal.h"
+#include "ItemProxy_Skills.h"
 #include "Tools.h"
 #include "StateProcessorComponent.h"
 

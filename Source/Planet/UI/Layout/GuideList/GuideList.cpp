@@ -1,18 +1,12 @@
 #include "GuideList.h"
 #include "PawnStateConsumablesHUD.h"
 
-#include <Components/GridPanel.h>
-#include <Kismet/GameplayStatics.h>
-#include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
 
-#include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
-#include "GuideActor.h"
 #include "GuideSubSystem.h"
 #include "GuideThread.h"
 #include "PlanetRichTextBlock.h"
-#include "ProxyProcessComponent.h"
 #include "GuideItem.h"
 
 struct FGuideList : public TStructVariable<FGuideList>
@@ -53,7 +47,7 @@ void UGuideList::DisEnable()
 	ILayoutItemInterfacetion::DisEnable();
 }
 
-void UGuideList::OnStartGuide(AGuideThread* NewGuidePtr)
+void UGuideList::OnStartGuide(AGuideThreadBase* NewGuidePtr)
 {
 	if (NewGuidePtr)
 	{

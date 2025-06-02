@@ -19,6 +19,8 @@
 #include "GE_Common.h"
 #include "GroupManagger.h"
 #include "InventoryComponent.h"
+#include "ItemProxy_Skills.h"
+#include "ModifyItemProxyStrategy.h"
 #include "OnEffectedTawrgetCallback.h"
 
 void UItemDecription_Skill_PassiveSkill_XR::SetUIStyle()
@@ -28,7 +30,7 @@ void UItemDecription_Skill_PassiveSkill_XR::SetUIStyle()
 void USkill_Passive_XR::OnAvatarSet(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
-)
+	)
 {
 	Super::OnAvatarSet(ActorInfo, Spec);
 
@@ -42,8 +44,8 @@ void USkill_Passive_XR::OnAvatarSet(
 		{
 			AbilityActivatedCallbacksHandle =
 				CharacterPtr->GetCharacterAbilitySystemComponent()->MakedDamageDelegate.AddCallback(
-					std::bind(&ThisClass::MakedDamageDelegate, this, std::placeholders::_1)
-				);
+					 std::bind(&ThisClass::MakedDamageDelegate, this, std::placeholders::_1)
+					);
 		}
 	}
 #endif
@@ -51,15 +53,17 @@ void USkill_Passive_XR::OnAvatarSet(
 	if (SkillProxyPtr)
 	{
 		ItemProxy_DescriptionPtr = Cast<FItemProxy_DescriptionType>(
-			DynamicCastSharedPtr<FPassiveSkillProxy>(SkillProxyPtr)->GetTableRowProxy_PassiveSkillExtendInfo()
-		);
+		                                                            DynamicCastSharedPtr<FPassiveSkillProxy>(
+			                                                             SkillProxyPtr
+			                                                            )->GetTableRowProxy_PassiveSkillExtendInfo()
+		                                                           );
 	}
 }
 
 void USkill_Passive_XR::OnRemoveAbility(
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilitySpec& Spec
-)
+	)
 {
 	if (AbilityActivatedCallbacksHandle)
 	{
@@ -71,7 +75,7 @@ void USkill_Passive_XR::OnRemoveAbility(
 
 void USkill_Passive_XR::MakedDamageDelegate(
 	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
-)
+	)
 {
 	if (CharacterPtr)
 	{
@@ -82,25 +86,25 @@ void USkill_Passive_XR::MakedDamageDelegate(
 
 			TArray<TSharedPtr<FActiveSkillProxy>> ActiveSkillProxyAry;
 			const auto ActiveSocket_1 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::ActiveSocket_1);
-			auto ActiveSkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(
-					HoldingItemsComponentPtr->FindProxy_Skill(ActiveSocket_1.GetAllocationedProxyID())
+			auto ActiveSkillProxySPtr = HoldingItemsComponentPtr->FindProxy<FModifyItemProxyStrategy_ActiveSkill>(
+				 ActiveSocket_1.GetAllocationedProxyID()
 				);
 			if (ActiveSkillProxySPtr && !ActiveSkillProxySPtr->CheckNotInCooldown())
 			{
 				ActiveSkillProxyAry.Add(
-				ActiveSkillProxySPtr
-				);
+				                        ActiveSkillProxySPtr
+				                       );
 			}
 
 			const auto ActiveSocket_2 = CharacterProxySPtr->FindSocket(UGameplayTagsLibrary::ActiveSocket_2);
-			ActiveSkillProxySPtr = DynamicCastSharedPtr<FActiveSkillProxy>(
-					HoldingItemsComponentPtr->FindProxy_Skill(ActiveSocket_2.GetAllocationedProxyID())
+			ActiveSkillProxySPtr = HoldingItemsComponentPtr->FindProxy<FModifyItemProxyStrategy_ActiveSkill>(
+				 ActiveSocket_2.GetAllocationedProxyID()
 				);
 			if (ActiveSkillProxySPtr && !ActiveSkillProxySPtr->CheckNotInCooldown())
 			{
 				ActiveSkillProxyAry.Add(
-				ActiveSkillProxySPtr
-				);
+				                        ActiveSkillProxySPtr
+				                       );
 			}
 
 			if (!ActiveSkillProxyAry.IsEmpty())
@@ -110,7 +114,10 @@ void USkill_Passive_XR::MakedDamageDelegate(
 					const auto Index = FMath::RandRange(0, ActiveSkillProxyAry.Num() - 1);
 					if (ActiveSkillProxyAry[Index])
 					{
-						ActiveSkillProxyAry[Index]->AddCooldownConsumeTime(-ItemProxy_DescriptionPtr->CD.PerLevelValue[0]);
+						ActiveSkillProxyAry[Index]->AddCooldownConsumeTime(
+						                                                   -ItemProxy_DescriptionPtr->CD.PerLevelValue[
+							                                                   0]
+						                                                  );
 						break;
 					}
 				}

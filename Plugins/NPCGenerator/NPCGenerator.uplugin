@@ -1,0 +1,18 @@
+{
+	"FileVersion": 1,
+	"Version": 1,
+	"VersionName": "1",
+	"FriendlyName": "NPCGenerator",
+	"Category": "Other",
+	"CreatedBy": "武侯笑笑生",
+	"Modules": [
+		{
+			"Name": "NPCGenerator",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		}
+	]
+}

@@ -11,6 +11,8 @@
 
 struct FStreamableHandle;
 
+struct FCharacterProxy;
+
 /**
  *
  */

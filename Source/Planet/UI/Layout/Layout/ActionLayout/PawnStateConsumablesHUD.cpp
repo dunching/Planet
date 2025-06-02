@@ -6,7 +6,7 @@
 #include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
 #include "ProxyProcessComponent.h"
-
+#include "ItemProxy_Consumable.h"
 
 struct FPawnStateConsumablesHUD : public TStructVariable<FPawnStateConsumablesHUD>
 {

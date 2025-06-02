@@ -9,7 +9,6 @@
 #include "Character/GravityCharacter.h"
 
 #include "GroupManaggerInterface.h"
-#include "ItemProxy_Minimal.h"
 #include "PlanetAbilitySystemComponent.h"
 #include "SceneActorInteractionInterface.h"
 #include "TemplateHelper.h"
@@ -49,6 +48,8 @@ class UConversationComponent;
 class UWidgetComponent;
 class AGroupManagger;
 
+struct FCharacterProxy;
+
 UCLASS()
 class PLANET_API ACharacterBase :
 	public AGravityCharacter,
@@ -67,6 +68,7 @@ public:
 	using FProcessedGAEventHandle =
 	TCallbackHandleContainer<void(
 		const FGameplayAbilityTargetData_GAReceivedEvent&
+		
 		)>::FCallbackHandleSPtr;
 
 	using FOnInitaliedGroupSharedInfo =

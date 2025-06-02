@@ -13,13 +13,14 @@ class UPrimitiveComponent;
 class UNiagaraComponent;
 class UAnimMontage;
 
+class UItemProxy_Description_WeaponSkill;
 class AWeapon_Bow;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
 class ASkill_WeaponActive_Bow_Projectile;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Bow_RegisterParam :
+struct PLANET_API FGameplayAbilityTargetData_Bow_RegisterParam :
 	public FGameplayAbilityTargetData_RegisterParam_SkillBase
 {
 	GENERATED_USTRUCT_BODY()

@@ -26,6 +26,7 @@
 #include "AssetRefMap.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CoinList.h"
+#include "ItemProxy_Coin.h"
 
 struct FTransactionLayout : public TStructVariable<FTransactionLayout>
 {
@@ -130,7 +131,9 @@ void UInteractionTransactionLayout::Enable()
 		                                                                       );
 
 	auto CoinSPtr = Cast<APlanetPlayerController>(UGameplayStatics::GetPlayerController(this, 0))->
-	                GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
+	                GetInventoryComponent()->FindProxyType<FModifyItemProxyStrategy_Coin>(
+		                 UGameplayTagsLibrary::Proxy_Coin_Regular
+		                );
 	if (CoinSPtr)
 	{
 		OnCoinChangedDelegateHandle = CoinSPtr->CallbackContainerHelper.AddOnValueChanged(
@@ -142,34 +145,83 @@ void UInteractionTransactionLayout::Enable()
 	{
 		CharacterPtr = CurrentActionSPtr->CharacterPtr;
 		auto InventoryComponentPtr = CharacterPtr->GetInventoryComponent();
-
-		OnSkillProxyChangedDelegateHandle = InventoryComponentPtr->OnSkillProxyChanged.AddCallback(
-			 std::bind(
-			           &ThisClass::OnTraderSkillProxyChanged,
-			           this,
-			           std::placeholders::_1,
-			           std::placeholders::_2
-			          )
-			);
-
-		OnWeaponProxyChangedDelegateHandle = InventoryComponentPtr->OnWeaponProxyChanged.AddCallback(
-			 std::bind(
-			           &ThisClass::OnTraderWeaponProxyChanged,
-			           this,
-			           std::placeholders::_1,
-			           std::placeholders::_2
-			          )
-			);
-
-		OnConsumableProxyChangedDelegateHandle = InventoryComponentPtr->OnConsumableProxyChanged.AddCallback(
-			 std::bind(
-			           &ThisClass::OnTraderConsumableProxyChanged,
-			           this,
-			           std::placeholders::_1,
-			           std::placeholders::_2,
-			           std::placeholders::_3
-			          )
-			);
+		{
+			auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+				FModifyItemProxyStrategy_WeaponSkill>();
+			if (ModifyItemProxyStrategySPtr)
+			{
+				OnWeaponSkillProxyChangedDelegateHandle = ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+					           &ThisClass::OnTraderSkillProxyChanged,
+					           this,
+					           std::placeholders::_1,
+					           std::placeholders::_2
+					          )
+					);
+			}
+		}
+		{
+			auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+				FModifyItemProxyStrategy_ActiveSkill>();
+			if (ModifyItemProxyStrategySPtr)
+			{
+				OnActiveSkillProxyChangedDelegateHandle = ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+					           &ThisClass::OnTraderSkillProxyChanged,
+					           this,
+					           std::placeholders::_1,
+					           std::placeholders::_2
+					          )
+					);
+			}
+		}
+		{
+			auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+				FModifyItemProxyStrategy_PassveSkill>();
+			if (ModifyItemProxyStrategySPtr)
+			{
+				OnPassiveSkillProxyChangedDelegateHandle = ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+					           &ThisClass::OnTraderSkillProxyChanged,
+					           this,
+					           std::placeholders::_1,
+					           std::placeholders::_2
+					          )
+					);
+			}
+		}
+		{
+			auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+				FModifyItemProxyStrategy_Weapon>();
+			if (ModifyItemProxyStrategySPtr)
+			{
+				OnWeaponProxyChangedDelegateHandle = ModifyItemProxyStrategySPtr->OnWeaponProxyChanged.AddCallback(
+					 std::bind(
+					           &ThisClass::OnTraderWeaponProxyChanged,
+					           this,
+					           std::placeholders::_1,
+					           std::placeholders::_2
+					          )
+					);
+			}
+		}
+		{
+			auto ModifyItemProxyStrategySPtr = InventoryComponentPtr->GetModifyItemProxyStrategy<
+				FModifyItemProxyStrategy_Consumable>();
+			if (ModifyItemProxyStrategySPtr)
+			{
+				OnConsumableProxyChangedDelegateHandle = ModifyItemProxyStrategySPtr->OnConsumableProxyChanged.
+					AddCallback(
+					            std::bind(
+					                      &ThisClass::OnTraderConsumableProxyChanged,
+					                      this,
+					                      std::placeholders::_1,
+					                      std::placeholders::_2,
+					                      std::placeholders::_3
+					                     )
+					           );
+			}
+		}
 
 		auto UIPtr = Cast<UTileView>(GetWidgetFromName(FTransactionLayout::Get().TileView));
 		if (UIPtr)
@@ -200,9 +252,19 @@ void UInteractionTransactionLayout::Enable()
 
 void UInteractionTransactionLayout::DisEnable()
 {
-	if (OnSkillProxyChangedDelegateHandle)
+	if (OnWeaponSkillProxyChangedDelegateHandle)
 	{
-		OnSkillProxyChangedDelegateHandle->UnBindCallback();
+		OnWeaponSkillProxyChangedDelegateHandle->UnBindCallback();
+	}
+
+	if (OnActiveSkillProxyChangedDelegateHandle)
+	{
+		OnActiveSkillProxyChangedDelegateHandle->UnBindCallback();
+	}
+
+	if (OnPassiveSkillProxyChangedDelegateHandle)
+	{
+		OnPassiveSkillProxyChangedDelegateHandle->UnBindCallback();
 	}
 
 	if (OnWeaponProxyChangedDelegateHandle)
@@ -232,8 +294,9 @@ void UInteractionTransactionLayout::OnQuitClicked()
 {
 	auto CurrentActionSPtr =
 		DynamicCastSharedPtr<HumanProcessor::FHumanInteractionBaseProcessor>(
-			UInputProcessorSubSystem::GetInstance()->GetCurrentAction()
-		);
+		                                                                     UInputProcessorSubSystem::GetInstance()->
+		                                                                     GetCurrentAction()
+		                                                                    );
 
 	if (CurrentActionSPtr)
 	{
@@ -537,7 +600,7 @@ inline void UInteractionTransactionLayout::NewNum(
 	}
 
 	auto CoinSPtr = PCPtr->
-	                GetInventoryComponent()->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_Regular);
+	                GetInventoryComponent()->FindProxyType<FModifyItemProxyStrategy_Coin>(UGameplayTagsLibrary::Proxy_Coin_Regular);
 
 	if (CoinSPtr && CurrentProxyPtr)
 	{

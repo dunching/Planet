@@ -45,7 +45,7 @@ void UOptionList::DisEnable()
 
 void UOptionList::UpdateDisplay(
 	AHumanCharacter_AI* InTargetCharacterPtr,
-	const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
+	const std::function<void(const TSubclassOf<AGuideInteractionBase>&)>& InCallback
 )
 {
 	TargetCharacterPtr = InTargetCharacterPtr;
@@ -78,7 +78,7 @@ void UOptionList::UpdateDisplay(
 
 void UOptionList::UpdateDisplay(
 	ISceneActorInteractionInterface* InSceneActorInteractionInterfacePtr,
-	const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
+	const std::function<void(const TSubclassOf<AGuideInteractionBase>&)>& InCallback
 )
 {
 	SceneActorInteractionInterfacePtr = InSceneActorInteractionInterfacePtr;

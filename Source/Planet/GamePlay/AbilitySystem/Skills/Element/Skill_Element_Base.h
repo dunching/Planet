@@ -6,6 +6,7 @@
 
 #include "Skill_Base.h"
 #include "ItemProxy_Minimal.h"
+#include "ItemProxy_Skills.h"
 #include "SceneProxyTable.h"
 
 #include "Skill_Element_Base.generated.h"

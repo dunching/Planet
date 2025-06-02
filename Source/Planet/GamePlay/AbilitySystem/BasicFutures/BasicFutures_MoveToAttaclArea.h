@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -9,6 +9,7 @@
 
 #include "BasicFuturesBase.h"
 #include "GenerateTypes.h"
+#include "TemplateHelper.h"
 
 #include "BasicFutures_MoveToAttaclArea.generated.h"
 

@@ -15,6 +15,7 @@
 
 struct FBasicProxy;
 struct FToolProxy;
+struct FConsumableProxy;
 
 struct FStreamableHandle;
 

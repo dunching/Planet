@@ -10,6 +10,7 @@
 #include "MenuInterface.h"
 #include "PlanetControllerInterface.h"
 #include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 
 struct FMainMenuLayout : public TStructVariable<FMainMenuLayout>
 {

@@ -28,7 +28,7 @@ AWeapon_HandProtection::AWeapon_HandProtection(const FObjectInitializer& ObjectI
 	RightSkeletalComponentPtr->SetupAttachment(RootComponent);
 }
 
-void AWeapon_HandProtection::AttachToCharacter(ACharacterBase* CharacterPtr)
+void AWeapon_HandProtection::AttachToCharacter(ACharacter* CharacterPtr)
 {
 	Super::AttachToCharacter(CharacterPtr);
 

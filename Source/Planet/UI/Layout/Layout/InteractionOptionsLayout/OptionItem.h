@@ -15,9 +15,9 @@
 class AGuideActor;
 class UPAD_TaskNode_Guide;
 class UPAD_TaskNode_Interaction;
-class AGuideInteraction_Actor;
+class AGuideInteractionBase;
 
-using FOnClickedInteractionItem =  TMulticastDelegate<void(const TSubclassOf<AGuideInteraction_Actor>&)>;
+using FOnClickedInteractionItem =  TMulticastDelegate<void(const TSubclassOf<AGuideInteractionBase>&)>;
 
 using FOnClickedIndex =  TMulticastDelegate<void(int32)>;
 
@@ -35,8 +35,8 @@ public:
 	virtual void NativeDestruct() override;
 
 	void SetData(
-		const TSubclassOf<AGuideInteraction_Actor>&TaskNode,
-		const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
+		const TSubclassOf<AGuideInteractionBase>&TaskNode,
+		const std::function<void(const TSubclassOf<AGuideInteractionBase>&)>& InCallback
 		);
 
 	void SetData(
@@ -52,7 +52,7 @@ protected:
 	UFUNCTION()
 	void OnClicked();
 	
-	TSubclassOf<AGuideInteraction_Actor> TaskNode;
+	TSubclassOf<AGuideInteractionBase> TaskNode;
 
 	FOnClickedInteractionItem OnClickedInteractionItem;
 	

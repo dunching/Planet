@@ -1,4 +1,3 @@
-
 #include "ArticleBase.h"
 
 #include "Components/SceneComponent.h"
@@ -7,8 +6,10 @@
 #include "CollisionDataStruct.h"
 #include "GameInstance/PlanetGameInstance.h"
 
-ARawMaterialBase::ARawMaterialBase(const FObjectInitializer& ObjectInitializer) :
-	Super(ObjectInitializer)
+ARawMaterialBase::ARawMaterialBase(
+	const FObjectInitializer& ObjectInitializer
+	) :
+	  Super(ObjectInitializer)
 {
 	SceneCompPtr = CreateDefaultSubobject<USceneComponent>(ARawMaterialBase::SceneCompName);
 	SceneCompPtr->SetMobility(EComponentMobility::Static);
@@ -19,7 +20,9 @@ ARawMaterialBase::ARawMaterialBase(const FObjectInitializer& ObjectInitializer) 
 	StaticMeshCompPtr->SetupAttachment(SceneCompPtr);
 }
 
-void ARawMaterialBase::OnConstruction(const FTransform& Transform)
+void ARawMaterialBase::OnConstruction(
+	const FTransform& Transform
+	)
 {
 	Super::OnConstruction(Transform);
 }
@@ -27,17 +30,44 @@ void ARawMaterialBase::OnConstruction(const FTransform& Transform)
 void ARawMaterialBase::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
+USceneActorInteractionComponent* ARawMaterialBase::GetSceneActorInteractionComponent() const
+{
+	return nullptr;
+}
+
+void ARawMaterialBase::HasbeenInteracted(
+	ACharacterBase* CharacterPtr
+	)
+{
+}
+
+void ARawMaterialBase::HasBeenStartedLookAt(
+	ACharacterBase* CharacterPtr
+	)
+{
+}
+
+void ARawMaterialBase::HasBeenLookingAt(
+	ACharacterBase* CharacterPtr
+	)
+{
+}
+
+void ARawMaterialBase::HasBeenEndedLookAt()
+{
 }
 
 FName ARawMaterialBase::SceneCompName = TEXT("SceneComp");
 
 FName ARawMaterialBase::StaticMeshCompName = TEXT("StaticMeshComp");
 
-URawMaterialInteractionComponent::URawMaterialInteractionComponent(const FObjectInitializer& ObjectInitializer):
-	Super(ObjectInitializer)
+URawMaterialInteractionComponent::URawMaterialInteractionComponent(
+	const FObjectInitializer& ObjectInitializer
+	):
+	 Super(ObjectInitializer)
 {
-
 }
 
 EPickType URawMaterialInteractionComponent::GetPickType() const

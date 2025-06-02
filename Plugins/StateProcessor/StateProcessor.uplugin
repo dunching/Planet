@@ -1,11 +1,11 @@
 {
-	"FileVersion": 3,
+	"FileVersion": 1,
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "StateProcessor",
 	"Description": "状态模式",
 	"Category": "Other",
-	"CreatedBy": "",
+	"CreatedBy": "武侯笑笑生",
 	"CreatedByURL": "",
 	"DocsURL": "",
 	"MarketplaceURL": "",
@@ -18,7 +18,16 @@
 		{
 			"Name": "StateProcessor",
 			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Utils",
+			"Enabled": true
 		}
 	]
 }

@@ -15,7 +15,6 @@
 #include "Components/SizeBox.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Engine/Texture2D.h"
-#include "ToolsLibrary.h"
 #include "BackpackIcon.h"
 
 #include "StateTagExtendInfo.h"
@@ -26,6 +25,7 @@
 #include "ProxyProcessComponent.h"
 #include "Skill_Base.h"
 #include "GameplayTagsLibrary.h"
+#include "ItemProxy_Consumable.h"
 #include "Skill_Active_Base.h"
 
 #include "Skill_Consumable_Generic.h"

@@ -12,9 +12,10 @@ class UAnimMontage;
 class AWeapon_PickAxe;
 class ACharacterBase;
 class UAbilityTask_PlayMontage;
+class UItemProxy_Description_WeaponSkill;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_Axe_RegisterParam :
+struct PLANET_API FGameplayAbilityTargetData_Axe_RegisterParam :
 	public FGameplayAbilityTargetData_RegisterParam_SkillBase
 {
 	GENERATED_USTRUCT_BODY()

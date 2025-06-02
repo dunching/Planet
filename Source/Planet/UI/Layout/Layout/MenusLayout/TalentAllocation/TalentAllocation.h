@@ -13,6 +13,10 @@
 
 class UTalentIcon;
 
+struct FCharacterProxy;
+
+UTalentIcon;
+
 /**
  *
  */

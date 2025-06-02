@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "BasicFutures_DisMount.h"
 

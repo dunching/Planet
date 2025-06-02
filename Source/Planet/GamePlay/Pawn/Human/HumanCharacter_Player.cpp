@@ -33,6 +33,7 @@
 #include "STT_CommonData.h"
 #include "UIManagerSubSystem.h"
 #include "PlanetGameplayCameraComponent.h"
+#include "TeamMatesHelperComponent.h"
 
 namespace HumanProcessor
 {
@@ -126,7 +127,7 @@ void UCharacterPlayerStateProcessorComponent::OnGameplayEffectTagCountChanged(
 	)
 {
 	Super::OnGameplayEffectTagCountChanged(Tag, Count);
-	
+
 	auto Lambda = [&]
 	{
 		const auto Value = Count > 0;
@@ -149,7 +150,7 @@ void UCharacterPlayerStateProcessorComponent::SetFocusCharactersAry(
 	if (TargetCharacterPtr && TargetCharacterPtr != PreviousFocusCharactersPtr)
 	{
 		PreviousFocusCharactersPtr = TargetCharacterPtr;
-		
+
 		TargetCharacterPtr->OnDestroyed.AddDynamic(this, &ThisClass::OnFocusCharacterDestroyed);
 		OnGameplayEffectTagCountChangedHandle = TargetCharacterPtr->GetCharacterAbilitySystemComponent()->
 		                                                            RegisterGenericGameplayTagEvent().AddUObject(
@@ -253,16 +254,21 @@ AHumanCharacter_Player::AHumanCharacter_Player(
 void AHumanCharacter_Player::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
 		// BUG,先暂时这样处理
 		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(TimerHandle, [this]
-		{
-			AdjustCamera(UGameOptions::GetInstance()->DefaultBoomLength);
-		}, 1, true);
+		GetWorldTimerManager().SetTimer(
+		                                TimerHandle,
+		                                [this]
+		                                {
+			                                AdjustCamera(UGameOptions::GetInstance()->DefaultBoomLength);
+		                                },
+		                                1,
+		                                true
+		                               );
 	}
 #endif
 }
@@ -324,7 +330,7 @@ void AHumanCharacter_Player::OnRep_GroupSharedInfoChanged()
 	{
 	}
 #endif
-	
+
 #if UE_EDITOR || UE_CLIENT
 	if (GetLocalRole() == ROLE_AutonomousProxy)
 	{
@@ -507,7 +513,8 @@ void AHumanCharacter_Player::EndLookAt()
 }
 
 bool AHumanCharacter_Player::InteractionSceneActor(
-	ASceneActor* SceneObjPtr
+	ASceneActor* SceneObjPtr,
+	ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
 	)
 {
 	if (!SceneObjPtr)
@@ -515,22 +522,27 @@ bool AHumanCharacter_Player::InteractionSceneActor(
 		return false;
 	}
 
+	if (!SceneActorInteractionInterfacePtr)
+	{
+		return false;
+	}
+
 	if (SceneObjPtr->IsA(AResourceBoxBase::StaticClass()))
 	{
 		//
-		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
+		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneActorInteractionInterfacePtr);
 
 		InteractionSceneObj_Server(SceneObjPtr);
 	}
 	else if (SceneObjPtr->IsA(AChallengeEntry::StaticClass()))
 	{
 		//
-		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
+		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneActorInteractionInterfacePtr);
 
 		// 隐藏交互提示
 		if (SceneObjPtr)
 		{
-			SceneObjPtr->HasBeenEndedLookAt();
+			SceneActorInteractionInterfacePtr->HasBeenEndedLookAt();
 		}
 
 		// 
@@ -548,7 +560,7 @@ bool AHumanCharacter_Player::InteractionSceneActor(
 	else
 	{
 		//
-		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneObjPtr);
+		GetSceneCharacterPlayerInteractionComponent()->OnPlayerInteraction.Broadcast(SceneActorInteractionInterfacePtr);
 
 		InteractionSceneObj_Server(SceneObjPtr);
 	}
@@ -596,8 +608,16 @@ void AHumanCharacter_Player::InteractionSceneObj_Server_Implementation(
 	ASceneActor* SceneObjPtr
 	)
 {
-	if (SceneObjPtr)
+	if (!SceneObjPtr)
 	{
-		SceneObjPtr->HasbeenInteracted(this);
+		return;
 	}
+	
+	auto InterfacePtr = Cast<ISceneActorInteractionInterface>(SceneObjPtr);
+	if (!InterfacePtr)
+	{
+		return;
+	}
+	
+	InterfacePtr->HasbeenInteracted(this);
 }

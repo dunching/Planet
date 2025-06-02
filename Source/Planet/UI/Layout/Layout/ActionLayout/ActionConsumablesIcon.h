@@ -16,6 +16,7 @@
 struct FStreamableHandle;
 
 struct FSkillProxy;
+struct FConsumableProxy;
 
 /**
  *

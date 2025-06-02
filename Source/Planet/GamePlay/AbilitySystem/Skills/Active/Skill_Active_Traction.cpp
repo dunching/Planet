@@ -17,6 +17,7 @@
 #include "CharacterStateInfo.h"
 #include "StateProcessorComponent.h"
 #include "AbilityTask_PlayMontage.h"
+#include "ItemProxy_Skills.h"
 #include "TractionActor.h"
 
 void UItemDecription_Skill_Active_Traction::SetUIStyle()

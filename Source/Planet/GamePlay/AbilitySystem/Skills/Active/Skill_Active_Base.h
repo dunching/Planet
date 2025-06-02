@@ -6,17 +6,19 @@
 
 #include "Skill_Base.h"
 #include "ItemProxy_Minimal.h"
+#include "PlanetGameplayAbility.h"
 
 #include "Skill_Active_Base.generated.h"
 
 struct FBasicProxy;
 struct FActiveSkillProxy;
 class UAbilityTask_TimerHelper;
+class UItemProxy_Description_ActiveSkill;
 struct FCanbeInteractionInfo;
 struct FSkillCooldownHelper;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_ActiveSkill_ActiveParam : 
+struct PLANET_API FGameplayAbilityTargetData_ActiveSkill_ActiveParam : 
 	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -44,7 +46,7 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveSkill_ActiveParam> 
  * 主动触发的节能
  */
 UCLASS()
-class USkill_Active_Base :
+class PLANET_API USkill_Active_Base :
 	public USkill_Base
 {
 	GENERATED_BODY()

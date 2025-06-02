@@ -2,38 +2,30 @@
 
 #include "Abilities/GameplayAbilityTypes.h"
 #include "AbilitySystemBlueprintLibrary.h"
-#include "NiagaraComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "UObject/Class.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "AbilitySystemComponent.h"
-#include "Abilities/Tasks/AbilityTask_Repeat.h"
 #include "GameFramework/Controller.h"
 
-
 #include "CharacterBase.h"
-#include "ProxyProcessComponent.h"
 #include "ToolFuture_Base.h"
 #include "AbilityTask_PlayMontage.h"
 #include "AbilityTask_PlayAnimAndWaitOverride.h"
 #include "ToolFuture_PickAxe.h"
-#include "PlanetModule.h"
 #include "CollisionDataStruct.h"
 #include "CharacterAttributesComponent.h"
-#include "AbilityTask_TimerHelper.h"
-#include "AssetRefMap.h"
-#include "AS_Character.h"
 #include "Weapon_PickAxe.h"
-#include "GE_Common.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
-#include "GameplayTagsLibrary.h"
+#include "SceneProxyTable.h"
 #include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "ItemProxy_Skills.h"
 #include "LogWriter.h"
 #include "PlanetGameplayAbilityTargetTypes.h"
-#include "SceneProxyTable.h"
+#include "TeamMatesHelperComponent.h"
 #include "Tools.h"
 
 struct FSkill_WeaponActive_PickAxe : public TStructVariable<FSkill_WeaponActive_PickAxe>
@@ -317,9 +309,9 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 
 			AbilityTask_PlayMontage_HumanPtr->Ability = this;
 			AbilityTask_PlayMontage_HumanPtr->SetAbilitySystemComponent(
-			                                                            CharacterPtr->
-			                                                            GetCharacterAbilitySystemComponent()
-			                                                           );
+																		CharacterPtr->
+																		GetCharacterAbilitySystemComponent()
+																	   );
 			AbilityTask_PlayMontage_HumanPtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			AbilityTask_PlayMontage_HumanPtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontageOnInterrupted);
 
@@ -338,9 +330,9 @@ void USkill_WeaponActive_PickAxe::PlayMontage()
 
 			AbilityTask_PlayMontage_PickAxePtr->Ability = this;
 			AbilityTask_PlayMontage_PickAxePtr->SetAbilitySystemComponent(
-			                                                              CharacterPtr->
-			                                                              GetCharacterAbilitySystemComponent()
-			                                                             );
+																		  CharacterPtr->
+																		  GetCharacterAbilitySystemComponent()
+																		 );
 			// AbilityTask_PlayMontage_PickAxePtr->OnCompleted.BindUObject(this, &ThisClass::OnMontageComplete);
 			// AbilityTask_PlayMontage_PickAxePtr->OnInterrupted.BindUObject(this, &ThisClass::OnMontateComplete);
 

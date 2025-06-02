@@ -18,6 +18,7 @@ class UAllocationIconBase;
 struct FWeaponProxy;
 struct IProxy_Allocationble;
 struct FCharacterProxy;
+struct FCharacterProxy;
 
 /**
  *

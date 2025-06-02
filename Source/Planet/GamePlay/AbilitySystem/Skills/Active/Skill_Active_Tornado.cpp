@@ -29,6 +29,7 @@
 #include "Tornado.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
+#include "ItemProxy_Skills.h"
 #include "Components/RichTextBlock.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetStringLibrary.h"

@@ -40,6 +40,7 @@
 #include "GameplayCameraCommon.h"
 #include "GameplayCameraHelper.h"
 #include "HumanCharacter_Player.h"
+#include "ItemProxy_Skills.h"
 #include "KismetGravityLibrary.h"
 #include "NiagaraActor.h"
 #include "PlanetPlayerController.h"

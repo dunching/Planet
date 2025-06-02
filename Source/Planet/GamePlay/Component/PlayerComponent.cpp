@@ -10,6 +10,7 @@
 #include "HumanAIController.h"
 #include "HumanCharacter_Player.h"
 #include "InputActions.h"
+#include "TeamMatesHelperComponent.h"
 #include "GameFramework/GameplayCameraComponent.h"
 
 FName UPlayerComponent::ComponentName = TEXT("PlayerComponent");

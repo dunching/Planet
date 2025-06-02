@@ -9,13 +9,13 @@
 #include "AssetRefMap.h"
 #include "AS_Character.h"
 #include "PlanetWorldSettings.h"
-#include "ProxyProcessComponent.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CollisionDataStruct.h"
 #include "GameplayTagsLibrary.h"
 #include "Weapon_Base.h"
 #include "InventoryComponent.h"
 #include "KismetGravityLibrary.h"
+#include "ModifyItemProxyStrategy.h"
 #include "PlanetPlayerController.h"
 #include "StateProcessorComponent.h"
 
@@ -180,7 +180,7 @@ void USkill_Base::UpdateRegisterParam(
 		if (GameplayAbilityTargetPtr)
 		{
 			SkillProxyPtr = CharacterPtr->GetInventoryComponent()->
-			                              FindProxy_Skill(GameplayAbilityTargetPtr->ProxyID);
+			                              FindProxy<FModifyItemProxyStrategy_Skill>(GameplayAbilityTargetPtr->ProxyID);
 		}
 	}
 }

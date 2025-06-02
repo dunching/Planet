@@ -5,7 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 
-#include "GuideActor.h"
+#include "GuideActorBase.h"
 #include "InputProcessorSubSystem.h"
 #include "InteractionList.h"
 #include "MainHUD.h"

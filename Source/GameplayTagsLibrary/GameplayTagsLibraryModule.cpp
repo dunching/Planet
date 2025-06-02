@@ -4,4 +4,4 @@
 
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_MODULE( FDefaultGameModuleImpl, GameplayTagsLibrary );
+IMPLEMENT_MODULE( FDefaultModuleImpl, GameplayTagsLibrary );

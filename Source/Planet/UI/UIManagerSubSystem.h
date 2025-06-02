@@ -8,7 +8,6 @@
 #include "Engine/World.h"
 
 #include "GenerateTypes.h"
-#include <GameInstance/PlanetGameInstance.h>
 #include "PlanetModule.h"
 #include "ItemProxy_Minimal.h"
 #include "LayoutCommon.h"

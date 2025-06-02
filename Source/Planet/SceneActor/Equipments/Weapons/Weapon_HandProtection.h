@@ -7,6 +7,7 @@
 
 #include "Weapon_Base.h"
 #include "PlanetGameplayAbility.h"
+#include "PlanetWeapon_Base.h"
 #include "Skill_Base.h"
 
 #include "Weapon_HandProtection.generated.h"
@@ -18,7 +19,7 @@ class AHumanCharacter;
 class ATool_PickAxe;
 
 UCLASS()
-class PLANET_API AWeapon_HandProtection : public AWeapon_Base
+class PLANET_API AWeapon_HandProtection : public APlanetWeapon_Base
 {
 	GENERATED_BODY()
 
@@ -26,7 +27,7 @@ public:
 
 	AWeapon_HandProtection(const FObjectInitializer& ObjectInitializer);
 
-	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
+	virtual void AttachToCharacter(ACharacter* CharacterPtr)override;
 
 protected:
 

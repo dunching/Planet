@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 
+#include "Components/ActorComponent.h"
 #include "GameplayTagContainer.h"
+
 #include "GenerateTypes.h"
 #include "GroupManaggerInterface.h"
-#include "Components/ActorComponent.h"
+#include "TeamMates_GenericType.h"
 
 #include "AIComponent.generated.h"
 

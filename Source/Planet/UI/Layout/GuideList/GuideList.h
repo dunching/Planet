@@ -14,6 +14,7 @@
 
 class AGuideActor;
 class AGuideThread;
+class AGuideThreadBase;
 class UGuideItem;
 class UPAD_TaskNode_Guide;
 
@@ -36,7 +37,7 @@ public:
 	virtual void DisEnable() override;
 
 protected:
-	void OnStartGuide(AGuideThread* NewGuidePtr);
+	void OnStartGuide(AGuideThreadBase* NewGuidePtr);
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Item Class")
 	TSubclassOf<UGuideItem>GuideItemClass;

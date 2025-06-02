@@ -4,6 +4,7 @@
 #include "Components/TextBlock.h"
 
 #include "CharacterBase.h"
+#include "ItemProxy_Character.h"
 #include "TalentAllocationComponent.h"
 
 struct FTalentIcon : public TStructVariable<FTalentIcon>

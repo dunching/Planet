@@ -10,13 +10,13 @@
 #include "HUDInterface.h"
 #include "InventoryComponent.h"
 #include "LayoutInterfacetion.h"
+#include "ModifyItemProxyStrategy.h"
 
 
 #include "InteractionTransactionLayout.generated.h"
 
 class UToolsMenu;
 class UGoodsItem;
-
 
 
 struct FToolsSocketInfo;
@@ -42,7 +42,6 @@ public:
 	virtual ELayoutCommon GetLayoutType() const override final;
 
 private:
-
 	UFUNCTION()
 	void OnQuitClicked();
 
@@ -104,11 +103,19 @@ private:
 
 	int32 CurrentNum = 0;
 
-	UInventoryComponent::FOnSkillProxyChanged::FCallbackHandleSPtr OnSkillProxyChangedDelegateHandle;
+	FModifyItemProxyStrategy_WeaponSkill::FOnSkillProxyChanged::FCallbackHandleSPtr
+	OnWeaponSkillProxyChangedDelegateHandle;
 
-	UInventoryComponent::FOnWeaponProxyChanged::FCallbackHandleSPtr OnWeaponProxyChangedDelegateHandle;
+	FModifyItemProxyStrategy_ActiveSkill::FOnSkillProxyChanged::FCallbackHandleSPtr
+	OnActiveSkillProxyChangedDelegateHandle;
 
-	UInventoryComponent::FOnConsumableProxyChanged::FCallbackHandleSPtr OnConsumableProxyChangedDelegateHandle;
+	FModifyItemProxyStrategy_PassveSkill::FOnSkillProxyChanged::FCallbackHandleSPtr
+	OnPassiveSkillProxyChangedDelegateHandle;
+
+	FModifyItemProxyStrategy_Weapon::FOnWeaponProxyChanged::FCallbackHandleSPtr OnWeaponProxyChangedDelegateHandle;
+
+	FModifyItemProxyStrategy_Consumable::FOnConsumableProxyChanged::FCallbackHandleSPtr
+	OnConsumableProxyChangedDelegateHandle;
 
 	TOnValueChangedCallbackContainer<int32>::FCallbackHandleSPtr OnCoinChangedDelegateHandle;
 };

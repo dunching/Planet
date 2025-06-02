@@ -24,13 +24,14 @@
 #include "ItemProxy_Minimal.h"
 #include "CharacterBase.h"
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "GameplayTagsLibrary.h"
 #include "CharacterAttibutes.h"
 #include "CharacterBase.h"
 #include "CharacterAttributesComponent.h"
 #include "GroupManagger.h"
 #include "ItemProxy_Character.h"
+#include "TeamMatesHelperComponent.h"
 
 struct FTeamMateInfo : public TStructVariable<FTeamMateInfo>
 {
@@ -147,4 +148,5 @@ void UTeamMateInfo::SynMember2Config(int32 Index )
 	}
 	auto GMCPtr = PCPtr->GetGroupManagger();
 	GMCPtr->GetTeamMatesHelperComponent()->UpdateTeammateConfig(GroupMateProxyPtr, Index);
+
 }

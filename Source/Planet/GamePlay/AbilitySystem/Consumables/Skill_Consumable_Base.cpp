@@ -7,6 +7,7 @@
 #include "PlanetAbilitySystemComponent.h"
 #include "CharacterBase.h"
 #include "InventoryComponent.h"
+#include "ItemProxy_Consumable.h"
 
 UScriptStruct* FGameplayAbilityTargetData_RegisterParam_Consumable::GetScriptStruct() const
 {

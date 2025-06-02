@@ -11,7 +11,7 @@
 #include "GroupManaggerInterface.h"
 #include "PlanetAIController.h"
 
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 
 #include "HumanAIController.generated.h"
 

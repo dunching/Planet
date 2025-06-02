@@ -11,7 +11,7 @@
 
 #include "CharacterTitle.h"
 #include "CharacterBase.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "InventoryComponent.h"
@@ -24,6 +24,7 @@
 #include "GeneratorColony_ByInvoke.h"
 #include "GeneratorColony_ByTime.h"
 #include "LogWriter.h"
+#include "TeamMatesHelperComponent.h"
 
 AHumanAIController::AHumanAIController(
 	const FObjectInitializer& ObjectInitializer

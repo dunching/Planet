@@ -14,7 +14,7 @@
 #include "AbilityTask_TimerHelper.h"
 #include "CollisionDataStruct.h"
 #include "HumanCharacter.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "SceneActorSubSystem.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "Tools.h"

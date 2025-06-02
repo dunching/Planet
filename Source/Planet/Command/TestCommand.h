@@ -8,11 +8,11 @@ class AHumanCharacter;
 
 namespace TestCommand
 {
-	void AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr);
+	PLANET_API void AddPlayerCharacterTestDataImp(AHumanCharacter* CharacterPtr);
 
-	void AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr);
+	PLANET_API void AddAICharacterTestDataImp(AHumanCharacter* CharacterPtr);
 
-	void AddCahracterTestData();
+	PLANET_API void AddCahracterTestData();
 
 	static FAutoConsoleCommand AddCahracterTestData111CMD(
 		//CMD 名字，在控制台输入这个调用
@@ -25,7 +25,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void ActiveBrandTest();
+	PLANET_API void ActiveBrandTest();
 
 	static FAutoConsoleCommand ActiveBrandTestCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -38,7 +38,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void ActiveBrandTest1();
+	PLANET_API void ActiveBrandTest1();
 
 	static FAutoConsoleCommand ActiveBrandTest1CMD(
 		//CMD 名字，在控制台输入这个调用
@@ -51,7 +51,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void ActiveBrandTest2();
+	PLANET_API void ActiveBrandTest2();
 
 	static FAutoConsoleCommand ActiveBrandTest2CMD(
 		//CMD 名字，在控制台输入这个调用
@@ -64,7 +64,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void ChallengeTest();
+	PLANET_API void ChallengeTest();
 
 	static FAutoConsoleCommand ChallengeTestCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -77,7 +77,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void TestHasBeenFlyAway(const TArray< FString >& Args);
+	PLANET_API void TestHasBeenFlyAway(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand TestHasBeenFlyAwayCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -90,7 +90,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void ReplyHP(const TArray< FString >& Args);
+	PLANET_API void ReplyHP(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand ReplyHPCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -103,7 +103,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void IncreaseCD(const TArray< FString >& Args);
+	PLANET_API void IncreaseCD(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand IncreaseCDCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -116,7 +116,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void AddProxy(const TArray< FString >& Args);
+	PLANET_API void AddProxy(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand AddProxyCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -129,7 +129,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void RemoveProxy(const TArray< FString >& Args);
+	PLANET_API void RemoveProxy(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand RemoveProxyCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -142,7 +142,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void SwitchPlayerInput(const TArray< FString >& Args);
+	PLANET_API void SwitchPlayerInput(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand SwitchPlayerInputCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -155,7 +155,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void AddOrRemoveState(const TArray< FString >& Args);
+	PLANET_API void AddOrRemoveState(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand AddOrRemoveStateCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -168,7 +168,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void SetBGMVolume(const TArray< FString >& Args);
+	PLANET_API void SetBGMVolume(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand SetBGMVolumeCMD(
 		//CMD 名字，在控制台输入这个调用
@@ -181,7 +181,7 @@ namespace TestCommand
 		EConsoleVariableFlags::ECVF_Default
 	);
 	
-	void AddExperience(const TArray< FString >& Args);
+	PLANET_API void AddExperience(const TArray< FString >& Args);
 
 	static FAutoConsoleCommand AddExperienceCMD(
 		//CMD 名字，在控制台输入这个调用

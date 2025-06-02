@@ -11,6 +11,7 @@
 #include "SceneProxyExtendInfo.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Container.h"
+#include "Tools.h"
 
 URaffleSubSystem* URaffleSubSystem::GetInstance()
 {
@@ -39,15 +40,6 @@ bool URaffleSubSystem::Raffle(ERaffleType RaffleType, int32 Count)const
 	{
 	case ERaffleType::kRafflePermanent:
 	{
-		auto CoinProxyPtr = HoldItemPropertyRef->FindProxy_Coin(UGameplayTagsLibrary::Proxy_Coin_RaffleLimit);
-		if (CoinProxyPtr)
-		{
-			if (CoinProxyPtr->GetNum() > Count)
-			{
-				CoinProxyPtr->ModifyNum(-Count);
-				return RafflePermanent(Count);
-			}
-		}
 	}
 	break;
 	case ERaffleType::kRaffleLimit:
@@ -117,18 +109,4 @@ void URaffleSubSystem::RafflePermanentComplete(
 	}
 
 	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-
-	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
-
-	TArray<FTableRowProxy*>GetProxyAry;
-	for (const auto& Iter : Ary)
-	{
-		auto RowPtr = DataTable->FindRow<FTableRowProxy>(*Iter.ToString(), TEXT("GetProxy"));
-
-		CharacterPtr->GetInventoryComponent()->AddProxy_Pending(Iter, 1, ApendingID);
- 
- 		GetProxyAry.Add(SceneProxyExtendInfoMapPtr->GetTableRowProxy(Iter));
-	}
-
-	OnGetProxyAry.ExcuteCallback(GetProxyAry);
 }

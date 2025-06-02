@@ -13,7 +13,7 @@
 #include "GuideItem.generated.h"
 
 class AGuideActor;
-class AGuideThread;
+class AGuideThreadBase;
 class UPAD_TaskNode_Guide;
 
 struct FTaskNodeDescript;
@@ -33,21 +33,21 @@ public:
 
 	virtual void NativeDestruct() override;
 	
-	void BindGuide(AGuideThread* NewGuidePtr);
+	void BindGuide(AGuideThreadBase* NewGuidePtr);
 
 protected:
 	virtual void Enable() override;
 	
 	virtual void DisEnable() override;
 
-	void OnStopGuide(AGuideThread* NewGuidePtr);
+	void OnStopGuide(AGuideThreadBase* NewGuidePtr);
 
 	void OnCurrentTaskNodeChanged(const FTaskNodeDescript& CurrentTaskNode);
 
 	void OnGuideThreadPropertyChagned(const FString& NewTaskName);
 	
 	// 当前追踪的引导
-	TObjectPtr<AGuideThread> CurrentLineGuidePtr = nullptr;
+	TObjectPtr<AGuideThreadBase> CurrentLineGuidePtr = nullptr;
 
 	FDelegateHandle OnStartGuideHandle;
 };

@@ -6,6 +6,7 @@
 
 #include "Skill_Base.h"
 #include "ItemProxy_Minimal.h"
+#include "PlanetGameplayAbility.h"
 #include "Skill_Active_Base.h"
 
 #include "Skill_Consumable_Base.generated.h"
@@ -13,8 +14,10 @@
 class AConsumable_Base;
 class ACharacterBase;
 
+struct FConsumableProxy;
+
 USTRUCT()
-struct FGameplayAbilityTargetData_RegisterParam_Consumable : 
+struct PLANET_API FGameplayAbilityTargetData_RegisterParam_Consumable : 
 	public FGameplayAbilityTargetData_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()

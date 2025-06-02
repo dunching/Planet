@@ -139,7 +139,8 @@ public:
 	 * @param SceneObjPtr 
 	 */
 	virtual bool InteractionSceneActor(
-		ASceneActor* SceneObjPtr
+		ASceneActor* SceneObjPtr,
+		ISceneActorInteractionInterface* SceneActorInteractionInterfacePtr
 	);
 
 	virtual bool InteractionSceneCharacter(

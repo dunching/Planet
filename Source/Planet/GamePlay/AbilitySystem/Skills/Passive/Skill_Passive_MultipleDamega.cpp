@@ -17,6 +17,7 @@
 
 #include "GameplayTagsLibrary.h"
 #include "GE_Common.h"
+#include "ItemProxy_Skills.h"
 #include "OnEffectedTawrgetCallback.h"
 
 void UItemDecription_Skill_PassiveSkill_MultipleDamega::SetUIStyle()

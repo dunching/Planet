@@ -6,6 +6,7 @@
 
 #include "Tool_Base.h"
 #include "PlanetGameplayAbility.h"
+#include "Planet_Tool_Base.h"
 #include "Skill_Base.h"
 
 #include "Tool_PickAxe.generated.h"
@@ -17,7 +18,7 @@ class AHumanCharacter;
 class ATool_PickAxe;
 
 UCLASS()
-class PLANET_API ATool_PickAxe : public ATool_Base
+class PLANET_API ATool_PickAxe : public APlanet_Tool_Base
 {
 	GENERATED_BODY()
 
@@ -25,9 +26,9 @@ public:
 
 	ATool_PickAxe(const FObjectInitializer& ObjectInitializer);
 
-	virtual void DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentActionType ActionType)override;
+	virtual void DoActionByCharacter(AHumanCharacter* CharacterPtr, EEquipmentActionType ActionType);
 
-	virtual void AttachToCharacter(ACharacterBase* CharacterPtr)override;
+	virtual void AttachToCharacter(ACharacter* CharacterPtr)override;
 
 	USkeletalMeshComponent* GetMesh();
 

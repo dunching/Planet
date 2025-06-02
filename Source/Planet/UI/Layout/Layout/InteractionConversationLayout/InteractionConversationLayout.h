@@ -15,7 +15,7 @@
 
 class UToolsMenu;
 class UOptionList;
-class AGuideInteraction_Actor;
+class AGuideInteractionBase;
 class ISceneActorInteractionInterface;
 
 

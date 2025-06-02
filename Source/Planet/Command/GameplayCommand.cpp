@@ -15,6 +15,7 @@
 #include "OpenWorldDataLayer.h"
 #include "OpenWorldSystem.h"
 #include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 
 void GameplayCommand::ActiveGuideMainThread()
 {

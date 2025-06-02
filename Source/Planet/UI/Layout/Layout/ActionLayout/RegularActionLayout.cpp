@@ -2,7 +2,6 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/Border.h"
-#include "Slate/SGameLayerManager.h"
 #include "Components/Button.h"
 #include "Components/CanvasPanel.h"
 
@@ -16,8 +15,6 @@
 #include "AS_Character.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterRisingTips.h"
-#include "EventSubjectComponent.h"
-#include "UICommon.h"
 #include "FocusTitle.h"
 #include "GameOptions.h"
 #include "GameplayTagsLibrary.h"
@@ -32,11 +29,12 @@
 #include "MainHUDLayout.h"
 #include "PawnStateActionHUD.h"
 #include "PawnStateConsumablesHUD.h"
-#include "PlanetGameViewportClient.h"
 #include "PlayerGameplayTasks.h"
 #include "ProgressTips.h"
 #include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "UpgradePromt.h"
+#include "WidgetScreenLayer.h"
 
 struct FRegularActionLayout : public TStructVariable<FRegularActionLayout>
 {
@@ -258,7 +256,7 @@ ELayoutCommon URegularActionLayout::GetLayoutType() const
 }
 
 void URegularActionLayout::OnStartGuide(
-	AGuideThread* GuideThread
+	AGuideThreadBase* GuideThread
 	)
 {
 	if (GuideThread)
@@ -275,7 +273,7 @@ void URegularActionLayout::OnStartGuide(
 }
 
 void URegularActionLayout::OnStopGuide(
-	AGuideThread* GuideThread
+	AGuideThreadBase* GuideThread
 	)
 {
 	if (GuideThread)

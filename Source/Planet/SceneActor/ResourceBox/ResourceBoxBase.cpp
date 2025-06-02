@@ -44,11 +44,30 @@ void AResourceBoxBase::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 }
 
+USceneActorInteractionComponent* AResourceBoxBase::GetSceneActorInteractionComponent() const
+{
+	return nullptr;
+}
+
 void AResourceBoxBase::HasbeenInteracted(ACharacterBase* InCharacterPtr)
 {
-	Super::HasbeenInteracted(InCharacterPtr);
-
 	InteractionImp_BoxBase(InCharacterPtr);
+}
+
+void AResourceBoxBase::HasBeenStartedLookAt(
+	ACharacterBase* CharacterPtr
+	)
+{
+}
+
+void AResourceBoxBase::HasBeenLookingAt(
+	ACharacterBase* CharacterPtr
+	)
+{
+}
+
+void AResourceBoxBase::HasBeenEndedLookAt()
+{
 }
 
 void AResourceBoxBase::InteractionImp_BoxBase_Implementation(ACharacterBase* InCharacterPtr)

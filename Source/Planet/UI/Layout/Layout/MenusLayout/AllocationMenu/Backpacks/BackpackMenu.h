@@ -17,6 +17,7 @@ struct FSceneProxyContainer;
 class UBackpackConsumableIcon;
 class UBackpackToolIcon;
 struct FSkillProxy;
+struct FCharacterProxy;
 struct FWeaponProxy;
 
 /**

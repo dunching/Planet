@@ -23,6 +23,7 @@
 #include "GuideInteraction.h"
 #include "GuideSubSystem.h"
 #include "HumanCharacter_Player.h"
+#include "TeamMatesHelperComponent.h"
 
 // UGameplayTasksComponent* USceneCharacterAIInteractionComponent::GetGameplayTasksComponent(
 // 	const UGameplayTask& Task) const
@@ -38,7 +39,7 @@ void USceneCharacterAIInteractionComponent::BeginPlay()
 }
 
 void USceneCharacterAIInteractionComponent::StartInteractionItem(
-	const TSubclassOf<AGuideInteraction_Actor>& Item
+	const TSubclassOf<AGuideInteractionBase>& Item
 )
 {
 	Super::StartInteractionItem(Item);
@@ -69,7 +70,7 @@ void USceneCharacterAIInteractionComponent::StartInteractionItem(
 }
 
 void USceneCharacterAIInteractionComponent::ChangedInterationState(
-	const TSubclassOf<AGuideInteraction_Actor>& Item,
+	const TSubclassOf<AGuideInteractionBase>& Item,
 	bool bIsEnable
 	)
 {

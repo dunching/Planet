@@ -11,7 +11,7 @@
 #include "CharacterBase.h"
 #include "AssetRefMap.h"
 #include "PlanetModule.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "InventoryComponent.h"
@@ -20,6 +20,7 @@
 #include "UICommon.h"
 #include "HorseCharacter.h"
 #include "GroupManagger.h"
+#include "TeamMatesHelperComponent.h"
 #include "Tools.h"
 
 AHorseAIController::AHorseAIController(const FObjectInitializer& ObjectInitializer) :

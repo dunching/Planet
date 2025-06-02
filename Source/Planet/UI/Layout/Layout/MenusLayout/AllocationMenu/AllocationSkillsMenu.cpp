@@ -27,6 +27,7 @@
 #include "PlanetPlayerController.h"
 #include "AllocationSkills.h"
 #include "ItemProxy_Character.h"
+#include "ItemProxy_Weapon.h"
 
 struct FAllocationSkillsMenu : public TStructVariable<FAllocationSkillsMenu>
 {

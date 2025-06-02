@@ -2,7 +2,7 @@
 #include "OnEffectedTawrgetCallback.h"
 
 #include "ConversationComponent.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "CharacterBase.h"
 
 bool FOnEffectedTawrgetCallback::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)

@@ -6,10 +6,10 @@
 
 #include "UserWidget_Override.h"
 
-#include "UIInterfaces.h"
+#include "TemplateHelper.h"
 #include "HUDInterface.h"
 #include "LayoutInterfacetion.h"
-
+#include "TeamMates_GenericType.h"
 
 #include "HUD_TeamInfo.generated.h"
 

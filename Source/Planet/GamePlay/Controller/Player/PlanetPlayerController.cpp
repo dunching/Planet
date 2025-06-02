@@ -21,7 +21,7 @@
 #include "InputActions.h"
 #include "UIManagerSubSystem.h"
 #include "CharacterBase.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanAIController.h"
 #include "ItemProxy_Minimal.h"
 #include "PlanetControllerInterface.h"
@@ -35,7 +35,7 @@
 #include "CollisionDataStruct.h"
 #include "EventSubjectComponent.h"
 #include "GameMode_Main.h"
-#include "GeneratorBase.h"
+#include "PlanetGenerator.h"
 #include "GeneratorColony_ByInvoke.h"
 #include "LogWriter.h"
 #include "GroupManagger.h"
@@ -43,20 +43,23 @@
 #include "InventoryComponent.h"
 #include "MainHUD.h"
 #include "PlanetWorldSettings.h"
-#include "GuideActor.h"
+#include "GuideActorBase.h"
 #include "GroupManagger_Player.h"
 #include "HumanCharacter_AI.h"
+#include "ItemProxy_Coin.h"
+#include "ModifyItemProxyStrategy.h"
 #include "OpenWorldSystem.h"
 #include "PlanetGameViewportClient.h"
 #include "PlayerGameplayTasks.h"
 #include "SceneProxyExtendInfo.h"
+#include "TeamMatesHelperComponent.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
-	 TEXT("PlanetPlayerController.DrawControllerRotation"),
-	 0,
-	 TEXT("")
-	 TEXT(" default: 0")
-	);
+                                                                                 TEXT("PlanetPlayerController.DrawControllerRotation"),
+                                                                                 0,
+                                                                                 TEXT("")
+                                                                                 TEXT(" default: 0")
+                                                                                );
 
 APlanetPlayerController::APlanetPlayerController(
 	const FObjectInitializer& ObjectInitializer
@@ -266,7 +269,7 @@ void APlanetPlayerController::BuyProxys_Implementation(
 		return;
 	}
 
-	auto CoinProxySPtr = InventoryComponentPtr->FindProxy_Coin(CostProxyType);
+	auto CoinProxySPtr = InventoryComponentPtr->FindProxyType<FModifyItemProxyStrategy_Coin>(CostProxyType);
 	if (!(CoinProxySPtr && Cost <= CoinProxySPtr->GetNum()))
 	{
 		return;
@@ -382,7 +385,7 @@ void APlanetPlayerController::UpdateCharacterTalent_Implementation(
 	int32 NewLevel
 	)
 {
-	auto TargetCharacterProxySPtr = GetGroupManagger()->GetInventoryComponent()->FindProxy_Character(CharacterID);
+	auto TargetCharacterProxySPtr = GetGroupManagger()->GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_Character>(CharacterID);
 	if (TargetCharacterProxySPtr)
 	{
 		TargetCharacterProxySPtr->UpdateTalentSocket(TalentSocket, NewLevel);

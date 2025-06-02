@@ -5,7 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 
-#include "GuideActor.h"
+#include "GuideActorBase.h"
 #include "GuideInteraction.h"
 #include "InputProcessorSubSystem.h"
 #include "InteractionList.h"
@@ -48,8 +48,8 @@ void UOptionItem::NativeDestruct()
 }
 
 void UOptionItem::SetData(
-	const TSubclassOf<AGuideInteraction_Actor>& InTaskNode,
-	const std::function<void(const TSubclassOf<AGuideInteraction_Actor>&)>& InCallback
+	const TSubclassOf<AGuideInteractionBase>& InTaskNode,
+	const std::function<void(const TSubclassOf<AGuideInteractionBase>&)>& InCallback
 )
 {
 	if (!InTaskNode.Get())

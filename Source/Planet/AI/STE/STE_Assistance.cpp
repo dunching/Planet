@@ -7,7 +7,7 @@
 
 #include "AIComponent.h"
 #include "HumanCharacter.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanAIController.h"
 #include "PlanetPlayerController.h"
 #include "LogWriter.h"
@@ -22,6 +22,7 @@
 #include "HumanCharacter_Player.h"
 #include "ItemProxy_Character.h"
 #include "STE_CharacterBase.h"
+#include "TeamMatesHelperComponent.h"
 
 void USTE_Assistance::TreeStart(
 	FStateTreeExecutionContext& Context

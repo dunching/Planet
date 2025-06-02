@@ -5,12 +5,13 @@
 #include "CoreMinimal.h"
 #include "UserWidget_Override.h"
 
-#include "GenerateTypes.h"
+#include "ItemProxy_GenericType.h"
 #include "LayoutInterfacetion.h"
 #include "UIInterfaces.h"
 
 #include "CoinInfo.generated.h"
 
+struct FCoinProxy;
 struct FCoinProxy;
 
 /**
@@ -32,14 +33,14 @@ public:
 
 	void SetNum(
 		int32 NewNum
-	);
+		);
 
 	void OnCoinProxyChanged(
 		const TSharedPtr<
 			FCoinProxy>& CoinProxySPtr,
 		EProxyModifyType ProxyModifyType,
 		int32 Num
-	);
+		);
 
 	TSharedPtr<FCoinProxy> ProxyPtr = nullptr;
 

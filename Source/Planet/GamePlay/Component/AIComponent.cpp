@@ -9,9 +9,13 @@
 #include "HumanAIController.h"
 #include "HumanCharacter_AI.h"
 #include "InventoryComponent.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
+#include "ModifyItemProxyStrategy.h"
 #include "NiagaraComponent.h"
 #include "PlanetGameViewportClient.h"
 #include "TaskPromt.h"
+#include "TeamMatesHelperComponent.h"
 
 FName UAIComponent::ComponentName = TEXT("AIComponent");
 
@@ -128,7 +132,7 @@ void UAIComponent::InitialAllocationsRowName()
 				{
 					if (FirstWeaponSocketInfo.IsValid())
 					{
-						auto NewWeaponProxySPtr = InventoryComponentPtr->AddProxy_Weapon(
+						auto NewWeaponProxySPtr = InventoryComponentPtr->AddProxy<FModifyItemProxyStrategy_Weapon>(
 							 FirstWeaponSocketInfo
 							);
 						if (NewWeaponProxySPtr)
@@ -153,7 +157,7 @@ void UAIComponent::InitialAllocationsRowName()
 			{
 				if (ActiveSkillSet_1.IsValid())
 				{
-					auto SkillProxyPtr = InventoryComponentPtr->AddProxy_Skill(
+					auto SkillProxyPtr = InventoryComponentPtr->AddProxy<FModifyItemProxyStrategy_ActiveSkill>(
 					                                                           ActiveSkillSet_1
 					                                                          );
 					if (SkillProxyPtr)

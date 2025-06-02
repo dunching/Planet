@@ -32,11 +32,11 @@ public:
 	virtual void BeginPlay() override;
 	
 	virtual void StartInteractionItem(
-		const TSubclassOf<AGuideInteraction_Actor>& Item
+		const TSubclassOf<AGuideInteractionBase>& Item
 		) override;
 	
 	virtual void ChangedInterationState(
-		const TSubclassOf<AGuideInteraction_Actor>& Item,
+		const TSubclassOf<AGuideInteractionBase>& Item,
 		bool bIsEnable
 	) override;
 

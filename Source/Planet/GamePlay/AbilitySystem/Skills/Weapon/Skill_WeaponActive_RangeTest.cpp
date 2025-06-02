@@ -26,7 +26,7 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "HumanCharacter.h"
 #include "CharacterAbilitySystemComponent.h"
 

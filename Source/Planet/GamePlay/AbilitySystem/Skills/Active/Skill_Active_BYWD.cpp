@@ -18,8 +18,10 @@
 #include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"
 #include "HumanCharacter.h"
+#include "ItemProxy_Skills.h"
 #include "Planet_Tools.h"
 #include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "Tools.h"
 #include "VectorTypes.h"
 

@@ -27,7 +27,7 @@
 #include "PlanetGameplayAbility.h"
 #include "BasicFuturesBase.h"
 #include "TalentAllocationComponent.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "AssetRefMap.h"
 #include "AS_Character.h"
 #include "PlanetControllerInterface.h"
@@ -46,7 +46,9 @@
 #include "SceneActor.h"
 #include "GE_CharacterInitail.h"
 #include "GroupManagger.h"
+#include "ModifyItemProxyStrategy.h"
 #include "PlanetCharacterMovementComponent.h"
+#include "TeamMatesHelperComponent.h"
 #include "Weapon_Base.h"
 
 ACharacterBase::ACharacterBase(
@@ -316,7 +318,9 @@ UCharacterTitleComponent* ACharacterBase::GetCharacterTitleComponent() const
 
 TSharedPtr<FCharacterProxy> ACharacterBase::GetCharacterProxy() const
 {
-	return GetInventoryComponent()->FindProxy_Character(GetCharacterAttributesComponent()->GetCharacterID());
+	return GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_Character>(
+		 GetCharacterAttributesComponent()->GetCharacterID()
+		);
 }
 
 USkeletalMeshComponent* ACharacterBase::GetCopyPoseMesh() const

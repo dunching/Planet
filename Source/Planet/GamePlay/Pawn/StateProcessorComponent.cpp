@@ -21,7 +21,7 @@
 #include "CollisionDataStruct.h"
 #include "GroupManagger.h"
 #include "KismetGravityLibrary.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "Kismet/KismetMathLibrary.h"
 
 FName UStateProcessorComponent::ComponentName = TEXT("StateProcessorComponent");

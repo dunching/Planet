@@ -6,23 +6,22 @@ public class Planet : ModuleRules
 {
 	public Planet(ReadOnlyTargetRules Target) : base(Target)
 	{
-		// 这几个有啥区别？
-		// PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-		// PCHUsage = PCHUsageMode.UseSharedPCHs;
-		// PCHUsage = PCHUsageMode.Default;
-
+		// Include What You Use (IWYU)
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
+
+		DefaultBuildSettings = BuildSettingsVersion.Latest;
 
 		UndefinedIdentifierWarningLevel = WarningLevel.Error;
 		bWarningsAsErrors = true;
 		bEnableExceptions = true;
 
+		CppStandard = CppStandardVersion.Cpp20;
+
+		bUseRTTI = true;
+
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
 		}
-
-		CppStandard = CppStandardVersion.Cpp20;
-		bUseRTTI = true;
 
 		PublicDefinitions.Add("TESTPLAYERCHARACTERHOLDDATA = 0");
 		PublicDefinitions.Add("TESTAICHARACTERHOLDDATA = 1");
@@ -31,27 +30,10 @@ public class Planet : ModuleRules
 
 		PublicIncludePaths.Add("Planet");
 		PublicIncludePaths.Add("Planet/OpenWorld");
-		PublicIncludePaths.Add("Planet/GuideSystem");
-		PublicIncludePaths.Add("Planet/ChallengeSystem");
-		PublicIncludePaths.Add("Planet/ChallengeSystem/GuideActor");
-		PublicIncludePaths.Add("Planet/ChallengeSystem/STE");
-		PublicIncludePaths.Add("Planet/ChallengeSystem/STT");
-		PublicIncludePaths.Add("Planet/GuideSystem/GuideActor");
-		PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideInteraction");
-		PublicIncludePaths.Add("Planet/GuideSystem/GuideActor/GuideThread");
-		PublicIncludePaths.Add("Planet/GuideSystem/STT");
-		PublicIncludePaths.Add("Planet/GuideSystem/STT/GuideInteraction");
-		PublicIncludePaths.Add("Planet/GuideSystem/STT/GuideThread");
-		PublicIncludePaths.Add("Planet/GuideSystem/STE");
-		PublicIncludePaths.Add("Planet/GuideSystem/STE/GuideInteraction");
-		PublicIncludePaths.Add("Planet/GuideSystem/STE/GuideThread");
-		PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask");
-		PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask/GuideThread");
-		PublicIncludePaths.Add("Planet/GuideSystem/GuideSystem_GameplayTask/GuideInteraction");
 		PublicIncludePaths.Add("Planet/GamePlay");
 		PublicIncludePaths.Add("Planet/GamePlay/GameplayCamera");
 		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem");
-		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/DataModifyInterface");
+		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/GameplayEffectDataModify");
 		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/GameplayAbilityTargetTypes");
 		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/AttributeSet");
 		PublicIncludePaths.Add("Planet/GamePlay/AbilitySystem/GameplayEffects");
@@ -74,7 +56,6 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/GamePlay/GameMode");
 		PublicIncludePaths.Add("Planet/GamePlay/GameState");
 		PublicIncludePaths.Add("Planet/GamePlay/PlayerState");
-		PublicIncludePaths.Add("Planet/GamePlay/GroupManagger");
 		PublicIncludePaths.Add("Planet/GamePlay/Pawn");
 		PublicIncludePaths.Add("Planet/GamePlay/Pawn/Horse");
 		PublicIncludePaths.Add("Planet/GamePlay/Pawn/Human");
@@ -82,8 +63,6 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/GamePlay/PlayerCameraManager");
 		PublicIncludePaths.Add("Planet/GamePlay/GameViewportClient");
 		PublicIncludePaths.Add("Planet/RootMotionSource");
-		PublicIncludePaths.Add("Planet/Generator");
-		PublicIncludePaths.Add("Planet/Generator/AI_Colony");
 		PublicIncludePaths.Add("Planet/Animation");
 		PublicIncludePaths.Add("Planet/Animation/Horse");
 		PublicIncludePaths.Add("Planet/Animation/Human");
@@ -145,23 +124,7 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/NetReplicateData");
 		PublicIncludePaths.Add("Planet/NetReplicateData/ItemProxys");
 		PublicIncludePaths.Add("Planet/AssetRefMap");
-		PublicIncludePaths.Add("Planet/GameOptions");
 		PublicIncludePaths.Add("Planet/CameraTrailHelper");
-		PublicIncludePaths.Add("Planet/InputProcessor/InputProcessorSubSystem");
-		PublicIncludePaths.Add("Planet/InputProcessor/TransitionProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/BirdProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HorseProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/TransactionProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/ActionProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/EndangeredProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/InteractionProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/BuildingProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/BuildingProcessor/PlacingBuindingsProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/BuildingProcessor/UseToolsProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/HumanProcessor/ViewMenusProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/VehicleProcessor");
-		PublicIncludePaths.Add("Planet/InputProcessor/VehicleProcessor/4WheeledVehicle");
 
 		PrivateIncludePaths.Add("Planet/Private");
 
@@ -179,41 +142,63 @@ public class Planet : ModuleRules
 			"InputCore",
 			"SlateCore",
 			"Slate",
-			"Niagara",
 			"UMG",
-
-			// 引擎插件
 			"EnhancedInput",
-			"GameplayTags",
-			"GameplayTasks",
-			"GameplayAbilities",
-			"GameplayStateTreeModule",
 			"AIModule",
 			"StateTreeModule",
 			"NavigationSystem",
 			"ChaosVehicles",
 			"ActorSequence",
 			"NetCore",
-			"ShaderConductor", 
+			"ShaderConductor",
+
+			// 引擎插件
+			"GameplayTags",
+			"GameplayTasks",
+			"GameplayAbilities",
+			"GameplayStateTreeModule",
+			"GameplayAbilities",
 			"GameplayCameras",
-			
+			"Niagara",
+
 			// 插件
-			"CommonUser", 
-			"Utils",
-			"Gravity",
-			"Weather",
 			"Common_UMG",
+			"CommonUser",
+			"GameplayEffectDataModify",
+			"Gravity",
+			"GroupManagger",
+			"GuideSystem",
+			"ItemProxy",
+			"NetAbilitySystem",
+			"NPCGenerator",
+			"SceneActor",
 			"StateProcessor",
+			"Utils",
+			"Weather",
 			
 			// 其他模块
-			"Tools",
-			"GameplayTagsLibrary",
-			"CommonType",
 			"AssetRef",
+			"ChallengeSystem",
+			"CommonType",
 			"GameOptions",
+			"GameplayTagsLibrary",
+			"Planet_GroupManagger",
+			"Planet_GuideSystem",
+			"Planet_InputProcessor",
+			"Planet_ItemProxy",
+			"Planet_NPCGenerator",
+			"Tools",
 		});
 
 		PublicDependencyModuleNames.AddRange(new string[]
+		{
+		});
+
+		PrivateIncludePathModuleNames.AddRange(new string[]
+		{
+		});
+
+		PublicIncludePathModuleNames.AddRange(new string[]
 		{
 		});
 	}

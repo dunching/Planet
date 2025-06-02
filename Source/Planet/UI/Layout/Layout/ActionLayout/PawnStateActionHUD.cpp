@@ -6,6 +6,7 @@
 #include "Components/HorizontalBox.h"
 #include "Components/Border.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/ProgressBar.h"
 
 #include "PlanetPlayerState.h"
 #include "PlanetModule.h"
@@ -22,8 +23,8 @@
 #include "State_Talent_NuQi.h"
 #include "State_Talent_YinYang.h"
 #include "GameplayTagsLibrary.h"
-#include "InventoryComponent.h"
-#include "Components/ProgressBar.h"
+#include "ItemProxy_Skills.h"
+#include "ItemProxy_Weapon.h"
 
 struct FPawnStateActionHUD : public TStructVariable<FPawnStateActionHUD>
 {

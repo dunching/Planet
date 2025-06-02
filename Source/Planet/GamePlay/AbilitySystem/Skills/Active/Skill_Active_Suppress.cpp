@@ -30,6 +30,7 @@
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "AbilityTask_ARM_MoveToForce.h"
 #include "AssetRefMap.h"
+#include "ItemProxy_Skills.h"
 #include "StateProcessorComponent.h"
 
 static TAutoConsoleVariable<int32> Skill_Active_Suppress_Debug(

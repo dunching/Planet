@@ -15,6 +15,7 @@
 #include "ProxyProcessComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Minimal.h"
+#include "ItemProxy_Skills.h"
 #include "Skill_WeaponActive_FoldingFan.h"
 
 void USkill_Active_FoldingFan_AddNum::PerformAction(

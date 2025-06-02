@@ -27,12 +27,13 @@
 #include "Weapon_PickAxe.h"
 #include "Weapon_RangeTest.h"
 #include "PlanetControllerInterface.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "Weapon_FoldingFan.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "KismetGravityLibrary.h"
 #include "AbilityTask_ApplyRootMotion_FlyAway.h"
 #include "AS_Character.h"
+#include "ItemProxy_Weapon.h"
 #include "LogWriter.h"
 
 namespace Skill_WeaponActive_FoldingFan

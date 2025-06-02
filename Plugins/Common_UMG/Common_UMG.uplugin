@@ -5,7 +5,7 @@
 	"FriendlyName": "Common_UMG",
 	"Description": "基础的UMG Widget",
 	"Category": "Other",
-	"CreatedBy": "",
+	"CreatedBy": "武侯笑笑生",
 	"CreatedByURL": "",
 	"DocsURL": "",
 	"MarketplaceURL": "",
@@ -18,7 +18,16 @@
 		{
 			"Name": "Common_UMG",
 			"Type": "Runtime",
-			"LoadingPhase": "PreLoadingScreen"
+			"LoadingPhase": "Default",
+			"WhitelistPlatforms": [
+				"Win64"
+			]
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "Utils",
+			"Enabled": true
 		}
 	]
 }

@@ -116,10 +116,7 @@ void UEffectItem::SetTexutre(
 	{
 		if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
 		{
-			auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-			auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
-
-			auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy>(*Iter.ToString(), TEXT("GetProxy"));
+			auto SceneProxyExtendInfoPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(Iter);
 			if (!SceneProxyExtendInfoPtr)
 			{
 				return;
@@ -131,10 +128,7 @@ void UEffectItem::SetTexutre(
 		}
 		else if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
-			auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
-			auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_Proxy.LoadSynchronous();
-
-			auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy>(*Iter.ToString(), TEXT("GetProxy"));
+			auto SceneProxyExtendInfoPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(Iter);
 			if (!SceneProxyExtendInfoPtr)
 			{
 				return;

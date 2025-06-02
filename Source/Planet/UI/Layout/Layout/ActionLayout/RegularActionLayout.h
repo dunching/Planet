@@ -16,6 +16,7 @@ struct FOnAttributeChangeData;
 struct FOnEffectedTawrgetCallback;
 
 class AGuideThread;
+class AGuideThreadBase;
 class UMainUILayout;
 class URaffleMenu;
 class UPawnStateActionHUD;
@@ -64,11 +65,11 @@ public:
 
 private:
 	void OnStartGuide(
-		AGuideThread* GuideThread
+		AGuideThreadBase* GuideThread
 		);
 
 	void OnStopGuide(
-		AGuideThread* GuideThread
+		AGuideThreadBase* GuideThread
 		);
 
 	UFUNCTION()

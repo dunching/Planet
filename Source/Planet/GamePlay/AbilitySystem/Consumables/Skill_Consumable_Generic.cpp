@@ -11,6 +11,8 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GameplayTagsLibrary.h"
 #include "GroupManagger.h"
+#include "ItemProxy_Consumable.h"
+#include "SceneProxyExtendInfo.h"
 #include "SceneProxyTable.h"
 
 USkill_Consumable_Generic::USkill_Consumable_Generic() :
@@ -172,7 +174,7 @@ void USkill_Consumable_Generic::SpawnActor()
 	{
 		FActorSpawnParameters ActorSpawnParameters;
 		ActorSpawnParameters.Owner = CharacterPtr;
-		ConsumableActorPtr = GetWorld()->SpawnActor<AConsumable_Test>(
+		ConsumableActorPtr = GetWorld()->SpawnActor<APlanet_Consumable_Base>(
 			ProxyPtr->GetTableRowProxy_Consumable()->Consumable_Class, ActorSpawnParameters
 		);
 

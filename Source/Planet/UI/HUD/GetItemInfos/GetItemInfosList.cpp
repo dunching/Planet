@@ -1,16 +1,20 @@
 #include "GetItemInfosList.h"
 
 #include <Components/VerticalBox.h>
+#include "Kismet/GameplayStatics.h"
 
 #include "CharacterBase.h"
-#include "GameOptions.h"
+#include "ModifyItemProxyStrategy.h"
 #include "GameplayTagsLibrary.h"
 #include "ItemProxy_Minimal.h"
 #include "GetItemInfosItem.h"
 #include "InventoryComponent.h"
 #include "TemplateHelper.h"
 #include "ItemProxy_Character.h"
-#include "Kismet/GameplayStatics.h"
+#include "ItemProxy_Weapon.h"
+#include "ItemProxy_Coin.h"
+#include "ItemProxy_Consumable.h"
+#include "ItemProxy_Skills.h"
 
 struct FGetItemInfosList : public TStructVariable<FGetItemInfosList>
 {
@@ -44,67 +48,126 @@ void UGetItemInfosList::SetPlayerCharacter(
 	{
 		return;
 	}
-	
+
 	{
-		auto Handle =
-			PlayeyCharacterPtr->GetInventoryComponent()->OnWeaponProxyChanged.AddCallback(
-				 std::bind(
-						   &UGetItemInfosList::OnWeaponProxyChanged,
-						   this,
-						   std::placeholders::_1,
-						   std::placeholders::_2
-						  )
-				);
-		Handle->bIsAutoUnregister = false;
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Weapon>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnWeaponProxyChanged.AddCallback(
+				                                                              std::bind(
+					                                                               &UGetItemInfosList::OnWeaponProxyChanged,
+					                                                               this,
+					                                                               std::placeholders::_1,
+					                                                               std::placeholders::_2
+					                                                              )
+				                                                             );
+			Handle->bIsAutoUnregister = false;
+		}
 	}
 	{
-		auto Handle =
-			PlayeyCharacterPtr->GetInventoryComponent()->OnSkillProxyChanged.AddCallback(
-				 std::bind(
-						   &UGetItemInfosList::OnSkillProxyChanged,
-						   this,
-						   std::placeholders::_1,
-						   std::placeholders::_2
-						  )
-				);
-		Handle->bIsAutoUnregister = false;
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_WeaponSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnSkillProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
 	}
 	{
-		auto Handle =
-			PlayeyCharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
-				 std::bind(
-						   &UGetItemInfosList::OnCoinProxyChanged,
-						   this,
-						   std::placeholders::_1,
-						   std::placeholders::_2,
-						   std::placeholders::_3
-						  )
-				);
-		Handle->bIsAutoUnregister = false;
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_ActiveSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnSkillProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
 	}
 	{
-		auto Handle =
-			PlayeyCharacterPtr->GetInventoryComponent()->OnConsumableProxyChanged.AddCallback(
-				 std::bind(
-						   &UGetItemInfosList::OnConsumableProxyChanged,
-						   this,
-						   std::placeholders::_1,
-						   std::placeholders::_2
-						  )
-				);
-		Handle->bIsAutoUnregister = false;
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_PassveSkill>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnSkillProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnSkillProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
 	}
 	{
-		auto Handle =
-			PlayeyCharacterPtr->GetInventoryComponent()->OnGroupmateProxyChanged.AddCallback(
-				 std::bind(
-						   &UGetItemInfosList::OnGourpmateProxyChanged,
-						   this,
-						   std::placeholders::_1,
-						   std::placeholders::_2
-						  )
-				);
-		Handle->bIsAutoUnregister = false;
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Coin>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnCoinProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnCoinProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2,
+							   std::placeholders::_3
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Consumable>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnConsumableProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnConsumableProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
+	}
+	{
+		auto ModifyItemProxyStrategySPtr = PlayeyCharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Character>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnGroupmateProxyChanged.AddCallback(
+					 std::bind(
+							   &UGetItemInfosList::OnGourpmateProxyChanged,
+							   this,
+							   std::placeholders::_1,
+							   std::placeholders::_2
+							  )
+					);
+			Handle->bIsAutoUnregister = false;
+		}
 	}
 }
 
@@ -242,9 +305,9 @@ void UGetItemInfosList::OnCoinProxyChanged(
 
 				//
 				UGameplayStatics::SpawnSound2D(
-													  this,
-													  GetCoinsSoundRef.LoadSynchronous()
-													 );
+				                               this,
+				                               GetCoinsSoundRef.LoadSynchronous()
+				                              );
 			}
 		}
 	}

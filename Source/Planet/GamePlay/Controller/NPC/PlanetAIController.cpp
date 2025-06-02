@@ -10,13 +10,14 @@
 #include "CharacterBase.h"
 #include "CharacterAbilitySystemComponent.h"
 #include "CharacterAttributesComponent.h"
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 #include "ItemProxy_Minimal.h"
 #include "HumanCharacter.h"
 #include "GameplayTagsLibrary.h"
 #include "KismetGravityLibrary.h"
 #include "GroupManagger.h"
 #include "LogWriter.h"
+#include "TeamMatesHelperComponent.h"
 #include "Components/SplineComponent.h"
 
 APlanetAIController::APlanetAIController(

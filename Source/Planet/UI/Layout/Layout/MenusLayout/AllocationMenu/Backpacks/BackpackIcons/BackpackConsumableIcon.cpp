@@ -21,7 +21,7 @@
 #include "ItemProxyDragDropOperationWidget.h"
 #include "ItemProxy_Minimal.h"
 #include "GameplayTagsLibrary.h"
-#include "UICommon.h"
+#include "ItemProxy_Consumable.h"
 
 struct FBackpackConsumableIcon : public TStructVariable<FBackpackConsumableIcon>
 {

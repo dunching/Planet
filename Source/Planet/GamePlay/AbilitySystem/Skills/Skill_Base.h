@@ -6,15 +6,18 @@
 
 #include "PlanetGameplayAbility.h"
 
+#include "GenerateTypes.h"
+
 #include "Skill_Base.generated.h"
 
 struct FBasicProxy;
 struct FSkillProxy;
 class UInteractiveComponent;
-class AWeapon_Base;
+class APlanetWeapon_Base;
+class ACharacterBase;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_RegisterParam_SkillBase :
+struct PLANET_API FGameplayAbilityTargetData_RegisterParam_SkillBase :
 	public FGameplayAbilityTargetData_RegisterParam
 {
 	GENERATED_USTRUCT_BODY()

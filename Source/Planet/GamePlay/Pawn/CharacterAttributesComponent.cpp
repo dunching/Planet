@@ -15,6 +15,7 @@
 #include "GroupManagger.h"
 #include "LogWriter.h"
 #include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 
 UCharacterAttributesComponent::UCharacterAttributesComponent(
 	const FObjectInitializer& ObjectInitializer

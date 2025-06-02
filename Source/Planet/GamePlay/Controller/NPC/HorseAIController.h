@@ -10,7 +10,7 @@
 #include "GenerateTypes.h"
 #include "PlanetAIController.h"
 
-#include "TeamMatesHelperComponent.h"
+#include "TeamMatesHelperComponentBase.h"
 
 #include "HorseAIController.generated.h"
 

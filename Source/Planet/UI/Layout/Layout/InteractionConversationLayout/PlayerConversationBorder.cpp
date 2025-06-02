@@ -6,7 +6,7 @@
 
 #include "ActionConsumablesIcon.h"
 #include "CharacterBase.h"
-#include "GuideActor.h"
+#include "GuideActorBase.h"
 #include "GuideSubSystem.h"
 #include "HumanCharacter_Player.h"
 #include "ProxyProcessComponent.h"

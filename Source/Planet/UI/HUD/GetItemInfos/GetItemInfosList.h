@@ -6,7 +6,7 @@
 
 #include "UserWidget_Override.h"
 
-#include "UIInterfaces.h"
+#include "ItemProxy_GenericType.h"
 #include "HUDInterface.h"
 #include "LayoutInterfacetion.h"
 
@@ -17,9 +17,12 @@ class UHUD_TeamMateInfo;
 class UGetItemInfosItem;
 
 struct FBasicProxy;
-struct FCoinProxy;
+struct FWeaponProxy;
 struct FSkillProxy;
+struct FCoinProxy;
 struct FConsumableProxy;
+struct FCharacterProxy;
+
 
 UCLASS()
 class PLANET_API UGetItemInfosList :

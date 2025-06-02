@@ -1,4 +1,4 @@
-// Copyright 2020 Dan Kestranek.
+// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "BasicFutures_MoveToAttaclArea.h"
 
@@ -204,7 +204,7 @@ void UBasicFutures_MoveToAttaclArea::MoveCompletedSignature(FAIRequestID InReque
 
 	if (GameplayAbilityTargetData_MoveToAttaclAreaSPtr)
 	{
-		GameplayAbilityTargetData_MoveToAttaclAreaSPtr->MoveCompletedSignature(Result);
+		std::ignore = GameplayAbilityTargetData_MoveToAttaclAreaSPtr->MoveCompletedSignature(Result);
 		GameplayAbilityTargetData_MoveToAttaclAreaSPtr = nullptr;
 	}
 }

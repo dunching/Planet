@@ -5,13 +5,10 @@
 #include "CoreMinimal.h"
 
 #include "Templates/SubclassOf.h"
-#include <Perception/AIPerceptionTypes.h>
-#include "Blueprint/StateTreeEvaluatorBlueprintBase.h"
 #include "StateTreeEvaluatorBase.h"
-#include "StateTreeExecutionContext.h"
 
-#include "GenerateTypes.h"
 #include "STE_CharacterBase.h"
+#include "TeamMates_GenericType.h"
 #include "TemplateHelper.h"
 
 #include "STE_Assistance.generated.h"

@@ -1,21 +1,12 @@
 #include "InteractionConversationLayout.h"
 
-#include "GuideActor.h"
-#include "GuideInteraction.h"
-#include "GuideSystemStateTreeComponent.h"
-#include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
 
-#include "HumanCharacter_Player.h"
-#include "HumanInteractionWithChallengeEntry.h"
-#include "HumanInteractionWithNPC.h"
 #include "InputProcessorSubSystem.h"
 #include "MainHUD.h"
-#include "MainHUDLayout.h"
-#include "OptionList.h"
-#include "PlanetPlayerController.h"
 #include "PlayerConversationBorder.h"
 #include "HumanRegularProcessor.h"
+#include "HumanCharacter_Player.h"
 
 class AMainHUD;
 

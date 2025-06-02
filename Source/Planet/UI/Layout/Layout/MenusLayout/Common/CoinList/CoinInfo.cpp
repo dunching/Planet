@@ -3,20 +3,15 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/TextBlock.h"
 #include <Blueprint/WidgetTree.h>
-#include <Components/HorizontalBox.h>
-#include "Engine/StreamableManager.h"
-#include "Engine/AssetManager.h"
-#include <Components/Image.h>
 
 #include "CharacterBase.h"
-#include "TalentAllocationComponent.h"
-#include "TalentIcon.h"
-#include "GameplayTagsLibrary.h"
-#include "HumanCharacter_AI.h"
+#include "ItemProxy_Coin.h"
 #include "HumanCharacter_Player.h"
 #include "InventoryComponent.h"
+#include "ModifyItemProxyStrategy.h"
 #include "TemplateHelper.h"
 #include "ProxyIcon.h"
+#include "ItemProxy_Skills.h"
 
 struct FCoinInfo : public TStructVariable<FCoinInfo>
 {
@@ -46,7 +41,8 @@ void UCoinInfo::Enable()
 		auto ProxyIconPtr = Cast<UProxyIcon>(GetWidgetFromName(FCoinInfo::Get().ProxyIcon));
 		if (ProxyIconPtr)
 		{
-			auto CoinProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxy_Coin(CoinType);
+			auto CoinProxySPtr = CharacterPtr->GetInventoryComponent()->FindProxyType<
+				FModifyItemProxyStrategy_Coin>(CoinType);
 			if (CoinProxySPtr)
 			{
 				SetNum(CoinProxySPtr->GetNum());
@@ -54,21 +50,31 @@ void UCoinInfo::Enable()
 			}
 			else
 			{
-				GetWorld()->GetTimerManager().SetTimerForNextTick(FTimerDelegate::CreateUObject(this, &ThisClass::RemoveFromParent));
+				GetWorld()->GetTimerManager().SetTimerForNextTick(
+				                                                  FTimerDelegate::CreateUObject(
+					                                                   this,
+					                                                   &ThisClass::RemoveFromParent
+					                                                  )
+				                                                 );
 			}
 		}
 
-		auto Handle =
-			CharacterPtr->GetInventoryComponent()->OnCoinProxyChanged.AddCallback(
-				 std::bind(
-						   &ThisClass::OnCoinProxyChanged,
-						   this,
-						   std::placeholders::_1,
-						   std::placeholders::_2,
-						   std::placeholders::_3
-						  )
-				);
-		Handle->bIsAutoUnregister = false;
+		auto ModifyItemProxyStrategySPtr = CharacterPtr->GetInventoryComponent()->GetModifyItemProxyStrategy<
+			FModifyItemProxyStrategy_Coin>();
+		if (ModifyItemProxyStrategySPtr)
+		{
+			auto Handle =
+				ModifyItemProxyStrategySPtr->OnCoinProxyChanged.AddCallback(
+				                                                            std::bind(
+					                                                             &ThisClass::OnCoinProxyChanged,
+					                                                             this,
+					                                                             std::placeholders::_1,
+					                                                             std::placeholders::_2,
+					                                                             std::placeholders::_3
+					                                                            )
+				                                                           );
+			Handle->bIsAutoUnregister = false;
+		}
 	}
 }
 

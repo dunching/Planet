@@ -11,6 +11,20 @@
 #include "TalentInfo.h"
 #include "Regions.h"
 
+FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(
+	const FGameplayTag& CommonCooldownTag
+	)
+{
+	auto SceneProxyExtendInfoMapPtr = USceneProxyExtendInfoMap::GetInstance();
+	auto DataTable = SceneProxyExtendInfoMapPtr->DataTable_CommonCooldownInfo.LoadSynchronous();
+
+	auto SceneProxyExtendInfoPtr = DataTable->FindRow<FTableRowProxy_CommonCooldownInfo>(
+		 *CommonCooldownTag.ToString(),
+		 TEXT("GetProxy")
+		);
+	return SceneProxyExtendInfoPtr;
+}
+
 USceneProxyExtendInfoMap::USceneProxyExtendInfoMap() :
 	Super()
 {
@@ -21,27 +35,12 @@ void USceneProxyExtendInfoMap::PostCDOContruct()
 	Super::PostCDOContruct();
 
 	InitialData();
-
-	if (DataTable_Proxy)
-	{
-		FTableRowProxy SceneUnitExtendInfoBase;
-		DataTable_Proxy.Get()->AddRow(TEXT("{"), SceneUnitExtendInfoBase);
-	}
 }
 
 USceneProxyExtendInfoMap* USceneProxyExtendInfoMap::GetInstance()
 {
 	auto WorldSetting = Cast<APlanetWorldSettings>(GetWorldImp()->GetWorldSettings());
 	return WorldSetting->GetSceneProxyExtendInfoMap();
-}
-
-FTableRowProxy* USceneProxyExtendInfoMap::GetTableRowProxy(FGameplayTag UnitType) const
-{
-	auto DataTablePtr = DataTable_Proxy.LoadSynchronous();
-
-	auto SceneUnitExtendInfoPtr = DataTablePtr->FindRow<FTableRowProxy>(*UnitType.ToString(), TEXT("GetUnit"));
-
-	return SceneUnitExtendInfoPtr;
 }
 
 FTableRowProxy_TagExtendInfo* USceneProxyExtendInfoMap::GetTableRowProxy_TagExtendInfo(FGameplayTag UnitType) const

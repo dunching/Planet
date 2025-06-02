@@ -22,9 +22,9 @@ USceneActorInteractionComponent::USceneActorInteractionComponent(
 	// bStartLogicAutomatically = false;
 }
 
-TArray<TSubclassOf<AGuideInteraction_Actor>> USceneActorInteractionComponent::GetInteractionLists() const
+TArray<TSubclassOf<AGuideInteractionBase>> USceneActorInteractionComponent::GetInteractionLists() const
 {
-	TArray<TSubclassOf<AGuideInteraction_Actor>> Results;
+	TArray<TSubclassOf<AGuideInteractionBase>> Results;
 
 	for (const auto& Iter : GuideInteractionAry)
 	{
@@ -37,7 +37,7 @@ TArray<TSubclassOf<AGuideInteraction_Actor>> USceneActorInteractionComponent::Ge
 	return Results;
 }
 
-TObjectPtr<AGuideInteraction_Actor> USceneActorInteractionComponent::GetCurrentInteraction() const
+TObjectPtr<AGuideInteractionBase> USceneActorInteractionComponent::GetCurrentInteraction() const
 {
 	return GuideInteractionActorPtr;
 }
@@ -48,7 +48,7 @@ TArray<FGuideInterationSetting> USceneActorInteractionComponent::GetGuideInterac
 }
 
 void USceneActorInteractionComponent::StartInteractionItem(
-	const TSubclassOf<AGuideInteraction_Actor>& Item
+	const TSubclassOf<AGuideInteractionBase>& Item
 	)
 {
 }
@@ -68,7 +68,7 @@ void USceneActorInteractionComponent::StopInteractionItem()
 }
 
 void USceneActorInteractionComponent::ChangedInterationState(
-	const TSubclassOf<AGuideInteraction_Actor>& Item,
+	const TSubclassOf<AGuideInteractionBase>& Item,
 	bool bIsEnable
 	)
 {
@@ -88,8 +88,8 @@ bool USceneActorInteractionComponent::GetIsEnableInteraction() const
 }
 
 void USceneActorInteractionComponent::StartInteractionImp(
-	const TSubclassOf<AGuideInteraction_Actor>& Item,
-	const TObjectPtr<AGuideInteraction_Actor>& GuideInteraction_ActorPtr
+	const TSubclassOf<AGuideInteractionBase>& Item,
+	const TObjectPtr<AGuideInteractionBase>& GuideInteraction_ActorPtr
 	)
 {
 	GuideInteractionActorPtr = GuideInteraction_ActorPtr;

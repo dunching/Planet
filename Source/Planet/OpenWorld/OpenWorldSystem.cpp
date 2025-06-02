@@ -15,6 +15,7 @@
 #include "PlayerGameplayTasks.h"
 #include "SpawnPoints.h"
 #include "Teleport.h"
+#include "Tools.h"
 
 UOpenWorldSubSystem* UOpenWorldSubSystem::GetInstance()
 {

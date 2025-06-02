@@ -11,10 +11,10 @@
 
 struct FBasicProxy;
 class UAbilityTask_TimerHelper;
-class AWeapon_Base;
+class APlanetWeapon_Base;
 
 USTRUCT()
-struct FGameplayAbilityTargetData_ActiveParam_WeaponActive :
+struct PLANET_API FGameplayAbilityTargetData_ActiveParam_WeaponActive :
 	public FGameplayAbilityTargetData_ActiveParam
 {
 	GENERATED_USTRUCT_BODY()
@@ -27,7 +27,7 @@ struct FGameplayAbilityTargetData_ActiveParam_WeaponActive :
 
 	bool bIsAutoContinue = false;
 
-	TObjectPtr<AWeapon_Base> WeaponPtr = nullptr;
+	TObjectPtr<APlanetWeapon_Base> WeaponPtr = nullptr;
 };
 
 template<>
@@ -41,7 +41,7 @@ struct TStructOpsTypeTraits<FGameplayAbilityTargetData_ActiveParam_WeaponActive>
 };
 
 UCLASS()
-class USkill_WeaponActive_Base : public USkill_Base
+class PLANET_API USkill_WeaponActive_Base : public USkill_Base
 {
 	GENERATED_BODY()
 
