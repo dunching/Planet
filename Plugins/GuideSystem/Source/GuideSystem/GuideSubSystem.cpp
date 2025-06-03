@@ -20,12 +20,8 @@ bool UGuideSubSystem::ShouldCreateSubsystem(
 
 UGuideSubSystem* UGuideSubSystem::GetInstance()
 {
-	return Cast<UGuideSubSystem>(
-	                             USubsystemBlueprintLibrary::GetWorldSubsystem(
-	                                                                           GetWorldImp(),
-	                                                                           UGuideSubSystem::StaticClass()
-	                                                                          )
-	                            );
+	auto WorldSetting = Cast<IGetGuideSubSystemInterface>(GetWorldImp()->GetWorldSettings());
+	return WorldSetting->GetGuideSubSystem();
 }
 
 void UGuideSubSystem::InitializeMainThread()

@@ -295,9 +295,16 @@ void APlanetPlayerController::BuyProxys_Implementation(
 
 	InventoryComponentPtr->AddProxyNum(BuyProxyTag, Num);
 
-	InventoryComponentPtr->RemoveProxyNum(CoinProxySPtr->GetID(), Cost);
+	CoinProxySPtr->ModifyNum(-Cost);
 
-	TraderInventoryComponentPtr->RemoveProxyNum(BuyProxyID, Num);
+	if (auto IProxy_UniquePtr = DynamicCastSharedPtr<IProxy_Unique>(TargetProxySPtr))
+	{
+		IProxy_UniquePtr->ModifyNum(-Num);
+	}
+	else
+	{
+		TraderInventoryComponentPtr->RemoveProxy(BuyProxyID);
+	}
 }
 
 void APlanetPlayerController::SwitchPlayerInput_Implementation(

@@ -23,6 +23,20 @@ using FOnStopGuide = TMulticastDelegate<void(
 
 struct FTaskNodeDescript;
 
+UINTERFACE(MinimalAPI, meta = (CannotImplementInterfaceInBlueprint))
+class UGetGuideSubSystemInterface : public UInterface
+{
+	GENERATED_BODY()
+};
+
+class GUIDESYSTEM_API IGetGuideSubSystemInterface
+{
+	GENERATED_BODY()
+
+public:
+	virtual UGuideSubSystem* GetGuideSubSystem()const = 0;
+};
+
 /**
  *	引导/任务系统
  *	包含：主线、支线、新手引导之类

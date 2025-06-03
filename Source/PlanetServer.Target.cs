@@ -15,16 +15,10 @@ public class PlanetServerTarget : TargetRules
 		ExtraModuleNames.AddRange( new string[] {
 	        
 			"AssetRef",
-			"ChallengeSystem",
 			"CommonType",
 			"GameOptions",
 			"GameplayTagsLibrary",
 			"Planet",
-			"Planet_GroupManagger",
-			"Planet_GuideSystem",
-			"Planet_InputProcessor",
-			"Planet_ItemProxy",
-			"Planet_NPCGenerator",
 			"Tools",
         } );
 	}

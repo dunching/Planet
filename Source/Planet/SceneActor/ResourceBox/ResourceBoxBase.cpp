@@ -20,6 +20,8 @@ void AResourceBoxBase::BeginPlay()
 {
 	Super::BeginPlay();
 
+	HasBeenEndedLookAt();
+
 	FVector Start = RootComponent->GetComponentLocation();
 	FVector End = Start + (UKismetGravityLibrary::GetGravity(RootComponent->GetComponentLocation()) * 1000.f);
 

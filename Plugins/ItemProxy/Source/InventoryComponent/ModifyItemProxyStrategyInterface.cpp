@@ -2,37 +2,87 @@
 
 #include "InventoryComponentBase.h"
 
-FModifyItemProxyStrategyInterface::FModifyItemProxyStrategyInterface()
+FModifyItemProxyStrategyIterface::FModifyItemProxyStrategyIterface()
 {
 }
 
-FModifyItemProxyStrategyInterface::~FModifyItemProxyStrategyInterface()
-{}
+FModifyItemProxyStrategyIterface::~FModifyItemProxyStrategyIterface()
+{
+}
 
-void FModifyItemProxyStrategyInterface::Add(
-	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
-	int32 Num
+TSharedPtr<FBasicProxy> FModifyItemProxyStrategyIterface::NetSerialize(
+	FArchive& Ar,
+	class UPackageMap* Map,
+	bool& bOutSuccess
 	)
 {
+	return nullptr;
 }
 
-FGameplayTag FModifyItemProxyStrategyInterface::GetCanOperationType() const
+FGameplayTag FModifyItemProxyStrategyIterface::GetCanOperationType() const
 {
 	return FGameplayTag::EmptyTag;
 }
 
-void FModifyItemProxyStrategyInterface::FindByID(
+void FModifyItemProxyStrategyIterface::FindByID(
 	const FGuid& ID,
-	const TSharedPtr<FBasicProxy>&FindResultSPtr,
+	const TSharedPtr<FBasicProxy>& FindResultSPtr,
 	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
 	)
 {
 }
 
-void FModifyItemProxyStrategyInterface::FindByType(
-	const FGameplayTag& ProxyType,
-	const TSharedPtr<FBasicProxy>& FindResultSPtr,
-	const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
+ TSharedPtr<FBasicProxy> FModifyItemProxyStrategyIterface::FindByType(
+		const FGameplayTag& ProxyType,
+		const TObjectPtr<const UInventoryComponentBase>& InventoryComponentPtr
+	)const
+{
+	return nullptr;
+}
+
+TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategyIterface::Add(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const FGameplayTag& InProxyType,
+	int32 Num
+	)
+{
+	return {};
+}
+
+void FModifyItemProxyStrategyIterface::Update(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const FGuid& InProxyID
+	)
+{
+}
+
+void FModifyItemProxyStrategyIterface::RemoveItemProxy(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+		const FGuid& InProxyID
+	)
+{
+}
+
+TSharedPtr<FBasicProxy> FModifyItemProxyStrategyIterface::AddByRemote(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
+	)
+{
+	return nullptr;
+}
+
+TSharedPtr<FBasicProxy> FModifyItemProxyStrategyIterface::UpdateByRemote(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const TSharedPtr<FBasicProxy>& LocalProxySPtr,
+	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
+	)
+{
+	return nullptr;
+}
+
+void FModifyItemProxyStrategyIterface::RemoveByRemote(
+	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const TSharedPtr<FBasicProxy>& RemoteProxySPtr
 	)
 {
 }

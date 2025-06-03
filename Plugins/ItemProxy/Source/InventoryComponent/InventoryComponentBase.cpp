@@ -8,6 +8,7 @@
 #include "ItemProxy_Container.h"
 #include "ItemProxy_GenericType.h"
 #include "ModifyItemProxyStrategyInterface.h"
+#include "Tools.h"
 
 UInventoryComponentBase::UInventoryComponentBase(
 	const FObjectInitializer& ObjectInitializer
@@ -38,7 +39,7 @@ void UInventoryComponentBase::InitializeComponent()
 	UWorld* World = GetWorld();
 	if ((World->IsGameWorld()))
 	{
-		Proxy_Container.SetInventoryComponentBase( this);
+		Proxy_Container.SetInventoryComponentBase(this);
 	}
 
 	// 初始化一些需要的Proxy
@@ -114,27 +115,26 @@ FName UInventoryComponentBase::ComponentName = TEXT("InventoryComponent");
 
 #if UE_EDITOR || UE_CLIENT
 TSharedPtr<FBasicProxy> UInventoryComponentBase::AddProxy_SyncHelper(
-	const TSharedPtr<FBasicProxy>& ProxySPtr
+	const TSharedPtr<FBasicProxy>& CacheProxySPtr
 	)
 {
-	TSharedPtr<FBasicProxy> Result;
+	CacheProxySPtr->InventoryComponentPtr = this;
 
-	const auto ProxyType = ProxySPtr->GetProxyType();
-	ProxySPtr->InventoryComponentPtr = this;
-
-	if (Result = FindProxy(ProxySPtr->GetID()))
+	if (auto Result = FindProxy(CacheProxySPtr->GetID()))
 	{
 		return Result;
 	}
 
-	return Result;
-}
+	const auto ProxyType = CacheProxySPtr->GetProxyType();
+	for (const auto& Iter : ModifyItemProxyStrategiesMap)
+	{
+		if (ProxyType.MatchesTag(Iter.Key))
+		{
+			return Iter.Value->AddByRemote(this, CacheProxySPtr);
+		}
+	}
 
-void UInventoryComponentBase::RemoveProxy_SyncHelper(
-	const TSharedPtr<FBasicProxy>& ProxySPtr
-	)
-{
-	const auto ProxyType = ProxySPtr->GetProxyType();
+	return nullptr;
 }
 
 void UInventoryComponentBase::UpdateProxy_SyncHelper(
@@ -153,21 +153,36 @@ void UInventoryComponentBase::UpdateProxy_SyncHelper(
 	}
 
 	const auto ProxyType = RemoteProxySPtr->GetProxyType();
+
+	for (const auto& Iter : ModifyItemProxyStrategiesMap)
+	{
+		if (ProxyType.MatchesTag(Iter.Key))
+		{
+			Iter.Value->UpdateByRemote(this, LocalProxySPtr, RemoteProxySPtr);
+			return;
+		}
+	}
 }
 
-#endif
-
-void UInventoryComponentBase::UpdateInContainer(
-	const TSharedPtr<FBasicProxy>& ItemProxySPtr
+void UInventoryComponentBase::RemoveProxy_SyncHelper(
+	const TSharedPtr<FBasicProxy>& ProxySPtr
 	)
 {
-#if UE_EDITOR || UE_SERVER
-	if (GetOwnerRole() == ROLE_Authority)
+	if (auto Result = FindProxy(ProxySPtr->GetID()))
 	{
-		Proxy_Container.AddItem(ItemProxySPtr);
+		const auto ProxyType = ProxySPtr->GetProxyType();
+		for (const auto& Iter : ModifyItemProxyStrategiesMap)
+		{
+			if (ProxyType.MatchesTag(Iter.Key))
+			{
+				Iter.Value->RemoveByRemote(this, ProxySPtr);
+				return ;
+			}
+		}
 	}
-#endif
 }
+
+#endif
 
 void UInventoryComponentBase::AddToContainer(
 	const TSharedPtr<FBasicProxy>& ItemProxySPtr
@@ -178,8 +193,6 @@ void UInventoryComponentBase::AddToContainer(
 	ProxysAry.Add(ItemProxySPtr);
 	ProxysMap.Add(ItemProxySPtr->ID, ItemProxySPtr);
 
-	Proxy_Container.AddItem(ItemProxySPtr);
-
 #if UE_EDITOR || UE_SERVER
 	if (GetOwnerRole() == ROLE_Authority)
 	{
@@ -188,15 +201,44 @@ void UInventoryComponentBase::AddToContainer(
 #endif
 }
 
+void UInventoryComponentBase::UpdateInContainer(
+	const TSharedPtr<FBasicProxy>& ItemProxySPtr
+	)
+{
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		Proxy_Container.UpdateItem(ItemProxySPtr);
+	}
+#endif
+}
+
+void UInventoryComponentBase::RemoveFromContainer(
+	const TSharedPtr<FBasicProxy>& ItemProxySPtr
+	)
+{
+	for (int32 Index = 0; Index < ProxysAry.Num(); Index++)
+	{
+		if (ProxysAry[Index] == ItemProxySPtr)
+		{
+			ProxysAry.RemoveAt(Index);
+			break;
+		}
+	}
+
+	ProxysMap.Remove(ItemProxySPtr->ID);
+
+#if UE_EDITOR || UE_SERVER
+	if (GetOwnerRole() == ROLE_Authority)
+	{
+		Proxy_Container.RemoveItem(ItemProxySPtr);
+	}
+#endif
+}
+
 TArray<TSharedPtr<FBasicProxy>> UInventoryComponentBase::GetProxys() const
 {
 	return ProxysAry;
-}
-
-void UInventoryComponentBase::AddProxys_Server_Implementation(
-	const FGuid& RewardsItemID
-	)
-{
 }
 
 const TArray<TSharedPtr<FBasicProxy>>& UInventoryComponentBase::GetSceneUintAry() const
@@ -209,16 +251,15 @@ TArray<TSharedPtr<FBasicProxy>> UInventoryComponentBase::AddProxyNum(
 	int32 Num
 	)
 {
-	if (Num <= 0)
+	for (const auto& Iter : ModifyItemProxyStrategiesMap)
 	{
-		return {};
+		if (ProxyType.MatchesTag(Iter.Key))
+		{
+			return Iter.Value->Add(this, ProxyType, Num);
+		}
 	}
 
-	TArray<TSharedPtr<FBasicProxy>> ResultAry;
-
-	auto SceneProxyExtendInfoPtr = GetTableRowProxy(ProxyType);
-
-	return ResultAry;
+	return {};
 }
 
 TSharedPtr<FBasicProxy> UInventoryComponentBase::AddProxy(
@@ -234,20 +275,43 @@ TSharedPtr<FBasicProxy> UInventoryComponentBase::AddProxy(
 	return nullptr;
 }
 
-void UInventoryComponentBase::RemoveProxyNum(
-	const IDType& ID,
-	int32 Num
+void UInventoryComponentBase::UpdateProxy(
+	const IDType& ID
 	)
 {
-	if (Num <= 0)
-	{
-		return;
-	}
-
 	TSharedPtr<FBasicProxy> ResultSPtr = FindProxy(ID);
 	if (ResultSPtr)
 	{
 		const auto ProxyType = ResultSPtr->GetProxyType();
+
+		for (const auto& Iter : ModifyItemProxyStrategiesMap)
+		{
+			if (ProxyType.MatchesTag(Iter.Key))
+			{
+				Iter.Value->Update(this, ID);
+				return;
+			}
+		}
+	}
+}
+
+void UInventoryComponentBase::RemoveProxy(
+	const IDType& ID
+	)
+{
+	TSharedPtr<FBasicProxy> ResultSPtr = FindProxy(ID);
+	if (ResultSPtr)
+	{
+		const auto ProxyType = ResultSPtr->GetProxyType();
+
+		for (const auto& Iter : ModifyItemProxyStrategiesMap)
+		{
+			if (ProxyType.MatchesTag(Iter.Key))
+			{
+				Iter.Value->RemoveItemProxy(this, ID);
+				return;
+			}
+		}
 	}
 }
 
@@ -259,7 +323,7 @@ TSharedPtr<FBasicProxy> UInventoryComponentBase::FindProxy(
 	{
 		return ProxysMap[ID];
 	}
-	
+
 	return nullptr;
 }
 
@@ -267,9 +331,12 @@ TSharedPtr<FBasicProxy> UInventoryComponentBase::FindProxyType(
 	const FGameplayTag& ProxyType
 	) const
 {
-	if (ProxyTypeMap.Contains(ProxyType))
+	for (const auto& Iter : ModifyItemProxyStrategiesMap)
 	{
-		return ProxyTypeMap[ProxyType];
+		if (ProxyType.MatchesTag(Iter.Key))
+		{
+			return Iter.Value->FindByType(ProxyType, this);
+		}
 	}
 
 	return nullptr;
@@ -290,4 +357,10 @@ TArray<TSharedPtr<FBasicProxy>> UInventoryComponentBase::GetProxys(
 	}
 
 	return Result;
+}
+
+const TMap<FGameplayTag, TSharedPtr<FModifyItemProxyStrategyIterface>>& UInventoryComponentBase::
+GetModifyItemProxyStrategies() const
+{
+	return ModifyItemProxyStrategiesMap;
 }

@@ -7,24 +7,16 @@
 
 #include "ItemProxy_Container.h"
 #include "ItemProxy_GenericType.h"
+#include "GetModifyItemProxyStrategiesInterface.h"
+#include "Tools.h"
 
 #include "InventoryComponentBase.generated.h"
 
 struct FSceneProxyContainer;
 struct FBasicProxy;
-struct FCharacterProxy;
 struct FProxy_FASI;
-struct FCharacterSocket;
-struct FSkillProxy;
-struct FWeaponProxyBase;
-struct IProxy_Allocationble;
-struct FWeaponSkillProxyBase;
-struct IProxy_Allocationble;
 
-struct FModifyItemProxyStrategyInterface;
-
-class IPlanetControllerInterface;
-class ACharacterBase;
+struct FModifyItemProxyStrategyIterface;
 
 /*
  *	持有物品相关
@@ -35,13 +27,7 @@ class ITEMPROXY_API UInventoryComponentBase :
 {
 	GENERATED_BODY()
 
-	friend ACharacterBase;
 	friend FProxy_FASI;
-	friend IProxy_Allocationble;
-	friend FWeaponSkillProxyBase;
-	friend IProxy_Allocationble;
-	friend FBasicProxy;
-	friend FCharacterProxy;
 
 public:
 	using FOwnerType = ACharacterBase;
@@ -56,7 +42,7 @@ public:
 
 #if UE_EDITOR || UE_CLIENT
 	TSharedPtr<FBasicProxy> AddProxy_SyncHelper(
-		const TSharedPtr<FBasicProxy>& ProxySPtr
+		const TSharedPtr<FBasicProxy>& CacheProxySPtr
 		);
 
 	void UpdateProxy_SyncHelper(
@@ -70,11 +56,6 @@ public:
 #endif
 
 #pragma region Basic
-	UFUNCTION(Server, Reliable)
-	void AddProxys_Server(
-		const FGuid& RewardsItemID
-		);
-
 	void AddProxy_Pending(
 		FGameplayTag ProxyType,
 		int32 Num,
@@ -96,7 +77,8 @@ public:
 	template <typename ModifyItemProxyStrategyType, bool bIsFullStrategy = false>
 	auto FindProxy(
 		const IDType& ID
-		) const->std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>>::type;
+		) const -> std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename
+			                            ModifyItemProxyStrategyType::FItemProxyType>>::type;
 
 	TSharedPtr<FBasicProxy> FindProxyType(
 		const FGameplayTag& ProxyType
@@ -105,8 +87,9 @@ public:
 	template <typename ModifyItemProxyStrategyType, bool bIsFullStrategy = false>
 	auto FindProxyType(
 		const FGameplayTag& ProxyType
-		) const->std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>>::type;
-	
+		) const -> std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename
+			                            ModifyItemProxyStrategyType::FItemProxyType>>::type;
+
 	/**
 	 * 修改物品的数量
 	 * 如果是可堆叠的，则增加一个物品并修改数量
@@ -129,17 +112,15 @@ public:
 		const FGameplayTag& ProxyType
 		);
 
+	void UpdateProxy(
+		const IDType& ID
+		);
+
 	/**
-	 * 修改物品的数量
-	 * 如果是可堆叠的，则减少一个物品的数量
-	 * 如果是不可堆叠的，则移除物品？
-	 * @param ProxyType 
-	 * @param Num 
-	 * @return 
+	 * 移除物品
 	 */
-	void RemoveProxyNum(
-		const IDType& ID,
-		int32 Num
+	void RemoveProxy(
+		const IDType& ID
 		);
 
 	TArray<TSharedPtr<FBasicProxy>> GetProxys(
@@ -154,25 +135,28 @@ public:
 
 #endif
 
+	void AddToContainer(
+		const TSharedPtr<FBasicProxy>& ItemProxySPtr
+		);
+
 	void UpdateInContainer(
 		const TSharedPtr<FBasicProxy>& ItemProxySPtr
 		);
 
-	void AddToContainer(
+	void RemoveFromContainer(
 		const TSharedPtr<FBasicProxy>& ItemProxySPtr
 		);
 
 	template <typename ModifyItemProxyStrategyType>
 	TSharedPtr<ModifyItemProxyStrategyType> GetModifyItemProxyStrategy() const;
 
-	UPROPERTY(Replicated)
-	FProxy_FASI_Container Proxy_Container;
+	const TMap<FGameplayTag, TSharedPtr<FModifyItemProxyStrategyIterface>>& GetModifyItemProxyStrategies() const;
 
-private:
 	void UpdateID(
 		const FGuid& NewID,
 		const FGuid& OldID
 		);
+private:
 
 protected:
 	virtual void InitializeComponent() override;
@@ -183,7 +167,6 @@ protected:
 		TArray<FLifetimeProperty>& OutLifetimeProps
 		) const override;
 
-private:
 	// 等待加入“库存”的物品
 	TMap<FGuid, TMap<FGameplayTag, int32>> PendingMap;
 
@@ -192,16 +175,22 @@ private:
 
 	TMap<IDType, TSharedPtr<FBasicProxy>> ProxysMap;
 
-	TMap<FGameplayTag, TSharedPtr<FBasicProxy>> ProxyTypeMap;
+	/**
+	 * 单独的绑定
+	 */
+	TMap<FGameplayTag, TSharedPtr<FModifyItemProxyStrategyIterface>> ModifyItemProxyStrategiesMap;
 
-	TMap<FGameplayTag, TSharedPtr<FModifyItemProxyStrategyInterface>> ModifyItemProxyStrategiesMap;
+	UPROPERTY(Replicated)
+	FProxy_FASI_Container Proxy_Container;
+
+private:
 };
 
 template <typename ModifyItemProxyStrategyType, bool bIsFullStrategy>
 auto UInventoryComponentBase::FindProxy(
 	const IDType& ID
 	) const -> typename std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename
-	ModifyItemProxyStrategyType::FItemProxyType>>::type
+		                                     ModifyItemProxyStrategyType::FItemProxyType>>::type
 {
 	if (ProxysMap.Contains(ID))
 	{
@@ -210,7 +199,7 @@ auto UInventoryComponentBase::FindProxy(
 		auto Result = MakeShared<ModifyItemProxyStrategyType>();
 
 		Result->FindByID(ID, ResultSPtr, this);
-		
+
 		if constexpr (bIsFullStrategy)
 		{
 			return Result;
@@ -228,23 +217,24 @@ template <typename ModifyItemProxyStrategyType, bool bIsFullStrategy>
 auto UInventoryComponentBase::FindProxyType(
 	const FGameplayTag& ProxyType
 	) const -> typename std::conditional<bIsFullStrategy, TSharedPtr<ModifyItemProxyStrategyType>, TSharedPtr<typename
-	ModifyItemProxyStrategyType::FItemProxyType>>::type
+		                                     ModifyItemProxyStrategyType::FItemProxyType>>::type
 {
-	if (ProxyTypeMap.Contains(ProxyType))
-	{
-		auto ResultSPtr = ProxyTypeMap[ProxyType];
-		
-		auto Result = MakeShared<ModifyItemProxyStrategyType>();
+	ModifyItemProxyStrategyType ModifyItemProxyStrategy;
 
-		Result->FindByType(ProxyType, ResultSPtr, this);
-		
+	if (ModifyItemProxyStrategiesMap.Contains(ModifyItemProxyStrategy.GetCanOperationType()))
+	{
+		auto ResultSPtr = ModifyItemProxyStrategiesMap[ModifyItemProxyStrategy.GetCanOperationType()];
+
 		if constexpr (bIsFullStrategy)
 		{
-			return Result;
+			ResultSPtr->FindByType(ProxyType, this);
+			return ResultSPtr;
 		}
 		else
 		{
-			return Result->ResultSPtr;
+			return DynamicCastSharedPtr<typename ModifyItemProxyStrategyType::FItemProxyType>(
+				 ResultSPtr->FindByType(ProxyType, this)
+				);
 		}
 	}
 

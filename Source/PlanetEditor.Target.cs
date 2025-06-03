@@ -23,16 +23,10 @@ public class PlanetEditorTarget : TargetRules
 	        "EditTool",
 	        
 	        "AssetRef",
-	        "ChallengeSystem",
 	        "CommonType",
 	        "GameOptions",
 	        "GameplayTagsLibrary",
             "Planet",
-            "Planet_GroupManagger",
-            "Planet_GuideSystem",
-            "Planet_InputProcessor",
-            "Planet_ItemProxy",
-            "Planet_NPCGenerator",
             "Tools",
         } );
 	}

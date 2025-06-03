@@ -126,6 +126,54 @@ public class Planet : ModuleRules
 		PublicIncludePaths.Add("Planet/AssetRefMap");
 		PublicIncludePaths.Add("Planet/CameraTrailHelper");
 
+		PublicIncludePaths.Add("Planet/ChallengeSystem");
+
+		PublicIncludePaths.Add("Planet/Imp_NPCGenerator/Generator");
+		PublicIncludePaths.Add("Planet/Imp_NPCGenerator/Generator/AI_Colony");
+
+		PublicIncludePaths.Add("Planet/Imp_ItemProxy");
+		PublicIncludePaths.Add("Planet/Imp_ItemProxy/InventoryComponent");
+		PublicIncludePaths.Add("Planet/Imp_ItemProxy/ItemProxys");
+		PublicIncludePaths.Add("Planet/Imp_ItemProxy/ItemProxy");
+
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputActions");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/TransitionProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/BirdProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HorseProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/TransactionProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/ActionProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/EndangeredProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/InteractionProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/BuildingProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/BuildingProcessor/PlacingBuindingsProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/BuildingProcessor/UseToolsProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/HumanProcessor/ViewMenusProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/VehicleProcessor");
+		PublicIncludePaths.Add("Planet/Imp_InputProcessor/InputProcessor/VehicleProcessor/4WheeledVehicle");
+
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem/GuideActor");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem/STE");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/ChallengeSystem/STT");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideActor");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideActor/GuideInteraction");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideActor/GuideThread");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STT");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STT/GuideInteraction");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STT/GuideThread");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STE");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STE/GuideInteraction");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/STE/GuideThread");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideSystem_GameplayTask");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideSystem_GameplayTask/GuideThread");
+		PublicIncludePaths.Add("Planet/Imp_GuideSystem/GuideSystem/GuideSystem_GameplayTask/GuideInteraction");
+
+		PublicIncludePaths.Add("Planet/Imp_GroupManagger");
+		PublicIncludePaths.Add("Planet/Imp_GroupManagger/GroupManagger");
+		PublicIncludePaths.Add("Planet/Imp_GroupManagger/TeamMatesHelper");
+
 		PrivateIncludePaths.Add("Planet/Private");
 
 		if (Target.bBuildEditor == true)
@@ -178,15 +226,9 @@ public class Planet : ModuleRules
 			
 			// 其他模块
 			"AssetRef",
-			"ChallengeSystem",
 			"CommonType",
 			"GameOptions",
 			"GameplayTagsLibrary",
-			"Planet_GroupManagger",
-			"Planet_GuideSystem",
-			"Planet_InputProcessor",
-			"Planet_ItemProxy",
-			"Planet_NPCGenerator",
 			"Tools",
 		});
 

@@ -59,18 +59,10 @@ public class EditTool : ModuleRules
 			
 			// 其他模块
 			"AssetRef",
-			"ChallengeSystem",
 			"CommonType",
 			"GameOptions",
 			"GameplayTagsLibrary",
-			
 			"Planet",
-
-			"Planet_GroupManagger",
-			"Planet_GuideSystem",
-			"Planet_InputProcessor",
-			"Planet_ItemProxy",
-			"Planet_NPCGenerator",
 			"Tools",
 		});
 

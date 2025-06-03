@@ -51,7 +51,7 @@ void UProxyIcon::NativeOnMouseEnter(
 
 	if (ProxyType.IsValid() && bIsDisplayInfo)
 	{
-		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(ProxyType);
+		auto ProxyDTSPtr = GetTableRowProxy(ProxyType);
 		if (ProxyDTSPtr)
 		{
 			if (ItemDecriptionPtr)
@@ -94,7 +94,7 @@ void UProxyIcon::SetItemType()
 	auto ImagePtr = Cast<UImage>(GetWidgetFromName(FProxyIcon::Get().Icon));
 	if (ImagePtr)
 	{
-		auto ProxyDTSPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(ProxyType);
+		auto ProxyDTSPtr = GetTableRowProxy(ProxyType);
 		if (ProxyDTSPtr)
 		{
 			if (auto ItemProxy_Description = ProxyDTSPtr->ItemProxy_Description.LoadSynchronous())

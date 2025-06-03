@@ -125,7 +125,10 @@ public:
 
 	virtual void InitialProxy(const FGameplayTag& InProxyType);
 
-	// 通过远程的更新客户端的数据
+	/**
+	 * 通过远程的更新客户端的数据
+	 * @param RemoteSPtr 
+	 */
 	void UpdateByRemote(const TSharedPtr<FBasicProxy>& RemoteSPtr);
 
 	// 装备至插槽
@@ -155,13 +158,16 @@ public:
 	// 
 	FString GetProxyName() const;
 
-	void Update2Client();
-
 	TObjectPtr<UItemProxy_Description>GetItemProxy_Description()const;
 	
 	void SetInventoryComponentBase(const TObjectPtr<UInventoryComponentBase>&InventoryComponentPtr);
 
 	TObjectPtr<UInventoryComponentBase> GetInventoryComponentBase() const;
+
+	/**
+	 * 更新数据
+	 */
+	virtual void UpdateData();
 
 private:
 

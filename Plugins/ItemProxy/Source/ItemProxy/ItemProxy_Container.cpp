@@ -2,31 +2,14 @@
 
 #include "InventoryComponentBase.h"
 #include "ItemProxy.h"
-#include "ItemProxyCollection.h"
-
-const FTableRowProxy* GetTableRowProxy(
-	const FGameplayTag& ProxyType
-	)
-{
-	auto SceneProxyExtendInfoMapPtr = UItemProxyCollection::GetInstance();
-	return SceneProxyExtendInfoMapPtr->GetTableRowProxy(ProxyType);
-}
-
-void FProxy_FASI::PreReplicatedRemove(
-	const struct FProxy_FASI_Container& InArraySerializer
-	)
-{
-	// 在这里 我们对本地的数据进行绑定
-
-	InArraySerializer.GetInventoryComponentBase()->RemoveProxy_SyncHelper(ProxySPtr);
-}
+#include "ModifyItemProxyStrategyInterface.h"
+#include "PAD_ItemProxyCollection.h"
 
 void FProxy_FASI::PostReplicatedAdd(
 	const struct FProxy_FASI_Container& InArraySerializer
 	)
 {
 	// 在这里 我们对本地的数据进行绑定
-
 	ProxySPtr = InArraySerializer.GetInventoryComponentBase()->AddProxy_SyncHelper(CacheProxySPtr);
 }
 
@@ -35,8 +18,15 @@ void FProxy_FASI::PostReplicatedChange(
 	)
 {
 	// 在这里 我们对本地的数据进行绑定
-
 	InArraySerializer.GetInventoryComponentBase()->UpdateProxy_SyncHelper(ProxySPtr, CacheProxySPtr);
+}
+
+void FProxy_FASI::PreReplicatedRemove(
+	const struct FProxy_FASI_Container& InArraySerializer
+	)
+{
+	// 在这里 我们对本地的数据进行绑定
+	InArraySerializer.GetInventoryComponentBase()->RemoveProxy_SyncHelper(ProxySPtr);
 }
 
 bool FProxy_FASI::NetSerialize(
@@ -45,6 +35,37 @@ bool FProxy_FASI::NetSerialize(
 	bool& bOutSuccess
 	)
 {
+	if (Ar.IsSaving())
+	{
+		auto ProxyType = ProxySPtr->GetProxyType();
+		Ar << ProxyType;
+
+		ProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+	}
+	else if (Ar.IsLoading())
+	{
+		FGameplayTag ProxyType = FGameplayTag::EmptyTag;
+		Ar << ProxyType;
+
+		if (CacheProxySPtr)
+		{
+			CacheProxySPtr->NetSerialize(Ar, Map, bOutSuccess);
+		}
+		else
+		{
+			auto GetModifyItemProxyStrategiesPtr = Cast<IGetModifyItemProxyStrategies>(GetWorldImp()->GetWorldSettings());
+			const auto ModifyItemProxyStrategiesMap = GetModifyItemProxyStrategiesPtr->GetModifyItemProxyStrategies();
+			
+			for (const auto& Iter : ModifyItemProxyStrategiesMap)
+			{
+				if (ProxyType.MatchesTag(Iter.Key))
+				{
+					CacheProxySPtr = Iter.Value->NetSerialize(Ar, Map, bOutSuccess);
+				}
+			}
+		}
+	}
+
 	return true;
 }
 

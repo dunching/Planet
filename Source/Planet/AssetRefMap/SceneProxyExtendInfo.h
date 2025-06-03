@@ -11,7 +11,7 @@
 #include "SceneProxyTable.h"
 #include "TalentInfo.h"
 #include "CharactersInfo.h"
-#include "ItemProxyCollection.h"
+#include "PAD_ItemProxyCollection.h"
 
 #include "SceneProxyExtendInfo.generated.h"
 
@@ -36,7 +36,7 @@ PLANET_API FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInf
  * DataTables
  */
 UCLASS(BlueprintType, Blueprintable)
-class PLANET_API USceneProxyExtendInfoMap : public UItemProxyCollection
+class PLANET_API USceneProxyExtendInfoMap : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 

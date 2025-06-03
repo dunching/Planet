@@ -116,7 +116,7 @@ void UEffectItem::SetTexutre(
 	{
 		if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Skill))
 		{
-			auto SceneProxyExtendInfoPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(Iter);
+			auto SceneProxyExtendInfoPtr = GetTableRowProxy(Iter);
 			if (!SceneProxyExtendInfoPtr)
 			{
 				return;
@@ -128,7 +128,7 @@ void UEffectItem::SetTexutre(
 		}
 		else if (Iter.MatchesTag(UGameplayTagsLibrary::Proxy_Consumables))
 		{
-			auto SceneProxyExtendInfoPtr = USceneProxyExtendInfoMap::GetInstance()->GetTableRowProxy(Iter);
+			auto SceneProxyExtendInfoPtr = GetTableRowProxy(Iter);
 			if (!SceneProxyExtendInfoPtr)
 			{
 				return;

@@ -83,7 +83,7 @@ bool USkill_Consumable_Generic::CommitAbility(
 	if (CharacterPtr->GetNetMode() == NM_DedicatedServer)
 	{
 		ProxyPtr->ModifyNum(-1);
-		ProxyPtr->Update2Client();
+		ProxyPtr->UpdateData();
 	}
 #endif
 

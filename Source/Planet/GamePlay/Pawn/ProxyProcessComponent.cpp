@@ -416,7 +416,7 @@ bool UProxyProcessComponent::SwitchWeaponImp(const FCharacterSocket& NewWeaponSo
 		if (GetNetMode() == NM_DedicatedServer)
 		{
 			PreviousWeaponSocketSPtr->RetractputWeapon();
-			PreviousWeaponSocketSPtr->Update2Client();
+			PreviousWeaponSocketSPtr->UpdateData();
 		}
 #endif
 	}
@@ -428,7 +428,7 @@ bool UProxyProcessComponent::SwitchWeaponImp(const FCharacterSocket& NewWeaponSo
 		if (GetNetMode() == NM_DedicatedServer)
 		{
 			NewWeaponSocketSPtr->ActiveWeapon();
-			NewWeaponSocketSPtr->Update2Client();
+			NewWeaponSocketSPtr->UpdateData();
 		}
 #endif
 	}

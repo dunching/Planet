@@ -9,15 +9,13 @@
 #include "UObject/ObjectMacros.h"
 #include "UObject/Interface.h"
 
-#include "TemplateHelper.h"
 #include "InventoryComponentBase.h"
-#include "ModifyItemProxyStrategyInterface.h"
-
+#include "ModifyItemProxyStrategyBase.h"
 
 #include "ModifyItemProxyStrategyGeneric.generated.h"
 
 template <typename ItemProxyType>
-struct ITEMPROXY_API FModifyItemProxyStrategyGeneric : public FModifyItemProxyStrategyInterface
+struct ITEMPROXY_API FModifyItemProxyStrategyGeneric : public FModifyItemProxyStrategyBase
 {
 	using FItemProxyType = ItemProxyType;
 	
@@ -27,8 +25,9 @@ struct ITEMPROXY_API FModifyItemProxyStrategyGeneric : public FModifyItemProxySt
 		FGameplayTag InOperationType
 		);
 
-	virtual void Add(
+	virtual TArray<TSharedPtr<FBasicProxy>> Add(
 		const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+		const FGameplayTag& InProxyType,
 		int32 Num
 		) override;
 
@@ -37,8 +36,9 @@ private:
 };
 
 template <typename ItemProxy>
-void FModifyItemProxyStrategyGeneric<ItemProxy>::Add(
+TArray<TSharedPtr<FBasicProxy>> FModifyItemProxyStrategyGeneric<ItemProxy>::Add(
 	const TObjectPtr<UInventoryComponentBase>& InventoryComponentPtr,
+	const FGameplayTag& InProxyType,
 	int32 Num
 	)
 {

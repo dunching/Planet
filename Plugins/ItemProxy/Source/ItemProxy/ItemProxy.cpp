@@ -2,7 +2,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "InventoryComponentBase.h"
-#include "ItemProxyCollection.h"
+#include "PAD_ItemProxyCollection.h"
 
 #include "ItemProxy_Description.h"
 #include "ItemProxy_Descriptions.h"
@@ -95,12 +95,12 @@ TSoftObjectPtr<UTexture2D> FBasicProxy::GetIcon() const
 	return nullptr;
 }
 
-void FBasicProxy::Update2Client()
+void FBasicProxy::UpdateData()
 {
 #if UE_EDITOR || UE_SERVER
 	if (GetInventoryComponentBase()->GetNetMode() == NM_DedicatedServer)
 	{
-		GetInventoryComponentBase()->Proxy_Container.UpdateItem(GetID());
+		GetInventoryComponentBase()->UpdateProxy(GetID());
 	}
 #endif
 }
@@ -143,7 +143,7 @@ FString FBasicProxy::GetProxyName() const
 
 const FTableRowProxy* FBasicProxy::GetTableRowProxy() const
 {
-	auto SceneProxyExtendInfoMapPtr = UItemProxyCollection::GetInstance();
+	auto SceneProxyExtendInfoMapPtr = UPAD_ItemProxyCollection::GetInstance();
 	return SceneProxyExtendInfoMapPtr->GetTableRowProxy(ProxyType);
 }
 

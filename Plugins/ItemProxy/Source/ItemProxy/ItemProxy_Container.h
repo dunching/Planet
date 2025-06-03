@@ -25,8 +25,6 @@ class UInventoryComponentBase;
 struct FBasicProxy;
 struct FTableRowProxy;
 
-ITEMPROXY_API const FTableRowProxy* GetTableRowProxy(const FGameplayTag &ProxyType);
-
 USTRUCT()
 struct ITEMPROXY_API FProxy_FASI : public FFastArraySerializerItem
 {
