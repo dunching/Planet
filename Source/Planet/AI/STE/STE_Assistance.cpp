@@ -15,6 +15,7 @@
 #include "CharacterAbilitySystemComponent.h"
 #include "GameOptions.h"
 #include "GeneratorColony_ByInvoke.h"
+#include "GeneratorColony_Patrol.h"
 #include "GroupManagger.h"
 #include "GroupManagger_NPC.h"
 #include "GroupManagger_Player.h"
@@ -64,12 +65,12 @@ void USTE_Assistance::TreeStop(
 {
 	if (TeammateOptionChangedDelegate)
 	{
-		TeammateOptionChangedDelegate->UnBindCallback();
+		TeammateOptionChangedDelegate.Reset();
 	}
 
 	if (TeammateChangedDelegate)
 	{
-		TeammateChangedDelegate->UnBindCallback();
+		TeammateChangedDelegate.Reset();
 	}
 
 	Super::TreeStop(Context);

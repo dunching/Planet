@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/WidgetComponent.h"
 
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 #include "UserWidget_Override.h"
 #include "GenerateTypes.h"
 #include "GroupManaggerInterface.h"

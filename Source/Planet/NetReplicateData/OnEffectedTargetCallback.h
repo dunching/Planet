@@ -9,7 +9,7 @@
 #include "GenerateTypes.h"
 #include "Net/Serialization/FastArraySerializer.h"
 
-#include "OnEffectedTawrgetCallback.generated.h"
+#include "OnEffectedTargetCallback.generated.h"
 
 class UConversationComponent;
 class ACharacterBase;
@@ -19,15 +19,15 @@ class ACharacterBase;
  * 对目标造成影响后的回执
  */
 USTRUCT()
-struct PLANET_API FOnEffectedTawrgetCallback
+struct PLANET_API FOnEffectedTargetCallback
 {
 	GENERATED_USTRUCT_BODY()
 
 	bool NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess);
 
-	ACharacterBase* InstigatorCharacterPtr = nullptr;
+	TObjectPtr<ACharacterBase> InstigatorCharacterPtr = nullptr;
 
-	ACharacterBase* TargetCharacterPtr = nullptr;
+	TObjectPtr<ACharacterBase>  TargetCharacterPtr = nullptr;
 
 	EElementalType ElementalType = EElementalType::kMetal;
 	
@@ -53,8 +53,8 @@ struct PLANET_API FOnEffectedTawrgetCallback
 };
 
 template <>
-struct TStructOpsTypeTraits<FOnEffectedTawrgetCallback> :
-	public TStructOpsTypeTraitsBase2<FOnEffectedTawrgetCallback>
+struct TStructOpsTypeTraits<FOnEffectedTargetCallback> :
+	public TStructOpsTypeTraitsBase2<FOnEffectedTargetCallback>
 {
 	enum
 	{

@@ -17,7 +17,7 @@ class ACharacterBase;
  * 根据时间刷新
  */
 UCLASS()
-class PLANET_API AGeneratorColony_ByTime : public AGeneratorBase
+class PLANET_API AGeneratorColony_ByTime : public APlanetGenerator
 {
 	GENERATED_BODY()
 

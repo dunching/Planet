@@ -112,7 +112,7 @@ void UHUD_TeamInfo::DisEnable()
 {
 	if (TeammateOptionChangedDelegateContainer)
 	{
-		TeammateOptionChangedDelegateContainer->UnBindCallback();
+		TeammateOptionChangedDelegateContainer.Reset();
 	}
 
 	ILayoutItemInterfacetion::DisEnable();

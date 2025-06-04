@@ -74,7 +74,7 @@ void USkill_Talent_NuQi::OnRemoveAbility(
 {
 	if (OnValueChanged)
 	{
-		OnValueChanged->UnBindCallback();
+		OnValueChanged.Reset();
 	}
 
 	if (CharacterPtr)

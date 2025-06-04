@@ -7,6 +7,7 @@
 #include "AIComponent.h"
 #include "AITask_MoveBySpline.h"
 #include "GeneratorColony_ByInvoke.h"
+#include "GeneratorColony_Patrol.h"
 #include "GroupManagger_NPC.h"
 #include "HumanAIController.h"
 #include "HumanCharacter.h"

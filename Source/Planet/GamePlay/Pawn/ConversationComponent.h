@@ -5,7 +5,7 @@
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 
 #include "ConversationComponent.generated.h"
 

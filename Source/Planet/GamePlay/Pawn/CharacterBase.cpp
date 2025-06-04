@@ -187,12 +187,12 @@ void ACharacterBase::EndPlay(
 {
 	if (HPChangedHandle)
 	{
-		HPChangedHandle->UnBindCallback();
+		HPChangedHandle.Reset();
 	}
 
 	if (MoveSpeedChangedHandle)
 	{
-		MoveSpeedChangedHandle->UnBindCallback();
+		MoveSpeedChangedHandle.Reset();
 	}
 
 	OriginalAIController = nullptr;

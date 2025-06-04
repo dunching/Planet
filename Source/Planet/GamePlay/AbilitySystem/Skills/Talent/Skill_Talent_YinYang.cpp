@@ -88,7 +88,7 @@ void USkill_Talent_YinYang::OnRemoveAbility(
 {
 	if (OnValueChanged)
 	{
-		OnValueChanged->UnBindCallback();
+		OnValueChanged.Reset();
 	}
 
 	if (CharacterPtr)

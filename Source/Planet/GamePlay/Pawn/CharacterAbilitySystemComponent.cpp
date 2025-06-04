@@ -27,7 +27,7 @@
 #include "BasicFutures_MoveToAttaclArea.h"
 #include "EventSubjectComponent.h"
 #include "Tornado.h"
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 #include "PlanetWeapon_Base.h"
 #include "Weapon_Base.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -914,6 +914,10 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 
 			DataComposition.DataMap = {
 				{
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				},
+				{
 					Tag, Value
 				}
 			};
@@ -937,6 +941,22 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 				GameplayAttributeDataMap.DataMap.Remove(Tag);
 			}
 		}
+		else
+		{
+			FDataComposition DataComposition;
+
+			DataComposition.DataMap = {
+				{
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
+		}
 
 		return;
 	}
@@ -952,6 +972,13 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 		{
 			FDataComposition DataComposition;
 
+			DataComposition.DataMap = {
+				{
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				}
+			};
+			
 			DataComposition.MagnitudeMap = {
 				{
 					Tag, Value
@@ -976,6 +1003,22 @@ void UCharacterAbilitySystemComponent::UpdateMapTemporary(
 			{
 				GameplayAttributeDataMap.MagnitudeMap.Remove(Tag);
 			}
+		}
+		else
+		{
+			FDataComposition DataComposition;
+
+			DataComposition.DataMap = {
+				{
+					UGameplayTagsLibrary::DataSource_Character,
+					GameplayAttributeDataPtr->GetCurrentValue()
+				}
+			};
+
+			ValueMap.Add(
+						 GameplayAttributeDataPtr,
+						 DataComposition
+						);
 		}
 
 		return;
@@ -1128,7 +1171,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 	                                          );
 
 	// 回执
-	FOnEffectedTawrgetCallback ReceivedEventModifyDataCallback;
+	FOnEffectedTargetCallback ReceivedEventModifyDataCallback;
 
 	ReceivedEventModifyDataCallback.InstigatorCharacterPtr = Instigator;
 	ReceivedEventModifyDataCallback.TargetCharacterPtr = TargetCharacterPtr;
@@ -1829,7 +1872,7 @@ void UCharacterAbilitySystemComponent::ApplyInputData(
 }
 
 void UCharacterAbilitySystemComponent::OnEffectOhterCharacter_Implementation(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	)
 {
 	MakedDamageDelegate(ReceivedEventModifyDataCallback);

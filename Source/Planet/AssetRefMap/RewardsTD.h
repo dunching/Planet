@@ -40,3 +40,16 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	TMap<FGuid, FRewardsItem> ProxyMap;
 };
+
+/**
+ * 在开放世界中，击败敌人后会获得的奖励
+ */
+USTRUCT(BlueprintType)
+struct PLANET_API FTableRow_RewardsItems_DefeatEnemy : public FTableRowBase
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
+	TMap<FGameplayTag, int32>RewardsMap;
+	
+};

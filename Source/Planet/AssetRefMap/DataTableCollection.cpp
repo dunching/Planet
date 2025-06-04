@@ -1,15 +1,13 @@
 ﻿
 #include "DataTableCollection.h"
 
-#include <Kismet/GameplayStatics.h>
-
 #include "GameplayTagsManager.h"
-#include "GameInstance/PlanetGameInstance.h"
 #include "Tools.h"
 #include "PlanetWorldSettings.h"
 #include "StateTagExtendInfo.h"
 #include "TalentInfo.h"
 #include "Regions.h"
+#include "RewardsTD.h"
 
 FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(
 	const FGameplayTag& CommonCooldownTag
@@ -82,6 +80,21 @@ const FTableRow_TalenSocket* UDataTableCollection::GetTableRow_TalenSocket(
 	auto DataTablePtr = TableRow_TalenSocket.LoadSynchronous();
 
 	auto RegionsPtr = DataTablePtr->FindRow<FTableRow_TalenSocket>(*UnitType.ToString(), TEXT("GetUnit"));
+	if (RegionsPtr)
+	{
+		return RegionsPtr;
+	}
+
+	return nullptr;
+}
+
+const FTableRow_RewardsItems_DefeatEnemy* UDataTableCollection::GetTableRow_RewardsItems_DefeatEnemy(
+	FGameplayTag UnitType
+	) const
+{
+	auto DataTablePtr = TableRow_RewardsItems_DefeatEnemy.LoadSynchronous();
+
+	auto RegionsPtr = DataTablePtr->FindRow<FTableRow_RewardsItems_DefeatEnemy>(*UnitType.ToString(), TEXT("GetUnit"));
 	if (RegionsPtr)
 	{
 		return RegionsPtr;

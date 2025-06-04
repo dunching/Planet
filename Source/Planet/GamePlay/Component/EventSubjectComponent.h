@@ -8,7 +8,7 @@
 
 #include "EventSubjectComponent.generated.h"
 
-struct FOnEffectedTawrgetCallback;
+struct FOnEffectedTargetCallback;
 
 /*
  * 事务由转发
@@ -23,7 +23,7 @@ class UEventSubjectComponent :
 
 public:
 	
-	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FOnEffectedTawrgetCallback&)>;
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(const FOnEffectedTargetCallback&)>;
 
 	static FName ComponentName;
 

@@ -354,6 +354,8 @@ public:
 	static FGameplayTag GEData_ModifyType_RemoveTemporary_Percent;
 
 
+	static FGameplayTag GEData_ModifyItem_Experience;
+
 	static FGameplayTag GEData_ModifyItem_CriticalDamage;
 
 	static FGameplayTag GEData_ModifyItem_CriticalHitRate;

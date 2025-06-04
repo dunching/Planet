@@ -11,6 +11,7 @@
 #include "GroupManaggerInterface.h"
 #include "HumanCharacter_AI.h"
 #include "PlanetControllerInterface.h"
+#include "OnEffectedTargetCallback.h"
 
 #include "PlanetPlayerController.generated.h"
 
@@ -309,6 +310,14 @@ protected:
 		AActor* Actor
 		);
 
+	void OnPossessCharacterMakedDamage(const FOnEffectedTargetCallback&OnEffectedTargetCallback);
+
+	using FMakedDamageDelegate = TCallbackHandleContainer<void(
+		const FOnEffectedTargetCallback&
+		)>;
+
+	FMakedDamageDelegate::FCallbackHandleSPtr MakedDamageDelegateHandle;
+	
 	UPROPERTY(ReplicatedUsing = OnRep_GroupSharedInfoChanged)
 	TObjectPtr<AGroupManagger> GroupManaggerPtr = nullptr;
 

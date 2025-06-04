@@ -255,32 +255,32 @@ void UInteractionTransactionLayout::DisEnable()
 {
 	if (OnWeaponSkillProxyChangedDelegateHandle)
 	{
-		OnWeaponSkillProxyChangedDelegateHandle->UnBindCallback();
+		OnWeaponSkillProxyChangedDelegateHandle.Reset();
 	}
 
 	if (OnActiveSkillProxyChangedDelegateHandle)
 	{
-		OnActiveSkillProxyChangedDelegateHandle->UnBindCallback();
+		OnActiveSkillProxyChangedDelegateHandle.Reset();
 	}
 
 	if (OnPassiveSkillProxyChangedDelegateHandle)
 	{
-		OnPassiveSkillProxyChangedDelegateHandle->UnBindCallback();
+		OnPassiveSkillProxyChangedDelegateHandle.Reset();
 	}
 
 	if (OnWeaponProxyChangedDelegateHandle)
 	{
-		OnWeaponProxyChangedDelegateHandle->UnBindCallback();
+		OnWeaponProxyChangedDelegateHandle.Reset();
 	}
 
 	if (OnConsumableProxyChangedDelegateHandle)
 	{
-		OnConsumableProxyChangedDelegateHandle->UnBindCallback();
+		OnConsumableProxyChangedDelegateHandle.Reset();
 	}
 
 	if (OnCoinChangedDelegateHandle)
 	{
-		OnCoinChangedDelegateHandle->UnBindCallback();
+		OnCoinChangedDelegateHandle.Reset();
 	}
 
 	ILayoutInterfacetion::DisEnable();

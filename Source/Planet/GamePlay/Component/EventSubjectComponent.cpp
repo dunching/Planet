@@ -1,6 +1,6 @@
 #include "EventSubjectComponent.h"
 
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 
 FName UEventSubjectComponent::ComponentName = TEXT("EventSubjectComponent");
 

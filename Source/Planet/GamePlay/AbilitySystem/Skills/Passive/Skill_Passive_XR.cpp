@@ -21,7 +21,7 @@
 #include "InventoryComponent.h"
 #include "ItemProxy_Skills.h"
 #include "ModifyItemProxyStrategy.h"
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 
 void UItemDecription_Skill_PassiveSkill_XR::SetUIStyle()
 {
@@ -67,14 +67,14 @@ void USkill_Passive_XR::OnRemoveAbility(
 {
 	if (AbilityActivatedCallbacksHandle)
 	{
-		AbilityActivatedCallbacksHandle->UnBindCallback();
+		AbilityActivatedCallbacksHandle.Reset();
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
 void USkill_Passive_XR::MakedDamageDelegate(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	)
 {
 	if (CharacterPtr)

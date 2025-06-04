@@ -122,12 +122,12 @@ void AHorseAIController::OnUnPossess()
 {
 	if (TeammateOptionChangedDelegate)
 	{
-		TeammateOptionChangedDelegate->UnBindCallback();
+		TeammateOptionChangedDelegate.Reset();
 	}
 
 	if (TeamHelperChangedDelegate)
 	{
-		TeamHelperChangedDelegate->UnBindCallback();
+		TeamHelperChangedDelegate.Reset();
 	}
 
 	Super::OnUnPossess();

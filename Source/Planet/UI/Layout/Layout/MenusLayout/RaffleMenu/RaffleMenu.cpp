@@ -70,7 +70,7 @@ void URaffleMenu::EnableMenu()
 
 void URaffleMenu::DisEnableMenu()
 {
-	OnGetProxyDelegateHandle->UnBindCallback();
+	OnGetProxyDelegateHandle.Reset();
 }
 
 EMenuType URaffleMenu::GetMenuType() const

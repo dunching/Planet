@@ -46,7 +46,7 @@ void UState_Talent_YinYang::NativeDestruct()
 	PRINTINVOKEINFO();
 	if (OnValueChangedHandle)
 	{
-		OnValueChangedHandle->UnBindCallback();
+		OnValueChangedHandle.Reset();
 	}
 	Super::NativeDestruct();
 }

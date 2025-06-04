@@ -26,5 +26,10 @@ void AGeneratorColony_ByTime::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SpawnGeneratorActor();
+#if UE_EDITOR || UE_SERVER
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		SpawnGeneratorActor();
+	}
+#endif
 }

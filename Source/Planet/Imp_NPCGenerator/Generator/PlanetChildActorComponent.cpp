@@ -28,7 +28,7 @@ void UPlanetChildActorComponent::CreateChildActor(
 )
 {
 	UWorld* World = GetWorld();
-	if ((World->IsGameWorld()))
+	if (World && (World->IsGameWorld()))
 	{
 #if UE_EDITOR || UE_SERVER
 		if (GetNetMode() == NM_DedicatedServer)

@@ -8,7 +8,7 @@
 #include "UserWidget_Override.h"
 
 #include "CharacterAttibutes.h"
-#include "GenerateTypes.h"
+#include "TemplateHelper.h"
 
 #include "MyProgressBar.generated.h"
 

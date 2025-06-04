@@ -109,11 +109,11 @@ void UAllocationSkillsMenu::NativeDestruct()
 
 	if (MainDelegateHandleSPtr)
 	{
-		MainDelegateHandleSPtr->UnBindCallback();
+		MainDelegateHandleSPtr.Reset();
 	}
 	if (SecondaryDelegateHandleSPtr)
 	{
-		SecondaryDelegateHandleSPtr->UnBindCallback();
+		SecondaryDelegateHandleSPtr.Reset();
 	}
 
 	DisEnableMenu();

@@ -206,7 +206,7 @@ void URegularActionLayout::DisEnable()
 
 		if (FocusCharacterDelegateSPtr)
 		{
-			FocusCharacterDelegateSPtr->UnBindCallback();
+			FocusCharacterDelegateSPtr.Reset();
 		}
 
 		auto CharacterAttributesRef =
@@ -223,17 +223,17 @@ void URegularActionLayout::DisEnable()
 
 	if (EffectOhterCharacterCallbackDelegate)
 	{
-		EffectOhterCharacterCallbackDelegate->UnBindCallback();
+		EffectOhterCharacterCallbackDelegate.Reset();
 	}
 
 	if (FocusCharacterDelegateSPtr)
 	{
-		FocusCharacterDelegateSPtr->UnBindCallback();
+		FocusCharacterDelegateSPtr.Reset();
 	}
 
 	if (LevelChangedDelegateHandle)
 	{
-		LevelChangedDelegateHandle->UnBindCallback();
+		LevelChangedDelegateHandle.Reset();
 	}
 
 	{
@@ -491,7 +491,7 @@ void URegularActionLayout::OnFocusDestruct(
 }
 
 void URegularActionLayout::OnEffectOhterCharacter(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	)
 {
 	auto ScreenLayer = UKismetGameLayerManagerLibrary::GetGameLayer<FHoverWidgetScreenLayer>(

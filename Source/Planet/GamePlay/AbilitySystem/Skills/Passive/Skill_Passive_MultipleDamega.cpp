@@ -18,7 +18,7 @@
 #include "GameplayTagsLibrary.h"
 #include "GE_Common.h"
 #include "ItemProxy_Skills.h"
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 
 void UItemDecription_Skill_PassiveSkill_MultipleDamega::SetUIStyle()
 {
@@ -57,14 +57,14 @@ void USkill_Passive_MultipleDamega::OnRemoveAbility(
 {
 	if (AbilityActivatedCallbacksHandle)
 	{
-		AbilityActivatedCallbacksHandle->UnBindCallback();
+		AbilityActivatedCallbacksHandle.Reset();
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
 }
 
 void USkill_Passive_MultipleDamega::MakedDamageDelegate(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	)
 {
 	if (CharacterPtr)

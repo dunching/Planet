@@ -108,12 +108,12 @@ void UEffectsList::DisEnable()
 {
 	if (CallbackHandle)
 	{
-		CallbackHandle->UnBindCallback();
+		CallbackHandle.Reset();
 	}
 
 	// if (CharacterStateMapHandle)
 	// {
-	// 	CharacterStateMapHandle->UnBindCallback();
+	// 	CharacterStateMapHandle.Reset();
 	// }
 
 #if UE_EDITOR || UE_SERVER

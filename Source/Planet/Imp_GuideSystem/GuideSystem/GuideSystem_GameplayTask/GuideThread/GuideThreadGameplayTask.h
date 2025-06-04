@@ -31,7 +31,7 @@ class UPAD_TaskNode_Interaction_NotifyGuideThread;
 
 struct FCoinProxy;
 struct FConsumableProxy;
-struct FOnEffectedTawrgetCallback;
+struct FOnEffectedTargetCallback;
 
 UCLASS()
 class PLANET_API UGameplayTask_Guide : public UGameplayTask_Base
@@ -272,7 +272,7 @@ class PLANET_API UGameplayTask_Guide_DefeatEnemy : public UGameplayTask_Guide
 	GENERATED_BODY()
 
 	using FMakedDamageHandle = TCallbackHandleContainer<void(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 	)>::FCallbackHandleSPtr;
 
 public:
@@ -291,7 +291,7 @@ public:
 
 protected:
 	void OnActiveGEAddedDelegateToSelf(
-		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	);
 
 	void UpdateDescription() const;
@@ -311,7 +311,7 @@ class PLANET_API UGameplayTask_Guide_ReturnOpenWorld : public UGameplayTask_Guid
 	GENERATED_BODY()
 
 	using FMakedDamageHandle = TCallbackHandleContainer<void(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 	)>::FCallbackHandleSPtr;
 
 public:
@@ -395,10 +395,10 @@ public:
 	
 private:
 	void OnEffectOhterCharacter(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 	);
 
 	TCallbackHandleContainer<void(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 	)>::FCallbackHandleSPtr DelegateHandle;
 };

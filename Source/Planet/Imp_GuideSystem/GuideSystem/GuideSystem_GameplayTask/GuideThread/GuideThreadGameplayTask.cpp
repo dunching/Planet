@@ -361,7 +361,7 @@ void UGameplayTask_Guide_CollectResource::OnDestroy(
 {
 	if (OnConsumableProxyChangedHandle)
 	{
-		OnConsumableProxyChangedHandle->UnBindCallback();
+		OnConsumableProxyChangedHandle.Reset();
 	}
 
 	Super::OnDestroy(bInOwnerFinished);
@@ -476,7 +476,7 @@ void UGameplayTask_Guide_DefeatEnemy::OnDestroy(
 {
 	if (DelegateHandle)
 	{
-		DelegateHandle->UnBindCallback();
+		DelegateHandle.Reset();
 	}
 
 	Super::OnDestroy(bInOwnerFinished);
@@ -503,7 +503,7 @@ FTaskNodeDescript UGameplayTask_Guide_DefeatEnemy::GetTaskNodeDescripton() const
 }
 
 void UGameplayTask_Guide_DefeatEnemy::OnActiveGEAddedDelegateToSelf(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	)
 {
 	if (
@@ -650,14 +650,14 @@ void UGameplayTask_Guide_AttckCharacter::OnDestroy(
 {
 	if (DelegateHandle)
 	{
-		DelegateHandle->UnBindCallback();
+		DelegateHandle.Reset();
 	}
 
 	Super::OnDestroy(bInOwnerFinished);
 }
 
 void UGameplayTask_Guide_AttckCharacter::OnEffectOhterCharacter(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 
 	)
 {

@@ -27,11 +27,11 @@ void UMyProgressBar::NativeDestruct()
 {
 	if (OnMaxPPValueChanged)
 	{
-		OnMaxPPValueChanged->UnBindCallback();
+		OnMaxPPValueChanged.Reset();
 	}
 	if (OnPPValueChanged)
 	{
-		OnPPValueChanged->UnBindCallback();
+		OnPPValueChanged.Reset();
 	}
 
 	Super::NativeDestruct();

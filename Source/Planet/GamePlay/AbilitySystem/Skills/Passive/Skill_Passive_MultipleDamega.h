@@ -20,7 +20,7 @@ class IOutputData_MultipleDamega_ModifyInterface;
 
 struct FGAEventData;
 struct FCharacterStateInfo;
-struct FOnEffectedTawrgetCallback;
+struct FOnEffectedTargetCallback;
 
 UCLASS()
 class PLANET_API UItemProxy_Description_PassiveSkill_MultipleDamega : public UItemProxy_Description_PassiveSkill
@@ -70,7 +70,7 @@ class PLANET_API USkill_Passive_MultipleDamega : public USkill_Passive_Base
 public:
 	using FMakedDamageHandle =
 	TCallbackHandleContainer<void(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 	)>::FCallbackHandleSPtr;
 
 	virtual void OnAvatarSet(
@@ -86,7 +86,7 @@ public:
 protected:
 	
 	void MakedDamageDelegate(
-		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	);
 
 	TSharedPtr<IOutputData_MultipleDamega_ModifyInterface>OutputDataModifySPtr = nullptr;

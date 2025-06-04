@@ -164,7 +164,7 @@ void UEffectItem::NativeDestruct()
 {
 	if (DataChangedHandle)
 	{
-		DataChangedHandle->UnBindCallback();
+		DataChangedHandle.Reset();
 	}
 
 	Super::NativeDestruct();

@@ -23,6 +23,7 @@
 #include "AIControllerStateTreeAIComponent.h"
 #include "GeneratorColony_ByInvoke.h"
 #include "GeneratorColony_ByTime.h"
+#include "GeneratorColony_Patrol.h"
 #include "LogWriter.h"
 #include "TeamMatesHelperComponent.h"
 
@@ -133,12 +134,12 @@ void AHumanAIController::OnUnPossess()
 {
 	if (TeammateOptionChangedDelegate)
 	{
-		TeammateOptionChangedDelegate->UnBindCallback();
+		TeammateOptionChangedDelegate.Reset();
 	}
 
 	if (TeamHelperChangedDelegate)
 	{
-		TeamHelperChangedDelegate->UnBindCallback();
+		TeamHelperChangedDelegate.Reset();
 	}
 
 	if (StateTreeAIComponentPtr)

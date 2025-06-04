@@ -1,6 +1,7 @@
 #include "PlanetGenerator.h"
 
 #include "AIComponent.h"
+#include "BuildingArea.h"
 #include "CharacterBase.h"
 #include "Net/UnrealNetwork.h"
 
@@ -39,6 +40,8 @@ void APlanetGenerator::BeginPlay()
 
 void APlanetGenerator::SpawnGeneratorActor()
 {
+	Super::SpawnGeneratorActor();
+	
 	AGroupManagger_NPC* GroupManagger_NPCPtr = nullptr;
 	if (!GroupManaggerPtr)
 	{
@@ -66,6 +69,18 @@ void APlanetGenerator::SpawnGeneratorActor()
 		CustomizerGroupManagger(GroupManaggerPtr);
 
 		GroupManaggerPtr->GetTeamMatesHelperComponentBase()->SwitchTeammateOption(DefaultTeammateOption);
+
+		TArray<class AActor*> OutActors;
+		GetAttachedActors(OutActors);
+		for (auto ActorPtr : OutActors)
+		{
+			if (auto BuildingAreaPtr = Cast<ABuildingArea>(ActorPtr))
+			{
+				GroupManaggerPtr->BuildingAreaPtr = BuildingAreaPtr;
+				
+				break;
+			}
+		}
 	}
 
 	bool bIsFirst = true;

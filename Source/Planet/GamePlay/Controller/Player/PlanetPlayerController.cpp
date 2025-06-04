@@ -53,14 +53,16 @@
 #include "PlayerGameplayTasks.h"
 #include "DataTableCollection.h"
 #include "InputProcessorSubSystem_Imp.h"
+#include "PlanetPlayerState.h"
+#include "RewardsTD.h"
 #include "TeamMatesHelperComponent.h"
 
 static TAutoConsoleVariable<int32> PlanetPlayerController_DrawControllerRotation(
-                                                                                 TEXT("PlanetPlayerController.DrawControllerRotation"),
-                                                                                 0,
-                                                                                 TEXT("")
-                                                                                 TEXT(" default: 0")
-                                                                                );
+	 TEXT("PlanetPlayerController.DrawControllerRotation"),
+	 0,
+	 TEXT("")
+	 TEXT(" default: 0")
+	);
 
 APlanetPlayerController::APlanetPlayerController(
 	const FObjectInitializer& ObjectInitializer
@@ -393,7 +395,8 @@ void APlanetPlayerController::UpdateCharacterTalent_Implementation(
 	int32 NewLevel
 	)
 {
-	auto TargetCharacterProxySPtr = GetGroupManagger()->GetInventoryComponent()->FindProxy<FModifyItemProxyStrategy_Character>(CharacterID);
+	auto TargetCharacterProxySPtr = GetGroupManagger()->GetInventoryComponent()->FindProxy<
+		FModifyItemProxyStrategy_Character>(CharacterID);
 	if (TargetCharacterProxySPtr)
 	{
 		TargetCharacterProxySPtr->UpdateTalentSocket(TalentSocket, NewLevel);
@@ -486,6 +489,19 @@ void APlanetPlayerController::OnPossess(
 				}
 			}
 #endif
+
+			auto PossessCharacterPtr = Cast<ACharacterBase>(InPawn);
+			if (PossessCharacterPtr)
+			{
+				MakedDamageDelegateHandle = PossessCharacterPtr->GetCharacterAbilitySystemComponent()->
+				                                                 MakedDamageDelegate.AddCallback(
+					                                                  std::bind(
+					                                                            &ThisClass::OnPossessCharacterMakedDamage,
+					                                                            this,
+					                                                            std::placeholders::_1
+					                                                           )
+					                                                 );
+			}
 		}
 		else if (InPawn->IsA(AHorseCharacter::StaticClass()))
 		{
@@ -510,6 +526,10 @@ void APlanetPlayerController::OnUnPossess()
 	auto CharacterPtr = Cast<FPawnType>(CurrentPawn);
 	if (CharacterPtr)
 	{
+		if (MakedDamageDelegateHandle)
+		{
+			MakedDamageDelegateHandle.Reset();
+		}
 	}
 
 	Super::OnUnPossess();
@@ -1421,6 +1441,61 @@ void APlanetPlayerController::OnRep_GroupSharedInfoChanged()
 
 void APlanetPlayerController::OnRep_WolrdProcess()
 {
+}
+
+void APlanetPlayerController::OnPossessCharacterMakedDamage(
+	const FOnEffectedTargetCallback& OnEffectedTargetCallback
+	)
+{
+	if (
+		!OnEffectedTargetCallback.TargetCharacterPtr
+	)
+	{
+		return;
+	}
+
+	const auto ProxyType = OnEffectedTargetCallback.TargetCharacterPtr->GetCharacterProxy()->GetProxyType();
+
+	if (
+		!ProxyType.MatchesTag(
+		                      UGameplayTagsLibrary::Proxy_Character_NPC_Assistional
+		                     )
+	)
+	{
+		return;
+	}
+
+	if (!OnEffectedTargetCallback.bIsDeath)
+	{
+	}
+
+	if (GetPlayerState<APlanetPlayerState>()->GetIsInChallenge())
+	{
+	}
+	else
+	{
+		const auto TableRow_RewardsItems_DefeatEnemyPtr = UDataTableCollection::GetInstance()->
+			GetTableRow_RewardsItems_DefeatEnemy(ProxyType);
+		if (TableRow_RewardsItems_DefeatEnemyPtr)
+		{
+			FGuid Guid = FGuid::NewGuid();
+
+			auto HICPtr = GetInventoryComponent();
+			for (const auto Iter : TableRow_RewardsItems_DefeatEnemyPtr->RewardsMap)
+			{
+				if (Iter.Key.MatchesTag(UGameplayTagsLibrary::Proxy))
+				{
+					HICPtr->AddProxy_Pending(Iter.Key, Iter.Value, Guid);
+				}
+				else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Experience))
+				{
+					AddExperience(Iter.Value);
+				}
+			}
+
+			HICPtr->SyncPendingProxy(Guid);
+		}
+	}
 }
 
 inline void APlanetPlayerController::AddProxy_Implementation(

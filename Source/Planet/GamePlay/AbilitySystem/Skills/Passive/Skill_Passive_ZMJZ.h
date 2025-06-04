@@ -19,7 +19,7 @@ class UGE_ZMJZImp;
 
 struct FGAEventData;
 struct FCharacterStateInfo;
-struct FOnEffectedTawrgetCallback;
+struct FOnEffectedTargetCallback;
 
 UCLASS()
 class PLANET_API UItemProxy_Description_PassiveSkill_ZMJZ : public UItemProxy_Description_PassiveSkill
@@ -57,7 +57,7 @@ class PLANET_API USkill_Passive_ZMJZ : public USkill_Passive_Base
 public:
 	using FMakedDamageHandle =
 	TCallbackHandleContainer<void(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 	)>::FCallbackHandleSPtr;
 
 	virtual void OnAvatarSet(
@@ -102,7 +102,7 @@ protected:
 	);
 
 	void MakedDamageDelegate(
-		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	);
 
 	void DurationDelegate(

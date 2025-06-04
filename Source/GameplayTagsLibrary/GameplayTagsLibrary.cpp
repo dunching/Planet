@@ -460,6 +460,9 @@ FGameplayTag UGameplayTagsLibrary::GEData_ModifyType_RemoveTemporary_Percent =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyType.RemoveTemporary.Percent")));
 
 
+FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_Experience =
+	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.Experience")));
+
 FGameplayTag UGameplayTagsLibrary::GEData_ModifyItem_CriticalDamage =
 	FGameplayTag::RequestGameplayTag(FName(TEXT("GEData.ModifyItem.CriticalDamage")));
 

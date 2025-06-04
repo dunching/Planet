@@ -90,7 +90,7 @@ void USkill_Active_Suppress::EndAbility(
 
 	if (MoveCompletedSignatureHandle)
 	{
-		MoveCompletedSignatureHandle->UnBindCallback();
+		MoveCompletedSignatureHandle.Reset();
 		MoveCompletedSignatureHandle = nullptr;
 	}
 

@@ -237,22 +237,22 @@ void UPawnStateActionHUD::DisEnable()
 {
 	for (auto Iter : OnAllocationSkillChangedDelegateAry)
 	{
-		Iter->UnBindCallback();
+		Iter.Reset();
 	}
 
 	if (OnCanAciveSkillChangedHandle)
 	{
-		OnCanAciveSkillChangedHandle->UnBindCallback();
+		OnCanAciveSkillChangedHandle.Reset();
 	}
 
 	if (ExperienceChangedDelegateHandle)
 	{
-		ExperienceChangedDelegateHandle->UnBindCallback();
+		ExperienceChangedDelegateHandle.Reset();
 	}
 
 	if (LevelExperienceChangedDelegateHandle)
 	{
-		LevelExperienceChangedDelegateHandle->UnBindCallback();
+		LevelExperienceChangedDelegateHandle.Reset();
 	}
 
 	ILayoutInterfacetion::DisEnable();

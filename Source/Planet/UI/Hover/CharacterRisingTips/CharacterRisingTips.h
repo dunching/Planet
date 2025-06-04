@@ -13,7 +13,7 @@
 
 #include "CharacterRisingTips.generated.h"
 
-struct FOnEffectedTawrgetCallback;
+struct FOnEffectedTargetCallback;
 
 class ACharacterBase;
 class UFightingTipsItem;
@@ -37,7 +37,7 @@ public:
 	 * @return 是否要显示，如果数据需要过滤或者数据无效 则不显示
 	 */
 	bool SetData(
-		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 		);
 
 protected:

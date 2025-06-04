@@ -12,7 +12,7 @@
 #include "PlanetModule.h"
 #include "GameOptions.h"
 #include "GameplayTagsLibrary.h"
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 #include "PlanetGameViewportClient.h"
 #include "TemplateHelper.h"
 #include "TextSubSystem.h"
@@ -39,7 +39,7 @@ void UCharacterRisingTips::NativeConstruct()
 }
 
 bool UCharacterRisingTips::SetData(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 	)
 {
 	if (!ReceivedEventModifyDataCallback.TargetCharacterPtr)
@@ -72,6 +72,8 @@ bool UCharacterRisingTips::SetData(
 			                    ReceivedEventModifyDataCallback.
 			                    ElementalType
 			                   );
+
+			return true;
 		}
 		else if (ReceivedEventModifyDataCallback.
 		         Damage > 0)
@@ -88,6 +90,8 @@ bool UCharacterRisingTips::SetData(
 			                    ReceivedEventModifyDataCallback.
 			                    ElementalType
 			                   );
+
+			return true;
 		}
 		else if (ReceivedEventModifyDataCallback.
 		         TherapeuticalDose > 0)
@@ -97,6 +101,8 @@ bool UCharacterRisingTips::SetData(
 			UIPtr->SetText(Text);
 
 			PlayTreatmentAnimation();
+
+			return true;
 		}
 		else
 		{
@@ -118,6 +124,8 @@ bool UCharacterRisingTips::SetData(
 					}
 
 					PlayStaminaAnimation();
+
+					return true;
 				}
 				else if (Iter.Key.MatchesTag(UGameplayTagsLibrary::GEData_ModifyItem_Mana))
 				{
@@ -135,12 +143,14 @@ bool UCharacterRisingTips::SetData(
 					}
 
 					PlayManaAnimation();
+
+					return true;
 				}
 			}
 		}
 	}
 
-	return true;
+	return false;
 }
 
 FVector UCharacterRisingTips::GetHoverPosition()

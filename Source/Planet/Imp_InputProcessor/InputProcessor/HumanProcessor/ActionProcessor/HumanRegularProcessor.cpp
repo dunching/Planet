@@ -128,7 +128,7 @@ namespace HumanProcessor
 
 		if (OnAllocationChangedHandle)
 		{
-			OnAllocationChangedHandle->UnBindCallback();
+			OnAllocationChangedHandle.Reset();
 		}
 
 		Super::QuitAction();

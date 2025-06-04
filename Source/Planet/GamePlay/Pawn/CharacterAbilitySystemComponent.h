@@ -44,7 +44,7 @@ struct FGameplayAbilityTargetData_TagModify;
 struct FGameplayAbilityTargetData;
 struct FGameplayEffectCustomExecutionParameters;
 struct FGameplayEffectCustomExecutionOutput;
-struct FOnEffectedTawrgetCallback;
+struct FOnEffectedTargetCallback;
 
 TMap<ECharacterPropertyType, FBaseProperty> GetAllData();
 
@@ -68,7 +68,7 @@ public:
 		)>;
 
 	using FMakedDamageDelegate = TCallbackHandleContainer<void(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 	
 		)>;
 
@@ -220,7 +220,7 @@ public:
 	// 对“其他”角色造成的影响（伤害、控制）
 	UFUNCTION(NetMulticast, Reliable)
 	void OnEffectOhterCharacter(
-		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 		);
 
 	virtual void OnGroupManaggerReady(

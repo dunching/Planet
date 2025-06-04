@@ -57,24 +57,24 @@ void UCharacterTitle::NativeDestruct()
 
 	if (MaxHPValueChanged)
 	{
-		MaxHPValueChanged->UnBindCallback();
+		MaxHPValueChanged.Reset();
 	}
 
 	if (CurrentHPValueChanged)
 	{
-		CurrentHPValueChanged->UnBindCallback();
+		CurrentHPValueChanged.Reset();
 	}
 
 	if (LevelChangedDelegateHandle)
 	{
-		LevelChangedDelegateHandle->UnBindCallback();
+		LevelChangedDelegateHandle.Reset();
 	}
 
 	for (auto Iter : ValueChangedAry)
 	{
 		if (Iter)
 		{
-			Iter->UnBindCallback();
+			Iter.Reset();
 		}
 	}
 

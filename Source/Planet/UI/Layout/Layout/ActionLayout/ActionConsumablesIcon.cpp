@@ -302,7 +302,7 @@ void UActionConsumablesIcon::NativeDestruct()
 {
 	if (OnValueChangedDelegateHandle)
 	{
-		OnValueChangedDelegateHandle->UnBindCallback();
+		OnValueChangedDelegateHandle.Reset();
 	}
 
 	Super::NativeDestruct();

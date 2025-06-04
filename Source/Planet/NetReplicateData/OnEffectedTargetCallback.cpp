@@ -1,11 +1,11 @@
 
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 
 #include "ConversationComponent.h"
 #include "TeamMatesHelperComponentBase.h"
 #include "CharacterBase.h"
 
-bool FOnEffectedTawrgetCallback::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
+bool FOnEffectedTargetCallback::NetSerialize(FArchive& Ar, class UPackageMap* Map, bool& bOutSuccess)
 {
 	Ar << InstigatorCharacterPtr;
 	Ar << TargetCharacterPtr;

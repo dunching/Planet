@@ -47,7 +47,7 @@ void UHumanAnimInstance::BeginDestroy()
 {
 	if (MoveSpeedChangedHandle)
 	{
-		MoveSpeedChangedHandle->UnBindCallback();
+		MoveSpeedChangedHandle.Reset();
 	}
 
 	Super::BeginDestroy();

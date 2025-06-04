@@ -27,6 +27,8 @@ struct FBasicProxy;
 struct FTableRowProxy_TagExtendInfo;
 struct FTableRowProxy_CharacterGrowthAttribute;
 struct FTableRow_Regions;
+struct FTableRow_TalenSocket;
+struct FTableRow_RewardsItems_DefeatEnemy;
 
 PLANET_API FTableRowProxy_CommonCooldownInfo* GetTableRowProxy_CommonCooldownInfo(
 	const FGameplayTag& CommonCooldownTag
@@ -64,6 +66,10 @@ public:
 		FGameplayTag UnitType
 		) const;
 
+	const FTableRow_RewardsItems_DefeatEnemy* GetTableRow_RewardsItems_DefeatEnemy(
+		FGameplayTag UnitType
+		) const;
+
 	TArray<FTableRow_Regions*> GetTableRow_AllRegions() const;
 
 	TArray<FTableRowProxy_CharacterGrowthAttribute*> GetTableRow_CharacterGrowthAttribute() const;
@@ -93,6 +99,9 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "Talent")
 	TSoftObjectPtr<UDataTable> TableRow_TalenSocket;
+
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "RewardsItems")
+	TSoftObjectPtr<UDataTable> TableRow_RewardsItems_DefeatEnemy;
 };
 
 template <typename ItemProxy_DescriptionType>

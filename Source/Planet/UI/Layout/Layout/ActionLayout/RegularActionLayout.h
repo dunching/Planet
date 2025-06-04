@@ -13,7 +13,7 @@
 #include "RegularActionLayout.generated.h"
 
 struct FOnAttributeChangeData;
-struct FOnEffectedTawrgetCallback;
+struct FOnEffectedTargetCallback;
 
 class AGuideThread;
 class AGuideThreadBase;
@@ -105,7 +105,7 @@ private:
 
 protected:
 	void OnEffectOhterCharacter(
-		const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+		const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 		);
 
 #pragma region MenusUI
@@ -136,7 +136,7 @@ protected:
 		)>::FCallbackHandleSPtr FocusCharacterDelegateSPtr;
 
 	TCallbackHandleContainer<void(
-		const FOnEffectedTawrgetCallback&
+		const FOnEffectedTargetCallback&
 		)>::FCallbackHandleSPtr EffectOhterCharacterCallbackDelegate;
 
 private:

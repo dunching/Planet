@@ -18,7 +18,7 @@
 #include "GameplayTagsLibrary.h"
 #include "GE_Common.h"
 #include "ItemProxy_Skills.h"
-#include "OnEffectedTawrgetCallback.h"
+#include "OnEffectedTargetCallback.h"
 
 void UItemDecription_Skill_PassiveSkill_ZMJZ::SetUIStyle()
 {
@@ -83,7 +83,7 @@ void USkill_Passive_ZMJZ::OnRemoveAbility(
 {
 	if (AbilityActivatedCallbacksHandle)
 	{
-		AbilityActivatedCallbacksHandle->UnBindCallback();
+		AbilityActivatedCallbacksHandle.Reset();
 	}
 
 	Super::OnRemoveAbility(ActorInfo, Spec);
@@ -170,7 +170,7 @@ void USkill_Passive_ZMJZ::ModifyGASpeed(
 }
 
 void USkill_Passive_ZMJZ::MakedDamageDelegate(
-	const FOnEffectedTawrgetCallback& ReceivedEventModifyDataCallback
+	const FOnEffectedTargetCallback& ReceivedEventModifyDataCallback
 )
 {
 	if (CharacterPtr)

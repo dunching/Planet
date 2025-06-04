@@ -186,7 +186,7 @@ void UGameplayTask_WaitPlayerEquipment::OnDestroy(
 
 	if (MemberChangedDelegate)
 	{
-		MemberChangedDelegate->UnBindCallback();
+		MemberChangedDelegate.Reset();
 	}
 
 	Super::OnDestroy(bInOwnerFinished);
@@ -276,11 +276,11 @@ void UGameplayTask_WaitOpenLayout::OnDestroy(
 {
 	if (OnSwitchToLayout)
 	{
-		OnSwitchToLayout->UnBindCallback();
+		OnSwitchToLayout.Reset();
 	}
 	if (OnSwitchToMenuLayout)
 	{
-		OnSwitchToMenuLayout->UnBindCallback();
+		OnSwitchToMenuLayout.Reset();
 	}
 
 	Super::OnDestroy(bInOwnerFinished);
